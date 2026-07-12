@@ -95,12 +95,18 @@ sub _build_operations {
   }
 
   # Normal index diff for every table that is NOT being rebuilt (rebuilt
-  # tables' indexes are handled above).
+  # tables' indexes are handled above). The full tables sections are threaded
+  # through so Diff::Index can suppress a standalone DROP INDEX for any index
+  # whose owning table is itself being dropped this pass -- SQLite's DROP TABLE
+  # already removes those indexes (karr #14).
   my %src_idx = %{ $self->source->{indexes} // {} };
   my %tgt_idx = %{ $self->target->{indexes} // {} };
   delete @src_idx{ keys %needs_rebuild };
   delete @tgt_idx{ keys %needs_rebuild };
-  push @ops, DBIO::SQLite::Diff::Index->diff(\%src_idx, \%tgt_idx);
+  push @ops, DBIO::SQLite::Diff::Index->diff(
+    \%src_idx, \%tgt_idx,
+    $self->source->{tables}, $self->target->{tables},
+  );
 
   return \@ops;
 }
@@ -119,7 +125,7 @@ DBIO::SQLite::Diff - Compare two introspected SQLite models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,68 @@
 Revision history for DBIO-MSSQL
 
+0.900001  2026-07-12
+    * Diff
+        - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr #15,
+          from core #77 / dbio-postgresql #32). When diff reconciled a live
+          schema containing a table absent from the target (removed from the
+          app's DBIO classes, or an unmanaged leftover), it emitted both
+          DROP TABLE <t> and a later standalone DROP INDEX <idx> ON <t>; since
+          MSSQL's DROP TABLE already removes the table's own indexes, the
+          standalone DROP INDEX failed once the table was gone ("Invalid object
+          name") and aborted apply()/upgrade(). DBIO::MSSQL::Diff::Index now
+          receives the tables sections (threaded in by DBIO::MSSQL::Diff) and
+          suppresses a standalone DROP INDEX for any index whose owning table is
+          itself being dropped in the same pass. Indexes of surviving tables are
+          still dropped as before; the two-argument diff() call stays backward
+          compatible (absent table sections suppress nothing).
+
+    * Tests
+        - Add t/51-diff-drop-table-index-cascade.t and extend t/50-diff.t:
+          full-diff regression for the DROP INDEX / DROP TABLE collision
+          (karr #15) plus Diff::Index unit cases for the tables-aware drop
+          suppression and its over-suppression guard.
+
+    * Storage
+        - new DBIO::MSSQL::Storage::ODBC (DBD::ODBC transport on top of the
+          transport-neutral DBIO::MSSQL::Storage base). ODBC connections are now
+          reblessed into this class instead of DBIO::MSSQL::Storage::Sybase, so
+          the ODBC path no longer pulls in DBIO::Sybase. The Sybase class stays
+          for the DBD::Sybase path. Needs DBIO core with the matching connector
+          mapping.
+
+    * Tests
+        - skip the optional-dependency tests instead of failing when
+          DBIO::Sybase (DBD::Sybase path) or DBIO::SQLite (SQL-comparison
+          test helper) is not installed (Codeberg #1)
+        - t/10-mssql.t and t/20-mssql-core.t: port leftover DBIx::Class names
+          to the DBIO storage classes (DBIO::MSSQL::Storage::Sybase /
+          ::NoBindVars) and the surviving PK::Auto compat shim, so the
+          DBD::Sybase path reblesses and runs against a live server; skip the
+          multiple-active-statements sections (need dynamic-cursor/MARS support
+          not ported to DBIO) consistently instead of dying mid-file; and
+          replace the removed-API "RNO detection" block (sql_limit_dialect /
+          sql_maker->{limit_dialect}) with an assertion that the storage is
+          wired to DBIO::MSSQL::SQLMaker (apply_limit). Both files now run
+          green to exit 0 over a named-server dbi:Sybase: DSN.
+
+    * Fixes
+        - DBIO::MSSQL::Storage::Sybase::_init compared the FreeTDS version
+          with a numeric '>', but modern versions like "1.3.17" aren't valid
+          numbers, warning "Argument ... isn't numeric" on every connect over
+          the Sybase/FreeTDS transport. Now compared via version->parse
+          (dotted-version, matching the ASE sibling); behaviour unchanged
+          (1.3.17 > 0.82 still disables statement caching, the ||999
+          sentinel for an undeterminable version is preserved). MARS
+          (multiple-active-statements) support was investigated and
+          confirmed infeasible on this transport -- documented as a
+          permanent limitation, not a gap to close. karr #13, #14.
+
+    * Dependencies
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. Microsoft SQL Server driver for DBIO.
 

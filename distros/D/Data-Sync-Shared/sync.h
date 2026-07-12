@@ -50,7 +50,9 @@
 #define SYNC_ERR_BUFLEN      256
 #define SYNC_SPIN_LIMIT      32
 #define SYNC_LOCK_TIMEOUT_SEC 2
+#ifndef SYNC_READER_SLOTS
 #define SYNC_READER_SLOTS    1024  /* per-process reader-counter mirror for RWLock */
+#endif
 
 /* ================================================================
  * Per-process reader-slot table (for RWLock dead-reader recovery)
@@ -80,7 +82,11 @@ typedef struct {
     uint32_t param;          /* 12: type-specific (sem max, barrier count, etc.) */
     uint64_t total_size;     /* 16: mmap size */
     uint64_t reader_slots_off;/* 24: offset of SyncReaderSlot[SYNC_READER_SLOTS], 0 if not allocated (non-RWLock primitives) */
-    uint8_t  _pad0[32];      /* 32-63 */
+    uint32_t slotless_readers;/* 32: RWLock live readers holding the lock with NO reader-slot
+                                     (claimed when the slot table was full). Keeps dead-reader
+                                     recovery from force-resetting the lock word out from under
+                                     them. Defaults to 0, so images from before this field (was padding) stay compatible. */
+    uint8_t  _pad0[28];      /* 36-63 */
 
     /* ---- Cache line 1 (64-127): mutable state ---- */
 
@@ -127,6 +133,7 @@ typedef struct {
     uint32_t    my_slot_idx; /* UINT32_MAX = unclaimed; per-process slot index */
     uint32_t    cached_pid;  /* getpid() at claim time */
     uint32_t    cached_fork_gen; /* fork-generation at claim time */
+    uint32_t    slotless_held; /* rwlock read-locks this handle holds without a reader-slot */
 } SyncHandle;
 
 /* ================================================================
@@ -188,6 +195,8 @@ static inline void sync_recover_stale_mutex(SyncHeader *hdr, uint32_t observed) 
             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
@@ -204,6 +213,9 @@ static inline void sync_mutex_lock(SyncHeader *hdr) {
             continue;
         }
         __atomic_add_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+        /* StoreLoad: publish mutex_waiters++ before re-reading mutex, so an
+         * unlocker sees our registration or we see the unlock (cur==0 -> retry). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t cur = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->mutex, FUTEX_WAIT, cur,
@@ -227,6 +239,8 @@ static inline void sync_mutex_lock(SyncHeader *hdr) {
 
 static inline void sync_mutex_unlock(SyncHeader *hdr) {
     __atomic_store_n(&hdr->mutex, 0, __ATOMIC_RELEASE);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
@@ -251,6 +265,8 @@ static inline void sync_recover_stale_rwlock(SyncHeader *hdr, uint32_t observed)
             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -275,6 +291,7 @@ static inline void sync_claim_reader_slot(SyncHandle *h) {
     pthread_once(&sync_atfork_once, sync_atfork_init);
     uint32_t cur_gen = __atomic_load_n(&sync_fork_gen, __ATOMIC_RELAXED);
     if (h->cached_fork_gen != cur_gen) {
+        if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
         h->cached_fork_gen = cur_gen;
         h->my_slot_idx = UINT32_MAX;
     }
@@ -354,24 +371,50 @@ static inline void sync_recover_dead_readers(SyncHandle *h) {
         if (sync_drain_dead_slot(h, i, pid)) any_recovery = 1;
     }
 
+    /* A live reader that could not claim a slot (table was full) is invisible
+     * to the scan above, yet still holds a +1 in the lock word. Treat any
+     * such slotless reader as a live reader so force-reset never zeroes the
+     * lock out from under it (which would let a writer in -> writer-exclusion
+     * violation). It is mirrored in hdr->slotless_readers exactly as slotted
+     * readers are mirrored via their slot subcount. */
+    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
+        any_live_reader = 1;
+
     /* Pass 2: only if force-reset will fire.  Issue the rwlock CAS first
      * to keep the race window with new readers narrow, then wipe the
      * deferred dead slots. */
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its value CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->value, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
+            for (uint32_t i = 0; !live_now && i < SYNC_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && sync_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->value, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 any_recovery = 1;
+                /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
                 if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* value changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0) continue;
-            if (sync_pid_alive(pid)) continue;
-            if (sync_drain_dead_slot(h, i, pid)) any_recovery = 1;
+        if (drain_ok) {
+            for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || sync_pid_alive(p)) continue;
+                if (sync_drain_dead_slot(h, i, p)) any_recovery = 1;
+            }
         }
     }
     if (any_recovery)
@@ -427,25 +470,57 @@ static inline void sync_recover_after_timeout(SyncHandle *h) {
     }
 }
 
+/* ---- Reader accounting (slot subcount, or global slotless count) ----
+ * A reader mirrors its +1 in the lock word so dead-reader recovery can see
+ * it. A slotted reader uses its reader-slot subcount; a reader that could not
+ * claim a slot (table full) uses the global hdr->slotless_readers instead, so
+ * recovery's force-reset never fires out from under it. enter() is called
+ * BEFORE the lock CAS (in-flight visibility); abort() undoes it when the
+ * acquire fails; leave() undoes it on unlock, peeling slotless first so a
+ * later slot claim cannot misattribute the decrement. */
+static inline void sync_reader_enter(SyncHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held++;
+    }
+}
+static inline void sync_reader_abort(SyncHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held--;
+    }
+}
+static inline void sync_reader_leave(SyncHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    }
+}
+
 static inline void sync_rwlock_rdlock(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     sync_claim_reader_slot(h);
     uint32_t *lock = &hdr->value;
     uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    /* Bump per-process subcount BEFORE attempting the rwlock CAS so a
-     * concurrent recovery scan sees us as a live in-flight reader. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    /* Mirror our reader contribution BEFORE the rwlock CAS so a concurrent
+     * recovery scan sees us as a live in-flight reader (slotted or slotless). */
+    sync_reader_enter(h);
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Write-preferring: yield to parked writers when lock is free. */
         if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
@@ -453,6 +528,9 @@ static inline void sync_rwlock_rdlock(SyncHandle *h) {
             continue;
         }
         sync_park_reader(h);
+        /* StoreLoad: publish our parked-waiter registration before re-reading
+         * the lock word (weak-memory lost-wakeup guard). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Sleep when write-locked OR yielding to parked writers (cur==0) */
         if (cur >= SYNC_RWLOCK_WRITER_BIT || cur == 0) {
@@ -504,21 +582,20 @@ static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
     int has_deadline = (timeout > 0);
     if (has_deadline) sync_make_deadline(timeout, &deadline);
 
-    /* Bump per-process subcount BEFORE attempting the rwlock CAS so a
-     * concurrent recovery scan sees us as a live in-flight reader. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    /* Register as an in-flight reader (slotted subcount or slotless) BEFORE the
+     * rwlock CAS so a concurrent recovery scan sees us as live. */
+    sync_reader_enter(h);
 
     uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return 1;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return 1;
         }
         if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
@@ -526,6 +603,9 @@ static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
             continue;
         }
         sync_park_reader(h);
+        /* StoreLoad: publish our parked-waiter registration before re-reading
+         * the lock word (weak-memory lost-wakeup guard). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur >= SYNC_RWLOCK_WRITER_BIT || cur == 0) {
             struct timespec *pts = NULL;
@@ -535,8 +615,7 @@ static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
             if (has_deadline) {
                 if (!sync_remaining_time(&deadline, &remaining)) {
                     sync_unpark_reader(h);
-                    if (h->my_slot_idx != UINT32_MAX)
-                        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+                    sync_reader_abort(h);
                     return 0;
                 }
                 if (remaining.tv_sec >= SYNC_LOCK_TIMEOUT_SEC) {
@@ -556,8 +635,7 @@ static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
                  * user's deadline), run the recovery scan; otherwise it's
                  * the user's deadline expiring and we should return 0. */
                 if (!capped) {
-                    if (h->my_slot_idx != UINT32_MAX)
-                        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+                    sync_reader_abort(h);
                     return 0;
                 }
                 if (cur >= SYNC_RWLOCK_WRITER_BIT) {
@@ -586,19 +664,16 @@ static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
 static inline int sync_rwlock_try_rdlock(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     sync_claim_reader_slot(h);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    sync_reader_enter(h);
     uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
     if (cur >= SYNC_RWLOCK_WRITER_BIT) {
-        if (h->my_slot_idx != UINT32_MAX)
-            __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        sync_reader_abort(h);
         return 0;
     }
     if (__atomic_compare_exchange_n(&hdr->value, &cur, cur + 1,
                 1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return 1;
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    sync_reader_abort(h);
     return 0;
 }
 
@@ -608,8 +683,10 @@ static inline void sync_rwlock_rdunlock(SyncHandle *h) {
      * sees subcount > 0 with our (live) PID will (correctly) treat us as
      * an in-flight reader and skip force-reset. */
     uint32_t prev = __atomic_sub_fetch(&hdr->value, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    sync_reader_leave(h);
+    /* StoreLoad: publish the reader-count decrement before reading waiters
+     * (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (prev == 0 && __atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -629,6 +706,8 @@ static inline void sync_rwlock_wrlock(SyncHandle *h) {
             continue;
         }
         sync_park_writer(h);
+        /* StoreLoad: see the rdlock park path (weak-memory lost-wakeup guard). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur != 0) {
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
@@ -668,6 +747,8 @@ static inline int sync_rwlock_wrlock_timed(SyncHandle *h, double timeout) {
             continue;
         }
         sync_park_writer(h);
+        /* StoreLoad: see the rdlock park path (weak-memory lost-wakeup guard). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur != 0) {
             struct timespec *pts = NULL;
@@ -714,6 +795,8 @@ static inline int sync_rwlock_try_wrlock(SyncHandle *h) {
 static inline void sync_rwlock_wrunlock(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -724,9 +807,10 @@ static inline void sync_rwlock_wrunlock(SyncHandle *h) {
 static inline void sync_rwlock_downgrade(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     sync_claim_reader_slot(h);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    sync_reader_enter(h);
     __atomic_store_n(&hdr->value, 1, __ATOMIC_RELEASE);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -873,6 +957,8 @@ static inline void sync_sem_release(SyncHandle *h) {
         if (__atomic_compare_exchange_n(&hdr->value, &cur, next,
                 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
             __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
+            /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
                 syscall(SYS_futex, &hdr->value, FUTEX_WAKE, 1, NULL, NULL, 0);
             return;
@@ -890,6 +976,8 @@ static inline void sync_sem_release_n(SyncHandle *h, uint32_t n) {
         if (__atomic_compare_exchange_n(&hdr->value, &cur, next,
                 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
             __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
+            /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0) {
                 uint32_t wake = n < (uint32_t)INT_MAX ? n : INT_MAX;
                 syscall(SYS_futex, &hdr->value, FUTEX_WAKE, wake, NULL, NULL, 0);
@@ -947,6 +1035,8 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
             uint32_t old_g = __atomic_load_n(&hdr->generation, __ATOMIC_RELAXED);
             if (old_g & SYNC_BARRIER_BROKEN_BIT) {
                 __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
+                /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
                 if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
                 return -1;
@@ -957,6 +1047,8 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
                 break;
         }
         __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
+        /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
         return 1;  /* leader */
@@ -1028,6 +1120,8 @@ static inline void sync_barrier_reset(SyncHandle *h) {
                 0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
             break;
     }
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -1117,6 +1211,8 @@ static inline void sync_condvar_signal(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     __atomic_add_fetch(&hdr->value, 1, __ATOMIC_RELEASE);
     __atomic_add_fetch(&hdr->stat_signals, 1, __ATOMIC_RELAXED);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
@@ -1125,6 +1221,8 @@ static inline void sync_condvar_broadcast(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     __atomic_add_fetch(&hdr->value, 1, __ATOMIC_RELEASE);
     __atomic_add_fetch(&hdr->stat_signals, 1, __ATOMIC_RELAXED);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -1195,6 +1293,8 @@ static inline int sync_once_enter(SyncHandle *h, double timeout) {
                 if (__atomic_compare_exchange_n(&hdr->value, &val, SYNC_ONCE_INIT,
                         0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
                     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+                    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+                    __atomic_thread_fence(__ATOMIC_SEQ_CST);
                     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
                         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
                 }
@@ -1226,6 +1326,8 @@ static inline void sync_once_done(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     __atomic_store_n(&hdr->value, SYNC_ONCE_DONE, __ATOMIC_RELEASE);
     __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -1233,6 +1335,8 @@ static inline void sync_once_done(SyncHandle *h) {
 static inline void sync_once_reset(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     __atomic_store_n(&hdr->value, SYNC_ONCE_INIT, __ATOMIC_RELEASE);
+    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -1261,8 +1365,25 @@ static inline uint64_t sync_layout_slots_off(uint32_t type) {
     return (type == SYNC_TYPE_RWLOCK) ? sizeof(SyncHeader) : 0;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int sync_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { SYNC_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        SYNC_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    SYNC_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
-                                uint32_t initial, char *errbuf) {
+                                uint32_t initial, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
     if (type > SYNC_TYPE_ONCE) { SYNC_ERR("unknown type %u", type); return NULL; }
@@ -1298,8 +1419,8 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         goto setup_handle;
     } else {
-        int fd = open(path, O_RDWR | O_CREAT, 0666);
-        if (fd < 0) { SYNC_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        int fd = sync_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
 
         if (flock(fd, LOCK_EX) < 0) {
             SYNC_ERR("flock(%s): %s", path, strerror(errno));
@@ -1384,9 +1505,19 @@ setup_handle:;
     h->path         = path ? strdup(path) : NULL;
     h->notify_fd    = -1;
     h->backing_fd   = -1;
-    h->reader_slots = (hdr->reader_slots_off > 0)
-        ? (SyncReaderSlot *)((char *)base + hdr->reader_slots_off)
+    /* Layer B: reader_slots_off is read from the (attacker-writable) mmap image
+     * and used as a pointer offset; bound it against the mapping size so a
+     * poisoned offset yields NULL instead of an out-of-bounds pointer. Valid
+     * images use 0 (non-RWLock) or sizeof(SyncHeader) (RWLock), both in range. */
+    {
+    uint64_t rso = hdr->reader_slots_off;
+    uint64_t need_slots = (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
+    h->reader_slots = (rso > 0 && rso <= (uint64_t)map_size &&
+                       (uint64_t)map_size - rso >= need_slots &&
+                       (rso & (uint64_t)(_Alignof(SyncReaderSlot) - 1)) == 0)
+        ? (SyncReaderSlot *)((char *)base + rso)
         : NULL;
+    }
     h->my_slot_idx  = UINT32_MAX;
 
     return h;
@@ -1505,9 +1636,17 @@ static SyncHandle *sync_open_fd(int fd, uint32_t type, char *errbuf) {
     h->path         = NULL;
     h->notify_fd    = -1;
     h->backing_fd   = myfd;
-    h->reader_slots = (hdr->reader_slots_off > 0)
-        ? (SyncReaderSlot *)((char *)base + hdr->reader_slots_off)
+    /* Layer B: bound the mmap-supplied reader_slots_off against the mapping
+     * size before using it as a pointer offset (see sync_create). */
+    {
+    uint64_t rso = hdr->reader_slots_off;
+    uint64_t need_slots = (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
+    h->reader_slots = (rso > 0 && rso <= (uint64_t)map_size &&
+                       (uint64_t)map_size - rso >= need_slots &&
+                       (rso & (uint64_t)(_Alignof(SyncReaderSlot) - 1)) == 0)
+        ? (SyncReaderSlot *)((char *)base + rso)
         : NULL;
+    }
     h->my_slot_idx  = UINT32_MAX;
 
     return h;
@@ -1519,7 +1658,9 @@ static void sync_destroy(SyncHandle *h) {
      * since we claimed it. A forked child that inherits the handle but never
      * acquired the lock itself must NOT clear the parent's slot. */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
-        h->cached_fork_gen == __atomic_load_n(&sync_fork_gen, __ATOMIC_RELAXED)) {
+        h->cached_fork_gen == __atomic_load_n(&sync_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        /* subcount==0: a still-held lock's slot must survive for recovery */
         uint32_t expected = h->cached_pid;
         /* CAS pid -> 0; do NOT clear subcount/wp/writp — between the CAS and
          * a follow-up store, a new process could claim the slot, and our

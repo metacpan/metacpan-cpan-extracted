@@ -10,8 +10,8 @@ sub fondation_meta {
         dependencies => ['Fondation::Model::DBIx::Async'],
         defaults     => {
             models => {
-                user    => { source => 'users' },
-                article => { source => 'articles' },
+                user    => { source => 'User' },
+                article => { source => 'Article' },
             },
         },
     };

@@ -389,7 +389,7 @@ DBIO::PostgreSQL::Introspect - Introspect a PostgreSQL database via pg_catalog
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

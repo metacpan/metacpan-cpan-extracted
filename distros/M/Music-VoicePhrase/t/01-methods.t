@@ -13,6 +13,7 @@ subtest defaults => sub {
     is $obj->base, 'C', 'base';
     is $obj->scale, 'major', 'scale';
     is $obj->octave, 0, 'octave';
+    is $obj->name, 'part', 'name';
     is $obj->patch, 0, 'patch';
     is $obj->gate, 1, 'gate';
     is scalar $obj->pitches->@*, 14, 'pitches';

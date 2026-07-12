@@ -15,9 +15,7 @@ sub usage {
 Usage: dbioadmin [OPTIONS]
 
 Actions (pick one):
-  --create            Create DDL files / diffs
   --upgrade           Upgrade the database to the current schema
-  --install           Install schema version metadata
   --deploy            Deploy the schema to the database
   --select            Select data from a resultset
   --insert            Insert data into a resultset
@@ -34,11 +32,8 @@ Arguments:
   --config-stanza=PATH  Stanza path for connect_info (e.g. Model::DB)
   --resultset=CLASS     Resultset to operate on for select/insert/update/delete
   --class=CLASS         Alias for --resultset
-  --sql-dir=DIR         SQL directory for create/upgrade/deploy
-  --sql-type=TYPE       SQL translator type for create
-  --version=VERSION     Version for install
-  --preversion=VERSION  Previous version for create-diff
-  --mode=MODE           upgrade mode: auto|native|legacy (default: auto)
+  --sql-dir=DIR         SQL directory for deploy
+  --mode=MODE           upgrade mode: auto|native (default: auto)
   --set=JSON            JSON payload for insert/update
   --attrs=JSON          JSON attrs hash for search
   --where=JSON          JSON where hash for search
@@ -57,9 +52,7 @@ my %opts;
 my @include_paths;
 
 GetOptions(
-  'create'          => \$opts{create},
   'upgrade'         => \$opts{upgrade},
-  'install'         => \$opts{install},
   'deploy'          => \$opts{deploy},
   'select'          => \$opts{select},
   'insert'          => \$opts{insert},
@@ -73,9 +66,6 @@ GetOptions(
   'config-stanza=s' => \$opts{config_stanza},
   'resultset|resultset-class|class=s' => \$opts{resultset},
   'sql-dir=s'       => \$opts{sql_dir},
-  'sql-type=s'      => \$opts{sql_type},
-  'version=s'       => \$opts{version},
-  'preversion=s'    => \$opts{preversion},
   'mode=s'          => \$opts{mode},
   'set=s'           => \$opts{set},
   'attrs=s'         => \$opts{attrs},
@@ -98,7 +88,7 @@ if (@include_paths) {
 require DBIO::Admin;
 
 my $action;
-for my $act (qw(create upgrade install deploy select insert update delete)) {
+for my $act (qw(upgrade deploy select insert update delete)) {
   if ($opts{$act}) {
     die "Multiple actions specified\n" if $action;
     $action = $act;
@@ -122,8 +112,8 @@ elsif ($opts{connect_info_hash}) {
   $admin_args{connect_info} = $opts{connect_info_hash};
 }
 
-for my $key (qw(config_file config_stanza resultset sql_dir sql_type
-                version preversion mode set attrs where force trace quiet)) {
+for my $key (qw(config_file config_stanza resultset sql_dir
+                mode set attrs where force trace quiet)) {
   $admin_args{$key} = $opts{$key} if defined $opts{$key};
 }
 
@@ -171,7 +161,7 @@ dbioadmin - CLI for DBIO schema administration
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -182,10 +172,6 @@ version 0.900000
     dbioadmin --schema-class=MyApp::Schema \
               --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
               --upgrade
-
-    dbioadmin --schema-class=MyApp::Schema \
-              --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
-              --create --sql-dir=./sql --sql-type=PostgreSQL
 
     dbioadmin --schema-class=MyApp::Schema \
               --connect='["dbi:Pg:dbname=myapp","user","pass",{}]' \
@@ -203,7 +189,7 @@ version 0.900000
 
 C<dbioadmin> is the CLI frontend for L<DBIO::Admin>. It connects to a
 database using a DBIO schema class and performs administrative operations:
-DDL generation, schema deployment and upgrade, and basic data manipulation.
+schema deployment and upgrade, and basic data manipulation.
 
 For programmatic use, see L<DBIO::Admin>.
 
@@ -224,16 +210,6 @@ result sources defined in the schema class.
 
 Upgrade the database to the current schema version. The upgrade strategy is
 controlled by C<--mode>.
-
-=item B<--create>
-
-Generate DDL files (and optionally diff files) into C<--sql-dir>. Requires
-C<--sql-dir>. Pass C<--preversion> to generate a diff from a previous version.
-
-=item B<--install>
-
-Install schema version metadata into the database without running DDL. Use
-C<--version> to specify the version to record.
 
 =item B<--select>
 
@@ -335,27 +311,14 @@ C<--select> and C<--delete>.
 
 =item B<--sql-dir=DIR>
 
-Directory for reading and writing SQL files. Required for C<--create>;
-optional for C<--upgrade> and C<--deploy>.
-
-=item B<--sql-type=TYPE>
-
-SQL translator type for C<--create>, e.g. C<PostgreSQL>, C<MySQL>, C<SQLite>.
-
-=item B<--version=VERSION>
-
-Version string to record when using C<--install>.
-
-=item B<--preversion=VERSION>
-
-Previous version when generating a diff with C<--create>.
+Directory of pre-generated SQL DDL files to read from when running
+C<--deploy>. Optional.
 
 =item B<--mode=MODE>
 
-Upgrade strategy. One of C<auto> (default), C<native>, or C<legacy>.
-C<auto> uses a native driver upgrade path when available and falls back to
-the legacy C<DBIO::Schema::Versioned> path otherwise. C<native> requires
-native driver support. C<legacy> requires C<DBIO::Schema::Versioned>.
+Upgrade strategy. One of C<auto> (default) or C<native>. Both use the native
+driver upgrade path; C<--upgrade> fails with a clear error if the
+schema/driver provides no native upgrader.
 
 =back
 
@@ -371,7 +334,7 @@ Output format for C<--select>: C<tsv> (tab-separated, default) or C<csv>
 =item B<--force>
 
 Skip confirmation prompts for destructive operations (C<--update>,
-C<--delete>, C<--install> with C<--force>).
+C<--delete>).
 
 =item B<--trace>
 

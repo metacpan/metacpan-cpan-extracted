@@ -975,3 +975,8 @@ int32_t pdfmake_crypt_get_permissions(const pdfmake_crypt_ctx_t *ctx)
 {
     return ctx->P;
 }
+
+void pdfmake_cfree(void *ptr)
+{
+    free(ptr);
+}

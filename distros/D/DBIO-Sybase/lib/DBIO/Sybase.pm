@@ -1,5 +1,5 @@
 package DBIO::Sybase;
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 # ABSTRACT: Sybase-specific schema management for DBIO
 
 use strict;
@@ -30,7 +30,7 @@ DBIO::Sybase - Sybase-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

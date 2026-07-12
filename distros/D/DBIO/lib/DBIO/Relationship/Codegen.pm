@@ -171,7 +171,7 @@ DBIO::Relationship::Codegen - Schema-time relationship method synthesis (accesso
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

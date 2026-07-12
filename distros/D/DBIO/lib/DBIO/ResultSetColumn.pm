@@ -277,13 +277,17 @@ DBIO::ResultSetColumn - Convenience wrapper for working with a single ResultSet 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
   $rs = $schema->resultset('CD')->search({ artist => 'Tool' });
   $rs_column = $rs->get_column('year');
   $max_year = $rs_column->max; #returns latest year
+
+See F<t/resultset/get_column_max.t> for a runnable example of the scalar
+aggregate return shown above (and F<t/resultset/as_query.t> for the
+C<< ->as_query >>/C<*_rs> resultset builders).
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,47 @@
 Revision history for DBIO-DuckDB
 
+0.900001  2026-07-12
+    * Fixes
+        - Every croak in DBIO::DuckDB::Storage (17 sites, including the
+          private _validate_quack_addr / _validate_quack_token helpers) now
+          routes through the inherited $self->throw_exception, so callers can
+          catch driver errors with $e->isa('DBIO::Exception') like the rest
+          of the family, instead of a plain Carp croak. Messages are
+          preserved verbatim; there is no DBIO::Exception::* subclass
+          taxonomy in core, so this is the same flat DBIO::Exception every
+          other driver throws. karr #7.
+
+    * Diff
+        - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr #8).
+          When diff reconciled a live schema containing a table absent from the
+          target (removed from the app's DBIO classes, or an unmanaged
+          leftover), it emitted both DROP TABLE <t> and a later standalone
+          DROP INDEX <t_idx>; since DuckDB's DROP TABLE already removes the
+          table's own indexes, and as_sql orders tables before indexes, the
+          standalone DROP INDEX failed once the table was gone and aborted
+          apply()/upgrade(). DBIO::DuckDB::Diff::Index now receives the tables
+          sections (threaded in by DBIO::DuckDB::Diff) and suppresses a
+          standalone DROP INDEX for any index whose owning table is itself
+          being dropped in the same pass. Indexes of surviving tables are still
+          dropped as before; the two-argument diff() call stays backward
+          compatible (absent table sections yield an empty dropped set).
+
+    * Tests
+        - Add t/41-diff-drop-table-index.t: full-diff regression for the
+          DROP INDEX / DROP TABLE collision (karr #8) plus Diff::Index unit
+          cases for the tables-aware drop suppression, including an
+          over-suppression guard (a surviving table's index is still dropped
+          standalone) and a two-argument backward-compatibility case.
+        - Add t/70-exceptions.t: asserts representative former-croak paths
+          (usage, invalid identifier, quack address) now throw a
+          DBIO::Exception object with the message preserved. karr #7.
+
+    * Dependencies
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. DuckDB driver for DBIO built on the pure-FFI DBD::DuckDB.
 

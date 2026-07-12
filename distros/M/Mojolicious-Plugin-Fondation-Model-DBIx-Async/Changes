@@ -1,3 +1,16 @@
+0.03      2026-07-12 00:14:42+02:00 Europe/Paris
+    - add setup (Future Fondation::Setup)
+    - move Fondation::Model::DBIx::Async::ResultSet to Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet;
+    - centralize DBIC source re-registration after all plugins finalize
+    - Fix _fondation_many_to_many read (\% instead of \$), qualify find() PK column for JOINs, and handle key collision in combined prefetch
+    - Add ResultSet->with() for fluent many_to_many prefetch data retrieval
+    - add test
+    - replace table name with resul_class name
+    - Pass all backend keys except those consumed
+    - use group as relation name (SQL word)
+    - replace table name with resul_class name
+    - Add ResultSet->with() for fluent many_to_many prefetch data retrieval
+
 0.02      2026-06-19 20:56:47+02:00 Europe/Paris
     - use DBIx::Class::Relationship::ManyToMany::Async
 

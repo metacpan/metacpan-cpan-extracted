@@ -24,12 +24,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO::MSSQL",
   "PREREQ_PM" => {
-    "DBIO" => "0.900000"
+    "DBIO" => "0.900001"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900000",
+  "VERSION" => "0.900001",
   "test" => {
     "TESTS" => "t/*.t t/sqlmaker/limit_dialects/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DBIO" => "0.900000",
+  "DBIO" => "0.900001",
   "Test::More" => "0.98"
 );
 

@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.12;
+$VERSION = 0.14;
 
 use base qw(Tk::ListBrowser::Item);
 
@@ -49,8 +49,6 @@ sub new {
 	$self->hidden(0) unless defined $self->hidden;
 	$self->priority(0) unless defined $self->priority;
 	$self->opened(1);
-	$self->maxX(0);
-	$self->maxY(0);
 	$self->{ANCHOR} = 0;
 	$self->{SELECTED} = 0;
 	
@@ -106,7 +104,7 @@ sub cindicator {
 sub clear {
 	my $self = shift;
 	my $c = $self->Subwidget('Canvas');
-	for ($self->canchor, $self->cguideH, $self->cguideV, $self->cindicator, $self->cselectl, $self->cselectr) {
+	for ($self->canchor, $self->cguideH, $self->cguideV, $self->cindicator) {
 		$c->delete($_) if defined $_;
 	}
 
@@ -121,23 +119,7 @@ sub clear {
 	$self->cguideH(undef);
 	$self->cguideV(undef);
 	$self->cindicator(undef);
-	$self->cselectl(undef);
-	$self->cselectr(undef);
-	$self->maxX(0);
-	$self->maxY(0);
 	$self->SUPER::clear;
-}
-
-sub cselectl {
-	my $self = shift;
-	$self->{CSELECTL} = shift if @_;
-	return $self->{CSELECTL}
-}
-
-sub cselectr {
-	my $self = shift;
-	$self->{CSELECTR} = shift if @_;
-	return $self->{CSELECTR}
 }
 
 sub ctext {
@@ -166,13 +148,16 @@ sub drawAnchor {
 	my ($self, $force) = @_;
 	return unless $self->ismapped;
 	
-	my @coords = $self->region;
+	my @coords = $self->getRegion;
 	$self->deleteAnchor;
 	my $c = $self->Subwidget('Canvas');
 	if ($self->listMode) {
-		my ($cw) = $self->canvasSize;
-		$coords[0] = 0;
-		$coords[2] = $cw;
+		$coords[0] = $self->cget('-marginleft');
+		my $col = $self->columnList;
+		$coords[2] = $coords[2] + $col;
+		unless ($col) {
+			($coords[2]) = $self->canvasSize;
+		}
 	}
 	my $a = $c->createRectangle(@coords,
 		-fill => undef,
@@ -180,75 +165,7 @@ sub drawAnchor {
 		-tags => ['anchor'],
 	);
 	$self->canchor($a);
-}
-
-sub drawSelect {
-	my $self = shift;
-	my $c = $self->Subwidget('Canvas');
-	my $lb = $self->listbrowser;
-	my $si = Tk::ListBrowser::SelectXPM->new($lb);
-	my @coords = $self->getRegion;
-	unless ($self->listMode) {
-		my $pixmap = $si->selectimage(@coords);
-		my $image = $c->createImage($coords[0], $coords[1],
-			-image => $pixmap,
-			-anchor => 'nw',
-			-tags => ['sel', $self->name],
-		);
-		$self->setRegion(@coords);
-		$self->anchorRaise($image);
-		$self->crect($image);
-		return
-	}
-
-	#draw centerpiece
-	$self->SUPER::drawSelect;
-
-
-	#draw left piece
-	my $lx = $coords[0];
-	$lx++ if $lx eq 0;
-	my $slpix = $si->selectimage(0, $coords[1], $lx, $coords[3], 1, 0);
-	my $slimg = $c->createImage(0, $coords[1],
-		-image => $slpix,
-		-anchor => 'nw',
-		-tags => ['sel', $self->name],
-	);
-	$self->anchorRaise($slimg);
-	$self->cselectl($slimg);
-	
-	#draw right piece
-	my @cols = $self->columnList;
-	my $last = pop @cols;
-	if (defined $last) {
-		@coords = $self->itemGet($self->name, $last)->getRegion;
-	}
-
-	my ($cw) = $self->canvasSize;
-	my $rx1 = $coords[2];
-	my $rx2 = $cw;
-	if ($rx1 > $cw) {
-		$rx1 = $cw - 4;
-		$rx2 = $cw;
-	}
-	$rx1 -- if $rx1 eq $rx2;
-	$rx2 = $rx1 + 300 if $rx2 < $rx1; #a little hack to prevent segfault exit when unmapped.
-	my $srpix = $si->selectimage($rx1, $coords[1], $rx2, $coords[3], 0, 1);
-	my $srimg = $c->createImage($rx1, $coords[1],
-		-image => $srpix,
-		-anchor => 'nw',
-		-tags => ['sel', $self->name],
-	);
-
-	my $r;
-	if (defined $last) {
-		$r = $self->itemGet($self->name, $last)->crect;
-	} else {
-		$r = $self->crect;
-	}
-	$c->raise($srimg, $r) if defined $r;
-	$self->anchorRaise($srimg);
-	$self->cselectr($srimg);
+	$c->raise('guides', 'anchor');
 }
 
 sub hasChildren {
@@ -272,18 +189,6 @@ sub inindicator {
 	my @coords = $c->coords($i);
 	return 1 if ($coords[0] > $x) and ($coords[2] < $x) and ($coords[1] > $y) and ($coords[3] < $y);
 	return ''
-}
-
-sub maxX {
-	my $self = shift;
-	$self->{MAXX} = shift if @_;
-	return $self->{MAXX}
-}
-
-sub maxY {
-	my $self = shift;
-	$self->{MAXY} = shift if @_;
-	return $self->{MAXY}
 }
 
 sub noshow {

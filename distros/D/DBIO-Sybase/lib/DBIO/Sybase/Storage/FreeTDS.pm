@@ -92,7 +92,7 @@ DBIO::Sybase::Storage::FreeTDS - Base class for drivers using DBD::Sybase over F
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

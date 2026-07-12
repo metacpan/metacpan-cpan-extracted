@@ -1,0 +1,60 @@
+Revision history for DBIO-Async
+
+0.900001  2026-07-12
+    First release. The shared, loop-agnostic async layer for DBIO drivers.
+
+    * Storage
+        - DBIO::Async::Storage, the future_io transport backend subclassing
+          core DBIO::Storage::Async: it inherits the Model-B orchestration
+          (_run_crud / txn_do_async / pipeline, sync ->get fallbacks,
+          connect-info normalisation, AccessBroker wiring) from core (ADR
+          0030 §4) and supplies only the transport -- Future::IO query
+          execution (_query_async / _query_async_pinned over an isolated
+          watcher seam: _await_conn_ready / _await_query_result over
+          ready_for_read on a driver-supplied socket fd), the Future class,
+          and the connection pool. DB-specific seam hooks croak "Subclass
+          must override" until a driver overrides them.
+        - future_io resolves a driver's DBIO::Async::Storage subclass by
+          CONVENTION in core (ref($storage) . '::Async'); loading DBIO::Async
+          no longer globally registers future_io on the core base
+          (ADR 0030 refinement, karr #65).
+        - _query_async / _query_async_pinned shape sql_maker's '?' placeholders
+          into the driver dialect internally via the inherited _transform_sql
+          seam (core #70 WP3, karr #3); the shaping is idempotent on
+          already-shaped SQL (including a '?' inside a quoted literal), so it
+          is safe alongside core's own call-site shaping during the
+          transition. Declares transport_capabilities => ('on_connect_replay'),
+          so an async layer that needs on_connect replay (e.g. AGE) can compose
+          onto this transport instead of silently losing the capability
+          (backed by the pool -> _setup_pool_connection -> _run_pool_connect_statement
+          replay chain, karr #68).
+        - The poll fd a driver's _conn_fileno returns is wrapped once per
+          connection into a cached filehandle (_conn_poll_fh, dup'd via
+          open '+<&') for Future::IO->poll, and reused by _await_readable.
+          Some Future::IO impls (e.g. IO::Async) mark a future done, and thus
+          run its on_ready close, BEFORE unwatch_io's by fileno; dup-and-close
+          per poll left a closed handle whose fileno came back undef and
+          corrupted the impl's watch table. One stable handle per connection
+          keeps the fileno valid across the whole watch/unwatch cycle. This
+          establishes a documented base assumption: $conn is a hashref, with
+          the poll filehandle cached under a reserved key. karr #25.
+
+    * Pool
+        - DBIO::Async::Pool subclassing core DBIO::Storage::PoolBase with a
+          generalized connection-readiness role: drivers whose connection
+          object is not immediately ready supply it; others short-circuit
+          to done($conn).
+
+    * TransactionContext
+        - DBIO::Async::TransactionContext, a thin subclass of core's generic
+          DBIO::Storage::Async::TransactionContext (ADR 0030 §4): the unified
+          txn_conn accessor / pinned-connection wrapper -- replacing the
+          per-driver txn_pg / txn_mdb names -- now lives in core and is
+          inherited unchanged.
+
+    * Dependencies
+        - The Future / Future::IO requirements live here, not in each
+          driver, so a sync-only driver pulls no async dependencies —
+          installing dbio-async is what turns async on. Future::IO's
+          built-in default impl is IO::Poll; no event loop is a hard
+          require (core ADR 0014).

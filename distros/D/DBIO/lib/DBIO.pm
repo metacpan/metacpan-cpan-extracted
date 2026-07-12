@@ -4,7 +4,7 @@ package DBIO;
 use strict;
 use warnings;
 
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 
 use DBIO::Base ();
 use DBIO::Skills ();
@@ -162,7 +162,7 @@ DBIO - Native relational mapping for Perl, built on DBI
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -255,6 +255,9 @@ L<DBIO::Cake> provides type functions that read like DDL:
   my $new_cd = $schema->resultset('CD')->create({ title => 'Spoon' });
   $schema->txn_do(sub { $new_cd->update({ title => 'Fork' }) });
   $millennium_cds_rs->update({ year => 2002 });
+
+See F<t/dbio_sugar_pragma.t> for a runnable example of the C<use DBIO>
+import-sugar and role auto-detection shown above.
 
 =head1 DESCRIPTION
 

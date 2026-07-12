@@ -9,6 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Number/Iterator.pm',
     ABSTRACT_FROM    => 'lib/Number/Iterator.pm',
     LICENSE          => 'artistic_2',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

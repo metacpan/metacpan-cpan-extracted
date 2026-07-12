@@ -187,22 +187,22 @@ ok(-e "$tmpdir/Test/Schema/Result/Post.pm", 'Post.pm generated');
 
 # Read and verify the User class
 my $user_src = DBIO::Util::slurp_file_utf8("$tmpdir/Test/Schema/Result/User.pm");
-like($user_src, qr/__PACKAGE__->table\('users'\)/, 'table name set');
-like($user_src, qr/__PACKAGE__->set_primary_key\('id'\)/, 'primary key set');
-like($user_src, qr/data_type => 'integer'/, 'id column type');
-like($user_src, qr/data_type => 'varchar'/, 'email column type');
+like($user_src, qr/__PACKAGE__->table\(['"]users['"]\)/, 'table name set');
+like($user_src, qr/__PACKAGE__->set_primary_key\(['"]id['"]\)/, 'primary key set');
+like($user_src, qr/data_type => ['"]integer['"]/, 'id column type');
+like($user_src, qr/data_type => ['"]varchar['"]/, 'email column type');
 like($user_src, qr/size => 255/, 'varchar size');
 
 # Read and verify the Post class
 my $post_src = DBIO::Util::slurp_file_utf8("$tmpdir/Test/Schema/Result/Post.pm");
-like($post_src, qr/__PACKAGE__->table\('posts'\)/, 'posts table name set');
-like($post_src, qr/__PACKAGE__->set_primary_key\('id'\)/, 'posts primary key');
+like($post_src, qr/__PACKAGE__->table\(['"]posts['"]\)/, 'posts table name set');
+like($post_src, qr/__PACKAGE__->set_primary_key\(['"]id['"]\)/, 'posts primary key');
 
 # Verify relationship inference (belongs_to on Post, has_many on User)
 like($post_src, qr/belongs_to/, 'Post has belongs_to relationship');
 like($user_src, qr/has_many/, 'User has has_many relationship');
 
 # Verify pg_schema is emitted for the schema qualification
-like($post_src, qr/__PACKAGE__->pg_schema\('public'\)/, 'pg_schema emitted for table');
+like($post_src, qr/__PACKAGE__->pg_schema\(['"]public['"]\)/, 'pg_schema emitted for table');
 
 done_testing;

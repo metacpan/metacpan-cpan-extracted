@@ -1,5 +1,28 @@
 Revision history for Map::Tube::API
 
+v1.0.0  2026-07-11
+        - An actual unit test suite has been added (t/01-exception.t,
+          t/02-useragent.t, t/03-api.t) that includes tests for
+          Map::Tube::API, Map::Tube::API::UserAgent and
+          Map::Tube::API::Exception while not requiring the need for any
+          real interaction with the network. This is achieved through the
+          use of the 'ua' attribute within Map::Tube::API::UserAgent with
+          the injection of the MockUA test double to return HTTP::Response
+          objects while also keeping tabs on all requests made during the
+          tests to validate whether the correct URL has being constructed.
+
+        - Besides them, the tests also cover all important aspects of the
+          work of the methods, such as inconsistency of a non-success HTTP
+          response with Map::Tube::API::Exception; the need for the
+          base_url/version parameters being passed as constructor parameters;
+          the absence of the base_url causing an error; validation of
+          parameters in shortest_route(), line_stations(), map_stations()
+          and available_maps(); the URL construction itself.
+
+        - Updated MANIFEST for the new test files.
+        - Updated copyright year information.
+        - Switched to dotted-decimal versioning (v-strings).
+
 0.09  Tue Feb 18 14:15:00 2025
       - Documented map: Toulouse.
 

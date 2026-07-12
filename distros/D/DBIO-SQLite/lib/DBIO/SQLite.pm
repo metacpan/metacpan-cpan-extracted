@@ -1,6 +1,6 @@
 package DBIO::SQLite;
 # ABSTRACT: SQLite-specific schema management for DBIO
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ DBIO::SQLite - SQLite-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

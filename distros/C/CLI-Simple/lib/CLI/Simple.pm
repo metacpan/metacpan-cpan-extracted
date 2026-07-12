@@ -24,7 +24,7 @@ use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -1811,9 +1811,9 @@ To do this you should follow this recipe:
 
   sub init {
     my ($self) = @__;
-    
+
     my @args = $self->get_args;
-  
+
     if ( ! @args ) {
       $self->command_args($self->command()); # set the args to the command
       $self->command('get'); # set the command to your default
@@ -1830,8 +1830,6 @@ I<NOTE: This only works if your commands have a deterministic number
 of arguments. For example you might always require at least 1
 argument. If you have no arguments as in the above recipe you would
 assume command is the argument to your default command.>
-
-=back
 
 =back
 

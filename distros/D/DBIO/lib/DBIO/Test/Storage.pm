@@ -29,6 +29,10 @@ sub new {
   $self->_auto_increment({});
   $self->{_sql_maker_opts} ||= {};
   $self->{_driver_determined} = 1;
+  # ADR 0030: the mock storage defaults to the 'immediate' async mode so mock
+  # tests exercise *_async with no event loop (degrade to an immediately
+  # resolved DBIO::Future::Immediate), instead of croaking as a sync instance would.
+  $self->_async_mode('immediate');
   $self;
 }
 
@@ -44,6 +48,7 @@ sub _populate_dbh { }
 sub disconnect {
   my $self = shift;
   $self->_fake_connected(0);
+  $self->next::method;
   1;
 }
 
@@ -330,9 +335,12 @@ sub dbh_do {
   sub new {
     my ($class, $storage, $args, $attrs) = @_;
 
-    # Generate the SQL to check for mocks
-    my ($ident, $select, $condition, $a) = @$args;
-    my ($sql, $bind) = $storage->_prep_for_execute('select', $ident, [$select, $condition, $a || {}]);
+    # Generate the SQL to check for mocks. Run the raw select arguments through
+    # _select_args first (exactly like the real DBIO::Storage::DBI::Cursor does
+    # via storage->_select), so join pruning / complex-prefetch rewriting is
+    # applied before the SQL is rendered and captured.
+    my ($op, $ident, @select_args) = $storage->_select_args(@$args);
+    my ($sql, $bind) = $storage->_prep_for_execute($op, $ident, \@select_args);
 
     push @{ $storage->_captured_queries }, {
       op   => 'select',
@@ -392,7 +400,7 @@ DBIO::Test::Storage - Fake storage for testing SQL generation without a database
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -407,6 +415,8 @@ version 0.900000
   $storage->reset_captured;
   $rs->all;  # generates SQL, returns empty results
   my @queries = $storage->captured_queries;
+
+See F<t/test/04_query_capture.t> for a runnable example.
 
 =head1 DESCRIPTION
 

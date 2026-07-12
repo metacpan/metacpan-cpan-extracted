@@ -554,7 +554,7 @@ DBIO::Replicated::Storage - Replicated DBI storage coordinator
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -573,6 +573,8 @@ version 0.900000
     my $artist = $schema->resultset('Artist')->find(1);
     ...
   });
+
+See F<t/test/08_replicated.t> for a runnable example.
 
 =head1 DESCRIPTION
 

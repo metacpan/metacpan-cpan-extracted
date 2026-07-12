@@ -75,6 +75,14 @@ near-clone variant, and it is why there is no `DBIO-MariaDB` on CPAN.
   (`DBIO::MySQL::Async`, EV::MariaDB) — that is a different protocol/base
   (`DBIO::Storage::Async`, Futures), not a third subclass here. The
   blocking/async split is owned there, not by this ADR.
+  **Update (2026-07-08): this consequence is superseded.** Async is no longer a
+  separate distribution. ADR 0030 brought it in-dist as convention-resolved
+  per-connection modes (`{ async => 'ev' | 'future_io' }`): the `future_io`
+  transport base ships in `dbio-async`, the `ev` mode in the optional
+  `dbio-mysql-ev` dist. ADR 0007 then applies *this* ADR's DBD split to the
+  future_io transport — the base `DBIO::MySQL::Storage::Async` carries the
+  DBD::mysql binding and `DBIO::MySQL::Storage::MariaDB::Async` overrides the
+  `mariadb_*` primitives, exactly like the sync split above.
 - Future engines that are MySQL-protocol-compatible (e.g. a Percona/TiDB-style
   fork) should be evaluated as another `::Storage` subclass + registry entry
   in this dist before a new distribution is considered.

@@ -30,7 +30,7 @@ DBIO::Future - Future interface contract for async DBIO operations
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -60,15 +60,18 @@ Any object returned by DBIO async methods must support these methods:
 
   $future->then(sub { my @result = @_; ... });
 
-Success callback. Called with the resolved values when the Future
-completes successfully. Must return a new Future.
+Success callback. Called with the resolved values when the Future completes
+successfully. May return either a new Future (which is chained and flattened) or
+a plain value, which is wrapped into an immediately-resolved Future. A conforming
+Future B<must> auto-wrap a plain return -- the storage and ResultSet C<*_async>
+C<then> callbacks rely on it (ADR 0031).
 
 =item catch
 
   $future->catch(sub { my $error = shift; ... });
 
-Error callback. Called with the error when the Future fails.
-Must return a new Future.
+Error callback. Called with the error when the Future fails. Like L</then>, may
+return a new Future or a plain value, which is wrapped into a resolved Future.
 
 =item get
 

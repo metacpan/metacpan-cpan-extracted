@@ -32,6 +32,8 @@ my %PERM_MAP = (
     printhigh   => PERM_PRINT_HIGH,
 );
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Crypt - PDF encryption support for PDF::Make

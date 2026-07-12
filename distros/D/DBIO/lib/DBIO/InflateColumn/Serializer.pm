@@ -45,7 +45,7 @@ DBIO::InflateColumn::Serializer - Inflators to serialize data structures for DBI
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -73,6 +73,8 @@ And you can recover your data structure with:
   my $struct = $obj->data_column;
 
 The data structures you assign to "data_column" will be saved in the database in JSON format.
+
+See F<t/serialize/01-inflatecolumn.t> for a runnable example.
 
 =head1 DESCRIPTION
 

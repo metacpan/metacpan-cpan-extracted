@@ -32,7 +32,7 @@ DBIO::Test::Schema::MooseSugar::ResultSet::Artist - Custom Moose-based ResultSet
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

@@ -11,6 +11,7 @@ use Try::Tiny;
 use Scalar::Util qw/weaken blessed/;
 use DBIO::Util qw(refcount quote_sub is_exception scope_guard old_mro file_path);
 use DBIO::Skills;
+use DBIO::Storage::Composed;
 use Devel::GlobalDestruction;
 use namespace::clean;
 
@@ -24,6 +25,11 @@ __PACKAGE__->mk_classdata('default_resultset_attributes' => {});
 # Optional per-schema overrides for DBIO::Skills. Keys are skill names (the
 # leading dbio- is optional), values are markdown strings.
 __PACKAGE__->mk_classdata('skills');
+# Ordered list of storage extension layer packages registered for this schema
+# (see L</register_storage_layer>). Defaults to an empty arrayref shared across
+# subclasses via inherited class data, so register_storage_layer must copy
+# before appending -- never mutate the arrayref in place.
+__PACKAGE__->mk_classdata('storage_layers' => []);
 
 
 # Pre-pends our classname to the given relative classname or
@@ -409,6 +415,15 @@ sub connection {
   $storage_class =~ s/^\+//;
   $storage_class =~ s/^::/DBIO::Storage::/;
 
+  # Compose any registered storage extension layers over the resolved base
+  # storage class (one behaviour, one transport -- see DBIO::Storage::Composed).
+  # The synthesised class is what actually gets instantiated below; the driver
+  # rebless (DBIO::Storage::DBI::_determine_driver) re-composes the same layers
+  # over the concrete driver class. Skipped cleanly when nothing is registered.
+  my @storage_layers = @{ $self->storage_layers };
+  $storage_class = DBIO::Storage::Composed->compose($storage_class, \@storage_layers)
+    if @storage_layers;
+
   try {
     $self->ensure_class_loaded ($storage_class);
   }
@@ -433,6 +448,22 @@ sub _normalize_storage_type {
   } else {
     $self->throw_exception('Unsupported REFTYPE given: '. ref $storage_type);
   }
+}
+
+
+sub register_storage_layer {
+  my ($self, $layer) = @_;
+
+  $self->throw_exception(
+    'register_storage_layer requires a storage layer class name'
+  ) unless defined $layer && length $layer;
+
+  my @layers = @{ $self->storage_layers };
+  return $self if grep { $_ eq $layer } @layers;   # dedup, preserve order
+
+  # NEW arrayref -- never push onto the shared inherited default in place.
+  $self->storage_layers([ @layers, $layer ]);
+  return $self;
 }
 
 
@@ -869,7 +900,7 @@ DBIO::Schema - Schema class and connection container for DBIO applications
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -898,6 +929,8 @@ version 0.900000
   # fetch objects using Library::Schema::Result::DVD
   my $resultset = $schema1->resultset('DVD')->search( ... );
   my @dvd_objects = $schema2->resultset('DVD')->search( ... );
+
+See F<t/39load_namespaces_1.t> for a runnable example.
 
 =head1 DESCRIPTION
 
@@ -1102,6 +1135,41 @@ L</connect> to get a proper Schema object instead.
 
 Overload C<connection> to change the behaviour of C<connect>.
 
+=head2 register_storage_layer
+
+=over 4
+
+=item Arguments: $layer_class
+
+=item Return Value: $self
+
+=back
+
+  __PACKAGE__->register_storage_layer('MyExt::Storage::Layer');
+
+Register a storage extension B<layer> package for this schema. On
+L</connection> the registered layers are composed over the resolved base
+storage class (and, on driver rebless, re-composed over the concrete driver
+class) into a single synthesised class -- see L<DBIO::Storage::Composed>. A
+layer is a plain method package that overrides or wraps the documented public
+storage surface, chaining with C<< $self->next::method(@_) >>; it MUST NOT
+C<use base> a driver storage.
+
+Callable on the class or on a connected instance -- an extension typically
+calls it from its own C<connection()> override (before C<< $self->next::method >>),
+mirroring how a driver component sets C<storage_type>.
+
+Registration is append-only and order-preserving, de-duplicated by class name
+(C<connection()> may run more than once). Because C<storage_layers> is inherited
+class data whose default empty arrayref is B<shared> across subclasses, this
+method builds a fresh arrayref (copy plus the new layer) and sets it back on the
+caller, so a registration never leaks into a parent or sibling schema class.
+
+B<Precedence:> registration order is C3 precedence. The first layer registered
+becomes the most-specific rung of the composed C<@ISA>, so its methods win the
+MRO and its C<next::method> reaches the next layer, then the base -- consistent
+with C<load_components>, where the first-loaded component runs first.
+
 =head2 compose_namespace
 
 =over 4
@@ -1213,11 +1281,13 @@ L<DBIO::Storage/deploy>.
 
 =back
 
-A convenient shortcut to
-C<< $self->storage->create_ddl_dir($self, @args) >>.
+B<DEPRECATED:> This method is deprecated and throws an exception if called.
+Generate and apply DDL through the storage's native Deploy class instead
+(see L<DBIO::Schema/deploy>).
 
-Creates an SQL file based on the Schema, for each of the specified
-database types, in the given directory.
+A convenient shortcut to
+C<< $self->storage->create_ddl_dir($self, @args) >>, which historically created
+an SQL file based on the Schema for each of the specified database types.
 
 =head2 ddl_filename
 

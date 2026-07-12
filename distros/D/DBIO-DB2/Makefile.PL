@@ -24,13 +24,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO::DB2",
   "PREREQ_PM" => {
-    "DBIO" => "0.900000",
+    "DBD::DB2" => 0,
+    "DBIO" => "0.900001",
     "DateTime::Format::DB2" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900000",
+  "VERSION" => "0.900001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +39,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DBIO" => "0.900000",
+  "DBD::DB2" => 0,
+  "DBIO" => "0.900001",
   "DateTime::Format::DB2" => 0,
   "Test::More" => "0.98"
 );

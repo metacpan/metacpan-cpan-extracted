@@ -17,7 +17,7 @@ for my $pass (1, 2) {
   my ($sql, @bind) = $sql_maker->select ('foo', undef, { -nest => \ 'bar' } );
   is_same_sql_bind (
     $sql, \@bind,
-    'SELECT * FROM foo WHERE ( bar )', [],
+    'SELECT * FROM "foo" WHERE ( bar )', [],
     "-nest still works (pass $pass)"
   );
 }

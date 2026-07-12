@@ -167,6 +167,31 @@ $introspect->policies;    # RLS
 $introspect->sequences;
 ```
 
+## Async & storage-layer extensions
+
+Async is opt-in per connection: `connect($dsn, $user, $pass, { async => $mode })`.
+
+- `ev` → the native `DBIO::PostgreSQL::EV` backend (dist `dbio-postgresql-ev`):
+  LISTEN/NOTIFY, COPY, pipeline. Registered once as a transport BASE on the
+  driver storage (`register_async_mode(ev => ...)`).
+- `future_io` → the loop-agnostic `DBIO::PostgreSQL::Storage::Async` transport
+  (over DBD::Pg's `pg_async` binding), resolved by convention off the driver
+  storage. Pooled CRUD + `txn_do_async`, advertises `on_connect_replay`;
+  LISTEN/NOTIFY/COPY/pipeline are NOT on this transport (they are the `ev` one).
+
+PostgreSQL extensions (AGE, PostGIS, …) are storage **layers**, not `storage_type`
+subclasses (core karr #70): `$schema->register_storage_layer('DBIO::PostgreSQL::Ext::Storage')`.
+Core composes the layer (C3) over the PG driver storage for sync, and its async
+mirror `…::Storage::Async` over the resolved transport for async — one behaviour,
+one transport. The driver component keeps choosing the driver BASE
+(`storage_type('+DBIO::PostgreSQL::Storage')` in `connection()`); only extensions
+use layers, and the `ev`/`future_io` registrations do not grow per extension.
+
+The shared `DBIO::PostgreSQL::SQLMaker` always emits `?` (the sync DBI driver
+needs it); the `future_io` transport rewrites `?`→`$N` **once**, in
+`_transform_sql`, invoked internally by the inherited `_query_async` — callers
+never shape. See skill `dbio-driver-development` for the composition + seam model.
+
 ## Testing
 
 Live integration (needs **pgvector**):
@@ -193,6 +218,7 @@ my $schema = DBIO::Test->init_schema(
 |--------|---------|
 | `DBIO::PostgreSQL` | Schema component (DB layer) |
 | `DBIO::PostgreSQL::Storage` | DBI storage: RETURNING, savepoints, BYTEA, JSONB inflate |
+| `DBIO::PostgreSQL::Storage::Async` | `future_io` async transport (DBD::Pg `pg_async`); `?`→`$N` seam |
 | `DBIO::PostgreSQL::SQLMaker` | JSONB operators, `special_ops` |
 | `DBIO::PostgreSQL::JSONB` | `jsonb()` path-expression DSL |
 | `DBIO::PostgreSQL::Result` | Result comp: indexes, triggers, RLS, pg_schema |

@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-per-engine-subdir-helper-pattern.md
@@ -51,3 +52,4 @@ t/40-sqlmaker-sybase-torture.t
 t/41-diff-changed-fields.t
 t/45-ddl-util.t
 t/50-introspect-contract.t
+t/release-coverage.t

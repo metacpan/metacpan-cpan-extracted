@@ -75,7 +75,6 @@ my @tests = (
         bind      => [ [ colB => 'test' ], [ colC => 'tost' ] ],
     },
     {
-        todo => 1,
         order_by => [
             { -asc  => 'colA' },
             { -desc => { colB => { 'LIKE' => 'test' } } },
@@ -85,7 +84,6 @@ my @tests = (
         bind      => [ [ colB => 'test' ], [ colC => 'tost' ] ],
     },
     {
-        todo => 1,
         order_by  => { -desc => { colA  => { LIKE  => 'test' } } },
         order_req => '"colA" LIKE ? DESC',
         bind      => [ [ colA => 'test' ] ],

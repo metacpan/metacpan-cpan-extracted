@@ -2,7 +2,7 @@ package Tk::ListBrowser;
 
 =head1 NAME
 
-Tk::ListBrowser - Tk::IconList inspired chameleon list box.
+Tk::ListBrowser - Canvas based chameleon list box.
 
 =cut
 
@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -346,6 +346,10 @@ one refresh loop cycle.
 Default value 1 milisecond. Specifies the interval between refresh
 loop cycles.
 
+=item Switch B<-scrollbars>
+
+Only available at create time. Default value I<osoe>.
+
 =item Switch B<-selectmode>
 
 Default value I<single>. Can either be I<single>, I<multiple> or I<exclusive>.
@@ -458,12 +462,21 @@ I<-textside>, and I<-wraplength>.
 sub Populate {
 	my ($self,$args) = @_;
 	
+	my $width = delete $args->{'-width'};
+	$width = 100 unless defined $width;
+	my $height = delete $args->{'-height'};
+	$height = 80 unless defined $height;
+	my $scrollbars = delete $args->{'-scrollbars'};
+	$scrollbars = 'osoe' unless defined $scrollbars;
+	
 	$self->SUPER::Populate($args);
 	
 	#create the canvas
 	my $canv = $self->Scrolled('LBCanvas',
 		-keycall => ['KeyPress', $self],
 		-scrollbars => 'osoe',
+		-width => $width,
+		-height => $height,
 	)->pack(-expand => 1, -fill => 'both');
 	my $c = $canv->Subwidget('scrolled');
 	$c->configure(
@@ -532,6 +545,7 @@ sub Populate {
 		-command => ['CALLBACK'],
 		-entryclass => ['PASSIVE', undef, undef, 'Tk::ListBrowser::Entry'],
 		-font => ['PASSIVE', 'font', 'Font', 'Arial 9'],
+		-height => [$c, 'height', 'Height', $height],
 		-indent => ['PASSIVE', 'indent', 'Indent', 22],
 		-motionselect => ['PASSIVE', undef, undef, ''],
 		-refreshentriespercycle => ['PASSIVE', undef, undef, 10],
@@ -541,6 +555,7 @@ sub Populate {
 		-selectmode => ['PASSIVE', undef, undef, 'single'],
 		-selectstyle => ['PASSIVE', undef, undef, 'anchor'],
 		-separator => ['PASSIVE', undef, undef, ''],
+		-width => [$c, 'width', 'Width', $width],
 
 		#colors
 		-background => [$c, 'background', 'Background', '#E8E8E8'],
@@ -850,14 +865,14 @@ sub anchorInitialize {
 	return ''
 }
 
-sub anchorRaise {
-	my ($self, $canvitem) = @_;
-	my $i = $self->anchorGet;
-	return unless defined $i;
-	my $c = $self->Subwidget('Canvas');
-	$c->raise($i->canchor, $canvitem);
-}
-
+#sub anchorRaise {
+#	my ($self, $canvitem) = @_;
+#	my $i = $self->anchorGet;
+#	return unless defined $i;
+#	my $c = $self->Subwidget('Canvas');
+#	$c->raise($i->canchor, $canvitem);
+#}
+#
 sub anchorRefresh {
 	my $self = shift;
 	my $a = $self->anchorGet;
@@ -926,11 +941,22 @@ sub Button1 {
 	$self->CanvasFocus;
 	my $c = $self->Subwidget('Canvas');
 
+	#return if an indicator was clicked
+	my @ind = $c->find('withtag', 'indicator');
+	for (@ind) {
+		my ($ix, $iy) = $c->coords($_);
+		my $img = $self->cget('-indicatorplusimg');
+		my $half = int($img->width / 2) + 2;
+		my ($x1, $y1, $x2, $y2) = $c->coords($_);
+		return if ($ix - $half <= $x) and ($ix + $half >= $x)
+			and ($iy - $half <= $y) and ($iy + $half >= $y);
+	}
+
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
+		$self->anchorSet($item->name);
 		return if $item->selected;
 		$self->selectionClear;
-		$self->anchorSet($item->name);
 		$item->select(1);
 		$self->Callback('-browsecmd', $item->name);
 		return
@@ -941,7 +967,8 @@ sub Button1 {
 
 sub Button1Control {
 	my ($self, $x, $y) = @_;
-	return $self->Button1($x, $y) if $self->cget('-selectmode') eq 'single';
+	$self->CanvasFocus;
+	return $self->Button1($x, $y) if ($self->cget('-selectmode') eq 'single') or ($self->cget('-selectmode') eq 'exclusive');
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
 		if ($item->selected) {
@@ -961,14 +988,15 @@ sub Button1Double {
 	if (defined $item) {
 		$self->Callback('-command', $item->name);
 	} else {
-		$self->selectionClear;
+		$self->selectionClear unless $self->cget('-selectmode') eq 'exclusive';
 	}
 }
 
 sub Button1Shift {
 	my ($self, $x, $y) = @_;
-	return $self->Button1($x, $y) if $self->cget('-selectmode') eq 'single';
+	return $self->Button1($x, $y) if ($self->cget('-selectmode') eq 'single') or ($self->cget('-selectmode') eq 'exclusive');
 	my $item = $self->initem($x, $y);
+	$self->CanvasFocus;
 	if (defined $item) {
 		my @pool = $self->getAll;
 		$self->anchorSet($item->name);
@@ -3045,32 +3073,51 @@ sub prioritySet {
 	$self->priorityMax($priority) if $max < $priority;
 }
 
-=item B<refresh>
+=item B<refresh>I<(?$havecellsize?)>
 
 Clears the canvas and rebuilds it. Call this method after you are done making changes.
+If you set I<$havecellsize> to 1 it will assume the cellsize is known and save you one iteration
+over the entire list. If you do not specify it, the method B<cellSize> will be called.
+View and selection are preserved.
 
 =cut
 
 sub refresh {
-	my $self = shift;
+	my ($self, $nocellsize) = @_;
+	$nocellsize = 0 unless defined $nocellsize;
 
-	my @sel = $self->selectionGet;
+	unless ($nocellsize) {
+		$self->cellSize;
+	}
+
 	my $anch = $self->anchorGet;
 	$self->refreshSaveView;
+	
+	my $handler = $self->handler;
 
-	$self->handler->refresh;
+	$self->clear;
+	my ($x, $y) = $handler->startXY;
+	my $column = 0;
+	my $row = 0;
+
+	my @pool = $self->getPool;
+	for (@pool) {
+		my $item = $_;
+		next if $item->noshow;
+		$handler->draw($item, $x, $y, $column, $row);
+
+		($x, $y, $column, $row) = $handler->nextPosition($x, $y, $column, $row);
+	}
+	$self->setScrollRegion;
 
 	$self->refreshRestoreView;
-	for (@sel) {
-		$self->selectionSet($_)
-	}
 	$self->anchorSet($anch) if defined $anch;
 }
 
 sub refreshCheck {
 	my ($self, $entry, $index) = @_;
 	return if $entry->noshow;
-	$self->refreshPurge($index)
+	$self->refreshPurge($index);# if $self->cget('-autorefresh');
 }
 
 sub refreshLoop {
@@ -3300,6 +3347,8 @@ sub selectionClear {
 	my $self = shift;
 	my @pool = $self->getAll;
 	grep { $_->select(0) } @pool;
+	my $c = $self->Subwidget('Canvas');
+#	$c->delete('sel'); #workaround
 }
 
 sub selectionClearChildren {
@@ -3404,31 +3453,21 @@ sub separator {	return $_[0]->cget('-separator') }
 
 sub setScrollRegion {
 	my $self = shift;
-	my $last = $self->infoLastVisible;
-	if (defined $last) {
-		my $l = $self->get($last);
-		my $x = $l->maxX + $self->cget('-marginright');
-		my $y = $l->maxY + $self->cget('-marginbottom');
-		if ($self->listMode) {
-			$x --;
-			$y --;
-		}
+	my $canvas = $self->Subwidget('Canvas');
 
-		my ($sx, $sy) = $self->canvasSize;
-		$sx ++;
-		$sy ++;
-		my $xscroll = $self->Subwidget('XScrollbar');
-		$sy = $sy - $xscroll->width if $y > $sy;
-		my $yscroll = $self->Subwidget('YScrollbar');
-		$sx = $sx - $yscroll->width if $x > $sx;
+	#getting coordinates
+	my ($d1, $d2, $x, $y) = $canvas->bbox("all");
+	$x = 0 unless defined $x;
+	$y = 0 unless defined $y;
+	$x = $x + $self->cget('-marginright');
+	$y = $y + $self->cget('-marginbottom');
 
-		$x = $sx if $x < $sx;
-		$y = $sy if $y < $sy;
+	#preventing the mouse wheel from scrolling the list when there are no scrollbars.
+	my ($sx, $sy) = $self->canvasSize;
+	$sy ++;
+	$y = $sy if $y < $sy;
 
-		$self->configure(-scrollregion => [0, 0, $x, $y]);
-	} else {
-		$self->configure(-scrollregion => [0, 0, 0, 0]) if @_;
-	}
+	$self->configure(-scrollregion => [0, 0, $x, $y]);
 }
 
 =item B<show>I<($name)>

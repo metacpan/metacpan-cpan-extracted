@@ -22,15 +22,19 @@ MODULE = Data::Log::Shared  PACKAGE = Data::Log::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, data_size)
+new(class, path, data_size, ...)
     const char *class
     SV *path
     UV data_size
   PREINIT:
     char errbuf[LOG_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    LogHandle *h = log_create(p, data_size, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Layer A: optional 4th arg is the backing-file mode for exclusive
+     * creation (default 0600 = owner-only). Pass e.g. 0660 to opt in to
+     * group sharing explicitly. Ignored for anonymous logs (undef path). */
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    LogHandle *h = log_create(p, data_size, mode, errbuf);
     if (!h) croak("Data::Log::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -81,11 +85,12 @@ append(self, data)
     EXTRACT_LOG(self);
   CODE:
     STRLEN len;
-    const char *buf = SvPV(data, len);
+    const char *buf = SvPV(data, len);        /* get-magic before reading SvUTF8 */
+    int utf8 = SvUTF8(data) ? 1 : 0;
     if (len == 0) croak("append: data must not be empty");
-    if (len > (STRLEN)(UINT32_MAX - LOG_ENTRY_HDR - 3))
-        croak("append: data too large");
-    int64_t off = log_append(h, buf, (uint32_t)len);
+    if (len >= 0x80000000u)                   /* bit 31 of the stored len = UTF8 */
+        croak("append: data too large (>= 2 GiB)");
+    int64_t off = log_append(h, buf, (uint32_t)len, utf8);
     RETVAL = (off >= 0) ? newSViv((IV)off) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -99,17 +104,21 @@ read_entry(self, offset, ...)
   PPCODE:
     const uint8_t *out_data;
     uint32_t out_len;
+    int out_utf8 = 0;
     uint64_t next_off;
     /* Optional third arg: abandon_wait_us (default LOG_ABANDON_WAIT_US).
      * Pass 0 to immediately treat any uncommitted slot as abandoned. */
     uint64_t wait_us = (items > 2) ? (uint64_t)SvUV(ST(2)) : (uint64_t)LOG_ABANDON_WAIT_US;
-    int rc = log_read_ex(h, offset, &out_data, &out_len, &next_off, wait_us);
+    int rc = log_read_ex(h, offset, &out_data, &out_len, &out_utf8, &next_off, wait_us);
     if (rc == LOG_READ_OK) {
         EXTEND(SP, 2);
-        PUSHs(sv_2mortal(newSVpvn((const char *)out_data, out_len)));
+        SV *dsv = newSVpvn((const char *)out_data, out_len);
+        if (out_utf8) SvUTF8_on(dsv);
+        PUSHs(sv_2mortal(dsv));
         PUSHs(sv_2mortal(newSVuv((UV)next_off)));
-    } else if (rc == LOG_READ_ABANDONED) {
-        /* Signal "skip this slot" — data is undef, next_off is set. */
+    } else if (rc == LOG_READ_ABANDONED || rc == LOG_READ_TRUNCATED) {
+        /* Signal "skip forward" — data is undef, next_off is set (past an
+         * abandoned slot, or to the truncation point). */
         EXTEND(SP, 2);
         PUSHs(sv_newmortal());  /* undef */
         PUSHs(sv_2mortal(newSVuv((UV)next_off)));

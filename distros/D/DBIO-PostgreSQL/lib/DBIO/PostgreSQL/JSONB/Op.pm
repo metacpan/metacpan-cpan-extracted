@@ -90,7 +90,7 @@ DBIO::PostgreSQL::JSONB::Op - JSONB path-extraction operator object built by jso
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,50 @@
 Revision history for DBIO-PostgreSQL-PostGIS
 
+0.900001  2026-07-12
+
+    * Storage: PostGIS is now a registered storage LAYER
+      (register_storage_layer) instead of a storage_type override —
+      hard cut, no deprecation shim. connection() registers the layer;
+      PostGIS::Storage drops `use base 'DBIO::PostgreSQL::Storage'` and
+      is a plain layer package calling only the public storage surface
+      (dbh_do/throw_exception) through the composed MRO. A second
+      deploy-hooking layer collides at compose time and croaks loudly
+      (dbio_deploy_class stays a single-owner base-hook override).
+      PostGIS ships no ::Async layer, so on a composed schema geometry
+      CRUD simply flows through whichever transport the schema resolves
+      unchanged; core skips async-less layers silently. Zero
+      storage_type writes remain in lib/. karr #4, core #70.
+
+    * Error handling: all driver-internal error throws now flow through
+      DBIO::Exception (CurtisPoe review F21). Previously these paths
+      used bare Carp::croak, breaking the family-wide exception
+      taxonomy that lets applications catch DBIO::Exception uniformly.
+
+        - Storage: new private _ensure_postgis_extension method runs a
+          cheap `SELECT 1 FROM pg_extension WHERE extname = 'postgis'`
+          check and throws DBIO::Exception with a clear message naming
+          the missing extension and the database. Not auto-called on
+          connect — wrap into first-use storage operations that
+          require PostGIS (deploy, schema load, geometry inflation).
+          Public Storage API (ensure_postgis, postgis_version) is
+          unchanged.
+        - Geometry: 4 croak sites in from_wkt, from_ewkt, from_geojson
+          (missing/unsupported type) now throw DBIO::Exception.
+        - Codec::WKB::Decoder: 3 croak sites in decode_hex (empty
+          input, invalid byte_order, buffer underrun) now throw
+          DBIO::Exception.
+
+    * Tests: new t/30-exceptions.t covers all 7 value-object sites
+      (assert isa('DBIO::Exception') + message regex) and the new
+      storage extension detection (installed/no-op, missing/throws,
+      undef dbname/throws) via a fake storage subclass with an
+      in-memory dbh response table — no real database required. New
+      t/50 (22 offline compose assertions: layer isa both / can
+      ensure_postgis / deploy-class override wins / register_storage_layer
+      wiring / second-deploy-hook collision croak / no ::Async sibling).
+
+    * Project: added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. PostGIS spatial extension support layered on DBIO::PostgreSQL.
 

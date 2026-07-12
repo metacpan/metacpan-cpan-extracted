@@ -6,6 +6,10 @@ use warnings;
 
 use base 'DBIO::Deploy::Base::TempDatabase';
 
+use DBIO::MySQL::DDL        ();
+use DBIO::MySQL::Introspect ();
+use DBIO::MySQL::Diff       ();
+
 # The three class-name hooks DBIO::Deploy::Base needs.
 
 sub _ddl_class       { 'DBIO::MySQL::DDL' }
@@ -42,7 +46,7 @@ DBIO::MySQL::Deploy - Deploy and upgrade MySQL/MariaDB schemas via test-deploy-a
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -4,6 +4,7 @@ package DBIO::Generate::Style::Cake;
 use strict;
 use warnings;
 use Data::Dumper ();
+use DBIO::Generate::Util ();
 use namespace::clean;
 
 
@@ -12,27 +13,26 @@ sub emit {
 
   my @lines;
 
-  push @lines, "package $spec->{class};";
-  push @lines, "# ABSTRACT: $spec->{moniker}";
+  push @lines, "package " . DBIO::Generate::Util::assert_pkg($spec->{class}) . ";";
+  push @lines, "# ABSTRACT: " . DBIO::Generate::Util::abstract_comment($spec->{moniker});
   push @lines, "";
   push @lines, "use DBIO::Cake;";
   push @lines, "";
 
   if (my @c = @{ $spec->{components} // [] }) {
-    push @lines, "load_components " . join(', ', map { "'$_'" } @c) . ";";
+    push @lines, "load_components " . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . ";";
     push @lines, "";
   }
 
   if ($spec->{is_view}) {
     push @lines, "table_class 'DBIO::ResultSource::View';";
-    push @lines, "table '$spec->{table}';";
+    push @lines, "table " . DBIO::Generate::Util::pl_str($spec->{table}) . ";";
     if (defined $spec->{view_definition}) {
-      (my $vdef = $spec->{view_definition}) =~ s/'/\\'/g;
-      push @lines, "view_definition '$vdef';";
+      push @lines, "view_definition " . DBIO::Generate::Util::pl_str($spec->{view_definition}) . ";";
     }
   }
   else {
-    push @lines, "table '$spec->{table}';";
+    push @lines, "table " . DBIO::Generate::Util::pl_str($spec->{table}) . ";";
   }
   push @lines, "";
 
@@ -40,21 +40,22 @@ sub emit {
   for my $col (@{ $spec->{column_order} // [] }) {
     my $info = $spec->{columns}{$col} // {};
     my $type_str = _cake_type($info);
+    my $col_str  = DBIO::Generate::Util::pl_str($col);
     if ($pk_set{$col}) {
-      push @lines, "primary_column $col => $type_str;";
+      push @lines, "primary_column $col_str => $type_str;";
     }
     elsif ($info->{is_nullable}) {
-      push @lines, "nullable_column $col => $type_str;";
+      push @lines, "nullable_column $col_str => $type_str;";
     }
     else {
-      push @lines, "column $col => $type_str;";
+      push @lines, "column $col_str => $type_str;";
     }
   }
   push @lines, "";
 
   for my $uq (@{ $spec->{uniq} // [] }) {
     my ($name, $cols) = @$uq;
-    push @lines, "unique_constraint '$name' => [" . join(', ', map { "'$_'" } @$cols) . "];";
+    push @lines, "unique_constraint " . DBIO::Generate::Util::pl_str($name) . " => [" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @$cols) . "];";
   }
   push @lines, "" if @{ $spec->{uniq} // [] };
 
@@ -67,7 +68,7 @@ sub emit {
   for my $rel (@{ $spec->{relationships} // [] }) {
     my ($rel_name, $remote_class, $cond, @rest) = @{ $rel->{args} };
     my $cond_str = _dump_inline($cond);
-    push @lines, "$rel->{method} '$rel_name', '$remote_class', $cond_str;";
+    push @lines, "$rel->{method} " . DBIO::Generate::Util::pl_str($rel_name) . ", " . DBIO::Generate::Util::pl_str($remote_class) . ", $cond_str;";
   }
   push @lines, "" if @{ $spec->{relationships} // [] };
 
@@ -80,7 +81,24 @@ sub _cake_type {
   my ($info) = @_;
   my $dt   = $info->{data_type} // 'varchar';
   my $size = $info->{size};
-  return defined $size ? "$dt($size)" : $dt;
+
+  # SECURITY: data_type / size are DB-reported and must never be spliced raw.
+  # The bareword DSL type-function form (e.g. `varchar(100)`) is only safe when
+  # the type token is a plain identifier and the size is an integer. For the
+  # common case that holds and we keep the readable DSL form; anything outside
+  # it falls back to explicit, string-literal `data_type => '...'` option pairs,
+  # which Cake's column() accepts identically and which cannot inject code.
+  my $safe_size = !defined $size || $size =~ /\A-?[0-9]+\z/;
+  if ($dt =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/ && $safe_size) {
+    return defined $size ? "$dt($size)" : $dt;
+  }
+
+  my $type_str = "data_type => " . DBIO::Generate::Util::pl_str($dt);
+  if (defined $size) {
+    $type_str .= ", size => "
+      . ($safe_size ? $size : DBIO::Generate::Util::pl_str($size));
+  }
+  return $type_str;
 }
 
 sub _dump_inline {
@@ -107,7 +125,7 @@ DBIO::Generate::Style::Cake - DBIO::Cake DSL emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 METHODS
 

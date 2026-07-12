@@ -24,7 +24,7 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->belongs_to(
-    'grp',
+    'group',
     'Mojolicious::Plugin::Fondation::TestDBIxRelation::Schema::Result::Group',
     { 'foreign.id' => 'self.group_id' },
 );

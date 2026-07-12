@@ -35,7 +35,7 @@ DBIO::Test::Schema::ArtistUndirectedMap - Test result class for the artist_undir
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

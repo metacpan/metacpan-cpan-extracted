@@ -9,23 +9,23 @@ use base qw/DBIO::Test::BaseResult/;
 __PACKAGE__->table('sequence_test');
 
 __PACKAGE__->add_columns(
+  # A scalar-ref sequence is passed through verbatim; a plain string is quoted
+  # by the SQL dialect. pkid1 is pre-quoted (lowercase), pkid2 is unquoted (so
+  # Oracle folds it to uppercase), nonpkid relies on dialect quoting.
   pkid1 => {
     data_type => 'integer',
-    sequence => 'pkid1_seq',
-    is_auto_increment => 1,
     auto_nextval => 1,
+    sequence => \'"pkid1_seq"',
   },
   pkid2 => {
     data_type => 'integer',
-    sequence => 'pkid2_seq',
-    is_auto_increment => 1,
     auto_nextval => 1,
+    sequence => \'pkid2_seq',
   },
   nonpkid => {
     data_type => 'integer',
-    sequence => 'nonpkid_seq',
-    is_auto_increment => 1,
     auto_nextval => 1,
+    sequence => 'nonpkid_seq',
   },
   name => {
     data_type => 'varchar',
@@ -50,7 +50,7 @@ DBIO::Oracle::Test::SequenceTest - Test result class for Oracle sequence tests
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use DBIO::AccessBroker::Credentials;
+use DBIO::AccessBroker::Static;
 
 {
   package TestSchema;
@@ -11,8 +11,9 @@ use DBIO::AccessBroker::Credentials;
   __PACKAGE__->load_components('PostgreSQL');
 }
 
-my $broker = DBIO::AccessBroker::Credentials->new(
-  dsn      => 'dbi:Pg:dbname=dbio_test;host=localhost',
+my $broker = DBIO::AccessBroker::Static->new(
+  host     => 'localhost',
+  dbname   => 'dbio_test',
   username => 'dbio',
   password => 'secret',
 );

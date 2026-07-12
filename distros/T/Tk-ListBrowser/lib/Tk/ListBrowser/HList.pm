@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.10;
+$VERSION =  0.14;
 
 use Math::Round qw(round);
 
@@ -67,15 +67,15 @@ sub draw {
 	my $parent = $self->infoParent($entry);
 	if (defined $parent) {
 		my $c = $self->Subwidget('Canvas');
-		my @eregion = $item->region;
+		my @eregion = $item->getRegion;
 		my $p = $self->get($parent);
 		my @pregion = $p->region;
 		my $half = 8;
 
 		#draw horizontal guide
-		my $hx1 = $pregion[0] + round(($eregion[0] - $pregion[0])/2);
-		my $hy1 = $eregion[1] + round(($eregion[3] - $eregion[1])/2);;
-		my $hx2 = $eregion[0];
+		my $hx1 = $x - round($indentsize/2);
+		my $hy1 = $y + round($self->cget('-cellheight')/2);
+		my $hx2 = $x;
 		my $hy2 = $hy1;
 		my $guideh = $c->createLine($hx1, $hy1, $hx2, $hy2,
 			-fill => $self->cget('-foreground'),
@@ -86,7 +86,7 @@ sub draw {
 
 		#draw vertical guide
 		my $vx1 = $hx1;
-		my $vy1 = $pregion[3];
+		my $vy1 = $p->rectY + $self->cget('-cellheight');
 		my $vx2 = $vx1;
 		my $vy2 = $hy1;
 		my $guidev = $c->createLine($vx1, $vy1, $vx2, $vy2,

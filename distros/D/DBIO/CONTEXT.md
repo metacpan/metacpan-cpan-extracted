@@ -66,5 +66,5 @@ _Avoid_: slave, secondary.
 
 ## Flagged ambiguities
 
-- **ReadWrite broker** historically bundled a **Backend identity** + a **Host** list + **Routing** (read round-robin) into one object. Resolved: that conflation is the category error this context removes — identity → **AccessBroker**, hosts + **Routing** → **Replicated**. `DBIO::AccessBroker::ReadWrite` is to be deleted; its read round-robin was unreachable through the storage layer anyway.
+- **ReadWrite broker** historically bundled a **Backend identity** + a **Host** list + **Routing** (read round-robin) into one object. Resolved: that conflation is the category error this context removes — identity → **AccessBroker**, hosts + **Routing** → **Replicated**. The package was removed in the fork (no longer on disk; ADR-0013 records the historical rationale). The read round-robin it tried to do is the wrong layer — routing belongs in **Replicated**.
 - The `$mode` parameter (`'read'`/`'write'`) on the broker API. Resolved: vestigial under single-identity **CredentialSource**s — deprecated, not load-bearing. Routing decides read vs write, not the broker.

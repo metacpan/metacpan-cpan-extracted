@@ -45,7 +45,7 @@ DBIO::Test::Schema::PunctuatedColumnName - Test result class for columns with pu
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

@@ -33,9 +33,13 @@ new(class, path, req_cap, resp_slots, resp_size, ...)
     uint64_t arena_cap;
   CODE:
     arena_cap = (items > 5) ? (uint64_t)SvUV(ST(5)) : 0;
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 7th arg (index 6, after arena_cap): file mode for a newly-created
+     * file-backed segment (default 0600, owner-only). Pass e.g. 0660 to opt into
+     * cross-user sharing. Ignored for anonymous/existing segments. */
+    mode_t mode = (items > 6 && (SvGETMAGIC(ST(6)), SvOK(ST(6)))) ? (mode_t)SvUV(ST(6)) : 0600;
     ReqRepHandle *h = reqrep_create(p, (uint32_t)req_cap, (uint32_t)resp_slots,
-                                     (uint32_t)resp_size, arena_cap, errbuf);
+                                     (uint32_t)resp_size, arena_cap, mode, errbuf);
     if (!h) croak("Data::ReqRep::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -923,7 +927,7 @@ req_fileno(self)
 MODULE = Data::ReqRep::Shared  PACKAGE = Data::ReqRep::Shared::Int
 
 SV *
-new(class, path, req_cap, resp_slots)
+new(class, path, req_cap, resp_slots, ...)
     const char *class
     SV *path
     UV req_cap
@@ -931,8 +935,12 @@ new(class, path, req_cap, resp_slots)
   PREINIT:
     char errbuf[REQREP_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    ReqRepHandle *h = reqrep_create_int(p, (uint32_t)req_cap, (uint32_t)resp_slots, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Optional 5th arg (index 4): file mode for a newly-created file-backed
+     * segment (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
+     * sharing. Ignored for anonymous/existing segments. */
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    ReqRepHandle *h = reqrep_create_int(p, (uint32_t)req_cap, (uint32_t)resp_slots, mode, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:

@@ -75,7 +75,7 @@ DBIO::Replicated::DebugProxy - Prefix trace output with replicated backend ident
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

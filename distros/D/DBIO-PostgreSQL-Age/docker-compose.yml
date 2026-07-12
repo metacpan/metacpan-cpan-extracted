@@ -1,0 +1,47 @@
+# docker-compose.yml — local Apache AGE test cluster for DBIO::PostgreSQL::Age.
+#
+# Brings up a PostgreSQL 18 with the Apache AGE extension preinstalled
+# (image: apache/age:latest, which is postgres:18 + AGE 1.7). On first
+# init, creates a dedicated test database and enables the AGE extension
+# there. The test scripts connect via DBIO_TEST_PG_DSN to this database.
+#
+# Usage:
+#   docker compose up -d
+#   docker compose logs -f        # wait for "database system is ready"
+#   DBIO_TEST_PG_DSN="dbi:Pg:dbname=dbio_age_test;host=127.0.0.1;port=5432" \
+#   DBIO_TEST_PG_USER=postgres   \
+#   DBIO_TEST_PG_PASS=dbio_age_test \
+#     prove -l t/
+#   docker compose down -v        # tear down (including the data volume)
+
+name: dbio-postgresql-age
+
+services:
+  postgres:
+    image: apache/age:latest
+    container_name: dbio-postgresql-age
+    restart: unless-stopped
+    environment:
+      # No POSTGRES_DB on purpose — the init script below creates a
+      # dedicated dbio_age_test DB and enables AGE there, leaving the
+      # default postgres DB untouched. Tests connect to dbio_age_test.
+      POSTGRES_PASSWORD: dbio_age_test
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      # 54329 keeps it side-by-side with anything already on 5432 (common
+      # in dev environments with other postgres instances). Change to
+      # "5432:5432" if you want the default port.
+      - "54329:5432"
+    volumes:
+      # First-start only: creates dbio_age_test DB and enables AGE there.
+      - ./docker/init-age-db.sh:/docker-entrypoint-initdb.d/10-age-db.sh:ro
+      # Persistent data (drop with `docker compose down -v`).
+      - age-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -q"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  age-data:

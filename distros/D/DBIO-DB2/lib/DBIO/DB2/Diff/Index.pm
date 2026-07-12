@@ -14,8 +14,16 @@ __PACKAGE__->mk_diff_accessors(qw/table_name index_name index_info/);
 
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
   my @ops;
+
+  # Tables present in the source model but absent from the target are being
+  # dropped in this same pass. Their indexes go with the table via DROP TABLE,
+  # so a later standalone DROP INDEX for one of them must be suppressed (karr #19).
+  $source_tables //= {};
+  $target_tables //= {};
+  my %dropped_table = map { $_ => 1 }
+    grep { !exists $target_tables->{$_} } keys %$source_tables;
 
   for my $table_name (sort keys %$target) {
     my $src_idxs = $source->{$table_name} // {};
@@ -52,6 +60,9 @@ sub diff {
   for my $table_name (sort keys %$source) {
     my $src_idxs = $source->{$table_name};
     my $tgt_idxs = $target->{$table_name} // {};
+    # Skip the whole table when it is itself being dropped this pass; DROP TABLE
+    # already removes its indexes, so a standalone DROP INDEX would fail (karr #19).
+    next if $dropped_table{$table_name};
     for my $name (sort keys %$src_idxs) {
       next if exists $tgt_idxs->{$name};
       push @ops, $class->new(
@@ -104,7 +115,7 @@ DBIO::DB2::Diff::Index - Diff operations for DB2 indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -117,6 +128,20 @@ C<new>, C<action> and C<summary_prefix> come from L<DBIO::Diff::Op>.
 =head1 METHODS
 
 =head2 diff
+
+    my @ops = DBIO::DB2::Diff::Index->diff(
+      $source, $target, $source_tables, $target_tables);
+
+Compares index sets across all tables. Index identity is by name; changed
+definitions produce a drop-then-create pair.
+
+The optional C<$source_tables> / C<$target_tables> hashrefs are the C<tables>
+sections of the two models (threaded in by L<DBIO::DB2::Diff>). They are used to
+detect tables being dropped in this same diff pass: DB2's C<DROP TABLE> already
+removes that table's own indexes, so emitting a standalone C<DROP INDEX> for one
+of them would fail (the index is already gone) and abort the deploy (karr #19).
+When these arguments are absent (e.g. direct unit-test calls) the dropped set is
+empty and no drops are suppressed, preserving the original two-argument behaviour.
 
 =head2 as_sql
 

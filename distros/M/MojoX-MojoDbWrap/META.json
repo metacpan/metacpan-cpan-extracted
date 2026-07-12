@@ -32,8 +32,8 @@
       "develop" : {
          "requires" : {
             "Dist::Milla" : "v1.0.22",
-            "Mojo::Pg" : "0",
-            "Mojo::SQLite" : "0",
+            "Mojo::Pg" : "5.0",
+            "Mojo::SQLite" : "4.000000",
             "Path::Tiny" : "0.084",
             "Template::Perlish" : "1.52",
             "Test::Pod" : "1.51",
@@ -42,21 +42,21 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "0",
-            "Ouch" : "0",
-            "namespace::clean" : "0",
+            "Moo" : "2.005005",
+            "Ouch" : "0.0501",
+            "namespace::clean" : "0.27",
             "perl" : "5.024000"
          }
       },
       "test" : {
          "requires" : {
             "Path::Tiny" : "0.084",
-            "Test::Exception" : "0"
+            "Test::Exception" : "0.43"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.002",
+   "version" : "0.004",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

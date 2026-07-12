@@ -13,7 +13,7 @@ DBIO::Manual::Migration - Step-by-step guide for migrating an existing DBIx::Cla
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 OVERVIEW
 
@@ -73,8 +73,8 @@ The following components are gone with no replacement:
 =item * L<DBIx::Class::CDBICompat> - Class::DBI bridge. Port to native
 DBIO Result classes.
 
-=item * L<DBIx::Class::Schema::Versioned> - replaced by
-L<DBIO::Migration> (different DDL strategy; see L<DBIO::Manual::Heritage>).
+=item * L<DBIx::Class::Schema::Versioned> - removed; use L<dbioadmin>'s
+native deploy / upgrade (see L<DBIO::Manual::Heritage>).
 
 =item * L<DBIx::Class::SQLMaker::ClassicExtensions> and the
 L<SQL::Abstract::Classic> escape hatch - DBIO uses canonical
@@ -219,15 +219,21 @@ in multiple driver tests.
 
 =head1 STEP 8 - SCHEMA DEPLOYMENT
 
-DBIO drivers ship native introspect/diff/deploy. SQL::Translator is
-optional and only used as a fallback for drivers that have not yet
-been ported (db2, firebird, informix, mssql, oracle, sybase). For
-PostgreSQL, MySQL and SQLite you get the native path automatically:
+Every DBIO driver ships native introspect/diff/deploy modules; none
+requires L<SQL::Translator>, which is no longer part of the core deploy
+path. C<< $schema->deploy >> checks the active storage for a
+C<dbio_deploy_class()> and routes to that native class:
 
   $schema->deploy;     # routed via dbio_deploy_class on the storage
 
-If your application explicitly invoked C<deploymen_statements> or
-parsed SQL::Translator output, review whether you actually need that
+If a storage declares no native deploy class, C<deploy()> does not
+translate the schema for you - it falls through to
+C<deployment_statements()>, which reads a pre-existing DDL file and
+throws if none is present. The core deploy path never calls
+SQL::Translator.
+
+If your application explicitly invoked C<deployment_statements> or
+parsed SQL::Translator output, review whether you still need that
 plumbing. The native deploy classes - L<DBIO::PostgreSQL::Deploy>,
 L<DBIO::MySQL::Deploy>, L<DBIO::SQLite::Deploy> - expose
 C<install>, C<diff>, C<apply> and C<upgrade> directly.

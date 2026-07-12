@@ -82,13 +82,15 @@ sub target_from_compiled {
         $charset = $collation = undef;   # already undef; explicit for clarity
       }
 
-      # MySQL/MariaDB reports 'NULL' (the string) as default_value for nullable
-      # columns that have no explicit default. Derive this from the schema so
-      # the comparison does not produce a phantom diff.
+      # A portable schema prescribes a default only when it declares one; when it
+      # does not, leave default_value undef so the always-on desired-state
+      # contract in DBIO::Diff::Compare skips it and leaves whatever the live
+      # column reports alone. information_schema reports SQL NULL (-> undef) as
+      # column_default for a nullable column with no explicit DEFAULT clause, so
+      # synthesising a literal string 'NULL' here produced a phantom MODIFY of
+      # every such column against that undef.
       my $not_null = ($c->{not_null} ? 1 : 0);
-      my $default  = defined $c->{default} ? $c->{default}
-                   : $not_null             ? undef
-                   :                         'NULL';
+      my $default  = $c->{default};
 
       push @cols, {
         column_name       => $c->{column_name},
@@ -137,6 +139,7 @@ sub _build_operations {
   );
   push @ops, DBIO::MySQL::Diff::Index->diff(
     $self->source->{indexes}, $self->target->{indexes},
+    $self->source->{tables},  $self->target->{tables},
   );
   push @ops, DBIO::MySQL::Diff::ForeignKey->diff(
     $self->source->{foreign_keys}, $self->target->{foreign_keys},
@@ -160,7 +163,7 @@ DBIO::MySQL::Diff - Compare two introspected MySQL/MariaDB models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

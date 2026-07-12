@@ -8,7 +8,7 @@ require './t/lib/common.pl';
 my $help_pattern = qr|^SYNOPSIS|m;
 
 subtest 'help' => sub {
-	delete local $ENV{'PERLDOC'};
+	local $ENV{'PERLDOC'} = '-o text';
 
 	my @tuples = (
 		 ['--help'], ['-h'],

@@ -95,7 +95,7 @@ DBIO::UUIDColumns - Automatically populate UUID columns on insert
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -109,6 +109,8 @@ version 0.900000
     name      => { data_type => 'varchar', size => 100 },
   );
   __PACKAGE__->set_primary_key('artist_id');
+
+See F<t/uuid_columns.t> for a runnable example.
 
 =head1 DESCRIPTION
 

@@ -8,15 +8,19 @@ SYNOPSIS
         my $off = $log->append("first entry");
         $log->append("second entry");
 
-        # replay from beginning
+        # replay from beginning (each_entry skips abandoned slots silently)
+        $log->each_entry(sub {
+            my ($data, $offset) = @_;
+            say "offset=$offset: $data";
+        });
+
+        # or manually -- guard with `defined $data` since a slot from a
+        # crashed writer is reported as (undef, $next)
         my $pos = 0;
         while (my ($data, $next) = $log->read_entry($pos)) {
-            say "offset=$pos: $data";
+            say "offset=$pos: $data" if defined $data;
             $pos = $next;
         }
-
-        # iterate
-        $log->each_entry(sub { say $_[0] });
 
         # tail: block until new entries
         my $count = $log->entry_count;
@@ -47,12 +51,36 @@ METHODS
 
   Read
         my ($data, $next_off) = $log->read_entry($offset);
-        # returns () if no entry at offset (end of log or uncommitted)
+        my ($data, $next_off) = $log->read_entry($offset, $abandon_wait_us);
+        # returns () if no entry at offset (end of log or in-flight writer)
+        # returns (undef, $next_off) if slot was abandoned by a crashed writer
+
+    "read_entry" distinguishes three cases:
+
+    *   Entry available: returns "($data, $next_off)" where $data is
+        defined.
+
+    *   End / in-flight: returns the empty list. The caller should stop
+        iterating (or wait via "wait_for") and retry.
+
+    *   Abandoned slot: a writer reserved the slot via CAS but died before
+        committing "len". After a bounded wait (default 2s, configurable via
+        the optional second argument $abandon_wait_us) the reader skips the
+        slot, returning "(undef, $next_off)". Pass 0 to skip immediately
+        without waiting.
+
+    "each_entry" handles all three cases internally, silently skipping
+    abandoned slots:
 
         my $final_pos = $log->each_entry(sub {
             my ($data, $offset) = @_;
         });
         my $final_pos = $log->each_entry(\&cb, $start_offset);
+        my $final_pos = $log->each_entry(\&cb, $start_offset, $abandon_wait_us);
+
+    $abandon_wait_us is forwarded to "read_entry"; pass 0 to skip
+    uncommitted slots immediately rather than waiting up to 2s for an
+    in-flight writer.
 
   Status
         my $off  = $log->tail_offset;   # byte offset past last entry
@@ -76,17 +104,18 @@ METHODS
 
   Truncation vs Reset
     The log has a fixed size ("data_size", set at creation). It is
-    append-only — space is never reclaimed automatically.
+    append-only -- space is never reclaimed automatically.
 
     truncate($offset) is concurrency-safe (lock-free CAS). It marks all
-    entries before $offset as logically invalid — readers calling
+    entries before $offset as logically invalid -- readers calling
     "read_entry" or "each_entry" will skip them. However, truncation does
     not free physical space: the tail offset keeps advancing, and the log
     will eventually fill regardless of truncation.
 
-    "reset" reclaims all space by zeroing the tail, but is not
-    concurrency-safe — it must only be called when no other process is
-    reading or writing.
+    "reset" reclaims all space by zeroing the tail and the data region. It
+    is not concurrency-safe -- it must only be called when no other process
+    is reading or writing. Cost is O(data_size) because the slot region is
+    zeroed to prevent stale-data hazards for subsequent readers.
 
     Typical pattern for long-running logs: size the log generously, truncate
     periodically to discard old entries from readers, and reset during
@@ -111,8 +140,15 @@ STATS
     "appends", "waits", "timeouts", "mmap_size".
 
 SECURITY
-    The mmap region is writable by all processes that open it. Do not share
-    backing files with untrusted processes.
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied only when the file is created (an
+    existing file keeps its own permissions). The file is opened with
+    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
+    with "O_EXCL"; the on-disk header is validated when the file is
+    attached. Any process you grant write access to a shared mapping is
+    trusted not to corrupt its contents while other processes are using it.
 
 BENCHMARKS
     Single-process (1M ops, x86_64 Linux, Perl 5.40):

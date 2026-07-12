@@ -239,6 +239,10 @@ static inline void reqrep_mutex_lock(ReqRepHeader *hdr) {
             continue;
         }
         __atomic_add_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
+        /* StoreLoad barrier: publish mutex_waiters++ before re-reading mutex,
+         * so an unlocker either sees our registration (and wakes us) or we see
+         * the unlock here (cur==0 -> retry, no sleep). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t cur = __atomic_load_n(&hdr->mutex, __ATOMIC_RELAXED);
         if (cur != 0) {
             long rc = syscall(SYS_futex, &hdr->mutex, FUTEX_WAIT, cur,
@@ -262,11 +266,19 @@ static inline void reqrep_mutex_lock(ReqRepHeader *hdr) {
 
 static inline void reqrep_mutex_unlock(ReqRepHeader *hdr) {
     __atomic_store_n(&hdr->mutex, 0, __ATOMIC_RELEASE);
+    /* StoreLoad barrier: publish the unlock before reading mutex_waiters, so a
+     * waiter that registered just before we unlocked is observed here. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
+/* The wake_* helpers are called AFTER the caller mutated shared state (enqueued
+ * a message, freed a slot, ...). The leading StoreLoad fence publishes that
+ * mutation before we read the waiter count, so a consumer/producer that
+ * registered concurrently is observed (else its wakeup is lost -> hang). */
 static inline void reqrep_wake_consumers(ReqRepHeader *hdr) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->recv_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->recv_futex, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->recv_futex, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -274,6 +286,7 @@ static inline void reqrep_wake_consumers(ReqRepHeader *hdr) {
 }
 
 static inline void reqrep_wake_producers(ReqRepHeader *hdr) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->send_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->send_futex, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->send_futex, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -281,6 +294,7 @@ static inline void reqrep_wake_producers(ReqRepHeader *hdr) {
 }
 
 static inline void reqrep_wake_slot_waiters(ReqRepHeader *hdr) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->slot_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->slot_futex, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->slot_futex, FUTEX_WAKE, 1, NULL, NULL, 0);
@@ -547,9 +561,31 @@ static int reqrep_compute_layout(uint32_t req_cap, uint32_t resp_slots_n,
     return 0;
 }
 
+/* Securely obtain a fd for a file-backed segment: create it exclusively
+ * (O_CREAT|O_EXCL|O_NOFOLLOW at `mode`, default 0600 = owner-only), or, if it
+ * already exists, attach to it (O_RDWR|O_NOFOLLOW, no O_CREAT). O_EXCL blocks a
+ * pre-seeded or hard-linked file and O_NOFOLLOW a symlink swap, so a local
+ * attacker can no longer redirect or poison the backing store through the path.
+ * Cross-user sharing is opt-in via a wider `mode` (e.g. 0660); the caller still
+ * validates the file's contents. */
+static int reqrep_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { REQREP_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        REQREP_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    REQREP_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
                                     uint32_t resp_slots_n, uint32_t resp_data_max,
-                                    uint64_t arena_hint, char *errbuf) {
+                                    uint64_t arena_hint, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
     req_cap = reqrep_next_pow2(req_cap);
@@ -583,8 +619,8 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
                             req_slots_off, req_arena_off, req_arena_cap,
                             resp_off, resp_stride);
     } else {
-        int fd = open(path, O_RDWR | O_CREAT, 0666);
-        if (fd < 0) { REQREP_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        int fd = reqrep_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
 
         if (flock(fd, LOCK_EX) < 0) {
             REQREP_ERR("flock(%s): %s", path, strerror(errno));
@@ -646,7 +682,7 @@ static ReqRepHandle *reqrep_open(const char *path, uint32_t mode, char *errbuf) 
     if (errbuf) errbuf[0] = '\0';
     if (!path) { REQREP_ERR("path required"); return NULL; }
 
-    int fd = open(path, O_RDWR);
+    int fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
     if (fd < 0) { REQREP_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
 
     if (flock(fd, LOCK_EX) < 0) {
@@ -883,6 +919,14 @@ static int reqrep_send_wait(ReqRepHandle *h, const char *str, uint32_t len,
         if (r == 1 || r == -2) return r;
 
         __atomic_add_fetch(waiter_cnt, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier + re-check: publish waiter_cnt++ before a final
+         * try_send so a consumer that drained the queue / freed a slot in the
+         * gap is seen here (reqrep_wake_* only bump the futex when waiters>0);
+         * else the wakeup is lost. temp r2: a failed re-check must not change
+         * which futex we park on. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        { int r2 = reqrep_try_send(h, str, len, utf8, out_id);
+          if (r2 == 1 || r2 == -2) { __atomic_sub_fetch(waiter_cnt, 1, __ATOMIC_RELEASE); return r2; } }
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!reqrep_remaining_time(&deadline, &remaining)) {
@@ -915,13 +959,21 @@ static inline int reqrep_recv_locked(ReqRepHandle *h, const char **out_str,
     ReqSlot *slot = &h->req_slots[idx];
 
     uint32_t len = slot->packed_len & REQREP_STR_LEN_MASK;
+    uint32_t arena_off = slot->arena_off;
     *out_utf8 = (slot->packed_len & REQREP_UTF8_FLAG) != 0;
     *out_id = REQREP_MAKE_ID(slot->resp_slot, slot->resp_gen);
+
+    /* arena_off/len come raw from the shared segment and a local
+     * peer can write the backing file. Bound arena_off+len against the arena
+     * capacity before the copy; a corrupt entry delivers an empty payload rather
+     * than reading out of bounds. Never taken for data written by our own send. */
+    if ((uint64_t)arena_off + len > (uint64_t)h->req_arena_cap)
+        len = 0;
 
     if (!reqrep_ensure_copy_buf(h, len + 1))
         return -1;
     if (len > 0)
-        memcpy(h->copy_buf, h->req_arena + slot->arena_off, len);
+        memcpy(h->copy_buf, h->req_arena + arena_off, len);
     h->copy_buf[len] = '\0';
     *out_str = h->copy_buf;
     *out_len = len;
@@ -967,6 +1019,18 @@ static int reqrep_recv_wait(ReqRepHandle *h, const char **out_str,
         if (r != 0) return r;
 
         __atomic_add_fetch(&hdr->recv_waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier + re-check: publish recv_waiters++ before a final
+         * try_recv, so a producer that enqueued in the gap since our first
+         * try_recv is observed here (or observes our waiter count and bumps
+         * recv_futex). reqrep_wake_consumers only bumps recv_futex when
+         * waiters>0, so without this a message posted in that window is lost
+         * and we sleep forever. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        r = reqrep_try_recv(h, out_str, out_len, out_utf8, out_id);
+        if (r != 0) {
+            __atomic_sub_fetch(&hdr->recv_waiters, 1, __ATOMIC_RELEASE);
+            return r;
+        }
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!reqrep_remaining_time(&deadline, &remaining)) {
@@ -1040,12 +1104,15 @@ static int reqrep_reply(ReqRepHandle *h, uint64_t id,
         __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
         __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
         __atomic_store_n(&slot->state, RESP_FREE, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: publish the slot state/generation change before reading waiters (else a registered waiter's wakeup is lost). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
         reqrep_wake_slot_waiters(h->hdr);
         return -2;
     }
 
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &slot->state, FUTEX_WAKE, 1, NULL, NULL, 0);
 
@@ -1102,6 +1169,10 @@ static int reqrep_get_wait(ReqRepHandle *h, uint64_t id,
             return reqrep_try_get(h, id, out_str, out_len, out_utf8);
 
         __atomic_add_fetch(&slot->waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: publish slot->waiters++ before re-reading
+         * generation/state, so a responder either sees our registration (and
+         * wakes us) or we see its state change here (and don't sleep). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
 
         /* Re-check: cancel may have fired between try_get and waiter registration */
         if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != REQREP_ID_GEN(id)) {
@@ -1146,6 +1217,7 @@ static void reqrep_cancel(ReqRepHandle *h, uint64_t id) {
         __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
         __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
         /* Wake get_wait blocked on this slot's state futex */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
         reqrep_wake_slot_waiters(h->hdr);
@@ -1236,6 +1308,7 @@ static void reqrep_clear(ReqRepHandle *h) {
                     0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
                 __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
                 __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
                 if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
                 break;
@@ -1364,7 +1437,7 @@ static void reqrep_int_init_header(void *base, uint32_t req_cap, uint32_t resp_s
 }
 
 static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
-                                        uint32_t resp_slots_n, char *errbuf) {
+                                        uint32_t resp_slots_n, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     req_cap = reqrep_next_pow2(req_cap);
     if (req_cap == 0) { REQREP_ERR("invalid req_cap"); return NULL; }
@@ -1388,8 +1461,8 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { REQREP_ERR("mmap(anonymous): %s", strerror(errno)); return NULL; }
     } else {
-        int fd = open(path, O_RDWR | O_CREAT, 0666);
-        if (fd < 0) { REQREP_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
+        int fd = reqrep_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { REQREP_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { REQREP_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -1517,6 +1590,12 @@ static int reqrep_int_send_wait(ReqRepHandle *h, int64_t value,
         if (r == 1) return 1;
 
         __atomic_add_fetch(waiter_cnt, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier + re-check (see reqrep_send_wait): a consumer that
+         * drained the queue / freed a slot in the gap is seen here, else the
+         * wakeup is lost.  temp r2: a failed re-check must not re-select the futex. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        { int r2 = reqrep_int_try_send(h, value, out_id);
+          if (r2 == 1) { __atomic_sub_fetch(waiter_cnt, 1, __ATOMIC_RELEASE); return r2; } }
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!reqrep_remaining_time(&deadline, &remaining)) {
@@ -1572,6 +1651,14 @@ static int reqrep_int_recv_wait(ReqRepHandle *h, int64_t *out_value,
         uint32_t fseq = __atomic_load_n(&hdr->recv_futex, __ATOMIC_ACQUIRE);
         if (reqrep_int_try_recv(h, out_value, out_id)) return 1;
         __atomic_add_fetch(&hdr->recv_waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier + re-check after registering; see reqrep_recv_wait.
+         * recv_futex is only bumped when waiters>0, so a message enqueued in the
+         * gap before we registered is lost without this re-check. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        if (reqrep_int_try_recv(h, out_value, out_id)) {
+            __atomic_sub_fetch(&hdr->recv_waiters, 1, __ATOMIC_RELEASE);
+            return 1;
+        }
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!reqrep_remaining_time(&deadline, &remaining)) {
@@ -1617,12 +1704,14 @@ static int reqrep_int_reply(ReqRepHandle *h, uint64_t id, int64_t value) {
         __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
         __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
         __atomic_store_n(&slot->state, RESP_FREE, __ATOMIC_RELEASE);
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
         reqrep_wake_slot_waiters(h->hdr);
         return -2;
     }
 
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &slot->state, FUTEX_WAKE, 1, NULL, NULL, 0);
     __atomic_add_fetch(&h->hdr->stat_replies, 1, __ATOMIC_RELAXED);
@@ -1660,6 +1749,9 @@ static int reqrep_int_get_wait(ReqRepHandle *h, uint64_t id, int64_t *out_value,
         if (state == RESP_READY)
             return reqrep_int_try_get(h, id, out_value);
         __atomic_add_fetch(&slot->waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: see reqrep_recv_wait's slot path — publish
+         * slot->waiters++ before re-reading generation/state. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != REQREP_ID_GEN(id)) {
             __atomic_sub_fetch(&slot->waiters, 1, __ATOMIC_RELEASE);
             return -4;
@@ -1738,6 +1830,7 @@ static void reqrep_int_clear(ReqRepHandle *h) {
                     0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
                 __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
                 __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
                 if (__atomic_load_n(&slot->waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
                 break;

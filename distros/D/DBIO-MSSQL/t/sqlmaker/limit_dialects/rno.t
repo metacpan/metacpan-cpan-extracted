@@ -2,6 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN {
+  eval { require DBIO::SQLite::Test; DBIO::SQLite::Test->import(':DiffSQL'); 1 }
+    or plan skip_all => 'DBIO::SQLite::Test (from DBIO::SQLite) required for SQL comparison helpers';
+}
+
 # Offline test for the MSSQL RowNumberOver limit dialect. No live DB and no
 # SQLite test infrastructure -- exercises DBIO::MSSQL::SQLMaker->apply_limit
 # directly, which is what the storage invokes to slice result sets (MSSQL has
@@ -10,7 +15,6 @@ use Test::More;
 # the SQLMaker subclass.
 
 use_ok 'DBIO::MSSQL::SQLMaker';
-use DBIO::SQLite::Test ':DiffSQL';
 
 my $OFFSET = DBIO::SQLMaker::ClassicExtensions->__offset_bindtype;
 my $TOTAL  = DBIO::SQLMaker::ClassicExtensions->__total_bindtype;

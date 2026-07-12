@@ -125,7 +125,7 @@ DBIO::PostgreSQL::PostGIS::ResultSet - Spatial query helpers for PostGIS-aware r
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

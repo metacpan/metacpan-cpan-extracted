@@ -3,8 +3,8 @@ package DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder;
 
 use strict;
 use warnings;
-use Carp qw( croak );
 use DBIO::Carp;
+use DBIO::Exception;
 
 my %WKB_TYPES = (
   1 => 'point', 2 => 'linestring', 3 => 'polygon',
@@ -23,10 +23,10 @@ sub decode_hex {
   my $len = length($bin);
   my $pos = 0;
 
-  croak 'decode_hex: empty input' unless $len > 0;
+  DBIO::Exception->throw('decode_hex: empty input') unless $len > 0;
 
   my $byte_order = _read_uint8(\$bin, \$pos, $len);
-  croak "decode_hex: invalid byte_order" unless $byte_order == 1 || $byte_order == 0;
+  DBIO::Exception->throw("decode_hex: invalid byte_order") unless $byte_order == 1 || $byte_order == 0;
   my $le = ($byte_order == 1);
 
   my $type_raw = _read_uint32(\$bin, \$pos, $le, $len);
@@ -48,8 +48,9 @@ sub decode_hex {
 
 sub _check_bounds {
   my ($buf, $pos, $need, $len) = @_;
-  croak "decode_hex: underrun at pos $$pos (need $need, have " . ($len - $$pos) . ")"
-    if $$pos + $need > $len;
+  DBIO::Exception->throw(
+    "decode_hex: underrun at pos $$pos (need $need, have " . ($len - $$pos) . ")"
+  ) if $$pos + $need > $len;
 }
 
 sub _read_uint8 {
@@ -120,7 +121,7 @@ DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder - EWKB-hex decoder for PostGIS ge
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 METHODS
 

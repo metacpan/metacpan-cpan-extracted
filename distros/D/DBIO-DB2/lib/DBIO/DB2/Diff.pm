@@ -24,8 +24,12 @@ sub _build_operations {
     $self->source->{columns}, $self->target->{columns},
     $self->source->{tables},  $self->target->{tables},
   );
+  # Index::diff also needs the tables sections to detect which tables are being
+  # dropped in this same pass, so it can suppress a standalone DROP INDEX that
+  # DROP TABLE already covers (DB2 drops a table's own indexes with it -- karr #19).
   push @ops, DBIO::DB2::Diff::Index->diff(
     $self->source->{indexes}, $self->target->{indexes},
+    $self->source->{tables},  $self->target->{tables},
   );
   push @ops, DBIO::DB2::Diff::ForeignKey->diff(
     $self->source->{foreign_keys}, $self->target->{foreign_keys},
@@ -49,7 +53,7 @@ DBIO::DB2::Diff - Compare two introspected DB2 models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,349 @@
+#!/usr/bin/env perl
+# dbio-demo-async -- demonstrate DBIO with the async PostgreSQL driver (EV::Pg).
+#
+# What this script actually shows:
+#   * Real event loop (AnyEvent condvar driving EV::Pg callbacks)
+#   * Schema deployment via DBIO's native deploy pipeline on EV::Pg
+#     (deploy_async -> pg_install_ddl -> txn_do_async) -- not hand-written
+#     CREATE TABLE statements, not the sync dbh_do path
+#   * Direct calls to the storage's _async methods (insert_async, select_async,
+#     txn_do_async) -- never the sync wrappers, which would just block the loop
+#   * Parallelism proof: a parallel batch of N inserts is timed against a
+#     sequential baseline, ratio printed
+#   * Parallel reads: 3 count queries fired concurrently
+#   * A real async transaction via txn_do_async
+#
+# Usage:
+#   dbio-demo-async dbi:Pg:dbname=test [USER] [PASS]
+#
+# AnyEvent comes along for free via EV::Pg; we require it lazily so the demo
+# still produces a useful error if someone runs it on a system that does not
+# have it installed.
+
+use strict;
+use warnings;
+use 5.020;
+use IO::Handle;
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+
+# ---------------------------------------------------------------------------
+# Inline schema -- Artist -> CD -> Track (same shape as dbio-demo)
+# ---------------------------------------------------------------------------
+
+package Demo::Schema::Result::Artist {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_artist');
+  __PACKAGE__->add_columns(
+    id   => { data_type => 'integer', is_auto_increment => 1 },
+    name => { data_type => 'varchar', size => 128 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->add_unique_constraint([qw( name )]);
+  __PACKAGE__->has_many(cds => 'Demo::Schema::Result::CD', 'artist_id');
+}
+
+package Demo::Schema::Result::CD {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_cd');
+  __PACKAGE__->add_columns(
+    id        => { data_type => 'integer', is_auto_increment => 1 },
+    artist_id => { data_type => 'integer' },
+    title     => { data_type => 'varchar', size => 256 },
+    year      => { data_type => 'integer', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->belongs_to(artist => 'Demo::Schema::Result::Artist', 'artist_id');
+  __PACKAGE__->has_many(tracks => 'Demo::Schema::Result::Track', 'cd_id');
+}
+
+package Demo::Schema::Result::Track {
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('demo_track');
+  __PACKAGE__->add_columns(
+    id       => { data_type => 'integer', is_auto_increment => 1 },
+    cd_id    => { data_type => 'integer' },
+    title    => { data_type => 'varchar', size => 256 },
+    position => { data_type => 'integer', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+  __PACKAGE__->belongs_to(cd => 'Demo::Schema::Result::CD', 'cd_id');
+}
+
+package Demo::Schema {
+  use DBIO Schema => -pg;
+  # ONE schema, both modes. `-pg` pins storage_type to DBIO::PostgreSQL::Storage
+  # (the sync DBI/DBD::Pg storage). The sync driver no longer auto-routes async
+  # to this dist -- its default async backend is the forked fallback -- so the
+  # demo opts into DBIO::PostgreSQL::EV::Storage explicitly after connect (below).
+  # load_components('PostgreSQL') then layers in the PostgreSQL schema
+  # component (provides pg_install_ddl -> native DDL generator), which
+  # deploy_async consumes.
+  __PACKAGE__->load_components('PostgreSQL');
+  __PACKAGE__->register_class(Artist => 'Demo::Schema::Result::Artist');
+  __PACKAGE__->register_class(CD     => 'Demo::Schema::Result::CD');
+  __PACKAGE__->register_class(Track  => 'Demo::Schema::Result::Track');
+}
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+package main;
+
+my $dsn  = shift or die "Usage: dbio-demo-async DSN [USER] [PASS]\n";
+my $user = shift;
+my $pass = shift;
+
+sub banner { say "\n", "=" x 60, "\n  $_[0]\n", "=" x 60 }
+sub step   { say "\n--- $_[0] ---" }
+sub show   { printf "  %-14s %s\n", @_ }
+
+# hrtime() returns a high-resolution monotonic time in seconds (Time::HiRes).
+# EV::Pg already requires Time::HiRes, so we get it for free.
+sub hrtime { Time::HiRes::time() }
+
+# ---------------------------------------------------------------------------
+# Banner & connect
+# ---------------------------------------------------------------------------
+
+banner("DBIO Async Demo (PostgreSQL + EV::Pg)");
+show("DSN:", $dsn);
+
+# Event-loop glue must be present for the async ops + the await() pump below.
+# The EV::Pg async backend (DBIO::PostgreSQL::EV::Storage) is opted into
+# explicitly after connect (below) and loaded lazily on first use -- we only
+# need the dist installed, not loaded here.
+eval { require AnyEvent; require EV; require EV::Pg; require Future; require Time::HiRes; 1 }
+  or die "AnyEvent / EV / EV::Pg / Future / Time::HiRes required -- EV::Pg comes with EV::Pg\n";
+
+step("Connecting (ONE schema -- sync DBI + lazy async EV::Pg backend)");
+my $schema  = Demo::Schema->connect($dsn, $user, $pass, {
+  AutoCommit => 1,
+  RaiseError => 1,
+});
+my $storage = $schema->storage;
+
+# Opt into the EV::Pg async backend explicitly. The sync driver no longer
+# defaults its async backend to this dist (its default is now the forked
+# fallback), so EV is opt-in. Must run before the first *_async call -- and
+# before the future_class gate below, which only reads 'Future' once the EV
+# backend has resolved.
+$storage->async_backend('DBIO::PostgreSQL::EV::Storage');
+
+say "  Connected.";
+show("Storage:", ref $storage);
+show("Future class:", $storage->future_class);
+
+# Hard verification gate. The SAME schema must give a sync DBI storage whose
+# pluggable async backend resolved to the real EV::Pg one: future_class flips
+# from DBIO::Test::Future (degrade) to Future. If it didn't resolve, the async
+# ops below would silently block the event loop instead of running async.
+die "wrong storage: ", ref($storage),
+    " (expected DBIO::PostgreSQL::Storage)\n"
+  unless ref($storage) eq 'DBIO::PostgreSQL::Storage';
+die "async backend did not resolve (future_class=", $storage->future_class,
+    ") -- is dbio-postgresql-ev installed?\n"
+  unless $storage->future_class eq 'Future';
+
+# Block until the future resolves by running the EV loop one tick at a
+# time. EV::Pg callbacks fire through EV; a Future only resolves when its
+# callback runs, so EV::run has to actually be pumped. AnyEvent->condvar
+# ->recv would normally do this, but in this mixed EV/AnyEvent script the
+# condvar's watcher doesn't reliably pick up EV::Pg's socket activity.
+# The async test suite uses the same EV::run(RUN_ONCE) loop -- we mirror it.
+sub await {
+  my ($f, $what) = @_;
+  my $label = $what // 'future';
+  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $label (>30s)\n" };
+  alarm 30;
+  EV::run(2) until $f->is_ready;  # EV::RUN_ONCE == 2
+  alarm 0;
+  die "$label failed: ", $f->failure, "\n" if $f->failure;
+  return $f->result;  # wants LIST context; caller must use list assignment
+}
+
+# ---------------------------------------------------------------------------
+# Deploy (async) -- via the native DBIO deploy pipeline. The DDL is generated
+# locally from the schema classes (DBIO::PostgreSQL::DDL->install_ddl), then
+# every statement is executed on EV::Pg inside a single async transaction by
+# $storage->deploy_async. Same storage the async ops below use; no hand-written
+# CREATE TABLE statements, no second connection.
+# ---------------------------------------------------------------------------
+
+step("Deploying schema (3 tables, async via deploy_async on EV::Pg)");
+# deploy_async lives on the async backend (the same backend that exposes
+# listen/notify/copy_in); CRUD *_async methods are dispatched transparently
+# from the sync storage, but a non-CRUD method needs $storage->async.
+await(
+  $storage->async->deploy_async($schema, { add_drop_table => 1 }),
+  'deploy_async',
+);
+say "  Tables created: demo_artist, demo_cd, demo_track";
+
+# ---------------------------------------------------------------------------
+# Insert a parent row (Artist + CD) synchronously so we have something to hang
+# tracks off of. Using the sync wrappers here is fine -- we're not trying to
+# prove anything about this section.
+# ---------------------------------------------------------------------------
+
+step("Inserting parent rows (Artist + CD)");
+# Two sequential async inserts. Future->then chaining here loses the
+# inner result (verified empirically), so we drive each insert through
+# await() and use plain variables to thread the ids.
+my ($artist_row) = await(
+  $storage->insert_async('demo_artist', { name => 'Async Demo Artist' }),
+  'insert artist',
+);
+my $artist_id = $artist_row->[0];
+my ($cd_row) = await(
+  $storage->insert_async('demo_cd', {
+    artist_id => $artist_id,
+    title     => 'Concurrency Test CD',
+    year      => 2024,
+  }),
+  'insert cd',
+);
+my $cd_id = $cd_row->[0];
+say "  Done.";
+show("Artist id:", $artist_id);
+show("CD id:    ", $cd_id);
+
+# ---------------------------------------------------------------------------
+# Baseline: N sequential inserts. Uses the SYNC wrapper (->get on the future)
+# so each insert blocks the event loop until its result comes back. This is
+# what the demo would look like if it had no event loop at all.
+# ---------------------------------------------------------------------------
+
+step("Baseline: N=10 sequential inserts (one at a time)");
+my $N = 10;
+my $t0 = hrtime;
+my @seq_ids;
+# Honest baseline: fire each insert, await its Future, then fire the next.
+# This serializes the round-trips on a single connection so the comparison
+# against the parallel batch below is apples-to-apples.
+for my $i (1 .. $N) {
+  my $f = $storage->insert_async('demo_track', {
+    cd_id    => $cd_id,
+    title    => sprintf('Sequential Track %02d', $i),
+    position => $i,
+  });
+  my ($row) = await($f, "seq insert $i");
+  push @seq_ids, $row->[0];
+}
+my $t1 = hrtime;
+my $t_seq = $t1 - $t0;  # NOTE: assign $t1 first; inline hrtime-$t0 miscomputes
+show("Inserted:", scalar(@seq_ids) . " tracks");
+show("Wall:   ", sprintf('%.3f s', $t_seq));
+
+# ---------------------------------------------------------------------------
+# Parallel: fire N inserts at once. Every insert_async returns a Future
+# immediately; we gather them with Future->needs_all and let the event loop
+# drive all the queries in parallel. Time drops from N * RTT to ~RTT.
+# ---------------------------------------------------------------------------
+
+step("Parallel: N=10 concurrent inserts (insert_async + needs_all)");
+my @par_futures;
+$t0 = hrtime;
+for my $i (1 .. $N) {
+  push @par_futures, $storage->insert_async('demo_track', {
+    cd_id    => $cd_id,
+    title    => sprintf('Parallel Track %02d', $i),
+    position => $N + $i,
+  });
+}
+my @par_rows = map { @$_ } await(Future->needs_all(@par_futures), 'parallel inserts');
+my $t2 = hrtime;
+my $t_par = $t2 - $t0;
+my $par_rows_n = scalar(@par_rows) / 4;  # 4 columns per row in RETURNING *
+show("Inserted:", $par_rows_n);
+show("Wall:   ", sprintf('%.3f s', $t_par));
+show("Speedup:", sprintf('%.2fx', $t_seq / ($t_par || 1e-9)));
+
+# ---------------------------------------------------------------------------
+# Parallel reads: 3 count() queries fired at the same time. Each one becomes
+# a single SELECT COUNT(*) -- with the sync driver this would be three
+# round-trips; here it is one.
+# ---------------------------------------------------------------------------
+
+step("Parallel reads: 3 count queries fired concurrently");
+my @read_futures;
+$t0 = hrtime;
+push @read_futures, $storage->select_async('demo_track', \[ 'COUNT(*) AS n' ], { cd_id => $cd_id });
+push @read_futures, $storage->select_async('demo_artist', \[ 'COUNT(*) AS n' ], { id    => $artist_id });
+push @read_futures, $storage->select_async('demo_cd',     \[ 'COUNT(*) AS n' ], { id    => $cd_id     });
+my @read_results = map { $_->[0] } await(Future->needs_all(@read_futures), 'parallel reads');
+my $t3 = hrtime;
+my $t_read = $t3 - $t0;
+show("Tracks:",  $read_results[0]);
+show("Artists:", $read_results[1]);
+show("CDs:    ", $read_results[2]);
+show("Wall:   ", sprintf('%.3f s', $t_read));
+
+# ---------------------------------------------------------------------------
+# Async transaction: insert a batch inside txn_do_async, then ROLLBACK to
+# prove the whole batch is atomic. The coderef receives a TransactionContext;
+# CRUD calls on the context ($ctx->insert_async) run on the pinned connection,
+# so BEGIN / writes / COMMIT / ROLLBACK all share one socket.
+# ---------------------------------------------------------------------------
+
+step("Async transaction: insert 5 tracks, then ROLLBACK");
+# Inside txn_do_async all CRUD runs on a SINGLE pinned connection -- the
+# one that ran BEGIN. Concurrent inserts on the same EV::Pg handle hit
+# libpq's "another command is already in progress". Serialise with then.
+my $txn_done = 0;
+my $txn_err;
+my $txn_f = $storage->txn_do_async(sub {
+  my ($ctx) = @_;
+  my $chain = $ctx->insert_async('demo_track', {
+    cd_id    => $cd_id,
+    title    => 'Txn Track 01',
+    position => 101,
+  });
+  for my $i (2 .. 5) {
+    $chain = $chain->then(sub {
+      return $ctx->insert_async('demo_track', {
+        cd_id    => $cd_id,
+        title    => sprintf('Txn Track %02d', $i),
+        position => 100 + $i,
+      });
+    });
+  }
+  $chain->then(sub {
+    say "  Inserted 5 rows in txn (rolling back).";
+    die "intentional rollback\n";
+  });
+});
+# The txn future is expected to FAIL (we die inside it to trigger ROLLBACK).
+# Drive the loop until it's resolved; if it's done -> txn committed (wrong,
+# our die should have failed it); if it failed -> that's the rolled-back path.
+EV::run(2) until $txn_f->is_ready;  # EV::RUN_ONCE == 2
+if ($txn_f->is_done) {
+  $txn_done = 1;
+} else {
+  $txn_err = $txn_f->failure;
+}
+show("Outcome:", $txn_done ? 'COMMITTED' : 'rolled back');
+show("Error:  ", ($txn_err // ''));
+
+# Confirm rollback worked: the txn-track rows must be gone.
+my $rb_f = $storage->select_async('demo_track', \[ 'COUNT(*) AS n' ],
+  { cd_id => $cd_id, title => { like => 'Txn Track%' } });
+my $count_after_rollback = (await($rb_f, 'post-rollback count'))[0][0];
+show("Tracks named 'Txn Track%':", $count_after_rollback);
+die "rollback did not undo txn inserts\n" if $count_after_rollback != 0;
+
+# ---------------------------------------------------------------------------
+# Done
+# ---------------------------------------------------------------------------
+
+banner("Done");
+say "  Async PostgreSQL demo complete.";
+say "  Parallel batch ran in " . sprintf('%.3fs', $t_par)
+  . " vs sequential " . sprintf('%.3fs', $t_seq)
+  . " -- " . sprintf('%.2fx speedup', $t_seq / ($t_par || 1e-9)) . ".\n";
+
+$storage->disconnect;

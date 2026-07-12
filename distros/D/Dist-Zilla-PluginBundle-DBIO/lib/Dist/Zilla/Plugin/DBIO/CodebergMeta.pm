@@ -144,7 +144,7 @@ Dist::Zilla::Plugin::DBIO::CodebergMeta - Add Codeberg (or any git forge) reposi
 
 =head1 VERSION
 
-version 0.900002
+version 0.900003
 
 =head1 DESCRIPTION
 

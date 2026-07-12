@@ -896,23 +896,21 @@ TO_CONTRIBUTE
         open(FH_SECURITY,'>SECURITY.md') || die "Can't open file: SECURITY.md\n";
         binmode FH_SECURITY;
         print FH_SECURITY <<'TO_SECURITY';
-# Security Policy
+We're waiting for you in the Jacode4e distribution, with our hearts pumping.
+https://metacpan.org/dist/Jacode4e
 
-## Reporting a Vulnerability
 
-If you discover a security vulnerability in this distribution, please report
-it by e-mail to the author at ina@cpan.org.
+Thank you for your interest in this software.
 
-Do NOT open a public GitHub issue for security vulnerabilities.  Please use
-private e-mail so that a fix can be prepared before public disclosure.
+This software is no longer maintained by its original author and is provided as-is.
 
-You can expect an acknowledgement within a few days.  If you do not receive
-a response within one week, please follow up.
+Almost all of this software's functionality has been carried over to the Jacode4e distribution.
+https://metacpan.org/dist/Jacode4e
 
-## Supported Versions
+Please see the documentation included with the Jacode4e distribution for usage instructions.
 
-Only the most recent release on CPAN is actively maintained.  Please
-upgrade to the latest version before reporting security issues.
+
+See you there!
 TO_SECURITY
         close FH_SECURITY;
         check_usascii('SECURITY.md');

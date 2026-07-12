@@ -1,5 +1,8 @@
 Revision history for OpenSearch::Client
 
+3.007007    2026-01-11
+            * POD link corrections for Bulk and Scroll helper classes
+            
 3.007006    2026-07-08
             * POD link corrections
             * Tweak tests to run OK against an AWS Managed instance

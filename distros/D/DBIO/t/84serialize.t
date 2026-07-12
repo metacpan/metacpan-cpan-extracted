@@ -20,13 +20,13 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # Artist columns: artistid, name, rank, charfield
 $schema->storage->mock_persistent(
-  qr/SELECT me\.artistid.*FROM artist me/i,
+  qr/SELECT "me"\."artistid".*FROM "artist" "me"/i,
   [[ 1, 'Caterwauler McCrae', 13, undef ]],
 );
 
 # CD search_related columns: cdid, artist, title, year, genreid, single_track
 $schema->storage->mock_persistent(
-  qr/SELECT me\.cdid.*FROM cd me/i,
+  qr/SELECT "me"\."cdid".*FROM cd "me"/i,
   [
     [ 1, 1, 'Spoonful of bees',       '1999', undef, undef ],
     [ 2, 1, 'Forkful of chortles',    '2001', undef, undef ],

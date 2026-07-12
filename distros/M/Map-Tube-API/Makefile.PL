@@ -30,15 +30,27 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::API'            => { file => 'lib/Map/Tube/API.pm'          , version => '0.09' },
-            'Map::Tube::API::UserAgent' => { file => 'lib/Map/Tube/API/UserAgent.pm', version => '0.09' },
-            'Map::Tube::API::Exception' => { file => 'lib/Map/Tube/API/Exception.pm', version => '0.09' },
+            'Map::Tube::API' => {
+                file    => 'lib/Map/Tube/API.pm',
+                version => MM->parse_version('lib/Map/Tube/API.pm')
+            },
+            'Map::Tube::API::UserAgent' => {
+                file    => 'lib/Map/Tube/API/UserAgent.pm',
+                version => MM->parse_version('lib/Map/Tube/API/UserAgent.pm')
+            },
+            'Map::Tube::API::Exception' => {
+                file    => 'lib/Map/Tube/API/Exception.pm',
+                version => MM->parse_version('lib/Map/Tube/API/Exception.pm')
+            },
         },
         resources => {
             repository => {
                 type => 'git',
                 url  => 'https://github.com/manwar/Map-Tube-API.git',
                 web  => 'https://github.com/manwar/Map-Tube-API',
+            },
+            bugtracker => {
+                web  => 'https://github.com/manwar/Map-Tube-API/issues'
             },
         }})
      : ()

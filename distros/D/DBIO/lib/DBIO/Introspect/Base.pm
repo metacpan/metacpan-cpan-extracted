@@ -4,6 +4,10 @@ package DBIO::Introspect::Base;
 use strict;
 use warnings;
 
+our $CONTRACT_VERSION = '1.1';
+
+
+sub contract_version { $CONTRACT_VERSION }
 
 sub new {
   my ($class, %args) = @_;
@@ -164,7 +168,7 @@ DBIO::Introspect::Base - Base class for DBIO driver introspectors
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -289,6 +293,25 @@ Comment string for a column, or C<undef>.
 Optional hook for driver-specific emitter statements. Each element is an
 arrayref C<[ $method_name, @args ]> which L<DBIO::Generate> emits verbatim
 as C<__PACKAGE__->method_name(@args)>. Defaults to an empty list.
+
+=head1 CONTRACT VERSION
+
+This class exposes an independent compatibility version, distinct from
+C<$VERSION> (the dist version injected by L<Dist::Zilla>'s
+C<VersionFromMainModule>):
+
+    my $v = $class->contract_version;
+
+C<$CONTRACT_VERSION> bumps when the L</CANONICAL MODEL> shape or the normalized
+contract methods (L</table_keys>, L</table_columns>, L</table_columns_info>,
+L</table_pk_info>, L</table_uniq_info>, L</table_fk_info>, L</table_is_view>,
+L</view_definition>, L</table_comment>, L</column_comment>,
+L</result_class_extra_statements>) changes. The dist C<$VERSION> bumps on
+every release, but two core releases at the same contract version remain
+wire-compatible. Out-of-tree drivers should record the contract version they
+were last tested against and compare it against core's at load time, warning
+(or strict-failing under C<DBIO_STRICT_CONTRACT>) when the shapes have
+drifted. See F<docs/adr/> for the contract-version policy.
 
 =head1 CANONICAL MODEL
 

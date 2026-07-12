@@ -44,25 +44,28 @@
    "provides" : {
       "Map::Tube::API" : {
          "file" : "lib/Map/Tube/API.pm",
-         "version" : "0.09"
+         "version" : "v1.0.0"
       },
       "Map::Tube::API::Exception" : {
          "file" : "lib/Map/Tube/API/Exception.pm",
-         "version" : "0.09"
+         "version" : "v1.0.0"
       },
       "Map::Tube::API::UserAgent" : {
          "file" : "lib/Map/Tube/API/UserAgent.pm",
-         "version" : "0.09"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Map-Tube-API/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Map-Tube-API.git",
          "web" : "https://github.com/manwar/Map-Tube-API"
       }
    },
-   "version" : "0.09",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

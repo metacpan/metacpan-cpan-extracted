@@ -36,7 +36,7 @@ DBIO::Test::Schema::Moose::ResultSet::Artist - Custom Moose-based ResultSet for 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

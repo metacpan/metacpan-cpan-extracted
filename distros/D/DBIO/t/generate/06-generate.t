@@ -83,7 +83,7 @@ my $artist_code = do { local $/; <$fh> };
 close $fh;
 
 like $artist_code, qr/package My::Schema::Result::Artist/, 'Artist package';
-like $artist_code, qr/__PACKAGE__->table\('artists'\)/,    'Artist table';
+like $artist_code, qr/__PACKAGE__->table\(['"]artists['"]\)/, 'Artist table';
 like $artist_code, qr/has_many/,                           'has_many on Artist';
 
 open my $fh2, '<', $cd_file or die $!;

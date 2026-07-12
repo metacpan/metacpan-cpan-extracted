@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.81.16 2026-07-12 00:00:00
+  - change SECURITY.md
+  - created by INABA Hitoshi
+
 2.13.81.15 2026-04-18 00:00:00
   - add t/9001_cheatsheet_ja.t (Japanese cheatsheet + tests)
   - add t/9002_cheatsheet_en.t (English cheatsheet + tests)

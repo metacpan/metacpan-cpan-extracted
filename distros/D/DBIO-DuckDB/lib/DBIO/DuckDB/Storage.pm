@@ -7,7 +7,6 @@ use warnings;
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
 
-use Carp 'croak';
 use Try::Tiny;
 use namespace::clean;
 
@@ -55,7 +54,7 @@ sub _ping {
 
 sub duckdb_appender {
   my ($self, $table, $schema) = @_;
-  croak 'Usage: $storage->duckdb_appender($table [, $schema])' unless $table;
+  $self->throw_exception('Usage: $storage->duckdb_appender($table [, $schema])') unless $table;
   return $self->_get_dbh->x_duckdb_appender($table, $schema);
 }
 
@@ -76,7 +75,7 @@ sub duckdb_arrow_fetch {
 
 sub duckdb_read_csv {
   my ($self, $path, $opts) = @_;
-  croak 'Usage: $storage->duckdb_read_csv($path [, \%opts])' unless $path;
+  $self->throw_exception('Usage: $storage->duckdb_read_csv($path [, \%opts])') unless $path;
   my $sth = $self->_get_dbh->x_duckdb_read_csv($path, $opts // {});
   my @rows;
   while (my $row = $sth->fetchrow_hashref) { push @rows, { %$row } }
@@ -86,7 +85,7 @@ sub duckdb_read_csv {
 
 sub duckdb_read_parquet {
   my ($self, $path) = @_;
-  croak 'Usage: $storage->duckdb_read_parquet($path)' unless $path;
+  $self->throw_exception('Usage: $storage->duckdb_read_parquet($path)') unless $path;
   return $self->_get_dbh->selectall_arrayref(
     'SELECT * FROM read_parquet(?)',
     { Slice => {} },
@@ -97,7 +96,7 @@ sub duckdb_read_parquet {
 
 sub duckdb_read_json {
   my ($self, $path, $opts) = @_;
-  croak 'Usage: $storage->duckdb_read_json($path [, \%opts])' unless $path;
+  $self->throw_exception('Usage: $storage->duckdb_read_json($path [, \%opts])') unless $path;
   my $sth = $self->_get_dbh->x_duckdb_read_json($path, $opts // {});
   my @rows;
   while (my $row = $sth->fetchrow_hashref) { push @rows, { %$row } }
@@ -113,9 +112,9 @@ sub duckdb_version {
 
 sub duckdb_install_extension {
   my ($self, $name, %opts) = @_;
-  croak 'extension name required' unless $name;
+  $self->throw_exception('extension name required') unless $name;
   $name =~ /^[A-Za-z_][A-Za-z0-9_]*$/
-    or croak "invalid extension name: $name";
+    or $self->throw_exception("invalid extension name: $name");
   my $dbh = $self->_get_dbh;
   $dbh->do("INSTALL $name");
   $dbh->do("LOAD $name") if $opts{load};
@@ -133,14 +132,14 @@ sub duckdb_checkpoint {
 sub quack_serve {
   my ($self, $addr, %opts) = @_;
   $addr //= 'quack:localhost';
-  _validate_quack_addr($addr);
+  _validate_quack_addr($self, $addr);
 
   $self->duckdb_install_extension('quack', load => 1);
 
   my $dbh = $self->_get_dbh;
 
   if (defined $opts{token}) {
-    _validate_quack_token($opts{token});
+    _validate_quack_token($self, $opts{token});
     my $tok_lit = $opts{token};
     $tok_lit =~ s/'/''/g;
     my $addr_lit = $addr;
@@ -159,20 +158,20 @@ sub quack_serve {
 
 sub quack_attach {
   my ($self, $addr, %opts) = @_;
-  croak 'Usage: $storage->quack_attach($addr, as => $name, ...)' unless $addr;
-  _validate_quack_addr($addr);
+  $self->throw_exception('Usage: $storage->quack_attach($addr, as => $name, ...)') unless $addr;
+  _validate_quack_addr($self, $addr);
 
   my $as = $opts{as}
-    or croak 'quack_attach: "as" option (catalog alias) is required';
+    or $self->throw_exception('quack_attach: "as" option (catalog alias) is required');
   $as =~ /^[A-Za-z_][A-Za-z0-9_]*$/
-    or croak "quack_attach: invalid catalog alias '$as'";
+    or $self->throw_exception("quack_attach: invalid catalog alias '$as'");
 
   $self->duckdb_install_extension('quack', load => 1);
 
   my $dbh = $self->_get_dbh;
 
   if (defined $opts{token}) {
-    _validate_quack_token($opts{token});
+    _validate_quack_token($self, $opts{token});
     my $tok_lit = $opts{token};
     $tok_lit =~ s/'/''/g;
     $dbh->do("CREATE SECRET (TYPE quack, TOKEN '$tok_lit')");
@@ -190,9 +189,9 @@ sub quack_attach {
 
 sub quack_detach {
   my ($self, $name) = @_;
-  croak 'Usage: $storage->quack_detach($name)' unless defined $name;
+  $self->throw_exception('Usage: $storage->quack_detach($name)') unless defined $name;
   $name =~ /^[A-Za-z_][A-Za-z0-9_]*$/
-    or croak "quack_detach: invalid catalog name '$name'";
+    or $self->throw_exception("quack_detach: invalid catalog name '$name'");
   $self->_get_dbh->do("DETACH $name");
   return 1;
 }
@@ -200,30 +199,30 @@ sub quack_detach {
 
 sub connect_call_quack_attach {
   my ($self, $args) = @_;
-  croak 'connect_call_quack_attach: hashref argument required'
+  $self->throw_exception('connect_call_quack_attach: hashref argument required')
     unless ref $args eq 'HASH';
   my $addr = $args->{addr}
-    or croak 'connect_call_quack_attach: "addr" required in args hashref';
+    or $self->throw_exception('connect_call_quack_attach: "addr" required in args hashref');
   return $self->quack_attach($addr, %{ $args }{ grep { $_ ne 'addr' } keys %$args });
 }
 
 # ---- private helpers ----
 
 sub _validate_quack_addr {
-  my ($addr) = @_;
+  my ($self, $addr) = @_;
   $addr =~ /^quack:/
-    or croak "quack address must start with 'quack:' (got: $addr)";
+    or $self->throw_exception("quack address must start with 'quack:' (got: $addr)");
   $addr =~ /'/
-    and croak "quack address must not contain single quotes";
+    and $self->throw_exception("quack address must not contain single quotes");
   $addr =~ /\n/
-    and croak "quack address must not contain newlines";
+    and $self->throw_exception("quack address must not contain newlines");
   return 1;
 }
 
 sub _validate_quack_token {
-  my ($tok) = @_;
+  my ($self, $tok) = @_;
   $tok =~ /\n/
-    and croak "quack token must not contain newlines";
+    and $self->throw_exception("quack token must not contain newlines");
   return 1;
 }
 
@@ -245,7 +244,7 @@ DBIO::DuckDB::Storage - DuckDB storage driver for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -357,7 +356,7 @@ C<$addr> must start with C<quack:> and must not contain single quotes or
 newlines. C<token> is optional; when given it is embedded as a SQL
 string literal (single quotes escaped).
 
-Returns 1 on success. Croaks on validation failure or SQL error.
+Returns 1 on success. Throws a L<DBIO::Exception> on validation failure or SQL error.
 
 =head2 quack_attach
 

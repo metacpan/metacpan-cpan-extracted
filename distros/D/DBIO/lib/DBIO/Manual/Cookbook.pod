@@ -13,7 +13,7 @@ DBIO::Manual::Cookbook - Miscellaneous recipes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SEARCHING
 
@@ -972,9 +972,6 @@ B<Test File> test.pl
     ### The statement below will print
     print "I can do admin stuff\n" if $admin->can('do_admin_stuff');
 
-Alternatively you can use L<DBIO::DynamicSubclass> that implements
-exactly the above functionality.
-
 =head2 Skip result object creation for faster results
 
 DBIO is not built for speed, it's built for convenience and
@@ -1431,44 +1428,25 @@ database.
 
 =head2 Creating DDL SQL
 
-The following functionality requires you to have L<SQL::Translator>
-(also known as "SQL Fairy") installed.
+Each driver ships a native Deploy class; core has no SQL::Translator-based DDL
+generation. The old C<create_ddl_dir> is deprecated and now throws - use the
+storage's native Deploy class instead.
 
-To create a set of database-specific .sql files for the above schema:
-
- my $schema = My::Schema->connect($dsn);
- $schema->create_ddl_dir(['MySQL', 'SQLite', 'PostgreSQL'],
-                        '0.1',
-                        './dbscriptdir/'
-                        );
-
-By default this will create schema files in the current directory, for
-MySQL, SQLite and PostgreSQL, using the $VERSION from your Schema.pm.
-
-To create a new database using the schema:
+To create a new database from the schema:
 
  my $schema = My::Schema->connect($dsn);
- $schema->deploy({ add_drop_table => 1});
+ $schema->deploy;
 
-To import created .sql files using the mysql client:
+C<deploy> routes through the C<dbio_deploy_class()> declared on the active
+storage (e.g. L<DBIO::PostgreSQL::Deploy>, L<DBIO::MySQL::Deploy>,
+L<DBIO::SQLite::Deploy>), which introspects both the live database and the
+desired schema and applies the diff (test-and-compare). The native Deploy
+classes expose C<install>, C<diff>, C<apply> and C<upgrade> directly for finer
+control, including version-to-version C<ALTER TABLE> upgrades.
 
-  mysql -h "host" -D "database" -u "user" -p < My_Schema_1.0_MySQL.sql
-
-To create C<ALTER TABLE> conversion scripts to update a database to a
-newer version of your schema at a later point, first set a new
-C<$VERSION> in your Schema file, then:
-
- my $schema = My::Schema->connect($dsn);
- $schema->create_ddl_dir(['MySQL', 'SQLite', 'PostgreSQL'],
-                         '0.2',
-                         '/dbscriptdir/',
-                         '0.1'
-                         );
-
-This will produce new database-specific .sql files for the new version
-of the schema, plus scripts to convert from version 0.1 to 0.2. This
-requires that the files for 0.1 as created above are available in the
-given directory to diff against.
+If you keep pre-generated C<.sql> files on disk,
+C<< $schema->deployment_statements >> reads and returns the matching DDL file
+(and throws if none is present); it performs no on-the-fly SQL generation.
 
 =head2 Select from dual
 
@@ -1525,17 +1503,11 @@ Or use C<cursor>
     print $vals[0]."\n";
   }
 
-In case you're going to use this "trick" together with L<DBIO::Schema/deploy> or
-L<DBIO::Schema/create_ddl_dir> a table called "dual" will be created in your
-current schema. This would overlap "sys.dual" and you could not fetch "sysdate" or
-"sequence.nextval" anymore from dual. To avoid this problem, just tell
-L<SQL::Translator> to not create table dual:
-
-    my $sqlt_args = {
-        add_drop_table => 1,
-        parser_args    => { sources => [ grep $_ ne 'Dual', schema->sources ] },
-    };
-    $schema->create_ddl_dir( [qw/Oracle/], undef, './sql', undef, $sqlt_args );
+In case you use this "trick" together with L<DBIO::Schema/deploy>, a table
+called "dual" would be created in your schema. This would overlap "sys.dual" and
+you could no longer fetch "sysdate" or "sequence.nextval" from it. To avoid the
+problem, keep the C<Dual> result class out of the set of sources you deploy - for
+example by registering it on a separate schema that you never call C<deploy> on.
 
 Or use L<DBIO::ResultClass::HashRefInflator>
 
@@ -1572,6 +1544,13 @@ C<oracles.heavily(nested(functions_can('take', 'lots'), OF), 'args')>
   group_by => [ 'cube( 1, 2, 3, 4 )' ],
 
 =head2 Adding Indexes And Functions To Your SQL
+
+B<Legacy path.> C<sqlt_deploy_hook> is a deprecated, SQL::Translator-era hook
+kept for backwards compatibility. With the native Deploy classes, declare
+indexes through the driver's own facilities instead - C<< __PACKAGE__->indices >>
+(see L<DBIO::ResultSourceProxy/indices>) or the L<DBIO::Cake/idx> DSL, which also
+emit native C<pg_indexes> for the PostgreSQL Deploy class. The hook below still
+fires for code that has not yet been ported.
 
 Often you will want indexes on columns on your table to speed up searching. To
 do this, create a method called C<sqlt_deploy_hook> in the relevant source
@@ -1611,84 +1590,76 @@ created:
    $sqlt_schema->drop_table('table_name');
  }
 
-You could also add views, procedures or triggers to the output using
-L<SQL::Translator::Schema/add_view>,
-L<SQL::Translator::Schema/add_procedure> or
-L<SQL::Translator::Schema/add_trigger>.
-
 =head2 Schema versioning
 
-The following example shows simplistically how you might use DBIO to
-deploy versioned schemas to your customers. The basic process is as follows:
+The following example shows how you might use DBIO to deploy and upgrade
+versioned schemas on your customers' databases. DBIO tracks the deployed
+version in a C<__VERSION> table via L<DBIO::DeploymentHandler>, and the native
+driver Deploy class reconciles the live database against your current schema in
+one shot - there are no pre-generated SQL diff files to ship. The basic process
+is as follows:
 
 =over 4
 
 =item 1.
 
-Create a DBIO schema
+Create a DBIO schema and give the schema class a C<$VERSION>
 
 =item 2.
-
-Save the schema
-
-=item 3.
 
 Deploy to customers
 
+=item 3.
+
+Modify the schema to change functionality
+
 =item 4.
 
-Modify schema to change functionality
-
-=item 5.
-
-Deploy update to customers
+Deploy the update to customers
 
 =back
 
-B<Create a DBIO schema>
+B<Create and version a DBIO schema>
 
-This can either be done manually, or generated from an existing database as
-described under L</Creating Schemas From An Existing Database>
+Build the schema manually or generate it from an existing database as described
+under L</Creating Schemas From An Existing Database>, and set a C<$VERSION> on
+the schema class so the deployment handler can track it:
 
-B<Save the schema>
-
-Call L<DBIO::Schema/create_ddl_dir> as above under L</Creating DDL SQL>.
+  package My::Schema;
+  use base 'DBIO::Schema';
+  our $VERSION = 1;
+  __PACKAGE__->load_namespaces;
 
 B<Deploy to customers>
 
-There are several ways you could deploy your schema. These are probably
-beyond the scope of this recipe, but might include:
+Install the schema and record its version:
 
-=over 4
-
-=item 1.
-
-Require customer to apply manually using their RDBMS.
-
-=item 2.
-
-Package along with your app, making database dump/schema update/tests
-all part of your install.
-
-=back
+  my $schema = My::Schema->connect($dsn, $user, $pass);
+  my $dh = DBIO::DeploymentHandler->new({ schema => $schema });
+  $dh->prepare_install;   # create the __VERSION table
+  $dh->install;           # deploy the schema via the native Deploy class
 
 B<Modify the schema to change functionality>
 
-As your application evolves, it may be necessary to modify your schema
-to change functionality. Once the changes are made to your schema in
-DBIO, export the modified schema and the conversion scripts as
-in L</Creating DDL SQL>.
+As your application evolves, edit your Result classes and bump the schema
+class C<$VERSION>. There are no conversion scripts to generate: the native
+Deploy class computes the diff between the live database and your current
+schema when you upgrade.
 
-B<Deploy update to customers>
+B<Deploy the update to customers>
 
-Add the L<DBIO::Schema::Versioned> schema component to your
-Schema class. This will add a new table to your database called
-C<dbix_class_schema_vesion> which will keep track of which version is installed
-and warn if the user tries to run a newer schema version than the
-database thinks it has.
+Run the upgrade. The deployment handler reconciles the live database against
+the current schema and bumps the recorded version:
 
-Alternatively, you can send the conversion SQL scripts to your
-customers as above.
+  my $schema = My::Schema->connect($dsn, $user, $pass);
+  my $dh = DBIO::DeploymentHandler->new({ schema => $schema });
+  $dh->upgrade;
+
+For data migrations that a DDL diff cannot express (column backfills, value
+normalisation, and so on) pass C<upgrade_hooks> to
+C<< DBIO::DeploymentHandler->new >>; see L<DBIO::DeploymentHandler> for details.
+The L<dbioadmin> CLI wraps the same deploy and upgrade operations for
+command-line use.
 
 =head2 Setting quoting for the generated SQL
 
@@ -1864,38 +1835,19 @@ C<unicode>).
 You want to start using the schema-based approach to L<DBIO>
 (see L<DBIO::Manual::Intro/Setting it up manually>), but have an
 established class-based setup with lots of existing classes that you don't
-want to move by hand. Try this nifty script instead:
+want to move by hand.
 
-  use MyDB;
-  use SQL::Translator;
+The old SQL::Translator-based bootstrap (the C<SQL::Translator::Parser::DBIO>
+parser and C<SQL::Translator::Producer::DBIO::File> producer) is no longer
+shipped. Instead, point L<DBIO::Generate> at the database your class-based setup
+already connects to and let it emit a fresh schema-based class tree:
 
-  my $schema = MyDB->schema_instance;
+  dbiogen -o dump_directory=./lib \
+          My::Schema dbi:Pg:dbname=foo username password
 
-  my $translator           =  SQL::Translator->new(
-      debug                => $debug          ||  0,
-      trace                => $trace          ||  0,
-      no_comments          => $no_comments    ||  0,
-      show_warnings        => $show_warnings  ||  0,
-      add_drop_table       => $add_drop_table ||  0,
-      validate             => $validate       ||  0,
-      parser_args          => {
-         'DBIx::Schema'    => $schema,
-                              },
-      producer_args   => {
-          'prefix'         => 'My::Schema',
-                         },
-  );
-
-  $translator->parser('SQL::Translator::Parser::DBIO');
-  $translator->producer('SQL::Translator::Producer::DBIO::File');
-
-  my $output = $translator->translate(@args) or die
-          "Error: " . $translator->error;
-
-  print $output;
-
-You could use L<Module::Find> to search for all subclasses in the MyDB::*
-namespace, which is currently left as an exercise for the reader.
+See L<DBIO::Manual::Intro/Using DBIO::Generate> and the
+L</Creating Schemas From An Existing Database> recipe above for the full set of
+options.
 
 =head1 OVERLOADING METHODS
 
@@ -2131,7 +2083,6 @@ array:
 
 You could then create average, high and low execution times for an SQL
 statement and dig down to see if certain parameters cause aberrant behavior.
-You might want to check out L<DBIO::QueryLog> as well.
 
 =head1 IMPROVING PERFORMANCE
 

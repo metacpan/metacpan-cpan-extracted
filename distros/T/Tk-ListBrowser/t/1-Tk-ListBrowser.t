@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 93;
+use Test::More tests => 94;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -270,7 +270,7 @@ if (defined $app) {
 testaccessors($ib, qw/cellheight cellwidth forceWidth header listWidth
 	pool priorityMax refreshLoopActive refreshPos/);
 testaccessors($item, qw/background cguideH cguideV cimage cindicator column cimage 
-	crect	ctext data font foreground hidden imageX imageY itemtype opened owner priority 
+	crect	cselectr ctext data font foreground hidden imageX imageY itemtype opened owner priority 
 	rectX	rectY row textanchor textjustify textside textX textY/);
 testaccessors($handler, qw/cellheight cellwidth/);
 

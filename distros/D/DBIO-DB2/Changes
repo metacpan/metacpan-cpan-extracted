@@ -1,5 +1,33 @@
 Revision history for DBIO-DB2
 
+0.900001  2026-07-12
+    * Diff
+        - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr #19).
+          When diff reconciled a live schema containing a table absent from the
+          target (removed from the app's DBIO classes, or an unmanaged leftover),
+          it emitted both DROP TABLE <t> and a later standalone DROP INDEX for
+          one of that table's indexes; since DB2's DROP TABLE already removes the
+          table's own indexes, the standalone DROP INDEX failed (index no longer
+          exists) and aborted apply()/upgrade(). DBIO::DB2::Diff::Index now
+          receives the tables sections (threaded in by DBIO::DB2::Diff) and
+          suppresses a standalone DROP INDEX for any index whose owning table is
+          itself being dropped in the same pass. Indexes of surviving tables are
+          still dropped as before. Backward compatible: absent table sections
+          yield an empty dropped set (original two-argument behaviour).
+        - Add t/32-diff-drop-table-index.t and extend t/30-diff.t: full-diff
+          regression for the collision (karr #19) plus Diff::Index unit cases for
+          the tables-aware drop suppression, including an over-suppression guard
+          (a surviving table's index is still dropped standalone).
+
+    * Project
+        - Added SECURITY.md following CPAN Security Group author guidelines
+          (v1.5.0): private email-first reporting with CPANSec escalation
+
+    * Dependencies
+        - DBD::DB2 is now a hard requires (was recommends); a
+          database-specific DBIO driver is useless without its DBD
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
 0.900000  2026-06-23
     First release. IBM DB2 driver for DBIO with native introspection, diff,
     DDL generation and test-deploy-and-compare deployment.

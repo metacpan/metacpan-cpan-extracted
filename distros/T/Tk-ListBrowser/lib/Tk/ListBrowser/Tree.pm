@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.10;
+$VERSION =  0.14;
 
 use Math::Round qw(round);
 
@@ -44,12 +44,15 @@ sub draw {
 	$x = $self->cget('-marginleft') + $indent;
 	$self->SUPER::draw($item, $x, $y, $column, $row);
 	my $entry = $item->name;
+	my $depth = $self->calculateDepth($item);
+	$depth ++;
+	my $leftx = ($depth * $indent);
 	if ($item->hasChildren) {
 		my $ind;
 		my $c = $self->Subwidget('Canvas');
-		my @eregion = $item->region;
-		my $ix = $eregion[0] - round($indent/2);
-		my $iy = $eregion[1] + round(($eregion[3] - $eregion[1])/2);
+		my @eregion = $item->getRegion;
+		my $ix = $leftx - round($indent/2);
+		my $iy = $y + round($self->cget('-cellheight')/2);
 		if ($item->opened) {
 			$ind = $c->createImage($ix, $iy,
 				-image => $self->cget('-indicatorminusimg'),
@@ -62,10 +65,10 @@ sub draw {
 			);
 		}
 		$c->bind($ind, '<ButtonRelease-1>', sub { $self->indicatorActivate($entry) });
+		$c->bind($ind, '<Button-1>', sub { $c->focus($ind) });
 		my @guides = $c->find('withtag', 'guides');
-		for (@guides) {
-			$c->raise($ind, $_);
-		}
+		$c->raise('indicator', 'guides') if @guides;
+		$c->raise('indicator', 'all');
 		$item->cindicator($ind);
 	}
 }

@@ -13,7 +13,7 @@ DBIO::Manual::Heritage - Everything that changed from DBIx::Class to DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 OVERVIEW
 
@@ -99,6 +99,9 @@ distribution and moved into dedicated CPAN distributions:
 Install only the driver you need. Every driver ships its own native
 introspection, diff, and deploy modules (the test-and-compare strategy) and
 does not require L<SQL::Translator>.
+
+C<DBIO::Informix> is currently unbuildable; see the distribution's README for
+the full status.
 
 Two drivers also have non-blocking async variants whose queries return
 C<Future> objects, and there is a GraphQL projection layer:
@@ -368,7 +371,7 @@ PostgreSQL storage can use native C<jsonb> for the changes column.
 The version table was renamed from C<dbix_class_schema_versions> to
 C<dbio_schema_versions>.
 
-See L<DBIO::ChangeLog> and L<DBIO::Schema::ChangeLog>.
+See L<DBIO::ChangeLog> and L<DBIO::ChangeLog::Schema>.
 
 =head2 DBIO::AccessBroker - credential source interface
 
@@ -611,7 +614,7 @@ C<DBIO_TEST_*>:
   DBICTest::*                       DBIO::Test::*
   DBICTEST_* env vars               DBIO_TEST_* env vars
   dbix_class_schema_versions        dbio_schema_versions
-  SQL::Translator (DDL/deploy)      native Deploy per driver (optional)
+  SQL::Translator (DDL/deploy)      native Deploy per driver (SQLT dropped)
 
 =head1 SEE ALSO
 

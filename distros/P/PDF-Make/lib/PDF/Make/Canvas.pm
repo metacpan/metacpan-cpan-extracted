@@ -145,6 +145,8 @@ our %EXPORT_TAGS = (
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Canvas - PDF content stream builder

@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-spatial-support-is-a-result-class-component-not-a-driver.md
@@ -27,11 +28,14 @@ share/skills/dbio-postgresql-postgis/SKILL.md
 t/00-load.t
 t/10-geometry.t
 t/20-inflate.t
+t/30-exceptions.t
 t/30-spatial-live.t
 t/40-deploy-roundtrip.t
+t/50-storage-layer-composition.t
 t/codec-wkb-decoder.t
 t/codec-wkt-builder.t
 t/codec-wkt-parser.t
 t/geometry-roundtrip.t
 t/introspect-storage.t
+t/release-coverage.t
 t/resultset-predicates.t

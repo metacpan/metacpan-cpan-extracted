@@ -73,3 +73,5 @@ mutation*
 ^xt/mutant_\d
 CLAUDE.md
 \.claude
+\.circleci
+t/online.enabled

@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.140     2026-07-11 21:04:43Z
+          - support for message bodies encoded with the
+            application/x-www-form-urlencoded media-type, and "encoding"
+            objects
+
 0.139     2026-06-27 23:43:59Z
           - when the best-matching media-type is "*/*", we will now still
             attempt to decode the message content, so it can be used in

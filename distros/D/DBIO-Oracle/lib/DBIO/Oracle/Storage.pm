@@ -128,7 +128,7 @@ DBIO::Oracle::Storage - Oracle Support for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

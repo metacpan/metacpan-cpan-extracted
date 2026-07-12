@@ -1,6 +1,18 @@
 Revision history for Perl extension Tk::ListBrowser.
 
-0.13 Date
+0.14 Sat jul 11 2026
+	- Set the canvas widget to a small default width and height.
+	- Fixed selection drawing in list mode when unmapped.
+	- Redirected options -width and -height to the canvas widget.
+	- Added option -scrollbars.
+	- Fixed rectX and rectY being undefined at create time in module Item.
+	- Greatly simplyfied setting the scrollregion.
+	- Moved method cselectr from module Entry to Item.
+	- Removed methods cselectl and initColumns.
+	- Moved all in method refresh of module Row to ListBrowser.
+	- Fixed double click clearing selection in exclusive select mode.
+
+0.13  Wed Jul 08 2026
 	- Limited Configure events to resize events in method OnConfigure and removed the timer. Things are smoother.
 	- Fiddled around with setScrollRegion to avoid oscillating scrollbars. Not completely succesful.
 

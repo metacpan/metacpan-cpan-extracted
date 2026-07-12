@@ -6,6 +6,8 @@ use PDF::Make;
 
 our $VERSION = '0.06';
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Linearization - PDF Linearization (Fast Web View) support

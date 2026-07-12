@@ -2,15 +2,15 @@ package CGI::Lingua;
 
 use warnings;
 use strict;
-use autodie qw(:file);
+use autodie qw(:all);
 
+use Carp qw(croak carp);
 use Object::Configure 0.14;
 use Params::Get 0.13;
 use Readonly;
 use Scalar::Util qw(blessed);
 use Storable;
 use Class::Autouse qw{
-	Carp
 	Locale::Language
 	Locale::Object::Country
 	Locale::Object::DB
@@ -18,7 +18,7 @@ use Class::Autouse qw{
 	I18N::LangTags::Detect
 };
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 # ── Module-level constants ───────────────────────────────────────────────────
 # Gathering magic strings here makes behavioural changes one-edit operations.
@@ -34,6 +34,8 @@ Readonly my $ACCEPT_LANG_MAX     => 256;              # max bytes we accept from
 Readonly my $GEO_UNKNOWN         => -1;               # geo-module sentinel: not yet probed
 Readonly my $GEO_ABSENT          =>  0;               # geo-module sentinel: unavailable
 Readonly my $GEO_PRESENT         =>  1;               # geo-module sentinel: loaded OK
+Readonly my %RTL_LANGS           => (map { $_ => 1 }  # ISO 639-1 codes whose primary script is RTL
+	qw(ar dv fa he ku ps sd ug ur yi));
 
 =head1 NAME
 
@@ -41,7 +43,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.80
+Version 0.82
 
 =cut
 
@@ -133,7 +135,7 @@ sub new
 			if(my $logger = $params->{'logger'}) {
 				$logger->error(__PACKAGE__ . ' use ->new() not ::new() to instantiate');
 			}
-			Carp::croak(__PACKAGE__ . ' use ->new() not ::new() to instantiate');
+			croak(__PACKAGE__ . ' use ->new() not ::new() to instantiate');
 		}
 		$class = __PACKAGE__;
 	} elsif(ref($class)) {
@@ -151,7 +153,7 @@ sub new
 			&& $params->{'logger'}->can('info')
 			&& $params->{'logger'}->can('error')
 		) {
-			Carp::croak('Logger must be a blessed object with warn/info/error methods');
+			croak('Logger must be a blessed object with warn/info/error methods');
 		}
 	}
 
@@ -163,16 +165,16 @@ sub new
 		# Validate supported type/length
 		if(ref($params->{supported})) {
 			if(ref($params->{supported}) ne 'ARRAY') {
-				Carp::croak('List of supported languages must be an array ref');
+				croak('List of supported languages must be an array ref');
 			}
 		} elsif((length($params->{supported}) < 2) || (length($params->{supported}) > 5)) {
-			Carp::croak('Supported languages must be the short code');
+			croak('Supported languages must be the short code');
 		}
 	} else {
 		if(my $logger = $params->{'logger'}) {
 			$logger->error('You must give a list of supported languages');
 		}
-		Carp::croak('You must give a list of supported languages');
+		croak('You must give a list of supported languages');
 	}
 
 	my $cache = $params->{cache};
@@ -540,31 +542,58 @@ sub _accept_language_match
 
 	my $requested_sublanguage;
 	if(!$l) {
+		# Sort tokens by q-value once; both scan passes share the ordered list
+		my $sorted = $self->_sorted_tokens($http_accept_language);
 		# First fallback: scan for xx-yy pairs, try base language xx
 		($l, $requested_sublanguage) =
-			$self->_scan_sublanguage_pairs($i18n, $http_accept_language);
-	}
-	if(!$l) {
-		# Second fallback: scan plain tokens without sublanguages
-		$l = $self->_scan_plain_tokens($i18n, $http_accept_language);
-		undef $requested_sublanguage if $l;
+			$self->_scan_sublanguage_pairs($i18n, $sorted);
+		if(!$l) {
+			# Second fallback: scan plain tokens without sublanguages
+			$l = $self->_scan_plain_tokens($i18n, $sorted);
+			undef $requested_sublanguage if $l;
+		}
 	}
 
 	return ($l, $requested_sublanguage);
 }
 
+# ── _sorted_tokens ────────────────────────────────────────────────────────
+# Purpose:      Parse an Accept-Language header into tokens sorted by
+#               descending quality value so fallback scans honour q= priority.
+# Entry:        $header — validated Accept-Language string.
+# Exit:         Arrayref of [$language_tag, $quality] pairs, highest q first.
+# Side Effects: None.
+sub _sorted_tokens
+{
+	my ($self, $header) = @_;
+	my @tokens;
+	for my $token (split /,/, $header) {
+		$token =~ s/^\s+|\s+$//g;
+		my $q = 1.0;
+		if($token =~ s/;\s*q\s*=\s*(\d+(?:\.\d+)?)//) {
+			$q = $1 + 0;
+		}
+		$token =~ s/^\s+|\s+$//g;
+		push @tokens, [$token, $q] if length $token;
+	}
+	return [sort { $b->[1] <=> $a->[1] } @tokens];
+}
+
 # ── _scan_sublanguage_pairs ───────────────────────────────────────────────
-# Purpose:      Walk the Accept-Language value looking for xx-yy pairs;
-#               try accepting the base language xx from the supported list.
-# Entry:        $i18n — I18N::AcceptLanguage instance; $header — header string.
+# Purpose:      Walk q-sorted tokens looking for xx-yy pairs; try accepting
+#               the base language xx from the supported list.
+# Entry:        $i18n — I18N::AcceptLanguage instance;
+#               $sorted — arrayref from _sorted_tokens.
 # Exit:         ($matched_code, $sublanguage_code) or (undef, undef).
 # Side Effects: Debug logging.
 sub _scan_sublanguage_pairs
 {
-	my ($self, $i18n, $header) = @_;
+	my ($self, $i18n, $sorted) = @_;
 
-	$self->_debug(__PACKAGE__, ': ', __LINE__, ": look through $header for alternatives");
-	while($header =~ /(..)\-(..)/g) {
+	$self->_debug(__PACKAGE__, ': ', __LINE__, ': scan q-sorted tokens for xx-yy pairs');
+	for my $entry (@{$sorted}) {
+		my ($tag) = @{$entry};
+		next unless $tag =~ /^(..)-(..)$/;
 		my ($base, $sub) = ($1, $2);
 		$self->_debug(__PACKAGE__, ': ', __LINE__, ": see if $base is supported");
 		if($i18n->accepts($base, $self->{_supported})) {
@@ -576,26 +605,27 @@ sub _scan_sublanguage_pairs
 }
 
 # ── _scan_plain_tokens ────────────────────────────────────────────────────
-# Purpose:      Walk Accept-Language tokens that have no sublanguage suffix
-#               and try accepting each against the supported list.
-# Entry:        $i18n — I18N::AcceptLanguage instance; $header — header string.
+# Purpose:      Walk q-sorted tokens that have no sublanguage suffix and try
+#               accepting each against the supported list.
+# Entry:        $i18n — I18N::AcceptLanguage instance;
+#               $sorted — arrayref from _sorted_tokens.
 # Exit:         Matched code string, or undef.
 # Side Effects: Debug logging.
 sub _scan_plain_tokens
 {
-	my ($self, $i18n, $header) = @_;
+	my ($self, $i18n, $sorted) = @_;
 
-	$self->_debug(__PACKAGE__, ': ', __LINE__, ": look harder through $header for alternatives");
-	foreach my $possible(split(/,/, $header)) {
-		next if $possible =~ /..\-../;    # already tried these in the pair scan
-		$possible =~ s/;.*$//;
-		$self->_debug(__PACKAGE__, ': ', __LINE__, ": see if $possible is supported");
-		if($i18n->accepts($possible, $self->{_supported})) {
-			$self->_debug("Fallback to $possible as best alternative");
-			return $possible;
+	$self->_debug(__PACKAGE__, ': ', __LINE__, ': scan q-sorted tokens for plain alternatives');
+	for my $entry (@{$sorted}) {
+		my ($tag) = @{$entry};
+		next if $tag =~ /^..-../;    # already tried in the pair scan
+		$self->_debug(__PACKAGE__, ': ', __LINE__, ": see if $tag is supported");
+		if($i18n->accepts($tag, $self->{_supported})) {
+			$self->_debug("Fallback to $tag as best alternative");
+			return $tag;
 		}
 	}
-	return undef;
+	return;
 }
 
 # ── _resolve_match ────────────────────────────────────────────────────────
@@ -949,7 +979,7 @@ sub _what_language {
 
 	if(ref($self)) {
 		$self->_trace('Entered _what_language');
-		if($self->{_what_language}) {
+		if(defined($self->{_what_language})) {
 			$self->_trace('_what_language: returning cached value: ', $self->{_what_language});
 			return $self->{_what_language};
 		}
@@ -1163,8 +1193,6 @@ sub country {
 	if((!$self->{_country}) &&
 	   (eval { require LWP::Simple::WithCache; require JSON::Parse })) {
 		$self->_debug("Look up $ip on geoplugin");
-		LWP::Simple::WithCache->import();
-		JSON::Parse->import();
 
 		if(my $data = LWP::Simple::WithCache::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
 			eval { $self->{_country} = JSON::Parse::parse_json($data)->{'geoplugin_countryCode'} };
@@ -1415,7 +1443,7 @@ sub locale {
 			}
 		}
 	}
-	return undef;
+	return;
 }
 
 =head2 time_zone
@@ -1473,8 +1501,6 @@ sub time_zone {
 		unless($self->{_timezone}) {
 			if(eval { require LWP::Simple::WithCache; require JSON::Parse }) {
 				$self->_debug("Look up $ip on ip-api.com");
-				LWP::Simple::WithCache->import();
-				JSON::Parse->import();
 
 				if(my $data = LWP::Simple::WithCache::get("http://ip-api.com/json/$ip")) {
 					eval { $self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'} };
@@ -1482,8 +1508,6 @@ sub time_zone {
 				}
 			} elsif(eval { require LWP::Simple; require JSON::Parse }) {
 				$self->_debug("Look up $ip on ip-api.com");
-				LWP::Simple->import();
-				JSON::Parse->import();
 
 				if(my $data = LWP::Simple::get("http://ip-api.com/json/$ip")) {
 					eval { $self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'} };
@@ -1510,6 +1534,263 @@ sub time_zone {
 		$self->_warn({ warning => "Couldn't determine the timezone" });
 	}
 	return $self->{_timezone};
+}
+
+=head2 is_rtl
+
+Returns true (1) if the negotiated language is written right-to-left, false (0)
+otherwise.  Covers Arabic, Hebrew, Persian, Urdu, Yiddish, Dhivehi, Pashto,
+Sindhi, Uyghur, and Kurdish.
+
+=head3 API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: 1 | 0
+
+=cut
+
+sub is_rtl
+{
+	my $self = shift;
+	return $RTL_LANGS{$self->language_code_alpha2() // ''} ? 1 : 0;
+}
+
+=head2 text_direction
+
+Returns C<'rtl'> or C<'ltr'> for the negotiated language, suitable for direct
+use as an HTML C<dir> attribute value.
+
+=head3 API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: 'rtl' | 'ltr'
+
+=cut
+
+sub text_direction
+{
+	my $self = shift;
+	return $self->is_rtl() ? 'rtl' : 'ltr';
+}
+
+=head2 plural_category
+
+Returns the CLDR plural category for the integer C<$n> in the negotiated
+language.  The returned string is one of C<'zero'>, C<'one'>, C<'two'>,
+C<'few'>, C<'many'>, or C<'other'>.
+
+Rules are embedded for ~70 languages including Arabic (6 forms), Slavic
+languages (3-4 forms), Celtic languages (up to 6 forms), and Hebrew, Maltese,
+Romanian, Latvian, Lithuanian, and Slovenian.  Languages not in the table fall
+back to the English rule (n == 1 => C<'one'>, else C<'other'>).
+
+For fractional numbers or full CLDR v42+ accuracy, use C<Locale::CLDR>.
+
+=head3 API SPECIFICATION
+
+    Input:  $n - non-negative integer (fractional values are truncated)
+    Returns: Str - one of zero/one/two/few/many/other
+
+=cut
+
+# CLDR plural category rules (https://unicode.org/cldr/charts/42/supplemental/language_plural_rules.html).
+# Values are coderefs: ($n) → category string.  Languages absent from this
+# table fall back to the standard one/other rule inside plural_category().
+my %PLURAL_RULES = (
+
+	# ── No plural distinction (always 'other') ────────────────────────────
+	(map { $_ => sub { 'other' } }
+		qw(az bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt lo ms
+		   my nqo root sah ses sg th to vi wo yo zh)),
+
+	# ── Standard: n == 1 → 'one', else 'other' ───────────────────────────
+	(map { $_ => sub { int($_[0]) == 1 ? 'one' : 'other' } }
+		qw(af an ast bg bn brx ca cgg da de el en eo es et eu fi
+		   gl gsw gu ha haw hu ia it kcg kk kl lb lg mas ml mn mr
+		   nb nd ne nl nn nyn om or pa pap rm rof rwk saq seh sn so
+		   sq ss ssy st sv sw ta te teo tig tk tl tn ts ur wae xh xog)),
+
+	# ── French / Portuguese-BR: n ≤ 1 → 'one' ────────────────────────────
+	(map { $_ => sub { int($_[0]) <= 1 ? 'one' : 'other' } } qw(fr pt_BR)),
+
+	# ── Arabic: zero/one/two/few/many/other ───────────────────────────────
+	ar => sub {
+		my $n    = int($_[0]);
+		my $m100 = $n % 100;
+		return 'zero'  if $n == 0;
+		return 'one'   if $n == 1;
+		return 'two'   if $n == 2;
+		return 'few'   if $m100 >= 3  && $m100 <= 10;
+		return 'many'  if $m100 >= 11 && $m100 <= 99;
+		return 'other';
+	},
+
+	# ── Hebrew: one/two/many/other ────────────────────────────────────────
+	he => sub {
+		my $n = int($_[0]);
+		return 'one'  if $n == 1;
+		return 'two'  if $n == 2;
+		return 'many' if $n != 0 && $n % 10 == 0;
+		return 'other';
+	},
+
+	# ── Russian / Ukrainian / Belarusian: one/few/many ────────────────────
+	(map { $_ => sub {
+		my $n    = int($_[0]);
+		my $m10  = $n % 10;
+		my $m100 = $n % 100;
+		return 'one' if $m10 == 1 && $m100 != 11;
+		return 'few' if $m10 >= 2 && $m10 <= 4 && ($m100 < 10 || $m100 >= 20);
+		return 'many';
+	} } qw(ru uk be)),
+
+	# ── Polish: one/few/many ──────────────────────────────────────────────
+	pl => sub {
+		my $n    = int($_[0]);
+		my $m10  = $n % 10;
+		my $m100 = $n % 100;
+		return 'one' if $n == 1;
+		return 'few' if $m10 >= 2 && $m10 <= 4 && ($m100 < 10 || $m100 >= 20);
+		return 'many';
+	},
+
+	# ── Czech / Slovak: one/few/other ────────────────────────────────────
+	(map { $_ => sub {
+		my $n = int($_[0]);
+		return 'one' if $n == 1;
+		return 'few' if $n >= 2 && $n <= 4;
+		return 'other';
+	} } qw(cs sk)),
+
+	# ── Romanian: one/few/other ───────────────────────────────────────────
+	ro => sub {
+		my $n    = int($_[0]);
+		my $m100 = $n % 100;
+		return 'one' if $n == 1;
+		return 'few' if $n == 0 || ($m100 >= 1 && $m100 <= 19);
+		return 'other';
+	},
+
+	# ── Latvian: zero/one/other ───────────────────────────────────────────
+	lv => sub {
+		my $n    = int($_[0]);
+		my $m10  = $n % 10;
+		my $m100 = $n % 100;
+		return 'zero'  if $m10 == 0 || ($m100 >= 11 && $m100 <= 19);
+		return 'one'   if $m10 == 1 && $m100 != 11;
+		return 'other';
+	},
+
+	# ── Lithuanian: one/few/other ─────────────────────────────────────────
+	lt => sub {
+		my $n    = int($_[0]);
+		my $m10  = $n % 10;
+		my $m100 = $n % 100;
+		return 'one' if $m10 == 1 && ($m100 < 10 || $m100 >= 20);
+		return 'few' if $m10 >= 2 && ($m100 < 10 || $m100 >= 20);
+		return 'other';
+	},
+
+	# ── Slovenian: one/two/few/other ──────────────────────────────────────
+	sl => sub {
+		my $m100 = int($_[0]) % 100;
+		return 'one'   if $m100 == 1;
+		return 'two'   if $m100 == 2;
+		return 'few'   if $m100 == 3 || $m100 == 4;
+		return 'other';
+	},
+
+	# ── Welsh: zero/one/two/few/many/other ───────────────────────────────
+	cy => sub {
+		my $n = int($_[0]);
+		return 'zero'  if $n == 0;
+		return 'one'   if $n == 1;
+		return 'two'   if $n == 2;
+		return 'few'   if $n == 3;
+		return 'many'  if $n == 6;
+		return 'other';
+	},
+
+	# ── Irish: one/two/few/many/other ────────────────────────────────────
+	ga => sub {
+		my $n = int($_[0]);
+		return 'one'  if $n == 1;
+		return 'two'  if $n == 2;
+		return 'few'  if $n >= 3 && $n <= 6;
+		return 'many' if $n >= 7 && $n <= 10;
+		return 'other';
+	},
+
+	# ── Maltese: one/two/few/many/other ──────────────────────────────────
+	mt => sub {
+		my $n    = int($_[0]);
+		my $m100 = $n % 100;
+		return 'one'  if $n == 1;
+		return 'two'  if $n == 2;
+		return 'few'  if $n == 0 || ($m100 >= 3  && $m100 <= 10);
+		return 'many' if $m100 >= 11 && $m100 <= 19;
+		return 'other';
+	},
+);
+
+sub plural_category
+{
+	my ($self, $n) = @_;
+	croak('plural_category: $n must be defined') unless defined $n;
+	my $code = $self->language_code_alpha2() // return 'other';
+	my $rule = $PLURAL_RULES{$code} // sub { int($_[0]) == 1 ? 'one' : 'other' };
+	return $rule->($n);
+}
+
+=head2 translation_file
+
+Returns the filesystem path to the best matching translation file for the
+negotiated language in the given directory.
+
+The lookup tries (in order):
+
+=over 4
+
+=item 1. C<$dir/$lang-$sublang.$ext>  (e.g. C<en-gb.json>)
+
+=item 2. C<$dir/$lang.$ext>           (e.g. C<en.json>)
+
+=back
+
+Returns C<undef> if no matching file exists.
+
+=head3 API SPECIFICATION
+
+    Input:
+      $dir - Str   path to the directory containing translation files
+      $ext - Str   file extension without leading dot (default: 'json')
+    Returns: Str (absolute or relative path) | undef
+
+=head3 MESSAGES
+
+    (none - returns undef silently when no file is found)
+
+=cut
+
+sub translation_file
+{
+	my ($self, $dir, $ext) = @_;
+	return unless defined $dir;
+	$ext //= 'json';
+	$ext =~ s/^\.//;    # accept '.json' or 'json'
+
+	my @candidates;
+	if(my $sub = $self->sublanguage_code_alpha2()) {
+		push @candidates, $self->language_code_alpha2() . '-' . $sub;
+	}
+	push @candidates, $self->language_code_alpha2()
+		if defined $self->language_code_alpha2();
+
+	for my $code (@candidates) {
+		my $path = "$dir/$code.$ext";
+		return $path if -e $path;
+	}
+	return;
 }
 
 # ── _code2language ────────────────────────────────────────────────────────
@@ -1609,7 +1890,7 @@ sub _code2countryname
 		return $name;
 	}
 	$self->_trace('<_code2countryname undef');
-	return undef;
+	return;
 }
 
 # ── _log ──────────────────────────────────────────────────────────────────
@@ -1645,7 +1926,7 @@ sub _trace  { my $self = shift; $self->_log('trace',  @_) }
 #               All callers MUST use this structured form — plain-string calls
 #               silently lose the message when no logger is configured.
 # Exit:         void
-# Side Effects: Calls logger->warn() or Carp::carp().
+# Side Effects: Calls logger->warn() or carp().
 sub _warn
 {
 	my $self = shift;
@@ -1657,7 +1938,7 @@ sub _warn
 		my $params = Params::Get::get_params('warning', @_);
 		my $msg    = $params->{'warning'} // join('', grep defined, @_);
 		$self->_log('warn', $msg);
-		Carp::carp($msg);
+		carp($msg);
 	}
 }
 
@@ -1665,13 +1946,19 @@ sub _warn
 
 =over 4
 
-=item * B<Accept-Language left-to-right scan ignores q-values>
+=item * B<is_rtl() covers primary-script RTL languages only>
 
-The second and third pass in C<_accept_language_match()> scan the header
-left-to-right and ignore quality (C<q=0.x>) values.  A header such as
-C<de;q=0.9,en;q=0.1> on a site that only supports C<en> would currently
-fail to fall back to English.  Use C<I18N::AcceptLanguage> passes only when
-possible.
+C<is_rtl()> returns true for the 10 ISO 639-1 codes whose overwhelmingly
+dominant script is right-to-left.  Languages with script variants (e.g.
+Azerbaijani C<az>, which uses Latin in modern Azerbaijan but Arabic in Iran)
+are treated as LTR.  If you serve content in multiple scripts of the same
+language, inspect the sublanguage or Accept-Language header directly.
+
+=item * B<plural_category() uses embedded CLDR rules, not Locale::CLDR>
+
+The embedded rules cover ~70 languages and truncate fractional C<$n> to an
+integer.  For full CLDR v42 accuracy (including fractional forms and
+languages not in the table) install and use C<Locale::CLDR> directly.
 
 =item * B<Logger must be a blessed object>
 
@@ -1739,6 +2026,8 @@ This means that if you support languages at a lower priority, it may be missed.
 
 =over 4
 
+=item * L<Configure an Object at Runtime|Object::Configure>
+
 =item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Lingua/coverage/>
 
 =item * VWF - Versatile Web Framework L<https://github.com/nigelhorne/vwf>
@@ -1798,6 +2087,28 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
     language : CGI::Lingua → Str
     result ∈ {name(l) | l ∈ supported} ∪ {'Unknown'}
+
+=head2 is_rtl
+
+    is_rtl : CGI::Lingua → Bool
+    is_rtl(s) ≙ language_code_alpha2(s) ∈ RTL_LANGS
+
+=head2 text_direction
+
+    text_direction : CGI::Lingua → {'rtl', 'ltr'}
+    text_direction(s) ≙ is_rtl(s) ? 'rtl' : 'ltr'
+
+=head2 plural_category
+
+    plural_category : CGI::Lingua × ℕ → PluralCategory
+    plural_category(s, n) ≙ PLURAL_RULES[language_code_alpha2(s)](n)
+
+=head2 translation_file
+
+    translation_file : CGI::Lingua × Path × Ext → Path | undef
+    translation_file(s, d, e) ≙
+      first p ∈ candidates(s) • ∃ file d/p.e
+      where candidates(s) = [lang(s)-sublang(s), lang(s)] \ {undef}
 
 =head1 ACKNOWLEDGEMENTS
 

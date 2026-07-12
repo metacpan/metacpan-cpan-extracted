@@ -377,7 +377,7 @@ subtest '_scan_sublanguage_pairs: finds base language from pair' => sub {
 		return $lang eq 'en' ? 'en' : undef;
 	});
 
-	my ($matched, $sub) = $l->_scan_sublanguage_pairs($i18n, 'en-gb,fr-FR');
+	my ($matched, $sub) = $l->_scan_sublanguage_pairs($i18n, $l->_sorted_tokens('en-gb,fr-FR'));
 	is($matched, 'en', 'Returns matched base language');
 	is($sub,     'gb', 'Returns the sublanguage code from the pair');
 	Test::Mockingbird::restore_all();
@@ -390,7 +390,7 @@ subtest '_scan_sublanguage_pairs: returns undef/undef when no match' => sub {
 	my $i18n = bless {}, 'MockI18NNone';
 	Test::Mockingbird::mock('MockI18NNone', 'accepts', sub { undef });
 
-	my ($matched, $sub) = $l->_scan_sublanguage_pairs($i18n, 'de-DE,it-IT');
+	my ($matched, $sub) = $l->_scan_sublanguage_pairs($i18n, $l->_sorted_tokens('de-DE,it-IT'));
 	ok(!defined $matched, 'Returns undef for code when no match');
 	ok(!defined $sub,     'Returns undef for sublanguage when no match');
 	Test::Mockingbird::restore_all();
@@ -408,7 +408,7 @@ subtest '_scan_plain_tokens: finds matching plain token' => sub {
 		return $lang eq 'fr' ? 'fr' : undef;
 	});
 
-	my $result = $l->_scan_plain_tokens($i18n, 'de,fr;q=0.8,en;q=0.5');
+	my $result = $l->_scan_plain_tokens($i18n, $l->_sorted_tokens('de,fr;q=0.8,en;q=0.5'));
 	is($result, 'fr', 'Returns first matching plain token');
 	Test::Mockingbird::restore_all();
 };
@@ -431,14 +431,16 @@ subtest '_scan_plain_tokens: skips tokens with sublanguage suffix' => sub {
 	});
 
 	# fr-CA has a sublanguage suffix so _scan_plain_tokens must skip it;
-	# 'en' (after stripping the q-value) must be accepted and returned.
+	# 'en' (after q-value stripping by _sorted_tokens) must be accepted.
 	my $i18n   = I18N::AcceptLanguage->new(strict => 1);
-	my $result = $l->_scan_plain_tokens($i18n, 'fr-CA,en;q=0.5');
+	my $result = $l->_scan_plain_tokens($i18n, $l->_sorted_tokens('fr-CA,en;q=0.5'));
 	is($result, 'en', 'en accepted after skipping fr-CA pair and stripping q-value');
 	Test::Mockingbird::restore_all();
 };
 
-subtest '_scan_plain_tokens: strips quality values before checking' => sub {
+subtest '_scan_plain_tokens: q-values already stripped by _sorted_tokens' => sub {
+	# _sorted_tokens handles q-value stripping; by the time _scan_plain_tokens
+	# receives the sorted list, every tag is bare (no ;q= suffix).
 	local %ENV = ();
 	my $l = _basic_obj();
 
@@ -446,8 +448,8 @@ subtest '_scan_plain_tokens: strips quality values before checking' => sub {
 	my $i18n = bless {}, 'MockI18NQV';
 	Test::Mockingbird::mock('MockI18NQV', 'accepts', sub { push @tried, $_[1]; undef });
 
-	$l->_scan_plain_tokens($i18n, 'en;q=0.5,fr;q=0.3');
-	ok(!grep { /q=/ } @tried, 'Quality values stripped before passing to accepts()');
+	$l->_scan_plain_tokens($i18n, $l->_sorted_tokens('en;q=0.5,fr;q=0.3'));
+	ok(!(grep { /q=/ } @tried), 'No q= suffix reaches accepts() after _sorted_tokens');
 	Test::Mockingbird::restore_all();
 };
 
@@ -869,9 +871,11 @@ subtest '_warn: without logger appends to messages and carps' => sub {
 	my $l = _basic_obj();
 	$l->{logger} = undef;    # force the Carp::carp code path
 	my @carp_msgs;
-	Test::Mockingbird::mock('Carp', 'carp', sub { push @carp_msgs, $_[0] });
+	# carp is now imported into CGI::Lingua at compile time (use Carp qw(carp)),
+	# so we must mock CGI::Lingua::carp — mocking Carp::carp would miss it.
+	Test::Mockingbird::mock('CGI::Lingua', 'carp', sub { push @carp_msgs, $_[0] });
 	$l->_warn({ warning => 'carp test' });
-	ok((grep { /carp test/ } @carp_msgs), 'Carp::carp called with message text');
+	ok((grep { /carp test/ } @carp_msgs), 'CGI::Lingua::carp called with message text');
 	ok((grep { $_->{message} =~ /carp test/ } @{$l->{messages}}), 'Message recorded internally');
 	Test::Mockingbird::restore_all();
 };
@@ -967,6 +971,165 @@ subtest 'No memory cycles in frozen DESTROY copy' => sub {
 	my $blob   = $cache->get('5.5.5.5/en/en');
 	my $thawed = Storable::thaw($blob);
 	memory_cycle_ok($thawed, 'Thawed DESTROY copy has no cycles');
+};
+
+# ── _sorted_tokens ────────────────────────────────────────────────────────────
+
+subtest '_sorted_tokens: returns arrayref sorted by q descending' => sub {
+	local %ENV = ();
+	my $l = _basic_obj();
+	my $sorted = $l->_sorted_tokens('de;q=0.9,en;q=0.1,fr');
+	is(ref($sorted), 'ARRAY', 'Returns an arrayref');
+	is($sorted->[0][0], 'fr', 'Highest q (1.0 implicit) first');
+	is($sorted->[0][1], 1.0,  'Implicit q=1.0 parsed correctly');
+	is($sorted->[1][0], 'de', 'q=0.9 second');
+	is($sorted->[2][0], 'en', 'q=0.1 last');
+};
+
+subtest '_sorted_tokens: strips q suffix from tags' => sub {
+	local %ENV = ();
+	my $l = _basic_obj();
+	my $sorted = $l->_sorted_tokens('en;q=0.5');
+	is($sorted->[0][0], 'en', 'Tag returned without ;q= suffix');
+};
+
+subtest '_sorted_tokens: empty header returns empty arrayref' => sub {
+	local %ENV = ();
+	my $l = _basic_obj();
+	my $sorted = $l->_sorted_tokens('');
+	is(ref($sorted), 'ARRAY', 'Still an arrayref');
+	is(scalar @{$sorted}, 0, 'No entries for empty header');
+};
+
+# ── is_rtl() / text_direction() ──────────────────────────────────────────────
+
+subtest 'is_rtl: returns 1 for Arabic' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'ar');
+	my $l = CGI::Lingua->new(supported => ['ar', 'en']);
+	is($l->is_rtl(), 1, 'Arabic is RTL');
+};
+
+subtest 'is_rtl: returns 1 for Hebrew' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'he');
+	my $l = CGI::Lingua->new(supported => ['he', 'en']);
+	is($l->is_rtl(), 1, 'Hebrew is RTL');
+};
+
+subtest 'is_rtl: returns 0 for English' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	is($l->is_rtl(), 0, 'English is not RTL');
+};
+
+subtest 'is_rtl: returns 0 when language is Unknown' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'zz');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	is($l->is_rtl(), 0, 'Unknown language is not RTL');
+};
+
+subtest 'text_direction: returns rtl for Arabic' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'ar');
+	my $l = CGI::Lingua->new(supported => ['ar', 'en']);
+	is($l->text_direction(), 'rtl', 'Arabic text direction is rtl');
+};
+
+subtest 'text_direction: returns ltr for French' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr');
+	my $l = CGI::Lingua->new(supported => ['fr', 'en']);
+	is($l->text_direction(), 'ltr', 'French text direction is ltr');
+};
+
+# ── plural_category() ────────────────────────────────────────────────────────
+
+subtest 'plural_category: English one/other' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	is($l->plural_category(1),  'one',   'n=1 is one');
+	is($l->plural_category(0),  'other', 'n=0 is other');
+	is($l->plural_category(2),  'other', 'n=2 is other');
+	is($l->plural_category(42), 'other', 'n=42 is other');
+};
+
+subtest 'plural_category: Arabic six forms' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'ar');
+	my $l = CGI::Lingua->new(supported => ['ar', 'en']);
+	is($l->plural_category(0),   'zero',  'n=0 zero');
+	is($l->plural_category(1),   'one',   'n=1 one');
+	is($l->plural_category(2),   'two',   'n=2 two');
+	is($l->plural_category(5),   'few',   'n=5 few');
+	is($l->plural_category(15),  'many',  'n=15 many');
+	is($l->plural_category(100), 'other', 'n=100 other');
+};
+
+subtest 'plural_category: Russian three forms' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'ru');
+	my $l = CGI::Lingua->new(supported => ['ru', 'en']);
+	is($l->plural_category(1),  'one',  'n=1 one');
+	is($l->plural_category(2),  'few',  'n=2 few');
+	is($l->plural_category(5),  'many', 'n=5 many');
+	is($l->plural_category(11), 'many', 'n=11 many (not one)');
+	is($l->plural_category(21), 'one',  'n=21 one');
+};
+
+subtest 'plural_category: falls back to one/other for unknown language' => sub {
+	# Construct directly with a code not in %PLURAL_RULES
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'tlh'); # Klingon — not in table
+	my $l = CGI::Lingua->new(supported => ['tlh', 'en']);
+	# language will be Unknown, so language_code_alpha2 returns undef
+	# plural_category must return 'other' without dying
+	my $cat;
+	lives_ok { $cat = $l->plural_category(1) } 'Does not die for unknown language';
+	ok(defined $cat, 'Returns a defined value');
+};
+
+# ── translation_file() ───────────────────────────────────────────────────────
+
+subtest 'translation_file: returns undef when dir arg is undef' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	ok(!defined $l->translation_file(undef), 'undef dir returns undef');
+};
+
+subtest 'translation_file: returns undef when no matching file exists' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	ok(!defined $l->translation_file('/nonexistent/path/xyz'), 'missing dir returns undef');
+};
+
+subtest 'translation_file: finds file with default json extension' => sub {
+	use File::Temp qw(tempdir);
+	my $dir = tempdir(CLEANUP => 1);
+	open(my $fh, '>', "$dir/en.json") or die $!;
+	print $fh '{}';
+	close $fh;
+
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'en');
+	my $l = CGI::Lingua->new(supported => ['en']);
+	is($l->translation_file($dir), "$dir/en.json", 'Returns path to en.json');
+};
+
+subtest 'translation_file: accepts explicit extension without leading dot' => sub {
+	use File::Temp qw(tempdir);
+	my $dir = tempdir(CLEANUP => 1);
+	open(my $fh, '>', "$dir/fr.po") or die $!;
+	print $fh '';
+	close $fh;
+
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr');
+	my $l = CGI::Lingua->new(supported => ['fr']);
+	is($l->translation_file($dir, 'po'), "$dir/fr.po", 'Returns path with explicit ext');
+};
+
+subtest 'translation_file: accepts extension with leading dot' => sub {
+	use File::Temp qw(tempdir);
+	my $dir = tempdir(CLEANUP => 1);
+	open(my $fh, '>', "$dir/de.json") or die $!;
+	print $fh '{}';
+	close $fh;
+
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'de');
+	my $l = CGI::Lingua->new(supported => ['de']);
+	is($l->translation_file($dir, '.json'), "$dir/de.json", 'Leading dot normalised');
 };
 
 done_testing();

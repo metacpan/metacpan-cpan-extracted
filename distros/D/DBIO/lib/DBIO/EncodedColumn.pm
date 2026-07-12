@@ -202,7 +202,7 @@ DBIO::EncodedColumn - One-way encode selected columns (e.g. passwords)
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -226,6 +226,8 @@ version 0.900000
 
   my $user = $schema->resultset('User')->new_result({ password => 's3cret' });
   $user->check_password('s3cret'); # true
+
+See F<t/94encoded_column.t> for a runnable example.
 
 =head1 DESCRIPTION
 

@@ -267,24 +267,7 @@ sub insert {
     { %current_rowdata }, # what to insert, copy because the storage *will* change it
   );
 
-  for (keys %$returned_cols) {
-    $self->store_column($_, $returned_cols->{$_})
-      # this ensures we fire store_column only once
-      # (some asshats like overriding it)
-      if (
-        (!exists $current_rowdata{$_})
-          or
-        (defined $current_rowdata{$_} xor defined $returned_cols->{$_})
-          or
-        (defined $current_rowdata{$_} and $current_rowdata{$_} ne $returned_cols->{$_})
-      );
-  }
-
-  delete $self->{_column_data_in_storage};
-  $self->in_storage(1);
-
-  $self->{_dirty_columns} = {};
-  $self->{related_resultsets} = {};
+  $self->_store_inserted_columns(\%current_rowdata, $returned_cols);
 
   foreach my $rel_name (keys %related_stuff) {
     next unless $rsrc->has_relationship ($rel_name);
@@ -323,6 +306,91 @@ sub insert {
   $self->store_storage_values if @{$self->storage_value_columns};
 
   return $self;
+}
+
+# Fold the columns the storage returned from an insert (autoinc PKs and any
+# retrieve_on_insert columns) back into the object, mark it stored and clean.
+# Shared by the synchronous insert() and the async insert_async() so both build
+# the now-stored object identically.
+sub _store_inserted_columns {
+  my ($self, $current_rowdata, $returned_cols) = @_;
+
+  for (keys %$returned_cols) {
+    $self->store_column($_, $returned_cols->{$_})
+      # this ensures we fire store_column only once
+      # (some asshats like overriding it)
+      if (
+        (!exists $current_rowdata->{$_})
+          or
+        (defined $current_rowdata->{$_} xor defined $returned_cols->{$_})
+          or
+        (defined $current_rowdata->{$_} and $current_rowdata->{$_} ne $returned_cols->{$_})
+      );
+  }
+
+  delete $self->{_column_data_in_storage};
+  $self->in_storage(1);
+
+  $self->{_dirty_columns} = {};
+  $self->{related_resultsets} = {};
+
+  return $self;
+}
+
+# Row-level mirror of DBIO::ResultSet::_rs_run_async (ADR 0030/0031): route to a
+# live embedded backend, degrade synchronously in the 'immediate' mode, or croak
+# on a sync instance.
+sub _row_run_async {
+  my ($self, $name, $backend_build, $sync_run) = @_;
+
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+
+  if (my $backend = $storage->_async_storage) {
+    return $backend_build->($backend, $fc);
+  }
+
+  $self->throw_exception(
+    "not an async connection -- connect with { async => ... } to use ${name}_async"
+  ) unless defined $storage->_async_mode;
+
+  my @r = eval { $sync_run->() };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+
+sub insert_async {
+  my $self = shift;
+
+  return $self->_row_run_async('insert',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my $rsrc = $self->result_source;
+      $self->throw_exception("No result_source set on this object; can't insert")
+        unless $rsrc;
+
+      return $fc->done($self) if $self->in_storage;
+
+      # Related-object multi-create is a multi-statement (and transactional)
+      # cascade, not a single insert_async; run it synchronously and resolve.
+      if ( %{ $self->{_relationship_data} || {} }
+             or
+           %{ $self->{_inflated_column} || {} } ) {
+        my $r = eval { $self->insert };
+        return $@ ? $fc->fail($@) : $fc->done($r);
+      }
+
+      my %current_rowdata = $self->get_columns;
+      return $backend->insert_async( $rsrc, { %current_rowdata } )->then(sub {
+        my ($returned_cols) = @_;
+        $self->_store_inserted_columns(\%current_rowdata, $returned_cols);
+        $self->store_storage_values if @{$self->storage_value_columns};
+        return $self;
+      });
+    },
+    sub { $self->insert },
+  );
 }
 
 
@@ -1213,7 +1281,7 @@ DBIO::Row - Basic row methods
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -1418,6 +1486,21 @@ L<new_result|DBIO::ResultSet/new_result> on a resultset.
 
 This will also insert any uninserted, related objects held inside this
 one, see L<DBIO::ResultSet/create> for more details.
+
+=head2 insert_async
+
+  my $future = $row->insert_async;
+  $future->then(sub { my $row = shift; ... });
+
+Async variant of L</insert>. For a plain single-row insert the storage write is
+routed through the backend's C<insert_async> and the returned columns are folded
+back into the object in the Future's C<then> (reusing the same store-back as the
+synchronous L</insert>), resolving with C<$self>. An insert that involves
+related-object multi-create (related rows that must be inserted before or after
+this one) cannot be expressed as a single C<insert_async>; it is performed
+synchronously and the Future resolves immediately. Requires an async connection;
+on a sync instance it croaks, and in the C<immediate> mode it degrades to a
+synchronous insert wrapped in an immediately-resolved Future. See ADR 0030/0031.
 
 =head2 in_storage
 

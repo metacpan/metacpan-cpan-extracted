@@ -294,10 +294,51 @@ sub _order_by {
     return $self->_parse_rs_attrs ($arg);
   }
   else {
+    # rewrite any { -asc|-desc => \%where_cond } element into a parameterized
+    # literal so the value flows through as a bind placeholder rather than an
+    # inlined quoted literal (SQLA renders a plain HASH value as { col => val }
+    # which quotes the value). The raw $arg is never mutated, so the chunk
+    # re-parsing done by the limit dialects keeps seeing the original structure.
+    #
+    # Suppressed inside the subquery-emulation limit dialects: those re-chunk
+    # the raw order_by as *strings* to build inner-select supplements and to
+    # re-alias the OVER()/outer order. A bind-carrying literal here would
+    # desync the placeholder in the rendered order from the still-inlined
+    # supplement (the re-alias is a plain string match). See the guards in
+    # _RowNumberOver / _RowNum / _prep_for_skimming_limit / _GenericSubQ.
+    $arg = $self->_order_by_transform_bind_conds($arg)
+      unless $self->{_dbio_no_order_bind_transform};
+
     my ($sql, @bind) = $self->next::method($arg);
     push @{$self->{order_bind}}, @bind;
     return $sql;
   }
+}
+
+# Walk an order_by spec (single element or arrayref of elements) and replace
+# every { -asc|-desc => \%cond } whose value is a where-style condition HASHREF
+# with { -asc|-desc => \[ $sql, @bind ] } produced via the WHERE machinery.
+# Returns a (possibly new) structure; the input is left untouched.
+sub _order_by_transform_bind_conds {
+  my ($self, $arg) = @_;
+
+  if (ref $arg eq 'ARRAY') {
+    return [ map { $self->_order_by_transform_bind_conds($_) } @$arg ];
+  }
+  elsif (ref $arg eq 'HASH' and grep { $_ =~ /^-(?:desc|asc)/i } keys %$arg) {
+    my %copy = %$arg;
+    for my $dir (keys %copy) {
+      next unless $dir =~ /^-(?:desc|asc)/i;
+      my $val = $copy{$dir};
+      # only a bare where-style condition HASHREF needs rewriting; scalars,
+      # literal refs (\'...' / \[...]) and column lists pass through unchanged
+      $copy{$dir} = \[ $self->_recurse_where($val) ]
+        if ref $val eq 'HASH';
+    }
+    return \%copy;
+  }
+
+  return $arg;
 }
 
 
@@ -529,6 +570,9 @@ sub apply_limit {
 sub _RowNumberOver {
   my ($self, $sql, $rs_attrs, $rows, $offset ) = @_;
 
+  # this dialect re-chunks the raw order_by as strings (supplement + re-alias)
+  local $self->{_dbio_no_order_bind_transform} = 1;
+
   # get selectors, and scan the order_by (if any)
   my $sq_attrs = $self->_subqueried_limit_attrs ( $sql, $rs_attrs );
 
@@ -640,6 +684,9 @@ sub _FirstSkip {
 sub _RowNum {
   my ( $self, $sql, $rs_attrs, $rows, $offset ) = @_;
 
+  # this dialect re-chunks the raw order_by as strings (supplement + re-alias)
+  local $self->{_dbio_no_order_bind_transform} = 1;
+
   my $sq_attrs = $self->_subqueried_limit_attrs ($sql, $rs_attrs);
 
   my $qalias = $self->_quote ($rs_attrs->{alias});
@@ -703,6 +750,9 @@ EOS
 
 sub _prep_for_skimming_limit {
   my ( $self, $sql, $rs_attrs ) = @_;
+
+  # this dialect re-chunks the raw order_by as strings (supplement + re-alias)
+  local $self->{_dbio_no_order_bind_transform} = 1;
 
   # get selectors
   my $sq_attrs = $self->_subqueried_limit_attrs ($sql, $rs_attrs);
@@ -866,6 +916,9 @@ sub _FetchFirst {
 
 sub _GenericSubQ {
   my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
+
+  # this dialect re-chunks the raw order_by as strings (column-name matching)
+  local $self->{_dbio_no_order_bind_transform} = 1;
 
   my $main_rsrc = $rs_attrs->{result_source};
 
@@ -1181,7 +1234,7 @@ DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

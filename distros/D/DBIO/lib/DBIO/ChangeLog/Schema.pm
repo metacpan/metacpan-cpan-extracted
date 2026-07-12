@@ -203,7 +203,7 @@ DBIO::ChangeLog::Schema - Schema-level change tracking component
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,8 @@ version 0.900000
 
   # Optional: restrict which sources are tracked (default: all)
   __PACKAGE__->changelog_sources([qw/ Artist Album /]);
+
+See F<t/changelog/01-basic.t> for a runnable example.
 
 =head1 DESCRIPTION
 

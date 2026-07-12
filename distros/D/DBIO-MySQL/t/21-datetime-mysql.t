@@ -23,11 +23,44 @@ DBIO::Test::Schema->load_classes({ 'DBIO::MySQL::Test' => ['EventTZ'] });
   DBIO::Test::Schema->load_classes({ 'DBIO::MySQL::Test' => ['EventTZDeprecated'] });
 }
 
+# Self-contained: build the single `event` table both EventTZ and
+# EventTZDeprecated map to, then connect with no_deploy. Deploying the whole
+# DBIO::Test::Schema is neither needed nor MySQL-deployable -- it carries
+# result classes with non-MySQL constructs (e.g. ArtistGUID's
+# uniqueidentifier auto-increment PK). This mirrors the PostgreSQL t/21
+# pattern.
+require DBI;
+{
+  my $bootstrap = DBI->connect($dsn, $user, $pass, {
+    AutoCommit => 1,
+    RaiseError => 1,
+    PrintError => 0,
+  });
+  $bootstrap->do('DROP TABLE IF EXISTS event');
+  $bootstrap->do(q{
+    CREATE TABLE event (
+      id         INTEGER   NOT NULL AUTO_INCREMENT,
+      starts_at  DATE,
+      created_on DATETIME,
+      PRIMARY KEY (id)
+    ) ENGINE=InnoDB
+  });
+  $bootstrap->disconnect;
+}
+
+# The test stores 0000-00-00 to exercise datetime_undef_if_invalid handling.
+# With no_deploy, DBIO::Test::deploy_schema (which would call deploy_setup) never
+# runs. deploy_setup only relaxes sql_mode on the handle live at deploy time, but
+# the zero-date write below happens on whatever session DBIO opens for the writes
+# (and survives reconnects). Wire the relaxation through on_connect_call so every
+# (re)connect strips NO_ZERO_DATE / NO_ZERO_IN_DATE -- the session issuing the
+# UPDATE is guaranteed to carry it. See DBIO::MySQL::Storage/connect_call_set_zero_date_permissive.
 my $schema = DBIO::Test->init_schema(
-  dsn  => $dsn,
-  user => $user,
-  pass => $pass,
-  deploy_args => { add_drop_table => 1 },
+  dsn          => $dsn,
+  user         => $user,
+  pass         => $pass,
+  no_deploy    => 1,
+  connect_opts => { on_connect_call => 'set_zero_date_permissive' },
 );
 
 # Test "timezone" parameter
@@ -102,15 +135,16 @@ throws_ok (
   "Invalid date format exception"
 );
 
-# Hygiene: this test creates EventTZ / EventTZDeprecated tables. They
-# are unrelated to the t/53 round-trip fixture, so drop them at END
-# to keep the live database in a clean state for downstream tests.
+# Hygiene: this test creates the `event` table (both EventTZ and
+# EventTZDeprecated map to it). Drop it at END with a dedicated dbh -- the
+# schema's own dbh may already be gone at process exit -- so the live
+# database stays clean for downstream tests.
 END {
   return unless $dsn;
-  my $dbh = eval { $schema->storage->dbh } or return;
-  for my $t (qw(event_tz event_tz_deprecated)) {
-    eval { $dbh->do("DROP TABLE IF EXISTS $t") };
-  }
+  my $h = eval { DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 }) };
+  return unless $h;
+  eval { $h->do('DROP TABLE IF EXISTS event') };
+  $h->disconnect;
 }
 
 done_testing;

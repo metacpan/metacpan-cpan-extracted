@@ -6,6 +6,14 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
+t/01-version.t
+t/02-psgi-app.t
+t/03-route-maps.t
+t/04-route-stations.t
+t/05-route-shortest-route.t
+t/06-content-type.t
+t/07-error-handling.t
+t/lib/TestMapTubeServer.pm
 t/manifest.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

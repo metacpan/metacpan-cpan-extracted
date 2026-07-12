@@ -1,0 +1,68 @@
+---
+# k8s/postgres.yaml — Apache AGE on PostgreSQL 18 for the DBIO::PostgreSQL::Age
+# test suite. Drop-in shape: one Service + one Deployment. The pod runs the
+# apache/age:latest image (postgres:18 + AGE 1.7), which ships the AGE
+# extension and preloads it via `shared_preload_libraries=age` (the image's
+# default command). The test script (k8s/test.sh) creates the test DB and
+# enables AGE there once the pod is ready.
+#
+# Reuses the same image as docker-compose so dev parity is real: same
+# PG version, same AGE version, same provisioning semantics.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-age-pg
+  labels:
+    app: dbio-age-pg
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: dbio-age-pg
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbio-age-pg
+  labels:
+    app: dbio-age-pg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbio-age-pg
+  template:
+    metadata:
+      labels:
+        app: dbio-age-pg
+    spec:
+      containers:
+        - name: postgres
+          # Apache AGE on PostgreSQL 18 (postgres:18 + AGE 1.7). Public
+          # image; the default command preloads AGE via
+          # shared_preload_libraries=age, so no command override is needed.
+          image: apache/age:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            # Trust auth in-cluster; the test runs from inside the same
+            # network boundary. Don't expose this Service outside the cluster.
+            - name: POSTGRES_PASSWORD
+              value: dbio_age_test
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

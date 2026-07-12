@@ -18,64 +18,64 @@ name: DBIO-DuckDB
 provides:
   DBIO::DuckDB:
     file: lib/DBIO/DuckDB.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::DDL:
     file: lib/DBIO/DuckDB/DDL.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::DDL::Emit:
     file: lib/DBIO/DuckDB/DDL/Emit.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Deploy:
     file: lib/DBIO/DuckDB/Deploy.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Diff:
     file: lib/DBIO/DuckDB/Diff.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Diff::Column:
     file: lib/DBIO/DuckDB/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Diff::Index:
     file: lib/DBIO/DuckDB/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Diff::Table:
     file: lib/DBIO/DuckDB/Diff/Table.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Introspect:
     file: lib/DBIO/DuckDB/Introspect.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Introspect::Columns:
     file: lib/DBIO/DuckDB/Introspect/Columns.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Introspect::ForeignKeys:
     file: lib/DBIO/DuckDB/Introspect/ForeignKeys.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Introspect::Indexes:
     file: lib/DBIO/DuckDB/Introspect/Indexes.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Introspect::Tables:
     file: lib/DBIO/DuckDB/Introspect/Tables.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::SQLMaker:
     file: lib/DBIO/DuckDB/SQLMaker.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Storage:
     file: lib/DBIO/DuckDB/Storage.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::DuckDB::Test:
     file: lib/DBIO/DuckDB/Test.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Shortcut::du:
     file: lib/DBIO/Shortcut/du.pm
-    version: '0.900000'
+    version: '0.900001'
 requires:
   DBD::DuckDB: '0.16'
-  DBIO: '0.900000'
+  DBIO: '0.900001'
   perl: '5.020'
 resources:
   bugtracker: https://codeberg.org/dbio/dbio-duckdb/issues
   homepage: https://codeberg.org/dbio/dbio-duckdb
   repository: https://codeberg.org/dbio/dbio-duckdb.git
-version: '0.900000'
+version: '0.900001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -211,7 +211,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900000
+          tag: v0.900001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -334,6 +334,10 @@ x_Dist_Zilla:
               version: '4.020'
       name: '@DBIO/PodWeaver'
       version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CoverageTest
+      name: '@DBIO/DBIO::CoverageTest'
+      version: ~
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'

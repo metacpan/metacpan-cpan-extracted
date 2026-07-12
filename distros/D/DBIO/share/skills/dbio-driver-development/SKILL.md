@@ -304,9 +304,57 @@ Storage detects via `_is_access_broker_connect_info([$broker])` (true if single 
 
 Rotating creds: storage re-fetches on next connect. Async pools refresh via `_conninfo_provider` calling `current_connect_info_for_storage($storage, $mode)`.
 
-## Async Drivers
+## Async Drivers (ADR 0030/0031)
 
-Bypass DBI, native async protocol.
+Async is an explicit, **per-connection mode** (ADR 0030), not a separate storage
+class chosen at schema-author time. A schema connected with
+`connect(..., { async => $mode })` answers the six `*_async` storage methods and
+the ResultSet/Row `*_async` helpers through an embedded async backend; without
+`{ async => ... }` it stays sync (`*_async` croaks — no auto-fallback). An add-on
+registers its mode on the core base storage:
+
+    DBIO::Storage::DBI->register_async_mode( $mode => 'DBIO::SomeDriver::Backend::Storage' );
+
+`forked` (and the core `immediate`) register generically on the base class; a
+native `ev` mode is registered by the concrete *sync* driver storage, so
+`{ async => 'ev' }` resolves DB-specifically. `future_io` is **not registered** —
+the core resolver discovers each driver's transport adapter by convention,
+`ref($storage) . '::Async'` (`DBIO::X::Storage` → `DBIO::X::Storage::Async`), and
+croaks early if a driver ships none (ADR 0030 refinement, karr #65).
+
+### Extensions are storage LAYERS, not storage_type subclasses (karr #70)
+
+A driver **extension** (AGE, PostGIS, a tenant add-on) does **not** subclass
+`storage_type` and does **not** ship a per-extension `<pkg>::Async` transport of
+its own. Under the storage-layer composition model it ships a plain storage
+**layer** — a method package, no `@ISA` pointing at a storage — registered on
+the schema:
+
+    $schema->register_storage_layer('DBIO::X::Ext::Storage');
+
+Core composes every registered layer over the base storage by C3-MRO class
+synthesis (`DBIO::Storage::Composed->compose($base, \@layers)`): the synthesised
+`DBIO::Storage::Composed::<Layer>__<Base>` has `@ISA = (@layers, $base)` under
+the `c3` MRO and no methods of its own, so calls walk the layers (registration
+order = precedence) and fall through to the base; layer hooks chain with
+`$self->next::method(@_)`. Two layers defining the *same own method* is a compose-
+time croak — silent shadowing between siblings is forbidden. The driver rebless
+(`_determine_driver`) re-composes the same layers over the concrete driver class
+(`recompose`), so a layer chosen on the generic storage survives onto the driver.
+
+**Async rides the same layers.** When a layered schema connects
+`{ async => $mode }`, core (1) resolves the transport off the composition
+**BASE** — the driver, never the layers (`_async_resolution_class` strips the
+layers back out of the linearised ISA, so a sync layer's plain `<Layer>::Async`
+mixin is never mistaken for the transport, karr #70/#67) — then (2) mirrors each
+registered sync layer `L` onto its async counterpart (`L->async_layer_class($mode)`
+if defined, else the convention sibling `${L}::Async` via `load_optional_class`;
+absent ⇒ that layer is sync-only and skipped) and composes those mirrors **on top
+of** the transport. One behaviour, one transport: an extension's async behaviour
+rides every transport exactly as its sync behaviour rides every driver, with no
+hand-written extension×transport matrix. An async mirror that declares
+`required_transport_capabilities` the transport does not advertise croaks at
+compose time naming the gap (see the capability table below).
 
 | Aspect | DBI | Async |
 |--------|-----|-------|
@@ -316,21 +364,71 @@ Bypass DBI, native async protocol.
 | Connection | single DBH | pool |
 | Batching | no | pipeline (multi queries/round-trip) |
 
-Required methods:
+A `future_io` adapter (convention name `DBIO::X::Storage::Async`) subclasses the
+shared `DBIO::Async::Storage` base (dist `dbio-async`) and overrides **only** the
+DB-specific transport seams — the Model-B orchestration (CRUD runner, txn pinning,
+pipeline, `*_async`) is inherited from core `DBIO::Storage::Async` (ADR 0030 §4):
 
 ```perl
-package DBIO::DriverName::Async::Storage;
-use base 'DBIO::Storage::Async';
+package DBIO::DriverName::Storage::Async;   # convention: ref($storage).'::Async'
+use base 'DBIO::Async::Storage';             # shared Future::IO base
 
-sub future_class { 'Future' }   # event-loop-specific
-sub pool { ... }                 # → Future
-sub select_async { ... }         # → Future
-sub select_single_async { ... }
+sub sql_maker_class     { 'DBIO::DriverName::SQLMaker' }
+sub _transform_sql      { ... }   # '?' -> the DB's positional placeholder (see below)
+sub _submit_query       { ... }   # send query bytes on the DBD's async binding
+sub _collect_result     { ... }   # read the ready result
+sub _conn_fileno        { ... }   # socket fd for the Future::IO watcher
+sub _normalize_conninfo { ... }   # DBD conninfo shape
 ```
 
+#### The `?` placeholder seam — shaped once, in the transport
+
+The SQLMaker is **shared with the sync DBI driver**, which needs SQL-standard
+`?` placeholders, so the maker MUST keep emitting `?`. Any per-DB placeholder
+rewrite (PostgreSQL `?` → `$N`, Oracle `?` → `:N`, …) lives in the transport's
+`_transform_sql` seam, which the inherited `DBIO::Storage::Async::_query_async` /
+`_query_async_pinned` invoke **once, internally**, on the maker's output before
+it reaches the wire. **Callers never shape** — no code path outside the transport
+touches placeholders, and there is no second/double shaping. `_transform_sql` is
+a required seam (the base croaks until provided): a DB whose wire already takes
+`?` overrides it to identity; a DB that needs positional placeholders rewrites
+there (and only there). Test the seam directly (`$Adapter->_transform_sql($sql)`)
+— that *is* the contract; do not re-add caller-side shaping in tests.
+
+An `ev` backend (`DBIO::X::EV::Storage`) does the same over its native
+event-loop client. Both must honour the resolution-shape contracts (ADR 0031 §3)
+so the core
+RS/Row helpers inflate uniformly: `select_async` → raw row arrayrefs (cursor
+`->all` shape), `select_single_async` → a single arrayref, `insert_async` → the
+returned-columns hashref sync `insert` returns; the Future's `then` must
+auto-wrap plain returns (ADR 0031 §4).
+
+#### Transport capabilities
+
+A transport advertises what it supports via the `transport_capabilities` class
+method; an async layer gates on it with `required_transport_capabilities`, and a
+shortfall croaks at compose time (a transport gap becomes *that transport's*
+ticket, never a silent feature loss). The two async transports for a driver
+carry different capability sets:
+
+| Feature | `future_io` (`DBIO::Async::Storage` base) | `ev` (`DBIO::X::EV::Storage`) |
+|---|---|---|
+| `on_connect_replay` (on_connect_do/call on pooled conns, karr #68) | ✅ advertised | ✅ |
+| pooled CRUD + `txn_do_async` pinning | ✅ | ✅ |
+| LISTEN / NOTIFY | ❌ (base `listen` croaks) | ✅ |
+| COPY | ❌ | ✅ |
+| pipeline (batch queries/round-trip) | ❌ (base `pipeline` croaks) | ✅ |
+
+The generic `future_io` base advertises exactly `on_connect_replay` and nothing
+more; a `future_io` adapter over a plain DBD binding declares no extra
+capabilities. The native `ev` backend is the transport that carries
+LISTEN/NOTIFY, COPY and pipelining. An add-on needing those must select the `ev`
+mode (or the transport's dist grows the capability).
+
 Implemented:
-- **DBIO::PostgreSQL::Async** (EV::Pg, libpq): LISTEN/NOTIFY, COPY IN/OUT, pipeline (≤64 in-flight), txn pinning. Sync methods block via `->get` on Future.
-- **DBIO::MySQL::Async** (EV::MariaDB): pipeline (≤64), txn pinning, sync via `->get`.
+- **DBIO::PostgreSQL::EV** (EV::Pg, libpq) / **DBIO::MySQL::EV** (EV::MariaDB): the `ev` mode — native event-loop client: LISTEN/NOTIFY, COPY, pipeline (≤64 in-flight), txn pinning. Sync methods block via `->get`.
+- **DBIO::Forked** (fork + pipe, any driver): the `forked` mode — no event loop, works for every driver (ADR 0030).
+- **DBIO::Async** (Future::IO): the `future_io` mode — the abstract `DBIO::Async::Storage` base over a driver's own async binding (`pg_async`/`mysql_async`); each driver supplies a convention-resolved adapter `DBIO::X::Storage::Async` that fills the transport seams. No adapter yet ⇒ `future_io` croaks early for that driver.
 
 ## Distribution Layout
 
@@ -356,7 +454,8 @@ DBIO-DriverName/
 | Storage | `DBIO::DriverName::Storage` | `DBIO::PostgreSQL::Storage` |
 | SQLMaker | `DBIO::DriverName::SQLMaker` | `DBIO::PostgreSQL::SQLMaker` |
 | DBD | `DBD::X` | `DBD::Pg`, `DBD::mysql` |
-| Async | `DBIO::DriverName::Async` | `DBIO::PostgreSQL::Async` |
+| Async (loop-agnostic, future_io) | `DBIO::DriverName::Storage::Async` | convention-resolved adapter on `DBIO::Async::Storage` |
+| Async (EV-bound) | `DBIO::DriverName::EV` | `DBIO::PostgreSQL::EV`, `DBIO::MySQL::EV` |
 
 ## Testing
 

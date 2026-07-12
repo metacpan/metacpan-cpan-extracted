@@ -29,7 +29,7 @@ DBIO::Core - Standard base class for DBIO result classes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -97,6 +97,8 @@ PostgreSQL-specific example:
   );
   __PACKAGE__->set_primary_key('id');
   1;
+
+See F<t/53-test-schema-fixtures.t> for a runnable example.
 
 =head1 DESCRIPTION
 

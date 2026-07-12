@@ -57,7 +57,7 @@ DBIO::Sybase::Diff - Compare two introspected Sybase ASE models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

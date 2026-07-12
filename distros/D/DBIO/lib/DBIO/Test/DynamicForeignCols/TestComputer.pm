@@ -51,7 +51,7 @@ DBIO::Test::DynamicForeignCols::TestComputer - Test result class for dynamic for
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

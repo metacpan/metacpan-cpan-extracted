@@ -8,6 +8,31 @@ use base qw/DBIO::Storage::DBI/;
 
 __PACKAGE__->register_driver('mysql' => __PACKAGE__);
 
+# Async is an explicit, per-connection mode (core ADR 0030): a connection opened
+# with connect(..., { async => 'ev' }) resolves the 'ev' mode through the mode
+# registry to the native MySQL EV backend below. Registering on this driver
+# storage class MRO-shadows the generic modes (forked/future_io) registered on
+# the base storage, so 'ev' picks the MySQL-specific backend. There is no auto-
+# fallback and no silent degrade: a mode that is neither requested nor registered
+# is simply unavailable, and requesting an unregistered/uninstalled mode croaks
+# (see DBIO::Storage::DBI::_async_storage). This only stores the class name --
+# DBIO::MySQL::EV::Storage (the optional dbio-mysql-ev dist) is loaded lazily
+# on first use, so registering it here is safe when the dist is absent.
+__PACKAGE__->register_async_mode( ev => 'DBIO::MySQL::EV::Storage' );
+
+# This is the ONLY async registration this driver needs, and it stays as-is
+# under the storage-layer composition model (core karr #70): a mode maps to a
+# transport BASE class, once, on this concrete driver storage. This dist writes
+# storage_type only from its Schema components' connection() (DBIO::MySQL /
+# DBIO::MySQL::MariaDB) -- choosing the driver BASE storage stays the driver's
+# job. A driver EXTENSION does not subclass storage_type nor add a shadow
+# register_async_mode / ::Async of its own: it registers a plain storage LAYER
+# (DBIO::Schema::register_storage_layer) whose async mirror composes ON TOP of
+# the resolved transport via DBIO::Storage::Composed. MySQL ships no such
+# extension today, but the mechanism is core-provided and this reference driver
+# honours it -- composition rides on top of this base; the mode->transport-base
+# map does not grow per extension.
+
 sub dbio_deploy_class { 'DBIO::MySQL::Deploy' }
 
 __PACKAGE__->sql_maker_class('DBIO::MySQL::SQLMaker');
@@ -84,12 +109,16 @@ sub deploy_defaults {
 
 sub deploy_setup {
   my ($self, $schema) = @_;
-  eval {
-    $self->dbh->do(
-      q{SET SESSION sql_mode = REPLACE(REPLACE(@@SESSION.sql_mode,'NO_ZERO_DATE',''),'NO_ZERO_IN_DATE','')}
-    );
-  };
+  eval { $self->connect_call_set_zero_date_permissive };
 }
+
+sub connect_call_set_zero_date_permissive {
+  my $self = shift;
+  $self->_do_query(
+    q{SET SESSION sql_mode = REPLACE(REPLACE(@@SESSION.sql_mode,'NO_ZERO_DATE',''),'NO_ZERO_IN_DATE','')}
+  );
+}
+
 
 sub _random_function { 'RAND()' }
 
@@ -165,7 +194,7 @@ DBIO::MySQL::Storage - MySQL storage layer for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -244,6 +273,25 @@ Strips C<NO_ZERO_DATE> and C<NO_ZERO_IN_DATE> from the session C<sql_mode>
 before deploying a schema during tests.  MySQL 8 strict mode rejects
 C<0000-00-00> which the test suite uses to verify
 C<datetime_undef_if_invalid> behaviour.
+
+Delegates to L</connect_call_set_zero_date_permissive>. Note this only
+relaxes the C<sql_mode> on the handle live at deploy time; when later
+B<writes> (not just the deploy) must tolerate zero dates, wire
+C<set_zero_date_permissive> through C<on_connect_call> instead so every
+(re)connect inherits the relaxed mode.
+
+=head2 connect_call_set_zero_date_permissive
+
+  my $schema = MyApp::Schema->connect(
+    $dsn, $user, $pass,
+    { on_connect_call => 'set_zero_date_permissive' },
+  );
+
+Strips C<NO_ZERO_DATE> and C<NO_ZERO_IN_DATE> from the session C<sql_mode>
+so C<0000-00-00> can be written under MySQL 8 strict mode. Installed as an
+C<on_connect_call> it re-runs on every (re)connect, so the session actually
+issuing the writes -- not merely the connection alive at deploy time --
+carries the relaxed mode. This is the seam L</deploy_setup> delegates to.
 
 =head2 deployment_statements
 

@@ -1,6 +1,6 @@
 package MojoX::MojoDbWrap;
 use v5.24;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.004' }
 
 use Moo;
 use warnings;

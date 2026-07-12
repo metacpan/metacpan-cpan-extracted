@@ -459,7 +459,7 @@ DBIO::Test - Test utilities for DBIO and DBIO driver distributions
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -477,6 +477,8 @@ version 0.900000
 
   # Only SQL generation tests (no deploy/populate)
   my $schema = DBIO::Test->init_schema(no_deploy => 1);
+
+See F<t/test/06_init_schema.t> for a runnable example.
 
 =head1 DESCRIPTION
 

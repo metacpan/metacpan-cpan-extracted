@@ -1,5 +1,8 @@
 Revision history for Number-Iterator
 
+1.03	2026-07-11
+	Remove pax headers
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

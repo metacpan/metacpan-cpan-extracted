@@ -140,6 +140,34 @@ use_ok 'DBIO::MSSQL::Diff';
   like($ops[1]->as_sql, qr/\(a, b\)/, 'recreated with new columns');
 }
 
+# --- Diff::Index: no standalone DROP INDEX when the owning table is dropped ---
+#     (karr #15) The table is present in source tables, absent from target
+#     tables -> DROP TABLE removes its indexes, so the standalone DROP INDEX
+#     must be suppressed.
+{
+  my @ops = DBIO::MSSQL::Diff::Index->diff(
+    { leftover => { idx_leftover => { columns => ['id'] } } },
+    {},
+    { leftover => { table_name => 'leftover' } },  # source: table exists live
+    {},                                            # target: table gone -> dropped
+  );
+  is(scalar @ops, 0, 'no standalone DROP INDEX when owning table is dropped');
+}
+
+# --- Diff::Index guard: do NOT over-suppress. A table that survives but loses
+#     one of its indexes must still get the standalone DROP INDEX (karr #15). ---
+{
+  my @ops = DBIO::MSSQL::Diff::Index->diff(
+    { t => { idx_email => { columns => ['email'] } } },
+    { t => {} },
+    { t => { table_name => 't' } },   # source: t exists
+    { t => { table_name => 't' } },   # target: t still exists -> only index dropped
+  );
+  is(scalar @ops, 1, 'index drop still emitted when the table itself survives');
+  is($ops[0]->action, 'drop', 'surviving-table index drop is a drop op');
+  is($ops[0]->as_sql, 'DROP INDEX idx_email ON t;', 'surviving-table index still dropped standalone');
+}
+
 # --- Full Diff orchestrator: source vs target model ---
 {
   my $source = {

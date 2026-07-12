@@ -32,7 +32,7 @@ Dist::Zilla::Plugin::DBIO::SetMeta - Set author, copyright_holder, and license o
 
 =head1 VERSION
 
-version 0.900002
+version 0.900003
 
 =head1 AUTHOR
 

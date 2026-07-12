@@ -27,7 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DBIO" : "0.900000",
+            "DBIO" : "0.900001",
             "GraphQL" : "0.54",
             "MIME::Base64" : "0",
             "perl" : "5.020"
@@ -36,7 +36,7 @@
       "test" : {
          "requires" : {
             "DBD::SQLite" : "1.70",
-            "DBIO::SQLite" : "0.900000",
+            "DBIO::SQLite" : "0.900001",
             "GraphQL::Execution" : "0",
             "Test::More" : "0.98"
          }
@@ -45,31 +45,31 @@
    "provides" : {
       "DBIO::GraphQL" : {
          "file" : "lib/DBIO/GraphQL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::GraphQL::Filter" : {
          "file" : "lib/DBIO/GraphQL/Filter.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::GraphQL::Filter::Null" : {
          "file" : "lib/DBIO/GraphQL/Filter/Null.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::GraphQL::Filter::Search" : {
          "file" : "lib/DBIO/GraphQL/Filter/Search.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::GraphQL::Mutation" : {
          "file" : "lib/DBIO/GraphQL/Mutation.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::GraphQL::Relationship" : {
          "file" : "lib/DBIO/GraphQL/Relationship.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::GraphQL::ScalarMap" : {
          "file" : "lib/DBIO/GraphQL/ScalarMap.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://codeberg.org/dbio/dbio-graphql"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -196,7 +196,6 @@
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
             "config" : {
-               "Dist::Zilla::Plugin::PkgVersion" : {},
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
@@ -205,23 +204,7 @@
                   "global" : 0,
                   "skip_version_provider" : 0
                },
-               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {
-                  "_fallback_version_provider_args" : {
-                     "first_version" : "0.900000"
-                  },
-                  "fallback_version_provider" : "Git::NextVersion"
-               },
-               "Git::NextVersion" : {
-                  "Dist::Zilla::Plugin::Git::NextVersion" : {
-                     "first_version" : "0.900000",
-                     "version_by_branch" : 0,
-                     "version_regexp" : "(?^:^v(.+)$)"
-                  },
-                  "Dist::Zilla::Role::Git::Repo" : {
-                     "git_version" : "2.39.5",
-                     "repo_root" : "."
-                  }
-               }
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "@DBIO/@Git::VersionManager/RewriteVersion::Transitional",
             "version" : "0.009"
@@ -277,7 +260,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -439,6 +422,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

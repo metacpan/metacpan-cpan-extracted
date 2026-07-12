@@ -107,7 +107,7 @@ DBIO::Storage::DateTimeFormat - Strptime-backed datetime format base for driver 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,8 @@ version 0.900000
 Then point the storage at it:
 
   __PACKAGE__->datetime_parser_type('DBIO::DriverName::DateTime::Format');
+
+See F<t/datetime_format.t> for a runnable example.
 
 =head1 DESCRIPTION
 

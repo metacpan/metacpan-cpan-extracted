@@ -37,7 +37,7 @@ DBIO::MySQL::Test::EventTZ - Test result class for MySQL/MariaDB timezone-aware 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

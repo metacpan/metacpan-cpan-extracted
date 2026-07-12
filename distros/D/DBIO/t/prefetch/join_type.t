@@ -20,11 +20,11 @@ my $nulls = {
 for my $type (keys %$nulls) {
   is_same_sql_bind (
     $cds->search({}, { prefetch => { artist => $nulls->{$type} } })->as_query,
-    '( SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-              artist.artistid, artist.name, artist.rank, artist.charfield
-        FROM cd me
-        JOIN artist artist
-          ON artist.artistid = me.artist
+    '( SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
+              "artist"."artistid", "artist"."name", "artist"."rank", "artist"."charfield"
+        FROM cd "me"
+        JOIN "artist" "artist"
+          ON "artist"."artistid" = "me"."artist"
     )', [],
     "same sql with null $type prefetch"
   );
@@ -34,14 +34,14 @@ for my $type (keys %$nulls) {
 is_same_sql_bind (
   $cds->search({}, { prefetch => { artist => { cds => 'artist' } } })->as_query,
   '(
-    SELECT  me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-            artist.artistid, artist.name, artist.rank, artist.charfield,
-            cds.cdid, cds.artist, cds.title, cds.year, cds.genreid, cds.single_track,
-            artist_2.artistid, artist_2.name, artist_2.rank, artist_2.charfield
-      FROM cd me
-      JOIN artist artist ON artist.artistid = me.artist
-      LEFT JOIN cd cds ON cds.artist = artist.artistid
-      LEFT JOIN artist artist_2 ON artist_2.artistid = cds.artist
+    SELECT  "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
+            "artist"."artistid", "artist"."name", "artist"."rank", "artist"."charfield",
+            "cds"."cdid", "cds"."artist", "cds"."title", "cds"."year", "cds"."genreid", "cds"."single_track",
+            "artist_2"."artistid", "artist_2"."name", "artist_2"."rank", "artist_2"."charfield"
+      FROM cd "me"
+      JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
+      LEFT JOIN cd "cds" ON "cds"."artist" = "artist"."artistid"
+      LEFT JOIN "artist" "artist_2" ON "artist_2"."artistid" = "cds"."artist"
   )',
   [],
 );

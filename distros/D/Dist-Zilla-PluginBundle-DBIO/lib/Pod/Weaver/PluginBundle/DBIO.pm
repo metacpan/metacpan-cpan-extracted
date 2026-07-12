@@ -71,7 +71,7 @@ Pod::Weaver::PluginBundle::DBIO - Pod::Weaver configuration for DBIO distributio
 
 =head1 VERSION
 
-version 0.900002
+version 0.900003
 
 =head1 SYNOPSIS
 

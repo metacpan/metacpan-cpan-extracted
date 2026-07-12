@@ -44,7 +44,7 @@ DBIO::ResultSource::View - ResultSource object representing a view
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,10 @@ version 0.900000
       size      => 100,
     },
   );
+
+See F<t/resultsource/virtual_view.t> for a runnable example: a virtual
+view (C<is_virtual> true) inlines its C<view_definition> as a FROM
+subquery in the generated SQL instead of referencing a table.
 
 =head1 DESCRIPTION
 

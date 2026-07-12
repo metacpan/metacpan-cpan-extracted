@@ -15,8 +15,8 @@ sub new {
   my ($class, %args) = @_;
   my $self = bless {}, $class;
 
-  for my $attr (qw/schema_class resultset config_stanza sql_dir sql_type
-                   version preversion config_file mode/) {
+  for my $attr (qw/schema_class resultset config_stanza sql_dir
+                   config_file mode/) {
     $self->{$attr} = $args{$attr} if exists $args{$attr};
   }
 
@@ -52,7 +52,6 @@ sub new {
 sub schema_class { $_[0]->{schema_class} }
 sub config_stanza { $_[0]->{config_stanza} }
 sub sql_dir { $_[0]->{sql_dir} }
-sub sql_type { $_[0]->{sql_type} }
 sub config_file { $_[0]->{config_file} }
 
 sub resultset {
@@ -61,22 +60,6 @@ sub resultset {
     return $_[0];
   }
   return $_[0]->{resultset};
-}
-
-sub version {
-  if (@_ > 1) {
-    $_[0]->{version} = $_[1];
-    return $_[0];
-  }
-  return $_[0]->{version};
-}
-
-sub preversion {
-  if (@_ > 1) {
-    $_[0]->{preversion} = $_[1];
-    return $_[0];
-  }
-  return $_[0]->{preversion};
 }
 
 sub force {
@@ -189,43 +172,16 @@ sub _build_config {
   return $cfg;
 }
 
-sub create {
-  my ($self, $sqlt_type, $sqlt_args, $preversion) = @_;
-
-  $preversion ||= $self->preversion;
-  $sqlt_type ||= $self->sql_type;
-
-  my $schema = $self->schema;
-  Carp::croak('create requires sql_dir') unless $self->sql_dir;
-
-  if (!-d $self->sql_dir) {
-    require File::Path;
-    File::Path::mkpath($self->sql_dir);
-  }
-
-  $schema->create_ddl_dir(
-    $sqlt_type,
-    (defined $schema->schema_version ? $schema->schema_version : ''),
-    $self->sql_dir,
-    $preversion,
-    $sqlt_args,
-  );
-}
-
 sub upgrade {
   my ($self) = @_;
   my $mode = lc($self->mode || 'auto');
-  Carp::croak("Unsupported mode '$mode' (expected auto|native|legacy)")
-    unless $mode =~ /\A(?:auto|native|legacy)\z/;
+  Carp::croak("Unsupported mode '$mode' (expected auto|native)")
+    unless $mode =~ /\A(?:auto|native)\z/;
 
-  if ($mode ne 'legacy') {
-    my $native = $self->_upgrade_native;
-    return $native if defined $native;
-    Carp::croak('No native upgrade path available for this schema/driver')
-      if $mode eq 'native';
-  }
+  my $native = $self->_upgrade_native;
+  return $native if defined $native;
 
-  return $self->_upgrade_legacy;
+  Carp::croak('No native upgrade path available for this schema/driver');
 }
 
 sub _upgrade_native {
@@ -241,49 +197,6 @@ sub _upgrade_native {
   }
 
   return undef;
-}
-
-sub _upgrade_legacy {
-  my ($self) = @_;
-  my $schema = $self->schema;
-
-  Carp::croak('Legacy upgrade requires a schema with an upgrade() method')
-    unless $schema->can('upgrade');
-
-  if ($self->sql_dir && $schema->can('upgrade_directory')) {
-    $schema->upgrade_directory($self->sql_dir);
-  }
-
-  return $schema->upgrade;
-}
-
-sub install {
-  my ($self, $version) = @_;
-
-  my $schema = $self->schema;
-  Carp::croak('install requires a schema with an install() method')
-    unless $schema->can('install');
-
-  $version ||= $self->version;
-
-  if (!$schema->can('get_db_version') || !$schema->get_db_version) {
-    print "Going to install schema version\n" if !$self->quiet;
-    my $ret = $schema->install($version);
-    print "return is $ret\n" if !$self->quiet;
-    return $ret;
-  }
-
-  if ($schema->can('get_db_version') && $schema->get_db_version && $self->force) {
-    Carp::carp("Forcing install may not be a good idea");
-    if ($self->_confirm) {
-      Carp::croak('Schema does not support forced install version overwrite')
-        unless $schema->can('_set_db_version');
-      $schema->_set_db_version({ version => $version });
-    }
-    return 1;
-  }
-
-  Carp::croak("Schema already has a version. Try upgrade instead.");
 }
 
 sub deploy {
@@ -514,7 +427,7 @@ DBIO::Admin - Lightweight schema administration helper for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -529,6 +442,8 @@ version 0.900000
   $admin->deploy;
   $admin->upgrade;
 
+See F<t/92admin_core.t> for a runnable example.
+
 =head1 DESCRIPTION
 
 Administrative helper used by L<dbioadmin>.
@@ -537,11 +452,7 @@ Supported operations:
 
 =over 4
 
-=item * C<create> (DDL file generation)
-
-=item * C<upgrade> (native driver upgrade where available, otherwise legacy versioned upgrade)
-
-=item * C<install> (legacy schema-version install)
+=item * C<upgrade> (native driver upgrade)
 
 =item * C<deploy>
 
@@ -555,15 +466,15 @@ L<dbioadmin>, L<DBIO::Schema>
 
 =head1 MODES
 
-C<mode> controls how C<upgrade> is executed:
+C<mode> controls how C<upgrade> is executed. Both accepted values use the
+native driver upgrade path; C<upgrade> croaks if the schema/driver provides
+no native upgrader.
 
 =over 4
 
-=item * C<auto> (default): native when available, otherwise legacy
+=item * C<auto> (default)
 
-=item * C<native>: require native driver upgrader support
-
-=item * C<legacy>: require C<DBIO::Schema::Versioned>-style upgrade path
+=item * C<native>
 
 =back
 

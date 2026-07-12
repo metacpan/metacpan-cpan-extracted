@@ -99,8 +99,20 @@ throws_ok { $dh->downgrade } qr/not supported/i,
   local *DBIO::DeploymentHandler::DeployMethod::Native::txn_do
     = sub { $_[1]->() };
 
-  warning_like { $dh->upgrade } qr/upgrading from 1 to 3/,
-    'upgrade announces from/to';
+  # F10: Test::Storage has no transactional_ddl capability (default 0),
+  # so upgrade takes the non-transactional branch and emits BOTH the
+  # "upgrading from N to M" announce AND a one-shot carp_once about the
+  # non-atomic upgrade path. Capture both explicitly rather than using
+  # warning_like, which only matches one warning at a time. The
+  # transactional-branch behaviour is covered separately in
+  # t/test/13_deploy_capabilities.t.
+  my @warnings;
+  {
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    $dh->upgrade;
+  }
+  ok( (grep { /\QDBIO::DeploymentHandler::upgrade(): upgrading from 1 to 3\E/ } @warnings),
+    'upgrade announces from/to' );
 
   is_deeply \@calls, [
     [pre => 2, 1, 3],

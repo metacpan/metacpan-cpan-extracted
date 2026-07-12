@@ -6,6 +6,12 @@
 # it -- see maint/docker/ for a fully containerised alternative that needs no
 # local DB2 client.
 #
+# RESOURCE DISCIPLINE — this runs on a small SHARED box (few cores, alongside
+# other DBs and services). DB2 is the heaviest of the test DBs; the pod carries
+# resources.limits so it can never starve the host. Run ONE test DB at a time,
+# `nice` the prove run, and DELETE the pod when done. See the "Live testing"
+# section in .claude/rules/dbio-rules.md.
+#
 # Usage:
 #   kubectl apply -f maint/k8s/db2-pod.yaml
 #   # First boot does one-time instance setup -- give it a few minutes:
@@ -15,9 +21,9 @@
 #   DBIO_TEST_DB2_DSN='dbi:DB2:DATABASE=testdb;HOSTNAME=127.0.0.1;PORT=50000;PROTOCOL=TCPIP;' \
 #   DBIO_TEST_DB2_USER=db2inst1 \
 #   DBIO_TEST_DB2_PASS=dbio \
-#     prove -l -I../dbio/lib t/10-db2.t
+#     nice -n 19 ionice -c3 prove -l -I../dbio/lib t/10-db2.t
 #
-#   kubectl delete -f maint/k8s/db2-pod.yaml
+#   kubectl delete -f maint/k8s/db2-pod.yaml   # ALWAYS clean up
 ---
 apiVersion: v1
 kind: Pod
@@ -32,6 +38,13 @@ spec:
       image: icr.io/db2_community/db2:latest
       securityContext:
         privileged: true        # DB2 community image requires it for instance setup
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: "2"              # DB2 is heavy; still bounded on a shared box
+          memory: 2Gi
       ports:
         - containerPort: 50000
       env:

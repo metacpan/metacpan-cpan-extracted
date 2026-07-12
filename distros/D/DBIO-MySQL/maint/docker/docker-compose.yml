@@ -1,0 +1,68 @@
+# Live future_io verification stack for dbio-mysql over GENUINE DBD::mysql.
+#
+#   cd maint/docker
+#   docker compose up --build --abort-on-container-exit --exit-code-from test
+#   docker compose down -v          # ALWAYS clean up (frees the capped DB)
+#
+# Brings up ONE resource-capped MySQL 8.0 server, then runs
+# t/55-future-io-live.t inside a Perl container that has genuine Oracle
+# libmysqlclient + DBD::mysql baked (the host cannot build DBD::mysql -- see
+# Dockerfile.test). The test connects with a dbi:mysql: DSN, so it exercises the
+# DBD::mysql (mysql_*) async binding of DBIO::MySQL::Storage::Async end to end.
+#
+# RESOURCE DISCIPLINE -- small SHARED box (see .claude/rules/dbio-rules.md
+# "Live testing"). BOTH containers carry mem_limit + cpus so they can never
+# starve the host; there is exactly ONE database. Run this stack alone (no other
+# live DB suite in parallel) and `down -v` when finished. The mysql:8.0 image and
+# mysql_native_password default match maint/k8s (dbio-mysql-ev) and the k8s pod
+# xbin/dbio-mysql-k8s spins up -- this compose file is the DBD::mysql-flavoured,
+# self-contained alternative for the host where DBD::mysql will not build.
+
+services:
+  mysql:
+    image: mysql:8.0
+    # mysql_native_password as the default auth plugin: the genuine DBD::mysql
+    # client then authenticates over a plain TCP connection without the
+    # caching_sha2_password public-key exchange. Matches maint/k8s/mysql-pod.yaml
+    # (dbio-mysql-ev).
+    command: ["--default-authentication-plugin=mysql_native_password"]
+    environment:
+      MYSQL_DATABASE: dbio_test
+      MYSQL_USER: dbio
+      MYSQL_PASSWORD: dbio
+      MYSQL_ROOT_PASSWORD: dbioroot
+    # Resource cap (compose non-swarm keys, honored by `docker compose up`):
+    # at most one core and 1 GiB on the shared box.
+    mem_limit: 1g
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "dbio", "-pdbio", "--silent"]
+      interval: 3s
+      timeout: 2s
+      retries: 50
+      start_period: 8s
+
+  test:
+    build:
+      context: ../..                       # repo root (dbio-mysql/)
+      dockerfile: maint/docker/Dockerfile.test
+    depends_on:
+      mysql:
+        condition: service_healthy
+    # dbi:mysql: DSN -> DBD::mysql -> DBIO::MySQL::Storage::Async (the mysql_*
+    # base adapter, NOT the mariadb_* subclass). host=mysql is the service name.
+    environment:
+      DBIO_TEST_MYSQL_DSN: "dbi:mysql:database=dbio_test;host=mysql;port=3306"
+      DBIO_TEST_MYSQL_USER: dbio
+      DBIO_TEST_MYSQL_PASS: dbio
+      DBIO_CORE: /src/dbio
+      DBIO_ASYNC: /src/dbio-async
+      DBIO_MYSQL: /src/dbio-mysql
+    # The client container is capped too; server + client together stay within
+    # 2 cores / 2 GiB on the 4-core shared box.
+    mem_limit: 1g
+    cpus: 1.0
+    volumes:
+      - ../../../dbio:/src/dbio:ro                 # dbio core   (CPAN lags -> mounted)
+      - ../../../dbio-async:/src/dbio-async:ro     # DBIO::Async (NOT on CPAN -> mounted)
+      - ../..:/src/dbio-mysql:ro                   # this dist   (driver under test)

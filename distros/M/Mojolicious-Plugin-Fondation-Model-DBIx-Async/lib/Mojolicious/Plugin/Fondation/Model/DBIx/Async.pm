@@ -1,8 +1,9 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::VERSION = '0.03';
 # ABSTRACT: Fondation plugin exposing DBIx::Class::Async natively
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
+use Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet;
 
 
 sub fondation_meta {
@@ -13,6 +14,41 @@ sub fondation_meta {
             backends        => [],
             models          => {},
             default_backend => undef,
+        },
+        setup => {
+            label       => 'Database',
+            description => 'Main database connection settings',
+            parameters  => [
+                {
+                    key         => '+backends.main.dsn',
+                    label       => 'DSN',
+                    type        => 'string',
+                    default     => 'dbi:SQLite:dbname=data/app.db',
+                    required    => 1,
+                    placeholder => 'dbi:Pg:dbname=mydb;host=localhost',
+                },
+                {
+                    key         => '+backends.main.workers',
+                    label       => 'Workers',
+                    type        => 'integer',
+                    default     => 2,
+                    min         => 1,
+                    max         => 10,
+                },
+                {
+                    key         => '+backends.main.schema_class',
+                    label       => 'Schema class',
+                    type        => 'string',
+                    default     => 'MySchema',
+                    required    => 1,
+                },
+                {
+                    key         => '+backends.main.quote_char',
+                    label       => 'Quote character',
+                    type        => 'string',
+                    default     => '"',
+                },
+            ],
         },
     };
 }
@@ -119,11 +155,18 @@ sub register ($self, $app, $config) {
         require IO::Async::Loop::Mojo;
 
         my $loop = IO::Async::Loop::Mojo->new;
+        # Pass all backend keys except those consumed here or by
+        # DBIx::Class::Async::Schema as DBIC connect attributes.
+        my %connect_attrs;
+        for my $k (keys %$bdef) {
+            next if $k =~ /^(?:dsn|user|pass|schema_class|workers|name)$/;
+            $connect_attrs{$k} = $bdef->{$k};
+        }
         $self->{_schemas}{$bname} = DBIx::Class::Async::Schema->connect(
             $bdef->{dsn},
             $bdef->{user}      // '',
             $bdef->{pass}      // '',
-            $bdef->{dbi_attrs} // {},
+            \%connect_attrs,
             {
                 schema_class => $bdef->{schema_class},
                 workers      => $bdef->{workers} // 2,
@@ -175,7 +218,8 @@ sub register ($self, $app, $config) {
             or die "Model '$name' is not configured\n";
         my $source  = $spec->{source} // $name;
         my $backend = $spec->{backend};
-        return $c->schema($backend)->resultset($source);
+        my $rs      = $c->schema($backend)->resultset($source);
+        return bless $rs, 'Mojolicious::Plugin::Fondation::Model::DBIx::Async::ResultSet';
     });
 
     # Shutdown cleanup: disconnect all DBIC::Async schemas on process exit.
@@ -197,6 +241,39 @@ sub register ($self, $app, $config) {
           $self->{_shutdown}->() if $self->{_shutdown};
       }
     }
+
+    # ── Global DBIC source re-registration after all plugins finalize ──
+    # Plugins add relationships (has_many, belongs_to, many_to_many_async)
+    # during fondation_finalyze. DBIx::Class clones sources on
+    # register_source(), so the initial Action::DBIx registration stores
+    # a snapshot. We re-register every source once after all plugins have
+    # finalized, so schema instances (including async workers) see the
+    # complete relationship graph.
+    $app->plugins->on(fondation_after_finalyze => sub ($app, $manager) {
+        my $c = $app->build_controller;
+        return unless $c->has_helper('schema_class');
+        my $sc = eval { $c->schema_class } or return;
+
+        # guard against non-DBIC schema class in source re-registration
+        return unless $sc->can('sources');
+
+        # Collect moniker → Result class from all plugins' dbic metadata
+        my %result_classes;
+        for my $entry (values %{$manager->registry}) {
+            next unless $entry->{dbic} && $entry->{dbic}{result_classes};
+            %result_classes = (%result_classes, %{$entry->{dbic}{result_classes}});
+        }
+
+        for my $source_name ($sc->sources) {
+            my $result_class = $result_classes{$source_name} or next;
+            eval {
+                $sc->register_source($source_name,
+                    $result_class->result_source_instance);
+                1;
+            } or $self->log->warn(
+                "Failed to re-register source '$source_name': $@");
+        }
+    });
 
     return $self;
 }
@@ -259,7 +336,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async - Fondation plugin exposing D
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -276,7 +353,7 @@ version 0.02
                       },
                   ],
                   models => {
-                      user => { source => 'users' },
+                      user => { source => 'User' },
                   },
               }},
           ],
@@ -367,7 +444,7 @@ can help there.
         ],
         default_backend => 'main',            # optional
         models => {
-            user    => { source => 'users' },
+            user    => { source => 'User' },
             article => { source => 'articles', backend => 'main' },
             log     => { source => 'logs',    backend => 'logs' },
         },
@@ -435,7 +512,7 @@ before the async worker responds.
 =head2 model_config
 
   my $cfg = $c->model_config('user');
-  # { name => 'user', source => 'users', backend => 'main' }
+  # { name => 'user', source => 'User', backend => 'main' }
 
 Returns model metadata.
 

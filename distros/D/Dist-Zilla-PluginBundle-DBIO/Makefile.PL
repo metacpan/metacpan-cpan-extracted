@@ -41,13 +41,14 @@ my %WriteMakefileArgs = (
     "Pod::Weaver::Section::GenerateSection" => 0
   },
   "TEST_REQUIRES" => {
+    "Devel::Cover" => "1.00",
     "Dist::Zilla::Tester" => 0,
     "PPI" => 0,
     "Pod::Elemental" => 0,
     "Software::License::Perl_5" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900002",
+  "VERSION" => "0.900003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +56,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Devel::Cover" => "1.00",
   "Dist::Zilla" => "6.000",
   "Dist::Zilla::Plugin::Bootstrap::lib" => 0,
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,

@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp qw(carp);
+use DBD::Oracle;
 use DBIO::Oracle::Type ();
 
 
@@ -27,11 +28,6 @@ sub bind_attribute_by_data_type {
   my ($self, $dt) = @_;
 
   if ($self->_is_lob_type($dt)) {
-    # DBD::Oracle is the live database driver: it is only needed when actually
-    # binding a LOB against a real Oracle handle, never for SQL generation.
-    # Loading it lazily here (as DBIO::Oracle::Type::oracle_lob_bind_attrs also
-    # does) lets DBIO::Oracle::Storage load offline for SQL-generation tests.
-    require DBD::Oracle;
     unless ($DBD::Oracle::__DBIO_DBD_VERSION_CHECK_OK__) {
       if ($DBD::Oracle::VERSION eq '1.23') {
         $self->throw_exception(
@@ -154,7 +150,7 @@ DBIO::Oracle::Storage::LOBSupport - LOB binding and chunking for Oracle
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

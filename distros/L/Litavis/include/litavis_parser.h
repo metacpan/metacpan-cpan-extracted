@@ -1,6 +1,31 @@
 #ifndef LITAVIS_PARSER_H
 #define LITAVIS_PARSER_H
 
+/* Perl redefines fopen/fclose/fread/fwrite on Windows+MULTIPLICITY via
+ * PerlSIO, which requires my_perl in scope.  Undo before plain-C functions. */
+#ifdef WIN32
+#  ifdef fopen
+#    undef fopen
+#  endif
+#  ifdef fclose
+#    undef fclose
+#  endif
+#  ifdef fread
+#    undef fread
+#  endif
+#  ifdef fwrite
+#    undef fwrite
+#  endif
+#endif
+
+/* opendir/readdir/closedir are hidden behind __STRICT_ANSI__ on MinGW
+ * when compiled with -std=c99; request POSIX extensions explicitly. */
+#ifdef __MINGW32__
+#  ifndef _XOPEN_SOURCE
+#    define _XOPEN_SOURCE 700
+#  endif
+#endif
+
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>

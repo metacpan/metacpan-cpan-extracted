@@ -28,6 +28,27 @@ __PACKAGE__->sql_quote_char('"');
 __PACKAGE__->datetime_parser_type('DateTime::Format::Pg');
 __PACKAGE__->_use_multicolumn_in(1);
 
+# Async is an explicit, per-connection mode (core ADR 0030): a connection opened
+# with connect(..., { async => 'ev' }) resolves the 'ev' mode through the mode
+# registry to the native EV backend below. Registering on this driver storage
+# class MRO-shadows the generic modes (forked/future_io) registered on the base
+# storage, so 'ev' picks the PostgreSQL-specific backend. There is no auto-
+# fallback and no silent degrade: a mode that is neither requested nor registered
+# is simply unavailable, and requesting an unregistered/uninstalled mode croaks
+# (see DBIO::Storage::DBI::_async_storage). This only stores the class name --
+# DBIO::PostgreSQL::EV::Storage (the optional dbio-postgresql-ev dist) is loaded
+# lazily on first use, so registering it here is safe when the dist is absent.
+__PACKAGE__->register_async_mode( ev => 'DBIO::PostgreSQL::EV::Storage' );
+
+# This is the ONLY async registration this driver needs, and it stays as-is
+# under the storage-layer composition model (core karr #70): a mode maps to a
+# transport BASE class, once, on this concrete driver storage. PostgreSQL
+# EXTENSIONS (AGE, PostGIS, ...) no longer subclass storage_type nor add shadow
+# register_async_mode / ::Async registrations -- they register plain storage
+# LAYERS (DBIO::Schema::register_storage_layer) whose async mirrors compose ON
+# TOP of the resolved transport via DBIO::Storage::Composed. Composition rides
+# on top of this base; the mode->transport-base map does not grow per extension.
+
 sub sql_maker {
   my $self = shift;
   my $sm = $self->next::method(@_);
@@ -272,7 +293,7 @@ DBIO::PostgreSQL::Storage - PostgreSQL storage layer for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -307,6 +328,14 @@ C<pg_rollback_to>.
 Deployment via L<DBIO::PostgreSQL::DDL> when the schema has the
 L<DBIO::PostgreSQL> component loaded, falling back to SQL::Translator
 otherwise.
+
+=item *
+
+Opt-in async via C<< MyApp::Schema->connect($dsn, $user, $pass, { async => 'ev' }) >>.
+The C<ev> mode resolves (core ADR 0030 mode registry) to the native EV backend
+from the optional L<DBIO::PostgreSQL::EV> dist, loaded lazily on first use. Without
+that dist installed, requesting the mode croaks with a clear C<install> message —
+there is no silent fallback or degrade.
 
 =back
 

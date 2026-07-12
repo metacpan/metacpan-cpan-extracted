@@ -25,13 +25,13 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::DuckDB",
   "PREREQ_PM" => {
     "DBD::DuckDB" => "0.16",
-    "DBIO" => "0.900000"
+    "DBIO" => "0.900001"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900000",
+  "VERSION" => "0.900001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::DuckDB" => "0.16",
-  "DBIO" => "0.900000",
+  "DBIO" => "0.900001",
   "Test::Exception" => 0,
   "Test::More" => "0.98"
 );

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx;
-$Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx::VERSION = '0.03';
 # ABSTRACT: Post-load action — discovers and registers DBIC Result/ResultSet
 # classes from plugins into the native DBIx::Class schema before workers fork.
 
@@ -53,13 +53,20 @@ sub after_load ($self, $long_name, $conf, $share_dir) {
             $self->log->warn("[$short] Cannot get result_source_instance for $module: $@");
             next;
         }
-        my $source_name = $source->name;
+        # Derive the source moniker from the class name (last segment(s)
+        # after ::Result::), matching the standard DBIx::Class
+        # load_namespaces convention (e.g. Result::UserGroup → 'UserGroup').
+        my ($moniker) = $module =~ /::Result::(.+)$/;
+        unless ($moniker) {
+            $self->log->warn("[$short] Cannot derive moniker from $module");
+            next;
+        }
 
-        eval { $schema_class->register_source($source_name, $source); 1 }
-            or $self->log->warn("[$short] register_source failed for $source_name: $@");
+        eval { $schema_class->register_source($moniker, $source); 1 }
+            or $self->log->warn("[$short] register_source failed for $moniker: $@");
 
-        $registered_results{$source_name} = $module;
-        $self->log->debug("[$short] Registered DBIC Result: $source_name ($module)");
+        $registered_results{$moniker} = $module;
+        $self->log->debug("[$short] Registered DBIC Result: $moniker ($module)");
     }
 
     # Discover ResultSets
@@ -94,7 +101,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async::Action::DBIx - Post-load act
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

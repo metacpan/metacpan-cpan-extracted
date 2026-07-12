@@ -219,4 +219,12 @@ int pdfmake_crypt_has_permission(const pdfmake_crypt_ctx_t *ctx, int32_t perm);
  */
 int32_t pdfmake_crypt_get_permissions(const pdfmake_crypt_ctx_t *ctx);
 
+/**
+ * Free a buffer allocated by the pdfmake C library (via malloc).
+ * Use this instead of free() in XS code to avoid cross-allocator
+ * mismatch on Windows (PERL_IMPLICIT_SYS may redirect free() through
+ * Perl's vtable while C library functions use the plain CRT malloc).
+ */
+void pdfmake_cfree(void *ptr);
+
 #endif /* PDFMAKE_CRYPT_H */

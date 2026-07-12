@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-resolvers-pass-column-hashrefs-as-nodes.md
@@ -32,7 +33,9 @@ t/04-mutations.t
 t/05-composite-pk.t
 t/06-pagination-filter.t
 t/07-relationship-contract.t
+t/08-orderby-injection.t
 t/lib/My/Schema.pm
 t/lib/My/Schema/Result/Author.pm
 t/lib/My/Schema/Result/Book.pm
 t/lib/My/Test.pm
+t/release-coverage.t

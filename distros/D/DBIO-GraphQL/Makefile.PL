@@ -24,17 +24,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO::GraphQL",
   "PREREQ_PM" => {
-    "DBIO" => "0.900000",
+    "DBIO" => "0.900001",
     "GraphQL" => "0.54",
     "MIME::Base64" => 0
   },
   "TEST_REQUIRES" => {
     "DBD::SQLite" => "1.70",
-    "DBIO::SQLite" => "0.900000",
+    "DBIO::SQLite" => "0.900001",
     "GraphQL::Execution" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900000",
+  "VERSION" => "0.900001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,8 +43,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::SQLite" => "1.70",
-  "DBIO" => "0.900000",
-  "DBIO::SQLite" => "0.900000",
+  "DBIO" => "0.900001",
+  "DBIO::SQLite" => "0.900001",
   "GraphQL" => "0.54",
   "GraphQL::Execution" => 0,
   "MIME::Base64" => 0,

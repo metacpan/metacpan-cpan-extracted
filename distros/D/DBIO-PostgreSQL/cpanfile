@@ -1,11 +1,21 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900000';
+requires 'DBIO', '0.900001';
 requires 'DBD::Pg';
 requires 'DateTime::Format::Pg';
 
+# future_io async transport (DBIO::PostgreSQL::Storage::Async): the shared
+# Future::IO backend base lives in dbio-async, resolved at runtime BY
+# CONVENTION (ref($storage).'::Async', ADR 0030) only when a connection asks
+# for { async => 'future_io' } -- the sync-only driver (DBIO::PostgreSQL::Storage)
+# never pulls it in, so it's not declared here.
+
 on test => sub {
   recommends 'Kubernetes::REST';
+  # A Future::IO event-loop implementation for the live future_io roundtrip
+  # (t/37-future-io-live.t); IO::Async is the recommended one.
+  recommends 'Future::IO::Impl::IOAsync';
+  recommends 'IO::Async';
   requires 'Test::More', '0.98';
   requires 'Test::Exception';
   requires 'Test::Warn';

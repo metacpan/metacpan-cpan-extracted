@@ -1,5 +1,282 @@
 Revision history for DBIO
 
+0.900001  2026-07-12
+    * Breaking Changes
+        - Removed DBIO::Schema::Versioned entirely (no deprecated stub, no
+          backward-compatibility shim). Its file-diff upgrade path depended on
+          the hard-deprecated create_ddl_dir() DDL-file generator and was
+          internally broken. Use the native deploy/upgrade path instead:
+          DBIO::DeploymentHandler together with your driver's
+          DBIO::<Driver>::Deploy class, which reconcile the live database
+          against the current schema in one shot with no SQL diff files.
+          karr #74.
+        - DBIO::Admin / dbioadmin: dropped the mode=legacy upgrade path and the
+          --create and --install actions (along with the --sql-type, --version
+          and --preversion options), which all relied on DBIO::Schema::Versioned
+          or the deprecated create_ddl_dir(). --mode now accepts only
+          auto|native (both take the native driver upgrade path) and --upgrade
+          croaks clearly when no native upgrader is available. karr #74.
+
+    * Security
+        - Fixed a code-injection (RCE) vulnerability in DBIO::Generate's five
+          style emitters (Vanilla, Cake, Candy, Moo, Moose): database-controlled
+          identifiers (column/table/constraint/relationship/moniker names,
+          default values, view definitions, column sizes) were spliced into
+          generated Perl source with no or incomplete escaping, so a database
+          whose identifiers an attacker controls could produce a generated
+          Result class that runs arbitrary Perl on use/require. All identifier
+          and string-literal emission now goes through the new
+          DBIO::Generate::Util: pl_str() (B::perlstring, the canonical escaped
+          Perl string literal), assert_pkg() (croaks unless a value used as a
+          bareword package name is a strict, well-formed package name), and
+          abstract_comment() (collapses newlines so a moniker cannot break out
+          of a comment line). Numeric column sizes are emitted bare only when
+          they match /\A-?[0-9]+\z/, else as a string literal. Regression:
+          t/generate/08-codegen-injection.t drives all five emitters with a
+          spec poisoned in every field and asserts no injected code runs
+          (verified RED pre-fix, GREEN after).
+        - Identifier quoting (quote_names) is now ON by default, departing from
+          upstream DBIx::Class. Generated SQL quotes table and column names with
+          the RDBMS-native quote char (ANSI '"' for the bare base storage),
+          hardening against reserved-word and identifier-quoting footguns. Pass
+          quote_names => 0 in connect_info to opt out; explicit quote_char /
+          name_sep are still honoured (Codeberg dbio/dbio#2)
+        - Storage tracing gained a class-level redact_bind_value hook (default
+          identity, so historical plaintext behaviour is unchanged unless
+          installed) called from _format_for_trace. Previously every bind
+          value was interpolated into the trace sink raw, so an INSERT/UPDATE
+          of a credential or PII column emitted its plaintext value with no
+          way to mask it. The coderef receives the column name attached to the
+          bind slot (or undef for positional binds) and the raw value, and
+          returns the value to interpolate into the trace string only -- the
+          value actually sent to the database is never touched. ADR 0025.
+
+    * New Features
+        - New DBIO::Storage::Composed: N extension storage layers compose with
+          M transports at runtime via C3-MRO synthesis (compose($base,
+          \@layers), with an own-method sibling-layer collision check) instead
+          of a hand-written NxM class per combination. DBIO::Schema::
+          register_storage_layer registers layers as inherited, copy-on-append,
+          C3-precedence-ordered classdata; connection() and the driver/
+          connector rebless path both compose the registered layers back over
+          the resolved class. The async side mirrors each sync layer onto its
+          "${Layer}::Async" counterpart (skipped if absent) and composes it
+          over the resolved transport, gated by a transport_capabilities /
+          required_transport_capabilities check that croaks naming the layer,
+          the missing capabilities and the transport. ADR 0032, karr #70.
+        - Async execution is now an explicit per-connection mode chosen at
+          connect via { async => MODE } (forked / future_io / ev / immediate),
+          resolved through a mode registry with MRO-aware lookup -- no
+          class-level backend declaration and no silent auto-fallback (the
+          earlier ADR 0028/0029 embedded-backend-with-fallback design was
+          removed outright in favour of this). ResultSet and Row gained real
+          async operations (all/first/single/count_async, insert_async /
+          create_async) that route through the storage backend and inflate in
+          the returned Future's ->then, reusing the sync path's prefetch/
+          collapse/count/store-back logic via _PrefetchedCursor. future_io
+          resolves its per-driver transport adapter by convention
+          (<StorageClass>::Async), walking the concrete storage's linearised
+          MRO -- including through DBIO::Storage::Composed, so an extension
+          layer (AGE/PostGIS-style) keeps future_io -- and stopping strictly
+          before the generic DBIO::Storage::DBI base; an explicit
+          register_async_mode(future_io => ...) still overrides the walk, and
+          a candidate that loads but isn't a DBIO::Storage::Async croaks
+          naming every class it tried. The '?' bind-placeholder seam is now
+          fully transport-internal (WP3): _run_crud hands sql_maker's raw '?'
+          SQL straight to the transport, which shapes it to its own dialect;
+          no core call site rewrites '?' anymore. DBIO::Test::Future was
+          renamed to DBIO::Future::Immediate (drops the misleading Test::
+          prefix from what is a production default). ADR 0014 and the removed
+          ADR 0028/0029 are superseded by ADR 0030-0032; karr #57, #61, #62,
+          #65, #66, #67, #70, #71.
+        - Async connection pools now replay on_connect_do / on_connect_call
+          (and their disconnect counterparts) on every physical connection
+          they spawn, via a central _setup_pool_connection /
+          _teardown_pool_connection seam invoked from the shared
+          PoolBase::_spawn_connection / shutdown path. Previously per-
+          connection session setup (search_path, timezone, SET, extension
+          LOADs such as AGE's LOAD 'age') ran for $schema->resultset(...) but
+          silently not for *_async on the same instance. The action list and
+          method resolution are read from the owning sync storage via a new
+          weak DBIO::Storage::Async::_owner_storage back-reference, reusing
+          the exact sync _do_connection_actions dispatch so resolution is
+          byte-identical to sync; execution is a blocking do per statement at
+          spawn time (pool spawn is rare). karr #68.
+        - Five out-of-tree driver base classes -- Introspect::Base,
+          Diff::Base, Deploy::Base, SQLMaker and Storage::DBI::Capabilities --
+          now each expose a contract_version accessor backed by a per-class
+          $CONTRACT_VERSION (currently 1.1, after the transactional_ddl /
+          supports_if_exists additions below), an explicit machine-readable
+          version for the canonical-model shape out-of-tree drivers depend on,
+          independent of the dist-wide $VERSION. Drivers should record the
+          contract version they were last tested against and warn/strict-fail
+          at load time on drift. ADR 0024.
+        - New transactional_ddl and supports_if_exists per-engine capability
+          flags on DBIO::Storage::DBI::Capabilities (both default off /
+          conservative). Deploy::Base and DeploymentHandler::upgrade now only
+          wrap a multi-statement DDL body in a transaction when the engine's
+          storage class declares transactional_ddl support; engines that
+          implicitly COMMIT per DDL statement (MySQL pre-8.0, Oracle, DB2,
+          Sybase, Informix) or need autocommit for a rebuild (SQLite) instead
+          run statement-at-a-time with a one-shot warning, with the __VERSION
+          row as the forward-progress recovery story. Diff::Op::
+          should_emit_if_exists($storage) is now the single place the diff
+          renderer decides between "DROP TABLE foo" and "DROP TABLE IF EXISTS
+          foo", replacing driver-name string matching. ADR 0026.
+        - DBIO::Storage::PoolBase grew a connection-readiness seam,
+          _connection_ready_future($conn), that acquire() now ALWAYS chains
+          through before resolving — on every slot path (fresh spawn, idle
+          reuse, and queued waiter). The default is a safe no-op
+          ($self->future_class->done($conn)), so synchronous / DBI pools are
+          usable the instant a connection exists and behaviour is unchanged.
+          Async transports whose connection keeps connecting in the background
+          after its constructor returns (EV::Pg, EV::MariaDB, future_io) MUST
+          override this seam or acquire() hands out a live-looking but
+          unconnected handle and the first bound query on a cold pool dies
+          "not connected". This hoists the fix dbio-postgresql-ev carried
+          privately (karr #9) into the shared base so a driver overrides ONE
+          seam instead of re-implementing acquire() plus a per-driver refaddr
+          side table. Generic bookkeeping primitives back the common pattern —
+          _register_connection_ready, _connection_ready_lookup and
+          _clear_connection_ready (keyed by Scalar::Util::refaddr) — and
+          shutdown clears the readiness table centrally so an async
+          _shutdown_connection never has to. The dbio-mysql-ev cold-pool
+          "not connected" bug (karr #20) is exactly the footgun this makes
+          visible at one documented place; adoption in the async drivers is
+          follow-up work in those repos. karr #75.
+        - DBIO::Storage::Async grew a generic async deploy pipeline (hoisted from
+          dbio-postgresql-ev): deploy_async($schema, \%opts), _install_ddl,
+          _execute_ddl_async and _drop_statements_for. deploy_async generates the
+          install DDL via the same _ddl_class->install_ddl($schema) hook the sync
+          DBIO::Deploy::Base path uses (a new _ddl_class seam), then runs each
+          statement through the existing _query_async_pinned transport seam — so
+          every Model-B async backend that already implements that seam for CRUD
+          gets DDL execution for free. Following ADR 0026, the batch is NOT
+          blanket-wrapped in a transaction: deploy_async probes
+          _use_transactional_ddl (delegating to the owning sync storage's
+          transactional_ddl capability) and only brackets the DDL in
+          txn_do_async on transactional-DDL engines; on engines that implicitly
+          COMMIT per DDL statement it runs statement-at-a-time on one pooled
+          connection with a one-shot warning, mirroring the sync
+          DBIO::Deploy::Base::_execute_ddl contract. add_drop_table => 1 prepends
+          DROP TABLE IF EXISTS ... CASCADE for every table source. karr #73.
+        - DBIO::ResultSet::update_or_create now DWIM-splits a mixed condition
+          that carries a nested related sub-hash. Previously
+          update_or_create({ col => $x, some_relation => { ... } }) fed the whole
+          structure to find(), which threw "Complex condition via relationship
+          '...' is unsupported in find()" whenever the relation could not reduce
+          to a plain foreign-key condition on the main table. It now peels such
+          relations out of the main-row search, finds/updates/creates the main
+          row from the plain columns, and applies each peeled relation via its
+          own update_or_create on the corresponding related resultset -- the
+          automated form of the previously manual find-then-
+          ->relation->update_or_create workaround, mirroring the multi-create
+          fan-out in DBIO::Row::insert. A belongs_to supplied as a resolvable
+          foreign key still folds into the main search unchanged; only relations
+          that cannot reduce to a concrete FK on this table (has_many / has_one /
+          might_have, or a non-resolvable belongs_to) are split. find()'s own
+          complex-condition guard is unchanged and still fires for a direct
+          find(). The 'key' attribute constrains only the main-table lookup and
+          is not propagated to the related resultsets; when any relation is split
+          out the whole operation runs in a transaction. karr #76, ADR 0033.
+
+    * Fixes
+        - Connector-based driver detection for Microsoft SQL Server now reblesses
+          ODBC/ADO connections into DBIO::MSSQL::Storage::ODBC instead of the
+          DBD::Sybase-specific DBIO::MSSQL::Storage::Sybase, so ODBC-only users no
+          longer require DBIO::Sybase
+        - Pool acquire was LIFO (pop @_idle), causing 1-hot / (N-1)-cold starvation
+          under bursty load with a pool of N connections. Switched to FIFO
+          (shift @_idle) in DBIO::Storage::PoolBase::acquire — symmetric with the
+          push-on-release path, zero extra state. Affects every async driver that
+          inherits PoolBase (dbio-mysql-ev, dbio-postgresql-ev, dbio-async). karr #15.
+        - Two latent-die fork-rename leftovers from the DBIC -> DBIO rename:
+          VersionStorage/Standard/Component called the stale
+          _dbic_connect_attributes accessor (now _dbio_connect_attributes),
+          which died on every connect through that component; and the
+          documented DBIC_NO_VERSION_CHECK env var (now DBIO_NO_VERSION_CHECK)
+          silently did nothing. The old env var name is still dual-read for
+          legacy compatibility. Per CurtisPoe architecture review #5, F01/F20.
+        - Replicated::Balancer gained _select and _dbh_columns_info_for
+          delegation. Storage.pm forwards both to the Balancer via
+          @reader_methods, but the Balancer only implemented select /
+          select_single / columns_info_for and has no AUTOLOAD, so any other
+          caller (e.g. ResultSet::results_exist) died on a replicated-storage
+          schema; both new methods also get the master-routing-in-transaction
+          guard select/select_single already had. Affects every driver that
+          uses Replicated (mysql, postgresql, sqlite). Per CurtisPoe review #5,
+          F15.
+        - SQLMaker: a { -asc|-desc => \%where_cond } order_by element (e.g.
+          ordering by a LIKE condition) previously rendered the value as an
+          inlined quoted literal with no bind emitted. It now flows through
+          the WHERE-condition machinery and renders as a properly
+          parameterized bind ("col" LIKE ?), closing two TODO cases inherited
+          from DBIx::Class. The subquery-emulation limit dialects
+          (RowNumberOver, RowNum, Top/FetchFirst, GenericSubQ) are unaffected
+          by design: they re-chunk the raw order_by as strings, and a
+          bind-carrying literal would desync from their still-inlined
+          supplement.
+        - dump_value's diagnostic formatting now matches upstream
+          DBIx::Class::_Util::dump_value (Useqq(1) + Quotekeys(0)): { name =>
+          "pop_art_1" } instead of { 'name' => 'pop_art_1' }. Diagnostics are
+          asserted on intent, not on serialization form (ADR 0027) -- no
+          consumer test in core pinned the old byte form. karr #56.
+        - future_io adapter resolution now distinguishes a genuinely-absent
+          <driver>::Async adapter from one that is present on disk but cannot
+          be loaded because its own dependency is not installed (a driver ships
+          DBIO::<Driver>::Storage::Async, which `use base`s DBIO::Async::Storage,
+          but the separate DBIO::Async distribution is absent). Previously the
+          latter surfaced a raw "Base class package ... is empty / Compilation
+          failed in require at Class/C3/Componentised.pm" stack that named
+          neither the adapter nor a remedy; now it fails loud with a clear,
+          actionable message naming the adapter and the missing module and
+          telling the user to install the distribution that provides it. A
+          genuine compile error in an installed adapter is surfaced honestly,
+          never misreported as a missing dependency. Shared by the transport
+          walk and the async-layer composition path, so every driver benefits
+          (mysql, postgresql, sqlite, ...). karr #78.
+
+    * Tests
+        - Every Tier-1 and Tier-2 core SYNOPSIS example is now backed by a
+          focused mock-only regression test cross-referenced from its POD
+          (FilterColumn, UUIDColumns, Ordered, PopulateMore,
+          InflateColumn::DateTime, ResultClass::HashRefInflator,
+          Candy::Exports, TxnScopeGuard, Cursor/DBI::Cursor, AutoCast,
+          Schema::Versioned's component surface), and several partials
+          (ResultSetColumn, ResultSource::View, Timestamp) were tightened to
+          assert the exact promised behaviour instead of a loose subset.
+          karr #72.
+        - New unit-test coverage for two previously-untested subsystems: the
+          InflateColumn::Serializer round-trip and size-overflow behaviour
+          across its JSON/YAML/MessagePack backends (including the
+          YAML::Load-not-LoadFile / non-blessed-decode risk surface), and
+          AccessBroker::Vault's TTL-expiry math, credential fetch/rotation,
+          transaction-safety guard and exception-taxonomy propagation. Per
+          CurtisPoe architecture review #5, F22/F23.
+
+    * Documentation
+        - DBIO::Storage::Async POD refreshed: collapsed the stale per-loop backend
+          list (EV::Pg / Net::Async / Mojo as separate dists) into the per-connection
+          mode model (future_io / ev / forked / immediate), with Future::IO::Impl::*
+          adapters as the loop-selection seam (ADR 0014 framing superseded;
+          mirrors dbio-async ADR 0004). karr #61.
+        - DBIO::Storage::Async POD gained a worked example combining the AGE
+          and PostGIS storage layers across future_io, ev and immediate
+          transports in one schema, since the async mode is chosen explicitly
+          per-connection (ADR 0030); cross-references the mechanism test and
+          the real driver-level realization in DBIO-PostgreSQL-Age. karr #71.
+        - The Manual (QuickStart, Features, Heritage, Migration, Cookbook,
+          FAQ) and DBIO::Storage::DBI / DeploymentHandler error messages had
+          their dead SQL::Translator references and dangling L<...> links
+          (renamed/removed packages, DBIx::Class-era pages never ported,
+          typos) cleaned up now that native deploy/upgrade is the only
+          migration story (ADR-0006); create_ddl_dir's POD is marked
+          deprecated and points at the native Deploy path.
+        - The event-loop-dependent async demo moved out of core to
+          dbio-postgresql-async (it depends on EV::Pg / an async driver,
+          which doesn't belong in the event-loop-free core); the sync demo
+          (demo/dbio-demo) stays here.
+
 0.900000  2026-06-23
     First DBIO release. DBIO is a fork of DBIx::Class; the entries below
     summarize everything that changed relative to the upstream codebase.

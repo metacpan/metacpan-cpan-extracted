@@ -90,7 +90,7 @@ static void eshu_css_scan_line(eshu_css_ctx_t *ctx,
 
 		/* ── Normal CODE state ── */
 
-		/* Block comment: /* */
+		/* Block comment: */
 		if (p + 1 < eol && p[0] == '/' && p[1] == '*') {
 			ctx->state = ESHU_CSS_COMMENT;
 			p += 2;

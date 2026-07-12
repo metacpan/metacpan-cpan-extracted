@@ -79,7 +79,7 @@ DBIO::Oracle::Diff::Index - Diff operations for Oracle indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

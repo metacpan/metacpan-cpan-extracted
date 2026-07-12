@@ -126,6 +126,14 @@ sub diff_nested {
   return @ops;
 }
 
+
+sub should_emit_if_exists {
+  my ($storage) = @_;
+  return 0 unless $storage;
+  return 0 unless ref($storage) && $storage->can('_use_if_exists');
+  return $storage->_use_if_exists ? 1 : 0;
+}
+
 1;
 
 __END__
@@ -140,7 +148,7 @@ DBIO::Diff::Op - Base class for DBIO driver diff operation objects
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -169,13 +177,16 @@ L<DBIO::Diff::Compare>) and per-engine op-construction callbacks.
 
 =item * L</summary_prefix> -- the C<+>/C<->/C<~> action glyph used in summaries.
 
+=item * L</should_emit_if_exists> -- the F12 helper a per-driver C<as_sql>
+calls to decide whether to emit C<IF [NOT] EXISTS> guards.
+
 =back
 
 Subclasses keep C<as_sql> (the real engine seam) and a thin C<summary>, and
 call these helpers from their own C<diff> class method. Drivers whose diff is
 orchestrated differently (e.g. PostgreSQL's registry-based dispatch, or its
 global definition-string index comparison) are free to ignore the walk helpers
-and use only L</new>/L</mk_diff_accessors>/L</summary_prefix>.
+and use only L</new>/L</mk_diff_accessors>/L</summary_prefix>/L</should_emit_if_exists>.
 
 =head1 METHODS
 
@@ -264,6 +275,22 @@ member's drop must be emitted even as its table is dropped (e.g. indexes).
 
 Tables and members are both walked in sorted order. Each callback may return
 zero or more ops; all are collected.
+
+=head2 should_emit_if_exists
+
+    return 1 if DBIO::Diff::Op::should_emit_if_exists($storage);
+
+F12 helper: returns true iff the connected storage's C<_use_if_exists>
+capability is truthy (L<DBIO::Storage::DBI::Capabilities>). Per-driver
+C<as_sql> methods call this to decide whether to emit C<IF [NOT] EXISTS>
+guards (C<CREATE TABLE IF NOT EXISTS>, C<DROP TABLE IF EXISTS>,
+C<ALTER TABLE ... ADD COLUMN IF NOT EXISTS>) so that re-applying a diff
+after a partial failure no-ops instead of erroring out.
+
+Returns false (conservative) when C<$storage> is missing, the storage
+lacks the capability probe, or the capability is 0. Per-driver adoption
+of this helper is a follow-up; the 41 driver C<as_sql> files are not
+modified in this commit.
 
 =head1 AUTHOR
 

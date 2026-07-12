@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Try::Tiny;
+use DBD::Oracle;
 use DBIO::Oracle::Type;
 
 
@@ -120,7 +121,7 @@ DBIO::Oracle::Introspect::Columns - Introspect Oracle columns
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

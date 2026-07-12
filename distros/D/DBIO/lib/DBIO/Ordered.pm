@@ -473,7 +473,7 @@ DBIO::Ordered - Maintain a position column over an ordered list of rows
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -510,6 +510,11 @@ In code:
   $item->move_to_group('groupname');
   $item->move_to_group('groupname', $position);
   $item->move_to_group({ group_id => 'a', other_group_id => 'b' }, $position);
+
+See F<t/ordered.t> for a runnable example of the core moves against the
+shared L<DBIO::Test::Schema::Employee> fixture (mock storage can verify
+the emitted SQL and the invoking row's own position change, but not a
+full multi-row persisted reorder -- see the caveat in that file).
 
 =head1 DESCRIPTION
 

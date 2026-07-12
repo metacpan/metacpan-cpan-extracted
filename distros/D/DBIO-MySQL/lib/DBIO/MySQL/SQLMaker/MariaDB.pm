@@ -67,7 +67,7 @@ DBIO::MySQL::SQLMaker::MariaDB - SQLMaker subclass for MariaDB's SQL syntax quir
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

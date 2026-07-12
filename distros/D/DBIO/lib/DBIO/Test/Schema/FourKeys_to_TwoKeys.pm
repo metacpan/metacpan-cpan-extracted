@@ -47,7 +47,7 @@ DBIO::Test::Schema::FourKeys_to_TwoKeys - Test result class for the fourkeys_to_
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

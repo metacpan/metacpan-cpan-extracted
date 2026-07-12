@@ -1,5 +1,9 @@
 Revision history for Data-ReqRep-Shared
 
+0.05  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.04  2026-05-27
     - slot_acquire: owner_pid CAS gates the state CAS, ACQUIRE on loads
       (fixes recovery ABA where a fresh free+acquire could clobber a live owner)

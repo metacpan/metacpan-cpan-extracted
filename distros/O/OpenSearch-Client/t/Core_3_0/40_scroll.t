@@ -218,6 +218,6 @@ sub test_scroll {
             is $result, $expect, "$title - Step $i: $name";
             $i++;
         }
-        }
+    }
 }
 

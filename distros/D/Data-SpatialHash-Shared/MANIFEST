@@ -67,6 +67,7 @@ xt/perf.t
 xt/pod.t
 xt/pool_exhaustion.t
 xt/reader_starvation_guard.t
+xt/slotless_reader_recovery.t
 xt/stress.t
 xt/torn_mutation.t
 xt/tsan.t

@@ -4,10 +4,14 @@ package DBIO::SQLMaker;
 use strict;
 use warnings;
 
+our $CONTRACT_VERSION = '1.1';
+
 use base qw(
   DBIO::SQLMaker::ClassicExtensions
   SQL::Abstract
 );
+
+sub contract_version { $CONTRACT_VERSION }
 
 # NOTE THE LACK OF mro SPECIFICATION
 # This is deliberate to ensure things will continue to work
@@ -90,7 +94,7 @@ DBIO::SQLMaker - An SQL::Abstract-based SQL maker class
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

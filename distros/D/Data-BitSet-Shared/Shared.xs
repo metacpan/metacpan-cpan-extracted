@@ -26,15 +26,16 @@ MODULE = Data::BitSet::Shared  PACKAGE = Data::BitSet::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[BS_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    BsHandle *h = bs_create(p, capacity, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    BsHandle *h = bs_create(p, capacity, mode, errbuf);
     if (!h) croak("Data::BitSet::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -270,8 +271,11 @@ to_string(self, ...)
   PREINIT:
     EXTRACT_BS(self);
   CODE:
+    uint32_t mw = bs_max_words(h);
     uint64_t cap = h->hdr->capacity;
     uint32_t nw = h->hdr->num_words;
+    if (nw > mw) nw = mw;                                /* bound word loop against mapping */
+    if (cap > (uint64_t)nw * 64) cap = (uint64_t)nw * 64; /* bound alloc/length against mapping */
     char *buf;
     Newx(buf, cap + 1, char);
     SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from newSVpvn (OOM) */

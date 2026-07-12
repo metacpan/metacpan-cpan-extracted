@@ -10,9 +10,9 @@ sub fondation_meta {
         dependencies => ['Fondation::Model::DBIx::Async'],
         defaults     => {
             models => {
-                user       => { source => 'users',      backend => undef },
-                group      => { source => 'groups',     backend => undef },
-                user_group => { source => 'user_group', backend => undef },
+                user       => { source => 'User',      backend => undef },
+                group      => { source => 'Group',     backend => undef },
+                user_group => { source => 'UserGroup', backend => undef },
             },
         },
     };

@@ -54,11 +54,21 @@ typedef struct {
     int       backing_fd;
 } BsHandle;
 
+/* Max words the current mapping can physically hold -- derived from the
+ * process-private mmap_size (NOT from any attacker-writable header field).
+ * Used to bound every file-stored count/index at use against the region size. */
+static inline uint32_t bs_max_words(const BsHandle *h) {
+    if (h->mmap_size < sizeof(BsHeader)) return 0;
+    uint64_t mw = (h->mmap_size - sizeof(BsHeader)) / 8;
+    return mw > UINT32_MAX ? UINT32_MAX : (uint32_t)mw;
+}
+
 /* ================================================================
  * Bit operations (lock-free CAS)
  * ================================================================ */
 
 static inline int bs_test(BsHandle *h, uint64_t bit) {
+    if (bit / 64 >= bs_max_words(h)) return 0;  /* corrupted header: beyond mapping */
     uint64_t word = __atomic_load_n(&h->data[bit / 64], __ATOMIC_ACQUIRE);
     return (word >> (bit % 64)) & 1;
 }
@@ -67,6 +77,7 @@ static inline int bs_test(BsHandle *h, uint64_t bit) {
 static inline int bs_set(BsHandle *h, uint64_t bit) {
     uint32_t widx = (uint32_t)(bit / 64);
     uint64_t mask = (uint64_t)1 << (bit % 64);
+    if (bit / 64 >= bs_max_words(h)) return 1;  /* corrupted header: skip OOB write */
     for (;;) {
         uint64_t word = __atomic_load_n(&h->data[widx], __ATOMIC_RELAXED);
         if (word & mask) return 1;  /* already set */
@@ -82,6 +93,7 @@ static inline int bs_set(BsHandle *h, uint64_t bit) {
 static inline int bs_clear(BsHandle *h, uint64_t bit) {
     uint32_t widx = (uint32_t)(bit / 64);
     uint64_t mask = (uint64_t)1 << (bit % 64);
+    if (bit / 64 >= bs_max_words(h)) return 0;  /* corrupted header: skip OOB write */
     for (;;) {
         uint64_t word = __atomic_load_n(&h->data[widx], __ATOMIC_RELAXED);
         if (!(word & mask)) return 0;  /* already clear */
@@ -97,6 +109,7 @@ static inline int bs_clear(BsHandle *h, uint64_t bit) {
 static inline int bs_toggle(BsHandle *h, uint64_t bit) {
     uint32_t widx = (uint32_t)(bit / 64);
     uint64_t mask = (uint64_t)1 << (bit % 64);
+    if (bit / 64 >= bs_max_words(h)) return 0;  /* corrupted header: skip OOB write */
     uint64_t old = __atomic_fetch_xor(&h->data[widx], mask, __ATOMIC_ACQ_REL);
     __atomic_add_fetch(&h->hdr->stat_toggles, 1, __ATOMIC_RELAXED);
     return (old & mask) ? 0 : 1;
@@ -106,6 +119,7 @@ static inline int bs_toggle(BsHandle *h, uint64_t bit) {
 static inline uint64_t bs_count(BsHandle *h) {
     uint64_t total = 0;
     uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound against mapping */
     for (uint32_t i = 0; i < nw; i++) {
         uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_RELAXED);
         total += (uint64_t)__builtin_popcountll(word);
@@ -115,6 +129,7 @@ static inline uint64_t bs_count(BsHandle *h) {
 
 static inline int bs_any(BsHandle *h) {
     uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound against mapping */
     for (uint32_t i = 0; i < nw; i++)
         if (__atomic_load_n(&h->data[i], __ATOMIC_RELAXED)) return 1;
     return 0;
@@ -125,6 +140,7 @@ static inline int bs_none(BsHandle *h) { return !bs_any(h); }
 /* Fill all bits. NOT safe concurrently with per-bit CAS ops. */
 static inline void bs_fill(BsHandle *h) {
     uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound OOB write against mapping */
     uint64_t cap = h->hdr->capacity;
     for (uint32_t i = 0; i < nw; i++) {
         uint64_t valid = (i == nw - 1 && cap % 64)
@@ -136,6 +152,7 @@ static inline void bs_fill(BsHandle *h) {
 /* Zero all bits. NOT safe concurrently with per-bit CAS ops. */
 static inline void bs_zero(BsHandle *h) {
     uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound OOB write against mapping */
     for (uint32_t i = 0; i < nw; i++)
         __atomic_store_n(&h->data[i], 0, __ATOMIC_RELEASE);
 }
@@ -143,6 +160,7 @@ static inline void bs_zero(BsHandle *h) {
 /* Find first set bit. Returns -1 if none. */
 static inline int64_t bs_first_set(BsHandle *h) {
     uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound against mapping */
     uint64_t cap = h->hdr->capacity;
     for (uint32_t i = 0; i < nw; i++) {
         uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_RELAXED);
@@ -157,6 +175,7 @@ static inline int64_t bs_first_set(BsHandle *h) {
 /* Find first clear bit. Returns -1 if none. */
 static inline int64_t bs_first_clear(BsHandle *h) {
     uint32_t nw = h->hdr->num_words;
+    uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound against mapping */
     uint64_t cap = h->hdr->capacity;
     for (uint32_t i = 0; i < nw; i++) {
         uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_RELAXED);
@@ -213,7 +232,24 @@ static inline BsHandle *bs_setup(void *base, size_t ms, const char *path, int bf
     return h;
 }
 
-static BsHandle *bs_create(const char *path, uint64_t capacity, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int bs_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { BS_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        BS_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    BS_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static BsHandle *bs_create(const char *path, uint64_t capacity, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { BS_ERR("capacity must be > 0"); return NULL; }
     uint32_t nw = (uint32_t)((capacity + 63) / 64);
@@ -230,8 +266,8 @@ static BsHandle *bs_create(const char *path, uint64_t capacity, char *errbuf) {
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { BS_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { BS_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = bs_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { BS_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { BS_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }

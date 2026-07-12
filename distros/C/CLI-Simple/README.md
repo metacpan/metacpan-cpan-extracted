@@ -68,7 +68,6 @@
 * [LICENSE AND COPYRIGHT](#license-and-copyright)
 * [SEE ALSO](#see-also)
 * [AUTHOR](#author)
-* [POD ERRORS](#pod-errors)
 # NAME
 
 CLI::Simple - a minimalist object oriented base class for CLI applications
@@ -991,9 +990,9 @@ name and its arguments._
 
         sub init {
           my ($self) = @__;
-          
+
           my @args = $self->get_args;
-        
+
           if ( ! @args ) {
             $self->command_args($self->command()); # set the args to the command
             $self->command('get'); # set the command to your default
@@ -1611,11 +1610,3 @@ under the same terms as Perl itself.  See
 # AUTHOR
 
 Rob Lauer - <rlauer@treasurersbriefcase.com>
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 1836:
-
-    &#x3d;back without =over

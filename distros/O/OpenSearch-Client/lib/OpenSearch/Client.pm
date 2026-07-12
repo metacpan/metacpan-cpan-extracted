@@ -26,7 +26,7 @@ use Moo 2.001000 ();
 use OpenSearch::Client::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '3.007006';
+our $VERSION = '3.007007';
 
 my %Default_Plugins = (
     client      => [ 'OpenSearch::Client::Core',         '3_0::Direct' ],
@@ -85,7 +85,7 @@ OpenSearch::Client - An unofficial Perl client for OpenSearch
 
 =head1 VERSION
 
-version 3.007006
+version 3.007007
 
 =head1 SYNOPSIS
 

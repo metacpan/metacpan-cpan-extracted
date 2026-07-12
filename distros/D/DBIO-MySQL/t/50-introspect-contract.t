@@ -192,16 +192,16 @@ ok(-f $cd_pm,     'Cd.pm generated');
 ok(-f $view_pm,   'Myview.pm generated');
 
 my $artist_src = do { open my $fh, '<', $artist_pm; local $/; <$fh> };
-like($artist_src, qr/table\('artist'\)/,   'Artist uses correct table name');
+like($artist_src, qr/table\(["']artist["']\)/,   'Artist uses correct table name');
 like($artist_src, qr/has_many/,             'Artist has_many relationship');
 like($artist_src, qr/source_info/,          'Artist has source_info');
 
 my $cd_src = do { open my $fh, '<', $cd_pm; local $/; <$fh> };
-like($cd_src, qr/table\('cd'\)/,          'Cd uses correct table name');
+like($cd_src, qr/table\(["']cd["']\)/,          'Cd uses correct table name');
 like($cd_src, qr/belongs_to/,              'Cd belongs_to relationship');
 like($cd_src, qr/TestMySQL::Schema::Result::Artist/, 'Cd references Artist class');
 
 my $view_src = do { open my $fh, '<', $view_pm; local $/; <$fh> };
-like($view_src, qr/table\('myview'\)/,    'Myview uses correct table name');
+like($view_src, qr/table\(["']myview["']\)/,    'Myview uses correct table name');
 
 done_testing;

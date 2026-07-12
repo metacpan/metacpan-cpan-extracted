@@ -15,7 +15,7 @@ my $schema = DBIO::Test->init_schema;
   my @q = $schema->storage->captured_queries;
   is scalar @q, 1, 'one query captured after ->all';
   is $q[0]{op}, 'select', 'captured op is select';
-  like $q[0]{sql}, qr/SELECT.*FROM artist/i, 'captured SQL is a SELECT on artist';
+  like $q[0]{sql}, qr/SELECT.*FROM "artist"/i, 'captured SQL is a SELECT on artist';
 }
 
 # captured_sql_bind
@@ -48,7 +48,7 @@ my $schema = DBIO::Test->init_schema;
   my @q = $schema->storage->captured_queries;
   ok scalar @q >= 1, 'insert captured';
   is $q[0]{op}, 'insert', 'captured op is insert';
-  like $q[0]{sql}, qr/INSERT INTO artist/i, 'captured INSERT SQL';
+  like $q[0]{sql}, qr/INSERT INTO "artist"/i, 'captured INSERT SQL';
 }
 
 # capture_executed_sql_bind on schema
@@ -58,7 +58,7 @@ my $schema = DBIO::Test->init_schema;
   });
 
   ok @$sqlbinds >= 1, 'capture_executed_sql_bind captured queries';
-  like $sqlbinds->[0][1][0], qr/SELECT.*FROM artist.*WHERE/i,
+  like $sqlbinds->[0][1][0], qr/SELECT.*FROM "artist".*WHERE/i,
     'captured SQL has WHERE clause';
 }
 

@@ -44,7 +44,7 @@ DBIO::Sybase::Storage::ASE::IdentityRetrieval - Identity retrieval for Sybase AS
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 METHODS
 

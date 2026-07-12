@@ -41,7 +41,7 @@ DBIO::Test::Schema::Moo::Result::CD - Moo-enabled test result class for the cd t
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

@@ -1,5 +1,10 @@
 Revision history for Map::Tube::Barcelona
 
+v1.0.0  2026-07-11
+        - Updated dependency on Map::Tube v5.1.0.
+        - Updated copyright year information.
+        - Switched to dotted-decimal versioning (v-strings).
+
 0.80  Sun Apr 20 15:20:00 2025
       - Re-structured map data link.
 

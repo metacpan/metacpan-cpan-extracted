@@ -25,6 +25,7 @@ sub _build_operations {
   );
   push @ops, DBIO::DuckDB::Diff::Index->diff(
     $self->source->{indexes}, $self->target->{indexes},
+    $self->source->{tables},  $self->target->{tables},
   );
 
   return \@ops;
@@ -44,7 +45,7 @@ DBIO::DuckDB::Diff - Compare two introspected DuckDB models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

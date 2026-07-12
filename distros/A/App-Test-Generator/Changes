@@ -1,5 +1,9 @@
 Revision history for App-Test-Generator
 
+0.43	Sat Jul 11 20:55:21 EDT 2026
+	[ Bug Fixes]
+	- Fix number/float tests when min is set to <= 0
+
 0.42	Tue Jul  7 08:23:44 EDT 2026
 	[New features]
 	- Add CoverageGuidedFuzzer->minimize_corpus(): reduces the accumulated

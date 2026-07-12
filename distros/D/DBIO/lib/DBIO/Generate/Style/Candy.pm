@@ -4,6 +4,7 @@ package DBIO::Generate::Style::Candy;
 use strict;
 use warnings;
 use Data::Dumper ();
+use DBIO::Generate::Util ();
 use namespace::clean;
 
 
@@ -12,25 +13,25 @@ sub emit {
 
   my @lines;
 
-  push @lines, "package $spec->{class};";
-  push @lines, "# ABSTRACT: $spec->{moniker}";
+  push @lines, "package " . DBIO::Generate::Util::assert_pkg($spec->{class}) . ";";
+  push @lines, "# ABSTRACT: " . DBIO::Generate::Util::abstract_comment($spec->{moniker});
   push @lines, "";
   push @lines, "use DBIO::Candy;";
   push @lines, "";
 
   if (my @c = @{ $spec->{components} // [] }) {
-    push @lines, "load_components " . join(', ', map { "'$_'" } @c) . ";";
+    push @lines, "load_components " . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . ";";
     push @lines, "";
   }
 
   if ($spec->{is_view}) {
     push @lines, "table_class 'DBIO::ResultSource::View';";
-    push @lines, "table '$spec->{table}';";
-    push @lines, "view_definition '$spec->{view_definition}';"
+    push @lines, "table " . DBIO::Generate::Util::pl_str($spec->{table}) . ";";
+    push @lines, "view_definition " . DBIO::Generate::Util::pl_str($spec->{view_definition}) . ";"
       if defined $spec->{view_definition};
   }
   else {
-    push @lines, "table '$spec->{table}';";
+    push @lines, "table " . DBIO::Generate::Util::pl_str($spec->{table}) . ";";
   }
   push @lines, "";
 
@@ -39,31 +40,34 @@ sub emit {
     my $info = $spec->{columns}{$col} // {};
     my $dt   = $info->{data_type} // 'varchar';
     my $size = defined $info->{size} ? $info->{size} : undef;
+    my $dt_str = DBIO::Generate::Util::pl_str($dt);
     my @extra;
     push @extra, "is_auto_increment => 1" if $info->{is_auto_increment};
     push @extra, "is_nullable => 1"       if $info->{is_nullable};
     my $info_str;
     if (@extra || defined $size) {
       my @inner;
-      push @inner, "size => $size"         if defined $size;
+      if (defined $size) {
+        push @inner, "size => " . ($size =~ /\A-?[0-9]+\z/ ? $size : DBIO::Generate::Util::pl_str($size));
+      }
       push @inner, @extra;
-      $info_str = "'$dt', { " . join(', ', @inner) . " }";
+      $info_str = "$dt_str, { " . join(', ', @inner) . " }";
     }
     else {
-      $info_str = "'$dt'";
+      $info_str = $dt_str;
     }
-    push @lines, "has_column $col => $info_str;";
+    push @lines, "has_column " . DBIO::Generate::Util::pl_str($col) . " => $info_str;";
   }
   push @lines, "";
 
   if (my @pk = @{ $spec->{pk} // [] }) {
-    push @lines, "primary_key " . join(', ', map { "'$_'" } @pk) . ";";
+    push @lines, "primary_key " . join(', ', map { DBIO::Generate::Util::pl_str($_) } @pk) . ";";
     push @lines, "";
   }
 
   for my $uq (@{ $spec->{uniq} // [] }) {
     my ($name, $cols) = @$uq;
-    push @lines, "unique_constraint '$name' => [" . join(', ', map { "'$_'" } @$cols) . "];";
+    push @lines, "unique_constraint " . DBIO::Generate::Util::pl_str($name) . " => [" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @$cols) . "];";
   }
   push @lines, "" if @{ $spec->{uniq} // [] };
 
@@ -75,7 +79,7 @@ sub emit {
 
   for my $rel (@{ $spec->{relationships} // [] }) {
     my ($rel_name, $remote_class, $cond, @rest) = @{ $rel->{args} };
-    push @lines, "$rel->{method} '$rel_name', '$remote_class', " . _dump_inline($cond) . ";";
+    push @lines, "$rel->{method} " . DBIO::Generate::Util::pl_str($rel_name) . ", " . DBIO::Generate::Util::pl_str($remote_class) . ", " . _dump_inline($cond) . ";";
   }
   push @lines, "" if @{ $spec->{relationships} // [] };
 
@@ -108,7 +112,7 @@ DBIO::Generate::Style::Candy - DBIO::Candy DSL emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 METHODS
 

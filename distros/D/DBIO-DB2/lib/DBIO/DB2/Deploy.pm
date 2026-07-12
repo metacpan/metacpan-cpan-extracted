@@ -165,7 +165,7 @@ DBIO::DB2::Deploy - Deploy and upgrade DB2 schemas via test-deploy-and-compare
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

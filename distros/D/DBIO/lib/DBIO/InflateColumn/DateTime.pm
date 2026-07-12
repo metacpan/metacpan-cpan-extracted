@@ -167,7 +167,7 @@ DBIO::InflateColumn::DateTime - Auto-create DateTime objects from date and datet
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -219,6 +219,10 @@ use C<DateTime::Format::ISO8601> thusly:
 
   use DateTime::Format::ISO8601;
   my $dt = DateTime::Format::ISO8601->parse_datetime('YYYY-MM-DD');
+
+See F<t/inflate_column_datetime.t> for a runnable example covering
+inflation, deflation, and the C<inflate_datetime>/C<inflate_date> opt-in
+and opt-out flags shown above.
 
 =head1 DESCRIPTION
 
@@ -335,9 +339,8 @@ Set the environment variable DBIO_FLOATING_TZ_OK to some true value.
 =back
 
 Putting extra attributes like timezone, locale or floating_tz_ok into extra => {} has been
-B<DEPRECATED> because this gets you into trouble using L<DBIO::Schema::Versioned>.
-Instead put it directly into the columns definition like in the examples above. If you still
-use the old way you'll see a warning - please fix your code then!
+B<DEPRECATED>. Instead put it directly into the columns definition like in the examples
+above. If you still use the old way you'll see a warning - please fix your code then!
 
 =head1 SEE ALSO
 

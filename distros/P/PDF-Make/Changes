@@ -1,5 +1,15 @@
 Revision history for PDF::Make
 
+0.07  2026-07-11
+      - Fix "Free to wrong pool" on Strawberry Perl (Windows): xs/crypt.xs
+        (encrypt_stream, decrypt_stream) and xs/watermark.xs (next_bates,
+        expand) called free() on buffers allocated by C library functions that
+        do not include perl.h.  On Windows, win32/win32.h (pulled in via
+        perl.h in Make.c) redefines free() to win32_free(), which checks that
+        the pointer belongs to Perl's managed pool. Fix: added pdfmake_cfree()
+        in src/pdfmake_crypt.c (no perl.h) and declared it in
+        include/pdfmake_crypt.h. 
+
 0.06  2026-07-07
       - pdfmake_format_real: replace hand-rolled digit-extraction loop with
         sprintf("%.6f") + trailing-zero strip.

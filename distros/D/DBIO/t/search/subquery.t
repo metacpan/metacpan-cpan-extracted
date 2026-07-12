@@ -18,7 +18,7 @@ my @tests = (
     search => \[ "title = ? AND year LIKE ?", [ title => 'buahaha' ], [ year => '20%' ] ],
     attrs => { rows => 5 },
     sqlbind => \[
-      "( SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track FROM cd me WHERE (title = ? AND year LIKE ?) LIMIT ?)",
+      '( SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track" FROM cd "me" WHERE (title = ? AND year LIKE ?) LIMIT ?)',
       [ { sqlt_datatype => 'varchar', sqlt_size => 100, dbic_colname => 'title' } => 'buahaha' ],
       [ { sqlt_datatype => 'varchar', sqlt_size => 100, dbic_colname => 'year' } => '20%' ],
       [ $ROWS => 5 ],
@@ -31,7 +31,7 @@ my @tests = (
       artistid => { 'in' => $art_rs->search({}, { rows => 1 })->get_column( 'artistid' )->as_query },
     },
     sqlbind => \[
-      "( SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track FROM cd me WHERE artistid IN ( SELECT me.artistid FROM artist me LIMIT ? ) )",
+      '( SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track" FROM cd "me" WHERE "artistid" IN ( SELECT "me"."artistid" FROM "artist" "me" LIMIT ? ) )',
       [ $ROWS => 1 ],
     ],
   },
@@ -44,7 +44,7 @@ my @tests = (
       ],
     },
     sqlbind => \[
-      "( SELECT (SELECT me.id FROM cd me LIMIT ?) FROM artist me )",
+      '( SELECT (SELECT "me"."id" FROM cd "me" LIMIT ?) FROM "artist" "me" )',
       [ $ROWS => 1 ],
     ],
   },
@@ -57,7 +57,7 @@ my @tests = (
       ],
     },
     sqlbind => \[
-      "( SELECT me.artistid, me.name, me.rank, me.charfield, (SELECT me.id FROM cd me LIMIT ?) FROM artist me )",
+      '( SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield", (SELECT "me"."id" FROM cd "me" LIMIT ?) FROM "artist" "me" )',
       [ $ROWS => 1 ],
     ],
   },
@@ -71,10 +71,10 @@ my @tests = (
       ],
     },
     sqlbind => \[
-      "( SELECT cd2.cdid, cd2.artist, cd2.title, cd2.year, cd2.genreid, cd2.single_track FROM (
-            SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track FROM cd me WHERE artist > ?
-          ) cd2
-        )",
+      '( SELECT "cd2"."cdid", "cd2"."artist", "cd2"."title", "cd2"."year", "cd2"."genreid", "cd2"."single_track" FROM (
+            SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track" FROM cd "me" WHERE "artist" > ?
+          ) "cd2"
+        )',
       [ { sqlt_datatype => 'integer', dbic_colname => 'artist' } => 20 ]
     ],
   },
@@ -91,7 +91,7 @@ my @tests = (
       ]
     },
     sqlbind => \[
-      "( SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me JOIN (SELECT me.artist as cds_artist FROM cd me) cds ON me.artistid = cds_artist )"
+      '( SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me" JOIN (SELECT me.artist as cds_artist FROM cd "me") "cds" ON "me"."artistid" = "cds_artist" )'
     ],
   },
 
@@ -111,14 +111,14 @@ my @tests = (
       ],
     },
     sqlbind => \[
-      "( SELECT cd2.cdid, cd2.artist, cd2.title, cd2.year, cd2.genreid, cd2.single_track
+      '( SELECT "cd2"."cdid", "cd2"."artist", "cd2"."title", "cd2"."year", "cd2"."genreid", "cd2"."single_track"
         FROM
-          (SELECT cd3.cdid, cd3.artist, cd3.title, cd3.year, cd3.genreid, cd3.single_track
+          (SELECT "cd3"."cdid", "cd3"."artist", "cd3"."title", "cd3"."year", "cd3"."genreid", "cd3"."single_track"
             FROM
-              (SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-                FROM cd me WHERE artist < ?) cd3
-            WHERE artist > ?) cd2
-      )",
+              (SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+                FROM cd "me" WHERE "artist" < ?) "cd3"
+            WHERE "artist" > ?) "cd2"
+      )',
       [ { sqlt_datatype => 'integer', dbic_colname => 'artist' } => 40 ],
       [ { dbic_colname => 'artist' } => 20 ], # no rsrc in outer manual from - hence no resolution
     ],
@@ -135,7 +135,7 @@ my @tests = (
       },
     },
     sqlbind => \[
-      "( SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track FROM cd me WHERE year = (SELECT MAX(inner.year) FROM cd inner WHERE artistid = me.artistid) )",
+      '( SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track" FROM cd "me" WHERE "year" = (SELECT MAX( "inner"."year" ) FROM cd "inner" WHERE "artistid" = me.artistid) )',
     ],
   },
 
@@ -148,10 +148,10 @@ my @tests = (
       ],
     },
     sqlbind => \[
-      "(SELECT cd2.cdid, cd2.artist, cd2.title, cd2.year, cd2.genreid, cd2.single_track FROM (
-          SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track FROM cd me WHERE title = ?
-        ) cd2
-      )",
+      '(SELECT "cd2"."cdid", "cd2"."artist", "cd2"."title", "cd2"."year", "cd2"."genreid", "cd2"."single_track" FROM (
+          SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track" FROM cd "me" WHERE "title" = ?
+        ) "cd2"
+      )',
       [ { sqlt_datatype => 'varchar', sqlt_size => 100, dbic_colname => 'title' }
           => 'Thriller'
       ]

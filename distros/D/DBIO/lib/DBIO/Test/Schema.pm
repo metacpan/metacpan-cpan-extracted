@@ -171,7 +171,7 @@ DBIO::Test::Schema - Standard test schema for the DBIO ecosystem
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -179,6 +179,8 @@ version 0.900000
 
   my $schema = DBIO::Test::Schema->connect(@connect_info);
   my $rs = $schema->resultset('Artist');
+
+See F<t/53-test-schema-fixtures.t> for a runnable example.
 
 =head1 DESCRIPTION
 

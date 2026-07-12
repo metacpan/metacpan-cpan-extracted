@@ -1,6 +1,6 @@
 package DBIO::PostgreSQL::Age;
 # ABSTRACT: Apache AGE graph database support for DBIO::PostgreSQL
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use warnings;
 
 sub connection {
   my ($self, @info) = @_;
-  $self->storage_type('+DBIO::PostgreSQL::Age::Storage');
+  $self->register_storage_layer('DBIO::PostgreSQL::Age::Storage');
   return $self->next::method(@info);
 }
 
@@ -27,7 +27,7 @@ DBIO::PostgreSQL::Age - Apache AGE graph database support for DBIO::PostgreSQL
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -55,16 +55,23 @@ graph database support into L<DBIO::PostgreSQL>. Apache AGE is a PostgreSQL
 extension that adds openCypher graph query capabilities via the C<cypher()>
 SQL function.
 
-Loading this component sets L<DBIO::Schema/storage_type> to
-L<DBIO::PostgreSQL::Age::Storage>, which extends the standard PostgreSQL
-storage with graph lifecycle management and Cypher query execution.
+Loading this component registers L<DBIO::PostgreSQL::Age::Storage> as a storage
+B<layer> (via L<DBIO::Schema/register_storage_layer>), so it is composed over the
+resolved PostgreSQL driver storage at connection time -- see
+L<DBIO::Storage::Composed>. The composed storage carries graph lifecycle
+management and Cypher query execution alongside the standard PostgreSQL storage,
+and stacks with other storage-layer extensions (e.g. L<DBIO::PostgreSQL::PostGIS>)
+on the same schema.
 
 =head1 METHODS
 
 =head2 connection
 
-Overrides L<DBIO/connection> to set C<+DBIO::PostgreSQL::Age::Storage>
-as C<storage_type>.
+Overrides L<DBIO/connection> to register L<DBIO::PostgreSQL::Age::Storage> as a
+storage layer (L<DBIO::Schema/register_storage_layer>) before connecting, so it
+is composed over the resolved driver storage rather than replacing it. This is
+what lets AGE stack with other PostgreSQL storage-layer extensions and ride
+every async transport its layer is composed onto.
 
 =head1 CONNECTION SETUP
 

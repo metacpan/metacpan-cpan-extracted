@@ -211,7 +211,7 @@ DBIO::FilterColumn - Automatically convert column data
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -231,6 +231,9 @@ Set up filters for the columns you want to convert.
  sub from_pennies { $_[1] / 100 }
 
  1;
+
+See F<t/filter_column.t> for a runnable example covering both this
+SYNOPSIS and the EXAMPLE OF USE below.
 
 =head1 DESCRIPTION
 

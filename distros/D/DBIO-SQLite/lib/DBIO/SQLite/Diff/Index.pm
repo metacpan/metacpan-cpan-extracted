@@ -15,7 +15,16 @@ __PACKAGE__->mk_diff_accessors(qw/table_name index_name index_info/);
 
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
+
+  # Tables present in the source model but absent from the target are being
+  # dropped in this same pass. SQLite's DROP TABLE removes the table's own
+  # indexes automatically, so a standalone DROP INDEX for one of them must be
+  # suppressed -- it would otherwise fail with "no such index" (karr #14).
+  $source_tables //= {};
+  $target_tables //= {};
+  my %dropped_table = map { $_ => 1 }
+    grep { !exists $target_tables->{$_} } keys %$source_tables;
 
   # Index members are already keyed by name, so no index_by. scope 'all'
   # because an index drop must be emitted even for source-only tables (the
@@ -63,6 +72,10 @@ sub diff {
     },
     on_gone => sub {
       my ($table, $name, $old) = @_;
+      # Suppress the standalone DROP INDEX when the owning table is itself
+      # being dropped this pass: SQLite's DROP TABLE already removed it, so a
+      # later DROP INDEX would fail with "no such index" (karr #14).
+      return if $dropped_table{$table};
       $class->new(
         action     => 'drop',
         table_name => $table,
@@ -121,7 +134,7 @@ DBIO::SQLite::Diff::Index - Diff operations for SQLite indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -137,10 +150,20 @@ explicit C<CREATE INDEX> statements.
 
 =head2 diff
 
-    my @ops = DBIO::SQLite::Diff::Index->diff($source, $target);
+    my @ops = DBIO::SQLite::Diff::Index->diff(
+      $source, $target, $source_tables, $target_tables);
 
 C<$source> and C<$target> are the C<indexes> sub-models from
 L<DBIO::SQLite::Introspect>: C<< { $table_name => { $idx_name => $info } } >>.
+
+The optional C<$source_tables> / C<$target_tables> hashrefs are the C<tables>
+sections of the two models (threaded in by L<DBIO::SQLite::Diff>). They are
+used to detect tables that are being dropped in this same diff pass: SQLite's
+C<DROP TABLE> automatically removes that table's own indexes, so emitting a
+later standalone C<DROP INDEX> for one of them would fail with C<no such index>
+and abort the deploy (karr #14). When these arguments are absent (e.g. direct
+unit-test calls) the dropped set is empty and no drops are suppressed,
+preserving the original two-argument behaviour.
 
 =head2 as_sql
 

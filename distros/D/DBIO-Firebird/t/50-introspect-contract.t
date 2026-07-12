@@ -154,11 +154,11 @@ is($fixture->table_is_view('AUTHORVIEW'), 1, 'AUTHORVIEW is a view');
   ok(-f $view_pm,   'Authorview.pm generated');
 
   my $author_src = do { open my $fh, '<', $author_pm; local $/; <$fh> };
-  like($author_src, qr/table\('AUTHOR'\)/i, 'Author uses correct table name');
+  like($author_src, qr/table\(['"]AUTHOR['"]\)/i, 'Author uses correct table name');
   like($author_src, qr/has_many/,           'Author has_many relationship');
 
   my $book_src = do { open my $fh, '<', $book_pm; local $/; <$fh> };
-  like($book_src, qr/table\('BOOK'\)/i, 'Book uses correct table name');
+  like($book_src, qr/table\(['"]BOOK['"]\)/i, 'Book uses correct table name');
   like($book_src, qr/belongs_to/,        'Book belongs_to relationship');
   like($book_src, qr/TestFirebird::Schema::Result::Author/,
     'Book references Author class');

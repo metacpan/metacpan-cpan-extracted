@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Litavis.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.010',
-
+    macro 	     => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'Colouring::In::XS'   => '0',
@@ -39,7 +39,9 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
-    PREREQ_PM => {},
+    PREREQ_PM => {
+        'Colouring::In::XS'   => '0',
+    },
 
     INC    => "-I. -Iinclude -I$colour_inc",
     OBJECT => '$(O_FILES)',

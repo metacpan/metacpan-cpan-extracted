@@ -38,13 +38,13 @@ my @cdids = (1, 2, 3, 4, 5);
     '(
       SELECT COUNT( * )
         FROM (
-          SELECT me.cd
-            FROM track me
-            JOIN cd cd ON cd.cdid = me.cd
-          WHERE ( me.cd IN ( ?, ?, ?, ?, ? ) )
-          GROUP BY me.cd
+          SELECT "me"."cd"
+            FROM "track" "me"
+            JOIN cd "cd" ON "cd"."cdid" = "me"."cd"
+          WHERE ( "me"."cd" IN ( ?, ?, ?, ?, ? ) )
+          GROUP BY "me"."cd"
         )
-      me
+      "me"
     )',
     [ map { [ { sqlt_datatype => 'integer', dbic_colname => 'me.cd' }
       => $_ ] } @cdids ],
@@ -54,16 +54,16 @@ my @cdids = (1, 2, 3, 4, 5);
   is_same_sql_bind (
     $track_rs->as_query,
     '(
-      SELECT me.cd, me.track_count, cd.cdid, cd.artist, cd.title, cd.year, cd.genreid, cd.single_track
+      SELECT "me"."cd", "me"."track_count", "cd"."cdid", "cd"."artist", "cd"."title", "cd"."year", "cd"."genreid", "cd"."single_track"
         FROM (
-          SELECT me.cd, COUNT (me.trackid) AS track_count
-            FROM track me
-            JOIN cd cd ON cd.cdid = me.cd
-          WHERE ( me.cd IN ( ?, ?, ?, ?, ? ) )
-          GROUP BY me.cd
-          ) me
-        JOIN cd cd ON cd.cdid = me.cd
-      WHERE ( me.cd IN ( ?, ?, ?, ?, ? ) )
+          SELECT "me"."cd", COUNT ("me"."trackid") AS "track_count"
+            FROM "track" "me"
+            JOIN cd "cd" ON "cd"."cdid" = "me"."cd"
+          WHERE ( "me"."cd" IN ( ?, ?, ?, ?, ? ) )
+          GROUP BY "me"."cd"
+          ) "me"
+        JOIN cd "cd" ON "cd"."cdid" = "me"."cd"
+      WHERE ( "me"."cd" IN ( ?, ?, ?, ?, ? ) )
     )',
     [ map { [ { sqlt_datatype => 'integer', dbic_colname => 'me.cd' }
       => $_ ] } (@cdids) x 2 ],
@@ -93,12 +93,12 @@ my @cdids = (1, 2, 3, 4, 5);
     '(
       SELECT COUNT( * )
         FROM (
-          SELECT me.cdid
-            FROM cd me
-          WHERE ( me.cdid IS NOT NULL )
-          GROUP BY me.cdid
+          SELECT "me"."cdid"
+            FROM cd "me"
+          WHERE ( "me"."cdid" IS NOT NULL )
+          GROUP BY "me"."cdid"
           LIMIT ?
-        ) me
+        ) "me"
     )',
     [[$ROWS => 2]],
     'count() query generated expected SQL',
@@ -107,22 +107,22 @@ my @cdids = (1, 2, 3, 4, 5);
   is_same_sql_bind (
     $most_tracks_rs->as_query,
     '(
-      SELECT  me.cdid, me.track_count, me.maxtr,
-              tracks.trackid, tracks.cd, tracks.position, tracks.title, tracks.last_updated_on, tracks.last_updated_at,
-              liner_notes.liner_id, liner_notes.notes
+      SELECT  "me"."cdid", "me"."track_count", "me"."maxtr",
+              "tracks"."trackid", "tracks"."cd", "tracks"."position", "tracks"."title", "tracks"."last_updated_on", "tracks"."last_updated_at",
+              "liner_notes"."liner_id", "liner_notes"."notes"
         FROM (
-          SELECT me.cdid, COUNT( tracks.trackid ) AS track_count, MAX( tracks.trackid ) AS maxtr
-            FROM cd me
-            LEFT JOIN track tracks ON tracks.cd = me.cdid
-          WHERE ( me.cdid IS NOT NULL )
-          GROUP BY me.cdid
-          ORDER BY track_count DESC, maxtr ASC
+          SELECT "me"."cdid", COUNT( "tracks"."trackid" ) AS "track_count", MAX( "tracks"."trackid" ) AS "maxtr"
+            FROM cd "me"
+            LEFT JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+          WHERE ( "me"."cdid" IS NOT NULL )
+          GROUP BY "me"."cdid"
+          ORDER BY "track_count" DESC, "maxtr" ASC
           LIMIT ?
-        ) me
-        LEFT JOIN track tracks ON tracks.cd = me.cdid
-        LEFT JOIN liner_notes liner_notes ON liner_notes.liner_id = me.cdid
-      WHERE ( me.cdid IS NOT NULL )
-      ORDER BY track_count DESC, maxtr ASC
+        ) "me"
+        LEFT JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+        LEFT JOIN "liner_notes" "liner_notes" ON "liner_notes"."liner_id" = "me"."cdid"
+      WHERE ( "me"."cdid" IS NOT NULL )
+      ORDER BY "track_count" DESC, "maxtr" ASC
     )',
     [[$ROWS => 2]],
     'next() query generated expected SQL',
@@ -150,24 +150,24 @@ my @cdids = (1, 2, 3, 4, 5);
 
   is_same_sql_bind(
     $most_tracks_rs->as_query,
-    '(SELECT  me.cdid, liner_notes.notes, me.tr_count, me.tr_maxid,
-              liner_notes.liner_id, liner_notes.notes
+    '(SELECT  "me"."cdid", "liner_notes"."notes", "me"."tr_count", "me"."tr_maxid",
+              "liner_notes"."liner_id", "liner_notes"."notes"
         FROM (
-          SELECT me.cdid, COUNT(tracks.trackid) AS tr_count, MAX(tracks.trackid) AS tr_maxid
-            FROM cd me
-            LEFT JOIN track tracks
-              ON tracks.cd = me.cdid
-          WHERE me.cdid IS NOT NULL AND tracks.trackid IS NOT NULL
-          GROUP BY me.cdid
-          ORDER BY tr_count DESC, tr_maxid ASC
+          SELECT "me"."cdid", COUNT("tracks"."trackid") AS "tr_count", MAX("tracks"."trackid") AS "tr_maxid"
+            FROM cd "me"
+            LEFT JOIN "track" "tracks"
+              ON "tracks"."cd" = "me"."cdid"
+          WHERE ( "me"."cdid" IS NOT NULL AND "tracks"."trackid" IS NOT NULL )
+          GROUP BY "me"."cdid"
+          ORDER BY "tr_count" DESC, "tr_maxid" ASC
           LIMIT ?
-        ) me
-        LEFT JOIN track tracks
-          ON tracks.cd = me.cdid
-        LEFT JOIN liner_notes liner_notes
-          ON liner_notes.liner_id = me.cdid
-      WHERE me.cdid IS NOT NULL AND tracks.trackid IS NOT NULL
-      ORDER BY tr_count DESC, tr_maxid ASC
+        ) "me"
+        LEFT JOIN "track" "tracks"
+          ON "tracks"."cd" = "me"."cdid"
+        LEFT JOIN "liner_notes" "liner_notes"
+          ON "liner_notes"."liner_id" = "me"."cdid"
+      WHERE ( "me"."cdid" IS NOT NULL AND "tracks"."trackid" IS NOT NULL )
+      ORDER BY "tr_count" DESC, "tr_maxid" ASC
     )',
     [[$ROWS => 2]],
     'Oddball mysql-ish group_by usage yields valid SQL',
@@ -186,15 +186,15 @@ my @cdids = (1, 2, 3, 4, 5);
   is_same_sql_bind (
     $rs->as_query,
     '(
-      SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-             tags.tagid, tags.cd, tags.tag
+      SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
+             "tags"."tagid", "tags"."cd", "tags"."tag"
         FROM (
-          SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-            FROM cd me
-          GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-        ) me
-        LEFT JOIN tags tags ON tags.cd = me.cdid
-      ORDER BY cdid
+          SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+            FROM cd "me"
+          GROUP BY "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+        ) "me"
+        LEFT JOIN "tags" "tags" ON "tags"."cd" = "me"."cdid"
+      ORDER BY "cdid"
     )',
     [],
     'Prefetch + distinct resulted in correct group_by',
@@ -225,12 +225,12 @@ my @cdids = (1, 2, 3, 4, 5);
       SELECT COUNT( * )
         FROM (
           SELECT SUBSTR(me.cd, 1, 1)
-            FROM track me
-            JOIN cd cd ON cd.cdid = me.cd
-          WHERE ( me.cd IN ( ?, ?, ?, ?, ? ) )
+            FROM "track" "me"
+            JOIN cd "cd" ON "cd"."cdid" = "me"."cd"
+          WHERE ( "me"."cd" IN ( ?, ?, ?, ?, ? ) )
           GROUP BY SUBSTR(me.cd, 1, 1)
         )
-      me
+      "me"
     )',
     [ map { [ { sqlt_datatype => 'integer', dbic_colname => 'me.cd' }
       => $_ ] } (@cdids) ],
@@ -249,15 +249,16 @@ my @cdids = (1, 2, 3, 4, 5);
     is_same_sql_bind (
       $cd_rs->as_query,
       '(
-        SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-               artist.artistid, artist.name, artist.rank, artist.charfield
+        SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
+               "artist"."artistid", "artist"."name", "artist"."rank", "artist"."charfield"
           FROM (
-            SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-              FROM cd me
-              JOIN artist artist ON artist.artistid = me.artist
-            GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-          ) me
-          JOIN artist artist ON artist.artistid = me.artist
+            SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+              FROM cd "me"
+              JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
+            GROUP BY "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+          ) "me"
+          LEFT JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+          JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
       )',
       [],
     );
@@ -271,21 +272,19 @@ my @cdids = (1, 2, 3, 4, 5);
     is_same_sql_bind (
       $cd_rs2->as_query,
       '(
-        SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-               artist.artistid, artist.name, artist.rank, artist.charfield
+        SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
+               "artist"."artistid", "artist"."name", "artist"."rank", "artist"."charfield"
           FROM (
-            SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-              FROM cd me
-              LEFT JOIN track tracks ON tracks.cd = me.cdid
-              JOIN artist artist ON artist.artistid = me.artist
-            WHERE ( tracks.title != ? )
-            GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-          ) me
-          LEFT JOIN track tracks ON tracks.cd = me.cdid
-          JOIN artist artist ON artist.artistid = me.artist
-        WHERE ( tracks.title != ? )
-        GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-                 artist.artistid, artist.name, artist.rank, artist.charfield
+            SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+              FROM cd "me"
+              LEFT JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+              JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
+            WHERE ( "tracks"."title" != ? )
+            GROUP BY "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+          ) "me"
+          LEFT JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+          JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
+        WHERE ( "tracks"."title" != ? )
       )',
       [ map { [ { sqlt_datatype => 'varchar', sqlt_size => 100, dbic_colname => 'tracks.title' }
             => 'ugabuganoexist' ] } (1,2)
@@ -308,22 +307,22 @@ my @cdids = (1, 2, 3, 4, 5);
 
   is_same_sql_bind($rs->as_query,
     '(
-      SELECT me.cdid, me.title, me.test_count,
-             tags.tagid, tags.cd, tags.tag
+      SELECT "me"."cdid", "me"."title", "me"."test_count",
+             "tags"."tagid", "tags"."cd", "tags"."tag"
         FROM (
-          SELECT  me.cdid, me.title,
-                  COUNT( tags.tag ) AS test_count
-            FROM cd me
-            LEFT JOIN tags tags
-              ON tags.cd = me.cdid
-          GROUP BY me.cdid, me.title
-          ORDER BY MAX( tags.tag ) DESC
+          SELECT  "me"."cdid", "me"."title",
+                  COUNT( "tags"."tag" ) AS "test_count"
+            FROM cd "me"
+            LEFT JOIN "tags" "tags"
+              ON "tags"."cd" = "me"."cdid"
+          GROUP BY "me"."cdid", "me"."title"
+          ORDER BY MAX( "tags"."tag" ) DESC
           LIMIT ?
           OFFSET ?
-        ) me
-        LEFT JOIN tags tags
-          ON tags.cd = me.cdid
-      ORDER BY tags.tag DESC
+        ) "me"
+        LEFT JOIN "tags" "tags"
+          ON "tags"."cd" = "me"."cdid"
+      ORDER BY "tags"."tag" DESC
     )',
     [ [$ROWS => 3], [$OFFSET => 1] ],
     'Expected limited prefetch with distinct SQL',
@@ -343,31 +342,31 @@ my @cdids = (1, 2, 3, 4, 5);
 
   is_same_sql_bind($rs->as_query,
     '(
-      SELECT cds.cdid, cds.title, cds.test_count,
-             tags.tagid, tags.cd, tags.tag
-        FROM cd me
-        JOIN artist artist
-          ON artist.artistid = me.artist
+      SELECT "cds"."cdid", "cds"."title", "cds"."test_count",
+             "tags"."tagid", "tags"."cd", "tags"."tag"
+        FROM cd "me"
+        JOIN "artist" "artist"
+          ON "artist"."artistid" = "me"."artist"
         JOIN (
-          SELECT  cds.cdid, cds.title,
-                  COUNT( tags.tag ) AS test_count,
-                  cds.artist
-            FROM cd me
-            JOIN artist artist
-              ON artist.artistid = me.artist
-            JOIN cd cds
-              ON cds.artist = artist.artistid
-            LEFT JOIN tags tags
-              ON tags.cd = cds.cdid
-          GROUP BY cds.cdid, cds.title, cds.artist
-          ORDER BY MAX( tags.tag ) DESC
+          SELECT  "cds"."cdid", "cds"."title",
+                  COUNT( "tags"."tag" ) AS "test_count",
+                  "cds"."artist"
+            FROM cd "me"
+            JOIN "artist" "artist"
+              ON "artist"."artistid" = "me"."artist"
+            JOIN cd "cds"
+              ON "cds"."artist" = "artist"."artistid"
+            LEFT JOIN "tags" "tags"
+              ON "tags"."cd" = "cds"."cdid"
+          GROUP BY "cds"."cdid", "cds"."title", "cds"."artist"
+          ORDER BY MAX( "tags"."tag" ) DESC
           LIMIT ?
           OFFSET ?
-        ) cds
-          ON cds.artist = artist.artistid
-        LEFT JOIN tags tags
-          ON tags.cd = cds.cdid
-      ORDER BY tags.tag DESC
+        ) "cds"
+          ON "cds"."artist" = "artist"."artistid"
+        LEFT JOIN "tags" "tags"
+          ON "tags"."cd" = "cds"."cdid"
+      ORDER BY "tags"."tag" DESC
     )',
     [ [$ROWS => 3], [$OFFSET => 1] ],
     'Expected limited prefetch with distinct SQL on premultiplied head',

@@ -77,12 +77,21 @@ $rs->search({ -bool => \['ST_DWithin(geom, ST_MakePoint(?,?)::geography, ?)',
 
 ## Driver wiring
 
+Loading the component registers the PostGIS storage **layer** (core storage-layer
+composition); it composes over the resolved driver storage at connect time:
+
 ```perl
 package MyApp::Schema;
-use base 'DBIO::PostgreSQL::PostGIS';   # sets storage_type +DBIO::PostgreSQL::PostGIS::Storage
+use DBIO 'Schema';
+__PACKAGE__->load_components('PostgreSQL', 'PostgreSQL::PostGIS');
+# connection() runs register_storage_layer('DBIO::PostgreSQL::PostGIS::Storage')
 ```
 
-- `DBIO::PostgreSQL::PostGIS::Storage` → `register_driver('Pg')`
+The connected storage then `isa` BOTH the PostGIS layer AND `DBIO::PostgreSQL::Storage`;
+`ensure_postgis` / `postgis_version` / the PostGIS-aware deploy class live on the layer.
+
+- `DBIO::PostgreSQL::PostGIS::Storage` is a plain storage **layer** — not a
+  `storage_type` subclass, no `use base`, no `register_driver`.
 - Codecs: `Codec::WKB::Decoder`, `Codec::WKT::Parser`, `Codec::WKT::Builder`
 - `Introspect` + `Deploy` for spatial-aware schema management
 

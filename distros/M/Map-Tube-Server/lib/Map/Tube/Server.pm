@@ -1,7 +1,11 @@
 package Map::Tube::Server;
 
-$Map::Tube::Server::VERSION   = '0.06';
-$Map::Tube::Server::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,12 +13,11 @@ Map::Tube::Server - Dancer2 based server for Map::Tube.
 
 =head1 VERSION
 
-Version 0.06
+Version v1.0.0
 
 =cut
 
 use 5.006;
-use strict; use warnings;
 use Data::Dumper;
 
 use Dancer2;

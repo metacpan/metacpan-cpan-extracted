@@ -1,0 +1,18 @@
+requires 'perl', '5.020';
+
+# Dependency-free async posture: only core Perl (fork, pipe, Storable,
+# IO::Select, POSIX) plus DBIO core. No Future / Future::IO / event-loop deps —
+# a sync driver gets made async without pulling the async ecosystem in. Core
+# modules are not declared here (same as DBIO::Async's cpanfile).
+requires 'DBIO', '0.900001';
+
+on test => sub {
+  requires 'Test::More', '0.98';
+
+  # Optional: live integration test t/05-sqlite-live.t — skips cleanly without
+  # it.  Declared as recommends (not requires) to preserve the dep-free posture
+  # of dbio-forked (ADR 0001): installing only dbio-forked + DBIO core must work
+  # without any concrete driver or DBD on the system. DBD::SQLite is pulled in
+  # transitively as a hard dep of DBIO::SQLite, so it is not listed separately.
+  recommends 'DBIO::SQLite';
+};

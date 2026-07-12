@@ -2077,9 +2077,12 @@ YAML
     },
     'query, header parameters: operation overshadows path-item',
   );
+};
 
+subtest $::TYPE.': request body parsing' => sub {
+  my ($request, $options, $result);
 
-  $openapi = OpenAPI::Modern->new(
+  my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
@@ -2782,7 +2785,7 @@ YAML
   $request = request('POST', 'http://example.com/foo',
     [ 'Content-Type' => 'application/schema+json; schema=https://example.com/my_schema/v1' ],
     '{"a":1,"c":3}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2791,7 +2794,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema required)))->to_string,
-          error => re(qr/^object is missing property: b/),
+          error => 'object is missing property: b',
         },
       ],
     },
@@ -2810,7 +2813,7 @@ YAML
   $request = request('POST', 'http://example.com/foo',
     [ 'Content-Type' => 'application/schema+json; foo=whargarbl' ],
     '{"a":1,"c":3}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2819,7 +2822,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content), 'application/json; foo=whargarbl', qw(schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content), 'application/json; foo=whargarbl', qw(schema required)))->to_string,
-          error => re(qr/^object is missing properties: x, y/),
+          error => 'object is missing properties: x, y',
         },
       ],
     },

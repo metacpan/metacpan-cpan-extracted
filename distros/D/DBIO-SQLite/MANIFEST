@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-native-schema-management-no-sql-translator.md
@@ -62,6 +63,7 @@ t/35-adapter.t
 t/35exception_inaction.t
 t/36-roundtrip-base-types.t
 t/37-rebuild.t
+t/40-diff-drop-table-index-cascade.t
 t/46where_attribute.t
 t/52leaks.t
 t/53lean_startup.t
@@ -219,6 +221,7 @@ t/relationship/unresolvable.t
 t/relationship/update_or_create_multi.t
 t/relationship/update_or_create_single.t
 t/relationship/virtual_columns.t
+t/release-coverage.t
 t/resultset/as_query.t
 t/resultset/as_subselect_rs.t
 t/resultset/bind_attr.t

@@ -17,40 +17,40 @@ name: DBIO-PostgreSQL-PostGIS
 provides:
   DBIO::PostgreSQL::PostGIS:
     file: lib/DBIO/PostgreSQL/PostGIS.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder:
     file: lib/DBIO/PostgreSQL/PostGIS/Codec/WKB/Decoder.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Codec::WKT::Builder:
     file: lib/DBIO/PostgreSQL/PostGIS/Codec/WKT/Builder.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Codec::WKT::Parser:
     file: lib/DBIO/PostgreSQL/PostGIS/Codec/WKT/Parser.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Deploy:
     file: lib/DBIO/PostgreSQL/PostGIS/Deploy.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Geometry:
     file: lib/DBIO/PostgreSQL/PostGIS/Geometry.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Introspect:
     file: lib/DBIO/PostgreSQL/PostGIS/Introspect.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::ResultSet:
     file: lib/DBIO/PostgreSQL/PostGIS/ResultSet.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::PostgreSQL::PostGIS::Storage:
     file: lib/DBIO/PostgreSQL/PostGIS/Storage.pm
-    version: '0.900000'
+    version: '0.900001'
 requires:
-  DBIO: '0.900000'
-  DBIO::PostgreSQL: '0.900000'
+  DBIO: '0.900001'
+  DBIO::PostgreSQL: '0.900001'
   perl: '5.020'
 resources:
   bugtracker: https://codeberg.org/dbio/dbio-postgresql-postgis/issues
   homepage: https://codeberg.org/dbio/dbio-postgresql-postgis
   repository: https://codeberg.org/dbio/dbio-postgresql-postgis.git
-version: '0.900000'
+version: '0.900001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -186,7 +186,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900000
+          tag: v0.900001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -309,6 +309,10 @@ x_Dist_Zilla:
               version: '4.020'
       name: '@DBIO/PodWeaver'
       version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CoverageTest
+      name: '@DBIO/DBIO::CoverageTest'
+      version: ~
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'

@@ -152,7 +152,7 @@ for my $mod (@modules) {
     # some common import names (these should never ever be methods)
     for my $f (qw/carp carp_once carp_unique croak confess cluck try catch finally/) {
       # catch is a legitimate method on Future classes
-      next if $f eq 'catch' and $mod->isa('DBIO::Test::Future') || $mod eq 'DBIO::Test::Future';
+      next if $f eq 'catch' and $mod->isa('DBIO::Future::Immediate') || $mod eq 'DBIO::Future::Immediate';
       if ($mod->can($f)) {
         my $via;
         for (reverse @{mro::get_linear_isa($mod)} ) {

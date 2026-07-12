@@ -75,7 +75,7 @@ DBIO::DB2::Introspect - Introspect a DB2 database via SYSCAT + information_schem
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -124,6 +124,40 @@ use_ok 'DBIO::MySQL::Diff';
   is($ops[0]->as_sql, 'DROP INDEX `gone_idx` ON `t`;', 'drop index SQL');
 }
 
+# --- Diff::Index: owning table dropped -> suppress standalone DROP INDEX (karr #23) ---
+# When the table itself is being dropped in the same pass (present in source
+# tables, absent from target tables), DROP TABLE already removes the table's
+# own indexes, so no standalone DROP INDEX must be emitted for them.
+{
+  my @ops = DBIO::MySQL::Diff::Index->diff(
+    { leftover => { idx_leftover_x => {
+      index_name => 'idx_leftover_x', columns => ['x'], origin => 'c',
+    }}},
+    {},
+    { leftover => { table_name => 'leftover' } },   # source tables: leftover exists
+    {},                                             # target tables: gone -> dropped
+  );
+  is(scalar @ops, 0, 'no standalone DROP INDEX when owning table is dropped (DROP TABLE covers it)');
+}
+
+# --- Diff::Index: over-suppression guard (karr #23) ---
+# A table that STAYS but loses one of its indexes must still get a standalone
+# DROP INDEX -- the suppression only applies to indexes of dropped tables.
+{
+  my @ops = DBIO::MySQL::Diff::Index->diff(
+    { users => { idx_users_email => {
+      index_name => 'idx_users_email', columns => ['email'], origin => 'c',
+    }}},
+    {},
+    { users => { table_name => 'users' } },   # source tables: users exists
+    { users => { table_name => 'users' } },   # target tables: users still exists
+  );
+  is(scalar @ops, 1, 'index drop still emitted when the table itself survives');
+  is($ops[0]->action, 'drop', 'surviving-table index drop is a drop op');
+  is($ops[0]->as_sql, 'DROP INDEX `idx_users_email` ON `users`;',
+    'surviving-table index still dropped standalone');
+}
+
 # --- Diff::ForeignKey add ---
 {
   my @ops = DBIO::MySQL::Diff::ForeignKey->diff(

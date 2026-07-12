@@ -191,7 +191,7 @@ DBIO::ResultSet::Pager - help when paging through sets of results
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -206,6 +206,8 @@ version 0.900000
   print "          Last page: ", $page->last_page, "\n";
   print "First entry on page: ", $page->first, "\n";
   print " Last entry on page: ", $page->last, "\n";
+
+See F<t/pager/data_page_compat/simple.t> for a runnable example.
 
 =head1 DESCRIPTION
 

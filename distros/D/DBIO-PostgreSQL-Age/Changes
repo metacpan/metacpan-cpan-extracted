@@ -1,5 +1,74 @@
 Revision history for DBIO-PostgreSQL-Age
 
+0.900001  2026-07-12
+    * Storage
+        - AGE now composes onto any schema as a storage LAYER
+          (register_storage_layer) instead of setting storage_type
+          directly, so it stacks with sibling extensions (e.g. PostGIS)
+          on one schema and runs on every async transport that can
+          replay LOAD 'age' -- future_io and ev today. Age::Storage and
+          Age::Storage::Async are now plain layers (no more `use base`
+          on the PostgreSQL sync/async storage classes); the async
+          layer is composed by core over whatever transport the mode
+          resolves (future_io -> PostgreSQL::Storage::Async, ev ->
+          EV::Storage) instead of hard-inheriting the future_io
+          adapter. cypher_async / create_graph_async / drop_graph_async
+          are dispatched from the sync side via core's _run_async (like
+          core CRUD *_async: route to the backend on an async
+          connection, degrade in-process under { async => 'immediate' },
+          croak on a sync connection); _cypher_sql_bind and
+          decode_agtype are shared by composition, never by inheriting
+          the sync DBI storage. The '?' seam is transport-internal
+          (core #70/ADR 0032): no caller-side _transform_sql call
+          remains, and the $$...$$ cypher body / $name refs survive
+          unshaped. required_transport_capabilities => (on_connect_replay)
+          is declared and enforced by core's capability gate. LOAD 'age'
+          + search_path setup rides the core pool on_connect-replay seam
+          (karr #68) on every freshly spawned pool connection, on every
+          transport -- no adapter-local LOAD hack. karr #5, #6, core #70.
+        - New decode_agtype() decodes agtype scalars, maps, lists,
+          vertices (id/label/properties), edges (id/label/start_id/
+          end_id/properties) and paths, including older-AGE-version
+          fallback when the ::vertex/::edge/::path type annotations are
+          absent. cypher() (and cypher_async) accept an { auto_decode =>
+          1 } option that runs it over every cell of every row; 4-arg
+          calls are unaffected.
+
+    * Fixes
+        - DBIO::PostgreSQL::Age::Storage no longer registers itself as the Pg
+          driver. The registration clobbered DBIO::PostgreSQL's entry, so any
+          plain dbi:Pg: connection made after the AGE module was loaded would
+          rebless into AGE storage and run graph SQL against a non-AGE database.
+          AGE is activated explicitly via the component (which registers the
+          Age storage layer), so the global registration was never needed.
+          karr #2.
+
+    * Tests
+        - t/30-registry.t pins that loading AGE storage leaves the Pg
+          driver resolving to the plain PostgreSQL storage
+        - Expanded live/offline coverage to 141 tests: agtype decoding
+          across every shape, an idempotent create_graph + MERGE deploy
+          pattern, WHERE/ORDER BY/SET/REMOVE/MERGE/OPTIONAL MATCH/WITH +
+          count()/variable-length-path Cypher coverage, layer stacking
+          with PostGIS on one schema, dual-mode coexistence (ev +
+          future_io instances on one schema class resolving distinct
+          composed backends, ADR 0030), and immediate-mode smoke
+          coverage. docker-compose and k8s test paths moved off the
+          retired private src.ci/srv/postgres image onto the public
+          apache/age image (postgres 18 + AGE 1.7); k8s/test.sh now
+          bails early on a port already in use or a port-forward that
+          never comes up, instead of reporting a false PASS against a
+          dead socket.
+
+    * Dependencies
+        - Requires core DBIO and DBIO::PostgreSQL >= 0.900001
+          (composition-carrying versions); DBIO::PostgreSQL::EV and
+          DBIO::PostgreSQL::PostGIS are develop-recommends only (the
+          offline suite gates on them and skips cleanly when absent)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. Apache AGE graph database support layered on DBIO::PostgreSQL.
 

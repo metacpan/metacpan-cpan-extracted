@@ -1,5 +1,8 @@
 Revision history for Apophis
 
+0.04	2026-07-11
+	- Remove pax headers
+
 0.03    2026-03-29
         - Fix Windows build failures on threaded Perl (MULTIPLICITY)
           - Undo perl.h macro overrides for mkdir, stat, unlink on WIN32

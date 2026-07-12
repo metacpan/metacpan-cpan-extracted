@@ -1,0 +1,84 @@
+# MySQL pod for dbio-mysql / dbio-mysql-ev integration tests.
+#
+# Server is MySQL 8.0 (the suites use MySQL-dialect SQL, e.g. `func() AS a, *`
+# and MySQL information_schema type strings that MariaDB reports differently).
+# Clients are DBD::MariaDB (sync/future_io) and EV::MariaDB (ev) — libmariadb
+# talks to a MySQL server fine. mysql_native_password is forced as the default
+# auth plugin so those libmariadb-based clients authenticate without the
+# caching_sha2_password / public-key dance over a plain TCP port-forward.
+#
+# RESOURCE DISCIPLINE — this runs on a small SHARED box (few cores, alongside
+# other DBs and services). The pod carries resources.limits so it can never
+# starve the host. Run ONE test DB at a time, `nice` the prove run, and DELETE
+# the pod when done — a forgotten pod is capped but still noise. See the
+# "Live testing" section in .claude/rules/dbio-rules.md.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/mysql-pod.yaml
+#   kubectl wait --for=condition=Ready pod/dbio-mysql-db --timeout=180s
+#   kubectl port-forward svc/dbio-mysql-db-svc 13306:3306 &
+#
+#   DBIO_TEST_MYSQL_DSN='dbi:MariaDB:database=dbio_test;host=127.0.0.1;port=13306' \
+#   DBIO_TEST_MYSQL_USER=dbio \
+#   DBIO_TEST_MYSQL_PASS=dbio \
+#     nice -n 19 ionice -c3 prove -lr t/       # serial, deprioritised
+#
+#   kubectl delete -f maint/k8s/mysql-pod.yaml   # ALWAYS clean up
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-mysql-db
+  labels:
+    app: dbio-mysql-db
+    role: dbio-test-db
+spec:
+  containers:
+    - name: mysql
+      image: mysql:8.0
+      args:
+        - --default-authentication-plugin=mysql_native_password
+      resources:
+        requests:
+          cpu: 250m
+          memory: 384Mi
+        limits:
+          cpu: "1"          # at most one core on a shared box
+          memory: 1Gi
+      ports:
+        - containerPort: 3306
+      env:
+        - name: MYSQL_DATABASE
+          value: dbio_test
+        - name: MYSQL_USER
+          value: dbio
+        - name: MYSQL_PASSWORD
+          value: dbio
+        - name: MYSQL_ROOT_PASSWORD
+          value: dbioroot
+      readinessProbe:
+        exec:
+          command:
+            - mysqladmin
+            - ping
+            - -h
+            - 127.0.0.1
+            - -u
+            - dbio
+            - -pdbio
+        initialDelaySeconds: 8
+        periodSeconds: 3
+        timeoutSeconds: 2
+        failureThreshold: 50
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-mysql-db-svc
+spec:
+  selector:
+    app: dbio-mysql-db
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP

@@ -149,7 +149,7 @@ DBIO::HashAccessor - Accessor methods for serialized hash columns
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -183,6 +183,8 @@ In code:
   $result->da_shift('array'); # shift from array
   $result->da_in('array',$value); # value is in array
   $result->da_in_delete('array',$value); # find and delete value in array
+
+See F<t/hash_accessor.t> for a runnable example.
 
 =head1 DESCRIPTION
 

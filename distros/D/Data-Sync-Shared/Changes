@@ -1,5 +1,9 @@
 Revision history for Data-Sync-Shared
 
+0.06  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.05  2026-05-26
     - RWLock dead-reader recovery: SIGKILL'd reader no longer pins the
       counter; 1024-slot per-process mirror drains dead contributions on

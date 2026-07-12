@@ -1,5 +1,10 @@
 Revision history for Data::Log::Shared
 
+0.05  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+    - append()/read_entry() now preserve the UTF-8 flag on round-trip.
+
 0.04  2026-05-26
     - Entry format v2: per-slot reserve_size lets readers skip slots
       abandoned by writers that crashed mid-append (fixes permanent gap)

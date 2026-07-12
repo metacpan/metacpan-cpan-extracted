@@ -34,7 +34,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -153,7 +153,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =head1 SYNOPSIS
 

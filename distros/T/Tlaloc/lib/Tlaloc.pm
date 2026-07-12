@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
 
 require XSLoader;
 XSLoader::load('Tlaloc', $VERSION);
@@ -21,7 +21,7 @@ Tlaloc - Wetness magic on Perl scalars, blessed by the Aztec rain god
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =head1 SYNOPSIS
 

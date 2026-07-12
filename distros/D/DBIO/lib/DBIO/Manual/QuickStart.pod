@@ -13,7 +13,7 @@ DBIO::Manual::QuickStart - Up and running with DBIO in 10 minutes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -198,9 +198,6 @@ From a detail to the root:
 If you want to exercise what you learned with a more complicated schema,
 load L<Northwind|https://github.com/dalers/mywind> into your
 database.
-
-If you want to transfer your existing SQL knowledge, read
-L<DBIO::Manual::SQLHackers>.
 
 Continue with L<DBIO::Manual::Intro> and
 L<DBIO/"WHERE TO START READING">.

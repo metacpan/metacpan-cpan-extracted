@@ -6,6 +6,8 @@ no warnings qw(redefine prototype);  # XS methods are overridden by Perl wrapper
 use PDF::Make;
 use PDF::Make::Field;
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Form - PDF interactive forms (AcroForms) for PDF::Make

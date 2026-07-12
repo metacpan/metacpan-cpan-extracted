@@ -193,6 +193,51 @@ use_ok 'DBIO::SQLite::Diff';
   is($ops[0]->as_sql, 'DROP INDEX gone_idx;', 'drop index SQL');
 }
 
+# --- Diff::Index: suppress DROP INDEX when the owning table is dropped (karr #14) ---
+# When the owning table is itself being dropped in the same pass (present in
+# source tables, absent from target tables), SQLite's DROP TABLE already removes
+# the table's indexes, so no standalone DROP INDEX must be emitted for them.
+{
+  my @ops = DBIO::SQLite::Diff::Index->diff(
+    {
+      leftover => {
+        idx_leftover_name => {
+          index_name => 'idx_leftover_name', columns => ['name'], origin => 'c',
+        },
+      },
+    },
+    {},
+    # source tables: the leftover table exists live
+    { leftover => { table_name => 'leftover' } },
+    # target tables: it is gone -> table is being dropped
+    {},
+  );
+  is(scalar @ops, 0, 'no standalone DROP INDEX when owning table is dropped');
+}
+
+# --- Diff::Index over-suppression guard (karr #14) ---
+# If the table stays but one of its indexes is removed, the standalone
+# DROP INDEX is still required.
+{
+  my @ops = DBIO::SQLite::Diff::Index->diff(
+    {
+      users => {
+        idx_users_email => {
+          index_name => 'idx_users_email', columns => ['email'], origin => 'c',
+        },
+      },
+    },
+    {},
+    # source tables: users exists
+    { users => { table_name => 'users' } },
+    # target tables: users still exists -> only the index is being dropped
+    { users => { table_name => 'users' } },
+  );
+  is(scalar @ops, 1, 'index drop still emitted when the table itself survives');
+  is($ops[0]->action, 'drop', 'surviving-table index drop is a drop op');
+  like($ops[0]->as_sql, qr/DROP INDEX idx_users_email/, 'surviving-table index still dropped standalone');
+}
+
 # --- Diff::Index alter (drop+create pair) ---
 {
   my @ops = DBIO::SQLite::Diff::Index->diff(

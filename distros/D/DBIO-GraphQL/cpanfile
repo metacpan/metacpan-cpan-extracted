@@ -1,12 +1,12 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900000';
+requires 'DBIO', '0.900001';
 requires 'GraphQL', '0.54';
 requires 'MIME::Base64';
 
 on test => sub {
   requires 'Test::More', '0.98';
   requires 'GraphQL::Execution';
-  requires 'DBIO::SQLite', '0.900000';
+  requires 'DBIO::SQLite', '0.900001';
   requires 'DBD::SQLite', '1.70';
 };

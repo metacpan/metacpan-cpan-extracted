@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Jacode4e::RoundTrip},
-    'VERSION'   => q{2.13.81.15},
+    'VERSION'   => q{2.13.81.16},
     'ABSTRACT'  => q{Converts JIS X 0213 Encodings with Round-Trip},
     'PREREQ_PM' => {
         'perl' => '5.00503',
@@ -42,7 +42,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Jacode4e::RoundTrip' => {
                 'file'    => 'lib/Jacode4e/RoundTrip.pm',
-                'version' => '2.13.81.15',
+                'version' => '2.13.81.16',
             }
         },
     };

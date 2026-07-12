@@ -1,10 +1,19 @@
 package Data::ReqRep::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Data::ReqRep::Shared', $VERSION);
+
+# ithreads: blessed shared-memory handles must never be cloned into a
+# child thread -- the clone would double-free the handle on thread exit.
+{ no strict 'refs'; *{"${_}::CLONE_SKIP"} = sub { 1 } for qw(
+  Data::ReqRep::Shared
+  Data::ReqRep::Shared::Client
+  Data::ReqRep::Shared::Int
+  Data::ReqRep::Shared::Int::Client
+); }
 
 1;
 
@@ -195,7 +204,7 @@ B<eventfd> (see L</Event Loop Integration>):
     $cli->notify;              # signal request eventfd
     $cli->req_eventfd_set($fd);  $cli->req_fileno;
 
-=head2 Event Loop Integration (eventfd)
+=head2 Event Loop Integration
 
 Two eventfds for bidirectional notification. Both are opt-in --
 C<send>/C<reply> do not signal automatically.
@@ -331,6 +340,17 @@ L<Data::Graph::Shared> - directed weighted graph
 L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
 
 L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
+=head1 SECURITY
+
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 AUTHOR
 

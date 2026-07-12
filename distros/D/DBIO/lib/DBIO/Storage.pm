@@ -440,6 +440,31 @@ sub deploy { die "Virtual method!" }
 
 sub connect_info { die "Virtual method!" }
 
+# --- DBIO-private connect attributes (karr #66) --------------------------
+# Single authoritative source for the attribute names a caller may pass in
+# connect_info that are DBIO-private and must NEVER reach DBI->connect. Both
+# connect-info paths consume these lists -- the sync normalizer
+# (DBIO::Storage::DBI::_normalize_connect_info) and the async strip
+# (DBIO::Storage::Async::connect_info) -- so the two paths can never drift on
+# what counts as DBIO-private. They live on this shared base (the common
+# ancestor of both DBI and Async storage) rather than on DBIO::Storage::DBI, so
+# the async base can reach them without a new Async->DBI dependency direction.
+
+# Storage-config options: routed to the storage, kept out of DBI->connect.
+# (cursor_class is a storage option too, but carries its own component_class
+# accessor, so it is appended at the split sites rather than listed here.)
+sub _dbio_storage_option_names {
+  qw/
+    on_connect_call on_disconnect_call on_connect_do on_disconnect_do
+    disable_sth_caching unsafe auto_savepoint
+  /;
+}
+
+# SQL-maker options: routed to the sql_maker, kept out of DBI->connect.
+sub _dbio_sql_maker_option_names {
+  qw/ quote_char name_sep quote_names /;
+}
+
 
 sub select { die "Virtual method!" }
 
@@ -455,58 +480,65 @@ sub delete { die "Virtual method!" }
 
 sub select_single { die "Virtual method!" }
 
+# Live async backend (a DBIO::Storage::Async) or undef when none configured.
+# Overridden in DBIO::Storage::DBI to do real discovery. Base = no backend.
+sub _async_storage { undef }
 
-sub select_async {
-  my $self = shift;
+# The connect-time async mode name (ADR 0030), or undef for a sync instance.
+# Overridden by the _async_mode accessor on DBIO::Storage::DBI; the base stub
+# keeps non-DBI storages on the sync path (their *_async croak).
+sub _async_mode { undef }
+
+# Shared dispatch for the six *_async methods (ADR 0030). Three outcomes:
+#   - an embedded backend is live    -> route ${op}_async to it (real async)
+#   - the instance is in 'immediate'  -> run $op synchronously, wrap the result
+#     mode (no backend, mode chosen)     in an immediately-resolved future
+#   - the instance is sync            -> croak loudly: *_async was called but no
+#     (no async mode chosen)             async mode was chosen at connect time
+# _async_storage croaks on its own for a chosen-but-unavailable mode.
+sub _run_async {
+  my ($self, $op, @args) = @_;
+
+  if (my $async = $self->_async_storage) {
+    my $method = "${op}_async";
+    return $async->$method(@args);
+  }
+
+  $self->throw_exception(
+    "not an async connection -- connect with { async => ... } to use ${op}_async"
+  ) unless defined $self->_async_mode;
+
   my $fc = $self->future_class;
-  my @r = eval { $self->select(@_) };
+  my @r = eval { $self->$op(@args) };
   return $@ ? $fc->fail($@) : $fc->done(@r);
 }
 
 
-sub select_single_async {
-  my $self = shift;
-  my $fc = $self->future_class;
-  my @r = eval { $self->select_single(@_) };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
-}
+sub select_async { shift->_run_async('select', @_) }
 
 
-sub insert_async {
-  my $self = shift;
-  my $fc = $self->future_class;
-  my @r = eval { $self->insert(@_) };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
-}
+sub select_single_async { shift->_run_async('select_single', @_) }
 
 
-sub update_async {
-  my $self = shift;
-  my $fc = $self->future_class;
-  my @r = eval { $self->update(@_) };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
-}
+sub insert_async { shift->_run_async('insert', @_) }
 
 
-sub delete_async {
-  my $self = shift;
-  my $fc = $self->future_class;
-  my @r = eval { $self->delete(@_) };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
-}
+sub update_async { shift->_run_async('update', @_) }
 
 
-sub txn_do_async {
-  my $self = shift;
-  my $fc = $self->future_class;
-  my @r = eval { $self->txn_do(@_) };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
-}
+sub delete_async { shift->_run_async('delete', @_) }
+
+
+sub txn_do_async { shift->_run_async('txn_do', @_) }
 
 
 sub future_class {
-  require DBIO::Test::Future;
-  'DBIO::Test::Future';
+  my $self = shift;
+  if (ref $self and my $async = $self->_async_storage) {
+    return $async->future_class;
+  }
+  require DBIO::Future::Immediate;
+  'DBIO::Future::Immediate';
 }
 
 
@@ -557,7 +589,7 @@ DBIO::Storage - Generic Storage Handler
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -873,9 +905,10 @@ only.
 
 =head2 select_async
 
-Async variant of L</select>. Returns a L<DBIO::Future> that resolves
-with the query results. Default implementation executes synchronously
-and returns an immediately-resolved Future via L</future_class>.
+Async variant of L</select>. Returns a L<DBIO::Future> that resolves with
+the query results. Requires an async connection (C<< connect(..., { async =>
+... }) >>); on a sync instance it croaks. In the C<immediate> mode it runs
+synchronously and returns an immediately-resolved Future via L</future_class>.
 
 =head2 select_single_async
 
@@ -901,7 +934,7 @@ after COMMIT or rejects after ROLLBACK.
 =head2 future_class
 
 Returns the class name used to construct Future objects. Defaults to
-L<DBIO::Test::Future> which resolves synchronously. Async storage
+L<DBIO::Future::Immediate> which resolves synchronously. Async storage
 drivers override this to return their event loop's Future class.
 
 =head2 columns_info_for

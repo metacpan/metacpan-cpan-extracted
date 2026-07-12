@@ -191,7 +191,7 @@ DBIO::GraphQL::Mutation - Build createX / updateX / deleteX GraphQL field per so
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

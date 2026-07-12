@@ -1,6 +1,6 @@
 package Language::Prolog::Sugar;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -66,7 +66,8 @@ sub import {
 	    if (ref $atoms eq 'ARRAY') {
 		foreach (@{$atoms}) {
 		    my $atom=$_;
-		    export sub () { $atom }, $to, $atom;
+		    my $name=$atom;
+		    export sub () { $atom }, $to, $name;
 		}
 	    }
 	    elsif (ref $atoms eq 'HASH') {

@@ -50,7 +50,7 @@ DBIO::PostgreSQL::Test::SequenceTest - Test result class for PostgreSQL sequence
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

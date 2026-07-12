@@ -27,7 +27,7 @@ DBIO::Firebird::Storage - Driver for the Firebird RDBMS via L<DBD::Firebird>
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

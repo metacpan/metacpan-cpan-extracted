@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v2.0.1');
+our $VERSION   = qv('v2.0.2');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -15,7 +15,7 @@ Map::Tube::London::Line::Metropolitan - London Tube Map: Metropolitan Line.
 
 =head1 VERSION
 
-Version v2.0.1
+Version v2.0.2
 
 =head1 DESCRIPTION
 
@@ -195,7 +195,7 @@ L<https://metacpan.org/dist/Map-Tube-London>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2014 - 2026 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

@@ -27,7 +27,8 @@
       },
       "runtime" : {
          "requires" : {
-            "DBIO" : "0.900000",
+            "DBD::DB2" : "0",
+            "DBIO" : "0.900001",
             "DateTime::Format::DB2" : "0",
             "perl" : "5.020"
          }
@@ -41,71 +42,71 @@
    "provides" : {
       "DBIO::DB2" : {
          "file" : "lib/DBIO/DB2.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::DDL" : {
          "file" : "lib/DBIO/DB2/DDL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Deploy" : {
          "file" : "lib/DBIO/DB2/Deploy.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Diff" : {
          "file" : "lib/DBIO/DB2/Diff.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Diff::Column" : {
          "file" : "lib/DBIO/DB2/Diff/Column.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Diff::ForeignKey" : {
          "file" : "lib/DBIO/DB2/Diff/ForeignKey.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Diff::Index" : {
          "file" : "lib/DBIO/DB2/Diff/Index.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Diff::Table" : {
          "file" : "lib/DBIO/DB2/Diff/Table.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Introspect" : {
          "file" : "lib/DBIO/DB2/Introspect.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Introspect::Columns" : {
          "file" : "lib/DBIO/DB2/Introspect/Columns.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Introspect::ForeignKeys" : {
          "file" : "lib/DBIO/DB2/Introspect/ForeignKeys.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Introspect::Indexes" : {
          "file" : "lib/DBIO/DB2/Introspect/Indexes.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Introspect::Tables" : {
          "file" : "lib/DBIO/DB2/Introspect/Tables.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::SQLMaker" : {
          "file" : "lib/DBIO/DB2/SQLMaker.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Storage" : {
          "file" : "lib/DBIO/DB2/Storage.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::DB2::Type" : {
          "file" : "lib/DBIO/DB2/Type.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Shortcut::db2" : {
          "file" : "lib/DBIO/Shortcut/db2.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -120,7 +121,7 @@
          "web" : "https://codeberg.org/dbio/dbio-db2"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -296,7 +297,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -458,6 +459,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

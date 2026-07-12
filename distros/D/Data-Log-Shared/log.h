@@ -64,6 +64,7 @@
 #define LOG_READ_EMPTY     0  /* no entry at offset (end / uncommitted in flight) */
 #define LOG_READ_OK        1  /* valid entry — out_data, out_len, next_off set */
 #define LOG_READ_ABANDONED 2  /* slot abandoned — next_off set, no data */
+#define LOG_READ_TRUNCATED 3  /* offset below truncation — next_off = truncation, no data */
 
 /* ================================================================
  * Header (128 bytes)
@@ -101,6 +102,16 @@ typedef struct {
     int        backing_fd;
 } LogHandle;
 
+/* Layer B trusted bound: the true byte size of the mapped data region,
+ * derived from the process-private mmap_size (NOT the attacker-writable
+ * hdr->data_size). Every file-stored offset/length that indexes h->data is
+ * bounded against this before use, so a local peer that corrupts the backing
+ * file cannot drive an out-of-bounds read or write. For a valid log this
+ * equals hdr->data_size exactly, so the added checks never fire on good data. */
+static inline uint64_t log_region_size(const LogHandle *h) {
+    return (h->mmap_size > sizeof(LogHeader)) ? (h->mmap_size - sizeof(LogHeader)) : 0;
+}
+
 /* ================================================================
  * Utility
  * ================================================================ */
@@ -127,18 +138,29 @@ static inline int log_remaining(const struct timespec *dl, struct timespec *rem)
  * writer leaves a recoverable slot boundary for readers.
  * ================================================================ */
 
-static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
+static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len, int utf8) {
     if (len == 0) return -1;  /* 0 is the uncommitted marker */
 
     LogHeader *hdr = h->hdr;
-    if (len > UINT32_MAX - LOG_ENTRY_HDR - 3U) return -1;
+    /* Bit 31 of the stored len field carries the UTF8 flag, so cap payloads at
+     * < 2 GiB -- a single 2 GiB+ log entry is not a real use case. */
+    if (len >= 0x80000000u) return -1;
     /* Pad total slot size up to 4-byte boundary so the next slot's
      * header words are naturally aligned for atomic ops on ARM64. */
     uint32_t entry_size = (LOG_ENTRY_HDR + len + 3U) & ~3U;
 
+    uint64_t region = log_region_size(h);
     for (;;) {
         uint64_t t = __atomic_load_n(&hdr->tail, __ATOMIC_RELAXED);
-        if (t + entry_size > hdr->data_size) return -1;
+        /* Layer B: tail is an attacker-writable shared-segment read used just
+         * below as a pointer offset (h->data + t) and as the memcpy target.
+         * Bound the slot within BOTH the logical data_size (the "log full"
+         * limit) and the true mapped region (mmap_size-derived, not the
+         * attacker-writable data_size), overflow-safe. For valid data
+         * data_size == region, so this is identical to the original
+         * full-check and the region test never fires early. */
+        if (t > hdr->data_size || entry_size > hdr->data_size - t) return -1;
+        if (t > region || entry_size > region - t) return -1;
 
         if (__atomic_compare_exchange_n(&hdr->tail, &t, t + entry_size,
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
@@ -156,13 +178,17 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
             __atomic_store_n((uint32_t *)slot, entry_size, __ATOMIC_RELEASE);
             /* Write payload. */
             memcpy(slot + LOG_ENTRY_HDR, data, len);
-            /* Commit: RELEASE store of len publishes the data. */
-            __atomic_store_n((uint32_t *)(slot + sizeof(uint32_t)), len, __ATOMIC_RELEASE);
+            /* Commit: RELEASE store of len publishes the data.  Bit 31 = UTF8. */
+            __atomic_store_n((uint32_t *)(slot + sizeof(uint32_t)),
+                             len | (utf8 ? 0x80000000u : 0u), __ATOMIC_RELEASE);
 
             __atomic_add_fetch(&hdr->count, 1, __ATOMIC_RELEASE);
             __atomic_add_fetch(&hdr->stat_appends, 1, __ATOMIC_RELAXED);
             __atomic_add_fetch(&hdr->wake_seq, 1, __ATOMIC_RELEASE);
 
+            /* StoreLoad: publish the commit + wake_seq++ before reading waiters,
+             * so a waiter that just bumped waiters can't be missed here. */
+            __atomic_thread_fence(__ATOMIC_SEQ_CST);
             if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
                 syscall(SYS_futex, &hdr->wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 
@@ -180,19 +206,41 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
  *                       crashed mid-append); next_off advanced past it,
  *                       no out_data. abandon_wait_us caps the wait for
  *                       an in-flight writer before declaring abandonment.
- *   LOG_READ_EMPTY     — no entry (past tail, truncated, or in-flight
- *                       writer not yet timed out).
+ *   LOG_READ_TRUNCATED — offset lies below the current truncation point
+ *                       (a concurrent truncate advanced past it);
+ *                       next_off is set to the truncation offset so the
+ *                       caller skips forward instead of stopping. No data.
+ *   LOG_READ_EMPTY     — no entry (past tail or in-flight writer not yet
+ *                       timed out).
  * ================================================================ */
 
 static inline int log_read_ex(LogHandle *h, uint64_t offset,
                               const uint8_t **out_data, uint32_t *out_len,
+                              int *out_utf8,
                               uint64_t *next_off,
                               uint64_t abandon_wait_us) {
     uint64_t trunc = __atomic_load_n(&h->hdr->truncation, __ATOMIC_ACQUIRE);
-    if (offset < trunc) return LOG_READ_EMPTY;  /* truncated */
+    if (offset < trunc) {
+        /* A concurrent truncate advanced past this offset. Hand back a
+         * skip-forward next_off so an iterator resumes at the truncation
+         * point instead of mistaking this for end-of-log and stopping. */
+        *next_off = trunc;
+        return LOG_READ_TRUNCATED;
+    }
     uint64_t t = __atomic_load_n(&h->hdr->tail, __ATOMIC_ACQUIRE);
     if (offset >= t) return LOG_READ_EMPTY;
-    if (offset + LOG_ENTRY_HDR > h->hdr->data_size) return LOG_READ_EMPTY;
+    /* Layer B: offset is caller-supplied (and, during iteration, derived from
+     * attacker-corruptible on-disk lengths) and indexes h->data just below.
+     * Bound it within the logical data_size AND the true mapped region
+     * (mmap_size-derived), overflow-safe, before any dereference -- this guards
+     * the reserve_size load at slot and the len load at slot+4. For valid data
+     * offset lies in a committed slot < tail <= data_size == region, so neither
+     * test fires. */
+    uint64_t region = log_region_size(h);
+    if (offset > h->hdr->data_size || LOG_ENTRY_HDR > h->hdr->data_size - offset)
+        return LOG_READ_EMPTY;
+    if (offset > region || LOG_ENTRY_HDR > region - offset)
+        return LOG_READ_EMPTY;
 
     uint8_t *slot = h->data + offset;
     /* Load reserve_size FIRST. ACQUIRE pairs with the writer's RELEASE-
@@ -212,8 +260,18 @@ static inline int log_read_ex(LogHandle *h, uint64_t offset,
         if (reserve_size > 0) {
             uint32_t len = __atomic_load_n(
                 (const uint32_t *)(slot + sizeof(uint32_t)), __ATOMIC_ACQUIRE);
+            int lutf8 = (len & 0x80000000u) != 0;   /* bit 31 = UTF8 flag */
+            len &= 0x7FFFFFFFu;
+            if (out_utf8) *out_utf8 = lutf8;
             if (len > 0) {
                 if (offset + LOG_ENTRY_HDR + len > t) return LOG_READ_EMPTY;
+                /* Layer B: len is an attacker-writable slot field used as the
+                 * memcpy length of the returned payload (out_data spans
+                 * offset+LOG_ENTRY_HDR .. +len). offset+LOG_ENTRY_HDR <= region
+                 * was enforced by the offset gate above, so
+                 * region-(offset+LOG_ENTRY_HDR) is a safe non-negative bound;
+                 * reject any len that would run the payload past the mapping. */
+                if (len > region - (offset + LOG_ENTRY_HDR)) return LOG_READ_EMPTY;
                 *out_data = slot + LOG_ENTRY_HDR;
                 *out_len = len;
                 *next_off = offset + (((uint64_t)LOG_ENTRY_HDR + len + 3U) & ~(uint64_t)3U);
@@ -239,6 +297,7 @@ static inline int log_read_ex(LogHandle *h, uint64_t offset,
      * > LOG_ENTRY_HDR), and within both the data region and committed tail. */
     if (reserve_size <= LOG_ENTRY_HDR
         || (reserve_size & 3U) != 0
+        || reserve_size > region - offset          /* Layer B: keep next_off within the mapping */
         || offset + reserve_size > h->hdr->data_size
         || offset + reserve_size > t)
         return LOG_READ_EMPTY;
@@ -252,7 +311,7 @@ static inline int log_read_ex(LogHandle *h, uint64_t offset,
 static inline int log_read(LogHandle *h, uint64_t offset,
                             const uint8_t **out_data, uint32_t *out_len,
                             uint64_t *next_off) {
-    int rc = log_read_ex(h, offset, out_data, out_len, next_off,
+    int rc = log_read_ex(h, offset, out_data, out_len, NULL, next_off,
                          LOG_ABANDON_WAIT_US);
     return rc == LOG_READ_OK ? 1 : 0;
 }
@@ -288,6 +347,9 @@ static inline int log_wait(LogHandle *h, uint64_t expected_count, double timeout
 
     for (;;) {
         __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELEASE);
+        /* StoreLoad: publish waiters++ before reading wake_seq/count, so a
+         * concurrent appender can't read waiters==0 while we read a stale count. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
         uint32_t seq = __atomic_load_n(&h->hdr->wake_seq, __ATOMIC_ACQUIRE);
         uint64_t cur = __atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE);
         if (cur == expected_count) {
@@ -371,7 +433,13 @@ static inline LogHandle *log_setup(void *base, size_t ms, const char *path, int 
     LogHandle *h = (LogHandle *)calloc(1, sizeof(LogHandle));
     if (!h) { munmap(base, ms); return NULL; }
     h->hdr = hdr;
-    h->data = (uint8_t *)base + hdr->data_off;
+    /* Layer B: data_off is validated to equal sizeof(LogHeader) on every path
+     * that reaches here (log_init_header sets it; log_validate_header rejects
+     * anything else). Anchor the data pointer on the compile-time constant so a
+     * TOCTOU corruption of the on-disk field between validate and here cannot
+     * redirect the base pointer, and so it stays consistent with the
+     * mmap_size-derived region bound (log_region_size). */
+    h->data = (uint8_t *)base + sizeof(LogHeader);
     h->mmap_size = ms;
     h->path = path ? strdup(path) : NULL;
     h->notify_fd = -1;
@@ -382,7 +450,28 @@ static inline LogHandle *log_setup(void *base, size_t ms, const char *path, int 
     return h;
 }
 
-static LogHandle *log_create(const char *path, uint64_t data_size, char *errbuf) {
+/* Layer A: obtain a backing-store fd without a symlink/hardlink race. Create it
+ * exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at `mode`, default 0600 = owner-only),
+ * or, if it already exists, attach to it (O_RDWR|O_NOFOLLOW, no O_CREAT). O_EXCL
+ * blocks a pre-planted symlink at create time; O_NOFOLLOW rejects a symlink on
+ * the attach path (ELOOP). The two-open dance retries only if the creator
+ * unlinks the file between our failed exclusive-create and our attach. */
+static int log_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { LOG_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        LOG_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    LOG_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static LogHandle *log_create(const char *path, uint64_t data_size, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (data_size == 0) { LOG_ERR("data_size must be > 0"); return NULL; }
     if (data_size > UINT64_MAX - sizeof(LogHeader)) { LOG_ERR("data_size too large"); return NULL; }
@@ -398,8 +487,8 @@ static LogHandle *log_create(const char *path, uint64_t data_size, char *errbuf)
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { LOG_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { LOG_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = log_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { LOG_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) {
@@ -477,7 +566,13 @@ static void log_destroy(LogHandle *h) {
  * publishes a fresh reserve_size. The header SEQ_CST fence below
  * publishes the zeroed region to all subsequent loads. */
 static void log_reset(LogHandle *h) {
-    memset(h->data, 0, (size_t)h->hdr->data_size);
+    /* Layer B: data_size is an attacker-writable shared-segment read used here
+     * as a memset length; clamp to the true mapped region so a corrupted
+     * data_size cannot drive an out-of-bounds zeroing. Equal for valid data. */
+    uint64_t region = log_region_size(h);
+    uint64_t zsize = h->hdr->data_size;
+    if (zsize > region) zsize = region;
+    memset(h->data, 0, (size_t)zsize);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
     __atomic_store_n(&h->hdr->truncation, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&h->hdr->tail, 0, __ATOMIC_RELEASE);

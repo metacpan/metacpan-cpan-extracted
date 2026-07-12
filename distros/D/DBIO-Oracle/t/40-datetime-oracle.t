@@ -34,21 +34,26 @@ my $timestamp_datatype = ($schema->storage->_server_info->{normalized_dbms_versi
 
 my $dbh = $schema->storage->dbh;
 
+# The Event result class names its table 'event' (lowercase). Identifier quoting
+# defaults to ON, so DBIO addresses it as "event" -- the DDL must quote it too,
+# otherwise Oracle creates an unquoted (uppercase) EVENT that DBIO can't find.
+my $q = $schema->storage->sql_maker->quote_char || '';
+
 #$dbh->do("alter session set nls_timestamp_format = 'YYYY-MM-DD HH24:MI:SSXFF'");
 
 eval {
-  $dbh->do("DROP TABLE event");
+  $dbh->do("DROP TABLE ${q}event${q}");
 };
 $dbh->do(<<EOS);
-  CREATE TABLE event (
-    id number NOT NULL,
-    starts_at date NOT NULL,
-    created_on $timestamp_datatype NOT NULL,
-    varchar_date varchar(20),
-    varchar_datetime varchar(20),
-    skip_inflation date,
-    ts_without_tz date,
-    PRIMARY KEY (id)
+  CREATE TABLE ${q}event${q} (
+    ${q}id${q} number NOT NULL,
+    ${q}starts_at${q} date NOT NULL,
+    ${q}created_on${q} $timestamp_datatype NOT NULL,
+    ${q}varchar_date${q} varchar(20),
+    ${q}varchar_datetime${q} varchar(20),
+    ${q}skip_inflation${q} date,
+    ${q}ts_without_tz${q} date,
+    PRIMARY KEY (${q}id${q})
   )
 EOS
 
@@ -114,7 +119,8 @@ done_testing;
 # clean up our mess
 END {
   if($schema && (my $dbh = $schema->storage->dbh)) {
-    $dbh->do("DROP TABLE event");
+    my $q = $schema->storage->sql_maker->quote_char || '';
+    $dbh->do("DROP TABLE ${q}event${q}");
   }
   undef $schema;
 }

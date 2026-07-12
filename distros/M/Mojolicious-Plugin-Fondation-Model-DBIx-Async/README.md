@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Model::DBIx::Async - Fondation plugin exposing D
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ version 0.02
                         },
                     ],
                     models => {
-                        user => { source => 'users' },
+                        user => { source => 'User' },
                     },
                 }},
             ],
@@ -112,7 +112,7 @@ can help there.
         ],
         default_backend => 'main',            # optional
         models => {
-            user    => { source => 'users' },
+            user    => { source => 'User' },
             article => { source => 'articles', backend => 'main' },
             log     => { source => 'logs',    backend => 'logs' },
         },
@@ -180,7 +180,7 @@ before the async worker responds.
 ## model\_config
 
     my $cfg = $c->model_config('user');
-    # { name => 'user', source => 'users', backend => 'main' }
+    # { name => 'user', source => 'User', backend => 'main' }
 
 Returns model metadata.
 

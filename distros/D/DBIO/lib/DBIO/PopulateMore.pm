@@ -129,7 +129,7 @@ DBIO::PopulateMore - Enhanced populate with cross-source references
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,8 @@ Then:
           jane => ['jane', 40, '!Index:Gender.female'],
         }}},
   ]);
+
+See F<t/populate_more.t> for a runnable example of the C<!Index:> cross-reference.
 
 =head1 DESCRIPTION
 

@@ -8,6 +8,10 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
+t/01-exception.t
+t/02-useragent.t
+t/03-api.t
+t/lib/MockUA.pm
 t/manifest.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

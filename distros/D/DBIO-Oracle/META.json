@@ -27,7 +27,8 @@
       },
       "runtime" : {
          "requires" : {
-            "DBIO" : "0.900000",
+            "DBD::Oracle" : "0",
+            "DBIO" : "0.900001",
             "DateTime::Format::Oracle" : "0",
             "Math::Base36" : "0.07",
             "perl" : "5.020"
@@ -43,107 +44,111 @@
    "provides" : {
       "DBIO::Oracle" : {
          "file" : "lib/DBIO/Oracle.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::DDL" : {
          "file" : "lib/DBIO/Oracle/DDL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Deploy" : {
          "file" : "lib/DBIO/Oracle/Deploy.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Diff" : {
          "file" : "lib/DBIO/Oracle/Diff.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Diff::Column" : {
          "file" : "lib/DBIO/Oracle/Diff/Column.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Diff::Index" : {
          "file" : "lib/DBIO/Oracle/Diff/Index.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Diff::Table" : {
          "file" : "lib/DBIO/Oracle/Diff/Table.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Identifier" : {
          "file" : "lib/DBIO/Oracle/Identifier.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Introspect" : {
          "file" : "lib/DBIO/Oracle/Introspect.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Introspect::Columns" : {
          "file" : "lib/DBIO/Oracle/Introspect/Columns.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Introspect::ForeignKeys" : {
          "file" : "lib/DBIO/Oracle/Introspect/ForeignKeys.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Introspect::Indexes" : {
          "file" : "lib/DBIO/Oracle/Introspect/Indexes.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Introspect::Keys" : {
          "file" : "lib/DBIO/Oracle/Introspect/Keys.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Introspect::Tables" : {
          "file" : "lib/DBIO/Oracle/Introspect/Tables.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::SQLMaker" : {
          "file" : "lib/DBIO/Oracle/SQLMaker.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::SQLMaker::Joins" : {
          "file" : "lib/DBIO/Oracle/SQLMaker/Joins.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage" : {
          "file" : "lib/DBIO/Oracle/Storage.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage::AutoIncrement" : {
          "file" : "lib/DBIO/Oracle/Storage/AutoIncrement.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage::ConnectSetup" : {
          "file" : "lib/DBIO/Oracle/Storage/ConnectSetup.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage::FKDeferral" : {
          "file" : "lib/DBIO/Oracle/Storage/FKDeferral.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage::LOBSupport" : {
          "file" : "lib/DBIO/Oracle/Storage/LOBSupport.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage::Savepoints" : {
          "file" : "lib/DBIO/Oracle/Storage/Savepoints.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Storage::WhereJoins" : {
          "file" : "lib/DBIO/Oracle/Storage/WhereJoins.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Test::SequenceTest" : {
          "file" : "lib/DBIO/Oracle/Test/SequenceTest.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Oracle::Type" : {
          "file" : "lib/DBIO/Oracle/Type.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
+      },
+      "DBIO::PK::Auto::Oracle" : {
+         "file" : "lib/DBIO/PK/Auto/Oracle.pm",
+         "version" : "0.900001"
       },
       "DBIO::Shortcut::ora" : {
          "file" : "lib/DBIO/Shortcut/ora.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -158,7 +163,7 @@
          "web" : "https://codeberg.org/dbio/dbio-oracle"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -270,7 +275,6 @@
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
             "config" : {
-               "Dist::Zilla::Plugin::PkgVersion" : {},
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
@@ -279,23 +283,7 @@
                   "global" : 0,
                   "skip_version_provider" : 0
                },
-               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {
-                  "_fallback_version_provider_args" : {
-                     "first_version" : "0.900000"
-                  },
-                  "fallback_version_provider" : "Git::NextVersion"
-               },
-               "Git::NextVersion" : {
-                  "Dist::Zilla::Plugin::Git::NextVersion" : {
-                     "first_version" : "0.900000",
-                     "version_by_branch" : 0,
-                     "version_regexp" : "(?^:^v(.+)$)"
-                  },
-                  "Dist::Zilla::Role::Git::Repo" : {
-                     "git_version" : "2.39.5",
-                     "repo_root" : "."
-                  }
-               }
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "@DBIO/@Git::VersionManager/RewriteVersion::Transitional",
             "version" : "0.009"
@@ -351,7 +339,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -513,6 +501,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

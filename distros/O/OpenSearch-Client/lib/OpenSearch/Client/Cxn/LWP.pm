@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Cxn::LWP;
-$OpenSearch::Client::Cxn::LWP::VERSION = '3.007006';
+$OpenSearch::Client::Cxn::LWP::VERSION = '3.007007';
 use Moo;
 with 'OpenSearch::Client::Role::Cxn', 'OpenSearch::Client::Role::Is_Sync';
 
@@ -100,22 +100,20 @@ sub _build_handle {
             : { SSL_verify_mode => 0x01 };          
     }
     
-    {
-        my $proxy;
-        if ( $self->has_http_proxy ) {
-            $proxy->{http} = $self->http_proxy;
-        }
-
-        if ( $self->has_https_proxy ) {
-            $proxy->{https} = $self->https_proxy;
-        }
-        
-        $args{proxy} = [ %$proxy ] if $proxy;
+    my $proxy;
+    
+    if ( $self->has_http_proxy ) {
+        $proxy->{http} = $self->http_proxy;
     }
     
-    $args{no_proxy} = $self->no_proxy if $self->has_no_proxy;
+    if ( $self->has_https_proxy ) {
+        $proxy->{https} = $self->https_proxy;
+    }
     
+    $args{proxy} = [ %$proxy ] if $proxy;
+    $args{no_proxy} = $self->no_proxy if $self->has_no_proxy;
     return LWP::UserAgent->new( %args, %{ $self->handle_args } );
+
 }
 
 1;
@@ -132,7 +130,7 @@ OpenSearch::Client::Cxn::LWP - A Cxn implementation which uses LWP
 
 =head1 VERSION
 
-version 3.007006
+version 3.007007
 
 =head1 DESCRIPTION
 

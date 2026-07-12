@@ -62,7 +62,7 @@ DBIO::ResultClass::HashRefInflator - Get raw hashrefs from a resultset
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ version 0.900000
  while (my $hashref = $rs->next) {
    ...
  }
+
+See F<t/resultset/hashref_inflator.t> for a runnable example of both
+invocation styles shown above.
 
 =head1 DESCRIPTION
 

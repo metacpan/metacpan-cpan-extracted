@@ -109,7 +109,7 @@ DBIO::Storage::Debug::PrettyTrace - Pretty Tracing DebugObj
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,8 @@ Where dbio.json contains:
    "show_progress":1,
    "squash_repeats":1
  }
+
+See F<t/debug/pretty.t> for a runnable example.
 
 =head1 METHODS
 

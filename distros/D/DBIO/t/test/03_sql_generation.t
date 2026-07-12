@@ -13,7 +13,7 @@ my $schema = DBIO::Test->init_schema;
 
   is_same_sql_bind(
     $q->[0], [ @{$q}[1..$#$q] ],
-    '(SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me WHERE name = ?)',
+    '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me" WHERE "name" = ?)',
     [[ { sqlt_datatype => 'varchar', dbic_colname => 'name', sqlt_size => 100 } => 'foo' ]],
     'simple WHERE generates correct SQL'
   );
@@ -28,7 +28,7 @@ my $schema = DBIO::Test->init_schema;
 
   is_same_sql(
     $q->[0],
-    '(SELECT me.artistid, me.name FROM artist me)',
+    '(SELECT "me"."artistid", "me"."name" FROM "artist" "me")',
     'column restriction works'
   );
 }
@@ -43,7 +43,7 @@ my $schema = DBIO::Test->init_schema;
 
   is_same_sql(
     $q->[0],
-    '(SELECT me.cdid, me.title FROM cd me JOIN artist artist ON artist.artistid = me.artist WHERE artist.name = ?)',
+    '(SELECT "me"."cdid", "me"."title" FROM cd "me" JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist" WHERE "artist"."name" = ?)',
     'join generates correct SQL'
   );
 }
@@ -59,7 +59,7 @@ my $schema = DBIO::Test->init_schema;
   });
 
   my $q = ${$rs->as_query};
-  like $q->[0], qr/WHERE.*artist IN.*SELECT/i, 'subquery in WHERE clause';
+  like $q->[0], qr/WHERE.*"artist" IN.*SELECT/i, 'subquery in WHERE clause';
 }
 
 # ORDER BY
@@ -71,7 +71,7 @@ my $schema = DBIO::Test->init_schema;
 
   is_same_sql(
     $q->[0],
-    '(SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me ORDER BY name DESC)',
+    '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me" ORDER BY "name" DESC)',
     'ORDER BY works'
   );
 }
@@ -108,7 +108,7 @@ my $schema = DBIO::Test->init_schema;
 
   is_same_sql(
     $count_q->[0],
-    '(SELECT COUNT(*) FROM artist me WHERE rank = ?)',
+    '(SELECT COUNT(*) FROM "artist" "me" WHERE "rank" = ?)',
     'count generates correct SQL'
   );
 }

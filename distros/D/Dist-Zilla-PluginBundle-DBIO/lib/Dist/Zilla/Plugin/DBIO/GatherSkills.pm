@@ -79,7 +79,7 @@ Dist::Zilla::Plugin::DBIO::GatherSkills - Ship a distribution's own agent skills
 
 =head1 VERSION
 
-version 0.900002
+version 0.900003
 
 =head1 DESCRIPTION
 

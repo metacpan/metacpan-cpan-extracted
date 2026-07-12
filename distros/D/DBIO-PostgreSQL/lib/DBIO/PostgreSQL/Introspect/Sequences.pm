@@ -81,7 +81,7 @@ DBIO::PostgreSQL::Introspect::Sequences - Introspect PostgreSQL sequences
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

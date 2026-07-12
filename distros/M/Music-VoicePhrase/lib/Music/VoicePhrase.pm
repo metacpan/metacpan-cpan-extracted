@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct measured phrases of notes
 
-our $VERSION = '0.0117';
+our $VERSION = '0.0118';
 
 use v5.36;
 use Moo;
@@ -157,6 +157,13 @@ has voices => (
 );
 
 
+has name => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a valid part name" unless defined $_[0] },
+    default => sub { 'part' },
+);
+
+
 has patch => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not a valid patch" unless $_[0] =~ /^[0-9]+$/ },
@@ -251,7 +258,7 @@ Music::VoicePhrase - Construct measured phrases of notes
 
 =head1 VERSION
 
-version 0.0117
+version 0.0118
 
 =head1 SYNOPSIS
 
@@ -394,6 +401,14 @@ Default: C<4> motifs
 The pitches given by L<Music::VoiceGen>.
 
 Default: C<4> voices
+
+=head2 name
+
+  $name = $mvp->name;
+
+Name for the given part, used in real-time processing.
+
+Default: C<'part'>
 
 =head2 patch
 

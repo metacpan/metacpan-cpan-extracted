@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::SQLite",
   "PREREQ_PM" => {
     "DBD::SQLite" => 0,
-    "DBIO" => "0.900000",
+    "DBIO" => "0.900001",
     "DateTime::Format::SQLite" => 0
   },
   "TEST_REQUIRES" => {
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.900000",
+  "VERSION" => "0.900001",
   "test" => {
     "TESTS" => "t/*.t t/count/*.t t/debug/*.t t/delete/*.t t/helpers/*.t t/inflate/*.t t/multi_create/*.t t/ordered/*.t t/pager/*.t t/prefetch/*.t t/relationship/*.t t/resultset/*.t t/resultsource/*.t t/row/*.t t/schema/*.t t/search/*.t t/sqlmaker/*.t t/sqlmaker/limit_dialects/*.t t/storage/*.t t/update/*.t"
   }
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
-  "DBIO" => "0.900000",
+  "DBIO" => "0.900001",
   "DateTime::Format::SQLite" => 0,
   "File::Temp" => 0,
   "Math::BigInt" => 0,

@@ -31,8 +31,9 @@ new(class, path, max, ...)
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
     uint32_t initial = (items > 3) ? (uint32_t)SvUV(ST(3)) : (uint32_t)max;
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    SyncHandle *h = sync_create(p, SYNC_TYPE_SEMAPHORE, (uint32_t)max, initial, errbuf);
+    mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    SyncHandle *h = sync_create(p, SYNC_TYPE_SEMAPHORE, (uint32_t)max, initial, mode, errbuf);
     if (!h) croak("Data::Sync::Shared::Semaphore->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -288,15 +289,16 @@ MODULE = Data::Sync::Shared  PACKAGE = Data::Sync::Shared::Barrier
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, parties)
+new(class, path, parties, ...)
     const char *class
     SV *path
     UV parties
   PREINIT:
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    SyncHandle *h = sync_create(p, SYNC_TYPE_BARRIER, (uint32_t)parties, 0, errbuf);
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    SyncHandle *h = sync_create(p, SYNC_TYPE_BARRIER, (uint32_t)parties, 0, mode, errbuf);
     if (!h) croak("Data::Sync::Shared::Barrier->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -521,14 +523,15 @@ MODULE = Data::Sync::Shared  PACKAGE = Data::Sync::Shared::RWLock
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path)
+new(class, path, ...)
     const char *class
     SV *path
   PREINIT:
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    SyncHandle *h = sync_create(p, SYNC_TYPE_RWLOCK, 0, 0, errbuf);
+    mode_t mode = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) ? (mode_t)SvUV(ST(2)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    SyncHandle *h = sync_create(p, SYNC_TYPE_RWLOCK, 0, 0, mode, errbuf);
     if (!h) croak("Data::Sync::Shared::RWLock->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -805,14 +808,15 @@ MODULE = Data::Sync::Shared  PACKAGE = Data::Sync::Shared::Condvar
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path)
+new(class, path, ...)
     const char *class
     SV *path
   PREINIT:
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    SyncHandle *h = sync_create(p, SYNC_TYPE_CONDVAR, 0, 0, errbuf);
+    mode_t mode = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) ? (mode_t)SvUV(ST(2)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    SyncHandle *h = sync_create(p, SYNC_TYPE_CONDVAR, 0, 0, mode, errbuf);
     if (!h) croak("Data::Sync::Shared::Condvar->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -1030,14 +1034,15 @@ MODULE = Data::Sync::Shared  PACKAGE = Data::Sync::Shared::Once
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path)
+new(class, path, ...)
     const char *class
     SV *path
   PREINIT:
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    SyncHandle *h = sync_create(p, SYNC_TYPE_ONCE, 0, 0, errbuf);
+    mode_t mode = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) ? (mode_t)SvUV(ST(2)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    SyncHandle *h = sync_create(p, SYNC_TYPE_ONCE, 0, 0, mode, errbuf);
     if (!h) croak("Data::Sync::Shared::Once->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:

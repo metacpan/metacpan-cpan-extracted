@@ -35,11 +35,10 @@ if(-e 't/online.enabled') {
 	);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
-	eval {
-		my $t = $l->time_zone();
-		die "Shouldn't succeed";
-	};
-	like($@, qr/^You must have LWP::Simple::WithCache/, 'Need connection to ip-api.com');
+	# time_zone() degrades gracefully when both LWP variants are absent:
+	# it warns via the logger and returns undef rather than croaking.
+	my $t = $l->time_zone();
+	is($t, undef, 'time_zone() returns undef when LWP::Simple::WithCache and LWP::Simple are absent');
 } else {
 	plan skip_all => 'On-line tests disabled';
 }

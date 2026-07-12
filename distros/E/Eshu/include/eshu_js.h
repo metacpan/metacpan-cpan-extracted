@@ -19,19 +19,31 @@
 
 typedef struct {
 	int             depth;
+	int             case_depth;       /* depth at which last case/default was seen */
+	int             case_extra;       /* 1 = add extra indent to case body lines  */
+	int             suppressed_parens; /* unclosed ( whose depth was suppressed   */
+	int             line_paren_delta;  /* net ( opens on current line             */
+	int             line_brace_delta;  /* net { opens on current line             */
+	int             line_bracket_delta;/* net [ opens on current line             */
 	enum eshu_state state;
 	int             tmpl_depth;
 	int             tmpl_brace_depth[ESHU_JS_MAX_TMPL_DEPTH];
-	int             can_regex;   /* 1 if next / starts a regex */
+	int             can_regex;         /* 1 if next / starts a regex              */
 	eshu_config_t   cfg;
 } eshu_js_ctx_t;
 
 static void eshu_js_ctx_init(eshu_js_ctx_t *ctx, const eshu_config_t *cfg) {
-	ctx->depth      = 0;
-	ctx->state      = ESHU_CODE;
-	ctx->tmpl_depth = 0;
-	ctx->can_regex  = 1;
-	ctx->cfg        = *cfg;
+	ctx->depth              = 0;
+	ctx->case_depth         = 0;
+	ctx->case_extra         = 0;
+	ctx->suppressed_parens  = 0;
+	ctx->line_paren_delta   = 0;
+	ctx->line_brace_delta   = 0;
+	ctx->line_bracket_delta = 0;
+	ctx->state              = ESHU_CODE;
+	ctx->tmpl_depth         = 0;
+	ctx->can_regex          = 1;
+	ctx->cfg                = *cfg;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -40,6 +52,40 @@ static void eshu_js_ctx_init(eshu_js_ctx_t *ctx, const eshu_config_t *cfg) {
 
 static int eshu_js_is_closing(char c) {
 	return c == '}' || c == ')' || c == ']';
+}
+
+/* Is this line a switch case/default label?
+ * Case labels stay at brace depth; body content gets +1 via case_extra. */
+static int eshu_js_is_case_label(const char *content, int len) {
+	const char *p, *end;
+	int is_kw = 0;
+
+	if (len < 2) return 0;
+
+	if (len >= 5 && strncmp(content, "case ", 5) == 0)
+		is_kw = 1;
+	else if (len >= 7 && strncmp(content, "default", 7) == 0 &&
+	         (len == 7 || content[7] == ':' || content[7] == ' ' ||
+	          content[7] == '\t' || content[7] == '/'))
+		is_kw = 1;
+
+	if (!is_kw) return 0;
+
+	p   = content;
+	end = content + len;
+	while (p < end) {
+		if (*p == '/' && p + 1 < end && *(p + 1) == '/') { end = p; break; }
+		if (*p == '"' || *p == '\'') {
+			char d = *p++;
+			while (p < end && *p != d) {
+				if (*p == '\\') p++;
+				p++;
+			}
+		}
+		p++;
+	}
+	while (end > content && (*(end - 1) == ' ' || *(end - 1) == '\t')) end--;
+	return end > content && *(end - 1) == ':';
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -57,12 +103,19 @@ static void eshu_js_scan_line(eshu_js_ctx_t *ctx,
 		switch (ctx->state) {
 
 		case ESHU_CODE:
-			if (c == '{' || c == '(' || c == '[') {
+			if (c == '{') {
 				ctx->depth++;
+				ctx->line_brace_delta++;
+				ctx->can_regex = 1;
+			} else if (c == '(' || c == '[') {
+				ctx->depth++;
+				if (c == '(') ctx->line_paren_delta++;
+				else ctx->line_bracket_delta++;
 				ctx->can_regex = 1;
 			} else if (c == '}') {
 				ctx->depth--;
 				if (ctx->depth < 0) ctx->depth = 0;
+				ctx->line_brace_delta--;
 				/* Check if this closes a template expression */
 				if (ctx->tmpl_depth > 0 &&
 				    ctx->depth == ctx->tmpl_brace_depth[ctx->tmpl_depth - 1]) {
@@ -72,9 +125,22 @@ static void eshu_js_scan_line(eshu_js_ctx_t *ctx,
 					break;
 				}
 				ctx->can_regex = 0;
-			} else if (c == ')' || c == ']') {
+			} else if (c == ']') {
 				ctx->depth--;
 				if (ctx->depth < 0) ctx->depth = 0;
+				ctx->line_bracket_delta--;
+				ctx->can_regex = 0;
+			} else if (c == ')') {
+				if (ctx->line_paren_delta > 0) {
+					ctx->line_paren_delta--;
+					ctx->depth--;
+					if (ctx->depth < 0) ctx->depth = 0;
+				} else if (ctx->suppressed_parens > 0) {
+					ctx->suppressed_parens--;
+				} else {
+					ctx->depth--;
+					if (ctx->depth < 0) ctx->depth = 0;
+				}
 				ctx->can_regex = 0;
 			} else if (c == '"') {
 				ctx->state = ESHU_STRING_DQ;
@@ -240,10 +306,25 @@ static void eshu_js_process_line(eshu_js_ctx_t *ctx, eshu_buf_t *out,
 	/* Normal code line */
 	indent_depth = ctx->depth;
 
-	/* If line starts with closer, dedent this line */
-	if (eshu_js_is_closing(*content)) {
+	/* Leaving a case block: clear case_extra once depth drops below case_depth */
+	if (ctx->case_extra && ctx->depth < ctx->case_depth)
+		ctx->case_extra = 0;
+
+	if (*content == ')' && ctx->suppressed_parens > 0) {
+		/* suppressed paren — don't dedent */
+	} else if (eshu_js_is_closing(*content)) {
 		indent_depth--;
 		if (indent_depth < 0) indent_depth = 0;
+		/* still inside a case block at deeper nesting */
+		if (ctx->case_extra && ctx->depth > ctx->case_depth)
+			indent_depth++;
+	} else if (eshu_js_is_case_label(content, line_len)) {
+		/* case/default label: stays at brace depth; body lines get +1 */
+		ctx->case_depth = ctx->depth;
+		ctx->case_extra = 1;
+	} else if (ctx->case_extra && ctx->depth >= ctx->case_depth) {
+		/* body line inside a case block: add one extra indent level */
+		indent_depth++;
 	}
 
 	eshu_emit_indent(out, indent_depth, &ctx->cfg);
@@ -251,7 +332,19 @@ static void eshu_js_process_line(eshu_js_ctx_t *ctx, eshu_buf_t *out,
 	eshu_buf_putc(out, '\n');
 
 	/* Scan for nesting changes */
+	ctx->line_paren_delta   = 0;
+	ctx->line_brace_delta   = 0;
+	ctx->line_bracket_delta = 0;
 	eshu_js_scan_line(ctx, content, eol);
+
+	/* Suppress unmatched ( when { or [ also opened on the same line.
+	 * e.g. foo((x) => { or foo((x) => [ — the outer ( is just call syntax,
+	 * only the { or [ should add structural indentation. */
+	if (ctx->line_paren_delta > 0 &&
+	    (ctx->line_brace_delta > 0 || ctx->line_bracket_delta > 0)) {
+		ctx->depth -= ctx->line_paren_delta;
+		ctx->suppressed_parens += ctx->line_paren_delta;
+	}
 }
 
 /* ══════════════════════════════════════════════════════════════════

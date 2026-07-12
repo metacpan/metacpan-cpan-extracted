@@ -4,6 +4,10 @@ package DBIO::Diff::Base;
 use strict;
 use warnings;
 
+our $CONTRACT_VERSION = '1.1';
+
+
+sub contract_version { $CONTRACT_VERSION }
 
 sub new { my ($class, %args) = @_; bless \%args, $class }
 
@@ -53,7 +57,7 @@ DBIO::Diff::Base - Base class for DBIO driver diff orchestrators
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -96,6 +100,24 @@ Returns all diff operations concatenated as a SQL migration script.
     my $text = $diff->summary;
 
 Returns a human-readable summary of all diff operations.
+
+=head1 CONTRACT VERSION
+
+This class exposes an independent compatibility version, distinct from
+C<$VERSION> (the dist version injected by L<Dist::Zilla>'s
+C<VersionFromMainModule>):
+
+    my $v = $class->contract_version;
+
+C<$CONTRACT_VERSION> bumps when the diff orchestrator's public interface
+(C<source>, C<target>, C<operations>, C<has_changes>, C<as_sql>,
+C<summary>) or the operation-object contract (L<DBIO::Diff::Op>) changes.
+The dist C<$VERSION> bumps on every release, but two core releases at the
+same contract version remain wire-compatible. Out-of-tree drivers should
+record the contract version they were last tested against and compare it
+against core's at load time, warning (or strict-failing under
+C<DBIO_STRICT_CONTRACT>) when the shapes have drifted. See F<docs/adr/>
+for the contract-version policy.
 
 =head1 AUTHOR
 

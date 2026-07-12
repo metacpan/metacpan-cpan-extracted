@@ -20,7 +20,7 @@ DBIO::Shortcut::db2 - `use DBIO -db2` shortcut for the DB2 driver
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

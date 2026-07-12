@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::PostGIS::Geometry;
 use strict;
 use warnings;
 
-use Carp ();
+use DBIO::Exception ();
 use DBIO::PostgreSQL::PostGIS::Codec::WKT::Parser  ();
 use DBIO::PostgreSQL::PostGIS::Codec::WKT::Builder ();
 use DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder ();
@@ -25,7 +25,7 @@ sub new {
 
 sub from_wkt {
   my ($class, $wkt, %args) = @_;
-  Carp::croak "from_wkt requires a WKT string" unless defined $wkt;
+  DBIO::Exception->throw("from_wkt requires a WKT string") unless defined $wkt;
   my $parsed = DBIO::PostgreSQL::PostGIS::Codec::WKT::Parser->parse($wkt);
   return $class->new(
     wkt           => $wkt,
@@ -38,7 +38,7 @@ sub from_wkt {
 
 sub from_ewkt {
   my ($class, $ewkt) = @_;
-  Carp::croak "from_ewkt requires an EWKT string" unless defined $ewkt;
+  DBIO::Exception->throw("from_ewkt requires an EWKT string") unless defined $ewkt;
   if ($ewkt =~ /\ASRID=(\d+);(.+)\z/s) {
     return $class->new(srid => $1, wkt => $2);
   }
@@ -107,7 +107,8 @@ sub bbox_polygon {
 sub from_geojson {
   my ($class, $gj, %args) = @_;
   my $srid = exists $args{srid} ? $args{srid} : 4326;
-  my $type = $gj->{type} or Carp::croak "from_geojson: missing 'type'";
+  my $type = $gj->{type}
+    or DBIO::Exception->throw("from_geojson: missing 'type'");
   my $coords = $gj->{coordinates};
   my $wkt;
   if ($type eq 'Point') {
@@ -133,7 +134,7 @@ sub from_geojson {
       . ')';
   }
   else {
-    Carp::croak "from_geojson: unsupported type '$type'";
+    DBIO::Exception->throw("from_geojson: unsupported type '$type'");
   }
   return $class->new(
     wkt           => $wkt,
@@ -262,7 +263,7 @@ DBIO::PostgreSQL::PostGIS::Geometry - Lightweight PostGIS geometry/geography val
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

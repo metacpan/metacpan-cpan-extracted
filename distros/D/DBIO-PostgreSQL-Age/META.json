@@ -22,13 +22,15 @@
       },
       "develop" : {
          "recommends" : {
+            "DBIO::PostgreSQL::EV" : "0.900001",
+            "DBIO::PostgreSQL::PostGIS" : "0.900001",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          }
       },
       "runtime" : {
          "requires" : {
-            "DBIO" : "0.900000",
-            "DBIO::PostgreSQL" : "0.900000",
+            "DBIO" : "0.900001",
+            "DBIO::PostgreSQL" : "0.900001",
             "perl" : "5.020"
          }
       },
@@ -42,11 +44,15 @@
    "provides" : {
       "DBIO::PostgreSQL::Age" : {
          "file" : "lib/DBIO/PostgreSQL/Age.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Age::Storage" : {
          "file" : "lib/DBIO/PostgreSQL/Age/Storage.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
+      },
+      "DBIO::PostgreSQL::Age::Storage::Async" : {
+         "file" : "lib/DBIO/PostgreSQL/Age/Storage/Async.pm",
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -61,7 +67,7 @@
          "web" : "https://codeberg.org/dbio/dbio-postgresql-age"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -237,7 +243,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -399,6 +405,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

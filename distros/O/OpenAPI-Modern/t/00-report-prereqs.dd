@@ -11,10 +11,7 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
-                                      'File::Spec' => '0',
                                       'Getopt::Long::Descriptive' => '0',
-                                      'IO::Handle' => '0',
-                                      'IPC::Open3' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test2::Plugin::SubtestFilter' => '0',
                                       'Test2::Warnings' => '0',
@@ -82,23 +79,15 @@ do { my $x = {
                    'requires' => {
                                    'CPAN::Meta::Check' => '0.011',
                                    'CPAN::Meta::Requirements' => '0',
-                                   'File::Spec' => '0',
-                                   'JSON::Schema::Modern' => '0.640',
-                                   'Module::Metadata' => '0',
-                                   'Mojolicious' => '0',
-                                   'Term::ANSIColor' => '0',
-                                   'Test2::API' => '0',
                                    'Test2::V0' => '0',
                                    'Test2::Warnings' => '0.038',
                                    'Test::Deep' => '0',
                                    'Test::File::ShareDir' => '0',
                                    'Test::JSON::Schema::Acceptance' => '1.014',
                                    'Test::Memory::Cycle' => '0',
-                                   'Test::Mojo' => '0',
                                    'Test::More' => '0',
                                    'Test::Needs' => '0',
                                    'YAML::PP' => '0.005',
-                                   'lib' => '0',
                                    'perl' => '5.020'
                                  }
                  },

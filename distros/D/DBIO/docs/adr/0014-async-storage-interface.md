@@ -1,6 +1,6 @@
 # ADR 0014 — Async storage interface (Future-returning, sync-degrading)
 
-- Status: accepted
+- Status: accepted — binding model superseded in part by [ADR 0030](0030-async-explicit-per-connection-mode.md)
 - Date: 2026-06-19
 - Tags: async, future, storage, pool, drivers, backfill
 
@@ -97,6 +97,36 @@ on a production default is a genuine smell worth flagging, not an accident.
 
 ## Future architecture work (tracked cross-repo, not here)
 
+- **Binding model superseded by [ADR 0030](0030-async-explicit-per-connection-mode.md).**
+  The `*_async`-degrade contract, the `DBIO::Storage::Async` abstract base and the
+  `PoolBase` tier described here all stand. What 0030 replaces is *how a real
+  non-blocking driver is selected and bound*: not a disjoint async `storage_type`
+  chosen at schema-author time (the `connection()` → `storage_type(...)` hijack
+  above), but an explicit per-connection `{ async => 'mode' }` choice resolved
+  through a mode registry, so one schema class runs sync and several async modes
+  side by side. The always-on silent degrade described here survives only as the
+  explicit `immediate` mode. Read 0030 before relying on the binding or degrade
+  mechanism described in this ADR.
+- **"Separate dist per loop" framing superseded — one shared `dbio-async`
+  backend, loop chosen via `Future::IO::Impl::*`.** The Decision above frames a
+  real non-blocking driver as a separate storage dist *per event loop*
+  (`dbio-postgresql-async` / `dbio-mysql-async`, with `DBIO::EV::Pg::Storage` /
+  `Net::Async::DBIO::Storage` / `Mojo::DBIO::Storage` as the per-loop backend list
+  in `DBIO::Storage::Async`'s POD). That framing is superseded: there is now ONE
+  shared, loop-agnostic backend — `DBIO::Async::Storage` in the `dbio-async` dist —
+  driving the driver's own non-blocking DBD binding through `Future::IO`, with the
+  event loop chosen by installing a `Future::IO::Impl::*` adapter (`IO::Poll`
+  built-in default; IO::Async / AnyEvent / Mojo / UV / Glib optional), **not** by
+  picking a different dist. It is registered as the `future_io` mode ([ADR 0030](0030-async-explicit-per-connection-mode.md) §2);
+  the loop-bound native-client route survives as the driver-resolved `ev` mode
+  (`DBIO::PostgreSQL::EV::Storage` / `DBIO::MySQL::EV::Storage`, the renamed
+  `-async` dists). The stale per-loop backend list and the class-name binding
+  example in `DBIO::Storage::Async`'s POD have been corrected accordingly. Detail:
+  dbio-async ADR 0004 (`docs/adr/0004-dbio-async-generic-future-io-layer.md` in the
+  dbio-async repo). Only the framing of how a real driver is structured changes —
+  the contracts in this ADR (the `*_async` degrade, the `DBIO::Storage::Async`
+  abstract base, the `PoolBase` tier, the `DBIO::Future` duck-type, no event-loop
+  hard require) are unaffected.
 - **Async storage as a CredentialSource consumer.** CONTEXT.md:58 records async
   as a "planned-but-unwired second" consumer of the AccessBroker seam (ADR 0013).
   The core abstract `DBIO::Storage::Async` indeed references no broker. But the

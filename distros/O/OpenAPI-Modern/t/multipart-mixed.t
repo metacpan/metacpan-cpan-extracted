@@ -15,8 +15,8 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
 use Helper;
-use Test2::Warnings qw(:no_end_test warnings had_no_warnings);
 use JSON::Schema::Modern::Utilities 'jsonp';
+use Mojo::UserAgent::Transactor;
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
@@ -27,7 +27,11 @@ START:
 $::TYPE = $::TYPES[$type_index];
 note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
-subtest $::TYPE.': multipart/mixed' => sub {
+subtest $::TYPE.': corrupt or unsupported multipart/mixed' => sub {
+  skip_all 'there is no nice way to construct a multipart/mixed in lwp' if $::TYPE eq 'lwp';
+  skip_all 'Plack insists on parsing a multipart/mixed message body'
+    if elem($::TYPE, [qw(plack catalyst dancer2)]);
+
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
@@ -48,6 +52,7 @@ YAML
 
   my $result = $openapi->validate_request(request('POST', 'http://example.com/supported',
     [ 'Content-Type' => 'multipart/mixed' ], '!!!'));
+
   is_equal(
     [
       $result->TO_JSON,
@@ -55,18 +60,20 @@ YAML
     ],
     [
       { valid => true },
-      { request => { body => { content => '!!!' } } },
+      { request => { body => { content => 'TODO' } } },
     ],
-    'multipart/mixed messages can be validated if there is no body schema',
+    'multipart/mixed messages are valid if there is no body schema',
   );
+
   $result = $openapi->validate_request(request('POST', 'http://example.com/unsupported',
     [ 'Content-Type' => 'multipart/mixed' ], '!!!'));
+
   is_equal(
     [
       $result->TO_JSON,
       $result->data,
     ],
-    [
+    my $result_data = [
       {
         valid => false,
         errors => [
@@ -80,7 +87,41 @@ YAML
       },
       {},
     ],
-    'multipart/mixed messages cannot be validated when there is a body schema',
+    'multipart/mixed messages are not valid when there is a body schema',
+  );
+
+
+  my $request = Mojo::UserAgent::Transactor->new->tx(POST => 'http://example.com/supported',
+    { 'Content-Type' => 'multipart/mixed' }, multipart => [ 'alpha', '42' ])->req;
+  $request->fix_headers;
+
+  $result = $openapi->validate_request($request);
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      { request => { body => { content => 'TODO' } } },
+    ],
+    'multipart/mixed messages with a real multipart body are valid if there is no body schema',
+  );
+
+  $request = Mojo::UserAgent::Transactor->new->tx(POST => 'http://example.com/unsupported',
+    { 'Content-Type' => 'multipart/mixed' }, multipart => [ 'alpha', '42' ])->req;
+  $request->fix_headers;
+
+  $result = $openapi->validate_request($request);
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    $result_data,
+    'multipart/mixed messages with a real multipart body are not valid when there is a body schema',
   );
 };
 
@@ -89,5 +130,4 @@ if (++$type_index < @::TYPES) {
   goto START;
 }
 
-had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

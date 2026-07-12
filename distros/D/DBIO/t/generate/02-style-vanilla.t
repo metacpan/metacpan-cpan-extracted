@@ -30,16 +30,16 @@ my $spec = {
 
 my $code = DBIO::Generate::Style::Vanilla->emit($spec);
 
-like $code, qr/^package My::Schema::Result::Artist;/m, 'package declaration';
-like $code, qr/use base 'DBIO::Core';/,               'use base';
-like $code, qr/__PACKAGE__->table\('artists'\);/,      'table call';
-like $code, qr/__PACKAGE__->add_columns\(/,            'add_columns call';
-like $code, qr/id\s*=>/,                               'id column';
-like $code, qr/name\s*=>/,                             'name column';
-like $code, qr/__PACKAGE__->set_primary_key\('id'\)/,  'set_primary_key';
-like $code, qr/has_many/,                              'has_many relationship';
-like $code, qr/'cds'/,                                'rel name';
-like $code, qr/My::Schema::Result::CD/,                'remote class';
+like $code, qr/^package My::Schema::Result::Artist;/m,    'package declaration';
+like $code, qr/use base ['"]DBIO::Core['"];/,             'use base';
+like $code, qr/__PACKAGE__->table\(['"]artists['"]\);/,   'table call';
+like $code, qr/__PACKAGE__->add_columns\(/,               'add_columns call';
+like $code, qr/['"]?id['"]?\s*=>/,                        'id column';
+like $code, qr/['"]?name['"]?\s*=>/,                      'name column';
+like $code, qr/__PACKAGE__->set_primary_key\(['"]id['"]\)/, 'set_primary_key';
+like $code, qr/has_many/,                                 'has_many relationship';
+like $code, qr/['"]cds['"]/,                              'rel name';
+like $code, qr/My::Schema::Result::CD/,                   'remote class';
 like $code, qr/^1;/m,                                  'ends with 1';
 
 # Verify emitted code is valid Perl: eval it unchanged, it declares and

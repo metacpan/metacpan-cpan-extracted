@@ -12,7 +12,7 @@ MojoX::MojoDbWrap - Light wrapper around Mojo::Pg/SQLite/...
 
 =head1 VERSION
 
-This document describes MojoX::MojoDbWrap version 0.002.
+This document describes MojoX::MojoDbWrap version 0.004.
 
 =begin html
 

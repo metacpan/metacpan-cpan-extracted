@@ -12,6 +12,14 @@ use DBIO::MySQL::Introspect::Util ();
 sub fetch {
   my ($class, $dbh, $tables) = @_;
 
+  # On MySQL 8 the information_schema result-column labels come back UPPERCASE
+  # regardless of the case written in the SELECT, while MariaDB returns them
+  # lowercase. Force lowercase hash keys for this fetch so the $row->{lc} reads
+  # below (and _aggregate_by_ordered's 'table_name'/'constraint_name' keys)
+  # resolve on both engines. fetchall_arrayref({}) honours the sth's
+  # FetchHashKeyName, which is captured from the dbh at prepare time.
+  local $dbh->{FetchHashKeyName} = 'NAME_lc';
+
   my $sth = $dbh->prepare(q{
     SELECT
       kcu.table_name,
@@ -80,7 +88,7 @@ DBIO::MySQL::Introspect::ForeignKeys - Introspect MySQL/MariaDB foreign keys
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -13,7 +13,7 @@ DBIO::Manual::Features - Feature overview with links to the relevant DBIO docume
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 PROJECT
 
@@ -322,11 +322,11 @@ natively into L<DBIO::Row> and require no C<load_components> call:
 
 =back
 
-=head2 Extensibility example: DBIO::TimeStamp
+=head2 Extensibility example: DBIO::Timestamp
 
 =over 1
 
-=item See L<DBIO::TimeStamp>
+=item See L<DBIO::Timestamp>
 
 =item Cross DB
 

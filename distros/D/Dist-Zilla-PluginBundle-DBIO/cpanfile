@@ -21,4 +21,6 @@ on test => sub {
   requires 'Pod::Elemental';
   requires 'PPI';
   requires 'Software::License::Perl_5';
+  # xt/release/coverage.t loads Devel::Cover::DB at run time
+  requires 'Devel::Cover', '1.00';
 };

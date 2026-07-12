@@ -1,5 +1,9 @@
 Revision history for Data::BitSet::Shared
 
+0.04  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.03  2026-06-01
     - to_string: free temp buffer via SAVEFREEPV (leak on OOM-croak)
 

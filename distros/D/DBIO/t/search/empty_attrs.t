@@ -23,19 +23,19 @@ my $rs = $schema->resultset('Artist')->search(
 
 is_same_sql_bind(
   $rs->as_query,
-  '(SELECT me.artistid FROM artist me)',
+  '(SELECT "me"."artistid" FROM "artist" "me")',
   [],
 );
 
 is_same_sql_bind(
   $rs->count_rs->as_query,
-  '(SELECT COUNT(*) FROM artist me)',
+  '(SELECT COUNT(*) FROM "artist" "me")',
   [],
 );
 
 is_same_sql_bind(
   $rs->as_subselect_rs->search({}, { columns => 'artistid' })->as_query,
-  '(SELECT me.artistid FROM (SELECT me.artistid FROM artist me) me)',
+  '(SELECT "me"."artistid" FROM (SELECT "me"."artistid" FROM "artist" "me") "me")',
   [],
 );
 

@@ -26,7 +26,7 @@ DBIO::MSSQL::Storage::Sybase::DateTime::Format - DateTime parser for MSSQL via D
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

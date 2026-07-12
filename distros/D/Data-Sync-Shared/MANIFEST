@@ -70,6 +70,7 @@ xt/reader_starvation_guard.t
 xt/rwlock_starvation.t
 xt/signal_safety.t
 xt/sigterm_cleanup.t
+xt/slotless_reader_recovery.t
 xt/stress.t
 xt/truncation.t
 xt/tsan.t

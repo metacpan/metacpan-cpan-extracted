@@ -34,12 +34,12 @@ for (1,2) {
   is_same_sql_bind (
     $complex_rs->as_query,
     '(
-      SELECT  me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
-              (SELECT COUNT( * ) FROM cd me WHERE me.artist != ? AND me.artist != ?),
+      SELECT  "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
+              (SELECT COUNT( * ) FROM cd "me" WHERE "me"."artist" != ? AND "me"."artist" != ?),
               me.artist + ?
-        FROM cd me
-      WHERE me.artist != ? AND me.artist != ?
-      GROUP BY me.cdid, me.artist - ?
+        FROM cd "me"
+      WHERE "me"."artist" != ? AND "me"."artist" != ?
+      GROUP BY "me"."cdid", me.artist - ?
       HAVING me.artist < ?
       ORDER BY me.artist * ?
       LIMIT ? OFFSET ?
@@ -139,9 +139,9 @@ sub shorthand_check {
       group_by => ['cdid', \[ 'artist - ?', $bind_shorthand ] ],
     })->as_query,
     '(
-      SELECT me.cdid, me.artist
-        FROM cd me
-      GROUP BY cdid, artist - ?
+      SELECT "me"."cdid", "me"."artist"
+        FROM cd "me"
+      GROUP BY "cdid", artist - ?
     )',
     [ $bind_expected ],
     $testname||(),

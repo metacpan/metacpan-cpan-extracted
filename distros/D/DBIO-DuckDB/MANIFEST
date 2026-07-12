@@ -6,6 +6,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-foreign-keys-omitted-from-install-ddl.md
@@ -39,5 +40,8 @@ t/21-introspect-contract.t
 t/30-deploy.t
 t/35-ddl-emit.t
 t/40-diff.t
+t/41-diff-drop-table-index.t
 t/50-arrow.t
 t/60-quack.t
+t/70-exceptions.t
+t/release-coverage.t

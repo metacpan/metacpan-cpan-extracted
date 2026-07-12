@@ -27,6 +27,7 @@ t/4-Tk-ListBrowser-priorities.t
 t/5-Tk-ListBrowser-insert.t
 t/6-Tk-ListBrowser-refreshSingle.t
 t/7-Tk-ListBrowser-autorefresh.t
+t/8-Tk-ListBrowser-hlist-tree-2.t
 t/icons/accessories-text-editor.png
 t/icons/arrow-down.png
 t/icons/Arrow-left-double.png

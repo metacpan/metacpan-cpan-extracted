@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION =  0.12;
+$VERSION =  0.14;
 use Carp;
 use Math::Round;
 
@@ -51,40 +51,9 @@ sub AUTOLOAD {
 sub draw {
 	my ($self, $item, $x, $y, $column, $row) = @_;
 	$item->draw($x, $y, $column, $row, $self->cget('-itemtype'));
-	$self->maxXYCalculate($item);
-}
-
-sub initColumns {
 }
 
 sub listbrowser { return $_[0]->{LISTBROWSER} }
-
-sub maxXYCalculate {
-	my ($self, $item, $entry) = @_;
-	my $target = $item;
-	$target = $entry if defined $entry;
-	my $prev = $self->infoPrevVisible($target->name);
-	my ($x1, $y1, $x2, $y2) = $item->region;
-	if (defined $prev) {
-		my $p = $target->get($prev);
-		my $mx = $p->maxX;
-		if ($x2 > $mx) {
-			$target->maxX($x2)
-		} else {
-			$target->maxX($mx)
-		}
-		my $my = $p->maxY;
-		if ($y2 > $my) {
-			$target->maxY($y2)
-		} else {
-			$target->maxY($my)
-		}
-		
-	} else {
-		$item->maxX($x2);
-		$item->maxY($y2);
-	}
-}
 
 sub nextPosition {
 	my ($self, $x, $y, $column, $row) = @_;
@@ -104,26 +73,6 @@ sub nextPosition {
 	return ($x, $y, $column, $row)
 }
 
-sub refresh {
-	my $self = shift;
-	my @pool = $self->getPool;
-	$self->clear;
-	$self->cellSize;
-	$self->initColumns;
-	
-	my ($x, $y) = $self->startXY;
-	my $column = 0;
-	my $row = 0;
-	for (@pool) {
-		my $item = $_;
-		next if $item->noshow;
-		$self->draw($item, $x, $y, $column, $row);
-
-		($x, $y, $column, $row) = $self->nextPosition($x, $y, $column, $row);
-	}
-	$self->setScrollRegion
-}
-
 sub scroll {
 	return 'vertical'
 }
@@ -135,10 +84,6 @@ sub startXY {
 	return ($self->cget('-marginleft'), $self->cget('-margintop')) unless defined $sxy;
 	return @$sxy
 }
-#sub startXY {
-#	my $self = shift;
-#	return ($self->cget('-marginleft'), $self->cget('-margintop'))
-#}
 
 sub type {
 	return 'row'

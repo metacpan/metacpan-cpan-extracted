@@ -1,5 +1,14 @@
 Revision history for Eshu
 
+0.07    2026-07-09
+        - eshu_file.h: undef Perl's fopen/fclose/fread/fwrite/fprintf macros
+          before plain-C static functions; on Windows+MULTIPLICITY Perl
+          redirects these to PerlSIO_fopen which requires my_perl in scope.
+        - eshu_file.h: define _XOPEN_SOURCE 700 before <dirent.h> on MinGW
+          so opendir/readdir/closedir are visible under -std=c99.
+	- remove pax headers
+	- Increase test coverage
+
 0.06    2026-04-05
         - Fix PROTOTYPES: ENABLE/DISABLE and VERSIONCHECK: DISABLE being
           incorrectly indented at 1 tab instead of column 0..

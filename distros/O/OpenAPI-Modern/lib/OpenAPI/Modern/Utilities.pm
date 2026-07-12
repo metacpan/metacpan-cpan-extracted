@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.139';
+our $VERSION = '0.140';
 
 use 5.020;
 use strictures 2;
@@ -206,10 +206,10 @@ sub intersect_types (@lol) {
   return grep $vals{$_} == $count, keys %vals;
 }
 
-# Given a reference to a string, coerce it to the best-matching primitive in the allowed list
-# other than object and array (which must be deserialized according to style rules first)
+# Given a reference to a string or number, coerce it to the best-matching primitive in the allowed
+# list other than object and array (which must be deserialized according to style rules first)
 # The core types are: (array, object, null, boolean, string, number)
-# Returns validity status, allowing the caller to fall back to the string value or generate an error.
+# Returns validity status, allowing the caller to fall back to the original value or generate an error.
 sub coerce_primitive ($dataref, $types = []) {
   return if not @$types;            # no type specified; indicate failure
   return if not defined $$dataref;  # null is an error
@@ -252,10 +252,10 @@ sub elem ($items, $set) {
   $items = [ $items ] if ref $items ne 'ARRAY';
 
   any {
-    my $x = $_;
-    any { defined $x ? (defined $_ && $x eq $_) : (!defined $_) } @$items
+    my $item = $_;
+    any { defined $item ? (defined $_ && $item eq $_) : (!defined $_) } @$set
   }
-  @$set;
+  @$items;
 }
 
 {
@@ -280,7 +280,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.139
+version 0.140
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

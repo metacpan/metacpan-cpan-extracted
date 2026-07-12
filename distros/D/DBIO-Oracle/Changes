@@ -1,5 +1,64 @@
 Revision history for DBIO-Oracle
 
+0.900001  2026-07-12
+    * Fixes
+        - SQLMaker's _quote() now allowlists Oracle's hierarchical/row
+          pseudo-columns (LEVEL, ROWNUM, ROWID, CONNECT_BY_ISCYCLE,
+          CONNECT_BY_ISLEAF) and emits them bare instead of quoting them;
+          quoting any of them raises ORA-00904 ("invalid identifier") now
+          that identifier quoting defaults to on. Caught both as a bare
+          string and as the single-segment arrayref shape SQL::Abstract v2
+          uses for an already-split identifier (e.g. order_by).
+          CONNECT_BY_ROOT is a prefix operator, not a standalone
+          identifier, so it never reaches _quote() and is intentionally
+          not in the allowlist. karr #17.
+        - Type::is_lob_type / is_text_lob_type took a Data::Type object,
+          but LOBSupport's _prep_for_execute passes a plain data-type
+          string (matching sqlt_datatype), so the predicate silently
+          returned false for every bind and LOB bind attrs were never
+          applied. Now takes the string, mirroring DBIx::Class::Storage::
+          DBI::_is_lob_type semantics.
+        - dump_value's diagnostic in the "Partially failed populate
+          throws" test pinned Data::Dumper's exact quoting form
+          (name => "pop_art_1"), coupling a behavioural assertion (which
+          row failed) to a serialization detail. Relaxed to assert the
+          diagnostic header by pattern and the dumped failing row
+          structurally (eval'd back to a hashref and compared with
+          is_deeply), so either quoting form passes. ADR core/0027,
+          karr #18.
+
+    * Storage
+        - DBIO::Oracle::Test::SequenceTest switched from
+          is_auto_increment => sequence => 'name' to auto_nextval => 1
+          with the sequence as a scalar ref, matching the API documented
+          in DBIO::Oracle::Storage.
+        - Added a DBIO::PK::Auto::Oracle deprecated compat shim: the
+          generic DBIO::PK::Auto component now covers Oracle auto-PK
+          handling directly, but load_components('PK::Auto::Oracle')
+          still needs a class to exist to load. The shim exists only to
+          satisfy that call and pulls in the generic component; new code
+          should use DBIO::PK::Auto directly. karr #16.
+
+    * Tests
+        - t/10/t/12/t/20/t/22/t/32: DDL and literal identifiers used in
+          the test fixtures are now quoted to match identifier quoting
+          being on by default (the unquoted `cd` table stays unquoted by
+          design, per its table(\'cd') declaration); the LEVEL order_by
+          expectation is corrected to bare LEVEL, with a new assertion
+          that LEVEL/ROWNUM stay bare under both quote_char states.
+
+    * Documentation
+        - Added SECURITY.md (CPANSec author guidelines v1.5.0): email-first
+          private reporting with CPANSec escalation; explicit notice that
+          Codeberg has no confidential issue channel.
+
+    * Dependencies
+        - DBD::Oracle is now a hard requires (was recommends): a database-
+          specific driver is useless without its DBD. Dropped the runtime
+          require DBD::Oracle workaround in Type, LOBSupport, and
+          Introspect::Columns in favour of plain use.
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
 0.900000  2026-06-23
     First release. Oracle database driver for DBIO.
 

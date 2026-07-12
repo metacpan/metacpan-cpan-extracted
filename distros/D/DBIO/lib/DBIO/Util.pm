@@ -111,6 +111,8 @@ sub dump_value ($) {
   local $Data::Dumper::Indent = 1;
   local $Data::Dumper::Terse = 1;
   local $Data::Dumper::Sortkeys = 1;
+  local $Data::Dumper::Useqq = 1;
+  local $Data::Dumper::Quotekeys = 0;
   Data::Dumper::Dumper($_[0]);
 }
 
@@ -593,7 +595,7 @@ DBIO::Util - Internal utility functions for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

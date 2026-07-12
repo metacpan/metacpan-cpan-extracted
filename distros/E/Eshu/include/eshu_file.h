@@ -11,6 +11,28 @@
 
 #include "eshu.h"
 #include "eshu_diff.h"
+
+/* Perl redefines fopen/fclose/fread/fwrite/fprintf via PerlSIO on Windows
+ * with MULTIPLICITY, which requires my_perl in scope.  This header contains
+ * plain C static functions that must use the real CRT stdio. */
+#ifdef WIN32
+#  ifdef fopen
+#    undef fopen
+#  endif
+#  ifdef fclose
+#    undef fclose
+#  endif
+#  ifdef fread
+#    undef fread
+#  endif
+#  ifdef fwrite
+#    undef fwrite
+#  endif
+#  ifdef fprintf
+#    undef fprintf
+#  endif
+#endif
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -21,6 +43,11 @@
 #  include <io.h>
 #  include <direct.h>
 #  ifdef __MINGW32__
+/* opendir/readdir/closedir are hidden behind __STRICT_ANSI__ with -std=c99;
+ * request POSIX extensions explicitly. */
+#    ifndef _XOPEN_SOURCE
+#      define _XOPEN_SOURCE 700
+#    endif
 #    include <dirent.h>
 #  else
 #    include "dirent_win.h"  /* MSVC needs a compat header */

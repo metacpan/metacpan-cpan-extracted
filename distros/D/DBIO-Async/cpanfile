@@ -1,0 +1,19 @@
+requires 'perl', '5.020';
+
+requires 'DBIO', '0.900001';
+requires 'Future', '0.52';
+requires 'Future::IO', '0.23';
+
+recommends 'IO::Async', '0.805';
+recommends 'Future::IO::Impl::IOAsync';
+
+# Optional event-loop adapters — the user picks the loop; none is hard-required.
+suggests 'Future::IO::Impl::AnyEvent';
+suggests 'Future::IO::Impl::Mojo';
+suggests 'Future::IO::Impl::UV';
+suggests 'Future::IO::Impl::Glib';
+
+on test => sub {
+  requires 'Test::More', '0.98';
+  requires 'Test::Exception';
+};

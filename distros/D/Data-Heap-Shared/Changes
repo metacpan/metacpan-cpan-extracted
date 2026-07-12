@@ -1,5 +1,9 @@
 Revision history for Data::Heap::Shared
 
+0.06  2026-07-03
+    - Security and robustness hardening; backing files now created mode
+      0600 (pass a file-mode argument to new() for cross-user sharing).
+
 0.05  2026-06-01
     - sift_down: compute child indices in 64-bit to avoid a uint32 overflow
       (2*idx+1) that corrupted the heap past ~2^31 entries

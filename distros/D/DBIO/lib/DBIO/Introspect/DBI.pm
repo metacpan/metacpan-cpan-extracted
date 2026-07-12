@@ -257,7 +257,7 @@ DBIO::Introspect::DBI - DBI-based introspection via standard metadata APIs
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

@@ -89,6 +89,13 @@ share_skill = dbio-mssql-database
   is versioned).
 - Core: `$VERSION` in lib/DBIO.pm via `[VersionFromMainModule]`.
 Target: `1.000000` when stable.
+- **Family alignment (soft rule):** keep the whole DBIO family on the *same*
+  released version — bump laggards up to match, don't release a patchwork.
+  Especially for a coordinated cross-repo train (a core change plus its
+  driver/transport/extension shares): release every touched dist at one shared
+  version so a given version of `X` always pairs with the same version across
+  repos. E.g. the #70 storage-layer-composition train ships core + dbio-async +
+  the drivers all as `0.900001`.
 
 ## PodWeaver
 

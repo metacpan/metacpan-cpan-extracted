@@ -933,7 +933,7 @@ next_bates(self)
         
         if (text) {
             RETVAL = newSVpv(text, 0);
-            free(text);
+            pdfmake_cfree(text);
         } else {
             XSRETURN_UNDEF;
         }
@@ -971,7 +971,7 @@ expand(self, page_num, total_pages, ...)
         
         if (text) {
             RETVAL = newSVpv(text, 0);
-            free(text);
+            pdfmake_cfree(text);
         } else {
             XSRETURN_UNDEF;
         }

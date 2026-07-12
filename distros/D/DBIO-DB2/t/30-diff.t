@@ -282,6 +282,35 @@ use_ok 'DBIO::DB2::DDL';
   is($ops[1]->action, 'create', 'create second');
 }
 
+# --- Diff::Index: suppress DROP INDEX when the owning table is dropped (karr #19) ---
+# When the owning table is itself being dropped in the same pass (present in
+# source tables, absent from target tables), DB2's DROP TABLE already removes the
+# table's indexes, so no standalone DROP INDEX must be emitted for them.
+{
+  my @ops = DBIO::DB2::Diff::Index->diff(
+    { leftover => { idx_leftover => { index_name => 'idx_leftover', columns => ['id'] } } },
+    {},
+    { leftover => { table_name => 'leftover' } }, # source tables: leftover exists live
+    {},                                           # target tables: it is gone -> being dropped
+  );
+  is(scalar @ops, 0, 'no standalone DROP INDEX when owning table is dropped (DROP TABLE covers it)');
+}
+
+# --- Diff::Index: over-suppression guard -- surviving table still drops its index (karr #19) ---
+# If the table stays but one of its indexes is removed, the standalone DROP INDEX
+# is still required.
+{
+  my @ops = DBIO::DB2::Diff::Index->diff(
+    { users => { idx_users_email => { index_name => 'idx_users_email', columns => ['email'] } } },
+    {},
+    { users => { table_name => 'users' } }, # source tables: users exists
+    { users => { table_name => 'users' } }, # target tables: users still exists -> only index dropped
+  );
+  is(scalar @ops, 1,           'index drop still emitted when the table itself survives');
+  is($ops[0]->action, 'drop',  'surviving-table index drop is a drop op');
+  is($ops[0]->as_sql, 'DROP INDEX idx_users_email;', 'surviving-table index still dropped standalone');
+}
+
 # --- Top-level Diff orchestrator: create from empty ---
 {
   my $source = {

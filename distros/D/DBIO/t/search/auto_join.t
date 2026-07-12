@@ -14,7 +14,7 @@ my $storage = $schema->storage;
 
 # --- belongs_to auto-join ---
 {
-  $storage->mock(qr/SELECT.*FROM cd me.*JOIN artist/i, [[1, 1, 'Title', 1999, undef, undef]]);
+  $storage->mock(qr/SELECT.*FROM cd "me".*JOIN "artist"/i, [[1, 1, 'Title', 1999, undef, undef]]);
   my @cds = $schema->resultset('CD')->search(
     { 'artist.name' => 'Caterwauler McCrae' }
   )->all;
@@ -29,7 +29,7 @@ my $storage = $schema->storage;
 
 # --- has_many auto-join ---
 {
-  $storage->mock(qr/SELECT.*FROM cd me.*JOIN track/i, [[2, 1, 'Title', 1999, undef, undef]]);
+  $storage->mock(qr/SELECT.*FROM cd "me".*JOIN "track"/i, [[2, 1, 'Title', 1999, undef, undef]]);
   my @cds = $schema->resultset('CD')->search(
     { 'tracks.title' => 'Boring Name' }
   )->all;
@@ -43,7 +43,7 @@ my $storage = $schema->storage;
 
 # --- count works with auto-join ---
 {
-  $storage->mock(qr/SELECT COUNT.*FROM cd me.*JOIN artist/i, [[3]]);
+  $storage->mock(qr/SELECT COUNT.*FROM cd "me".*JOIN "artist"/i, [[3]]);
   my $count = $schema->resultset('CD')->search(
     { 'artist.name' => 'Caterwauler McCrae' }
   )->count;
@@ -53,7 +53,7 @@ my $storage = $schema->storage;
 
 # --- chained search preserves auto-join ---
 {
-  $storage->mock(qr/SELECT.*FROM cd me.*JOIN artist/i, [[1, 1, 'Title', 2000, undef, undef]]);
+  $storage->mock(qr/SELECT.*FROM cd "me".*JOIN "artist"/i, [[1, 1, 'Title', 2000, undef, undef]]);
   my $rs = $schema->resultset('CD')->search(
     { 'artist.name' => 'Caterwauler McCrae' }
   );
@@ -64,7 +64,7 @@ my $storage = $schema->storage;
 
 # --- explicit join still works (no duplication) ---
 {
-  $storage->mock(qr/SELECT.*FROM cd me.*JOIN artist/i, [[1, 1, 'Title', 1999, undef, undef]]);
+  $storage->mock(qr/SELECT.*FROM cd "me".*JOIN "artist"/i, [[1, 1, 'Title', 1999, undef, undef]]);
   my @cds = $schema->resultset('CD')->search(
     { 'artist.name' => 'Caterwauler McCrae' },
     { join => 'artist' },
@@ -81,7 +81,7 @@ my $storage = $schema->storage;
 
 # --- me.column does not trigger auto-join ---
 {
-  $storage->mock(qr/SELECT.*FROM cd me/i, [[1, 1, 'Spoonful of bees', 1999, undef, undef]]);
+  $storage->mock(qr/SELECT.*FROM cd "me"/i, [[1, 1, 'Spoonful of bees', 1999, undef, undef]]);
   my @cds = $schema->resultset('CD')->search(
     { 'me.title' => 'Spoonful of bees' }
   )->all;
@@ -106,7 +106,7 @@ my $storage = $schema->storage;
 
 # --- multiple auto-joins ---
 {
-  $storage->mock(qr/SELECT.*FROM cd me.*JOIN/i, [[1, 1, 'Title', 1999, undef, undef]]);
+  $storage->mock(qr/SELECT.*FROM cd "me".*JOIN/i, [[1, 1, 'Title', 1999, undef, undef]]);
   my $rs = $schema->resultset('CD')->search({
     'artist.name' => 'Caterwauler McCrae',
     'tags.tag'    => 'Blue',

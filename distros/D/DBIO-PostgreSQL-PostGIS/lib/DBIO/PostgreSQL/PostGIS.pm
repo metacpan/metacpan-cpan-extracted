@@ -1,6 +1,6 @@
 package DBIO::PostgreSQL::PostGIS;
 # ABSTRACT: PostGIS spatial extension support for DBIO::PostgreSQL
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ __PACKAGE__->load_components(qw( InflateColumn ));
 
 sub connection {
   my ($self, @info) = @_;
-  $self->storage_type('+DBIO::PostgreSQL::PostGIS::Storage');
+  $self->register_storage_layer('DBIO::PostgreSQL::PostGIS::Storage');
   return $self->next::method(@info);
 }
 
@@ -82,7 +82,7 @@ DBIO::PostgreSQL::PostGIS - PostGIS spatial extension support for DBIO::PostgreS
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -138,12 +138,21 @@ L<DBIO::PostgreSQL::PostGIS::ResultSet>.
 
 =back
 
-For the schema-level storage extensions (C<ensure_postgis>,
-C<postgis_version>), set C<storage_type> on the schema:
+The schema-level storage extensions (C<ensure_postgis>, C<postgis_version>,
+the PostGIS-aware deploy class) live on the
+L<DBIO::PostgreSQL::PostGIS::Storage> B<layer>. Loading this component
+registers that layer (via L<DBIO::Schema/register_storage_layer>), so it is
+composed over the resolved driver storage (see L<DBIO::Storage::Composed>).
+Loading the component is all you do:
 
   package MyApp::Schema;
-  use base 'DBIO::Schema';
-  __PACKAGE__->storage_type('+DBIO::PostgreSQL::PostGIS::Storage');
+  use DBIO 'Schema';
+  __PACKAGE__->load_components('PostgreSQL', 'PostgreSQL::PostGIS');
+
+To pull in the storage layer without the result-class geometry inflation
+(unusual), register it directly instead of loading the component:
+
+  __PACKAGE__->register_storage_layer('DBIO::PostgreSQL::PostGIS::Storage');
 
 =head1 METHODS
 
@@ -173,7 +182,7 @@ that already inherits from C<DBIO::PostgreSQL::PostGIS::ResultSet>.
 
 =item * L<DBIO::PostgreSQL::PostGIS::Geometry> - Lightweight geometry value object
 
-=item * L<DBIO::PostgreSQL::PostGIS::Storage> - Storage class with spatial methods
+=item * L<DBIO::PostgreSQL::PostGIS::Storage> - Storage layer with spatial methods
 
 =item * L<DBIO::PostgreSQL::PostGIS::ResultSet> - Spatial query helpers
 

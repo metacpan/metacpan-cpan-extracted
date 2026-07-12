@@ -23,10 +23,10 @@ sub test_order {
             }
           )->as_query,
         "(
-          SELECT me.foo, me.bar, me.hello, me.goodbye, me.sensors, me.read_count
-          FROM fourkeys me
-          WHERE ( foo = ? )
-          HAVING read_count > ? OR read_count < ?
+          SELECT \"me\".\"foo\", \"me\".\"bar\", \"me\".\"hello\", \"me\".\"goodbye\", \"me\".\"sensors\", \"me\".\"read_count\"
+          FROM \"fourkeys\" \"me\"
+          WHERE ( \"foo\" = ? )
+          HAVING \"read_count\" > ? OR read_count < ?
           ORDER BY $args->{order_req}
         )",
         [
@@ -52,7 +52,7 @@ my @tests = (
     },
     {
         order_by  => { -asc => 'foo' },
-        order_req => 'foo ASC',
+        order_req => '"foo" ASC',
         bind      => [],
     },
     {
@@ -75,19 +75,17 @@ my @tests = (
         bind      => [ [ colB => 'test' ], [ colC => 'tost' ] ],
     },
     {
-        todo => 1,
         order_by => [
             { -asc  => 'colA' },
             { -desc => { colB => { 'LIKE' => 'test' } } },
             { -asc  => { colC => { 'LIKE' => 'tost' } } }
         ],
-        order_req => 'colA ASC, colB LIKE ? DESC, colC LIKE ? ASC',
+        order_req => '"colA" ASC, "colB" LIKE ? DESC, "colC" LIKE ? ASC',
         bind      => [ [ colB => 'test' ], [ colC => 'tost' ] ],
     },
     {
-        todo => 1,
         order_by  => { -desc => { colA  => { LIKE  => 'test' } } },
-        order_req => 'colA LIKE ? DESC',
+        order_req => '"colA" LIKE ? DESC',
         bind      => [ [ colA => 'test' ] ],
     },
 );

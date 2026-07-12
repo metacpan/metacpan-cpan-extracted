@@ -5,23 +5,15 @@ author:
 build_requires:
   CPAN::Meta::Check: '0.011'
   CPAN::Meta::Requirements: '0'
-  File::Spec: '0'
-  JSON::Schema::Modern: '0.640'
-  Module::Metadata: '0'
-  Mojolicious: '0'
-  Term::ANSIColor: '0'
-  Test2::API: '0'
   Test2::V0: '0'
   Test2::Warnings: '0.038'
   Test::Deep: '0'
   Test::File::ShareDir: '0'
   Test::JSON::Schema::Acceptance: '1.014'
   Test::Memory::Cycle: '0'
-  Test::Mojo: '0'
   Test::More: '0'
   Test::Needs: '0'
   YAML::PP: '0.005'
-  lib: '0'
   perl: '5.020'
 configure_requires:
   Module::Build::Tiny: '0.034'
@@ -56,19 +48,19 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.139'
+    version: '0.140'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.139'
+    version: '0.140'
   JSON::Schema::Modern::Vocabulary::OpenAPI_3_0:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm
-    version: '0.139'
+    version: '0.140'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.139'
+    version: '0.140'
   OpenAPI::Modern::Utilities:
     file: lib/OpenAPI/Modern/Utilities.pm
-    version: '0.139'
+    version: '0.140'
 requires:
   Clone: '0'
   Encode: '2.89'
@@ -92,10 +84,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.139'
+version: '0.140'
 x_Dist_Zilla:
   perl:
-    version: '5.043011'
+    version: '5.044000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -625,7 +617,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260601'
+          Module::CoreList: '5.20260708'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -789,7 +781,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.139
+          tag: v0.140
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -913,14 +905,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
           phase: runtime
           type: suggests
       name: RuntimeSuggests
@@ -953,18 +937,28 @@ x_Dist_Zilla:
             - Carp
             - Digest::MD5
             - Exporter
+            - File::Spec
+            - IO::Handle
+            - IPC::Open3
             - JSON::Schema::Modern::Document
             - JSON::Schema::Modern::Result
             - JSON::Schema::Modern::Utilities
             - JSON::Schema::Modern::Vocabulary
+            - Module::Metadata
             - Mojo::File
             - Mojo::Message::Request
             - Mojo::Message::Response
+            - Mojo::UserAgent::Transactor
             - Mojo::Util
+            - Mojolicious
             - Scalar::Util
+            - Term::ANSIColor
+            - Test2::API
+            - Test::Mojo
             - constant
             - experimental
             - feature
+            - lib
             - open
             - strict
             - utf8
@@ -1038,7 +1032,7 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_breaks:
   Test::Mojo::Role::OpenAPI::Modern: '< 0.007'
-x_generated_by_perl: v5.43.11
+x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

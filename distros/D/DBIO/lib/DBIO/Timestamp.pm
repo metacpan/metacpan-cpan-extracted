@@ -103,7 +103,7 @@ DBIO::Timestamp - Automatically set and update timestamp columns
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -123,6 +123,10 @@ version 0.900000
 Or use the helpers to declare both standard columns in one go:
 
   __PACKAGE__->cols_updated_created;
+
+See F<t/timestamp_runtime.t> for a runnable example of the auto-population
+on insert and update; the column-metadata the helpers install is covered
+by F<t/test/10_timestamp_helpers.t>.
 
 =head1 DESCRIPTION
 

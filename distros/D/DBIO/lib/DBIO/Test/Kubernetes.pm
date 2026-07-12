@@ -536,7 +536,7 @@ DBIO::Test::Kubernetes - Provision temporary database pods in Kubernetes for DBI
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -555,6 +555,8 @@ version 0.900000
     system('prove', '-Ilib', 't/');
 
     $k8s->cleanup;
+
+See F<t/kubernetes/smoke.t> for a runnable example.
 
 =head1 DESCRIPTION
 

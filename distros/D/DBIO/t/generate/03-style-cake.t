@@ -31,13 +31,13 @@ my $spec = {
 
 my $code = DBIO::Generate::Style::Cake->emit($spec);
 
-like $code, qr/^package My::Schema::Result::CD;/m, 'package line';
-like $code, qr/use DBIO::Cake/,                    'use DBIO::Cake';
-like $code, qr/^table 'cd';/m,                     'table DSL';
-like $code, qr/^primary_column cdid\b/m,           'primary_column DSL';
-like $code, qr/^column title\b/m,                   'column DSL for title';
-like $code, qr/varchar\(100\)/,                     'varchar size inline';
-like $code, qr/belongs_to 'artist'/,               'belongs_to rel';
+like $code, qr/^package My::Schema::Result::CD;/m,     'package line';
+like $code, qr/use DBIO::Cake/,                        'use DBIO::Cake';
+like $code, qr/^table ['"]cd['"];/m,                   'table DSL';
+like $code, qr/^primary_column ['"]cdid['"]\s*=>/m,    'primary_column DSL';
+like $code, qr/^column ['"]title['"]\s*=>/m,           'column DSL for title';
+like $code, qr/varchar\(100\)/,                        'varchar size inline';
+like $code, qr/belongs_to ['"]artist['"]/,            'belongs_to rel';
 like $code, qr/^1;/m,                               'ends with 1';
 
 done_testing;

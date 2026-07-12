@@ -25,13 +25,13 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::Sybase",
   "PREREQ_PM" => {
     "DBD::Sybase" => "1.26",
-    "DBIO" => "0.900000"
+    "DBIO" => "0.900001"
   },
   "TEST_REQUIRES" => {
     "DBD::Sybase" => "1.26",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900000",
+  "VERSION" => "0.900001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::Sybase" => "1.26",
-  "DBIO" => "0.900000",
+  "DBIO" => "0.900001",
   "Test::More" => "0.98"
 );
 

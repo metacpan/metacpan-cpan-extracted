@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.138-15-g85c5cae9
+package OpenAPI::Modern; # git description: v0.139-15-g110add0a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.139';
+our $VERSION = '0.140';
 
 use 5.020;
 use utf8;
@@ -12,6 +12,7 @@ use Moo;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+use if "$]" < 5.026, experimental => 'lexical_subs';
 no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -27,7 +28,7 @@ use builtin::compat qw(indexed blessed);
 use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
-use JSON::Schema::Modern::Utilities 0.638 qw(jsonp unjsonp canonical_uri E abort is_equal true false get_type jsonp_set jsonp_get decode_media_type match_media_type);
+use JSON::Schema::Modern::Utilities 0.638 qw(jsonp unjsonp canonical_uri E abort is_equal true false get_type is_type jsonp_set jsonp_get decode_media_type match_media_type);
 use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_cookie_name is_cookie_value elem);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
@@ -1175,8 +1176,10 @@ sub _deserialize_style ($self, $data, $state, %opt) {
   my ($in, $style, $explode, $allowEmptyValue, $name, $schema, $strip_internal_ws) =
     @opt{qw(in style explode allowEmptyValue name schema strip_internal_ws)};
 
-  my @types = $self->_type_in_schema($schema, { %$state,
-      keyword_path => $state->{keyword_path}.'/schema' });
+  # sometimes the schema is somewhere else; respect it
+  $state = { %$state, schema_path => $state->{keyword_path}.'/schema' } if not exists $state->{schema_path};
+
+  my @types = $self->_type_in_schema($schema, { %$state, keyword_path => $state->{schema_path} });
 
   if ($style eq 'simple' or $style eq 'matrix' or $style eq 'label') {
     # RFC6570 §3.2.1: "A variable that is undefined (§2.3) has no value and is ignored by the
@@ -1267,8 +1270,8 @@ sub _deserialize_style ($self, $data, $state, %opt) {
         ];
 
       if (not @errors) {
-        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' }) if $type eq 'object';
-        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' }) if $type eq 'array';
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} }) if $type eq 'object';
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} }) if $type eq 'array';
         return \$data;
       }
     }
@@ -1296,7 +1299,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
       if (not $explode and elem('object', \@types)) {
         if (not @values % 2) {
           $data = +{ @values };
-          $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+          $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
           return \$data;
         }
         # fall through to primitive
@@ -1305,7 +1308,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
       if (elem('array', \@types)
           and (elem($style, [qw(simple label)]) or ($style eq 'matrix' and not $explode))) {
         $data = \@values;
-        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
         return \$data;
       }
     }
@@ -1327,19 +1330,19 @@ sub _deserialize_style ($self, $data, $state, %opt) {
     # if all types are acceptable, fall through to returning string immediately
 
     if ($explode and @types != 6) {
-      if (elem('array', \@types)) {
-        $data = $params->every_param($name);
-        $data = [ grep length, @$data ] if $allowEmptyValue;
-        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
-        return @$data ? \$data : ();
-      }
-
       if (elem('object', \@types)) {
         # treat the entire querystring as the hash of keys and values; if duplicate, last entry wins
         $data = +{ $params->pairs->@* };
         delete $data->@{grep +(!length $data->{$_}), keys %$data} if $allowEmptyValue;
-        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
         return keys %$data ? \$data : ();
+      }
+
+      if (elem('array', \@types)) {
+        $data = $params->every_param($name);
+        $data = [ grep length, @$data ] if $allowEmptyValue;
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
+        return @$data ? \$data : ();
       }
     }
 
@@ -1356,12 +1359,12 @@ sub _deserialize_style ($self, $data, $state, %opt) {
       my @values = split /,/, $data, -1;
       if (not @values % 2 and elem('object', \@types)) {
         $data = +{ @values };
-        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
         return \$data;
       }
       if (elem('array', \@types)) {
         $data = \@values;
-        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
         return \$data;
       }
     }
@@ -1398,12 +1401,12 @@ sub _deserialize_style ($self, $data, $state, %opt) {
 
     if (not @values % 2 and elem('object', \@types)) {
       $data = +{ @values };
-      $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+      $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
       return \$data;
     }
     if (elem('array', \@types)) {
       $data = \@values;
-      $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+      $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
       return \$data;
     }
   }
@@ -1431,7 +1434,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
       }
     }
 
-    $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+    $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
     return keys %$data ? \$data : ();
   }
 
@@ -1452,17 +1455,17 @@ sub _deserialize_style ($self, $data, $state, %opt) {
     # if all types are acceptable, fall through to returning string immediately
 
     if ($explode and @types != 6) {
-      if (elem('array', \@types)) {
-        $data = [ map +($_->[0] eq $name ? $_->[1] : ()), @pairs ];
-        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
-        return @$data ? \$data : ();
-      }
-
       if (elem('object', \@types)) {
         # treat the entire header string as the hash of keys and values; if duplicate, last entry wins
         $data = +{ map @$_, @pairs };
-        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
         return keys %$data ? \$data : ();
+      }
+
+      if (elem('array', \@types)) {
+        $data = [ map +($_->[0] eq $name ? $_->[1] : ()), @pairs ];
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{schema_path} });
+        return @$data ? \$data : ();
       }
     }
 
@@ -1492,12 +1495,14 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       'missing header: Content-Type')
     if not length $content_type;
 
+  # find the best-matching entry under content/ to get the media-type object
   my $media_type = match_media_type($content_type, [ keys $content_obj->%* ]);
   return E({ %$state, keyword => 'content', recommended_response => [ 415 ] },
       'incorrect Content-Type "%s"', $content_type)
     if not defined $media_type;
 
-  my $content_ref = \ $message->body;
+  # multipart/* messages will be decoded using its Mojo::Content::MultiPart object, not the raw string
+  my $content_ref = $message->content->is_multipart ? $message->content : \ $message->body;
 
   $content_ref = $self->_deserialize_content($content_ref, { %$state }, $content_obj, $media_type, $content_type);
   return if not $content_ref;
@@ -1540,20 +1545,21 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
 sub _deserialize_content ($self, $content_ref, $state, $content_obj, $media_type, $content_type) {
   $state->{keyword_path} = jsonp($state->{keyword_path}, 'content', $media_type);
 
-  # TODO: respect Content-Encoding header
-
   my $deserialized_content_ref;
   try {
-    # case-insensitive, wildcard lookup; text/* supports charset;
-    # returns undef if no suitable decoder can be found
-    $deserialized_content_ref = decode_media_type($content_type, $content_ref);
+    if (not match_media_type($content_type, ['multipart/*'])) {
+      # TODO: handle Content-Encoding header(s)
+
+      # case-insensitive, wildcard lookup; text/* supports charset;
+      # returns undef if no suitable decoder can be found
+      $deserialized_content_ref = decode_media_type($content_type, $content_ref);
+    }
   }
   catch ($e) {
     return E($state, 'could not decode content as %s: %s', $content_type, $e =~ s/^(.*)\n/$1/r);
   }
 
   my $saved_state = { %$state };
-
   my $media_type_obj = $content_obj->{$media_type};
   while (defined(my $ref = $media_type_obj->{'$ref'})) {
     $media_type_obj = $self->_resolve_ref('media-type', $ref, $state);
@@ -1562,9 +1568,11 @@ sub _deserialize_content ($self, $content_ref, $state, $content_obj, $media_type
   if (not $deserialized_content_ref) {
     # don't fail, and return the original data, if the best-matching media-type object is under */*
     # or the schema would pass on any input
-    return $content_ref if $media_type eq '*/*'
-      or all { ref $_ eq 'HASH' ? !keys %$_ : $_ }
-        ($media_type_obj->{schema}//(), $media_type_obj->{itemSchema}//());
+    return (ref $content_ref eq 'SCALAR' && !match_media_type($content_type, ['multipart/*'])
+        ? $content_ref : \'TODO')
+      if $media_type eq '*/*'
+        or all { ref $_ eq 'HASH' ? !keys %$_ : $_ }
+          ($media_type_obj->{schema}//(), $media_type_obj->{itemSchema}//());
 
     # coming soon!
     abort($saved_state, 'EXCEPTION: unimplemented media type "%s"', $content_type =~ s/;.*\z//r)
@@ -1573,13 +1581,256 @@ sub _deserialize_content ($self, $content_ref, $state, $content_obj, $media_type
     abort($saved_state, 'EXCEPTION: unsupported media type "%s": add support with JSON::Schema::Modern::Utilities::add_media_type(...)', $content_type =~ s/;.*\z//r);
   }
 
-  # coming soon!
-  if (match_media_type($content_type, ['application/x-www-form-urlencoded', 'multipart/*'])
-      and my $keyword = first { exists $content_obj->{$media_type}{$_} } qw(encoding prefixEncoding itemEncoding)) {
-    return E({ %$state, keyword => $keyword }, '%s keyword not yet implemented', $keyword);
-  }
+  return $deserialized_content_ref
+    if not match_media_type($content_type, ['application/x-www-form-urlencoded']);
+
+  $state->{data_path} .= '/content';
+
+  ()= $self->_decode_content(
+    $deserialized_content_ref,
+    { %$state, keyword_path => $state->{keyword_path}.'/schema' },  # schema_state
+    $media_type_obj->{schema},                                      # schema
+    { %$state },                                            # encoding_state
+    # v3.1.2 §4.8.14.1: "The encoding field SHALL only apply to Request Body Objects"
+    $state->{data_path} =~ m{^/request/body/} || $self->openapi_document->oas_version >= '3.2'
+      ? $media_type_obj : undef,                            # encoding_parent
+    $content_type,                                          # message Content-Type
+  );
 
   return $deserialized_content_ref;
+}
+
+# Use the encoding object for application/x-www-form-urlencoded messages to deserialize encoded content
+# - $schema represents the schema for the content being passed in $content_ref
+# - $encoding_parent contains either the 'encoding' or 'prefixEncoding' and/or 'itemEncoding'
+#   keywords (which is a media-type object at the first level, and an encoding object thereafter)
+# - $content_type is the type of this part or element, from the header on the message or individual
+#   part, or as determined by the encoding object for that element
+# This is highly recursive, but we have defined conditions for termination:
+# - $state->{depth} exceeds max_depth
+# - value (of any type) has neither a corresponding encoding object nor a schema
+# - value is a primitive with no further decoding
+# No return value; decoded content overwrites in place the referenced data that was decoded
+sub _decode_content ($self, $content_ref, $schema_state, $schema, $encoding_state, $encoding_parent, $content_type) {
+  foreach my $state ($schema_state, $encoding_state) {
+    abort($state, 'EXCEPTION: maximum evaluation depth (%d) exceeded', $self->max_depth)
+      if $state->{depth}++ > $self->evaluator->max_depth;
+  }
+
+  $encoding_state->{is_form} = match_media_type($content_type, [qw(application/x-www-form-urlencoded multipart/form-data)]);
+
+  # used for handling of arrays-in-object content when encoding by name (duplicate names for values
+  # in application/x-www-form-urlencoded) and top-level array content
+  state sub _adjust_state_for_array ($self, $idx, $schema_state, $schema) {
+    $schema_state = { %$schema_state, depth => $schema_state->{depth}+1,
+      data_path => $schema_state->{data_path}.'/'.$idx };
+
+    # this is not exhaustive: if a keyword is hidden in an 'allOf', we will not find it
+    SCHEMA_LOOP: {
+      undef $schema, last SCHEMA_LOOP if not defined $schema or ref $schema ne 'HASH';
+
+      if (defined(($schema->{prefixItems}//[])->[$idx])) {
+        $schema_state->{keyword_path} = $schema_state->{keyword_path}.'/prefixItems/'.$idx;
+        $schema = $schema->{prefixItems}[$idx];
+      }
+      elsif (exists $schema->{items}) {
+        $schema_state->{keyword_path} = $schema_state->{keyword_path}.'/items';
+        $schema = $schema->{items};
+      }
+      else {
+        if (defined(my $ref = $schema->{'$ref'})) {
+          $schema = $self->_resolve_ref('schema', $ref, $schema_state);
+          redo SCHEMA_LOOP;
+        }
+        if (defined(my $ref = $schema->{'$dynamicRef'})) {
+          $schema = $self->_resolve_dynamicRef('schema', $ref, $schema_state);
+          redo SCHEMA_LOOP;
+        }
+
+        undef $schema;
+      }
+    }
+
+    return ($schema_state, $schema);
+  }
+
+  if (ref $content_ref->$* eq 'HASH') {
+    # v3.2.0 §4.14.5.1: "For application/x-www-form-urlencoded, the encoding keys MUST map to
+    # parameter names, with the values produced according to the rules of the Encoding Object."
+    foreach my $property (sort keys $content_ref->$*->%*) {
+      my $schema_state = { %$schema_state, depth => $schema_state->{depth}+1,
+        data_path => jsonp($schema_state->{data_path}, $property) };
+      my $schema = $schema;
+
+      # this is not exhaustive: if a keyword is hidden in an 'allOf', we will not find it
+      SCHEMA_LOOP: {
+        undef $schema, last SCHEMA_LOOP if not defined $schema or ref $schema ne 'HASH';
+
+        if (exists(($schema->{properties}//{})->{$property})) {
+          $schema_state->{keyword_path} = jsonp($schema_state->{keyword_path}, 'properties', $property);
+          $schema = $schema->{properties}{$property};
+        }
+        elsif (my $pattern = first { $property =~ m/(?:$_)/ } keys(($schema->{patternProperties}//{})->%*)) {
+          $schema_state->{keyword_path} = jsonp($schema_state->{keyword_path}, 'patternProperties', $pattern);
+          $schema = $schema->{patternProperties}{$pattern};
+        }
+        elsif (exists($schema->{additionalProperties})) {
+          $schema_state->{keyword_path} = $schema_state->{keyword_path}.'/additionalProperties';
+          $schema = $schema->{additionalProperties};
+        }
+        else {
+          if (defined(my $ref = $schema->{'$ref'})) {
+            $schema = $self->_resolve_ref('schema', $ref, $schema_state);
+            redo SCHEMA_LOOP;
+          }
+          if (defined(my $ref = $schema->{'$dynamicRef'})) {
+            $schema = $self->_resolve_dynamicRef('schema', $ref, $schema_state);
+            redo SCHEMA_LOOP;
+          }
+
+          undef $schema;
+        }
+      }
+
+      my $encoding_state = { %$encoding_state, depth => $encoding_state->{depth}+1,
+        data_path => jsonp($encoding_state->{data_path}, $property),
+        keyword_path => jsonp($encoding_state->{keyword_path}, 'encoding', $property),
+      };
+      my $encoding_obj = (($encoding_parent//{})->{encoding}//{})->{$property};
+
+      # v3.2.0 §4.15.5 1: "Array properties MUST be handled by applying the given Encoding Object to
+      # produce one encoded value per array item, each with the same name..."
+      if ($encoding_state->{is_form} and ref $content_ref->$*->{$property} eq 'ARRAY') {
+        foreach my $idx (0 .. $content_ref->$*->{$property}->$#*) {
+          my ($schema_state, $schema) = _adjust_state_for_array($self, $idx, $schema_state, $schema);
+          my $encoding_state = { %$encoding_state, depth => $encoding_state->{depth}+1,
+            data_path => $encoding_state->{data_path}.'/'.$idx };
+
+          ()= $self->_decode_content_element(\ $content_ref->$*->{$property}[$idx],
+            $property, $schema_state, $schema, $encoding_state, $encoding_obj);
+        }
+      }
+      else {
+        # we are parsing form data with a string value, or object-based data from some other decoding
+        # v3.2.0 §4.15.5 1: "... For all other value types for both top-level non-array properties
+        # and for values, including array values, within a top-level array, the Encoding Object
+        # MUST be applied to the entire value."
+        ()= $self->_decode_content_element(\ $content_ref->$*->{$property},
+          $property, $schema_state, $schema, $encoding_state, $encoding_obj);
+      }
+    } # end foreach property
+  } # end HASH
+
+  elsif (ref $content_ref->$* eq 'ARRAY') {
+    # v3.2.0 §4.15.5.2: "To use the prefixEncoding and/or itemEncoding fields, either itemSchema
+    # or an array schema MUST be present."
+    undef $encoding_parent if ref $schema eq 'HASH'
+      and (ref $schema->{type} eq 'ARRAY' ? !elem('array', $schema->{type}) : ($schema->{type}//'') ne 'array');
+
+    foreach my $idx (0 .. $content_ref->$*->$#*) {
+      my ($schema_state, $schema) = _adjust_state_for_array($self, $idx, $schema_state, $schema);
+      my $encoding_state = { %$encoding_state, depth => $encoding_state->{depth}+1,
+        data_path => $encoding_state->{data_path}.'/'.$idx };
+      my $encoding_obj;
+
+      if ((($encoding_parent//{})->{prefixEncoding}//[])->[$idx]) {
+        $encoding_state->{keyword_path} = $encoding_state->{keyword_path}.'/prefixEncoding/'.$idx;
+        $encoding_obj = $encoding_parent->{prefixEncoding}[$idx];
+      }
+      elsif (($encoding_parent//{})->{itemEncoding}) {
+        $encoding_state->{keyword_path} = $encoding_state->{keyword_path}.'/itemEncoding';
+        $encoding_obj = $encoding_parent->{itemEncoding};
+      }
+
+      ()= $self->_decode_content_element(\ $content_ref->$*->[$idx],
+        $idx, $schema_state, $schema, $encoding_state, $encoding_obj);
+    } # end foreach array item
+  } # end ARRAY
+
+  else {
+    my @types = $self->_type_in_schema($schema, { %$schema_state });
+    coerce_primitive($content_ref, \@types);
+  }
+}
+
+# decode one object property value, or one array item value, while iterating over the entire object
+# or array, and continue to recurse on the decoded content
+sub _decode_content_element ($self, $element_ref, $name, $schema_state, $schema, $encoding_state, $encoding_obj) {
+  my ($element_decoded_ref, $content_type);
+
+  # if this element is not a string, we assume it was already correctly decoded into the correct
+  # type (e.g. as or from a nested json structure), and skip the decoding step
+  goto RECURSE if not is_type('string', $element_ref->$*);
+
+  # v3.2.0 §4.15.1.2: "[These fields] SHALL be ignored if the media type is not
+  # application/x-www-form-urlencoded or multipart/form-data."
+  if ($encoding_state->{is_form} and $encoding_obj
+      and any { exists $encoding_obj->{$_} } qw(style explode allowReserved)) {
+    my $style = $encoding_obj->{style} // 'form';
+
+    $element_decoded_ref = $self->_deserialize_style(
+      Mojo::Parameters->new($element_ref->$*),
+      { %$encoding_state, schema_path => $schema_state->{keyword_path}, errors => my $errors = [] },
+      in => 'query',
+      style => $style,
+      explode => $encoding_obj->{explode} // ($style eq 'form' ? true : false),
+      name => $name,
+      schema => $schema // true,
+    );
+
+    if (@$errors) {
+      push $encoding_state->{errors}->@*, @$errors;
+      return;
+    }
+
+    # if false but no error, then no content was extracted
+    $element_decoded_ref = '' if not $element_decoded_ref;
+  }
+  else {
+    my $local_state;    # used for media-type decoding
+
+    # TODO: split by comma and pick the first media-type that decodes successfully, or for multipart
+    # content we have the Content-Type header available for comparison against the OAD
+    if (defined($content_type = ($encoding_obj//{})->{contentType})) {
+      $local_state = { %$encoding_state, keyword_path => $encoding_state->{keyword_path}.'/contentType' };
+    }
+    elsif (ref $schema eq 'HASH') {
+      # v3.2.0 §4.14.1: "If no Encoding Object is provided for a property or item, the behavior is
+      # determined by the default values documented for the Encoding Object."
+
+      $local_state = { %$schema_state };  # ends in /schema iff at root
+      my @types = $self->_type_in_schema($schema, { %$local_state });
+      $content_type =
+          @types == 6 || elem([qw(null boolean number)], \@types) ? 'application/octet-stream'
+        : elem([qw(object array)], \@types) ? 'application/json'
+        : exists(($schema//{})->{contentEncoding}) ? 'application/octet-stream' : 'text/plain';
+    }
+    else {
+      # no schema, so leave property value alone (the default media-type for unspecified schemas is
+      # application/octet-stream, which is an identity function)
+      return;
+    }
+
+    try {
+      $element_decoded_ref = decode_media_type($content_type, $element_ref);
+    }
+    catch ($e) {
+      return E($local_state, 'could not decode content as %s: %s', $content_type, $e =~ s/^(.*)\n/$1/r);
+    }
+
+    # don't fail, and use the original data, if the schema would pass on any input
+    abort($local_state, 'EXCEPTION: unsupported media type "%s": add support with JSON::Schema::Modern::Utilities::add_media_type(...)', $content_type)
+      if not $element_decoded_ref and defined $schema and not (ref $schema eq 'HASH' ? !keys %$schema : $schema);
+  }
+
+  $element_ref->$* = $element_decoded_ref->$* if $element_decoded_ref;
+
+  RECURSE:
+  if (defined $schema or defined $encoding_obj) {
+    ()= $self->_decode_content(
+      $element_ref,   # this may be the original data, if nothing was decoded
+      $schema_state, $schema, $encoding_state, $encoding_obj, $content_type);
+  }
 }
 
 # wrap a result object around the errors
@@ -1633,6 +1884,7 @@ sub _resolve_dynamicRef ($self, $ref, $state) {
 
 # determines the type(s) expected in a schema: array, object, null, boolean, string, number
 # (integers will be treated as numbers as they are not a distinct core type)
+# cache lookup (which may fail for a non-existent schema) can be bypassed by passing boolean true
 sub _type_in_schema ($self, $schema, $state) {
   return $schema ? (qw(array object boolean string number), $state->{vocabularies}[0] =~ /::OpenAPI_3_0\z/ ? () : 'null') : ('string')
     if ref $schema ne 'HASH';
@@ -2045,7 +2297,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.139
+version 0.140
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2654,10 +2906,6 @@ C<multipart/*> messages
 
 =item *
 
-C<application/x-www-form-urlencoded> messages and the C<encoding> object within media-type objects
-
-=item *
-
 The use of C<$ref> within a path-item object is only allowed when not adjacent to any other path-item properties (C<parameters>, C<servers>, request methods)
 
 =item *
@@ -2703,6 +2951,8 @@ To decode the cookie on the server side:
 Which will be the value: C<< { a => 1, b => 2 } >>
 
 =head1 SEE ALSO
+
+=for stopwords WHATWG
 
 =over 4
 
@@ -2769,6 +3019,10 @@ L<RFC6265: HTTP State Management Mechanism|https://datatracker.ietf.org/doc/html
 =item *
 
 L<RFC6570: URI Template|https://datatracker.ietf.org/doc/html/rfc6570>
+
+=item *
+
+L<Web Hypertext Application Technology Working Group (WHATWG): application/x-www-form-urlencoded|https://url.spec.whatwg.org/#application/x-www-form-urlencoded>
 
 =back
 

@@ -227,7 +227,7 @@ DBIO::Relationship::Base - Inter-table relationships
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -241,6 +241,8 @@ version 0.900000
       };
     },
   );
+
+See F<t/relationship/dynamic_foreign_columns.t> for a runnable example.
 
 =head1 DESCRIPTION
 

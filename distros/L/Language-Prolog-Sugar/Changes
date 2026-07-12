@@ -1,5 +1,14 @@
 Revision history for Perl extension Language::Prolog::Sugar.
 
+0.07 2026-07-11 17:48:13-0400
+	- No change from v0.06_01
+
+0.06_01 2026-07-09 21:04:15-0400
+	- Fix RT#148548 : Import atoms to test error on newer `perl`s.
+	  See <https://rt.cpan.org/Public/Bug/Display.html?id=148548>.
+	  Thanks to GENE and HAARG for the bug report and fix.
+	- Update `ExtUtils::MakeMaker` to use `CPAN::Meta::Spec` v2.
+
 0.06  24 Nov 2006
         - added auto_term
         - auto_functor obsoleted

@@ -171,12 +171,39 @@ for my $q ( '', '"' ) {
           FROM ${q}artist${q} ${q}me${q}
         START WITH ${q}name${q} = ?
         CONNECT BY ${q}parentid${q} = PRIOR ${q}artistid${q}
-        ORDER BY ${q}LEVEL${q} ASC, ${q}name${q} ASC
+        ORDER BY LEVEL ASC, ${q}name${q} ASC
       )",
       [
         [ { 'sqlt_datatype' => 'varchar', 'dbic_colname' => 'name', 'sqlt_size' => 100 }
             => 'root'],
       ],
+    );
+  }
+
+  # Oracle pseudo-columns (LEVEL, ROWNUM, ...) must never be quoted, even when
+  # quoting is on -- "LEVEL" / "ROWNUM" => ORA-00904 invalid identifier. Assert
+  # the SQLMaker emits them bare under both quote_char settings.
+  {
+    my $rs = $schema->resultset('Artist')->search({}, {
+      start_with => { name => 'root' },
+      connect_by => { parentid => { -prior => { -ident => 'artistid' } } },
+      order_by => [ 'LEVEL', 'ROWNUM' ],
+    });
+
+    is_same_sql_bind (
+      $rs->as_query,
+      "(
+        SELECT ${q}me${q}.${q}artistid${q}, ${q}me${q}.${q}name${q}, ${q}me${q}.${q}rank${q}, ${q}me${q}.${q}charfield${q}, ${q}me${q}.${q}parentid${q}
+          FROM ${q}artist${q} ${q}me${q}
+        START WITH ${q}name${q} = ?
+        CONNECT BY ${q}parentid${q} = PRIOR ${q}artistid${q}
+        ORDER BY LEVEL, ROWNUM
+      )",
+      [
+        [ { 'sqlt_datatype' => 'varchar', 'dbic_colname' => 'name', 'sqlt_size' => 100 }
+            => 'root'],
+      ],
+      "pseudo-columns LEVEL/ROWNUM stay unquoted (quote_char='$q')",
     );
   }
 

@@ -38,7 +38,7 @@ DBIO::GraphQL::ScalarMap - Map DBIO column data_types to GraphQL scalars
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

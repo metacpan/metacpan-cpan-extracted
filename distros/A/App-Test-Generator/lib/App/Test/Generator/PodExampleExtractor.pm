@@ -5,7 +5,7 @@ use Carp qw(croak);
 use File::Slurp qw(read_file);
 use Readonly;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 Readonly my $ANNOTATION_RE => qr/\#\s*(?:=>|returns?)\s*(.+?)\s*$/;
 Readonly my $VERBATIM_RE   => qr/^[ \t]/;

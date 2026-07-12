@@ -15,7 +15,17 @@ __PACKAGE__->mk_diff_accessors(qw(
 
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
+
+  # Tables present in the source model but absent from the target are being
+  # dropped in this same pass. Their indexes go with the table via DROP TABLE,
+  # so a later standalone DROP INDEX for one of them must be suppressed (karr
+  # #23). Backward compatible: absent table sections -> empty set -> no
+  # suppression.
+  $source_tables //= {};
+  $target_tables //= {};
+  my %dropped_table = map { $_ => 1 }
+    grep { !exists $target_tables->{$_} } keys %$source_tables;
 
   # Indexes need a "union" view of the per-table membership: an index on
   # a brand-new table is just as much a create as one on a table that
@@ -47,6 +57,9 @@ sub diff {
     },
     on_gone => sub {
       my ($table_name, $index_name, $index_info) = @_;
+      # Owning table dropped this pass -> DROP TABLE already took the index;
+      # a standalone DROP INDEX would fail (karr #23).
+      return () if $dropped_table{$table_name};
       $class->new(action => 'drop', table_name => $table_name,
         index_name => $index_name, index_info => $index_info);
     },
@@ -96,7 +109,7 @@ DBIO::MySQL::Diff::Index - Diff operations for MySQL/MariaDB indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -108,6 +121,19 @@ the table itself.
 =head1 METHODS
 
 =head2 diff
+
+    my @ops = DBIO::MySQL::Diff::Index->diff(
+      $source, $target, $source_tables, $target_tables);
+
+The optional C<$source_tables> / C<$target_tables> hashrefs are the C<tables>
+sections of the two models (threaded in by L<DBIO::MySQL::Diff>, the same way it
+already threads them into C<Diff::Column> / C<Diff::ForeignKey>). They are used
+to detect tables that are being dropped in this same diff pass: C<DROP TABLE>
+already removes that table's own indexes, so emitting a later standalone
+C<DROP INDEX ... ON <table>> for one of them would fail against the server (the
+C<ON <table>> target no longer exists), aborting the deploy (karr #23). When
+these arguments are absent (e.g. direct unit-test calls) the set is empty and no
+drops are suppressed, preserving the original two-argument behaviour.
 
 =head2 as_sql
 

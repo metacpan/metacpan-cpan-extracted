@@ -37,7 +37,6 @@
             "Class::Load" : "0",
             "DBD::SQLite" : "0",
             "Data::Validate::IP" : "0.25",
-            "ExtUtils::MakeMaker" : "6.64",
             "HTTP::BrowserDetect" : "0",
             "I18N::AcceptLanguage" : "0",
             "I18N::LangTags::Detect" : "1.04",
@@ -45,6 +44,7 @@
             "Locale::Language" : "0",
             "Locale::Object" : "0.8",
             "Locale::Object::Country" : "0.78",
+            "Log::Abstraction" : "0",
             "Net::Subnet" : "0",
             "Net::Whois::IANA" : "0",
             "Net::Whois::IP" : "0",
@@ -53,7 +53,8 @@
             "Params::Get" : "0.13",
             "Readonly" : "0",
             "Sys::Syslog" : "0",
-            "perl" : "5.006002"
+            "autodie" : "0",
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -63,9 +64,6 @@
             "FindBin" : "0",
             "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
-            "LWP::Simple::WithCache" : "0.04",
-            "Log::Abstraction" : "0",
-            "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
@@ -77,8 +75,7 @@
             "Test::RequiresInternet" : "0",
             "Test::Returns" : "0",
             "Test::Which" : "0",
-            "Test::Without::Module" : "0",
-            "autodie" : "0"
+            "Test::Without::Module" : "0"
          }
       }
    },
@@ -96,6 +93,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.81",
+   "version" : "0.82",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

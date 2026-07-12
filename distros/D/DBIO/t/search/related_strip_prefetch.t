@@ -19,19 +19,19 @@ my $rel_rs = $rs->search_related ('tags', { 'tags.tag' => { '!=', undef }}, { di
 is_same_sql_bind (
   $rel_rs->as_query,
   '(
-    SELECT tags.tagid, tags.cd, tags.tag
+    SELECT "tags"."tagid", "tags"."cd", "tags"."tag"
       FROM (
-        SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-          FROM cd me
-          JOIN artist artist ON artist.artistid = me.artist
-          LEFT JOIN track tracks ON tracks.cd = me.cdid
-        WHERE ( tracks.trackid != ? )
+        SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+          FROM cd "me"
+          JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
+          LEFT JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+        WHERE ( "tracks"."trackid" != ? )
         LIMIT ?
-      ) me
-      JOIN artist artist ON artist.artistid = me.artist
-      JOIN tags tags ON tags.cd = me.cdid
-    WHERE ( tags.tag IS NOT NULL )
-    GROUP BY tags.tagid, tags.cd, tags.tag
+      ) "me"
+      JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist"
+      JOIN "tags" "tags" ON "tags"."cd" = "me"."cdid"
+    WHERE ( "tags"."tag" IS NOT NULL )
+    GROUP BY "tags"."tagid", "tags"."cd", "tags"."tag"
   )',
 
   [

@@ -5,10 +5,20 @@ use Test::More;
 # Verify that schemas and result classes can be defined with 'use DBIO' syntax.
 # ISA checks run without a DB. Live tests require DBIO_TEST_MYSQL_DSN.
 
+# The storage component must match the DBD named in the DSN: DBD::MariaDB
+# (dbi:MariaDB:) needs the MariaDB storage (mariadb_* DBD attributes), while
+# DBD::mysql (dbi:mysql:) needs the plain MySQL storage (mysql_* attributes).
+# Loading the wrong one pins a storage that FETCHes attributes the connected
+# DBD does not implement (e.g. mysql_insertid on a DBD::MariaDB handle).
+my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_MYSQL_$_" } qw(DSN USER PASS)};
+my $mysql_component = ($dsn && $dsn =~ /^dbi:MariaDB:/i)
+    ? 'MySQL::MariaDB'
+    : 'MySQL';
+
 {
     package MyTest::MySQLSchema;
     use DBIO 'Schema';
-    __PACKAGE__->load_components('MySQL');
+    __PACKAGE__->load_components($mysql_component);
 }
 
 {
@@ -51,8 +61,6 @@ ok 'MyTest::MySQLSchema::Result::CD'->isa('DBIO::Core'),
 
 # --- Live tests (require DBIO_TEST_MYSQL_DSN) ---
 
-my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_MYSQL_$_" } qw(DSN USER PASS)};
-
 SKIP: {
     skip 'Set DBIO_TEST_MYSQL_DSN, _USER and _PASS to run live tests'
         . ' (NOTE: creates and drops tables artist, cd)', 5
@@ -74,15 +82,24 @@ SKIP: {
     });
     is $cd->artist->name, 'Test Artist', 'belongs_to traversal works';
     is $artist->cds->count, 1, 'has_many count correct';
+}
 
-    # Hygiene: leave no live-DB residue so t/53 round-trip and other live
-    # tests start from a clean slate. add_drop_table already drops CD
-    # before dropping artist, but only if the test reaches the end of
-    # the schema deploy -- be explicit in case we never get there.
+# Hygiene: leave no live-DB residue so t/53's round-trip and other live tests
+# start from a clean slate. Done in END with a dedicated dbh (matching the
+# PostgreSQL t/05 pattern) so cleanup still runs if the test dies mid-way --
+# the native Deploy path does not honour add_drop_table, so a leftover table
+# would otherwise make the next run's deploy fail with "table already exists".
+# Drop cd before artist to satisfy the foreign key.
+END {
+    return unless $dsn;
+    require DBI;
+    my $h = eval { DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 }) };
+    return unless $h;
     eval {
-        $schema->storage->dbh->do('DROP TABLE IF EXISTS cd');
-        $schema->storage->dbh->do('DROP TABLE IF EXISTS artist');
+        $h->do('DROP TABLE IF EXISTS cd');
+        $h->do('DROP TABLE IF EXISTS artist');
     };
+    $h->disconnect;
 }
 
 done_testing;

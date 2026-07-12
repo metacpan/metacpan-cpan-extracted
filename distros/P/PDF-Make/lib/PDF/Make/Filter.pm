@@ -72,6 +72,8 @@ sub tiff_predictor_decode {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Filter - Perl access to PDF stream filters (Flate, ASCII85, LZW, etc.)

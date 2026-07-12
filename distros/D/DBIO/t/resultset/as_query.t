@@ -12,7 +12,7 @@ my $cdrs = $schema->resultset('CD');
 {
   is_same_sql_bind(
     $art_rs->as_query,
-    "(SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me)", [],
+    '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me")', [],
   );
 }
 
@@ -26,7 +26,7 @@ my $name_resolved_bind = [
 {
   is_same_sql_bind(
     $art_rs->as_query,
-    "(SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me WHERE ( name = ? ))",
+    '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me" WHERE ( "name" = ? ))',
     [ $name_resolved_bind ],
   );
 }
@@ -41,7 +41,7 @@ my $rank_resolved_bind = [
 {
   is_same_sql_bind(
     $art_rs->as_query,
-    "(SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me WHERE name = ? AND rank = ? )",
+    '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me" WHERE "name" = ? AND "rank" = ? )',
     [ $name_resolved_bind, $rank_resolved_bind ],
   );
 }
@@ -51,7 +51,7 @@ my $rscol = $art_rs->get_column( 'charfield' );
 {
   is_same_sql_bind(
     $rscol->as_query,
-    "(SELECT me.charfield FROM artist me WHERE name = ? AND rank = ? )",
+    '(SELECT "me"."charfield" FROM "artist" "me" WHERE "name" = ? AND "rank" = ? )',
     [ $name_resolved_bind, $rank_resolved_bind ],
   );
 }
@@ -66,12 +66,12 @@ my $rscol = $art_rs->get_column( 'charfield' );
   # Just verify the SQL is generated correctly (no real DB)
   is_same_sql_bind(
     $subsel_rs->as_query,
-    "(SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
-       FROM cd me
-       WHERE cdid IN (
-         SELECT me.cdid FROM cd me JOIN artist artist ON artist.artistid = me.artist WHERE artist.name = ?
+    '(SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track"
+       FROM cd "me"
+       WHERE "cdid" IN (
+         SELECT "me"."cdid" FROM cd "me" JOIN "artist" "artist" ON "artist"."artistid" = "me"."artist" WHERE "artist"."name" = ?
        )
-    )",
+    )',
     [ [{ sqlt_datatype => 'varchar', sqlt_size => 100, dbic_colname => 'artist.name' }
         => 'Caterwauler McCrae'] ],
   );
@@ -83,14 +83,14 @@ is_same_sql_bind($schema->resultset('Artist')->search({
 }, {
    from => $schema->resultset('Artist')->search({ 'name' => 'frew'})->as_query,
 })->as_query,
-   '(SELECT me.artistid, me.name, me.rank, me.charfield FROM (
-     SELECT me.artistid, me.name, me.rank, me.charfield FROM
-       artist me
+   '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM (
+     SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM
+       "artist" "me"
        WHERE (
-         ( name = ? )
+         ( "name" = ? )
        )
      ) WHERE (
-       ( rank = ? )
+       ( "rank" = ? )
      )
    )',
    [

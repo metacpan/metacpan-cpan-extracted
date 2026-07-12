@@ -48,14 +48,46 @@ sub diff {
 # on a portable text column, see Diff.pm ESCALATION NOTE).
 sub _mysql_column_changed {
   my ($old, $new) = @_;
-  return scalar changed_fields($old, $new,
+  my @changed = changed_fields($old, $new,
     type    => ['data_type'],
-    scalar  => [qw(column_type default_value character_set collation comment)],
+    scalar  => [qw(default_value character_set collation comment)],
     bool    => ['not_null'],
     dim     => [qw(numeric_precision numeric_scale datetime_precision)],
     array   => ['values'],
     desired_state => 1,
   );
+
+  # column_type carries the parameterised type (char(32), decimal(10,2)) and is
+  # the real width/precision discriminator, so it is compared here rather than as
+  # a plain scalar: MySQL 8.0.17+ drops the *display width* from integer types
+  # (bigint(20) -> bigint) while MariaDB and MySQL < 8.0.17 keep it. Normalising
+  # the integer display width away on BOTH sides keeps that server-version
+  # difference from surfacing as a phantom MODIFY. Desired-state contract: only
+  # compare when the target ($new) prescribes a column_type.
+  if (defined $new->{column_type}
+        && _norm_int_display_width($old->{column_type})
+        ne _norm_int_display_width($new->{column_type})) {
+    push @changed, 'column_type';
+  }
+
+  return scalar @changed;
+}
+
+# Strip the parenthesised display width from integer-family column types
+# (int / integer / tinyint / smallint / mediumint / bigint), e.g.
+# 'bigint(20)' -> 'bigint', 'int(10) unsigned' -> 'int unsigned'. tinyint(1) is
+# preserved because MySQL keeps that width to signal BOOLEAN. decimal / numeric
+# / char / varchar widths are NOT stripped -- there the parenthesised value is
+# semantic, not a display width.
+sub _norm_int_display_width {
+  my ($ct) = @_;
+  return '' unless defined $ct;
+  my $s = lc $ct;
+  $s =~ s/\s+/ /g;
+  $s =~ s/^\s+|\s+$//g;
+  $s =~ s/\btinyint\((?!1\))\d+\)/tinyint/g;
+  $s =~ s/\b(bigint|smallint|mediumint|integer|int)\(\d+\)/$1/g;
+  return $s;
 }
 
 
@@ -113,7 +145,7 @@ DBIO::MySQL::Diff::Column - Diff operations for MySQL/MariaDB columns
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

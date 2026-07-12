@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Apophis', $VERSION);
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Apophis - Content-addressable storage with deterministic UUID v5 identifiers
+Apophis - Content addressable storage with deterministic UUID v5 identifiers
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ Version 0.02
 
 =head1 DESCRIPTION
 
-Apophis is a B<100% XS> content-addressable storage library built on the
+Apophis is a XS content addressable storage library built on the
 B<Horus> UUID library (RFC 9562).  It generates deterministic UUID v5
 identifiers for arbitrary content using SHA-1 namespace hashing.
 
@@ -72,9 +72,6 @@ different UUIDs for the same content.
 Stored objects are sharded across a 2-level hex directory tree (65,536
 directories) for efficient filesystem access at scale.  Writes are atomic
 (temp + rename).  CAS is naturally idempotent — no locking required.
-
-All logic is implemented in C for maximum performance.  The Perl layer
-is just C<XSLoader> — every method is an XSUB.
 
 =head1 METHODS
 

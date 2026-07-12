@@ -1,10 +1,13 @@
 package Map::Tube::Barcelona::Line::L8;
 
-$Map::Tube::Barcelona::Line::L8::VERSION   = '0.80';
-$Map::Tube::Barcelona::Line::L8::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
-use strict; use warnings;
 
 =head1 NAME
 
@@ -12,7 +15,7 @@ Map::Tube::Barcelona::Line::L8 - Barcelona Metro Map: L8 Line.
 
 =head1 VERSION
 
-Version 0.80
+Version v1.0.0
 
 =encoding utf8
 
@@ -101,7 +104,7 @@ L<https://metacpan.org/dist/Map-Tube-Barcelona/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2014 - 2026 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic  License (2.0). You may obtain a copy of the full

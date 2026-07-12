@@ -219,13 +219,13 @@ CODE:
     
     rc = pdfmake_crypt_encrypt_stream(&self->ctx, obj_num, gen_num,
                                        in, in_len, &out, &out_len);
-    
+
     if (rc != 0 || out == NULL) {
-        if (out) free(out);
+        if (out) pdfmake_cfree(out);
         RETVAL = &PL_sv_undef;
     } else {
         RETVAL = newSVpvn((char *)out, out_len);
-        free(out);
+        pdfmake_cfree(out);
     }
 OUTPUT:
     RETVAL
@@ -247,13 +247,13 @@ CODE:
     
     rc = pdfmake_crypt_decrypt_stream(&self->ctx, obj_num, gen_num,
                                        in, in_len, &out, &out_len);
-    
+
     if (rc != 0 || out == NULL) {
-        if (out) free(out);
+        if (out) pdfmake_cfree(out);
         RETVAL = &PL_sv_undef;
     } else {
         RETVAL = newSVpvn((char *)out, out_len);
-        free(out);
+        pdfmake_cfree(out);
     }
 OUTPUT:
     RETVAL

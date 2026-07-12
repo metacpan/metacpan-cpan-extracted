@@ -20,7 +20,7 @@ DBIO::Shortcut::du - `use DBIO -du` shortcut for the DuckDB driver
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

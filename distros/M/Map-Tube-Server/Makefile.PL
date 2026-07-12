@@ -27,11 +27,20 @@ WriteMakefile(
     clean => { FILES => 'Map-Tube-Server*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Map::Tube::Server' => {
+                file    => 'lib/Map/Tube/Server.pm',
+                version => MM->parse_version('lib/Map/Tube/Server.pm')
+            },
+        },
         resources => {
             repository => {
                 type => 'git',
                 url  => 'https://github.com/manwar/Map-Tube-Server.git',
                 web  => 'https://github.com/manwar/Map-Tube-Server',
+            },
+             bugtracker => {
+                web     => 'https://github.com/manwar/Map-Tube-Server/issues'
             },
         }})
      : ()

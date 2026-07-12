@@ -40,7 +40,7 @@ DBIO::Storage::Pool - Abstract connection pool interface for async storage
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,8 @@ version 0.900000
 
   sub acquire { ... }   # return Future resolving to a connection
   sub release { ... }   # return connection to pool
+
+See F<t/storage/pool_base.t> for a runnable example.
 
 =head1 DESCRIPTION
 

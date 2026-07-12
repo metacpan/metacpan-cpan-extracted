@@ -43,7 +43,7 @@ DBIO::Test::Schema::Link - Test result class for the link table
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

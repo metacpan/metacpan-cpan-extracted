@@ -1,5 +1,38 @@
 Revision history for DBIO-SQLite
 
+0.900001  2026-07-12
+    * Fixes
+        - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr
+          #14). When diff reconciled a live schema containing a table absent
+          from the target (removed from the app's DBIO classes, or an
+          unmanaged leftover), it emitted both DROP TABLE <t> and a later
+          standalone DROP INDEX for one of that table's indexes; since
+          SQLite's DROP TABLE already removes the table's own indexes, the
+          standalone DROP INDEX died with "no such index" and aborted
+          apply()/upgrade(). DBIO::SQLite::Diff::Index now receives the tables
+          sections (threaded in by DBIO::SQLite::Diff) and suppresses a
+          standalone DROP INDEX for any index whose owning table is itself
+          being dropped in the same pass. Indexes of surviving tables are
+          still dropped as before; the two-argument diff() call stays
+          backward compatible (absent table sections => nothing suppressed)
+        - t/01-access-broker-api.t referenced the never-released
+          DBIO::AccessBroker::Credentials, which broke the test suite on
+          fresh installs (the module only existed as a local dev leftover);
+          switched to the released DBIO::AccessBroker::Static
+          (Codeberg #1, reported by eserte)
+        - t/populate_more.t: updated the load_components path after core
+          renamed DBIO::Schema::PopulateMore to DBIO::PopulateMore
+        - Removed the now-stale TODO markers from the two order_by
+          hashref-condition cases in the SQLMaker suite: core's
+          parameterization fix (bdd38a2ce) already made them pass,
+          they were just surfacing as "TODO passed" noise
+
+    * Dependencies
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. SQLite driver for DBIO with native deploy, introspect,
     diff and DDL generation -- no SQL::Translator.

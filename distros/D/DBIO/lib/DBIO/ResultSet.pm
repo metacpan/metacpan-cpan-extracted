@@ -396,14 +396,12 @@ sub find {
     if (
       length ref($call_cond->{$key})
         and
-      my $relinfo = $rsrc->relationship_info($key)
+      $rsrc->relationship_info($key)
         and
       # implicitly skip has_many's (likely MC)
       (ref (my $val = delete $call_cond->{$key}) ne 'ARRAY' )
     ) {
-      my ($rel_cond, $crosstable) = $rsrc->_resolve_condition(
-        $relinfo->{cond}, $val, $key, $key
-      );
+      my ($rel_cond, $crosstable) = $self->_resolve_related_cond($rsrc, $key, $val);
 
       $self->throw_exception("Complex condition via relationship '$key' is unsupported in find()")
          if $crosstable or ref($rel_cond) ne 'HASH';
@@ -488,6 +486,25 @@ sub find {
   }
 }
 
+# Resolve a related-object sub-condition down to a condition on THIS source's
+# own columns, exactly as find() does when folding a related sub-hash into the
+# main search. Returns ($resolved_cond, $crosstable): $crosstable is true when
+# the relationship cannot be reduced to a join-free condition on the main table
+# at all. Note that even when $crosstable is false the individual values in
+# $resolved_cond may be undef/UNRESOLVABLE_CONDITION -- e.g. a has_many searched
+# by its own non-key columns resolves join-free to { self_pk => undef }, which
+# does NOT pin a concrete foreign key. This is the single resolution seam shared
+# by find()'s complex-condition guard and update_or_create()'s relation-
+# splitting DWIM; each caller interprets the result for itself (ADR 0033).
+sub _resolve_related_cond {
+  my ($self, $rsrc, $rel_name, $val) = @_;
+
+  my $relinfo = $rsrc->relationship_info($rel_name)
+    or return (undef, undef);
+
+  return $rsrc->_resolve_condition( $relinfo->{cond}, $val, $rel_name, $rel_name );
+}
+
 # This is a stop-gap method as agreed during the discussion on find() cleanup:
 # http://lists.scsys.co.uk/pipermail/dbix-class/2010-October/009535.html
 #
@@ -570,6 +587,22 @@ sub single {
       $self->throw_exception('single() only takes search conditions, no attributes. You want ->search( $cond, $attrs )->single()');
   }
 
+  my @select_args = $self->_single_select_args($where);
+
+  my $data = [ $self->result_source->storage->select_single(@select_args) ];
+
+  return undef unless @$data;
+  $self->{_stashed_rows} = [ $data ];
+  $self->_construct_results->[0];
+}
+
+# Build the (from, select, where, attrs) argument list for the single-row
+# storage select that backs both single() and single_async(). Factored out so
+# the async path issues the identical query (and the same has_many-collapse
+# assertion) the synchronous path does.
+sub _single_select_args {
+  my ($self, $where) = @_;
+
   my $attrs = { %{$self->_resolved_attrs} };
 
   $self->throw_exception(
@@ -588,14 +621,7 @@ sub single {
     }
   }
 
-  my $data = [ $self->result_source->storage->select_single(
-    $attrs->{from}, $attrs->{select},
-    $attrs->{where}, $attrs
-  )];
-
-  return undef unless @$data;
-  $self->{_stashed_rows} = [ $data ];
-  $self->_construct_results->[0];
+  return ($attrs->{from}, $attrs->{select}, $attrs->{where}, $attrs);
 }
 
 
@@ -1149,49 +1175,205 @@ sub first {
   return $_[0]->reset->next;
 }
 
+# Shared dispatch for the ResultSet/Row *_async methods (ADR 0030/0031).
+# Mirrors the storage-level _run_async three-way contract one tier up:
+#
+#   * a live embedded async backend  -> route the read/write through the
+#     storage's *_async op and inflate the raw result in the Future's ->then,
+#     so it is genuinely non-blocking on a real backend (real async)
+#   * the 'immediate' mode           -> run the ordinary synchronous method and
+#     (mode chosen, no backend)          wrap its result in an immediately-
+#                                        resolved Future via future_class
+#   * a sync instance                -> croak loudly: *_async was called but no
+#     (no async mode chosen)             async mode was selected at connect time
+#
+# $backend_build builds the real-async Future given ($backend, $future_class);
+# $sync_run is the synchronous fallback invoked for the immediate mode. The
+# _async_storage resolver croaks on its own for a chosen-but-unavailable mode.
+sub _rs_run_async {
+  my ($self, $name, $backend_build, $sync_run) = @_;
+
+  my $storage = $self->result_source->storage;
+  my $fc = $storage->future_class;
+
+  if (my $backend = $storage->_async_storage) {
+    return $backend_build->($backend, $fc);
+  }
+
+  $self->throw_exception(
+    "not an async connection -- connect with { async => ... } to use ${name}_async"
+  ) unless defined $storage->_async_mode;
+
+  my @r = eval { $sync_run->() };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+# Inflate raw fetched rows (arrayrefs in $attrs->{select} order, exactly what a
+# real cursor's ->all would yield) into result objects with full fetch_all
+# collapse/prefetch parity, by feeding them to the very same
+# _construct_results('fetch_all') the synchronous ->all path uses. A pre-filled
+# cursor stands in for the storage cursor so no synchronous query is issued;
+# _construct_results pulls the rows from it via ->all just as it would from a
+# real eager cursor, then runs the identical collapser/inflator. Returns the
+# arrayref of constructed result objects (possibly empty).
+sub _inflate_fetched_rows {
+  my ($self, $raw_rows) = @_;
+
+  delete @{$self}{qw/_stashed_rows _stashed_results/};
+  local $self->{cursor} = DBIO::ResultSet::_PrefetchedCursor->new($raw_rows);
+  return $self->_construct_results('fetch_all') || [];
+}
+
 
 sub all_async {
   my $self = shift;
-  my $storage = $self->result_source->storage;
-  my $fc = $storage->future_class;
-  my @r = eval { $self->all };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
+  if (@_) {
+    $self->throw_exception("all_async() doesn't take any arguments, you probably wanted ->search(...)->all_async()");
+  }
+
+  return $self->_rs_run_async('all',
+    sub {
+      my ($backend, $fc) = @_;
+
+      if (my $c = $self->get_cache) {
+        return $fc->done(@$c);
+      }
+
+      my $attrs = $self->_resolved_attrs;
+      return $backend->select_async(
+        $attrs->{from}, $attrs->{select}, $attrs->{where}, $attrs,
+      )->then(sub {
+        my @raw = @_;
+        my $objs = $self->_inflate_fetched_rows(\@raw);
+        $self->set_cache($objs) if $self->{attrs}{cache};
+        # Resolve with the object LIST via an explicit Future, not a bare
+        # `return @$objs`. A real Future's ->then invokes a non-Future-returning
+        # callback in SCALAR context, so `return @$objs` would collapse to the
+        # element count (the DBIO::Future::Immediate shim's ->then uses list
+        # context, which hid this until the first live real-async run). Matches
+        # the get_cache branch above, which already returns $fc->done(@$c).
+        return $fc->done(@$objs);
+      });
+    },
+    sub { $self->all },
+  );
 }
 
 
 sub first_async {
   my $self = shift;
-  my $storage = $self->result_source->storage;
-  my $fc = $storage->future_class;
-  my $r = eval { $self->first };
-  return $@ ? $fc->fail($@) : $fc->done($r);
+
+  return $self->_rs_run_async('first',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my $attrs = $self->_resolved_attrs;
+      return $backend->select_async(
+        $attrs->{from}, $attrs->{select}, $attrs->{where}, $attrs,
+      )->then(sub {
+        my @raw = @_;
+        my $objs = $self->_inflate_fetched_rows(\@raw);
+        return $objs->[0];
+      });
+    },
+    sub { $self->first },
+  );
 }
 
 
 sub single_async {
-  my $self = shift;
-  my $storage = $self->result_source->storage;
-  my $fc = $storage->future_class;
-  my $r = eval { $self->single(@_) };
-  return $@ ? $fc->fail($@) : $fc->done($r);
+  my ($self, @args) = @_;
+  if (@args > 1) {
+    $self->throw_exception('single() only takes search conditions, no attributes. You want ->search( $cond, $attrs )->single()');
+  }
+
+  return $self->_rs_run_async('single',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my @select_args = $self->_single_select_args($args[0]);
+      return $backend->select_single_async(@select_args)->then(sub {
+        my ($raw_row) = @_;
+        return undef unless defined $raw_row;
+        $self->{_stashed_rows} = [ $raw_row ];
+        return $self->_construct_results->[0];
+      });
+    },
+    sub { $self->single(@args) },
+  );
 }
 
 
 sub count_async {
   my $self = shift;
-  my $storage = $self->result_source->storage;
-  my $fc = $storage->future_class;
-  my $r = eval { $self->count(@_) };
-  return $@ ? $fc->fail($@) : $fc->done($r);
+  return $self->search(@_)->count_async if @_ and defined $_[0];
+
+  return $self->_rs_run_async('count',
+    sub {
+      my ($backend, $fc) = @_;
+
+      return $fc->done( scalar @{ $self->get_cache } ) if $self->get_cache;
+
+      my $attrs = { %{ $self->_resolved_attrs } };
+
+      # software-side limit adjustment, identical to count()
+      my ($rows, $offset) = delete @{$attrs}{qw/rows offset/};
+
+      my $crs = $self->_has_resolved_attr (qw/collapse group_by/)
+        ? $self->_count_subq_rs ($attrs)
+        : $self->_count_rs ($attrs);
+
+      my $cattrs = $crs->_resultset->_resolved_attrs;
+
+      return $backend->select_single_async(
+        $cattrs->{from}, $cattrs->{select}, $cattrs->{where}, $cattrs,
+      )->then(sub {
+        my ($raw) = @_;
+        my $count = (defined $raw && ref $raw eq 'ARRAY') ? ($raw->[0] // 0) : ($raw // 0);
+
+        $count -= $offset if $offset;
+        $count = $rows if $rows and $rows < $count;
+        $count = 0 if ($count < 0);
+
+        return $count;
+      });
+    },
+    sub { $self->count },
+  );
 }
 
 
 sub create_async {
-  my $self = shift;
-  my $storage = $self->result_source->storage;
-  my $fc = $storage->future_class;
-  my $r = eval { $self->create(@_) };
-  return $@ ? $fc->fail($@) : $fc->done($r);
+  my ($self, @args) = @_;
+
+  return $self->_rs_run_async('create',
+    sub {
+      my ($backend, $fc) = @_;
+      return $self->new_result($args[0])->insert_async;
+    },
+    sub { $self->create(@args) },
+  );
+}
+
+{
+  # A stand-in cursor carrying already-fetched raw rows into
+  # _construct_results('fetch_all') without issuing any synchronous query. Only
+  # ->all (and ->reset/->next for safety) are exercised by the fetch_all path.
+  package DBIO::ResultSet::_PrefetchedCursor;
+
+  sub new {
+    my ($class, $rows) = @_;
+    return bless { rows => $rows || [] }, $class;
+  }
+
+  sub all {
+    my $self = shift;
+    return @{ $self->{rows} };
+  }
+
+  sub reset { $_[0]->{rows} = []; return $_[0] }
+
+  sub next { return () }
 }
 
 # _rs_update_delete
@@ -1893,13 +2075,83 @@ sub update_or_create {
   my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
   my $cond = ref $_[0] eq 'HASH' ? shift : {@_};
 
-  my $row = $self->find($cond, $attrs);
+  my ($main_cond, $related_subconds) = $self->_split_related_update_conds($cond);
+
+  # When related sub-structures are peeled off to be applied after the main
+  # row, wrap the whole operation in a transaction so a partially-built graph
+  # never survives a failure -- mirroring the multi-create guarantee in
+  # DBIO::Row::insert. No transaction is opened for the common no-relation case.
+  my $guard = keys %$related_subconds
+    ? $self->result_source->schema->txn_scope_guard
+    : undef;
+
+  my $row = $self->find($main_cond, $attrs);
   if (defined $row) {
-    $row->update($cond);
-    return $row;
+    $row->update($main_cond);
+  }
+  else {
+    $row = $self->new_result($main_cond)->insert;
   }
 
-  return $self->new_result($cond)->insert;
+  # DWIM: apply each peeled-off relation through the (now stored) main row's
+  # related resultset. The main-table 'key' constraint applies only to the main
+  # table, so it is intentionally NOT propagated to these calls.
+  for my $rel_name (keys %$related_subconds) {
+    $row->related_resultset($rel_name)
+        ->update_or_create($related_subconds->{$rel_name});
+  }
+
+  $guard->commit if $guard;
+
+  return $row;
+}
+
+# update_or_create() DWIM: split a mixed condition into ( \%main_cond,
+# \%related_subconds ). A top-level key is peeled off into %related_subconds
+# only when it is a relationship name whose value is a plain (unblessed) hashref
+# that does NOT reduce to a *concrete* foreign-key condition on the main table.
+#
+# A resolvable belongs_to (FK-bearing hashref, or a blessed related object)
+# reduces join-free to { self_fk => <defined value> } and STAYS in %main_cond --
+# find()/update() handle it exactly as before. A has_many / has_one / might_have
+# searched by its own non-key columns either is crosstable, or resolves join-free
+# to { self_pk => undef } (which would silently clobber the main key with an
+# undef FK -- the original defect this DWIM fixes). Those are peeled off and
+# applied to their own related resultset after the main row exists.
+#
+# has_many arrayrefs (multi) and blessed/other non-plain-hashref relation values
+# are left untouched in %main_cond: the main create/multi-create or update path
+# already handles or rejects them, unchanged. See ADR 0033.
+sub _split_related_update_conds {
+  my ($self, $cond) = @_;
+
+  my $rsrc = $self->result_source;
+  my %main_cond = %$cond;
+  my %related_subconds;
+
+  for my $key (keys %main_cond) {
+    next unless ref $main_cond{$key} eq 'HASH';
+    next unless $rsrc->relationship_info($key);
+
+    my ($rel_cond, $crosstable)
+      = $self->_resolve_related_cond($rsrc, $key, $main_cond{$key});
+
+    # Keep in the main search only when the relation reduces to a concrete,
+    # fully-defined foreign-key condition on this table (resolvable belongs_to).
+    my $concrete_fk =
+         ! $crosstable
+      && ref $rel_cond eq 'HASH'
+      && keys %$rel_cond
+      && ! grep {
+           ! defined $_ or ( ! ref($_) && $_ eq UNRESOLVABLE_CONDITION )
+         } values %$rel_cond;
+
+    next if $concrete_fk;
+
+    $related_subconds{$key} = delete $main_cond{$key};
+  }
+
+  return (\%main_cond, \%related_subconds);
 }
 
 
@@ -3176,7 +3428,7 @@ DBIO::ResultSet - Lazy query object for fetching and manipulating DBIO rows
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -3187,6 +3439,8 @@ version 0.900000
 
   my $registered_users_rs = $schema->resultset('User')->search({ registered => 1 });
   my @cds_in_2005 = $schema->resultset('CD')->search({ year => 2005 })->all();
+
+See F<t/resultset/as_query.t> for a runnable example.
 
 =head1 DESCRIPTION
 
@@ -3877,36 +4131,52 @@ an object for the first result (or C<undef> if the resultset is empty).
   my $future = $rs->all_async;
   $future->then(sub { my @rows = @_; ... });
 
-Async variant of L</all>. Returns a L<DBIO::Future> that resolves with
-all result objects. With synchronous storage, the Future resolves
-immediately.
+Async variant of L</all>. Returns a L<DBIO::Future> that resolves with all
+result objects, fully inflated with the same prefetch/collapse handling as
+L</all> (the raw rows fetched through the backend's C<select_async> are run
+through the same C<_construct_results> path).
+
+Requires an async connection (C<< connect(..., { async => ... }) >>); on a sync
+instance it croaks. In the C<immediate> mode it runs synchronously and resolves
+immediately. See ADR 0030/0031.
 
 =head2 first_async
 
   my $future = $rs->first_async;
 
-Async variant of L</first>. Returns a L<DBIO::Future> that resolves
-with the first result object (or undef).
+Async variant of L</first>. Returns a L<DBIO::Future> that resolves with the
+first result object (or undef). The backend path fetches and collapses the full
+result set (the only collapse-correct way to obtain the first object under a
+prefetch) and resolves with its first element.
 
 =head2 single_async
 
   my $future = $rs->single_async;
 
-Async variant of L</single>.
+Async variant of L</single>. Routes the single-row fetch through the backend's
+C<select_single_async> and inflates the row with the same single-row collapse
+assertion as L</single>.
 
 =head2 count_async
 
   my $future = $rs->count_async;
   $future->then(sub { my $count = shift; ... });
 
-Async variant of L</count>.
+Async variant of L</count>. Routes the count query through the backend's
+C<select_single_async> and resolves with the integer count (applying the same
+software-side C<rows>/C<offset> adjustment as L</count>).
 
 =head2 create_async
 
   my $future = $rs->create_async(\%vals);
   $future->then(sub { my $row = shift; ... });
 
-Async variant of L</create>.
+Async variant of L</create>. For a plain single-row create the row's own insert
+is routed through the backend's C<insert_async> and the resulting result object
+is built in the Future's C<then> (reusing the same column store-back as the
+synchronous L<DBIO::Row/insert>). A create that involves related-object
+multi-create cannot be expressed as a single C<insert_async> and is run
+synchronously, resolving immediately (delegated to L<DBIO::Row/insert_async>).
 
 =head2 update
 
@@ -4341,6 +4611,22 @@ For example:
   }, {
     key => 'primary',
   });
+
+If C<%col_data> mixes plain columns of this table with a nested related
+sub-structure keyed on a relationship name (the DWIM shape
+C<< { some_col => $x, some_relation => { ... } } >>), C<update_or_create>
+splits them automatically: the main row is found-or-updated (or created)
+from the plain columns, and each related sub-structure is then applied via
+its own C<update_or_create> on the corresponding related resultset. Only
+relationships that cannot be reduced to a plain foreign-key condition on this
+table are split out this way (a C<has_many> / C<has_one> / C<might_have>, or a
+C<belongs_to> whose value is not a resolvable foreign key); a C<belongs_to>
+supplied as a resolvable foreign key still folds into the main search as
+before. The C<key> attribute constrains only the main-table lookup and is not
+propagated to the related resultsets. When any relation is split out, the whole
+operation runs inside a transaction, mirroring the multi-create behaviour of
+L<DBIO::ResultSet/create>. This removes the need for the manual
+find-then-C<< ->relation->update_or_create >> workaround.
 
 B<Note>: Make sure to read the documentation of L</find> and understand the
 significance of the C<key> attribute, as its lack may skew your search, and

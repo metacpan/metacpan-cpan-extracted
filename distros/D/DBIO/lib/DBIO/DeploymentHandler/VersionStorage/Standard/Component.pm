@@ -21,9 +21,9 @@ sub connection  {
 
   $self->attach_version_storage;
 
-  my $args = $self->storage->_dbic_connect_attributes;
+  my $args = $self->storage->_dbio_connect_attributes; # fork-rename: was _dbic_connect_attributes
 
-  unless ( $args->{ignore_version} || $ENV{DBIC_NO_VERSION_CHECK}) {
+  unless ( $args->{ignore_version} || $ENV{DBIO_NO_VERSION_CHECK}) { # documented name; legacy DBIC_NO_VERSION_CHECK still honored in DBIO::Storage::DBI
     my $versions = $self->resultset('__VERSION');
 
     if (!$versions->version_storage_is_installed) {
@@ -53,7 +53,7 @@ DBIO::DeploymentHandler::VersionStorage::Standard::Component - Attach this compo
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

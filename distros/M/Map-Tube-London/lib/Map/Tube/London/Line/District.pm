@@ -1,10 +1,11 @@
 package Map::Tube::London::Line::District;
 
-$Map::Tube::London::Line::District::VERSION   = '1.42';
-$Map::Tube::London::Line::District::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
 
-use 5.006;
-use strict; use warnings;
+our $VERSION   = qv('v2.0.2');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -12,7 +13,7 @@ Map::Tube::London::Line::District - London Tube Map: District Line.
 
 =head1 VERSION
 
-Version 1.42
+Version v2.0.2
 
 =head1 DESCRIPTION
 
@@ -286,7 +287,7 @@ L<https://metacpan.org/dist/Map-Tube-London>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2014 - 2026 Mohammad Sajid Anwar.
 
 This program is  free software; you can  redistribute it and / or modify it under
 the  terms  of the the Artistic  License (2.0). You may obtain a copy of the full

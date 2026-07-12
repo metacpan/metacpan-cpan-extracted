@@ -397,7 +397,8 @@ static void eshu_pl_scan_line(eshu_pl_ctx_t *ctx,
 				ctx->last_was_value = 0;
 			} else if ((c == 'q' || c == 'm' || c == 's' || c == 'y' ||
 			            (c == 't' && p + 1 < end && *(p + 1) == 'r')) &&
-			           !eshu_pl_preceded_by_word(line_start, p)) {
+			           !eshu_pl_preceded_by_word(line_start, p) &&
+			           !(p > line_start && *(p - 1) == '{')) {
 				int consumed = eshu_pl_try_q_construct(ctx, p, end);
 				if (consumed > 0) {
 					p += consumed;
@@ -546,14 +547,8 @@ static void eshu_pl_scan_line(eshu_pl_ctx_t *ctx,
 			}
 			break;
 
-		/* These states are handled at the line level, not char level */
-		case ESHU_HEREDOC:
-		case ESHU_HEREDOC_INDENT:
-		case ESHU_POD:
-		case ESHU_CHAR_LIT:
-		case ESHU_COMMENT_LINE:
-		case ESHU_COMMENT_BLOCK:
-		case ESHU_PREPROCESSOR:
+		/* States handled at line level, or not used by Perl scanner */
+		default:
 			return;
 		}
 		p++;

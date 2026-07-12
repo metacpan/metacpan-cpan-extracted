@@ -34,7 +34,7 @@ DBIO::Test::Schema::SelfRefAlias - Test result class for the self_ref_alias tabl
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

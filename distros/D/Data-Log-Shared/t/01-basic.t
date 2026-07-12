@@ -193,9 +193,12 @@ is $log->truncation, 0, 'truncation starts at 0';
 $log->truncate($off2t);
 is $log->truncation, $off2t, 'truncation advanced';
 
-# read_entry on truncated offset returns nothing
+# read_entry on a truncated offset yields no data but a skip-forward
+# next_off = truncation point, so an iterator resumes instead of stopping.
 my @tr = $log->read_entry($off1t);
-is scalar @tr, 0, 'truncated entry unreadable';
+is scalar @tr, 2, 'truncated offset returns (undef, next_off)';
+is $tr[0], undef, 'truncated entry has no data';
+is $tr[1], $off2t, 'truncated read skips forward to truncation';
 
 # entries at/after truncation still readable
 my ($td2) = $log->read_entry($off2t);
@@ -238,5 +241,21 @@ is $log->truncation, $mid, 'cross-process truncate';
 my @post;
 $log->each_entry(sub { push @post, $_[0] }, 0);
 is_deeply \@post, ["middle", "after"], 'cross-process truncate visible';
+
+# regression: a truncate that advances DURING iteration must not stop the
+# reader early. each_entry snapshots truncation once; before the fix, a
+# concurrent truncate past the cursor made read_entry return () (no
+# next_off) and the loop mistook it for end-of-log, dropping every entry
+# at/after the new truncation point.
+$log->reset;
+my @o = map { $log->append("row-$_") } 0 .. 4;
+my @visited;
+$log->each_entry(sub {
+    my ($data, $off) = @_;
+    push @visited, $data;
+    $log->truncate($o[3]) if @visited == 1;  # advance truncation mid-loop
+});
+is_deeply \@visited, ["row-0", "row-3", "row-4"],
+    'truncate mid-iteration skips forward, still visits entries >= truncation';
 
 done_testing;

@@ -36,7 +36,7 @@ my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
   is( $connect_count, 1, 'only one connection made');
 }
 
-isa_ok( $schema->storage, 'DBIO::MSSQL::Storage::Sybase' );
+isa_ok( $schema->storage, 'DBIO::MSSQL::Storage::ODBC' );
 
 {
   my $schema2 = $schema->connect (@{$schema->storage->connect_info});

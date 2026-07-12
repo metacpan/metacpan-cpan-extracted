@@ -60,6 +60,15 @@ if (defined $app) {
 		-text => 'Refresh',
 		-command => ['refresh', $doctree],
 	)->pack(-side => 'left');
+	$app->Button(
+		-text => 'Delete',
+		-command => ['entryDelete', $doctree, $sfile],
+	)->pack(-side => 'left');
+	$app->Button(
+		-text => 'Add',
+		-command => ['entryAdd', $doctree, $sfile],
+	)->pack(-side => 'left');
+	
 }
 
 @tests = (

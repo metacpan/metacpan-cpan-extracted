@@ -1,0 +1,196 @@
+# syntax=docker/dockerfile:1.7
+#
+# Test image for dbio-postgresql-ev.
+#
+# Why this exists: EV::Pg >= 0.07 links against libpq symbols that were
+# introduced in PostgreSQL 16 (PQconnectionUsedGSSAPI, PGRES_TUPLES_CHUNK).
+# On hosts that ship libpq 15 (Debian 12 default), EV::Pg.so loads fine via
+# lazy binding but fails the moment make test sets PERL_DL_NONLAZY=1 and the
+# dynamic linker tries to resolve every undefined symbol up-front. Multi-stage
+# pulls libpq 17 out of postgres:17-bookworm, then drops it onto a slim
+# Debian base so the XS module and the runtime libpq stay in lockstep.
+#
+# Build:
+#   docker build -f maint/docker/Dockerfile.test -t dbio-async-test .
+#
+# Run the whole suite against an external PostgreSQL (any reachable instance):
+#   docker run --rm \
+#     -e DBIO_TEST_PG_DSN='dbi:Pg:dbname=dbio_async;host=host.docker.internal;port=5432' \
+#     -e DBIO_TEST_PG_USER=dbio \
+#     -e DBIO_TEST_PG_PASS=dbio \
+#     dbio-async-test
+#
+# Run a single file (proves the env wiring works end-to-end):
+#   docker run --rm -e DBIO_TEST_PG_DSN=... dbio-async-test -lv t/21-deploy-async-live.t
+#
+# The image is the CLIENT only. PostgreSQL itself stays wherever the caller
+# wants it: docker run of postgres:17, k8s (maint/k8s/pg-pod.yaml), a system
+# install, or a managed service. The image's job is to make EV::Pg resolve
+# cleanly under PERL_DL_NONLAZY=1.
+
+# ---------------------------------------------------------------------------
+# Stage 1 — extract libpq from postgres:17-bookworm
+# ---------------------------------------------------------------------------
+FROM postgres:17-bookworm AS libpq-source
+
+# The postgres:* images ship only the runtime libpq.so; the C headers and
+# the pkg-config stub are NOT included. Install libpq-dev here so EV::Pg's
+# XS build can find libpq-fe.h when Stage 2 cpanm's it.
+#
+# Note on version: the PGDG bookworm repo currently ships libpq 18.x even
+# under the postgres:17 image. libpq's ABI is stable across major versions
+# (every PG release ships libpq.so.5 with the same SO-version), so libpq.so.5
+# from this image satisfies EV::Pg >= 0.07's symbol requirements
+# (PQconnectionUsedGSSAPI, PGRES_TUPLES_CHUNK) cleanly.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq-dev pkg-config \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /libpq-out/usr/lib /libpq-out/usr/include /libpq-out/usr/lib/pkgconfig /libpq-out/usr/bin \
+    && cp -a /usr/lib/x86_64-linux-gnu/libpq.so* /libpq-out/usr/lib/ \
+    && cp -a /usr/include/postgresql /libpq-out/usr/include/ \
+    && cp -a /usr/lib/x86_64-linux-gnu/pkgconfig/libpq.pc /libpq-out/usr/lib/pkgconfig/ \
+    && cp -a /usr/lib/postgresql/*/bin/pg_config /libpq-out/usr/bin/
+
+# ---------------------------------------------------------------------------
+# Stage 2 — slim Debian + the libpq 17 we just lifted + Perl + EV::Pg
+# ---------------------------------------------------------------------------
+FROM debian:bookworm-slim
+
+# Install the libpq 17 we pulled from postgres:17-bookworm. /usr/local/lib
+# comes ahead of /usr/lib/x86_64-linux-gnu on the loader path, so even if
+# bookworm ever ships libpq 16 in the future, ours wins.
+#
+# /usr/local/{include,lib} are the canonical prefixes for hand-installed
+# libraries, but several Perl XS modules (DBD::Pg in particular) hard-code
+# the system paths /usr/include/postgresql and /usr/lib/x86_64-linux-gnu
+# in their Configure scripts and refuse to look anywhere else. We symlink
+# our copies into those locations so the hard-coded paths find libpq 17.
+COPY --from=libpq-source /libpq-out/usr/lib/ /usr/local/lib/
+COPY --from=libpq-source /libpq-out/usr/include/ /usr/local/include/
+COPY --from=libpq-source /libpq-out/usr/lib/pkgconfig/ /usr/local/lib/pkgconfig/
+COPY --from=libpq-source /libpq-out/usr/bin/ /usr/local/bin/
+RUN ldconfig \
+    && ln -s /usr/local/include/postgresql /usr/include/postgresql \
+    && for f in /usr/local/lib/libpq.so*; do \
+         ln -sf "$f" "/usr/lib/x86_64-linux-gnu/$(basename "$f")"; \
+       done
+
+# Perl + cpanm + the XS build chain + libldap (a runtime dep of libpq 17;
+# EV::Pg's XS module dynamically links it for the LDAP authentication path,
+# so it must be present even though our tests never authenticate via LDAP).
+# ssl-dev is needed by several of the CPAN deps (Net::SSLeay, IO::Socket::SSL,
+# etc.).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+         perl \
+         cpanminus \
+         build-essential \
+         pkg-config \
+         libssl-dev \
+         libldap-2.5-0 \
+         ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Tell pkg-config and the EV::Pg build where to find libpq 17.
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
+WORKDIR /src
+
+# Copy cpanfile + the rest of the source in one shot so cpanm --installdeps
+# can resolve the distribution's runtime + test deps from the same tree.
+COPY cpanfile dist.ini ./
+COPY lib/ ./lib/
+COPY t/ ./t/
+COPY demo/ ./demo/
+COPY maint/ ./maint/
+
+# Distribution deps. We do NOT use `cpanm --installdeps /src` here on
+# purpose: cpanfile pins EV::Pg < 0.03 (the verified line on libpq 15) but
+# we deliberately install EV::Pg@0.07 to match the libpq we shipped in
+# this image. --installdeps would see the mismatch and try to downgrade.
+# Instead we install each dep explicitly at the version we want, and rely
+# on cpanm's transitive resolution to pull EV, Future, Moo, SQL::Abstract,
+# Test::More, Test::Exception via the dependencies below. See README for
+# the cpanfile TODO.
+#
+# Order matters: install DBIO::PostgreSQL FIRST so its own test deps
+# (which include DBD::Pg) never enter cpanm's resolution path for /src.
+# Distribution deps. We do NOT use `cpanm --installdeps /src` here on
+# purpose: cpanfile pins EV::Pg < 0.03 (the verified line on libpq 15) but
+# we deliberately install EV::Pg@0.07 to match the libpq we shipped in
+# this image. --installdeps would see the mismatch and try to downgrade.
+# Instead we install each dep explicitly at the version we want, and rely
+# on cpanm's transitive resolution to pull EV, Future, Moo, SQL::Abstract,
+# Test::More, Test::Exception via the dependencies below. See README for
+# the cpanfile TODO.
+#
+# Order matters: install DBIO::PostgreSQL FIRST so its own test deps
+# (which include DBD::Pg) never enter cpanm's resolution path for /src.
+#
+# The wide dep list mirrors DBIO's transitive requirements. Listing them
+# explicitly is verbose but makes the image self-contained and survives
+# cpanfile changes -- new dependencies added to dbio-postgresql-ev
+# are caught by the test run itself (missing-module errors are obvious),
+# rather than silently breaking the image build.
+RUN cpanm --notest DBIO::PostgreSQL \
+    && cpanm --notest EV::Pg@0.07 \
+    && cpanm --notest \
+         Test::More Test::Exception Test::Deep Test::FailWarnings Test::Fatal \
+         Test::LeakTrace Test::Memory::Cycle Test::MockObject Test::Needs \
+         Test::NoWarnings Test::Output Test::Requires Test::SubCalls \
+         Test::Warn \
+         Future EV AnyEvent \
+         SQL::Abstract SQL::Abstract::Plugin::InsertReturning \
+         Moo MooX::Types::MooseLike MooX::ClassAttribute \
+         Moose Role::Tiny \
+         Class::Accessor::Grouped Class::C3::Componentised Class::C3 Class::Inspector \
+         Class::Load Class::Load::XS Class::Method::Modifiers Class::Tiny \
+         Scope::Guard Guard \
+         Sub::Name Sub::Identify Sub::Exporter Sub::Install \
+         Module::Runtime Module::Pluggable Module::Build \
+         Data::OptList Data::Dumper::Concise \
+         List::Util List::MoreUtils Params::Util Params::Validate \
+         Try::Tiny Carp Carp::Clan Scalar::Util \
+         String::RewritePrefix Hash::Merge JSON JSON::PP JSON::XS \
+         Devel::GlobalDestruction Devel::StackTrace \
+         Time::HiRes IO::Handle IO::Select \
+         DBI DBD::Pg \
+         aliased B::Hooks::EndOfScope namespace::clean \
+         Context::Preserve Hook::LexWrap Attribute::Handlers \
+         DateTime DateTime::Format::Pg DateTime::Format::Builder DateTime::Locale \
+         Dist::CheckConflicts Module::Find \
+         Package::Stash ExtUtils::MakeMaker
+
+# Sanity gate: prove the XS module loads under the same PERL_DL_NONLAZY=1
+# that `make test` sets. If this fails, the image is broken and every test
+# downstream will look like an EV::Pg bug -- so fail the build loudly here.
+#
+# The Pg.so path is found via Perl's @INC (cpanm installs to
+# /usr/local/lib by default, which is on @INC), not via $Config{archlibexp}
+# (which only covers the system Perl tree).
+RUN PERL_DL_NONLAZY=1 perl -e 'use EV::Pg; \
+    my $so = $INC{"EV/Pg.pm"}; $so =~ s{/Pg\.pm$}{/../auto/EV/Pg/Pg.so}; \
+    die "EV::Pg.pm not in %INC" unless $so && -f $so; \
+    my $ldd = `ldd $so`; \
+    die "EV::Pg.so does not link against /usr/local/lib libpq: $ldd" \
+        unless $ldd =~ m{/usr/local/lib/libpq\.so}; \
+    my $syms = `nm -D $so`; \
+    die "EV::Pg.so missing PQconnectionUsedGSSAPI reference (libpq 16+ symbol)" \
+        unless $syms =~ /U\s+PQconnectionUsedGSSAPI/; \
+    print "OK: EV::Pg.so links against libpq 17, all required symbols resolved\n"'
+
+# Default: run the whole live test suite. The caller picks the PG instance
+# via DBIO_TEST_PG_DSN; tests under t/*-live.t skip themselves when it is
+# unset, so the same image is usable for offline lint and online coverage.
+#
+# EXTRA_LIB_DIR lets the caller mount a directory of in-development Perl
+# modules at run time and have it prepended to @INC. The typical case is a
+# newer DBIO::PostgreSQL checked out alongside this repo (the version on
+# CPAN lags behind and lacks the async_backend hook this distribution's
+# live tests rely on). The entrypoint script wires the path into
+# PERL5LIB; prove then sees the local checkout first.
+ENV EXTRA_LIB_DIR=/extra-lib
+COPY maint/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["-lr", "t/"]

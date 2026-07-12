@@ -137,7 +137,7 @@ DBIO::InflateColumn - Automatically create references from column data
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -152,6 +152,8 @@ version 0.900000
       ...
     },
   });
+
+See F<t/serialize/01-inflatecolumn.t> for a runnable example.
 
 =head1 DESCRIPTION
 

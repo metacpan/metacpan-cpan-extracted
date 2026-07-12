@@ -22,7 +22,7 @@ $app->plugin('Fondation' => {
                 },
             ],
             models => {
-                user => { source => 'users', backend => 'main' },
+                user => { source => 'User', backend => 'main' },
             },
         }},
         'Fondation::TestDBIxAsync',
@@ -33,7 +33,7 @@ my $c = $app->build_controller;
 
 # 1. Action::DBIx registered the plugin's Result
 my $schema = $c->schema;
-my $source = eval { $schema->source('users') };
+my $source = eval { $schema->source('User') };
 ok($source, 'users source registered by Action::DBIx');
 is($source->result_class, 'Mojolicious::Plugin::Fondation::TestDBIxAsync::Schema::Result::User',
     'result_class from plugin');
@@ -42,7 +42,7 @@ is($source->result_class, 'Mojolicious::Plugin::Fondation::TestDBIxAsync::Schema
 my $entry = $app->fondation->registry->{'Mojolicious::Plugin::Fondation::TestDBIxAsync'};
 ok($entry->{dbic}, 'dbic metadata present');
 ok($entry->{dbic}{result_classes}, 'result_classes present');
-ok($entry->{dbic}{result_classes}{users}, 'result_classes has users table');
+ok($entry->{dbic}{result_classes}{User}, 'result_classes has User source');
 is($entry->{dbic}{total_added}, 2, 'two results added (User + Article)');
 
 # 3. End-to-end: deploy + CRUD via model()

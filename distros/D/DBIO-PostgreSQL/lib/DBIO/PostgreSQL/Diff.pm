@@ -36,10 +36,14 @@ my @_ORDER = qw(
 # Trailing context each table-aware diff class needs after its own
 # (source, target) section pair. Diff::Table builds full CREATE TABLE
 # statements and therefore needs the *column* data; Diff::Column and
-# Diff::Policy need the *table* list for schema/table context.
+# Diff::Policy need the *table* list for schema/table context; Diff::Index
+# needs the *table* list to detect which tables are being dropped in the
+# same pass, so it can suppress standalone DROP INDEX ops that DROP TABLE
+# ... CASCADE already covers (karr #32).
 my %_AUX_SECTION = (
   tables   => 'columns',
   columns  => 'tables',
+  indexes  => 'tables',
   policies => 'tables',
 );
 
@@ -269,7 +273,7 @@ DBIO::PostgreSQL::Diff - Compare two introspected PostgreSQL models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

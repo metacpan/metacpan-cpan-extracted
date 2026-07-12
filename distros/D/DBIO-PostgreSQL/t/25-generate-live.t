@@ -97,9 +97,12 @@ ok(-e "$tmpdir/TestGen/Schema/Result/Post.pm", 'Post.pm generated');
 ok(-e "$tmpdir/TestGen/Schema/Result/Tree.pm", 'Tree.pm generated');
 
 my $user_src = DBIO::Util::slurp_file_utf8("$tmpdir/TestGen/Schema/Result/User.pm");
-like($user_src, qr/__PACKAGE__->table\('users'\)/, 'User table name set');
-like($user_src, qr/__PACKAGE__->set_primary_key\('id'\)/, 'User primary key set');
-like($user_src, qr/__PACKAGE__->pg_schema\('$schema_name'\)/, 'User schema qualifier emitted');
+# DBIO::Generate emits string literals via B::perlstring, i.e. double-quoted
+# (->table("users")), so accept either quote style — same tolerance as the
+# offline sibling t/25-generate-via-introspect.t.
+like($user_src, qr/__PACKAGE__->table\(['"]users['"]\)/, 'User table name set');
+like($user_src, qr/__PACKAGE__->set_primary_key\(['"]id['"]\)/, 'User primary key set');
+like($user_src, qr/__PACKAGE__->pg_schema\(['"]\Q$schema_name\E['"]\)/, 'User schema qualifier emitted');
 
 # --- Index metadata (pg_index via result_class_extra_statements) ---
 ok($user_src =~ /pg_index/m, 'pg_index metadata present in User');

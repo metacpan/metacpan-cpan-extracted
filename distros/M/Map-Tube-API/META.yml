@@ -20,13 +20,13 @@ no_index:
 provides:
   Map::Tube::API:
     file: lib/Map/Tube/API.pm
-    version: '0.09'
+    version: v1.0.0
   Map::Tube::API::Exception:
     file: lib/Map/Tube/API/Exception.pm
-    version: '0.09'
+    version: v1.0.0
   Map::Tube::API::UserAgent:
     file: lib/Map/Tube/API/UserAgent.pm
-    version: '0.09'
+    version: v1.0.0
 requires:
   JSON: '2.53'
   LWP::UserAgent: '0'
@@ -35,6 +35,7 @@ requires:
   namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
+  bugtracker: https://github.com/manwar/Map-Tube-API/issues
   repository: https://github.com/manwar/Map-Tube-API.git
-version: '0.09'
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

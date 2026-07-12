@@ -1,9 +1,11 @@
 package Data::Log::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Log::Shared', $VERSION);
+
+sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (double-free)
 
 sub each_entry {
     my ($self, $cb, $from, $abandon_wait_us) = @_;
@@ -43,7 +45,7 @@ Data::Log::Shared - Append-only shared-memory log (WAL) for Linux
         say "offset=$offset: $data";
     });
 
-    # or manually — guard with `defined $data` since a slot from a
+    # or manually -- guard with `defined $data` since a slot from a
     # crashed writer is reported as (undef, $next)
     my $pos = 0;
     while (my ($data, $next) = $log->read_entry($pos)) {
@@ -145,16 +147,16 @@ Returns 1 if new entries arrived (count != expected), 0 on timeout.
 =head2 Truncation vs Reset
 
 The log has a fixed size (C<data_size>, set at creation). It is
-append-only — space is never reclaimed automatically.
+append-only -- space is never reclaimed automatically.
 
 C<truncate($offset)> is concurrency-safe (lock-free CAS). It marks
-all entries before C<$offset> as logically invalid — readers calling
+all entries before C<$offset> as logically invalid -- readers calling
 C<read_entry> or C<each_entry> will skip them. However, truncation
 does B<not> free physical space: the tail offset keeps advancing,
 and the log will eventually fill regardless of truncation.
 
 C<reset> reclaims all space by zeroing the tail and the data region.
-It is B<not> concurrency-safe — it must only be called when no other
+It is B<not> concurrency-safe -- it must only be called when no other
 process is reading or writing. Cost is O(data_size) because the slot
 region is zeroed to prevent stale-data hazards for subsequent readers.
 
@@ -185,8 +187,14 @@ C<waiters>, C<appends>, C<waits>, C<timeouts>, C<mmap_size>.
 
 =head1 SECURITY
 
-The mmap region is writable by all processes that open it.
-Do not share backing files with untrusted processes.
+Backing files are created with mode C<0600> (owner-only) by default, so only the
+creating user can open and attach them. To share a backing file across users,
+pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+only when the file is created (an existing file keeps its own permissions). The
+file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
+and created with C<O_EXCL>; the on-disk header is validated when the file is
+attached. Any process you grant write access to a shared mapping is trusted not
+to corrupt its contents while other processes are using it.
 
 =head1 BENCHMARKS
 

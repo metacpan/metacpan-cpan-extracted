@@ -45,7 +45,8 @@ my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
 note "Oracle Version: " . $schema->storage->_server_info->{dbms_version};
 
 my $dbh = $schema->storage->dbh;
-do_creates($dbh);
+my $q = $schema->storage->sql_maker->quote_char || '';
+do_creates($dbh, $q);
 
 ### test hierarchical queries
 {
@@ -230,14 +231,18 @@ do_creates($dbh);
 
   # combine a connect_by with group_by and having
   # add some bindvals to make sure things still work
+  #
+  # rank is quoted in these literal fragments so they resolve against the
+  # quote-by-default DDL: the artist."rank" column is stored lowercase, so a
+  # bare (Oracle-uppercased) rank would raise ORA-00904.
   {
     my $rs = $schema->resultset('Artist')->search({}, {
-      select => \[ 'COUNT(rank) + ?', [ __cbind => 3 ] ],
+      select => \[ qq{COUNT(${q}rank${q}) + ?}, [ __cbind => 3 ] ],
       as => 'cnt',
       start_with => { name => 'root' },
       connect_by => { parentid => { -prior => { -ident => 'artistid' } } },
-      group_by => \[ 'rank + ? ', [ __gbind =>  1] ],
-      having => \[ 'count(rank) < ?', [ cnt => 2 ] ],
+      group_by => \[ qq{${q}rank${q} + ? }, [ __gbind =>  1] ],
+      having => \[ qq{count(${q}rank${q}) < ?}, [ cnt => 2 ] ],
     });
 
     is_deeply (
@@ -290,45 +295,49 @@ do_creates($dbh);
 done_testing;
 
 sub do_creates {
-  my $dbh = shift;
+  my ($dbh, $q) = @_;
 
   eval {
-    $dbh->do("DROP SEQUENCE artist_autoinc_seq");
-    $dbh->do("DROP SEQUENCE artist_pk_seq");
-    $dbh->do("DROP SEQUENCE cd_seq");
-    $dbh->do("DROP SEQUENCE track_seq");
-    $dbh->do("DROP TABLE artist");
-    $dbh->do("DROP TABLE track");
+    $dbh->do("DROP SEQUENCE ${q}artist_autoinc_seq${q}");
+    $dbh->do("DROP SEQUENCE ${q}artist_pk_seq${q}");
+    $dbh->do("DROP SEQUENCE ${q}cd_seq${q}");
+    $dbh->do("DROP SEQUENCE ${q}track_seq${q}");
+    $dbh->do("DROP TABLE ${q}artist${q}");
+    $dbh->do("DROP TABLE ${q}track${q}");
+    # table cd is created unquoted (see below) => Oracle folds it to CD
     $dbh->do("DROP TABLE cd");
   };
 
-  $dbh->do("CREATE SEQUENCE artist_pk_seq START WITH 1 MAXVALUE 999999 MINVALUE 0");
-  $dbh->do("CREATE SEQUENCE cd_seq START WITH 1 MAXVALUE 999999 MINVALUE 0");
-  $dbh->do("CREATE SEQUENCE track_seq START WITH 1 MAXVALUE 999999 MINVALUE 0");
+  $dbh->do("CREATE SEQUENCE ${q}artist_pk_seq${q} START WITH 1 MAXVALUE 999999 MINVALUE 0");
+  $dbh->do("CREATE SEQUENCE ${q}cd_seq${q} START WITH 1 MAXVALUE 999999 MINVALUE 0");
+  $dbh->do("CREATE SEQUENCE ${q}track_seq${q} START WITH 1 MAXVALUE 999999 MINVALUE 0");
 
-  $dbh->do("CREATE TABLE artist (artistid NUMBER(12), parentid NUMBER(12), name VARCHAR(255), autoinc_col NUMBER(12), rank NUMBER(38), charfield VARCHAR2(10))");
-  $dbh->do("ALTER TABLE artist ADD (CONSTRAINT artist_pk PRIMARY KEY (artistid))");
+  $dbh->do("CREATE TABLE ${q}artist${q} (${q}artistid${q} NUMBER(12), ${q}parentid${q} NUMBER(12), ${q}name${q} VARCHAR(255), ${q}autoinc_col${q} NUMBER(12), ${q}rank${q} NUMBER(38), ${q}charfield${q} VARCHAR2(10))");
+  $dbh->do("ALTER TABLE ${q}artist${q} ADD (CONSTRAINT ${q}artist_pk${q} PRIMARY KEY (${q}artistid${q}))");
 
-  $dbh->do("CREATE TABLE cd (cdid NUMBER(12), artist NUMBER(12), title VARCHAR(255), year VARCHAR(4), genreid NUMBER(12), single_track NUMBER(12))");
-  $dbh->do("ALTER TABLE cd ADD (CONSTRAINT cd_pk PRIMARY KEY (cdid))");
+  # table cd will be unquoted => Oracle will see it as uppercase CD; its columns
+  # are still quoted (the CD result class declares table(\'cd') as a scalar ref,
+  # so DBIO always emits the table name bare while quoting the columns).
+  $dbh->do("CREATE TABLE cd (${q}cdid${q} NUMBER(12), ${q}artist${q} NUMBER(12), ${q}title${q} VARCHAR(255), ${q}year${q} VARCHAR(4), ${q}genreid${q} NUMBER(12), ${q}single_track${q} NUMBER(12))");
+  $dbh->do("ALTER TABLE cd ADD (CONSTRAINT ${q}cd_pk${q} PRIMARY KEY (${q}cdid${q}))");
 
-  $dbh->do("CREATE TABLE track (trackid NUMBER(12), cd NUMBER(12) REFERENCES cd(cdid) DEFERRABLE, position NUMBER(12), title VARCHAR(255), last_updated_on DATE, last_updated_at DATE, small_dt DATE)");
-  $dbh->do("ALTER TABLE track ADD (CONSTRAINT track_pk PRIMARY KEY (trackid))");
+  $dbh->do("CREATE TABLE ${q}track${q} (${q}trackid${q} NUMBER(12), ${q}cd${q} NUMBER(12) REFERENCES CD(${q}cdid${q}) DEFERRABLE, ${q}position${q} NUMBER(12), ${q}title${q} VARCHAR(255), ${q}last_updated_on${q} DATE, ${q}last_updated_at${q} DATE, ${q}small_dt${q} DATE)");
+  $dbh->do("ALTER TABLE ${q}track${q} ADD (CONSTRAINT ${q}track_pk${q} PRIMARY KEY (${q}trackid${q}))");
 
   $dbh->do(qq{
-    CREATE OR REPLACE TRIGGER artist_insert_trg_pk
-    BEFORE INSERT ON artist
+    CREATE OR REPLACE TRIGGER ${q}artist_insert_trg_pk${q}
+    BEFORE INSERT ON ${q}artist${q}
     FOR EACH ROW
       BEGIN
-        IF :new.artistid IS NULL THEN
-          SELECT artist_pk_seq.nextval
-          INTO :new.artistid
+        IF :new.${q}artistid${q} IS NULL THEN
+          SELECT ${q}artist_pk_seq${q}.nextval
+          INTO :new.${q}artistid${q}
           FROM DUAL;
         END IF;
       END;
   });
   $dbh->do(qq{
-    CREATE OR REPLACE TRIGGER cd_insert_trg
+    CREATE OR REPLACE TRIGGER ${q}cd_insert_trg${q}
     BEFORE INSERT OR UPDATE ON cd
     FOR EACH ROW
 
@@ -338,23 +347,23 @@ sub do_creates {
       BEGIN
         tmpVar := 0;
 
-        IF :new.cdid IS NULL THEN
-          SELECT cd_seq.nextval
+        IF :new.${q}cdid${q} IS NULL THEN
+          SELECT ${q}cd_seq${q}.nextval
           INTO tmpVar
           FROM dual;
 
-          :new.cdid := tmpVar;
+          :new.${q}cdid${q} := tmpVar;
         END IF;
       END;
   });
   $dbh->do(qq{
-    CREATE OR REPLACE TRIGGER track_insert_trg
-    BEFORE INSERT ON track
+    CREATE OR REPLACE TRIGGER ${q}track_insert_trg${q}
+    BEFORE INSERT ON ${q}track${q}
     FOR EACH ROW
       BEGIN
-        IF :new.trackid IS NULL THEN
-          SELECT track_seq.nextval
-          INTO :new.trackid
+        IF :new.${q}trackid${q} IS NULL THEN
+          SELECT ${q}track_seq${q}.nextval
+          INTO :new.${q}trackid${q}
           FROM DUAL;
         END IF;
       END;
@@ -364,14 +373,16 @@ sub do_creates {
 # clean up our mess
 END {
   if ($schema and my $dbh = $schema->storage->dbh) {
-    eval { $dbh->do($_) } for (
-      'DROP SEQUENCE artist_pk_seq',
-      'DROP SEQUENCE cd_seq',
-      'DROP SEQUENCE track_seq',
-      'DROP TABLE artist',
-      'DROP TABLE track',
-      'DROP TABLE cd',
-    );
+    for my $q ('', '"') {
+      eval { $dbh->do($_) } for (
+        "DROP SEQUENCE ${q}artist_pk_seq${q}",
+        "DROP SEQUENCE ${q}cd_seq${q}",
+        "DROP SEQUENCE ${q}track_seq${q}",
+        "DROP TABLE ${q}artist${q}",
+        "DROP TABLE ${q}track${q}",
+        "DROP TABLE ${q}cd${q}",
+      );
+    }
   };
   undef $schema;
 }

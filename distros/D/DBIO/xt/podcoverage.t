@@ -116,12 +116,6 @@ my $exceptions = {
         /]
     },
 
-    'DBIO::Schema::Versioned' => {
-        ignore => [ qw/
-            connection
-        /]
-    },
-
     'DBIO::Storage::Debug::PrettyTrace'      => {
         ignore => [ qw/
           print

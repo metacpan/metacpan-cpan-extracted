@@ -219,6 +219,35 @@ use_ok 'DBIO::Firebird::Diff';
   like($ops[1]->as_sql, qr/CREATE UNIQUE INDEX idx ON t \(a, b\);/, 'recreated with new def');
 }
 
+# --- Diff::Index suppresses drop for an index of a dropped table (karr #14) ---
+# When the owning table is itself being dropped in the same pass (present in
+# source tables, absent from target tables), Firebird's DROP TABLE already
+# removes the table's indexes, so no standalone DROP INDEX must be emitted.
+{
+  my @ops = DBIO::Firebird::Diff::Index->diff(
+    { leftover => { idx_leftover_id => { columns => ['id'], is_unique => 1 } } },
+    {},
+    { leftover => { table_name => 'leftover' } },  # source tables: leftover exists
+    {},                                            # target tables: gone -> dropped
+  );
+  is(scalar @ops, 0, 'no standalone DROP INDEX when owning table is dropped');
+}
+
+# --- Diff::Index over-suppression guard (karr #14) ---
+# A table that STAYS but loses an unrelated index must still get its standalone
+# DROP INDEX; the suppression is scoped to indexes of dropped tables only.
+{
+  my @ops = DBIO::Firebird::Diff::Index->diff(
+    { t => { idx_gone => { columns => ['x'], is_unique => 0 } } },
+    { t => {} },
+    { t => { table_name => 't' } },  # source tables: t exists
+    { t => { table_name => 't' } },  # target tables: t survives
+  );
+  is(scalar @ops, 1, 'index drop still emitted when the table itself survives');
+  is($ops[0]->action, 'drop', 'surviving-table index drop is a drop op');
+  is($ops[0]->as_sql, 'DROP INDEX idx_gone;', 'surviving-table index still dropped standalone');
+}
+
 # --- Full Diff orchestration via _build_operations ---
 {
   my $source = {

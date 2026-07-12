@@ -82,7 +82,7 @@ DBIO::Firebird::Storage::InterBase - Driver for the Firebird RDBMS via L<DBD::In
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

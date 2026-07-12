@@ -27,7 +27,7 @@ WriteMakefile(
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
         'File::ShareDir'       => '1.114',
-        'Map::Tube'            => '5.0.1',
+        'Map::Tube'            => '5.1.0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-London-*' },

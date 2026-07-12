@@ -23,6 +23,6 @@ __PACKAGE__->has_many(
 );
 
 use DBIx::Class::Relationship::ManyToMany::Async;
-__PACKAGE__->many_to_many_async('groups', 'user_group', 'grp');
+__PACKAGE__->many_to_many_async('groups', 'user_group', 'group');
 
 1;

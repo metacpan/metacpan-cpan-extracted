@@ -39,8 +39,6 @@ my @modules = qw(
   DBIO::PostgreSQL::DDL
   DBIO::PostgreSQL::Deploy
   DBIO::PostgreSQL::Storage
-  DBIO::PostgreSQL::Loader
-  DBIO::PostgreSQL::Loader::Model
   DBIO::PostgreSQL::Test::EventTZPg
   DBIO::PostgreSQL::Test::SequenceTest
 );

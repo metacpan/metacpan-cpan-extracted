@@ -66,14 +66,11 @@ if(eval 'require IP::Country') {
 }
 
 my $test_requires = {
-	'autodie' => 0,
 	'CHI' => 0,
 	'IPC::System::Simple' => 0,
 	'IPC::Run3' => 0,
-	'Log::Abstraction' => 0,
 	'File::Temp' => 0,
 	'FindBin' => 0,
-	'Test::Carp' => 0,
 	'Test::Compile' => 0,
 	'Test::DescribeMe' => 0,
 	'Test::Memory::Cycle' => 0,
@@ -115,8 +112,9 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
     }, TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
+	'autodie' => 0,		# used at compile time: use autodie qw(:all)
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
-	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	'Log::Abstraction' => 0,	# used by Object::Configure for logger conversion
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
 	'Locale::Object' => 0.80,	# Fix for RT#131347
 	'I18N::AcceptLanguage' => 0,
@@ -155,7 +153,7 @@ WriteMakefile(
 		}
 	},
     },
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.10.1'	# autodie bundled into core from 5.10.1; //= and defined-or used throughout
 );
 
 sub are_online

@@ -4,6 +4,7 @@ package DBIO::Generate::Style::Moose;
 use strict;
 use warnings;
 use Data::Dumper ();
+use DBIO::Generate::Util ();
 use namespace::clean;
 
 # IMPORTANT: This module writes "use Moose" as text. It does NOT load Moose
@@ -15,8 +16,8 @@ sub emit {
 
   my @lines;
 
-  push @lines, "package $spec->{class};";
-  push @lines, "# ABSTRACT: $spec->{moniker}";
+  push @lines, "package " . DBIO::Generate::Util::assert_pkg($spec->{class}) . ";";
+  push @lines, "# ABSTRACT: " . DBIO::Generate::Util::abstract_comment($spec->{moniker});
   push @lines, "";
   push @lines, "use Moose;";
   push @lines, "use MooseX::NonMoose;";
@@ -24,41 +25,41 @@ sub emit {
   push @lines, "";
 
   my $base = $spec->{result_base_class} // 'DBIO::Core';
-  push @lines, "extends '$base';";
+  push @lines, "extends " . DBIO::Generate::Util::pl_str($base) . ";";
   push @lines, "";
 
   if (my @c = @{ $spec->{components} // [] }) {
-    push @lines, "__PACKAGE__->load_components(" . join(', ', map { "'$_'" } @c) . ");";
+    push @lines, "__PACKAGE__->load_components(" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . ");";
     push @lines, "";
   }
 
   if ($spec->{is_view}) {
     push @lines, "__PACKAGE__->table_class('DBIO::ResultSource::View');";
-    push @lines, "__PACKAGE__->table('$spec->{table}');";
-    push @lines, "__PACKAGE__->result_source_instance->view_definition('$spec->{view_definition}');"
+    push @lines, "__PACKAGE__->table(" . DBIO::Generate::Util::pl_str($spec->{table}) . ");";
+    push @lines, "__PACKAGE__->result_source_instance->view_definition(" . DBIO::Generate::Util::pl_str($spec->{view_definition}) . ");"
       if defined $spec->{view_definition};
   }
   else {
-    push @lines, "__PACKAGE__->table('$spec->{table}');";
+    push @lines, "__PACKAGE__->table(" . DBIO::Generate::Util::pl_str($spec->{table}) . ");";
   }
   push @lines, "";
 
   push @lines, "__PACKAGE__->add_columns(";
   for my $col (@{ $spec->{column_order} // [] }) {
     my $info = $spec->{columns}{$col} // {};
-    push @lines, "  $col => " . _dump_inline($info) . ",";
+    push @lines, "  " . DBIO::Generate::Util::pl_str($col) . " => " . _dump_inline($info) . ",";
   }
   push @lines, ");";
   push @lines, "";
 
   if (my @pk = @{ $spec->{pk} // [] }) {
-    push @lines, "__PACKAGE__->set_primary_key(" . join(', ', map { "'$_'" } @pk) . ");";
+    push @lines, "__PACKAGE__->set_primary_key(" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @pk) . ");";
     push @lines, "";
   }
 
   for my $uq (@{ $spec->{uniq} // [] }) {
     my ($name, $cols) = @$uq;
-    push @lines, "__PACKAGE__->add_unique_constraint('$name', [" . join(', ', map { "'$_'" } @$cols) . "]);";
+    push @lines, "__PACKAGE__->add_unique_constraint(" . DBIO::Generate::Util::pl_str($name) . ", [" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @$cols) . "]);";
   }
   push @lines, "" if @{ $spec->{uniq} // [] };
 
@@ -73,8 +74,8 @@ sub emit {
     my $cond_str = _dump_inline($cond);
     my $rest_str = @rest ? ', ' . join(', ', map { _dump_inline($_) } @rest ) : '';
     push @lines, "__PACKAGE__->$rel->{method}(";
-    push @lines, "  '$rel_name',";
-    push @lines, "  '$remote_class',";
+    push @lines, "  " . DBIO::Generate::Util::pl_str($rel_name) . ",";
+    push @lines, "  " . DBIO::Generate::Util::pl_str($remote_class) . ",";
     push @lines, "  $cond_str$rest_str,";
     push @lines, ");";
     push @lines, "";
@@ -111,7 +112,7 @@ DBIO::Generate::Style::Moose - Moose-style emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 METHODS
 

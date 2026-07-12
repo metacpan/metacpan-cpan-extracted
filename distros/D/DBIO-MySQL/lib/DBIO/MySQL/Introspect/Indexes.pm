@@ -12,6 +12,14 @@ sub fetch {
   my ($class, $dbh, $tables) = @_;
   my %indexes;
 
+  # On MySQL 8 the information_schema result-column labels come back UPPERCASE
+  # regardless of the case written in the SELECT, while MariaDB returns them
+  # lowercase. Force lowercase hash keys for this fetch so the $row->{lc} reads
+  # below resolve on both engines. The sth captures FetchHashKeyName from the
+  # dbh at prepare time, so it must be set before prepare (Tables.pm sidesteps
+  # this by aliasing every column, which echoes the alias case verbatim).
+  local $dbh->{FetchHashKeyName} = 'NAME_lc';
+
   my $sth = $dbh->prepare(q{
     SELECT
       table_name,
@@ -70,7 +78,7 @@ DBIO::MySQL::Introspect::Indexes - Introspect MySQL/MariaDB indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

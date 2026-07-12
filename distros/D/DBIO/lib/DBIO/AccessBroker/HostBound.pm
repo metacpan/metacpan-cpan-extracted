@@ -132,7 +132,7 @@ DBIO::AccessBroker::HostBound - One credential identity pinned to one host
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,8 @@ version 0.900000
     my $replica = $broker->for_host({ host => 'db-replica', port => 5433 });
 
     # $primary and $replica share one credential lease; only the host differs.
+
+See F<t/access_broker/06-replicated-passthrough.t> for a runnable example.
 
 =head1 DESCRIPTION
 

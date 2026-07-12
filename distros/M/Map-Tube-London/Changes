@@ -1,5 +1,9 @@
 Revision history for Map::Tube::London
 
+v2.0.2  2026-07-11
+        - Updated dependency on Map::Tube v5.1.0.
+        - Updated copyright year information.
+
 v2.0.1  2026-06-24
         - Updated dependency on Map::Tube v5.0.1.
         - Updated unit test to respect the change in algorithm in Map::Tube.

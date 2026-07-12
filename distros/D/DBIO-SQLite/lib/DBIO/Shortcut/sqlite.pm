@@ -20,7 +20,7 @@ DBIO::Shortcut::sqlite - `use DBIO -sqlite` shortcut for the SQLite driver
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

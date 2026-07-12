@@ -11,8 +11,12 @@ my $MSGS     = $ENV{STRESS_MSGS}     || 2_000;
 my $WORKERS  = $ENV{STRESS_WORKERS}  || 4;
 my $CLIENTS  = $ENV{STRESS_CLIENTS}  || 4;
 my $CANCEL   = $ENV{STRESS_CANCEL}   || 20;
+# Generous client-side per-request timeout: an oversubscribed CI runner (2 cores
+# under `prove -j2` plus this test's forked workers/clients) can deschedule a
+# client for seconds, so a tight cap fails spuriously though the work is correct.
+my $CTMO     = $ENV{STRESS_TIMEOUT}  || 30;
 
-diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CANCEL";
+diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CANCEL, ctmo ${CTMO}s";
 
 # ============================================================
 # 1. MPMC Int: N clients, M workers, full round-trip
@@ -43,10 +47,10 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
             for my $i (1..$MSGS) {
                 my $val = $c * 100000 + $i;
                 if ($i % $CANCEL == 0) {
-                    my $id = $cli->send_wait($val, 5.0);
+                    my $id = $cli->send_wait($val, $CTMO);
                     if (defined $id) { $cli->cancel($id); $cancel_ok++ }
                 } else {
-                    my $resp = $cli->req_wait($val, 5.0);
+                    my $resp = $cli->req_wait($val, $CTMO);
                     $ok++ if defined $resp && $resp == $val * 2;
                 }
             }
@@ -88,7 +92,7 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
         if ($pid == 0) {
             my $cli = Data::ReqRep::Shared::Int::Client->new($path);
             for my $i (1..$MSGS) {
-                $cli->req_wait($p * 100000 + $i, 10.0);
+                $cli->req_wait($p * 100000 + $i, $CTMO);
             }
             exit 0;
         }
@@ -134,7 +138,7 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
     my $ok = 0;
     for my $i (1..$MSGS) {
         my $val = $i * ($i % 2 ? 1 : -1);
-        my $resp = $cli->req_wait($val, 10.0);
+        my $resp = $cli->req_wait($val, $CTMO);
         $ok++ if defined $resp && $resp == ($val * 3 + 7);
     }
 
@@ -167,7 +171,7 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
             my $cli = Data::ReqRep::Shared::Int::Client->new($path);
             my $ok = 0;
             for my $i (1..200) {
-                my $resp = $cli->req_wait($c * 1000 + $i, 5.0);
+                my $resp = $cli->req_wait($c * 1000 + $i, $CTMO);
                 $ok++ if defined $resp && $resp == $c * 1000 + $i;
             }
             exit($ok == 200 ? 0 : 1);

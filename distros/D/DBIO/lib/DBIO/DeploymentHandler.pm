@@ -156,7 +156,7 @@ sub upgrade {
   carp("upgrading from $from to $to");
 
   my $diff;
-  $self->txn_do(sub {
+  my $body = sub {
     $self->_run_hooks('pre', $from, $to);
 
     $diff = $self->deploy_method->upgrade;
@@ -170,9 +170,34 @@ sub upgrade {
       ddl         => undef,
       upgrade_sql => $upgrade_sql,
     });
-  });
+  };
+
+  # F10: only wrap in txn_do when the engine can honour it. On engines
+  # whose DDL forces an implicit COMMIT (MySQL pre-8.0, Oracle, DB2,
+  # Sybase, Informix) or whose rebuild path depends on AutoCommit=on
+  # (SQLite), the wrap is a no-op or a regression -- the body runs
+  # statement-at-a-time and the __VERSION row gate is the forward-progress
+  # recovery story.
+  if ($self->_storage_uses_transactional_ddl) {
+    $self->txn_do($body);
+  }
+  else {
+    carp_once("non-transactional upgrade on @{[ ref($self->schema->storage) || $self->schema->storage ]} -- upgrade is not atomic; recovery depends on the __VERSION row gate");
+    $body->();
+  }
 
   return $diff;
+}
+
+# F10: helper that probes the storage's transactional_ddl capability. False
+# when the storage is missing, the capability is unset, or the storage
+# reports it as 0. Drivers register via _use_transactional_ddl(1|0) in
+# L<DBIO::Storage::DBI::Capabilities>.
+sub _storage_uses_transactional_ddl {
+  my ($self) = @_;
+  my $storage = eval { $self->schema->storage } || return 0;
+  return 0 unless $storage->can('_use_transactional_ddl');
+  return $storage->_use_transactional_ddl ? 1 : 0;
 }
 
 sub downgrade {
@@ -269,7 +294,7 @@ DBIO::DeploymentHandler - Extensible DBIO deployment
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -295,6 +320,8 @@ version 0.900000
   # later:
   $dh->upgrade;           # one-shot reconcile + run hooks for skipped versions
 
+See F<t/deployment_handler.t> for a runnable example.
+
 =head1 DESCRIPTION
 
 DBIO::DeploymentHandler provides schema deployment and version management
@@ -315,6 +342,23 @@ Schema version is tracked in a C<__VERSION> table.
 
 This is a port of L<DBIx::Class::DeploymentHandler> adapted for DBIO's
 native driver architecture.
+
+=head1 TRANSACTIONAL UPGRADE
+
+L</upgrade> wraps the hook + DDL + version-bump body in
+C<< $self->txn_do >> when the underlying storage reports
+C<< _use_transactional_ddl >> truthy (see L<DBIO::Storage::DBI::Capabilities>).
+A failure anywhere in the body rolls back both the DDL and the C<__VERSION>
+row write.
+
+On engines where DDL forces an implicit C<COMMIT> (MySQL pre-8.0 without
+transactional DDL, Oracle, DB2, Sybase, Informix) or where the rebuild path
+depends on C<AutoCommit=on> (SQLite) the wrap is skipped -- the engine
+cannot honour it. In that case the C<__VERSION> row write is the
+forward-progress gate: a partially applied upgrade can be re-run, the diff
+re-computes against live state, and the next apply picks up the remainder.
+A C<carp_once> is emitted at the first non-transactional upgrade naming
+this storage class.
 
 =head1 AUTHOR
 

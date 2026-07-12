@@ -28,8 +28,8 @@ my $code = DBIO::Generate::Style::Candy->emit($spec);
 
 like $code, qr/^package My::Schema::Result::Artist;/m, 'package';
 like $code, qr/use DBIO::Candy;/,                       'use DBIO::Candy';
-like $code, qr/has_column id/,                         'has_column for id';
-like $code, qr/has_column name/,                       'has_column for name';
+like $code, qr/has_column ['"]?id['"]?/,               'has_column for id';
+like $code, qr/has_column ['"]?name['"]?/,             'has_column for name';
 like $code, qr/varchar/,                               'varchar type';
 like $code, qr/200/,                                   'size 200';
 like $code, qr/^1;/m,                                  '1 at end';

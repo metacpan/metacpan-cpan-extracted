@@ -15,7 +15,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
 use Helper;
-use JSON::Schema::Modern::Utilities 'jsonp';
+use JSON::Schema::Modern::Utilities qw(jsonp encode_media_type);
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
@@ -1281,6 +1281,157 @@ YAML
       },
     },
     'media-type parameter and body data now includes defaults',
+  );
+};
+
+subtest 'application/x-www-form-urlencoded responses' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    post:
+      operationId: me
+      responses:
+        default:
+          content:
+            application/x-www-form-urlencoded: {}
+YAML
+
+  my $result = $openapi->validate_response(response(200,
+      [ 'Content-Type' => 'application/x-www-form-urlencoded' ],
+      'id=f81d4fae-7dec-11d0-a765-00a0c91e6bf6&address=123%20Example%20Dr.'),
+    { operation_id => 'me' });
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        response => {
+          body => {
+            content => {
+              id => 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
+              address => '123 Example Dr.',
+            },
+          },
+        },
+      },
+    ],
+    'single-level object is deserialized from form=urlencoded, no schema or encoding object',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml((OPENAPI_PREAMBLE =~ s/3\.2/3.1/r).<<'YAML'));
+paths:
+  /foo:
+    post:
+      operationId: me
+      responses:
+        default:
+          description: foo
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  quantity:
+                    type: number
+              encoding:
+                meta:
+                  contentType: application/json # this will be ignored
+YAML
+
+  $result = $openapi->validate_response(response(200,
+      [ 'Content-Type' => 'application/x-www-form-urlencoded' ],
+      { meta => $::dumper->encode({ a => 1, b => 2 }), quantity => 42 }),
+    { operation_id => 'me' });
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        response => {
+          body => {
+            content => {
+              meta => { a => 1, b => 2 },
+              quantity => 42,
+            },
+          },
+        },
+      },
+    ],
+    'encoding object is ignored in v3.1, but the json-decoding into an object is still done',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml((OPENAPI_PREAMBLE =~ s/3\.2/3.1/r).<<'YAML'));
+components:
+  schemas:
+    my_schema:
+      type: object
+      properties:
+        key1:
+          type: number
+        key2:
+          type: object  # when encoding/contentType is missing, default to application/json
+paths:
+  /foo:
+    post:
+      operationId: me
+      responses:
+        default:
+          description: .
+          headers:
+            My-Header:
+              required: true
+              content:
+                application/x-www-form-urlencoded:
+                  schema:
+                    $ref: '#/components/schemas/my_schema'
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                $ref: '#/components/schemas/my_schema'
+YAML
+
+  my $encoded  = encode_media_type('application/x-www-form-urlencoded',
+      \{ key1 => '1e+1', key2 => $::dumper->encode({ x => 1 }) })->$*;
+  my $decoded = { key1 => 10, key2 => { x => 1 } };
+
+  my $response = response(200, [ 'My-Header' => $encoded, 'Content-Type' => 'application/x-www-form-urlencoded' ], $encoded);
+
+  $result = $openapi->validate_response($response, { operation_id => 'me' });
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        response => {
+          header => {
+            'My-Header' => $decoded,
+          },
+          body => { content => $decoded },
+        },
+      },
+    ],
+    'parameter and body decoding is successful, with type coercion, even on 3.1',
   );
 };
 

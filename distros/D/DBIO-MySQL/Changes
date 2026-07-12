@@ -1,5 +1,119 @@
 Revision history for DBIO-MySQL
 
+0.900001  2026-07-12
+    * Storage
+        - Add DBIO::MySQL::Storage::Async and DBIO::MySQL::Storage::MariaDB::Async,
+          the real future_io async adapter. It drives whichever DBD the DSN
+          named: the base class carries DBD::mysql's async binding (async /
+          mysql_fd / mysql_async_ready / mysql_async_result / mysql_insertid),
+          and the MariaDB subclass overrides five DBD-specific primitives with
+          DBD::MariaDB's mariadb_* binding -- mirroring the sync mysql_insertid /
+          mariadb_insertid split, so a dbi:mysql: connection uses DBD::mysql's
+          async and a dbi:MariaDB: connection uses DBD::MariaDB's. Subclasses
+          DBIO::Async::Storage and fills only the DB-specific seams
+          (_submit_query / _collect_result, socket fd, insertid folded onto the
+          autoinc PK in place of RETURNING); Model-B orchestration is inherited.
+          Convention-resolved off the leaf driver storage (ADR 0030) — no
+          registration. Pipeline is unsupported (one async query per connection).
+        - Register the 'ev' async mode (core ADR 0030): connect(..., { async => 'ev' })
+          now resolves DBIO::MySQL::EV::Storage via the core mode registry;
+          this shadows the generic modes registered on DBIO::Storage::DBI
+          and replaces the obsolete async_backend() / load_components('MySQL::EV')
+          opt-ins. Requires the optional dbio-mysql-ev dist at first use;
+          absent → the canonical "install DBIO::MySQL::EV::Storage" croak (ADR 0030).
+        - Reference-driver compliance for the storage-layer composition model
+          (karr #22, core #70): storage_type is written at exactly two sites,
+          both driver Schema components (DBIO::MySQL -> DBIO::MySQL::Storage,
+          DBIO::MySQL::MariaDB -> DBIO::MySQL::Storage::MariaDB) -- the
+          driver's job; extensions register plain storage LAYERS instead of
+          subclassing storage_type. Inherits transport_capabilities =>
+          (on_connect_replay); MySQL/MariaDB have no LISTEN/NOTIFY/COPY
+          (documented), pipelining stays on the ev backend. The driver was
+          already future_io-compliant -- MySQL keeps '?' natively, so
+          _transform_sql is identity, run once inside the inherited
+          DBIO::Async::Storage transport (no double-shaping). No behavioural
+          change -- POD/comments + driver-level structural tests only.
+
+    * Documentation
+        - Add docs/adr/0030-async-mode-registration.md — per-repo operationalisation
+          of the core async mode registry mechanism for the MySQL driver
+        - Add docs/adr/0007-async-transport-mirrors-the-sync-dbd-split.md —
+          records why the future_io adapter mirrors the sync mysql_*/mariadb_*
+          DBD split (one base class plus a MariaDB-flavoured subclass) instead
+          of a single generic transport
+
+    * Security
+        - Add SECURITY.md following the CPAN Security Group's Guidelines for
+          Adding a Security Policy to Perl Distributions (v1.5.0): email-first
+          private reporting to the maintainer
+
+    * Bugfixes
+        - Diff: suppress the standalone DROP INDEX that collided with DROP TABLE
+          in a full-schema sync (karr #23). When a whole table is removed in the
+          same diff pass, DROP TABLE already drops that table's own indexes;
+          as_sql runs tables before indexes, so the later DROP INDEX ... ON
+          <table> targeted an already-gone table and failed on a real server.
+          DBIO::MySQL::Diff now threads the source/target tables sections into
+          Diff::Index->diff (as it already does for Diff::Column /
+          Diff::ForeignKey), and Diff::Index skips the drop for any index whose
+          owning table is itself being dropped. Indexes removed from a surviving
+          table are unaffected. Backward compatible: absent table args -> no
+          suppression.
+        - Fix the native introspect->diff round-trip against a real MySQL 8
+          server, which produced phantom diffs (every column reported as a
+          spurious add) and a zero-date write failure: information_schema
+          result columns come back UPPERCASE on MySQL 8, so Columns/
+          ForeignKeys/Indexes now force NAME_lc on their fetches; MySQL
+          8.0.17+ drops the integer display width in information_schema
+          (bigint(20) -> bigint), now normalised on both sides in
+          Diff::Column (tinyint(1) and the semantic decimal/char widths stay
+          untouched); target_from_compiled no longer synthesises a literal
+          'NULL' default for nullable no-default columns (information_schema
+          reports SQL NULL as undef, not the string); and a new
+          connect_call_set_zero_date_permissive on_connect seam relaxes
+          strict sql_mode on every (re)connect, not just the deploy-time
+          handle, so zero-date writes survive reconnects
+        - Remove t/30-versioning.t and its DBIOVersion_v1/v2/v3 fixtures; the
+          test exercised DBIO::Schema::Versioned, which core retired (its
+          upgrade path depended on the hard-deprecated create_ddl_dir, with
+          no native replacement -- core karr #74)
+        - Remove t/01-access-broker-api.t, which required the undeclared and
+          since-removed DBIO::AccessBroker::Credentials and broke the test
+          suite on a clean install (Codeberg #1)
+        - Make the table-name assertions in t/50-introspect-contract.t
+          quote-agnostic; the code generator emits double-quoted strings via
+          B::perlstring
+
+    * Dependencies
+        - Require DBIO 0.900001 (central private-attr strip in
+          DBIO::Storage::Async::connect_info, on which both the sync and the
+          future_io path rely)
+        - DBIO::Async, the shared future_io backend base the async adapter
+          subclasses, is deliberately NOT declared in cpanfile: it is
+          optional and convention-resolved at runtime (ADR 0030), only
+          pulled when { async => 'future_io' } is used, so a sync-only
+          install never drags in the async stack. Core's future_io resolver
+          now names the missing module and the distribution that provides
+          it when the adapter can't load (core karr #78), so a separate
+          recommends pointer is no longer needed.
+        - Add a runtime suggests on DBD::mysql alongside the recommended
+          DBD::MariaDB, so both supported DBD drivers are advertised in the
+          metadata (DBD::MariaDB stays the default, DBD::mysql the alternative)
+        - Drop a stray test-phase recommends on Kubernetes::REST, an unused
+          copy-paste leftover from another distribution
+
+    * Tests
+        - Add maint/docker/ (karr #21): a Docker test image for a buildable,
+          live DBD::mysql -- ubuntu:24.04's libmysqlclient-dev is still the
+          genuine Oracle MySQL client (Debian switched its default provider to
+          MariaDB, and the MySQL APT repo's own signing key has expired),
+          sidestepping both the wrong-flavour and wrong-signature roadblocks.
+          Live-verified the mysql_* future_io transport (t/55) against a real
+          mysql:8.0 server -- non-blocking select/insert/select_single,
+          mysql_insertid folded onto the autoinc PK, txn_do_async commit and
+          rollback, and the high-level create_async/all_async API -- mirroring
+          the already-live mariadb_* subclass
+
 0.900000  2026-06-23
     First release. MySQL and MariaDB driver for DBIO, with native schema
     deployment, introspection, diffing and DDL generation.

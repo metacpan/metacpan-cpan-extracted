@@ -30,7 +30,13 @@ sub _rebless {
     # saner class name
     $dbtype = 'ASE' if $dbtype eq 'SQL_Server';
 
-    my $subclass = __PACKAGE__ . "::$dbtype";
+    # Microsoft SQL Server lives in a different distribution/namespace
+    # (DBIO::MSSQL), not under DBIO::Sybase::Storage::*. load_optional_class
+    # below loads it on demand and fails gracefully if dbio-mssql is absent.
+    my $subclass = $dbtype eq 'Microsoft_SQL_Server'
+      ? 'DBIO::MSSQL::Storage::Sybase'
+      : __PACKAGE__ . "::$dbtype";
+
     if ($self->load_optional_class($subclass)) {
       bless $self, $subclass;
       $self->_rebless;
@@ -42,7 +48,17 @@ sub _init {
   # once the driver is determined see if we need to insert the DBD::Sybase w/ FreeTDS fixups
   # this is a dirty version of "instance role application", \o/ DO WANT Moo \o/
   my $self = shift;
-  if (! $self->isa('DBIO::Sybase::Storage::FreeTDS') and $self->_using_freetds) {
+  # Only synthesize a "<ref>::FreeTDS" trait once we have reblessed into a
+  # concrete server subclass. On the bare base the synthetic trait name would
+  # collide with the real DBIO::Sybase::Storage::FreeTDS module and its @ISA
+  # rewrite would make that class inherit from itself (recursive inheritance).
+  if (
+    ref($self) ne __PACKAGE__
+      and
+    ! $self->isa('DBIO::Sybase::Storage::FreeTDS')
+      and
+    $self->_using_freetds
+  ) {
     require DBIO::Sybase::Storage::FreeTDS;
 
     my @isa = @{mro::get_linear_isa(ref $self)};
@@ -123,7 +139,7 @@ DBIO::Sybase::Storage - Base class for drivers using L<DBD::Sybase>
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

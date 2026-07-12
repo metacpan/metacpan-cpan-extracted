@@ -1,5 +1,5 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.15';
+$VERSION = '2.13.81.16';
 '有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
 # 如果您可以阅读此字符，则可以通过选择所有内容并将其保存为文件名“Jacode4e/RoundTrip.pm”来将其用作模块。
 # 如果您可以閱讀此字符，則可以通過選擇所有內容並將其保存為文件名“Jacode4e/RoundTrip.pm”來將其用作模塊。

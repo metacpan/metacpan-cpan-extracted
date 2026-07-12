@@ -15,17 +15,21 @@
  * ══════════════════════════════════════════════════════════════════ */
 
 typedef struct {
-	int            depth;       /* brace nesting depth       */
-	int            pp_depth;    /* preprocessor #if depth    */
-	enum eshu_state state;      /* current scanner state     */
+	int            depth;       /* brace nesting depth                      */
+	int            pp_depth;    /* preprocessor #if depth                   */
+	int            case_depth;  /* depth at which last case/default was seen */
+	int            case_extra;  /* 1 = add extra indent to case body lines  */
+	enum eshu_state state;      /* current scanner state                    */
 	eshu_config_t  cfg;
 } eshu_ctx_t;
 
 static void eshu_ctx_init(eshu_ctx_t *ctx, const eshu_config_t *cfg) {
-	ctx->depth    = 0;
-	ctx->pp_depth = 0;
-	ctx->state    = ESHU_CODE;
-	ctx->cfg      = *cfg;
+	ctx->depth      = 0;
+	ctx->pp_depth   = 0;
+	ctx->case_depth = 0;
+	ctx->case_extra = 0;
+	ctx->state      = ESHU_CODE;
+	ctx->cfg        = *cfg;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -41,6 +45,68 @@ static int eshu_c_is_closing(char c) {
 /* Is this a preprocessor line? (first non-ws char is '#') */
 static int eshu_c_is_pp(const char *content) {
 	return *content == '#';
+}
+
+/* Is this line a switch case/default label?
+ * Matches "case <expr>:" or "default:" (ignoring trailing // comments).
+ * Case labels stay at brace depth; their body content gets +1 via case_extra. */
+static int eshu_c_is_case_label(const char *content, int len) {
+	const char *p, *end;
+	int is_kw = 0;
+
+	if (len < 2) return 0;
+
+	if (len >= 5 && strncmp(content, "case ", 5) == 0)
+		is_kw = 1;
+	else if (len >= 7 && strncmp(content, "default", 7) == 0 &&
+	         (len == 7 || content[7] == ':' || content[7] == ' ' ||
+	          content[7] == '\t' || content[7] == '/'))
+		is_kw = 1;
+
+	if (!is_kw) return 0;
+
+	/* Trimmed content must end with ':' (ignore // comments) */
+	p   = content;
+	end = content + len;
+	while (p < end) {
+		if (*p == '/' && p + 1 < end && *(p + 1) == '/') { end = p; break; }
+		if (*p == '"' || *p == '\'') {
+			char d = *p++;
+			while (p < end && *p != d) {
+				if (*p == '\\') p++;
+				p++;
+			}
+		}
+		p++;
+	}
+	while (end > content && (*(end - 1) == ' ' || *(end - 1) == '\t')) end--;
+	return end > content && *(end - 1) == ':';
+}
+
+/* Is this line a bare goto label (identifier followed by ':' alone)?
+ * Excludes case/default. These are emitted at column 0 in C style. */
+static int eshu_c_is_goto_label(const char *content, int len) {
+	const char *p;
+	int ident_len;
+
+	if (len < 2) return 0;
+	if (!isalpha((unsigned char)*content) && *content != '_') return 0;
+
+	p = content;
+	while (p < content + len && (isalnum((unsigned char)*p) || *p == '_')) p++;
+	ident_len = (int)(p - content);
+
+	/* exclude case and default */
+	if (ident_len == 4 && strncmp(content, "case",    4) == 0) return 0;
+	if (ident_len == 7 && strncmp(content, "default", 7) == 0) return 0;
+
+	while (p < content + len && (*p == ' ' || *p == '\t')) p++;
+	if (p >= content + len || *p != ':') return 0;
+	p++;
+
+	while (p < content + len && (*p == ' ' || *p == '\t')) p++;
+	if (p >= content + len) return 1;
+	return *p == '/' && p + 1 < content + len && *(p + 1) == '/';
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -146,14 +212,8 @@ static void eshu_c_scan_line(eshu_ctx_t *ctx, const char *p, const char *end) {
 			/* handled separately */
 			break;
 
-		/* Perl-only states — not used in C scanner */
-		case ESHU_HEREDOC:
-		case ESHU_HEREDOC_INDENT:
-		case ESHU_REGEX:
-		case ESHU_QW:
-		case ESHU_QQ:
-		case ESHU_Q:
-		case ESHU_POD:
+		/* States not used by the C scanner — ignore */
+		default:
 			break;
 		}
 		p++;
@@ -225,10 +285,27 @@ static void eshu_c_process_line(eshu_ctx_t *ctx, eshu_buf_t *out,
 	/* Normal code line */
 	indent_depth = ctx->depth;
 
-	/* If line starts with closer, dedent this line */
+	/* Leaving a case block: clear case_extra once depth drops below case_depth */
+	if (ctx->case_extra && ctx->depth < ctx->case_depth)
+		ctx->case_extra = 0;
+
 	if (eshu_c_is_closing(*content)) {
+		/* closing brace/paren — dedent this line */
 		indent_depth--;
 		if (indent_depth < 0) indent_depth = 0;
+		/* still inside a case block at deeper nesting */
+		if (ctx->case_extra && ctx->depth > ctx->case_depth)
+			indent_depth++;
+	} else if (eshu_c_is_case_label(content, line_len)) {
+		/* case/default label: stays at brace depth; body lines get +1 */
+		ctx->case_depth = ctx->depth;
+		ctx->case_extra = 1;
+	} else if (eshu_c_is_goto_label(content, line_len)) {
+		/* goto label: always at column 0 */
+		indent_depth = 0;
+	} else if (ctx->case_extra && ctx->depth >= ctx->case_depth) {
+		/* body line inside a case block: add one extra indent level */
+		indent_depth++;
 	}
 
 	eshu_emit_indent(out, indent_depth, &ctx->cfg);

@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-guid-autoinc-suppresses-identity-insert-and-scope-identity.md
@@ -33,6 +34,7 @@ lib/DBIO/MSSQL/Result.pm
 lib/DBIO/MSSQL/SQLMaker.pm
 lib/DBIO/MSSQL/Storage.pm
 lib/DBIO/MSSQL/Storage/DateTime/Format.pm
+lib/DBIO/MSSQL/Storage/ODBC.pm
 lib/DBIO/MSSQL/Storage/Sybase.pm
 lib/DBIO/MSSQL/Storage/Sybase/DateTime/Format.pm
 lib/DBIO/MSSQL/Storage/Sybase/NoBindVars.pm
@@ -49,5 +51,7 @@ t/30-datetime-mssql.t
 t/31-datetime-format.t
 t/40-sqlmaker-mssql-torture.t
 t/50-diff.t
+t/51-diff-drop-table-index-cascade.t
 t/52-introspect-contract.t
+t/release-coverage.t
 t/sqlmaker/limit_dialects/rno.t

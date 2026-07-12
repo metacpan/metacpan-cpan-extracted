@@ -1,13 +1,23 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900000';
+requires 'DBIO', '0.900001';
 requires 'DateTime::Format::MySQL';
 
 # DBD::MariaDB bundles the MariaDB Connector/C and works with both MySQL 5.7+
-# and MariaDB 10+. DBD::mysql does not build against libmariadb headers.
+# and MariaDB 10+, so it is the recommended default. DBD::mysql is also fully
+# supported (the mysql_* DSN/driver path) but only suggested, as it does not
+# build against libmariadb headers.
 recommends 'DBD::MariaDB';
+suggests 'DBD::mysql';
+
+# future_io async transport base: DBIO::MySQL::Storage::Async subclasses
+# DBIO::Async::Storage, resolved at runtime BY CONVENTION
+# (ref($storage).'::Async', ADR 0030) only when a connection asks for
+# { async => 'future_io' } -- the sync-only driver (DBIO::MySQL::Storage) never
+# pulls it in, so it's not declared here. The ev backend (DBIO::MySQL::EV) is
+# a separate dist with its own event loop, resolved at runtime -- not here
+# either.
 
 on test => sub {
-  recommends 'Kubernetes::REST';
   requires 'Test::More', '0.98';
   requires 'Test::Exception';
   requires 'Test::Warn';
@@ -15,4 +25,8 @@ on test => sub {
   requires 'Scalar::Util';
   requires 'Time::HiRes';
   requires 'Data::Dumper';
+  # A Future::IO event-loop implementation for the live future_io roundtrip
+  # (t/54-future-io-live.t); IO::Async is the recommended one.
+  recommends 'Future::IO::Impl::IOAsync';
+  recommends 'IO::Async';
 };

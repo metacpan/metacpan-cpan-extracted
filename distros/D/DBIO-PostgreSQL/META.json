@@ -28,13 +28,15 @@
       "runtime" : {
          "requires" : {
             "DBD::Pg" : "0",
-            "DBIO" : "0.900000",
+            "DBIO" : "0.900001",
             "DateTime::Format::Pg" : "0",
             "perl" : "5.020"
          }
       },
       "test" : {
          "recommends" : {
+            "Future::IO::Impl::IOAsync" : "0",
+            "IO::Async" : "0",
             "Kubernetes::REST" : "0"
          },
          "requires" : {
@@ -49,155 +51,159 @@
    "provides" : {
       "DBIO::PostgreSQL" : {
          "file" : "lib/DBIO/PostgreSQL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Adapter" : {
          "file" : "lib/DBIO/PostgreSQL/Adapter.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::DDL" : {
          "file" : "lib/DBIO/PostgreSQL/DDL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Deploy" : {
          "file" : "lib/DBIO/PostgreSQL/Deploy.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff" : {
          "file" : "lib/DBIO/PostgreSQL/Diff.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Column" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Column.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Extension" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Extension.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Function" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Function.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Index" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Index.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Policy" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Policy.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Schema" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Schema.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Table" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Table.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Trigger" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Trigger.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Diff::Type" : {
          "file" : "lib/DBIO/PostgreSQL/Diff/Type.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::CheckConstraints" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/CheckConstraints.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Columns" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Columns.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Extensions" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Extensions.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::ForeignKeys" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/ForeignKeys.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Functions" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Functions.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Indexes" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Indexes.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Normalize" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Normalize.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Parse" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Parse.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Policies" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Policies.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Schemas" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Schemas.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Sequences" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Sequences.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Tables" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Tables.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Triggers" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Triggers.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Introspect::Types" : {
          "file" : "lib/DBIO/PostgreSQL/Introspect/Types.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::JSONB" : {
          "file" : "lib/DBIO/PostgreSQL/JSONB.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::JSONB::Op" : {
          "file" : "lib/DBIO/PostgreSQL/JSONB/Op.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::PgSchema" : {
          "file" : "lib/DBIO/PostgreSQL/PgSchema.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Result" : {
          "file" : "lib/DBIO/PostgreSQL/Result.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::SQLMaker" : {
          "file" : "lib/DBIO/PostgreSQL/SQLMaker.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Storage" : {
          "file" : "lib/DBIO/PostgreSQL/Storage.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
+      },
+      "DBIO::PostgreSQL::Storage::Async" : {
+         "file" : "lib/DBIO/PostgreSQL/Storage/Async.pm",
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Test::EventTZPg" : {
          "file" : "lib/DBIO/PostgreSQL/Test/EventTZPg.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::PostgreSQL::Test::SequenceTest" : {
          "file" : "lib/DBIO/PostgreSQL/Test/SequenceTest.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Shortcut::pg" : {
          "file" : "lib/DBIO/Shortcut/pg.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -212,7 +218,7 @@
          "web" : "https://codeberg.org/dbio/dbio-postgresql"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -388,7 +394,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -550,6 +556,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

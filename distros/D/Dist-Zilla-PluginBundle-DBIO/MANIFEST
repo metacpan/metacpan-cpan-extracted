@@ -7,9 +7,11 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 lib/Dist/Zilla/Plugin/DBIO/CodebergMeta.pm
+lib/Dist/Zilla/Plugin/DBIO/CoverageTest.pm
 lib/Dist/Zilla/Plugin/DBIO/GatherSkills.pm
 lib/Dist/Zilla/Plugin/DBIO/SetMeta.pm
 lib/Dist/Zilla/PluginBundle/DBIO.pm
@@ -19,6 +21,8 @@ share/skills/dbio-perl-release/SKILL.md
 t/10-bundle.t
 t/20-podweaver.t
 t/30-codebergmeta.t
+t/40-bundle-coverage.t
 t/compile.t
 t/corpus/heritage/weaver.ini
 t/corpus/standard/weaver.ini
+t/release-coverage.t

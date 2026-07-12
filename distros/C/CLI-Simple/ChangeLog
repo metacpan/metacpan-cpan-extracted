@@ -1,3 +1,32 @@
+Sat Jul 11 09:12:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.13]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.13.md: new
+	* .includes/perl.mk: podchecker
+	* README.md: generated
+	* VERSION: bump
+	* lib/CLI/Simple.pm.in: fixed pod
+
+Thu Jul  9 08:58:18 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.12]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.12.md: new
+	* README.md: generated
+	* VERSION: bump
+	* lib/CLI/Simple.pm.in
+	- pod updates for new features
+	(new)
+	- check options against current valid option list
+	(validate_command)
+	- bypass command validation check if _validate_command is false
+	(command_args): new
+	* lib/CLI/Simple/Constants.pm.in
+	- +@VALID_OPTIONS
+	* t/01-cli-simple.t
+	- test for unknown options
+
 Tue Jul  7 10:48:12 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.11]:

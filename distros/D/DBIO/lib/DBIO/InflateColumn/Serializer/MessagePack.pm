@@ -52,7 +52,7 @@ DBIO::InflateColumn::Serializer::MessagePack - MessagePack Inflator
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -81,6 +81,8 @@ And you can recover your data structure with:
 The data structures you assign to "data_column" will be saved in the database
 in MessagePack format. MessagePack is a compact binary serialization format,
 ideal for columns where space efficiency matters.
+
+See F<t/serialize/01-inflatecolumn.t> for a runnable example.
 
 =head1 DESCRIPTION
 

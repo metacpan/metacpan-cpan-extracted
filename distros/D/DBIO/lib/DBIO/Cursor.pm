@@ -48,7 +48,7 @@ DBIO::Cursor - Abstract object representing a query cursor on a resultset.
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,9 @@ version 0.900000
 
   # list of all raw values as arrayrefs
   my @all_cds_column_values = $cursor->all;
+
+See F<t/cursor.t> for a runnable example of this raw-value C<< ->next >>/
+C<< ->all >> API (shared with L<DBIO::Storage::DBI::Cursor>).
 
 =head1 DESCRIPTION
 

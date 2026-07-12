@@ -107,7 +107,7 @@ DBIO::Skills - Runtime access to the AI agent skills bundled with DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,8 @@ version 0.900000
 
   # from a connected schema (adds the schema's own driver + overrides)
   my $md = $schema->skill('mysql-database');
+
+See F<t/skills.t> for a runnable example.
 
 =head1 DESCRIPTION
 

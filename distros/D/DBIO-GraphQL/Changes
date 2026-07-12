@@ -1,5 +1,33 @@
 Revision history for DBIO-GraphQL
 
+0.900001  2026-07-12
+    Security fix.
+
+    * Security
+        - Fix SQL injection (CWE-89) in the orderBy.field argument of the
+          plural allXs queries. The field was passed unvalidated into the DBIO
+          order_by clause; under default DBIO storage identifiers are emitted
+          unquoted into ORDER BY, so a client could inject arbitrary SQL in
+          that position. orderBy.field is now validated against the source's
+          columns (has_column) and rejected if it is not a known column,
+          matching the column check the filter path already applies. Reported
+          by Olaf via CPANSec's coordinated disclosure process.
+
+    * Fixes
+        - Filter's _compile_column guard used column_info() + an
+          unless($info) die, but core's column_info throws "No such column"
+          before that check could run, so the intended
+          "DBIO::GraphQL::Filter: unknown column ..." message was
+          unreachable. Switched to has_column (returns false instead of
+          throwing), mirroring the orderBy fix above, so the clean
+          GraphQL-level error message actually fires. karr #3.
+
+    * Dependencies
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. Auto-generate an executable GraphQL schema from a connected DBIO schema.
 

@@ -1,0 +1,55 @@
+Revision history for DBIO-Deprecated
+
+0.900001  2026-07-12
+    First release. Permanent home for CPAN redirect ("tombstone") stub
+    modules covering DBIO modules that were renamed or retired -- whether
+    the rename crossed a distribution boundary or happened within a
+    distribution's own release history (PAUSE indexes per module name, not
+    per distribution, so both orphan the old name the same way). Ships
+    thirteen tombstones, audited by diffing each family dist's tagged
+    release(s) against its current HEAD:
+
+    * Tombstones -- renamed, from dbio-mysql-ev (old dist DBIO-MySQL-Async,
+      last CPAN release 0.900000)
+        - DBIO::MySQL::Async -- redirects to DBIO::MySQL::EV
+        - DBIO::MySQL::Async::Pool -- redirects to DBIO::MySQL::EV::Pool
+        - DBIO::MySQL::Async::QueryExecutor -- redirects to
+          DBIO::MySQL::EV::QueryExecutor
+        - DBIO::MySQL::Async::Storage -- redirects to
+          DBIO::MySQL::EV::Storage
+        - DBIO::MySQL::Async::TransactionContext -- redirects to
+          DBIO::MySQL::EV::TransactionContext
+
+    * Tombstones -- renamed, from dbio-postgresql-ev (old dist
+      DBIO-PostgreSQL-Async, last CPAN release 0.900000)
+        - DBIO::PostgreSQL::Async -- redirects to DBIO::PostgreSQL::EV
+        - DBIO::PostgreSQL::Async::ConnectInfo -- redirects to
+          DBIO::PostgreSQL::EV::ConnectInfo
+        - DBIO::PostgreSQL::Async::Pool -- redirects to
+          DBIO::PostgreSQL::EV::Pool
+        - DBIO::PostgreSQL::Async::Storage -- redirects to
+          DBIO::PostgreSQL::EV::Storage
+        - DBIO::PostgreSQL::Async::TransactionContext -- redirects to
+          DBIO::PostgreSQL::EV::TransactionContext
+
+    * Tombstones -- from dbio core (dist DBIO)
+        - DBIO::Test::Future -- renamed to DBIO::Future::Immediate (last
+          shipped under the old name in DBIO 0.900000)
+        - DBIO::StartupCheck -- removed outright, no replacement (obsolete
+          Red Hat/Fedora system-perl bug check from ~2008; last shipped in
+          DBIO 0.900000)
+
+    * Tombstones -- from dbio-dzil (dist Dist-Zilla-PluginBundle-DBIO)
+        - Dist::Zilla::Plugin::DBIO::SetCopyrightHolder -- renamed to
+          Dist::Zilla::Plugin::DBIO::SetMeta within the same distribution
+          (last shipped under the old name in v0.900001); an example of a
+          same-distribution rename that still orphans the old module name
+          on PAUSE's per-module index.
+
+    * Mechanism
+        - Each tombstone carries an explicit $VERSION (0.900001, or 0.900002
+          for the dbio-dzil tombstone whose superseded release was itself
+          0.900001) strictly higher than the last CPAN release that shipped
+          that module name, so PAUSE indexes this dist as canonical for the
+          old name and `cpanm Old::Module::Name` installs the redirect
+          instead of the stale pre-rename/pre-removal code.

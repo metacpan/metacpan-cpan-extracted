@@ -1,5 +1,5 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900000';
+requires 'DBIO', '0.900001';
 requires 'DBD::DuckDB', '0.16';
 
 on test => sub {

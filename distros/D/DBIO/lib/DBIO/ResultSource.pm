@@ -1364,7 +1364,7 @@ DBIO::ResultSource - Metadata object describing a table, view, or query source
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -1392,6 +1392,8 @@ version 0.900000
   __PACKAGE__->result_source_instance->view_definition(
       "SELECT cdid, artist, title FROM cd WHERE year ='2000'"
       );
+
+See F<t/101source.t> for a runnable example.
 
 =head1 DESCRIPTION
 

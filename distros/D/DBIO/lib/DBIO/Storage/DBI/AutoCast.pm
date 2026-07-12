@@ -52,11 +52,15 @@ DBIO::Storage::DBI::AutoCast - Storage component for RDBMS requiring explicit pl
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
   $schema->storage->auto_cast(1);
+
+See F<t/storage/auto_cast.t> for a runnable example: with C<auto_cast>
+on, typed placeholders are emitted as C<CAST(? AS I<type>)>; with it off
+they stay plain C<?>.
 
 =head1 DESCRIPTION
 

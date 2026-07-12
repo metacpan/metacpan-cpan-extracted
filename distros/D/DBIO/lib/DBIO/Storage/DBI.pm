@@ -15,6 +15,7 @@ use Try::Tiny;
 use DBIO::Util qw(is_plain_value is_literal_value);
 use DBIO::Util qw(quote_sub perlstring serialize dump_value sigwarn_silencer is_windows is_dev_release old_mro help_url);
 use DBIO::Skills;
+use DBIO::Storage::Composed;
 use namespace::clean;
 
 # default cursor class, overridable in connect_info attributes
@@ -24,25 +25,59 @@ __PACKAGE__->mk_group_accessors('inherited' => qw/
   sql_quote_char sql_name_sep
 /);
 
+# Class-level hook to redact bind values before they are interpolated into
+# the trace output. The default is the identity function (returns the value
+# unchanged) which preserves the historical plaintext trace behavior.
+# Install a custom coderef on the storage class:
+#
+#   __PACKAGE__->redact_bind_value(sub {
+#     my ($colname, $value) = @_;
+#     return $colname eq 'password' ? '***' : $value;
+#   });
+#
+# The coderef receives the column name (or undef if no column metadata is
+# attached to the bind slot) and the raw bind value, and must return the
+# value to interpolate into the trace. The original bind value passed to
+# the database is *not* modified - only the trace string is.
+__PACKAGE__->mk_classdata('redact_bind_value' => sub { return $_[1] });
+
 __PACKAGE__->mk_group_accessors('component_class' => qw/sql_maker_class datetime_parser_type/);
 
 __PACKAGE__->sql_maker_class('DBIO::SQLMaker');
 __PACKAGE__->datetime_parser_type('DateTime::Format::MySQL'); # historic default
 
+# Identifier quoting is ON by default (security hardening). Concrete drivers
+# override sql_quote_char with their RDBMS-native quote; the bare base storage
+# falls back to the ANSI SQL standard double quote so the default-on path never
+# has to warn about a missing quote_char.
+__PACKAGE__->sql_quote_char('"');
 __PACKAGE__->sql_name_sep('.');
 
 __PACKAGE__->mk_group_accessors('simple' => qw/
   _connect_info _dbio_connect_attributes _driver_determined
   _dbh _dbh_details _conn_pid _sql_maker _sql_maker_opts _dbh_autocommit
-  _perform_autoinc_retrieval _autoinc_supplied_for_op
+  _perform_autoinc_retrieval _autoinc_supplied_for_op _async_mode
 /);
 
+# Async mode registry (ADR 0030): maps a connect-time mode name to the embedded
+# backend class that answers the six *_async methods for an instance connected
+# with { async => $mode }. Generic modes (e.g. 'forked', 'future_io') register
+# on a base class and are inherited by every driver; native modes (e.g. 'ev')
+# are registered by the concrete driver storage class, so the same logical mode
+# name resolves to a DB-specific backend. Lookup walks the instance's MRO, so a
+# driver registration shadows/extends the generic ones. 'immediate' is the
+# in-process degrade mode (no event loop, no embedded backend): it maps to the
+# immediate Future class and is recognised by NOT being a DBIO::Storage::Async
+# subclass. Core registers only 'immediate' -- 'forked'/'future_io'/'ev' come
+# from their add-on/driver dists, never auto-wired here.
+my %_async_mode_registry;
+__PACKAGE__->register_async_mode( immediate => 'DBIO::Future::Immediate' );
+
 # the values for these accessors are picked out (and deleted) from
-# the attribute hashref passed to connect_info
-my @storage_options = qw/
-  on_connect_call on_disconnect_call on_connect_do on_disconnect_do
-  disable_sth_caching unsafe auto_savepoint
-/;
+# the attribute hashref passed to connect_info. karr #66: the names live once
+# on DBIO::Storage and are consumed by both this sync path and the async strip
+# (DBIO::Storage::Async), so the two lists can never drift.
+my @storage_options = __PACKAGE__->_dbio_storage_option_names;
 __PACKAGE__->mk_group_accessors('simple' => @storage_options);
 
 
@@ -254,7 +289,9 @@ sub connect_info {
     ) if ! $attrs{AutoCommit} and ! $ENV{DBIO_UNSAFE_AUTOCOMMIT_OK};
 
     # Strip DBIO-private attrs before passing to DBI->connect.
-    # ignore_version is consumed by DBIO::Schema::Versioned, not by the DBD.
+    # ignore_version is consumed by the DeploymentHandler version-storage
+    # component (DBIO::DeploymentHandler::VersionStorage::Standard::Component),
+    # not by the DBD.
     my %dbi_attrs = %attrs;
     delete @dbi_attrs{qw( ignore_version )};
 
@@ -271,6 +308,13 @@ sub connect_info {
 
     $self->$storage_opt($value);
   }
+
+  # ADR 0030: the async execution mode is chosen per connection via
+  # { async => 'MODE' } in the connect attributes, and is fixed for the life of
+  # this instance. Absent => sync (the *_async methods croak). Reset the
+  # resolved-backend cache so a fresh connect_info re-resolves the mode.
+  $self->_async_mode($info->{async_mode});
+  delete $self->{_async_storage_obj};
 
   # Extract the individual sqlmaker options
   #
@@ -370,8 +414,14 @@ sub _normalize_connect_info {
   @{ $info{storage_options} }{@storage_opts} =
     delete @attrs{@storage_opts} if @storage_opts;
 
+  # ADR 0030: the async mode is a DBIO-private connect attribute, not a DBI one.
+  # Pull it out of %attrs (so it never reaches DBI->connect) and surface it
+  # separately for connect_info to set on the instance.
+  $info{async_mode} = delete $attrs{async}
+    if exists $attrs{async};
+
   my @sql_maker_opts = grep exists $attrs{$_},
-    qw/quote_char name_sep quote_names/;
+    $self->_dbio_sql_maker_option_names;
 
   @{ $info{sql_maker_options} }{@sql_maker_opts} =
     delete @attrs{@sql_maker_opts} if @sql_maker_opts;
@@ -450,6 +500,298 @@ sub txn_do {
 }
 
 
+sub register_async_mode {
+  my ($class, $mode, $backend_class) = @_;
+  $_async_mode_registry{$class}{$mode} = $backend_class;
+}
+
+# The class whose linearised ISA the async transport/mode resolution walks.
+# Async transport (mode) resolution is a property of the DRIVER, never of the
+# storage LAYERS composed on top of it (karr #70): a composed instance's class
+# (DBIO::Storage::Composed::<layer>__<driver>) has the sync layer packages
+# more-specific than the driver in its MRO, and a sync layer's plain ::Async
+# mixin (the WP2 async-mirror target -- NOT a DBIO::Storage::Async transport)
+# would otherwise be probed before the driver's real transport adapter. So we
+# resolve the walk against the composition BASE (the concrete driver storage),
+# not ref($self). A non-composed instance has no registry entry -> base is just
+# ref($self), i.e. behaviour identical to before composition existed. Class-
+# method callers (e.g. DBIO::Storage::DBI->_resolve_async_mode_class) keep the
+# ref($self) || $self fallback.
+sub _async_resolution_class {
+  my $self  = shift;
+  my $class = ref($self) || $self;
+  my $comp  = DBIO::Storage::Composed->composition_of($class);
+  return $comp ? $comp->{base} : $class;
+}
+
+# Walk the instance's MRO and return the backend class registered for $mode
+# (driver registrations shadow/extend generic ones), or undef if no class in
+# the linearised ISA registered that mode. With exclude => $pkg, that one class
+# is skipped in the walk -- used by future_io (karr #65) to honour an explicit
+# per-driver registration while ignoring any GENERIC base-class one. The walk
+# is over the composition BASE (see _async_resolution_class), so storage layers
+# never shadow the driver's transport registrations (karr #70).
+sub _resolve_async_mode_class {
+  my ($self, $mode, %opt) = @_;
+  my $exclude = $opt{exclude};
+  for my $pkg (@{ mro::get_linear_isa($self->_async_resolution_class) }) {
+    next if defined $exclude and $pkg eq $exclude;
+    return $_async_mode_registry{$pkg}{$mode}
+      if exists $_async_mode_registry{$pkg}
+      && exists $_async_mode_registry{$pkg}{$mode};
+  }
+  return undef;
+}
+
+# Resolve an OPTIONAL async class candidate to the three-way outcome that
+# load_optional_class alone cannot express: LOADED / genuinely-ABSENT /
+# PRESENT-but-UNLOADABLE. load_optional_class returns 0 only when the
+# candidate's OWN .pm is missing from @INC; when the file EXISTS but its
+# compilation fails -- e.g. its own dependency is not installed (the driver
+# ships <pkg>::Async, but the separate async dist providing its base class,
+# such as DBIO::Async, is absent), or a genuine bug in the adapter -- it
+# instead THROWS the raw compile error. We reproduce the distinction and, on
+# the unloadable case, fail loud with a clear, correctly-attributed message
+# (ADR 0030 §3: a broken adapter fails loud, never silently degrading to a
+# parent's). Naming the missing MODULE is only claimed when Perl actually
+# reports one -- a syntax error in an installed adapter is surfaced honestly,
+# never misreported as a missing dependency.
+# Returns 1 if loaded, 0 if genuinely absent; throws otherwise.
+sub _try_load_async_class {
+  my ($self, $candidate, $what) = @_;
+  $what //= 'async class';
+
+  my $loaded = eval { $self->load_optional_class($candidate) };
+  return $loaded if defined $loaded;   # 1 = loaded, 0 = genuinely absent
+
+  my $err = $@;   # load_optional_class threw: file exists, compilation failed
+
+  # A not-installed dependency shows up in one of two shapes: the require's
+  # own "Can't locate X.pm in @INC", or use base/parent's "Base class
+  # package "X" is empty" (base.pm suppresses the inner Can't-locate and
+  # reports the empty base instead).
+  my $missing;
+  if ($err =~ /\bCan't locate (\S+?)\.pm in \@INC/) {
+    ($missing = $1) =~ s{/}{::}g;
+  }
+  elsif ($err =~ /\bBase class package "([\w:]+)" is empty/) {
+    $missing = $1;
+  }
+
+  $self->throw_exception(
+    (defined $missing && $missing ne $candidate)
+      ? "$what '$candidate' is present but cannot be loaded -- it requires "
+      . "'$missing', which is not installed. Install the distribution that "
+      . "provides '$missing' and retry.\n\nUnderlying error: $err"
+      : "$what '$candidate' is present but failed to load.\n\n"
+      . "Underlying error: $err"
+  );
+}
+
+# Resolve (and cache) the embedded async backend for this instance's chosen
+# mode, or undef. undef means one of two very different things, disambiguated
+# by _async_mode: no mode chosen (sync -- *_async croaks) vs. the 'immediate'
+# in-process mode (no event loop, no backend -- *_async degrades). A bad/absent
+# mode croaks loudly here (ADR 0030: explicit or it croaks). The resolved value
+# is cached in {_async_storage_obj}; disconnect/connect_info delete the slot.
+sub _async_storage {
+  my $self = shift;
+
+  return $self->{_async_storage_obj}
+    if exists $self->{_async_storage_obj};
+
+  my $mode = $self->_async_mode;
+
+  # No async mode chosen -> sync instance, no backend. The *_async dispatch
+  # turns this into a loud croak; we never touch the driver/registry here.
+  return $self->{_async_storage_obj} = undef
+    if !defined $mode;
+
+  # The native 'ev' mapping is declared on the concrete driver storage class,
+  # and future_io's adapter is derived by convention FROM that class (below);
+  # both only work once the storage is reblessed into its driver storage. Force
+  # driver determination so the registry walk sees the driver's registrations
+  # and ref($self) is the concrete driver storage class.
+  $self->_determine_driver;
+
+  my $backend_class;
+
+  if ($mode eq 'future_io') {
+    # --- ADR 0030 refinement (karr #65 + #67): future_io class-by-CONVENTION -
+    # future_io's transport adapter is discovered off the concrete,
+    # driver-determined storage class: <pkg> . '::Async' -- parallel to the
+    # sync driver storage (DBIO::X::Storage -> DBIO::X::Storage::Async). Because
+    # a storage is always driver-specific, every driver's adapter is thus
+    # deterministic with no registry entry at all. Precedence:
+    #   1. An EXPLICIT register_async_mode(future_io => ...) on a concrete
+    #      driver storage class still wins, as a backward-compatible override.
+    #      A GENERIC base-class (DBIO::Storage::DBI) registration is deliberately
+    #      NOT honoured -- so merely loading an async dist can no longer globally
+    #      "claim" future_io for every driver and then die deep in an abstract
+    #      base's _submit_query seam. That is exactly what this replaces.
+    #   2. Otherwise WALK the linearised ISA (ADR 0030 second refinement, karr
+    #      #67), most-specific first, probing <pkg>::Async at each rung and
+    #      STOPPING strictly BEFORE the generic DBIO::Storage::DBI base (a
+    #      generic ::Async claiming every driver is the hole #65 banned; the
+    #      walk must not reopen it). The first candidate that LOADS wins; one
+    #      that loads but is NOT a DBIO::Storage::Async croaks AT ONCE naming
+    #      it -- a broken extension adapter fails loud, never silently degrading
+    #      to a parent's adapter. This mirrors the registry walk
+    #      (_resolve_async_mode_class) so extension storage_type subclasses
+    #      (AGE/PostGIS) inherit the nearest parent adapter, just like sync
+    #      storage inheritance.
+    # The MODE stays explicit (ADR 0030: the caller still writes
+    # { async => 'future_io' }); only the CLASS is resolved by convention. This
+    # is NOT the banned ADR 0029 mode auto-fallback.
+    $backend_class = $self->_resolve_async_mode_class($mode, exclude => __PACKAGE__);
+
+    if (defined $backend_class) {
+      $self->throw_exception(
+        "async mode '$mode' is not available -- install $backend_class"
+      ) unless $self->load_optional_class($backend_class);
+    }
+    else {
+      # Walk the composition BASE, not ref($self): the transport adapter is a
+      # property of the concrete DRIVER, and a composed instance's storage
+      # layers (with their plain ::Async mixins) sit more-specific than the
+      # driver in ref($self)'s MRO -- probing those would find a layer's async
+      # mixin (not a DBIO::Storage::Async) before the driver's real adapter and
+      # croak. For a non-composed instance the base IS ref($self) (karr #70).
+      my $class = $self->_async_resolution_class;
+      my @tried;
+      for my $pkg (@{ mro::get_linear_isa($class) }) {
+        last if $pkg eq __PACKAGE__;   # stop strictly BEFORE the generic base
+        my $adapter = $pkg . '::Async';
+        push @tried, $adapter;
+        # Genuinely absent -> keep walking; present-but-unloadable (its own
+        # async dependency missing, or broken) -> fail loud with the cause.
+        next unless $self->_try_load_async_class($adapter, 'future_io adapter');
+
+        # Loaded -- it MUST be a proper backend or we fail loud, naming it;
+        # never silently skip past it to a parent's adapter (ADR 0030 §3).
+        $self->throw_exception(
+          "driver $class does not support future_io -- "
+          . "$adapter loaded but is not a DBIO::Storage::Async"
+        ) unless $adapter->isa('DBIO::Storage::Async');
+
+        $backend_class = $adapter;
+        last;
+      }
+
+      $self->throw_exception(
+        "driver $class does not support future_io -- no ${class}::Async adapter "
+        . "found on it or any parent (tried: @{[ join ', ', @tried ]})"
+      ) unless defined $backend_class;
+    }
+  }
+  else {
+    $backend_class = $self->_resolve_async_mode_class($mode);
+
+    $self->throw_exception(
+      "async mode '$mode' is not available -- no driver or add-on registers it"
+    ) if !defined $backend_class;
+
+    $self->throw_exception(
+      "async mode '$mode' is not available -- install $backend_class"
+    ) unless $self->load_optional_class($backend_class);
+  }
+
+  # A non-DBIO::Storage::Async target (the 'immediate' Future class) is the
+  # in-process degrade mode: no embedded backend is built.
+  return $self->{_async_storage_obj} = undef
+    unless $backend_class->isa('DBIO::Storage::Async');
+
+  # --- WP2 (karr #70): async mirror composition. The transport class is now
+  # resolved; mirror each registered SYNC storage layer onto its ASYNC
+  # counterpart and compose them over the transport, so an extension's async
+  # behaviour rides every transport just as its sync behaviour rides every
+  # driver (one behaviour, one transport). Per sync layer L, in registration
+  # order:
+  #   * L->async_layer_class($mode) if L defines it -- a package (must load, or
+  #     croak) or undef (fall back to convention);
+  #   * otherwise the convention sibling "${L}::Async" via load_optional_class;
+  #   * absent -> skip L silently (a sync-only extension, e.g. PostGIS).
+  # This does NOT touch the transport resolution above (ADR 0030: the mode
+  # stays explicit; only the layer CLASSES are added by composition).
+  # A storage with no live schema (weakened ref already gone) can carry no
+  # registered layers, so there is nothing to mirror.
+  my $schema = $self->schema;
+  my @async_layers;
+  for my $sync_layer ($schema ? @{ $schema->storage_layers } : ()) {
+    my $async_layer;
+
+    if ($sync_layer->can('async_layer_class')) {
+      $async_layer = $sync_layer->async_layer_class($mode);
+      if (defined $async_layer) {
+        # An explicitly declared class MUST load: genuinely absent -> the
+        # "could not be loaded" croak; present-but-unloadable -> _try_load's
+        # cause-naming croak (never a raw compile stack).
+        $self->throw_exception(
+          "async layer class '$async_layer' for storage layer '$sync_layer' "
+        . "(async mode '$mode') could not be loaded"
+        ) unless $self->_try_load_async_class(
+          $async_layer, "async layer class for storage layer '$sync_layer'"
+        );
+      }
+    }
+
+    if (!defined $async_layer) {
+      my $candidate = "${sync_layer}::Async";
+      # Convention sibling: genuinely absent -> skip L silently (sync-only
+      # extension, e.g. PostGIS); present-but-unloadable -> fail loud naming
+      # the cause, never a silent feature loss nor a raw compile stack.
+      $async_layer = $candidate
+        if $self->_try_load_async_class($candidate, 'async layer');
+    }
+
+    push @async_layers, $async_layer if defined $async_layer;
+  }
+
+  if (@async_layers) {
+    # Capability gate: an async layer may only compose over a transport that
+    # provides every capability it declares as required. A shortfall croaks
+    # naming the layer, the missing capabilities and the transport -- a
+    # transport gap becomes that transport's ticket, never a silent feature loss.
+    my %have = map { $_ => 1 } $backend_class->transport_capabilities;
+    for my $async_layer (@async_layers) {
+      next unless $async_layer->can('required_transport_capabilities');
+      my @missing = grep { !$have{$_} }
+        $async_layer->required_transport_capabilities;
+      next unless @missing;
+      $self->throw_exception(
+        "async layer '$async_layer' requires transport "
+      . (@missing == 1 ? 'capability' : 'capabilities') . " '"
+      . join("', '", @missing) . "' which transport '$backend_class' does not "
+      . "provide -- upgrade the transport '$backend_class' (or its "
+      . "distribution) or choose another async mode"
+      );
+    }
+
+    $backend_class =
+      DBIO::Storage::Composed->compose($backend_class, \@async_layers);
+  }
+
+  # Build the embedded backend (ADR 0028 mechanism): ->new($schema) fed this
+  # storage's DBI-form connect_info.
+  my $async = $backend_class->new($self->schema);
+  $async->connect_info($self->_connect_info);
+
+  # karr #68: give the async backend a weak back-reference to THIS owning sync
+  # storage, so its pool can resolve on_connect_call/on_connect_do (and their
+  # connect_call_* methods) on the class that actually defines them, and replay
+  # them against each freshly-spawned pool connection.
+  $async->_owner_storage($self) if $async->can('_owner_storage');
+
+  return $self->{_async_storage_obj} = $async;
+}
+
+
+sub async {
+  my $self = shift;
+  return $self->_async_storage;
+}
+
+
 sub disconnect {
 
   if( my $dbh = $_[0]->_dbh ) {
@@ -466,6 +808,13 @@ sub disconnect {
     $dbh->disconnect;
     $_[0]->_dbh(undef);
     $_[0]->deferred_rollback(undef);
+  }
+
+  # Tear down the embedded async backend, if one was built. Outside the _dbh
+  # guard so it runs even when no sync dbh was ever opened. delete invalidates
+  # the _async_storage cache so a later *_async call rebuilds.
+  if (my $async = delete $_[0]->{_async_storage_obj}) {
+    $async->disconnect;
   }
 }
 
@@ -529,10 +878,18 @@ sub sql_maker {
 
     my ($quote_char, $name_sep);
 
-    if ($opts{quote_names}) {
-      $quote_char = (delete $opts{quote_char}) || $self->sql_quote_char || do {
-        my $s_class = (ref $self) || $self;
-        carp_unique (<<"__EOW__");
+    # Identifier quoting defaults to ON (security hardening, Codeberg
+    # dbio/dbio#2). Quote unless the user explicitly passed a false
+    # quote_names in their connect_info.
+    if (!exists $opts{quote_names} || $opts{quote_names}) {
+      # An explicitly supplied quote_char is always respected, including an
+      # empty string (which means "no quoting" and must win over the class
+      # default) -- hence exists(), not truthiness.
+      $quote_char = exists $opts{quote_char}
+        ? delete $opts{quote_char}
+        : $self->sql_quote_char || do {
+          my $s_class = (ref $self) || $self;
+          carp_unique (<<"__EOW__");
 You requested 'quote_names' but your storage class ($s_class) does
 not explicitly define a default sql_quote_char and you have not
 supplied a quote_char as part of your connection_info. DBIO will
@@ -541,8 +898,8 @@ the time. Please file a Codeberg issue against '$s_class' at
 https://codeberg.org/dbio/dbio/issues
 __EOW__
 
-        '"'; # RV
-      };
+          '"'; # RV
+        };
 
       $name_sep = (delete $opts{name_sep}) || $self->sql_name_sep;
     }
@@ -627,6 +984,44 @@ sub _run_connection_actions {
 
     $_[0]->_do_connection_actions(connect_call_ => [[ rebase_sqlmaker => 'DBICDevRel::SQLAC::SwapOut' ]]);
   }
+}
+
+# karr #68: replay THIS storage's configured on_connect actions against a freshly
+# spawned async pool connection. Called from the embedded async backend's
+# _setup_pool_connection with $runner, a coderef that runs one statement on the
+# pool connection. We reuse the exact sync dispatch (_do_connection_actions +
+# _parse_connect_do, in the same order _run_connection_actions uses) so that
+# connect_call_* resolve on this (owning) storage identically to sync -- but the
+# statements they emit via _do_query are redirected onto the pool connection by
+# localising _pool_connect_runner (honoured in _do_query). This is the
+# convention-friendly dispatch (ticket #68 option a): resolve on the sync
+# storage, execute against the pool handle.
+sub _run_pool_connect_actions {
+  my ($self, $runner) = @_;
+
+  local $self->{_pool_connect_runner} = $runner;
+
+  $self->_do_connection_actions(connect_call_ => $_) for (
+    ( $self->on_connect_call || () ),
+    $self->_parse_connect_do('on_connect_do'),
+  );
+
+  return $self;
+}
+
+# Symmetric counterpart for disconnect: same dispatch machinery, run against the
+# pool connection while it is still live (from the pool's shutdown path).
+sub _run_pool_disconnect_actions {
+  my ($self, $runner) = @_;
+
+  local $self->{_pool_connect_runner} = $runner;
+
+  $self->_do_connection_actions(disconnect_call_ => $_) for (
+    ( $self->on_disconnect_call || () ),
+    $self->_parse_connect_do('on_disconnect_do'),
+  );
+
+  return $self;
 }
 
 
@@ -794,7 +1189,7 @@ my %_driver_registry = (
 # Connector registry: maps SQL_DBMS_NAME values (via ODBC/ADO) to
 # DBIO Storage classes for secondary driver detection.
 my %_connector_registry = (
-  'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::Sybase',
+  'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::ODBC',
   'Firebird'             => 'DBIO::Firebird::Storage',
 );
 
@@ -839,7 +1234,18 @@ sub _determine_driver {
     my $started_connected = 0;
     local $self->{_in_determine_driver} = 1;
 
-    if (ref($self) eq __PACKAGE__) {
+    # A composed storage class (DBIO::Storage::Composed over the generic base)
+    # must enter driver determination too: its BASE is __PACKAGE__, so the bare
+    # ref() equality would skip it and the driver would never get composed in.
+    # Recover its composition; when its base is the generic __PACKAGE__ treat it
+    # exactly like a bare generic storage, and re-compose the same layers over
+    # the concrete driver class as the rebless target. A non-composed instance
+    # has no registry entry and behaves exactly as before.
+    my $composition = DBIO::Storage::Composed->composition_of(ref $self);
+    my $is_generic = ref($self) eq __PACKAGE__
+      || ($composition && $composition->{base} eq __PACKAGE__);
+
+    if ($is_generic) {
       my $driver;
       if ($self->_dbh) { # we are connected
         $driver = $self->_dbh->{Driver}{Name};
@@ -854,7 +1260,13 @@ sub _determine_driver {
 
         if ($storage_class && $self->load_optional_class($storage_class)) {
           mro::set_mro($storage_class, 'c3');
-          bless $self, $storage_class;
+
+          # Re-compose the instance's layers over the driver class, or rebless
+          # straight to the driver when it was never composed.
+          my $target = $composition
+            ? DBIO::Storage::Composed->recompose(ref $self, $storage_class)
+            : $storage_class;
+          bless $self, $target;
           $self->_rebless();
 
           # Expose this driver's bundled agent skills (see DBIO::Skills).
@@ -947,7 +1359,14 @@ sub _determine_connector_driver {
     return if $self->isa($subclass);
 
     if ($self->load_optional_class($subclass)) {
-      bless $self, $subclass;
+      # Keep the instance's layers when reblessing onto the connector subclass
+      # (mirrors the driver rebless above); rebless straight to the subclass
+      # when it was never composed.
+      my $composition = DBIO::Storage::Composed->composition_of(ref $self);
+      my $target = $composition
+        ? DBIO::Storage::Composed->recompose(ref $self, $subclass)
+        : $subclass;
+      bless $self, $target;
       $self->_rebless;
     }
     else {
@@ -1044,6 +1463,17 @@ sub _do_query {
     my $sql = shift @do_args;
     my $attrs = shift @do_args;
     my @bind = map { [ undef, $_ ] } @do_args;
+
+    # karr #68: when replaying this storage's connection actions against a
+    # freshly-spawned async pool connection (_run_pool_connect_actions), the
+    # statement must execute on THAT pool connection, not on this sync storage's
+    # own dbh. The runner (installed by the async backend's
+    # _setup_pool_connection) does the blocking do on the pool handle. Only ever
+    # set inside that dynamic scope, so the normal sync path is untouched.
+    if (my $runner = $self->{_pool_connect_runner}) {
+      $runner->($sql, $attrs, @do_args);
+      return $self;
+    }
 
     $self->dbh_do(sub {
       $_[0]->_query_start($sql, \@bind);
@@ -1406,19 +1836,37 @@ sub _resolve_bindattrs {
 }
 
 sub _format_for_trace {
-  #my ($self, $bind) = @_;
+  my $self = $_[0];
 
   ### Turn @bind from something like this:
   ###   ( [ "artist", 1 ], [ \%attrs, 3 ] )
   ### to this:
   ###   ( "'1'", "'3'" )
+  ###
+  ### Bind values are run through the L</redact_bind_value> hook before
+  ### interpolation so that credential / PII columns do not leak into the
+  ### trace sink. The hook receives the column name (or undef if no
+  ### column metadata is attached to the bind slot) and the raw value,
+  ### and must return the value to interpolate.
+
+  my $redact = $self->redact_bind_value;
 
   map {
-    defined( $_ && $_->[1] )
-      ? qq{'$_->[1]'}
-      : q{NULL}
+    my $val = $_ && $_->[1];
+    if (defined $val) {
+      my $colname = ( ref( $_->[0] ) eq 'HASH' )
+        ? $_->[0]{dbic_colname}
+        : undef;
+      my $shown = $redact->( $colname, $val );
+      qq{'$shown'};
+    }
+    else {
+      q{NULL};
+    }
   } @{$_[1] || []};
 }
+
+
 
 sub _query_start {
   my ( $self, $sql, $bind ) = @_;
@@ -2591,7 +3039,7 @@ DBIO::Storage::DBI - DBI storage handler
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -2610,6 +3058,8 @@ version 0.900000
   $schema->resultset('Book')->search({
      written_on => $schema->storage->datetime_parser->format_datetime(DateTime->now)
   });
+
+See F<t/test/04_query_capture.t> for a runnable example.
 
 =head1 DESCRIPTION
 
@@ -2834,9 +3284,16 @@ statement handles via L<DBI/prepare_cached>.
 
 =item quote_names
 
-When true automatically sets L</quote_char> and L</name_sep> to the characters
-appropriate for your particular RDBMS. This option is preferred over specifying
-L</quote_char> directly.
+B<On by default in DBIO> (unlike upstream DBIx::Class, where it defaults off).
+Automatically sets L</quote_char> and L</name_sep> to the characters appropriate
+for your particular RDBMS, so generated SQL always quotes table and column
+identifiers. This is a security-hardening default: it makes reserved words and
+unusual identifiers safe and removes a class of SQL-injection footguns. This
+option is preferred over specifying L</quote_char> directly.
+
+Pass C<< quote_names => 0 >> in your connect_info to opt out and emit unquoted
+identifiers. An explicitly supplied L</quote_char> / L</name_sep> is always
+respected.
 
 =item quote_char
 
@@ -2983,6 +3440,81 @@ Example:
     @column_list
   );
 
+=head2 register_async_mode
+
+  DBIO::Storage::DBI->register_async_mode( forked    => 'DBIO::Forked::Storage' );
+  DBIO::PostgreSQL::Storage->register_async_mode( ev   => 'DBIO::PostgreSQL::EV::Storage' );
+
+Registers an async I<mode> name against the embedded backend class that answers
+the C<*_async> methods for a connection opened with C<< { async => $mode } >>.
+Generic modes register on a base storage class (inherited by every driver);
+native modes register on a concrete driver storage class, so the same logical
+mode name (e.g. C<ev>) resolves to a DB-specific backend. See L<ADR 0030>.
+
+The C<future_io> mode is the exception: it is resolved B<by convention>, not
+from this registry. Rather than a registered class, its transport adapter is
+found by walking the concrete storage's linearised ISA most-specific first and
+taking the first C<< <class>::Async >> that loads (stopping before the generic
+C<DBIO::Storage::DBI> base), so an extension C<storage_type> subclass without
+its own adapter inherits the nearest parent driver's one. An explicit
+C<< register_async_mode(future_io => ...) >> on a concrete class still wins over
+the walk; a same-named adapter that loads but is not a L<DBIO::Storage::Async>
+croaks rather than degrading to a parent. See L<ADR 0030> (karr #65, #67).
+
+=head2 register_driver
+
+Registers a DBD driver-name to DBIO storage-class mapping.
+
+=head2 register_connector_driver
+
+Registers an ODBC/ADO C<SQL_DBMS_NAME> to DBIO storage-class mapping.
+
+=head2 redact_bind_value
+
+=head2 last_insert_id
+
+Returns autoincrement values for the columns requested by insert codepaths.
+
+=head2 deploy_defaults
+
+Returns a hash of default arguments merged into every C<< $schema->deploy() >>
+call made by L<DBIO::Test>.  The base implementation returns an empty list;
+drivers override this to declare their requirements without hard-coding driver
+names in test infrastructure.
+
+  # DBIO::MySQL::Storage
+  sub deploy_defaults { return (add_drop_table => 1) }
+
+=head2 deploy_setup
+
+  $storage->deploy_setup($schema);
+
+Called by L<DBIO::Test> immediately before C<< $schema->deploy() >>.  The
+default implementation is a no-op.  Drivers override this to perform any
+one-time database-level setup that must happen before the schema is installed
+(for example, stripping incompatible C<sql_mode> flags on MySQL).
+
+=head2 async
+
+Returns the embedded async backend storage (a L<DBIO::Storage::Async>) for an
+instance connected with an event-loop async mode (C<< { async => 'forked' } >>,
+C<'future_io'>, C<'ev'>, ...), or C<undef> for a sync or C<immediate>-mode
+instance. It is a thin public alias over the lazy C<_async_storage> resolver
+that also feeds the six CRUD C<*_async> methods, so it shares their backend
+discovery and caching. An unavailable mode croaks (see L</register_async_mode>
+and ADR 0030). For C<future_io> the backend class is resolved by convention:
+the concrete storage's linearised ISA is walked most-specific first for a
+C<< <class>::Async >> adapter, stopping before the generic C<DBIO::Storage::DBI>
+base, so extension C<storage_type> subclasses (AGE, PostGIS) reach async CRUD
+through the nearest parent driver's adapter (karr #67).
+
+Use it to reach async-only driver features that are not covered by the CRUD
+C<*_async> methods -- for example PostgreSQL's C<listen>/C<notify>,
+C<pipeline>, and C<copy_in> -- on the very same schema that serves your
+synchronous queries:
+
+  $schema->storage->async->listen('channel');
+
 =head2 disconnect
 
 Our C<disconnect> method also performs a rollback first if the
@@ -3044,37 +3576,6 @@ Example:
 
   __PACKAGE__->register_driver('Pg' => 'DBIO::PostgreSQL::Storage');
 
-=head2 register_driver
-
-Registers a DBD driver-name to DBIO storage-class mapping.
-
-=head2 register_connector_driver
-
-Registers an ODBC/ADO C<SQL_DBMS_NAME> to DBIO storage-class mapping.
-
-=head2 last_insert_id
-
-Returns autoincrement values for the columns requested by insert codepaths.
-
-=head2 deploy_defaults
-
-Returns a hash of default arguments merged into every C<< $schema->deploy() >>
-call made by L<DBIO::Test>.  The base implementation returns an empty list;
-drivers override this to declare their requirements without hard-coding driver
-names in test infrastructure.
-
-  # DBIO::MySQL::Storage
-  sub deploy_defaults { return (add_drop_table => 1) }
-
-=head2 deploy_setup
-
-  $storage->deploy_setup($schema);
-
-Called by L<DBIO::Test> immediately before C<< $schema->deploy() >>.  The
-default implementation is a no-op.  Drivers override this to perform any
-one-time database-level setup that must happen before the schema is installed
-(for example, stripping incompatible C<sql_mode> flags on MySQL).
-
 =head2 register_connector_driver
 
 =over 4
@@ -3092,7 +3593,7 @@ secondary driver detection in L</_determine_connector_driver>.
 Example:
 
   __PACKAGE__->register_connector_driver(
-    'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::Sybase',
+    'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::ODBC',
   );
 
 =head2 connect_call_datetime_setup
@@ -3142,6 +3643,34 @@ mix and match old and new within the same codebase as follows:
     },
   );
 
+=head2 redact_bind_value
+
+Class-level accessor for a coderef that decides how each bind value appears
+in the trace output. The coderef is invoked as
+
+  $redactor->($column_name, $value)
+
+where C<$column_name> is the column name attached to the bind slot by the
+SQL generator (or C<undef> for binds that carry no column metadata, such as
+positional placeholders in raw SQL passed to L</do_query>). The coderef
+returns the value to interpolate into the trace string. The raw bind value
+sent to the database is not modified - only its representation in the trace
+sink is.
+
+The default redactor is the identity function, which preserves the
+historical plaintext trace behavior. Install a custom redactor to scrub
+credential or PII columns, e.g.:
+
+  DBIO::Storage::DBI->redact_bind_value(sub {
+      my ($colname, $value) = @_;
+      return $colname eq 'password' ? '***' : $value;
+  });
+
+The redactor is a single class-level slot; setting it on a subclass does
+not affect the parent or sibling classes. If you need per-instance
+behavior, install a closure that consults C<$self> on the storage object
+(via a dispatcher closure captured at connect time).
+
 =head2 select
 
 =over 4
@@ -3188,49 +3717,14 @@ be performed instead of the usual C<eq>.
 =back
 
 B<DEPRECATED:> This method is deprecated and will throw an
-exception if called. Use the native Deploy class on your storage instead.
+exception if called. Use the native Deploy class on your storage instead
+(see L<DBIO::Schema/deploy>).
 
-Creates a SQL file based on the Schema, for each of the specified
-database engines in C<\@databases> in the given directory.
-(note: specify database driver names, not DBI driver names).
-
-Given a previous version number, this will also create a file containing
-the ALTER TABLE statements to transform the previous schema into the
-current one. Note that these statements may contain C<DROP TABLE> or
-C<DROP COLUMN> statements that can potentially destroy data.
-
-The file names are created using the C<ddl_filename> method below, please
-override this method in your schema if you would like a different file
-name format. For the ALTER file, the same format is used, replacing
-$version in the name with "$preversion-$version".
-
-For quoting purposes supply C<quote_identifiers>.
-
-If no arguments are passed, then the following default values are assumed:
-
-=over 4
-
-=item databases  - ['MySQL', 'SQLite', 'PostgreSQL']
-
-=item version    - $schema->schema_version
-
-=item directory  - './'
-
-=item preversion - <none>
-
-=back
-
-By default, C<\%sqlt_args> will have
-
- { add_drop_table => 1, ignore_constraint_names => 1, ignore_index_names => 1 }
-
-merged with the hash passed in. To disable any of those features, pass in a
-hashref like the following
-
- { ignore_constraint_names => 0, # ... other options }
-
-WARNING: You are strongly advised to check all SQL files created, before applying
-them.
+Historically this created SQL DDL files for each requested database engine,
+plus C<ALTER TABLE> upgrade scripts between schema versions, via
+L<SQL::Translator>. Core no longer generates SQL on the fly; the native Deploy
+classes (e.g. L<DBIO::PostgreSQL::Deploy>) handle introspection, diff and
+deployment. The original signature is retained only for the deprecation throw.
 
 =head2 deployment_statements
 

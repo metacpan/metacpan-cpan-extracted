@@ -77,6 +77,7 @@ typedef struct {
     HeapHeader *hdr;
     HeapEntry  *data;
     size_t      mmap_size;
+    uint64_t    capacity;      /* trusted copy; hdr->capacity is peer-writable */
     char       *path;
     int         notify_fd;
     int         backing_fd;
@@ -192,7 +193,7 @@ static inline int heap_remaining(const struct timespec *dl, struct timespec *rem
 static inline int heap_push(HeapHandle *h, int64_t priority, int64_t value) {
     HeapHeader *hdr = h->hdr;
     heap_mutex_lock(hdr);
-    if (hdr->size >= hdr->capacity) {
+    if (hdr->size >= h->capacity) {
         heap_mutex_unlock(hdr);
         return 0;
     }
@@ -212,6 +213,16 @@ static inline int heap_pop(HeapHandle *h, int64_t *out_priority, int64_t *out_va
     HeapHeader *hdr = h->hdr;
     heap_mutex_lock(hdr);
     if (hdr->size == 0) {
+        heap_mutex_unlock(hdr);
+        return 0;
+    }
+    /* Layer B: size is read from the shared segment and used just below as an
+     * array index (h->data[size]) and as the sift-down bound.  A local peer
+     * with write access to the backing file can corrupt it past capacity,
+     * which would drive an out-of-bounds read/write.  A valid heap always
+     * keeps size <= capacity (push enforces it), so this never fires for
+     * good data. */
+    if (hdr->size > h->capacity) {
         heap_mutex_unlock(hdr);
         return 0;
     }
@@ -240,6 +251,10 @@ static inline int heap_pop_wait(HeapHandle *h, int64_t *out_p, int64_t *out_v, d
     for (;;) {
         __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELEASE);
         uint32_t cur = __atomic_load_n(&hdr->size, __ATOMIC_ACQUIRE);
+        if (cur > h->capacity) {   /* corrupt size: heap_pop can never succeed, so do not busy-spin */
+            __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
+            return 0;
+        }
         if (cur == 0) {
             struct timespec *pts = NULL;
             if (has_dl) {
@@ -317,13 +332,31 @@ static inline HeapHandle *heap_setup(void *base, size_t ms, const char *path, in
     h->hdr = hdr;
     h->data = (HeapEntry *)((uint8_t *)base + hdr->data_off);
     h->mmap_size = ms;
+    h->capacity = hdr->capacity;
     h->path = path ? strdup(path) : NULL;
     h->notify_fd = -1;
     h->backing_fd = bfd;
     return h;
 }
 
-static HeapHandle *heap_create(const char *path, uint64_t capacity, char *errbuf) {
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int heap_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { HEAP_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        HEAP_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    HEAP_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
+static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { HEAP_ERR("capacity must be > 0"); return NULL; }
     if (capacity > HEAP_MAX_CAPACITY) { HEAP_ERR("capacity too large (max %u)", (unsigned)HEAP_MAX_CAPACITY); return NULL; }
@@ -342,8 +375,8 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, char *errbuf
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { HEAP_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = heap_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { HEAP_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { HEAP_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }

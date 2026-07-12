@@ -13,7 +13,7 @@ DBIO::Manual::FAQ - Frequently Asked Questions (in theory)
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -409,8 +409,6 @@ C<column_info> supplied with C<add_columns>.
 
 The C<populate> method in L<DBIO::ResultSet> provides
 efficient bulk inserts.
-
-L<DBIO::Fixtures> provides an alternative way to do this.
 
 =item .. update a collection of rows at the same time?
 

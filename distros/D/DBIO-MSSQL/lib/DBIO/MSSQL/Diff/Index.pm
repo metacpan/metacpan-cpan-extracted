@@ -14,7 +14,18 @@ __PACKAGE__->mk_diff_accessors(qw/table_name index_name index_info/);
 
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
+
+  # Tables present in the source model but absent from the target are being
+  # dropped in this same pass. MSSQL's DROP TABLE also removes the table's own
+  # indexes, so a later standalone DROP INDEX ... ON <table> would fail (the
+  # table no longer exists). Suppress those drops (karr #15). Absent table
+  # sections yield an empty set, preserving the original two-argument
+  # behaviour used by direct unit-test calls.
+  $source_tables //= {};
+  $target_tables //= {};
+  my %dropped_table = map { $_ => 1 }
+    grep { !exists $target_tables->{$_} } keys %$source_tables;
 
   my $create = sub {
     my ($table, $name, $info) = @_;
@@ -40,7 +51,13 @@ sub diff {
       my ($table, $name, $old, $new) = @_;
       ($drop->($table, $name, $old), $create->($table, $name, $new));
     },
-    on_gone    => sub { $drop->(@_) },
+    on_gone    => sub {
+      my ($table, $name, $info) = @_;
+      # Skip when the owning table is itself being dropped this pass; the
+      # DROP TABLE already removes this index (karr #15).
+      return () if $dropped_table{$table};
+      return $drop->($table, $name, $info);
+    },
   );
 }
 
@@ -86,7 +103,7 @@ DBIO::MSSQL::Diff::Index - Diff operations for MSSQL indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -100,6 +117,18 @@ default of L<DBIO::Diff::Compare/changed_index_fields>).
 =head1 METHODS
 
 =head2 diff
+
+    my @ops = DBIO::MSSQL::Diff::Index->diff(
+      $source, $target, $source_tables, $target_tables);
+
+The optional C<$source_tables> / C<$target_tables> hashrefs are the C<tables>
+sections of the two models (threaded in by L<DBIO::MSSQL::Diff>). They detect
+tables that are being dropped in this same diff pass: MSSQL's C<DROP TABLE>
+already removes that table's own indexes, so emitting a standalone
+C<DROP INDEX ... ON <table>> for one of them would fail once the table is gone
+and abort the deploy (karr #15). When these arguments are absent (e.g. direct
+unit-test calls) the set is empty and no drops are suppressed, preserving the
+original two-argument behaviour.
 
 =head2 as_sql
 

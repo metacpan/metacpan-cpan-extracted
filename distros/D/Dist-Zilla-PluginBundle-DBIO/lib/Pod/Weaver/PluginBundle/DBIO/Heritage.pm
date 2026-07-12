@@ -27,7 +27,7 @@ Pod::Weaver::PluginBundle::DBIO::Heritage - Pod::Weaver configuration for DBIO h
 
 =head1 VERSION
 
-version 0.900002
+version 0.900003
 
 =head1 SYNOPSIS
 

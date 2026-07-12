@@ -21,6 +21,8 @@ sub create {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Layer - Optional Content Groups (PDF Layers)

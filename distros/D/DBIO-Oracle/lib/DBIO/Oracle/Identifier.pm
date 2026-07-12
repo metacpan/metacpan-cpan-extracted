@@ -85,7 +85,7 @@ DBIO::Oracle::Identifier - Shorten Oracle identifiers to the 30-character limit
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

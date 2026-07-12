@@ -29,8 +29,8 @@ my $code = DBIO::Generate::Style::Moo->emit($spec);
 
 like $code, qr/^package My::Schema::Result::Artist;/m, 'package line';
 like $code, qr/use Moo;/,                          'use Moo in generated text';
-like $code, qr/extends 'DBIO::Core'/,              'extends base class';
-like $code, qr/__PACKAGE__->table\('artists'\)/, 'table call';
+like $code, qr/extends ['"]DBIO::Core['"]/,        'extends base class';
+like $code, qr/__PACKAGE__->table\(['"]artists['"]\)/, 'table call';
 like $code, qr/^1;/m,                             'ends with 1';
 
 # Text is stable - run twice, same result
@@ -39,8 +39,8 @@ is $code2, $code, 'emit is deterministic';
 
 # Optionally load generated code if Moo + MooX::NonMoose are present
 SKIP: {
-  eval { require Moo; require MooX::NonMoose; 1 }
-    or skip 'Moo and/or MooX::NonMoose not installed — skipping load test', 1;
+  eval { require Moo; require MooX::NonMoose; require MooseX::MarkAsMethods; 1 }
+    or skip 'Moo and/or MooX::NonMoose/MooseX::MarkAsMethods not installed — skipping load test', 1;
 
   eval $code;
   ok !$@, 'generated Moo class loads without error' or diag $@;

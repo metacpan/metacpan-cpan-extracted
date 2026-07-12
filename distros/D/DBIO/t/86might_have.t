@@ -8,7 +8,7 @@ use DBIO::Test;
 my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # Mock find for CD id 1 - persistent so update's internal check also works
-$schema->storage->mock_persistent(qr/SELECT me\.cdid.*FROM cd me/i, [[1, 1, 'Spoonful of bees', 1999, 1, undef]]);
+$schema->storage->mock_persistent(qr/SELECT "me"\."cdid".*FROM cd "me"/i, [[1, 1, 'Spoonful of bees', 1999, 1, undef]]);
 
 my $cd = $schema->resultset("CD")->find(1);
 $cd->title('test');
@@ -24,9 +24,9 @@ $schema->is_executed_querycount( sub {
 $schema->storage->clear_mocks;
 
 # Mock find for CD id 2 with prefetch of liner_notes
-$schema->storage->mock_persistent(qr/SELECT me\.cdid.*liner_notes/i, [[2, 1, 'Forkful of bees', 2001, undef, undef, 2, 'Buy Whiskey!']]);
+$schema->storage->mock_persistent(qr/SELECT "me"\."cdid".*"liner_notes"/i, [[2, 1, 'Forkful of bees', 2001, undef, undef, 2, 'Buy Whiskey!']]);
 # Also mock plain CD select for update's needs
-$schema->storage->mock_persistent(qr/SELECT me\.cdid.*FROM cd me/i, [[2, 1, 'Forkful of bees', 2001, undef, undef]]);
+$schema->storage->mock_persistent(qr/SELECT "me"\."cdid".*FROM cd "me"/i, [[2, 1, 'Forkful of bees', 2001, undef, undef]]);
 
 my $cd2 = $schema->resultset("CD")->find(2, {prefetch => 'liner_notes'});
 $cd2->title('test2');

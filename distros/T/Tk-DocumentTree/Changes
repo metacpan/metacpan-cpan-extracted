@@ -1,8 +1,12 @@
 Revision history for Perl extension Tk::DocumentTree.
 
-0.10  Date
+0.11  Sun Jul 12 2026
+	- Changed to a relaxed refresh mechanism. Looks a lot less busy.
+
+0.10  Thud Jul 09 2026
 	- Updated documentation.
 	- Set -selectmode to 'exclusive' for the ListBrowser widget.
+	- Fixed window scrolling back up when selecting an item lower in the list.
 
 0.09  Wed Jul 01 2026
 	- Reimplemented using Tk::ListBrowser instead of Tk::ITree. Biggest gain here, we now have filters.

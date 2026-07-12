@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-test-deploy-and-compare-against-a-temp-schema-not-temp-database.md
@@ -43,5 +44,7 @@ t/10-db2.t
 t/11-db2-fk.t
 t/30-diff.t
 t/31-diff-compare-semantics.t
+t/32-diff-drop-table-index.t
 t/35-ddl-fk.t
 t/40-introspect-contract.t
+t/release-coverage.t

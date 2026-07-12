@@ -4,28 +4,29 @@ package DBIO::Oracle::Type;
 use strict;
 use warnings;
 
+use DBD::Oracle;
+
 
 
 sub is_lob_type {
   my ($self, $dt) = @_;
-  return unless $dt && $dt->can('sql_type');
-  my $type = $dt->sql_type;
-  return unless $type;
-  return $type =~ /LOB\b/i;
+  $dt && ($dt =~ /lob|bfile|text|image|bytea|memo/i
+    || $dt =~ /^long(?:\s+(?:raw|bit\s*varying|varbit|binary
+                              |varchar|character\s*varying|nvarchar
+                              |national\s*character\s*varying))?\z/xi);
 }
 
 
 sub is_text_lob_type {
   my ($self, $dt) = @_;
-  return unless is_lob_type($self, $dt);
-  my $type = $dt->sql_type;
-  return $type =~ /CLOB\b/i;
+  $dt && ($dt =~ /^(?:n?clob|memo)\z/i
+    || $dt =~ /^long(?:\s+(?:varchar|character\s*varying|nvarchar
+                        |national\s*character\s*varying))\z/xi);
 }
 
 
 sub oracle_lob_bind_attrs {
   my ($is_text) = @_;
-  require DBD::Oracle;
   return {
     ora_type => $is_text ? DBD::Oracle::ORA_CLOB() : DBD::Oracle::ORA_BLOB(),
   };
@@ -174,7 +175,7 @@ DBIO::Oracle::Type - Oracle type mapping utilities
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -182,22 +183,22 @@ Consolidated Oracle type mapping logic used by L<DBIO::Oracle::Storage>,
 L<DBIO::Oracle::DDL>, L<DBIO::Oracle::Introspect::Columns>, and
 L<DBIO::Oracle::Diff::Column>.
 
-The pure type-string functions (L</normalize_type>, L</map_dbio_type_to_oracle>,
-L</map_dbd_type_to_dbio>) have no dependency on L<DBD::Oracle> and can be used
-offline (e.g. by L<DBIO::Oracle::Diff>). Only L</oracle_lob_bind_attrs> pulls in
-L<DBD::Oracle>, and it does so lazily at call time.
-
 =func is_lob_type
 
-    $self->is_lob_type($dt)
+    $self->is_lob_type($data_type)
 
-Returns true if the given L<Data::Type> is a LOB type (BLOB/CLOB/NCLOB).
+Returns true if the given data-type string names a LOB type. Operates on the
+plain C<data_type> string carried by a bind's C<sqlt_datatype> (e.g. C<'clob'>,
+C<'blob'>, C<'text'>), matching the semantics of the upstream
+L<DBIx::Class::Storage::DBI/_is_lob_type>. The leading C<$self> is ignored; it
+exists so the function can be called as a method via the storage wrapper.
 
 =func is_text_lob_type
 
-    $self->is_text_lob_type($dt)
+    $self->is_text_lob_type($data_type)
 
-Returns true if the LOB type is a text LOB (CLOB/NCLOB), false for binary.
+Returns true if the data-type string names a text LOB (CLOB/NCLOB), false for a
+binary LOB. Mirrors L<DBIx::Class::Storage::DBI/_is_text_lob_type>.
 
 =func oracle_lob_bind_attrs
 

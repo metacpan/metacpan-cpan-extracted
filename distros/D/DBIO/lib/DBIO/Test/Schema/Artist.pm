@@ -199,7 +199,7 @@ DBIO::Test::Schema::Artist - Test result class for the artist table
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

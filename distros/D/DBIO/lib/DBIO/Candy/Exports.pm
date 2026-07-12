@@ -21,7 +21,10 @@ use Sub::Exporter -setup => {
 };
 
 # Sub::Exporter generates an anonymous import; name it so
-# t/55namespaces_cleaned.t can verify it
+# t/55namespaces_cleaned.t can verify *that* sub is properly named (it
+# only checks naming/namespace-leak hygiene, not what export_methods /
+# export_method_aliases actually do -- that behavior, and DBIO::Candy's
+# consumption of it, is covered by t/candy_exports.t).
 Sub::Util::set_subname('DBIO::Candy::Exports::import', \&import);
 
 1;
@@ -38,7 +41,7 @@ DBIO::Candy::Exports - Create sugar for DBIO components
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -61,6 +64,9 @@ version 0.900000
 The above will make it such that users of your component who use it with
 L<DBIO::Candy> will have the methods you designate exported into their
 namespace.
+
+See F<t/candy_exports.t> for a runnable example, including a component
+consumed by L<DBIO::Candy>'s C<-components> option.
 
 =head1 DESCRIPTION
 

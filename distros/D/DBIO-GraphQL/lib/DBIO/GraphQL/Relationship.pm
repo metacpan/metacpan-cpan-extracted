@@ -129,7 +129,7 @@ DBIO::GraphQL::Relationship - Resolve GraphQL relationship fields from a DBIO so
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

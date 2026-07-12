@@ -7,6 +7,7 @@ use lib 't/lib', 'lib';
 use My::Schema;
 use My::Test qw(deploy_schema);
 use DBIO::GraphQL;
+use DBIO::GraphQL::Filter::Search;
 use GraphQL::Execution qw(execute);
 
 my $db = My::Schema->connect('dbi:SQLite:dbname=:memory:');
@@ -246,6 +247,35 @@ sub gql {
   is($conn->{total},           5, 'total=5 (filtered)'  );
   is(scalar @{$conn->{nodes}}, 2, '2 nodes returned'    );
   is($conn->{nodes}[0]{id},    1, 'first node is book 1');
+}
+
+# Unknown filter column is rejected at the DBIO::GraphQL::Filter level, BEFORE
+# any search condition is built and BEFORE any SQL runs (ticket #3). WHY this
+# matters: _compile_column must gate the column with has_column (false, no
+# throw) so the clean DBIO::GraphQL::Filter message fires - NOT core's
+# column_info() "No such column" exception. If the guard is reverted to
+# column_info, core throws first with a different message and the like() below
+# fails; that message assertion is what encodes the intent (clean,
+# GraphQL-level rejection of unknown filter columns) rather than "it dies
+# somewhere".
+{
+  my $filter = DBIO::GraphQL::Filter::Search->new(schema => $db);
+  my $cond = eval { $filter->to_search({ no_such_col => { eq => 1 } }, 'Book') };
+  my $err = $@;
+  ok($err, 'unknown filter column dies before producing a search condition')
+    or diag 'got cond: ' . explain($cond);
+  like($err,
+    qr/^DBIO::GraphQL::Filter: unknown column 'no_such_col' on source 'Book'/,
+    'rejection uses the clean DBIO::GraphQL::Filter message, not core "No such column"');
+}
+
+# A real column must still pass the guard (guard does not over-block).
+{
+  my $filter = DBIO::GraphQL::Filter::Search->new(schema => $db);
+  my $cond = eval { $filter->to_search({ title => { eq => 'Book 1' } }, 'Book') };
+  ok(!$@, 'known filter column is not blocked by the guard')
+    or diag $@;
+  ok($cond, 'known filter column compiles to a search condition');
 }
 
 done_testing;

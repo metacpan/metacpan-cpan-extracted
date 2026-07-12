@@ -42,7 +42,7 @@ DBIO::SQLite::Adapter - SQLite base->native type resolver
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

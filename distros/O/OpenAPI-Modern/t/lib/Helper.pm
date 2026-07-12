@@ -17,7 +17,7 @@ use Test2::V0 qw(!bag !bool !warnings !subtest), -no_pragmas => 1;  # prefer Tes
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings', ':report_warnings';
 sub subtest { Test2::V0::subtest(@_); bail_if_not_passing() if $ENV{AUTHOR_TESTING}; }
 use if $ENV{AUTHOR_TESTING} || -d '.git', 'Test2::Plugin::SubtestFilter';
-use List::Util 'pairs';
+use List::Util qw(pairs pairgrep pairmap);
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Carp 'croak';
@@ -59,10 +59,14 @@ our @TYPES = $ENV{TYPE} ? split(/,/, $ENV{TYPE}) : qw(mojo lwp plack catalyst da
 our $TYPE = $ENV{TYPE} ? (split(/,/, $ENV{TYPE}))[0] : 'mojo'; # safe default
 
 # Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
+# body_content can be a reference; the Content-Type header is used to determine the encoding format:
+# see _generate_body
 sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
   die 'Wide character in body content at ', join(' line ', (caller)[1,2]), ".\n"
-    if length $body_content and $body_content =~ /[^\x00-\xff]/;
+    if not ref $body_content and length $body_content and $body_content =~ /[^\x00-\xff]/;
+
+  ($headers, $body_content) = _generate_body($headers, $body_content) if ref $body_content;
 
   my $req;
   if (elem($TYPE, [qw(lwp plack catalyst dancer2)])) {
@@ -119,22 +123,17 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   return $req;
 }
 
+# body_content can be a reference; the Content-Type header is used to determine the encoding format:
+# see _generate_body
 sub response ($code, $headers = [], $body_content = undef) {
   die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
   die 'Wide character in body content at ', join(' line ', (caller)[1,2]), ".\n"
-    if length $body_content and $body_content =~ /[^\x00-\xff]/;
+    if not ref $body_content and length $body_content and $body_content =~ /[^\x00-\xff]/;
+
+  ($headers, $body_content) = _generate_body($headers, $body_content) if ref $body_content;
 
   my $res;
-  if ($TYPE eq 'lwp') {
-    test_needs('HTTP::Response', 'HTTP::Status');
-
-    $res = HTTP::Response->new($code, HTTP::Status::status_message($code), $headers, $body_content);
-    $res->protocol('HTTP/1.1'); # not added by HTTP::Response constructor
-    $res->headers->header('Content-Length' => length($body_content)//0)
-      if not defined $res->headers->header('Content-Length')
-        and not defined $res->headers->header('Transfer-Encoding');
-  }
-  elsif ($TYPE eq 'mojo') {
+  if ($TYPE eq 'mojo') {
     $res = Mojo::Message::Response->new(code => $code);
     $res->headers->add(@$_) foreach pairs @$headers;
     $res->body($body_content) if defined $body_content;
@@ -142,23 +141,23 @@ sub response ($code, $headers = [], $body_content = undef) {
     # add missing Content-Length, etc
     $res->fix_headers;
   }
+  elsif ($TYPE eq 'lwp') {
+    test_needs('HTTP::Response', 'HTTP::Status');
+
+    $res = HTTP::Response->new($code, HTTP::Status::status_message($code), $headers, $body_content);
+    $res->protocol('HTTP/1.1'); # not added by HTTP::Response constructor
+  }
   elsif ($TYPE eq 'plack') {
     test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
     die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
 
     $res = Plack::Response->new($code, $headers, $body_content);
-    $res->headers->header('Content-Length' => length $body_content)
-      if defined $body_content and not defined $res->headers->header('Content-Length')
-        and not defined $res->headers->header('Transfer-Encoding');
   }
   elsif ($TYPE eq 'catalyst') {
     test_needs('Catalyst::Response', { 'HTTP::Headers' => '6.07' });
 
     $res = Catalyst::Response->new(status => $code, body => $body_content);
     $res->headers->push_header(@$_) foreach pairs @$headers;
-    $res->headers->header('Content-Length' => length $body_content)
-      if defined $body_content and not defined $res->headers->header('Content-Length')
-        and not defined $res->headers->header('Transfer-Encoding');
   }
   elsif ($TYPE eq 'dancer2') {
     test_needs('Dancer2::Core::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
@@ -169,12 +168,16 @@ sub response ($code, $headers = [], $body_content = undef) {
       headers => $headers,
       defined $body_content ? (content => $body_content) : (),
     );
-    $res->headers->header('Content-Length' => length $body_content)
-      if defined $body_content and not defined $res->headers->header('Content-Length')
-        and not defined $res->headers->header('Transfer-Encoding');
   }
   else {
     die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
+  }
+
+  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
+    $res->headers->header('Content-Length' => length $body_content)
+      if defined $body_content
+        and not defined $res->headers->header('Content-Length')
+        and not defined $res->headers->header('Transfer-Encoding');
   }
 
   return $res;
@@ -184,7 +187,7 @@ sub uri ($uri_string, @path_parts) {
   die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
 
   my $uri;
-  if (elem($TYPE, [qw(lwp plack catalyst)])) {
+  if (elem($TYPE, [qw(lwp plack catalyst dancer2)])) {
     test_needs('URI');
     $uri = URI->new($uri_string);
     $uri->path_segments(@path_parts) if @path_parts;
@@ -215,6 +218,7 @@ sub query_params ($request, $pairs) {
     # this is the encoded query string portion of the URI
     $request->env->{QUERY_STRING} = Mojo::Parameters->new->pairs($pairs)->to_string;
     $request->env->{REQUEST_URI} .= '?' . $request->env->{QUERY_STRING};
+    $request->uri->query($request->env->{QUERY_STRING}) if $TYPE eq 'catalyst';
     # $request->_clear_parameters if $TYPE eq 'catalyst';  # might need this later
   }
   else {
@@ -240,6 +244,42 @@ sub remove_header ($message, $header_name) {
   else {
     die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
+}
+
+sub _generate_body ($headers, $body_content) {
+  my (undef, $content_type) = pairgrep { $a eq 'Content-Type' } @$headers;
+
+  die 'missing Content-Type header' if not defined $content_type;
+
+  if ($content_type eq 'application/x-www-form-urlencoded') {
+    $body_content = _form_urlencoded_content($body_content);
+  }
+  else {
+    die 'unsupported Content-Type '.$content_type;
+  }
+
+  return ($headers, $body_content);
+}
+
+# Accepts a form specification as either:
+# - a hashref of names and values: { name1 => value1, name2 => [ value2, value3 ], ... },
+# - or an arrayref of pairs (which preserves order):
+#   [ name1 => value1, name2 => value2, name2 => value3, ... ]
+# Values can also be a form specification, to permit nesting forms (with limitations:
+# an arrayref for a nested form cannot be used inside a hashref)
+# ideally, this output would be deserialized back to the same input.
+sub _form_urlencoded_content ($body_content) {
+    ref $body_content eq 'ARRAY' ? Mojo::Parameters->new->pairs([
+      pairmap { $a, (ref $b ? _form_urlencoded_content($b) : $b) } $body_content->@*
+    ])->to_string
+  : ref $body_content eq 'HASH'
+  ? Mojo::Parameters->new->pairs([
+    pairmap {
+        ref $b eq 'HASH' ? ($a => _form_urlencoded_content($b))
+      : ref $b eq 'ARRAY' ? (map +($a => $_), $b->@*) : ($a, $b) } $body_content->%*
+  ])->to_string
+
+  : die 'unknown ref type';
 }
 
 # prints the method and URI of the request, or the response code and message of the response,

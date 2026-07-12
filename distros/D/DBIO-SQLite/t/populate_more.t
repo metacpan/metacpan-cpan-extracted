@@ -6,7 +6,7 @@ use Test::Exception;
 {
   package PopulateMoreTest::Schema;
   use base 'DBIO::Schema';
-  __PACKAGE__->load_components(qw/Schema::PopulateMore/);
+  __PACKAGE__->load_components(qw/PopulateMore/);
   __PACKAGE__->register_class('Artist' => 'DBIO::Test::Schema::Artist');
   __PACKAGE__->register_class('CD' => 'DBIO::Test::Schema::CD');
   __PACKAGE__->register_class('Genre' => 'DBIO::Test::Schema::Genre');

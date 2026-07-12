@@ -8,7 +8,7 @@ PostgreSQL driver for DBIO (fork of DBIx::Class::Storage::DBI::Pg).
 - native introspection via pg_catalog ([DBIO::PostgreSQL::Introspect](https://metacpan.org/pod/DBIO::PostgreSQL::Introspect))
 - native diff ([DBIO::PostgreSQL::Diff](https://metacpan.org/pod/DBIO::PostgreSQL::Diff))
 - native DDL generation ([DBIO::PostgreSQL::DDL](https://metacpan.org/pod/DBIO::PostgreSQL::DDL))
-- async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) ([DBIO::PostgreSQL::Async](https://metacpan.org/pod/DBIO::PostgreSQL::Async), no DBI)
+- opt-in async PostgreSQL via [EV::Pg](https://metacpan.org/pod/EV::Pg) ([DBIO::PostgreSQL::EV](https://metacpan.org/pod/DBIO::PostgreSQL::EV), no DBI) — add-on dist, not enabled by default; without it async degrades to the forked fallback
 
 ## Usage
 
@@ -68,7 +68,7 @@ The driver supports the full range of PostgreSQL features:
 - `FOR UPDATE SKIP LOCKED` for non-blocking row locking
 - Advisory locks via `pg_advisory_lock`/`pg_try_advisory_lock`
 - `COPY` bulk import/export support
-- `LISTEN`/`NOTIFY` pub/sub via [DBIO::PostgreSQL::Async](https://metacpan.org/pod/DBIO::PostgreSQL::Async)
+- `LISTEN`/`NOTIFY` pub/sub via the opt-in [DBIO::PostgreSQL::EV](https://metacpan.org/pod/DBIO::PostgreSQL::EV) add-on
 
 **Introspection (pg_catalog)**
 - `pg_class`, `pg_attribute`, `pg_index` for tables/columns/indexes

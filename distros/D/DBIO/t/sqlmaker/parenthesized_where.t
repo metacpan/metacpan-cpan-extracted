@@ -127,8 +127,8 @@ my $sm = DBIO::SQLMaker->new(quote_char => '"', name_sep => '.');
   # The whole subquery is itself wrapped in one '( ... )' by as_query; what we
   # pin is that the WHERE inside carries exactly one canonical paren layer.
   is ${$aq}->[0],
-    '(SELECT me.artistid, me.name, me.rank, me.charfield FROM artist me'
-      . ' WHERE ( me.name = ? AND me.rank = ? ))',
+    '(SELECT "me"."artistid", "me"."name", "me"."rank", "me"."charfield" FROM "artist" "me"'
+      . ' WHERE ( "me"."name" = ? AND "me"."rank" = ? ))',
     'resultset compound WHERE: single canonical paren layer end-to-end';
 }
 

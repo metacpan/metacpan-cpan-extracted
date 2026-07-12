@@ -30,6 +30,8 @@ our @ISA = ('PDF::Make::Extract');
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Text - Deprecated alias for L<PDF::Make::Extract>

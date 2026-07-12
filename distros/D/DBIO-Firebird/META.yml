@@ -17,75 +17,76 @@ name: DBIO-Firebird
 provides:
   DBIO::Firebird:
     file: lib/DBIO/Firebird.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::DDL:
     file: lib/DBIO/Firebird/DDL.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::DateTime::Format:
     file: lib/DBIO/Firebird/DateTime/Format.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Deploy:
     file: lib/DBIO/Firebird/Deploy.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Diff:
     file: lib/DBIO/Firebird/Diff.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Diff::Column:
     file: lib/DBIO/Firebird/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Diff::Index:
     file: lib/DBIO/Firebird/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Diff::Table:
     file: lib/DBIO/Firebird/Diff/Table.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Introspect:
     file: lib/DBIO/Firebird/Introspect.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Introspect::Columns:
     file: lib/DBIO/Firebird/Introspect/Columns.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Introspect::ForeignKeys:
     file: lib/DBIO/Firebird/Introspect/ForeignKeys.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Introspect::Indexes:
     file: lib/DBIO/Firebird/Introspect/Indexes.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Introspect::Tables:
     file: lib/DBIO/Firebird/Introspect/Tables.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Introspect::Uniques:
     file: lib/DBIO/Firebird/Introspect/Uniques.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::SQLMaker:
     file: lib/DBIO/Firebird/SQLMaker.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Storage:
     file: lib/DBIO/Firebird/Storage.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Storage::Common:
     file: lib/DBIO/Firebird/Storage/Common.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Storage::InterBase:
     file: lib/DBIO/Firebird/Storage/InterBase.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Test::SequenceTest:
     file: lib/DBIO/Firebird/Test/SequenceTest.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Firebird::Type:
     file: lib/DBIO/Firebird/Type.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Shortcut::fb:
     file: lib/DBIO/Shortcut/fb.pm
-    version: '0.900000'
+    version: '0.900001'
 requires:
-  DBIO: '0.900000'
+  DBD::Firebird: '0'
+  DBIO: '0.900001'
   perl: '5.020'
 resources:
   bugtracker: https://codeberg.org/dbio/dbio-firebird/issues
   homepage: https://codeberg.org/dbio/dbio-firebird
   repository: https://codeberg.org/dbio/dbio-firebird.git
-version: '0.900000'
+version: '0.900001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -221,7 +222,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900000
+          tag: v0.900001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -344,6 +345,10 @@ x_Dist_Zilla:
               version: '4.020'
       name: '@DBIO/PodWeaver'
       version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CoverageTest
+      name: '@DBIO/DBIO::CoverageTest'
+      version: ~
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'

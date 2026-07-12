@@ -14,8 +14,17 @@ __PACKAGE__->mk_diff_accessors(qw(table_key index_name index_info));
 
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
   my @ops;
+
+  # Tables present in the source model but absent from the target are being
+  # dropped in this same pass. Their indexes go with the table via
+  # DROP TABLE ... CASCADE, so a later standalone DROP INDEX for one of them
+  # must be suppressed (karr #32).
+  $source_tables //= {};
+  $target_tables //= {};
+  my %dropped_table = map { $_ => 1 }
+    grep { !exists $target_tables->{$_} } keys %$source_tables;
 
   # Collect all index names across all tables
   my %src_indexes;
@@ -71,6 +80,9 @@ sub diff {
   # Dropped indexes
   for my $name (sort keys %src_indexes) {
     next if exists $tgt_indexes{$name};
+    # Skip when the owning table is itself being dropped this pass; the
+    # DROP TABLE ... CASCADE already removes this index (karr #32).
+    next if $dropped_table{ $src_indexes{$name}{table_key} };
     push @ops, $class->new(
       action     => 'drop',
       table_key  => $src_indexes{$name}{table_key},
@@ -120,7 +132,7 @@ DBIO::PostgreSQL::Diff::Index - Diff operations for PostgreSQL indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -148,10 +160,20 @@ Index metadata hashref (C<definition>, C<access_method>, C<columns>, etc.).
 
 =head2 diff
 
-    my @ops = DBIO::PostgreSQL::Diff::Index->diff($source, $target);
+    my @ops = DBIO::PostgreSQL::Diff::Index->diff(
+      $source, $target, $source_tables, $target_tables);
 
 Compares index sets across all tables. Index identity is by name; definition
 changes produce a drop-then-create pair.
+
+The optional C<$source_tables> / C<$target_tables> hashrefs are the C<tables>
+sections of the two models (threaded in by L<DBIO::PostgreSQL::Diff> via its
+aux-section wiring). They are used to detect tables that are being dropped in
+this same diff pass: a C<DROP TABLE ... CASCADE> already removes that table's
+own indexes, so emitting a standalone C<DROP INDEX> for one of them would fail
+with C<index ... does not exist> and abort the deploy (karr #32). When these
+arguments are absent (e.g. direct unit-test calls) the set is empty and no
+drops are suppressed, preserving the original two-argument behaviour.
 
 =head2 as_sql
 

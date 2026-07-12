@@ -1,7 +1,9 @@
 package Map::Tube::API;
 
-$Map::Tube::API::VERSION   = '0.09';
-$Map::Tube::API::AUTHORITY = 'cpan:MANWAR';
+use version;
+
+our $VERSION   = qv('v1.0.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +11,7 @@ Map::Tube::API - Interface to Map::Tube REST API.
 
 =head1 VERSION
 
-Version 0.09
+Version v1.0.0
 
 =cut
 
@@ -307,7 +309,7 @@ L<https://metacpan.org/pod/Map::Tube::API>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2024 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2024 - 2026 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

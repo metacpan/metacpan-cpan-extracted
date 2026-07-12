@@ -11,8 +11,14 @@ my $MSGS     = $ENV{STRESS_MSGS}     || 2_000;
 my $WORKERS  = $ENV{STRESS_WORKERS}  || 4;
 my $CLIENTS  = $ENV{STRESS_CLIENTS}  || 4;
 my $CANCEL   = $ENV{STRESS_CANCEL}   || 20;  # cancel every Nth request
+# Generous client-side per-request timeout: on an oversubscribed CI runner
+# (2 cores running `prove -j2` alongside this test's forked workers/clients) a
+# client process can be descheduled for several seconds, so a tight 5s cap
+# causes spurious failures even though the work completes correctly. Requests
+# are milliseconds normally; a request exceeding this genuinely indicates a stall.
+my $CTMO     = $ENV{STRESS_TIMEOUT}  || 30;
 
-diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CANCEL";
+diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CANCEL, ctmo ${CTMO}s";
 
 # ============================================================
 # 1. High-volume MPMC: N clients, M workers, full round-trip
@@ -44,10 +50,10 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
             my $cancel_ok = 0;
             for my $i (1..$MSGS) {
                 if ($i % $CANCEL == 0) {
-                    my $id = $cli->send_wait("c${c}m$i", 5.0);
+                    my $id = $cli->send_wait("c${c}m$i", $CTMO);
                     if (defined $id) { $cli->cancel($id); $cancel_ok++ }
                 } else {
-                    my $resp = $cli->req_wait("c${c}m$i", 5.0);
+                    my $resp = $cli->req_wait("c${c}m$i", $CTMO);
                     $ok++ if defined $resp && $resp =~ /^w\d+:c${c}m${i}$/;
                 }
             }
@@ -90,7 +96,7 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         if ($pid == 0) {
             my $cli = Data::ReqRep::Shared::Client->new($path);
             for my $i (1..$MSGS) {
-                $cli->req_wait("c${c}b$i", 10.0);
+                $cli->req_wait("c${c}b$i", $CTMO);
             }
             exit 0;
         }
@@ -141,7 +147,7 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         # variable size: 1 to 5000 bytes
         my $len = 1 + ($i * 37) % 5000;
         my $msg = chr(65 + ($i % 26)) x $len;
-        my $resp = $cli->req_wait($msg, 5.0);
+        my $resp = $cli->req_wait($msg, $CTMO);
         $ok++ if defined $resp && $resp eq $msg;
     }
 
@@ -181,9 +187,9 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
 
     my $ok = 0;
     for my $i (1..$MSGS) {
-        my $id = $cli->send_wait_notify("m$i", 5.0);
+        my $id = $cli->send_wait_notify("m$i", $CTMO);
         next unless defined $id;
-        my $resp = $cli->get_wait($id, 5.0);
+        my $resp = $cli->get_wait($id, $CTMO);
         $ok++ if defined $resp && $resp eq "ok";
     }
 

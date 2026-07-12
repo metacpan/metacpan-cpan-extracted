@@ -23,87 +23,93 @@ name: DBIO-MySQL
 provides:
   DBIO::MySQL:
     file: lib/DBIO/MySQL.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Adapter:
     file: lib/DBIO/MySQL/Adapter.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::DDL:
     file: lib/DBIO/MySQL/DDL.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Deploy:
     file: lib/DBIO/MySQL/Deploy.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Diff:
     file: lib/DBIO/MySQL/Diff.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Diff::Column:
     file: lib/DBIO/MySQL/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Diff::ForeignKey:
     file: lib/DBIO/MySQL/Diff/ForeignKey.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Diff::Index:
     file: lib/DBIO/MySQL/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Diff::Table:
     file: lib/DBIO/MySQL/Diff/Table.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Introspect:
     file: lib/DBIO/MySQL/Introspect.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Introspect::Columns:
     file: lib/DBIO/MySQL/Introspect/Columns.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Introspect::ForeignKeys:
     file: lib/DBIO/MySQL/Introspect/ForeignKeys.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Introspect::Indexes:
     file: lib/DBIO/MySQL/Introspect/Indexes.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Introspect::Tables:
     file: lib/DBIO/MySQL/Introspect/Tables.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Introspect::Util:
     file: lib/DBIO/MySQL/Introspect/Util.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::MariaDB:
     file: lib/DBIO/MySQL/MariaDB.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Result:
     file: lib/DBIO/MySQL/Result.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::SQLMaker:
     file: lib/DBIO/MySQL/SQLMaker.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::SQLMaker::MariaDB:
     file: lib/DBIO/MySQL/SQLMaker/MariaDB.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Storage:
     file: lib/DBIO/MySQL/Storage.pm
-    version: '0.900000'
+    version: '0.900001'
+  DBIO::MySQL::Storage::Async:
+    file: lib/DBIO/MySQL/Storage/Async.pm
+    version: '0.900001'
   DBIO::MySQL::Storage::MariaDB:
     file: lib/DBIO/MySQL/Storage/MariaDB.pm
-    version: '0.900000'
+    version: '0.900001'
+  DBIO::MySQL::Storage::MariaDB::Async:
+    file: lib/DBIO/MySQL/Storage/MariaDB/Async.pm
+    version: '0.900001'
   DBIO::MySQL::Test::EventTZ:
     file: lib/DBIO/MySQL/Test/EventTZ.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::MySQL::Test::EventTZDeprecated:
     file: lib/DBIO/MySQL/Test/EventTZDeprecated.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Shortcut::mysql:
     file: lib/DBIO/Shortcut/mysql.pm
-    version: '0.900000'
+    version: '0.900001'
 recommends:
   DBD::MariaDB: '0'
 requires:
-  DBIO: '0.900000'
+  DBIO: '0.900001'
   DateTime::Format::MySQL: '0'
   perl: '5.020'
 resources:
   bugtracker: https://codeberg.org/dbio/dbio-mysql/issues
   homepage: https://codeberg.org/dbio/dbio-mysql
   repository: https://codeberg.org/dbio/dbio-mysql.git
-version: '0.900000'
+version: '0.900001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -239,7 +245,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900000
+          tag: v0.900001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -362,6 +368,10 @@ x_Dist_Zilla:
               version: '4.020'
       name: '@DBIO/PodWeaver'
       version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CoverageTest
+      name: '@DBIO/DBIO::CoverageTest'
+      version: ~
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'

@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-three-layer-pg-hierarchy-and-pgschema-layer.md
@@ -14,6 +15,7 @@ docs/adr/0002-temp-database-deploy-strategy.md
 docs/adr/0003-definition-string-index-comparison.md
 docs/adr/0004-exact-pg-type-strings-no-abstract-mapping.md
 docs/adr/0005-native-jsonb-operators-and-jsonb-path-dsl.md
+docs/adr/0030-async-mode-registration.md
 lib/DBIO/PostgreSQL.pm
 lib/DBIO/PostgreSQL/Adapter.pm
 lib/DBIO/PostgreSQL/DDL.pm
@@ -49,6 +51,7 @@ lib/DBIO/PostgreSQL/PgSchema.pm
 lib/DBIO/PostgreSQL/Result.pm
 lib/DBIO/PostgreSQL/SQLMaker.pm
 lib/DBIO/PostgreSQL/Storage.pm
+lib/DBIO/PostgreSQL/Storage/Async.pm
 lib/DBIO/PostgreSQL/Test/EventTZPg.pm
 lib/DBIO/PostgreSQL/Test/SequenceTest.pm
 lib/DBIO/Shortcut/pg.pm
@@ -91,7 +94,14 @@ t/31-threads.t
 t/32-threadtxn.t
 t/33-introspect-normalize.t
 t/34-introspect-parse.t
+t/35-async-mode.t
+t/36-future-io-async.t
+t/37-future-io-live.t
+t/38-storage-layer-composition.t
+t/39-storage-layer-composition-live.t
+t/40-diff-drop-table-index-cascade.t
 t/85utf8.t
 t/postgresql-result-check-constraints.t
 t/postgresql-result-extra-ddl.t
+t/release-coverage.t
 xbin/dbio-pg-k8s

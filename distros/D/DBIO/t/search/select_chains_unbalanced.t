@@ -16,72 +16,72 @@ my @chain = (
     as          => 'cd_id',
     columns     => [ 'title' ],
   } => 'SELECT
-          me.title,
-          me.cdid
-        FROM cd me'
+          "me"."title",
+          "me"."cdid"
+        FROM cd "me"'
     => [qw/title cd_id/],
 
   {
     '+select'   => \ 'DISTINCT(foo, bar)',
     '+as'       => [qw/foo bar/],
   } => 'SELECT
-          me.title,
-          me.cdid,
+          "me"."title",
+          "me"."cdid",
           DISTINCT(foo, bar)
-        FROM cd me'
+        FROM cd "me"'
     => [qw/title cd_id foo bar/],
 
   {
     '+select'   => [ 'genreid', $multicol_rs->as_query ],
     '+as'       => [qw/genreid name rank/],
   } => 'SELECT
-          me.title,
-          me.cdid,
+          "me"."title",
+          "me"."cdid",
           DISTINCT(foo, bar),
-          me.genreid,
-          (SELECT me.name, me.rank FROM artist me WHERE ( artistid 1 ))
-        FROM cd me'
+          "me"."genreid",
+          (SELECT "me"."name", "me"."rank" FROM "artist" "me" WHERE ( "artistid" 1 ))
+        FROM cd "me"'
     => [qw/title cd_id foo bar genreid name rank/],
 
   {
     '+select'   => { count => 'me.cdid', -as => 'cnt' },  # lack of 'as' infers from '-as'
     '+columns'  => { len => { length => 'me.title' } },
   } => 'SELECT
-          me.title,
-          LENGTH( me.title ),
-          me.cdid,
+          "me"."title",
+          LENGTH( "me"."title" ),
+          "me"."cdid",
           DISTINCT(foo, bar),
-          me.genreid,
-          (SELECT me.name, me.rank FROM artist me WHERE ( artistid 1 )),
-          COUNT( me.cdid ) AS cnt
-        FROM cd me'
+          "me"."genreid",
+          (SELECT "me"."name", "me"."rank" FROM "artist" "me" WHERE ( "artistid" 1 )),
+          COUNT( "me"."cdid" ) AS "cnt"
+        FROM cd "me"'
     => [qw/title len cd_id foo bar genreid name rank cnt/],
   {
     '+select'   => \'unaliased randomness',
   } => 'SELECT
-          me.title,
-          LENGTH( me.title ),
-          me.cdid,
+          "me"."title",
+          LENGTH( "me"."title" ),
+          "me"."cdid",
           DISTINCT(foo, bar),
-          me.genreid,
-          (SELECT me.name, me.rank FROM artist me WHERE ( artistid 1 )),
-          COUNT( me.cdid ) AS cnt,
+          "me"."genreid",
+          (SELECT "me"."name", "me"."rank" FROM "artist" "me" WHERE ( "artistid" 1 )),
+          COUNT( "me"."cdid" ) AS "cnt",
           unaliased randomness
-        FROM cd me'
+        FROM cd "me"'
     => [qw/title len cd_id foo bar genreid name rank cnt/],
   {
     '+select'   => \'MOAR unaliased randomness',
   } => 'SELECT
-          me.title,
-          LENGTH( me.title ),
-          me.cdid,
+          "me"."title",
+          LENGTH( "me"."title" ),
+          "me"."cdid",
           DISTINCT(foo, bar),
-          me.genreid,
-          (SELECT me.name, me.rank FROM artist me WHERE ( artistid 1 )),
-          COUNT( me.cdid ) AS cnt,
+          "me"."genreid",
+          (SELECT "me"."name", "me"."rank" FROM "artist" "me" WHERE ( "artistid" 1 )),
+          COUNT( "me"."cdid" ) AS "cnt",
           unaliased randomness,
           MOAR unaliased randomness
-        FROM cd me'
+        FROM cd "me"'
     => [qw/title len cd_id foo bar genreid name rank cnt/],
 );
 

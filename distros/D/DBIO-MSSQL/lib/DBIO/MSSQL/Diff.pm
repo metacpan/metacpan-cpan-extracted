@@ -26,6 +26,7 @@ sub _build_operations {
   );
   push @ops, DBIO::MSSQL::Diff::Index->diff(
     $self->source->{indexes}, $self->target->{indexes},
+    $self->source->{tables},  $self->target->{tables},
   );
   push @ops, DBIO::MSSQL::Diff::ForeignKey->diff(
     $self->source->{foreign_keys}, $self->target->{foreign_keys},
@@ -50,7 +51,7 @@ DBIO::MSSQL::Diff - Compare two introspected MSSQL models
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

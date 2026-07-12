@@ -22,15 +22,16 @@ MODULE = Data::Heap::Shared  PACKAGE = Data::Heap::Shared
 PROTOTYPES: DISABLE
 
 SV *
-new(class, path, capacity)
+new(class, path, capacity, ...)
     const char *class
     SV *path
     UV capacity
   PREINIT:
     char errbuf[HEAP_ERR_BUFLEN];
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
-    HeapHandle *h = heap_create(p, capacity, errbuf);
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    mode_t mode = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (mode_t)SvUV(ST(3)) : 0600;
+    HeapHandle *h = heap_create(p, capacity, mode, errbuf);
     if (!h) croak("Data::Heap::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:

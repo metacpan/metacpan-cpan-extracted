@@ -1,3 +1,7 @@
+0.004  2026-07-11 11:49:37 CEST
+   - Set explicit minimum version of depended-on packages in cpanfile
+     (addressing https://www.cpantesters.org/cpan/report/e662cfaa-7b5a-11f1-bd84-ab326e8775ea)
+
 0.002  2026-07-07 08:09:41 CEST
    - Actual release as an official distribution (previous was trial)
 

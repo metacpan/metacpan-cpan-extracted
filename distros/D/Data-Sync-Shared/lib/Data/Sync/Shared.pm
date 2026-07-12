@@ -1,12 +1,25 @@
 package Data::Sync::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::Sync::Shared', $VERSION);
 
-# Guard objects — auto-release on scope exit
+# ithreads: blessed shared-memory handles must never be cloned into a
+# child thread -- the clone would double-free the handle on thread exit.
+{ no strict 'refs'; *{"${_}::CLONE_SKIP"} = sub { 1 } for qw(
+  Data::Sync::Shared::Semaphore
+  Data::Sync::Shared::Barrier
+  Data::Sync::Shared::RWLock
+  Data::Sync::Shared::Condvar
+  Data::Sync::Shared::Once
+  Data::Sync::Shared::RWLock::Guard
+  Data::Sync::Shared::Condvar::Guard
+  Data::Sync::Shared::Semaphore::Guard
+); }
+
+# Guard objects -- auto-release on scope exit
 
 package Data::Sync::Shared::RWLock::Guard {
     sub DESTROY {
@@ -40,7 +53,7 @@ sub Data::Sync::Shared::Condvar::lock_guard {
     bless [$self], 'Data::Sync::Shared::Condvar::Guard';
 }
 
-# Condvar wait_while — loop until predicate returns false
+# Condvar wait_while -- loop until predicate returns false
 
 sub Data::Sync::Shared::Condvar::wait_while {
     my ($self, $pred, $timeout) = @_;
@@ -56,7 +69,7 @@ sub Data::Sync::Shared::Condvar::wait_while {
             my $remaining = $deadline - Time::HiRes::time();
             return 0 if $remaining <= 0;
             $self->wait($remaining);
-            # Fall through to re-check predicate even on timeout — the
+            # Fall through to re-check predicate even on timeout -- the
             # condition may have cleared just before our deadline expired.
         } else {
             $self->wait;
@@ -99,7 +112,7 @@ Data::Sync::Shared - Shared-memory synchronization primitives for Linux
 
     use Data::Sync::Shared;
 
-    # Semaphore — bounded counter for resource limiting
+    # Semaphore -- bounded counter for resource limiting
     my $sem = Data::Sync::Shared::Semaphore->new('/tmp/sem.shm', 4);
     $sem->acquire;            # block until available
     $sem->acquire(1.5);       # with timeout
@@ -112,12 +125,12 @@ Data::Sync::Shared - Shared-memory synchronization primitives for Linux
         my $g = $sem->acquire_guard;   # auto-release on scope exit
     }
 
-    # Barrier — N processes rendezvous
+    # Barrier -- N processes rendezvous
     my $bar = Data::Sync::Shared::Barrier->new('/tmp/bar.shm', 3);
     my $leader = $bar->wait;       # block until all 3 arrive
     my $leader = $bar->wait(5.0);  # with timeout (-1=timeout)
 
-    # RWLock — reader-writer lock
+    # RWLock -- reader-writer lock
     my $rw = Data::Sync::Shared::RWLock->new('/tmp/rw.shm');
     $rw->rdlock;  $rw->rdunlock;
     $rw->wrlock;  $rw->wrunlock;
@@ -127,7 +140,7 @@ Data::Sync::Shared - Shared-memory synchronization primitives for Linux
         my $g = $rw->wrlock_guard;  # auto-release on scope exit
     }
 
-    # Condvar — condition variable with built-in mutex
+    # Condvar -- condition variable with built-in mutex
     my $cv = Data::Sync::Shared::Condvar->new('/tmp/cv.shm');
     $cv->lock;
     $cv->try_lock;       # non-blocking
@@ -138,7 +151,7 @@ Data::Sync::Shared - Shared-memory synchronization primitives for Linux
     $cv->wait_while(sub { !$ready }, 5.0);  # predicate loop
     $cv->unlock;
 
-    # Once — one-time initialization gate
+    # Once -- one-time initialization gate
     my $once = Data::Sync::Shared::Once->new('/tmp/once.shm');
     if ($once->enter) {          # or enter($timeout)
         do_init();
@@ -222,12 +235,21 @@ dies while holding a lock, other processes detect the stale lock within
 
 =head2 Security
 
-The shared memory region (mmap) is writable by all processes that open
-it. A malicious process with write access to the backing file or memfd
-can corrupt header fields (lock words, counters, parameters) and cause
-other processes to deadlock, spin, or behave incorrectly. Do not share
-backing files with untrusted processes. Use anonymous mode or memfd
-with restricted fd passing for isolation.
+Backing files are created securely: the path is opened with
+O_CREAT|O_EXCL|O_NOFOLLOW (a pre-existing symlink at the path is
+rejected, and an existing regular file is attached rather than
+truncated) and the new file is created mode 0600 (owner-only) by
+default, so a segment is not world-writable unless you opt in. To
+share a file with a peer group, pass an explicit octal mode as the
+last argument to new():
+
+    my $sem = Data::Sync::Shared::Semaphore->new($path, $max, $initial, 0660);
+    my $rw  = Data::Sync::Shared::RWLock->new($path, 0660);
+
+The mode is still subject to the caller's umask, exactly like open().
+Offsets read back from an attached segment are bounds-checked before
+use, so a poisoned reader-slot offset cannot steer a pointer outside
+the mapping.
 
 =head2 Guard Objects
 
@@ -404,7 +426,7 @@ All primitives support:
 
     my $p  = $obj->path;           # backing file path (undef if anon)
     my $fd = $obj->memfd;          # memfd fd (-1 if file-backed/anon)
-    $obj->sync;                    # msync — flush to disk
+    $obj->sync;                    # msync -- flush to disk
     $obj->unlink;                  # remove backing file
     Class->unlink($path);          # class method form
     my $s  = $obj->stats;          # diagnostic hashref

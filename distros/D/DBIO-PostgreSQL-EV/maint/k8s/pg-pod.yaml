@@ -1,0 +1,71 @@
+# PostgreSQL pod for dbio-postgresql-ev integration tests.
+#
+# RESOURCE DISCIPLINE — this runs on a small SHARED box (few cores, alongside
+# other DBs and services). The pod carries resources.limits so it can never
+# starve the host. Run ONE test DB at a time, `nice` the prove run, and DELETE
+# the pod when done — a forgotten pod is capped but still noise. See the
+# "Live testing" section in .claude/rules/dbio-rules.md.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/pg-pod.yaml
+#   kubectl wait --for=condition=Ready pod/dbio-async-pg --timeout=60s
+#   kubectl port-forward svc/dbio-async-pg-svc 5432:5432 &
+#
+#   DBIOTEST_PG_DSN='dbi:Pg:dbname=dbio_async;host=127.0.0.1;port=5432' \
+#   DBIOTEST_PG_USER=dbio \
+#   DBIOTEST_PG_PASS=dbio \
+#     nice -n 19 ionice -c3 prove -l t/10-integration.t t/11-access-broker-live.t
+#
+#   kubectl delete -f maint/k8s/pg-pod.yaml   # ALWAYS clean up
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-async-pg
+  labels:
+    app: dbio-async-pg
+    role: dbio-test-db
+spec:
+  containers:
+    - name: postgres
+      image: postgres:17
+      resources:
+        requests:
+          cpu: 250m
+          memory: 256Mi
+        limits:
+          cpu: "1"          # at most one core on a shared box
+          memory: 1Gi       # headroom for AGE + PostGIS extensions
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_DB
+          value: dbio_async
+        - name: POSTGRES_USER
+          value: dbio
+        - name: POSTGRES_PASSWORD
+          value: dbio
+      readinessProbe:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - dbio
+            - -d
+            - dbio_async
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        timeoutSeconds: 2
+        failureThreshold: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-async-pg-svc
+spec:
+  selector:
+    app: dbio-async-pg
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP

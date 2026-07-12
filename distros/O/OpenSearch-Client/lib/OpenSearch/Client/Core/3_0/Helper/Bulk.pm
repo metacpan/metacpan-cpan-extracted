@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Helper::Bulk;
-$OpenSearch::Client::Core::3_0::Helper::Bulk::VERSION = '3.007006';
+$OpenSearch::Client::Core::3_0::Helper::Bulk::VERSION = '3.007007';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::Helper::Bulk',
     'OpenSearch::Client::Role::Is_Sync';
@@ -101,7 +101,7 @@ OpenSearch::Client::Core::3_0::Helper::Bulk - A helper module for the Bulk API
 
 =head1 VERSION
 
-version 3.007006
+version 3.007007
 
 =head1 SYNOPSIS
 
@@ -136,11 +136,11 @@ version 3.007006
 
 =head1 DESCRIPTION
 
-This module provides a wrapper for the L<OpenSearch::Client::Core::3_0::Direct/#bulk>
+This module provides a wrapper for the L<OpenSearch::Client::Core::3_0::Direct#bulk>
 method which makes it easier to run multiple create, index, update or delete
 actions in a single request.
 
-The L<OpenSearch::Client::Core::3_0::Bulk> module acts as a queue, buffering up actions
+The L<OpenSearch::Client::Core::3_0::Helper::Bulk> module acts as a queue, buffering up actions
 until it reaches a maximum count of actions, or a maximum size of JSON request
 body, at which point it issues a C<bulk()> request.
 
@@ -176,7 +176,7 @@ OpenSearch::Client client as the C<os> argument.
 The C<index> parameter provides a default value C<index>,
 which can be overridden in each action.
 You can also pass any other values which are accepted
-by the L<bulk()|OpenSearch::Client::Core::3_0::Direct/#bulk> method.
+by the L<bulk()|OpenSearch::Client::Core::3_0::Direct#bulk> method.
 
 See L</flush()> for more information about the other parameters.
 
@@ -187,7 +187,7 @@ See L</flush()> for more information about the other parameters.
     $result = $bulk->flush;
 
 The C<flush()> method sends all buffered actions to OpenSearch using
-a L<bulk()|OpenSearch::Client::Core::3_0:Direct/#bulk> request.
+a L<bulk()|OpenSearch::Client::Core::3_0::Direct#bulk> request.
 
 =head2 Auto-flushing
 
@@ -350,7 +350,7 @@ and must be specified either in L</new()> or in every action.
     );
 
 The C<create()> helper method allows you to add multiple C<create> actions.
-It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct/#create>
+It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct#create>
 except that the document body should be passed as the C<source> or C<_source>
 parameter, instead of as C<body>.
 
@@ -376,7 +376,7 @@ you can just pass the individual document bodies.
     );
 
 The C<index()> helper method allows you to add multiple C<index> actions.
-It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct/#index>
+It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct#index>
 except that the document body should be passed as the C<source> or C<_source>
 parameter, instead of as C<body>.
 
@@ -388,7 +388,7 @@ parameter, instead of as C<body>.
     );
 
 The C<delete()> helper method allows you to add multiple C<delete> actions.
-It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct/#delete>.
+It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct#delete>.
 
 =head2 C<delete_ids()>
 
@@ -413,11 +413,11 @@ In this case, all you have to do is to pass in a list of IDs.
     );
 
 The C<update()> helper method allows you to add multiple C<update> actions.
-It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct/#update>.
+It accepts the same parameters as L<OpenSearch::Client::Core::3_0::Direct#update>.
 An update can either use a I<partial doc> which gets merged with an existing
 doc (example 1 above), or can use a C<script> to update an existing doc
 (example 2 above). More information on C<script> can be found here:
-L<OpenSearch::Client::Core::3_0::Direct/#update>.
+L<OpenSearch::Client::Core::3_0::Direct#update>.
 
 =head1 MANUAL
 

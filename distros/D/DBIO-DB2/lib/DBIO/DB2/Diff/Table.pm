@@ -106,7 +106,7 @@ DBIO::DB2::Diff::Table - Diff operations for DB2 tables
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

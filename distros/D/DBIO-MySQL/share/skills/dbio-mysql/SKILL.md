@@ -25,6 +25,24 @@ DBIO MySQL/MariaDB driver. Follows dbio-driver-development conventions.
 
 `DBIO::MySQL::MariaDB` sets `storage_type('+DBIO::MySQL::Storage::MariaDB')`.
 
+## Async Wiring
+
+Per core ADR 0030, async is an explicit per-connection mode resolved through the core mode registry:
+
+- **`ev` mode:** this storage registers `ev => DBIO::MySQL::EV::Storage` on `DBIO::MySQL::Storage`. MariaDB subclass inherits via MRO. Backend lives in the optional `dbio-mysql-ev` dist; loaded lazily on first `*_async` call. Absent → canonical `install DBIO::MySQL::EV::Storage` croak.
+- **`future_io` mode (ADR 0030/0031):** NOT registered — resolved by CONVENTION, `ref($storage).'::Async'`. `DBIO::MySQL::Storage::Async` (DBD::mysql binding) / `DBIO::MySQL::Storage::MariaDB::Async` (DBD::MariaDB `mariadb_*` binding) subclass `DBIO::Async::Storage` and fill only the DB transport seams; Model-B orchestration is inherited.
+- Reach: `connect(..., { async => 'ev' })` or `{ async => 'future_io' }`. `async_backend()` and `load_components('MySQL::EV')` are OBSOLETE patterns from before ADR 0030.
+
+See `docs/adr/0030-async-mode-registration.md`.
+
+## `?` placeholder seam (future_io)
+
+`DBIO::MySQL::Storage::Async::_transform_sql` is **identity** — MySQL keeps standard `?` placeholders (unlike PostgreSQL's `?`→`$N` rewrite). Shaping happens exactly ONCE, internally, inside the inherited `DBIO::Async::Storage::_query_async`; the adapter does NOT override `_query_async`. No caller-side `_transform_sql` — a layer/extension issues `?` SQL through `_query_async` and never shapes SQL itself. MySQL has no `RETURNING`, so `_post_insert_sql` is empty and INSERT returned-columns are assembled from the captured `mysql_insertid`/`mariadb_insertid`.
+
+## Storage-layer composition (core karr #70)
+
+Extensions are plain storage **LAYERS**, not `storage_type` subclasses. `storage_type` is written ONLY by the driver Schema components — `DBIO::MySQL` (`+DBIO::MySQL::Storage`) and `DBIO::MySQL::MariaDB` (`+DBIO::MySQL::Storage::MariaDB`); choosing the base storage stays the driver's job. An extension registers a plain method package via `$schema->register_storage_layer('DBIO::MySQL::Ext::Storage')`; core composes it (C3) OVER the driver storage via `DBIO::Storage::Composed`. Its async mirror `...::Ext::Storage::Async` composes OVER the resolved `future_io` transport (found by convention off the driver, NOT the layer). The `ev`/`future_io` map does not grow per extension. Transport capabilities: the future_io transport inherits `transport_capabilities => (on_connect_replay)` and declares nothing extra; MySQL has no LISTEN/NOTIFY/COPY (PostgreSQL features); pipelining lives on the `ev` backend. MySQL ships no extension today, but this reference driver honours the mechanism (offline `t/56-storage-layer-composition.t`, live `t/57-*-live.t`).
+
 ## Key Storage Methods
 
 | Method | Description |

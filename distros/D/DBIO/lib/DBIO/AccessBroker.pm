@@ -134,7 +134,7 @@ DBIO::AccessBroker - Credential lifecycle for DBIO connections
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,8 @@ version 0.900000
     );
     # DBIO can now connect directly with a broker
     my $schema = MyApp::Schema->connect($broker);
+
+See F<t/access_broker/> for a runnable example.
 
 =head1 DESCRIPTION
 

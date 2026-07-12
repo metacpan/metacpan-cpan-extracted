@@ -87,7 +87,7 @@ sub _create_pod {
     spec     => {
       containers => [{
         name  => 'postgres',
-        image => 'src.ci/srv/postgres:18',
+        image => 'postgres:18',
         env   => [
           { name => 'POSTGRES_USER',     value => $user },
           { name => 'POSTGRES_PASSWORD', value => $pass },

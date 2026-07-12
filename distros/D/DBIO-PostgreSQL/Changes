@@ -1,5 +1,108 @@
 Revision history for DBIO-PostgreSQL
 
+0.900001  2026-07-12
+    * Storage
+        - Add DBIO::PostgreSQL::Storage::Async — the first REAL future_io async
+          transport (core ADR 0030/0031, karr #25). connect(..., { async =>
+          'future_io' }) now resolves it BY CONVENTION (ref($storage).'::Async',
+          no registration) and runs genuinely non-blocking SELECT / INSERT /
+          txn_do over DBD::Pg's pg_async binding driven through Future::IO. The
+          Model-B orchestration is inherited from DBIO::Async::Storage; this
+          class fills only the DB-specific transport seams (submit via
+          {pg_async => PG_ASYNC}, collect via pg_ready/pg_result, socket fd via
+          pg_socket, ?->$N placeholders, RETURNING * for the returned-columns
+          hashref). dbio-async is an optional recommends -- only the future_io
+          mode needs it, resolved by convention per ADR 0030, so a sync-only
+          install never pulls the async stack; the live roundtrip test
+          additionally wants a Future::IO::Impl (IO::Async recommended).
+        - Register the 'ev' async mode (core ADR 0030): connect(..., { async => 'ev' })
+          now resolves DBIO::PostgreSQL::EV::Storage via the core mode registry;
+          this shadows the generic modes registered on DBIO::Storage::DBI and
+          replaces the obsolete async_backend() / load_components('PostgreSQL::EV')
+          opt-ins. Requires the optional dbio-postgresql-ev dist at first use;
+          absent → the canonical "install DBIO::PostgreSQL::EV::Storage" croak
+          (ADR 0030). The dist stays optional — no cpanfile dependency is added.
+        - Reference-driver compliance for the storage-layer composition model
+          (karr #28, core #70): storage_type is written once in the Schema
+          component's connection(); extensions register plain storage LAYERS
+          (composed via DBIO::Storage::Composed) instead of subclassing
+          storage_type. _transform_sql stays the single ?->$N rewrite, run once
+          inside the transport (no double-shaping); transport_capabilities =>
+          (on_connect_replay), the ev transport carries LISTEN/NOTIFY/COPY/
+          pipeline and future_io fails loud when a layer needs them. No
+          behavioural change -- the driver's role is unchanged.
+
+    * Diff
+        - Fix DROP INDEX / DROP TABLE CASCADE collision in full-schema sync
+          (karr #32). When diff reconciled a live schema containing a table
+          absent from the target (removed from the app's DBIO classes, or an
+          unmanaged leftover), it emitted both DROP TABLE <t> CASCADE and a
+          later standalone DROP INDEX <t>_pkey; since CASCADE already dropped
+          the table's own indexes, the standalone DROP INDEX died with
+          "index ... does not exist" and aborted apply()/upgrade().
+          DBIO::PostgreSQL::Diff::Index now receives the tables sections (via
+          the aux-section wiring in DBIO::PostgreSQL::Diff) and suppresses a
+          standalone DROP INDEX for any index whose owning table is itself
+          being dropped in the same pass. Indexes of surviving tables are
+          still dropped as before. Scoped to this driver; the same class of
+          bug likely exists in sibling drivers' Diff/Index equivalents.
+
+    * Documentation
+        - Add docs/adr/0030-async-mode-registration.md — per-repo operationalisation
+          of the core async mode registry mechanism for the PostgreSQL driver
+        - Document the { async => 'ev' } opt-in in DBIO::PostgreSQL::Storage POD
+
+    * Security
+        - Add SECURITY.md following the CPAN Security Group author guidelines
+          (v1.5.0): email-first private reporting to the maintainer with CPANSec
+          escalation, and a note that Codeberg has no confidential issue channel.
+
+    * Dependencies
+        - requires DBIO 0.900001 (family-aligned).
+        - DBIO::Async, the shared future_io backend base, is deliberately
+          NOT declared in cpanfile (karr #27): the sync driver loads
+          without it; only { async => 'future_io' } pulls it in, resolved
+          lazily by convention (ADR 0030). Core's future_io resolver now
+          names the missing module and the distribution that provides it
+          when the adapter can't load (core karr #78), so a separate
+          recommends pointer is no longer needed.
+
+    * Tests
+        - Drop references to removed modules so the suite passes on fresh
+          installs: DBIO::PostgreSQL::Loader/::Loader::Model (removed with
+          the generation contract) and DBIO::AccessBroker::Credentials
+          (replaced in core by DBIO::AccessBroker::Static); the
+          access-broker test now uses Static (Codeberg #1)
+        - Make the generated-code assertions in both t/25 variants
+          (-via-introspect and -live) quote-agnostic to match the
+          B::perlstring double-quoted emitter output; the live variant's
+          table/set_primary_key/pg_schema checks were missed in the earlier
+          consolidation and failed against a real database (karr #30)
+        - Expand t/35-async-mode.t: assert the 'ev' registration does not
+          shadow the base 'immediate' mode, unknown modes resolve to undef,
+          and an absent dbio-postgresql-ev croaks with the install hint
+        - Add t/36-future-io-async.t (offline): the core resolver resolves
+          future_io to DBIO::PostgreSQL::Storage::Async by convention, the
+          adapter isa DBIO::Async::Storage, every transport seam is overridden
+          (none left croaking), and the ?->$N / RETURNING * shaping is correct
+        - Add t/37-future-io-live.t (gated on DBIO_TEST_PG_*): a live
+          non-blocking future_io roundtrip — select_async / insert_async /
+          txn_do_async (commit + rollback), insert_async yielding the
+          returned-columns hashref with the autoinc PK via RETURNING, a raw
+          ->then Future chain, and the high-level create_async / all_async API
+        - Add t/38-storage-layer-composition.t (offline structural, 19
+          assertions) and t/39-storage-layer-composition-live.t (live-gated,
+          skips cleanly): a storage LAYER composes over DBIO::PostgreSQL::Storage
+          and its ::Async mirror over DBIO::PostgreSQL::Storage::Async under
+          { async => 'future_io' } — the walk resolves the driver transport off
+          the composition base, not the layer mixin (karr #28)
+        - xbin/dbio-pg-k8s: use the official postgres:18 image (src.ci retired)
+        - Add t/40-diff-drop-table-index-cascade.t and extend t/05-diff-index.t:
+          full-diff regression for the DROP INDEX / DROP TABLE CASCADE collision
+          (karr #32) plus Diff::Index unit cases for the new tables-aware drop
+          suppression, including an over-suppression guard (a surviving table's
+          index is still dropped standalone)
+
 0.900000  2026-06-23
     First release. The PostgreSQL driver for DBIO: PostgreSQL-native
     storage, SQL generation, schema introspection, diff, DDL and

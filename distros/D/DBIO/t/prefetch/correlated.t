@@ -23,19 +23,19 @@ my $c_rs = $cdrs->search ({}, {
 is_same_sql_bind(
   $c_rs->as_query,
   '(
-    SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+    SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
            (SELECT COUNT( * )
-              FROM cd siblings
-            WHERE me.artist != ?
-              AND siblings.artist = me.artist
-              AND siblings.cdid != me.cdid
-              AND siblings.cdid != ?
+              FROM cd "siblings"
+            WHERE "me"."artist" != ?
+              AND "siblings"."artist" = "me"."artist"
+              AND "siblings"."cdid" != "me"."cdid"
+              AND "siblings"."cdid" != ?
            ),
-           tracks.trackid, tracks.cd, tracks.position, tracks.title, tracks.last_updated_on, tracks.last_updated_at
-      FROM cd me
-      LEFT JOIN track tracks
-        ON tracks.cd = me.cdid
-    WHERE me.artist != ?
+           "tracks"."trackid", "tracks"."cd", "tracks"."position", "tracks"."title", "tracks"."last_updated_on", "tracks"."last_updated_at"
+      FROM cd "me"
+      LEFT JOIN "track" "tracks"
+        ON "tracks"."cd" = "me"."cdid"
+    WHERE "me"."artist" != ?
   )',
   [
 
@@ -68,24 +68,24 @@ $c_rs = $c_rs->search ({}, {
 is_same_sql_bind(
   $c_rs->as_query,
   '(
-    SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+    SELECT "me"."cdid", "me"."artist", "me"."title", "me"."year", "me"."genreid", "me"."single_track",
            (SELECT COUNT( * )
-              FROM cd siblings
-            WHERE me.artist != ?
-              AND siblings.artist = me.artist
-              AND siblings.cdid != me.cdid
-              AND siblings.cdid != ?
+              FROM cd "siblings"
+            WHERE "me"."artist" != ?
+              AND "siblings"."artist" = "me"."artist"
+              AND "siblings"."cdid" != "me"."cdid"
+              AND "siblings"."cdid" != ?
            ),
-           (SELECT MIN( year ), MAX( year )
-              FROM cd siblings
-            WHERE me.artist != ?
-              AND siblings.artist = me.artist
+           (SELECT MIN( "year" ), MAX( "year" )
+              FROM cd "siblings"
+            WHERE "me"."artist" != ?
+              AND "siblings"."artist" = "me"."artist"
            ),
-           tracks.trackid, tracks.cd, tracks.position, tracks.title, tracks.last_updated_on, tracks.last_updated_at
-      FROM cd me
-      LEFT JOIN track tracks
-        ON tracks.cd = me.cdid
-    WHERE me.artist != ?
+           "tracks"."trackid", "tracks"."cd", "tracks"."position", "tracks"."title", "tracks"."last_updated_on", "tracks"."last_updated_at"
+      FROM cd "me"
+      LEFT JOIN "track" "tracks"
+        ON "tracks"."cd" = "me"."cdid"
+    WHERE "me"."artist" != ?
   )',
   [
 

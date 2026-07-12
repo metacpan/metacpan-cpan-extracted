@@ -15,7 +15,16 @@ __PACKAGE__->mk_diff_accessors(qw/table_name index_name index_info/);
 
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
+
+  # Tables present in the source model but absent from the target are being
+  # dropped in this same pass. DuckDB's DROP TABLE removes the table's own
+  # indexes, so a later standalone DROP INDEX for one of them must be
+  # suppressed (karr #8).
+  $source_tables //= {};
+  $target_tables //= {};
+  my %dropped_table = map { $_ => 1 }
+    grep { !exists $target_tables->{$_} } keys %$source_tables;
 
   return $class->diff_nested($source, $target,
     scope        => 'all',
@@ -47,6 +56,9 @@ sub diff {
     },
     on_gone => sub {
       my ($table_name, $name, $old) = @_;
+      # Skip when the owning table is itself being dropped this pass; DuckDB's
+      # DROP TABLE already removes this index (karr #8).
+      return () if $dropped_table{$table_name};
       $class->new(
         action     => 'drop',
         table_name => $table_name,
@@ -97,7 +109,7 @@ DBIO::DuckDB::Diff::Index - Diff operations for DuckDB indexes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -110,6 +122,22 @@ INDEX.
 =head1 METHODS
 
 =head2 diff
+
+    my @ops = DBIO::DuckDB::Diff::Index->diff(
+      $source, $target, $source_tables, $target_tables);
+
+Compares index sets across all tables. Index identity is by name; changed
+definitions become a drop-then-create pair.
+
+The optional C<$source_tables> / C<$target_tables> hashrefs are the C<tables>
+sections of the two models (threaded in by L<DBIO::DuckDB::Diff>). They detect
+tables being dropped in this same pass: DuckDB's C<DROP TABLE> already removes
+that table's own indexes, so emitting a later standalone C<DROP INDEX> for one
+of them would fail once the table is gone (the diff order is
+tables-then-columns-then-indexes). Such drops are suppressed. When these
+arguments are absent (e.g. direct unit-test calls) the dropped-table set is
+empty and no drops are suppressed, preserving the original two-argument
+behaviour.
 
 =head2 as_sql
 

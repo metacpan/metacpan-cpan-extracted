@@ -21,7 +21,7 @@ DBIO::Test::Taint::Namespaces::Result::Test - Test result class for taint mode n
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

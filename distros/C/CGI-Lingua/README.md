@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.80
+Version 0.82
 
 # SYNOPSIS
 
@@ -225,15 +225,83 @@ CGI::Lingua will make use of that, otherwise it will use [ip-api.com](https://me
     "LWP::Simple::WithCache and LWP::Simple are both absent; cannot contact ip-api.com"
       Returns undef rather than croaking; install either LWP variant to enable ip-api lookups.
 
+## is\_rtl
+
+Returns true (1) if the negotiated language is written right-to-left, false (0)
+otherwise.  Covers Arabic, Hebrew, Persian, Urdu, Yiddish, Dhivehi, Pashto,
+Sindhi, Uyghur, and Kurdish.
+
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: 1 | 0
+
+## text\_direction
+
+Returns `'rtl'` or `'ltr'` for the negotiated language, suitable for direct
+use as an HTML `dir` attribute value.
+
+### API SPECIFICATION
+
+    Input:  none beyond $self
+    Returns: 'rtl' | 'ltr'
+
+## plural\_category
+
+Returns the CLDR plural category for the integer `$n` in the negotiated
+language.  The returned string is one of `'zero'`, `'one'`, `'two'`,
+`'few'`, `'many'`, or `'other'`.
+
+Rules are embedded for ~70 languages including Arabic (6 forms), Slavic
+languages (3-4 forms), Celtic languages (up to 6 forms), and Hebrew, Maltese,
+Romanian, Latvian, Lithuanian, and Slovenian.  Languages not in the table fall
+back to the English rule (n == 1 => `'one'`, else `'other'`).
+
+For fractional numbers or full CLDR v42+ accuracy, use `Locale::CLDR`.
+
+### API SPECIFICATION
+
+    Input:  $n - non-negative integer (fractional values are truncated)
+    Returns: Str - one of zero/one/two/few/many/other
+
+## translation\_file
+
+Returns the filesystem path to the best matching translation file for the
+negotiated language in the given directory.
+
+The lookup tries (in order):
+
+- 1. `$dir/$lang-$sublang.$ext`  (e.g. `en-gb.json`)
+- 2. `$dir/$lang.$ext`           (e.g. `en.json`)
+
+Returns `undef` if no matching file exists.
+
+### API SPECIFICATION
+
+    Input:
+      $dir - Str   path to the directory containing translation files
+      $ext - Str   file extension without leading dot (default: 'json')
+    Returns: Str (absolute or relative path) | undef
+
+### MESSAGES
+
+    (none - returns undef silently when no file is found)
+
 # LIMITATIONS
 
-- **Accept-Language left-to-right scan ignores q-values**
+- **is\_rtl() covers primary-script RTL languages only**
 
-    The second and third pass in `_accept_language_match()` scan the header
-    left-to-right and ignore quality (`q=0.x`) values.  A header such as
-    `de;q=0.9,en;q=0.1` on a site that only supports `en` would currently
-    fail to fall back to English.  Use `I18N::AcceptLanguage` passes only when
-    possible.
+    `is_rtl()` returns true for the 10 ISO 639-1 codes whose overwhelmingly
+    dominant script is right-to-left.  Languages with script variants (e.g.
+    Azerbaijani `az`, which uses Latin in modern Azerbaijan but Arabic in Iran)
+    are treated as LTR.  If you serve content in multiple scripts of the same
+    language, inspect the sublanguage or Accept-Language header directly.
+
+- **plural\_category() uses embedded CLDR rules, not Locale::CLDR**
+
+    The embedded rules cover ~70 languages and truncate fractional `$n` to an
+    integer.  For full CLDR v42 accuracy (including fractional forms and
+    languages not in the table) install and use `Locale::CLDR` directly.
 
 - **Logger must be a blessed object**
 
@@ -297,6 +365,7 @@ This means that if you support languages at a lower priority, it may be missed.
 
 # SEE ALSO
 
+- [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/CGI-Lingua/coverage/)
 - VWF - Versatile Web Framework [https://github.com/nigelhorne/vwf](https://github.com/nigelhorne/vwf)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
@@ -344,6 +413,28 @@ You can also look for information at:
 
     language : CGI::Lingua → Str
     result ∈ {name(l) | l ∈ supported} ∪ {'Unknown'}
+
+## is\_rtl
+
+    is_rtl : CGI::Lingua → Bool
+    is_rtl(s) ≙ language_code_alpha2(s) ∈ RTL_LANGS
+
+## text\_direction
+
+    text_direction : CGI::Lingua → {'rtl', 'ltr'}
+    text_direction(s) ≙ is_rtl(s) ? 'rtl' : 'ltr'
+
+## plural\_category
+
+    plural_category : CGI::Lingua × ℕ → PluralCategory
+    plural_category(s, n) ≙ PLURAL_RULES[language_code_alpha2(s)](n)
+
+## translation\_file
+
+    translation_file : CGI::Lingua × Path × Ext → Path | undef
+    translation_file(s, d, e) ≙
+      first p ∈ candidates(s) • ∃ file d/p.e
+      where candidates(s) = [lang(s)-sublang(s), lang(s)] \ {undef}
 
 # ACKNOWLEDGEMENTS
 

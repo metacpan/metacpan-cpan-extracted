@@ -15,11 +15,11 @@ Readonly my $WEIGHT_RETURNS_PROPERTY => 20;
 Readonly my $WEIGHT_RETURNS_SELF     => 15;
 Readonly my $WEIGHT_RETURNS_CONSTANT => 10;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =head1 DESCRIPTION
 

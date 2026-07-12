@@ -36,7 +36,7 @@ use Data::SpatialHash::Shared;
     my $h = $s->insert(5.1, 5.1, 1);
     $s->move($h, 5.9, 5.9);                              # still cell (5,5)
     is_deeply [$s->query_cell(5, 5)], [1], 'same-cell move keeps entry in cell';
-    is_deeply [$s->position($h)], [5.9, 5.9, 0], 'same-cell move updates position';
+    { my @p = $s->position($h); ok abs($p[0]-5.9)<1e-9 && abs($p[1]-5.9)<1e-9 && $p[2]==0, 'same-cell move updates position'; }
     $s->move($h, 8.1, 8.1);                              # cell (8,8)
     is_deeply [$s->query_cell(5, 5)], [], 'cross-cell move leaves old cell';
     is_deeply [$s->query_cell(8, 8)], [1], 'cross-cell move enters new cell';

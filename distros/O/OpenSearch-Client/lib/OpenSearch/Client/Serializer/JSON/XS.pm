@@ -21,7 +21,7 @@
 # limitations under the License
 
 package OpenSearch::Client::Serializer::JSON::XS;
-$OpenSearch::Client::Serializer::JSON::XS::VERSION = '3.007006';
+$OpenSearch::Client::Serializer::JSON::XS::VERSION = '3.007007';
 use Moo;
 use JSON::XS 2.26;
 
@@ -43,7 +43,7 @@ OpenSearch::Client::Serializer::JSON::XS - A JSON Serializer using JSON::XS
 
 =head1 VERSION
 
-version 3.007006
+version 3.007007
 
 =head1 SYNOPSIS
 

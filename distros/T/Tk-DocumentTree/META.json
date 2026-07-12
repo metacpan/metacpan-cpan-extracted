@@ -35,7 +35,7 @@
             "File::Spec" : "0",
             "Test::Tk" : "3.04",
             "Tk" : "800.024",
-            "Tk::ListBrowser" : "0.12"
+            "Tk::ListBrowser" : "0.14"
          }
       }
    },
@@ -47,6 +47,6 @@
          "web" : "https://github.com/haje61/Tk-DocumentTree"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

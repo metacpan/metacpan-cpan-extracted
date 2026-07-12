@@ -197,7 +197,7 @@ DBIO::Storage::Statistics - SQL Statistics
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,8 @@ version 0.900000
     # Output:
     #   SELECT me.id, me.name FROM artist me: '1', '2'
     #     Elapsed: 0.003421s
+
+See F<t/storage_statistics.t> for a runnable example.
 
 =head1 DESCRIPTION
 

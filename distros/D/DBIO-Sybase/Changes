@@ -1,5 +1,26 @@
 Revision history for DBIO-Sybase
 
+0.900001  2026-07-12
+    * Storage
+        - DBIO::Sybase::Storage::_rebless now reblesses Microsoft SQL Server
+          connections (sp_server_info dbtype "Microsoft SQL Server") into
+          DBIO::MSSQL::Storage::Sybase, loaded on demand via
+          load_optional_class (no hard dependency on DBIO::MSSQL). Previously
+          the cross-namespace subclass was never resolved and the connection
+          stayed on the bare base, crashing in _init.
+        - DBIO::Sybase::Storage::_init no longer attempts to synthesize a
+          "<ref>::FreeTDS" trait while still on the bare DBIO::Sybase::Storage
+          base; doing so collided with the real
+          DBIO::Sybase::Storage::FreeTDS module and triggered recursive
+          inheritance. The trait is only mixed in after rebless into a
+          concrete server subclass.
+
+    * Dependencies
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
 0.900000  2026-06-23
     First release. Sybase/ASE database driver for DBIO, extracted from
     DBIO core as a separate distribution.

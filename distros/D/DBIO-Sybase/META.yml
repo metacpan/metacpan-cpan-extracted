@@ -18,115 +18,115 @@ name: DBIO-Sybase
 provides:
   DBIO::Shortcut::syb:
     file: lib/DBIO/Shortcut/syb.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase:
     file: lib/DBIO/Sybase.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::DDL:
     file: lib/DBIO/Sybase/DDL.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Deploy:
     file: lib/DBIO/Sybase/Deploy.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff:
     file: lib/DBIO/Sybase/Diff.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Column:
     file: lib/DBIO/Sybase/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Column::Add:
     file: lib/DBIO/Sybase/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Column::Alter:
     file: lib/DBIO/Sybase/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Column::Drop:
     file: lib/DBIO/Sybase/Diff/Column.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::ForeignKey:
     file: lib/DBIO/Sybase/Diff/ForeignKey.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::ForeignKey::Create:
     file: lib/DBIO/Sybase/Diff/ForeignKey.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::ForeignKey::Drop:
     file: lib/DBIO/Sybase/Diff/ForeignKey.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Index:
     file: lib/DBIO/Sybase/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Index::Alter:
     file: lib/DBIO/Sybase/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Index::Create:
     file: lib/DBIO/Sybase/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Index::Drop:
     file: lib/DBIO/Sybase/Diff/Index.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Table:
     file: lib/DBIO/Sybase/Diff/Table.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Table::Create:
     file: lib/DBIO/Sybase/Diff/Table.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Diff::Table::Drop:
     file: lib/DBIO/Sybase/Diff/Table.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Introspect:
     file: lib/DBIO/Sybase/Introspect.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Introspect::Columns:
     file: lib/DBIO/Sybase/Introspect/Columns.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Introspect::ForeignKeys:
     file: lib/DBIO/Sybase/Introspect/ForeignKeys.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Introspect::Indexes:
     file: lib/DBIO/Sybase/Introspect/Indexes.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Introspect::Tables:
     file: lib/DBIO/Sybase/Introspect/Tables.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::SQLMaker:
     file: lib/DBIO/Sybase/SQLMaker.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage:
     file: lib/DBIO/Sybase/Storage.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE:
     file: lib/DBIO/Sybase/Storage/ASE.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE::BulkInsert:
     file: lib/DBIO/Sybase/Storage/ASE/BulkInsert.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE::DateTime::Format:
     file: lib/DBIO/Sybase/Storage/ASE.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE::IdentityRetrieval:
     file: lib/DBIO/Sybase/Storage/ASE/IdentityRetrieval.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE::LOBWriter:
     file: lib/DBIO/Sybase/Storage/ASE/LOBWriter.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE::NoBindVars:
     file: lib/DBIO/Sybase/Storage/ASE/NoBindVars.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::ASE::TxnManager:
     file: lib/DBIO/Sybase/Storage/ASE/TxnManager.pm
-    version: '0.900000'
+    version: '0.900001'
   DBIO::Sybase::Storage::FreeTDS:
     file: lib/DBIO/Sybase/Storage/FreeTDS.pm
-    version: '0.900000'
+    version: '0.900001'
 requires:
   DBD::Sybase: '1.26'
-  DBIO: '0.900000'
+  DBIO: '0.900001'
   perl: '5.020'
 resources:
   bugtracker: https://codeberg.org/dbio/dbio-sybase/issues
   homepage: https://codeberg.org/dbio/dbio-sybase
   repository: https://codeberg.org/dbio/dbio-sybase.git
-version: '0.900000'
+version: '0.900001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -262,7 +262,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900000
+          tag: v0.900001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -385,6 +385,10 @@ x_Dist_Zilla:
               version: '4.020'
       name: '@DBIO/PodWeaver'
       version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CoverageTest
+      name: '@DBIO/DBIO::CoverageTest'
+      version: ~
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'

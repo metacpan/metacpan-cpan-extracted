@@ -1,9 +1,27 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900000';
-requires 'DBIO::PostgreSQL', '0.900000';
+# Composition-carrying core + PostgreSQL driver (storage-layer composition,
+# the '?' seam and the async mirror -- core karr #70). These are the installed
+# 0.900001 dev builds; CPAN still shows 0.900000, which predates composition, so
+# per the family bootstrap convention we pin to the dev version reached via
+# `dzil install`, not to a stale released number.
+requires 'DBIO', '0.900001';
+requires 'DBIO::PostgreSQL', '0.900001';
 
 on test => sub {
   requires 'Test::More', '0.98';
   requires 'Test::Exception', '0.43';
+};
+
+on develop => sub {
+  # Optional async transports / sibling extension AGE composes with. NEVER hard
+  # requires: the offline suite gates on them and skips cleanly when absent.
+  #   * DBIO::PostgreSQL::EV     -- the native 'ev' transport + its reusable
+  #     DBIO::PostgreSQL::EV::TestHarness (t/43 live ev integration, t/41 dual-mode).
+  #   * DBIO::PostgreSQL::PostGIS -- the stacking / dual-mode regression
+  #     (t/40, t/41): two storage-layer extensions on one schema.
+  # Pinned to the installed 0.900001 dev builds (composition), same bootstrap
+  # reasoning as the core requires above.
+  recommends 'DBIO::PostgreSQL::EV', '0.900001';
+  recommends 'DBIO::PostgreSQL::PostGIS', '0.900001';
 };

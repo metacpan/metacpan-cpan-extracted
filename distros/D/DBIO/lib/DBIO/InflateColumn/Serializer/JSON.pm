@@ -55,7 +55,7 @@ DBIO::InflateColumn::Serializer::JSON - JSON Inflator
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -87,6 +87,8 @@ The data structures you assign to "data_column" will be saved in the database in
 
 Any arguments included in C<serializer_options> are passed to the
 L<JSON::MaybeXS> constructor used for serialization and deserialization.
+
+See F<t/serialize/01-inflatecolumn.t> for a runnable example.
 
 =head1 DESCRIPTION
 

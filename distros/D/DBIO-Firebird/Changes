@@ -1,5 +1,45 @@
 Revision history for DBIO-Firebird
 
+0.900001  2026-07-12
+    * Diff
+        - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr #14,
+          from dbio core #77 / dbio-postgresql #32). When diff reconciled a
+          live schema containing a table absent from the target (removed from
+          the app's DBIO classes, or an unmanaged leftover), it emitted both
+          DROP TABLE <t> and a later standalone DROP INDEX for one of that
+          table's indexes; since Firebird's DROP TABLE already removes the
+          table's own indexes, the standalone DROP INDEX failed once the table
+          was gone and aborted apply()/upgrade(). DBIO::Firebird::Diff::Index
+          now receives the tables sections (via the aux-section wiring in
+          DBIO::Firebird::Diff) and suppresses a standalone DROP INDEX for any
+          index whose owning table is itself being dropped in the same pass.
+          Indexes of surviving tables are still dropped as before. The diff
+          signature stays backward compatible: absent table sections yield an
+          empty dropped set (old two-argument behaviour).
+
+    * Dependencies
+        - DBD::Firebird is now a hard "requires" instead of "recommends":
+          the driver is useless without it, and t/00-load.t failed (rather
+          than skipping) when it was absent
+          (codeberg #1, reported by Slaven Rezić / eserte)
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
+    * Tests
+        - Add t/45-diff-drop-table-index-cascade.t and extend t/40-diff.t:
+          full-diff regression for the DROP INDEX / DROP TABLE collision
+          (karr #14) plus Diff::Index unit cases for the new tables-aware drop
+          suppression, including an over-suppression guard (a surviving table's
+          index is still dropped standalone)
+        - t/50-introspect-contract.t: make the generated-code table()
+          assertions quote-agnostic (['"]). DBIO::Generate renders all
+          literals through DBIO::Generate::Util::pl_str -> B::perlstring,
+          which always emits double quotes, so the old single-quoted
+          regexes failed 2/40 offline; matches Core's quote-agnostic
+          precedent in ../dbio/t/generate/*
+
 0.900000  2026-06-23
     First release. Firebird and InterBase database driver for DBIO.
 

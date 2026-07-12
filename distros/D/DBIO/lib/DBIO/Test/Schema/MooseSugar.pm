@@ -27,7 +27,7 @@ DBIO::Test::Schema::MooseSugar - Test schema with Moose + DBIO::Cake result clas
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

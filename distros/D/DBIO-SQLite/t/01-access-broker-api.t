@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use DBIO::AccessBroker::Credentials;
+use DBIO::AccessBroker::Static;
 
 {
   package TestSchema;
@@ -11,9 +11,9 @@ use DBIO::AccessBroker::Credentials;
   __PACKAGE__->load_components('SQLite');
 }
 
-my $broker = DBIO::AccessBroker::Credentials->new(
+my $broker = DBIO::AccessBroker::Static->new(
   dbname   => ':memory:',
-  user     => '',
+  username => '',
   password => '',
 );
 

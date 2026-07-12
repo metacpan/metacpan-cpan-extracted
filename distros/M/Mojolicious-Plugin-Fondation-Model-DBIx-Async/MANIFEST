@@ -11,10 +11,15 @@ cpanfile
 dist.ini
 lib/Mojolicious/Plugin/Fondation/Model/DBIx/Async.pm
 lib/Mojolicious/Plugin/Fondation/Model/DBIx/Async/Action/DBIx.pm
+lib/Mojolicious/Plugin/Fondation/Model/DBIx/Async/ResultSet.pm
+share/translations/en.json
+share/translations/fr.json
 t/01-model-helper.t
 t/02-action-dbix.t
 t/03-relations.t
 t/03-shutdown.t
+t/04-source-name.t
+t/05-with.t
 t/lib/DBIxTestHelper.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync.pm
 t/lib/Mojolicious/Plugin/Fondation/TestDBIxAsync/Schema/Result/Article.pm

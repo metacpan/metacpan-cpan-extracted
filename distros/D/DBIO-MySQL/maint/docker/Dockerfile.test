@@ -1,0 +1,87 @@
+# syntax=docker/dockerfile:1.7
+#
+# Test image for dbio-mysql — the GENUINE DBD::mysql (mysql_*) async path.
+#
+# Why this exists: DBD::mysql (5.013+) needs the *genuine Oracle*
+# libmysqlclient development headers — the MYSQL_OPT_* / SSL_MODE_* constants.
+# Debian 12/13 (this host, and the perl:5.40 base image) ship the
+# MariaDB-flavoured default-libmysqlclient-dev / libmariadb-dev, which lack
+# those constants, so DBD::mysql fails to compile on the host. Same class of
+# problem as dbio-postgresql-ev/maint/docker/Dockerfile.test (Debian's libpq was
+# the wrong version for the XS module), fixed the simpler way here:
+#
+#   Ubuntu still packages the genuine Oracle MySQL 8 client. Ubuntu maintains
+#   the mysql-8.0 source package from Oracle, so its libmysqlclient-dev is the
+#   real thing. Debian switched its provider to MariaDB; Ubuntu did not. So a
+#   plain ubuntu:24.04 base gets us buildable DBD::mysql with no MySQL APT repo
+#   and no GPG dance — the MySQL APT route is dead anyway: Oracle's mysql-2023
+#   signing key expired 2025-10-22 and Debian trixie's strict sqv verifier
+#   refuses the unsigned InRelease outright.
+#
+# Build (from the repo root, dbio-mysql/):
+#   docker build -f maint/docker/Dockerfile.test -t dbio-mysql-genuine .
+#
+# Normally driven by maint/docker/docker-compose.yml, which pairs this client
+# with ONE resource-capped mysql:8.0 server. Source (dbio core, DBIO::Async,
+# this dist) is MOUNTED at run time, not baked, so editing tests never rebuilds.
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# perl + cpanminus + the XS build chain, and the GENUINE Oracle MySQL client
+# dev package. build-essential + libperl provide the XS toolchain DBD::mysql and
+# the DBIO dep tree (Class::Load::XS, namespace::clean, ...) compile against.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      perl \
+      cpanminus \
+      build-essential \
+      libmysqlclient-dev \
+      pkg-config \
+      ca-certificates \
+      util-linux \
+    && rm -rf /var/lib/apt/lists/*
+
+# Sanity gate #1 — prove these are the genuine Oracle headers, not MariaDB's.
+# libmariadb-dev has no MYSQL_OPT_SSL_MODE / SSL_MODE_* : if this ever fails the
+# base image regressed to a MariaDB provider and every DBD::mysql test below
+# would look like a driver bug, so fail the build loudly right here.
+RUN test -f /usr/include/mysql/mysql.h \
+    && grep -rq 'MYSQL_OPT_SSL_MODE' /usr/include/mysql/ \
+    && grep -rq 'SSL_MODE_REQUIRED'  /usr/include/mysql/ \
+    && echo "OK: genuine Oracle MySQL client dev headers present"
+
+# DBD::mysql: DBI must be present first (its Makefile.PL uses DBI/DBD.pm at
+# configure time). Sanity gate #2 — DBD::mysql must load AND link the genuine
+# libmysqlclient (never libmariadb). This is the whole reason the image exists.
+RUN cpanm --notest DBI \
+    && cpanm --notest DBD::mysql \
+    && perl -MDBD::mysql -e 'print "DBD::mysql $DBD::mysql::VERSION built OK\n"' \
+    && MYSO="$(perl -MDBD::mysql -e 'my $p=$INC{"DBD/mysql.pm"}; $p=~s{/mysql\.pm$}{/../auto/DBD/mysql/mysql.so}; print $p')" \
+    && ldd "$MYSO" | grep -q 'libmysqlclient' \
+    && ! ldd "$MYSO" | grep -q 'libmariadb' \
+    && echo "OK: DBD::mysql links genuine libmysqlclient (not libmariadb)"
+
+# Warm the heavy, stable dependency tree into the image so the first container
+# start is fast. DBIO on CPAN (0.900000) lags the dev tree, but its DEPENDENCY
+# tree (Moo, SQL::Abstract, Class::Accessor::Grouped, ...) is exactly what we
+# want cached; the dev core/async/driver code is MOUNTED and prepended to @INC
+# at run time (entrypoint.sh), so the mounted copy always wins. Best-effort
+# (|| true): the authoritative dep install is the entrypoint's per-dist
+# `cpanm --installdeps` against the mounted source, and a genuinely missing
+# module surfaces loudly in the test run itself.
+RUN cpanm --notest DBIO || true
+
+# DBIO::Async is NOT on CPAN, so `cpanm DBIO` above cannot pull its deps: install
+# the future_io transport + event-loop stack, DateTime::Format::MySQL (this
+# dist's runtime dep), and the test deps explicitly. Fatal — the live roundtrip
+# cannot run without an IO::Async loop under Future::IO.
+RUN cpanm --notest \
+      Future Future::IO Future::IO::Impl::IOAsync IO::Async \
+      DateTime::Format::MySQL \
+      Test::More Test::Exception Test::Warn \
+      DBI::Const::GetInfoType Try::Tiny Scalar::Util namespace::clean
+
+WORKDIR /src/dbio-mysql
+COPY maint/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

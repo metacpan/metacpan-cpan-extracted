@@ -1,5 +1,65 @@
 Revision history for CGI-Lingua
 
+0.82	Sat Jul 11 20:41:15 UTC 2026
+	[ Distribution ]
+	- Move autodie from TEST_REQUIRES to PREREQ_PM — it is now a compile-time
+	  runtime dependency (use autodie qw(:all) in the module itself)
+	- Add Log::Abstraction to PREREQ_PM explicitly (runtime dep via Object::Configure)
+	- Remove ExtUtils::MakeMaker from PREREQ_PM (build tool, already in CONFIGURE_REQUIRES)
+	- Remove Test::Carp from TEST_REQUIRES (t/carp.t no longer uses it)
+	- Raise MIN_PERL_VERSION from 5.6.2 to 5.10.1 (autodie bundled into core from
+	  5.10.1; //= defined-or used throughout)
+
+	[ Bug Fixes ]
+	- Remove LWP::Simple::WithCache->import(), LWP::Simple->import(), and
+	  JSON::Parse->import() calls inside country() and time_zone(); these were
+	  unnecessary (fully-qualified function names are used throughout) and on some
+	  older versions of LWP::Simple::WithCache the import() reinstalls the real get
+	  in the symbol table, overwriting any mock/spy and causing real network calls
+	  during testing (fixes CPAN Testers failures for spy subtests in t/integration.t)
+
+	[ Enhancement ]
+	- Add explicit use Carp qw(croak carp); remove Carp from Class::Autouse so
+	  croak/carp are resolved at compile time rather than lazy-loaded at runtime
+	- Expand use autodie from qw(:file) to qw(:all) for fuller fatal-error coverage
+	- plural_category(): croak on undef $n rather than silently treating it as 0
+	- Change return undef to bare return in _scan_plain_tokens, locale(), and
+	  _code2countryname (perlcritic ProhibitExplicitReturnUndef)
+	- _what_language(): use defined() check for cached value to guard against a
+	  falsy language tag silently bypassing the cache
+	- Add is_rtl(): returns 1 when the negotiated language uses a right-to-left
+	  script (Arabic, Hebrew, Persian, Urdu, Yiddish, Dhivehi, Pashto, Sindhi,
+	  Uyghur, Kurdish)
+	- Add text_direction(): returns 'rtl' or 'ltr' for direct use as HTML dir attr
+	- Add plural_category($n): returns CLDR plural category (zero/one/two/few/many/other)
+	  for the negotiated language using embedded rules for ~70 languages
+	- Add translation_file($dir, $ext?): returns path to best matching translation
+	  file (e.g. en-gb.json) falling back to base language (en.json); default ext json
+	- Fix q-value priority in Accept-Language fallback passes: _scan_sublanguage_pairs
+	  and _scan_plain_tokens previously scanned left-to-right ignoring q= weights;
+	  new _sorted_tokens() helper pre-sorts tokens by q descending so both passes
+	  honour browser-declared priorities; removes the documented LIMITATION
+
+	[ Tests ]
+	- Fix t/rt131607.t: time_zone() degrades gracefully (warns + returns undef)
+	  when both LWP variants are absent; replace eval+die+like(croak pattern)
+	  with is($t, undef, ...) to match the actual contract, see
+	  https://www.cpantesters.org/cpan/report/9d32fb26-7d57-11f1-afd9-04246e8775ea
+	- Fix t/carp.t: replace Test::Carp does_croak_that_matches with throws_ok —
+	  Test::Carp intercepts Carp::croak at runtime but use Carp qw(croak) imports
+	  the symbol into CGI::Lingua at compile time, making the interception miss;
+	  throws_ok catches any exception via eval regardless of owning package
+	- Fix t/function.t and t/extended_tests.t: mock CGI::Lingua::carp instead of
+	  Carp::carp in _warn subtests — importing carp at compile time makes the
+	  Carp:: namespace mock ineffective post-import
+	- Update t/function.t: adapt _scan_sublanguage_pairs and _scan_plain_tokens subtests to
+	  pass _sorted_tokens() arrayref instead of raw header string; add _sorted_tokens subtests
+	  (sorted order, q-value stripping, empty header); add subtests for is_rtl(),
+	  text_direction(), plural_category() (English/Arabic/Russian/unknown fallback), and
+	  translation_file() (undef dir, missing file, json default, explicit ext, leading dot);
+	  extended from 92 to 110 subtests; fix grep-list-context operator precedence bug in
+	  'no q= suffix' assertion (message string was being included in grep's LIST argument)
+
 0.81	Sun Jul  5 09:04:51 EDT 2026
 	[ Bug Fixes ]
 	- Fix ref() parenthesisation bug in new() that broke cache lookups for arrayref-supported

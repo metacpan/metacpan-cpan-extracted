@@ -1,5 +1,6 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900000';
+requires 'DBIO', '0.900001';
+requires 'DBD::Oracle';
 requires 'Math::Base36', '0.07';
 requires 'DateTime::Format::Oracle';
 

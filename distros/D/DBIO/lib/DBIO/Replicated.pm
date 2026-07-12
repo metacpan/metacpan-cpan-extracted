@@ -27,7 +27,7 @@ DBIO::Replicated - Replicated storage support for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -43,6 +43,8 @@ version 0.900000
     [ $replica_dsn_1, $user, $pass ],
     [ $replica_dsn_2, $user, $pass ],
   );
+
+See F<t/test/08_replicated.t> for a runnable example.
 
 =head1 DESCRIPTION
 

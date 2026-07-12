@@ -73,8 +73,8 @@ sub _driver_deploy {
 
   DBIO::Exception->throw(
     "Cannot find native deploy class for storage $driver_class "
-    . "(tried $deploy_class). Either set dbio_deploy_class on the storage "
-    . "or use the SQL::Translator-based DeployMethod."
+    . "(tried $deploy_class). Set dbio_deploy_class on the storage, or "
+    . "provide a native Deploy class at $deploy_class."
   ) unless eval "require $deploy_class; 1";
 
   return $deploy_class->new(schema => $self->schema);
@@ -96,7 +96,7 @@ DBIO::DeploymentHandler::DeployMethod::Native - Native DBIO driver deploy (no SQ
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

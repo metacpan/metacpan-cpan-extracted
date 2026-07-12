@@ -1,6 +1,8 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900000';
+requires 'DBIO', '0.900001';
 requires 'DateTime::Format::DB2';
+
+requires 'DBD::DB2';
 
 on test => sub {
   requires 'Test::More', '0.98';

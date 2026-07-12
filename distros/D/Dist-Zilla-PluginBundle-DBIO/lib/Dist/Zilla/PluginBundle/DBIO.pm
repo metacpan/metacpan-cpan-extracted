@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::DBIO;
 # ABSTRACT: Dist::Zilla plugin bundle for DBIO distributions
-our $VERSION = '0.900002';
+our $VERSION = '0.900003';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -50,6 +50,14 @@ has share_skill => (
 );
 
 sub mvp_multivalue_args { qw(share_skill) }
+
+
+has coverage_threshold => (
+  is      => 'ro',
+  isa     => 'Int',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{coverage_threshold} // 80 },
+);
 
 sub configure {
   my ($self) = @_;
@@ -121,6 +129,11 @@ sub configure {
   ]);
 
   # Tests
+  # CoverageTest must run before ExtraTests: it gathers xt/release/coverage.t
+  # which ExtraTests then promotes into t/ for the release test suite.
+  $self->add_plugins([ 'DBIO::CoverageTest' => {
+    coverage_threshold => $self->coverage_threshold,
+  }]);
   $self->add_plugins('ExtraTests');
 
   # Build — core uses MakeMaker::Awesome
@@ -141,6 +154,10 @@ sub configure {
   # (Codeberg/Forgejo or GitHub), no API token. Replaces [GithubMeta] and the
   # external Dist::Zilla::Plugin::Codeberg::Meta.
   $self->add_plugins([ 'DBIO::CodebergMeta' => { issues => 1 } ]);
+
+  # IRC channel — fixed for the whole DBIO family (one source of truth), set
+  # for every distribution rather than per-dist. No x_IRC_user.
+  $self->add_plugins([ 'MetaResources' => { 'x_IRC' => 'irc://irc.perl.org/#dbio' } ]);
 
   # Git checks
   $self->add_plugins([ 'Git::Check' => {
@@ -188,7 +205,7 @@ Dist::Zilla::PluginBundle::DBIO - Dist::Zilla plugin bundle for DBIO distributio
 
 =head1 VERSION
 
-version 0.900002
+version 0.900003
 
 =head1 SYNOPSIS
 
@@ -217,7 +234,8 @@ Standard L<Dist::Zilla> plugin bundle for all DBIO distributions.
 
 =head2 All distributions
 
-Every distribution using C<[@DBIO]> gets:
+Every distribution using C<[@DBIO]> gets an automatic code-coverage test
+(F<xt/release/coverage.t>) that scores F<lib/> after a Devel::Cover run, plus:
 
 =over 4
 
@@ -229,7 +247,11 @@ Every distribution using C<[@DBIO]> gets:
 
 =item * L<Dist::Zilla::Plugin::ExtraTests> — moves F<xt/> tests into F<t/> for release
 
+=item * L<Dist::Zilla::Plugin::DBIO::CoverageTest> — generates F<xt/release/coverage.t>, a coverage gate that reads F<cover_db/> after C<HARNESS_PERL_SWITCHES=-MDevel::Cover>. Default skip-with-diagnose on a missing run; C<COVERAGE_STRICT=1> or C<RELEASE=1> turns the same gap into a failure.
+
 =item * L<Dist::Zilla::Plugin::DBIO::CodebergMeta> — repository, bugtracker and homepage META resources, derived offline from the git remote (Codeberg/Forgejo or GitHub)
+
+=item * L<Dist::Zilla::Plugin::MetaResources> — sets the family-wide IRC channel META resource (C<x_IRC = irc://irc.perl.org/#dbio>) for every distribution; fixed, not per-dist configurable
 
 =item * L<Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch> — enforces release from C<main>
 
@@ -288,6 +310,12 @@ Names of the agent skills this distribution owns (is the source of truth for).
 They are shipped as a sharedir (C<share/skills/>) and exposed at runtime via
 L<DBIO::Skills>. Repeatable; if omitted, the set is derived from the dist name.
 See L<Dist::Zilla::Plugin::DBIO::GatherSkills>.
+
+=head2 coverage_threshold
+
+Statement-coverage percentage required for F<xt/release/coverage.t> to pass.
+Default: 80. Set to C<0> to gather the file as a no-op skip (coverage
+enforcement disabled). See L<Dist::Zilla::Plugin::DBIO::CoverageTest>.
 
 =head1 AUTHOR
 

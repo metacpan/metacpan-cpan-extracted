@@ -21,12 +21,13 @@ $app->plugin('Fondation' => {
                     dsn          => "dbi:SQLite:dbname=$dbfile",
                     schema_class => 'TestDBIxAsyncSchema',
                     workers      => 1,
+                    quote_char   => '"',
                 },
             ],
             models => {
-                user       => { source => 'users',      backend => 'main' },
-                group      => { source => 'groups',     backend => 'main' },
-                user_group => { source => 'user_group', backend => 'main' },
+                user       => { source => 'User',      backend => 'main' },
+                group      => { source => 'Group',     backend => 'main' },
+                user_group => { source => 'UserGroup', backend => 'main' },
             },
         }},
         'Fondation::TestDBIxRelation',
@@ -45,8 +46,8 @@ subtest 'schema relationships registered' => sub {
 
     ok($user_class->has_relationship('user_group'),
         'user has_many user_group');
-    ok($ug_class->has_relationship('grp'),
-        'user_group belongs_to grp');
+    ok($ug_class->has_relationship('group'),
+        'user_group belongs_to group');
     ok($ug_class->has_relationship('user'),
         'user_group belongs_to user');
 };

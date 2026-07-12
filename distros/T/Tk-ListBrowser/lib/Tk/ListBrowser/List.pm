@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION = 0.12;
+$VERSION = 0.14;
 
 use base qw(Tk::ListBrowser::Row);
 
@@ -50,42 +50,6 @@ sub draw {
 		$i = $self->itemCreate($entry, $_) unless defined $i;
 		$i->draw($cx, $y, $column, $row, $col->cget('-itemtype'));
 	}
-	$self->maxXYCalculate($item);
-}
-
-sub initColumns {
-	my $self = shift;
-
-	if ($self->headerAvailable) {
-		$self->startXY($self->cget('-marginleft'), $self->cget('-margintop') + $self->cget('-headerheight'));
-	} else {
-		$self->startXY($self->SUPER::startXY);
-	}
-
-	my @pool = $self->listbrowser->getAll;
-	my ($x, $y) = $self->startXY;
-	my $rows = 0;
-	for (@pool) {
-		$rows ++ unless $_->noshow
-	}
-	my $maxy = $y + ($rows * ($self->cget('-cellheight') + 1));
-
-	my $ml = $self->cget('-marginleft');
-	my $mr = $self->cget('-marginright');
-
-	my $maxx = $self->listWidth + 1 + $ml;
-	my @columns = $self->columnList;
-	my $above;
-	my $canvas = $self->Subwidget('Canvas');
-	for (@columns) {
-		my $c = $self->columnGet($_);
-		my $dx = $maxx + $c->cget('-cellwidth');
-		$c->region($maxx, $y, $dx, $maxy);
-		$c->draw;
-		$canvas->raise($c->crect, $above->crect) if (defined $above) and (defined $c->crect);
-		$above = $c;
-		$maxx = $dx + 1;
-	}
 }
 
 sub listHeight {
@@ -96,21 +60,6 @@ sub listHeight {
 
 sub maxIndent {
 	return 0
-}
-
-sub maxXYCalculate {
-	my ($self, $item) = @_;
-	my @col = $self->columnList;
-	my $i;
-	for (reverse @col) {
-		my $last = $_;
-		my $cl = $self->itemGet($item->name, $last);
-		next unless defined $cl;
-		$i = $cl;
-		last
-	}
-	$i = $item unless defined $i;
-	$self->SUPER::maxXYCalculate($i, $item);
 }
 
 sub nextPosition {

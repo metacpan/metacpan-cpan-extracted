@@ -136,7 +136,7 @@ DBIO::Oracle::Storage::AutoIncrement - Auto-increment / sequence detection for O
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

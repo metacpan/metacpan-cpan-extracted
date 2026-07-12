@@ -28,7 +28,7 @@
       "runtime" : {
          "requires" : {
             "DBD::SQLite" : "0",
-            "DBIO" : "0.900000",
+            "DBIO" : "0.900001",
             "DateTime::Format::SQLite" : "0",
             "perl" : "5.020"
          }
@@ -47,83 +47,83 @@
    "provides" : {
       "DBIO::SQLite" : {
          "file" : "lib/DBIO/SQLite.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Adapter" : {
          "file" : "lib/DBIO/SQLite/Adapter.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::DDL" : {
          "file" : "lib/DBIO/SQLite/DDL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Deploy" : {
          "file" : "lib/DBIO/SQLite/Deploy.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Diff" : {
          "file" : "lib/DBIO/SQLite/Diff.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Diff::Column" : {
          "file" : "lib/DBIO/SQLite/Diff/Column.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Diff::Index" : {
          "file" : "lib/DBIO/SQLite/Diff/Index.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Diff::Rebuild" : {
          "file" : "lib/DBIO/SQLite/Diff/Rebuild.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Diff::Table" : {
          "file" : "lib/DBIO/SQLite/Diff/Table.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Introspect" : {
          "file" : "lib/DBIO/SQLite/Introspect.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Introspect::Columns" : {
          "file" : "lib/DBIO/SQLite/Introspect/Columns.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Introspect::ForeignKeys" : {
          "file" : "lib/DBIO/SQLite/Introspect/ForeignKeys.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Introspect::Indexes" : {
          "file" : "lib/DBIO/SQLite/Introspect/Indexes.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Introspect::Tables" : {
          "file" : "lib/DBIO/SQLite/Introspect/Tables.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Result" : {
          "file" : "lib/DBIO/SQLite/Result.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::SQLMaker" : {
          "file" : "lib/DBIO/SQLite/SQLMaker.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Storage" : {
          "file" : "lib/DBIO/SQLite/Storage.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Test" : {
          "file" : "lib/DBIO/SQLite/Test.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::SQLite::Util" : {
          "file" : "lib/DBIO/SQLite/Util.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Shortcut::sqlite" : {
          "file" : "lib/DBIO/Shortcut/sqlite.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -138,7 +138,7 @@
          "web" : "https://codeberg.org/dbio/dbio-sqlite"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -250,7 +250,6 @@
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
             "config" : {
-               "Dist::Zilla::Plugin::PkgVersion" : {},
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
@@ -259,23 +258,7 @@
                   "global" : 0,
                   "skip_version_provider" : 0
                },
-               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {
-                  "_fallback_version_provider_args" : {
-                     "first_version" : "0.900000"
-                  },
-                  "fallback_version_provider" : "Git::NextVersion"
-               },
-               "Git::NextVersion" : {
-                  "Dist::Zilla::Plugin::Git::NextVersion" : {
-                     "first_version" : "0.900000",
-                     "version_by_branch" : 0,
-                     "version_regexp" : "(?^:^v(.+)$)"
-                  },
-                  "Dist::Zilla::Role::Git::Repo" : {
-                     "git_version" : "2.39.5",
-                     "repo_root" : "."
-                  }
-               }
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "@DBIO/@Git::VersionManager/RewriteVersion::Transitional",
             "version" : "0.009"
@@ -331,7 +314,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -493,6 +476,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

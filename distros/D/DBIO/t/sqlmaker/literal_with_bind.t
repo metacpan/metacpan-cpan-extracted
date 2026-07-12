@@ -8,7 +8,7 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
 my $ars    = $schema->resultset('Artist');
 
 # Mock search results so ->first returns a row
-$schema->storage->mock_persistent(qr/SELECT.*FROM artist/i, [[666, 'test', 13]]);
+$schema->storage->mock_persistent(qr/SELECT.*FROM\s+"?artist"?/i, [[666, 'test', 13]]);
 
 my $rank = \13;
 my $ref1 = \['?', [name => 'foo']];

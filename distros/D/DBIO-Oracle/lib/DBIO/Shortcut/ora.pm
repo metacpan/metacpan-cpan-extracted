@@ -20,7 +20,7 @@ DBIO::Shortcut::ora - `use DBIO -ora` shortcut for the Oracle driver
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

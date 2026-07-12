@@ -1,0 +1,158 @@
+Revision history for DBIO-MySQL-EV
+
+0.900001  2026-07-12
+
+    * Storage
+        - DBIO::MySQL::EV::Storage becomes a thin transport over the shared
+          core Model-B machinery (720 -> 623 lines, ~208 code lines / 22
+          subs): select_async/…/delete_async, _run_crud, txn_do_async, the
+          sync fallbacks, _generate_sql, sql_maker, new, schema/debug/
+          connected/disconnect/DESTROY, pipeline and the prepared-statement
+          cache are all deleted and now inherited from core
+          DBIO::Storage::Async (coderef-identity asserted in tests). What's
+          kept is genuine MySQL value-add: _transform_sql as identity
+          (MySQL speaks '?' natively, no ?->$N rewrite; applied first in
+          the query seams to keep the core '?'-seam contract uniform),
+          insert_async/_run_crud_pinned(insert) (no RETURNING, so INSERT +
+          SELECT LAST_INSERT_ID() ride the same pinned session and the LII
+          folds onto the auto-increment column), and
+          _normalize_async_connect_info (dbname -> database). pool()
+          now passes storage => $self so core's _setup_pool_connection
+          fires on_connect_do/on_connect_call replay for every spawned EV
+          pool connection (_run_pool_connect_statement drives it
+          synchronously on the EV::MariaDB handle). transport_capabilities
+          is (on_connect_replay) only -- no LISTEN/NOTIFY/COPY; pipeline is
+          not claimed as a capability (EV::MariaDB pipelines automatically
+          at the wire with no explicit-mode API to map onto the base
+          seams). karr #18, #19, core #70.
+
+    * Bugfixes
+        - AccessBroker::Credentials was removed from core (split into
+          ::Static for single-identity and DBIO::Replicated for routing); a
+          stale local copy had masked the break, so a fresh install/smoker
+          hit "Can't locate DBIO/AccessBroker/Credentials.pm". Switched the
+          test to ::Static, mirroring the dbio-postgresql fix. karr #10.
+        - The async path retained bind values on the in-flight bind
+          arrayref after a query's Future completed (the sync path clears
+          them once execute() returns), causing a re-issued query on the
+          same handle to see stale binds while a prior future was pending,
+          and memory growth proportional to total binds ever issued rather
+          than outstanding queries. Bind values are now cleared in the
+          completion handler (fires on both done and fail), never on the
+          issuing side (which would corrupt a still-pending query's
+          binds). Per CurtisPoe architecture review #5, karr #11.
+        - Three driver bugs surfaced by the first end-to-end test driving
+          the real DBIO facade through EV::MariaDB + EV::run (the
+          mock-based suite only ever proved the Future API shape, never
+          that the driver works against a live DB): Storage.pm's pool()
+          was missing a lazy require for QueryExecutor (fired "Can't
+          locate object method 'new'" on first use); txn_do_async held its
+          coderef Future only weakly via a bare ->then->catch chain, so it
+          could be GC'd before BEGIN's callback fired, silently hanging any
+          EV::run-based wait loop -- fixed with ->retain, mirroring the
+          dbio-postgresql-async fix; and QueryExecutor's execute() passed a
+          bind arrayref to $mdb->query, which silently ignores it, so
+          bound queries either threw a syntax error or ran with stale
+          binds from the previous prepared statement -- now routed through
+          prepare+execute whenever binds are non-empty. txn_do_async's
+          on_fail also now surfaces a ROLLBACK failure as a wrapped error
+          instead of dropping it silently.
+        - Fix PRODUCTION BUG: the first bound async query on a cold pool
+          connection died 'not connected' (karr #20). DBIO::MySQL::EV::Pool
+          wired on_connect => sub {} -- a pure no-op -- so it never tracked
+          connection readiness; core DBIO::Storage::PoolBase's
+          connection-readiness gate (karr #75) had nothing to wait on.
+          _create_connection now registers a real per-connection readiness
+          Future (core _register_connection_ready) resolved from
+          EV::MariaDB's on_connect/on_error, and a new
+          _connection_ready_future override looks it up -- mirroring
+          dbio-postgresql-ev's karr #9 fix. New offline regression test
+          t/08-pool-readiness.t (mirrors PG's t/04). Closes karr #19's
+          leftover gap.
+    * Async opt-in via { async => 'ev' } (ADR 0030, karr #14)
+        - Dropped the connection()/storage_type hijack in DBIO::MySQL::EV.
+          Loading the MySQL::EV component is now an inert marker; the EV
+          backend is reached explicitly through
+          MyApp::Schema->connect($dsn, $u, $p, { async => 'ev' }), which
+          resolves the 'ev' mode via DBIO::MySQL::Storage's mode registry
+          (the registration is its own karr ticket on the dbio-mysql
+          board). PostgreSQL's DBIO::PostgreSQL::EV has no such override
+          either; this brings MySQL to parity.
+    * insert_async resolves with the returned-columns HASHREF (ADR 0031 §3)
+        - MySQL has no RETURNING clause; the EV storage reads
+          SELECT LAST_INSERT_ID() on the pinned connection and assembles
+          the hashref = { %to_insert, $col => $lii_id } via the new
+          _insert_returned_columns hook (overrides the inherited
+          RETURNING-row -> hashref default). $col is the source's first
+          is_auto_increment column, falling back to the first PK column
+          not supplied in %to_insert. The legacy ->last_insert_id
+          side-effect is preserved. create_async / Row::insert_async
+          fold the hashref back via _store_inserted_columns.
+    * select_async / select_single_async shapes (ADR 0031 §3)
+        - select_async resolves with the raw row arrayrefs (cursor ->all
+          shape) and select_single_async with a single row arrayref,
+          matching the sync cursor shape and what _inflate_fetched_rows /
+          _construct_results consume.
+    * Future then auto-wrap (ADR 0031 §4)
+        - The backend Future is plain Future (perl-Future), whose ->then
+          natively auto-wraps a plain return into a resolved Future --
+          compliance is transitive. Documented in POD and verified by
+          t/storage-facade-mock.t.
+
+    * Packaging
+        - Renamed distribution DBIO-MySQL-Async to DBIO-MySQL-EV and namespace
+          DBIO::MySQL::Async to DBIO::MySQL::EV. The EV::MariaDB driver is
+          hard-wired to the EV event loop; the DBIO::MySQL::Async namespace is
+          freed for a future loop-agnostic driver built on DBIO::Async::Storage.
+          CPAN namespace migration — the old distribution stays on CPAN. No
+          behaviour change.
+
+    * Tests
+        - Add maint/k8s/mysql-pod.yaml (mysql:8.0, mysql_native_password
+          forced so the libmariadb-based clients authenticate over a plain
+          port-forward) for live integration testing, and
+          DBIO::MySQL::EV::TestHarness (installable, gated on
+          DBIO_TEST_MYSQL_DSN, mirrors the PostgreSQL-EV harness API).
+        - Fixed test/harness-only bugs surfaced on the first live run
+          (no production runtime change): PoolBase::acquire can hand off
+          an EV::MariaDB handle before its async connect completes when no
+          on_connect action is configured, so pooled-connection tests now
+          wait for readiness explicitly (_await_connected) or warm the
+          pool first; a live SELECT used an invalid bare '*' after a named
+          select-expression and a plain-string column alias that got
+          backtick-quoted into an unknown column; and a broker test now
+          asserts the achievable truth (broker attaches to the sync
+          storage; a schema-level connect() cannot select an async mode
+          and attach a broker at the same time). karr #19, #21.
+
+    * Dependencies
+        - Requires core DBIO >= 0.900001 (family-wide version alignment)
+
+    * Project
+        - Added SECURITY.md (CPAN Security Group guidelines v1.5.0)
+
+0.900000  2026-06-23
+    First release. Future-based async MySQL/MariaDB storage for DBIO via EV::MariaDB.
+
+    * Storage
+        - DBIO::MySQL::Async::Storage on DBIO::Storage::Async, speaking the
+          MariaDB C client directly through EV::MariaDB (no DBI / DBD::mysql)
+        - Async select/insert/update/delete returning Future objects
+        - Sync fallback (->all, ->first, ...) via blocking ->get on the Future
+
+    * Transactions
+        - txn_do_async driving the BEGIN/COMMIT/ROLLBACK chain
+        - TransactionContext pinning one pooled connection for the txn duration
+
+    * Pipelining
+        - Pipeline mode batching queries into a single network round-trip,
+          up to 64 in-flight
+
+    * Connection pool
+        - Connection pool with transaction pinning, built on
+          DBIO::Storage::PoolBase
+
+    * AccessBroker
+        - Accept AccessBroker objects via Schema->connect($broker)
+        - Refresh async conninfo through the broker for newly created
+          pooled connections

@@ -1,5 +1,12 @@
 Release history for Dist-Zilla-PluginBundle-DBIO
 
+0.900003  2026-07-12
+    - IRC channel set centrally for the whole DBIO family via [MetaResources]: every [@DBIO] dist gets x_IRC = irc://irc.perl.org/#dbio in its META, fixed and not per-dist configurable (no more per-dist irc = lines needed)
+    - DBIO::CoverageTest generates xt/release/coverage.t for every [@DBIO] dist: statement-coverage gate reading cover_db/ with default threshold 80%, overridable via coverage_threshold = N in dist.ini, set to 0 to disable; default skip-with-diagnose, COVERAGE_STRICT=1 or RELEASE=1 turns a coverage gap into a failure
+    - Devel::Cover added as a test prerequisite for the generated coverage test
+    - cover_db/ ignored in git (test artifact) and excluded from core distributions at build time
+    - Added SECURITY.md (CPAN Security Group guidelines v1.5.0): email-first private reporting to the maintainer with CPANSec escalation
+
 0.900002  2026-06-23
     - DBIO::CodebergMeta replaces GithubMeta: repository/bugtracker/homepage resources derived offline from the codeberg.org git remote, no token or network; GithubMeta dependency dropped
     - author and license set automatically via DBIO::SetMeta: heritage => "DBIO & DBIx::Class Authors", default => "DBIO Authors", license always Perl_5; no author =/license = needed in dist.ini

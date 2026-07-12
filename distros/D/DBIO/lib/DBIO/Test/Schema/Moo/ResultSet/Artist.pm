@@ -34,7 +34,7 @@ DBIO::Test::Schema::Moo::ResultSet::Artist - Custom Moo-based ResultSet for the 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

@@ -101,8 +101,8 @@ is($c->default_backend_name('custom'), 'custom',
                     },
                 ],
                 models => {
-                    user    => { source => 'users',   backend => 'main' },
-                    article => { source => 'articles' },              # no backend
+                    user    => { source => 'User',   backend => 'main' },
+                    article => { source => 'Article' },              # no backend
                 },
             }},
             'Fondation::TestDBIxAsync',

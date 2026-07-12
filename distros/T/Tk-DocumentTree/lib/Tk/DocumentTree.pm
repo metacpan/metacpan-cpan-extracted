@@ -8,7 +8,7 @@ Tk::DocumentTree - Tk::ListBrowser based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -110,7 +110,7 @@ sub Populate {
 	$self->Advertise(PATH => $topbar);
 	my $tree = $self->ListBrowser(
 		-arrange => 'tree',
-		-autorefresh => 1,
+		-autorefresh => 0,
 		-browsecmd => ['EntryClick', $self],
 		-filterforce => 1,
 		-itemtype => 'imagetext',
@@ -139,6 +139,7 @@ sub Populate {
 		-diriconcall => ['CALLBACK', undef, undef, ['DefaultDirIcon', $self]],
 		-entryselect => ['CALLBACK', undef, undef, sub {}],
 		-fileiconcall => ['CALLBACK', undef, undef, ['DefaultFileIcon', $self]],
+		-refreshdelay => ['PASSIVE', undef, undef, 300],
 		-saveiconcall => ['CALLBACK', undef, undef, ['DefaultSaveIcon', $self]],
 		DEFAULT => [$tree],
 	);
@@ -168,7 +169,6 @@ sub Add {
 			-text => $new,
 			-data => $type,
 		);
-		$self->setCellSize($n);
 	} else {
 		my $sep = $self->cget('-separator');
 		my $nsep = quotemeta($sep);
@@ -221,10 +221,10 @@ sub Add {
 					-text => $title,
 					-data => $data,
 				);
-				$self->setCellSize($n)
 			}
 		}
 	}
+	$self->refreshList;
 }
 
 sub collapse {
@@ -242,7 +242,6 @@ sub collapse {
 			$self->collapse($_);
 		}
 		$self->close($_);
-		$self->refreshPurge($self->index($_));
 		$self->update;
 	}
 }
@@ -260,6 +259,7 @@ sub collapseAll {
 	$self->collapse;
 	$self->update;
 	$self->entryShow($self->GetFileName($sel)) if defined $sel;
+	$self->refreshList;
 }
 
 sub CreatePathBar {
@@ -292,6 +292,7 @@ sub Delete {
 		my @peers = $self->infoChildren($par);
 		$self->Delete($par) unless @peers;
 	}
+	$self->refreshList;
 }
 
 sub DirList {
@@ -336,6 +337,7 @@ sub entryAdd {
 	}
 #	$self->pause(5500);
 	$self->Add($new, $type);
+	$self->refreshList;
 }
 
 sub EntryClick {
@@ -436,11 +438,12 @@ sub entryShow {
 		my $p = $self->get($parent);
 		unless ($p->opened) {
 			$self->open($parent);
-			$self->refreshPurge($self->index($parent));
 		}
 		$parent = $self->infoParent($parent);
 	}
+	$self->selectionSet($entry);
 	$self->see($entry);
+	$self->refreshList;
 }
 
 =item B<expandAll>
@@ -460,10 +463,10 @@ sub expandAll {
 	for (@children) {
 		if ($self->infoChildren($_)) {
 			$self->open($_);
-			$self->refreshPurge($self->index($_));
 			$self->expandAll($_);
 		}
 	}
+	$self->refreshList;
 }
 
 =item B<fileList>
@@ -703,6 +706,34 @@ sub pause {
 	my $var = 0;
 	$self->after($time, sub { $time = 1 });
 	$self->waitVariable(\$time);
+}
+
+sub refreshList {
+	my ($self, $flag) = @_;
+	
+	my $delay = $self->cget('-refreshdelay');
+	unless (defined $flag) {
+		my $id = $self->{'timer_id'};
+		$self->afterCancel($id) if defined $id;
+		
+		$id = $self->after($delay, [refreshTimer => $self]);
+		$self->{'timer_id'} = $id;
+		
+		return
+	}
+
+	$self->setCellSize;
+	my $c = $self->Subwidget('Tree')->Subwidget('Canvas');
+	my ($view) = $c->yview;
+	$self->refreshPurge;
+	$self->after($delay, sub { $c->yview('moveto', $view) });
+
+}
+
+sub refreshTimer {
+	my $self = shift;
+	delete $self->{'timer_id'};
+	$self->refreshList(1);
 }
 
 sub setCellSize {

@@ -52,9 +52,11 @@ my $NS = 'dbio_postgis_deploy_test';
 {
   package DeployGisTest::Schema;
   use base 'DBIO::Schema';
-  # PostgreSQL supplies pg_schemas/pg_search_path; PostgreSQL::PostGIS
-  # (listed last => more-base => its connection() runs last) wins the
-  # storage_type race and installs the PostGIS storage class.
+  # PostgreSQL supplies pg_schemas/pg_search_path and chooses the driver
+  # storage (storage_type). PostgreSQL::PostGIS no longer races storage_type:
+  # it registers a storage LAYER (register_storage_layer) that composes OVER
+  # the driver storage (core #70), so the live storage isa both and its
+  # dbio_deploy_class override selects the PostGIS deploy class.
   __PACKAGE__->load_components('PostgreSQL', 'PostgreSQL::PostGIS');
   __PACKAGE__->pg_schemas('dbio_postgis_deploy_test');
   __PACKAGE__->pg_search_path('dbio_postgis_deploy_test', 'public');

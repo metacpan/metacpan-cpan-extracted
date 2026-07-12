@@ -46,7 +46,7 @@ DBIO::Moose - Enable Moose attributes in DBIO result classes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -75,6 +75,8 @@ version 0.900000
 
   __PACKAGE__->meta->make_immutable;
   1;
+
+See F<t/moose.t> for a runnable example.
 
 =head1 DESCRIPTION
 

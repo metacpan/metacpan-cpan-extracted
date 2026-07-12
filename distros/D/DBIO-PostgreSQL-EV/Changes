@@ -1,0 +1,172 @@
+Revision history for DBIO-PostgreSQL-EV
+
+0.900001  2026-07-12
+    * Documentation
+        - DBIO::PostgreSQL::EV POD: replaced the stale async_backend() opt-in
+          story with the actual { async => 'ev' } per-connection opt-in
+          (ADR 0030); SYNOPSIS now shows loading the PostgreSQL::EV component
+          and connecting with the async option instead of implying async runs
+          without either. (karr #23, flagged during #22)
+
+    * Pool
+        - DBIO::PostgreSQL::EV::Pool adopts core DBIO::Storage::PoolBase's new
+          connection-readiness seam (karr #75, hoisted from this pool's own
+          karr #9 fix). Dropped the local acquire() override -- the base now
+          gates every acquire() through _connection_ready_future for all
+          three paths (spawn/idle-reuse/waiter) -- and the private {_ready}
+          refaddr bookkeeping, replaced with core's
+          _register_connection_ready/_connection_ready_lookup helpers;
+          _shutdown_connection no longer has to clean the table up itself
+          (the base's shutdown() does it centrally). Behaviour unchanged;
+          this mirrors the reference fix dbio-mysql-ev's karr #20 was
+          missing and just adopted the same way.
+
+    * Packaging
+        - Renamed dist DBIO-PostgreSQL-Async -> DBIO-PostgreSQL-EV and the
+          DBIO::PostgreSQL::Async::* namespace -> DBIO::PostgreSQL::EV::*. The
+          EV::Pg/libpq-async driver is now named for its event loop; the ::Async
+          namespace is reserved for a future loop-agnostic driver. The old dist
+          stays on CPAN — this is a namespace migration, not a behaviour change.
+
+    * Storage
+        - DBIO::PostgreSQL::EV::Storage is now a thin transport over core
+          DBIO::Storage::Async instead of reimplementing the whole async surface
+          (Storage.pm 1109 -> 938 lines). It inherits the shared machinery —
+          select/insert/update/delete_async, _run_crud, txn_do_async, the
+          insert-RETURNING overlay, pipeline, the sync fallbacks and SQL
+          generation — and keeps only the EV/libpq wire seams plus EV value-add
+          (listen/notify, copy_in, deploy_async). (karr #22, core #70)
+        - Async is opt-in per connection via { async => 'ev' } (ADR 0030):
+          loading the PostgreSQL::EV component is an inert marker, and the EV
+          backend is reached explicitly through
+          MyApp::Schema->connect($dsn, $u, $p, { async => 'ev' }). The async
+          storage is embedded as the async backend of the sync storage rather
+          than hijacking storage_type; it weakens its schema ref to break the
+          embed cycle and accepts the sync driver's DBI-form connect_info. The
+          legacy async_backend() instance method and async_fallback chain are
+          gone — a *_async call on a sync instance now croaks explicitly rather
+          than silently degrading. (ADR 0028, ADR 0030, karr #59)
+        - insert_async resolves with a returned-columns HASHREF, not a positional
+          row (ADR 0031 §3): _run_crud appends RETURNING * to the INSERT and folds
+          the returned row onto the source's declared column order, so
+          create_async / Row::insert_async see the autoinc PK on the row.
+          select_async resolves with row arrayrefs (cursor ->all shape),
+          select_single_async with a single row arrayref / undef; documented in
+          POD. The backend Future is plain perl-Future, whose ->then auto-wraps a
+          plain return, so no explicit Future->done is needed in *_async
+          callbacks (ADR 0031 §4). (karr #18)
+        - transport_capabilities advertises on_connect_replay, listen, notify,
+          copy and pipeline — each backed by a real implementation, none
+          claimed-but-absent. (karr #22)
+
+    * SQL
+        - Async CRUD translates the SQL maker's '?' placeholders into PostgreSQL
+          positional '$N' before handing SQL to libpq (EV::Pg->query_params only
+          understands '$N') via the _transform_sql seam. The shared
+          DBIO::PostgreSQL::SQLMaker keeps emitting '?' for the sync DBI driver;
+          the translation is async-only and preserves the '@?' jsonpath operator
+          and '?' inside quoted literals. Without it a bound WHERE/SET/VALUES
+          reached Postgres as '... = ?' and died with a syntax error.
+          (karr #7, core #70, ADR 0032)
+
+    * Deploy
+        - deploy_async: deploy a schema through DBIO's native deploy pipeline,
+          executing every generated DDL statement on EV::Pg inside a single
+          async transaction (COMMIT on success, ROLLBACK on the first DDL
+          error). The add_drop_table option prepends DROP TABLE IF EXISTS ...
+          CASCADE for every regular table (views and non-plain-identifier names
+          skipped) so a re-run on a populated database stays idempotent. A
+          blocking deploy() wrapper drives it via ->get for scripts. Covered by
+          t/21-deploy-async-live.t (live).
+
+    * Connection pool
+        - on_connect_do / on_connect_call now replay on every EV pooled
+          connection (e.g. AGE's load_age): pool() passes storage => $self so
+          core's pool setup fires, and each on_connect statement is driven to
+          completion on the EV loop. (karr #22, karr #69)
+        - Pooled acquire waits for the connection to finish its async connect
+          before resolving, so the first CRUD call on a cold pool no longer dies
+          with "not connected"; idle reuse stays immediate and a failed connect
+          fails the dependent query instead of hanging. (karr #9)
+        - Pool acquire order is FIFO (core PoolBase shift/push), verified by a
+          pg_backend_pid() rotation test. (karr #20)
+        - Guarded _shutdown_connection against undef at global destruction — no
+          more "Use of uninitialized value" from Pool.pm on teardown.
+
+    * Bug fixes
+        - txn_do_async no longer hangs. Its COMMIT/ROLLBACK chain was built off
+          the coderef's Future, which Future.pm holds only weakly, so the chain
+          was garbage-collected ("lost a sequence Future") before COMMIT/ROLLBACK
+          could run — the transaction Future never resolved and the event loop
+          busy-spun at ~100% CPU. The chain now completes the outer Future
+          directly via on_done/on_fail and retains the coderef Future until it
+          settles. (karr #10)
+        - copy_in no longer races the pooled-connection release: the connection
+          is released and the Future completed only after libpq finishes the COPY
+          stream (EV::Pg fires the COPY callback twice), so a follow-up query on
+          the same storage no longer hits "another command is already in
+          progress". A second listen() issued while the first LISTEN was still in
+          flight is no longer silently lost — LISTEN/UNLISTEN serialise through a
+          single dispatch queue. (karr #13, karr #15)
+
+    * Security
+        - Added SECURITY.md following the CPAN Security Group author guidelines
+          (v1.5.0): email-first private reporting to the maintainer with CPANSec
+          escalation, and an explicit note that Codeberg has no confidential
+          issue channel.
+
+    * Dependencies
+        - Loosened the EV::Pg pin to >= 0.02, < 0.08. EV::Pg 0.07 added the
+          libpq-16+ symbols (PQconnectionUsedGSSAPI, PGRES_TUPLES_CHUNK); the
+          previous < 0.03 upper bound locked out the Docker test image (libpq 17
+          + EV::Pg 0.07). libpq 16+ is the new client floor; libpq-15 hosts
+          (Debian 12 default) should use maint/docker/Dockerfile.test. README and
+          maint/docker/README.md updated. (karr #16)
+        - Bumped DBIO-family requirements to 0.900001 to keep the whole family on
+          one released version.
+
+    * Tests
+        - Added DBIO::PostgreSQL::EV::TestHarness — an installable, reusable
+          live-PG async harness (skip_all_unless_live,
+          run_on_each_pooled_connection, await, query_on) that the EV live suite
+          dogfoods and other dists (e.g. AGE) consume instead of duplicating
+          scaffolding. (karr #22)
+        - t/02-access-broker.t: swap the removed DBIO::AccessBroker::Credentials
+          for DBIO::AccessBroker::Static (user -> username) so the suite passes
+          on fresh installs instead of dying with "Can't locate
+          DBIO/AccessBroker/Credentials.pm". (karr #8, Codeberg #1)
+        - Added offline structural/contract guards (thin-transport
+          inherited-vs-overridden identity, positional placeholders, pool
+          readiness, bind-value release, insert RETURNING shapes) and live
+          regression suites for pipeline, listen/notify, concurrency, copy_in,
+          cold pool, transactions and the composed async layer.
+
+0.900000  2026-06-23
+    First release. Future-based async PostgreSQL storage for DBIO, speaking
+    libpq's async protocol via EV::Pg with no DBI in the path.
+
+    * Storage
+        - DBIO::PostgreSQL::Async::Storage built on DBIO::Storage::Async
+        - Non-blocking select/insert/update/delete returning Future objects
+        - Prepared statement caching
+        - Sync fallback (->all, ->first, etc. via blocking ->get on the Future)
+
+    * Transactions
+        - txn_do_async with BEGIN/COMMIT/ROLLBACK chaining
+        - Transaction context with connection pinning
+
+    * Pipelining
+        - Pipeline mode batching multiple queries in a single round-trip
+
+    * LISTEN/NOTIFY
+        - Real-time event streaming via ->listen and ->notify
+
+    * COPY
+        - COPY IN for bulk data loading
+
+    * Connection pool
+        - Async connection pool with transaction pinning
+
+    * AccessBroker
+        - Accept AccessBroker objects via Schema->connect($broker)
+        - Refresh async conninfo through the broker for new pooled connections

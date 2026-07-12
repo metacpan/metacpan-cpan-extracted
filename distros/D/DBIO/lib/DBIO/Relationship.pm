@@ -27,7 +27,7 @@ DBIO::Relationship - Relationship declaration helpers for DBIO result classes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,8 @@ version 0.900000
   $schema->resultset('Actor')->add_to_roles({ Name => 'Sherlock Holmes'});
 
 See L<DBIO::Manual::Cookbook> for more.
+
+See F<t/relationship/info.t> for a runnable example.
 
 =head1 DESCRIPTION
 

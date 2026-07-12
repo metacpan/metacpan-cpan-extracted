@@ -4,10 +4,18 @@ package DBIO::Deploy::Base;
 use strict;
 use warnings;
 
+our $CONTRACT_VERSION = '1.1';
+
 # Loaded without importing: importing _split_statements would leak it into
 # this package's method-resolution namespace (t/55namespaces_cleaned.t).
+# We deliberately do NOT use DBIO::Carp either -- its `import` installs
+# carp/carp_once/carp_unique into our namespace and triggers the same
+# namespace leak. The F02 informational warning is fired via a local
+# one-time closure below.
 use DBIO::SQL::Util ();
 
+
+sub contract_version { $CONTRACT_VERSION }
 
 sub new {
   my ($class, %args) = @_;
@@ -53,11 +61,36 @@ sub _install_ddl {
 
 sub _execute_ddl {
   my ($self, $dbh, $sql) = @_;
-  for my $stmt (DBIO::SQL::Util::_split_statements($sql)) {
-    next if $stmt =~ /^\s*--/;
-    $dbh->do($stmt);
+  my @stmts = grep { !/^\s*--/ } DBIO::SQL::Util::_split_statements($sql);
+  return 1 unless @stmts;
+
+  my $storage = eval { $self->schema->storage } || undef;
+  my $use_txn = $storage && $storage->can('_use_transactional_ddl')
+    ? $storage->_use_transactional_ddl
+    : 0;
+
+  if ($use_txn) {
+    $storage->txn_do(sub {
+      $dbh->do($_) for @stmts;
+    });
+  }
+  else {
+    my $class = ref($self) || $self;
+    DBIO::Deploy::Base::_warn_non_txn_ddl_once("$class -- DDL loop is not atomic; recovery depends on the driver's version-row gate");
+    $dbh->do($_) for @stmts;
   }
   return 1;
+}
+
+# F02: one-time informational warning for non-transactional DDL runs.
+# Implemented as a local one-time closure rather than `use DBIO::Carp`
+# to avoid the namespace leak (t/55namespaces_cleaned.t). Keyed on the
+# full message so a different engine class gets its own one-shot.
+my %_WARNED_NON_TXN_DDL;
+sub _warn_non_txn_ddl_once {
+  my ($msg) = @_;
+  return if $_WARNED_NON_TXN_DDL{$msg}++;
+  warn "non-transactional DDL on $msg\n";
 }
 
 
@@ -116,7 +149,7 @@ DBIO::Deploy::Base - Base class for DBIO driver deploy orchestrators
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -203,6 +236,16 @@ C<< _ddl_class->install_ddl($self->schema) >>.
 Splits C<$sql> into statements (L<DBIO::SQL::Util/_split_statements>) and runs
 each via C<< $dbh->do >>, skipping comment-only statements.
 
+When the storage reports C<< _use_transactional_ddl >> truthy, the loop is
+wrapped in C<< $storage->txn_do >> so a failure on any statement rolls the
+whole batch back. When the storage reports C<0> (the default for engines
+whose DDL forces an implicit C<COMMIT> -- MySQL pre-8.0, Oracle, DB2, Sybase,
+Informix -- or whose rebuild path depends on C<AutoCommit=on>, e.g. SQLite),
+the loop runs statement-at-a-time as before and a C<carp> is emitted naming
+this engine class so operators see that a partial-failure recovery depends on
+per-driver bookkeeping (e.g. the C<__VERSION> row gate in
+L<DBIO::DeploymentHandler>).
+
 =head2 _build_target_model
 
 The desired-state model: deploy the install DDL into a throwaway database and
@@ -236,6 +279,63 @@ database. No-op (returns false) when C<< $diff->has_changes >> is false.
 
 Convenience: L</diff> then L</apply>. Returns the diff object if changes were
 applied, or C<undef> if the database was already up to date.
+
+=head1 CONTRACT VERSION
+
+This class exposes an independent compatibility version, distinct from
+C<$VERSION> (the dist version injected by L<Dist::Zilla>'s
+C<VersionFromMainModule>):
+
+    my $v = $class->contract_version;
+
+C<$CONTRACT_VERSION> bumps when the deploy orchestrator's public interface
+(C<install>, C<apply>, C<upgrade>, C<diff>) or the hook contract
+(C<_ddl_class>, C<_introspect_class>, C<_diff_class>,
+C<_build_target_model>) changes. The dist C<$VERSION> bumps on every
+release, but two core releases at the same contract version remain
+wire-compatible. Out-of-tree drivers should record the contract version
+they were last tested against and compare it against core's at load time,
+warning (or strict-failing under C<DBIO_STRICT_CONTRACT>) when the shapes
+have drifted. See F<docs/adr/> for the contract-version policy.
+
+=head1 TRANSACTIONAL DDL
+
+Whether the loop in L</_execute_ddl> is wrapped in C<< $storage->txn_do >>
+is governed by the C<transactional_ddl> capability on the storage
+(L<DBIO::Storage::DBI::Capabilities>):
+
+=over 4
+
+=item * Engines where DDL is transactional: PostgreSQL, Firebird, the
+newer transactional DDL mode in MariaDB 10.6+ / MySQL 8.0+. The driver
+sets C<< _use_transactional_ddl(1) >> and the whole multi-statement DDL
+runs as one atomic unit -- a failure on statement 7 of 12 rolls back
+the preceding six.
+
+=item * Engines that force an implicit C<COMMIT> on DDL: MySQL (pre 8.0
+unless explicit transactional DDL is on), Oracle, DB2, Sybase, Informix.
+On these engines wrapping C<$dbh-E<gt>do()> in C<txn_do> is a no-op as
+far as DDL is concerned, and the loop runs statement-at-a-time as
+before. A C<carp> is emitted at the first L</_execute_ddl> call naming
+this engine class so operators see that a partial-failure recovery
+depends on the driver's own bookkeeping (e.g. version-row gates).
+
+=item * Engines whose rebuild path depends on C<AutoCommit=on>: SQLite.
+We deliberately do B<not> wrap in C<txn_do> for SQLite even when the
+storage reports transactional DDL: a blanket C<txn_do> wrap would
+regress SQLite's in-place rebuilds. Drivers that need transactional
+DDL on a non-transactional engine (e.g. PostgreSQL on the wire) opt in
+via L<DBIO::Storage::DBI::Capabilities>'s C<< _use_transactional_ddl(1) >>.
+
+=back
+
+Recovery on the non-transactional set is engine-specific. MySQL rolls
+back DDL on most error paths (CREATE TABLE / DROP TABLE / RENAME are
+atomic per-statement at the storage level) but multi-statement DDL
+bundles can still leave the schema half-applied. L<DBIO::DeploymentHandler>
+relies on the C<__VERSION> row as a forward-progress gate: a partially
+applied upgrade can be re-run safely because the diff re-computes
+against live state, and the next apply picks up the remainder.
 
 =head1 AUTHOR
 

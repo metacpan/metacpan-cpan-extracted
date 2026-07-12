@@ -26,13 +26,13 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
     $crs->as_query,
     '(SELECT COUNT( * )
        FROM (
-        SELECT tracks.trackid
-          FROM cd me
-          JOIN track tracks ON tracks.cd = me.cdid
-          JOIN cd disc ON disc.cdid = tracks.cd
-        WHERE ( ( position = ? OR position = ? ) )
+        SELECT "tracks"."trackid"
+          FROM cd "me"
+          JOIN "track" "tracks" ON "tracks"."cd" = "me"."cdid"
+          JOIN cd "disc" ON "disc"."cdid" = "tracks"."cd"
+        WHERE ( ( "position" = ? OR "position" = ? ) )
         LIMIT ? OFFSET ?
-       ) tracks
+       ) "tracks"
     )',
     [
       [ { sqlt_datatype => 'int', dbic_colname => 'position' } => 1 ],
@@ -57,15 +57,15 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
     $crs->as_query,
     '(SELECT COUNT( * )
       FROM (
-        SELECT cds.cdid
-          FROM artist me
-          JOIN cd cds ON cds.artist = me.artistid
-          LEFT JOIN track tracks ON tracks.cd = cds.cdid
-          JOIN artist artist ON artist.artistid = cds.artist
-        WHERE tracks.position = ? OR tracks.position = ?
-        GROUP BY cds.cdid
+        SELECT "cds"."cdid"
+          FROM "artist" "me"
+          JOIN cd "cds" ON "cds"."artist" = "me"."artistid"
+          LEFT JOIN "track" "tracks" ON "tracks"."cd" = "cds"."cdid"
+          JOIN "artist" "artist" ON "artist"."artistid" = "cds"."artist"
+        WHERE "tracks"."position" = ? OR "tracks"."position" = ?
+        GROUP BY "cds"."cdid"
         LIMIT ? OFFSET ?
-      ) cds
+      ) "cds"
     )',
     [
       [ { sqlt_datatype => 'int', dbic_colname => 'tracks.position' } => 1 ],
@@ -95,12 +95,12 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
     $crs->as_query,
     '(SELECT COUNT( * )
       FROM (
-        SELECT me.artistid, MAX( cds.year ) AS newest_cd_year
-          FROM artist me
-          LEFT JOIN cd cds ON cds.artist = me.artistid
-        GROUP BY me.artistid
-        HAVING newest_cd_year = ?
-      ) me
+        SELECT "me"."artistid", MAX( "cds"."year" ) AS "newest_cd_year"
+          FROM "artist" "me"
+          LEFT JOIN cd "cds" ON "cds"."artist" = "me"."artistid"
+        GROUP BY "me"."artistid"
+        HAVING "newest_cd_year" = ?
+      ) "me"
     )',
     [ [ { dbic_colname => 'newest_cd_year' }
           => '2001' ] ],
@@ -127,12 +127,12 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
     $crs->as_query,
     '(SELECT COUNT( * )
       FROM (
-        SELECT me.artistid, MAX( cds.year ) AS newest_cd_year
-          FROM artist me
-          LEFT JOIN cd cds ON cds.artist = me.artistid
-        GROUP BY me.artistid
-        HAVING newest_cd_year = ? OR newest_cd_year = ?
-      ) me
+        SELECT "me"."artistid", MAX( "cds"."year" ) AS "newest_cd_year"
+          FROM "artist" "me"
+          LEFT JOIN cd "cds" ON "cds"."artist" = "me"."artistid"
+        GROUP BY "me"."artistid"
+        HAVING ( "newest_cd_year" = ? OR "newest_cd_year" = ? )
+      ) "me"
     )',
     [
       [ { dbic_colname => 'newest_cd_year' }

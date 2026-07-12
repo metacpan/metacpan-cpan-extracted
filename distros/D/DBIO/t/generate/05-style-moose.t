@@ -29,8 +29,8 @@ my $code = DBIO::Generate::Style::Moose->emit($spec);
 
 like $code, qr/^package My::Schema::Result::Tag;/m, 'package line';
 like $code, qr/use Moose;/,                          'use Moose in generated text';
-like $code, qr/extends 'DBIO::Core'/,                'extends base class';
-like $code, qr/__PACKAGE__->table\('tags'\)/,        'table call';
+like $code, qr/extends ['"]DBIO::Core['"]/,          'extends base class';
+like $code, qr/__PACKAGE__->table\(['"]tags['"]\)/,  'table call';
 like $code, qr/^1;/m,                                'ends with 1';
 
 # Text is stable - run twice, same result
@@ -39,8 +39,8 @@ is $code2, $code, 'emit is deterministic';
 
 # Optionally load generated code if Moose is present
 SKIP: {
-  eval { require Moose; 1 }
-    or skip 'Moose not installed — skipping load test', 1;
+  eval { require Moose; require MooseX::NonMoose; require MooseX::MarkAsMethods; 1 }
+    or skip 'Moose and/or MooseX extensions not installed — skipping load test', 1;
 
   eval $code;
   ok !$@, 'generated Moose class loads without error' or diag $@;

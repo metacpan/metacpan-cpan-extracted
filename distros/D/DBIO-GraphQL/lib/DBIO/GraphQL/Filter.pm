@@ -185,8 +185,7 @@ sub _compile {
 
 sub _compile_column {
   my ($self, $col, $ops, $source) = @_;
-  my $info = $source->column_info($col);
-  unless ($info) {
+  unless ($source->has_column($col)) {
     die "DBIO::GraphQL::Filter: unknown column '$col' on source '"
       . $source->source_name . "'\n";
   }
@@ -244,7 +243,7 @@ DBIO::GraphQL::Filter - Per-source GraphQL filter InputObject with adapter seam
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

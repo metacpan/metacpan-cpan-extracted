@@ -36,88 +36,88 @@ my @tests = (
   {
     where => { artistid => 1, charfield => undef },
     cc_result => { artistid => 1, charfield => undef },
-    sql => 'WHERE artistid = ? AND charfield IS NULL',
+    sql => 'WHERE "artistid" = ? AND "charfield" IS NULL',
     efcc_result => { artistid => 1 },
     efcc_n_result => { artistid => 1, charfield => undef },
   },
   {
     where => { -and => [ artistid => 1, charfield => undef, { rank => 13 } ] },
     cc_result => { artistid => 1, charfield => undef, rank => 13 },
-    sql => 'WHERE artistid = ?  AND charfield IS NULL AND rank = ?',
+    sql => 'WHERE "artistid" = ?  AND "charfield" IS NULL AND "rank" = ?',
     efcc_result => { artistid => 1, rank => 13 },
     efcc_n_result => { artistid => 1, charfield => undef, rank => 13 },
   },
   {
     where => { -and => [ { artistid => 1, charfield => undef}, { rank => 13 } ] },
     cc_result => { artistid => 1, charfield => undef, rank => 13 },
-    sql => 'WHERE artistid = ?  AND charfield IS NULL AND rank = ?',
+    sql => 'WHERE "artistid" = ?  AND "charfield" IS NULL AND "rank" = ?',
     efcc_result => { artistid => 1, rank => 13 },
     efcc_n_result => { artistid => 1, charfield => undef, rank => 13 },
   },
   {
     where => { -and => [ -or => { name => 'Caterwauler McCrae' }, 'rank' ] },
     cc_result => { name => 'Caterwauler McCrae', rank => undef },
-    sql => 'WHERE name = ? AND rank IS NULL',
+    sql => 'WHERE "name" = ? AND "rank" IS NULL',
     efcc_result => { name => 'Caterwauler McCrae' },
     efcc_n_result => { name => 'Caterwauler McCrae', rank => undef },
   },
   {
     where => { -and => [ [ [ artist => {'=' => \'foo' } ] ], { name => \[ '= ?', 'bar' ] } ] },
     cc_result => { artist => {'=' => \'foo' }, name => \[ '= ?', 'bar' ] },
-    sql => 'WHERE artist = foo AND name = ?',
+    sql => 'WHERE "artist" = foo AND "name" = ?',
     efcc_result => { artist => \'foo' },
   },
   {
     where => { -and => [ -or => { name => 'Caterwauler McCrae', artistid => 2 } ] },
     cc_result => { -or => [ artistid => 2, name => 'Caterwauler McCrae' ] },
-    sql => 'WHERE artistid = ? OR name = ?',
+    sql => 'WHERE "artistid" = ? OR "name" = ?',
     efcc_result => {},
   },
   {
     where => { -or => { name => 'Caterwauler McCrae', artistid => 2 } },
     cc_result => { -or => [ artistid => 2, name => 'Caterwauler McCrae' ] },
-    sql => 'WHERE artistid = ? OR name = ?',
+    sql => 'WHERE "artistid" = ? OR "name" = ?',
     efcc_result => {},
   },
   {
     where => { -and => [ \'foo=bar',  [ { artistid => { '=', $num } } ], { name => 'Caterwauler McCrae'} ] },
     cc_result => { -and => [ \'foo=bar' ], name => 'Caterwauler McCrae', artistid => $num },
-    sql => 'WHERE foo=bar AND artistid = ? AND name = ?',
+    sql => 'WHERE foo=bar AND "artistid" = ? AND "name" = ?',
     efcc_result => { name => 'Caterwauler McCrae', artistid => $num },
   },
   {
     where => { -and => [ \'foo=bar',  [ { artistid => { '=', $num } } ], { name => 'Caterwauler McCrae'}, \'buzz=bozz' ] },
     cc_result => { -and => [ \'foo=bar', \'buzz=bozz' ], name => 'Caterwauler McCrae', artistid => $num },
-    sql => 'WHERE foo=bar AND artistid = ? AND name = ? AND buzz=bozz',
-    collapsed_sql => 'WHERE foo=bar AND buzz=bozz AND artistid = ? AND name = ?',
+    sql => 'WHERE foo=bar AND "artistid" = ? AND "name" = ? AND buzz=bozz',
+    collapsed_sql => 'WHERE foo=bar AND buzz=bozz AND "artistid" = ? AND "name" = ?',
     efcc_result => { name => 'Caterwauler McCrae', artistid => $num },
   },
   {
     where => { artistid => [ $num ], rank => [ 13, 2, 3 ], charfield => [ undef ] },
     cc_result => { artistid => $num, charfield => undef, rank => [13, 2, 3] },
-    sql => 'WHERE artistid = ? AND charfield IS NULL AND ( rank = ? OR rank = ? OR rank = ? )',
+    sql => 'WHERE "artistid" = ? AND "charfield" IS NULL AND ( "rank" = ? OR "rank" = ? OR "rank" = ? )',
     efcc_result => { artistid => $num },
     efcc_n_result => { artistid => $num, charfield => undef },
   },
   {
     where => { artistid => { '=' => 1 }, rank => { '>' => 12 }, charfield => { '=' => undef } },
     cc_result => { artistid => 1, charfield => undef, rank => { '>' => 12 } },
-    sql => 'WHERE artistid = ? AND charfield IS NULL AND rank > ?',
+    sql => 'WHERE "artistid" = ? AND "charfield" IS NULL AND "rank" > ?',
     efcc_result => { artistid => 1 },
     efcc_n_result => { artistid => 1, charfield => undef },
   },
   {
     where => { artistid => { '=' => [ 1 ], }, charfield => { '=' => [ -AND => \'1', \['?',2] ] }, rank => { '=' => [ -OR => $num, $num ] } },
     cc_result => { artistid => 1, charfield => [-and => { '=' => \['?',2] }, { '=' => \'1' } ], rank => { '=' => [$num, $num] } },
-    sql => 'WHERE artistid = ? AND charfield = 1 AND charfield = ? AND ( rank = ? OR rank = ? )',
-    collapsed_sql => 'WHERE artistid = ? AND charfield = ? AND charfield = 1 AND ( rank = ? OR rank = ? )',
+    sql => 'WHERE "artistid" = ? AND "charfield" = 1 AND "charfield" = ? AND ( "rank" = ? OR "rank" = ? )',
+    collapsed_sql => 'WHERE "artistid" = ? AND "charfield" = ? AND "charfield" = 1 AND ( "rank" = ? OR "rank" = ? )',
     efcc_result => { artistid => 1, charfield => UNRESOLVABLE_CONDITION },
   },
   {
     where => { -and => [ artistid => 1, artistid => 2 ], name => [ -and => { '!=', 1 }, 2 ], charfield => [ -or => { '=', 2 } ], rank => [-and => undef, { '=', undef }, { '!=', 2 } ] },
     cc_result => { artistid => [ -and => 1, 2 ], name => [ -and => { '!=', 1 }, 2 ], charfield => 2, rank => [ -and => { '!=', 2 }, undef ] },
-    sql => 'WHERE artistid = ? AND artistid = ? AND charfield = ? AND name != ? AND name = ? AND rank IS NULL AND rank IS NULL AND rank != ?',
-    collapsed_sql => 'WHERE artistid = ? AND artistid = ? AND charfield = ? AND name != ? AND name = ? AND rank != ? AND rank IS NULL',
+    sql => 'WHERE "artistid" = ? AND "artistid" = ? AND "charfield" = ? AND "name" != ? AND "name" = ? AND "rank" IS NULL AND "rank" IS NULL AND "rank" != ?',
+    collapsed_sql => 'WHERE "artistid" = ? AND "artistid" = ? AND "charfield" = ? AND "name" != ? AND "name" = ? AND "rank" != ? AND "rank" IS NULL',
     efcc_result => {
       artistid => UNRESOLVABLE_CONDITION,
       name => 2,
@@ -132,8 +132,8 @@ my @tests = (
   },
   (map { {
     where => $_,
-    sql => 'WHERE (rank = 13 OR charfield IS NULL OR artistid = ?) AND (artistid = ? OR charfield IS NULL OR rank != 42)',
-    collapsed_sql => 'WHERE (artistid = ? OR charfield IS NULL OR rank = 13) AND (artistid = ? OR charfield IS NULL OR rank != 42)',
+    sql => 'WHERE ("rank" = 13 OR "charfield" IS NULL OR "artistid" = ?) AND ("artistid" = ? OR "charfield" IS NULL OR "rank" != 42)',
+    collapsed_sql => 'WHERE ("artistid" = ? OR "charfield" IS NULL OR "rank" = 13) AND ("artistid" = ? OR "charfield" IS NULL OR "rank" != 42)',
     cc_result => { -and => [
       { -or => [ artistid => 1, charfield => undef, rank => { '=' => \13 } ] },
       { -or => [ artistid => 1, charfield => undef, rank => { '!=' => \42 } ] },
@@ -160,8 +160,8 @@ my @tests = (
       baz => { '!=' => { -ident => 'bozz' } },
       baz => { -ident => 'buzz' },
     ] },
-    sql => 'WHERE ( foo IS NOT NULL AND bar IN ( ?, ? ) ) OR foo IS NULL OR baz != bozz OR baz = buzz',
-    collapsed_sql => 'WHERE baz != bozz OR baz = buzz OR foo IS NULL OR ( bar IN ( ?, ? ) AND foo IS NOT NULL )',
+    sql => 'WHERE ( "foo" IS NOT NULL AND "bar" IN ( ?, ? ) ) OR "foo" IS NULL OR "baz" != "bozz" OR "baz" = "buzz"',
+    collapsed_sql => 'WHERE "baz" != "bozz" OR "baz" = "buzz" OR "foo" IS NULL OR ( "bar" IN ( ?, ? ) AND "foo" IS NOT NULL )',
     cc_result => { -or => [
       baz => { '!=' => { -ident => 'bozz' } },
       baz => { '=' => { -ident => 'buzz' } },
@@ -172,8 +172,8 @@ my @tests = (
   },
   {
     where => { -or => [ rank => { '=' => \13 }, charfield => { '=' => undef }, artistid => { '=' => 1 }, genreid => { '=' => \['?', 2] } ] },
-    sql => 'WHERE rank = 13 OR charfield IS NULL OR artistid = ? OR genreid = ?',
-    collapsed_sql => 'WHERE artistid = ? OR charfield IS NULL OR genreid = ? OR rank = 13',
+    sql => 'WHERE "rank" = 13 OR "charfield" IS NULL OR "artistid" = ? OR "genreid" = ?',
+    collapsed_sql => 'WHERE "artistid" = ? OR "charfield" IS NULL OR "genreid" = ? OR "rank" = 13',
     cc_result => { -or => [ artistid => 1, charfield => undef, genreid => { '=' => \['?', 2] }, rank => { '=' => \13 } ] },
     efcc_result => {},
     efcc_n_result => {},
@@ -187,8 +187,8 @@ my @tests = (
       { -or => [ artistid => 1, charfield => undef, rank => { '=' => \13 } ] },
       { -or => [ artistid => 1, charfield => undef, rank => { '=' => \13 } ] },
     ] },
-    sql => 'WHERE (rank = 13 OR charfield IS NULL OR artistid = ?) AND (artistid = ? OR charfield IS NULL OR rank = 13)',
-    collapsed_sql => 'WHERE (artistid = ? OR charfield IS NULL OR rank = 13) AND (artistid = ? OR charfield IS NULL OR rank = 13)',
+    sql => 'WHERE ("rank" = 13 OR "charfield" IS NULL OR "artistid" = ?) AND ("artistid" = ? OR "charfield" IS NULL OR "rank" = 13)',
+    collapsed_sql => 'WHERE ("artistid" = ? OR "charfield" IS NULL OR "rank" = 13) AND ("artistid" = ? OR "charfield" IS NULL OR "rank" = 13)',
     efcc_result => {},
     efcc_n_result => {},
   },
@@ -204,28 +204,28 @@ my @tests = (
       -not => { foo => 42 },
     ]},
     sql => 'WHERE
-          ( rank = 13 OR charfield IS NULL OR artistid = ? )
-      AND ( artistid = ? OR charfield IS NULL OR rank != 42 )
-      AND foo = 1
-      AND bar = ?
-      AND foo = ?
-      AND bar = 4
+          ( "rank" = 13 OR "charfield" IS NULL OR "artistid" = ? )
+      AND ( "artistid" = ? OR "charfield" IS NULL OR "rank" != 42 )
+      AND "foo" = 1
+      AND "bar" = ?
+      AND "foo" = ?
+      AND "bar" = 4
       AND (EXISTS (SELECT 1))
       AND (EXISTS (SELECT 2))
-      AND NOT foo = ?
-      AND NOT foo = ?
+      AND NOT "foo" = ?
+      AND NOT "foo" = ?
     ',
     collapsed_sql => 'WHERE
-          ( artistid = ? OR charfield IS NULL OR rank = 13 )
-      AND ( artistid = ? OR charfield IS NULL OR rank != 42 )
+          ( "artistid" = ? OR "charfield" IS NULL OR "rank" = 13 )
+      AND ( "artistid" = ? OR "charfield" IS NULL OR "rank" != 42 )
       AND (EXISTS (SELECT 1))
       AND (EXISTS (SELECT 2))
-      AND NOT foo = ?
-      AND NOT foo = ?
-      AND bar = 4
-      AND bar = ?
-      AND foo = 1
-      AND foo = ?
+      AND NOT "foo" = ?
+      AND NOT "foo" = ?
+      AND "bar" = 4
+      AND "bar" = ?
+      AND "foo" = 1
+      AND "foo" = ?
     ',
     cc_result => {
       -and => [
@@ -261,7 +261,7 @@ my @tests = (
         '_wc_macros.to' => { -like => '%correct%' },
       ],
     },
-    sql => 'WHERE ( _macro.to LIKE ? OR _wc_macros.to LIKE ? ) AND group.is_active = ? AND me.is_active = ?',
+    sql => 'WHERE ( "_macro"."to" LIKE ? OR "_wc_macros"."to" LIKE ? ) AND "group"."is_active" = ? AND "me"."is_active" = ?',
     efcc_result => { 'group.is_active' => 1, 'me.is_active' => 1 },
   },
 
@@ -272,7 +272,7 @@ my @tests = (
       name => { '=' => { -value => undef } },
       rank => { '=' => { -ident => 'bar' } },
     ] },
-    sql => 'WHERE artistid = ? AND charfield = foo AND name IS NULL AND rank = bar',
+    sql => 'WHERE "artistid" = ? AND "charfield" = "foo" AND "name" IS NULL AND "rank" = "bar"',
     cc_result => {
       artistid => { -value => [1] },
       name => undef,
@@ -314,18 +314,18 @@ my @tests = (
       where => { -or => [ foo => 1, $_ ] },
       cc_result => { foo => 1 },
       efcc_result => { foo => 1 },
-      sql => 'WHERE foo = ?',
+      sql => 'WHERE "foo" = ?',
     },
     {
       where => { -or => [ $_, foo => 1 ] },
       cc_result => { foo => 1 },
       efcc_result => { foo => 1 },
-      sql => 'WHERE foo = ?',
+      sql => 'WHERE "foo" = ?',
     },
     {
       where => { -and => [ fuu => 2, $_, foo => 1 ] },
-      sql => 'WHERE fuu = ? AND foo = ?',
-      collapsed_sql => 'WHERE foo = ? AND fuu = ?',
+      sql => 'WHERE "fuu" = ? AND "foo" = ?',
+      collapsed_sql => 'WHERE "foo" = ? AND "fuu" = ?',
       cc_result => { foo => 1, fuu => 2 },
       efcc_result => { foo => 1, fuu => 2 },
     },
@@ -347,8 +347,8 @@ my @tests = (
   {
     where => { -and => [ [ 'artistid' ], [ -and => [ artistid => { '!=', 69 }, artistid => undef, artistid => { '=' => 200 } ]], artistid => [], { -or => [] }, { -and => [] }, [ 'charfield' ], { name => [] }, 'rank' ] },
     cc_result => { artistid => [ -and => [], { '!=', 69 }, undef, 200  ], charfield => undef, name => [], rank => undef },
-    sql => 'WHERE artistid IS NULL AND artistid != ? AND artistid IS NULL AND artistid = ? AND 0=1 AND charfield IS NULL AND 0=1 AND rank IS NULL',
-    collapsed_sql => 'WHERE 0=1 AND artistid != ? AND artistid IS NULL AND artistid = ? AND charfield IS NULL AND 0=1 AND rank IS NULL',
+    sql => 'WHERE "artistid" IS NULL AND "artistid" != ? AND "artistid" IS NULL AND "artistid" = ? AND 0=1 AND "charfield" IS NULL AND 0=1 AND "rank" IS NULL',
+    collapsed_sql => 'WHERE 0=1 AND "artistid" != ? AND "artistid" IS NULL AND "artistid" = ? AND "charfield" IS NULL AND 0=1 AND "rank" IS NULL',
     efcc_result => { artistid => UNRESOLVABLE_CONDITION },
     efcc_n_result => { artistid => UNRESOLVABLE_CONDITION, charfield => undef, rank => undef },
   },
@@ -370,7 +370,7 @@ my @tests = (
       ]],
       'me.title' => 'Spoonful of bees',
     },
-    sql => 'WHERE LOWER(me.title) LIKE ? AND me.title = ?',
+    sql => 'WHERE LOWER(me.title) LIKE ? AND "me"."title" = ?',
     efcc_result => { 'me.title' => 'Spoonful of bees' },
   },
 
@@ -382,7 +382,7 @@ my @tests = (
     cc_result => {
       array_col => { '@>' => { -value => [ 1,2,3 ] } }
     },
-    sql => 'WHERE array_col @> ?',
+    sql => 'WHERE "array_col" @> ?',
     efcc_result => {},
   },
 
@@ -442,7 +442,7 @@ my @tests = (
         x => { -ident => 'y' },
       ],
     },
-    sql => 'WHERE foo = bar AND baz = ber AND x = y',
+    sql => 'WHERE foo = bar AND baz = ber AND "x" = "y"',
     cc_result => {
       -and => [
         \'foo = bar',
@@ -528,7 +528,7 @@ for my $lhs (undef, '') {
           foo => "bar",
           bizz => "buzz",
         },
-        sql => 'WHERE baz AND bizz = ? AND foo = ?',
+        sql => 'WHERE baz AND "bizz" = ? AND "foo" = ?',
         warn => $expected_warning,
       };
     }
@@ -542,6 +542,9 @@ for my $eq (
   { '=' => { -ident => 'baz' } },
   { '=' => \'baz' },
 ) {
+  # With quote_names on (default), an -ident rhs renders the value as a
+  # quoted identifier; the literal-scalarref forms pass "baz" through bare.
+  my $baz = ( ref $eq eq 'HASH' and ref $eq->{'='} eq 'HASH' ) ? '"baz"' : 'baz';
   for my $where (
     { foo => "bar", -and => [ 0 => $eq ], bizz => "buzz" },
     { foo => "bar", -or => [ 0 => $eq ], bizz => "buzz" },
@@ -561,7 +564,7 @@ for my $eq (
         bizz => 'buzz',
         ( ref $eq eq 'HASH' ? ( 0 => $eq->{'='} ) : () ),
       },
-      sql => 'WHERE 0 = baz AND bizz = ? AND foo = ?',
+      sql => qq{WHERE "0" = $baz AND "bizz" = ? AND "foo" = ?},
     };
 
     push @tests, {
@@ -572,7 +575,7 @@ for my $eq (
         foo => 'bar',
       ]},
       efcc_result => {},
-      sql => 'WHERE 0 = baz OR bizz = ? OR foo = ?',
+      sql => qq{WHERE "0" = $baz OR "bizz" = ? OR "foo" = ?},
     }
 
   }
@@ -592,8 +595,8 @@ for my $eq (
         foo => 'bar',
       ]},
       efcc_result => {},
-      sql => 'WHERE foo = ? OR 0 = baz OR bizz = ?',
-      collapsed_sql => 'WHERE 0 = baz OR bizz = ? OR foo = ?',
+      sql => qq{WHERE "foo" = ? OR "0" = $baz OR "bizz" = ?},
+      collapsed_sql => qq{WHERE "0" = $baz OR "bizz" = ? OR "foo" = ?},
     }
   }
 
@@ -609,8 +612,8 @@ for my $eq (
         foo => 'bar',
       ]},
       efcc_result => {},
-      sql => 'WHERE foo = ? OR 0 = ? OR bizz = ?',
-      collapsed_sql => 'WHERE 0 = ? OR bizz = ? OR foo = ?',
+      sql => 'WHERE "foo" = ? OR "0" = ? OR "bizz" = ?',
+      collapsed_sql => 'WHERE "0" = ? OR "bizz" = ? OR "foo" = ?',
     };
   }
 

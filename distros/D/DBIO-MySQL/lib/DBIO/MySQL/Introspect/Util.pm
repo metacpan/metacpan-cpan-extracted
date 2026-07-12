@@ -35,7 +35,7 @@ DBIO::MySQL::Introspect::Util - Shared helpers for the MySQL/MariaDB introspect 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

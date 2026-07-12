@@ -8,6 +8,8 @@
 use Test::More tests => 1;
 BEGIN { use_ok('Language::Prolog::Sugar') };
 
+Language::Prolog::Sugar->import( atoms =>[qw(foo bar)] );
+
 #########################
 
 # Insert your test code below, the Test::More module is use()ed here so read

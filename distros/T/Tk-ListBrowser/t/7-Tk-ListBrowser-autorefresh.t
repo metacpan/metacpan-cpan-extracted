@@ -87,7 +87,6 @@ sub newarrange {
 	print "$arg\n" if defined $arg;
 	$ib->clear;
 	$ib->deleteAll;
-	$ib->handler->initColumns;
 
 	my $a = $arranges{$arrange};
 	$ib->configure('-cellimageheight' => 38);

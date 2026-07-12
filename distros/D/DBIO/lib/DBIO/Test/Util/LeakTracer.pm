@@ -379,7 +379,7 @@ DBIO::Test::Util::LeakTracer - Memory leak detection and tracing for DBIO tests
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

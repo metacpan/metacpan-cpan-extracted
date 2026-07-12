@@ -36,7 +36,7 @@ DBIO::Test::Schema::Moo::Result::Artist - Moo-enabled test result class for the 
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

@@ -1,12 +1,28 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Language-Prolog-Sugar
-version:      0.06
-version_from: Sugar.pm
-installdirs:  site
+---
+abstract: 'Syntactic sugar for Prolog term constructors'
+author:
+  - 'Salvador Fandiño <sfandino@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Language-Prolog-Sugar
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Language::Prolog::Types:       0
-    Test::More:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+  Language::Prolog::Types: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/salva/p5-Language-Prolog-Sugar/issues
+  repository: https://github.com/salva/p5-Language-Prolog-Sugar.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -148,7 +148,7 @@ DBIO::Storage::TxnScopeGuard - Scope-based transaction handling
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -161,6 +161,10 @@ version 0.900000
 
    $guard->commit;
  }
+
+See F<t/storage/txn_scope_guard.t> for a runnable example: BEGIN on
+creation, COMMIT on C<< ->commit >>, and the implicit ROLLBACK when a
+guard leaves scope without an explicit commit.
 
 =head1 DESCRIPTION
 

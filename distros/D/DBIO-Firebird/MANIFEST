@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SECURITY.md
 cpanfile
 dist.ini
 docs/adr/0001-three-layer-storage-inheritance.md
@@ -49,6 +50,8 @@ t/17-deploy-live.t
 t/20-firebird-core.t
 t/30-datetime-firebird.t
 t/40-diff.t
+t/45-diff-drop-table-index-cascade.t
 t/50-introspect-contract.t
 t/55-type.t
+t/release-coverage.t
 t/sqlmaker/limit_dialects/first_skip.t

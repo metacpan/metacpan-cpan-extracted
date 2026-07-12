@@ -12,13 +12,13 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 # Mock results for the various queries
 # Producer->first needs a row
-$schema->storage->mock_persistent(qr/SELECT.*FROM producer/i, [[1, 'Matt S Trout']]);
+$schema->storage->mock_persistent(qr/SELECT.*FROM "producer"/i, [[1, 'Matt S Trout']]);
 # CD queries need rows (for ->all, ->first, ->count)
 $schema->storage->mock_persistent(qr/SELECT.*FROM cd/i, [[1, 1, 'Spoonful of bees', 1999, 1, undef]]);
 # COUNT queries
 $schema->storage->mock_persistent(qr/SELECT COUNT/i, [[1]]);
 # Artist->first
-$schema->storage->mock_persistent(qr/SELECT.*FROM artist/i, [[1, 'Caterwauler McCrae', 13, undef]]);
+$schema->storage->mock_persistent(qr/SELECT.*FROM "artist"/i, [[1, 'Caterwauler McCrae', 13, undef]]);
 
 # A search() with prefetch seems to pollute an already joined resultset
 # in a way that offsets future joins (adapted from a test case by Debolaz)

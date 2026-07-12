@@ -5,6 +5,8 @@ use warnings;
 use 5.010001;
 use PDF::Make ();  # XS supplies _verify, _count, _sign_doc and the SigningIdentity / Certificate accessors
 
+=encoding utf8
+
 =head1 NAME
 
 PDF::Make::Signature - Digital signature support for PDF documents

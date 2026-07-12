@@ -115,23 +115,45 @@ sub _where_field_PRIOR {
   return ($sql, @bind);
 }
 
+
+my %PSEUDO_COLUMNS = map { $_ => 1 } qw(
+  LEVEL
+  ROWNUM
+  ROWID
+  CONNECT_BY_ISCYCLE
+  CONNECT_BY_ISLEAF
+);
+
+sub _pseudo_columns { \%PSEUDO_COLUMNS }
+
 sub _quote {
   my ($self, $label) = @_;
 
   return '' unless defined $label;
   return ${$label} if ref($label) eq 'SCALAR';
 
-  # SQL::Abstract v2 hands qualified identifiers to _render_ident as an arrayref
-  # of already-split segments, so the string regex below never sees them and the
-  # WHERE/HAVING column qualifiers bypass Oracle identifier shortening while the
-  # SELECT/FROM string path shortens them. Shorten each over-long segment here
-  # too, with the same keyword-less _shorten_identifier call so both paths emit
-  # the identical short name.
+  # Oracle pseudo-columns (LEVEL, ROWNUM, ...) are not real identifiers and must
+  # never be wrapped in quote_char -- "LEVEL" => ORA-00904. They arrive here both
+  # as a bare string (string render path) and as a single-segment arrayref (the
+  # SQL::Abstract v2 already-split identifier path, e.g. from order_by); catch
+  # both and emit the bare keyword.
   if (ref $label eq 'ARRAY') {
+    return $label->[0]
+      if @$label == 1 and defined $label->[0] and !ref $label->[0]
+        and $PSEUDO_COLUMNS{ uc $label->[0] };
+
+    # SQL::Abstract v2 hands qualified identifiers to _render_ident as an arrayref
+    # of already-split segments, so the string regex below never sees them and the
+    # WHERE/HAVING column qualifiers bypass Oracle identifier shortening while the
+    # SELECT/FROM string path shortens them. Shorten each over-long segment here
+    # too, with the same keyword-less _shorten_identifier call so both paths emit
+    # the identical short name.
     return $self->next::method([
       map { (defined and !ref and length > 30) ? $self->_shorten_identifier($_) : $_ } @$label
     ]);
   }
+
+  return $label if $PSEUDO_COLUMNS{ uc $label };
 
   $label =~ s/ ( [^\.]{31,} ) /$self->_shorten_identifier($1)/gxe;
 
@@ -215,7 +237,7 @@ DBIO::Oracle::SQLMaker - Oracle-specific SQL generation for DBIO
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 
@@ -247,6 +269,19 @@ Used automatically by L<DBIO::Oracle::Storage>.
 Oracle has no native C<LIMIT> keyword. Wrap the statement in a C<ROWNUM>
 subquery via the inherited C<_RowNum> dialect instead of the base
 C<LIMIT ?> syntax.
+
+=head2 _pseudo_columns
+
+    if ($sql_maker->_pseudo_columns->{ uc $name }) { ... }
+
+Returns a hashref whose keys are the Oracle hierarchical/row pseudo-columns
+(C<LEVEL>, C<ROWNUM>, C<ROWID>, C<CONNECT_BY_ISCYCLE>, C<CONNECT_BY_ISLEAF>)
+that must never be quoted. These are not real identifiers: quoting them yields
+e.g. C<"LEVEL"> which Oracle rejects with C<ORA-00904: invalid identifier>.
+C<_quote> consults this set and returns such a label verbatim.
+
+C<CONNECT_BY_ROOT> is a prefix operator, not a standalone identifier, so it
+never reaches C<_quote> on its own and is intentionally absent.
 
 =head2 _shorten_identifier
 

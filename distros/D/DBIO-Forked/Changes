@@ -1,0 +1,64 @@
+Revision history for DBIO-Forked
+
+0.900001  2026-07-12
+    First release. The dependency-free, fork-based async layer for DBIO
+    drivers: a generic async-storage backend that makes ANY sync DBIO
+    driver async by running each query in a forked child that speaks the
+    ordinary sync driver, with results streamed back over a pipe. It needs
+    no async-capable DB client and no event loop -- only core Perl (fork,
+    pipe, Storable, IO::Select, POSIX) plus DBIO core. A sibling of
+    DBIO::Async on the same layer: both satisfy the core
+    DBIO::Storage::Async contract, but DBIO::Forked targets the drivers
+    that will never get a native async client (Oracle, SQLite, DB2,
+    Sybase, ...).
+
+    * Storage
+        - DBIO::Forked::Storage subclasses core DBIO::Storage::Async and
+          activates per connection via connect(..., { async => 'forked' }),
+          registered on core through register_async_mode -- not a
+          class-level backend declaration. _run_forked forks per query;
+          the child runs the inherited sync storage's ordinary CRUD (its
+          _verify_pid fork handling reconnects fresh, so no SQL is
+          rebuilt and no connect_info is replayed), Storable-freezes the
+          rows over a pipe, and _exits. select/select_single child
+          results are reshaped to the async backend contract (raw row
+          arrayrefs / a single arrayref) so real ResultSet/Row async
+          (all_async/first_async/etc.) gets the right shape; insert_async
+          resolves the returned-columns hashref.
+        - txn_do_async routes the whole transaction through one forked
+          child: the body closure is fork-inherited, so BEGIN / body /
+          COMMIT|ROLLBACK all run on the child's freshly-reconnected sync
+          connection. Two caller limits, documented and tested: the
+          body's return value must be Storable-serializable (a live
+          Row/ResultSet fails loud as a failed Future via
+          _serialization_error, never a corrupt blob), and the body must
+          be sync-only (a nested *_async call inside it would re-fork).
+
+    * Future
+        - DBIO::Forked::Future, a loop-free Future over a pipe read fd
+          (is_ready peeks non-blocking, get blocks then Storable-thaws and
+          reaps the child, zombie-free). Carries the full future_class
+          surface core's ResultSet-async helpers call: done/fail/
+          needs_all class constructors plus and_then -- a drop-in for
+          DBIO::Future::Immediate, not just the minimal DBIO::Future
+          contract. needs_all blocks serially on the already-parallel
+          forked children (wall time = slowest child); get is
+          wantarray-aware (scalar context returns the first value).
+
+    * Tests
+        - Permanent integration test t/05-sqlite-live.t proves Forked
+          end-to-end over a real dbio-sqlite + DBD::SQLite file-backed
+          database: the txn body runs in a real fork (child pid != parent
+          pid), the child's committed insert is visible in the parent via
+          the shared file DB, needs_all collects parallel forked reads,
+          and no zombies remain. Skips cleanly when DBD::SQLite /
+          dbio-sqlite are absent, preserving the dependency-free default
+          suite.
+
+    * Dependencies
+        - Dependency-free by design: only core Perl (fork, pipe,
+          Storable, IO::Select, POSIX) plus DBIO core -- no Future /
+          Future::IO / event-loop dependency, unlike DBIO::Async.
+          DBIO::SQLite is a test-only recommends for the live integration
+          test (DBD::SQLite comes in transitively as its own hard
+          dependency, so it is not declared separately here).

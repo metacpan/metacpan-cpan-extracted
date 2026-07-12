@@ -70,7 +70,7 @@
 
 /* parse optional trailing "wrap => [Wx, Wy(, Wz)]" and "sphere => R" args;
    returns world pointer (or NULL) and sets *sphere if a sphere radius is given */
-static const double *sph_parse_opts(pTHX_ SV **sp, int first, int items, double world[3], double *sphere, const char *who) {
+static const double *sph_parse_opts(pTHX_ SV **sp, int first, int items, double world[3], double *sphere, mode_t *mode, const char *who) {
     const double *wp = NULL;
     if ((items - first) % 2 != 0) croak("%s: odd number of option arguments", who);
     for (int ai = first; ai + 1 < items; ai += 2) {
@@ -88,6 +88,10 @@ static const double *sph_parse_opts(pTHX_ SV **sp, int first, int items, double 
         } else if (strcmp(key, "sphere") == 0) {
             *sphere = (double)SvNV(sp[ai + 1]);
             if (!(*sphere > 0.0) || !isfinite(*sphere)) croak("%s: sphere radius must be finite and > 0", who);
+        } else if (strcmp(key, "mode") == 0) {
+            /* opt-in file permission bits for a path-backed create (default 0600);
+               ignored by new_memfd (mode == NULL) since a memfd has no path mode */
+            if (mode) *mode = (mode_t)SvUV(sp[ai + 1]);
         } else {
             croak("%s: unknown option '%s'", who, key);
         }
@@ -111,13 +115,14 @@ new(class, path, max_entries, num_buckets, cell_size, ...)
     double world[3] = {0,0,0};
     double sphere_radius = 0;
   CODE:
-    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (max_entries > UINT32_MAX || num_buckets > UINT32_MAX)
         croak("Data::SpatialHash::Shared->new: max_entries/num_buckets exceed 2^32");
+    mode_t mode = 0600;
     const double *worldp = sph_parse_opts(aTHX_ &ST(0), 5, items, world, &sphere_radius,
-                                          "Data::SpatialHash::Shared->new");
+                                          &mode, "Data::SpatialHash::Shared->new");
     SpatialHandle *h = sph_create(p, (uint32_t)max_entries, (uint32_t)num_buckets,
-                                  (double)cell_size, worldp, sphere_radius, errbuf);
+                                  (double)cell_size, worldp, sphere_radius, mode, errbuf);
     if (!h) croak("Data::SpatialHash::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -138,7 +143,7 @@ new_memfd(class, name, max_entries, num_buckets, cell_size, ...)
     if (max_entries > UINT32_MAX || num_buckets > UINT32_MAX)
         croak("Data::SpatialHash::Shared->new_memfd: max_entries/num_buckets exceed 2^32");
     const double *worldp = sph_parse_opts(aTHX_ &ST(0), 5, items, world, &sphere_radius,
-                                          "Data::SpatialHash::Shared->new_memfd");
+                                          NULL, "Data::SpatialHash::Shared->new_memfd");
     SpatialHandle *h = sph_create_memfd(name, (uint32_t)max_entries, (uint32_t)num_buckets,
                                         (double)cell_size, worldp, sphere_radius, errbuf);
     if (!h) croak("Data::SpatialHash::Shared->new_memfd: %s", errbuf);

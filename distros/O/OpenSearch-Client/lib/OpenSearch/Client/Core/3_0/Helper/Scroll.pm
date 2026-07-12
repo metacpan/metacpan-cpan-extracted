@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Helper::Scroll;
-$OpenSearch::Client::Core::3_0::Helper::Scroll::VERSION = '3.007006';
+$OpenSearch::Client::Core::3_0::Helper::Scroll::VERSION = '3.007007';
 use Moo;
 use OpenSearch::Client::Util qw(parse_params throw);
 use namespace::clean;
@@ -147,7 +147,7 @@ OpenSearch::Client::Core::3_0::Helper::Scroll - A helper module for scrolled sea
 
 =head1 VERSION
 
-version 3.007006
+version 3.007007
 
 =head1 SYNOPSIS
 
@@ -177,14 +177,14 @@ until there are no more matching results, much like a cursor in an SQL
 database.
 
 Unlike paginating through results (with the C<from> parameter in
-L<search()|OpenSearch::Client::Core::3_0::Direct/#search>),
+L<search()|OpenSearch::Client::Core::3_0::Direct#search>),
 scrolled searches take a snapshot of the current state of the index. Even
 if you keep adding new documents to the index or updating existing documents,
 a scrolled search will only see the index as it was when the search began.
 
 This module is a helper utility that wraps the functionality of the
-L<search()|OpenSearch::Client::Core::3_0::Direct/#search> and
-L<scroll()|OpenSearch::Client::Core::3_0::Direct/#scroll> methods to make
+L<search()|OpenSearch::Client::Core::3_0::Direct#search> and
+L<scroll()|OpenSearch::Client::Core::3_0::Direct#scroll> methods to make
 them easier to use.
 
 This class does L<OpenSearch::Client::Core::3_0::Role::Scroll> and
@@ -250,7 +250,7 @@ C<client_id>:
 
 Very often the I<something> that you will want to do with these results
 involves bulk-indexing them into a new index. The easiest way to
-do this is to use the built-in L<OpenSearch::Client::Core::3_0::Direct/#reindex>
+do this is to use the built-in L<OpenSearch::Client::Core::3_0::Direct#reindex>
 functionality provided by OpenSearch.
 
 =head1 METHODS
@@ -265,12 +265,12 @@ functionality provided by OpenSearch.
         %search_params
     );
 
-The L<OpenSearch::Client::Core::3_0::Direct/#scroll_helper> method loads
+The L<OpenSearch::Client::Core::3_0::Direct#scroll_helper> method loads
 L<OpenSearch::Client::Core::3_0::Scroll> class and calls L</new()>,
 passing in any arguments.
 
 You can specify a C<scroll> duration (which defaults to C<"1m">).
-Any other parameters are passed directly to L<OpenSearch::Client::Core::3_0::Direct/#search>.
+Any other parameters are passed directly to L<OpenSearch::Client::Core::3_0::Direct#search>.
 
 The C<scroll> duration tells OpenSearch how long it should keep the scroll
 alive.  B<Note>: this duration doesn't need to be long enough to process
@@ -279,7 +279,7 @@ The expiry gets renewed for another C<scroll> period every time new
 a new batch of results is retrieved from the cluster.
 
 By default, the C<scroll_id> is passed as the C<body> to the
-L<scroll|OpenSearch::Client::Core::3_0::Direct/#scroll> request.
+L<scroll|OpenSearch::Client::Core::3_0::Direct#scroll> request.
 
 =head2 C<next()>
 
@@ -365,11 +365,11 @@ How long the original search plus all subsequent batches took, in milliseconds.
 
 =over
 
-=item * L<OpenSearch::Client::Core::3_0::Direct/#search>
+=item * L<OpenSearch::Client::Core::3_0::Direct#search>
 
-=item * L<OpenSearch::Client::Core::3_0::Direct/#scroll>
+=item * L<OpenSearch::Client::Core::3_0::Direct#scroll>
 
-=item * L<OpenSearch::Client::Core::3_0::Direct/#reindex>
+=item * L<OpenSearch::Client::Core::3_0::Direct#reindex>
 
 =back
 

@@ -48,7 +48,7 @@ DBIO::DB2::Introspect::Tables - Introspect DB2 tables and views
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

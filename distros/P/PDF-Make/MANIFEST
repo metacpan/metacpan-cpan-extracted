@@ -89,7 +89,6 @@ include/pdfmake_watermark.h
 include/pdfmake_writer.h
 include/pdfmake_x509.h
 include/xop_compat.h
-Install/Files.pm
 lib/PDF/Make.pm
 lib/PDF/Make/Action.pm
 lib/PDF/Make/Arena.pm

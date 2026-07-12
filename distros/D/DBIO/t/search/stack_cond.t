@@ -72,20 +72,20 @@ for my $c (
   is_same_sql_bind (
     $rs->as_query,
     "(
-      SELECT me.title
-        FROM cd me
+      SELECT \"me\".\"title\"
+        FROM cd \"me\"
       WHERE
-        ( genreid != 42 OR genreid IS NULL )
+        ( \"genreid\" != 42 OR \"genreid\" IS NULL )
           AND
-        ( genreid != 42 OR genreid IS NULL )
+        ( \"genreid\" != 42 OR \"genreid\" IS NULL )
           AND
-        title != bar
+        \"title\" != bar
           AND
-        title $c->{sql}
+        \"title\" $c->{sql}
           AND
-        year != ?
+        \"year\" != ?
           AND
-        year $c->{sql}
+        \"year\" $c->{sql}
     )",
     \@bind,
     'Double condition correctly collapsed for steps' . Dumper \@query_steps,

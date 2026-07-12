@@ -9,6 +9,8 @@ include/slug_utf8.h
 lib/Slug.pm
 Makefile.PL
 MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 ppport.h
 README
 Slug.xs
@@ -23,6 +25,3 @@ t/07-slug-custom.t
 t/08-utf8.t
 xt/01-pod.t
 xt/boilerplate.t
-xt/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

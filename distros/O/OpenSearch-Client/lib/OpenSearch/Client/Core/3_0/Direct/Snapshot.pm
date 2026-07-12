@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Snapshot;
-$OpenSearch::Client::Core::3_0::Direct::Snapshot::VERSION = '3.007006';
+$OpenSearch::Client::Core::3_0::Direct::Snapshot::VERSION = '3.007007';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Snapshot>
 
 =head1 VERSION
 
-version 3.007006
+version 3.007007
 
 =head1 SYNOPSIS
 

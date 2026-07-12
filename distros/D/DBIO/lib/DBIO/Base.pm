@@ -11,7 +11,6 @@ use DBIO::Optional::Dependencies;
 
 use base qw/DBIO::Componentised Class::Accessor::Grouped/;
 use Scalar::Util ();
-use DBIO::StartupCheck;
 use DBIO::Exception;
 
 my $successfully_loaded_components;
@@ -85,7 +84,7 @@ DBIO::Base - Meta-infrastructure base for all DBIO internal classes
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

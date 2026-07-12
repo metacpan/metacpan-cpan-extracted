@@ -13,7 +13,7 @@ DBIO::Manual::ResultClass - Representing a single result (row) from a DB query
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -43,6 +43,8 @@ version 0.900000
 
   __PACKAGE__->set_primary_key('id');
   __PACKAGE__->add_unique_constraint(u_title => ['cd_id', 'title']);
+
+See F<t/53-test-schema-fixtures.t> for a runnable example.
 
 =head1 DESCRIPTION
 

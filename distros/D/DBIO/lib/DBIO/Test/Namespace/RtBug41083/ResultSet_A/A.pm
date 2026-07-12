@@ -19,7 +19,7 @@ DBIO::Test::Namespace::RtBug41083::ResultSet_A::A - Test fixture for namespace r
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

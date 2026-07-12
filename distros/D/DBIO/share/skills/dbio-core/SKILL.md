@@ -65,6 +65,11 @@ ResultSet chaining: `$schema->resultset('User')->search({active=>1})->search({ro
   BEGIN { eval { require Moo; 1 } or plan skip_all => 'Moo not installed' }
   ```
   List in cpanfile as `suggests`, never `requires`
+- **Mock storage cursor invariant (karr #55)**: the fake cursor's
+  captured SQL must equal the SQL a real cursor would have executed.
+  Any new test infra on the fake storage must route through
+  `$storage->_select_args` to apply join pruning and complex-prefetch
+  rewriting. The diff between fake-captured and as_query is a bug.
 
 ## Shared Schemas
 
@@ -137,3 +142,56 @@ Storage detects broker via `_is_access_broker_connect_info([$broker])` → true 
 - Pure-Perl style baseline → [[dbio-perl-syntax]]
 - Drivers: Moo (PostgreSQL) or Moose (Replicated) — match existing driver
 - `DBIO::Moo`/`DBIO::Moose` = optional bridges (`suggests`), FOREIGNBUILDARGS + lazy rules → [[dbio-moo-moose]]
+
+## Driver contract versioning (ADR 0024)
+
+The five base classes out-of-tree drivers subclass carry
+`$CONTRACT_VERSION` and a `contract_version()` accessor:
+
+- `DBIO::Introspect::Base`
+- `DBIO::Diff::Base`
+- `DBIO::Deploy::Base`
+- `DBIO::SQLMaker`
+- `DBIO::Storage::DBI::Capabilities`
+
+The contract version advances only when the public shape changes in a
+way drivers can observe (new method, new capability, signature change).
+Current contract: 1.1 (post F02/F10/F12). Tripwire:
+`t/test/12_contract_version.t`.
+
+Drivers record what they were tested against and warn / strict-fail at
+load time when it drifts:
+
+```perl
+our $TESTED_AGAINST_CONTRACT = '1.1';
+if (DBIO::Storage::DBI::Capabilities->contract_version
+    ne $TESTED_AGAINST_CONTRACT) {
+    warnings::warn "DBIO contract drift: wrote against 1.1, core now "
+                 . "ships " . DBIO::Storage::DBI::Capabilities->contract_version;
+}
+```
+
+## DDL transactional safety + IF EXISTS (ADR 0026)
+
+Two capabilities on `DBIO::Storage::DBI::Capabilities`, both default 0
+(conservative):
+
+- `transactional_ddl` — `__PACKAGE__->_use_transactional_ddl(1)` to opt
+  in. Only true for engines where DDL is honoured inside a transaction
+  (Pg yes, MySQL pre-8.0 / Oracle / DB2 / Sybase / Informix no, SQLite
+  explicitly NO — rebuild path needs `AutoCommit=on`).
+- `supports_if_exists` — `__PACKAGE__->_use_supports_if_exists(1)` to
+  opt in. Engines that parse `DROP TABLE IF EXISTS` etc.
+
+Deploy/Base and DeploymentHandler probe the capability before wrapping
+DDL in `$storage->txn_do`. A driver that does not opt in is treated
+as non-transactional. For diff renderers: `Diff::Op::should_emit_if_exists($storage)`
+is the single emit site — never reintroduce driver-name string matches.
+
+## Trace redaction (ADR 0025)
+
+`redact_bind_value` is a class-level hook on `DBIO::Storage::DBI` that
+the trace formatter consults for every bind value, before the value
+lands in the trace stream. Display-only — the bind value going to
+`$dbh->execute(@bind)` is untouched. Identity default (no change unless
+installed).

@@ -11,6 +11,7 @@ use base qw/
 use mro 'c3';
 
 use DBIO::Carp;
+use version ();
 use namespace::clean;
 
 
@@ -55,15 +56,23 @@ sub _init {
   # - no sth caching
   #
   # warn about the fact as well, do not provide a mechanism to shut it up
-  if ($self->_using_freetds and (my $ver = $self->_using_freetds_version||999) > 0.82) {
-    carp_once(
-      "Your DBD::Sybase was compiled against buggy FreeTDS version $ver. "
-    . 'Statement caching does not work and will be disabled.'
-    );
+  #
+  # Parse as a dotted version so modern FreeTDS strings like "1.3.17" are not
+  # coerced to a number (which truncates at the second dot and warns "isn't
+  # numeric"). An undeterminable version (0/undef) keeps the historic 999
+  # sentinel so it is still treated as a new/buggy build.
+  if ($self->_using_freetds) {
+    my $ver = $self->_using_freetds_version || 999;
+    if (version->parse("v$ver") > version->parse('v0.82')) {
+      carp_once(
+        "Your DBD::Sybase was compiled against buggy FreeTDS version $ver. "
+      . 'Statement caching does not work and will be disabled.'
+      );
 
-    $self->_identity_method('@@identity');
-    $self->_no_scope_identity_query(1);
-    $self->disable_sth_caching(1);
+      $self->_identity_method('@@identity');
+      $self->_no_scope_identity_query(1);
+      $self->disable_sth_caching(1);
+    }
   }
 }
 
@@ -120,7 +129,7 @@ DBIO::MSSQL::Storage::Sybase - Support for Microsoft SQL Server via DBD::Sybase
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 DESCRIPTION
 

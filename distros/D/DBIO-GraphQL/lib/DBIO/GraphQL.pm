@@ -1,6 +1,6 @@
 package DBIO::GraphQL;
 # ABSTRACT: Auto-generate a GraphQL schema from a DBIO schema
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 use strict;
 use warnings;
 
@@ -263,9 +263,14 @@ sub _apply_pagination {
 
   my $order_by = $args->{orderBy};
   if ($order_by && $order_by->{field}) {
+    my $field = $order_by->{field};
+    unless ($source->has_column($field)) {
+      die "DBIO::GraphQL: unknown order column '$field' on source '"
+        . $source->source_name . "'\n";
+    }
     my $dir = lc($order_by->{direction} // 'ASC');
     $rs = $rs->search(undef, {
-      order_by => { "-$dir" => $order_by->{field} }
+      order_by => { "-$dir" => $field }
     });
   }
   else {
@@ -340,7 +345,7 @@ DBIO::GraphQL - Auto-generate a GraphQL schema from a DBIO schema
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

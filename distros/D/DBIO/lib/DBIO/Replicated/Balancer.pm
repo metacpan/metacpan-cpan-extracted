@@ -112,6 +112,39 @@ sub columns_info_for {
   return $self->current_replicant->columns_info_for(@_);
 }
 
+sub _select {
+  my $self = shift;
+  my @args = @_;
+
+  if (ref($args[-1]) eq 'HASH' && (my $forced_pool = $args[-1]->{force_pool})) {
+    delete $args[-1]->{force_pool};
+    return $self->_get_forced_pool($forced_pool)->_select(@args);
+  }
+  elsif ($self->master->transaction_depth) {
+    return $self->master->_select(@args);
+  }
+
+  $self->increment_storage;
+  return $self->current_replicant->_select(@args);
+}
+
+sub _dbh_columns_info_for {
+  my ($self, $dbh, $table) = @_;
+
+  # Like select/select_single, route to master when inside a transaction so
+  # we read the data the current transaction can actually see.
+  # _dbh_columns_info_for is provided by base Storage::DBI with a fixed
+  # ($self, $dbh, $table) signature, so it cannot honour force_pool like
+  # select/select_single do; callers who need force_pool routing must drop
+  # down to columns_info_for instead.
+  if ($self->master->transaction_depth) {
+    return $self->master->_dbh_columns_info_for($dbh, $table);
+  }
+
+  $self->increment_storage;
+  return $self->current_replicant->_dbh_columns_info_for($dbh, $table);
+}
+
 sub _get_forced_pool {
   my ($self, $forced_pool) = @_;
 
@@ -142,7 +175,7 @@ DBIO::Replicated::Balancer - Base class for replicated read balancing
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 

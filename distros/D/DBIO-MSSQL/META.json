@@ -27,10 +27,10 @@
       },
       "runtime" : {
          "recommends" : {
-            "DBIO::Sybase" : "0.900000"
+            "DBIO::Sybase" : "0.900001"
          },
          "requires" : {
-            "DBIO" : "0.900000",
+            "DBIO" : "0.900001",
             "perl" : "5.020"
          }
       },
@@ -43,91 +43,95 @@
    "provides" : {
       "DBIO::MSSQL" : {
          "file" : "lib/DBIO/MSSQL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Adapter" : {
          "file" : "lib/DBIO/MSSQL/Adapter.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::DDL" : {
          "file" : "lib/DBIO/MSSQL/DDL.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Deploy" : {
          "file" : "lib/DBIO/MSSQL/Deploy.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Diff" : {
          "file" : "lib/DBIO/MSSQL/Diff.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Diff::Column" : {
          "file" : "lib/DBIO/MSSQL/Diff/Column.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Diff::ForeignKey" : {
          "file" : "lib/DBIO/MSSQL/Diff/ForeignKey.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Diff::Index" : {
          "file" : "lib/DBIO/MSSQL/Diff/Index.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Diff::Table" : {
          "file" : "lib/DBIO/MSSQL/Diff/Table.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Introspect" : {
          "file" : "lib/DBIO/MSSQL/Introspect.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Introspect::Columns" : {
          "file" : "lib/DBIO/MSSQL/Introspect/Columns.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Introspect::ForeignKeys" : {
          "file" : "lib/DBIO/MSSQL/Introspect/ForeignKeys.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Introspect::Indexes" : {
          "file" : "lib/DBIO/MSSQL/Introspect/Indexes.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Introspect::Tables" : {
          "file" : "lib/DBIO/MSSQL/Introspect/Tables.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Result" : {
          "file" : "lib/DBIO/MSSQL/Result.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::SQLMaker" : {
          "file" : "lib/DBIO/MSSQL/SQLMaker.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Storage" : {
          "file" : "lib/DBIO/MSSQL/Storage.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Storage::DateTime::Format" : {
          "file" : "lib/DBIO/MSSQL/Storage/DateTime/Format.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
+      },
+      "DBIO::MSSQL::Storage::ODBC" : {
+         "file" : "lib/DBIO/MSSQL/Storage/ODBC.pm",
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Storage::Sybase" : {
          "file" : "lib/DBIO/MSSQL/Storage/Sybase.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Storage::Sybase::DateTime::Format" : {
          "file" : "lib/DBIO/MSSQL/Storage/Sybase/DateTime/Format.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::MSSQL::Storage::Sybase::NoBindVars" : {
          "file" : "lib/DBIO/MSSQL/Storage/Sybase/NoBindVars.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       },
       "DBIO::Shortcut::ms" : {
          "file" : "lib/DBIO/Shortcut/ms.pm",
-         "version" : "0.900000"
+         "version" : "0.900001"
       }
    },
    "release_status" : "stable",
@@ -142,7 +146,7 @@
          "web" : "https://codeberg.org/dbio/dbio-mssql"
       }
    },
-   "version" : "0.900000",
+   "version" : "0.900001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -318,7 +322,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900000",
+                  "tag" : "v0.900001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -480,6 +484,11 @@
             },
             "name" : "@DBIO/PodWeaver",
             "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",

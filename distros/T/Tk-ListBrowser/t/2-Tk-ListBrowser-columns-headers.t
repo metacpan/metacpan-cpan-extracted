@@ -61,10 +61,10 @@ if (defined $app) {
 #		-filterforce => 1,
 		-sortcase => 0,
 
-#		-marginleft => 80,
+		-marginleft => 80,
 #		-margintop => 80,
 #		-marginbottom => 80,
-#		-marginright => 80,
+		-marginright => 80,
 
 		-browsecmd => sub {
 			print "browsecmd ";

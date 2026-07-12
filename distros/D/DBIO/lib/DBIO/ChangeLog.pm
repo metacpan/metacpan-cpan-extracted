@@ -237,7 +237,7 @@ DBIO::ChangeLog - Row-level change tracking component
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 
@@ -252,6 +252,8 @@ version 0.900000
     password_hash => { data_type => 'varchar', size => 255, changelog => 0 },
   );
   __PACKAGE__->set_primary_key('id');
+
+See F<t/changelog/> for a runnable example.
 
 =head1 DESCRIPTION
 

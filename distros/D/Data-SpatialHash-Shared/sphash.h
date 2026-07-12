@@ -48,7 +48,9 @@
 #define SPH_VERSION      1
 #define SPH_NONE         UINT32_MAX
 #define SPH_ERR_BUFLEN   256
+#ifndef SPH_READER_SLOTS
 #define SPH_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
+#endif
 
 #define SPH_MAX_QUERY_CELLS (1u << 26)   /* ~67M cell ceiling per query; raise + rebuild if you genuinely need larger regions */
 /* query function return codes */
@@ -96,7 +98,10 @@ struct SphHeader {
     uint32_t rwlock;                  /* 72   */
     uint32_t rwlock_waiters;          /* 76   */
     uint32_t rwlock_writers_waiting;  /* 80   */
-    uint32_t _pad0;                   /* 84   */
+    uint32_t slotless_readers;        /* 84: live readers holding the lock with no reader-slot
+                                             (table full); keeps dead-reader recovery from
+                                             force-resetting under them. Was _pad0 (zeroed),
+                                             so existing images stay compatible. */
     uint64_t stat_ops;                /* 88   */
     double   world[3];                /* 96   toroidal wrap extents per axis (0 = no wrap) */
     uint32_t flags;                   /* 120  bit0 = SPH_FLAG_WRAP */
@@ -127,6 +132,7 @@ typedef struct SpatialHandle {
     uint32_t       my_slot_idx;  /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t       cached_pid;   /* getpid() cached at last slot claim */
     uint32_t       cached_fork_gen; /* sph_fork_gen value at last slot claim */
+    uint32_t       slotless_held; /* rwlock read-locks this handle holds without a reader-slot */
     double         world[3];        /* cached wrap extents (0 = no wrap on axis) */
     int64_t        wrap_cells[3];   /* ceil(world/cell) per axis, 0 = no wrap */
     int            wrap;            /* nonzero if any axis wraps */
@@ -273,6 +279,7 @@ static inline void sph_claim_reader_slot(SpatialHandle *h) {
     cur_gen = __atomic_load_n(&sph_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % SPH_READER_SLOTS;
@@ -384,19 +391,40 @@ static inline void sph_recover_dead_readers(SpatialHandle *h) {
      *       rwlock(0 -> 1) succeeds cleanly.
      * Only after the CAS resolves do we wipe the deferred dead slots,
      * keeping that work outside the race-sensitive window. */
+    /* A live reader with no slot (table was full) is invisible to the scan
+     * above but still holds a +1 in the lock word; never force-reset under it. */
+    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
+        any_live_reader = 1;
+
     if (found_dead_reader && !any_live_reader) {
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
+        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
+        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
         if (cur > 0 && cur < SPH_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
+            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
+            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
+            for (uint32_t i = 0; !live_now && i < SPH_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p && sph_pid_alive(p) &&
+                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
+                    live_now = 1;
+            }
+            if (live_now) {
+                drain_ok = 0;
+            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
                     0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
                 if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+            } else {
+                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
             }
         }
-        for (uint32_t i = 0; i < SPH_READER_SLOTS; i++) {
-            uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-            if (pid == 0 || sph_pid_alive(pid)) continue;
-            sph_drain_dead_slot(h, i, pid);
+        if (drain_ok) {
+            for (uint32_t i = 0; i < SPH_READER_SLOTS; i++) {
+                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (p == 0 || sph_pid_alive(p)) continue;
+                sph_drain_dead_slot(h, i, p);
+            }
         }
     }
 }
@@ -448,20 +476,40 @@ static inline void sph_unpark_writer(SpatialHandle *h) {
     }
 }
 
+/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
+ * recovery can see it. A slotted reader uses its slot subcount; a reader that
+ * could not claim a slot (table full) uses the global hdr->slotless_readers,
+ * so recovery's force-reset never fires out from under it. leave() peels
+ * slotless first so a later slot claim cannot misattribute the decrement. */
+static inline void sph_reader_enter(SpatialHandle *h) {
+    if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        h->slotless_held++;
+    }
+}
+static inline void sph_reader_leave(SpatialHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    }
+}
+
 static inline void sph_rwlock_rdlock(SpatialHandle *h) {
     sph_claim_reader_slot(h);
     SphHeader *hdr = h->hdr;
     uint32_t *lock = &hdr->rwlock;
     uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    /* Claim subcount BEFORE bumping the shared rwlock counter.  This way
-     * a concurrent writer-side recovery scan that sees our PID alive with
-     * subcount > 0 will (correctly) defer force-reset, even while we are
-     * still spinning trying to win the rwlock CAS.  Without this, a reader
-     * killed between rwlock CAS-success and subcount++ would let recovery
-     * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
-     * our eventual rdunlock dec. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    /* Mirror our reader contribution BEFORE bumping the shared rwlock counter,
+     * so a concurrent writer-side recovery scan that sees us (slotted PID with
+     * subcount > 0, or a nonzero slotless count) defers force-reset even while
+     * we are still spinning to win the rwlock CAS.  Without this a reader
+     * killed between rwlock CAS-success and this bump would let recovery
+     * force-reset rwlock to 0 underneath us, wrapping our eventual dec. */
+    sph_reader_enter(h);
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         /* Write-preferring: when lock is free (cur==0) and writers are
@@ -469,11 +517,11 @@ static inline void sph_rwlock_rdlock(SpatialHandle *h) {
          * already active (cur>=1), new readers may join freely. */
         if (cur > 0 && cur < SPH_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
                 return;
         }
         if (__builtin_expect(spin < SPH_RWLOCK_SPIN_LIMIT, 1)) {
@@ -506,8 +554,7 @@ static inline void sph_rwlock_rdunlock(SpatialHandle *h) {
      * window where we still own a unit of rwlock but our slot subcount is
      * 0, letting recovery force-reset rwlock underneath us. */
     uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+    sph_reader_leave(h);
     if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -854,9 +901,26 @@ static int sph_validate_create_args(uint32_t max_entries, uint32_t *num_buckets,
     return 1;
 }
 
+/* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
+ * default 0600), or attach an existing file (O_RDWR|O_NOFOLLOW, no O_CREAT). */
+static int sph_secure_open(const char *path, mode_t mode, char *errbuf) {
+    for (int attempt = 0; attempt < 100; attempt++) {
+        int fd = open(path, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, mode);
+        if (fd >= 0) { (void)fchmod(fd, mode); return fd; }   /* exact mode: umask narrowed the O_EXCL create */
+        if (errno != EEXIST) { SPH_ERR("create %s: %s", path, strerror(errno)); return -1; }
+        fd = open(path, O_RDWR|O_NOFOLLOW|O_CLOEXEC);
+        if (fd >= 0) return fd;
+        if (errno == ENOENT) continue;   /* creator unlinked between our two opens; retry */
+        SPH_ERR("open %s: %s", path, strerror(errno));  /* ELOOP => symlink rejected */
+        return -1;
+    }
+    SPH_ERR("open %s: create/attach kept racing", path);
+    return -1;
+}
+
 static SpatialHandle *sph_create(const char *path, uint32_t max_entries,
                                   uint32_t num_buckets, double cell_size,
-                                  const double *world, double sphere_radius, char *errbuf) {
+                                  const double *world, double sphere_radius, mode_t mode, char *errbuf) {
     if (!sph_validate_create_args(max_entries, &num_buckets, cell_size, world, sphere_radius, errbuf)) return NULL;
 
     uint64_t total = sph_total_size(max_entries, num_buckets);
@@ -870,8 +934,8 @@ static SpatialHandle *sph_create(const char *path, uint32_t max_entries,
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
         if (base == MAP_FAILED) { SPH_ERR("mmap: %s", strerror(errno)); return NULL; }
     } else {
-        fd = open(path, O_RDWR|O_CREAT, 0666);
-        if (fd < 0) { SPH_ERR("open: %s", strerror(errno)); return NULL; }
+        fd = sph_secure_open(path, mode, errbuf);
+        if (fd < 0) return NULL;
         if (flock(fd, LOCK_EX) < 0) { SPH_ERR("flock: %s", strerror(errno)); close(fd); return NULL; }
         struct stat st;
         if (fstat(fd, &st) < 0) { SPH_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
@@ -935,6 +999,15 @@ static SpatialHandle *sph_open_fd(int fd, char *errbuf) {
 
 static void sph_destroy(SpatialHandle *h) {
     if (!h) return;
+    /* Release our reader slot on clean teardown (else short-lived-reader churn
+     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+    if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
+        h->cached_fork_gen == __atomic_load_n(&sph_fork_gen, __ATOMIC_RELAXED) &&
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        uint32_t expected = h->cached_pid;
+        __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
+                &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    }
     if (h->notify_fd >= 0) close(h->notify_fd);
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->hdr) munmap(h->hdr, h->mmap_size);
@@ -981,6 +1054,10 @@ static inline int sph_is_live(const SpatialHandle *h, uint32_t idx) {
 static inline uint32_t sph_alloc_slot(SpatialHandle *h) {
     uint32_t idx = h->hdr->free_head;
     if (idx == SPH_NONE) return SPH_NONE;
+    /* free_head is read raw from the backing file; a tampered value would make
+     * the writes below land out of bounds (CWE-787). Reject an out-of-range
+     * head instead of allocating. */
+    if (idx >= h->hdr->max_entries) return SPH_NONE;
     h->hdr->free_head = h->entries[idx].next;       /* pop free-list */
     h->bitmap[idx / 64] |= (uint64_t)1 << (idx % 64);
     h->entries[idx].next = SPH_NONE;
@@ -1002,6 +1079,10 @@ static inline void sph_bucket_link(SpatialHandle *h, uint32_t idx) {
     int64_t cell[3]; sph_cell_of(h, h->entries[idx].pos, cell);
     uint32_t b = sph_bucket_of_cell(h, cell);
     uint32_t head = h->buckets[b];
+    /* head is read raw from the backing file; a tampered out-of-range value would
+     * make the entries[head].prev write below land out of bounds (CWE-787).
+     * Treat a corrupt head as an empty chain -- never taken for valid data. */
+    if (head != SPH_NONE && head >= h->hdr->max_entries) head = SPH_NONE;
     h->entries[idx].prev = SPH_NONE;
     h->entries[idx].next = head;
     if (head != SPH_NONE) h->entries[head].prev = idx;
@@ -1012,6 +1093,12 @@ static inline void sph_bucket_unlink(SpatialHandle *h, uint32_t idx) {
     int64_t cell[3]; sph_cell_of(h, h->entries[idx].pos, cell);
     uint32_t b = sph_bucket_of_cell(h, cell);
     uint32_t p = h->entries[idx].prev, n = h->entries[idx].next;
+    /* prev/next are read raw from the backing file; bound each before using it as
+     * an entries[] index so a tampered link cannot drive an OOB write (CWE-787).
+     * Out-of-range is treated as end-of-chain -- never taken for valid data. */
+    uint32_t me = h->hdr->max_entries;
+    if (p != SPH_NONE && p >= me) p = SPH_NONE;
+    if (n != SPH_NONE && n >= me) n = SPH_NONE;
     if (p != SPH_NONE) h->entries[p].next = n; else h->buckets[b] = n;
     if (n != SPH_NONE) h->entries[n].prev = p;
 }
@@ -1089,7 +1176,13 @@ static inline double sph_dist2(const SpatialHandle *h, const double a[3], const 
 static int sph_walk_cell(SpatialHandle *h, const int64_t C[3], sph_collect_t *out,
                          int (*accept)(const double pos[3], void *ctx), void *ctx) {
     uint32_t b = sph_bucket_of_cell(h, C);
+    uint32_t me = h->hdr->max_entries;
+    uint32_t steps = 0;
     for (uint32_t idx = h->buckets[b]; idx != SPH_NONE; idx = h->entries[idx].next) {
+        /* buckets[b] and each ->next are read raw from the backing file. Bound
+         * every index before dereferencing entries[idx] (CWE-125) and cap the
+         * walk at max_entries so a tampered ->next cycle cannot spin forever. */
+        if (idx >= me || steps++ >= me) break;
         int64_t ec[3]; sph_cell_of(h, h->entries[idx].pos, ec);
         if (!sph_cell_eq(ec, C)) continue;                 /* collision / dedup guard */
         if (accept && !accept(h->entries[idx].pos, ctx)) continue;
@@ -1204,8 +1297,14 @@ static int sph_cmp_d2(const void *a, const void *b) {
 static uint32_t sph_knn_walk(SpatialHandle *h, const int64_t C[3], const double c[3],
                              int dims, sph_cand_t *heap, uint32_t *n, uint32_t k) {
     uint32_t b = sph_bucket_of_cell(h, C);
+    uint32_t me = h->hdr->max_entries;
+    uint32_t steps = 0;
     uint32_t walked = 0;
     for (uint32_t idx = h->buckets[b]; idx != SPH_NONE; idx = h->entries[idx].next) {
+        /* buckets[b] and each ->next are read raw from the backing file. Bound
+         * every index before dereferencing entries[idx] (CWE-125) and cap the
+         * walk at max_entries so a tampered ->next cycle cannot spin forever. */
+        if (idx >= me || steps++ >= me) break;
         int64_t ec[3]; sph_cell_of(h, h->entries[idx].pos, ec);
         if (!sph_cell_eq(ec, C)) continue;
         walked++;
@@ -1358,7 +1457,11 @@ static int sph_pairs(SpatialHandle *h, double fixed_r, sph_pair_cb emit, void *c
                     int64_t C2 = (dims == 3) ? (h->wrap ? sph_wrap_cell(b2+i2, h->wrap_cells[2]) : b2+i2) : 0;
                     int64_t C[3] = { C0, C1, C2 };
                     uint32_t bkt = sph_bucket_of_cell(h, C);
+                    uint32_t steps = 0;
                     for (uint32_t idx = h->buckets[bkt]; idx != SPH_NONE; idx = h->entries[idx].next) {
+                        /* buckets[bkt] and ->next are raw from the backing file: bound the
+                         * index before deref (CWE-125) and cap the walk at max_entries. */
+                        if (idx >= me || steps++ >= me) break;
                         if (idx <= a) continue;                  /* unordered: emit each pair once */
                         int64_t ec[3]; sph_cell_of(h, h->entries[idx].pos, ec);
                         if (!sph_cell_eq(ec, C)) continue;       /* hash-collision guard */
@@ -1388,15 +1491,20 @@ static void sph_clear_locked(SpatialHandle *h) {
 static void sph_chain_stats(SpatialHandle *h, uint32_t *occupied, uint32_t *max_chain,
                             uint32_t *max_cell) {
     uint32_t occ = 0, mx = 0, mxc = 0, nb = h->hdr->num_buckets;
+    uint32_t me = h->hdr->max_entries;
     for (uint32_t b = 0; b < nb; b++) {
-        uint32_t len = 0;
+        uint32_t len = 0, steps = 0;
         for (uint32_t idx = h->buckets[b]; idx != SPH_NONE; idx = h->entries[idx].next) {
+            /* buckets[b] and ->next are raw from the backing file: bound before deref
+               (CWE-125) and cap the walk at max_entries against a tampered cycle. */
+            if (idx >= me || steps++ >= me) break;
             len++;
             /* per-cell occupancy: count chain entries sharing idx's cell (entries of
                one cell always hash to one bucket, so a cell is a subset of a chain) */
             int64_t ci[3]; sph_cell_of(h, h->entries[idx].pos, ci);
-            uint32_t cc = 0;
+            uint32_t cc = 0, jsteps = 0;
             for (uint32_t j = h->buckets[b]; j != SPH_NONE; j = h->entries[j].next) {
+                if (j >= me || jsteps++ >= me) break;
                 int64_t cj[3]; sph_cell_of(h, h->entries[j].pos, cj);
                 if (sph_cell_eq(ci, cj)) cc++;
             }

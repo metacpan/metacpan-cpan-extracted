@@ -46,7 +46,7 @@ DBIO::Test::Schema::ArtistGUID - Test result class for the artist_guid table (UN
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 AUTHOR
 
