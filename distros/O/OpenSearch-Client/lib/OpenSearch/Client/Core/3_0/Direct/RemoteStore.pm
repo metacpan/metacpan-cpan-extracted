@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::RemoteStore;
-$OpenSearch::Client::Core::3_0::Direct::RemoteStore::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::RemoteStore::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::RemoteStore>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_remotestore/_restore>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->remote_store->restore(
         
         'body'                     =>  $body,      # optional
@@ -99,6 +102,19 @@ C<POST /_remotestore/_restore>
     );
 
 L<OpenSearch documentation for remote_store-E<gt>restore|https://opensearch.org/docs/latest/opensearch/remote/#restoring-from-a-backup>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->remote_store->method_supported_in_version(
+        method  => 'restore',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

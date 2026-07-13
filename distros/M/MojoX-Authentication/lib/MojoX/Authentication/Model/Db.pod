@@ -1,0 +1,142 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::Db
+
+
+=head1 SYNOPSIS
+
+   use MojoX::Authentication::Model::Db;
+
+
+=head1 DESCRIPTION
+
+This class is not supposed to be used directly but through
+L<MojoX::Authentication::Model> instead.
+
+This class composes role L<MojoX::Authentication::Model::Role::Local>
+and inherits its methods.
+
+=head1 INTERFACE
+
+=head2 B<< column_remaps >>
+
+   my $aref = $self->column_remaps;
+
+=head2 B<< create >>
+
+my $instance = MojoX::Authentication::Model::Db->new(
+      $config, %args);
+
+Constructor. 
+
+Can receive the configuration either from a more "generic" C<$config>
+hash as well as direct named arguments.
+
+First a name is determined, either from C<$args{name}> or C<hashy> by
+default. Then C<$config> is looked at for a corresponding value, which
+is either expected to be missing/C<undef> or be a hash reference. In
+case a hash reference is found, its pairs override those on C<%args>,
+with the only exception of the key C<name> which is preserved if already
+present or set to the default otherwise.
+
+If the C<wmdb> key is present, a new instance of the class is created and
+returned. Otherwise, the method returns C<undef>.
+
+Also accepts parameters for the following accessors: L</name> (only from
+C<%args>, see above), L</table>, L</column_remaps>, L</crypt_passphrase>
+(inherited from role L<MojoX::Authentication::Model::Role::Local>),
+L</remaps>, and L</username_column>.
+
+
+=head2 B<< load_user >>
+
+   my $user = $provider->load_user($ignored, $uid);
+
+Load the user by its userid, compatibly with
+L<mojolicious::plugin::authentication>'s interface for loading users.
+the first parameter (which is supposed to be a controller instance) is
+ignored.
+
+See L</id_column>.
+
+=head2 B<< load_user_by_name >>
+
+   my $user = $provider->load_user_by_name($ignored, $username);
+
+Load the user by its username, according to L</name_column>.
+
+=head2 B<< name >>
+
+   my $name = $provider->name;
+
+Name assigned to the provider (e.g. if you want to use different
+databases at the same time and hence want to instantiate this class
+multiple times).
+
+=head2 B<< remaps >>
+
+   my $aref = $provider->remaps;
+
+Accessor for the list of remaps, handled by
+L<MojoX::Authentication::Model::Role::Remap>.
+
+Make sure that the mapping contains a way to map the column containing
+the secret to check in correspondence of key C<secret>, otherwise
+L<MojoX::Authentication::Model::Role::Local> will fail to check secrets.
+
+=head2 B<< save_user >>
+
+   $provider->save_user($user);    # OR
+   $provider->save_user($user, $is_secret_cleartext);
+
+Save a user.
+
+The input C<$user> is supposed to be a hash reference with I<at least>
+keys C<name> (for the username/userid) and C<secret> (for the secret).
+it <MAY> contain other key/value pairs, which will be copied.
+
+The C<secret> is supposed to be already hashed. It is possible to set
+the optional additional parameter C<$is_secret_cleartext> to a true
+value to indicate that the hashing should be done by the function before
+saving the user.
+
+=head2 B<< table >>
+
+   my $string = $provider->table;
+
+Returns the name of the table where user accounts are kept. Defaults to
+C<accounts>.
+
+The names of the columns with I<interesting> values are accessible
+through L</id_column>, L</name_column> and L</secret_column>.
+
+=head2 B<< username_column >>
+
+   my $string = $provider->name_column;
+
+Returns the name of the column where the username is kept. Defaults to
+C<name>.
+
+See also L</table>.
+
+=head2 B<< wmdb >>
+
+   my $wmdb = $provider->wmdb;
+
+Accessor to the L<MojoX::MojoDbWrap> object wrapping the relevant
+database access object (most probably an object of either
+L<Mojo::SQLite> or L<Mojo::Pg> class).
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

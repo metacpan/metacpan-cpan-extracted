@@ -12,13 +12,16 @@ use File::Spec;
 
 use Moo;
 
-our $VERSION = '1.24';
+our $VERSION = '1.26';
 
 # ------------------------------------------------
 
 sub build_html
 {
-	my($self, $pad)	= @_;
+	my($self, $pad) = @_;
+
+	$self -> logger -> debug("Entered HTML.build_html()");
+
 	my($header)		= $self -> load_template('header', $pad);
 	my($body)		= $self -> load_template('body', $pad);
 	my($footer)		= $self -> load_template('footer', $pad);
@@ -34,6 +37,8 @@ sub build_html
 	# Special case. See Database.pm's build_pad().
 
 	$header =~ s/!packages_id!/$$pad{packages_id}/;
+
+	$self -> logger -> debug("Leaving HTML.build_html()");
 
 	return ($header, $body, $footer);
 

@@ -1,0 +1,58 @@
+% layout 'main';
+% title l 'Server Error';
+<style>
+  .error-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+  }
+  .error-box {
+    text-align: center;
+    padding: 48px 40px;
+    max-width: 480px;
+  }
+  .error-code {
+    font-size: 6rem;
+    font-weight: 700;
+    letter-spacing: -2px;
+    color: #ef4444;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .error-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1e2937;
+    margin-bottom: 16px;
+  }
+  .error-message {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .home-link {
+    display: inline-block;
+    padding: 10px 28px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #0ea5e9;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .home-link:hover {
+    background: rgba(14, 165, 233, 0.06);
+    border-color: #0ea5e9;
+  }
+</style>
+<div class="error-page">
+  <div class="error-box">
+    <div class="error-code">500</div>
+    <div class="error-title"><%= l 'Internal Server Error' %></div>
+    <div class="error-message"><%= l 'Something went wrong on our side. Please try again later.' %></div>
+    <a href="/" class="home-link"><%= l 'Go Home' %></a>
+  </div>
+</div>

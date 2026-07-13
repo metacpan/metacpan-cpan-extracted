@@ -20,10 +20,10 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.30';
+$VERSIONE = '0.30.1';
 $VERSIONE = $VERSIONE;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -143,7 +143,7 @@ for my $target (@ARGV) {
     elsif ($target eq 'dist') {
 
         # your PAUSE ID here
-        my $author = q{ina <ina@cpan.org>};
+        my $author = q{ina <ina.cpan@gmail.com>};
 
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
@@ -896,23 +896,22 @@ TO_CONTRIBUTE
         open(FH_SECURITY,'>SECURITY.md') || die "Can't open file: SECURITY.md\n";
         binmode FH_SECURITY;
         print FH_SECURITY <<'TO_SECURITY';
-# Security Policy
+We're waiting for you in the mb distribution, with our hearts drumming.
 
-## Reporting a Vulnerability
+https://metacpan.org/dist/mb
 
-If you discover a security vulnerability in this distribution, please report
-it by e-mail to the author at ina@cpan.org.
 
-Do NOT open a public GitHub issue for security vulnerabilities.  Please use
-private e-mail so that a fix can be prepared before public disclosure.
+Thank you for your interest in this software.
 
-You can expect an acknowledgement within a few days.  If you do not receive
-a response within one week, please follow up.
+This software is no longer maintained by its original author and is provided as-is.
 
-## Supported Versions
+Almost all of this software's functionality has been carried over to the mb distribution.
+https://metacpan.org/dist/mb
 
-Only the most recent release on CPAN is actively maintained.  Please
-upgrade to the latest version before reporting security issues.
+Please see the documentation included with the mb distribution for usage instructions.
+
+
+See you there!
 TO_SECURITY
         close FH_SECURITY;
         check_usascii('SECURITY.md');
@@ -1059,7 +1058,7 @@ TO_SECURITY
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;
@@ -1203,7 +1202,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1441,7 +1440,7 @@ This software requires perl5.00503 or later.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt> in a CPAN
 
 This project was originated by INABA Hitoshi.
 

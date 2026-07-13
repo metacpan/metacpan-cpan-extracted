@@ -3,13 +3,14 @@ package Schedule::Easing;
 use strict;
 use warnings;
 
-our $VERSION='0.1.4';
+our $VERSION='0.1.5';
 
 use Carp qw/carp confess/;
 
 use Schedule::Easing::Block;
 use Schedule::Easing::MD5;
 use Schedule::Easing::Numeric;
+use Schedule::Easing::Pass;
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -25,6 +26,7 @@ my %builder=(
 	'block'  =>'Schedule::Easing::Block',
 	'md5'    =>'Schedule::Easing::MD5',
 	'numeric'=>'Schedule::Easing::Numeric',
+	'pass'   =>'Schedule::Easing::Pass',
 );
 
 sub init {
@@ -102,12 +104,12 @@ Schedule::Easing - Stateless, stable filtering of events with ramp-up activation
 
 =head1 VERSION
 
-Version 0.1.4
+Version 0.1.5
 
 =head1 SYNOPSIS
 
   use Schedule::Easing;
-  
+
   my $easing=Schedule::Easing->new(
     schedule=>[
       {
@@ -118,6 +120,7 @@ Version 0.1.4
         tsB   =>456_000,
         begin =>0,
         final =>1,
+        digestsub=>..., # see below
         ...
       },
       {
@@ -133,7 +136,7 @@ Version 0.1.4
       },
     ],
   );
-  
+
   my @matches=$easing->matches(ts=>time(), events=>\@events);
   my @timestamps=$easing->schedule(events=>\@events);
 
@@ -156,6 +159,7 @@ Suppose the following failures and warnings are logged
   [1755487903] ERROR logging failure for order 8052060, will retry from logger.pm line 323
   [1755487925] ERROR invalid type in request, handler.pm line 485
   [1755487944] WARNING stock exceeded, requested 144 cherries
+  [1755487946] CRITICAL failure from logger.pm line 428
   [1755487947] ERROR logging failure for order 7463359, will retry from logger.pm line 323
   [1755487969] ERROR logging failure for order 8405888, will retry from logger.pm line 323
   [1755487990] ERROR logging failure for order 5695806, will retry from logger.pm line 323
@@ -188,8 +192,12 @@ The logging failures contain order numbers that can be used to compute a message
     tsA=>1755487800, tsB=>1755489160,
   },
 
-Finally, all stock messages can be blocked.
+Finally, all stock messages can be blocked or included.
 
+  {
+    name=>'Include all critical messages', type=>'pass',
+    match=>qr/(.*(?:CRITICAL).*)/,
+  },
   {
     name=>'Ignore stock messages', type=>'block',
     match=>qr/(.*(?:INFO|WARNING) stock.*)/,
@@ -197,6 +205,7 @@ Finally, all stock messages can be blocked.
 
 With the above configurations, if the sample lines arrive at the given timestamps, the following will be included in the output.
 
+  [1755487946] CRITICAL failure from logger.pm line 428
   [1755488026] ERROR logging failure for order 4762096, will retry from logger.pm line 323
   [1755488059] ERROR invalid type in request, handler.pm line 19
 
@@ -256,9 +265,22 @@ The MD5 type requires that the C<match> configuration include one capture group 
 
 All matching groups are ordered by name, concatenated, and used to compute the message digest.  The digest value is used modulo the time range, C<tsB>-C<tsA>, to determine if the message crosses the current threshold for inclusion.
 
+Message digests may need to match only certain characters within a matching pattern.  Characters can be stripped using C<digestsub>:
+
+  digestsub=>   'pattern',
+  digestsub=> qr/pattern/,
+  digestsub=>[  'pattern','substitution']
+  digestsub=>[qr/pattern/,'substitution']
+
+Substitution is applied to all digest capture groups via the expected substitution C<s/pattern/substitution/g>.  When only a pattern is given, the substition is the empty string.  Digest substitution does I<not> affect the contents of the returned matching messages, only the digest construction.  As a practical example, consider C<digestsub=qr/\s/>, which can be used to match lines of code consistently even if line numbers or spacing changes.
+
 =head3 Block
 
 For configuration convenience, messages that match C<match> can always be blocked by setting C<type=block>.
+
+=head3 Pass
+
+For configuration convenience, messages that match C<match> can always be included by setting C<type=pass>.
 
 =head2 Unmatched Lines
 

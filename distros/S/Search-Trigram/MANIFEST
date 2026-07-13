@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+include/strigram.h
+include/strigram_compat.h
+include/xop_compat.h
+lib/Search/Trigram.pm
+Trigram.xs
+strigram.c
+t/00-load.t
+t/01-index.t
+t/02-search.t
+t/03-score.t
+t/04-unicode.t
+t/05-edge.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+typemap
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

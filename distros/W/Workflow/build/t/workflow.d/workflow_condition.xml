@@ -1,0 +1,4 @@
+<conditions>
+   <condition name="HasUser"
+              class="Workflow::Condition::HasUser"/>
+</conditions>

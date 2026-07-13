@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Controller::Welcome;
-$Mojolicious::Plugin::Fondation::Controller::Welcome::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Controller::Welcome::VERSION = '0.04';
 # ABSTRACT: Welcome page controller with language-aware template selection
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -16,7 +16,12 @@ sub index ($self) {
     # Only 'en' and 'fr' exist; fall back to 'en' for anything else
     $lang = 'en' unless $lang eq 'fr';
 
-    $c->render(template => "welcome_$lang");
+    my $has_setup = exists $c->app->fondation->registry->{'Mojolicious::Plugin::Fondation::Setup'};
+
+    $c->render(
+        template  => "welcome_$lang",
+        has_setup => $has_setup,
+    );
 }
 
 1;
@@ -33,7 +38,7 @@ Mojolicious::Plugin::Fondation::Controller::Welcome - Welcome page controller wi
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

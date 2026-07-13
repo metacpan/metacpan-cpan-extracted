@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics;
-$OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SecurityAnalytics>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security_analytics/alerts>
 
 =back
+
+I<Method added in OpenSearch version 2.4>
+
 
     $resp = $client->security_analytics->get_alerts(
         
@@ -120,6 +123,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security_analytics/findings/_search>
 
 =back
+
+I<Method added in OpenSearch version 2.4>
+
 
     $resp = $client->security_analytics->get_findings(
         
@@ -163,6 +169,9 @@ C<GET /_plugins/_security_analytics/findings/correlate>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->security_analytics->search_finding_correlations(
         
          # Endpoint specific query string parameters
@@ -182,6 +191,19 @@ C<GET /_plugins/_security_analytics/findings/correlate>
     );
 
 L<OpenSearch documentation for security_analytics-E<gt>search_finding_correlations|https://docs.opensearch.org/docs/latest/security-analytics/api-tools/correlation-eng/#list-correlations-for-a-finding-belonging-to-a-log-type>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->security_analytics->method_supported_in_version(
+        method  => 'get_alerts',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

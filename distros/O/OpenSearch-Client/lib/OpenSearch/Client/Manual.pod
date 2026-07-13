@@ -9,7 +9,7 @@ B<OpenSearch::Client::Manual>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 Basics
 
@@ -34,7 +34,7 @@ L<OpenSearch::Client::Manual::Modules>
 
 You can lookup paths in the OpenSearch API documentation to find out which namespace and method is used for each path.
 
-L<OpenSearch::Client::Manual::Paths|OpenSearch::Client::Manual::Paths>
+L<OpenSearch::Client::Core::3_0::Manual::Paths>
 
 =head1 Helper modules
 

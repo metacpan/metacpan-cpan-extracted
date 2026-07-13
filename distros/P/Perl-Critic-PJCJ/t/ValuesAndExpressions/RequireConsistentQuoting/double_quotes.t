@@ -9,7 +9,10 @@ use lib qw( lib t/lib );
 
 use Test2::V0 qw( done_testing subtest );
 
-use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting ();
+use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting qw(
+  desc_optimal
+  desc_single
+);
 use ViolationFinder qw( bad good );
 
 my $Policy
@@ -27,23 +30,36 @@ subtest "Double quoted strings" => sub {
 };
 
 subtest "Escaped special characters" => sub {
-  bad $Policy, 'my $output = "Price: \$10"', "use ''",
+  bad $Policy, 'my $output = "Price: \$10"', desc_single,
     "Escaped dollar signs should use single quotes";
-  bad $Policy, 'my $email = "\@domain"', "use ''",
+  bad $Policy, 'my $email = "\@domain"', desc_single,
     "Escaped at-signs should use single quotes";
-  bad $Policy, 'my $quote = "\""', "use ''",
+
+  # An apostrophe would need escaping in '', so prefer q() instead
+  bad $Policy, q(my $x = "\$10 isn't"), desc_optimal("q()"),
+    "escaped sigil with an apostrophe should use q() not single quotes";
+
+  # POD EXAMPLES: the email example is only detectable in escaped form
+  bad $Policy, 'my $email = "user\@domain.com"', desc_single,
+    "escaped @ in double quotes should use single quotes";
+  good $Policy, 'my $email = "user@domain.com"',
+    "bare @ interpolates, so the policy accepts double quotes";
+  bad $Policy, 'my $quote = "\""', desc_single,
     "Escaped double quotes should use single quotes";
-  bad $Policy, 'my $csv = "val1,\"unclosed quote,val3\n"', "use qq()",
+  bad $Policy, 'my $csv = "val1,\"unclosed quote,val3\n"',
+    desc_optimal("qq()"),
     "Escaped double quotes with escape sequences should use qq()";
 };
 
 subtest "Interpolation with quotes" => sub {
   # Strings that interpolate and have escaped quotes should use qq()
-  bad $Policy, 'my $x = "$var \""', "use qq()",
+  bad $Policy, 'my $x = "$var \""', desc_optimal("qq()"),
     "Escaped double quotes with interpolation should use qq()";
-  bad $Policy, 'my $text = "contains $var and \"quotes\""', "use qq()",
+  bad $Policy, 'my $text = "contains $var and \"quotes\""',
+    desc_optimal("qq()"),
     "Double quotes with interpolation and escaped quotes should use qq()";
-  bad $Policy, 'my $x = "string with $var and \"quotes\""', "use qq()",
+  bad $Policy, 'my $x = "string with $var and \"quotes\""',
+    desc_optimal("qq()"),
     "Double quotes with interpolation and escaped quotes should use qq()";
 
   # Contains both single and double quotes
@@ -64,7 +80,7 @@ subtest "Additional double quote coverage tests" => sub {
     "double quotes justified by interpolation";
   good $Policy, 'my $x = "array: @arr";',
     "double quotes justified by array interpolation";
-  bad $Policy, 'my $x = "escaped: \\$var";', "use ''",
+  bad $Policy, 'my $x = "escaped: \\$var";', desc_single,
     "escaped variables suggest single quotes";
 };
 

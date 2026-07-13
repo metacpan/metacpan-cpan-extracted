@@ -1,0 +1,32 @@
+---
+abstract: 'Setup wizard generator — scans plugins for user-configurable parameters, generates a setup workflow, and serves the wizard UI'
+author:
+  - 'Daniel Brosseau <dab@cpan.org>'
+build_requires:
+  File::Spec: '3.00'
+  File::Temp: '0.01'
+  FindBin: '1.00'
+  Test::More: '1.00'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Fondation-Setup
+requires:
+  Mojolicious: '9.46'
+  Mojolicious::Plugin::Fondation::Layout::Bootstrap: '0.01'
+  Mojolicious::Plugin::Fondation::Workflow: '0.01'
+  YAML::XS: '0.01'
+  perl: '5.026'
+resources:
+  homepage: https://github.com/Dabg/Mojolicious-Plugin-Fondation-Setup
+  repository: https://github.com/Dabg/Mojolicious-Plugin-Fondation-Setup.git
+version: '0.02'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

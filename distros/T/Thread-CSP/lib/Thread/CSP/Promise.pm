@@ -1,5 +1,5 @@
 package Thread::CSP::Promise;
-$Thread::CSP::Promise::VERSION = '0.015';
+$Thread::CSP::Promise::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Thread::CSP::Promise - Promises for thread return values.
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ This returns a handle that one byte will be written to when the promise finishes
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

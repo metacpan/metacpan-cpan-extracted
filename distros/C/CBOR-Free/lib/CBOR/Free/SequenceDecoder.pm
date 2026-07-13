@@ -50,6 +50,8 @@ with L<CBOR::Free::Decoder>:
 
 =item * C<naive_utf8()>
 
+=item * C<reject_duplicate_keys()>
+
 =item * C<string_decode_cbor()>
 
 =item * C<string_decode_never()>

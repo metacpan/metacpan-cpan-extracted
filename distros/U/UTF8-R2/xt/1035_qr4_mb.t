@@ -2,7 +2,7 @@
 #
 # 1035_qr4_mb.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # This file is encoded in Shift_JIS.

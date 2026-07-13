@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Utils;
-$Mojolicious::Plugin::Fondation::Utils::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Utils::VERSION = '0.04';
 # ABSTRACT: Utility functions: config merge, name resolution, share directory helpers
 
 use Mojo::Base -strict, -signatures;
@@ -87,7 +87,7 @@ Mojolicious::Plugin::Fondation::Utils - Utility functions: config merge, name re
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

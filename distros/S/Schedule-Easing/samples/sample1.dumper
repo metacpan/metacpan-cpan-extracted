@@ -1,5 +1,10 @@
 [
 	{
+		name=>'Include all critical messages',
+		type=>'pass',
+		match=>qr/(.*(?:CRITICAL).*)/,
+	},
+	{
 		name=>'Invalid type errors',
 		type=>'numeric',
 		match=>qr/ERROR invalid type.*line (?<value>\d+)/,

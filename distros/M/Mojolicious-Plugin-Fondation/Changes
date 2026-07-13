@@ -1,5 +1,18 @@
 Revision history for Mojolicious-Plugin-Fondation
 
+0.04      2026-07-12 18:45:13+02:00 Europe/Paris
+    - Add Setup wizard link to welcome page when Fondation::Setup is loaded
+    - add command fondation clean
+    - add local controllers
+    - Resolver: add before/after ordering hints in fondation_meta
+    - Make helpers follow dependency order: first loaded wins, Fondation fallbacks run last
+    - Add layout to error page
+    - Delete error template
+    - Skipping all fondation_finalyze if schema not found
+    - add find_template_source to API
+    - Remove legacy arrayref dependency format ['Plugin', {config}]
+    - Add no-op fallback for fondation.authenticated
+
 0.03      2026-06-17 17:57:48+02:00 Europe/Paris
     - Fix Windows path separator handling in Templates action and tests
 

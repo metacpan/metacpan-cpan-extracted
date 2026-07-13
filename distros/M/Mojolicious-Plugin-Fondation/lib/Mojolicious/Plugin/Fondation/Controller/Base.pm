@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Controller::Base;
-$Mojolicious::Plugin::Fondation::Controller::Base::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Controller::Base::VERSION = '0.04';
 # ABSTRACT: Base controller class for Fondation controllers
 
 use Mojo::Base 'Mojolicious::Controller', -signatures;
@@ -19,7 +19,7 @@ Mojolicious::Plugin::Fondation::Controller::Base - Base controller class for Fon
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

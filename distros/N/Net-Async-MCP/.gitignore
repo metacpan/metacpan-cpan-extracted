@@ -15,3 +15,16 @@ dzil-local/
 *~
 *.swp
 *.bak
+
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
+!/.claude/
+/.claude/*
+!/.claude/settings.json
+!/.claude/agents/
+!/.claude/agents/**
+!/.claude/skills/
+!/.claude/skills/**
+!/.claude/rules/
+!/.claude/rules/**
+!/.claude/hooks/
+!/.claude/hooks/**

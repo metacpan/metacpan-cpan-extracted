@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::ISM;
-$OpenSearch::Client::Core::3_0::Direct::ISM::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::ISM::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::ISM>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ C<POST /_plugins/_ism/add>
 C<POST /_plugins/_ism/add/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ism->add_policy(
         
@@ -122,6 +125,9 @@ C<POST /_plugins/_ism/change_policy/{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ism->change_policy(
         
         'body'         =>  $body,      # optional
@@ -158,6 +164,9 @@ C<DELETE /_plugins/_ism/policies/{policy_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ism->delete_policy(
         
          # path parameters
@@ -187,6 +196,9 @@ I<Paths served by this method:>
 C<HEAD /_plugins/_ism/policies/{policy_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ism->exists_policy(
         
@@ -227,6 +239,9 @@ C<POST /_plugins/_ism/explain/{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ism->explain_policy(
         
         'body'         =>  $body,      # optional
@@ -259,6 +274,9 @@ C<GET /_plugins/_ism/policies>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ism->get_policies(
         
          # Common API query string parameters
@@ -284,6 +302,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ism/policies/{policy_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ism->get_policy(
         
@@ -314,6 +335,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_ism/policies>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ism->put_policies(
         
@@ -348,6 +372,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_ism/policies/{policy_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ism->put_policy(
         
@@ -386,6 +413,9 @@ C<POST /_plugins/_refresh_search_analyzers/{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ism->refresh_search_analyzers(
         
          # path parameters
@@ -418,6 +448,9 @@ C<POST /_plugins/_ism/remove>
 C<POST /_plugins/_ism/remove/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ism->remove_policy(
         
@@ -456,6 +489,9 @@ C<POST /_plugins/_ism/retry/{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ism->retry_index(
         
         'body'         =>  $body,      # optional
@@ -478,6 +514,19 @@ C<POST /_plugins/_ism/retry/{index}>
     );
 
 L<OpenSearch documentation for ism-E<gt>retry_index|https://opensearch.org/docs/latest/im-plugin/ism/api/#retry-failed-index>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->ism->method_supported_in_version(
+        method  => 'add_policy',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

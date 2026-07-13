@@ -1,0 +1,26 @@
+---
+# Run: fuzz-harness-generator -r schemas/zoom.yml
+
+config:
+  dedup: 1
+  test_empty: 1
+  test_non_ascii: 0
+  test_nuls: 0
+  test_undef: 0
+
+module: HTML::OSM
+function: zoom
+
+new:
+
+output:
+  type: integer
+  min: 0
+  max: 19
+
+input:
+  zoom:
+    type: integer
+    min: 0
+    max: 19
+    optional: true

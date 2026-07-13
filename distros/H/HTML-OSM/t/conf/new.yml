@@ -1,0 +1,29 @@
+---
+config:
+  dedup: 1
+  test_empty: 1
+  test_non_ascii: 0
+  test_nuls: 0
+  test_undef: 0
+function: new
+module: HTML::OSM
+output:
+  isa: HTML::OSM
+  type: object
+
+input:
+  zoom:
+    type: integer
+    min: 0
+    max: 19
+    optional: true
+  height:
+    type: string
+    optional: true
+  width:
+    type: string
+    optional: true
+  min_interval:
+    type: number
+    min: 0
+    optional: true

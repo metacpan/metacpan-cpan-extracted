@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '4.0000'; # VERSION
+our $VERSION = '4.0001'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 
 # ABSTRACT: Be like GeekRuthie when you build your dists
@@ -191,7 +191,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 =head1 VERSION
 
-version 4.0000
+version 4.0001
 
 =head1 DESCRIPTION
 

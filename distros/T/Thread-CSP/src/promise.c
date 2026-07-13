@@ -143,15 +143,6 @@ const MGVTBL Thread__CSP__Promise_magic = {
 	.svt_free = promise_destroy
 };
 
-
-static PerlIO* S_sv_to_handle(pTHX_ SV* handle) {
-	if (!SvROK(handle) || SvTYPE(SvRV(handle)) != SVt_PVGV)
-		Perl_croak(aTHX_ "");
-
-	return IoOFP(sv_2io(handle));
-}
-#define sv_to_handle(handle) S_sv_to_handle(aTHX_ handle)
-
 SV* S_promise_finished_fh(pTHX_ struct promise* promise) {
 	MUTEX_LOCK(&promise->mutex);
 

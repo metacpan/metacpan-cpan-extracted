@@ -15,6 +15,11 @@ my %sample=(
 		format=>'prefix %d:  warning of type %d in %s at %d',
 		sample=>undef, # defer
 	},
+	prefixWarningTypextra=>{
+		'md5' =>qr/^(?<digest0>\w+)\s+\d+:\s+(?<digest1>warning of type .+?) in \w+ at \d+$/,
+		format=>'prefix %d:  warning of type %s in %s at %d',
+		sample=>undef, # defer
+	},
 );
 
 sub randarr { my ($aref)=@_; return $$aref[int(rand(1+$#$aref))]; }
@@ -24,6 +29,17 @@ $sample{prefixWarning}{sample}=sub {
 	return sprintf($sample{prefixWarning}{format}
 		,int(rand(1e6))
 		,$i
+		,randarr($sample{subsystems})
+		,int(rand(1e9)));
+};
+
+$sample{prefixWarningTypextra}{sample}=sub {
+	my ($i)=@_;
+	my @s=split(//,$i);
+	for(my $j=1+$#s;$j>=0;$j--) { if(rand()>0.5) { splice(@s,$j,0,'-') } }
+	return sprintf($sample{prefixWarningTypextra}{format}
+		,int(rand(1e6))
+		,join('-',@s)
 		,randarr($sample{subsystems})
 		,int(rand(1e9)));
 };
@@ -107,7 +123,7 @@ subtest 'Initialization'=>sub {
 # Some percent error is expected away from linear, therefore
 # we check that results are non-decreasing and that the number
 # of matched events is within some percentage of expected.
-# We also don't check every timestimp, since "per second"
+# We also don't check every timestamp, since "per second"
 # variations will be larger.
 #
 # Because the digest is based on a fixed range of warning "types",
@@ -115,7 +131,7 @@ subtest 'Initialization'=>sub {
 # of (eventN,tsA,tsB,threshold).
 #
 subtest 'md5'=>sub {
-	plan tests=>24;
+	plan tests=>31; # 6*5+1(digestseq)
 	my $label='md5 [0,100]';
 	my ($eventN,$tsA,$tsB,$threshold)=(2_000,100,700,2.1);
 	my $easing=Schedule::Easing->new(
@@ -136,6 +152,48 @@ subtest 'md5'=>sub {
 	validateSequence(
 		eventN=>$eventN,
 		samplename=>'prefixWarning',
+		easing=>$easing,
+		tsA=>$tsA,
+		tsB=>$tsB,
+		begin=>0,
+		final=>$eventN,
+		tsStep=>100,
+		label=>$label,
+		threshold=>$threshold,
+	);
+	#
+	$easing=Schedule::Easing->new(
+		warnExpired=>0,
+		schedule=>[
+			{
+				type=>'md5',
+				name=>'Fake warnings md5 w/digestsub',
+				match=>$sample{prefixWarningTypextra}{md5},
+				begin=>0.00,
+				final=>1.00,
+				tsA=>$tsA,
+				tsB=>$tsB,
+				# tsStep=>86400, # not yet supported
+			},
+		],
+	);
+	{
+		# Verify that digestsub produces the same sequences as the regular messages
+		my $digestsub=['-',''];
+		my @eventsB=sort {int(rand(3))-1} map {&{$sample{prefixWarningTypextra}{sample}}($_)} (1..$eventN);
+		my @eventsA=map {s/-//gr} @eventsB; # for comparison, hyphens are removed from the B-matched messages later
+		my (@seqA,@seqB);
+		for(my $ts=$tsA;$ts<=$tsB;$ts+=100) {
+			delete($$easing{schedule}[0]{digestsub});
+			push @seqA,[$easing->matches(ts=>$ts,events=>\@eventsA)];
+			$$easing{schedule}[0]{digestsub}=$digestsub;
+			push @seqB,[map {s/-//gr} $easing->matches(ts=>$ts,events=>\@eventsB)];
+		}
+		is_deeply(\@seqA,\@seqB,'md5 [0,100]:  Digest substitution, event sequences match');
+	}
+	validateSequence(
+		eventN=>$eventN,
+		samplename=>'prefixWarningTypextra',
 		easing=>$easing,
 		tsA=>$tsA,
 		tsB=>$tsB,

@@ -9,7 +9,11 @@ allow-unsafe = 1
 # top = 0
 verbose = %f:%l:%c [%p] %m - %e\n
 # include =
-# exclude =
+# Perl::Critic::Freenode is an obsolete compatibility shim whose policies
+# subclass the Perl::Critic::Community ones. With both installed, every
+# Community policy runs twice and reports duplicate violations. Drop the
+# Freenode-namespace duplicates so only the Community policies apply.
+exclude = Freenode
 # single-policy =
 # theme =
 color-severity-highest = red
@@ -28,7 +32,7 @@ color-severity-lowest = cyan
 
 
 # Map blocks should have a single statement.
-[BuiltinFunctions::ProhibitComplexMappings]
+[-BuiltinFunctions::ProhibitComplexMappings]
 # set_themes                         = complexity core maintenance pbp
 # add_themes                         =
 # severity                           = 3
@@ -36,7 +40,6 @@ color-severity-lowest = cyan
 
 # The maximum number of statements to allow within a map block.
 # Minimum value 1. No maximum.
-max_statements = 5
 
 
 # Use 4-argument `substr' instead of writing `substr($foo, 2, 6) = $bar'.
@@ -48,7 +51,7 @@ max_statements = 5
 
 
 # Forbid $b before $a in sort blocks.
-[BuiltinFunctions::ProhibitReverseSortBlock]
+[-BuiltinFunctions::ProhibitReverseSortBlock]
 # set_themes                         = core cosmetic pbp
 # add_themes                         =
 # severity                           = 1
@@ -312,7 +315,7 @@ max_elsif = 10
 
 
 # Don't use operators like `not', `!~', and `le' within `until' and `unless'.
-[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
 # set_themes                         = core maintenance pbp
 # add_themes                         =
 # severity                           = 3
@@ -649,6 +652,7 @@ only_in_void_context = 1
 
 
 # Minimize complexity in code that is outside of subroutines.
+# Critic doesn't know about new class keyword - disable if using it
 [Modules::ProhibitExcessMainComplexity]
 # set_themes                         = complexity core maintenance
 # add_themes                         =
@@ -663,8 +667,6 @@ max_mccabe = 3
 
 
 # Put packages (especially subclasses) in separate files.
-# There can be good reasons to do this but since there is no additional config
-# we'll turn this off.
 [Modules::ProhibitMultiplePackages]
 # set_themes                         = bugs core
 # add_themes                         =
@@ -817,7 +819,7 @@ packages = via|[A-Z][a-z0-9_]*
 subroutines = :all_lower
 
 # Subroutine names that are exempt from capitalization rules.  The values here are regexes that will be surrounded by \A and \z.
-subroutine_exemptions = AUTOLOAD BUILD BUILDARGS CLEAR CLOSE DELETE DEMOLISH DESTROY EXISTS EXTEND FETCH FETCHSIZE FIRSTKEY GETC NEXTKEY POP PRINT PRINTF PUSH READ READLINE SCALAR SHIFT SPLICE STORE STORESIZE TIEARRAY TIEHANDLE TIEHASH TIESCALAR UNSHIFT UNTIE PUSHED OPEN WRITE
+subroutine_exemptions = AUTOLOAD BUILD BUILDARGS CLEAR CLOSE DELETE DEMOLISH DESTROY EXISTS EXTEND FETCH FETCHSIZE FIRSTKEY GETC NEXTKEY POP PRINT PRINTF PUSH READ READLINE SCALAR SHIFT SPLICE STORE STORESIZE TIEARRAY TIEHANDLE TIEHASH TIESCALAR UNSHIFT UNTIE PUSHED OPEN WRITE ADJUST CLONE
 
 # How local lexical variables names should be capitalized.  Valid values are :single_case, :all_lower, :all_upper, :starts_with_lower, :starts_with_upper, :no_restriction, or a regex.
 local_lexical_variables = :all_lower
@@ -841,7 +843,7 @@ file_lexical_variables = [A-Z][a-z0-9_]*
 global_variables = [A-Z][a-z0-9_]*
 
 # Global variable names that are exempt from capitalization rules.  The values here are regexes that will be surrounded by \A and \z.
-global_variable_exemptions = VERSION ISA EXPORT(?:_OK)? EXPORT_TAGS AUTOLOAD ENV SIG
+global_variable_exemptions = VERSION ISA EXPORT(?:_OK)? EXPORT_TAGS AUTOLOAD ENV SIG self TODO
 
 # How constant names should be capitalized.  Valid values are :single_case, :all_lower, :all_upper, :starts_with_lower, :starts_with_upper, :no_restriction, or a regex.
 # constants = :all_upper
@@ -850,10 +852,10 @@ global_variable_exemptions = VERSION ISA EXPORT(?:_OK)? EXPORT_TAGS AUTOLOAD ENV
 # constant_exemptions =
 
 # How labels should be capitalized.  Valid values are :single_case, :all_lower, :all_upper, :starts_with_lower, :starts_with_upper, :no_restriction, or a regex.
-# labels = :all_upper
+labels = :all_lower
 
 # Labels that are exempt from capitalization rules.  The values here are regexes that will be surrounded by \A and \z.
-# label_exemptions =
+label_exemptions = SKIP
 
 
 # Don't use vague variable or subroutine names like 'last' or 'record'.
@@ -1111,7 +1113,7 @@ skip_object = 1
 # skip_when_using =
 
 # Pattern defining private subroutine names that are always allowed.
-allow_name_regex = ^(?:_build_\w+|_data_printer)$
+allow_name_regex = ^(?:_(build|set)_\w+|_data_printer)$
 
 
 # Prevent access to private subs in other packages.
@@ -1320,7 +1322,7 @@ severity                           = 1
 
 
 # Long chains of method calls indicate tightly coupled code.
-[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+[-ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
 # set_themes                         = core maintenance
 # add_themes                         =
 # severity                           = 2
@@ -1425,7 +1427,7 @@ severity                           = 1
 
 
 # Warns that you might have used single quotes when you really wanted double-quotes.
-[ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
 # set_themes                         = core cosmetic pbp
 # add_themes                         =
 # severity                           = 1
@@ -1509,7 +1511,7 @@ severity                           = 1
 # packages = Data::Dumper File::Find FindBin Log::Log4perl Test::Builder Text::Wrap
 
 # The set of packages to allow variables for, in addition to those given in "packages".
-add_packages = DBI
+# add_packages =
 
 
 # Use double colon (::) to separate package name components instead of single quotes (').
@@ -1564,7 +1566,7 @@ add_packages = DBI
 
 
 # Write `local $foo = $bar;' instead of just `local $foo;'.
-[Variables::RequireInitializationForLocalVars]
+[-Variables::RequireInitializationForLocalVars]
 # set_themes                         = bugs certrec core pbp
 # add_themes                         =
 # severity                           = 3
@@ -1588,7 +1590,7 @@ add_packages = DBI
 
 # Global variables to exclude from this policy.
 # Values that are always included: $ARG, $_, @_.
-allow = %ENV %SIG $> $0
+allow = %ENV %SIG $> $0 $|
 
 
 # Negative array index should be used.
@@ -1603,3 +1605,8 @@ allow = %ENV %SIG $> $0
 [ValuesAndExpressions::RequireConsistentQuoting]
 [CodeLayout::ProhibitLongLines]
 allow_lines_matching = ^\s*package\s+
+
+# FindBin is core and appropriate for test bootstrapping; allow it while the
+# rest of the discouraged-module list stays enforced.
+[Community::DiscouragedModules]
+allowed_modules = FindBin

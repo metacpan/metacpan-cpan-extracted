@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Cat;
-$OpenSearch::Client::Core::3_0::Direct::Cat::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Cat::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Cat>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ C<GET /_cat/aliases>
 C<GET /_cat/aliases/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->aliases(
         
@@ -123,6 +126,9 @@ C<GET /_cat/pit_segments/_all>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->cat->all_pit_segments(
         
          # Endpoint specific query string parameters
@@ -160,6 +166,9 @@ C<GET /_cat/allocation>
 C<GET /_cat/allocation/{node_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->allocation(
         
@@ -203,6 +212,9 @@ C<GET /_cat/cluster_manager>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->cat->cluster_manager(
         
          # Endpoint specific query string parameters
@@ -242,6 +254,9 @@ C<GET /_cat/count>
 C<GET /_cat/count/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->count(
         
@@ -284,6 +299,9 @@ C<GET /_cat/fielddata/{fields}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->fielddata(
         
          # path parameters
@@ -324,6 +342,9 @@ C<GET /_cat/health>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->health(
         
          # Endpoint specific query string parameters
@@ -360,6 +381,9 @@ C<GET /_cat>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->help(
         
          # Common API query string parameters
@@ -388,6 +412,9 @@ C<GET /_cat/indices>
 C<GET /_cat/indices/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->indices(
         
@@ -436,6 +463,9 @@ C<GET /_cat/master>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->master(
         
          # Endpoint specific query string parameters
@@ -473,6 +503,9 @@ C<GET /_cat/nodeattrs>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->nodeattrs(
         
          # Endpoint specific query string parameters
@@ -509,6 +542,9 @@ I<Paths served by this method:>
 C<GET /_cat/nodes>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->nodes(
         
@@ -550,6 +586,9 @@ C<GET /_cat/pending_tasks>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->pending_tasks(
         
          # Endpoint specific query string parameters
@@ -588,6 +627,9 @@ C<GET /_cat/pit_segments>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->cat->pit_segments(
         
         'body'         =>  $body,      # optional
@@ -624,6 +666,9 @@ I<Paths served by this method:>
 C<GET /_cat/plugins>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->plugins(
         
@@ -664,6 +709,9 @@ C<GET /_cat/recovery>
 C<GET /_cat/recovery/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->recovery(
         
@@ -708,6 +756,9 @@ C<GET /_cat/repositories>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->repositories(
         
          # Endpoint specific query string parameters
@@ -748,6 +799,9 @@ C<GET /_cat/segment_replication>
 C<GET /_cat/segment_replication/{index}>
 
 =back
+
+I<Method added in OpenSearch version 2.6>
+
 
     $resp = $client->cat->segment_replication(
         
@@ -802,6 +856,9 @@ C<GET /_cat/segments/{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->segments(
         
          # path parameters
@@ -845,6 +902,9 @@ C<GET /_cat/shards>
 C<GET /_cat/shards/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->shards(
         
@@ -892,6 +952,9 @@ C<GET /_cat/snapshots/{repository}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->snapshots(
         
          # path parameters
@@ -935,6 +998,9 @@ C<GET /_cat/tasks>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->tasks(
         
          # Endpoint specific query string parameters
@@ -976,6 +1042,9 @@ C<GET /_cat/templates>
 C<GET /_cat/templates/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cat->templates(
         
@@ -1022,6 +1091,9 @@ C<GET /_cat/thread_pool/{thread_pool_patterns}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cat->thread_pool(
         
          # path parameters
@@ -1050,6 +1122,19 @@ C<GET /_cat/thread_pool/{thread_pool_patterns}>
     );
 
 L<OpenSearch documentation for cat-E<gt>thread_pool|https://opensearch.org/docs/latest/api-reference/cat/cat-thread-pool/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->cat->method_supported_in_version(
+        method  => 'aliases',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

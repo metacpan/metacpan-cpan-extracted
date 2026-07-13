@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/carp/;
 
-our $VERSION='0.1.4';
+our $VERSION='0.1.5';
 
 my %shapes=(
 	linear=>\&linearShape,

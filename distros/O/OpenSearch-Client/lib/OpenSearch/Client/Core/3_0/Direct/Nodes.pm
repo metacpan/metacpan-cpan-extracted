@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Nodes;
-$OpenSearch::Client::Core::3_0::Direct::Nodes::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Nodes::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Nodes>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ C<GET /_nodes/hot_threads>
 C<GET /_nodes/{node_id}/hot_threads>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->nodes->hot_threads(
         
@@ -131,6 +134,9 @@ C<GET /_nodes/{node_id}/{metric}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->nodes->info(
         
          # path parameters
@@ -169,6 +175,9 @@ C<POST /_nodes/reload_secure_settings>
 C<POST /_nodes/{node_id}/reload_secure_settings>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->nodes->reload_secure_settings(
         
@@ -220,6 +229,9 @@ C<GET /_nodes/{node_id}/stats/{metric}>
 C<GET /_nodes/{node_id}/stats/{metric}/{index_metric}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->nodes->stats(
         
@@ -273,6 +285,9 @@ C<GET /_nodes/{node_id}/usage/{metric}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->nodes->usage(
         
          # path parameters
@@ -294,6 +309,19 @@ C<GET /_nodes/{node_id}/usage/{metric}>
     );
 
 L<OpenSearch documentation for nodes-E<gt>usage|https://docs.opensearch.org/latest/api-reference/nodes-apis/index/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->nodes->method_supported_in_version(
+        method  => 'hot_threads',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

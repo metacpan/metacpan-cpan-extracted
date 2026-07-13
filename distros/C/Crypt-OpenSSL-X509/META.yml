@@ -22,7 +22,7 @@ resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-x509/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-x509
   repository: https://github.com/dsully/perl-crypt-openssl-x509.git
-version: 2.1.2
+version: 2.1.3
 x_contributors:
   - 'TIMLEGGE <timlegge@cpan.org>'
   - 'SKAJI <skaji@cpan.org>'

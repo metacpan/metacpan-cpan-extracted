@@ -28,11 +28,8 @@ sub filter_conflicting_targets ($targets_content) {
   chomp @lines;
   my @filtered_lines;
   my $skip_until_next_target = 0;
-  my $in_phoney              = 0;
 
   for my $line (@lines) {
-    $in_phoney = 0 if $line =~ "";
-
     # Check if this line starts a new target
     if ($line =~ /^([a-zA-Z][a-zA-Z0-9_-]*)\s*:/) {
       my $target_name = $1;
@@ -49,8 +46,7 @@ sub filter_conflicting_targets ($targets_content) {
     }
 
     # Remove conflicting targets from .PHONY lines
-    if ($in_phoney || $line =~ /^\.PHONY:/) {
-      $in_phoney = 1;
+    if ($line =~ /^\.PHONY:/) {
       for my $target (sort keys %$conflicts) {
         # Only remove exact matches, not partial matches like "install"
         # in "install-deps"
@@ -99,7 +95,7 @@ sub inject_postamble ($content, $postamble) {
   $content
 }
 
-sub main {
+sub main () {
   my $makefile_pl     = shift @ARGV or die "Usage: $0 <Makefile.PL>\n";
   my $targets_file    = "dev/Makefile.targets";
   my $targets_content = read_targets_file($targets_file);
@@ -138,29 +134,29 @@ the Run::AfterBuild plugin.
 
 =head1 FUNCTIONS
 
-=head2 read_targets_file($targets_file)
+=head2 read_targets_file ($targets_file)
 
 Reads the contents of the targets file and returns it as a string.
 
-=head2 filter_conflicting_targets($targets_content)
+=head2 filter_conflicting_targets ($targets_content)
 
 Removes targets that would conflict with ExtUtils::MakeMaker's built-in
 targets (test, clean, install) to avoid "target redefined" warnings.
 
-=head2 create_postamble($targets_content)
+=head2 create_postamble ($targets_content)
 
 Creates the Perl code for the MY::postamble subroutine that will be
 injected into the Makefile.PL.
 
-=head2 read_makefile_pl($makefile_pl)
+=head2 read_makefile_pl ($makefile_pl)
 
 Reads the Makefile.PL file and returns its contents.
 
-=head2 write_makefile_pl($makefile_pl, $content)
+=head2 write_makefile_pl ($makefile_pl, $content)
 
 Writes the modified content back to the Makefile.PL file.
 
-=head2 inject_postamble($content, $postamble)
+=head2 inject_postamble ($content, $postamble)
 
 Injects the postamble code before the WriteMakefile call in the Makefile.PL.
 

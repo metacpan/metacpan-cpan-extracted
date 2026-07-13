@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.31  2026-07-12 JST (Japan Standard Time)
+  - change SECURITY.md
+  - created by INABA Hitoshi
+
 0.30  2026-04-04 JST (Japan Standard Time)
 
     Fixes:
@@ -17,6 +21,7 @@ Revision history for this software.
     - t/9050-pod.t: fix warnings stub guard to use
       !defined(&warnings::import) form (consistent with other 9xxx
       tests).
+  - created by INABA Hitoshi
 
 0.29  2026-03-31 JST (Japan Standard Time)
   - add t/lib/INA_CPAN_Check.pm: shared test library aligned with

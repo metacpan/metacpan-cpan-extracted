@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.32';
+    $VERSION = '0.33';
     XSLoader::load();
 }
 
@@ -226,7 +226,9 @@ use case is legitimate and potentially gainful.
 An exception is thrown if the decoder finds anything else as a map key.
 Note that, because Perl does not distinguish between binary and text strings,
 if two keys of the same map contain the same bytes, Perl will consider these
-a duplicate key and prefer the latter.
+a duplicate key and prefer the latter. Use C<reject_duplicate_keys()> on
+L<CBOR::Free::Decoder> to reject map keys that would overwrite an earlier
+key.
 
 =item * CBOR booleans become the corresponding L<Types::Serialiser> values.
 Both CBOR null and undefined become Perl undef.

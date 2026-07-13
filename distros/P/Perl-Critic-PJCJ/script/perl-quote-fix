@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+use v5.26.0;
+use strict;
+use warnings;
+use feature      qw( signatures );
+use experimental qw( signatures );
+
+use Cwd                       qw( abs_path );
+use File::Basename            qw( dirname );
+use File::Temp                qw( tempfile );
+use Getopt::Long              qw( GetOptions );
+use Pod::Usage                qw( pod2usage );
+use Perl::Critic::PJCJ::Fixer ();
+
+sub parse_lines ($spec) {
+  return unless defined $spec;
+  if ($spec =~ /\A(\d+)-(\d+)\z/ && $1 <= $2) {
+    return [$1, $2];
+  }
+  pod2usage(
+    -message => "--lines requires an ascending range such as 10-20",
+    -exitval => 2,
+  );
+}
+
+sub write_fixed ($file, $fixed, $mode) {
+  my ($out, $temp) = eval {
+    tempfile("perl-quote-fix-XXXXXX", DIR => dirname($file), UNLINK => 0)
+  };
+  unless ($out) {
+    warn "Cannot create temporary file for $file: $@";
+    return 0;
+  }
+  my $ok = print {$out} $fixed;
+  $ok &&= close $out;
+  $ok &&= chmod $mode, $temp;
+  $ok &&= rename $temp, $file;
+  return 1 if $ok;
+  my $error = $!;
+  unlink $temp;
+  warn "Cannot write $file: $error\n";
+  0
+}
+
+sub fix_in_place ($fixer, $file) {
+  $file = abs_path($file) if -l $file;
+  my $fh;
+  unless (open $fh, "<", $file) {
+    warn "Cannot read $file: $!\n";
+    return 0;
+  }
+  my $source = do { local $/ = undef; <$fh> };
+  my $mode   = (stat $fh)[2] & 07777;
+  close $fh or warn "Cannot close $file: $!\n";
+  my $fixed = $fixer->fix($source);
+  return 1 if $fixed eq $source;
+  write_fixed($file, $fixed, $mode)
+}
+
+sub run_in_place ($lines) {
+  pod2usage(
+    -message => "--inplace cannot be combined with --lines",
+    -exitval => 2,
+  ) if defined $lines;
+  pod2usage(-message => "--inplace requires file arguments", -exitval => 2)
+    unless @ARGV;
+
+  my $fixer  = Perl::Critic::PJCJ::Fixer->new;
+  my $status = 0;
+  for my $file (@ARGV) {
+    $status = 1 unless fix_in_place($fixer, $file);
+  }
+  exit $status;
+}
+
+sub read_source ($file) {
+  my $fh;
+  unless (open $fh, "<", $file) {
+    warn "Cannot read $file: $!\n";
+    exit 1;
+  }
+  my $source = do { local $/ = undef; <$fh> };
+  $source // ""
+}
+
+sub run_filter ($lines) {
+  my $fixer = Perl::Critic::PJCJ::Fixer->new;
+  unless (@ARGV) {
+    my $source = do { local $/ = undef; <> }
+      // "";
+    print $fixer->fix($source, lines => $lines);
+    return;
+  }
+  print $fixer->fix(read_source($_), lines => $lines) for @ARGV;
+}
+
+sub main () {
+  my %opt;
+  GetOptions(\%opt, "lines=s", "inplace", "help|h") or pod2usage(2);
+  pod2usage(0) if $opt{help};
+
+  run_in_place($opt{lines}) if $opt{inplace};
+  my $lines = parse_lines($opt{lines});
+  run_filter($lines);
+}
+
+main
+
+__END__
+
+=head1 NAME
+
+perl-quote-fix - fix RequireConsistentQuoting violations in Perl source
+
+=head1 VERSION
+
+version v0.3.0
+
+=head1 SYNOPSIS
+
+  perl-quote-fix [--lines START-END] < input.pl > output.pl
+  perl-quote-fix [--lines START-END] file ... > output.pl
+  perl-quote-fix --inplace file ...
+
+  Options:
+    --lines START-END  only fix violations within this line range
+    --inplace          fix the named files in place
+    --help             show this help
+
+=head1 DESCRIPTION
+
+Reads Perl source on standard input, or from the named files, and writes it
+to standard output with all violations of
+L<Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting>
+fixed. Each named file is read explicitly and fixed as a separate document;
+an input which cannot be read is reported and the exit status is non-zero.
+The runtime value of every string is preserved; anything that cannot be
+fixed safely is left unchanged. Source that the policy already accepts
+passes through byte for byte.
+
+With C<--lines>, the whole document is still parsed but only violations
+starting within the inclusive line range are fixed. This suits editor
+integrations that format a selection.
+
+With C<--inplace>, the named files are fixed in place in a single process,
+which is much faster than one invocation per file. Files needing no fix are
+left untouched and file modes are preserved. Each file is replaced
+atomically via a temporary file in the same directory, so a failed write
+leaves the original untouched. A file which cannot be read or written is
+reported and the exit status is non-zero, but the remaining files are
+still fixed. C<--inplace> cannot be combined with C<--lines>.
+
+The fixer does not tidy layout. Run L<perltidy> afterwards if a fix has
+disturbed alignment.
+
+=head1 AUTHOR
+
+Paul Johnson <paul@pjcj.net>
+
+=head1 LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

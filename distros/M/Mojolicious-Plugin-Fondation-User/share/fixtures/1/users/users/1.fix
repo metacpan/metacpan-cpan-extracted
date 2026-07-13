@@ -1,0 +1,12 @@
+$HASH1 = {
+           active   => 1,
+           created_at
+                    => '2026-02-03T13:58:04',
+           email    => 'admin@example.com',
+           id       => 1,
+           password
+                    => '$argon2id$v=19$m=262144,t=3,p=1$GbkuUY4WWvneDKP5sJiIIg$lpUqwizmTZY5ax336sZvcDSAVfTk1DClTi0qYk7F0zY', # 'pass'
+           updated_at
+                    => '2026-02-03T13:58:04',
+           username => 'admin'
+         };

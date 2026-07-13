@@ -1,13 +1,13 @@
 # Perl::Critic::PJCJ
 
-A Perl::Critic policy distribution for enforcing code style consistency
-in Perl code.
+A Perl::Critic policy distribution for enforcing code style consistency in Perl
+code.
 
 ## Description
 
-This distribution provides Perl::Critic policies that enforce consistent
-coding practices to improve code readability and maintainability. It includes
-policies for string quoting consistency and line length limits.
+This distribution provides Perl::Critic policies that enforce consistent coding
+practices to improve code readability and maintainability. It includes policies
+for string quoting consistency and line length limits.
 
 ## Policies
 
@@ -28,8 +28,8 @@ simple rules:
 **Special Cases:**
 
 - **Use statements** - Import lists require `qw()` for simple string arguments
-- **Pragmas** - Pragmas (all-lowercase module names) with a single argument
-  also allow quoted strings, with normal quoting rules applied
+- **Pragmas** - Pragmas (all-lowercase module names) with a single argument also
+  allow quoted strings, with normal quoting rules applied
 - **Newlines** - Multi-line strings may use any quoting style
 
 #### Rationale
@@ -41,10 +41,10 @@ simple rules:
   interpolation
 - Many years ago, Tom Christiansen wrote a lengthy article on how perl's default
   quoting system is interpolation, and not interpolating means something
-  extraordinary is happening. I can't find the original article, but you can
-  see that double quotes are used by default in The Perl Cookbook, for example.
-- Only bracket delimiters should be used (no exotic delimiters like `/`,
-  `|`, `#`, etc.)
+  extraordinary is happening. I can't find the original article, but you can see
+  that double quotes are used by default in The Perl Cookbook, for example.
+- Only bracket delimiters should be used (no exotic delimiters like `/`, `|`,
+  `#`, etc.)
 - Optimal delimiter selection reduces visual noise in code
 
 #### Examples
@@ -99,17 +99,17 @@ readability, especially in narrow terminal windows or when viewing code
 side-by-side with diffs or other files.
 
 The default maximum line length is 80 characters, which provides good
-readability across various display contexts while still allowing reasonable
-code density.
+readability across various display contexts while still allowing reasonable code
+density.
 
-You can configure `perltidy` to keep lines within the specified limit. Only
-when it is unable to do that will you need to manually make changes.
+You can configure `perltidy` to keep lines within the specified limit. Only when
+it is unable to do that will you need to manually make changes.
 
 Line lengths are measured in characters. Source is decoded as UTF-8 before
 measuring, so each multi-byte UTF-8 character counts as one. Single-byte
-encodings such as ASCII and Latin-1 are also measured correctly. Source in
-other multi-byte encodings (for example Shift-JIS) is not decoded and is
-measured by its octet length instead.
+encodings such as ASCII and Latin-1 are also measured correctly. Source in other
+multi-byte encodings (for example Shift-JIS) is not decoded and is measured by
+its octet length instead.
 
 #### Configuration
 
@@ -189,16 +189,26 @@ make install
 
 ## Usage
 
-Add individual policies to your `.perlcriticrc` file:
+Activate both policies in your `.perlcriticrc` file with an `include` line, then
+configure them with the usual policy blocks:
 
 ```ini
-[ValuesAndExpressions::RequireConsistentQuoting]
+include = RequireConsistentQuoting ProhibitLongLines
 
 [CodeLayout::ProhibitLongLines]
 max_line_length = 72
 ```
 
+Both policies also carry the `pjcj` theme, so `perlcritic --theme pjcj` selects
+them.
+
 Then run perlcritic on your code:
+
+```bash
+perlcritic --theme pjcj MyScript.pl
+```
+
+Or run a single policy directly:
 
 ```bash
 perlcritic --single-policy \

@@ -23,14 +23,15 @@ if (defined $app) {
 		-text => 'Add',
 		-command => sub {
 			my $txt = $entry->get;
-			$picker->HistoryAdd($txt);
+			$picker->historyAdd($txt);
+#			$picker->historyUpdate;
 		}
 	)->pack(
 		-side => 'left',
 	);
 	$bframe->Button(
 		-text => 'Clear',
-		-command => sub { $picker->HistoryReset }
+		-command => sub { $picker->historyReset }
 	)->pack(
 		-side => 'left',
 	);
@@ -60,6 +61,7 @@ if (defined $app) {
 		-historyfile => 't/colorentry_history',
 	)->pack(
 		-fill => 'both',
+		-expand => 1,
 		-padx => 2,
 		-pady => 2,
 	);

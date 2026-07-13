@@ -1,0 +1,21 @@
+requires 'perl', '5.024000';
+requires 'Crypt::Passphrase';
+requires 'Crypt::Passphrase::Argon2';
+requires 'Module::Runtime', '0.018';
+requires 'Moo', '2.005005';
+requires 'namespace::clean', '0.27';
+requires 'Net::SAML2';
+requires 'Ouch', '0.0501';
+requires 'Try::Catch';
+
+on test => sub {
+   requires 'Path::Tiny',      '0.084';
+   requires 'Test::Exception', '0.43';
+};
+
+on develop => sub {
+   requires 'Path::Tiny',          '0.084';
+   requires 'Template::Perlish',   '1.52';
+   requires 'Test::Pod::Coverage', '1.04';
+   requires 'Test::Pod',           '1.51';
+};

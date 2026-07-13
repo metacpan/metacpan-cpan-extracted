@@ -96,13 +96,17 @@ setup() {
 }
 
 setup_hooks() {
+  if [[ ! -d .git/hooks ]]; then
+    pi "No .git/hooks directory - skipping hook setup"
+    return 0
+  fi
   for hook in commit-msg prepare-commit-msg; do
-    local target="../../utils/${hook}-hook"
-    local link=".git/hooks/$hook"
-    if [[ ! -e $link ]]; then
-      ln -s "$target" "$link"
-      pi "Created git $hook hook"
-    fi
+    for link in ".git/hooks/$hook" ".git/hooks/$hook.legacy"; do
+      if [[ -L $link && $(readlink "$link") == *"utils/${hook}-hook" ]]; then
+        rm "$link"
+        pi "Removed legacy $hook symlink"
+      fi
+    done
   done
   if command -v pre-commit >/dev/null 2>&1; then
     pre-commit install --install-hooks
@@ -184,6 +188,9 @@ prompt_version_bump() {
   3) detected_version="$bump_major" ;;
   4)
     read -rp "Enter version (e.g. v1.2.3): " detected_version
+    if [[ ! $detected_version =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      pf "Invalid version: '$detected_version' (expected v1.2.3)"
+    fi
     ;;
   *) pf "Invalid choice: $choice" ;;
   esac
@@ -225,10 +232,10 @@ release_ticket() {
   fi
   pi "On main branch"
 
-  # Working tree must be clean (Changes.md excluded — it gets
+  # Working tree must be clean (Changes.md excluded - it gets
   # committed on the release branch)
   if [[ -n $(git status --porcelain -- ':!Changes.md') ]]; then
-    pf "Working tree is not clean — commit or stash changes first"
+    pf "Working tree is not clean - commit or stash changes first"
   fi
   pi "Working tree is clean (excluding Changes.md)"
 
@@ -237,7 +244,18 @@ release_ticket() {
   detect_version
   prompt_version_bump
 
-  # Step 2: Create GitHub ticket
+  # Step 2: Bump dist.ini before any remote artefacts exist
+  if [[ $detected_version != "$last_version" ]]; then
+    if ((dryrun)); then
+      pi "[dry run] would update dist.ini to $detected_version"
+    else
+      pi "Updating dist.ini to $detected_version"
+      perl -pi -e \
+        "s/^version\\s*=\\s*\\S+/version = $detected_version/" dist.ini
+    fi
+  fi
+
+  # Step 3: Create GitHub ticket
   local title="Release $detected_version"
   local body
   body=$(release_ticket_body "$detected_version")
@@ -252,30 +270,22 @@ release_ticket() {
     issue_num="${issue_url##*/}"
   fi
 
-  # Step 3: Create release branch
+  # Step 4: Create release branch
   local release_branch="GH-${issue_num}-release"
   confirm "create branch $release_branch from main"
   if ((!dryrun)); then
     git checkout -b "$release_branch" main
   fi
 
-  # Step 4: Commit changelog and version bump (local, no checkpoint)
+  # Step 5: Commit changelog and version bump (local, no checkpoint)
   if ((dryrun)); then
-    if [[ $detected_version != "$last_version" ]]; then
-      pi "[dry run] would update dist.ini to $detected_version"
-    fi
     pi "[dry run] would commit Changes.md and dist.ini"
   else
-    if [[ $detected_version != "$last_version" ]]; then
-      pi "Updating dist.ini to $detected_version"
-      perl -pi -e \
-        "s/^version\\s*=\\s*\\S+/version = $detected_version/" dist.ini
-    fi
     git add Changes.md dist.ini
     git commit -m "Release $detected_version"
   fi
 
-  # Step 5: Push branch and create PR
+  # Step 6: Push branch and create PR
   confirm "push branch and create PR"
   local pr_body="${body}"$'\n\n'"Closes #${issue_num}"
   if ((dryrun)); then

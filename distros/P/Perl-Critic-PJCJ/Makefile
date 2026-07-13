@@ -16,12 +16,13 @@
 #     BUILD_REQUIRES => {  }
 #     CONFIGURE_REQUIRES => { ExtUtils::MakeMaker=>q[0] }
 #     DISTNAME => q[Perl-Critic-PJCJ]
+#     EXE_FILES => [q[script/perl-quote-fix]]
 #     LICENSE => q[perl]
 #     NAME => q[Perl::Critic::PJCJ]
-#     PREREQ_PM => { ExtUtils::MakeMaker=>q[0], File::Spec=>q[0], IO::Handle=>q[0], IPC::Open3=>q[0], List::Util=>q[1.33], PPI=>q[0], Perl::Critic=>q[0], Test2::V0=>q[0], Test::More=>q[0] }
+#     PREREQ_PM => { Cwd=>q[0], Encode=>q[0], ExtUtils::MakeMaker=>q[0], File::Basename=>q[0], File::Spec=>q[0], File::Temp=>q[0], Getopt::Long=>q[0], IO::Handle=>q[0], IPC::Open3=>q[0], List::Util=>q[1.33], PPI=>q[1.220], Perl::Critic=>q[0], Pod::Usage=>q[0], Scalar::Util=>q[0], Test2::V0=>q[0], Test::More=>q[0], parent=>q[0] }
 #     TEST_REQUIRES => { ExtUtils::MakeMaker=>q[0], File::Spec=>q[0], IO::Handle=>q[0], IPC::Open3=>q[0], Test2::V0=>q[0], Test::More=>q[0] }
-#     VERSION => q[v0.2.7]
-#     test => { TESTS=>q[t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t] }
+#     VERSION => q[v0.3.0]
+#     test => { TESTS=>q[t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Fixer/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t] }
 
 # --- MakeMaker post_initialize section:
 
@@ -61,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Perl::Critic::PJCJ
 NAME_SYM = Perl_Critic_PJCJ
-VERSION = v0.2.7
+VERSION = v0.3.0
 VERSION_MACRO = VERSION
-VERSION_SYM = v0_2_7
+VERSION_SYM = v0_3_0
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = v0.2.7
+XS_VERSION = v0.3.0
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -187,6 +188,8 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/Perl/Critic/PJCJ.pm \
+	lib/Perl/Critic/PJCJ/Fixer.pm \
+	lib/Perl/Critic/PJCJ/Violation.pm \
 	lib/Perl/Critic/Policy/CodeLayout/ProhibitLongLines.pm \
 	lib/Perl/Critic/Policy/ValuesAndExpressions/RequireConsistentQuoting.pm \
 	lib/Perl/Critic/Utils/SourceLocation.pm
@@ -268,7 +271,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Perl-Critic-PJCJ
-DISTVNAME = Perl-Critic-PJCJ-v0.2.7
+DISTVNAME = Perl-Critic-PJCJ-v0.3.0
 
 
 # --- MakeMaker macro section:
@@ -432,6 +435,22 @@ manifypods : pure_all config
 
 # --- MakeMaker installbin section:
 
+EXE_FILES = script/perl-quote-fix
+
+pure_all :: $(INST_SCRIPT)/perl-quote-fix
+	$(NOECHO) $(NOOP)
+
+realclean ::
+	$(RM_F) \
+	  $(INST_SCRIPT)/perl-quote-fix 
+
+$(INST_SCRIPT)/perl-quote-fix : script/perl-quote-fix $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/perl-quote-fix
+	$(CP) script/perl-quote-fix $(INST_SCRIPT)/perl-quote-fix
+	$(FIXIN) $(INST_SCRIPT)/perl-quote-fix
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/perl-quote-fix
+
+
 
 # --- MakeMaker subdirs section:
 
@@ -514,10 +533,18 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Cwd: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Encode: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  File::Basename: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  File::Temp: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Getopt::Long: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  List::Util: '\''1.33'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  PPI: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  PPI: '\''1.220'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Perl::Critic: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v0.2.7' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Pod::Usage: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Scalar::Util: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  parent: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v0.3.0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.020'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -555,9 +582,17 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Cwd" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Encode" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "File::Basename" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "File::Temp" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Getopt::Long" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "List::Util" : "1.33",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "PPI" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Perl::Critic" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "PPI" : "1.220",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Perl::Critic" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Pod::Usage" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Scalar::Util" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "parent" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "test" : {' >> META_new.json
@@ -572,7 +607,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v0.2.7",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v0.3.0",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.16"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -848,7 +883,7 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 TEST_VERBOSE=0
 TEST_TYPE=test_$(LINKTYPE)
 TEST_FILE = test.pl
-TEST_FILES = t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t
+TEST_FILES = t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Fixer/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t
 TESTDB_SW = -d
 
 testdb :: testdb_$(LINKTYPE)
@@ -882,13 +917,21 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Perl-Critic-PJCJ" VERSION="v0.2.7">' > Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Perl-Critic-PJCJ" VERSION="v0.3.0">' > Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Perl::Critic policies for code style consistency</ABSTRACT>' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Paul Johnson &lt;paul@pjcj.net&gt;</AUTHOR>' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Cwd::" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Encode::" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="File::Basename" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="File::Temp" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Getopt::Long" />' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="List::Util" VERSION="1.33" />' >> Perl-Critic-PJCJ.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="PPI::" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="PPI::" VERSION="1.220" />' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Perl::Critic" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Pod::Usage" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Scalar::Util" />' >> Perl-Critic-PJCJ.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="parent::" />' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-2level-5.42" />' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Perl-Critic-PJCJ.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> Perl-Critic-PJCJ.ppd
@@ -904,6 +947,8 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  -e 'pop @parts; $$filter=join q{ }, map qq{"$$_"}, @parts;' \
 	  -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', $$filter, '\''$(PERM_DIR)'\'')' -- $(PM_FILTER) -- \
 	  'lib/Perl/Critic/PJCJ.pm' 'blib/lib/Perl/Critic/PJCJ.pm' \
+	  'lib/Perl/Critic/PJCJ/Fixer.pm' 'blib/lib/Perl/Critic/PJCJ/Fixer.pm' \
+	  'lib/Perl/Critic/PJCJ/Violation.pm' 'blib/lib/Perl/Critic/PJCJ/Violation.pm' \
 	  'lib/Perl/Critic/Policy/CodeLayout/ProhibitLongLines.pm' 'blib/lib/Perl/Critic/Policy/CodeLayout/ProhibitLongLines.pm' \
 	  'lib/Perl/Critic/Policy/ValuesAndExpressions/RequireConsistentQuoting.pm' 'blib/lib/Perl/Critic/Policy/ValuesAndExpressions/RequireConsistentQuoting.pm' \
 	  'lib/Perl/Critic/Utils/SourceLocation.pm' 'blib/lib/Perl/Critic/Utils/SourceLocation.pm' 
@@ -961,10 +1006,11 @@ reinstall-deps:
 	dzil listdeps --develop | cpm install -g --reinstall --no-prebuilt -
 
 t:
-	yath test -j20 --qvf -T --term-width=$(tput cols)
+	yath test -j20 --qvf -T --term-width=$$(tput cols 2>/dev/null || echo 80)
 
 tv:
-	yath test -j20 --qvf -T --term-width=$(tput cols) -v
+	yath test -j20 --qvf -T \
+		--term-width=$$(tput cols 2>/dev/null || echo 80) -v
 
 zt: clean
 	dzil test -j20
@@ -972,11 +1018,14 @@ zt: clean
 
 format:
 	@mkdir -p tmp/perltidy
-	@git ls-files "*.pl" "*.pm" "*.t" | while read file; do \
-		cp "$$file" "$$file.tdybak"; \
-		perlimports --inplace-edit --no-preserve-unused \
-			"$$file" 2>/dev/null || true; \
-		perltidy -b "$$file" >/dev/null 2>&1; \
+	@files=$$(git ls-files -z | xargs -0 utils/perl-hook list); \
+	test -n "$$files" || exit 0; \
+	for file in $$files; do cp "$$file" "$$file.tdybak"; done; \
+	perlimports --inplace-edit --no-preserve-unused $$files 2>/dev/null \
+		|| true; \
+	perl -Ilib script/perl-quote-fix --inplace $$files || exit 1; \
+	utils/perl-hook format $$files || exit 1; \
+	for file in $$files; do \
 		if ! diff -q "$$file.tdybak" "$$file" >/dev/null 2>&1; then \
 			echo "Formatted $$file"; \
 		fi; \
@@ -999,7 +1048,7 @@ cover: build
 	HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,^t/ make t
 
 cover-html: cover
-	cover --report=html_basic --launch
+	cover --report=html --launch
 
 cover-compilation: cover
 	cover --report=compilation

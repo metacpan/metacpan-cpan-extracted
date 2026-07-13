@@ -88,7 +88,8 @@
             "YAML::XS" : "0",
             "base" : "2.18",
             "lib" : "0",
-            "strict" : "0"
+            "strict" : "0",
+            "version" : "0"
          }
       }
    },
@@ -104,7 +105,7 @@
          "web" : "https://github.com/markdootson/opensearch-client-perl"
       }
    },
-   "version" : "3.007007",
+   "version" : "3.007008",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "Apache-2.0"

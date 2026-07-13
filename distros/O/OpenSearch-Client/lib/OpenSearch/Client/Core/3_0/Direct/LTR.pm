@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::LTR;
-$OpenSearch::Client::Core::3_0::Direct::LTR::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::LTR::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::LTR>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ C<POST /_ltr/_featureset/{name}/_addfeatures>
 C<POST /_ltr/{store}/_featureset/{name}/_addfeatures>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->add_features_to_set(
         
@@ -125,6 +128,9 @@ C<POST /_ltr/{store}/_featureset/{name}/_addfeatures/{query}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->add_features_to_set_by_query(
         
          # path parameters
@@ -163,6 +169,9 @@ C<GET /_ltr/_cachestats>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->cache_stats(
         
          # Common API query string parameters
@@ -191,6 +200,9 @@ C<POST /_ltr/_clearcache>
 C<POST /_ltr/{store}/_clearcache>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->clear_cache(
         
@@ -222,6 +234,9 @@ C<PUT /_ltr>
 
 =back
 
+I<Method added in OpenSearch version 2.17.1>
+
+
     $resp = $client->ltr->create_default_store(
         
          # Common API query string parameters
@@ -250,6 +265,9 @@ C<PUT /_ltr/_feature/{id}>
 C<PUT /_ltr/{store}/_feature/{id}>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->create_feature(
         
@@ -291,6 +309,9 @@ C<PUT /_ltr/{store}/_featureset/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->create_featureset(
         
         'body'         =>  $body,      # optional
@@ -330,6 +351,9 @@ C<PUT /_ltr/_model/{id}>
 C<PUT /_ltr/{store}/_model/{id}>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->create_model(
         
@@ -371,6 +395,9 @@ C<POST /_ltr/{store}/_featureset/{name}/_createmodel>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->create_model_from_set(
         
         'body'         =>  $body,      # optional
@@ -408,6 +435,9 @@ C<PUT /_ltr/{store}>
 
 =back
 
+I<Method added in OpenSearch version 2.17.1>
+
+
     $resp = $client->ltr->create_store(
         
          # path parameters
@@ -438,6 +468,9 @@ C<DELETE /_ltr>
 
 =back
 
+I<Method added in OpenSearch version 2.17.1>
+
+
     $resp = $client->ltr->delete_default_store(
         
          # Common API query string parameters
@@ -466,6 +499,9 @@ C<DELETE /_ltr/_feature/{id}>
 C<DELETE /_ltr/{store}/_feature/{id}>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->delete_feature(
         
@@ -501,6 +537,9 @@ C<DELETE /_ltr/{store}/_featureset/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->delete_featureset(
         
          # path parameters
@@ -535,6 +574,9 @@ C<DELETE /_ltr/{store}/_model/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->delete_model(
         
          # path parameters
@@ -565,6 +607,9 @@ I<Paths served by this method:>
 C<DELETE /_ltr/{store}>
 
 =back
+
+I<Method added in OpenSearch version 2.17.1>
+
 
     $resp = $client->ltr->delete_store(
         
@@ -598,6 +643,9 @@ C<GET /_ltr/_feature/{id}>
 C<GET /_ltr/{store}/_feature/{id}>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->get_feature(
         
@@ -633,6 +681,9 @@ C<GET /_ltr/{store}/_featureset/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->get_featureset(
         
          # path parameters
@@ -667,6 +718,9 @@ C<GET /_ltr/{store}/_model/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->get_model(
         
          # path parameters
@@ -698,6 +752,9 @@ C<GET /_ltr/{store}>
 
 =back
 
+I<Method added in OpenSearch version 2.17.1>
+
+
     $resp = $client->ltr->get_store(
         
          # path parameters
@@ -728,6 +785,9 @@ C<GET /_ltr>
 
 =back
 
+I<Method added in OpenSearch version 2.17.1>
+
+
     $resp = $client->ltr->list_stores(
         
          # Common API query string parameters
@@ -756,6 +816,9 @@ C<GET /_ltr/_feature>
 C<GET /_ltr/{store}/_feature>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->search_features(
         
@@ -796,6 +859,9 @@ C<GET /_ltr/{store}/_featureset>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->search_featuresets(
         
          # path parameters
@@ -834,6 +900,9 @@ C<GET /_ltr/_model>
 C<GET /_ltr/{store}/_model>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->search_models(
         
@@ -880,6 +949,9 @@ C<GET /_plugins/_ltr/{node_id}/stats/{stat}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->stats(
         
          # path parameters
@@ -917,6 +989,9 @@ C<POST /_ltr/_feature/{id}>
 C<POST /_ltr/{store}/_feature/{id}>
 
 =back
+
+I<Method added in OpenSearch version 2.19>
+
 
     $resp = $client->ltr->update_feature(
         
@@ -958,6 +1033,9 @@ C<POST /_ltr/{store}/_featureset/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.19>
+
+
     $resp = $client->ltr->update_featureset(
         
         'body'         =>  $body,      # optional
@@ -981,6 +1059,19 @@ C<POST /_ltr/{store}/_featureset/{id}>
     );
 
 L<OpenSearch documentation for ltr-E<gt>update_featureset|https://docs.opensearch.org/latest/search-plugins/ltr/index/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->ltr->method_supported_in_version(
+        method  => 'add_features_to_set',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

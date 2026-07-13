@@ -52,6 +52,7 @@ on 'test' => sub {
   requires "base" => "2.18";
   requires "lib" => "0";
   requires "strict" => "0";
+  requires "version" => "0";
 };
 
 on 'test' => sub {

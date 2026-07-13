@@ -6,11 +6,21 @@ use warnings;
 use feature "signatures";
 use experimental "signatures";
 
-use Exporter  qw( import );
-use PPI       ();
-use Test2::V0 qw( fail is like );
+use Exporter   qw( import );
+use List::Util qw( any );
+use PPI        ();
+use Test2::V0  qw( diag fail is like );
 
-our @EXPORT_OK = qw( find_violations count_violations good bad );
+use Perl::Critic::PJCJ::Fixer ();
+
+our @EXPORT_OK = qw( find_violations count_violations good bad fixes
+  unchanged );
+
+my $Fixer = Perl::Critic::PJCJ::Fixer->new;
+
+sub _is_quoting_policy ($policy) {
+  ref($policy) =~ /RequireConsistentQuoting/
+}
 
 sub find_violations ($policy, $code) {
   my $doc = PPI::Document->new(\$code);
@@ -24,14 +34,13 @@ sub find_violations ($policy, $code) {
   }
 
   # Handle policies that apply to specific element types
-  for my $type (@applies_to) {
-    $doc->find(
-      sub ($top, $elem) {
-        push @violations, $policy->violates($elem, $doc) if $elem->isa($type);
-        0
-      }
-    );
-  }
+  $doc->find(
+    sub ($top, $elem) {
+      push @violations, $policy->violates($elem, $doc)
+        if any { $elem->isa($_) } @applies_to;
+      0
+    }
+  );
 
   @violations
 }
@@ -44,11 +53,11 @@ sub count_violations ($policy, $code, $expected_violations, $description) {
 
 sub good ($policy, $code, $description) {
   my @violations = count_violations($policy, $code, 0, $description);
-  my $field
-    = ref($policy) =~ /RequireConsistentQuoting/
-    ? "explanation"
-    : "description";
-  fail join " --- ", (map $_ // "*undef*", $_->$field, $code) for @violations;
+  fail join " --- ", (map $_ // "*undef*", $_->description, $code)
+    for @violations;
+
+  is $Fixer->fix($code), $code, "$description - fixer leaves it alone"
+    if _is_quoting_policy($policy);
 }
 
 sub bad ($policy, $code, $expected_message, $description) {
@@ -56,13 +65,23 @@ sub bad ($policy, $code, $expected_message, $description) {
   is @violations, 1, "$description - should have one violation";
   return unless @violations;
 
-  # For quoting policies, check explanation instead of description
-  my $field
-    = ref($policy) =~ /RequireConsistentQuoting/
-    ? "explanation"
-    : "description";
-  like $violations[0]->$field, qr/\Q$expected_message\E/,
+  like $violations[0]->description, qr/\Q$expected_message\E/,
     "$description - should suggest $expected_message";
+
+  if (_is_quoting_policy($policy)) {
+    my $fixed     = $Fixer->fix($code);
+    my @remaining = find_violations($policy, $fixed);
+    is @remaining, 0, "$description - fixer resolves the violation"
+      or diag "fixed source: $fixed";
+  }
+}
+
+sub fixes ($in, $out, $desc) {
+  is $Fixer->fix($in), $out, $desc;
+}
+
+sub unchanged ($in, $desc) {
+  is $Fixer->fix($in), $in, $desc;
 }
 
 "
@@ -159,6 +178,8 @@ Parameters:
 =back
 
 This is a convenience function that verifies the code passes the policy check.
+For the RequireConsistentQuoting policy it also asserts that
+L<Perl::Critic::PJCJ::Fixer> leaves the code unchanged.
 
 =head2 bad
 
@@ -181,15 +202,27 @@ Parameters:
 =back
 
 This function verifies that the code violates the policy exactly once and that
-the violation message contains the expected text. For most policies, it checks
-the description field. For the RequireConsistentQuoting policy, it checks the
-explanation field instead.
+the violation's description contains the expected text. For the
+RequireConsistentQuoting policy it also asserts that
+L<Perl::Critic::PJCJ::Fixer> resolves the violation.
+
+=head2 fixes
+
+  fixes $code, $expected, $description;
+
+Tests that L<Perl::Critic::PJCJ::Fixer> rewrites C<$code> to C<$expected>.
+
+=head2 unchanged
+
+  unchanged $code, $description;
+
+Tests that L<Perl::Critic::PJCJ::Fixer> leaves C<$code> unchanged.
 
 =head1 AUTHOR
 
 Paul Johnson, E<lt>paul@pjcj.netE<gt>
 
-=head1 LICENSE
+=head1 LICENCE
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

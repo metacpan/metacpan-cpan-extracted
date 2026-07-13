@@ -18,9 +18,10 @@ my $Policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new;
 subtest "Policy methods" => sub {
   # Test default_themes
   my @themes = $Policy->default_themes;
-  is @themes,    2,            "default_themes returns two themes";
+  is @themes,    3,            "default_themes returns three themes";
   is $themes[0], "cosmetic",   "first theme is cosmetic";
   is $themes[1], "formatting", "second theme is formatting";
+  is $themes[2], "pjcj",       "third theme is pjcj";
 
   # Test applies_to
   my @types = $Policy->applies_to;

@@ -13,6 +13,12 @@ typedef struct promise* Thread__CSP__Promise;
 
 MODULE = Thread::CSP              PACKAGE = Thread::CSP  PREFIX = thread_
 
+TYPEMAP: <<END
+Thread::CSP::Channel T_MAGICEXT
+Thread::CSP::Promise T_MAGICEXT
+AV* T_SLURP_AV
+END
+
 BOOT:
 	global_init(aTHX);
 

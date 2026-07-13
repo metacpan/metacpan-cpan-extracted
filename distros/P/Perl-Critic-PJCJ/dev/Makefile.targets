@@ -26,10 +26,11 @@ reinstall-deps:
 	dzil listdeps --develop | cpm install -g --reinstall --no-prebuilt -
 
 t:
-	yath test -j20 --qvf -T --term-width=$(tput cols)
+	yath test -j20 --qvf -T --term-width=$$(tput cols 2>/dev/null || echo 80)
 
 tv:
-	yath test -j20 --qvf -T --term-width=$(tput cols) -v
+	yath test -j20 --qvf -T \
+		--term-width=$$(tput cols 2>/dev/null || echo 80) -v
 
 zt: clean
 	dzil test -j20
@@ -39,11 +40,14 @@ test: zt
 
 format:
 	@mkdir -p tmp/perltidy
-	@git ls-files "*.pl" "*.pm" "*.t" | while read file; do \
-		cp "$$file" "$$file.tdybak"; \
-		perlimports --inplace-edit --no-preserve-unused \
-			"$$file" 2>/dev/null || true; \
-		perltidy -b "$$file" >/dev/null 2>&1; \
+	@files=$$(git ls-files -z | xargs -0 utils/perl-hook list); \
+	test -n "$$files" || exit 0; \
+	for file in $$files; do cp "$$file" "$$file.tdybak"; done; \
+	perlimports --inplace-edit --no-preserve-unused $$files 2>/dev/null \
+		|| true; \
+	perl -Ilib script/perl-quote-fix --inplace $$files || exit 1; \
+	utils/perl-hook format $$files || exit 1; \
+	for file in $$files; do \
 		if ! diff -q "$$file.tdybak" "$$file" >/dev/null 2>&1; then \
 			echo "Formatted $$file"; \
 		fi; \
@@ -70,7 +74,7 @@ cover: build
 	HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,^t/ make t
 
 cover-html: cover
-	cover --report=html_basic --launch
+	cover --report=html --launch
 
 cover-compilation: cover
 	cover --report=compilation

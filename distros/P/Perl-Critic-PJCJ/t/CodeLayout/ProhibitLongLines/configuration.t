@@ -4,7 +4,7 @@ use v5.26.0;
 use strict;
 use warnings;
 
-use Test2::V0    qw( done_testing is subtest );
+use Test2::V0    qw( dies done_testing is like ok subtest );
 use feature      qw( signatures );
 use experimental qw( signatures );
 
@@ -86,9 +86,10 @@ subtest "Default behaviour when no configuration set" => sub {
 };
 
 subtest "allow_lines_matching - single pattern exempts matching lines" => sub {
-  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new;
-  $policy->{_max_line_length}      = 40;
-  $policy->{_allow_lines_matching} = { "^\\s*package\\s+" => 1 };
+  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+    max_line_length      => 40,
+    allow_lines_matching => "^\\s*package\\s+",
+  );
 
   my $pkg_line
     = "package Very::Long::Package::Name::That::Exceeds::The::Limit v1.0;";
@@ -96,9 +97,10 @@ subtest "allow_lines_matching - single pattern exempts matching lines" => sub {
 };
 
 subtest "allow_lines_matching - non-matching lines still violate" => sub {
-  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new;
-  $policy->{_max_line_length}      = 40;
-  $policy->{_allow_lines_matching} = { "^\\s*package\\s+" => 1 };
+  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+    max_line_length      => 40,
+    allow_lines_matching => "^\\s*package\\s+",
+  );
 
   my $long_line = 'my $var = "' . ("x" x 28) . '";';
   bad $policy, $long_line, "Line is 41 characters long (exceeds 40)",
@@ -106,10 +108,10 @@ subtest "allow_lines_matching - non-matching lines still violate" => sub {
 };
 
 subtest "allow_lines_matching - multiple patterns" => sub {
-  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new;
-  $policy->{_max_line_length} = 40;
-  $policy->{_allow_lines_matching}
-    = { "^\\s*package\\s+" => 1, "https?://" => 1 };
+  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+    max_line_length      => 40,
+    allow_lines_matching => "^\\s*package\\s+ https?://",
+  );
 
   my $pkg_line
     = "package Very::Long::Package::Name::That::Exceeds::The::Limit v1.0;";
@@ -124,9 +126,8 @@ subtest "allow_lines_matching - multiple patterns" => sub {
 };
 
 subtest "allow_lines_matching - empty patterns means no exemptions" => sub {
-  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new;
-  $policy->{_max_line_length}      = 40;
-  $policy->{_allow_lines_matching} = {};
+  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+    max_line_length => 40);
 
   my $long_line = 'my $var = "' . ("x" x 28) . '";';
   bad $policy, $long_line, "Line is 41 characters long (exceeds 40)",
@@ -134,15 +135,33 @@ subtest "allow_lines_matching - empty patterns means no exemptions" => sub {
 };
 
 subtest "allow_lines_matching - exempt line among non-exempt lines" => sub {
-  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new;
-  $policy->{_max_line_length}      = 40;
-  $policy->{_allow_lines_matching} = { "^\\s*package\\s+" => 1 };
+  my $policy = Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+    max_line_length      => 40,
+    allow_lines_matching => "^\\s*package\\s+",
+  );
 
   # Multi-line code: package line is long but exempt, other long line is not
   my $code = join "\n",
     "package Very::Long::Package::Name::That::Exceeds::Limit v1.0;",
     'my $var = "' . ("x" x 28) . '";';
   count_violations $policy, $code, 1, "Only non-exempt long line violates";
+};
+
+subtest "invalid allow_lines_matching is a configuration error" => sub {
+  my $err = dies {
+    Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+      allow_lines_matching => "[unclosed")
+  };
+  ok $err, "constructing with an invalid pattern dies";
+  like "$err", qr/allow_lines_matching/, "error names the parameter";
+  like "$err", qr/not a valid regular expression/,
+    "error says the pattern is invalid";
+
+  $err = dies {
+    Perl::Critic::Policy::CodeLayout::ProhibitLongLines->new(
+      allow_lines_matching => "^\\s*package\\s+ [unclosed")
+  };
+  ok $err, "one invalid pattern among valid ones still dies";
 };
 
 done_testing;

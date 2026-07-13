@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-Fondation-User
+
+0.01      2026-07-12 20:22:13+02:00 Europe/Paris
+  - Initial release
+  - Replace table name with result_class name
+  - Use ->with('groups') to retrieve groups
+  - Sync group assignments

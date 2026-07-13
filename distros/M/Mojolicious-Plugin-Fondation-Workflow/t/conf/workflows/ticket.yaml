@@ -1,0 +1,86 @@
+---
+type: ticket
+initial_state: draft
+persister: FondationWorkflow
+description: "Simple ticket workflow for testing"
+
+fondation:
+    label: "Tickets"
+    description: "Ticket lifecycle"
+
+state:
+  - name: draft
+    fondation:
+        label: "Draft"
+        color: "warning"
+        icon: "pencil"
+    action:
+      - name: submit
+        resulting_state: submitted
+      - name: cancel
+        resulting_state: cancelled
+
+  - name: submitted
+    fondation:
+        label: "Submitted"
+        color: "info"
+    action:
+      - name: approve
+        resulting_state: closed
+      - name: reject
+        resulting_state: draft
+
+  - name: closed
+    fondation:
+        label: "Closed"
+        color: "success"
+    action:
+      - name: reopen
+        resulting_state: draft
+
+  - name: cancelled
+    fondation:
+        label: "Cancelled"
+        color: "secondary"
+
+action:
+  - name: submit
+    class: Workflow::Action::Null
+    fondation:
+        label: "Submit"
+        color: "primary"
+        icon: "send"
+        permission: "ticket.submit"
+        confirm: "Confirm submission?"
+        group: "main"
+
+  - name: cancel
+    class: Workflow::Action::Null
+    fondation:
+        label: "Cancel"
+        color: "secondary"
+        permission: "ticket.cancel"
+        group: "danger"
+
+  - name: approve
+    class: Workflow::Action::Null
+    fondation:
+        label: "Approve"
+        color: "success"
+        permission: "ticket.approve"
+        confirm: "Confirm approval?"
+
+  - name: reject
+    class: Workflow::Action::Null
+    fondation:
+        label: "Reject"
+        color: "alert"
+        permission: "ticket.reject"
+        group: "danger"
+
+  - name: reopen
+    class: Workflow::Action::Null
+    fondation:
+        label: "Reopen"
+        color: "warning"
+        permission: "ticket.reopen"

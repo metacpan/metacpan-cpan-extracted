@@ -1,0 +1,199 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication - [Put something meaningful here!]
+
+
+=head1 VERSION
+
+This document describes MojoX::Authentication version 0.001.
+
+=begin html
+
+
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/MojoX-Authentication">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/MojoX-Authentication.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/MojoX-Authentication">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/MojoX-Authentication.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/MojoX-Authentication.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=MojoX-Authentication">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use MojoX::Authentication;
+
+
+=head1 DESCRIPTION
+
+This module aims at being a I<batteries included> facility for handling
+authentication in L<Mojolicious> applications.
+
+More documentation will come, but the application in the C<eg>
+sub-directory contains an example for using the three ways of
+authentication that are supported: local with in-memory hashes, local
+with database (SQLite), remote with SAML 2.0.
+
+
+=head1 INTERFACE
+
+=begin hidden
+
+=head2 BUILD
+
+Used to call L</app_startup> if requested.
+
+=head2 BUILDARGS
+
+Used to I<massage> the input parameters before creating the instance.
+
+=end hidden
+
+=head2 B<< app >>
+
+   my $app = $ma->app;
+
+Retrieve the application object reference set at creation or later when
+calling L</app_startup> (if you decide to use it).
+
+It is mandatory if L</model> is missing.
+
+=head2 B<< app_startup >>
+
+   $ma->app_startup; # OR
+   $ma->app_startup($app);
+
+Perform some startup over the application (either provided explicitly as
+C<$app>, or retrieved via L</app>), like adding and initializing plugin
+L<Mojolicious::Plugin::Authentication> and setting a C<before_render>
+hook to inject the user data in the stash, if present (see
+L</user_stash_key> for the key used in the stash).
+
+=head2 B<< ctr_credentials_login >>
+
+   $ma->ctr_credentals_login($controller, $routes_for); # OR
+   $ma->ctr_credentals_login($controller);
+
+Opinionated way of handling the login through credentials, practically
+acting as a wrapper around the C<$controller>. Assumes that username and
+secret can be retrieved via C<param()> with keys C<username> and
+C<password> respectively.
+
+The C<$routes_for>, if present, is supposed to be a hash reference
+holding the routes to redirect the client for key C<ok> (in case the
+interaction is successful) and key C<not_ok> (otherwise). They default
+to C<protected_root> and C<public_root> respectively.
+
+=head2 B<< ctr_logout >>
+
+   $ma->ctr_logout($controller);
+
+Perform the logout. If the provider supports the C<logout> method, this
+totally delegates to it; otherwise, it calls the C<logout> method over
+the C<$controller>.
+
+=head2 B<< ctr_saml2_login >>
+
+   $ma->ctr_saml2_login($controller, $route_for);
+
+Opinionated way of handling the login through credentials, practically
+acting as a wrapper around the C<$controller>. This is the initial
+request where the user is then sent to the Identity Provider.
+
+The C<$routes_for> works like for L</ctr_credentials_login>, except that
+in case of success the redirection URL will send the user to the
+Identity Provider.
+
+=head2 B<< ctr_saml2_sso_post >>
+
+   $ma->ctr_saml2_sso_post($controller, $route_for);
+
+Opinionated way of handling the login through credentials, practically
+acting as a wrapper around the C<$controller>. This is the final
+request where the user comes back from the Identity Provider.
+
+The C<$routes_for> works like for L</ctr_credentials_login>.
+
+
+=head2 B<< model >>
+
+   my $model = $ma->model;
+
+Accessor to the I<model>, most probably an instance of
+L<MojoX::Authentication::Model>.
+
+If it is not set at creation, it is expected that L</app> is set and
+that it can be called like C<< $app->model->authentication >> to
+retrieve the correct value for this member.
+
+=head2 B<< new >>
+
+   my $ma = MojoX::Authentication->new(%args); # OR
+   my $ma = MojoX::Authentication->new(\%args);
+
+Constructor.
+
+Accepts initialization values for L</app>, L</model>,
+L</saml2_provider_name>, and L</user_stash_key>.
+
+=head2 B<< saml2_provider_name >>
+
+   my $string = $ma->saml2_provider_name;
+
+Accessor to the (default) provider name for SAML2 logins. This works
+under the assumption that there will only be one identity provider;
+otherwise you will have to do some more coding on your side.
+
+=head2 B<< user_stash_key >>
+
+   my $string = $ma->user_stash_key;
+
+Accessor to the key (a string) used to set the user in the stash, when
+available. Defaults to C<user>, so in your templates you should be able
+to use the C<$user> variable. See L</app_startup> for its usage.
+
+=head1 BUGS AND LIMITATIONS
+
+Minimul perl version 5.24.
+
+
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

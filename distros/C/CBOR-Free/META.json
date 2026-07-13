@@ -67,6 +67,6 @@
          "web" : "https://github.com/FGasper/p5-CBOR-Free"
       }
    },
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

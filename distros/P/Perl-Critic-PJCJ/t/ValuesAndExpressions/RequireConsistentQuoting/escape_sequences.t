@@ -10,7 +10,11 @@ use experimental qw( signatures );
 
 # Test escape sequence handling in quotes
 use lib qw( lib t/lib );
-use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting ();
+use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting qw(
+  desc_double
+  desc_optimal
+  desc_single
+);
 use ViolationFinder qw( bad good );
 
 my $Policy
@@ -20,14 +24,14 @@ subtest "Escaped sigils should suggest double quotes" => sub {
   # In single quotes: '\$' is literally backslash-dollar
   # In double quotes: "\$" is properly escaped dollar
 
-  bad $Policy, 'my $price = "Cost: \$10"', "use ''",
+  bad $Policy, 'my $price = "Cost: \$10"', desc_single,
     "Escaped dollar in single quotes should suggest single quotes";
 
-  bad $Policy, 'my $email = "Contact: \@domain"', "use ''",
+  bad $Policy, 'my $email = "Contact: \@domain"', desc_single,
     "Escaped at in single quotes should suggest single quotes";
 
   # Mixed escaped and literal content
-  bad $Policy, 'my $mixed = "\$escaped and literal text"', "use ''",
+  bad $Policy, 'my $mixed = "\$escaped and literal text"', desc_single,
     "Escaped sigils with text should suggest single quotes";
 };
 
@@ -139,30 +143,30 @@ subtest "q() with escape sequences should recommend changes" => sub {
   # So q() with escape sequences should be preserved to maintain literal meaning
 
   # Single character escapes in q()
-  bad $Policy, 'my $text = q(Line with \\n newline)', 'use ""',
+  bad $Policy, 'my $text = q(Line with \\n newline)', desc_double,
     'q() with literal \n should suggest double quotes';
-  bad $Policy, 'my $text = q(Tab \\t here)', 'use ""',
+  bad $Policy, 'my $text = q(Tab \\t here)', desc_double,
     'q() with literal \t should suggest double quotes';
-  bad $Policy, 'my $text = q(Return \\r here)', 'use ""',
+  bad $Policy, 'my $text = q(Return \\r here)', desc_double,
     'q() with literal \r should suggest double quotes';
 
   # Variable sigils in q() - these are literal backslash-dollar/at
   # Since \$ in q() is literal (two characters), it's preserved
-  bad $Policy, 'my $price = q(Cost: \\$5.00)', "use ''",
+  bad $Policy, 'my $price = q(Cost: \\$5.00)', desc_single,
     'q() with literal \$ should suggest single quotes';
-  bad $Policy, 'my $email = q(user\\@domain.com)', "use ''",
+  bad $Policy, 'my $email = q(user\\@domain.com)', desc_single,
     'q() with literal \@ should suggest single quotes';
 
   # Hex/octal escapes in q()
-  bad $Policy, 'my $hex = q(Hex \\x1b escape)', 'use ""',
+  bad $Policy, 'my $hex = q(Hex \\x1b escape)', desc_double,
     'q() with literal \x hex should suggest double quotes';
-  bad $Policy, 'my $oct = q(Octal \\033 escape)', 'use ""',
+  bad $Policy, 'my $oct = q(Octal \\033 escape)', desc_double,
     'q() with literal \033 should suggest double quotes';
 
   # Control and named escapes in q()
-  bad $Policy, 'my $ctrl = q(Control \\c[ char)', 'use ""',
+  bad $Policy, 'my $ctrl = q(Control \\c[ char)', desc_double,
     'q() with literal \c should suggest double quotes';
-  bad $Policy, 'my $named = q(Named \\N{SMILEY} char)', 'use ""',
+  bad $Policy, 'my $named = q(Named \\N{SMILEY} char)', desc_double,
     "q() with literal \\N should suggest double quotes";
 };
 
@@ -181,9 +185,9 @@ subtest "qq() with escape sequences should stay qq()" => sub {
 
   # Variable sigils in qq() - these escape the sigils for literal output
   # Since \$ in qq() produces a literal $, single quotes would work too
-  bad $Policy, 'my $price = qq(Cost: \\$5.00)', "use ''",
+  bad $Policy, 'my $price = qq(Cost: \\$5.00)', desc_single,
     'qq() with escaped \$ should suggest single quotes';
-  bad $Policy, 'my $email = qq(user\\@domain.com)', "use ''",
+  bad $Policy, 'my $email = qq(user\\@domain.com)', desc_single,
     'qq() with escaped \@ should suggest single quotes';
 
   # Hex/octal escapes in qq()
@@ -228,7 +232,7 @@ subtest "Edge cases with backslashes" => sub {
   good $Policy, 'my $backslash = "Just \\ backslash"',
     "Escaped backslash in double quotes is acceptable";
 
-  bad $Policy, q(my $backslash = 'Just \\ backslash'), 'use ""',
+  bad $Policy, q(my $backslash = 'Just \\ backslash'), desc_double,
     "Literal backslashes in single quotes should suggest double quotes";
 
   good $Policy, q(my $quote = 'Has "double" quotes'),
@@ -334,6 +338,18 @@ subtest "String modification escape sequences" => sub {
     "Double quotes with only \\E escape should stay double quotes";
 };
 
+subtest "Foldcase escape sequences" => sub {
+  good $Policy, 'my $x = "\$a\FBAR";',
+    "Foldcase escape must not become a literal F in single quotes";
+  good $Policy, 'my $x = qq(a\Fb);',
+    "Foldcase escape keeps qq() like the other case escapes";
+  good $Policy, q(my $x = 'a\Fb';),
+    "Foldcase escape would change meaning in double quotes";
+
+  bad $Policy, 'my $x = "\$aFBAR";', desc_single,
+    "An unescaped F is not a quote-sensitive escape";
+};
+
 subtest "Incomplete and backslash escape sequences" => sub {
   # Test incomplete or malformed escape sequences
 
@@ -411,7 +427,7 @@ subtest "Strings with conflicting quoting requirements" => sub {
 
   # Double quotes with escape sequences should stay double quotes even if
   # they contain content that would normally suggest single quotes
-  bad $Policy, 'my $mixed = "\"\n"', "use qq()",
+  bad $Policy, 'my $mixed = "\"\n"', desc_optimal("qq()"),
     "Double quotes with escaped quote and newline should use qq()";
   good $Policy, q(my $mixed = "Don't\t"),
     "Double quotes with apostrophe and tab should stay double quotes";
@@ -419,7 +435,7 @@ subtest "Strings with conflicting quoting requirements" => sub {
     "Double quotes with apostrophe and CR should stay double quotes";
 
   # Test with various single character escapes mixed with quote content
-  bad $Policy, 'my $mixed = "Quote: \"Hello\"\n"', "use qq()",
+  bad $Policy, 'my $mixed = "Quote: \"Hello\"\n"', desc_optimal("qq()"),
     "Double quotes with escaped quotes and newline should use qq()";
   good $Policy, q(my $mixed = "Path: 'C:\\Program Files'\t"),
     "Double quotes with single quotes and tab should stay double quotes";
@@ -458,7 +474,7 @@ subtest "Strings with conflicting quoting requirements" => sub {
   # Test edge case: only quote and escape sequence
   good $Policy, q(my $minimal = "'\n"),
     "Double quotes with only quote and newline should stay double quotes";
-  bad $Policy, 'my $minimal = "\"\t"', "use qq()",
+  bad $Policy, 'my $minimal = "\"\t"', desc_optimal("qq()"),
     "Double quotes with escaped quote and tab should use qq()";
 };
 

@@ -1,0 +1,145 @@
+package Workflow::Condition::LazyAND;
+
+use warnings;
+use strict;
+use v5.14.0;
+
+our $VERSION = '2.10';
+
+use parent qw( Workflow::Condition );
+use Workflow::Exception qw( configuration_error );
+
+__PACKAGE__->mk_accessors('conditions');
+
+sub init {
+    my ( $self, $params ) = @_;
+    $self->SUPER::init( $params );
+
+    # This is a tricky one. The admin may have configured this by repeating
+    # the param name "condition" or by using unique names (e.g.: "condition1",
+    # "condition2", etc.). We'll need to string these back together as
+    # an array.
+    # Yes, I know. The regex doesn't require the suffix to be numeric.
+    my @conditions = ();
+    foreach my $key ( sort grep {m/^condition/} keys %{$params} ) {
+        push @conditions, $self->normalize_array( $params->{$key} );
+    }
+    $self->conditions( [@conditions] );
+}
+
+sub evaluate {
+    my ( $self, $wf ) = @_;
+    my $conditions = $self->conditions;
+
+    my $total = 0;
+
+    return Workflow::Condition::IsFalse->new("No conditions were defined") unless(@{$conditions});
+
+    foreach my $cond ( @{$conditions} ) {
+        my $result = $self->evaluate_condition( $wf, $cond );
+        if ( not $result ) {
+            return Workflow::Condition::IsFalse->new("Stopped after checking $total conditions");
+        }
+        $total++;
+    }
+
+    return Workflow::Condition::IsTrue->new("Matched a total of $total conditions");
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Workflow::Condition::LazyAND
+
+=head1 VERSION
+
+This documentation describes version 2.09 of this package
+
+=head1 DESCRIPTION
+
+Using nested conditions (See Workflow::Condition::Nested), this evaluates
+the given conditions using lazy-evaluation, returning I<true> if B<all>
+nested conditions are I<true>. If a nested condition evaluates to I<false>,
+further evaluation is aborted and I<false> is returned.
+
+=head1 SYNOPSIS
+
+In condition.yaml:
+
+  condition:
+  - name: cond1
+    ...
+  - name: cond2
+    ...
+  - name cond3
+    ...
+  - name: check_prereqs
+    class: Workflow::Condition::LazyAND
+    param:
+    - name: condition
+      value: cond1
+    - name: condition
+      value: cond2
+    - name: condition
+      value: cond3
+
+In workflow.yaml:
+
+  state:
+  - name: CHECK_PREREQS
+    autorun: yes
+    action:
+    - name: null_1
+      resulting_state: HAVE_PREREQS
+      condition:
+      - name: check_prereqs
+    - name: null_2
+      resulting_state: FAILURE
+      condition:
+      - name: !check_prereqs
+
+=cut
+
+=head1 PARAMETERS
+
+The following parameters may be configured in the C<param> key of the
+condition in the YAML configuration:
+
+=head2 condition, conditionN
+
+The condition parameter may be specified as either a list of repeating
+entries B<or> with a unique integer appended to the I<condition> string:
+
+  param:
+  - name: condition
+    value: first_condition_to_test
+  - name: condition
+    value: second_condition_to_test
+
+B<or>
+
+  param:
+  - name: condition1
+    value: first_condition_to_test
+  - name: condition2
+    value: second_condition_to_test
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Please see the F<LICENSE>
+
+=head1 AUTHORS
+
+Please see L<Workflow>
+
+=cut

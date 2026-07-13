@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::WLM;
-$OpenSearch::Client::Core::3_0::Direct::WLM::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::WLM::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::WLM>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<PUT /_wlm/query_group>
 
 =back
 
+I<Method added in OpenSearch version 2.17>
+
+
     $resp = $client->wlm->create_query_group(
         
         'body'         =>  $body,      # optional
@@ -107,6 +110,9 @@ I<Paths served by this method:>
 C<DELETE /_wlm/query_group/{name}>
 
 =back
+
+I<Method added in OpenSearch version 2.17>
+
 
     $resp = $client->wlm->delete_query_group(
         
@@ -141,6 +147,9 @@ C<GET /_wlm/query_group/{name}>
 
 =back
 
+I<Method added in OpenSearch version 2.17>
+
+
     $resp = $client->wlm->get_query_group(
         
          # path parameters
@@ -171,6 +180,9 @@ C<PUT /_wlm/query_group/{name}>
 
 =back
 
+I<Method added in OpenSearch version 2.17>
+
+
     $resp = $client->wlm->update_query_group(
         
         'body'         =>  $body,      # optional
@@ -189,6 +201,19 @@ C<PUT /_wlm/query_group/{name}>
     );
 
 L<OpenSearch documentation for wlm-E<gt>update_query_group|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/workload-management/wlm-feature-overview/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->wlm->method_supported_in_version(
+        method  => 'create_query_group',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

@@ -1,5 +1,29 @@
 Revision history for HTML-OSM
 
+0.10	Sun Jul 12 21:23:33 EDT 2026
+	[ Bug Fixes ]
+	- Don't try to call a method on an ininitialized variable
+	- Use consistent default sizes
+	- Bump minimum versions
+	- Set maximum zoom to 19
+	- Fix function-style HTML::OSM::new() with arguments blessing into wrong package
+
+	[ Enhancements ]
+	- Re-enable search box and reset button in rendered map
+	- Add "Clear search markers" button to remove dynamically-added markers
+	- add_geojson(): render GeoJSON layers via Leaflet-native L.geoJSON()
+	- add_heatmap(): render heatmap layers via Leaflet.heat plugin
+	- add_gpx(): render GPX tracks from a URL via leaflet-gpx plugin
+	- add_choropleth(): data-driven colour-fill layers; colours pre-computed in Perl
+	- new(cluster=>1): group markers with Leaflet.markercluster plugin
+	- onload_render() no longer requires point markers when GeoJSON/heatmap/GPX/choropleth data is present
+	- Use Params::Validate::Strict on new()
+	- Added the test dashboard at https://nigelhorne.github.io/HTML-OSM/coverage/
+
+	[ Tests ]
+	- Started fuzz testing
+	- Extend new() fuzz schema with zoom, height, width and min_interval inputs
+
 0.09	Thu Jul 31 11:15:55 EDT 2025
 	Remove unused module: File::Slurp
 	Use Params::Get, Object::Configure

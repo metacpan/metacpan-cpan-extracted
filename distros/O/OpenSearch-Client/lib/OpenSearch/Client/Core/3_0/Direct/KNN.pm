@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::KNN;
-$OpenSearch::Client::Core::3_0::Direct::KNN::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::KNN::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::KNN>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/_knn/models/{model_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->knn->delete_model(
         
          # path parameters
@@ -109,6 +112,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_knn/models/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->knn->get_model(
         
@@ -142,6 +148,9 @@ C<GET /_plugins/_knn/models/_search>
 C<POST /_plugins/_knn/models/_search>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->knn->search_models(
         
@@ -225,6 +234,9 @@ C<GET /_plugins/_knn/{node_id}/stats/{stat}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->knn->stats(
         
          # path parameters
@@ -263,6 +275,9 @@ C<POST /_plugins/_knn/models/{model_id}/_train>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->knn->train_model(
         
         'body'         =>  $body,      # optional
@@ -299,6 +314,9 @@ C<GET /_plugins/_knn/warmup/{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->knn->warmup(
         
          # path parameters
@@ -315,6 +333,19 @@ C<GET /_plugins/_knn/warmup/{index}>
     );
 
 L<OpenSearch documentation for knn-E<gt>warmup|https://docs.opensearch.org/latest/vector-search/api/knn/#warmup-operation>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->knn->method_supported_in_version(
+        method  => 'delete_model',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

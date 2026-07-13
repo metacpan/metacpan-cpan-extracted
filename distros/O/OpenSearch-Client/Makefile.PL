@@ -65,9 +65,10 @@ my %WriteMakefileArgs = (
     "YAML::XS" => 0,
     "base" => "2.18",
     "lib" => 0,
-    "strict" => 0
+    "strict" => 0,
+    "version" => 0
   },
-  "VERSION" => "3.007007",
+  "VERSION" => "3.007008",
   "test" => {
     "TESTS" => "t/10_Basic/*.t t/20_Serializer/*.t t/30_Logger/*.t t/40_Transport/*.t t/50_Cxn_Pool/*.t t/60_Cxn/*.t t/70_Request/*.t t/Core_3_0/*.t"
   }
@@ -122,6 +123,7 @@ my %FallbackPrereqs = (
   "namespace::clean" => 0,
   "overload" => 0,
   "strict" => 0,
+  "version" => 0,
   "warnings" => 0
 );
 

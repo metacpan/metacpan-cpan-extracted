@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Tasks;
-$OpenSearch::Client::Core::3_0::Direct::Tasks::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Tasks::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Tasks>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,9 @@ C<POST /_tasks/{task_id}/_cancel>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->tasks->cancel(
         
          # path parameters
@@ -120,6 +123,9 @@ C<GET /_tasks/{task_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->tasks->get(
         
          # path parameters
@@ -155,6 +161,9 @@ C<GET /_tasks>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->tasks->list(
         
          # Endpoint specific query string parameters
@@ -177,6 +186,19 @@ C<GET /_tasks>
     );
 
 L<OpenSearch documentation for tasks-E<gt>list|https://opensearch.org/docs/latest/api-reference/tasks/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->tasks->method_supported_in_version(
+        method  => 'cancel',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

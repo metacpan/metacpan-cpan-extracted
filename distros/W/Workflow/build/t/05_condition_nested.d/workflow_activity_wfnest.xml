@@ -1,0 +1,35 @@
+
+<actions>
+
+    <!-- Initialization, etc. -->
+
+    <action name="initialize" class="Workflow::Action::Null"/>
+
+    <action name="subtests_done" class="Workflow::Action::Null"/>
+
+    <action name="tests_done" class="Workflow::Action::Null"/>
+
+    <action name="ack_subtest_fail" class="Workflow::Action::Null"/>
+
+    <action name="null1" class="Workflow::Action::Null"/>
+
+    <action name="null2" class="Workflow::Action::Null"/>
+
+    <!-- Actions for Workflow::Condition::LazyAND -->
+
+    <action name="test_lazy_and" class="Workflow::Action::Null"/>
+
+    <action name="lazy_and_1" class="Workflow::Action::Null"/>
+
+    <action name="lazy_and_2" class="Workflow::Action::Null"/>
+
+    <!-- Actions for Workflow::Condition::LazyAND -->
+
+    <action name="test_lazy_or" class="Workflow::Action::Null"/>
+
+    <action name="lazy_or_1" class="Workflow::Action::Null"/>
+
+    <action name="lazy_or_2" class="Workflow::Action::Null"/>
+
+
+</actions>

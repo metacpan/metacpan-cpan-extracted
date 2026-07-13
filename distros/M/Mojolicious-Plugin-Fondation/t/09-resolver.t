@@ -164,14 +164,83 @@ subtest 'Config merge -- direct overrides app config overrides defaults' => sub 
 };
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Diamond dependency: A → B, A → C, B → D, C → D
+# before / after — ordering hints
 # ═══════════════════════════════════════════════════════════════════════════
 
-# We need plugins for this: DiamondRoot → DiamondLeft + DiamondRight,
-# DiamondLeft → DiamondBase, DiamondRight → DiamondBase.
-# DiamondBase should appear only once and before everything else.
+subtest 'after — target loaded before declarer' => sub {
+    my $app      = _build_app();
+    my $resolver = Mojolicious::Plugin::Fondation::Resolver->new(app => $app);
 
-# For now, skip diamond test -- it requires creating 4 more plugins.
-# The important thing is that duplicate resolution works (tested above).
+    # BeforeAfterRoot depends on [BeforeTest, AfterTest, Leaf].
+    # AfterTest declares after => ['Leaf'] → Leaf must load before AfterTest.
+    my $sorted = $resolver->resolve('Fondation::Resolver::BeforeAfterRoot');
+
+    my $leaf_pos  = _index_of('Resolver::Leaf', $sorted);
+    my $after_pos = _index_of('Resolver::AfterTest', $sorted);
+
+    ok($leaf_pos < $after_pos,
+       'after: Leaf (target) loaded before AfterTest (declarer)')
+        or diag "Order: " . join(', ', map { $_->{short} } @$sorted);
+};
+
+subtest 'before — declarer loaded before target' => sub {
+    my $app      = _build_app();
+    my $resolver = Mojolicious::Plugin::Fondation::Resolver->new(app => $app);
+
+    # BeforeAfterRoot depends on [BeforeTest, AfterTest, Leaf].
+    # BeforeTest declares before => ['Leaf'] → BeforeTest must load before Leaf.
+    my $sorted = $resolver->resolve('Fondation::Resolver::BeforeAfterRoot');
+
+    my $before_pos = _index_of('Resolver::BeforeTest', $sorted);
+    my $leaf_pos   = _index_of('Resolver::Leaf', $sorted);
+
+    ok($before_pos < $leaf_pos,
+       'before: BeforeTest (declarer) loaded before Leaf (target)')
+        or diag "Order: " . join(', ', map { $_->{short} } @$sorted);
+};
+
+subtest 'before/after cycle detected' => sub {
+    my $app      = _build_app();
+    my $resolver = Mojolicious::Plugin::Fondation::Resolver->new(app => $app);
+
+    # Resolve a root that depends on BeforeCycleA and BeforeCycleB.
+    # BeforeCycleA → before → BeforeCycleB
+    # BeforeCycleB → before → BeforeCycleA  ← cycle!
+    my $sorted = eval {
+        $resolver->resolve('Mojolicious::Plugin::Fondation', {
+            dependencies => [
+                'Fondation::Resolver::BeforeCycleA',
+                'Fondation::Resolver::BeforeCycleB',
+            ],
+        });
+        1;
+    };
+    ok(!$sorted, 'before/after cycle: resolve returned no result');
+    ok($@, 'before/after cycle detected');
+    like($@, qr/cycle/i, 'Error message mentions cycle');
+};
+
+subtest 'before — non-existent target silently ignored' => sub {
+    my $app      = _build_app();
+    my $resolver = Mojolicious::Plugin::Fondation::Resolver->new(app => $app);
+
+    # BeforeGhost declares before => ['NonExistent']
+    my $sorted = $resolver->resolve('Fondation::Resolver::BeforeGhost');
+
+    is(scalar @$sorted, 1, 'One plugin resolved');
+    is($sorted->[0]{long},
+       'Mojolicious::Plugin::Fondation::Resolver::BeforeGhost',
+       'BeforeGhost loaded without error');
+};
 
 done_testing();
+
+# ── helper ────────────────────────────────────────────────────────────────
+
+sub _index_of {
+    my ($short_name, $sorted) = @_;
+    for my $i (0 .. $#$sorted) {
+        return $i if $sorted->[$i]{long} =~ /\Q$short_name\E$/;
+    }
+    return -1;
+}

@@ -1,5 +1,33 @@
 Revision history for RPi-Const
 
+1.07    2026-07-12
+    - Added t/50-const_coverage.t, a self-policing coverage guard: it asserts
+      every export tag and every constant value against a manifest, and fails
+      if a new tag or constant is added without a test (closes the previously
+      untested :altmode and :mcp23017_pins tags)
+    - Added dedicated per-tag tests t/28-const_altmode.t and
+      t/48-const_mcp23017_pins.t, matching the existing per-tag test convention
+    - Added :wiringpi tag with WIRINGPI_MIN_VERSION ('3.18') - the canonical
+      minimum wiringPi version for the entire RPi:: distribution family; the
+      consuming files across the dists are cataloged in REQ.md
+    - Added RPi::Const::BuildCheck: the canonical wiringPi/I2C Makefile.PL
+      build guards for the whole RPi:: family (wiringpi_build_check /
+      i2c_build_check), so each XS dist's Makefile.PL shrinks to a shim pulled
+      in via CONFIGURE_REQUIRES. Reads the minimum from WIRINGPI_MIN_VERSION
+      (single source), preserves the RPI_DIST_RELEASE bypass and exit-0
+      NA-not-FAIL semantics, and fixes two latent bugs in the hand-copied
+      guards: version_ge() compares (major, minor) as integers so 3.8 correctly
+      fails a 3.18 minimum, and an unparseable 'gpio -v' now exits NA instead
+      of silently passing. All I/O is injectable; t/55-buildcheck.t covers it
+      off-Pi (incl. a fork test of the exit-0 semantics)
+    - Broadened header discovery in RPi::Const::BuildCheck: when include_dirs
+      is not supplied, the wiringPi/i2c checks now search /usr/include and
+      /usr/local/include and, on a miss, the C compiler's own <...> search
+      path (parsed from its verbose preprocessor output), so a header in a
+      multiarch dir or a non-default prefix is still found. Best-effort and
+      injectable via new cc / cc_output opts; t/55-buildcheck.t covers the
+      parser and the fallback off-Pi
+
 1.06    2026-06-18
     - Added :mcp23017_pins tag with named pin numbers A0-A7 (bank A pins
       0-7) and B0-B7 (bank B pins 8-15)

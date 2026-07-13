@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct measured phrases of notes
 
-our $VERSION = '0.0118';
+our $VERSION = '0.0119';
 
 use v5.36;
 use Moo;
@@ -178,6 +178,13 @@ has gate => (
 );
 
 
+has volume => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not an integer" unless $_[0] =~ /^\d+$/ },
+    default => sub { 100 },
+);
+
+
 has queue => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref $_[0] eq 'ARRAY' },
@@ -258,7 +265,7 @@ Music::VoicePhrase - Construct measured phrases of notes
 
 =head1 VERSION
 
-version 0.0118
+version 0.0119
 
 =head1 SYNOPSIS
 
@@ -430,6 +437,15 @@ A C<2> means the note is to be held twice as long.
 This is used in real-time processing.
 
 Default: C<1> (unity)
+
+=head2 volume
+
+  $volume = $mvp->volume;
+  $mvp->volume($n);
+
+Computed attribute for the volume that is used in real-time processing.
+
+Default: C<100>
 
 =head2 queue
 

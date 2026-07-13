@@ -1,4 +1,4 @@
-package Perl::Critic::Utils::SourceLocation v0.2.7;
+package Perl::Critic::Utils::SourceLocation v0.3.0;
 
 use v5.26.0;
 use strict;
@@ -7,9 +7,6 @@ use feature "signatures";
 use experimental "signatures";
 
 use parent qw( PPI::Element );
-
-# This is NOT a Perl::Critic policy - it's a helper class
-sub is_policy { 0 }
 
 sub new ($class, %args) {
   bless {
@@ -25,17 +22,11 @@ sub new ($class, %args) {
 sub location ($self) {
   my $line = $self->{line_number};
   my $col  = $self->{column_number};
-  [ $line, $col, $col, $line, $self->{filename} ]
+  [$line, $col, $col, $line, $self->{filename}]
 }
 
-# Standard PPI::Element interface
-sub line_number          ($self) { $self->{line_number} }
-sub column_number        ($self) { $self->{column_number} }
-sub logical_line_number  ($self) { $self->{line_number} }
-sub visual_column_number ($self) { $self->{column_number} }
-sub logical_filename     ($self) { $self->{filename} }
-sub content              ($self) { $self->{content} }
-sub filename             ($self) { $self->{filename} }
+sub content  ($self) { $self->{content} }
+sub filename ($self) { $self->{filename} }
 
 # Support for filename extraction by violation system
 # Return self as the "document"
@@ -56,7 +47,7 @@ Perl::Critic::Utils::SourceLocation - Synthetic PPI element
 
 =head1 VERSION
 
-version v0.2.7
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -97,12 +88,6 @@ Creates a new SourceLocation object. Parameters:
 
 =back
 
-=head2 is_policy
-
-  my $is_policy = $location->is_policy;  # Always returns 0
-
-Returns false to indicate this is not a Perl::Critic policy.
-
 =head2 filename
 
   my $filename = $location->filename;
@@ -111,7 +96,7 @@ Returns the filename associated with this location, or undef if none was set.
 
 =head1 AUTHOR
 
-Paul Johnson C<< <paul@pjcj.net> >>
+Paul Johnson <paul@pjcj.net>
 
 =head1 COPYRIGHT
 

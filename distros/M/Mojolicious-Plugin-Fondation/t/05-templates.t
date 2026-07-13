@@ -35,7 +35,7 @@ subtest 'Plugin with share/templates directory' => sub {
     # Load Fondation with User plugin and explicit share_dir
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
     my $fondation = $app->manager;
@@ -110,7 +110,7 @@ subtest 'Template rendering from plugin' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
 
@@ -159,8 +159,8 @@ subtest 'Template priority: dependency plugin over parent plugin' => sub {
             {
                 'Fondation::Authorization' => {
                     dependencies => [
-                        ['Fondation::Role', { share_dir => $role_share_dir }],
-                        ['Fondation::Permission', { share_dir => $perm_share_dir }]
+                        {'Fondation::Role' => { share_dir => $role_share_dir }},
+                        {'Fondation::Permission' => { share_dir => $perm_share_dir }}
                     ],
                     share_dir => $auth_share_dir
                 }
@@ -228,7 +228,7 @@ subtest 'App-level template overrides plugin template' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
 
@@ -259,7 +259,7 @@ subtest 'Transitive dependency template is registered and renderable' => sub {
             {
                 'Fondation::Authorization' => {
                     dependencies => [
-                        ['Fondation::Role', { share_dir => $role_share_dir }],
+                        {'Fondation::Role' => { share_dir => $role_share_dir }},
                     ],
                 }
             }

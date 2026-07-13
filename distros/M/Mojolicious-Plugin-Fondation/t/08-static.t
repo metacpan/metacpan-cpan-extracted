@@ -46,7 +46,7 @@ subtest 'Plugin with share/public/ directory registers static paths' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ],
     });
 
@@ -84,7 +84,7 @@ subtest 'Static file is served from plugin public directory' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ],
     });
 
@@ -107,7 +107,7 @@ subtest 'Static action respects explicit actions list' => sub {
     $app->plugin('Fondation' => {
         actions      => ['Templates', 'Controllers'],
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ],
     });
 
@@ -132,7 +132,7 @@ subtest 'Static priority: dependency plugin over parent plugin' => sub {
             {
                 'Fondation::Authorization' => {
                     dependencies => [
-                        ['Fondation::Role', { share_dir => $role_share_dir }],
+                        {'Fondation::Role' => { share_dir => $role_share_dir }},
                     ],
                     share_dir => $auth_share_dir,
                 }
@@ -193,7 +193,7 @@ subtest 'App-level static file overrides plugin static file' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }],
+            {'Fondation::User' => { share_dir => $user_share_dir }},
         ],
     });
 

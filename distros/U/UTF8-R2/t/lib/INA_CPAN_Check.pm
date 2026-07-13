@@ -532,7 +532,7 @@ sub check_F {
     $author = '' unless defined $author;
     if ($meta_yml =~ /^author:\s*\n(\s+-[^\n]+)/m) { $author = $1 }
     ok($author =~ /ina\@cpan\.org/i,
-       'F - META.yml author contains ina@cpan.org');
+       'F - META.yml author contains ina.cpan@gmail.com');
 
     my $prov = _provides_versions_yml($meta_yml);
     ok(%$prov, 'F - META.yml provides section is non-empty');
@@ -613,7 +613,7 @@ sub check_I {
     ok($text =~ /WriteMakefile\s*\(/, 'I - Makefile.PL calls WriteMakefile()');
     ok($text =~ /'NAME'/ && $text =~ /'VERSION'/,
        'I - Makefile.PL contains NAME and VERSION keys');
-    ok($text =~ /ina\@cpan\.org/, 'I - Makefile.PL AUTHOR contains ina@cpan.org');
+    ok($text =~ /ina\@cpan\.org/, 'I - Makefile.PL AUTHOR contains ina.cpan@gmail.com');
     ok($text =~ /\$INC\{'warnings\.pm'\}.*?!defined.*?warnings::import/s
     || $text =~ /!defined.*?warnings::import.*?\$INC\{'warnings\.pm'\}/s,
        'I - Makefile.PL warnings stub guards with !defined(&warnings::import)');

@@ -155,6 +155,7 @@ t/Core_3_0/33_bulk_errors.t
 t/Core_3_0/34_bulk_cxn_errors.t
 t/Core_3_0/35_bulk_data_types.t
 t/Core_3_0/40_scroll.t
+t/Core_3_0/50_version_can_do.t
 t/Core_3_0/60_auth_httptiny.t
 t/Core_3_0/61_auth_lwp.t
 t/lib/LogCallback.pl

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Security;
-$OpenSearch::Client::Core::3_0::Direct::Security::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Security::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Security>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,9 @@ C<POST /_plugins/_security/authinfo>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->authinfo(
         
          # Endpoint specific query string parameters
@@ -114,6 +117,9 @@ C<POST /_plugins/_security/api/authtoken>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->authtoken(
         
          # Common API query string parameters
@@ -139,6 +145,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/account>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->change_password(
         
@@ -168,6 +177,9 @@ C<GET /_plugins/_security/api/_upgrade_check>
 
 =back
 
+I<Method added in OpenSearch version 2.14>
+
+
     $resp = $client->security->config_upgrade_check(
         
          # Common API query string parameters
@@ -193,6 +205,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_security/api/_upgrade_perform>
 
 =back
+
+I<Method added in OpenSearch version 2.14>
+
 
     $resp = $client->security->config_upgrade_perform(
         
@@ -221,6 +236,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/actiongroups/{action_group}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->create_action_group(
         
@@ -254,6 +272,9 @@ C<PUT /_plugins/_security/api/allowlist>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->security->create_allowlist(
         
         'body'         =>  $body,      # optional
@@ -281,6 +302,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/roles/{role}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->create_role(
         
@@ -314,6 +338,9 @@ C<PUT /_plugins/_security/api/rolesmapping/{role}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->create_role_mapping(
         
         'body'         =>  $body,      # optional
@@ -345,6 +372,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/tenants/{tenant}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->create_tenant(
         
@@ -378,6 +408,9 @@ C<PUT /_plugins/_security/api/tenancy/config>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->security->create_update_tenancy_config(
         
         'body'         =>  $body,      # optional
@@ -405,6 +438,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/internalusers/{username}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->create_user(
         
@@ -438,6 +474,9 @@ C<PUT /_plugins/_security/api/user/{username}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->create_user_legacy(
         
         'body'         =>  $body,      # optional
@@ -470,6 +509,9 @@ C<DELETE /_plugins/_security/api/actiongroups/{action_group}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->delete_action_group(
         
          # path parameters
@@ -499,6 +541,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_security/api/nodesdn/{cluster_name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->delete_distinguished_name(
         
@@ -530,6 +575,9 @@ C<DELETE /_plugins/_security/api/roles/{role}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->delete_role(
         
          # path parameters
@@ -559,6 +607,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_security/api/rolesmapping/{role}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->delete_role_mapping(
         
@@ -590,6 +641,9 @@ C<DELETE /_plugins/_security/api/tenants/{tenant}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->delete_tenant(
         
          # path parameters
@@ -619,6 +673,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_security/api/internalusers/{username}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->delete_user(
         
@@ -650,6 +707,9 @@ C<DELETE /_plugins/_security/api/user/{username}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->delete_user_legacy(
         
          # path parameters
@@ -680,6 +740,9 @@ C<DELETE /_plugins/_security/api/cache>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->flush_cache(
         
          # Common API query string parameters
@@ -705,6 +768,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_security/api/generateonbehalfoftoken>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->security->generate_obo_token(
         
@@ -733,6 +799,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_security/api/internalusers/{username}/authtoken>
 
 =back
+
+I<Method added in OpenSearch version 2.7>
+
 
     $resp = $client->security->generate_user_token(
         
@@ -764,6 +833,9 @@ C<POST /_plugins/_security/api/user/{username}/authtoken>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->security->generate_user_token_legacy(
         
          # path parameters
@@ -794,6 +866,9 @@ C<GET /_plugins/_security/api/account>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_account_details(
         
          # Common API query string parameters
@@ -819,6 +894,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/actiongroups/{action_group}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_action_group(
         
@@ -850,6 +928,9 @@ C<GET /_plugins/_security/api/actiongroups>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_action_groups(
         
          # Common API query string parameters
@@ -875,6 +956,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/certificates>
 
 =back
+
+I<Method added in OpenSearch version 2.15>
+
 
     $resp = $client->security->get_all_certificates(
         
@@ -907,6 +991,9 @@ C<GET /_plugins/_security/api/allowlist>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->security->get_allowlist(
         
          # Common API query string parameters
@@ -932,6 +1019,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/audit>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_audit_configuration(
         
@@ -959,6 +1049,9 @@ C<GET /_plugins/_security/api/ssl/certs>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->security->get_certificates(
         
          # Common API query string parameters
@@ -984,6 +1077,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/securityconfig>
 
 =back
+
+I<Method added in OpenSearch version 2.10>
+
 
     $resp = $client->security->get_configuration(
         
@@ -1011,6 +1107,9 @@ C<GET /_plugins/_security/dashboardsinfo>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_dashboards_info(
         
          # Common API query string parameters
@@ -1036,6 +1135,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/nodesdn/{cluster_name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_distinguished_name(
         
@@ -1071,6 +1173,9 @@ C<GET /_plugins/_security/api/nodesdn>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_distinguished_names(
         
          # Endpoint specific query string parameters
@@ -1100,6 +1205,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/certificates/{node_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.15>
+
 
     $resp = $client->security->get_node_certificates(
         
@@ -1136,6 +1244,9 @@ C<GET /_plugins/_security/api/permissionsinfo>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_permissions_info(
         
          # Common API query string parameters
@@ -1161,6 +1272,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/roles/{role}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_role(
         
@@ -1192,6 +1306,9 @@ C<GET /_plugins/_security/api/rolesmapping/{role}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_role_mapping(
         
          # path parameters
@@ -1222,6 +1339,9 @@ C<GET /_plugins/_security/api/rolesmapping>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_role_mappings(
         
          # Common API query string parameters
@@ -1248,6 +1368,9 @@ C<GET /_plugins/_security/api/roles>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_roles(
         
          # Common API query string parameters
@@ -1273,6 +1396,9 @@ I<Paths served by this method:>
 C<GET /_opendistro/_security/sslinfo>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_sslinfo(
         
@@ -1304,6 +1430,9 @@ C<GET /_plugins/_security/api/tenancy/config>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->security->get_tenancy_config(
         
          # Common API query string parameters
@@ -1329,6 +1458,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/tenants/{tenant}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_tenant(
         
@@ -1360,6 +1492,9 @@ C<GET /_plugins/_security/api/tenants>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_tenants(
         
          # Common API query string parameters
@@ -1385,6 +1520,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/internalusers/{username}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_user(
         
@@ -1416,6 +1554,9 @@ C<GET /_plugins/_security/api/user/{username}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_user_legacy(
         
          # path parameters
@@ -1446,6 +1587,9 @@ C<GET /_plugins/_security/api/internalusers>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->get_users(
         
          # Common API query string parameters
@@ -1471,6 +1615,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/user>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->get_users_legacy(
         
@@ -1500,6 +1647,9 @@ C<GET /_plugins/_security/health>
 C<POST /_plugins/_security/health>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->health(
         
@@ -1531,6 +1681,9 @@ C<POST /_plugins/_security/api/migrate>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->migrate(
         
          # Common API query string parameters
@@ -1556,6 +1709,9 @@ I<Paths served by this method:>
 C<PATCH /_plugins/_security/api/actiongroups/{action_group}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->patch_action_group(
         
@@ -1589,6 +1745,9 @@ C<PATCH /_plugins/_security/api/actiongroups>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_action_groups(
         
         'body'         =>  $body,      # optional
@@ -1616,6 +1775,9 @@ I<Paths served by this method:>
 C<PATCH /_plugins/_security/api/allowlist>
 
 =back
+
+I<Method added in OpenSearch version 2.1>
+
 
     $resp = $client->security->patch_allowlist(
         
@@ -1645,6 +1807,9 @@ C<PATCH /_plugins/_security/api/audit>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_audit_configuration(
         
         'body'         =>  $body,      # optional
@@ -1673,6 +1838,9 @@ C<PATCH /_plugins/_security/api/securityconfig>
 
 =back
 
+I<Method added in OpenSearch version 2.10>
+
+
     $resp = $client->security->patch_configuration(
         
         'body'         =>  $body,      # optional
@@ -1700,6 +1868,9 @@ I<Paths served by this method:>
 C<PATCH /_plugins/_security/api/nodesdn/{cluster_name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->patch_distinguished_name(
         
@@ -1733,6 +1904,9 @@ C<PATCH /_plugins/_security/api/nodesdn>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_distinguished_names(
         
         'body'         =>  $body,      # optional
@@ -1760,6 +1934,9 @@ I<Paths served by this method:>
 C<PATCH /_plugins/_security/api/roles/{role}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->patch_role(
         
@@ -1793,6 +1970,9 @@ C<PATCH /_plugins/_security/api/rolesmapping/{role}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_role_mapping(
         
         'body'         =>  $body,      # optional
@@ -1825,6 +2005,9 @@ C<PATCH /_plugins/_security/api/rolesmapping>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_role_mappings(
         
         'body'         =>  $body,      # optional
@@ -1853,6 +2036,9 @@ C<PATCH /_plugins/_security/api/roles>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_roles(
         
         'body'         =>  $body,      # optional
@@ -1880,6 +2066,9 @@ I<Paths served by this method:>
 C<PATCH /_plugins/_security/api/tenants/{tenant}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->patch_tenant(
         
@@ -1913,6 +2102,9 @@ C<PATCH /_plugins/_security/api/tenants>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_tenants(
         
         'body'         =>  $body,      # optional
@@ -1940,6 +2132,9 @@ I<Paths served by this method:>
 C<PATCH /_plugins/_security/api/internalusers/{username}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->patch_user(
         
@@ -1973,6 +2168,9 @@ C<PATCH /_plugins/_security/api/internalusers>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->patch_users(
         
         'body'         =>  $body,      # optional
@@ -2001,6 +2199,9 @@ C<POST /_plugins/_security/dashboardsinfo>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->post_dashboards_info(
         
          # Common API query string parameters
@@ -2027,6 +2228,9 @@ C<PUT /_plugins/_security/api/ssl/http/reloadcerts>
 
 =back
 
+I<Method added in OpenSearch version 2.8>
+
+
     $resp = $client->security->reload_http_certificates(
         
          # Common API query string parameters
@@ -2052,6 +2256,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/ssl/transport/reloadcerts>
 
 =back
+
+I<Method added in OpenSearch version 2.8>
+
 
     $resp = $client->security->reload_transport_certificates(
         
@@ -2082,6 +2289,9 @@ C<POST /_plugins/_security/tenantinfo>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->security->tenant_info(
         
          # Common API query string parameters
@@ -2107,6 +2317,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/audit/config>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->update_audit_configuration(
         
@@ -2136,6 +2349,9 @@ C<PUT /_plugins/_security/api/securityconfig/config>
 
 =back
 
+I<Method added in OpenSearch version 2.10>
+
+
     $resp = $client->security->update_configuration(
         
         'body'         =>  $body,      # optional
@@ -2163,6 +2379,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_security/api/nodesdn/{cluster_name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->update_distinguished_name(
         
@@ -2195,6 +2414,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_security/api/validate>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->security->validate(
         
@@ -2229,6 +2451,9 @@ C<POST /_plugins/_security/whoami>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->security->who_am_i(
         
          # Common API query string parameters
@@ -2255,6 +2480,9 @@ C<GET /_plugins/_security/whoamiprotected>
 
 =back
 
+I<Method added in OpenSearch version 2.11>
+
+
     $resp = $client->security->who_am_i_protected(
         
          # Common API query string parameters
@@ -2267,6 +2495,19 @@ C<GET /_plugins/_security/whoamiprotected>
     );
 
 L<OpenSearch documentation for security-E<gt>who_am_i_protected|https://docs.opensearch.org/latest/security/access-control/api/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->security->method_supported_in_version(
+        method  => 'authinfo',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

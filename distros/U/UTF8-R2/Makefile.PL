@@ -5,14 +5,14 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{UTF8::R2},
-    'VERSION'   => q{0.30},
+    'VERSION'   => q{0.31},
     'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use},
     'PREREQ_PM' => {
         'Symbol' => '0',
         'perl' => '5.00503',
         'strict' => '1.01',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -43,7 +43,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'UTF8::R2' => {
                 'file'    => 'lib/UTF8/R2.pm',
-                'version' => '0.30',
+                'version' => '0.31',
             }
         },
     };

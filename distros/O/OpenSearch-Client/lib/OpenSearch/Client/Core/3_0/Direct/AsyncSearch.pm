@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::AsyncSearch;
-$OpenSearch::Client::Core::3_0::Direct::AsyncSearch::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::AsyncSearch::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::AsyncSearch>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/_asynchronous_search/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->asynchronous_search->delete(
         
          # path parameters
@@ -110,6 +113,9 @@ C<GET /_plugins/_asynchronous_search/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->asynchronous_search->get(
         
          # path parameters
@@ -139,6 +145,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_asynchronous_search>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->asynchronous_search->search(
         
@@ -175,6 +184,9 @@ C<GET /_plugins/_asynchronous_search/stats>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->asynchronous_search->stats(
         
          # Common API query string parameters
@@ -187,6 +199,19 @@ C<GET /_plugins/_asynchronous_search/stats>
     );
 
 L<OpenSearch documentation for asynchronous_search-E<gt>stats|https://opensearch.org/docs/latest/search-plugins/async/index/#monitor-stats>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->asynchronous_search->method_supported_in_version(
+        method  => 'delete',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

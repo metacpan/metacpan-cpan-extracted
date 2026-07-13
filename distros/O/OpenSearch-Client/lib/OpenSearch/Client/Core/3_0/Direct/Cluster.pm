@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Cluster;
-$OpenSearch::Client::Core::3_0::Direct::Cluster::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Cluster::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Cluster>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,9 @@ C<POST /_cluster/allocation/explain>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->allocation_explain(
         
         'body'                   =>  $body,      # optional
@@ -115,6 +118,9 @@ I<Paths served by this method:>
 C<DELETE /_component_template/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->delete_component_template(
         
@@ -152,6 +158,9 @@ C<DELETE /_cluster/decommission/awareness>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->delete_decommission_awareness(
         
          # Common API query string parameters
@@ -177,6 +186,9 @@ I<Paths served by this method:>
 C<DELETE /_cluster/voting_config_exclusions>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->delete_voting_config_exclusions(
         
@@ -208,6 +220,9 @@ C<DELETE /_cluster/routing/awareness/weights>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->delete_weighted_routing(
         
         'body'         =>  $body,      # optional
@@ -235,6 +250,9 @@ I<Paths served by this method:>
 C<HEAD /_component_template/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->exists_component_template(
         
@@ -275,6 +293,9 @@ C<GET /_component_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->get_component_template(
         
          # path parameters
@@ -312,6 +333,9 @@ C<GET /_cluster/decommission/awareness/{awareness_attribute_name}/_status>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->get_decommission_awareness(
         
          # path parameters
@@ -341,6 +365,9 @@ I<Paths served by this method:>
 C<GET /_cluster/settings>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->get_settings(
         
@@ -376,6 +403,9 @@ C<GET /_cluster/routing/awareness/{attribute}/weights>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->get_weighted_routing(
         
          # path parameters
@@ -408,6 +438,9 @@ C<GET /_cluster/health>
 C<GET /_cluster/health/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->health(
         
@@ -456,6 +489,9 @@ C<GET /_cluster/pending_tasks>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->pending_tasks(
         
          # Endpoint specific query string parameters
@@ -487,6 +523,9 @@ I<Paths served by this method:>
 C<POST /_cluster/voting_config_exclusions>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->post_voting_config_exclusions(
         
@@ -522,6 +561,9 @@ C<POST /_component_template/{name}>
 C<PUT /_component_template/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->put_component_template(
         
@@ -562,6 +604,9 @@ C<PUT /_cluster/decommission/awareness/{awareness_attribute_name}/{awareness_att
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->put_decommission_awareness(
         
          # path parameters
@@ -592,6 +637,9 @@ I<Paths served by this method:>
 C<PUT /_cluster/settings>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->put_settings(
         
@@ -628,6 +676,9 @@ C<PUT /_cluster/routing/awareness/{attribute}/weights>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->put_weighted_routing(
         
         'body'         =>  $body,      # optional
@@ -660,6 +711,9 @@ C<GET /_remote/info>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->remote_info(
         
          # Common API query string parameters
@@ -685,6 +739,9 @@ I<Paths served by this method:>
 C<POST /_cluster/reroute>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->reroute(
         
@@ -729,6 +786,9 @@ C<GET /_cluster/state/{metric}>
 C<GET /_cluster/state/{metric}/{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->cluster->state(
         
@@ -782,6 +842,9 @@ C<GET /_cluster/stats/{metric}/{index_metric}/nodes/{node_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->cluster->stats(
         
          # path parameters
@@ -805,6 +868,19 @@ C<GET /_cluster/stats/{metric}/{index_metric}/nodes/{node_id}>
     );
 
 L<OpenSearch documentation for cluster-E<gt>stats|https://opensearch.org/docs/latest/api-reference/cluster-api/cluster-stats/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->cluster->method_supported_in_version(
+        method  => 'allocation_explain',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

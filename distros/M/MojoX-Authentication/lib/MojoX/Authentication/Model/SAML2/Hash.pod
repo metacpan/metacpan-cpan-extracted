@@ -1,0 +1,64 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::SAML2::Hash;
+
+
+=head1 SYNOPSIS
+
+   use MojoX::Authentication::Model::SAML2::Hash;
+
+   my $cache = MojoX::Authentication::Model::SAML2::Hash;
+
+   my $data = {...};
+   $cache->set($data, $key, $expiration_time);
+   
+   my $data_out = $cache->get($key);
+
+   $cache->wipe($key);
+
+
+=head1 DESCRIPTION
+
+Cache for data, based on a hash local to the process.
+
+=head1 INTERFACE
+
+=head2 B<< get >>
+
+   my $data = $cache->get($key);
+
+Retrieve an object from the cache, by key.
+
+=head2 B<< new >>
+
+   my $cache = MojoX::Authentication::Model::SAML2::Db->new;
+
+Constructor for an object.
+
+=head2 B<< set >>
+
+   $cache->set($data, $key, $expiration_time);
+
+Set an element in the cache, with expiration time (expressed as an
+epoch).
+
+=head2 B<< wipe >>
+
+   $cache->wipe($key);
+
+Permanently remove an item from the cache.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

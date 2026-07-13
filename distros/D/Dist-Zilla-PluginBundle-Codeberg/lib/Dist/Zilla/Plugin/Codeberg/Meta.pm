@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg::Meta 2.0100;
+package Dist::Zilla::Plugin::Codeberg::Meta 2.0101;
 
 use Modern::Perl;
 use JSON::MaybeXS;
@@ -146,7 +146,7 @@ Dist::Zilla::Plugin::Codeberg::Meta - Add a Codeberg repo's info to META.{yml,js
 
 =head1 VERSION
 
-version 2.0100
+version 2.0101
 
 =head1 SYNOPSIS
 

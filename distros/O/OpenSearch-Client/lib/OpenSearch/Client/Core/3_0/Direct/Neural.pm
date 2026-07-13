@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Neural;
-$OpenSearch::Client::Core::3_0::Direct::Neural::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Neural::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Neural>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,9 @@ C<GET /_plugins/_neural/{node_id}/stats/{stat}>
 
 =back
 
+I<Method added in OpenSearch version 3.0>
+
+
     $resp = $client->neural->stats(
         
          # path parameters
@@ -114,6 +117,19 @@ C<GET /_plugins/_neural/{node_id}/stats/{stat}>
     );
 
 L<OpenSearch documentation for neural-E<gt>stats|https://docs.opensearch.org/latest/vector-search/api/neural/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->neural->method_supported_in_version(
+        method  => 'stats',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

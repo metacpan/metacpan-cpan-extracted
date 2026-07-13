@@ -1,0 +1,11 @@
+{
+    "Not Found": "Non trouvé",
+    "Page Not Found": "Page introuvable",
+    "The page you are looking for does not exist or has been moved.": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "Server Error": "Erreur serveur",
+    "Internal Server Error": "Erreur interne du serveur",
+    "Something went wrong on our side. Please try again later.": "Une erreur est survenue de notre côté. Veuillez réessayer plus tard.",
+    "Forbidden": "Accès interdit",
+    "You do not have permission to access this resource.": "Vous n'avez pas la permission d'accéder à cette ressource.",
+    "Go Home": "Accueil"
+}

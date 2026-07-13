@@ -10,7 +10,11 @@ use experimental qw( signatures );
 
 # Test the newline special case handling
 use lib qw( lib t/lib );
-use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting ();
+use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting qw(
+  desc_double
+  desc_optimal
+  desc_use_qw
+);
 use ViolationFinder qw( bad good );
 
 my $Policy
@@ -103,13 +107,13 @@ subtest "qq() operators with newlines" => sub {
 
 subtest "Strings without newlines still follow rules" => sub {
   # Single quotes without newlines should still be checked
-  bad $Policy, <<~'EOCODE', 'use ""', "single quotes without newlines";
+  bad $Policy, <<~'EOCODE', desc_double, "single quotes without newlines";
     my $text = 'hello';
     EOCODE
 
   # qq() without newlines for simple strings should still be checked
   bad $Policy,
-    <<~'EOCODE', 'use ""', "qq() without newlines for simple string";
+    <<~'EOCODE', desc_double, "qq() without newlines for simple string";
     my $text = qq(hello);
     EOCODE
 };
@@ -135,8 +139,32 @@ subtest "Edge cases" => sub {
     EOCODE
 
   # String without escape sequences or newlines should still be checked
-  bad $Policy, <<~'EOCODE', 'use ""', "simple string without newlines";
+  bad $Policy, <<~'EOCODE', desc_double, "simple string without newlines";
     my $text = 'hello world';
+    EOCODE
+};
+
+subtest "qw and qx with newlines keep delimiter checks" => sub {
+  # Newlines exempt string tokens only; qw()/qx() keep their delimiter checks
+  bad $Policy, <<~'EOCODE', desc_use_qw, "multi-line qw{} still flagged";
+    my @w = qw{
+      alpha
+      beta
+    };
+    EOCODE
+
+  good $Policy, <<~'EOCODE', "multi-line qw() is fine";
+    my @w = qw(
+      alpha
+      beta
+    );
+    EOCODE
+
+  bad $Policy,
+    <<~'EOCODE', desc_optimal("qx()"), "multi-line qx{} still flagged";
+    my $out = qx{
+      ls
+    };
     EOCODE
 };
 

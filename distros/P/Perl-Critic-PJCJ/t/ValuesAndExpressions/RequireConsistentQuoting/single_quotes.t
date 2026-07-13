@@ -10,7 +10,10 @@ use experimental qw( signatures );
 
 # Test the policy directly without using Perl::Critic framework
 use lib qw( lib t/lib );
-use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting ();
+use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting qw(
+  desc_double
+  desc_optimal
+);
 use ViolationFinder qw( bad good );
 
 my $Policy
@@ -18,13 +21,13 @@ my $Policy
 
 subtest "Single quoted strings" => sub {
   # Should violate - single quotes for simple strings
-  bad $Policy, q(my $x = 'hello'), 'use ""',
+  bad $Policy, q(my $x = 'hello'), desc_double,
     "Single quoted simple string should use double quotes";
-  bad $Policy, q(my $x = 'world'), 'use ""',
+  bad $Policy, q(my $x = 'world'), desc_double,
     "Another simple string should use double quotes";
-  bad $Policy, q(my $x = 'hello world'), 'use ""',
+  bad $Policy, q(my $x = 'hello world'), desc_double,
     "Simple string with space should use double quotes";
-  bad $Policy, q(my $x = 'no special chars'), 'use ""',
+  bad $Policy, q(my $x = 'no special chars'), desc_double,
     "Single quotes for non-interpolating string should use double quotes";
 
   # Should NOT violate - appropriate use of single quotes
@@ -40,7 +43,7 @@ subtest "Single quoted strings" => sub {
 
 subtest "Escaped characters in single quotes" => sub {
   # Escaped single quotes should recommend double quotes
-  bad $Policy, q(my $x = 'I\'m happy'), 'use ""',
+  bad $Policy, q(my $x = 'I\'m happy'), desc_double,
     'Escaped single quotes should use ""';
 
   # Literal special characters
@@ -61,13 +64,15 @@ subtest "Mixed quote content" => sub {
 
   # When content has both types with suboptimal delimiter - should suggest
   # better delimiter
-  bad $Policy, q(my $x = q[has 'single' and "double" quotes]), "use q()",
+  bad $Policy, q(my $x = q[has 'single' and "double" quotes]),
+    desc_optimal("q()"),
     "q[] with both quote types should recommend q() for optimal delimiter";
-  bad $Policy, q(my $x = q{contains 'single' and "double" quotes}), "use q()",
+  bad $Policy, q(my $x = q{contains 'single' and "double" quotes}),
+    desc_optimal("q()"),
     "q{} with both quote types should recommend q() for optimal delimiter";
 
   # When content has only single quotes - should recommend double quotes
-  bad $Policy, q[my $x = q(has 'single' quotes)], 'use ""',
+  bad $Policy, q[my $x = q(has 'single' quotes)], desc_double,
     "q() with only single quotes should recommend double quotes";
 
   # Bug case: content with both $ and ' should keep q()
@@ -86,7 +91,7 @@ subtest "Mixed quote content" => sub {
 subtest "Additional single quote coverage tests" => sub {
   # Test to hit the uncovered condition in single quote checking (line 229)
   # This should exercise: not $would_interpolate and index($string, "\"") == -1
-  bad $Policy, q(my $x = 'simple';), 'use ""',
+  bad $Policy, q(my $x = 'simple';), desc_double,
     "simple single quoted string without double quotes";
 
   # Test single quoted string that contains double quotes (should not violate)
@@ -94,7 +99,7 @@ subtest "Additional single quote coverage tests" => sub {
     "single quotes justified by double quotes inside";
 
   # Test with single quotes that have escaped characters
-  bad $Policy, q(my $x = 'don\\'t';), 'use ""',
+  bad $Policy, q(my $x = 'don\\'t';), desc_double,
     "single quotes with escaped single quote should use double quotes";
 
   # Test strings that might expose issues in would_interpolate logic

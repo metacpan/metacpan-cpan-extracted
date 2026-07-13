@@ -1,14 +1,22 @@
 Revision history for Dist-Zilla-PluginBundle-Codeberg
 
-2.0100 2026-06-14T15:52:47-04:00 America/New_York
+2.0101 2026-07-12T14:19:15-04:00 America/New_York
  [MAJOR]
  [API CHANGE]
  [MINOR]
- - Updated API calls to use Forgejo/Codeberg API
-
  [ENHANCEMENTS]
  [REVISION]
  [BUG FIXES]
+ - Updated API calls for Create to Forgejo/Codeberg API
+ - Remove installer from dist.ini
+
+ [STATISTICS]
+ - code churn: 3 files changed, 4 insertions(+), 5 deletions(-)
+
+2.0100 2026-06-14T15:52:47-04:00 America/New_York
+ [MINOR]
+ - Updated API calls to use Forgejo/Codeberg API
+
  [STATISTICS]
  - code churn: 6 files changed, 23 insertions(+), 20 deletions(-)
 

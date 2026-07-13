@@ -1,10 +1,10 @@
 {
    "abstract" : "Communicating sequential processes threading for Perl",
    "author" : [
-      "Leon Timmermans <leont@cpan.org>"
+      "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.044"
+            "CPAN::Requirements::Dynamic" : "0.002",
+            "Module::Build::Tiny" : "0.048"
          }
       },
       "develop" : {
@@ -54,15 +55,15 @@
    "provides" : {
       "Thread::CSP" : {
          "file" : "lib/Thread/CSP.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Thread::CSP::Channel" : {
          "file" : "lib/Thread/CSP/Channel.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Thread::CSP::Promise" : {
          "file" : "lib/Thread/CSP/Promise.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -76,7 +77,7 @@
          "web" : "https://github.com/Leont/threads-csp"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_dynamic_prereqs" : {
       "expressions" : [
          {
@@ -90,8 +91,8 @@
       ],
       "version" : 1
    },
-   "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0
 }

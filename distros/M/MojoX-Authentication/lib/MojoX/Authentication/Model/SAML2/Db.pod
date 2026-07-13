@@ -1,0 +1,85 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::SAML2::Db;
+
+
+=head1 SYNOPSIS
+
+   use MojoX::MojoDbWrap;
+   use MojoX::Authentication::Model::SAML2::Db;
+
+   my $wrap MojoX::MojoDbWrap->new(...);
+   my $cache = MojoX::Authentication::Model::SAML2::Db->new(wmdb => $wrap);
+
+   my $data = {...};
+   $cache->set($data, $key, $expiration_time);
+   
+   my $data_out = $cache->get($key);
+
+   $cache->wipe($key);
+
+
+=head1 DESCRIPTION
+
+Cache for data, based on a database wrapped by a L<MojoX::MojoDbWrap>.
+
+=head1 INTERFACE
+
+=head2 B<< get >>
+
+   my $data = $cache->get($key);
+
+Retrieve an object from the cache, by key.
+
+=head2 B<< new >>
+
+   my $cache = MojoX::Authentication::Model::SAML2::Db->new(
+      wmdb => $wrap, table => $table_name);
+
+Constructor for an object.
+
+L</wmdb> is an instance of L<MojoX::MojoDbWrap> object, or compatible.
+
+L</table> is the name of the table holding the cache items, defaulting
+to C<logged_in>.
+
+=head2 B<< set >>
+
+   $cache->set($data, $key, $expiration_time);
+
+Set an element in the cache, with expiration time (expressed as an
+epoch).
+
+=head2 B<< table >>
+
+   my $string = $cache->table;
+
+Accessor to the name of the table holding the cache.
+
+=head2 B<< wipe >>
+
+   $cache->wipe($key);
+
+Permanently remove an item from the cache.
+
+=head2 B<< wmdb >>
+
+   my $wmdb = $cache->wmdb;
+
+Accessor to the L<MojoX::MojoDbWrap> object wrapping access to the
+database.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

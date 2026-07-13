@@ -1,0 +1,159 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::Role::Remap;
+
+
+=head1 SYNOPSIS
+
+   package Some::Class;
+   use Moo;
+   with 'MojoX::Authentication::Model::Role::Remap';
+
+   sub some_method ($self) {
+      my $record = { ... };
+      my $mappings = [ ... ];
+      $self->remap($record, $mappings);
+   }
+
+=head1 DESCRIPTION
+
+Role providing a method L</remap> to perform smart remapping over a
+record, e.g. to adapt keys from columns in a database over to what is
+expected in some other component, or to produce new keys based on what
+is available.
+
+=head1 INTERFACE
+
+=head2 B<< remap >>
+
+   $provider->remap($record, $mappings); # OR
+   $provider->remap($record, $mappings, $is_backwards);
+
+Perform the mapping as explained below. In case C<$is_backwards> is
+present and true, the mapping is applied backwards.
+
+The C<$record> argument is the hash reference where remapping will be
+applied. It is changed, so make sure to copy it if you need to preserve
+the original.
+
+The C<$mappings> argument is an array reference that can contain three
+kind of items:
+
+=over
+
+=item *
+
+code reference: the expected signature is as follows:
+
+   sub ($record, $is_backwards)
+
+and is called passing the corresponding arguments (C<$is_backwards> is
+set to C<0> if missing in the call to the C<remap> function).
+
+The called function is supposed to know what to do over C<$record> in
+both the forward and the backwards cases.
+
+=item *
+
+array reference: it is expected to contain an even list of keys,
+arranged as output/input key pairs considering the forward direction.
+Mapping will take the value corresponding to the input key, if present,
+and assigning it to the output key.
+
+Examples:
+
+   $record = { foo => 'hey!', bar => 'not for much' };
+   $map    = [ qw< bar foo galook baz > ];
+
+   # pair #1 is output(bar) input(foo). The input key exists so:
+   $record->{bar} = $record->{foo}
+
+   # pair #2 is output(galook) input(baz). The input key does *not*
+   # exist so it is skipped.
+
+   # final record after the mapping:
+   $record = { foo => 'hey!', bar => 'hey!' };
+
+When C<$is_backwards> is true, the same algorithm is applied to the
+reversed list (hence roles of output and input keys are reversed and
+traversed in reverse order).
+
+=item *
+
+hash reference: it is expected to contain the following keys:
+
+=over
+
+=item *
+
+C<okey> (required) the output key in the forward direction (becomes the
+input key in the backwards direction)
+
+=item *
+
+C<ikey> (required) the input key in the forward direction (becomes the
+output key in the backwards direction)
+
+=item *
+
+C<op>/C<backwards_op> (optional) an operation to be applied over the value
+before it is set for the output key. If set it must be a sub reference.
+C<op> is applied when the mapping is in the forward direction
+(C<$is_backwards> missing or false), C<backwards_op> otherwise.
+
+=back
+
+The two operations are optional; in case they are missing, it's just a
+different way to copy one value from the C<ikey> to the C<okey>.
+
+Examples:
+
+   $map    = { okey => 'bar', ikey => 'foo',
+               fwd_op => sub ($x) { join(', ', $x->@*) },
+               bwd_op => sub ($x) { [ split m{,\ }mxs, $x ] },
+             };
+
+   # forward direction
+   $record = { foo => [ 1, 2, 3 ] };
+   #     --> { foo => [ 1, 2, 3 ], bar => '1, 2, 3' }
+
+   # backwards direction
+   $record = { bar => '5, 6, 7' }
+   #     --> { foo => [ 5, 6, 7 ], bar => '5, 6, 7' }
+
+It is up to the operations to make sure that the forward and backwards
+operations are actually one the reverse of the other.
+
+It is also possible to set C<okey> the same as C<ikey> to perform
+in-place marshalling of the parameters:
+
+   $map    = { okey => 'foo', ikey => 'foo',
+               op           => sub ($x) { join(', ', $x->@*) },
+               backwards_op => sub ($x) { [ split m{,\ }mxs, $x ] },
+             };
+
+   # forward direction
+   $record = { foo => [ 1, 2, 3 ] };
+   #     --> { foo => '1, 2, 3' }
+
+   # backwards direction
+   $record = { foo => '5, 6, 7' }
+   #     --> { foo => [ 5, 6, 7 ] }
+
+
+=back
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

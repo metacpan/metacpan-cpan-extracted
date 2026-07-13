@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.171-3-g9cbe6f9
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.172-4-g2d3a2be
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.172';
+our $VERSION = '0.173';
 
 use Moose;
 with
@@ -517,7 +517,7 @@ sub configure {
         'release snapshot.add_files_in' => ['.'],
         'release snapshot.commit_msg' => '%N-%v%t%n%n%c',
 
-        'Git::Tag.tag_message' => 'v%v%t',
+        'Git::Tag.tag_message' => "v%v%t%n%n%c",
 
         # if the caller set bump_only_matching_versions, then this global setting falls on the floor automatically
         # because the bundle uses the non-Transitional plugin in that case.
@@ -681,7 +681,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.172
+version 0.173
 
 =head1 SYNOPSIS
 
@@ -1022,7 +1022,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     commit_msg = %N-%v%t%n%n%c
 
     [Git::Tag]
-    tag_message = v%v%t
+    tag_message = v%v%t%n%n%c
 
     [BumpVersionAfterRelease::Transitional]
     :version = 0.004

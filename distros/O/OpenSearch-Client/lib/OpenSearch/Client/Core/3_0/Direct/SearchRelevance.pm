@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SearchRelevance;
-$OpenSearch::Client::Core::3_0::Direct::SearchRelevance::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::SearchRelevance::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SearchRelevance>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/_search_relevance/experiments/{experiment_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->delete_experiments(
         
          # path parameters
@@ -109,6 +112,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_search_relevance/judgments/{judgment_id}>
 
 =back
+
+I<Method added in OpenSearch version 3.1>
+
 
     $resp = $client->search_relevance->delete_judgments(
         
@@ -140,6 +146,9 @@ C<DELETE /_plugins/_search_relevance/query_sets/{query_set_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->delete_query_sets(
         
          # path parameters
@@ -170,6 +179,9 @@ C<DELETE /_plugins/_search_relevance/experiments/schedule/{experiment_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.4>
+
+
     $resp = $client->search_relevance->delete_scheduled_experiments(
         
          # path parameters
@@ -199,6 +211,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_search_relevance/search_configurations/{search_configuration_id}>
 
 =back
+
+I<Method added in OpenSearch version 3.1>
+
 
     $resp = $client->search_relevance->delete_search_configurations(
         
@@ -233,6 +248,9 @@ C<GET /_plugins/_search_relevance/experiments/{experiment_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->get_experiments(
         
          # path parameters
@@ -266,6 +284,9 @@ C<GET /_plugins/_search_relevance/judgments/{judgment_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->get_judgments(
         
          # path parameters
@@ -298,6 +319,9 @@ C<GET /_plugins/_search_relevance/{node_id}/stats>
 C<GET /_plugins/_search_relevance/{node_id}/stats/{stat}>
 
 =back
+
+I<Method added in OpenSearch version 3.1>
+
 
     $resp = $client->search_relevance->get_node_stats(
         
@@ -341,6 +365,9 @@ C<GET /_plugins/_search_relevance/query_sets/{query_set_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->get_query_sets(
         
          # path parameters
@@ -373,6 +400,9 @@ C<GET /_plugins/_search_relevance/experiments/schedule>
 C<GET /_plugins/_search_relevance/experiments/schedule/{experiment_id}>
 
 =back
+
+I<Method added in OpenSearch version 3.4>
+
 
     $resp = $client->search_relevance->get_scheduled_experiments(
         
@@ -407,6 +437,9 @@ C<GET /_plugins/_search_relevance/search_configurations/{search_configuration_id
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->get_search_configurations(
         
          # path parameters
@@ -439,6 +472,9 @@ C<GET /_plugins/_search_relevance/stats>
 C<GET /_plugins/_search_relevance/stats/{stat}>
 
 =back
+
+I<Method added in OpenSearch version 3.1>
+
 
     $resp = $client->search_relevance->get_stats(
         
@@ -478,6 +514,9 @@ C<POST /_plugins/_search_relevance/query_sets>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->post_query_sets(
         
         'body'         =>  $body,      # optional
@@ -505,6 +544,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_search_relevance/experiments/schedule>
 
 =back
+
+I<Method added in OpenSearch version 3.4>
+
 
     $resp = $client->search_relevance->post_scheduled_experiments(
         
@@ -534,6 +576,9 @@ C<PUT /_plugins/_search_relevance/experiments>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->put_experiments(
         
         'body'         =>  $body,      # optional
@@ -561,6 +606,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_search_relevance/judgments>
 
 =back
+
+I<Method added in OpenSearch version 3.1>
+
 
     $resp = $client->search_relevance->put_judgments(
         
@@ -590,6 +638,9 @@ C<PUT /_plugins/_search_relevance/query_sets>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->put_query_sets(
         
         'body'         =>  $body,      # optional
@@ -618,6 +669,9 @@ C<PUT /_plugins/_search_relevance/search_configurations>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->search_relevance->put_search_configurations(
         
         'body'         =>  $body,      # optional
@@ -632,6 +686,19 @@ C<PUT /_plugins/_search_relevance/search_configurations>
     );
 
 L<OpenSearch documentation for search_relevance-E<gt>put_search_configurations|https://docs.opensearch.org/latest/search-plugins/search-relevance/using-search-relevance-workbench/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->search_relevance->method_supported_in_version(
+        method  => 'delete_experiments',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

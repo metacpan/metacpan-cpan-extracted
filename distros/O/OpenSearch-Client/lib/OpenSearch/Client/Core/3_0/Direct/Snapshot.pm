@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Snapshot;
-$OpenSearch::Client::Core::3_0::Direct::Snapshot::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Snapshot::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Snapshot>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_snapshot/{repository}/_cleanup>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->cleanup_repository(
         
          # path parameters
@@ -115,6 +118,9 @@ I<Paths served by this method:>
 C<PUT /_snapshot/{repository}/{snapshot}/_clone/{target_snapshot}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->snapshot->clone(
         
@@ -158,6 +164,9 @@ C<PUT /_snapshot/{repository}/{snapshot}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->create(
         
         'body'                     =>  $body,      # optional
@@ -200,6 +209,9 @@ C<PUT /_snapshot/{repository}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->create_repository(
         
         'body'                     =>  $body,      # required
@@ -239,6 +251,9 @@ C<DELETE /_snapshot/{repository}/{snapshot}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->delete(
         
          # path parameters
@@ -275,6 +290,9 @@ C<DELETE /_snapshot/{repository}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->delete_repository(
         
          # path parameters
@@ -310,6 +328,9 @@ I<Paths served by this method:>
 C<GET /_snapshot/{repository}/{snapshot}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->snapshot->get(
         
@@ -352,6 +373,9 @@ C<GET /_snapshot/{repository}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->get_repository(
         
          # path parameters
@@ -387,6 +411,9 @@ I<Paths served by this method:>
 C<POST /_snapshot/{repository}/{snapshot}/_restore>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->snapshot->restore(
         
@@ -433,6 +460,9 @@ C<GET /_snapshot/{repository}/{snapshot}/_status>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->status(
         
          # path parameters
@@ -470,6 +500,9 @@ C<POST /_snapshot/{repository}/_verify>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->snapshot->verify_repository(
         
          # path parameters
@@ -492,6 +525,19 @@ C<POST /_snapshot/{repository}/_verify>
     );
 
 L<OpenSearch documentation for snapshot-E<gt>verify_repository|https://opensearch.org/docs/latest/api-reference/snapshots/verify-snapshot-repository/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->snapshot->method_supported_in_version(
+        method  => 'cleanup_repository',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

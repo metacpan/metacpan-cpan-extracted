@@ -2,7 +2,7 @@
   "blame": false,
   "gitignore": true,
   "ignore": [
-    "**/var/project/**"
+    "**/node_modules/**"
   ],
   "max-lines": 100000,
   "max-size": 10000000,

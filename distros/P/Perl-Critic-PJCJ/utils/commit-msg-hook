@@ -2,17 +2,25 @@
 
 # Git commit message hook to check for some of our standards.
 
-use 5.28.0;
+use v5.26.0;
 use warnings;
-use warnings FATAL => qw( utf8 recursion   );
-use experimental qw( signatures       );
-use open         qw( :encoding(UTF-8) );
-use feature      qw( unicode_strings  );
+use warnings FATAL => qw( recursion );
+use utf8;
+use experimental "signatures";
+use feature "unicode_strings";
+
+use Encode         ();
+use Cwd            qw( abs_path );
+use File::Basename qw( dirname );
+use lib dirname(abs_path(__FILE__)) . "/lib";
+use GitHook qw( on_main ticket_re );
 
 my $Version = "1.00";
 
 $|++;
+binmode STDOUT, ":encoding(UTF-8)";
 
+#<<<
 my @Blocklist = (qw(
   adapts     adapting     adapted
   adds       adding       added
@@ -78,9 +86,11 @@ my @Blocklist = (qw(
   updates    updating     updated
   uses       using        used
 ));  # adapted from https://github.com/m1foley/fit-commit
+#>>>
 
 my $Blocklist = join "|", @Blocklist;
 $Blocklist = qr/^(?:$Blocklist)\b/i;
+my $Ticket_re = ticket_re;
 my @Errors;
 
 sub check_line_endings ($msg) {
@@ -88,41 +98,49 @@ sub check_line_endings ($msg) {
   for my $m (@$msg) {
     if ($m =~ /\015\012$/) {
       $m =~ s/\015\012$//;
-      push @Errors, [ "Line $n has windows line endings (CR LF)", $m ];
+      push @Errors, ["Line $n has windows line endings (CR LF)", $m];
     }
     $n++;
   }
 }
 
+sub check_subject ($l, $main, $merge, $skip) {
+  push @Errors, ["Line 1 is longer than 50 characters", $l]
+    if !$skip && length $l > 50;
+  push @Errors, ["Line 1 should not reference ticket id", $l]
+    if !$skip && $l =~ /[-#]\w?(?:\d{3,})/;
+  push @Errors,
+    ["Merge should reference ticket rather than full branch name", $l]
+    if !$main && $merge && $l !~ /'$Ticket_re'/;
+  my $start = substr($l, 0, 1) // "";
+  push @Errors, ["Line 1 does not start with an expected character", $l]
+    if $start !~ /\w/;
+  push @Errors, ["Line 1 does not start with a capital letter", $l]
+    if !$skip && $start eq lc $start;
+  my $verb = $l =~ $Blocklist ? "does" : $l =~ /^\w+ing\b/ ? "might" : "";
+  push @Errors, ["Line 1 $verb not use imperative present tense", $l]
+    if !$skip && $verb;
+  push @Errors, ["Line 1 needs changing from the commit template", $l]
+    if $l =~ /Capitalised, short description/;
+}
+
 sub check_beginning ($msg) {
   return unless @$msg;
 
-  my $l     = shift @$msg;
-  my $merge = $l =~ /^Merge branch /;
-  push @Errors, [ "Line 1 is longer than 50 characters", $l ]
-    if !$merge && length $l > 50;
-  push @Errors, [ "Line 1 should not reference ticket id", $l ]
-    if !$merge && $l =~ /[-#]\w?(?:\d{3,})/;
-  push @Errors,
-    [ "Merge should reference ticket rather than full branch name", $l ]
-    if $merge && $l !~ /'[A-Z]{2,8}-\d+'/;
-  my $start = substr($l, 0, 1) // "";
-  push @Errors, [ "Line 1 does not start with an expected character", $l ]
-    if $start !~ /\w/;
-  push @Errors, [ "Line 1 does not start with a capital letter", $l ]
-    if $start eq lc $start;
-  my $verb = $l =~ $Blocklist ? "does" : $l =~ /^\w+ing\b/ ? "might" : "";
-  push @Errors, [ "Line 1 $verb not use imperative present tense", $l ]
-    if $verb;
-  push @Errors, [ "Line 1 needs changing from the commit template", $l ]
-    if $l =~ /Capitalised, short description/;
+  my $main       = on_main;
+  my $l          = shift @$msg;
+  my $merge      = $l =~ /^Merge /;
+  my $autosquash = $l =~ /^(?:fixup|squash|amend)! /;
+  my $skip       = $merge || $autosquash;
+
+  check_subject($l, $main, $merge, $skip);
 
   my $l2 = $msg->[0] // "";
-  push @Errors, [ "Line 2 is not empty", $l2 ] if !$merge && length $l2;
+  push @Errors, ["Line 2 is not empty", $l2] if !$skip && length $l2;
 
   my $l3 = $msg->[1] // "";
-  push @Errors, [ "Line 3 does not reference ticket id", $l3 ]
-    if !$merge && $l3 !~ /^Ticket [A-Z]{2,8}-\d+$/;
+  push @Errors, ["Line 3 does not reference ticket id", $l3]
+    if !$main && !$skip && $l3 !~ /^Ticket $Ticket_re$/;
 }
 
 sub check_end ($msg) {
@@ -132,40 +150,55 @@ sub check_end ($msg) {
     last if $m eq "# ------------------------ >8 ------------------------";
     last if $m =~ /^# interactive rebase in progress; onto/;
     next if $m =~ /^#/;
-    push @Errors, [ "Line $n is longer than 72 characters", $m ]
+    push @Errors, ["Line $n is longer than 72 characters", $m]
       if length $m > 72;
     $n++;
   }
 }
 
 sub process_msg ($msg) {
-  push @Errors, ["Empty commit message"] unless @$msg;
+  push @Errors, ["Empty commit message", ""] unless @$msg;
   check_line_endings($msg);
   chomp @$msg;
   check_beginning($msg);
   check_end($msg);
 }
 
-sub main {
-  my ($file) = @ARGV;
-  return 0 if $ENV{DZIL_RELEASING};
-
-  open my $fh, "<", $file or die "Can't open $file: $!";
-  my @msg = <$fh>;
+sub read_msg ($file) {
+  open my $fh, "<:raw", $file or die "Can't open $file: $!";
+  my $bytes = do { local $/; <$fh> }
+    // "";
   close $fh or die "Can't close $file: $!";
+  my $text = eval {
+    Encode::decode("UTF-8", $bytes, Encode::FB_CROAK | Encode::LEAVE_SRC)
+  };
+  unless (defined $text) {
+    push @Errors, ["Commit message is not valid UTF-8", ""];
+    $text = Encode::decode("UTF-8", $bytes, Encode::FB_DEFAULT);
+  }
+  split /^/m, $text
+}
+
+sub main () {
+  my ($file) = @ARGV;
+  # say STDERR "commit-msg hook: [$file]";
+
+  my @msg = read_msg($file);
   process_msg(\@msg);
 
   return 0 unless @Errors;
 
-  say "Errors found:";
   my $max = 0;
   for my $e (@Errors) { $max = length $e->[0] if length $e->[0] > $max }
-  for my $e (@Errors) { printf "%-${max}s: «%s»\n", @$e }
+  my $report = join "", "Errors found:\n",
+    map { sprintf "%-${max}s: «%s»\n", @$_ } @Errors;
+  print $report;  # captured by pre-commit, shown on failure
 
-  print "Force commit? [y/N] ";
-  open my $in, "<", "/dev/tty" or die "Can't open tty";
-  my $force = <$in> // "";
-  close $in or die "Can't close tty";
+  open my $tty, "+<", "/dev/tty" or return 1;  # no terminal: decline
+  binmode $tty, ":encoding(UTF-8)";
+  print $tty $report, "Force commit? [y/N] ";
+  my $force = <$tty> // "";
+  close $tty or die "Can't close tty";
   $force =~ /^y/i ? 0 : 1
 }
 

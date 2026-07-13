@@ -1,6 +1,6 @@
 package Dist::Zilla::MintingProfile::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '4.0000'; # VERSION
+our $VERSION = '4.0001'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: GEEKRUTH's Dist::Zilla minting profiles
  
@@ -24,7 +24,7 @@ Dist::Zilla::MintingProfile::GEEKRUTH - GEEKRUTH's Dist::Zilla minting profiles
 
 =head1 VERSION
 
-version 4.0000
+version 4.0001
 
 =head1 AUTHOR
 

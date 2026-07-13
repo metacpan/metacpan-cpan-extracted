@@ -1,5 +1,8 @@
 Revision history for Thread-CSP
 
+0.016     2026-07-12 21:47:35+02:00 Europe/Brussels
+          - Fix configure dependency on CPAN::Requirements::Dynamic
+
 0.015     2025-05-25 14:19:18+02:00 Europe/Brussels
           - Use the shared memory pool for promise and channel allocation
           - Fix leak of thread arguments

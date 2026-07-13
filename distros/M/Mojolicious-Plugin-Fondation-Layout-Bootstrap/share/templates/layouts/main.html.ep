@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF -->
+    <meta name="csrf-token" content="<%= csrf_token %>">
+
+    <title><%= stash('title') || 'Fondation' %></title>
+
+    %= asset 'app.css'
+    %== i18n_js
+    %== render_zone 'head/auth'
+
+  </head>
+
+  <body class="bg-light">
+
+    %= include 'layouts/navbar'
+
+    <!-- Main -->
+    <main class="py-4">
+      <div class="container">
+
+        <!-- Breadcrumb -->
+        % if ($c->has_helper('render_menu_breadcrumb')) {
+          %= $c->render_menu_breadcrumb
+        % }
+
+        <!-- Messages -->
+        %= include 'layouts/partials/messages'
+
+        <!-- Content -->
+        <div id="content" class="row">
+          <div class="col-12">
+            %= content
+          </div>
+        </div>
+      </div>
+    </main>
+
+    %= asset 'app.js'
+
+  </body>
+</html>

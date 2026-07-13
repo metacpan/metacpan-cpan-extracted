@@ -1,6 +1,7 @@
-#!perl -w
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
 
 # use lib 'lib';
 use Test::Most tests => 7;
@@ -17,6 +18,6 @@ my $obj = HTML::OSM->new(zoom => 10, coordinates => [ 1, 2 ]);
 cmp_ok($obj->{'zoom'}, '==', 10, 'direct key-value pairs');
 
 # Test cloning behaviour by calling new() on an existing object
-my $obj2 = $obj->new({ cooordinates => [ 3, 4 ] });
+my $obj2 = $obj->new({ coordinates => [ 3, 4 ] });
 cmp_ok($obj2->{zoom}, '==', 10, 'clone keeps old args');
-cmp_ok($obj2->{cooordinates}[0], '==', 3, 'clone adds new args');
+cmp_ok($obj2->{coordinates}[0], '==', 3, 'clone adds new args');

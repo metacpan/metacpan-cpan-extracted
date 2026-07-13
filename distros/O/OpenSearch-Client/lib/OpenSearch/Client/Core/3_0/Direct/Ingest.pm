@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Ingest;
-$OpenSearch::Client::Core::3_0::Direct::Ingest::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Ingest::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Ingest>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<DELETE /_ingest/pipeline/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ingest->delete_pipeline(
         
@@ -119,6 +122,9 @@ C<GET /_ingest/pipeline/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ingest->get_pipeline(
         
          # path parameters
@@ -154,6 +160,9 @@ C<GET /_ingest/processor/grok>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ingest->processor_grok(
         
          # Endpoint specific query string parameters
@@ -183,6 +192,9 @@ I<Paths served by this method:>
 C<PUT /_ingest/pipeline/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ingest->put_pipeline(
         
@@ -231,6 +243,9 @@ C<POST /_ingest/pipeline/{id}/_simulate>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ingest->simulate(
         
         'body'         =>  $body,      # required
@@ -253,6 +268,19 @@ C<POST /_ingest/pipeline/{id}/_simulate>
     );
 
 L<OpenSearch documentation for ingest-E<gt>simulate|https://opensearch.org/docs/latest/api-reference/ingest-apis/simulate-ingest/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->ingest->method_supported_in_version(
+        method  => 'delete_pipeline',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

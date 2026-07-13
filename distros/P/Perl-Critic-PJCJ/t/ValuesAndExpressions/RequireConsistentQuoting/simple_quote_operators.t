@@ -10,7 +10,11 @@ use experimental qw( signatures );
 
 # Test that q() and qq() suggest simpler quotes for simple strings
 use lib qw( lib t/lib );
-use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting ();
+use Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting qw(
+  desc_double
+  desc_optimal
+  desc_single
+);
 use ViolationFinder qw( bad good );
 
 my $Policy
@@ -19,58 +23,61 @@ my $Policy
 subtest "q() with simple strings - follow single quote rules" => sub {
   # Case 1: Simple strings that would cause single quotes to suggest double
   # quotes
-  bad $Policy, 'my $x = q(simple);', 'use ""',
+  bad $Policy, 'my $x = q(simple);', desc_double,
     "q() with simple string should suggest double quotes";
-  bad $Policy, 'my $x = q{simple};', 'use ""',
+  bad $Policy, 'my $x = q{simple};', desc_double,
     "q{} with simple string should suggest double quotes";
 
   # Case 2: Strings where single quotes would be acceptable
-  bad $Policy, 'my $x = q(has "quotes");', "use ''",
+  bad $Policy, 'my $x = q(has "quotes");', desc_single,
     "q() with content that justifies single quotes should suggest them";
-  bad $Policy, 'my $x = q{$variable};', "use ''",
+  bad $Policy, 'my $x = q{$variable};', desc_single,
     "q{} with variable content should suggest single quotes";
 
   # Case 3: Strings that would cause single quotes to suggest double quotes
   # (because they contain single quotes but no variables)
-  bad $Policy, q[my $x = q(don't);], 'use ""',
+  bad $Policy, q[my $x = q(don't);], desc_double,
     "q() with embedded single quote should suggest double quotes";
-  bad $Policy, q(my $x = q{user's};), 'use ""',
+  bad $Policy, q(my $x = q{user's};), desc_double,
     "q{} with embedded single quote should suggest double quotes";
 
   # Case 3: Strings that would cause single quotes to need q()
   # (because they have both single and double quotes)
-  bad $Policy, q(my $x = 'mix \'single\' and "double"';), "use q()",
-    "'' with mixed quotes should suggest q()";
-  bad $Policy, q[my $x = 'mix \'single\' and "double" and ()';], "use q[]",
+  bad $Policy, q(my $x = 'mix \'single\' and "double"';),
+    desc_optimal("q()"), "'' with mixed quotes should suggest q()";
+  bad $Policy, q[my $x = 'mix \'single\' and "double" and ()';],
+    desc_optimal("q[]"),
     "'' with mixed quotes and parentheses should suggest q[]";
-  bad $Policy, q(my $x = q|mix 'single' and "double"|;), "use q()",
+  bad $Policy, q(my $x = q|mix 'single' and "double"|;), desc_optimal("q()"),
     "q| with mixed quotes should suggest q()";
 
   # Case 4: Strings that have single quotes that would need escaping
-  bad $Policy, q(my $x = q/can't and won't/;), 'use ""',
+  bad $Policy, q(my $x = q/can't and won't/;), desc_double,
     "q/ with single quotes should suggest double quotes";
 };
 
 subtest "qq() with simple strings - follow double quote rules" => sub {
   # Case 1: Simple strings that would be fine as double quotes
-  bad $Policy, 'my $x = qq(simple);', 'use ""',
+  bad $Policy, 'my $x = qq(simple);', desc_double,
     "qq() with simple string should suggest double quotes";
-  bad $Policy, 'my $x = qq{simple};', 'use ""',
+  bad $Policy, 'my $x = qq{simple};', desc_double,
     "qq{} with simple string should suggest double quotes";
 
   # Case 2: Strings that would cause double quotes to suggest single quotes
   # (because they have escaped characters that look like variables)
-  bad $Policy, 'my $x = qq(price: \\$5.00);', "use ''",
+  bad $Policy, 'my $x = qq(price: \\$5.00);', desc_single,
     "qq() with escaped dollar should suggest single quotes";
-  bad $Policy, 'my $x = qq{email\\@domain.com};', "use ''",
+  bad $Policy, 'my $x = qq{email\\@domain.com};', desc_single,
     "qq{} with escaped at-sign should suggest single quotes";
 
   # Case 3: Strings that would cause double quotes to need qq()
   # (because they contain double quotes and need interpolation)
   bad $Policy, 'my $var = "test"; my $x = qq/has "quotes" and $var/;',
-    "use qq()", "qq/ with quotes and interpolation should suggest qq()";
+    desc_optimal("qq()"),
+    "qq/ with quotes and interpolation should suggest qq()";
   bad $Policy, 'my @arr = (); my $x = qq|has "quotes" and @arr|;',
-    "use qq()", "qq| with quotes and interpolation should suggest qq()";
+    desc_optimal("qq()"),
+    "qq| with quotes and interpolation should suggest qq()";
 };
 
 subtest "Consistency verification" => sub {

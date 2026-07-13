@@ -30,6 +30,7 @@ lib/CBOR/Free/Tagged.pm
 lib/CBOR/Free/X.pm
 lib/CBOR/Free/X/Base.pm
 lib/CBOR/Free/X/CannotDecode64Bit.pm
+lib/CBOR/Free/X/DuplicateMapKey.pm
 lib/CBOR/Free/X/Incomplete.pm
 lib/CBOR/Free/X/InvalidControl.pm
 lib/CBOR/Free/X/InvalidMapKey.pm
@@ -48,6 +49,7 @@ t/config.t
 t/dec_strings.t
 t/decode.t
 t/decode_map_keys.t
+t/duplicate_map_keys.t
 t/encode_modes.t
 t/errors.t
 t/examples.t

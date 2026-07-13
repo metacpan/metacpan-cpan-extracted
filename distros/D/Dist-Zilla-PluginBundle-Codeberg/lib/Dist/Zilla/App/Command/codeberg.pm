@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::codeberg 2.0100;
+package Dist::Zilla::App::Command::codeberg 2.0101;
 use Modern::Perl;
 use Cwd qw(cwd);
 use Dist::Zilla::App -command;
@@ -79,7 +79,7 @@ Dist::Zilla::App::Command::codeberg - Use the Codeberg plugins from the command-
 
 =head1 VERSION
 
-version 2.0100
+version 2.0101
 
 =head1 SYNOPSIS
 

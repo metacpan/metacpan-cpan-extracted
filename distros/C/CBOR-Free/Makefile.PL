@@ -1,4 +1,6 @@
 use ExtUtils::MakeMaker;
+use File::Temp;
+use Config;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -24,6 +26,13 @@ WriteMakefile1(
     LICENSE      => 'perl',
 
     INC => '-Wall -I.',
+
+    DEFINE => join(
+        q< >,
+        map { "-D$_" } (
+            ( _ntohll_exists() ? 'CBF_64BIT_INET' : () ),
+        ),
+    ),
 
     OBJECT => [
         '$(BASEEXT)$(OBJ_EXT)',
@@ -97,4 +106,25 @@ sub WriteMakefile1 {  #Compatibility code for old versions of EU::MM. Written by
     delete $params{LICENSE} if $eumm_version < 6.31;
 
     WriteMakefile(%params);
+}
+
+sub _ntohll_exists {
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+    open my $fh, '>', "$dir/c.c";
+    syswrite $fh, <<CC;
+#include <stdint.h>
+#include <arpa/inet.h>
+int main() {
+  uint64_t a = ntohll(0);
+  return 0;
+}
+CC
+    close $fh;
+
+    print "Checking for 64-bit inet functions (e.g., ntohll) …$/";
+    my $has = !system $Config{'cc'}, "$dir/c.c", '-o', "$dir/a.out";
+
+    print "\t… " . ($has ? 'yup!' : 'nope.') . $/;
+
+    return $has;
 }

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Rollups;
-$OpenSearch::Client::Core::3_0::Direct::Rollups::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Rollups::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Rollups>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/_rollup/jobs/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->rollups->delete(
         
          # path parameters
@@ -109,6 +112,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_rollup/jobs/{id}/_explain>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->rollups->explain(
         
@@ -140,6 +146,9 @@ C<GET /_plugins/_rollup/jobs/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->rollups->get(
         
          # path parameters
@@ -169,6 +178,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_rollup/jobs/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->rollups->put(
         
@@ -207,6 +219,9 @@ C<POST /_plugins/_rollup/jobs/{id}/_start>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->rollups->start(
         
          # path parameters
@@ -237,6 +252,9 @@ C<POST /_plugins/_rollup/jobs/{id}/_stop>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->rollups->stop(
         
          # path parameters
@@ -253,6 +271,19 @@ C<POST /_plugins/_rollup/jobs/{id}/_stop>
     );
 
 L<OpenSearch documentation for rollups-E<gt>stop|https://opensearch.org/docs/latest/im-plugin/index-rollups/rollup-api/#start-or-stop-an-index-rollup-job>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->rollups->method_supported_in_version(
+        method  => 'delete',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

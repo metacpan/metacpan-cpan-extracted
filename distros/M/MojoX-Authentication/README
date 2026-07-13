@@ -1,0 +1,150 @@
+NAME
+
+    MojoX::Authentication - [Put something meaningful here!]
+
+VERSION
+
+    This document describes MojoX::Authentication version 0.001.
+
+SYNOPSIS
+
+       use MojoX::Authentication;
+
+DESCRIPTION
+
+    This module aims at being a batteries included facility for handling
+    authentication in Mojolicious applications.
+
+    More documentation will come, but the application in the eg
+    sub-directory contains an example for using the three ways of
+    authentication that are supported: local with in-memory hashes, local
+    with database (SQLite), remote with SAML 2.0.
+
+INTERFACE
+
+ app
+
+       my $app = $ma->app;
+
+    Retrieve the application object reference set at creation or later when
+    calling "app_startup" (if you decide to use it).
+
+    It is mandatory if "model" is missing.
+
+ app_startup
+
+       $ma->app_startup; # OR
+       $ma->app_startup($app);
+
+    Perform some startup over the application (either provided explicitly
+    as $app, or retrieved via "app"), like adding and initializing plugin
+    Mojolicious::Plugin::Authentication and setting a before_render hook to
+    inject the user data in the stash, if present (see "user_stash_key" for
+    the key used in the stash).
+
+ ctr_credentials_login
+
+       $ma->ctr_credentals_login($controller, $routes_for); # OR
+       $ma->ctr_credentals_login($controller);
+
+    Opinionated way of handling the login through credentials, practically
+    acting as a wrapper around the $controller. Assumes that username and
+    secret can be retrieved via param() with keys username and password
+    respectively.
+
+    The $routes_for, if present, is supposed to be a hash reference holding
+    the routes to redirect the client for key ok (in case the interaction
+    is successful) and key not_ok (otherwise). They default to
+    protected_root and public_root respectively.
+
+ ctr_logout
+
+       $ma->ctr_logout($controller);
+
+    Perform the logout. If the provider supports the logout method, this
+    totally delegates to it; otherwise, it calls the logout method over the
+    $controller.
+
+ ctr_saml2_login
+
+       $ma->ctr_saml2_login($controller, $route_for);
+
+    Opinionated way of handling the login through credentials, practically
+    acting as a wrapper around the $controller. This is the initial request
+    where the user is then sent to the Identity Provider.
+
+    The $routes_for works like for "ctr_credentials_login", except that in
+    case of success the redirection URL will send the user to the Identity
+    Provider.
+
+ ctr_saml2_sso_post
+
+       $ma->ctr_saml2_sso_post($controller, $route_for);
+
+    Opinionated way of handling the login through credentials, practically
+    acting as a wrapper around the $controller. This is the final request
+    where the user comes back from the Identity Provider.
+
+    The $routes_for works like for "ctr_credentials_login".
+
+ model
+
+       my $model = $ma->model;
+
+    Accessor to the model, most probably an instance of
+    MojoX::Authentication::Model.
+
+    If it is not set at creation, it is expected that "app" is set and that
+    it can be called like $app->model->authentication to retrieve the
+    correct value for this member.
+
+ new
+
+       my $ma = MojoX::Authentication->new(%args); # OR
+       my $ma = MojoX::Authentication->new(\%args);
+
+    Constructor.
+
+    Accepts initialization values for "app", "model",
+    "saml2_provider_name", and "user_stash_key".
+
+ saml2_provider_name
+
+       my $string = $ma->saml2_provider_name;
+
+    Accessor to the (default) provider name for SAML2 logins. This works
+    under the assumption that there will only be one identity provider;
+    otherwise you will have to do some more coding on your side.
+
+ user_stash_key
+
+       my $string = $ma->user_stash_key;
+
+    Accessor to the key (a string) used to set the user in the stash, when
+    available. Defaults to user, so in your templates you should be able to
+    use the $user variable. See "app_startup" for its usage.
+
+BUGS AND LIMITATIONS
+
+    Minimul perl version 5.24.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+

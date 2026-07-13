@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # SYNOPSIS
 
@@ -300,6 +300,8 @@ All Fondation-aware plugins must define a class method `fondation_meta`:
         return {
             dependencies     => ['XXX', 'YYY'],   # loaded before this plugin
             provides_actions => ['MyAction'],       # optional custom action
+            before           => ['ZZZ'],            # soft: load this plugin before ZZZ
+            after            => ['WWW'],            # soft: load this plugin after WWW
             defaults         => {
                 title => 'Default Title',
             },
@@ -308,6 +310,10 @@ All Fondation-aware plugins must define a class method `fondation_meta`:
 
 - `dependencies` -> array of plugin names to load first
 - `provides_actions` -> optional array of custom action short names
+- `before` -> soft ordering: this plugin loads **before** the listed plugins.
+Silently ignored when the target is not in the graph.
+- `after` -> soft ordering: this plugin loads **after** the listed plugins.
+Silently ignored when the target is not in the graph.
 - `defaults` -> fallback configuration values (lowest priority)
 
 This method is called before `register` to collect metadata without

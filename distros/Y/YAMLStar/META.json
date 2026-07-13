@@ -53,6 +53,6 @@
          "web" : "https://github.com/yaml/yamlstar"
       }
    },
-   "version" : "v0.1.12",
+   "version" : "v0.1.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

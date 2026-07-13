@@ -1,5 +1,9 @@
 Revision history for Schedule::Easing
 
+0.1.5 - 2026-07-12
+	- Support md5 digestsub
+	- Add type=pass
+
 0.1.4 - 2025-09-14
 	- Support begin>final in shaping functions
 	- Support begin>final for timestamps/::schedule

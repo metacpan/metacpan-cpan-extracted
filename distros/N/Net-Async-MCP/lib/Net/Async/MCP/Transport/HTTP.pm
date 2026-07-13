@@ -1,6 +1,5 @@
 package Net::Async::MCP::Transport::HTTP;
 # ABSTRACT: Streamable HTTP MCP transport via Net::Async::HTTP
-our $VERSION = '0.002';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -223,7 +222,7 @@ Net::Async::MCP::Transport::HTTP - Streamable HTTP MCP transport via Net::Async:
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -312,11 +311,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

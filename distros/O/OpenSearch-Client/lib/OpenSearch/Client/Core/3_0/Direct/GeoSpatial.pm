@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::GeoSpatial;
-$OpenSearch::Client::Core::3_0::Direct::GeoSpatial::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::GeoSpatial::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::GeoSpatial>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/geospatial/ip2geo/datasource/{name}>
 
 =back
 
+I<Method added in OpenSearch version 2.11>
+
+
     $resp = $client->geospatial->delete_ip2geo_datasource(
         
          # path parameters
@@ -112,6 +115,9 @@ C<POST /_plugins/geospatial/geojson/_upload>
 
 =back
 
+I<Method added in OpenSearch version 2.11>
+
+
     $resp = $client->geospatial->geojson_upload_post(
         
         'body'         =>  $body,      # optional
@@ -141,6 +147,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/geospatial/geojson/_upload>
 
 =back
+
+I<Method added in OpenSearch version 2.11>
+
 
     $resp = $client->geospatial->geojson_upload_put(
         
@@ -173,6 +182,9 @@ C<GET /_plugins/geospatial/ip2geo/datasource/{name}>
 
 =back
 
+I<Method added in OpenSearch version 2.11>
+
+
     $resp = $client->geospatial->get_ip2geo_datasource(
         
          # path parameters
@@ -203,6 +215,9 @@ C<GET /_plugins/geospatial/_upload/stats>
 
 =back
 
+I<Method added in OpenSearch version 2.11>
+
+
     $resp = $client->geospatial->get_upload_stats(
         
          # Common API query string parameters
@@ -231,6 +246,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/geospatial/ip2geo/datasource/{name}>
 
 =back
+
+I<Method added in OpenSearch version 2.11>
+
 
     $resp = $client->geospatial->put_ip2geo_datasource(
         
@@ -264,6 +282,9 @@ C<PUT /_plugins/geospatial/ip2geo/datasource/{name}/_settings>
 
 =back
 
+I<Method added in OpenSearch version 2.11>
+
+
     $resp = $client->geospatial->put_ip2geo_datasource_settings(
         
         'body'         =>  $body,      # optional
@@ -282,6 +303,19 @@ C<PUT /_plugins/geospatial/ip2geo/datasource/{name}/_settings>
     );
 
 L<OpenSearch documentation for geospatial-E<gt>put_ip2geo_datasource_settings|https://docs.opensearch.org/docs/latest/ingest-pipelines/processors/ip2geo/#updating-an-ip2geo-data-source>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->geospatial->method_supported_in_version(
+        method  => 'delete_ip2geo_datasource',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

@@ -171,7 +171,9 @@ CBOR binary strings become undecoded Perl strings.
 An exception is thrown if the decoder finds anything else as a map key.
 Note that, because Perl does not distinguish between binary and text strings,
 if two keys of the same map contain the same bytes, Perl will consider these
-a duplicate key and prefer the latter.
+a duplicate key and prefer the latter. Use `reject_duplicate_keys()` on
+[CBOR::Free::Decoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ADecoder) to reject map keys that would overwrite an earlier
+key.
 - CBOR booleans become the corresponding [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) values.
 Both CBOR null and undefined become Perl undef.
 - [CBOR’s “indirection” tag](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml) is interpreted as a scalar reference. This behavior is always

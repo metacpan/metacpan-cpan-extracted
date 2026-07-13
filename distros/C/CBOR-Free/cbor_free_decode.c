@@ -1,3 +1,4 @@
+#define NO_XSLOCKS
 #include "easyxs/init.h"
 
 #include "cbor_free_common.h"
@@ -32,36 +33,17 @@
 
 // Basically ntohll(), but it accepts a pointer.
 static inline UV _buffer_u64_to_uv( unsigned char *buffer ) {
-    UV num = 0;
-
-#if IS_64_BIT
-    num |= *(buffer++);
-    num <<= 8;
-
-    num |= *(buffer++);
-    num <<= 8;
-
-    num |= *(buffer++);
-    num <<= 8;
-
-    num |= *(buffer++);
-    num <<= 8;
+#ifdef CBF_64BIT_INET
+    return ntohll( *( (uint64_t*) buffer ) );
 #else
-    buffer += 4;
+
+    return (
+#if IS_64_BIT
+        ( ((UV) ntohl( *( (uint32_t*) buffer ) )) << 32 ) +
 #endif
-
-    num |= *(buffer++);
-    num <<= 8;
-
-    num |= *(buffer++);
-    num <<= 8;
-
-    num |= *(buffer++);
-    num <<= 8;
-
-    num |= *(buffer++);
-
-    return num;
+        ntohl( *( (uint32_t*) buffer + 1 ) )
+    );
+#endif
 }
 
 const char *MAJOR_TYPE_DESCRIPTION[] = {
@@ -192,6 +174,19 @@ void _croak_invalid_map_key( pTHX_ decode_ctx* decstate ) {
     assert(0);
 }
 
+void _croak_duplicate_map_key( pTHX_ decode_ctx* decstate, UV offset ) {
+    _free_decode_state_if_not_persistent(aTHX_ decstate);
+
+    SV* args[2] = {
+        newSVpvs("DuplicateMapKey"),
+        newSVuv(offset),
+    };
+
+    cbf_die_with_arguments( aTHX_ 2, args );
+
+    assert(0);
+}
+
 void _croak_cannot_decode_64bit( pTHX_ decode_ctx* decstate ) {
     UV offset = decstate->curbyte - decstate->start;
 
@@ -288,7 +283,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
 
 #if !IS_64_BIT
 
-            if (decstate->curbyte[0] || decstate->curbyte[1] || decstate->curbyte[2] || decstate->curbyte[3]) {
+            if (*( (uint32_t*) decstate->curbyte )) {
                 _croak_cannot_decode_64bit( aTHX_ decstate );
             }
 #endif
@@ -456,6 +451,8 @@ bool _decode_str( pTHX_ decode_ctx* decstate, union numbuf_or_sv* string_u ) {
 void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
     _RETURN_IF_INCOMPLETE( decstate, 1,  );
 
+    UV key_offset = decstate->curbyte - decstate->start;
+
     union numbuf_or_sv my_key;
     my_key.numbuf.buffer = NULL;
 
@@ -515,6 +512,20 @@ void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
         default:
             _croak_invalid_map_key( aTHX_ decstate);
             return; // Silence compiler warning.
+    }
+
+    if (decstate->flags & CBF_FLAG_REJECT_DUPLICATE_KEYS) {
+        bool duplicate = my_key_has_sv
+            ? hv_exists_ent(hash, my_key.sv, 0)
+            : hv_exists(hash, keystr, keylen);
+
+        if (duplicate) {
+            if (my_key_has_sv) {
+                SvREFCNT_dec( my_key.sv );
+            }
+
+            _croak_duplicate_map_key( aTHX_ decstate, key_offset );
+        }
     }
 
     SV *curval = cbf_decode_one( aTHX_ decstate );

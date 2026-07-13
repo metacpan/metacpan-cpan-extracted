@@ -1,0 +1,107 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::Hash
+
+
+=head1 SYNOPSIS
+
+   use MojoX::Authentication::Model::Hash;
+
+
+=head1 DESCRIPTION
+
+This class is not supposed to be used directly but through
+L<MojoX::Authentication::Model> instead.
+
+This class composes role L<MojoX::Authentication::Model::Role::Local>
+and inherits its methods.
+
+
+=head1 INTERFACE
+
+=head2 B<< create >>
+
+   my $instance = MojoX::Authentication::Model::Hash->new(
+      $config, %args);
+
+Constructor. 
+
+Can receive the configuration either from a more "generic" C<$config>
+hash as well as direct named arguments.
+
+First a name is determined, either from C<$args{name}> or C<hashy> by
+default. Then C<$config> is looked at for a corresponding value, which
+is either expected to be missing/C<undef> or be a hash reference. In
+case a hash reference is found, its pairs override those on C<%args>,
+with the only exception of the key C<name> which is preserved if already
+present or set to the default otherwise.
+
+If the C<db> key is present, a new instance of the class is created and
+returned. Otherwise, the method returns C<undef>.
+
+Also accepts parameters C<name> (from C<%args> only see above) and
+C<crypt_passphrase>, that can be either a L<Crypt::Passphrase> instance
+or arguments to instantate one.
+
+=head2 B<< db >>
+
+   my $db_hash = $provider->db;
+
+Accessor to the hash holding the accounts database. Take extreme care to
+fiddle directly with its value.
+
+=head2 B<< load_user >>
+
+   my $user = $provider->load_user($ignored, $uid);
+
+Load the user by its userid, compatibly with
+L<Mojolicious::Plugin::Authentication>'s interface for loading users.
+The first parameter (which is supposed to be a controller instance) is
+ignored.
+
+This class has no distiction between user identifiers and user names.
+
+=head2 B<< load_user_by_name >>
+
+   my $user = $provider->load_user_by_name($ignored, $name);
+
+Alias for L</load_user>, this class has no distiction between user
+identifiers and user names.
+
+=head2 B<< name >>
+
+   my $name = $provider->name;
+
+Name assigned to the provider (e.g. if you want to use different
+databases at the same time and hence want to instantiate this class
+multiple times).
+
+=head2 B<< save_user >>
+
+   $provider->save_user($user);    # OR
+   $provider->save_user($user, $is_secret_cleartext);
+
+Save a user.
+
+The input C<$user> is supposed to be a hash reference with I<at least>
+keys C<name> (for the username/userid) and C<secret> (for the secret).
+it <MAY> contain other key/value pairs, which will be copied.
+
+The C<secret> is supposed to be already hashed. It is possible to set
+the optional additional parameter C<$is_secret_cleartext> to a true
+value to indicate that the hashing should be done by the function before
+saving the user.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

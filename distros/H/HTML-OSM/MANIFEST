@@ -1,4 +1,5 @@
 Changes
+cpanfile
 examples/england
 examples/locations
 examples/onmap_render
@@ -11,17 +12,27 @@ README.md
 t/10-compile.t
 t/20-new.t
 t/30-basics.t
+t/40-layers.t
 t/comment-spelling.t
+t/conf/new.yml
+t/conf/zoom.yml
 t/cover.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/fuzz.t
+t/integration.t
 t/limiting.t
+t/locales.t
 t/mock.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-snippets.t
 t/pod-synopsis.t
 t/pod.t
+t/unit.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

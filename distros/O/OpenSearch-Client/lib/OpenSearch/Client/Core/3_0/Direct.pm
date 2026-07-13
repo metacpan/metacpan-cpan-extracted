@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct;
-$OpenSearch::Client::Core::3_0::Direct::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -71,6 +71,36 @@ has 'bulk_helper_class'    => ( is => 'rw' );
 has 'scroll_helper_class'  => ( is => 'rw' );
 has '_bulk_class'          => ( is => 'lazy' );
 has '_scroll_class'        => ( is => 'lazy' );
+has 'opensearch_version'   => ( is => 'lazy' );
+
+#---------------------------------------
+sub global_method_supported_in_version {
+#---------------------------------------
+    my( $self, @args ) = @_;
+    my %params = ( ref($args[0]) ) ? %{ $args[0] } : @args;
+    
+    my $version = $params{version} || $self->opensearch_version;
+    my $module  = $params{module} || '_core';
+    my $method  = $params{method} || 'not_a_real_method_name';
+    
+    if( $module eq '_core' ) {
+        if( $self->can($method) ) {
+            my $result = $self->method_supported_in_version( method => $method, version => $version);
+            return $result;
+        }
+    } else {
+       if( $self->can($module) ) {
+            my $cli = $self->$module;
+            if( $cli->can($method) ) {
+                my $result = $cli->method_supported_in_version( method => $method, version => $version);
+                return $result;
+            }
+        }
+    }
+    
+    return 0;
+}
+
 
 #===================================
 sub _build__bulk_class {
@@ -88,6 +118,15 @@ sub _build__scroll_class {
     my $scroll_class = $self->scroll_helper_class
         || 'Core::' . $self->api_version . '::Helper::Scroll';
     $self->_build_helper( 'scroll', $scroll_class );
+}
+
+#===================================
+sub _build_opensearch_version {
+#===================================
+    my $self  = shift;
+    my $resp  = $self->info();
+    my $os_version = $resp->{version}->{number};    
+    return $os_version;
 }
 
 #===================================
@@ -159,7 +198,7 @@ B<OpenSearch::Client::Core::3_0::Direct>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -214,6 +253,9 @@ C<PUT /_bulk>
 C<PUT /{index}/_bulk>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->bulk(
         
@@ -271,6 +313,9 @@ C<PUT /{index}/_bulk/stream>
 
 =back
 
+I<Method added in OpenSearch version 2.17>
+
+
     $resp = $client->bulk_stream(
         
         'body'                    =>  $body,      # required
@@ -322,6 +367,9 @@ C<DELETE /_search/scroll/{scroll_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->clear_scroll(
         
         'body'         =>  $body,      # optional
@@ -363,6 +411,9 @@ C<POST /_count>
 C<POST /{index}/_count>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->count(
         
@@ -419,6 +470,9 @@ C<PUT /{index}/_create/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->create(
         
         'body'                    =>  $body,      # required
@@ -463,6 +517,9 @@ C<POST /{index}/_search/point_in_time>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->create_pit(
         
          # path parameters
@@ -501,6 +558,9 @@ I<Paths served by this method:>
 C<DELETE /{index}/_doc/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->delete(
         
@@ -545,6 +605,9 @@ C<DELETE /_search/point_in_time/_all>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->delete_all_pits(
         
          # Common API query string parameters
@@ -571,6 +634,9 @@ I<Paths served by this method:>
 C<POST /{index}/_delete_by_query>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->delete_by_query(
         
@@ -641,6 +707,9 @@ C<POST /_delete_by_query/{task_id}/_rethrottle>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->delete_by_query_rethrottle(
         
          # path parameters
@@ -676,6 +745,9 @@ C<DELETE /_search/point_in_time>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->delete_pit(
         
         'body'         =>  $body,      # optional
@@ -704,6 +776,9 @@ I<Paths served by this method:>
 C<DELETE /_scripts/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->delete_script(
         
@@ -741,6 +816,9 @@ I<Paths served by this method:>
 C<HEAD /{index}/_doc/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->exists(
         
@@ -786,6 +864,9 @@ I<Paths served by this method:>
 C<HEAD /{index}/_source/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->exists_source(
         
@@ -833,6 +914,9 @@ C<GET /{index}/_explain/{id}>
 C<POST /{index}/_explain/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->explain(
         
@@ -892,6 +976,9 @@ C<POST /{index}/_field_caps>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->field_caps(
         
         'body'                =>  $body,      # optional
@@ -932,6 +1019,9 @@ I<Paths served by this method:>
 C<GET /{index}/_doc/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->get(
         
@@ -978,6 +1068,9 @@ C<GET /_search/point_in_time/_all>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->get_all_pits(
         
          # Common API query string parameters
@@ -1004,6 +1097,9 @@ I<Paths served by this method:>
 C<GET /_scripts/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->get_script(
         
@@ -1041,6 +1137,9 @@ C<GET /_script_context>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->get_script_context(
         
          # Common API query string parameters
@@ -1068,6 +1167,9 @@ C<GET /_script_language>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->get_script_languages(
         
          # Common API query string parameters
@@ -1094,6 +1196,9 @@ I<Paths served by this method:>
 C<GET /{index}/_source/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->get_source(
         
@@ -1145,6 +1250,9 @@ C<PUT /{index}/_doc/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->index(
         
         'body'                    =>  $body,      # optional
@@ -1193,6 +1301,9 @@ C<GET />
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->info();
 
 L<OpenSearch documentation for info|https://docs.opensearch.org/latest/api-reference/>
@@ -1219,6 +1330,9 @@ C<POST /_mget>
 C<POST /{index}/_mget>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->mget(
         
@@ -1273,6 +1387,9 @@ C<POST /{index}/_msearch>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->msearch(
         
         'body'                           =>  $body,      # required
@@ -1326,6 +1443,9 @@ C<POST /{index}/_msearch/template>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->msearch_template(
         
         'body'                     =>  $body,      # required
@@ -1376,6 +1496,9 @@ C<POST /{index}/_mtermvectors>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->mtermvectors(
         
         'body'              =>  $body,      # optional
@@ -1424,6 +1547,9 @@ C<HEAD />
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ping(
         
          # Common API query string parameters
@@ -1459,6 +1585,9 @@ C<PUT /_scripts/{id}>
 C<PUT /_scripts/{id}/{context}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->put_script(
         
@@ -1510,6 +1639,9 @@ C<POST /{index}/_rank_eval>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->rank_eval(
         
         'body'                =>  $body,      # required
@@ -1552,6 +1684,9 @@ C<POST /_reindex>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->reindex(
         
         'body'                    =>  $body,      # optional
@@ -1592,6 +1727,9 @@ I<Paths served by this method:>
 C<POST /_reindex/{task_id}/_rethrottle>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->reindex_rethrottle(
         
@@ -1637,6 +1775,9 @@ C<POST /_render/template/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->render_search_template(
         
         'body'         =>  $body,      # optional
@@ -1672,6 +1813,9 @@ C<GET /_scripts/painless/_execute>
 C<POST /_scripts/painless/_execute>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->scripts_painless_execute(
         
@@ -1710,6 +1854,9 @@ C<POST /_search/scroll>
 C<POST /_search/scroll/{scroll_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->scroll(
         
@@ -1758,6 +1905,9 @@ C<POST /_search>
 C<POST /{index}/_search>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->search(
         
@@ -1852,6 +2002,9 @@ C<POST /{index}/_search_shards>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->search_shards(
         
         'body'                =>  $body,      # optional
@@ -1902,6 +2055,9 @@ C<POST /_search/template>
 C<POST /{index}/_search/template>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->search_template(
         
@@ -1963,6 +2119,9 @@ C<POST /{index}/_termvectors/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->termvectors(
         
         'body'              =>  $body,      # optional
@@ -2010,6 +2169,9 @@ I<Paths served by this method:>
 C<POST /{index}/_update/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->update(
         
@@ -2060,6 +2222,9 @@ I<Paths served by this method:>
 C<POST /{index}/_update_by_query>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->update_by_query(
         
@@ -2131,6 +2296,9 @@ C<POST /_update_by_query/{task_id}/_rethrottle>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->update_by_query_rethrottle(
         
          # path parameters
@@ -2151,6 +2319,73 @@ C<POST /_update_by_query/{task_id}/_rethrottle>
     );
 
 L<OpenSearch documentation for update_by_query_rethrottle|https://docs.opensearch.org/latest/api-reference/>
+
+=head2 opensearch_version
+
+A lazy populated property with the version of the current OpenSearch cluster.
+
+It is populated by:
+
+    my $version = $os->info->{version}->{number};
+
+=head2 global_method_supported_in_version
+
+Return whether a method is supported for an OpenSearch server version;
+
+    my $boolean = $os->global_method_supported_in_version(
+        method  => $methodname,        # required
+        module  => $module_namespace,  # optional
+        version => $version            # optional
+    );
+    
+=over
+
+=item module
+ 
+Provide a module name if the method is not in the top level name space.
+ 
+For example, to check if the method C<$os-E<gt>neural-E<gt>stats()> is supported by the api in OpenSearch version 2.19
+ 
+    my $boolean = $os->global_method_supported_in_version(
+        module  => 'neural',
+        method  => 'stats',
+        version => '2.19'
+    );
+    
+For methods in the top level namespace do not provide a module.
+
+For example, to check if the method C<$os-E<gt>get_all_pits()> is supported by the api in OpenSearch version 2.19
+
+    my $boolean = $os->global_method_supported_in_version(
+        method  => 'get_all_pits',
+        version => '2.19'
+    );
+
+=item version
+
+Provide a version if you want to check against a particular version of OpenSearch.
+If you do not provide a version, the version to check against will be taken from C<$os-E<gt>opensearch_version()>
+
+For example, to check if the method C<$os-E<gt>get_all_pits()> is supported by the api in the OpenSearch instance you are connected to
+
+    my $boolean = $os->global_method_supported_in_version(
+        method  => 'get_all_pits',
+    );
+
+=back
+
+=head2 method_supported_in_version
+
+Return whether a method in the top level namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->method_supported_in_version(
+        method  => 'get_all_pits',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head2 bulk_helper
 

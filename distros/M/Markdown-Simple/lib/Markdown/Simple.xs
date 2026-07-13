@@ -317,6 +317,7 @@ CODE:
 			croak("markdown_to_html: input is not valid UTF-8");
 	}
 	RETVAL = out;
+	if (SvUTF8(input)) SvUTF8_on(RETVAL);
 }
 OUTPUT:
 	RETVAL
@@ -389,6 +390,7 @@ CODE:
 			croak("render: input is not valid UTF-8");
 	}
 	RETVAL = out;
+	if (SvUTF8(input)) SvUTF8_on(RETVAL);
 }
 OUTPUT:
 	RETVAL

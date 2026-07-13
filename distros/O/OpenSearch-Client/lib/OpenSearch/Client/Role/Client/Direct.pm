@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Client::Direct;
-$OpenSearch::Client::Role::Client::Direct::VERSION = '3.007007';
+$OpenSearch::Client::Role::Client::Direct::VERSION = '3.007008';
 use Moo::Role;
 with 'OpenSearch::Client::Role::Client';
 use OpenSearch::Client::Util qw(load_plugin is_compat throw);
@@ -181,7 +181,9 @@ sub _install_api {
     my ( $class, $group ) = @_;
     my $defns = $class->api;
     my $stash = Package::Stash->new($class);
-
+    
+    my $_os_version_stash = {};
+    
     my $group_qr = $group ? qr/$group\./ : qr//;
     for my $action ( keys %$defns ) {
         my ($name) = ( $action =~ /^$group_qr([^.]+)$/ )
@@ -189,12 +191,35 @@ sub _install_api {
         next if $stash->has_symbol( '&' . $name );
 
         my %defn = ( name => $name, %{ $defns->{$action} } );
+        if (exists($defn{os_version})) {
+            $_os_version_stash->{$name} = $defn{os_version} || '1.000000';
+        } else {
+            $_os_version_stash->{$name} = '1.000000';
+        }
+        
         $stash->add_symbol(
             '&' . $name => sub {
                 shift->perform_request( \%defn, @_ );
             }
         );
     }
+    
+    ## add method to tell if an particular module method is supported
+    ## in an OpenSearch version.
+    
+    $stash->add_symbol(
+        '&method_supported_in_version' => sub {
+            my( $self, @args ) = @_;
+            my %params = ( ref($args[0]) ) ? %{ $args[0] } : @args;
+            my $version = $params{version};
+            my $method  = $params{method};
+            return 0 unless($method && $version);
+            return 0 unless(exists($_os_version_stash->{$method}));
+            my $supported_version = $_os_version_stash->{$method};
+            my $checkversion = version->declare('v' . $version)->numify;
+            return ( $checkversion < $supported_version ) ? 0 : 1;
+        }
+    );
 }
 
 #===================================
@@ -232,7 +257,7 @@ OpenSearch::Client::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 DESCRIPTION
 

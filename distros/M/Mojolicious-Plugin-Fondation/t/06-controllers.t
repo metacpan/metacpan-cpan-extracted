@@ -41,8 +41,8 @@ subtest 'Controller priority: dependency plugin over parent plugin' => sub {
             {
                 'Fondation::Authorization' => {
                     dependencies => [
-                        ['Fondation::Role', { share_dir => $role_share_dir }],
-                        ['Fondation::Permission', { share_dir => $perm_share_dir }]
+                        {'Fondation::Role' => { share_dir => $role_share_dir }},
+                        {'Fondation::Permission' => { share_dir => $perm_share_dir }}
                     ],
                     share_dir => $auth_share_dir
                 }
@@ -116,7 +116,7 @@ subtest 'Plugin with unique controller (no name conflict) + metadata' => sub {
     my $app = create_test_app($tempdir);
 
     $app->plugin('Fondation' => {
-        dependencies => [['Fondation::TestController', {}]]
+        dependencies => [{'Fondation::TestController' => {}}]
     });
 
     my $fondation = $app->manager;
@@ -173,7 +173,7 @@ subtest 'App controller has priority over plugin controller' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::Role', { share_dir => $role_share_dir }]
+            {'Fondation::Role' => { share_dir => $role_share_dir }}
         ]
     });
 
@@ -231,7 +231,7 @@ subtest 'Controllers action is active by default' => sub {
 
     # Load Fondation WITHOUT explicit 'actions' -- Controllers should be active
     $app->plugin('Fondation' => {
-        dependencies => [['Fondation::TestController', {}]]
+        dependencies => [{'Fondation::TestController' => {}}]
     });
 
     my $fondation = $app->manager;

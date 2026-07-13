@@ -12,7 +12,7 @@ use Scalar::Util qw(looks_like_number); # core
 use Data::Dumper;
 use version;
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 =head1 NAME
 
@@ -379,7 +379,6 @@ sub get_module_versions_in_release {
                 ],
             }},
             "fields" => ["path","name","stat.size"],
-            "inner_hits" => {"module" => {"path" => {"module" => {}}}},
         }; 
         my $response = _https_request(POST => 'https://fastapi.metacpan.org/v1/file',
             { 'Content-Type' => 'application/json;charset=UTF-8' },
@@ -409,10 +408,8 @@ sub get_module_versions_in_release {
 
         my $size = $hit->{fields}{"stat.size"};
         # files can contain more than one package ('module')
-        my $rel_mods = $hit->{inner_hits}{module}{hits}{hits} || [];
-        for my $inner_hit (@$rel_mods) { # actually packages in the file
-            my $mod = $inner_hit->{_source};
-
+        my $rel_mods = $hit->{_source}{module} || [];
+        for my $mod (@$rel_mods) { # actually packages in the file
             # Some files may contain multiple packages. We want to ignore
             # all except the one that matches the name of the file.
             # We use a fairly loose (but still very effective) test because we
@@ -426,13 +423,14 @@ sub get_module_versions_in_release {
 
             # warn if package previously seen in this release
             # with a different version or file size
+            my $mod_version = $mod->{version} || $mod->{version_numified};
             if (my $prev = $modules_in_release{$mod->{name}}) {
-                my $version_obj = eval { version->parse($mod->{version}) };
-                die "$author/$release: $mod $mod->{version}: $@" if $@;
+                my $version_obj = eval { version->parse($mod_version) };
+                die "$author/$release: $mod->{name} $mod_version: $@" if $@;
 
                 if ($VERBOSE) {
                     # XXX could add a show-only-once cache here
-                    my $msg = "$mod->{name} $mod->{version} ($size) seen in $path after $prev->{path} $prev->{version} ($prev->{size})";
+                    my $msg = "$mod->{name} $mod_version ($size) seen in $path after $prev->{path} $prev->{version} ($prev->{size})";
                     warn "$release: $msg\n"
                         if ($version_obj != version->parse($prev->{version}) or $size != $prev->{size});
                 }
@@ -443,7 +441,7 @@ sub get_module_versions_in_release {
             $modules_in_release{$mod->{name}} = {
                 name => $mod->{name},
                 path => $path,
-                version => $mod->{version},
+                version => $mod_version,
                 size => $size,
             };
         }

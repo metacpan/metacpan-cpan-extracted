@@ -37,8 +37,8 @@ subtest 'should load config file if provided' => sub {
 	close $fh;
 
 	my $osm = HTML::OSM->new(config_file => $config_file);
-	is $osm->{'css_url'}, 'https://example.com', 'Config file loaded correctly';
 	unlink $config_file;
+	is $osm->{'css_url'}, 'https://example.com', 'Config file loaded correctly';
 };
 
 # Check default values
@@ -46,6 +46,11 @@ cmp_ok($osm->{zoom}, '==', 12, 'Default zoom is 12');
 is($osm->{height}, '400px', 'Default height is 400px');
 is($osm->{width}, '600px', 'Default width is 600px');
 is_deeply($osm->{coordinates}, [], 'Coordinates default to an empty array');
+ok(!$osm->{cluster}, 'cluster disabled by default');
+like($osm->{cluster_js_url},      qr/markercluster/, 'cluster_js_url default set');
+like($osm->{cluster_css_url},     qr/MarkerCluster/, 'cluster_css_url default set');
+like($osm->{heatmap_js_url},      qr/leaflet-heat/,  'heatmap_js_url default set');
+like($osm->{gpx_js_url},          qr/leaflet-gpx/,   'gpx_js_url default set');
 
 # Invalid constructor arguments
 dies_ok { HTML::OSM->new({ coordinates => 'not an array' }) } 'Dies with invalid coordinate structure';
@@ -67,7 +72,7 @@ is_deeply($osm->{center}, [40.7128, -74.0060], 'Center is correctly updated');
 
 # Invalid center inputs
 ok(!$osm->center([999, 999]), 'Invalid coordinates do not update the center');
-ok(!$osm->center('place not found'), 'Fails on unknown center location');
+ok(!$osm->center('xyzzy'), 'Fails on unknown center location');
 
 # 4. Zoom Level Tests
 # Valid zoom changes
@@ -87,9 +92,9 @@ my ($head, $body) = $osm->onload_render();
 like($head, qr/leaflet/, 'Leaflet script is included in the head');
 like($body, qr/map\.setView/, 'Body includes map initialization');
 
-# No coordinates error
+# No map data at all
 my $osm_empty = HTML::OSM->new();
-dies_ok { $osm_empty->onload_render() } 'Dies if no coordinates are provided';
+dies_ok { $osm_empty->onload_render() } 'Dies if no map data of any kind is provided';
 
 # Clone Tests
 my $osm_clone = $osm->new(zoom => 17);

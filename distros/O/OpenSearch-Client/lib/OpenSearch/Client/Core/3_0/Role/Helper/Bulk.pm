@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Role::Helper::Bulk;
-$OpenSearch::Client::Core::3_0::Role::Helper::Bulk::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Role::Helper::Bulk::VERSION = '3.007008';
 
 use Moo::Role;
 requires 'add_action', 'flush';
@@ -316,7 +316,7 @@ OpenSearch::Client::Core::3_0::Role::Helper::Bulk - Provides common functionalit
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 MANUAL
 

@@ -53,13 +53,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.172'
+    version: '0.173'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.172'
+    version: '0.173'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.172'
+    version: '0.173'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -211,10 +211,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.172'
+version: '0.173'
 x_Dist_Zilla:
   perl:
-    version: '5.043008'
+    version: '5.044000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -308,7 +308,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: DynamicPrereqs
       version: '0.040'
@@ -378,7 +378,6 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - INSTALL
             - LICENCE
-            - META.json
             - README.pod
           exclude_match: []
           include_dotfiles: 0
@@ -424,12 +423,12 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@Author::ETHER/generate CONTRIBUTING'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/InstallGuide'
       version: '1.200014'
@@ -711,7 +710,7 @@ x_Dist_Zilla:
           inherit_version: 0
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
@@ -789,7 +788,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
@@ -827,7 +826,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260220'
+          Module::CoreList: '5.20260708'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -991,7 +990,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.172
+          tag: v0.173
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1108,7 +1107,7 @@ x_Dist_Zilla:
             - Moose::Conflicts
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000039'
           version: '0.006'
       name: Test::CheckBreaks
       version: '0.020'
@@ -1181,7 +1180,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.43.8
+x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

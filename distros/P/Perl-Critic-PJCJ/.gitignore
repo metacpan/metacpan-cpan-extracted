@@ -1,25 +1,44 @@
-# editor directories and file
-*.bak
-*.org
+# Editor, patch and OS noise
 *~
+*.org
+*.orig
+*.bak
 *.sw?
-.idea/
-
-# Development files
-tags*
-tmp/
-llm/
-.perl-version
-*.tdy
-.build/
-cover_db/
-
-# Droppings
+._*
+*.patch
+*.rej
 .DS_Store
+
+# Ctags index
+tags*
+
+# Logs and scratch space
+*.log
+/tmp
+
+# Distribution archives
 *.tgz
 *.tar.gz
-*.pyo
-*.pyc
+*.tar.bz2
 
-# Local
+# Local CPAN install (cpm/cpanm -L local) and build cruft
+/local
+/.cpanm/
+
+# Local Perl version (plenv/perlbrew) - personal to a checkout
+/.perl-version
+
+# Perl build, coverage, and tidy droppings
+.build/
+cover_db*/
+*.tdy
+
+# Local secrets and environment overrides
+/.env
+*.key
+
+# LLM working files, plans, and environment notes
+/llm
+
+# Project-specific
 Perl-Critic-PJCJ-*/

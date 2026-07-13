@@ -248,4 +248,4 @@ image_hint(cfg, value = NULL)
         RETVAL
 
 BOOT:
-	PERL_INITIALIZE_IMAGER_CALLBACKS;
+        PERL_INITIALIZE_IMAGER_CALLBACKS_NAME("Imager::File::WEBP");

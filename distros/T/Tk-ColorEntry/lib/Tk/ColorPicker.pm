@@ -3,7 +3,7 @@ package Tk::ColorPicker;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.12';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -11,10 +11,11 @@ use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'ColorPicker';
 
 require Tk::NoteBook;
-require Tk::Pane;
+require Tk::ListBrowser;
 use Imager::Screenshot 'screenshot';
 use Math::Round;
 use Scalar::Util qw(looks_like_number);
+use Convert::Color;
 
 my @colspaces = (
 	[qw[RGB Red Green Blue]],
@@ -79,6 +80,14 @@ You can switch color depth on the fly.
 =item Switch: B<-colordepth>
 
 Default value 8 bits per color channel. Can be 4, 8, 12 or 16;
+
+=item Switch: B<-colorheight>
+
+Specifies the height of the color squares on the history page. Default value is 30.
+
+=item Switch: B<-colorwidth>
+
+Specifies the width of the color squares on the history page. Default value is 40.
 
 =item Switch: B<-depthselect>
 
@@ -236,20 +245,29 @@ sub Populate {
 	}
 	
 	$self->{VARPOOL} = \%varpool;
-	my $recent = $nb->add('Recent', -label => 'Recent');
-	my $hp = $recent->Scrolled('Pane',
-		-sticky => 'new',
-		-scrollbars => 'osoe',
+	my $history;
+	my $recent = $nb->add('Recent', -label => 'Recent', -raisecmd => sub {
+		$self->after(1, sub {
+			$self->historyUpdate;
+		})
+	});
+	$history = $recent->ListBrowser(
+		-width => 250,
+		-arrange => 'row',
+		-itemtype => 'image',
+		-textside => 'bottom',
+		-browsecmd => ['historySelect', $self],
 	)->pack(
 		-expand => 1,
 		-fill => 'both',
 	);
-	my $history = $hp->Frame->pack(-anchor => 'nw');
 	$self->Advertise(History => $history);
 
 	
 	$self->ConfigSpecs(
 		-balloon => ['PASSIVE'],
+		-colorwidth => ['PASSIVE', undef, undef, 40],
+		-colorheight => ['PASSIVE', undef, undef, 30],
 		-colordepth => ['METHOD', undef, undef, 8],
 		-depthselect =>['METHOD', undef, undef, 0],
 		-historycolumns => ['PASSIVE', undef, undef, 6],
@@ -685,6 +703,68 @@ sub getRGBx {
 	return $self->notationRGBx($self->getHEX);
 }
 
+sub getXPM {
+	my ($self, $color) = @_;
+	
+#	print "color $color\n";
+	$color = $self->convert($color);
+#	print "converted $color\n";
+
+	my $width = $self->cget('-colorwidth');
+	my $height = $self->cget('-colorheight');
+	#create rgb
+	my $sbg = $color;
+	$sbg =~ s/^#//;
+	my $bg = Convert::Color->new("rgb8:$sbg");
+	my ($red, $green, $blue) = $bg->rgb;
+	#convert top rgb
+	my $tred = $self->offset($red, 0, 1.81);
+	my $tgreen = $self->offset($green, 0, 1.81);
+	my $tblue = $self->offset($blue, 0, 1.75);
+
+	#convert bottom rgb
+	my $bred = $self->offset($red, 255, 1.79);
+	my $bgreen = $self->offset($green, 255, 2);
+	my $bblue =  $self->offset($blue, 255, 2);
+
+	#create xpm color definitions
+	my $t = Convert::Color->new("rgb:$tred,$tgreen,$tblue");
+	my $b = Convert::Color->new("rgb:$bred,$bgreen,$bblue");
+	my $bottom = '#' . $t->as_rgb8->hex;
+	my $top = '#' . $b->as_rgb8->hex;
+	my $fill = '#' . $bg->as_rgb8->hex;
+
+	#create the image
+	my $xpm = "/* XPM */
+static char * select_draft_xpm[] = {
+\"$width $height 3 1\",
+\" 	c $top\",
+\".	c $bottom\",
+\"+	c $fill\",
+";
+	
+	my $base = "\" ";
+	my $end = ".\",\n";
+	
+	#create top line
+	$xpm = "$xpm$base";
+	for (1 .. $width - 2) { $xpm = "$xpm "}
+	$xpm = "$xpm$end";
+
+	#create body
+	my $line = $base;
+	for (1 .. $width - 2) { $line = "$line+"}
+	$line = "$line$end";
+	for (1 .. $height - 2) { $xpm = "$xpm$line" }
+
+	#create bottom line
+	$xpm = "$xpm$base";
+	for (1 .. $width - 2) { $xpm = "$xpm."}
+	$xpm = "$xpm$end";
+	
+	return $self->Pixmap(-data => $xpm);
+}
+
 sub hex2cmy {
 	my ($self, $hex) = @_;
 	my ($red, $green, $blue) = $self->hex2rgb($hex);
@@ -860,35 +940,22 @@ sub historyUpdate {
 	my $column = 0;
 	my $row = 0;
 	my $numcolumns = $self->cget('-historycolumns');
-	my $page = $self->Subwidget('History');
-	for ($page->children) {
-		$_->gridForget;
-		$_->destroy;
-	}
+	my $list = $self->Subwidget('History');
+	$list->deleteAll;
 	for (@$history) {
 		my $color = $_;
-		next unless $self->validate($color);
-		my $l = $page->Label(
-			-cursor => 'hand1',
-			-background => $color,
-			-borderwidth => $self->cget('-indborderwidth'),
-			-relief => $self->cget('-indrelief'),
-			-width => $self->cget('-indicatorwidth'),
-		)->grid(
-			-column => $column,
-			-row => $row,
-			-padx => 2,
-			-pady => 2,
+		next if $list->infoExists($color);
+		my $xpm = $self->getXPM($color);
+		my $e = $list->add($color,
+#			-text => $color,
+			-image => $xpm,
 		);
-		$l->bind('<ButtonRelease-1>', [$self, 'historySelect', $color]);
-		my $balloon = $self->cget('-balloon');
-		$balloon->attach($l, -balloonmsg => $color) if defined $balloon;
-		$column ++;
-		if ($column eq $numcolumns) {
-			$column = 0;
-			$row ++;
+		unless (defined $self->{HAVECELLSIZE}) {
+			$self->Subwidget('History')->cellSize($e);
+			$self->{HAVECELLSIZE} = 1;
 		}
 	}
+	$list->refreshPurge;
 }
 
 sub hsv2rgb {
@@ -1154,6 +1221,16 @@ sub numround {
 	$number = round($number);
 	$number = $number / $mult;
 	return $number;
+}
+
+sub offset {
+	my ($self, $base, $factor, $div) = @_;
+	$div = 2 unless defined $div;
+	$base = $base * 255;
+	my $new = ($base + $factor)/$div;
+	$new = $new/255;
+	return 1 if $new > 1;
+	return $new
 }
 
 sub pickActivate {

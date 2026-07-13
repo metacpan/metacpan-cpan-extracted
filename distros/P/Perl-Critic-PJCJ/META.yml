@@ -18,16 +18,27 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Perl-Critic-PJCJ
+no_index:
+  directory:
+    - utils
 requires:
+  Cwd: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
   List::Util: '1.33'
-  PPI: '0'
+  PPI: '1.220'
   Perl::Critic: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  parent: '0'
   perl: v5.26.0
 resources:
   bugtracker: https://github.com/pjcj/Perl-Critic-PJCJ/issues
   homepage: https://pjcj.net/perl.html
   repository: git://github.com/pjcj/Perl-Critic-PJCJ.git
-version: v0.2.7
+version: v0.3.0
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -109,6 +120,10 @@ x_Dist_Zilla:
       name: Git::GatherDir
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: '6.037'
+    -
       class: Dist::Zilla::Plugin::License
       name: License
       version: '6.037'
@@ -148,6 +163,10 @@ x_Dist_Zilla:
       name: PkgVersion
       version: '6.037'
     -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: '6.037'
+    -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
       version: '6.037'
@@ -159,7 +178,6 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'perl dev/append_postamble %d/Makefile.PL && (cd %d && perl Makefile.PL)'
-            - "perl -e \"exit(system('utils/run', 'setup') >> 8) unless $ENV{CI}\""
           version: '0.050'
       name: Run::AfterBuild
       version: '0.050'
@@ -175,7 +193,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.54.0
+          git_version: 2.55.0
           repo_root: .
       name: Git::Check
       version: '2.052'
@@ -197,7 +215,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes.md
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.54.0
+          git_version: 2.55.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -210,11 +228,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.2.7
+          tag: v0.3.0
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.54.0
+          git_version: 2.55.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -228,7 +246,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.54.0
+          git_version: 2.55.0
           repo_root: .
       name: Git::Push
       version: '2.052'

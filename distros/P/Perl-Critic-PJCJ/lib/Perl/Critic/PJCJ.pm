@@ -1,4 +1,4 @@
-package Perl::Critic::PJCJ v0.2.7;
+package Perl::Critic::PJCJ v0.3.0;
 
 use v5.26.0;
 use strict;
@@ -20,15 +20,19 @@ Perl::Critic::PJCJ - Perl::Critic policies for code style consistency
 
 =head1 VERSION
 
-version v0.2.7
+version v0.3.0
 
 =head1 SYNOPSIS
 
   # In your .perlcriticrc file:
-  include = Perl::Critic::PJCJ
+  include = RequireConsistentQuoting ProhibitLongLines
 
   # Or from the command line:
-  perlcritic --include Perl::Critic::PJCJ lib/
+  perlcritic --include RequireConsistentQuoting \
+    --include ProhibitLongLines lib/
+
+  # Or select the policies by theme:
+  perlcritic --theme pjcj lib/
 
 =head1 DESCRIPTION
 
@@ -57,7 +61,7 @@ different display contexts.
 
 =head1 AUTHOR
 
-Paul Johnson C<< <paul@pjcj.net> >>
+Paul Johnson <paul@pjcj.net>
 
 =head1 COPYRIGHT
 

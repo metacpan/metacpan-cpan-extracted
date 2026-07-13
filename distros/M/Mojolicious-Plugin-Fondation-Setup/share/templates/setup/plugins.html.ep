@@ -1,0 +1,159 @@
+% layout (stash('layout') // 'main');
+% title l('Plugin Selection');
+
+<div class="container mt-4">
+  <h2><%= l('Available Fondation Plugins') %></h2>
+  <p class="text-muted">
+    <%= l('Select the plugins you want to configure for your application. Selecting a plugin also selects its Fondation dependencies.') %>
+  </p>
+
+  % if (my $error = stash 'error') {
+    <div class="alert alert-danger"><%= $error %></div>
+  % }
+
+  % my $plugins = stash 'plugins';
+  % if ($plugins && @$plugins) {
+    <form method="post" action="<%= url_for 'setup_start' %>">
+      %= csrf_field
+      <div class="list-group mb-4" id="plugin-list">
+        % for my $p (@$plugins) {
+          % my $installed = $p->{installed};
+          % my $deps      = $p->{dependencies} // [];
+          <label class="list-group-item d-flex align-items-start">
+            <input type="checkbox" class="form-check-input me-3 mt-1 plugin-cb"
+                   name="selected_plugins" value="<%= $p->{module_class} %>"
+                   <%= $already_selected->{$p->{module_class}} ? 'checked' : '' %>
+                   data-deps="<%= join ',', @$deps %>">
+            <div class="flex-grow-1">
+              <strong><%= $p->{module_class} %></strong>
+              % if ($installed) {
+                <span class="badge bg-success ms-2"><%= l('Installed') %></span>
+              % } else {
+                <span class="badge bg-warning text-dark ms-2"><%= l('Not installed') %></span>
+              % }
+              % if (@$deps) {
+                <span class="badge bg-info ms-1" title="<%= l('Depends on:') . ' ' . join(', ', @$deps) %>">
+                  <%= scalar @$deps %> <%= l('dep(s)') %>
+                </span>
+              % }
+              <br><small class="text-muted"><%= $p->{abstract} %></small>
+              <br><small>v<%= $p->{version} %> — <%= $p->{author} %> — <%= $p->{date} %></small>
+              % if (@$deps) {
+                <br><small class="text-muted">
+                  <i class="bi bi-diagram-2"></i>
+                  <%= l('Depends on:') %>
+                  % for my $d (@$deps) {
+                    <code><%= $d %></code><%= $d eq $deps->[-1] ? '' : ', ' %>
+                  % }
+                </small>
+              % }
+            </div>
+          </label>
+        % }
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" id="btn-continue">
+          <%= l('Continue') %>
+        </button>
+        <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger">
+          <%= l('Reset') %>
+        </a>
+      </div>
+    </form>
+  % } elsif ($plugins) {
+    <div class="alert alert-info"><%= l('No Fondation plugins found on MetaCPAN.') %></div>
+  % } else {
+    <div class="text-center py-5">
+      <p class="text-muted"><%= l('Fetching plugin list from MetaCPAN...') %></p>
+    </div>
+  % }
+
+</div>
+
+<script>
+// Auto-enable dependency checkboxes when a plugin is selected
+document.addEventListener('DOMContentLoaded', function() {
+  var cbs = document.querySelectorAll('.plugin-cb');
+  var allModules = {};
+  cbs.forEach(function(cb) { allModules[cb.value] = cb; });
+
+  function getDeps(cb) {
+    var raw = cb.getAttribute('data-deps');
+    return raw ? raw.split(',').filter(function(s) { return s; }) : [];
+  }
+
+  function allDependants(module) {
+    var deps = [];
+    cbs.forEach(function(cb) {
+      if (getDeps(cb).indexOf(module) !== -1 && cb.checked) {
+        deps.push(cb.value);
+      }
+    });
+    return deps;
+  }
+
+  cbs.forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      if (cb.checked) {
+        // Auto-check all dependencies
+        getDeps(cb).forEach(function(dep) {
+          var depEl = allModules[dep];
+          if (depEl && !depEl.checked) {
+            depEl.checked = true;
+          }
+        });
+      } else {
+        // When unchecking, also uncheck any of its deps that are ONLY needed by this plugin
+        getDeps(cb).forEach(function(dep) {
+          var depEl = allModules[dep];
+          if (depEl && depEl.checked) {
+            var others = allDependants(dep).filter(function(d) { return d !== cb.value; });
+            if (others.length === 0) {
+              depEl.checked = false;
+            }
+          }
+        });
+      }
+      // Re-evaluate dependency locks
+      updateDependencyLocks();
+    });
+
+    // Hook to prevent unchecking a dependency that is required by another checked plugin
+    cb.addEventListener('click', function(e) {
+      if (!cb.checked) return; // already unchecked, about to check — allow
+      var reqBy = allDependants(cb.value);
+      if (reqBy.length > 0) {
+        e.preventDefault();
+        alert('<%= l('This plugin is required by:') %> ' + reqBy.join(', '));
+      }
+    });
+  });
+
+  function updateDependencyLocks() {
+    cbs.forEach(function(cb) {
+      var reqBy = allDependants(cb.value);
+      var label = cb.parentElement;
+      if (reqBy.length > 0 && !cb.checked) {
+        cb.checked = true; // re-force check
+      }
+      // Visual indicator
+      var badge = label.querySelector('.dep-required-badge');
+      if (reqBy.length > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge bg-secondary ms-1 dep-required-badge';
+          label.appendChild(badge);
+        }
+        badge.textContent = '<%= l('Required by') %> ' + reqBy.length + ' <%= l('plugin(s)') %>';
+        badge.title = reqBy.join(', ');
+      } else if (badge) {
+        badge.remove();
+      }
+    });
+  }
+
+  // Initial dependency lock check for already-checked plugins
+  updateDependencyLocks();
+});
+</script>

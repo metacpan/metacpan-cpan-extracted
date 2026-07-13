@@ -1,0 +1,110 @@
+
+
+<workflow>
+    <type>WFNEST</type>
+    <description>Test Workflow for nested use of Workflow::Condition</description>
+    <persister>TestWFNest</persister>
+
+    <state name="INITIAL">
+        <description>INITIAL</description>
+        <action name="initialize" resulting_state="INITIALIZED">
+        </action>
+    </state>
+
+    <!-- This is the starting point for all test sets -->
+
+    <state name="INITIALIZED">
+        <description>Initialized</description>
+        <action name="test_greedy_or" resulting_state="TEST_GREEDY_OR">
+        </action>
+        <action name="test_lazy_and" resulting_state="TEST_LAZY_AND">
+        </action>
+        <action name="test_lazy_or" resulting_state="TEST_LAZY_OR">
+        </action>
+        <action name="tests_done" resulting_state="SUCCESS">
+        </action>
+    </state>
+
+    <!-- This is an additional step to track failed tests -->
+
+    <state name="SUBTEST_FAIL">
+        <description>SUBTEST_FAIL</description>
+        <action name="ack_subtest_fail" resulting_state="INITIALIZED">
+        </action>
+    </state>
+
+    <!-- Final state when all tests are complete -->
+
+    <state name="SUCCESS">
+        <description>Success</description>
+    </state>
+
+    <!-- Test set for Workflow::Condition::LazyAND -->
+
+    <state name="TEST_LAZY_AND">
+        <description>TEST_LAZY_AND</description>
+        <action name="lazy_and_1" resulting_state="TEST_LAZY_AND_1">
+        </action>
+        <action name="lazy_and_2" resulting_state="TEST_LAZY_AND_2">
+        </action>
+        <action name="subtests_done" resulting_state="INITIALIZED">
+        </action>
+    </state>
+
+    <state name="TEST_LAZY_AND_1"
+            autorun="yes">
+        <description>TEST_LAZY_AND_1</description>
+        <action name="null1" resulting_state="INITIALIZED">
+            <condition name="lazy_and_1"/>
+        </action>
+        <action name="null2" resulting_state="SUBTEST_FAIL">
+            <condition name="!lazy_and_1"/>
+        </action>
+    </state>
+
+    <state name="TEST_LAZY_AND_2"
+            autorun="yes">
+        <description>TEST_LAZY_AND_2</description>
+        <action name="null1" resulting_state="INITIALIZED">
+            <condition name="lazy_and_2"/>
+        </action>
+        <action name="null2" resulting_state="SUBTEST_FAIL">
+            <condition name="!lazy_and_2"/>
+        </action>
+    </state>
+
+    <!-- Test set for Workflow::Condition::LazyOR -->
+
+    <state name="TEST_LAZY_OR">
+        <description>TEST_LAZY_OR</description>
+        <action name="lazy_or_1" resulting_state="TEST_LAZY_OR_1">
+        </action>
+        <action name="lazy_or_2" resulting_state="TEST_LAZY_OR_2">
+        </action>
+        <action name="subtests_done" resulting_state="INITIALIZED">
+        </action>
+    </state>
+
+    <state name="TEST_LAZY_OR_1"
+            autorun="yes">
+        <description>TEST_LAZY_OR_1</description>
+        <action name="null1" resulting_state="INITIALIZED">
+            <condition name="lazy_or_1"/>
+        </action>
+        <action name="null2" resulting_state="SUBTEST_FAIL">
+            <condition name="!lazy_or_1"/>
+        </action>
+    </state>
+
+    <state name="TEST_LAZY_OR_2"
+            autorun="yes">
+        <description>TEST_LAZY_OR_2</description>
+        <action name="null1" resulting_state="INITIALIZED">
+            <condition name="lazy_or_2"/>
+        </action>
+        <action name="null2" resulting_state="SUBTEST_FAIL">
+            <condition name="!lazy_or_2"/>
+        </action>
+    </state>
+
+</workflow>

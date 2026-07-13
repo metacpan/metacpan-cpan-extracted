@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Notifications;
-$OpenSearch::Client::Core::3_0::Direct::Notifications::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Notifications::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Notifications>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_plugins/_notifications/configs>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->notifications->create_config(
         
         'body'         =>  $body,      # optional
@@ -107,6 +110,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_notifications/configs/{config_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.0>
+
 
     $resp = $client->notifications->delete_config(
         
@@ -137,6 +143,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_notifications/configs>
 
 =back
+
+I<Method added in OpenSearch version 2.2>
+
 
     $resp = $client->notifications->delete_configs(
         
@@ -169,6 +178,9 @@ C<GET /_plugins/_notifications/configs/{config_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->notifications->get_config(
         
          # path parameters
@@ -198,6 +210,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_notifications/configs>
 
 =back
+
+I<Method added in OpenSearch version 2.0>
+
 
     $resp = $client->notifications->get_configs(
         
@@ -270,6 +285,9 @@ C<GET /_plugins/_notifications/channels>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->notifications->list_channels(
         
          # Common API query string parameters
@@ -295,6 +313,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_notifications/features>
 
 =back
+
+I<Method added in OpenSearch version 2.0>
+
 
     $resp = $client->notifications->list_features(
         
@@ -324,6 +345,9 @@ C<GET /_plugins/_notifications/feature/test/{config_id}>
 C<POST /_plugins/_notifications/feature/test/{config_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.0>
+
 
     $resp = $client->notifications->send_test(
         
@@ -355,6 +379,9 @@ C<PUT /_plugins/_notifications/configs/{config_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.0>
+
+
     $resp = $client->notifications->update_config(
         
         'body'         =>  $body,      # optional
@@ -373,6 +400,19 @@ C<PUT /_plugins/_notifications/configs/{config_id}>
     );
 
 L<OpenSearch documentation for notifications-E<gt>update_config|https://opensearch.org/docs/latest/observing-your-data/notifications/api/#update-channel-configuration>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->notifications->method_supported_in_version(
+        method  => 'create_config',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

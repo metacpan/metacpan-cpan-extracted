@@ -130,7 +130,9 @@ void channel_close(struct channel* channel) {
 	MUTEX_UNLOCK(&channel->data_mutex);
 }
 
-void S_channel_refcount_dec(pTHX_ struct channel* channel) {
+static int channel_magic_destroy(pTHX_ SV* sv, MAGIC* magic) {
+	struct channel* channel = (struct channel*)magic->mg_ptr;
+
 	if (refcount_dec(&channel->refcount) == 1) {
 		notification_unset(&channel->read_notification);
 		notification_unset(&channel->write_notification);
@@ -140,11 +142,7 @@ void S_channel_refcount_dec(pTHX_ struct channel* channel) {
 		MUTEX_DESTROY(&channel->data_mutex);
 		PerlMemShared_free(channel);
 	}
-}
 
-static int channel_magic_destroy(pTHX_ SV* sv, MAGIC* magic) {
-	struct channel* object = (struct channel*)magic->mg_ptr;
-	channel_refcount_dec(object);
 	return 0;
 }
 

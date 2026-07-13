@@ -15,6 +15,9 @@ CBOR::Free::Decoder
     # Enable shared/circular references:
     $decoder->preserve_references();
 
+    # Reject maps that would overwrite a decoded Perl hash key:
+    $decoder->reject_duplicate_keys();
+
 =head1 DESCRIPTION
 
 This class provides an object-oriented interface to L<CBOR::Free>’s
@@ -75,6 +78,20 @@ This I<should> be safe in contexts—such as IPC—where you control the CBOR
 serialization and can thus ensure validity of the encoded text.
 
 If in doubt, leave this off.
+
+=cut
+
+#----------------------------------------------------------------------
+
+=head2 $enabled_yn = I<OBJ>->reject_duplicate_keys( [$ENABLE] )
+
+Enables or disables rejection of duplicate map keys. It is disabled by
+default. If enabled, decoding dies with a
+L<CBOR::Free::X::DuplicateMapKey> exception when two CBOR keys would occupy
+the same key in the decoded Perl hash.
+
+Calling this method without C<$ENABLE> enables rejection. Passing a false
+value disables it. The return value indicates whether rejection is enabled.
 
 =cut
 

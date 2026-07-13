@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg 2.0100;
+package Dist::Zilla::Plugin::Codeberg 2.0101;
 
 use Modern::Perl;
 use JSON::MaybeXS;
@@ -194,7 +194,7 @@ Dist::Zilla::Plugin::Codeberg - Plugins to integrate Dist::Zilla with Codeberg
 
 =head1 VERSION
 
-version 2.0100
+version 2.0101
 
 =head1 DESCRIPTION
 

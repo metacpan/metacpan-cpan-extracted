@@ -15,6 +15,8 @@ use Test::Pod::Coverage::TrustMe;
 my $config = {};
 my $modules = [
   "Perl::Critic::PJCJ",
+  "Perl::Critic::PJCJ::Fixer",
+  "Perl::Critic::PJCJ::Violation",
   "Perl::Critic::Policy::CodeLayout::ProhibitLongLines",
   "Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting",
   "Perl::Critic::Utils::SourceLocation",

@@ -1,5 +1,5 @@
 package Thread::CSP::Channel;
-$Thread::CSP::Channel::VERSION = '0.015';
+$Thread::CSP::Channel::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Thread::CSP::Channel - Channels for Communicating sequential processes
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ This will close the queue. Any C<receive> will now return undef, and any write i
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,17 @@
 Revision history for OpenSearch::Client
 
-3.007007    2026-01-11
+3.007008    2026-07-13
+            * Added property opensearch_version
+              a lazy populated property with the version of the current
+              OpenSearch cluster.
+            * Added global_method_supported_in_version method to return
+              whether a given method in the api is supported by a given
+              OpenSearch server version
+            * Added method_supported_in_version method to each namespace
+              module to return whether a given module method in the api
+              is supported by a given OpenSearch server version
+
+3.007007    2026-07-11
             * POD link corrections for Bulk and Scroll helper classes
             
 3.007006    2026-07-08

@@ -38,7 +38,7 @@ use Dist::Surveyor::Inquiry; # internal
 use Module::CoreList;
 use Module::Metadata;
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use constant ON_WIN32 => $^O eq 'MSWin32';
 use constant ON_VMS   => $^O eq 'VMS';

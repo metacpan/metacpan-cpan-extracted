@@ -16,7 +16,7 @@ subtest "Constructor with all parameters" => sub {
     line_number   => 42,
     column_number => 5,
     content       => "sample content",
-    filename      => "test.pl"
+    filename      => "test.pl",
   );
 
   isa_ok $location, "Perl::Critic::Utils::SourceLocation";
@@ -38,7 +38,7 @@ subtest "All accessor methods" => sub {
     line_number   => 123,
     column_number => 45,
     content       => "test line content",
-    filename      => "example.pm"
+    filename      => "example.pm",
   );
 
   is $location->line_number,          123, "line_number accessor";
@@ -55,7 +55,7 @@ subtest "Location method for violation system" => sub {
   my $location = Perl::Critic::Utils::SourceLocation->new(
     line_number   => 100,
     column_number => 20,
-    filename      => "source.pl"
+    filename      => "source.pl",
   );
 
   my $location_array = $location->location;
@@ -68,18 +68,12 @@ subtest "Location method for violation system" => sub {
   is $location_array->[4], "source.pl", "fifth element is filename";
 };
 
-subtest "Policy identification" => sub {
-  my $location = Perl::Critic::Utils::SourceLocation->new(line_number => 1);
-
-  is $location->is_policy, 0, "is_policy returns false";
-};
-
 subtest "Constructor with explicit undef values" => sub {
   my $location = Perl::Critic::Utils::SourceLocation->new(
     line_number   => 50,
     column_number => undef,
     content       => undef,
-    filename      => undef
+    filename      => undef,
   );
 
   is $location->line_number,   50, "line_number set correctly";

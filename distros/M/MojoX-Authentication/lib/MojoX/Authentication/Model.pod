@@ -1,0 +1,290 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model
+
+
+=head1 SYNOPSIS
+
+   use MojoX::Authentication::Model;
+
+   my $am = MojoX::Authentication::Model->new(
+      config => {}, # might contain stuff useful for specific providers
+      providers => [
+         {
+            class => 'MojoX::Authentication::Model::Hash',
+            name => 'memory-hash', # override default in class
+            args  => {
+               db => [
+                  { name => foo => secret => 12345 },
+                  { name => bar => secret => 67890 },
+               ],
+            }
+         },
+         {
+            class => 'MojoX::Authentication::Model::Db',
+            name  => 'local-db',
+            args => {
+               wmdb => $wmdb, # MojoX::MojoDbWrap compatible
+            },
+         },
+         {
+            class => 'MojoX::Authentication::Model::SAML2',
+            name => 'external-idp',
+            args => { ... },
+         },
+      ],
+   );
+
+   my $provider = $am->provider_named('local-db');
+
+   # mostly used with Mojolicious::Plugin::Authentication
+   $app->plugin(Authentication => {
+      ...
+      load_user     => sub (@args) { $am->load_user(@args)     },
+      validate_user => sub (@args) { $am->validate_user(@args) },
+   });
+
+=head1 DESCRIPTION
+
+This module provides a model that acts as an entry point for several
+competing <identity providers> of different nature.
+
+As an example, you might want to support holding users in a hash
+(possibly configured in a development environment) as well as in a
+database or externally in a SAML 2.0 identity provider. This module lets
+you set all of them in the order they should be tried, and will dispatch
+the requests from L<Mojolicious::Plugin::Authentication> to each of them
+in the same order, until one of them provides a defined response.
+
+Let's take the example in the L</SYNOPSIS> and change it a bit:
+
+   my $development_users = [
+      { name => foo => secret => '12345' },
+      { name => bar => secret => '67890' },
+   ];
+   my $am = MojoX::Authentication::Model->new(
+      config => {}, # might contain stuff useful for specific providers
+      providers => [
+         {
+            class => 'MojoX::Authentication::Model::Hash',
+            name => 'memory-hash', # override default in class
+            args  => { db => ( $ENV{DEVEL} ? $development_users : [] ) }
+         },
+         {
+            class => 'MojoX::Authentication::Model::Db',
+            name  => 'local-db',
+            args => {
+               wmdb => $wmdb, # MojoX::MojoDbWrap compatible
+            },
+         },
+         {
+            class => 'MojoX::Authentication::Model::SAML2',
+            name => 'external-idp',
+            args => { ... },
+         },
+      ],
+   );
+   $app->plugin(Authentication => {
+      ...
+      load_user     => sub (@args) { $am->load_user(@args)     },
+      validate_user => sub (@args) { $am->validate_user(@args) },
+   });
+
+The constructor for this module is fed with three providers.
+
+The first one takes a definition from a reference with hardcoded
+values and cleartext passwords, which is of course B<NOT> secure at all.
+Anyway, we only use C<$development_users> if the environment variable
+C<DEVEL> is true, otherwise it's the empty array to win. This means that
+in the development environment we get users C<foo> and C<bar> with their
+simple password, while elsewhere we don't get them (at least not from
+the hash).
+
+The second provider uses a local database, possibly based on SQLite or
+Postgresql. This is probably the way to go for handling users locally in
+a robust manner.
+
+The third provider lets us plug into an external identity provider using
+SAML 2.0. It is set as the last option so that we can override it in
+case of need (e.g. if we decide to handle a user locally instead, or
+even with the hash in case we are in development).
+
+The final goal is simple: code the L<Mojolicious> application with the
+sequence of providers that are anticipated and supported, allowing for
+deployment-specific customizations.
+
+
+=head1 INTERFACE
+
+The interface of this module can be divided into two parts:
+
+=over
+
+=item *
+
+methods that deal with the object itself, e.g. the constructor;
+
+=item *
+
+methods that are iterated over the different providers, until one of
+them provides a non-undefined response.
+
+=back
+
+=head2 Methods for the object
+
+=head2 B<< config >>
+
+   my $config = $am->config;
+
+Accessor to the C<config> set during construction. It's supposed to hold
+a hash reference with configurations that apply to specific providers,
+by name.
+
+=head2 B<< new >>
+
+   my $am = MojoX::Authentication::Model->new(%args); # OR
+   my $am = MojoX::Authentication::Model->new(\%args);
+
+Create a new instance of the class.
+
+Supported arguments:
+
+=over
+
+=item *
+
+L</config>: a hash reference holding any configuration that might be
+useful for the providers. Depending on the provider, it will be exposed
+to them so that they will be able to grab the needed values, if any.
+
+=item *
+
+C<providers>: an array reference holding a list of providers. These are
+supposed to be sorted in the way they will be tried later, so put them
+in order of priority.
+
+=back
+
+Each I<provider> in C<providers> can be:
+
+=over
+
+=item *
+
+a blessed object. This is supposed to be I<the> provider that supports
+the needed interface, partially or completely. If it supports method
+C<update_from_config>, it will be called passing the C<config>.
+
+=item *
+
+a reference to a sub. This is supposed to act as a I<factory>, so it
+will be called passing the C<config> as the only argument and its return
+value will be the provider. It's acceptable for this factory to return
+C<undef> and ignore the provider altogether (e.g. because there were not
+the right configurations in C<config>).
+
+=item *
+
+a reference to a hash. This is supposed to include I<instructions> for
+getting a provider instance and the following keys are supported:
+
+=over
+
+=item *
+
+C<name>: the name of the provider. If present, it overrides any name
+that might be set in the provider instance itself.
+
+=item *
+
+C<instance>: the instance as an already formed object. This is taken at
+face value. If it has a method named C<update_from_config> it will be
+called passing the C<config> as the only parameter.
+
+When this key is present, other keys might be ignored (e.g. C<class>).
+
+=item *
+
+C<class>: the name of the class that supports a method C<create> to
+generate an instance.
+
+=item *
+
+C<args>: arguments to pass to the C<create> method of the C<class>. It
+is not mandatory; if present, it can be either an array reference or a
+hash reference.
+
+=back
+
+=back
+
+=head3 B<< provider_named >>
+
+   my $provider = $am->provider_named($name);
+
+Get the provider associated to C<$name>, if any.
+
+=head2 Methods for the providers
+
+The following methods all implement the mechanism to call the same-named
+method on each provider, in order of priority, until one of them
+provides a non-undefined return value, which then becomes the return
+value of the method itself.
+
+Providers might choose to I<not> implement any of these methods; in this
+case they will be skipped.
+
+=head3 B<< load_user >>
+
+   my $user = $am->load_user($app, $uid);
+
+Load the user's data from the provider.
+
+The interface is compatible with L<Mojolicious::Plugin::Authentication>
+like this:
+
+   my $am = ...;
+   $app->plugin(Authentication => {
+      ...
+      load_user => sub (@args) { $am->load_user(@args) },
+   });
+
+
+=head3 B<< provider_name_for >>
+
+   my $name = $am->provider_name_for($controller, $username);
+
+Retrieve the name of the provider that is capable of handling the user
+identified by C<$username>.
+
+
+=head3 B<< validate_user >>
+
+   my $uid = $am->validate_user($controller, $username, $secret, $extra);
+
+Perform validation of credentials for C<$username>.
+
+The interface is compatible with L<Mojolicious::Plugin::Authentication>
+like this:
+
+   my $am = ...;
+   $app->plugin(Authentication => {
+      ...
+      validate_user => sub (@args) { $am->validate_user(@args) },
+   });
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

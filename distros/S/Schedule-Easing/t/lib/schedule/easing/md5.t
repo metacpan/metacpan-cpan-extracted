@@ -6,7 +6,7 @@ use Schedule::Easing::MD5;
 use Test::More tests=>3;
 
 subtest 'Matches'=>sub {
-	plan tests=>4;
+	plan tests=>10;
 	my $ease=Schedule::Easing::MD5->new(match=>qr/^hello (?<digest>\w+)/);
 	is_deeply({$ease->matches('hello world')},{matched=>1,digest=>'world'},'Returns single value');
 	is_deeply({$ease->matches('hello -----')},{},                          'No match');
@@ -14,6 +14,19 @@ subtest 'Matches'=>sub {
 	$ease=Schedule::Easing::MD5->new(match=>qr/^hello (?<digest0>\w+) (?<digest1>\w+)/);
 	is_deeply({$ease->matches('hello foo bar')},{matched=>1,digest0=>'foo',digest1=>'bar'},'Returns double value');
 	is_deeply({$ease->matches('hello --- ---')},{},                                        'No match');
+	#
+	$ease=Schedule::Easing::MD5->new(match=>qr/^hello (?<digest>\w+)/,digestsub=>'[o]');
+	is_deeply({$ease->matches('hello world')},{matched=>1,digest=>'wrld'},'Substitution string');
+	$ease=Schedule::Easing::MD5->new(match=>qr/^hello (?<digest>\w+)/,digestsub=>qr/[o]/);
+	is_deeply({$ease->matches('hello world')},{matched=>1,digest=>'wrld'},'Substitution regexp');
+	$ease=Schedule::Easing::MD5->new(match=>qr/^hello (?<digest>\w+)/,digestsub=>[qr/[o]/,'-']);
+	is_deeply({$ease->matches('hello world')},{matched=>1,digest=>'w-rld'},'Substitution array');
+	#
+	$ease=Schedule::Easing::MD5->new(match=>qr/^file (?<digest0>.+?) line \d+:(?<digest1>.*)/,digestsub=>'\s');
+	my %expect=$ease->matches('file FILE line 7:  my $x=7;');
+	is_deeply({$ease->matches('file FILE line 9:  my $x=7;')},\%expect,'Substitution, ignored line number');
+	is_deeply({$ease->matches('file FILE line 7:  my $x = 7;')},\%expect,'Substitution, inner spacing');
+	is_deeply({$ease->matches('file FILE line 7:    my $x=7;  ')},\%expect,'Substitution, pre/post spacing');
 };
 
 subtest 'Includes'=>sub {

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Replication;
-$OpenSearch::Client::Core::3_0::Direct::Replication::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Replication::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Replication>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<GET /_plugins/_replication/autofollow_stats>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->autofollow_stats(
         
          # Common API query string parameters
@@ -105,6 +108,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_replication/_autofollow>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->replication->create_replication_rule(
         
@@ -134,6 +140,9 @@ C<DELETE /_plugins/_replication/_autofollow>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->delete_replication_rule(
         
         'body'         =>  $body,      # optional
@@ -162,6 +171,9 @@ C<GET /_plugins/_replication/follower_stats>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->follower_stats(
         
          # Common API query string parameters
@@ -188,6 +200,9 @@ C<GET /_plugins/_replication/leader_stats>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->leader_stats(
         
          # Common API query string parameters
@@ -213,6 +228,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_replication/{index}/_pause>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->replication->pause(
         
@@ -246,6 +264,9 @@ C<POST /_plugins/_replication/{index}/_resume>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->resume(
         
         'body'         =>  $body,      # optional
@@ -277,6 +298,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_replication/{index}/_start>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->replication->start(
         
@@ -310,6 +334,9 @@ C<GET /_plugins/_replication/{index}/_status>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->status(
         
          # path parameters
@@ -339,6 +366,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_replication/{index}/_stop>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->replication->stop(
         
@@ -372,6 +402,9 @@ C<PUT /_plugins/_replication/{index}/_update>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->replication->update_settings(
         
         'body'         =>  $body,      # optional
@@ -390,6 +423,19 @@ C<PUT /_plugins/_replication/{index}/_update>
     );
 
 L<OpenSearch documentation for replication-E<gt>update_settings|https://opensearch.org/docs/latest/tuning-your-cluster/replication-plugin/api/#update-settings>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->replication->method_supported_in_version(
+        method  => 'autofollow_stats',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

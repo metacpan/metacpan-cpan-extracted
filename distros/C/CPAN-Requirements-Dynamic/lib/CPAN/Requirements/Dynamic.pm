@@ -1,5 +1,5 @@
 package CPAN::Requirements::Dynamic;
-$CPAN::Requirements::Dynamic::VERSION = '0.002';
+$CPAN::Requirements::Dynamic::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ my %default_commands = (
 	},
 	config_defined => sub {
 		my ($self, $entry) = @_;
-		return $self->{config}->get($entry) eq 'define';
+		return ($self->{config}->get($entry) // '') eq 'define';
 	},
 	has_env => sub {
 		my ($self, $entry) = @_;
@@ -145,7 +145,7 @@ CPAN::Requirements::Dynamic - Dynamic prerequisites in meta files
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

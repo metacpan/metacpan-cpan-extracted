@@ -1,10 +1,11 @@
 package Mojolicious::Plugin::Fondation::API;
-$Mojolicious::Plugin::Fondation::API::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::API::VERSION = '0.04';
 # ABSTRACT: Stable public contract for Fondation plugins -- read-only access
 
 use Mojo::Base -base, -signatures;
 
 has 'registry';
+has 'load_order';
 
 # ---------------------------------------------------------------------------
 # plugin($name) -- returns a specific plugin's merged config hashref
@@ -35,6 +36,24 @@ sub _resolve_long ($self, $name) {
     return Mojolicious::Plugin::Fondation::Utils::long_name($name);
 }
 
+sub find_template_source ($self, $name = '') {
+    return undef unless $name && $self->registry && $self->load_order;
+
+    # Normalize to .html.ep format
+    my $normalized = $name;
+    $normalized .= '.html.ep' unless $normalized =~ /\.html\.ep$/i;
+
+    for my $long (@{$self->load_order}) {
+        my $entry = $self->registry->{$long} or next;
+        next unless $entry->{templates};
+
+        if (exists $entry->{templates}{$normalized}) {
+            return $entry->{short_name};
+        }
+    }
+    return undef;
+}
+
 1;
 
 __END__
@@ -49,7 +68,7 @@ Mojolicious::Plugin::Fondation::API - Stable public contract for Fondation plugi
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

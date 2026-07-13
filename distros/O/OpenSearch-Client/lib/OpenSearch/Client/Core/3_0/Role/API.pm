@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Role::API;
-$OpenSearch::Client::Core::3_0::Role::API::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Role::API::VERSION = '3.007008';
 
 use Moo::Role;
 with 'OpenSearch::Client::Role::API';
@@ -148,6 +148,7 @@ sub api {
             'source'                  => 'string',
         },
         serialize => 'bulk',
+        os_version =>  1.000000,
     },
 
     '_core.bulk_stream' => {
@@ -181,6 +182,7 @@ sub api {
             'source'                  => 'string',
         },
         serialize => 'bulk',
+        os_version =>  2.017000,
     },
 
     '_core.clear_scroll' => {
@@ -200,6 +202,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.count' => {
@@ -236,6 +239,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.create' => {
@@ -260,6 +264,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.create_pit' => {
@@ -281,6 +286,7 @@ sub api {
             'pretty'                      => 'boolean',
             'source'                      => 'string',
         },
+        os_version =>  2.004000,
     },
 
     '_core.delete' => {
@@ -305,6 +311,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.delete_all_pits' => {
@@ -320,6 +327,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     '_core.delete_by_query' => {
@@ -370,6 +378,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.delete_by_query_rethrottle' => {
@@ -387,6 +396,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.delete_pit' => {
@@ -403,6 +413,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     '_core.delete_script' => {
@@ -422,6 +433,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.exists' => {
@@ -448,6 +460,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.exists_source' => {
@@ -473,6 +486,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.explain' => {
@@ -504,6 +518,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.field_caps' => {
@@ -531,6 +546,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.get' => {
@@ -557,6 +573,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.get_all_pits' => {
@@ -572,6 +589,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     '_core.get_script' => {
@@ -590,6 +608,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.get_script_context' => {
@@ -605,6 +624,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.get_script_languages' => {
@@ -620,6 +640,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.get_source' => {
@@ -645,6 +666,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.index' => {
@@ -678,6 +700,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.info' => {
@@ -686,6 +709,7 @@ sub api {
         parts   => {},
         paths   => [[ {}, "" ]],
         qs      => {},
+        os_version =>  1.000000,
     },
 
     '_core.mget' => {
@@ -714,6 +738,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.msearch' => {
@@ -743,6 +768,7 @@ sub api {
             'source'                         => 'string',
         },
         serialize => 'bulk',
+        os_version =>  1.000000,
     },
 
     '_core.msearch_template' => {
@@ -769,6 +795,7 @@ sub api {
             'source'                   => 'string',
         },
         serialize => 'bulk',
+        os_version =>  1.000000,
     },
 
     '_core.mtermvectors' => {
@@ -803,6 +830,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.ping' => {
@@ -818,6 +846,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.put_script' => {
@@ -842,6 +871,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.rank_eval' => {
@@ -866,6 +896,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.reindex' => {
@@ -892,6 +923,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.reindex_rethrottle' => {
@@ -909,6 +941,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.render_search_template' => {
@@ -930,6 +963,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.scripts_painless_execute' => {
@@ -948,6 +982,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.scroll' => {
@@ -973,6 +1008,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.search' => {
@@ -1043,6 +1079,7 @@ sub api {
             'pretty'                         => 'boolean',
             'source'                         => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.search_shards' => {
@@ -1071,6 +1108,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.search_template' => {
@@ -1106,6 +1144,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.termvectors' => {
@@ -1139,6 +1178,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.update' => {
@@ -1168,6 +1208,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.update_by_query' => {
@@ -1219,6 +1260,7 @@ sub api {
             'pretty'                  => 'boolean',
             'source'                  => 'string',
         },
+        os_version =>  1.000000,
     },
 
     '_core.update_by_query_rethrottle' => {
@@ -1236,6 +1278,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'asynchronous_search.delete' => {
@@ -1251,6 +1294,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'asynchronous_search.get' => {
@@ -1266,6 +1310,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'asynchronous_search.search' => {
@@ -1287,6 +1332,7 @@ sub api {
             'pretty'                       => 'boolean',
             'source'                       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'asynchronous_search.stats' => {
@@ -1302,6 +1348,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.aliases' => {
@@ -1328,6 +1375,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.all_pit_segments' => {
@@ -1350,6 +1398,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'cat.allocation' => {
@@ -1378,6 +1427,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.cluster_manager' => {
@@ -1402,6 +1452,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'cat.count' => {
@@ -1426,6 +1477,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.fielddata' => {
@@ -1452,6 +1504,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.health' => {
@@ -1475,6 +1528,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.help' => {
@@ -1490,6 +1544,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.indices' => {
@@ -1523,6 +1578,7 @@ sub api {
             'pretty'                     => 'boolean',
             'source'                     => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.master' => {
@@ -1547,6 +1603,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.nodeattrs' => {
@@ -1571,6 +1628,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.nodes' => {
@@ -1598,6 +1656,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.pending_tasks' => {
@@ -1623,6 +1682,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.pit_segments' => {
@@ -1646,6 +1706,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'cat.plugins' => {
@@ -1670,6 +1731,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.recovery' => {
@@ -1699,6 +1761,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.repositories' => {
@@ -1723,6 +1786,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.segment_replication' => {
@@ -1759,6 +1823,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  2.006000,
     },
 
     'cat.segments' => {
@@ -1786,6 +1851,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.shards' => {
@@ -1815,6 +1881,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.snapshots' => {
@@ -1844,6 +1911,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.tasks' => {
@@ -1870,6 +1938,7 @@ sub api {
             'pretty'          => 'boolean',
             'source'          => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.templates' => {
@@ -1897,6 +1966,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cat.thread_pool' => {
@@ -1925,6 +1995,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.allocation_explain' => {
@@ -1946,6 +2017,7 @@ sub api {
             'pretty'                 => 'boolean',
             'source'                 => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.delete_component_template' => {
@@ -1965,6 +2037,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.delete_decommission_awareness' => {
@@ -1980,6 +2053,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.delete_voting_config_exclusions' => {
@@ -1997,6 +2071,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.delete_weighted_routing' => {
@@ -2013,6 +2088,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.exists_component_template' => {
@@ -2032,6 +2108,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.get_component_template' => {
@@ -2055,6 +2132,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.get_decommission_awareness' => {
@@ -2070,6 +2148,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.get_settings' => {
@@ -2091,6 +2170,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.get_weighted_routing' => {
@@ -2106,6 +2186,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.health' => {
@@ -2138,6 +2219,7 @@ sub api {
             'pretty'                           => 'boolean',
             'source'                           => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.pending_tasks' => {
@@ -2157,6 +2239,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.post_voting_config_exclusions' => {
@@ -2176,6 +2259,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.put_component_template' => {
@@ -2197,6 +2281,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.put_decommission_awareness' => {
@@ -2212,6 +2297,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.put_settings' => {
@@ -2233,6 +2319,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.put_weighted_routing' => {
@@ -2249,6 +2336,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.remote_info' => {
@@ -2264,6 +2352,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.reroute' => {
@@ -2288,6 +2377,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.state' => {
@@ -2317,6 +2407,7 @@ sub api {
             'pretty'                     => 'boolean',
             'source'                     => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'cluster.stats' => {
@@ -2340,6 +2431,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'dangling_indices.delete_dangling_index' => {
@@ -2360,6 +2452,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'dangling_indices.import_dangling_index' => {
@@ -2380,6 +2473,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'dangling_indices.list_dangling_indices' => {
@@ -2395,6 +2489,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'flow_framework.create' => {
@@ -2417,6 +2512,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.delete' => {
@@ -2434,6 +2530,7 @@ sub api {
             'pretty'        => 'boolean',
             'source'        => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.deprovision' => {
@@ -2451,6 +2548,7 @@ sub api {
             'pretty'        => 'boolean',
             'source'        => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.get' => {
@@ -2466,6 +2564,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.get_status' => {
@@ -2483,6 +2582,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.get_steps' => {
@@ -2500,6 +2600,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.provision' => {
@@ -2516,6 +2617,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.search' => {
@@ -2532,6 +2634,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.search_state' => {
@@ -2548,6 +2651,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'flow_framework.update' => {
@@ -2570,6 +2674,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'geospatial.delete_ip2geo_datasource' => {
@@ -2585,6 +2690,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'geospatial.geojson_upload_post' => {
@@ -2601,6 +2707,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'geospatial.geojson_upload_put' => {
@@ -2617,6 +2724,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'geospatial.get_ip2geo_datasource' => {
@@ -2635,6 +2743,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'geospatial.get_upload_stats' => {
@@ -2650,6 +2759,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'geospatial.put_ip2geo_datasource' => {
@@ -2666,6 +2776,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'geospatial.put_ip2geo_datasource_settings' => {
@@ -2682,6 +2793,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'indices.add_block' => {
@@ -2704,6 +2816,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.analyze' => {
@@ -2727,6 +2840,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.clear_cache' => {
@@ -2755,6 +2869,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.clone' => {
@@ -2778,6 +2893,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.close' => {
@@ -2801,6 +2917,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.create' => {
@@ -2822,6 +2939,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.create_data_stream' => {
@@ -2838,6 +2956,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.data_streams_stats' => {
@@ -2856,6 +2975,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.delete' => {
@@ -2878,6 +2998,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.delete_alias' => {
@@ -2900,6 +3021,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.delete_data_stream' => {
@@ -2915,6 +3037,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.delete_index_template' => {
@@ -2934,6 +3057,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.delete_template' => {
@@ -2953,6 +3077,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.exists' => {
@@ -2976,6 +3101,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.exists_alias' => {
@@ -2999,6 +3125,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.exists_index_template' => {
@@ -3019,6 +3146,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.exists_template' => {
@@ -3039,6 +3167,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.flush' => {
@@ -3065,6 +3194,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.forcemerge' => {
@@ -3092,6 +3222,7 @@ sub api {
             'pretty'                => 'boolean',
             'source'                => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get' => {
@@ -3116,6 +3247,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_alias' => {
@@ -3141,6 +3273,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_data_stream' => {
@@ -3159,6 +3292,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_field_mapping' => {
@@ -3183,6 +3317,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_index_template' => {
@@ -3206,6 +3341,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_mapping' => {
@@ -3232,6 +3368,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_settings' => {
@@ -3261,6 +3398,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_template' => {
@@ -3284,6 +3422,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.get_upgrade' => {
@@ -3306,6 +3445,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.open' => {
@@ -3331,6 +3471,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.put_alias' => {
@@ -3359,6 +3500,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.put_index_template' => {
@@ -3380,6 +3522,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.put_mapping' => {
@@ -3404,6 +3547,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.put_settings' => {
@@ -3432,6 +3576,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.put_template' => {
@@ -3453,6 +3598,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.recovery' => {
@@ -3474,6 +3620,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.refresh' => {
@@ -3498,6 +3645,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.resolve_index' => {
@@ -3515,6 +3663,7 @@ sub api {
             'pretty'            => 'boolean',
             'source'            => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.rollover' => {
@@ -3540,6 +3689,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.segments' => {
@@ -3563,6 +3713,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.shard_stores' => {
@@ -3586,6 +3737,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.shrink' => {
@@ -3610,6 +3762,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.simulate_index_template' => {
@@ -3629,6 +3782,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.simulate_template' => {
@@ -3653,6 +3807,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.split' => {
@@ -3677,6 +3832,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.stats' => {
@@ -3707,6 +3863,7 @@ sub api {
             'pretty'                      => 'boolean',
             'source'                      => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.update_aliases' => {
@@ -3727,6 +3884,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.upgrade' => {
@@ -3751,6 +3909,7 @@ sub api {
             'pretty'                 => 'boolean',
             'source'                 => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'indices.validate_query' => {
@@ -3785,6 +3944,7 @@ sub api {
             'pretty'              => 'boolean',
             'source'              => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ingest.delete_pipeline' => {
@@ -3804,6 +3964,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ingest.get_pipeline' => {
@@ -3825,6 +3986,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ingest.processor_grok' => {
@@ -3842,6 +4004,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ingest.put_pipeline' => {
@@ -3862,6 +4025,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ingest.simulate' => {
@@ -3883,6 +4047,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ingestion.get_state' => {
@@ -3902,6 +4067,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'ingestion.pause' => {
@@ -3920,6 +4086,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'ingestion.resume' => {
@@ -3939,6 +4106,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'insights.top_queries' => {
@@ -3956,6 +4124,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.add_policy' => {
@@ -3977,6 +4146,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.change_policy' => {
@@ -3998,6 +4168,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.delete_policy' => {
@@ -4013,6 +4184,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.exists_policy' => {
@@ -4028,6 +4200,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.explain_policy' => {
@@ -4049,6 +4222,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.get_policies' => {
@@ -4064,6 +4238,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.get_policy' => {
@@ -4079,6 +4254,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.put_policies' => {
@@ -4099,6 +4275,7 @@ sub api {
             'pretty'           => 'boolean',
             'source'           => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.put_policy' => {
@@ -4118,6 +4295,7 @@ sub api {
             'pretty'           => 'boolean',
             'source'           => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.refresh_search_analyzers' => {
@@ -4133,6 +4311,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.remove_policy' => {
@@ -4153,6 +4332,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ism.retry_index' => {
@@ -4174,6 +4354,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'knn.delete_model' => {
@@ -4189,6 +4370,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'knn.get_model' => {
@@ -4204,6 +4386,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'knn.search_models' => {
@@ -4265,6 +4448,7 @@ sub api {
             'pretty'                         => 'boolean',
             'source'                         => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'knn.stats' => {
@@ -4287,6 +4471,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'knn.train_model' => {
@@ -4308,6 +4493,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'knn.warmup' => {
@@ -4323,6 +4509,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'list.help' => {
@@ -4338,6 +4525,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.018000,
     },
 
     'list.indices' => {
@@ -4374,6 +4562,7 @@ sub api {
             'pretty'                     => 'boolean',
             'source'                     => 'string',
         },
+        os_version =>  2.018000,
     },
 
     'list.shards' => {
@@ -4406,6 +4595,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  2.018000,
     },
 
     'ltr.add_features_to_set' => {
@@ -4429,6 +4619,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.add_features_to_set_by_query' => {
@@ -4451,6 +4642,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.cache_stats' => {
@@ -4466,6 +4658,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.clear_cache' => {
@@ -4484,6 +4677,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.create_default_store' => {
@@ -4499,6 +4693,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017001,
     },
 
     'ltr.create_feature' => {
@@ -4520,6 +4715,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.create_featureset' => {
@@ -4541,6 +4737,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.create_model' => {
@@ -4562,6 +4759,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.create_model_from_set' => {
@@ -4583,6 +4781,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.create_store' => {
@@ -4598,6 +4797,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017001,
     },
 
     'ltr.delete_default_store' => {
@@ -4613,6 +4813,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017001,
     },
 
     'ltr.delete_feature' => {
@@ -4631,6 +4832,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.delete_featureset' => {
@@ -4649,6 +4851,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.delete_model' => {
@@ -4667,6 +4870,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.delete_store' => {
@@ -4682,6 +4886,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017001,
     },
 
     'ltr.get_feature' => {
@@ -4700,6 +4905,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.get_featureset' => {
@@ -4718,6 +4924,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.get_model' => {
@@ -4736,6 +4943,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.get_store' => {
@@ -4751,6 +4959,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017001,
     },
 
     'ltr.list_stores' => {
@@ -4766,6 +4975,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017001,
     },
 
     'ltr.search_features' => {
@@ -4788,6 +4998,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.search_featuresets' => {
@@ -4810,6 +5021,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.search_models' => {
@@ -4832,6 +5044,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.stats' => {
@@ -4854,6 +5067,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.update_feature' => {
@@ -4875,6 +5089,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ltr.update_featureset' => {
@@ -4896,6 +5111,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.019000,
     },
 
     'ml.add_agentic_memory' => {
@@ -4912,6 +5128,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.chunk_model' => {
@@ -4928,6 +5145,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.create_connector' => {
@@ -4944,6 +5162,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.create_controller' => {
@@ -4960,6 +5179,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.create_memory' => {
@@ -4976,6 +5196,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.create_memory_container' => {
@@ -4992,6 +5213,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.create_memory_container_session' => {
@@ -5008,6 +5230,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.create_message' => {
@@ -5024,6 +5247,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.create_model_meta' => {
@@ -5040,6 +5264,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.delete_agent' => {
@@ -5055,6 +5280,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.013000,
     },
 
     'ml.delete_agentic_memory' => {
@@ -5070,6 +5296,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.delete_agentic_memory_query' => {
@@ -5086,6 +5313,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.delete_connector' => {
@@ -5101,6 +5329,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.delete_controller' => {
@@ -5116,6 +5345,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.delete_memory' => {
@@ -5131,6 +5361,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.delete_memory_container' => {
@@ -5149,6 +5380,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.delete_model' => {
@@ -5164,6 +5396,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.delete_model_group' => {
@@ -5179,6 +5412,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.delete_task' => {
@@ -5194,6 +5428,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.deploy_model' => {
@@ -5209,6 +5444,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'ml.execute_agent' => {
@@ -5225,6 +5461,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.013000,
     },
 
     'ml.execute_agent_stream' => {
@@ -5241,6 +5478,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.execute_algorithm' => {
@@ -5257,6 +5495,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'ml.execute_tool' => {
@@ -5273,6 +5512,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.get_agent' => {
@@ -5288,6 +5528,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.013000,
     },
 
     'ml.get_agentic_memory' => {
@@ -5303,6 +5544,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.get_all_memories' => {
@@ -5321,6 +5563,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_all_messages' => {
@@ -5339,6 +5582,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_all_tools' => {
@@ -5354,6 +5598,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_connector' => {
@@ -5369,6 +5614,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'ml.get_controller' => {
@@ -5384,6 +5630,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_memory' => {
@@ -5399,6 +5646,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_memory_container' => {
@@ -5414,6 +5662,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.get_message' => {
@@ -5429,6 +5678,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_message_traces' => {
@@ -5447,6 +5697,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.get_model' => {
@@ -5462,6 +5713,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.get_model_group' => {
@@ -5477,6 +5729,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.get_profile' => {
@@ -5493,6 +5746,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'ml.get_profile_models' => {
@@ -5512,6 +5766,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'ml.get_profile_tasks' => {
@@ -5531,6 +5786,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'ml.get_stats' => {
@@ -5551,6 +5807,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.get_task' => {
@@ -5566,6 +5823,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.get_tool' => {
@@ -5581,6 +5839,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.load_model' => {
@@ -5596,6 +5855,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.predict' => {
@@ -5612,6 +5872,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.predict_model' => {
@@ -5628,6 +5889,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.predict_model_stream' => {
@@ -5644,6 +5906,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.register_agents' => {
@@ -5660,6 +5923,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.013000,
     },
 
     'ml.register_model' => {
@@ -5676,6 +5940,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'ml.register_model_group' => {
@@ -5692,6 +5957,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.register_model_meta' => {
@@ -5708,6 +5974,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'ml.search_agentic_memory' => {
@@ -5724,6 +5991,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.search_agents' => {
@@ -5742,6 +6010,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.013000,
     },
 
     'ml.search_connectors' => {
@@ -5760,6 +6029,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'ml.search_memory' => {
@@ -5778,6 +6048,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.search_memory_container' => {
@@ -5796,6 +6067,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.search_message' => {
@@ -5814,6 +6086,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.search_model_group' => {
@@ -5832,6 +6105,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.009000,
     },
 
     'ml.search_models' => {
@@ -5850,6 +6124,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.search_tasks' => {
@@ -5868,6 +6143,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.train' => {
@@ -5884,6 +6160,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.train_predict' => {
@@ -5900,6 +6177,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.003000,
     },
 
     'ml.undeploy_model' => {
@@ -5919,6 +6197,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'ml.unload_model' => {
@@ -5938,6 +6217,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ml.update_agentic_memory' => {
@@ -5954,6 +6234,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.update_connector' => {
@@ -5970,6 +6251,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.update_controller' => {
@@ -5986,6 +6268,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.update_memory' => {
@@ -6002,6 +6285,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.update_memory_container' => {
@@ -6018,6 +6302,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.003000,
     },
 
     'ml.update_message' => {
@@ -6034,6 +6319,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.update_model' => {
@@ -6050,6 +6336,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'ml.update_model_group' => {
@@ -6066,6 +6353,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.009000,
     },
 
     'ml.upload_chunk' => {
@@ -6082,6 +6370,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'ml.upload_model' => {
@@ -6098,6 +6387,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'neural.stats' => {
@@ -6124,6 +6414,7 @@ sub api {
             'pretty'                    => 'boolean',
             'source'                    => 'string',
         },
+        os_version =>  3.000000,
     },
 
     'nodes.hot_threads' => {
@@ -6149,6 +6440,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'nodes.info' => {
@@ -6172,6 +6464,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'nodes.reload_secure_settings' => {
@@ -6193,6 +6486,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'nodes.stats' => {
@@ -6224,6 +6518,7 @@ sub api {
             'pretty'                      => 'boolean',
             'source'                      => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'nodes.usage' => {
@@ -6246,6 +6541,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'notifications.create_config' => {
@@ -6262,6 +6558,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.delete_config' => {
@@ -6277,6 +6574,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.delete_configs' => {
@@ -6295,6 +6593,7 @@ sub api {
             'pretty'          => 'boolean',
             'source'          => 'string',
         },
+        os_version =>  2.002000,
     },
 
     'notifications.get_config' => {
@@ -6310,6 +6609,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.get_configs' => {
@@ -6367,6 +6667,7 @@ sub api {
             'pretty'                                        => 'boolean',
             'source'                                        => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.list_channels' => {
@@ -6382,6 +6683,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.list_features' => {
@@ -6397,6 +6699,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.send_test' => {
@@ -6414,6 +6717,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'notifications.update_config' => {
@@ -6430,6 +6734,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'observability.create_object' => {
@@ -6446,6 +6751,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'observability.delete_object' => {
@@ -6461,6 +6767,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'observability.delete_objects' => {
@@ -6479,6 +6786,7 @@ sub api {
             'pretty'        => 'boolean',
             'source'        => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'observability.get_localstats' => {
@@ -6494,6 +6802,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.005000,
     },
 
     'observability.get_object' => {
@@ -6509,6 +6818,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'observability.list_objects' => {
@@ -6524,6 +6834,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'observability.update_object' => {
@@ -6540,6 +6851,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'ppl.explain' => {
@@ -6559,6 +6871,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ppl.get_stats' => {
@@ -6577,6 +6890,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ppl.post_stats' => {
@@ -6596,6 +6910,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ppl.query' => {
@@ -6615,6 +6930,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'query.datasource_delete' => {
@@ -6630,6 +6946,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'query.datasource_retrieve' => {
@@ -6645,6 +6962,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'query.datasources_create' => {
@@ -6661,6 +6979,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'query.datasources_list' => {
@@ -6676,6 +6995,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'query.datasources_update' => {
@@ -6692,6 +7012,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'remote_store.restore' => {
@@ -6711,6 +7032,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'replication.autofollow_stats' => {
@@ -6726,6 +7048,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.create_replication_rule' => {
@@ -6742,6 +7065,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.delete_replication_rule' => {
@@ -6758,6 +7082,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.follower_stats' => {
@@ -6773,6 +7098,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.leader_stats' => {
@@ -6788,6 +7114,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.pause' => {
@@ -6804,6 +7131,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.resume' => {
@@ -6820,6 +7148,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.start' => {
@@ -6836,6 +7165,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.status' => {
@@ -6851,6 +7181,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.stop' => {
@@ -6867,6 +7198,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'replication.update_settings' => {
@@ -6883,6 +7215,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.001000,
     },
 
     'rollups.delete' => {
@@ -6898,6 +7231,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'rollups.explain' => {
@@ -6913,6 +7247,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'rollups.get' => {
@@ -6928,6 +7263,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'rollups.put' => {
@@ -6947,6 +7283,7 @@ sub api {
             'pretty'           => 'boolean',
             'source'           => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'rollups.start' => {
@@ -6962,6 +7299,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'rollups.stop' => {
@@ -6977,6 +7315,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'search_pipeline.delete' => {
@@ -6995,6 +7334,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  2.009000,
     },
 
     'search_pipeline.get' => {
@@ -7015,6 +7355,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  2.009000,
     },
 
     'search_pipeline.put' => {
@@ -7034,6 +7375,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  2.009000,
     },
 
     'search_relevance.delete_experiments' => {
@@ -7049,6 +7391,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.delete_judgments' => {
@@ -7064,6 +7407,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.delete_query_sets' => {
@@ -7079,6 +7423,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.delete_scheduled_experiments' => {
@@ -7094,6 +7439,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.004000,
     },
 
     'search_relevance.delete_search_configurations' => {
@@ -7109,6 +7455,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.get_experiments' => {
@@ -7127,6 +7474,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.get_judgments' => {
@@ -7145,6 +7493,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.get_node_stats' => {
@@ -7169,6 +7518,7 @@ sub api {
             'pretty'                    => 'boolean',
             'source'                    => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.get_query_sets' => {
@@ -7187,6 +7537,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.get_scheduled_experiments' => {
@@ -7205,6 +7556,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.004000,
     },
 
     'search_relevance.get_search_configurations' => {
@@ -7223,6 +7575,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.get_stats' => {
@@ -7247,6 +7600,7 @@ sub api {
             'pretty'                    => 'boolean',
             'source'                    => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.post_query_sets' => {
@@ -7263,6 +7617,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.post_scheduled_experiments' => {
@@ -7279,6 +7634,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.004000,
     },
 
     'search_relevance.put_experiments' => {
@@ -7295,6 +7651,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.put_judgments' => {
@@ -7311,6 +7668,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.put_query_sets' => {
@@ -7327,6 +7685,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'search_relevance.put_search_configurations' => {
@@ -7343,6 +7702,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  3.001000,
     },
 
     'security.authinfo' => {
@@ -7363,6 +7723,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.authtoken' => {
@@ -7378,6 +7739,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.change_password' => {
@@ -7394,6 +7756,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.config_upgrade_check' => {
@@ -7409,6 +7772,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.014000,
     },
 
     'security.config_upgrade_perform' => {
@@ -7425,6 +7789,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.014000,
     },
 
     'security.create_action_group' => {
@@ -7441,6 +7806,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.create_allowlist' => {
@@ -7457,6 +7823,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'security.create_role' => {
@@ -7473,6 +7840,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.create_role_mapping' => {
@@ -7489,6 +7857,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.create_tenant' => {
@@ -7505,6 +7874,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.create_update_tenancy_config' => {
@@ -7521,6 +7891,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'security.create_user' => {
@@ -7537,6 +7908,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.create_user_legacy' => {
@@ -7553,6 +7925,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_action_group' => {
@@ -7568,6 +7941,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_distinguished_name' => {
@@ -7583,6 +7957,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_role' => {
@@ -7598,6 +7973,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_role_mapping' => {
@@ -7613,6 +7989,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_tenant' => {
@@ -7628,6 +8005,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_user' => {
@@ -7643,6 +8021,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.delete_user_legacy' => {
@@ -7658,6 +8037,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.flush_cache' => {
@@ -7673,6 +8053,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.generate_obo_token' => {
@@ -7689,6 +8070,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.012000,
     },
 
     'security.generate_user_token' => {
@@ -7704,6 +8086,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'security.generate_user_token_legacy' => {
@@ -7719,6 +8102,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'security.get_account_details' => {
@@ -7734,6 +8118,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_action_group' => {
@@ -7749,6 +8134,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_action_groups' => {
@@ -7764,6 +8150,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_all_certificates' => {
@@ -7782,6 +8169,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.015000,
     },
 
     'security.get_allowlist' => {
@@ -7797,6 +8185,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'security.get_audit_configuration' => {
@@ -7812,6 +8201,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_certificates' => {
@@ -7827,6 +8217,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'security.get_configuration' => {
@@ -7842,6 +8233,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.010000,
     },
 
     'security.get_dashboards_info' => {
@@ -7857,6 +8249,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_distinguished_name' => {
@@ -7874,6 +8267,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_distinguished_names' => {
@@ -7891,6 +8285,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_node_certificates' => {
@@ -7909,6 +8304,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.015000,
     },
 
     'security.get_permissions_info' => {
@@ -7924,6 +8320,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_role' => {
@@ -7939,6 +8336,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_role_mapping' => {
@@ -7954,6 +8352,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_role_mappings' => {
@@ -7969,6 +8368,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_roles' => {
@@ -7984,6 +8384,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_sslinfo' => {
@@ -8001,6 +8402,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_tenancy_config' => {
@@ -8016,6 +8418,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'security.get_tenant' => {
@@ -8031,6 +8434,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_tenants' => {
@@ -8046,6 +8450,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_user' => {
@@ -8061,6 +8466,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_user_legacy' => {
@@ -8076,6 +8482,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_users' => {
@@ -8091,6 +8498,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.get_users_legacy' => {
@@ -8106,6 +8514,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.health' => {
@@ -8125,6 +8534,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.migrate' => {
@@ -8140,6 +8550,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_action_group' => {
@@ -8156,6 +8567,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_action_groups' => {
@@ -8172,6 +8584,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_allowlist' => {
@@ -8188,6 +8601,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'security.patch_audit_configuration' => {
@@ -8204,6 +8618,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_configuration' => {
@@ -8220,6 +8635,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.010000,
     },
 
     'security.patch_distinguished_name' => {
@@ -8236,6 +8652,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_distinguished_names' => {
@@ -8252,6 +8669,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_role' => {
@@ -8268,6 +8686,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_role_mapping' => {
@@ -8284,6 +8703,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_role_mappings' => {
@@ -8300,6 +8720,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_roles' => {
@@ -8316,6 +8737,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_tenant' => {
@@ -8332,6 +8754,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_tenants' => {
@@ -8348,6 +8771,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_user' => {
@@ -8364,6 +8788,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.patch_users' => {
@@ -8380,6 +8805,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.post_dashboards_info' => {
@@ -8395,6 +8821,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.reload_http_certificates' => {
@@ -8410,6 +8837,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.008000,
     },
 
     'security.reload_transport_certificates' => {
@@ -8425,6 +8853,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.008000,
     },
 
     'security.tenant_info' => {
@@ -8442,6 +8871,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.update_audit_configuration' => {
@@ -8458,6 +8888,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.update_configuration' => {
@@ -8474,6 +8905,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.010000,
     },
 
     'security.update_distinguished_name' => {
@@ -8490,6 +8922,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.validate' => {
@@ -8507,6 +8940,7 @@ sub api {
             'pretty'          => 'boolean',
             'source'          => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'security.who_am_i' => {
@@ -8524,6 +8958,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.000000,
     },
 
     'security.who_am_i_protected' => {
@@ -8539,6 +8974,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.011000,
     },
 
     'security_analytics.get_alerts' => {
@@ -8567,6 +9003,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'security_analytics.get_findings' => {
@@ -8596,6 +9033,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  2.004000,
     },
 
     'security_analytics.search_finding_correlations' => {
@@ -8616,6 +9054,7 @@ sub api {
             'pretty'           => 'boolean',
             'source'           => 'string',
         },
+        os_version =>  2.007000,
     },
 
     'sm.create_policy' => {
@@ -8632,6 +9071,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.delete_policy' => {
@@ -8647,6 +9087,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.explain_policy' => {
@@ -8662,6 +9103,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.get_policies' => {
@@ -8683,6 +9125,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.get_policy' => {
@@ -8698,6 +9141,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.start_policy' => {
@@ -8713,6 +9157,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.stop_policy' => {
@@ -8728,6 +9173,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'sm.update_policy' => {
@@ -8747,6 +9193,7 @@ sub api {
             'pretty'           => 'boolean',
             'source'           => 'string',
         },
+        os_version =>  2.001000,
     },
 
     'snapshot.cleanup_repository' => {
@@ -8766,6 +9213,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.clone' => {
@@ -8785,6 +9233,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.create' => {
@@ -8807,6 +9256,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.create_repository' => {
@@ -8828,6 +9278,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.delete' => {
@@ -8846,6 +9297,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.delete_repository' => {
@@ -8865,6 +9317,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.get' => {
@@ -8885,6 +9338,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.get_repository' => {
@@ -8907,6 +9361,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.restore' => {
@@ -8927,6 +9382,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.status' => {
@@ -8950,6 +9406,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'snapshot.verify_repository' => {
@@ -8969,6 +9426,7 @@ sub api {
             'pretty'                   => 'boolean',
             'source'                   => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'sql.close' => {
@@ -8988,6 +9446,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'sql.explain' => {
@@ -9007,6 +9466,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'sql.get_stats' => {
@@ -9025,6 +9485,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'sql.post_stats' => {
@@ -9044,6 +9505,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'sql.query' => {
@@ -9063,6 +9525,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'sql.settings' => {
@@ -9081,6 +9544,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'tasks.cancel' => {
@@ -9104,6 +9568,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'tasks.get' => {
@@ -9122,6 +9587,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'tasks.list' => {
@@ -9145,6 +9611,7 @@ sub api {
             'pretty'               => 'boolean',
             'source'               => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.delete' => {
@@ -9160,6 +9627,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.explain' => {
@@ -9175,6 +9643,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.get' => {
@@ -9190,6 +9659,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.preview' => {
@@ -9206,6 +9676,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.put' => {
@@ -9225,6 +9696,7 @@ sub api {
             'pretty'           => 'boolean',
             'source'           => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.search' => {
@@ -9246,6 +9718,7 @@ sub api {
             'pretty'         => 'boolean',
             'source'         => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.start' => {
@@ -9261,6 +9734,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'transforms.stop' => {
@@ -9276,6 +9750,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'ubi.initialize' => {
@@ -9291,6 +9766,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  1.000000,
     },
 
     'wlm.create_query_group' => {
@@ -9307,6 +9783,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017000,
     },
 
     'wlm.delete_query_group' => {
@@ -9322,6 +9799,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017000,
     },
 
     'wlm.get_query_group' => {
@@ -9340,6 +9818,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017000,
     },
 
     'wlm.update_query_group' => {
@@ -9356,6 +9835,7 @@ sub api {
             'pretty'       => 'boolean',
             'source'       => 'string',
         },
+        os_version =>  2.017000,
     },
 
 );
@@ -9376,7 +9856,7 @@ OpenSearch::Client::Core::3_0::Role::API
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 DESCRIPTION
 

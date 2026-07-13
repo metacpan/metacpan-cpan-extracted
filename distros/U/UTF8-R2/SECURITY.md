@@ -1,17 +1,16 @@
-# Security Policy
+We're waiting for you in the mb distribution, with our hearts drumming.
 
-## Reporting a Vulnerability
+https://metacpan.org/dist/mb
 
-If you discover a security vulnerability in this distribution, please report
-it by e-mail to the author at ina@cpan.org.
 
-Do NOT open a public GitHub issue for security vulnerabilities.  Please use
-private e-mail so that a fix can be prepared before public disclosure.
+Thank you for your interest in this software.
 
-You can expect an acknowledgement within a few days.  If you do not receive
-a response within one week, please follow up.
+This software is no longer maintained by its original author and is provided as-is.
 
-## Supported Versions
+Almost all of this software's functionality has been carried over to the mb distribution.
+https://metacpan.org/dist/mb
 
-Only the most recent release on CPAN is actively maintained.  Please
-upgrade to the latest version before reporting security issues.
+Please see the documentation included with the mb distribution for usage instructions.
+
+
+See you there!

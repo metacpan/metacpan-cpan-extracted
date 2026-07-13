@@ -1,5 +1,8 @@
 Revision history for Dist-Surveyor
 
+0.023     2026-07-12 18:07:34-04:00 America/New_York
+    - Fix get_module_versions_in_release to retrieve modules and versions correctly from MetaCPAN API
+
 0.022     2025-05-04 04:49:45-04:00 America/New_York
     - Update LICENSE text
 

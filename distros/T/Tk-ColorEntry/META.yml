@@ -18,13 +18,15 @@ no_index:
     - t
     - inc
 requires:
+  Convert::Color: '0.18'
   Imager: '1.019'
   Imager::Screenshot: '0.014'
   Math::Round: '0.08'
   Test::Tk: '3.03'
   Tk: '804.030'
+  Tk::ListBrowser: '0.14'
   Tk::PopList: '0.09'
 resources:
   repository: git://github.com/haje61/Tk-ColorEntry.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

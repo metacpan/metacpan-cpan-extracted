@@ -1,0 +1,25 @@
+Changes
+examples/docs/api-reference.md
+examples/docs/getting-started.md
+examples/docs/guides/routing.md
+examples/docs/guides/search.md
+examples/docs/guides/styling.md
+examples/docs/index.md
+examples/docs/reference/render-dir.md
+examples/docs/reference/render.md
+examples/docs/reference/search-widget.md
+examples/markdown_example.pl
+ignore.txt
+lib/Chandra/Markdown.pm
+lib/Chandra/Markdown/App.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-markdown.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

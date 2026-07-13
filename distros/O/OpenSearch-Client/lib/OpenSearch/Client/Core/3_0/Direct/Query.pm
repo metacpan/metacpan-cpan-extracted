@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Query;
-$OpenSearch::Client::Core::3_0::Direct::Query::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Query::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Query>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/_query/_datasources/{datasource_name}>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->query->datasource_delete(
         
          # path parameters
@@ -109,6 +112,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_query/_datasources/{datasource_name}>
 
 =back
+
+I<Method added in OpenSearch version 2.7>
+
 
     $resp = $client->query->datasource_retrieve(
         
@@ -140,6 +146,9 @@ C<POST /_plugins/_query/_datasources>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->query->datasources_create(
         
         'body'         =>  $body,      # optional
@@ -168,6 +177,9 @@ C<GET /_plugins/_query/_datasources>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->query->datasources_list(
         
          # Common API query string parameters
@@ -194,6 +206,9 @@ C<PUT /_plugins/_query/_datasources>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->query->datasources_update(
         
         'body'         =>  $body,      # optional
@@ -208,6 +223,19 @@ C<PUT /_plugins/_query/_datasources>
     );
 
 L<OpenSearch documentation for query-E<gt>datasources_update|https://docs.opensearch.org/latest/observing-your-data/prometheusmetrics/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->query->method_supported_in_version(
+        method  => 'datasource_delete',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

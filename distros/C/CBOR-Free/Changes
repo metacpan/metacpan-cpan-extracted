@@ -1,5 +1,10 @@
 Revision history for Perl module CBOR::Free
 
+0.33 12 July 2026
+- Add opt-in rejection of duplicate map keys to the object and sequence
+  decoders.
+- Various CI fixes & tweaks.
+
 0.32 4 March 2022
 - Fix compatibility with big-endian systems.
 - Add Test::Pod requirement for testing.

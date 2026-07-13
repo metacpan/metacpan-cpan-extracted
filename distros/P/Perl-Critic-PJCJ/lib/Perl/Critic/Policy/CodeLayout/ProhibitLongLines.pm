@@ -1,4 +1,4 @@
-package Perl::Critic::Policy::CodeLayout::ProhibitLongLines v0.2.7;
+package Perl::Critic::Policy::CodeLayout::ProhibitLongLines v0.3.0;
 
 use v5.26.0;
 use strict;
@@ -8,16 +8,38 @@ use experimental "signatures";
 
 use parent qw( Perl::Critic::Policy );
 
-use Encode                              qw( decode FB_CROAK );
-use File::Basename                      qw( dirname );
-use List::Util                          qw( any );
-use Perl::Critic::Utils                 qw( $SEVERITY_MEDIUM );
+use Encode              qw( decode FB_CROAK );
+use File::Basename      qw( basename dirname );
+use File::Spec          ();
+use List::Util          qw( any );
+use Perl::Critic::Utils qw( $SEVERITY_MEDIUM words_from_string );
 use Perl::Critic::Utils::SourceLocation ();
 
-my $Desc = "Line exceeds maximum length";
 my $Expl = "Keep lines under the configured maximum for readability";
 
-sub supported_parameters { (
+my %Lookup_needed;  # abs dir             -> can a lookup possibly answer?
+my %Attr_value;     # "$attr\0$abs_file"  -> computed override (may be undef)
+
+sub _parse_allow_lines_matching ($self, $parameter, $config_string) {
+  my $string = $config_string // $parameter->get_default_string // "";
+  my @patterns;
+  for my $pattern (words_from_string($string)) {
+    my $re = eval { qr/$pattern/ };
+    if (!defined $re) {
+      my $error = $@;
+      chomp $error;
+      $self->throw_parameter_value_exception(
+        "allow_lines_matching", $pattern,
+        undef,                  "is not a valid regular expression: $error",
+      );
+    }
+    push @patterns, $re;
+  }
+  $self->__set_parameter_value($parameter, \@patterns);
+  return
+}
+
+sub supported_parameters ($self) { (
   {
     name            => "max_line_length",
     description     => "Maximum allowed line length in characters",
@@ -28,7 +50,7 @@ sub supported_parameters { (
     name           => "allow_lines_matching",
     description    => "Regex patterns for lines exempt from length check",
     default_string => "",
-    behavior       => "string list",
+    parser         => \&_parse_allow_lines_matching,
   }, {
     name           => "gitattributes_line_length",
     description    => "Git attribute name for per-file line length override",
@@ -37,64 +59,42 @@ sub supported_parameters { (
   },
 ) }
 
-sub default_severity { $SEVERITY_MEDIUM }
-sub default_themes   { qw( cosmetic formatting ) }
+sub default_severity ($self) { $SEVERITY_MEDIUM }
+sub default_themes   ($self) { qw( cosmetic formatting pjcj ) }
 
-sub applies_to { "PPI::Document" }
+sub applies_to ($self) { "PPI::Document" }
 
-sub violates ($self, $elem, $doc) {
-  my $override = $self->_get_gitattr_line_length($doc->filename);
-  return if defined $override && $override eq "ignore";
-
-  my $max_length = $override // $self->{_max_line_length};
-  my @patterns   = keys $self->{_allow_lines_matching}->%*;
-  my $source     = $doc->serialize;
-
-  # PPI serializes source as octets, so decode to characters before measuring
-  # line lengths.  Keep the octets if the source is not valid UTF-8.
-  my $decoded = eval { decode("UTF-8", $source, FB_CROAK) };
-  $source = $decoded if defined $decoded;
-
-  my @lines = split /\n/, $source;
-
-  my @violations;
-
-  for my $line_num (0 .. $#lines) {
-    my $length = length $lines[$line_num];
-    if ($length > $max_length) {
-      next if any { $lines[$line_num] =~ /$_/ } @patterns;
-      my $violation_desc
-        = "Line is $length characters long (exceeds $max_length)";
-
-      # Find a token on this line for accurate line number reporting
-      my $line_token = $self->_find_token_on_line($doc, $line_num + 1);
-
-      # If no token found, create synthetic element with correct line number
-      if (!$line_token) {
-        $line_token = Perl::Critic::Utils::SourceLocation->new(
-          line_number   => $line_num + 1,
-          column_number => 1,
-          content       => $lines[$line_num],
-          filename      => $doc->filename
-        );
-      }
-
-      push @violations, $self->violation($violation_desc, $Expl, $line_token);
+sub _lookup_needed ($dir) {
+  while (1) {
+    return 1 if -e "$dir/.gitattributes";
+    if (-e "$dir/.git") {
+      return 1 if !-d "$dir/.git" || -e "$dir/.git/info/attributes";
+      return 0;
     }
+    my $parent = dirname($dir);
+    return 0 if $parent eq $dir;
+    $dir = $parent;
   }
-
-  @violations
 }
 
-sub _get_gitattr_line_length ($self, $filename) {
-  return unless defined $filename && length $filename;
-  my $attr = $self->{_gitattributes_line_length};
-  return unless defined $attr && length $attr;
+sub _gitattr_lookup ($self, $attr, $filename) {
+  my $dir     = dirname($filename);
+  my $abs_dir = File::Spec->rel2abs($dir);
+  $Lookup_needed{$abs_dir} //= _lookup_needed($abs_dir);
+  return unless $Lookup_needed{$abs_dir};
 
+  my $base   = basename($filename);
   my $output = eval {
-    my $dir = dirname($filename);
-    open my $fh, "-|", "git", "-C", $dir, "check-attr", $attr, "--", $filename
-      or return;
+    open my $saved_err, ">&", \*STDERR or return;
+    my $quiet  = open STDERR, ">", File::Spec->devnull;
+    my $opened = open my $fh, "-|", "git", "-C", $dir, "check-attr", $attr,
+      "--", $base;
+    if ($quiet) {
+      # Restore our own STDERR; keep going even if the dup back fails, since
+      # abandoning the lookup would not make a broken STDERR any better
+      open STDERR, ">&", $saved_err or warn "Cannot restore STDERR: $!\n";
+    }
+    return unless $opened;
     my $result = do { local $/ = undef; <$fh> };
     close $fh or return;
     $result
@@ -107,23 +107,70 @@ sub _get_gitattr_line_length ($self, $filename) {
   return
 }
 
-sub _find_token_on_line ($self, $doc, $target_line) {
-  my $found_token;
+sub _get_gitattr_line_length ($self, $filename) {
+  return unless defined $filename && length $filename;
+  my $attr = $self->{_gitattributes_line_length};
+  return unless defined $attr && length $attr;
 
-  $doc->find(
-    sub ($top, $elem) {
-      return 0 unless $elem->isa("PPI::Token");
+  my $key = join "\0", $attr, File::Spec->rel2abs($filename);
+  return $Attr_value{$key} if exists $Attr_value{$key};
+  $Attr_value{$key} = $self->_gitattr_lookup($attr, $filename)
+}
 
-      my $line = $elem->line_number;
-      if (defined $line && $line == $target_line) {
-        $found_token = $elem;
-        return 1;
+sub _first_tokens_by_line ($self, $doc) {
+  my %first;
+  for my $token ($doc->tokens) {
+    my $line = $token->line_number;
+    next unless defined $line;
+    $first{$line} //= $token;
+  }
+  \%first
+}
+
+sub violates ($self, $elem, $doc) {
+  my $override = $self->_get_gitattr_line_length($doc->filename);
+  return if defined $override && $override eq "ignore";
+
+  my $max_length = $override // $self->{_max_line_length};
+  my $patterns   = $self->{_allow_lines_matching};
+  my $source     = $doc->serialize;
+
+  # PPI serializes source as octets, so decode to characters before measuring
+  # line lengths.  Keep the octets if the source is not valid UTF-8.
+  my $decoded = eval { decode("UTF-8", $source, FB_CROAK) };
+  $source = $decoded if defined $decoded;
+
+  my @lines = split /\n/, $source;
+
+  my @violations;
+  my $token_map;
+
+  for my $line_num (0 .. $#lines) {
+    my $length = length $lines[$line_num];
+    if ($length > $max_length) {
+      next if any { $lines[$line_num] =~ $_ } @$patterns;
+      my $violation_desc
+        = "Line is $length characters long (exceeds $max_length)";
+
+      # Anchor at the first token on this line for accurate reporting
+      $token_map //= $self->_first_tokens_by_line($doc);
+      my $line_token = $token_map->{ $line_num + 1 };
+
+      # If no token found, create synthetic element with correct line number
+      if (!$line_token) {
+        $line_token = Perl::Critic::Utils::SourceLocation->new(
+          line_number   => $line_num + 1,
+          column_number => 1,
+          content       => $lines[$line_num],
+          filename      => $doc->filename,
+        );
       }
-      return 0;
-    }
-  );
 
-  $found_token
+      push @violations, $self->violation($violation_desc, $Expl, $line_token);
+    }
+  }
+
+  @violations
 }
 
 "
@@ -141,7 +188,7 @@ Perl::Critic::Policy::CodeLayout::ProhibitLongLines - Prohibit long lines
 
 =head1 VERSION
 
-version v0.2.7
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -199,6 +246,9 @@ Multiple patterns (space-separated):
   [CodeLayout::ProhibitLongLines]
   allow_lines_matching = ^\s*package\s+ https?://
 
+Invalid patterns are reported as a configuration error when the policy is
+loaded.
+
 =head2 gitattributes_line_length
 
 The name of a git attribute to look up for per-file line length overrides.
@@ -222,6 +272,10 @@ need this line if you want a different name):
 Requires C<git> on C<$PATH>. Falls back to the configured
 C<max_line_length> when git is unavailable, the file is outside a
 repository, or the attribute is unspecified.
+
+Overrides are read from C<.gitattributes> files and the repository's
+C<.git/info/attributes>. Attribute sources configured elsewhere (such as
+C<core.attributesFile>) are not consulted.
 
 =head1 EXAMPLES
 
@@ -266,7 +320,7 @@ This Policy is part of the Perl::Critic::PJCJ distribution.
 
 =head1 AUTHOR
 
-Paul Johnson C<< <paul@pjcj.net> >>
+Paul Johnson <paul@pjcj.net>
 
 =head1 COPYRIGHT
 

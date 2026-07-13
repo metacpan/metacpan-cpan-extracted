@@ -14,12 +14,23 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Perl-Critic-PJCJ",
+  "EXE_FILES" => [
+    "script/perl-quote-fix"
+  ],
   "LICENSE" => "perl",
   "NAME" => "Perl::Critic::PJCJ",
   "PREREQ_PM" => {
+    "Cwd" => 0,
+    "Encode" => 0,
+    "File::Basename" => 0,
+    "File::Temp" => 0,
+    "Getopt::Long" => 0,
     "List::Util" => "1.33",
-    "PPI" => 0,
-    "Perl::Critic" => 0
+    "PPI" => "1.220",
+    "Perl::Critic" => 0,
+    "Pod::Usage" => 0,
+    "Scalar::Util" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -29,22 +40,30 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.2.7",
+  "VERSION" => "v0.3.0",
   "test" => {
-    "TESTS" => "t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t"
+    "TESTS" => "t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Fixer/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "Cwd" => 0,
+  "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "File::Basename" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
+  "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.33",
-  "PPI" => 0,
+  "PPI" => "1.220",
   "Perl::Critic" => 0,
+  "Pod::Usage" => 0,
+  "Scalar::Util" => 0,
   "Test2::V0" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "parent" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
@@ -88,10 +107,11 @@ reinstall-deps:
 	dzil listdeps --develop | cpm install -g --reinstall --no-prebuilt -
 
 t:
-	yath test -j20 --qvf -T --term-width=$(tput cols)
+	yath test -j20 --qvf -T --term-width=$$(tput cols 2>/dev/null || echo 80)
 
 tv:
-	yath test -j20 --qvf -T --term-width=$(tput cols) -v
+	yath test -j20 --qvf -T \
+		--term-width=$$(tput cols 2>/dev/null || echo 80) -v
 
 zt: clean
 	dzil test -j20
@@ -99,11 +119,14 @@ zt: clean
 
 format:
 	@mkdir -p tmp/perltidy
-	@git ls-files "*.pl" "*.pm" "*.t" | while read file; do \
-		cp "$$file" "$$file.tdybak"; \
-		perlimports --inplace-edit --no-preserve-unused \
-			"$$file" 2>/dev/null || true; \
-		perltidy -b "$$file" >/dev/null 2>&1; \
+	@files=$$(git ls-files -z | xargs -0 utils/perl-hook list); \
+	test -n "$$files" || exit 0; \
+	for file in $$files; do cp "$$file" "$$file.tdybak"; done; \
+	perlimports --inplace-edit --no-preserve-unused $$files 2>/dev/null \
+		|| true; \
+	perl -Ilib script/perl-quote-fix --inplace $$files || exit 1; \
+	utils/perl-hook format $$files || exit 1; \
+	for file in $$files; do \
 		if ! diff -q "$$file.tdybak" "$$file" >/dev/null 2>&1; then \
 			echo "Formatted $$file"; \
 		fi; \
@@ -126,7 +149,7 @@ cover: build
 	HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,^t/ make t
 
 cover-html: cover
-	cover --report=html_basic --launch
+	cover --report=html --launch
 
 cover-compilation: cover
 	cover --report=compilation

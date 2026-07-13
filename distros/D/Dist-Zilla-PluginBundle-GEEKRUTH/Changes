@@ -1,5 +1,17 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
+4.0001 2026-07-12T14:00:52-04:00 America/New_York
+ [MAJOR]
+ [API CHANGE]
+ [MINOR]
+ [ENHANCEMENTS]
+ [REVISION]
+ [BUG FIXES]
+ - Fixed issue with Changes skel
+
+ [STATISTICS]
+ - code churn: 2 files changed, 13 insertions(+), 1 deletion(-)
+
 4.0000 2026-07-08T19:54:18-04:00 America/New_York
  [MAJOR]
  - Move to Codeberg

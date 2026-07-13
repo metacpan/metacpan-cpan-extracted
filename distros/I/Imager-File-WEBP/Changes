@@ -1,3 +1,11 @@
+Imager-File-WEBP 0.006
+======================
+
+ - depend on Imager 1.033 for the EXIF parser fix
+   CVE-2026-14454
+
+ - use the ..._NAME() API initializer for better error reporting
+
 Imager-File-WEBP 0.005 - 19 Apr 2019
 ======================
 

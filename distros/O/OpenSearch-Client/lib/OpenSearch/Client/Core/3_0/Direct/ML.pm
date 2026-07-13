@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::ML;
-$OpenSearch::Client::Core::3_0::Direct::ML::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::ML::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::ML>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories>
 
 =back
 
+I<Method added in OpenSearch version 3.3>
+
+
     $resp = $client->ml->add_agentic_memory(
         
         'body'                 =>  $body,      # optional
@@ -111,6 +114,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/models/{model_id}/chunk/{chunk_number}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ml->chunk_model(
         
@@ -145,6 +151,9 @@ C<POST /_plugins/_ml/connectors/_create>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->create_connector(
         
         'body'         =>  $body,      # optional
@@ -172,6 +181,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/controllers/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->create_controller(
         
@@ -205,6 +217,9 @@ C<POST /_plugins/_ml/memory>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->create_memory(
         
         'body'         =>  $body,      # optional
@@ -233,6 +248,9 @@ C<POST /_plugins/_ml/memory_containers/_create>
 
 =back
 
+I<Method added in OpenSearch version 3.3>
+
+
     $resp = $client->ml->create_memory_container(
         
         'body'         =>  $body,      # optional
@@ -260,6 +278,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories/sessions>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->create_memory_container_session(
         
@@ -293,6 +314,9 @@ C<POST /_plugins/_ml/memory/{memory_id}/messages>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->create_message(
         
         'body'         =>  $body,      # optional
@@ -325,6 +349,9 @@ C<POST /_plugins/_ml/models/meta>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->create_model_meta(
         
         'body'         =>  $body,      # optional
@@ -352,6 +379,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_ml/agents/{agent_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.13>
+
 
     $resp = $client->ml->delete_agent(
         
@@ -382,6 +412,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->delete_agentic_memory(
         
@@ -414,6 +447,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_delete_by_query>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->delete_agentic_memory_query(
         
@@ -448,6 +484,9 @@ C<DELETE /_plugins/_ml/connectors/{connector_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->delete_connector(
         
          # path parameters
@@ -477,6 +516,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_ml/controllers/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->delete_controller(
         
@@ -508,6 +550,9 @@ C<DELETE /_plugins/_ml/memory/{memory_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->delete_memory(
         
          # path parameters
@@ -537,6 +582,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_ml/memory_containers/{memory_container_id}>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->delete_memory_container(
         
@@ -573,6 +621,9 @@ C<DELETE /_plugins/_ml/models/{model_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.3>
+
+
     $resp = $client->ml->delete_model(
         
          # path parameters
@@ -602,6 +653,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_ml/model_groups/{model_group_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ml->delete_model_group(
         
@@ -633,6 +687,9 @@ C<DELETE /_plugins/_ml/tasks/{task_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.3>
+
+
     $resp = $client->ml->delete_task(
         
          # path parameters
@@ -663,6 +720,9 @@ C<POST /_plugins/_ml/models/{model_id}/_deploy>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->ml->deploy_model(
         
          # path parameters
@@ -692,6 +752,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/agents/{agent_id}/_execute>
 
 =back
+
+I<Method added in OpenSearch version 2.13>
+
 
     $resp = $client->ml->execute_agent(
         
@@ -725,6 +788,9 @@ C<POST /_plugins/_ml/agents/{agent_id}/_execute/stream>
 
 =back
 
+I<Method added in OpenSearch version 3.3>
+
+
     $resp = $client->ml->execute_agent_stream(
         
         'body'         =>  $body,      # optional
@@ -756,6 +822,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/_execute/{algorithm_name}>
 
 =back
+
+I<Method added in OpenSearch version 2.0>
+
 
     $resp = $client->ml->execute_algorithm(
         
@@ -789,6 +858,9 @@ C<POST /_plugins/_ml/tools/_execute/{tool_name}>
 
 =back
 
+I<Method added in OpenSearch version 3.3>
+
+
     $resp = $client->ml->execute_tool(
         
         'body'         =>  $body,      # optional
@@ -821,6 +893,9 @@ C<GET /_plugins/_ml/agents/{agent_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.13>
+
+
     $resp = $client->ml->get_agent(
         
          # path parameters
@@ -850,6 +925,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->get_agentic_memory(
         
@@ -883,6 +961,9 @@ C<GET /_plugins/_ml/memory>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->get_all_memories(
         
          # Endpoint specific query string parameters
@@ -913,6 +994,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/memory/{memory_id}/messages>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->get_all_messages(
         
@@ -949,6 +1033,9 @@ C<GET /_plugins/_ml/tools>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->get_all_tools(
         
          # Common API query string parameters
@@ -974,6 +1061,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/connectors/{connector_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.11>
+
 
     $resp = $client->ml->get_connector(
         
@@ -1005,6 +1095,9 @@ C<GET /_plugins/_ml/controllers/{model_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->get_controller(
         
          # path parameters
@@ -1034,6 +1127,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/memory/{memory_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->get_memory(
         
@@ -1065,6 +1161,9 @@ C<GET /_plugins/_ml/memory_containers/{memory_container_id}>
 
 =back
 
+I<Method added in OpenSearch version 3.3>
+
+
     $resp = $client->ml->get_memory_container(
         
          # path parameters
@@ -1095,6 +1194,9 @@ C<GET /_plugins/_ml/memory/message/{message_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->get_message(
         
          # path parameters
@@ -1124,6 +1226,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/memory/message/{message_id}/traces>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->get_message_traces(
         
@@ -1160,6 +1265,9 @@ C<GET /_plugins/_ml/models/{model_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.3>
+
+
     $resp = $client->ml->get_model(
         
          # path parameters
@@ -1189,6 +1297,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/model_groups/{model_group_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ml->get_model_group(
         
@@ -1220,6 +1331,9 @@ C<GET /_plugins/_ml/profile>
 
 =back
 
+I<Method added in OpenSearch version 2.4>
+
+
     $resp = $client->ml->get_profile(
         
         'body'         =>  $body,      # optional
@@ -1250,6 +1364,9 @@ C<GET /_plugins/_ml/profile/models>
 C<GET /_plugins/_ml/profile/models/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.4>
+
 
     $resp = $client->ml->get_profile_models(
         
@@ -1285,6 +1402,9 @@ C<GET /_plugins/_ml/profile/tasks>
 C<GET /_plugins/_ml/profile/tasks/{task_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.4>
+
 
     $resp = $client->ml->get_profile_tasks(
         
@@ -1327,6 +1447,9 @@ C<GET /_plugins/_ml/{node_id}/stats/{stat}>
 
 =back
 
+I<Method added in OpenSearch version 1.3>
+
+
     $resp = $client->ml->get_stats(
         
          # path parameters
@@ -1358,6 +1481,9 @@ C<GET /_plugins/_ml/tasks/{task_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.3>
+
+
     $resp = $client->ml->get_task(
         
          # path parameters
@@ -1387,6 +1513,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/tools/{tool_name}>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->get_tool(
         
@@ -1418,6 +1547,9 @@ C<POST /_plugins/_ml/models/{model_id}/_load>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->load_model(
         
          # path parameters
@@ -1447,6 +1579,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/_predict/{algorithm_name}/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.3>
+
 
     $resp = $client->ml->predict(
         
@@ -1481,6 +1616,9 @@ C<POST /_plugins/_ml/models/{model_id}/_predict>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->predict_model(
         
         'body'         =>  $body,      # optional
@@ -1512,6 +1650,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/models/{model_id}/_predict/stream>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->predict_model_stream(
         
@@ -1545,6 +1686,9 @@ C<POST /_plugins/_ml/agents/_register>
 
 =back
 
+I<Method added in OpenSearch version 2.13>
+
+
     $resp = $client->ml->register_agents(
         
         'body'         =>  $body,      # optional
@@ -1572,6 +1716,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/models/_register>
 
 =back
+
+I<Method added in OpenSearch version 2.7>
+
 
     $resp = $client->ml->register_model(
         
@@ -1601,6 +1748,9 @@ C<POST /_plugins/_ml/model_groups/_register>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->register_model_group(
         
         'body'         =>  $body,      # optional
@@ -1629,6 +1779,9 @@ C<POST /_plugins/_ml/models/_register_meta>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->ml->register_model_meta(
         
         'body'         =>  $body,      # optional
@@ -1656,6 +1809,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/_search>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->search_agentic_memory(
         
@@ -1693,6 +1849,9 @@ C<POST /_plugins/_ml/agents/_search>
 
 =back
 
+I<Method added in OpenSearch version 2.13>
+
+
     $resp = $client->ml->search_agents(
         
         'body'         =>  $body,      # optional
@@ -1723,6 +1882,9 @@ C<GET /_plugins/_ml/connectors/_search>
 C<POST /_plugins/_ml/connectors/_search>
 
 =back
+
+I<Method added in OpenSearch version 2.11>
+
 
     $resp = $client->ml->search_connectors(
         
@@ -1755,6 +1917,9 @@ C<POST /_plugins/_ml/memory/_search>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->search_memory(
         
         'body'         =>  $body,      # optional
@@ -1786,6 +1951,9 @@ C<POST /_plugins/_ml/memory_containers/_search>
 
 =back
 
+I<Method added in OpenSearch version 3.3>
+
+
     $resp = $client->ml->search_memory_container(
         
         'body'         =>  $body,      # optional
@@ -1816,6 +1984,9 @@ C<GET /_plugins/_ml/memory/{memory_id}/_search>
 C<POST /_plugins/_ml/memory/{memory_id}/_search>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->search_message(
         
@@ -1852,6 +2023,9 @@ C<POST /_plugins/_ml/model_groups/_search>
 
 =back
 
+I<Method added in OpenSearch version 2.9>
+
+
     $resp = $client->ml->search_model_group(
         
         'body'         =>  $body,      # optional
@@ -1882,6 +2056,9 @@ C<GET /_plugins/_ml/models/_search>
 C<POST /_plugins/_ml/models/_search>
 
 =back
+
+I<Method added in OpenSearch version 1.3>
+
 
     $resp = $client->ml->search_models(
         
@@ -1914,6 +2091,9 @@ C<POST /_plugins/_ml/tasks/_search>
 
 =back
 
+I<Method added in OpenSearch version 1.3>
+
+
     $resp = $client->ml->search_tasks(
         
         'body'         =>  $body,      # optional
@@ -1941,6 +2121,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/_train/{algorithm_name}>
 
 =back
+
+I<Method added in OpenSearch version 1.3>
+
 
     $resp = $client->ml->train(
         
@@ -1973,6 +2156,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/_train_predict/{algorithm_name}>
 
 =back
+
+I<Method added in OpenSearch version 1.3>
+
 
     $resp = $client->ml->train_predict(
         
@@ -2009,6 +2195,9 @@ C<POST /_plugins/_ml/models/{model_id}/_undeploy>
 
 =back
 
+I<Method added in OpenSearch version 2.7>
+
+
     $resp = $client->ml->undeploy_model(
         
         'body'         =>  $body,      # optional
@@ -2044,6 +2233,9 @@ C<POST /_plugins/_ml/models/{model_id}/_unload>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->unload_model(
         
         'body'         =>  $body,      # optional
@@ -2075,6 +2267,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_ml/memory_containers/{memory_container_id}/memories/{type}/{id}>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->update_agentic_memory(
         
@@ -2110,6 +2305,9 @@ C<PUT /_plugins/_ml/connectors/{connector_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->update_connector(
         
         'body'          =>  $body,      # optional
@@ -2141,6 +2339,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_ml/controllers/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->update_controller(
         
@@ -2174,6 +2375,9 @@ C<PUT /_plugins/_ml/memory/{memory_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->update_memory(
         
         'body'         =>  $body,      # optional
@@ -2205,6 +2409,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_ml/memory_containers/{memory_container_id}>
 
 =back
+
+I<Method added in OpenSearch version 3.3>
+
 
     $resp = $client->ml->update_memory_container(
         
@@ -2238,6 +2445,9 @@ C<PUT /_plugins/_ml/memory/message/{message_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->ml->update_message(
         
         'body'         =>  $body,      # optional
@@ -2269,6 +2479,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_ml/models/{model_id}>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->ml->update_model(
         
@@ -2302,6 +2515,9 @@ C<PUT /_plugins/_ml/model_groups/{model_group_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.9>
+
+
     $resp = $client->ml->update_model_group(
         
         'body'            =>  $body,      # optional
@@ -2333,6 +2549,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ml/models/{model_id}/upload_chunk/{chunk_number}>
 
 =back
+
+I<Method added in OpenSearch version 2.7>
+
 
     $resp = $client->ml->upload_chunk(
         
@@ -2367,6 +2586,9 @@ C<POST /_plugins/_ml/models/_upload>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ml->upload_model(
         
         'body'         =>  $body,      # optional
@@ -2381,6 +2603,19 @@ C<POST /_plugins/_ml/models/_upload>
     );
 
 L<OpenSearch documentation for ml-E<gt>upload_model|https://docs.opensearch.org/latest/ml-commons-plugin/api/index/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->ml->method_supported_in_version(
+        method  => 'add_agentic_memory',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

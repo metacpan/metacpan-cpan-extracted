@@ -1,0 +1,13 @@
+<div id="alert-container"></div>
+<div id="alert-box" class="alert alert-box alert-dismissible" style="display: none" role="alert">
+    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    <span></span>
+</div>
+
+   <% if ( my $message = flash 'message' ) { %>
+    <div class="alert <%= flash 'message_class' %> alert-dismissible fade show" role="alert">
+      <strong>
+	<%= $message %>
+      </strong>
+    </div>
+    <% } %>

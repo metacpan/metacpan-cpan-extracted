@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Action::Base;
-$Mojolicious::Plugin::Fondation::Action::Base::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Action::Base::VERSION = '0.04';
 # ABSTRACT: Base class for Fondation post-load actions
 
 use Mojo::Base -base, -signatures;
@@ -25,7 +25,7 @@ Mojolicious::Plugin::Fondation::Action::Base - Base class for Fondation post-loa
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

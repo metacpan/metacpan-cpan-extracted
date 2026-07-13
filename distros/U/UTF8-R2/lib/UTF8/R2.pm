@@ -5,13 +5,13 @@ package UTF8::R2;
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
-# Copyright (c) 2019, 2020, 2021, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020, 2021, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.30';
+$VERSION = '0.31';
 $VERSION = $VERSION;
 
 use strict;
@@ -2094,7 +2094,7 @@ upload *.tar.gz to PAUSE(The [Perl programming] Authors Upload Server)
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 This project was originated by INABA Hitoshi.
 

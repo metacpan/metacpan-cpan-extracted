@@ -399,6 +399,18 @@ plugin 'Fondation' => {
     </p>
   </div>
 
+  % if ($has_setup) {
+  <!-- Setup wizard -->
+  <div class="panel">
+    <h2>Setup wizard</h2>
+    <p>
+      Configure your application interactively — database, authentication,
+      mail, and more — via the
+      <a href="<%= url_for '/setup' %>">setup wizard</a>.
+    </p>
+  </div>
+  % }
+
   <footer>
     Fondation — Mojolicious Plugin
   </footer>

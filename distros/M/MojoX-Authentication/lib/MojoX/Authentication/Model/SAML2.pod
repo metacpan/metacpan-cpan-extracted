@@ -1,0 +1,257 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Foo::Model::Authentication::SAML2
+
+
+=head1 SYNOPSIS
+
+   use Foo::Model::Authentication::SAML2;
+
+
+=head1 DESCRIPTION
+
+Manage the model for the interaction with an Identity Provider in SAML
+2.0.
+
+Outstanding requests are cached for some time, based on a time-to-live
+that can be provided (either set in the object as L</ttl> or when
+caching a user) and defaults to 5 minutes.
+
+=head1 INTERFACE
+
+=head2 B<< cache >>
+
+   my $cache = $provider->cache;
+
+Accessor to the cache management object. You're not supposed to need this.
+
+=head2 B<< create >>
+
+   my $provider = MojoX::Authentication::Model::SAML2->create(
+      $config, %args);
+
+Create a new instance, according to the interface consumed by
+L<MojoX::Authentication::Model>.
+
+The merging of C<$config> and C<%args> is such that C<$config> wins
+except for the C<name> key, which either comes from C<$args{name}> or
+defaults to C<saml2>.
+
+Supported keys are L</cache>, L</idp>, L</name> (only from C<%args>, see
+above), L</remaps>, L</request_ttl>, L</sig_hash>, L</sp_configuration>,
+L</user_key>, L</user_ttl>, and L</username_validator>.
+
+The value for key L</cache> is turned into a cache-management object
+with an interface like L<MojoX::Authentication::Model::SAML2::Hash>. In
+particular, you can pass:
+
+=over
+
+=item *
+
+an object of class L<MojoX::MojoDbWrap>, in which case class
+L<MojoX::Authentication::Model::SAML2::Db> is used, passing the object
+as parameter C<wmdb>
+
+=item *
+
+a blessed object, in which case it's assumed to be already a valid cache
+management object
+
+=item *
+
+a hash reference with instructions to instantiate a cache management
+object. Expected to provide a C<class> (required) and C<args> (optional,
+either as hash or array reference if present).
+
+=back
+
+The value for key L</idp> is turned into a L<Net::SAML2::IdP> if not
+blessed (in this case it's supposed to support that interface anyway).
+
+The value for key L</remaps> is an array reference, see the accessor
+documentation for its format.
+
+=head2 B<< handles_username >>
+
+   my $bool = $provider->handles_username($controller, $username);
+
+Returns a true value if the provider handles the provided username,
+false otherwise. Useful to figure out what provider supports a username,
+especially if there can be multiple SAML 2.0 providers.
+
+=head2 B<< idp >>
+
+   my $idp_object = $provider->idp;
+
+Accessor for the L<Net::SAML2::IdP> object (or interface-compatible).
+
+=head2 B<< idp_login >>
+
+   my ($id, $url) = $provider->idp_login;
+
+Create a new login context, providing back its identifier and the URL to
+send back to the client, redirecting them to the identity provider
+endpoint with the correct parameters.
+
+The login context is saved for later processing and it's set to last for
+L</request_ttl> seconds.
+
+=head2 B<< load_user >>
+
+   my $user = $provider->load_user($ignored, $uid);
+
+Load a user, if present. The interface is compatible with the call done
+by L<MojoX::Authentication::Model>, which in turn implements what
+expected by L<Mojolicious::Plugin::Authentication>.
+
+=head2 B<< logout >>
+
+   $provider->logout($controller, $user);
+
+Do the logout. It's currently just a thin wrapper around the C<logout>
+provided by L<Mojolicious::Plugin::Authentication> but it should be
+enhanced in the future to support proper remote logout.
+
+=head2 B<< name >>
+
+   my $string = $provider->name;
+
+Accessor to the name of the provider.
+
+=head2 B<< parse_assertion >>
+
+   $provider->parse_assertion($request_id, $response);
+
+Parse an incoming C<$response>, arguably associated to an ongoing
+request with identifier C<$request_id>. In case the parsing is
+successful, the user is considered logged in and saved in the case for
+L</user_ttl> seconds.
+
+=head2 B<< remaps >>
+
+   my $aref = $provider->remaps;
+
+Array holding the mappings applied by L</normalize_user> over the passed
+C<$user> hashref.
+
+Items in the array can be:
+
+=over
+
+=item *
+
+code reference: the sub is called passing the user hashref to be
+normalized.
+
+=item *
+
+hash reference: all key/value pairs are iterated. Each key is
+interpreted as a key to be found in the user hashref (it is skipped if
+not present) and the corresponding value a target key. As an example:
+
+   user hashref   { foo => 'hello!', bar => 'not for much...' }
+
+   mapping        { bar => 'foo' }
+
+   { foo => 'bar' }
+
+looks for key C<foo> in the user hashref and, if found, sets the same
+value for key C<bar> in the same hashref.
+
+=back
+
+
+=head2 B<< request_ttl >>
+
+   my $secs = $provider->request_ttl;
+
+Accessor for the time-to-live related to caching of request identifiers.
+When a request is received past this time-to-live, it is considered
+expired.
+
+=head2 B<< sig_hash >>
+
+   my $string = $provider->sig_hash;
+
+Accessor for the string holding the signature hashing function to be
+used. Defaults to C<undef>, which means that none will be set in
+L</idp_login>.
+
+=head2 B<< sp_configuration >>
+
+   my $cfg = $provider->sp_configuration;
+
+Accessor for the Service Provider configuration (hash reference). It is
+supposed to contain the following keys:
+
+=over
+
+=item *
+
+C<identifier>: the value set as the C<issuer> in L</idp_login>.
+
+=item *
+
+C<key>: the private key of the Service Provider, used to sign the
+redirect. It's the path to a file.
+
+=item *
+
+C<sso-post-url-override>: the URL to pass as parameter C<assertion_url>
+when building the request in L</idp_login>.
+
+=back
+
+=head2 B<< user_key >>
+
+   my $key = $provider->user_key;
+
+Accessor to the key that is set in the user's data with the user
+identifier.
+
+=head2 B<< user_ttl >>
+
+   my $secs = $provider->user_ttl;
+
+The time-to-live of the cached user when it is correctly parsed. After
+this, there will be the need to perform a new interaction with the
+Identity Provider.
+
+=head2 B<< username_validator >>
+
+   my $sub = $provider->username_validator;
+
+Accessor for the username validation function. This is wrapped by
+L</handles_username> behind the scenes, so it should be set to some
+validation mechanism that allows figuring out if the specific SAML2
+Identity Provider is the right one for the username.
+
+=head2 B<< validate_user >>
+
+   my $uid = $provider->validate_user($ctr, $user, $secret, $extra);
+
+Do the user validation, compatibly with
+L<Mojolicious::Plugin::Authentication>.
+   
+
+=head2 B<< wipe_user >>
+
+   $provider->wipe_user($user);
+
+Remove the user from the cache.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

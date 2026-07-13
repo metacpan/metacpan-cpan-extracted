@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::List;
-$OpenSearch::Client::Core::3_0::Direct::List::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::List::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::List>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<GET /_list>
 
 =back
 
+I<Method added in OpenSearch version 2.18>
+
+
     $resp = $client->list->help(
         
          # Common API query string parameters
@@ -108,6 +111,9 @@ C<GET /_list/indices>
 C<GET /_list/indices/{index}>
 
 =back
+
+I<Method added in OpenSearch version 2.18>
+
 
     $resp = $client->list->indices(
         
@@ -162,6 +168,9 @@ C<GET /_list/shards/{index}>
 
 =back
 
+I<Method added in OpenSearch version 2.18>
+
+
     $resp = $client->list->shards(
         
          # path parameters
@@ -194,6 +203,19 @@ C<GET /_list/shards/{index}>
     );
 
 L<OpenSearch documentation for list-E<gt>shards|https://opensearch.org/docs/latest/api-reference/list/list-shards/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->list->method_supported_in_version(
+        method  => 'help',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SnapshotManagement;
-$OpenSearch::Client::Core::3_0::Direct::SnapshotManagement::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::SnapshotManagement::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SnapshotManagement>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_plugins/_sm/policies/{policy_name}>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->sm->create_policy(
         
         'body'         =>  $body,      # optional
@@ -112,6 +115,9 @@ C<DELETE /_plugins/_sm/policies/{policy_name}>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->sm->delete_policy(
         
          # path parameters
@@ -142,6 +148,9 @@ C<GET /_plugins/_sm/policies/{policy_name}/_explain>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->sm->explain_policy(
         
          # path parameters
@@ -171,6 +180,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_sm/policies>
 
 =back
+
+I<Method added in OpenSearch version 2.1>
+
 
     $resp = $client->sm->get_policies(
         
@@ -206,6 +218,9 @@ C<GET /_plugins/_sm/policies/{policy_name}>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->sm->get_policy(
         
          # path parameters
@@ -235,6 +250,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_sm/policies/{policy_name}/_start>
 
 =back
+
+I<Method added in OpenSearch version 2.1>
+
 
     $resp = $client->sm->start_policy(
         
@@ -266,6 +284,9 @@ C<POST /_plugins/_sm/policies/{policy_name}/_stop>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->sm->stop_policy(
         
          # path parameters
@@ -296,6 +317,9 @@ C<PUT /_plugins/_sm/policies/{policy_name}>
 
 =back
 
+I<Method added in OpenSearch version 2.1>
+
+
     $resp = $client->sm->update_policy(
         
         'body'             =>  $body,      # optional
@@ -319,6 +343,19 @@ C<PUT /_plugins/_sm/policies/{policy_name}>
     );
 
 L<OpenSearch documentation for sm-E<gt>update_policy|https://docs.opensearch.org/latest/tuning-your-cluster/availability-and-recovery/snapshots/sm-api/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->sm->method_supported_in_version(
+        method  => 'create_policy',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

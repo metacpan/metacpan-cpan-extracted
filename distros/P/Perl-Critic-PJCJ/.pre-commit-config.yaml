@@ -2,21 +2,34 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
+fail_fast: false  # Allow all checks to run even if one fails
+
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+  - prepare-commit-msg
+default_stages: [ pre-commit ]  # Unmarked hooks run at commit stage only
+minimum_pre_commit_version: "2.18.0"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
         args: [ --maxkb=600 ]
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-json
+      - id: check-shebang-scripts-are-executable
+        # Test files have shebangs by convention but the harness runs them
+        exclude: \.t$
       - id: check-merge-conflict
       - id: check-symlinks
       - id: check-toml
       - id: check-vcs-permalinks
       - id: check-xml
-        exclude: ^dev/Makefile\.targets$  # no idea why it thinks this is xml
+        # .targets is an MSBuild XML extension, but ours is a Makefile
+        exclude: ^dev/Makefile\.targets$
       - id: check-yaml
       - id: destroyed-symlinks
       - id: detect-private-key
@@ -33,67 +46,95 @@ repos:
     rev: 3.0.0
     hooks:
       - id: forbid-binary
-      - id: git-check    # configure in .gitattributes
-      - id: protect-first-parent
+        exclude: |
+          (?x)(
+            \.png$  |
+            \.ico$
+          )
+      - id: git-check    # Configure in .gitattributes
       - id: script-must-have-extension
       - id: script-must-not-have-extension
+      # Shell/bash scripts, detected by type and shebang
       - id: shellcheck
         args: [ -a ]
       - id: shfmt
-        args: [ -w -i 2 -s -d ]
+        args: [ -w, -i, "2", -s, -d ]
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.37.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
-        args: [ --config-file=.yamllint ]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
+    rev: v0.49.0
     hooks:
       - id: markdownlint
 
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.13.1-beta
+    rev: v2.14.0
     hooks:
       - id: hadolint
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1
+    rev: v1.48.0
     hooks:
       - id: typos
         args: [ --force-exclude ]
 
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.22
+    rev: 1.0.0
     hooks:
       - id: mdformat
         args: [ --number ]
         additional_dependencies:
           - mdformat-gfm
           - mdformat-frontmatter
-
-  - repo: https://github.com/golangci/misspell
-    rev: v0.7.0
-    hooks:
-      - id: misspell
-        # The hook will run on all files by default.
-        # To limit to some files only, use pre-commit patterns/types
-        # files: <pattern>
-        # exclude: <pattern>
-        # types: <types>
+          - mdformat-wikilink
 
   - repo: local
     hooks:
+      # perl-hook selects Perl files itself, by extension or shebang, so
+      # coverage doesn't depend on paths or the executable bit.
+      - id: perltidy-check
+        name: perltidy (check only)
+        description: Check Perl files are formatted with perltidy
+        language: system
+        entry: utils/perl-hook tidy
+        types: [ text ]
+
       - id: perlcritic
         name: perlcritic
-        description: Ensure perl files adhere to standards
-        language: perl
-        entry: perl -Ilib -S perlcritic lib t dev
-        pass_filenames: false
+        description: Check Perl files with perlcritic
+        language: system
+        entry: utils/perl-hook critic
+        types: [ text ]
+
       - id: jscpd
         name: Check for duplicated code
         description: Ensure we don't have large sections of duplicated code
         language: node
         entry: jscpd
-        pass_filenames: true
+        pass_filenames: false
+        additional_dependencies:
+          - jscpd@5.0.11
+
+      - id: fmt-commit-msg
+        name: reflow commit message
+        description: Reflow the commit message body to 72 columns
+        language: system
+        entry: utils/fmt-commit-msg
+        stages: [ commit-msg ]
+
+      - id: commit-msg
+        name: commit message style
+        description: Check the commit message against house style
+        language: system
+        entry: utils/commit-msg-hook
+        stages: [ commit-msg ]
+
+      - id: prepare-commit-msg
+        name: prepare commit message
+        description: Insert the ticket reference and hints
+        language: system
+        entry: utils/prepare-commit-msg-hook
+        stages: [ prepare-commit-msg ]

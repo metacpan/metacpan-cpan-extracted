@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+  <div class="container">
+
+    <a class="navbar-brand" href="/">
+      Fondation
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMain">
+
+      <!-- Left -->
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">
+            %= l('Home')
+          </a>
+
+        </li>
+        % if ($c->has_helper('render_menu')) {
+          %== $c->render_menu('left_menu')
+        % }
+      </ul>
+
+      <!-- Right -->
+      <ul class="navbar-nav ms-auto">
+
+        % if ($c->has_helper('render_menu')) {
+          %== $c->render_menu('admin_menu')
+        % }
+
+        % if ($c->has_helper('render_menu')) {
+          %== $c->render_menu('devel_menu')
+        % }
+
+        % if ($c->has_helper('render_menu')) {
+          %== $c->render_menu('account_menu')
+        % }
+
+      </ul>
+
+    </div>
+
+  </div>
+</nav>

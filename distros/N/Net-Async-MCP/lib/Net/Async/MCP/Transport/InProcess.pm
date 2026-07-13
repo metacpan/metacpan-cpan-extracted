@@ -1,10 +1,10 @@
 package Net::Async::MCP::Transport::InProcess;
 # ABSTRACT: In-process MCP transport via direct MCP::Server calls
-our $VERSION = '0.002';
 use strict;
 use warnings;
 
 use Future;
+use MCP::Server::Context;
 use Scalar::Util qw( blessed );
 use Carp qw( croak );
 
@@ -30,7 +30,7 @@ sub send_request {
     defined $params ? ( params => $params ) : (),
   };
 
-  my $response = $self->{server}->handle($request, {});
+  my $response = $self->{server}->handle($request, MCP::Server::Context->new);
 
   # Handle Mojo::Promise from async MCP tools
   if (blessed($response) && $response->isa('Mojo::Promise')) {
@@ -56,7 +56,7 @@ sub send_notification {
     defined $params ? ( params => $params ) : (),
   };
 
-  $self->{server}->handle($request, {});
+  $self->{server}->handle($request, MCP::Server::Context->new);
   return Future->done;
 }
 
@@ -93,7 +93,7 @@ Net::Async::MCP::Transport::InProcess - In-process MCP transport via direct MCP:
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -114,8 +114,10 @@ version 0.002
 
 L<Net::Async::MCP::Transport::InProcess> provides direct in-process
 communication with an L<MCP::Server> instance. It calls C<handle()>
-directly on the server object, making it the most efficient transport for
-Perl-based MCP servers running in the same process.
+directly on the server object, passing a fresh L<MCP::Server::Context> with
+each request, making it the most efficient transport for Perl-based MCP
+servers running in the same process. The context carries no scopes, so
+L<MCP::Server>'s OAuth scope checks impose no restriction for this transport.
 
 If a tool returns a L<Mojo::Promise> (from an async MCP server
 implementation), the promise is resolved synchronously via C<wait()>. For
@@ -133,7 +135,8 @@ constructed with a C<server> argument.
 
 Constructs a new in-process transport. Requires a C<server> argument which
 must be an L<MCP::Server> instance (or any object with a C<handle> method
-that accepts a JSON-RPC request hashref).
+that accepts a JSON-RPC request hashref and an L<MCP::Server::Context>
+instance).
 
 =head2 send_request
 
@@ -168,6 +171,8 @@ connection to close. Returns an immediately resolved L<Future>.
 
 =item * L<MCP::Server> - The MCP server this transport communicates with
 
+=item * L<MCP::Server::Context> - Per-request context passed to C<handle()>
+
 =back
 
 =head1 SUPPORT
@@ -183,11 +188,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

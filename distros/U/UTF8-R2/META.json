@@ -1,9 +1,9 @@
 {
     "name" : "UTF8-R2",
-    "version" : "0.30",
+    "version" : "0.31",
     "abstract" : "makes UTF-8 scripting easy for enterprise use",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
     "generated_by" : "pmake.bat",
@@ -61,7 +61,7 @@
     "provides" : {
         "UTF8::R2" : {
             "file" : "lib/UTF8/R2.pm",
-            "version" : "0.30"
+            "version" : "0.31"
         }
     }
 }

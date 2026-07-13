@@ -23,9 +23,9 @@ sub build_app {
     my $tmpdir = tempdir(CLEANUP => 1);
     my $app    = create_fondation_app($tmpdir, {
         dependencies => [
-            ['Fondation::TestInit'    => { share_dir => "$FindBin::Bin/share/fondation/test_init" }],
-            ['Fondation::TestUpgrade' => { share_dir => "$FindBin::Bin/share/fondation/test_upgrade" }],
-            ['Fondation::TestClean'   => { share_dir => "$FindBin::Bin/share/fondation/test_clean" }],
+            {'Fondation::TestInit'    => { share_dir => "$FindBin::Bin/share/fondation/test_init" }},
+            {'Fondation::TestUpgrade' => { share_dir => "$FindBin::Bin/share/fondation/test_upgrade" }},
+            {'Fondation::TestClean'   => { share_dir => "$FindBin::Bin/share/fondation/test_clean" }},
         ],
     });
     return $app;
@@ -138,8 +138,8 @@ subtest '_run_refresh cleans then inits' => sub {
     my $tmpdir = tempdir(CLEANUP => 1);
     my $app    = create_fondation_app($tmpdir, {
         dependencies => [
-            ['Fondation::TestClean' => { share_dir => "$FindBin::Bin/share/fondation/test_clean" }],
-            ['Fondation::TestInit'  => { share_dir => "$FindBin::Bin/share/fondation/test_init" }],
+            {'Fondation::TestClean' => { share_dir => "$FindBin::Bin/share/fondation/test_clean" }},
+            {'Fondation::TestInit'  => { share_dir => "$FindBin::Bin/share/fondation/test_init" }},
         ],
     });
 

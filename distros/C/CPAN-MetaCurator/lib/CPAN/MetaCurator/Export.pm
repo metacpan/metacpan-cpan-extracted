@@ -16,6 +16,7 @@ use HTML::Escape 'escape_html';
 
 use Moo;
 
+use Switch::Declare;
 use Syntax::Keyword::Match;
 
 use Tree::DAG_Node;
@@ -33,7 +34,7 @@ has test_topics_path =>
 our $leaf_id;
 our %seen;
 
-our $VERSION = '1.24';
+our $VERSION = '1.26';
 
 # -----------------------------------------------
 
@@ -86,7 +87,7 @@ sub export_tree
 	{
 		next if (! $wanted{$$topic{title} });
 
-		$self -> logger -> info("Topic: id: $$topic{id}. html_id: $$pad{topic_html_ids}{$$topic{title}}. title: $$topic{title}");
+		$self -> logger -> info("Topic: id: $$topic{id}. html_id: $$pad{topic_names}{$$topic{title}}. title: $$topic{title}");
 
 		$daughter = Tree::DAG_Node -> new({name => $$topic{title}, attributes => {id => ++$leaf_id} });
 
@@ -144,6 +145,31 @@ sub export_tree
 	#
 	# This works. It's nicer.
 	#say map("$_\n", @{$root->tree2string});
+
+	# Scan the tree looking for topics. We stockpile each along with its id.
+
+	my($attributes);
+	my($id);
+	my($name);
+	my($topic, %topic_id_map);
+
+	$root -> walk_down
+	({
+		callbackback => sub
+		{
+			my($node, $options)	= @_;
+			$attributes			= $node -> attributes;
+			$name       		= $node -> name;
+
+			if ($name =~ /^\[Topic/)
+			{
+				$id		= $$attributes{id};
+				$topic	= $1 if ($name =~ />(.+)</);
+
+				say "$topic => $id";
+			}
+		} # End of callbackback.
+	});
 
 	return 0;
 
@@ -220,7 +246,7 @@ sub parse_topic
 	my(%node_type);
 	my(@pre_pre);
 	my($see_also_root, $see_also_1, @see_also);
-	my($token);
+	my($text, $token, $type);
 
 	$inside{pre_pre}	= false;
 	$inside{see_also}	= false;
@@ -298,27 +324,26 @@ sub parse_topic
 
 			if ($inside{see_also})
 			{
-				# Sample from topic AbCeDarian:
-				# It means in abcd order, i.e. alphabetical, so I can put it first in the list of topics :-)
-				# Sample from topic AiEngines:
-				# [[Acronyms]]
+				# Fix me. References to topics can be forward references.
 
-				$$item{text}	= $token;
-				@components		= split(' - ', $token); # [0] may be text or Topic.
-				$components[0]	= $token if ($#components < 0);
-
-				# Must allow for topics AssemblerX86 & UTF8.
-
-				if ($components[0] =~ m/^\[\[([A-Za-z]+\d?\d?)\]\]/)
+				@components	= split(' - ', $token);
+				$text		= ($#components < 1) ? $components[0] : $components[1];
+				$type		= switch ($components[0])
 				{
-					$components[0]	= $1;
-					$$item{text}	= $1;
-				}
+					case /^\[?\[?[A-Za-z]+\d?\d?\]?\]?$/	{'topic'}
+					case /^http/							{'uri'}
+					default									{'text'}
+				};
 
-				$components[0]	= '' if ($components[0] !~ m/^[A-Za-z]+\d{0,2}$/);
-				$is_topic		= $$pad{topic_names}{$components[0]}; # Defined => it's a topic.
-				$$item{text}	= "[Topic] $$item{text}" if ($is_topic && ($$item{text} !~ m/^http/) );
-				$$item{text}	= $token if ($token =~ /^http/);
+				match ($type : eq)
+				{
+					case('topic')	{
+										$$item{text} = ($components[0] =~ /^\[?\[?([A-Za-z]+\d?\d?)\]?\]?$/) ? $1 : $components[0];
+										$$item{text} = "[Topic] <button class='btn btn-info'>$$item{text}</button>"
+									}
+					case('uri')		{$$item{text} = "<a href = '" . escape_html($components[0]) . "' target = '_blank'>$text</a>"}
+					case('text')	{$$item{text} = $token}
+				}
 
 				push@see_also, $item;
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation;
-$Mojolicious::Plugin::Fondation::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::VERSION = '0.04';
 # ABSTRACT: Hierarchical plugin loader with configuration priority and resource sharing
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -7,6 +7,7 @@ use Mojolicious::Plugin::Fondation::Resolver;
 use Mojolicious::Plugin::Fondation::Manager;
 use Mojolicious::Plugin::Fondation::API;
 use Mojolicious::Plugin::Fondation::Helpers;
+use Mojo::Util;
 use Mojolicious::Plugin::Fondation::Utils qw(merge short_name find_share_dir);
 
 sub register ($self, $app, $config = {}) {
@@ -21,17 +22,26 @@ sub register ($self, $app, $config = {}) {
         config => $merged_config,
     );
 
-    # API shares the Manager's registry -- no circular ref
+    # API shares the Manager's registry and load_order -- no circular ref
     $manager->{api} = Mojolicious::Plugin::Fondation::API->new(
-        registry => $manager->registry,
+        registry   => $manager->registry,
+        load_order => $manager->load_order,
     );
-
-    # ── Register all helpers (fallbacks + real) BEFORE plugin discovery ──
-    Mojolicious::Plugin::Fondation::Helpers->register($app, $manager);
 
     # ── Register command namespace ──
     push @{$app->commands->namespaces},
         'Mojolicious::Plugin::Fondation::Command';
+
+    # ── Install helper wrapper: first to register wins ──
+    # During plugin loading, $app->helper won't overwrite a helper already
+    # registered by a dependency (loaded earlier).  Fondation's own helpers
+    # are registered last, so they only take effect when no plugin provides
+    # an alternative — true fallbacks.
+    my $original_helper = $app->can('helper');
+    Mojo::Util::monkey_patch(ref($app), helper => sub ($self, $name, $sub) {
+        return if exists $self->renderer->helpers->{$name};
+        $original_helper->($self, $name, $sub);
+    });
 
     # ── Resolve the full dependency graph (with cycle detection) ──
     my $resolver = Mojolicious::Plugin::Fondation::Resolver->new(app => $app);
@@ -42,7 +52,7 @@ sub register ($self, $app, $config = {}) {
     $manager->registry->{'Mojolicious::Plugin::Fondation'} = {
         instance       => $self,
         short_name     => $short,
-        share_dir      => find_share_dir('Mojolicious::Plugin::Fondation'),
+        share_dir      => find_share_dir('Mojolicious::Plugin::Fondation', $merged_config->{share_dir}),
         config         => $merged_config,
         loaded_at      => time,
         metadata       => { has_templates => 0, has_assets => 0 },
@@ -54,6 +64,20 @@ sub register ($self, $app, $config = {}) {
 
     # ── Instantiate all plugins in resolved order ──
     $manager->load_all($sorted);
+
+    # ── Move Fondation to end of load_order ──
+    # All other plugins' templates/controllers/static are now ahead of
+    # Fondation's, and their helpers have been registered (first wins).
+    # Fondation's helpers only take effect when no plugin provided them.
+    my @reordered = grep { $_ ne 'Mojolicious::Plugin::Fondation' } @{$manager->load_order};
+    push @reordered, 'Mojolicious::Plugin::Fondation';
+    $manager->{load_order} = \@reordered;
+
+    # ── Register Fondation helpers as true fallbacks ──
+    Mojolicious::Plugin::Fondation::Helpers->register($app, $manager);
+
+    # ── Restore original helper method ──
+    Mojo::Util::monkey_patch(ref($app), helper => $original_helper);
 
     # ── Post-load actions and finalyze ──
     $manager->run_post_load_actions();
@@ -86,7 +110,7 @@ Mojolicious::Plugin::Fondation - Hierarchical plugin loader with configuration p
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -421,6 +445,8 @@ All Fondation-aware plugins must define a class method C<fondation_meta>:
         return {
             dependencies     => ['XXX', 'YYY'],   # loaded before this plugin
             provides_actions => ['MyAction'],       # optional custom action
+            before           => ['ZZZ'],            # soft: load this plugin before ZZZ
+            after            => ['WWW'],            # soft: load this plugin after WWW
             defaults         => {
                 title => 'Default Title',
             },
@@ -432,6 +458,12 @@ All Fondation-aware plugins must define a class method C<fondation_meta>:
 =item * C<dependencies> -> array of plugin names to load first
 
 =item * C<provides_actions> -> optional array of custom action short names
+
+=item * C<before> -> soft ordering: this plugin loads B<before> the listed plugins.
+Silently ignored when the target is not in the graph.
+
+=item * C<after> -> soft ordering: this plugin loads B<after> the listed plugins.
+Silently ignored when the target is not in the graph.
 
 =item * C<defaults> -> fallback configuration values (lowest priority)
 

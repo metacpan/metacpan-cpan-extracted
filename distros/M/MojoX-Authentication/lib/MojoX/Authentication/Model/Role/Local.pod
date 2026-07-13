@@ -1,0 +1,76 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::Role::Local;
+
+
+=head1 SYNOPSIS
+
+   package Some::Class;
+   use Moo;
+   with 'MojoX::Authentication::Model::Role::Local';
+   sub load_user_by_name ($self, $controller, $name) { ... }
+   ...
+
+=head1 DESCRIPTION
+
+Role to manage local accounts, ensuring the usage of
+L<Crypt::Passphrase> compatible ways of managing secrets.
+
+This role I<demands> that the class implements method
+C<load_user_by_name> with the following signature:
+
+   sub load_user_by_name ($self, $controller, $name);
+
+where C<$controller> is a L<Mojolicious::Controller> compatible class.
+The return value from this method B<MUST> be a hash reference holding
+the secret associated to the user identified by C<$name> in the value
+corresponding to key C<secret>; this value is supposed to be a valid
+value previously hashed with L<Crypt::Passphrase> or anything compatible
+with it.
+
+=head1 INTERFACE
+
+=head2 B<< crypt_passphrase >>
+
+   my $cp = $provider->crypt_passphrase;
+
+Accessor for the L<Crypt::Passphrase> object passed during construction.
+
+=head2 B<< handles_username >>
+
+   my $bool = $provider->handles_username($controller, $username);
+
+Returns a true value if the provider handles the provided username,
+false otherwise. Useful to figure out what provider supports a username.
+
+=head2 B<< hash_secret >>
+
+   my $hashed = $provider->hash_secret($secret);
+
+Wrapper for C<< $provider->crypt_passphrase->hash_password($secret) >>.
+
+=head2 B<< validate_user >>
+
+   my $uid = $provider->validate_user($controller, $name, $secret, $extra);
+
+Validate the user identified by C<$name> against the provided
+C<$secret>. Parameter C<$extra> is ignored and only present to support
+the right signature.
+
+This method calls method C<load_user_by_name> that must be provided by
+the class compositing the role.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

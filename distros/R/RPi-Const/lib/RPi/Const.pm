@@ -3,7 +3,7 @@ package RPi::Const;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 require Exporter;
 use base qw( Exporter );
@@ -113,7 +113,7 @@ use constant {
     ON => 1,
     OFF => 0,
 };
-       
+
 { # state
 
     my @const = qw(
@@ -133,7 +133,7 @@ use constant {
     EDGE_RISING => 2,
     EDGE_BOTH   => 3,
 };
-       
+
 { # interrupt
 
     my @const = qw(
@@ -302,6 +302,19 @@ use constant {
     $EXPORT_TAGS{int_edge} = \@const;
 }
 
+use constant {
+    WIRINGPI_MIN_VERSION => '3.18',
+};
+
+{ # wiringPi requirements
+    my @const = qw(
+        WIRINGPI_MIN_VERSION
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{wiringpi} = \@const;
+}
+
 sub _vim{1;};
 1;
 __END__
@@ -430,7 +443,7 @@ Hardware register locations and related info for the MCP23107 GPIO Expander
     MCP23017_GPIOB      => 0x13,
     MCP23017_OLATA      => 0x14,
     MCP23017_OLATB      => 0x15,
-    
+
     MCP23017_INPUT      => 1,
     MCP23017_OUTPUT     => 0
 
@@ -468,6 +481,18 @@ wiringPi's own C<INT_EDGE_*> C<#define>s). Same values as the C<:interrupt>
     INT_EDGE_FALLING => 1,
     INT_EDGE_RISING  => 2,
     INT_EDGE_BOTH    => 3,
+
+=head2 :wiringpi
+
+Requirements for the wiringPi library itself. C<WIRINGPI_MIN_VERSION> is the
+canonical minimum wiringPi version for the entire RPi:: distribution family;
+every distribution that links wiringPi consumes it in its C<Makefile.PL>
+version check and references it in its documentation (see C<REQ.md> in this
+distribution's repository for the complete list of consuming files). Note
+that wiringPi minor versions are integers - 3.8 is I<older> than 3.18 -
+so compare accordingly.
+
+    WIRINGPI_MIN_VERSION => '3.18',
 
 =head1 AUTHOR
 

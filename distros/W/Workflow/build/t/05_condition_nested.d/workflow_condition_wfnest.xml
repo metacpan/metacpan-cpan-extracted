@@ -1,0 +1,52 @@
+
+<conditions>
+
+    <!-- Generic nested conditions used in the tests -->
+
+    <condition name="always_true" class="Workflow::Condition::Evaluate">
+        <param name="test" value="1"/>
+    </condition>
+
+    <condition name="always_true_2" class="Workflow::Condition::Evaluate">
+        <param name="test" value="1"/>
+    </condition>
+
+    <condition name="always_false" class="Workflow::Condition::Evaluate">
+        <param name="test" value="return 0"/>
+    </condition>
+
+    <condition name="always_false_2" class="Workflow::Condition::Evaluate">
+        <param name="test" value="return 0"/>
+    </condition>
+
+    <!-- Conditions for Workflow::Condition::LazyAND -->
+
+    <!-- this should evaluate to 'false' -->
+    <condition name="lazy_and_1" class="Workflow::Condition::LazyAND">
+        <param name="condition1" value="always_true"/>
+        <param name="condition2" value="always_false"/>
+        <param name="condition3" value="always_true_2"/>
+    </condition>
+
+    <!-- this should evaluate to 'true' -->
+    <condition name="lazy_and_2" class="Workflow::Condition::LazyAND">
+        <param name="condition1" value="always_true"/>
+        <param name="condition3" value="always_true_2"/>
+    </condition>
+
+    <!-- Conditions for Workflow::Condition::LazyOR -->
+
+    <!-- this should evaluate to 'false' -->
+    <condition name="lazy_or_1" class="Workflow::Condition::LazyOR">
+        <param name="condition1" value="always_false"/>
+        <param name="condition2" value="always_false_2"/>
+    </condition>
+
+    <!-- this should evaluate to 'true' -->
+    <condition name="lazy_or_2" class="Workflow::Condition::LazyOR">
+        <param name="condition1" value="always_false"/>
+        <param name="condition2" value="always_true"/>
+        <param name="condition3" value="always_false_2"/>
+    </condition>
+
+</conditions>

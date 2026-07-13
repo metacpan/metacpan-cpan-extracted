@@ -1,0 +1,46 @@
+From: CPANSec Security Scanner Bot <cpan-security@security.metacpan.org>
+Subject: [PATCH] Crypt::OpenSSL::X509: fix hv_exts heap OOB-read on long-OID extensions
+
+hv_exts() allocated a fixed 128-byte buffer and passed OBJ_obj2txt()'s
+return value (the FULL required OID-text length, not bytes written) to
+hv_store() as the key length, so an extension OID stringifying to more
+than 128 bytes made hv_store() read past the allocation. Query the
+required length first, allocate exactly, then format: no over-read and
+the full OID is preserved. Also frees the per-iteration key buffer.
+
+--- a/X509.xs	2026-06-25 07:02:03.000000000 +0000
++++ b/X509.xs	2026-06-29 06:30:27.802389779 +0000
+@@ -284,8 +284,19 @@
+ 
+     if (no_name == 0 || no_name == 1) {
+ 
+-       key = malloc(sizeof(char) * (len + 1)); /*FIXME will it leak?*/
+-       r = OBJ_obj2txt(key, len, X509_EXTENSION_get_object(ext), no_name);
++       /* OBJ_obj2txt() returns the FULL length the textual OID needs,
++          regardless of the buffer size it is given -- it does NOT return
++          the number of bytes written. The previous code passed a fixed
++          128-byte buffer and then handed that return value to hv_store()
++          as the key length, so an OID stringifying to more than 128 bytes
++          made hv_store() read past the allocation (heap OOB read). Query
++          the required length first, allocate exactly that, then format:
++          no truncation, no over-read. */
++       r = OBJ_obj2txt(NULL, 0, X509_EXTENSION_get_object(ext), no_name);
++       if (r < 0) r = 0;
++       key = malloc(sizeof(char) * ((size_t)r + 1));
++       if (key == NULL) croak("malloc failed for extension key\n");
++       r = OBJ_obj2txt(key, r + 1, X509_EXTENSION_get_object(ext), no_name);
+        ckey = key;
+ 
+     } else if (no_name == 2) {
+@@ -295,6 +306,10 @@
+     }
+ 
+     if (! hv_store(RETVAL, ckey, r, rv, 0) ) croak("Error storing extension in hash\n");
++
++    /* free the per-iteration key buffer (addresses the FIXME above): the
++       hash has copied the key bytes, so our allocation can be released. */
++    if (key != NULL) { free(key); key = NULL; }
+   }
+ 
+   return RETVAL;
+

@@ -5,16 +5,20 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perl/Critic/PJCJ.pm',
+    'Perl/Critic/PJCJ/Fixer.pm',
+    'Perl/Critic/PJCJ/Violation.pm',
     'Perl/Critic/Policy/CodeLayout/ProhibitLongLines.pm',
     'Perl/Critic/Policy/ValuesAndExpressions/RequireConsistentQuoting.pm',
     'Perl/Critic/Utils/SourceLocation.pm'
 );
 
-
+my @scripts = (
+    'script/perl-quote-fix'
+);
 
 # no fake home requested
 
@@ -53,6 +57,41 @@ for my $lib (@module_files)
         push @warnings, @_warnings;
     }
 }
+
+foreach my $file (@scripts)
+{ SKIP: {
+    open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
+    my $line = <$fh>;
+
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*(?:env )?perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    @switches = (@switches, split(' ', $1)) if $1;
+
+    close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
+        if grep $_ eq '-T', @switches and $ENV{PERL5LIB};
+
+    my $stderr = IO::Handle->new;
+
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
+    binmode $stderr, ':crlf' if $^O eq 'MSWin32';
+    my @_warnings = <$stderr>;
+    waitpid($pid, 0);
+    is($?, 0, "$file compiled ok");
+
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { +require blib; blib->VERSION('1.01') };
+
+    # in older perls, -c output is simply the file portion of the path being tested
+    if (@_warnings = grep !/\bsyntax OK$/,
+        grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
+    {
+        warn @_warnings;
+        push @warnings, @_warnings;
+    }
+} }
 
 
 

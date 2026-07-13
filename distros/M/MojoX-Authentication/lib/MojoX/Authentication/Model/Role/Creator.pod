@@ -1,0 +1,51 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::Role::Creator;
+
+
+=head1 SYNOPSIS
+
+   package Some::Class;
+   use Moo;
+   use constant DEFAULT_NAME => 'foobar';
+   with 'MojoX::Authentication::Model::Role::Creator';
+   sub create ($self, $config, %args) {
+      %args = $self->_create_args(DEFAULT_NAME, $config, %args);
+      ...
+   }
+   ...
+
+=head1 DESCRIPTION
+
+Role to ease merging of C<$config> into C<%args>, preserving the C<name>
+key if present or using a default. There is only a private method
+C<_create_args> that is supposed to be called inside the C<create>
+method of relevant classes, so it's only of interest for anybody
+implementing new providers.
+
+=head1 INTERFACE
+
+=head2 B<< _create_args >>
+
+   %args = $provider->_create_args($default_name, $config, %args);
+
+This method is assumed to be called inside the C<create> method for one
+of the provider implementations. See
+L<MojoX::Authentication::Model::Hash> for an example of usage.
+
+This is a private method and it's not meant to be called by clients of
+the object.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

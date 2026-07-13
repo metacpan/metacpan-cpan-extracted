@@ -27,7 +27,7 @@ subtest 'render_zone renders HTML template from plugin extension dir' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
 
@@ -46,7 +46,7 @@ subtest 'render_zone returns empty string for unknown zone' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
 
@@ -66,11 +66,11 @@ subtest 'render_zone collects from multiple plugins in load order' => sub {
     # User is loaded first, then Authorization → Role (dependency)
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }],
+            {'Fondation::User' => { share_dir => $user_share_dir }},
             {
                 'Fondation::Authorization' => {
                     dependencies => [
-                        ['Fondation::Role', { share_dir => $role_share_dir }],
+                        {'Fondation::Role' => { share_dir => $role_share_dir }},
                     ],
                 }
             }
@@ -104,7 +104,7 @@ subtest 'render_zone_js returns JS content' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
 
@@ -123,7 +123,7 @@ subtest 'render_zone_js returns empty for unknown zone' => sub {
 
     $app->plugin('Fondation' => {
         dependencies => [
-            ['Fondation::User', { share_dir => $user_share_dir }]
+            {'Fondation::User' => { share_dir => $user_share_dir }}
         ]
     });
 

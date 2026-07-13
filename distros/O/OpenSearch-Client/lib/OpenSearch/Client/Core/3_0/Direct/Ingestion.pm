@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Ingestion;
-$OpenSearch::Client::Core::3_0::Direct::Ingestion::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Ingestion::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Ingestion>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<GET /{index}/ingestion/_state>
 
 =back
+
+I<Method added in OpenSearch version 3.1>
+
 
     $resp = $client->ingestion->get_state(
         
@@ -116,6 +119,9 @@ C<POST /{index}/ingestion/_pause>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->ingestion->pause(
         
          # path parameters
@@ -151,6 +157,9 @@ C<POST /{index}/ingestion/_resume>
 
 =back
 
+I<Method added in OpenSearch version 3.1>
+
+
     $resp = $client->ingestion->resume(
         
         'body'                     =>  $body,      # optional
@@ -174,6 +183,19 @@ C<POST /{index}/ingestion/_resume>
     );
 
 L<OpenSearch documentation for ingestion-E<gt>resume|https://docs.opensearch.org/docs/latest/api-reference/document-apis/pull-based-ingestion-management/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->ingestion->method_supported_in_version(
+        method  => 'get_state',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

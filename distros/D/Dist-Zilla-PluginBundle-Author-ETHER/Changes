@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.173     2026-07-13 01:46:12Z
+          - add the release notes to the release tag message
+          - now including a blurb about my $VERSION format in generated pod
+
 0.172     2026-03-19 17:15:05Z
           - updates to CONTRIBUTING for AI contribution guidelines
 

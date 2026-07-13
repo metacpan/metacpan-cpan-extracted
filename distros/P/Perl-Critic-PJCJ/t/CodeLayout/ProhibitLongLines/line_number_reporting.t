@@ -55,6 +55,23 @@ EOCODE
   # Also check the exact message
   is $violations[0]->description, "Line is 73 characters long (exceeds 72)",
     "POD violation has exact expected message";
+  is $violations[0]->column_number, 1, "POD violation anchors at column 1";
+};
+
+subtest "violations anchor at the start of the line" => sub {
+  my $long = 'my $long_variable = "' . ("y" x 60) . '";';
+  my @v    = find_violations($Policy, "my \$x = 1;\n$long\n");
+  is scalar @v,            1, "one violation";
+  is $v[0]->line_number,   2, "correct line";
+  is $v[0]->column_number, 1, "column is the start of the line";
+  like $v[0]->source, qr/\Q$long\E/, "source shows the offending line";
+
+  my $indented = "if (1) {\n  $long\n}\n";
+  @v = find_violations($Policy, $indented);
+  is scalar @v,            1, "one violation in indented code";
+  is $v[0]->column_number, 1, "indented line also anchors at column 1";
+  like $v[0]->source, qr/\Q$long\E/,
+    "source shows the indented offending line";
 };
 
 subtest "Mixed POD and code violations" => sub {
@@ -74,8 +91,8 @@ EOCODE
 
   my @violations = line_numbers(
     $mixed_code,
-    [ 2, 7, 11 ],
-    "Mixed code and POD violations should report correct line numbers"
+    [2, 7, 11],
+    "Mixed code and POD violations should report correct line numbers",
   );
 
   # Check specific messages
@@ -109,9 +126,8 @@ my $end = 3;
 EOCODE
 
   line_numbers(
-    $multi_pod_code,
-    [ 5, 13 ],
-    "Multiple POD sections should report correct line numbers"
+    $multi_pod_code, [5, 13],
+    "Multiple POD sections should report correct line numbers",
   );
 };
 
@@ -129,8 +145,8 @@ EOCODE
 
   my @violations = line_numbers(
     $pod_with_code,
-    [ 5, 6 ],
-    "Long lines within POD code examples should report correct line numbers"
+    [5, 6],
+    "Long lines within POD code examples should report correct line numbers",
   );
 
   # Check specific line lengths
@@ -149,7 +165,7 @@ EOCODE
 
   my @violations = line_numbers(
     $comment_code, [2],
-    "Comment long lines should report correct line numbers"
+    "Comment long lines should report correct line numbers",
   );
 
   is $violations[0]->description, "Line is 73 characters long (exceeds 72)",
@@ -169,7 +185,7 @@ EOCODE
 
   my @violations = line_numbers(
     $empty_pod_code, [7],
-    "Code after empty POD should report correct line numbers"
+    "Code after empty POD should report correct line numbers",
   );
 
   is $violations[0]->description, "Line is 80 characters long (exceeds 72)",

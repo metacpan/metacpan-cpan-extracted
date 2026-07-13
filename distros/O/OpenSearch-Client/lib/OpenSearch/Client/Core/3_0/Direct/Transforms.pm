@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Transforms;
-$OpenSearch::Client::Core::3_0::Direct::Transforms::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Transforms::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Transforms>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<DELETE /_plugins/_transform/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->transforms->delete(
         
          # path parameters
@@ -109,6 +112,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_transform/{id}/_explain>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->transforms->explain(
         
@@ -140,6 +146,9 @@ C<GET /_plugins/_transform/{id}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->transforms->get(
         
          # path parameters
@@ -170,6 +179,9 @@ C<POST /_plugins/_transform/_preview>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->transforms->preview(
         
         'body'         =>  $body,      # optional
@@ -197,6 +209,9 @@ I<Paths served by this method:>
 C<PUT /_plugins/_transform/{id}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->transforms->put(
         
@@ -235,6 +250,9 @@ C<GET /_plugins/_transform>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->transforms->search(
         
          # Endpoint specific query string parameters
@@ -269,6 +287,9 @@ C<POST /_plugins/_transform/{id}/_start>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->transforms->start(
         
          # path parameters
@@ -299,6 +320,9 @@ C<POST /_plugins/_transform/{id}/_stop>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->transforms->stop(
         
          # path parameters
@@ -315,6 +339,19 @@ C<POST /_plugins/_transform/{id}/_stop>
     );
 
 L<OpenSearch documentation for transforms-E<gt>stop|https://opensearch.org/docs/latest/im-plugin/index-transforms/transforms-apis/#stop-a-transform-job>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->transforms->method_supported_in_version(
+        method  => 'delete',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

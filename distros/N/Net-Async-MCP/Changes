@@ -1,3 +1,14 @@
+0.003     2026-07-12 20:46:34Z
+  - Fixed InProcess transport to pass a real MCP::Server::Context to
+    handle() instead of a plain hashref, restoring compatibility with
+    MCP::Server >= 0.10 (Context class) and >= 0.11 (OAuth scope checks),
+    which call methods like has_scope on the context for most requests
+  - Added Claude Code house rules (.claude/rules/net-async-mcp-rules.md):
+    engineering discipline, delegation to the net-async-mcp-worker agent,
+    a release-permission gate, a never-act-without-instruction policy for
+    GitHub issues, and pointers to the karr skill (now hardlinked) for
+    internal AI-to-AI coordination
+
 0.002     2026-03-07 05:14:23Z
   - Added HTTP transport for remote MCP servers (Streamable HTTP spec)
   - Improved .gitignore with proper directory patterns, tar.gz, cover_db,

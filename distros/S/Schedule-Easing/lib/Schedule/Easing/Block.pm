@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw/Schedule::Easing::Ease/;
 
-our $VERSION='0.1.4';
+our $VERSION='0.1.5';
 
 sub _default_keys {
 	my ($self)=@_;
@@ -30,18 +30,6 @@ sub new {
 		map {$_=>$opt{$_}} grep {defined($opt{$_})} $class->_default_keys()
 	);
 	return bless(\%self,$class)->validate()->init();
-}
-
-sub validate {
-	my ($self)=@_;
-	$self->SUPER::validate();
-	return $self;
-}
-
-sub init {
-	my ($self)=@_;
-	$self->SUPER::init();
-	return $self;
 }
 
 sub includes {

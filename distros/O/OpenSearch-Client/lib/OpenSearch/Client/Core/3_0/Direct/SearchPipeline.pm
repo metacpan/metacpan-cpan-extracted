@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SearchPipeline;
-$OpenSearch::Client::Core::3_0::Direct::SearchPipeline::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::SearchPipeline::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SearchPipeline>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<DELETE /_search/pipeline/{id}>
 
 =back
+
+I<Method added in OpenSearch version 2.9>
+
 
     $resp = $client->search_pipeline->delete(
         
@@ -118,6 +121,9 @@ C<GET /_search/pipeline/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.9>
+
+
     $resp = $client->search_pipeline->get(
         
          # path parameters
@@ -152,6 +158,9 @@ C<PUT /_search/pipeline/{id}>
 
 =back
 
+I<Method added in OpenSearch version 2.9>
+
+
     $resp = $client->search_pipeline->put(
         
         'body'                     =>  $body,      # optional
@@ -175,6 +184,19 @@ C<PUT /_search/pipeline/{id}>
     );
 
 L<OpenSearch documentation for search_pipeline-E<gt>put|https://opensearch.org/docs/latest/search-plugins/search-pipelines/creating-search-pipeline/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->search_pipeline->method_supported_in_version(
+        method  => 'delete',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

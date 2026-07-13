@@ -13,6 +13,11 @@
       "version" : 2
    },
    "name" : "Perl-Critic-PJCJ",
+   "no_index" : {
+      "directory" : [
+         "utils"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -29,6 +34,7 @@
             "Dist::Zilla::Plugin::Git" : "0",
             "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
             "Perl::Critic" : "0",
+            "Perl::Critic::Community" : "0",
             "Perl::Critic::Moose" : "0",
             "Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice" : "0",
             "Perl::Tidy" : "0",
@@ -43,9 +49,17 @@
       },
       "runtime" : {
          "requires" : {
+            "Cwd" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
             "List::Util" : "1.33",
-            "PPI" : "0",
+            "PPI" : "1.220",
             "Perl::Critic" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
             "perl" : "v5.26.0"
          }
       },
@@ -75,7 +89,7 @@
          "web" : "https://github.com/pjcj/Perl-Critic-PJCJ"
       }
    },
-   "version" : "v0.2.7",
+   "version" : "v0.3.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -182,6 +196,11 @@
             "version" : "2.052"
          },
          {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
+            "version" : "6.037"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "License",
             "version" : "6.037"
@@ -232,6 +251,11 @@
             "version" : "6.037"
          },
          {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "MetaNoIndex",
+            "version" : "6.037"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "MetaResources",
             "version" : "6.037"
@@ -243,8 +267,7 @@
                   "fatal_errors" : 1,
                   "quiet" : 0,
                   "run" : [
-                     "perl dev/append_postamble %d/Makefile.PL && (cd %d && perl Makefile.PL)",
-                     "perl -e \"exit(system('utils/run', 'setup') >> 8) unless $ENV{CI}\""
+                     "perl dev/append_postamble %d/Makefile.PL && (cd %d && perl Makefile.PL)"
                   ],
                   "version" : "0.050"
                }
@@ -267,7 +290,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.54.0",
+                  "git_version" : "2.55.0",
                   "repo_root" : "."
                }
             },
@@ -296,7 +319,7 @@
                   "changelog" : "Changes.md"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.54.0",
+                  "git_version" : "2.55.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -313,12 +336,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.2.7",
+                  "tag" : "v0.3.0",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.54.0",
+                  "git_version" : "2.55.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -338,7 +361,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.54.0",
+                  "git_version" : "2.55.0",
                   "repo_root" : "."
                }
             },

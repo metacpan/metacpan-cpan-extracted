@@ -23,8 +23,12 @@ lib/Mojolicious/Plugin/Fondation/Manager.pm
 lib/Mojolicious/Plugin/Fondation/Resolver.pm
 lib/Mojolicious/Plugin/Fondation/TestHelper.pm
 lib/Mojolicious/Plugin/Fondation/Utils.pm
+share/templates/exception.production.html.ep
+share/templates/not_found.production.html.ep
 share/templates/welcome_en.html.ep
 share/templates/welcome_fr.html.ep
+share/translations/en.json
+share/translations/fr.json
 t/01-load.t
 t/02-fondation.t
 t/03-actions.t
@@ -40,6 +44,7 @@ t/12-context-log.t
 t/13-fondation-command.t
 t/13-merge.t
 t/14-requires-conditions.t
+t/error-pages.t
 t/lib/Mojolicious/Plugin/Fondation/Authorization.pm
 t/lib/Mojolicious/Plugin/Fondation/Authorization/Controller/Common.pm
 t/lib/Mojolicious/Plugin/Fondation/CustomAction.pm
@@ -48,6 +53,12 @@ t/lib/Mojolicious/Plugin/Fondation/CycleA.pm
 t/lib/Mojolicious/Plugin/Fondation/CycleB.pm
 t/lib/Mojolicious/Plugin/Fondation/LogTest.pm
 t/lib/Mojolicious/Plugin/Fondation/Permission.pm
+t/lib/Mojolicious/Plugin/Fondation/Resolver/AfterTest.pm
+t/lib/Mojolicious/Plugin/Fondation/Resolver/BeforeAfterRoot.pm
+t/lib/Mojolicious/Plugin/Fondation/Resolver/BeforeCycleA.pm
+t/lib/Mojolicious/Plugin/Fondation/Resolver/BeforeCycleB.pm
+t/lib/Mojolicious/Plugin/Fondation/Resolver/BeforeGhost.pm
+t/lib/Mojolicious/Plugin/Fondation/Resolver/BeforeTest.pm
 t/lib/Mojolicious/Plugin/Fondation/Resolver/CycleX.pm
 t/lib/Mojolicious/Plugin/Fondation/Resolver/CycleY.pm
 t/lib/Mojolicious/Plugin/Fondation/Resolver/Leaf.pm

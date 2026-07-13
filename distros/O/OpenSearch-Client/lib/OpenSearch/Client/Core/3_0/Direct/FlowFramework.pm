@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::FlowFramework;
-$OpenSearch::Client::Core::3_0::Direct::FlowFramework::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::FlowFramework::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::FlowFramework>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_flow_framework/workflow>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->flow_framework->create(
         
@@ -116,6 +119,9 @@ C<DELETE /_plugins/_flow_framework/workflow/{workflow_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->flow_framework->delete(
         
          # path parameters
@@ -149,6 +155,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_flow_framework/workflow/{workflow_id}/_deprovision>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->flow_framework->deprovision(
         
@@ -184,6 +193,9 @@ C<GET /_plugins/_flow_framework/workflow/{workflow_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->flow_framework->get(
         
          # path parameters
@@ -213,6 +225,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_flow_framework/workflow/{workflow_id}/_status>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->flow_framework->get_status(
         
@@ -248,6 +263,9 @@ C<GET /_plugins/_flow_framework/workflow/_steps>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->flow_framework->get_steps(
         
          # Endpoint specific query string parameters
@@ -277,6 +295,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_flow_framework/workflow/{workflow_id}/_provision>
 
 =back
+
+I<Method added in OpenSearch version 2.12>
+
 
     $resp = $client->flow_framework->provision(
         
@@ -313,6 +334,9 @@ C<POST /_plugins/_flow_framework/workflow/_search>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->flow_framework->search(
         
         'body'         =>  $body,      # required
@@ -344,6 +368,9 @@ C<POST /_plugins/_flow_framework/workflow/state/_search>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->flow_framework->search_state(
         
         'body'         =>  $body,      # required
@@ -372,6 +399,9 @@ C<PUT /_plugins/_flow_framework/workflow/{workflow_id}>
 
 =back
 
+I<Method added in OpenSearch version 2.12>
+
+
     $resp = $client->flow_framework->update(
         
         'body'           =>  $body,      # optional
@@ -398,6 +428,19 @@ C<PUT /_plugins/_flow_framework/workflow/{workflow_id}>
     );
 
 L<OpenSearch documentation for flow_framework-E<gt>update|https://opensearch.org/docs/latest/automating-configurations/api/create-workflow/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->flow_framework->method_supported_in_version(
+        method  => 'create',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

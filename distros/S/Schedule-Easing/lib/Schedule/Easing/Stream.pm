@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/confess/;
 
-our $VERSION='0.1.4';
+our $VERSION='0.1.5';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -101,7 +101,7 @@ Schedule::Easing::Stream - Control timestamp update, queuing, and buffering of i
 		batch =>16,
 		sleep =>4,
 	);
-	
+
 	$stream->read();
 
 =head1 DESCRIPTION

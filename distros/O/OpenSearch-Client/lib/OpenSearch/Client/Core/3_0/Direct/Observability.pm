@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Observability;
-$OpenSearch::Client::Core::3_0::Direct::Observability::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Observability::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Observability>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_plugins/_observability/object>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->observability->create_object(
         
         'body'         =>  $body,      # optional
@@ -107,6 +110,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_observability/object/{object_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->observability->delete_object(
         
@@ -137,6 +143,9 @@ I<Paths served by this method:>
 C<DELETE /_plugins/_observability/object>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->observability->delete_objects(
         
@@ -169,6 +178,9 @@ C<GET /_plugins/_observability/_local/stats>
 
 =back
 
+I<Method added in OpenSearch version 2.5>
+
+
     $resp = $client->observability->get_localstats(
         
          # Common API query string parameters
@@ -194,6 +206,9 @@ I<Paths served by this method:>
 C<GET /_plugins/_observability/object/{object_id}>
 
 =back
+
+I<Method added in OpenSearch version 1.1>
+
 
     $resp = $client->observability->get_object(
         
@@ -225,6 +240,9 @@ C<GET /_plugins/_observability/object>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->observability->list_objects(
         
          # Common API query string parameters
@@ -251,6 +269,9 @@ C<PUT /_plugins/_observability/object/{object_id}>
 
 =back
 
+I<Method added in OpenSearch version 1.1>
+
+
     $resp = $client->observability->update_object(
         
         'body'         =>  $body,      # optional
@@ -269,6 +290,19 @@ C<PUT /_plugins/_observability/object/{object_id}>
     );
 
 L<OpenSearch documentation for observability-E<gt>update_object|https://docs.opensearch.org/latest/observing-your-data/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->observability->method_supported_in_version(
+        method  => 'create_object',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

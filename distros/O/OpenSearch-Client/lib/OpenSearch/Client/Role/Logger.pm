@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Logger;
-$OpenSearch::Client::Role::Logger::VERSION = '3.007007';
+$OpenSearch::Client::Role::Logger::VERSION = '3.007008';
 use Moo::Role;
 
 use URI();
@@ -174,7 +174,7 @@ OpenSearch::Client::Role::Logger - Provides common functionality to Logger imple
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 DESCRIPTION
 

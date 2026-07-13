@@ -4,7 +4,7 @@ use Imager;
 use vars qw($VERSION @ISA);
 
 BEGIN {
-  $VERSION = "0.005";
+  $VERSION = "0.006";
 
   require XSLoader;
   XSLoader::load('Imager::File::WEBP', $VERSION);

@@ -70,7 +70,7 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
       $js->add_document($document) if $opt->dump_identifiers;
     }
     catch ($e) {
-      say blessed($e) && $e->isa('JSON::Schema::Modern::Result') ? $e->dump : $e;
+      say +blessed($e) && $e->isa('JSON::Schema::Modern::Result') ? $e->dump : $e;
       exit 2;
     }
 
@@ -86,10 +86,10 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
 
   if ($result->valid and defined $opt->upgrade and (not @ARGV or $document_filename eq $ARGV[-1])) {
     my $new_schema = $document->upgrade($opt->upgrade || ());
-    say encode($new_schema, $filetype);
+    say +encode($new_schema, $filetype);
   }
   else {
-    say encode(@ARGV > 1 ? { $document_filename => $result } : $result);
+    say +encode(@ARGV > 1 ? { $document_filename => $result } : $result);
   }
 }
 
@@ -104,7 +104,7 @@ if ($opt->dump_identifiers) {
   grep $_->[0] !~ m{^(?:https?://json-schema.org/|https://spec.openapis.org/oas/)},
   $js->_resource_pairs;
 
-  say encode({identifiers => \%identifiers });
+  say +encode({identifiers => \%identifiers });
 }
 
 exit $exit_val;
@@ -156,7 +156,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.140
+version 0.141
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

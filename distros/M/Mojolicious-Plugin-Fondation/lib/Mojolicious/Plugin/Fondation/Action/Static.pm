@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Action::Static;
-$Mojolicious::Plugin::Fondation::Action::Static::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Action::Static::VERSION = '0.04';
 # ABSTRACT: Registers public asset directories from plugin share directories
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Action::Base', -signatures;
@@ -38,7 +38,7 @@ Mojolicious::Plugin::Fondation::Action::Static - Registers public asset director
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

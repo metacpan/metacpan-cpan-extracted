@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::Indices;
-$OpenSearch::Client::Core::3_0::Direct::Indices::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::Indices::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::Indices>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<PUT /{index}/_block/{block}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->add_block(
         
@@ -129,6 +132,9 @@ C<POST /{index}/_analyze>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->analyze(
         
         'body'         =>  $body,      # optional
@@ -167,6 +173,9 @@ C<POST /_cache/clear>
 C<POST /{index}/_cache/clear>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->clear_cache(
         
@@ -213,6 +222,9 @@ C<PUT /{index}/_clone/{target}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->clone(
         
         'body'                     =>  $body,      # optional
@@ -255,6 +267,9 @@ C<POST /{index}/_close>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->close(
         
          # path parameters
@@ -295,6 +310,9 @@ C<PUT /{index}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->create(
         
         'body'                     =>  $body,      # optional
@@ -334,6 +352,9 @@ C<PUT /_data_stream/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->create_data_stream(
         
         'body'         =>  $body,      # optional
@@ -369,6 +390,9 @@ C<GET /_data_stream/{name}/_stats>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->data_streams_stats(
         
          # path parameters
@@ -398,6 +422,9 @@ I<Paths served by this method:>
 C<DELETE /{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->delete(
         
@@ -441,6 +468,9 @@ C<DELETE /{index}/_aliases/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->delete_alias(
         
          # path parameters
@@ -478,6 +508,9 @@ C<DELETE /_data_stream/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->delete_data_stream(
         
          # path parameters
@@ -507,6 +540,9 @@ I<Paths served by this method:>
 C<DELETE /_index_template/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->delete_index_template(
         
@@ -544,6 +580,9 @@ C<DELETE /_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->delete_template(
         
          # path parameters
@@ -579,6 +618,9 @@ I<Paths served by this method:>
 C<HEAD /{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->exists(
         
@@ -623,6 +665,9 @@ C<HEAD /{index}/_alias/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->exists_alias(
         
          # path parameters
@@ -661,6 +706,9 @@ C<HEAD /_index_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->exists_index_template(
         
          # path parameters
@@ -697,6 +745,9 @@ I<Paths served by this method:>
 C<HEAD /_template/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->exists_template(
         
@@ -744,6 +795,9 @@ C<POST /{index}/_flush>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->flush(
         
          # path parameters
@@ -785,6 +839,9 @@ C<POST /{index}/_forcemerge>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->forcemerge(
         
          # path parameters
@@ -825,6 +882,9 @@ I<Paths served by this method:>
 C<GET /{index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->get(
         
@@ -876,6 +936,9 @@ C<GET /{index}/_alias/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->get_alias(
         
          # path parameters
@@ -917,6 +980,9 @@ C<GET /_data_stream/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->get_data_stream(
         
          # path parameters
@@ -949,6 +1015,9 @@ C<GET /_mapping/field/{fields}>
 C<GET /{index}/_mapping/field/{fields}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->get_field_mapping(
         
@@ -992,6 +1061,9 @@ C<GET /_index_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->get_index_template(
         
          # path parameters
@@ -1031,6 +1103,9 @@ C<GET /_mapping>
 C<GET /{index}/_mapping>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->get_mapping(
         
@@ -1081,6 +1156,9 @@ C<GET /{index}/_settings/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->get_settings(
         
          # path parameters
@@ -1126,6 +1204,9 @@ C<GET /_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->get_template(
         
          # path parameters
@@ -1166,6 +1247,9 @@ C<GET /{index}/_upgrade>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->get_upgrade(
         
          # path parameters
@@ -1201,6 +1285,9 @@ I<Paths served by this method:>
 C<POST /{index}/_open>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->open(
         
@@ -1274,6 +1361,9 @@ C<PUT /{index}/_aliases/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->put_alias(
         
         'body'                     =>  $body,      # optional
@@ -1316,6 +1406,9 @@ C<PUT /_index_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->put_index_template(
         
         'body'                     =>  $body,      # required
@@ -1357,6 +1450,9 @@ C<POST /{index}/_mapping>
 C<PUT /{index}/_mapping>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->put_mapping(
         
@@ -1402,6 +1498,9 @@ C<PUT /_settings>
 C<PUT /{index}/_settings>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->put_settings(
         
@@ -1449,6 +1548,9 @@ C<PUT /_template/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->put_template(
         
         'body'                     =>  $body,      # required
@@ -1490,6 +1592,9 @@ C<GET /_recovery>
 C<GET /{index}/_recovery>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->recovery(
         
@@ -1535,6 +1640,9 @@ C<POST /{index}/_refresh>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->refresh(
         
          # path parameters
@@ -1570,6 +1678,9 @@ I<Paths served by this method:>
 C<GET /_resolve/index/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->resolve_index(
         
@@ -1608,6 +1719,9 @@ C<POST /{alias}/_rollover>
 C<POST /{alias}/_rollover/{new_index}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->rollover(
         
@@ -1653,6 +1767,9 @@ C<GET /{index}/_segments>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->segments(
         
          # path parameters
@@ -1693,6 +1810,9 @@ C<GET /{index}/_shard_stores>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->shard_stores(
         
          # path parameters
@@ -1732,6 +1852,9 @@ C<POST /{index}/_shrink/{target}>
 C<PUT /{index}/_shrink/{target}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->shrink(
         
@@ -1776,6 +1899,9 @@ C<POST /_index_template/_simulate_index/{name}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->simulate_index_template(
         
         'body'                     =>  $body,      # optional
@@ -1815,6 +1941,9 @@ C<POST /_index_template/_simulate>
 C<POST /_index_template/_simulate/{name}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->simulate_template(
         
@@ -1857,6 +1986,9 @@ C<POST /{index}/_split/{target}>
 C<PUT /{index}/_split/{target}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->split(
         
@@ -1910,6 +2042,9 @@ C<GET /{index}/_stats/{metric}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->stats(
         
          # path parameters
@@ -1953,6 +2088,9 @@ C<POST /_aliases>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->update_aliases(
         
         'body'                     =>  $body,      # optional
@@ -1989,6 +2127,9 @@ C<POST /_upgrade>
 C<POST /{index}/_upgrade>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->indices->upgrade(
         
@@ -2037,6 +2178,9 @@ C<POST /{index}/_validate/query>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->indices->validate_query(
         
         'body'                =>  $body,      # optional
@@ -2070,6 +2214,19 @@ C<POST /{index}/_validate/query>
     );
 
 L<OpenSearch documentation for indices-E<gt>validate_query|https://docs.opensearch.org/latest/api-reference/index-apis/index/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->indices->method_supported_in_version(
+        method  => 'add_block',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

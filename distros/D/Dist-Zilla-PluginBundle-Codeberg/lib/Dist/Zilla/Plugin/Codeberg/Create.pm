@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg::Create 2.0100;
+package Dist::Zilla::Plugin::Codeberg::Create 2.0101;
 
 use Modern::Perl;
 use JSON::MaybeXS;
@@ -137,7 +137,7 @@ sub after_mint {
       ]
    );
 
-   my $url = $self->api . '/repos';
+   my $url = $self->api . '/user/repos';
    $content = encode_json($params);
    $headers->{'content-type'} = 'application/json';
    $self->log_debug("Sending POST $url");
@@ -161,7 +161,7 @@ sub after_mint {
       my $git = Git::Wrapper->new($root);
 
       $self->log( [ 'Setting Codeberg remote \'%s\'', $self->remote ] );
-      $git->remote( 'add', $self->remote, $repo->{ssh_url_to_repo} );
+      $git->remote( 'add', $self->remote, $repo->{ssh_url} );
 
       my ($branch) = try {
          $git->rev_parse( { abbrev_ref => 1, symbolic_full_name => 1 },
@@ -207,7 +207,7 @@ Dist::Zilla::Plugin::Codeberg::Create - Create a new Codeberg repo on dzil new
 
 =head1 VERSION
 
-version 2.0100
+version 2.0101
 
 =head1 SYNOPSIS
 

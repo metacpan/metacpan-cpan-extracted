@@ -12,9 +12,6 @@ SV* S_channel_send_ready_fh(pTHX_ struct channel*);
 #define channel_send_ready_fh(channel) S_channel_send_ready_fh(aTHX_ channel)
 void channel_close(struct channel*);
 
-void S_channel_refcount_dec(pTHX_ struct channel* channel);
-#define channel_refcount_dec(channel) S_channel_refcount_dec(aTHX_ channel)
-
 #define channel_new(class) channel_alloc(1)
 
 extern const MGVTBL Thread__CSP__Channel_magic;

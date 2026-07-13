@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::PPL;
-$OpenSearch::Client::Core::3_0::Direct::PPL::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::PPL::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::PPL>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,9 @@ C<POST /_plugins/_ppl/_explain>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ppl->explain(
         
         'body'         =>  $body,      # optional
@@ -113,6 +116,9 @@ C<GET /_plugins/_ppl/stats>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ppl->get_stats(
         
          # Endpoint specific query string parameters
@@ -143,6 +149,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_ppl/stats>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->ppl->post_stats(
         
@@ -177,6 +186,9 @@ C<POST /_plugins/_ppl>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->ppl->query(
         
         'body'         =>  $body,      # optional
@@ -196,6 +208,19 @@ C<POST /_plugins/_ppl>
     );
 
 L<OpenSearch documentation for ppl-E<gt>query|https://opensearch.org/docs/latest/search-plugins/sql/sql-ppl-api/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->ppl->method_supported_in_version(
+        method  => 'explain',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

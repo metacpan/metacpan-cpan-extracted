@@ -294,6 +294,14 @@ naive_utf8(decode_ctx* decode_state, SV* new_setting = NULL)
     OUTPUT:
         RETVAL
 
+bool
+reject_duplicate_keys(decode_ctx* decode_state, SV* new_setting = NULL)
+    CODE:
+        RETVAL = _handle_flag_call( aTHX_ decode_state, new_setting, CBF_FLAG_REJECT_DUPLICATE_KEYS );
+
+    OUTPUT:
+        RETVAL
+
 SV *
 string_decode_cbor(SV* self)
     CODE:
@@ -387,6 +395,14 @@ bool
 naive_utf8(seqdecode_ctx* seqdecode, SV* new_setting = NULL)
     CODE:
         RETVAL = _handle_flag_call( aTHX_ seqdecode->decode_state, new_setting, CBF_FLAG_NAIVE_UTF8 );
+
+    OUTPUT:
+        RETVAL
+
+bool
+reject_duplicate_keys(seqdecode_ctx* seqdecode, SV* new_setting = NULL)
+    CODE:
+        RETVAL = _handle_flag_call( aTHX_ seqdecode->decode_state, new_setting, CBF_FLAG_REJECT_DUPLICATE_KEYS );
 
     OUTPUT:
         RETVAL

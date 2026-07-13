@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Resolver;
-$Mojolicious::Plugin::Fondation::Resolver::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Resolver::VERSION = '0.04';
 # ABSTRACT: Dependency graph resolver with cycle detection and topological sort
 
 use Mojo::Base -base, -signatures;
@@ -24,68 +24,121 @@ sub resolve ($self, $name_or_short, $direct_conf = {}) {
     $self->{states} = {};
     $self->{result} = [];
 
-    $self->_visit($long, $direct_conf);
+    # Phase 1 — Discover all plugins via the original dependency graph
+    my $graph = {};
+    $self->_discover_graph($long, $direct_conf, $graph);
+
+    # Phase 2 — Augment with before / after ordering hints
+    $self->_augment_graph($graph);
+
+    # Phase 3 — Topological sort on the augmented graph
+    $self->{states} = {};
+    $self->_sort($long, $graph);
 
     return $self->{result};
 }
 
 # ---------------------------------------------------------------------------
-# _visit -- DFS traversal with 3-state cycle detection
-#
-# State machine:
-#   undef     -> unvisited, recurse
-#   'visiting' -> currently in DFS path -> CYCLE DETECTED
-#   'visited'  -> already resolved, skip
-#
-# On cycle: dies with a message naming the plugin causing the cycle.
+# Phase 1 — _discover_graph: DFS to collect every reachable plugin.
+# Builds a flat map: $long => { deps => [...], config => {...}, meta => {...} }
 # ---------------------------------------------------------------------------
-sub _visit ($self, $long, $direct_conf) {
-    my $state = $self->states->{$long};
+sub _discover_graph ($self, $long, $direct_conf, $graph) {
+    return if $graph->{$long};    # already discovered
 
-    if (defined $state && $state eq 'visiting') {
-        die "Dependency cycle detected: $long is part of a circular dependency chain.\n";
-    }
-
-    return if defined $state && $state eq 'visited';
-
-    # Mark as visiting -- if we encounter it again during this DFS, it's a cycle
-    $self->states->{$long} = 'visiting';
-
-    my $meta    = $self->_discover_meta($long);
-    my $short   = short_name($long);
-    my $merged  = merge(
+    my $meta   = $self->_discover_meta($long);
+    my $short  = short_name($long);
+    my $merged = merge(
         $direct_conf,
         $self->app->config->{$short} // {},
         $meta->{defaults} // {}
     );
 
-    # Resolve dependencies first (depth-first = deps before dependant)
     my $deps = $merged->{dependencies} // $meta->{dependencies} // [];
-    for my $dep_spec (@$deps) {
-        my ($dep_name, $dep_conf);
-        if (ref $dep_spec eq 'HASH') {
-            ($dep_name) = keys %$dep_spec;
-            $dep_conf = $dep_spec->{$dep_name} // {};
-        }
-        elsif (ref $dep_spec eq 'ARRAY') {
-            ($dep_name, $dep_conf) = @$dep_spec;
-            $dep_conf //= {};
-        }
-        else {
-            $dep_name    = $dep_spec;
-            $dep_conf    = {};
-        }
-        $self->_visit(long_name($dep_name), $dep_conf);
-    }
 
-    # Mark as visited + add to result (post-order = deps added first)
-    $self->states->{$long} = 'visited';
-    push @{$self->result}, {
-        long   => $long,
-        short  => $short,
+    $graph->{$long} = {
+        deps   => [@$deps],           # shallow copy of spec list
         config => $merged,
         meta   => $meta,
     };
+
+    # Recurse into declared dependencies
+    for my $dep_spec (@$deps) {
+        my ($dep_name, $dep_conf) = $self->_parse_dep($dep_spec);
+        $self->_discover_graph(long_name($dep_name), $dep_conf, $graph);
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Phase 2 — _augment_graph: add edges from before / after declarations.
+#
+#   after  => ['B']   →   B must load before me   →   B is a dependency of me
+#   before => ['B']   →   I must load before B     →   I am a dependency of B
+#
+# Silently ignored when the target plugin is not in the graph.
+# ---------------------------------------------------------------------------
+sub _augment_graph ($self, $graph) {
+    for my $long (keys %$graph) {
+        my $entry = $graph->{$long};
+
+        # after — the named plugin should be loaded before me
+        my $after = $entry->{config}{after} // $entry->{meta}{after} // [];
+        for my $target_short (@$after) {
+            my $target = long_name($target_short);
+            next unless $graph->{$target};
+            push @{$entry->{deps}}, $target;
+        }
+
+        # before — I should be loaded before the named plugin
+        my $before = $entry->{config}{before} // $entry->{meta}{before} // [];
+        for my $target_short (@$before) {
+            my $target = long_name($target_short);
+            next unless $graph->{$target};
+            push @{$graph->{$target}{deps}}, $long;
+        }
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Phase 3 — _sort: topological sort via DFS with 3-state cycle detection.
+#
+# Cycles caused by conflicting before/after are caught here just like
+# dependency cycles.
+# ---------------------------------------------------------------------------
+sub _sort ($self, $long, $graph) {
+    my $state = $self->states->{$long};
+
+    if (defined $state && $state eq 'visiting') {
+        die "Dependency cycle detected: $long is part of a circular dependency chain.\n";
+    }
+    return if defined $state && $state eq 'visited';
+
+    $self->states->{$long} = 'visiting';
+
+    my $entry = $graph->{$long};
+    for my $dep_spec (@{$entry->{deps}}) {
+        my ($dep_name) = $self->_parse_dep($dep_spec);
+        $self->_sort(long_name($dep_name), $graph);
+    }
+
+    $self->states->{$long} = 'visited';
+    push @{$self->result}, {
+        long   => $long,
+        short  => short_name($long),
+        config => $entry->{config},
+        meta   => $entry->{meta},
+    };
+}
+
+# ---------------------------------------------------------------------------
+# _parse_dep -- normalize a dependency spec (string or hashref).
+# Returns ($name, $conf).
+# ---------------------------------------------------------------------------
+sub _parse_dep ($self, $dep_spec) {
+    if (ref $dep_spec eq 'HASH') {
+        my ($name) = keys %$dep_spec;
+        return ($name, $dep_spec->{$name} // {});
+    }
+    return ($dep_spec, {});
 }
 
 # ---------------------------------------------------------------------------
@@ -128,7 +181,7 @@ Mojolicious::Plugin::Fondation::Resolver - Dependency graph resolver with cycle 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

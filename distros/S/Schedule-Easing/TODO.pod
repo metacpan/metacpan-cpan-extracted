@@ -6,25 +6,25 @@
 
 Documentation is likely incomplete, but has also gotten a bit more complex as configuration options become supported (sorry).
 
-=head2 Script timestamps option
-
-(Available with 0.1.3)  C<schedule-easing.pl --timestamps> should work.  It is currently available but not fully tested.  See notes in L<Schedule::Easing/"Timestamp Discovery">.
-
 =head2 Relaxing, reducing, decreasing messages over time is experimental
 
 (Available with 0.1.4) Behavior when C<beginE<gt>final> is partially tested.  Documentation may be incomplete.
 
-=head2 Power and Step inverses are experimental
+=head2 Pass type
 
-The functions have not been tested with the C<timestamps> calculations.
+(Available with 0.1.5) Support C<type=pass> that always includes a matching message.  Will help with faster bailout and to avoid unexpected matching against later easing configurations.
+
+=head2 Digest substitution
+
+(Available with 0.1.5) C<digestsub> supports replacing/removing characters in digest strings.
+
+=head2 Message substitution
+
+With the addition of digest substitution, there may be cases where messages should also undergo substitution when matching.  That is, if "extra details" are included in a message for the sake of the digest computation, it may be reasonable to remove portions of the message before display.  As this can be achieved with C<sed> or similar tools, it was not added in 0.1.5.  Options are being reviewed.
 
 =head2 Timestamp support in Block
 
 The C<block> type is currently universal.  It may be useful to have a scheduled blocking event that starts at C<tsA>, or that concludes at C<tsB>, or both.
-
-=head2 Pass type
-
-Support C<type=pass> that always includes a matching message.  Will help with faster bailout and to avoid unexpected matching against later easing configurations.
 
 =head1 To Review
 

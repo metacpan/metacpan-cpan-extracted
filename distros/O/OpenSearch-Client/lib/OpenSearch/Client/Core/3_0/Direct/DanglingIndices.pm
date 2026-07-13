@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::DanglingIndices;
-$OpenSearch::Client::Core::3_0::Direct::DanglingIndices::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::DanglingIndices::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::DanglingIndices>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ I<Paths served by this method:>
 C<DELETE /_dangling/{index_uuid}>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->dangling_indices->delete_dangling_index(
         
@@ -117,6 +120,9 @@ C<POST /_dangling/{index_uuid}>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->dangling_indices->import_dangling_index(
         
          # path parameters
@@ -154,6 +160,9 @@ C<GET /_dangling>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->dangling_indices->list_dangling_indices(
         
          # Common API query string parameters
@@ -166,6 +175,19 @@ C<GET /_dangling>
     );
 
 L<OpenSearch documentation for dangling_indices-E<gt>list_dangling_indices|https://opensearch.org/docs/latest/api-reference/index-apis/dangling-index/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->dangling_indices->method_supported_in_version(
+        method  => 'delete_dangling_index',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::SQL;
-$OpenSearch::Client::Core::3_0::Direct::SQL::VERSION = '3.007007';
+$OpenSearch::Client::Core::3_0::Direct::SQL::VERSION = '3.007008';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
@@ -43,7 +43,7 @@ B<OpenSearch::Client::Core::3_0::Direct::SQL>
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 
@@ -78,6 +78,9 @@ C<POST /_plugins/_sql/close>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->sql->close(
         
         'body'         =>  $body,      # optional
@@ -110,6 +113,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_sql/_explain>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->sql->explain(
         
@@ -144,6 +150,9 @@ C<GET /_plugins/_sql/stats>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->sql->get_stats(
         
          # Endpoint specific query string parameters
@@ -174,6 +183,9 @@ I<Paths served by this method:>
 C<POST /_plugins/_sql/stats>
 
 =back
+
+I<Method added in OpenSearch version 1.0>
+
 
     $resp = $client->sql->post_stats(
         
@@ -208,6 +220,9 @@ C<POST /_plugins/_sql>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->sql->query(
         
         'body'         =>  $body,      # optional
@@ -241,6 +256,9 @@ C<PUT /_plugins/_query/settings>
 
 =back
 
+I<Method added in OpenSearch version 1.0>
+
+
     $resp = $client->sql->settings(
         
         'body'         =>  $body,      # optional
@@ -259,6 +277,19 @@ C<PUT /_plugins/_query/settings>
     );
 
 L<OpenSearch documentation for sql-E<gt>settings|https://opensearch.org/docs/latest/search-plugins/sql/settings/>
+
+=head2 method_supported_in_version
+
+Return whether a method in this module namespace is supported for an OpenSearch server version
+
+    my $boolean = $os->sql->method_supported_in_version(
+        method  => 'close',
+        version => '2.4.0'
+    );
+
+Both C<method> and C<version> are required.
+
+See also L<global_method_supported_in_version|OpenSearch::Client::Core::3_0::Direct#global_method_supported_in_version>
 
 =head1 MANUAL
 

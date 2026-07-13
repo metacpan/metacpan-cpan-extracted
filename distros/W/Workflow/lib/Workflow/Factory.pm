@@ -12,7 +12,7 @@ use Scalar::Util 'blessed';
 use Syntax::Keyword::Try;
 use Module::Runtime qw( require_module );
 
-$Workflow::Factory::VERSION = '2.09';
+$Workflow::Factory::VERSION = '2.10';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -321,7 +321,7 @@ sub create_workflow {
         $wf_config, $self->{_workflow_state}{$wf_type}, $self );
 
     if ($context and not blessed $context) {
-        $context = Worfklow::Context->new( %{ $context } );
+        $context = Workflow::Context->new( %{ $context } );
     }
     elsif (not $context) {
         $context = Workflow::Context->new;
@@ -835,7 +835,7 @@ Workflow::Factory - Generates new workflow and supporting objects
 
 =head1 VERSION
 
-This documentation describes version 2.09 of this package
+This documentation describes version 2.10 of this package
 
 =head1 SYNOPSIS
 

@@ -21,7 +21,7 @@
 # limitations under the License
 
 package OpenSearch::Client::Serializer::JSON::Cpanel;
-$OpenSearch::Client::Serializer::JSON::Cpanel::VERSION = '3.007007';
+$OpenSearch::Client::Serializer::JSON::Cpanel::VERSION = '3.007008';
 use Cpanel::JSON::XS;
 use Moo;
 
@@ -44,7 +44,7 @@ OpenSearch::Client::Serializer::JSON::Cpanel - A JSON Serializer using Cpanel::J
 
 =head1 VERSION
 
-version 3.007007
+version 3.007008
 
 =head1 SYNOPSIS
 

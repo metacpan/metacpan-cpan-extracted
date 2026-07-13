@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.172';
+our $VERSION = '0.173';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -42,7 +42,16 @@ sub configure {
 
         [ 'Region' => 'header' ],
         'Name',
-        'Version',
+
+        [ 'Version' => { format => [ split /\n/, <<'VERSION' ] } ],
+version %v
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
+%T
+%T This is a trial release!
+VERSION
+
         [ 'Region' => 'prelude' ],
         [ 'Generic' => 'SYNOPSIS' ],
         [ 'Generic' => 'DESCRIPTION' ],
@@ -186,7 +195,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.172
+version 0.173
 
 =head1 SYNOPSIS
 

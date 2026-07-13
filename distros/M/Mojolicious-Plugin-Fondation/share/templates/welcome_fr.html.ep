@@ -404,6 +404,18 @@ plugin 'Fondation' => {
     </p>
   </div>
 
+  % if ($has_setup) {
+  <!-- Assistant de configuration -->
+  <div class="panel">
+    <h2>Assistant de configuration</h2>
+    <p>
+      Configurez votre application de manière interactive — base de données,
+      authentification, messagerie, et plus — via
+      l'<a href="<%= url_for '/setup' %>">assistant de configuration</a>.
+    </p>
+  </div>
+  % }
+
   <footer>
     Fondation — Plugin Mojolicious
   </footer>

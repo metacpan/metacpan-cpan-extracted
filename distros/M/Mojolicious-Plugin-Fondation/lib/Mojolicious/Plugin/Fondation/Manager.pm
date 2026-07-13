@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Manager;
-$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::Manager::VERSION = '0.04';
 # ABSTRACT: Plugin registry, post-load actions, and finalyze initialization
 
 use Mojo::Base -base, -signatures;
@@ -142,10 +142,43 @@ sub run_post_load_actions ($self) {
         unshift @{$self->app->static->paths}, $app_public->to_string;
         $self->log->debug("App public priority: " . share_relative($app_public));
     }
+
+    # Add local controller namespace (Mojolicious::Lite clears it).
+    # Only when the app actually has local controllers.
+    my $moniker      = $self->app->moniker;
+    my $local_ns     = Mojo::Util::camelize($moniker);
+    my $ctrl_path    = $local_ns =~ s{::}{/}gr;
+    my $local_ctrl_dir = $self->app->home->child('lib', split('/', $ctrl_path), 'Controller');
+    if (-d $local_ctrl_dir) {
+        my $ns = $self->app->routes->namespaces;
+        my $ctrl_ns = "${local_ns}::Controller";
+        unless (grep { $_ eq $ctrl_ns } @$ns) {
+            unshift @$ns, $ctrl_ns;
+            $self->log->debug("App controller namespace: $ctrl_ns");
+        }
+    }
 }
 
 sub run_finalyze ($self) {
     $self->log->debug("Running fondation_finalyze in loading order");
+
+    # If schema_class is configured but MySchema.pm doesn't exist yet,
+    # skip all finalyze — plugins with DBIC dependencies would crash.
+    # db bootstrap-schema (a CLI command) runs before finalyze and
+    # creates the file; the next restart will pass this check.
+    my $c = $self->app->build_controller;
+    if ($c->has_helper('schema_class')) {
+        my $sc = eval { $c->schema_class };
+        if ($sc) {
+            eval "require $sc; 1" or do {
+                $self->log->warn(
+                    "Schema '$sc' not found. "
+                  . "Run 'db bootstrap-schema' first. "
+                  . "Skipping all fondation_finalyze.");
+                return;
+            };
+        }
+    }
 
     for my $long (@{$self->load_order}) {
         my $entry  = $self->registry->{$long};
@@ -181,7 +214,7 @@ Mojolicious::Plugin::Fondation::Manager - Plugin registry, post-load actions, an
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

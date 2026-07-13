@@ -3,13 +3,15 @@ package Schedule::Easing::MD5;
 use strict;
 use warnings;
 use parent qw/Schedule::Easing::Ease/;
+use Carp qw/confess/;
 use Digest::MD5 qw/md5/;
 
-our $VERSION='0.1.4';
+our $VERSION='0.1.5';
 
 sub _default_keys {
 	my ($self)=@_;
 	return (
+		'digestsub',
 		$self->SUPER::_default_keys(),
 	);
 }
@@ -32,7 +34,18 @@ sub new {
 	return bless(\%self,$class)->validate()->init();
 }
 
-# validate = SUPER::validate
+sub validate {
+	my ($self)=@_;
+	$self->SUPER::validate();
+	if(exists($$self{digestsub})) {
+		my $r=ref($$self{digestsub});
+		if($r eq 'ARRAY') { if($#{$$self{digestsub}}<1) { confess('Must be 2-element array:  digestsub') } }
+		elsif(!$r||($r eq 'Regexp')) { $$self{digestsub}=[$$self{digestsub},''] }
+		else { confess('Must be array, string, or regexp:  digestsub') }
+	}
+	return $self;
+}
+
 # init     = SUPER::init
 
 sub includes {
@@ -65,6 +78,15 @@ sub schedule {
 		if($y<$$self{final}) { return }
 	}
 	return $$self{_unshaper}->($y,@$self{qw/tsA tsB begin final/},@{$$self{shapeopt}});
+}
+
+sub matches {
+	my ($self,$message)=@_;
+	my %res=$self->SUPER::matches($message);
+	if($$self{digestsub}) {
+		foreach my $k (grep {/^digest/} keys(%res)) {
+			$res{$k}=~s/$$self{digestsub}[0]/$$self{digestsub}[1]/g } }
+	return %res;
 }
 
 1;
