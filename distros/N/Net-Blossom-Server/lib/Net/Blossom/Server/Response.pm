@@ -5,31 +5,36 @@ use strictures 2;
 use Net::Blossom::_ConstructorArgs ();
 
 use Carp qw(croak);
-use Class::Tiny qw(status body _headers);
+use Class::Tiny qw(status _headers), {
+    body => '',
+};
 use JSON ();
 use Scalar::Util qw(blessed);
 
 my $TOKEN = qr/[!#$%&'*+\-.^_`|~0-9A-Za-z]+/;
 my $JSON = JSON->new->utf8->canonical;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(status headers body);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "status is required" unless exists $args{status} && defined $args{status};
-    _validate_status($args{status});
-
     $args{headers} = {} unless defined $args{headers};
     $args{_headers} = _normalize_headers($args{headers});
     delete $args{headers};
 
-    $args{body} = '' unless defined $args{body};
-    _validate_body($args{body});
+    return \%args;
+}
 
-    return bless \%args, $class;
+sub BUILD {
+    my ($self) = @_;
+    croak "status is required" unless defined $self->status;
+    _validate_status($self->status);
+    $self->body('') unless defined $self->body;
+    _validate_body($self->body);
+    return;
 }
 
 sub json {
@@ -328,5 +333,15 @@ headers.
 
 Returns scalar and array reference bodies as an array reference of chunks. Stream
 bodies croak because they must be consumed by the gateway adapter.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

@@ -56,13 +56,13 @@ Mojolicious::Plugin::FormChecker - Mojolicious plugin for validating query param
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::FormChecker](https://metacpan.org/pod/Mojolicious::Plugin::FormChecker) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin for
+[Mojolicious::Plugin::FormChecker](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFormChecker) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin for
 validating query parameters input.
 
 # METHODS
 
-[Mojolicious::Plugin::FormChecker](https://metacpan.org/pod/Mojolicious::Plugin::FormChecker) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::FormChecker](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFormChecker) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -410,15 +410,15 @@ argument to `form_checker`
 
 # SEE ALSO
 
-[Mojolicious::Plugin::FormValidator](https://metacpan.org/pod/Mojolicious::Plugin::FormValidator),
-[Mojolicious::Plugin::FormValidatorLazy](https://metacpan.org/pod/Mojolicious::Plugin::FormValidatorLazy)
+[Mojolicious::Plugin::FormValidator](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFormValidator),
+[Mojolicious::Plugin::FormValidatorLazy](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFormValidatorLazy)
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [http://mojolicio.us](http://mojolicio.us).
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides), [http://mojolicio.us](http://mojolicio.us).
 
 # EXAMPLES
 
 The `examples/` directory of this distribution contains an example
-of a [Mojolicious::Lite](https://metacpan.org/pod/Mojolicious::Lite) application utilizing this plugin.
+of a [Mojolicious::Lite](https://metacpan.org/pod/Mojolicious%3A%3ALite) application utilizing this plugin.
 
 # REPOSITORY
 

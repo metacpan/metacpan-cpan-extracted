@@ -6,30 +6,36 @@ use Net::Blossom::_ConstructorArgs ();
 use Net::Blossom::Server::Response;
 
 use Carp qw(croak);
-use Class::Tiny qw(status reason _headers);
+use Class::Tiny qw(status _headers), {
+    reason => '',
+};
 
 my $TOKEN = qr/[!#$%&'*+\-.^_`|~0-9A-Za-z]+/;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(status reason headers);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "status is required" unless exists $args{status} && defined $args{status};
-    croak "status must be an HTTP status code"
-        unless !ref($args{status}) && $args{status} =~ /\A[1-5][0-9][0-9]\z/;
-
     $args{reason} = '' unless defined $args{reason};
-    croak "reason must be a scalar" if ref($args{reason});
-    croak "reason must not contain CR or LF" if $args{reason} =~ /[\r\n]/;
-
     $args{headers} = {} unless defined $args{headers};
     $args{_headers} = _normalize_headers($args{headers});
     delete $args{headers};
 
-    return bless \%args, $class;
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    croak "status is required" unless defined $self->status;
+    croak "status must be an HTTP status code"
+        unless !ref($self->status) && $self->status =~ /\A[1-5][0-9][0-9]\z/;
+    $self->reason('') unless defined $self->reason;
+    croak "reason must be a scalar" if ref($self->reason);
+    croak "reason must not contain CR or LF" if $self->reason =~ /[\r\n]/;
+    return;
 }
 
 sub throw {
@@ -155,5 +161,15 @@ Returns a header value using case-insensitive lookup.
     my $response = $error->as_response;
 
 Returns a C<Net::Blossom::Server::Response> for the error.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

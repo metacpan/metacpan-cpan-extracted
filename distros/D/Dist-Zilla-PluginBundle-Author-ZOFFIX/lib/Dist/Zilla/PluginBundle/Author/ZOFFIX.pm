@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::ZOFFIX;
 
-our $VERSION = '1.001008'; # VERSION
+our $VERSION = '1.001009'; # VERSION
 
 use Moose;
 with (
@@ -33,6 +33,7 @@ sub configure {
         PruneCruft
         ManifestSkip
         MetaYAML
+        MetaJSON
         License
         Readme
         ExecDir

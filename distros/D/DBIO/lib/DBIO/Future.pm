@@ -30,7 +30,7 @@ DBIO::Future - Future interface contract for async DBIO operations
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

@@ -76,6 +76,11 @@ Backends normally store blob bytes, descriptor metadata, and owner metadata. The
 descriptor URL is deployment policy, so a storage constructor will usually take
 a public C<base_url> and use it when building descriptors.
 
+Backends may separate these responsibilities using
+L<Net::Blossom::Server::MetadataStore> and
+L<Net::Blossom::Server::BlobStore>. A coordinator still implements this
+storage contract and keeps metadata and byte changes consistent.
+
 A minimal upload writer records bytes in C<write>, makes the blob and owner
 relationship visible in C<commit>, and discards unfinished bytes in C<abort>:
 

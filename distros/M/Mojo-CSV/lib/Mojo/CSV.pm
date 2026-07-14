@@ -10,7 +10,7 @@ use MooX::ChainedAttributes;
 use strictures 2;
 use namespace::clean;
 
-our $VERSION = '1.001004'; # VERSION
+our $VERSION = '1.001005'; # VERSION
 
 has in  => (
     is      => 'rw',
@@ -78,8 +78,7 @@ sub slurp {
 
 sub slurp_body {
     my $self = shift;
-    my $r = $self->slurp( @_ );
-    return c @$r[ 1 .. $r->size-1 ];
+    return $self->slurp( @_ )->tail(-1);
 }
 
 sub spurt {

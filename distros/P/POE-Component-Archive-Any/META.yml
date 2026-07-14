@@ -1,30 +1,29 @@
 ---
-abstract: 'a non-blocking wrapper around'
+abstract: unknown
 author:
-  - 'Zoffix Znet <zoffix@cpan.org>'
+  - unknown
 build_requires:
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: POE-Component-Archive-Any
-provides:
-  POE::Component::Archive::Any:
-    file: lib/POE/Component/Archive/Any.pm
-    version: 0.002
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Archive::Any: 0
-  Carp: 0
-  POE: 0
-  POE::Filter::Line: 0
-  POE::Filter::Reference: 0
-  POE::Wheel::Run: 0
-  perl: 5.006
-resources:
-  license: http://dev.perl.org/licenses/
-version: 0.002
+  Archive::Any: '0'
+  Carp: '0'
+  POE: '0'
+  POE::Filter::Line: '0'
+  POE::Filter::Reference: '0'
+  POE::Wheel::Run: '0'
+  Test::More: '0'
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

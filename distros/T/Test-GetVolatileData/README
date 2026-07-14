@@ -90,8 +90,8 @@ EXPORTS
             num => 42,
         );
 
-    Takes a positive interger as a value. Tells "get_data()" to get more
-    than one line, and the value specifies the maximum number of results to
+    Takes a positive interger as a value. Tells get_data() to get more than
+    one line, and the value specifies the maximum number of results to
     return. If the data document has fewer than "num" entries, then all the
     available entries will be returned as a list. Otherwise, a "num" number
     of randomly-selected entries will be returned.
@@ -99,12 +99,16 @@ EXPORTS
 AUTHOR
     Zoffix Znet, "<zoffix at cpan.org>"
 
+REPOSITORY
+    Fork this module on GitHub:
+    <https://github.com/zoffixznet/Test-GetVolatileData>
+
 BUGS
-    Please report any bugs or feature requests to "bug-test-getvolatiledata
-    at rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-GetVolatileData>. I
-    will be notified, and then you'll automatically be notified of progress
-    on your bug as I make changes.
+    To report bugs or request features, please use
+    <https://github.com/zoffixznet/Test-GetVolatileData/issues>
+
+    If you can't access GitHub, you can email your request to
+    "bug-test-getvolatiledata at rt.cpan.org"
 
 SUPPORT
     You can find documentation for this module with the perldoc command.

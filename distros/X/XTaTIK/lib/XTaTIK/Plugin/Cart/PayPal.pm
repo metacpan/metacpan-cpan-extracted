@@ -1,6 +1,6 @@
 package XTaTIK::Plugin::Cart::PayPal;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Mojo::Base 'Mojolicious::Controller';
 use utf8;

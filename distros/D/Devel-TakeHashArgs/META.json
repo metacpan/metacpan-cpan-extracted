@@ -1,47 +1,43 @@
 {
-   "abstract" : "make a hash from @_ and set defaults in subs while checking that all mandatory arguments are present",
+   "abstract" : "unknown",
    "author" : [
-      "Zoffix Znet <zoffix@cpan.org>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-TakeHashArgs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Exporter" : "5.58",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
-   "provides" : {
-      "Devel::TakeHashArgs" : {
-         "file" : "lib/Devel/TakeHashArgs.pm",
-         "version" : "0.006"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
-   },
-   "version" : "0.006"
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

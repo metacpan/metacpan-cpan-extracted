@@ -5,22 +5,30 @@ use strictures 2;
 use Net::Blossom::_ConstructorArgs ();
 
 use Carp qw(croak);
-use Class::Tiny qw(method url status reason headers content);
+use Class::Tiny qw(method url status reason), {
+    headers => sub { {} },
+    content => '',
+};
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(method url status reason headers content);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    $args{headers} = {} unless defined $args{headers};
-    $args{content} = '' unless defined $args{content};
-    _validate_required_scalar(\%args, $_) for qw(method url status reason);
-    _validate_status($args{status});
-    croak "headers must be a hash reference" unless ref($args{headers}) eq 'HASH';
-    croak "content must be a scalar" if ref($args{content});
-    return bless \%args, $class;
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    $self->headers({}) unless defined $self->headers;
+    $self->content('') unless defined $self->content;
+    _validate_required_scalar($self, $_) for qw(method url status reason);
+    _validate_status($self->status);
+    croak "headers must be a hash reference" unless ref($self->headers) eq 'HASH';
+    croak "content must be a scalar" if ref($self->content);
+    return;
 }
 
 sub header {
@@ -34,10 +42,10 @@ sub header {
 }
 
 sub _validate_required_scalar {
-    my ($args, $field) = @_;
-    croak "$field is required" unless exists $args->{$field} && defined $args->{$field};
-    croak "$field must be a scalar" if ref($args->{$field});
-    croak "$field is required" if $field =~ /\A(?:method|url)\z/ && !length $args->{$field};
+    my ($self, $field) = @_;
+    croak "$field is required" unless defined $self->$field;
+    croak "$field must be a scalar" if ref($self->$field);
+    croak "$field is required" if $field =~ /\A(?:method|url)\z/ && !length $self->$field;
 }
 
 sub _validate_status {
@@ -114,5 +122,15 @@ Returns the response body bytes as a scalar.
 
 Returns a response header value using case-insensitive lookup. Returns C<undef>
 when C<$name> is undefined or the header is absent.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

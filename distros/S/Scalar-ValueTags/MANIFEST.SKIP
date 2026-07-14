@@ -1,0 +1,12 @@
+\.bak$
+\.sw.$
+_build
+\.git/
+\.gitignore/
+blib/
+Build$
+lib/.*\.c
+lib/.*\.o
+^MYMETA\.yml$
+^MYMETA\.json$
+Scalar-ValueTags.*\.tar\.gz

@@ -2,7 +2,7 @@
 #
 # 9020_cheatsheet_tr.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip Hizli Basvuru (Turkce)
 # Bu test, Türkçe konuşanlar için hızlı başvuru kılavuzu olarak da hizmet verir.

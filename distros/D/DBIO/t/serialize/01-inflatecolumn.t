@@ -144,10 +144,7 @@ subtest 'YAML backend' => sub {
             ok(!blessed($dec),
                 'YAML safety: decoded value is not blessed (F04 risk-surface: LoadBlessed off)');
 
-            my $src = _read_source(
-                'DBIO::InflateColumn::Serializer::YAML',
-                '/storage/raid/home/getty/dev/perl/dbio-dev/dbio/lib/DBIO/InflateColumn/Serializer/YAML.pm',
-            );
+            my $src = _read_source('DBIO::InflateColumn::Serializer::YAML');
             like($src, qr/\bYAML::Load\b/,
                 'YAML safety: source uses YAML::Load (not LoadFile / LoadString)');
             unlike($src, qr/\bYAML::LoadFile\b/,
@@ -267,13 +264,17 @@ subtest 'Unknown backend throws with clear message' => sub {
 done_testing;
 
 # ---------------------------------------------------------------------------
-# Tiny helper: read the source file for a given module, falling back to the
-# absolute path passed in $_[1]. We prefer %INC so the test is hermetic and
-# does not depend on the lib path of whoever is running prove.
+# Tiny helper: read the source file for an already-loaded module by looking
+# it up in %INC. %INC is keyed by path form (Foo/Bar.pm), never by package
+# form (Foo::Bar), so we convert first. This keeps the test hermetic and
+# portable — it reads whatever copy of the module was actually loaded,
+# regardless of the lib path of whoever is running prove.
 # ---------------------------------------------------------------------------
 sub _read_source {
-    my ($module, $fallback) = @_;
-    my $path = $INC{$module} || $INC{$module . '.pm'} || $fallback;
+    my ($module) = @_;
+    (my $key = $module) =~ s{::}{/}g;
+    $key .= '.pm';
+    my $path = $INC{$key} or return '';
     open my $fh, '<', $path or return '';
     local $/;
     my $src = <$fh>;

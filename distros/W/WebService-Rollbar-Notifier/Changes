@@ -1,5 +1,8 @@
 Revision history for WebService-Rollbar-Notifier
 
+1.002011  2026-07-12 21:21:26-04:00 America/Toronto
+    - Skip live API tests unless TEST_ROLLBAR_ACCESS_TOKEN is set
+
 1.002010 2020-03-07
     - Debitrot (#13)
 

@@ -3,16 +3,20 @@ package Net::Blossom::Server::Backend::Postgres;
 use strictures 2;
 
 use Carp qw(croak);
+use Class::Tiny qw(dbh base_url _schema metadata_store blob_store);
 use DBI ();
-use File::Temp qw(tempfile);
 use Net::Blossom::BlobDescriptor;
 use Net::Blossom::_URL;
+use Net::Blossom::Server::Backend::Postgres::BlobStore;
+use Net::Blossom::Server::Backend::Postgres::MetadataStore;
+use Net::Blossom::Server::BlobStore;
 use Net::Blossom::Server::BlobResult;
+use Net::Blossom::Server::MetadataStore;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = _constructor_args(@_);
     my %known = map { $_ => 1 } qw(dsn username password dbh base_url connect_attrs);
@@ -30,206 +34,117 @@ sub new {
 
     my $base_url = _normalize_base_url($args{base_url});
     my $dbh = defined $args{dbh} ? _validate_dbh($args{dbh}) : _connect(%args);
+    my ($schema) = $dbh->selectrow_array(q{SELECT current_schema()});
+    croak "Postgres connection has no current schema"
+        unless defined $schema && length $schema;
 
-    return bless {
-        dbh      => $dbh,
-        base_url => $base_url,
-    }, $class;
-}
+    my $metadata_store = Net::Blossom::Server::Backend::Postgres::MetadataStore->new(dbh => $dbh);
+    my $blob_store = Net::Blossom::Server::Backend::Postgres::BlobStore->new(dbh => $dbh);
+    Net::Blossom::Server::MetadataStore->assert_implements($metadata_store);
+    Net::Blossom::Server::BlobStore->assert_implements($blob_store);
 
-sub dbh {
-    my ($self) = @_;
-    return $self->{dbh};
-}
-
-sub base_url {
-    my ($self) = @_;
-    return $self->{base_url};
+    return {
+        dbh            => $dbh,
+        base_url       => $base_url,
+        _schema        => $schema,
+        metadata_store => $metadata_store,
+        blob_store     => $blob_store,
+    };
 }
 
 sub deploy_schema {
     my ($self) = @_;
-    my $dbh = $self->dbh;
-
-    $dbh->do(q{
-        CREATE TABLE IF NOT EXISTS blossom_blobs (
-            sha256   text PRIMARY KEY NOT NULL,
-            body     bytea NOT NULL,
-            size     bigint NOT NULL,
-            type     text NOT NULL,
-            uploaded bigint NOT NULL
-        )
-    });
-    $dbh->do(q{
-        CREATE TABLE IF NOT EXISTS blossom_owners (
-            pubkey   text NOT NULL,
-            sha256   text NOT NULL,
-            type     text NOT NULL,
-            uploaded bigint NOT NULL,
-            PRIMARY KEY (pubkey, sha256),
-            FOREIGN KEY (sha256) REFERENCES blossom_blobs(sha256) ON DELETE CASCADE
-        )
-    });
-    $dbh->do(q{
-        CREATE INDEX IF NOT EXISTS blossom_owners_pubkey_order
-            ON blossom_owners (pubkey, uploaded DESC, sha256 ASC)
-    });
-
+    $self->_migrate_legacy_schema;
+    $self->blob_store->deploy_schema;
+    $self->metadata_store->deploy_schema;
     return 1;
 }
 
 sub begin_upload {
     my ($self, %context) = @_;
-    my ($fh, $path) = tempfile('net-blossom-postgres-upload-XXXXXX', TMPDIR => 1, UNLINK => 0);
-    binmode $fh
-        or croak "unable to binmode upload temp file: $!";
+    my $blob_upload = $self->blob_store->begin_upload(%context);
+    Net::Blossom::Server::BlobStore->assert_upload($blob_upload);
 
     return Net::Blossom::Server::Backend::Postgres::_Upload->new(
-        storage => $self,
-        fh      => $fh,
-        path    => $path,
+        storage     => $self,
+        blob_upload => $blob_upload,
     );
 }
 
 sub get_blob {
     my ($self, $sha256) = @_;
-    my $row = $self->dbh->selectrow_hashref(
-        q{SELECT sha256, body, size, type, uploaded FROM blossom_blobs WHERE sha256 = ?},
-        undef,
-        $sha256,
-    );
+    my $row = $self->metadata_store->find_blob($sha256);
     return unless defined $row;
+    my $body = $self->blob_store->get_blob($row->{storage_key});
+    return unless defined $body;
 
     return Net::Blossom::Server::BlobResult->new(
         descriptor => $self->_descriptor($row),
-        body       => $row->{body},
+        body       => $body,
     );
 }
 
 sub head_blob {
     my ($self, $sha256) = @_;
-    my $row = $self->dbh->selectrow_hashref(
-        q{SELECT sha256, size, type, uploaded FROM blossom_blobs WHERE sha256 = ?},
-        undef,
-        $sha256,
-    );
+    my $row = $self->metadata_store->find_blob($sha256);
     return unless defined $row;
     return $self->_descriptor($row);
 }
 
 sub delete_blob {
     my ($self, $sha256, %opts) = @_;
+    my $metadata = $self->metadata_store;
 
-    return $self->_with_transaction(sub {
-        $self->_lock_blob($sha256);
+    return $metadata->with_transaction(sub {
+        $metadata->lock_blob($sha256);
 
         if (defined $opts{pubkey}) {
-            my $rows = $self->dbh->do(
-                q{DELETE FROM blossom_owners WHERE sha256 = ? AND pubkey = ?},
-                undef,
-                $sha256,
-                $opts{pubkey},
-            );
-            return 0 unless _changed_rows($rows);
+            return 0 unless $metadata->delete_owner($sha256, $opts{pubkey});
             $self->_delete_blob_if_unowned($sha256);
             return 1;
         }
 
-        my ($exists) = $self->dbh->selectrow_array(
-            q{SELECT 1 FROM blossom_blobs WHERE sha256 = ?},
-            undef,
-            $sha256,
-        );
-        return 0 unless $exists;
+        my $record = $metadata->find_blob($sha256);
+        return 0 unless defined $record;
 
-        $self->dbh->do(q{DELETE FROM blossom_owners WHERE sha256 = ?}, undef, $sha256);
-        $self->dbh->do(q{DELETE FROM blossom_blobs WHERE sha256 = ?}, undef, $sha256);
+        $metadata->delete_owners($sha256);
+        $self->blob_store->delete_blob($record->{storage_key});
+        $metadata->delete_blob($sha256);
         return 1;
     });
 }
 
 sub list_blobs {
     my ($self, $pubkey, %opts) = @_;
-    my @where = ('o.pubkey = ?');
-    my @bind = ($pubkey);
-
-    if (defined $opts{cursor}) {
-        my $cursor = $self->dbh->selectrow_hashref(
-            q{SELECT sha256, uploaded FROM blossom_owners WHERE pubkey = ? AND sha256 = ?},
-            undef,
-            $pubkey,
-            $opts{cursor},
-        );
-        return [] unless defined $cursor;
-        push @where, q{(o.uploaded < ? OR (o.uploaded = ? AND o.sha256 > ?))};
-        push @bind, $cursor->{uploaded}, $cursor->{uploaded}, $cursor->{sha256};
-    }
-
-    my $sql = q{
-        SELECT o.sha256, b.size, o.type, o.uploaded
-          FROM blossom_owners o
-          JOIN blossom_blobs b ON b.sha256 = o.sha256
-         WHERE
-    } . join(' AND ', @where) . q{
-         ORDER BY o.uploaded DESC, o.sha256 ASC
-    };
-
-    if (defined $opts{limit}) {
-        return [] if $opts{limit} <= 0;
-        $sql .= q{ LIMIT ?};
-        push @bind, int($opts{limit});
-    }
-
-    my $rows = $self->dbh->selectall_arrayref($sql, { Slice => {} }, @bind);
+    my $rows = $self->metadata_store->list_blobs($pubkey, %opts);
     return [map { $self->_descriptor($_) } @$rows];
 }
 
 sub _commit_upload {
     my ($self, $upload, %metadata) = @_;
-    my $body = $upload->_body;
+    my $store = $self->metadata_store;
     my $created;
 
-    $self->_with_transaction(sub {
-        $self->_lock_blob($metadata{sha256});
+    $store->with_transaction(sub {
+        $store->lock_blob($metadata{sha256});
+        my $record = $store->find_blob($metadata{sha256});
 
-        my $sth = $self->dbh->prepare(
-            q{
-                INSERT INTO blossom_blobs
-                    (sha256, body, size, type, uploaded)
-                VALUES (?, ?, ?, ?, ?)
-                ON CONFLICT (sha256) DO NOTHING
-            }
-        );
-        $sth->bind_param(1, $metadata{sha256});
-        $sth->bind_param(2, $body, { pg_type => _pg_bytea() });
-        $sth->bind_param(3, $metadata{size});
-        $sth->bind_param(4, $metadata{type});
-        $sth->bind_param(5, $metadata{uploaded});
-        my $rows = $sth->execute;
-        $created = _changed_rows($rows) ? 1 : 0;
+        if (defined $record) {
+            $created = 0;
+        }
+        else {
+            my $storage_key = $upload->_prepare(%metadata);
+            $created = $store->insert_blob(%metadata, storage_key => $storage_key) ? 1 : 0;
+        }
 
         if (defined $metadata{pubkey}) {
-            $self->dbh->do(
-                q{
-                    INSERT INTO blossom_owners
-                        (pubkey, sha256, type, uploaded)
-                    VALUES (?, ?, ?, ?)
-                    ON CONFLICT (pubkey, sha256)
-                    DO UPDATE SET type = EXCLUDED.type,
-                                  uploaded = EXCLUDED.uploaded
-                },
-                undef,
-                $metadata{pubkey},
-                $metadata{sha256},
-                $metadata{type},
-                $metadata{uploaded},
-            );
+            $store->upsert_owner(%metadata);
         }
 
         return 1;
     });
 
-    eval { $upload->_cleanup };
+    eval { $upload->_cleanup($created) };
 
     return {
         descriptor => $self->_descriptor(\%metadata),
@@ -239,29 +154,12 @@ sub _commit_upload {
 
 sub _delete_blob_if_unowned {
     my ($self, $sha256) = @_;
-    my ($owners) = $self->dbh->selectrow_array(
-        q{SELECT COUNT(*) FROM blossom_owners WHERE sha256 = ?},
-        undef,
-        $sha256,
-    );
-    return if $owners;
-    $self->dbh->do(q{DELETE FROM blossom_blobs WHERE sha256 = ?}, undef, $sha256);
-    return;
-}
-
-sub _lock_blob {
-    my ($self, $sha256) = @_;
-    my @keys = map {
-        my $key = unpack 'N', pack 'H8', substr($sha256, $_, 8);
-        $key -= 4_294_967_296 if $key > 2_147_483_647;
-        $key;
-    } (0, 8);
-
-    $self->dbh->selectrow_array(
-        q{SELECT pg_advisory_xact_lock(?, ?)},
-        undef,
-        @keys,
-    );
+    my $metadata = $self->metadata_store;
+    return if $metadata->owner_count($sha256);
+    my $record = $metadata->find_blob($sha256);
+    return unless defined $record;
+    $self->blob_store->delete_blob($record->{storage_key});
+    $metadata->delete_blob($sha256);
     return;
 }
 
@@ -277,32 +175,49 @@ sub _descriptor {
     );
 }
 
-sub _with_transaction {
-    my ($self, $code) = @_;
-    my $dbh = $self->dbh;
-    my $manage = $dbh->{AutoCommit};
-    my $wantarray = wantarray;
-    my (@result, $result);
+sub _migrate_legacy_schema {
+    my ($self) = @_;
+    my $schema = $self->_schema;
+    my $columns = $self->dbh->selectall_arrayref(q{
+        SELECT column_name, udt_name
+          FROM information_schema.columns
+         WHERE table_schema = ?
+           AND table_name = 'blossom_blobs'
+    }, undef, $schema);
+    return 1 unless @$columns;
 
-    $dbh->begin_work if $manage;
-    my $ok = eval {
-        if ($wantarray) {
-            @result = $code->();
-        }
-        else {
-            $result = $code->();
-        }
-        1;
-    };
-    my $error = $@;
+    my %columns = map { $_->[0] => $_->[1] } @$columns;
+    return 1 if exists $columns{storage_key} && !exists $columns{body_oid};
+    croak "incompatible blossom_blobs schema; recreate it for PostgreSQL large-object storage"
+        unless !exists $columns{body}
+        && defined $columns{body_oid}
+        && $columns{body_oid} eq 'oid';
 
-    if (!$ok) {
-        eval { $dbh->rollback if $manage };
-        die $error;
-    }
+    my $blobs = $self->_table('blossom_blobs');
+    my $data = $self->_table('blossom_blob_data');
+    $self->metadata_store->with_transaction(sub {
+        $self->dbh->do(qq{
+            CREATE TABLE $data (
+                storage_key text PRIMARY KEY NOT NULL,
+                body_oid    oid NOT NULL
+            )
+        });
+        $self->dbh->do(qq{
+            INSERT INTO $data (storage_key, body_oid)
+            SELECT sha256, body_oid FROM $blobs
+        });
+        $self->dbh->do(qq{ALTER TABLE $blobs ADD COLUMN storage_key text});
+        $self->dbh->do(qq{UPDATE $blobs SET storage_key = sha256});
+        $self->dbh->do(qq{ALTER TABLE $blobs ALTER COLUMN storage_key SET NOT NULL});
+        $self->dbh->do(qq{ALTER TABLE $blobs DROP COLUMN body_oid});
+        return 1;
+    });
+    return 1;
+}
 
-    $dbh->commit if $manage;
-    return $wantarray ? @result : $result;
+sub _table {
+    my ($self, $name) = @_;
+    return $self->dbh->quote_identifier($self->_schema, $name);
 }
 
 sub _connect {
@@ -339,6 +254,8 @@ sub _validate_dbh {
     my $driver = eval { $dbh->{Driver}{Name} };
     croak "dbh must be a Postgres DBI handle"
         unless defined $driver && $driver eq 'Pg';
+    croak "dbh must have AutoCommit enabled"
+        unless $dbh->{AutoCommit};
     $dbh->{RaiseError} = 1;
     $dbh->{PrintError} = 0;
     eval { $dbh->{pg_enable_utf8} = 0 };
@@ -357,17 +274,6 @@ sub _normalize_base_url {
     return $base_url;
 }
 
-sub _changed_rows {
-    my ($rows) = @_;
-    return defined $rows && $rows ne '0E0' && $rows > 0;
-}
-
-sub _pg_bytea {
-    eval 'use DBD::Pg qw(:pg_types); 1'
-        or die $@;
-    return PG_BYTEA();
-}
-
 sub _constructor_args {
     return %{$_[0]} if @_ == 1 && ref($_[0]) eq 'HASH';
     croak "constructor arguments must be name/value pairs" if @_ % 2;
@@ -380,25 +286,23 @@ sub _constructor_args {
     use strictures 2;
 
     use Carp qw(croak);
+    use Class::Tiny qw(storage blob_upload), {
+        committed => 0,
+        aborted   => 0,
+    };
 
-    sub new {
-        my ($class, %args) = @_;
-        return bless {
-            storage   => $args{storage},
-            fh        => $args{fh},
-            path      => $args{path},
-            committed => 0,
-            aborted   => 0,
-        }, $class;
+    sub BUILD {
+        my ($self) = @_;
+        $self->committed;
+        $self->aborted;
+        return;
     }
 
     sub write {
         my ($self, $chunk) = @_;
         croak "upload is already committed" if $self->{committed};
         croak "upload is aborted" if $self->{aborted};
-        print {$self->{fh}} $chunk
-            or croak "storage write failed: $!";
-        return length $chunk;
+        return $self->{blob_upload}->write($chunk);
     }
 
     sub commit {
@@ -415,42 +319,22 @@ sub _constructor_args {
         my ($self) = @_;
         return 1 if $self->{aborted} || $self->{committed};
         $self->{aborted} = 1;
-        $self->_cleanup;
-        return 1;
+        return $self->{blob_upload}->abort;
     }
 
-    sub _body {
-        my ($self) = @_;
-        $self->_close;
-
-        open my $fh, '<:raw', $self->{path}
-            or croak "unable to read upload temp file: $!";
-        my $body = do { local $/; <$fh> };
-        close $fh
-            or croak "unable to close upload temp file: $!";
-        return $body;
+    sub _prepare {
+        my ($self, %metadata) = @_;
+        return $self->{blob_upload}->prepare(%metadata);
     }
 
     sub _cleanup {
-        my ($self) = @_;
-        $self->_close;
-        unlink $self->{path}
-            or croak "unable to remove upload temp file: $!"
-            if defined $self->{path} && -e $self->{path};
-        $self->{path} = undef;
-        return 1;
+        my ($self, $created) = @_;
+        return $created
+            ? $self->{blob_upload}->commit
+            : $self->{blob_upload}->abort;
     }
 
-    sub _close {
-        my ($self) = @_;
-        return 1 unless defined $self->{fh};
-        close $self->{fh}
-            or croak "unable to close upload temp file: $!";
-        $self->{fh} = undef;
-        return 1;
-    }
-
-    sub DESTROY {
+    sub DEMOLISH {
         my ($self) = @_;
         return if $self->{committed} || $self->{aborted};
         eval { $self->abort };
@@ -489,15 +373,33 @@ and implements the L<Net::Blossom::Server::Storage> contract.
 
 Postgres access is provided through L<DBI> and L<DBD::Pg>.
 
-Blob bodies are stored in Postgres C<bytea> values. This keeps the backend
-self-contained and transactional. Very large public media services may still
-prefer a backend that stores blob bytes outside the metadata database.
+Blob bodies are stored as
+L<PostgreSQL large objects|https://www.postgresql.org/docs/current/largeobjects.html>.
+Uploads are written to a temporary file and imported only after the server has
+validated the hash. Downloads are returned as streams, so blob bodies are not
+loaded into Perl memory as a whole.
+
+Each active download uses a cloned DBI connection and a read transaction until
+the body reaches EOF or is closed. Deployments must allow enough PostgreSQL
+connections for their concurrent downloads. Very large public media services
+may still prefer a backend that stores blob bytes outside the metadata database.
 
 This backend serializes uploads and deletes for the same hash with a
 transaction-level PostgreSQL advisory lock. The lock is released when the
 transaction commits or rolls back. Direct SQL writes to the backend tables do
 not participate in this locking protocol. Operations for different hashes may
 run concurrently.
+
+The backend coordinates separate
+L<Net::Blossom::Server::Backend::Postgres::MetadataStore> and
+L<Net::Blossom::Server::Backend::Postgres::BlobStore> components on one DBI
+handle. Applications normally use this top-level storage class.
+
+=head1 UPGRADING FROM 0.001001
+
+C<deploy_schema> automatically separates the current large-object schema into
+metadata and blob-data tables. Existing large-object identifiers, descriptors,
+and owners are preserved. Back up the database before upgrading.
 
 =head1 CONSTRUCTOR
 
@@ -517,7 +419,12 @@ created. It may include a path prefix, but not userinfo, query, or fragment
 parts. Trailing slashes are removed.
 
 Instead of C<dsn>, callers may pass an existing DBI handle as C<dbh>. The handle
-must be a Postgres handle.
+must be a Postgres handle with C<AutoCommit> enabled so the backend can manage
+its transactions. The backend clones this handle for each active blob download.
+
+The backend uses the connection's current schema at construction time. All
+later operations, including cloned download connections, remain bound to that
+schema.
 
 Optional C<connect_attrs> may be supplied with C<dsn>. The backend always forces
 C<AutoCommit>, C<RaiseError>, C<PrintError>, and C<pg_enable_utf8> to values
@@ -537,26 +444,37 @@ Returns the DBI handle used by the backend.
 
 Returns the normalized descriptor URL prefix.
 
+=head2 metadata_store
+
+Returns the PostgreSQL metadata-store component.
+
+=head2 blob_store
+
+Returns the PostgreSQL large-object store component.
+
 =head2 deploy_schema
 
     $storage->deploy_schema;
 
 Creates the required Postgres tables and indexes if they do not already exist.
-This method is safe to call more than once.
+They are created in the schema captured by C<new>. This method is safe to call
+more than once. It migrates the C<0.001001> schema automatically.
 
 =head2 begin_upload
 
     my $upload = $storage->begin_upload(%context);
 
 Starts a blob upload and returns an upload writer. The server core writes bytes
-to the writer and later calls C<commit> with validated blob metadata.
+to a temporary file and later calls C<commit> with validated blob metadata. A
+new blob is imported as a PostgreSQL large object transactionally.
 
 =head2 get_blob
 
     my $result = $storage->get_blob($sha256);
 
 Returns a L<Net::Blossom::Server::BlobResult> for C<$sha256>, or C<undef> when
-the blob is absent.
+the blob is absent. Its body is a stream backed by a dedicated DBI connection.
+Reading to EOF or calling C<close> releases that connection.
 
 =head2 head_blob
 
@@ -570,8 +488,8 @@ C<undef> when the blob is absent.
     my $deleted = $storage->delete_blob($sha256, pubkey => $pubkey);
 
 Deletes one owner relationship when C<pubkey> is supplied. The blob bytes are
-deleted when the final owner is removed. Without C<pubkey>, the blob and all
-owners are deleted.
+deleted with C<pg_lo_unlink> when the final owner is removed. Without C<pubkey>,
+the blob and all owners are deleted.
 
 =head2 list_blobs
 
@@ -580,5 +498,16 @@ owners are deleted.
 Returns descriptors owned by C<$pubkey>, sorted by C<uploaded> descending and
 C<sha256> ascending. C<cursor> and C<limit> follow the
 L<Net::Blossom::Server::Storage> contract.
+
+=head1 SEE ALSO
+
+L<PostgreSQL large objects|https://www.postgresql.org/docs/current/largeobjects.html>,
+L<DBD::Pg/Large Objects>
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
 
 =cut

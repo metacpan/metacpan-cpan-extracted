@@ -109,7 +109,7 @@ DBIO::Deploy::Base::TempDatabase - Deploy base for drivers that diff against a t
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

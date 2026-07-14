@@ -71,8 +71,13 @@ on 'test' => sub {
   # this is already a dep of n::c, but just in case - used by t/55namespaces_cleaned.t
   # remove and do a manual glob-collection if n::c is no longer a dep
   requires 'Package::Stash', '0.28';
+
+  # Optional: core runtime uses the native deploy path (no SQL::Translator),
+  # but a few tests exercise the legacy SQLT deploy hook end-to-end. They skip
+  # cleanly when it is absent; recommending it lets capable smokers cover it.
+  recommends 'SQL::Translator', '0';
 };
 
 on 'develop' => sub {
-  requires 'Dist::Zilla::PluginBundle::DBIO', '0.900001';
+  requires 'Dist::Zilla::PluginBundle::DBIO', '0.900003';
 };

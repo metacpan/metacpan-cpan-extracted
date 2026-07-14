@@ -3,7 +3,7 @@ package POE::Component::Archive::Any;
 use warnings;
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp;
 use POE (qw( Filter::Reference  Filter::Line  Wheel::Run ));

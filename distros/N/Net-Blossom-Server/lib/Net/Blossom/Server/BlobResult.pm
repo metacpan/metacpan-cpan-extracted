@@ -9,21 +9,26 @@ use Carp qw(croak);
 use Class::Tiny qw(descriptor body);
 use Scalar::Util qw(blessed);
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(descriptor body);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "descriptor is required" unless defined $args{descriptor};
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    croak "descriptor is required" unless defined $self->descriptor;
     croak "descriptor must be a Net::Blossom::BlobDescriptor"
-        unless blessed($args{descriptor}) && $args{descriptor}->isa('Net::Blossom::BlobDescriptor');
+        unless blessed($self->descriptor) && $self->descriptor->isa('Net::Blossom::BlobDescriptor');
 
-    croak "body is required" unless exists $args{body} && defined $args{body};
-    _validate_body($args{descriptor}, $args{body});
+    croak "body is required" unless defined $self->body;
+    _validate_body($self->descriptor, $self->body);
 
-    return bless \%args, $class;
+    return;
 }
 
 sub _validate_body {
@@ -106,5 +111,15 @@ Returns the C<Net::Blossom::BlobDescriptor>.
 =head2 body
 
 Returns the scalar, array reference, or stream object body.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

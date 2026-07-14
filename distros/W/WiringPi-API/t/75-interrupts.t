@@ -221,6 +221,21 @@ like($@, qr/unknown signal/, 'auto_dispatch_interrupts() rejects an unknown sign
     ok(! defined $SIG{USR2}, '... and restores the chosen signal handler');
 }
 
+# A pre-existing handler on the chosen signal must be SAVED on enable and
+# RESTORED on disable (not clobbered/deleted). The block above covered the
+# no-prior-handler path (restore == delete); this covers the restore-prior path.
+{
+    my $prior = sub { 'prior USR2 handler' };
+    local $SIG{USR2} = $prior;
+
+    is(auto_dispatch_interrupts(1, 'USR2'), 1, 'enable auto-dispatch over a live USR2 handler');
+    is($SIG{USR2}, \&WiringPi::API::dispatch_interrupts,
+        '... our dispatcher takes over the signal while enabled');
+
+    is(auto_dispatch_interrupts(0), 1, 'disable auto-dispatch');
+    is($SIG{USR2}, $prior, '... and the pre-existing handler is restored, not deleted');
+}
+
 # ---------------------------------------------------------------------------
 # Real hardware (opt-in via RPI_BOARD). Uses BCM17 driven by toggling its
 # internal pull resistor - electrically safe (a weak pull can't damage a wired

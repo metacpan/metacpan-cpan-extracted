@@ -7,7 +7,7 @@ use Carp;
 
 use base 'Net::OBEX::Packet::Headers::Base';
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 my %Header_HI_For = (
     type            => "\x42",

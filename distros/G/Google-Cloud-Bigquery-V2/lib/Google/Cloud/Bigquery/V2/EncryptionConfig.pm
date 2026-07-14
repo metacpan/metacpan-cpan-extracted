@@ -1,0 +1,57 @@
+package Google::Cloud::Bigquery::V2::EncryptionConfig;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Auditing };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Inclusion };
+    eval { require Google::Api::Policy };
+    eval { require Google::Protobuf::Wrappers };
+    my $descriptor_b64 = <<'EOF';
+CjBnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvZW5jcnlwdGlvbl9jb25maWcucHJvdG8SGGdv
+b2dsZS5jbG91ZC5iaWdxdWVyeS52MhoZZ29vZ2xlL2FwaS9hdWRpdGluZy5wcm90bxofZ29v
+Z2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90bxoaZ29vZ2xlL2FwaS9pbmNsdXNpb24ucHJv
+dG8aF2dvb2dsZS9hcGkvcG9saWN5LnByb3RvGh5nb29nbGUvcHJvdG9idWYvd3JhcHBlcnMu
+cHJvdG8idAoXRW5jcnlwdGlvbkNvbmZpZ3VyYXRpb24SWQoMa21zX2tleV9uYW1lGAEgASgL
+MhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlQhngQQHq6oCsAwcSBUFVRElUwvaM3AQD
+gAEBUgprbXNLZXlOYW1lQn0KHGNvbS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJCFUVuY3J5
+cHRpb25Db25maWdQcm90b1o7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92Mi9hcGl2
+Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGKK1dvSDwUKA2FsbEqvBwoGEgQAACABCggKAQwSAwAA
+EgoICgECEgMCACEKCQoCAwASAwQAIwoJCgIDARIDBQApCgkKAgMCEgMGACQKCQoCAwMSAwcA
+IQoJCgIDBBIDCAAoCggKAQgSAwoAUgoJCgIICxIDCgBSCggKAQgSAwsANQoJCgIIARIDCwA1
+CggKAQgSAwwANgoJCgIICBIDDAA2CggKAQgSAw0ALQoPCggI0bqr+gEBABIDDQAtCsQCCgIE
+ABIEFQAgARq3AiAoLS0gRW5jcnlwdGlvbiBpbmZvIHRoYXQgY2FuIGJlIGFzc29jaWF0ZWQg
+d2l0aCBtdWx0aXBsZSBBUEkgbWV0aG9kcy4gU2VlOgogZ29vZ2xlZGF0YS9hcGlzZXJ2aW5n
+L2NvbmZpZy9jbG91ZC9oZWxpeC92Mi90ZW1wbGF0ZXMvZW5jcnlwdGlvbmNvbmZpZ3VyYXRp
+b24uanNvbnQKIC0tKQogKC0tIGFwaS1saW50ZXI6IGFiYnJldmlhdGlvbnM9ZGlzYWJsZWQg
+LS0pCiAoPT0gc3VwcHJlc3Nfd2FybmluZyBuYW1pbmctbmFtZS1hYmJyZXZpYXRpb24gPT0p
+CiBDb25maWd1cmF0aW9uIGZvciBDbG91ZCBLTVMgZW5jcnlwdGlvbiBzZXR0aW5ncy4KCgoK
+AwQAARIDFQgfCrwCCgQEAAIAEgQbAh8EGq0CIERlc2NyaWJlcyB0aGUgQ2xvdWQgS01TIGVu
+Y3J5cHRpb24ga2V5IHRoYXQgd2lsbCBiZSB1c2VkIHRvCiBwcm90ZWN0IGRlc3RpbmF0aW9u
+IEJpZ1F1ZXJ5IHRhYmxlLiBUaGUgQmlnUXVlcnkgU2VydmljZSBBY2NvdW50IGFzc29jaWF0
+ZWQKIHdpdGggeW91ciBwcm9qZWN0IHJlcXVpcmVzIGFjY2VzcyB0byB0aGlzIGVuY3J5cHRp
+b24ga2V5LgogKC0tIEEgd3JhcHBlciBpcyB1c2VkIGJlY2F1c2UgaW4gQXBpYXJ5IGl0IGlz
+IHBvc3NpYmxlIHRvIHNldCB0aGlzIGZpZWxkIHRvCiAgICAgdGhlIGVtcHR5IHN0cmluZy4g
+LS0pCgoMCgUEAAIABhIDGwIdCgwKBQQAAgABEgMbHioKDAoFBAACAAMSAxstLgoNCgUEAAIA
+CBIEGy8fAwoRCgoEAAIACK2NwDUCEgMcBDMKDwoIBAACAAicCAASAx0EKgoRCgoEAAIACOjO
+wUsQEgMeBEZiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration ===
+    # Fields for EncryptionConfiguration
+    # Field: kms_key_name Type: 11 (.google.protobuf.StringValue)
+
+1;

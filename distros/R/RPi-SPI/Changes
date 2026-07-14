@@ -1,47 +1,64 @@
 Revision history for RPi-SPI
 
+3.1802    2026-07-13
+    - GPIO chip-select transfers now hold the hardware CE line off with
+      SPI_NO_CS (via WiringPi::API's spiNoCS()) so they no longer strobe
+      a device on CE0/CE1; requires WiringPi::API 3.1804
+    - Added full software bit-bang mode: pass new() a hashref of clk, mosi,
+      miso, cs (and optional mode/delay) GPIO pins to run the whole bus in
+      software via WiringPi::API's spiBitBang()
+    - new()'s speed parameter now croaks on an explicit non-positive or
+      non-integer value instead of silently rewriting it to the 1MHz default;
+      an undefined speed still means "use the default"
+    - rw() now croaks on a non-arrayref buffer or a non-positive-integer length
+      instead of failing deep in the transport layer
+    - Added t/05-unit.t: HW-free coverage of channel/CS routing, speed handling,
+      bit-bang param validation, rw() argument validation, and the rw() framing
+      sequence for the plain, GPIO-CS (with and without SPI_NO_CS), and bit-bang
+      paths (transport funcs stubbed - no bus, no wiring)
+
 3.1801    2026-06-12
-        - Fix undefined subs in bit-bang CS path against WiringPi::API 3.18
+    - Fix undefined subs in bit-bang CS path against WiringPi::API 3.18
 
 2.3609  2018-10-03
-        - fix documentation that claimed the return from rw() was an array
-          reference, where really it's an array (closes #6)
+    - fix documentation that claimed the return from rw() was an array
+      reference, where really it's an array (closes #6)
 
 2.3608  2018-02-07
-        - fix issue where we were calling _channel() twice in new(), instead
-          of one call to _channel() and one to _speed() (fixes #5). Thanks
-          gnotoix (Github) for the report and patch!
+    - fix issue where we were calling _channel() twice in new(), instead
+      of one call to _channel() and one to _speed() (fixes #5). Thanks
+      gnotoix (Github) for the report and patch!
 
 2.3607  2017-06-28
-        - bump prereq ver of WiringPi::API to 2.3612
+    - bump prereq ver of WiringPi::API to 2.3612
 
 2.3606  2017-03-13
-        - changed version scheme from 2.36.x to to 2.360x in module and prereqs
+    - changed version scheme from 2.36.x to to 2.360x in module and prereqs
 
 2.36.5  2017-03-11
-        - we now accept a GPIO pin number as the channel. If 0 or 1 are sent
-          in as channel, we'll use the built-in RPi SPI channel (CE0 or CE1).
-          If a GPIO pin is sent in that is greater than 1, we'll know that this
-          connects to your CS/SS pin on your IC, and we'll automagically
-          bit-bang on that pin for communication, freeing up the two onboard
-          hardware SPI channels. The API was not changed for this. (closes #1)
-        - prereq of WiringPi::API now 2.36.7
+    - we now accept a GPIO pin number as the channel. If 0 or 1 are sent
+      in as channel, we'll use the built-in RPi SPI channel (CE0 or CE1).
+      If a GPIO pin is sent in that is greater than 1, we'll know that this
+      connects to your CS/SS pin on your IC, and we'll automagically
+      bit-bang on that pin for communication, freeing up the two onboard
+      hardware SPI channels. The API was not changed for this. (closes #1)
+    - prereq of WiringPi::API now 2.36.7
 
 2.36.4  2017-01-26
-        - changed rw() so that it now returns an array, per WiringPi::API's
-          spiDataRW() call. This was an oversight/bug in that code
-        - fix quoting issue in a prereq in Makefile.PL
-        - WiringPi::API prereq now v2.36.4
+    - changed rw() so that it now returns an array, per WiringPi::API's
+      spiDataRW() call. This was an oversight/bug in that code
+    - fix quoting issue in a prereq in Makefile.PL
+    - WiringPi::API prereq now v2.36.4
 
 2.36.2  2017-01-22
-        - fix params in pod, they weren't displaying correctly
+    - fix params in pod, they weren't displaying correctly
 
 2.36.1  2017-01-22
-        - initial release (version number matches wiringPi's, plus an
-          incremental trailing decimal place for updates to this module
-        - we default to 1MHz speed if not specified in the new() method
-        - we die() if we can't open or write to the SPI bus
-        - changed to using WiringPi::API::spiDataRW() (a custom wrapper for
-          wiringPiSPIDataRW(), so that we can send in an aref to the C
-          functions)
+    - initial release (version number matches wiringPi's, plus an
+      incremental trailing decimal place for updates to this module
+    - we default to 1MHz speed if not specified in the new() method
+    - we die() if we can't open or write to the SPI bus
+    - changed to using WiringPi::API::spiDataRW() (a custom wrapper for
+      wiringPiSPIDataRW(), so that we can send in an aref to the C
+      functions)
 

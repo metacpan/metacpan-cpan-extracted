@@ -1,5 +1,12 @@
 Revision history for HTML-ExtractText
 
+1.002005  2026-07-12
+        - Fix breakage by newer Mojolicious/Mojo::DOM: text extraction relied
+          on Mojo::DOM's private _nodes()/_ancestors() internals, whose return
+          conventions changed in later releases and caused ->extract() to
+          silently return empty strings. Reworked to read the stable Mojo::DOM
+          ->tree node structure directly and use the public ->ancestors() API.
+
 1.002004  2016-10-30
         - Fix breakage by Mojolicious 7.0 (dionys)
 

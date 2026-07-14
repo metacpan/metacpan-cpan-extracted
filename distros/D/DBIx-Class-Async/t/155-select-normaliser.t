@@ -48,7 +48,7 @@ subtest '_is_ident_hashref identifies -ident hashrefs correctly' => sub {
 
 # normalise() -- array-level transformation
 
-subtest 'normalise() — bare strings pass through unchanged' => sub {
+subtest 'normalise() - bare strings pass through unchanged' => sub {
     my ($sel, $as) = $SN->normalise(
         select => [ 'me.id', 'me.name', 'me.email'  ],
         as     => [ 'id',    'name',    'email'     ],
@@ -58,7 +58,7 @@ subtest 'normalise() — bare strings pass through unchanged' => sub {
     is_deeply( $as,  [ 'id',    'name',    'email'     ], 'as unchanged'     );
 };
 
-subtest 'normalise() — { -ident } without -as rewrites select, leaves as undef' => sub {
+subtest 'normalise() - { -ident } without -as rewrites select, leaves as undef' => sub {
 
     # Design note: when -as is absent and the caller's as[] slot is also undef,
     # the output as slot is undef. DBIC omits undef alias entries, so the
@@ -74,7 +74,7 @@ subtest 'normalise() — { -ident } without -as rewrites select, leaves as undef
     is( $as->[0], undef, 'as slot is undef when -as absent and as[] empty' );
 };
 
-subtest 'normalise() — { -ident, -as } rewrites select and populates as' => sub {
+subtest 'normalise() - { -ident, -as } rewrites select and populates as' => sub {
 
     my ($sel, $as) = $SN->normalise(
         select => [ { '-ident' => 'me.status', '-as' => 'current_status' } ],
@@ -85,7 +85,7 @@ subtest 'normalise() — { -ident, -as } rewrites select and populates as' => su
     is_deeply( $as,  [ 'current_status' ], 'alias populated from -as'       );
 };
 
-subtest 'normalise() — function hashrefs pass through unchanged' => sub {
+subtest 'normalise() - function hashrefs pass through unchanged' => sub {
 
     # Design note: function hashrefs { func => $col, -as => $alias } must not
     # be touched. DBIC handles -as inside function hashrefs itself via a
@@ -103,7 +103,7 @@ subtest 'normalise() — function hashrefs pass through unchanged' => sub {
     is( $as->[0], 'cnt', 'as entry preserved' );
 };
 
-subtest 'normalise() — literal SQL refs pass through unchanged' => sub {
+subtest 'normalise() - literal SQL refs pass through unchanged' => sub {
 
     my $literal = \[ 'COALESCE(me.col, ?)', 0 ];
     my ($sel, $as) = $SN->normalise(
@@ -115,7 +115,7 @@ subtest 'normalise() — literal SQL refs pass through unchanged' => sub {
     is( $as->[0],  'coalesced', 'as entry preserved'                    );
 };
 
-subtest 'normalise() — mixed list with all forms' => sub {
+subtest 'normalise() - mixed list with all forms' => sub {
 
     # This is the most representative real-world use case:
     # a select list containing bare strings, -ident items, function hashrefs,
@@ -150,7 +150,7 @@ subtest 'normalise() — mixed list with all forms' => sub {
     is( $as->[4], 'now',            'slot 4: as array entry preserved'       );
 };
 
-subtest 'normalise() — caller as[] takes priority over -as in -ident hashref' => sub {
+subtest 'normalise() - caller as[] takes priority over -as in -ident hashref' => sub {
 
     # Design note: the caller may specify the alias both inline (-as) and in
     # the as[] array. The as[] array always wins because:
@@ -173,7 +173,7 @@ subtest 'normalise() — caller as[] takes priority over -as in -ident hashref' 
     is( $as->[0],  'from_as_array', 'as[] wins over inline -as'     );
 };
 
-subtest 'normalise() — as[] longer than select — extra entries preserved' => sub {
+subtest 'normalise() - as[] longer than select - extra entries preserved' => sub {
 
     # Extra as[] entries beyond the length of select are an unusual but valid
     # state (they would be silently ignored by DBIC). We preserve them rather
@@ -190,7 +190,7 @@ subtest 'normalise() — as[] longer than select — extra entries preserved' =>
     is( $as->[1],     'orphaned_alias', 'extra as entry preserved'     );
 };
 
-subtest 'normalise() — as[] shorter than select — gap filled from -ident -as' => sub {
+subtest 'normalise() - as[] shorter than select - gap filled from -ident -as' => sub {
 
     my ($sel, $as) = $SN->normalise(
         select => [
@@ -204,7 +204,7 @@ subtest 'normalise() — as[] shorter than select — gap filled from -ident -as
     is( $as->[1], 'current_status', 'slot 1 filled from -ident -as');
 };
 
-subtest 'normalise() — scalar (non-array) select is wrapped in arrayref' => sub {
+subtest 'normalise() - scalar (non-array) select is wrapped in arrayref' => sub {
 
     # Callers sometimes pass a single column as a scalar rather than a
     # one-element arrayref. normalise() accepts both forms.
@@ -218,7 +218,7 @@ subtest 'normalise() — scalar (non-array) select is wrapped in arrayref' => su
     is( $as->[0], 'name', 'as entry preserved' );
 };
 
-subtest 'normalise() — hashref (non-array) select is wrapped in arrayref' => sub {
+subtest 'normalise() - hashref (non-array) select is wrapped in arrayref' => sub {
 
     my ($sel, $as) = $SN->normalise(
         select => { '-ident' => 'me.status', '-as' => 'st' },
@@ -229,7 +229,7 @@ subtest 'normalise() — hashref (non-array) select is wrapped in arrayref' => s
     is( $as->[0], 'st', 'alias from -as' );
 };
 
-subtest 'normalise() — empty select produces empty arrays' => sub {
+subtest 'normalise() - empty select produces empty arrays' => sub {
 
     my ($sel, $as) = $SN->normalise( select => [], as => [] );
 
@@ -239,7 +239,7 @@ subtest 'normalise() — empty select produces empty arrays' => sub {
 
 # normalise_attrs() -- full attrs hashref transformation
 
-subtest 'normalise_attrs() — no select key returns hashref unchanged' => sub {
+subtest 'normalise_attrs() - no select key returns hashref unchanged' => sub {
 
     # Design note: we return the same hashref reference rather than a copy when
     # there is no select key, because there is nothing to change and copying
@@ -252,7 +252,7 @@ subtest 'normalise_attrs() — no select key returns hashref unchanged' => sub {
     is( $result, $attrs, 'same reference returned when no select key' );
 };
 
-subtest 'normalise_attrs() — rewrites select/as, preserves other keys' => sub {
+subtest 'normalise_attrs() - rewrites select/as, preserves other keys' => sub {
 
     my $attrs = {
         select   => [ { '-ident' => 'me.status', '-as' => 'current_status' } ],
@@ -274,7 +274,7 @@ subtest 'normalise_attrs() — rewrites select/as, preserves other keys' => sub 
     is(        $result->{join},     'orders',        'join preserved'     );
 };
 
-subtest 'normalise_attrs() — no as key in attrs — as is populated from -ident items' => sub {
+subtest 'normalise_attrs() - no as key in attrs - as is populated from -ident items' => sub {
 
     my $attrs = {
         select => [ { '-ident' => 'me.col', '-as' => 'my_alias' } ],
@@ -287,7 +287,7 @@ subtest 'normalise_attrs() — no as key in attrs — as is populated from -iden
     is_deeply( $result->{as},     [ 'my_alias' ], 'as created from -ident item' );
 };
 
-subtest 'normalise_attrs() — input hashref is not modified in place' => sub {
+subtest 'normalise_attrs() - input hashref is not modified in place' => sub {
 
     # Design note: normalise_attrs() must be side-effect-free on its input.
     # The caller may hold a reference to the original attrs and pass them to
@@ -338,7 +338,7 @@ subtest 'normalise_attrs() — input hashref is not modified in place' => sub {
 # correct SQL from the output because bare strings in select[] map directly
 # to column references in the generated SQL.
 
-subtest 'structural proof — normalised output has correct types for SQL generation' => sub {
+subtest 'structural proof - normalised output has correct types for SQL generation' => sub {
 
     my $literal = \[ 'NOW()' ];
 

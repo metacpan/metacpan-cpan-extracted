@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "RPi::Const" : "1.07"
          }
       },
       "runtime" : {
          "requires" : {
-            "RPi::Const" : "1.05",
+            "RPi::Const" : "1.07",
             "perl" : "5.006"
          }
       }
@@ -48,6 +48,6 @@
          "web" : "https://github.com/stevieb9/wiringpi-api"
       }
    },
-   "version" : "3.1803",
+   "version" : "3.1804",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

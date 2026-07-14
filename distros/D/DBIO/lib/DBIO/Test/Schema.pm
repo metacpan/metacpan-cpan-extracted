@@ -171,7 +171,7 @@ DBIO::Test::Schema - Standard test schema for the DBIO ecosystem
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

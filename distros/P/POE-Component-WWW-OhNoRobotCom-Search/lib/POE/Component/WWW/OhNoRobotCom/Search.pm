@@ -3,7 +3,7 @@ package POE::Component::WWW::OhNoRobotCom::Search;
 use warnings;
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp;
 use WWW::OhNoRobotCom::Search;
@@ -21,7 +21,7 @@ sub search {
 sub _prepare_wheel {
     my ( $self, $args ) = @_;
     $self->{_robo} = WWW::OhNoRobotCom::Search->new(
-        %{ $self->{obj_args} || {} }
+        %{ $self->{obj_args} || {} } 
     );
 }
 
@@ -52,8 +52,6 @@ sub _process_request {
 
 1;
 __END__
-
-=encoding utf8
 
 =head1 NAME
 

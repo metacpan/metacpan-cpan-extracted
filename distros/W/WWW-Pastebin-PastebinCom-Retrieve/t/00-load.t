@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 19;
 my $ID = 'f525c4cec';
 my $URI = 'http://pastebin.com/f525c4cec';
 
@@ -29,11 +29,20 @@ SKIP: {
     unless ( defined $o_ref ) {
         diag "Got retrieve error: " . $o->error;
         ok( (defined $o->error and length $o->error), 'error got a message');
-        skip "Got error", 6;
+        skip "Got error", 9;
     }
 
-    is_deeply( $o_ref, _make_dump(),
-        'return from retrieve() matches the dump'
+    # The paste body is fetched verbatim from pastebin.com/raw/<id> and must
+    # match byte-for-byte. name/lang are still scraped from the paste page;
+    # posted_on is checked loosely since pastebin.com's date format has
+    # changed over the years (it now renders e.g. "Mar 22nd, 2008").
+    is( $o_ref->{content}, _expected_content(),
+        'content matches the raw paste body exactly'
+    );
+    is( $o_ref->{name}, 'Zoffix', 'name() metadata scraped from page' );
+    is( $o_ref->{lang}, 'Perl',   'lang() metadata scraped from page' );
+    like( $o_ref->{posted_on}, qr/2008/,
+        'posted_on() references the correct year'
     );
 
     isa_ok($o->uri, 'URI::http', '->uri() is a URI object');
@@ -45,11 +54,6 @@ SKIP: {
 }
 
 
-sub _make_dump {
-    return {
-          "lang" => "Perl",
-          "posted_on" => "Sat 22 Mar 16:07",
-          "content" => "sub error {\r\n    my \$self = shift;\r\n    if ( \@_ ) {\r\n        \$self->{ ERROR } = shift;\r\n    }\r\n    return \$self->{ ERROR };\r\n}\r\n\r\nsub content {\r\n    my \$self = shift;\r\n    if ( \@_ ) {\r\n        \$self->{ CONTENT } = shift;\r\n    }\r\n    return \$self->{ CONTENT };\r\n}",
-          "name" => "Zoffix"
-        };
+sub _expected_content {
+    return "sub error {\r\n    my \$self = shift;\r\n    if ( \@_ ) {\r\n        \$self->{ ERROR } = shift;\r\n    }\r\n    return \$self->{ ERROR };\r\n}\r\n\r\nsub content {\r\n    my \$self = shift;\r\n    if ( \@_ ) {\r\n        \$self->{ CONTENT } = shift;\r\n    }\r\n    return \$self->{ CONTENT };\r\n}";
 }

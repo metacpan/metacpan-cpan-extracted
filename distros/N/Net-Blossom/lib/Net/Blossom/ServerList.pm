@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Class::Tiny qw(_blossom);
 use Net::Nostr::Blossom;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(servers);
@@ -20,13 +20,14 @@ sub new {
     croak "server list requires at least one server" unless @{$args{servers}};
 
     my $blossom = Net::Nostr::Blossom->new(servers => $args{servers});
-    return bless { _blossom => $blossom }, $class;
+    return { _blossom => $blossom };
 }
 
 sub from_event {
     my ($class, $event) = @_;
     my $blossom = Net::Nostr::Blossom->from_event($event);
-    return bless { _blossom => $blossom }, $class;
+    my $servers = $blossom->servers;
+    return $class->new(servers => $servers);
 }
 
 sub servers {
@@ -166,5 +167,11 @@ an empty list when no hash is found.
 Builds fallback blob URLs for every server in the list using the hash and
 optional extension extracted from C<$url>. Returns an array reference. Returns an
 empty array reference when C<$url> does not contain a hash.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
 
 =cut

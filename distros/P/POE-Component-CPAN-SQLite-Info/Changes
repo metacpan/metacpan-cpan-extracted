@@ -1,5 +1,9 @@
 Revision history for POE-Component-CPAN-SQLite-Info
 
+0.12    2026-07-13
+        - Fixed freshen dying under modern LWP with
+          "Can't store CODE items"
+
 0.11    2013-11-12
         - Fixed a "bug" that supposedly rendered this module dead:
           for some reason crucial code was commented out.

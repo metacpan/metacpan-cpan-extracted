@@ -40,7 +40,7 @@ DBIO::Test::Schema::CD_to_Producer - Test result class for the cd_to_producer ta
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

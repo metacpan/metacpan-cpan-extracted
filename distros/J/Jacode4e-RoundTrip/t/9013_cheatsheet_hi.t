@@ -2,7 +2,7 @@
 #
 # 9013_cheatsheet_hi.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip त्वरित संदर्भ (हिन्दी)
 # यह परीक्षण हिन्दी भाषी उपयोगकर्ताओं के लिए त्वरित संदर्भ के रूप में भी कार्य करता है।

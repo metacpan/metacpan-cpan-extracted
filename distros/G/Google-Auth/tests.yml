@@ -1,0 +1,32 @@
+- name: install cpanm and multiple modules
+  uses: perl-actions/install-with-cpanm@v1
+  with:
+     cpanfile: 'cpanfile'
+     sudo: false
+jobs:
+  perl_tester:
+    runs-on: ubuntu-latest
+    name: "perl v${{ matrix.perl-version }}"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - "5.30"
+          - "5.28"
+          - "5.26"
+        # ...
+        # - '5.8'
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: uses install-with-cpanm
+        uses: perl-actions/install-with-cpanm@v1
+        with:
+          cpanfile: "cpanfile"
+          sudo: false
+      - run: perl Makefile.PL
+      - run: make test

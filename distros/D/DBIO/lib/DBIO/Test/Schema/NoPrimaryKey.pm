@@ -29,7 +29,7 @@ DBIO::Test::Schema::NoPrimaryKey - Test result class for a table with no primary
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

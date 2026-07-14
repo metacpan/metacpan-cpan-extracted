@@ -4,13 +4,21 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::Deep;
-use Test::RequiresInternet 'api.rollbar.com' => 80;
 
 use Devel::StackTrace;
 use WebService::Rollbar::Notifier;
 
+# The live tests below actually POST to the real Rollbar API
+# (api.rollbar.com). Rollbar rejects any request whose access token is not a
+# valid, enabled `post_server_item` token, so these tests can only pass when a
+# real token is supplied via the TEST_ROLLBAR_ACCESS_TOKEN environment
+# variable. When it is not set (the normal case for CPAN smokers and end
+# users), we skip the live portion instead of firing off doomed requests that
+# would fail with an HTTP 403 response.
+my $access_token = $ENV{TEST_ROLLBAR_ACCESS_TOKEN};
+
 my $rollbar = WebService::Rollbar::Notifier->new(
-    access_token => $ENV{TEST_ROLLBAR_ACCESS_TOKEN} || 'dc851d5abb5c41edad589c336d49004e',
+    access_token => $access_token || 'dummy_token',
     callback => undef, # block to read response
 );
 
@@ -20,6 +28,18 @@ can_ok $rollbar, qw/
     critical error warning info debug notify
     callback framework language server
 /;
+
+unless ( $access_token ) {
+    diag 'Set the TEST_ROLLBAR_ACCESS_TOKEN environment variable to a valid '
+        . 'Rollbar post_server_item access token to run the live API tests.';
+    done_testing;
+    exit;
+}
+
+# We only reach this point with a real token, so we genuinely need a working
+# connection to the Rollbar API.
+require Test::RequiresInternet;
+Test::RequiresInternet->import( 'api.rollbar.com' => 80 );
 
 my $VER = $WebService::Rollbar::Notifier::VERSION;
 

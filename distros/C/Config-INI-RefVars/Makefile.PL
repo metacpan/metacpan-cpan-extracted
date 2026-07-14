@@ -76,13 +76,13 @@ my %WriteMakefileArgs = (
         'Test::Warn' => '0.37',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp',
-               PREOP => 'perl release-tools/pm_filter.pl $(DISTVNAME)'
+               PREOP => 'perl tools/pm_filter.pl $(DISTVNAME)'
     },
     clean => { FILES => 'Config-INI-RefVars-*' },
 );
 
 if ($ENV{AAHAZRED_PERL_DEVEL}) {
-  $WriteMakefileArgs{PM_FILTER} = 'perl release-tools/pm_filter.pl';
+  $WriteMakefileArgs{PM_FILTER} = 'perl tools/pm_filter.pl';
 }
 
 # Compatibility with old versions of ExtUtils::MakeMaker
@@ -104,3 +104,19 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+
+sub MY::postamble {
+  return "
+clean_all: clean
+\trm -f MANIFEST README
+
+README.md: $PM_File
+\tpod2markdown $PM_File > README.md
+
+README: $PM_File
+\tpod2text $PM_File > README
+
+all :: README
+";
+}

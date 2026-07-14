@@ -7,12 +7,12 @@
 
 =head1 NAME
 
-Foo::Model::Authentication::SAML2
+MojoX::Authentication::Model::SAML2
 
 
 =head1 SYNOPSIS
 
-   use Foo::Model::Authentication::SAML2;
+   use MojoX::Authentication::Model::SAML2;
 
 
 =head1 DESCRIPTION

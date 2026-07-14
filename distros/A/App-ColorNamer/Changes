@@ -1,5 +1,9 @@
 Revision history for App-ColorNamer
 
+1.001001  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 0.0104  2014-01-23
         - Switched away from deprecated Class::Data::Accessor
         - Switched to dzil

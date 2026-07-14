@@ -1,11 +1,9 @@
 package Mojolicious::Plugin::Fondation::Setup::MetaCPAN;
-
+$Mojolicious::Plugin::Fondation::Setup::MetaCPAN::VERSION = '0.04';
 # ABSTRACT: MetaCPAN discovery for Fondation plugins
 
 use Mojo::Base -base, -signatures;
 use version;
-
-our $VERSION = '0.01';
 
 has base_url => 'https://fastapi.metacpan.org/v1';
 
@@ -97,7 +95,7 @@ Mojolicious::Plugin::Fondation::Setup::MetaCPAN - MetaCPAN discovery for Fondati
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,10 @@
 # Version/Revision history
 
+0.11 Tue 14 Jul 2026 08:07:43 MSK
+    * Bug #159996463 registered. See https://www.cpantesters.org/cpan/report/57536a76-6c61-1014-b81f-8fc30e238516
+    * Bug fixed with Plugin::Log: incorrect access to config value
+    * Acrux::Log: added the file method
+
 0.10 Tue 30 Jun 2026 12:36:09 MSK
     * Changed default logging backend from syslog to STDERR.
       Applications relying on implicit syslog logging should explicitly

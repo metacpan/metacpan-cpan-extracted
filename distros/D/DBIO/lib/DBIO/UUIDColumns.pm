@@ -95,7 +95,7 @@ DBIO::UUIDColumns - Automatically populate UUID columns on insert
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

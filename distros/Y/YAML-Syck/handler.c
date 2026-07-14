@@ -27,6 +27,21 @@ syck_hdlr_add_node( SyckParser *p, SyckNode *n )
     return id;
 }
 
+/*
+ * A node evicted from the anchors table by redefinition may still be live on
+ * the parser's value stack, so it cannot be freed here.  Keep it for teardown.
+ */
+void
+syck_retire_node( SyckParser *p, SyckNode *n )
+{
+    if ( p->retired == NULL )
+    {
+        p->retired = st_init_numtable();
+    }
+    st_insert( p->retired, (st_data_t)( p->retired->num_entries + 1 ),
+               (st_data_t)n );
+}
+
 SyckNode *
 syck_hdlr_add_anchor( SyckParser *p, char *a, SyckNode *n )
 {
@@ -64,10 +79,15 @@ syck_hdlr_add_anchor( SyckParser *p, char *a, SyckNode *n )
     {
         if ( ntmp != (void *)1 )
         {
-            syck_free_node( ntmp );
+            syck_retire_node( p, ntmp );
         }
+        st_insert( p->anchors, (st_data_t)a, (st_data_t)n );
     }
-    st_insert( p->anchors, (st_data_t)a, (st_data_t)n );
+    else
+    {
+        st_insert( p->anchors, (st_data_t)syck_strndup( a, strlen( a ) ),
+                   (st_data_t)n );
+    }
     return n;
 }
 
@@ -84,10 +104,12 @@ syck_hdlr_remove_anchor( SyckParser *p, char *a )
     {
         if ( ntmp != (void *)1 )
         {
-            syck_free_node( ntmp );
+            syck_retire_node( p, ntmp );
         }
+        S_FREE( atmp );
     }
-    st_insert( p->anchors, (st_data_t)a, (st_data_t)1 );
+    st_insert( p->anchors, (st_data_t)syck_strndup( a, strlen( a ) ),
+               (st_data_t)1 );
 }
 
 SyckNode *
@@ -113,7 +135,9 @@ syck_hdlr_get_anchor( SyckParser *p, char *a )
                 if ( ! st_lookup( p->bad_anchors, (st_data_t)a, (st_data_t *)&n ) )
                 {
                     n = (p->bad_anchor_handler)( p, a );
-                    st_insert( p->bad_anchors, (st_data_t)a, (st_data_t)n );
+                    st_insert( p->bad_anchors,
+                               (st_data_t)syck_strndup( a, strlen( a ) ),
+                               (st_data_t)n );
                 }
             }
         }

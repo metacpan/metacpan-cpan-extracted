@@ -1,9 +1,8 @@
 ---
-abstract: 'Interface to L<https://open-meteo.com> for historical weather data'
+abstract: 'Interface to L<https://open-meteo.com> for historical and forecast weather data'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
-  DateTime: '0'
   ExtUtils::MakeMaker: '0'
   File::Glob: '0'
   File::Slurp: '0'
@@ -15,7 +14,6 @@ build_requires:
   Test::Carp: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
-  Test::LWP::UserAgent: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0'
   Test::Most: '0'
@@ -23,14 +21,13 @@ build_requires:
   Test::NoWarnings: '0'
   Test::Returns: '0'
   Test::Which: '0'
-  TimeZone::TimeZoneDB: '0'
   WWW::RT::CPAN: '0'
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
-license: open_source
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -41,11 +38,14 @@ no_index:
     - inc
 requires:
   CHI: '0'
-  Encode: '0'
+  Cwd: '0'
   ExtUtils::MakeMaker: '6.64'
+  File::HomeDir: '0'
+  Geo::Coder::Free: '0'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
+  LWP::UserAgent::Cached: '0'
   Object::Configure: '0'
   Params::Get: '0.13'
   Params::Validate::Strict: '0'
@@ -54,9 +54,9 @@ requires:
   Time::HiRes: '0'
   URI: '0'
   constant: '0'
-  perl: '5.006002'
+  perl: '5.010000'
 resources:
   bugtracker: https://github.com/nigelhorne/Weather-Meteo/issues
-  repository: git://github.com/nigelhorne/Weather-Meteo.git
-version: '0.14'
+  repository: https://github.com/nigelhorne/Weather-Meteo.git
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

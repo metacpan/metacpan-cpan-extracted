@@ -134,7 +134,7 @@ DBIO::Diff::Compare - Engine-agnostic comparison helpers for DBIO diff operation
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

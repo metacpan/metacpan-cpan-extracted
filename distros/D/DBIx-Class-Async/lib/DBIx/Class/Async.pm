@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.4');
+our $VERSION   = qv('v1.0.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async - Non-blocking, multi-worker asynchronous wrapper for DBIx::C
 
 =head1 VERSION
 
-Version v1.0.4
+Version v1.0.5
 
 =head1 DISCLAIMER
 
@@ -86,7 +86,7 @@ environment variables and run the test in C<xt/>:
 
 DBIx::Class::Async has been tested against PostgreSQL using
 L<Test::PostgreSQL::v2> which spins up a temporary PostgreSQL instance
-automatically — no manual database setup required.
+automatically - no manual database setup required.
 
 The following features were verified to work correctly:
 

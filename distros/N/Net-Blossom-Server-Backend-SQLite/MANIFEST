@@ -1,8 +1,11 @@
 Changes
-LICENSE
 lib/Net/Blossom/Server/Backend/SQLite.pm
+lib/Net/Blossom/Server/Backend/SQLite/BlobStore.pm
+lib/Net/Blossom/Server/Backend/SQLite/MetadataStore.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 t/00-load.t
 t/01-Constructor.t
 t/02-Schema.t

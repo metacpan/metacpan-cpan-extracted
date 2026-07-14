@@ -19,7 +19,7 @@ DBIO::Test::Namespace::RtBug41083::Result::Foo - Test fixture for namespace reso
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

@@ -1,2 +1,11 @@
+0.001001 2026-07-13
+    - Validate NUT-18 and NUT-26 Cashu payment requests, including duplicate
+      CBOR map keys.
+    - Require CBOR::Free 0.33 for Cashu CBOR decoding and duplicate map-key
+      rejection.
+    - Use Class::Tiny for all object construction.
+    - Ensure coverage tests load the working-tree modules.
+    - Link the top-level client POD to Net::Blossom::Server.
+
 0.001000 2026-07-09
     - Initial CPAN release.

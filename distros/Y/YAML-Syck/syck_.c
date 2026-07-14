@@ -166,11 +166,13 @@ syck_new_parser(void)
     p->syms = NULL;
     p->anchors = NULL;
     p->bad_anchors = NULL;
+    p->retired = NULL;
     p->implicit_typing = 1;
     p->taguri_expansion = 0;
     p->bufsize = SYCK_BUFFERSIZE;
     p->buffer = NULL;
     p->lvl_idx = 0;
+    p->max_depth = 0;
     syck_parser_reset_levels( p );
     return p;
 }
@@ -199,7 +201,16 @@ enum st_retval
 syck_st_free_nodes( st_data_t key, st_data_t value, st_data_t arg )
 {
     SyckNode *n = (SyckNode *)value;
+    char *k = (char *)key;
     if ( n != (void *)1 ) syck_free_node( n );
+    S_FREE( k );   /* the anchor tables own their key strings */
+    return ST_CONTINUE;
+}
+
+enum st_retval
+syck_st_free_retired( st_data_t key, st_data_t value, st_data_t arg )
+{
+    syck_free_node( (SyckNode *)value );
     return ST_CONTINUE;
 }
 
@@ -221,6 +232,13 @@ syck_st_free( SyckParser *p )
         st_foreach( p->bad_anchors, syck_st_free_nodes, 0 );
         st_free_table( p->bad_anchors );
         p->bad_anchors = NULL;
+    }
+
+    if ( p->retired != NULL )
+    {
+        st_foreach( p->retired, syck_st_free_retired, 0 );
+        st_free_table( p->retired );
+        p->retired = NULL;
     }
 }
 
@@ -356,10 +374,15 @@ syck_parser_pop_level( SyckParser *p )
     free( p->levels[p->lvl_idx].domain );
 }
 
-void 
+void
 syck_parser_add_level( SyckParser *p, int len, enum syck_level_status status )
 {
     ASSERT( p != NULL );
+    if ( p->max_depth > 0 && p->lvl_idx >= p->max_depth )
+    {
+        (p->error_handler)(p, "document is nested too deeply");
+        return;
+    }
     if ( p->lvl_idx + 1 > p->lvl_capa )
     {
         p->lvl_capa += ALLOC_CT;

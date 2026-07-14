@@ -82,6 +82,8 @@ sub T_incompletes {
     my $seqdec = CBOR::Free::SequenceDecoder->new();
 
     for my $tt (INCOMPLETE_TESTS()) {
+        note $tt->[0];
+
         throws_ok(
             sub { CBOR::Free::decode( $tt->[1] ) },
             'CBOR::Free::X::Incomplete',

@@ -1,5 +1,12 @@
 Revision history for Mojolicious-Plugin-Fondation-Setup
 
+0.04      2026-07-13 20:32:03+02:00 Europe/Paris
+    - add locally-developed plugins
+    - forced to install the selected plugins before their configuration
+
+0.03      2026-07-13 14:22:10+02:00 Europe/Paris
+    - update documentation
+    - new config format
 0.02      2026-07-12 20:02:17+02:00 Europe/Paris
     - search installed versions
     - depends on Fondation::Layout::Bootstrap

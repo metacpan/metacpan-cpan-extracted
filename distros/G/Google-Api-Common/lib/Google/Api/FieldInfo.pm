@@ -1,0 +1,205 @@
+package Google::Api::FieldInfo;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Protobuf };
+    my $descriptor_b64 = <<'EOF';
+Chtnb29nbGUvYXBpL2ZpZWxkX2luZm8ucHJvdG8SCmdvb2dsZS5hcGkaIGdvb2dsZS9wcm90
+b2J1Zi9kZXNjcmlwdG9yLnByb3RvItoBCglGaWVsZEluZm8SNAoGZm9ybWF0GAEgASgOMhwu
+Z29vZ2xlLmFwaS5GaWVsZEluZm8uRm9ybWF0UgZmb3JtYXQSRAoQcmVmZXJlbmNlZF90eXBl
+cxgCIAMoCzIZLmdvb2dsZS5hcGkuVHlwZVJlZmVyZW5jZVIPcmVmZXJlbmNlZFR5cGVzIlEK
+BkZvcm1hdBIWChJGT1JNQVRfVU5TUEVDSUZJRUQQABIJCgVVVUlENBABEggKBElQVjQQAhII
+CgRJUFY2EAMSEAoMSVBWNF9PUl9JUFY2EAQiLAoNVHlwZVJlZmVyZW5jZRIbCgl0eXBlX25h
+bWUYASABKAlSCHR5cGVOYW1lOlcKCmZpZWxkX2luZm8SHS5nb29nbGUucHJvdG9idWYuRmll
+bGRPcHRpb25zGMzx+YoBIAEoCzIVLmdvb2dsZS5hcGkuRmllbGRJbmZvUglmaWVsZEluZm9C
+bAoOY29tLmdvb2dsZS5hcGlCDkZpZWxkSW5mb1Byb3RvUAFaQWdvb2dsZS5nb2xhbmcub3Jn
+L2dlbnByb3RvL2dvb2dsZWFwaXMvYXBpL2Fubm90YXRpb25zO2Fubm90YXRpb25zogIER0FQ
+SUqWIQoGEgQOAGkBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoK
+IExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAi
+TGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxp
+YW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBM
+aWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNF
+LTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8g
+aW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlz
+IGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMg
+T1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4K
+IFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBw
+ZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhID
+EAATCgkKAgMAEgMSACoKCAoBCBIDFABYCgkKAggLEgMUAFgKCAoBCBIDFQAiCgkKAggKEgMV
+ACIKCAoBCBIDFgAvCgkKAggIEgMWAC8KCAoBCBIDFwAnCgkKAggBEgMXACcKCAoBCBIDGAAi
+CgkKAggkEgMYACIKCQoBBxIEGgAtAQreBQoCBwASAywCLhrSBSBSaWNoIHNlbWFudGljIGRl
+c2NyaXB0b3Igb2YgYW4gQVBJIGZpZWxkIGJleW9uZCB0aGUgYmFzaWMgdHlwaW5nLgoKIEV4
+YW1wbGVzOgoKICAgICBzdHJpbmcgcmVxdWVzdF9pZCA9IDEgWyhnb29nbGUuYXBpLmZpZWxk
+X2luZm8pLmZvcm1hdCA9IFVVSUQ0XTsKICAgICBzdHJpbmcgb2xkX2lwX2FkZHJlc3MgPSAy
+IFsoZ29vZ2xlLmFwaS5maWVsZF9pbmZvKS5mb3JtYXQgPSBJUFY0XTsKICAgICBzdHJpbmcg
+bmV3X2lwX2FkZHJlc3MgPSAzIFsoZ29vZ2xlLmFwaS5maWVsZF9pbmZvKS5mb3JtYXQgPSBJ
+UFY2XTsKICAgICBzdHJpbmcgYWN0dWFsX2lwX2FkZHJlc3MgPSA0IFsKICAgICAgIChnb29n
+bGUuYXBpLmZpZWxkX2luZm8pLmZvcm1hdCA9IElQVjRfT1JfSVBWNgogICAgIF07CiAgICAg
+Z29vZ2xlLnByb3RvYnVmLkFueSBnZW5lcmljX2ZpZWxkID0gNSBbCiAgICAgICAoZ29vZ2xl
+LmFwaS5maWVsZF9pbmZvKS5yZWZlcmVuY2VkX3R5cGVzID0ge3R5cGVfbmFtZTogIkFjdHVh
+bFR5cGUifSwKICAgICAgIChnb29nbGUuYXBpLmZpZWxkX2luZm8pLnJlZmVyZW5jZWRfdHlw
+ZXMgPSB7dHlwZV9uYW1lOiAiT3RoZXJUeXBlIn0sCiAgICAgXTsKICAgICBnb29nbGUucHJv
+dG9idWYuQW55IGdlbmVyaWNfdXNlcl9pbnB1dCA9IDUgWwogICAgICAgKGdvb2dsZS5hcGku
+ZmllbGRfaW5mbykucmVmZXJlbmNlZF90eXBlcyA9IHt0eXBlX25hbWU6ICIqIn0sCiAgICAg
+XTsKCgoKAwcAAhIDGgcjCgoKAwcABhIDLAIWCgoKAwcAARIDLBchCgoKAwcAAxIDLCQtCkwK
+AgQAEgQwAFsBGkAgUmljaCBzZW1hbnRpYyBpbmZvcm1hdGlvbiBvZiBhbiBBUEkgZmllbGQg
+YmV5b25kIGJhc2ljIHR5cGluZy4KCgoKAwQAARIDMAgRCpoBCgQEAAQAEgQzAk8DGosBIFRo
+ZSBzdGFuZGFyZCBmb3JtYXQgb2YgYSBmaWVsZCB2YWx1ZS4gVGhlIHN1cHBvcnRlZCBmb3Jt
+YXRzIGFyZSBhbGwgYmFja2VkCiBieSBlaXRoZXIgYW4gUkZDIGRlZmluZWQgYnkgdGhlIElF
+VEYgb3IgYSBHb29nbGUtZGVmaW5lZCBBSVAuCgoMCgUEAAQAARIDMwcNCiwKBgQABAACABID
+NQQbGh0gRGVmYXVsdCwgdW5zcGVjaWZpZWQgdmFsdWUuCgoOCgcEAAQAAgABEgM1BBYKDgoH
+BAAEAAIAAhIDNRkaCroCCgYEAAQAAgESAzwEDhqqAiBVbml2ZXJzYWxseSBVbmlxdWUgSWRl
+bnRpZmllciwgdmVyc2lvbiA0LCB2YWx1ZSBhcyBkZWZpbmVkIGJ5CiBodHRwczovL2RhdGF0
+cmFja2VyLmlldGYub3JnL2RvYy9odG1sL3JmYzQxMjIuIFRoZSB2YWx1ZSBtYXkgYmUKIG5v
+cm1hbGl6ZWQgdG8gZW50aXJlbHkgbG93ZXJjYXNlIGxldHRlcnMuIEZvciBleGFtcGxlLCB0
+aGUgdmFsdWUKIGBGNDdBQzEwQi01OENDLTAzNzItODU2Ny0wRTAyQjJDM0Q0NzlgIHdvdWxk
+IGJlIG5vcm1hbGl6ZWQgdG8KIGBmNDdhYzEwYi01OGNjLTAzNzItODU2Ny0wZTAyYjJjM2Q0
+NzlgLgoKDgoHBAAEAAIBARIDPAQJCg4KBwQABAACAQISAzwMDQqBAgoGBAAEAAICEgNCBA0a
+8QEgSW50ZXJuZXQgUHJvdG9jb2wgdjQgdmFsdWUgYXMgZGVmaW5lZCBieSBbUkZDCiA3OTFd
+KGh0dHBzOi8vZGF0YXRyYWNrZXIuaWV0Zi5vcmcvZG9jL2h0bWwvcmZjNzkxKS4gVGhlIHZh
+bHVlIG1heSBiZQogY29uZGVuc2VkLCB3aXRoIGxlYWRpbmcgemVyb3MgaW4gZWFjaCBvY3Rl
+dCBzdHJpcHBlZC4gRm9yIGV4YW1wbGUsCiBgMDAxLjAyMi4yMzMuMDQwYCB3b3VsZCBiZSBj
+b25kZW5zZWQgdG8gYDEuMjIuMjMzLjQwYC4KCg4KBwQABAACAgESA0IECAoOCgcEAAQAAgIC
+EgNCCwwK3AIKBgQABAACAxIDSQQNGswCIEludGVybmV0IFByb3RvY29sIHY2IHZhbHVlIGFz
+IGRlZmluZWQgYnkgW1JGQwogMjQ2MF0oaHR0cHM6Ly9kYXRhdHJhY2tlci5pZXRmLm9yZy9k
+b2MvaHRtbC9yZmMyNDYwKS4gVGhlIHZhbHVlIG1heSBiZQogbm9ybWFsaXplZCB0byBlbnRp
+cmVseSBsb3dlcmNhc2UgbGV0dGVycyB3aXRoIHplcm9zIGNvbXByZXNzZWQsIGZvbGxvd2lu
+ZwogW1JGQyA1OTUyXShodHRwczovL2RhdGF0cmFja2VyLmlldGYub3JnL2RvYy9odG1sL3Jm
+YzU5NTIpLiBGb3IgZXhhbXBsZSwKIHRoZSB2YWx1ZSBgMjAwMTowREI4OjA6OjBgIHdvdWxk
+IGJlIG5vcm1hbGl6ZWQgdG8gYDIwMDE6ZGI4OjpgLgoKDgoHBAAEAAIDARIDSQQICg4KBwQA
+BAACAwISA0kLDArBAQoGBAAEAAIEEgNOBBUasQEgQW4gSVAgYWRkcmVzcyBpbiBlaXRoZXIg
+djQgb3IgdjYgZm9ybWF0IGFzIGRlc2NyaWJlZCBieSB0aGUgaW5kaXZpZHVhbAogdmFsdWVz
+IGRlZmluZWQgaGVyZWluLiBTZWUgdGhlIGNvbW1lbnRzIG9uIHRoZSBJUFY0IGFuZCBJUFY2
+IHR5cGVzIGZvcgogYWxsb3dlZCBub3JtYWxpemF0aW9ucyBvZiBlYWNoLgoKDgoHBAAEAAIE
+ARIDTgQQCg4KBwQABAACBAISA04TFAqsAQoEBAACABIDVAIUGp4BIFRoZSBzdGFuZGFyZCBm
+b3JtYXQgb2YgYSBmaWVsZCB2YWx1ZS4gVGhpcyBkb2VzIG5vdCBleHBsaWNpdGx5IGNvbmZp
+Z3VyZQogYW55IEFQSSBjb25zdW1lciwganVzdCBkb2N1bWVudHMgdGhlIEFQSSdzIGZvcm1h
+dCBmb3IgdGhlIGZpZWxkIGl0IGlzCiBhcHBsaWVkIHRvLgoKDAoFBAACAAYSA1QCCAoMCgUE
+AAIAARIDVAkPCgwKBQQAAgADEgNUEhMK2gEKBAQAAgESA1oCLhrMASBUaGUgdHlwZShzKSB0
+aGF0IHRoZSBhbm5vdGF0ZWQsIGdlbmVyaWMgZmllbGQgbWF5IHJlcHJlc2VudC4KCiBDdXJy
+ZW50bHksIHRoaXMgbXVzdCBvbmx5IGJlIHVzZWQgb24gZmllbGRzIG9mIHR5cGUgYGdvb2ds
+ZS5wcm90b2J1Zi5BbnlgLgogU3VwcG9ydGluZyBvdGhlciBnZW5lcmljIHR5cGVzIG1heSBi
+ZSBjb25zaWRlcmVkIGluIHRoZSBmdXR1cmUuCgoMCgUEAAIBBBIDWgIKCgwKBQQAAgEGEgNa
+CxgKDAoFBAACAQESA1oZKQoMCgUEAAIBAxIDWiwtCloKAgQBEgReAGkBGk4gQSByZWZlcmVu
+Y2UgdG8gYSBtZXNzYWdlIHR5cGUsIGZvciB1c2UgaW4gW0ZpZWxkSW5mb11bZ29vZ2xlLmFw
+aS5GaWVsZEluZm9dLgoKCgoDBAEBEgNeCBUK+wMKBAQBAgASA2gCFxrtAyBUaGUgbmFtZSBv
+ZiB0aGUgdHlwZSB0aGF0IHRoZSBhbm5vdGF0ZWQsIGdlbmVyaWMgZmllbGQgbWF5IHJlcHJl
+c2VudC4KIElmIHRoZSB0eXBlIGlzIGluIHRoZSBzYW1lIHByb3RvYnVmIHBhY2thZ2UsIHRo
+ZSB2YWx1ZSBjYW4gYmUgdGhlIHNpbXBsZQogbWVzc2FnZSBuYW1lIGUuZy4sIGAiTXlNZXNz
+YWdlImAuIE90aGVyd2lzZSwgdGhlIHZhbHVlIG11c3QgYmUgdGhlCiBmdWxseS1xdWFsaWZp
+ZWQgbWVzc2FnZSBuYW1lIGUuZy4sIGAiZ29vZ2xlLmxpYnJhcnkudjEuQm9vayJgLgoKIElm
+IHRoZSB0eXBlKHMpIGFyZSB1bmtub3duIHRvIHRoZSBzZXJ2aWNlIChlLmcuIHRoZSBmaWVs
+ZCBhY2NlcHRzIGdlbmVyaWMKIHVzZXIgaW5wdXQpLCB1c2UgdGhlIHdpbGRjYXJkIGAiKiJg
+IHRvIGRlbm90ZSB0aGlzIGJlaGF2aW9yLgoKIFNlZSBbQUlQLTIwMl0oaHR0cHM6Ly9nb29n
+bGUuYWlwLmRldi8yMDIjdHlwZS1yZWZlcmVuY2VzKSBmb3IgbW9yZSBkZXRhaWxzLgoKDAoF
+BAECAAUSA2gCCAoMCgUEAQIAARIDaAkSCgwKBQQBAgADEgNoFRZiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Api::FieldInfo::FieldInfo ===
+    # Fields for FieldInfo
+    # Field: format Type: 14 (.google.api.FieldInfo.Format)
+    # Field: referenced_types Type: 11 (.google.api.TypeReference)
+
+=pod
+
+=head1 NAME
+
+Google::Api::FieldInfo::FieldInfo - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::FieldInfo;
+
+    my $msg = Google::Api::FieldInfo::FieldInfo->new(
+        format => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<format>
+
+Type: Enum (.google.api.FieldInfo.Format)
+
+=item * B<referenced_types>
+
+Type: Message (.google.api.TypeReference)
+
+=back
+
+=cut
+
+# Enum: FieldInfo::Format
+our $FieldInfo_FORMAT_UNSPECIFIED = 0;
+our $FieldInfo_UUID4 = 1;
+our $FieldInfo_IPV4 = 2;
+our $FieldInfo_IPV6 = 3;
+our $FieldInfo_IPV4_OR_IPV6 = 4;
+
+=pod
+
+=head2 Enum: FieldInfo::Format
+
+Values:
+
+=over 4
+
+=item * C<FORMAT_UNSPECIFIED> => 0
+
+=item * C<UUID4> => 1
+
+=item * C<IPV4> => 2
+
+=item * C<IPV6> => 3
+
+=item * C<IPV4_OR_IPV6> => 4
+
+=back
+
+=cut
+
+# === Message: Google::Api::FieldInfo::TypeReference ===
+    # Fields for TypeReference
+    # Field: type_name Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Api::FieldInfo::TypeReference - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::FieldInfo;
+
+    my $msg = Google::Api::FieldInfo::TypeReference->new(
+        type_name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<type_name>
+
+Type: String
+
+=back
+
+=cut
+
+1;

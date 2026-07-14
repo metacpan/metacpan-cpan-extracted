@@ -6,7 +6,7 @@ use Net::Blossom::Client;
 use Net::Blossom::ServerList;
 use Net::Blossom::URI;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001001';
 
 sub client {
     my $class = shift;
@@ -36,7 +36,8 @@ Net::Blossom - Perl client and protocol support for Blossom
 C<Net::Blossom> is the main entry point for the Perl implementation of the
 Blossom protocol. The distribution provides value objects for Blossom protocol
 data, BUD-11 authorization token creation, Blossom URI handling, server-list
-handling, and an HTTP client.
+handling, and an HTTP client. Server-side support is provided separately by
+L<Net::Blossom::Server>.
 
 This module intentionally keeps a small surface. Most callers should use
 C<client> or construct C<Net::Blossom::Client> directly.
@@ -54,6 +55,6 @@ to C<Net::Blossom::Client-E<gt>new>.
 
 L<Net::Blossom::Client>, L<Net::Blossom::AuthToken>,
 L<Net::Blossom::BlobDescriptor>, L<Net::Blossom::ServerList>,
-L<Net::Blossom::URI>
+L<Net::Blossom::URI>, L<Net::Blossom::Server>
 
 =cut

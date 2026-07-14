@@ -191,7 +191,7 @@ DBIO::ResultSet::Pager - help when paging through sets of results
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

@@ -3039,7 +3039,7 @@ DBIO::Storage::DBI - DBI storage handler
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

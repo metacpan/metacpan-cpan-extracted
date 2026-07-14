@@ -31,7 +31,7 @@ sub build_app {
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'test' },
+                    foo => { source => 'Foo', backend => 'test' },
                 },
             }},
             { 'Fondation::TestDBIx' => {
@@ -72,7 +72,7 @@ sub build_app {
     # Verify data via raw DBI
     require TestSchema;
     my $native = TestSchema->connect("dbi:SQLite:dbname=$dbfile");
-    my $rs = $native->resultset('foos');
+    my $rs = $native->resultset('Foo');
     my @rows = $rs->all;
     is(scalar @rows, 1, 'one row inserted');
     is($rows[0]->name, 'alpha', 'row has correct name');

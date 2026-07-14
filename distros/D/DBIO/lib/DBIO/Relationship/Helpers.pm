@@ -27,7 +27,7 @@ DBIO::Relationship::Helpers - Load all standard relationship declaration compone
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

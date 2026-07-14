@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use lib qw(../lib  lib);
+use lib '../lib';
 sub POE::Kernel::ASSERT_DEFAULT () { 1 }
 use POE qw(Component::IRC  Component::IRC::Plugin::WWW::XKCD::AsText);
 
@@ -26,7 +26,7 @@ $poe_kernel->run;
 
 sub _start {
     $irc->yield( register => 'all' );
-
+    
     $irc->plugin_add(
         'xkcd' => POE::Component::IRC::Plugin::WWW::XKCD::AsText->new
     );

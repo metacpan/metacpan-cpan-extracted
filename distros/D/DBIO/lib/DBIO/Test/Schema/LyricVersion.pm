@@ -39,7 +39,7 @@ DBIO::Test::Schema::LyricVersion - Test result class for the lyric_versions tabl
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

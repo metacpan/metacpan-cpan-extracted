@@ -391,20 +391,24 @@ use Test::More;
     'Versioned: draft pg pass through');
 
   # SQLT path: end-to-end via sqlt_deploy_hook
-  require SQL::Translator::Schema::Table;
-  my $sqlt_table = SQL::Translator::Schema::Table->new(name => 'versioned');
-  $sqlt_table->add_field(name => 'id',      data_type => 'integer');
-  $sqlt_table->add_field(name => 'key',     data_type => 'varchar');
-  $sqlt_table->add_field(name => 'version', data_type => 'integer');
-  TestComp::Result::Versioned->sqlt_deploy_hook($sqlt_table);
+  SKIP: {
+    eval { require SQL::Translator::Schema::Table; 1 }
+      or skip "SQL::Translator not available: $@", 3;
 
-  my @sqlt_indexes = $sqlt_table->get_indices;
-  is(scalar @sqlt_indexes, 2, 'sqlt_table: two indexes added');
-  my ($sqlt_pub) = grep { $_->name eq 'versioned_published' } @sqlt_indexes;
-  ok($sqlt_pub, 'sqlt: published index present');
-  my @opts = $sqlt_pub->options;
-  is_deeply(\@opts, [{ where => 'version IS NOT NULL' }],
-    'sqlt: published options reached the SQLT::Index');
+    my $sqlt_table = SQL::Translator::Schema::Table->new(name => 'versioned');
+    $sqlt_table->add_field(name => 'id',      data_type => 'integer');
+    $sqlt_table->add_field(name => 'key',     data_type => 'varchar');
+    $sqlt_table->add_field(name => 'version', data_type => 'integer');
+    TestComp::Result::Versioned->sqlt_deploy_hook($sqlt_table);
+
+    my @sqlt_indexes = $sqlt_table->get_indices;
+    is(scalar @sqlt_indexes, 2, 'sqlt_table: two indexes added');
+    my ($sqlt_pub) = grep { $_->name eq 'versioned_published' } @sqlt_indexes;
+    ok($sqlt_pub, 'sqlt: published index present');
+    my @opts = $sqlt_pub->options;
+    is_deeply(\@opts, [{ where => 'version IS NOT NULL' }],
+      'sqlt: published options reached the SQLT::Index');
+  }
 
   # PG native path: pg_indexes method was installed by Cake
   ok(TestComp::Result::Versioned->can('pg_indexes'),

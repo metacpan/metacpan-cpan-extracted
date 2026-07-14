@@ -18,10 +18,10 @@ no_index:
     - t
     - inc
 requires:
-  WiringPi::API: '3.1803'
+  WiringPi::API: '3.1804'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/rpi-spi/issues
   repository: https://github.com/stevieb9/rpi-spi.git
-version: '3.1801'
+version: '3.1802'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

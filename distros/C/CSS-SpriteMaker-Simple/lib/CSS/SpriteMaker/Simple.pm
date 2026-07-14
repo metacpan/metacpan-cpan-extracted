@@ -1,6 +1,6 @@
 package CSS::SpriteMaker::Simple;
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 use Mojo::Base -base;
 

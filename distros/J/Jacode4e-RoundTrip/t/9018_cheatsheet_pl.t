@@ -2,7 +2,7 @@
 #
 # 9018_cheatsheet_pl.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Skrocona dokumentacja Jacode4e::RoundTrip (Polski)
 # Ten test sluzy rowniez jako skrocona dokumentacja dla uzytkownikow polskojezycznych.

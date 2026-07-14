@@ -210,7 +210,7 @@ use parent 'Acme::Crux::Plugin';
 use Acrux::Log;
 
 use Carp qw/croak/;
-use Acrux::RefUtil qw/as_array_ref as_hash_ref is_code_ref is_true_flag is_ref/;
+use Acrux::RefUtil qw/is_code_ref is_true_flag is_ref/;
 
 sub register {
     my ($self, $app, $args) = @_;
@@ -218,27 +218,29 @@ sub register {
 
     # Autoclean flag: PLGARGS || OPTS || ORIG || CONF || DEFS
     my $autoclean = is_true_flag($args->{autoclean}) # From plugin arguments first
-      || $app->getopt("logautoclean")               # From command line options
-      || $app->orig->{"logautoclean"}               # From App arguments
-      || ($has_config ? $app->config->get("/logautoclean") : 0); # From config file
+      || $app->getopt("logautoclean")                # From command line options
+      || $app->orig->{"logautoclean"}                # From App arguments
+      || ($has_config ? $app->config->latest("/logautoclean") : 0); # From config file
 
     # Colorize flag: PLGARGS || OPTS || ORIG || CONF || DEFS
     my $colorize = is_true_flag($args->{color}) # From plugin arguments first
-      || $app->getopt("logcolorize")           # From command line options
-      || $app->orig->{"logcolorize"}           # From App arguments
-      || ($has_config ? $app->config->get("/logcolorize") : 0); # From config file
+      || $app->getopt("logcolorize")            # From command line options
+      || $app->orig->{"logcolorize"}            # From App arguments
+      || ($has_config ? $app->config->latest("/logcolorize") : 0); # From config file
 
     # Log facility: PLGARGS || OPTS || ORIG || CONF || DEFS
-    my $facility = $args->{facility}  # From plugin arguments first
+    my $facility = $args->{facility} # From plugin arguments first
       || $app->getopt("logfacility") # From command line options
       || $app->orig->{"logfacility"} # From App arguments
-      || ($has_config ? $app->config->get("/logfacility") : ''); # From config file
+      || ($has_config ? $app->config->latest("/logfacility") : ''); # From config file
+    croak(qq{Invalid log facility}) if defined($facility) && is_ref($facility);
 
     # Log file: PLGARGS || OPTS || CONF || ORIG || DEFS
-    my $file = $args->{file}  # From plugin arguments first
+    my $file = $args->{file}     # From plugin arguments first
       || $app->getopt("logfile") # From command line options
-      || ($has_config ? $app->config->get("/logfile") : '') # From config file
-      || $app->logfile; # From App arguments
+      || ($has_config ? $app->config->latest("/logfile") : '') # From config file
+      || $app->logfile;          # From App arguments
+    croak(qq{Invalid log file}) if defined($file) && is_ref($file);
 
     # Format: PLGARGS || DEFS
     my $frmt = $args->{format} || $app->orig->{"logformat"};
@@ -253,16 +255,18 @@ sub register {
     }
 
     # Log ident: PLGARGS || OPTS || ORIG || CONF || DEFS
-    my $ident = $args->{ident}  # From plugin arguments first
+    my $ident = $args->{ident}    # From plugin arguments first
       || $app->getopt("logident") # From command line options
       || $app->orig->{"logident"} # From App arguments
-      || ($has_config ? $app->config->get("/logident") : ''); # From config file
+      || ($has_config ? $app->config->latest("/logident") : ''); # From config file
+    croak(qq{Invalid log ident}) if defined($ident) && is_ref($ident);
 
     # Log level: PLGARGS || OPTS || ORIG || CONF || DEFS
-    my $level = $args->{level}  # From plugin arguments first
+    my $level = $args->{level}    # From plugin arguments first
       || $app->getopt("loglevel") # From command line options
       || $app->orig->{"loglevel"} # From App arguments
-      || ($has_config ? $app->config->get("/loglevel") : ''); # From config file
+      || ($has_config ? $app->config->latest("/loglevel") : ''); # From config file
+    croak(qq{Invalid log level}) if defined($level) && is_ref($level);
 
     # Logger: PLGARGS || DEFS
     my $logger = $args->{logger} || $app->orig->{"logger"};
@@ -271,28 +275,29 @@ sub register {
     }
 
     # Log options: PLGARGS || OPTS || ORIG || CONF || DEFS
-    my $logopt = $args->{logopt}  # From plugin arguments first
-      || $app->getopt("logopt") # From command line options
-      || $app->orig->{"logopt"} # From App arguments
-      || ($has_config ? $app->config->get("/logopt") : ''); # From config file
+    my $logopt = $args->{logopt} # From plugin arguments first
+      || $app->getopt("logopt")  # From command line options
+      || $app->orig->{"logopt"}  # From App arguments
+      || ($has_config ? $app->config->latest("/logopt") : ''); # From config file
 
     # Short flag: PLGARGS || OPTS || ORIG || CONF || DEFS
     my $short = is_true_flag($args->{short}) # From plugin arguments first
       || $app->getopt("logshort") # From command line options
       || $app->orig->{"logshort"} # From App arguments
-      || ($has_config ? $app->config->get("/logshort") : 0); # From config file
+      || ($has_config ? $app->config->latest("/logshort") : 0); # From config file
 
     # Log prefix: PLGARGS || OPTS || ORIG || CONF || DEFS
-    my $prefix = $args->{prefix}  # From plugin arguments first
+    my $prefix = $args->{prefix}   # From plugin arguments first
       || $app->getopt("logprefix") # From command line options
       || $app->orig->{"logprefix"} # From App arguments
-      || ($has_config ? $app->config->get("/logprefix") : ''); # From config file
+      || ($has_config ? $app->config->latest("/logprefix") : ''); # From config file
+    croak(qq{Invalid log prefix}) if defined($prefix) && is_ref($prefix);
 
     # Correct provider rules
     my $provider = $args->{provider} # From plugin arguments first
       || $app->getopt("logprovider") # From command line options
       || $app->orig->{"logprovider"} # From App arguments
-      || ($has_config ? $app->config->get("/logprovider") : '') || ''; # From config file
+      || ($has_config ? $app->config->latest("/logprovider") : '') || ''; # From config file
     if    ($provider eq 'syslog') { $file = 'syslog'; $handle = $logger = undef }
     elsif ($provider eq 'file')   { $logger = $handle = undef }
     elsif ($provider eq 'handle') { $logger = undef }

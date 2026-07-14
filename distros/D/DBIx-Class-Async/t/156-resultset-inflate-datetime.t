@@ -94,7 +94,7 @@ SKIP: {
     unlike $stringified, qr/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/,
         'BUG 2: DateTime must NOT stringify with bare ISO8601 (T separator, no offset)';
 
-    # PostgreSQL returns +00 or +0000 depending on driver version —
+    # PostgreSQL returns +00 or +0000 depending on driver version -
     # accept both in the regex
     like $stringified, qr/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}[+-]\d{2}/,
         'BUG 2: DateTime must stringify with space separator and timezone offset';

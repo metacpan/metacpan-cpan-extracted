@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.94",
     "Test::Warn" => "0.21"
   },
-  "VERSION" => "0.900001",
+  "VERSION" => "0.900002",
   "test" => {
     "TESTS" => "t/*.t t/access_broker/*.t t/changelog/*.t t/composed/*.t t/count/*.t t/debug/*.t t/generate/*.t t/helpers/*.t t/introspect/*.t t/kubernetes/*.t t/pager/data_page_compat/*.t t/prefetch/*.t t/relationship/*.t t/resultset/*.t t/resultsource/*.t t/schema/*.t t/search/*.t t/serialize/*.t t/sqlmaker/*.t t/sqlmaker/limit_dialects/*.t t/storage/*.t t/test/*.t t/util/*.t"
   }

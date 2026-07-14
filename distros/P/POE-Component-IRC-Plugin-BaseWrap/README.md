@@ -34,14 +34,13 @@ POE::Component::IRC::Plugin::BaseWrap - base class for IRC plugins which need tr
     __END__
 
 
-
     <Zoffix> TimeBot, time
     <TimeBot> Zoffix, time over here is: Mon Mar 10 18:12:15 2008
 
 # PoCo FLAVOR
 
-This distribution also contains [POE::Component::IRC::Plugin::BasePoCoWrap](https://metacpan.org/pod/POE::Component::IRC::Plugin::BasePoCoWrap)
-module, for wrapping [POE::Component](https://metacpan.org/pod/POE::Component) stuff.
+This distribution also contains [POE::Component::IRC::Plugin::BasePoCoWrap](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3ABasePoCoWrap)
+module, for wrapping [POE::Component](https://metacpan.org/pod/POE%3A%3AComponent) stuff.
 
 # DESCRIPTION
 
@@ -54,8 +53,8 @@ and /msg messages.
 
 This document contains a section at the end titled "PLUGIN DOCUMENTATION"
 which you can copy/paste into your module when using this base class
-to describe any functionality that this plugin offers. It is __recommended__
-that you read that documentation __first__ as to know in details the
+to describe any functionality that this plugin offers. It is **recommended**
+that you read that documentation **first** as to know in details the
 functionality of this base class.
 
 In this document a word "plugin" refers to the POE::Component::IRC::Plugin
@@ -84,7 +83,7 @@ are provided by default (as well as their default values). Exception
 being the `response_event` argument default is `irc_basewrap` and
 `trigger` argument's default is `qr/^basewrap\s+(?=\S)/i`
 
-__Note:__ user is able to change this arguments on the fly by accessing
+**Note:** user is able to change this arguments on the fly by accessing
 them as hashref keys in plugin's object.
 
 ## `_make_response_message`
@@ -523,7 +522,7 @@ which uses this base class as well as the bot that uses the plugin.
 
 # SEE ALSO
 
-[POE::Component::IRC::Plugin::BasePoCoWrap](https://metacpan.org/pod/POE::Component::IRC::Plugin::BasePoCoWrap), [POE::Component::IRC::Plugin](https://metacpan.org/pod/POE::Component::IRC::Plugin),
+[POE::Component::IRC::Plugin::BasePoCoWrap](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3ABasePoCoWrap), [POE::Component::IRC::Plugin](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin),
 
 # REPOSITORY
 
@@ -540,7 +539,7 @@ to `bug-POE-Component-IRC-Plugin-BaseWrap at rt.cpan.org`
 
 # AUTHOR
 
-Zoffix Znet <zoffix at cpan.org>
+Zoffix Znet &lt;zoffix at cpan.org>
 ([http://zoffix.com/](http://zoffix.com/), [http://haslayout.net/](http://haslayout.net/))
 
 # LICENSE

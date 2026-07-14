@@ -5,15 +5,15 @@ POE::Component::IRC::Plugin::Toys - a collection of fun-to-have plugins
 # CONTENTS
 
 This distribution provides the following
-[POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC) plugins:
+[POE::Component::IRC](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC) plugins:
 
-- [POE::Component::IRC::Plugin::AlarmClock](https://metacpan.org/pod/POE::Component::IRC::Plugin::AlarmClock)   IRC alarm clock
-- [POE::Component::IRC::Plugin::CoinFlip](https://metacpan.org/pod/POE::Component::IRC::Plugin::CoinFlip)    flip coins on IRC
-- [POE::Component::IRC::Plugin::Fortune](https://metacpan.org/pod/POE::Component::IRC::Plugin::Fortune)     fortune cookies
-- [POE::Component::IRC::Plugin::Magic8Ball](https://metacpan.org/pod/POE::Component::IRC::Plugin::Magic8Ball)  Magic 8 Ball
-- [POE::Component::IRC::Plugin::SigFail](https://metacpan.org/pod/POE::Component::IRC::Plugin::SigFail)  make witty error/no result messages
-- [POE::Component::IRC::Plugin::Thanks](https://metacpan.org/pod/POE::Component::IRC::Plugin::Thanks)    make witty responses to "thank you"s
-- [POE::Component::IRC::Plugin::YouAreDoingItWrong](https://metacpan.org/pod/POE::Component::IRC::Plugin::YouAreDoingItWrong) show people what they are doing wrong by giving links to
+- [POE::Component::IRC::Plugin::AlarmClock](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3AAlarmClock)   IRC alarm clock
+- [POE::Component::IRC::Plugin::CoinFlip](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3ACoinFlip)    flip coins on IRC
+- [POE::Component::IRC::Plugin::Fortune](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3AFortune)     fortune cookies
+- [POE::Component::IRC::Plugin::Magic8Ball](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3AMagic8Ball)  Magic 8 Ball
+- [POE::Component::IRC::Plugin::SigFail](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3ASigFail)  make witty error/no result messages
+- [POE::Component::IRC::Plugin::Thanks](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3AThanks)    make witty responses to "thank you"s
+- [POE::Component::IRC::Plugin::YouAreDoingItWrong](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin%3A%3AYouAreDoingItWrong) show people what they are doing wrong by giving links to
 [www.doingitwrong.com](http://www.doingitwrong.com/) images
 
 # EXAMPLES

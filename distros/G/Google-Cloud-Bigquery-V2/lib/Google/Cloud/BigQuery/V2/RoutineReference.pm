@@ -1,0 +1,58 @@
+package Google::Cloud::BigQuery::V2::RoutineReference;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+CjBnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcm91dGluZV9yZWZlcmVuY2UucHJvdG8SGGdv
+b2dsZS5jbG91ZC5iaWdxdWVyeS52MhofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90
+byJ+ChBSb3V0aW5lUmVmZXJlbmNlEiIKCnByb2plY3RfaWQYASABKAlCA+BBAlIJcHJvamVj
+dElkEiIKCmRhdGFzZXRfaWQYAiABKAlCA+BBAlIJZGF0YXNldElkEiIKCnJvdXRpbmVfaWQY
+AyABKAlCA+BBAlIJcm91dGluZUlkQnIKHGNvbS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJC
+FVJvdXRpbmVSZWZlcmVuY2VQcm90b1o7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92
+Mi9hcGl2Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGJK5AkKBhIEDgAkAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIQoJCgIDABIDEgApCggKAQgSAxQAUgoJ
+CgIICxIDFABSCggKAQgSAxUANgoJCgIICBIDFQA2CggKAQgSAxYANQoJCgIIARIDFgA1CiMK
+AgQAEgQZACQBGhcgSWQgcGF0aCBvZiBhIHJvdXRpbmUuCgoKCgMEAAESAxkIGApHCgQEAAIA
+EgMbAkEaOiBSZXF1aXJlZC4gVGhlIElEIG9mIHRoZSBwcm9qZWN0IGNvbnRhaW5pbmcgdGhp
+cyByb3V0aW5lLgoKDAoFBAACAAUSAxsCCAoMCgUEAAIAARIDGwkTCgwKBQQAAgADEgMbFhcK
+DAoFBAACAAgSAxsYQAoPCggEAAIACJwIABIDGxk/CkcKBAQAAgESAx4CQRo6IFJlcXVpcmVk
+LiBUaGUgSUQgb2YgdGhlIGRhdGFzZXQgY29udGFpbmluZyB0aGlzIHJvdXRpbmUuCgoMCgUE
+AAIBBRIDHgIICgwKBQQAAgEBEgMeCRMKDAoFBAACAQMSAx4WFwoMCgUEAAIBCBIDHhhACg8K
+CAQAAgEInAgAEgMeGT8KqAEKBAQAAgISAyMCQRqaASBSZXF1aXJlZC4gVGhlIElEIG9mIHRo
+ZSByb3V0aW5lLiBUaGUgSUQgbXVzdCBjb250YWluIG9ubHkKIGxldHRlcnMgKGEteiwgQS1a
+KSwgbnVtYmVycyAoMC05KSwgb3IgdW5kZXJzY29yZXMgKF8pLiBUaGUgbWF4aW11bQogbGVu
+Z3RoIGlzIDI1NiBjaGFyYWN0ZXJzLgoKDAoFBAACAgUSAyMCCAoMCgUEAAICARIDIwkTCgwK
+BQQAAgIDEgMjFhcKDAoFBAACAggSAyMYQAoPCggEAAICCJwIABIDIxk/YgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::BigQuery::V2::RoutineReference::RoutineReference ===
+    # Fields for RoutineReference
+    # Field: project_id Type: 9 ()
+    # Field: dataset_id Type: 9 ()
+    # Field: routine_id Type: 9 ()
+
+1;

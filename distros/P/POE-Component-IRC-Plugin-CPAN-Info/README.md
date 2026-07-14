@@ -58,7 +58,7 @@ that if the database was never created yet, the bot will be saying
 _No idea_ for all queries, until the database is updated.
 
 I haven't much interest in making a sane fix for this at the moment, so
-I'm just going to put this note here :) Turn on `<debug =` 1 >> on the
+I'm just going to put this note here :) Turn on `debug => 1` on the
 plugin and if you don't see `got_info` success, then just restart
 the bot, for the database to be built (it might take a couple of minutes).
 
@@ -68,8 +68,8 @@ the bot, for the database to be built (it might take a couple of minutes).
 
 # DESCRIPTION
 
-The module is a [POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC) plugin which uses
-[POE::Component::IRC::Plugin](https://metacpan.org/pod/POE::Component::IRC::Plugin) for easy addon of the module.
+The module is a [POE::Component::IRC](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC) plugin which uses
+[POE::Component::IRC::Plugin](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC%3A%3APlugin) for easy addon of the module.
 
 The module provides interface for querying information about CPAN authors,
 (e.g. full name and email address), modules (e.g. version and
@@ -179,7 +179,7 @@ But I am getting ahead of myself.. more on this later.
     $irc->plugin_add( 'CPANInfo' => $cpan_info_plugin );
 
 The constructor returns an object suitable to be fed to
-[POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC)'s `plugin_add()` method. It may take a lot of
+[POE::Component::IRC](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AIRC)'s `plugin_add()` method. It may take a lot of
 arguments, luckily all of them are optional with sensible defaults. The
 possible options are as follows:
 
@@ -195,7 +195,7 @@ it fetches those automatically, namely those are
     $CPAN/authors/01mailrc.txt.gz.
 
 The `mirror` argument specifies what CPAN mirror to get those files
-from. __Defaults to:__ `http://cpan.perl.org`
+from. **Defaults to:** `http://cpan.perl.org`
 
 ## path
 
@@ -205,7 +205,7 @@ When component fetches the needed files it
 will mirror them locally. By specifying the `path` argument you can
 tell the component where to store those. The component will create
 two directories inside the one you've specified, namely 'authors' and
-'modules'. This argument __defaults to__ `'cpan_sqlite_info'` directory
+'modules'. This argument **defaults to** `'cpan_sqlite_info'` directory
 inside the current directory.
 
 ## freshen\_interval
@@ -217,7 +217,7 @@ component retrieve a fresh copy of CPAN files (described in `mirror`
 option above). If an error occurred during fetching of the files, the
 component will _retry_ in `freshen_interval` or 30 seconds, whichever
 is sooner.
-__Defaults to:__ `43200` (half a day)
+**Defaults to:** `43200` (half a day)
 
 ## send\_events
 
@@ -227,7 +227,7 @@ Specifies whether or not the component should emit any events which
 are described below. When set to a true value the plugin will
 emit the events, otherwise won't. Technically, it is possible to disable any
 native plugin output (see `listen_for_input` argument below) and respond
-only by listening to the events it sends. __Defaults to:__ `1`
+only by listening to the events it sends. **Defaults to:** `1`
 
 ## got\_info\_event
 
@@ -240,7 +240,7 @@ the only argument of `ARG0` which will indicate the time at which
 the event was sent. Generally, on slow boxes the processing of the files
 can take some time (it's all non-blocking, don't worry) thus if you
 are just starting the component, it won't have data readily available
-until you receive the first `got_info_event`. __Defaults to:__
+until you receive the first `got_info_event`. **Defaults to:**
 `cpaninfo_got_info`
 
 ## no\_result\_event
@@ -250,7 +250,7 @@ until you receive the first `got_info_event`. __Defaults to:__
 When plugin will see a matching command, but doesn't have any data
 available for the request (e.g. calling `mod_desc` on non-existent
 module) the plugin will send the event specified by `no_result_event`
-argument. __Defaults to:__ `cpaninfo_no_result`
+argument. **Defaults to:** `cpaninfo_no_result`
 
 ## response\_event
 
@@ -258,7 +258,7 @@ argument. __Defaults to:__ `cpaninfo_no_result`
 
 When plugin will have a response ready (e.g. response to the request
 about some module's author), the event specified by `response_event`
-will be sent out. __Defaults to:__ `cpaninfo_response`
+will be sent out. **Defaults to:** `cpaninfo_response`
 
 ## respond\_no\_result
 
@@ -274,7 +274,7 @@ of the `no_result_responses` (see below) and reply with that. _Note:_
 this doesn't affect the cases when triggers (see `triggers` below)
 don't match, it only affects the cases when a particular command matched
 but data is not available such as asking for a version of a non-existent
-module. __Defaults to:__ `1`
+module. **Defaults to:** `1`
 
 ## no\_result\_responses
 
@@ -285,7 +285,7 @@ data is not available (e.g. asking for a version of a non-existent module)
 and `respond_no_result` option (see above) is set to a _true value_.
 The component will respond with one of the randomly chosen responses.
 Those responses are defined by the `no_result_responses` argument
-which takes an arrayref of possible responses. __Defaults to:__
+which takes an arrayref of possible responses. **Defaults to:**
 `[ 'No clue', 'No idea' ]`
 
 ## show\_help
@@ -298,7 +298,7 @@ all the time :) ). The details are explained in HELP MESSAGES section.
 The `show_help` key to the constructor enables or disables the help
 system. When `show_help` argument is set to a true value, plugin
 will respond to help inquiries, otherwise the help system will be off.
-__Defaults to:__ `1`
+**Defaults to:** `1`
 
 ## listen\_for\_help
 
@@ -345,7 +345,7 @@ global "listening". In other words if you did something along the lines of:
     );
 
 Your users would be able to use plugin's commands in the channel but
-would __NOT__ be able to use help at all, because the plugin
+would **NOT** be able to use help at all, because the plugin
 would ignore `qw(notice privmsg)` messages sent to it because
 `listen_for_input` doesn't contain those elements.
 
@@ -376,7 +376,7 @@ in it, respond with list of their names. Yes, you may set
 `max_modules_limit` to `0` and have the component always respond
 with the quantity. Alternatively, you may set it to a large value
 and set `max_modules_length` (see below) to chop the long lists
-__Defaults to:__ `5`
+**Defaults to:** `5`
 
 ## max\_modules\_length
 
@@ -386,7 +386,7 @@ Along with `max_modules_limit` (see above) you can specify the maximum
 length of the `dist_mods` output. If the output exceeds
 `max_modules_length` characters in length it will be chopped off and
 the total number of modules in the distribution will be prepended.
-__Defaults to:__ `300`
+**Defaults to:** `300`
 
 ## max\_output\_length
 
@@ -398,7 +398,7 @@ is longer than `max_output_length` characters it will be chopped off
 with `...` appended. _Note:_ if this argument is set
 to a lower value than `max_modules_length` (see above), then output from
 `dist_mods` will be chopped up to `max_output_length` (kind of an
-"override"). __Defaults to:__ `600`
+"override"). **Defaults to:** `600`
 
 ## max\_output\_length\_pub
 
@@ -409,7 +409,7 @@ with the exception that it applies _only to public messages_ (i.e.
 the output to public channels). Thus, you might want to set lower
 output length for channel output as there are more people and flooding
 the channel is not nice, but allow longer messages to /notice and /msg
-requests with `max_output_length` argument. __Defaults to:__ `400`
+requests with `max_output_length` argument. **Defaults to:** `400`
 
 ## output\_line\_length
 
@@ -421,7 +421,7 @@ output 500 character message, but `output_line_length` is set to `300`
 the plugin will break the output up into two messages and send one
 300 character message followed by a 200 character message. This argument
 ensures your bot will not be dropped from the network for `"Excess Flood"`.
-__Defaults to:__ `300`
+**Defaults to:** `300`
 
 ## banned
 
@@ -436,7 +436,7 @@ by the plugin.
     ->new( debug => 1 );
 
 When `debug` argument is set to a true value plugin will print out
-a bit of debugging information. __Defaults to:__ `0`
+a bit of debugging information. **Defaults to:** `0`
 
 ## triggers
 
@@ -482,9 +482,9 @@ information.
         },
     );
 
-Takes a hashref of arguments, those will be passed to [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)'s
-constructor. __Defaults to:__ whatever [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)'s constructor
-defaults are, __except__ `timeout` which defaults to `30`.
+Takes a hashref of arguments, those will be passed to [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)'s
+constructor. **Defaults to:** whatever [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)'s constructor
+defaults are, **except** `timeout` which defaults to `30`.
 
 # TRIGGERS
 
@@ -495,7 +495,7 @@ in this case :) ).
 Triggers are broken down into three categories:
 `dist`, `mod` and `auth` which are for distribution related commands,
 module related commands and author related commands respectively.
-When the category trigger is matched, it is __removed from the input__
+When the category trigger is matched, it is **removed from the input**
 and attempt to match command trigger is made. This means that if
 you want your trigger for `dist_mods` command to be `dist_modules`
 You'd set the _command trigger_ to be `qr/^modules/;` because
@@ -553,8 +553,8 @@ it represents default triggers set up on the plugin. If you want
 to change only one trigger just specify it as
 `->new( triggers =` { mod => { desc => 'description' } } );
 no need to repeat every trigger, the rest will be left at the defaults.
-__Note:__ as opposed to `triggers` hashref, the `help` hashref
-contains a bunch of strings, __NOT__ regex references.
+**Note:** as opposed to `triggers` hashref, the `help` hashref
+contains a bunch of strings, **NOT** regex references.
 
 The only key that takes a `qr//` is a `help_re`, this key determines the
 help system trigger, as with other triggers (see TRIGGERS section above)

@@ -52,7 +52,7 @@ DBIO::Test::Schema::Encoded - Test result class for the encoded table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

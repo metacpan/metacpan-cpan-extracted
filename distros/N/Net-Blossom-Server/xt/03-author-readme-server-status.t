@@ -16,22 +16,14 @@ my $content = do { local $/; <$fh> };
 unlike($content, qr/server behavior is still scaffold-only/i,
     'README does not describe implemented server behavior as scaffold-only');
 
-for my $route (
-    'PUT /upload',
-    'HEAD /upload',
-    'GET /<sha256>',
-    'HEAD /<sha256>',
-    'DELETE /<sha256>',
-    'GET /list/<pubkey>',
-    'PUT /media',
-    'HEAD /media',
-    'PUT /mirror',
+for my $dist (
+    '`dist/Net-Blossom`: shared protocol objects and the client library.',
+    '`dist/Net-Blossom-Server`: server-side support and storage backend contracts.',
+    '`dist/Net-Blossom-Server-Backend-SQLite`: SQLite storage backend.',
+    '`dist/Net-Blossom-Server-Backend-Postgres`: Postgres storage backend.',
 ) {
-    like($content, qr/\Q$route\E/, "README mentions $route server support");
+    like($content, qr/\Q$dist\E/, "README mentions $dist");
 }
-
-like($content, qr/allowlist-only HTTP mirror fetcher/i,
-    'README mentions allowlist HTTP mirror fetcher');
 
 done_testing;
 

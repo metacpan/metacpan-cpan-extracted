@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Asset;
-$Mojolicious::Plugin::Fondation::Asset::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::Asset::VERSION = '0.03';
 # ABSTRACT: AssetPack wrapper -- generate via command, load pre-built def at runtime
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -114,7 +114,7 @@ Mojolicious::Plugin::Fondation::Asset - AssetPack wrapper -- generate via comman
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

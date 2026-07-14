@@ -23,6 +23,13 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup     => [ 'Test-GetVolatileData-*' ],
     create_makefile_pl => 'traditional',
+    meta_merge => {
+        resources => {
+            repository => 'git://github.com/zoffixznet/Test-GetVolatileData.git',
+            bugtracker => 'https://github.com/zoffixznet/Test-GetVolatileData/issues',
+            homepage   => 'https://github.com/zoffixznet/Test-GetVolatileData',
+        },
+    },
 );
 if ( $ENV{RELEASE_TESTING} ) {
     system('pod2text lib/Test/GetVolatileData.pm > README');

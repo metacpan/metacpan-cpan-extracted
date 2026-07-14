@@ -1,0 +1,107 @@
+package Google::Cloud::Bigquery::V2::TableConstraints;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Inclusion };
+    eval { require Google::Cloud::Bigquery::V2::TableReference };
+    eval { require Datapol::SemanticAnnotations };
+    my $descriptor_b64 = <<'EOF';
+CjBnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvdGFibGVfY29uc3RyYWludHMucHJvdG8SGGdv
+b2dsZS5jbG91ZC5iaWdxdWVyeS52MhofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90
+bxoaZ29vZ2xlL2FwaS9pbmNsdXNpb24ucHJvdG8aLmdvb2dsZS9jbG91ZC9iaWdxdWVyeS92
+Mi90YWJsZV9yZWZlcmVuY2UucHJvdG8aPHN0b3JhZ2UvZGF0YXBvbC9hbm5vdGF0aW9ucy9w
+cm90by9zZW1hbnRpY19hbm5vdGF0aW9ucy5wcm90byIyCgpQcmltYXJ5S2V5EiQKB2NvbHVt
+bnMYASADKAlCCuBBAqCg8JgB5wdSB2NvbHVtbnMihQEKD0NvbHVtblJlZmVyZW5jZRI5ChJy
+ZWZlcmVuY2luZ19jb2x1bW4YASABKAlCCuBBAqCg8JgB5wdSEXJlZmVyZW5jaW5nQ29sdW1u
+EjcKEXJlZmVyZW5jZWRfY29sdW1uGAIgASgJQgrgQQKgoPCYAecHUhByZWZlcmVuY2VkQ29s
+dW1uIvEBCgpGb3JlaWduS2V5Eh4KBG5hbWUYASABKAlCCuBBAaCg8JgBzAhSBG5hbWUSXwoQ
+cmVmZXJlbmNlZF90YWJsZRgCIAEoCzIoLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5UYWJs
+ZVJlZmVyZW5jZUIK4EECoKDwmAHMCFIPcmVmZXJlbmNlZFRhYmxlEmIKEWNvbHVtbl9yZWZl
+cmVuY2VzGAMgAygLMikuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyLkNvbHVtblJlZmVyZW5j
+ZUIK4EECoKDwmAHnB1IQY29sdW1uUmVmZXJlbmNlcyK6AQoQVGFibGVDb25zdHJhaW50cxJR
+CgtwcmltYXJ5X2tleRgBIAEoCzIkLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5QcmltYXJ5
+S2V5QgrgQQGgoPCYAecHUgpwcmltYXJ5S2V5ElMKDGZvcmVpZ25fa2V5cxgCIAMoCzIkLmdv
+b2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5Gb3JlaWduS2V5QgrgQQGgoPCYAecHUgtmb3JlaWdu
+S2V5c0K8AQocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIVVGFibGVDb25zdHJhaW50
+c1Byb3RvWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5
+cGI7YmlncXVlcnlwYorV29IPRApCcGFja2FnZTp0aGlyZF9wYXJ0eS9qYXZhL2NlbC90b29s
+cy9zcmMvdGVzdC9qYXZhL2Rldi9jZWwvdG9vbHMvbWNwSsgRCgYSBAUAUQEKiQIKAQwSAwUA
+EjL+ASAoLS0gYXBpLWxpbnRlcjogY29yZTo6MDEyMzo6cmVzb3VyY2UtYW5ub3RhdGlvbj1k
+aXNhYmxlZAogICAgIGFpcC5kZXYvbm90LXByZWNlZGVudDogVGhlc2UgbWVzc2FnZXMgYXJl
+IG5vdCBBUEkgcmVzb3VyY2VzLiAtLSkKICgtLSBhcGktbGludGVyOiBjb3JlOjowMTkxOjpq
+YXZhLW11bHRpcGxlLWZpbGVzPWRpc2FibGVkCiAgICAgYWlwLmRldi9ub3QtcHJlY2VkZW50
+OiBXZSBuZWVkIHRvIGRvIHRoaXMgYmVjYXVzZSByZWFzb25zLiAtLSkKCggKAQISAwcAIQoJ
+CgIDABIDCQApCgkKAgMBEgMKACQKCQoCAwISAwsAOAoJCgIDAxIDDABGCggKAQgSAw4AUgoJ
+CgIICxIDDgBSCggKAQgSAw8ANQoJCgIIARIDDwA1CggKAQgSAxAANgoJCgIICBIDEAA2CgkK
+AQgSBBEAEwIKDgoGCNG6q/oBEgQRABMCCkkKAgQAEgQWABwBGj0gUmVwcmVzZW50cyB0aGUg
+cHJpbWFyeSBrZXkgY29uc3RyYWludCBvbiBhIHRhYmxlJ3MgY29sdW1ucy4KCgoKAwQAARID
+FggSCkwKBAQAAgASBBgCGwQaPiBUaGUgY29sdW1ucyB0aGF0IGFyZSBjb21wb3NlZCBvZiB0
+aGUgcHJpbWFyeSBrZXkgY29uc3RyYWludC4KCgwKBQQAAgAEEgMYAgoKDAoFBAACAAUSAxgL
+EQoMCgUEAAIAARIDGBIZCgwKBQQAAgADEgMYHB0KDQoFBAACAAgSBBgeGwMKDwoIBAACAAic
+CAASAxkEKgoQCgkEAAIACISEjhMSAxoELQpICgIEARIEHwArARo8IFRoZSBwYWlyIG9mIHRo
+ZSBmb3JlaWduIGtleSBjb2x1bW4gYW5kIHByaW1hcnkga2V5IGNvbHVtbi4KCgoKAwQBARID
+HwgXCjkKBAQBAgASBCECJAQaKyBUaGUgY29sdW1uIHRoYXQgY29tcG9zZXMgdGhlIGZvcmVp
+Z24ga2V5LgoKDAoFBAECAAUSAyECCAoMCgUEAQIAARIDIQkbCgwKBQQBAgADEgMhHh8KDQoF
+BAECAAgSBCEgJAMKDwoIBAECAAicCAASAyIEKgoQCgkEAQIACISEjhMSAyMELQpdCgQEAQIB
+EgQnAioEGk8gVGhlIGNvbHVtbiBpbiB0aGUgcHJpbWFyeSBrZXkgdGhhdCBhcmUgcmVmZXJl
+bmNlZCBieSB0aGUKIHJlZmVyZW5jaW5nX2NvbHVtbi4KCgwKBQQBAgEFEgMnAggKDAoFBAEC
+AQESAycJGgoMCgUEAQIBAxIDJx0eCg0KBQQBAgEIEgQnHyoDCg8KCAQBAgEInAgAEgMoBCoK
+EAoJBAECAQiEhI4TEgMpBC0KRwoCBAISBC4APwEaOyBSZXByZXNlbnRzIGEgZm9yZWlnbiBr
+ZXkgY29uc3RyYWludCBvbiBhIHRhYmxlJ3MgY29sdW1ucy4KCgoKAwQCARIDLggSCkAKBAQC
+AgASBDACMwQaMiBTZXQgb25seSBpZiB0aGUgZm9yZWlnbiBrZXkgY29uc3RyYWludCBpcyBu
+YW1lZC4KCgwKBQQCAgAFEgMwAggKDAoFBAICAAESAzAJDQoMCgUEAgIAAxIDMBARCg0KBQQC
+AgAIEgQwEjMDCg8KCAQCAgAInAgAEgMxBCoKEAoJBAICAAiEhI4TEgMyBC8KWwoEBAICARIE
+NQI4BBpNIFRoZSB0YWJsZSB0aGF0IGhvbGRzIHRoZSBwcmltYXJ5IGtleSBhbmQgaXMgcmVm
+ZXJlbmNlZCBieSB0aGlzIGZvcmVpZ24ga2V5LgoKDAoFBAICAQYSAzUCEAoMCgUEAgIBARID
+NREhCgwKBQQCAgEDEgM1JCUKDQoFBAICAQgSBDUmOAMKDwoIBAICAQicCAASAzYEKgoQCgkE
+AgIBCISEjhMSAzcELwo5CgQEAgICEgQ7Aj4EGisgVGhlIGNvbHVtbnMgdGhhdCBjb21wb3Nl
+IHRoZSBmb3JlaWduIGtleS4KCgwKBQQCAgIEEgM7AgoKDAoFBAICAgYSAzsLGgoMCgUEAgIC
+ARIDOxssCgwKBQQCAgIDEgM7LzAKDQoFBAICAggSBDsxPgMKDwoIBAICAgicCAASAzwEKgoQ
+CgkEAgICCISEjhMSAz0ELQpLCgIEAxIEQgBRARo/IFRoZSBUYWJsZUNvbnN0cmFpbnRzIGRl
+ZmluZXMgdGhlIHByaW1hcnkga2V5IGFuZCBmb3JlaWduIGtleS4KCgoKAwQDARIDQggYCpoB
+CgQEAwIAEgRGAkkEGosBIFJlcHJlc2VudHMgYSBwcmltYXJ5IGtleSBjb25zdHJhaW50IG9u
+IGEgdGFibGUncyBjb2x1bW5zLgogUHJlc2VudCBvbmx5IGlmIHRoZSB0YWJsZSBoYXMgYSBw
+cmltYXJ5IGtleS4KIFRoZSBwcmltYXJ5IGtleSBpcyBub3QgZW5mb3JjZWQuCgoMCgUEAwIA
+BhIDRgIMCgwKBQQDAgABEgNGDRgKDAoFBAMCAAMSA0YbHAoNCgUEAwIACBIERh1JAwoPCggE
+AwIACJwIABIDRwQqChAKCQQDAgAIhISOExIDSAQtCl4KBAQDAgESBE0CUAQaUCBQcmVzZW50
+IG9ubHkgaWYgdGhlIHRhYmxlIGhhcyBhIGZvcmVpZ24ga2V5LgogVGhlIGZvcmVpZ24ga2V5
+IGlzIG5vdCBlbmZvcmNlZC4KCgwKBQQDAgEEEgNNAgoKDAoFBAMCAQYSA00LFQoMCgUEAwIB
+ARIDTRYiCgwKBQQDAgEDEgNNJSYKDQoFBAMCAQgSBE0nUAMKDwoIBAMCAQicCAASA04EKgoQ
+CgkEAwIBCISEjhMSA08ELWIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey ===
+    # Fields for PrimaryKey
+    # Field: columns Type: 9 ()
+
+# === Message: Google::Cloud::Bigquery::V2::TableConstraints::ColumnReference ===
+    # Fields for ColumnReference
+    # Field: referencing_column Type: 9 ()
+    # Field: referenced_column Type: 9 ()
+
+# === Message: Google::Cloud::Bigquery::V2::TableConstraints::ForeignKey ===
+    # Fields for ForeignKey
+    # Field: name Type: 9 ()
+    # Field: referenced_table Type: 11 (.google.cloud.bigquery.v2.TableReference)
+    # Field: column_references Type: 11 (.google.cloud.bigquery.v2.ColumnReference)
+
+# === Message: Google::Cloud::Bigquery::V2::TableConstraints::TableConstraints ===
+    # Fields for TableConstraints
+    # Field: primary_key Type: 11 (.google.cloud.bigquery.v2.PrimaryKey)
+    # Field: foreign_keys Type: 11 (.google.cloud.bigquery.v2.ForeignKey)
+
+1;

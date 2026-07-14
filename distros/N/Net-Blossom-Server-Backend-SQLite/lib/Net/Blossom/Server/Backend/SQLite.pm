@@ -3,16 +3,20 @@ package Net::Blossom::Server::Backend::SQLite;
 use strictures 2;
 
 use Carp qw(croak);
+use Class::Tiny qw(dbh base_url metadata_store blob_store);
 use DBI ();
-use File::Temp qw(tempfile);
 use Net::Blossom::BlobDescriptor;
 use Net::Blossom::_URL;
+use Net::Blossom::Server::Backend::SQLite::BlobStore;
+use Net::Blossom::Server::Backend::SQLite::MetadataStore;
+use Net::Blossom::Server::BlobStore;
 use Net::Blossom::Server::BlobResult;
+use Net::Blossom::Server::MetadataStore;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = _constructor_args(@_);
     my %known = map { $_ => 1 } qw(database dbh base_url);
@@ -30,211 +34,111 @@ sub new {
     my $dbh = defined $args{dbh} ? _validate_dbh($args{dbh}) : _connect($args{database});
     $dbh->do('PRAGMA foreign_keys = ON');
 
-    return bless {
-        dbh      => $dbh,
-        base_url => $base_url,
-    }, $class;
-}
+    my $metadata_store = Net::Blossom::Server::Backend::SQLite::MetadataStore->new(dbh => $dbh);
+    my $blob_store = Net::Blossom::Server::Backend::SQLite::BlobStore->new(dbh => $dbh);
+    Net::Blossom::Server::MetadataStore->assert_implements($metadata_store);
+    Net::Blossom::Server::BlobStore->assert_implements($blob_store);
 
-sub dbh {
-    my ($self) = @_;
-    return $self->{dbh};
-}
-
-sub base_url {
-    my ($self) = @_;
-    return $self->{base_url};
+    return {
+        dbh            => $dbh,
+        base_url       => $base_url,
+        metadata_store => $metadata_store,
+        blob_store     => $blob_store,
+    };
 }
 
 sub deploy_schema {
     my ($self) = @_;
-    my $dbh = $self->dbh;
-
-    $dbh->do(q{
-        CREATE TABLE IF NOT EXISTS blossom_blobs (
-            sha256   TEXT PRIMARY KEY NOT NULL,
-            body     BLOB NOT NULL,
-            size     INTEGER NOT NULL,
-            type     TEXT NOT NULL,
-            uploaded INTEGER NOT NULL
-        )
-    });
-    $dbh->do(q{
-        CREATE TABLE IF NOT EXISTS blossom_owners (
-            pubkey   TEXT NOT NULL,
-            sha256   TEXT NOT NULL,
-            type     TEXT NOT NULL,
-            uploaded INTEGER NOT NULL,
-            PRIMARY KEY (pubkey, sha256),
-            FOREIGN KEY (sha256) REFERENCES blossom_blobs(sha256) ON DELETE CASCADE
-        )
-    });
-    $dbh->do(q{
-        CREATE INDEX IF NOT EXISTS blossom_owners_pubkey_order
-            ON blossom_owners (pubkey, uploaded DESC, sha256 ASC)
-    });
-
+    $self->_migrate_legacy_schema;
+    $self->blob_store->deploy_schema;
+    $self->metadata_store->deploy_schema;
     return 1;
 }
 
 sub begin_upload {
     my ($self, %context) = @_;
-    my ($fh, $path) = tempfile('net-blossom-sqlite-upload-XXXXXX', TMPDIR => 1, UNLINK => 0);
-    binmode $fh
-        or croak "unable to binmode upload temp file: $!";
+    my $blob_upload = $self->blob_store->begin_upload(%context);
+    Net::Blossom::Server::BlobStore->assert_upload($blob_upload);
 
     return Net::Blossom::Server::Backend::SQLite::_Upload->new(
-        storage => $self,
-        fh      => $fh,
-        path    => $path,
+        storage     => $self,
+        blob_upload => $blob_upload,
     );
 }
 
 sub get_blob {
     my ($self, $sha256) = @_;
-    my $row = $self->dbh->selectrow_hashref(
-        q{SELECT sha256, body, size, type, uploaded FROM blossom_blobs WHERE sha256 = ?},
-        undef,
-        $sha256,
-    );
+    my $row = $self->metadata_store->find_blob($sha256);
     return unless defined $row;
+    my $body = $self->blob_store->get_blob($row->{storage_key});
+    return unless defined $body;
 
     return Net::Blossom::Server::BlobResult->new(
         descriptor => $self->_descriptor($row),
-        body       => $row->{body},
+        body       => $body,
     );
 }
 
 sub head_blob {
     my ($self, $sha256) = @_;
-    my $row = $self->dbh->selectrow_hashref(
-        q{SELECT sha256, size, type, uploaded FROM blossom_blobs WHERE sha256 = ?},
-        undef,
-        $sha256,
-    );
+    my $row = $self->metadata_store->find_blob($sha256);
     return unless defined $row;
     return $self->_descriptor($row);
 }
 
 sub delete_blob {
     my ($self, $sha256, %opts) = @_;
+    my $metadata = $self->metadata_store;
 
-    return $self->_with_transaction(sub {
+    return $metadata->with_transaction(sub {
+        $metadata->lock_blob($sha256);
         if (defined $opts{pubkey}) {
-            my $rows = $self->dbh->do(
-                q{DELETE FROM blossom_owners WHERE sha256 = ? AND pubkey = ?},
-                undef,
-                $sha256,
-                $opts{pubkey},
-            );
-            return 0 unless _changed_rows($rows);
+            return 0 unless $metadata->delete_owner($sha256, $opts{pubkey});
             $self->_delete_blob_if_unowned($sha256);
             return 1;
         }
 
-        my ($exists) = $self->dbh->selectrow_array(
-            q{SELECT 1 FROM blossom_blobs WHERE sha256 = ?},
-            undef,
-            $sha256,
-        );
-        return 0 unless $exists;
+        my $record = $metadata->find_blob($sha256);
+        return 0 unless defined $record;
 
-        $self->dbh->do(q{DELETE FROM blossom_owners WHERE sha256 = ?}, undef, $sha256);
-        $self->dbh->do(q{DELETE FROM blossom_blobs WHERE sha256 = ?}, undef, $sha256);
+        $metadata->delete_owners($sha256);
+        $self->blob_store->delete_blob($record->{storage_key});
+        $metadata->delete_blob($sha256);
         return 1;
     });
 }
 
 sub list_blobs {
     my ($self, $pubkey, %opts) = @_;
-    my @where = ('o.pubkey = ?');
-    my @bind = ($pubkey);
-
-    if (defined $opts{cursor}) {
-        my $cursor = $self->dbh->selectrow_hashref(
-            q{SELECT sha256, uploaded FROM blossom_owners WHERE pubkey = ? AND sha256 = ?},
-            undef,
-            $pubkey,
-            $opts{cursor},
-        );
-        return [] unless defined $cursor;
-        push @where, q{(o.uploaded < ? OR (o.uploaded = ? AND o.sha256 > ?))};
-        push @bind, $cursor->{uploaded}, $cursor->{uploaded}, $cursor->{sha256};
-    }
-
-    my $sql = q{
-        SELECT o.sha256, b.size, o.type, o.uploaded
-          FROM blossom_owners o
-          JOIN blossom_blobs b ON b.sha256 = o.sha256
-         WHERE
-    } . join(' AND ', @where) . q{
-         ORDER BY o.uploaded DESC, o.sha256 ASC
-    };
-
-    if (defined $opts{limit}) {
-        return [] if $opts{limit} <= 0;
-        $sql .= q{ LIMIT ?};
-        push @bind, int($opts{limit});
-    }
-
-    my $rows = $self->dbh->selectall_arrayref($sql, { Slice => {} }, @bind);
+    my $rows = $self->metadata_store->list_blobs($pubkey, %opts);
     return [map { $self->_descriptor($_) } @$rows];
 }
 
 sub _commit_upload {
     my ($self, $upload, %metadata) = @_;
-    my $body = $upload->_body;
+    my $store = $self->metadata_store;
     my $created;
 
-    $self->_with_transaction(sub {
-        my $rows = $self->dbh->do(
-            q{
-                INSERT OR IGNORE INTO blossom_blobs
-                    (sha256, body, size, type, uploaded)
-                VALUES (?, ?, ?, ?, ?)
-            },
-            undef,
-            $metadata{sha256},
-            $body,
-            $metadata{size},
-            $metadata{type},
-            $metadata{uploaded},
-        );
-        $created = _changed_rows($rows) ? 1 : 0;
+    $store->with_transaction(sub {
+        $store->lock_blob($metadata{sha256});
+        my $record = $store->find_blob($metadata{sha256});
+
+        if (defined $record) {
+            $created = 0;
+        }
+        else {
+            my $storage_key = $upload->_prepare(%metadata);
+            $created = $store->insert_blob(%metadata, storage_key => $storage_key) ? 1 : 0;
+        }
 
         if (defined $metadata{pubkey}) {
-            $rows = $self->dbh->do(
-                q{
-                    UPDATE blossom_owners
-                       SET type = ?, uploaded = ?
-                     WHERE pubkey = ? AND sha256 = ?
-                },
-                undef,
-                $metadata{type},
-                $metadata{uploaded},
-                $metadata{pubkey},
-                $metadata{sha256},
-            );
-            if (!_changed_rows($rows)) {
-                $self->dbh->do(
-                    q{
-                        INSERT INTO blossom_owners
-                            (pubkey, sha256, type, uploaded)
-                        VALUES (?, ?, ?, ?)
-                    },
-                    undef,
-                    $metadata{pubkey},
-                    $metadata{sha256},
-                    $metadata{type},
-                    $metadata{uploaded},
-                );
-            }
+            $store->upsert_owner(%metadata);
         }
 
         return 1;
     });
 
-    eval { $upload->_cleanup };
+    eval { $upload->_cleanup($created) };
 
     return {
         descriptor => $self->_descriptor(\%metadata),
@@ -244,13 +148,12 @@ sub _commit_upload {
 
 sub _delete_blob_if_unowned {
     my ($self, $sha256) = @_;
-    my ($owners) = $self->dbh->selectrow_array(
-        q{SELECT COUNT(*) FROM blossom_owners WHERE sha256 = ?},
-        undef,
-        $sha256,
-    );
-    return if $owners;
-    $self->dbh->do(q{DELETE FROM blossom_blobs WHERE sha256 = ?}, undef, $sha256);
+    my $metadata = $self->metadata_store;
+    return if $metadata->owner_count($sha256);
+    my $record = $metadata->find_blob($sha256);
+    return unless defined $record;
+    $self->blob_store->delete_blob($record->{storage_key});
+    $metadata->delete_blob($sha256);
     return;
 }
 
@@ -266,32 +169,77 @@ sub _descriptor {
     );
 }
 
-sub _with_transaction {
-    my ($self, $code) = @_;
+sub _migrate_legacy_schema {
+    my ($self) = @_;
     my $dbh = $self->dbh;
-    my $manage = $dbh->{AutoCommit};
-    my $wantarray = wantarray;
-    my (@result, $result);
+    my %columns = map { $_->[1] => 1 } @{$dbh->selectall_arrayref(
+        q{PRAGMA table_info(blossom_blobs)},
+    )};
+    return 1 unless %columns;
+    return 1 if $columns{storage_key} && !$columns{body};
+    croak "incompatible blossom_blobs schema"
+        unless $columns{body} && !$columns{storage_key};
 
-    $dbh->begin_work if $manage;
+    my ($foreign_keys) = $dbh->selectrow_array('PRAGMA foreign_keys');
+    $dbh->do('PRAGMA foreign_keys = OFF');
+    $dbh->begin_work;
     my $ok = eval {
-        if ($wantarray) {
-            @result = $code->();
-        }
-        else {
-            $result = $code->();
-        }
+        $dbh->do(q{ALTER TABLE blossom_owners RENAME TO blossom_owners_legacy});
+        $dbh->do(q{ALTER TABLE blossom_blobs RENAME TO blossom_blobs_legacy});
+        $dbh->do(q{
+            CREATE TABLE blossom_blob_data (
+                storage_key TEXT PRIMARY KEY NOT NULL,
+                body        BLOB NOT NULL
+            )
+        });
+        $dbh->do(q{
+            INSERT INTO blossom_blob_data (storage_key, body)
+            SELECT sha256, body FROM blossom_blobs_legacy
+        });
+        $dbh->do(q{
+            CREATE TABLE blossom_blobs (
+                sha256      TEXT PRIMARY KEY NOT NULL,
+                storage_key TEXT NOT NULL,
+                size        INTEGER NOT NULL,
+                type        TEXT NOT NULL,
+                uploaded    INTEGER NOT NULL
+            )
+        });
+        $dbh->do(q{
+            INSERT INTO blossom_blobs (sha256, storage_key, size, type, uploaded)
+            SELECT sha256, sha256, size, type, uploaded FROM blossom_blobs_legacy
+        });
+        $dbh->do(q{
+            CREATE TABLE blossom_owners (
+                pubkey   TEXT NOT NULL,
+                sha256   TEXT NOT NULL,
+                type     TEXT NOT NULL,
+                uploaded INTEGER NOT NULL,
+                PRIMARY KEY (pubkey, sha256),
+                FOREIGN KEY (sha256) REFERENCES blossom_blobs(sha256) ON DELETE CASCADE
+            )
+        });
+        $dbh->do(q{
+            INSERT INTO blossom_owners (pubkey, sha256, type, uploaded)
+            SELECT pubkey, sha256, type, uploaded FROM blossom_owners_legacy
+        });
+        $dbh->do(q{DROP TABLE blossom_owners_legacy});
+        $dbh->do(q{DROP TABLE blossom_blobs_legacy});
+        my $violations = $dbh->selectall_arrayref('PRAGMA foreign_key_check');
+        croak "SQLite schema migration left invalid foreign keys" if @$violations;
         1;
     };
     my $error = $@;
 
     if (!$ok) {
-        eval { $dbh->rollback if $manage };
+        eval { $dbh->rollback };
+        $dbh->do('PRAGMA foreign_keys = ON') if $foreign_keys;
         die $error;
     }
 
-    $dbh->commit if $manage;
-    return $wantarray ? @result : $result;
+    $dbh->commit;
+    $dbh->do('PRAGMA foreign_keys = ON') if $foreign_keys;
+    return 1;
 }
 
 sub _connect {
@@ -319,6 +267,8 @@ sub _validate_dbh {
     my $driver = eval { $dbh->{Driver}{Name} };
     croak "dbh must be a SQLite DBI handle"
         unless defined $driver && $driver eq 'SQLite';
+    croak "dbh must have AutoCommit enabled"
+        unless $dbh->{AutoCommit};
     $dbh->{RaiseError} = 1;
     $dbh->{PrintError} = 0;
     return $dbh;
@@ -336,11 +286,6 @@ sub _normalize_base_url {
     return $base_url;
 }
 
-sub _changed_rows {
-    my ($rows) = @_;
-    return defined $rows && $rows ne '0E0' && $rows > 0;
-}
-
 sub _constructor_args {
     return %{$_[0]} if @_ == 1 && ref($_[0]) eq 'HASH';
     croak "constructor arguments must be name/value pairs" if @_ % 2;
@@ -353,25 +298,23 @@ sub _constructor_args {
     use strictures 2;
 
     use Carp qw(croak);
+    use Class::Tiny qw(storage blob_upload), {
+        committed => 0,
+        aborted   => 0,
+    };
 
-    sub new {
-        my ($class, %args) = @_;
-        return bless {
-            storage   => $args{storage},
-            fh        => $args{fh},
-            path      => $args{path},
-            committed => 0,
-            aborted   => 0,
-        }, $class;
+    sub BUILD {
+        my ($self) = @_;
+        $self->committed;
+        $self->aborted;
+        return;
     }
 
     sub write {
         my ($self, $chunk) = @_;
         croak "upload is already committed" if $self->{committed};
         croak "upload is aborted" if $self->{aborted};
-        print {$self->{fh}} $chunk
-            or croak "storage write failed: $!";
-        return length $chunk;
+        return $self->{blob_upload}->write($chunk);
     }
 
     sub commit {
@@ -388,42 +331,22 @@ sub _constructor_args {
         my ($self) = @_;
         return 1 if $self->{aborted} || $self->{committed};
         $self->{aborted} = 1;
-        $self->_cleanup;
-        return 1;
+        return $self->{blob_upload}->abort;
     }
 
-    sub _body {
-        my ($self) = @_;
-        $self->_close;
-
-        open my $fh, '<:raw', $self->{path}
-            or croak "unable to read upload temp file: $!";
-        my $body = do { local $/; <$fh> };
-        close $fh
-            or croak "unable to close upload temp file: $!";
-        return $body;
+    sub _prepare {
+        my ($self, %metadata) = @_;
+        return $self->{blob_upload}->prepare(%metadata);
     }
 
     sub _cleanup {
-        my ($self) = @_;
-        $self->_close;
-        unlink $self->{path}
-            or croak "unable to remove upload temp file: $!"
-            if defined $self->{path} && -e $self->{path};
-        $self->{path} = undef;
-        return 1;
+        my ($self, $created) = @_;
+        return $created
+            ? $self->{blob_upload}->commit
+            : $self->{blob_upload}->abort;
     }
 
-    sub _close {
-        my ($self) = @_;
-        return 1 unless defined $self->{fh};
-        close $self->{fh}
-            or croak "unable to close upload temp file: $!";
-        $self->{fh} = undef;
-        return 1;
-    }
-
-    sub DESTROY {
+    sub DEMOLISH {
         my ($self) = @_;
         return if $self->{committed} || $self->{aborted};
         eval { $self->abort };
@@ -468,6 +391,17 @@ Blob bodies are stored in SQLite C<BLOB> values. This keeps storage simple, but
 large media archives or high-traffic public servers should usually use Postgres
 or a backend that stores blob bytes outside the metadata database.
 
+The backend coordinates separate
+L<Net::Blossom::Server::Backend::SQLite::MetadataStore> and
+L<Net::Blossom::Server::Backend::SQLite::BlobStore> components on one DBI
+handle. Applications normally use this top-level storage class.
+
+=head1 UPGRADING FROM 0.001000 OR 0.001001
+
+C<deploy_schema> automatically moves blob bodies from the C<blossom_blobs>
+table into C<blossom_blob_data>. Existing descriptors and owners are preserved.
+Back up the database before upgrading.
+
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -483,7 +417,7 @@ created. It may include a path prefix, but not userinfo, query, or fragment
 parts. Trailing slashes are removed.
 
 Instead of C<database>, callers may pass an existing DBI handle as C<dbh>. The
-handle must be a SQLite handle.
+handle must be a SQLite handle with C<AutoCommit> enabled.
 
 =head1 METHODS
 
@@ -499,12 +433,21 @@ Returns the DBI handle used by the backend.
 
 Returns the normalized descriptor URL prefix.
 
+=head2 metadata_store
+
+Returns the SQLite metadata-store component.
+
+=head2 blob_store
+
+Returns the SQLite blob-store component.
+
 =head2 deploy_schema
 
     $storage->deploy_schema;
 
 Creates the required SQLite tables and indexes if they do not already exist.
-This method is safe to call more than once.
+This method is safe to call more than once and migrates the earlier combined
+schema when needed.
 
 =head2 begin_upload
 
@@ -542,5 +485,11 @@ owners are deleted.
 Returns descriptors owned by C<$pubkey>, sorted by C<uploaded> descending and
 C<sha256> ascending. C<cursor> and C<limit> follow the
 L<Net::Blossom::Server::Storage> contract.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
 
 =cut

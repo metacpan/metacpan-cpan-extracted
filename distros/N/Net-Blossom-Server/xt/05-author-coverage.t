@@ -30,6 +30,8 @@ my $test_status = _in_dir($dist, sub {
     local $ENV{HARNESS_PERL_SWITCHES} = join ',',
         '-MDevel::Cover=-db',
         $db,
+        '-blib',
+        0,
         '-coverage',
         'statement',
         '-coverage',
@@ -59,8 +61,12 @@ my ($report_status, $report) = _in_dir($dist, sub {
 is($report_status, 0, 'coverage report generated');
 diag $report if $report_status != 0;
 
-my ($statement, $subroutine) = _total_coverage($report);
-if (defined $statement && defined $subroutine) {
+my ($statement, $subroutine, $total) = _total_coverage($report);
+if (defined $statement && defined $subroutine && defined $total) {
+    diag sprintf 'Coverage totals: statement %.1f%%, subroutine %.1f%%, total %.1f%%',
+        $statement,
+        $subroutine,
+        $total;
     cmp_ok($statement, '>=', 96.0, 'statement coverage is at least 96%');
     cmp_ok($subroutine, '>=', 96.0, 'subroutine coverage is at least 96%');
 }
@@ -123,6 +129,6 @@ sub _in_dir {
 
 sub _total_coverage {
     my ($report) = @_;
-    return unless $report =~ /^Total\s+([0-9]+(?:\.[0-9]+)?)\s+([0-9]+(?:\.[0-9]+)?)/m;
-    return ($1, $2);
+    return unless $report =~ /^Total\s+([0-9]+(?:\.[0-9]+)?)\s+([0-9]+(?:\.[0-9]+)?)\s+([0-9]+(?:\.[0-9]+)?)/m;
+    return ($1, $2, $3);
 }

@@ -3,7 +3,7 @@ package Spreadsheet::DataToExcel;
 use warnings;
 use strict;
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 use Spreadsheet::WriteExcel; 
 use base 'Class::Data::Accessor';
 __PACKAGE__->mk_classaccessors( qw/

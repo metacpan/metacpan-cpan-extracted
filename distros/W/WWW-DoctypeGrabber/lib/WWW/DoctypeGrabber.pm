@@ -3,7 +3,7 @@ package WWW::DoctypeGrabber;
 use warnings;
 use strict;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Carp;
 use LWP::UserAgent;
@@ -44,7 +44,7 @@ sub grab {
     $self->$_(undef) for qw(error  doctype  result);
 
     $uri = "http://$uri"
-        unless $uri =~ m{^https?://};
+        unless $uri =~ m{^\w+://};
 
     my $response = $self->ua->get( $uri );
     if ( $response->is_success ) {

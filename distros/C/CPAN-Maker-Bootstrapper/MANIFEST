@@ -1,4 +1,5 @@
 bin/bootstrapper
+bin/cmb
 bin/cpan-maker-bootstrapper
 ChangeLog
 lib/CPAN/Maker/Bootstrapper.pm

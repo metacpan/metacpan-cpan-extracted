@@ -2,13 +2,11 @@ Build.PL
 Changes
 MANIFEST
 README
-LICENSE
 lib/POE/Component/IRC/Plugin/WWW/XKCD/AsText.pm
 t/00-load.t
-xt/pod-coverage.t
-xt/pod.t
-xt/kwalitee.t
+t/pod-coverage.t
+t/pod.t
 examples/xkcd_bot.pl
 Makefile.PL
 META.yml
-META.json
+META.json                                Module JSON meta-data (added by MakeMaker)

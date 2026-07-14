@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::WWW::Cache::Google;
 use warnings;
 use strict;
 
-our $VERSION = '2.001003'; # VERSION
+our $VERSION = '2.001004'; # VERSION
 
 use base 'POE::Component::IRC::Plugin::BasePoCoWrap';
 use POE::Component::WWW::Cache::Google;

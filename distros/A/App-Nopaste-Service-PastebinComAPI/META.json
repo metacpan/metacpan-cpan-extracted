@@ -35,14 +35,23 @@
    "provides" : {
       "App::Nopaste::Service::PastebinComAPI" : {
          "file" : "lib/App/Nopaste/Service/PastebinComAPI.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI/issues"
+      },
+      "homepage" : "https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI",
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI.git",
+         "web" : "https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI"
+      }
    },
-   "version" : "1.002"
+   "version" : "1.003"
 }

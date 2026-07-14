@@ -1,5 +1,9 @@
 Revision history for Perl extension XTaTIK.
 
+0.005003 2026-07-13
+    - Remove dependency on unavailable Mojolicious::Plugin::Bootstrap3; bundle
+      Bootstrap assets and register bootstrap.css/js locally
+
 0.005002 2015-09-29
     [Miscellaneous]
         - Add category titles to page titles when browsing categories (#163)

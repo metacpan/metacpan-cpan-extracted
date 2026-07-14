@@ -40,9 +40,9 @@ Net::OBEX - implementation of OBEX protocol
 
 # DESCRIPTION
 
-__WARNING!!! This module is still in its early alpha stage, it is
+**WARNING!!! This module is still in its early alpha stage, it is
 recommended that you use it only for testing. A lot of functionality
-is still not implemented.__
+is still not implemented.**
 
 The module is a Perl implementation of IrOBEX protocol.
 
@@ -66,8 +66,8 @@ Must be called after either `connect()`, `set_path()`, `get()` or
 `put()` method. Returns either true or false value indicating whether
 or not the call to last `connect()`, `set_path()`, `get()` or
 `put()` method ended with a successful response from the server
-(code 200). __Note:__ the aforementioned methods returning a non-error
-(see descriptions below) does __NOT__ imply that `success()` will return
+(code 200). **Note:** the aforementioned methods returning a non-error
+(see descriptions below) does **NOT** imply that `success()` will return
 a true value.
 
 ## code
@@ -111,7 +111,7 @@ is `200`)
 
 Creates a new socket and connects it. Takes a bunch of arguments, two
 of which (`address` and `port`) are mandatory. Net::OBEX uses
-[Socket::Class](https://metacpan.org/pod/Socket::Class) as its "horse" but it _might_ be possible to use
+[Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass) as its "horse" but it _might_ be possible to use
 a different socket if you want to (see `sock()` method). Returns a hashref
 which is described below after arguments. Possible arguments are as follows:
 
@@ -119,74 +119,74 @@ which is described below after arguments. Possible arguments are as follows:
 
     ->connect( address => '00:17:E3:37:76:BB', ...
 
-__Mandatory__. Specifies the MAC address of the device to connect to.
+**Mandatory**. Specifies the MAC address of the device to connect to.
 
 ### port
 
     ->connect( port => 9, ...
 
-__Mandatory__. Specifies the port of the device to connect to.
+**Mandatory**. Specifies the port of the device to connect to.
 
 ### version
 
     ->connect( version => "\x10", ...
 
-__Optional__. Specifies the OBEX protocol version to use, takes a "version"
+**Optional**. Specifies the OBEX protocol version to use, takes a "version"
 byte to use in the Connect packet encoded with the major number in the high
 order 4 bits, and the minor version in the low order 4 bits. Generally
-speaking you won't have to touch this one. __Defaults to:__ `0x10`
+speaking you won't have to touch this one. **Defaults to:** `0x10`
 (version 1.0)
 
 ### mtu
 
     ->connect( mtu     => 4096, ...
 
-__Optional__. Specifies the MTU of your device, i.e. the maximum length
-of the packet in bytes it can accept. __Defaults to:__ `4096`
+**Optional**. Specifies the MTU of your device, i.e. the maximum length
+of the packet in bytes it can accept. **Defaults to:** `4096`
 
 ### domain
 
     ->connect( domain  => 'bluetooth', ...
 
-__Optional__. Specifies the `domain` argument to pass to [Socket::Class](https://metacpan.org/pod/Socket::Class)
-constructor. See documentation for [Socket::Class](https://metacpan.org/pod/Socket::Class) for more information.
-__Defaults to:__ `bluetooth`
+**Optional**. Specifies the `domain` argument to pass to [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass)
+constructor. See documentation for [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass) for more information.
+**Defaults to:** `bluetooth`
 
 ### type
 
     ->connect( type    => 'stream', ...
 
-__Optional__. Specifies the `type` argument to pass to [Socket::Class](https://metacpan.org/pod/Socket::Class)
-constructor. See documentation for [Socket::Class](https://metacpan.org/pod/Socket::Class) for more information.
-__Defaults to:__ `stream`
+**Optional**. Specifies the `type` argument to pass to [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass)
+constructor. See documentation for [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass) for more information.
+**Defaults to:** `stream`
 
 ### proto
 
     ->connect( proto   => 'rfcomm', ...
 
-__Optional__. Specifies the `proto` argument to pass to [Socket::Class](https://metacpan.org/pod/Socket::Class)
-constructor. See documentation for [Socket::Class](https://metacpan.org/pod/Socket::Class) for more information.
-__Defaults to:__ `rfcomm`
+**Optional**. Specifies the `proto` argument to pass to [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass)
+constructor. See documentation for [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass) for more information.
+**Defaults to:** `rfcomm`
 
 ### headers
 
     ->connect( headers => [ $some, $raw, $headers ], ...
 
-__Optional__. If you want to pass along some additional packet headers
+**Optional**. If you want to pass along some additional packet headers
 to the Connect packet you can use the `headers` argument which takes
 an arrayref elements of which are OBEX packet headers. See
-[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net::OBEX::Packet::Headers) for information on how to make them.
-__Defaults to:__ `[]` (no headers)
+[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3AHeaders) for information on how to make them.
+**Defaults to:** `[]` (no headers)
 
 ### target
 
     ->connect( target => 'F9EC7BC4953C11D2984E525400DC9E09', ....
 
-__Optional__. Since it's common that you will need a `Target` header
+**Optional**. Since it's common that you will need a `Target` header
 in the Connect packet you can use the `target` argument instead of
-manually creating the header. __Note:__ the module will automatically
+manually creating the header. **Note:** the module will automatically
 `pack()` what you specify in the `target` argument, so you can just use
-the UUID (without dashes). __By default__ no `target` is specified.
+the UUID (without dashes). **By default** no `target` is specified.
 
 ### `connect` RETURN VALUE
 
@@ -211,7 +211,7 @@ If an error occurred during the request, `connect()` will return either
 `undef` or an empty list, depending on the context and the reason
 for the error will be available via `error()` method. Otherwise it will
 return a hashref presented above. If the
-dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net::OBEX::Response)
+dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AResponse)
 `parse_sock()` method description for the return value when
 "is connect packet" option is true.
 
@@ -245,19 +245,19 @@ to close the socket as well, you probably would want to use the
 
     $obex->disconnect( description => 'die in a fire!' );
 
-__Optional__. Takes a scalar as an argument which will be passed in the
-`Description` header in the Disconnect packet. __By default__ no
+**Optional**. Takes a scalar as an argument which will be passed in the
+`Description` header in the Disconnect packet. **By default** no
 description is supplied.
 
 ### headers
 
     $obex->disconnect( headers => [ $some, $raw, $headers ] );
 
-__Optional__. If you want to pass along some additional packet headers
+**Optional**. If you want to pass along some additional packet headers
 to the Disconnect packet you can use the `headers` argument which takes
 an arrayref elements of which are OBEX packet headers. See
-[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net::OBEX::Packet::Headers) for information on how to make them.
-__Defaults to:__ `[]` (no headers)
+[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3AHeaders) for information on how to make them.
+**Defaults to:** `[]` (no headers)
 
 ### `disconnect` RETURN VALUE
 
@@ -275,7 +275,7 @@ If an error occurred during the request, `disconnect()` will return either
 `undef` or an empty list, depending on the context and the reason
 for the error will be available via `error()` method. Otherwise it will
 return a hashref presented above. If the
-dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net::OBEX::Response)
+dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AResponse)
 `parse_sock()` method description for the return value when
 "is connect packet" option is false.
 
@@ -296,35 +296,35 @@ arguments which are as follows:
 
     $obex->set_path( path => 'there_somewhere' );
 
-__Optional__. Whatever you specify in the `path` argument will be sent
+**Optional**. Whatever you specify in the `path` argument will be sent
 out in the packet's `Name` header, which is the path to change to.
-__By default__ no path is set, meaning set path to "root folder".
+**By default** no path is set, meaning set path to "root folder".
 
 ### do\_up
 
     $obex->set_path( do_up => 1 );
 
-__Optional__. Takes either true or false value, indicating whether or
+**Optional**. Takes either true or false value, indicating whether or
 not to set the "backup a level before applying name" flag in the SetPath
-packet. __Defaults to:__ `0`
+packet. **Defaults to:** `0`
 
 ### no\_create
 
     $obex->set_path( no_create => 0 );
 
-__Optional__. Takes either true or false value, indicating whether or not
+**Optional**. Takes either true or false value, indicating whether or not
 to set the "don't create directory if it does not exist, return an
-error instead." flag in the SetPath packet. __Defaults to:__ `1`
+error instead." flag in the SetPath packet. **Defaults to:** `1`
 
 ### headers
 
     $obex->set_path( headers => [ $some, $raw, $headers ] );
 
-__Optional__. If you want to pass along some additional packet headers
+**Optional**. If you want to pass along some additional packet headers
 to the SetPath packet you can use the `headers` argument which takes
 an arrayref elements of which are OBEX packet headers. See
-[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net::OBEX::Packet::Headers) for information on how to make them.
-__Defaults to:__ `[]` (no headers)
+[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3AHeaders) for information on how to make them.
+**Defaults to:** `[]` (no headers)
 
 ### `set_path` RETURN VALUE
 
@@ -342,7 +342,7 @@ If an error occurred during the request, `set_path()` will return either
 `undef` or an empty list, depending on the context and the reason
 for the error will be available via `error()` method. Otherwise it will
 return a hashref presented above. If the
-dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net::OBEX::Response)
+dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AResponse)
 `parse_sock()` method description for the return value when
 "is connect packet" option is false.
 
@@ -369,55 +369,55 @@ are as follows:
 
     $obex->get( is_final => 1 );
 
-__Optional__.  When set to a true value will instruct the object to set the
+**Optional**.  When set to a true value will instruct the object to set the
 high bit of the Get packet on. When set to a false value will set the high
-bit off. __Defaults to:__ `1`
+bit off. **Defaults to:** `1`
 
 ### headers
 
     $obex->get( headers => [ $some, $raw, $headers ] );
 
-__Optional__. If you want to pass along some additional packet headers
+**Optional**. If you want to pass along some additional packet headers
 to the Get packet you can use the `headers` argument which takes
 an arrayref elements of which are OBEX packet headers. See
-[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net::OBEX::Packet::Headers) for information on how to make them.
-__Defaults to:__ `[]` (no headers)
+[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3AHeaders) for information on how to make them.
+**Defaults to:** `[]` (no headers)
 
 ### type
 
     $obex->get( type => 'x-obex/folder-listing' );
 
-__Optional__. Takes a scalar as value, whatever you specify will be
+**Optional**. Takes a scalar as value, whatever you specify will be
 packed up into a OBEX `Type` header and shipped along with your Get packet.
-__By default__ `type` is not specified.
+**By default** `type` is not specified.
 
 ### name
 
     $obex->get( name => 'some_file' );
 
-__Optional__. Takes a scalar as value, whatever you specify will be
+**Optional**. Takes a scalar as value, whatever you specify will be
 packed up into a OBEX `Name` header and shipped along with your Get packet.
-__By default__ `name` is not specified.
+**By default** `name` is not specified.
 
 ### no\_continue
 
     $obex->get( no_continue => 1 );
 
-__Optional__. By default the `get()` method will automatically send out
+**Optional**. By default the `get()` method will automatically send out
 any Get (Continue) packets to get the entire data. However, if that's not
 what you want set the `no_continue` to a true value. When set to a false
 value will automatically send as many Get (Continue) packets as needed
 to get the entire thing, when set to a true value will send only one
-Get packet leaving the rest up to you. __Defaults to:__ `0`
+Get packet leaving the rest up to you. **Defaults to:** `0`
 
 ### file
 
     $obex->get( file => $file_handle );
 
-__Optional__. If you are retrieving large quantities of data it is probably
+**Optional**. If you are retrieving large quantities of data it is probably
 not a good idea to stuff all of it into a hashref. The `file` argument
 takes an open file handle, and when specified will write the data into
-that file instead of storing it in the return hashref. __By default__
+that file instead of storing it in the return hashref. **By default**
 fetched data will be returned in the return hashref.
 
 ### `get` RETURN VALUE
@@ -501,7 +501,7 @@ keys/values of the return are as follows:
 
 #### body
 
-The <body> key will contain the entire data that was retrieved (if
+The &lt;body> key will contain the entire data that was retrieved (if
 `no_continue` is false) or the contents of the `Body` header of the
 packet (if `no_continue` is set to a true value). If `file` argument
 is set, the `body` key will be empty.
@@ -520,11 +520,11 @@ code of the _first_ received packet.
 #### responses
 
 The `responses` key will contain an arrayref elements of which will be
-the return values of `parse_sock()` method from [Net::OBEX::Headers](https://metacpan.org/pod/Net::OBEX::Headers)
+the return values of `parse_sock()` method from [Net::OBEX::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AHeaders)
 module. There will be as many elements as many Get packets were sent out
 to retrieve entire data; of course, there will be only one if `no_continue`
 argument to `get()` is set to a true value. For more information, see
-`parse_sock()` method in [Net::OBEX::Headers](https://metacpan.org/pod/Net::OBEX::Headers) with the "is connect packet"
+`parse_sock()` method in [Net::OBEX::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AHeaders) with the "is connect packet"
 flag set to false. If `file` argument is set, `responses` arrayref
 will be empty.
 
@@ -546,7 +546,7 @@ Instructs the object to send `PUT` packet. As of now only sending
 of files is supported and due to the limited testing environment this
 support may be broken. During my tests (with Motorolla KRZR phone)
 doing `put` on files which it doesn't seem to allow (text file instead
-of pictures) would end up with `200, OK Success` __BUT__ the file would
+of pictures) would end up with `200, OK Success` **BUT** the file would
 not be actually uploaded to the device and trying to `get()` it would
 result in `404`. Not sure if this is a "glitch" with my phone or it is
 the way it's supposed to be... silently giving OKs when things are failing.
@@ -561,68 +561,68 @@ arguments which are as follows:
 
     $obex->put( what => 'some_file' );
 
-__Mandatory__. Specifies the file name of the file to `PUT`, later this may
+**Mandatory**. Specifies the file name of the file to `PUT`, later this may
 be changed to allow to contain some arbitrary contents.
 
 ### body\_in\_first
 
     $obex->put( what => 'some_file', body_in_first => 1 );
 
-__Optional__. Takes either true or false values. If a true value is specified
+**Optional**. Takes either true or false values. If a true value is specified
 will send a `Body` header in the first `PUT` packet. Otherwise
 first `Body` header will be sent only after receiving a `Continue`
-response from the party. __Defaults to:__ `0`
+response from the party. **Defaults to:** `0`
 
 ### length
 
     $obex->put( what => 'some_file', length => 31232 );
 
-__Optional__. If specified will stuff the `PUT` packet with a `Length`
+**Optional**. If specified will stuff the `PUT` packet with a `Length`
 header containing the value of `length` argument (the length of the
-contents to `PUT`), this header is optional and __by default__ will
+contents to `PUT`), this header is optional and **by default** will
 not be sent.
 
 ### time
 
     $obex->put( what => 'some_file', time => '20080320T202020Z' );
 
-__Optional__. If specified will stuff the `PUT` packet with a Unicode
+**Optional**. If specified will stuff the `PUT` packet with a Unicode
 version of `Time` header (date/time of last modification).
 Local times should be represented in the format YYYYMMDDTHHMMSS and UTC
 time in the format YYYYMMDDTHHMMSSZ. The letter `T` delimits the date from
 the time. UTC time is identified by concatenating a `Z` to the end of the
-sequence. __By default__ no `Time` headers will be sent.
+sequence. **By default** no `Time` headers will be sent.
 
 ### name
 
     $obex->put( what => 'some_file', name => 'other_file' );
 
-__Optional__. If specified will insert a `Name` header into the `PUT`
-packet with the value you specify. __By default__ the value of `what`
-argument will be used __unless__ you set the `no_name` argument (see
+**Optional**. If specified will insert a `Name` header into the `PUT`
+packet with the value you specify. **By default** the value of `what`
+argument will be used **unless** you set the `no_name` argument (see
 below) to a true value.
 
 ### no\_name
 
     $obex->put( what => 'some_file', no_name => 1 );
 
-__Optional__. By default the object will insert a `Name` header into the
+**Optional**. By default the object will insert a `Name` header into the
 packet with value being the name of the file specified in `what` argument.
 If you want to prevent this set `no_name` argument to a true value.
-__Note:__ the `Name` header __WILL__ be sent if you specify the `name`
-argument irrelevant of the `no_name` argument's value. __Note 2:__
-yo do __NOT__ have to specify the `no_name` argument if you specified the
-`name` argument. __Defaults to:__ `0`
+**Note:** the `Name` header **WILL** be sent if you specify the `name`
+argument irrelevant of the `no_name` argument's value. **Note 2:**
+yo do **NOT** have to specify the `no_name` argument if you specified the
+`name` argument. **Defaults to:** `0`
 
 ### headers
 
     $obex->put( what => 'file', headers => [ $some, $raw, $headers ] );
 
-__Optional__. If you want to pass along some additional packet headers
+**Optional**. If you want to pass along some additional packet headers
 to the SetPath packet you can use the `headers` argument which takes
 an arrayref elements of which are OBEX packet headers. See
-[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net::OBEX::Packet::Headers) for information on how to make them.
-__Defaults to:__ `[]` (no headers)
+[Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3AHeaders) for information on how to make them.
+**Defaults to:** `[]` (no headers)
 
 ### `put` RETURN VALUE
 
@@ -640,7 +640,7 @@ If an error occurred during the request, `put()` will return either
 `undef` or an empty list, depending on the context and the reason
 for the error will be available via `error()` method. Otherwise it will
 return a hashref presented above. If the
-dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net::OBEX::Response)
+dump above is not self explanatory see [Net::OBEX::Response](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AResponse)
 `parse_sock()` method description for the return value when
 "is connect packet" option is false.
 
@@ -667,7 +667,7 @@ Takes no arguments, returns the return value of the last successful
 
     $obex->sock( $new_socket );
 
-Returns a [Socket::Class](https://metacpan.org/pod/Socket::Class) object which is used by the module for
+Returns a [Socket::Class](https://metacpan.org/pod/Socket%3A%3AClass) object which is used by the module for
 communications. Technically you can swap it out to the socket of your choice
 by giving it as an argument (but should you? :) ).
 
@@ -704,13 +704,13 @@ the set header, but it's probably a BadIdea(tm).
 
     my $net_obex_response_object = $obex->obj_res;
 
-Takes no arguments, returns a [Net::OBEX::Response](https://metacpan.org/pod/Net::OBEX::Response) object used internally.
+Takes no arguments, returns a [Net::OBEX::Response](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3AResponse) object used internally.
 
 ## obj\_head
 
     my $net_obex_packet_headers_object = $obex->obj_head;
 
-Takes no arguments, returns a [Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net::OBEX::Packet::Headers) object used
+Takes no arguments, returns a [Net::OBEX::Packet::Headers](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3AHeaders) object used
 internally. You can use this object to create any additional headers you'd
 want to include in `headers` arguments (where applicable).
 
@@ -718,7 +718,7 @@ want to include in `headers` arguments (where applicable).
 
     my $net_obex_packet_request = $obex->obj_req;
 
-Takes no arguments, returns a [Net::OBEX::Packet::Request](https://metacpan.org/pod/Net::OBEX::Packet::Request) object used
+Takes no arguments, returns a [Net::OBEX::Packet::Request](https://metacpan.org/pod/Net%3A%3AOBEX%3A%3APacket%3A%3ARequest) object used
 internally.
 
 # EXAMPLES
@@ -742,7 +742,7 @@ to `bug-Net-OBEX at rt.cpan.org`
 
 # AUTHOR
 
-Zoffix Znet <zoffix at cpan.org>
+Zoffix Znet &lt;zoffix at cpan.org>
 ([http://zoffix.com/](http://zoffix.com/), [http://haslayout.net/](http://haslayout.net/))
 
 # LICENSE

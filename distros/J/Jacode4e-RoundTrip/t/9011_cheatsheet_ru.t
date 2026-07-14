@@ -2,7 +2,7 @@
 #
 # 9011_cheatsheet_ru.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Краткий справочник Jacode4e::RoundTrip (Русский)
 # Этот тест служит также быстрым справочником для русскоязычных пользователей.

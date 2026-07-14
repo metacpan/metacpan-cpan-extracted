@@ -400,7 +400,7 @@ DBIO::Test::Storage - Fake storage for testing SQL generation without a database
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

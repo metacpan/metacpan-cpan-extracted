@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(tile);
 use strict;
 use warnings;
 
-our $VERSION = '1.010002'; # VERSION
+our $VERSION = '1.010003'; # VERSION
 
 =pod
 

@@ -112,7 +112,7 @@ DBIO::Generate::Style::Candy - DBIO::Candy DSL emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 METHODS
 

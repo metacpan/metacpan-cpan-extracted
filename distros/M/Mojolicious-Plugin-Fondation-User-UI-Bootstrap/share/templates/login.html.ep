@@ -1,0 +1,51 @@
+% layout (stash('layout') // 'main');
+
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+
+        <h2 class="card-title text-center mb-4"><%= l 'Login' %></h2>
+
+        <form method="post" action="/login">
+          <%= csrf_field %>
+
+          <div class="mb-3">
+            <label for="username" class="form-label"><%= l 'Username' %></label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              class="form-control"
+              placeholder="<%= l 'Username' %>"
+              required
+              autofocus
+            >
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label"><%= l 'Password' %></label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              class="form-control"
+              placeholder="<%= l 'Password' %>"
+              required
+            >
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">
+              <%= l 'Sign in' %>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>

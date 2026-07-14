@@ -7,26 +7,33 @@ use parent 'Net::Blossom::Error';
 use Net::Blossom::_ConstructorArgs ();
 
 use Carp qw(croak);
-use Class::Tiny qw(method url status reason x_reason headers body payment_challenges);
+use Class::Tiny qw(method url status reason x_reason headers body), {
+    payment_challenges => sub { {} },
+};
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(method url status reason x_reason headers body payment_challenges);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
-
-    $args{headers} = {} unless defined $args{headers};
-    $args{body} = '' unless defined $args{body};
-    $args{payment_challenges} = {} unless defined $args{payment_challenges};
     croak "payment_challenges must be a hash reference"
-        unless ref($args{payment_challenges}) eq 'HASH';
+        if defined $args{payment_challenges} && ref($args{payment_challenges}) ne 'HASH';
 
     my $payment_challenges = delete $args{payment_challenges};
-    my $self = $class->SUPER::new(%args);
+    my $normalized = $class->SUPER::BUILDARGS(%args);
+    $normalized->{payment_challenges} = $payment_challenges
+        if defined $payment_challenges;
+    return $normalized;
+}
+
+sub BUILD {
+    my ($self) = @_;
     croak "status must be 402 for PaymentRequired" unless $self->status == 402;
-    $self->{payment_challenges} = $payment_challenges;
-    return $self;
+    $self->payment_challenges({}) unless defined $self->payment_challenges;
+    croak "payment_challenges must be a hash reference"
+        unless ref($self->payment_challenges) eq 'HASH';
+    return;
 }
 
 sub payment_methods {
@@ -65,8 +72,10 @@ from a Blossom server. It is a subclass of C<Net::Blossom::Error>.
 
 When this object is produced by C<Net::Blossom::Client>, payment challenges are
 parsed from non-reserved C<X-*> response headers. Known C<cashu> and
-C<lightning> challenges are validated before being exposed. Unknown future
-payment methods are preserved when they have a scalar non-empty payload.
+C<lightning> challenges are validated before being exposed. Cashu validation
+supports the NUT-24 HTTP payment profile in both NUT-18 C<creqA> and NUT-26
+C<creqB> encodings. Unknown future payment methods are preserved when they
+have a scalar non-empty payload.
 
 =head1 CONSTRUCTOR
 
@@ -130,5 +139,15 @@ prefix. Returns C<undef> when the method is unknown or undefined.
 =head2 as_string
 
 Inherited from C<Net::Blossom::Error>.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

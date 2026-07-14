@@ -13,7 +13,7 @@ DBIO::Manual::Heritage - Everything that changed from DBIx::Class to DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 OVERVIEW
 
@@ -575,8 +575,18 @@ C<DBIO::Test::Schema::*> under C<dbio/lib/>:
   DBIO::Test::Schema::Vanilla
   DBIO::Test::Schema::Candy
   DBIO::Test::Schema::Cake
-  DBIO::Test::Schema::Moo
-  DBIO::Test::Schema::Moose
+
+The optional OO-framework demo schemas are standalone schema classes and
+live as B<siblings> of (not under) C<DBIO::Test::Schema>. Keeping them out
+of the C<DBIO::Test::Schema::*> namespace is deliberate: a no-arg
+C<load_classes> sweep of that namespace would otherwise try to load them
+and die on any box lacking the optional dependency (Moose / MooseX::NonMoose
+/ Moo). Tests that use them guard with C<eval { require ... }>.
+
+  DBIO::Test::MooSchema         # Moo result classes
+  DBIO::Test::MooseSchema       # Moose result classes
+  DBIO::Test::MooCakeSchema     # Moo + Cake DDL
+  DBIO::Test::MooseSugarSchema  # Moose + Cake DDL
 
 Load driver-specific result classes with the hashref form:
 

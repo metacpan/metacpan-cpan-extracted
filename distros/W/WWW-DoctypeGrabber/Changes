@@ -1,5 +1,8 @@
 Revision history for WWW-DoctypeGrabber
 
+0.008  2026-07-13
+        - Made the test suite offline and deterministic (no live web page)
+
 0.007  2013-12-07
         - Fixed broken test
 

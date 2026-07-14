@@ -35,6 +35,10 @@
 extern "C" {
 #endif
 
+#ifndef UTF8_VALID_STREAM_PROBE_WINDOW_SIZE
+#  define UTF8_VALID_STREAM_PROBE_WINDOW_SIZE 256
+#endif
+
 /*
  * utf8_valid_stream_status_t -- outcome of a streaming validation step.
  *
@@ -71,18 +75,38 @@ typedef struct {
 
 typedef struct {
   utf8_dfa_state_t state;
-  size_t pending;
+  size_t carried;
+  size_t probe_window;
+  bool probe_ascii;
 } utf8_valid_stream_t;
+
+static inline void
+utf8_valid_stream_set_window(utf8_valid_stream_t *s, size_t window) {
+  s->probe_window = window;
+}
+
+static inline void
+utf8_valid_stream_set_ascii(utf8_valid_stream_t *s, bool ascii) {
+  s->probe_ascii = ascii;
+}
 
 static inline void
 utf8_valid_stream_init(utf8_valid_stream_t *s) {
   s->state = UTF8_DFA_ACCEPT;
-  s->pending = 0;
+  s->carried = 0;
+  s->probe_window = UTF8_VALID_STREAM_PROBE_WINDOW_SIZE;
+#ifdef UTF8_VALID_STREAM_PROBE_ASCII
+  s->probe_ascii = true;
+#else
+  s->probe_ascii = false;
+#endif
 }
 
 static inline size_t
-utf8_valid_stream_dual_prefix(const uint8_t *bytes, size_t len) {
-  size_t probe = len > 256 ? 256 : len - 1;
+utf8_valid_stream_probe_boundary(const uint8_t *bytes, 
+                                 size_t len, 
+                                 size_t probe_window) {
+  size_t probe = len > probe_window ? probe_window : len - 1;
 
   // Back up to a definite UTF-8 boundary:
   // the start of the final sequence in the probe window.
@@ -90,6 +114,22 @@ utf8_valid_stream_dual_prefix(const uint8_t *bytes, size_t len) {
     probe--;
 
   return probe;
+}
+
+static inline bool
+utf8_valid_stream_probe_run(const uint8_t *bytes, 
+                            size_t len, 
+                            bool ascii) {
+  utf8_dfa_state_t state;
+
+  if (len < 64)
+    state = utf8_dfa_run(UTF8_DFA_ACCEPT, bytes, len);
+  else if (ascii)
+    state = utf8_dfa_run_ascii(UTF8_DFA_ACCEPT, bytes, len);
+  else
+    state = utf8_dfa_run_dual(UTF8_DFA_ACCEPT, bytes, len);
+
+  return state == UTF8_DFA_ACCEPT;
 }
 
 /*
@@ -126,24 +166,26 @@ utf8_valid_stream_check(utf8_valid_stream_t* s,
                         bool eof) {
   const uint8_t* bytes = (const uint8_t*)src;
   utf8_dfa_state_t state = s->state;
-  size_t carried = s->pending;
+  size_t carried = s->carried;
   size_t consumed = 0;
   size_t chunk_bytes = 0;
   size_t pos = 0;
-  bool run_dual = true;
+  bool probe_run = s->probe_window >= 64;
 
   while (pos < len) {
     state = utf8_dfa_step(state, bytes[pos++]);
     chunk_bytes++;
 
     if (state == UTF8_DFA_ACCEPT) {
-      if (run_dual && len - pos >= 64) {
+      if (probe_run && len - pos >= 64) {
         do {
-          size_t probe = utf8_valid_stream_dual_prefix(bytes + pos, len - pos);
-          if (probe < 64 || utf8_dfa_run_dual(UTF8_DFA_ACCEPT, bytes + pos, probe) != UTF8_DFA_ACCEPT) {
-            run_dual = false;
+          size_t probe = utf8_valid_stream_probe_boundary(bytes + pos, len - pos, s->probe_window);
+          if (probe == 0)
+            probe_run = false;
+          else
+            probe_run = utf8_valid_stream_probe_run(bytes + pos, probe, s->probe_ascii);
+          if (!probe_run)
             break;
-          }
           pos += probe;
         } while (len - pos >= 64);
       }
@@ -155,7 +197,7 @@ utf8_valid_stream_check(utf8_valid_stream_t* s,
       size_t total = carried + chunk_bytes;
       size_t advance = total > 1 ? chunk_bytes - 1 : 1;
       s->state = UTF8_DFA_ACCEPT;
-      s->pending = 0;
+      s->carried = 0;
       return (utf8_valid_stream_result_t){
         .status   = UTF8_VALID_STREAM_ILLFORMED,
         .consumed = carried ? 0 : consumed,
@@ -168,7 +210,7 @@ utf8_valid_stream_check(utf8_valid_stream_t* s,
 
   if (state == UTF8_DFA_ACCEPT) {
     s->state = UTF8_DFA_ACCEPT;
-    s->pending = 0;
+    s->carried = 0;
     return (utf8_valid_stream_result_t){
       .status   = UTF8_VALID_STREAM_OK,
       .consumed = len,
@@ -180,7 +222,7 @@ utf8_valid_stream_check(utf8_valid_stream_t* s,
 
   if (eof) {
     s->state = UTF8_DFA_ACCEPT;
-    s->pending = 0;
+    s->carried = 0;
     return (utf8_valid_stream_result_t){
       .status   = UTF8_VALID_STREAM_TRUNCATED,
       .consumed = carried ? 0 : consumed,
@@ -191,7 +233,7 @@ utf8_valid_stream_check(utf8_valid_stream_t* s,
   }
 
   s->state = state;
-  s->pending = carried + chunk_bytes;
+  s->carried = carried + chunk_bytes;
   return (utf8_valid_stream_result_t){
     .status   = UTF8_VALID_STREAM_PARTIAL,
     .consumed = consumed,

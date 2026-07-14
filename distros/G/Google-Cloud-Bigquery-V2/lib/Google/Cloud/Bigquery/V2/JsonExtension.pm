@@ -1,0 +1,41 @@
+package Google::Cloud::Bigquery::V2::JsonExtension;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Inclusion };
+    my $descriptor_b64 = <<'EOF';
+Ci1nb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvanNvbl9leHRlbnNpb24ucHJvdG8SGGdvb2ds
+ZS5jbG91ZC5iaWdxdWVyeS52MhoaZ29vZ2xlL2FwaS9pbmNsdXNpb24ucHJvdG8qPAoNSnNv
+bkV4dGVuc2lvbhIeChpKU09OX0VYVEVOU0lPTl9VTlNQRUNJRklFRBAAEgsKB0dFT0pTT04Q
+AUK7AQocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkISSnNvbkV4dGVuc2lvblByb3Rv
+UAFaO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjti
+aWdxdWVyeXBiitXb0g9ECkJwYWNrYWdlOnRoaXJkX3BhcnR5L2phdmEvY2VsL3Rvb2xzL3Ny
+Yy90ZXN0L2phdmEvZGV2L2NlbC90b29scy9tY3BKkgUKBhIEAAAYAQoICgEMEgMAABIKCAoB
+AhIDAgAhCgkKAgMAEgMEACQKCAoBCBIDBgBSCgkKAggLEgMGAFIKCAoBCBIDBwAiCgkKAggK
+EgMHACIKCAoBCBIDCAA1CgkKAggBEgMIADUKCAoBCBIDCQAzCgkKAggIEgMJADMKCQoBCBIE
+CgAMAgoOCgYI0bqr+gESBAoADAIKuAEKAgUAEgQRABgBGqsBIFVzZWQgdG8gaW5kaWNhdGUg
+dGhhdCBhIEpTT04gdmFyaWFudCwgcmF0aGVyIHRoYW4gbm9ybWFsIEpTT04sIGlzIGJlaW5n
+IHVzZWQKIGFzIHRoZSBzb3VyY2VfZm9ybWF0LiBUaGlzIHNob3VsZCBvbmx5IGJlIHVzZWQg
+aW4gY29tYmluYXRpb24gd2l0aCB0aGUKIEpTT04gc291cmNlIGZvcm1hdC4KCgoKAwUAARID
+EQUSCqQBCgQFAAIAEgMUAiEalgEgVGhlIGRlZmF1bHQgaWYgcHJvdmlkZWQgdmFsdWUgaXMg
+bm90IG9uZSBpbmNsdWRlZCBpbiB0aGUgZW51bSwgb3IgdGhlIHZhbHVlCiBpcyBub3Qgc3Bl
+Y2lmaWVkLiBUaGUgc291cmNlIGZvcm1hdCBpcyBwYXJzZWQgd2l0aG91dCBhbnkgbW9kaWZp
+Y2F0aW9uLgoKDAoFBQACAAESAxQCHAoMCgUFAAIAAhIDFB8gClQKBAUAAgESAxcCDhpHIFVz
+ZSBHZW9KU09OIHZhcmlhbnQgb2YgSlNPTi4gU2VlIGh0dHBzOi8vdG9vbHMuaWV0Zi5vcmcv
+aHRtbC9yZmM3OTQ2LgoKDAoFBQACAQESAxcCCQoMCgUFAAIBAhIDFwwNYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;

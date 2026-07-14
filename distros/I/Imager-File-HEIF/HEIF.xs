@@ -319,5 +319,5 @@ i_heif_encoders(class, enum heif_compression_format fmt = heif_compression_undef
     heif_context_free(ctx);
 
 BOOT:
-	PERL_INITIALIZE_IMAGER_CALLBACKS;
+	PERL_INITIALIZE_IMAGER_CALLBACKS_NAME("Imager::File::HEIF");
         i_heif_init();

@@ -29,7 +29,7 @@
               [ 'British Columbia' => 'BC'],
               [ 'Manitoba' => 'MB'],
               [ 'New Brunswick' => 'NB'],
-              [ 'New Foundland' => 'NF'],
+              [ 'Newfoundland' => 'NF'],
               [ 'Northwest Terriories' => 'NT'],
               [ 'Nova Scotia' => 'NS'],
               [ 'Nunavut' => 'NU'],

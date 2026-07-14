@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::ColorNamer;
 use warnings;
 use strict;
 
-our $VERSION = '2.001003'; # VERSION
+our $VERSION = '2.001004'; # VERSION
 
 use App::ColorNamer;
 use base 'POE::Component::IRC::Plugin::BaseWrap';

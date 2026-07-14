@@ -1,5 +1,9 @@
 Revision history for Mojo-PDF
 
+1.005004  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.005003  2020-10-04
   - Implement `->pic` method
   - Documentation tweaks

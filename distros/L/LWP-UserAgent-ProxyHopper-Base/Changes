@@ -1,5 +1,11 @@
 Revision history for LWP-UserAgent-ProxyHopper-Base
 
+0.004   July 12, 2026
+        Fixed a syntax error that broke compilation on modern Perl: the
+        indirect method call `__PACKAGE__->mk_classaccessors qw(...)` is
+        no longer valid without parentheses, so the argument list is now
+        wrapped as `mk_classaccessors(qw(...))`.
+
 0.003   August 6, 2012
         Updated examples and docs to thank for the patch
 

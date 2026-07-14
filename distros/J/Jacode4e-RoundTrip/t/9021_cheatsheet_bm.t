@@ -2,7 +2,7 @@
 #
 # 9021_cheatsheet_bm.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Rujukan Pantas Jacode4e::RoundTrip (Bahasa Melayu)
 # Ujian ini juga berfungsi sebagai rujukan pantas untuk pengguna berbahasa Melayu.

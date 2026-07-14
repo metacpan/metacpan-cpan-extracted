@@ -3,7 +3,7 @@ package POE::Component::Bundle::WebDevelopment;
 use strict;
 use warnings;
 
-our $VERSION = '2.001001'; # VERSION
+our $VERSION = '2.001002'; # VERSION
 
 1;
 

@@ -2,7 +2,7 @@
 #
 # 9024_cheatsheet_mn.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip Хурдан лавлах (Монгол)
 # Энэ тест нь монгол хэлтэй хэрэглэгчдэд зориулсан хурдан лавлах болно.

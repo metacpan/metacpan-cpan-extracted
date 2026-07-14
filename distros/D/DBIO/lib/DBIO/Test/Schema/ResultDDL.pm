@@ -18,7 +18,7 @@ DBIO::Test::Schema::ResultDDL - Test schema using DBIO::Cake syntax
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

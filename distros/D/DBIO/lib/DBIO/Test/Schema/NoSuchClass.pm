@@ -21,7 +21,7 @@ DBIO::Test::Schema::NoSuchClass - Test non-result class for load_classes error t
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

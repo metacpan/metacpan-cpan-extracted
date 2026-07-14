@@ -3,6 +3,7 @@ use strictures 2;
 use Test::More;
 use Digest::SHA qw(sha256_hex);
 use JSON ();
+use MIME::Base64 qw(encode_base64);
 
 use Net::Blossom::Client;
 
@@ -28,7 +29,28 @@ my $HASH = 'b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553';
 my $JSON = JSON->new->utf8->canonical;
 my $CASHU_CHALLENGE = 'creqApWF0gaNhdGVub3N0cmFheKlucHJvZmlsZTFxeTI4d3VtbjhnaGo3dW45ZDNzaGp0bnl2OWtoMnVld2Q5aHN6OW1od2RlbjV0ZTB3ZmprY2N0ZTljdXJ4dmVuOWVlaHFjdHJ2NWhzenJ0aHdkZW41dGUwZGVoaHh0bnZkYWtxcWd5ZGFxeTdjdXJrNDM5eWtwdGt5c3Y3dWRoZGh1NjhzdWNtMjk1YWtxZWZkZWhrZjBkNDk1Y3d1bmw1YWeBgmFuYjE3YWloYjdhOTAxNzZhYQphdWNzYXRhbYF4Imh0dHBzOi8vbm9mZWVzLnRlc3RudXQuY2FzaHUuc3BhY2U';
 my $PADDED_CASHU_CHALLENGE = $CASHU_CHALLENGE . '=';
+my $CASHU_B_CHALLENGE = 'CREQB1QYQQWER9D4HNZV3NQGQQSQQQQQQQQQQRAQPSQQGQQSQQZQG9QQVXSAR5WPEN5TE0D45KUAPWV4UXZMTSD3JJUCM0D5RQQRJRDANXVET9YPCXZ7TDV4H8GXHR3TQ';
 my $LIGHTNING_CHALLENGE = 'lnbc30n1pnnmw3lpp57727jjq8zxctahfavqacymellq56l70f7lwfkmhxfjva6dgul2zqhp5w48l28v60yvythn6qvnpq0lez54422a042yaw4kq8arvd68a6n7qcqzzsxqyz5vqsp5sqezejdfaxx5hge83tf59a50h6gagwah59fjn9mw2d5mn278jkys9qxpqysgqt2q2lhjl9kgfaqz864mhlsspftzdyr642lf3zdt6ljqj6wmathdhtgcn0e6f4ym34jl0qkt6gwnllygvzkhdlpq64c6yv3rta2hyzlqp8k28pz';
+
+sub cashu_a_from_cbor_hex {
+    my ($hex) = @_;
+    my $encoded = encode_base64(pack('H*', $hex), '');
+    $encoded =~ tr{+/}{-_};
+    $encoded =~ s/=+\z//;
+    return "creqA$encoded";
+}
+
+sub payment_error {
+    my ($challenge) = @_;
+    my $ua = Local::UA->new({
+        status  => 402,
+        reason  => 'Payment Required',
+        headers => { 'X-Cashu' => $challenge },
+        content => 'pay first',
+    });
+    my $client = Net::Blossom::Client->new(server => 'https://cdn.example.com', ua => $ua);
+    return dies { $client->upload_blob('paid bytes') };
+}
 
 sub descriptor {
     return {
@@ -101,6 +123,46 @@ subtest 'BUD-07 accepts padded NUT-24 Cashu payment requests' => sub {
     isa_ok($error, 'Net::Blossom::PaymentRequired');
     is_deeply([$error->payment_methods], [qw(cashu)], 'padded cashu challenge parsed');
     is($error->payment_challenge('cashu'), $PADDED_CASHU_CHALLENGE, 'padded cashu challenge preserved');
+
+    my $upper_prefix = $CASHU_CHALLENGE;
+    substr $upper_prefix, 0, 5, 'CREQA';
+    my $upper_error = payment_error($upper_prefix);
+    is($upper_error->payment_challenge('cashu'), $upper_prefix, 'case-insensitive creqA prefix accepted');
+};
+
+subtest 'BUD-07 accepts current NUT-26 Cashu payment requests' => sub {
+    my $error = payment_error($CASHU_B_CHALLENGE);
+
+    isa_ok($error, 'Net::Blossom::PaymentRequired');
+    is_deeply([$error->payment_methods], [qw(cashu)], 'creqB cashu challenge parsed');
+    is($error->payment_challenge('cashu'), $CASHU_B_CHALLENGE, 'creqB cashu challenge preserved');
+
+    my $lower = lc $CASHU_B_CHALLENGE;
+    my $lower_error = payment_error($lower);
+    is($lower_error->payment_challenge('cashu'), $lower, 'lowercase creqB challenge accepted');
+};
+
+subtest 'BUD-07 rejects wrong CBOR types in NUT-18 Cashu payment requests' => sub {
+    my $mint = '68747470733a2f2f6d696e742e6578616d706c652e636f6d';
+    my @cases = (
+        ['text amount',    "a361616131617563736174616d817818$mint"],
+        ['boolean amount', "a36161f5617563736174616d817818$mint"],
+        ['byte amount',    "a361614131617563736174616d817818$mint"],
+        ['numeric unit',   "a3616101617501616d817818$mint"],
+        ['numeric mint',   'a3616101617563736174616d8101'],
+        ['byte unit',      "a3616101617543736174616d817818$mint"],
+        ['byte mint',      "a3616101617563736174616d815818$mint"],
+        ['byte map key',   "a3416101617563736174616d817818$mint"],
+        ['invalid UTF-8',  "a3616101617561ff616d817818$mint"],
+        ['invalid mint URL', 'a3616101617563736174616d816178'],
+    );
+
+    for my $case (@cases) {
+        my ($name, $hex) = @$case;
+        my $error = payment_error(cashu_a_from_cbor_hex($hex));
+        isa_ok($error, 'Net::Blossom::PaymentRequired', "$name response");
+        is($error->payment_challenge('cashu'), undef, "$name rejected");
+    }
 };
 
 subtest 'BUD-07 payment proof headers can be supplied when retrying body endpoints' => sub {

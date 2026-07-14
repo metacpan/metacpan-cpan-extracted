@@ -18,7 +18,7 @@ DBIOx - Bring your own database magic!
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

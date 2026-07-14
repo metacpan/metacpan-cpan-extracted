@@ -1,40 +1,80 @@
 {
+   "X_No_Archive" : "Yes",
    "abstract" : "xxHash Implementation For Perl",
    "author" : [
-      "Sanko Robinson <sanko@cpan.org>"
+      "Sanko Robinson"
    ],
+   "description" : "xxHash is an extremely fast non-cryptographic hash algorithm, working at RAM speed limit. This is a wrapper of both the 32-, 64-, and 128-bit hash functions.",
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
    "license" : [
-      "bsd"
+      "artistic_2"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Digest-xxHash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "ext"
+      ],
+      "file" : [],
+      "namespace" : [],
+      "package" : []
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
             "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0"
+            "Module::Build" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.19"
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "v5.40.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Perl::Tidy" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Math::Int64" : "0.53",
+            "perl" : "5.022"
+         },
          "requires" : {
-            "Math::Int64" : "0.53"
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Digest::xxHash" : {
          "file" : "lib/Digest/xxHash.pm",
-         "version" : "2.04"
+         "version" : "3.00"
       }
    },
    "release_status" : "stable",
@@ -42,13 +82,27 @@
       "bugtracker" : {
          "web" : "https://github.com/sanko/digest-xxhash/issues"
       },
+      "homepage" : "https://github.com/sanko/digest-xxhash",
       "license" : [
-         "http://opensource.org/licenses/BSD-3-Clause"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
-         "url" : "https://github.com/sanko/digest-xxhash"
+         "type" : "git",
+         "url" : "https://github.com/sanko/digest-xxhash.git",
+         "web" : "https://github.com/sanko/digest-xxhash"
       }
    },
-   "version" : "2.04",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "3.00",
+   "x_contributors" : [
+      "Nicholas Clark (nwc10)",
+      "Scott Baker (scottchiefbaker)",
+      "vividsnow"
+   ],
+   "x_custom_builder" : 0,
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".clang-format",
+      ".github/**"
+   ]
 }

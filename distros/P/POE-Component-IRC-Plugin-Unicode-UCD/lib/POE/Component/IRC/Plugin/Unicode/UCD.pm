@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::Unicode::UCD;
 use warnings;
 use strict;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use base 'POE::Component::IRC::Plugin::BaseWrap';
 
@@ -332,7 +332,7 @@ The result of the request.
 
 =head1 AUTHOR
 
-Thanks to L<Lukas (mauke) Mai|https://metacpan.org/author/MAUKE> for providing the unicode lookup code.
+Thanks to Lukas (mauke) Mai for providing the unicode lookup code.
 
 Zoffix Znet, C<< <zoffix at cpan.org> >>
 (L<http://zoffix.com>, L<http://haslayout.net>)

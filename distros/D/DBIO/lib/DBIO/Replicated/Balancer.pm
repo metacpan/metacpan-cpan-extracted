@@ -175,7 +175,7 @@ DBIO::Replicated::Balancer - Base class for replicated read balancing
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

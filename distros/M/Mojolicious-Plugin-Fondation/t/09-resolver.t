@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp 'tempdir';
+use File::Path 'make_path';
 use FindBin;
 
 use lib "$FindBin::Bin/../lib";
@@ -231,6 +232,51 @@ subtest 'before — non-existent target silently ignored' => sub {
     is($sorted->[0]{long},
        'Mojolicious::Plugin::Fondation::Resolver::BeforeGhost',
        'BeforeGhost loaded without error');
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# dev_plugins_dir — discover plugins from a development directory
+# ═══════════════════════════════════════════════════════════════════════════
+
+subtest 'dev_plugins_dir — discovers plugins from dev directory' => sub {
+    my $app = _build_app();
+
+    # Build a fake dev directory: Mojolicious-Plugin-Fondation-DevTest/
+    my $dev_root  = tempdir(CLEANUP => 1);
+    my $pkg_dir   = "$dev_root/Mojolicious-Plugin-Fondation-DevTest";
+    my $ns_dir    = "$pkg_dir/lib/Mojolicious/Plugin/Fondation";
+    make_path($ns_dir);
+
+    # Write a minimal Fondation plugin
+    open my $fh, '>', "$ns_dir/DevTest.pm" or die $!;
+    print $fh <<'END_PM';
+package Mojolicious::Plugin::Fondation::DevTest;
+use Mojo::Base 'Mojolicious::Plugin', -signatures;
+
+sub fondation_meta {
+    return {
+        dependencies => [],
+        defaults     => { from_dev => 1 },
+    };
+}
+
+sub register ($self, $app, $conf) {
+    return $self;
+}
+
+1;
+END_PM
+    close $fh;
+
+    my $resolver = Mojolicious::Plugin::Fondation::Resolver->new(app => $app);
+    my $sorted   = $resolver->resolve('Fondation::DevTest',
+                                      { dev_plugins_dir => $dev_root });
+
+    is(scalar @$sorted, 1, 'One plugin resolved from dev dir');
+    is($sorted->[0]{long}, 'Mojolicious::Plugin::Fondation::DevTest',
+       'Correct long name');
+    is($sorted->[0]{config}{from_dev}, 1,
+       'Dev plugin config merged');
 };
 
 done_testing();

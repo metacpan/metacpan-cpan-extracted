@@ -69,7 +69,7 @@ unshift @INC, "$tmpdir/lib";
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'test' },
+                    foo => { source => 'Foo', backend => 'test' },
                 },
             }},
             { 'Fondation::TestDBIx' => {
@@ -81,7 +81,7 @@ unshift @INC, "$tmpdir/lib";
 
     # Register the source so DeploymentHandler sees it
     TestSchema->register_source(
-        'foos', TestSchema::Result::Foo->result_source_instance);
+        'Foo', TestSchema::Result::Foo->result_source_instance);
 
     $app->commands->run('db', 'prepare', '-y');
     $app->commands->run('db', 'install');
@@ -98,7 +98,7 @@ unshift @INC, "$tmpdir/lib";
 
     # Verify foos has data
     my $native = TestSchema->connect("dbi:SQLite:dbname=$dbfile");
-    my @foos = $native->resultset('foos')->all;
+    my @foos = $native->resultset('Foo')->all;
     is(scalar @foos, 1, 'foos has data after v1 populate');
     is($foos[0]->name, 'alpha', 'foos row has correct name');
 }
@@ -146,8 +146,8 @@ require TestSchema::Result::Bar;
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'test' },
-                    bar => { source => 'bars', backend => 'test' },
+                    foo => { source => 'Foo', backend => 'test' },
+                    bar => { source => 'Bar', backend => 'test' },
                 },
             }},
             { 'Fondation::TestDBIx' => {
@@ -161,9 +161,9 @@ require TestSchema::Result::Bar;
     });
 
     TestSchema->register_source(
-        'foos', TestSchema::Result::Foo->result_source_instance);
+        'Foo', TestSchema::Result::Foo->result_source_instance);
     TestSchema->register_source(
-        'bars', TestSchema::Result::Bar->result_source_instance);
+        'Bar', TestSchema::Result::Bar->result_source_instance);
 
     # db prepare -a: detects drift (new table 'bars'), auto-bumps
     my $out_prep = '';
@@ -212,8 +212,8 @@ require TestSchema::Result::Bar;
 
     # Verify both tables have data
     my $native = TestSchema->connect("dbi:SQLite:dbname=$dbfile");
-    my @foos = $native->resultset('foos')->all;
-    my @bars = $native->resultset('bars')->all;
+    my @foos = $native->resultset('Foo')->all;
+    my @bars = $native->resultset('Bar')->all;
     is(scalar @foos, 1, 'foos still has data after upgrade');
     is(scalar @bars, 1, 'bars has data after v2 populate');
     is($bars[0]->name, 'beta', 'bars row has correct name');

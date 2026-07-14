@@ -202,7 +202,7 @@ DBIO::EncodedColumn - One-way encode selected columns (e.g. passwords)
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

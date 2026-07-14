@@ -2,13 +2,12 @@ Build.PL
 Changes
 MANIFEST
 README
-LICENSE
 examples/draw.pl
 lib/Win32/GUITaskAutomate.pm
+t/kwalitee.t
 t/00-load.t
-xt/pod-coverage.t
-xt/pod.t
-xt/kwalitee.t
+t/pod-coverage.t
+t/pod.t
 Makefile.PL
 META.yml
-META.json
+META.json                                Module JSON meta-data (added by MakeMaker)

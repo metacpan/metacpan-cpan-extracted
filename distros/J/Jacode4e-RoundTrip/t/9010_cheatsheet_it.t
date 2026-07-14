@@ -2,7 +2,7 @@
 #
 # 9010_cheatsheet_it.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Guida rapida Jacode4e::RoundTrip (Italiano)
 # Questa guida serve anche come riferimento rapido per gli utenti italiani.

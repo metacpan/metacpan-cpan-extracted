@@ -2,7 +2,7 @@ package Mojo::PDF;
 
 use Mojo::Base -base;
 
-our $VERSION = '1.005003'; # VERSION
+our $VERSION = '1.005004'; # VERSION
 
 use Carp qw/croak/;
 $Carp::Internal{ (__PACKAGE__) }++;

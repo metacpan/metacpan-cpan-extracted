@@ -70,5 +70,7 @@ Email-.*
 .test-script-*
 typescript
 mutation.json
+^xt/
 CLAUDE.md
 \.claude
+\.circleci

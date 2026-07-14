@@ -98,7 +98,7 @@ Valid %args are:
 - **Format =>** `$format` _(optional)_
 
     Output image format; default is 'PNG'; valid values depend on the
-    Imager installations; see [Imager::Files](https://metacpan.org/pod/Imager::Files) for details.
+    Imager installations; see [Imager::Files](https://metacpan.org/pod/Imager%3A%3AFiles) for details.
 
 - **HEdgeMargin =>** `$pixels` _(optional)_
 

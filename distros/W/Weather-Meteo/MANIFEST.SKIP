@@ -43,7 +43,7 @@
 \.tmp$
 \.#
 \.rej$
-\.yml$
+schemas\.yml$
 \.swp$
 
 # Avoid OS-specific files/dirs
@@ -67,7 +67,11 @@
 \.releaserc
 \.lwpcookies
 Weather-.*
-t/online.enabled
+.test-script-*
+typescript
+mutation*
+^xt/mutant_\d
 CLAUDE.md
-mutation.json
-.claude/settings.local.json
+\.claude
+\.circleci
+t/online.enabled

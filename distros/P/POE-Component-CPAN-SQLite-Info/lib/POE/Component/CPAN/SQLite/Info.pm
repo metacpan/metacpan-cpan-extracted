@@ -3,7 +3,7 @@ package POE::Component::CPAN::SQLite::Info;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use LWP::UserAgent;
 use File::Spec;
@@ -348,10 +348,23 @@ sub _fetch_data_files {
     keys %{ $req_ref->{uris} };
     while ( my ( $name, $uri ) = each %{ $req_ref->{uris} } ) {
 
-        $req_ref->{requests}{ $name } = $ua->mirror(
+        my $response = $ua->mirror(
             $uri,
             $req_ref->{files}{ $name },
         );
+
+        # Modern LWP::UserAgent attaches a `response_done` handler holding a
+        # CODE ref onto the HTTP::Response returned by mirror(). This response
+        # is sent back to the parent session through POE::Filter::Reference,
+        # which serialises with Storable, and Storable dies on CODE refs
+        # ("Can't store CODE items"), killing the child wheel and hanging the
+        # whole freshen. Drop the handlers slot before storing the response;
+        # only its status is ever read downstream, and status_line() and
+        # is_success() keep working.
+        delete $response->{handlers}
+            if ref $response eq 'HTTP::Response';
+
+        $req_ref->{requests}{ $name } = $response;
 
         my $requests_ref = $req_ref->{requests};
         # check for fetch errors, but do not consider 304 an error,

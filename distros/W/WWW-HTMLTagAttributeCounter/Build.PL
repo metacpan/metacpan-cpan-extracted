@@ -17,7 +17,6 @@ my $builder = Module::Build->new(
         'Class::Accessor::Grouped' => 0,
         'perl' => '5.006',
     },
-    configure_requires => { 'Module::Build' => 0 },
     add_to_cleanup      => [ 'WWW-HTMLTagAttributeCounter-*' ],
     create_makefile_pl => 'traditional',
 );

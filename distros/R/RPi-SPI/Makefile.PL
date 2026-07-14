@@ -31,7 +31,7 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'WiringPi::API'     => 3.1803,
+        'WiringPi::API'     => 3.1804,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-SPI-*' },

@@ -31,7 +31,7 @@ DBIO::Test::Schema::EventSmallDT - Test result class for the event_small_dt tabl
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

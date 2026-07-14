@@ -2,7 +2,7 @@
 #
 # 9001_cheatsheet_ja.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip チートシート（日本語）
 # このテストは日本語話者向けのクイックリファレンスを兼ねています。

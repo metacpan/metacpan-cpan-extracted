@@ -44,7 +44,7 @@ DBIO::ResultSource::View - ResultSource object representing a view
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

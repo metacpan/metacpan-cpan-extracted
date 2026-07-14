@@ -1,0 +1,58 @@
+package Google::Cloud::Bigquery::V2::RestrictionConfig;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Auditing };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Inclusion };
+    eval { require Datapol::SemanticAnnotations };
+    my $descriptor_b64 = <<'EOF';
+CjFnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcmVzdHJpY3Rpb25fY29uZmlnLnByb3RvEhhn
+b29nbGUuY2xvdWQuYmlncXVlcnkudjIaGWdvb2dsZS9hcGkvYXVkaXRpbmcucHJvdG8aH2dv
+b2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnBy
+b3RvGjxzdG9yYWdlL2RhdGFwb2wvYW5ub3RhdGlvbnMvcHJvdG8vc2VtYW50aWNfYW5ub3Rh
+dGlvbnMucHJvdG8izgEKEVJlc3RyaWN0aW9uQ29uZmlnEmgKBHR5cGUYASABKA4yOy5nb29n
+bGUuY2xvdWQuYmlncXVlcnkudjIuUmVzdHJpY3Rpb25Db25maWcuUmVzdHJpY3Rpb25UeXBl
+QhfgQQOgoPCYAecH6uqArAMHEgVBVURJVFIEdHlwZSJPCg9SZXN0cmljdGlvblR5cGUSIAoc
+UkVTVFJJQ1RJT05fVFlQRV9VTlNQRUNJRklFRBAAEhoKFlJFU1RSSUNURURfREFUQV9FR1JF
+U1MQAUKAAQocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIWUmVzdHJpY3Rpb25Db25m
+aWdQcm90b1ABWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1
+ZXJ5cGI7YmlncXVlcnlwYorV29IPBQoDYWxsSv0FCgYSBAAAIgEKCAoBDBIDAAASCggKAQIS
+AwIAIQoJCgIDABIDBAAjCgkKAgMBEgMFACkKCQoCAwISAwYAJAoJCgIDAxIDBwBGCggKAQgS
+AwkAUgoJCgIICxIDCQBSCggKAQgSAwoANQoJCgIIARIDCgA1CggKAQgSAwsAIgoJCgIIChID
+CwAiCggKAQgSAwwANwoJCgIICBIDDAA3CggKAQgSAw0ALQoPCggI0bqr+gEBABIDDQAtCiAK
+AgQAEgQQACIBGhQgKC0tIE5leHQgaWQ6IDIgLS0pCgoKCgMEAAESAxAIGQpQCgQEAAQAEgQS
+AhoDGkIgUmVzdHJpY3Rpb25UeXBlIHNwZWNpZmllcyB0aGUgdHlwZSBvZiBkYXRhc2V0L3Rh
+YmxlIHJlc3RyaWN0aW9uLgoKDAoFBAAEAAESAxIHFgomCgYEAAQAAgASAxQEJRoXIFNob3Vs
+ZCBuZXZlciBiZSB1c2VkLgoKDgoHBAAEAAIAARIDFAQgCg4KBwQABAACAAISAxQjJAqcAQoG
+BAAEAAIBEgMZBB8ajAEgUmVzdHJpY3QgZGF0YSBlZ3Jlc3MuIFNlZSBbRGF0YQogZWdyZXNz
+XShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlncXVlcnkvZG9jcy9hbmFseXRpY3MtaHVi
+LWludHJvZHVjdGlvbiNkYXRhX2VncmVzcykKIGZvciBtb3JlIGRldGFpbHMuCgoOCgcEAAQA
+AgEBEgMZBBoKDgoHBAAEAAIBAhIDGR0eCkAKBAQAAgASBB0CIQQaMiBTcGVjaWZpZXMgdGhl
+IHR5cGUgb2YgZGF0YXNldC90YWJsZSByZXN0cmljdGlvbi4KCgwKBQQAAgAGEgMdAhEKDAoF
+BAACAAESAx0SFgoMCgUEAAIAAxIDHRkaCg0KBQQAAgAIEgQdGyEDChEKCgQAAgAIrY3ANQIS
+Ax4EMwoPCggEAAIACJwIABIDHwQtChAKCQQAAgAIhISOExIDIAQtYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig ===
+    # Fields for RestrictionConfig
+    # Field: type Type: 14 (.google.cloud.bigquery.v2.RestrictionConfig.RestrictionType)
+
+# Enum: RestrictionConfig::RestrictionType
+our $RestrictionConfig_RESTRICTION_TYPE_UNSPECIFIED = 0;
+our $RestrictionConfig_RESTRICTED_DATA_EGRESS = 1;
+
+1;

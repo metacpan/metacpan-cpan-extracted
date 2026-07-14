@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Resolver;
-$Mojolicious::Plugin::Fondation::Resolver::VERSION = '0.04';
+$Mojolicious::Plugin::Fondation::Resolver::VERSION = '0.05';
 # ABSTRACT: Dependency graph resolver with cycle detection and topological sort
 
 use Mojo::Base -base, -signatures;
@@ -23,6 +23,11 @@ sub resolve ($self, $name_or_short, $direct_conf = {}) {
     # Reset internal state for fresh resolution
     $self->{states} = {};
     $self->{result} = [];
+
+    # ── Dev plugin discovery: scan dev_plugins_dir for Mojolicious-Plugin-Fondation-*/lib ──
+    if (my $dev_root = $direct_conf->{dev_plugins_dir}) {
+        $self->_add_dev_plugins_to_inc($dev_root);
+    }
 
     # Phase 1 — Discover all plugins via the original dependency graph
     my $graph = {};
@@ -142,6 +147,20 @@ sub _parse_dep ($self, $dep_spec) {
 }
 
 # ---------------------------------------------------------------------------
+# _add_dev_plugins_to_inc — scan dev_plugins_dir for plugin repos and add
+# their lib/ directories to @INC (before installed modules, so dev wins).
+# ---------------------------------------------------------------------------
+sub _add_dev_plugins_to_inc ($self, $dev_root) {
+    my @dirs = sort glob("$dev_root/Mojolicious-Plugin-Fondation-*");
+    for my $dir (@dirs) {
+        my $lib = "$dir/lib";
+        next unless -d $lib;
+        unshift @INC, $lib;
+        $self->app->log->debug("Dev plugin lib added to \@INC: $lib");
+    }
+}
+
+# ---------------------------------------------------------------------------
 # _discover_meta -- load fondation_meta from a plugin class without
 # instantiating it (i.e. without calling register).
 # ---------------------------------------------------------------------------
@@ -181,7 +200,7 @@ Mojolicious::Plugin::Fondation::Resolver - Dependency graph resolver with cycle 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

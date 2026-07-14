@@ -1,5 +1,25 @@
 Revision history for Email-Abuse-Investigator
 
+0.13	Mon Jul 13 20:56:19 EDT 2026
+	[Security]
+	- _raw_whois(): strip all C0/C1 ASCII control characters (\x00-\x1F,
+	  \x7F) from the WHOIS query before writing it to the socket.  This
+	  prevents WHOIS protocol injection via embedded CRLF sequences in a
+	  crafted domain name.  Croaks when the stripped query is empty.
+
+	- _rdap_lookup(): strip RFC 4007 IPv6 zone identifiers (%eth0 suffix)
+	  from $ip and validate the remainder as dotted-quad IPv4 or hex-colon
+	  IPv6 before interpolating it into the ARIN RDAP URL path.  Returns {}
+	  immediately for any value that fails validation.
+
+	- bin/abuse_check, bin/submit_abuse_report: validate the $ARGV[0] file
+	  path before opening it.  Paths containing NUL bytes, bare CR or LF, or
+	  directory-traversal sequences (../) are now rejected with a clear error
+	  message.  This also makes the scripts safe under perl -T (taint mode).
+
+	[Bug fixes]
+	Fix RT#176347
+
 0.12	Sat Jun 27 13:17:32 EDT 2026
 	[Bug Fixes]
 	- Fix some uninitialized variables

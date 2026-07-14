@@ -35,7 +35,7 @@ $schema->await($schema->deploy({ add_drop_table => 1 }));
 
 isa_ok($schema, 'DBIx::Class::Async::Schema', 'Schema connected to Oracle');
 
-subtest 'Basic CRUD — User' => sub {
+subtest 'Basic CRUD - User' => sub {
     my $user_rs = $schema->resultset('User');
     isa_ok($user_rs, 'DBIx::Class::Async::ResultSet');
 
@@ -86,7 +86,7 @@ subtest 'Search and count' => sub {
     cmp_ok($active_count, '>=', 2, 'search()->count() works on Oracle');
 };
 
-subtest 'Relationships — belongs_to and has_many' => sub {
+subtest 'Relationships - belongs_to and has_many' => sub {
     my $user_rs  = $schema->resultset('User');
     my $order_rs = $schema->resultset('Order');
 
@@ -116,7 +116,7 @@ subtest 'Relationships — belongs_to and has_many' => sub {
     is($user_orders->[0]->id, $order->id, 'has_many correct order');
 };
 
-subtest 'Transactions — txn_do' => sub {
+subtest 'Transactions - txn_do' => sub {
     my $user_rs = $schema->resultset('User');
     my $before  = $user_rs->count->get;
 

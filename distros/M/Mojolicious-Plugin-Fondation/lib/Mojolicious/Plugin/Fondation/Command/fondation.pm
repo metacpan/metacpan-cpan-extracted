@@ -256,7 +256,7 @@ Mojolicious::Plugin::Fondation::Command::fondation - Fondation orchestration com
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

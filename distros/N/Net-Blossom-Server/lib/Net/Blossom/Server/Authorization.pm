@@ -8,7 +8,10 @@ use Net::Blossom::Server::Error;
 use Net::Blossom::Server::Request;
 
 use Carp qw(croak);
-use Class::Tiny qw(_domains clock clock_skew_seconds);
+use Class::Tiny qw(_domains), {
+    clock              => sub { sub { time } },
+    clock_skew_seconds => 30,
+};
 use JSON ();
 use MIME::Base64 qw(decode_base64);
 use Net::Nostr::Event;
@@ -18,7 +21,7 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 my $DOMAIN = qr/\A[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\z/;
 my $JSON = JSON->new->utf8;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(domains clock clock_skew_seconds);
@@ -34,14 +37,17 @@ sub new {
     $args{_domains} = [@{$args{domains}}];
     delete $args{domains};
 
-    $args{clock} = sub { time } unless defined $args{clock};
-    croak "clock must be a code reference" unless ref($args{clock}) eq 'CODE';
+    return \%args;
+}
 
-    $args{clock_skew_seconds} = 30 unless defined $args{clock_skew_seconds};
+sub BUILD {
+    my ($self) = @_;
+    $self->clock(sub { time }) unless defined $self->clock;
+    croak "clock must be a code reference" unless ref($self->clock) eq 'CODE';
+    $self->clock_skew_seconds(30) unless defined $self->clock_skew_seconds;
     croak "clock_skew_seconds must be a non-negative integer"
-        unless $args{clock_skew_seconds} =~ /\A\d+\z/;
-
-    return bless \%args, $class;
+        unless $self->clock_skew_seconds =~ /\A\d+\z/;
+    return;
 }
 
 sub domains {
@@ -350,5 +356,15 @@ C<HEAD /E<lt>sha256E<gt>>, C<PUT /upload>, C<HEAD /upload>,
 C<DELETE /E<lt>sha256E<gt>>, C<GET /list/E<lt>pubkeyE<gt>>,
 C<PUT /mirror>, C<PUT /media>, and C<HEAD /media>. Unknown routes return
 C<undef> so the server core can return its normal routing response.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

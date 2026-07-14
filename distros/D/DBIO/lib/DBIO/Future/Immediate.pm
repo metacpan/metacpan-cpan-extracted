@@ -89,7 +89,7 @@ DBIO::Future::Immediate - Dependency-free immediate Future for DBIO's 'immediate
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

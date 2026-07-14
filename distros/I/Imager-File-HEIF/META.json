@@ -4,7 +4,7 @@
       "Tony Cook <tonyc@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,19 +23,19 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Imager" : "0.94",
+            "Imager" : "1.033",
             "Test::More" : "0.47"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Imager" : "0.94"
+            "Imager" : "1.033"
          }
       },
       "runtime" : {
          "requires" : {
-            "Imager" : "0.94",
+            "Imager" : "1.033",
             "XSLoader" : "0"
          }
       },
@@ -58,6 +58,6 @@
          "web" : "http://github.com/tonycoz/imager-file-heif.git"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

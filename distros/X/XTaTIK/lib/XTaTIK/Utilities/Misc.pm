@@ -3,7 +3,7 @@ package XTaTIK::Utilities::Misc;
 use strict;
 use warnings;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Exporter::Easy  OK => [qw/merge_conf/];
 use experimental 'postderef';

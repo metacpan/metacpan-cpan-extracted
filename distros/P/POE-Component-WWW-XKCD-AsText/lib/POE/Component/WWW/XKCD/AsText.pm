@@ -3,7 +3,7 @@ package POE::Component::WWW::XKCD::AsText;
 use warnings;
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp;
 use WWW::XKCD::AsText;
@@ -15,12 +15,12 @@ sub spawn {
         if @_ & 1;
 
     my %params = @_;
-
+    
     $params{ lc $_ } = delete $params{ $_ } for keys %params;
 
     delete $params{options}
         unless ref $params{options} eq 'HASH';
-
+    
     $params{obj_args} = {
         timeout => delete( $params{timeout} ),
         ua      => delete( $params{ua}      ),
@@ -101,7 +101,7 @@ sub _retrieve {
 
     return
         if $self->{shutdown};
-
+        
     my $args;
     if ( ref $_[ARG0] eq 'HASH' ) {
         $args = { %{ $_[ARG0] } };
@@ -142,10 +142,10 @@ sub _retrieve {
     else {
         $args->{sender} = $sender;
     }
-
+    
     $kernel->refcount_increment( $args->{sender} => __PACKAGE__ );
     $self->{wheel}->put( $args );
-
+    
     undef;
 }
 
@@ -162,14 +162,14 @@ sub _shutdown {
         unless $self->{alias};
 
     $self->{shutdown} = 1;
-
+    
     $self->{wheel}->shutdown_stdin
         if $self->{wheel};
 }
 
 sub _child_closed {
     my ( $kernel, $self ) = @_[ KERNEL, OBJECT ];
-
+    
     carp "_child_closed called (@_[ARG0..$#_])\n"
         if $self->{debug};
 
@@ -202,13 +202,13 @@ sub _child_stderr {
 
 sub _child_stdout {
     my ( $kernel, $self, $input ) = @_[ KERNEL, OBJECT, ARG0 ];
-
+    
     my $session = delete $input->{sender};
     my $event   = delete $input->{event};
 
     $kernel->post( $session, $event, $input );
     $kernel->refcount_decrement( $session => __PACKAGE__ );
-
+    
     undef;
 }
 
@@ -219,7 +219,7 @@ sub _wheel {
         binmode STDIN;
         binmode STDOUT;
     }
-
+    
     my $raw;
     my $size = 4096;
     my $filter = POE::Filter::Reference->new;
@@ -255,8 +255,6 @@ sub _process_request {
 
 1;
 __END__
-
-=encoding utf8
 
 
 =head1 NAME

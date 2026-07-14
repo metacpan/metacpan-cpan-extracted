@@ -1,5 +1,9 @@
 Revision history for WWW-WebDevout-BrowserSupportInfo
 
+0.0104  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 0.0103  2013-11-01
         - Minor fixes to comply with specs and Kwalitee game
         - Fixed a bug in examples/support.pl

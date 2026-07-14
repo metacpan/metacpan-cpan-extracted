@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-Asset,
-version 0.02:
+version 0.03:
 
   AssetPack wrapper -- generate via command, load pre-built def at runtime
 

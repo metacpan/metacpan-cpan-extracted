@@ -473,7 +473,7 @@ DBIO::Ordered - Maintain a position column over an ordered list of rows
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

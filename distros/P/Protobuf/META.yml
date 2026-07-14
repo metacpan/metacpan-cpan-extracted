@@ -1,20 +1,25 @@
 ---
-abstract: "Namespace reservation for Google's Protocol Buffers"
+abstract: 'High-performance Protocol Buffers implementation using upb'
 author:
   - 'C.J. Collier <cjac@colliertech.org>'
 build_requires:
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
-  File::Find: '0'
   File::Spec: '0'
   Path::Tiny: '0'
   Test::MockModule: '0'
   Test::More: '0'
-  Test::Perl::Critic: '0'
-  Test::Pod: '1.22'
-  Test::Pod::Coverage: '1.08'
-  Test::Valgrind: '0'
 configure_requires:
+  Config: '0'
+  Cwd: '0'
+  Devel::PPPort: '0'
+  ExtUtils::Embed: '0'
   ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  JSON::MaybeXS: '0'
+  Path::Tiny: '0'
+  Template: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: apache
@@ -26,22 +31,20 @@ no_index:
   directory:
     - t
     - inc
+    - xlib
+    - t
+    - inc
+    - local
 requires:
+  JSON::MaybeXS: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Math::BigInt: '0'
   Moo: '0'
   Type::Tiny: '0'
   Types::Standard: '0'
-  namespace::autoclean: '0'
-  perl: '5.006'
+  perl: '5.014'
 resources:
-  bugtracker: https://github.com/protocolbuffers/protobuf/issues
-  repository: https://github.com/protocolbuffers/protobuf.git
-version: '0.001'
-x_clean:
-  FILES: 'Protobuf-* blib'
-x_copyright:
-  holder: 'Google LLC and contributors'
-  year: 2025
-x_dist:
-  COMPRESS: 'gzip -9f'
-  SUFFIX: gz
+  repository: https://github.com/LLC-Technologies-Collier/protobuf.git
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

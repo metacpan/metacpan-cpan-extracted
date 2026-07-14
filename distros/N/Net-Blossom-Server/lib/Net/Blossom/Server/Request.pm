@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 
 my $TOKEN = qr/[!#$%&'*+\-.^_`|~0-9A-Za-z]+/;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(method path query headers body remote_addr content_length content_type);
@@ -51,7 +51,7 @@ sub new {
     $args{_headers} = $headers;
     $args{_query} = $query;
     delete @args{qw(headers query)};
-    return bless \%args, $class;
+    return \%args;
 }
 
 sub headers {
@@ -321,5 +321,11 @@ Returns all query values for C<$name>.
 
 Returns true when the request has a scalar body, a stream body, or a positive
 C<content_length>.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
 
 =cut

@@ -3,7 +3,7 @@ package WWW::Pastebin::PastebinCom::Retrieve;
 use warnings;
 use strict;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 use URI;
 use HTML::TokeParser::Simple;
@@ -15,7 +15,7 @@ sub retrieve {
     my $id   = shift;
 
     $self->$_(undef) for qw(error uri id results);
-    
+
     return $self->_set_error('Missing or empty paste ID or URI')
         unless defined $id and length $id;
 
@@ -25,14 +25,18 @@ sub retrieve {
     $self->id( $id );
     $self->uri( $uri );
 
-    my $ua = $self->ua;
-    my $response = $ua->get( $uri );
-    if (
-        $response->is_success
-        or $response->code == 404 # and just WHY they thought giving 404s
-        # on existing pastes is such a great idea?
-    ) {
-        return $self->_get_was_successful( $response->content );
+    # Fetch the raw paste body directly. pastebin.com no longer exposes the
+    # paste content in a form we can reliably scrape out of the HTML page, but
+    # it still serves the exact, unmodified paste text at /raw/<id>.
+    my $ua       = $self->ua;
+    my $raw_uri  = URI->new( 'https://pastebin.com/raw/' . $id );
+    my $response = $ua->get($raw_uri);
+
+    if ( $response->is_success ) {
+        return $self->_get_was_successful( $response->decoded_content );
+    }
+    elsif ( $response->code == 404 ) {
+        return $self->_set_error('This paste does not seem to exist');
     }
     else {
         return $self->_set_error('Network error: ' . $response->status_line);
@@ -43,10 +47,11 @@ sub _make_uri_and_id {
     my ( $self, $what ) = @_;
 
     my ( $private, $id ) = $what =~ m{
-        (?:http://)?
+        (?:https?://)?
         (?:www\.)?
         (.*?) # "private paste" subdomain
         pastebin\.com/
+        (?:raw/)? # optional /raw/ prefix if a raw URI was passed in
         (\w+) # paste ID
     }xi;
 
@@ -59,83 +64,86 @@ sub _make_uri_and_id {
     return ( URI->new("http://${private}pastebin.com/$id"), $id );
 }
 
-sub _parse {
-    my ( $self, $content ) = @_;
+sub _get_was_successful {
+    my ( $self, $raw_content ) = @_;
 
-    # yes, they could've given 200s on existing pastes and 404s on
-    # non-existant, but NO!! 404s for EVERYONE... yey \o/
-    # that calls for urgent parsing of HTML with regexen WEEEEEEE
-    $content =~ m|<TITLE>404 Not Found</TITLE>|
-        and $content !~ /<div>/
-        and return $self->_set_error('This paste does not seem to exist');
+    # The raw body IS the paste content -- store it verbatim.
+    $self->content($raw_content);
 
-    my $parser = HTML::TokeParser::Simple->new( \$content );
-    
-    my ( %data, %nav );
-    @nav{ qw(level  start  get_name_date  get_lang  get_content) }
-    = (0) x 5;
+    my %data = ( content => $raw_content );
 
-    while ( my $t = $parser->get_token ) {
-        if ( $t->is_start_tag('div')
-            and defined $t->get_attr('id')
-            and $t->get_attr('id') eq 'content'
-        ) {
-            @nav{ qw(level start) } = (1, 1);
-        }
-        elsif ( $nav{start} == 1 and $t->is_start_tag('h1') ) {
-            @nav{ qw(level get_name_date) } = (2, 1);
-        }
-        elsif ( $nav{get_name_date} == 1 and $t->is_text ) {
-            @data{ qw(name posted_on) } = $t->as_is
-            =~ /Posted by (.+) on (.+)/;
+    # Best-effort scrape of the paste's metadata (name/posted_on/lang) from
+    # the human-facing HTML page. The paste content itself never depends on
+    # this succeeding, so any failure here degrades gracefully to 'N/A'.
+    @data{ qw(name posted_on lang) }
+        = $self->_get_metadata( $self->uri );
 
-            @nav{ qw(level get_name_date) } = (3, 0);
-        }
-        elsif ( $nav{start} == 1
-            and $t->is_start_tag('option')
-            and defined $t->get_attr('selected')
-        ) {
-            @nav{ qw(level get_lang) } = (4, 1);
-        }
-        elsif ( $nav{get_lang} == 1 and $t->is_text ) {
-            @nav{ qw(level get_lang) } = (5, 0);
-            $data{lang} = $t->as_is;
-        }
-        elsif ( $nav{start} == 1
-            and $t->is_start_tag('textarea')
-            and defined $t->get_attr('id')
-            and $t->get_attr('id') eq 'code'
-        ) {
-            @nav{ qw(level get_content) } = (6, 1);
-        }
-        elsif ( $nav{get_content} == 1 and $t->is_text ) {
-            $data{content} = $t->as_is;
-            $nav{is_success} = 1;
-            last;
-        }
-        elsif ( $nav{get_content} == 1 and $t->is_end_tag('textarea') ) {
-            return $self->_set_error('This paste does not seem to exist');
-        }
-    }
-
-    unless ( $nav{is_success} ) {
-        return $self->_set_error (
-            "Parser error (level $nav{level}).\n"
-                . "Failed on content:\n$content"
-        );
-    }
-
-    for ( values %data ) {
-        unless ( defined and length ) {
-            $_ = 'N/A';
+    for my $key ( qw(name posted_on lang) ) {
+        unless ( defined $data{$key} and length $data{$key} ) {
+            $data{$key} = 'N/A';
             next;
         }
-        decode_entities $_;
-        s/\240/ /g;
+        decode_entities $data{$key};
+        $data{$key} =~ s/\240/ /g;
+        $data{$key} =~ s/^\s+|\s+$//g;
     }
 
-    $self->content( $data{content} );
-    return \%data;
+    return $self->results( \%data );
+}
+
+sub _get_metadata {
+    my ( $self, $uri ) = @_;
+
+    my $response = $self->ua->get($uri);
+    return
+        unless $response->is_success;
+
+    my $content = $response->decoded_content;
+    my $parser  = HTML::TokeParser::Simple->new( \$content );
+
+    my ( %meta, %nav );
+    while ( my $t = $parser->get_token ) {
+        # Author name lives in an <h1> inside the paste's info bar.
+        if ( $t->is_start_tag('h1') ) {
+            $nav{get_name} = 1;
+        }
+        elsif ( $nav{get_name} and $t->is_text ) {
+            $meta{name} = $t->as_is;
+            $nav{get_name} = 0;
+        }
+
+        # Post date lives in <div class="date"><span title="...">Mar 22nd,
+        # 2008</span>. Grab the first such span's text.
+        elsif ( not defined $meta{posted_on}
+            and $t->is_start_tag('div')
+            and defined $t->get_attr('class')
+            and $t->get_attr('class') =~ /\bdate\b/
+        ) {
+            $nav{in_date} = 1;
+        }
+        elsif ( $nav{in_date} and $t->is_start_tag('span') ) {
+            $nav{get_date} = 1;
+        }
+        elsif ( $nav{get_date} and $t->is_text ) {
+            $meta{posted_on} = $t->as_is;
+            @nav{ qw(get_date in_date) } = (0, 0);
+        }
+
+        # Language is the first link into the /archive/<lang> section.
+        elsif ( not defined $meta{lang}
+            and $t->is_start_tag('a')
+            and defined $t->get_attr('href')
+            and $t->get_attr('href') =~ m{^/archive/}
+        ) {
+            $nav{get_lang} = 1;
+        }
+        elsif ( $nav{get_lang} and $t->is_text ) {
+            $meta{lang} = $t->as_is;
+            $nav{get_lang} = 0;
+        }
+    }
+
+    return @meta{ qw(name posted_on lang) };
 }
 
 

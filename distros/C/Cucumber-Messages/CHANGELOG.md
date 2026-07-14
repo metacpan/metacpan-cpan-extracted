@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [34.0.2] - 2026-07-13
+### Added
+- [cpp] Add deserialization using `from_json`. ([#462](https://github.com/cucumber/messages/pull/462))
+
+### Changed
+- [cpp] CUCUMBER_MESSAGES_FETCH_DEPS always defaults to Off. ([#462](https://github.com/cucumber/messages/pull/462))
+
+### Fixed
+- [jsonschema] Define minimum and maximum argument index values. ([#479](https://github.com/cucumber/messages/pull/479))
+- [cpp] When fetching dependencies is disabled, still try to find them. ([#478](https://github.com/cucumber/messages/pull/478))
+
 ## [34.0.1] - 2026-07-05
 ### Fixed
 - [Dart] Fix automated release process?
@@ -16,7 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Dart] Add initial `cucumber_messages` package. ([#431](https://github.com/cucumber/messages/pull/431/), [#470](https://github.com/cucumber/messages/pull/470))
 
 ### Changed
-- [Ruby] Updated minimum Ruby version to 3.3 ([#472](https://github.com/cucumber/messages/pull/472)
+- [Ruby] Updated minimum Ruby version to 3.3 ([#472](https://github.com/cucumber/messages/pull/472))
 - [cpp] Replaced custom cmate script with native cmake and CPM. ([#432](https://github.com/cucumber/messages/pull/432))
 - [cpp] Moved all generated files to their own folder, does not change includes paths for dependent projects. ([#432](https://github.com/cucumber/messages/pull/432))
 - [jsonschema] Allow steps to contain both `DataTable` and `DocString`. ([#468](https://github.com/cucumber/messages/pull/468))
@@ -714,7 +725,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v34.0.1...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v34.0.2...HEAD
+[34.0.2]: https://github.com/cucumber/messages/compare/v34.0.1...v34.0.2
 [34.0.1]: https://github.com/cucumber/messages/compare/v34.0.0...v34.0.1
 [34.0.0]: https://github.com/cucumber/messages/compare/v33.0.4...v34.0.0
 [33.0.4]: https://github.com/cucumber/messages/compare/v33.0.3...v33.0.4

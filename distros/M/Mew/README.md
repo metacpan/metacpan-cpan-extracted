@@ -74,7 +74,7 @@ Mew - Moo with sugar on top
 # DESCRIPTION
 
 This module is just like regular [Moo](https://metacpan.org/pod/Moo), except it also imports
-[strictures](https://metacpan.org/pod/strictures) and [namespace::clean](https://metacpan.org/pod/namespace::clean), along with
+[strictures](https://metacpan.org/pod/strictures) and [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean), along with
 a couple of standard types modules. In addition, it sweetens the
 [Moo's has subroutine](https://metacpan.org/pod/Moo#has) to allow for more concise attribute
 declarations.
@@ -88,8 +88,8 @@ Virtually all of the functionality is described in [Moo](https://metacpan.org/po
     use Mew;
 
 Automatically imports the following modules: [Moo](https://metacpan.org/pod/Moo), [strictures](https://metacpan.org/pod/strictures),
-[Types::Standard](https://metacpan.org/pod/Types::Standard), [Types::Common::Numeric](https://metacpan.org/pod/Types::Common::Numeric), [MooX::ChainedAttributes](https://metacpan.org/pod/MooX::ChainedAttributes),
-and [namespace::clean](https://metacpan.org/pod/namespace::clean). **NOTE: in particular the last one.** It'll scrub
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard), [Types::Common::Numeric](https://metacpan.org/pod/Types%3A%3ACommon%3A%3ANumeric), [MooX::ChainedAttributes](https://metacpan.org/pod/MooX%3A%3AChainedAttributes),
+and [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean). **NOTE: in particular the last one.** It'll scrub
 your namespace, thus if you're using things like [experimental](https://metacpan.org/pod/experimental), you should
 declare them **after** you `use Mew`.
 
@@ -109,7 +109,7 @@ exactly as it used to. The sugar won't be enabled in that case.
     has [qw/_z1  -z2/] => Str;
 
 To get the sugar, you need to specify one of the imported types from either
-[Types::Standard](https://metacpan.org/pod/Types::Standard) or [Types::Common::Numeric](https://metacpan.org/pod/Types::Common::Numeric) as the second argument. Once
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard) or [Types::Common::Numeric](https://metacpan.org/pod/Types%3A%3ACommon%3A%3ANumeric) as the second argument. Once
 that is done, `Mew` will add some default settings, which are:
 
     1) Set `isa` to the type you gave
@@ -191,7 +191,7 @@ the values you provide will be used instead of the defaults.
 
 # SEE ALSO
 
-[Moo](https://metacpan.org/pod/Moo), [Type::Tiny](https://metacpan.org/pod/Type::Tiny)
+[Moo](https://metacpan.org/pod/Moo), [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>
@@ -254,7 +254,7 @@ The rest is:
 </div>
 
 <div>
-    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/MSTROUT"> <img src="http://www.gravatar.com/avatar/9a085716bde55f2144dcb29eee47cead?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F4e8e2db385219e064e6dea8fbd386434" alt="MSTROUT" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">MSTROUT</span> </a> </span>
+    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/MSTROUT"> <img src="http://www.gravatar.com/avatar/4e8e2db385219e064e6dea8fbd386434?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F4e8e2db385219e064e6dea8fbd386434" alt="MSTROUT" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">MSTROUT</span> </a> </span>
 </div>
 
 <div>

@@ -57,7 +57,7 @@ DBIO::Diff::Base - Base class for DBIO driver diff orchestrators
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

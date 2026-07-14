@@ -1,0 +1,104 @@
+package Google::Type::Timeofday;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Chtnb29nbGUvdHlwZS90aW1lb2ZkYXkucHJvdG8SC2dvb2dsZS50eXBlImsKCVRpbWVPZkRh
+eRIUCgVob3VycxgBIAEoBVIFaG91cnMSGAoHbWludXRlcxgCIAEoBVIHbWludXRlcxIYCgdz
+ZWNvbmRzGAMgASgFUgdzZWNvbmRzEhQKBW5hbm9zGAQgASgFUgVuYW5vc0JpCg9jb20uZ29v
+Z2xlLnR5cGVCDlRpbWVPZkRheVByb3RvUAFaPmdvb2dsZS5nb2xhbmcub3JnL2dlbnByb3Rv
+L2dvb2dsZWFwaXMvdHlwZS90aW1lb2ZkYXk7dGltZW9mZGF5ogIDR1RQSuoNCgYSBA4ALgEK
+vAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5k
+ZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5
+b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhl
+IExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAg
+ICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNz
+IHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBz
+b2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQg
+b24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05T
+IE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNl
+bnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFu
+ZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQABQKCAoBCBIDEgBV
+CgkKAggLEgMSAFUKCAoBCBIDEwAiCgkKAggKEgMTACIKCAoBCBIDFAAvCgkKAggIEgMUAC8K
+CAoBCBIDFQAoCgkKAggBEgMVACgKCAoBCBIDFgAhCgkKAggkEgMWACEK+gEKAgQAEgQcAC4B
+Gu0BIFJlcHJlc2VudHMgYSB0aW1lIG9mIGRheS4gVGhlIGRhdGUgYW5kIHRpbWUgem9uZSBh
+cmUgZWl0aGVyIG5vdCBzaWduaWZpY2FudAogb3IgYXJlIHNwZWNpZmllZCBlbHNld2hlcmUu
+IEFuIEFQSSBtYXkgY2hvb3NlIHRvIGFsbG93IGxlYXAgc2Vjb25kcy4gUmVsYXRlZAogdHlw
+ZXMgYXJlIFtnb29nbGUudHlwZS5EYXRlXVtnb29nbGUudHlwZS5EYXRlXSBhbmQKIGBnb29n
+bGUucHJvdG9idWYuVGltZXN0YW1wYC4KCgoKAwQAARIDHAgRCuABCgQEAAIAEgMgAhIa0gEg
+SG91cnMgb2YgYSBkYXkgaW4gMjQgaG91ciBmb3JtYXQuIE11c3QgYmUgZ3JlYXRlciB0aGFu
+IG9yIGVxdWFsIHRvIDAgYW5kCiB0eXBpY2FsbHkgbXVzdCBiZSBsZXNzIHRoYW4gb3IgZXF1
+YWwgdG8gMjMuIEFuIEFQSSBtYXkgY2hvb3NlIHRvIGFsbG93IHRoZQogdmFsdWUgIjI0OjAw
+OjAwIiBmb3Igc2NlbmFyaW9zIGxpa2UgYnVzaW5lc3MgY2xvc2luZyB0aW1lLgoKDAoFBAAC
+AAUSAyACBwoMCgUEAAIAARIDIAgNCgwKBQQAAgADEgMgEBEKZAoEBAACARIDJAIUGlcgTWlu
+dXRlcyBvZiBhbiBob3VyLiBNdXN0IGJlIGdyZWF0ZXIgdGhhbiBvciBlcXVhbCB0byAwIGFu
+ZCBsZXNzIHRoYW4gb3IKIGVxdWFsIHRvIDU5LgoKDAoFBAACAQUSAyQCBwoMCgUEAAIBARID
+JAgPCgwKBQQAAgEDEgMkEhMKsgEKBAQAAgISAykCFBqkASBTZWNvbmRzIG9mIGEgbWludXRl
+LiBNdXN0IGJlIGdyZWF0ZXIgdGhhbiBvciBlcXVhbCB0byAwIGFuZCB0eXBpY2FsbHkgbXVz
+dAogYmUgbGVzcyB0aGFuIG9yIGVxdWFsIHRvIDU5LiBBbiBBUEkgbWF5IGFsbG93IHRoZSB2
+YWx1ZSA2MCBpZiBpdCBhbGxvd3MKIGxlYXAtc2Vjb25kcy4KCgwKBQQAAgIFEgMpAgcKDAoF
+BAACAgESAykIDwoMCgUEAAICAxIDKRITCn8KBAQAAgMSAy0CEhpyIEZyYWN0aW9ucyBvZiBz
+ZWNvbmRzLCBpbiBuYW5vc2Vjb25kcy4gTXVzdCBiZSBncmVhdGVyIHRoYW4gb3IgZXF1YWwg
+dG8gMAogYW5kIGxlc3MgdGhhbiBvciBlcXVhbCB0byA5OTksOTk5LDk5OS4KCgwKBQQAAgMF
+EgMtAgcKDAoFBAACAwESAy0IDQoMCgUEAAIDAxIDLRARYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Type::Timeofday::TimeOfDay ===
+    # Fields for TimeOfDay
+    # Field: hours Type: 5 ()
+    # Field: minutes Type: 5 ()
+    # Field: seconds Type: 5 ()
+    # Field: nanos Type: 5 ()
+
+=pod
+
+=head1 NAME
+
+Google::Type::Timeofday::TimeOfDay - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Type::Timeofday;
+
+    my $msg = Google::Type::Timeofday::TimeOfDay->new(
+        hours => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<hours>
+
+Type: Int32
+
+=item * B<minutes>
+
+Type: Int32
+
+=item * B<seconds>
+
+Type: Int32
+
+=item * B<nanos>
+
+Type: Int32
+
+=back
+
+=cut
+
+1;

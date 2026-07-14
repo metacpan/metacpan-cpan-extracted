@@ -21,6 +21,9 @@ multi \= foo\
   bar\
   baz
 
+space before backslash \= this line \
+that line
+
 expand :\= $(multi)\
 !
 
@@ -42,6 +45,8 @@ END_INI
        'ordinary assignment does not use continuation');
     is($vars->{multi}, 'foo  bar  baz',
        'continued assignment');
+    is($vars->{'space before backslash'}, 'this line that line',
+       'space before backslash');
     is($vars->{expand}, 'foo  bar  baz!',
        'continuation also works with := assignments');
     is($vars->{append}, 'abcdef',

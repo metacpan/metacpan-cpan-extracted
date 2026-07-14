@@ -12,4 +12,8 @@ use_ok('Net::Blossom::Response');
 use_ok('Net::Blossom::ServerList');
 use_ok('Net::Blossom::URI');
 
+my $client = Net::Blossom->client(server => 'https://cdn.example.com');
+isa_ok($client, 'Net::Blossom::Client', 'client wrapper');
+is($client->server, 'https://cdn.example.com', 'client wrapper passes arguments through');
+
 done_testing;

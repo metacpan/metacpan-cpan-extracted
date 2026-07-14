@@ -1,0 +1,167 @@
+package Google::Api::Usage;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+ChZnb29nbGUvYXBpL3VzYWdlLnByb3RvEgpnb29nbGUuYXBpIpwBCgVVc2FnZRIiCgxyZXF1
+aXJlbWVudHMYASADKAlSDHJlcXVpcmVtZW50cxIrCgVydWxlcxgGIAMoCzIVLmdvb2dsZS5h
+cGkuVXNhZ2VSdWxlUgVydWxlcxJCCh1wcm9kdWNlcl9ub3RpZmljYXRpb25fY2hhbm5lbBgH
+IAEoCVIbcHJvZHVjZXJOb3RpZmljYXRpb25DaGFubmVsIpMBCglVc2FnZVJ1bGUSGgoIc2Vs
+ZWN0b3IYASABKAlSCHNlbGVjdG9yEjgKGGFsbG93X3VucmVnaXN0ZXJlZF9jYWxscxgCIAEo
+CFIWYWxsb3dVbnJlZ2lzdGVyZWRDYWxscxIwChRza2lwX3NlcnZpY2VfY29udHJvbBgDIAEo
+CFISc2tpcFNlcnZpY2VDb250cm9sQmwKDmNvbS5nb29nbGUuYXBpQgpVc2FnZVByb3RvUAFa
+RWdvb2dsZS5nb2xhbmcub3JnL2dlbnByb3RvL2dvb2dsZWFwaXMvYXBpL3NlcnZpY2Vjb25m
+aWc7c2VydmljZWNvbmZpZ6ICBEdBUElK8xcKBhIEDgBLAQq8BAoBDBIDDgASMrEEIENvcHly
+aWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vu
+c2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlz
+IGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkg
+b2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNo
+ZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGlj
+YWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRl
+ZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lT
+LAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhl
+ciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZp
+YyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRl
+ciB0aGUgTGljZW5zZS4KCggKAQISAxAAEwoICgEIEgMSAFwKCQoCCAsSAxIAXAoICgEIEgMT
+ACIKCQoCCAoSAxMAIgoICgEIEgMUACsKCQoCCAgSAxQAKwoICgEIEgMVACcKCQoCCAESAxUA
+JwoICgEIEgMWACIKCQoCCCQSAxYAIgo7CgIEABIEGQAzARovIENvbmZpZ3VyYXRpb24gY29u
+dHJvbGxpbmcgdXNhZ2Ugb2YgYSBzZXJ2aWNlLgoKCgoDBAABEgMZCA0K/wMKBAQAAgASAyMC
+IxrxAyBSZXF1aXJlbWVudHMgdGhhdCBtdXN0IGJlIHNhdGlzZmllZCBiZWZvcmUgYSBjb25z
+dW1lciBwcm9qZWN0IGNhbiB1c2UgdGhlCiBzZXJ2aWNlLiBFYWNoIHJlcXVpcmVtZW50IGlz
+IG9mIHRoZSBmb3JtIDxzZXJ2aWNlLm5hbWU+LzxyZXF1aXJlbWVudC1pZD47CiBmb3IgZXhh
+bXBsZSAnc2VydmljZXVzYWdlLmdvb2dsZWFwaXMuY29tL2JpbGxpbmctZW5hYmxlZCcuCgog
+Rm9yIEdvb2dsZSBBUElzLCBhIFRlcm1zIG9mIFNlcnZpY2UgcmVxdWlyZW1lbnQgbXVzdCBi
+ZSBpbmNsdWRlZCBoZXJlLgogR29vZ2xlIENsb3VkIEFQSXMgbXVzdCBpbmNsdWRlICJzZXJ2
+aWNldXNhZ2UuZ29vZ2xlYXBpcy5jb20vdG9zL2Nsb3VkIi4KIE90aGVyIEdvb2dsZSBBUElz
+IHNob3VsZCBpbmNsdWRlCiAic2VydmljZXVzYWdlLmdvb2dsZWFwaXMuY29tL3Rvcy91bml2
+ZXJzYWwiLiBBZGRpdGlvbmFsIFRvUyBjYW4gYmUKIGluY2x1ZGVkIGJhc2VkIG9uIHRoZSBi
+dXNpbmVzcyBuZWVkcy4KCgwKBQQAAgAEEgMjAgoKDAoFBAACAAUSAyMLEQoMCgUEAAIAARID
+IxIeCgwKBQQAAgADEgMjISIKlQEKBAQAAgESAygCHxqHASBBIGxpc3Qgb2YgdXNhZ2UgcnVs
+ZXMgdGhhdCBhcHBseSB0byBpbmRpdmlkdWFsIEFQSSBtZXRob2RzLgoKICoqTk9URToqKiBB
+bGwgc2VydmljZSBjb25maWd1cmF0aW9uIHJ1bGVzIGZvbGxvdyAibGFzdCBvbmUgd2lucyIg
+b3JkZXIuCgoMCgUEAAIBBBIDKAIKCgwKBQQAAgEGEgMoCxQKDAoFBAACAQESAygVGgoMCgUE
+AAIBAxIDKB0eCr0DCgQEAAICEgMyAisarwMgVGhlIGZ1bGwgcmVzb3VyY2UgbmFtZSBvZiBh
+IGNoYW5uZWwgdXNlZCBmb3Igc2VuZGluZyBub3RpZmljYXRpb25zIHRvIHRoZQogc2Vydmlj
+ZSBwcm9kdWNlci4KCiBHb29nbGUgU2VydmljZSBNYW5hZ2VtZW50IGN1cnJlbnRseSBvbmx5
+IHN1cHBvcnRzCiBbR29vZ2xlIENsb3VkIFB1Yi9TdWJdKGh0dHBzOi8vY2xvdWQuZ29vZ2xl
+LmNvbS9wdWJzdWIpIGFzIGEgbm90aWZpY2F0aW9uCiBjaGFubmVsLiBUbyB1c2UgR29vZ2xl
+IENsb3VkIFB1Yi9TdWIgYXMgdGhlIGNoYW5uZWwsIHRoaXMgbXVzdCBiZSB0aGUgbmFtZQog
+b2YgYSBDbG91ZCBQdWIvU3ViIHRvcGljIHRoYXQgdXNlcyB0aGUgQ2xvdWQgUHViL1N1YiB0
+b3BpYyBuYW1lIGZvcm1hdAogZG9jdW1lbnRlZCBpbiBodHRwczovL2Nsb3VkLmdvb2dsZS5j
+b20vcHVic3ViL2RvY3Mvb3ZlcnZpZXcuCgoMCgUEAAICBRIDMgIICgwKBQQAAgIBEgMyCSYK
+DAoFBAACAgMSAzIpKgo4CgIEARIENgBLARosIFVzYWdlIGNvbmZpZ3VyYXRpb24gcnVsZXMg
+Zm9yIHRoZSBzZXJ2aWNlLgoKCgoDBAEBEgM2CBEKvwEKBAQBAgASAzwCFhqxASBTZWxlY3Rz
+IHRoZSBtZXRob2RzIHRvIHdoaWNoIHRoaXMgcnVsZSBhcHBsaWVzLiBVc2UgJyonIHRvIGlu
+ZGljYXRlIGFsbAogbWV0aG9kcyBpbiBhbGwgQVBJcy4KCiBSZWZlciB0byBbc2VsZWN0b3Jd
+W2dvb2dsZS5hcGkuRG9jdW1lbnRhdGlvblJ1bGUuc2VsZWN0b3JdIGZvciBzeW50YXgKIGRl
+dGFpbHMuCgoMCgUEAQIABRIDPAIICgwKBQQBAgABEgM8CREKDAoFBAECAAMSAzwUFQraAgoE
+BAECARIDRAIkGswCIFVzZSB0aGlzIHJ1bGUgdG8gY29uZmlndXJlIHVucmVnaXN0ZXJlZCBj
+YWxscyBmb3IgdGhlIHNlcnZpY2UuIFVucmVnaXN0ZXJlZAogY2FsbHMgYXJlIGNhbGxzIHRo
+YXQgZG8gbm90IGNvbnRhaW4gY29uc3VtZXIgcHJvamVjdCBpZGVudGl0eS4KIChFeGFtcGxl
+OiBjYWxscyB0aGF0IGRvIG5vdCBjb250YWluIGFuIEFQSSBrZXkpLgoKIFdBUk5JTkc6IEJ5
+IGRlZmF1bHQsIEFQSSBtZXRob2RzIGRvIG5vdCBhbGxvdyB1bnJlZ2lzdGVyZWQgY2FsbHMs
+IGFuZCBlYWNoCiBtZXRob2QgY2FsbCBtdXN0IGJlIGlkZW50aWZpZWQgYnkgYSBjb25zdW1l
+ciBwcm9qZWN0IGlkZW50aXR5LgoKDAoFBAECAQUSA0QCBgoMCgUEAQIBARIDRAcfCgwKBQQB
+AgEDEgNEIiMKlgIKBAQBAgISA0oCIBqIAiBJZiB0cnVlLCB0aGUgc2VsZWN0ZWQgbWV0aG9k
+IHNob3VsZCBza2lwIHNlcnZpY2UgY29udHJvbCBhbmQgdGhlIGNvbnRyb2wKIHBsYW5lIGZl
+YXR1cmVzLCBzdWNoIGFzIHF1b3RhIGFuZCBiaWxsaW5nLCB3aWxsIG5vdCBiZSBhdmFpbGFi
+bGUuCiBUaGlzIGZsYWcgaXMgdXNlZCBieSBHb29nbGUgQ2xvdWQgRW5kcG9pbnRzIHRvIGJ5
+cGFzcyBjaGVja3MgZm9yIGludGVybmFsCiBtZXRob2RzLCBzdWNoIGFzIHNlcnZpY2UgaGVh
+bHRoIGNoZWNrIG1ldGhvZHMuCgoMCgUEAQICBRIDSgIGCgwKBQQBAgIBEgNKBxsKDAoFBAEC
+AgMSA0oeH2IGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Api::Usage::Usage ===
+    # Fields for Usage
+    # Field: requirements Type: 9 ()
+    # Field: rules Type: 11 (.google.api.UsageRule)
+    # Field: producer_notification_channel Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Api::Usage::Usage - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::Usage;
+
+    my $msg = Google::Api::Usage::Usage->new(
+        requirements => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<requirements>
+
+Type: String
+
+=item * B<rules>
+
+Type: Message (.google.api.UsageRule)
+
+=item * B<producer_notification_channel>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Api::Usage::UsageRule ===
+    # Fields for UsageRule
+    # Field: selector Type: 9 ()
+    # Field: allow_unregistered_calls Type: 8 ()
+    # Field: skip_service_control Type: 8 ()
+
+=pod
+
+=head1 NAME
+
+Google::Api::Usage::UsageRule - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::Usage;
+
+    my $msg = Google::Api::Usage::UsageRule->new(
+        selector => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<selector>
+
+Type: String
+
+=item * B<allow_unregistered_calls>
+
+Type: Bool
+
+=item * B<skip_service_control>
+
+Type: Bool
+
+=back
+
+=cut
+
+1;

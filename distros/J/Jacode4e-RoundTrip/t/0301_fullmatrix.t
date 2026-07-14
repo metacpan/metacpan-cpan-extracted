@@ -2,7 +2,7 @@
 #
 # 0301_fullmatrix.t
 #
-# Copyright (c) 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2022 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;

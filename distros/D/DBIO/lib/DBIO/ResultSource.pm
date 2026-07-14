@@ -1364,7 +1364,7 @@ DBIO::ResultSource - Metadata object describing a table, view, or query source
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

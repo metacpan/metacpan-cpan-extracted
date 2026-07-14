@@ -27,7 +27,7 @@ DBIO::Test::DeployComponent - Test component for sqlt_deploy_hook testing
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

@@ -4,13 +4,13 @@
       "Zoffix Znet <zoffix@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-DoctypeGrabber",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "WWW::DoctypeGrabber" : {
          "file" : "lib/WWW/DoctypeGrabber.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -46,5 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.007"
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

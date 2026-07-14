@@ -1,5 +1,8 @@
 Revision history for WWW-OhNoRobotCom-Search
 
+0.004   2026-07-12
+        - Updated the search endpoint URL, which had changed
+
 0.003   2013-12-18
         - Fixed broken prereqs and tests
 

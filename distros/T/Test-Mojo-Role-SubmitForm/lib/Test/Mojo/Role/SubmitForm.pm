@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Role::Tiny;
 use Carp qw/croak/;
 
-our $VERSION = '1.004004'; # VERSION
+our $VERSION = '1.004005'; # VERSION
 
 sub click_ok {
     my ( $self, $selector_or_dom, $extra_params ) = @_;

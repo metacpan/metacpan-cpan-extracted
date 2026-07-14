@@ -200,7 +200,7 @@ distribution in one step.
 
 # VERSION
 
-This documentation refers to version 2.0.9.
+This documentation refers to version 2.0.14.
 
 # FEATURES
 
@@ -725,19 +725,20 @@ By default `CLI::Simple` passes a standard set of POD section names to
 
     SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE
 
-You can override this by setting `help_sections` on the object before
-or after construction:
+You can override this by passing an array of sections names during construction.
 
-    my $cli = MyApp->new( ... );
-    $cli->set_help_sections( [qw( SYNOPSIS OPTIONS )] );
+    my $cli = CLI::Simple->new( help_sections => [qw(SYNOPSIS COMMANDS OPTIONS)], ...);
 
-Or by overriding in `init`:
+You must do this during construction or add `help_sections` to your
+`extra_options` and set the defaults for `help_sections`:
 
-    sub init {
-      my ($self) = @_;
-      $self->set_help_sections( [qw( SYNOPSIS OPTIONS EXAMPLES )] );
-      return $self->SUPER::init;
-    }
+    my $cli = CLI::Simple->new(
+      commands        => $commands,
+      extra_options   => [ qw(help_sections) ],
+      default_options => { help_sections => [qw(SYNOPIS COMMANDS OPTIONS)] },
+      option_specs    => \@option_specs
+    );
+                          
 
 Section names follow [Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage) conventions. Subsections are
 specified with a `/` separator, e.g. `DESCRIPTION/Commands` renders

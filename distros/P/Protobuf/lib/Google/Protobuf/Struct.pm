@@ -1,0 +1,229 @@
+package Google::Protobuf::Struct;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Chxnb29nbGUvcHJvdG9idWYvc3RydWN0LnByb3RvEg9nb29nbGUucHJvdG9idWYimAEKBlN0
+cnVjdBI7CgZmaWVsZHMYASADKAsyIy5nb29nbGUucHJvdG9idWYuU3RydWN0LkZpZWxkc0Vu
+dHJ5UgZmaWVsZHMaUQoLRmllbGRzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSLAoFdmFsdWUY
+AiABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWVSBXZhbHVlOgI4ASKyAgoFVmFsdWUSOwoK
+bnVsbF92YWx1ZRgBIAEoDjIaLmdvb2dsZS5wcm90b2J1Zi5OdWxsVmFsdWVIAFIJbnVsbFZh
+bHVlEiMKDG51bWJlcl92YWx1ZRgCIAEoAUgAUgtudW1iZXJWYWx1ZRIjCgxzdHJpbmdfdmFs
+dWUYAyABKAlIAFILc3RyaW5nVmFsdWUSHwoKYm9vbF92YWx1ZRgEIAEoCEgAUglib29sVmFs
+dWUSPAoMc3RydWN0X3ZhbHVlGAUgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdEgAUgtz
+dHJ1Y3RWYWx1ZRI7CgpsaXN0X3ZhbHVlGAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLkxpc3RW
+YWx1ZUgAUglsaXN0VmFsdWVCBgoEa2luZCI7CglMaXN0VmFsdWUSLgoGdmFsdWVzGAEgAygL
+MhYuZ29vZ2xlLnByb3RvYnVmLlZhbHVlUgZ2YWx1ZXMqGwoJTnVsbFZhbHVlEg4KCk5VTExf
+VkFMVUUQAEJ/ChNjb20uZ29vZ2xlLnByb3RvYnVmQgtTdHJ1Y3RQcm90b1ABWi9nb29nbGUu
+Z29sYW5nLm9yZy9wcm90b2J1Zi90eXBlcy9rbm93bi9zdHJ1Y3RwYvgBAaICA0dQQqoCHkdv
+b2dsZS5Qcm90b2J1Zi5XZWxsS25vd25UeXBlc0qsIQoGEgQfAHABCugMCgEMEgMfABIaGiAo
+PT0gcGFnZSBwcm90b190eXBlcyA9PSkKMsEMIFByb3RvY29sIEJ1ZmZlcnMgLSBHb29nbGUn
+cyBkYXRhIGludGVyY2hhbmdlIGZvcm1hdAogQ29weXJpZ2h0IDIwMDggR29vZ2xlIEluYy4g
+IEFsbCByaWdodHMgcmVzZXJ2ZWQuCiBodHRwczovL2RldmVsb3BlcnMuZ29vZ2xlLmNvbS9w
+cm90b2NvbC1idWZmZXJzLwoKIFJlZGlzdHJpYnV0aW9uIGFuZCB1c2UgaW4gc291cmNlIGFu
+ZCBiaW5hcnkgZm9ybXMsIHdpdGggb3Igd2l0aG91dAogbW9kaWZpY2F0aW9uLCBhcmUgcGVy
+bWl0dGVkIHByb3ZpZGVkIHRoYXQgdGhlIGZvbGxvd2luZyBjb25kaXRpb25zIGFyZQogbWV0
+OgoKICAgICAqIFJlZGlzdHJpYnV0aW9ucyBvZiBzb3VyY2UgY29kZSBtdXN0IHJldGFpbiB0
+aGUgYWJvdmUgY29weXJpZ2h0CiBub3RpY2UsIHRoaXMgbGlzdCBvZiBjb25kaXRpb25zIGFu
+ZCB0aGUgZm9sbG93aW5nIGRpc2NsYWltZXIuCiAgICAgKiBSZWRpc3RyaWJ1dGlvbnMgaW4g
+YmluYXJ5IGZvcm0gbXVzdCByZXByb2R1Y2UgdGhlIGFib3ZlCiBjb3B5cmlnaHQgbm90aWNl
+LCB0aGlzIGxpc3Qgb2YgY29uZGl0aW9ucyBhbmQgdGhlIGZvbGxvd2luZyBkaXNjbGFpbWVy
+CiBpbiB0aGUgZG9jdW1lbnRhdGlvbiBhbmQvb3Igb3RoZXIgbWF0ZXJpYWxzIHByb3ZpZGVk
+IHdpdGggdGhlCiBkaXN0cmlidXRpb24uCiAgICAgKiBOZWl0aGVyIHRoZSBuYW1lIG9mIEdv
+b2dsZSBJbmMuIG5vciB0aGUgbmFtZXMgb2YgaXRzCiBjb250cmlidXRvcnMgbWF5IGJlIHVz
+ZWQgdG8gZW5kb3JzZSBvciBwcm9tb3RlIHByb2R1Y3RzIGRlcml2ZWQgZnJvbQogdGhpcyBz
+b2Z0d2FyZSB3aXRob3V0IHNwZWNpZmljIHByaW9yIHdyaXR0ZW4gcGVybWlzc2lvbi4KCiBU
+SElTIFNPRlRXQVJFIElTIFBST1ZJREVEIEJZIFRIRSBDT1BZUklHSFQgSE9MREVSUyBBTkQg
+Q09OVFJJQlVUT1JTCiAiQVMgSVMiIEFORCBBTlkgRVhQUkVTUyBPUiBJTVBMSUVEIFdBUlJB
+TlRJRVMsIElOQ0xVRElORywgQlVUIE5PVAogTElNSVRFRCBUTywgVEhFIElNUExJRUQgV0FS
+UkFOVElFUyBPRiBNRVJDSEFOVEFCSUxJVFkgQU5EIEZJVE5FU1MgRk9SCiBBIFBBUlRJQ1VM
+QVIgUFVSUE9TRSBBUkUgRElTQ0xBSU1FRC4gSU4gTk8gRVZFTlQgU0hBTEwgVEhFIENPUFlS
+SUdIVAogT1dORVIgT1IgQ09OVFJJQlVUT1JTIEJFIExJQUJMRSBGT1IgQU5ZIERJUkVDVCwg
+SU5ESVJFQ1QsIElOQ0lERU5UQUwsCiBTUEVDSUFMLCBFWEVNUExBUlksIE9SIENPTlNFUVVF
+TlRJQUwgREFNQUdFUyAoSU5DTFVESU5HLCBCVVQgTk9UCiBMSU1JVEVEIFRPLCBQUk9DVVJF
+TUVOVCBPRiBTVUJTVElUVVRFIEdPT0RTIE9SIFNFUlZJQ0VTOyBMT1NTIE9GIFVTRSwKIERB
+VEEsIE9SIFBST0ZJVFM7IE9SIEJVU0lORVNTIElOVEVSUlVQVElPTikgSE9XRVZFUiBDQVVT
+RUQgQU5EIE9OIEFOWQogVEhFT1JZIE9GIExJQUJJTElUWSwgV0hFVEhFUiBJTiBDT05UUkFD
+VCwgU1RSSUNUIExJQUJJTElUWSwgT1IgVE9SVAogKElOQ0xVRElORyBORUdMSUdFTkNFIE9S
+IE9USEVSV0lTRSkgQVJJU0lORyBJTiBBTlkgV0FZIE9VVCBPRiBUSEUgVVNFCiBPRiBUSElT
+IFNPRlRXQVJFLCBFVkVOIElGIEFEVklTRUQgT0YgVEhFIFBPU1NJQklMSVRZIE9GIFNVQ0gg
+REFNQUdFLgoKCAoBAhIDIQAYCggKAQgSAyMAHwoJCgIIHxIDIwAfCggKAQgSAyQARgoJCgII
+CxIDJABGCggKAQgSAyUALAoJCgIIARIDJQAsCggKAQgSAyYALAoJCgIICBIDJgAsCggKAQgS
+AycAIgoJCgIIChIDJwAiCggKAQgSAykAIQoJCgIIJBIDKQAhCggKAQgSAyoAOwoJCgIIJRID
+KgA7CswECgIEABIEOQA8ARq/BCBSZXByZXNlbnRzIGEgSlNPTiBvYmplY3QuCgogQW4gdW5v
+cmRlcmVkIGtleS12YWx1ZSBtYXAsIGludGVuZGluZyB0byBwZXJmZWN0bHkgY2FwdHVyZSB0
+aGUgc2VtYW50aWNzIG9mIGEKIEpTT04gb2JqZWN0LiBUaGlzIGVuYWJsZXMgcGFyc2luZyBh
+bnkgYXJiaXRyYXJ5IEpTT04gcGF5bG9hZCBhcyBhIG1lc3NhZ2UKIGZpZWxkIGluIFByb3Rv
+SlNPTiBmb3JtYXQuCgogVGhpcyBmb2xsb3dzIFJGQyA4MjU5IGd1aWRlbGluZXMgZm9yIGlu
+dGVyb3BlcmFibGUgSlNPTjogbm90YWJseSB0aGlzIHR5cGUKIGNhbm5vdCByZXByZXNlbnQg
+bGFyZ2UgSW50NjQgdmFsdWVzIG9yIGBOYU5gL2BJbmZpbml0eWAgbnVtYmVycywKIHNpbmNl
+IHRoZSBKU09OIGZvcm1hdCBnZW5lcmFsbHkgZG9lcyBub3Qgc3VwcG9ydCB0aG9zZSB2YWx1
+ZXMgaW4gaXRzIG51bWJlcgogdHlwZS4KCiBJZiB5b3UgZG8gbm90IGludGVuZCB0byBwYXJz
+ZSBhcmJpdHJhcnkgSlNPTiBpbnRvIHlvdXIgbWVzc2FnZSwgYSBjdXN0b20KIHR5cGVkIG1l
+c3NhZ2Ugc2hvdWxkIGJlIHByZWZlcnJlZCBpbnN0ZWFkIG9mIHVzaW5nIHRoaXMgdHlwZS4K
+CgoKAwQAARIDOQgOCjkKBAQAAgASAzsCIBosIFVub3JkZXJlZCBtYXAgb2YgZHluYW1pY2Fs
+bHkgdHlwZWQgdmFsdWVzLgoKDAoFBAACAAYSAzsCFAoMCgUEAAIAARIDOxUbCgwKBQQAAgAD
+EgM7Hh8KqwIKAgQBEgREAFwBGp4CIFJlcHJlc2VudHMgYSBKU09OIHZhbHVlLgoKIGBWYWx1
+ZWAgcmVwcmVzZW50cyBhIGR5bmFtaWNhbGx5IHR5cGVkIHZhbHVlIHdoaWNoIGNhbiBiZSBl
+aXRoZXIKIG51bGwsIGEgbnVtYmVyLCBhIHN0cmluZywgYSBib29sZWFuLCBhIHJlY3Vyc2l2
+ZSBzdHJ1Y3QgdmFsdWUsIG9yIGEKIGxpc3Qgb2YgdmFsdWVzLiBBIHByb2R1Y2VyIG9mIHZh
+bHVlIGlzIGV4cGVjdGVkIHRvIHNldCBvbmUgb2YgdGhlc2UKIHZhcmlhbnRzLiBBYnNlbmNl
+IG9mIGFueSB2YXJpYW50IGlzIGFuIGludmFsaWQgc3RhdGUuCgoKCgMEAQESA0QIDQoiCgQE
+AQgAEgRGAlsDGhQgVGhlIGtpbmQgb2YgdmFsdWUuCgoMCgUEAQgAARIDRggMCigKBAQBAgAS
+A0gEHRobIFJlcHJlc2VudHMgYSBKU09OIGBudWxsYC4KCgwKBQQBAgAGEgNIBA0KDAoFBAEC
+AAESA0gOGAoMCgUEAQIAAxIDSBscCvYBCgQEAQIBEgNOBBwa6AEgUmVwcmVzZW50cyBhIEpT
+T04gbnVtYmVyLiBNdXN0IG5vdCBiZSBgTmFOYCwgYEluZmluaXR5YCBvcgogYC1JbmZpbml0
+eWAsIHNpbmNlIHRob3NlIGFyZSBub3Qgc3VwcG9ydGVkIGluIEpTT04uIFRoaXMgYWxzbyBj
+YW5ub3QKIHJlcHJlc2VudCBsYXJnZSBJbnQ2NCB2YWx1ZXMsIHNpbmNlIEpTT04gZm9ybWF0
+IGdlbmVyYWxseSBkb2VzIG5vdAogc3VwcG9ydCB0aGVtIGluIGl0cyBudW1iZXIgdHlwZS4K
+CgwKBQQBAgEFEgNOBAoKDAoFBAECAQESA04LFwoMCgUEAQIBAxIDThobCigKBAQBAgISA1EE
+HBobIFJlcHJlc2VudHMgYSBKU09OIHN0cmluZy4KCgwKBQQBAgIFEgNRBAoKDAoFBAECAgES
+A1ELFwoMCgUEAQICAxIDURobCk0KBAQBAgMSA1QEGBpAIFJlcHJlc2VudHMgYSBKU09OIGJv
+b2xlYW4gKGB0cnVlYCBvciBgZmFsc2VgIGxpdGVyYWwgaW4gSlNPTikuCgoMCgUEAQIDBRID
+VAQICgwKBQQBAgMBEgNUCRMKDAoFBAECAwMSA1QWFwooCgQEAQIEEgNXBBwaGyBSZXByZXNl
+bnRzIGEgSlNPTiBvYmplY3QuCgoMCgUEAQIEBhIDVwQKCgwKBQQBAgQBEgNXCxcKDAoFBAEC
+BAMSA1caGwonCgQEAQIFEgNaBB0aGiBSZXByZXNlbnRzIGEgSlNPTiBhcnJheS4KCgwKBQQB
+AgUGEgNaBA0KDAoFBAECBQESA1oOGAoMCgUEAQIFAxIDWhscCpYDCgIFABIEZwBqARqJAyBS
+ZXByZXNlbnRzIGEgSlNPTiBgbnVsbGAuCgogYE51bGxWYWx1ZWAgaXMgYSBzZW50aW5lbCwg
+dXNpbmcgYW4gZW51bSB3aXRoIG9ubHkgb25lIHZhbHVlIHRvIHJlcHJlc2VudAogdGhlIG51
+bGwgdmFsdWUgZm9yIHRoZSBgVmFsdWVgIHR5cGUgdW5pb24uCgogQSBmaWVsZCBvZiB0eXBl
+IGBOdWxsVmFsdWVgIHdpdGggYW55IHZhbHVlIG90aGVyIHRoYW4gYDBgIGlzIGNvbnNpZGVy
+ZWQKIGludmFsaWQuIE1vc3QgUHJvdG9KU09OIHNlcmlhbGl6ZXJzIHdpbGwgZW1pdCBhIGBW
+YWx1ZWAgd2l0aCBhIGBudWxsX3ZhbHVlYAogc2V0IGFzIGEgSlNPTiBgbnVsbGAgcmVnYXJk
+bGVzcyBvZiB0aGUgaW50ZWdlciB2YWx1ZSwgYW5kIHNvIHdpbGwgcm91bmQgdHJpcAogdG8g
+YSBgMGAgdmFsdWUuCgoKCgMFAAESA2cFDgoaCgQFAAIAEgNpAhEaDSBOdWxsIHZhbHVlLgoK
+DAoFBQACAAESA2kCDAoMCgUFAAIAAhIDaQ8QCiYKAgQCEgRtAHABGhogUmVwcmVzZW50cyBh
+IEpTT04gYXJyYXkuCgoKCgMEAgESA20IEQo6CgQEAgIAEgNvAhwaLSBSZXBlYXRlZCBmaWVs
+ZCBvZiBkeW5hbWljYWxseSB0eXBlZCB2YWx1ZXMuCgoMCgUEAgIABBIDbwIKCgwKBQQCAgAG
+EgNvCxAKDAoFBAICAAESA28RFwoMCgUEAgIAAxIDbxobYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Protobuf::Struct::Struct ===
+    # Fields for Struct
+    # Field: fields Type: 11 (.google.protobuf.Struct.FieldsEntry)
+
+=pod
+
+=head1 NAME
+
+Google::Protobuf::Struct::Struct - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Protobuf::Struct;
+
+    my $msg = Google::Protobuf::Struct::Struct->new(
+        fields => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<fields>
+
+Type: Message (.google.protobuf.Struct.FieldsEntry)
+
+=back
+
+=cut
+
+# === Message: Google::Protobuf::Struct::Value ===
+    # Fields for Value
+    # Field: null_value Type: 14 (.google.protobuf.NullValue)
+    # Field: number_value Type: 1 ()
+    # Field: string_value Type: 9 ()
+    # Field: bool_value Type: 8 ()
+    # Field: struct_value Type: 11 (.google.protobuf.Struct)
+    # Field: list_value Type: 11 (.google.protobuf.ListValue)
+
+=pod
+
+=head1 NAME
+
+Google::Protobuf::Struct::Value - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Protobuf::Struct;
+
+    my $msg = Google::Protobuf::Struct::Value->new(
+        null_value => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<null_value>
+
+Type: Enum (.google.protobuf.NullValue)
+
+=item * B<number_value>
+
+Type: Double
+
+=item * B<string_value>
+
+Type: String
+
+=item * B<bool_value>
+
+Type: Bool
+
+=item * B<struct_value>
+
+Type: Message (.google.protobuf.Struct)
+
+=item * B<list_value>
+
+Type: Message (.google.protobuf.ListValue)
+
+=back
+
+=cut
+
+# === Message: Google::Protobuf::Struct::ListValue ===
+    # Fields for ListValue
+    # Field: values Type: 11 (.google.protobuf.Value)
+
+=pod
+
+=head1 NAME
+
+Google::Protobuf::Struct::ListValue - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Protobuf::Struct;
+
+    my $msg = Google::Protobuf::Struct::ListValue->new(
+        values => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<values>
+
+Type: Message (.google.protobuf.Value)
+
+=back
+
+=cut
+
+1;

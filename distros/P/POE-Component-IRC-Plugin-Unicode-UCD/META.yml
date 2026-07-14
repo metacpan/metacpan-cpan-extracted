@@ -1,28 +1,27 @@
 ---
-abstract: 'lookup unicode chars/codes from IRC'
+abstract: unknown
 author:
-  - 'Zoffix Znet <zoffix@cpan.org>'
+  - unknown
 build_requires:
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: 0.4
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: POE-Component-IRC-Plugin-Unicode-UCD
-provides:
-  POE::Component::IRC::Plugin::Unicode::UCD:
-    file: lib/POE/Component/IRC/Plugin/Unicode/UCD.pm
-    version: 0.004
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 1.04
-  Encode: 2.12
-  POE::Component::IRC::Plugin::BaseWrap: 0.001
-  Unicode::UCD: 0.24
-  perl: 5.006
-resources:
-  license: http://dev.perl.org/licenses/
-version: 0.004
+  Carp: '1.04'
+  Encode: '2.12'
+  POE::Component::IRC::Plugin::BaseWrap: '0.001'
+  Test::More: '0'
+  Unicode::UCD: '0.24'
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

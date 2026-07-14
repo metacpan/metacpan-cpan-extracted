@@ -9,23 +9,28 @@ use Carp qw(croak);
 use Class::Tiny qw(descriptor created);
 use Scalar::Util qw(blessed);
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(descriptor created);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "descriptor is required" unless defined $args{descriptor};
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    croak "descriptor is required" unless defined $self->descriptor;
     croak "descriptor must be a Net::Blossom::BlobDescriptor"
-        unless blessed($args{descriptor}) && $args{descriptor}->isa('Net::Blossom::BlobDescriptor');
+        unless blessed($self->descriptor) && $self->descriptor->isa('Net::Blossom::BlobDescriptor');
 
-    croak "created is required" unless defined $args{created};
-    croak "created must be a scalar" if ref($args{created});
-    croak "created must be 0 or 1" unless $args{created} =~ /\A[01]\z/;
-    $args{created} = $args{created} ? 1 : 0;
+    croak "created is required" unless defined $self->created;
+    croak "created must be a scalar" if ref($self->created);
+    croak "created must be 0 or 1" unless $self->created =~ /\A[01]\z/;
+    $self->created($self->created ? 1 : 0);
 
-    return bless \%args, $class;
+    return;
 }
 
 1;
@@ -86,5 +91,15 @@ Returns the C<Net::Blossom::BlobDescriptor>.
 =head2 created
 
 Returns C<1> for a newly stored blob and C<0> for an existing blob.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

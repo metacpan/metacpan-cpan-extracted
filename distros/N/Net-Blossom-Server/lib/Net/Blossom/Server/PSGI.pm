@@ -23,26 +23,31 @@ my %PREFLIGHT_HEADERS = (
     'Access-Control-Max-Age'       => 86400,
 );
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(server authorize authorization);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "server is required" unless defined $args{server};
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    croak "server is required" unless defined $self->server;
     croak "server must be a Net::Blossom::Server"
-        unless blessed($args{server}) && $args{server}->isa('Net::Blossom::Server');
+        unless blessed($self->server) && $self->server->isa('Net::Blossom::Server');
 
     croak "authorize must be a code reference"
-        if defined $args{authorize} && ref($args{authorize}) ne 'CODE';
+        if defined $self->authorize && ref($self->authorize) ne 'CODE';
     croak "authorization must be a Net::Blossom::Server::Authorization"
-        if defined $args{authorization}
-        && !(blessed($args{authorization}) && $args{authorization}->isa('Net::Blossom::Server::Authorization'));
+        if defined $self->authorization
+        && !(blessed($self->authorization) && $self->authorization->isa('Net::Blossom::Server::Authorization'));
     croak "authorize and authorization are mutually exclusive"
-        if defined $args{authorize} && defined $args{authorization};
+        if defined $self->authorize && defined $self->authorization;
 
-    return bless \%args, $class;
+    return;
 }
 
 sub to_app {
@@ -302,5 +307,15 @@ Returns the optional BUD-11 authorization verifier.
     my $app = $adapter->to_app;
 
 Returns a PSGI application code reference.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

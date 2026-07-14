@@ -59,7 +59,8 @@ ResultSet chaining: `$schema->resultset('User')->search({active=>1})->search({ro
 - Core tests MUST use `DBIO::Test::Storage` (fake). Never `dbi:SQLite` or real DB in core
 - Driver integration: `DBIO_TEST_PG_DSN`, `DBIO_TEST_MYSQL_DSN`, etc.
 - `t/` = tests; `xt/` = author tests
-- Shared test schemas → `DBIO::Test::Schema::*` in `dbio/lib/`. Do NOT redefine result classes inline in driver tests
+- Shared test schemas → `DBIO::Test::Schema::*` in `dbio/lib/` (see Shared Schemas below for the OO-variant siblings). Do NOT redefine result classes inline in driver tests
+- Do NOT nest a new standalone demo schema under `DBIO::Test::Schema::*` — that namespace is walked by a no-arg `load_classes` sweep (t/102load_classes.t); a class there with its own optional deps (Moose/Moo/...) dies the sweep fatally on boxes lacking them, instead of skipping gracefully. Put it as a sibling instead (`DBIO::Test::FooSchema`), as done for the Moo/Moose/MooCake/MooseSugar schemas below
 - Optional dep skip:
   ```perl
   BEGIN { eval { require Moo; 1 } or plan skip_all => 'Moo not installed' }
@@ -75,10 +76,10 @@ ResultSet chaining: `$schema->resultset('User')->search({active=>1})->search({ro
 
 | Schema | Layer | DDL |
 |--------|-------|-----|
-| `DBIO::Test::Schema::Moo` | Moo | `add_columns` |
-| `DBIO::Test::Schema::Moose` | Moose | `add_columns` |
-| `DBIO::Test::Schema::MooCake` | Moo + Cake | Cake DDL |
-| `DBIO::Test::Schema::MooseSugar` | Moose + Cake | Cake DDL |
+| `DBIO::Test::MooSchema` | Moo | `add_columns` |
+| `DBIO::Test::MooseSchema` | Moose | `add_columns` |
+| `DBIO::Test::MooCakeSchema` | Moo + Cake | Cake DDL |
+| `DBIO::Test::MooseSugarSchema` | Moose + Cake | Cake DDL |
 
 Each: Artist + CD, has_many/belongs_to, one custom + one default ResultSet.
 

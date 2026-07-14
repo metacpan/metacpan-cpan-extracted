@@ -2,7 +2,7 @@
 #
 # 9005_cheatsheet_zh_TW.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip 快速參考手冊（繁體中文）
 # 本測試同時作為繁體中文使用者的快速參考手冊。

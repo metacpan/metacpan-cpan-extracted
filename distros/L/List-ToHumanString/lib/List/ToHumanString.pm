@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.003001'; # VERSION
+our $VERSION = '1.003002'; # VERSION
 
 require Exporter;
 our @ISA         = qw(Exporter);

@@ -1,8 +1,16 @@
 use strictures 2;
 
+use Digest::SHA ();
+use File::Temp qw(tempfile);
 use Test::More;
 
 use Net::Blossom::Server::Backend::Postgres;
+
+sub dies(&) {
+    my ($code) = @_;
+    my $ok = eval { $code->(); 1 };
+    return $ok ? undef : $@;
+}
 
 my $dbh = _test_dbh();
 _reset_schema($dbh);
@@ -21,7 +29,8 @@ my @tables = sort map { $_->[0] } @{$dbh->selectall_arrayref(q{
      WHERE table_schema = current_schema()
        AND table_name LIKE 'blossom_%'
 })};
-is_deeply(\@tables, [qw(blossom_blobs blossom_owners)], 'schema creates storage tables');
+is_deeply(\@tables, [qw(blossom_blob_data blossom_blobs blossom_owners)],
+    'schema creates separate metadata and large-object tables');
 
 my ($index_exists) = $dbh->selectrow_array(q{
     SELECT 1
@@ -31,6 +40,115 @@ my ($index_exists) = $dbh->selectrow_array(q{
        AND indexname = 'blossom_owners_pubkey_order'
 });
 ok($index_exists, 'schema creates owner ordering index');
+
+my $columns = $dbh->selectall_arrayref(q{
+    SELECT column_name, udt_name
+      FROM information_schema.columns
+     WHERE table_schema = current_schema()
+       AND table_name = 'blossom_blobs'
+     ORDER BY ordinal_position
+});
+is_deeply($columns, [
+    [sha256 => 'text'],
+    [storage_key => 'text'],
+    [size => 'int8'],
+    [type => 'text'],
+    [uploaded => 'int8'],
+], 'metadata table contains no large-object OID');
+
+my $data_columns = $dbh->selectall_arrayref(q{
+    SELECT column_name, udt_name
+      FROM information_schema.columns
+     WHERE table_schema = current_schema()
+       AND table_name = 'blossom_blob_data'
+     ORDER BY ordinal_position
+});
+is_deeply($data_columns, [
+    [storage_key => 'text'],
+    [body_oid => 'oid'],
+], 'blob table contains storage keys and large-object OIDs');
+
+_reset_schema($dbh);
+my ($fh, $path) = tempfile('net-blossom-postgres-legacy-XXXXXX', TMPDIR => 1, UNLINK => 1);
+binmode $fh;
+my $legacy_body = "legacy postgres blob\n";
+print {$fh} $legacy_body;
+close $fh;
+my $legacy_sha256 = Digest::SHA::sha256_hex($legacy_body);
+my $legacy_pubkey = '79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798';
+
+$dbh->do(q{
+    CREATE TABLE blossom_blobs (
+        sha256   text PRIMARY KEY NOT NULL,
+        body_oid oid NOT NULL,
+        size     bigint NOT NULL,
+        type     text NOT NULL,
+        uploaded bigint NOT NULL
+    )
+});
+$dbh->do(q{
+    CREATE TABLE blossom_owners (
+        pubkey   text NOT NULL,
+        sha256   text NOT NULL,
+        type     text NOT NULL,
+        uploaded bigint NOT NULL,
+        PRIMARY KEY (pubkey, sha256),
+        FOREIGN KEY (sha256) REFERENCES blossom_blobs(sha256) ON DELETE CASCADE
+    )
+});
+$dbh->begin_work;
+my $legacy_oid = $dbh->pg_lo_import($path);
+$dbh->do(
+    q{INSERT INTO blossom_blobs (sha256, body_oid, size, type, uploaded) VALUES (?, ?, ?, ?, ?)},
+    undef,
+    $legacy_sha256,
+    $legacy_oid,
+    length($legacy_body),
+    'text/plain',
+    1725107000,
+);
+$dbh->do(
+    q{INSERT INTO blossom_owners (pubkey, sha256, type, uploaded) VALUES (?, ?, ?, ?)},
+    undef,
+    $legacy_pubkey,
+    $legacy_sha256,
+    'text/plain',
+    1725107000,
+);
+$dbh->commit;
+
+ok($storage->deploy_schema, 'legacy large-object schema migration succeeds');
+ok($storage->deploy_schema, 'migrated schema remains idempotent');
+is(_body_to_scalar($storage->get_blob($legacy_sha256)->body), $legacy_body,
+    'legacy large-object bytes survive migration');
+is_deeply(
+    [map { $_->sha256 } @{$storage->list_blobs($legacy_pubkey)}],
+    [$legacy_sha256],
+    'legacy owner survives migration',
+);
+is_deeply(
+    $dbh->selectrow_arrayref(
+        q{SELECT storage_key, body_oid FROM blossom_blob_data WHERE storage_key = ?},
+        undef,
+        $legacy_sha256,
+    ),
+    [$legacy_sha256, $legacy_oid],
+    'legacy OID moves to the blob table unchanged',
+);
+
+_reset_schema($dbh);
+$dbh->do(q{
+    CREATE TABLE blossom_blobs (
+        sha256   text PRIMARY KEY NOT NULL,
+        body     bytea NOT NULL,
+        size     bigint NOT NULL,
+        type     text NOT NULL,
+        uploaded bigint NOT NULL
+    )
+});
+like(dies { $storage->deploy_schema },
+    qr/incompatible blossom_blobs schema.*recreate/i,
+    'deploy rejects the obsolete bytea schema clearly');
 
 done_testing;
 
@@ -58,5 +176,20 @@ sub _reset_schema {
     my ($dbh) = @_;
     $dbh->do('DROP TABLE IF EXISTS blossom_owners');
     $dbh->do('DROP TABLE IF EXISTS blossom_blobs');
+    $dbh->do('DROP TABLE IF EXISTS blossom_blob_data');
+    $dbh->do('SELECT lo_unlink(oid) FROM pg_largeobject_metadata');
     return;
+}
+
+sub _body_to_scalar {
+    my ($body) = @_;
+    my $value = '';
+    while (1) {
+        my $chunk = '';
+        my $read = $body->read($chunk, 8192);
+        die 'stream read failed' unless defined $read;
+        last unless $read;
+        $value .= $chunk;
+    }
+    return $value;
 }

@@ -1,7 +1,8 @@
 Revision history for WWW-HTMLTagAttributeCounter
 
-0.0104  2013-12-02
-        - Fixed a broken test
+0.0105  2026-07-13
+        - Maintenance update - verified module is still working
+
 
 0.0103  2013-12-02
         - Minor fixes to comply with the specs and Kwalitee game

@@ -4,7 +4,7 @@ package DBIO;
 use strict;
 use warnings;
 
-our $VERSION = '0.900001';
+our $VERSION = '0.900002';
 
 use DBIO::Base ();
 use DBIO::Skills ();
@@ -162,7 +162,7 @@ DBIO - Native relational mapping for Perl, built on DBI
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

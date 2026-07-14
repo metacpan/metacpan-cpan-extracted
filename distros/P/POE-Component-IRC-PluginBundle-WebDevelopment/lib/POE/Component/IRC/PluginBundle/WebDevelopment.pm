@@ -3,7 +3,7 @@ package POE::Component::IRC::PluginBundle::WebDevelopment;
 use strict;
 use warnings;
 
-our $VERSION = '2.001003'; # VERSION
+our $VERSION = '2.001004'; # VERSION
 
 q|
 Programming is 10% science, 20% ingenuity, and 70% getting the

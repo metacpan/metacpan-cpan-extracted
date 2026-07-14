@@ -5,12 +5,17 @@ use Test::More;
 use Test::Exception;
 use Test::Warn;
 
-use DBIO::Test::Schema::Moo;
+BEGIN {
+  eval { require Moo; 1 }
+    or plan skip_all => 'Moo not installed';
+}
+
+use DBIO::Test::MooSchema;
 use DBIO::DeploymentHandler;
 
 my $schema;
 lives_ok {
-  $schema = DBIO::Test::Schema::Moo->connect('DBIO::Test::Storage', '');
+  $schema = DBIO::Test::MooSchema->connect('DBIO::Test::Storage', '');
 } 'connect to DBIO::Test::Storage works';
 
 # --- Basic API surface ----------------------------------------------------

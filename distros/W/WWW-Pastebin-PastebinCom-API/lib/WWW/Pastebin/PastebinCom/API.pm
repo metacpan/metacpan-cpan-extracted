@@ -3,7 +3,7 @@ package WWW::Pastebin::PastebinCom::API;
 use strict;
 use warnings;
 
-our $VERSION = '1.001004'; # VERSION
+our $VERSION = '1.001006'; # VERSION
 
 use LWP::UserAgent;
 use Carp;
@@ -63,7 +63,7 @@ sub get_user_info {
         );
 
     my $response = $self->_ua->post(
-        'http://pastebin.com/api/api_post.php',
+        'https://pastebin.com/api/api_post.php',
         {
             api_dev_key         => $api_key,
             api_user_key        => $user_key,
@@ -100,7 +100,7 @@ sub list_user_pastes {
         );
 
     my $response = $self->_ua->post(
-        'http://pastebin.com/api/api_post.php',
+        'https://pastebin.com/api/api_post.php',
         {
             api_dev_key         => $api_key,
             api_user_key        => $user_key,
@@ -133,7 +133,7 @@ sub list_trends {
         or return $self->_set_error(q|Missing API key|);
 
     my $response = $self->_ua->post(
-        'http://pastebin.com/api/api_post.php',
+        'https://pastebin.com/api/api_post.php',
         {
             api_dev_key         => $api_key,
             api_option          => 'trends',
@@ -172,7 +172,7 @@ sub delete_paste {
         );
 
     my $response = $self->_ua->post(
-        'http://pastebin.com/api/api_post.php',
+        'https://pastebin.com/api/api_post.php',
         {
             # mandatory API keys
             api_dev_key         => $api_key,
@@ -210,7 +210,7 @@ sub get_paste {
     if ( defined $login and defined $pass ) {
         $self->_ua->cookie_jar( HTTP::Cookies->new );
         $self->_ua->post(
-            'http://pastebin.com/login.php', {
+            'https://pastebin.com/login.php', {
                 submit_hidden   => 'submit_hidden',
                 user_name       => $login,
                 user_password   => $pass,
@@ -220,7 +220,7 @@ sub get_paste {
     }
 
     my $response = $self->_ua->get(
-        "http://pastebin.com/raw.php?i=$paste_key",
+        "https://pastebin.com/raw/$paste_key",
     );
 
     $self->_ua->cookie_jar( undef );
@@ -268,7 +268,7 @@ sub paste {
         or return $self->_set_error(q|Missing API key|);
 
     my $response = $self->_ua->post(
-        'http://pastebin.com/api/api_post.php',
+        'https://pastebin.com/api/api_post.php',
         {
             # mandatory API keys
             api_dev_key    => $api_key,
@@ -301,7 +301,7 @@ sub get_user_key {
         or return $self->_set_error(q|Missing API key|);
 
     my $response = $self->_ua->post(
-        'http://pastebin.com/api/api_login.php',
+        'https://pastebin.com/api/api_login.php',
         {
             api_dev_key         => $api_key,
             api_user_name       => $login,
@@ -734,7 +734,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### Simple paste with all optional args at default values
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     print $bin->paste('Stuff to paste') || die "$bin";
@@ -743,7 +743,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### Private paste with all optional args set
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -773,7 +773,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### Delete one of user's private pastes
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -788,7 +788,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### List trending pastes
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     my $trends = $bin->list_trends
@@ -801,7 +801,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### List user's private pastes
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -819,7 +819,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### List user's info
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -860,7 +860,7 @@ API key from pastebin.com. Simply create an account on pastebin.com,
 login, then visit (L<http://pastebin.com/api>) and
 the key will be listed somewhere in the second section on the page.
 The key will look something like this:
-C<a3767061e0e64fef6c266126f7e588f4>.
+C<YOUR_API_KEY_HERE>.
 
 =head1 METHODS
 
@@ -871,8 +871,8 @@ C<a3767061e0e64fef6c266126f7e588f4>.
 
     # API key and setting timeout
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key =>  'a3767061e0e64fef6c266126f7e588f4',
-        user_key => '4fd751dc94f0b62c489b2c7720e0d240',
+        api_key =>  'YOUR_API_KEY_HERE',
+        user_key => 'YOUR_USER_KEY_HERE',
         timeout => 60,
     );
 
@@ -891,7 +891,7 @@ All arguments are optional and are described below.
 =head3 C<api_key>
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key =>  'a3767061e0e64fef6c266126f7e588f4',
+        api_key =>  'YOUR_API_KEY_HERE',
     );
 
 B<Optional>.
@@ -909,12 +909,12 @@ API key from pastebin.com. Simply create an account on pastebin.com,
 login, then visit (L<http://pastebin.com/api>) and
 the key will be listed somewhere in the second section on the page.
 The key will look something like this:
-C<a3767061e0e64fef6c266126f7e588f4>.
+C<YOUR_API_KEY_HERE>.
 
 =head3 C<user_key>
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        user_key => '4fd751dc94f0b62c489b2c7720e0d240',
+        user_key => 'YOUR_USER_KEY_HERE',
     );
 
 B<Optional>. Takes a user key string as a value. By default
@@ -992,7 +992,7 @@ you to have an API key with pastebin.com.
 =head2 C<< get_user_key >>
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -1008,7 +1008,7 @@ constructor). B<Takes> two mandatory arguments as
 strings: first
 one is your pastebin.com login, second one is your pastebin.com
 password. B<On success> sets C<< ->user_key() >> accessor and
-returns a user key (e.g. C<4fd751dc94f0b62c489b2c7720e0d240>).
+returns a user key (e.g. C<YOUR_USER_KEY_HERE>).
 B<On failure returns> either C<undef> or an empty list, depending
 on the context, and C<< ->error() >> method will contain
 human-readable description of the error. Note that
@@ -1021,7 +1021,7 @@ to something prior to the call of C<< ->get_user_key() >>
     ##### Simple paste with all optional args at default values
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     print $bin->paste('Stuff to paste') || die "$bin";
@@ -1030,7 +1030,7 @@ to something prior to the call of C<< ->get_user_key() >>
     ##### Make an unlisted paste
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     print $bin->paste( 'Stuff to paste', unlisted => 1, )
@@ -1040,7 +1040,7 @@ to something prior to the call of C<< ->get_user_key() >>
     ##### Private paste with all optional args set
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -1580,7 +1580,7 @@ Positive integer or zero. The number of times the paste was viewed.
 =head2 C<list_trends>
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     my $trends = $bin->list_trends
@@ -1604,7 +1604,7 @@ will not be there.
 =head2 C<get_user_info>
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -1753,7 +1753,7 @@ interpolate the value of C<< ->error() >> instead, if an error is set.
 
     my $bin = WWW::Pastebin::PastebinCom::API->new;
 
-    $bin->api_key('a3767061e0e64fef6c266126f7e588f4');
+    $bin->api_key('YOUR_API_KEY_HERE');
     printf "Current API key is %s\n", $bin->api_key;
 
 B<Takes> one optional argument as a string, which is a pastebin.com's
@@ -1763,7 +1763,7 @@ API key, as a string.
 =head2 C<user_key>
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/

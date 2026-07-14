@@ -21,7 +21,7 @@ DBIO::Test::Taint::Classes::Auto - Test class for taint mode with auto-loading
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

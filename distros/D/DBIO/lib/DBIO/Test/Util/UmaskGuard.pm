@@ -25,7 +25,7 @@ DBIO::Test::Util::UmaskGuard - RAII guard that restores the umask on scope exit
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

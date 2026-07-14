@@ -3,7 +3,7 @@ package HTML::ExtractText::Extra;
 use strict;
 use warnings;
 
-our $VERSION = '1.001003'; # VERSION
+our $VERSION = '1.001004'; # VERSION
 
 use parent 'HTML::ExtractText';
 

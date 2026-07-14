@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "WiringPi::API" : "3.1803",
+            "WiringPi::API" : "3.1804",
             "perl" : "5.006"
          }
       }
@@ -48,6 +48,6 @@
          "web" : "https://github.com/stevieb9/rpi-spi"
       }
    },
-   "version" : "3.1801",
+   "version" : "3.1802",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,109 @@
+package Google::Api::Log;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Label };
+    my $descriptor_b64 = <<'EOF';
+ChRnb29nbGUvYXBpL2xvZy5wcm90bxIKZ29vZ2xlLmFwaRoWZ29vZ2xlL2FwaS9sYWJlbC5w
+cm90byKdAQoNTG9nRGVzY3JpcHRvchISCgRuYW1lGAEgASgJUgRuYW1lEjMKBmxhYmVscxgC
+IAMoCzIbLmdvb2dsZS5hcGkuTGFiZWxEZXNjcmlwdG9yUgZsYWJlbHMSIAoLZGVzY3JpcHRp
+b24YAyABKAlSC2Rlc2NyaXB0aW9uEiEKDGRpc3BsYXlfbmFtZRgEIAEoCVILZGlzcGxheU5h
+bWVCagoOY29tLmdvb2dsZS5hcGlCCExvZ1Byb3RvUAFaRWdvb2dsZS5nb2xhbmcub3JnL2dl
+bnByb3RvL2dvb2dsZWFwaXMvYXBpL3NlcnZpY2Vjb25maWc7c2VydmljZWNvbmZpZ6ICBEdB
+UElK/g4KBhIEDgA1AQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMK
+CiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUg
+IkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBs
+aWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUg
+TGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5T
+RS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRv
+IGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBp
+cyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVT
+IE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQu
+CiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcg
+cGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQIS
+AxAAEwoJCgIDABIDEgAgCggKAQgSAxQAXAoJCgIICxIDFABcCggKAQgSAxUAIgoJCgIIChID
+FQAiCggKAQgSAxYAKQoJCgIICBIDFgApCggKAQgSAxcAJwoJCgIIARIDFwAnCggKAQgSAxgA
+IgoJCgIIJBIDGAAiCsICCgIEABIEIgA1ARq1AiBBIGRlc2NyaXB0aW9uIG9mIGEgbG9nIHR5
+cGUuIEV4YW1wbGUgaW4gWUFNTCBmb3JtYXQ6CgogICAgIC0gbmFtZTogbGlicmFyeS5nb29n
+bGVhcGlzLmNvbS9hY3Rpdml0eV9oaXN0b3J5CiAgICAgICBkZXNjcmlwdGlvbjogVGhlIGhp
+c3Rvcnkgb2YgYm9ycm93aW5nIGFuZCByZXR1cm5pbmcgbGlicmFyeSBpdGVtcy4KICAgICAg
+IGRpc3BsYXlfbmFtZTogQWN0aXZpdHkKICAgICAgIGxhYmVsczoKICAgICAgIC0ga2V5OiAv
+Y3VzdG9tZXJfaWQKICAgICAgICAgZGVzY3JpcHRpb246IElkZW50aWZpZXIgb2YgYSBsaWJy
+YXJ5IGN1c3RvbWVyCgoKCgMEAAESAyIIFQqEAgoEBAACABIDJwISGvYBIFRoZSBuYW1lIG9m
+IHRoZSBsb2cuIEl0IG11c3QgYmUgbGVzcyB0aGFuIDUxMiBjaGFyYWN0ZXJzIGxvbmcgYW5k
+IGNhbgogaW5jbHVkZSB0aGUgZm9sbG93aW5nIGNoYXJhY3RlcnM6IHVwcGVyLSBhbmQgbG93
+ZXItY2FzZSBhbHBoYW51bWVyaWMKIGNoYXJhY3RlcnMgW0EtWmEtejAtOV0sIGFuZCBwdW5j
+dHVhdGlvbiBjaGFyYWN0ZXJzIGluY2x1ZGluZwogc2xhc2gsIHVuZGVyc2NvcmUsIGh5cGhl
+biwgcGVyaW9kIFsvXy0uXS4KCgwKBQQAAgAFEgMnAggKDAoFBAACAAESAycJDQoMCgUEAAIA
+AxIDJxARCqgBCgQEAAIBEgMsAiYamgEgVGhlIHNldCBvZiBsYWJlbHMgdGhhdCBhcmUgYXZh
+aWxhYmxlIHRvIGRlc2NyaWJlIGEgc3BlY2lmaWMgbG9nIGVudHJ5LgogUnVudGltZSByZXF1
+ZXN0cyB0aGF0IGNvbnRhaW4gbGFiZWxzIG5vdCBzcGVjaWZpZWQgaGVyZSBhcmUKIGNvbnNp
+ZGVyZWQgaW52YWxpZC4KCgwKBQQAAgEEEgMsAgoKDAoFBAACAQYSAywLGgoMCgUEAAIBARID
+LBshCgwKBQQAAgEDEgMsJCUKgAEKBAQAAgISAzACGRpzIEEgaHVtYW4tcmVhZGFibGUgZGVz
+Y3JpcHRpb24gb2YgdGhpcyBsb2cuIFRoaXMgaW5mb3JtYXRpb24gYXBwZWFycyBpbgogdGhl
+IGRvY3VtZW50YXRpb24gYW5kIGNhbiBjb250YWluIGRldGFpbHMuCgoMCgUEAAICBRIDMAII
+CgwKBQQAAgIBEgMwCRQKDAoFBAACAgMSAzAXGAp7CgQEAAIDEgM0AhoabiBUaGUgaHVtYW4t
+cmVhZGFibGUgbmFtZSBmb3IgdGhpcyBsb2cuIFRoaXMgaW5mb3JtYXRpb24gYXBwZWFycyBv
+bgogdGhlIHVzZXIgaW50ZXJmYWNlIGFuZCBzaG91bGQgYmUgY29uY2lzZS4KCgwKBQQAAgMF
+EgM0AggKDAoFBAACAwESAzQJFQoMCgUEAAIDAxIDNBgZYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Api::Log::LogDescriptor ===
+    # Fields for LogDescriptor
+    # Field: name Type: 9 ()
+    # Field: labels Type: 11 (.google.api.LabelDescriptor)
+    # Field: description Type: 9 ()
+    # Field: display_name Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Api::Log::LogDescriptor - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::Log;
+
+    my $msg = Google::Api::Log::LogDescriptor->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<labels>
+
+Type: Message (.google.api.LabelDescriptor)
+
+=item * B<description>
+
+Type: String
+
+=item * B<display_name>
+
+Type: String
+
+=back
+
+=cut
+
+1;

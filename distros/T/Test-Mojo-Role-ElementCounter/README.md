@@ -66,18 +66,18 @@ The test we write:
 # SEE ALSO
 
 Note that as of [Mojolicious](https://metacpan.org/pod/Mojolicious) version 6.06,
-[Test::Mojo](https://metacpan.org/pod/Test::Mojo) implements the exact match
+[Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) implements the exact match
 version of `element_count_is` natively (same method name).
 This role is helpful only if you need dive methods or ranges.
 
 # DESCRIPTION
 
-A [Test::Mojo](https://metacpan.org/pod/Test::Mojo) role that allows you to do strict element count tests on
+A [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) role that allows you to do strict element count tests on
 large structures.
 
 # METHODS
 
-You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test::Mojo), plus these:
+You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo), plus these:
 
 ## `element_count_is`
 
@@ -112,7 +112,7 @@ not `ul li`.
 
 **Note:** the selector prefix only applies to `element_count_is` and
 `dived_text_is` methods. It does not affect operation of other
-methods provided by [Test::Mojo](https://metacpan.org/pod/Test::Mojo)
+methods provided by [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo)
 
 ## `dive_out`
 
@@ -146,10 +146,10 @@ Resets stored selector prefix to an empty string (see `dive_in`).
     $t = $t->dive('#products li:first-child ')
         ->dived_text_is('a' => 'Product 1');
 
-Same as [Test::Mojo](https://metacpan.org/pod/Test::Mojo)'s `text_is` method, except the selector will
+Same as [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo)'s `text_is` method, except the selector will
 be prefixed by the stored selector prefix (see `dive_in`).
 
-**NOTE:** as of version 1.001006, [Test::Mojo](https://metacpan.org/pod/Test::Mojo)'s `text_like` will be used
+**NOTE:** as of version 1.001006, [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo)'s `text_like` will be used
 with a regex constructed to be the exact match, with any amount of whitespace
 before and after the string. This is done to workaround Mojolicious Donut
 breaking its whitespace handling in Mojo::DOM and by extention Test::Mojo,

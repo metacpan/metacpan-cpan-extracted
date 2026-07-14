@@ -152,7 +152,7 @@ DBIO::Test::Schema::Track - Test result class for the track table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

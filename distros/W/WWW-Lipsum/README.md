@@ -37,7 +37,7 @@ Generate _Lorem Ipsum_ place holder text from perl, using
 
 # SEE ALSO
 
-You most likely want [Text::Lorem](https://metacpan.org/pod/Text::Lorem) or [Text::Lorem::More](https://metacpan.org/pod/Text::Lorem::More)
+You most likely want [Text::Lorem](https://metacpan.org/pod/Text%3A%3ALorem) or [Text::Lorem::More](https://metacpan.org/pod/Text%3A%3ALorem%3A%3AMore)
 instead of this module, as those generate _Lorem Ipsum_ text without
 using a web service.
 
@@ -229,7 +229,7 @@ to `bug-www-lipsum at rt.cpan.org`
 
 # AUTHOR
 
-Zoffix Znet <zoffix at cpan.org>
+Zoffix Znet &lt;zoffix at cpan.org>
 ([http://zoffix.com/](http://zoffix.com/), [http://haslayout.net/](http://haslayout.net/))
 
 # LICENSE
@@ -246,7 +246,7 @@ by Earle Martin. I have a couple of modules that depend on
 CPAN, leaving my modules dead.
 
 At first, I resurrected Earle's version, but it had a bug. The code
-was using [HTML::TokeParser](https://metacpan.org/pod/HTML::TokeParser) and was a pain in the butt
+was using [HTML::TokeParser](https://metacpan.org/pod/HTML%3A%3ATokeParser) and was a pain in the butt
 to maintain, and the interface really irked me.
 So, I rewrote the whole thing from scratch, broke the API
 (more or less), and released the module under a same-as-perl license.

@@ -3,7 +3,7 @@ package WWW::OhNoRobotCom::Search;
 use warnings;
 use strict;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Carp;
 use URI;
@@ -89,7 +89,7 @@ sub _fetch_results {
     my $ua = $self->ua;
     $ua->requests_redirectable([]);
 
-    my $uri = URI->new('http://www.ohnorobot.com/index.pl');
+    my $uri = URI->new('https://www.ohnorobot.com/index.php');
     $uri->query_form(  %$request_args_ref );
     my $response = $ua->get( $uri, );
 
@@ -294,7 +294,7 @@ optional, arguments are given in a key/value fashion and are as follows:
 The C<comic_id> argument takes a scalar as a value which should be a
 comic ID number or an empty string which indicates that search should be
 done on all comics. To obtain the comic ID number go to
-L<http://www.ohnorobot.com/index.pl?show=advanced>, "View Source" and search
+L<https://www.ohnorobot.com/index.php?show=advanced>, "View Source" and search
 for the name of the comic, when you'll find an <option> the C<value="">
 attribute of that option will be the number you are looking for. Idealy,
 it would make sense to make the C<search()> method accepts names instead

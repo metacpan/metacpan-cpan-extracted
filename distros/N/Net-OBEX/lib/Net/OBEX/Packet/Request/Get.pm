@@ -6,7 +6,7 @@ use warnings;
 
 use Carp;
 use base 'Net::OBEX::Packet::Request::Base';
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 sub new {
     my $class = shift;
     croak "Must have even number of arguments to new()"

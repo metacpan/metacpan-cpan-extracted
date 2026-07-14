@@ -52,7 +52,7 @@ DBIO::Test::Schema::Year1999CDs - Test virtual view result class for 1999 CDs
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

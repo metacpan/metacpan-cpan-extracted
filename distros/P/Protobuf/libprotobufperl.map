@@ -1,0 +1,12 @@
+{
+  global:
+    boot_*;
+    PerlUpb_*;
+    upb_*;
+    _upb_*;
+    google_*;
+    proto2_*;
+    utf8_range_*;
+  local:
+    *;
+};

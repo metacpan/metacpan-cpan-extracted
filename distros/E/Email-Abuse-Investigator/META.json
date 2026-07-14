@@ -77,10 +77,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/Email-Abuse-Investigator.git",
-         "web" : "https://github.com/nigelhorne/Email-Abuse-Investigator",
-         "x_repository" : "https://github.com/nigelhorne/Email-Abuse-Investigator"
+         "web" : "https://github.com/nigelhorne/Email-Abuse-Investigator"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

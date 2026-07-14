@@ -2,7 +2,7 @@
 #
 # 9014_cheatsheet_th.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # คู่มืออ้างอิงด่วน Jacode4e::RoundTrip (ภาษาไทย)
 # การทดสอบนี้ยังทำหน้าที่เป็นคู่มืออ้างอิงด่วนสำหรับผู้ใช้ภาษาไทย

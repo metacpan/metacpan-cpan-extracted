@@ -13,7 +13,7 @@ DBIO::Manual::Migration - Step-by-step guide for migrating an existing DBIx::Cla
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 OVERVIEW
 

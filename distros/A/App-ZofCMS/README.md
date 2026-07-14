@@ -37,12 +37,12 @@ a great framework, not just for web, and it offers far more functionality
 than ZofCMS ever will.
 
 ZofCMS is plugin based. If you create your own plugins, please upload them
-to [App::ZofCMS::Plugin](https://metacpan.org/pod/App::ZofCMS::Plugin) namespace or email it to me (`zoffix@cpan.org`)
+to [App::ZofCMS::Plugin](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3APlugin) namespace or email it to me (`zoffix@cpan.org`)
 and I will package it, upload it, and give you corresponding credits.
 
-ZofCMS currently uses [HTML::Template](https://metacpan.org/pod/HTML::Template) as a module to interpret HTML
+ZofCMS currently uses [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate) as a module to interpret HTML
 templates. And so far, I have no plans to change this to anything alike
-[Template::Toolkit](https://metacpan.org/pod/Template::Toolkit).
+[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit).
 
 Despite the "core" of the framework along with all of its plugins being
 on CPAN there is a helper script (`zofcms_helper`) which can produce
@@ -64,7 +64,7 @@ After coding a templating system from scratch for
 one of the sites, which runs on the server without any SQL, ssh
 or ability to install any perl modules directly from CPAN, I already felt
 that something needed to be done. The "perl hashref" templates which I used
-to make all those products displayed with only one [HTML::Template](https://metacpan.org/pod/HTML::Template)
+to make all those products displayed with only one [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate)
 template proved to be flexible, extendable and maintainable and that's
 exactly from where ZofCMS template format came.
 
@@ -107,18 +107,18 @@ There is also a `dir` parameter, but it's use it optional. For example,
 if you are to access `index.pl?page=foo/bar/baz/page` framework will
 convert the query into `page=page&dir=foo/bar/baz/`.
 
-The "config file" (see [App::ZofCMS::Config](https://metacpan.org/pod/App::ZofCMS::Config)) is loaded and checked whether
+The "config file" (see [App::ZofCMS::Config](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3AConfig)) is loaded and checked whether
 or not the specified page is an "allowed page"; if it isn't, user will
 be presented with a 404.
 
 Later on, the "ZofCMS template" file is located and loaded. This template
 is just a file with a Perl hashref in it. All keys have special meanings,
-see [App::ZofCMS::Template](https://metacpan.org/pod/App::ZofCMS::Template) for details. Some (or even all) of those keys
+see [App::ZofCMS::Template](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3ATemplate) for details. Some (or even all) of those keys
 can be specified in the "config file" under several keys which provide
-"defaults", see [App::ZofCMS::Config](https://metacpan.org/pod/App::ZofCMS::Config) for details.
+"defaults", see [App::ZofCMS::Config](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3AConfig) for details.
 
 ZofCMS template will reference a "base" template (which is a
-[HTML::Template](https://metacpan.org/pod/HTML::Template) template) as well as several other [HTML::Template](https://metacpan.org/pod/HTML::Template)
+[HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate) template) as well as several other [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate)
 files. The framework then will run any plugins, fill out all the values
 in the templates and display the page to the user.
 
@@ -148,7 +148,7 @@ ZofCMS directory/file setup is arranged to have one directory web
 accessible; that one will contain `index.pl` along with any CSS/JS files
 or images that will be on your website. Another directory will not be
 web accessible; here you will keep your ZofCMS templates along with page
-templates (i.e. [HTML::Template](https://metacpan.org/pod/HTML::Template), or "data") and the config file.
+templates (i.e. [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate), or "data") and the config file.
 
 As example we will want our site to be in `/var/www/testsite/` directory,
 thus we go (assuming we are on the system which has `mkdir` and `cd`):
@@ -182,12 +182,12 @@ have in here:
                   will live.
 
 In the `data` directory you will notice a file called `base.tmpl` this
-is the "base" [HTML::Template](https://metacpan.org/pod/HTML::Template) file, it will be filled with virtually
+is the "base" [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate) file, it will be filled with virtually
 all the keys from ZofCMS template. In the `templates` directory you will
 find `index.tmpl` and `404.tmpl`
 
 **Before we proceed any further** I advise you to read documentation
-for [App::ZofCMS::Config](https://metacpan.org/pod/App::ZofCMS::Config) and [App::ZofCMS::Template](https://metacpan.org/pod/App::ZofCMS::Template) as I am not going
+for [App::ZofCMS::Config](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3AConfig) and [App::ZofCMS::Template](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3ATemplate) as I am not going
 to explain what each key means; it is explained in aforementioned
 documentation in detail.
 
@@ -197,7 +197,7 @@ Now, let's create our first page. Let it be named something original,
 like "foo" :)
 
 Open up your config file and under valid pages add '/foo'. Considering
-you \*did\* read documentation for [App::ZofCMS::Config](https://metacpan.org/pod/App::ZofCMS::Config) you'll know exactly
+you \*did\* read documentation for [App::ZofCMS::Config](https://metacpan.org/pod/App%3A%3AZofCMS%3A%3AConfig) you'll know exactly
 what to do at this point.
 
 now go to your "core dir" (which will be /var/www/testsite/web\_site/

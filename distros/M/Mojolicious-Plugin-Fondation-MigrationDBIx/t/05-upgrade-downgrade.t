@@ -33,7 +33,7 @@ sub build_app {
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'test' },
+                    foo => { source => 'Foo', backend => 'test' },
                 },
             }},
             { 'Fondation::TestDBIx' => {

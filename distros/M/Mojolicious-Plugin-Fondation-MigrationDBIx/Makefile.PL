@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DBIx::Class::DeploymentHandler" => 0,
     "DBIx::Class::Fixtures" => 0,
-    "DBIx::Class::Migration" => 0,
     "JSON::MaybeXS" => 0,
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::Fondation" => "0.01",
@@ -29,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::Mojo" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +38,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBIx::Class::DeploymentHandler" => 0,
   "DBIx::Class::Fixtures" => 0,
-  "DBIx::Class::Migration" => 0,
   "JSON::MaybeXS" => 0,
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::Fondation" => "0.01",

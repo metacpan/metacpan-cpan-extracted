@@ -1,5 +1,9 @@
 Revision history for Perl extension Number-RGB
 
+2.001001  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.41 2015-09-26
   - Remove unused hash_traversal_mask from tests (#2, RT#107357)
 

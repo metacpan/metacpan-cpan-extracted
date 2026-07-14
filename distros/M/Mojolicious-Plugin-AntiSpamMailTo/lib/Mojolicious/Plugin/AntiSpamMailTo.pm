@@ -2,7 +2,7 @@ package Mojolicious::Plugin::AntiSpamMailTo;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.001003'; # VERSION
+our $VERSION = '1.001004'; # VERSION
 
 use HTML::Entities;
 
@@ -67,6 +67,14 @@ Mojolicious::Plugin::AntiSpamMailTo - Mojolicious plugin for obfuscating email a
             Send me an email at <%== mailto %>
     </a></p>
 
+The output in the browser would be this, with each character in the
+email address HTML encoded:
+
+    <p><a
+        href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;">
+            Send me an email at &#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;
+    </a></p>
+
 Every call to C<mailto_href()> or C<mailto()> updates the globally
 stored email address. But you can use a different address each time:
 
@@ -87,14 +95,6 @@ stored email address. But you can use a different address each time:
     <p><a
         href="<%== mailto_href 'foo@example.com' %>">
             Send me an email at <%== mailto 'bar@example.com' %>
-    </a></p>
-
-The output in the browser would be this, with each character in the
-email address HTML encoded:
-
-    <p><a
-        href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;">
-            Send me an email at &#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;
     </a></p>
 
 =head1 DESCRIPTION

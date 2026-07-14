@@ -53,7 +53,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
       },
-   "version" : "1.650",
+   "version" : "1.651",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_suggests" : {
       "Clone" : 0.47,

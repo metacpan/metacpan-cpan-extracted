@@ -1,5 +1,28 @@
 Revision history for Weather::Meteo
 
+0.15	Mon Jul 13 12:51:54 EDT 2026
+	[ Security ]
+	- Fix SSRF: validate and untaint the host parameter in new() against a
+	  hostname-only regex; rejects IP addresses, @-injection, and path segments
+	  (WEATHER__METEO__host env var was previously accepted verbatim)
+	- Fix taint-mode compliance: coordinate validation now uses list-context
+	  captures so $latitude/$longitude are untainted before reaching URI/LWP
+	- Fix ReDoS: replace /^-?\d+(\.\d+)?$/ with atomic-group equivalent
+	  /\A(-?(?>\d+)(?:\.(?>\d+))?)\z/ in all three public data methods and
+	  _normalise_coord(); eliminates O(n) backtracking on adversarial input
+	- Fix log injection: sanitise $@ from JSON parse failures before carp
+	  (strip control characters, cap at 200 chars)
+	- Fix path traversal in bin/weather: CACHE_DIR and OPENADDR_HOME env vars
+	  are now untainted via character-class regex and canonicalised with
+	  Cwd::realpath() before any filesystem operation
+	- Fix TOCTOU race in bin/weather cache directory creation: replaced the
+	  -d check + mkdir pair with atomic mkdir()+EEXIST idiom
+
+	[ Enhancements ]
+	- Add forecast() method using api.open-meteo.com/v1/forecast (1-16 days ahead)
+	- Add sunrise_sunset() method returning { sunrise, sunset } for any date
+	- Add sunrise,sunset to weather() daily fields
+
 0.14	Mon Jun  1 08:55:15 EDT 2026
 	Use Test::Mockingbird instead of Test::MockModule in t/30-basics.t
 	Fix $self->error() calls that should be $logger->error() in weather()

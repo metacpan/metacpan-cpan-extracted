@@ -12,7 +12,7 @@ Mojolicious::Plugin::IP2Location - Mojolicious wrapper around Geo::IP2Location::
 
 # DESCRIPTION
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious) plugin wrapper for [Geo::IP2Location::Lite](https://metacpan.org/pod/Geo::IP2Location::Lite)
+[Mojolicious](https://metacpan.org/pod/Mojolicious) plugin wrapper for [Geo::IP2Location::Lite](https://metacpan.org/pod/Geo%3A%3AIP2Location%3A%3ALite)
 
 <div>
     <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-warning.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
@@ -28,7 +28,7 @@ distribution. Proper docs and tests will follow soon.
 
 # SEE ALSO
 
-[Geo::IP2Location::Lite](https://metacpan.org/pod/Geo::IP2Location::Lite), [Geo::IP2Location](https://metacpan.org/pod/Geo::IP2Location),
+[Geo::IP2Location::Lite](https://metacpan.org/pod/Geo%3A%3AIP2Location%3A%3ALite), [Geo::IP2Location](https://metacpan.org/pod/Geo%3A%3AIP2Location),
 [http://lite.ip2location.com/database-ip-country-region-city](http://lite.ip2location.com/database-ip-country-region-city)
 
 <div>

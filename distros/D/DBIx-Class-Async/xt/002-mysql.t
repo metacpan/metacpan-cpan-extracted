@@ -35,7 +35,7 @@ isa_ok($schema, 'DBIx::Class::Async::Schema', 'Schema connected to MySQL');
 
 $schema->await($schema->deploy({ add_drop_table => 1 }));
 
-subtest 'Basic CRUD — User' => sub {
+subtest 'Basic CRUD - User' => sub {
     my $user_rs = $schema->resultset('User');
     isa_ok($user_rs, 'DBIx::Class::Async::ResultSet');
 
@@ -83,7 +83,7 @@ subtest 'Search and count' => sub {
     cmp_ok(scalar @$active, '>=', 2, 'At least 2 active users found');
 };
 
-subtest 'Relationships — belongs_to and has_many' => sub {
+subtest 'Relationships - belongs_to and has_many' => sub {
     my $user_rs  = $schema->resultset('User');
     my $order_rs = $schema->resultset('Order');
 
@@ -111,7 +111,7 @@ subtest 'Relationships — belongs_to and has_many' => sub {
     is(scalar @$user_orders, 1, 'has_many returns 1 order');
 };
 
-subtest 'Transactions — txn_do' => sub {
+subtest 'Transactions - txn_do' => sub {
     my $user_rs = $schema->resultset('User');
     my $before  = $user_rs->count->get;
 

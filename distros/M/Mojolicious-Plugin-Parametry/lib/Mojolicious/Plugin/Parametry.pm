@@ -6,7 +6,7 @@ use Mojolicious::Plugin::Parametry::Paramer;
 use Mojolicious::Plugin::Parametry::ParamerHelpers;
 
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -100,7 +100,7 @@ helper will also trim leading and trailing whitespace.
 B<CAVEATS:> this helper can be used to access only params named with valid
 Perl method names and no support for other names is currently planned.
 
-=head2 C<P>
+=head2 C<PP>
 
     $c->PP
 

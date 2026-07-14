@@ -31,7 +31,7 @@ DBIO::Test::Schema::CustomSql - Test result class using a custom SQL query as so
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

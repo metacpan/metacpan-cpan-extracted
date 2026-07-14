@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQLCom;
 use strict;
 use warnings;
 
-our $VERSION = '0.000053';
+our $VERSION = '0.000054';
 
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
@@ -92,7 +92,12 @@ sub bootstrap {
     if ($self->{+USE_BOOTSTRAP}) {
         if ($self->{+USE_INSTALLDB}) {
             local $ENV{PERL5LIB} = "";
-            $self->run_command([$self->install_bin, '--datadir=' . $data_dir]);
+            # mysql_install_db does not read our defaults file, so the config's
+            # user=root (added when running as root) does not reach it -- pass it
+            # explicitly here so bootstrap works as root too. See MySQL.pm's
+            # _default_config for the rationale.
+            my @root = $self->_run_as_root ? ('--user=root') : ();
+            $self->run_command([$self->install_bin, '--datadir=' . $data_dir, @root]);
         }
         $self->write_config();
         $self->run_command([$self->start_command, '--bootstrap'], {stdin => $init_file});

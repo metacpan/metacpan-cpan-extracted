@@ -96,7 +96,7 @@ DBIO::DeploymentHandler::DeployMethod::Native - Native DBIO driver deploy (no SQ
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

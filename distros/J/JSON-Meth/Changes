@@ -1,5 +1,9 @@
 Revision history for JSON-Meth
 
+1.001008  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.001007  2015-11-28
         - Fix test failures due to newer Cpanel::JSON::XS version
              stringifying objects

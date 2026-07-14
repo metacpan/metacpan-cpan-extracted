@@ -68,7 +68,6 @@ WriteMakefile(
 		resources => {
 			homepage => 'https://metacpan.org/pod/Email::Abuse::Investigator',
 			repository => {
-				repository => 'https://github.com/nigelhorne/Email-Abuse-Investigator',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Email-Abuse-Investigator.git',
 				web => 'https://github.com/nigelhorne/Email-Abuse-Investigator',

@@ -1,64 +1,124 @@
-
-package Protobuf;
-
-# Copyright 2025 Google LLC and contributors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-use strict;
-use warnings;
-use namespace::autoclean;
-
-our $VERSION = '0.001';
-
-1;
-__END__
+=encoding UTF-8
 
 =head1 NAME
 
-Protobuf - Namespace reservation for Google's Protocol Buffers
+Protobuf - High-performance Google Protocol Buffers implementation
+
+=head1 VERSION
+
+version 0.05
 
 =head1 SYNOPSIS
 
-  # This module currently does nothing but reserve the namespace.
-  use Protobuf;
+    use Protobuf;
+
+    # Load descriptors (typically done by generated code)
+    my $pool = Protobuf::DescriptorPool->generated_pool;
+
+    # Example: Create a new message (assuming My::Message is generated)
+    # my $msg = My::Message->new({ name => 'foo', value => 123 });
+
+    # Serialize
+    # my $binary = $msg->serialize;
+
+    # Parse
+    # my $decoded = My::Message->parse($binary);
 
 =head1 DESCRIPTION
 
-This module reserves the C<Protobuf> namespace on CPAN for future
-development of Perl bindings for Google's Protocol Buffers.
+This module provides a Perl interface to Google Protocol Buffers, leveraging the high-performance C library L<upb|https://github.com/protocolbuffers/upb>. The implementation aims for speed, efficiency, and close alignment with the features and behaviors of the official Python UPB-based extension.
 
-Protocol Buffers are a language-neutral, platform-neutral, extensible
-mechanism for serializing structured data.
+=head1 SEE ALSO
+
+L<Protobuf::Message>, L<Protobuf::DescriptorPool>, L<Protobuf::Arena>
 
 =head1 AUTHOR
 
-C.J. Collier <cjac@colliertech.org>
+C.J. Collier <cjac@google.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2025 Google LLC and contributors
+This software is copyright (c) 2026 by Google LLC.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This is free software; you can redistribute it and/or modify it under
+the terms of the BSD 3-Clause License.
 
 =cut
+
+package Protobuf;
+
+use strict;
+use warnings;
+use Log::Any qw($log);
+
+our $VERSION = '0.05';
+
+our $HAS_XS;
+{
+    my $no_xs = $ENV{'PROTOBUF_NO_XS'} || ($ENV{'PROTOBUF_ENGINE'} && $ENV{'PROTOBUF_ENGINE'} eq 'pure_perl');
+    if ($no_xs) {
+        $HAS_XS = 0;
+    } else {
+        eval {
+            require XSLoader;
+            XSLoader::load('Protobuf', $VERSION);
+            $HAS_XS = 1;
+        };
+        if ($@) {
+            $HAS_XS = 0;
+            warn "Protobuf XS not loaded: $@" if $ENV{'PROTOBUF_DEBUG'};
+            $log->debugf('Protobuf XS not loaded: %s', $@) if $ENV{'PROTOBUF_DEBUG'};
+        }
+    }
+}
+
+if ($HAS_XS) {
+    require Protobuf::Internal;
+    Protobuf::Internal::init_registry();
+}
+require Protobuf::Message;
+require Protobuf::Arena;
+
+
+our $ENGINE;
+my %engines;
+
+sub get_engine {
+    my ($class_or_name, $name) = @_;
+
+    # Handle method call vs function call
+    if (defined($class_or_name) && $class_or_name eq 'Protobuf') {
+        # Method call: Protobuf->get_engine($name)
+    } else {
+        # Function call: get_engine($name)
+        $name = $class_or_name;
+    }
+
+    $name ||= $ENV{PROTOBUF_ENGINE} || ($HAS_XS ? 'xs' : 'pure_perl');
+
+    # Map high-level profiles to implementation engines
+    my $engine_key = ($name =~ /^(?:xs|balanced|write_heavy|read_heavy|zero_copy)$/) ? 'xs' : 'pure_perl';
+
+    # If we requested XS but don't have it, fallback to PurePerl
+    if ($engine_key eq 'xs' && !$HAS_XS) {
+        $engine_key = 'pure_perl';
+    }
+
+    return $engines{$engine_key} if $engines{$engine_key};
+
+    my $class = "Protobuf::Engine::" . ($engine_key eq 'xs' ? 'XS' : 'PurePerl');
+    (my $file = $class) =~ s/::/\//g;
+    require "$file.pm";
+
+    return $engines{$engine_key} = $class->new();
+}
+
+sub engine {
+    my ($class, $name) = @_;
+    if ($name) {
+        $ENGINE = get_engine($name);
+    }
+    return $ENGINE ||= get_engine();
+}
+
+1;

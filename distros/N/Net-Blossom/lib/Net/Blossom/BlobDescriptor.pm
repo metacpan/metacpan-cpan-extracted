@@ -5,38 +5,46 @@ use strictures 2;
 use Net::Blossom::_ConstructorArgs ();
 
 use Carp qw(croak);
-use Class::Tiny qw(url sha256 size type uploaded nip94 extra);
+use Class::Tiny qw(url sha256 size type uploaded nip94), {
+    extra => sub { {} },
+};
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 my %STANDARD_FIELD = map { $_ => 1 } qw(url sha256 size type uploaded nip94);
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(url sha256 size type uploaded nip94 extra);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+
     for my $field (qw(url sha256 size type uploaded)) {
-        croak "$field is required" unless defined $args{$field};
-        croak "$field must be a scalar" if ref($args{$field});
+        croak "$field is required" unless defined $self->$field;
+        croak "$field must be a scalar" if ref($self->$field);
     }
-    croak "url is required" unless length $args{url};
-    croak "sha256 must be 64-char lowercase hex" unless $args{sha256} =~ $HEX64;
+    croak "url is required" unless length $self->url;
+    croak "sha256 must be 64-char lowercase hex" unless $self->sha256 =~ $HEX64;
     croak "size must be a non-negative integer"
-        unless $args{size} =~ /\A\d+\z/;
-    croak "type is required" unless length $args{type};
+        unless $self->size =~ /\A\d+\z/;
+    croak "type is required" unless length $self->type;
     croak "uploaded must be a non-negative integer"
-        unless $args{uploaded} =~ /\A\d+\z/;
-    _validate_nip94($args{nip94}) if exists $args{nip94};
+        unless $self->uploaded =~ /\A\d+\z/;
+    _validate_nip94($self->nip94) if exists $self->{nip94};
+    $self->extra({}) unless defined $self->extra;
     croak "extra must be a hash reference"
-        if defined $args{extra} && ref($args{extra}) ne 'HASH';
-    for my $field (sort keys %{$args{extra} || {}}) {
+        unless ref($self->extra) eq 'HASH';
+    for my $field (sort keys %{$self->extra}) {
         croak "extra must not contain standard descriptor field $field" if $STANDARD_FIELD{$field};
     }
 
-    $args{extra} = {} unless defined $args{extra};
-    return bless \%args, $class;
+    return;
 }
 
 sub from_hash {
@@ -190,5 +198,15 @@ Returns a standard descriptor field or an extension field from C<extra>.
 Returns a hash reference suitable for JSON encoding. Standard fields are
 included with numeric C<size> and C<uploaded> values, extension fields are
 preserved, and C<nip94> is included when present.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

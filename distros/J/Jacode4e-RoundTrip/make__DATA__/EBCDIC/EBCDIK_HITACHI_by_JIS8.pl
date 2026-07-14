@@ -2,7 +2,7 @@
 #
 # EBCDIK_HITACHI_by_JIS8.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # HiRDB Datareplicator Version 8 manuals, Hitachi, Ltd.

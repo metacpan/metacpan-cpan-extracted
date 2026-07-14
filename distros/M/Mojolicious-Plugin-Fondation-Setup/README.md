@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Setup - Setup wizard generator — scans plugins
 
 # VERSION
 
-version 0.02
+version 0.04
 
 # SYNOPSIS
 

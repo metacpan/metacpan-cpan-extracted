@@ -1,0 +1,28 @@
+# Avoid version control files
+\B\.git\b
+\B\.gitignore\b
+
+# Avoid temp and backup files
+~$
+\.tmp$
+\.bak$
+\#$
+\b\.#
+
+# Avoid Makemaker generated and utility files
+\bMakefile$
+\bMakefile\.old$
+\bblib/
+\bpm_to_blib\b
+\bblibdirs\b
+\bMYMETA\b
+
+# Avoid Module::Build generated and utility files
+\bBuild$
+\b_build/
+
+# Avoid temp test files in this project
+\btmp/
+
+# Avoid compiled distribution tarballs
+\.tar\.gz$

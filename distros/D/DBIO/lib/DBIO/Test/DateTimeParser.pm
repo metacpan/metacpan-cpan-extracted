@@ -28,7 +28,7 @@ DBIO::Test::DateTimeParser - Minimal datetime parser for DBIO offline test stora
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

@@ -1,5 +1,9 @@
 Revision history for LWP-UserAgent-Proxify
 
+0.005  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 0.004   Mar 18, 2008
         Required version change in Build.PL to install a patched version of another module
 

@@ -1,0 +1,55 @@
+package Google::Cloud::BigQuery::V2::Error;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+CiRnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvZXJyb3IucHJvdG8SGGdvb2dsZS5jbG91ZC5i
+aWdxdWVyeS52MiJ5CgpFcnJvclByb3RvEhYKBnJlYXNvbhgBIAEoCVIGcmVhc29uEhoKCGxv
+Y2F0aW9uGAIgASgJUghsb2NhdGlvbhIdCgpkZWJ1Z19pbmZvGAMgASgJUglkZWJ1Z0luZm8S
+GAoHbWVzc2FnZRgEIAEoCVIHbWVzc2FnZUJbChxjb20uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5
+LnYyWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5cGI7
+YmlncXVlcnlwYkrqCAoGEgQOACMBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29v
+Z2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAy
+LjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQg
+aW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5
+IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNl
+cy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBh
+Z3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBM
+aWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdB
+UlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3Ig
+aW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdv
+dmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNl
+LgoKCAoBAhIDEAAhCggKAQgSAxIAUgoJCgIICxIDEgBSCggKAQgSAxMANQoJCgIIARIDEwA1
+ChwKAgQAEgQWACMBGhAgRXJyb3IgZGV0YWlscy4KCgoKAwQAARIDFggSCjwKBAQAAgASAxgC
+FBovIEEgc2hvcnQgZXJyb3IgY29kZSB0aGF0IHN1bW1hcml6ZXMgdGhlIGVycm9yLgoKDAoF
+BAACAAUSAxgCCAoMCgUEAAIAARIDGAkPCgwKBQQAAgADEgMYEhMKPgoEBAACARIDGwIWGjEg
+U3BlY2lmaWVzIHdoZXJlIHRoZSBlcnJvciBvY2N1cnJlZCwgaWYgcHJlc2VudC4KCgwKBQQA
+AgEFEgMbAggKDAoFBAACAQESAxsJEQoMCgUEAAIBAxIDGxQVCmIKBAQAAgISAx8CGBpVIERl
+YnVnZ2luZyBpbmZvcm1hdGlvbi4gVGhpcyBwcm9wZXJ0eSBpcyBpbnRlcm5hbCB0byBHb29n
+bGUgYW5kIHNob3VsZCBub3QKIGJlIHVzZWQuCgoMCgUEAAICBRIDHwIICgwKBQQAAgIBEgMf
+CRMKDAoFBAACAgMSAx8WFwo5CgQEAAIDEgMiAhUaLCBBIGh1bWFuLXJlYWRhYmxlIGRlc2Ny
+aXB0aW9uIG9mIHRoZSBlcnJvci4KCgwKBQQAAgMFEgMiAggKDAoFBAACAwESAyIJEAoMCgUE
+AAIDAxIDIhMUYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::BigQuery::V2::Error::ErrorProto ===
+    # Fields for ErrorProto
+    # Field: reason Type: 9 ()
+    # Field: location Type: 9 ()
+    # Field: debug_info Type: 9 ()
+    # Field: message Type: 9 ()
+
+1;

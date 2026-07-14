@@ -35,7 +35,7 @@ DBIO::Test::Schema::TwoKeyTreeLike - Test result class for the twokeytreelike ta
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

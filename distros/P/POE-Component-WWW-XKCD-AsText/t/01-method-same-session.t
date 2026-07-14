@@ -43,7 +43,7 @@ sub ret {
                 "http://xkcd.com/1/",
                 '{uri} must be pointing to the right comic'
             );
-            my $VAR1 = "[[A boy sits in a barrel which is floating in an ocean.]]\n\nBoy: I wonder where I'll float next?\n\n[[The barrel drifts into the distance. Nothing else can be seen.]]\n\n{{Alt: Don't we all.}}";
+            my $VAR1 = "[[A boy sits in a barrel which is floating in an ocean.]]\r\n\r\nBoy: I wonder where I'll float next?\r\n\r\n[[The barrel drifts into the distance. Nothing else can be seen.]]\r\n\r\n{{Alt: Don't we all.}}";
             is(
                 $in->{text},
                 $VAR1,

@@ -8,7 +8,7 @@ die "Usage: perl read.pl <comic_ID>\n"
 
 my $ID = shift;
 
-use lib qw(../lib  lib);
+use lib '../lib';
 use POE qw(Component::WWW::XKCD::AsText);
 
 my $poco = POE::Component::WWW::XKCD::AsText->spawn;

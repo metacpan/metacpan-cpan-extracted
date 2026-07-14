@@ -24,7 +24,7 @@ use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -224,8 +224,12 @@ sub new {
       if none { $o eq $_ } @VALID_OPTIONS;
   }
 
-  my ( $default_options, $option_specs, $commands, $extra_options, $abbreviations, $error_handler, $alias, $validate_command )
-    = @args{qw(default_options option_specs commands extra_options abbreviations error_handler alias validate_command)};
+  my (
+    $default_options, $option_specs, $commands,         $extra_options, $abbreviations,
+    $error_handler,   $alias,        $validate_command, $help_sections
+    )
+    = @args{
+    qw(default_options option_specs commands extra_options abbreviations error_handler alias validate_command help_sections)};
 
   $validate_command //= $TRUE;
 
@@ -361,8 +365,14 @@ sub new {
 
   if ( !$self->can('get_help_sections') ) {
     $self->mk_accessors('help_sections');
-    $self->set_help_sections( [qw( SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE )] );
   }
+  else {
+    $help_sections //= $self->get_help_sections;
+  }
+
+  $help_sections //= [qw( SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE )];
+
+  $self->set_help_sections($help_sections);
 
   # AUTO_DEFAULT uses the only command as the default
   if ( $AUTO_DEFAULT && scalar keys %{$commands} == 1 ) {
@@ -893,7 +903,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.9.
+This documentation refers to version 2.0.14.
 
 =head1 FEATURES
 
@@ -1540,20 +1550,20 @@ L<Pod::Usage> when rendering help output:
 
   SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE
 
-You can override this by setting C<help_sections> on the object before
-or after construction:
+You can override this by passing an array of sections names during construction.
 
-  my $cli = MyApp->new( ... );
-  $cli->set_help_sections( [qw( SYNOPSIS OPTIONS )] );
+ my $cli = CLI::Simple->new( help_sections => [qw(SYNOPSIS COMMANDS OPTIONS)], ...);
 
-Or by overriding in C<init>:
+You must do this during construction or add C<help_sections> to your
+C<extra_options> and set the defaults for C<help_sections>:
 
-  sub init {
-    my ($self) = @_;
-    $self->set_help_sections( [qw( SYNOPSIS OPTIONS EXAMPLES )] );
-    return $self->SUPER::init;
-  }
-
+  my $cli = CLI::Simple->new(
+    commands        => $commands,
+    extra_options   => [ qw(help_sections) ],
+    default_options => { help_sections => [qw(SYNOPIS COMMANDS OPTIONS)] },
+    option_specs    => \@option_specs
+  );
+                        
 Section names follow L<Pod::Usage> conventions. Subsections are
 specified with a C</> separator, e.g. C<DESCRIPTION/Commands> renders
 only the C<Commands> subsection under C<=head1 DESCRIPTION>.

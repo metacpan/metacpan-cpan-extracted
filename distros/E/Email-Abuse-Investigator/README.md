@@ -5,7 +5,7 @@ hosted URLs, and suspicious domains
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -980,13 +980,44 @@ Two levels of caching are used:
     redundant WHOIS queries for infrastructure that appears in multiple
     messages in the same run (e.g. a sending ISP seen in 500 spam messages).
 
+# SECURITY
+
+## WHOIS query sanitization
+
+`_raw_whois()` strips all ASCII control characters (`\x00`-`\x1F` and
+`\x7F`) from `$query` before writing it to the socket.  This prevents
+WHOIS protocol injection: a maliciously crafted domain name containing
+embedded `\r\n` would otherwise smuggle a second WHOIS command into the
+same TCP connection.  If stripping leaves an empty string the method
+croaks immediately rather than sending a blank query.
+
+## RDAP IP validation
+
+`_rdap_lookup()` validates `$ip` before interpolating it into the ARIN
+RDAP URL path.  RFC 4007 IPv6 zone identifiers (`%eth0` suffixes on
+link-local addresses) are stripped first; the remaining value must match
+either a dotted-quad IPv4 address or a pure hex-colon IPv6 address.  A
+value that fails this check returns `{}` immediately without making any
+network call.
+
+## CLI path validation
+
+Both `bin/abuse_check` and `bin/submit_abuse_report` validate the
+`$ARGV[0]` file path before opening it.  They reject any path that
+contains NUL bytes or bare CR/LF characters, and independently reject
+paths containing directory-traversal sequences (`../`).  This makes the
+scripts safe to invoke under `perl -T` (taint mode) and prevents
+accidental or intentional access to files outside the intended directory.
+
 # IPV6 SUPPORT
 
 IPv6 addresses are extracted from `Received:` headers using bracketed
 notation (`[2001:db8::1]`).  They are tested against the private range
 list (which covers ::1, fe80::/10, fc00::/7, fd00::/8, and the
 documentation range 2001:db8::/32) and passed through `_whois_ip()` and
-`_rdap_lookup()` in the same way as IPv4 addresses.
+`_rdap_lookup()` in the same way as IPv4 addresses.  RFC 4007 zone
+identifiers (e.g. `%eth0`) are stripped by `_rdap_lookup()` before the
+address is placed in the RDAP URL.
 
 `_resolve_host()` attempts both A and AAAA lookups when `Net::DNS` is
 installed.  `_raw_whois()` uses `IO::Socket::IP` for dual-stack WHOIS
@@ -1277,10 +1308,14 @@ The following are optional but strongly recommended:
     header_value : Object × FieldName → Maybe FieldValue
     header_value(o, n) ≜ first { lc(h.name) = lc(n) } o._headers .value
 
+# AUTHOR
+
+Nigel Horne, `<njh@nigelhorne.com>`
+
 # LICENCE AND COPYRIGHT
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to GPL2 licence terms.
+Usage is subject to the GPL2 licence terms.
 If you use it,
 please let me know.

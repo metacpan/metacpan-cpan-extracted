@@ -47,10 +47,11 @@ your calls in eval to assure you do not get unexpected results.
 
 ## $YAML::Syck::MaxDepth
 
-Maximum nesting depth for `Dump`.  Defaults to 512.  If a data structure
-is nested deeper than this limit, `Dump` will `croak` instead of
-overflowing the C stack.  Increase this if you legitimately need to
-serialize very deeply nested structures.
+Maximum nesting depth for `Load` and `Dump`.  Defaults to 512.
+`Dump` will `croak` if a data structure exceeds this depth, and `Load`
+will `croak` if a YAML document is nested deeper than this limit.  This
+prevents stack exhaustion from maliciously crafted input.  Increase the
+value if you legitimately need very deeply nested structures.
 
 ## $YAML::Syck::Headless
 

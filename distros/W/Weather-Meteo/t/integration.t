@@ -79,7 +79,8 @@ my %config = (
 		. '"daily":{"time":["2022-12-25"],'
 		. '"weathercode":[3],"temperature_2m_max":[6.7],"temperature_2m_min":[3.9],'
 		. '"rain_sum":[0.0],"snowfall_sum":[0.0],"precipitation_hours":[0.0],'
-		. '"windspeed_10m_max":[12.5],"windgusts_10m_max":[25.3]}}';
+		. '"windspeed_10m_max":[12.5],"windgusts_10m_max":[25.3],'
+		. '"sunrise":["2022-12-25T08:09"],"sunset":["2022-12-25T15:57"]}}';
 	},
 
 	# Alternative response for a second date
@@ -89,7 +90,21 @@ my %config = (
 	         . '"weathercode":[2,2,1,1,1,1,1,1,1,1,2,2,3,3,2,1,1,1,1,1,2,2,1,1]},'
 	         . '"daily":{"time":["2023-06-15"],"temperature_2m_max":[28.0],"temperature_2m_min":[13.0],'
 	         . '"weathercode":[3],"rain_sum":[0.0],"snowfall_sum":[0.0],"precipitation_hours":[0.0],'
-	         . '"windspeed_10m_max":[10.2],"windgusts_10m_max":[18.5]}}',
+	         . '"windspeed_10m_max":[10.2],"windgusts_10m_max":[18.5],'
+	         . '"sunrise":["2023-06-15T04:43"],"sunset":["2023-06-15T21:22"]}}',
+
+	# Forecast response: hourly + daily with sunrise/sunset
+	forecast_json => '{"hourly":{"temperature_2m":[15,16,17],"rain":[0,0,0],'
+	              . '"snowfall":[0,0,0],"weathercode":[2,2,2]},'
+	              . '"daily":{"time":["2026-07-14"],'
+	              . '"sunrise":["2026-07-14T04:52"],"sunset":["2026-07-14T21:18"],'
+	              . '"weathercode":[2],"temperature_2m_max":[22.5],"temperature_2m_min":[14.2],'
+	              . '"rain_sum":[0.0],"snowfall_sum":[0.0],"precipitation_hours":[0.0],'
+	              . '"windspeed_10m_max":[15.3],"windgusts_10m_max":[28.7]}}',
+
+	# Minimal daily-only response for sunrise_sunset()
+	sunrise_json  => '{"daily":{"time":["2022-12-25"],'
+	              . '"sunrise":["2022-12-25T08:09"],"sunset":["2022-12-25T15:57"]}}',
 
 	# Cache key for the primary coordinates and date with default timezone
 	cache_key => "weather:${LAT}:${LON}:${DATE}:Europe/London",
@@ -134,8 +149,10 @@ subtest 'module loads and new_ok works' => sub {
 	isa_ok($meteo, 'Weather::Meteo', 'new() returns a Weather::Meteo');
 
 	# The public interface must be present
-	ok($meteo->can('weather'), 'weather() method present');
-	ok($meteo->can('ua'),      'ua() method present');
+	ok($meteo->can('weather'),        'weather() method present');
+	ok($meteo->can('forecast'),       'forecast() method present');
+	ok($meteo->can('sunrise_sunset'), 'sunrise_sunset() method present');
+	ok($meteo->can('ua'),             'ua() method present');
 
 	diag('module load ok') if $ENV{TEST_VERBOSE};
 };
@@ -217,6 +234,8 @@ subtest 'weather() builds URL with all required query parameters' => sub {
 	like($url, qr/precipitation_unit=$PRECIP_UNIT/, 'URL uses inch precip units');
 	like($url, qr/hourly=/,                  'URL requests hourly data');
 	like($url, qr/daily=/,                   'URL requests daily data');
+	like($url, qr/sunrise/,                  'URL requests sunrise in daily data');
+	like($url, qr/sunset/,                   'URL requests sunset in daily data');
 	like($url, qr/\Q$DEFAULT_HOST\E/,        'URL targets default host');
 
 	restore_all();
@@ -401,6 +420,13 @@ subtest 'rate limiting: Time::HiRes::sleep called between rapid requests' => sub
 	my $ua = TestUA->new();
 	local $TestUA::PAYLOAD = $config{full_json};
 
+	# Suppress the inevitable "Prototype mismatch" warnings that Perl emits
+	# when Test::Mockingbird installs and later restores its wrapper over the
+	# prototyped XSUB Time::HiRes::sleep.  The spy itself works correctly.
+	local $SIG{__WARN__} = sub {
+		warn @_ unless $_[0] =~ /Prototype mismatch.*Time::HiRes::sleep/;
+	};
+
 	# Spy on sleep -- the real sleep runs (0.01 s max); we just observe calls
 	my $sleep_spy = spy 'Time::HiRes::sleep';
 
@@ -432,6 +458,10 @@ subtest 'rate limiting: Time::HiRes::sleep called between rapid requests' => sub
 subtest 'no sleep when min_interval=0 (default)' => sub {
 	my $ua = TestUA->new();
 	local $TestUA::PAYLOAD = $config{full_json};
+
+	local $SIG{__WARN__} = sub {
+		warn @_ unless $_[0] =~ /Prototype mismatch.*Time::HiRes::sleep/;
+	};
 
 	my $sleep_spy = spy 'Time::HiRes::sleep';
 
@@ -675,6 +705,91 @@ subtest 'custom CHI cache: data stored and retrieved correctly' => sub {
 
 	restore_all();
 	diag('CHI cache round-trip ok') if $ENV{TEST_VERBOSE};
+};
+
+# ===========================================================================
+# 19. forecast() end-to-end workflow
+# ===========================================================================
+
+# Purpose: forecast() returns a correct structure and targets the forecast host.
+subtest 'forecast() end-to-end: returns hourly + daily with sunrise/sunset' => sub {
+	my $ua  = TestUA->new();
+	my $spy = spy 'TestUA::get';
+	local $TestUA::PAYLOAD = $config{forecast_json};
+
+	my $meteo  = Weather::Meteo->new(ua => $ua, cache => _fresh_cache());
+	my $result = $meteo->forecast({ latitude => $LAT, longitude => $LON, days => 3 });
+
+	ok(defined($result),            'forecast() returns a defined value');
+	ok(exists($result->{'hourly'}), 'result has hourly key');
+	ok(exists($result->{'daily'}),  'result has daily key');
+
+	# Verify sunrise and sunset are present in the daily section
+	my $daily = $result->{'daily'};
+	ok(exists($daily->{'sunrise'}), 'daily contains sunrise');
+	ok(exists($daily->{'sunset'}),  'daily contains sunset');
+
+	# Confirm the request went to the forecast host
+	my @calls = $spy->();
+	cmp_ok(scalar(@calls), '==', 1, 'exactly one UA call made');
+	my $url = $calls[0][2];
+	like($url, qr/api\.open-meteo\.com/,  'URL targets forecast host');
+	like($url, qr|/v1/forecast|,          'URL uses /v1/forecast path');
+	like($url, qr/forecast_days=3/,       'URL contains requested days count');
+
+	restore_all();
+	diag('forecast workflow ok') if $ENV{TEST_VERBOSE};
+};
+
+# ===========================================================================
+# 20. sunrise_sunset() end-to-end workflow
+# ===========================================================================
+
+# Purpose: sunrise_sunset() returns exactly { sunrise, sunset } and uses the
+# archive endpoint for a historical date.
+subtest 'sunrise_sunset() end-to-end: historical date returns { sunrise, sunset }' => sub {
+	my $ua  = TestUA->new();
+	my $spy = spy 'TestUA::get';
+	local $TestUA::PAYLOAD = $config{sunrise_json};
+
+	my $meteo  = Weather::Meteo->new(ua => $ua, cache => _fresh_cache());
+	my $result = $meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+
+	ok(defined($result),             'sunrise_sunset() returns a defined value');
+	ok(ref($result) eq 'HASH',       'result is a hashref');
+	ok(exists($result->{'sunrise'}), 'result has sunrise key');
+	ok(exists($result->{'sunset'}),  'result has sunset key');
+
+	# Only sunrise and sunset -- no hourly or other daily fields
+	ok(!exists($result->{'hourly'}), 'result does not include hourly');
+	ok(!exists($result->{'daily'}),  'result does not expose raw daily');
+
+	# Confirm the archive endpoint was called
+	my @calls = $spy->();
+	cmp_ok(scalar(@calls), '==', 1, 'exactly one UA call made');
+	my $url = $calls[0][2];
+	like($url, qr/archive-api\.open-meteo\.com/, 'historical date uses archive host');
+	like($url, qr/start_date=\Q$DATE\E/,         'URL contains correct date');
+
+	restore_all();
+	diag('sunrise_sunset workflow ok') if $ENV{TEST_VERBOSE};
+};
+
+# Purpose: a second sunrise_sunset() call for the same args must use the cache.
+subtest 'sunrise_sunset() caches result and skips UA on repeat call' => sub {
+	my $ua  = TestUA->new();
+	my $spy = spy 'TestUA::get';
+	local $TestUA::PAYLOAD = $config{sunrise_json};
+
+	my $meteo = Weather::Meteo->new(ua => $ua, cache => _fresh_cache());
+	my $r1    = $meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+	my $r2    = $meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+
+	is_deeply($r2, $r1, 'cached result equals first result');
+	cmp_ok(scalar($spy->()), '==', 1, 'UA called only once');
+
+	restore_all();
+	diag('sunrise_sunset cache ok') if $ENV{TEST_VERBOSE};
 };
 
 done_testing();

@@ -3,7 +3,7 @@ package LWP::UserAgent::ProxyHopper::Base;
 use warnings;
 use strict;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Carp;
 use Devel::TakeHashArgs;
@@ -11,7 +11,7 @@ use List::MoreUtils 'uniq';
 use WWW::FreeProxyListsCom;
 use WWW::Proxy4FreeCom;
 use base 'Class::Data::Accessor';
-__PACKAGE__->mk_classaccessors qw(
+__PACKAGE__->mk_classaccessors(qw(
     proxify_list
     proxify_bad_list
     proxify_real_bad_list
@@ -23,7 +23,7 @@ __PACKAGE__->mk_classaccessors qw(
     _proxify_last_load_args
     _proxify_freeproxylists_obj
     _proxify_proxy4free_obj
-);
+));
 
 sub proxify_load {
     my $self = shift;

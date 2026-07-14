@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Test::Needs;
 use MIME::Base64	  qw( encode_base64 );
 use MIME::QuotedPrint qw( encode_qp );
 use POSIX			 qw( strftime );
@@ -1933,6 +1934,111 @@ subtest 'form_contacts -- empty object returns empty list' => sub {
 	my @forms = $a->form_contacts();
 	is scalar @forms, 0, 'empty state: no form contacts';
 	restore_net();
+};
+
+# =============================================================================
+# 38. _raw_whois -- CONTROL CHARACTER INJECTION GUARD
+# =============================================================================
+# The :Protected _raw_whois method strips all C0/C1 control characters from
+# its $query argument before sending it to the WHOIS socket.  These tests
+# verify the guard at the method boundary rather than over a live connection.
+
+subtest '_raw_whois -- query of only control characters croaks immediately' => sub {
+	# Strategy: a query that is entirely control characters becomes empty
+	# after stripping.  The guard must croak before any socket is opened,
+	# so this test completes instantly even without a network connection.
+	my $a = Email::Abuse::Investigator->new(timeout => 1);
+	throws_ok { $a->_raw_whois("\x00\r\n\x01\x1F\x7F", 'localhost') }
+		qr/empty query after stripping control characters/i,
+		'all-control-character query croaks before any connection attempt';
+};
+
+subtest '_raw_whois -- mixed query strips controls and proceeds gracefully' => sub {
+	# Strategy: embed NUL and CRLF in an otherwise valid hostname.
+	# After stripping the query becomes "example.com", which is valid.
+	# The connection to 'localhost' will fail in CI (no WHOIS server there)
+	# but the guard must NOT croak; only a clean connection failure returns undef.
+	my $a = Email::Abuse::Investigator->new(timeout => 1);
+	my $result;
+	lives_ok { $result = $a->_raw_whois("exam\x00ple.com\r\n", 'localhost') }
+		'embedded NUL/CRLF in query does not croak (control chars stripped)';
+	ok !defined($result) || length($result) > 0,
+		'returns undef (connection refused) or a real response -- never croaks';
+};
+
+subtest '_raw_whois -- lone DEL (0x7F) stripped from query' => sub {
+	# DEL is the C1 boundary and must also be stripped.
+	my $a = Email::Abuse::Investigator->new(timeout => 1);
+	lives_ok { $a->_raw_whois("test\x7Fdomain.example", 'localhost') }
+		'DEL character in query does not croak';
+};
+
+# =============================================================================
+# 39. _rdap_lookup -- IP FORMAT VALIDATION
+# =============================================================================
+# _rdap_lookup() validates $ip before placing it in the RDAP URL path and
+# strips RFC 4007 IPv6 zone identifiers.  These tests exercise the validation
+# layer without requiring a live RDAP endpoint.
+
+{
+	# Minimal fake UA and response objects: avoid requiring Test::MockObject.
+	package t::FakeUA;
+	sub new     { bless {}, shift }
+	sub get     { bless {}, 't::FakeResponse' }
+	package t::FakeResponse;
+	sub is_success { 0 }
+}
+
+subtest '_rdap_lookup -- slash in IP returns {} without network call' => sub {
+	# A path-traversal attempt like '1.2.3.4/../../other' must be caught by
+	# the format check (\A\d{1,3}(?:\.\d{1,3}){3}\z fails) and return {}
+	# immediately.  We install a fake UA so any accidental network call would
+	# produce a visible failure rather than blocking in CI.
+	my $a = Email::Abuse::Investigator->new(timeout => 1);
+	$a->{ua} = t::FakeUA->new();
+	my $r;
+	lives_ok { $r = $a->_rdap_lookup('1.2.3.4/../../other') }
+		'_rdap_lookup does not croak on slash-containing IP';
+	is_deeply $r, {}, 'slash in IP returns empty hashref';
+};
+
+subtest '_rdap_lookup -- non-IP string returns {}' => sub {
+	my $a = Email::Abuse::Investigator->new(timeout => 1);
+	$a->{ua} = t::FakeUA->new();
+	my $r;
+	lives_ok { $r = $a->_rdap_lookup('not-an-ip') }
+		'_rdap_lookup does not croak on non-IP string';
+	is_deeply $r, {}, 'non-IP string returns empty hashref';
+};
+
+subtest '_rdap_lookup -- IPv6 zone ID stripped; valid IPv6 proceeds to RDAP call' => sub {
+	# fe80::1%eth0 has a zone ID.  After stripping %eth0 the remainder
+	# fe80::1 matches [0-9a-fA-F:]+ so the method must reach the RDAP call
+	# (and return {} because the fake UA returns a 500).  If the zone ID
+	# were NOT stripped the format check would reject the value immediately;
+	# we can distinguish the two outcomes by checking that the fake UA was
+	# called (LWP required) vs returning {} due to validation failure.
+	Test::Needs->import('LWP::UserAgent');
+
+	my $a = Email::Abuse::Investigator->new(timeout => 1);
+
+	# Use an object attribute to record calls: named subs in package blocks
+	# close over lexicals from compile time, not the runtime invocation of
+	# the enclosing subtest, so a shared-lexical spy counter does not work.
+	{
+		package t::SpyUA;
+		sub new     { bless { called => 0 }, shift }
+		sub get     { $_[0]->{called} = 1; bless {}, 't::FakeResponse' }
+		sub called  { $_[0]->{called} }
+	}
+	my $spy_ua = t::SpyUA->new();
+	$a->{ua} = $spy_ua;
+
+	my $r;
+	lives_ok { $r = $a->_rdap_lookup('fe80::1%eth0') }
+		'_rdap_lookup does not croak on zone-ID IPv6';
+	is_deeply $r, {}, 'returns {} when RDAP endpoint returns failure';
+	ok $spy_ua->called(), 'UA was called -- zone ID was stripped and IPv6 passed validation';
 };
 
 done_testing();

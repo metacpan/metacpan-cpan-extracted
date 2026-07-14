@@ -1,6 +1,6 @@
 package XTaTIK;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Mojo::Base 'Mojolicious';
 
@@ -43,8 +43,6 @@ sub startup {
             catdir $ENV{XTATIK_COMPANY}, 'public', 'sass';
 
         lib->import( catdir $ENV{XTATIK_COMPANY}, 'lib' );
-
-        blasdsdasdsa->import;
     }
 
     unshift @sass_path,
@@ -93,7 +91,7 @@ sub startup {
     $self->plugin('AntiSpamMailTo');
     $self->plugin('FormChecker' => error_class => 'foo');
     $self->plugin('IP2Location');
-    $self->plugin('bootstrap3');
+    $self->_setup_bootstrap_assets;
 
     $self->asset(
         'app.css' => qw{
@@ -256,6 +254,41 @@ sub startup {
         $ru->post('/hot-products')->to('user#hot_products_post');
         $ru->get('/quotes')->to('user#quotes_handler');
     }
+}
+
+# Registers the "bootstrap.css" and "bootstrap.js" AssetPack assets that our
+# templates load via `%= asset "bootstrap.css"` / `%= asset "bootstrap.js"`.
+#
+# This used to be provided by Mojolicious::Plugin::Bootstrap3, which bundled
+# Bootstrap 3's Sass sources, JavaScript, and jQuery and registered these two
+# assets. That plugin is no longer available on CPAN, so we ship the same
+# Bootstrap 3.3.5 sources under lib/XTaTIK/public/ and register the assets
+# ourselves, faithfully mirroring what the plugin's register() did.
+sub _setup_bootstrap_assets {
+    my $self = shift;
+
+    # The plugin loaded AssetPack itself (unless already loaded); do the same,
+    # since our own $self->asset(...) calls below rely on it.
+    $self->plugin('AssetPack') unless eval { $self->asset; 1 };
+
+    # Make our bundled Bootstrap Sass partials (lib/XTaTIK/public/sass/bootstrap/*)
+    # resolvable via @import "bootstrap/..." in our bootstrap.scss.
+    my $sass_dir = catdir dirname(__FILE__), qw/XTaTIK public sass/;
+    $ENV{SASS_PATH} = length($ENV{SASS_PATH}//'')
+        ? "$ENV{SASS_PATH}:$sass_dir" : $sass_dir;
+
+    # Same asset topics and JavaScript file list the plugin registered by default
+    # (jQuery first, then the individual Bootstrap components).
+    $self->asset('bootstrap.css' => '/sass/bootstrap.scss');
+    $self->asset(
+        'bootstrap.js' =>
+            '/JS/jquery-1.11.0.min.js',
+            map "/JS/bootstrap/$_", qw/
+                transition.js alert.js    button.js   carousel.js
+                collapse.js    dropdown.js modal.js    tooltip.js
+                popover.js     scrollspy.js tab.js     affix.js
+            /,
+    );
 }
 
 #### HELPERS

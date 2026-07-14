@@ -1,27 +1,33 @@
 {
-   "abstract" : "base class for LWP::UserAgent based modules which want to proxy-hop their requests",
+   "abstract" : "unknown",
    "author" : [
-      "Zoffix Znet <zoffix@cpan.org>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LWP-UserAgent-ProxyHopper-Base",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -30,22 +36,13 @@
             "Class::Data::Accessor" : "0.04001",
             "Devel::TakeHashArgs" : "0.001",
             "List::MoreUtils" : "0.21",
+            "Test::More" : "0",
             "WWW::FreeProxyListsCom" : "0.002",
             "WWW::Proxy4FreeCom" : "0.001"
          }
       }
    },
-   "provides" : {
-      "LWP::UserAgent::ProxyHopper::Base" : {
-         "file" : "lib/LWP/UserAgent/ProxyHopper/Base.pm",
-         "version" : "0.003"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
-   },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

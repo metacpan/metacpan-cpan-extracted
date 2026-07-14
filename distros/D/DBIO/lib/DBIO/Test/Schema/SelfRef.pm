@@ -35,7 +35,7 @@ DBIO::Test::Schema::SelfRef - Test result class for the self_ref table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

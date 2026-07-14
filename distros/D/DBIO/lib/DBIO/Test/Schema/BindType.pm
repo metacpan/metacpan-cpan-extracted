@@ -47,7 +47,7 @@ DBIO::Test::Schema::BindType - Test result class for the bindtype_test table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

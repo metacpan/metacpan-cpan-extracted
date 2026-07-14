@@ -26,10 +26,43 @@
                    data-deps="<%= join ',', @$deps %>">
             <div class="flex-grow-1">
               <strong><%= $p->{module_class} %></strong>
-              % if ($installed) {
+              % if ($p->{is_dev}) {
+                <span class="badge bg-info ms-2"><%= l('Dev') %></span>
                 <span class="badge bg-success ms-2"><%= l('Installed') %></span>
+                % if ($p->{installed_version}) {
+                  <span class="badge bg-light text-dark ms-1">v<%= $p->{installed_version} %></span>
+                % }
+                % if ($p->{cpan_version}) {
+                  <span class="badge bg-light text-dark ms-1">CPAN v<%= $p->{cpan_version} %></span>
+                % }
+                % if ($p->{upgrade_available}) {
+                  <span class="badge bg-warning text-dark ms-1">Update</span>
+                % }
+                % if ($p->{release_pending}) {
+                  <span class="badge bg-danger ms-1">Release</span>
+                % }
               % } else {
-                <span class="badge bg-warning text-dark ms-2"><%= l('Not installed') %></span>
+                <span class="badge bg-secondary ms-2"><%= l('CPAN') %></span>
+                % if ($installed) {
+                  <span class="badge bg-success ms-2"><%= l('Installed') %></span>
+                  % if ($p->{installed_version}) {
+                    <span class="badge bg-light text-dark ms-1">v<%= $p->{installed_version} %></span>
+                  % }
+                  % if ($p->{cpan_version}) {
+                    <span class="badge bg-light text-dark ms-1">CPAN v<%= $p->{cpan_version} %></span>
+                  % }
+                  % if ($p->{upgrade_available}) {
+                    <span class="badge bg-warning text-dark ms-1">Update</span>
+                  % }
+                  % if ($p->{release_pending}) {
+                    <span class="badge bg-danger ms-1">Release</span>
+                  % }
+                % } else {
+                  <span class="badge bg-warning text-dark ms-2"><%= l('Not installed') %></span>
+                  % if ($p->{version}) {
+                    <span class="badge bg-light text-dark ms-1">v<%= $p->{version} %></span>
+                  % }
+                % }
               % }
               % if (@$deps) {
                 <span class="badge bg-info ms-1" title="<%= l('Depends on:') . ' ' . join(', ', @$deps) %>">
@@ -37,7 +70,6 @@
                 </span>
               % }
               <br><small class="text-muted"><%= $p->{abstract} %></small>
-              <br><small>v<%= $p->{version} %> — <%= $p->{author} %> — <%= $p->{date} %></small>
               % if (@$deps) {
                 <br><small class="text-muted">
                   <i class="bi bi-diagram-2"></i>
@@ -104,16 +136,26 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         });
       } else {
-        // When unchecking, also uncheck any of its deps that are ONLY needed by this plugin
-        getDeps(cb).forEach(function(dep) {
-          var depEl = allModules[dep];
-          if (depEl && depEl.checked) {
-            var others = allDependants(dep).filter(function(d) { return d !== cb.value; });
-            if (others.length === 0) {
+        // Cascade-uncheck orphaned transitive dependencies.
+        // When a plugin is unchecked, walk its dependency tree and uncheck
+        // any dep that is no longer required by another checked plugin.
+        var cascade = [cb.value];
+        while (cascade.length > 0) {
+          var val = cascade.shift();
+          var el = allModules[val];
+          if (!el) continue;
+          getDeps(el).forEach(function(dep) {
+            var depEl = allModules[dep];
+            if (!depEl || !depEl.checked) return;
+            var stillNeeded = allDependants(dep).some(function(d) {
+              return d !== val && allModules[d] && allModules[d].checked;
+            });
+            if (!stillNeeded) {
               depEl.checked = false;
+              cascade.push(dep);
             }
-          }
-        });
+          });
+        }
       }
       // Re-evaluate dependency locks
       updateDependencyLocks();

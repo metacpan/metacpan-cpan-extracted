@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Action::Controllers;
-$Mojolicious::Plugin::Fondation::Action::Controllers::VERSION = '0.04';
+$Mojolicious::Plugin::Fondation::Action::Controllers::VERSION = '0.05';
 # ABSTRACT: Auto-discovers controller classes under a plugin namespace
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Action::Base', -signatures;
@@ -58,7 +58,7 @@ Mojolicious::Plugin::Fondation::Action::Controllers - Auto-discovers controller 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

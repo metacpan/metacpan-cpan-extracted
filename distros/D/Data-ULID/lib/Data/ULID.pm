@@ -3,7 +3,7 @@ package Data::ULID;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw/ulid binary_ulid ulid_date ulid_to_uuid uuid_to_ulid/;
@@ -14,7 +14,15 @@ use Time::HiRes qw/time/;
 use Bytes::Random::Secure::Tiny;
 my $rng = Bytes::Random::Secure::Tiny->new;
 
-use constant HAS_DATETIME => eval { require DateTime; 1 };
+my $datetime_status;
+sub HAS_DATETIME
+{
+    if (!defined $datetime_status) {
+        $datetime_status = eval { require DateTime; 1 };
+    }
+
+    return $datetime_status;
+}
 
 BEGIN {
     use Config;

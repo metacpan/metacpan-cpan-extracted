@@ -346,7 +346,7 @@ DBIO::Candy - Sugar syntax for defining DBIO result classes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

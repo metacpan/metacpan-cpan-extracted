@@ -1,9 +1,8 @@
 package Mojolicious::Plugin::Fondation::Layout::Bootstrap;
+$Mojolicious::Plugin::Fondation::Layout::Bootstrap::VERSION = '0.04';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 # ABSTRACT: Simple layout plugin for Fondation
-
-our $VERSION = '0.01';
 
 sub fondation_meta {
     return {
@@ -30,7 +29,7 @@ Mojolicious::Plugin::Fondation::Layout::Bootstrap - Simple layout plugin for Fon
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

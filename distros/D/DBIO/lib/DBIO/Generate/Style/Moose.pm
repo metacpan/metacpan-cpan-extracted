@@ -112,7 +112,7 @@ DBIO::Generate::Style::Moose - Moose-style emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 METHODS
 

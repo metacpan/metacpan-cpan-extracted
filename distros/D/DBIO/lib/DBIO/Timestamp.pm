@@ -103,7 +103,7 @@ DBIO::Timestamp - Automatically set and update timestamp columns
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

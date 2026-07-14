@@ -1,5 +1,44 @@
 Revision history for DBIO
 
+0.900002  2026-07-13
+
+    * Tests
+        - Four tests shipped in 0.900001 depended on things that don't hold on
+          a fresh CPAN Testers smoker: a hardcoded developer-machine path, and
+          optional modules (Moose, Moo, SQL::Translator) pulled in either
+          directly or via a no-arg load_classes() namespace sweep, none of it
+          guarded for portability. No lib/ runtime behaviour was affected.
+        - t/serialize/01-inflatecolumn.t: the YAML-safety subtest's
+          _read_source() looked up %INC with package-form keys (Foo::Bar),
+          which never match -- %INC is always keyed in path form -- so it
+          silently fell back to a hardcoded absolute path that only existed on
+          one machine. Fixed the key conversion; the now-unneeded fallback path
+          was dropped.
+        - t/102load_classes.t: a no-arg load_classes() sweep of
+          DBIO::Test::Schema::* incidentally pulled in four standalone OO-demo
+          schemas (Moose/MooseSugar/Moo/MooCake) that hard-require optional
+          Moose/Moo and died fatally -- instead of skipping gracefully -- when
+          those are absent. The four schemas moved out to
+          DBIO::Test::{Moose,MooseSugar,Moo,MooCake}Schema, siblings of
+          DBIO::Test::Schema rather than members of the swept namespace, and
+          the test now loads only the deliberately-broken fixture class it
+          actually means to exercise. dbio-sqlite's consuming tests
+          (t/moose-moose.t, t/moose-sugar.t, t/moo-cake.t) followed the rename.
+        - t/cake_comprehensive.t: an unguarded require
+          SQL::Translator::Schema::Table for the legacy SQLT deploy-hook path
+          -- SQL::Translator was never declared as a dependency at all.
+          Wrapped in SKIP; added as a test-only cpanfile recommends.
+        - t/deployment_handler.t: use DBIO::Test::Schema::Moo (now
+          DBIO::Test::MooSchema) was missing the BEGIN-time Moo guard used
+          everywhere else in the suite.
+
+    * Documentation
+        - DBIO::Manual::Heritage: the OO-framework demo schemas are now listed
+          under their new sibling names (DBIO::Test::{Moo,Moose,MooCake,
+          MooseSugar}Schema) with a note on why they sit beside, rather than
+          under, DBIO::Test::Schema -- a no-arg load_classes() sweep of that
+          namespace must not drag in the optional Moose/Moo dependency.
+
 0.900001  2026-07-12
     * Breaking Changes
         - Removed DBIO::Schema::Versioned entirely (no deprecated stub, no

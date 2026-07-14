@@ -1,0 +1,18 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/POE/Component/IRC/Plugin/BasePoCoWrap.pm',
+    'lib/POE/Component/IRC/Plugin/BaseWrap.pm',
+    't/00-basepocowrap-load.t',
+    't/00-basewrap-load.t',
+    't/00-compile.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

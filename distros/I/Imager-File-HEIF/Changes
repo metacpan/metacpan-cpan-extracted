@@ -1,3 +1,17 @@
+Imager-File-HEIF 0.007 - 13 Jun 2026
+======================
+
+ - require Imager 1.033 for the EXIF parser fix.
+   CVE-2026-14454
+
+ - use the ..._NAME() API initializer for better error reporting
+
+ - don't test avc compression when testing a non-HEVC compression type
+   write and read since libheif 1.22 and 1.23 don't read the test file
+   they write
+   https://github.com/tonycoz/imager-file-heif/issues/7
+   https://github.com/strukturag/libheif/issues/1866
+
 Imager-File-HEIF 0.006 - 30 Apr 2026
 ======================
 

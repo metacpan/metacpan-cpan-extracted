@@ -15,10 +15,11 @@ WriteMakefile(
         'strictures' => '2',
     },
     PREREQ_PM        => {
-        'DBD::Pg'              => '0',
+        'Class::Tiny'          => '1.001',
+        'DBD::Pg'              => '2.12.0',
         'DBI'                  => '0',
-        'Net::Blossom'         => '0.001000',
-        'Net::Blossom::Server' => '0.001000',
+        'Net::Blossom'         => '0.001001',
+        'Net::Blossom::Server' => '0.001002',
         'strictures'           => '2',
     },
     test             => {

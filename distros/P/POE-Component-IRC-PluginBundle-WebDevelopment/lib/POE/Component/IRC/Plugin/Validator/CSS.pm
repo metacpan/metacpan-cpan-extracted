@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::Validator::CSS;
 use warnings;
 use strict;
 
-our $VERSION = '2.001003'; # VERSION
+our $VERSION = '2.001004'; # VERSION
 
 use Carp;
 use POE qw(Component::WebService::Validator::CSS::W3C);

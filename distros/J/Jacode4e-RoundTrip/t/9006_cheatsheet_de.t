@@ -2,7 +2,7 @@
 #
 # 9006_cheatsheet_de.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip Kurzreferenz (Deutsch)
 # Dieser Test dient gleichzeitig als Kurzreferenz für deutschsprachige Nutzer.

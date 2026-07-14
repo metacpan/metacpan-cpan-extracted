@@ -226,9 +226,9 @@ sub new {
     $self->{retries}    //= RETRIES;
     $self->{delay}      //= DELAY;
     $self->{_is_locked} = 0;
-    croak("Incorrect pid attribute") unless $self->{pid} =~ /^[0-9]{1,11}$/;
-    croak("Incorrect retries attribute") unless $self->{retries} =~ /^[0-9]{1,5}$/;
-    croak("Incorrect delay attribute") unless $self->{delay} =~ /^[0-9]{1,5}$/;
+    croak("Incorrect \"pid\" attribute: " . $self->{pid}) unless $self->{pid} =~ /^[0-9]{1,11}$/;
+    croak("Incorrect \"retries\" attribute: " . $self->{retries}) unless $self->{retries} =~ /^[0-9]{1,5}$/;
+    croak("Incorrect \"delay\" attribute: " . $self->{delay}) unless $self->{delay} =~ /^[0-9]{1,5}$/;
 
     # Lock file
     return $self->lock if $self->{auto};
@@ -261,7 +261,7 @@ sub error {
 sub lock {
     my $self = shift;
     if ($self->_is_locked) {
-        $self->_debug(sprintf("File %s already locked", $self->file));
+        $self->_debug(sprintf("File \"%s\" already locked", $self->file));
         return $self;
     }
 
@@ -293,7 +293,7 @@ sub lock {
         }
 
     } else {
-        $self->error(sprintf("Could not write to %s: $!", $tmp_file))->_debug($self->error);
+        $self->error(sprintf("Could not write to \"%s\": $!", $tmp_file))->_debug($self->error);
     }
 
     # Remove temp file in silent mode
@@ -311,7 +311,7 @@ sub check {
         chomp(my $line = <$fh>);
         close $fh;
         $self->own(($line || 0) * 1) if $line =~ /^\d+$/;
-        $self->_debug(sprintf("Found owner PID=%d in %s", $self->own, $self->file));
+        $self->_debug(sprintf("Found owner PID=%d in \"%s\"", $self->own, $self->file));
 
         # Check PID and owner PID
         if ($self->own == $self->pid) {
@@ -334,13 +334,13 @@ sub check {
             }
 
             # Try unlink the lock file
-            $self->error(sprintf("Could not unlink %s: $!", $self->file))->_debug($self->error)
+            $self->error(sprintf("Could not unlink \"%s\": $!", $self->file))->_debug($self->error)
                 unless unlink $self->file;
             $self->own(0) unless -f $self->file; # Reset owner PID to 0
             $self->_debug("Found and removed stale lock file");
         }
     } else {
-        $self->error(sprintf("Could not read %s: $!", $self->file))->_debug($self->error);
+        $self->error(sprintf("Could not read \"%s\": $!", $self->file))->_debug($self->error);
     }
 
     return 0;
@@ -350,7 +350,7 @@ sub unlock {
 
     # Remove lock file
     if ($self->_is_locked) {
-        $self->error(sprintf("Could not unlink %s: $!", $self->file))->_debug($self->error)
+        $self->error(sprintf("Could not unlink \"%s\": $!", $self->file))->_debug($self->error)
             unless unlink $self->file;
         $self->own(0) unless -f $self->file; # Reset owner PID to 0
     } else {

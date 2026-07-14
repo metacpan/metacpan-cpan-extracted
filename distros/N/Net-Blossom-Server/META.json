@@ -38,9 +38,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Tiny" : "0",
+            "Class::Tiny" : "1.001",
             "JSON" : "0",
-            "Net::Blossom" : "0.001000",
+            "Net::Blossom" : "0.001001",
             "Net::Nostr::Core" : "0",
             "URI" : "0",
             "perl" : "5.016",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/NicholasBHubbard/Net-Blossom"
       }
    },
-   "version" : "0.001000",
+   "version" : "0.001002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

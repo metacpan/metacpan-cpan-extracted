@@ -1,5 +1,9 @@
 Revision history for Spreadsheet-DataToExcel
 
+0.0105  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 0.0104  2013-10-30
         - Minor changes to comply with specs and Kwalitee game
         - Got rid of the "Use of qw(...) as parentheses is deprecated"

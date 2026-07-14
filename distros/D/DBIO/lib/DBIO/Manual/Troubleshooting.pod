@@ -13,7 +13,7 @@ DBIO::Manual::Troubleshooting - Troubleshooting common DBIO problems
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head2 "Can't locate storage blabla"
 

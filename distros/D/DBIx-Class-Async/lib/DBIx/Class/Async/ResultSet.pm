@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.4');
+our $VERSION   = qv('v1.0.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::ResultSet - Non-blocking resultset proxy with Future-based e
 
 =head1 VERSION
 
-Version v1.0.4
+Version v1.0.5
 
 =head1 SYNOPSIS
 
@@ -2568,7 +2568,7 @@ sub search {
     my $new_cond;
 
     if (!defined $cond) {
-        # No new condition — preserve existing as-is
+        # No new condition - preserve existing as-is
         $new_cond = $existing;
     }
     elsif (ref $cond eq 'SCALAR') {
@@ -2583,19 +2583,19 @@ sub search {
         $new_cond = _merge_cond($existing, $cond);
     }
     elsif (ref $cond) {
-        # Blessed object or unrecognised ref type — warn and treat as no-op
+        # Blessed object or unrecognised ref type - warn and treat as no-op
         carp(
             "search() received unrecognised condition type: "
             . ref($cond)
-            . " — ignoring"
+            . " - ignoring"
         );
         $new_cond = $existing;
     }
     else {
-        # Plain scalar — not valid as a DBIx::Class condition
+        # Plain scalar - not valid as a DBIx::Class condition
         croak(
             "search() received a plain scalar as condition: '$cond' "
-            . "— did you mean \\\"$cond\" for literal SQL?"
+            . "- did you mean \\\"$cond\" for literal SQL?"
         );
     }
 

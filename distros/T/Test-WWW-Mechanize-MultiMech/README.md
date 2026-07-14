@@ -68,14 +68,14 @@ Test::WWW::Mechanize::MultiMech - coordinate multi-object mech tests for multi-u
 Ofttimes I had to test a web app where I had several user permission
 categories and I needed to ensure that, for example, only admins get
 the admin panel, etc. This module allows you to instantiate several
-[Test::WWW::Mechanize](https://metacpan.org/pod/Test::WWW::Mechanize) objects and then easily call methods
+[Test::WWW::Mechanize](https://metacpan.org/pod/Test%3A%3AWWW%3A%3AMechanize) objects and then easily call methods
 on all of them (using one line of code) or individually, to test for
 differences between them that should be there.
 
 # ORDERING/SIMULTANEITY NOTES
 
 Note that this module does not fork out or do any other business to
-make all the mech objects execute their methods __simultaneously__. The
+make all the mech objects execute their methods **simultaneously**. The
 methods that are called to be executed on all mech objects will be called
 in the order that you specify the `users` to the `->new` method.
 Which user you get when using `any`, either as a method or the key
@@ -86,10 +86,10 @@ in return value hashref, is not specified; it is what it says on the tin,
 
 The general idea is that you define aliases for each of your mech
 objects in the bunch inside the `->new` method. Then, you can call
-your usual [Test::WWW::Mechanize](https://metacpan.org/pod/Test::WWW::Mechanize) methods on your
+your usual [Test::WWW::Mechanize](https://metacpan.org/pod/Test%3A%3AWWW%3A%3AMechanize) methods on your
 `Test::WWW::Mechanize::MultiMech` object and they will be called
-__on each__ mech object in a bundle. And, you can use the aliases you
-specified to call [Test::WWW::Mechanize](https://metacpan.org/pod/Test::WWW::Mechanize) methods on specific objects
+**on each** mech object in a bundle. And, you can use the aliases you
+specified to call [Test::WWW::Mechanize](https://metacpan.org/pod/Test%3A%3AWWW%3A%3AMechanize) methods on specific objects
 in the bundle.
 
 The return value for all-object method calls will be hashrefs, where keys
@@ -101,7 +101,7 @@ for each user. E.g.:
     print $mech->uri->{user_alias}->query;
 
 If you make a call `$mech->USER_ALIAS->method` that method
-will be called __only__ for the user whose alias is `USER_ALIAS`, e.g.
+will be called **only** for the user whose alias is `USER_ALIAS`, e.g.
 
     # check that "admin" users have Admin panel
     $mech->admin->text_contains('Admin panel');
@@ -117,7 +117,7 @@ and sticking with it. E.g.:
     # call ->uri on every mech object and get the result of any one of them
     $mech->uri->{any}->query;
 
-__Note:__ if you `->ignore()` a user, they won't be considered
+**Note:** if you `->ignore()` a user, they won't be considered
 as a candidate for `$mech->any` and they won't be as a key in the
 return value of all-user method calls.
 
@@ -138,9 +138,9 @@ return value of all-user method calls.
         ],
     );
 
-You __must__ specify at least one user using the `users` key, whose
-value is an arrayref of users. Everything else will be __passed__ to
-the `->new` method of [Test::WWW::Mechanize](https://metacpan.org/pod/Test::WWW::Mechanize). The users arrayref
+You **must** specify at least one user using the `users` key, whose
+value is an arrayref of users. Everything else will be **passed** to
+the `->new` method of [Test::WWW::Mechanize](https://metacpan.org/pod/Test%3A%3AWWW%3A%3AMechanize). The users arrayref
 is specified as a list of key/value pairs, where keys are user aliases
 and values are, possibly empty, hashrefs of parameters. The aliases will be
 used as method calls to call methods on mech object of individual
@@ -148,7 +148,7 @@ users (see ["GENERAL IDEA BEHIND THE INTERFACE OF THIS MODULE"](#general-idea-be
 section above), so ensure your user aliases do not conflict with mech
 calls and other things (e.g. you can't have a user alias named
 `get_ok`, as calling `$mech->get_ok('foo');` would call
-the `->get_ok` [Test::WWW::Mechanize](https://metacpan.org/pod/Test::WWW::Mechanize) method on each of your users).
+the `->get_ok` [Test::WWW::Mechanize](https://metacpan.org/pod/Test%3A%3AWWW%3A%3AMechanize) method on each of your users).
 Currently valid keys in the hashref value are:
 
 ### `pass`
@@ -159,8 +159,8 @@ Currently valid keys in the hashref value are:
         ],
     );
 
-__Optional__. Specifies user's password, which is currently only used in the
-`->login()` method. __By default__ is not specified.
+**Optional**. Specifies user's password, which is currently only used in the
+`->login()` method. **By default** is not specified.
 
 ### `login`
 
@@ -170,7 +170,7 @@ __Optional__. Specifies user's password, which is currently only used in the
         ],
     );
 
-__Optional__. Specifies user's login (user name), which is currently only used in the `->login()` method. __If not specified__, the alias
+**Optional**. Specifies user's login (user name), which is currently only used in the `->login()` method. **If not specified**, the alias
 for this user will be used as login instead (e.g. `admin` would be
 used in the example code above, instead of `joe@example.com`).
 
@@ -192,11 +192,11 @@ It's a shortcut for accessing page `login_page` and then calling
 individually.
 
 Takes arguments as key/value pairs. Value of key `login_page`
-__specifies__ the URL of the login page. __If omitted__, current page
+**specifies** the URL of the login page. **If omitted**, current page
 of each mech object will be used.
 
 All other arguments will be forwarded to the `->submit_form_ok()`
-method of [Test::WWW::Mechanize](https://metacpan.org/pod/Test::WWW::Mechanize).
+method of [Test::WWW::Mechanize](https://metacpan.org/pod/Test%3A%3AWWW%3A%3AMechanize).
 
 The `fields` argument, if specified, can contain any field name
 whose value is `\'LOGIN'` or `\'PASS'` (note the reference
@@ -216,7 +216,7 @@ substituted with the login/password of each user individually.
 Adds new mech object to the bundle. This can be useful when you
 want to do a quick test on a page with an unprivileged user, whom
 you dump with a `->remove_user` method.
-__Takes__ a user alias, optionally followed by user args hashref.
+**Takes** a user alias, optionally followed by user args hashref.
 See `->new()` method for possible keys/values in the user args
 hashref. Calling with a user alias alone is equivalent to calling with
 an empty user args hashref.
@@ -226,7 +226,7 @@ hashref will be overwritten. The user alias added with `->add_user`
 method will be added to the end of the sequence for all-user method calls
 (even if the user already existed, they will be moved to the end).
 
-__Keep in mind__ that the mech object given to this user is brand new.
+**Keep in mind** that the mech object given to this user is brand new.
 So you need to use absolute URLs when making the next call to,
 say `->get_ok`, methods on this user (or with the next
 all-users method).
@@ -235,7 +235,7 @@ all-users method).
 
     my $user_args = $mech->remove_user('guest');
 
-__Takes__ a valid user alias.
+**Takes** a valid user alias.
 Removes user with that alias from the MultiMech mech object bundle. If
 removing an existing user, that user's user args hashref will be returned,
 otherwise the return value is an empty list or `undef`, depending on the
@@ -284,7 +284,7 @@ unignored at all times. The module will
 [croak()](https://metacpan.org/pod/Carp) if you attempt to ignore
 the last available user.
 
-__NOTE:__ ignored users are simply excluded from the all-user method calls.
+**NOTE:** ignored users are simply excluded from the all-user method calls.
 It is still perfectly valid to call single-user method calls on
 ignored users (e.g. `$mech->ignoreduser->get_ok('/foo')`)
 
@@ -310,10 +310,22 @@ retaining information on which 'user' is doing what.
 
 # REPOSITORY
 
+<div>
+    <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-github.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
+</div>
+
 Fork this module on GitHub:
 [https://github.com/zoffixznet/Test-WWW-Mechanize-MultiMech](https://github.com/zoffixznet/Test-WWW-Mechanize-MultiMech)
 
+<div>
+    </div></div>
+</div>
+
 # BUGS
+
+<div>
+    <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-bugs.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
+</div>
 
 To report bugs or request features, please use
 [https://github.com/zoffixznet/Test-WWW-Mechanize-MultiMech/issues](https://github.com/zoffixznet/Test-WWW-Mechanize-MultiMech/issues)
@@ -321,7 +333,23 @@ To report bugs or request features, please use
 If you can't access GitHub, you can email your request
 to `bug-Test-WWW-Mechanize-MultiMech at rt.cpan.org`
 
+<div>
+    </div></div>
+</div>
+
 # AUTHOR
+
+<div>
+    <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-author.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
+</div>
+
+<div>
+    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/ZOFFIX"> <img src="http://www.gravatar.com/avatar/328e658ab6b08dfb5c106266a4a5d065?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F627d83ef9879f31bdabf448e666a32d5" alt="ZOFFIX" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">ZOFFIX</span> </a> </span>
+</div>
+
+<div>
+    </div></div>
+</div>
 
 # LICENSE
 

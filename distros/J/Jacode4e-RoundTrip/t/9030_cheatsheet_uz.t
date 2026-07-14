@@ -2,7 +2,7 @@
 #
 # 9030_cheatsheet_uz.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip Tezkor Ma'lumotnoma (O'zbekcha)
 # Ushbu test o'zbek tilli foydalanuvchilar uchun tezkor ma'lumotnoma sifatida ham xizmat qiladi.

@@ -16,27 +16,27 @@ use_ok qw/Acrux::Log/;
 
 # Error message with debug loglevel
 {
-    my $log = Acrux::Log->new();
+    my $log = Acrux::Log->new(prefix => '# ', file => '-');
     is $log->level, 'debug', "Debug LogLevel";
-    ok $log->error("My test error message"), 'Error message to syslog';
+    ok $log->error("My test error message #1"), 'Error message to STDOUT';
 }
 
 # Info and fatal message with eror loglevel
 {
-    my $log = Acrux::Log->new(level => 'error');
+    my $log = Acrux::Log->new(level => 'error', prefix => '# ', file => '-');
     is $log->level, 'error', "Error LogLevel";
-    ok !$log->info("My test info message"), 'Info message not allowed';
-    ok $log->fatal("My test fatal message"), 'Fatal message to syslog';
+    ok !$log->info("My test info message #2"), 'Info message not allowed';
+    ok $log->fatal("My test fatal message #2.1"), 'Fatal message to syslog';
     #note explain $log;
 }
 
 # Fake Logger
 {
     my $fake = FakeLogger->new;
-    my $log = Acrux::Log->new(logger => $fake);
-    $log->error("Test error message") and ok 1, "Test error message to STDOUT via FakeLogger";
+    my $log = Acrux::Log->new(logger => $fake, prefix => '# ');
+    $log->error("Test error message #3") and ok 1, "Test error message to STDOUT via FakeLogger";
     #ok $log->debug("Test debug message");
-    $log->info("Test info message") and ok 1, "Test info message to STDOUT via FakeLogger";
+    $log->info("Test info message #3.1") and ok 1, "Test info message to STDOUT via FakeLogger";
     #note explain $log;
 }
 
@@ -55,7 +55,7 @@ use_ok qw/Acrux::Log/;
         handle => IO::Handle->new_from_fd(fileno(STDOUT), "w"),
         prefix => '# ',
     );
-    ok $log->error("My test error message"), 'Error message to handler STDOUT';
+    ok $log->error("My test error message #4"), 'Error message to handler STDOUT';
 }
 
 done_testing;

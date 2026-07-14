@@ -1,5 +1,9 @@
 Revision history for WWW-PAUSE-CleanUpHomeDir
 
+1.001003  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.001002   2015-03-24
         - Fixed failing tests
 

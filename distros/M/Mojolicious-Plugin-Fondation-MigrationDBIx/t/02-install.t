@@ -31,7 +31,7 @@ sub build_app {
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'test' },
+                    foo => { source => 'Foo', backend => 'test' },
                 },
             }},
             { 'Fondation::TestDBIx' => {
@@ -68,7 +68,7 @@ sub build_app {
     require TestSchema;
     my $native = TestSchema->connect("dbi:SQLite:dbname=$dbfile");
     my @sources = $native->sources;
-    ok((grep { $_ eq 'foos' } @sources), 'foos table exists');
+    ok((grep { $_ eq 'Foo' } @sources), 'Foo source registered');
 }
 
 # ==========================================================================

@@ -86,7 +86,11 @@ for my $mod (@modules) {
   SKIP: {
     skip "$mod exempt from namespace checks",1
       if $skip_idx->{$mod}
-      || $mod =~ /^DBIO::Test::Schema::/;
+      || $mod =~ /^DBIO::Test::Schema::/
+      # optional-OO demo schemas (moved out of DBIO::Test::Schema::* so the
+      # load_classes sweep never hits them): Moose/Moo/MooseX::NonMoose
+      # legitimately import confess/FOREIGNBUILDARGS into these classes.
+      || $mod =~ /^DBIO::Test::(?:Moo|Moose|MooCake|MooseSugar)Schema(?:::|$)/;
 
     my %all_method_like = (map
       { %{stash_for($_)->get_all_symbols('CODE')} }

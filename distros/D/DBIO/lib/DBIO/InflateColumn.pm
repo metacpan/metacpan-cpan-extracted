@@ -137,7 +137,7 @@ DBIO::InflateColumn - Automatically create references from column data
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

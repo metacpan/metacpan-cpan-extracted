@@ -12,6 +12,13 @@ WriteMakefile
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
-  'PL_FILES' => {}
+  'PL_FILES' => {},
+  'META_MERGE' => {
+    'resources' => {
+      'repository' => 'git://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI.git',
+      'bugtracker' => 'https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI/issues',
+      'homepage'   => 'https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI',
+    },
+  },
 )
 ;

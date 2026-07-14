@@ -1,0 +1,47 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Pastebin-PastebinCom-Retrieve",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "HTML::Entities" : "1.35",
+            "HTML::TokeParser::Simple" : "3.15",
+            "Test::More" : "0",
+            "URI" : "1.35",
+            "WWW::Pastebin::Base::Retrieve" : "0.001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

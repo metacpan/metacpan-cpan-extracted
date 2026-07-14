@@ -2,7 +2,7 @@
 #
 # 9025_cheatsheet_my.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip အမြန်ကိုးကားချက် (မြန်မာဘာသာ)
 # ဤစမ်းသပ်မှုသည် မြန်မာဘာသာသုံးသူများအတွက် အမြန်ကိုးကားချက်အဖြစ်လည်း ဆောင်ရွက်သည်။

@@ -52,6 +52,6 @@
          "web" : "https://sourceforge.net/p/acrux/code/ci/master/tree/"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

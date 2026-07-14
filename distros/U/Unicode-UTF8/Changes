@@ -1,3 +1,17 @@
+0.74 2026-07-13
+ - Fixed slurp_utf8() failing to link on Windows: PerlIO_openn is not
+   exported there. The file is now opened with the unbuffered PerlLIO
+   fd wrappers (open3/fstat/read/close) instead.
+
+0.73 2026-07-13
+ - Added slurp_utf8($filename) which reads an entire file and returns its
+   contents decoded from UTF-8 as a character string.
+ - Added support for older MSVC C compilers by using __inline in place of the 
+   C99 inline keyword on pre-Visual Studio 2015 builds.
+ - Fixed SSE2 detection to only enable the SIMD implementation on 64-bit x86
+   targets. This prevents unsupported SSE2 code from being selected on 32-bit 
+   x86 builds. Reported by Paul Howarth (@pghmcfc) issue #14.
+
 0.72 2026-07-07
  - read_utf8() now takes a single-pass fast path on PerlIO fast-gets layers,
    validating/copying/counting straight out of the layer buffer (up to ~11%

@@ -56,6 +56,8 @@ t/Local/Test/RefVars.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+tools/pm_filter.pl
+tools/test-many.sh
 xt/boilerplate.t
 xt/pod-spell.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

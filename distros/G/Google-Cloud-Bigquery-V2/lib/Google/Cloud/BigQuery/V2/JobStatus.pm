@@ -1,0 +1,65 @@
+package Google::Cloud::BigQuery::V2::JobStatus;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Cloud::BigQuery::V2::Error };
+    my $descriptor_b64 = <<'EOF';
+Cilnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvam9iX3N0YXR1cy5wcm90bxIYZ29vZ2xlLmNs
+b3VkLmJpZ3F1ZXJ5LnYyGh9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGiRnb29n
+bGUvY2xvdWQvYmlncXVlcnkvdjIvZXJyb3IucHJvdG8itwEKCUpvYlN0YXR1cxJMCgxlcnJv
+cl9yZXN1bHQYASABKAsyJC5nb29nbGUuY2xvdWQuYmlncXVlcnkudjIuRXJyb3JQcm90b0ID
+4EEDUgtlcnJvclJlc3VsdBJBCgZlcnJvcnMYAiADKAsyJC5nb29nbGUuY2xvdWQuYmlncXVl
+cnkudjIuRXJyb3JQcm90b0ID4EEDUgZlcnJvcnMSGQoFc3RhdGUYAyABKAlCA+BBA1IFc3Rh
+dGVCawocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIOSm9iU3RhdHVzUHJvdG9aO2Ns
+b3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdxdWVy
+eXBiSqMLCgYSBA4AJwEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExD
+CgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhl
+ICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21w
+bGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhl
+IExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VO
+U0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0
+byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2Ug
+aXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElF
+UyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVk
+LgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5n
+IHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgEC
+EgMQACEKCQoCAwASAxIAKQoJCgIDARIDEwAuCggKAQgSAxUAUgoJCgIICxIDFQBSCggKAQgS
+AxYALwoJCgIICBIDFgAvCggKAQgSAxcANQoJCgIIARIDFwA1CgoKAgQAEgQZACcBCgoKAwQA
+ARIDGQgRCoIBCgQEAAIAEgMcAkoadSBPdXRwdXQgb25seS4gRmluYWwgZXJyb3IgcmVzdWx0
+IG9mIHRoZSBqb2IuIElmIHByZXNlbnQsIGluZGljYXRlcyB0aGF0IHRoZQogam9iIGhhcyBj
+b21wbGV0ZWQgYW5kIHdhcyB1bnN1Y2Nlc3NmdWwuCgoMCgUEAAIABhIDHAIMCgwKBQQAAgAB
+EgMcDRkKDAoFBAACAAMSAxwcHQoMCgUEAAIACBIDHB5JCg8KCAQAAgAInAgAEgMcH0gKhAIK
+BAQAAgESAyICTRr2ASBPdXRwdXQgb25seS4gVGhlIGZpcnN0IGVycm9ycyBlbmNvdW50ZXJl
+ZCBkdXJpbmcgdGhlIHJ1bm5pbmcgb2YgdGhlIGpvYi4KIFRoZSBmaW5hbCBtZXNzYWdlIGlu
+Y2x1ZGVzIHRoZSBudW1iZXIgb2YgZXJyb3JzIHRoYXQgY2F1c2VkIHRoZSBwcm9jZXNzIHRv
+CiBzdG9wLiBFcnJvcnMgaGVyZSBkbyBub3QgbmVjZXNzYXJpbHkgbWVhbiB0aGF0IHRoZSBq
+b2IgaGFzIG5vdCBjb21wbGV0ZWQgb3IKIHdhcyB1bnN1Y2Nlc3NmdWwuCgoMCgUEAAIBBBID
+IgIKCgwKBQQAAgEGEgMiCxUKDAoFBAACAQESAyIWHAoMCgUEAAIBAxIDIh8gCgwKBQQAAgEI
+EgMiIUwKDwoIBAACAQicCAASAyIiSwpuCgQEAAICEgMmAj8aYSBPdXRwdXQgb25seS4gUnVu
+bmluZyBzdGF0ZSBvZiB0aGUgam9iLiAgVmFsaWQgc3RhdGVzIGluY2x1ZGUgJ1BFTkRJTkcn
+LAogJ1JVTk5JTkcnLCBhbmQgJ0RPTkUnLgoKDAoFBAACAgUSAyYCCAoMCgUEAAICARIDJgkO
+CgwKBQQAAgIDEgMmERIKDAoFBAACAggSAyYTPgoPCggEAAICCJwIABIDJhQ9YgZwcm90bzM=
+
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::BigQuery::V2::JobStatus::JobStatus ===
+    # Fields for JobStatus
+    # Field: error_result Type: 11 (.google.cloud.bigquery.v2.ErrorProto)
+    # Field: errors Type: 11 (.google.cloud.bigquery.v2.ErrorProto)
+    # Field: state Type: 9 ()
+
+1;

@@ -72,5 +72,29 @@ subtest "separator => '/'" => sub {
 };
 
 
+subtest 'separator in variable name' => sub {
+  my $ini = <<'INI';
+[FOO]
+var = abcde
+
+[BAR]
+FOO/var = my var in section BAR
+a = $(FOO/var)
+b = $(BAR/FOO/var)
+INI
+
+  my $vars = Config::INI::RefVars->new(separator => '/') ->parse_ini(src => $ini)->variables;
+
+  is($vars->{BAR}{'FOO/var'}, 'my var in section BAR',
+     'separator remains part of a variable name in a definition');
+
+  is($vars->{BAR}{a}, 'abcde',
+     'single qualified reference uses FOO as section');
+
+  is($vars->{BAR}{b}, 'my var in section BAR',
+     'qualified reference may address a variable containing the separator');
+};
+
+
 #==================================================================================================
 done_testing();

@@ -49,7 +49,7 @@ $schema->await(
 );
 
 # Test 1: accessor without prefetch
-# The where condition IS applied — expect only ACTIVE
+# The where condition IS applied - expect only ACTIVE
 my $iface = $schema->await(
     $schema->resultset('Interface')->find(1)
 );

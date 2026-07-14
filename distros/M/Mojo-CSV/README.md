@@ -61,8 +61,8 @@ Flushes buffer and closes ["out"](#out) filehandle. Call this when you're done
     $csv->in( Mojo::Asset::Memory->new->add_chunk('foo,bar,baz') );
 
 Specifies the input for ["slurp"](#slurp), ["slurp\_body"](#slurp_body) and ["row"](#row).
-Takes a filename, an opened filehandle, a [Mojo::Asset::File](https://metacpan.org/pod/Mojo::Asset::File) object, or
-a [Mojo::Asset::Memory](https://metacpan.org/pod/Mojo::Asset::Memory) object.
+Takes a filename, an opened filehandle, a [Mojo::Asset::File](https://metacpan.org/pod/Mojo%3A%3AAsset%3A%3AFile) object, or
+a [Mojo::Asset::Memory](https://metacpan.org/pod/Mojo%3A%3AAsset%3A%3AMemory) object.
 
 ## `new`
 
@@ -97,7 +97,7 @@ to read must be first set with [in method](#in) or `in` argument to
     my $data = Mojo::CSV->new->slurp('file.csv');
     my $data = Mojo::CSV->new( in => 'file.csv' )->slurp;
 
-Returns a [Mojo::Collection](https://metacpan.org/pod/Mojo::Collection) object, each item of which is an arrayref
+Returns a [Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) object, each item of which is an arrayref
 representing a row of CSV data.
 
 ## `slurp_body`
@@ -127,7 +127,7 @@ are themselves arrayrefs (each item is a cell data). It will call
 
 Returns a CSV string. Takes either a single arrayref to encode just a single
 row or an arrayref of arrayrefs to include multiple rows.
-[Arrayref-like things](https://metacpan.org/pod/Mojo::Collection) should work too.
+[Arrayref-like things](https://metacpan.org/pod/Mojo%3A%3ACollection) should work too.
 
 ## `trickle`
 
@@ -139,7 +139,7 @@ the writes may be buffered (see ["flush"](#flush))
 
 # SEE ALSO
 
-[Text::CSV](https://metacpan.org/pod/Text::CSV), [Text::xSV](https://metacpan.org/pod/Text::xSV)
+[Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV), [Text::xSV](https://metacpan.org/pod/Text%3A%3AxSV)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>

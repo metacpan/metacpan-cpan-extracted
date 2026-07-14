@@ -72,7 +72,7 @@ Patches are definitely welcome though.
 
 # SEE ALSO
 
-[Package::Stash](https://metacpan.org/pod/Package::Stash)
+[Package::Stash](https://metacpan.org/pod/Package%3A%3AStash)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>

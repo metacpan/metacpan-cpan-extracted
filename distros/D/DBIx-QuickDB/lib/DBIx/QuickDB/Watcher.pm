@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000053';
+our $VERSION = '0.000054';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;

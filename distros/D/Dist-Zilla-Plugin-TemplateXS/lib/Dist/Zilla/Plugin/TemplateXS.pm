@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::TemplateXS;
-$Dist::Zilla::Plugin::TemplateXS::VERSION = '0.005';
+$Dist::Zilla::Plugin::TemplateXS::VERSION = '0.006';
 use Moose;
 with qw(Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::TextTemplate);
 
@@ -100,7 +100,7 @@ Dist::Zilla::Plugin::TemplateXS - A simple xs-file-from-template plugin
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,7 @@ This contains the B<path> to the template that is to be used. If not set, a defa
 
  MODULE = {{ $module }}				PACKAGE = {{ $module }}
 
-{{ $prototypes_line ? 'PROTOTYPES: DISABLE\n' : '' }}
+{{ $prototypes_line ? "PROTOTYPES: DISABLE\n" : '' }}
 
 =head1 AUTHOR
 
@@ -174,4 +174,4 @@ __[ Module.xs ]__
 
 MODULE = {{ $module }}				PACKAGE = {{ $module }}
 
-{{ $prototypes_line ? 'PROTOTYPES: DISABLE\n' : '' }}
+{{ $prototypes_line ? "PROTOTYPES: DISABLE\n" : '' }}

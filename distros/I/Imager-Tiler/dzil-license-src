@@ -6,6 +6,8 @@ __[ META2_NAME ]__
 Academic Free License version 3.0
 __URL__
 http://www.opensource.org/licenses/afl-3.0.php
+__[ SPDX_EXPRESSION ]__
+AFL-3.0
 __[ NOTICE ]__
 
 Copyright(C) 2007, 2008, Dean Arnold (darnold@presicient.com), Presicient Corp., USA.

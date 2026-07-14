@@ -1,5 +1,9 @@
 Revision history for Test-Mojo-Role-ElementCounter
 
+1.001009  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.001008 2020-04-19
    - Fix prereqs (#4)
 

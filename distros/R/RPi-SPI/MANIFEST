@@ -5,6 +5,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/00-load.t
+t/05-unit.t
 t/manifest.t
 t/pod-coverage.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

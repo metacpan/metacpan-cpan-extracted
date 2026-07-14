@@ -3,7 +3,7 @@ package JavaScript::Minifier;
 use strict;
 use warnings;
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 require Exporter;
 our @ISA = qw(Exporter);

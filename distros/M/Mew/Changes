@@ -1,5 +1,9 @@
 Revision history for Mew
 
+1.002004  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.002003  2018-07-31
   - Fix regression with `Maybe` handling
 

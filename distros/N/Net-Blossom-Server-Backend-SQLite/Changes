@@ -1,2 +1,15 @@
+0.001002 2026-07-13
+    - Separate metadata and blob-byte storage behind public component APIs.
+    - Migrate the 0.001000 and 0.001001 combined schemas automatically while
+      preserving data.
+    - Roll back the migration when legacy owner relationships are invalid.
+    - Reject metadata changes, blob preparation, and blob deletion outside the
+      coordinating transaction.
+
+0.001001 2026-07-13
+    - Use Class::Tiny for all object construction.
+    - Reject DBI handles with AutoCommit disabled.
+    - Ensure coverage tests load the working-tree module.
+
 0.001000 2026-07-09
     - Initial CPAN release.

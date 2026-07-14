@@ -1,0 +1,101 @@
+package Google::Type::Date;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+ChZnb29nbGUvdHlwZS9kYXRlLnByb3RvEgtnb29nbGUudHlwZSJCCgREYXRlEhIKBHllYXIY
+ASABKAVSBHllYXISFAoFbW9udGgYAiABKAVSBW1vbnRoEhAKA2RheRgDIAEoBVIDZGF5QloK
+D2NvbS5nb29nbGUudHlwZUIJRGF0ZVByb3RvUAFaNGdvb2dsZS5nb2xhbmcub3JnL2dlbnBy
+b3RvL2dvb2dsZWFwaXMvdHlwZS9kYXRlO2RhdGWiAgNHVFBK/A4KBhIEDgA1AQq8BAoBDBID
+DgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUg
+QXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkg
+bm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5z
+ZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRw
+Oi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWly
+ZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJl
+CiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAi
+QVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5Z
+IEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9y
+IHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1p
+dGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAFAoICgEIEgMSAEsKCQoCCAsS
+AxIASwoICgEIEgMTACIKCQoCCAoSAxMAIgoICgEIEgMUACoKCQoCCAgSAxQAKgoICgEIEgMV
+ACgKCQoCCAESAxUAKAoICgEIEgMWACEKCQoCCCQSAxYAIQq6BQoCBAASBCgANQEarQUgUmVw
+cmVzZW50cyBhIHdob2xlIG9yIHBhcnRpYWwgY2FsZW5kYXIgZGF0ZSwgc3VjaCBhcyBhIGJp
+cnRoZGF5LiBUaGUgdGltZSBvZgogZGF5IGFuZCB0aW1lIHpvbmUgYXJlIGVpdGhlciBzcGVj
+aWZpZWQgZWxzZXdoZXJlIG9yIGFyZSBpbnNpZ25pZmljYW50LiBUaGUKIGRhdGUgaXMgcmVs
+YXRpdmUgdG8gdGhlIEdyZWdvcmlhbiBDYWxlbmRhci4gVGhpcyBjYW4gcmVwcmVzZW50IG9u
+ZSBvZiB0aGUKIGZvbGxvd2luZzoKCiAqIEEgZnVsbCBkYXRlLCB3aXRoIG5vbi16ZXJvIHll
+YXIsIG1vbnRoLCBhbmQgZGF5IHZhbHVlcy4KICogQSBtb250aCBhbmQgZGF5LCB3aXRoIGEg
+emVybyB5ZWFyIChmb3IgZXhhbXBsZSwgYW4gYW5uaXZlcnNhcnkpLgogKiBBIHllYXIgb24g
+aXRzIG93biwgd2l0aCBhIHplcm8gbW9udGggYW5kIGEgemVybyBkYXkuCiAqIEEgeWVhciBh
+bmQgbW9udGgsIHdpdGggYSB6ZXJvIGRheSAoZm9yIGV4YW1wbGUsIGEgY3JlZGl0IGNhcmQg
+ZXhwaXJhdGlvbgogICBkYXRlKS4KCiBSZWxhdGVkIHR5cGVzOgoKICogW2dvb2dsZS50eXBl
+LlRpbWVPZkRheV1bZ29vZ2xlLnR5cGUuVGltZU9mRGF5XQogKiBbZ29vZ2xlLnR5cGUuRGF0
+ZVRpbWVdW2dvb2dsZS50eXBlLkRhdGVUaW1lXQogKiBbZ29vZ2xlLnByb3RvYnVmLlRpbWVz
+dGFtcF1bZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcF0KCgoKAwQAARIDKAgMCmAKBAQAAgAS
+AysCERpTIFllYXIgb2YgdGhlIGRhdGUuIE11c3QgYmUgZnJvbSAxIHRvIDk5OTksIG9yIDAg
+dG8gc3BlY2lmeSBhIGRhdGUgd2l0aG91dAogYSB5ZWFyLgoKDAoFBAACAAUSAysCBwoMCgUE
+AAIAARIDKwgMCgwKBQQAAgADEgMrDxAKZgoEBAACARIDLwISGlkgTW9udGggb2YgYSB5ZWFy
+LiBNdXN0IGJlIGZyb20gMSB0byAxMiwgb3IgMCB0byBzcGVjaWZ5IGEgeWVhciB3aXRob3V0
+IGEKIG1vbnRoIGFuZCBkYXkuCgoMCgUEAAIBBRIDLwIHCgwKBQQAAgEBEgMvCA0KDAoFBAAC
+AQMSAy8QEQquAQoEBAACAhIDNAIQGqABIERheSBvZiBhIG1vbnRoLiBNdXN0IGJlIGZyb20g
+MSB0byAzMSBhbmQgdmFsaWQgZm9yIHRoZSB5ZWFyIGFuZCBtb250aCwgb3IgMAogdG8gc3Bl
+Y2lmeSBhIHllYXIgYnkgaXRzZWxmIG9yIGEgeWVhciBhbmQgbW9udGggd2hlcmUgdGhlIGRh
+eSBpc24ndAogc2lnbmlmaWNhbnQuCgoMCgUEAAICBRIDNAIHCgwKBQQAAgIBEgM0CAsKDAoF
+BAACAgMSAzQOD2IGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Type::Date::Date ===
+    # Fields for Date
+    # Field: year Type: 5 ()
+    # Field: month Type: 5 ()
+    # Field: day Type: 5 ()
+
+=pod
+
+=head1 NAME
+
+Google::Type::Date::Date - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Type::Date;
+
+    my $msg = Google::Type::Date::Date->new(
+        year => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<year>
+
+Type: Int32
+
+=item * B<month>
+
+Type: Int32
+
+=item * B<day>
+
+Type: Int32
+
+=back
+
+=cut
+
+1;

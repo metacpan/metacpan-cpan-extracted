@@ -1,5 +1,8 @@
 Revision history for Perl module CBOR::Free
 
+0.34
+- Fix longstanding pointer bug on i386; add CI for various other platforms.
+
 0.33 12 July 2026
 - Add opt-in rejection of duplicate map keys to the object and sequence
   decoders.

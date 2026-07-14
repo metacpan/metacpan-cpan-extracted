@@ -3,7 +3,7 @@ package WWW::HTMLTagAttributeCounter;
 use warnings;
 use strict;
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use LWP::UserAgent;
 use HTML::TokeParser::Simple;

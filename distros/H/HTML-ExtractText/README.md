@@ -70,7 +70,7 @@ can either return the results as a hashref or automatically call
 setter methods on a provided object.
 
 If you're looking for extra automatic post-processing and laxer
-definition of what constitutes "text", see [HTML::ExtractText::Extra](https://metacpan.org/pod/HTML::ExtractText::Extra).
+definition of what constitutes "text", see [HTML::ExtractText::Extra](https://metacpan.org/pod/HTML%3A%3AExtractText%3A%3AExtra).
 
 # OVERLOADED METHODS
 
@@ -332,9 +332,9 @@ examples in this documentation should really include something akin to:
 
 # SEE ALSO
 
-[HTML::ExtractText::Extra](https://metacpan.org/pod/HTML::ExtractText::Extra) - a subclass that offers extra features
+[HTML::ExtractText::Extra](https://metacpan.org/pod/HTML%3A%3AExtractText%3A%3AExtra) - a subclass that offers extra features
 
-[Mojo::DOM](https://metacpan.org/pod/Mojo::DOM), [Text::Balanced](https://metacpan.org/pod/Text::Balanced), [HTML::Extract](https://metacpan.org/pod/HTML::Extract)
+[Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM), [Text::Balanced](https://metacpan.org/pod/Text%3A%3ABalanced), [HTML::Extract](https://metacpan.org/pod/HTML%3A%3AExtract)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>
@@ -376,7 +376,7 @@ to `bug-html-extracttext at rt.cpan.org`
 </div>
 
 <div>
-    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/ZOFFIX"> <img src="http://www.gravatar.com/avatar/328e658ab6b08dfb5c106266a4a5d065?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F627d83ef9879f31bdabf448e666a32d5" alt="ZOFFIX" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">ZOFFIX</span> </a> </span>
+    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/ZOFFIX"> <img src="" alt="ZOFFIX" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">ZOFFIX</span> </a> </span>
 </div>
 
 <div>

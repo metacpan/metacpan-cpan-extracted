@@ -2,7 +2,7 @@
 #
 # 9009_cheatsheet_pt.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Referencia rapida do Jacode4e::RoundTrip (Portugues)
 # Este teste tambem serve como referencia rapida para utilizadores lusofonos.

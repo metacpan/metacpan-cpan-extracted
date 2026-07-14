@@ -44,9 +44,16 @@ for my $module (qw(
     ok(!$net_blossom_deps{$module}, "Net-Blossom does not depend on $module");
 }
 
-my $json_pp = join '::', qw(JSON PP);
-my @json_pp_files = _files_containing($root, qr/\b\Q$json_pp\E\b/);
-is_deeply(\@json_pp_files, [], "$json_pp is not used; use JSON () instead");
+for my $module (
+    [qw(JSON PP)],
+    [qw(JSON XS)],
+    [qw(Cpanel JSON XS)],
+    [qw(JSON MaybeXS)],
+) {
+    my $name = join '::', @$module;
+    my @files = _files_containing($root, qr/\b\Q$name\E\b/);
+    is_deeply(\@files, [], "$name is not used; use JSON () instead");
+}
 
 done_testing;
 
@@ -102,7 +109,7 @@ sub _files_containing {
     my @files;
     _walk_files($root, sub {
         my ($file) = @_;
-        return unless $file =~ m{\A\Q$root\E/(?:dist/[^/]+/(?:lib|t|xt)/.*\.p[mt]|dist/[^/]+/Makefile\.PL)\z};
+        return unless $file =~ m{\A\Q$root\E/(?:dist/[^/]+/(?:lib|t|xt)/.*\.(?:pm|t)|dist/[^/]+/Makefile\.PL)\z};
 
         open my $fh, '<', $file
             or die "Unable to read $file: $!";

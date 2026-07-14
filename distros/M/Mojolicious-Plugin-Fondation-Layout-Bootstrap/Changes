@@ -1,8 +1,13 @@
 Revision history for Mojolicious-Plugin-Fondation-Layout-Bootstrap
 
+0.04      2026-07-13 23:12:05+02:00 Europe/Paris
+  - the version is built with 'dzil'
+
 0.03      2026-07-12 19:44:46+02:00 Europe/Paris
+  - depends on Fondation::Asset
 
 0.02      2026-07-12 19:38:05+02:00 Europe/Paris
+  - Layout::Boostrap depends on Mojolicious::Plugin::Asset
 
 0.01      2026-07-12 18:10:13+02:00 Europe/Paris
   - Initial release

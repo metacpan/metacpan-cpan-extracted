@@ -31,7 +31,7 @@ DBIO::Test::Schema::Money - Test result class for the money_test table (MONEY co
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

@@ -779,7 +779,7 @@ DBIO::Storage::Async - Base class for async storage implementations
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

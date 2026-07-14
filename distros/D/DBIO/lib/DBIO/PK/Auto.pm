@@ -20,7 +20,7 @@ DBIO::PK::Auto - Automatic primary key class (compatibility shim)
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

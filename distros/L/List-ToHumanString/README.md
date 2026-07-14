@@ -30,7 +30,7 @@ a list of items, where that string is meant to be read by a human.
 
 # SEE ALSO
 
-[Lingua::Conjunction](https://metacpan.org/pod/Lingua::Conjunction) -- You might find [Lingua::Conjunction](https://metacpan.org/pod/Lingua::Conjunction)
+[Lingua::Conjunction](https://metacpan.org/pod/Lingua%3A%3AConjunction) -- You might find [Lingua::Conjunction](https://metacpan.org/pod/Lingua%3A%3AConjunction)
 more apt at joining the list of things, if that's the only
 thing that you're after.
 

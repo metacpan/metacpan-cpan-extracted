@@ -1,0 +1,120 @@
+package Google::Type::Expr;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+ChZnb29nbGUvdHlwZS9leHByLnByb3RvEgtnb29nbGUudHlwZSJ6CgRFeHByEh4KCmV4cHJl
+c3Npb24YASABKAlSCmV4cHJlc3Npb24SFAoFdGl0bGUYAiABKAlSBXRpdGxlEiAKC2Rlc2Ny
+aXB0aW9uGAMgASgJUgtkZXNjcmlwdGlvbhIaCghsb2NhdGlvbhgEIAEoCVIIbG9jYXRpb25C
+WgoPY29tLmdvb2dsZS50eXBlQglFeHByUHJvdG9QAVo0Z29vZ2xlLmdvbGFuZy5vcmcvZ2Vu
+cHJvdG8vZ29vZ2xlYXBpcy90eXBlL2V4cHI7ZXhwcqICA0dUUEq5FAoGEgQOAEgBCrwECgEM
+EgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRo
+ZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1h
+eSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNl
+bnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0
+dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1
+aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdh
+cmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFu
+ICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBB
+TlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBm
+b3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxp
+bWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAUCggKAQgSAxIASwoJCgII
+CxIDEgBLCggKAQgSAxMAIgoJCgIIChIDEwAiCggKAQgSAxQAKgoJCgIICBIDFAAqCggKAQgS
+AxUAKAoJCgIIARIDFQAoCggKAQgSAxYAIQoJCgIIJBIDFgAhCp8JCgIEABIENwBIARqSCSBS
+ZXByZXNlbnRzIGEgdGV4dHVhbCBleHByZXNzaW9uIGluIHRoZSBDb21tb24gRXhwcmVzc2lv
+biBMYW5ndWFnZSAoQ0VMKQogc3ludGF4LiBDRUwgaXMgYSBDLWxpa2UgZXhwcmVzc2lvbiBs
+YW5ndWFnZS4gVGhlIHN5bnRheCBhbmQgc2VtYW50aWNzIG9mIENFTAogYXJlIGRvY3VtZW50
+ZWQgYXQgaHR0cHM6Ly9naXRodWIuY29tL2dvb2dsZS9jZWwtc3BlYy4KCiBFeGFtcGxlIChD
+b21wYXJpc29uKToKCiAgICAgdGl0bGU6ICJTdW1tYXJ5IHNpemUgbGltaXQiCiAgICAgZGVz
+Y3JpcHRpb246ICJEZXRlcm1pbmVzIGlmIGEgc3VtbWFyeSBpcyBsZXNzIHRoYW4gMTAwIGNo
+YXJzIgogICAgIGV4cHJlc3Npb246ICJkb2N1bWVudC5zdW1tYXJ5LnNpemUoKSA8IDEwMCIK
+CiBFeGFtcGxlIChFcXVhbGl0eSk6CgogICAgIHRpdGxlOiAiUmVxdWVzdG9yIGlzIG93bmVy
+IgogICAgIGRlc2NyaXB0aW9uOiAiRGV0ZXJtaW5lcyBpZiByZXF1ZXN0b3IgaXMgdGhlIGRv
+Y3VtZW50IG93bmVyIgogICAgIGV4cHJlc3Npb246ICJkb2N1bWVudC5vd25lciA9PSByZXF1
+ZXN0LmF1dGguY2xhaW1zLmVtYWlsIgoKIEV4YW1wbGUgKExvZ2ljKToKCiAgICAgdGl0bGU6
+ICJQdWJsaWMgZG9jdW1lbnRzIgogICAgIGRlc2NyaXB0aW9uOiAiRGV0ZXJtaW5lIHdoZXRo
+ZXIgdGhlIGRvY3VtZW50IHNob3VsZCBiZSBwdWJsaWNseSB2aXNpYmxlIgogICAgIGV4cHJl
+c3Npb246ICJkb2N1bWVudC50eXBlICE9ICdwcml2YXRlJyAmJiBkb2N1bWVudC50eXBlICE9
+ICdpbnRlcm5hbCciCgogRXhhbXBsZSAoRGF0YSBNYW5pcHVsYXRpb24pOgoKICAgICB0aXRs
+ZTogIk5vdGlmaWNhdGlvbiBzdHJpbmciCiAgICAgZGVzY3JpcHRpb246ICJDcmVhdGUgYSBu
+b3RpZmljYXRpb24gc3RyaW5nIHdpdGggYSB0aW1lc3RhbXAuIgogICAgIGV4cHJlc3Npb246
+ICInTmV3IG1lc3NhZ2UgcmVjZWl2ZWQgYXQgJyArIHN0cmluZyhkb2N1bWVudC5jcmVhdGVf
+dGltZSkiCgogVGhlIGV4YWN0IHZhcmlhYmxlcyBhbmQgZnVuY3Rpb25zIHRoYXQgbWF5IGJl
+IHJlZmVyZW5jZWQgd2l0aGluIGFuIGV4cHJlc3Npb24KIGFyZSBkZXRlcm1pbmVkIGJ5IHRo
+ZSBzZXJ2aWNlIHRoYXQgZXZhbHVhdGVzIGl0LiBTZWUgdGhlIHNlcnZpY2UKIGRvY3VtZW50
+YXRpb24gZm9yIGFkZGl0aW9uYWwgaW5mb3JtYXRpb24uCgoKCgMEAAESAzcIDApdCgQEAAIA
+EgM6AhgaUCBUZXh0dWFsIHJlcHJlc2VudGF0aW9uIG9mIGFuIGV4cHJlc3Npb24gaW4gQ29t
+bW9uIEV4cHJlc3Npb24gTGFuZ3VhZ2UKIHN5bnRheC4KCgwKBQQAAgAFEgM6AggKDAoFBAAC
+AAESAzoJEwoMCgUEAAIAAxIDOhYXCqMBCgQEAAIBEgM/AhMalQEgT3B0aW9uYWwuIFRpdGxl
+IGZvciB0aGUgZXhwcmVzc2lvbiwgaS5lLiBhIHNob3J0IHN0cmluZyBkZXNjcmliaW5nCiBp
+dHMgcHVycG9zZS4gVGhpcyBjYW4gYmUgdXNlZCBlLmcuIGluIFVJcyB3aGljaCBhbGxvdyB0
+byBlbnRlciB0aGUKIGV4cHJlc3Npb24uCgoMCgUEAAIBBRIDPwIICgwKBQQAAgEBEgM/CQ4K
+DAoFBAACAQMSAz8REgqSAQoEBAACAhIDQwIZGoQBIE9wdGlvbmFsLiBEZXNjcmlwdGlvbiBv
+ZiB0aGUgZXhwcmVzc2lvbi4gVGhpcyBpcyBhIGxvbmdlciB0ZXh0IHdoaWNoCiBkZXNjcmli
+ZXMgdGhlIGV4cHJlc3Npb24sIGUuZy4gd2hlbiBob3ZlcmVkIG92ZXIgaXQgaW4gYSBVSS4K
+CgwKBQQAAgIFEgNDAggKDAoFBAACAgESA0MJFAoMCgUEAAICAxIDQxcYCowBCgQEAAIDEgNH
+AhYafyBPcHRpb25hbC4gU3RyaW5nIGluZGljYXRpbmcgdGhlIGxvY2F0aW9uIG9mIHRoZSBl
+eHByZXNzaW9uIGZvciBlcnJvcgogcmVwb3J0aW5nLCBlLmcuIGEgZmlsZSBuYW1lIGFuZCBh
+IHBvc2l0aW9uIGluIHRoZSBmaWxlLgoKDAoFBAACAwUSA0cCCAoMCgUEAAIDARIDRwkRCgwK
+BQQAAgMDEgNHFBViBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Type::Expr::Expr ===
+    # Fields for Expr
+    # Field: expression Type: 9 ()
+    # Field: title Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: location Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Type::Expr::Expr - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Type::Expr;
+
+    my $msg = Google::Type::Expr::Expr->new(
+        expression => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<expression>
+
+Type: String
+
+=item * B<title>
+
+Type: String
+
+=item * B<description>
+
+Type: String
+
+=item * B<location>
+
+Type: String
+
+=back
+
+=cut
+
+1;

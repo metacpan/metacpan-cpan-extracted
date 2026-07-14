@@ -2,7 +2,7 @@
 #
 # 9007_cheatsheet_fr.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Aide-mémoire Jacode4e::RoundTrip (Français)
 # Ce test sert également de référence rapide pour les utilisateurs francophones.

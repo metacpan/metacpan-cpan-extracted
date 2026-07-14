@@ -31,7 +31,10 @@ sub _start {
 
 sub validated {
     my $in = $_[ARG0];
-    ok( exists $in->{result}, '{result} must exist' );
+    ok(
+        exists $in->{result} || exists $in->{request_error},
+        'either {result} or {request_error} must exist',
+    );
     SKIP: {
         if ( $in->{result} ) {
             ok(
@@ -60,7 +63,7 @@ sub validated {
             isa_ok( $in->{http_response}, 'HTTP::Response' );
             is(
                 $in->{val_uri},
-                'http://jigsaw.w3.org/css-validator/validator',
+                'https://jigsaw.w3.org/css-validator/validator',
                 '{val_uri} must contain default validator URI',
             );
             isa_ok( $in->{som}, 'SOAP::SOM' );

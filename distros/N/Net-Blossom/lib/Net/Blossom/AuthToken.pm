@@ -5,7 +5,10 @@ use strictures 2;
 use Net::Blossom::_ConstructorArgs ();
 
 use Carp qw(croak);
-use Class::Tiny qw(key action content expiration server servers hashes created_at);
+use Class::Tiny qw(key action content expiration server servers), {
+    hashes     => sub { [] },
+    created_at => sub { time() - 1 },
+};
 use JSON ();
 use MIME::Base64 qw(encode_base64);
 use Net::Nostr::Event;
@@ -15,52 +18,58 @@ my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 my %ACTION = map { $_ => 1 } qw(get upload list delete media);
 my $JSON = JSON->new->utf8->canonical;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(key action content expiration server servers hashes created_at);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "key is required" unless defined $args{key};
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+
+    croak "key is required" unless defined $self->key;
     croak "key must provide pubkey_hex and sign_event"
-        unless blessed($args{key}) && $args{key}->can('pubkey_hex') && $args{key}->can('sign_event');
-    croak "action is required" unless defined $args{action};
+        unless blessed($self->key) && $self->key->can('pubkey_hex') && $self->key->can('sign_event');
+    croak "action is required" unless defined $self->action;
     croak "action must be one of get, upload, list, delete, media"
-        unless $ACTION{$args{action}};
-    croak "content is required" unless defined $args{content} && length $args{content};
-    croak "expiration is required" unless defined $args{expiration};
+        unless $ACTION{$self->action};
+    croak "content is required" unless defined $self->content && length $self->content;
+    croak "expiration is required" unless defined $self->expiration;
     croak "expiration must be a non-negative integer"
-        unless $args{expiration} =~ /\A\d+\z/;
+        unless $self->expiration =~ /\A\d+\z/;
     croak "expiration must be in the future"
-        unless $args{expiration} > time;
+        unless $self->expiration > time;
 
     my @servers;
-    push @servers, $args{server} if defined $args{server};
-    if (defined $args{servers}) {
-        croak "servers must be an array reference" unless ref($args{servers}) eq 'ARRAY';
-        push @servers, @{$args{servers}};
+    push @servers, $self->server if defined $self->server;
+    if (defined $self->servers) {
+        croak "servers must be an array reference" unless ref($self->servers) eq 'ARRAY';
+        push @servers, @{$self->servers};
     }
     for my $server (@servers) {
         croak "server must be a lowercase domain name"
             unless defined $server && !ref($server) && _valid_server_domain($server);
     }
-    $args{servers} = \@servers;
+    $self->servers(\@servers);
 
-    $args{hashes} = [] unless defined $args{hashes};
-    croak "hashes must be an array reference" unless ref($args{hashes}) eq 'ARRAY';
-    for my $hash (@{$args{hashes}}) {
+    $self->hashes([]) unless defined $self->hashes;
+    croak "hashes must be an array reference" unless ref($self->hashes) eq 'ARRAY';
+    for my $hash (@{$self->hashes}) {
         croak "hash must be 64-char lowercase hex"
             unless defined $hash && $hash =~ $HEX64;
     }
-    croak "$args{action} authorization requires at least one hash"
-        if $args{action} =~ /\A(?:upload|delete|media)\z/ && !@{$args{hashes}};
+    croak $self->action . " authorization requires at least one hash"
+        if $self->action =~ /\A(?:upload|delete|media)\z/ && !@{$self->hashes};
 
-    $args{created_at} = time() - 1 unless defined $args{created_at};
+    $self->created_at(time() - 1) unless defined $self->created_at;
     croak "created_at must be a non-negative integer"
-        unless $args{created_at} =~ /\A\d+\z/;
+        unless $self->created_at =~ /\A\d+\z/;
 
-    return bless \%args, $class;
+    return;
 }
 
 sub to_event {
@@ -236,5 +245,15 @@ JSON encoded as unpadded base64url.
 =head1 SEE ALSO
 
 L<Net::Blossom::Client>, L<Net::Nostr::Event>
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

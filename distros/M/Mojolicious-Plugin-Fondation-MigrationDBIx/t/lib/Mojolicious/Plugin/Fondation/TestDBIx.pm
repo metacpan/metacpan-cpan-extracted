@@ -9,7 +9,7 @@ sub fondation_meta {
         dependencies => ['Fondation::Model::DBIx::Async'],
         defaults     => {
             models => {
-                foo => { source => 'foos', backend => 'test' },
+                foo => { source => 'Foo', backend => 'test' },
             },
         },
     };

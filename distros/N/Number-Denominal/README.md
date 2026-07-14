@@ -4,8 +4,6 @@ Number::Denominal - break up numbers into arbitrary denominations
 
 # SYNOPSIS
 
-
-
     use Number::Denominal;
 
     my ( $sec, $min, $hr ) = (localtime)[0..2];
@@ -65,7 +63,7 @@ Define arbitrary set of units and split up a number into those units.
 This module arose from a discussion in IRC, regarding splitting
 a number of seconds into minutes, hours, days...
 [Paul 'LeoNerd' Evans](https://metacpan.org/author/PEVANS) brought up
-the idea for [Number::Denominal](https://metacpan.org/pod/Number::Denominal) that would split up a number into any
+the idea for [Number::Denominal](https://metacpan.org/pod/Number%3A%3ADenominal) that would split up a number into any
 arbitrarily defined arbitrary units and I am the code monkey that
 released it.
 
@@ -91,26 +89,25 @@ released it.
     );
 
 
-
     # Specify precision:
     my $string = denominal( $number, \'time', { precision => 2 } );
 
-Breaks up the number into given denominations and __returns__ it as a
+Breaks up the number into given denominations and **returns** it as a
 human-readable string (e.g. `"5 hours, 22 minutes, and 4 seconds"`.
 If the value for any unit ends up being zero, that unit will be omitted
 (an empty string will be returned if the given number is zero).
 
-__The first argument__ is the number that needs to be broken up into units.
+**The first argument** is the number that needs to be broken up into units.
 Negative numbers will be `abs()'ed`.
 
-__The other arguments__ are given as a list and
+**The other arguments** are given as a list and
 define unit denominations. The list of denominations should start
 with a unit name and end with a unit name, and each unit name must be
 separated by a number that represents how many left-side units fit into the
-right-side unit. __Unit name__ can be an arrayref, a simple string,
+right-side unit. **Unit name** can be an arrayref, a simple string,
 or a scalarref. The meaning is as follows:
 
-__The last argument__ is optional and, if present, is given as a
+**The last argument** is optional and, if present, is given as a
 hashref. It specifies various options. See `OPTIONS HASHREF` section
 below for possible values.
 
@@ -257,9 +254,9 @@ denominated. Currently supported values are as follows:
 
     my $string = denominal( $number, \'time', { precision => 2 } );
 
-__Takes__ a positive integer as a value. Specifies precision of output.
+**Takes** a positive integer as a value. Specifies precision of output.
 This means the output will have at most `precision` number of different
-units. __Rounding__ is in place for units smaller than `precision`.
+units. **Rounding** is in place for units smaller than `precision`.
 
 For example,
 
@@ -307,24 +304,23 @@ as zero.
     ## @bits will always contain 5 elements, some of which might be 0
 
 
-
     my @bits = denominal_list(
         $number,
         [ qw/60  60  24  7/ ],
     );
 
-Functions the same as `denominal()`, except it __returns__ a list of unit
+Functions the same as `denominal()`, except it **returns** a list of unit
 values, instead of a string. (e.g. when `denominal()` would return
 "8 hours, 23 minutes, and 5 seconds", `denominal_list()` would return
 a list of numbers—`8, 23, 5`—for hours, minutes, seconds, and
-`0` __for all the remaining units__).
+`0` **for all the remaining units**).
 
 Another shortcut is possible with `denominal_list()`. Instead of giving
 each unit a name, you can call `denominal_list()` with just
-__two arguments__ and pass an arrayref as the second
+**two arguments** and pass an arrayref as the second
 argument, containing a list of numbers defining unit denominations.
 
-__Note on precision:__ if you're using `precision` argument to specify
+**Note on precision:** if you're using `precision` argument to specify
 the precision of units (see its description in ["OPTIONS HASHREF"](#options-hashref)
 section above), then it will affect how many units will have values
 other than zeros; i.e. you'll still have the same number of elements
@@ -341,15 +337,19 @@ as without `precision`.
 
     say "The number has $data->{second} seconds and $data->{week} weeks!";
 
-Functions the same as `denominal()`, except it __returns__ a hashref
-where the keys are the __singular__ names of the units and values are
+Functions the same as `denominal()`, except it **returns** a hashref
+where the keys are the **singular** names of the units and values are
 the numerical values of each unit. If a unit's value is zero, its key
 will be absent from the hashref.
 
+# SEE ALSO
+
+[Lingua::EN::Number::Format::MixWithWords](https://metacpan.org/pod/Lingua%3A%3AEN%3A%3ANumber%3A%3AFormat%3A%3AMixWithWords)
+
 # AUTHORS
 
-- __Idea:__ Paul Evans, `<pevans at cpan.org>`
-- __Code:__ Zoffix Znet, `<zoffix at cpan.org>`
+- **Idea:** Paul Evans, `<pevans at cpan.org>`
+- **Code:** Zoffix Znet, `<zoffix at cpan.org>`
 
 # REPOSITORY
 

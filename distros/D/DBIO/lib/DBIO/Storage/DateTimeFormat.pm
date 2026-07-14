@@ -107,7 +107,7 @@ DBIO::Storage::DateTimeFormat - Strptime-backed datetime format base for driver 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

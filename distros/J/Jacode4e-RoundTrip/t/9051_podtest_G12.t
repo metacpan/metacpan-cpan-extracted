@@ -2,7 +2,7 @@
 #
 # 9051_podtest_G12.t
 #
-# Copyright (c) 2019, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.

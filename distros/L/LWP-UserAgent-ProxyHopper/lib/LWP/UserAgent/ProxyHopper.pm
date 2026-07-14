@@ -3,7 +3,7 @@ package LWP::UserAgent::ProxyHopper;
 use warnings;
 use strict;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use base qw(LWP::UserAgent LWP::UserAgent::ProxyHopper::Base);
 

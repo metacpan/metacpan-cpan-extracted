@@ -1,0 +1,11 @@
+[
+  {
+    "title":        "Users",
+    "link":         "/users",
+    "icon":         "fas fa-users",
+    "icon_color":   "#000000",
+    "menu":         "admin_menu",
+    "parent_title": "Administration",
+    "description":  "Manage application users"
+  }
+]

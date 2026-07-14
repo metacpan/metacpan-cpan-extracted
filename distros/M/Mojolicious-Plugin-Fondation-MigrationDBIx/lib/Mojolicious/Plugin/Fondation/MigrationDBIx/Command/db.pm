@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db;
-$Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db::VERSION = '0.02';
+$Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db::VERSION = '0.03';
 # ABSTRACT: Database migration and fixture commands for DBIx::Class backends
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -350,10 +350,10 @@ sub _copy_tree_from_plugins ($self, $app, $subdir, $target_dir, $force) {
 
             my $rel_path = $src->to_rel($src_root);
 
-            # Strip the plugin's fixture version prefix (e.g. "1/")
+            # Strip the plugin's fixture version prefix (e.g. "1/" or "1\")
             # so that fixtures land in the target version directory
             # determined by the current schema version.
-            $rel_path =~ s{^[^/]+/}{};
+            $rel_path =~ s{^[^/\\]+[/\\]}{};
             my $target = $target_dir->child($rel_path);
 
             next if -e $target && !$force;
@@ -506,7 +506,8 @@ sub _populate ($self, $app, $config, @args) {
     my $conf_dir = $app->home->child('share', 'fixtures', $set_version, 'conf');
 
     unless (-d $conf_dir) {
-        die "Fixture config directory not found: $conf_dir\n";
+        say "Fixture config directory not found: $conf_dir";
+        return;
     }
 
     # Discover available set names from conf/*.json
@@ -770,7 +771,7 @@ Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db - Database migration 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

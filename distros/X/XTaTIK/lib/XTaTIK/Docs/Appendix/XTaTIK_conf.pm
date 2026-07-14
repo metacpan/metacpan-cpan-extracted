@@ -3,7 +3,7 @@ package XTaTIK::Docs::Appendix::XTaTIK_conf;
 use strict;
 use warnings;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 1;
 __END__

@@ -46,7 +46,7 @@ sub cmd_release_notes {
   $release->write_tarball;
 
   # verify artifacts exist
-  my @file_list = map { "release-$version.$_" } qw(diffs lst tar.gz);
+  my @file_list = map {"release-$version.$_"} qw(diffs lst tar.gz);
 
   foreach my $file (@file_list) {
     die "ERROR: $file not found or empty!\n"
@@ -162,7 +162,7 @@ sub _extract_changelog_section {
 
   while ( my $line = <$fh> ) {
     $blocks++ if $line !~ /^\s/xsm && $line =~ /\S/xsm;
-    last if $blocks > 1;
+    last      if $blocks > 1;
     $section .= $line;
   }
 

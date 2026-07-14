@@ -28,11 +28,14 @@
 #include "API.h"
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 #include <lcd.h>
 #include <sys/mman.h>
 #include <softPwm.h>
 #include <softTone.h>
 #include <sr595.h>
+#include <pcf8574.h>
 
 // Used for interrupts (self-pipe: the wiringPi ISR thread write()s a fixed
 // event record to a pipe and never touches Perl; the Perl side reads
@@ -390,6 +393,11 @@ sr595Setup(pin_base, num_pins, data_pin, clock_pin, latch_pin)
     int clock_pin
     int latch_pin
 
+int
+pcf8574Setup(pin_base, i2c_address)
+    int pin_base
+    int i2c_address
+
 void
 piLock(keyNum)
     int keyNum
@@ -589,6 +597,141 @@ spiDataRW (channel, byte_ref, len)
             PUSHs(sv_2mortal(newSViv(buf[i])));
         Safefree(buf);
 
+void
+spiBitBang (clk, mosi, miso, cs, byte_ref, len, mode, delay_us)
+    int clk
+    int mosi
+    int miso
+    int cs
+    SV *byte_ref
+    int len
+    int mode
+    int delay_us
+    PREINIT:
+        AV *bytes;
+        unsigned char *buf;
+        int i;
+        int num_bytes;
+        int clk_idle;
+        int clk_active;
+        int cpha;
+    PPCODE:
+        if (clk < 0)
+            croak("spiBitBang: clk param must be a valid GPIO pin number");
+        if (mosi < -1)
+            croak("spiBitBang: mosi param must be a GPIO pin number, or -1 if unused");
+        if (miso < -1)
+            croak("spiBitBang: miso param must be a GPIO pin number, or -1 if unused");
+        if (cs < -1)
+            croak("spiBitBang: cs param must be a GPIO pin number, or -1 if unused");
+        if (! SvROK(byte_ref) || SvTYPE(SvRV(byte_ref)) != SVt_PVAV)
+            croak("spiBitBang: data param must be an array reference");
+        bytes = (AV*)SvRV(byte_ref);
+        num_bytes = av_len(bytes) + 1;
+        if (len != num_bytes)
+            croak("spiBitBang: len param does not match element count in data");
+        if (mode < 0 || mode > 3)
+            croak("spiBitBang: mode param must be 0-3");
+        if (delay_us < 0)
+            croak("spiBitBang: delay_us param must be 0 or greater");
+        Newx(buf, len > 0 ? len : 1, unsigned char);
+        for (i = 0; i < len; i++) {
+            SV **elem = av_fetch(bytes, i, 0);
+            int val;
+            if (elem == NULL || ! SvOK(*elem)) {
+                Safefree(buf);
+                croak("spiBitBang: byte %d in data param is undefined", i);
+            }
+            val = (int)SvNV(*elem);
+            if (val < 0 || val > 255) {
+                Safefree(buf);
+                croak("spiBitBang: byte %d in data param out of range: (%d)", i, val);
+            }
+            buf[i] = (unsigned char)val;
+        }
+
+        /* CPOL selects the clock idle level, CPHA the sampling edge. Data
+           is MSB-first, chip select is active-low, and the caller is
+           responsible for the pins already being in their idle states */
+
+        clk_idle   = (mode & 0x02) ? HIGH : LOW;
+        clk_active = (mode & 0x02) ? LOW : HIGH;
+        cpha       = mode & 0x01;
+
+        if (cs >= 0) {
+            digitalWrite(cs, LOW);
+            if (delay_us > 0)
+                delayMicroseconds(delay_us);
+        }
+
+        for (i = 0; i < len; i++) {
+            unsigned char in = 0;
+            int b;
+            for (b = 7; b >= 0; b--) {
+                if (cpha == 0) {
+                    /* Data valid before the leading edge; both ends sample
+                       on it, the trailing edge shifts */
+                    if (mosi >= 0)
+                        digitalWrite(mosi, (buf[i] >> b) & 0x01);
+                    if (delay_us > 0)
+                        delayMicroseconds(delay_us);
+                    digitalWrite(clk, clk_active);
+                    if (miso >= 0 && digitalRead(miso))
+                        in |= (unsigned char)(1 << b);
+                    if (delay_us > 0)
+                        delayMicroseconds(delay_us);
+                    digitalWrite(clk, clk_idle);
+                }
+                else {
+                    /* Data shifts on the leading edge and samples on the
+                       trailing edge */
+                    digitalWrite(clk, clk_active);
+                    if (mosi >= 0)
+                        digitalWrite(mosi, (buf[i] >> b) & 0x01);
+                    if (delay_us > 0)
+                        delayMicroseconds(delay_us);
+                    digitalWrite(clk, clk_idle);
+                    if (miso >= 0 && digitalRead(miso))
+                        in |= (unsigned char)(1 << b);
+                    if (delay_us > 0)
+                        delayMicroseconds(delay_us);
+                }
+            }
+            buf[i] = in;
+        }
+
+        if (cs >= 0)
+            digitalWrite(cs, HIGH);
+
+        EXTEND(SP, (SSize_t)len);
+        for (i = 0; i < len; i++)
+            PUSHs(sv_2mortal(newSViv(buf[i])));
+        Safefree(buf);
+
+int
+spiNoCS (channel, state)
+    int channel
+    int state
+    PREINIT:
+        int fd;
+        uint8_t spi_mode;
+    CODE:
+        if (channel != 0 && channel != 1)
+            croak("spiNoCS: channel param must be 0 or 1");
+        fd = wiringPiSPIGetFd(channel);
+        if (fd < 0)
+            croak("spiNoCS: SPI channel %d is not set up", channel);
+        if (ioctl(fd, SPI_IOC_RD_MODE, &spi_mode) < 0)
+            croak("spiNoCS: failed to read the SPI mode: %s", strerror(errno));
+        if (state)
+            spi_mode |= SPI_NO_CS;
+        else
+            spi_mode &= (uint8_t)~SPI_NO_CS;
+        if (ioctl(fd, SPI_IOC_WR_MODE, &spi_mode) < 0)
+            croak("spiNoCS: failed to write the SPI mode: %s", strerror(errno));
+        RETVAL = 1;
+    OUTPUT:
+        RETVAL
 
 int
 wiringPiSPIGetFd(channel)

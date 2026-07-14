@@ -70,7 +70,7 @@ DBIO::AccessBroker::Vault - Credential rotation with TTL
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,64 @@
+# Editor/OS
+*~
+.DS_Store
+.#*
+
+# Build
+/blib/
+/pm_to_blib
+/_build/
+/Build
+.Bsort.tmp
+*.o
+*.a
+*.so
+*.bs
+*.x
+*.xsc
+*.bin
+lib/**/*.c
+*.BUILD
+BUILD.bazel
+src_google_protobuf_descriptor.pb.cc
+/Protobuf.xs
+/Protobuf.c
+/Protobuf.c.test
+/protoc-gen-perl-pb
+/maint/generate_xs.pl.bak
+/stderr.txt
+/debug
+/tmp_debug/
+/tmp_gen/
+
+# Test
+/cover_db/
+# Ignore all files and directories within t/c by default
+t/c/**
+
+# BUT, don't ignore directories within t/c, so Git can traverse into them
+!t/c/**/
+
+# Now, re-include the specific file types you want to track
+!t/c/**/*.h
+!t/c/**/*.c
+!t/c/**/*.proto
+!t/c/**/*.json
+
+# Ignore these test-related files
+*.gcov
+*.gcno
+*.gcda
+
+# Distribution
+Protobuf-*
+MYMETA.*
+Makefile
+Makefile.old
+MANIFEST
+MANIFEST.bak
+ppport.h
+
+*.bak
+vgcore.*
+tmp/
+local/cache/authors/id/H/HA/HAARG/

@@ -85,7 +85,7 @@ DBIO::Storage::DBI::NoBindVars - Some DBDs have poor to no support for bind vari
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

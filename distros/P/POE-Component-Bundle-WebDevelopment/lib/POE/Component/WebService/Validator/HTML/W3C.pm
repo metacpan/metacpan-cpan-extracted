@@ -3,7 +3,7 @@ package POE::Component::WebService::Validator::HTML::W3C;
 use warnings;
 use strict;
 
-our $VERSION = '2.001001'; # VERSION
+our $VERSION = '2.001002'; # VERSION
 
 use WebService::Validator::HTML::W3C;
 use POE (qw( Wheel::Run  Filter::Reference  Filter::Line));

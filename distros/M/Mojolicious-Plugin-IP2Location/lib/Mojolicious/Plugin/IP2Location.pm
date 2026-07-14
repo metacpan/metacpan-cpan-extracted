@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::IP2Location;
 
-our $VERSION = '0.001001'; # VERSION
+our $VERSION = '0.001002'; # VERSION
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Geo::IP2Location::Lite;

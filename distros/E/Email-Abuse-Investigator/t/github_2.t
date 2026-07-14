@@ -126,7 +126,7 @@ sub without_ae_dns {
 	# $HAS_ANYEVENT_DNS flag is set to false.
 	Test::Without::Module->import('AnyEvent::DNS');
 	delete $INC{'Email/Abuse/Investigator.pm'};
-	{ no warnings 'redefine'; require Email::Abuse::Investigator; }
+	{ local $SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /redefined/ }; require Email::Abuse::Investigator; }
 
 	$code->();
 
@@ -136,7 +136,7 @@ sub without_ae_dns {
 		$INC{$key} = $saved_inc{$key} if defined $saved_inc{$key};
 	}
 	delete $INC{'Email/Abuse/Investigator.pm'};
-	{ no warnings 'redefine'; require Email::Abuse::Investigator; }
+	{ local $SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /redefined/ }; require Email::Abuse::Investigator; }
 }
 
 # =============================================================================

@@ -4,13 +4,13 @@
       "Zoffix Znet <zoffix@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-GetVolatileData",
    "prereqs" : {
@@ -36,14 +36,23 @@
    "provides" : {
       "Test::GetVolatileData" : {
          "file" : "lib/Test/GetVolatileData.pm",
-         "version" : "1.0102"
+         "version" : "2.001001"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zoffixznet/Test-GetVolatileData/issues"
+      },
+      "homepage" : "https://github.com/zoffixznet/Test-GetVolatileData",
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zoffixznet/Test-GetVolatileData.git",
+         "web" : "https://github.com/zoffixznet/Test-GetVolatileData"
+      }
    },
-   "version" : "1.0102"
+   "version" : "2.001001"
 }

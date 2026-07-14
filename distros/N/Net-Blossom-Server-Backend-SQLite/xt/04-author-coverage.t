@@ -30,6 +30,8 @@ my $test_status = _in_dir($dist, sub {
     local $ENV{HARNESS_PERL_SWITCHES} = join ',',
         '-MDevel::Cover=-db',
         $db,
+        '-blib',
+        0,
         '-coverage',
         'statement',
         '-coverage',

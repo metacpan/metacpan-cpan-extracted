@@ -1,5 +1,9 @@
 Revision history for Acme-Dump-And-Dumper
 
+1.001006  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.001005  2015-03-21
     - Fixed issues where objects that are referenced more
         than once weren't roperly processed (Issue #2)

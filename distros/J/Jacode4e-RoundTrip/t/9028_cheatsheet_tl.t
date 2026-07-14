@@ -2,7 +2,7 @@
 #
 # 9028_cheatsheet_tl.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Mabilis na Sanggunian ng Jacode4e::RoundTrip (Filipino/Tagalog)
 # Ang pagsubok na ito ay nagsisilbi ring mabilis na sanggunian para sa mga gumagamit ng Filipino.

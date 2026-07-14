@@ -35,12 +35,12 @@ At its simplest; use CSS selectors:
 # DESCRIPTION
 
 The module offers extra options and post-processing that the vanilla
-[HTML::ExtractText](https://metacpan.org/pod/HTML::ExtractText) does not provide.
+[HTML::ExtractText](https://metacpan.org/pod/HTML%3A%3AExtractText) does not provide.
 
 # METHODS FROM `HTML::ExtractText`
 
 This module offers all the standard methods and behaviour
-[HTML::ExtractText](https://metacpan.org/pod/HTML::ExtractText) provides. See its documentation for details.
+[HTML::ExtractText](https://metacpan.org/pod/HTML%3A%3AExtractText) provides. See its documentation for details.
 
 # EXTRA OPTIONS IN `->new`
 
@@ -120,9 +120,9 @@ Accessor method for the `nbsp` argument to `->new`.
 
 # SEE ALSO
 
-[HTML::ExtractText](https://metacpan.org/pod/HTML::ExtractText) - a basic version of this extractor
+[HTML::ExtractText](https://metacpan.org/pod/HTML%3A%3AExtractText) - a basic version of this extractor
 
-[Mojo::DOM](https://metacpan.org/pod/Mojo::DOM), [Text::Balanced](https://metacpan.org/pod/Text::Balanced), [HTML::Extract](https://metacpan.org/pod/HTML::Extract)
+[Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM), [Text::Balanced](https://metacpan.org/pod/Text%3A%3ABalanced), [HTML::Extract](https://metacpan.org/pod/HTML%3A%3AExtract)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>

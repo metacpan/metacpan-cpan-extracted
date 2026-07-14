@@ -1,14 +1,18 @@
 Changes
-LICENSE
 lib/Net/Blossom/Server/Backend/Postgres.pm
+lib/Net/Blossom/Server/Backend/Postgres/BlobStore.pm
+lib/Net/Blossom/Server/Backend/Postgres/MetadataStore.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 t/00-load.t
 t/01-Constructor.t
 t/02-Schema.t
 t/03-StorageContract.t
 t/04-Backend.t
 t/05-Concurrency.t
+t/06-Stream.t
 xt/00-author-pod-syntax.t
 xt/01-author-license-metadata.t
 xt/02-author-pod-coverage.t

@@ -148,7 +148,7 @@ DBIO::Diff::Op - Base class for DBIO driver diff operation objects
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

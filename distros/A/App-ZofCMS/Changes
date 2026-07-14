@@ -1,5 +1,9 @@
 Revision history for App-ZofCMS
 
+1.001009  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.001008 2019-12-05
     - Fixed incorrect plugin priority handling on newer perls
 

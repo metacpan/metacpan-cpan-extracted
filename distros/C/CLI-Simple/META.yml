@@ -26,10 +26,10 @@ no_index:
 provides:
   CLI::Simple:
     file: lib/CLI/Simple.pm
-    version: v2.0.13
+    version: v2.0.14
   CLI::Simple::Constants:
     file: lib/CLI/Simple/Constants.pm
-    version: v2.0.13
+    version: v2.0.14
   CLI::Simple::DumpSpec:
     file: lib/CLI/Simple/DumpSpec.pm
     version: '0'
@@ -50,7 +50,7 @@ provides:
     version: '0'
   CLI::Simple::Utils:
     file: lib/CLI/Simple/Utils.pm
-    version: v2.0.13
+    version: v2.0.14
 recommends:
   IO::Pager: '0'
 requires:
@@ -69,5 +69,5 @@ resources:
   bugtracker: http://github.com/rlauer6/CLI-Simple/issues
   homepage: http://github.com/rlauer6/CLI-Simple
   repository: git://github.com/rlauer6/CLI-Simple.git
-version: v2.0.13
+version: v2.0.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

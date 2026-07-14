@@ -5,7 +5,7 @@ package Net::OBEX::Response::Generic;
 use strict;
 use warnings;
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 use Carp;
 use base 'Class::Data::Accessor';

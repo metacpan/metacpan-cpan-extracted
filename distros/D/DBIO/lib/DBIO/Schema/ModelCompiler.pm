@@ -65,7 +65,7 @@ DBIO::Schema::ModelCompiler - compile a base-type schema into one engine's nativ
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

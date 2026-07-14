@@ -3,51 +3,51 @@ abstract: 'POE based base class for non-blocking wrappers around blocking stuff'
 author:
   - 'Zoffix Znet <cpan@zoffix.com>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::More: 0
-  perl: 5.006
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  perl: 5.006
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: POE-Component-NonBlockingWrapper-Base
 provides:
   POE::Component::NonBlockingWrapper::Base:
     file: lib/POE/Component/NonBlockingWrapper/Base.pm
-    version: 1.001002
+    version: '1.001003'
 requires:
-  Carp: 0
-  POE: 0
-  POE::Filter::Line: 0
-  POE::Filter::Reference: 0
-  POE::Wheel::Run: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  POE: '0'
+  POE::Filter::Line: '0'
+  POE::Filter::Reference: '0'
+  POE::Wheel::Run: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/zoffixznet/poe-component-nonblockingwrapper-base/issues
   homepage: http://metacpan.org/release/POE-Component-NonBlockingWrapper-Base
   repository: git://github.com/zoffixznet/poe-component-nonblockingwrapper-base.git
-version: 1.001002
+version: '1.001003'
 x_Dist_Zilla:
   perl:
-    version: 5.014002
+    version: '5.042002'
   plugins:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::ZOFFIX/OurPkgVersion'
-      version: 0.005001
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Pod::Spiffy
       name: '@Author::ZOFFIX/Pod::Spiffy'
-      version: 1.001007
+      version: '1.001007'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -56,15 +56,16 @@ x_Dist_Zilla:
           check_all_prereqs: 1
           modules: []
           phase: release
+          run_under_travis: 0
           skip:
+            - ExtUtils::MakeMaker
+            - File::Copy
+            - IPC::Open3
+            - base
             - strict
             - warnings
-            - base
-            - ExtUtils::MakeMaker
-            - IPC::Open3
-            - File::Copy
       name: '@Author::ZOFFIX/PromptIfStale'
-      version: 0.040
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -75,64 +76,64 @@ x_Dist_Zilla:
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
-          root: '.'
+          root: .
       name: '@Author::ZOFFIX/GatherDir'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::ZOFFIX/PruneCruft'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::ZOFFIX/ManifestSkip'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ZOFFIX/MetaYAML'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::ZOFFIX/License'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::ZOFFIX/Readme'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::ZOFFIX/ExecDir'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::ZOFFIX/ShareDir'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::ZOFFIX/MakeMaker'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::ZOFFIX/Manifest'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::ZOFFIX/AutoPrereqs'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::ZOFFIX/MetaConfig'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
       name: '@Author::ZOFFIX/Prereqs::AuthorDeps'
-      version: 0.004
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: '@Author::ZOFFIX/MinimumPerl'
-      version: 1.006
+      version: '1.006'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -141,21 +142,33 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::ZOFFIX/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: 5.032
+              version: '6.037'
+          include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: 1
           inherit_version: 1
           meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
       name: '@Author::ZOFFIX/MetaProvides::Package'
-      version: 2.003001
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
       name: '@Author::ZOFFIX/InstallGuide'
-      version: 1.200006
+      version: '1.200014'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
       name: '@Author::ZOFFIX/ReadmeAnyFromPod'
-      version: 0.150250
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -169,30 +182,31 @@ x_Dist_Zilla:
           needs_display: 0
           phase: test
           script_finder:
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@Author::ZOFFIX/Test::Compile'
-      version: 2.051
+      version: '2.059'
     -
       class: Dist::Zilla::Plugin::Test::DistManifest
       name: '@Author::ZOFFIX/Test::DistManifest'
-      version: 2.000005
+      version: '2.000006'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
           trailing_whitespace: 1
       name: '@Author::ZOFFIX/Test::EOL'
-      version: 0.17
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@Author::ZOFFIX/Test::Version'
-      version: 0.003001
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -200,85 +214,107 @@ x_Dist_Zilla:
           filename: xt/release/kwalitee.t
           skiptest: []
       name: '@Author::ZOFFIX/Test::Kwalitee'
-      version: 2.11
+      version: '2.13'
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: '@Author::ZOFFIX/MetaTests'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
       name: '@Author::ZOFFIX/Test::CPAN::Meta::JSON'
-      version: 0.003
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@Author::ZOFFIX/MojibakeTests'
-      version: 0.7
+      version: '0.8'
     -
-      class: Dist::Zilla::Plugin::NoTabsTests
+      class: Dist::Zilla::Plugin::Test::NoTabs
       config:
         Dist::Zilla::Plugin::Test::NoTabs:
-          filename: xt/release/no-tabs.t
+          filename: xt/author/no-tabs.t
           finder:
             - ':InstallModules'
             - ':ExecFiles'
             - ':TestFiles'
-      name: '@Author::ZOFFIX/NoTabsTests'
-      version: 0.13
+      name: '@Author::ZOFFIX/Test::NoTabs'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ZOFFIX/PodSyntaxTests'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
       name: '@Author::ZOFFIX/Test::Portability'
-      version: 2.000006
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::UnusedVars
       name: '@Author::ZOFFIX/Test::UnusedVars'
-      version: 2.000007
+      version: '2.001001'
     -
       class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
       name: '@Author::ZOFFIX/Test::Pod::LinkCheck'
-      version: 1.001
+      version: '1.004'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+          filename: xt/release/cpan-changes.t
       name: '@Author::ZOFFIX/Test::CPAN::Changes'
-      version: 0.009
+      version: '0.013'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories:
+            - bin
+            - lib
+          spell_cmd: ''
+          stopwords: []
+          wordlist: Pod::Wordlist
       name: '@Author::ZOFFIX/Test::PodSpelling'
-      version: 2.006008
+      version: '2.007006'
     -
       class: Dist::Zilla::Plugin::CheckSelfDependency
       config:
         Dist::Zilla::Plugin::CheckSelfDependency:
           finder:
             - ':InstallModules'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
       name: '@Author::ZOFFIX/CheckSelfDependency'
-      version: 0.010
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Author::ZOFFIX/CheckPrereqsIndexed'
-      version: 0.015
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
+      config:
+        Dist::Zilla::Plugin::Test::MinimumVersion:
+          max_target_perl: '5.008008'
       name: '@Author::ZOFFIX/Test::MinimumVersion'
-      version: 2.000006
+      version: '2.000011'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
         Dist::Zilla::Plugin::Git::NextVersion:
-          first_version: 1.001001
+          first_version: '1.001001'
           version_by_branch: 0
-          version_regexp: '(?^:^v(.+)$)'
+          version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.43.0
+          repo_root: .
       name: '@Author::ZOFFIX/Git::NextVersion'
-      version: 2.030
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::AutoMetaResources
       name: '@Author::ZOFFIX/AutoMetaResources'
-      version: 1.20
+      version: '1.21'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -287,19 +323,19 @@ x_Dist_Zilla:
             - README.md
           match: []
       name: '@Author::ZOFFIX/CopyFilesFromRelease'
-      version: 0.005
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::ZOFFIX/TestRelease'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::ZOFFIX/InstallRelease'
-      version: 0.008
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::ZOFFIX/ConfirmRelease'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -307,45 +343,52 @@ x_Dist_Zilla:
           untracked_files: die
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
-            - dist.ini
             - Changes
+            - dist.ini
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.43.0
+          repo_root: .
       name: '@Author::ZOFFIX/Git::Check'
-      version: 2.030
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
-          time_zone: local
+          commit_msg: v%V%n%n%c
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
-            - dist.ini
             - Changes
+            - dist.ini
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.43.0
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
       name: '@Author::ZOFFIX/Git::Commit'
-      version: 2.030
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
+          changelog: Changes
           signed: 0
-          tag: v1.001002
-          tag_format: v%v
-          tag_message: v%v
-          time_zone: local
+          tag: v1.001003
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.43.0
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
       name: '@Author::ZOFFIX/Git::Tag'
-      version: 2.030
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -354,51 +397,63 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          repo_root: '.'
+          git_version: 2.43.0
+          repo_root: .
       name: '@Author::ZOFFIX/Git::Push'
-      version: 2.030
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::ZOFFIX/UploadToCPAN'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 5.032
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 5.032
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: 5.032
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::ZOFFIX/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: 5.032
+      version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: 5.032
+    version: '6.037'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

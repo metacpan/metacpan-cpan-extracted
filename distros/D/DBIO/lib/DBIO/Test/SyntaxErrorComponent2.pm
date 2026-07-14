@@ -20,7 +20,7 @@ DBIO::Test::SyntaxErrorComponent2 - Test component with intentional syntax error
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

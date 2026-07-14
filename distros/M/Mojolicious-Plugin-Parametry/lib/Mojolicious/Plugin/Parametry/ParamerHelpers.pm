@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Mojo::Collection;
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 sub new { bless { _c => $_[1] }, $_[0] }
 

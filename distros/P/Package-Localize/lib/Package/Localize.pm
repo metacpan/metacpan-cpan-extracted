@@ -3,7 +3,7 @@ package Package::Localize;
 use strict;
 use warnings;
 
-our $VERSION = '1.001002'; # VERSION
+our $VERSION = '1.001003'; # VERSION
 
 use Data::GUID;
 use List::AllUtils qw/uniq/;

@@ -134,7 +134,7 @@ DBIO::AccessBroker - Credential lifecycle for DBIO connections
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package HTML::ExtractText;
 use strict;
 use warnings;
 
-our $VERSION = '1.002004'; # VERSION
+our $VERSION = '1.002005'; # VERSION
 
 use Try::Tiny;
 use Scalar::Util qw/blessed/;
@@ -149,17 +149,24 @@ sub _extract {
         ->map( sub { $self->_process( @_ ) } )->each;
 }
 
-# The _all_text & _text functions copied from Mojo::DOM 6.66.
+# The _all_text & _text functions copied from Mojo::DOM 6.66, adapted to
+# avoid Mojo::DOM's private _nodes()/_ancestors() internals, whose return
+# conventions changed in later Mojo::DOM releases (which silently broke text
+# extraction). _child_nodes() reads the stable ->tree node structure directly.
+sub _child_nodes {
+    my $tree = shift;
+    return unless $tree;
+    return @$tree[ ( $tree->[0] eq 'tag' ? 4 : 1 ) .. $#$tree ];
+}
+
 sub _all_text {
     my ( $dom ) = @_;
     my $trim = 1;
 
-    # Detect "pre" tag
-    my $tree = $dom->tree;
-    map { $_->[1] eq 'pre' and $trim = 0 } Mojo::DOM::_ancestors( $dom ), $tree
-        if $trim && $tree->[0] ne 'root';
+    # Detect "pre" tag on the element itself or any of its ancestors
+    $trim = 0 if $dom->tag eq 'pre' or $dom->ancestors('pre')->size;
 
-    return _text( [Mojo::DOM::_nodes($tree)], $trim );
+    return _text( [ _child_nodes( $dom->tree ) ], $trim );
 }
 
 sub _text {
@@ -193,7 +200,7 @@ sub _text {
         # Nested tag.
         elsif ( $type eq 'tag' ) {
            no warnings 'recursion';
-           $chunk = _text( [Mojo::DOM::_nodes($node)], 1, $node->[1] eq 'pre' ? 0 : $trim );
+           $chunk = _text( [ _child_nodes($node) ], 1, $node->[1] eq 'pre' ? 0 : $trim );
         }
 
         # Add leading whitespace if punctuation allows it.
@@ -559,7 +566,7 @@ to C<bug-html-extracttext at rt.cpan.org>
 
 =for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-author.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
 
-=for html   <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/ZOFFIX"> <img src="http://www.gravatar.com/avatar/328e658ab6b08dfb5c106266a4a5d065?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F627d83ef9879f31bdabf448e666a32d5" alt="ZOFFIX" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">ZOFFIX</span> </a> </span>
+=for html   <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/ZOFFIX"> <img src="" alt="ZOFFIX" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">ZOFFIX</span> </a> </span>
 
 =for text Zoffix Znet <zoffix at cpan.org>
 

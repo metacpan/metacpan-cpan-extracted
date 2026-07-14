@@ -50,7 +50,7 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'DBIx-Class-Async-*' },
-    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+    META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
             'DBIx::Class::Async' => {
@@ -131,7 +131,6 @@ WriteMakefile(
             bugtracker => {
                 web  => 'https://github.com/manwar/DBIx-Class-Async/issues'
             },
-        }})
-     : ()
-    ),
+        },
+    },
 );

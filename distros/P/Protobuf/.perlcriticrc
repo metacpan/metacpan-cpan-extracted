@@ -1,1 +1,20 @@
-severity = 3
+# .perlcriticrc
+
+# Default severity: 4 (Stern)
+severity = 4
+
+# Themes to include
+theme = core && !cosmetic
+
+# Disable some noisy or overly strict policies
+[-NamingConventions::Capitalization]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-Modules::RequireEndWithOne]
+[-RegularExpressions::RequireExtendedFormatting]
+
+# Configure specific policies
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[Documentation::RequirePodSections]
+

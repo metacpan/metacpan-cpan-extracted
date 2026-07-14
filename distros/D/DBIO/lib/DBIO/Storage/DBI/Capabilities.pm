@@ -92,7 +92,7 @@ DBIO::Storage::DBI::Capabilities - Two-tier capability probing for DBI storage d
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

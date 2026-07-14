@@ -394,6 +394,26 @@ EOT
 };
 
 
+subtest "Weird non-existing variable name" => sub {
+  my $src = <<'EOT';
+     [FOO]
+     var=abcde
+
+     [BAR]
+     a = $([BAR][FOO]var)
+EOT
+  my $obj = Config::INI::RefVars->new->parse_ini(src => $src);
+  is_deeply($obj->variables,
+            {
+             'FOO' => { var => 'abcde' },
+             'BAR' => { a   => ""      },
+            },
+            'variables(): non existing $([BAR][FOO]var) gives empty string');
+};
+
+
+
+
 #==================================================================================================
 done_testing();
 

@@ -1,6 +1,6 @@
 package XTaTIK::Model::ProductSearch;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Mojo::Base -base;
 use Search::Indexer;

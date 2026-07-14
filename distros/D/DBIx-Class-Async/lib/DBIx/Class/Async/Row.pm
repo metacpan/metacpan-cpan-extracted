@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.4');
+our $VERSION   = qv('v1.0.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::Row - Asynchronous Row object representing a single database
 
 =head1 VERSION
 
-Version v1.0.4
+Version v1.0.5
 
 =head1 SYNOPSIS
 
@@ -1288,7 +1288,7 @@ sub _ensure_accessors {
             *{"${class}::$rel_name"} = sub {
                 my ($inner, @args) = @_;
 
-                # PRIORITY: If we have a prefetched object, return it —
+                # PRIORITY: If we have a prefetched object, return it -
                 # UNLESS the relationship has a where condition containing
                 # raw SQL refs (e.g. \'datetime("now")'). Such conditions
                 # cannot be evaluated in Perl, so we must skip the cache
@@ -1377,7 +1377,7 @@ sub _fetch_relationship_async {
 
     # 2. Cache Hit Logic
     # Skip cache if relationship has raw SQL refs in where condition
-    # (e.g. \'datetime("now")') — these cannot be evaluated in Perl
+    # (e.g. \'datetime("now")') - these cannot be evaluated in Perl
     # and must go to the DB to be applied correctly every time.
     my $rel_where     = $rel_info->{attrs}{where};
     my $has_sql_where = $rel_where && _where_has_sql_refs($rel_where);
@@ -1402,7 +1402,7 @@ sub _fetch_relationship_async {
     # Previously rel_info->{attrs}{where} was never passed to search(),
     # so datetime filters and any other where on the relationship definition
     # were silently dropped on every async fetch.
-    # Only build %search_attrs if we actually have a rel_where to merge —
+    # Only build %search_attrs if we actually have a rel_where to merge -
     # passing an empty hashref instead of undef can interfere with other
     # attrs-based mechanisms such as _has_dynamic_sql cache detection.
     my %search_attrs = %{ $attrs // {} };
@@ -1427,7 +1427,7 @@ sub _fetch_relationship_async {
     }
     else {
         # Multi returns the RS directly (synchronously).
-        # Only pass \%search_attrs if it contains something — passing an
+        # Only pass \%search_attrs if it contains something - passing an
         # empty hashref instead of the original $attrs risks discarding
         # caller-provided attrs such as +select with dynamic SQL, which
         # would break _has_dynamic_sql cache detection in ResultSet.pm.

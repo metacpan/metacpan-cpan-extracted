@@ -1,0 +1,114 @@
+package Google::Api::Httpbody;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Protobuf::Any };
+    my $descriptor_b64 = <<'EOF';
+Chlnb29nbGUvYXBpL2h0dHBib2R5LnByb3RvEgpnb29nbGUuYXBpGhlnb29nbGUvcHJvdG9i
+dWYvYW55LnByb3RvIncKCEh0dHBCb2R5EiEKDGNvbnRlbnRfdHlwZRgBIAEoCVILY29udGVu
+dFR5cGUSEgoEZGF0YRgCIAEoDFIEZGF0YRI0CgpleHRlbnNpb25zGAMgAygLMhQuZ29vZ2xl
+LnByb3RvYnVmLkFueVIKZXh0ZW5zaW9uc0JlCg5jb20uZ29vZ2xlLmFwaUINSHR0cEJvZHlQ
+cm90b1ABWjtnb29nbGUuZ29sYW5nLm9yZy9nZW5wcm90by9nb29nbGVhcGlzL2FwaS9odHRw
+Ym9keTtodHRwYm9keaICBEdBUElKmxMKBhIEDgBPAQq8BAoBDBIDDgASMrEEIENvcHlyaWdo
+dCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2Us
+IFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZp
+bGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0
+YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5v
+cmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJs
+ZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1
+bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAog
+V0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBl
+eHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBs
+YW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0
+aGUgTGljZW5zZS4KCggKAQISAxAAEwoJCgIDABIDEgAjCggKAQgSAxQAUgoJCgIICxIDFABS
+CggKAQgSAxUAIgoJCgIIChIDFQAiCggKAQgSAxYALgoJCgIICBIDFgAuCggKAQgSAxcAJwoJ
+CgIIARIDFwAnCggKAQgSAxgAIgoJCgIIJBIDGAAiCrIKCgIEABIERQBPARqlCiBNZXNzYWdl
+IHRoYXQgcmVwcmVzZW50cyBhbiBhcmJpdHJhcnkgSFRUUCBib2R5LiBJdCBzaG91bGQgb25s
+eSBiZSB1c2VkIGZvcgogcGF5bG9hZCBmb3JtYXRzIHRoYXQgY2FuJ3QgYmUgcmVwcmVzZW50
+ZWQgYXMgSlNPTiwgc3VjaCBhcyByYXcgYmluYXJ5IG9yCiBhbiBIVE1MIHBhZ2UuCgoKIFRo
+aXMgbWVzc2FnZSBjYW4gYmUgdXNlZCBib3RoIGluIHN0cmVhbWluZyBhbmQgbm9uLXN0cmVh
+bWluZyBBUEkgbWV0aG9kcyBpbgogdGhlIHJlcXVlc3QgYXMgd2VsbCBhcyB0aGUgcmVzcG9u
+c2UuCgogSXQgY2FuIGJlIHVzZWQgYXMgYSB0b3AtbGV2ZWwgcmVxdWVzdCBmaWVsZCwgd2hp
+Y2ggaXMgY29udmVuaWVudCBpZiBvbmUKIHdhbnRzIHRvIGV4dHJhY3QgcGFyYW1ldGVycyBm
+cm9tIGVpdGhlciB0aGUgVVJMIG9yIEhUVFAgdGVtcGxhdGUgaW50byB0aGUKIHJlcXVlc3Qg
+ZmllbGRzIGFuZCBhbHNvIHdhbnQgYWNjZXNzIHRvIHRoZSByYXcgSFRUUCBib2R5LgoKIEV4
+YW1wbGU6CgogICAgIG1lc3NhZ2UgR2V0UmVzb3VyY2VSZXF1ZXN0IHsKICAgICAgIC8vIEEg
+dW5pcXVlIHJlcXVlc3QgaWQuCiAgICAgICBzdHJpbmcgcmVxdWVzdF9pZCA9IDE7CgogICAg
+ICAgLy8gVGhlIHJhdyBIVFRQIGJvZHkgaXMgYm91bmQgdG8gdGhpcyBmaWVsZC4KICAgICAg
+IGdvb2dsZS5hcGkuSHR0cEJvZHkgaHR0cF9ib2R5ID0gMjsKCiAgICAgfQoKICAgICBzZXJ2
+aWNlIFJlc291cmNlU2VydmljZSB7CiAgICAgICBycGMgR2V0UmVzb3VyY2UoR2V0UmVzb3Vy
+Y2VSZXF1ZXN0KQogICAgICAgICByZXR1cm5zIChnb29nbGUuYXBpLkh0dHBCb2R5KTsKICAg
+ICAgIHJwYyBVcGRhdGVSZXNvdXJjZShnb29nbGUuYXBpLkh0dHBCb2R5KQogICAgICAgICBy
+ZXR1cm5zIChnb29nbGUucHJvdG9idWYuRW1wdHkpOwoKICAgICB9CgogRXhhbXBsZSB3aXRo
+IHN0cmVhbWluZyBtZXRob2RzOgoKICAgICBzZXJ2aWNlIENhbGRhdlNlcnZpY2UgewogICAg
+ICAgcnBjIEdldENhbGVuZGFyKHN0cmVhbSBnb29nbGUuYXBpLkh0dHBCb2R5KQogICAgICAg
+ICByZXR1cm5zIChzdHJlYW0gZ29vZ2xlLmFwaS5IdHRwQm9keSk7CiAgICAgICBycGMgVXBk
+YXRlQ2FsZW5kYXIoc3RyZWFtIGdvb2dsZS5hcGkuSHR0cEJvZHkpCiAgICAgICAgIHJldHVy
+bnMgKHN0cmVhbSBnb29nbGUuYXBpLkh0dHBCb2R5KTsKCiAgICAgfQoKIFVzZSBvZiB0aGlz
+IHR5cGUgb25seSBjaGFuZ2VzIGhvdyB0aGUgcmVxdWVzdCBhbmQgcmVzcG9uc2UgYm9kaWVz
+IGFyZQogaGFuZGxlZCwgYWxsIG90aGVyIGZlYXR1cmVzIHdpbGwgY29udGludWUgdG8gd29y
+ayB1bmNoYW5nZWQuCgoKCgMEAAESA0UIEApaCgQEAAIAEgNHAhoaTSBUaGUgSFRUUCBDb250
+ZW50LVR5cGUgaGVhZGVyIHZhbHVlIHNwZWNpZnlpbmcgdGhlIGNvbnRlbnQgdHlwZSBvZiB0
+aGUgYm9keS4KCgwKBQQAAgAFEgNHAggKDAoFBAACAAESA0cJFQoMCgUEAAIAAxIDRxgZCjwK
+BAQAAgESA0oCERovIFRoZSBIVFRQIHJlcXVlc3QvcmVzcG9uc2UgYm9keSBhcyByYXcgYmlu
+YXJ5LgoKDAoFBAACAQUSA0oCBwoMCgUEAAIBARIDSggMCgwKBQQAAgEDEgNKDxAKbQoEBAAC
+AhIDTgIuGmAgQXBwbGljYXRpb24gc3BlY2lmaWMgcmVzcG9uc2UgbWV0YWRhdGEuIE11c3Qg
+YmUgc2V0IGluIHRoZSBmaXJzdCByZXNwb25zZQogZm9yIHN0cmVhbWluZyBBUElzLgoKDAoF
+BAACAgQSA04CCgoMCgUEAAICBhIDTgseCgwKBQQAAgIBEgNOHykKDAoFBAACAgMSA04sLWIG
+cHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Api::Httpbody::HttpBody ===
+    # Fields for HttpBody
+    # Field: content_type Type: 9 ()
+    # Field: data Type: 12 ()
+    # Field: extensions Type: 11 (.google.protobuf.Any)
+
+=pod
+
+=head1 NAME
+
+Google::Api::Httpbody::HttpBody - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::Httpbody;
+
+    my $msg = Google::Api::Httpbody::HttpBody->new(
+        content_type => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<content_type>
+
+Type: String
+
+=item * B<data>
+
+Type: Bytes
+
+=item * B<extensions>
+
+Type: Message (.google.protobuf.Any)
+
+=back
+
+=cut
+
+1;

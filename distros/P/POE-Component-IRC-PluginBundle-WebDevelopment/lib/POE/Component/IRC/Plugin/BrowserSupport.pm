@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::BrowserSupport;
 use warnings;
 use strict;
 
-our $VERSION = '2.001003'; # VERSION
+our $VERSION = '2.001004'; # VERSION
 
 use POE::Component::WWW::WebDevout::BrowserSupportInfo;
 use base 'POE::Component::IRC::Plugin::BasePoCoWrap';

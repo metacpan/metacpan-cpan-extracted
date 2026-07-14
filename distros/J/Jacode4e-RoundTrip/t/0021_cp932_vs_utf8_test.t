@@ -2,7 +2,7 @@
 #
 # 0021_cp932_vs_utf8_test.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;

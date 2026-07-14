@@ -1,5 +1,9 @@
 Revision history for POE-Component-IRC-Plugin-BaseWrap
 
+1.001002  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 1.001001  2014-02-02
     - Merged POE::Component::IRC::Plugin::BaseWrap
         and POE::Component::IRC::Plugin::BasePoCoWrap

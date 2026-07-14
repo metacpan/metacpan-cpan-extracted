@@ -56,11 +56,13 @@ t/QuickDB/QuickDB.pm
 t/QuickDB/SQLite.t
 t/Tools/QuickDB.t
 t/broken_mariadb_versions.t
+t/clone_cleanup.t
 t/clone_dir.t
 t/clone_sequence.t
 t/fast_destroy.t
 t/lib/QDB/DriverBody.pm
 t/lib/QDB/Installs.pm
+t/mysql_root_user.t
 t/resource_skip.t
 t/schema/duckdb.sql
 t/schema/mariadb.sql

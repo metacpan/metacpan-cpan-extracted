@@ -56,7 +56,7 @@ my $source = Mock::Source->new( Details => 'multi', Items => 'multi' );
 my $schema = Mock::Schema->new($source);
 my $RC     = 'My::Schema::Result::Operation';
 
-subtest 'base class — throw and catch' => sub {
+subtest 'base class - throw and catch' => sub {
     throws_ok {
         DBIx::Class::Async::Exception->throw(
             message => 'Something went wrong',
@@ -71,21 +71,21 @@ subtest 'base class — throw and catch' => sub {
     ok( $e,                                  'boolean overload is true' );
 };
 
-subtest 'base class — rethrow preserves object identity' => sub {
+subtest 'base class - rethrow preserves object identity' => sub {
     eval { DBIx::Class::Async::Exception->throw( message => 'Original' ) };
     my $original = $@;
     throws_ok { $original->rethrow } 'DBIx::Class::Async::Exception', 'rethrow throws';
     is( $@, $original, 'same object re-thrown' );
 };
 
-subtest 'base class — throw(existing_object) re-throws as-is' => sub {
+subtest 'base class - throw(existing_object) re-throws as-is' => sub {
     my $e = DBIx::Class::Async::Exception->new( message => 'Already built' );
     throws_ok { DBIx::Class::Async::Exception->throw($e) }
         'DBIx::Class::Async::Exception';
     is( $@, $e, 'same object re-thrown' );
 };
 
-subtest 'base class — loading base also loads full hierarchy' => sub {
+subtest 'base class - loading base also loads full hierarchy' => sub {
     for my $subclass (qw(
         DBIx::Class::Async::Exception::RelationshipAsColumn
         DBIx::Class::Async::Exception::NotInStorage
@@ -98,7 +98,7 @@ subtest 'base class — loading base also loads full hierarchy' => sub {
     }
 };
 
-subtest 'RelationshipAsColumn — direct use and accessors' => sub {
+subtest 'RelationshipAsColumn - direct use and accessors' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::RelationshipAsColumn->throw(
             message           => "[DBIx::Class::Async] Relationship 'Details' ...",
@@ -121,7 +121,7 @@ subtest 'RelationshipAsColumn — direct use and accessors' => sub {
     like( "$e",                qr/Details/,          'stringifies via message' );
 };
 
-subtest 'RelationshipAsColumn — relationship_type defaults to "relationship"' => sub {
+subtest 'RelationshipAsColumn - relationship_type defaults to "relationship"' => sub {
     my $e = DBIx::Class::Async::Exception::RelationshipAsColumn->new(
         message      => 'test',
         relationship => 'Foo',
@@ -129,7 +129,7 @@ subtest 'RelationshipAsColumn — relationship_type defaults to "relationship"' 
     is( $e->relationship_type, 'relationship', 'default relationship_type' );
 };
 
-subtest 'NotInStorage — direct use and accessors' => sub {
+subtest 'NotInStorage - direct use and accessors' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::NotInStorage->throw(
             message   => "[DBIx::Class::Async] Cannot update row not in storage",
@@ -146,7 +146,7 @@ subtest 'NotInStorage — direct use and accessors' => sub {
     like( $e->hint, qr/insert/i, 'hint present' );
 };
 
-subtest 'MissingColumn — direct use and accessors' => sub {
+subtest 'MissingColumn - direct use and accessors' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::MissingColumn->throw(
             message      => "[DBIx::Class::Async] Required column 'opdate' not provided",
@@ -163,7 +163,7 @@ subtest 'MissingColumn — direct use and accessors' => sub {
     is( $e->source_class, $RC,      'source_class accessor' );
 };
 
-subtest 'NoSuchRelationship — direct use and accessors' => sub {
+subtest 'NoSuchRelationship - direct use and accessors' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::NoSuchRelationship->throw(
             message      => "[DBIx::Class::Async] No relationship 'Widgets' on $RC",
@@ -178,7 +178,7 @@ subtest 'NoSuchRelationship — direct use and accessors' => sub {
     is( $e->relationship, 'Widgets', 'relationship accessor' );
 };
 
-subtest 'AmbiguousColumn — direct use and accessors' => sub {
+subtest 'AmbiguousColumn - direct use and accessors' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::AmbiguousColumn->throw(
             message => "[DBIx::Class::Async] Ambiguous column 'status'",
@@ -192,7 +192,7 @@ subtest 'AmbiguousColumn — direct use and accessors' => sub {
     is( $e->column, 'status', 'column accessor' );
 };
 
-subtest 'Factory — produces RelationshipAsColumn' => sub {
+subtest 'Factory - produces RelationshipAsColumn' => sub {
     my $raw = "DBIx::Class::Row::store_column(): No such column 'Details' "
             . "on My::Schema::Result::Operation at ...";
 
@@ -213,7 +213,7 @@ subtest 'Factory — produces RelationshipAsColumn' => sub {
     is( $e->original_error,    $raw,               'original_error' );
 };
 
-subtest 'Factory — genuine unknown column produces base exception' => sub {
+subtest 'Factory - genuine unknown column produces base exception' => sub {
     my $raw = "DBIx::Class::Row::store_column(): No such column 'Nonexistent' "
             . "on My::Schema::Result::Operation at ...";
 
@@ -230,7 +230,7 @@ subtest 'Factory — genuine unknown column produces base exception' => sub {
     like( $@->hint, qr/add_columns/i, 'hints at add_columns' );
 };
 
-subtest 'Factory — not in_storage' => sub {
+subtest 'Factory - not in_storage' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::Factory->throw_from_dbic_error(
             error     => 'Unable to perform update on a row not in_storage',
@@ -240,7 +240,7 @@ subtest 'Factory — not in_storage' => sub {
     is( $@->operation, 'update', 'operation' );
 };
 
-subtest 'Factory — ambiguous column' => sub {
+subtest 'Factory - ambiguous column' => sub {
     throws_ok {
         DBIx::Class::Async::Exception::Factory->throw_from_dbic_error(
             error => "Column 'status' in where clause is ambiguous",
@@ -250,7 +250,7 @@ subtest 'Factory — ambiguous column' => sub {
     like( $@->hint, qr/me\.status/, 'hint' );
 };
 
-subtest 'Factory — unknown error wraps in base exception' => sub {
+subtest 'Factory - unknown error wraps in base exception' => sub {
     my $raw = 'Some completely unknown internal DBIC error XYZ-99';
     throws_ok {
         DBIx::Class::Async::Exception::Factory->throw_from_dbic_error( error => $raw );
@@ -258,7 +258,7 @@ subtest 'Factory — unknown error wraps in base exception' => sub {
     is( $@->original_error, $raw, 'original_error preserved' );
 };
 
-subtest 'Factory — re-throws existing Async exception as-is' => sub {
+subtest 'Factory - re-throws existing Async exception as-is' => sub {
     my $existing = DBIx::Class::Async::Exception->new( message => 'Already one of ours' );
     throws_ok {
         DBIx::Class::Async::Exception::Factory->throw_from_dbic_error( error => $existing );
@@ -266,7 +266,7 @@ subtest 'Factory — re-throws existing Async exception as-is' => sub {
     is( $@, $existing, 'same object, not re-wrapped' );
 };
 
-subtest 'Factory — make_from_dbic_error returns instead of throwing' => sub {
+subtest 'Factory - make_from_dbic_error returns instead of throwing' => sub {
     my $raw = "DBIx::Class::Row::store_column(): No such column 'Details' "
             . "on My::Schema::Result::Operation at ...";
 

@@ -45,7 +45,7 @@ DBIO::Storage::DBI::IdentityInsert - Storage Component for Sybase ASE and MSSQL 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

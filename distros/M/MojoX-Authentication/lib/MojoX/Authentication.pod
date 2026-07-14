@@ -7,12 +7,13 @@
 
 =head1 NAME
 
-MojoX::Authentication - [Put something meaningful here!]
+MojoX::Authentication - moderately opinionated support module for
+authentication in Mojolicious applications (local and SAML2)
 
 
 =head1 VERSION
 
-This document describes MojoX::Authentication version 0.001.
+This document describes MojoX::Authentication version 0.003.
 
 =begin html
 

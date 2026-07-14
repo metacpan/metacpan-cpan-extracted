@@ -191,7 +191,7 @@ This module is currently maintained by:
 </div>
 
 <div>
-    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/CWEST"> <img src="http://www.gravatar.com/avatar/1ed0b822068d34032bca7d2beeb2f846?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2Fb3bb9984adabb61d974f96965b2ed074" alt="CWEST" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">CWEST</span> </a> </span>
+    <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/CWEST"> <img src="http://www.gravatar.com/avatar/b3bb9984adabb61d974f96965b2ed074?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2Fb3bb9984adabb61d974f96965b2ed074" alt="CWEST" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">CWEST</span> </a> </span>
 </div>
 
 <div>

@@ -18,7 +18,7 @@ DBIO::Test::FakeComponent - Test component for ensure_class_loaded testing
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

@@ -27,11 +27,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -3890,11 +3890,21 @@ sub _parse_domain_whois_abuse :Private {
 #   preferred over raw WHOIS because it returns structured JSON.
 #
 # Entry criteria:
-#   $ip     -- a defined IPv4 or IPv6 address string.
+#   $ip     -- a defined IPv4 or IPv6 address string.  RFC 4007 zone
+#              identifiers (e.g. %eth0 appended to link-local addresses)
+#              are stripped before validation.  The remaining value must
+#              match dotted-quad IPv4 or bare hex-colon IPv6; malformed
+#              inputs return {} immediately without a network call.
 #   LWP::UserAgent must be installed.
 #
 # Exit status:
-#   Returns { org, abuse, country } hashref; empty hashref on failure.
+#   Returns { org, abuse, country } hashref; empty hashref on failure or
+#   when $ip does not pass format validation.
+#
+# Security:
+#   $ip is validated before being interpolated into the RDAP URL path to
+#   prevent URL path manipulation.  Zone IDs are stripped first because
+#   a literal '%' in the path would corrupt the URL.
 
 sub _rdap_lookup :Protected {
 	my ($self, $ip) = @_;
@@ -3917,9 +3927,19 @@ sub _rdap_lookup :Protected {
 		$self->{ua} = $ua;
 	}
 
+	# Validate and normalise the IP before interpolating into the URL path.
+	# Strip RFC 4007 IPv6 zone IDs (%eth0 suffix) which would corrupt the URL,
+	# then assert the result is a valid dotted-quad IPv4 or bare hex IPv6.
+	(my $safe_ip = $ip) =~ s/%.*\z//;
+	unless ($safe_ip =~ /\A\d{1,3}(?:\.\d{1,3}){3}\z/
+	     || $safe_ip =~ /\A[0-9a-fA-F:]+\z/) {
+		$self->_debug("_rdap_lookup: malformed IP '$ip' -- skipping");
+		return {};
+	}
+
 	# Use the ARIN RDAP endpoint; it covers the ARIN region and redirects
 	# for RIPE/APNIC/LACNIC/AfriNIC allocations.
-	my $res = eval { $ua->get("https://rdap.arin.net/registry/ip/$ip") };
+	my $res = eval { $ua->get("https://rdap.arin.net/registry/ip/$safe_ip") };
 	return {} unless $res && $res->is_success();
 
 	my $j = $res->decoded_content();
@@ -3952,12 +3972,21 @@ sub _rdap_lookup :Protected {
 #   IO::Socket::IP when that module is available.
 #
 # Entry criteria:
-#   $query   -- the domain name or IP to query (defined, non-empty).
+#   $query   -- the domain name or IP to query (defined, non-empty after
+#               stripping control characters; croaks if it becomes empty).
 #   $server  -- the WHOIS server hostname (default: 'whois.iana.org').
 #   $self->{timeout} -- seconds used for connect and per-read waits.
 #
 # Exit status:
 #   Returns the raw WHOIS response string, or undef on connection/write failure.
+#   Croaks if $query is empty or contains only control characters.
+#
+# Security:
+#   All ASCII control characters (C0 range 0x00-0x1F and DEL 0x7F) are
+#   stripped from $query before it is sent to the socket.  This prevents
+#   WHOIS protocol injection via CRLF sequences that could smuggle a second
+#   query into the same TCP stream.  The guard is enforced at this
+#   :Protected boundary so subclass callers are also protected.
 #
 # Notes:
 #   Uses IO::Socket::IP (dual-stack) when available, falling back to
@@ -3967,7 +3996,17 @@ sub _rdap_lookup :Protected {
 sub _raw_whois :Protected {
 	my ($self, $query, $server) = @_;
 	$server //= 'whois.iana.org';
-	$self->_debug("WHOIS $server -> $query");
+
+	# Strip all C0/C1 control characters to prevent WHOIS protocol injection.
+	# Legitimate domain names and IP addresses never contain CR, LF, NUL, or
+	# any other control character; their presence indicates either a caller bug
+	# or hostile input embedded in a malicious email.  This guard is placed at
+	# the :Protected boundary so subclass callers are also protected.
+	(my $safe_query = $query) =~ s/[\x00-\x1F\x7F]+//g;
+	Carp::croak(__PACKAGE__ . '::_raw_whois: empty query after stripping control characters')
+		unless length $safe_query;
+
+	$self->_debug("WHOIS $server -> $safe_query");
 
 	# Choose the socket class based on what is installed.
 	# IO::Socket::IP supports both IPv4 and IPv6 WHOIS servers.
@@ -3985,7 +4024,7 @@ sub _raw_whois :Protected {
 	return unless $sock;
 
 	# Send the WHOIS query in wire format (CRLF-terminated per RFC 3912)
-	$sock->print("$query\r\n") or do { $sock->close(); return };
+	$sock->print("$safe_query\r\n") or do { $sock->close(); return };
 
 	# Use IO::Select to implement per-read timeouts without alarm()
 	my $sel      = IO::Select->new($sock);
@@ -4595,13 +4634,44 @@ messages in the same run (e.g. a sending ISP seen in 500 spam messages).
 
 =back
 
+=head1 SECURITY
+
+=head2 WHOIS query sanitization
+
+C<_raw_whois()> strips all ASCII control characters (C<\x00>-C<\x1F> and
+C<\x7F>) from C<$query> before writing it to the socket.  This prevents
+WHOIS protocol injection: a maliciously crafted domain name containing
+embedded C<\r\n> would otherwise smuggle a second WHOIS command into the
+same TCP connection.  If stripping leaves an empty string the method
+croaks immediately rather than sending a blank query.
+
+=head2 RDAP IP validation
+
+C<_rdap_lookup()> validates C<$ip> before interpolating it into the ARIN
+RDAP URL path.  RFC 4007 IPv6 zone identifiers (C<%eth0> suffixes on
+link-local addresses) are stripped first; the remaining value must match
+either a dotted-quad IPv4 address or a pure hex-colon IPv6 address.  A
+value that fails this check returns C<{}> immediately without making any
+network call.
+
+=head2 CLI path validation
+
+Both C<bin/abuse_check> and C<bin/submit_abuse_report> validate the
+C<$ARGV[0]> file path before opening it.  They reject any path that
+contains NUL bytes or bare CR/LF characters, and independently reject
+paths containing directory-traversal sequences (C<../>).  This makes the
+scripts safe to invoke under C<perl -T> (taint mode) and prevents
+accidental or intentional access to files outside the intended directory.
+
 =head1 IPV6 SUPPORT
 
 IPv6 addresses are extracted from C<Received:> headers using bracketed
 notation (C<[2001:db8::1]>).  They are tested against the private range
 list (which covers ::1, fe80::/10, fc00::/7, fd00::/8, and the
 documentation range 2001:db8::/32) and passed through C<_whois_ip()> and
-C<_rdap_lookup()> in the same way as IPv4 addresses.
+C<_rdap_lookup()> in the same way as IPv4 addresses.  RFC 4007 zone
+identifiers (e.g. C<%eth0>) are stripped by C<_rdap_lookup()> before the
+address is placed in the RDAP URL.
 
 C<_resolve_host()> attempts both A and AAAA lookups when C<Net::DNS> is
 installed.  C<_raw_whois()> uses C<IO::Socket::IP> for dual-stack WHOIS
@@ -4909,11 +4979,15 @@ in via C<new()> (not currently supported) to enable proper isolation.
   header_value : Object × FieldName → Maybe FieldValue
   header_value(o, n) ≜ first { lc(h.name) = lc(n) } o._headers .value
 
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh@nigelhorne.com> >>
+
 =head1 LICENCE AND COPYRIGHT
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to GPL2 licence terms.
+Usage is subject to the GPL2 licence terms.
 If you use it,
 please let me know.
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 use parent qw( Test::Builder::Module );
 our @EXPORT = qw( synopsis_ok all_synopsis_ok );
@@ -86,6 +86,10 @@ sub _extract_synopsis
 
     my $parser = Test::Synopsis::Parser->new;
     $parser->parse_file($file);
+    # Attach the fully-collected =for test_synopsis options to every block,
+    # so directives apply regardless of their position relative to the
+    # SYNOPSIS code block (restores pre-0.14, position-independent behavior).
+    $_->[2] = $parser->{tsyn_options} for @{ $parser->{tsyn_blocks} };
     $parser->{tsyn_blocks}
 }
 
@@ -154,9 +158,7 @@ sub _handle_text
         push @{ $self->{tsyn_blocks} }, [
             $line,
             $text,
-            $self->{tsyn_options},
         ];
-        $self->{tsyn_options} = [];
     }
 }
 

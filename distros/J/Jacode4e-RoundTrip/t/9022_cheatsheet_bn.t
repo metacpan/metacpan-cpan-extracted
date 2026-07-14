@@ -2,7 +2,7 @@
 #
 # 9022_cheatsheet_bn.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip দ্রুত রেফারেন্স (বাংলা)
 # এই পরীক্ষাটি বাংলাভাষী ব্যবহারকারীদের জন্য দ্রুত রেফারেন্স হিসেবেও কাজ করে।

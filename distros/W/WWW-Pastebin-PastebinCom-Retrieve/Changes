@@ -1,5 +1,13 @@
 Revision history for WWW-Pastebin-PastebinCom-Retrieve
 
+0.004  2026-07-13
+        - Maintenance update - verified module is still working
+
+
+0.003   Jul 12, 2026
+        Fetch paste content from pastebin.com/raw/<id> instead of scraping
+        the HTML page, which no longer works.
+
 0.002   Mar 23, 2008
         Unimportant (to functionality that is) documentation fix
 

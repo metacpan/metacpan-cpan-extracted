@@ -29,7 +29,7 @@ Mojolicious::Plugin::Parametry - Mojolicious plugin providing param helpers
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::Parametry](https://metacpan.org/pod/Mojolicious::Plugin::Parametry) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that provides
+[Mojolicious::Plugin::Parametry](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AParametry) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that provides
 a simpler (to a taste) way to access parameter values as well as a set of
 helpers for managing params and their values.
 
@@ -41,8 +41,8 @@ method named.
 
 # METHODS
 
-[Mojolicious::Plugin::Parametry](https://metacpan.org/pod/Mojolicious::Plugin::Parametry) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::Parametry](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AParametry) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -70,11 +70,11 @@ helper will also trim leading and trailing whitespace.
 **CAVEATS:** this helper can be used to access only params named with valid
 Perl method names and no support for other names is currently planned.
 
-## `P`
+## `PP`
 
     $c->PP
 
-Provides access to [Mojolicious::Plugin::Parametry::ParamerHelpers](https://metacpan.org/pod/Mojolicious::Plugin::Parametry::ParamerHelpers)
+Provides access to [Mojolicious::Plugin::Parametry::ParamerHelpers](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AParametry%3A%3AParamerHelpers)
 object, initialized with the current controller object. Available methods
 are:
 
@@ -96,7 +96,7 @@ are:
     $c->PP->matching('foo_', subst => 'bar_', as_hash => 1);
 
 Gathers matching params, optionally complemented with their values, and
-returns them as a [Mojo::Collection](https://metacpan.org/pod/Mojo::Collection) (or a hashref, if `as_hash` is set),
+returns them as a [Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) (or a hashref, if `as_hash` is set),
 optionally manipulating the names. Available args:
 
 #### first positional
@@ -113,7 +113,7 @@ to the start of the parameter name_
 
     $c->PP->matching(qr/foo/, vals => 1);
 
-**Optional**. Causes the method to return a [Mojo::Collection](https://metacpan.org/pod/Mojo::Collection) of
+**Optional**. Causes the method to return a [Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) of
 the values of parameter whose names match the matcher.
 
 #### `as_hash`

@@ -137,7 +137,10 @@ SKIP:
 SKIP:
 {
   # look for a non-HEVC encoder
-  my ($enc) = grep $_->compression ne "hevc"
+  # FIXME: libheif 1.22, 1.23 won't decode the avc it created
+  # I suspect due to size issues, but skip for now
+  # https://github.com/tonycoz/imager-file-heif/issues/7
+  my ($enc) = grep $_->compression !~ /^(avc|hevc)$/
     && Imager::File::HEIF->have_decoder_for($_->compression),
     Imager::File::HEIF->encoders;
   $enc or skip "only hevc available for both encode and decode", 1;
@@ -148,8 +151,6 @@ SKIP:
                  heif_compression => $enc->compression),
      "write with non-HEVC compression");
   my $res = Imager->new;
-  # we might not have a decoder for this, even if we have an
-  # encoder... fix once we can list decoders
   ok($res->read(data => \$data, type => "heif"),
      "read it back again ".$enc->compression)
     or diag $res->errstr;

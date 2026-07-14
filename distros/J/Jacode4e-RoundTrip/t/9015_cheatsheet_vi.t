@@ -2,7 +2,7 @@
 #
 # 9015_cheatsheet_vi.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Tai lieu tham khao nhanh Jacode4e::RoundTrip (Tieng Viet)
 # Bai kiem tra nay cung la tai lieu tham khao nhanh cho nguoi dung tieng Viet.

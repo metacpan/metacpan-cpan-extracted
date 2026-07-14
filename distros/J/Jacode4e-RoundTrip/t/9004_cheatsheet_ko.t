@@ -2,7 +2,7 @@
 #
 # 9004_cheatsheet_ko.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip 빠른 참조 (한국어)
 # 이 테스트는 한국어 사용자를 위한 빠른 참조 가이드를 겸합니다.

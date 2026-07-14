@@ -11,15 +11,19 @@ pair #= $(1):$(2)
 hello #= Hello $(1)
 
 [sec]
+2 = two
 x = $(=# pair,a,b)
 y = $(=# hello,World)
+z = $(=# pair,XYZ)
 INI
 
   my $obj = Config::INI::RefVars->new();
   my $vars = $obj->parse_ini(src => $ini)->variables();
 
-  is($vars->{sec}{x}, 'a:b', 'pair function works');
+  is($vars->{sec}{2}, 'two',         'no conflict with digit named variable');
+  is($vars->{sec}{x}, 'a:b',         'pair function works');
   is($vars->{sec}{y}, 'Hello World', 'hello function works');
+  is($vars->{sec}{z}, 'XYZ:',        'parameter vars are local');
 };
 
 

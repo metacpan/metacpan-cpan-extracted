@@ -1,0 +1,30 @@
+Implement the following classes, including tests:
+
+KeyInfo
+lib/googleauth/id_tokens/key_sources.rb -> lib/Google/Auth/IDTokens/KeySources.pm
+test/id_tokens/key_sources_test.rb -> t/key_sources_test.t
+
+Verifier
+lib/googleauth/id_tokens/verifier.rb ->  lib/Google/Auth/IDTokens/Verifier.pm
+test/id_tokens/verifier_test.rb -> t/verifier.t
+
+WebUserAuthorizer
+lib/googleauth/web_user_authorizer.rb -> lib/Google/Auth/WebUserAuthorizer.pm
+
+UserAuthorizer
+lib/googleauth/user_authorizer.rb -> lib/Google/Auth/UserAuthorizer.pm
+
+DefaultCredentials
+lib/googleauth/default_credentials.rb -> lib/Google/Auth/DefaultCredentials.pm
+
+ServiceAccountCredentials
+lib/googleauth/service_account.rb -> lib/Google/Auth/ServiceAccountCredentials.pm
+
+ClientId
+lib/googleauth/client_id.rb -> lib/Google/Auth/ClientId.pm
+
+GCECredentials
+lib/googleauth/compute_engine.rb -> lib/Google/Auth/ComputeEngine.pm
+
+IAMCredentials
+lib/googleauth/iam.rb -> lib/Google/Auth/IAMCredentials.pm

@@ -1,3 +1,19 @@
+Mon Jul 13 13:38:12 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.14]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.14.md: new
+	* README.md: generated
+	* VERSION: bump
+	* lib/CLI/Simple.pm.in
+	- document proper use of help_sections
+	(new)
+	- accept help_sections
+	- set default help sections if not provided in constructor
+	* lib/CLI/Simple/Utils.pm.in
+	(choose): fix context error
+	(file_or_stdout): new
+
 Sat Jul 11 09:12:02 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.13]:

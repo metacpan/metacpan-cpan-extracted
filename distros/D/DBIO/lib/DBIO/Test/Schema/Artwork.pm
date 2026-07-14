@@ -58,7 +58,7 @@ DBIO::Test::Schema::Artwork - Test result class for the cd_artwork table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

@@ -1,0 +1,196 @@
+package Google::Api::SystemParameter;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+CiFnb29nbGUvYXBpL3N5c3RlbV9wYXJhbWV0ZXIucHJvdG8SCmdvb2dsZS5hcGkiSQoQU3lz
+dGVtUGFyYW1ldGVycxI1CgVydWxlcxgBIAMoCzIfLmdvb2dsZS5hcGkuU3lzdGVtUGFyYW1l
+dGVyUnVsZVIFcnVsZXMibgoTU3lzdGVtUGFyYW1ldGVyUnVsZRIaCghzZWxlY3RvchgBIAEo
+CVIIc2VsZWN0b3ISOwoKcGFyYW1ldGVycxgCIAMoCzIbLmdvb2dsZS5hcGkuU3lzdGVtUGFy
+YW1ldGVyUgpwYXJhbWV0ZXJzInYKD1N5c3RlbVBhcmFtZXRlchISCgRuYW1lGAEgASgJUgRu
+YW1lEh8KC2h0dHBfaGVhZGVyGAIgASgJUgpodHRwSGVhZGVyEi4KE3VybF9xdWVyeV9wYXJh
+bWV0ZXIYAyABKAlSEXVybFF1ZXJ5UGFyYW1ldGVyQnYKDmNvbS5nb29nbGUuYXBpQhRTeXN0
+ZW1QYXJhbWV0ZXJQcm90b1ABWkVnb29nbGUuZ29sYW5nLm9yZy9nZW5wcm90by9nb29nbGVh
+cGlzL2FwaS9zZXJ2aWNlY29uZmlnO3NlcnZpY2Vjb25maWeiAgRHQVBJSsEZCgYSBA4AXwEK
+vAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5k
+ZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5
+b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhl
+IExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAg
+ICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNz
+IHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBz
+b2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQg
+b24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05T
+IE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNl
+bnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFu
+ZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQABMKCAoBCBIDEgBc
+CgkKAggLEgMSAFwKCAoBCBIDEwAiCgkKAggKEgMTACIKCAoBCBIDFAA1CgkKAggIEgMUADUK
+CAoBCBIDFQAnCgkKAggBEgMVACcKCAoBCBIDFgAiCgkKAggkEgMWACIKugIKAgQAEgQeAD0B
+Gq0CICMjIyBTeXN0ZW0gcGFyYW1ldGVyIGNvbmZpZ3VyYXRpb24KCiBBIHN5c3RlbSBwYXJh
+bWV0ZXIgaXMgYSBzcGVjaWFsIGtpbmQgb2YgcGFyYW1ldGVyIGRlZmluZWQgYnkgdGhlIEFQ
+SQogc3lzdGVtLCBub3QgYnkgYW4gaW5kaXZpZHVhbCBBUEkuIEl0IGlzIHR5cGljYWxseSBt
+YXBwZWQgdG8gYW4gSFRUUCBoZWFkZXIKIGFuZC9vciBhIFVSTCBxdWVyeSBwYXJhbWV0ZXIu
+IFRoaXMgY29uZmlndXJhdGlvbiBzcGVjaWZpZXMgd2hpY2ggbWV0aG9kcwogY2hhbmdlIHRo
+ZSBuYW1lcyBvZiB0aGUgc3lzdGVtIHBhcmFtZXRlcnMuCgoKCgMEAAESAx4IGArXBgoEBAAC
+ABIDPAIpGskGIERlZmluZSBzeXN0ZW0gcGFyYW1ldGVycy4KCiBUaGUgcGFyYW1ldGVycyBk
+ZWZpbmVkIGhlcmUgd2lsbCBvdmVycmlkZSB0aGUgZGVmYXVsdCBwYXJhbWV0ZXJzCiBpbXBs
+ZW1lbnRlZCBieSB0aGUgc3lzdGVtLiBJZiB0aGlzIGZpZWxkIGlzIG1pc3NpbmcgZnJvbSB0
+aGUgc2VydmljZQogY29uZmlnLCBkZWZhdWx0IHN5c3RlbSBwYXJhbWV0ZXJzIHdpbGwgYmUg
+dXNlZC4gRGVmYXVsdCBzeXN0ZW0gcGFyYW1ldGVycwogYW5kIG5hbWVzIGlzIGltcGxlbWVu
+dGF0aW9uLWRlcGVuZGVudC4KCiBFeGFtcGxlOiBkZWZpbmUgYXBpIGtleSBmb3IgYWxsIG1l
+dGhvZHMKCiAgICAgc3lzdGVtX3BhcmFtZXRlcnMKICAgICAgIHJ1bGVzOgogICAgICAgICAt
+IHNlbGVjdG9yOiAiKiIKICAgICAgICAgICBwYXJhbWV0ZXJzOgogICAgICAgICAgICAgLSBu
+YW1lOiBhcGlfa2V5CiAgICAgICAgICAgICAgIHVybF9xdWVyeV9wYXJhbWV0ZXI6IGFwaV9r
+ZXkKCgogRXhhbXBsZTogZGVmaW5lIDIgYXBpIGtleSBuYW1lcyBmb3IgYSBzcGVjaWZpYyBt
+ZXRob2QuCgogICAgIHN5c3RlbV9wYXJhbWV0ZXJzCiAgICAgICBydWxlczoKICAgICAgICAg
+LSBzZWxlY3RvcjogIi9MaXN0U2hlbHZlcyIKICAgICAgICAgICBwYXJhbWV0ZXJzOgogICAg
+ICAgICAgICAgLSBuYW1lOiBhcGlfa2V5CiAgICAgICAgICAgICAgIGh0dHBfaGVhZGVyOiBB
+cGktS2V5MQogICAgICAgICAgICAgLSBuYW1lOiBhcGlfa2V5CiAgICAgICAgICAgICAgIGh0
+dHBfaGVhZGVyOiBBcGktS2V5MgoKICoqTk9URToqKiBBbGwgc2VydmljZSBjb25maWd1cmF0
+aW9uIHJ1bGVzIGZvbGxvdyAibGFzdCBvbmUgd2lucyIgb3JkZXIuCgoMCgUEAAIABBIDPAIK
+CgwKBQQAAgAGEgM8Cx4KDAoFBAACAAESAzwfJAoMCgUEAAIAAxIDPCcoCl4KAgQBEgRBAE8B
+GlIgRGVmaW5lIGEgc3lzdGVtIHBhcmFtZXRlciBydWxlIG1hcHBpbmcgc3lzdGVtIHBhcmFt
+ZXRlciBkZWZpbml0aW9ucyB0bwogbWV0aG9kcy4KCgoKAwQBARIDQQgbCr8BCgQEAQIAEgNH
+AhYasQEgU2VsZWN0cyB0aGUgbWV0aG9kcyB0byB3aGljaCB0aGlzIHJ1bGUgYXBwbGllcy4g
+VXNlICcqJyB0byBpbmRpY2F0ZSBhbGwKIG1ldGhvZHMgaW4gYWxsIEFQSXMuCgogUmVmZXIg
+dG8gW3NlbGVjdG9yXVtnb29nbGUuYXBpLkRvY3VtZW50YXRpb25SdWxlLnNlbGVjdG9yXSBm
+b3Igc3ludGF4CiBkZXRhaWxzLgoKDAoFBAECAAUSA0cCCAoMCgUEAQIAARIDRwkRCgwKBQQB
+AgADEgNHFBUKpAIKBAQBAgESA04CKhqWAiBEZWZpbmUgcGFyYW1ldGVycy4gTXVsdGlwbGUg
+bmFtZXMgbWF5IGJlIGRlZmluZWQgZm9yIGEgcGFyYW1ldGVyLgogRm9yIGEgZ2l2ZW4gbWV0
+aG9kIGNhbGwsIG9ubHkgb25lIG9mIHRoZW0gc2hvdWxkIGJlIHVzZWQuIElmIG11bHRpcGxl
+CiBuYW1lcyBhcmUgdXNlZCB0aGUgYmVoYXZpb3IgaXMgaW1wbGVtZW50YXRpb24tZGVwZW5k
+ZW50LgogSWYgbm9uZSBvZiB0aGUgc3BlY2lmaWVkIG5hbWVzIGFyZSBwcmVzZW50IHRoZSBi
+ZWhhdmlvciBpcwogcGFyYW1ldGVyLWRlcGVuZGVudC4KCgwKBQQBAgEEEgNOAgoKDAoFBAEC
+AQYSA04LGgoMCgUEAQIBARIDThslCgwKBQQBAgEDEgNOKCkKyAEKAgQCEgRUAF8BGrsBIERl
+ZmluZSBhIHBhcmFtZXRlcidzIG5hbWUgYW5kIGxvY2F0aW9uLiBUaGUgcGFyYW1ldGVyIG1h
+eSBiZSBwYXNzZWQgYXMgZWl0aGVyCiBhbiBIVFRQIGhlYWRlciBvciBhIFVSTCBxdWVyeSBw
+YXJhbWV0ZXIsIGFuZCBpZiBib3RoIGFyZSBwYXNzZWQgdGhlIGJlaGF2aW9yCiBpcyBpbXBs
+ZW1lbnRhdGlvbi1kZXBlbmRlbnQuCgoKCgMEAgESA1QIFwpaCgQEAgIAEgNWAhIaTSBEZWZp
+bmUgdGhlIG5hbWUgb2YgdGhlIHBhcmFtZXRlciwgc3VjaCBhcyAiYXBpX2tleSIgLiBJdCBp
+cyBjYXNlIHNlbnNpdGl2ZS4KCgwKBQQCAgAFEgNWAggKDAoFBAICAAESA1YJDQoMCgUEAgIA
+AxIDVhARCl0KBAQCAgESA1oCGRpQIERlZmluZSB0aGUgSFRUUCBoZWFkZXIgbmFtZSB0byB1
+c2UgZm9yIHRoZSBwYXJhbWV0ZXIuIEl0IGlzIGNhc2UKIGluc2Vuc2l0aXZlLgoKDAoFBAIC
+AQUSA1oCCAoMCgUEAgIBARIDWgkUCgwKBQQCAgEDEgNaFxgKYwoEBAICAhIDXgIhGlYgRGVm
+aW5lIHRoZSBVUkwgcXVlcnkgcGFyYW1ldGVyIG5hbWUgdG8gdXNlIGZvciB0aGUgcGFyYW1l
+dGVyLiBJdCBpcyBjYXNlCiBzZW5zaXRpdmUuCgoMCgUEAgICBRIDXgIICgwKBQQCAgIBEgNe
+CRwKDAoFBAICAgMSA14fIGIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Api::SystemParameter::SystemParameters ===
+    # Fields for SystemParameters
+    # Field: rules Type: 11 (.google.api.SystemParameterRule)
+
+=pod
+
+=head1 NAME
+
+Google::Api::SystemParameter::SystemParameters - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::SystemParameter;
+
+    my $msg = Google::Api::SystemParameter::SystemParameters->new(
+        rules => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<rules>
+
+Type: Message (.google.api.SystemParameterRule)
+
+=back
+
+=cut
+
+# === Message: Google::Api::SystemParameter::SystemParameterRule ===
+    # Fields for SystemParameterRule
+    # Field: selector Type: 9 ()
+    # Field: parameters Type: 11 (.google.api.SystemParameter)
+
+=pod
+
+=head1 NAME
+
+Google::Api::SystemParameter::SystemParameterRule - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::SystemParameter;
+
+    my $msg = Google::Api::SystemParameter::SystemParameterRule->new(
+        selector => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<selector>
+
+Type: String
+
+=item * B<parameters>
+
+Type: Message (.google.api.SystemParameter)
+
+=back
+
+=cut
+
+# === Message: Google::Api::SystemParameter::SystemParameter ===
+    # Fields for SystemParameter
+    # Field: name Type: 9 ()
+    # Field: http_header Type: 9 ()
+    # Field: url_query_parameter Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Api::SystemParameter::SystemParameter - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Api::SystemParameter;
+
+    my $msg = Google::Api::SystemParameter::SystemParameter->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<http_header>
+
+Type: String
+
+=item * B<url_query_parameter>
+
+Type: String
+
+=back
+
+=cut
+
+1;

@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use base 'App::Nopaste::Service';
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 sub available {
     eval 'require WWW::Pastebin::PastebinCom::API; 1';
@@ -107,11 +107,18 @@ L<App::Nopaste::Service::PastebinCom>
 
 Zoffix Znet, C<< <zoffix at cpan.org> >>
 
+=head1 REPOSITORY
+
+Fork this module on GitHub:
+L<https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI>
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-app-nopaste-service-pastebincomapi at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Nopaste-Service-PastebinComAPI>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+To report bugs or request features, please use
+L<https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI/issues>
+
+If you can't access GitHub, you can email your request
+to C<bug-app-nopaste-service-pastebincomapi at rt.cpan.org>
 
 =head1 SUPPORT
 

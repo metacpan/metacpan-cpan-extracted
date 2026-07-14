@@ -22,6 +22,7 @@ my @files = (
     't/10-in-pod-skip.t',
     't/11-DATA-in-pod.t',
     't/12-DATA-token-errors.t',
+    't/13-for-location.t',
     't/lib/BrokenSYNOPSIS01.pm',
     't/lib/ENDInPod.pm',
     't/lib/ENDInPodWithError.pm',
@@ -34,6 +35,8 @@ my @files = (
     't/lib/Test10InPodSkipWithBegin.pm',
     't/lib/Test11DATAInPod.pm',
     't/lib/Test12DATAInPodWithError.pm',
+    't/lib/TestForAfterCode.pm',
+    't/lib/TestForBeforeCode.pm',
     't/lib/TestMultipleChunks.pm'
 );
 

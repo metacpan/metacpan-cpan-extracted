@@ -11,10 +11,10 @@
 #include <arpa/inet.h>
 
 #define _IS_INCOMPLETE(decstate, len) \
-    ((len + decstate->curbyte) > decstate->end)
+    (len > (decstate->end - decstate->curbyte))
 
 #define _SET_INCOMPLETE(decstate, len) \
-    decstate->incomplete_by = (len + decstate->curbyte) - decstate->end;
+    decstate->incomplete_by = len - (decstate->end - decstate->curbyte);
 
 #define _RETURN_IF_INCOMPLETE( decstate, len, toreturn ) \
     if (_IS_INCOMPLETE(decstate, len)) { \

@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::CSS::SelectorTools;
 use warnings;
 use strict;
 
-our $VERSION = '2.001003'; # VERSION
+our $VERSION = '2.001004'; # VERSION
 
 use Carp;
 use POE;

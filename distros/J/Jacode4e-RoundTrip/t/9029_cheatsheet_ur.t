@@ -2,7 +2,7 @@
 #
 # 9029_cheatsheet_ur.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip فوری حوالہ (اردو)
 # یہ ٹیسٹ اردو زبان کے صارفین کے لیے فوری حوالہ کے طور پر بھی کام کرتا ہے۔

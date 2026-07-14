@@ -184,7 +184,7 @@ DBIO::Relationship::ManyToMany - Declare a many-to-many relationship via a bridg
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 METHODS
 

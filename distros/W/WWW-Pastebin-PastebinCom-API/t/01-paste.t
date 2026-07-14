@@ -9,9 +9,13 @@ use WWW::Pastebin::PastebinCom::API;
 
 plan tests => 22;
 
-my $API_KEY = 'a3767061e0e64fef6c266126f7e588f3';
-my $USER    = 'perlpaster';
-my $PASS    = 'perlpaster';
+# Live tests that create/list/delete pastes need a real pastebin.com
+# developer API key plus account credentials. Configure them via the
+# environment to enable those tests; without them, the key-requiring
+# tests skip cleanly and only the keyless ->get_paste() calls run.
+my $API_KEY = $ENV{PASTEBINCOM_API_KEY};
+my $USER    = $ENV{PASTEBINCOM_LOGIN};
+my $PASS    = $ENV{PASTEBINCOM_PASS};
 
 my $bin = create_and_test_object();
 test_get_paste( $bin );
@@ -167,10 +171,8 @@ sub test_creation_of_new_paste {
     my $test_paste = qq|Test for Perl implementation of the API\n|
     . join "\n", map join(qq|$_ => $ENV{$_}|), keys %ENV;
 
-    my $user_key = $bin->get_user_key(qw/
-        perlpaster
-        perlpaster
-    /) or skip "Failed to get user key: $bin", 6;
+    my $user_key = $bin->get_user_key( $USER, $PASS )
+        or skip "Failed to get user key: $bin", 6;
 
     like(
         $user_key, qr{^\w+$}, 'Does user key look like a user key?',
@@ -189,7 +191,7 @@ sub test_creation_of_new_paste {
     ) or skip "Failed to create the paste: $bin", 4;
 
     like(
-        $paste_link, qr{^http://pastebin.com/\w+$},
+        $paste_link, qr{^https?://pastebin.com/\w+$},
         'Does paste return what looks like paste ID?'
     );
 
@@ -208,7 +210,7 @@ sub create_and_test_object {
     diag("Testing object creation");
     my $bin = WWW::Pastebin::PastebinCom::API->new(
         api_key => $API_KEY,
-        timeout => 5,
+        timeout => 10,
     );
 
     isa_ok( $bin, 'WWW::Pastebin::PastebinCom::API' );

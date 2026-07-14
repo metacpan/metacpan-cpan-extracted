@@ -24,6 +24,12 @@ WWW::Pastebin::PastebinCa::Retrieve - a module to retrieve pastes from http://pa
 The module provides interface to retrieve pastes from
 [http://pastebin.ca/](http://pastebin.ca/) website via Perl.
 
+**Note:** pastebin.ca was rebuilt in 2026 and now exposes a documented API
+(see [https://pastebin.ca/api/v1/openapi.json](https://pastebin.ca/api/v1/openapi.json)) instead of scrapeable HTML.
+The original numeric ("legacy") pastes were restored and remain retrievable.
+This module fetches a paste's raw body from `/raw/<id>` and its metadata
+from `/api/v1/legacy/<id>`.
+
 # CONSTRUCTOR
 
 ## `new`
@@ -57,7 +63,7 @@ as follows:
 
     ->new( timeout => 10 );
 
-**Optional**. Specifies the `timeout` argument of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)'s
+**Optional**. Specifies the `timeout` argument of [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)'s
 constructor, which is used for retrieving. **Defaults to:** `30` seconds.
 
 ### `ua`
@@ -69,11 +75,11 @@ constructor, which is used for retrieving. **Defaults to:** `30` seconds.
     ->new( ua => LWP::UserAgent->new( agent => 'Foos!' ) );
 
 **Optional**. If the `timeout` argument is not enough for your needs
-of mutilating the [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object used for retrieving, feel free
-to specify the `ua` argument which takes an [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object
+of mutilating the [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object used for retrieving, feel free
+to specify the `ua` argument which takes an [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object
 as a value. **Note:** the `timeout` argument to the constructor will
 not do anything if you specify the `ua` argument as well. **Defaults to:**
-plain boring default [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object with `timeout` argument
+plain boring default [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object with `timeout` argument
 set to whatever `WWW::Pastebin::PastebinCa::Retrieve`'s `timeout`
 argument is set to as well as `agent` argument is set to mimic Firefox.
 
@@ -99,18 +105,21 @@ and the reason for the error will be available via `error()` method.
 On success returns a hashref with the following keys/values:
 
     $VAR1 = {
-          'language' => 'Raw',
+          'language' => 'perl',
           'content' => 'blah blah content of the paste',
-          'post_date' => 'Friday, March 21st, 2008 at 1:05:19pm MDT',
+          'post_date' => 'Thursday, March 6th, 2008 at 3:57:44pm UTC',
           'name' => 'Unnamed',
-          'desc' => 'Perl stuff'
+          'desc' => ''
     };
 
 - language
 
-        { 'language' => 'Raw' }
+        { 'language' => 'perl' }
 
-    The (computer) language of the paste.
+    The (computer) language / syntax hint of the paste, as reported by
+    pastebin.ca. **Note:** since the 2026 site rebuild this is the site's short
+    syntax code (e.g. `perl`, `text`) rather than the long descriptive name
+    used by the old site.
 
 - content
 
@@ -120,21 +129,24 @@ On success returns a hashref with the following keys/values:
 
 - post\_date
 
-        { 'post_date' => 'Wednesday, March 5th, 2008 at 10:31:42pm MST' }
+        { 'post_date' => 'Thursday, March 6th, 2008 at 3:57:44pm UTC' }
 
-    The date when the paste was created
+    The date when the paste was created, formatted from the paste's creation
+    timestamp (in UTC).
 
 - name
 
-        { 'name' => 'Mine' }
+        { 'name' => 'Unnamed' }
 
     The name of the poster or the title of the paste.
 
 - desc
 
-        { 'desc' => 'Perl stuff' }
+        { 'desc' => '' }
 
-    Contains description of the paste.
+    Contains description of the paste. **Note:** pastebin.ca no longer stores a
+    separate paste description, so this is always an empty string; the key is
+    retained for backwards compatibility.
 
 ## `error`
 
@@ -170,8 +182,9 @@ an ID or a URI was given to `retrieve()`
     my $paste_uri = $paster->uri;
 
 Must be called after a successful call to `retrieve()`. Takes no arguments,
-returns a [URI](https://metacpan.org/pod/URI) object with the URI pointing to the last retrieved paste
-irrelevant of whether an ID or a URI was given to `retrieve()`
+returns a [URI](https://metacpan.org/pod/URI) object with the URI pointing to the raw body of the last
+retrieved paste irrelevant of whether an ID or a URI was given to
+`retrieve()`
 
 ## `results`
 
@@ -210,8 +223,8 @@ object in a string to get the contents of the paste.
 
     $paster->ua( LWP::UserAgent->new( timeout => 10, agent => 'foos' );
 
-Returns a currently used [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object used for retrieving
-pastes. Takes one optional argument which must be an [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)
+Returns a currently used [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object used for retrieving
+pastes. Takes one optional argument which must be an [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
 object, and the object you specify will be used in any subsequent calls
 to `retrieve()`.
 

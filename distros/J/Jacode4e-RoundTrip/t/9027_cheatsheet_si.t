@@ -2,7 +2,7 @@
 #
 # 9027_cheatsheet_si.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip ඉක්මන් යොමු (සිංහල)
 # මෙම පරීක්ෂණය සිංහල භාෂා පරිශීලකයින් සඳහා ඉක්මන් යොමු ලෙසද ක්‍රියා කරයි.

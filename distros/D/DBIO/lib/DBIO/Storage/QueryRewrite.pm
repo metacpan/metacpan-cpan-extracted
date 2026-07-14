@@ -1489,7 +1489,7 @@ DBIO::Storage::QueryRewrite - SQL analysis and query rewrite utilities
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

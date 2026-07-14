@@ -1,10 +1,9 @@
 Revision history for POE-Component-IRC-Plugin-WWW-OhNoRobotCom-Search
 
-0.002   2013-12-16
-        - Minor fixes to comply with the specs and Kwalitee game
-        - Added autogeneration of README from POD
-        - Moved author tests to xt/
+0.003  2026-07-13
+        - Maintenance update - verified module is still working
 
-0.001   2008-03-23
-        - First version, released on an unsuspecting world.
+
+0.001   Mar 23, 2008
+        First version, released on an unsuspecting world.
 

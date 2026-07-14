@@ -47,9 +47,9 @@ POE::Component::NonBlockingWrapper::Base - POE based base class for non-blocking
 
 The module is a base class for modules which are non-blocking POE based
 wrappers around blocking stuff. Non-blocking stuff is run via a _single_
-[POE::Wheel::Run](https://metacpan.org/pod/POE::Wheel::Run) process. You might also want to check out
-[POE::Component::Generic](https://metacpan.org/pod/POE::Component::Generic) or
-[POE::Component::Generic::Object](https://metacpan.org/pod/POE::Component::Generic::Object) for more goodies.
+[POE::Wheel::Run](https://metacpan.org/pod/POE%3A%3AWheel%3A%3ARun) process. You might also want to check out
+[POE::Component::Generic](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AGeneric) or
+[POE::Component::Generic::Object](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AGeneric%3A%3AObject) for more goodies.
 
 # HOW TO USE THIS
 
@@ -76,13 +76,13 @@ Finally, you need to redefine some methods and make some of your own.
     }
 
 This sub must return a list of key/value pairs which will be passed into
-the [POE::Session](https://metacpan.org/pod/POE::Session) the base class creates. The first element of `@_`
+the [POE::Session](https://metacpan.org/pod/POE%3A%3ASession) the base class creates. The first element of `@_`
 will be your PoCo object, the arguments which were passed into the
 constructor (new()) will be available as hashref keys in your object.
 
 The keys returned will be valid POE events your POE::Component will accept.
-__Note:__ the method/event which will be talking to the non-blocking wheel
-__must__ contain `_wheel_entry` as the value. Also note that the
+**Note:** the method/event which will be talking to the non-blocking wheel
+**must** contain `_wheel_entry` as the value. Also note that the
 `shutdown` method/event is pre-made already so you don't have to worry
 about returning it from `_methods_define()` sub.
 
@@ -390,8 +390,8 @@ word "EXAMPLE" but make sure to proof read the entire thing :)
 
 # SEE ALSO
 
-[POE](https://metacpan.org/pod/POE), [POE::Wheel::Run](https://metacpan.org/pod/POE::Wheel::Run), [POE::Component::Generic](https://metacpan.org/pod/POE::Component::Generic),
-[POE::Component::Generic::Object](https://metacpan.org/pod/POE::Component::Generic::Object)
+[POE](https://metacpan.org/pod/POE), [POE::Wheel::Run](https://metacpan.org/pod/POE%3A%3AWheel%3A%3ARun), [POE::Component::Generic](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AGeneric),
+[POE::Component::Generic::Object](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AGeneric%3A%3AObject)
 
 # REPOSITORY
 
@@ -407,7 +407,7 @@ to `bug-poe-component-nonblockingwrapper-base at rt.cpan.org`
 
 # AUTHOR
 
-Zoffix Znet <zoffix at cpan.org> ([http://zoffix.com/](http://zoffix.com/))
+Zoffix Znet &lt;zoffix at cpan.org> ([http://zoffix.com/](http://zoffix.com/))
 
 # LICENSE
 

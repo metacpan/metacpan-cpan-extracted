@@ -33,7 +33,7 @@ DBIO::Replicated::Backend::Replicant - Replicant backend wrapper
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

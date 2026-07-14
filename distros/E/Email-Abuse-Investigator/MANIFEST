@@ -9,6 +9,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00-load.t
+t/abuse_check.t
+t/abuse_check.t
 t/conf/new.yml
 t/conf/originating_ip.yml
 t/conf/risk_assessment.yml
@@ -19,11 +21,11 @@ t/eol.t
 t/extended_tests.t
 t/function.t
 t/fuzz.t
+t/github_2.t
 t/integration.t
 t/kwalitee.t
 t/locales.t
 t/manifest.t
-t/github_2.t
 t/mutant_killers.t
 t/mutation_survivors.t
 t/pod-coverage.t

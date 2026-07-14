@@ -134,7 +134,7 @@ DBIO::Storage::Composed - Runtime C3 composition of storage extension layers ove
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

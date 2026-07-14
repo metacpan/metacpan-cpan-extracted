@@ -39,7 +39,7 @@
 /*
  * Track line numbers
  */
-#define NEWLINE(ptr)    YYLINEPTR = ptr + newline_len(ptr); if ( YYLINEPTR > YYLINECTPTR ) { YYLINE++; YYLINECTPTR = YYLINEPTR; }
+#define NEWLINE(ptr)    YYLINEPTR = ptr + newline_len(ptr, YYLIMIT); if ( YYLINEPTR > YYLINECTPTR ) { YYLINE++; YYLINECTPTR = YYLINEPTR; }
 
 /*
  * I like seeing the level operations as macros...
@@ -132,7 +132,7 @@
 
 /* concat the inline characters to the plain scalar */
 #define PLAIN_NOT_INL() \
-    if ( *(YYCURSOR - 1) == ' ' || is_newline( YYCURSOR - 1 ) ) \
+    if ( *(YYCURSOR - 1) == ' ' || is_newline( YYCURSOR - 1, YYLIMIT ) ) \
     { \
         YYCURSOR--; \
     } \
@@ -176,7 +176,8 @@
             if ( nlDoWhat != NL_KEEP ) \
             { \
                 char *fc = n->data.str->ptr + n->data.str->len - 1; \
-                while ( is_newline( fc ) ) fc--; \
+                while ( fc >= n->data.str->ptr && \
+                        is_newline( fc, n->data.str->ptr + n->data.str->len ) ) fc--; \
                 if ( nlDoWhat != NL_CHOMP && fc < n->data.str->ptr + n->data.str->len - 1 ) \
                     fc += 1; \
                 n->data.str->len = fc - n->data.str->ptr + 1; \
@@ -194,7 +195,7 @@
     NEWLINE(indent); \
     while ( indent < YYCURSOR ) \
     { \
-        if ( is_newline( ++indent ) ) \
+        if ( is_newline( ++indent, YYLIMIT ) ) \
         { \
             NEWLINE(indent); \
         } \
@@ -237,8 +238,8 @@ SyckParser *syck_parser_ptr = NULL;
  */
 void eat_comments( SyckParser * );
 char escape_seq( char );
-int is_newline( char *ptr );
-int newline_len( char *ptr );
+int is_newline( char *ptr, char *limit );
+int newline_len( char *ptr, char *limit );
 int sycklex_yaml_utf8( SYCKSTYPE *, SyckParser * );
 int sycklex_bytecode_utf8( SYCKSTYPE *, SyckParser * );
 int syckwrap(void);
@@ -898,7 +899,7 @@ yy70:
 	++YYCURSOR;
 yy71:
 #line 482 "token.re"
-	{   if ( is_newline( YYCURSOR - 1 ) ) 
+	{   if ( is_newline( YYCURSOR - 1, YYLIMIT ) ) 
                         {
                             YYCURSOR--;
                         }
@@ -1087,7 +1088,7 @@ yy82:
 #line 444 "token.re"
 	{   ENSURE_YAML_IOPEN(lvl, YYTOKEN - YYLINEPTR, 1);
                         FORCE_NEXT_TOKEN(YAML_IOPEN);
-                        if ( *YYCURSOR == '#' || is_newline( YYCURSOR ) || is_newline( YYCURSOR - 1 ) )
+                        if ( *YYCURSOR == '#' || is_newline( YYCURSOR, YYLIMIT ) || is_newline( YYCURSOR - 1, YYLIMIT ) )
                         {
                             YYCURSOR--; 
                             ADD_LEVEL((YYTOKEN + 1) - YYLINEPTR, syck_lvl_seq);
@@ -1622,7 +1623,7 @@ yy113:
 
                         while ( YYTOKEN < YYCURSOR )
                         {
-                            int nl_len = newline_len( YYTOKEN++ );
+                            int nl_len = newline_len( YYTOKEN++, YYLIMIT );
                             if ( nl_len )
                             {
                                 nl_count++;
@@ -1872,7 +1873,7 @@ yy147:
 
                         while ( YYTOKEN < YYCURSOR )
                         {
-                            int nl_len = newline_len( YYTOKEN++ );
+                            int nl_len = newline_len( YYTOKEN++, YYLIMIT );
                             if ( nl_len )
                             {
                                 nl_count++;
@@ -2035,7 +2036,7 @@ yy163:
                         {
                             while ( YYTOKEN < YYCURSOR )
                             {
-                                int nl_len = newline_len( YYTOKEN++ );
+                                int nl_len = newline_len( YYTOKEN++, YYLIMIT );
                                 if ( nl_len )
                                 {
                                     nl_count++;
@@ -2638,7 +2639,7 @@ yy208:
                         pacer = YYTOKEN;
                         while ( pacer < YYCURSOR )
                         {
-                            int nl_len = newline_len( pacer++ );
+                            int nl_len = newline_len( pacer++, YYLIMIT );
                             if ( nl_len )
                             {
                                 nl_count++;
@@ -2905,18 +2906,21 @@ escape_seq( char ch )
 }
 
 int
-is_newline( char *ptr )
+is_newline( char *ptr, char *limit )
 {
-    return newline_len( ptr );
+    return newline_len( ptr, limit );
 }
 
 int
-newline_len( char *ptr )
+newline_len( char *ptr, char *limit )
 {
+    if ( ptr >= limit )
+        return 0;
+
     if ( *ptr == '\n' )
         return 1;
-    
-    if ( *ptr == '\r' && *( ptr + 1 ) == '\n' )
+
+    if ( *ptr == '\r' && ptr + 1 < limit && *( ptr + 1 ) == '\n' )
         return 2;
 
     return 0;

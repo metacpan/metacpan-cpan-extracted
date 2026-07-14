@@ -229,8 +229,7 @@ EMITED EVENTS
     The result of the request.
 
 AUTHOR
-    Thanks to Lukas (mauke) Mai <https://metacpan.org/author/MAUKE> for
-    providing the unicode lookup code.
+    Thanks to Lukas (mauke) Mai for providing the unicode lookup code.
 
     Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
     <http://haslayout.net>)

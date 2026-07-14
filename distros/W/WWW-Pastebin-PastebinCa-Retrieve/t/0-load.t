@@ -2,13 +2,12 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Test::Deep;
 
 BEGIN {
     use_ok('WWW::Pastebin::Base::Retrieve');
-    use_ok('HTML::TokeParser::Simple');
-    use_ok('HTML::Entities');
+    use_ok('JSON::PP');
     use_ok('WWW::Pastebin::PastebinCa::Retrieve');
 }
 

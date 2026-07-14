@@ -5,6 +5,12 @@
 #define NEED_sv_2pv_flags
 #include "ppport.h"
 
+#if !defined(__cplusplus) && defined(_MSC_VER) && _MSC_VER < 1900
+#  define inline __inline
+#endif
+
+#define UTF8_VALID_STREAM_PROBE_WINDOW_SIZE 1024
+
 #include "utf8_dfa32.h"
 #include "utf8_valid.h"
 #include "utf8_valid_stream.h"
@@ -19,6 +25,10 @@
 
 #ifndef SvPVCLEAR  
 # define SvPVCLEAR(sv) sv_setpvs((sv), "")
+#endif
+
+#ifndef O_BINARY
+# define O_BINARY 0
 #endif
 
 static inline STRLEN
@@ -548,7 +558,7 @@ PerlIO_read_utf8(pTHX_ PerlIO *fh, SV *bufsv, SSize_t length, SSize_t offset) {
 
       // Count completed code points (FFFD included).
       {
-        STRLEN boundary = fed - s.pending;
+        STRLEN boundary = fed - s.carried;
         got     += utf8_distance_unsafe(buf + complete, boundary - complete);
         complete = boundary;
       }
@@ -560,9 +570,9 @@ PerlIO_read_utf8(pTHX_ PerlIO *fh, SV *bufsv, SSize_t length, SSize_t offset) {
     // A trailing incomplete sequence was read but not emitted; push it back so
     // the next call re-reads it. At EOF the drain already resolved any tail to
     // U+FFFD, so s.pending is 0 there.
-    if (s.pending) {
-      PerlIO_unread(fh, buf + fed - s.pending, s.pending);
-      fed -= s.pending;
+    if (s.carried) {
+      PerlIO_unread(fh, buf + fed - s.carried, s.carried);
+      fed -= s.carried;
     }
   }
 
@@ -571,6 +581,108 @@ PerlIO_read_utf8(pTHX_ PerlIO *fh, SV *bufsv, SSize_t length, SSize_t offset) {
   SvUTF8_on(bufsv);
   SvSETMAGIC(bufsv);
   return got;
+}
+
+// Slurp a whole file, decoded to characters, using unbuffered (:unix) IO.
+// Reads in fixed chunks and validates in place with the streaming DFA,
+// substituting U+FFFD for each maximal ill-formed subpart (warning in the
+// utf8 category).
+// Returns a mortal, UTF8-on SV; croaks if the file cannot be opened or read.
+static SV *
+xs_slurp_utf8(pTHX_ SV *namesv) {
+  const STRLEN CHUNK = 65536;
+  const char *filename = SvPV_nolen(namesv);
+  int fd = PerlLIO_open3(filename, O_RDONLY | O_BINARY, 0);
+  if (fd < 0)
+    croak("Couldn't open '%s': %s", filename, Strerror(errno));
+
+  utf8_valid_stream_t s;
+  utf8_valid_stream_init(&s);
+
+  SV *sv = sv_2mortal(newSVpvn("", 0));
+  STRLEN fed = 0;    // bytes emitted so far
+  STRLEN cap = 0;    // current buffer capacity
+
+  // Starting size: st_size is only a hint for regular files. The file may
+  // grow or shrink after the stat, and ill-formed input expands to U+FFFD,
+  // so the read loop below grows the buffer geometrically as needed.
+  // Non-regular files (pipes/FIFOs) report no size and start at one chunk.
+  {
+    Stat_t st;
+    if (PerlLIO_fstat(fd, &st) == 0 &&
+        S_ISREG(st.st_mode) && st.st_size > 0)
+      cap = (STRLEN)st.st_size;
+  }
+  if (cap < CHUNK)
+    cap = CHUNK;
+
+  char *buf = SvGROW(sv, cap + 1);
+
+  for (;;) {
+    // Room for a chunk plus its worst-case U+FFFD expansion (each subpart
+    // grows by at most 2 bytes). Double the capacity when short.
+    if (fed + CHUNK * 3 + 1 > cap) {
+      while (cap < fed + CHUNK * 3 + 1)
+        cap *= 2;
+      buf = SvGROW(sv, cap + 1);
+    }
+
+    SSize_t count;
+    do {
+      count = PerlLIO_read(fd, buf + fed, CHUNK);
+    } while (count < 0 && errno == EINTR);
+    const int saved = errno;
+    if (count < 0) {
+      PerlLIO_close(fd);
+      croak("Couldn't read '%s': %s", filename, Strerror(saved));
+    }
+
+    bool eof = (count == 0);
+    STRLEN scan = fed;   // start of the newly read bytes
+    fed += (STRLEN)count;
+
+    // Drain the chunk; it may hold several ill-formed subparts.
+    for (;;) {
+      utf8_valid_stream_result_t r =
+          utf8_valid_stream_check(&s, buf + scan, fed - scan, eof);
+
+      if (r.status == UTF8_VALID_STREAM_ILLFORMED ||
+          r.status == UTF8_VALID_STREAM_TRUNCATED) {
+        STRLEN sub_start = scan + r.consumed - r.carried;
+        STRLEN sublen = r.carried + r.advance;   // <= 3
+        STRLEN delta = 3 - sublen;               // >= 0
+
+        if (ckWARN_d(WARN_UTF8))
+          xs_report_illformed_read(aTHX_ buf + sub_start, sublen, eof);
+
+        if (delta) {
+          Move(buf + sub_start + sublen,
+               buf + sub_start + sublen + delta,
+               fed - (sub_start + sublen), char);
+          fed += delta;
+        }
+
+        memcpy(buf + sub_start, "\xEF\xBF\xBD", 3);
+        scan = sub_start + 3;
+
+        if (r.status == UTF8_VALID_STREAM_TRUNCATED)
+          break;
+        continue;
+      }
+      break;  // OK / PARTIAL: chunk drained
+    }
+
+    if (eof)
+      break;
+  }
+
+  PerlLIO_close(fd);
+
+  SvCUR_set(sv, fed);
+  *SvEND(sv) = '\0';
+  SvPOK_on(sv);
+  SvUTF8_on(sv);
+  return sv;
 }
 
 /* SVt_PV, SVt_PVIV, SVt_PVNV, SVt_PVMG */
@@ -689,6 +801,15 @@ read_utf8(fh, bufsv, length, offset = 0)
   }
   OUTPUT:
     RETVAL
+
+void
+slurp_utf8(filename)
+    SV *filename
+  PPCODE:
+  {
+    ST(0) = xs_slurp_utf8(aTHX_ filename);
+    XSRETURN(1);
+  }
 
 void
 valid_utf8(octets)

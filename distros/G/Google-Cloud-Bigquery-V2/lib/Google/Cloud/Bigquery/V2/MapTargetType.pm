@@ -1,0 +1,39 @@
+package Google::Cloud::Bigquery::V2::MapTargetType;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Inclusion };
+    my $descriptor_b64 = <<'EOF';
+Ci5nb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvbWFwX3RhcmdldF90eXBlLnByb3RvEhhnb29n
+bGUuY2xvdWQuYmlncXVlcnkudjIaGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnByb3RvKkUKDU1h
+cFRhcmdldFR5cGUSHwobTUFQX1RBUkdFVF9UWVBFX1VOU1BFQ0lGSUVEEAASEwoPQVJSQVlf
+T0ZfU1RSVUNUEAFCfAocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkISTWFwVGFyZ2V0
+VHlwZVByb3RvUAFaO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmln
+cXVlcnlwYjtiaWdxdWVyeXBiitXb0g8FCgNhbGxKrAQKBhIEAAAUAQoICgEMEgMAABIKCAoB
+AhIDAgAhCgkKAgMAEgMEACQKCAoBCBIDBgBSCgkKAggLEgMGAFIKCAoBCBIDBwAiCgkKAggK
+EgMHACIKCAoBCBIDCAA1CgkKAggBEgMIADUKCAoBCBIDCQAzCgkKAggIEgMJADMKCAoBCBID
+CgAtCg8KCAjRuqv6AQEAEgMKAC0KSgoCBQASBA0AFAEaPiBJbmRpY2F0ZXMgdGhlIG1hcCB0
+YXJnZXQgdHlwZS4gT25seSBhcHBsaWVzIHRvIHBhcnF1ZXQgbWFwcy4KCgoKAwUAARIDDQUS
+CowBCgQFAAIAEgMQAiIafyBJbiB0aGlzIG1vZGUsIHRoZSBtYXAgd2lsbCBoYXZlIHRoZSBm
+b2xsb3dpbmcgc2NoZW1hOgogc3RydWN0IG1hcF9maWVsZF9uYW1lIHsgIHJlcGVhdGVkIHN0
+cnVjdCBrZXlfdmFsdWUgeyAga2V5ICB2YWx1ZSAgfSB9LgoKDAoFBQACAAESAxACHQoMCgUF
+AAIAAhIDECAhCnUKBAUAAgESAxMCFhpoIEluIHRoaXMgbW9kZSwgdGhlIG1hcCB3aWxsIGhh
+dmUgdGhlIGZvbGxvd2luZyBzY2hlbWE6CiByZXBlYXRlZCBzdHJ1Y3QgbWFwX2ZpZWxkX25h
+bWUgeyAga2V5ICB2YWx1ZSB9LgoKDAoFBQACAQESAxMCEQoMCgUFAAIBAhIDExQVYgZwcm90
+bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;

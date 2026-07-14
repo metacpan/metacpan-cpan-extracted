@@ -65,7 +65,7 @@ DBIO::Generate::Util - Safe Perl-literal emission helpers for DBIO::Generate sty
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

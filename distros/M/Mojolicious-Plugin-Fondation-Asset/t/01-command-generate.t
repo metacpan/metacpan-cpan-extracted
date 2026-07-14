@@ -83,20 +83,28 @@ subtest 'Second generate is idempotent' => sub {
 };
 
 # ═══════════════════════════════════════════════════════════════════════════
-# 4. No plugin with assetpack.def → nothing written, no error
+# 4. With only Fondation::Asset (no extra plugins), Fondation core's
+#    assetpack.def provides the minimal app.js bundle with fondation.js
 # ═══════════════════════════════════════════════════════════════════════════
 
-subtest 'No asset definitions found' => sub {
+subtest 'Minimal bundle from Fondation core' => sub {
     my $tmpdir = tempdir(CLEANUP => 1);
     my $app    = create_fondation_app($tmpdir, {
         dependencies => ['Fondation::Asset'],
     });
 
-    my $out = capture_command($app, 'asset', 'generate', '-y');
+    my $out      = capture_command($app, 'asset', 'generate', '-y');
+    my $def_file = $app->home->child('share', 'assets', 'assetpack.def');
 
-    like($out, qr/No asset definitions found/, 'reports no definitions');
-    ok(!-f $app->home->child('share', 'assets', 'assetpack.def'),
-       'no file created when no definitions exist');
+    ok(-f $def_file, 'assetpack.def created')
+        or diag "output: $out";
+
+    like($out, qr/Assets generated successfully/, 'reports success');
+
+    my $def = $def_file->slurp;
+
+    like($def, qr/! app\.js/,            'app.js bundle declared');
+    like($def, qr{< js/fondation\.js},   'fondation.js included');
 };
 
 done_testing;

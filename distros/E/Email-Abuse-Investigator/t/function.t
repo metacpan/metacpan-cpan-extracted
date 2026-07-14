@@ -1796,10 +1796,10 @@ note '=== 36. sending_software() and received_trail() ===';
 		received   => 'from web.example.com (web.example.com [91.198.174.42])'
 					. ' by mx id MSGID42; Mon, 01 Jan 2024 00:00:00 +0000',
 	);
-	my $a = Email::Abuse::Investigator->new();
-	$a->parse_email($sw_email);
+	my $sw_obj = Email::Abuse::Investigator->new();
+	$sw_obj->parse_email($sw_email);
 
-	my @sw = $a->sending_software();
+	my @sw = $sw_obj->sending_software();
 	ok @sw > 0, 'sending_software() returns entries';
 
 	my ($php) = grep { $_->{header} eq 'x-php-originating-script' } @sw;
@@ -1811,17 +1811,20 @@ note '=== 36. sending_software() and received_trail() ===';
 	ok defined $mailer,				   'x-mailer captured';
 	is $mailer->{value}, 'PHPMailer 6.0', 'x-mailer value correct';
 
-	# Results are sorted alphabetically by header name (per %sw_notes sort)
+	# Results are sorted alphabetically by header name (per %sw_notes sort).
+	# Do not use $a/$$b as variable names anywhere in this scope: Perl 5.36+
+	# raises a fatal "Can't use 'my $a' in sort comparison" if $a or $b are
+	# declared with my in the same lexical scope as a sort block that uses them.
 	my @sorted = sort { ($a->{header} // '') cmp ($b->{header} // '') } @sw;
 	is_deeply \@sw, \@sorted, 'sending_software() sorted by header name';
 
 	# No software headers -> empty list
-	my $b = Email::Abuse::Investigator->new();
-	$b->parse_email(make_email());
-	is scalar($b->sending_software()), 0, 'no software headers -> empty list';
+	my $no_sw = Email::Abuse::Investigator->new();
+	$no_sw->parse_email(make_email());
+	is scalar($no_sw->sending_software()), 0, 'no software headers -> empty list';
 
 	# received_trail() assembles oldest-first per-hop data
-	my @trail = $a->received_trail();
+	my @trail = $sw_obj->received_trail();
 	ok @trail > 0, 'received_trail() returns entries';
 
 	my ($ip_hop) = grep { defined $_->{ip} && $_->{ip} eq '91.198.174.42' } @trail;

@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(get_data);
 
-our $VERSION = '1.0102';
+our $VERSION = '2.001001';
 
 our $ERROR;
 
@@ -168,11 +168,18 @@ a C<num> number of randomly-selected entries will be returned.
 
 Zoffix Znet, C<< <zoffix at cpan.org> >>
 
+=head1 REPOSITORY
+
+Fork this module on GitHub:
+L<https://github.com/zoffixznet/Test-GetVolatileData>
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-test-getvolatiledata at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-GetVolatileData>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+To report bugs or request features, please use
+L<https://github.com/zoffixznet/Test-GetVolatileData/issues>
+
+If you can't access GitHub, you can email your request
+to C<bug-test-getvolatiledata at rt.cpan.org>
 
 =head1 SUPPORT
 

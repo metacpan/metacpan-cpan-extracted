@@ -1,6 +1,6 @@
 package XTaTIK::Common;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 require Exporter;
 @ISA = qw(Exporter);

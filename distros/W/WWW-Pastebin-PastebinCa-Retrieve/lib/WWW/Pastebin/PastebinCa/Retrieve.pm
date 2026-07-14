@@ -3,114 +3,107 @@ package WWW::Pastebin::PastebinCa::Retrieve;
 use warnings;
 use strict;
 
-our $VERSION = '1.001002'; # VERSION
+our $VERSION = '1.001003'; # VERSION
 
 use base 'WWW::Pastebin::Base::Retrieve';
-use HTML::TokeParser::Simple;
-use HTML::Entities;
+use JSON::PP ();
+use POSIX ();
+
+# pastebin.ca was rebuilt in 2026 behind a modern API. The old numeric
+# ("legacy") pastes were restored and are served through two endpoints:
+#   GET /raw/<id>              -> the raw paste body (text/plain)
+#   GET /api/v1/legacy/<id>    -> JSON metadata about the paste
+# There is no longer an HTML page to scrape, so we fetch the raw body via
+# the base class and grab the remaining metadata from the JSON probe.
+
+my $Base = 'https://pastebin.ca';
 
 sub _make_uri_and_id {
     my ( $self, $id ) = @_;
 
-    my ( $private ) = $id =~ m{(?:http://)? (?:www\.)? (.+?) pastebin\.ca};
+    # Accept either a bare numeric id or any pastebin.ca URL pointing at one.
+    $id =~ s{\s+}{}g;
+    $id =~ s{^https?://}{}i;
+    $id =~ s{^(?:www\.)?pastebin\.ca/}{}i;
+    $id =~ s{/(?:raw|dl|edit|embed).*$}{}i;
+    $id =~ s{^raw/}{}i;
 
-    $private = ''
-        unless defined $private;
+    return $self->_set_error(
+        q|Doesn't look like a correct paste ID or URI|
+    ) unless length $id and $id =~ /\A[0-9]+\z/;
 
-    $id =~ s{ ^ \s+ | (?:http://)? (?:www\.)?.*? pastebin\.ca/ | \s+ $}{}gxi;
-    return ( URI->new("http://${private}pastebin.ca/$id"), $id );
+    # The URI the base class fetches is the raw-body endpoint; that response
+    # becomes the paste content in _get_was_successful().
+    return ( URI->new("$Base/raw/$id"), $id );
+}
+
+sub _get_was_successful {
+    my ( $self, $content ) = @_;
+
+    # $content here is the raw paste body from GET /raw/<id>.
+    $self->content( $content );
+
+    my %data = ( content => $content );
+
+    # Pull the remaining metadata (title, language, date) from the JSON probe.
+    my $meta_uri = "$Base/api/v1/legacy/" . $self->id;
+    my $meta_res = $self->ua->get( $meta_uri );
+    if ( $meta_res->is_success ) {
+        my $json = eval { JSON::PP::decode_json( $meta_res->decoded_content ) };
+        my $p = ref $json eq 'HASH' ? $json->{paste} : undef;
+        if ( ref $p eq 'HASH' ) {
+            $data{name}     = defined $p->{title} ? $p->{title} : 'Unnamed';
+            $data{language} = defined $p->{syntax_hint}
+                            ? $p->{syntax_hint} : '';
+            $data{post_date} = _format_date( $p->{created_at} );
+        }
+    }
+
+    # These keys always exist for a consistent return shape, even when the
+    # metadata probe is unavailable.
+    $data{name}      = 'Unnamed' unless defined $data{name};
+    $data{language}  = ''        unless defined $data{language};
+    $data{post_date} = ''        unless defined $data{post_date};
+    # pastebin.ca no longer stores a separate paste description; kept for
+    # backwards compatibility of the return shape.
+    $data{desc}      = '';
+
+    return $self->results( \%data );
+}
+
+sub _format_date {
+    my $ms = shift;
+    return '' unless defined $ms and $ms =~ /\A\d+\z/;
+    my $epoch = int( $ms / 1000 );
+    my @t = gmtime $epoch;
+    # e.g. "Thursday, March 6th, 2008 at 3:57:44pm UTC"
+    my $day    = POSIX::strftime( '%A',  @t );
+    my $month  = POSIX::strftime( '%B',  @t );
+    my $mday   = $t[3];
+    my $year   = $t[5] + 1900;
+    my $suffix = _ordinal_suffix( $mday );
+    my $hour24 = $t[2];
+    my $ampm   = $hour24 >= 12 ? 'pm' : 'am';
+    my $hour12 = $hour24 % 12; $hour12 = 12 unless $hour12;
+    my $time   = sprintf '%d:%02d:%02d%s', $hour12, $t[1], $t[0], $ampm;
+    return "$day, $month ${mday}${suffix}, $year at $time UTC";
+}
+
+sub _ordinal_suffix {
+    my $n = shift;
+    return 'th' if $n % 100 >= 11 and $n % 100 <= 13;
+    my %s = ( 1 => 'st', 2 => 'nd', 3 => 'rd' );
+    return $s{ $n % 10 } || 'th';
 }
 
 sub _parse {
+    # Not used any more: the raw endpoint returns the body directly, and
+    # _get_was_successful() assembles the result. Kept as a courtesy for the
+    # base-class contract in case a subclass calls it.
     my ( $self, $content ) = @_;
-    return $self->_set_error( 'Nothing to parse (empty document retrieved)' )
-        unless defined $content and length $content;
-
-    my $parser = HTML::TokeParser::Simple->new( \$content );
-
-    my %data;
-    my %nav = (
-        level       => 0,
-        get_lang    => 0,
-        get_name    => 0,
-        get_date    => 0,
-        get_desc    => 0,
-    );
-    while ( my $t = $parser->get_token ) {
-        if ( $t->is_start_tag('h2')
-            #and defined $t->get_attr('class')
-            #and $t->get_attr('class') eq 'first'
-        ) {
-
-            $nav{level} = 1;
-        }
-        elsif ( $nav{level} == 1 and $t->is_start_tag('dt') ) {
-            @nav{ qw(level  get_name) } = (2, 1);
-        }
-        elsif ( $nav{get_name} == 1 and $t->is_text ) {
-            $data{name} = $t->as_is;
-            $nav{get_name} = 0;
-        }
-        elsif ( $t->is_start_tag('p') and defined $t->get_attr('id')
-            and $t->get_attr('id') eq 'des'
-        ) {
-            $nav{get_desc} = 1;
-        }
-        elsif ( $nav{get_desc} and $t->is_text ) {
-            $data{desc} = $t->as_is;
-            $nav{get_desc} = 0;
-        }
-        elsif ( $nav{level} == 2 and $t->is_start_tag('dd') ) {
-            $nav{get_date} = 1;
-            $nav{level}++;
-        }
-        elsif ( $nav{get_date} and $t->is_text ) {
-            $data{post_date} = $t->as_is;
-            $data{post_date} =~ s/\s+/ /g;
-            $data{post_date} =~ s/&nbsp;//g;
-            $nav{get_date}   = 0;
-            $nav{level} = 7;
-        }
-        elsif ( $nav{level} == 7 and $t->is_start_tag('span') ) {
-            $nav{level}++;
-        }
-        elsif ( $t->is_start_tag('textarea')
-            and defined $t->get_attr('name')
-            and $t->get_attr('name') eq 'content' ) {
-            $nav{get_paste} = 1;
-        }
-        elsif ( $nav{get_paste} and $t->is_text ) {
-            $data{content} = $t->as_is;
-            $nav{get_paste} = 0;
-            $nav{get_lang} = 1;
-        }
-        elsif ( $nav{get_lang} == 1 and  $t->is_start_tag('select') ) {
-            $nav{get_lang} = 2;
-        }
-        elsif ( $nav{get_lang} == 2 and $t->is_start_tag('option')
-            and $t->get_attr('selected')
-        ) {
-            $nav{get_lang} = 3;
-        }
-        elsif ( $nav{get_lang} == 3 and $t->is_text ) {
-            $data{language} = $t->as_is;
-            $nav{success} = 1;
-            last;
-        }
-
-    }
-    unless ( $nav{success} ) {
-        my $message = "Failed to parse paste.. ";
-        $message .= $nav{level}
-                  ? "\$nav{level} == $nav{level}"
-                  : "that paste ID doesn't seem to exist";
-        return $self->_set_error( $message );
-    }
-
-    decode_entities( $_ ) for values %data;
-
-    $self->content( $data{content} );
-    return \%data;
+    $self->content( $content );
+    return { content => $content, name => 'Unnamed',
+             language => '', post_date => '', desc => '' };
 }
 
 1;
@@ -139,6 +132,12 @@ WWW::Pastebin::PastebinCa::Retrieve - a module to retrieve pastes from http://pa
 
 The module provides interface to retrieve pastes from
 L<http://pastebin.ca/> website via Perl.
+
+B<Note:> pastebin.ca was rebuilt in 2026 and now exposes a documented API
+(see L<https://pastebin.ca/api/v1/openapi.json>) instead of scrapeable HTML.
+The original numeric ("legacy") pastes were restored and remain retrievable.
+This module fetches a paste's raw body from C<< /raw/<id> >> and its metadata
+from C<< /api/v1/legacy/<id> >>.
 
 =head1 CONSTRUCTOR
 
@@ -207,20 +206,23 @@ and the reason for the error will be available via C<error()> method.
 On success returns a hashref with the following keys/values:
 
     $VAR1 = {
-          'language' => 'Raw',
+          'language' => 'perl',
           'content' => 'blah blah content of the paste',
-          'post_date' => 'Friday, March 21st, 2008 at 1:05:19pm MDT',
+          'post_date' => 'Thursday, March 6th, 2008 at 3:57:44pm UTC',
           'name' => 'Unnamed',
-          'desc' => 'Perl stuff'
+          'desc' => ''
     };
 
 =over 14
 
 =item language
 
-    { 'language' => 'Raw' }
+    { 'language' => 'perl' }
 
-The (computer) language of the paste.
+The (computer) language / syntax hint of the paste, as reported by
+pastebin.ca. B<Note:> since the 2026 site rebuild this is the site's short
+syntax code (e.g. C<perl>, C<text>) rather than the long descriptive name
+used by the old site.
 
 =item content
 
@@ -230,21 +232,24 @@ The content of the paste.
 
 =item post_date
 
-    { 'post_date' => 'Wednesday, March 5th, 2008 at 10:31:42pm MST' }
+    { 'post_date' => 'Thursday, March 6th, 2008 at 3:57:44pm UTC' }
 
-The date when the paste was created
+The date when the paste was created, formatted from the paste's creation
+timestamp (in UTC).
 
 =item name
 
-    { 'name' => 'Mine' }
+    { 'name' => 'Unnamed' }
 
 The name of the poster or the title of the paste.
 
 =item desc
 
-    { 'desc' => 'Perl stuff' }
+    { 'desc' => '' }
 
-Contains description of the paste.
+Contains description of the paste. B<Note:> pastebin.ca no longer stores a
+separate paste description, so this is always an empty string; the key is
+retained for backwards compatibility.
 
 =back
 
@@ -276,8 +281,9 @@ an ID or a URI was given to C<retrieve()>
     my $paste_uri = $paster->uri;
 
 Must be called after a successful call to C<retrieve()>. Takes no arguments,
-returns a L<URI> object with the URI pointing to the last retrieved paste
-irrelevant of whether an ID or a URI was given to C<retrieve()>
+returns a L<URI> object with the URI pointing to the raw body of the last
+retrieved paste irrelevant of whether an ID or a URI was given to
+C<retrieve()>
 
 =head2 C<results>
 

@@ -1,0 +1,64 @@
+package Google::Cloud::BigQuery::V2::JobReference;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Protobuf::Wrappers };
+    my $descriptor_b64 = <<'EOF';
+Cixnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvam9iX3JlZmVyZW5jZS5wcm90bxIYZ29vZ2xl
+LmNsb3VkLmJpZ3F1ZXJ5LnYyGh9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGh5n
+b29nbGUvcHJvdG9idWYvd3JhcHBlcnMucHJvdG8ijQEKDEpvYlJlZmVyZW5jZRIiCgpwcm9q
+ZWN0X2lkGAEgASgJQgPgQQJSCXByb2plY3RJZBIaCgZqb2JfaWQYAiABKAlCA+BBAlIFam9i
+SWQSPQoIbG9jYXRpb24YAyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWVCA+BB
+AVIIbG9jYXRpb25CbgocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIRSm9iUmVmZXJl
+bmNlUHJvdG9aO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVl
+cnlwYjtiaWdxdWVyeXBiSqALCgYSBA4AKQEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAy
+NiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJz
+aW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4
+Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBh
+IGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xp
+Y2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3
+IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIg
+dGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhP
+VVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVz
+cyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3Vh
+Z2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExp
+Y2Vuc2UuCgoICgECEgMQACEKCQoCAwASAxIAKQoJCgIDARIDEwAoCggKAQgSAxUAUgoJCgII
+CxIDFQBSCggKAQgSAxYAMgoJCgIICBIDFgAyCggKAQgSAxcANQoJCgIIARIDFwA1ClUKAgQA
+EgQaACkBGkkgQSBqb2IgcmVmZXJlbmNlIGlzIGEgZnVsbHkgcXVhbGlmaWVkIGlkZW50aWZp
+ZXIgZm9yIHJlZmVycmluZyB0byBhIGpvYi4KCgoKAwQAARIDGggUCkMKBAQAAgASAxwCQRo2
+IFJlcXVpcmVkLiBUaGUgSUQgb2YgdGhlIHByb2plY3QgY29udGFpbmluZyB0aGlzIGpvYi4K
+CgwKBQQAAgAFEgMcAggKDAoFBAACAAESAxwJEwoMCgUEAAIAAxIDHBYXCgwKBQQAAgAIEgMc
+GEAKDwoIBAACAAicCAASAxwZPwqyAQoEBAACARIDIQI9GqQBIFJlcXVpcmVkLiBUaGUgSUQg
+b2YgdGhlIGpvYi4gVGhlIElEIG11c3QgY29udGFpbiBvbmx5IGxldHRlcnMgKGEteiwgQS1a
+KSwKIG51bWJlcnMgKDAtOSksIHVuZGVyc2NvcmVzIChfKSwgb3IgZGFzaGVzICgtKS4gVGhl
+IG1heGltdW0gbGVuZ3RoIGlzIDEsMDI0CiBjaGFyYWN0ZXJzLgoKDAoFBAACAQUSAyECCAoM
+CgUEAAIBARIDIQkPCgwKBQQAAgEDEgMhEhMKDAoFBAACAQgSAyEUPAoPCggEAAIBCJwIABID
+IRU7Cr8BCgQEAAICEgQnAigvGrABIE9wdGlvbmFsLiBUaGUgZ2VvZ3JhcGhpYyBsb2NhdGlv
+biBvZiB0aGUgam9iLiBUaGUgZGVmYXVsdCB2YWx1ZSBpcyBVUy4KCiBGb3IgbW9yZSBpbmZv
+cm1hdGlvbiBhYm91dCBCaWdRdWVyeSBsb2NhdGlvbnMsIHNlZToKIGh0dHBzOi8vY2xvdWQu
+Z29vZ2xlLmNvbS9iaWdxdWVyeS9kb2NzL2xvY2F0aW9ucwoKDAoFBAACAgYSAycCHQoMCgUE
+AAICARIDJx4mCgwKBQQAAgIDEgMnKSoKDAoFBAACAggSAygGLgoPCggEAAICCJwIABIDKAct
+YgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::BigQuery::V2::JobReference::JobReference ===
+    # Fields for JobReference
+    # Field: project_id Type: 9 ()
+    # Field: job_id Type: 9 ()
+    # Field: location Type: 11 (.google.protobuf.StringValue)
+
+1;

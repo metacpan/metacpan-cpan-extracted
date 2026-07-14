@@ -3,7 +3,7 @@ package WiringPi::API;
 use strict;
 use warnings;
 
-our $VERSION = '3.1803';
+our $VERSION = '3.1804';
 
 use Carp qw(croak);
 use Fcntl qw(
@@ -100,9 +100,9 @@ my @wpi_c_functions = (
         serialOpen              serialDataAvail         serialFlush
         serialGetchar           serialPutchar           serialPuts
     ),
-    # Shift register
+    # Pin extensions (shift register, I2C expander)
     qw(
-        sr595Setup
+        sr595Setup              pcf8574Setup
     ),
     # Soft tone
     qw(
@@ -111,7 +111,8 @@ my @wpi_c_functions = (
     # SPI
     qw(
         wiringPiSPISetup        wiringPiSPISetupMode    spiDataRW
-        wiringPiSPIGetFd        wiringPiSPIClose
+        wiringPiSPIGetFd        wiringPiSPIClose        spiBitBang
+        spiNoCS
     ),
     # Timing
     qw(
@@ -205,7 +206,8 @@ my @wpi_perl_functions = (
     # SPI
     qw(
         spi_setup           spi_setup_mode      spi_data
-        spi_get_fd          spi_close
+        spi_get_fd          spi_close           spi_bit_bang
+        spi_no_cs
     ),
     # Thread / lock
     qw(
@@ -1247,11 +1249,17 @@ sub gpio_layout {
 sub wpi_to_gpio {
     shift if @_ == 2;
     my $pin = shift;
+    # wpiPinToGpio() indexes a 64-entry wiringPi table; guard out-of-range /
+    # non-integer input to avoid an OOB read, returning the -1 "no such pin"
+    # sentinel (mirrors phys_to_wpi()).
+    return -1 if ! defined $pin || $pin !~ /^-?\d+$/ || $pin < 0 || $pin >= 64;
     return wpiPinToGpio($pin);
 }
 sub phys_to_gpio {
     shift if @_ == 2;
     my $pin = shift;
+    # physToGpio is likewise a 64-entry table; same OOB guard as above.
+    return -1 if ! defined $pin || $pin !~ /^-?\d+$/ || $pin < 0 || $pin >= 64;
     return physPinToGpio($pin);
 }
 sub phys_to_wpi {
@@ -1767,6 +1775,59 @@ sub spi_close {
 
     return wiringPiSPIClose($channel);
 }
+sub spi_bit_bang {
+    shift if @_ == 9;
+    my ($clk, $mosi, $miso, $cs, $data, $len, $mode, $delay_us) = @_;
+
+    if (! defined $clk || $clk !~ /^\d+$/){
+        croak "spi_bit_bang() clk param must be a GPIO pin number\n";
+    }
+
+    for ($mosi, $miso, $cs){
+        $_ = -1 if ! defined $_;
+
+        if ($_ !~ /^-?\d+$/ || $_ < -1){
+            croak "spi_bit_bang() mosi, miso and cs params must be GPIO " .
+                  "pin numbers, or -1 if unused\n";
+        }
+    }
+
+    if (ref $data ne 'ARRAY'){
+        croak "spi_bit_bang() data param must be an array reference\n";
+    }
+
+    if (! defined $len || @$data != $len){
+        croak "spi_bit_bang() array reference must have \$len param count\n";
+    }
+
+    $mode = 0 if ! defined $mode;
+
+    if ($mode !~ /^[0-3]$/){
+        croak "spi_bit_bang() mode param must be 0-3\n";
+    }
+
+    $delay_us = 0 if ! defined $delay_us;
+
+    if ($delay_us !~ /^\d+$/){
+        croak "spi_bit_bang() delay_us param must be an integer 0 or greater\n";
+    }
+
+    return spiBitBang($clk, $mosi, $miso, $cs, $data, $len, $mode, $delay_us);
+}
+sub spi_no_cs {
+    shift if @_ == 3;
+    my ($channel, $state) = @_;
+
+    if (! defined $channel || ($channel != 0 && $channel != 1)){
+        croak "spi_no_cs() channel param must be 0 or 1\n";
+    }
+
+    if (! defined $state){
+        croak "spi_no_cs() requires a \$state param (1 to set, 0 to clear)\n";
+    }
+
+    return spiNoCS($channel, $state ? 1 : 0);
+}
 
 # bmp180 pressure sensor functions
 
@@ -1914,8 +1975,11 @@ even while main is busy or sleeping:
 =head1 DESCRIPTION
 
 This is an XS-based module, and requires L<wiringPi|http://wiringpi.com> version
-3.18+ to be installed. The C<wiringPiDev> shared library is also required (for
-the LCD functionality), but it's installed by default with C<wiringPi>.
+3.18+ to be installed (the canonical minimum for the whole RPi:: family is
+published as C<WIRINGPI_MIN_VERSION> in L<RPi::Const>, which this
+distribution's C<Makefile.PL> consumes). The C<wiringPiDev> shared library is
+also required (for the LCD functionality), but it's installed by default with
+C<wiringPi>.
 
 See the documentation on the L<wiringPi|http://wiringpi.com> website for a more
 in-depth description of most of the functions it provides. Some of the
@@ -3674,6 +3738,30 @@ Mandatory: Integer, the GPIO pin number connected to the register's C<SHCP> pin
 Mandatory: Integer, the GPIO pin number connected to the register's C<STCP> pin
 (12). Can be any GPIO pin capable of output.
 
+=head2 pcf8574Setup($pin_base, $i2c_address)
+
+Registers a PCF8574 (or PCF8574A) 8-bit I2C I/O expander, mapping its eight
+pins onto virtual GPIO pin numbers starting at C<$pin_base>. After setup, the
+expander's pins work with C<digital_write>/C<digital_read> (and any function
+that takes a pin number) exactly like native GPIO - the calls are routed to the
+expander over I2C.
+
+This is what lets an HD44780 LCD on a PCF8574 backpack be driven through the
+standard C<lcd_*> functions; see L<RPi::WiringPi/lcd> (C<< i2c => $addr >>).
+
+Parameters:
+
+    $pin_base
+
+Mandatory: Integer higher than all native GPIO pins (>= 64). The expander's
+first pin (P0) becomes GPIO C<$pin_base>, P1 becomes C<$pin_base + 1>, and so
+on through P7.
+
+    $i2c_address
+
+Mandatory: Integer, the expander's I2C address (e.g. C<0x27> for a PCF8574, or
+C<0x3F> for some PCF8574A backpacks).
+
 =head1 SERIAL FUNCTIONS
 
 These functions provide basic access to read and write to a serial device.
@@ -4139,6 +4227,92 @@ Parameters:
     $channel
 
 Mandatory: Integer, C<0> or C<1>.
+
+=head2 spi_bit_bang($clk, $mosi, $miso, $cs, $data, $len, $mode, $delay_us)
+
+Maps to C<spiBitBang(int clk, int mosi, int miso, int cs, AV* data, int len,
+int mode, int delay_us)>
+
+Performs a full software (bit-banged) SPI transaction on arbitrary GPIO pins,
+with no involvement from the kernel SPI driver or the hardware SPI peripheral.
+The chip select (if one is given) is asserted active-low around the whole
+frame, data moves MSB-first, and the read-back data is returned as a Perl
+array, exactly like L</spi_data>.
+
+The pins must already be initialized: clock driven to its idle level, chip
+select driven HIGH, C<$mosi> as an output and C<$miso> as an input.
+L<RPi::SPI> does all of this for you.
+
+Parameters:
+
+    $clk
+
+Mandatory: Integer, the GPIO pin connected to the device's clock input.
+
+    $mosi
+
+Mandatory: Integer, the GPIO pin connected to the device's data-in pin, or
+C<-1> if you only read from the device.
+
+    $miso
+
+Mandatory: Integer, the GPIO pin connected to the device's data-out pin, or
+C<-1> if you only write to the device (the returned bytes will all be C<0>).
+
+    $cs
+
+Mandatory: Integer, the GPIO pin connected to the device's chip select pin, or
+C<-1> if you manage chip select yourself.
+
+    $data
+
+Mandatory: An array reference, each element a single unsigned 8-bit byte to
+write. Overwritten-and-returned semantics are identical to L</spi_data>.
+
+    $len
+
+Mandatory: Integer, the number of bytes in the C<$data> array reference.
+
+    $mode
+
+Optional: Integer C<0>-C<3>, the SPI mode (clock polarity/phase). Defaults to
+C<0>.
+
+    $delay_us
+
+Optional: Integer, microseconds to pause per clock phase. Defaults to C<0>,
+which clocks as fast as the GPIO calls allow. Use it to slow the bus down for
+scopes, long wires or slow devices.
+
+Returns a Perl array containing the same number of elements you sent in.
+
+=head2 spi_no_cs($channel, $state)
+
+Maps to C<int spiNoCS(int channel, int state)>
+
+Sets or clears the kernel's C<SPI_NO_CS> flag on an already-opened hardware
+SPI channel. While the flag is set, transfers run without asserting the
+hardware chip select (CE0/CE1), which lets you frame transactions with your
+own GPIO as the chip select - without the hardware CE line strobing a second
+device behind your back.
+
+Note: the flag lives on the kernel's SPI device (shared by everything that
+has that spidev node open), not on your file descriptor, so set it just
+before your transaction and clear it right after. L<RPi::SPI> does exactly
+this in its GPIO chip select mode.
+
+Parameters:
+
+    $channel
+
+Mandatory: Integer, C<0> or C<1>. The channel must already have been set up
+with L</spi_setup> or friends.
+
+    $state
+
+Mandatory: True to set the flag, false to clear it.
+
+Returns C<1> on success, croaks on failure.
 
 =head1 BMP180 PRESSURE SENSOR FUNCTIONS
 

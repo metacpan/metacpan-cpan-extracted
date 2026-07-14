@@ -1,10 +1,8 @@
 package Mojolicious::Plugin::Fondation::Setup;
-
+$Mojolicious::Plugin::Fondation::Setup::VERSION = '0.04';
 # ABSTRACT: Setup wizard generator — scans plugins for user-configurable parameters, generates a setup workflow, and serves the wizard UI
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
-
-our $VERSION = '0.01';
 
 sub fondation_meta {
     return {
@@ -46,7 +44,7 @@ Mojolicious::Plugin::Fondation::Setup - Setup wizard generator — scans plugins
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

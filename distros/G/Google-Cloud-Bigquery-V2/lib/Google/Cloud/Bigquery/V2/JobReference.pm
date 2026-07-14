@@ -1,0 +1,84 @@
+package Google::Cloud::Bigquery::V2::JobReference;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Auditing };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Inclusion };
+    eval { require Google::Api::Migration };
+    eval { require Google::Protobuf::Wrappers };
+    eval { require Datapol::SemanticAnnotations };
+    my $descriptor_b64 = <<'EOF';
+Cixnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvam9iX3JlZmVyZW5jZS5wcm90bxIYZ29vZ2xl
+LmNsb3VkLmJpZ3F1ZXJ5LnYyGhlnb29nbGUvYXBpL2F1ZGl0aW5nLnByb3RvGh9nb29nbGUv
+YXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGhpnb29nbGUvYXBpL2luY2x1c2lvbi5wcm90bxoa
+Z29vZ2xlL2FwaS9taWdyYXRpb24ucHJvdG8aHmdvb2dsZS9wcm90b2J1Zi93cmFwcGVycy5w
+cm90bxo8c3RvcmFnZS9kYXRhcG9sL2Fubm90YXRpb25zL3Byb3RvL3NlbWFudGljX2Fubm90
+YXRpb25zLnByb3RvIpoDCgxKb2JSZWZlcmVuY2USVAoKcHJvamVjdF9pZBgBIAEoCUI14EEC
+oKDwmAHMCOrqgKwDBxIFQVVESVSav+TaBBg6FnByb2plY3RfaWRfYWx0ZXJuYXRpdmVSCXBy
+b2plY3RJZBIuCgZqb2JfaWQYAiABKAlCF+BBAqCg8JgBzAjq6oCsAwcSBUFVRElUUgVqb2JJ
+ZBJmCghsb2NhdGlvbhgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZUIs4EEB
+6uqArAMHEgVBVURJVJq/5NoEFjoUbG9jYXRpb25fYWx0ZXJuYXRpdmVSCGxvY2F0aW9uElIK
+FnByb2plY3RfaWRfYWx0ZXJuYXRpdmUYBCADKAlCHKCg8JgBzAjq6oCsAwcSBUFVRElUmr/k
+2gQCGAFSFHByb2plY3RJZEFsdGVybmF0aXZlEkgKFGxvY2F0aW9uX2FsdGVybmF0aXZlGAUg
+AygJQhXq6oCsAwcSBUFVRElUmr/k2gQCGAFSE2xvY2F0aW9uQWx0ZXJuYXRpdmVCeQocY29t
+Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIRSm9iUmVmZXJlbmNlUHJvdG9aO2Nsb3VkLmdv
+b2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdxdWVyeXBiitXb
+0g8FCgNhbGxK4Q0KBhIEAABEAQoICgEMEgMAABIKCAoBAhIDAgAhCgkKAgMAEgMEACMKCQoC
+AwESAwUAKQoJCgIDAhIDBgAkCgkKAgMDEgMHACQKCQoCAwQSAwgAKAoJCgIDBRIDCQBGCggK
+AQgSAwsAUgoJCgIICxIDCwBSCggKAQgSAwwANQoJCgIIARIDDAA1CggKAQgSAw0AMgoJCgII
+CBIDDQAyCggKAQgSAw4ALQoPCggI0bqr+gEBABIDDgAtClUKAgQAEgQRAEQBGkkgQSBqb2Ig
+cmVmZXJlbmNlIGlzIGEgZnVsbHkgcXVhbGlmaWVkIGlkZW50aWZpZXIgZm9yIHJlZmVycmlu
+ZyB0byBhIGpvYi4KCgoKAwQAARIDEQgUCjoKBAQAAgASBBMCGQQaLCBUaGUgSUQgb2YgdGhl
+IHByb2plY3QgY29udGFpbmluZyB0aGlzIGpvYi4KCgwKBQQAAgAFEgMTAggKDAoFBAACAAES
+AxMJEwoMCgUEAAIAAxIDExYXCg0KBQQAAgAIEgQTGBkDChAKCQQAAgAIhISOExIDFAQvChEK
+CgQAAgAIrY3ANQISAxUEMwoPCggEAAIACJwIABIDFgQqChIKCgQAAgAI88esSwcSBBcEGCAK
+qQEKBAQAAgESBB4CIgQamgEgVGhlIElEIG9mIHRoZSBqb2IuIFRoZSBJRCBtdXN0IGNvbnRh
+aW4gb25seSBsZXR0ZXJzIChhLXosIEEtWiksCiBudW1iZXJzICgwLTkpLCB1bmRlcnNjb3Jl
+cyAoXyksIG9yIGRhc2hlcyAoLSkuIFRoZSBtYXhpbXVtIGxlbmd0aCBpcyAxLDAyNAogY2hh
+cmFjdGVycy4KCgwKBQQAAgEFEgMeAggKDAoFBAACAQESAx4JDwoMCgUEAAIBAxIDHhITCg0K
+BQQAAgEIEgQeFCIDChAKCQQAAgEIhISOExIDHwQvChEKCgQAAgEIrY3ANQISAyAEMwoPCggE
+AAIBCJwIABIDIQQqCrUBCgQEAAICEgQoAiwEGqYBIFRoZSBnZW9ncmFwaGljIGxvY2F0aW9u
+IG9mIHRoZSBqb2IuIFRoZSBkZWZhdWx0IHZhbHVlIGlzIFVTLgoKIEZvciBtb3JlIGluZm9y
+bWF0aW9uIGFib3V0IEJpZ1F1ZXJ5IGxvY2F0aW9ucywgc2VlOgogaHR0cHM6Ly9jbG91ZC5n
+b29nbGUuY29tL2JpZ3F1ZXJ5L2RvY3MvbG9jYXRpb25zCgoMCgUEAAICBhIDKAIdCgwKBQQA
+AgIBEgMoHiYKDAoFBAACAgMSAygpKgoNCgUEAAICCBIEKCssAwoRCgoEAAICCK2NwDUCEgMp
+BDMKDwoIBAACAgicCAASAyoEKgoRCgoEAAICCPPHrEsHEgMrBFAK6gEKBAQAAgMSBDQCOAQa
+2wEgKC0tCiBUaGUgYWx0ZXJuYXRpdmUgZmllbGQgdGhhdCB3aWxsIGJlIHVzZWQgd2hlbiBF
+U0YgaXMgbm90IGFibGUgdG8gdHJhbnNsYXRlCiB0aGUgcmVjZWl2ZWQgZGF0YSB0byB0aGUg
+cHJvamVjdF9pZCBmaWVsZC4gU2VlIGRldGFpbHMgYXQKIGdvL2RlYWxpbmdfd2l0aF9hcGlh
+cnlfbGF4X2FycmF5X3BhcnNpbmcuCiAtLSkKIFRoaXMgZmllbGQgc2hvdWxkIG5vdCBiZSB1
+c2VkLgoKDAoFBAACAwQSAzQCCgoMCgUEAAIDBRIDNAsRCgwKBQQAAgMBEgM0EigKDAoFBAAC
+AwMSAzQrLAoNCgUEAAIDCBIENC04AwoQCgkEAAIDCISEjhMSAzUELwoRCgoEAAIDCK2NwDUC
+EgM2BDMKEQoKBAACAwjzx6xLAxIDNwQ7CugBCgQEAAIEEgRAAkMEGtkBICgtLQogVGhlIGFs
+dGVybmF0aXZlIGZpZWxkIHRoYXQgd2lsbCBiZSB1c2VkIHdoZW4gRVNGIGlzIG5vdCBhYmxl
+IHRvIHRyYW5zbGF0ZQogdGhlIHJlY2VpdmVkIGRhdGEgdG8gdGhlIGxvY2F0aW9uIGZpZWxk
+LiBTZWUgZGV0YWlscyBhdAogZ28vZGVhbGluZ193aXRoX2FwaWFyeV9sYXhfYXJyYXlfcGFy
+c2luZy4KIC0tKQogVGhpcyBmaWVsZCBzaG91bGQgbm90IGJlIHVzZWQuCgoMCgUEAAIEBBID
+QAIKCgwKBQQAAgQFEgNACxEKDAoFBAACBAESA0ASJgoMCgUEAAIEAxIDQCkqCg0KBQQAAgQI
+EgRAK0MDChEKCgQAAgQIrY3ANQISA0EEMwoRCgoEAAIECPPHrEsDEgNCBDtiBnByb3RvMw==
+
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Bigquery::V2::JobReference::JobReference ===
+    # Fields for JobReference
+    # Field: project_id Type: 9 ()
+    # Field: job_id Type: 9 ()
+    # Field: location Type: 11 (.google.protobuf.StringValue)
+    # Field: project_id_alternative Type: 9 ()
+    # Field: location_alternative Type: 9 ()
+
+1;

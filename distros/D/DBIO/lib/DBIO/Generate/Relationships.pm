@@ -253,7 +253,7 @@ DBIO::Generate::Relationships - Relationship inference for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 METHODS
 

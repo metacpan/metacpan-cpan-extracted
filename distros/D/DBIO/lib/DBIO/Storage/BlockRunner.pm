@@ -251,7 +251,7 @@ DBIO::Storage::BlockRunner - Execute code blocks with transaction wrapping and r
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

@@ -97,7 +97,7 @@ DBIO::SQL::Util - Shared SQL utility functions for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

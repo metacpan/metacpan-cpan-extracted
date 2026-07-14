@@ -3,6 +3,8 @@ use strictures 2;
 use Test::More;
 
 use Net::Blossom::Server::Backend::Postgres;
+use Net::Blossom::Server::BlobStore;
+use Net::Blossom::Server::MetadataStore;
 use Net::Blossom::Server::Storage;
 
 sub dies(&) {
@@ -16,9 +18,22 @@ sub dies(&) {
     use strictures 2;
 
     sub do {}
-    sub selectrow_array {}
+    sub selectrow_array { return 'public' }
     sub selectrow_hashref {}
     sub selectall_arrayref {}
+    sub quote_identifier {
+        shift;
+        return join '.', map { qq{"$_"} } @_;
+    }
+}
+
+{
+    package Local::NoSchemaDBH;
+    use strictures 2;
+
+    our @ISA = ('Local::FakeDBH');
+
+    sub selectrow_array { return }
 }
 
 my $fake_pg = bless {
@@ -29,6 +44,14 @@ my $fake_sqlite = bless {
     Driver     => { Name => 'SQLite' },
     AutoCommit => 1,
 }, 'Local::FakeDBH';
+my $manual_transaction_pg = bless {
+    Driver     => { Name => 'Pg' },
+    AutoCommit => 0,
+}, 'Local::FakeDBH';
+my $no_schema_pg = bless {
+    Driver     => { Name => 'Pg' },
+    AutoCommit => 1,
+}, 'Local::NoSchemaDBH';
 
 like(dies { Net::Blossom::Server::Backend::Postgres->new },
     qr/dsn or dbh is required/, 'dsn or dbh required');
@@ -63,6 +86,18 @@ like(dies {
         base_url => 'https://cdn.example.test',
     );
 }, qr/dbh must be a Postgres DBI handle/, 'dbh must be a Postgres handle');
+like(dies {
+    Net::Blossom::Server::Backend::Postgres->new(
+        dbh      => $manual_transaction_pg,
+        base_url => 'https://cdn.example.test',
+    );
+}, qr/dbh must have AutoCommit enabled/, 'dbh must let the backend own transactions');
+like(dies {
+    Net::Blossom::Server::Backend::Postgres->new(
+        dbh      => $no_schema_pg,
+        base_url => 'https://cdn.example.test',
+    );
+}, qr/Postgres connection has no current schema/, 'dbh must have a current schema');
 like(dies {
     Net::Blossom::Server::Backend::Postgres->new(
         dbh      => $fake_pg,
@@ -140,6 +175,14 @@ isa_ok($storage, 'Net::Blossom::Server::Backend::Postgres');
 ok(Net::Blossom::Server::Storage->assert_implements($storage), 'storage contract methods exist');
 is($storage->dbh, $fake_pg, 'constructor accepts an existing DBI handle');
 is($storage->base_url, 'https://cdn.example.test/blobs', 'base_url is normalized');
+isa_ok($storage->metadata_store, 'Net::Blossom::Server::Backend::Postgres::MetadataStore');
+isa_ok($storage->blob_store, 'Net::Blossom::Server::Backend::Postgres::BlobStore');
+is($storage->metadata_store->dbh, $storage->dbh, 'metadata store shares backend DB handle');
+is($storage->blob_store->dbh, $storage->dbh, 'blob store shares backend DB handle');
+ok(Net::Blossom::Server::MetadataStore->assert_implements($storage->metadata_store),
+    'metadata component implements its contract');
+ok(Net::Blossom::Server::BlobStore->assert_implements($storage->blob_store),
+    'blob component implements its contract');
 
 my $hashref_storage = Net::Blossom::Server::Backend::Postgres->new({
     dbh      => $fake_pg,

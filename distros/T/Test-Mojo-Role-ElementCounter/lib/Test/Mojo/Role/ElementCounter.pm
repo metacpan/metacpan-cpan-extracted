@@ -5,7 +5,7 @@ use Encode;
 use Carp qw/croak/;
 use Role::Tiny;
 
-our $VERSION = '1.001008'; # VERSION
+our $VERSION = '1.001009'; # VERSION
 
 has _counter_selector_prefix => '';
 

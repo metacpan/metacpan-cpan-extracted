@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::CPAN::Info;
 use warnings;
 use strict;
 
-our $VERSION = '1.001002'; # VERSION
+our $VERSION = '1.001003'; # VERSION
 
 use Carp;
 use POE;
@@ -701,7 +701,7 @@ that if the database was never created yet, the bot will be saying
 I<No idea> for all queries, until the database is updated.
 
 I haven't much interest in making a sane fix for this at the moment, so
-I'm just going to put this note here :) Turn on C<<debug => 1 >> on the
+I'm just going to put this note here :) Turn on C<< debug => 1 >> on the
 plugin and if you don't see C<got_info> success, then just restart
 the bot, for the database to be built (it might take a couple of minutes).
 

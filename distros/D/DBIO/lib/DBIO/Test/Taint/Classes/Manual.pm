@@ -21,7 +21,7 @@ DBIO::Test::Taint::Classes::Manual - Test class for taint mode with manual loadi
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

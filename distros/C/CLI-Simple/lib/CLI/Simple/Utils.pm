@@ -16,6 +16,7 @@ our @EXPORT_OK = qw(
   choose
   dmp
   dump_json
+  file_or_stdout
   normalize_options
   slurp
   slurp_json
@@ -24,7 +25,7 @@ our @EXPORT_OK = qw(
   to_snake_case
 );
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 sub toPascalCase { goto &_toCamelCase; }
 sub ToCamelCase  { goto &_toCamelCase; }
@@ -78,9 +79,41 @@ sub to_snake_case {
 ########################################################################
 sub choose(&) { ## no critic
 ########################################################################
-  my @result = shift->();
+  my $code = shift;
 
-  return wantarray ? @result : $result[0];
+  # Pass the correct context down to the block
+  if (wantarray) {
+    return $code->();
+  }
+  elsif ( defined wantarray ) {
+    return scalar $code->();
+  }
+  else {
+    $code->();
+    return;
+  }
+}
+
+########################################################################
+sub file_or_stdout {
+########################################################################
+  my ( $self, $outfile, $mode ) = @_;
+
+  $mode //= 'r';
+
+  $outfile //= $self->can('get_outfile') ? $self->get_outfile : qw{-};
+
+  my $fh = choose {
+    if ( !$outfile || $outfile eq q{-} ) {
+      return \*STDOUT;
+    }
+
+    require IO::File;
+
+    return IO::File->new( $outfile, $mode );
+  };
+
+  return $fh;
 }
 
 ########################################################################
@@ -209,7 +242,14 @@ just seems wrong.
 Shortcut for:
 
  print {*STDERR} Dumper([this => $this, that => $that]);
- 
+
+=head2 file_or_stdout
+
+ file_or_stdout([file], [mode]);
+
+Returns an open file handle by opening a passed file and optional mode
+or returning \*STDOUT if file is empty or '-'.
+
 =head2 slurp_json
 
  slurp_json($file)

@@ -46,6 +46,8 @@
             "File::Copy::Recursive" : "0.45",
             "File::HomeDir" : "1.006",
             "File::ShareDir" : "1.118",
+            "Git::Raw" : "0",
+            "IO::Scalar" : "2.113",
             "JSON::PP" : "0",
             "Markdown::Render" : "0",
             "Module::Metadata" : "0",
@@ -67,7 +69,7 @@
    "provides" : {
       "CPAN::Maker::Bootstrapper" : {
          "file" : "lib/CPAN/Maker/Bootstrapper.pm",
-         "version" : "v2.0.4"
+         "version" : "v2.0.6"
       },
       "CPAN::Maker::Bootstrapper::ConfigReader" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/ConfigReader.pm",
@@ -131,6 +133,6 @@
          "web" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper"
       }
    },
-   "version" : "v2.0.4",
+   "version" : "v2.0.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

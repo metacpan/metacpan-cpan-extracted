@@ -11,7 +11,7 @@ use Net::OBEX::Packet::Request::Put;
 use Net::OBEX::Packet::Request::SetPath;
 use Net::OBEX::Packet::Request::Abort;
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 my %Valid_Packets = map { $_ => 1 }
                         qw(connect disconnect get put setpath abort);

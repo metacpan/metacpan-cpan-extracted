@@ -1234,7 +1234,7 @@ DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

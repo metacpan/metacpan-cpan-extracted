@@ -76,6 +76,15 @@ sub install_stubs {
 	my (%ov) = @_;
 	no warnings 'redefine';
 
+	# Flush the global CHI Memory store so that stale dom:/url: entries
+	# written by a previous subtest — or by t/unit.t when all test files
+	# are executed in the same process — cannot shadow the fresh stubs
+	# installed below.  Mirrors the identical flush in without_optionals().
+	eval {
+		require CHI;
+		CHI->new(driver => 'Memory', global => 1, expires_in => 3600)->clear();
+	};
+
 	*Email::Abuse::Investigator::_reverse_dns = ref($ov{rdns}) eq 'CODE'
 		? $ov{rdns}
 		: sub { $ov{rdns} // undef };
@@ -167,7 +176,7 @@ sub without_optionals {
 	# set the corresponding $HAS_* flags to undef/false.
 	Test::Without::Module->import(@$blocked_ref);
 	delete $INC{'Email/Abuse/Investigator.pm'};
-	{ no warnings 'redefine'; require Email::Abuse::Investigator; }
+	{ local $SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /redefined/ }; require Email::Abuse::Investigator; }
 
 	$code->();
 
@@ -178,7 +187,7 @@ sub without_optionals {
 		$INC{$key} = $saved_inc{$key} if defined $saved_inc{$key};
 	}
 	delete $INC{'Email/Abuse/Investigator.pm'};
-	{ no warnings 'redefine'; require Email::Abuse::Investigator; }
+	{ local $SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /redefined/ }; require Email::Abuse::Investigator; }
 }
 
 # ---------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-Fondation
 
+0.05      2026-07-13 14:12:33+02:00 Europe/Paris
+    - add fondation.js with no-op JS fallbacks
+    - scan dev_plugins_dir to add local plugins
+
 0.04      2026-07-12 18:45:13+02:00 Europe/Paris
     - Add Setup wizard link to welcome page when Fondation::Setup is loaded
     - add command fondation clean

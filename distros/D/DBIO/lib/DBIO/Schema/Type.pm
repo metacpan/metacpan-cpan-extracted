@@ -69,7 +69,7 @@ DBIO::Schema::Type - portable base-type vocabulary for multi-engine schemas
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

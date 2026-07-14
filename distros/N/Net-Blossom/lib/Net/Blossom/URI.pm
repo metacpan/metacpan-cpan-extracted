@@ -6,49 +6,60 @@ use Net::Blossom::_ConstructorArgs ();
 use Net::Blossom::_URL ();
 
 use Carp qw(croak);
-use Class::Tiny qw(sha256 extension xs as sz);
+use Class::Tiny qw(sha256 sz), {
+    extension => 'bin',
+    xs        => sub { [] },
+    as        => sub { [] },
+};
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(sha256 extension xs as sz);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
 
-    croak "sha256 is required" unless defined $args{sha256};
-    croak "sha256 must be 64-char lowercase hex" unless $args{sha256} =~ $HEX64;
+    return \%args;
+}
 
-    $args{extension} = 'bin' unless defined $args{extension} && length $args{extension};
-    $args{extension} =~ s/\A\.//;
+sub BUILD {
+    my ($self) = @_;
+    croak "sha256 is required" unless defined $self->sha256;
+    croak "sha256 must be 64-char lowercase hex" unless $self->sha256 =~ $HEX64;
+
+    my $extension = $self->extension;
+    $extension = 'bin' unless defined $extension && length $extension;
+    $extension =~ s/\A\.//;
     croak "extension must contain only letters and digits"
-        unless length($args{extension}) && $args{extension} =~ /\A[A-Za-z0-9]+\z/;
+        unless length($extension) && $extension =~ /\A[A-Za-z0-9]+\z/;
+    $self->extension($extension);
 
-    $args{xs} = [] unless defined $args{xs};
-    croak "xs must be an array reference" unless ref($args{xs}) eq 'ARRAY';
-    my @xs = @{$args{xs}};
+    $self->xs([]) unless defined $self->xs;
+    croak "xs must be an array reference" unless ref($self->xs) eq 'ARRAY';
+    my @xs = @{$self->xs};
     for my $server (@xs) {
         croak "server hint must be a domain or http(s) root URL"
             unless defined $server && !ref($server) && _valid_server_hint($server);
     }
 
-    $args{as} = [] unless defined $args{as};
-    croak "as must be an array reference" unless ref($args{as}) eq 'ARRAY';
-    my @as = @{$args{as}};
+    $self->as([]) unless defined $self->as;
+    croak "as must be an array reference" unless ref($self->as) eq 'ARRAY';
+    my @as = @{$self->as};
     for my $author (@as) {
         croak "author hint must be 64-char lowercase hex"
             unless defined $author && !ref($author) && $author =~ $HEX64;
     }
 
-    if (defined $args{sz}) {
+    if (defined $self->sz) {
         croak "size must be a positive integer"
-            unless !ref($args{sz}) && $args{sz} =~ /\A[1-9][0-9]*\z/;
+            unless !ref($self->sz) && $self->sz =~ /\A[1-9][0-9]*\z/;
     }
 
-    $args{xs} = \@xs;
-    $args{as} = \@as;
-    return bless \%args, $class;
+    $self->xs(\@xs);
+    $self->as(\@as);
+    return;
 }
 
 sub parse {
@@ -217,5 +228,15 @@ Returns the optional byte size.
 
 Returns the C<blossom:> URI string. Query parameters are emitted in C<xs>,
 C<as>, then C<sz> order.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

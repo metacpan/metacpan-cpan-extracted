@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Fondation::Helpers;
 # ABSTRACT: All Fondation helpers in one place -- keeps Fondation.pm minimal
-$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.04';
+$Mojolicious::Plugin::Fondation::Helpers::VERSION = '0.05';
 use Mojo::Base -base, -signatures;
 use Mojo::ByteStream 'b';
 
@@ -139,7 +139,7 @@ Mojolicious::Plugin::Fondation::Helpers - All Fondation helpers in one place -- 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

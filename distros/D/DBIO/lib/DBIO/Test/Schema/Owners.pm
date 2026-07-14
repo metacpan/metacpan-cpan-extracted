@@ -37,7 +37,7 @@ DBIO::Test::Schema::Owners - Test result class for the owners table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

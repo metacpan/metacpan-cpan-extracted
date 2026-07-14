@@ -1,6 +1,6 @@
 package XTaTIK::Controller::User;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Mojo::Base 'Mojolicious::Controller';
 use experimental 'postderef';

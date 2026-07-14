@@ -21,7 +21,7 @@ DBIO::Test::Namespace::Result::A - Test fixture for namespace resolution
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

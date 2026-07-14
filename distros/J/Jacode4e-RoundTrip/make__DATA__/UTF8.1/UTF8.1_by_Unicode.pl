@@ -2,7 +2,7 @@
 #
 # UTF8.1_by_Unicode.pl
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # UTF-8, a transformation format of ISO 10646

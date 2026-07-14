@@ -43,3 +43,9 @@ extra_options:
   - llm_api_key_helper
   - dist_dir
   - import_file_listing
+  - help_sections
+default_options:
+  help_sections:
+      - SYNOPSIS
+      - COMMANDS
+      - OPTIONS

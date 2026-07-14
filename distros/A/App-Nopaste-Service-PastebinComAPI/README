@@ -33,13 +33,17 @@ SEE ALSO
 AUTHOR
     Zoffix Znet, "<zoffix at cpan.org>"
 
+REPOSITORY
+    Fork this module on GitHub:
+    <https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI>
+
 BUGS
-    Please report any bugs or feature requests to
-    "bug-app-nopaste-service-pastebincomapi at rt.cpan.org", or through the
-    web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Nopaste-Service-Past
-    ebinComAPI>. I will be notified, and then you'll automatically be
-    notified of progress on your bug as I make changes.
+    To report bugs or request features, please use
+    <https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI/issues
+    >
+
+    If you can't access GitHub, you can email your request to
+    "bug-app-nopaste-service-pastebincomapi at rt.cpan.org"
 
 SUPPORT
     You can find documentation for this module with the perldoc command.

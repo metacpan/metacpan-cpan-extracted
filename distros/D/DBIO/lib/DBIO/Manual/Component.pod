@@ -13,7 +13,7 @@ DBIO::Manual::Component - Developing DBIO Components
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 WHAT IS A COMPONENT
 

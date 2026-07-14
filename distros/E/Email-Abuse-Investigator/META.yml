@@ -49,5 +49,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Email-Abuse-Investigator
   homepage: https://metacpan.org/pod/Email::Abuse::Investigator
   repository: git://github.com/nigelhorne/Email-Abuse-Investigator.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

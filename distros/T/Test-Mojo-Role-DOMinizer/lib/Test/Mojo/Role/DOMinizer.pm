@@ -3,7 +3,7 @@ package Test::Mojo::Role::DOMinizer;
 use Mojo::Base -base;
 use Role::Tiny;
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 sub in_DOM {
     my ($self, $code) = @_;
@@ -53,7 +53,8 @@ Test::Mojo::Role::DOMinizer - Test::Mojo role to examine DOM mid test chain
             $t
         })
 
-        # Returning Test::Mojo object from sub makes it return value of in_DOM:
+        # Returning a Test::Mojo object from sub makes it the 
+        # return value of in_DOM, otherwise, the original one is used:
         ->in_DOM(sub {
             # (example `click_ok` method is from Test::Mojo::Role::SubmitForm)
             $_[1]->click_ok('.config-form' => {
@@ -106,7 +107,7 @@ return value of the method. Otherwise, the original L<Mojo::Test> object
 the method was called on will be used. Essentially this means you can ignore
 what you return from the sub.
 
-The call to C<in_DOM> does not generate perform any tests in itself, so
+The call to C<in_DOM> does not perform any tests in itself, so
 don't count it towards total number of tests run.
 
 =head1 SEE ALSO

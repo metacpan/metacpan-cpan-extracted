@@ -3,7 +3,7 @@ package POE::Component::WWW::Cache::Google;
 use warnings;
 use strict;
 
-our $VERSION = '2.001001'; # VERSION
+our $VERSION = '2.001002'; # VERSION
 
 use POE;
 use base 'POE::Component::NonBlockingWrapper::Base';

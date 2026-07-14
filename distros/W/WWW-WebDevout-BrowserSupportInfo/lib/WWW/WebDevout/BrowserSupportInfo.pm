@@ -3,7 +3,7 @@ package WWW::WebDevout::BrowserSupportInfo;
 use warnings;
 use strict;
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use Carp;
 use URI;

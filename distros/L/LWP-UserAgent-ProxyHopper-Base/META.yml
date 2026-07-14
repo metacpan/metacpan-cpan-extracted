@@ -1,29 +1,29 @@
 ---
-abstract: 'base class for LWP::UserAgent based modules which want to proxy-hop their requests'
+abstract: unknown
 author:
-  - 'Zoffix Znet <zoffix@cpan.org>'
+  - unknown
 build_requires:
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: 0.4
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112150'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: LWP-UserAgent-ProxyHopper-Base
-provides:
-  LWP::UserAgent::ProxyHopper::Base:
-    file: lib/LWP/UserAgent/ProxyHopper/Base.pm
-    version: 0.003
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 1.04
-  Class::Data::Accessor: 0.04001
-  Devel::TakeHashArgs: 0.001
-  List::MoreUtils: 0.21
-  WWW::FreeProxyListsCom: 0.002
-  WWW::Proxy4FreeCom: 0.001
-resources:
-  license: http://dev.perl.org/licenses/
-version: 0.003
+  Carp: '1.04'
+  Class::Data::Accessor: '0.04001'
+  Devel::TakeHashArgs: '0.001'
+  List::MoreUtils: '0.21'
+  Test::More: '0'
+  WWW::FreeProxyListsCom: '0.002'
+  WWW::Proxy4FreeCom: '0.001'
+version: '0.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

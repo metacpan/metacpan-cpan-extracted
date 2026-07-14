@@ -351,7 +351,7 @@ subtest 'weather() -- integer coordinates accepted without decimal' => sub {
 	my $result = $meteo->weather({ latitude => 51, longitude => 1, date => $DATE });
 
 	ok(defined($result), 'integer coords: result defined');
-	like($captured_url, qr/latitude=51[^.]/, 'integer lat in URL without decimal');
+	like($captured_url, qr/latitude=51(?!\.)/, 'integer lat in URL without decimal');
 
 	restore_all();
 	diag("url=$captured_url") if $ENV{TEST_VERBOSE};

@@ -29,6 +29,16 @@ my @bad_code_spans = _bad_single_angle_code_spans(@files);
 ok(!@bad_code_spans, 'no raw => inside single-angle C<> POD spans');
 diag join "\n", @bad_code_spans if @bad_code_spans;
 
+open my $module, '<', "$FindBin::Bin/../lib/Net/Blossom/Server/Backend/Postgres.pm"
+    or die "Unable to read Postgres.pm: $!";
+my $pod = do { local $/; <$module> };
+close $module;
+
+like($pod, qr{https://www\.postgresql\.org/docs/current/largeobjects\.html},
+    'POD links to PostgreSQL large-object documentation');
+like($pod, qr{L<DBD::Pg/Large Objects>},
+    'POD links to DBD::Pg large-object documentation');
+
 done_testing;
 
 sub _has_pod {

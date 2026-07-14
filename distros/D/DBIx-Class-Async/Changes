@@ -1,5 +1,11 @@
 Revision history for DBIx::Class::Async
 
+v1.0.5   2026-07-13
+         [POD CHANGES]
+         - Used App:genstopwords v0.0.1 to generate .stopwords
+         - Tidied up Makefile.PL script.
+         - Cosmetic Changes to pod document.
+
 v1.0.4   2026-05-31
          [BUG FIXES]
          - Fixed a SEGV (signal 11) during Perl global destruction when

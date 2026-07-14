@@ -16,11 +16,14 @@ name: App-Nopaste-Service-PastebinComAPI
 provides:
   App::Nopaste::Service::PastebinComAPI:
     file: lib/App/Nopaste/Service/PastebinComAPI.pm
-    version: 1.002
+    version: 1.003
 requires:
   App::Nopaste::Service: 0
   WWW::Pastebin::PastebinCom::API: 0.003
   perl: 5.006
 resources:
+  bugtracker: https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI/issues
+  homepage: https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: 1.002
+  repository: git://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI.git
+version: 1.003

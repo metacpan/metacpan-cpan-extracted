@@ -900,7 +900,7 @@ DBIO::Schema - Schema class and connection container for DBIO applications
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

@@ -20,7 +20,7 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 $VERSIONE = '0.30';
@@ -143,7 +143,7 @@ for my $target (@ARGV) {
     elsif ($target eq 'dist') {
 
         # your PAUSE ID here
-        my $author = q{ina <ina@cpan.org>};
+        my $author = q{ina <ina.cpan@gmail.com>};
 
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
@@ -1057,7 +1057,7 @@ TO_SECURITY
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;
@@ -1201,7 +1201,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1439,7 +1439,7 @@ This software requires perl5.00503 or later.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt> in a CPAN
 
 This project was originated by INABA Hitoshi.
 

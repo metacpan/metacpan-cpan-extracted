@@ -10,8 +10,8 @@ In your `dist.ini`:
 
 # DESCRIPTION
 
-This is a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) plugin bundle. It is heavily based on
-[Dist::Zilla::PluginBundle::Author::ETHER](https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::ETHER)
+This is a [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla) plugin bundle. It is heavily based on
+[Dist::Zilla::PluginBundle::Author::ETHER](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AAuthor%3A%3AETHER)
 and is approximately equivalent to the following `dist.ini`:
 
     [OurPkgVersion]
@@ -120,12 +120,12 @@ to `bug-Dist-Zilla-PluginBundle-Author-ZOFFIX at rt.cpan.org`
 
 # AUTHOR
 
-Zoffix Znet <zoffix at cpan.org>
+Zoffix Znet &lt;zoffix at cpan.org>
 ([http://zoffix.com/](http://zoffix.com/), [http://haslayout.net/](http://haslayout.net/))
 
 # LICENSE
 
-This software is copyright (c) 2014 by Zoffix Znet <zoffix at cpan.org>.
+This software is copyright (c) 2014 by Zoffix Znet &lt;zoffix at cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

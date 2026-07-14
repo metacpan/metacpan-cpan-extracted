@@ -42,7 +42,7 @@ DBIO::Test::Schema::TypedObject - Test result class for the typed_object table
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

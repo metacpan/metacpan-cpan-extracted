@@ -18,15 +18,16 @@ no_index:
     - t
     - inc
 requires:
+  Class::Tiny: '1.001'
   DBD::SQLite: '0'
   DBI: '0'
-  Net::Blossom: '0.001000'
-  Net::Blossom::Server: '0.001000'
+  Net::Blossom: '0.001001'
+  Net::Blossom::Server: '0.001002'
   perl: '5.016'
   strictures: '2'
 resources:
   bugtracker: https://github.com/NicholasBHubbard/Net-Blossom/issues
   homepage: https://github.com/NicholasBHubbard/Net-Blossom
   repository: https://github.com/NicholasBHubbard/Net-Blossom.git
-version: '0.001000'
+version: '0.001002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -10,7 +10,7 @@ use Cwd qw(abs_path);
 use File::Spec::Functions qw(catdir catfile file_name_is_absolute splitpath);
 use Config::INI::RefVars::Builtins;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use constant DFLT_TOCOPY_SECTION => "__TOCOPY__";
 use constant FLD_KEY_PREFIX      => __PACKAGE__ . ' __ ';
@@ -755,16 +755,11 @@ $_look_up = sub {
 };
 
 
-# extended var name
+# Extended name of a variable definition
 $_x_var_name = sub {
   my ($self, $curr_sect, $variable) = @_;
 
-  if ($variable =~ $self->{+VREF_RE}) {
-    return ($2, "[$1]$2");
-  }
-  else {
-    return ($variable, "[$curr_sect]$variable");
-  }
+  return ($variable, "[$curr_sect]$variable");
 };
 
 
@@ -779,8 +774,12 @@ $_expand_vars = sub {
   if (defined($variable)) {
     ((my $var_basename), $x_variable_name) = $self->$_x_var_name($curr_sect, $variable);
 
-    return $self->$_look_up($curr_sect, $variable)
-      if (exists($self->{+EXPANDED}{$x_variable_name}) || $var_basename =~ /^=(?:ENV|CONFIG):/);
+    if (exists($self->{+EXPANDED}{$x_variable_name})) {
+      return $self->{+VARIABLES}{$curr_sect}{$variable};
+    }
+    if ($var_basename =~ /^=(?:ENV|CONFIG):/) {
+      return $self->$_look_up($curr_sect, $variable);
+    }
 
     croak("recursive variable '$x_variable_name' references itself")
       if exists($seen->{$x_variable_name});
@@ -806,10 +805,14 @@ $_expand_vars = sub {
         $result[$level - 1] .= $self->$_dispatch_call($curr_sect, $1, $seen);
       }
       else {
+        my ($ref_section, $ref_variable, $ref_value) =
+          $self->$_look_up($curr_sect, $result[$level]);
         $result[$level - 1] .= $self->$_expand_vars(
-          $self->$_look_up($curr_sect, $result[$level]),
-          $seen,
-        );
+                                                    $ref_section,
+                                                    $ref_variable,
+                                                    $ref_value,
+                                                    $seen,
+                                                   );
       }
       $raw[$level - 1] .= $raw_expr . ')';
       pop(@result);
@@ -860,7 +863,7 @@ Config::INI::RefVars - INI file reader with variable references and function cal
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -871,15 +874,8 @@ Version 1.03
   my $vars = $cfg->variables;
   print $vars->{database}{host}, "\n";
 
-C<Config::INI::RefVars> extends the INI format with variable references and
-function calls. The parser resolves all variable references, built-in function
-calls, and user-defined function calls while reading the INI file. The
-resulting data structure therefore contains only plain Perl scalars and no
-unresolved references.
-
 
 =head1 QUICK EXAMPLE
-
 
 Suppose F<config.ini> contains
 
@@ -929,7 +925,7 @@ references, function calls, include directives, line continuations, and
 additional assignment operators. All references are resolved while parsing, so
 the resulting data structure contains only plain Perl scalars.
 
-Minimum version of perl required to use this module: C<v5.10.1>.
+The minimum Perl version required to use this module is C<v5.10.1>.
 
 
 =head2 OVERVIEW
@@ -973,18 +969,26 @@ of sections in the order in which they appear in the INI file.
 
 =item *
 
-A variable name cannot be empty.
+There are several assignment operators, not just C<=>. The other assignment
+operators have one or more punctuation characters to the left of the C<=>
+symbol.
 
 =item *
 
-Spaces around the assignment operator are ignored. Note that there are several
-assignment operators, not just C<=>.
+Spaces around the assignment operator are usually ignored, but may be needed
+as separators in some cases.
 
 =item *
 
 If you want to define a variable whose name ends with an punctuation character other
 than an underscore, there must be at least one space between the variable name
 and the assignment operator.
+
+=item *
+
+The name of a user-defined variable cannot be empty. Furthermore, it cannot
+begin with any of the characters C<;>, or C<[>. Obviously, it also cannot contain a
+C<=> at all (but see constructor variable C<tocopy_vars>).
 
 =item *
 
@@ -1080,7 +1084,8 @@ This allows you to set a default value for an environment variable:
 
 If the environment variable C<ENV_VAR> is not defined or is empty, then
 C<env_var> has the value C<the default>. This would not work with
-C<?=>. Please note that you must also use C<:=>!
+C<?=>. Please note that you must also use the C<:=> operator for the
+assignment!
 
 
 =item C<:=>
@@ -1162,21 +1167,24 @@ See L<LINE CONTINUATION>.
 
 =head2 LINE CONTINUATION
 
-By default, each physical input line is treated as a separate assignment.
+By default, the value assigned in an assignment statement ends at the first
+non-space character on the same line. However, this module also supports line
+continuations by modifying the assignment operators.
 
 To enable line continuation, place a backslash immediately before the
 assignment operator. This works with all assignment operators, for example
-C<\=>, C<:\=>, C<+\=>, etc.
+C<\=>, C<:\=>, C<+\=>, etc.  The backslash must appear immediately before the
+equals sign.
 
-If such an assignment ends with a backslash, the trailing backslash is
-removed and the following physical line is appended. This process is
-repeated until a line does not end with a backslash or end-of-file is
-reached.
+If a line containing such a modified assignment operator ends with a
+backslash, the trailing backslash is removed and the following physical line
+is appended. This process is repeated until a line no longer ends with a
+backslash or the end of the file is reached.
 
-Trailing whitespace is stripped from each physical line before line
-continuation is processed.
+Spaces following a backslash are always ignored, because spaces at the end of
+a line are removed before parsing.
 
-The backslash preceding the assignment operator is only a marker to enable
+B<Note:> The backslash preceding the assignment operator is only a marker to enable
 line continuation and is not part of the operator itself.
 
 Examples:
@@ -1207,7 +1215,8 @@ line continuation, even if their value ends with a backslash.
 Here, the variable C<normal> has the value C<foo\>, and the variable C<bar>
 has the value C<baz>.
 
-B<Note:> The first character in a continued line cannot be C<=>. This
+B<Note:> To avoid ambiguity, the first character of a continuous line must not
+be "=". This
 
   v\=abcd\
   =
@@ -1218,7 +1227,14 @@ will cause a C<directive in line continuation> error, but this will work:
   v\=abcd\
    =
 
-This works because of the space before the C<=>.
+This works because of the space before the C<=>, the result would be C<abcd =>.
+
+This would work, too:
+
+  v\=abcd\
+  $()=
+
+The result would be C<abcd=>.
 
 
 =head2 INCLUDE FILES
@@ -1507,7 +1523,7 @@ Version of the C<Config::INI::RefVars> module.
 =item C<=devnull>
 
 A string representation of the null device (result of function
-C<devnull> from L<File::Spec::Functions>.
+C<devnull> from L<File::Spec::Functions>).
 
 =item C<=rootdir>
 
@@ -1766,11 +1782,11 @@ There are two kinds of function calls:
 
 =over
 
-=item Built-in functions
+=item * Built-in functions
 
   value = $(=& func, arg1, arg2, ...)
 
-=item User-defined functions
+=item * User-defined functions
 
   value = $(=# func, arg1, arg2, ...)
 
@@ -1869,6 +1885,11 @@ Example:
 Result:
 
   x = a:b:
+
+B<Note:> These numeric variables are always local within the function. They
+never overwrite a numeric variable defined outside the function, and a numeric
+variable defined outside the function is not visible within the function.
+
 
 =head3 Function Lookup
 
@@ -2168,7 +2189,7 @@ I<tocopy> section, the hash values become the corresponding variable values. Thi
 allows you to specify variables that you cannot specify in the INI file,
 e.g. variables with a C<=> in the name.
 
-Keys with C<=> or C<;> as the first character are not permitted.
+Keys with C<=>, C<[> or C<;> as the first character are not permitted.
 
 Default is C<undef>.
 
@@ -2330,17 +2351,19 @@ If you parse this INI source like this:
 
 then the C<variables> method returns this:
 
-   'A' => {
-           'a' => '1',
-           'foo' => 'xyz'
-          },
-   'B' => {
-           'b' => '2',
-           'foo' => 'xyz'
-          },
-   '__TOCOPY__' => {
-                    'foo' => 'xyz'
-                   }
+  {
+    'A' => {
+            'a' => '1',
+            'foo' => 'xyz'
+           },
+    'B' => {
+            'b' => '2',
+            'foo' => 'xyz'
+           },
+    '__TOCOPY__' => {
+                     'foo' => 'xyz'
+                    }
+  }
 
 but C<sections_h> returns
 
@@ -2355,6 +2378,42 @@ No C<__TOCOPY__>. The reason for this is that the return values of
 C<sections_h> and C<sections> refer to what is contained in the source, and in
 this case C<__TOCOPY__> is not contained in the source, but comes from a
 method argument.
+
+=head3 Separator in Variable Names
+
+   my $cfg = Config::INI::RefVars->new(separator => "/");
+
+   my $ini =<<'INI';
+    [FOO]
+    var=abcde
+
+    [BAR]
+    FOO/var=my var in section BAR
+    a=$(FOO/var)
+    b=$(BAR/FOO/var)
+   INI
+
+By specifying the C<separator> argument, qualified variable references use
+the form C<$(SECTION/VARIABLE)>.
+
+Section C<[BAR]> defines a variable named C<FOO/var>. This is a valid
+variable name, even though it contains the configured separator.
+
+The resulting data structure is:
+
+   {
+      'FOO' => {
+                 'var' => 'abcde'
+               },
+      'BAR' => {
+                 'b' => 'my var in section BAR',
+                 'a' => 'abcde',
+                 'FOO/var' => 'my var in section BAR'
+               }
+   }
+
+In this case, C<FOO/var> can only be referenced in the qualified form.
+
 
 =head3 Regular Expressions: Groups
 
@@ -2530,7 +2589,11 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub Issue (preferred for issues)
+
+L<https://github.com/AAHAZRED/perl-Config-INI-RefVars/issues>
+
+=item * RT: CPAN's request tracker (you may report bugs also here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-INI-RefVars>
 

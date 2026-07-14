@@ -9,10 +9,10 @@ BEGIN {
     or plan skip_all => 'Moo not installed';
 }
 
-use DBIO::Test::Schema::Moo;
+use DBIO::Test::MooSchema;
 
 # Connect with fake storage — no real database needed
-my $schema = DBIO::Test::Schema::Moo->connect('DBIO::Test::Storage', '');
+my $schema = DBIO::Test::MooSchema->connect('DBIO::Test::Storage', '');
 
 my $artist_rs = $schema->resultset('Result::Artist');
 my $cd_rs     = $schema->resultset('Result::CD');
@@ -55,7 +55,7 @@ subtest 'new_result: Moo attr NOT stored as DB column' => sub {
 
 subtest 'inflate_result: lazy builder works without new()' => sub {
   my $rsrc = $schema->source('Result::Artist');
-  my $row  = DBIO::Test::Schema::Moo::Result::Artist->inflate_result(
+  my $row  = DBIO::Test::MooSchema::Result::Artist->inflate_result(
     $rsrc, { id => 1, name => 'Inflated' }
   );
 
@@ -65,7 +65,7 @@ subtest 'inflate_result: lazy builder works without new()' => sub {
 
 subtest 'inflate_result: lazy default works without new()' => sub {
   my $rsrc = $schema->source('Result::Artist');
-  my $row  = DBIO::Test::Schema::Moo::Result::Artist->inflate_result(
+  my $row  = DBIO::Test::MooSchema::Result::Artist->inflate_result(
     $rsrc, { id => 2, name => 'Scored' }
   );
 
@@ -90,7 +90,7 @@ subtest 'CD: new_result with Moo attr' => sub {
 
 subtest 'CD: inflate_result lazy full_title' => sub {
   my $rsrc = $schema->source('Result::CD');
-  my $cd   = DBIO::Test::Schema::Moo::Result::CD->inflate_result(
+  my $cd   = DBIO::Test::MooSchema::Result::CD->inflate_result(
     $rsrc, { id => 1, artist_id => 1, title => 'Alive', year => 1999 }
   );
 
@@ -103,7 +103,7 @@ subtest 'CD: inflate_result lazy full_title' => sub {
 # -----------------------------------------------------------------------
 
 subtest 'custom ResultSet class on Artist' => sub {
-  isa_ok( $artist_rs, 'DBIO::Test::Schema::Moo::ResultSet::Artist',
+  isa_ok( $artist_rs, 'DBIO::Test::MooSchema::ResultSet::Artist',
     'resultset() returns custom class' );
   can_ok( $artist_rs, 'by_name' );
   can_ok( $artist_rs, 'order_by_name' );
@@ -112,7 +112,7 @@ subtest 'custom ResultSet class on Artist' => sub {
 
 subtest 'CD uses default ResultSet (no custom class)' => sub {
   isa_ok( $cd_rs, 'DBIO::ResultSet', 'CD resultset is a DBIO::ResultSet' );
-  ok( !$cd_rs->isa('DBIO::Test::Schema::Moo::ResultSet::CD'),
+  ok( !$cd_rs->isa('DBIO::Test::MooSchema::ResultSet::CD'),
     'CD has no custom ResultSet class' );
 };
 

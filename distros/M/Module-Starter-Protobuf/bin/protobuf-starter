@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Module::Starter ();
+
+# Define default config mapping
+my %config = (
+    class   => 'Module::Starter',
+    plugins => ['Module::Starter::Protobuf'], # Auto-load our plugin!
+    builder => ['ExtUtils::MakeMaker'],
+);
+
+# Parse command line options, including our custom ones!
+GetOptions(
+    'module=s@'    => \$config{modules},
+    'dir=s'        => \$config{dir},
+    'protos=s'     => \$config{protos},        # Custom option!
+    'import-path=s'=> \$config{import_path},   # Custom option!
+    'grpc-target=s'=> \$config{grpc_target},   # Custom option!
+    'author=s@'    => \$config{author},
+    'email=s'      => \$config{email},
+    'license=s'    => \$config{license},
+    'force'        => \$config{force},
+    'verbose'      => \$config{verbose},
+    'help'         => sub { pod2usage(1) },
+) or pod2usage(2);
+
+# Validate required inputs
+pod2usage(-msg => 'No modules specified. Use --module', -exitval => 2) unless $config{modules};
+pod2usage(-msg => 'No output directory specified. Use --dir', -exitval => 2) unless $config{dir};
+pod2usage(-msg => 'No proto files specified. Use --protos', -exitval => 2) unless $config{protos};
+
+# Default some values if missing
+$config{import_path} ||= '.';
+$config{grpc_target} ||= 'localhost:50051';
+$config{author}      ||= ['C.J. Collier <cjac@google.com>'];
+
+# Load our plugin into the class
+$config{class}->import(@{ $config{plugins} });
+
+# Instantiate and run
+my $starter = $config{class}->new(%config);
+$starter->postprocess_config;
+$starter->pre_create_distro;
+$starter->create_distro;
+$starter->post_create_distro;
+$starter->pre_exit;
+
+print "Created starter directories and files in $config{dir}\n";
+exit 0;
+
+__END__
+
+=head1 NAME
+
+protobuf-starter - bootstrap a gRPC client library Perl distribution from Protocol Buffers
+
+=head1 SYNOPSIS
+
+    protobuf-starter --module=Google::Cloud::BigQuery \
+                     --protos=protos/bigquery.proto \
+                     --import-path=protos \
+                     --grpc-target=bigquery.googleapis.com \
+                     --dir=Google-Cloud-BigQuery \
+                     --author="C.J. Collier <cjac@google.com>"
+
+=head1 DESCRIPTION
+
+protobuf-starter is a command-line utility that bootstraps a skeletal Perl 
+distribution for a gRPC client library compiled from Protocol Buffers schemas.
+
+=cut

@@ -4,7 +4,7 @@ package WebService::Rollbar::Notifier;
 use strict;
 use warnings;
 
-our $VERSION = '1.002010'; # VERSION
+our $VERSION = '1.002011'; # VERSION
 
 use Carp;
 use Scalar::Util qw/blessed/;

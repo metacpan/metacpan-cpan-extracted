@@ -1,5 +1,9 @@
 Revision history for Net-OBEX
 
+1.001002  2026-07-13
+        - Maintenance update - verified module is still working
+
+
 0.006   2013-10-28
         - Minor changes to comply with specs and Kwalitee game
 

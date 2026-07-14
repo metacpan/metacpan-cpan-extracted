@@ -385,7 +385,7 @@ DBIO::ResultSource::RowParser::Util - Assemble row-parser source code for simple
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 METHODS
 

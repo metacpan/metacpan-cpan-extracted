@@ -185,6 +185,7 @@
 #define UTF8_DFA32_H
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -447,6 +448,23 @@ static inline utf8_dfa_state_t utf8_dfa_run_triple(utf8_dfa_state_t state,
   if (s0 != UTF8_DFA_ACCEPT || s1 != UTF8_DFA_ACCEPT)
     return UTF8_DFA_REJECT;
   return s2;
+}
+
+static inline utf8_dfa_state_t utf8_dfa_run_ascii(utf8_dfa_state_t state,
+                                                  const uint8_t* bytes,
+                                                  size_t len) {
+  for (; len >= 16; bytes += 16, len -= 16) {
+    if (state == UTF8_DFA_ACCEPT) {
+      uint64_t w0, w1;
+      memcpy(&w0, bytes + 0, 8);
+      memcpy(&w1, bytes + 8, 8);
+      w0 |= w1;
+      if ((w0 & UINT64_C(0x8080808080808080)) == 0)
+        continue;
+    }
+    state = utf8_dfa_run16(state, bytes);
+  }
+  return utf8_dfa_run(state, bytes, len);
 }
 
 #ifdef __cplusplus

@@ -3,7 +3,7 @@ package Devel::TakeHashArgs;
 use warnings;
 use strict;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 require Exporter;
 our @ISA = 'Exporter';

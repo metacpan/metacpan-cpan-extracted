@@ -42,7 +42,7 @@ sub build_app {
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'main' },
+                    foo => { source => 'Foo', backend => 'main' },
                 },
             }},
             { 'Fondation::MigrationDBIx' => {} },
@@ -156,7 +156,7 @@ RESULT
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'main' },
+                    foo => { source => 'Foo', backend => 'main' },
                 },
             }},
             { 'Fondation::MigrationDBIx' => {} },
@@ -203,7 +203,7 @@ RESULT2
                     },
                 ],
                 models => {
-                    foo => { source => 'foos', backend => 'main' },
+                    foo => { source => 'Foo', backend => 'main' },
                 },
             }},
             { 'Fondation::MigrationDBIx' => {} },

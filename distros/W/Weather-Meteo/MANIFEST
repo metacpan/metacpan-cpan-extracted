@@ -12,6 +12,8 @@ t/20-new.t
 t/30-basics.t
 t/carp.t
 t/comment-spelling.t
+t/conf/new.yml
+t/conf/ua.yml
 t/critic.t
 t/edge_cases.t
 t/eof.t
@@ -23,6 +25,7 @@ t/integration.t
 t/kwalitee.t
 t/limiting.t
 t/links.t
+t/locales.t
 t/mutant_killers.t
 t/no404s.t
 t/noplan.t

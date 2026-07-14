@@ -20,7 +20,13 @@ use Email::Abuse::Investigator;
 # ---- Read the raw email ------------------------------------------------
 my $raw;
 if (@ARGV) {
-	open my $fh, '<:raw', $ARGV[0] or die "Cannot open $ARGV[0]: $!";
+	# Validate path: reject NUL bytes, bare newlines, and directory-traversal
+	# sequences before opening.  This also makes the path taint-safe under -T.
+	my ($safe_path) = $ARGV[0] =~ /\A([^\x00\r\n]+)\z/
+		or die "Invalid characters in path '$ARGV[0]'\n";
+	die "Path traversal attempt in '$safe_path'\n"
+		if $safe_path =~ m{(?:^|/)\.\.(?:/|$)};
+	open my $fh, '<:raw', $safe_path or die "Cannot open $safe_path: $!";
 	local $/;
 	$raw = <$fh>;
 	close $fh;

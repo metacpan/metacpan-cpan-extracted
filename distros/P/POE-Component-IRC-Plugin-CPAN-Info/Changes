@@ -1,5 +1,13 @@
 Revision history for POE-Component-IRC-Plugin-CPAN-Info
 
+1.001003  2026-07-13
+        - Maintenance update - verified module is still working
+
+
+1.001002    2014-03-10
+        - Accidental re-release (re-ran dzil release, without realizing
+            previous run succeeded)
+
 1.001001    2014-03-09
         - Restored after accidental deletion
         - Converted to dzil

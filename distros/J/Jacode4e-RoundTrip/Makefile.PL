@@ -5,13 +5,13 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Jacode4e::RoundTrip},
-    'VERSION'   => q{2.13.81.16},
+    'VERSION'   => q{2.13.81.17},
     'ABSTRACT'  => q{Converts JIS X 0213 Encodings with Round-Trip},
     'PREREQ_PM' => {
         'perl' => '5.00503',
         'strict' => '1.01',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -42,7 +42,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Jacode4e::RoundTrip' => {
                 'file'    => 'lib/Jacode4e/RoundTrip.pm',
-                'version' => '2.13.81.16',
+                'version' => '2.13.81.17',
             }
         },
     };

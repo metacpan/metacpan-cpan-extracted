@@ -1,6 +1,6 @@
 package XTaTIK::Controller::Cart;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Mojo::Base 'Mojolicious::Controller';
 use XTaTIK::Common qw/n_to_br  set_product_pic/;

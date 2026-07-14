@@ -82,10 +82,10 @@ syck_base64dec( char *s, long len, long *out_len )
     while (s < send) {
         while (s < send && (s[0] == '\r' || s[0] == '\n')) { s++; }
         if (s >= send) break;
-        if ((a = b64_xtable[(int)s[0]]) == -1) break;
-        if ((b = b64_xtable[(int)s[1]]) == -1) break;
-        if ((c = b64_xtable[(int)s[2]]) == -1) break;
-        if ((d = b64_xtable[(int)s[3]]) == -1) break;
+        if ((a = b64_xtable[(unsigned char)s[0]]) == -1) break;
+        if (s + 1 >= send || (b = b64_xtable[(unsigned char)s[1]]) == -1) break;
+        if (s + 2 >= send || (c = b64_xtable[(unsigned char)s[2]]) == -1) break;
+        if (s + 3 >= send || (d = b64_xtable[(unsigned char)s[3]]) == -1) break;
         *end++ = a << 2 | b >> 4;
         *end++ = b << 4 | c >> 2;
         *end++ = c << 6 | d;

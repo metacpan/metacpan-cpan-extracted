@@ -7,7 +7,7 @@ use Imager::File::HEIF::Encoder::Parameter;
 our $VERSION;
 
 BEGIN {
-  $VERSION = "0.006";
+  $VERSION = "0.007";
 
   require XSLoader;
   XSLoader::load('Imager::File::HEIF', $VERSION);

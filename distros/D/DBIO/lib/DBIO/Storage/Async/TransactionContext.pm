@@ -78,7 +78,7 @@ DBIO::Storage::Async::TransactionContext - Generic pinned-connection context for
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 DESCRIPTION
 

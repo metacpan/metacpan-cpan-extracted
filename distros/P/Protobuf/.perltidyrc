@@ -1,0 +1,28 @@
+# Basic Indentation
+--indent-columns=4
+--continuation-indentation=4
+--extended-continuation-indentation
+
+# Line Length
+--maximum-line-length=100
+
+# Whitespace
+--brace-tightness=1
+--block-brace-tightness=0
+--paren-tightness=1
+--square-bracket-tightness=1
+--want-left-space="="
+--want-right-space="="
+--add-whitespace
+--delete-semicolons
+--add-semicolons
+
+# Newlines
+--add-newlines
+--delete-old-newlines
+
+# Comments
+--indent-block-comments
+
+# Other
+--blanks-before-subs

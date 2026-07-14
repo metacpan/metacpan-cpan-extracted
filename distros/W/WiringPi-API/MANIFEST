@@ -9,7 +9,6 @@ docs/pod.md
 docs/schematics/test_physical_setup_schem.jpg
 docs/threads-examples.md
 INLINE.h
-INT.md
 lib/WiringPi/API.pm
 lib/WiringPi/API/BackgroundInterrupt.pm
 lib/WiringPi/API/BackgroundInterrupts.pm
@@ -40,12 +39,19 @@ t/70-i2c_fixes.t
 t/75-interrupts.t
 t/76-interrupt_pipe_failure.t
 t/77-background_interrupts_control.t
+t/78-background_interrupt_single.t
 t/80-phys_to_wpi_bounds.t
 t/85-worker.t
 t/86-worker_thread.t
 t/87-running_waitpid.t
 t/88-shared_channel_framing.t
 t/90-pin_mode_alt.t
+t/91-spi_data.t
+t/92-pin_map_bounds.t
+t/93-arg_validation.t
+t/94-bmp180_math.t
+t/95-spi_no_cs.t
+t/96-spi_bit_bang.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

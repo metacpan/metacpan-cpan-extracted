@@ -40,7 +40,7 @@ my @undocumented = qw(
     setPadDrive setPadDrivePin
     softPwmCreate softPwmStop softPwmWrite
     softToneCreate softToneStop softToneWrite
-    spiDataRW sr595Setup
+    spiBitBang spiDataRW spiNoCS sr595Setup
     wiringPiGlobalMemoryAccess wiringPiGpioDeviceGetFd
     wiringPiI2CRawRead wiringPiI2CRawWrite wiringPiI2CRead
     wiringPiI2CReadBlockData wiringPiI2CReadReg16 wiringPiI2CReadReg8

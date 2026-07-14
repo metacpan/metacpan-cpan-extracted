@@ -22,7 +22,7 @@ no_index:
 provides:
   CPAN::Maker::Bootstrapper:
     file: lib/CPAN/Maker/Bootstrapper.pm
-    version: v2.0.4
+    version: v2.0.6
   CPAN::Maker::Bootstrapper::ConfigReader:
     file: lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
     version: '0'
@@ -71,6 +71,8 @@ requires:
   File::Copy::Recursive: '0.45'
   File::HomeDir: '1.006'
   File::ShareDir: '1.118'
+  Git::Raw: '0'
+  IO::Scalar: '2.113'
   JSON::PP: '0'
   Markdown::Render: '0'
   Module::Metadata: '0'
@@ -87,5 +89,5 @@ resources:
   bugtracker: http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues
   homepage: http://github.com/rlauer6/CPAN-Maker-Bootstrapper
   repository: git://github.com/rlauer6/CPAN-Maker-Bootstrapper.git
-version: v2.0.4
+version: v2.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

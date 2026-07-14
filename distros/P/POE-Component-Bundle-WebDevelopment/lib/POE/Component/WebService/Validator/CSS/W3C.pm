@@ -3,7 +3,7 @@ package POE::Component::WebService::Validator::CSS::W3C;
 use warnings;
 use strict;
 
-our $VERSION = '2.001001'; # VERSION
+our $VERSION = '2.001002'; # VERSION
 
 use Carp;
 use URI;
@@ -26,7 +26,7 @@ sub spawn {
     # fill in defaults
     %params = (
         ua      => LWP::UserAgent->new( timeout => 30 ),
-        val_uri => 'http://jigsaw.w3.org/css-validator/validator',
+        val_uri => 'https://jigsaw.w3.org/css-validator/validator',
 
         %params,
     );
@@ -390,11 +390,11 @@ will be set to C<30> seconds.
 =head3 val_uri
 
     my $poco = POE::Component::WebService::Validator::CSS::W3C->spawn(
-        val_uri => 'http://jigsaw.w3.org/css-validator/validator',
+        val_uri => 'https://jigsaw.w3.org/css-validator/validator',
     );
 
 Specifies the URI of the CSS validator to access. B<Defaults to:>
-C<http://jigsaw.w3.org/css-validator/validator>, however you are strongly
+C<https://jigsaw.w3.org/css-validator/validator>, however you are strongly
 encouraged install local validator, see
 L<http://jigsaw.w3.org/css-validator/DOWNLOAD.html> for details.
 
@@ -588,7 +588,7 @@ Takes no arguments. Tells the component to shut itself down.
     'refer_to_uri' => bless( do{\(my $o = 'http://jigsaw.w3.org/css-validator/validator?uri=google.ca')}, 'URI::http' ),
     'http_response' => bless( { blah }, 'HTTP::Response' ),
     'som' => bless( { blah }, 'SOAP::SOM' ),
-    'val_uri' => 'http://jigsaw.w3.org/css-validator/validator',
+    'val_uri' => 'https://jigsaw.w3.org/css-validator/validator',
     'num_warnings' => '0',
     'warnings' => [],
  };
@@ -687,7 +687,7 @@ to find out why you failed to access the validator.
 
 =head3 val_uri
 
-    { 'val_uri' => 'http://jigsaw.w3.org/css-validator/validator' }
+    { 'val_uri' => 'https://jigsaw.w3.org/css-validator/validator' }
 
 The C<val_uri> key will contain a URI of the CSS validator which
 was used for validaton.

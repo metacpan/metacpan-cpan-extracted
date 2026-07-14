@@ -2,7 +2,7 @@
 #
 # 9016_cheatsheet_id.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Referensi cepat Jacode4e::RoundTrip (Bahasa Indonesia)
 # Pengujian ini juga berfungsi sebagai referensi cepat bagi pengguna Bahasa Indonesia.

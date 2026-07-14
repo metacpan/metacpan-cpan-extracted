@@ -2,7 +2,7 @@
 #
 # JEF_by_CP932.pl
 #
-# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # Linkexpress operation manual J2X1-5930-03Z2(00) FUJITSU LIMITED

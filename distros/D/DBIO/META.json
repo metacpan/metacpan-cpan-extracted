@@ -43,7 +43,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Zilla::PluginBundle::DBIO" : "0.900001"
+            "Dist::Zilla::PluginBundle::DBIO" : "0.900003"
          }
       },
       "runtime" : {
@@ -83,6 +83,9 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "SQL::Translator" : "0"
+         },
          "requires" : {
             "DBD::SQLite" : "1.29",
             "File::Temp" : "0.22",
@@ -97,611 +100,675 @@
    "provides" : {
       "DBIO" : {
          "file" : "lib/DBIO.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::AccessBroker" : {
          "file" : "lib/DBIO/AccessBroker.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::AccessBroker::HostBound" : {
          "file" : "lib/DBIO/AccessBroker/HostBound.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::AccessBroker::Static" : {
          "file" : "lib/DBIO/AccessBroker/Static.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::AccessBroker::Vault" : {
          "file" : "lib/DBIO/AccessBroker/Vault.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Adapter::Base" : {
          "file" : "lib/DBIO/Adapter/Base.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Admin" : {
          "file" : "lib/DBIO/Admin.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Base" : {
          "file" : "lib/DBIO/Base.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Cake" : {
          "file" : "lib/DBIO/Cake.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Candy" : {
          "file" : "lib/DBIO/Candy.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Candy::Exports" : {
          "file" : "lib/DBIO/Candy/Exports.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Carp" : {
          "file" : "lib/DBIO/Carp.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ChangeLog" : {
          "file" : "lib/DBIO/ChangeLog.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ChangeLog::Entry" : {
          "file" : "lib/DBIO/ChangeLog/Entry.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ChangeLog::Schema" : {
          "file" : "lib/DBIO/ChangeLog/Schema.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ChangeLog::Set" : {
          "file" : "lib/DBIO/ChangeLog/Set.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ChangeLog::Table" : {
          "file" : "lib/DBIO/ChangeLog/Table.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Componentised" : {
          "file" : "lib/DBIO/Componentised.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Core" : {
          "file" : "lib/DBIO/Core.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Cursor" : {
          "file" : "lib/DBIO/Cursor.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Deploy::Base" : {
          "file" : "lib/DBIO/Deploy/Base.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Deploy::Base::TempDatabase" : {
          "file" : "lib/DBIO/Deploy/Base/TempDatabase.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler" : {
          "file" : "lib/DBIO/DeploymentHandler.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::Dad" : {
          "file" : "lib/DBIO/DeploymentHandler/Dad.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::DeployMethod::Native" : {
          "file" : "lib/DBIO/DeploymentHandler/DeployMethod/Native.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::HandlesDeploy" : {
          "file" : "lib/DBIO/DeploymentHandler/HandlesDeploy.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::HandlesVersionStorage" : {
          "file" : "lib/DBIO/DeploymentHandler/HandlesVersionStorage.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::HandlesVersioning" : {
          "file" : "lib/DBIO/DeploymentHandler/HandlesVersioning.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::VersionHandler::Monotonic" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionHandler/Monotonic.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard::Component" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard/Component.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard/VersionResult.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Diff::Base" : {
          "file" : "lib/DBIO/Diff/Base.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Diff::Compare" : {
          "file" : "lib/DBIO/Diff/Compare.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Diff::Op" : {
          "file" : "lib/DBIO/Diff/Op.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::EncodedColumn" : {
          "file" : "lib/DBIO/EncodedColumn.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Exception" : {
          "file" : "lib/DBIO/Exception.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::FilterColumn" : {
          "file" : "lib/DBIO/FilterColumn.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Future" : {
          "file" : "lib/DBIO/Future.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Future::Immediate" : {
          "file" : "lib/DBIO/Future/Immediate.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate" : {
          "file" : "lib/DBIO/Generate.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Relationships" : {
          "file" : "lib/DBIO/Generate/Relationships.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Style::Cake" : {
          "file" : "lib/DBIO/Generate/Style/Cake.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Style::Candy" : {
          "file" : "lib/DBIO/Generate/Style/Candy.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Style::Moo" : {
          "file" : "lib/DBIO/Generate/Style/Moo.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Style::Moose" : {
          "file" : "lib/DBIO/Generate/Style/Moose.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Style::Vanilla" : {
          "file" : "lib/DBIO/Generate/Style/Vanilla.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Generate::Util" : {
          "file" : "lib/DBIO/Generate/Util.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::HashAccessor" : {
          "file" : "lib/DBIO/HashAccessor.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::InflateColumn" : {
          "file" : "lib/DBIO/InflateColumn.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::InflateColumn::DateTime" : {
          "file" : "lib/DBIO/InflateColumn/DateTime.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::InflateColumn::Serializer" : {
          "file" : "lib/DBIO/InflateColumn/Serializer.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::InflateColumn::Serializer::JSON" : {
          "file" : "lib/DBIO/InflateColumn/Serializer/JSON.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::InflateColumn::Serializer::MessagePack" : {
          "file" : "lib/DBIO/InflateColumn/Serializer/MessagePack.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::InflateColumn::Serializer::YAML" : {
          "file" : "lib/DBIO/InflateColumn/Serializer/YAML.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Introspect::Base" : {
          "file" : "lib/DBIO/Introspect/Base.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Introspect::DBI" : {
          "file" : "lib/DBIO/Introspect/DBI.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Moo" : {
          "file" : "lib/DBIO/Moo.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Moose" : {
          "file" : "lib/DBIO/Moose.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Optional::Dependencies" : {
          "file" : "lib/DBIO/Optional/Dependencies.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Ordered" : {
          "file" : "lib/DBIO/Ordered.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::PK" : {
          "file" : "lib/DBIO/PK.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::PK::Auto" : {
          "file" : "lib/DBIO/PK/Auto.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::PopulateMore" : {
          "file" : "lib/DBIO/PopulateMore.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship" : {
          "file" : "lib/DBIO/Relationship.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::Base" : {
          "file" : "lib/DBIO/Relationship/Base.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::BelongsTo" : {
          "file" : "lib/DBIO/Relationship/BelongsTo.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::CascadeActions" : {
          "file" : "lib/DBIO/Relationship/CascadeActions.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::Codegen" : {
          "file" : "lib/DBIO/Relationship/Codegen.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::HasMany" : {
          "file" : "lib/DBIO/Relationship/HasMany.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::HasOne" : {
          "file" : "lib/DBIO/Relationship/HasOne.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::Helpers" : {
          "file" : "lib/DBIO/Relationship/Helpers.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Relationship::ManyToMany" : {
          "file" : "lib/DBIO/Relationship/ManyToMany.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated" : {
          "file" : "lib/DBIO/Replicated.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Backend" : {
          "file" : "lib/DBIO/Replicated/Backend.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Backend::Master" : {
          "file" : "lib/DBIO/Replicated/Backend/Master.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Backend::Replicant" : {
          "file" : "lib/DBIO/Replicated/Backend/Replicant.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Balancer" : {
          "file" : "lib/DBIO/Replicated/Balancer.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Balancer::First" : {
          "file" : "lib/DBIO/Replicated/Balancer/First.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Balancer::Random" : {
          "file" : "lib/DBIO/Replicated/Balancer/Random.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::DebugProxy" : {
          "file" : "lib/DBIO/Replicated/DebugProxy.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Pool" : {
          "file" : "lib/DBIO/Replicated/Pool.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Replicated::Storage" : {
          "file" : "lib/DBIO/Replicated/Storage.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultClass::HashRefInflator" : {
          "file" : "lib/DBIO/ResultClass/HashRefInflator.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSet" : {
          "file" : "lib/DBIO/ResultSet.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSet::Pager" : {
          "file" : "lib/DBIO/ResultSet/Pager.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSetColumn" : {
          "file" : "lib/DBIO/ResultSetColumn.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSource" : {
          "file" : "lib/DBIO/ResultSource.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSource::RowParser" : {
          "file" : "lib/DBIO/ResultSource/RowParser.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSource::RowParser::Util" : {
          "file" : "lib/DBIO/ResultSource/RowParser/Util.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSource::Table" : {
          "file" : "lib/DBIO/ResultSource/Table.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSource::View" : {
          "file" : "lib/DBIO/ResultSource/View.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSourceHandle" : {
          "file" : "lib/DBIO/ResultSourceHandle.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::ResultSourceProxy" : {
          "file" : "lib/DBIO/ResultSourceProxy.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Row" : {
          "file" : "lib/DBIO/Row.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::SQL::Util" : {
          "file" : "lib/DBIO/SQL/Util.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::SQLMaker" : {
          "file" : "lib/DBIO/SQLMaker.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::SQLMaker::ClassicExtensions" : {
          "file" : "lib/DBIO/SQLMaker/ClassicExtensions.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Schema" : {
          "file" : "lib/DBIO/Schema.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Schema::ModelCompiler" : {
          "file" : "lib/DBIO/Schema/ModelCompiler.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Schema::Type" : {
          "file" : "lib/DBIO/Schema/Type.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Skills" : {
          "file" : "lib/DBIO/Skills.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage" : {
          "file" : "lib/DBIO/Storage.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::Async" : {
          "file" : "lib/DBIO/Storage/Async.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::Async::TransactionContext" : {
          "file" : "lib/DBIO/Storage/Async/TransactionContext.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::BlockRunner" : {
          "file" : "lib/DBIO/Storage/BlockRunner.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::Composed" : {
          "file" : "lib/DBIO/Storage/Composed.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI" : {
          "file" : "lib/DBIO/Storage/DBI.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::AccessBroker" : {
          "file" : "lib/DBIO/Storage/DBI/AccessBroker.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::AutoCast" : {
          "file" : "lib/DBIO/Storage/DBI/AutoCast.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::Capabilities" : {
          "file" : "lib/DBIO/Storage/DBI/Capabilities.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::Cursor" : {
          "file" : "lib/DBIO/Storage/DBI/Cursor.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::DataTypeClassifier" : {
          "file" : "lib/DBIO/Storage/DBI/DataTypeClassifier.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::IdentityInsert" : {
          "file" : "lib/DBIO/Storage/DBI/IdentityInsert.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::NoBindVars" : {
          "file" : "lib/DBIO/Storage/DBI/NoBindVars.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::ODBC" : {
          "file" : "lib/DBIO/Storage/DBI/ODBC.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DBI::UniqueIdentifier" : {
          "file" : "lib/DBIO/Storage/DBI/UniqueIdentifier.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::DateTimeFormat" : {
          "file" : "lib/DBIO/Storage/DateTimeFormat.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::Debug::PrettyTrace" : {
          "file" : "lib/DBIO/Storage/Debug/PrettyTrace.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::Pool" : {
          "file" : "lib/DBIO/Storage/Pool.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::PoolBase" : {
          "file" : "lib/DBIO/Storage/PoolBase.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::QueryRewrite" : {
          "file" : "lib/DBIO/Storage/QueryRewrite.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::Statistics" : {
          "file" : "lib/DBIO/Storage/Statistics.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Storage::TxnScopeGuard" : {
          "file" : "lib/DBIO/Storage/TxnScopeGuard.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test" : {
          "file" : "lib/DBIO/Test.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::BaseResult" : {
          "file" : "lib/DBIO/Test/BaseResult.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::BaseResultSet" : {
          "file" : "lib/DBIO/Test/BaseResultSet.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Cursor" : {
          "file" : "lib/DBIO/Test/Cursor.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::DateTimeParser" : {
          "file" : "lib/DBIO/Test/DateTimeParser.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::DeployComponent" : {
          "file" : "lib/DBIO/Test/DeployComponent.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::ErrorComponent" : {
          "file" : "lib/DBIO/Test/ErrorComponent.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::FakeComponent" : {
          "file" : "lib/DBIO/Test/FakeComponent.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::ForeignComponent" : {
          "file" : "lib/DBIO/Test/ForeignComponent.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Kubernetes" : {
          "file" : "lib/DBIO/Test/Kubernetes.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooCakeSchema" : {
+         "file" : "lib/DBIO/Test/MooCakeSchema.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooCakeSchema::Result::Artist" : {
+         "file" : "lib/DBIO/Test/MooCakeSchema/Result/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooCakeSchema::Result::CD" : {
+         "file" : "lib/DBIO/Test/MooCakeSchema/Result/CD.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooCakeSchema::ResultSet::Artist" : {
+         "file" : "lib/DBIO/Test/MooCakeSchema/ResultSet/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooSchema" : {
+         "file" : "lib/DBIO/Test/MooSchema.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooSchema::Result::Artist" : {
+         "file" : "lib/DBIO/Test/MooSchema/Result/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooSchema::Result::CD" : {
+         "file" : "lib/DBIO/Test/MooSchema/Result/CD.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooSchema::ResultSet::Artist" : {
+         "file" : "lib/DBIO/Test/MooSchema/ResultSet/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSchema" : {
+         "file" : "lib/DBIO/Test/MooseSchema.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSchema::Result::Artist" : {
+         "file" : "lib/DBIO/Test/MooseSchema/Result/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSchema::Result::CD" : {
+         "file" : "lib/DBIO/Test/MooseSchema/Result/CD.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSchema::ResultSet::Artist" : {
+         "file" : "lib/DBIO/Test/MooseSchema/ResultSet/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSugarSchema" : {
+         "file" : "lib/DBIO/Test/MooseSugarSchema.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSugarSchema::Result::Artist" : {
+         "file" : "lib/DBIO/Test/MooseSugarSchema/Result/Artist.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSugarSchema::Result::CD" : {
+         "file" : "lib/DBIO/Test/MooseSugarSchema/Result/CD.pm",
+         "version" : "0.900002"
+      },
+      "DBIO::Test::MooseSugarSchema::ResultSet::Artist" : {
+         "file" : "lib/DBIO/Test/MooseSugarSchema/ResultSet/Artist.pm",
+         "version" : "0.900002"
       },
       "DBIO::Test::OptionalComponent" : {
          "file" : "lib/DBIO/Test/OptionalComponent.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::ResultSetManager" : {
          "file" : "lib/DBIO/Test/ResultSetManager.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::SQLMRebase" : {
          "file" : "lib/DBIO/Test/SQLMRebase.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Schema" : {
          "file" : "lib/DBIO/Test/Schema.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Storage" : {
          "file" : "lib/DBIO/Test/Storage.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::SyntaxErrorComponent1" : {
          "file" : "lib/DBIO/Test/SyntaxErrorComponent1.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::SyntaxErrorComponent2" : {
          "file" : "lib/DBIO/Test/SyntaxErrorComponent2.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::SyntaxErrorComponent3" : {
          "file" : "lib/DBIO/Test/SyntaxErrorComponent3.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Util" : {
          "file" : "lib/DBIO/Test/Util.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Util::LeakTracer" : {
          "file" : "lib/DBIO/Test/Util/LeakTracer.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Util::OverrideRequire" : {
          "file" : "lib/DBIO/Test/Util/OverrideRequire.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Test::Util::UmaskGuard" : {
          "file" : "lib/DBIO/Test/Util/UmaskGuard.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Timestamp" : {
          "file" : "lib/DBIO/Timestamp.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::UUIDColumns" : {
          "file" : "lib/DBIO/UUIDColumns.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Util" : {
          "file" : "lib/DBIO/Util.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Version" : {
          "file" : "lib/DBIO/Version.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIO::Version::Table" : {
          "file" : "lib/DBIO/Version/Table.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       },
       "DBIOx" : {
          "file" : "lib/DBIOx.pm",
-         "version" : "0.900001"
+         "version" : "0.900002"
       }
    },
    "release_status" : "stable",
@@ -716,7 +783,7 @@
          "web" : "https://codeberg.org/dbio/dbio"
       }
    },
-   "version" : "0.900001",
+   "version" : "0.900002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -1071,7 +1138,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900001",
+                  "tag" : "v0.900002",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

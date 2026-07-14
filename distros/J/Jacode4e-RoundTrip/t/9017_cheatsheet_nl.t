@@ -2,7 +2,7 @@
 #
 # 9017_cheatsheet_nl.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Beknopte referentie Jacode4e::RoundTrip (Nederlands)
 # Deze test dient tevens als beknopte referentie voor Nederlandstalige gebruikers.

@@ -78,7 +78,7 @@ WriteMakefile(
 	ABSTRACT_FROM	=> 'lib/Weather/Meteo.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
+	  ? ('LICENSE'=> 'gpl_2')
 	  : ()),
 	EXE_FILES => [ 'bin/weather' ],
 	PL_FILES	=> {},
@@ -86,11 +86,14 @@ WriteMakefile(
 	PREREQ_PM => {
 		'constant' => 0,
 		'CHI' => 0,
-		'Encode' => 0,
+		'Cwd' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
+		'File::HomeDir' => 0,
+		'Geo::Coder::Free' => 0,
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
+		'LWP::UserAgent::Cached' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0.13,
 		'Params::Validate::Strict' => 0,
@@ -105,7 +108,7 @@ WriteMakefile(
 		resources => {
 			repository => {
 				type => 'git',
-				url => 'git://github.com/nigelhorne/Weather-Meteo.git',
+				url => 'https://github.com/nigelhorne/Weather-Meteo.git',
 				web => 'https://github.com/nigelhorne/Weather-Meteo',
 				repository => 'https://github.com/nigelhorne/Weather-Meteo',
 			}, bugtracker => {
@@ -116,7 +119,7 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.10.0'	# atomic groups (?>...) in coordinate regexes require 5.10+
 );
 
 sub are_online

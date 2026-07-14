@@ -38,12 +38,12 @@ Acme::Dump::And::Dumper - dump data structures without seeing any object guts
 
 # DESCRIPTION
 
-A [Data::Dumper](https://metacpan.org/pod/Data::Dumper), with an additional sub that's like `Dumper()`
+A [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper), with an additional sub that's like `Dumper()`
 but doesn't dump the contents of object refs.
 
 # EXPORTS
 
-In addition to all the stuff available for export in [Data::Dumper](https://metacpan.org/pod/Data::Dumper),
+In addition to all the stuff available for export in [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper),
 this module provides `DnD()` function (pneumonic: "Dump'n'Dumper").
 
 ## `DnD`
@@ -81,7 +81,7 @@ use, when I don't want to see any object guts.
     * hoelzro ducks
     <hoelzro> s/Dumper/Dump/ # ruined my own awful joke
 
-P.S.: eventually I ended up using [Data::Rmap](https://metacpan.org/pod/Data::Rmap) instead of the Freezer.
+P.S.: eventually I ended up using [Data::Rmap](https://metacpan.org/pod/Data%3A%3ARmap) instead of the Freezer.
 
 <div>
     <img src="http://zoffix.com/CPAN/Acme-Dump-and-Dumper.jpg"
@@ -104,7 +104,7 @@ to `bug-Acme-Dump-And-Dumper at rt.cpan.org`
 
 # AUTHOR
 
-Zoffix Znet <zoffix at cpan.org>
+Zoffix Znet &lt;zoffix at cpan.org>
 ([http://zoffix.com/](http://zoffix.com/), [http://haslayout.net/](http://haslayout.net/))
 
 # LICENSE

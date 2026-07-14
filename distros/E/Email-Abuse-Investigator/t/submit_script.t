@@ -12,7 +12,6 @@ use warnings;
 use Test::More;
 use File::Temp  qw(tempfile);
 use IPC::Open3  qw(open3);
-use Symbol      qw(gensym);
 use File::Spec;
 use FindBin     qw($Bin);
 
@@ -56,16 +55,24 @@ sub make_eml {
 # ---------------------------------------------------------------------------
 sub run_script {
 	my (@args) = @_;
+	# Route child stderr to a temp file so the only IPC pipe is stdout.
+	# Reading stdout then stderr sequentially from two pipes causes a
+	# classic deadlock on Windows (small ~4 KB pipe buffer): the child
+	# fills the stderr pipe while the parent blocks on stdout, and both
+	# sides stall.  A file has no buffer limit so it never blocks.
+	my ($err_fh, $err_path) = tempfile(SUFFIX => '.err', UNLINK => 1);
 	my ($in, $out);
-	my $err = gensym();
 	# Include the distribution lib/ in @INC for the subprocess
-	my $pid = open3($in, $out, $err,
+	my $pid = open3($in, $out, $err_fh,
 		$PERL, "-I$LIB", $SCRIPT, @args);
 	close $in;
 	my $stdout = do { local $/; <$out> } // '';
-	my $stderr = do { local $/; <$err> } // '';
+	close $out;
 	waitpid $pid, 0;
 	my $exit = $? >> 8;
+	seek $err_fh, 0, 0;
+	my $stderr = do { local $/; <$err_fh> } // '';
+	close $err_fh;
 	return ($stdout, $stderr, $exit);
 }
 
@@ -151,5 +158,25 @@ subtest '--interactive documented in --help' => sub {
 	like $out . $err, qr/interactive/i,
 		'--interactive mentioned in help output';
 };
+
+# ---------------------------------------------------------------------------
+# 6. Path traversal rejected
+# ---------------------------------------------------------------------------
+subtest 'path traversal in filename is rejected' => sub {
+	# Strategy: pass a path containing ../ as the email file argument.
+	# The script must exit non-zero and print an error mentioning traversal.
+	my ($out, $err, $exit) = run_script('--dry-run', '--from=x@x.example',
+		'../../../etc/passwd');
+	my $combined = $out . $err;
+	ok $exit != 0, 'exit status non-zero for traversal path';
+	like $combined, qr/traversal/i,
+		'error message mentions traversal';
+};
+
+# NUL bytes in argv cannot be tested via subprocess: POSIX execve(2) uses
+# NUL-terminated strings, so the OS truncates any argv element at the first
+# NUL before the child process sees it.  The in-script guard against NUL is
+# still valuable when the script is called from Perl (e.g. system() or
+# IPC::Open3 with a tainted string), but it cannot be exercised this way.
 
 done_testing();

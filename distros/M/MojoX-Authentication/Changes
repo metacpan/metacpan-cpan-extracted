@@ -1,2 +1,8 @@
+0.003  2026-07-13 23:07:55 CEST
+   - Get rid of semicolons in POD names
+
+0.002  2026-07-13 22:37:31 CEST
+   - Fix annoyance in documentation
+
 0.001  2026-07-12 23:11:52 CEST
    - Initial release - there is barely any test but the example works...

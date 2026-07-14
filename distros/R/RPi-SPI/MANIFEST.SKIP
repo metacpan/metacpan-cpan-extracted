@@ -33,3 +33,4 @@ build/
 .bblog$
 .base$
 main$
+^\.claude/

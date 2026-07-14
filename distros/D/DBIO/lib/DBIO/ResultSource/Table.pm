@@ -27,7 +27,7 @@ DBIO::ResultSource::Table - Table object
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

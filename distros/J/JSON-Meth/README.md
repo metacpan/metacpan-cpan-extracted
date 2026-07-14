@@ -98,8 +98,8 @@ implement such a method, it will be replaced with `null`
 
 # SEE ALSO
 
-For more full-featured encoders, see [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS),
-[Mojo::JSON](https://metacpan.org/pod/Mojo::JSON), or [Mojo::JSON::MaybeXS](https://metacpan.org/pod/Mojo::JSON::MaybeXS).
+For more full-featured encoders, see [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS),
+[Mojo::JSON](https://metacpan.org/pod/Mojo%3A%3AJSON), or [Mojo::JSON::MaybeXS](https://metacpan.org/pod/Mojo%3A%3AJSON%3A%3AMaybeXS).
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>

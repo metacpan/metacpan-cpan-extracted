@@ -10,20 +10,12 @@ use Class::Tiny qw(pubkey action _hashes);
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(pubkey action hashes);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
-
-    croak "pubkey is required" unless defined $args{pubkey};
-    croak "pubkey must be a scalar" if ref($args{pubkey});
-    croak "pubkey must be 64-char lowercase hex" unless $args{pubkey} =~ $HEX64;
-
-    croak "action is required" unless defined $args{action};
-    croak "action must be a scalar" if ref($args{action});
-    croak "action is required" unless length $args{action};
 
     $args{hashes} = [] unless defined $args{hashes};
     croak "hashes must be an array reference" unless ref($args{hashes}) eq 'ARRAY';
@@ -34,7 +26,18 @@ sub new {
     $args{_hashes} = [@{$args{hashes}}];
     delete $args{hashes};
 
-    return bless \%args, $class;
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    croak "pubkey is required" unless defined $self->pubkey;
+    croak "pubkey must be a scalar" if ref($self->pubkey);
+    croak "pubkey must be 64-char lowercase hex" unless $self->pubkey =~ $HEX64;
+    croak "action is required" unless defined $self->action;
+    croak "action must be a scalar" if ref($self->action);
+    croak "action is required" unless length $self->action;
+    return;
 }
 
 sub hashes {
@@ -131,5 +134,15 @@ Returns true when C<$sha256> is present in the authorized hash list. Otherwise
 throws L<Net::Blossom::Server::Error>. The default status is C<401> with a
 C<WWW-Authenticate: Nostr> challenge. Supplying another status, such as the
 BUD-04 mirror C<409>, suppresses that challenge.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::WWW::XKCD::AsText;
 use warnings;
 use strict;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Carp;
 use POE qw(Component::WWW::XKCD::AsText);
@@ -41,7 +41,7 @@ sub _start {
     my ( $kernel, $self ) = @_[ KERNEL, OBJECT ];
     $self->{_session_id} = $_[SESSION]->ID();
     $kernel->refcount_increment( $self->{_session_id}, __PACKAGE__ );
-
+    
     $self->{poco} = POE::Component::WWW::XKCD::AsText->spawn(
         debug => $self->{debug},
     );
@@ -51,11 +51,11 @@ sub _start {
 
 sub PCI_register {
     my ( $self, $irc ) = splice @_, 0, 2;
-
+    
     $self->{irc} = $irc;
-
+    
     $irc->plugin_register( $self, 'SERVER', qw(public notice msg) );
-
+    
     $self->{_session_id} = POE::Session->create(
         object_states => [
             $self => [
@@ -81,12 +81,12 @@ sub _shutdown {
 
 sub PCI_unregister {
     my $self = shift;
-
+    
     # Plugin is dying make sure our POE session does as well.
     $poe_kernel->call( $self->{_session_id} => '_shutdown' );
-
+    
     delete $self->{irc};
-
+    
     return 1;
 }
 
@@ -177,8 +177,8 @@ sub _xkcd_done {
         $response_message =~ s/\n\s*\n/\n \n/g;
         $response_message = [ split /\n/, $response_message ];
     }
-
-    $self->{irc}->send_event( $self->{response_event} => {
+                         
+    $self->{irc}->_send_event( $self->{response_event} => {
             text => $in_ref->{text},
             id   => $in_ref->{id},
             map { $_ => $in_ref->{"_$_"} }
@@ -211,8 +211,6 @@ sub _xkcd_done {
 
 __END__
 
-=encoding utf8
-
 =head1 NAME
 
 POE::Component::IRC::Plugin::WWW::XKCD::AsText - read http://xkcd.com comics on IRC
@@ -241,7 +239,7 @@ POE::Component::IRC::Plugin::WWW::XKCD::AsText - read http://xkcd.com comics on 
 
     sub _start {
         $irc->yield( register => 'all' );
-
+        
         $irc->plugin_add(
             'XKCD' =>
                 POE::Component::IRC::Plugin::WWW::XKCD::AsText->new
@@ -256,11 +254,11 @@ POE::Component::IRC::Plugin::WWW::XKCD::AsText - read http://xkcd.com comics on 
 
     <Zoffix_> XKCDBot, xkcd 1
     <XKCDBot> [[A boy sits in a barrel which is floating in an ocean.]]
-    <XKCDBot>
+    <XKCDBot>  
     <XKCDBot> Boy: I wonder where I'll float next?
-    <XKCDBot>
+    <XKCDBot>  
     <XKCDBot> [[The barrel drifts into the distance. Nothing else can be seen.]]
-    <XKCDBot>
+    <XKCDBot>  
     <XKCDBot> {{Alt: Don't we all.}}
 
 =head1 DESCRIPTION
@@ -420,7 +418,7 @@ of a hashref in C<ARG0>. The keys/values of that hashref are as follows:
 The C<who> key will contain the usermask of the user who requested the
 comic.
 
-=head3
+=head3 
 
     { 'type' => 'public' }
 

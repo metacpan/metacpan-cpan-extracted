@@ -284,12 +284,16 @@ struct _syck_parser {
     } io;
     /* Symbol table for anchors */
     st_table *anchors, *bad_anchors;
+    /* Nodes evicted from anchors by redefinition, freed at teardown */
+    st_table *retired;
     /* Optional symbol table for SYMIDs */
     st_table *syms;
     /* Levels of indentation */
     SyckLevel *levels;
     int lvl_idx;
     int lvl_capa;
+    /* Maximum nesting depth (0 = no limit) */
+    int max_depth;
     /* Pointer for extension's use */
     void *bonus;
 };

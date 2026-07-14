@@ -2,7 +2,7 @@
 #
 # make_test_A_by_B_basic.pl
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
@@ -35,7 +35,7 @@ print STDERR $filename, "\n";
 #
 # %s
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;

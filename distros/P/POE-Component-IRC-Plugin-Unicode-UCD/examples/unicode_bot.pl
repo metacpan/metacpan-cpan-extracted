@@ -33,5 +33,5 @@ sub _start {
 }
 
 sub irc_001 {
-    $_[KERNEL]->post( $_[SENDER] => join => '#perlbot' );
+    $_[KERNEL]->post( $_[SENDER] => join => '#zofbot' );
 }

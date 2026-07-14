@@ -93,6 +93,26 @@ FUNCTIONS
 
     Since version 0.71.
 
+  slurp_utf8
+        $string = slurp_utf8($filename);
+
+    Reads the entire file named $filename and returns its contents decoded
+    from UTF-8 as a character string. The file is read using unbuffered
+    (":unix") IO, and the octets are validated and decoded directly.
+
+    There is no upper bound on the amount read; the whole file is loaded
+    into memory. When handling untrusted or potentially large files, check
+    the size first (for example with "-s $filename") before calling
+    "slurp_utf8".
+
+    Ill-formed and truncated input is not fatal: each maximal ill-formed
+    subpart is replaced with the Unicode replacement character U+FFFD and a
+    warning is emitted in the "utf8" warnings category.
+
+    Throws an exception if the file cannot be opened or read.
+
+    Since version 0.73.
+
   valid_utf8
         $boolean = valid_utf8($octets);
 

@@ -13,7 +13,7 @@ DBIO::Manual::Features - Feature overview with links to the relevant DBIO docume
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 PROJECT
 

@@ -1,5 +1,55 @@
 Revision history for Perl extension WiringPi::API.
 
+3.1804    2026-07-13
+        - Fixed phys_to_gpio() and wpi_to_gpio(): they forwarded out-of-range
+          / non-integer input straight to the wiringPi library lookups (64-entry
+          tables), an out-of-bounds read; they now guard the index and return
+          the -1 "no such pin" sentinel, matching phys_to_wpi()
+        - Added t/91-spi_data.t (spi_data channel/arrayref/len + spiDataRW
+          byte-range croaks), t/92-pin_map_bounds.t (the phys/wpi_to_gpio bounds
+          guard above), t/93-arg_validation.t (shift_reg_setup/serial_gets/
+          lcd_init argument croaks), and t/94-bmp180_math.t (the bmp180_temp/
+          pressure unit conversions, via stubbed reads) - all HW-free
+        - Added pcf8574Setup(pin_base, i2c_address) (exported, from libwiringPi):
+          registers a PCF8574 I2C I/O-expander's 8 pins as virtual GPIOs, so the
+          existing lcd*()/digital_* functions can drive an HD44780 over an I2C
+          backpack by routing their digitalWrite() calls to the expander. Used
+          by RPi::WiringPi's lcd(i2c => ...) path
+        - Makefile.PL's minimum wiringPi version now comes from RPi::Const's
+          WIRINGPI_MIN_VERSION (literal 3.18 fallback when RPi::Const isn't
+          installed at configure time); RPi::Const prereq bumped to 1.07;
+          DESCRIPTION POD points at the canonical constant
+        - Added spiNoCS(channel, state) / spi_no_cs(): sets or clears the
+          kernel SPI_NO_CS flag on an open SPI channel so transactions can be
+          framed by a user-managed GPIO chip select without the hardware
+          CE0/CE1 pin strobing alongside (used by RPi::SPI's GPIO CS mode)
+        - Added spiBitBang(clk, mosi, miso, cs, data, len, mode, delay_us) /
+          spi_bit_bang(): full software SPI transaction on arbitrary GPIO
+          pins (modes 0-3, MSB-first, active-low CS, optional per-phase
+          delay) with no kernel SPI involvement; the frame loop runs
+          entirely in C. Used by RPi::SPI's new bit-bang mode
+        - Added t/95-spi_no_cs.t and t/96-spi_bit_bang.t (HW-free validation
+          croaks for the two new functions)
+        - Added t/78-background_interrupt_single.t: HW-free coverage of the
+          singular background_interrupt() - its pre-fork argument validation
+          croaks, and the opt-in results channel (B5) round-trip (a real fork
+          with set_interrupt()/wait_interrupts() stubbed, so the child frames a
+          return value up the pipe and the parent handle's read() drains it),
+          plus the no-results-channel fh()/read() undef case
+        - Extended t/75-interrupts.t: auto_dispatch_interrupts() now also
+          verifies that a pre-existing handler on the chosen signal is saved on
+          enable and restored (not deleted) on disable
+        - Removed a stale INT.md entry from MANIFEST (the file never existed;
+          the interrupt doc is docs/interrupt-examples.md) - it was failing
+          the manicheck / would break make dist
+        - Makefile.PL: replaced the inline wiringPi presence/version guard
+          with a shim calling RPi::Const::BuildCheck::wiringpi_build_check(),
+          pulled in via CONFIGURE_REQUIRES => { 'RPi::Const' => 1.07 }; dropped
+          "use version". The check (and the canonical 3.18 minimum) now lives
+          in one place for the whole RPi:: family, and the buggy decimal
+          version compare / silent-pass-on-unparseable-gpio are gone. Falls
+          back to an NA-safe exit-0 message if RPi::Const isn't yet installed
+
 3.1803     2026-06-12
         - Check both fcntl() return values in ensure_interrupt_pipe(); on
           failure close the pipe fds, reset them and fail arming cleanly

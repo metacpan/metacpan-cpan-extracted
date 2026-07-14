@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.006001'; # VERSION
+our $VERSION = '1.006002'; # VERSION
 
 use Test::WWW::Mechanize;
 use Test::Builder qw//;

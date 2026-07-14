@@ -5,6 +5,8 @@ use File::Temp qw(tempdir);
 use Test::More;
 
 use Net::Blossom::Server::Backend::SQLite;
+use Net::Blossom::Server::BlobStore;
+use Net::Blossom::Server::MetadataStore;
 use Net::Blossom::Server::Storage;
 
 sub dies(&) {
@@ -122,6 +124,14 @@ my $storage = Net::Blossom::Server::Backend::SQLite->new(
 isa_ok($storage, 'Net::Blossom::Server::Backend::SQLite');
 ok(Net::Blossom::Server::Storage->assert_implements($storage), 'storage contract methods exist');
 is($storage->base_url, 'https://cdn.example.test/blobs', 'base_url is normalized');
+isa_ok($storage->metadata_store, 'Net::Blossom::Server::Backend::SQLite::MetadataStore');
+isa_ok($storage->blob_store, 'Net::Blossom::Server::Backend::SQLite::BlobStore');
+is($storage->metadata_store->dbh, $storage->dbh, 'metadata store shares backend DB handle');
+is($storage->blob_store->dbh, $storage->dbh, 'blob store shares backend DB handle');
+ok(Net::Blossom::Server::MetadataStore->assert_implements($storage->metadata_store),
+    'metadata component implements its contract');
+ok(Net::Blossom::Server::BlobStore->assert_implements($storage->blob_store),
+    'blob component implements its contract');
 
 my $hashref_storage = Net::Blossom::Server::Backend::SQLite->new({
     database => "$dir/hashref.sqlite",
@@ -141,5 +151,19 @@ my $dbh_storage = Net::Blossom::Server::Backend::SQLite->new(
     base_url => 'https://cdn.example.test/dbh',
 );
 is($dbh_storage->dbh, $dbh, 'constructor accepts an existing DBI handle');
+
+my $manual_dbh = DBI->connect(
+    "dbi:SQLite:dbname=$dir/manual-handle.sqlite",
+    '',
+    '',
+    { RaiseError => 1, PrintError => 0, AutoCommit => 0 },
+);
+like(dies {
+    Net::Blossom::Server::Backend::SQLite->new(
+        dbh      => $manual_dbh,
+        base_url => 'https://cdn.example.test/manual-dbh',
+    );
+}, qr/dbh must have AutoCommit enabled/, 'dbh must have AutoCommit enabled');
+$manual_dbh->disconnect;
 
 done_testing;

@@ -2,7 +2,7 @@
 #
 # 9026_cheatsheet_ne.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e::RoundTrip द्रुत सन्दर्भ (नेपाली)
 # यो परीक्षण नेपाली भाषाका प्रयोगकर्ताहरूको लागि द्रुत सन्दर्भको रूपमा पनि काम गर्छ।

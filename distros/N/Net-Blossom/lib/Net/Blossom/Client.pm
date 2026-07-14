@@ -8,14 +8,17 @@ use Net::Blossom::Error;
 use Net::Blossom::PaymentRequired;
 use Net::Blossom::Response;
 use Net::Blossom::ServerList;
+use Net::Blossom::_Bech32 ();
+use Net::Blossom::_CashuPaymentRequest ();
 use Net::Blossom::_URL ();
 
 use Carp qw(croak);
-use Class::Tiny qw(server ua auth);
+use Class::Tiny qw(server auth), {
+    ua => sub { HTTP::Tiny->new },
+};
 use Digest::SHA qw(sha256_hex);
 use HTTP::Tiny;
 use JSON ();
-use MIME::Base64 qw(decode_base64);
 use Net::Nostr::Zap qw(bolt11_amount);
 use Scalar::Util qw(blessed);
 
@@ -24,24 +27,26 @@ my $HEX128 = qr/\A[0-9a-f]{128}\z/;
 my $JSON = JSON->new->utf8;
 my $CANONICAL_JSON = JSON->new->utf8->canonical;
 my %RESERVED_PAYMENT_METHOD = map { $_ => 1 } qw(reason sha-256 content-type content-length);
-my $BECH32_CHARS = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
-my %BECH32_VALUE = map { substr($BECH32_CHARS, $_, 1) => $_ } 0 .. length($BECH32_CHARS) - 1;
-my @BECH32_GENERATOR = (0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3);
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(server ua auth);
     my @unknown = grep { !exists $known{$_} } keys %args;
     croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
-    croak "server is required" unless defined $args{server} && length $args{server};
-    croak "server must be an http(s) base URL" if ref($args{server});
-    croak "server must be an http(s) base URL" unless _valid_server_url($args{server});
+    return \%args;
+}
 
-    $args{server} =~ s{/+\z}{};
-    $args{ua} = HTTP::Tiny->new unless defined $args{ua};
+sub BUILD {
+    my ($self) = @_;
+    croak "server is required" unless defined $self->server && length $self->server;
+    croak "server must be an http(s) base URL" if ref($self->server);
+    croak "server must be an http(s) base URL" unless _valid_server_url($self->server);
 
-    return bless \%args, $class;
+    (my $server = $self->server) =~ s{/+\z}{};
+    $self->server($server);
+    $self->ua(HTTP::Tiny->new) unless defined $self->ua;
+    return;
 }
 
 sub get_blob {
@@ -474,175 +479,16 @@ sub _payment_challenges {
 
 sub _valid_payment_challenge {
     my ($method, $payload) = @_;
-    return _valid_cashu_challenge($payload) if $method eq 'cashu';
+    return Net::Blossom::_CashuPaymentRequest::valid($payload) if $method eq 'cashu';
     return _valid_lightning_challenge($payload) if $method eq 'lightning';
     return 1;
 }
 
-sub _valid_cashu_challenge {
-    my ($payload) = @_;
-    return 0 unless defined $payload && !ref($payload) && $payload =~ /\AcreqA([A-Za-z0-9_-]+={0,2})\z/;
-
-    my $bytes = _decode_base64url($1);
-    return 0 unless defined $bytes && length $bytes;
-
-    my ($request, $pos) = _cbor_decode($bytes, 0, 0);
-    return 0 unless defined $pos && $pos == length($bytes) && ref($request) eq 'HASH';
-    return _valid_cashu_request($request);
-}
-
-sub _valid_cashu_request {
-    my ($request) = @_;
-    return 0 unless exists $request->{a} && defined $request->{a} && !ref($request->{a});
-    return 0 unless "$request->{a}" =~ /\A\d+\z/ && $request->{a} > 0;
-    return 0 unless exists $request->{u} && defined $request->{u} && !ref($request->{u}) && length $request->{u};
-    return 0 unless exists $request->{m} && ref($request->{m}) eq 'ARRAY' && @{$request->{m}};
-
-    for my $mint (@{$request->{m}}) {
-        return 0 unless defined $mint && !ref($mint) && length $mint;
-    }
-
-    return 1;
-}
-
-sub _decode_base64url {
-    my ($encoded) = @_;
-    return unless defined $encoded && !ref($encoded) && $encoded =~ /\A[A-Za-z0-9_-]+={0,2}\z/;
-
-    $encoded =~ s/=+\z//;
-    return if length($encoded) % 4 == 1;
-    $encoded =~ tr{-_}{+/};
-    $encoded .= '=' while length($encoded) % 4;
-    return decode_base64($encoded);
-}
-
-sub _cbor_decode {
-    my ($bytes, $pos, $depth) = @_;
-    return if $depth > 32 || $pos >= length($bytes);
-
-    my $initial = ord substr($bytes, $pos, 1);
-    my $major = $initial >> 5;
-    my $additional = $initial & 0x1f;
-    my ($arg, $next) = _cbor_argument($bytes, $pos + 1, $additional);
-    return unless defined $next;
-    $pos = $next;
-
-    return ($arg, $pos) if $major == 0;
-    return (-1 - $arg, $pos) if $major == 1;
-
-    if ($major == 2 || $major == 3) {
-        return if $pos + $arg > length($bytes);
-        return (substr($bytes, $pos, $arg), $pos + $arg);
-    }
-
-    if ($major == 4) {
-        my @values;
-        for (1 .. $arg) {
-            my ($value, $value_pos) = _cbor_decode($bytes, $pos, $depth + 1);
-            return unless defined $value_pos;
-            push @values, $value;
-            $pos = $value_pos;
-        }
-        return (\@values, $pos);
-    }
-
-    if ($major == 5) {
-        my %map;
-        for (1 .. $arg) {
-            my ($key, $key_pos) = _cbor_decode($bytes, $pos, $depth + 1);
-            return unless defined $key_pos && defined $key && !ref($key);
-            my ($value, $value_pos) = _cbor_decode($bytes, $key_pos, $depth + 1);
-            return unless defined $value_pos;
-            $map{$key} = $value;
-            $pos = $value_pos;
-        }
-        return (\%map, $pos);
-    }
-
-    return _cbor_decode($bytes, $pos, $depth + 1) if $major == 6;
-
-    if ($major == 7) {
-        return (0, $pos) if $additional == 20;
-        return (1, $pos) if $additional == 21;
-        return (undef, $pos) if $additional == 22 || $additional == 23;
-        return ($arg, $pos);
-    }
-
-    return;
-}
-
-sub _cbor_argument {
-    my ($bytes, $pos, $additional) = @_;
-    return ($additional, $pos) if $additional < 24;
-
-    my $size = $additional == 24 ? 1
-        : $additional == 25 ? 2
-        : $additional == 26 ? 4
-        : $additional == 27 ? 8
-        : undef;
-    return unless defined $size && $pos + $size <= length($bytes);
-
-    my $value = 0;
-    for my $offset (0 .. $size - 1) {
-        $value = ($value << 8) + ord substr($bytes, $pos + $offset, 1);
-    }
-
-    return ($value, $pos + $size);
-}
-
 sub _valid_lightning_challenge {
     my ($payload) = @_;
-    my ($hrp) = _bech32_parts($payload);
+    my ($hrp) = Net::Blossom::_Bech32::decode($payload, 1);
     return 0 unless defined $hrp && $hrp =~ /\Aln(?:bc|tb|bcrt|sb)(?:\d+[munp]?)?\z/;
-    return 0 unless _valid_bech32($payload);
     return eval { bolt11_amount(lc $payload); 1 } ? 1 : 0;
-}
-
-sub _valid_bech32 {
-    my ($value) = @_;
-    my ($hrp, $data) = _bech32_parts($value);
-    return 0 unless defined $hrp;
-
-    my @values = (_bech32_hrp_expand($hrp), map { $BECH32_VALUE{$_} } split //, $data);
-    return _bech32_polymod(\@values) == 1;
-}
-
-sub _bech32_parts {
-    my ($value) = @_;
-    return unless defined $value && !ref($value) && length $value;
-    return if $value =~ /[^\x21-\x7e]/;
-    return if lc($value) ne $value && uc($value) ne $value;
-
-    my $normalized = lc $value;
-    my $separator = rindex($normalized, '1');
-    return if $separator < 1;
-
-    my $data = substr($normalized, $separator + 1);
-    return if length($data) < 6;
-    return unless $data =~ /\A[$BECH32_CHARS]+\z/;
-
-    return (substr($normalized, 0, $separator), $data);
-}
-
-sub _bech32_hrp_expand {
-    my ($hrp) = @_;
-    my @chars = split //, $hrp;
-    return ((map { ord($_) >> 5 } @chars), 0, (map { ord($_) & 31 } @chars));
-}
-
-sub _bech32_polymod {
-    my ($values) = @_;
-    my $chk = 1;
-
-    for my $value (@$values) {
-        my $top = $chk >> 25;
-        $chk = (($chk & 0x1ffffff) << 5) ^ $value;
-        for my $i (0 .. 4) {
-            $chk ^= $BECH32_GENERATOR[$i] if (($top >> $i) & 1);
-        }
-    }
-
-    return $chk;
 }
 
 sub _payment_challenge_method {
@@ -1037,5 +883,15 @@ Malformed JSON success bodies also croak.
 L<Net::Blossom::AuthToken>, L<Net::Blossom::BlobDescriptor>,
 L<Net::Blossom::Error>, L<Net::Blossom::PaymentRequired>,
 L<Net::Blossom::Response>, L<Net::Blossom::ServerList>
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

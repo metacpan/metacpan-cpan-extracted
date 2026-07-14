@@ -10,7 +10,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### Simple paste with all optional args at default values
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     print $bin->paste('Stuff to paste') || die "$bin";
@@ -19,7 +19,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### Private paste with all optional args set
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -49,7 +49,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### Delete one of user's private pastes
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -64,7 +64,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### List trending pastes
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     my $trends = $bin->list_trends
@@ -77,7 +77,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### List user's private pastes
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -95,7 +95,7 @@ WWW::Pastebin::PastebinCom::API - implementation of pastebin.com API
     ##### List user's info
 
     $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -123,7 +123,7 @@ the API provides, it doesn't offer anything but the raw contents
 of the paste (not even that, if we're to get technical). If your
 main aim is to **retrieve** pastes and/or retrieve info about
 pastes (e.g. expiry date, highlight, etc), then this module will not
-help you. See [WWW::Pastebin::PastebinCom::Retrieve](https://metacpan.org/pod/WWW::Pastebin::PastebinCom::Retrieve) for that task.
+help you. See [WWW::Pastebin::PastebinCom::Retrieve](https://metacpan.org/pod/WWW%3A%3APastebin%3A%3APastebinCom%3A%3ARetrieve) for that task.
 
 # API KEY NEEDED
 
@@ -134,7 +134,7 @@ API key from pastebin.com. Simply create an account on pastebin.com,
 login, then visit ([http://pastebin.com/api](http://pastebin.com/api)) and
 the key will be listed somewhere in the second section on the page.
 The key will look something like this:
-`a3767061e0e64fef6c266126f7e588f4`.
+`YOUR_API_KEY_HERE`.
 
 # METHODS
 
@@ -145,8 +145,8 @@ The key will look something like this:
 
     # API key and setting timeout
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key =>  'a3767061e0e64fef6c266126f7e588f4',
-        user_key => '4fd751dc94f0b62c489b2c7720e0d240',
+        api_key =>  'YOUR_API_KEY_HERE',
+        user_key => 'YOUR_USER_KEY_HERE',
         timeout => 60,
     );
 
@@ -165,7 +165,7 @@ All arguments are optional and are described below.
 ### `api_key`
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key =>  'a3767061e0e64fef6c266126f7e588f4',
+        api_key =>  'YOUR_API_KEY_HERE',
     );
 
 **Optional**.
@@ -183,12 +183,12 @@ API key from pastebin.com. Simply create an account on pastebin.com,
 login, then visit ([http://pastebin.com/api](http://pastebin.com/api)) and
 the key will be listed somewhere in the second section on the page.
 The key will look something like this:
-`a3767061e0e64fef6c266126f7e588f4`.
+`YOUR_API_KEY_HERE`.
 
 ### `user_key`
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        user_key => '4fd751dc94f0b62c489b2c7720e0d240',
+        user_key => 'YOUR_USER_KEY_HERE',
     );
 
 **Optional**. Takes a user key string as a value. By default
@@ -224,10 +224,10 @@ pastebin.com.
         )
     );
 
-**Optional**. Takes an [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)-compatible object. That
+**Optional**. Takes an [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)-compatible object. That
 object must implement `->post()` and `->get()` methods
-that return the same stuff [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) returns.
-**By default** uses [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) with `timeout` set by
+that return the same stuff [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) returns.
+**By default** uses [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) with `timeout` set by
 `timeout` constructor argument (see above) and `agent` set
 to Firefox on Linux.
 
@@ -266,7 +266,7 @@ you to have an API key with pastebin.com.
 ## `get_user_key`
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -282,7 +282,7 @@ constructor). **Takes** two mandatory arguments as
 strings: first
 one is your pastebin.com login, second one is your pastebin.com
 password. **On success** sets `->user_key()` accessor and
-returns a user key (e.g. `4fd751dc94f0b62c489b2c7720e0d240`).
+returns a user key (e.g. `YOUR_USER_KEY_HERE`).
 **On failure returns** either `undef` or an empty list, depending
 on the context, and `->error()` method will contain
 human-readable description of the error. Note that
@@ -295,7 +295,7 @@ to something prior to the call of `->get_user_key()`
     ##### Simple paste with all optional args at default values
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     print $bin->paste('Stuff to paste') || die "$bin";
@@ -304,7 +304,7 @@ to something prior to the call of `->get_user_key()`
     ##### Make an unlisted paste
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     print $bin->paste( 'Stuff to paste', unlisted => 1, )
@@ -314,7 +314,7 @@ to something prior to the call of `->get_user_key()`
     ##### Private paste with all optional args set
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -854,7 +854,7 @@ Positive integer or zero. The number of times the paste was viewed.
 ## `list_trends`
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     my $trends = $bin->list_trends
@@ -878,7 +878,7 @@ will not be there.
 ## `get_user_info`
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/
@@ -1027,7 +1027,7 @@ interpolate the value of `->error()` instead, if an error is set.
 
     my $bin = WWW::Pastebin::PastebinCom::API->new;
 
-    $bin->api_key('a3767061e0e64fef6c266126f7e588f4');
+    $bin->api_key('YOUR_API_KEY_HERE');
     printf "Current API key is %s\n", $bin->api_key;
 
 **Takes** one optional argument as a string, which is a pastebin.com's
@@ -1037,7 +1037,7 @@ API key, as a string.
 ## `user_key`
 
     my $bin = WWW::Pastebin::PastebinCom::API->new(
-        api_key => 'a3767061e0e64fef6c266126f7e588f4',
+        api_key => 'YOUR_API_KEY_HERE',
     );
 
     $bin->get_user_key(qw/

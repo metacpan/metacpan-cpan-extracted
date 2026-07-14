@@ -22,6 +22,13 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup     => [ 'App-Nopaste-Service-PastebinComAPI-*' ],
     create_makefile_pl => 'traditional',
+    meta_merge => {
+        resources => {
+            repository => 'git://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI.git',
+            bugtracker => 'https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI/issues',
+            homepage   => 'https://github.com/zoffixznet/App-Nopaste-Service-PastebinComAPI',
+        },
+    },
 );
 if ( $ENV{RELEASE_TESTING} ) {
     system('pod2text lib/App/Nopaste/Service/PastebinComAPI.pm > README');

@@ -1,5 +1,8 @@
 Revision history for WWW-Pastebin-PastebinCa-Retrieve
 
+1.001003    2026-07-12
+        - Updated for the rebuilt pastebin.ca API
+
 1.001001    2015-03-27
         - Fixed failing tests
         - Converted distro to Dist::Zilla

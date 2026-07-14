@@ -86,13 +86,13 @@ _(actual output will not have line breaks)_:
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::Breadcrumbs](https://metacpan.org/pod/Mojolicious::Plugin::Breadcrumbs) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin for
+[Mojolicious::Plugin::Breadcrumbs](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ABreadcrumbs) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin for
 auto-generating breadcrumbs.
 
 # METHODS
 
-[Mojolicious::Plugin::Breadcrumbs](https://metacpan.org/pod/Mojolicious::Plugin::Breadcrumbs) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::Breadcrumbs](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ABreadcrumbs) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## `->register()`
 

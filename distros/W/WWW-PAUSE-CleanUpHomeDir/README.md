@@ -202,7 +202,7 @@ for which never versions are available. **Note:** a call to this method
 will reset the list stored in `last_list()`, it will be set to `undef`.
 **Note 2:** if either the distribution you specified does no exist
 (in your PAUSE home dir) or `.meta` or `.readme` files do not exist
-the call will cause [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize) to croak on you.
+the call will cause [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) to croak on you.
 
 ## deleted\_list
 
@@ -233,7 +233,7 @@ after undeletion (well, only the `status` keys will present incorrect
 status of the files).
 **Note 2:** if either the file you specified does no exist
 (in your PAUSE home dir) or files stored in `deleted_list()` do not exist
-(later is unlikely) the call will cause [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize) to croak on you.
+(later is unlikely) the call will cause [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) to croak on you.
 
 ## error
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.4');
+our $VERSION   = qv('v1.0.5');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use Scalar::Util qw(weaken);
@@ -15,7 +15,7 @@ DBIx::Class::Async::Storage - Storage Layer for DBIx::Class::Async
 
 =head1 VERSION
 
-Version v1.0.4
+Version v1.0.5
 
 =cut
 

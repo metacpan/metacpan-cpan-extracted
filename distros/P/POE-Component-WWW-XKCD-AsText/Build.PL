@@ -17,15 +17,9 @@ my $builder = Module::Build->new(
         'POE::Filter::Line'      => 1.2222,
         'POE::Filter::Reference' => 1.2220,
         'POE::Wheel::Run'        => 1.2222,
-        'perl' => '5.006',
     },
-    configure_requires => { 'Module::Build' => 0 },
     add_to_cleanup      => [ 'POE-Component-WWW-XKCD-AsText-*' ],
     create_makefile_pl => 'traditional',
 );
-if ( $ENV{RELEASE_TESTING} ) {
-    system('pod2text lib/POE/Component/WWW/XKCD/AsText.pm > README');
-}
-
 
 $builder->create_build_script();

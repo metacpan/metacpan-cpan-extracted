@@ -96,7 +96,7 @@ DBIO::Replicated::Backend - Wrapper base class for replicated backends
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 AUTHOR
 

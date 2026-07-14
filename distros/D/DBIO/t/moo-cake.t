@@ -9,10 +9,10 @@ BEGIN {
     or plan skip_all => 'Moo not installed';
 }
 
-use DBIO::Test::Schema::MooCake;
+use DBIO::Test::MooCakeSchema;
 
 # Connect with fake storage — no real database needed
-my $schema = DBIO::Test::Schema::MooCake->connect('DBIO::Test::Storage', '');
+my $schema = DBIO::Test::MooCakeSchema->connect('DBIO::Test::Storage', '');
 
 my $artist_rs = $schema->resultset('Artist');
 my $cd_rs     = $schema->resultset('CD');
@@ -62,7 +62,7 @@ subtest 'new_result: Moo attr NOT stored as DB column' => sub {
 
 subtest 'inflate_result: lazy builder works' => sub {
   my $rsrc = $schema->source('Artist');
-  my $row  = DBIO::Test::Schema::MooCake::Result::Artist->inflate_result(
+  my $row  = DBIO::Test::MooCakeSchema::Result::Artist->inflate_result(
     $rsrc, { id => 1, name => 'Cakey' }
   );
   is( $row->display_name, 'Artist: Cakey', 'lazy builder on inflate_result row' );
@@ -71,7 +71,7 @@ subtest 'inflate_result: lazy builder works' => sub {
 
 subtest 'inflate_result: CD lazy full_title' => sub {
   my $rsrc = $schema->source('CD');
-  my $cd   = DBIO::Test::Schema::MooCake::Result::CD->inflate_result(
+  my $cd   = DBIO::Test::MooCakeSchema::Result::CD->inflate_result(
     $rsrc, { id => 1, artist_id => 1, title => 'Baked', year => 2000 }
   );
   is( $cd->full_title, 'Baked (2000)', 'CD lazy builder on inflate_result' );
@@ -83,7 +83,7 @@ subtest 'inflate_result: CD lazy full_title' => sub {
 # -----------------------------------------------------------------------
 
 subtest 'Artist has custom ResultSet' => sub {
-  isa_ok( $artist_rs, 'DBIO::Test::Schema::MooCake::ResultSet::Artist',
+  isa_ok( $artist_rs, 'DBIO::Test::MooCakeSchema::ResultSet::Artist',
     'artist resultset is custom class' );
   can_ok( $artist_rs, 'by_name' );
   can_ok( $artist_rs, 'order_by_name' );
@@ -92,7 +92,7 @@ subtest 'Artist has custom ResultSet' => sub {
 
 subtest 'CD uses default ResultSet' => sub {
   isa_ok( $cd_rs, 'DBIO::ResultSet', 'cd resultset is base class' );
-  ok( !$cd_rs->isa('DBIO::Test::Schema::MooCake::ResultSet::CD'),
+  ok( !$cd_rs->isa('DBIO::Test::MooCakeSchema::ResultSet::CD'),
     'no custom CD ResultSet' );
 };
 

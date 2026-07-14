@@ -3,6 +3,7 @@
 PERL       := $(shell command -v perl)
 PERLTIDY   := $(shell command -v perltidy)
 PERLCRITIC := $(shell command -v perlcritic)
+PODCHECKER := $(shell command -v podchecker)
 
 PERL_BIN_FILES = $(patsubst %.pl.in,%.pl,$(filter %.pl.in,$(BIN_FILES:%=%.in)))
 
@@ -71,6 +72,8 @@ define check_syntax_pm
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
 	  perl -wc $(PERLINCLUDE) -M"$$module" -e 1 2>$$errfile \
 	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
+	  podcheck="$$($(PODCHECKER) $@ 2>&1 || true)"; \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; } \
 	fi
 endef
 
@@ -84,6 +87,8 @@ define check_syntax_pl
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
 	  perl -wc $(PERLINCLUDE) -e 1 2>$$errfile \
 	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
+	  podcheck="$$($(PODCHECKER) $@ 2>&1 || true)"; \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; } \
 	fi
 endef
 

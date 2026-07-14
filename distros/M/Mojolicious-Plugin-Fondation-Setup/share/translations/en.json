@@ -11,5 +11,9 @@
     "Start Over": "Start Over",
     "Reset": "Reset",
     "Parameter": "Parameter",
-    "Value": "Value"
+    "Value": "Value",
+    "Dev": "Dev",
+    "CPAN": "CPAN",
+    "These plugins are not installed yet and will be skipped:": "These plugins are not installed yet and will be skipped:",
+    "Install them with:": "Install them with:"
 }

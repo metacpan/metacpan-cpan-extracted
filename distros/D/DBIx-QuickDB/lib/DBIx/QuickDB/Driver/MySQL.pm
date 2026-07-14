@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000053';
+our $VERSION = '0.000054';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;
@@ -26,6 +26,12 @@ use DBIx::QuickDB::Util::HashBase qw{
 
 sub provider        { croak "'$_[0]' does not implement provider" }
 sub verify_provider { croak "'$_[0]' does not implement verify_provider" }
+
+# True when we are running as root (EUID 0) on a platform where that matters.
+# mysqld/mariadbd refuse to start as root without an explicit user=root. Factored
+# out as a method so tests can simulate root without actually being it. $> is not
+# meaningful on Windows, so it never reports root there.
+sub _run_as_root { $^O ne 'MSWin32' && $> == 0 }
 
 sub dbd_driver_order { shift; grep { $_ } @_, 'DBD::MariaDB', 'DBD::mysql' }
 
@@ -279,6 +285,15 @@ sub _default_config {
 
             'character_set_server' => $self->{+CHARACTER_SET_SERVER},
 
+            # Modern mysqld/mariadbd refuse to run as root (EUID 0) unless
+            # explicitly told 'user=root'. QuickDB has no dedicated service
+            # account to drop to, so when we ARE root we tell the server to stay
+            # root -- this is exactly the documented override. Every server
+            # invocation (bootstrap/--initialize/start) reads this defaults file,
+            # so a single config entry covers them all. As a non-root user the
+            # option would be ignored with a warning, so only add it as root.
+            $self->_run_as_root ? ('user' => 'root') : (),
+
             defined($ENV{QDB_MYSQL_SSL_FIPS}) ? ('ssl_fips_mode' => "$ENV{QDB_MYSQL_SSL_FIPS}") : (),
         },
     );
@@ -477,6 +492,16 @@ Should be either L<DBD::mysql> or L<DBD::MariaDB>. If not specified then
 DBD::MariaDB is preferred with a fallback to DBD::MySQL.
 
 =back
+
+=head1 RUNNING AS ROOT
+
+Modern C<mysqld>/C<mariadbd> refuse to start as the C<root> user (EUID 0)
+unless explicitly given C<--user=root>. When DBIx::QuickDB detects it is running
+as root it adds C<user = root> to the generated defaults file automatically, so
+bootstrap and server startup work without any extra configuration. As a
+non-root user nothing is added. (This differs from the PostgreSQL driver, whose
+C<initdb>/C<postgres> refuse to run as root with no override and so are simply
+declared non-viable under EUID 0.)
 
 =head1 ENVIRONMENT VARIABLES
 

@@ -6,7 +6,7 @@ BEGIN {
     use_ok('LWP::UserAgent');
     use_ok('HTML::TokeParser::Simple');
     use_ok('overload');
-    use_ok('Class::Accessor::Grouped');
+    use_ok('Class::Data::Accessor');
 	use_ok( 'WWW::HTMLTagAttributeCounter' );
 }
 

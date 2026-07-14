@@ -29,7 +29,22 @@ my @bad_code_spans = _bad_single_angle_code_spans(@files);
 ok(!@bad_code_spans, 'no raw => inside single-angle C<> POD spans');
 diag join "\n", @bad_code_spans if @bad_code_spans;
 
+like(
+    _description_opening("$FindBin::Bin/../lib/Net/Blossom.pm"),
+    qr/L<Net::Blossom::Server>/,
+    'top-level description links to Net::Blossom::Server',
+);
+
 done_testing;
+
+sub _description_opening {
+    my ($file) = @_;
+    open my $fh, '<', $file
+        or die "Unable to read $file: $!";
+    my $pod = do { local $/; <$fh> };
+    my ($opening) = $pod =~ /^=head1 DESCRIPTION\s*\n\s*\n(.*?)(?:\n\s*\n|\z)/ms;
+    return defined $opening ? $opening : '';
+}
 
 sub _has_pod {
     my ($file) = @_;

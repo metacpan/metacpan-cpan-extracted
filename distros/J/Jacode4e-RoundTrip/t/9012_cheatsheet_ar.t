@@ -2,7 +2,7 @@
 #
 # 9012_cheatsheet_ar.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # دليل مرجعي سريع لـ Jacode4e::RoundTrip (العربية)
 # يعمل هذا الاختبار أيضاً كمرجع سريع للمستخدمين الناطقين بالعربية.

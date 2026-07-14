@@ -2,7 +2,7 @@
 #
 # LetsJ_by_Unicode.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # ANSI X3.4-1968 (US-ASCII) with 0x60/0x27 as left/right single quotation mark to Unicode

@@ -1,0 +1,17 @@
+Revision history for Google-Auth-Library-Perl
+
+0.04    2025-12-21
+    - Refactored project structure: core Google::Auth code moved into google-auth/ directory.
+    - Added protobuf submodule containing a fork of the official Protocol Buffers repository.
+    - Vendored protobuf is currently based on v22.3.
+    - Perl implementation for Protocol Buffers is ongoing within protobuf/perl/.
+
+0.03    2023-06-22
+	Nothing to report at this time, but work is planned.
+
+0.02    2022-03-16
+        Release approved by Google OSPO
+
+0.01    2022-03-02
+        First version, including a translation from ruby into lib/Google/Auth/IDTokens/KeySources.pm
+        Included are also the tests translated from ruby into t/key_sources_test.t and expanded upon

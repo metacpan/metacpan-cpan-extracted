@@ -15,13 +15,9 @@ my $builder = Module::Build->new(
         Carp            => 1.04,
         'Win32::GUIRobot' => 0.05,
         'Win32::Clipboard' => 0.5201,
-        'perl' => '5.008008',
     },
-    configure_requires => { 'Module::Build' => 0 },
     add_to_cleanup      => [ 'Win32-GUITaskAutomate-*' ],
     create_makefile_pl => 'traditional',
 );
-if ( $ENV{RELEASE_TESTING} ) {
-    system('pod2text lib/Win32/GUITaskAutomate.pm > README');
-}
+
 $builder->create_build_script();

@@ -6,14 +6,16 @@ use Net::Blossom::_ConstructorArgs ();
 use Net::Blossom::Server::Error;
 
 use Carp qw(croak);
-use Class::Tiny qw(_allowed_hosts timeout max_bytes user_agent);
+use Class::Tiny qw(_allowed_hosts max_bytes user_agent), {
+    timeout => 5,
+};
 use HTTP::Tiny ();
 use Scalar::Util qw(blessed);
 use URI ();
 
 my $DEFAULT_TIMEOUT = 5;
 
-sub new {
+sub BUILDARGS {
     my $class = shift;
     my %args = Net::Blossom::_ConstructorArgs::normalize(@_);
     my %known = map { $_ => 1 } qw(allowed_hosts timeout max_bytes user_agent);
@@ -32,32 +34,37 @@ sub new {
     $args{_allowed_hosts} = \@allowed_hosts;
     delete $args{allowed_hosts};
 
-    croak "max_bytes is required" unless defined $args{max_bytes};
+    return \%args;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    croak "max_bytes is required" unless defined $self->max_bytes;
     croak "max_bytes must be a positive integer"
-        unless !ref($args{max_bytes}) && $args{max_bytes} =~ /\A[1-9][0-9]*\z/;
+        unless !ref($self->max_bytes) && $self->max_bytes =~ /\A[1-9][0-9]*\z/;
 
-    $args{timeout} = $DEFAULT_TIMEOUT unless defined $args{timeout};
+    $self->timeout($DEFAULT_TIMEOUT) unless defined $self->timeout;
     croak "timeout must be a positive integer"
-        unless !ref($args{timeout}) && $args{timeout} =~ /\A[1-9][0-9]*\z/;
+        unless !ref($self->timeout) && $self->timeout =~ /\A[1-9][0-9]*\z/;
 
-    if (defined $args{user_agent}) {
+    if (defined $self->user_agent) {
         croak "user_agent must provide request"
-            unless blessed($args{user_agent}) && $args{user_agent}->can('request');
+            unless blessed($self->user_agent) && $self->user_agent->can('request');
     }
     else {
         my %http_args = (
             agent        => 'Net-Blossom-Server',
-            timeout      => $args{timeout},
+            timeout      => $self->timeout,
             max_redirect => 0,
-            max_size     => $args{max_bytes},
+            max_size     => $self->max_bytes,
             proxy        => undef,
         );
         $http_args{http_proxy} = undef if HTTP::Tiny->can('http_proxy');
         $http_args{https_proxy} = undef if HTTP::Tiny->can('https_proxy');
-        $args{user_agent} = HTTP::Tiny->new(%http_args);
+        $self->user_agent(HTTP::Tiny->new(%http_args));
     }
 
-    return bless \%args, $class;
+    return;
 }
 
 sub allowed_hosts {
@@ -327,5 +334,15 @@ The method throws L<Net::Blossom::Server::Error> for expected HTTP-facing
 failures: C<400> for malformed URLs, C<403> for non-allowlisted hosts, C<413>
 for blobs larger than C<max_bytes>, and C<502> for origin failures or unusable
 origin responses.
+
+=head1 INTERNAL METHODS
+
+=head2 BUILDARGS
+
+Normalizes constructor arguments for Class::Tiny.
+
+=head2 BUILD
+
+Validates the constructed object for Class::Tiny.
 
 =cut

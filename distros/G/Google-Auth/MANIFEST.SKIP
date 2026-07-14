@@ -1,0 +1,39 @@
+# Avoid version control files.
+^\.git/
+^\.gitignore$
+^\.gitmodules$
+
+# Avoid temporary, backup, and editor files.
+~$
+\.bak$
+\.tmp$
+\#$
+\b\.#
+\.swp$
+
+# Avoid build and testing artifacts.
+\bblib/
+\bpm_to_blib$
+\bMakefile$
+\bMakefile\.old$
+\bblibdirs$
+\bBuild$
+\b_build/
+\bcover_db/
+\bnytprof/
+\bnytprof\.out$
+
+# Avoid compiled C/XS artifacts (these are regenerated during make).
+\bXS\.c$
+\bXS\.o$
+\bXS\.bs$
+^Auth\.bs$
+
+# Avoid local development temporary directories and logs.
+^tmp/
+^Google-Auth-
+^MYMETA\.
+
+# Avoid cpanm or local testing artifacts.
+^\.cpanm/
+^local/

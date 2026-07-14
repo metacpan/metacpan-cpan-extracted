@@ -1,7 +1,8 @@
 Revision history for POE-Component-IRC-Plugin-Unicode-UCD
 
-0.004	2013-12-05
-	- Added a link to mauke's author page, seeing that he's got one now
+0.005  2026-07-13
+        - Maintenance update - verified module is still working
+
 
 0.003   2013-11-30
         - Moved author tests to xt/

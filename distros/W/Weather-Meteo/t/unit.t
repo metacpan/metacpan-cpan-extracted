@@ -49,6 +49,19 @@ my %config = (
 	invalid_json   => 'not valid json',
 	custom_host    => 'test-host.example.com',
 	min_interval   => 0,
+
+	# Realistic forecast response including sunrise/sunset in daily
+	forecast_json  => '{"hourly":{"temperature_2m":[15,16,17],"rain":[0,0,0],'
+	               . '"snowfall":[0,0,0],"weathercode":[2,2,2]},'
+	               . '"daily":{"time":["2026-07-14"],'
+	               . '"sunrise":["2026-07-14T04:52"],"sunset":["2026-07-14T21:18"],'
+	               . '"weathercode":[2],"temperature_2m_max":[22.5],"temperature_2m_min":[14.2],'
+	               . '"rain_sum":[0.0],"snowfall_sum":[0.0],"precipitation_hours":[0.0],'
+	               . '"windspeed_10m_max":[15.3],"windgusts_10m_max":[28.7]}}',
+
+	# Minimal daily-only response for sunrise_sunset()
+	sunrise_json   => '{"daily":{"time":["2022-12-25"],'
+	               . '"sunrise":["2022-12-25T08:09"],"sunset":["2022-12-25T15:57"]}}',
 );
 
 # ---------------------------------------------------------------------------
@@ -92,10 +105,12 @@ subtest 'new() -- returns a Weather::Meteo object' => sub {
 subtest 'new() -- returned object has all documented public methods' => sub {
 	my $meteo = Weather::Meteo->new();
 
-	# POD documents three public methods
-	ok($meteo->can('new'),     'new() method available');
-	ok($meteo->can('weather'), 'weather() method available');
-	ok($meteo->can('ua'),      'ua() method available');
+	# POD documents five public methods
+	ok($meteo->can('new'),            'new() method available');
+	ok($meteo->can('weather'),        'weather() method available');
+	ok($meteo->can('forecast'),       'forecast() method available');
+	ok($meteo->can('sunrise_sunset'), 'sunrise_sunset() method available');
+	ok($meteo->can('ua'),             'ua() method available');
 
 	diag('public methods ok') if $ENV{TEST_VERBOSE};
 };
@@ -480,7 +495,9 @@ subtest 'weather() -- malformed JSON carp identifies the failure' => sub {
 };
 
 # Purpose: an API-level {"error":true} payload must return undef.
-subtest 'weather() -- API error flag in response returns undef' => sub {
+subtest 'weather() -- API error flag returns undef and carps the API reason' => sub {
+	# The module now surfaces the API-provided reason via carp (resolved TODO).
+	# warning_like captures the carp; $result is set via lexical capture.
 	mock 'LWP::UserAgent::get' => sub {
 		my $r = HTTP::Response->new(200, 'OK');
 		$r->content($config{api_error_json});
@@ -488,7 +505,11 @@ subtest 'weather() -- API error flag in response returns undef' => sub {
 	};
 
 	my $meteo  = Weather::Meteo->new(cache => _fresh_cache());
-	my $result = $meteo->weather({ latitude => $LAT, longitude => $LON, date => $DATE });
+	my $result;
+	warning_like {
+		$result = $meteo->weather({ latitude => $LAT, longitude => $LON, date => $DATE });
+	} qr/API error/,
+	'API error flag emits a carp mentioning "API error"';
 
 	ok(!defined($result), 'API error flag returns undef');
 
@@ -554,6 +575,229 @@ subtest 'weather() -- cached result matches original response' => sub {
 
 	restore_all();
 	diag('cached result eq original') if $ENV{TEST_VERBOSE};
+};
+
+# ===========================================================================
+# POD-documented behaviour: forecast()
+# ===========================================================================
+
+# Purpose: basic hashref call returns a defined hashref with hourly and daily.
+subtest 'forecast() -- hashref args return a hashref with hourly and daily keys' => sub {
+	mock 'LWP::UserAgent::get' => sub {
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{forecast_json});
+		return $r;
+	};
+
+	my $meteo  = Weather::Meteo->new(cache => _fresh_cache());
+	my $result = $meteo->forecast({ latitude => $LAT, longitude => $LON });
+
+	ok(defined($result),            'forecast() returns a defined value');
+	ok(ref($result) eq 'HASH',      'result is a hashref');
+	ok(exists($result->{'hourly'}), 'result contains hourly key');
+	ok(exists($result->{'daily'}),  'result contains daily key');
+
+	restore_all();
+};
+
+# Purpose: the request must target the forecast endpoint, not the archive.
+subtest 'forecast() -- request targets api.open-meteo.com/v1/forecast' => sub {
+	my $captured_url = '';
+	mock 'LWP::UserAgent::get' => sub {
+		my ($self_ua, $url) = @_;
+		$captured_url = $url;
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{forecast_json});
+		return $r;
+	};
+
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+	$meteo->forecast({ latitude => $LAT, longitude => $LON });
+
+	like($captured_url,   qr/api\.open-meteo\.com/, 'URL targets forecast host');
+	like($captured_url,   qr|/v1/forecast|,         'URL uses /v1/forecast path');
+	unlike($captured_url, qr/archive/,              'URL does not target archive host');
+
+	restore_all();
+	diag("url=$captured_url") if $ENV{TEST_VERBOSE};
+};
+
+# Purpose: the days parameter must flow through to forecast_days in the URL.
+subtest 'forecast() -- days parameter flows into the URL as forecast_days' => sub {
+	my $captured_url = '';
+	mock 'LWP::UserAgent::get' => sub {
+		my ($self_ua, $url) = @_;
+		$captured_url = $url;
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{forecast_json});
+		return $r;
+	};
+
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+	$meteo->forecast({ latitude => $LAT, longitude => $LON, days => 3 });
+
+	like($captured_url, qr/forecast_days=3/, 'URL contains forecast_days=3');
+
+	restore_all();
+	diag("url=$captured_url") if $ENV{TEST_VERBOSE};
+};
+
+# Purpose: missing latitude must croak with a usage message.
+subtest 'forecast() -- missing latitude croaks with usage text' => sub {
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+
+	throws_ok { $meteo->forecast({ longitude => $LON }) }
+		qr/Usage: forecast/,
+		'missing latitude causes croak with usage text';
+};
+
+# Purpose: an out-of-range days value must carp and fall back to 7.
+subtest 'forecast() -- out-of-range days carps and defaults to 7' => sub {
+	my $captured_url = '';
+	mock 'LWP::UserAgent::get' => sub {
+		my ($self_ua, $url) = @_;
+		$captured_url = $url;
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{forecast_json});
+		return $r;
+	};
+
+	my $warned = 0;
+	local $SIG{__WARN__} = sub { $warned++ };
+
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+	$meteo->forecast({ latitude => $LAT, longitude => $LON, days => 99 });
+
+	ok($warned,                               'out-of-range days emits a carp warning');
+	like($captured_url, qr/forecast_days=7/, 'URL defaults to forecast_days=7');
+
+	restore_all();
+};
+
+# Purpose: a second identical call must use the cache, not the UA.
+subtest 'forecast() -- second identical call uses cache, not UA' => sub {
+	my $ua_calls = 0;
+	mock 'LWP::UserAgent::get' => sub {
+		$ua_calls++;
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{forecast_json});
+		return $r;
+	};
+
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+	$meteo->forecast({ latitude => $LAT, longitude => $LON });
+	$meteo->forecast({ latitude => $LAT, longitude => $LON });
+
+	cmp_ok($ua_calls, '==', 1, 'UA called exactly once for two identical forecast requests');
+
+	restore_all();
+	diag("ua_calls=$ua_calls") if $ENV{TEST_VERBOSE};
+};
+
+# Purpose: the daily section must contain sunrise and sunset strings.
+subtest 'forecast() -- daily data contains sunrise and sunset' => sub {
+	mock 'LWP::UserAgent::get' => sub {
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{forecast_json});
+		return $r;
+	};
+
+	my $meteo  = Weather::Meteo->new(cache => _fresh_cache());
+	my $result = $meteo->forecast({ latitude => $LAT, longitude => $LON });
+
+	my $daily = $result->{'daily'};
+	ok(exists($daily->{'sunrise'}), 'daily contains sunrise');
+	ok(exists($daily->{'sunset'}),  'daily contains sunset');
+	like($daily->{'sunrise'}[0], qr/T\d{2}:\d{2}/, 'sunrise is an ISO-8601 datetime');
+	like($daily->{'sunset'}[0],  qr/T\d{2}:\d{2}/, 'sunset is an ISO-8601 datetime');
+
+	restore_all();
+};
+
+# ===========================================================================
+# POD-documented behaviour: sunrise_sunset()
+# ===========================================================================
+
+# Purpose: a historical date returns a hashref with sunrise and sunset keys.
+subtest 'sunrise_sunset() -- historical date returns { sunrise, sunset }' => sub {
+	mock 'LWP::UserAgent::get' => sub {
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{sunrise_json});
+		return $r;
+	};
+
+	my $meteo  = Weather::Meteo->new(cache => _fresh_cache());
+	my $result = $meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+
+	ok(defined($result),             'sunrise_sunset() returns a defined value');
+	ok(ref($result) eq 'HASH',       'result is a hashref');
+	ok(exists($result->{'sunrise'}), 'result has sunrise key');
+	ok(exists($result->{'sunset'}),  'result has sunset key');
+
+	restore_all();
+	diag("sunrise=$result->{sunrise} sunset=$result->{sunset}") if $ENV{TEST_VERBOSE};
+};
+
+# Purpose: a historical date must use the archive endpoint, not the forecast one.
+subtest 'sunrise_sunset() -- historical date targets archive endpoint' => sub {
+	my $captured_url = '';
+	mock 'LWP::UserAgent::get' => sub {
+		my ($self_ua, $url) = @_;
+		$captured_url = $url;
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{sunrise_json});
+		return $r;
+	};
+
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+	$meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+
+	like($captured_url, qr/archive-api\.open-meteo\.com/, 'historical date uses archive host');
+	like($captured_url, qr/daily=sunrise%2Csunset|daily=sunrise,sunset/, 'URL requests only sunrise and sunset');
+
+	restore_all();
+	diag("url=$captured_url") if $ENV{TEST_VERBOSE};
+};
+
+# Purpose: missing latitude must croak with a usage message.
+subtest 'sunrise_sunset() -- missing latitude croaks with usage text' => sub {
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+
+	throws_ok { $meteo->sunrise_sunset({ longitude => $LON }) }
+		qr/Usage: sunrise_sunset/,
+		'missing latitude causes croak with usage text';
+};
+
+# Purpose: an invalid date string must carp and return undef.
+subtest 'sunrise_sunset() -- invalid date format carps and returns undef' => sub {
+	my $warned = 0;
+	local $SIG{__WARN__} = sub { $warned++ };
+
+	my $meteo  = Weather::Meteo->new(cache => _fresh_cache());
+	my $result = $meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => 'not-a-date' });
+
+	ok(!defined($result), 'invalid date returns undef');
+	ok($warned,           'invalid date emits a carp warning');
+};
+
+# Purpose: a second identical call must use the cache, not the UA.
+subtest 'sunrise_sunset() -- second identical call uses cache, not UA' => sub {
+	my $ua_calls = 0;
+	mock 'LWP::UserAgent::get' => sub {
+		$ua_calls++;
+		my $r = HTTP::Response->new(200, 'OK');
+		$r->content($config{sunrise_json});
+		return $r;
+	};
+
+	my $meteo = Weather::Meteo->new(cache => _fresh_cache());
+	$meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+	$meteo->sunrise_sunset({ latitude => $LAT, longitude => $LON, date => $DATE });
+
+	cmp_ok($ua_calls, '==', 1, 'UA called exactly once for two identical sunrise_sunset requests');
+
+	restore_all();
+	diag("ua_calls=$ua_calls") if $ENV{TEST_VERBOSE};
 };
 
 done_testing();

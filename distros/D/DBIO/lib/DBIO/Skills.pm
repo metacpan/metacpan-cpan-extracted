@@ -107,7 +107,7 @@ DBIO::Skills - Runtime access to the AI agent skills bundled with DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

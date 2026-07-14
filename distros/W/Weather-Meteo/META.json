@@ -1,12 +1,12 @@
 {
-   "abstract" : "Interface to L<https://open-meteo.com> for historical weather data",
+   "abstract" : "Interface to L<https://open-meteo.com> for historical and forecast weather data",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,11 +33,14 @@
       "runtime" : {
          "requires" : {
             "CHI" : "0",
-            "Encode" : "0",
+            "Cwd" : "0",
             "ExtUtils::MakeMaker" : "6.64",
+            "File::HomeDir" : "0",
+            "Geo::Coder::Free" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
+            "LWP::UserAgent::Cached" : "0",
             "Object::Configure" : "0",
             "Params::Get" : "0.13",
             "Params::Validate::Strict" : "0",
@@ -46,12 +49,11 @@
             "Time::HiRes" : "0",
             "URI" : "0",
             "constant" : "0",
-            "perl" : "5.006002"
+            "perl" : "5.010000"
          }
       },
       "test" : {
          "requires" : {
-            "DateTime" : "0",
             "File::Glob" : "0",
             "File::Slurp" : "0",
             "File::stat" : "0",
@@ -62,7 +64,6 @@
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
-            "Test::LWP::UserAgent" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
             "Test::Most" : "0",
@@ -70,7 +71,6 @@
             "Test::NoWarnings" : "0",
             "Test::Returns" : "0",
             "Test::Which" : "0",
-            "TimeZone::TimeZoneDB" : "0",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
@@ -85,11 +85,11 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/nigelhorne/Weather-Meteo.git",
+         "url" : "https://github.com/nigelhorne/Weather-Meteo.git",
          "web" : "https://github.com/nigelhorne/Weather-Meteo",
          "x_repository" : "https://github.com/nigelhorne/Weather-Meteo"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

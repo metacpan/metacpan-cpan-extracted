@@ -3,7 +3,7 @@ package Net::OBEX::Packet::Request::Disconnect;
 
 use strict;
 use warnings;
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 use Carp;
 use base 'Net::OBEX::Packet::Request::Base';

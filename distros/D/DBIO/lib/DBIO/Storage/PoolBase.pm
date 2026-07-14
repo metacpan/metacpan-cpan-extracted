@@ -223,7 +223,7 @@ DBIO::Storage::PoolBase - Shared connection pool mechanics for async DBIO driver
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package XTaTIK::Utilities::ToadFarmer;
 use strict;
 use warnings;
 
-our $VERSION = '0.005002'; # VERSION
+our $VERSION = '0.005003'; # VERSION
 
 use Toadfarm -init;
 use XTaTIK::Utilities::Misc qw/merge_conf/;

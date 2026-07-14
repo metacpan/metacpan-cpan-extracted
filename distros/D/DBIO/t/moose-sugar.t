@@ -9,10 +9,10 @@ BEGIN {
     or plan skip_all => 'Moose and MooseX::NonMoose not installed';
 }
 
-use DBIO::Test::Schema::MooseSugar;
+use DBIO::Test::MooseSugarSchema;
 
 # Connect with fake storage — no real database needed
-my $schema = DBIO::Test::Schema::MooseSugar->connect('DBIO::Test::Storage', '');
+my $schema = DBIO::Test::MooseSugarSchema->connect('DBIO::Test::Storage', '');
 
 my $artist_rs = $schema->resultset('Artist');
 my $cd_rs     = $schema->resultset('CD');
@@ -69,7 +69,7 @@ subtest 'new_result: Moose attr NOT stored as DB column' => sub {
 
 subtest 'inflate_result: lazy builder works' => sub {
   my $rsrc = $schema->source('Artist');
-  my $row  = DBIO::Test::Schema::MooseSugar::Result::Artist->inflate_result(
+  my $row  = DBIO::Test::MooseSugarSchema::Result::Artist->inflate_result(
     $rsrc, { id => 1, name => 'Sugary' }
   );
   is( $row->display_name, 'Artist: Sugary', 'lazy builder on inflate_result row' );
@@ -78,7 +78,7 @@ subtest 'inflate_result: lazy builder works' => sub {
 
 subtest 'inflate_result: type constraint on lazy attr mutation' => sub {
   my $rsrc = $schema->source('Artist');
-  my $row  = DBIO::Test::Schema::MooseSugar::Result::Artist->inflate_result(
+  my $row  = DBIO::Test::MooseSugarSchema::Result::Artist->inflate_result(
     $rsrc, { id => 2, name => 'TypeTest' }
   );
   throws_ok { $row->score('bad') }
@@ -88,7 +88,7 @@ subtest 'inflate_result: type constraint on lazy attr mutation' => sub {
 
 subtest 'inflate_result: CD lazy full_title' => sub {
   my $rsrc = $schema->source('CD');
-  my $cd   = DBIO::Test::Schema::MooseSugar::Result::CD->inflate_result(
+  my $cd   = DBIO::Test::MooseSugarSchema::Result::CD->inflate_result(
     $rsrc, { id => 1, artist_id => 1, title => 'Sweet', year => 2001 }
   );
   is( $cd->full_title, 'Sweet (2001)', 'CD lazy builder on inflate_result' );
@@ -100,7 +100,7 @@ subtest 'inflate_result: CD lazy full_title' => sub {
 # -----------------------------------------------------------------------
 
 subtest 'Artist has custom ResultSet' => sub {
-  isa_ok( $artist_rs, 'DBIO::Test::Schema::MooseSugar::ResultSet::Artist',
+  isa_ok( $artist_rs, 'DBIO::Test::MooseSugarSchema::ResultSet::Artist',
     'artist resultset is custom class' );
   can_ok( $artist_rs, 'by_name' );
   can_ok( $artist_rs, 'order_by_name' );
@@ -109,7 +109,7 @@ subtest 'Artist has custom ResultSet' => sub {
 
 subtest 'CD uses default ResultSet' => sub {
   isa_ok( $cd_rs, 'DBIO::ResultSet', 'cd resultset is base class' );
-  ok( !$cd_rs->isa('DBIO::Test::Schema::MooseSugar::ResultSet::CD'),
+  ok( !$cd_rs->isa('DBIO::Test::MooseSugarSchema::ResultSet::CD'),
     'no custom CD ResultSet' );
 };
 
@@ -118,14 +118,14 @@ subtest 'CD uses default ResultSet' => sub {
 # -----------------------------------------------------------------------
 
 subtest 'Result classes are immutable' => sub {
-  ok( DBIO::Test::Schema::MooseSugar::Result::Artist->meta->is_immutable,
+  ok( DBIO::Test::MooseSugarSchema::Result::Artist->meta->is_immutable,
     'Artist is immutable' );
-  ok( DBIO::Test::Schema::MooseSugar::Result::CD->meta->is_immutable,
+  ok( DBIO::Test::MooseSugarSchema::Result::CD->meta->is_immutable,
     'CD is immutable' );
 };
 
 subtest 'schema class is immutable' => sub {
-  ok( DBIO::Test::Schema::MooseSugar->meta->is_immutable,
+  ok( DBIO::Test::MooseSugarSchema->meta->is_immutable,
     'schema class itself is immutable' );
 };
 

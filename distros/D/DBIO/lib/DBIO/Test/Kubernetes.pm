@@ -536,7 +536,7 @@ DBIO::Test::Kubernetes - Provision temporary database pods in Kubernetes for DBI
 
 =head1 VERSION
 
-version 0.900001
+version 0.900002
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::MigrationDBIx - Migration and fixture management
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 

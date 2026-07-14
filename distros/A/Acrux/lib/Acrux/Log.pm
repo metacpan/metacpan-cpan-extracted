@@ -12,9 +12,9 @@ Acrux::Log - Acrux logger
 
     use Acrux::Log;
 
-    # Using syslog
+    # Logging to STDERR (by default)
     my $log = Acrux::Log->new();
-       $log->error("My test error message to syslog")
+       $log->error("My test error message to STDERR")
 
     # Using file
     my $log = Acrux::Log->new(file => '/tmp/test.log');
@@ -34,6 +34,8 @@ Acrux::Log - Acrux logger
     my $log = Acrux::Log->new(file => '=');
 
     # Using syslog
+    my $log = Acrux::Log->new(file => 'syslog'); # or 'syslog:', ':syslog'
+    my $log = Acrux::Log->new(file => '@');
 
     # Customize minimum log level
     my $log = Acrux::Log->new(level => 'warn');
@@ -108,7 +110,7 @@ See also L<Sys::Syslog/Facilities>
     file => '/var/log/myapp.log'
     file => 'stdout' # 'stdout:', ':stdout', '-'
     file => 'stderr' # 'stderr:', ':stderr', '='
-    file => 'syslog'
+    file => 'syslog' # 'syslog:', ':syslog', '@'
 
 Log file path used by "handle"
 
@@ -245,6 +247,12 @@ Log C<error> message
     $log->fatal('Bye', 'bye');
 
 Log C<fatal> message
+
+=head2 file
+
+    my $file = $log->file;
+
+This method returns file path
 
 =head2 info
 
@@ -393,7 +401,7 @@ sub new {
     $args->{level}      ||= 'debug';
     $args->{file}       ||= undef;
     $args->{handle}     ||= undef;
-    $args->{provider}   = 'unknown';
+    $args->{provider}     = 'unknown';
     $args->{autoclean}  ||= 0;
     $args->{prefix}     ||= '';
     $args->{format}     ||= undef;
@@ -436,18 +444,21 @@ sub new {
         if ($file =~ /^\:?syslog\:?$/i or $file eq '@') {
             Sys::Syslog::openlog($args->{ident}, $args->{logopt}, $args->{facility});
             $self->{provider} = "syslog";
+            $self->{file} = "syslog";
         }
 
         # Use STDOUT handle
         elsif ($file =~ /^\:?stdout\:?$/i or $file eq '-') {
             $self->{provider} = "handle";
             $self->{handle} = IO::Handle->new_from_fd(fileno(STDOUT), "w");
+            $self->{file} = "stdout";
         }
 
         # Use STDERR handle
         elsif ($file =~ /^\:?stderr\:?$/i or $file eq '=') {
             $self->{provider} = "handle";
             $self->{handle} = IO::Handle->new_from_fd(fileno(STDERR), "w");
+            $self->{file} = "stderr";
         }
 
         # Open log file handle
@@ -471,10 +482,16 @@ sub new {
 
     return $self;
 }
+sub file { shift->{file} }
 sub level {
     my $self = shift;
     if (scalar(@_) >= 1) {
-        $self->{level} = shift;
+        my $level = lc(shift // '');
+        if (exists $MAGIC{$level}) {
+            $self->{level} = $level;
+        } else {
+            carp "Incorrect log level specified";
+        }
         return $self;
     }
     return $self->{level};

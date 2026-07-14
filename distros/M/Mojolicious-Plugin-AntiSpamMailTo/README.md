@@ -24,6 +24,14 @@ Mojolicious::Plugin::AntiSpamMailTo - Mojolicious plugin for obfuscating email a
             Send me an email at <%== mailto %>
     </a></p>
 
+The output in the browser would be this, with each character in the
+email address HTML encoded:
+
+    <p><a
+        href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;">
+            Send me an email at &#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;
+    </a></p>
+
 Every call to `mailto_href()` or `mailto()` updates the globally
 stored email address. But you can use a different address each time:
 
@@ -46,25 +54,17 @@ stored email address. But you can use a different address each time:
             Send me an email at <%== mailto 'bar@example.com' %>
     </a></p>
 
-The output in the browser would be this, with each character in the
-email address HTML encoded:
-
-    <p><a
-        href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;">
-            Send me an email at &#122;&#111;&#102;&#102;&#105;&#120;&#64;&#99;&#112;&#97;&#110;&#46;&#99;&#111;&#109;
-    </a></p>
-
 # DESCRIPTION
 
-[Mojolicious::Plugin::AntiSpamMailTo](https://metacpan.org/pod/Mojolicious::Plugin::AntiSpamMailTo) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin for
+[Mojolicious::Plugin::AntiSpamMailTo](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AAntiSpamMailTo) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin for
 outputting email addresses as encoded HTML entities, which
 (kinda seems to) confuses a bunch of noobish spam bots, lowering the
 amount of crap you get sent to the address.
 
 # METHODS
 
-[Mojolicious::Plugin::AntiSpamMailTo](https://metacpan.org/pod/Mojolicious::Plugin::AntiSpamMailTo) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::AntiSpamMailTo](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AAntiSpamMailTo) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 

@@ -1,11 +1,10 @@
 Revision history for WWW-Pastebin-PastebinCa-Create
 
-0.004   2013-12-27
-        - Fixed a bug that caused death when Mech encountered
-          network errors
+1.001001    2026-07-13
+        - Converted distro to Dist::Zilla; bug tracker now on GitHub
 
-0.003   2013-12-07
-        - Fixed broken test (fixes RT#91236)
+0.005   2026-07-12
+        - Updated for the rebuilt pastebin.ca API
 
 0.002   2013-11-25
         - Stopped using deprecated Class::Data::Accessor

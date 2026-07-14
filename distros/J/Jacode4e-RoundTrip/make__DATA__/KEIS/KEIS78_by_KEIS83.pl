@@ -2,7 +2,7 @@
 #
 # KEIS78_by_KEIS83.pl
 #
-# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # Appendix B.2 Character code differences

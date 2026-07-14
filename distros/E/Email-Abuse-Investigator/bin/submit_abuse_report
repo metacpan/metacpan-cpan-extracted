@@ -110,7 +110,13 @@ $smtp_port //= 25;
 # -----------------------------------------------------------------------
 my $raw;
 if (@ARGV) {
-	open my $fh, '<:raw', $ARGV[0] or die basename($0), ": cannot open '$ARGV[0]': $!";
+	# Validate path: reject NUL bytes, bare newlines, and directory-traversal
+	# sequences before opening.  This also makes the path taint-safe under -T.
+	my ($safe_path) = $ARGV[0] =~ /\A([^\x00\r\n]+)\z/
+		or die basename($0) . ": invalid characters in path '$ARGV[0]'\n";
+	die basename($0) . ": path traversal attempt in '$safe_path'\n"
+		if $safe_path =~ m{(?:^|/)\.\.(?:/|$)};
+	open my $fh, '<:raw', $safe_path or die basename($0) . ": cannot open '$safe_path': $!";
 	local $/;
 	$raw = <$fh>;
 	close $fh;

@@ -1,19 +1,22 @@
 Changes
-LICENSE
 lib/Net/Blossom/Server.pm
 lib/Net/Blossom/Server/Authorization.pm
 lib/Net/Blossom/Server/AuthorizationResult.pm
 lib/Net/Blossom/Server/BlobResult.pm
+lib/Net/Blossom/Server/BlobStore.pm
 lib/Net/Blossom/Server/Error.pm
 lib/Net/Blossom/Server/MirrorFetcher/HTTP.pm
+lib/Net/Blossom/Server/MetadataStore.pm
 lib/Net/Blossom/Server/PSGI.pm
 lib/Net/Blossom/Server/Request.pm
 lib/Net/Blossom/Server/Response.pm
 lib/Net/Blossom/Server/Storage.pm
 lib/Net/Blossom/Server/Storage/Test.pm
 lib/Net/Blossom/Server/UploadResult.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 t/00-load.t
 t/01-Request.t
 t/02-Response.t
@@ -34,6 +37,7 @@ t/16-HeadBlobAction.t
 t/17-MediaAction.t
 t/18-MirrorAction.t
 t/19-MirrorFetcherHTTP.t
+t/20-ComponentContracts.t
 xt/00-author-pod-syntax.t
 xt/01-author-license-metadata.t
 xt/02-author-pod-coverage.t
