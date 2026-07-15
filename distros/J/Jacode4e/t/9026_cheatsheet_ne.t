@@ -2,7 +2,7 @@
 #
 # 9026_cheatsheet_ne.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e द्रुत सन्दर्भ (नेपाली)
 # यो परीक्षण नेपाली भाषाका प्रयोगकर्ताहरूको लागि द्रुत सन्दर्भको रूपमा पनि काम गर्छ।
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm       IBM CP932
 #   cp932nec       NEC CP932
 #   sjis2004       JISC Shift_JIS-2004
+#   sjis           JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004        JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc            JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004        JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis            JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930        IBM CP00930 (CP00290+CP00300, CCSID 5026 कातकाना)
 #   keis78         HITACHI KEIS78
 #   keis83         HITACHI KEIS83
@@ -69,7 +74,8 @@ use lib "$FindBin::Bin/../lib";
 # [चेतावनी: द्विदिशात्मक रूपान्तरण]
 #
 #   हानिकारक रूपान्तरणहरू छन् (उदा. CP932 मा 398 फिर्ता नहुने म्यापिङहरू छन्)।
-#   द्विदिशात्मक रूपान्तरणका लागि Jacode4e::RoundTrip मोड्युल प्रयोग गर्नुस्।
+#   द्विदिशात्मक रूपान्तरणका लागि 'ROUND_TRIP' => 1 विकल्प प्रयोग गर्नुस्।
+#   दुवै दिशामा 'ROUND_TRIP' => 1 र समान Jacode4e संस्करण आवश्यक छ।
 #
 # ======================================================================
 

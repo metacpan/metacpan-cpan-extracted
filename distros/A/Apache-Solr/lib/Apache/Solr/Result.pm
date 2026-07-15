@@ -1,13 +1,16 @@
-# Copyrights 2012-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Apache-Solr.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Apache-Solr version 1.12.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Apache::Solr::Result;{
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 }
 
 
@@ -16,9 +19,9 @@ no warnings 'recursion';  # linked list of pages can get deep
 
 use strict;
 
-use Log::Report    qw(solr);
-use Time::HiRes    qw(time);
-use Scalar::Util   qw(weaken);
+use Log::Report    qw/solr/;
+use Time::HiRes    qw/time/;
+use Scalar::Util   qw/weaken/;
 
 use Apache::Solr::Document ();
 
@@ -26,14 +29,16 @@ use Data::Dumper;
 $Data::Dumper::Indent    = 1;
 $Data::Dumper::Quotekeys = 0;
 
+#--------------------
 
 use overload
-    '""' => 'endpoint'
-  , bool => 'success';
+	'""' => 'endpoint',
+	bool => 'success';
 
-#----------------------
+#--------------------
 
 sub new(@) { my $c = shift; (bless {}, $c)->init({@_}) }
+
 sub init($)
 {	my ($self, $args) = @_;
 
@@ -62,29 +67,29 @@ sub _pageset($)
 	weaken $_[0]->{ASR_pages};           # otherwise memory leak
 }
 
-#---------------
+#--------------------
 
-sub start()    {shift->{ASR_start}}
-sub endpoint() {shift->{ASR_endpoint}}
-sub params()   {@{shift->{ASR_params}}}
-sub core()     {shift->{ASR_core}}
-sub sequential() {shift->{ASR_seq}}
+sub start()      { $_[0]->{ASR_start} }
+sub endpoint()   { $_[0]->{ASR_endpoint} }
+sub params()     { @{ $_[0]->{ASR_params}} }
+sub core()       { $_[0]->{ASR_core} }
+sub sequential() { $_[0]->{ASR_seq} }
 
-sub request(;$) 
+sub request(;$)
 {	my $self = shift;
 	@_ && $_[0] or return $self->{ASR_request};
 	$self->{ASR_req_out} = time;
 	$self->{ASR_request} = shift;
 }
 
-sub response(;$) 
+sub response(;$)
 {	my $self = shift;
 	@_ && $_[0] or return $self->{ASR_response};
 	$self->{ASR_resp_in}  = time;
 	$self->{ASR_response} = shift;
 }
 
-sub decoded(;$) 
+sub decoded(;$)
 {	my $self = shift;
 	@_ or return $self->{ASR_decoded};
 	$self->{ASR_dec_done} = time;
@@ -130,6 +135,7 @@ sub serverError()
 	$resp->code != 200 or return;
 	my $ct   = $resp->content_type;
 	$ct eq 'text/html' or return;
+
 	my $body = $resp->decoded_content || $resp->content;
 	$body =~ s!.*<body>!!;
 	$body =~ s!</body>.*!!;
@@ -144,7 +150,7 @@ sub errors()
 {	my $self = shift;
 	my @errors;
 	if(my $h = $self->httpError)   { push @errors, "HTTP error:",   "   $h" }
-	if(my $a = $self->serverError) 
+	if(my $a = $self->serverError)
 	{	$a =~ s/^/   /gm;
 		push @errors, "Server error:", $a;
 	}
@@ -152,7 +158,7 @@ sub errors()
 	join "\n", @errors, '';
 }
 
-#--------------------------
+#--------------------
 
 sub _responseData()
 {	my $dec  = shift->decoded;
@@ -196,7 +202,7 @@ sub selected($%)
 
 	$rank < $data->{numFound}       # outside answer range
 		or return ();
- 
+
 	my $pagenr  = $self->selectedPageNr($rank);
 	my $page    = $self->selectedPage($pagenr) || $self->selectedPageLoad($pagenr, $self->core);
 	$page->selected($rank);
@@ -213,24 +219,26 @@ sub highlighted($)
 {	my ($self, $doc) = @_;
 	my $rank   = $doc->rank;
 	my $pagenr = $self->selectedPageNr($rank);
+
 	my $hl     = $self->selectedPage($pagenr)->decoded->{highlighting}
-		or error __x"There is no highlighting information in the result";
+		or error __x"there is no highlighting information in the result.";
+
 	Apache::Solr::Document->fromResult($hl->{$doc->uniqueId}, $rank);
 }
 
-#--------------------------
+#--------------------
 
 sub terms($;$)
 {	my ($self, $field) = (shift, shift);
 	return $self->{ASR_terms}{$field} = shift if @_;
 
 	my $r = $self->{ASR_terms}{$field}
-		or error __x"No search for terms on field {field} requested", field => $field;
+		or error __x"no search for terms on field {field} requested.", field => $field;
 
 	$r;
 }
 
-#--------------------------
+#--------------------
 
 sub _to_msec($) { sprintf "%.1f", $_[0] * 1000 }
 
@@ -274,7 +282,7 @@ sub showTimings(;$)
 
 
 sub selectedPageNr($) { my $pz = shift->fullPageSize; $pz ? int(shift() / $pz) : 0 }
-sub selectPages()     { @{shift->{ASR_pages}} }
+sub selectPages()     { @{ $_[0]->{ASR_pages}} }
 
 
 sub selectedPage($)   { my $pages = shift->{ASR_pages}; $pages->[shift()] }
@@ -303,7 +311,7 @@ sub _calc_page_size()
 sub selectedPageLoad($;$)
 {	my ($self, $pagenr, $client) = @_;
 	$client
-		or error __x"Cannot autoload page {nr}, no client provided", nr => $pagenr;
+		or error __x"cannot autoload page {nr}, no client provided.", nr => $pagenr;
 
 	my $fpz    = $self->fullPageSize;
 	my @params = $self->replaceParams( { start => $pagenr * $fpz, rows => $fpz }, $self->params);

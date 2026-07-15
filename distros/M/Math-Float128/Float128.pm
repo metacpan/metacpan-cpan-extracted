@@ -45,7 +45,7 @@ use overload
 
 use constant F128_PV_NV_BUG => Math::Float128::Constant::_has_pv_nv_bug();
 
-# Inspired by https://github.com/Perl/perl5/issues/19550:
+# Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
 use constant ISSUE_19550    => Math::Float128::Constant::_issue_19550();
 
 use subs qw(FLT128_DIG FLT128_MANT_DIG FLT128_MIN_EXP FLT128_MAX_EXP FLT128_MIN_10_EXP FLT128_MAX_10_EXP
@@ -53,12 +53,11 @@ use subs qw(FLT128_DIG FLT128_MANT_DIG FLT128_MIN_EXP FLT128_MAX_EXP FLT128_MIN_
             M_2_SQRTPIq M_SQRT2q M_SQRT1_2q
             FLT128_MAX FLT128_MIN FLT128_EPSILON FLT128_DENORM_MIN);
 
-$Math::Float128::VERSION = '0.16';
+$Math::Float128::VERSION = '0.17';
 
 Math::Float128->DynaLoader::bootstrap($Math::Float128::VERSION);
 
-@Math::Float128::EXPORT = ();
-@Math::Float128::EXPORT_OK = qw(
+my @tagged = qw(
     F128_PV_NV_BUG
     flt128_set_prec flt128_get_prec InfF128 NaNF128 ZeroF128 UnityF128 is_NaNF128
     is_InfF128 is_InfF128 is_ZeroF128 STRtoF128 NVtoF128 IVtoF128 UVtoF128 F128toSTR
@@ -79,26 +78,9 @@ Math::Float128->DynaLoader::bootstrap($Math::Float128::VERSION);
     fromSTR fromNV fromIV fromUV fromF128
     );
 
-%Math::Float128::EXPORT_TAGS = (all => [qw(
-    F128_PV_NV_BUG
-    flt128_set_prec flt128_get_prec InfF128 NaNF128 ZeroF128 UnityF128 is_NaNF128
-    is_InfF128 is_InfF128 is_ZeroF128 STRtoF128 NVtoF128 IVtoF128 UVtoF128 F128toSTR
-    F128toSTRP F128toF128 F128toNV
-    FLT128_DIG FLT128_MANT_DIG FLT128_MIN_EXP FLT128_MAX_EXP FLT128_MIN_10_EXP FLT128_MAX_10_EXP
-    M_Eq M_LOG2Eq M_LOG10Eq M_LN2q M_LN10q M_PIq M_PI_2q M_PI_4q M_1_PIq M_2_PIq
-    M_2_SQRTPIq M_SQRT2q M_SQRT1_2q
-    FLT128_MAX FLT128_MIN FLT128_EPSILON FLT128_DENORM_MIN
-    cmp2NV f128_bytes
-    acos_F128 acosh_F128 asin_F128 asinh_F128 atan_F128 atanh_F128 atan2_F128 cbrt_F128 ceil_F128
-    copysign_F128 cosh_F128 cos_F128 erf_F128 erfc_F128 exp_F128 expm1_F128 fabs_F128 fdim_F128
-    finite_F128 floor_F128 fma_F128 fmax_F128 fmin_F128 fmod_F128 frexp_F128 hypot_F128 isinf_F128
-    ilogb_F128 isnan_F128 j0_F128 j1_F128 jn_F128 ldexp_F128 lgamma_F128 llrint_F128 llround_F128
-    log_F128 log10_F128 log2_F128 log1p_F128 lrint_F128 lround_F128 modf_F128 nan_F128
-    nearbyint_F128 nextafter_F128 pow_F128 remainder_F128 remquo_F128 rint_F128 round_F128
-    scalbln_F128 scalbn_F128 signbit_F128 sincos_F128 sinh_F128 sin_F128 sqrt_F128 tan_F128
-    tanh_F128 tgamma_F128 trunc_F128 y0_F128 y1_F128 yn_F128
-    fromSTR fromNV fromIV fromUV fromF128
-    )]);
+@Math::Float128::EXPORT = ();
+@Math::Float128::EXPORT_OK = @tagged;
+%Math::Float128::EXPORT_TAGS = (all => \@tagged);
 
 $Math::Float128::NOK_POK = 0; # Set to 1 to allow warnings in new() and overloaded operations when
                               # a scalar that has set both NOK (NV) and POK (PV) flags is encountered

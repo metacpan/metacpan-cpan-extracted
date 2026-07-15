@@ -28,6 +28,7 @@ t/Net-Curl-Promiser-AnyEvent_reuse.t
 t/Net-Curl-Promiser-IOAsync.t
 t/Net-Curl-Promiser-IOAsync_net_curl_easy_overload.t
 t/Net-Curl-Promiser-Mojo.t
+t/Net-Curl-Promiser-Mojo_alternate_ioloop.t
 t/Net-Curl-Promiser-Select.t
 t/Net-Curl-Promiser-Select_setopt_fail.t
 t/cancel_fail.t

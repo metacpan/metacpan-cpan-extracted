@@ -6,12 +6,12 @@ $INC{'Template/EmbeddedPerl/Test/FF.pm'} = __FILE__;
 BEGIN {
   use Test::Most;
   eval "
-    use V5.40;
+    use v5.40;
     use Valiant::HTML::Util::View;
     use Valiant::HTML::Util::Form;
     use strictures;
   ";
-  plan skip_all => 'Valiant required for these tests' if $@;
+  plan skip_all => "Valiant test dependencies unavailable: $@" if $@;
 }
 
 {
@@ -59,7 +59,7 @@ my $generated = '
   seek DATA, $position, 0;
   ok my $generator1 = $yat->from_string($template);
   ok my $out = $generator1->render($f, $person);
-  is $out, $generated, 'rendered template';
+  is $out, "$generated\n", 'rendered template';
 }
 
 {
@@ -71,7 +71,7 @@ my $generated = '
 {
   ok my $generator1 = $yat->from_data(__PACKAGE__);
   ok my $out = $generator1->render($f, $person);
-  is $out, $generated, 'rendered template';
+  is $out, "$generated\n", 'rendered template';
 }
 
 {

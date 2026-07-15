@@ -1,0 +1,62 @@
+# Syntax file for elm
+# Converted from: elm.vim
+# Conversion date: 2026-07-13
+
+language: elm
+extensions: elm
+
+[keyword:Conditional]
+case else if of then
+
+[keyword:Delimiter]
+alias
+
+[keyword:Identifier]
+number
+
+[keyword:Include]
+as exposing import module where
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[keyword:Typedef]
+port type
+
+[match:Type]
+pattern: \b[A-Z][0-9A-Za-z_-]*
+
+[match:Type]
+pattern: \b(?:[A-Z][0-9A-Za-z_'-\.]*)+\.[A-Za-z]
+
+[match:Delimiter]
+pattern: [,;]
+
+[match:Delimiter]
+pattern: [()[\]{}]
+
+[match:Special]
+pattern: \[A-Z][0-9a-fA-F]{4}
+
+[match:Special]
+pattern: \\[nrfvbt\\\"]
+
+[match:String]
+pattern: '[^'\\]'|'\\.'|'\[A-Z][0-9a-fA-F]{4}'
+
+[match:Debug]
+pattern: Debug.(?:log|todo|toString)
+
+[match:Number]
+pattern: -\?\b\d+\b
+
+[match:Float]
+pattern: -\?(?:\b\d+\.\d+\b)
+
+[match:Function]
+pattern: ^[a-z]\w*
+
+[region:Function]
+start: \
+end: ->
+

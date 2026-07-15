@@ -1,0 +1,79 @@
+# Syntax file for swift
+# Converted from: swift.vim
+# Conversion date: 2026-07-13
+
+language: swift
+extensions: swift
+
+[keyword:Boolean]
+false true
+
+[keyword:Define]
+associatedtype class enum extension func inout let operator precedencegroup
+protocol struct typealias var
+
+[keyword:Function]
+deinit init subscript
+
+[keyword:Identifier]
+Self metatype self super
+
+[keyword:Include]
+import
+
+[keyword:Keyword]
+break case catch continue default defer do else fallthrough for guard if in
+repeat return switch throw try where while
+
+[keyword:Label]
+didSet get set willSet
+
+[keyword:Operator]
+convenience dynamic fileprivate final internal lazy nonmutating open override
+prefix private public required rethrows static throws weak
+
+[keyword:PreProc]
+autoreleasepool
+
+[keyword:Special]
+where
+
+[keyword:Statement]
+mutating
+
+[keyword:Todo]
+FIXME MARK TODO
+
+[keyword:Type]
+Any AnyObject
+
+[match:Statement]
+pattern: indirect case
+
+[match:Identifier]
+pattern: \$\b[A-Za-z_0-9]+\b
+
+[match:Keyword]
+pattern: \bcase\b
+
+[match:Number]
+pattern: [+\-]\?\b(?:[0-9][0-9_]*)(?:[.][0-9_]*)\?(?:[eE][+\-]\?[0-9][0-9_]*)\?\b
+
+[match:Number]
+pattern: [+\-]\?\b0x[0-9A-Fa-f][0-9A-Fa-f_]*(?:(?:[.][0-9A-Fa-f_]*)\?[pP][+\-]\?[0-9][0-9_]*)\?\b
+
+[match:Number]
+pattern: [+\-]\?\b0o[0-7][0-7_]*\b
+
+[match:Number]
+pattern: [+\-]\?\b0b[01][01_]*\b
+
+[match:PreCondit]
+pattern: #(?:\bcolumn\b|\bdsohandle\b|\bfile\b|\bline\b|\bfunction\b)
+
+[match:PreCondit]
+pattern: ^\s*#(?:\bif\b|\belse\b|\belseif\b|\bendif\b|\berror\b|\bwarning\b)
+
+[match:Type]
+pattern: @\b\w+\b
+

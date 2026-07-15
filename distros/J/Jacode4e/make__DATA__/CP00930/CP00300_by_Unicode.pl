@@ -2,7 +2,7 @@
 #
 # CP00300_by_Unicode.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # IBM Japanese Graphic Character Set, Kanji DBCS Host and DBCS - PC

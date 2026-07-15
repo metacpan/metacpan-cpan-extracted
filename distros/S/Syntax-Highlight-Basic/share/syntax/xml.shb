@@ -1,0 +1,19 @@
+# Syntax file for xml
+# Converted from: xml.vim
+# Conversion date: 2026-07-13
+
+language: xml
+extensions: xml
+
+[keyword:Statement]
+CDATA DOCTYPE PUBLIC SYSTEM
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[match:Error]
+pattern: [<&]
+
+[match:Type]
+pattern: ]]>
+

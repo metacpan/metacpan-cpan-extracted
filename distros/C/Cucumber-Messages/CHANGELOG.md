@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [34.1.0] - 2026-07-15
+### Added
+- [Ruby] Re-added a new improved `#seconds_to_duration` method using strings to correctly determine floating point amounts. ([#487](https://github.com/cucumber/messages/pull/487))
+
+### Fixed
+- [cpp] Allow building tests with system GTest when fetching dependencies is disabled. ([#483](https://github.com/cucumber/messages/pull/483))
+
 ## [34.0.2] - 2026-07-13
 ### Added
 - [cpp] Add deserialization using `from_json`. ([#462](https://github.com/cucumber/messages/pull/462))
@@ -725,7 +732,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v34.0.2...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v34.1.0...HEAD
+[34.1.0]: https://github.com/cucumber/messages/compare/v34.0.2...v34.1.0
 [34.0.2]: https://github.com/cucumber/messages/compare/v34.0.1...v34.0.2
 [34.0.1]: https://github.com/cucumber/messages/compare/v34.0.0...v34.0.1
 [34.0.0]: https://github.com/cucumber/messages/compare/v33.0.4...v34.0.0

@@ -1,7 +1,7 @@
 # ABSTRACT: Write the ref-backed board out as a tasks/ file view
 
 package App::karr::Cmd::Materialize;
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -57,7 +57,7 @@ App::karr::Cmd::Materialize - Write the ref-backed board out as a tasks/ file vi
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

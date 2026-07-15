@@ -597,19 +597,19 @@ Math::Float128 - perl interface to C's (quadmath) __float128 operations
 
 =head1 BUGS
 
-   The mingw64 compilers have buggy coshq(), expq(), fmaq(), tgammaq()
-   and nearbyintq() functions that crash when called. When a mingw64
-   compiler is detected, this module uses workarounds for those problem
-   functions. See the documentation (above) for cosh_F128(), exp_F128(),
-   fma_F128(), nearbyint_F128() and tgamma_F128() for an outline of the
-   workarounds involved.
+   Old mingw64 compilers (less than version 4) have buggy coshq(), expq(),
+   fmaq(), tgammaq() and nearbyintq() functions that crash when called.
+   If such a mingw64 compiler is detected, this module uses workarounds for
+   those problem functions. See the documentation (above) for cosh_F128(),
+   exp_F128(), fma_F128(), nearbyint_F128() and tgamma_F128() for an
+   outline of the workarounds involved.
 
 
 =head1 LICENSE
 
    This program is free software; you may redistribute it and/or modify
    it under the same terms as Perl itself.
-   Copyright 2013-18, 2020 Sisyphus
+   Copyright 2013-18, 2020, 2026 Sisyphus
 
 
 =head1 AUTHOR

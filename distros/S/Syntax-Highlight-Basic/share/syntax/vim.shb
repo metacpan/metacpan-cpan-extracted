@@ -1,0 +1,453 @@
+# Syntax file for vim
+# Converted from: vim.vim
+# Conversion date: 2026-07-13
+
+language: vim
+extensions: vim
+
+[keyword:Error]
+autoprint beautify biosk bioskey consk conskey flash graphic hardtabs ht mesg
+noautoprint nobeautify nobiosk nobioskey noconsk noconskey noflash nographic
+nohardtabs nomesg nonovice noop noopen nooptimize noredraw noslow noslowopen
+nosourceany novice now1200 now300 now9600 op open optimize redraw slow
+slowopen sourceany w1200 w300 w9600
+
+[keyword:Function]
+abs acos add and append appendbufline argc argidx arglistid argv asin
+assert_beeps assert_equal assert_equalfile assert_exception assert_fails
+assert_false assert_inrange assert_match assert_nobeep assert_notequal
+assert_notmatch assert_report assert_true atan atan2 autocmd_add
+autocmd_delete autocmd_get balloon_gettext balloon_show balloon_split
+blob2list browse browsedir bufadd bufexists buflisted bufload bufloaded
+bufname bufnr bufwinid bufwinnr byte2line byteidx byteidxcomp call ceil
+ch_canread ch_close ch_close_in ch_evalexpr ch_evalraw ch_getbufnr ch_getjob
+ch_info ch_log ch_logfile ch_open ch_read ch_readblob ch_readraw ch_sendexpr
+ch_sendraw ch_setoptions ch_status changenr char2nr charclass charcol charidx
+chdir cindent clearmatches col complete complete_add complete_check
+complete_info confirm copy cos cosh count cscope_connection cursor debugbreak
+deepcopy delete deletebufline did_filetype diff_filler diff_hlID digraph_get
+digraph_getlist digraph_set digraph_setlist echoraw empty environ escape eval
+eventhandler executable execute exepath exists exists_compiled exp expand
+expandcmd expr10 extend extendnew feedkeys filereadable filewritable filter
+finddir findfile flatten flattennew float2nr floor fmod fnameescape
+fnamemodify foldclosed foldclosedend foldlevel foldtext foldtextresult
+foreground fullcommand funcref function garbagecollect get getbufinfo
+getbufline getbufoneline getbufvar getcellwidths getchangelist getchar
+getcharmod getcharpos getcharsearch getcharstr getcmdcompltype getcmdline
+getcmdpos getcmdscreenpos getcmdtype getcmdwintype getcompletion getcurpos
+getcursorcharpos getcwd getenv getfontname getfperm getfsize getftime getftype
+getimstatus getjumplist getline getloclist getmarklist getmatches getmousepos
+getmouseshape getpid getpos getqflist getreg getreginfo getregtype
+getscriptinfo gettabinfo gettabvar gettabwinvar gettagstack gettext getwininfo
+getwinpos getwinposx getwinposy getwinvar glob glob2regpat globpath has
+has_key haslocaldir hasmapto histadd histdel histget histnr hlID hlexists
+hlget hlset hostname iconv indent index indexof input inputdialog inputlist
+inputrestore inputsave inputsecret insert interrupt invert isabsolutepath
+isdirectory isinf islocked isnan items job_getchannel job_info job_setoptions
+job_start job_status job_stop join js_decode js_encode json_decode json_encode
+keys keytrans len libcall libcallnr line line2byte lispindent list2blob
+list2str listener_add listener_flush listener_remove localtime log log10
+luaeval map maparg mapcheck maplist mapnew mapset match matchadd matchaddpos
+matcharg matchdelete matchend matchfuzzy matchfuzzypos matchlist matchstr
+matchstrpos max menu_info min mkdir mode mzeval nextnonblank nr2char or
+pathshorten perleval popup_atcursor popup_beval popup_clear popup_close
+popup_create popup_dialog popup_filter_menu popup_filter_yesno popup_findecho
+popup_findinfo popup_findpreview popup_getoptions popup_getpos popup_hide
+popup_list popup_locate popup_menu popup_move popup_notification
+popup_setoptions popup_settext popup_show pow prevnonblank printf
+prompt_getprompt prompt_setcallback prompt_setinterrupt prompt_setprompt
+prop_add prop_add_list prop_clear prop_find prop_list prop_remove
+prop_type_add prop_type_change prop_type_delete prop_type_get prop_type_list
+pum_getpos pumvisible py3eval pyeval pyxeval rand range readblob readdir
+readdirex readfile reduce reg_executing reg_recording reltime reltimefloat
+reltimestr remote_expr remote_foreground remote_peek remote_read remote_send
+remote_startserver remove rename repeat resolve reverse round rubyeval
+screenattr screenchar screenchars screencol screenpos screenrow screenstring
+search searchcount searchdecl searchpair searchpairpos searchpos server2client
+serverlist setbufline setbufvar setcellwidths setcharpos setcharsearch
+setcmdline setcmdpos setcursorcharpos setenv setfperm setline setloclist
+setmatches setpos setqflist setreg settabvar settabwinvar settagstack
+setwinvar sha256 shellescape shiftwidth sign_define sign_getdefined
+sign_getplaced sign_jump sign_place sign_placelist sign_undefine sign_unplace
+sign_unplacelist simplify sin sinh slice sort sound_clear sound_playevent
+sound_playfile sound_stop soundfold spellbadword spellsuggest split sqrt srand
+state str2float str2list str2nr strcharlen strcharpart strchars
+strdisplaywidth strftime strgetchar stridx string strlen strpart strptime
+strridx strtrans strutf16len strwidth submatch substitute swapfilelist
+swapinfo swapname synID synIDattr synIDtrans synconcealed synstack system
+systemlist tabpagebuflist tabpagenr tabpagewinnr tagfiles taglist tan tanh
+tempname term_dumpdiff term_dumpload term_dumpwrite term_getaltscreen
+term_getansicolors term_getattr term_getcursor term_getjob term_getline
+term_getscrolled term_getsize term_getstatus term_gettitle term_gettty
+term_list term_scrape term_sendkeys term_setansicolors term_setapi
+term_setkill term_setrestore term_setsize term_start term_wait terminalprops
+test_alloc_fail test_autochdir test_feedinput test_garbagecollect_now
+test_garbagecollect_soon test_getvalue test_gui_event test_ignore_error
+test_mswin_event test_null_blob test_null_channel test_null_dict
+test_null_function test_null_job test_null_list test_null_partial
+test_null_string test_option_not_set test_override test_refcount test_setmouse
+test_settime test_srand_seed test_unknown test_void timer_info timer_pause
+timer_start timer_stop timer_stopall tolower toupper tr trim trunc type
+typename undofile undotree uniq utf16idx values virtcol virtcol2col visualmode
+wildmenumode win_execute win_findbuf win_getid win_gettype win_gotoid
+win_id2tabwin win_id2win win_move_separator win_move_statusline win_screenpos
+win_splitmove winbufnr wincol windowsversion winheight winlayout winline winnr
+winrestcmd winrestview winsaveview winwidth wordcount writefile xor
+
+[keyword:PreProc]
+acd ai akm al aleph allowrevins altkeymap ambiwidth ambw anti antialias ar
+arab arabic arabicshape ari arshape asd autochdir autoindent autoread
+autoshelldir autowrite autowriteall aw awa background backspace backup
+backupcopy backupdir backupext backupskip balloondelay ballooneval
+balloonevalterm balloonexpr bdir bdlay belloff beval bevalterm bex bexpr bg bh
+bin binary bk bkc bl bo bold bomb breakat breakindent breakindentopt bri
+briopt brk browsedir bs bsdir bsk bt bufhidden buflisted buftype casemap cb cc
+ccv cd cdh cdhome cdpath cedit cf cfu ch charconvert ci cin cindent cink
+cinkeys cino cinoptions cinscopedecls cinsd cinw cinwords clipboard cm
+cmdheight cmdwinheight cmp cms co cocu cole colorcolumn columns com comments
+commentstring compatible complete completefunc completeopt completepopup
+completeslash concealcursor conceallevel confirm copyindent cot cp cpo
+cpoptions cpp cpt crb cryptmethod cscopepathcomp cscopeprg cscopequickfix
+cscoperelative cscopetag cscopetagorder cscopeverbose csl cspc csprg csqf csre
+cst csto csverb cuc cul culopt cursorbind cursorcolumn cursorline
+cursorlineopt cwh debug deco def define delcombine dex dg dict dictionary diff
+diffexpr diffopt digraph dip dir directory display dy ea ead eadirection eb ed
+edcompatible ef efm ei ek emo emoji enc encoding endoffile endofline eof eol
+ep equalalways equalprg errorbells errorfile errorformat esckeys et
+eventignore ex expandtab exrc fcl fcs fdc fde fdi fdl fdls fdm fdn fdo fdt fen
+fenc fencs fex ff ffs fic fileencoding fileencodings fileformat fileformats
+fileignorecase filetype fillchars fixendofline fixeol fk fkmap flp fml fmr fo
+foldclose foldcolumn foldenable foldexpr foldignore foldlevel foldlevelstart
+foldmarker foldmethod foldminlines foldnestmax foldopen foldtext formatexpr
+formatlistpat formatoptions formatprg fp fs fsync ft gcr gd gdefault gfm gfn
+gfs gfw ghr gli go gp grepformat grepprg gtl gtt guicursor guifont guifontset
+guifontwide guiheadroom guiligatures guioptions guipty guitablabel
+guitabtooltip helpfile helpheight helplang hf hh hi hid hidden highlight
+history hk hkmap hkmapp hkp hl hlg hls hlsearch ic icon iconstring ignorecase
+im imactivatefunc imactivatekey imaf imak imc imcmdline imd imdisable imi
+iminsert ims imsearch imsf imst imstatusfunc imstyle inc include includeexpr
+incsearch inde indentexpr indentkeys indk inex inf infercase insertmode invacd
+invai invakm invallowrevins invaltkeymap invanti invantialias invar invarab
+invarabic invarabicshape invari invarshape invasd invautochdir invautoindent
+invautoread invautoshelldir invautowrite invautowriteall invaw invawa
+invbackup invballooneval invballoonevalterm invbeval invbevalterm invbin
+invbinary invbk invbl invbomb invbreakindent invbri invbuflisted invcdh
+invcdhome invcf invci invcin invcindent invcompatible invconfirm invcopyindent
+invcp invcrb invcscoperelative invcscopetag invcscopeverbose invcsre invcst
+invcsverb invcuc invcul invcursorbind invcursorcolumn invcursorline invdeco
+invdelcombine invdg invdiff invdigraph invea inveb inved invedcompatible invek
+invemo invemoji invendoffile invendofline inveof inveol invequalalways
+inverrorbells inverse invesckeys invet invex invexpandtab invexrc invfen
+invfic invfileignorecase invfixendofline invfixeol invfk invfkmap
+invfoldenable invfs invfsync invgd invgdefault invguipty invhid invhidden
+invhk invhkmap invhkmapp invhkp invhls invhlsearch invic invicon invignorecase
+invim invimc invimcmdline invimd invimdisable invincsearch invinf invinfercase
+invinsertmode invis invjoinspaces invjs invlangnoremap invlangremap
+invlazyredraw invlbr invlinebreak invlisp invlist invlnr invloadplugins invlpl
+invlrm invlz invma invmacatsui invmagic invmh invml invmle invmod invmodeline
+invmodelineexpr invmodifiable invmodified invmore invmousef invmousefocus
+invmousehide invmousemev invmousemoveevent invnu invnumber invodev
+invopendevice invpaste invpi invpreserveindent invpreviewwindow invprompt
+invpvw invreadonly invrelativenumber invremap invrestorescreen invrevins invri
+invrightleft invrl invrnu invro invrs invru invruler invsb invsc invscb invscf
+invscrollbind invscrollfocus invscs invsecure invsft invshellslash
+invshelltemp invshiftround invshortname invshowcmd invshowfulltag invshowmatch
+invshowmode invsi invsm invsmartcase invsmartindent invsmarttab invsmd
+invsmoothscroll invsms invsn invsol invspell invsplitbelow invsplitright
+invspr invsr invssl invsta invstartofline invstmp invswapfile invswf invta
+invtagbsearch invtagrelative invtagstack invtbi invtbidi invtbs invtermbidi
+invtermguicolors invterse invtextauto invtextmode invtf invtgc invtgst
+invtildeop invtimeout invtitle invto invtop invtr invttimeout invttybuiltin
+invttyfast invtx invudf invundofile invvb invvisualbell invwa invwarn invwb
+invweirdinvert invwfh invwfw invwic invwildignorecase invwildmenu
+invwinfixheight invwinfixwidth invwiv invwmnu invwrap invwrapscan invwrite
+invwriteany invwritebackup invws invxtermcodes is isf isfname isi isident isk
+iskeyword isp isprint italic joinspaces jop js jumpoptions key keymap keymodel
+keyprotocol keywordprg km kmp kp kpc langmap langmenu langnoremap langremap
+laststatus lazyredraw lbr lcs linebreak lines linespace lisp lispoptions
+lispwords list listchars lm lmap lnr loadplugins lop lpl lrm ls lsp luadll lw
+lz ma macatsui magic makeef makeencoding makeprg mat matchpairs matchtime
+maxcombine maxfuncdepth maxmapdepth maxmem maxmempattern maxmemtot mco mef
+menc menuitems mfd mh mis mkspellmem ml mle mls mm mmd mmp mmt mod modeline
+modelineexpr modelines modifiable modified more mouse mousef mousefocus
+mousehide mousem mousemev mousemodel mousemoveevent mouses mouseshape mouset
+mousetime mp mps msm mzq mzquantum mzschemedll mzschemegcdll nf noacd noai
+noakm noallowrevins noaltkeymap noanti noantialias noar noarab noarabic
+noarabicshape noari noarshape noasd noautochdir noautoindent noautoread
+noautoshelldir noautowrite noautowriteall noaw noawa nobackup noballooneval
+noballoonevalterm nobeval nobevalterm nobin nobinary nobk nobl nobomb
+nobreakindent nobri nobuflisted nocdh nocdhome nocf noci nocin nocindent
+nocombine nocompatible noconfirm nocopyindent nocp nocrb nocscoperelative
+nocscopetag nocscopeverbose nocsre nocst nocsverb nocuc nocul nocursorbind
+nocursorcolumn nocursorline nodeco nodelcombine nodg nodiff nodigraph noea
+noeb noed noedcompatible noek noemo noemoji noendoffile noendofline noeof
+noeol noequalalways noerrorbells noesckeys noet noex noexpandtab noexrc nofen
+nofic nofileignorecase nofixendofline nofixeol nofk nofkmap nofoldenable nofs
+nofsync nogd nogdefault noguipty nohid nohidden nohk nohkmap nohkmapp nohkp
+nohls nohlsearch noic noicon noignorecase noim noimc noimcmdline noimd
+noimdisable noincsearch noinf noinfercase noinsertmode nois nojoinspaces nojs
+nolangnoremap nolangremap nolazyredraw nolbr nolinebreak nolisp nolist nolnr
+noloadplugins nolpl nolrm nolz noma nomacatsui nomagic nomh noml nomle nomod
+nomodeline nomodelineexpr nomodifiable nomodified nomore nomousef nomousefocus
+nomousehide nomousemev nomousemoveevent none nonu nonumber noodev noopendevice
+nopaste nopi nopreserveindent nopreviewwindow noprompt nopvw noreadonly
+norelativenumber noremap norestorescreen norevins nori norightleft norl nornu
+noro nors noru noruler nosb nosc noscb noscf noscrollbind noscrollfocus noscs
+nosecure nosft noshellslash noshelltemp noshiftround noshortname noshowcmd
+noshowfulltag noshowmatch noshowmode nosi nosm nosmartcase nosmartindent
+nosmarttab nosmd nosmoothscroll nosms nosn nosol nospell nosplitbelow
+nosplitright nospr nosr nossl nosta nostartofline nostmp noswapfile noswf nota
+notagbsearch notagrelative notagstack notbi notbidi notbs notermbidi
+notermguicolors noterse notextauto notextmode notf notgc notgst notildeop
+notimeout notitle noto notop notr nottimeout nottybuiltin nottyfast notx noudf
+noundofile novb novisualbell nowa nowarn nowb noweirdinvert nowfh nowfw nowic
+nowildignorecase nowildmenu nowinfixheight nowinfixwidth nowiv nowmnu nowrap
+nowrapscan nowrite nowriteany nowritebackup nows noxtermcodes nrformats nu
+number numberwidth nuw odev oft ofu omnifunc opendevice operatorfunc opfunc
+osfiletype pa packpath para paragraphs paste pastetoggle patchexpr patchmode
+path pdev penc perldll pex pexpr pfn ph pheader pi pm pmbcs pmbfn popt pp
+preserveindent previewheight previewpopup previewwindow printdevice
+printencoding printexpr printfont printheader printmbcharset printmbfont
+printoptions prompt pt pumheight pumwidth pvh pvp pvw pw pythondll pythonhome
+pythonthreedll pythonthreehome pyx pyxversion qe qftf quickfixtextfunc
+quoteescape rdt re readonly redrawtime regexpengine relativenumber remap
+renderoptions report restorescreen reverse revins ri rightleft rightleftcmd rl
+rlc rnu ro rop rs rtp ru rubydll ruf ruler rulerformat runtimepath sb sbo sbr
+sc scb scf scl scr scroll scrollbind scrollfocus scrolljump scrolloff
+scrollopt scs sect sections secure sel selection selectmode sessionoptions sft
+sh shcf shell shellcmdflag shellpipe shellquote shellredir shellslash
+shelltemp shelltype shellxescape shellxquote shiftround shiftwidth shm
+shortmess shortname showbreak showcmd showcmdloc showfulltag showmatch
+showmode showtabline shq si sidescroll sidescrolloff signcolumn siso sj slm
+sloc sm smartcase smartindent smarttab smc smd smoothscroll sms sn so
+softtabstop sol sp spc spell spellcapcheck spellfile spelllang spelloptions
+spellsuggest spf spk spl splitbelow splitkeep splitright spo spr sps sr srr ss
+ssl ssop st sta stal standout startofline statusline stl stmp strikethrough
+sts su sua suffixes suffixesadd sw swapfile swapsync swb swf switchbuf sws sxe
+sxq syn synmaxcol syntax t_8b t_8f t_8u t_AB t_AF t_AL t_AU t_BD t_BE t_CS
+t_CV t_Ce t_Co t_Cs t_DL t_Ds t_EC t_EI t_F1 t_F2 t_F3 t_F4 t_F5 t_F6 t_F7
+t_F8 t_F9 t_GP t_IE t_IS t_K1 t_K3 t_K4 t_K5 t_K6 t_K7 t_K8 t_K9 t_KA t_KB
+t_KC t_KD t_KE t_KF t_KG t_KH t_KI t_KJ t_KK t_KL t_PE t_PS t_RB t_RC t_RF
+t_RI t_RK t_RS t_RT t_RV t_Ri t_SC t_SH t_SI t_SR t_ST t_Sb t_Sf t_Si t_TE
+t_TI t_Te t_Ts t_Us t_VS t_WP t_WS t_XM t_ZH t_ZR t_al t_bc t_cd t_ce t_cl
+t_cm t_cs t_da t_db t_dl t_ds t_fd t_fe t_fs t_k1 t_k2 t_k3 t_k4 t_k5 t_k6
+t_k7 t_k8 t_k9 t_kB t_kD t_kI t_kN t_kP t_kb t_kd t_ke t_kh t_kl t_kr t_ks
+t_ku t_le t_mb t_md t_me t_mr t_ms t_nd t_op t_se t_so t_sr t_te t_ti t_ts
+t_u7 t_ue t_us t_ut t_vb t_ve t_vi t_vs t_xn t_xs ta tabline tabpagemax
+tabstop tag tagbsearch tagcase tagfunc taglength tagrelative tags tagstack tal
+tb tbi tbidi tbis tbs tc tcldll tenc term termbidi termencoding termguicolors
+termwinkey termwinscroll termwinsize termwintype terse textauto textmode
+textwidth tf tfu tgc tgst thesaurus thesaurusfunc tildeop timeout timeoutlen
+title titlelen titleold titlestring tl tm to toolbar toolbariconsize top tpm
+tr ts tsl tsr tsrfu ttimeout ttimeoutlen ttm tty ttybuiltin ttyfast ttym
+ttymouse ttyscroll ttytype tw twk tws twsl twt tx uc udf udir ul undercurl
+underline undodir undofile undolevels undoreload updatecount updatetime ur ut
+varsofttabstop vartabstop vb vbs vdir ve verbose verbosefile vfile vi viewdir
+viewoptions vif viminfo viminfofile virtualedit visualbell vop vsts vts wa wak
+warn wb wc wcm wcr wd weirdinvert wfh wfw wh whichwrap wi wic wig wildchar
+wildcharm wildignore wildignorecase wildmenu wildmode wildoptions wim
+winaltkeys wincolor window winfixheight winfixwidth winheight winminheight
+winminwidth winptydll winwidth wiv wiw wm wmh wmnu wmw wop wrap wrapmargin
+wrapscan write writeany writebackup writedelay ws ww xtermcodes
+
+[keyword:Special]
+ALL ALLBUT CONTAINED TOP augroup behave buffer case clear cluster color
+command compiler cscope custom customlist dir enable environment event
+expression file file_in_path filetype foldlevel function help highlight
+history include iskeyword keyword list locale manual mapping match menu off on
+option packadd region reset shellcmd sign sync syntax syntime tag
+tag_listfiles user var
+
+[keyword:Statement]
+a ab abc[lear] abo[veleft] abstract addd al[l] am[enu] an[oremenu] ar[gs]
+arga[dd] argd[elete] argded[upe] argdo arge[dit] argg[lobal] argl[ocal]
+argu[ment] as[cii] au aun[menu] bN[ext] b[uffer] ba[ll] bad[d] balt bd[elete]
+bel[owright] bf[irst] bl[ast] bm[odified] bn[ext] bo[tright] bp[revious]
+br[ewind] brea[k] breaka[dd] breakd[el] breakl[ist] bro[wse] bufdo buffers
+bun[load] bw[ipeout] cN[ext] cNf[ile] c[hange] ca cabc[lear] cabo[ve]
+cad[dbuffer] cadde[xpr] caddf[ile] caf[ter] cal[l] cat[ch] cb[uffer] cbe[fore]
+cbel[ow] cbo[ttom] cc ccl[ose] cd cdo ce[nter] cex[pr] cf[ile] cfdo cfir[st]
+cg[etfile] cgetb[uffer] cgete[xpr] changes chd[ir] che[ckpath] checkt[ime]
+chi[story] cl[ist] cla[st] class cle[arjumps] clo[se] cmapc[lear] cme[nu]
+cn[ext] cnew[er] cnf[ile] cnor cnoreme[nu] co[py] col[der] colo[rscheme] com
+comc[lear] comp[iler] con[tinue] conf[irm] cons[t] cope[n] cp[revious]
+cpf[ile] cq[uit] cr[ewind] cs cscope cstag cun cuna[bbrev] cunme[nu] cw[indow]
+d[elete] debug debugg[reedy] def defc[ompile] defer delc[ommand] delel delep
+deletel deletep deletl deletp delf[unction] dell delm[arks] delp dep di[splay]
+dif[fupdate] diffg[et] diffo[ff] diffp[atch] diffpu[t] diffs[plit] difft[his]
+dig[raphs] dir disa[ssemble] dj[ump] dl dli[st] do doau doaut dp dr[op]
+ds[earch] dsp[lit] e[dit] ea earlier ec echoc[onsole] echoe[rr] echom[sg]
+echon echow[indow] el[se] elsei[f] em[enu] en[dif] endclass enddef endenum
+endf[unction] endfo[r] endinterface endt[ry] endw[hile] ene[w] enum eval ex
+exi[t] exp export exu[sage] f[ile] files filet filetype filt[er] fin[d]
+fina[lly] fini[sh] fir[st] fix[del] fo[ld] foldc[lose] foldd[oopen]
+folddoc[losed] foldo[pen] for fu[nction] go[to] gr[ep] grepa[dd] gui gvim
+h[elp] ha[rdcopy] helpc[lose] helpf[ind] helpg[rep] helpt[ags] hi hid[e]
+his[tory] hor[izontal] i ia iabc[lear] if ij[ump] il[ist] imapc[lear] ime[nu]
+imp import in inor inoreme[nu] interface intro is[earch] isp[lit] iuna[bbrev]
+iunme[nu] j[oin] ju[mps] k kee[pmarks] keepa keepalt keepj[umps]
+keepp[atterns] lN[ext] lNf[ile] l[ist] la[st] lab[ove] lad[dexpr] laddb[uffer]
+laddf[ile] laf[ter] lan[guage] lat later lb[uffer] lbe[fore] lbel[ow]
+lbo[ttom] lc[d] lch[dir] lcl[ose] lcs lcscope ld[o] le[ft] lefta[bove]
+leg[acy] lex[pr] lf[ile] lfdo lfir[st] lg[etfile] lgetb[uffer] lgete[xpr]
+lgr[ep] lgrepa[dd] lh[elpgrep] lhi[story] ll lla[st] lli[st] lma lmak[e]
+lmapc[lear] lne[xt] lnew[er] lnf[ile] lo[adview] loadk loadkeymap loc[kmarks]
+lockv[ar] lol[der] lop[en] lp[revious] lpf[ile] lr[ewind] ls lt[ag] lua luado
+luafile lv[imgrep] lvimgrepa[dd] lw[indow] m[ove] ma[rk] mak[e] marks mat[ch]
+me[nu] menut[ranslate] mes[sages] mk[exrc] mks[ession] mksp[ell] mkv[imrc]
+mkvie[w] mod[e] mz[scheme] mzf[ile] n[ext] nb[key] nbc[lose] nbs[tart] new
+nmapc[lear] nme[nu] nnoreme[nu] noa noautocmd noh[lsearch] nor nore noreme[nu]
+nos[wapfile] nu[mber] nunme[nu] o[pen] ol[dfiles] omapc[lear] ome[nu] on[ly]
+onoreme[nu] opt[ions] ounme[nu] ownsyntax p[rint] pa[ckadd] packl[oadall]
+pc[lose] pe[rl] ped[it] perld[o] po[p] popu[p] pp[op] pre[serve] prev[ious]
+pro prof[ile] profd[el] promptf[ind] promptr[epl] ps[earch] ptN[ext] pta[g]
+ptf[irst] ptj[ump] ptl[ast] ptn[ext] ptp[revious] ptr[ewind] pts[elect] pu[t]
+public pw[d] py3 py3do py3f[ile] py[thon] pydo pyf[ile] python3 pythonx pyx
+pyxdo pyxfile q[uit] qa[ll] quita[ll] r[ead] rec[over] red[o] redi[r] redr[aw]
+redraws[tatus] redrawt[abline] reg[isters] res[ize] ret[ab] retu[rn] rew[ind]
+ri[ght] rightb[elow] ru[ntime] rub[y] rubyd[o] rubyf[ile] rundo rv[iminfo] sI
+sIc sIe sIg sIl sIn sIp sIr sN[ext] sa[rgument] sal[l] san[dbox] sav[eas]
+sbN[ext] sb[uffer] sba[ll] sbf[irst] sbl[ast] sbm[odified] sbn[ext]
+sbp[revious] sbr[ewind] sc scI sce scg sci scl scp scr[iptnames]
+scripte[ncoding] scriptv[ersion] scs scscope se[t] setf[iletype] setg[lobal]
+setl[ocal] sf[ind] sfir[st] sg sgI sgc sge sgi sgl sgn sgp sgr sh[ell] si sic
+sie sig sign sil[ent] sim[alt] sin sip sir sl[eep] sla[st] sm[agic] sm[ap] sme
+smenu smile sn[ext] sno[magic] snoreme snoremenu so[urce] sor[t] sp[lit]
+spe[llgood] spelld[ump] spelli[nfo] spellr[are] spellr[epall] spellr[rare]
+spellu[ndo] spellw[rong] spr[evious] sr srI src sre[wind] srg sri srl srn srp
+st[op] sta[g] star[tinsert] startg[replace] startr[eplace] static stj[ump]
+stopi[nsert] sts[elect] substitutepattern substituterepeat sun[hide] sunme
+sunmenu sus[pend] sv[iew] sw[apname] sy syn sync syncbind syntime t tN[ext]
+ta[g] tab tabN[ext] tabc[lose] tabd[o] tabe[dit] tabf[ind] tabfir[st]
+tabl[ast] tabm[ove] tabn[ext] tabnew tabo[nly] tabp[revious] tabr[ewind] tabs
+tags tc[d] tch[dir] tcl tcld[o] tclf[ile] te[aroff] ter[minal] tf[irst]
+th[row] tj[ump] tl[ast] tlm tlmenu tln tlnoremenu tlu tlunmenu tm[enu] tma[p]
+tmapc[lear] tn[ext] tno[remap] to[pleft] tp[revious] tr[ewind] try ts[elect]
+tu[nmenu] tunma[p] type u[ndo] una[bbreviate] undoj[oin] undol[ist] unh[ide]
+unl unlo[ckvar] unme[nu] uns[ilent] up[date] v ve[rsion] verb[ose] vert[ical]
+vi[sual] vie[w] vim9[cmd] vim9s[cript] vim[grep] vimgrepa[dd] viu[sage]
+vme[nu] vne[w] vnoreme[nu] vs[plit] vunme[nu] wN[ext] w[rite] wa[ll] wh[ile]
+wi win[size] winc[md] windo winp[os] wn[ext] wp[revious] wq wqa[ll] wundo
+wv[iminfo] x[it] xa[ll] xmapc[lear] xme xmenu xnoreme xnoremenu xprop
+xr[estore] xunme xunmenu xwininfo y[ank]
+
+[keyword:Todo]
+COMBAK FIXME TODO XXX
+
+[keyword:Type]
+Boolean BufAdd BufCreate BufDelete BufEnter BufFilePost BufFilePre BufHidden
+BufLeave BufNew BufNewFile BufRead BufReadCmd BufReadPost BufReadPre BufUnload
+BufWinEnter BufWinLeave BufWipeout BufWrite BufWriteCmd BufWritePost
+BufWritePre Character CmdUndefined CmdlineChanged CmdlineEnter CmdlineLeave
+CmdwinEnter CmdwinLeave ColorScheme ColorSchemePre Comment CompleteChanged
+CompleteDone CompleteDonePre Conditional Constant CursorHold CursorHoldI
+CursorMoved CursorMovedI Debug Define Delimiter DiffUpdated DirChanged
+DirChangedPre EncodingChanged Error Exception ExitPre FileAppendCmd
+FileAppendPost FileAppendPre FileChangedRO FileChangedShell
+FileChangedShellPost FileEncoding FileExplorer FileReadCmd FileReadPost
+FileReadPre FileType FileWriteCmd FileWritePost FileWritePre FilterReadPost
+FilterReadPre FilterWritePost FilterWritePre Float FocusGained FocusLost
+FuncUndefined Function GUIEnter GUIFailed Identifier Ignore Include
+InsertChange InsertCharPre InsertEnter InsertLeave InsertLeavePre Keyword
+Label Macro MenuPopup ModeChanged NONE Number Operator OptionSet PreCondit
+PreProc QuickFixCmdPost QuickFixCmdPre QuitPre RemoteReply Repeat SafeState
+SafeStateAgain SessionLoadPost ShellCmdPost ShellFilterPost SigUSR1 SourceCmd
+SourcePost SourcePre Special SpecialChar SpecialComment SpellFileMissing
+Statement StdinReadPost StdinReadPre StorageClass String Structure SwapExists
+Syntax TabClosed TabEnter TabLeave TabNew Tag TermChanged TermResponse
+TerminalOpen TerminalWinOpen TextChanged TextChangedI TextChangedP
+TextChangedT TextYankPost Todo Type Typedef Underlined User VimEnter VimLeave
+VimLeavePre VimResized VimResume VimSuspend WinClosed WinEnter WinLeave WinNew
+WinResized WinScrolled ccomment clear end fromstart ignore match minimum skip
+start
+
+[match:Identifier]
+pattern: \b[bwglstav]:[a-zA-Z_][a-zA-Z0-9#_]*\b
+
+[match:Identifier]
+pattern: \s\K&t_\S[a-zA-Z0-9]\b
+
+[match:Identifier]
+pattern: \s\K&t_k;
+
+[match:Operator]
+pattern: |||&&|[-+*/%.!]
+
+[match:Operator]
+pattern: (?:\bis|\bisnot)[?#]{0,2}\b
+
+[match:Type]
+pattern: :\s*\K\b(?:bool|number|float|string|blob|list<|dict<|job|channel|func)\b
+
+[match:Comment]
+pattern: \S.*
+
+[match:Identifier]
+pattern: <c(?:word|WORD)>
+
+[match:Identifier]
+pattern: <(?:[acs]file|amatch|abuf)>
+
+[match:Identifier]
+pattern: \s%[ \t:]
+
+[match:Identifier]
+pattern: \s%$
+
+[match:Identifier]
+pattern: \s%<
+
+[match:Identifier]
+pattern: #\d+|[#%]<\b
+
+[match:PreProc]
+pattern: \$[a-zA-Z_][a-zA-Z0-9_]*
+
+[match:PreProc]
+pattern: \${[a-zA-Z_][a-zA-Z0-9_]*}
+
+[match:String]
+pattern: [^(,]'[^'] *?\K'
+
+[match:Number]
+pattern: '[a-zA-Z0-9][-+,!]
+
+[match:Number]
+pattern: '[<>][-+,!]
+
+[match:Number]
+pattern: ,\K'[<>]
+
+[match:Number]
+pattern: [!,:]\K'[a-zA-Z0-9]
+
+[match:PreProc]
+pattern: [^ \t\\b]+
+
+[match:Error]
+pattern: \belse\s+if\b
+
+[match:SpecialChar]
+pattern: [--]
+
+[region:String]
+start: \[
+end: ]
+escape: \
+
+[region:Error]
+start: lua\s*<<\s*$
+end: \.$
+
+[region:Error]
+start: rub[y]\s*<<\s*$
+end: \.$
+
+[region:Error]
+start: tc[l]\=\s*<<\s*$
+end: \.$
+
+[region:Error]
+start: tc[l]\=\s*<<\s*$
+end: \.$
+

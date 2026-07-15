@@ -1,0 +1,1 @@
+<p><%= $self->name %><%= $self->punctuation %></p>

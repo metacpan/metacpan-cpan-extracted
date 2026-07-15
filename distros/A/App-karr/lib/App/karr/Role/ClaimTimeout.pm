@@ -1,7 +1,7 @@
 # ABSTRACT: Shared claim timeout logic
 
 package App::karr::Role::ClaimTimeout;
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moo::Role;
 use Time::Piece;
 
@@ -36,7 +36,7 @@ App::karr::Role::ClaimTimeout - Shared claim timeout logic
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 DESCRIPTION
 

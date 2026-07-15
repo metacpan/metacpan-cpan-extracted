@@ -9,7 +9,7 @@ use File::Spec::Functions;# qw(catdir catfile);
 use File::Basename qw(dirname basename);
 
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 
 sub default_dispatch_table {
@@ -206,7 +206,7 @@ Config::INI::RefVars::Builtins - Built-in functions for Config::INI::RefVars
 
 =head1 VERSION
 
-Version 1.04
+Version 1.06
 
 =head1 SYNOPSIS
 

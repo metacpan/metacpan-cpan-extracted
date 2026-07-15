@@ -1,0 +1,95 @@
+# Pygments to Vim language name mapping
+# Format: pygments_alias vim_name
+# Lines starting with # are comments
+# Used by Syntax::Highlight::Basic::Parser to resolve Pygments-compatible
+# language names to Vim .shb syntax file names.
+#
+# To add a new mapping, add a line with the Pygments alias and the
+# corresponding Vim syntax file name (without .shb extension).
+
+actionscript actionscript
+as actionscript
+as3 actionscript
+ada ada
+ada95 ada
+ada2005 ada
+applescript applescript
+arduino arduino
+nasm nasm
+autoit autoit
+awk awk
+gawk awk
+bash sh
+sh sh
+zsh zsh
+shell sh
+c c
+csharp cs
+cs cs
+c# cs
+cpp cpp
+c++ cpp
+clojure clojure
+clj clojure
+cobol cobol
+coffeescript coffee
+coffee coffee
+common-lisp lisp
+cl lisp
+lisp lisp
+d d
+dart dart
+elixir elixir
+ex elixir
+exs elixir
+elm elm
+erlang erlang
+fsharp fsharp
+f# fsharp
+fortran fortran
+f90 fortran
+go go
+golang go
+groovy groovy
+haskell haskell
+hs haskell
+java java
+javascript javascript
+js javascript
+julia julia
+jl julia
+kotlin kotlin
+kt kotlin
+lua lua
+matlab matlab
+objective-c objc
+objc objc
+ocaml ocaml
+perl perl
+pl perl
+php php
+php3 php
+php4 php
+powershell ps1
+pwsh ps1
+ps1 ps1
+prolog prolog
+python python
+py python
+python3 python
+r r
+splus r
+ruby ruby
+rb ruby
+rust rust
+rs rust
+scala scala
+sc scala
+scheme scheme
+scm scheme
+swift swift
+tcl tcl
+typescript typescript
+ts typescript
+vhdl vhdl
+vim vim

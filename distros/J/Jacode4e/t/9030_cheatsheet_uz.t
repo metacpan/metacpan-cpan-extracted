@@ -2,7 +2,7 @@
 #
 # 9030_cheatsheet_uz.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e Tezkor Ma'lumotnoma (O'zbekcha)
 # Ushbu test o'zbek tilli foydalanuvchilar uchun tezkor ma'lumotnoma sifatida ham xizmat qiladi.
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -69,8 +74,9 @@ use lib "$FindBin::Bin/../lib";
 # [OGOHLANTIRISH: IKKI TOMONLAMA KONVERSIYA]
 #
 #   Yo'qotishli konversiyalar mavjud (masalan, CP932 da 398 ta qaytarib bo'lmaydigan
-#   xaritalash mavjud). Ikki tomonlama konversiya uchun Jacode4e::RoundTrip modulidan
-#   foydalaning.
+#   xaritalash mavjud). Ikki tomonlama konversiya uchun 'ROUND_TRIP' => 1
+#   foydalaning. Ikkala yo'nalish 'ROUND_TRIP' => 1 va bir xil Jacode4e
+#   versiyasini talab qiladi.
 #
 # ======================================================================
 

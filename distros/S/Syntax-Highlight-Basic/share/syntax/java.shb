@@ -1,0 +1,45 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Java
+language: java
+extensions: java
+
+[keyword:Conditional]
+if else switch
+
+[keyword:Repeat]
+while for do
+
+[keyword:Statement]
+break continue return case default
+
+[keyword:Type]
+int long short char float double void boolean byte
+
+[keyword:StorageClass]
+class interface enum extends implements abstract final static public private protected
+
+[keyword:Keyword]
+package import new this super null true false throws
+
+[match:Comment]
+pattern: //.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|0[0-7]*|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?[fFdDlL]?)\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:@]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:Comment]
+start: /*
+end: */

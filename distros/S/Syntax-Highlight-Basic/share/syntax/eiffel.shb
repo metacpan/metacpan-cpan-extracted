@@ -1,0 +1,134 @@
+# Syntax file for eiffel
+# Converted from: eiffel.vim
+# Conversion date: 2026-07-13
+
+language: eiffel
+extensions: eiffel
+
+[keyword:Boolean]
+False True false true
+
+[keyword:Debug]
+debug
+
+[keyword:Error]
+CURRENT FALSE None PRECURSOR RESULT TRUE VOID current false none precursor
+result true void
+
+[keyword:Exception]
+rescue retry
+
+[keyword:Keyword]
+alias external some
+
+[keyword:Operator]
+Strip implies not old strip xor
+
+[keyword:PreProc]
+creation feature indexing inherit note
+
+[keyword:Special]
+BIT all like
+
+[keyword:Statement]
+Unique across as assign attached attribute check deferred detachable do else
+elseif expanded export from frozen if infix inspect is local loop obsolete
+once prefix redefine rename select separate then undefine unique until variant
+when
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[match:Error]
+pattern: \b[a-z_]+[A-Z][a-zA_Z_]*\b
+
+[match:Error]
+pattern: \b[A-Z][a-z_]*[A-Z][a-zA-Z_]*\b
+
+[match:Number]
+pattern: \d[0-9a-fA-F]*[xX]
+
+[match:PreProc]
+pattern: \bclass\b
+
+[match:Keyword]
+pattern: \bend\b
+
+[match:Special]
+pattern: [[\]]
+
+[match:Error]
+pattern: \]
+
+[match:Statement]
+pattern: \bagent\b
+
+[match:Statement]
+pattern: \bconvert\b
+
+[match:Special]
+pattern: \bcreate\b
+
+[match:PreProc]
+pattern: ^create\b
+
+[match:Statement]
+pattern: \brequire(?:\s+else)?\b
+
+[match:Statement]
+pattern: \bensure(?:\s+then)?\b
+
+[match:Statement]
+pattern: \binvariant\b
+
+[match:PreProc]
+pattern: ^invariant\b
+
+[match:Operator]
+pattern: \band(?:\s+then)?\b
+
+[match:Operator]
+pattern: \bor(?:\s+else)?\b
+
+[match:Operator]
+pattern: \$
+
+[match:Special]
+pattern: !
+
+[match:Special]
+pattern: [{}]
+
+[match:Special]
+pattern: <<
+
+[match:Special]
+pattern: >>
+
+[match:Special]
+pattern: ->
+
+[match:Operator]
+pattern: [@#|&][^ \e\t\b%]*
+
+[match:Error]
+pattern: '(?:%[^/]|%/\d+/|[^'%])+'
+
+[match:Error]
+pattern: ''
+
+[match:Number]
+pattern: -?\b\d+(?:_\d+)*\b
+
+[match:Number]
+pattern: \b[01]+[bB]\b
+
+[match:Number]
+pattern: -?\b\d+(?:_\d+)*\.(?:\d+(?:_\d+)*)?(?:[eE][-+]?\d+(?:_\d+)*)?
+
+[match:Number]
+pattern: -?\.\d+(?:_\d+)*(?:[eE][-+]?\d+(?:_\d+)*)?
+
+[match:Type]
+pattern: \b[A-Z][A-Z0-9_]*\b
+

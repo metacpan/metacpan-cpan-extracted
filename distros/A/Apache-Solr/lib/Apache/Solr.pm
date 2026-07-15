@@ -1,13 +1,16 @@
-# Copyrights 2012-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Apache-Solr.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Apache-Solr version 1.12.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Apache::Solr;{
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 }
 
 
@@ -15,7 +18,7 @@ use warnings;
 use strict;
 
 use Apache::Solr::Tables;
-use Log::Report    qw(solr);
+use Log::Report    qw/solr/;
 
 use Scalar::Util   qw/blessed/;
 use Encode         qw/encode/;
@@ -38,11 +41,10 @@ my  $http_agent;
 
 sub _to_bool($)
 {	my $b = shift;
-	   !defined $b ? undef
-	 : ($b && $b ne 'false' && $b ne 'off') ? 'true' 
-	 : 'false';
+	!defined $b ? undef : ($b && $b ne 'false' && $b ne 'off') ? 'true' : 'false';
 }
 
+#--------------------
 
 sub new(@)
 {	my ($class, %args) = @_;
@@ -64,6 +66,7 @@ sub init($)
 	$self->{AS_sversion} = $args->{server_version} || LATEST_SOLR_VERSION;
 	$self->{AS_retry_wait} = $args->{retry_wait} // 5;  # seconds
 	$self->{AS_retry_max}  = $args->{retry_max}  // 60;
+	$self->{AS_underscore} = exists $args->{field_key_simplify} ? $args->{field_key_simplify} : 1;
 
 	$http_agent = $self->{AS_agent} =
 		$args->{agent} || $http_agent || LWP::UserAgent->new(keep_alive=>1);
@@ -72,12 +75,12 @@ sub init($)
 	$self;
 }
 
-#---------------
+#--------------------
 
 sub core(;$) { my $s = shift; @_ ? $s->{AS_core}   = shift : $s->{AS_core} }
 sub autocommit(;$) { my $s = shift; @_ ? $s->{AS_commit} = shift : $s->{AS_commit} }
-sub agent() {shift->{AS_agent}}
-sub serverVersion() {shift->{AS_sversion}}
+sub agent() { $_[0]->{AS_agent} }
+sub serverVersion() { $_[0]->{AS_sversion} }
 
 
 sub server(;$)
@@ -89,7 +92,9 @@ sub server(;$)
 }
 
 
-#--------------------------
+sub fieldKeySimplify() { $_[0]->{AS_underscore} }
+
+#--------------------
 
 sub select(@)
 {	my $self = shift;
@@ -105,7 +110,7 @@ sub queryTerms(@)
 }
 sub _terms(@) {panic "not implemented"}
 
-#-------------------------------------
+#--------------------
 
 sub addDocument($%)
 {	my ($self, $docs, %args) = @_;
@@ -143,7 +148,7 @@ sub commit(%)
 	my %attrs;
 	if(exists $args{waitFlush})
 	{	  if($sv ge '4.0')
-			 { $self->removed("commit(waitFlush)"); delete $args{waitFlush} }
+			{	$self->removed("commit(waitFlush)"); delete $args{waitFlush} }
 		elsif($sv ge '1.4') { $self->deprecated("commit(waitFlush)") }
 		else { $attrs{waitFlush} = _to_bool delete $args{waitFlush} }
 	}
@@ -236,7 +241,7 @@ sub _delete(@) {panic "not implemented"}
 sub rollback()
 {	my $self = shift;
 	$self->serverVersion ge '1.4'
-		or error __x"Rollback not supported by solr server";
+		or error __x"rollback not supported by your solr server version.";
 
 	$self->_rollback;
 }
@@ -246,8 +251,8 @@ sub extractDocument(@)
 {	my $self  = shift;
 
 	$self->serverVersion ge '1.4'
-		or error __x"extractDocument() requires Solr v1.4 or higher";
-		
+		or error __x"extractDocument() requires Solr v1.4 or higher.";
+
 	my %p   = $self->expandExtract(@_);
 	my $data;
 
@@ -262,8 +267,8 @@ sub extractDocument(@)
 	if(defined $p{string})
 	{	# try to avoid copying the data, which can be huge
 		$data = $ct =~ m!^text/!i
-		  ? \encode(utf8 => (ref $p{string} eq 'SCALAR' ? ${$p{string}} : $p{string}))
-		  : (ref $p{string} eq 'SCALAR' ? $p{string} : \$p{string} );
+		? \encode(utf8 => (ref $p{string} eq 'SCALAR' ? ${$p{string}} : $p{string}))
+		: (ref $p{string} eq 'SCALAR' ? $p{string} : \$p{string} );
 
 		delete $p{string};
 	}
@@ -279,7 +284,7 @@ sub extractDocument(@)
 		}
 	}
 	else
-	{	error __x"Extract requires document as file or string";
+	{	error __x"extract requires document as file or string.";
 	}
 
 	$self->_extract([%p], $data, $ct);
@@ -287,12 +292,12 @@ sub extractDocument(@)
 
 sub _extract($) { panic "not implemented" }
 
-#-------------------------
+#--------------------
 
 sub _core_admin($@)
 {	my ($self, $action, $params) = @_;
 	$params->{core} ||= $self->core;
-	
+
 	my $endpoint = $self->endpoint('cores', core => 'admin', params => $params);
 	my @params   = %$params;
 	my $result   = Apache::Solr::Result->new(params => [ %$params ], endpoint => $endpoint, core => $self);
@@ -319,7 +324,7 @@ sub coreUnload($%)
 	$self->_core_admin('UNLOAD', \%args);
 }
 
-#--------------------------
+#--------------------
 
 sub _calling_sub()
 {	for(my $i=0;$i <10; $i++)
@@ -336,7 +341,7 @@ sub _simpleExpand($$$)
 	my @t;
 	while(@p)
 	{	my ($k, $v) = (shift @p, shift @p);
-		$k =~ s/_/./g;
+		$k =~ s/_/./g if $self->fieldKeySimplify;
 		$k = $prefix.$k if defined $prefix && index($k, $prefix)!=0;
 		my $param   = $k =~ m/^f\.[^\.]+\.(.*)/ ? $1 : $k;
 
@@ -381,11 +386,11 @@ sub expandExtract(@)
 	while(@p)
 	{	my ($k, $v) = (shift @p, shift @p);
 		if(!ref $v || ref $v eq 'SCALAR')
-			 { push @s, $k => $v }
+			{	push @s, $k => $v }
 		elsif($k eq 'literal' || $k eq 'literals')
-			 { push @s, $self->_expand_flatten($v, 'literal.') }
+			{	push @s, $self->_expand_flatten($v, 'literal.') }
 		elsif($k eq 'fmap' || $k eq 'boost' || $k eq 'resource')
-			 { push @s, $self->_expand_flatten($v, "$k.") }
+			{	push @s, $self->_expand_flatten($v, "$k.") }
 		else { panic "unknown set '$k'" }
 	}
 
@@ -396,23 +401,23 @@ sub expandExtract(@)
 
 # probably more config later, currently only one column
 # "also-per-field" means, not only $set.$more, but also f.$field.$set.$more
-my %sets =   #also-per-field?
-  ( expand  => [0]
-  , facet   => [1]
-  , hl      => [1]
-  , mlt     => [0]
-  , stats   => [0]
-  , suggest => [0]
-  , group   => [0]
-  );
- 
+my %sets = (  #also-per-field?
+	expand  => [0],
+	facet   => [1],
+	hl      => [1],
+	mlt     => [0],
+	stats   => [0],
+	suggest => [0],
+	group   => [0],
+);
+
 sub expandSelect(@)
 {	my $self = shift;
 	my @s;
 	my (@flat, %seen_set);
 	while(@_)
 	{	my ($k, $v) = (shift, shift);
-		$k =~ s/_/./g;
+		$k =~ s/_/./g if $self->fieldKeySimplify;
 		my @p = split /\./, $k;
 
 		# fields are $set.$more or f.$field.$set.$more
@@ -422,10 +427,10 @@ sub expandSelect(@)
 		if(my $def = $sets{$set})
 		{	$seen_set{$set} = 1;
 			!$per_field || $def->[0]
-			   or error __x"Set {set} cannot be used per field, in {field}", set => $set, field => $k;
+				or error __x"set {set} cannot be used per field, in {field}.", set => $set, field => $k;
 
 			if(ref $v eq 'HASH')
-			{	!$more or error __x"Field {field} is not simple for a set", field => $k;
+			{	!$more or error __x"field {field} is not simple for a set.", field => $k;
 				push @s, $self->_simpleExpand($v, "$k.");
 			}
 			elsif($more)    # skip $set=true for now
@@ -433,7 +438,7 @@ sub expandSelect(@)
 			}
 		}
 		elsif(ref $v eq 'HASH')
-		{	error __x"Unknown set {set}", set => $set;
+		{	error __x"unknown field set {set}.", set => $set;
 		}
 		else
 		{	push @flat, $k => $v;
@@ -448,35 +453,35 @@ sub expandSelect(@)
 sub deprecated($)
 {	my ($self, $msg) = @_;
 	return if $self->{AS_depr_msg}{$msg}++;  # report only once
-	warning __x"Deprecated solr {message}", message => $msg;
+	warning __x"deprecated solr {message}", message => $msg;
 }
 
 
 sub ignored($)
 {	my ($self, $msg) = @_;
 	return if $self->{AS_ign_msg}{$msg}++;  # report only once
-	warning __x"Ignored solr {message}", message => $msg;
+	warning __x"ignored solr {message}", message => $msg;
 }
 
 
 sub removed($)
 {	my ($self, $msg) = @_;
 	return if $self->{AS_rem_msg}{$msg}++;  # report only once
-	warning __x"Removed solr {message}", message => $msg;
+	warning __x"removed solr {message}", message => $msg;
 }
 
 
-#------------------------
+#--------------------
 
 sub endpoint($@)
 {	my ($self, $action, %args) = @_;
-	my $core = $args{core} || $self->core;
-	my $take = $self->server->clone;    # URI
+	my $core   = $args{core} || $self->core;
+	my $take   = $self->server->clone;    # URI
 	$take->path($take->path . (defined $core ? "/$core" : '') . "/$action");
 
 	# make parameters ordered
 	my $params = $args{params} || [];
-	$params	= [ %$params ] if ref $params eq 'HASH';
+	$params	   = [ %$params ] if ref $params eq 'HASH';
 	@$params or return $take;
 
 	# remove paramers with undefined value
@@ -498,13 +503,13 @@ sub request($$;$$)
 	my $req;
 	if($body)
 	{	# request with 'form' payload
-		$req       = HTTP::Request->new
-		  ( POST => $url
-		  , [ Content_Type        => $body_ct
+		$req       = HTTP::Request->new(
+			POST => $url,
+			[ Content_Type        => $body_ct
 			, Content_Disposition => 'form-data; name="content"'
-			]
-		  , (ref $body eq 'SCALAR' ? $$body : $body)
-		  );
+			],
+			(ref $body eq 'SCALAR' ? $$body : $body)
+		);
 	}
 	else
 	{	# request without payload
@@ -548,6 +553,6 @@ sub request($$;$$)
 
 sub decodeResponse($) { undef }
 
-#----------------------------------
+#--------------------
 
 1;

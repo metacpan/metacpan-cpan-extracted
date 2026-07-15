@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion-Emitter
 
+0.1.2 2026-07-14T17:50:06Z
+
+    - added has_event and clear_event handlers for feature event
+
 0.1.1 2026-06-30T14:03:40Z
 
     - config replaced to Aion::Env::Etc

@@ -1,0 +1,85 @@
+# Syntax file for tcl
+# Converted from: tcl.vim
+# Conversion date: 2026-07-13
+
+language: tcl
+extensions: tcl
+
+[keyword:Boolean]
+false no off on true yes
+
+[keyword:Conditional]
+catch else elseif finally if switch then throw try
+
+[keyword:Label]
+default
+
+[keyword:Repeat]
+break continue for foreach while
+
+[keyword:Special]
+abs accelerator acos activate active activebackground activerelief
+actveforeground add after anchor anymore ascii asin aspect atan atan2
+background before bigincrement bitmap bool borderwidth cascade ceil cget
+checkbutton children class clone closeenough code colormap columnbreak command
+compare configure confine container cos cosh create current cursor decreasing
+default delete dictionary digits direction donesearch double
+elementborderwidth end entier entrycget entryconfigure eval exists exp expand
+export exportselection fill first floor fmod font foreground forget from get
+height hidemargin highlightbackground highlightcolor highlightthickness hypot
+image import in increasing index indicatoron info inscope insert
+insertbackground insertborderwidth insertofftime insertontime insertwidth int
+integer invoke ipadx ipady isqrt justify label last length log log10 match max
+menu min names nextelement none offvalue onvalue orient origin outline padx
+pady parent polygon post postcascade postcommand pow propagate qualifiers
+radiobutton rand range real relief resolution round scrollregion
+selectbackground selectborderwidth selectcolor selectforeground selectimage
+selectmode separator set setgrid show showvalue side sin sinh size slaves
+sliderlength sliderrelief spacing1 spacing2 spacing3 sqrt srand startsearch
+state tabs tag tail takefocus tan tanh tearoff tearoffcommand tickinterval
+title to tolower toupper trim trimleft trimright type types underline unpost
+value variable visual which wide width wordend wordstart wrap xscrollcommand
+xscrollincrement yposition yscrollcommand yscrollincrement
+
+[keyword:Statement]
+after append array auto_execok auto_import auto_load auto_mkindex auto_qualify
+auto_reset bgerror binary cd chan clock close concat dde dict encoding eof
+error eval exec exit expr fblocked fconfigure fcopy file fileevent flush
+format gets glob global history http incr info interp join lappend lassign
+lindex linsert list llength lmap load lrange lrepeat lreplace lreverse lsearch
+lset lsort memory my namespace next nextto open package parray pid puts pwd
+read refchan regexp registry regsub rename scan seek self set socket source
+split string subst tcl_endOfWord tcl_findLibrary tcl_startOfNextWord
+tcl_startOfPreviousWord tcl_wordBreakAfter tcl_wordBreakBefore tell time trace
+unknown unload unset update uplevel upvar variable vwait
+
+[keyword:Structure]
+toplevel
+
+[keyword:Todo]
+TODO
+
+[keyword:Type]
+apply coroutine proc return tailcall yield yieldto
+
+[match:Identifier]
+pattern: $(?:(?:::)\?(?:[[:alnum:]_]*::)*)[a-zA-Z][[:alnum:]_]*
+
+[match:Identifier]
+pattern: ${[^}]*}
+
+[match:Number]
+pattern: \b\d+(?:u?l?|lu|f)\b
+
+[match:Number]
+pattern: \b\d+\.\d*(?:e[-+]?\d+)?[fl]?\b
+
+[match:Number]
+pattern: \.\d+(?:e[-+]?\d+)?[fl]?\b
+
+[match:Number]
+pattern: \b\d+e[-+]?\d+[fl]?\b
+
+[match:Number]
+pattern: 0x[0-9a-fA-F]+(?:u?l?|lu)\b
+

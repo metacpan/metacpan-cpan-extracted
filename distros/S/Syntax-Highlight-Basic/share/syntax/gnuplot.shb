@@ -1,0 +1,200 @@
+# Syntax file for gnuplot
+# Converted from: gnuplot.vim
+# Conversion date: 2026-07-13
+
+language: gnuplot
+extensions: gnuplot
+
+[keyword:Conditional]
+else if
+
+[keyword:Error]
+FIT_LAMBDA_FACTOR FIT_LIMIT FIT_LOG FIT_MAXITER FIT_SCRIPT FIT_START_LAMBDA
+clabel thru ticscale ticslevel
+
+[keyword:Identifier]
+EllipticE EllipticK EllipticPi abs acos acosh airy arg asin asinh atan atan2
+atanh besj0 besj1 besy0 besy1 ceil column columnhead columnheader cos cosh
+defined erf erfc exists exp expint floor gamma gprintf hsv2rgb ibeta igamma
+imag int inverf invnorm lambertw lgamma log log10 norm rand real sgn sin sinh
+sprintf sqrt strftime stringcolumn strlen strptime strstrt substr system tan
+tanh time timecolumn tm_hour tm_mday tm_min tm_mon tm_sec tm_wday tm_yday
+tm_year valid value voigt word words
+
+[keyword:Keyword]
+CMY FNT13X25 FNT5X9 FNT9X17 HSV Left RGB Right XYZ YIQ a4paper absolute
+acceleration acsplines add add2history adobeglyphnames aed512 aed767 aifm all
+altdiagonal amstex angle angles animate append aqua array arrow arrowstyle as
+aspect at auto autojustify autoscale autotitle auxfile avs axes axis back
+background backhead bars base bdefault be begin beginning behind bentover
+beveled bezer bgr big binary bind bitgraph bitmap blacktext blue bmargin
+border both bottom box boxed boxerrorbars boxes boxplot boxwidth
+boxxyerrorbars brg brief bspline butt by c1 c2 c3 c4 cairo cairolatex
+candlesticks canvas cartesian cauchy cb cbdata cbdtics cblabel cbmtics cbrange
+cbtics cbzeroaxis center cgm charsize circle circles clip clip1in clip4in
+clipboardformat close clustered cmykimages cnormal cntrlabel cntrparam color
+colorbox colornames colortext colour colourtext columnheader columnstacked
+comma commentschars context contour corel corners2color courier cp1250 cp1251
+cp1254 cp437 cp850 cp852 cp950 crop csplines ctrl ctrlq cubehelix cubicspline
+cumulative cycles cylindrical dashed dashlength data datafile debug
+decimalsign default defaultfont defaultplex defaultsize defined deg degrees
+delay delete depth depthorder dgrid3d discrete dl dots doubleclick downwards
+dpu414 draft dumb dummy duplex dx dxf dxy800a dy dynamic dz edf eepic ellipse
+ellipses emf empty emtex emxvga encoding end endian enhanced eps epscairo
+epslatex epson_180dpi epson_60dpi epson_lx800 equal errorbars errorlines
+errorscaling errorvariables every excl exp explicit externalimages fc feed fig
+file filetype fill fill[ed] fillcolor filled filledcurves financebars fit
+fit2rgbformulae fix fixed fixmax fixmin flipx flipy flipz float flush fname
+font fontpath fontscale format fortran fraction frequency from front fs fsize
+fsteps ftriangles fulldoc fullwidth func function functions gamma gap gauss
+gbr general geographic geomean ggi giant gif gparrows gpic gppoints gradient
+graph grass gray grb green grid hacktext hann harmean head head[s] header
+heads height hidden3d histeps histogram historysize horizontal hp2623a hp2648
+hp500c hpdj hpgl hpljii hppj hypertext image imagen implicit impulses in
+inches increment incremental index inlineimages input inside int interactive
+interlace interpolate interval inverse invert iso_8859_1 iso_8859_15
+iso_8859_2 iso_8859_9 isosamples jpeg jsdir kc-tek40xx kdensity keepfix key
+km-tek40xx koi8r koi8u kyo l label labels lambda-factor landscape large latex
+layerdefault layout lc left length level1 level3 leveldefault levels limit
+limit_abs line linear linecolor lines linespoints linestyle linetype linewidth
+link linux lmargin loadpath locale log logfile logscale loop lp ls lt lua lw
+macros magnification map mapping margin matrix max maxcolors maxcols maxiter
+maxrows mcbtics mean median medium metric mf mif min mirror missing mitered
+mode model mono monochrome mouse mouseformat mp mppoints multiplot mx2tics
+mxtics my2tics mytics mztics name nec_cp6 negative newstyle next
+noadobeglyphnames noaltdiagonal noautoscale noautotitle noauxfile nobackground
+nobentover nobitmap noborder nobox nocbtics noclip nocontours noctrl noctrlq
+nodoubleclick noenhanced noequal noerrorscaling noerrorvariables noextend
+noexternalimages nofeed nofilled nofontfiles nofpe_trap noftriangles nofulldoc
+nogparrows nogppoints nohacktext nohead noheader nohidden3d nointerlace
+noinvert nolabels nomcbtics nomirror nomx2tics nomxtics nomy2tics nomytics
+nomztics none nonuniform nooffset noopaque nooptimize nooriginreset nooutliers
+nooutput nopicenvironment nopoint nopolardistance noprescale nops_allcF
+nopsnfss nopspoints noquiet noraise noratio noreplotonresize noreverse normal
+norotate noruler nosquare nostandalone nosurface notightboundingbox
+notikzarrows notimestamp notitle notransparent notruecolor noundefined nounit
+noverbose nowedge nox2tics noxtics noy2tics noytics nozoomcoordinates
+nozoomjump noztics object off offset offsets okidata oldstyle on one onecolor
+opaque openstep optimize order origin originreset out outliers output outside
+p palette palfuncparam parallel parametric pattern pbm pdf pdfcairo perltk
+perpendicular persist pi picenvironment plot pm pm3d png pngcairo point
+pointinterval pointintervalbox points pointsize pointsmax pointtype polar
+polardistance polygon polyline pop portrait position positive postscript
+preamble prescale print prologues providevars ps ps_allcF psdir pslatex psnfss
+psnfss-version7 pspoints pstex pstricks pt push qms qnorm qt quiet rad radians
+radius raise range ratio raxis rbg record rectangle red regis relative
+replotonresize results reverse rgb rgbalpha rgbformulae rgbimage rgbimages
+right rmargin rms roman rotate round rounded rowsfirst rowstacked rrange rtics
+rto ruler s samplen samples saturation save sbezier scale scan scansautomatic
+scansbackward scansforward screen script separation separator server set
+simplex size sjis skip small smooth solid sorted spacing spherical splines
+square squared standalone starc start start-lambda steps style sun surface svg
+svga t tab table tan tandy_60dpi tc tek40 tek40xx tek410x term terminal
+termoption texdraw textbox textcolor texthidden textrigid textscale
+textspecial tgif thickness tics tightboundingbox tikz tikzarrows tikzplot time
+timefmt timestamp tiny tit title tkcanvas tmargin to top tpic trange transpose
+trianglepattern truecolor two u undefined unique unit units unsorted upwards
+urange user userstyles using utf8 v var variable variables vectors verbose
+version vertical vgagl via view volatile vrange vttek vws vx384 w wedge
+whitespace widelines widget width windows with wx wxt x x11 x1y1 x1y2 x2
+x2data x2dtics x2label x2mtics x2range x2ticlabels x2tics x2y1 x2y2 x2zeroaxis
+x:y:t:u:v:z:s x:y:t:u:z:s x:y:t:z:s x:y:z:s x:z x:z:s xdata xdtics xerrorbars
+xerrorlines xlabel xlib xmtics xrange xtic xticlabels xtics xx xy xyerrorbars
+xyerrorlines xyplane xyz xzeroaxis y y2 y2data y2dtics y2label y2mtics y2range
+y2ticlabels y2tics y2zeroaxis ydata ydtics yerrorbars yerrorlines ylabel
+ymtics yrange ytic yticlabels ytics yy yzeroaxis z zdata zdtics zero zeroaxis
+zlabel zmtics zoomcoordinates zoomjump zrange ztic zticlabels ztics zy
+zzeroaxis
+
+[keyword:Number]
+GNUTERM GPVAL_CB_LOG GPVAL_CB_MAX GPVAL_CB_MIN GPVAL_COMPILE_OPTIONS
+GPVAL_DATA_CB_MAX GPVAL_DATA_CB_MIN GPVAL_DATA_X2_MAX GPVAL_DATA_X2_MIN
+GPVAL_DATA_X_MAX GPVAL_DATA_X_MIN GPVAL_DATA_Y2_MAX GPVAL_DATA_Y2_MIN
+GPVAL_DATA_Y_MAX GPVAL_DATA_Y_MIN GPVAL_DATA_Z_MAX GPVAL_DATA_Z_MIN
+GPVAL_ENCODING GPVAL_ERRMSG GPVAL_ERRNO GPVAL_LAST_PLOT GPVAL_MULTIPLOT
+GPVAL_NaN GPVAL_OUTPUT GPVAL_PATCHLEVEL GPVAL_PLOT GPVAL_PWD GPVAL_R_LOG
+GPVAL_R_MIN GPVAL_SPLOT GPVAL_TERM GPVAL_TERMINALS GPVAL_TERMOPTIONS
+GPVAL_TERM_WINDOWID GPVAL_TERM_XMAX GPVAL_TERM_XMIN GPVAL_TERM_XSIZE
+GPVAL_TERM_YMAX GPVAL_TERM_YMIN GPVAL_TERM_YSIZE GPVAL_T_LOG GPVAL_T_MAX
+GPVAL_T_MIN GPVAL_U_LOG GPVAL_U_MAX GPVAL_U_MIN GPVAL_VERSION GPVAL_VIEW_MAP
+GPVAL_VIEW_ROT_X GPVAL_VIEW_ROT_Z GPVAL_VIEW_SCALE GPVAL_VIEW_ZSCALE
+GPVAL_V_LOG GPVAL_V_MAX GPVAL_V_MIN GPVAL_X2_LOG GPVAL_X2_MAX GPVAL_X2_MIN
+GPVAL_X_LOG GPVAL_X_MAX GPVAL_X_MIN GPVAL_Y2_LOG GPVAL_Y2_MAX GPVAL_Y2_MIN
+GPVAL_Y_LOG GPVAL_Y_MAX GPVAL_Y_MIN GPVAL_Z_LOG GPVAL_Z_MAX GPVAL_Z_MIN
+GPVAL_pi NaN STATS_blank STATS_blocks STATS_columns STATS_correlation
+STATS_index_max STATS_index_max_x STATS_index_max_y STATS_index_min
+STATS_index_min_x STATS_index_min_y STATS_intercept STATS_invalid
+STATS_lo_quartile STATS_lo_quartile_x STATS_lo_quartile_y STATS_max
+STATS_max_x STATS_max_y STATS_mean STATS_mean_x STATS_mean_y STATS_median
+STATS_median_x STATS_median_y STATS_min STATS_min_x STATS_min_y
+STATS_outofrange STATS_pos_max_y STATS_pos_min_y STATS_records STATS_slope
+STATS_stddev STATS_stddev_x STATS_stddev_y STATS_sum STATS_sum_x STATS_sum_y
+STATS_sumsq STATS_sumsq_x STATS_sumsq_y STATS_sumxy STATS_up_quartile
+STATS_up_quartile_x STATS_up_quartile_y pi
+
+[keyword:Repeat]
+do for while
+
+[keyword:Statement]
+call cd clear evaluate exit fit help history load lower p pause plot print pwd
+quit raise refresh rep replot reread reset save set shell show splot spstats
+stats system test undefine unset update
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[match:Special]
+pattern: \\.
+
+[match:Special]
+pattern: \d+in
+
+[match:Special]
+pattern: \d+cm
+
+[match:Special]
+pattern: \d+pt
+
+[match:Number]
+pattern: GPFUN_[a-zA-Z_]*
+
+[match:Number]
+pattern: \b\d+(?:u?l?|lu|f)\b
+
+[match:Float]
+pattern: \b\d+\.\d*(?:e[-+]?\d+)?[fl]?\b
+
+[match:Float]
+pattern: \.\d+(?:e[-+]?\d+)?[fl]?\b
+
+[match:Float]
+pattern: \b\d+e[-+]?\d+[fl]?\b
+
+[match:Number]
+pattern: \b0x[0-9a-fA-F]+(?:u?l?|lu)\b
+
+[match:Error]
+pattern: \b0[0-7]*[89]
+
+[match:Operator]
+pattern: [-+*/^|&?:]
+
+[match:Operator]
+pattern: \*\*
+
+[match:Operator]
+pattern: &&
+
+[match:Operator]
+pattern: ||
+
+[match:Keyword]
+pattern: \btransparent\b
+
+[match:Macro]
+pattern: @\w*
+
+[region:Special]
+start: \s*!
+end: $
+

@@ -1,0 +1,7 @@
+# Syntax file for typescript
+# Converted from: typescript.vim
+# Conversion date: 2026-07-13
+
+language: typescript
+extensions: typescript
+

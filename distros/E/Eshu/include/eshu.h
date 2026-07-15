@@ -21,9 +21,21 @@ enum eshu_lang {
 	ESHU_LANG_XS   = 2,
 	ESHU_LANG_XML  = 3,
 	ESHU_LANG_HTML = 4,
-	ESHU_LANG_CSS  = 5,
-	ESHU_LANG_JS   = 6,
-	ESHU_LANG_POD  = 7
+	ESHU_LANG_CSS    = 5,
+	ESHU_LANG_JS     = 6,
+	ESHU_LANG_POD    = 7,
+	ESHU_LANG_PYTHON = 8,
+	ESHU_LANG_BASH   = 9,
+	ESHU_LANG_GO     = 10,
+	ESHU_LANG_RUST   = 11,
+	ESHU_LANG_TS     = 12,
+	ESHU_LANG_RUBY   = 13,
+	ESHU_LANG_LUA    = 14,
+	ESHU_LANG_JAVA   = 15,
+	ESHU_LANG_SQL    = 16,
+	ESHU_LANG_JSON   = 17,
+	ESHU_LANG_YAML   = 18,
+	ESHU_LANG_PHP    = 19
 };
 
 /* ══════════════════════════════════════════════════════════════════
@@ -66,7 +78,72 @@ enum eshu_state {
 	ESHU_JS_REGEX_CLASS,
 	/* POD-specific states */
 	ESHU_POD_VERBATIM,
-	ESHU_POD_OVER
+	ESHU_POD_OVER,
+	/* Python-specific states */
+	ESHU_PY_STRING_DQ3,  /* triple double-quote string """...""" */
+	ESHU_PY_STRING_SQ3,  /* triple single-quote string '''...''' */
+	ESHU_PY_STRING_DQ,   /* single double-quote "..."            */
+	ESHU_PY_STRING_SQ,   /* single single-quote '...'            */
+	ESHU_PY_FSTRING_DQ,  /* f"..." — same as DQ but tracks {}    */
+	ESHU_PY_FSTRING_SQ,  /* f'...'                               */
+	/* JSON/JSONC states */
+	ESHU_JSON_STRING,        /* "..." — content opaque, track \-escapes */
+	ESHU_JSON_COMMENT_LINE,  /* // to EOL (JSONC only)                  */
+	ESHU_JSON_COMMENT_BLOCK, /* block comment (JSONC only)                */
+	/* Bash-specific states */
+	ESHU_BASH_HEREDOC,       /* <<WORD  heredoc body                 */
+	ESHU_BASH_HEREDOC_IND,   /* <<-WORD heredoc with stripped tabs   */
+	ESHU_BASH_ANSI_STR,      /* $'...' ANSI-C quoting                */
+	ESHU_BASH_DQUOTE,        /* "..." with $var interpolation        */
+	ESHU_BASH_ARITH,         /* $(( )) arithmetic expansion          */
+	/* Go-specific states */
+	ESHU_GO_RAW_STR,         /* `...` raw string literal (backtick)  */
+	ESHU_GO_RUNE,            /* '.' rune literal                     */
+	/* Lua-specific states */
+	ESHU_LUA_STRING_DQ,      /* "..." double-quoted string           */
+	ESHU_LUA_STRING_SQ,      /* '...' single-quoted string           */
+	ESHU_LUA_LONG_STR,       /* [[...]] / [=[...]=] long string      */
+	ESHU_LUA_LONG_CMT,       /* --[[...]] long comment               */
+	/* Java-specific states */
+	ESHU_JAVA_TEXT_BLOCK,    /* """...""" text block (Java 15+)       */
+	ESHU_JAVA_CHAR,          /* '.' char literal                     */
+	ESHU_JAVA_ANNOTATION,    /* @Annotation — single-line            */
+	/* PHP-specific states */
+	ESHU_PHP_STRING_DQ,      /* "..." with $var interpolation        */
+	ESHU_PHP_STRING_SQ,      /* '...' no interpolation               */
+	ESHU_PHP_HEREDOC,        /* <<<EOT heredoc body                  */
+	ESHU_PHP_NOWDOC,         /* <<<'EOT' nowdoc body                 */
+	ESHU_PHP_HTML,           /* content between ?> and <?php         */
+	/* Rust-specific states */
+	ESHU_RUST_RAW_STR,       /* r"...", r#"..."#, r##"..."## raw strings */
+	ESHU_RUST_BYTE_STR,      /* b"..." byte string literal           */
+	ESHU_RUST_CHAR,          /* '.' char literal                     */
+	ESHU_RUST_LIFETIME,      /* 'a lifetime annotation               */
+	/* Ruby-specific states */
+	ESHU_RB_STRING_DQ,       /* "..." with #{} interpolation         */
+	ESHU_RB_STRING_SQ,       /* '...' no interpolation               */
+	ESHU_RB_STRING_PCT,      /* %w[] %i[] %Q[] etc.                  */
+	ESHU_RB_HEREDOC,         /* <<HEREDOC body                       */
+	ESHU_RB_HEREDOC_SQUIG,   /* <<~HEREDOC body (strips indent)      */
+	ESHU_RB_REGEX,           /* /regex/ literal                      */
+	ESHU_RB_SYMBOL,          /* :symbol                              */
+	ESHU_RB_INTERP,          /* #{...} interpolation inside string   */
+	/* SQL-specific states */
+	ESHU_SQL_STRING_SQ,      /* '...' single-quoted string (ANSI)    */
+	ESHU_SQL_STRING_DQ,      /* "..." double-quoted identifier        */
+	ESHU_SQL_IDENT_BT,       /* `...` backtick identifier (MySQL)    */
+	ESHU_SQL_IDENT_BR,       /* [...] bracketed identifier (T-SQL)   */
+	ESHU_SQL_COMMENT_LINE,   /* -- to EOL                            */
+	ESHU_SQL_COMMENT_BLOCK,  /* block comment                        */
+	ESHU_SQL_DOLLAR_STR,     /* $$ ... $$ dollar-quoted (PostgreSQL) */
+	/* YAML-specific states */
+	ESHU_YAML_BLOCK_SCALAR_LIT,  /* | literal block scalar body          */
+	ESHU_YAML_BLOCK_SCALAR_FOLD, /* > folded block scalar body           */
+	ESHU_YAML_FLOW_MAP,          /* { ... } flow mapping                 */
+	ESHU_YAML_FLOW_SEQ,          /* [ ... ] flow sequence                */
+	ESHU_YAML_STRING_DQ,         /* "..." double-quoted scalar           */
+	ESHU_YAML_STRING_SQ,         /* '...' single-quoted scalar           */
+	ESHU_YAML_DIRECTIVE          /* %YAML / %TAG directives              */
 };
 
 /* ══════════════════════════════════════════════════════════════════
@@ -194,5 +271,79 @@ static void eshu_emit_indent(eshu_buf_t *out, int depth,
 			eshu_buf_putc(out, ' ');
 	}
 }
+
+/* ══════════════════════════════════════════════════════════════════
+ *  Python context
+ * ══════════════════════════════════════════════════════════════════ */
+
+typedef struct {
+	int            depth;           /* current logical indent depth         */
+	int            depth_stack[64]; /* leading-space count per depth level  */
+	int            depth_top;       /* number of entries in depth_stack     */
+	int            bracket_depth;   /* unclosed ( [ { count                 */
+	int            in_continuation; /* 1 if prev line ended with backslash  */
+	enum eshu_state state;
+	eshu_config_t  cfg;
+} eshu_py_ctx_t;
+
+/* ══════════════════════════════════════════════════════════════════
+ *  JSON context
+ * ══════════════════════════════════════════════════════════════════ */
+
+typedef struct {
+	int            depth;
+	int            jsonc;  /* 1 = tolerate // and block comments */
+	enum eshu_state state;
+	eshu_config_t  cfg;
+} eshu_json_ctx_t;
+
+/* ══════════════════════════════════════════════════════════════════
+ *  Java context
+ * ══════════════════════════════════════════════════════════════════ */
+
+typedef struct {
+	int            depth;
+	int            paren_depth;
+	int            bracket_depth;
+	int            case_depth;
+	int            case_extra;
+	int            switch_arrow;
+	enum eshu_state state;
+	eshu_config_t  cfg;
+} eshu_java_ctx_t;
+
+/* ══════════════════════════════════════════════════════════════════
+ *  PHP context
+ * ══════════════════════════════════════════════════════════════════ */
+
+typedef struct {
+	int            depth;
+	int            paren_depth;
+	int            bracket_depth;
+	int            case_depth;
+	int            case_extra;
+	int            in_php;           /* 0 = HTML mode, 1 = PHP mode */
+	char           heredoc_tag[64];  /* end-marker for current heredoc */
+	int            heredoc_indent;   /* leading-ws chars on end marker */
+	enum eshu_state state;
+	eshu_config_t  cfg;
+} eshu_php_ctx_t;
+
+/* ══════════════════════════════════════════════════════════════════
+ *  Ruby context
+ * ══════════════════════════════════════════════════════════════════ */
+
+typedef struct {
+	int            depth;
+	int            brace_depth;       /* { } for hash/block */
+	int            paren_depth;       /* ( ) */
+	int            bracket_depth;     /* [ ] */
+	int            interp_depth;      /* #{} nesting in strings */
+	char           heredoc_tag[64];
+	int            heredoc_squig;     /* 1 if <<~ */
+	int            can_regex;         /* 1 if / starts a regex */
+	enum eshu_state state;
+	eshu_config_t  cfg;
+} eshu_rb_ctx_t;
 
 #endif /* ESHU_H */

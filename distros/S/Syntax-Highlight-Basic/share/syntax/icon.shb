@@ -1,0 +1,82 @@
+# Syntax file for icon
+# Converted from: icon.vim
+# Conversion date: 2026-07-13
+
+language: icon
+extensions: icon
+
+[keyword:Function]
+Active Alert Bg CenterString Clip Clone Color ColorDialog ColorValue CopyArea
+Couple DrawArc DrawCircle DrawCurve DrawImage DrawLine DrawPoint DrawPolygon
+DrawRectangle DrawSegment DrawString Enqueue EraseArea Event Fg FillArc
+FillCircle FillPolygon FillRectangle Font FreeColor GotoRC GotoXY LeftString
+Lower NewColor Notice OpenDialog PaletteChars PaletteColor PaletteGrays
+PaletteKey Pattern Pending Pixel Raise ReadImage RightString SaveDialog
+SelectDialog Shade TextDialog TextWidth ToggleDialog Uncouple WAttrib WClose
+WDefault WDelay WDone WFlush WOpen WQuit WRead WReads WSync WWrite WWrites
+WriteImage abs acos any args asin atan bal callout center char chdir close
+collect copy cos cset delay delete detab display dtor entab errorclear exit
+exp find flush function get getch getche getenv iand icom image insert integer
+ior ishift ixor kbhit key left list loadfunc log many map match member move
+name numeric open ord pop pos proc pull push put read reads real remove rename
+repl reverse right rtod runerr save seek self seq serial set sin sort sortf
+sqrt stop string system tab table tan trim type upto variable where write
+writes
+
+[keyword:Include]
+link
+
+[keyword:Label]
+break by case create default do else every fail if initial next not of repeat
+return suspend then to until while
+
+[keyword:PreProc]
+_ACORN _AMIGA _ARM_FUNCTIONS _ASCII _CALLING _COMPILED _CO_EXPRESSIONS
+_DIRECT_EXECUTION _DOS_FUNCTIONS _EBCDIC _EVENT_MONITOR _EXECUTABLE_IMAGES
+_EXTERNAL_FUNCTIONS _EXTERNAL_VALUES _INTERPRETED _KEYBOARD_FUNCTIONS
+_LARGE_INTEGERS _MACINTOSH _MEMORY_MONITOR _MSDOS _MSDOS_386 _MULTIREGION
+_MULTITASKING _OS2 _PIPES _PORT _PRESENTATION_MGR _RECORD_IO _STRING_INVOKE
+_SYSTEM_FUNCTION _UNIX _VISUALIZATION _VMS _WINDOW_FUNCTIONS _X_WINDOW_SYSTEM
+
+[keyword:StorageClass]
+global invocable local record static
+
+[keyword:Todo]
+BUG FIXME TODO XXX
+
+[match:Error]
+pattern: \s+$
+
+[match:Error]
+pattern:  +\t
+
+[match:SpecialChar]
+pattern: \[0-9a-fA-F][0-9a-fA-F]{2}|\\[0-7]{3}|\\[bdeflnrtv\"\'\\]|\\^[a-zA-Z0-9]
+
+[match:SpecialChar]
+pattern: \\$
+
+[match:SpecialChar]
+pattern: _\s*$
+
+[match:Error]
+pattern: ]
+
+[match:Error]
+pattern: }
+
+[match:Number]
+pattern: \b\d+\b
+
+[match:Number]
+pattern: \b\d{1,2}[rR][a-zA-Z0-9]+\b
+
+[match:Float]
+pattern: \b\d+\.
+
+[match:Float]
+pattern: \b\d+e[-+]?\d+\b
+
+[match:PreProc]
+pattern: _V\d+
+

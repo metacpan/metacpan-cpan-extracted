@@ -1,6 +1,6 @@
 # Sys::OsRelease
 # ABSTRACT: read operating system details from standard /etc/os-release file
-# Copyright (c) 2022 by Ian Kluft
+# Copyright (c) 2022-2026 by Ian Kluft
 # Open Source license Perl's Artistic License 2.0: <http://www.perlfoundation.org/artistic_license_2_0>
 # SPDX-License-Identifier: Artistic-2.0
 
@@ -14,13 +14,8 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.3.1';
-BEGIN {
-    use version;
-    if ( $^V >= version->declare("v5.16.0")) {
-        use feature qw(fc);
-    }
-}
+$Sys::OsRelease::VERSION = '0.4.0';
+use if $] >= 5.016, "feature", "fc";  # retain even though 5.22 is minimum Perl, same code in Sys::OsRelease::Lite
 use feature qw(say);
 use Config;
 use Carp qw(carp croak);
@@ -419,7 +414,7 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -455,14 +450,21 @@ This module maintains minimal prerequisites, and only those which are usually in
 That is intended to be acceptable for establishing system or container environments which contain Perl programs.
 It can also be used for installing or configuring software that needs to know about the system environment.
 
+Note: due to restrictions of the Dist::Zilla build environment and its dependencies,
+Sys::OsRelease had to follow an increase in the minimum Perl version from 5.10 to 5.22.
+For systems with Perl older than 5.22, see below about I<Sys::OsRelease::Lite>
+which repackages Sys::OsRelease without the Dist::Zilla version limitation.
+
 =head2 The os-release Standard
 
 FreeDesktop.Org's os-release standard is at L<https://www.freedesktop.org/software/systemd/man/os-release.html>.
 
 Current attributes recognized by Sys::OsRelease are:
-    NAME ID ID_LIKE PRETTY_NAME CPE_NAME VARIANT VARIANT_ID VERSION VERSION_ID VERSION_CODENAME BUILD_ID IMAGE_ID
-    IMAGE_VERSION HOME_URL DOCUMENTATION_URL SUPPORT_URL BUG_REPORT_URL PRIVACY_POLICY_URL LOGO ANSI_COLOR
-    DEFAULT_HOSTNAME SYSEXT_LEVEL
+    NAME ID ID_LIKE PRETTY_NAME CPE_NAME VARIANT VARIANT_ID VERSION VERSION_ID VERSION_CODENAME
+    BUILD_ID IMAGE_ID IMAGE_VERSION RELEASE_TYPE HOME_URL DOCUMENTATION_URL SUPPORT_URL BUG_REPORT_URL
+    PRIVACY_POLICY_URL SUPPORT_END LOGO ANSI_COLOR ANSI_COLOR_REVERSE VENDOR_NAME VENDOR_URL EXPERIMENT
+    EXPERIMENT_URL DEFAULT_HOSTNAME ARCHITECTURE SYSEXT_LEVEL CONFEXT_LEVEL SYSEXT_SCOPE CONFEXT_SCOPE
+    PORTABLE_PREFIXES PORTABLE_SCOPE
 
 If other attributes are found in the os-release file, they will be accepted.
 Folded to lower case, the attribute names are used as keys in an internal hash structure.
@@ -718,6 +720,18 @@ uses Sys::OsRelease to determine OS type
 
 system information collected from multiple sources including system architecture, hardware, OS release data
 
+=item L<Sys::OsRelease::Lite>
+
+A repackaging of Sys::OsRelease for older versions of Perl before 5.22.
+This was made because dependencies of Dist::Zilla forced it to bump its minimum Perl version to 5.22,
+which in turn forced Sys::OsRelease to follow.
+Sys::OsRelease::Lite provides Sys::OsRelease with the same source code,
+implemented as a symbolic link in the common Git repository that houses both modules.
+It is packaged with L<ExtUtils::MakeMaker> to maintain availability back to Perl 5.10.
+Compatibility was at time time still being maintained via CPAN testing was back to 5.10.
+The use case was systems with RHEL 6 on Perl 5.10.1 and RHEL 7 on Perl 5.16,
+or similar variations.
+
 =back
 
 =head1 BUGS AND LIMITATIONS
@@ -727,8 +741,6 @@ Please report bugs via GitHub at L<https://github.com/ikluft/Sys-OsRelease/issue
 Patches and enhancements may be submitted via a pull request at L<https://github.com/ikluft/Sys-OsRelease/pulls>
 
 =head1 LICENSE INFORMATION
-
-Copyright (c) 2022 by Ian Kluft
 
 This module is distributed in the hope that it will be useful, but it is provided “as is” and without any express or implied warranties. For details, see the full text of the license in the file LICENSE or at L<https://www.perlfoundation.org/artistic-license-20.html>.
 

@@ -42,18 +42,34 @@ and data sections.  See the rest of the docs for more information.
 within template files or strings. It provides methods for creating templates
 from various sources, including strings, file handles, and data sections.
 
-The module also supports features like helper functions, automatic escaping, 
-and customizable sandbox environments.
+The module also supports helper functions, automatic escaping, declarative
+named template arguments, and customizable template compilation namespaces.
+It can compose untyped pages with partials and layouts, and can render
+preconstructed typed view objects through an explicit `render_view` API.
 
 Its quite similar to [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) and other embedded Perl template engines
 but its got one trick the others can't do (see [EXCUSE](https://metacpan.org/pod/EXCUSE) below).
 
-**NOTE**: This is a very basic template engine, which doesn't have lots of things
-you probably need like template includes / partials and so forth.  That's by
-design since I plan to wrap this in a [Catalyst](https://metacpan.org/pod/Catalyst) view which will provide
-all those features.  If you want to use this stand alone you might need to add
-those features yourself (or ideally put something on CPAN that wraps this to 
-provide those features).  Or you can pay me to do it for you ;)
+For complete runnable examples of `smart_lines`, `args`, partials, layouts,
+named content blocks, ordered template directories, and typed views, follow
+the learning path below.
+
+# LEARNING PATH
+
+Start with the framework-neutral Contacts tutorial:
+
+    perldoc Template::EmbeddedPerl::Tutorial
+
+For copyable solutions to specific template tasks:
+
+    perldoc Template::EmbeddedPerl::Cookbook
+
+For the experimental typed-view and wrapper-view refactor:
+
+    perldoc Template::EmbeddedPerl::Cookbook::TypedViews
+
+The complete runnable applications are under `examples/contacts/untyped` and
+`examples/contacts/typed`.
 
 # ACKNOWLEDGEMENTS
 
@@ -153,12 +169,28 @@ least potentially easier to read.  For example:
     &lt;p><%= $item %>&lt;/p>
 % }
 
+Set `smart_lines => 1` to make each line starting with `%` or `%=` a complete
+directive without needing a trailing delimiter. This works well with named
+template arguments:
+
+    % args $name, $greeting = 'Hello'
+    <p><%= $greeting %>, <%= $name %></p>
+
+The full composition and typed-view examples are in
+`Template::EmbeddedPerl::Cookbook::TypedViews`.
+
 You can add '=' to the closing tag to indicate that the expression should be trimmed of leading
 and trailing whitespace. This is useful when you want to include the expression in a block of text.
 where you don't want the whitespace to affect the output.
 
-    <% Perl code =%>
     <%= Perl expression, replaced with result, trimmed =%>
+
+You can add '-' to the closing tag to trim whitespace after the tag through the next
+newline. This is useful when a readable code block should not emit a leading newline
+before the next element, for example in partial HTML responses.
+
+    <% Perl code -%>
+    <%= Perl expression, replaced with result -%>
 
 If you want to skip the newline after the closing tag you can use a backslash.
 
@@ -214,10 +246,10 @@ Creates a new `Template::EmbeddedPerl` object. Accepts the following arguments:
 
 - `sandbox_ns`
 
-    The namespace for the sandbox environment. Default is `'Template::EmbeddedPerl::Sandbox'`.
-    Basically the template is compiled into an anponymous subroutine and this is the namespace
-    that subroutine is executed in.  This is a security feature to prevent the template from
-    accessing the outside environment.
+    The namespace where templates are compiled. Default is `'Template::EmbeddedPerl::Sandbox'`.
+    This isolates unqualified symbols but is not a security boundary: templates execute arbitrary
+    Perl and can access modules, files, processes, and application globals. Only compile templates
+    from trusted sources.
 
 - `directories`
 
@@ -230,6 +262,31 @@ Creates a new `Template::EmbeddedPerl` object. Accepts the following arguments:
 
     I don't do anything smart to make sure you don't reference templates in dangerous places.
     So be careful to make sure you don't let application users specify the template path.
+
+    The same ordered lookup is used by partials, layouts, explicit typed-view
+    templates, and convention-based typed-view templates.
+
+- `smart_lines`
+
+    Boolean indicating whether full lines beginning with `%` or `%=` are complete
+    Perl directives. Default is `0`. This is useful with the `args`, `layout`,
+    `content_for`, and `view` helpers.
+
+- `view_namespace`
+
+    Namespace prefix used to resolve logical typed-view classes and derive a
+    convention template identifier. Logical names are prefixed with the namespace;
+    for template lookup, the matching prefix is removed, `::` becomes `/`, and each
+    CamelCase package segment becomes lowercase snake case. For example,
+    `MyApp::View::HTML::ContactList` maps to `html/contact_list`.
+
+
+- `view_factory`
+
+    Optional coderef for logical child views:
+    `sub ($class, $args, $context) { ... }`. It receives the resolved class and
+    template-supplied arguments, and can inject dependencies such as `root` and
+    `parent`. Without it, the engine calls `$class->new(%args)`.
 
 - `template_extension`
 
@@ -413,6 +470,23 @@ Useful if you want to load templates from the same directory as your package.
 Compiles and executes the provided template content with the given arguments. You might
 want to enable the cache if you are doing this.
 
+Passing a blessed value to this legacy API remains ordinary positional input in
+`@_`; it does not become a typed `$self`.
+
+## render\_view
+
+> **Experimental:** Typed view support, including `render_view`, `view`,
+> `view_namespace`, and `view_factory`, may change as real-world integration
+> needs become clearer.
+
+    my $output = $template->render_view($view);
+
+Renders a preconstructed blessed typed view object. In its template, lexical
+`$self` is the active view. Use the `view` helper for nested typed objects and
+the `partial` or `layout` helpers for untyped composition. See
+`Template::EmbeddedPerl::Cookbook::TypedViews` for the resolver protocol,
+template precedence, and complete examples.
+
 # HELPER FUNCTIONS
 
 The module provides a set of default helper functions that can be used in templates.
@@ -446,12 +520,38 @@ The module provides a set of default helper functions that can be used in templa
 
 - `escape_javascript`
 
-    Escapes JavaScript entities in a string. Useful for making strings safe to use
-     in JavaScript.
+    Escapes a value for use inside a JavaScript string, including preventing a closing
+    `script` tag from terminating an enclosing HTML script element. This is not a general
+    JavaScript sanitizer; use a context-appropriate sanitizer for untrusted code.
 
 - `trim`
 
     Trims leading and trailing whitespace from a string.
+
+- `partial`
+
+    `partial $identifier, %args` renders an untyped template immediately. Its
+    rendered result is safe and is not escaped a second time.
+
+- `layout`
+
+    `layout $identifier, %args` registers an untyped layout around the current
+    output. The first declared layout is outermost.
+
+- `yield`
+
+    `yield` returns the current body; `yield $name` returns named content.
+
+- `content_for`, `content_replace`, `has_content`
+
+    Capture, replace, and test named content blocks in the current render frame.
+
+- `view`
+
+    `view $object` renders a preconstructed child; `view $logical_name, %args`
+    resolves its class through `view_namespace` and calls `$class->new(%args)`,
+    or `view_factory` when configured. A final coderef is a wrapper body; inside
+    it `$self` remains the caller and the callback argument is the new wrapper.
 
 # ERROR HANDLING
 

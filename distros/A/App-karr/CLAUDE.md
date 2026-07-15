@@ -52,7 +52,7 @@ The Go implementation at `../kanban-md/` is the feature reference. Key docs:
 - `lib/App/karr/Task.pm` — Task object: parse/write Markdown+YAML frontmatter
 - `lib/App/karr/Config.pm` — Board config management (defaults + helpers)
 - `lib/App/karr/SyncGuard.pm` — Push insurance on die/croak
-- `lib/App/karr/Git.pm` — Low-level Git operations, all-native via Git::Native (libgit2, no fork/exec)
+- `lib/App/karr/Git.pm` — Low-level Git operations; local ops native via Git::Native (libgit2), with a git-CLI fallback for remote transport (ssh-config/ProxyCommand)
 - `lib/App/karr/BoardStore.pm` — Ref-backed board storage (load_tasks, save_task, effective_config)
 - `lib/App/karr/Lock.pm` — Advisory task locking via refs
 
@@ -130,6 +130,6 @@ Live status is on the karr board (`refs/karr/*`); this is the at-a-glance summar
 Agent/skill/rule material lives under `.claude/`:
 - `rules/karr-rules.md` — house rules, auto-loaded (discipline, delegation, coordination, release)
 - `agents/karr-*.md` — the project agent fleet (briefing-aware; skills force-loaded at spawn)
-- `skills/` — `kanban-issues-karr-cli` + shared Getty Perl skills (hardlinked via manage-skills; don't rename)
+- `skills/` — `kanban-issues-karr-cli` + shared Getty Perl skills (hardlinked via manage-skills; don't rename, and edit via `cat > .claude/skills/<skill>/SKILL.md` — **not** the `Edit`/`Write` tools, which mint a new inode and break the shared hardlink; see skill `manage-skills`)
 
 Keep this file focused on the repository; behavioral rules belong in `rules/`, not here.

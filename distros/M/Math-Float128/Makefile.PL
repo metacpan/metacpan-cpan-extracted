@@ -8,34 +8,51 @@ our $DEFS = '';
 
 # Attempt to avoid the incorrect 'FAIL' reports from Chris Williams' broken NetBSD smoker(s).
 # Comment out the 'exit 0;' (26 lines further down) if this causes problems.
+#if($Config{osname} eq 'netbsd') {
+#
+#  my($inc, $cc) = ('', undef);
+#
+#  if(@ARGV) {
+#    for my $arg(@ARGV) {
+#      $inc = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
+#      $cc = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+#    }
+# }
+#
+#  $inc =~ s/'//g;
+#  $inc =~ s/"//g;
+#
+#  unless(defined($cc)) {
+#    $cc = defined($Config{cc}) ? $Config{cc} : 'cc';
+# }
+#
+#  my $opt = $Config{optimize};
+#
+#  my $out = `$cc $opt $inc $Config{ccflags} -o quad.exe -x c quad.in 2>&1`;
+#
+#  if($out =~ /quadmath\.h: No such file or directory/i) {
+#    print "Aborting: Got\n$out\n";
+#    exit 0;
+#  }
+#}
 
-if($Config{osname} eq 'netbsd') {
+my ($inc_options, $libs_options, $lddlflags_options) = ('', '', '');
 
-  my($inc, $cc) = ('', undef);
-
-  if(@ARGV) {
-    for my $arg(@ARGV) {
-      $inc = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
-      $cc = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
-    }
-  }
-
-  $inc =~ s/'//g;
-  $inc =~ s/"//g;
-
-  unless(defined($cc)) {
-    $cc = defined($Config{cc}) ? $Config{cc} : 'cc';
-  }
-
-  my $opt = $Config{optimize};
-
-  my $out = `$cc $opt $inc $Config{ccflags} -o quad.exe -x c quad.in 2>&1`;
-
-  if($out =~ /quadmath\.h: No such file or directory/i) {
-    print "Aborting: Got\n$out\n";
-    exit 0;
-  }
+if($Config{osname} =~ /bsd/i) {
+  # Try to find the settings that will enable Math::Float128 to build successfully on BSD boxes.
+  $inc_options  = `find /usr/local/lib -name quadmath.h`;
+  chomp $inc_options;
+  $inc_options  = "-I" . $inc_options if $inc_options;;
+  $inc_options  =~ s/\/quadmath\.h$//;
+  $libs_options = `find /usr/local/lib -name libquadmath.a`;
+  chomp $libs_options;
+  $libs_options = "-L" . $libs_options if $libs_options;
+  $libs_options =~ s/\/libquadmath\.a$//;
+  $lddlflags_options = $Config{lddlflags} . " $libs_options ";
+  $libs_options .= " -lquadmath -lm";
 }
+
+$libs_options = "-lquadmath -lm" unless $libs_options;
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
@@ -153,9 +170,9 @@ my %options = %{
   NAME => 'Math::Float128',
   DEFINE => $defines,
   LIBS => [
-    '-lquadmath -lm'
+    "$libs_options"
   ],
-  INC => '',
+  INC => "$inc_options",
   LICENSE  => 'perl',
   VERSION_FROM => 'Float128.pm',
   clean   => { FILES => 'quad.exe' },
@@ -171,6 +188,7 @@ my %options = %{
   },
 }
 };
+if($lddlflags_options) { $options{'LDDLFLAGS'} = "$lddlflags_options"; }
 WriteMakefile(%options);
 
 # Remove the Makefile dependency. Causes problems on a few systems.

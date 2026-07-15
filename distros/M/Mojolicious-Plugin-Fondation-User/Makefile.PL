@@ -30,12 +30,13 @@ my %WriteMakefileArgs = (
     "DBIx::Class::TimeStamp" => 0,
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::Fondation" => "0.01",
+    "Mojolicious::Plugin::Fondation::MigrationDBIx" => "0.01",
     "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.01"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.302190"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "DBIx::Class::TimeStamp" => 0,
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::Fondation" => "0.01",
+  "Mojolicious::Plugin::Fondation::MigrationDBIx" => "0.01",
   "Mojolicious::Plugin::Fondation::Model::DBIx::Async" => "0.01",
   "Test::More" => "1.302190"
 );

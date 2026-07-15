@@ -1,0 +1,32 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for SQL
+language: sql
+extensions: sql
+
+[keyword:Statement]
+SELECT FROM WHERE INSERT INTO UPDATE DELETE CREATE DROP ALTER TABLE INDEX VIEW
+select from where insert into update delete create drop alter table index view
+
+[keyword:Keyword]
+AND OR NOT NULL LIKE IN BETWEEN JOIN ON AS ORDER BY GROUP HAVING DISTINCT UNION ALL
+and or not null like in between join on as order by group having distinct union all
+
+[keyword:Type]
+INT VARCHAR CHAR TEXT DATE BOOLEAN FLOAT DECIMAL
+int varchar char text date boolean float decimal
+
+[match:Comment]
+pattern: --.*$
+
+[match:Number]
+pattern: \b\d+(?:\.\d+)?\b
+
+[match:String]
+pattern: '[^']*'
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!]+
+
+[region:Comment]
+start: /*
+end: */

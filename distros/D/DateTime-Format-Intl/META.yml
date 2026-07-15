@@ -23,13 +23,13 @@ no_index:
     - t
     - inc
 requires:
-  DateTime: '0.42'
-  DateTime::Format::Unicode: v0.1.6
-  DateTime::Locale::FromCLDR: v0.6.1
-  Locale::Intl: v0.1.3
-  Locale::Unicode::Data: v1.8.4
+  DateTime::Format::Unicode: v0.3.0
+  DateTime::Lite: v0.8.0
+  DateTime::Locale::FromCLDR: v0.8.7
+  Locale::Intl: v0.3.0
+  Locale::Unicode::Data: v1.8.6
   Scalar::Util: '0'
-  Want: '0.17'
+  Wanted: v0.1.2
   parent: '0'
   perl: '5.010001'
   strict: '0'
@@ -37,7 +37,7 @@ requires:
   warnings: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-Intl/issues
-  repository: https://gitlab.com/jackdeguest/DateTime-Format-Intl
-version: v0.1.9
+  bugtracker: https://gitlab.com/deguest/DateTime-Format-Intl/issues
+  repository: https://gitlab.com/deguest/DateTime-Format-Intl
+version: v0.1.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

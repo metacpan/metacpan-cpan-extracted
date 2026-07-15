@@ -3,7 +3,7 @@
  *
  * Pure C (POSIX), no Perl dependencies.
  * Requires: eshu.h, eshu_c.h, eshu_pl.h, eshu_xs.h, eshu_xml.h,
- *           eshu_css.h, eshu_diff.h
+ *           eshu_css.h, eshu_bash.h, eshu_go.h, eshu_diff.h
  */
 
 #ifndef ESHU_FILE_H
@@ -242,17 +242,96 @@ static const char *eshu_detect_lang_ext(const char *path) {
 		return "js";
 	/* ts */
 	if (ext_len == 2 && eshu_ci(dot[0], 't') && eshu_ci(dot[1], 's'))
-		return "js";
+		return "ts";
 	/* tsx */
 	if (ext_len == 3 && eshu_ci(dot[0], 't') && eshu_ci(dot[1], 's') && eshu_ci(dot[2], 'x'))
-		return "js";
+		return "ts";
 	/* mts */
 	if (ext_len == 3 && eshu_ci(dot[0], 'm') && eshu_ci(dot[1], 't') && eshu_ci(dot[2], 's'))
-		return "js";
+		return "ts";
 
 	/* pod */
 	if (ext_len == 3 && eshu_ci(dot[0], 'p') && eshu_ci(dot[1], 'o') && eshu_ci(dot[2], 'd'))
 		return "pod";
+
+	/* sh */
+	if (ext_len == 2 && eshu_ci(dot[0], 's') && eshu_ci(dot[1], 'h'))
+		return "bash";
+	/* bash */
+	if (ext_len == 4 && eshu_ci(dot[0], 'b') && eshu_ci(dot[1], 'a')
+	    && eshu_ci(dot[2], 's') && eshu_ci(dot[3], 'h'))
+		return "bash";
+	/* zsh */
+	if (ext_len == 3 && eshu_ci(dot[0], 'z') && eshu_ci(dot[1], 's') && eshu_ci(dot[2], 'h'))
+		return "bash";
+	/* ksh */
+	if (ext_len == 3 && eshu_ci(dot[0], 'k') && eshu_ci(dot[1], 's') && eshu_ci(dot[2], 'h'))
+		return "bash";
+
+	/* go */
+	if (ext_len == 2 && eshu_ci(dot[0], 'g') && eshu_ci(dot[1], 'o'))
+		return "go";
+
+	/* rs (Rust) */
+	if (ext_len == 2 && eshu_ci(dot[0], 'r') && eshu_ci(dot[1], 's'))
+		return "rust";
+
+	/* lua */
+	if (ext_len == 3 && eshu_ci(dot[0], 'l') && eshu_ci(dot[1], 'u') && eshu_ci(dot[2], 'a'))
+		return "lua";
+
+	/* json */
+	if (ext_len == 4 && eshu_ci(dot[0], 'j') && eshu_ci(dot[1], 's')
+	    && eshu_ci(dot[2], 'o') && eshu_ci(dot[3], 'n'))
+		return "json";
+	/* jsonc */
+	if (ext_len == 5 && eshu_ci(dot[0], 'j') && eshu_ci(dot[1], 's')
+	    && eshu_ci(dot[2], 'o') && eshu_ci(dot[3], 'n') && eshu_ci(dot[4], 'c'))
+		return "json";
+
+	/* java */
+	if (ext_len == 4 && eshu_ci(dot[0], 'j') && eshu_ci(dot[1], 'a')
+	    && eshu_ci(dot[2], 'v') && eshu_ci(dot[3], 'a'))
+		return "java";
+
+	/* php */
+	if (ext_len == 3 && eshu_ci(dot[0], 'p') && eshu_ci(dot[1], 'h') && eshu_ci(dot[2], 'p'))
+		return "php";
+	/* phtml */
+	if (ext_len == 5 && eshu_ci(dot[0], 'p') && eshu_ci(dot[1], 'h')
+	    && eshu_ci(dot[2], 't') && eshu_ci(dot[3], 'm') && eshu_ci(dot[4], 'l'))
+		return "php";
+	/* php3/4/5 */
+	if (ext_len == 4 && eshu_ci(dot[0], 'p') && eshu_ci(dot[1], 'h')
+	    && eshu_ci(dot[2], 'p') && (dot[3] >= '3' && dot[3] <= '5'))
+		return "php";
+
+	/* rb */
+	if (ext_len == 2 && eshu_ci(dot[0], 'r') && eshu_ci(dot[1], 'b'))
+		return "ruby";
+	/* rake */
+	if (ext_len == 4 && eshu_ci(dot[0], 'r') && eshu_ci(dot[1], 'a')
+	    && eshu_ci(dot[2], 'k') && eshu_ci(dot[3], 'e'))
+		return "ruby";
+
+	/* sql */
+	if (ext_len == 3 && eshu_ci(dot[0], 's') && eshu_ci(dot[1], 'q') && eshu_ci(dot[2], 'l'))
+		return "sql";
+	/* psql */
+	if (ext_len == 4 && eshu_ci(dot[0], 'p') && eshu_ci(dot[1], 's')
+	    && eshu_ci(dot[2], 'q') && eshu_ci(dot[3], 'l'))
+		return "sql";
+	/* ddl */
+	if (ext_len == 3 && eshu_ci(dot[0], 'd') && eshu_ci(dot[1], 'd') && eshu_ci(dot[2], 'l'))
+		return "sql";
+
+	/* yaml */
+	if (ext_len == 4 && eshu_ci(dot[0], 'y') && eshu_ci(dot[1], 'a')
+	    && eshu_ci(dot[2], 'm') && eshu_ci(dot[3], 'l'))
+		return "yaml";
+	/* yml */
+	if (ext_len == 3 && eshu_ci(dot[0], 'y') && eshu_ci(dot[1], 'm') && eshu_ci(dot[2], 'l'))
+		return "yaml";
 
 	return NULL;
 }
@@ -287,11 +366,33 @@ static int eshu_lang_from_string(const char *lang) {
 	if (strcmp(lang, "jsx") == 0)       return ESHU_LANG_JS;
 	if (strcmp(lang, "mjs") == 0)       return ESHU_LANG_JS;
 	if (strcmp(lang, "cjs") == 0)       return ESHU_LANG_JS;
-	if (strcmp(lang, "ts") == 0)        return ESHU_LANG_JS;
-	if (strcmp(lang, "typescript") == 0) return ESHU_LANG_JS;
-	if (strcmp(lang, "tsx") == 0)       return ESHU_LANG_JS;
-	if (strcmp(lang, "mts") == 0)       return ESHU_LANG_JS;
+	if (strcmp(lang, "ts") == 0)         return ESHU_LANG_TS;
+	if (strcmp(lang, "typescript") == 0) return ESHU_LANG_TS;
+	if (strcmp(lang, "tsx") == 0)        return ESHU_LANG_TS;
+	if (strcmp(lang, "mts") == 0)        return ESHU_LANG_TS;
 	if (strcmp(lang, "pod") == 0)       return ESHU_LANG_POD;
+	if (strcmp(lang, "bash") == 0)  return ESHU_LANG_BASH;
+	if (strcmp(lang, "sh") == 0)    return ESHU_LANG_BASH;
+	if (strcmp(lang, "shell") == 0) return ESHU_LANG_BASH;
+	if (strcmp(lang, "zsh") == 0)   return ESHU_LANG_BASH;
+	if (strcmp(lang, "ksh") == 0)   return ESHU_LANG_BASH;
+	if (strcmp(lang, "go") == 0)    return ESHU_LANG_GO;
+	if (strcmp(lang, "rust") == 0)  return ESHU_LANG_RUST;
+	if (strcmp(lang, "rs") == 0)    return ESHU_LANG_RUST;
+	if (strcmp(lang, "lua") == 0)   return ESHU_LANG_LUA;
+	if (strcmp(lang, "json") == 0)  return ESHU_LANG_JSON;
+	if (strcmp(lang, "jsonc") == 0) return ESHU_LANG_JSON;
+	if (strcmp(lang, "java") == 0)  return ESHU_LANG_JAVA;
+	if (strcmp(lang, "php") == 0)   return ESHU_LANG_PHP;
+	if (strcmp(lang, "phtml") == 0) return ESHU_LANG_PHP;
+	if (strcmp(lang, "sql") == 0)   return ESHU_LANG_SQL;
+	if (strcmp(lang, "psql") == 0)  return ESHU_LANG_SQL;
+	if (strcmp(lang, "ddl") == 0)   return ESHU_LANG_SQL;
+	if (strcmp(lang, "ruby") == 0)  return ESHU_LANG_RUBY;
+	if (strcmp(lang, "rb") == 0)    return ESHU_LANG_RUBY;
+	if (strcmp(lang, "rake") == 0)  return ESHU_LANG_RUBY;
+	if (strcmp(lang, "yaml") == 0)  return ESHU_LANG_YAML;
+	if (strcmp(lang, "yml") == 0)   return ESHU_LANG_YAML;
 	return -1;
 }
 
@@ -314,6 +415,30 @@ static char *eshu_indent_dispatch(const char *src, size_t src_len,
 		return eshu_indent_js(src, src_len, cfg, out_len);
 	case ESHU_LANG_POD:
 		return eshu_indent_pod(src, src_len, cfg, out_len);
+	case ESHU_LANG_BASH:
+		return eshu_indent_bash(src, src_len, cfg, out_len);
+	case ESHU_LANG_PYTHON:
+		return eshu_indent_python(src, src_len, cfg, out_len);
+	case ESHU_LANG_GO:
+		return eshu_indent_go(src, src_len, cfg, out_len);
+	case ESHU_LANG_RUST:
+		return eshu_indent_rust(src, src_len, cfg, out_len);
+	case ESHU_LANG_TS:
+		return eshu_indent_ts(src, src_len, cfg, out_len);
+	case ESHU_LANG_LUA:
+		return eshu_indent_lua(src, src_len, cfg, out_len);
+	case ESHU_LANG_JSON:
+		return eshu_indent_json(src, src_len, cfg, out_len);
+	case ESHU_LANG_JAVA:
+		return eshu_indent_java(src, src_len, cfg, out_len);
+	case ESHU_LANG_PHP:
+		return eshu_indent_php(src, src_len, cfg, out_len);
+	case ESHU_LANG_SQL:
+		return eshu_indent_sql(src, src_len, cfg, out_len);
+	case ESHU_LANG_YAML:
+		return eshu_indent_yaml(src, src_len, cfg, out_len);
+	case ESHU_LANG_RUBY:
+		return eshu_indent_ruby(src, src_len, cfg, out_len);
 	default:
 		return eshu_indent_c(src, src_len, cfg, out_len);
 	}

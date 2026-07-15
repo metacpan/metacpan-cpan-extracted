@@ -1,0 +1,6 @@
+Revision history for Mojolicious-Sessions-Store
+
+0.01      2026-07-14 17:19:59+02:00 Europe/Paris
+    - Initial release
+    - Backend::File for file-based session storage
+    - Sessions::Store core module (subclass of Mojolicious::Sessions)

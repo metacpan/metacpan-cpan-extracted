@@ -11,4 +11,5 @@ requires 'Regexp::Common', '2024080801';
 
 on test => sub {
   requires 'Test::Most' => '0.34';
+  requires 'Moo';
 };

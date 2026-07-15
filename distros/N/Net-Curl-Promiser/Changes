@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.21 Tue 14 Jul 2026
+- Allow a custom Mojo event loop. (Thank you, monnerat!)
+- Fix Linux runs in GitHub Actions.
+
 0.20 Mon 24 Jul 2023
 - Fix Select test (broken in 0.19).
 

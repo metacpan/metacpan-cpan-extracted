@@ -21,92 +21,102 @@ Implement the Solr client, where the communication is in XML.
 This module uses XML::LibXML to parse and construct XML.
 
 Extends L<"DESCRIPTION" in Apache::Solr|Apache::Solr/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Apache::Solr|Apache::Solr/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Apache::Solr|Apache::Solr/"Constructors">.
- 
+
 =over 4
 
-=item Apache::Solr::XML-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Creates a new object.  You may have objects shared the same
 LWP::UserAgent object, to share connections.
+Improves base, see L<Apache::Solr/"Constructors">
 
- -Option        --Defined in     --Default
-  agent           Apache::Solr     <created internally>
-  autocommit      Apache::Solr     true
-  core            Apache::Solr     undef
-  format          Apache::Solr     'XML'
-  retry_max       Apache::Solr     60
-  retry_wait      Apache::Solr     5
-  server          Apache::Solr     <required>
-  server_version  Apache::Solr     <latest>
+ -Option            --Defined in     --Default
+  agent               Apache::Solr     <created internally>
+  autocommit          Apache::Solr     true
+  core                Apache::Solr     undef
+  field_key_simplify  Apache::Solr     true
+  format              Apache::Solr     'XML'
+  retry_max           Apache::Solr     60
+  retry_wait          Apache::Solr     5
+  server              Apache::Solr     <required>
+  server_version      Apache::Solr     <latest>
 
 =over 2
 
-=item agent => LWP::UserAgent object
+=item agent => LWP::UserAgent-object
 
 =item autocommit => BOOLEAN
 
-=item core => NAME
+=item core => $name
+
+=item field_key_simplify => BOOLEAN
 
 =item format => 'XML'|'JSON'
 
 =item retry_max => COUNT
 
-=item retry_wait => SECONDS
+=item retry_wait => $seconds
 
-=item server => URL
+=item server => $url
 
-=item server_version => VERSION
-
-=back
+=item server_version => $version
 
 =back
 
-=head2 Accessors
+=back
 
-Extends L<"Accessors" in Apache::Solr|Apache::Solr/"Accessors">.
- 
+=head2 Attributes
+
+Extends L<"Attributes" in Apache::Solr|Apache::Solr/"Attributes">.
+
 =over 4
 
 =item $obj-E<gt>B<agent>()
 
-Inherited, see L<Apache::Solr/"Accessors">
+Inherited, see L<Apache::Solr/"Attributes">
 
 =item $obj-E<gt>B<autocommit>( [BOOLEAN] )
 
-Inherited, see L<Apache::Solr/"Accessors">
+Inherited, see L<Apache::Solr/"Attributes">
 
 =item $obj-E<gt>B<core>( [$core] )
 
-Inherited, see L<Apache::Solr/"Accessors">
+Inherited, see L<Apache::Solr/"Attributes">
+
+=item $obj-E<gt>B<fieldKeySimplify>()
+
+Inherited, see L<Apache::Solr/"Attributes">
 
 =item $obj-E<gt>B<server>( [$uri|STRING] )
 
-Inherited, see L<Apache::Solr/"Accessors">
+Inherited, see L<Apache::Solr/"Attributes">
 
 =item $obj-E<gt>B<serverVersion>()
 
-Inherited, see L<Apache::Solr/"Accessors">
+Inherited, see L<Apache::Solr/"Attributes">
 
 =item $obj-E<gt>B<xmlsimple>()
+
+Z<>
 
 =back
 
 =head2 Commands
 
 Extends L<"Commands" in Apache::Solr|Apache::Solr/"Commands">.
- 
+
 =head2 Helpers
 
 Extends L<"Helpers" in Apache::Solr|Apache::Solr/"Helpers">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<simpleDocument>( $command, [$attributes, [$content]] )
@@ -115,22 +125,87 @@ Construct a simple XML structure.
 
 =item $obj-E<gt>B<simpleUpdate>( $command, $attributes, [$content] )
 
+Z<>
+
 =back
 
 =head1 DETAILS
 
 Extends L<"DETAILS" in Apache::Solr|Apache::Solr/"DETAILS">.
- 
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Fault: Cannot read document from $fn: $!
+
+Cast by C<extractDocument()>
+
+=item Fault: Read error for document $fn: $!
+
+Cast by C<extractDocument()>
+
+=item Fault: Solr request failed after $elapse seconds after $retries retries: $!
+
+Cast by C<request()>
+
+=item Alert: Solr request failed with $code, $retries retries left: $!
+
+Cast by C<request()>
+
+=item Error: Solr request failed with: $err
+
+Cast by C<request()>
+
+=item Warning: deprecated solr $message
+
+Cast by C<deprecated()>
+
+=item Error: extract requires document as file or string.
+
+Cast by C<extractDocument()>
+
+=item Error: extractDocument() requires Solr v1.4 or higher.
+
+Cast by C<extractDocument()>
+
+=item Error: field $field is not simple for a set.
+
+Cast by C<expandSelect()>
+
+=item Warning: ignored solr $message
+
+Cast by C<ignored()>
+
+=item Warning: removed solr $message
+
+Cast by C<removed()>
+
+=item Error: rollback not supported by your solr server version.
+
+Cast by C<rollback()>
+
+=item Error: set $set cannot be used per field, in $field.
+
+Cast by C<expandSelect()>
+
+=item Error: unknown field set $set.
+
+Cast by C<expandSelect()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.11,
-built on May 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr version 1.12,
+built on July 15, 2026. Website: F<https://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

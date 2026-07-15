@@ -3,6 +3,7 @@ requires 'perl' => '5.026';
 requires 'Mojolicious' => '9.46';
 requires 'Mojolicious::Plugin::Fondation' => '0.01';
 requires 'Mojolicious::Plugin::Fondation::Model::DBIx::Async' => '0.01';
+requires 'Mojolicious::Plugin::Fondation::MigrationDBIx' => '0.01';
 requires 'DBIx::Class' => '0.082843';
 requires 'DBIx::Class::TimeStamp';
 requires 'Crypt::Passphrase' => '0';

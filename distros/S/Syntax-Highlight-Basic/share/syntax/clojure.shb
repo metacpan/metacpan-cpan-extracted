@@ -1,0 +1,16 @@
+# Syntax file for clojure
+# Converted from: clojure.vim
+# Conversion date: 2026-07-13
+
+language: clojure
+extensions: clojure
+
+[match:Number]
+pattern: \v<[-+]?%(%([2-9]|[12]\d|3[0-6])[rR][[:alnum:]]+|%(0[0-7]*|0x[0-9a-fA-F]+|[1-9]\d*)N?|%(0|[1-9]\d*|%(0|[1-9]\d*)\.\d*)%(M|[eE][-+]?\d+)?|%(0|[1-9]\d*)/%(0|[1-9]\d*))>
+
+[match:Comment]
+pattern: #!.*$
+
+[match:Comment]
+pattern: ,
+

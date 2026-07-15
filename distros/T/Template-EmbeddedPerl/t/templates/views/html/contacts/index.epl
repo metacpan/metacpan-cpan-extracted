@@ -1,0 +1,6 @@
+%= view 'HTML::Page', title => $self->title, sub {
+  <h1><%= $_[0]->title %></h1>
+  <p>root=<%= $self->title %></p>
+  %= view 'HTML::Contacts::Item', contact => $self->contacts->[0]
+% }
+<%= $self->capture_context %>

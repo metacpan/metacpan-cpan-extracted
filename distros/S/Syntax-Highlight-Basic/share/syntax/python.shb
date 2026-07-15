@@ -1,0 +1,49 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Python
+language: python
+extensions: py pyw pyi
+
+[keyword:Conditional]
+if elif else
+
+[keyword:Repeat]
+for while
+
+[keyword:Statement]
+as assert async await break class continue def del global lambda nonlocal pass return with yield
+
+[keyword:Operator]
+and in is not or
+
+[keyword:Exception]
+except finally raise try
+
+[keyword:Include]
+from import
+
+[match:Comment]
+pattern: #.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=!&|^~?:@]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:String]
+start: """
+end: """
+
+[region:String]
+start: '''
+end: '''

@@ -2,7 +2,7 @@
 #
 # 9013_cheatsheet_hi.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e त्वरित संदर्भ (हिन्दी)
 # यह परीक्षण हिन्दी भाषी उपयोगकर्ताओं के लिए त्वरित संदर्भ के रूप में भी कार्य करता है।
@@ -37,6 +37,11 @@
 #   cp932ibm       IBM CP932
 #   cp932nec       NEC CP932
 #   sjis2004       JISC Shift_JIS-2004
+#   sjis           JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004        JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc            JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004        JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis            JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930        IBM CP00930 (CP00290+CP00300, CCSID 5026 कातकाना)
 #   keis78         HITACHI KEIS78
 #   keis83         HITACHI KEIS83
@@ -63,7 +68,8 @@
 # [चेतावनी: द्विदिशात्मक रूपांतरण]
 #
 #   हानिपूर्ण रूपांतरण मौजूद हैं (उदा. CP932 में 398 अपरिवर्तनीय मैपिंग हैं)।
-#   द्विदिशात्मक रूपांतरण के लिए Jacode4e::RoundTrip मॉड्यूल का उपयोग करें।
+#   द्विदिशात्मक रूपांतरण के लिए 'ROUND_TRIP' => 1 विकल्प का उपयोग करें।
+#   दोनों दिशाओं में 'ROUND_TRIP' => 1 और समान Jacode4e संस्करण आवश्यक है।
 #
 # ======================================================================
 die "This file is not encoded in UTF-8.\n" if 'あ' ne "\xe3\x81\x82";

@@ -1,0 +1,1 @@
+<css safe="<%= inspect_safe(yield 'css') %>"><%= yield 'css' %></css><body><%= yield %></body><js safe="<%= inspect_safe(yield 'js') %>"><%= yield 'js' %></js><has-css><%= has_content('css') ? 'yes' : 'no' %></has-css>\

@@ -1,0 +1,72 @@
+# Syntax file for dylan
+# Converted from: dylan.vim
+# Conversion date: 2026-07-13
+
+language: dylan
+extensions: dylan
+case: ignore
+
+[keyword:Conditional]
+case else elseif finally if otherwise select then unless when
+
+[keyword:Exception]
+exception handler signal
+
+[keyword:Include]
+create exclude export import rename use
+
+[keyword:Keyword]
+above below by class constant from function generic in instance interface
+library local macro method primary slot subclass then to variable
+
+[keyword:PreProc]
+afterwards begin block cleanup end
+
+[keyword:Repeat]
+begin for from to until while
+
+[keyword:Statement]
+define let
+
+[keyword:StorageClass]
+abstract concrete domain functional inherited inline open primary sealed
+sideways singleton virtual
+
+[match:Operator]
+pattern: \s[-!%&\*+/=\?@\\^|~:]+[-#!>%&:\*+/=\?@\\^|~]*
+
+[match:Operator]
+pattern: (?:\b[A-Z][a-zA-Z0-9_']*\.)?:[-!#$%&\*+./=\?@\\^|~:]*
+
+[match:Number]
+pattern: \b[0-9]+\b|\b0[xX][0-9a-fA-F]+\b|\b0[oO][0-7]+\b
+
+[match:Number]
+pattern: \b[0-9]+\.[0-9]+(?:[eE][-+]?[0-9]+)?\b
+
+[match:Boolean]
+pattern: #t|#f
+
+[match:Comment]
+pattern: //.*
+
+[match:Character]
+pattern: '[^\\]'
+
+[match:Constant]
+pattern: $\b[a-zA-Z0-9\-]+\b
+
+[match:Structure]
+pattern: <\b[a-zA-Z0-9\-]+\b>
+
+[match:Identifier]
+pattern: \*\b[a-zA-Z0-9\-]+\b\*
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Macro]
+start: [Mm]odule:
+end: $
+

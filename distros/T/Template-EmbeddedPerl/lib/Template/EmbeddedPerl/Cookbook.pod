@@ -1,0 +1,748 @@
+=head1 NAME
+
+Template::EmbeddedPerl::Cookbook - Recipes for common template tasks
+
+=head1 DESCRIPTION
+
+This cookbook is a task-oriented reference for applications that already know
+what they need to render. Each recipe starts with a result, then gives code and
+the situation where it is useful. Templates execute arbitrary Perl, so compile
+only trusted template sources and do not let request data choose template paths.
+
+=head1 WHICH DOCUMENT SHOULD I READ?
+
+New to the engine? Start with L<Template::EmbeddedPerl::Tutorial>, which builds
+the runnable Contacts application from strings through layouts. Reading this
+cookbook from its recipe headings is appropriate when you already have a
+specific task to solve. Framework authors who need object-backed views,
+factories, and wrapper views should continue to
+L<Template::EmbeddedPerl::Cookbook::TypedViews>.
+
+=head1 RENDERING AND LOADING
+
+=head2 How do I render a template string?
+
+The following complete program prints:
+
+  Hello, Ada!
+
+  use Template::EmbeddedPerl;
+
+  my $compiled = Template::EmbeddedPerl->from_string(
+      'Hello, <%= shift %>!',
+  );
+  print $compiled->render('Ada');
+
+Use C<from_string> for short generated templates, tests, and templates kept in
+application code. Keep C<$compiled> when the same source will be rendered more
+than once.
+
+=head2 How do I load the first matching file from ordered directories?
+
+The following engine looks for C<pages/contacts.epl> in the application
+directory before the shared directory:
+
+B<Fragment:>
+
+  my $engine = Template::EmbeddedPerl->new(
+      directories => [
+          '/srv/contacts/templates',
+          '/srv/shared/templates',
+      ],
+      smart_lines => 1,
+      auto_escape => 1,
+  );
+
+  my $html = $engine->from_file('pages/contacts')->render(
+      contacts => $contacts,
+  );
+
+The expected result is the rendered C<pages/contacts.epl> file. The first
+existing candidate wins, so use this ordering when an application overrides a
+shared template. The checked-in
+C<examples/contacts/untyped/templates/pages/contacts.epl> uses this style.
+
+=head2 How do I compile a template from a filehandle?
+
+This complete program prints C<Hello, Ada!>:
+
+  use Template::EmbeddedPerl;
+
+  my $source = 'Hello, <%= shift %>!';
+  open my $fh, '<', \$source or die "Cannot open template: $!";
+
+  my $compiled = Template::EmbeddedPerl->from_fh(
+      $fh,
+      source => 'memory/greeting.epl',
+  );
+  print $compiled->render('Ada');
+
+Use C<from_fh> when another trusted component supplies an already-open stream.
+It reads and closes the handle; pass C<source> so diagnostics name the original
+template rather than an anonymous input.
+
+=head2 How do I render a package DATA section?
+
+Put the template after C<__DATA__> in an installed module, then load it by
+package name:
+
+B<Fragment: MyApp/Email.pm>
+
+  package MyApp::Email;
+  1;
+  __DATA__
+  Hello, <%= shift %>!
+
+B<Fragment: application code>
+
+  my $compiled = Template::EmbeddedPerl->from_data('MyApp::Email');
+  my $text = $compiled->render('Ada');
+  # Hello, Ada!
+
+Use C<from_data> for a small template shipped with its Perl module. The module
+must be loadable, and C<from_data> restores its DATA handle after reading it so
+later calls can render the same source again.
+
+=head2 How do I reuse a compiled template?
+
+This complete program prints two greetings without recompiling the source:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new;
+  my $greeting = $engine->from_string('Hello, <%= shift %>!');
+
+  print $greeting->render('Ada'), "\n";
+  print $greeting->render('Grace'), "\n";
+
+  # Hello, Ada!
+  # Hello, Grace!
+
+Use a retained C<Template::EmbeddedPerl::Compiled> object for a template that
+is rendered repeatedly in the same process.
+
+=head2 How do I use the compile cache safely?
+
+This complete program can ask the engine for the same source repeatedly while
+reusing its cached compiled code:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(use_cache => 1);
+  my $first = $engine->from_string('Hello, <%= shift %>!');
+  my $second = $engine->from_string('Hello, <%= shift %>!');
+
+  print $first->render('Ada'), "\n";
+  print $second->render('Grace'), "\n";
+
+  # Hello, Ada!
+  # Hello, Grace!
+
+Use C<use_cache> for repeated C<from_string> or C<from_file> calls in a
+persistent process. It is not needed when the application already retains the
+compiled object, and a short-lived command gets little benefit from an
+in-memory cache.
+
+=head1 TEMPLATE INPUTS
+
+=head2 How do I require a named argument?
+
+This template accepts only a supplied C<name>:
+
+B<Fragment: greeting.epl>
+
+  % args $name
+  Hello, <%= $name %>!
+
+  $page->render(name => 'Ada');
+  # Hello, Ada!
+
+Use a required argument when a template cannot produce a meaningful result
+without that value. Omitting C<name> raises a missing-required-argument error.
+
+=head2 How do I give a named argument a scalar default?
+
+This template renders C<Hello, world!> when C<name> is absent:
+
+B<Fragment: greeting.epl>
+
+  % args $name = 'world'
+  Hello, <%= $name %>!
+
+  $page->render;
+  # Hello, world!
+
+Use a scalar default for a stable fallback that does not depend on other
+arguments.
+
+=head2 How do I calculate a default only when it is needed?
+
+The coderef runs only when C<heading> is absent:
+
+B<Fragment: page.epl>
+
+  % args $title = 'Contacts', $heading = sub { uc $title }
+  <h1><%= $heading %></h1>
+
+  $page->render;
+  # <h1>CONTACTS</h1>
+
+Use a lazy default for work that depends on already-bound arguments or calls an
+application helper. The Contacts example uses the same pattern for its
+C<display_heading> helper.
+
+=head2 How do I distinguish an absent argument from explicit undef?
+
+An explicit C<undef> is supplied, so it suppresses the lazy default:
+
+B<Fragment: page.epl>
+
+  % args $heading = sub { 'Contacts' }
+  <h1><%= $heading %></h1>
+
+  $page->render;
+  # <h1>Contacts</h1>
+
+  $page->render(heading => undef);
+  # <h1></h1>
+
+Use this distinction when callers need to request an intentionally empty value
+instead of accepting a computed fallback.
+
+=head2 How do I reject unknown named arguments?
+
+The declaration is the complete contract for this template:
+
+B<Fragment: greeting.epl>
+
+  % args $name, $punctuation = '!'
+  Hello, <%= $name %><%= $punctuation %>
+
+  $page->render(name => 'Ada', colour => 'blue');
+  # dies: Unknown template argument 'colour'
+
+Use C<args> on reusable pages, partials, and layouts to catch misspelled and
+unexpected inputs at their own template boundary.
+
+=head1 OUTPUT AND ESCAPING
+
+=head2 How do I enable automatic HTML escaping?
+
+This complete program prints escaped HTML:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(auto_escape => 1);
+  print $engine->from_string('<p><%= shift %></p>')->render('<Ada>');
+
+  # <p>&lt;Ada&gt;</p>
+
+Use C<auto_escape =E<gt> 1> for HTML templates. It escapes ordinary expression
+values, while rendered partials and layouts stay safe composition output and
+are not escaped a second time.
+
+=head2 How do I emit trusted raw HTML?
+
+Mark only reviewed, trusted markup as raw:
+
+B<Fragment: page.epl>
+
+  <main><%= raw $trusted_html %></main>
+
+  # with $trusted_html = '<strong>Contacts</strong>'
+  # <main><strong>Contacts</strong></main>
+
+Use C<raw> only after the application has established that a value is safe for
+the exact HTML context. It bypasses automatic escaping and is not a sanitizer.
+
+=head2 How do I pass a value that is already HTML-safe?
+
+The C<safe> helper escapes a value once and returns a safe-string object:
+
+B<Fragment: application code>
+
+  my $label = $engine->safe('<Ada>');
+  my $html = $engine->from_string('<p><%= shift %></p>')->render($label);
+  # <p>&lt;Ada&gt;</p>
+
+Use C<safe> when application code has escaped a value and needs to preserve that
+safety marker across later template expressions. Use C<safe_concat> to combine
+safe and ordinary fragments while escaping each ordinary fragment once.
+
+=head2 How do I escape a value for a URL component?
+
+Use C<url_encode> for one URL value, not an entire already-structured URL:
+
+B<Fragment: link.epl>
+
+  <a href="/search?q=<%= url_encode $query %>">Search</a>
+
+  # with $query = 'tea & cake'
+  # <a href="/search?q=tea%20%26%20cake">Search</a>
+
+Use this helper for query values or path components before placing them into a
+URL. Keep C<auto_escape> enabled too when the URL is inserted into HTML.
+
+=head2 How do I escape a JavaScript string value?
+
+Escape for JavaScript first, then mark that encoded string as raw so HTML
+escaping does not change its JavaScript escapes:
+
+B<Fragment: page.epl with auto_escape enabled>
+
+  <script>
+  const name = '<%= raw escape_javascript($name) %>';
+  </script>
+
+  # with $name = q{Ada's </script> record}
+  # const name = 'Ada\'s <\/script> record';
+
+Use C<escape_javascript> only for a value inside a JavaScript string literal.
+It is not a general JavaScript sanitizer; do not use it to make untrusted code
+safe to execute.
+
+=head2 How do I control expression flattening?
+
+By default, an expression returning a list is joined before output:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(auto_flatten_expr => 1);
+  print $engine->from_string('<%= map { uc } qw(a b c) %>')->render;
+
+  # ABC
+
+Use the default when a template expression intentionally produces several
+pieces of output. Set C<auto_flatten_expr =E<gt> 0> when expressions should
+retain normal scalar-context behavior instead.
+
+=head1 COMPOSITION
+
+=head2 How do I render a reusable partial?
+
+The Contacts page renders each item through the checked-in partial:
+
+B<Fragment: examples/contacts/untyped/templates/pages/contacts.epl>
+
+  % for my $contact (@$contacts) {
+  %= partial 'contacts/item', contact => $contact, root_title => $title, parent_title => $title
+  % }
+
+B<Fragment: examples/contacts/untyped/templates/contacts/item.epl>
+
+  % args $contact, $root_title, $parent_title
+  <li data-root="<%= $root_title %>" data-parent="<%= $parent_title %>"><strong><%= $contact->{name} %></strong> <%= $contact->{email} %></li>
+
+The result is a list item such as C<< <li ...><strong>&lt;Ada&gt;</strong> ... >>.
+Use a partial for an immediate reusable fragment with its own explicit C<args>
+contract; pass every value it needs instead of relying on caller lexicals.
+
+=head2 How do I wrap a page in one or more layouts?
+
+Register layouts in the page; the first declaration becomes the outermost
+wrapper:
+
+B<Fragment: page.epl>
+
+  % layout 'layouts/outer'
+  % layout 'layouts/inner'
+  body
+
+  # outer(inner(body))
+
+Use layouts for page shells shared by several pages. A layout is registered
+while the page renders, then applied after its body is available, so each
+layout has its own independent named argument contract.
+
+=head2 How do I place the page body in a layout?
+
+The layout below prints the body registered by its page:
+
+B<Fragment: layouts/application.epl>
+
+  % args $title
+  <title><%= $title %></title>
+  <body><%= yield %></body>
+
+  # a page body of <main>Contacts</main> becomes:
+  # <body><main>Contacts</main></body>
+
+Use body C<yield> for the primary page content. It returns a safe value, so
+composed page output does not get escaped a second time.
+
+=head2 How do I add named content to a layout slot?
+
+Capture a named block in the page and yield it from the layout:
+
+B<Fragment: page.epl>
+
+  % content_for head => sub { raw '<meta name="section" content="contacts">' }
+  <main>Contacts</main>
+
+B<Fragment: layouts/application.epl>
+
+  <head><%= yield 'head' %></head>
+  <body><%= yield %></body>
+
+  # <head><meta name="section" content="contacts"></head>
+
+Use C<content_for> to append slot output in render order. Use
+C<content_replace> to discard earlier content for a slot, and C<has_content>
+when a layout should render a slot only when it is nonempty.
+
+=head2 How do I give a typed wrapper view a body?
+
+Pass a final coderef to C<view>; its captured result becomes the wrapper's body:
+
+B<Fragment: caller template, with preamble => 'use v5.40;'>
+
+  %= view 'HTML::Panel', title => 'Contacts', sub ($panel) {
+  <main>Contacts</main>
+  % }
+
+B<Fragment: html/panel.epl>
+
+  <section class="panel">
+  <h1><%= $self->title %></h1>
+  <%= yield %>
+  </section>
+
+The result is a panel containing the C<main> body. Use a wrapper body when a
+typed view owns a structural boundary but its caller owns the inner content.
+This is advanced typed-view composition; see
+L<Template::EmbeddedPerl::Cookbook::TypedViews> for the object and factory
+setup.
+
+=head1 SYNTAX AND FORMATTING
+
+=head2 How do I use smart code and expression lines?
+
+With smart lines enabled, directive lines do not add blank output lines:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(smart_lines => 1);
+  print $engine->from_string("% my \$name = 'Ada'\n%= uc \$name\n")->render;
+
+  # ADA
+
+Use C<%> for code and C<%=> for an expression when template control flow is
+clearer one line at a time. A smart C<args> declaration must be the first
+executable directive.
+
+=head2 How do I trim an expression value?
+
+Add C<=> before the normal close marker to trim the expression itself:
+
+B<Fragment: template text>
+
+  <%= "  Contacts  " =%>
+
+  # Contacts
+
+Use expression-value trimming when a computed value carries unwanted leading
+or trailing whitespace but the surrounding template whitespace must remain.
+
+=head2 How do I trim following whitespace after a tag?
+
+Add C<-> before the close marker to remove whitespace through the following
+newline:
+
+B<Fragment: template text>
+
+  <% my $name = 'Ada'; -%>
+  <p><%= $name %></p>
+
+  # <p>Ada</p>
+
+Use this form for readable control blocks or response fragments that must not
+start with a blank line.
+
+=head2 How do I suppress one newline after a tag?
+
+Put a backslash immediately after the close marker:
+
+B<Fragment: template text>
+
+  <% my $name = 'Ada'; %>\
+  <p><%= $name %></p>
+
+  # <p>Ada</p>
+
+Use backslash newline suppression when only that newline should disappear.
+Write C<\\> when the output needs a literal trailing backslash.
+
+=head2 How do I write a literal template marker?
+
+Escape a marker with a backslash:
+
+B<Fragment: template text>
+
+  \% not a smart directive
+  \<% not Perl %>
+
+  # % not a smart directive
+  # <% not Perl %>
+
+Use this when documentation, generated templates, or plain text must show the
+engine's marker syntax literally.
+
+=head2 How do I choose custom markers?
+
+Configure all markers together when the default C<E<lt>%> syntax conflicts with
+the template language:
+
+B<Fragment: application setup>
+
+  my $engine = Template::EmbeddedPerl->new(
+      open_tag => '[[',
+      close_tag => ']]',
+      expr_marker => '?',
+      line_start => '++',
+      comment_mark => '//',
+      smart_lines => 1,
+  );
+
+  my $output = $engine->from_string(
+      "// hidden\n++ my \$name = 'Ada'\n[[? uc \$name ]]\n",
+  )->render;
+  # (a blank line)
+  # ADA
+
+Use custom markers before templates are written, and keep one consistent syntax
+per template directory.
+
+=head2 How do I interpolate variables in template text?
+
+Interpolation replaces simple variable expressions outside template tags:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(
+      interpolation => 1,
+      prepend => 'my ($name) = @_;',
+  );
+  print $engine->from_string('Hello, $name. Price: \$5.')->render('Ada');
+
+  # Hello, Ada. Price: $5.
+
+Use C<interpolation> for small text-oriented templates that benefit from inline
+variables. Escape a literal dollar sign as C<\$>; use normal expression tags
+when the interpolation would become complex.
+
+=head1 HELPERS AND CONFIGURATION
+
+=head2 How do I add an application helper?
+
+Helpers receive the engine first, then their template arguments:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(
+      helpers => {
+          display_heading => sub {
+              my ($engine, $text) = @_;
+              return uc $text;
+          },
+      },
+  );
+  print $engine->from_string('<h1><%= display_heading shift %></h1>')
+      ->render('Contacts');
+
+  # <h1>CONTACTS</h1>
+
+Use a helper for named application policy shared across templates. The Contacts
+application's C<display_heading> helper is a checked-in example.
+
+=head2 How do I override a default helper?
+
+An application helper with the same name overrides the default for that engine:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(
+      helpers => {
+          trim => sub {
+              my ($engine, $value) = @_;
+              return "[$value]";
+          },
+      },
+  );
+  print $engine->from_string('<%= trim "Ada" %>')->render;
+
+  # [Ada]
+
+Use an override sparingly when an application needs a consistent replacement
+for a default helper. Preserve the helper signature and avoid overriding
+C<raw>, C<safe>, or escaping helpers unless the security consequences are
+understood.
+
+=head2 How do I load a module or language feature for templates?
+
+C<preamble> runs before the generated template subroutine:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(
+      preamble => 'use v5.40;',
+  );
+  print $engine->from_string(
+      '<% sub greeting ($name) { "Hello, $name!" } %><%= greeting "Ada" %>',
+  )->render;
+
+  # Hello, Ada!
+
+Use C<preamble> for imports, pragmas, or language features required by several
+templates. Template diagnostics still report original template line numbers.
+
+=head2 How do I run setup for every render?
+
+C<prepend> runs inside each generated template subroutine after the render
+context has been removed from C<@_>:
+
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(
+      prepend => 'my ($name) = @_;',
+  );
+  print $engine->from_string('Hello, <%= $name %>!')->render('Ada');
+
+  # Hello, Ada!
+
+Use C<prepend> for local per-render setup such as binding positional render
+arguments. Prefer C<args> for public named template inputs.
+
+=head2 How do I find templates next to a package?
+
+Ask the engine for the directory that supplied a loaded package:
+
+B<Fragment: MyApp::Email has already been loaded>
+
+  my $directory = Template::EmbeddedPerl->directory_for_package('MyApp::Email');
+  my $engine = Template::EmbeddedPerl->new(
+      directories => [$directory],
+  );
+  my $message = $engine->from_file('welcome')->render(name => 'Ada');
+
+The expected result is C<welcome.epl> from the same directory as
+C<MyApp::Email>. Use this for package-owned templates instead of relying on the
+current working directory.
+
+=head1 TESTING AND TROUBLESHOOTING
+
+=head2 How do I test a compiled template with Test::Most?
+
+This complete C<t/greeting.t> test checks both compilation and rendering:
+
+  use Test::Most;
+  use Template::EmbeddedPerl;
+
+  my $compiled = Template::EmbeddedPerl->from_string('Hello, <%= shift %>!');
+  is($compiled->render('Ada'), 'Hello, Ada!', 'renders a greeting');
+
+  done_testing;
+
+Running C<prove -lv t/greeting.t> reports one passing test. Use a compiled
+template in tests when its source is important to the behavior under test.
+
+=head2 How do I assert exact escaped output?
+
+Test the complete output, including escaping, for a security-sensitive value:
+
+  use Test::Most;
+  use Template::EmbeddedPerl;
+
+  my $engine = Template::EmbeddedPerl->new(auto_escape => 1);
+  is(
+      $engine->from_string('<p><%= shift %></p>')->render('<Ada>'),
+      '<p>&lt;Ada&gt;</p>',
+      'escapes an HTML-looking name exactly once',
+  );
+
+  done_testing;
+
+This test passes only for the shown escaped result. Use exact assertions for
+HTML escaping and composition so a double-escape regression is visible.
+
+=head2 How do I test a partial or layout in isolation?
+
+Give a narrow engine only the fixture directory and render a page that calls
+the target:
+
+B<Fragment: t/partial.t>
+
+  my $engine = Template::EmbeddedPerl->new(
+      directories => ['t/templates/composition'],
+      smart_lines => 1,
+      auto_escape => 1,
+  );
+  my $page = $engine->from_string(<<'EPL');
+  <ul>
+  %= partial 'contacts/item', contact => {name => '<Jane>'}
+  </ul>
+  EPL
+
+  is($page->render, "<ul>\n<li>&lt;Jane&gt;</li>\n</ul>\n");
+
+The expected result isolates the partial's argument contract and escaping. Use
+the same approach for layouts, supplying a minimal page body and then asserting
+the wrapper. The checked-in C<t/partial.t> and C<t/layout.t> are runnable
+examples of both forms.
+
+=head2 How do I give string and filehandle templates useful source labels?
+
+Pass C<source> whenever the input has a meaningful origin:
+
+B<Fragment: application code>
+
+  my $compiled = $engine->from_string(
+      "first\n<%= \$missing %>\n",
+      source => 'emails/welcome.epl',
+  );
+
+  my $from_fh = $engine->from_fh(
+      $fh,
+      source => 'emails/password-reset.epl',
+  );
+
+A compile error in the first template reports C<emails/welcome.epl line 2>.
+Use labels for generated, database-backed, and streamed templates so errors
+identify the actual source and template line.
+
+=head2 How do I read a compile diagnostic and render stack?
+
+An error has a source name, a template line, and nearby source context. Errors
+that cross partial, layout, or typed-view composition also end with a render
+stack:
+
+B<Fragment: error handling around a composed page>
+
+  my $error = eval { $engine->from_file('pages/contacts')->render; '' } || $@;
+  warn $error;
+
+  # ... at /srv/contacts/templates/contacts/item.epl line 2
+  # Render stack:
+  #   root pages/contacts (/srv/contacts/templates/pages/contacts.epl)
+  #   partial contacts/item (/srv/contacts/templates/contacts/item.epl)
+
+Use the source and line to repair the local template first, then read the stack
+from top to bottom to see which parent rendered it. Give string templates a
+C<source> label so they provide the same diagnostic value as files.
+
+=head2 How do I inspect the generated Perl?
+
+Set the debug environment variable for a one-off run:
+
+  DEBUG_TEMPLATE_EMBEDDED_PERL=1 perl script.pl
+
+The engine writes a C<Compiled: ...> representation of the generated Perl to
+standard error before evaluation. Use this only to investigate difficult
+compilation problems, then disable it; generated code is an implementation
+detail rather than an application interface.
+
+=head1 SEE ALSO
+
+L<Template::EmbeddedPerl>, L<Template::EmbeddedPerl::Tutorial>, and
+L<Template::EmbeddedPerl::Cookbook::TypedViews>.
+
+=cut

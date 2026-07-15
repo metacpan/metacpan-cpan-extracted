@@ -2,7 +2,7 @@
 #
 # 9012_cheatsheet_ar.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # دليل مرجعي سريع لـ Jacode4e (العربية)
 # يعمل هذا الاختبار أيضاً كمرجع سريع للمستخدمين الناطقين بالعربية.
@@ -37,6 +37,9 @@
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930 (CP00290+CP00300، CCSID 5026 كاتاكانا)
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83

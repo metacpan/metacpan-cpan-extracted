@@ -1,0 +1,270 @@
+# Syntax file for freebasic
+# Converted from: freebasic.vim
+# Conversion date: 2026-07-13
+
+language: freebasic
+extensions: freebasic
+
+[keyword:Boolean]
+FALSE TRUE
+
+[keyword:Conditional]
+ELSE ELSEIF IF IIF THEN WITH __IIF __WITH
+
+[keyword:Debug]
+ASSERT ASSERTWARN STOP __ASSERT __ASSERTWARN
+
+[keyword:Function]
+ABS ABSTRACT ACOS ADD ALIAS ALLOCATE ALPHA ANY ASIN ATAN2 ATN BLOAD BSAVE
+BYREF BYVAL CALL CALLOCATE CDECL CIRCLE CLEAR CLS COLOR CONSTRUCTOR COS CUSTOM
+CVA_ARG CVA_COPY CVA_END CVA_LIST CVA_START DEALLOCATE DECLARE DESTRUCTOR DRAW
+EXP FB_MEMCOPY FB_MEMCOPYCLEAR FB_MEMMOVE FIELD FIX FLIP FRAC FRE FUNCTION GET
+IMAGECONVERTROW IMAGECREATE IMAGEDESTROY IMAGEINFO INT LIB LINE LOG MOD NAKED
+OPERATOR OVERLOAD OVERRIDE PAINT PALETTE PASCAL PCOPY PEEK PMAP POINT
+POINTCOORD POKE PRESET PROPERTY PSET PUT RANDOMIZE REALLOCATE RGB RGBA RND
+SADD SCREEN SCREENCONTROL SCREENCOPY SCREENEVENT SCREENGLPROC SCREENINFO
+SCREENLIST SCREENLOCK SCREENPTR SCREENRES SCREENSET SCREENSYNC SCREENUNLOCK
+SGN SIN SQR STATIC STDCALL SUB SWAP TAN TRANS VA_ARG VA_FIRST VA_NEXT VIRTUAL
+WINDOW WINDOWTITLE __ACOS __ALLOCATE __ASIN __ATAN2 __CALLOCATE __CVA_ARG
+__CVA_COPY __CVA_END __CVA_LIST __CVA_START __DEALLOCATE __FLIP
+__IMAGECONVERTROW __IMAGECREATE __IMAGEDESTROY __IMAGEINFO __POINTCOORD
+__REALLOCATE __RGB __RGBA __SCREENCONTROL __SCREENCOPY __SCREENEVENT
+__SCREENGLPROC __SCREENINFO __SCREENLIST __SCREENLOCK __SCREENPTR __SCREENRES
+__SCREENSET __SCREENSYNC __SCREENUNLOCK __THISCALL __VA_ARG __VA_FIRST
+__VA_NEXT __WINDOWTITLE
+
+[keyword:Operator]
+BIT BITRESET BITSET HIBYTE HIWORD LOBYTE LOWORD PROCPTR STRPTR VARPTR __BIT
+__BITRESET __BITSET __HIBYTE __HIWORD __LOBYTE __LOWORD __PROCPTR
+
+[keyword:PreCondit]
+DEFBYTE DEFDBL DEFINT DEFLNG DEFLONGINT DEFSHORT DEFSNG DEFSTR DEFUBYTE
+DEFUILONGINT DEFUINT DEFUSHORT __DEFBYTE __DEFLONGINT __DEFSHORT __DEFUBYTE
+__DEFUINT __DEFULONGINT __DEFUSHORT
+
+[keyword:PreProc]
+DEFINED __DATE_ISO__ __DATE__ __FB_64BIT__ __FB_ARGC__ __FB_ARGV__
+__FB_ARG_COUNT__ __FB_ARG_EXTRACT__ __FB_ARG_LEFTOF__ __FB_ARG_RIGHTOF__
+__FB_ARM__ __FB_ASM__ __FB_BACKEND__ __FB_BIGENDIAN__ __FB_BUILD_DATE_ISO__
+__FB_BUILD_DATE__ __FB_BUILD_SHA1__ __FB_CYGWIN__ __FB_DARWIN__ __FB_DEBUG__
+__FB_DOS__ __FB_ERR__ __FB_EVAL__ __FB_FPMODE__ __FB_FPU__ __FB_FREEBSD__
+__FB_GCC__ __FB_GUI__ __FB_IIF__ __FB_JOIN__ __FB_LANG__ __FB_LINUX__
+__FB_MAIN__ __FB_MIN_VERSION__ __FB_MT__ __FB_NETBSD__ __FB_OPENBSD__
+__FB_OPTIMIZE__ __FB_OPTION_BYVAL__ __FB_OPTION_DYNAMIC__ __FB_OPTION_ESCAPE__
+__FB_OPTION_EXPLICIT__ __FB_OPTION_GOSUB__ __FB_OPTION_PRIVATE__
+__FB_OUT_DLL__ __FB_OUT_EXE__ __FB_OUT_LIB__ __FB_OUT_OBJ__ __FB_PCOS__
+__FB_PPC__ __FB_QUERY_SYMBOL__ __FB_QUOTE__ __FB_SIGNATURE__ __FB_SSE__
+__FB_UNIQUEID_POP__ __FB_UNIQUEID_PUSH__ __FB_UNIQUEID__ __FB_UNIX__
+__FB_UNQUOTE__ __FB_VECTORIZE__ __FB_VERSION__ __FB_VER_MAJOR__
+__FB_VER_MINOR__ __FB_VER_PATCH__ __FB_WIN32__ __FB_X86__ __FB_XBOX__
+__FILE_NQ__ __FILE__ __FUNCTION_NQ__ __FUNCTION__ __LINE__ __PATH__ __TIME__
+
+[keyword:Repeat]
+CONTINUE DO FOR LOOP NEXT STEP UNTIL WEND WHILE __CONTINUE
+
+[keyword:Special]
+ACCESS APPEND ASM BEEP BINARY CHAIN CHDIR CLOSE CLS COMMON CONDBROADCAST
+CONDCREATE CONDDESTROY CONDSIGNAL CONDWAIT CSRLIN CURDIR DATA DIR DYLIBFREE
+DYLIBLOAD DYLIBSYMBOL ENCODING EOF ERFN ERL ERMN ERR ERROR EXEC EXEPATH EXPORT
+EXTERN FILEATTR FILECOPY FILEDATETIME FILEEXISTS FILEFLUSH FILELEN FILESETEOF
+FREEFILE IMPORT INP INPUT ISREDIRECTED KILL LET LOC LOCATE LOCK LOF LPOS
+LPRINT MKDIR MUTEXCREATE MUTEXDESTROY MUTEXLOCK MUTEXUNLOCK NAME NAMESPACE
+OFFSETOF OUT OUTPUT POS PRINT PRIVATE PROTECTED PUBLIC RANDOM READ RESET
+RESTORE RMDIR RUN SEEK SETENVIRON SHELL SPC SYSTEM TAB THREADCALL THREADCREATE
+THREADDETACH THREADSELF THREADWAIT TO UNLOCK USING VIEW WAIT WIDTH WINPUT
+WRITE _ __ASM __CURDIR __DIR __DYLIBFREE __DYLIBLOAD __DYLIBSYMBOL __ENCODING
+__ERFN __ERMN __EXEC __EXEPATH __EXPORT __IMPORT __OFFSETOF
+
+[keyword:Statement]
+EXIT GETJOYSTICK GETKEY GETMOUSE GOSUB GOTO INKEY INPUT MULTIKEY RETURN SCOPE
+SETMOUSE SLEEP STICK STRIG __GETJOYSTICK __GETKEY __GETMOUSE __MULTIKEY
+__SETMOUSE __SLEEP
+
+[keyword:StorageClass]
+ARRAYLEN ARRAYSIZE ArrayConstDescriptorPtr ArrayDescriptorPtr ERASE FBARRAY
+LBOUND PRESERVE REDIM UBOUND
+
+[keyword:String]
+ASC CVD CVI CVL CVLONGINT CVS CVSHORT FORMAT INSTR INSTRREV LEN LSET RSET VAL
+VALINT VALLNG VALUINT VALULNG WBIN WCHR WHEX WOCT WSPACE WSTR __CVLONGINT
+__CVSHORT __INSTRREV __MKLONGINT __MKSHORT __TRIM __VALINT __VALLNG __VALUINT
+__VALULNG __WBIN __WCHR __WHEX __WOCT __WSPACE __WSTR
+
+[keyword:Todo]
+FIXME NOTE TODO XXX
+
+[keyword:Type]
+AS BASE BOOLEAN BYTE CAST CBOOL CBYTE CDBL CINT CLASS CLNG CLNGINT CONST CPTR
+CSHORT CSIGN CSNG CUBYTE CUINT CULNG CULNGINT CUNSG CUSHORT DATE DATEADD
+DATEDIFF DATEPART DATESERIAL DATEVALUE DAY DIM DOUBLE ENUM EXPLICIT EXTENDS
+HOUR IMPLEMENTS INTEGER ISDATE LONG LONGINT MINUTE MONTH MONTHNAME NOW OBJECT
+POINTER PTR SECOND SETDATE SETTIME SHARED SHORT SINGLE SIZEOF THIS TIME TIMER
+TIMESERIAL TIMEVALUE TYPE TYPEOF UBYTE UINTEGER ULONG ULONGINT UNION UNSIGNED
+USHORT VAR WEEKDAY WEEKDAYNAME YEAR ZSTRING __BOOLEAN __BYTE __CAST __CBOOL
+__CBYTE __CLNGINT __CPTR __CSHORT __CSIGN __CUINT __CULNG __CULNGINT __CUNSG
+__CUSHORT __CYBTE __EXPLICIT __EXTENDS __IMPLEMENTS __LONGINT __OBJECT
+__POINTER __PTR __SHORT __SIZEOF __TYPEOF __UBYTE __UINTEGER __ULONG
+__ULONGINT __UNION __UNSIGNED __USHORT __ZSTRING
+
+[match:Identifier]
+pattern: \b[a-zA-Z_]\w*\b
+
+[match:Special]
+pattern: \bend\s+__asm\b
+
+[match:Special]
+pattern: \bend\s+asm\b
+
+[match:Statement]
+pattern: \bend\b
+
+[match:Statement]
+pattern: \bend\s+scope\b
+
+[match:Conditional]
+pattern: \bend\s+__with\b
+
+[match:Conditional]
+pattern: \bend\s+with\b
+
+[match:Conditional]
+pattern: \bend\s+if\b
+
+[match:Conditional]
+pattern: \bselect\s+case\b
+
+[match:Conditional]
+pattern: \bcase\b
+
+[match:Conditional]
+pattern: \bcase\s+is\b
+
+[match:Conditional]
+pattern: \bend\s+select\b
+
+[match:Type]
+pattern: \bstring\b
+
+[match:Type]
+pattern: \bend\s+enum\b
+
+[match:Type]
+pattern: \bend\s+type\b
+
+[match:Type]
+pattern: \b__WSTRING\b
+
+[match:Type]
+pattern: \bend\s+__union\b
+
+[match:Type]
+pattern: \bWSTRING\b
+
+[match:Type]
+pattern: \bend\s+union\b
+
+[match:Special]
+pattern: \bon\s+error\b
+
+[match:Special]
+pattern: \bget\s+#\b
+
+[match:Special]
+pattern: \binput\s+#\b
+
+[match:Special]
+pattern: \bline\s+input\s+#\b
+
+[match:Special]
+pattern: \bput\s+#\b
+
+[match:Special]
+pattern: \bopen\b
+
+[match:Function]
+pattern: \bend\s+function\b
+
+[match:Function]
+pattern: \bend\s+sub\b
+
+[match:Function]
+pattern: \bend\s+constructor\b
+
+[match:Function]
+pattern: \bend\s+destructor\b
+
+[match:Function]
+pattern: \bend\s+operator\b
+
+[match:Function]
+pattern: \bend\s+property\b
+
+[match:Function]
+pattern: \bpalette\s+get\b
+
+[match:Special]
+pattern: \bend\s+extern\b
+
+[match:Special]
+pattern: \bend\s+namespace\b
+
+[match:Special]
+pattern: #\d+
+
+[match:Special]
+pattern: #[a-zA-Z][[:alpha:].]*[%&!#]?
+
+[match:PreProc]
+pattern: #\s*assert\b
+
+[match:PreProc]
+pattern: #\s*cmdline\b
+
+[match:PreProc]
+pattern: #\s*error\b
+
+[match:PreProc]
+pattern: #\s*lang\b
+
+[match:PreProc]
+pattern: #\s*line\b
+
+[match:String]
+pattern: \bspace\$
+
+[match:String]
+pattern: \bchr\$
+
+[match:String]
+pattern: \bspace\b\$?
+
+[match:String]
+pattern: \bchr\b\$?
+
+[match:String]
+pattern: \btrim\b\$?
+
+[match:Statement]
+pattern: \bline\s+input\b
+
+[match:Operator]
+pattern: =>?|[-+&/\\*^]=
+
+[match:Operator]
+pattern: [-+&/\\*^]
+
+[match:Operator]
+pattern: =|<>|<=|<|>=|>
+
+[match:Error]
+pattern: &h\w*\b
+
+[match:Error]
+pattern: &o\w*\b
+
+[match:Error]
+pattern: &b\w*\b
+
+[match:Float]
+pattern: \b\d+[f!#]
+

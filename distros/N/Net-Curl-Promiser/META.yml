@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
-  Test::Class::Tiny: '0'
+  Test::Class::Tiny: '0.03'
   Test::Deep: '1.120'
   Test::FailWarnings: '0'
   Test::Fatal: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Net-Curl-Promiser/issues
   repository: git://github.com/FGasper/p5-Net-Curl-Promiser.git
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

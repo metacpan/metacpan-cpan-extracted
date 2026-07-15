@@ -2,7 +2,7 @@
 #
 # KEIS90_by_SJIS.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # Appendix E Handling of character codes in PDE - Form Designer (applies only to distributed type PDE)

@@ -8,7 +8,7 @@ B<OpenSearch::Client::Core::3_0::Manual::Paths>
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 DESCRIPTION
 

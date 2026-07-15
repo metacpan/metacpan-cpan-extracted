@@ -1,5 +1,21 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001016 14 July 2026
+          - Add smart lines and declarative named template arguments.
+          - Add scalar and lazy argument defaults with improved argument
+            validation and source-mapped diagnostics.
+          - Add partials, layouts, default and named content blocks, and
+            experimental typed views with wrapper-view composition.
+          - Add ordered template and view-template lookup, conventional typed
+            view resolution, and customizable view construction.
+          - Preserve accurate template names, line numbers, source excerpts,
+            and render stacks across comments, smart lines, and nested renders.
+          - Fix newline trimming and plain-text escaping regressions.
+          - Add installed tutorial and cookbook POD with runnable untyped and
+            typed Contacts examples.
+          - Exclude internal documentation and example namespaces from CPAN
+            indexing while retaining the public POD and examples in releases.
+
 0.001015 07 December 2025
           - fixed bug when > or < appeared in a multiline <% .. %> block
 

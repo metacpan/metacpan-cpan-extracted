@@ -2,7 +2,7 @@
 #
 # 0011_option_input_layout_test.t
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;

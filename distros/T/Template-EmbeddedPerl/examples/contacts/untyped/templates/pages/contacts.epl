@@ -1,0 +1,16 @@
+% args $contacts, $title = 'Contacts', $heading = sub { display_heading($title) }
+% layout 'layouts/application', title => $title
+%= content_replace 'head', sub {
+<meta name="section" content="contacts">
+% }
+<section class="page">
+<main>
+<h1><%= $heading %></h1>
+<p class="badge"><%= scalar @$contacts %> contacts</p>
+<ul>
+% for my $contact (@$contacts) {
+%= partial 'contacts/item', contact => $contact, root_title => $title, parent_title => $title
+% }
+</ul>
+</main>
+</section>

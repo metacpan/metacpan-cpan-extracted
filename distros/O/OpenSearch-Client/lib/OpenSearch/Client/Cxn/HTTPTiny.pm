@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Cxn::HTTPTiny;
-$OpenSearch::Client::Cxn::HTTPTiny::VERSION = '3.007008';
+$OpenSearch::Client::Cxn::HTTPTiny::VERSION = '3.007009';
 use Moo;
 with 'OpenSearch::Client::Role::Cxn', 'OpenSearch::Client::Role::Is_Sync';
 
@@ -110,7 +110,7 @@ OpenSearch::Client::Cxn::HTTPTiny - A Cxn implementation which uses HTTP::Tiny
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 DESCRIPTION
 

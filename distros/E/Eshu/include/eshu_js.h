@@ -393,4 +393,184 @@ static char * eshu_indent_js(const char *src, size_t src_len,
 	return result;
 }
 
+
+#include "eshu_hl_util.h"
+
+/* ══════════════════════════════════════════════════════════════════
+ *  JavaScript keyword list
+ * ══════════════════════════════════════════════════════════════════ */
+
+static const char * const eshu_hl_js_kw[] = {
+    "async", "await",
+    "break",
+    "case", "catch", "class", "const", "continue",
+    "debugger", "default", "delete", "do",
+    "else", "export", "extends",
+    "false", "finally", "for", "function",
+    "get",
+    "if", "import", "in", "instanceof",
+    "let",
+    "new", "null",
+    "of",
+    "return",
+    "set", "static", "super", "switch",
+    "this", "throw", "true", "try", "typeof",
+    "undefined",
+    "var", "void",
+    "while", "with",
+    "yield",
+    /* built-ins often treated as keywords */
+    "Infinity", "NaN",
+    NULL
+};
+
+/* ══════════════════════════════════════════════════════════════════
+ *  JavaScript highlighter
+ * ══════════════════════════════════════════════════════════════════ */
+
+static char *eshu_highlight_js(const char *src, size_t src_len, size_t *out_len) {
+    eshu_buf_t out;
+    const char *p     = src;
+    const char *end   = src + src_len;
+    const char *plain = p;
+    int last_val      = 0;
+    int tmpl_depth    = 0; /* template literal nesting */
+
+    eshu_buf_init(&out, src_len * 2 + 64);
+
+#define JS_SPAN(cls, ts, te) do { \
+    eshu_hl_flush(&out, plain, (ts)); \
+    eshu_hl_span(&out, (cls), (ts), (te)); \
+    p = (te); plain = p; \
+} while(0)
+
+    while (p < end) {
+        char c = *p;
+
+        /* line comment */
+        if (c == '/' && p + 1 < end && *(p + 1) == '/') {
+            const char *ts = p; p += 2;
+            while (p < end && *p != '\n') p++;
+            JS_SPAN("esh-c", ts, p);
+            last_val = 0; continue;
+        }
+
+        /* block comment */
+        if (c == '/' && p + 1 < end && *(p + 1) == '*') {
+            const char *ts = p; p += 2;
+            while (p + 1 < end && !(*p == '*' && *(p + 1) == '/')) p++;
+            if (p + 1 < end) p += 2;
+            JS_SPAN("esh-c", ts, p);
+            last_val = 0; continue;
+        }
+
+        /* template literal */
+        if (c == '`') {
+            const char *ts = p++;
+            tmpl_depth++;
+            while (p < end) {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                if (*p == '`') { p++; tmpl_depth--; break; }
+                /* ${...} we skip without sub-highlighting for now */
+                p++;
+            }
+            JS_SPAN("esh-s", ts, p);
+            last_val = 1; continue;
+        }
+
+        /* string */
+        if (c == '"' || c == '\'') {
+            const char *ts = p++;
+            while (p < end && *p != c) {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                if (*p == '\n') break;
+                p++;
+            }
+            if (p < end && *p == c) p++;
+            JS_SPAN("esh-s", ts, p);
+            last_val = 1; continue;
+        }
+
+        /* regex: / not preceded by rvalue and not // */
+        if (c == '/' && !last_val &&
+            !(p + 1 < end && *(p + 1) == '/') &&
+            !(p + 1 < end && *(p + 1) == '*')) {
+            const char *ts = p++;
+            int in_class = 0;
+            while (p < end) {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                if (*p == '[') { in_class = 1; p++; continue; }
+                if (*p == ']') { in_class = 0; p++; continue; }
+                if (!in_class && *p == '/') { p++; break; }
+                if (*p == '\n') { p = ts + 1; goto js_not_regex; }
+                p++;
+            }
+            while (p < end && isalpha((unsigned char)*p)) p++;
+            JS_SPAN("esh-r", ts, p);
+            last_val = 1; continue;
+        js_not_regex:;
+        }
+
+        /* number */
+        if (isdigit((unsigned char)c) ||
+            (c == '.' && p + 1 < end && isdigit((unsigned char)*(p + 1)))) {
+            const char *ts = p;
+            if (c == '0' && p + 1 < end && (*(p + 1) == 'x' || *(p + 1) == 'X')) {
+                p += 2; while (p < end && isxdigit((unsigned char)*p)) p++;
+            } else if (c == '0' && p + 1 < end && (*(p + 1) == 'b' || *(p + 1) == 'B')) {
+                p += 2; while (p < end && (*p == '0' || *p == '1')) p++;
+            } else if (c == '0' && p + 1 < end && (*(p + 1) == 'o' || *(p + 1) == 'O')) {
+                p += 2; while (p < end && *p >= '0' && *p <= '7') p++;
+            } else {
+                while (p < end && (isdigit((unsigned char)*p) || *p == '_')) p++;
+                if (p < end && *p == '.') {
+                    p++; while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+                if (p < end && (*p == 'e' || *p == 'E')) {
+                    p++; if (p < end && (*p == '+' || *p == '-')) p++;
+                    while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+            }
+            /* bigint suffix */
+            if (p < end && *p == 'n') p++;
+            JS_SPAN("esh-n", ts, p);
+            last_val = 1; continue;
+        }
+
+        /* identifier or keyword */
+        if (eshu_hl_isalpha_(c)) {
+            const char *ts = p;
+            while (p < end && eshu_hl_isalnum_(*p)) p++;
+            eshu_hl_flush(&out, plain, ts);
+            plain = p;
+            size_t ilen = (size_t)(p - ts);
+            if (eshu_hl_kw(ts, ilen, eshu_hl_js_kw)) {
+                eshu_hl_span(&out, "esh-k", ts, p);
+                last_val = 0;
+            } else {
+                eshu_hl_write_html(&out, ts, ilen);
+                last_val = 1;
+            }
+            continue;
+        }
+
+        /* rvalue context tracking */
+        if (c == ')' || c == ']') last_val = 1;
+        else if (c == '(' || c == '[' || c == ',' || c == ';' ||
+                 c == '=' || c == '!' || c == ':' || c == '?' ||
+                 c == '{' || c == '&' || c == '|' || c == '^' ||
+                 c == '+' || c == '-' || c == '*' || c == '<' || c == '>')
+            last_val = 0;
+        if (c == '\n') last_val = 0;
+        p++;
+    }
+
+    eshu_hl_flush(&out, plain, end);
+    eshu_buf_putc(&out, '\0');
+    *out_len = out.len - 1;
+    return out.data;
+
+#undef JS_SPAN
+}
+
 #endif /* ESHU_JS_H */

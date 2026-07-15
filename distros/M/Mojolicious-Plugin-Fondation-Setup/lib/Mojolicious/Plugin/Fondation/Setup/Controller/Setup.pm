@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Fondation::Setup::Controller::Setup;
-$Mojolicious::Plugin::Fondation::Setup::Controller::Setup::VERSION = '0.04';
-# ABSTRACT: Setup wizard controller — plugin selection, workflow wizard, and .conf generation
+$Mojolicious::Plugin::Fondation::Setup::Controller::Setup::VERSION = '0.10';
+# ABSTRACT: Session-based setup wizard — no Workflow, no file persister
 
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 use version;
@@ -8,390 +8,349 @@ use version;
 use Mojo::File 'path';
 use Mojo::Loader;
 use Mojo::Util qw(encode);
-use YAML::XS qw(Dump);
-use Workflow::Factory;
 use Mojolicious::Plugin::Fondation::Setup::MetaCPAN;
 
-# ──────────────────────────────────────────────────────────────────────
-# GET /setup/plugins — plugin selection page
-# ──────────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════
+# Session keys used by this controller:
+#
+#   setup_plugins       => [$class, ...]        selected plugin classes
+#   setup_index         => $int                 current wizard step
+#   setup_context       => {$key => $val, ...}  accumulated form values
+#   setup_states        => [{label, plugin, params}, ...]
+#   setup_not_installed => [$class, ...]
+#   setup_retry         => [$class, ...]        previous selection for retry
+#
+# Wizard indexes:
+#   0 .. $#states   → form for that plugin
+#   @states         → review
+#   @states + 1     → done
+# ══════════════════════════════════════════════════════════════════════
+
+# ── GET /setup/plugins ──────────────────────────────────────────────
 
 sub plugins ($self) {
     $self->render_later;
 
-    # Read existing conf file to pre-select already configured plugins
-    my %already_selected;
-    my $moniker   = $self->app->moniker;
-    my $conf_path = $self->app->home->child("$moniker.conf");
-    if (-f $conf_path) {
-        my $conf = do($conf_path->to_string);
-        if ($conf && $conf->{Fondation} && $conf->{Fondation}{dependencies}) {
-            for my $dep (@{$conf->{Fondation}{dependencies}}) {
-                my $name = ref $dep ? (keys %$dep)[0] : $dep;
-                $name = "Mojolicious::Plugin::$name" unless $name =~ /^Mojolicious::/;
-                $already_selected{$name} = 1;
-            }
-        }
-    }
+    my %preselected = $self->_read_conf_plugins;
+    $preselected{$_} = 1 for @{ $self->session('setup_retry') // [] };
 
-    # Pre-select plugins passed via ?selected= from the retry link
-    if (my $sel = $self->param('selected')) {
-        $already_selected{$_} = 1 for split /,/, $sel;
-    }
-
-    my $mc = Mojolicious::Plugin::Fondation::Setup::MetaCPAN->new;
-    $mc->discover_p($self->app)->then(sub ($plugins) {
-        # Merge locally-developed plugins. Local version + CPAN metadata.
-        my $dev = $self->_discover_dev_plugins;
-        my %dev_by_class = map { $_->{module_class} => $_ } @$dev;
-        for my $p (@$plugins) {
-            $p->{is_dev} = 0;
-            $p->{cpan_version} = $p->{version};
-            if (my $d = $dev_by_class{$p->{module_class}}) {
-                # Local wins for version/installed, keep CPAN metadata
-                $p->{is_dev}            = 1;
-                $p->{installed}         = 1;
-                $p->{installed_version} = $d->{installed_version};
-            }
-            # Compare installed vs CPAN versions
-            $p->{upgrade_available} = 0;
-            $p->{release_pending}   = 0;
-            if ($p->{installed_version} && $p->{version}) {
-                my $local = version->parse($p->{installed_version});
-                my $cpan  = version->parse($p->{version});
-                $p->{upgrade_available} = 1 if $cpan  > $local;
-                $p->{release_pending}   = 1 if $local > $cpan;
-            }
-        }
-        # Add dev-only plugins not on MetaCPAN
-        my %seen_cpan = map { $_->{module_class} => 1 } @$plugins;
-        for my $d (@$dev) {
-            next if $seen_cpan{$d->{module_class}};
-            push @$plugins, $d;
-        }
-        $self->stash(plugins => $plugins, already_selected => \%already_selected);
+    $self->_discover(sub ($plugins) {
+        $_->{badges} = $self->_badges_for($_) for @$plugins;
+        $self->stash(plugins => $plugins, preselected => \%preselected);
         $self->render(template => 'setup/plugins');
-    })->catch(sub ($err) {
-        # MetaCPAN failed — still show local plugins if available
-        my $dev = $self->_discover_dev_plugins;
-        if (@$dev) {
-            $_->{is_dev} = 1 for @$dev;
-            $self->stash(plugins => $dev, already_selected => \%already_selected);
-            $self->render(template => 'setup/plugins');
-        } else {
-            $self->stash(error => "Failed to fetch plugins: $err", already_selected => \%already_selected);
-            $self->render(template => 'setup/plugins');
-        }
     });
 }
 
-# ──────────────────────────────────────────────────────────────────────
-# GET /setup/discover — async API: fetch plugin list from MetaCPAN
-# ──────────────────────────────────────────────────────────────────────
+# ── GET /setup/discover (JSON API) ───────────────────────────────────
 
 sub discover ($self) {
     $self->render_later;
-    my $mc = Mojolicious::Plugin::Fondation::Setup::MetaCPAN->new;
-    $mc->discover_p($self->app)->then(sub ($plugins) {
-        my $dev = $self->_discover_dev_plugins;
-        my %dev_by_class = map { $_->{module_class} => $_ } @$dev;
-        for my $p (@$plugins) {
-            $p->{is_dev} = 0;
-            $p->{cpan_version} = $p->{version};
-            if (my $d = $dev_by_class{$p->{module_class}}) {
-                $p->{is_dev}            = 1;
-                $p->{installed}         = 1;
-                $p->{installed_version} = $d->{installed_version};
-            }
-            $p->{upgrade_available} = 0;
-            $p->{release_pending}   = 0;
-            if ($p->{installed_version} && $p->{version}) {
-                my $local = version->parse($p->{installed_version});
-                my $cpan  = version->parse($p->{version});
-                $p->{upgrade_available} = 1 if $cpan  > $local;
-                $p->{release_pending}   = 1 if $local > $cpan;
-            }
-        }
-        my %seen_cpan = map { $_->{module_class} => 1 } @$plugins;
-        for my $d (@$dev) {
-            next if $seen_cpan{$d->{module_class}};
-            push @$plugins, $d;
-        }
+    $self->_discover(sub ($plugins) {
+        $_->{badges} = $self->_badges_for($_) for @$plugins;
         $self->render(json => { plugins => $plugins });
-    })->catch(sub ($err) {
-        my $dev = $self->_discover_dev_plugins;
-        if (@$dev) {
-            $_->{is_dev} = 1 for @$dev;
-            $self->render(json => { plugins => $dev });
-        } else {
-            $self->render(json => { error => "$err" }, status => 500);
-        }
     });
 }
 
-# ──────────────────────────────────────────────────────────────────────
-# POST /setup/start — build workflow from selected plugins and redirect to wizard
-# ──────────────────────────────────────────────────────────────────────
+# ── POST /setup/start ───────────────────────────────────────────────
 
 sub start ($self) {
     my @selected = @{ $self->every_param('selected_plugins') // [] };
     return $self->reply->not_found unless @selected;
 
-    # Separate installed from not-yet-installed plugins.
-    # Only installed plugins can have their fondation_meta loaded.
+    # Separate installed from not-installed
     my (@installed, @not_installed);
-    my %installed_versions;
     for my $class (@selected) {
-        my $pm = $class =~ s{::}{/}gr . '.pm';
-        if ($INC{$pm} || eval "require $class; 1") {
+        if ($self->_try_load($class)) {
             push @installed, $class;
-            my $ver = eval { $class->VERSION } // 'unknown';
-            $installed_versions{$class} = $ver;
-        } elsif ($self->_is_dev_plugin($class)) {
-            # Plugin is in dev_plugins_dir but not in @INC.
-            # Add its lib/ to @INC so that its own use/require statements work,
-            # then load it so fondation_meta is available.
-            my $dev_dir = $self->_dev_plugins_dir;
-            (my $rel = "$pm") =~ s{::}{/}g;
-            my @found = glob("$dev_dir/Mojolicious-Plugin-Fondation-*/lib/$rel");
-            if (@found && -f $found[0]) {
-                # The lib/ dir is two levels up from the .pm file
-                # e.g. .../Mojolicious-Plugin-Fondation-Model-DBIx-Async/lib/
-                my $lib_dir = $found[0];
-                $lib_dir =~ s{/lib/.*}{/lib};
-                unshift @INC, $lib_dir if -d $lib_dir;
-                eval { require "$found[0]"; 1 };
-                if (!$@) {
-                    push @installed, $class;
-                    my $ver = eval { $class->VERSION } // 'unknown';
-                    $installed_versions{$class} = $ver;
-                    next;
-                }
-            }
-            push @not_installed, $class;
         } else {
             push @not_installed, $class;
         }
     }
 
-    # Collect setup parameters from installed plugins only.
-    # If any plugin is not installed, skip config — the wizard will show
-    # install instructions first. Config can be done after installation.
-    my $conf_config = $self->_parse_conf_for_plugins(@selected);
-    my $params      = @not_installed ? [] : $self->_collect_setup_params($conf_config, @installed);
+    # Build one state per installed plugin that has setup parameters
+    my @states;
+    my %context;
+    my $conf_config = $self->_read_conf_for(@selected);
 
-    unless (@$params || @not_installed) {
-        $self->flash(error => 'No configurable parameters found in selected plugins.');
-        return $self->redirect_to('setup_plugins');
+    for my $class (@installed) {
+        my $meta = $self->_fondation_meta($class) or next;
+        my $setup = $meta->{setup} or next;
+        my $params = $setup->{parameters} // [];
+
+        my @fields;
+        my $plugin_conf = $conf_config->{$class};
+
+        for my $p (@$params) {
+            my $key = $p->{key} or next;
+            my $val = $self->_resolve_config($plugin_conf, $key) // $p->{default};
+            $context{$key} = $val;
+
+            push @fields, {
+                key         => $key,
+                label       => $p->{label}       // $key,
+                type        => $p->{type}        // 'string',
+                default     => $p->{default},
+                current     => $val,
+                required    => $p->{required}    ? 1 : 0,
+                placeholder => $p->{placeholder},
+                options     => $p->{options},
+                min         => $p->{min},
+                max         => $p->{max},
+            };
+        }
+
+        next unless @fields;
+
+        (my $short = $class) =~ s/^Mojolicious::Plugin:://;
+        push @states, {
+            label       => $setup->{label}       // $short,
+            plugin      => $short,
+            description => $setup->{description} // '',
+            fields      => \@fields,
+        };
     }
 
-    # Build the workflow YAML data structure
-    my $yaml_data = $self->_build_workflow_data($params);
-
-    # Register with Workflow::Factory (in-memory, no file needed)
-    my $factory = Workflow::Factory->instance;
-
-    # Ensure the persister directory exists
-    my $persister_path = $self->_persister_file_dir;
-    my $persister_dir  = $self->app->home->child($persister_path);
-    $persister_dir->make_path unless -d $persister_dir;
-
-    $factory->add_config(
-        persister => [{
-            name  => 'SetupFile',
-            class => 'Workflow::Persister::File',
-            path  => $persister_dir->to_string,
-        }],
-        workflow => [ $yaml_data ],
-        action   => [ $yaml_data ],
-    );
-
-    # Create the workflow instance
-    my $wf = $factory->create_workflow('setup', undef);
-    return $self->reply->not_found unless $wf;
-
-    # Store selected plugins in context for conf generation later
-    $wf->context->param(_plugins => join(',', @selected));
-
-    $wf->context->param(_not_installed     => join(',', @not_installed)) if @not_installed;
-    $wf->context->param(_installed_versions => join(',', map { "$_=$installed_versions{$_}" } sort keys %installed_versions));
-    $factory->save_workflow($wf);
-
-    $self->cookie(
-        setup_wizard_id => $wf->id,
-        { path => '/', httponly => 1 }
+    # Store everything in session
+    $self->session(
+        setup_plugins       => \@selected,
+        setup_states        => \@states,
+        setup_context       => \%context,
+        setup_index         => 0,
+        setup_not_installed => \@not_installed,
+        setup_retry         => \@selected,
     );
 
     $self->redirect_to('setup_wizard');
 }
 
-# ──────────────────────────────────────────────────────────────────────
-# GET /setup — show the setup wizard
-# ──────────────────────────────────────────────────────────────────────
+# ── GET /setup ──────────────────────────────────────────────────────
 
 sub wizard ($self) {
     $self->render_later;
 
-    my $wf_id = $self->cookie('setup_wizard_id');
-    my $wf;
+    my $plugins  = $self->session('setup_plugins');
+    my $states   = $self->session('setup_states');
+    my $index    = $self->session('setup_index');
+    my $context  = $self->session('setup_context');
+    my $missing  = $self->session('setup_not_installed');
 
-    if ($wf_id) {
-        $wf = $self->workflow('setup', $wf_id);
-    }
+    return $self->redirect_to('setup_plugins') unless $plugins;
 
-    unless ($wf) {
-        # No workflow yet — redirect to plugin selection
-        return $self->redirect_to('setup_plugins');
-    }
-
-    return $self->reply->not_found unless $wf;
-
-    my %context;
-    my $raw_context = $wf->wf->context->param;
-    if (ref $raw_context eq 'HASH') {
-        %context = %$raw_context;
-    }
-
-    my $selected_plugins = [ split /,/, ($context{_plugins} // '') ];
+    my $is_review = ($index == @$states);
+    my $is_done   = ($index > @$states);
+    my $state     = $is_done || $is_review ? undef : $states->[$index];
 
     $self->stash(
-        wf              => $wf,
-        context         => \%context,
-        is_done         => $wf->state eq 'setup_done',
-        is_review       => $wf->state eq 'setup_review',
-        conf_path       => $context{_conf_path},
+        states          => $states,
+        state_index     => $index,
+        current_state   => $state,
+        is_first        => ($index == 0),
+        is_last         => ($index == @$states - 1),
+        is_review       => $is_review,
+        is_done         => $is_done,
+        context         => $context,
+        selected_plugins => $plugins,
+        not_installed   => $missing,
+        conf_path       => $context->{_conf_path},
         config_loaded   => $INC{'Mojolicious/Plugin/Config.pm'} ? 1 : 0,
-        selected_plugins => $selected_plugins,
-        not_installed   => [ split /,/, ($context{_not_installed} // '') ],
     );
 
-    # Check for upgrades via MetaCPAN
-    my $mc = Mojolicious::Plugin::Fondation::Setup::MetaCPAN->new;
-    $mc->discover_p($self->app)->then(sub ($plugins) {
-        my %cpan_version;
-        $cpan_version{$_->{module_class}} = $_->{version} for @$plugins;
+    # Async: fetch CPAN versions for upgrade/dependency checks
+    $self->_discover(sub ($all_plugins) {
+        my %cpan_ver;
+        my %cpan_deps;
+        for my $p (@$all_plugins) {
+            $cpan_ver{$p->{module_class}}  = $p->{version};
+            $cpan_deps{$p->{module_class}} = $p->{dependencies} // [];
+        }
 
-        my @upgradable;
-        for my $class (@$selected_plugins) {
-            my $installed = $self->_installed_version_for($class);
-            next unless defined $installed;
-            my $cpan = $cpan_version{$class} or next;
-            if (version->parse($cpan) > version->parse($installed)) {
-                push @upgradable, {
-                    module_class => $class,
-                    installed    => $installed,
-                    cpan         => $cpan,
-                };
+        my (@upgradable, @unresolvable);
+        my %selected = map { $_ => 1 } @$plugins;
+        my $dev_dir  = $self->_dev_plugins_dir;
+        my $mc       = Mojolicious::Plugin::Fondation::Setup::MetaCPAN->new;
+
+        for my $class (@$plugins) {
+            # --- upgradable ---
+            if (my $inst = $mc->installed_version($class)) {
+                my $cpan = $cpan_ver{$class};
+                if ($cpan && version->parse($cpan) > version->parse($inst)) {
+                    push @upgradable, { module_class => $class, installed => $inst, cpan => $cpan };
+                }
+            }
+
+            # --- dependencies ---
+            my $deps;
+            my $meta = $self->_fondation_meta($class);
+            if ($meta && $meta->{dependencies}) {
+                $deps = $meta->{dependencies};
+            } else {
+                $deps = $cpan_deps{$class} // [];
+            }
+
+            for my $dep (@$deps) {
+                $dep = "Mojolicious::Plugin::$dep" unless $dep =~ /^Mojolicious::/;
+                next if $dep eq 'Mojolicious::Plugin::Fondation';
+                next if $selected{$dep};
+                next if $mc->installed_version($dep);
+                next if $cpan_ver{$dep};
+                next if $dev_dir && $self->_try_load_dev($dep);
+                push @unresolvable, { plugin => $class, dependency => $dep };
             }
         }
-        $self->stash(upgradable => \@upgradable);
-        $self->render(template => 'setup/wizard');
-    })->catch(sub ($err) {
-        $self->app->log->debug("MetaCPAN upgrade check failed: $err");
-        $self->stash(upgradable => []);
+
+        # If anything blocks configuration (not installed, upgradable,
+        # or unresolvable deps), skip to review and show only the alerts.
+        my $review_entries;
+        my $can_configure = 1;
+        if (@$missing || @upgradable || @unresolvable) {
+            $self->session(setup_index => scalar @$states) if $index <= @$states;
+            $self->stash(is_review => 1, is_done => 0, current_state => undef) if $index <= @$states;
+            $review_entries = [];
+            $can_configure  = 0;
+        } else {
+            $review_entries = $self->_review_entries($context);
+        }
+
+        $self->stash(
+            upgradable     => \@upgradable,
+            unresolvable   => \@unresolvable,
+            install_command => $self->_install_command(\@upgradable, $missing, \%cpan_ver),
+            review_entries  => $review_entries,
+            can_configure   => $can_configure,
+        );
+
         $self->render(template => 'setup/wizard');
     });
 }
 
-# ──────────────────────────────────────────────────────────────────────
-# POST /setup/execute — process form data and execute a workflow action
-# ──────────────────────────────────────────────────────────────────────
+# ── POST /setup/execute ─────────────────────────────────────────────
 
 sub execute ($self) {
-    my $wf_id  = $self->cookie('setup_wizard_id');
-    my $action = $self->param('action');
+    my $action  = $self->param('action');
+    my $states  = $self->session('setup_states') // [];
+    my $index   = $self->session('setup_index');
+    my $context = $self->session('setup_context') // {};
 
-    return $self->reply->not_found unless $wf_id && $action;
+    return $self->reply->not_found unless defined $action;
 
-    my $wf = $self->workflow('setup', $wf_id);
-    return $self->reply->not_found unless $wf;
-
-    unless ($wf->can($action)) {
-        $self->flash(error => "Action '$action' is not available in current state.");
-        return $self->redirect_to('setup_wizard');
+    if ($action eq 'back') {
+        $self->session(setup_index => $index - 1);
     }
-
-    if ($action ne 'back') {
-        my $state_meta = $wf->state_fondation;
-        for my $p (@{ $state_meta->{parameters} // [] }) {
-            my $val = $self->param($p->{key});
-            $wf->wf->context->param($p->{key} => $val) if defined $val;
+    elsif ($action eq 'next' || $action eq 'save') {
+        # Save form values
+        my $state = $states->[$index];
+        if ($state && $state->{fields}) {
+            for my $f (@{$state->{fields}}) {
+                my $val = $self->param($f->{key});
+                $context->{$f->{key}} = $val if defined $val;
+            }
+            $self->session(setup_context => $context);
         }
-    }
 
-    eval { $wf->execute($action); };
-    if ($@) {
-        $self->flash(error => "Execution failed: $@");
-    }
-
-    if ($wf->state eq 'setup_done') {
-        # Generate the .conf file from collected context values
-        my $conf = $self->_generate_conf($wf);
-        $wf->wf->context->param(_conf_path => $conf);
+        if ($action eq 'save') {
+            my $path = $self->_generate_conf;
+            $context->{_conf_path} = $path;
+            $self->session(
+                setup_context => $context,
+                setup_index   => scalar @$states + 1,
+            );
+        } else {
+            $self->session(setup_index => $index + 1);
+        }
     }
 
     $self->redirect_to('setup_wizard');
 }
 
-# ──────────────────────────────────────────────────────────────────────
-# GET /setup/reset — reset the wizard
-# ──────────────────────────────────────────────────────────────────────
+# ── GET /setup/reset ────────────────────────────────────────────────
 
 sub reset ($self) {
-    $self->cookie(setup_wizard_id => '', { path => '/', expires => 1 });
+    $self->session(
+        setup_plugins       => undef,
+        setup_states        => undef,
+        setup_context       => undef,
+        setup_index         => undef,
+        setup_not_installed => undef,
+        setup_retry         => undef,
+    );
     $self->redirect_to('setup_plugins');
 }
 
 # ══════════════════════════════════════════════════════════════════════
-# INTERNAL METHODS
+# INTERNAL HELPERS
 # ══════════════════════════════════════════════════════════════════════
 
-# Read persister_file_dir from Workflow's merged config (via app manager)
-sub _persister_file_dir ($self) {
-    my $reg = $self->app->manager->registry;
-    my $wf  = $reg->{'Mojolicious::Plugin::Fondation::Workflow'};
-    return $wf ? ($wf->{config}{persister_file_dir} // 'data/setup') : 'data/setup';
-}
+# Shared discovery: MetaCPAN + dev plugins merge.
+# Calls $cb with the merged plugin arrayref.
+sub _discover ($self, $cb) {
+    my $mc = Mojolicious::Plugin::Fondation::Setup::MetaCPAN->new;
+    $mc->discover_p($self->app)->then(sub ($plugins) {
+        my $dev = $self->_dev_plugins;
 
-# Resolve a dotted key path in a config hash (e.g. backends.main.dsn).
-# Handles flattened array notation: backends => [main => { dsn => '...' }]
-sub _resolve_config_value ($self, $config, $key_path) {
-    $key_path =~ s/^\+//;
-    my @parts  = split /\./, $key_path;
-    my $current = $config;
-
-    for my $part (@parts) {
-        if (ref $current eq 'HASH') {
-            return undef unless exists $current->{$part};
-            $current = $current->{$part};
-        }
-        elsif (ref $current eq 'ARRAY') {
-            my $found = 0;
-            for (my $i = 0; $i < @$current; $i += 2) {
-                if ($current->[$i] eq $part) {
-                    $current = $current->[$i + 1];
-                    $found = 1;
-                    last;
+        my %dev_by_class = map { $_->{module_class} => $_ } @$dev;
+        for my $p (@$plugins) {
+            $p->{is_dev} = 0;
+            $p->{cpan_version} = $p->{version};
+            if (my $d = $dev_by_class{$p->{module_class}}) {
+                $p->{is_dev}            = 1;
+                $p->{installed}         = 1;
+                $p->{installed_version} = $d->{installed_version};
+                # Merge dev dependencies into CPAN deps (union)
+                my %seen = map { $_ => 1 } @{ $p->{dependencies} // [] };
+                for my $dd (@{ $d->{dependencies} // [] }) {
+                    push @{ $p->{dependencies} }, $dd unless $seen{$dd}++;
                 }
             }
-            return undef unless $found;
+            $p->{upgrade_available} = 0;
+            $p->{release_pending}   = 0;
+            if ($p->{installed_version} && $p->{version}) {
+                my $local = version->parse($p->{installed_version});
+                my $cpan  = version->parse($p->{version});
+                $p->{upgrade_available} = 1 if $cpan  > $local;
+                $p->{release_pending}   = 1 if $local > $cpan;
+            }
         }
-        else {
-            return undef;
-        }
-    }
 
-    return $current unless ref $current;
-    return undef;
+        my %seen_cpan = map { $_->{module_class} => 1 } @$plugins;
+        for my $d (@$dev) {
+            next if $seen_cpan{$d->{module_class}};
+            push @$plugins, $d;
+        }
+
+        $cb->($plugins);
+    })->catch(sub ($err) {
+        my $dev = $self->_dev_plugins;
+        if (@$dev) {
+            $_->{is_dev} = 1 for @$dev;
+            $cb->($dev);
+        } else {
+            $self->stash(error => "MetaCPAN unavailable: $err");
+            $cb->([]);
+        }
+    });
 }
 
-# Parse the existing conf file and extract per-plugin config hashes.
-# Returns { $full_class => $config_hash }
-sub _parse_conf_for_plugins ($self, @classes) {
-    my %plugin_config;
+# Parse $moniker.conf and return { $full_class => 1 } for already-configured plugins.
+sub _read_conf_plugins ($self) {
+    my %selected;
+    my $conf_path = $self->app->home->child($self->app->moniker . '.conf');
+    return %selected unless -f $conf_path;
 
-    my $moniker   = $self->app->moniker;
-    my $conf_path = $self->app->home->child("$moniker.conf");
+    my $conf = do($conf_path->to_string);
+    return %selected unless $conf && $conf->{Fondation} && $conf->{Fondation}{dependencies};
+
+    for my $dep (@{$conf->{Fondation}{dependencies}}) {
+        my $name = ref $dep ? (keys %$dep)[0] : $dep;
+        $name = "Mojolicious::Plugin::$name" unless $name =~ /^Mojolicious::/;
+        $selected{$name} = 1;
+    }
+    return %selected;
+}
+
+# Parse $moniker.conf and return { $full_class => $config_hash } for selected plugins.
+sub _read_conf_for ($self, @classes) {
+    my %plugin_config;
+    my $conf_path = $self->app->home->child($self->app->moniker . '.conf');
     return \%plugin_config unless -f $conf_path;
 
     my $conf = do($conf_path->to_string);
@@ -405,394 +364,137 @@ sub _parse_conf_for_plugins ($self, @classes) {
     return \%plugin_config;
 }
 
-# Collect setup parameters from selected plugin classes (via fondation_meta).
-# $conf_config is an optional hashref from parsing the conf file: { $class => $config }
-sub _collect_setup_params ($self, $conf_config, @classes) {
-    my @params;
+# Resolve a dotted key in a config hash. Supports array notation (+prefix).
+sub _resolve_config ($self, $config, $key_path) {
+    return undef unless $config;
+    $key_path =~ s/^\+//;
+    my @parts = split /\./, $key_path;
+    my $cur   = $config;
 
-    for my $class (@classes) {
-        my $meta = eval {
-            my $err = Mojo::Loader::load_class($class);
-            die $err if $err;
-            $class->can('fondation_meta') ? $class->fondation_meta : undef;
-        };
-        unless ($meta) {
-            $self->app->log->debug("Setup: no fondation_meta for $class: $@");
-            next;
+    for my $part (@parts) {
+        if (ref $cur eq 'HASH') {
+            return undef unless exists $cur->{$part};
+            $cur = $cur->{$part};
         }
-        my $setup = $meta->{setup} or do {
-            $self->app->log->debug("Setup: $class has no setup block");
-            next;
-        };
-
-        my $short = $class;
-        $short =~ s/^Mojolicious::Plugin:://;
-        my $label = $setup->{label} // $short;
-        my $desc  = $setup->{description} // '';
-
-        # Try to get the plugin's config from the conf file
-        my $plugin_conf = $conf_config && $conf_config->{$class};
-
-        for my $param (@{ $setup->{parameters} // [] }) {
-            my $key = $param->{key} or next;
-
-            # Resolve current value: conf file > default
-            my $current_value = $param->{default};
-            if ($plugin_conf) {
-                my $val = $self->_resolve_config_value($plugin_conf, $key);
-                $current_value = $val if defined $val;
-            }
-
-            push @params, {
-                plugin_short  => $short,
-                plugin_label  => $label,
-                plugin_desc   => $desc,
-                key           => $key,
-                label         => $param->{label} // $key,
-                type          => $param->{type} // 'string',
-                default       => $param->{default},
-                current       => $current_value,
-                required      => $param->{required} ? 1 : 0,
-                min           => $param->{min},
-                max           => $param->{max},
-                placeholder   => $param->{placeholder},
-                options       => $param->{options},
-            };
-        }
-    }
-
-    return \@params;
-}
-
-# Build the workflow data structure from collected parameters.
-sub _build_workflow_data ($self, $params) {
-    my @params = @$params;
-
-    # Group parameters by plugin
-    my @plugin_groups;
-    my %seen_plugin;
-    for my $p (@params) {
-        my $short = $p->{plugin_short};
-        unless (exists $seen_plugin{$short}) {
-            push @plugin_groups, {
-                plugin_short => $short,
-                label        => $p->{plugin_label},
-                description  => $p->{plugin_desc},
-                parameters   => [],
-            };
-            $seen_plugin{$short} = scalar @plugin_groups - 1;
-        }
-        push @{$plugin_groups[$seen_plugin{$short}]{parameters}}, $p;
-    }
-
-    # Build states
-    my @states;
-    my $prev_state;
-
-    # No configurable parameters — go straight to review
-    unless (@plugin_groups) {
-        return {
-            type          => 'setup',
-            initial_state => 'setup_review',
-            persister     => 'SetupFile',
-            fondation     => {
-                label       => 'Application Setup',
-                description => 'Configure your application',
-            },
-            state => [
-                {
-                    name      => 'setup_review',
-                    fondation => { label => 'Review' },
-                    action    => [
-                        { name => 'save', resulting_state => 'setup_done' },
-                    ],
-                },
-                {
-                    name      => 'setup_done',
-                    fondation => { label => 'Done', color => 'success', icon => 'check-circle' },
-                    action    => [],
-                },
-            ],
-            action => [
-                { name => 'save', class => 'Workflow::Action::Null',
-                  fondation => { label => 'Save Configuration', color => 'success', icon => 'check', group => 'main' } },
-            ],
-        };
-    }
-
-    for (my $i = 0; $i < @plugin_groups; $i++) {
-        my $group   = $plugin_groups[$i];
-        my $state   = $self->_plugin_state_name($group->{plugin_short});
-        my $is_last = ($i == @plugin_groups - 1);
-
-        my $state_actions = [];
-        if ($i > 0) {
-            push @$state_actions, { name => 'back', resulting_state => $prev_state };
-        }
-        if ($is_last) {
-            push @$state_actions, { name => 'next', resulting_state => 'setup_review' };
-        } else {
-            my $next_state = $self->_plugin_state_name($plugin_groups[$i+1]{plugin_short});
-            push @$state_actions, { name => 'next', resulting_state => $next_state };
-        }
-
-        my @parameters;
-        for my $p (@{$group->{parameters}}) {
-            my $pm = {
-                key      => $p->{key},
-                type     => $p->{type},
-                label    => $p->{label},
-                default  => $p->{default},
-                current  => $p->{current},
-                required => $p->{required},
-            };
-            $pm->{min}         = $p->{min} if defined $p->{min};
-            $pm->{max}         = $p->{max} if defined $p->{max};
-            $pm->{placeholder} = $p->{placeholder} if defined $p->{placeholder};
-            $pm->{options}     = $p->{options} if $p->{options};
-            push @parameters, $pm;
-        }
-
-        push @states, {
-            name      => $state,
-            fondation => {
-                label       => $group->{label},
-                plugin      => $group->{plugin_short},
-                description => $group->{description},
-                parameters  => \@parameters,
-            },
-            action => $state_actions,
-        };
-
-        $prev_state = $state;
-    }
-
-    # Review state
-    push @states, {
-        name      => 'setup_review',
-        fondation => { label => 'Review' },
-        action    => [
-            { name => 'back', resulting_state => $prev_state },
-            { name => 'save', resulting_state => 'setup_done' },
-        ],
-    };
-
-    # Done state (terminal)
-    push @states, {
-        name      => 'setup_done',
-        fondation => { label => 'Done', color => 'success', icon => 'check-circle' },
-        action    => [],
-    };
-
-    return {
-        type         => 'setup',
-        initial_state => $states[0]{name},
-        persister    => 'SetupFile',
-        fondation    => {
-            label       => 'Application Setup',
-            description => 'Configure your application',
-        },
-        state  => \@states,
-        action => [
-            { name => 'next', class => 'Workflow::Action::Null',
-              fondation => { label => 'Next', color => 'primary', icon => 'arrow-right', group => 'navigation' } },
-            { name => 'back', class => 'Workflow::Action::Null',
-              fondation => { label => 'Back', color => 'secondary', icon => 'arrow-left', group => 'navigation' } },
-            { name => 'save', class => 'Workflow::Action::Null',
-              fondation => { label => 'Save Configuration', color => 'success', icon => 'check', group => 'main' } },
-        ],
-    };
-}
-
-# Derive a state name from a plugin short name.
-sub _plugin_state_name ($self, $plugin_short) {
-    my $name = $plugin_short;
-    $name =~ s/Fondation:://g;
-    $name = lc($name);
-    $name =~ s/::/_/g;
-    $name =~ s/[^a-z0-9_]+/_/g;
-    $name =~ s/_+/_/g;
-    $name =~ s/^_|_$//g;
-    return "setup_${name}";
-}
-
-# Generate the .conf file from collected context values.
-sub _generate_conf ($self, $wf) {
-    my $context = $wf->wf->context->param;
-    my %ctx = ref $context eq 'HASH' ? %$context : ();
-
-    my $plugins_str = delete $ctx{_plugins} || '';
-    my @plugins = split /,/, $plugins_str;
-
-    # Build key→plugin mapping from fondation_meta setup parameters
-    my %key_to_plugin;
-    for my $plugin_class (@plugins) {
-        my $meta = eval {
-            my $err = Mojo::Loader::load_class($plugin_class);
-            die $err if $err;
-            $plugin_class->can('fondation_meta') ? $plugin_class->fondation_meta : undef;
-        };
-        next unless $meta && $meta->{setup} && $meta->{setup}{parameters};
-        for my $p (@{ $meta->{setup}{parameters} }) {
-            $key_to_plugin{ $p->{key} } = $plugin_class if $p->{key};
-        }
-    }
-
-    # Build per-plugin config.
-    # Keys with "+" prefix (e.g. +backends.main.dsn) indicate the first
-    # segment is an arrayref and the second is a name within it.
-    my %plugin_config;
-    for my $key (sort keys %ctx) {
-        next unless defined $ctx{$key} && $ctx{$key} ne '';
-        next if $key eq 'workflow_id';
-        my $plugin = $key_to_plugin{$key} or next;
-
-        my $is_array = ($key =~ s/^\+//);
-        my @parts    = split /\./, $key;
-        my $target   = ($plugin_config{$plugin} //= {});
-
-        if ($is_array) {
-            # +backends.main.dsn → $parts[0]=backends, $parts[1]=name, $parts[2..]=subkeys
-            my $array_key = $parts[0];   # backends
-            my $name      = $parts[1];   # main
-            # Ensure $target->{backends} is an arrayref
-            $target->{$array_key} //= [];
-            # Find or create the named entry
-            my $entry;
-            for (my $j = 0; $j < @{$target->{$array_key}}; $j += 2) {
-                if ($target->{$array_key}[$j] eq $name) {
-                    $entry = $target->{$array_key}[$j+1];
+        elsif (ref $cur eq 'ARRAY') {
+            my $found = 0;
+            for (my $i = 0; $i < @$cur; $i += 2) {
+                if ($cur->[$i] eq $part) {
+                    $cur   = $cur->[$i + 1];
+                    $found = 1;
                     last;
                 }
             }
-            unless ($entry) {
-                $entry = {};
-                push @{$target->{$array_key}}, $name, $entry;
-            }
-            # Navigate remaining subkeys
-            $target = $entry;
-            for my $i (2 .. $#parts - 1) {
-                $target->{$parts[$i]} //= {};
-                $target = $target->{$parts[$i]};
-            }
-            $target->{$parts[-1]} = $ctx{"+$key"};  # leaf value
-        } else {
-            # Plain dotted key → nested hash
-            for my $i (0 .. $#parts - 1) {
-                $target->{$parts[$i]} //= {};
-                $target = $target->{$parts[$i]};
-            }
-            $target->{$parts[-1]} = $ctx{$key};
+            return undef unless $found;
         }
+        else { return undef }
     }
-
-    # Build Fondation wrapper — dependencies as plain strings (no config)
-    my @deps;
-    for my $plugin (@plugins) {
-        (my $short = $plugin) =~ s/^Mojolicious::Plugin:://;
-        push @deps, $short;
-    }
-
-    my %conf = ( Fondation => { dependencies => \@deps } );
-
-    # Add each plugin's config at root level so $app->config->{$short} works
-    for my $plugin (@plugins) {
-        next unless $plugin_config{$plugin};
-        (my $short = $plugin) =~ s/^Mojolicious::Plugin:://;
-        $conf{$short} = $plugin_config{$plugin};
-    }
-
-    my $moniker   = $self->app->moniker;
-    my $conf_path = $self->app->home->child("$moniker.conf");
-
-    require Data::Dumper;
-    local $Data::Dumper::Indent   = 1;
-    local $Data::Dumper::Terse    = 1;
-    local $Data::Dumper::Sortkeys = 1;
-    local $Data::Dumper::Quotekeys = 0;
-
-    my $content = Data::Dumper::Dumper(\%conf);
-    $conf_path->spurt(encode('UTF-8', $content));
-
-    $self->app->log->info("Configuration saved to $conf_path");
-    return $conf_path->to_string;
+    return $cur unless ref $cur;
+    return undef;
 }
 
-sub _installed_version_for ($self, $class) {
+# Load a class safely. Returns true on success.
+sub _try_load ($self, $class) {
     my $pm = $class =~ s{::}{/}gr . '.pm';
-    return undef unless $INC{$pm} || eval "require $class; 1";
-    return eval { $class->VERSION } // undef;
+    return 1 if $INC{$pm};
+    return 1 if eval "require $class; 1";
+
+    # Try dev_plugins_dir
+    if ($self->_try_load_dev($class)) {
+        return 1 if eval "require $class; 1";
+    }
+    return 0;
 }
 
-# Read dev_plugins_dir from the Fondation manager config (not app config).
-sub _dev_plugins_dir ($self) {
-    my $manager = $self->app->manager;
-    return $manager ? ($manager->config->{dev_plugins_dir} // undef) : undef;
-}
-
-# Check whether a plugin class lives under dev_plugins_dir.
-# Returns true if the .pm file is found in any scanned dev subdirectory.
-sub _is_dev_plugin ($self, $class) {
-    my $dev_dir = $self->_dev_plugins_dir
-        or return 0;
-
+# Load a class from dev_plugins_dir by adding its lib/ to @INC.
+sub _try_load_dev ($self, $class) {
+    my $dev_dir = $self->_dev_plugins_dir or return 0;
     (my $rel = "$class.pm") =~ s{::}{/}g;
+    my @found = glob("$dev_dir/Mojolicious-Plugin-Fondation-*/lib/$rel");
+    return 0 unless @found && -f $found[0];
 
-    my @dev = glob("$dev_dir/Mojolicious-Plugin-Fondation-*/lib/$rel");
-    return @dev > 0;
+    (my $lib_dir = $found[0]) =~ s{/lib/.*}{/lib};
+    return 0 unless -d $lib_dir;
+    unshift @INC, $lib_dir;
+    return 1;
+}
+
+# Call fondation_meta() on a class. Returns hashref or undef.
+sub _fondation_meta ($self, $class) {
+    eval {
+        my $err = Mojo::Loader::load_class($class);
+        die $err if $err;
+        $class->can('fondation_meta') ? $class->fondation_meta : undef;
+    } // undef;
 }
 
 # Scan dev_plugins_dir for locally-developed Fondation plugins.
-# Returns an arrayref of plugin hashes (same shape as discover_p).
-sub _discover_dev_plugins ($self) {
-    my $dev_dir = $self->_dev_plugins_dir
-        or return [];
-
+#
+# Expects directories named Mojolicious-Plugin-Fondation-* under
+# $app->manager->config->{dev_plugins_dir}. Each directory contains
+# a standard Dist::Zilla layout (lib/, dist.ini).
+#
+# For each plugin found, this method:
+#   1. Derives the module class from the directory name
+#      Mojolicious-Plugin-Fondation-Foo-Bar → Mojolicious::Plugin::Fondation::Foo::Bar
+#   2. Reads the .pm source file (without executing it — no require)
+#   3. Extracts $VERSION (from source, fallback to dist.ini)
+#   4. Extracts # ABSTRACT: comment
+#
+# Returns an arrayref of plugin hashes with the same shape as
+# MetaCPAN::discover_p, all marked installed=1, is_dev=1.
+sub _dev_plugins ($self) {
+    my $dev_dir = $self->_dev_plugins_dir or return [];
     my @plugins;
-    my @dirs = glob("$dev_dir/Mojolicious-Plugin-Fondation-*");
-    for my $dir (@dirs) {
-        next unless -d $dir;
-        (my $dist = $dir) =~ s{.*/}{};  # Mojolicious-Plugin-Fondation-Foo-Bar
 
-        # Derive module class from directory name
+    # Scan each Mojolicious-Plugin-Fondation-* directory
+    for my $dir (glob("$dev_dir/Mojolicious-Plugin-Fondation-*")) {
+        next unless -d $dir;
+
+        # Extract distribution name from path (e.g. "Mojolicious-Plugin-Fondation-Asset")
+        (my $dist = $dir) =~ s{.*/}{};
+
+        # Derive Perl module class: Foo-Bar → Mojolicious::Plugin::Fondation::Foo::Bar
         (my $module_class = $dist) =~ s/^Mojolicious-Plugin-//;
         $module_class = "Mojolicious::Plugin::$module_class";
         $module_class =~ s/-/::/g;
 
-        # Dev plugins are always installed; loading is deferred to start().
-        # Extract metadata from source without triggering register().
-        my ($abstract, $version, $deps) = ('', '', []);
-        my $pm = "$module_class.pm";
-        $pm =~ s{::}{/}g;
-        my $pm_path = "$dir/lib/$pm";
+        my ($abstract, $version) = ('', '');
+
+        # Locate the .pm file (e.g. lib/Mojolicious/Plugin/Fondation/Foo/Bar.pm)
+        (my $pm_rel = "$module_class.pm") =~ s{::}{/}g;
+        my $pm_path = "$dir/lib/$pm_rel";
+
+        my $deps = [];
+
         if (-f $pm_path) {
+            # Read source WITHOUT requiring it — avoids triggering register()
             open my $fh, '<', $pm_path or next;
             my $src = do { local $/; <$fh> };
             close $fh;
 
-            # Extract version: try $VERSION in source, then dist.ini
+            # Extract $VERSION from source:  $VERSION = '0.02';
             if ($src =~ /\$VERSION\s*=\s*['"]?([^'";]+)/) {
                 $version = $1;
-            } else {
+            }
+            # Fallback: read version from dist.ini
+            else {
                 my $ini = "$dir/dist.ini";
                 if (-f $ini) {
-                    open my $fh2, '<', $ini or next;
+                    open my $fh2, '<', $ini;
                     while (my $line = <$fh2>) {
-                        if ($line =~ /^version\s*=\s*(\S+)/) {
-                            $version = $1;
-                            last;
-                        }
+                        if ($line =~ /^version\s*=\s*(\S+)/) { $version = $1; last }
                     }
                     close $fh2;
                 }
             }
 
-            # Extract # ABSTRACT: comment
-            if ($src =~ /^\s*#\s*ABSTRACT:\s*(.+)$/m) {
-                $abstract = $1;
-            }
+            # Extract ABSTRACT comment:  # ABSTRACT: Foo bar
+            if ($src =~ /^\s*#\s*ABSTRACT:\s*(.+)$/m) { $abstract = $1 }
 
-            # Safely eval the fondation_meta sub in a temp package
+            # Extract dependencies from fondation_meta in source
+            # (brace-counted eval, safe — no require)
+            $deps = [];
             if ($src =~ /(sub\s+fondation_meta\s*\{)/) {
                 my $pos  = $-[0] + length($1);
                 my $depth = 1;
@@ -804,33 +506,176 @@ sub _discover_dev_plugins ($self) {
                     $end++;
                 }
                 my $body = substr($src, $-[0], $end - $-[0]);
-                my $meta = eval qq{package _FondationDevMeta; $body; _FondationDevMeta::fondation_meta();};
-                if ($meta && !$@ && ref $meta eq 'HASH') {
-                    $deps = $meta->{dependencies} // [];
-                    $abstract = $meta->{setup}{description} // '' unless $abstract;
+                my $meta = eval qq{no warnings 'redefine'; package _FondationDevMeta; $body; _FondationDevMeta::fondation_meta();};
+                if ($meta && !$@ && ref $meta eq 'HASH' && $meta->{dependencies}) {
+                    $deps = $meta->{dependencies};
+                    # Normalize to full class names
+                    $deps = [ map { /^Mojolicious::Plugin::/ ? $_ : "Mojolicious::Plugin::$_" } @$deps ];
                 }
             }
-
-            # Convert short dep names to full class names
-            $deps = [ map { /^Mojolicious::Plugin::/ ? $_ : "Mojolicious::Plugin::$_" } @$deps ];
         }
-        my $installed = 1;
 
+        # Build entry in the same shape as MetaCPAN::discover_p
         push @plugins, {
             distribution      => $dist,
             version           => $version,
             abstract          => $abstract,
-            author            => '',
-            date              => '',
             module_class      => $module_class,
-            installed         => $installed,
+            installed         => 1,
             installed_version => $version,
-            upgrade_available => 0,
-            dependencies      => $deps,
             is_dev            => 1,
+            dependencies      => $deps,
         };
     }
     return \@plugins;
+}
+
+sub _dev_plugins_dir ($self) {
+    my $manager = $self->app->manager;
+    return $manager ? ($manager->config->{dev_plugins_dir} // undef) : undef;
+}
+
+# ── Display helpers (pre-compute data for templates) ──────────────────
+
+# Build badge list for a plugin entry (used by plugins.html.ep and discover JSON).
+sub _badges_for ($self, $p) {
+    my @badges;
+
+    if ($p->{is_dev}) {
+        push @badges, { text => 'Dev',       class => 'info' };
+        push @badges, { text => 'Installed', class => 'success ms-2' };
+        push @badges, { text => "v$p->{installed_version}", class => 'light text-dark ms-1' } if $p->{installed_version};
+        push @badges, { text => "CPAN v$p->{cpan_version}", class => 'light text-dark ms-1' } if $p->{cpan_version};
+        push @badges, { text => 'Update',  class => 'warning text-dark ms-1' } if $p->{upgrade_available};
+        push @badges, { text => 'Release', class => 'danger ms-1' }          if $p->{release_pending};
+    } else {
+        push @badges, { text => 'CPAN', class => 'secondary ms-2' };
+        if ($p->{installed}) {
+            push @badges, { text => 'Installed', class => 'success ms-2' };
+            push @badges, { text => "v$p->{installed_version}", class => 'light text-dark ms-1' } if $p->{installed_version};
+            push @badges, { text => "CPAN v$p->{cpan_version}", class => 'light text-dark ms-1' } if $p->{cpan_version};
+            push @badges, { text => 'Update',  class => 'warning text-dark ms-1' } if $p->{upgrade_available};
+            push @badges, { text => 'Release', class => 'danger ms-1' }          if $p->{release_pending};
+        } else {
+            push @badges, { text => 'Not installed', class => 'warning text-dark ms-2' };
+            push @badges, { text => "v$p->{version}", class => 'light text-dark ms-1' } if $p->{version};
+        }
+    }
+
+    my $deps = $p->{dependencies} // [];
+    if (@$deps) {
+        push @badges, { text => scalar(@$deps) . ' dep(s)', class => 'info ms-1', title => join(', ', @$deps) };
+    }
+
+    return \@badges;
+}
+
+# Build the cpanm command string for upgradable + not-installed plugins.
+sub _install_command ($self, $upgradable, $missing, $cpan_ver) {
+    my @parts;
+    for my $u (@{$upgradable // []}) {
+        push @parts, "$u->{module_class}\@$u->{cpan}";
+    }
+    for my $m (@{$missing // []}) {
+        my $v = $cpan_ver->{$m};
+        push @parts, $v ? "$m\@$v" : $m;
+    }
+    return @parts ? join(' ', @parts) : undef;
+}
+
+# Build sorted, filtered review entries from context.
+sub _review_entries ($self, $context) {
+    my @entries;
+    for my $key (sort keys %$context) {
+        next if $key =~ /^_/;
+        my $val = $context->{$key};
+        next unless defined $val && $val ne '';
+        push @entries, { key => $key, value => $val };
+    }
+    return \@entries;
+}
+
+# ── .conf generation ─────────────────────────────────────────────────
+
+sub _generate_conf ($self) {
+    my $plugins = $self->session('setup_plugins') // [];
+    my $context = $self->session('setup_context') // {};
+
+    # Build key → plugin mapping from fondation_meta
+    my %key_to_plugin;
+    for my $class (@$plugins) {
+        my $meta = $self->_fondation_meta($class) or next;
+        my $params = $meta->{setup}{parameters} // [];
+        for my $p (@$params) {
+            $key_to_plugin{ $p->{key} } = $class if $p->{key};
+        }
+    }
+
+    # Collect values per plugin
+    my %plugin_config;
+    for my $key (sort keys %$context) {
+        next unless defined $context->{$key} && $context->{$key} ne '';
+        next if $key =~ /^_/;  # skip internal keys
+        my $plugin = $key_to_plugin{$key} or next;
+
+        my $is_array = ($key =~ s/^\+//);
+        my @parts    = split /\./, $key;
+        my $target   = ($plugin_config{$plugin} //= {});
+
+        if ($is_array) {
+            $target->{$parts[0]} //= [];
+            my $entry;
+            for (my $j = 0; $j < @{$target->{$parts[0]}}; $j += 2) {
+                if ($target->{$parts[0]}[$j] eq $parts[1]) {
+                    $entry = $target->{$parts[0]}[$j + 1];
+                    last;
+                }
+            }
+            unless ($entry) {
+                $entry = {};
+                push @{$target->{$parts[0]}}, $parts[1], $entry;
+            }
+            $target = $entry;
+            for my $i (2 .. $#parts - 1) {
+                $target->{$parts[$i]} //= {};
+                $target = $target->{$parts[$i]};
+            }
+            $target->{$parts[-1]} = $context->{"+$key"};
+        } else {
+            for my $i (0 .. $#parts - 1) {
+                $target->{$parts[$i]} //= {};
+                $target = $target->{$parts[$i]};
+            }
+            $target->{$parts[-1]} = $context->{$key};
+        }
+    }
+
+    # Build conf structure
+    my @deps;
+    for my $class (@$plugins) {
+        (my $short = $class) =~ s/^Mojolicious::Plugin:://;
+        push @deps, $short;
+    }
+
+    my %conf = ( Fondation => { dependencies => \@deps } );
+    for my $class (@$plugins) {
+        next unless $plugin_config{$class};
+        (my $short = $class) =~ s/^Mojolicious::Plugin:://;
+        $conf{$short} = $plugin_config{$class};
+    }
+
+    require Data::Dumper;
+    local $Data::Dumper::Indent    = 1;
+    local $Data::Dumper::Terse     = 1;
+    local $Data::Dumper::Sortkeys  = 1;
+    local $Data::Dumper::Quotekeys = 0;
+
+    my $content  = Data::Dumper::Dumper(\%conf);
+    my $conf_path = $self->app->home->child($self->app->moniker . '.conf');
+    $conf_path->spurt(encode('UTF-8', $content));
+
+    $self->app->log->info("Configuration saved to $conf_path");
+    return $conf_path->to_string;
 }
 
 1;
@@ -843,258 +688,106 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Fondation::Setup::Controller::Setup - Setup wizard controller — plugin selection, workflow wizard, and .conf generation
+Mojolicious::Plugin::Fondation::Setup::Controller::Setup - Session-based setup wizard — no Workflow, no file persister
 
 =head1 VERSION
 
-version 0.04
+version 0.10
 
 =head1 SYNOPSIS
 
-    # Routes are registered automatically by Fondation::Setup:
-    #   GET  /setup          → wizard()
-    #   GET  /setup/plugins  → plugins()
-    #   GET  /setup/discover → discover()
-    #   POST /setup/start    → start()
-    #   POST /setup/execute  → execute()
-    #   GET  /setup/reset    → reset()
+  # Routes registered by Fondation::Setup:
+  GET  /setup          → wizard()   — main wizard page
+  GET  /setup/plugins  → plugins()  — plugin selection with checkboxes
+  GET  /setup/discover → discover() — JSON API: plugin list
+  POST /setup/start    → start()    — build session state, redirect
+  POST /setup/execute  → execute()  — process next/back/save
+  GET  /setup/reset    → reset()    — clear session, restart
 
 =head1 DESCRIPTION
 
-This controller implements the Fondation setup wizard — a step-by-step
-interface for discovering, selecting, and configuring Fondation plugins.
-It fetches available plugins from MetaCPAN, lets the user pick which ones
-to install, walks them through configuration parameters via a Workflow
-state machine, and generates the application's C<.conf> file.
-
-The wizard is designed to be the first thing a user sees after installing
-a Fondation-based application. It can also be re-run later to add or
-upgrade plugins.
+This controller implements the Setup wizard using Mojolicious sessions
+instead of Workflow.pm. State (selected plugins, current step, form
+values) is stored entirely in C<$self-E<gt>session>.
 
 =head1 NAME
 
-Mojolicious::Plugin::Fondation::Setup::Controller::Setup - Setup wizard controller — plugin selection, workflow wizard, and .conf generation
+Mojolicious::Plugin::Fondation::Setup::Controller::Setup — Session-based setup wizard controller
 
-=head1 ACTIONS
+=head1 SESSION KEYS
 
-=head2 plugins
+=over
 
-    GET /setup/plugins
+=item C<setup_plugins>
 
-Renders the plugin selection page. Reads the existing C<.conf> file to
-pre-select plugins that are already configured, fetches the full list of
-Fondation plugins from MetaCPAN (async), and passes both to the
-C<setup/plugins> template.
+Arrayref of selected plugin class names.
 
-Stash keys:
+=item C<setup_states>
 
-=over 4
+Arrayref of wizard states. Each state is a hashref with C<label>,
+C<plugin>, C<description>, and C<fields> (arrayref of form field
+definitions).
 
-=item * C<plugins> — arrayref of plugin metadata from MetaCPAN
+=item C<setup_index>
 
-=item * C<already_selected> — hashref of fully-qualified class names
-already present in the config
+Integer index into C<setup_states>. A value equal to the array
+size means "review", and beyond means "done".
 
-=back
+=item C<setup_context>
 
-=head2 discover
+Hashref of accumulated form values (C<$key =E<gt> $value>).
 
-    GET /setup/discover
+=item C<setup_not_installed>
 
-Async JSON endpoint that returns the full list of Fondation plugins
-discovered on MetaCPAN. Used by the plugin selection UI to populate
-the list dynamically.
+Arrayref of plugin class names that are not yet installed via C<cpanm>.
 
-Response: C<{ plugins => [...] }> on success, C<{ error => "..." }>
-with status 500 on failure.
+=item C<setup_retry>
 
-=head2 start
-
-    POST /setup/start
-
-Builds a Workflow state machine from the selected plugins' configuration
-parameters. Expects C<selected_plugins> (array of fully-qualified class
-names) in the POST body.
-
-Flow:
-
-=over 4
-
-=item 1. Reads each selected plugin's C<fondation_meta → setup → parameters>
-
-=item 2. Resolves current values from the existing C<.conf> file if present
-
-=item 3. Builds a YAML workflow data structure with one state per plugin
-
-=item 4. Registers the workflow with C<Workflow::Factory> (in-memory)
-
-=item 5. Checks which selected plugins are not yet installed
-
-=item 6. Stores the workflow ID in a cookie (C<setup_wizard_id>)
-
-=item 7. Redirects to C</setup> (the wizard)
+Arrayref of previously selected plugins, used by C<plugins()> to
+pre-check them when the user clicks "I have installed the plugins, retry".
 
 =back
-
-=head2 wizard
-
-    GET /setup
-
-Renders the setup wizard page. Loads the workflow identified by the
-C<setup_wizard_id> cookie. If no workflow exists yet, redirects to
-C</setup/plugins>.
-
-Also performs an async MetaCPAN check for upgradable plugins — compares
-installed versions against CPAN versions and flags any that are out of
-date.
-
-Stash keys:
-
-=over 4
-
-=item * C<wf> — the workflow object
-
-=item * C<context> — workflow context hashref (user-provided values)
-
-=item * C<is_done> — true when state is C<setup_done>
-
-=item * C<is_review> — true when state is C<setup_review>
-
-=item * C<conf_path> — path to the generated C<.conf> file (when done)
-
-=item * C<config_loaded> — true if C<Mojolicious::Plugin::Config> is loaded
-
-=item * C<selected_plugins> — arrayref of selected plugin class names
-
-=item * C<not_installed> — arrayref of plugins not yet installed
-
-=item * C<upgradable> — arrayref of plugins with newer versions on CPAN
-
-=back
-
-=head2 execute
-
-    POST /setup/execute
-
-Processes a workflow action (C<next>, C<back>, C<save>). Reads form
-parameters matching the current state's parameter keys and stores them
-in the workflow context. On C<save> (transition to C<setup_done>),
-generates the C<.conf> file via C<_generate_conf>.
-
-Expects:
-
-=over 4
-
-=item * C<action> — the workflow action name to execute
-
-=item * Parameter values matching the current state's C<parameters> keys
-
-=back
-
-=head2 reset
-
-    GET /setup/reset
-
-Clears the C<setup_wizard_id> cookie and redirects back to the plugin
-selection page. Use this to start the wizard over from scratch.
 
 =head1 INTERNAL METHODS
 
-These methods are not exposed as routes but implement the core logic.
+=head2 _discover($cb)
 
-=head2 _persister_file_dir
+Shared async discovery: fetches plugins from MetaCPAN, merges with
+C<dev_plugins_dir>, and calls C<$cb> with the merged arrayref.
 
-    my $dir = $self->_persister_file_dir;
+=head2 _badges_for($plugin)
 
-Returns the directory path for the Workflow::Persister::File storage.
-Reads C<persister_file_dir> from C<Fondation::Workflow>'s merged config
-in the registry, defaulting to C<data/setup>.
+Returns an arrayref of C<{text, class, title?}> hashes for rendering
+Bootstrap badges in the plugin selection template.
 
-=head2 _resolve_config_value
+=head2 _install_command($upgradable, $missing, $cpan_ver)
 
-    my $value = $self->_resolve_config_value($config, $key_path);
+Builds the C<cpanm> command string for the install/upgrade alert.
+Returns C<undef> if nothing to install.
 
-Resolves a dotted key path within a config hash. Handles flattened array
-notation (e.g. C<backends.main.dsn> where C<backends> is an arrayref of
-C<< name => { dsn => '...' } >> pairs). Keys prefixed with C<+> are
-stripped before resolution.
+=head2 _review_entries($context)
 
-=head2 _parse_conf_for_plugins
+Returns sorted, filtered C<{key, value}> pairs from the context
+hash (excludes internal C<_>-prefixed keys and empty values).
 
-    my $configs = $self->_parse_conf_for_plugins(@classes);
+=head2 _dev_plugins
 
-Parses the existing C<.conf> file and extracts per-plugin configuration
-hashes for the given class names. Returns a hashref keyed by
-fully-qualified class name.
+Scans C<dev_plugins_dir> for locally-developed Fondation plugins.
+Returns an arrayref with the same shape as C<MetaCPAN::discover_p>.
 
-=head2 _collect_setup_params
+=head2 _dev_plugins_dir
 
-    my $params = $self->_collect_setup_params($conf_config, @classes);
-
-Loads each plugin's C<fondation_meta → setup → parameters> and resolves
-current values from the config file (if available). Returns an arrayref
-of parameter hashes ready for the workflow builder.
-
-Each parameter hash contains: C<plugin_short>, C<plugin_label>,
-C<plugin_desc>, C<key>, C<label>, C<type>, C<default>, C<current>,
-C<required>, and optionally C<min>, C<max>, C<placeholder>, C<options>.
-
-=head2 _build_workflow_data
-
-    my $yaml_data = $self->_build_workflow_data($params);
-
-Builds a complete Workflow data structure from collected parameters.
-Creates one state per plugin group, a C<setup_review> state, and a
-terminal C<setup_done> state. Includes C<next>, C<back>, and C<save>
-actions with Fondation metadata for UI rendering (labels, colors, icons).
-
-=head2 _plugin_state_name
-
-    my $state = $self->_plugin_state_name($plugin_short);
-
-Derives a workflow state name from a plugin short name — lowercased,
-double-colons replaced with underscores, non-alphanumeric chars stripped,
-prefixed with C<setup_>. Example: C<Fondation::Model::DBIx::Async>
-becomes C<setup_model_dbix_async>.
+Returns the C<dev_plugins_dir> path from C<$app-E<gt>manager-E<gt>config>.
 
 =head2 _generate_conf
 
-    my $conf_path = $self->_generate_conf($wf);
+Generates the C<$moniker.conf> file from session state using
+C<Data::Dumper>.
 
-Generates the application C<.conf> file from all values collected in the
-workflow context. Builds a hash with:
+=head1 SEE ALSO
 
-=over 4
-
-=item * C<Fondation → dependencies> — array of plugin short names
-
-=item * Root-level keys per plugin with their configured values
-
-=item * Dotted keys expanded into nested hashes; C<+> prefix keys use
-flattened array notation
-
-=back
-
-Writes the file using C<Data::Dumper> and returns its path.
-
-=head2 _installed_version_for
-
-    my $version = $self->_installed_version_for($class);
-
-Returns the installed version of a plugin class, or C<undef> if not
-installed. Used to compare against MetaCPAN versions for upgrade
-detection.
-
-=head1 AUTHOR
-
-Daniel Brosseau <dab@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2026 by Daniel Brosseau.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+L<Mojolicious::Plugin::Fondation::Setup>,
+L<Mojolicious::Plugin::Fondation::Setup::MetaCPAN>
 
 =head1 AUTHOR
 

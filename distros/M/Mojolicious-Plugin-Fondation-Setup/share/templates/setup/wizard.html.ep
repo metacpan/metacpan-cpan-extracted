@@ -2,39 +2,43 @@
 % title l('Application Setup');
 
 <div class="container mt-4">
+  <h2><%= l('Application Setup') %></h2>
 
-  %# ── Progress indicator ──────────────────────────────────────────
-  <div class="mb-4">
-    <h2><%= l('Application Setup') %></h2>
-    % my $state_meta = $wf->state_fondation;
-    <p class="text-muted"><%= $c->l($state_meta->{description} // '') %></p>
-  </div>
-
-  %# ── Unified alert: plugins to install or update ──
-  % my $missing    = stash('not_installed');
-  % my $upgradable = stash('upgradable');
-  % my @to_install = ((map { $_->{module_class} } @{$upgradable // []}), (@{$missing // []}));
-  % if (@to_install) {
+  %# ── Install command alert ────────────────────────────────────────
+  % if (my $cmd = stash('install_command')) {
     <div class="alert alert-warning">
       <strong><%= l('Run this command to install or update plugins:') %></strong>
-      <pre class="mt-2 mb-0"><code>cpanm <%= join ' ', @to_install %></code></pre>
+      <pre class="mt-2 mb-0"><code>cpanm <%= $cmd %></code></pre>
       <p class="mt-2 mb-0"><strong><%= l('Then run:') %></strong> <code>myapp.pl fondation refresh</code></p>
     </div>
   % }
 
-  % if ($is_done) {
-    %# ── Done state ─────────────────────────────────────────────────
+  %# ── Unresolvable deps alert ──────────────────────────────────────
+  % my $unresolvable = stash('unresolvable');
+  % if ($unresolvable && @$unresolvable) {
+    <div class="alert alert-danger">
+      <strong><%= l('Unresolvable dependencies:') %></strong>
+      <ul class="mb-0 mt-2">
+        % for my $u (@$unresolvable) {
+          <li><code><%= $u->{dependency} %></code> <%= l('required by') %> <code><%= $u->{plugin} %></code> &mdash; <%= l('not installed, not on CPAN') %></li>
+        % }
+      </ul>
+    </div>
+  % }
+
+  %# ── Done ────────────────────────────────────────────────────────
+  % if (stash('is_done')) {
     <div class="alert alert-success">
-      <h4><i class="bi bi-check-circle"></i> <%= l('Setup complete!') %></h4>
+      <h4><%= l('Setup complete!') %></h4>
       % if (my $path = stash('conf_path')) {
-        <p><%= l('Configuration saved to') %>: <code><%= $path %></code></p>
+        <p><%= l('Configuration saved to:') %> <code><%= $path %></code></p>
       % }
-      % my $plugins = stash('selected_plugins');
-      % if ($plugins && @$plugins) {
+      % my $p = stash('selected_plugins');
+      % if ($p && @$p) {
         <p><%= l('Configured plugins:') %></p>
         <ul>
-          % for my $p (@$plugins) {
-            <li><code><%= $p %></code></li>
+          % for my $pl (@$p) {
+            <li><code><%= $pl %></code></li>
           % }
         </ul>
       % }
@@ -45,166 +49,127 @@ myapp.pl daemon</code></pre>
       % } else {
         <div class="alert alert-warning mt-2">
           <strong><%= l('Important:') %></strong>
-          <%= l('The Mojolicious::Plugin::Config plugin is not loaded. To use this configuration file, add the following to your application startup script:') %>
+          <%= l('The Config plugin is not loaded. Add this to your startup script:') %>
           <pre class="mt-2"><code>plugin 'Config';</code></pre>
           <p class="mb-0"><strong><%= l('Then run:') %></strong> <code>myapp.pl fondation refresh</code></p>
         </div>
       % }
-      <div class="alert alert-info mt-2">
-        <strong><%= l('Tip:') %></strong>
-        <%= l('Fondation::Setup is only needed during initial configuration. Once your app is configured, you can simplify your startup script to:') %>
-        <pre class="mt-2"><code>plugin 'Config';
-plugin 'Fondation';</code></pre>
-        <%= l('All plugin dependencies are now managed through your configuration file.') %>
-      </div>
     </div>
 
-  % } elsif ($is_review) {
-    %# ── Review state: show all collected context values ────────────
+    <div class="mt-3">
+      <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger"><%= l('Start Over') %></a>
+    </div>
+
+  %# ── Review ──────────────────────────────────────────────────────
+  % } elsif (stash('is_review')) {
+    % my $entries = stash('review_entries');
+    % if ($entries && @$entries) {
     <div class="card mb-4">
       <div class="card-header"><strong><%= l('Review') %></strong></div>
       <div class="card-body">
         <table class="table table-striped">
           <thead><tr><th><%= l('Parameter') %></th><th><%= l('Value') %></th></tr></thead>
           <tbody>
-            % my $raw = $wf->wf->context->param;
-            % my $ctx = ref $raw eq 'HASH' ? $raw : {};
-            % for my $key (sort keys %$ctx) {
-              % next unless defined $ctx->{$key} && $ctx->{$key} ne '';
-              % next if $key eq 'workflow_id';
-              % next if $key eq '_plugins';
-              % next if $key eq '_conf_path';
-              <tr><td><code><%= $key %></code></td><td><%= $ctx->{$key} %></td></tr>
+            % for my $e (@$entries) {
+              <tr><td><code><%= $e->{key} %></code></td><td><%= $e->{value} %></td></tr>
             % }
           </tbody>
         </table>
       </div>
     </div>
+    % }
 
+    <div class="d-flex gap-2">
+      % if (stash('can_configure')) {
+        <form method="post" action="<%= url_for 'setup_execute' %>">
+          %= csrf_field
+          <input type="hidden" name="action" value="back">
+          <button type="submit" class="btn btn-secondary"><%= l('Back') %></button>
+        </form>
+        <form method="post" action="<%= url_for 'setup_execute' %>">
+          %= csrf_field
+          <input type="hidden" name="action" value="save">
+          <button type="submit" class="btn btn-success"><%= l('Save Configuration') %></button>
+        </form>
+        <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger ms-auto"><%= l('Reset') %></a>
+      % } else {
+        <a href="<%= url_for 'setup_plugins' %>" class="btn btn-primary"><%= l('I have installed the plugins, retry') %></a>
+        <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger ms-auto"><%= l('Reset') %></a>
+      % }
+    </div>
+
+  %# ── Form (parameter state) ──────────────────────────────────────
   % } else {
-    %# ── Parameter state: render form fields ────────────────────────
-    % my $params = $state_meta->{parameters} // [];
+    % my $state   = stash('current_state');
+    % my $ctx     = stash('context') // {};
+    % my $is_first = stash('is_first');
+    % my $is_last  = stash('is_last');
+
     <form method="post" action="<%= url_for 'setup_execute' %>">
       %= csrf_field
       <div class="card mb-4">
         <div class="card-header">
-          <strong><%= $c->l($state_meta->{label}) %></strong>
-          % if ($state_meta->{plugin}) {
-            <small class="text-muted">(<%= $state_meta->{plugin} %>)</small>
-          % }
+          <strong><%= $state->{label} %></strong>
+          <small class="text-muted">(<%= $state->{plugin} %>)</small>
         </div>
         <div class="card-body">
-          % for my $p (@$params) {
-            % my $val = $context->{$p->{key}} // $p->{current};
+          % if ($state->{description}) {
+            <p class="text-muted"><%= $state->{description} %></p>
+          % }
+          % for my $f (@{$state->{fields}}) {
+            % my $val = $ctx->{$f->{key}} // $f->{current};
             <div class="mb-3">
-              <label for="<%= $p->{key} %>" class="form-label">
-                <%= $c->l($p->{label}) %>
-                % if ($p->{required}) {
+              <label for="<%= $f->{key} %>" class="form-label">
+                <%= $f->{label} %>
+                % if ($f->{required}) {
                   <span class="text-danger">*</span>
                 % }
               </label>
 
-              % my $type = $p->{type} // 'string';
-
-              % if ($type eq 'select' && $p->{options}) {
-                <select name="<%= $p->{key} %>" id="<%= $p->{key} %>"
-                        class="form-select">
-                  % for my $opt (@{$p->{options}}) {
-                    % my $opt_val   = ref $opt eq 'HASH' ? $opt->{value} : $opt;
-                    % my $opt_label = ref $opt eq 'HASH' ? ($opt->{label} // $opt_val) : $opt;
-                    <option value="<%= $opt_val %>"
-                            <%= defined $val && $val eq $opt_val ? 'selected' : '' %>>
-                      <%= $c->l($opt_label) %>
-                    </option>
+              % if ($f->{type} eq 'select' && $f->{options}) {
+                <select name="<%= $f->{key} %>" id="<%= $f->{key} %>" class="form-select">
+                  % for my $opt (@{$f->{options}}) {
+                    % my $ov = ref $opt eq 'HASH' ? $opt->{value} : $opt;
+                    % my $ol = ref $opt eq 'HASH' ? ($opt->{label} // $ov) : $opt;
+                    <option value="<%= $ov %>" <%= defined $val && $val eq $ov ? 'selected' : '' %>><%= $ol %></option>
                   % }
                 </select>
-
-              % } elsif ($type eq 'boolean') {
+              % } elsif ($f->{type} eq 'boolean') {
                 <div class="form-check">
-                  <input type="checkbox" name="<%= $p->{key} %>" id="<%= $p->{key} %>"
-                         class="form-check-input" value="1"
-                         <%= $val ? 'checked' : '' %>>
+                  <input type="checkbox" name="<%= $f->{key} %>" id="<%= $f->{key} %>"
+                         class="form-check-input" value="1" <%= $val ? 'checked' : '' %>>
                 </div>
-
-              % } elsif ($type eq 'integer') {
-                <input type="number" name="<%= $p->{key} %>" id="<%= $p->{key} %>"
+              % } elsif ($f->{type} eq 'integer') {
+                <input type="number" name="<%= $f->{key} %>" id="<%= $f->{key} %>"
                        value="<%= $val %>" class="form-control"
-                       <%= defined $p->{min} ? qq{min="$p->{min}"} : '' %>
-                       <%= defined $p->{max} ? qq{max="$p->{max}"} : '' %>>
-
-              % } elsif ($type eq 'password') {
-                <input type="password" name="<%= $p->{key} %>" id="<%= $p->{key} %>"
+                       <%= defined $f->{min} ? qq{min="$f->{min}"} : '' %>
+                       <%= defined $f->{max} ? qq{max="$f->{max}"} : '' %>>
+              % } elsif ($f->{type} eq 'password') {
+                <input type="password" name="<%= $f->{key} %>" id="<%= $f->{key} %>"
                        value="<%= $val %>" class="form-control"
-                       placeholder="<%= $c->l($p->{placeholder} // '') %>">
-
+                       placeholder="<%= $f->{placeholder} // '' %>">
               % } else {
-                %# string, text, or unknown — default to text input
-                <input type="text" name="<%= $p->{key} %>" id="<%= $p->{key} %>"
+                <input type="text" name="<%= $f->{key} %>" id="<%= $f->{key} %>"
                        value="<%= $val %>" class="form-control"
-                       placeholder="<%= $c->l($p->{placeholder} // '') %>">
-              % }
-
-              % if ($p->{description}) {
-                <div class="form-text"><%= $c->l($p->{description}) %></div>
+                       placeholder="<%= $f->{placeholder} // '' %>">
               % }
             </div>
           % }
         </div>
       </div>
-  % }
 
-  %# ── Action buttons (inside the same form for parameter states,
-  %#   separate forms for review since there are no fields) ──────────
-  % unless ($is_done) {
-    % if (!$is_review) {
-      %# Parameter state: buttons inside the form
       <div class="d-flex gap-2">
-        % my @actions = @{ $wf->actions };
-        % for my $a (@actions) {
-          <button type="submit" name="action" value="<%= $a->{name} %>"
-                  class="btn btn-<%= $a->{color} // 'primary' %>">
-            % if ($a->{icon}) {
-              <i class="bi bi-<%= $a->{icon} %>"></i>
-            % }
-            <%= $c->l($a->{label}) %>
-          </button>
+        % unless ($is_first) {
+          <button type="submit" name="action" value="back" class="btn btn-secondary"><%= l('Back') %></button>
         % }
-        <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger ms-auto">
-          <%= l('Reset') %>
-        </a>
-      </div>
-      </form>
-    % } else {
-      %# Review state
-      <div class="d-flex gap-2">
-        % if (@to_install) {
-          %# Plugins to install — retry link with selected plugins in URL
-          % my $sel_param = join(',', @{$selected_plugins // []});
-          <a href="<%= url_for('setup_plugins')->query(selected => $sel_param) %>"
-             class="btn btn-primary">
-            <%= l('I have installed the plugins, retry') %>
-          </a>
+        % if ($is_last) {
+          <button type="submit" name="action" value="save" class="btn btn-success"><%= l('Save Configuration') %></button>
         % } else {
-          % my @actions = @{ $wf->actions };
-          % for my $a (@actions) {
-            <form method="post" action="<%= url_for 'setup_execute' %>" class="d-inline">
-              %= csrf_field
-              <input type="hidden" name="action" value="<%= $a->{name} %>">
-              <button type="submit"
-                      class="btn btn-<%= $a->{color} // 'primary' %>">
-                % if ($a->{icon}) {
-                  <i class="bi bi-<%= $a->{icon} %>"></i>
-                % }
-                <%= $c->l($a->{label}) %>
-              </button>
-            </form>
-          % }
+          <button type="submit" name="action" value="next" class="btn btn-primary"><%= l('Next') %></button>
         % }
-        <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger ms-auto">
-          <%= l('Reset') %>
-        </a>
+        <a href="<%= url_for 'setup_reset' %>" class="btn btn-outline-danger ms-auto"><%= l('Reset') %></a>
       </div>
-    % }
+    </form>
   % }
 
 </div>

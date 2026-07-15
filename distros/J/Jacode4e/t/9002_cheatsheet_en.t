@@ -2,7 +2,7 @@
 #
 # 9002_cheatsheet_en.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e Cheatsheet (English)
 # This test also serves as a quick reference for English speakers.
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -86,7 +91,8 @@ use lib "$FindBin::Bin/../lib";
 # [ROUND-TRIP CAUTION]
 #
 #   Lossy conversions exist (e.g. CP932 has 398 non-round-trip mappings).
-#   For round-trip conversion, use the Jacode4e::RoundTrip module.
+#   For round-trip conversion, use the 'ROUND_TRIP' => 1 option.
+#   Both directions need 'ROUND_TRIP' => 1 and the same Jacode4e version.
 #
 # ======================================================================
 

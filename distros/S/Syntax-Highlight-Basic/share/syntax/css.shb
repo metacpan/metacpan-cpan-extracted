@@ -1,0 +1,30 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for CSS
+language: css
+extensions: css
+
+[match:Comment]
+pattern: /\*.*\*/
+
+[match:Number]
+pattern: \b\d+(?:\.\d+)?(?:px|em|rem|%|vh|vw|pt|cm|mm)?\b
+
+[match:Special]
+pattern: [{}();:.,]+
+
+[match:Identifier]
+pattern: [.#]\w[\w-]*
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:Comment]
+start: /*
+end: */

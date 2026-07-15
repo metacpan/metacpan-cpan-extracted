@@ -1,0 +1,50 @@
+# Syntax file for 8th
+# Converted from: 8th.vim
+# Conversion date: 2026-07-13
+
+language: 8th
+extensions: 8th
+
+[keyword:Define]
+i; var var,
+
+[keyword:Function]
+null
+
+[keyword:Number]
+base! base@ decimal hex
+
+[match:Define]
+pattern: \b\S+:
+
+[match:Number]
+pattern: \b'.\b
+
+[match:Label]
+pattern: "\"[^"]+\"\s*:
+
+[match:Include]
+pattern: \bneeds\[
+
+[match:Include]
+pattern: ]\b
+
+[match:Define]
+pattern: m:\[]!
+
+[match:Define]
+pattern: v:\[]
+
+[match:Define]
+pattern: db:bind-exec\[]
+
+[match:Define]
+pattern: db:exec\[]
+
+[match:Define]
+pattern: db:col\[]
+
+[region:String]
+start: \.\?"
+end: $
+

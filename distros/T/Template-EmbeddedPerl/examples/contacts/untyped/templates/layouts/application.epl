@@ -1,0 +1,11 @@
+% args $title
+<!doctype html>
+<html>
+<head>
+<title><%= $title %></title>
+%= yield 'head'
+</head>
+<body>
+%= yield
+</body>
+</html>

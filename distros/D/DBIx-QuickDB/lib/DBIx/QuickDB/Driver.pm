@@ -2,16 +2,15 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000054';
+our $VERSION = '0.000055';
 
 use Carp qw/croak confess/;
-use File::Path qw/remove_tree/;
 use File::Temp qw/tempdir/;
 use POSIX ":sys_wait_h";
 use Scalar::Util qw/blessed/;
 use Time::HiRes qw/sleep time/;
 
-use DBIx::QuickDB::Util qw/clone_dir env_timeout/;
+use DBIx::QuickDB::Util qw/clone_dir env_timeout remove_tree_robust/;
 
 use DBIx::QuickDB::Watcher;
 
@@ -304,15 +303,20 @@ sub checkpoint { }
 sub cleanup {
     my $self = shift;
 
-    # Ignore errors here. The eval matters: the 'error' handler only collects
-    # per-file failures, but File::Path hard-dies ("cannot chdir to .. from
-    # DIR ... aborting") when the tree mutates underneath it -- which happens
-    # legitimately when the watcher daemon is deleting this same directory
-    # concurrently. Deletion is idempotent best-effort; whoever wins, the dir
-    # ends up gone. Without the eval that race aborted the whole process (in
-    # cleanup) after an otherwise passing run.
-    my $err = [];
-    eval { remove_tree($self->{+DIR}, {safe => 1, error => \$err}) } if -d $self->{+DIR};
+    # Close any of this process's DBI handles to this db BEFORE deleting the
+    # data dir. Essential on Windows: a still-open SQLite database file cannot
+    # be unlinked, which leaves the directory non-empty so its removal fails.
+    # The watcher teardown paths (stop/DESTROY/destroy_quietly) already
+    # disconnect before signalling, but the watcher-less path -- SQLite, whose
+    # stop() is a no-op -- reached cleanup() with handles still open. Idempotent:
+    # a second disconnect simply finds no matching handles.
+    $self->_disconnect_handles;
+
+    # Best-effort, idempotent, and Windows-aware (retries while a transient lock
+    # clears). Errors are swallowed: the watcher daemon may be deleting this same
+    # directory concurrently, and either way the dir ends up gone. See
+    # DBIx::QuickDB::Util::remove_tree_robust.
+    remove_tree_robust($self->{+DIR}) if -d $self->{+DIR};
     return;
 }
 

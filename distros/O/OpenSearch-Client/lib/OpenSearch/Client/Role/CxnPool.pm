@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::CxnPool;
-$OpenSearch::Client::Role::CxnPool::VERSION = '3.007008';
+$OpenSearch::Client::Role::CxnPool::VERSION = '3.007009';
 use Moo::Role;
 use OpenSearch::Client::Util qw(parse_params);
 use List::Util qw(shuffle);
@@ -158,7 +158,7 @@ OpenSearch::Client::Role::CxnPool - Provides common functionality to the CxnPool
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 DESCRIPTION
 

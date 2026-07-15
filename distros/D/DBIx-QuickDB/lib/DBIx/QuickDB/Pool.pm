@@ -2,16 +2,17 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000054';
+our $VERSION = '0.000055';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
-use File::Path qw/remove_tree make_path/;
+use File::Path qw/make_path/;
 use Digest::SHA qw/sha1_hex/;
 use Scalar::Util qw/refaddr/;
 use Time::HiRes qw/time/;
 
 use DBIx::QuickDB;
+use DBIx::QuickDB::Util qw/remove_tree_robust/;
 
 use DBIx::QuickDB::Util::HashBase qw{
     +cache_dir
@@ -81,7 +82,7 @@ sub clear_old_cache {
         next unless $age <= (time - $stamp);
 
         eval {
-            remove_tree($full, {safe => 1});
+            remove_tree_robust($full);
             unlink("$full.lock") if -e "$full.lock";
             unlink("$full.READY") if -e "$full.READY";
             1;
@@ -327,7 +328,7 @@ sub cache_check {
     delete $spec->{db};
     delete $spec->{built_checksum};
 
-    remove_tree($spec->{dir}, {safe => 1}) if $self->{+PURGE_OLD};
+    remove_tree_robust($spec->{dir}) if $self->{+PURGE_OLD};
 
     delete $spec->{dir};
 
@@ -338,8 +339,11 @@ sub build_db {
     my $self = shift;
     my ($dir, $spec, %params) = @_;
 
-    # Create the dir, deleting it if it exists
-    remove_tree($dir, {safe => 1}) if -d $dir;
+    # Create the dir, deleting it if it exists. On Windows a lingering handle to
+    # a prior instance's data file can otherwise leave the dir non-empty, so the
+    # stale db survives into the rebuilt instance (a later CREATE TABLE then dies
+    # with "table already exists"); remove_tree_robust retries past that.
+    remove_tree_robust($dir) if -d $dir;
     make_path($dir);
     $spec->{dir} = $dir;
 

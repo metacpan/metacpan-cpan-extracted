@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -10,11 +10,21 @@ use utf8;
 use PPI::Document;
 use File::Spec;
 use Digest::MD5;
+use Encode qw(encode);
 use Scalar::Util;
+use Template::EmbeddedPerl::Arguments;
 use Template::EmbeddedPerl::Compiled;
-use Template::EmbeddedPerl::Utils qw(normalize_linefeeds generate_error_message);
+use Template::EmbeddedPerl::RenderContext;
+use Template::EmbeddedPerl::RenderFrame;
+use Template::EmbeddedPerl::Utils qw(
+  diagnostic_source_label
+  normalize_linefeeds
+  generate_error_message
+);
 use Template::EmbeddedPerl::SafeString;
 use Regexp::Common qw /balanced/;
+
+our $ACTIVE_RENDERER;
 
 # used for the variable interpolation feature
 my $balanced_parens   = $RE{balanced}{-parens => '()'};
@@ -136,6 +146,7 @@ sub new {
     close_tag => '%>',
     expr_marker => '=',
     line_start => '%',
+    smart_lines => 0,
     sandbox_ns => 'Template::EmbeddedPerl::Sandbox',
     directories => [],
     template_extension => 'epl',
@@ -160,8 +171,15 @@ sub new {
 
 sub inject_helpers {
   my ($self) = @_;
+  my $sandbox_ns = $self->{sandbox_ns};
+  die "Invalid sandbox namespace '$sandbox_ns'"
+    unless defined($sandbox_ns) && $sandbox_ns =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
   my %helpers = $self->get_helpers;
   foreach my $helper(keys %helpers) {
+    die "Invalid template helper name '$helper'"
+      unless $helper =~ /\A[A-Za-z_]\w*\z/;
+
     if($self->{sandbox_ns}->can($helper)) {
       warn "Skipping injection of helper '$helper'; already exists in namespace $self->{sandbox_ns}" 
         if $ENV{DEBUG_TEMPLATE_EMBEDDED_PERL};
@@ -169,9 +187,43 @@ sub inject_helpers {
     }
     eval qq[
       package @{[ $self->{sandbox_ns} ]};
-      sub $helper { \$self->get_helpers('$helper')->(\$self, \@_) }
+      sub $helper {
+        my \$context = Template::EmbeddedPerl->_current_render_context('$helper');
+        my \$engine = \$context->engine;
+        \$engine->get_helpers('$helper')->(\$engine, \@_);
+      }
     ]; die $@ if $@;
   }
+}
+
+sub _current_render_context {
+  my ($class, $helper) = @_;
+  my $context = $ACTIVE_RENDERER;
+
+  die "Template helper '$helper' called outside render context" unless $context;
+
+  return $context;
+}
+
+sub _new_render_context {
+  my ($self, %args) = @_;
+  return Template::EmbeddedPerl::RenderContext->new(
+    engine => $self,
+    frame => Template::EmbeddedPerl::RenderFrame->new,
+    %args,
+  );
+}
+
+sub render_view {
+  my ($self, $view) = @_;
+  die "render_view requires a blessed view object\n"
+    unless Scalar::Util::blessed($view);
+
+  my $context = $self->_new_render_context(
+    view => $view,
+    root_view => $view,
+  );
+  return $context->render_view_object($view);
 }
 
 sub get_helpers {
@@ -195,15 +247,92 @@ sub default_helpers {
     escape_javascript => sub { my ($self, @args) = @_; return $self->escape_javascript(@args); },
     trim              => sub { my ($self, $arg) = @_; return $self->trim($arg); },
     mtrim             => sub { my ($self, $arg) = @_; return $self->mtrim($arg); },
+    partial           => sub {
+      my ($engine, $identifier, @args) = @_;
+      my $context = Template::EmbeddedPerl->_current_render_context('partial');
+      my $output = $context->render_file('partial', $identifier, @args);
+      return $engine->raw($output);
+    },
+    view              => sub {
+      my ($engine, $target, @args) = @_;
+      my $body = @args && ref($args[-1]) eq 'CODE' ? pop @args : undef;
+      my $context = Template::EmbeddedPerl->_current_render_context('view');
+      my $output = $context->frame->with_transaction(sub {
+        my $child = $context->build_child_view($target, \@args);
+        my $captured = $body ? $body->($child) : '';
+        return $context->frame->with_body(
+          defined($captured) ? $captured : '',
+          sub {
+            return $context->with(view => $child)->render_view_object($child);
+          },
+        );
+      });
+      return $engine->raw($output);
+    },
+    layout            => sub {
+      my ($engine, $identifier, @args) = @_;
+      my $context = Template::EmbeddedPerl->_current_render_context('layout');
+      $context->frame->register_layout($identifier, @args);
+      return;
+    },
+    content_for       => sub {
+      my ($engine, @args) = @_;
+      my ($name, $callback) = _content_capture_arguments('content_for', @args);
+      my $frame = Template::EmbeddedPerl->_current_render_context('content_for')->frame;
+      my $output = $callback->();
+      $frame->append_content($name, $engine->raw(defined $output ? $output : ''));
+      return;
+    },
+    content_replace   => sub {
+      my ($engine, @args) = @_;
+      my ($name, $callback) = _content_capture_arguments('content_replace', @args);
+      my $frame = Template::EmbeddedPerl->_current_render_context('content_replace')->frame;
+      my $output = $callback->();
+      $frame->replace_content($name, $engine->raw(defined $output ? $output : ''));
+      return;
+    },
+    has_content       => sub {
+      my ($engine, @args) = @_;
+      my ($name) = _content_name_arguments('has_content', @args);
+      return Template::EmbeddedPerl->_current_render_context('has_content')->frame
+        ->has_content($name);
+    },
+    yield             => sub {
+      my ($engine, @args) = @_;
+      my $frame = Template::EmbeddedPerl->_current_render_context('yield')->frame;
+      my $output = @args
+        ? $frame->content(_content_name_arguments('yield', @args))
+        : $frame->default_body;
+      return $engine->raw($output);
+    },
     to_safe_string    => sub {
-      my ($self, @args) = @_;
+      my ($engine, @args) = @_;
+      my $context = Template::EmbeddedPerl->_current_render_context('to_safe_string');
+      my $receiver = defined($context->view) ? $context->view : $engine;
       return map {
         Scalar::Util::blessed($_) && $_->can('to_safe_string')
-        ? $_->to_safe_string($self)
+        ? $_->to_safe_string($receiver)
         : $_;
       } @args;
     },
   );
+}
+
+sub _content_capture_arguments {
+  my ($helper, @args) = @_;
+  die "Invalid $helper arguments" unless @args == 2;
+  my ($name, $callback) = @args;
+  die "Invalid $helper name" unless defined($name) && !ref($name) && length($name);
+  die "Invalid $helper callback" unless ref($callback) eq 'CODE';
+  return ($name, $callback);
+}
+
+sub _content_name_arguments {
+  my ($helper, @args) = @_;
+  die "Invalid $helper arguments" unless @args == 1;
+  my ($name) = @args;
+  die "Invalid $helper name" unless defined($name) && !ref($name) && length($name);
+  return $name;
 }
 
 # Create a new template document in various ways
@@ -211,19 +340,26 @@ sub default_helpers {
 sub from_string {
   my ($proto, $template, %args) = @_;
   my $source = delete($args{source});
+  my $identifier = delete($args{identifier});
   my $self = ref($proto) ? $proto : $proto->new(%args);
+  my $diagnostic_source = diagnostic_source_label($source);
 
   my $digest;
   if($self->{use_cache}) {
-    $digest = Digest::MD5::md5_hex($template);
+    $self->{compiled_cache} ||= {};
+    $digest = Digest::MD5::md5_hex(
+      $template,
+      "\0template-source\0",
+      encode('UTF-8', $diagnostic_source),
+    );
     if(my $cached = $self->{compiled_cache}->{$digest}) {
-      return $self->{compiled_cache}->{$digest};
       return bless {
         template => $cached->{template},
         parsed => $cached->{parsed},
         code => $cached->{code},
         yat => $self,
         source => $source,
+        identifier => $identifier,
       }, 'Template::EmbeddedPerl::Compiled';     
     }  
   }
@@ -231,7 +367,22 @@ sub from_string {
   $template = normalize_linefeeds($template);
 
   my @template = split(/\n/, $template);
-  my @parsed = $self->parse_template($template);
+  my ($rewritten_template) = eval {
+    Template::EmbeddedPerl::Arguments->rewrite(
+      $template,
+      comment_mark => $self->{comment_mark},
+      line_start => $self->{line_start},
+      open_tag => $self->{open_tag},
+      close_tag => $self->{close_tag},
+    );
+  };
+  if ($@) {
+    my $error = $@;
+    $error =~ s/ at template line (\d+)\n\z/ at $diagnostic_source line $1\n/;
+    die $error;
+  }
+
+  my @parsed = $self->parse_template($rewritten_template);
   my $code = $self->compile(\@template, $source, @parsed);
 
   if($self->{use_cache}) {
@@ -248,27 +399,33 @@ sub from_string {
     code => $code,
     yat => $self,
     source => $source,
+    identifier => $identifier,
   }, 'Template::EmbeddedPerl::Compiled'; 
 }
 
 sub from_data {
   my ($proto, $package, @args) = @_;
 
-  eval "require $package;"; if ($@) {
+  die "Invalid package name '$package'"
+    unless defined($package) && $package =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
+  my $package_file = $package;
+  $package_file =~ s{::}{/}g;
+  eval { require "${package_file}.pm"; 1 }; if ($@) {
     die "Failed to load package '$package': $@";
   }
 
   my $data_handle = do { no strict 'refs'; *{"${package}::DATA"}{IO} };
   if (defined $data_handle) {
-    #my $position = tell( $data_handle );
+    my $position = tell($data_handle);
     my $data_content = do { local $/; <$data_handle> };
-    #seek $data_handle, $position, 0;
-    my $package_file = $package;
-    $package_file =~ s/::/\//g;
+    seek($data_handle, $position, 0)
+      or die "Failed to restore __DATA__ handle for package '$package': $!"
+      if defined($position) && $position >= 0;
     my $path = $INC{"${package_file}.pm"};
-    return $proto->from_string($data_content, @args, source => "${path}/DATA");
+    return $proto->from_string($data_content, @args, source => "@{[ $path || $package ]}/DATA");
   } else {
-    print "No __DATA__ section found in package $package.\n";
+    die "No __DATA__ section found in package '$package'";
   }
 }
 
@@ -283,19 +440,123 @@ sub from_fh {
 sub from_file {
   my ($proto, $file_proto, @args) = @_;
   my $self = ref($proto) ? $proto : $proto->new(@args);
-  my $file = "${file_proto}.@{[ $self->{template_extension} ]}";
+  my $path = $self->_resolve_template_file($file_proto);
+  $Template::EmbeddedPerl::RenderContext::SOURCE_OBSERVER->($self, $file_proto, $path)
+    if $Template::EmbeddedPerl::RenderContext::SOURCE_OBSERVER;
+  return $self->_from_resolved_file($file_proto, $path, @args);
+}
 
-  # find if it exists in the directories
-  foreach my $dir (@{ $self->{directories} }) {
-    $dir = File::Spec->catdir(@$dir) if ((ref($dir)||'') eq 'ARRAY');
-    my $path = File::Spec->catfile($dir, $file);
-    if (-e $path) {
-      open my $fh, '<', $path or die "Failed to open file $path: $!";
-      my %args = (@args, source => $path);
-      return $self->from_fh($fh, %args);
-    }
+sub _from_resolved_file {
+  my ($self, $identifier, $path, @args) = @_;
+  open my $fh, '<', $path or die "Failed to open file $path: $!";
+  my %args = (@args, source => $path, identifier => $identifier);
+  return $self->from_fh($fh, %args);
+}
+
+sub _template_candidates {
+  my ($self, $identifier) = @_;
+  my $file = "$identifier.$self->{template_extension}";
+  return map {
+    File::Spec->catfile(ref($_) eq 'ARRAY' ? File::Spec->catdir(@$_) : $_, $file)
+  } @{ $self->{directories} };
+}
+
+sub _resolve_template_file {
+  my ($self, $identifier) = @_;
+  my @candidates = $self->_template_candidates($identifier);
+  return $_ for grep { -e $_ } @candidates;
+  die "Template '$identifier' not found; searched: " . join(', ', @candidates) . "\n";
+}
+
+sub _snake_case_segment {
+  my ($self, $segment) = @_;
+  $segment =~ s/([A-Z]+)([A-Z][a-z])/$1_$2/g;
+  $segment =~ s/([a-z0-9])([A-Z])/$1_$2/g;
+  return lc $segment;
+}
+
+sub _class_to_template {
+  my ($self, $class) = @_;
+  my $namespace = $self->{view_namespace};
+  my $prefix = defined($namespace) ? "$namespace\::" : undef;
+
+  die "Cannot resolve template for view class '$class'\n"
+    unless defined($prefix) && index($class, $prefix) == 0;
+
+  my $suffix = substr($class, length($prefix));
+  die "Cannot resolve template for view class '$class'\n" unless length($suffix);
+
+  return join '/', map { $self->_snake_case_segment($_) } split /::/, $suffix;
+}
+
+sub _logical_view_class {
+  my ($self, $logical_name) = @_;
+
+  die "Invalid logical view name '$logical_name'\n"
+    unless defined($logical_name)
+      && !ref($logical_name)
+      && $logical_name =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
+  my $namespace = $self->{view_namespace};
+  die "Logical view '$logical_name' requires view_namespace\n"
+    unless defined($namespace) && length($namespace);
+  die "Invalid view_namespace '$namespace'\n"
+    unless $namespace =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
+  return "$namespace\::$logical_name";
+}
+
+sub _construct_view {
+  my ($self, $logical_name, $args, $context) = @_;
+  my $class = $self->_logical_view_class($logical_name);
+
+  unless ($class->can('new')) {
+    my $class_file = "$class.pm";
+    $class_file =~ s{::}{/}g;
+    my $loaded = eval { require $class_file; 1 };
+    die "Failed to load logical view '$logical_name' as '$class': $@"
+      unless $loaded;
   }
-  die "File $file not found in directories: @{[ join ', ', @{ $proto->{directories} } ]}";
+
+  my $factory = $self->{view_factory};
+  die "view_factory must be a code reference\n"
+    if defined($factory) && ref($factory) ne 'CODE';
+
+  my $view;
+  if ($factory) {
+    my $constructed = eval {
+      $view = $factory->($class, {%$args}, $context);
+      1;
+    };
+    die "view_factory failed for logical view '$logical_name' as '$class': $@"
+      unless $constructed;
+  } else {
+    my $constructed = eval {
+      $view = $class->new(%$args);
+      1;
+    };
+    die "Failed to construct logical view '$logical_name' as '$class': $@"
+      unless $constructed;
+  }
+
+  die "view_factory did not return a blessed view for '$logical_name'\n"
+    if $factory && !Scalar::Util::blessed($view);
+  die "Constructor did not return a blessed view for '$logical_name'\n"
+    unless Scalar::Util::blessed($view);
+
+  return $view;
+}
+
+sub _resolve_view_template {
+  my ($self, $view) = @_;
+  my $class = Scalar::Util::blessed($view) || ref($view) || "$view";
+
+  if (Scalar::Util::blessed($view) && $view->can('template')) {
+    my $template = $view->template;
+    return $template if defined($template) && length($template);
+  }
+
+  return $self->_class_to_template($class);
 }
 
 # Methods to parse and compile the template
@@ -307,20 +568,38 @@ sub parse_template {
   my $expr_marker = $self->{expr_marker};
   my $line_start = $self->{line_start};
   my $comment_mark = $self->{comment_mark};
+  my $trim_close_tag = "-${close_tag}";
+  my $expr_trim_close_tag = "${expr_marker}${close_tag}";
 
   ## support shorthand line start tags ##
 
-  # Convert all lines starting with %= to start with <%= and then add %> to the end
-  $template =~ s/^\s*${line_start}${expr_marker}(.*?)(?=\\?$)/${open_tag}${expr_marker}$1${close_tag}/mg;
-  # Convert all lines starting with % to start with <% and then add %> to the end
-  # Use negative lookahead (?!>\s*\\?$) to exclude %> closing tag from conversion
-  $template =~ s/^\s*${line_start}(?!>\s*\\?$)(.*?)(?=\\?$)/${open_tag}$1${close_tag}/mg;
+  if ($self->{smart_lines}) {
+    $template =~ s{\r\n}{\n}g;
+    $template =~ s{
+        ^[\t ]*\Q${line_start}${expr_marker}\E(.*?)(\n|\z)
+    }{
+        $open_tag . $expr_marker . $1 . $close_tag
+          . (length($2) ? "\\\n" : '')
+    }mgex;
+    $template =~ s{
+        ^[\t ]*(?!\Q${close_tag}\E[\t ]*$)\Q${line_start}\E(.*?)(\n|\z)
+    }{
+        $open_tag . $1 . $close_tag
+          . (length($2) ? "\\\n" : '')
+    }mgex;
+  } else {
+    # Convert all lines starting with %= to start with <%= and then add %> to the end
+    $template =~ s{^\s*\Q${line_start}${expr_marker}\E(.*?)(?=\\?$)}{${open_tag}${expr_marker}$1${close_tag}}mg;
+    # Convert all lines starting with % to start with <% and then add %> to the end
+    # Exclude lines containing only the closing tag from conversion.
+    $template =~ s{^\s*(?!\Q${close_tag}\E\s*\\?$)\Q${line_start}\E(.*?)(?=\\?$)}{${open_tag}$1${close_tag}}mg;
+  }
 
   ## Escapes so you can actually have % and %= in the template
   # Convert all lines starting with \%= to start instead with %=
-  $template =~ s/^\s*\\${line_start}${expr_marker}(.*)$/${line_start}${expr_marker}$1/mg;
+  $template =~ s{^\s*\\\Q${line_start}${expr_marker}\E(.*)$}{${line_start}${expr_marker}$1}mg;
   # Convert all lines starting with \% to start instead with %
-  $template =~ s/^\s*\\${line_start}(.*)$/${line_start}$1/mg;
+  $template =~ s{^\s*\\\Q${line_start}\E(.*)$}{${line_start}$1}mg;
 
   # This code parses the template and returns an array of parsed blocks.
   # Each block is represented as an array reference with two elements: the type and the content.
@@ -332,20 +611,30 @@ sub parse_template {
   #my @segments = split /(\Q${open_tag}\E.*?\Q${close_tag}\E)/s, $template;
   my @segments = split /((?<!\\)\Q${open_tag}\E.*?(?<!\\)\Q${close_tag}\E)/s, $template;
   my @parsed = ();
+  my $trim_next_text = 0;
 
   foreach my $segment (@segments) {
 
-    my ($open_type, $content, $close_type) = ($segment =~ /^(\Q${open_tag}${expr_marker}\E|\Q$open_tag\E)(.*?)(\Q${expr_marker}${close_tag}\E|\Q$close_tag\E)?$/s);
+    my ($open_type, $content, $close_type) = ($segment =~ /^(\Q${open_tag}${expr_marker}\E|\Q$open_tag\E)(.*?)(\Q${trim_close_tag}\E|\Q${expr_trim_close_tag}\E|\Q$close_tag\E)?$/s);
     if(!$open_type) {
+      if($trim_next_text) {
+        $trim_next_text = 0;
+        if($segment =~ s/\A[ \t]*\n//) {
+          $segment = "\\\n$segment";
+        } else {
+          $segment =~ s/\A[ \t]*\z//;
+        }
+      }
+
       # Remove \ from escaped line_start, open_tag, and close_tag
-      $segment =~ s/\\${line_start}/${line_start}/g;
-      $segment =~ s/\\${open_tag}/${open_tag}/g;
-      $segment =~ s/\\${close_tag}/${close_tag}/g;
-      $segment =~ s/\\${expr_marker}${close_tag}/${expr_marker}${close_tag}/g;
+      $segment =~ s{\\\Q${line_start}\E}{${line_start}}g;
+      $segment =~ s{\\\Q${open_tag}\E}{${open_tag}}g;
+      $segment =~ s{\\\Q${close_tag}\E}{${close_tag}}g;
+      $segment =~ s{\\\Q${expr_marker}${close_tag}\E}{${expr_marker}${close_tag}}g;
 
       # check the segment for comment lines 
-      $segment =~ s/^[ \t]*?${comment_mark}.*?(\\?)$/$1/mg; 
-      $segment =~ s/^[ \t]*?\\${comment_mark}/${comment_mark}/mg;
+      $segment =~ s{^[ \t]*?\Q${comment_mark}\E.*?(\\?)$}{$1}mg;
+      $segment =~ s{^[ \t]*?\\\Q${comment_mark}\E}{${comment_mark}}mg;
 
       if($self->{interpolation}) {
         my @parts = ();
@@ -380,17 +669,21 @@ sub parse_template {
         push @parsed, ['text', $segment];
       }
     } else {
+      $trim_next_text = 0 if $trim_next_text;
+
       # Support trim with =%>
-      $content = "trim $content" if $close_type eq "${expr_marker}${close_tag}";
+      $content = "trim $content"
+        if $open_type eq "${open_tag}${expr_marker}" && $close_type eq $expr_trim_close_tag;
+      $trim_next_text = 1 if $close_type eq $trim_close_tag;
 
       # ?? ==%> or maybe something else...
       # $parsed[-1][1] =~s/[ \t]+$//mg if $close_type eq "${expr_marker}${close_tag}";
  
       # Remove \ from escaped line_start, open_tag, and close_tag
-      $content =~ s/\\${line_start}/${line_start}/g;
-      $content =~ s/\\${open_tag}/${open_tag}/g;
-      $content =~ s/\\${close_tag}/${close_tag}/g;
-      $content =~ s/\\${expr_marker}${close_tag}/${expr_marker}${close_tag}/g;
+      $content =~ s{\\\Q${line_start}\E}{${line_start}}g;
+      $content =~ s{\\\Q${open_tag}\E}{${open_tag}}g;
+      $content =~ s{\\\Q${close_tag}\E}{${close_tag}}g;
+      $content =~ s{\\\Q${expr_marker}${close_tag}\E}{${expr_marker}${close_tag}}g;
 
       if ($open_type eq "${open_tag}${expr_marker}") {
         push @parsed, ['expr', tokenize($content)];
@@ -431,11 +724,13 @@ sub compile {
       my $escaped_newline_end = $content =~ s/\\\n$//mg;
 
       $content =~ s/^\\\\/\\/mg;   
-      $compiled .= "@{[$escaped_newline_start ? qq[\n]:'' ]} \$_O .= \"" . quotemeta($content) . "\";@{[$escaped_newline_end ? qq[\n]:'' ]}";
+      $compiled .= ("\n" x $escaped_newline_start)
+        . ' $_O .= "' . quotemeta($content) . '";'
+        . ("\n" x $escaped_newline_end);
     }
   }
 
-  $compiled = $self->compiled($compiled);
+  $compiled = $self->compiled($compiled, $source);
 
   warn "Compiled: $compiled\n" if $ENV{DEBUG_TEMPLATE_EMBEDDED_PERL};
 
@@ -447,10 +742,13 @@ sub compile {
 }
 
 sub compiled {
-  my ($self, $compiled) = @_;
+  my ($self, $compiled, $source) = @_;
+  my $diagnostic_source = diagnostic_source_label($source);
   my $wrapper = "package @{[ $self->{sandbox_ns} ]}; ";
   $wrapper .= "use strict; use warnings; use utf8; @{[ $self->{preamble} ]}; ";
-  $wrapper .= "sub { my \$_O = ''; @{[ $self->{prepend} ]}; ${compiled}; return \$_O; };";
+  $wrapper .= "sub { my \$__context = shift; my \$_O = ''; my \$self = \$__context->view; @{[ $self->{prepend} ]};\n";
+  $wrapper .= qq{#line 1 "$diagnostic_source"\n};
+  $wrapper .= "${compiled}; return \$_O; };";
   return $wrapper;
 }
 
@@ -602,18 +900,16 @@ C<Template::EmbeddedPerl> is a template engine that allows you to embed Perl cod
 within template files or strings. It provides methods for creating templates
 from various sources, including strings, file handles, and data sections.
 
-The module also supports features like helper functions, automatic escaping, 
-and customizable sandbox environments.
+The module also supports features like helper functions, automatic escaping,
+and customizable template compilation namespaces.
 
 Its quite similar to L<Mojo::Template> and other embedded Perl template engines
 but its got one trick the others can't do (see L<EXCUSE> below).
 
-B<NOTE>: This is a very basic template engine, which doesn't have lots of things
-you probably need like template includes / partials and so forth.  That's by
-design since I plan to wrap this in a L<Catalyst> view which will provide
-all those features.  If you want to use this stand alone you might need to add
-those features yourself (or ideally put something on CPAN that wraps this to 
-provide those features).  Or you can pay me to do it for you ;)
+The core supports standalone composition with partials, layouts, named content
+blocks, and optional typed view objects. Framework integrations can provide a
+view resolver when logical child names need application-specific construction
+or dependency injection.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -713,13 +1009,34 @@ least potentially easier to read.  For example:
     <p><%= $item %></p>
 % }
 
+=head2 Smart Lines and Named Arguments
+
+Set C<smart_lines> to a true value to make a line beginning with C<< % >> or C<< %= >>
+a complete directive without a trailing delimiter. This is especially useful
+for declarative named template arguments:
+
+  % args $name, $greeting = 'Hello', $heading = sub { "Hello, $name" }
+  <p><%= $heading %></p>
+
+C<args> must be the first executable directive. An argument without a default
+is required; a scalar expression supplies a default; a coderef is a lazy
+default evaluated only when its argument is absent. An explicit C<undef> is a
+supplied value and does not evaluate a lazy default. Render arguments are named
+key/value pairs when a template declares C<args>.
+
 
 You can add '=' to the closing tag to indicate that the expression should be trimmed of leading
 and trailing whitespace. This is useful when you want to include the expression in a block of text.
 where you don't want the whitespace to affect the output.
 
-  <% Perl code =%>
   <%= Perl expression, replaced with result, trimmed =%>
+
+You can add '-' to the closing tag to trim whitespace after the tag through the next
+newline. This is useful when a readable code block should not emit a leading newline
+before the next element, for example in partial HTML responses.
+
+  <% Perl code -%>
+  <%= Perl expression, replaced with result -%>
 
 If you want to skip the newline after the closing tag you can use a backslash.
 
@@ -803,10 +1120,10 @@ The marker indicating a template expression. Default is C<< '=' >>.
 
 =item * C<sandbox_ns>
 
-The namespace for the sandbox environment. Default is C<< 'Template::EmbeddedPerl::Sandbox' >>.
-Basically the template is compiled into an anponymous subroutine and this is the namespace
-that subroutine is executed in.  This is a security feature to prevent the template from
-accessing the outside environment.
+The namespace where templates are compiled. Default is C<< 'Template::EmbeddedPerl::Sandbox' >>.
+This isolates unqualified symbols but is not a security boundary: templates execute arbitrary
+Perl and can access modules, files, processes, and application globals. Only compile templates
+from trusted sources.
 
 =item * C<directories>
 
@@ -819,6 +1136,37 @@ of the path to the directory.  Directories will be searched in order listed.
 
 I don't do anything smart to make sure you don't reference templates in dangerous places.
 So be careful to make sure you don't let application users specify the template path.
+
+The first matching file wins. Partials, layouts, explicit typed-view templates,
+and convention-derived typed-view templates use this same ordered search path.
+
+=item * C<smart_lines>
+
+Boolean indicating whether a line beginning with C<< % >> or C<< %= >> is a complete
+directive. Default is C<0>. See L</Smart Lines and Named Arguments>.
+
+=item * C<view_namespace>
+
+Optional namespace prefix for logical typed-view class lookup and
+convention-based typed-view template lookup. For a logical name, the engine
+prefixes this namespace to find the class. For a view without an explicit
+template, the matching prefix is removed, C<::> becomes C</>, and each
+remaining CamelCase segment is converted to lowercase snake case. Acronym runs
+stay together: C<HTML>, C<HTMLPage>, and C<ContactList> become C<html>,
+C<html_page>, and C<contact_list>.
+
+For example, C<MyApp::View::HTML::ContactList> with
+C<view_namespace =E<gt> 'MyApp::View'> resolves C<html/contact_list> before the
+normal C<template_extension> is added.
+
+=item * C<view_factory>
+
+Optional coderef used to construct nested logical typed views. It receives
+C<< ($class, \%args, $context) >> and must return a blessed object. C<$class>
+is the class resolved from the logical name and C<view_namespace>; C<\%args>
+contains only values supplied by the template. Use it for dependency injection,
+such as C<root> and C<parent> relationships. Without a factory, the engine
+calls C<< $class->new(%args) >>.
 
 =item * C<template_extension>
 
@@ -846,8 +1194,10 @@ C<raw> helper has a version called C<safe> which does any needed encoding first 
 unchanged any already created safe string objects).
 
 If the value is an object that does C<to_safe_string> then the object will first be converted
-to a safe string by calling it (with the template object as the first parameter).  That will
-allow you to safely stringify objects without needing to do so manually.
+to a safe string by calling it. Legacy C<render> methods pass the template
+engine as the first parameter; typed C<render_view> rendering passes the active
+view. That allows you to safely stringify objects without needing to do so
+manually.
 
 B<NOTE> we only check for objects with the C<to_safe_string> method when using C<auto_escape>
 If you are not using this safety feature and you are manually performing any needed escaping
@@ -1110,6 +1460,48 @@ Useful if you want to load templates from the same directory as your package.
 Compiles and executes the provided template content with the given arguments. You might
 want to enable the cache if you are doing this.
 
+Compatibility note: C<render> and C<Template::EmbeddedPerl::Compiled::render>
+keep every legacy argument, including a blessed first argument, in C<@_>. They
+do not infer a typed C<$self>.
+
+=head2 render_view
+
+B<Experimental:> Typed view support, including C<render_view>, C<view>,
+C<view_namespace>, and C<view_factory>, may change as real-world integration
+needs become clearer.
+
+  my $output = $template->render_view($view);
+
+Renders a preconstructed blessed view object. Its template receives that object
+as lexical C<$self>. A non-blessed value is an error. Root and nested views use
+the same template precedence:
+
+=over 4
+
+=item 1.
+
+A nonempty C<< $view->template >> result.
+
+=item 2.
+
+The C<view_namespace> convention.
+
+=back
+
+Use the C<view> helper for a nested typed object. C<< view $object >> renders a
+preconstructed child, which bypasses construction. C<< view $logical_name,
+%args >> resolves its class from C<view_namespace> and calls
+C<< $class->new(%args) >> by default. If configured, C<view_factory> alone
+performs construction and receives C<< ($class, \%args, $context) >>; use it
+to inject dependencies. The final coderef, if any, is a wrapper body. In that
+callback lexical C<$self> remains the caller; the callback argument is the
+wrapper object, and the wrapper template itself receives the wrapper as
+C<$self>.
+
+The core accepts any blessed object. Moo is used only by the test and cookbook
+examples. L<Template::EmbeddedPerl::Cookbook::TypedViews> contains complete Moo
+examples for applications that use it.
+
 =head1 HELPER FUNCTIONS
 
 The module provides a set of default helper functions that can be used in templates.
@@ -1145,12 +1537,41 @@ Encodes a string for use in a URL.
 
 =item * C<escape_javascript>
 
-Escapes JavaScript entities in a string. Useful for making strings safe to use
- in JavaScript.
+Escapes a value for use inside a JavaScript string, including preventing a closing
+C<script> tag from terminating an enclosing HTML script element. This is not a general
+JavaScript sanitizer; use a context-appropriate sanitizer for untrusted code.
 
 =item * C<trim>
 
 Trims leading and trailing whitespace from a string.
+
+=item * C<partial>
+
+C<< partial $identifier, %args >> renders an untyped template immediately with
+the caller's C<$self>. Its output is safe rendered output and is not escaped a
+second time by C<auto_escape>.
+
+=item * C<layout>
+
+C<< layout $identifier, %args >> registers an untyped outer template for the
+current output. Layout arguments are independent named arguments for the
+layout. Multiple layouts nest with the first declaration outermost.
+
+=item * C<yield>
+
+C<yield> returns the current body. C<< yield $name >> returns named content
+captured in the current render frame.
+
+=item * C<content_for>, C<content_replace>, and C<has_content>
+
+C<< content_for $name, sub { ... } >> appends named content in render order.
+C<content_replace> replaces it, and C<< has_content $name >> reports whether
+the named content is nonempty.
+
+=item * C<view>
+
+Renders a typed child as described in L</render_view>. The optional final
+coderef supplies the wrapper body.
 
 =back
 
@@ -1166,6 +1587,13 @@ Can't locate object method "input" at /path/to/templates/hello.yat line 4.
   3:     <%= label('first_name') %>
   4:     <%= input('first_name') %>
   5:     <%= errors('last_name') %>
+
+Each top-level C<render>, compiled-template C<render>, and C<render_view> call
+creates exactly one render frame. Nested partials, layouts, and views share that
+frame. Render cycles are rejected with their active chain. A nested exception is
+decorated with one source-aware C<Render stack>; failed rendering restores the
+frame's body, named content, layouts, and stack state so the engine can be
+reused for a later top-level render.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -1231,4 +1659,3 @@ __END__
   }->();
 }
 %= "BB: $bb"
-

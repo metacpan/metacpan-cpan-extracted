@@ -1,0 +1,158 @@
+################################################################################
+# Jacode4e त्वरित संदर्भ पत्र (HI)
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
+# https://metacpan.org/dist/Jacode4e
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
+################################################################################
+
+======================================================================
+Jacode4e त्वरित संदर्भ (हिन्दी)
+======================================================================
+
+[मूल उपयोग]
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, { %option });
+
+  $line             : रूपांतरित की जाने वाली स्ट्रिंग (संदर्भ द्वारा पारित, यथास्थान अधिलेखित)
+  $OUTPUT_encoding  : आउटपुट एन्कोडिंग का नाम
+  $INPUT_encoding   : इनपुट एन्कोडिंग का नाम
+  $char_count       : रूपांतरण के बाद अक्षरों की संख्या
+
+[एन्कोडिंग नामों की सूची]
+
+  mnemonic    description
+  ---------   ---------------------------------------------------
+  cp932x      CP932X (Extended CP932 to JIS X 0213, single-shift 0x9C5A)
+  cp932       Microsoft CP932 (Windows-31J / IANA registered name)
+  cp932ibm    IBM CP932
+  cp932nec    NEC CP932
+  sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208); year editions below
+  sjis2004    JISC Shift_JIS-2004 (JIS X 0213:2004)
+  euc         JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  euc2004     JISC EUC-JIS-2004 (JIS X 0213 plane 1 and plane 2)
+  jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  jis2004     JISC ISO-2022-JP-2004 (JIS X 0213 plane 1 and plane 2)
+  cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
+  keis78      HITACHI KEIS78
+  keis83      HITACHI KEIS83
+  keis90      HITACHI KEIS90
+  jef         FUJITSU JEF (12pt, use OUTPUT_SHIFTING option for shift codes)
+  jef9p       FUJITSU JEF ( 9pt, use OUTPUT_SHIFTING option for shift codes)
+  jipsj       NEC JIPS(J)
+  jipse       NEC JIPS(E)
+  letsj       UNISYS LetsJ
+  utf8        UTF-8.0 (aka UTF-8)
+  utf8.1      UTF-8.1 (conversion based on Shift_JIS-to-Unicode mapping, not CP932)
+  utf8jp      UTF-8-SPUA-JP (JIS X 0213 on SPUA ordered by JIS level/plane/row/cell)
+
+  sjis / euc / jis के वर्ष-संस्करण (बिना वर्ष वाला नाम 1990 संस्करण है):
+    sjis1978  euc1978  jis1978   JIS C 6226-1978
+    sjis1983  euc1983  jis1983   JIS X 0208-1983
+    sjis1990  euc1990  jis1990   JIS X 0208-1990  (= sjis / euc / jis)
+    sjis2000  euc2000  jis2000   JIS X 0213:2000
+    sjis2004  euc2004  jis2004   JIS X 0213:2004
+
+[वर्ष के अनुसार JIS संस्करणों के अंतर (शुरुआती लोगों के लिए)]
+
+  जापानी कांजी को चरणों में मानकीकृत किया गया। समान बाइट्स संस्करणों के बीच अलग अक्षर दर्शा सकती हैं, इसलिए अपने डेटा से मेल खाता संस्करण चुनें। यदि पता न हो तो बिना वर्ष वाला sjis / euc / jis उपयोग करें।
+
+  1978 (JIS C 6226-1978) : पहला कांजी मानक (स्तर 1 और स्तर 2)।
+  1983 (JIS X 0208-1983) : 22 कांजी जोड़ों का कोड बदला और कुछ आकृतियाँ बदलीं; पुराने डेटा के खराब होने का सबसे आम कारण।
+  1990 (JIS X 0208-1990) : केवल 2 कांजी जोड़े (U+51DC, U+7199); बिना वर्ष वाला sjis / euc / jis यही संस्करण है।
+  2000 (JIS X 0213:2000) : बड़ा विस्तार; नए प्लेन 2 पर स्तर 3 और स्तर 4 के कांजी और चिह्न जोड़े।
+  2004 (JIS X 0213:2004) : 10 कांजी जोड़े और 168 कांजी की उदाहरण आकृति बदली (कोड 2000 जैसा ही, केवल आकृति बदली)।
+
+[विकल्प]
+
+  विकल्पों को चौथे तर्क के रूप में दें: { 'KEY' => मान, ... }
+
+  INPUT_LAYOUT
+    'S' (1-बाइट SBCS) और 'D' (2-बाइट DBCS) द्वारा निश्चित रिकॉर्ड लेआउट; प्रत्येक अक्षर के बाद पुनरावृत्ति संख्या दी जा सकती है। डिफ़ॉल्ट: स्वचालित।
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'INPUT_LAYOUT'=>'S2D2SD'});
+
+  OUTPUT_SHIFTING
+    सत्य: DBCS अनुक्रमों के आसपास शिफ्ट-आउट/शिफ्ट-इन कोड जोड़ता है। डिफ़ॉल्ट: असत्य।
+    e.g. Jacode4e::convert(\$line,'jef','cp932x',{'OUTPUT_SHIFTING'=>1});
+
+  SPACE
+    DBCS/MBCS स्पेस भरण कोड (बाइनरी स्ट्रिंग)। डिफ़ॉल्ट: उस एन्कोडिंग का स्पेस।
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'SPACE'=>"\x81\xA1"});
+
+  GETA
+    मैप न हो सकने वाले अक्षरों के लिए DBCS/MBCS गेता कोड।
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'GETA'=>"\x81\xA2"});
+
+  OVERRIDE_MAPPING
+    प्रति-अक्षर FROM => TO ओवरराइड का हैश संदर्भ (SPACE को भी ओवरराइड करता है)।
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'OVERRIDE_MAPPING'=>{"\x44\x5A"=>"\x81\x7C"}});
+
+  JIS_SOSI
+    सत्य: 'jis' इनपुट में SO (0x0E)/SI (0x0F) को JIS X 0201 कातकाना में शिफ्ट माना जाता है (JIS7 आदत)। डिफ़ॉल्ट: असत्य; इनपुट 'jis' हो।
+    e.g. Jacode4e::convert(\$line,'utf8','jis',{'JIS_SOSI'=>1});
+
+  JIS_X0212
+    सत्य: 'jis' आउटपुट में, JIS X 0212 में मौजूद पर JIS X 0208 में अनुपस्थित अक्षर ESC $ ( D के रूप में लिखा जाता है। OUTPUT_SHIFTING आवश्यक। डिफ़ॉल्ट: असत्य।
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_X0212'=>1,'OUTPUT_SHIFTING'=>1});
+
+  JIS_KANA
+    'jis' आउटपुट में कातकाना शैली: 'GR' (0xA1..0xDF), 'I' (ESC ( I, OUTPUT_SHIFTING आवश्यक), 'SO' (SO/GL/SI)। डिफ़ॉल्ट: 'GR'।
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_KANA'=>'SO','OUTPUT_SHIFTING'=>1});
+
+  JIS_DBCS
+    'jis' आउटपुट में DBCS एस्केप: 'B' (ESC $ B), '@' (ESC $ @), '&@B', '(B', '(@'। डिफ़ॉल्ट: 'B'; आउटपुट 'jis' हो।
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_DBCS'=>'@'});
+
+  JIS_SBCS
+    'jis' आउटपुट में SBCS एस्केप: 'B' (ESC ( B ASCII), 'J' (ESC ( J रोमन), 'H' (ESC ( H पुराना)। डिफ़ॉल्ट: 'B'; आउटपुट 'jis' हो।
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_SBCS'=>'J'});
+
+  JIS2004_PLANE1
+    'jis2004' आउटपुट में प्लेन-1 एस्केप: 'Q' (ESC $ ( Q, :2004), 'O' (ESC $ ( O, :2000)। डिफ़ॉल्ट: 'Q'; आउटपुट 'jis2004' हो।
+    e.g. Jacode4e::convert(\$line,'jis2004','utf8',{'JIS2004_PLANE1'=>'O'});
+
+  ROUND_TRIP
+    सत्य: प्रतिवर्ती रूपांतरण; जिस अक्षर का मूल कोड नहीं है उसे उपयोगकर्ता-परिभाषित (GAIJI) क्षेत्र में रखा जाता है ताकि "A से B" और "B से A" मूल को बहाल करें। दोनों दिशाओं में ROUND_TRIP=>1 और समान Jacode4e संस्करण आवश्यक। डिफ़ॉल्ट: असत्य (मैप न होने पर GETA)। तालिका पहली बार उपयोग पर आलसी रूप से बनती है।
+    e.g. Jacode4e::convert(\$line,'cp00930','utf8',{'ROUND_TRIP'=>1});
+
+[शिफ्ट कोड संदर्भ]
+
+  encoding  shift-out (DBCS start)  shift-in (DBCS end)
+  --------  ---------------------   -------------------
+  cp00930   0x0E                    0x0F
+  keis78    0x0A 0x42               0x0A 0x41
+  keis83    0x0A 0x42               0x0A 0x41
+  keis90    0x0A 0x42               0x0A 0x41
+  jef       0x28                    0x29
+  jef9p     0x38                    0x29
+  jipsj     0x1A 0x70               0x1A 0x71
+  jipse     0x3F 0x75               0x3F 0x76
+  letsj     0x93 0x70               0x93 0xF1
+
+[प्रोग्रामिंग उदाहरण]
+
+  # 1) UTF-8 से मेनफ्रेम एन्कोडिंग तक (शिफ्ट, स्पेस, गेता सहित)
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+  while (<>) {
+      $char_count = Jacode4e::convert(\$_, 'cp00930', 'utf8', {
+          'OUTPUT_SHIFTING' => 1,
+          'SPACE'           => "\x40\x40",
+          'GETA'            => "\x44\x4B",
+      });
+      print $_;
+  }
+
+  # 2) पुराना 1978 Shift_JIS से UTF-8 तक (वर्ष-सचेत)
+  Jacode4e::convert(\$line, 'utf8', 'sjis1978');
+
+  # 3) राउंड-ट्रिप: UTF-8 -> CP00930 -> UTF-8 मूल को बहाल करता है
+  Jacode4e::convert(\$line, 'cp00930', 'utf8', { 'ROUND_TRIP' => 1 });
+  Jacode4e::convert(\$line, 'utf8', 'cp00930', { 'ROUND_TRIP' => 1 });
+
+======================================================================

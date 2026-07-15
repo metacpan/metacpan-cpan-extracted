@@ -1,0 +1,702 @@
+# Syntax file for asm68k
+# Converted from: asm68k.vim
+# Conversion date: 2026-07-13
+
+language: asm68k
+extensions: asm68k
+
+[keyword:Identifier]
+a0 a1 a2 a3 a4 a5 a6 a7 ac ac0 ac1 acusr bac0 bac1 bac2 bac3 bac4 bac5 bac6
+bac7 bad0 bad1 bad2 bad3 bad4 bad5 bad6 bad7 caar cacr cal ccr control crp d0
+d1 d2 d3 d4 d5 d6 d7 dfc dfcr drp dtt0 dtt1 fp0 fp1 fp2 fp3 fp4 fp5 fp6 fp7
+fpcr fpiar fpsr iaddr isp itt0 itt1 mmusr msp pc pcsr psr scc sfc sfcr sp sr
+srp ssp status tc tt0 tt1 urp usp val vbr za0 za1 za2 za3 za4 za5 za6 za7 zd0
+zd1 zd2 zd3 zd4 zd5 zd6 zd7 zpc
+
+[keyword:Todo]
+TODO
+
+[match:Statement]
+pattern: \babcd(?:\.b)?\s
+
+[match:Statement]
+pattern: \badda(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \baddi(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \baddq(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \baddx(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \badd(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bandi(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \band(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bas[lr](?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bb[vc][cs](?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbeq(?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbg[et](?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bb[hm]i(?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbl[est](?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbne(?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbpl(?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbchg(?:\.[bl])?\s
+
+[match:Statement]
+pattern: \bbclr(?:\.[bl])?\s
+
+[match:Statement]
+pattern: \bbfchg\s
+
+[match:Statement]
+pattern: \bbfclr\s
+
+[match:Statement]
+pattern: \bbfexts\s
+
+[match:Statement]
+pattern: \bbfextu\s
+
+[match:Statement]
+pattern: \bbfffo\s
+
+[match:Statement]
+pattern: \bbfins\s
+
+[match:Statement]
+pattern: \bbfset\s
+
+[match:Statement]
+pattern: \bbftst\s
+
+[match:Statement]
+pattern: \bbkpt\s
+
+[match:Statement]
+pattern: \bbra(?:\.[bwls])?\s
+
+[match:Statement]
+pattern: \bbset(?:\.[bl])?\s
+
+[match:Statement]
+pattern: \bbsr(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bbtst(?:\.[bl])?\s
+
+[match:Statement]
+pattern: \bcallm\s
+
+[match:Statement]
+pattern: \bcas2(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bcas(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bchk2(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bchk(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bclr(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bcmpa(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bcmpi(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bcmpm(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bcmp2(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bcmp(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bdb[cv][cs](?:\.w)?\s
+
+[match:Statement]
+pattern: \bdbeq(?:\.w)?\s
+
+[match:Statement]
+pattern: \bdb[ft](?:\.w)?\s
+
+[match:Statement]
+pattern: \bdbg[et](?:\.w)?\s
+
+[match:Statement]
+pattern: \bdb[hm]i(?:\.w)?\s
+
+[match:Statement]
+pattern: \bdbl[est](?:\.w)?\s
+
+[match:Statement]
+pattern: \bdbne(?:\.w)?\s
+
+[match:Statement]
+pattern: \bdbpl(?:\.w)?\s
+
+[match:Statement]
+pattern: \bdbra(?:\.w)?\s
+
+[match:Statement]
+pattern: \bdiv[su](?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bdiv[su]l(?:\.l)?\s
+
+[match:Statement]
+pattern: \beori(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \beor(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bexg(?:\.l)?\s
+
+[match:Statement]
+pattern: \bextb(?:\.l)?\s
+
+[match:Statement]
+pattern: \bext(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \billegal\b
+
+[match:Statement]
+pattern: \bjmp(?:\.[ls])?\s
+
+[match:Statement]
+pattern: \bjsr(?:\.[ls])?\s
+
+[match:Statement]
+pattern: \blea(?:\.l)?\s
+
+[match:Statement]
+pattern: \blink(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bls[lr](?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bmovea(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bmovec(?:\.l)?\s
+
+[match:Statement]
+pattern: \bmovem(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bmovep(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bmoveq(?:\.l)?\s
+
+[match:Statement]
+pattern: \bmoves(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bmove(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bmul[su](?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bnbcd(?:\.b)?\s
+
+[match:Statement]
+pattern: \bnegx(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bneg(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bnop\b
+
+[match:Statement]
+pattern: \bnot(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bori(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bor(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bpack\s
+
+[match:Statement]
+pattern: \bpea(?:\.l)?\s
+
+[match:Statement]
+pattern: \breset\b
+
+[match:Statement]
+pattern: \bro[lr](?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \brox[lr](?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \brt[dm]\s
+
+[match:Statement]
+pattern: \brt[ers]\b
+
+[match:Statement]
+pattern: \bsbcd(?:\.b)?\s
+
+[match:Statement]
+pattern: \bs[cv][cs](?:\.b)?\s
+
+[match:Statement]
+pattern: \bseq(?:\.b)?\s
+
+[match:Statement]
+pattern: \bs[ft](?:\.b)?\s
+
+[match:Statement]
+pattern: \bsg[et](?:\.b)?\s
+
+[match:Statement]
+pattern: \bs[hm]i(?:\.b)?\s
+
+[match:Statement]
+pattern: \bsl[est](?:\.b)?\s
+
+[match:Statement]
+pattern: \bsne(?:\.b)?\s
+
+[match:Statement]
+pattern: \bspl(?:\.b)?\s
+
+[match:Statement]
+pattern: \bsuba(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bsubi(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bsubq(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bsubx(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bsub(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bswap(?:\.w)?\s
+
+[match:Statement]
+pattern: \btas(?:\.b)?\s
+
+[match:Statement]
+pattern: \btdiv[su](?:\.l)?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?[cv][cs](?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?eq(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?[ft](?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?g[et](?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?[hm]i(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?l[est](?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?ne(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?pl(?:\.[wl])?\s
+
+[match:Statement]
+pattern: \bt(?:rap)?v\b
+
+[match:Statement]
+pattern: \bt(?:rap)?[cv][cs]\b
+
+[match:Statement]
+pattern: \bt(?:rap)?eq\b
+
+[match:Statement]
+pattern: \bt(?:rap)?[ft]\b
+
+[match:Statement]
+pattern: \bt(?:rap)?g[et]\b
+
+[match:Statement]
+pattern: \bt(?:rap)?[hm]i\b
+
+[match:Statement]
+pattern: \bt(?:rap)?l[est]\b
+
+[match:Statement]
+pattern: \bt(?:rap)?ne\b
+
+[match:Statement]
+pattern: \bt(?:rap)?pl\b
+
+[match:Statement]
+pattern: \btrap\s
+
+[match:Statement]
+pattern: \btst(?:\.[bwl])?\s
+
+[match:Statement]
+pattern: \bunlk\s
+
+[match:Statement]
+pattern: \bunpk\s
+
+[match:Label]
+pattern: ^[a-z_?.][a-z0-9_?.$]*$
+
+[match:Label]
+pattern: ^[a-z_?.][a-z0-9_?.$]*\s
+
+[match:Label]
+pattern: ^\s*[a-z_?.][a-z0-9_?.$]*:
+
+[match:Number]
+pattern: \$[0-9a-fA-F]+\b
+
+[match:Number]
+pattern: \b[0-9][0-9a-fA-F]*H\b
+
+[match:Number]
+pattern: @[0-7]+\b
+
+[match:Number]
+pattern: \b[0-7]+[QO]\b
+
+[match:Number]
+pattern: %[01]+\b
+
+[match:Number]
+pattern: \b[01]+B\b
+
+[match:Number]
+pattern: \b[0-9]+D?\b
+
+[match:SpecialChar]
+pattern: _*E_*
+
+[match:Number]
+pattern: :(?:[0-9a-f]+_*)+
+
+[match:Error]
+pattern: '[ -~]*'
+
+[match:Error]
+pattern: '[ -~]*$
+
+[match:Error]
+pattern: [^ -~]
+
+[match:Operator]
+pattern: [-+*/]
+
+[match:Operator]
+pattern: \.SIZEOF\.
+
+[match:Operator]
+pattern: \.STARTOF\.
+
+[match:Operator]
+pattern: <<
+
+[match:Operator]
+pattern: >>
+
+[match:Operator]
+pattern: &
+
+[match:Operator]
+pattern: !
+
+[match:Operator]
+pattern: !!
+
+[match:Operator]
+pattern: <>
+
+[match:Operator]
+pattern: =
+
+[match:Operator]
+pattern: >=
+
+[match:Operator]
+pattern: <=
+
+[match:Operator]
+pattern: ==
+
+[match:Operator]
+pattern: <[CV][CS]>
+
+[match:Operator]
+pattern: <EQ>
+
+[match:Operator]
+pattern: <G[TE]>
+
+[match:Operator]
+pattern: <[HM]I>
+
+[match:Operator]
+pattern: <L[SET]>
+
+[match:Operator]
+pattern: <NE>
+
+[match:Operator]
+pattern: <PL>
+
+[match:Include]
+pattern: \bINCLUDE\s
+
+[match:Repeat]
+pattern: \bFOR(?:\.[BWL])?\s
+
+[match:Repeat]
+pattern: \bDOWNTO\s
+
+[match:Repeat]
+pattern: \bTO\s
+
+[match:Repeat]
+pattern: \bBY\s
+
+[match:Repeat]
+pattern: \bDO(?:\.[SL])?\b
+
+[match:Repeat]
+pattern: \bENDF\b
+
+[match:Repeat]
+pattern: \bNEXT(?:\.[SL])?\b
+
+[match:Repeat]
+pattern: \bREPEAT\b
+
+[match:Repeat]
+pattern: \bUNTIL(?:\.[BWL])?\s
+
+[match:Repeat]
+pattern: \bWHILE(?:\.[BWL])?\s
+
+[match:Repeat]
+pattern: \bENDW\b
+
+[match:Macro]
+pattern: \bMACRO\b
+
+[match:Macro]
+pattern: \bLOCAL\s
+
+[match:Macro]
+pattern: \bMEXIT\b
+
+[match:Macro]
+pattern: \bENDM\b
+
+[match:Keyword]
+pattern: \\[0-9]
+
+[match:Special]
+pattern: \bIFC\s
+
+[match:Special]
+pattern: \bIFDEF\s
+
+[match:Special]
+pattern: \bIFEQ\s
+
+[match:Special]
+pattern: \bIFGE\s
+
+[match:Special]
+pattern: \bIFGT\s
+
+[match:Special]
+pattern: \bIFLE\s
+
+[match:Special]
+pattern: \bIFLT\s
+
+[match:Special]
+pattern: \bIFNC\b
+
+[match:Special]
+pattern: \bIFNDEF\s
+
+[match:Special]
+pattern: \bIFNE\s
+
+[match:Special]
+pattern: \bELSEC\b
+
+[match:Special]
+pattern: \bENDC\b
+
+[match:Special]
+pattern: \bREPT\s
+
+[match:Special]
+pattern: \bIRP\s
+
+[match:Special]
+pattern: \bIRPC\s
+
+[match:Special]
+pattern: \bENDR\b
+
+[match:Special]
+pattern: \bALIGN\s
+
+[match:Special]
+pattern: \bCHIP\s
+
+[match:Special]
+pattern: \bCOMLINE\s
+
+[match:Special]
+pattern: \bCOMMON(?:\.S)?\s
+
+[match:Special]
+pattern: \bDC(?:\.[BWLSDXP])?\s
+
+[match:Special]
+pattern: \bDC\.\\[0-9]\s
+
+[match:Special]
+pattern: \bDCB(?:\.[BWLSDXP])?\s
+
+[match:Special]
+pattern: \bDS(?:\.[BWLSDXP])?\s
+
+[match:Special]
+pattern: \bEND\b
+
+[match:Special]
+pattern: \bEQU\s
+
+[match:Special]
+pattern: \bFEQU(?:\.[SDXP])?\s
+
+[match:Special]
+pattern: \bFAIL\b
+
+[match:Special]
+pattern: \bFOPT\s
+
+[match:Special]
+pattern: \b(?:NO)?FORMAT\b
+
+[match:Special]
+pattern: \bIDNT\b
+
+[match:Special]
+pattern: \b(?:NO)?LIST\b
+
+[match:Special]
+pattern: \bLLEN\s
+
+[match:Special]
+pattern: \bMASK2\b
+
+[match:Special]
+pattern: \bNAME\s
+
+[match:Special]
+pattern: \bNOOBJ\b
+
+[match:Special]
+pattern: \bOFFSET\s
+
+[match:Special]
+pattern: \bOPT\b
+
+[match:Special]
+pattern: \bORG(?:\.[SL])?\b
+
+[match:Special]
+pattern: \b(?:NO)?PAGE\b
+
+[match:Special]
+pattern: \bPLEN\s
+
+[match:Special]
+pattern: \bREG\s
+
+[match:Special]
+pattern: \bRESTORE\b
+
+[match:Special]
+pattern: \bSAVE\b
+
+[match:Special]
+pattern: \bSECT(?:\.S)?\s
+
+[match:Special]
+pattern: \bSECTION(?:\.S)?\s
+
+[match:Special]
+pattern: \bSET\s
+
+[match:Special]
+pattern: \bSPC\s
+
+[match:Special]
+pattern: \bTTL\s
+
+[match:Special]
+pattern: \bXCOM\s
+
+[match:Special]
+pattern: \bXDEF\s
+
+[match:Special]
+pattern: \bXREF(?:\.S)?\s
+

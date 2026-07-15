@@ -1,0 +1,40 @@
+# Syntax file for racket
+# Converted from: racket.vim
+# Conversion date: 2026-07-13
+
+language: racket
+extensions: racket
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?[0-9a-fA-F]+/[0-9a-fA-F]+\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?[0-9a-fA-F]+/[0-9a-fA-F]+[-+][0-9a-fA-F]+(?:/[0-9a-fA-F]+)\?i\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+](?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?i\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?[-+](?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?i\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+](?:inf|nan)\.[0f][-+](?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?i\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?[-+](?:inf|nan)\.[0f]i\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?@[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+](?:inf|nan)\.[0f]@[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?\b
+
+[match:Number]
+pattern: \b(?:#x|#[ei]#x|#x#[ei])[-+]\?(?:[0-9a-fA-F]+|[0-9a-fA-F]+#*\.|[0-9a-fA-F]*\.[0-9a-fA-F]+)#*(?:/[0-9a-fA-F]+#*)\?(?:[sl][-+]\?[0-9a-fA-F]+#*)\?@[-+](?:inf|nan)\.[0f]\b
+
+[match:Todo]
+pattern: \b(?:FIXME|TODO|XXX):\?\b
+

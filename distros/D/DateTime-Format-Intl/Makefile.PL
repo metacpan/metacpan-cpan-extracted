@@ -26,15 +26,13 @@ my %WriteMakefileArgs = (
         'vars'                          => 0,
         'warnings'                      => 0,
         'warnings::register'            => 0,
-        # 2008-02-29
-        'DateTime'                      => '0.42',
-        'DateTime::Locale::FromCLDR'    => 'v0.6.1',
-        'DateTime::Format::Unicode'     => 'v0.1.6',
-        'Locale::Intl'                  => 'v0.1.3',
-        'Locale::Unicode::Data'         => 'v1.8.4',
+        'DateTime::Lite'                => 'v0.8.0',
+        'DateTime::Locale::FromCLDR'    => 'v0.8.7',
+        'DateTime::Format::Unicode'     => 'v0.3.0',
+        'Locale::Intl'                  => 'v0.3.0',
+        'Locale::Unicode::Data'         => 'v1.8.6',
         'Scalar::Util'                  => 0,
-        # Version compatible with perl v5.10.1
-        'Want'                          => '0.17',
+        'Wanted'                        => 'v0.1.2',
     },
     TEST_REQUIRES =>
     {
@@ -56,12 +54,12 @@ my %WriteMakefileArgs = (
         resources => {
             # homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/DateTime-Format-Intl.git',
-                web         => 'https://gitlab.com/jackdeguest/DateTime-Format-Intl',
+                url         => 'git@gitlab.com:deguest/DateTime-Format-Intl.git',
+                web         => 'https://gitlab.com/deguest/DateTime-Format-Intl',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/DateTime-Format-Intl/issues',
+                web         => 'https://gitlab.com/deguest/DateTime-Format-Intl/issues',
             },
         },
     }) : ()),

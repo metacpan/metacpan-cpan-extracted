@@ -1,0 +1,482 @@
+#!/usr/bin/env perl
+
+use 5.016;
+use strict;
+use warnings;
+
+#===========================================================================
+# CLI wrapper for Syntax::Highlight::Basic
+#===========================================================================
+
+use Syntax::Highlight::Basic;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+Main:
+{
+    my $cli = _parse_options(@ARGV);
+    exit _run($cli);
+}
+
+#===========================================================================
+# Option parsing
+#===========================================================================
+
+sub _parse_options
+{
+    my (@args) = @_;
+
+    my $cli = {
+        language    => undef,
+        format      => undef,
+        syntax_dirs => [],
+        wrap        => 0,
+        css_class   => undef,
+        colors_file => undef,
+        colors      => undef,
+        help        => 0,
+        man         => 0,
+        version     => 0,
+        input       => undef,
+    };
+
+    GetOptions(
+        'language=s'    => \$cli->{language},
+        'format=s'      => \$cli->{format},
+        'syntax-dir=s'  => sub { push @{$cli->{syntax_dirs}}, $_[1] },
+        'css-class=s'   => \$cli->{css_class},
+        'colors-file=s' => \$cli->{colors_file},
+        'wrap'          => \$cli->{wrap},
+        'no-wrap'       => sub { $cli->{wrap} = 0 },
+        'man'           => \$cli->{man},
+        'h|help'        => \$cli->{help},
+        'v|version'     => \$cli->{version},
+    ) or _error("Invalid options.");
+
+    if ($cli->{help})
+    {
+        _print_help();
+        exit 0;
+    }
+
+    if ($cli->{man})
+    {
+        pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
+    }
+
+    if ($cli->{version})
+    {
+        _print_version();
+        exit 0;
+    }
+
+    # Determine default format based on TTY
+    if (!defined $cli->{format})
+    {
+        $cli->{format} = -t STDOUT ? 'ansi' : 'html';
+    }
+
+    # Validate format
+    my %valid_formats = map { $_ => 1 } qw(pygments html ansi);
+    if (!$valid_formats{$cli->{format}})
+    {
+        _error("Unknown format '$cli->{format}'.  Valid formats: pygments, html, ansi");
+    }
+
+    # Remaining args: input file
+    my @remaining = @ARGV;
+    if (@remaining > 0)
+    {
+        $cli->{input} = $remaining[0];
+    }
+
+    return $cli;
+}
+
+#===========================================================================
+# Main run logic
+#===========================================================================
+
+sub _run
+{
+    my ($cli) = @_;
+
+    my $input_file  = $cli->{input};
+    my $language    = $cli->{language};
+    my $format      = $cli->{format};
+    my $wrap        = $cli->{wrap};
+    my $css_class   = $cli->{css_class};
+    my $colors_file = $cli->{colors_file};
+
+    # Load colors file if specified
+    my $colors;
+    if (defined $colors_file)
+    {
+        $colors = _load_colors_file($colors_file, $format);
+    }
+
+    # Read input
+    my $code;
+    if (defined $input_file && $input_file ne '-')
+    {
+        if (!-f $input_file)
+        {
+            _error("Input file '$input_file' does not exist or is not a regular file.");
+        }
+        open(my $fh, '<', $input_file) or
+            _error("Cannot open '$input_file': $!");
+        local $/;
+        $code = <$fh>;
+        close($fh);
+
+        # Auto-detect language from extension if not specified
+        if (!defined $language)
+        {
+            $language = _detect_language($input_file);
+        }
+    }
+    else
+    {
+        local $/;
+        $code = <STDIN>;
+    }
+
+    # Create facade and highlight
+    my $shb = Syntax::Highlight::Basic->new(
+        syntax_dirs => $cli->{syntax_dirs},
+    );
+
+    my $result = $shb->highlight($code, $language, {
+        format    => $format,
+        wrap      => $wrap,
+        css_class => $css_class,
+        colors    => $colors,
+    });
+
+    print $result;
+    return 0;
+}
+
+#===========================================================================
+# Language detection from file extension
+#===========================================================================
+
+sub _detect_language
+{
+    my ($filename) = @_;
+
+    my %ext_map = (
+        pl    => 'perl',
+        pm    => 'perl',
+        t     => 'perl',
+        py    => 'python',
+        pyw   => 'python',
+        pyi   => 'python',
+        js    => 'javascript',
+        c     => 'c',
+        h     => 'c',
+        cpp   => 'cpp',
+        cc    => 'cpp',
+        cxx   => 'cpp',
+        hpp   => 'cpp',
+        rb    => 'ruby',
+        sh    => 'sh',
+        bash  => 'sh',
+        go    => 'go',
+        java  => 'java',
+        sql    => 'sql',
+        yaml  => 'yaml',
+        yml   => 'yaml',
+        html  => 'html',
+        htm   => 'html',
+        css   => 'css',
+        php   => 'php',
+        rs    => 'rust',
+        json  => 'json',
+        xml   => 'xml',
+        swift => 'swift',
+        kt    => 'kotlin',
+        scala => 'scala',
+        lua   => 'lua',
+        r     => 'r',
+        cs    => 'cs',
+        dart  => 'dart',
+        hs    => 'haskell',
+        elm   => 'elm',
+        clj   => 'clojure',
+        ex    => 'elixir',
+        exs   => 'elixir',
+        zsh   => 'zsh',
+        fish  => 'fish',
+        vim   => 'vim',
+        make  => 'make',
+        mk    => 'make',
+        dockerfile => 'dockerfile',
+    );
+
+    if ($filename =~ /\.([^.]+)$/)
+    {
+        my $ext = lc($1);
+        return $ext_map{$ext} if exists $ext_map{$ext};
+    }
+
+    return undef;
+}
+
+#===========================================================================
+# Colors file loading
+#===========================================================================
+
+sub _load_colors_file
+{
+    my ($path, $format) = @_;
+
+    if (!-f $path)
+    {
+        _error("Colors file '$path' does not exist or is not a regular file.");
+    }
+
+    open(my $fh, '<', $path) or
+        _error("Cannot open colors file '$path': $!");
+
+    my %colors;
+    while (my $line = <$fh>)
+    {
+        chomp $line;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next if $line =~ /^#/;
+        next if $line =~ /^\s*$/;
+
+        if ($line =~ /^(.+?)\s*=\s*(.+)$/)
+        {
+            my $key   = $1;
+            my $value = $2;
+
+            if (defined $format && $format eq 'ansi')
+            {
+                # ANSI format: color_index,bold_flag
+                if ($value =~ /^(\d+)\s*,\s*([01])$/)
+                {
+                    $colors{$key} = { color => int($1), bold => int($2) };
+                }
+                else
+                {
+                    _error("Invalid ANSI color value '$value' for key '$key'.  Expected: N,0 or N,1");
+                }
+            }
+            else
+            {
+                # HTML/Pygments format: CSS color string
+                $colors{$key} = $value;
+            }
+        }
+    }
+    close($fh);
+
+    return \%colors;
+}
+
+#===========================================================================
+# Helpers
+#===========================================================================
+
+sub _print_help
+{
+    print <<'HELP';
+Usage: syntax-highlight-basic [OPTIONS] [FILE]
+
+Apply syntax highlighting to source code.
+
+Options:
+  --language LANG     Language name for syntax highlighting
+                      (default: auto-detect from file extension)
+  --format FORMAT     Output format: pygments, html, ansi
+                      (default: ansi if stdout is a terminal, else html)
+  --syntax-dir DIR    Additional directory to search for .shb syntax files
+                      (may be specified multiple times)
+  --css-class CLASS   CSS class for the outer container
+                      (default: 'highlight' for pygments, none for html)
+  --colors-file FILE  File with key=value color overrides, one per line
+                      (for ansi: key=N,0|1; for html: key=#RRGGBB)
+  --wrap              Wrap output in container element
+  --no-wrap           Disable wrapping (default)
+  --man               Show man page and exit
+  -h, --help          Show this help and exit
+  -v, --version       Show version and exit
+
+Arguments:
+  FILE                File to read (use - for stdin, default is stdin)
+HELP
+}
+
+sub _print_version
+{
+    my $version = $Syntax::Highlight::Basic::VERSION // '0.1.0';
+    print "syntax-highlight-basic version $version\n";
+}
+
+sub _error
+{
+    my ($msg) = @_;
+
+    print STDERR "syntax-highlight-basic: $msg\n";
+    exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+syntax-highlight-basic - Apply syntax highlighting to source code
+
+=head1 SYNOPSIS
+
+syntax-highlight-basic [OPTIONS] [FILE]
+
+syntax-highlight-basic --language perl --format html script.pl
+
+echo 'print "hello";' | syntax-highlight-basic --language perl
+
+=head1 DESCRIPTION
+
+C<syntax-highlight-basic> reads source code from a file or stdin and outputs
+syntax-highlighted text in one of three formats: Pygments-compatible HTML
+(C<pygments>), HTML with inline color styles (C<html>), or ANSI terminal
+escape codes (C<ansi>).
+
+C<FILE> may be a path to a source file or C<-> for stdin.  If no file is
+given, input is read from stdin.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--language> I<LANG>
+
+Specify the programming language for syntax highlighting (e.g., C<perl>,
+C<python>, C<javascript>).  If not given, the language is auto-detected
+from the file extension.
+
+=item B<--format> I<FORMAT>
+
+Output format.  Must be one of:
+
+=over 4
+
+=item C<pygments>
+
+HTML with Pygments-compatible CSS class names.  Use with a Pygments CSS theme.
+
+=item C<html>
+
+HTML with inline C<style="color: #RRGGBB"> attributes.  No external CSS needed.
+
+=item C<ansi>
+
+ANSI 256-color terminal escape codes.  Suitable for direct terminal output.
+
+=back
+
+Default: C<ansi> when stdout is a terminal, C<html> otherwise.
+
+=item B<--syntax-dir> I<DIR>
+
+Add an additional directory to search for C<.shb> syntax definition files.
+May be specified multiple times.  User directories are searched before the
+built-in syntax directory.
+
+=item B<--css-class> I<CLASS>
+
+CSS class name for the outer container element.  For C<html> format, this
+adds C<class="CLASS"> to the C<E<lt>preE<gt>> element.  For C<pygments>
+format, this replaces the default C<highlight> class on the
+C<E<lt>divE<gt>> element.  Ignored for C<ansi> format.
+
+Default: C<highlight> for pygments, none for html.
+
+=item B<--colors-file> I<FILE>
+
+Load color overrides from a file.  Each line should be a C<key=value> pair.
+Blank lines and lines starting with C<#> are ignored.
+
+For C<html> and C<pygments> formats, values are CSS color strings:
+
+    Comment=#888888
+    Keyword=#0000ff
+    String=#00aa00
+
+For C<ansi> format, values are C<color_index,bold_flag>:
+
+    Comment=245,0
+    Keyword=33,1
+    String=46,0
+
+Valid group names are documented in L<Syntax::Highlight::Basic::Output::HTML>
+and L<Syntax::Highlight::Basic::Output::Ansi>.
+
+=item B<--wrap>
+
+Wrap output in an appropriate container element.  For C<html> and C<pygments>
+formats, this wraps the output in C<E<lt>preE<gt>E<lt>codeE<gt>> (or
+C<E<lt>div class="highlight"E<gt>> for Pygments).
+
+=item B<--no-wrap>
+
+Disable wrapping (default).
+
+=item B<--man>
+
+Display this full man-page help and exit.
+
+=item B<-h>, B<--help>
+
+Display short usage help and exit.
+
+=item B<-v>, B<--version>
+
+Display version number and exit.
+
+=back
+
+=head1 EXAMPLES
+
+  # Highlight a Perl script to terminal (ANSI)
+  syntax-highlight-basic myscript.pl
+
+  # Highlight Python code to HTML file
+  syntax-highlight-basic --language python --format html app.py > app.html
+
+  # Pipe code and get Pygments output with wrapping
+  echo 'if ($x) { print "hello"; }' | syntax-highlight-basic --language perl --format pygments --wrap
+
+  # Use custom syntax directory
+  syntax-highlight-basic --syntax-dir ./my-syntax --language mylang code.mylang
+
+=head1 EXIT STATUS
+
+Returns C<0> on success.  Errors are reported to stderr and the program exits
+with a non-zero status.
+
+=head1 VERSION
+
+0.1.0
+
+=head1 AUTHOR
+
+Syntax::Highlight::Basic Contributors
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Syntax::Highlight::Basic>,
+L<Syntax::Highlight::Basic::Parser>,
+L<Syntax::Highlight::Basic::Output::Pygments>,
+L<Syntax::Highlight::Basic::Output::HTML>,
+L<Syntax::Highlight::Basic::Output::Ansi>
+
+=cut

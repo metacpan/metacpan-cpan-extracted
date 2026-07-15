@@ -20,7 +20,7 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 $VERSIONE = '0.30';
@@ -143,7 +143,7 @@ for my $target (@ARGV) {
     elsif ($target eq 'dist') {
 
         # your PAUSE ID here
-        my $author = q{ina <ina@cpan.org>};
+        my $author = q{ina <ina.cpan@gmail.com>};
 
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
@@ -394,12 +394,19 @@ END
 
         #                                          1234567890123456
         my $requires_as_json = join ",\n", map {qq{                "$_" : "$requires{$_}"}}                            sort keys %requires;
+
+        # META.yml above declares "build_requires: Test: 1.122" (Test.pm
+        # is used by the pod tests). Keep META.json consistent with it:
+        # the CPAN::Meta v2 "build" and "test" phases both get Test.
+        my %build_requires = %requires;
+        $build_requires{'Test'} = '1.122';
+        my $build_requires_as_json = join ",\n", map {qq{                "$_" : "$build_requires{$_}"}}                sort keys %build_requires;
         my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}",\n            "version" : "$version"\n        }}} sort keys %provides;
         #                                          12345678          123456789012                          12345678
 
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json, $requires_as_json, $provides_as_json);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $build_requires_as_json, $requires_as_json, $requires_as_json, $build_requires_as_json, $provides_as_json);
 {
     "name" : "%s",
     "version" : "%s",
@@ -901,7 +908,7 @@ TO_CONTRIBUTE
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability in this distribution, please report
-it by e-mail to the author at ina@cpan.org.
+it by e-mail to the author at ina.cpan@gmail.com.
 
 Do NOT open a public GitHub issue for security vulnerabilities.  Please use
 private e-mail so that a fix can be prepared before public disclosure.
@@ -1059,7 +1066,7 @@ TO_SECURITY
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;
@@ -1203,7 +1210,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1441,7 +1448,7 @@ This software requires perl5.00503 or later.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt> in a CPAN
 
 This project was originated by INABA Hitoshi.
 

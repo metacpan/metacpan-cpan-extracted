@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Is_Sync;
-$OpenSearch::Client::Role::Is_Sync::VERSION = '3.007008';
+$OpenSearch::Client::Role::Is_Sync::VERSION = '3.007009';
 use Moo::Role;
 use namespace::clean;
 
@@ -39,7 +39,7 @@ OpenSearch::Client::Role::Is_Sync - A role to mark classes which should be used 
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 MANUAL
 

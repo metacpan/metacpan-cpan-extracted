@@ -1,0 +1,125 @@
+# Syntax file for cs
+# Converted from: cs.vim
+# Conversion date: 2026-07-13
+
+language: cs
+extensions: cs
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if switch
+
+[keyword:Exception]
+catch finally throw try when
+
+[keyword:Keyword]
+as base explicit implicit is
+
+[keyword:Label]
+case default
+
+[keyword:Repeat]
+break continue do for foreach goto return while
+
+[keyword:Statement]
+a as ascending b br by c code cref descending equals example exception from
+group href i in include inheritdoc into is join let list lock nameof new on
+orderby out para param paramref params ref remarks returns see seealso select
+sizeof stackalloc summary typeparam typeparamref u using value
+
+[keyword:StorageClass]
+abstract const event operator override readonly sealed static virtual volatile
+
+[keyword:Structure]
+class enum interface namespace struct
+
+[keyword:Todo]
+FIXME HACK NOTE TBD TODO XXX
+
+[keyword:Type]
+T bool byte char decimal double dynamic float int long nint nuint object sbyte
+short string uint ulong ushort var void
+
+[match:Structure]
+pattern: \brecord[\s\n]+@?[a-zA-Z_]\w*[\s\n]*[<(:{;]
+
+[match:Structure]
+pattern: \bdelegate\b
+
+[match:Include]
+pattern: global[\s\n]*::
+
+[match:Statement]
+pattern: \bwhere\b
+
+[match:Structure]
+pattern: \bwhere\b[\s\n]+@?[a-zA-Z_]\w*[\s\n]*:
+
+[match:Structure]
+pattern: \bextern\s+alias\b
+
+[match:Keyword]
+pattern: \bthis\b
+
+[match:StorageClass]
+pattern: \bthis[\s\n]+@?[a-zA-Z_]
+
+[match:Error]
+pattern: [^([:space:]]
+
+[match:Operator]
+pattern: -{1,2}
+
+[match:Operator]
+pattern: ={1,2}
+
+[match:Operator]
+pattern: >{1,2}
+
+[match:Operator]
+pattern: <{1,2}
+
+[match:Operator]
+pattern: [!><+\-*/]=
+
+[match:Operator]
+pattern: [!*/^]
+
+[match:Operator]
+pattern: =>
+
+[match:Operator]
+pattern: &&
+
+[match:Operator]
+pattern: ||
+
+[match:Operator]
+pattern: :
+
+[match:PreProc]
+pattern: \%^#!.*
+
+[match:Error]
+pattern: \\.
+
+[match:Error]
+pattern: [^']
+
+[match:SpecialChar]
+pattern: \\["\\'0abfnrtv]
+
+[match:SpecialChar]
+pattern: \\[uUx]
+
+[match:Character]
+pattern: '[^\\]'
+
+[match:SpecialChar]
+pattern: ""
+
+[match:Identifier]
+pattern: @[a-zA-Z_]\w*
+

@@ -13,6 +13,7 @@
 
 
 #include "math_float128_include.h"
+#include "math_float128_unused.h"
 
 int nnum = 0;
 
@@ -53,6 +54,7 @@ int _win32_infnanstring(char * s) { /* MS Windows only - detect 1.#INF and 1.#IN
 
   return 0;
 #else
+  PERL_UNUSED_ARG(s);
   croak("Math::Float128::_win32_infnanstring not implemented for this build of perl");
 #endif
 }
@@ -354,6 +356,7 @@ void F128toSTR(pTHX_ SV * f) {
      dXSARGS;
      float128 t;
      char * buffer;
+     PERL_UNUSED_VAR(items);
 
      if(sv_isobject(f)) {
        const char *h = HvNAME(SvSTASH(SvRV(f)));
@@ -377,6 +380,7 @@ void F128toSTRP(pTHX_ SV * f, int decimal_prec) {
      dXSARGS;
      float128 t;
      char * buffer;
+     PERL_UNUSED_VAR(items);
 
      if(decimal_prec < 1)croak("2nd arg (precision) to F128toSTRP  must be at least 1");
 
@@ -430,6 +434,7 @@ SV * _overload_add(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG(third);
 
      Newx(ld, 1, float128);
      if(ld == NULL) croak("Failed to allocate memory in _overload_add function");
@@ -512,6 +517,7 @@ SV * _overload_mul(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG(third);
 
      Newx(ld, 1, float128);
      if(ld == NULL) croak("Failed to allocate memory in _overload_mul function");
@@ -779,6 +785,7 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_equiv(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     if(SvUOK(b)) {
        if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) == (float128)SvUVX(b)) return newSViv(1);
@@ -859,6 +866,7 @@ SV * _overload_equiv(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_not_equiv(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     if(SvUOK(b)) {
        if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) != (float128)SvUVX(b)) return newSViv(1);
@@ -940,6 +948,7 @@ SV * _overload_not_equiv(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_true(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
 
      if(_is_nan(*(INT2PTR(float128 *, SvIVX(SvRV(a)))))) return newSViv(0);
      if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) != 0.0Q) return newSViv(1);
@@ -947,12 +956,14 @@ SV * _overload_true(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_not(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
      if(_is_nan(*(INT2PTR(float128 *, SvIVX(SvRV(a)))))) return newSViv(1);
      if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) != 0.0L) return newSViv(0);
      return newSViv(1);
 }
 
 SV * _overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -1033,6 +1044,7 @@ SV * _overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -1113,6 +1125,7 @@ SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -1194,6 +1207,7 @@ SV * _overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -1843,10 +1857,12 @@ SV * _overload_spaceship(pTHX_ SV * a, SV * b, SV * third) {
     croak("Invalid argument supplied to Math::Float128::_overload_spaceship function");
 }
 
+
 SV * _overload_copy(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, float128);
      if(ld == NULL) croak("Failed to allocate memory in _overload_copy function");
@@ -1921,6 +1937,7 @@ SV * _overload_abs(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_abs function");
@@ -1939,6 +1956,7 @@ SV * _overload_int(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_int function");
@@ -1959,6 +1977,7 @@ SV * _overload_sqrt(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_sqrt function");
@@ -1976,6 +1995,7 @@ SV * _overload_log(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_log function");
@@ -1994,6 +2014,7 @@ SV * _overload_exp(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_exp function");
@@ -2016,6 +2037,7 @@ SV * _overload_sin(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_sin function");
@@ -2034,6 +2056,7 @@ SV * _overload_cos(pTHX_ SV * a, SV * b, SV * third) {
 
      float128 * f;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(f, 1, float128);
      if(f == NULL) croak("Failed to allocate memory in _overload_cos function");
@@ -2150,22 +2173,14 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::Float128::_overload_atan2 function");
 }
 
-SV * _overload_inc(pTHX_ SV * a, SV * b, SV * third) {
-
-     SvREFCNT_inc(a);
-
+void _overload_inc(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
      *(INT2PTR(float128 *, SvIVX(SvRV(a)))) += 1.0Q;
-
-     return a;
 }
 
-SV * _overload_dec(pTHX_ SV * a, SV * b, SV * third) {
-
-     SvREFCNT_inc(a);
-
+void _overload_dec(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
      *(INT2PTR(float128 *, SvIVX(SvRV(a)))) -= 1.0Q;
-
-     return a;
 }
 
 SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
@@ -2269,6 +2284,7 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -2818,6 +2834,7 @@ void _f128_bytes(pTHX_ SV * sv) {
   int i, n = sizeof(float128);
   char * buff;
   void * p = &f128;
+  PERL_UNUSED_VAR(items);
 
   Newx(buff, 4, char);
   if(buff == NULL) croak("Failed to allocate memory in _f128_bytes function");
@@ -3278,13 +3295,11 @@ int _avoid_inf_cast(void) {
 
 int _has_pv_nv_bug(void) {
 #if defined(F128_PV_NV_BUG)
-     return 1;
+  return 1;
 #else
      return 0;
 #endif
 }
-
-
 
 
 MODULE = Math::Float128  PACKAGE = Math::Float128
@@ -3819,23 +3834,41 @@ CODE:
   RETVAL = _overload_atan2 (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
-SV *
+void
 _overload_inc (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
-CODE:
-  RETVAL = _overload_inc (aTHX_ a, b, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _overload_inc(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
-SV *
+void
 _overload_dec (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
-CODE:
-  RETVAL = _overload_dec (aTHX_ a, b, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _overload_dec(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 SV *
 _overload_pow (a, b, third)

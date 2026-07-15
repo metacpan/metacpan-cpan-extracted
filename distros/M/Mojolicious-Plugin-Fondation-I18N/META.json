@@ -1,0 +1,45 @@
+{
+   "abstract" : "Fondation I18N plugin -- JSON-backed localization for the Fondation ecosystem",
+   "author" : [
+      "Daniel Brosseau <dab@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Fondation-I18N",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "I18N::LangTags" : "0",
+            "I18N::LangTags::Detect" : "0",
+            "Mojolicious" : "9.46",
+            "Mojolicious::Plugin::Fondation" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-I18N",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-I18N.git",
+         "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-I18N"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

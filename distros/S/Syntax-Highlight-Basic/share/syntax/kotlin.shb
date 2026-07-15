@@ -1,0 +1,147 @@
+# Syntax file for kotlin
+# Converted from: kotlin.vim
+# Conversion date: 2026-07-13
+
+language: kotlin
+extensions: kotlin
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if when
+
+[keyword:Error]
+typeof
+
+[keyword:Exception]
+catch finally throw try
+
+[keyword:Include]
+import package
+
+[keyword:Keyword]
+get out set super this where
+
+[keyword:Operator]
+by in is
+
+[keyword:Repeat]
+do for while
+
+[keyword:Statement]
+break continue return
+
+[keyword:StorageClass]
+abstract actual annotation companion crossinline dynamic enum expect external
+final inline inner noinline open override reified sealed suspend vararg
+
+[keyword:Structure]
+class constructor fun init interface object typealias val var
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[keyword:Type]
+AbstractCollection AbstractCoroutineContextElement AbstractCoroutineContextKey
+AbstractDoubleTimeSource AbstractIterator AbstractList AbstractLongTimeSource
+AbstractMap AbstractMutableCollection AbstractMutableList AbstractMutableMap
+AbstractMutableSet AbstractSet AccessDeniedException Accessor Annotation
+AnnotationRetention AnnotationTarget Any Appendable ArithmeticException Array
+ArrayDeque ArrayList AssertionError Boolean BooleanArray BooleanIterator
+BuilderInference Byte ByteArray ByteIterator CName CallsInPlace
+CancellationException Char CharArray CharCategory CharDirectionality
+CharIterator CharProgression CharRange CharSequence CharacterCodingException
+Charsets ClassCastException Cloneable ClosedFloatingPointRange ClosedRange
+Collection Comparable ComparableTimeMark Comparator
+ConcurrentModificationException ConditionalEffect ContextFunctionTypeParams
+Continuation ContinuationInterceptor ContractBuilder CopyActionContext
+CopyActionResult CoroutineContext DeepRecursiveFunction DeepRecursiveScope
+Delegates Deprecated DeprecatedSinceKotlin DeprecationLevel Destructured
+Double DoubleArray DoubleIterator DslMarker Duration DurationUnit Effect
+Element EmptyCoroutineContext Entry Enum EnumEntries Error Exception
+ExperimentalContracts ExperimentalJsExport ExperimentalMultiplatform
+ExperimentalObjCName ExperimentalObjCRefinement ExperimentalPathApi
+ExperimentalStdlibApi ExperimentalSubclassOptIn ExperimentalTime
+ExperimentalTypeInference ExperimentalUnsignedTypes ExtensionFunctionType
+FileAlreadyExistsException FileSystemException FileTreeWalk FileVisitorBuilder
+FileWalkDirection Float FloatArray FloatIterator FreezingIsDeprecated Function
+Function0 Function1 Function10 Function11 Function12 Function13 Function14
+Function15 Function16 Function17 Function18 Function19 Function2 Function20
+Function21 Function22 Function3 Function4 Function5 Function6 Function7
+Function8 Function9 FunctionN Getter Grouping HashMap HashSet HiddenFromObjC
+HidesFromObjC Ignore IllegalArgumentException IllegalStateException
+IndexOutOfBoundsException IndexedValue Int IntArray IntIterator IntProgression
+IntRange InvocationKind Iterable Iterator JsExport JsName JvmDefault
+JvmDefaultWithCompatibility JvmDefaultWithoutCompatibility JvmField JvmInline
+JvmMultifileClass JvmName JvmOverloads JvmRecord JvmSerializableLambda
+JvmStatic JvmSuppressWildcards JvmSynthetic JvmWildcard KAnnotatedElement
+KCallable KClass KClassifier KDeclarationContainer KFunction KMutableProperty
+KMutableProperty0 KMutableProperty1 KMutableProperty2 KParameter KProperty
+KProperty0 KProperty1 KProperty2 KType KTypeParameter KTypeProjection
+KVariance KVisibility Key Kind KotlinNullPointerException
+KotlinReflectionNotSupportedError KotlinVersion Lazy LazyThreadSafetyMode
+Level LinkedHashMap LinkedHashSet List ListIterator Long LongArray
+LongIterator LongProgression LongRange Map MatchGroup MatchGroupCollection
+MatchNamedGroupCollection MatchResult Metadata Monotonic MustBeDocumented
+MutableCollection MutableEntry MutableIterable MutableIterator MutableList
+MutableListIterator MutableMap MutableSet NoSuchElementException
+NoSuchFileException NoWhenBranchMatchedException NotImplementedError Nothing
+NullPointerException Number NumberFormatException ObjCName ObservableProperty
+OnErrorAction OnErrorResult OpenEndRange OptIn OptionalExpectation
+OverloadResolutionByLambdaReturnType Pair ParameterName PathWalkOption
+PropertyDelegateProvider PublishedApi PurelyImplements Random RandomAccess
+ReadOnlyProperty ReadWriteProperty RefinesInSwift Regex RegexOption Repeatable
+ReplaceWith RequiresOptIn RestrictsSuspension Result Retention Returns
+ReturnsNotNull RuntimeException Sequence SequenceScope Set Setter
+SharedImmutable Short ShortArray ShortIterator ShouldRefineInSwift
+SimpleEffect SinceKotlin Strictfp String StringBuilder SubclassOptInRequired
+Suppress Synchronized Target TestTimeSource ThreadLocal Throwable Throws
+TimeMark TimeSource TimedValue Transient Triple TypeCastException Typography
+UByte UByteArray UInt UIntArray UIntProgression UIntRange ULong ULongArray
+ULongProgression ULongRange UShort UShortArray
+UninitializedPropertyAccessException Unit UnsafeVariance
+UnsupportedOperationException ValueTimeMark Volatile WithComparableMarks
+
+[match:Special]
+pattern: \v\@(author|constructor|receiver|return|since|suppress)>
+
+[match:Identifier]
+pattern: \v(\s|\[)\S+
+
+[match:Error]
+pattern: \v\\.
+
+[match:Character]
+pattern: \v'[^\\]'
+
+[match:Identifier]
+pattern: \v(\w)@<!\@[[:alnum:]_.]*(:[[:alnum:]_.]*)?
+
+[match:Identifier]
+pattern: \v\w+\@
+
+[match:Identifier]
+pattern: \v(\w)@<=\@\w+
+
+[match:Identifier]
+pattern: \v\$[a-zA-Z_]\w*
+
+[match:Number]
+pattern: \v<\d+[_[:digit:]]*(uL?|UL?|[LFf])?
+
+[match:Number]
+pattern: \v<0[Xx][0-9a-fA-F]+[_[:xdigit:]]*(uL?|UL?|L)?
+
+[match:Number]
+pattern: \v<0[Bb][01]+[_01]*(uL?|UL?|L)?
+
+[match:Float]
+pattern: \v<\d*(\d[eE][-+]?\d+|\.\d+([eE][-+]?\d+)?)[Ff]?
+
+[match:Special]
+pattern: !!
+
+[match:Structure]
+pattern: ->
+

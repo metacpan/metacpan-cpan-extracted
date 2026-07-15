@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Cxn;
-$OpenSearch::Client::Role::Cxn::VERSION = '3.007008';
+$OpenSearch::Client::Role::Cxn::VERSION = '3.007009';
 use Moo::Role;
 use OpenSearch::Client::Util qw(parse_params throw to_list);
 use List::Util qw(min);
@@ -452,7 +452,7 @@ OpenSearch::Client::Role::Cxn - Provides common functionality to HTTP Cxn implem
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 DESCRIPTION
 

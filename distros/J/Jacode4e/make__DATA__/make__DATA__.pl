@@ -2,7 +2,7 @@
 #
 # make__DATA__.pl
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
@@ -31,32 +31,205 @@ require 'JIPS/make_JIPSJ.pl';
 require 'JIPS/make_JIPSE.pl';
 require 'LetsJ/LetsJ_by_Unicode.pl';
 
+# JISC Shift_JIS, EUC-JP, and ISO-2022-JP (JIS X 0201 and JIS X 0208)
+# for "sjis", "euc", and "jis" encodings of Jacode4e
+
+sub SJIS_by_JIS8 {
+    my($jis8) = @_;
+    my $c = hex($jis8);
+    if (($c <= 0x7F) or ((0xA1 <= $c) and ($c <= 0xDF))) {
+        return $jis8;
+    }
+    return q{};
+}
+
+sub EUC_by_JIS8 {
+    my($jis8) = @_;
+    my $c = hex($jis8);
+    if ($c <= 0x7F) {
+        return $jis8;
+    }
+    elsif ((0xA1 <= $c) and ($c <= 0xDF)) {
+        return "8E$jis8";   # SS2 + JIS X 0201 Katakana
+    }
+    return q{};
+}
+
+sub JIS_by_JIS8 {
+    my($jis8) = @_;
+    return SJIS_by_JIS8($jis8);   # JIS X 0201 Katakana as GR octet (8-bit JIS)
+}
+
+sub SJIS_by_CP932 {
+    my($cp932) = @_;
+    # JIS X 0208 area of CP932: lead octet 81..86, 88..9F, E0..EA
+    # (87=NEC special, ED,EE=NEC selected IBM extended, F0..=user/IBM extended)
+    if ($cp932 =~ /^(?:8[12345689ABCDEF]|9[0123456789ABCDEF]|E[0123456789A])[0123456789ABCDEF][0123456789ABCDEF]$/) {
+        return $cp932;
+    }
+    return q{};
+}
+
+sub JIS_by_CP932 {
+    my($cp932) = @_;
+    if (SJIS_by_CP932($cp932) eq q{}) {
+        return q{};
+    }
+    my($c1,$c2) = map { hex($_) } $cp932 =~ /^(..)(..)$/;
+    my($j1,$j2);
+    if ($c2 >= 0x9F) {
+        $j1 = ((($c1 < 0xA0) ? ($c1 - 0x81) : ($c1 - 0xC1)) * 2) + 0x22;
+        $j2 = $c2 - 0x7E;
+    }
+    else {
+        $j1 = ((($c1 < 0xA0) ? ($c1 - 0x81) : ($c1 - 0xC1)) * 2) + 0x21;
+        $j2 = $c2 - (($c2 > 0x7E) ? 0x20 : 0x1F);
+    }
+    return sprintf("%02X%02X", $j1, $j2);
+}
+
+sub EUC_by_CP932 {
+    my($cp932) = @_;
+    my $jis = JIS_by_CP932($cp932);
+    if ($jis eq q{}) {
+        return q{};
+    }
+    my($j1,$j2) = map { hex($_) } $jis =~ /^(..)(..)$/;
+    return sprintf("%02X%02X", $j1 + 0x80, $j2 + 0x80);
+}
+
+# JIS X 0208 era (1978, 1983, 1990) of "sjis" by JIS C 6226-1978,
+# JIS X 0208-1983, and JIS X 0208-1990 differences,
+# and JIS X 0213 era (2000, 2004) of "sjis" by JIS X 0213:2000 and
+# JIS X 0213:2004 differences
+
+require 'JIS/JIS78GL_by_JIS83GL.pl';
+
+# 2 kanji were appended by JIS X 0208-1990 (not in 1983 nor 1978)
+# https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/83-vs-90-1.sjs
+my %SJIS_appended_by_1990 = map { $_ => 1 } qw(
+    EAA3 EAA4
+);
+
+# 10 kanji were appended by JIS X 0213:2004 (not in JIS X 0213:2000)
+# http://x0213.org/codetable/sjis-0213-2004-std.txt (marked as [2004])
+my %SJIS_appended_by_2004 = map { $_ => 1 } qw(
+    879F 889E 9873 989E EAA5 EFF8 EFF9 EFFA EFFB EFFC
+);
+
+# Shift_JIS (JIS X 0208, two octets) to JIS X 0208 GL (kuten) hex
+sub JISGL_by_SJIS {
+    my($sjis) = @_;
+    return q{} if length($sjis) != 4;
+    my($c1,$c2) = map { hex($_) } $sjis =~ /^(..)(..)$/;
+    my($j1,$j2);
+    if ($c2 >= 0x9F) {
+        $j1 = ((($c1 < 0xA0) ? ($c1 - 0x81) : ($c1 - 0xC1)) * 2) + 0x22;
+        $j2 = $c2 - 0x7E;
+    }
+    else {
+        $j1 = ((($c1 < 0xA0) ? ($c1 - 0x81) : ($c1 - 0xC1)) * 2) + 0x21;
+        $j2 = $c2 - (($c2 > 0x7E) ? 0x20 : 0x1F);
+    }
+    return sprintf("%02X%02X", $j1, $j2);
+}
+
+# JIS X 0208 GL (kuten) hex to Shift_JIS (two octets), inverse of JISGL_by_SJIS
+sub SJIS_by_JISGL {
+    my($jis) = @_;
+    my($j1,$j2) = map { hex($_) } $jis =~ /^(..)(..)$/;
+    my($x,$hi);
+    if ((($j1 - 0x21) % 2) == 0) { $x = ($j1 - 0x21) / 2; $hi = 0; }
+    else                         { $x = ($j1 - 0x22) / 2; $hi = 1; }
+    my $c1 = ($x <= 0x1E) ? ($x + 0x81) : ($x + 0xC1);
+    my $c2;
+    if ($hi) { $c2 = $j2 + 0x7E; }
+    else     { $c2 = $j2 + (($j2 > 0x5F) ? 0x20 : 0x1F); }
+    return sprintf("%02X%02X", $c1, $c2);
+}
+
+# "sjis" of JIS X 0208-1983 by "sjis" of JIS X 0208-1990
+sub SJIS1983_by_SJIS1990 {
+    my($sjis1990) = @_;
+    if (($sjis1990 eq q{}) or $SJIS_appended_by_1990{$sjis1990}) {
+        return q{};
+    }
+    return $sjis1990;
+}
+
+# "sjis" of JIS C 6226-1978 by "sjis" of JIS X 0208-1983
+sub SJIS1978_by_SJIS1983 {
+    my($sjis1983) = @_;
+    if ($sjis1983 eq q{}) {
+        return q{};
+    }
+    if (length($sjis1983) != 4) {   # JIS X 0201 single octet is unchanged
+        return $sjis1983;
+    }
+    my $jis83gl = JISGL_by_SJIS($sjis1983);
+    my $jis78gl = JIS78GL_by_JIS83GL($jis83gl);
+    if (not defined $jis78gl) {      # unchanged between 1978 and 1983
+        return $sjis1983;
+    }
+    if ($jis78gl eq q{}) {           # not in JIS C 6226-1978 (Category 1)
+        return q{};
+    }
+
+    # A relocation is applied only when it is a two-way exchange (the
+    # JIS C 6226-1978 "simplified and traditional exchanged" pairs of
+    # Category 3, which are bidirectional in %JIS78GL_by_JIS83GL). A
+    # one-way relocation (Category 2, where JIS X 0208-1983 gave the
+    # unsimplified form a new code while the simplified form kept the
+    # original code) would collide with the simplified form that keeps
+    # that code, so the unsimplified form is treated as not in JIS C
+    # 6226-1978.
+
+    my $back = JIS78GL_by_JIS83GL($jis78gl);
+    if ((not defined $back) or ($back ne $jis83gl)) {
+        return q{};
+    }
+    return SJIS_by_JISGL($jis78gl);  # relocated (exchanged) in JIS C 6226-1978
+}
+
+# "sjis" of JIS X 0213:2000 by "sjis" of JIS X 0213:2004
+sub SJIS2000_by_SJIS2004 {
+    my($sjis2004) = @_;
+    if (($sjis2004 eq q{}) or $SJIS_appended_by_2004{$sjis2004}) {
+        return q{};
+    }
+    return $sjis2004;
+}
+
 binmode(STDOUT);
 
 print STDOUT <<'COMMENT';
 __DATA__
-###################################################################################################################
+#####################################################################################################################################
 # Jacode4e table
-###################################################################################################################
-#+++++++----------------------------------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-#||||||| ++++------------------------------------------------------------------------------------------------------ Microsoft CP932, IANA Windows-31J
-#||||||| |||| ++++------------------------------------------------------------------------------------------------- IBM CP932
-#||||||| |||| |||| ++++-------------------------------------------------------------------------------------------- NEC CP932
-#||||||| |||| |||| |||| ++++--------------------------------------------------------------------------------------- JISC Shift_JIS-2004
-#||||||| |||| |||| |||| |||| ++++---------------------------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-#||||||| |||| |||| |||| |||| |||| ++++----------------------------------------------------------------------------- HITACHI KEIS78
-#||||||| |||| |||| |||| |||| |||| |||| ++++------------------------------------------------------------------------ HITACHI KEIS83
-#||||||| |||| |||| |||| |||| |||| |||| |||| ++++------------------------------------------------------------------- HITACHI KEIS90
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++-------------------------------------------------------------- FUJITSU JEF
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------------------------- NEC JIPS(J)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------------------------- NEC JIPS(E)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++----------------------------------------------- UNISYS LetsJ
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------------------- Unicode
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++------------------------ UTF-8.0 (aka UTF-8)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++++++----------- UTF-8.1
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
-#2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 123456789012 12345678
-#VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVVVVVV VVVVVVVV
+#####################################################################################################################################
+#+++++++-------------------------------------------------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+#|        ++++-------------------------------------------------------------------------------------------------------------------- Microsoft CP932, IANA Windows-31J
+#|        |    ++++--------------------------------------------------------------------------------------------------------------- IBM CP932
+#|        |    |    ++++---------------------------------------------------------------------------------------------------------- NEC CP932
+#|        |    |    |    ++++----------------------------------------------------------------------------------------------------- JISC Shift_JIS of JIS C 6226-1978  (JIS X 0201, JIS X 0208)
+#|        |    |    |    |    ++++------------------------------------------------------------------------------------------------ JISC Shift_JIS of JIS X 0208-1983  (JIS X 0201, JIS X 0208)
+#|        |    |    |    |    |    ++++------------------------------------------------------------------------------------------- JISC Shift_JIS of JIS X 0208-1990  (JIS X 0201, JIS X 0208)
+#|        |    |    |    |    |    |    ++++-------------------------------------------------------------------------------------- JISC Shift_JIS-2004 of JIS X 0213:2000
+#|        |    |    |    |    |    |    |    ++++--------------------------------------------------------------------------------- JISC Shift_JIS-2004 of JIS X 0213:2004
+#|        |    |    |    |    |    |    |    |    ++++---------------------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+#|        |    |    |    |    |    |    |    |    |    ++++----------------------------------------------------------------------- HITACHI KEIS78
+#|        |    |    |    |    |    |    |    |    |    |    ++++------------------------------------------------------------------ HITACHI KEIS83
+#|        |    |    |    |    |    |    |    |    |    |    |    ++++------------------------------------------------------------- HITACHI KEIS90
+#|        |    |    |    |    |    |    |    |    |    |    |    |    ++++-------------------------------------------------------- FUJITSU JEF
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    ++++--------------------------------------------------- NEC JIPS(J)
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    |    ++++---------------------------------------------- NEC JIPS(E)
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    ++++----------------------------------------- UNISYS LetsJ
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    +++++++++------------------------------- Unicode
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |         ++++++++++++------------------ UTF-8.0 (aka UTF-8)
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |         |            ++++++++++++----- UTF-8.1
+#|        |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |         |            |            ++++++++- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+#1234567 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 123456789012 12345678
+#VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVVVVVV VVVVVVVV
 COMMENT
 
 my $spua_jp = 0xF0000;
@@ -83,7 +256,11 @@ for my $jis8 (qw(
         [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # Microsoft CP932, IANA Windows-31J
         [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # IBM CP932
         [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # NEC CP932
-        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # Shift_JIS-2004
+        [(SJIS_by_JIS8                      ($jis8)  || ' -- '    ) => '%-4s ' ], # JISC Shift_JIS of JIS C 6226-1978  (JIS X 0201, JIS X 0208)
+        [(SJIS_by_JIS8                      ($jis8)  || ' -- '    ) => '%-4s ' ], # JISC Shift_JIS of JIS X 0208-1983  (JIS X 0201, JIS X 0208)
+        [(SJIS_by_JIS8                      ($jis8)  || ' -- '    ) => '%-4s ' ], # JISC Shift_JIS of JIS X 0208-1990  (JIS X 0201, JIS X 0208)
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # JISC Shift_JIS-2004 of JIS X 0213:2000
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # JISC Shift_JIS-2004 of JIS X 0213:2004
         [(EBCDIC_IBM_CPGID00290_by_JIS8     ($jis8)  || ' -- '    ) => '%-4s ' ], # IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
         [(EBCDIK_HITACHI_by_JIS8            ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS78
         [(EBCDIK_HITACHI_by_JIS8            ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS83
@@ -144,7 +321,11 @@ for my $unicode (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys %unico
         [(CP932_by_Unicode       ($unicode) || ' -- '    ) => '%-4s ' ], # Microsoft CP932, IANA Windows-31J
         [(CP932IBM_by_Unicode    ($unicode) || ' -- '    ) => '%-4s ' ], # IBM CP932
         [(CP932NEC_by_Unicode    ($unicode) || ' -- '    ) => '%-4s ' ], # NEC CP932
-        [(ShiftJIS2004_by_Unicode($unicode) || ' -- '    ) => '%-4s ' ], # Shift_JIS-2004
+        [(SJIS1978_by_SJIS1983(SJIS1983_by_SJIS1990(SJIS_by_CP932(CP932_by_Unicode($unicode)))) || ' -- ' ) => '%-4s ' ], # JISC Shift_JIS of JIS C 6226-1978  (JIS X 0201, JIS X 0208)
+        [(SJIS1983_by_SJIS1990(SJIS_by_CP932(CP932_by_Unicode($unicode)))                       || ' -- ' ) => '%-4s ' ], # JISC Shift_JIS of JIS X 0208-1983  (JIS X 0201, JIS X 0208)
+        [(SJIS_by_CP932(CP932_by_Unicode($unicode))                                             || ' -- ' ) => '%-4s ' ], # JISC Shift_JIS of JIS X 0208-1990  (JIS X 0201, JIS X 0208)
+        [(SJIS2000_by_SJIS2004(ShiftJIS2004_by_Unicode($unicode))                               || ' -- ' ) => '%-4s ' ], # JISC Shift_JIS-2004 of JIS X 0213:2000
+        [(ShiftJIS2004_by_Unicode($unicode)                                                     || ' -- ' ) => '%-4s ' ], # JISC Shift_JIS-2004 of JIS X 0213:2004
         [(CP00930_by_Unicode     ($unicode) || ' -- '    ) => '%-4s ' ], # IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
         [(KEIS78_by_Unicode      ($unicode) || ' -- '    ) => '%-4s ' ], # HITACHI KEIS78
         [(KEIS83_by_Unicode      ($unicode) || ' -- '    ) => '%-4s ' ], # HITACHI KEIS83

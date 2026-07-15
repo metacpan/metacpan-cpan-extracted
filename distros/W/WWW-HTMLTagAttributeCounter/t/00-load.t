@@ -6,8 +6,8 @@ BEGIN {
     use_ok('LWP::UserAgent');
     use_ok('HTML::TokeParser::Simple');
     use_ok('overload');
-    use_ok('Class::Data::Accessor');
-	use_ok( 'WWW::HTMLTagAttributeCounter' );
+    use_ok('Class::Accessor::Grouped');
+    use_ok( 'WWW::HTMLTagAttributeCounter' );
 }
 
 diag( "Testing WWW::HTMLTagAttributeCounter $WWW::HTMLTagAttributeCounter::VERSION, Perl $], $^X" );
@@ -40,18 +40,3 @@ is_deeply( $result, { div => 1, span => 3, foo => 0 } );
 $c->count( \$html, [ qw/div span foo/ ] );
 is( "$c", $c->result_readable );
 is( "$c", "1 div, 0 foo and 3 span");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

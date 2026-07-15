@@ -1,0 +1,155 @@
+# Syntax file for scala
+# Converted from: scala.vim
+# Conversion date: 2026-07-13
+
+language: scala
+extensions: scala
+
+[keyword:Function]
+abstract final implicit implicitly lazy null override private protected
+require sealed super
+
+[keyword:Include]
+import package
+
+[keyword:Keyword]
+case catch class def do else extends final finally for forSome if macro match
+object return throw trait try val var while with yield
+
+[keyword:PreProc]
+become goto initialize onTransition shouldBe startWith stay unbecome using
+when
+
+[keyword:Special]
+eq false ne new this true
+
+[match:PreProc]
+pattern: ^\s+\Kit should
+
+[match:PreProc]
+pattern: \bshould\b
+
+[match:Number]
+pattern: '[_A-Za-z0-9$]+
+
+[match:Special]
+pattern: \\[\\"'ntbrf]
+
+[match:Special]
+pattern: \[A-Z][A-Fa-f0-9]{4}
+
+[match:Operator]
+pattern: ||
+
+[match:Operator]
+pattern: &&
+
+[match:Operator]
+pattern: |
+
+[match:Operator]
+pattern: &
+
+[match:Function]
+pattern: \b[_A-Za-z0-9$]+\b
+
+[match:Function]
+pattern: `[^`]+`
+
+[match:Special]
+pattern: \b[_\.A-Za-z0-9$]+\b
+
+[match:Special]
+pattern: `[^`]+`
+
+[match:Type]
+pattern: #
+
+[match:Special]
+pattern: \b[A-Z][A-Za-z0-9$]*\b
+
+[match:Type]
+pattern: \b[_\.A-Za-z0-9$]+\b
+
+[match:Special]
+pattern: \b[_\.A-Za-z0-9$]+\b
+
+[match:Type]
+pattern: \b[_\.A-Za-z0-9$]+\b
+
+[match:Special]
+pattern: `[^`]+`
+
+[match:String]
+pattern: \\"
+
+[match:Function]
+pattern: \$[a-zA-Z0-9_$]+
+
+[match:Function]
+pattern: \$[a-zA-Z0-9_$]+(?:%[-A-Za-z0-9\.]+)\?
+
+[match:Number]
+pattern: \b0[dDfFlL]\?\b
+
+[match:Number]
+pattern: \b[1-9]\d*[dDfFlL]\?\b
+
+[match:Number]
+pattern: \b0[xX][0-9a-fA-F]+[dDfFlL]\?\b
+
+[match:Number]
+pattern: \b\d+[eE][-+]?\d+[fFdD]?\b
+
+[match:Keyword]
+pattern: [-+=:<>]+
+
+[match:Function]
+pattern: @\b[`_A-Za-z0-9$]+\b
+
+[match:Function]
+pattern: @[_A-Za-z0-9$]+
+
+[match:Keyword]
+pattern: [.`_A-Za-z0-9$]+
+
+[match:Todo]
+pattern: \vTODO|FIXME|XXX
+
+[match:PreProc]
+pattern: @\b[`_A-Za-z0-9$]+\b
+
+[match:PreProc]
+pattern: stay[\s\n]+using
+
+[match:PreProc]
+pattern: ^\s*stay\s*$
+
+[match:PreProc]
+pattern: when([^)]*)
+
+[match:PreProc]
+pattern: startWith([^)]*)
+
+[match:PreProc]
+pattern: initialize()
+
+[match:PreProc]
+pattern: onTransition
+
+[match:PreProc]
+pattern: onTermination
+
+[match:PreProc]
+pattern: whenUnhandled
+
+[match:PreProc]
+pattern: \busing\b
+
+[match:PreProc]
+pattern: \bgoto\b
+
+[region:Function]
+start: \[\[
+end: \]\]
+

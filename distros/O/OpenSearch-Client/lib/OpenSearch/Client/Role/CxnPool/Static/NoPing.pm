@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::CxnPool::Static::NoPing;
-$OpenSearch::Client::Role::CxnPool::Static::NoPing::VERSION = '3.007008';
+$OpenSearch::Client::Role::CxnPool::Static::NoPing::VERSION = '3.007009';
 use Moo::Role;
 with 'OpenSearch::Client::Role::CxnPool';
 
@@ -100,7 +100,7 @@ OpenSearch::Client::Role::CxnPool::Static::NoPing - A CxnPool for connecting to 
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 MANUAL
 

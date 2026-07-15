@@ -1,0 +1,2 @@
+% args $title = 'Default'
+<!doctype html><title><%= $title %></title><body><%= yield %></body>

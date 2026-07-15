@@ -1,0 +1,34 @@
+# Syntax file for bc
+# Converted from: bc.vim
+# Conversion date: 2026-07-13
+
+language: bc
+extensions: bc
+
+[keyword:Constant]
+BC_BASE_MAX BC_DIM_MAX BC_ENV_ARGS BC_LINE_LENGTH BC_SCALE_MAX BC_STRING_MAX
+ibase last obase scale
+
+[keyword:Keyword]
+break continue define else for halt if length limits print quit read return
+sqrt while
+
+[keyword:Type]
+auto
+
+[match:Identifier]
+pattern: [a-z_][a-z0-9_]*
+
+[match:Number]
+pattern: [0-9]+
+
+[match:Comment]
+pattern: \#.*
+
+[match:Error]
+pattern: ]
+
+[region:Comment]
+start: /\*
+end: \*/
+

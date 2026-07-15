@@ -38,7 +38,20 @@
 #include "eshu_xml.h"
 #include "eshu_css.h"
 #include "eshu_diff.h"
+#include "eshu_bash.h"
+#include "eshu_go.h"
+#include "eshu_py.h"
+#include "eshu_json.h"
+#include "eshu_java.h"
+#include "eshu_lua.h"
+#include "eshu_rust.h"
+#include "eshu_php.h"
+#include "eshu_ruby.h"
+#include "eshu_ts.h"
+#include "eshu_sql.h"
+#include "eshu_yaml.h"
 #include "eshu_file.h"
+#include "eshu_hl.h"
 
 MODULE = Eshu  PACKAGE = Eshu
 
@@ -161,9 +174,11 @@ detect_lang(class, filename_sv)
 				               && (dot[0] == 'c' || dot[0] == 'C')
 				               && (dot[1] == 'j' || dot[1] == 'J')
 				               && (dot[2] == 's' || dot[2] == 'S'))
-				           || (ext_len == 2
-				               && (dot[0] == 't' || dot[0] == 'T')
-				               && (dot[1] == 's' || dot[1] == 'S'))
+				           ) {
+					RETVAL = newSVpvs("js");
+				} else if ((ext_len == 2
+				            && (dot[0] == 't' || dot[0] == 'T')
+				            && (dot[1] == 's' || dot[1] == 'S'))
 				           || (ext_len == 3
 				               && (dot[0] == 't' || dot[0] == 'T')
 				               && (dot[1] == 's' || dot[1] == 'S')
@@ -172,12 +187,133 @@ detect_lang(class, filename_sv)
 				               && (dot[0] == 'm' || dot[0] == 'M')
 				               && (dot[1] == 't' || dot[1] == 'T')
 				               && (dot[2] == 's' || dot[2] == 'S'))) {
-					RETVAL = newSVpvs("js");
+					RETVAL = newSVpvs("ts");
 				} else if (ext_len == 3
 				           && (dot[0] == 'p' || dot[0] == 'P')
 				           && (dot[1] == 'o' || dot[1] == 'O')
 				           && (dot[2] == 'd' || dot[2] == 'D')) {
 					RETVAL = newSVpvs("pod");
+				} else if ((ext_len == 2
+				            && (dot[0] == 'p' || dot[0] == 'P')
+				            && (dot[1] == 'y' || dot[1] == 'Y'))
+				           || (ext_len == 3
+				               && (dot[0] == 'p' || dot[0] == 'P')
+				               && (dot[1] == 'y' || dot[1] == 'Y')
+				               && (dot[2] == 'w' || dot[2] == 'W'))) {
+					RETVAL = newSVpvs("python");
+				} else if ((ext_len == 2
+				            && (dot[0] == 's' || dot[0] == 'S')
+				            && (dot[1] == 'h' || dot[1] == 'H'))
+				           || (ext_len == 4
+				               && (dot[0] == 'b' || dot[0] == 'B')
+				               && (dot[1] == 'a' || dot[1] == 'A')
+				               && (dot[2] == 's' || dot[2] == 'S')
+				               && (dot[3] == 'h' || dot[3] == 'H'))
+				           || (ext_len == 3
+				               && (dot[0] == 'z' || dot[0] == 'Z')
+				               && (dot[1] == 's' || dot[1] == 'S')
+				               && (dot[2] == 'h' || dot[2] == 'H'))
+				           || (ext_len == 3
+				               && (dot[0] == 'k' || dot[0] == 'K')
+				               && (dot[1] == 's' || dot[1] == 'S')
+				               && (dot[2] == 'h' || dot[2] == 'H'))) {
+					RETVAL = newSVpvs("bash");
+				} else if (ext_len == 2
+				           && (dot[0] == 'g' || dot[0] == 'G')
+				           && (dot[1] == 'o' || dot[1] == 'O')) {
+					RETVAL = newSVpvs("go");
+				} else if (ext_len == 2
+				           && (dot[0] == 'r' || dot[0] == 'R')
+				           && (dot[1] == 's' || dot[1] == 'S')) {
+					RETVAL = newSVpvs("rust");
+				} else if (ext_len == 3
+				           && (dot[0] == 'l' || dot[0] == 'L')
+				           && (dot[1] == 'u' || dot[1] == 'U')
+				           && (dot[2] == 'a' || dot[2] == 'A')) {
+					RETVAL = newSVpvs("lua");
+				} else if ((ext_len == 4
+				            && (dot[0] == 'j' || dot[0] == 'J')
+				            && (dot[1] == 's' || dot[1] == 'S')
+				            && (dot[2] == 'o' || dot[2] == 'O')
+				            && (dot[3] == 'n' || dot[3] == 'N'))
+				           || (ext_len == 5
+				               && (dot[0] == 'j' || dot[0] == 'J')
+				               && (dot[1] == 's' || dot[1] == 'S')
+				               && (dot[2] == 'o' || dot[2] == 'O')
+				               && (dot[3] == 'n' || dot[3] == 'N')
+				               && (dot[4] == 'c' || dot[4] == 'C'))) {
+					RETVAL = newSVpvs("json");
+				} else if (ext_len == 4
+				           && (dot[0] == 'j' || dot[0] == 'J')
+				           && (dot[1] == 'a' || dot[1] == 'A')
+				           && (dot[2] == 'v' || dot[2] == 'V')
+				           && (dot[3] == 'a' || dot[3] == 'A')) {
+					RETVAL = newSVpvs("java");
+				} else if ((ext_len == 3
+				            && (dot[0] == 'p' || dot[0] == 'P')
+				            && (dot[1] == 'h' || dot[1] == 'H')
+				            && (dot[2] == 'p' || dot[2] == 'P'))
+				           || (ext_len == 5
+				               && (dot[0] == 'p' || dot[0] == 'P')
+				               && (dot[1] == 'h' || dot[1] == 'H')
+				               && (dot[2] == 't' || dot[2] == 'T')
+				               && (dot[3] == 'm' || dot[3] == 'M')
+				               && (dot[4] == 'l' || dot[4] == 'L'))
+				           || (ext_len == 4
+				               && (dot[0] == 'p' || dot[0] == 'P')
+				               && (dot[1] == 'h' || dot[1] == 'H')
+				               && (dot[2] == 'p' || dot[2] == 'P')
+				               && (dot[3] >= '3' && dot[3] <= '5'))) {
+					RETVAL = newSVpvs("php");
+				} else if ((ext_len == 2
+				            && (dot[0] == 'r' || dot[0] == 'R')
+				            && (dot[1] == 'b' || dot[1] == 'B'))
+				           || (ext_len == 4
+				               && (dot[0] == 'r' || dot[0] == 'R')
+				               && (dot[1] == 'a' || dot[1] == 'A')
+				               && (dot[2] == 'k' || dot[2] == 'K')
+				               && (dot[3] == 'e' || dot[3] == 'E'))) {
+					RETVAL = newSVpvs("ruby");
+				} else if ((ext_len == 3
+				            && (dot[0] == 's' || dot[0] == 'S')
+				            && (dot[1] == 'q' || dot[1] == 'Q')
+				            && (dot[2] == 'l' || dot[2] == 'L'))
+				           || (ext_len == 4
+				               && (dot[0] == 'p' || dot[0] == 'P')
+				               && (dot[1] == 's' || dot[1] == 'S')
+				               && (dot[2] == 'q' || dot[2] == 'Q')
+				               && (dot[3] == 'l' || dot[3] == 'L'))
+				           || (ext_len == 3
+				               && (dot[0] == 'd' || dot[0] == 'D')
+				               && (dot[1] == 'd' || dot[1] == 'D')
+				               && (dot[2] == 'l' || dot[2] == 'L'))) {
+					RETVAL = newSVpvs("sql");
+				}
+				/* yaml */
+				if (!RETVAL &&
+				       ((ext_len == 4
+				         && (dot[0] == 'y' || dot[0] == 'Y')
+				         && (dot[1] == 'a' || dot[1] == 'A')
+				         && (dot[2] == 'm' || dot[2] == 'M')
+				         && (dot[3] == 'l' || dot[3] == 'L'))
+				        || (ext_len == 3
+				            && (dot[0] == 'y' || dot[0] == 'Y')
+				            && (dot[1] == 'm' || dot[1] == 'M')
+				            && (dot[2] == 'l' || dot[2] == 'L')))) {
+					RETVAL = newSVpvs("yaml");
+				}
+			} else {
+				/* no dot: check for special filenames */
+				const char *base = filename;
+				{
+					const char *q = filename + len;
+					while (q > filename && *(q-1) != '/' && *(q-1) != '\\') q--;
+					base = q;
+				}
+				if (strcmp(base, "Gemfile") == 0 ||
+				    strcmp(base, "Rakefile") == 0 ||
+				    strcmp(base, "Guardfile") == 0) {
+					RETVAL = newSVpvs("ruby");
 				}
 			}
 		}
@@ -474,6 +610,67 @@ indent_js(class, src_sv, ...)
 		RETVAL
 
 SV *
+indent_ts(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_TS;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_ts(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_ts(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		size_t result_len;
+		char *result;
+
+		PERL_UNUSED_VAR(class);
+		src    = SvPV(src_sv, src_len);
+		result = eshu_highlight_ts(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		SvUTF8_on(RETVAL);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
 indent_pod(class, src_sv, ...)
 	SV * class
 	SV * src_sv
@@ -508,6 +705,656 @@ indent_pod(class, src_sv, ...)
 
 		result = eshu_indent_pod(src, (size_t)src_len, &cfg, &out_len);
 		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_python(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_PYTHON;
+		cfg.indent_char  = ' ';
+		cfg.indent_width = 4;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == '\t') ? '\t' : ' ';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_python(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_bash(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_BASH;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_bash(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_bash(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_bash(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_go(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_GO;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_go(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_go(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_go(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_json(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang         = ESHU_LANG_JSON;
+		cfg.indent_char  = ' ';
+		cfg.indent_width = 2;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == '\t') ? '\t' : ' ';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_json(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_json(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_json(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_java(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang         = ESHU_LANG_JAVA;
+		cfg.indent_char  = ' ';
+		cfg.indent_width = 4;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == '\t') ? '\t' : ' ';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_java(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_java(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_java(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_lua(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_LUA;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_lua(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_lua(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_lua(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_rust(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_RUST;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_rust(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_rust(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_rust(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_php(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang        = ESHU_LANG_PHP;
+		cfg.indent_char = ' ';
+		cfg.indent_width = 4;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_php(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_php(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_php(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_ruby(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang         = ESHU_LANG_RUBY;
+		cfg.indent_char  = ' ';
+		cfg.indent_width = 2;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == ' ') ? ' ' : '\t';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_ruby(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_ruby(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_ruby(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_sql(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang = ESHU_LANG_SQL;
+		cfg.indent_char  = ' ';
+		cfg.indent_width = 4;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == '\t') ? '\t' : ' ';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_sql(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_sql(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_sql(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+indent_yaml(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		eshu_config_t cfg;
+		char *result;
+		size_t out_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		cfg = eshu_default_config();
+		cfg.lang         = ESHU_LANG_YAML;
+		cfg.indent_char  = ' ';
+		cfg.indent_width = 2;
+
+		for (i = 2; i + 1 < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			SV *val = ST(i + 1);
+			if (strEQ(key, "indent_char")) {
+				const char *ic = SvPV_nolen(val);
+				cfg.indent_char = (*ic == '\t') ? '\t' : ' ';
+			} else if (strEQ(key, "indent_width")) {
+				cfg.indent_width = SvIV(val);
+			} else if (strEQ(key, "range_start")) {
+				cfg.range_start = SvIV(val);
+			} else if (strEQ(key, "range_end")) {
+				cfg.range_end = SvIV(val);
+			}
+		}
+
+		result = eshu_indent_yaml(src, (size_t)src_len, &cfg, &out_len);
+		RETVAL = newSVpvn(result, out_len);
+		free(result);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_yaml(class, src_sv)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		char *result;
+		size_t result_len;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		result = eshu_highlight_yaml(src, (size_t)src_len, &result_len);
+		RETVAL = newSVpvn(result, result_len);
 		free(result);
 	}
 	OUTPUT:
@@ -568,15 +1415,66 @@ indent_string(class, src_sv, ...)
 			cfg.lang = ESHU_LANG_CSS;
 			result = eshu_indent_css(src, (size_t)src_len, &cfg, &out_len);
 		} else if (strEQ(lang, "js") || strEQ(lang, "javascript") ||
-		           strEQ(lang, "jsx") || strEQ(lang, "ts") ||
-		           strEQ(lang, "typescript") || strEQ(lang, "tsx") ||
-		           strEQ(lang, "mjs") || strEQ(lang, "cjs") ||
-		           strEQ(lang, "mts")) {
+		           strEQ(lang, "jsx") || strEQ(lang, "mjs") ||
+		           strEQ(lang, "cjs")) {
 			cfg.lang = ESHU_LANG_JS;
 			result = eshu_indent_js(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "ts") || strEQ(lang, "typescript") ||
+		           strEQ(lang, "tsx") || strEQ(lang, "mts")) {
+			cfg.lang = ESHU_LANG_TS;
+			result = eshu_indent_ts(src, (size_t)src_len, &cfg, &out_len);
 		} else if (strEQ(lang, "pod")) {
 			cfg.lang = ESHU_LANG_POD;
 			result = eshu_indent_pod(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "python") || strEQ(lang, "py")) {
+			cfg.lang         = ESHU_LANG_PYTHON;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 4;
+			result = eshu_indent_python(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "bash") || strEQ(lang, "sh") ||
+		           strEQ(lang, "shell") || strEQ(lang, "zsh") ||
+		           strEQ(lang, "ksh")) {
+			cfg.lang = ESHU_LANG_BASH;
+			result = eshu_indent_bash(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "go")) {
+			cfg.lang = ESHU_LANG_GO;
+			result = eshu_indent_go(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "rust") || strEQ(lang, "rs")) {
+			cfg.lang = ESHU_LANG_RUST;
+			result = eshu_indent_rust(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "json") || strEQ(lang, "jsonc")) {
+			cfg.lang         = ESHU_LANG_JSON;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 2;
+			result = eshu_indent_json(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "java")) {
+			cfg.lang         = ESHU_LANG_JAVA;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 4;
+			result = eshu_indent_java(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "lua")) {
+			cfg.lang = ESHU_LANG_LUA;
+			result = eshu_indent_lua(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "php") || strEQ(lang, "phtml")) {
+			cfg.lang         = ESHU_LANG_PHP;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 4;
+			result = eshu_indent_php(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "ruby") || strEQ(lang, "rb")) {
+			cfg.lang         = ESHU_LANG_RUBY;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 2;
+			result = eshu_indent_ruby(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "sql") || strEQ(lang, "psql") || strEQ(lang, "ddl")) {
+			cfg.lang         = ESHU_LANG_SQL;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 4;
+			result = eshu_indent_sql(src, (size_t)src_len, &cfg, &out_len);
+		} else if (strEQ(lang, "yaml") || strEQ(lang, "yml")) {
+			cfg.lang         = ESHU_LANG_YAML;
+			cfg.indent_char  = ' ';
+			cfg.indent_width = 2;
+			result = eshu_indent_yaml(src, (size_t)src_len, &cfg, &out_len);
 		} else {
 			croak("Eshu: unsupported language '%s'", lang);
 			result = NULL; /* not reached */
@@ -857,6 +1755,33 @@ indent_dir(class, path_sv, ...)
 		free(report.changes);
 
 		RETVAL = newRV_noinc((SV *)report_hv);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *
+highlight_string(class, src_sv, ...)
+	SV * class
+	SV * src_sv
+	CODE:
+	{
+		const char *src;
+		STRLEN src_len;
+		const char *lang = "c";
+		char *result;
+		size_t result_len;
+		int i;
+
+		PERL_UNUSED_VAR(class);
+		src = SvPV(src_sv, src_len);
+		for (i = 2; i < items; i += 2) {
+			const char *key = SvPV_nolen(ST(i));
+			if (strEQ(key, "lang") && i + 1 < items)
+				lang = SvPV_nolen(ST(i + 1));
+		}
+		result = eshu_highlight(src, (size_t)src_len, lang, &result_len);
+		RETVAL = newSVpvn(result, result_len);
+		free(result);
 	}
 	OUTPUT:
 		RETVAL

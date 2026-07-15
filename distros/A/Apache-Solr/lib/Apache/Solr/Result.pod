@@ -28,13 +28,25 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
 
 =head1 DESCRIPTION
 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<stringification> 
+
+Z<>
+
+=back
+
 =head1 METHODS
 
 =head2 Constructors
 
 =over 4
 
-=item Apache::Solr::Result-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option    --Default
   core        undef
@@ -46,13 +58,13 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
 
 =over 2
 
-=item core => L<Apache::Solr|Apache::Solr> object
+=item core => Apache::Solr object
 
 =item endpoint => URI
 
-=item params => ARRAY|HASH
+=item params => \%params|\@pairs
 
-The parameters used for the query.  [1.11] not required anymore.
+The parameters used for the query.  [1.11] not a required option anymore.
 
 =item request => HTTP::Request object
 
@@ -72,7 +84,7 @@ of a repeat of a message exchange between this client and the database.
 
 =back
 
-=head2 Accessors
+=head2 Attributes
 
 =over 4
 
@@ -99,6 +111,8 @@ All errors collected by this object into one string.
 
 =item $obj-E<gt>B<httpError>()
 
+Z<>
+
 =item $obj-E<gt>B<params>()
 
 List of (expanded) parameters used to call the solr server.
@@ -117,13 +131,19 @@ Set/get the HTTP::Response object received from this query action.
 
 =item $obj-E<gt>B<serverError>()
 
+Z<>
+
 =item $obj-E<gt>B<solrError>()
+
+Z<>
 
 =item $obj-E<gt>B<solrQTime>()
 
 Elapse (as reported by the server) to handle the request.  In seconds!
 
 =item $obj-E<gt>B<solrStatus>()
+
+Z<>
 
 =item $obj-E<gt>B<start>()
 
@@ -132,14 +152,14 @@ the message to be sent.
 
 =item $obj-E<gt>B<success>()
 
-Returns true if the command has successfully completed.  
+Returns C<true> if the command has successfully completed.
 
-example: 
+» example: 
 
-   my $result = $sorl->commit;
-   $result->success or die;
-   $result or die;          # same, via overloading
-   $solr->commit or die;    # same, also overloading
+  my $result = $sorl->commit;
+  $result->success or die;
+  $result or die;          # same, via overloading
+  $solr->commit or die;    # same, also overloading
 
 =back
 
@@ -151,7 +171,7 @@ example:
 
 =item $obj-E<gt>B<highlighted>($document)
 
-Return information which relates to the selected $document.
+Return information which relates to the selected C<$document>.
 
 =item $obj-E<gt>B<nextSelected>(%options)
 
@@ -159,7 +179,7 @@ Return information which relates to the selected $document.
 [1.06] Use L<selected()|Apache::Solr::Result/"in response to a select()"> or search parameter C<start> to give a starting
 point.  [1.06] The C<%options> are passed to L<selected()|Apache::Solr::Result/"in response to a select()">.
 
-example: 
+» example: 
 
   my $result = $solr->select(q => ...);
   while(my $doc = $result->nextSelected)
@@ -172,7 +192,7 @@ Returns the number of selected documents, as result of a
 L<Apache::Solr::select()|Apache::Solr/"Search"> call.  Probably many of those documents are
 not loaded (yet).
 
-example: 
+» example: 
 
   print $result->nrSelected, " results\n";
 
@@ -186,7 +206,7 @@ example:
 =item $obj-E<gt>B<selected>($rank, %options)
 
 Returns information about the query by L<Apache::Solr::select()|Apache::Solr/"Search"> on
-position $rank (count starts at 0!)  Returned is an L<Apache::Solr::Document|Apache::Solr::Document>
+position C<$rank> (count starts at 0!)  Returned is an L<Apache::Solr::Document|Apache::Solr::Document>
 object.
 
 The first request will take a certain number of "rows".  This routine
@@ -196,13 +216,13 @@ requests are cached as well.
 
 This method has no C<%options> at the moment.
 
-example: 
+» example: 
 
-   my $r = $solr->select(rows => 10, ...);
-   $r or die $r->errors;
+  my $r = $solr->select(rows => 10, ...);
+  $r or die $r->errors;
 
-   if(my $last = $r->selected(9)) {...}
-   my $doc = $r->selected(11);     # auto-request more
+  if(my $last = $r->selected(9)) {...}
+  my $doc = $r->selected(11);     # auto-request more
 
 =back
 
@@ -213,7 +233,7 @@ example:
 =item $obj-E<gt>B<terms>( $field, [$terms] )
 
 Returns the results of a 'terms' query (see L<Apache::Solr::queryTerms()|Apache::Solr/"Search">),
-which is a HASH.  When $terms are specified, a new table is set.
+which is a HASH.  When C<$terms> are specified, a new table is set.
 
 In Solr XML (at least upto v4.0) the results are presented as lst, not arr
 So: their sort order is lost.
@@ -229,7 +249,9 @@ So: their sort order is lost.
 [1.07] Returns the page size of all of the full returned pages.  The last page
 is probably smaller.
 
-=item $obj-E<gt>B<replaceParams>(HASH, $oldparams)
+=item $obj-E<gt>B<replaceParams>(\%params, \%oldparams)
+
+Z<>
 
 =item $obj-E<gt>B<selectedPage>($pagenr)
 
@@ -245,37 +267,51 @@ Query the database for the next page of results.
 
 =item $obj-E<gt>B<selectedPageNr>($rank)
 
+Z<>
+
 =item $obj-E<gt>B<selectedPageSize>()
 
 [1.07] DEPRECATED.  Use L<fullPageSize()|Apache::Solr::Result/"Helpers">.
 
 =item $obj-E<gt>B<selectedPages>()
 
+Z<>
+
 =item $obj-E<gt>B<showTimings>( [$fh] )
 
-Print timing informat to the $fh, by default the selected
-file-handle (probably STDOUT).
+Print timing informat to the C<$fh>, by default the selected file-handle (probably STDOUT).
 
 =back
 
-=head1 OVERLOADING
+=head1 DIAGNOSTICS
 
 =over 4
 
-=item overload: B<stringification >
+=item Error: cannot autoload page $nr, no client provided.
+
+Cast by C<selectedPageLoad()>
+
+=item Error: no search for terms on field $field requested.
+
+Cast by C<terms()>
+
+=item Error: there is no highlighting information in the result.
+
+Cast by C<highlighted()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.11,
-built on May 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr version 1.12,
+built on July 15, 2026. Website: F<https://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -1,0 +1,11 @@
+[
+  {
+    "title":        "Setup",
+    "link":         "/setup",
+    "icon":         "fas fa-cog",
+    "icon_color":   "#000000",
+    "menu":         "admin_menu",
+    "parent_title": "Administration",
+    "description":  "Application setup wizard"
+  }
+]

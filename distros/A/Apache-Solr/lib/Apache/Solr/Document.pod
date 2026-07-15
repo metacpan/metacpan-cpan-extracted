@@ -14,10 +14,10 @@ Apache::Solr::Document - Apache Solr (Lucene) Document container
   $solr->addDocument($doc, commit => 1, overwrite => 1)
 
   # take results
-  my $results = $solr->select
-    ( q  => 'text:gold'             # search text-fields for 'gold'
-    , hl => { field => 'content' }  # highlight 'gold' in content'
-    );
+  my $results = $solr->select(
+    q  => 'text:gold',              # search text-fields for 'gold'
+    hl => { field => 'content' }    # highlight 'gold' in content'
+ );
 
   my $doc = $results->selected(3);  # fourth answer
   print $doc->rank;                 # 3
@@ -45,16 +45,18 @@ by L<Apache::Solr::select()|Apache::Solr/"Search">.
 
 =over 4
 
-=item Apache::Solr::Document-E<gt>B<fromResult>(HASH, $rank)
+=item $class-E<gt>B<fromResult>(\%data, $rank)
 
 Create a document object from data received as result of a select
 search.
 
-=item Apache::Solr::Document-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option--Default
   boost   1.0
-  fields  {}
+  fields  +{}
 
 =over 2
 
@@ -62,21 +64,21 @@ search.
 
 Boost the preference for hits in this document.
 
-=item fields => HASH|ARRAY
+=item fields => \%fields|\@pairs
 
-Passed to L<addFields()|Apache::Solr::Document/"Accessors">.
-
-=back
+Passed to L<addFields()|Apache::Solr::Document/"Attributes">.
 
 =back
 
-=head2 Accessors
+=back
+
+=head2 Attributes
 
 =over 4
 
 =item $obj-E<gt>B<addField>($name, $content, %options)
 
-$content can be specified as SCALAR (reference) for performance. In
+C<$content> can be specified as SCALAR (reference) for performance. In
 that case, a reference to the original will be kept.  When C<undef>,
 the field gets ignored.
 
@@ -91,14 +93,14 @@ the field gets ignored.
 =item update => 'add'|'set'|'inc'|...
 
 [1.02, Solr 4.0]  See 'Atomic Updates' in
-F<https://cwiki.apache.org/confluence/display/solr/Updating+Parts+of+Documents>
+L<https://cwiki.apache.org/confluence/display/solr/Updating+Parts+of+Documents>
 
 =back
 
-=item $obj-E<gt>B<addFields>(HASH|ARRAY, %options)
+=item $obj-E<gt>B<addFields>(\%fields|\@pairs, %options)
 
-The HASH or ARRAY containing NAME/CONTENT pairs.
-The %options are passed L<addField()|Apache::Solr::Document/"Accessors"> as %options.
+The C<%fields> as HASH or as ARRAY containing NAME/CONTENT C<@pairs>.
+The C<%options> are passed L<addField()|Apache::Solr::Document/"Attributes"> as C<%options>.
 
 =item $obj-E<gt>B<boost>( [$fieldname, [$boost]] )
 
@@ -106,26 +108,26 @@ Boost value for all fields in the document.
 
 [0.93] When a FIELD NAME is given, the boost specific for that field is
 returned (not looking at the document's boost value)  This can also be
-used to set the $boost value for the field.
+used to set the C<$boost> value for the field.
 
 =item $obj-E<gt>B<content>($name)
 
-Returns the content of the first field with $name.
+Returns the content of the first field with C<$name>.
 
 =item $obj-E<gt>B<field>($name)
 
-Returns the first field with $name (or undef).  This is a HASH, containing
+Returns the first field with C<$name> (or C<undef>).  This is a HASH, containing
 C<name>, C<content> and sometimes a C<boost> key.
 
 If you need the content (that's the usually the case), you can also
 (probably more readible) use the (autoloaded) method NAMEd after the
 field with a leading '_'.
 
-example: 
+» example: 
 
-   $doc->field('subject')->{content};
-   $doc->content('subject');
-   $doc->_subject;
+  $doc->field('subject')->{content};
+  $doc->content('subject');
+  $doc->_subject;
 
 =item $obj-E<gt>B<fieldNames>()
 
@@ -134,7 +136,7 @@ All used unique names.
 =item $obj-E<gt>B<fields>( [$name] )
 
 Returns a list of HASHs, each containing at least a C<name> and a
-C<content>.  Each HASH will also contain a C<boost> value.  When a $name
+C<content>.  Each HASH will also contain a C<boost> value.  When a C<$name>
 is provided, only those fields are returned.
 
 =item $obj-E<gt>B<rank>()
@@ -150,18 +152,17 @@ usual C<id>, you have to set it via global value C<$Apache::Solr::uniqueKey>
 
 =back
 
-=head2 Helpers
-
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.11,
-built on May 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr version 1.12,
+built on July 15, 2026. Website: F<https://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

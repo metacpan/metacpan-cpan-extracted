@@ -576,4 +576,124 @@ static char * eshu_indent_xml(const char *src, size_t src_len,
 	return result;
 }
 
+
+#include "eshu_hl_util.h"
+
+/* ══════════════════════════════════════════════════════════════════
+ *  XML / HTML highlighter
+ * ══════════════════════════════════════════════════════════════════ */
+
+typedef enum {
+    XHL_TEXT,       /* text content */
+    XHL_TAG,        /* inside <...> after tag name */
+    XHL_ATTR_DQ,    /* inside attribute value "..." */
+    XHL_ATTR_SQ     /* inside attribute value '...' */
+} eshu_xhl_state_t;
+
+static char *eshu_highlight_xml(const char *src, size_t src_len, size_t *out_len) {
+    eshu_buf_t out;
+    const char *p     = src;
+    const char *end   = src + src_len;
+    const char *plain = p;
+
+    eshu_buf_init(&out, src_len * 2 + 64);
+
+#define X_SPAN(cls, ts, te) do { \
+    eshu_hl_flush(&out, plain, (ts)); \
+    eshu_hl_span(&out, (cls), (ts), (te)); \
+    p = (te); plain = p; \
+} while(0)
+
+    while (p < end) {
+        char c = *p;
+
+        /* XML / HTML comment: <!-- ... --> */
+        if (c == '<' && p + 3 < end && *(p+1) == '!' &&
+            *(p+2) == '-' && *(p+3) == '-') {
+            const char *ts = p; p += 4;
+            while (p + 2 < end && !(*(p)=='-' && *(p+1)=='-' && *(p+2)=='>')) p++;
+            if (p + 2 < end) p += 3;
+            X_SPAN("esh-c", ts, p);
+            continue;
+        }
+
+        /* CDATA */
+        if (c == '<' && p + 8 < end && memcmp(p, "<![CDATA[", 9) == 0) {
+            const char *ts = p; p += 9;
+            while (p + 2 < end && !(*(p)==']' && *(p+1)==']' && *(p+2)=='>')) p++;
+            if (p + 2 < end) p += 3;
+            X_SPAN("esh-s", ts, p);
+            continue;
+        }
+
+        /* doctype */
+        if (c == '<' && p + 1 < end && *(p+1) == '!') {
+            const char *ts = p;
+            while (p < end && *p != '>') p++;
+            if (p < end) p++;
+            X_SPAN("esh-p", ts, p);
+            continue;
+        }
+
+        /* opening or closing tag */
+        if (c == '<') {
+            const char *ts = p++;
+            /* skip '/' for closing tags */
+            if (p < end && *p == '/') p++;
+            /* tag name */
+            const char *tag_start = p;
+            while (p < end && (isalnum((unsigned char)*p) || *p == '-' ||
+                               *p == ':' || *p == '_' || *p == '.')) p++;
+            /* emit '<' or '</' as plain, then tag name as esh-g */
+            eshu_hl_flush(&out, plain, ts);
+            plain = p;
+            /* emit the '<[/]' literal */
+            eshu_hl_write_html(&out, ts, (size_t)(tag_start - ts));
+            /* tag name span */
+            if (p > tag_start)
+                eshu_hl_span(&out, "esh-g", tag_start, p);
+            /* scan attributes */
+            while (p < end && *p != '>') {
+                if (*p == '/') { eshu_hl_putc_html(&out, *p++); plain = p; continue; }
+                /* attribute name */
+                if (isalpha((unsigned char)*p) || *p == '_' || *p == ':') {
+                    const char *an = p;
+                    while (p < end && (isalnum((unsigned char)*p) || *p == '-' ||
+                                       *p == '_' || *p == ':' || *p == '.')) p++;
+                    eshu_hl_span(&out, "esh-a", an, p);
+                    plain = p;
+                    continue;
+                }
+                /* attribute value */
+                if (*p == '"' || *p == '\'') {
+                    char q = *p;
+                    const char *vs = p++;
+                    while (p < end && *p != q) p++;
+                    if (p < end) p++;
+                    eshu_hl_span(&out, "esh-s", vs, p);
+                    plain = p;
+                    continue;
+                }
+                eshu_hl_putc_html(&out, *p++);
+                plain = p;
+            }
+            if (p < end && *p == '>') {
+                eshu_hl_putc_html(&out, '>');
+                p++;
+            }
+            plain = p;
+            continue;
+        }
+
+        p++;
+    }
+
+    eshu_hl_flush(&out, plain, end);
+    eshu_buf_putc(&out, '\0');
+    *out_len = out.len - 1;
+    return out.data;
+
+#undef X_SPAN
+}
+
 #endif /* ESHU_XML_H */

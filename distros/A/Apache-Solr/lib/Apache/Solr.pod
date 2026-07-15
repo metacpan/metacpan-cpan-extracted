@@ -13,7 +13,7 @@ Apache::Solr - Apache Solr (Lucene) extension
 =head1 SYNOPSIS
 
   # use Log::Report mode => "DEBUG";
-  my $solr    = Apache::Solr->new(server => $url);
+  my $solr    = Apache::Solr->new(server => $url, field_key_simplify => 0);
   my $lwp     = $solr->agent;   # internal LWP::UserAgent
 
   my $doc     = Apache::Solr::Document->new(...);
@@ -26,7 +26,7 @@ Apache::Solr - Apache Solr (Lucene) extension
 
   my $results = $solr->select(q => "really", hl => {fl=>'content'});
   while(my $doc = $results->nextSelected)
-  {    my $hldoc = $results->highlighted($doc);
+  {   my $hldoc = $results->highlighted($doc);
       print $hldoc->_content;
       ...
   }
@@ -36,7 +36,7 @@ Apache::Solr - Apache Solr (Lucene) extension
   dispatcher SYSLOG => 'default';  # now all warnings/error to syslog
   try { $solr->select(...) }; print $@->wasFatal;
 
-  # [1.11] Information about communication errors 
+  # [1.11] Information about communication errors
   my $result = try { $solr->select(...) };
   if(my $ex = $@->wasFatal)
   {  $result = $ex->message->valueOf('result');
@@ -49,7 +49,7 @@ Solr is a stand-alone full-text search-engine (based on Lucent), with
 loads of features.  This module tries to provide a high level interface
 to the Solr server.
 
-See F<F<http://wiki.apache.org/solr/> and F<http://lucene.apache.org/solr/>
+See L<https://wiki.apache.org/solr/> and L<https://lucene.apache.org/solr/>
 
 =head1 METHODS
 
@@ -57,24 +57,25 @@ See F<F<http://wiki.apache.org/solr/> and F<http://lucene.apache.org/solr/>
 
 =over 4
 
-=item Apache::Solr-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a client to connect to one "core" (collection) of the Solr
 server.
 
- -Option        --Default
-  agent           <created internally>
-  autocommit      true
-  core            undef
-  format          'XML'
-  retry_max       60
-  retry_wait      5
-  server          <required>
-  server_version  <latest>
+ -Option            --Default
+  agent               <created internally>
+  autocommit          true
+  core                undef
+  field_key_simplify  true
+  format              'XML'
+  retry_max           60
+  retry_wait          5
+  server              <required>
+  server_version      <latest>
 
 =over 2
 
-=item agent => LWP::UserAgent object
+=item agent => LWP::UserAgent-object
 
 Agent which implements the communication between this client and the
 Solr server.
@@ -91,14 +92,20 @@ via https.
 
 Commit all changes immediately unless specified differently.
 
-=item core => NAME
+=item core => $name
 
-Set the core name to be addressed by this client. When there is no core
+Set the core C<$name> to be addressed by this client. When there is no core
 name specified, the core is selected by the server or already part of
 the URL.
 
 You probably want to set-up a core dedicated for testing and one for
 the live environment.
+
+=item field_key_simplify => BOOLEAN
+
+[1.12] support the use of underscores ('_') as alternative for dot ('.')
+in field paths.  For backwards compatibility reasons, this field has
+B<the wrong default>, see example.
 
 =item format => 'XML'|'JSON'
 
@@ -115,19 +122,19 @@ seconds.
 
 You can disable retries with with '0'.
 
-=item retry_wait => SECONDS
+=item retry_wait => $seconds
 
 [1.09] When the connection to the Solr server fails, or when the server
 does not respond correctly, a retry is attempted after waiting a few
-seconds.  You may use '0' to avoid waiting.
+C<$seconds>.  You may use '0' to skip waiting.
 
-=item server => URL
+=item server => $url
 
 The locations of the Solr server depends on the way the java environment
-is set-up.   The URL is either an URI object or a string which can be
+is set-up.   The C<$url> is either an URI object or a string which can be
 instantiated as such.
 
-=item server_version => VERSION
+=item server_version => $version
 
 By default the latest version of the server software, currently 4.5.
 Try to get this setting right, because it will help you a lot in correct
@@ -139,9 +146,26 @@ users.
 
 =back
 
+» example: field_key_simplify
+
+[1.12] On the Perl side, the query parameter structure is processed as
+a HASH.  The Solr fields are nested with dots, which means they are not
+barewords which can be used unquoted as has keys.  That's inconvenient.
+So, you can use an underscore instead of a dot. B<However:> the underscore
+is also a value character in a field name token.  So, it is very unwise to
+enable this rewrite even though it makes your Perl pretty.
+
+   f_cat_facet  => { missing => 1 },  # by default means:
+  'f.cat.facet' => { missing => 1 },
+
+   f.myinteger_i.facet.range.start    # is by default rules:
+   f.myinteger.i.facet.range.start    # which is broken.
+
+Wrong default kept to be backwards compatible.
+
 =back
 
-=head2 Accessors
+=head2 Attributes
 
 =over 4
 
@@ -152,15 +176,23 @@ the server.
 
 =item $obj-E<gt>B<autocommit>( [BOOLEAN] )
 
+Z<>
+
 =item $obj-E<gt>B<core>( [$core] )
 
-Returns the $core, when not defined the default core as set by L<new(core)|Apache::Solr/"Constructors">.
+Returns the C<$core>, when not defined the default core as set by L<new(core)|Apache::Solr/"Constructors">.
 May return C<undef>.
+
+=item $obj-E<gt>B<fieldKeySimplify>()
+
+[1.12] Returns C<true> when underscores in field paths are to be interpreted as dots.
+This is C<true> by default, but deprecated.  Please expliticly disable this rewrite
+rule by setting L<new(field_key_simplify)|Apache::Solr/"Constructors"> to C<false>.
 
 =item $obj-E<gt>B<server>( [$uri|STRING] )
 
 Returns the URI object which refers to the server base address.  You need
-to clone() it before modifying.  You may set a new value as STRING or C<$uri>
+to C<clone()> it before modifying.  You may set a new value as C<STRING> or C<$uri>
 object.
 
 =item $obj-E<gt>B<serverVersion>()
@@ -178,14 +210,14 @@ latest).  Treat this version as string, to avoid rounding errors.
 
 =item $obj-E<gt>B<queryTerms>($terms)
 
-Search for often used terms. See F<http://wiki.apache.org/solr/TermsComponent>
+Search for often used terms. See L<https://wiki.apache.org/solr/TermsComponent>
 
-$terms are passed to L<expandTerms()|Apache::Solr/"Parameter pre-processing"> before being used.
+C<$terms> are passed to L<expandTerms()|Apache::Solr/"Parameter pre-processing"> before being used.
 
 B<Be warned:> The result is not sorted when XML communication is used,
 even when you explicitly request it.
 
-example: 
+» example: 
 
   my $r = $self->queryTerms(fl => 'subject', limit => 100);
   if($r->success)
@@ -216,21 +248,21 @@ as optional first parameter.
 
 =head3 Updates
 
-See F<http://wiki.apache.org/solr/UpdateXmlMessages>.  Missing are the
+See L<https://wiki.apache.org/solr/UpdateXmlMessages>.  Missing are the
 atomic updates.
 
 =over 4
 
-=item $obj-E<gt>B<addDocument>( <$doc|ARRAY>, %options )
+=item $obj-E<gt>B<addDocument>($doc|\@docs, %options)
 
 Add one or more documents (L<Apache::Solr::Document|Apache::Solr::Document> objects) to the Solr
 database on the server.
 
  -Option            --Default
-  allowDups           <false>
+  allowDups           false
   commit              <autocommit>
   commitWithin        undef
-  overwrite           <true>
+  overwrite           true
   overwriteCommitted  <not allowDups>
   overwritePending    <not allowDups>
 
@@ -242,7 +274,7 @@ database on the server.
 
 =item commit => BOOLEAN
 
-=item commitWithin => SECONDS
+=item commitWithin => $seconds
 
 [Since Solr 3.4] Automatically translated into 'commit' for older
 servers.  Currently, the resolution is milli-seconds.
@@ -261,11 +293,13 @@ servers.  Currently, the resolution is milli-seconds.
 
 =item $obj-E<gt>B<commit>(%options)
 
+Z<>
+
  -Option        --Default
-  expungeDeletes  <false>
-  softCommit      <false>
-  waitFlush       <true>
-  waitSearcher    <true>
+  expungeDeletes  false
+  softCommit      false
+  waitFlush       true
+  waitSearcher    true
 
 =over 2
 
@@ -311,12 +345,12 @@ the last delete.  By default the value of L<new(autocommit)|Apache::Solr/"Constr
 
 [deprecated since ?]
 
-=item id => ID|ARRAY-of-IDs
+=item id => $id|\@ids
 
 The expected content of the uniqueKey fields (usually named C<id>) for
 the documents to be removed.
 
-=item query => QUERY|ARRAY-of-QUERYs
+=item query => $query|\@queries
 
 =back
 
@@ -326,11 +360,11 @@ Call the Solr Tika built-in to have the server translate various
 kinds of structured documents into Solr searchable documents.  This
 component is also called "Solr Cell".
 
-The %options are mostly passed on as attributes to the server call,
+The C<%options> are mostly passed on as attributes to the server call,
 but there are a few more.  You need to pass either a C<file> or
 C<string> with data.
 
-See F<http://wiki.apache.org/solr/ExtractingRequestHandler>
+See L<https://wiki.apache.org/solr/ExtractingRequestHandler>
 
  -Option      --Default
   commit        new(autocommit)
@@ -357,18 +391,20 @@ also specify the C<file> option with a filename.
 
 =back
 
-example: 
+» example: 
 
-   my $r = $solr->extractDocument(file => 'design.pdf',
-       literal_id => 'host');
+  my $r = $solr->extractDocument(file => 'design.pdf',
+      literal_id => 'host');
 
 =item $obj-E<gt>B<optimize>(%options)
 
+Z<>
+
  -Option      --Default
   maxSegments   1
-  softCommit    <false>
-  waitFlush     <true>
-  waitSearcher  <true>
+  softCommit    false
+  waitFlush     <C<true>>
+  waitSearcher  true
 
 =over 2
 
@@ -396,13 +432,13 @@ example:
 
 =head3 Core management
 
-See F<https://solr.apache.org/guide/6_6/coreadmin-api.html>
+See L<https://solr.apache.org/guide/6_6/coreadmin-api.html>
 The CREATE, SWAP, ALIAS, and RENAME actions are not yet supported, because
 they are not very useful, it seems.
 
 =over 4
 
-=item $obj-E<gt>B<coreReload>( [$core] )
+=item $obj-E<gt>B<coreReload>(%options)
 
 [0.94] Load a new core (on the server) from the configuration of this
 core. While the new core is initializing, the existing one will continue
@@ -414,16 +450,16 @@ the old core is unloaded.
 
 =over 2
 
-=item core => NAME
+=item core => $name
 
 =back
 
-example: 
+» example: 
 
   my $result = $solr->coreReload;
   $result or die $result->errors;
 
-=item $obj-E<gt>B<coreStatus>()
+=item $obj-E<gt>B<coreStatus>(%options)
 
 [0.94] Returns a HASH with information about this core.  There is no
 description about the exact structure and interpretation of this data.
@@ -433,11 +469,11 @@ description about the exact structure and interpretation of this data.
 
 =over 2
 
-=item core => NAME
+=item core => $name
 
 =back
 
-example: 
+» example: 
 
   my $result = $solr->coreStatus;
   $result or die $result->errors;
@@ -447,14 +483,16 @@ example:
 
 =item $obj-E<gt>B<coreUnload>(%options)
 
-Removes a core from Solr. Active requests will continue to be processed, but no new requests will be sent to the named core. If a core is registered under more than one name, only the given name is removed.
+Removes a core from Solr. Active requests will continue to be processed,
+but no new requests will be sent to the named core. If a core is
+registered under more than one name, only the given name is removed.
 
  -Option--Default
   core    <this core>
 
 =over 2
 
-=item core => NAME
+=item core => $name
 
 =back
 
@@ -474,9 +512,9 @@ General rules:
 
 =item * you can group them on prefix
 
-=item * use underscore as alternative to dots: less quoting needed
+=item * use underscore as alternative to dots: less quoting needed (see L<new(field_key_simplify)|Apache::Solr/"Constructors">)
 
-=item * boolean values in Perl will get translated into 'true' and 'false'
+=item * boolean values in Perl will get translated into 'C<true>' and 'C<false>'
 
 =item * when an ARRAY (or LIST), the order of the parameters get preserved
 
@@ -486,23 +524,23 @@ General rules:
 
 =item $obj-E<gt>B<deprecated>($message)
 
-Produce a warning $message about deprecated parameters with the
+Produce a warning C<$message> about deprecated parameters with the
 indicated server version.
 
-=item $obj-E<gt>B<expandExtract>(PAIRS|ARRAY)
+=item $obj-E<gt>B<expandExtract>(%pairs|\@pairs)
 
 Used by L<extractDocument()|Apache::Solr/"Updates">.
 
 [0.93] If the key is C<literal> or C<literals>, then the keys in the
-value HASH (or ARRAY of PAIRS) get 'literal.' prepended.  "Literals"
+value HASH (or C<@pairs> ARRAY) get 'literal.' prepended.  "Literals"
 are fields you add yourself to the SolrCEL output.  Unless C<extractOnly>,
 you need to specify the 'id' literal.
 
 [0.94] You can also use C<fmap>, C<boost>, and C<resource> with an
-HASH (or ARRAY-of-PAIRS).  [0.97] the value in each PAIR may be a SCALAR
+HASH (or C<@pairs> ARRAY).  [0.97] the value in each PAIR may be a SCALAR
 (ref string) which circumvents some copying.
 
-example: 
+» example: 
 
   my $result = $solr->extractDocument(string => $document,
       resource_name => $fn, extractOnly => 1,
@@ -511,7 +549,7 @@ example:
       boost => { abc => 3.5 }, boost_xyz => 2.0
   );
 
-=item $obj-E<gt>B<expandSelect>(PAIRS)
+=item $obj-E<gt>B<expandSelect>(%pairs)
 
 The L<select()|Apache::Solr/"Search"> method accepts many, many parameters.  These are passed
 to modules in the server, which need configuration before being usable.
@@ -524,23 +562,23 @@ by the backend abbreviation.
 
 =item * expand
 
-=item * facet -> F<http://wiki.apache.org/solr/SimpleFacetParameters>
+=item * facet -> L<https://wiki.apache.org/solr/SimpleFacetParameters>
 
-=item * hl (highlight) -> F<http://wiki.apache.org/solr/HighlightingParameters>
+=item * hl (highlight) -> L<https://wiki.apache.org/solr/HighlightingParameters>
 
-=item * mlt -> F<https://solr.apache.org/guide/8_11/morelikethis.html>
+=item * mlt -> L<https://solr.apache.org/guide/8_11/morelikethis.html>
 
-=item * stats -> F<http://wiki.apache.org/solr/StatsComponent>
+=item * stats -> L<https://wiki.apache.org/solr/StatsComponent>
 
-=item * suggest -> F<https://solr.apache.org/guide/8_11/suggester.html>
+=item * suggest -> L<https://solr.apache.org/guide/8_11/suggester.html>
 
-=item * group -> F<http://wiki.apache.org/solr/FieldCollapsing>
+=item * group -> L<https://wiki.apache.org/solr/FieldCollapsing>
 
 =back
 
 You may use WebService::Solr::Query to construct the query ('q').
 
-example: 
+» example: 
 
   my @r = $solr->expandSelect(
       q => 'inStock:true', rows => 10,
@@ -560,11 +598,11 @@ example:
     &stats=true&stats.field=price&stats.field=popularity
     &group=true&group.query=price:[0+TO+99.99]&group.limit=3
 
-=item $obj-E<gt>B<expandTerms>(PAIRS|ARRAY)
+=item $obj-E<gt>B<expandTerms>(%pairs|\@pairs)
 
 Used by L<queryTerms()|Apache::Solr/"Search"> only.
 
-example: 
+» example: 
 
   my @t = $solr->expandTerms('terms.lower.incl' => 'true');
   my @t = $solr->expandTerms([lower_incl => 1]);   # same
@@ -573,12 +611,12 @@ example:
 
 =item $obj-E<gt>B<ignored>($message)
 
-Produce a warning $message about parameters which will get ignored
+Produce a warning C<$message> about parameters which will get ignored
 because they were not yet supported by the indicated server version.
 
 =item $obj-E<gt>B<removed>($message)
 
-Produce a warning $message about parameters which will not be passed on,
+Produce a warning C<$message> about parameters which will not be passed on,
 because they were removed from the indicated server version.
 
 =back
@@ -597,11 +635,11 @@ Compute the address to be called (for HTTP)
 
 =over 2
 
-=item core => NAME
+=item core => $name
 
 If no core is specified, the default of the server is addressed.
 
-=item params => HASH|ARRAY-of-pairs
+=item params => %params|\@params
 
 The order of the parameters will be preserved when an ARRAY or parameters
 is passed; you never know for a HASH.
@@ -631,7 +669,7 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =item * simplified parameter syntax, improving readibility
 
-=item * real Perl-level boolean parameters, not 'true' and 'false'
+=item * real Perl-level boolean parameters, not 'C<true>' and 'C<false>'
 
 =item * warnings for deprecated and ignored parameters
 
@@ -649,16 +687,79 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Fault: Cannot read document from $fn: $!
+
+Cast by C<extractDocument()>
+
+=item Fault: Read error for document $fn: $!
+
+Cast by C<extractDocument()>
+
+=item Fault: Solr request failed after $elapse seconds after $retries retries: $!
+
+Cast by C<request()>
+
+=item Alert: Solr request failed with $code, $retries retries left: $!
+
+Cast by C<request()>
+
+=item Error: Solr request failed with: $err
+
+Cast by C<request()>
+
+=item Warning: deprecated solr $message
+
+Cast by C<deprecated()>
+
+=item Error: extract requires document as file or string.
+
+Cast by C<extractDocument()>
+
+=item Error: extractDocument() requires Solr v1.4 or higher.
+
+Cast by C<extractDocument()>
+
+=item Error: field $field is not simple for a set.
+
+Cast by C<expandSelect()>
+
+=item Warning: ignored solr $message
+
+Cast by C<ignored()>
+
+=item Warning: removed solr $message
+
+Cast by C<removed()>
+
+=item Error: rollback not supported by your solr server version.
+
+Cast by C<rollback()>
+
+=item Error: set $set cannot be used per field, in $field.
+
+Cast by C<expandSelect()>
+
+=item Error: unknown field set $set.
+
+Cast by C<expandSelect()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.11,
-built on May 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr version 1.12,
+built on July 15, 2026. Website: F<https://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

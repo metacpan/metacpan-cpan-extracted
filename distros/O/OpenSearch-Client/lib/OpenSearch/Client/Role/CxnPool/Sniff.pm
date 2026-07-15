@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::CxnPool::Sniff;
-$OpenSearch::Client::Role::CxnPool::Sniff::VERSION = '3.007008';
+$OpenSearch::Client::Role::CxnPool::Sniff::VERSION = '3.007009';
 use Moo::Role;
 with 'OpenSearch::Client::Role::CxnPool';
 requires 'next_cxn', 'sniff';
@@ -121,7 +121,7 @@ OpenSearch::Client::Role::CxnPool::Sniff - A CxnPool role for connecting to a lo
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 CONFIGURATION
 

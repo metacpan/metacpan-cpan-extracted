@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 0.1.0
+# 0.1.1
 # 
 # # SYNOPSIS
 # 

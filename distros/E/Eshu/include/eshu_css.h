@@ -215,4 +215,129 @@ static char * eshu_indent_css(const char *src, size_t src_len,
 	return result;
 }
 
+
+#include "eshu_hl_util.h"
+
+/* ══════════════════════════════════════════════════════════════════
+ *  CSS highlighter
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* CSS context: are we inside a rule block (between { and })? */
+typedef enum {
+    ESHU_HL_CSS_TOP,        /* top-level: selectors / at-rules */
+    ESHU_HL_CSS_RULE,       /* inside {} — property: value pairs */
+    ESHU_HL_CSS_ATRULE_PAREN /* inside @media (...) */
+} eshu_hl_css_ctx_t;
+
+static char *eshu_highlight_css(const char *src, size_t src_len, size_t *out_len) {
+    eshu_buf_t out;
+    const char *p     = src;
+    const char *end   = src + src_len;
+    const char *plain = p;
+    eshu_hl_css_ctx_t ctx = ESHU_HL_CSS_TOP;
+    int brace_depth   = 0;
+
+    eshu_buf_init(&out, src_len * 2 + 64);
+
+#define CSS_SPAN(cls, ts, te) do { \
+    eshu_hl_flush(&out, plain, (ts)); \
+    eshu_hl_span(&out, (cls), (ts), (te)); \
+    p = (te); plain = p; \
+} while(0)
+
+    while (p < end) {
+        char c = *p;
+
+        /* block comment */
+        if (c == '/' && p + 1 < end && *(p + 1) == '*') {
+            const char *ts = p; p += 2;
+            while (p + 1 < end && !(*p == '*' && *(p + 1) == '/')) p++;
+            if (p + 1 < end) p += 2;
+            CSS_SPAN("esh-c", ts, p);
+            continue;
+        }
+
+        /* string */
+        if (c == '"' || c == '\'') {
+            const char *ts = p++;
+            while (p < end && *p != c) {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                p++;
+            }
+            if (p < end) p++;
+            CSS_SPAN("esh-s", ts, p);
+            continue;
+        }
+
+        /* at-rule */
+        if (c == '@' && (p + 1 < end) && isalpha((unsigned char)*(p + 1))) {
+            const char *ts = p++;
+            while (p < end && (isalnum((unsigned char)*p) || *p == '-')) p++;
+            CSS_SPAN("esh-p", ts, p);
+            continue;
+        }
+
+        /* number with optional unit */
+        if (isdigit((unsigned char)c) ||
+            (c == '-' && p + 1 < end && isdigit((unsigned char)*(p + 1))) ||
+            (c == '.' && p + 1 < end && isdigit((unsigned char)*(p + 1)))) {
+            const char *ts = p;
+            if (c == '-') p++;
+            while (p < end && isdigit((unsigned char)*p)) p++;
+            if (p < end && *p == '.') {
+                p++; while (p < end && isdigit((unsigned char)*p)) p++;
+            }
+            /* unit: px, em, rem, %, vw, vh, ... */
+            while (p < end && (isalpha((unsigned char)*p) || *p == '%')) p++;
+            CSS_SPAN("esh-n", ts, p);
+            continue;
+        }
+
+        /* color hex: #rrggbb or #rgb */
+        if (c == '#' && p + 1 < end && isxdigit((unsigned char)*(p + 1))) {
+            const char *ts = p++;
+            while (p < end && isxdigit((unsigned char)*p)) p++;
+            CSS_SPAN("esh-n", ts, p);
+            continue;
+        }
+
+        /* track brace depth for context */
+        if (c == '{') {
+            brace_depth++;
+            ctx = ESHU_HL_CSS_RULE;
+            p++; continue;
+        }
+        if (c == '}') {
+            if (brace_depth > 0) brace_depth--;
+            ctx = (brace_depth > 0) ? ESHU_HL_CSS_RULE : ESHU_HL_CSS_TOP;
+            p++; continue;
+        }
+
+        /* property name: identifier before ':' inside a rule */
+        if (ctx == ESHU_HL_CSS_RULE && eshu_hl_isalpha_(c)) {
+            const char *ts = p;
+            while (p < end && (isalnum((unsigned char)*p) || *p == '-' || *p == '_')) p++;
+            /* peek for ':' after optional whitespace */
+            const char *peek = p;
+            while (peek < end && (*peek == ' ' || *peek == '\t')) peek++;
+            if (peek < end && *peek == ':') {
+                CSS_SPAN("esh-k", ts, p);
+            } else {
+                /* plain */
+            }
+            continue;
+        }
+
+        (void)ctx;
+        p++;
+    }
+
+    eshu_hl_flush(&out, plain, end);
+    eshu_buf_putc(&out, '\0');
+    *out_len = out.len - 1;
+    return out.data;
+
+#undef CSS_SPAN
+}
+
 #endif /* ESHU_CSS_H */

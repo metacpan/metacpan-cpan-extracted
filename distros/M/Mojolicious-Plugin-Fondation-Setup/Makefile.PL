@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Setup wizard generator \x{2014} scans plugins for user-configurable parameters, generates a setup workflow, and serves the wizard UI",
+  "ABSTRACT" => "Setup wizard with session-based state (clean rebuild)",
   "AUTHOR" => "Daniel Brosseau <dab\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Mojolicious" => "9.46",
     "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.01",
-    "Mojolicious::Plugin::Fondation::Workflow" => "0.01",
+    "Mojolicious::Plugin::Fondation::SessionStore" => 0,
     "YAML::XS" => "0.01"
   },
   "TEST_REQUIRES" => {
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.00",
     "Test::More" => "1.00"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => ""
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "FindBin" => "1.00",
   "Mojolicious" => "9.46",
   "Mojolicious::Plugin::Fondation::Layout::Bootstrap" => "0.01",
-  "Mojolicious::Plugin::Fondation::Workflow" => "0.01",
+  "Mojolicious::Plugin::Fondation::SessionStore" => 0,
   "Test::More" => "1.00",
   "YAML::XS" => "0.01"
 );

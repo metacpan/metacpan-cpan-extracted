@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Client::Direct;
-$OpenSearch::Client::Role::Client::Direct::VERSION = '3.007008';
+$OpenSearch::Client::Role::Client::Direct::VERSION = '3.007009';
 use Moo::Role;
 with 'OpenSearch::Client::Role::Client';
 use OpenSearch::Client::Util qw(load_plugin is_compat throw);
@@ -204,22 +204,7 @@ sub _install_api {
         );
     }
     
-    ## add method to tell if an particular module method is supported
-    ## in an OpenSearch version.
-    
-    $stash->add_symbol(
-        '&method_supported_in_version' => sub {
-            my( $self, @args ) = @_;
-            my %params = ( ref($args[0]) ) ? %{ $args[0] } : @args;
-            my $version = $params{version};
-            my $method  = $params{method};
-            return 0 unless($method && $version);
-            return 0 unless(exists($_os_version_stash->{$method}));
-            my $supported_version = $_os_version_stash->{$method};
-            my $checkversion = version->declare('v' . $version)->numify;
-            return ( $checkversion < $supported_version ) ? 0 : 1;
-        }
-    );
+    $stash->add_symbol( '%_api_method_supported_version_stash' => $_os_version_stash );
 }
 
 #===================================
@@ -257,7 +242,7 @@ OpenSearch::Client::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 DESCRIPTION
 

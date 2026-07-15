@@ -1,0 +1,154 @@
+# Syntax file for pascal
+# Converted from: pascal.vim
+# Conversion date: 2026-07-13
+
+language: pascal
+extensions: pascal
+case: ignore
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if then
+
+[keyword:Constant]
+AnyFile Archive Black Blink Blue Brown Cyan DarkGray Directory FAuxiliary
+FCarry FOverflow FParity FSign FZero Green Hidden LightBlue LightCyan
+LightGray LightGreen LightMagenta LightRed Magenta Red ScreenHeight
+ScreenWidth Sysfile TextRecBufSize TextRecNameLength VolumeId White Yellow
+bw40 bw80 co40 co80 fmClosed fmInout fmInput fmOutput maxint mono nil
+
+[keyword:Exception]
+at except finally on raise try
+
+[keyword:Function]
+Abs AddDisk Addr Append Arc Arctan Assign AssignCrt Assigned Bar Bar3D
+BigCursor BlockRead BlockWrite Break CSeg ChDir Chr Circle ClearDevice
+ClearViewPort Close CloseGraph ClrEol ClrScr Concat Continue Copy Cos
+CursorOff CursorOn DSeg Dec DelLine Delay Delete DetectGraph DiskFree DiskSize
+Dispose DosExitCode DosVersion DrawPoly Ellipse EnvCount EnvStr Eof Eoln Erase
+Exclude Exec Exit Exp Expand FSearch FSplit FilePos FileSize FillChar
+FillEllipse FillPoly FindClose FindFirst FindNext FloodFill Flush Frac FreeMem
+Get GetArcCoords GetAspectRatio GetBkColor GetCBreak GetColor GetDate
+GetDefaultPalette GetDir GetDriverName GetEnv GetFAttr GetFTime GetFillPattern
+GetFillSettings GetGraphMode GetImage GetIntVec GetLineSettings GetMaxColor
+GetMaxMode GetMaxX GetMaxY GetMem GetModeName GetModeRange GetPalette
+GetPaletteSize GetPixel GetTextSettings GetTime GetVerify GetViewSettings GetX
+GetY GotoXY GraphDefaults GraphErrorMsg GraphResult Halt Hi High HighVideo
+IOResult ImageSize Inc Include InitGraph InsLine Insert InstallUserDriver
+InstallUserFont Int Intr Keep KeyPressed Length Line LineRel LineTo Ln Lo Low
+LowVideo MSDos MaxAvail MemAvail MkDir Move MoveRel MoveTo New NoSound
+NormVideo Odd Ofs Ord OutText OutTextXY PackTime Page ParamCount ParamStr Pi
+PieSlice Pos Pred Ptr Put PutImage PutPixel Random Randomize Read ReadKey
+Readln Rectangle RegisterBGIDriver RegisterBGIFont Rename Reset RestoreCRTMode
+Rewrite RmDir Round RunError SPtr SSeg Sector Seek SeekEof SeekEoln Seg
+SetActivePage SetAllPallette SetAspectRatio SetBkColor SetCBreak SetColor
+SetDate SetFAttr SetFTime SetFillPattern SetFillStyle SetGraphBufSize
+SetGraphMode SetIntVec SetLineStyle SetPalette SetRGBPalette SetTextBuf
+SetTextJustify SetTextStyle SetTime SetUserCharSize SetVerify SetViewPort
+SetVisualPage SetWriteMode Sin SizeOf Sound Sqr Sqrt Str StrAlloc StrBufSize
+StrCat StrComp StrCopy StrDispose StrECopy StrEnd StrFmt StrIComp StrLCat
+StrLComp StrLCopy StrLFmt StrLIComp StrLen StrLower StrMove StrNew StrPCopy
+StrPLCopy StrPas StrPos StrRScan StrScan StrUpper Succ Swap SwapVectors
+TextBackground TextColor TextHeight TextMode TextWidth Trunc Truncate TypeOf
+UnPackTime UpCase Val WhereX WhereY Window Write Writeln pack unpack
+
+[keyword:Label]
+case goto label
+
+[keyword:Operator]
+and as div downto in is mod not of or packed shl shr xor
+
+[keyword:Repeat]
+do for repeat to until while
+
+[keyword:Statement]
+CheckBreak CheckEOF CheckSnow DirectVideo DosError ErrorAddr ExitCode ExitProc
+FileMode FreeList FreeZero HeapEnd HeapError HeapOrg HeapPtr InOutRes Input
+LastMode Output OvrCodeList OvrDebugPtr OvrDosHandle OvrEmsHandle OvrHeapEnd
+OvrHeapOrg OvrHeapPtr OvrHeapSize OvrLoadList PrefixSeg RandSeed Result
+SaveInt00 SaveInt02 SaveInt1B SaveInt21 SaveInt23 SaveInt24 SaveInt34
+SaveInt35 SaveInt36 SaveInt37 SaveInt38 SaveInt39 SaveInt3A SaveInt3B
+SaveInt3C SaveInt3D SaveInt3E SaveInt3F SaveInt75 SegA000 SegB000 SegB800
+SelectorInc StackLimit Test8087 TextAttr TextChar WindMax WindMin automated
+begin cdecl class const constructor cvar destructor dispinterface end exports
+fail finalization function implementation inherited initialization interface
+library object operator otherwise out package pascal popstack private
+procedure program property protected public published record register
+resourcestring safecall self stdcall strict threadvar type unit uses var with
+
+[keyword:Todo]
+DEBUG FIXME NOTE TODO XXX
+
+[keyword:Type]
+AnsiChar AnsiString ArcCoordsType Byte ByteBool Cardinal ComStr Comp Currency
+DateTime DirStr Double ExtStr Extended FileRec FillPatternType
+FillSettingsType Int64 LineSettingsType LongBool LongInt LongWord NameStr
+PAnsiChar PChar PWideChar PaletteType PathStr PointType Real48 Registers
+SearchRec ShortInt ShortString Single SmallInt TextBuf TextRec
+TextSettingsType ViewPortType WideChar WideString Word WordBool absolute
+abstract array assembler boolean char contains default dispid dynamic export
+external far file forward implements index inline integer interrupt message
+name near nodefault overload overridden override pointer readonly real
+reintroduce requires resident sealed set stored string text variant virtual
+writeonly
+
+[match:Error]
+pattern: \s+$
+
+[match:Error]
+pattern:  +\t
+
+[match:Operator]
+pattern: [+\-/*=]
+
+[match:Operator]
+pattern: [<>]=?
+
+[match:Operator]
+pattern: <>
+
+[match:Operator]
+pattern: :=
+
+[match:Operator]
+pattern: [()]
+
+[match:Operator]
+pattern: \.\.
+
+[match:Operator]
+pattern: [\^.]
+
+[match:Identifier]
+pattern: [][]
+
+[match:Number]
+pattern: -?\b\d+\b
+
+[match:Number]
+pattern: \$[0-9a-fA-F]+\b
+
+[match:Number]
+pattern: &[0-7]+\b
+
+[match:Number]
+pattern: %[01]+\b
+
+[match:Float]
+pattern: -?\b\d+\.\d+\b
+
+[match:Float]
+pattern: -?\b\d+\.\d+[eE]-?\d+\b
+
+[match:Error]
+pattern: \t
+
+[match:Float]
+pattern: -?\b\d+\.\d+[dD]-?\d+\b
+
+[region:PreProc]
+start: {\$
+end: }
+

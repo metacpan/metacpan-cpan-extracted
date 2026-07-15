@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 # VERSION
 
-version 4.0001
+version 4.0002
 
 # DESCRIPTION
 

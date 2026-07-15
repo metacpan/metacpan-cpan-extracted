@@ -1,0 +1,158 @@
+################################################################################
+# Jacode4e 速查表 (TW)
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
+# https://metacpan.org/dist/Jacode4e
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
+################################################################################
+
+======================================================================
+Jacode4e 快速參考手冊（繁體中文）
+======================================================================
+
+[基本用法]
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, { %option });
+
+  $line             : 要轉換的字串（以參照傳遞，就地覆寫）
+  $OUTPUT_encoding  : 輸出編碼名稱
+  $INPUT_encoding   : 輸入編碼名稱
+  $char_count       : 轉換後的字元數
+
+[編碼名稱一覽]
+
+  mnemonic    description
+  ---------   ---------------------------------------------------
+  cp932x      CP932X (Extended CP932 to JIS X 0213, single-shift 0x9C5A)
+  cp932       Microsoft CP932 (Windows-31J / IANA registered name)
+  cp932ibm    IBM CP932
+  cp932nec    NEC CP932
+  sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208); year editions below
+  sjis2004    JISC Shift_JIS-2004 (JIS X 0213:2004)
+  euc         JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  euc2004     JISC EUC-JIS-2004 (JIS X 0213 plane 1 and plane 2)
+  jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  jis2004     JISC ISO-2022-JP-2004 (JIS X 0213 plane 1 and plane 2)
+  cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
+  keis78      HITACHI KEIS78
+  keis83      HITACHI KEIS83
+  keis90      HITACHI KEIS90
+  jef         FUJITSU JEF (12pt, use OUTPUT_SHIFTING option for shift codes)
+  jef9p       FUJITSU JEF ( 9pt, use OUTPUT_SHIFTING option for shift codes)
+  jipsj       NEC JIPS(J)
+  jipse       NEC JIPS(E)
+  letsj       UNISYS LetsJ
+  utf8        UTF-8.0 (aka UTF-8)
+  utf8.1      UTF-8.1 (conversion based on Shift_JIS-to-Unicode mapping, not CP932)
+  utf8jp      UTF-8-SPUA-JP (JIS X 0213 on SPUA ordered by JIS level/plane/row/cell)
+
+  sjis / euc / jis 的年代版本（無年份者為 1990 年版）：
+    sjis1978  euc1978  jis1978   JIS C 6226-1978
+    sjis1983  euc1983  jis1983   JIS X 0208-1983
+    sjis1990  euc1990  jis1990   JIS X 0208-1990  (= sjis / euc / jis)
+    sjis2000  euc2000  jis2000   JIS X 0213:2000
+    sjis2004  euc2004  jis2004   JIS X 0213:2004
+
+[JIS 標準各年代差異（適合初學者）]
+
+  日文漢字是分階段標準化的。不同版本中相同的位元組可能表示不同的字元，因此請選擇與資料相符的版本。若不確定，請使用無年份的 sjis / euc / jis。
+
+  1978 (JIS C 6226-1978) : 最早的漢字標準（第 1 水準與第 2 水準）。
+  1983 (JIS X 0208-1983) : 交換了 22 對漢字的編碼位置並變更部分字形；舊資料亂碼的最常見原因。
+  1990 (JIS X 0208-1990) : 僅新增 2 個漢字（U+51DC、U+7199）；無年份的 sjis / euc / jis 即此版本。
+  2000 (JIS X 0213:2000) : 大幅擴充；在新的第 2 面新增第 3、第 4 水準漢字與符號。
+  2004 (JIS X 0213:2004) : 新增 10 個漢字並變更 168 個漢字的示例字形（編碼與 2000 年版相同，僅字形改變）。
+
+[選項一覽]
+
+  選項作為第 4 個引數傳入：{ 'KEY' => 值, ... }
+
+  INPUT_LAYOUT
+    用 'S'（1 位元組 SBCS）和 'D'（2 位元組 DBCS）指定固定記錄佈局；字母後可加重複次數。預設：自動。
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'INPUT_LAYOUT'=>'S2D2SD'});
+
+  OUTPUT_SHIFTING
+    為真時在 DBCS 段前後輸出移出/移入碼。預設：假。
+    e.g. Jacode4e::convert(\$line,'jef','cp932x',{'OUTPUT_SHIFTING'=>1});
+
+  SPACE
+    DBCS/MBCS 空格填充碼（二進位字串）。預設：該編碼的空格。
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'SPACE'=>"\x81\xA1"});
+
+  GETA
+    用於無法對應字元的 DBCS/MBCS 填充（geta）碼。
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'GETA'=>"\x81\xA2"});
+
+  OVERRIDE_MAPPING
+    逐字元 FROM => TO 覆寫的雜湊參照（同時覆寫 SPACE）。
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'OVERRIDE_MAPPING'=>{"\x44\x5A"=>"\x81\x7C"}});
+
+  JIS_SOSI
+    為真：'jis' 輸入時把 SO(0x0E)/SI(0x0F) 視為切換到 JIS X 0201 片假名（JIS7 習慣）。預設：假；輸入為 'jis' 時有效。
+    e.g. Jacode4e::convert(\$line,'utf8','jis',{'JIS_SOSI'=>1});
+
+  JIS_X0212
+    為真：'jis' 輸出時，將屬於 JIS X 0212 但不屬於 JIS X 0208 的字元寫為 ESC $ ( D。需要 OUTPUT_SHIFTING。預設：假。
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_X0212'=>1,'OUTPUT_SHIFTING'=>1});
+
+  JIS_KANA
+    'jis' 輸出的片假名形式：'GR'(0xA1..0xDF)、'I'(ESC ( I，需 OUTPUT_SHIFTING)、'SO'(SO/GL/SI)。預設：'GR'。
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_KANA'=>'SO','OUTPUT_SHIFTING'=>1});
+
+  JIS_DBCS
+    'jis' 輸出的 DBCS 跳脫：'B'(ESC $ B)、'@'(ESC $ @)、'&@B'、'(B'、'(@'。預設：'B'；輸出為 'jis' 時有效。
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_DBCS'=>'@'});
+
+  JIS_SBCS
+    'jis' 輸出的 SBCS 跳脫：'B'(ESC ( B ASCII)、'J'(ESC ( J 羅馬字)、'H'(ESC ( H 舊式)。預設：'B'；輸出為 'jis' 時有效。
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_SBCS'=>'J'});
+
+  JIS2004_PLANE1
+    'jis2004' 輸出的第 1 面跳脫：'Q'(ESC $ ( Q，:2004)、'O'(ESC $ ( O，:2000)。預設：'Q'；輸出為 'jis2004' 時有效。
+    e.g. Jacode4e::convert(\$line,'jis2004','utf8',{'JIS2004_PLANE1'=>'O'});
+
+  ROUND_TRIP
+    為真：可逆轉換；無本地編碼的字元會配置到使用者自訂（外字）區，使「A→B」與「B→A」還原原始資料。往返兩個方向都須指定 ROUND_TRIP=>1 且使用相同版本的 Jacode4e。預設：假（無法對應者變為 GETA）。表在首次使用時延遲建立。
+    e.g. Jacode4e::convert(\$line,'cp00930','utf8',{'ROUND_TRIP'=>1});
+
+[移位碼速查]
+
+  encoding  shift-out (DBCS start)  shift-in (DBCS end)
+  --------  ---------------------   -------------------
+  cp00930   0x0E                    0x0F
+  keis78    0x0A 0x42               0x0A 0x41
+  keis83    0x0A 0x42               0x0A 0x41
+  keis90    0x0A 0x42               0x0A 0x41
+  jef       0x28                    0x29
+  jef9p     0x38                    0x29
+  jipsj     0x1A 0x70               0x1A 0x71
+  jipse     0x3F 0x75               0x3F 0x76
+  letsj     0x93 0x70               0x93 0xF1
+
+[程式範例]
+
+  # 1) UTF-8 轉主機編碼（含移位、空格、geta）
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+  while (<>) {
+      $char_count = Jacode4e::convert(\$_, 'cp00930', 'utf8', {
+          'OUTPUT_SHIFTING' => 1,
+          'SPACE'           => "\x40\x40",
+          'GETA'            => "\x44\x4B",
+      });
+      print $_;
+  }
+
+  # 2) 舊的 1978 年版 Shift_JIS 轉 UTF-8（指定年代）
+  Jacode4e::convert(\$line, 'utf8', 'sjis1978');
+
+  # 3) 往返：UTF-8 -> CP00930 -> UTF-8 還原原始資料
+  Jacode4e::convert(\$line, 'cp00930', 'utf8', { 'ROUND_TRIP' => 1 });
+  Jacode4e::convert(\$line, 'utf8', 'cp00930', { 'ROUND_TRIP' => 1 });
+
+======================================================================

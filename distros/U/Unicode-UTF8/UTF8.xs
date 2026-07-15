@@ -9,7 +9,9 @@
 #  define inline __inline
 #endif
 
-#define UTF8_VALID_STREAM_PROBE_WINDOW_SIZE 1024
+#ifndef UTF8_VALID_STREAM_PROBE_WINDOW_SIZE
+#  define UTF8_VALID_STREAM_PROBE_WINDOW_SIZE 1024
+#endif
 
 #include "utf8_dfa32.h"
 #include "utf8_valid.h"
@@ -583,6 +585,12 @@ PerlIO_read_utf8(pTHX_ PerlIO *fh, SV *bufsv, SSize_t length, SSize_t offset) {
   return got;
 }
 
+static void
+xs_close_fd(pTHX_ void *p) {
+  int fd = (int)PTR2IV(p);
+  PerlLIO_close(fd);
+}
+
 // Slurp a whole file, decoded to characters, using unbuffered (:unix) IO.
 // Reads in fixed chunks and validates in place with the streaming DFA,
 // substituting U+FFFD for each maximal ill-formed subpart (warning in the
@@ -595,6 +603,8 @@ xs_slurp_utf8(pTHX_ SV *namesv) {
   int fd = PerlLIO_open3(filename, O_RDONLY | O_BINARY, 0);
   if (fd < 0)
     croak("Couldn't open '%s': %s", filename, Strerror(errno));
+
+  SAVEDESTRUCTOR_X(xs_close_fd, INT2PTR(void *, (IV)fd));
 
   utf8_valid_stream_t s;
   utf8_valid_stream_init(&s);
@@ -675,8 +685,6 @@ xs_slurp_utf8(pTHX_ SV *namesv) {
     if (eof)
       break;
   }
-
-  PerlLIO_close(fd);
 
   SvCUR_set(sv, fed);
   *SvEND(sv) = '\0';

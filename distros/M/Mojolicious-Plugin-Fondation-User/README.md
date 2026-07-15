@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::User - User management plugin for Fondation
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

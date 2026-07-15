@@ -1,0 +1,50 @@
+# Syntax file for json
+# Converted from: json.vim
+# Conversion date: 2026-07-13
+
+language: json
+extensions: json
+
+[keyword:Function]
+null
+
+[match:Special]
+pattern: \[A-Z][0-9a-fA-F]{4}
+
+[match:Error]
+pattern: \b[[:alpha:]][[:alnum:]]*\b
+
+[match:Error]
+pattern: """
+
+[match:Error]
+pattern: -?\b0\d\.\d*\b
+
+[match:Error]
+pattern: //.*
+
+[match:Error]
+pattern: (?:/\*)|(?:\*/)
+
+[match:Error]
+pattern: ;
+
+[match:Error]
+pattern: ,[\s\n]*[}\]]
+
+[match:Error]
+pattern: (?:"|\]|\d)\K[\s\n]+"
+
+[match:Error]
+pattern: (?:\]|})[\s\n]+"
+
+[match:Error]
+pattern: }[\s\n]+{
+
+[match:Error]
+pattern: (?:true|false)[\s\n]+"
+
+[region:Error]
+start: '
+end: '
+

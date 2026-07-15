@@ -2,7 +2,7 @@
 #
 # 0303_add_mapping-jef-2.13.6.18.t
 #
-# Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2021 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;

@@ -1,0 +1,53 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for JavaScript
+language: javascript
+extensions: js mjs cjs
+
+[keyword:Conditional]
+if else switch
+
+[keyword:Repeat]
+while for do in of
+
+[keyword:Statement]
+break continue return with await yield async
+
+[keyword:StorageClass]
+var let const
+
+[keyword:Operator]
+new delete instanceof typeof
+
+[keyword:Exception]
+try catch finally throw
+
+[keyword:Keyword]
+true false null undefined this arguments function class export import extends super static get set
+
+[match:Comment]
+pattern: //.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=!&|^~?:]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:String]
+start: `
+end: `
+escape: \
+
+[region:Comment]
+start: /*
+end: */

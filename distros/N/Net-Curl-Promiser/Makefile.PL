@@ -35,7 +35,7 @@ WriteMakefile1(
         'Test::FailWarnings' => 0,
         'Test::Fatal'       => 0,
         'Test::Deep' => '1.120',    # has none()
-        'Test::Class::Tiny' => 0,
+        'Test::Class::Tiny' => 0.03,
     },
 );
 

@@ -1,0 +1,37 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Shell/Bash
+language: sh
+extensions: sh bash
+
+[keyword:Conditional]
+if then else elif fi
+
+[keyword:Repeat]
+while for do done until
+
+[keyword:Statement]
+break continue return exit
+
+[keyword:Keyword]
+case in esac function local export readonly
+
+[match:Comment]
+pattern: #.*$
+
+[match:Number]
+pattern: \b\d+\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:]+
+
+[match:Identifier]
+pattern: \$\w+|\$\{[^}]+\}
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '

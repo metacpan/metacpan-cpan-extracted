@@ -1181,7 +1181,7 @@ DESCRIPTION
         cannot specify in the INI file, e.g. variables with a "=" in the
         name.
 
-        Keys with "=", "[" or ";" as the first character are not permitted.
+        Keys with "=" or ";" as the first character are not permitted.
 
         Default is "undef".
 

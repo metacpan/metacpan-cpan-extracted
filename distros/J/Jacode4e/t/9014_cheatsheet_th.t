@@ -2,7 +2,7 @@
 #
 # 9014_cheatsheet_th.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # คู่มืออ้างอิงด่วน Jacode4e (ภาษาไทย)
 # การทดสอบนี้ยังทำหน้าที่เป็นคู่มืออ้างอิงด่วนสำหรับผู้ใช้ภาษาไทย
@@ -37,6 +37,11 @@
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 คาตาคานะ)
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -63,7 +68,8 @@
 # [คำเตือน: การแปลงสองทิศทาง]
 #
 #   มีการแปลงแบบสูญเสีย (เช่น CP932 มี 398 การแมปที่ไม่สามารถย้อนกลับได้)
-#   สำหรับการแปลงสองทิศทาง ให้ใช้โมดูล Jacode4e::RoundTrip
+#   สำหรับการแปลงสองทิศทาง ให้ใช้ตัวเลือก 'ROUND_TRIP' => 1
+#   ทั้งสองทิศทางต้องใช้ 'ROUND_TRIP' => 1 และ Jacode4e เวอร์ชันเดียวกัน
 #
 # ======================================================================
 die "This file is not encoded in UTF-8.\n" if 'あ' ne "\xe3\x81\x82";

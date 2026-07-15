@@ -1,0 +1,6 @@
+! app.css
+<< https://cdn.jsdelivr.net/npm/swagger-ui-dist/swagger-ui.css
+
+! app.js
+<< https://cdn.jsdelivr.net/npm/swagger-ui-dist/swagger-ui-bundle.js
+< js/validators.js

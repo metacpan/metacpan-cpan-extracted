@@ -1,7 +1,7 @@
 # ABSTRACT: Create a new task
 
 package App::karr::Cmd::Create;
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -118,7 +118,7 @@ App::karr::Cmd::Create - Create a new task
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

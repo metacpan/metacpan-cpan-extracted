@@ -1,0 +1,158 @@
+################################################################################
+# Jacode4e فوری حوالہ جاتی کارڈ (UR)
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
+# https://metacpan.org/dist/Jacode4e
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
+################################################################################
+
+======================================================================
+Jacode4e فوری حوالہ (اردو)
+======================================================================
+
+[بنیادی استعمال]
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, { %option });
+
+  $line             : تبدیل کی جانے والی سٹرنگ (حوالے سے دی گئی، اسی جگہ اوور رائٹ ہوتی ہے)
+  $OUTPUT_encoding  : آؤٹ پٹ انکوڈنگ کا نام
+  $INPUT_encoding   : ان پٹ انکوڈنگ کا نام
+  $char_count       : تبدیلی کے بعد حروف کی تعداد
+
+[انکوڈنگ ناموں کی فہرست]
+
+  mnemonic    description
+  ---------   ---------------------------------------------------
+  cp932x      CP932X (Extended CP932 to JIS X 0213, single-shift 0x9C5A)
+  cp932       Microsoft CP932 (Windows-31J / IANA registered name)
+  cp932ibm    IBM CP932
+  cp932nec    NEC CP932
+  sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208); year editions below
+  sjis2004    JISC Shift_JIS-2004 (JIS X 0213:2004)
+  euc         JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  euc2004     JISC EUC-JIS-2004 (JIS X 0213 plane 1 and plane 2)
+  jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  jis2004     JISC ISO-2022-JP-2004 (JIS X 0213 plane 1 and plane 2)
+  cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
+  keis78      HITACHI KEIS78
+  keis83      HITACHI KEIS83
+  keis90      HITACHI KEIS90
+  jef         FUJITSU JEF (12pt, use OUTPUT_SHIFTING option for shift codes)
+  jef9p       FUJITSU JEF ( 9pt, use OUTPUT_SHIFTING option for shift codes)
+  jipsj       NEC JIPS(J)
+  jipse       NEC JIPS(E)
+  letsj       UNISYS LetsJ
+  utf8        UTF-8.0 (aka UTF-8)
+  utf8.1      UTF-8.1 (conversion based on Shift_JIS-to-Unicode mapping, not CP932)
+  utf8jp      UTF-8-SPUA-JP (JIS X 0213 on SPUA ordered by JIS level/plane/row/cell)
+
+  sjis / euc / jis کے سال ایڈیشن (بغیر سال والا نام 1990 ایڈیشن ہے):
+    sjis1978  euc1978  jis1978   JIS C 6226-1978
+    sjis1983  euc1983  jis1983   JIS X 0208-1983
+    sjis1990  euc1990  jis1990   JIS X 0208-1990  (= sjis / euc / jis)
+    sjis2000  euc2000  jis2000   JIS X 0213:2000
+    sjis2004  euc2004  jis2004   JIS X 0213:2004
+
+[سال کے لحاظ سے JIS ایڈیشنوں کے فرق (نئے سیکھنے والوں کے لیے)]
+
+  جاپانی کانجی مرحلہ وار معیاری بنائے گئے۔ ایک ہی بائٹس مختلف ایڈیشنوں میں مختلف حرف کا مطلب دے سکتی ہیں، اس لیے اپنے ڈیٹا سے مطابقت رکھنے والا ایڈیشن منتخب کریں۔ معلوم نہ ہو تو بغیر سال والا sjis / euc / jis استعمال کریں۔
+
+  1978 (JIS C 6226-1978) : پہلا کانجی معیار (سطح 1 اور سطح 2)۔
+  1983 (JIS X 0208-1983) : 22 کانجی جوڑوں کا کوڈ بدلا اور کچھ شکلیں تبدیل کیں؛ پرانے ڈیٹا کے خراب ہونے کی سب سے عام وجہ۔
+  1990 (JIS X 0208-1990) : صرف 2 کانجی شامل کیے (U+51DC, U+7199)؛ بغیر سال والا sjis / euc / jis یہی ایڈیشن ہے۔
+  2000 (JIS X 0213:2000) : بڑی توسیع؛ نئے پلین 2 پر سطح 3 اور سطح 4 کے کانجی اور علامات شامل کیں۔
+  2004 (JIS X 0213:2004) : 10 کانجی شامل کیے اور 168 کانجی کی نمونہ شکل بدلی (کوڈ 2000 جیسا ہی، صرف شکل نئی)۔
+
+[اختیارات]
+
+  اختیارات کو چوتھی دلیل کے طور پر دیں: { 'KEY' => قدر, ... }
+
+  INPUT_LAYOUT
+    'S' (1-بائٹ SBCS) اور 'D' (2-بائٹ DBCS) سے مقررہ ریکارڈ لے آؤٹ؛ ہر حرف کے بعد دہرانے کی تعداد آ سکتی ہے۔ طے شدہ: خودکار۔
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'INPUT_LAYOUT'=>'S2D2SD'});
+
+  OUTPUT_SHIFTING
+    سچ: DBCS تسلسل کے گرد شفٹ آؤٹ/شفٹ اِن کوڈ شامل کرتا ہے۔ طے شدہ: جھوٹ۔
+    e.g. Jacode4e::convert(\$line,'jef','cp932x',{'OUTPUT_SHIFTING'=>1});
+
+  SPACE
+    DBCS/MBCS اسپیس فِل کوڈ (بائنری سٹرنگ)۔ طے شدہ: اسی انکوڈنگ کا اسپیس۔
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'SPACE'=>"\x81\xA1"});
+
+  GETA
+    جن حروف کو میپ نہ کیا جا سکے ان کے لیے DBCS/MBCS گیتا کوڈ۔
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'GETA'=>"\x81\xA2"});
+
+  OVERRIDE_MAPPING
+    فی حرف FROM => TO اووررائیڈ کا ہیش حوالہ (SPACE کو بھی اووررائیڈ کرتا ہے)۔
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'OVERRIDE_MAPPING'=>{"\x44\x5A"=>"\x81\x7C"}});
+
+  JIS_SOSI
+    سچ: 'jis' ان پٹ میں SO (0x0E)/SI (0x0F) کو JIS X 0201 کاتاکانا کی طرف شفٹ سمجھا جاتا ہے (JIS7 عادت)۔ طے شدہ: جھوٹ؛ ان پٹ 'jis' ہو۔
+    e.g. Jacode4e::convert(\$line,'utf8','jis',{'JIS_SOSI'=>1});
+
+  JIS_X0212
+    سچ: 'jis' آؤٹ پٹ میں، وہ حرف جو JIS X 0212 میں ہو مگر JIS X 0208 میں نہ ہو ESC $ ( D کے طور پر لکھا جاتا ہے۔ OUTPUT_SHIFTING درکار۔ طے شدہ: جھوٹ۔
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_X0212'=>1,'OUTPUT_SHIFTING'=>1});
+
+  JIS_KANA
+    'jis' آؤٹ پٹ میں کاتاکانا انداز: 'GR' (0xA1..0xDF), 'I' (ESC ( I, OUTPUT_SHIFTING درکار), 'SO' (SO/GL/SI)۔ طے شدہ: 'GR'۔
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_KANA'=>'SO','OUTPUT_SHIFTING'=>1});
+
+  JIS_DBCS
+    'jis' آؤٹ پٹ میں DBCS ایسکیپ: 'B' (ESC $ B), '@' (ESC $ @), '&@B', '(B', '(@'۔ طے شدہ: 'B'؛ آؤٹ پٹ 'jis' ہو۔
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_DBCS'=>'@'});
+
+  JIS_SBCS
+    'jis' آؤٹ پٹ میں SBCS ایسکیپ: 'B' (ESC ( B ASCII), 'J' (ESC ( J رومن), 'H' (ESC ( H پرانا)۔ طے شدہ: 'B'؛ آؤٹ پٹ 'jis' ہو۔
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_SBCS'=>'J'});
+
+  JIS2004_PLANE1
+    'jis2004' آؤٹ پٹ میں پلین-1 ایسکیپ: 'Q' (ESC $ ( Q, :2004), 'O' (ESC $ ( O, :2000)۔ طے شدہ: 'Q'؛ آؤٹ پٹ 'jis2004' ہو۔
+    e.g. Jacode4e::convert(\$line,'jis2004','utf8',{'JIS2004_PLANE1'=>'O'});
+
+  ROUND_TRIP
+    سچ: الٹ پلٹ کے قابل تبدیلی؛ جس حرف کا مقامی کوڈ نہ ہو اسے صارف کے متعین (GAIJI) علاقے میں رکھا جاتا ہے تاکہ "A سے B" اور "B سے A" اصل بحال کریں۔ دونوں سمتوں میں ROUND_TRIP=>1 اور یکساں Jacode4e ورژن درکار۔ طے شدہ: جھوٹ (میپ نہ ہو تو GETA)۔ ٹیبل پہلی بار استعمال پر سست انداز میں بنتا ہے۔
+    e.g. Jacode4e::convert(\$line,'cp00930','utf8',{'ROUND_TRIP'=>1});
+
+[شفٹ کوڈ حوالہ]
+
+  encoding  shift-out (DBCS start)  shift-in (DBCS end)
+  --------  ---------------------   -------------------
+  cp00930   0x0E                    0x0F
+  keis78    0x0A 0x42               0x0A 0x41
+  keis83    0x0A 0x42               0x0A 0x41
+  keis90    0x0A 0x42               0x0A 0x41
+  jef       0x28                    0x29
+  jef9p     0x38                    0x29
+  jipsj     0x1A 0x70               0x1A 0x71
+  jipse     0x3F 0x75               0x3F 0x76
+  letsj     0x93 0x70               0x93 0xF1
+
+[پروگرامنگ مثالیں]
+
+  # 1) UTF-8 سے مین فریم انکوڈنگ تک (شفٹ، اسپیس، گیتا کے ساتھ)
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+  while (<>) {
+      $char_count = Jacode4e::convert(\$_, 'cp00930', 'utf8', {
+          'OUTPUT_SHIFTING' => 1,
+          'SPACE'           => "\x40\x40",
+          'GETA'            => "\x44\x4B",
+      });
+      print $_;
+  }
+
+  # 2) پرانا 1978 Shift_JIS سے UTF-8 تک (سال کے مطابق)
+  Jacode4e::convert(\$line, 'utf8', 'sjis1978');
+
+  # 3) راؤنڈ ٹرپ: UTF-8 -> CP00930 -> UTF-8 اصل بحال کرتا ہے
+  Jacode4e::convert(\$line, 'cp00930', 'utf8', { 'ROUND_TRIP' => 1 });
+  Jacode4e::convert(\$line, 'utf8', 'cp00930', { 'ROUND_TRIP' => 1 });
+
+======================================================================

@@ -1,9 +1,9 @@
 package Mojolicious::Plugin::Fondation::User::UI::Bootstrap;
+$Mojolicious::Plugin::Fondation::User::UI::Bootstrap::VERSION = '0.02';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 # ABSTRACT: Web UI for Fondation::User — templates, assets, and i18n
 
-our $VERSION = '0.01';
 
 sub fondation_meta {
     return {
@@ -40,7 +40,7 @@ Mojolicious::Plugin::Fondation::User::UI::Bootstrap - Web UI for Fondation::User
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

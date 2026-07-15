@@ -1,0 +1,1 @@
+<li data-root="<%= $self->root->title %>" data-parent="<%= $self->parent->title %>"><strong><%= $self->contact->{name} %></strong> <%= $self->contact->{email} %></li>

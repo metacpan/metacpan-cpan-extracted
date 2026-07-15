@@ -3,7 +3,7 @@ package WWW::HTMLTagAttributeCounter;
 use warnings;
 use strict;
 
-our $VERSION = '0.0105';
+our $VERSION = '1.001001'; # VERSION
 
 use LWP::UserAgent;
 use HTML::TokeParser::Simple;
@@ -116,11 +116,15 @@ __END__
 
 =encoding utf8
 
+=for stopwords webpage arrayref hashref parsable IRC
+
 =head1 NAME
 
 WWW::HTMLTagAttributeCounter - access a webpage and count number of tags or attributes
 
 =head1 SYNOPSIS
+
+=for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-code.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
 
     use strict;
     use warnings;
@@ -134,6 +138,8 @@ WWW::HTMLTagAttributeCounter - access a webpage and count number of tags or attr
 
     print "I counted $c tags on zoffix.com\n";
 
+=for html  </div></div>
+
 =head1 DESCRIPTION
 
 The module was developed for use in an IRC bot thus you may find it useless for anything else.
@@ -145,6 +151,8 @@ attributes.
 
 =head2 C<new>
 
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-key-value.png"> <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/out-object.png">
+
     my $c = WWW::HTMLTagAttributeCounter->new;
 
     my $c = WWW::HTMLTagAttributeCounter->new(
@@ -155,6 +163,8 @@ Contructs and returns a fresh C<WWW::HTMLTagAttributeCounter> object. Takes the 
 arguments in a key/value fashion:
 
 =head3 C<ua>
+
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-object.png">
 
     my $c = WWW::HTMLTagAttributeCounter->new(
         ua => LWP::UserAgent->new( timeout => 10 ),
@@ -172,6 +182,8 @@ as the first argument. B<Default to:>
 =head1 METHODS
 
 =head2 C<count>
+
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-scalar-or-arrayref.png"> <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/out-hashref.png">
 
     my $result = $c->count( 'http://zoffix.com/', 'div' )
         or die $c->error;
@@ -241,6 +253,8 @@ were counting and values are the actual count numbers.
 
 =head2 C<result>
 
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-no-args.png"> <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/out-hashref.png">
+
     $c->count( 'http://zoffix.com/', [ qw/div a span/ ], )
         or die $c->error;
 
@@ -250,6 +264,8 @@ Must be called after a successful call to C<count()> method. Returns the exact s
 last call to C<count()> method returned.
 
 =head2 C<result_readable>
+
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-no-args.png"> <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/out-scalar.png">
 
     $c->count( 'http://zoffix.com/', [ qw/div a span/ ], )
         or die $c->error;
@@ -271,6 +287,8 @@ get the return of this method.
 
 =head2 C<error>
 
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-no-args.png"> <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/out-scalar.png">
+
     $c->count( 'http://zoffix.com/', [ qw/div a span/ ], )
         or die $c->error;
 
@@ -280,6 +298,8 @@ human parsable error message explaing the failure.
 
 =head2 C<ua>
 
+=for html  <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/in-object.png"> <img alt="" src="http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/out-object.png">
+
     my $ua = $c->ua;
     $ua->proxy( 'http', 'http://foo.com' );
     $c->ua( $ua );
@@ -287,52 +307,44 @@ human parsable error message explaing the failure.
 Returns currently used object that used for fetching URIs - see constructor's C<ua> argument
 for details. Takes one optional argument - the new object to use for fetching.
 
-=head1 AUTHOR
+=for html <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>
 
-'Zoffix, C<< <'zoffix at cpan.org'> >>
-(L<http://zoffix.com/>, L<http://haslayout.net/>, L<http://zofdesign.com/>)
+=head1 REPOSITORY
+
+=for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-github.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
+
+Fork this module on GitHub:
+L<https://github.com/zoffixznet/WWW-HTMLTagAttributeCounter>
+
+=for html  </div></div>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-www-htmltagattributecounter at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-HTMLTagAttributeCounter>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+=for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-bugs.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
 
-=head1 SUPPORT
+To report bugs or request features, please use
+L<https://github.com/zoffixznet/WWW-HTMLTagAttributeCounter/issues>
 
-You can find documentation for this module with the perldoc command.
+If you can't access GitHub, you can email your request
+to C<bug-www-htmltagattributecounter at rt.cpan.org>
 
-    perldoc WWW::HTMLTagAttributeCounter
+=for html  </div></div>
 
-You can also look for information at:
+=head1 AUTHOR
 
-=over 4
+=for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-author.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
 
-=item * RT: CPAN's request tracker
+=for html   <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/ZOFFIX"> <img src="http://www.gravatar.com/avatar/328e658ab6b08dfb5c106266a4a5d065?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F627d83ef9879f31bdabf448e666a32d5" alt="ZOFFIX" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">ZOFFIX</span> </a> </span>
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-HTMLTagAttributeCounter>
+=for text Zoffix Znet <zoffix at cpan.org>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=for html  </div></div>
 
-L<http://annocpan.org/dist/WWW-HTMLTagAttributeCounter>
+=head1 LICENSE
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/WWW-HTMLTagAttributeCounter>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/WWW-HTMLTagAttributeCounter>
-
-=back
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 'Zoffix, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+You can use and distribute this module under the same terms as Perl itself.
+See the C<LICENSE> file included in this distribution for complete
+details.
 
 =cut
 

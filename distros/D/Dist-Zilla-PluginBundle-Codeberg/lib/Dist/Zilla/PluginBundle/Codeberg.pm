@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Codeberg 2.0101;
+package Dist::Zilla::PluginBundle::Codeberg 2.0102;
 
 use Modern::Perl;
 use Carp;
@@ -116,7 +116,7 @@ Dist::Zilla::PluginBundle::Codeberg - Access Codeberg functionality to maintain 
 
 =head1 VERSION
 
-version 2.0101
+version 2.0102
 
 =head1 SYNOPSIS
 

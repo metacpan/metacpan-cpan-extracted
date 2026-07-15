@@ -36,7 +36,8 @@
          "requires" : {
             "Carp" : "0",
             "feature" : "0",
-            "perl" : "5.010",
+            "if" : "0",
+            "perl" : "5.022",
             "strict" : "0",
             "utf8" : "0",
             "version" : "0",
@@ -64,9 +65,9 @@
          "web" : "https://github.com/ikluft/Sys-OsRelease"
       }
    },
-   "version" : "0.3.1",
+   "version" : "0.4.0",
    "x_generated_by_perl" : "v5.42.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

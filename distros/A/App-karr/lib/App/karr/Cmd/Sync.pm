@@ -1,7 +1,7 @@
 # ABSTRACT: Sync karr board with remote
 
 package App::karr::Cmd::Sync;
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moo;
 use MooX::Cmd;
 use feature 'say';
@@ -19,8 +19,7 @@ option pull => ( is => 'ro', default => 0, doc => 'Pull refs from remote' );
 sub execute {
     my ( $self, $args, $data ) = @_;
 
-    require App::karr::Git;
-    my $git = App::karr::Git->new( dir => $self->git_root->stringify );
+    my $git = $self->git;
 
     unless ( $git->is_repo ) {
         say "Not a git repository. Skipping sync.";
@@ -41,12 +40,14 @@ sub execute {
 
     unless ($push_only) {
         print STDERR "Pulling refs/karr/ from remote...\n" unless $self->quiet;
-        $git->pull;
+        $git->pull
+            or die "Pull failed: " . ( $git->last_error // 'unknown error' ) . "\n";
     }
 
     unless ($pull_only) {
         print STDERR "Pushing refs/karr/ to remote...\n" unless $self->quiet;
-        $git->push;
+        $git->push
+            or die "Push failed: " . ( $git->last_error // 'unknown error' ) . "\n";
     }
 
     say "Done.";
@@ -66,7 +67,7 @@ App::karr::Cmd::Sync - Sync karr board with remote
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

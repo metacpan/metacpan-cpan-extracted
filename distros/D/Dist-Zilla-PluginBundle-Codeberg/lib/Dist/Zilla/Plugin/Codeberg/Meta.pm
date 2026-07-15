@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg::Meta 2.0101;
+package Dist::Zilla::Plugin::Codeberg::Meta 2.0102;
 
 use Modern::Perl;
 use JSON::MaybeXS;
@@ -90,7 +90,7 @@ sub metadata {
    $html_url
       = $offline
       ? "https://codeberg.org/$repo_name"
-      : $repo->{url};
+      : $repo->{html_url};
 
    $git_url
       = $offline
@@ -98,7 +98,7 @@ sub metadata {
       : $repo->{ssh_url};
 
    if ( !$offline && $repo->{has_issues} == JSON->true() ) {
-      $bugtracker = "$html_url/-/issues";
+      $bugtracker = "$html_url/issues";
    }
 
    my $meta;
@@ -146,7 +146,7 @@ Dist::Zilla::Plugin::Codeberg::Meta - Add a Codeberg repo's info to META.{yml,js
 
 =head1 VERSION
 
-version 2.0101
+version 2.0102
 
 =head1 SYNOPSIS
 

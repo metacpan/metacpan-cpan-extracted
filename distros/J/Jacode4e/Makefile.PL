@@ -5,13 +5,14 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Jacode4e},
-    'VERSION'   => q{2.13.6.22},
+    'VERSION'   => q{2.13.6.23},
     'ABSTRACT'  => q{Converts Character Encodings for Enterprise in Japan},
     'PREREQ_PM' => {
         'perl' => '5.00503',
         'strict' => '1.01',
+        'vars' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -42,7 +43,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Jacode4e' => {
                 'file'    => 'lib/Jacode4e.pm',
-                'version' => '2.13.6.22',
+                'version' => '2.13.6.23',
             }
         },
     };

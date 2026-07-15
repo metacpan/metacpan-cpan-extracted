@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.9
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.1.10
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2026/06/07
+## Modified 2026/06/23
 ## All rights reserved
 ## 
 ## 
@@ -22,14 +22,14 @@ BEGIN
         $VERSION $DEBUG $ERROR $FATAL_EXCEPTIONS
         $CACHE $LAST_CACHE_CLEAR $MAX_CACHE_SIZE $BROWSER_DEFAULTS
     );
-    use DateTime;
+    use DateTime::Lite;
     use DateTime::Locale::FromCLDR;
     use DateTime::Format::Unicode;
     use Locale::Intl;
     use Locale::Unicode::Data;
     use Scalar::Util ();
-    use Want;
-    our $VERSION = 'v0.1.9';
+    use Wanted;
+    our $VERSION = 'v0.1.10';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -354,7 +354,7 @@ sub new
         }
         else
         {
-            warn( "Warning only: unsupported numbering system provided (${locale_num_sys}) via the locale \"nu\" extension (${locale})." ) if( warnings::enabled() );
+            warn( "Warning only: unsupported numbering system provided (${locale_num_sys}) via the locale extension \"nu\" (${locale})." ) if( warnings::enabled() );
         }
     }
     # Still have not found anything
@@ -404,9 +404,9 @@ sub new
         # Calling DateTime time_zone with 'local' might die if not found on the system, so we catch it with eval
         my $dt = eval
         {
-            DateTime->now( time_zone => 'local' );
+            DateTime::Lite->now( time_zone => 'local' );
         };
-        if( $@ )
+        if( $@ || !defined( $dt ) )
         {
             $tz = 'UTC';
         }
@@ -430,8 +430,8 @@ sub new
         # Only supported values are: long, short and narrow
         my $width_map =
         {
-            'abbreviated' => 'short',
-            'wide' => 'long',
+            abbreviated => 'short',
+            wide        => 'long',
         };
         my $tree = $cldr->make_inheritance_tree( $locale ) ||
             return( $self->pass_error( $cldr->error ) );
@@ -440,7 +440,7 @@ sub new
         LOCALE: foreach my $loc ( @$tree )
         {
             my $all = $cldr->calendar_eras_l10n(
-                locale => $loc,
+                locale   => $loc,
                 calendar => $calendar,
             );
             return( $self->pass_error( $cldr->error ) ) if( !defined( $all ) && $cldr->error );
@@ -651,11 +651,11 @@ sub error
         else
         {
             warn( $def->{message}  ) if( warnings::enabled() );
-            if( Want::want( 'ARRAY' ) )
+            if( Wanted::want( 'ARRAY' ) )
             {
                 rreturn( [] );
             }
-            elsif( Want::want( 'OBJECT' ) )
+            elsif( Wanted::want( 'OBJECT' ) )
             {
                 rreturn( DateTime::Format::Intl::NullObject->new );
             }
@@ -674,13 +674,13 @@ sub format
     my $this = shift( @_ );
     if( !defined( $this ) || !length( $this // '' ) )
     {
-        $this = DateTime->now;
+        $this = DateTime::Lite->now;
     }
-    elsif( !( Scalar::Util::blessed( $this ) && $this->isa( 'DateTime' ) ) )
+    elsif( !( Scalar::Util::blessed( $this ) && ( $this->isa( 'DateTime' ) || $this->isa( 'DateTime::Lite' ) ) ) )
     {
         return( $self->error({
             type => 'RangeError',
-            message => "Date value provided is not a DateTime object."
+            message => "Date value provided is not a DateTime or DateTime::Lite object."
         }) );
     }
     my $dt = $this->clone;
@@ -702,6 +702,7 @@ sub format
     my $unicode = $self->{_unicode} || die( "The DateTime::Locale::FromCLDR object is gone." );
     my $locale = $self->{locale} || die( "Our Locale::Unicode object is gone!" );
     # We share our DateTime::Locale::FromCLDR object with DateTime, because this module fares much better than the DateTime::Locale::FromData one
+    # If the object is a DateTime::Lite one, then it works too!
     $dt->set_locale( $unicode );
 
     # This is built upon object instantiation, so that format(9 can be called multiple times and run more rapidly.
@@ -732,18 +733,18 @@ sub format_range
 {
     my $self = shift( @_ );
     my( $this1, $this2 ) = @_;
-    if( !( Scalar::Util::blessed( $this1 ) && $this1->isa( 'DateTime' ) ) )
+    if( !( Scalar::Util::blessed( $this1 ) && ( $this1->isa( 'DateTime' ) || $this1->isa( 'DateTime::Lite' ) ) ) )
     {
         return( $self->error({
             type => 'RangeError',
             message => "Start datetime value provided is not a DateTime object."
         }) );
     }
-    elsif( !( Scalar::Util::blessed( $this2 ) && $this2->isa( 'DateTime' ) ) )
+    elsif( !( Scalar::Util::blessed( $this2 ) && ( $this2->isa( 'DateTime' ) || $this2->isa( 'DateTime::Lite' ) ) ) )
     {
         return( $self->error({
             type => 'RangeError',
-            message => "End datetime value provided is not a DateTime object."
+            message => "End datetime value provided is not a DateTime or a DateTime::Lite object."
         }) );
     }
     my $dt1 = $this1->clone;
@@ -753,6 +754,7 @@ sub format_range
     my $unicode = $self->{_unicode} || die( "The DateTime::Locale::FromCLDR object is gone." );
     my $locale = $self->{locale} || die( "Our Locale::Unicode object is gone!" );
     # We share our DateTime::Locale::FromCLDR object with DateTime, because this module fares much better than the DateTime::Locale::FromData one
+    # And it works well with DateTime::Lite too.
     $dt1->set_locale( $unicode );
     $dt2->set_locale( $unicode );
     # Get the greatest difference between those two datetime
@@ -782,14 +784,14 @@ sub format_range_to_parts
 {
     my $self = shift( @_ );
     my( $this1, $this2 ) = @_;
-    if( !( Scalar::Util::blessed( $this1 ) && $this1->isa( 'DateTime' ) ) )
+    if( !( Scalar::Util::blessed( $this1 ) && ( $this1->isa( 'DateTime' ) || $this1->isa( 'DateTime::Lite' ) ) ) )
     {
         return( $self->error({
             type => 'RangeError',
             message => "Start datetime value provided is not a DateTime object."
         }) );
     }
-    elsif( !( Scalar::Util::blessed( $this2 ) && $this2->isa( 'DateTime' ) ) )
+    elsif( !( Scalar::Util::blessed( $this2 ) && ( $this2->isa( 'DateTime' ) || $this2->isa( 'DateTime::Lite' ) ) ) )
     {
         return( $self->error({
             type => 'RangeError',
@@ -814,6 +816,7 @@ sub format_range_to_parts
         $dt1 = $this1->clone;
         $dt2 = $this2->clone;
         # We share our DateTime::Locale::FromCLDR object with DateTime, because this module fares much better than the DateTime::Locale::FromData one
+        # And it is native for DateTime::Lite too.
         $dt1->set_locale( $unicode );
         $dt2->set_locale( $unicode );
     }
@@ -951,13 +954,13 @@ sub format_to_parts
     my $this = shift( @_ );
     if( !defined( $this ) || !length( $this // '' ) )
     {
-        $this = DateTime->now;
+        $this = DateTime::Lite->now;
     }
-    elsif( !( Scalar::Util::blessed( $this ) && $this->isa( 'DateTime' ) ) )
+    elsif( !( Scalar::Util::blessed( $this ) && ( $this->isa( 'DateTime' ) || $this->isa( 'DateTime::Lite' ) ) ) )
     {
         return( $self->error({
             type => 'RangeError',
-            message => "Date value provided is not a DateTime object."
+            message => "Date value provided is not a DateTime or DateTime::Lite object."
         }) );
     }
     my $args = {};
@@ -976,6 +979,7 @@ sub format_to_parts
     {
         $dt = $this->clone;
         # We share our DateTime::Locale::FromCLDR object with DateTime, because this module fares much better than the DateTime::Locale::FromData one
+        # And it works naturally with DateTime::Lite too.
         $dt->set_locale( $unicode );
     }
 
@@ -1078,7 +1082,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         rreturn( DateTime::Format::Intl::NullObject->new );
     }
@@ -1643,7 +1647,7 @@ sub _format_to_parts
     my $self = shift( @_ );
     my $args = $self->_get_args_as_hash( @_ );
     my $pat = $args->{pattern} || die( "No pattern was provided." );
-    my $dt  = $args->{datetime} || die( "No DateTime object was provided." );
+    my $dt  = $args->{datetime} || die( "No DateTime or DateTime::Lite object was provided." );
     my $locale = $self->{locale} || die( "Our Locale::Unicode object is gone!" );
     my $opts = $self->resolvedOptions;
     unless( $opts->{numberingSystem} eq 'latn' )
@@ -4563,7 +4567,7 @@ sub TO_JSON { return( shift->as_string ); }
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -4579,7 +4583,7 @@ sub TO_JSON { return( shift->as_string ); }
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -4597,7 +4601,7 @@ sub TO_JSON { return( shift->as_string ); }
     use strict;
     use warnings;
     use vars qw( $DEBUG $ERROR );
-    use Want;
+    use Wanted;
 
     sub new
     {
@@ -4675,11 +4679,11 @@ sub TO_JSON { return( shift->as_string ); }
             else
             {
                 warn( $msg ) if( warnings::enabled( 'DateTime::Format::Intl' ) );
-                if( Want::want( 'ARRAY' ) )
+                if( Wanted::want( 'ARRAY' ) )
                 {
                     rreturn( [] );
                 }
-                elsif( Want::want( 'OBJECT' ) )
+                elsif( Wanted::want( 'OBJECT' ) )
                 {
                     rreturn( DateTime::Format::Intl::NullObject->new );
                 }
@@ -4700,7 +4704,7 @@ sub TO_JSON { return( shift->as_string ); }
     sub pass_error
     {
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             rreturn( DateTime::Format::Intl::NullObject->new );
         }
@@ -4861,11 +4865,11 @@ sub TO_JSON { return( shift->as_string ); }
             else
             {
                 warn( $msg ) if( warnings::enabled( 'DateTime::Format::Intl' ) );
-                if( Want::want( 'ARRAY' ) )
+                if( Wanted::want( 'ARRAY' ) )
                 {
                     rreturn( [] );
                 }
-                elsif( Want::want( 'OBJECT' ) )
+                elsif( Wanted::want( 'OBJECT' ) )
                 {
                     rreturn( DateTime::Format::Intl::NullObject->new );
                 }
@@ -4882,7 +4886,7 @@ sub TO_JSON { return( shift->as_string ); }
     sub pass_error
     {
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             rreturn( DateTime::Format::Intl::NullObject->new );
         }
@@ -5017,9 +5021,11 @@ DateTime::Format::Intl - A Web Intl.DateTimeFormat Class Implementation
 
 =head1 SYNOPSIS
 
+    use DateTime::Lite;
+    # or
     use DateTime;
     use DateTime::Format::Intl;
-    my $dt = DateTime->now;
+    my $dt = DateTime::Lite->now;
     my $fmt = DateTime::Format::Intl->new(
         # You can use ja-JP (Unicode / web-style) or ja_JP (system-style), it does not matter.
         'ja_JP', {
@@ -5062,8 +5068,10 @@ DateTime::Format::Intl - A Web Intl.DateTimeFormat Class Implementation
 
 In basic use without specifying a locale, C<DateTime::Format::Intl> uses the default locale and default options:
 
+    use DateTime::Lite;
+    # or
     use DateTime;
-    my $date = DateTime->new(
+    my $date = DateTime::Lite->new(
         year    => 2012,
         month   => 11,
         day     => 20,
@@ -5082,7 +5090,7 @@ Using C<timeStyle> and C<dateStyle>:
 
 Possible values are: C<full>, C<long>, C<medium> and C<short>
 
-    my $now = DateTime->new(
+    my $now = DateTime::Lite->new(
         year => 2024,
         month => 9,
         day => 13,
@@ -5138,7 +5146,7 @@ Using C<dayPeriod>:
 
 Use the C<dayPeriod> option to output a string for the times of day (C<in the morning>, C<at night>, C<noon>, etc.). Note, that this only works when formatting for a 12 hour clock (C<< hourCycle => 'h12' >> or C<< hourCycle => 'h11' >>) and that for many locales the strings are the same irrespective of the value passed for the C<dayPeriod>.
 
-    my $date = DateTime->new(
+    my $date = DateTime::Lite->new(
         year    => 2012,
         month   => 11,
         day     => 17,
@@ -5180,7 +5188,7 @@ Using C<timeZoneName>:
 
 Use the C<timeZoneName> option to output a string for the C<timezone> (C<GMT>, C<Pacific Time>, etc.).
 
-    my $date = DateTime->new(
+    my $date = DateTime::Lite->new(
         year    => 2021,
         month   => 11,
         day     => 17,
@@ -5249,7 +5257,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.9
+    v0.1.10
 
 =head1 DESCRIPTION
 
@@ -5534,7 +5542,7 @@ Note: C<dateStyle> and C<timeStyle> can be used with each other, but not with ot
       month => 'long',
       day => 'numeric',
     };
-    my $date = DateTime->new(
+    my $date = DateTime::Lite->new(
         year => 2012,
         month => 6,
         day => 1,
@@ -5569,7 +5577,7 @@ Same as L<formatToParts|/formatToParts>
 
 =head2 formatRange
 
-    my $d1 = DateTime->new(
+    my $d1 = DateTime::Lite->new(
         year    => 2024,
         month   => 5,
         day     => 10,
@@ -5577,7 +5585,7 @@ Same as L<formatToParts|/formatToParts>
         minute  => 0,
         second  => 0,
     );
-    my $d2 = DateTime->new(
+    my $d2 = DateTime::Lite->new(
         year    => 2024,
         month   => 5,
         day     => 11,
@@ -5599,13 +5607,13 @@ Same as L<formatToParts|/formatToParts>
     });
     say $fmt3->formatRange( $d1 => $d2 ); # vendredi 10 mai 2024 - samedi 11 mai 2024
 
-This C<formatRange()> method takes 2 L<DateTime> objects, and formats the range between 2 dates and returns a string.
+This C<formatRange()> method takes 2 L<DateTime::Lite> objects (or L<DateTime> objects), and formats the range between 2 dates and returns a string.
 
 The format used is the most concise way based on the locales and options provided when instantiating the new L<DateTime::Format::Intl> object. When no option were provided upon object instantiation, it default to a short version of the date format using L<date_format_short|DateTime::Locale::FromCLDR/date_format_short>), which, in turn, gets interpreted in various formats depending on the locale chosen. In British English, this would be C<10/05/2024> for May 10th, 2024.
 
 =head2 formatRangeToParts
 
-    my $d1 = DateTime->new(
+    my $d1 = DateTime::Lite->new(
         year    => 2024,
         month   => 5,
         day     => 10,
@@ -5613,7 +5621,7 @@ The format used is the most concise way based on the locales and options provide
         minute  => 0,
         second  => 0,
     );
-    my $d2 = DateTime->new(
+    my $d2 = DateTime::Lite->new(
         year    => 2024,
         month   => 5,
         day     => 11,
@@ -5656,7 +5664,7 @@ The C<formatRangeToParts()> method returns an array of locale-specific tokens re
 
 =head2 formatToParts
 
-    my $d = DateTime->new(
+    my $d = DateTime::Lite->new(
         year    => 2024,
         month   => 5,
         day     => 10,
@@ -5685,9 +5693,9 @@ This would return an array containing the following hash references:
     { type => 'literal', value => ':' },
     { type => 'minute',  value => '00' }
 
-The C<formatToParts()> method takes an optional L<DateTime> object, and returns an array of locale-specific tokens representing each part of the formatted date produced by this L<DateTime::Format::Intl> object. It is useful for custom formatting of date strings.
+The C<formatToParts()> method takes an optional L<DateTime> or L<DateTime::Lite> object, and returns an array of locale-specific tokens representing each part of the formatted date produced by this L<DateTime::Format::Intl> object. It is useful for custom formatting of date strings.
 
-If no L<DateTime> object is provided, it will default to the current date and time.
+If no L<DateTime> or L<DateTime::Lite> object is provided, it will default to the current date and time.
 
 The properties of the hash references returned are as follows:
 
@@ -5929,7 +5937,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Locale::Unicode>, L<Locale::Intl>, L<Locale::Unicode::Data>, L<DateTime::Locale::FromCLDR>, L<DateTime::Format::Unicode>, L<DateTime>
+L<Locale::Unicode>, L<Locale::Intl>, L<Locale::Unicode::Data>, L<DateTime::Locale::FromCLDR>, L<DateTime::Format::Unicode>, L<DateTime::Lite>
 
 L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat>
 

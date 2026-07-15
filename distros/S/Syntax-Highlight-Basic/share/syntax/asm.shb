@@ -1,0 +1,109 @@
+# Syntax file for asm
+# Converted from: asm.vim
+# Conversion date: 2026-07-13
+
+language: asm
+extensions: asm
+
+[keyword:Todo]
+FIXME NOTE TODO XXX
+
+[match:Type]
+pattern: \.long
+
+[match:Type]
+pattern: \.ascii
+
+[match:Type]
+pattern: \.asciz
+
+[match:Type]
+pattern: \.byte
+
+[match:Type]
+pattern: \.double
+
+[match:Type]
+pattern: \.float
+
+[match:Type]
+pattern: \.hword
+
+[match:Type]
+pattern: \.int
+
+[match:Type]
+pattern: \.octa
+
+[match:Type]
+pattern: \.quad
+
+[match:Type]
+pattern: \.short
+
+[match:Type]
+pattern: \.single
+
+[match:Type]
+pattern: \.space
+
+[match:Type]
+pattern: \.string
+
+[match:Type]
+pattern: \.word
+
+[match:Identifier]
+pattern: [a-z_][a-z0-9_]*
+
+[match:Label]
+pattern: [a-z_][a-z0-9_]*:
+
+[match:Number]
+pattern: \b0+[1-7]?\b
+
+[match:Number]
+pattern: \b[1-9]\d*\b
+
+[match:Number]
+pattern: \b0[0-7][0-7]+\b
+
+[match:Number]
+pattern: \b0[xX][0-9a-fA-F]+\b
+
+[match:Number]
+pattern: \b0[bB][0-1]+\b
+
+[match:Float]
+pattern: [+-]?Inf\b|\bNaN\b
+
+[match:Special]
+pattern: \\.
+
+[match:Special]
+pattern: \\ 
+
+[match:Special]
+pattern: \[0-9a-fA-F][0-9a-fA-F]+
+
+[match:Include]
+pattern: \.include
+
+[match:PreCondit]
+pattern: \.if
+
+[match:PreCondit]
+pattern: \.else
+
+[match:PreCondit]
+pattern: \.endif
+
+[match:Macro]
+pattern: \.macro
+
+[match:Macro]
+pattern: \.endm
+
+[match:Statement]
+pattern: \.[A-Za-z][0-9A-Za-z-_]*
+

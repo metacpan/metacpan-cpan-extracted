@@ -1,0 +1,155 @@
+# Syntax file for ada
+# Converted from: ada.vim
+# Conversion date: 2026-07-13
+
+language: ada
+extensions: ada
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+case elsif if select when
+
+[keyword:Keyword]
+all begin body declare do entry exception generic in new null out overriding
+project protected renames separate task until use with
+
+[keyword:Label]
+others
+
+[keyword:Operator]
+abs mod not rem xor
+
+[keyword:PreProc]
+pragma
+
+[keyword:Repeat]
+exit for loop reverse while
+
+[keyword:Statement]
+accept delay goto raise requeue return terminate
+
+[keyword:StorageClass]
+abstract access aliased array at constant delta digits interface limited of
+private range synchronized tagged
+
+[keyword:Todo]
+FIXME NOTE TODO XXX
+
+[keyword:Typedef]
+subtype type
+
+[match:Operator]
+pattern: \band\b
+
+[match:Operator]
+pattern: \band\s+then\b
+
+[match:Operator]
+pattern: \bor\b
+
+[match:Operator]
+pattern: \bor\s+else\b
+
+[match:Operator]
+pattern: [-+*/<>&]
+
+[match:Operator]
+pattern: [/<>]=
+
+[match:Operator]
+pattern: \.\.
+
+[match:Operator]
+pattern: =
+
+[match:Special]
+pattern: [:;.,]
+
+[match:Special]
+pattern: [:;().,]
+
+[match:Special]
+pattern: :=
+
+[match:Number]
+pattern: \b\d[0-9_]*(?:\.\d[0-9_]*)?(?:[Ee][+-]?\d[0-9_]*)?\b
+
+[match:Number]
+pattern: \b\d\d?#[0-9a-fA-F][0-9A-Fa-f_]*(?:\.[0-9a-fA-F][0-9A-Fa-f_]*)?#(?:[Ee][+-]?\d[0-9_]*)?
+
+[match:Number]
+pattern: [[:space:]<>=(,|:;&*/+-][+-]\d
+
+[match:Error]
+pattern: //
+
+[match:Error]
+pattern: /\*
+
+[match:Error]
+pattern: ==
+
+[match:Error]
+pattern:  +\t
+
+[match:Special]
+pattern: \t
+
+[match:Keyword]
+pattern: \bend\b
+
+[match:Repeat]
+pattern: \bend\s+loop\b
+
+[match:Statement]
+pattern: \babort\b
+
+[match:Keyword]
+pattern: \brecord;
+
+[match:Conditional]
+pattern: \bthen\b
+
+[match:Conditional]
+pattern: \bthen\s+abort\b
+
+[match:Conditional]
+pattern: \belse\b
+
+[match:Conditional]
+pattern: \bend\s+if\b
+
+[match:Conditional]
+pattern: \bend\s+case\b
+
+[match:Conditional]
+pattern: \bend\s+select\b
+
+[match:Keyword]
+pattern: \bwith\b
+
+[match:Keyword]
+pattern: \buse\b
+
+[match:Keyword]
+pattern: \bwith\s+null\s+record\b
+
+[match:Keyword]
+pattern: ;\s*\Kwith\s+(?:function|procedure|package)\b
+
+[match:Keyword]
+pattern: ^\s*\Kwith\s+(?:function|procedure|package)\b
+
+[match:Character]
+pattern: '.'
+
+[region:Label]
+start: <<
+end: >>
+
+[region:String]
+start: "
+end: "
+

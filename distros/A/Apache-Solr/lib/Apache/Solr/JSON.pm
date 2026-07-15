@@ -1,13 +1,16 @@
-# Copyrights 2012-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Apache-Solr.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Apache-Solr version 1.12.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Apache::Solr::JSON;{
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 }
 
 use base 'Apache::Solr';
@@ -15,13 +18,14 @@ use base 'Apache::Solr';
 use warnings;
 use strict;
 
-use Log::Report          qw(solr);
+use Log::Report          qw/solr/;
 
 use Apache::Solr::Result ();
 use HTTP::Request        ();
 use JSON                 ();
-use Scalar::Util         qw(blessed);
+use Scalar::Util         qw/blessed/;
 
+#--------------------
 
 sub init($)
 {	my ($self, $args) = @_;
@@ -32,11 +36,11 @@ sub init($)
 	$self;
 }
 
-#---------------
+#--------------------
 
-sub json() {shift->{ASJ_json}}
+sub json() { $_[0]->{ASJ_json} }
 
-#--------------------------
+#--------------------
 
 sub _select($$)
 {	my ($self, $args, $params) = @_;
@@ -63,13 +67,14 @@ sub _extract($$$)
 	$result;
 }
 
+
 sub _add($$$)
 {	my ($self, $docs, $attrs, $params) = @_;
 	$attrs   ||= {};
 	$params  ||= [];
 
 	my $sv = $self->serverVersion;
-	$sv ge '3.1' or error __x"Solr version too old for updates in JSON syntax";
+	$sv ge '3.1' or error __x"Solr version too old for updates in JSON syntax.";
 
 	# We cannot create HASHes with twice the same key in Perl, so cannot
 	# produce the syntax for adding multiple documents.  Try to save it.
@@ -89,7 +94,7 @@ sub _add($$$)
 	}
 	elsif(keys %$attrs)
 	{	# in combination with attributes only
-		error __x"Unable to add more than one doc with JSON interface";
+		error __x"unable to add more than one doc with JSON interface.";
 	}
 	else
 	{	$add = [ map $self->_doc2json($_), @$docs ];
@@ -111,12 +116,12 @@ sub _doc2json($)
 			undef $boost
 				if $boost > 0.9999 && $boost < 1.0001;
 
-			push @f
-			  , ! defined $boost && $update eq 'value'
-			  ? $field->{content}
-			  : defined $boost
-			  ? +{ boost => $boost, $update => $field->{content} }
-			  : +{ $update => $field->{content} };
+			push @f,
+				! defined $boost && $update eq 'value'
+			? $field->{content}
+			: defined $boost
+			? +{ boost => $boost, $update => $field->{content} }
+			: +{ $update => $field->{content} };
 		}
 		# we have to combine multi-fields into ARRAYS
 		$doc{$fieldname} = @f > 1 ? \@f : $f[0];
@@ -128,7 +133,7 @@ sub _doc2json($)
 sub _commit($)   { my ($s, $attr) = @_; $s->simpleUpdate(commit   => $attr) }
 sub _optimize($) { my ($s, $attr) = @_; $s->simpleUpdate(optimize => $attr) }
 sub _delete($$)  { my $self = shift; $self->simpleUpdate(delete   => @_) }
-sub _rollback()  { shift->simpleUpdate('rollback') }
+sub _rollback()  { $_[0]->simpleUpdate('rollback') }
 
 sub _terms($)
 {	my ($self, $terms) = @_;
@@ -142,7 +147,7 @@ sub _terms($)
 	while(my ($field, $terms) = each %$table)
 	{	# repack array-of-pairs into array-of-arrays-of-pair
 		my @pairs = @$terms;
-		my @terms; 
+		my @terms;
 		push @terms, [shift @pairs, shift @pairs] while @pairs;
 		$result->terms($field => \@terms);
 	}
@@ -150,7 +155,7 @@ sub _terms($)
 	$result;
 }
 
-#--------------------------
+#--------------------
 
 sub request($$;$$)
 {	my ($self, $url, $result, $body, $body_ct) = @_;
@@ -168,13 +173,14 @@ sub request($$;$$)
 	$self->SUPER::request($url, $result, $body, $body_ct);
 }
 
+
 sub decodeResponse($)
 {	my ($self, $resp) = @_;
 
 	# At least until Solr 4.0 response ct=text/plain while producing JSON
 	my $ct = $resp->content_type;
 	$ct =~ m/json/i
-		or error __x"Answer from solr server is not json but {type}", type => $ct;
+		or error __x"answer from solr server is not json but {type}.", type => $ct;
 
 	$self->json->decode($resp->decoded_content || $resp->content);
 }
@@ -183,7 +189,7 @@ sub decodeResponse($)
 sub simpleUpdate($$;$)
 {	my ($self, $command, $attrs, $content) = @_;
 	my $sv       = $self->serverVersion;
-	$sv ge '3.1' or error __x"Solr version too old for updates in JSON syntax";
+	$sv ge '3.1' or error __x"Solr version too old for updates in JSON syntax.";
 
 	$attrs     ||= {};
 	my $params   = [ commit => delete $attrs->{commit} ];

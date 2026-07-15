@@ -1,0 +1,512 @@
+# Syntax file for lua
+# Converted from: lua.vim
+# Conversion date: 2026-07-13
+
+language: lua
+extensions: lua
+
+[keyword:Constant]
+false nil true
+
+[keyword:Function]
+__add __band __bnot __bor __bxor __call __close __concat __div __eq __gc
+__idiv __index __le __len __lt __metatable __mod __mode __mul __name
+__newindex __pairs __pow __shl __shr __sub __tostring __unm
+
+[keyword:Identifier]
+LUA_PATH PI _ALERT _ENV _ERRORMESSAGE _G _INPUT _LOADED _OUTPUT _REQUIREDNAME
+_STDERR _STDIN _STDOUT _VERSION abs acos appendto ascii asin assert atan atan2
+call ceil clock closefile collectgarbage copytagmethods cos date deg dofile
+dostring error execute exit exp floor flush foreach foreachi format frexp
+gcinfo getenv getfenv getglobal getinfo getlocal getmetatable getn
+gettagmethod globals gsub ipairs ldexp load loadfile loadlib loadstring log
+log10 max min mod module newtag next openfile pairs pcall print rad random
+randomseed rawequal rawget rawlen rawset read readfrom remove rename require
+seek select self setcallhook setfenv setglobal setlinehook setlocal setlocale
+setmetatable settag settagmethod sin sort sqrt strbyte strchar strfind strlen
+strlower strrep strsub strupper tag tan tinsert tmpname tonumber tostring
+tremove type unpack warn write writeto xpcall
+
+[keyword:Operator]
+and not or
+
+[keyword:Repeat]
+in
+
+[keyword:Statement]
+break goto local return
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[match:Error]
+pattern: }
+
+[match:Label]
+pattern: ::[a-zA-Z_][a-zA-Z0-9_]*::
+
+[match:Operator]
+pattern: [#<>=~^&|*/%+-]|\.{2,3}
+
+[match:Operator]
+pattern: [#<>=~^*/%+-]|\.{2,3}
+
+[match:Operator]
+pattern: [<>=~^*/+-]|\.{2,3}
+
+[match:Comment]
+pattern: \%^#!.*
+
+[match:Number]
+pattern: \b\d+\b
+
+[match:Number]
+pattern: \b\d+[eE][-+]?\d+\b
+
+[match:Number]
+pattern: \b0[xX][0-9a-fA-F]+\b
+
+[match:Identifier]
+pattern: \bpackage\.cpath\b
+
+[match:Identifier]
+pattern: \bpackage\.loaded\b
+
+[match:Identifier]
+pattern: \bpackage\.loadlib\b
+
+[match:Identifier]
+pattern: \bpackage\.path\b
+
+[match:Identifier]
+pattern: \bpackage\.preload\b
+
+[match:Identifier]
+pattern: \bpackage\.loaders\b
+
+[match:Identifier]
+pattern: \bpackage\.seeall\b
+
+[match:Identifier]
+pattern: \bpackage\.config\b
+
+[match:Identifier]
+pattern: \bpackage\.preload\b
+
+[match:Identifier]
+pattern: \bpackage\.searchers\b
+
+[match:Identifier]
+pattern: \bpackage\.searchpath\b
+
+[match:Identifier]
+pattern: \bcoroutine\.isyieldable\b
+
+[match:Identifier]
+pattern: \bcoroutine\.close\b
+
+[match:Identifier]
+pattern: \bcoroutine\.running\b
+
+[match:Identifier]
+pattern: \bcoroutine\.create\b
+
+[match:Identifier]
+pattern: \bcoroutine\.resume\b
+
+[match:Identifier]
+pattern: \bcoroutine\.status\b
+
+[match:Identifier]
+pattern: \bcoroutine\.wrap\b
+
+[match:Identifier]
+pattern: \bcoroutine\.yield\b
+
+[match:Identifier]
+pattern: \bstring\.byte\b
+
+[match:Identifier]
+pattern: \bstring\.char\b
+
+[match:Identifier]
+pattern: \bstring\.dump\b
+
+[match:Identifier]
+pattern: \bstring\.find\b
+
+[match:Identifier]
+pattern: \bstring\.format\b
+
+[match:Identifier]
+pattern: \bstring\.gsub\b
+
+[match:Identifier]
+pattern: \bstring\.len\b
+
+[match:Identifier]
+pattern: \bstring\.lower\b
+
+[match:Identifier]
+pattern: \bstring\.rep\b
+
+[match:Identifier]
+pattern: \bstring\.sub\b
+
+[match:Identifier]
+pattern: \bstring\.upper\b
+
+[match:Identifier]
+pattern: \bstring\.gfind\b
+
+[match:Identifier]
+pattern: \bstring\.gmatch\b
+
+[match:Identifier]
+pattern: \bstring\.match\b
+
+[match:Identifier]
+pattern: \bstring\.reverse\b
+
+[match:Identifier]
+pattern: \bstring\.pack\b
+
+[match:Identifier]
+pattern: \bstring\.packsize\b
+
+[match:Identifier]
+pattern: \bstring\.unpack\b
+
+[match:Identifier]
+pattern: \butf8\.char\b
+
+[match:Identifier]
+pattern: \butf8\.charpattern\b
+
+[match:Identifier]
+pattern: \butf8\.codes\b
+
+[match:Identifier]
+pattern: \butf8\.codepoint\b
+
+[match:Identifier]
+pattern: \butf8\.len\b
+
+[match:Identifier]
+pattern: \butf8\.offset\b
+
+[match:Identifier]
+pattern: \btable\.getn\b
+
+[match:Identifier]
+pattern: \btable\.setn\b
+
+[match:Identifier]
+pattern: \btable\.foreach\b
+
+[match:Identifier]
+pattern: \btable\.foreachi\b
+
+[match:Identifier]
+pattern: \btable\.maxn\b
+
+[match:Identifier]
+pattern: \btable\.pack\b
+
+[match:Identifier]
+pattern: \btable\.unpack\b
+
+[match:Identifier]
+pattern: \btable\.move\b
+
+[match:Identifier]
+pattern: \btable\.concat\b
+
+[match:Identifier]
+pattern: \btable\.insert\b
+
+[match:Identifier]
+pattern: \btable\.sort\b
+
+[match:Identifier]
+pattern: \btable\.remove\b
+
+[match:Identifier]
+pattern: \bbit32\.arshift\b
+
+[match:Identifier]
+pattern: \bbit32\.band\b
+
+[match:Identifier]
+pattern: \bbit32\.bnot\b
+
+[match:Identifier]
+pattern: \bbit32\.bor\b
+
+[match:Identifier]
+pattern: \bbit32\.btest\b
+
+[match:Identifier]
+pattern: \bbit32\.bxor\b
+
+[match:Identifier]
+pattern: \bbit32\.extract\b
+
+[match:Identifier]
+pattern: \bbit32\.lrotate\b
+
+[match:Identifier]
+pattern: \bbit32\.lshift\b
+
+[match:Identifier]
+pattern: \bbit32\.replace\b
+
+[match:Identifier]
+pattern: \bbit32\.rrotate\b
+
+[match:Identifier]
+pattern: \bbit32\.rshift\b
+
+[match:Identifier]
+pattern: \bmath\.abs\b
+
+[match:Identifier]
+pattern: \bmath\.acos\b
+
+[match:Identifier]
+pattern: \bmath\.asin\b
+
+[match:Identifier]
+pattern: \bmath\.atan\b
+
+[match:Identifier]
+pattern: \bmath\.atan2\b
+
+[match:Identifier]
+pattern: \bmath\.ceil\b
+
+[match:Identifier]
+pattern: \bmath\.sin\b
+
+[match:Identifier]
+pattern: \bmath\.cos\b
+
+[match:Identifier]
+pattern: \bmath\.tan\b
+
+[match:Identifier]
+pattern: \bmath\.deg\b
+
+[match:Identifier]
+pattern: \bmath\.exp\b
+
+[match:Identifier]
+pattern: \bmath\.floor\b
+
+[match:Identifier]
+pattern: \bmath\.log\b
+
+[match:Identifier]
+pattern: \bmath\.max\b
+
+[match:Identifier]
+pattern: \bmath\.min\b
+
+[match:Identifier]
+pattern: \bmath\.mod\b
+
+[match:Identifier]
+pattern: \bmath\.log10\b
+
+[match:Identifier]
+pattern: \bmath\.log10\b
+
+[match:Identifier]
+pattern: \bmath\.huge\b
+
+[match:Identifier]
+pattern: \bmath\.fmod\b
+
+[match:Identifier]
+pattern: \bmath\.modf\b
+
+[match:Identifier]
+pattern: \bmath\.cosh\b
+
+[match:Identifier]
+pattern: \bmath\.sinh\b
+
+[match:Identifier]
+pattern: \bmath\.tanh\b
+
+[match:Identifier]
+pattern: \bmath\.rad\b
+
+[match:Identifier]
+pattern: \bmath\.sqrt\b
+
+[match:Identifier]
+pattern: \bmath\.pow\b
+
+[match:Identifier]
+pattern: \bmath\.frexp\b
+
+[match:Identifier]
+pattern: \bmath\.ldexp\b
+
+[match:Identifier]
+pattern: \bmath\.maxinteger\b
+
+[match:Identifier]
+pattern: \bmath\.mininteger\b
+
+[match:Identifier]
+pattern: \bmath\.tointeger\b
+
+[match:Identifier]
+pattern: \bmath\.type\b
+
+[match:Identifier]
+pattern: \bmath\.ult\b
+
+[match:Identifier]
+pattern: \bmath\.random\b
+
+[match:Identifier]
+pattern: \bmath\.randomseed\b
+
+[match:Identifier]
+pattern: \bmath\.pi\b
+
+[match:Identifier]
+pattern: \bio\.close\b
+
+[match:Identifier]
+pattern: \bio\.flush\b
+
+[match:Identifier]
+pattern: \bio\.input\b
+
+[match:Identifier]
+pattern: \bio\.lines\b
+
+[match:Identifier]
+pattern: \bio\.open\b
+
+[match:Identifier]
+pattern: \bio\.output\b
+
+[match:Identifier]
+pattern: \bio\.popen\b
+
+[match:Identifier]
+pattern: \bio\.read\b
+
+[match:Identifier]
+pattern: \bio\.stderr\b
+
+[match:Identifier]
+pattern: \bio\.stdin\b
+
+[match:Identifier]
+pattern: \bio\.stdout\b
+
+[match:Identifier]
+pattern: \bio\.tmpfile\b
+
+[match:Identifier]
+pattern: \bio\.type\b
+
+[match:Identifier]
+pattern: \bio\.write\b
+
+[match:Identifier]
+pattern: \bos\.clock\b
+
+[match:Identifier]
+pattern: \bos\.date\b
+
+[match:Identifier]
+pattern: \bos\.difftime\b
+
+[match:Identifier]
+pattern: \bos\.execute\b
+
+[match:Identifier]
+pattern: \bos\.exit\b
+
+[match:Identifier]
+pattern: \bos\.getenv\b
+
+[match:Identifier]
+pattern: \bos\.remove\b
+
+[match:Identifier]
+pattern: \bos\.rename\b
+
+[match:Identifier]
+pattern: \bos\.setlocale\b
+
+[match:Identifier]
+pattern: \bos\.time\b
+
+[match:Identifier]
+pattern: \bos\.tmpname\b
+
+[match:Identifier]
+pattern: \bdebug\.debug\b
+
+[match:Identifier]
+pattern: \bdebug\.gethook\b
+
+[match:Identifier]
+pattern: \bdebug\.getinfo\b
+
+[match:Identifier]
+pattern: \bdebug\.getlocal\b
+
+[match:Identifier]
+pattern: \bdebug\.getupvalue\b
+
+[match:Identifier]
+pattern: \bdebug\.setlocal\b
+
+[match:Identifier]
+pattern: \bdebug\.setupvalue\b
+
+[match:Identifier]
+pattern: \bdebug\.sethook\b
+
+[match:Identifier]
+pattern: \bdebug\.traceback\b
+
+[match:Identifier]
+pattern: \bdebug\.getfenv\b
+
+[match:Identifier]
+pattern: \bdebug\.setfenv\b
+
+[match:Identifier]
+pattern: \bdebug\.getmetatable\b
+
+[match:Identifier]
+pattern: \bdebug\.setmetatable\b
+
+[match:Identifier]
+pattern: \bdebug\.getregistry\b
+
+[match:Identifier]
+pattern: \bdebug\.getuservalue\b
+
+[match:Identifier]
+pattern: \bdebug\.setuservalue\b
+
+[match:Identifier]
+pattern: \bdebug\.upvalueid\b
+
+[match:Identifier]
+pattern: \bdebug\.upvaluejoin\b
+
+[match:Identifier]
+pattern: \bdebug.setcstacklimit\b
+

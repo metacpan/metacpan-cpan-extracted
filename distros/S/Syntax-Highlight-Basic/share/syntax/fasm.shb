@@ -1,0 +1,49 @@
+# Syntax file for fasm
+# Converted from: fasm.vim
+# Conversion date: 2026-07-13
+
+language: fasm
+extensions: fasm
+case: ignore
+
+[keyword:Operator]
+as at defined eq eqtype from mod on ptr rva used
+
+[match:Operator]
+pattern: [+-/*]
+
+[match:Operator]
+pattern: [=|&~<>]|<=|>=|<>
+
+[match:Number]
+pattern: \b[01]+b\b
+
+[match:Number]
+pattern: \b\d[0-9a-fA-F]*h\b
+
+[match:Number]
+pattern: \b(?:0x|$)[0-9a-fA-F]*\b
+
+[match:Number]
+pattern: \b\d+(?:\.\d*)?(?:e[-+]?\d*)?\b
+
+[match:Number]
+pattern: \b(?:0[0-7]+o?|[0-7]+o)\b
+
+[match:Number]
+pattern: \b(?:0|[1-9]\d*)\b
+
+[match:Special]
+pattern: [#?%$,]
+
+[match:Label]
+pattern: ^\s*[^; \t]+:
+
+[region:Comment]
+start: ;
+end: $
+
+[region:String]
+start: "
+end: "\|$
+

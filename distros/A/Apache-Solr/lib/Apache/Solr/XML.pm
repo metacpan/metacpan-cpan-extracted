@@ -1,13 +1,16 @@
-# Copyrights 2012-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Apache-Solr.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Apache-Solr version 1.12.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Apache::Solr::XML;{
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 }
 
 use base 'Apache::Solr';
@@ -15,13 +18,13 @@ use base 'Apache::Solr';
 use warnings;
 use strict;
 
-use Log::Report          qw(solr);
+use Log::Report          qw/solr/;
 
 use Apache::Solr::Result ();
 use XML::LibXML::Simple  ();
 use HTTP::Message        ();
 use HTTP::Request        ();
-use Scalar::Util         qw(blessed);
+use Scalar::Util         qw/blessed/;
 
 use Data::Dumper;
 $Data::Dumper::Indent    = 1;
@@ -34,6 +37,7 @@ my @xml_decode_config = (
 	KeyAttr      => [],
 );
 
+#--------------------
 
 sub init($)
 {	my ($self, $args) = @_;
@@ -45,10 +49,11 @@ sub init($)
 	$self;
 }
 
-#---------------
-sub xmlsimple() {shift->{ASX_simple}}
+#--------------------
 
-#--------------------------
+sub xmlsimple() { $_[0]->{ASX_simple} }
+
+#--------------------
 
 sub _select($$)
 {	my ($self, $args, $params) = @_;
@@ -113,7 +118,7 @@ sub _doc2xml($$$)
 sub _commit($)   { my ($s, $attr) = @_; $s->simpleUpdate(commit   => $attr) }
 sub _optimize($) { my ($s, $attr) = @_; $s->simpleUpdate(optimize => $attr) }
 sub _delete($$)  { my $self = shift; $self->simpleUpdate(delete   => @_) }
-sub _rollback()  { shift->simpleUpdate('rollback') }
+sub _rollback()  { $_[0]->simpleUpdate('rollback') }
 
 sub _terms($)
 {	my ($self, $terms) = @_;
@@ -132,7 +137,7 @@ sub _terms($)
 	$result;
 }
 
-#--------------------------
+#--------------------
 
 sub request($$;$$)
 {	my ($self, $url, $result, $body, $body_ct) = @_;
@@ -164,7 +169,7 @@ sub _cleanup_parsed($)
 {	my $data = shift;
 
 	if(!ref $data) { return $data }
-	elsif(ref $data eq 'HASH')   
+	elsif(ref $data eq 'HASH')
 	{	my %d = %$data;   # start with shallow copy
 
 		# Hash
@@ -259,7 +264,7 @@ sub endpoint($@)
 	if(ref $params eq 'HASH') { $params->{wt} ||= 'xml' }
 	else { $args{params} = [ wt => 'xml', @$params ] }
 
-    $self->SUPER::endpoint($action => %args);
+	$self->SUPER::endpoint($action => %args);
 }
 
 1;

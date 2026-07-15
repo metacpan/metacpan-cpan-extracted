@@ -59,16 +59,18 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Dist::Zilla::App::Tester" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Path::Tiny" : "0",
+            "Storable" : "0",
             "Test2::Tools::Compare" : "0",
             "Test2::Tools::Explain" : "0",
             "Test2::Tools::JSON" : "0",
-            "Test2::V0" : "0",
+            "Test2::V1" : "0",
             "Test::DZil" : "0",
             "Test::More" : "0",
             "lib" : "0",
@@ -81,31 +83,31 @@
    "provides" : {
       "Dist::Zilla::App::Command::codeberg" : {
          "file" : "lib/Dist/Zilla/App/Command/codeberg.pm",
-         "version" : "2.0101"
+         "version" : "2.0102"
       },
       "Dist::Zilla::Plugin::Codeberg" : {
          "file" : "lib/Dist/Zilla/Plugin/Codeberg.pm",
-         "version" : "2.0101"
+         "version" : "2.0102"
       },
       "Dist::Zilla::Plugin::Codeberg::Create" : {
          "file" : "lib/Dist/Zilla/Plugin/Codeberg/Create.pm",
-         "version" : "2.0101"
+         "version" : "2.0102"
       },
       "Dist::Zilla::Plugin::Codeberg::Meta" : {
          "file" : "lib/Dist/Zilla/Plugin/Codeberg/Meta.pm",
-         "version" : "2.0101"
+         "version" : "2.0102"
       },
       "Dist::Zilla::Plugin::Codeberg::Update" : {
          "file" : "lib/Dist/Zilla/Plugin/Codeberg/Update.pm",
-         "version" : "2.0101"
+         "version" : "2.0102"
       },
       "Dist::Zilla::PluginBundle::Codeberg" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Codeberg.pm",
-         "version" : "2.0101"
+         "version" : "2.0102"
       }
    },
    "release_status" : "stable",
-   "version" : "2.0101",
+   "version" : "2.0102",
    "x_author_pledge" : {
       "version" : 1
    },

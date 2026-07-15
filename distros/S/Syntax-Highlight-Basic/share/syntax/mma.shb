@@ -1,0 +1,50 @@
+# Syntax file for mma
+# Converted from: mma.vim
+# Conversion date: 2026-07-13
+
+language: mma
+extensions: mma
+
+[keyword:Error]
+BROKEN FIXTHIS FIX[ME]
+
+[keyword:Identifier]
+Above After All Automatic Before Below Black Blue Booleans Brown ButtonCell
+Byte C Catalan Cell CellContents CellGroup CellLabel CellStyle CellTags
+Character ComplexInfinity Complexes Constant Cyan Degree E EndOfFile
+EulerGamma EvaluationCell Expression False Flat General GeneratedCell Glaisher
+GoldenRatio Gray Green HoldAll HoldAllComplete HoldFirst HoldRest I
+Indeterminate Infinity Integer Integers Khinchin Left Listable Locked Magenta
+NHoldAll NHoldFirst NHoldRest Next None Notebook Null Number NumericFunction
+OneIdentity Orange Orderless Pi Pink Previous Protected Purple Rationals
+ReadProtected Real Reals Red Right SequenceHold String Stub Symbol Temporary
+TextLine True White Word Yellow
+
+[keyword:Todo]
+HEY NOTE TODO
+
+[keyword:Type]
+DigitCharacter EndOfLine EndOfString LetterCharacter StartOfLine StartOfString
+WhitespaceCharacter WordBoundary WordCharacter
+
+[match:Todo]
+pattern: X{3,}
+
+[match:Comment]
+pattern: (\*\*+)
+
+[match:Identifier]
+pattern: \$[a-zA-Z]+[0-9a-zA-Z$]*
+
+[match:Operator]
+pattern: [*+=^.:?-]
+
+[match:Special]
+pattern: ::[a-zA-Z]+
+
+[match:Operator]
+pattern: &
+
+[match:String]
+pattern: \\\[\w+\d*\]
+

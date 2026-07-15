@@ -7,7 +7,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 #$VERSION = eval $VERSION;
 Math::Float128::Constant->DynaLoader::bootstrap($VERSION);
 

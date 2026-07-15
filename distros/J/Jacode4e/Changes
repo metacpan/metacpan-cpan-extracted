@@ -1,5 +1,159 @@
 Revision history for this software.
 
+2.13.6.23 2026-07-14 00:00:00
+  - add 'sjis' encoding, JISC Shift_JIS (JIS X 0201 and JIS X 0208 only,
+    CP932 extended characters are not converted, use 'cp932' for them)
+    with the eras 'sjis1978' (JIS C 6226-1978), 'sjis1983' (JIS X
+    0208-1983), 'sjis1990' (JIS X 0208-1990), 'sjis2000' (JIS X
+    0213:2000), and 'sjis2004' (JIS X 0213:2004). The year-less 'sjis'
+    is the 1990 era. The eras differ by the JIS C 6226-1978 versus JIS
+    X 0208-1983 exchanged/relocated codes, the two kanji appended by
+    JIS X 0208-1990 (U+51DC, U+7199), and the ten kanji appended by JIS
+    X 0213:2004.
+  - add 'euc' encoding, JISC EUC-JP (code set 0, 1, 2, and 3), with the
+    eras 'euc1978', 'euc1983', 'euc1990', 'euc2000', and 'euc2004' (the
+    year-less 'euc' is the 1990 era). 'euc' of each era is derived by
+    encoding conversion from the 'sjis' column of the same era via
+    men-ku-ten, so no new mapping data is added for code set 0, 1,
+    and 2
+  - support EUC-JP code set 3 (SS3 0x8F + JIS X 0212) input/output on
+    'euc1990' (and so the year-less 'euc') for every character that
+    has a row in the Jacode4e table through some OTHER encoding
+    (CP932X, CP932, CP932IBM, CP932NEC, CP00930, KEIS78/83/90, JEF,
+    JIPS(J)/(E), or LetsJ). A character whose ONLY repertoire
+    membership is JIS X 0212 (about half of the JIS X 0212 repertoire;
+    3108 of 6067 code points in the source table) has no row and
+    becomes GETA, because giving it one would require allocating a new
+    UTF-8-SPUA-JP code point and is out of scope for this release;
+    JIS X 0208 always wins over JIS X 0212 for a character that is in
+    both (matches how 'sjis'/'euc'/'jis' behave for era differences).
+    eras other than 1990 (1978, 1983, 2000, 2004) have no code set 3,
+    since JIS X 0212 was specifically a 1990-era JIS supplement
+  - the JIS X 0212 mapping is embedded as the "__EUC_X0212__" block
+    appended after the main table in lib/Jacode4e.pm's __DATA__
+    section (JIS X 0212 GL octets + Unicode code point per line,
+    derived from the JIS X 0212 (1990) to Unicode 1.1 Table already
+    bundled at make__DATA__/LetsJ/...JIS0212.TXT); regenerate it with
+    make__DATA__/JIS/fill_euc_codeset3.pl
+  - add 'jis' encoding, JISC ISO-2022-JP (7bit JIS), with the eras
+    'jis1978', 'jis1983', 'jis1990', 'jis2000', and 'jis2004' (the
+    year-less 'jis' is the 1990 era). 'jis' of each era shares the
+    'euc' table of the same era, so JIS X 0212 (ESC $ ( D) is
+    available on 'jis1990' for the same character set as EUC-JP code
+    set 3 of 'euc1990' (input is always accepted; output needs the
+    JIS_X0212 option, see below)
+    input escape sequences: ESC ( B, ESC ( J, ESC ( H, ESC ( I,
+    ESC $ @, ESC $ B, ESC $ ( @, ESC $ ( B, ESC $ ( D, and
+    ESC & @ ESC $ B
+    8bit JIS Katakana (GR octets 0xA1..0xDF) is also accepted on input
+    SO (0x0E) and SI (0x0F) are input shift functions to JIS X 0201
+    Katakana (JIS7 katakana habit) with option JIS_SOSI => 1, and are
+    data octets by default; SI restores the GL designation before SO
+    output uses ESC ( B and ESC $ B with option OUTPUT_SHIFTING => 1;
+    the DBCS designation on output is ESC $ @ for 'jis1978', ESC $ B
+    for 'jis1983'/'jis1990', ESC $ ( O for 'jis2000', and ESC $ ( Q
+    for 'jis2004'
+  - add option JIS_X0212 => 1: a character that has no JIS X 0208 code
+    but has a JIS X 0212 code is written as ESC $ ( D and JIS X 0212
+    codes on 'jis' output (ISO-2022-JP-1); requires OUTPUT_SHIFTING
+    => 1 because escape sequences must be allowed in the output;
+    default is false, effective only when $OUTPUT_encoding is 'jis'
+  - add option JIS_KANA => 'GR' (default) / 'I' / 'SO': JIS X 0201
+    Katakana style on 'jis' output (GR octets, ESC ( I and GL octets,
+    or SO + GL octets + SI)
+  - add option JIS_DBCS => 'B' (default) / '@' / '&@B' / '(B' / '(@':
+    DBCS escape sequence on 'jis' output
+  - add option JIS_SBCS => 'B' (default) / 'J' / 'H': SBCS escape
+    sequence on 'jis' output
+  - add five columns "sjis1978", "sjis1983", "sjis1990", "sjis2000",
+    and "sjis2004" to the conversion table in __DATA__ (row count is
+    unchanged, all previously existing columns are unchanged), and
+    make__DATA__/make__DATA__.pl generates them (the "euc" and "jis"
+    columns are not stored in __DATA__; they are derived at load time
+    from the "sjis" column of each era and the "__EUC_X0212__" block,
+    see above)
+  - add 'reset' hook to Jacode4e::convert() to initialize the kana
+    shifting state of 'jis' encoding on every call
+  - add doc/jacode4e_cheatsheet.*.txt (21 languages, same language set
+    as the Jacode distribution: BM BN EN FR HI ID JA KM KO MN MY NE SI
+    TH TL TR TW UR UZ VI ZH)
+  - add t/0306_sjis_basic.t
+  - add t/0307_euc_basic.t
+  - add t/0308_jis_basic.t
+  - add t/0309_sjis_euc_jis_roundtrip.t (whole code space roundtrip)
+  - add t/0310_sjis_vs_cp932.t ('sjis' is JIS X 0201/0208 subset of 'cp932')
+  - add t/0312_euc_codeset3.t (EUC-JP code set 3 / JIS X 0212
+    input/output and its coverage limits)
+  - add t/0313_jis_variants_input.t
+  - add t/0314_jis_variants_output.t
+  - add t/0315_jis_x0212_output.t (JIS X 0212 output on 'jis' with the
+    JIS_X0212 option)
+  - add t/0318_sjis_euc_jis_era.t (era of 'sjis', 'euc', and 'jis')
+  - add t/0319_euc_x0212_fill.t (repertoire coverage count, EUC code
+    set 3 target uniqueness, JIS X 0208-over-JIS X 0212 precedence,
+    and era isolation)
+  - add t/9080_cheatsheets.t
+  - add "sjis", "euc", and "jis" to encoding list of cheatsheet tests
+    t/9001..t/9030
+  - add the era encodings ('sjis1978'.. 'sjis2004', 'euc1978'..
+    'euc2004', 'jis1978'.. 'jis2004') to --dumptable
+  - package lib/Jacode4e.pm-2.13.6.23.TABLE.*.txt (generated by
+    --dumptable; the EUC/JIS/SJIS dumps are one file per era,
+    ...TABLE.EUC1978.txt .. ...TABLE.EUC2004.txt, etc.)
+  - fix Jacode4e::convert() return value: a trailing shifting code (such
+    as the last ESC ( B / ESC $ B of 'jis', SI/SO of 'cp00930' and 'keis*',
+    etc.) was counted as one character; input consisting of shifting
+    code(s) only now returns 0 (the closing shifting code for
+    OUTPUT_SHIFTING is still emitted as before)
+  - add t/0311_trailing_shift_count.t
+  - integrate Jacode4e::RoundTrip into Jacode4e: add option
+    ROUND_TRIP => 1 for round-trip (reversible) conversion. A character
+    that has no native code in an encoding is allocated a code point from
+    the user-defined (GAIJI) area of the encoding (cp932x, cp00930,
+    keis78, keis83, keis90, jef, jef9p, jipsj, jipse, letsj, utf8, utf8.1,
+    utf8jp). The default (no ROUND_TRIP option) keeps the ordinary
+    Jacode4e behavior unchanged (a character with no native code becomes
+    GETA). The ROUND_TRIP table is built lazily on the first ROUND_TRIP
+    call (all data lines are kept in memory for this), so there is no
+    extra cost when the option is not used.
+    CAUTION: both "A to B" and "B to A" must specify ROUND_TRIP => 1 and
+    use the same version of Jacode4e (the allocation order of the
+    user-defined area depends on the data table of the version).
+  - add --dumptable-roundtrip to dump the ROUND_TRIP table into
+    "*.ROUNDTRIP.*.txt" files, separately from --dumptable
+  - add t/0316_round_trip.t
+  - add 'euc2004' encoding, JISC EUC-JIS-2004 (JIS X 0201, and
+    JIS X 0213 plane 1 as two GR octets, plane 2 as SS3 0x8F + two
+    GR octets). It is derived from the 'sjis2004' column via men-ku-ten
+    (plane-row-cell), so no new mapping data is added.
+  - add 'jis2004' encoding, JISC ISO-2022-JP-2004.
+    input escape sequences: ESC ( B, ESC ( J, ESC ( I, ESC $ B,
+    ESC $ @, ESC $ ( Q (JIS X 0213:2004 plane 1), ESC $ ( O
+    (JIS X 0213:2000 plane 1), and ESC $ ( P (plane 2).
+    output uses ESC $ ( Q for plane 1 (default), ESC $ ( P for plane 2,
+    and ESC ( B for US-ASCII, with option OUTPUT_SHIFTING => 1.
+  - add option JIS2004_PLANE1 => 'Q' (default, JIS X 0213:2004) or 'O'
+    (JIS X 0213:2000): plane 1 designation escape sequence on 'jis2004'
+    output
+  - add 'euc2004' to --dumptable (the euc2004 table dumps plane 1 rows
+    and plane 2 rows in EUC-JIS-2004 code set 3 form, three-octet row
+    labels such as "EUC2004 8FA1A0")
+  - add t/0317_euc2004_jis2004.t
+  - restore the full-width "|" guide notation in the __DATA__ header
+    (one "|" per code digit of each already-defined column, matching
+    the "#1234567 1234 ..." ruler line); the guide lines are comments
+    (skipped by the "next if /^#/" parser), so this is cosmetic only
+  - regenerate doc/jacode4e_cheatsheet.*.txt (all 21 languages) with:
+    the year editions of 'sjis'/'euc'/'jis' (1978/1983/1990/2000/2004,
+    the year-less name is the 1990 edition), a beginner-friendly section
+    on the differences between the JIS editions by year, all twelve
+    { %option } keys each with a description and a call example (the
+    ROUND_TRIP option is documented in the same style as the others,
+    not as a separate caution), and runnable programming samples
+  - add doc/build_cheatsheets.pl to generate the 21 cheat sheets from
+    one shared template (Perl 5.005_03 compatible)
+  - created by INABA Hitoshi
+
 2.13.6.22 2026-04-18 00:00:00
   - add t/9001_cheatsheet_ja.t (Japanese cheatsheet + tests)
   - add t/9002_cheatsheet_en.t (English cheatsheet + tests)
@@ -19,6 +173,7 @@ Revision history for this software.
   - add t/9016_cheatsheet_id.t (Indonesian cheatsheet + tests)
   - add t/9017_cheatsheet_nl.t (Dutch cheatsheet + tests)
   - add t/9018_cheatsheet_pl.t (Polish cheatsheet + tests)
+  - add t/9019_cheatsheet_sv.t (Swedish cheatsheet + tests)
   - add t/9020_cheatsheet_tr.t (Turkish cheatsheet + tests)
   - add t/9021_cheatsheet_bm.t (Malay cheatsheet + tests)
   - add t/9022_cheatsheet_bn.t (Bengali cheatsheet + tests)

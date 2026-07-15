@@ -1,0 +1,1 @@
+<article><%= $self->contact->{name} %>; root=<%= $self->root->title %>; parent=<%= $self->parent->title %></article>

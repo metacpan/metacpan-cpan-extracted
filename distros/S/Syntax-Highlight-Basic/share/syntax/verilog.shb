@@ -1,0 +1,116 @@
+# Syntax file for verilog
+# Converted from: verilog.vim
+# Conversion date: 2026-07-13
+
+language: verilog
+extensions: verilog
+
+[keyword:Conditional]
+case casex casez default else endcase if
+
+[keyword:Label]
+begin end fork join
+
+[keyword:Repeat]
+for forever repeat while
+
+[keyword:Statement]
+always and assign automatic buf bufif0 bufif1 cell cmos config deassign
+defparam design disable edge endconfig endfunction endgenerate endmodule
+endprimitive endspecify endtable endtask event force function generate genvar
+highz0 highz1 ifnone incdir include initial inout input instance integer large
+liblist library localparam macromodule medium module nand negedge nmos nor
+noshowcancelled not notif0 notif1 or output parameter pmos posedge primitive
+pull0 pull1 pulldown pullup pulsestyle_ondetect pulsestyle_onevent rcmos real
+realtime reg release rnmos rpmos rtran rtranif0 rtranif1 scalared
+showcancelled signed small specify specparam strong0 strong1 supply0 supply1
+table task time tran tranif0 tranif1 tri tri0 tri1 triand trior trireg
+unsigned use vectored wait wand weak0 weak1 wire wor xnor xor
+
+[keyword:Todo]
+FIXME TODO
+
+[match:Operator]
+pattern: [&|~><!)(*#%@+/=?:;}{,.\^\-\[\]]
+
+[match:Define]
+pattern: `celldefine
+
+[match:Define]
+pattern: `default_nettype
+
+[match:Define]
+pattern: `define
+
+[match:Define]
+pattern: `else
+
+[match:Define]
+pattern: `elsif
+
+[match:Define]
+pattern: `endcelldefine
+
+[match:Define]
+pattern: `endif
+
+[match:Define]
+pattern: `ifdef
+
+[match:Define]
+pattern: `ifndef
+
+[match:Define]
+pattern: `include
+
+[match:Define]
+pattern: `line
+
+[match:Define]
+pattern: `nounconnected_drive
+
+[match:Define]
+pattern: `resetall
+
+[match:Define]
+pattern: `timescale
+
+[match:Define]
+pattern: `unconnected_drive
+
+[match:Define]
+pattern: `undef
+
+[match:Define]
+pattern: $[a-zA-Z0-9_]+\b
+
+[match:Constant]
+pattern: \b[A-Z][A-Z0-9_]+\b
+
+[match:Number]
+pattern: (?:\b\d+|)'[sS]\?[bB]\s*[0-1_xXzZ?]+\b
+
+[match:Number]
+pattern: (?:\b\d+|)'[sS]\?[oO]\s*[0-7_xXzZ?]+\b
+
+[match:Number]
+pattern: (?:\b\d+|)'[sS]\?[dD]\s*[0-9_xXzZ?]+\b
+
+[match:Number]
+pattern: (?:\b\d+|)'[sS]\?[hH]\s*[0-9a-fA-F_xXzZ?]+\b
+
+[match:Number]
+pattern: \b[+-]?[0-9_]+(?:\.[0-9_]*|)(?:e[0-9_]*|)\b
+
+[match:Special]
+pattern: \\[nt"\\]
+
+[match:Special]
+pattern: \\[0-7][0-7]?[0-7]?
+
+[match:SpecialComment]
+pattern: //\s*synopsys\b.*$
+
+[match:SpecialComment]
+pattern: //\s*\$s\b.*$
+

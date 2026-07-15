@@ -1,0 +1,49 @@
+# Syntax file for dart
+# Converted from: dart.vim
+# Conversion date: 2026-07-13
+
+language: dart
+extensions: dart
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if switch
+
+[keyword:Exception]
+catch finally rethrow throw try
+
+[keyword:Identifier]
+Function abstract covariant deferred dynamic factory operator part static this
+typedef var
+
+[keyword:Keyword]
+assert async await class const export extends external final hide implements
+import interface library mixin null on show super sync yield
+
+[keyword:Label]
+case default
+
+[keyword:Operator]
+is new
+
+[keyword:Repeat]
+do for in while
+
+[keyword:Statement]
+return with
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[keyword:Type]
+String StringBuffer bool double enum int void
+
+[match:Number]
+pattern: -?\b\d+L?\b|0[xX][0-9a-fA-F]+\b
+
+[region:Comment]
+start: /\*
+end: \*/
+

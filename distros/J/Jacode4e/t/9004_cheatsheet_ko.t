@@ -2,7 +2,7 @@
 #
 # 9004_cheatsheet_ko.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e 빠른 참조 (한국어)
 # 이 테스트는 한국어 사용자를 위한 빠른 참조 가이드를 겸합니다.
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 가타카나)
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -69,7 +74,8 @@ use lib "$FindBin::Bin/../lib";
 # 【왕복 변환 주의사항】
 #
 #   손실 변환이 존재합니다 (예: CP932에는 398개의 비왕복 매핑 문자가 있습니다).
-#   왕복 변환이 필요한 경우 Jacode4e::RoundTrip 모듈을 사용하십시오.
+#   왕복 변환이 필요한 경우 'ROUND_TRIP' => 1 옵션을 사용하십시오.
+#   양방향 모두 'ROUND_TRIP' => 1 과 동일한 버전의 Jacode4e 가 필요합니다.
 #
 # ======================================================================
 

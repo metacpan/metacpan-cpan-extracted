@@ -2,7 +2,7 @@
 #
 # JIPSJ_by_Unicode_CultiCoLtd.pl
 #
-# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # JIPS code book, Culti Co.,Ltd.

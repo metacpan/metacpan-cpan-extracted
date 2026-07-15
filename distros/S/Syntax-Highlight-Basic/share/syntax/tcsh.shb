@@ -1,0 +1,46 @@
+# Syntax file for tcsh
+# Converted from: tcsh.vim
+# Conversion date: 2026-07-13
+
+language: tcsh
+extensions: tcsh
+
+[keyword:Function]
+backward-char backward-delete-char backward-delete-word backward-kill-line
+backward-word beginning-of-line capitalize-word change-case
+change-till-end-of-line clear-screen complete-word complete-word-back
+complete-word-fwd complete-word-raw copy-prev-word copy-region-as-kill
+dabbrev-expand delete-char delete-char-or-eof delete-char-or-list
+delete-char-or-list-or-eof delete-word digit digit-argument down-history
+downcase-word e_copy_to_clipboard e_dosify_next e_dosify_prev e_page_down
+e_page_up e_paste_from_clipboard end-of-file end-of-line
+exchange-point-and-mark expand-glob expand-history expand-line
+expand-variables forward-char forward-word gosmacs-transpose-chars
+history-search-backward history-search-forward i-search-back i-search-fwd
+insert-last-word keyboard-quit kill-line kill-region kill-whole-line
+list-choices list-choices-raw list-glob list-or-eof load-average magic-space
+newline newline-and-down-history newline-and-hold normalize-command
+normalize-path overwrite-mode prefix-meta quoted-insert redisplay
+run-fg-editor run-help self-insert-command sequence-lead-in set-mark-command
+spell-line spell-word stuff-char toggle-literal-history transpose-chars
+transpose-gosling tty-dsusp tty-flush-output tty-sigintr tty-sigquit
+tty-sigtsusp tty-start-output tty-stop-output undefined-key universal-argument
+up-history upcase-word vi-add vi-add-at-eol vi-beginning-of-next-word
+vi-char-back vi-char-fwd vi-charto-back vi-charto-fwd vi-chg-case vi-chg-meta
+vi-chg-to-eol vi-cmd-mode vi-cmd-mode-complete vi-delmeta vi-delprev
+vi-endword vi-eword vi-insert vi-insert-at-bol vi-repeat-char-back
+vi-repeat-char-fwd vi-repeat-search-back vi-repeat-search-fwd vi-replace-char
+vi-replace-mode vi-search-back vi-search-fwd vi-substitute-char
+vi-substitute-line vi-undo vi-word-back vi-word-fwd vi-zero which-command yank
+yank-pop
+
+[keyword:Statement]
+alias alloc bg bindkey break breaksw builtins bye case cd chdir complete
+continue default dirs echo echotc else end endif endsw eval exec exit fg
+filetest foreach getspath getxvers glob goto hashstat history hup inlib jobs
+kill limit log login logout ls ls-F migrate newgrp nice nohup notify onintr
+popd printenv pushd rehash repeat rootnode sched set setenv setpath setspath
+settc setty setxvers shift source stop suspend switch telltc termname time
+umask unalias uncomplete unhash universe unlimit unset unsetenv ver wait warp
+watchlog where which while
+

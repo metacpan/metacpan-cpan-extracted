@@ -1,0 +1,29 @@
+---
+abstract: 'another server-side session storage for Mojolicious'
+author:
+  - 'Daniel Brosseau <dab@cpan.org>'
+build_requires:
+  File::Spec: '3.00'
+  File::Temp: '0.01'
+  FindBin: '1.00'
+  Test::More: '1.00'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Sessions-Store
+requires:
+  Bytes::Random::Secure: '0'
+  Mojolicious: '9.46'
+  perl: '5.026'
+resources:
+  homepage: https://github.com/Dabg/Mojolicious-Sessions-Store
+  repository: https://github.com/Dabg/Mojolicious-Sessions-Store.git
+version: '0.01'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

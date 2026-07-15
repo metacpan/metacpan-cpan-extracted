@@ -1,0 +1,2 @@
+% args $contact, $root_title, $parent_title
+<li data-root="<%= $root_title %>" data-parent="<%= $parent_title %>"><strong><%= $contact->{name} %></strong> <%= $contact->{email} %></li>

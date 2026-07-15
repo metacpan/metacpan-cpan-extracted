@@ -1,5 +1,8 @@
 Revision history for WWW-HTMLTagAttributeCounter
 
+1.001001    2026-07-14
+        - Fixed stale Class::Data::Accessor test dep; converted to Dist::Zilla; bug tracker now on GitHub
+
 0.0105  2026-07-13
         - Maintenance update - verified module is still working
 

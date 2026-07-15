@@ -1,0 +1,51 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for C
+language: c
+extensions: c h
+
+[keyword:Conditional]
+if else switch
+
+[keyword:Repeat]
+while for do
+
+[keyword:Statement]
+break continue return goto case default
+
+[keyword:Type]
+int long short char float double void unsigned signed struct union enum typedef
+
+[keyword:StorageClass]
+auto register static extern const volatile
+
+[keyword:Include]
+include
+
+[keyword:Operator]
+sizeof
+
+[match:PreProc]
+pattern: ^#\s*\w+.*
+
+[match:Comment]
+pattern: //.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|0[0-7]*|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?[fFlL]?)\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:Comment]
+start: /*
+end: */

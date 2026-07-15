@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Fondation::User::Schema::ResultSet::User;
 # ABSTRACT: DBIx::Class ResultSet class for users table
-$Mojolicious::Plugin::Fondation::User::Schema::ResultSet::User::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::User::Schema::ResultSet::User::VERSION = '0.02';
 use base 'DBIx::Class::ResultSet';
 
 use strict;
@@ -49,7 +49,7 @@ Mojolicious::Plugin::Fondation::User::Schema::ResultSet::User - DBIx::Class Resu
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

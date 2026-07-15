@@ -20,7 +20,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Util;
-$OpenSearch::Client::Util::VERSION = '3.007008';
+$OpenSearch::Client::Util::VERSION = '3.007009';
 use Moo;
 use OpenSearch::Client::Error();
 use Scalar::Util qw(blessed);
@@ -138,7 +138,7 @@ OpenSearch::Client::Util - A utility class for internal use by OpenSearch::Clien
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 MANUAL
 

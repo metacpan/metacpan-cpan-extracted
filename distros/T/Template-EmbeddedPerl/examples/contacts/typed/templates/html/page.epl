@@ -1,0 +1,7 @@
+% layout 'layouts/application', title => $self->title
+%= content_replace 'head', sub {
+<meta name="section" content="contacts">
+% }
+<section class="page">
+%= yield
+</section>

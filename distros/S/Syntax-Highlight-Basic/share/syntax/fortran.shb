@@ -1,0 +1,163 @@
+# Syntax file for fortran
+# Converted from: fortran.vim
+# Conversion date: 2026-07-13
+
+language: fortran
+extensions: fortran
+case: ignore
+
+[keyword:Conditional]
+else elsewhere then where
+
+[keyword:Constant]
+C_intptr_t c_alert c_backspace c_bool c_carriage_return c_char c_double
+c_double_complex c_float c_float_complex c_form_feed c_horizontal_tab c_int
+c_int16_t c_int32_t c_int64_t c_int8_t c_int_fast16_t c_int_fast32_t
+c_int_fast64_t c_int_fast8_t c_int_least16_t c_int_least32_t c_int_least64_t
+c_int_least8_t c_intmax_t c_long c_long_double c_long_double_complex
+c_long_long c_new_line c_null_char c_null_funptr c_null_ptr c_short
+c_signed_char c_size_t c_vertical_tab character_kinds character_storage_size
+error_unit file_storage_size ieee_negative_subnormal ieee_positive_subnormal
+input_unit int16 int32 int64 int8 integer_kinds iostat_end iostat_eor
+iostat_inquire_internal_unit iso_fortran_env logical_kinds
+numeric_storage_size output_unit real128 real16 real32 real64 real_kinds
+stat_failed_image stat_unlocked_failed_image
+
+[keyword:Function]
+abs acos acosd acosh acospi adjustl adjustr aimag aint algama all allocated
+anint any asin asind asinh asinpi associated atan atan2 atan2d atan2pi atand
+atanh atanpi atomic_add atomic_and atomic_cas atomic_define atomic_fetch_add
+atomic_fetch_and atomic_fetch_or atomic_fetch_xor atomic_or atomic_ref
+atomic_xor bessel_j0 bessel_j1 bessel_jn bessel_y0 bessel_y1 bessel_yn bge bgt
+bit_size ble blt btest c_associated c_f_pointer c_f_procpointer c_funloc c_loc
+c_sizeof cdabs cdcos cdexp cdlog cdsin cdsqrt ceiling char cmplx co_broadcast
+co_max co_min co_reduce co_sum command_argument_count compiler_options
+compiler_version conjg cos cosd cosh coshape cospi cpu_time cqabs cqcos cqexp
+cqlog cqsin cqsqrt cshift date_and_time dcmplx dconjg derf derfc dfloat dgamma
+digits dimag dlgama dot_product dshiftl dshiftr eoshift erf erfc erfc_scaled
+execute_command_line exp exponent extends_type_of failed_images findloc floor
+fraction gamma get_command get_command_argument get_environment_variable
+get_team hypot iall iand iany ibclr ibits ibset ichar ieee_arithmetic
+ieee_get_modes ieee_get_rounding_mode ieee_get_underflow_mode ieee_max
+ieee_max_mag ieee_min ieee_min_mag ieee_set_modes ieee_set_rounding_mode
+ieee_set_status ieee_set_underflow_mode ieee_support_subnormal
+ieee_support_underflow_control ieor image_index image_status index int ior
+iparity iqint is_iostat_end is_iostat_eor ishft ishftc iso_c_binding lbound
+lcobound leadz len_trim log log10 log_gamma maskl maskr matmul max maxexponent
+maxloc merge merge_bits min minexponent minloc modulo move_alloc mvbits
+nearest new_line nint norm2 null num_images out_of_range pack parity popcnt
+poppar precision present qabs qacos qasin qatan qatan2 qcmplx qconjg qcos
+qcosh qdim qerf qerfc qexp qgamma qimag qlgama qlog qlog10 qmax1 qmin1 qmod
+qnint qsign qsin qsinh qsqrt qtan qtanh radix random_init random_number
+random_seed range reduce repeat reshape rrspacing same_type_as scale scan
+selected_char_kind selected_int_kind selected_logical_kind selected_real_kind
+set_exponent shape shifta shiftl shiftr sign sin sind sinh sinpi size spacing
+split spread sqrt stopped_images storage_size system_clock tan tand tanh tanpi
+team_number this_image tokenize trailz transpose trim ubound ucobound unpack
+verify
+
+[keyword:Include]
+include
+
+[keyword:Keyword]
+action advance allocate call contains continue cycle deallocate decimal delim
+eor exit flush iomsg newunit nml nullify only pad position print readwrite
+return round use
+
+[keyword:PreCondit]
+assignment operator result
+
+[keyword:Repeat]
+concurrent while
+
+[keyword:StorageClass]
+in out
+
+[keyword:Todo]
+bug debug fixme note todo
+
+[keyword:Type]
+abstract allocatable asynchronous bind c_devptr c_funptr c_ptr codimension
+constant contiguous cudaArrayPtr cudaChannelFormatDesc cudaErrorInvalidValue
+cudaErrorNotReady cudaEvent cudaEventBlockingSync cudaEventDefault
+cudaEventDisableTiming cudaExtent cudaFuncAttributes cudaFuncCachePreferL1
+cudaFuncCachePreferNone cudaFuncCachePreferShared cudaLimitMallocHeapSize
+cudaLimitPrintfSize cudaLimitStackSize cudaMemcpy3DParms
+cudaMemcpyDeviceToDevice cudaMemcpyDeviceToHost cudaMemcpyHostToDevice
+cudaPitchedPtr cudaSharedMemBankSizeDefault cudaSharedMemBankSizeEightByte
+cudaSharedMemBankSizeFourByte cudaSuccess cudaSymbol cuda_count_kind
+cuda_stream_kind cudadeviceprop deferred device dim1 dim2 dim3 dim4 dimension
+elemental enumerator extends external final generic global host import impure
+intent intrinsic non_intrinsic non_overridable non_recursive nopass optional
+parameter pass pinned pointer private protected public pure recursive save
+sequence shared target texture value volatile
+
+[match:Identifier]
+pattern: ^\s{6,}\K[a-zA-Z]\w*\s*:
+
+[match:Identifier]
+pattern: ^\s*\K[a-zA-Z]\w*\s*:
+
+[match:Type]
+pattern: ^\s*\Kimplicit\s+none\b
+
+[match:Type]
+pattern: \benum\s*,\s*bind\s*(\s*c\s*)
+
+[match:Repeat]
+pattern: \bdo\b
+
+[match:Repeat]
+pattern: \bend\s*do\b
+
+[match:Operator]
+pattern: \.\s*n?eqv\s*\.
+
+[match:Operator]
+pattern: \.\s*[gl][et]\s*\.
+
+[match:Error]
+pattern: \t
+
+[match:Error]
+pattern: \t
+
+[match:Keyword]
+pattern: \bfail\s+image\b
+
+[match:Keyword]
+pattern: \bgo\s*to\b
+
+[match:Conditional]
+pattern: \bif\b
+
+[match:Conditional]
+pattern: \belse\s*if\b
+
+[match:StorageClass]
+pattern: \bin\s*out\b
+
+[match:StorageClass]
+pattern: \bkind\s*=
+
+[match:StorageClass]
+pattern: \blen\s*=
+
+[match:Type]
+pattern: \battributes\b
+
+[match:String]
+pattern: \bblockidx%[xyz]\b
+
+[match:String]
+pattern: \bblockdim%[xyz]\b
+
+[match:String]
+pattern: \bgriddim%[xyz]\b
+
+[match:String]
+pattern: \bthreadidx%[xyz]\b
+
+[match:Error]
+pattern: ^.{4}\d\S
+

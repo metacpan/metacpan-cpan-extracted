@@ -1,42 +1,105 @@
 # NAME
 
-Mojolicious::Plugin::Fondation::Setup - Setup wizard generator — scans plugins for user-configurable parameters, generates a setup workflow, and serves the wizard UI
+Mojolicious::Plugin::Fondation::Setup - Setup wizard with session-based state (clean rebuild)
 
 # VERSION
 
-version 0.04
+version 0.10
 
 # SYNOPSIS
 
-    # In your Fondation config
+    # myapp.pl
+    use Mojolicious::Lite;
     plugin 'Fondation' => {
-        dependencies => [
-            'Fondation::Setup',
-        ],
+        dependencies => ['Fondation::Setup'],
     };
+    app->start;
 
-    # Web wizard
-    /setup          — Setup wizard UI
-    /setup/plugins  — Plugin selection page
-    /setup/execute  — POST form data + execute action
-    /setup/reset    — Reset wizard
+    # Then visit http://localhost:3000/setup
 
 # DESCRIPTION
 
-This plugin provides an interactive web wizard at `/setup` for configuring
-Fondation applications. It discovers available plugins via MetaCPAN, lets the
-user pick which ones to enable, and walks through their configuration
-parameters step by step using [Fondation::Workflow](https://metacpan.org/pod/Fondation%3A%3AWorkflow) with
-[Workflow::Persister::File](https://metacpan.org/pod/Workflow%3A%3APersister%3A%3AFile) (no database required).
+This plugin provides a step-by-step web wizard at `/setup` for
+configuring a Fondation application. It discovers available plugins
+from MetaCPAN, lets the user pick which ones to enable, and walks
+through their configuration parameters.
+
+## How it works
+
+- 1. **Plugin selection** (`/setup/plugins`)
+
+    The wizard fetches the list of Fondation plugins from MetaCPAN. Each
+    plugin shows its version, status (installed/not installed), and
+    dependencies. Plugins already in the application's `.conf` file are
+    pre-selected. Checking a plugin automatically checks its dependencies.
+
+- 2. **Install missing plugins**
+
+    If any selected plugin is not installed via `cpanm`, the wizard
+    shows the exact command to run. Configuration is skipped until all
+    plugins are installed. After running `cpanm`, click "I have installed
+    the plugins, retry" to continue.
+
+- 3. **Configuration** (one page per plugin)
+
+    For each installed plugin that declares user-configurable parameters
+    (via `fondation_meta → setup`), the wizard shows a form. Values from
+    an existing `.conf` file pre-fill the fields.
+
+- 4. **Review and save**
+
+    A summary table shows all configured values. Click "Save Configuration"
+    to write the `$moniker.conf` file.
+
+- 5. **Apply**
+
+    Run `myapp.pl fondation refresh` then restart the server.
+
+## State management
+
+All wizard state (selected plugins, current step, form values) is
+stored in Mojolicious sessions — no database or file persister needed.
+Clicking "Reset" or visiting `/setup/reset` clears the session.
 
 # NAME
 
-Mojolicious::Plugin::Fondation::Setup - Setup wizard for Fondation applications
+Mojolicious::Plugin::Fondation::Setup — Interactive web wizard for configuring Fondation applications
+
+# QUICK START
+
+    # 1. Create a new application directory
+    mkdir Myapp && cd Myapp
+
+    # 2. Create myapp.pl
+    echo 'use Mojolicious::Lite;
+    plugin "Fondation" => { dependencies => ["Fondation::Setup"] };
+    app->start;' > myapp.pl
+
+    # 3. Initialize (creates assets, etc.)
+    perl myapp.pl fondation init
+
+    # 4. Start the development server
+    perl myapp.pl daemon
+
+    # 5. Open http://localhost:3000/setup in your browser
+
+# ROUTES
+
+    GET  /setup           Wizard main page
+    GET  /setup/plugins   Plugin selection with checkboxes
+    GET  /setup/discover  JSON API: plugin list from MetaCPAN
+    POST /setup/start     Build session state from selected plugins
+    POST /setup/execute   Process next/back/save actions
+    GET  /setup/reset     Clear session, restart
+
+# CONFIGURATION
+
+No configuration parameters. The plugin reads `dev_plugins_dir` for locally-developed plugins.
 
 # PLUGIN CONTRACT
 
-Other Fondation plugins declare user-configurable parameters via the
-`setup` key in their `fondation_meta`:
+Other Fondation plugins declare their configurable parameters via the
+`setup` key in `fondation_meta`:
 
     sub fondation_meta {
         return {
@@ -45,7 +108,7 @@ Other Fondation plugins declare user-configurable parameters via the
                 description => 'Main database connection',
                 parameters  => [
                     {
-                        key      => 'backends.main.dsn',
+                        key      => 'dsn',
                         label    => 'DSN',
                         type     => 'string',
                         default  => 'dbi:SQLite:dbname=data/app.db',
@@ -56,50 +119,27 @@ Other Fondation plugins declare user-configurable parameters via the
         };
     }
 
-Each parameter supports: key, label, type (string|integer|boolean|select|password),
-default, required, min, max, placeholder, options (for select type).
+# DEPENDENCIES
+
+- `Fondation::Layout::Bootstrap` — provides the page layout
 
 # OUTPUT
 
-## $moniker.conf
+The wizard generates `$moniker.conf` (e.g. `myapp.conf`) in the
+application home directory. Example:
 
-Application configuration file written when the user clicks "Save" in the
-wizard.  Top-level key is `Fondation`, with `dependencies` listing every
-selected plugin.  Plugins that have `setup` parameters are wrapped in a
-hashref with their config; plugins without `setup` parameters are listed as
-plain strings.
-
-# WIZARD FLOW
-
-    GET  /setup/plugins   — AJAX plugin list from MetaCPAN with selection checkboxes
-    POST /setup/start     — build dynamic workflow from selected plugins
-    GET  /setup           — interactive wizard (one step per plugin + review + done)
-    POST /setup/execute   — store form values, execute workflow action
-    GET  /setup/reset     — clear cookie, restart
-
-Plugins already present in `$moniker.conf` are pre-checked on the selection
-page.  Their existing config values (e.g. DSN, workers) pre-fill the wizard
-fields so the user only changes what they need.
-
-When the workflow reaches the `setup_done` state the controller writes
-`$moniker.conf` and displays a confirmation page listing the configured
-plugins and the path to the generated file.  If `Mojolicious::Plugin::Config`
-is not loaded, a warning is shown with instructions to add `plugin 'Config';`
-to the startup script and restart.
-
-# ROUTES
-
-- `GET /setup` — render the wizard for the current state
-- `GET /setup/plugins` — plugin selection page (MetaCPAN list with checkboxes)
-- `GET /setup/discover` — JSON API returning MetaCPAN plugin list
-- `POST /setup/start` — build dynamic workflow from selected plugins
-- `POST /setup/execute` — store form values in context, execute action
-- `GET /setup/reset` — clear wizard cookie, start fresh
+    {
+        Fondation => {
+            dependencies => ['Fondation::Model::DBIx::Async', 'Fondation::User'],
+        },
+        'Fondation::Model::DBIx::Async' => {
+            backends => [main => { dsn => 'dbi:SQLite:dbname=data/app.db' }],
+        },
+    }
 
 # SEE ALSO
 
-[Mojolicious::Plugin::Fondation::Setup::Controller::Setup](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFondation%3A%3ASetup%3A%3AController%3A%3ASetup),
-[Mojolicious::Plugin::Fondation::Workflow](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFondation%3A%3AWorkflow)
+[Mojolicious::Plugin::Fondation](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AFondation),
 
 # AUTHOR
 

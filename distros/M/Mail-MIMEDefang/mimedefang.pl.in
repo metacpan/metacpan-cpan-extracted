@@ -1,0 +1,1386 @@
+#!@PERL@
+# -*- Perl -*-
+#***********************************************************************
+#
+# mimedefang.pl
+#
+# Perl scanner which parses MIME messages and filters or removes
+# objectionable attachments.
+#
+# Copyright (C) 2000-2005 Roaring Penguin Software Inc.
+#
+# This program may be distributed under the terms of the GNU General
+# Public License, Version 2.
+#
+# This program was derived from the sample program "mimeexplode"
+# in the MIME-Tools Perl module distribution.
+#
+#***********************************************************************
+
+use strict;
+use warnings;
+
+# Move site library directory ahead of default library directory in @INC.
+# That's so we can sanely package our own version of MIME::Base64 that
+# won't conflict with the built-in one on RPM-based platforms.
+use lib '@PERLINSTALLSITELIB@';
+
+use FindBin;
+use lib "$FindBin::Bin/modules/lib";
+
+require 5.008;
+package main;
+
+use Mail::MIMEDefang;
+use Mail::MIMEDefang::MIME;
+use Mail::MIMEDefang::Net;
+use Mail::MIMEDefang::Mail;
+use Mail::MIMEDefang::RFC2822;
+use Mail::MIMEDefang::Utils;
+use Mail::MIMEDefang::Actions;
+use Mail::MIMEDefang::Antispam;
+
+use Carp;
+use Socket;
+use IO::Socket;
+use IO::Select;
+use IO::Handle;
+use IO::File;
+use MIME::Tools 5.410 ();
+use MIME::Words qw(:all);
+use Digest::SHA;
+use Time::Local;
+use MIME::Parser;
+use Sys::Hostname;
+use File::Spec qw ();
+use Errno qw(ENOENT EACCES);
+
+undef $SASpamTester;
+undef $PrivateMyHostName;
+undef @VirusScannerMessageRoutines;
+undef @VirusScannerEntityRoutines;
+$VirusScannerRoutinesInitialized = 0;
+
+$SALocalTestsOnly = 1;
+$DoStatusTags = 0;
+
+$Features{'Virus:AVP'}      = ('@AVP@' ne '/bin/false' ? '@AVP@' : 0);
+$Features{'Virus:AVP5'}      = ('@AVP5@' ne '/bin/false' ? '@AVP5@' : 0);
+$Features{'Virus:KAVSCANNER'} = ('@KAVSCANNER@' ne '/bin/false' ? '@KAVSCANNER@' : 0);
+$Features{'Virus:CLAMAV'}   = ('@CLAMSCAN@' ne '/bin/false' ? '@CLAMSCAN@' : 0);
+$Features{'Virus:CLAMD'}    = ('@CLAMD@' ne '/bin/false' ? '@CLAMD@' : 0);
+$Features{'Virus:CLAMDSCAN'} = ('/bin/false' ne '/bin/false' ? '/bin/false' : 0);
+$Features{'Virus:FPROT'}    = ('@FPROT@' ne '/bin/false' ? '@FPROT@' : 0);
+$Features{'Virus:FPSCAN'}    = ('@FPSCAN@' ne '/bin/false' ? '@FPSCAN@' : 0);
+$Features{'Virus:FSAV'}     = ('@FSAV@' ne '/bin/false' ? '@FSAV@' : 0);
+$Features{'Virus:HBEDV'}    = ('@HBEDV@' ne '/bin/false' ? '@HBEDV@' : 0);
+$Features{'Virus:VEXIRA'}   = ('@VEXIRA@' ne '/bin/false' ? '@VEXIRA@' : 0);
+$Features{'Virus:NAI'}      = ('@NAI@' ne '/bin/false' ? '@NAI@' : 0);
+$Features{'Virus:BDC'}      = ('@BDC@' ne '/bin/false' ? '@BDC@' : 0);
+$Features{'Virus:NVCC'}     = ('@NVCC@' ne '/bin/false' ? '@NVCC@' : 0);
+$Features{'Virus:SymantecCSS'} = 0; # Ditto
+$Features{'Virus:FPROTD'}   = 0;
+$Features{'Virus:FPROTD6'}   = 0;
+$Features{'Virus:SOPHIE'}   = ('@SOPHIE@' ne '/bin/false' ? '@SOPHIE@' : 0);
+$Features{'Virus:SOPHOS'}   = ('@SOPHOS@' ne '/bin/false' ? '@SOPHOS@' : 0);
+$Features{'Virus:SAVSCAN'}   = ('@SAVSCAN@' ne '/bin/false' ? '@SAVSCAN@' : 0);
+$Features{'Virus:TREND'}    = ('@TREND@' ne '/bin/false' ? '@TREND@' : 0);
+$Features{'Virus:TROPHIE'}  = ('@TROPHIE@' ne '/bin/false' ? '@TROPHIE@' : 0);
+$Features{'Virus:CSAV'}     = ('@CSAV@' ne '/bin/false' ? '@CSAV@' : 0);
+$Features{'Virus:NOD32'}    = ('@NOD32@' ne '/bin/false' ? '@NOD32@' : 0);
+
+$Features{'Path:SENDMAIL'}  = '@SENDMAILPROG@';
+$Features{'Path:QUARANTINEDIR'} = '@QDIR@';
+$Features{'Path:SPOOLDIR'}  = '@SPOOLDIR@';
+$Features{'Path:CONFDIR'}   = '@CONFDIR_EVAL@';
+$Features{'Path:CLAMDCONF'} = '@CONFDIR_EVAL@/MD-clamdscan.conf';
+
+$Features{"Path:RSPAMC"} = ('@RSPAMC@' ne '/bin/false' ? '@RSPAMC@' : 0);
+
+# Not in server mode by default
+$ServerMode = 0;
+
+# Don't add Apparently-To: header for SpamAssassin
+$AddApparentlyToForSpamAssassin = 0;
+
+# Don't add warnings inline (add a MIME part instead)
+$AddWarningsInline = 0;
+
+# M$ Exchange or Outlook cannot display multiple Inline: parts
+$Stupidity{"NoMultipleInlines"} = 0;
+
+# Warning goes at beginning
+$WarningLocation = 0;
+
+# No limit to complexity of MIME messages
+$MaxMIMEParts = -1;
+
+# Cache the timzone calculation
+$CachedTimezone = "";
+
+# Syslog facility is "mail"
+$SyslogFacility = "mail";
+undef $GraphDefangSyslogFacility;
+
+$URL = 'https://mimedefang.org/enduser/';
+$CSSHost    = "127.0.0.1:7777:local";
+$FprotdHost = "127.0.0.1:10200";
+$Fprotd6Host = "127.0.0.1:10200";
+
+$SophieSock = '@SPOOLDIR@/sophie';
+$ClamdSock  = '@SPOOLDIR@/clamd.sock';
+$TrophieSock = '@SPOOLDIR@/trophie';
+
+#***********************************************************************
+# %PROCEDURE: md_copy_orig_msg_to_work_dir
+# %ARGUMENTS:
+#  None
+# %DESCRIPTION:
+#  Copies original INPUTMSG file into work directory for virus-scanning
+# %RETURNS:
+#  1 on success, 0 on failure.
+#***********************************************************************
+sub md_copy_orig_msg_to_work_dir {
+    return if (!in_message_context("md_copy_orig_msg_to_work_dir"));
+    return copy_or_link("INPUTMSG", "Work/INPUTMSG");
+}
+
+#***********************************************************************
+# %PROCEDURE: fatal
+# %ARGUMENTS:
+#  msg -- message
+# %RETURNS:
+#  Nothing
+# %DESCRIPTION:
+#  Logs an error and (if we are not in server mode) exits.
+#***********************************************************************
+sub fatal {
+    my($msg) = @_;
+    md_syslog('err', "$msg");
+    if (!$ServerMode) {
+	croak($msg);
+    } else {
+	print_and_flush("error: $msg");
+    }
+}
+
+#***********************************************************************
+# %PROCEDURE: get_host_name
+# %ARGUMENTS:
+#  None
+# %RETURNS:
+#  Local host name, if it could be determined.
+#***********************************************************************
+sub get_host_name {
+  return Mail::MIMEDefang::Net::get_host_name($PrivateMyHostName);
+}
+
+sub rfc2822_date
+{
+	return Mail::MIMEDefang::RFC2822::rfc2822_date($CachedTimezone);
+}
+
+sub header_timezone
+{
+	my($now) = @_;
+	return Mail::MIMEDefang::RFC2822::header_timezone($CachedTimezone, $now);
+}
+
+#***********************************************************************
+# %PROCEDURE: gen_msgid_header
+# %ARGUMENTS:
+#  None
+# %RETURNS:
+#  A string like this: "Message-ID: <message@id.com>\n"
+# %DESCRIPTION:
+#  Generates RFC2822-compliant Message-ID headers.
+#***********************************************************************
+sub gen_msgid_header {
+	# Generate a "random" message ID that looks
+	# similar to sendmail's for SpamAssassin comparing
+	# Received / MessageID QueueID
+	return Mail::MIMEDefang::RFC2822::gen_msgid_header($QueueID, get_host_name());
+}
+
+#***********************************************************************
+# %PROCEDURE: stream_by_recipient
+# %ARGUMENTS:
+#  None
+# %RETURNS:
+#  True if message was resent; false if it was for only a single user
+# %DESCRIPTION:
+#  If there is more than one recipient, re-send the message once per
+#  recipient.
+#  MAKE SURE your sendmail is set up to use
+#  /etc/mail/submit.cf.
+#
+#  Use this
+#  ONLY from filter_begin() and ONLY if you have Sendmail 8.12 or newer,
+#  and ONLY if locally-submitted mail goes via SMTP.
+#***********************************************************************
+sub stream_by_recipient {
+    return 0 if (!in_message_context("stream_by_recipient"));
+    if ($#Recipients <= 0) {
+	# Only one recipient (or none??)
+	return 0;
+    }
+
+    foreach my $recip (@Recipients) {
+	if (!resend_message_one_recipient($recip)) {
+	    md_syslog('crit', 'stream_by_recipient: COULD NOT RESEND MESSAGE - PLEASE INVESTIGATE');
+	    action_bounce("Unable to stream message");
+
+	    # We return 1 to avoid rest of filter
+	    return 1;
+	}
+    }
+    $TerminateAndDiscard = 1;
+    return 1;
+}
+
+#***********************************************************************
+# %PROCEDURE: stream_by_domain
+# %ARGUMENTS:
+#  None
+# %RETURNS:
+#  True if message was resent; false if it was for only a single domain.
+# %DESCRIPTION:
+#  Checks each recipient.  If recipients are in more than one domain
+#  (foo@abc.com, foo@xyz.com), the message is re-sent (once per domain),
+#  action_discard() is called, and scanning terminates.  Use this
+#  ONLY from filter_begin() and ONLY if you have Sendmail 8.12 or newer,
+#  and ONLY if locally-submitted mail goes via SMTP.
+#***********************************************************************
+sub stream_by_domain {
+    my(%Domains, $dom, $nkeys);
+    return 0 if (!in_message_context("stream_by_domain"));
+
+    # Grab list of domains of recipients
+    foreach my $recip (@Recipients) {
+	$dom = $recip;
+	# Remove angle brackets
+	$dom =~ s/[<>]//g;
+	# Get domain
+	$dom =~ s/.*\@//;
+	if (!defined($Domains{$dom})) {
+	    $Domains{$dom} = [ $recip ];
+	} else {
+	    push( @{ $Domains{$dom} }, $recip);
+	}
+	$Domain = $dom;
+    }
+
+    $nkeys = keys(%Domains);
+    if ($nkeys > 1) {
+	# More than one domain.  Cancel and resend
+	foreach my $key (keys %Domains) {
+	    if (!resend_message(@{$Domains{$key}})) {
+		md_syslog('crit', 'stream_by_domain: COULD NOT RESEND MESSAGE - PLEASE INVESTIGATE');
+		action_bounce("Unable to stream message");
+
+		# We return 1 to avoid rest of filter
+		return 1;
+	    }
+	}
+	$TerminateAndDiscard = 1;
+	return 1;
+    }
+
+    return 0;
+}
+
+#***********************************************************************
+# %PROCEDURE: main
+# %ARGUMENTS:
+#  workdir -- directory to "chdir" to and do all work in.
+#  msg -- file containing MIME message
+# %RETURNS:
+#  0 if parse went well; non-zero otherwise.
+# %DESCRIPTION:
+#  Main program.  Splits the MIME message up and then reconstructs it.
+#***********************************************************************
+sub main {
+    my($Filter);
+    my($workdir);
+    $Filter = '@CONFDIR_EVAL@/mimedefang-filter';
+
+    $DoStatusTags = 0;
+
+    my($ip, $name, $sender, $recip, $firstRecip, $helo, $map, $key);
+    # Check for "-f filter-file" option
+    if ($#ARGV >= 2) {
+	if ($ARGV[0] eq "-f") {
+	    $Filter = $ARGV[1];
+	    shift @ARGV;
+	    shift @ARGV;
+	}
+    }
+    if ($#ARGV != 0) {
+	md_syslog('warning', "Usage: mimedefang.pl [-f filter] workdir | -server | -test | -features | -validate");
+	print STDERR "Usage: mimedefang.pl [-f filter] workdir | -server | -test | -features | -validate\n";
+	return 1;
+    }
+
+    $ValidateIPHeader = "";
+    my $in;
+    if (open($in, '<', '@CONFDIR_EVAL@/mimedefang-ip-key')) {
+	$ValidateIPHeader = <$in>;
+	chomp($ValidateIPHeader);
+	close($in);
+    }
+
+    # These are set unconditionally; filter() can change them.
+    $NotifySenderSubject = "MIMEDefang Notification";
+    $NotifyAdministratorSubject = "MIMEDefang Notification";
+    $QuarantineSubject = "MIMEDefang Quarantine Report";
+    $NotifyNoPreamble = 0;
+
+    # Load the filter
+    init_globals();
+    if ($ValidateIPHeader ne "" and
+	$ValidateIPHeader !~ /^X-MIMEDefang-Relay/) {
+	md_syslog('err', "Invalid value for mimedefang-ip-key: $ValidateIPHeader");
+	$ValidateIPHeader = "";
+    }
+
+    if (! -r $Filter) {
+	md_syslog('err', "Cannot read filter $Filter: Check permissions.  mimedefang.pl will not work.");
+    }
+
+    # Special-case /dev/null so we can invoke without
+    # a filter for test purposes.
+    unless ($Filter eq '/dev/null') {
+	    require $Filter;
+    }
+
+    # In case it wasn't done in filter... won't hurt to do it again
+    detect_and_load_perl_modules();
+    # Load Antivirus code only if needed
+    if (Mail::MIMEDefang::detect_antivirus_support()) {
+      use Mail::MIMEDefang::Antivirus;
+    }
+
+    # Backward-compatibility
+    if (defined($Administrator)) {
+	$AdminAddress = $Administrator;
+	md_syslog('warning', 'Variable $Administrator is deprecated.  Use $AdminAddress instead');
+    }
+
+    # Defaults
+    $AdminName = 'MIMEDefang Administrator' unless defined($AdminName);
+    $AdminAddress = 'postmaster@localhost' unless defined($AdminAddress);
+    $DaemonName = 'MIMEDefang' unless defined($DaemonName);
+    $DaemonAddress = 'mailer-daemon@localhost' unless defined($DaemonAddress);
+    $SALocalTestsOnly = 1 unless defined($SALocalTestsOnly);
+
+    if (!defined($GeneralWarning)) {
+	$GeneralWarning =
+	    "WARNING: This e-mail has been altered by MIMEDefang.  Following this\n" .
+	    "paragraph are indications of the actual changes made.  For more\n" .
+	    "information about your site's MIMEDefang policy, contact\n" .
+	    "$AdminName <$AdminAddress>.  For more information about MIMEDefang, see:\n\n" .
+	    "            $URL\n\n";
+    }
+
+    # check dir
+    $workdir = $ARGV[0];
+    if ($workdir eq "-test") {
+	printf("Filter $Filter seems syntactically correct.\n");
+	exit(0);
+    }
+    if ($workdir eq "-validate") {
+	if (defined(&filter_validate)) {
+	    exit(filter_validate());
+	}
+	print STDERR "ERROR: You must define a function called filter_validate in your filter\nto use the -validate argument.\n";
+	exit(1);
+    }
+
+    if ($workdir eq "-features") {
+	# Print available features
+	my($ans);
+
+	# Print MIMEDefang version
+	my $ver = md_version();
+	print("MIMEDefang version $ver\n\n");
+	# Print the features we have first
+	foreach my $thing (sort keys %Features) {
+	    my($feat);
+	    $feat = $Features{$thing};
+	    $ans = $feat ? "yes" : "no";
+	    if ($ans eq "yes") {
+		if ($feat ne "1") {
+		    printf("%-30s: %s\n", $thing,  "yes ($feat)");
+		} else {
+		    printf("%-30s: %s\n", $thing,  "yes");
+		}
+	    }
+	}
+
+	# And now print the ones we don't have
+	foreach my $thing (sort keys %Features) {
+	    my($feat);
+	    $feat = $Features{$thing};
+	    $ans = $feat ? "yes" : "no";
+	    if ($ans eq "no") {
+		printf("%-30s: %s\n", $thing,  "no");
+	    }
+	}
+
+	# And print Perl module versions
+	print("\n");
+	my($version);
+	foreach my $thing (qw(Archive::Zip Digest::SHA HTML::Parser IO::Socket MIME::Base64 MIME::Tools MIME::Words Mail::Mailer Mail::SpamAssassin Net::DNS Unix::Syslog )) {
+	    unless (eval "require $thing") {
+		printf("%-30s: missing\n", $thing);
+		next;
+	    }
+	    $version = $thing->VERSION();
+	    $version = "UNKNOWN" unless defined($version);
+	    printf("%-30s: Version %s\n", $thing, $version);
+	}
+	exit(0);
+    }
+
+    my $enter_main_loop;
+    if ($workdir eq "-server") {
+	$ServerMode = 1;
+	$enter_main_loop = 1;
+    } elsif ($workdir eq "-serveru") {
+	$ServerMode = 1;
+	$enter_main_loop = 1;
+	$DoStatusTags = 1;
+    } elsif ($workdir eq "-embserver") {
+	$ServerMode = 1;
+	$enter_main_loop = 0;
+    } elsif ($workdir eq "-embserveru") {
+	$ServerMode = 1;
+	$DoStatusTags = 1;
+	$enter_main_loop = 0;
+    } else {
+	$ServerMode = 0;
+    }
+
+    if (!$ServerMode) {
+	chdir($Features{'Path:SPOOLDIR'});
+	if (defined(&filter_initialize)) {
+	    filter_initialize();
+	}
+
+	init_globals();
+	do_scan($workdir);
+	exit(0);
+    }
+
+    do_main_loop() if $enter_main_loop;
+}
+
+sub do_main_loop
+{
+	init_status_tag();
+
+	chdir($Features{'Path:SPOOLDIR'});
+	if(defined(&filter_initialize)) {
+		filter_initialize();
+	}
+
+	# Infinite server loop... well, not quite infinite; we stop on EOF
+	# from STDIN.
+	while (my $line = <STDIN>) {
+		chomp $line;
+
+		# Clear out vars so they aren't used by filter_begin, etc.
+		init_globals();
+
+		# Change to spool dir -- ignore error
+		chdir($Features{'Path:SPOOLDIR'});
+
+		my ($cmd, @args) = map { percent_decode($_) } split(/\s+/, $line);
+		$cmd = lc $cmd;
+
+		no strict 'refs';
+		my $cmd_handler = *{"handle_${cmd}"};
+		use strict 'refs';
+		if (defined(&{'handle_' . $cmd})) {
+			no strict 'refs';
+			&{'handle_' . $cmd}(@args);
+			use strict 'refs';
+		} else {
+			unknown_command_handler( $cmd, @args );
+		}
+	}
+
+	# EOF on STDIN... time to bye-bye...
+	if(defined(&filter_cleanup)) {
+		my $exit_code = filter_cleanup();
+		exit(defined($exit_code) ? $exit_code : 0);
+	}
+	exit(0);
+}
+
+# This is the only command handler not named handle_XXXXX for two reasons:
+#  1) We don't want someone to pass in a command named 'unknown_command' and
+#     get this handler.
+#  2) This handler takes $cmd as first argument, whereas the others do not get
+#     their own name passed down as the first arg.
+sub unknown_command_handler
+{
+	my ($cmd, @args) = @_;
+
+	if(!defined(&filter_unknown_cmd)) {
+		print_and_flush('error: Unknown command');
+		return;
+	}
+
+	my ($code, @list) = filter_unknown_cmd($cmd, @args);
+	$code = "error:" if($code ne "ok" and $code ne "error:");
+
+	my $reply = join(' ', map { percent_encode($_) } ($code, @list) );
+	print_and_flush($reply);
+}
+
+sub handle_ping
+{
+	print_and_flush('PONG');
+}
+
+sub handle_scan
+{
+	my ($dummyqid, $workdir) = @_;
+	# EVIL FOLLOWS.  AVERT YOUR EYES.
+	# File::Spec::Unix caches $ENV{'TMPDIR'}.
+	# We want to force it to cache it BEFORE
+	# we muck about with the env. variable,
+	# otherwise code that uses File::Spec->tmpfile
+	# will fail when our transient $workdir/tmp is
+	# deleted.  Horrible.
+
+	# FORCE File::Spec to cache a reasonable tmpfile
+	File::Spec->tmpdir();
+
+	my $old_tmpdir;
+	mkdir("$workdir/tmp");
+	if(-d "$workdir/tmp") {
+		$old_tmpdir = $ENV{'TMPDIR'};
+		$ENV{'TMPDIR'} = "$workdir/tmp";
+	} else {
+		$old_tmpdir = undef;
+	}
+
+	do_scan($workdir);
+
+	# If we set TMPDIR to $workdir/tmp, reset it
+	# here.
+	if(exists($ENV{'TMPDIR'}) && $ENV{'TMPDIR'} eq "$workdir/tmp")
+	{
+		if($old_tmpdir) {
+			$ENV{'TMPDIR'} = $old_tmpdir;
+		} else {
+			delete($ENV{'TMPDIR'});
+		}
+	}
+
+	chdir($Features{'Path:SPOOLDIR'});
+}
+
+sub handle_map
+{
+	my ($map, $key) = @_;
+
+	if(!defined(&filter_map)) {
+		md_syslog('err', "No filter_map function defined");
+		print_and_flush('PERM No filter_map function defined');
+		return;
+	}
+
+	my ($code, $val) = filter_map($map, $key);
+	if(         $code ne "OK"
+		and $code ne "NOTFOUND"
+		and $code ne "TEMP"
+		and $code ne "TIMEOUT"
+		and $code ne "PERM")
+	{
+		md_syslog('err', "Invalid code from filter_map: $code");
+		print_and_flush('PERM Invalid code from filter_map: ' . percent_encode($code));
+		return;
+	}
+	print_and_flush("$code " . percent_encode($val));
+}
+
+#***********************************************************************
+# %PROCEDURE: handle_tick
+# %ARGUMENTS:
+#  Tick value (integer)
+# %DESCRIPTION:
+#  May be called periodically by multiplexor; runs filter_tick routine
+#  if it exists.
+# %RETURNS:
+#  Nothing
+#***********************************************************************
+sub handle_tick
+{
+	my ($tick_no) = @_;
+	$tick_no ||= 0;
+	if(defined(&filter_tick)) {
+		filter_tick($tick_no);
+		print_and_flush("tock $tick_no");
+	} else {
+		print_and_flush("error: tick $tick_no: filter_tick undefined");
+	}
+}
+
+#***********************************************************************
+# %PROCEDURE: handle_relayok
+# %ARGUMENTS:
+#  hostip -- IP address of relay host
+#  hostname -- name of relay host
+#  port -- client port
+#  myip -- my IP address
+#  myport -- my listening port
+# %RETURNS:
+#  Nothing, but prints "ok 1" if we accept connection, "ok 0" if not.
+#***********************************************************************
+sub handle_relayok
+{
+        my ($hostip, $hostname, $port, $myip, $myport, $qid) = @_;
+
+        if(!defined(&filter_relay)) {
+            send_filter_answer('CONTINUE', "ok", "filter_relay", "host $hostip ($hostname)");
+            return;
+        }
+
+        # Set up globals
+        $RelayAddr     = $hostip;
+        $RelayHostname = $hostname;
+        $QueueID       = $qid;
+        $MsgID         = $qid;
+        my ($ok, $msg, $code, $dsn, $delay) = filter_relay($hostip, $hostname, $port, $myip, $myport, $qid);
+        send_filter_answer($ok, $msg, "filter_relay", "host $hostip ($hostname)", $code, $dsn, $delay);
+}
+
+#***********************************************************************
+# %PROCEDURE: handle_helook
+# %ARGUMENTS:
+#  ip -- IP address of relay host
+#  name -- name of relay host
+#  helo -- arg to SMTP HELO command
+#  port -- client port
+#  myip -- my IP address
+#  myport -- my listening port
+# %RETURNS:
+#  Nothing, but prints "ok 1" if we accept connections from this host.
+# "ok 0" if not.
+#***********************************************************************
+sub handle_helook
+{
+	my ($ip, $name, $helo, $port, $myip, $myport, $qid) = @_;
+	if(!defined(&filter_helo)) {
+		send_filter_answer('CONTINUE', "ok", "filter_helo", "helo $helo");
+		return;
+	}
+
+	# Set up globals
+	$RelayAddr     = $ip;
+	$RelayHostname = $name;
+	$Helo          = $helo;
+        $QueueID       = $qid;
+        $MsgID         = $qid;
+	my ($ok, $msg, $code, $dsn, $delay) = filter_helo($ip, $name, $helo, $port, $myip, $myport, $qid);
+	send_filter_answer($ok, $msg, "filter_helo", "helo $helo", $code, $dsn, $delay);
+}
+
+#***********************************************************************
+# %PROCEDURE: handle_senderok
+# %ARGUMENTS:
+#  sender -- e-mail address of sender
+#  ip -- IP address of relay host
+#  name -- name of relay host
+#  helo -- arg to SMTP HELO command
+# %RETURNS:
+#  Nothing, but prints "ok 1" if we accept message from this sender,
+# "ok 0" if not.
+#***********************************************************************
+sub handle_senderok
+{
+	my ($sender, $ip, $name, $helo);
+
+	($sender, $ip, $name, $helo, $CWD, $QueueID, @ESMTPArgs) = @_;
+
+	if(!defined(&filter_sender)) {
+		send_filter_answer('CONTINUE', "ok", "filter_sender", "sender $sender");
+		return;
+	}
+
+	if (!chdir($CWD)) {
+		send_filter_answer('TEMPFAIL', "could not chdir($CWD): $!", "filter_sender", "sender $sender");
+	}
+
+	# Set up additional globals
+	$MsgID         = $QueueID;
+	$Sender        = $sender;
+	$RelayAddr     = $ip;
+	$RelayHostname = $name;
+	$Helo          = $helo;
+
+	my ($ok, $msg, $code, $dsn, $delay) = filter_sender($sender, $ip, $name, $helo);
+	send_filter_answer($ok, $msg, "filter_sender", "sender $sender", $code, $dsn, $delay);
+
+	chdir($Features{'Path:SPOOLDIR'});
+}
+
+#***********************************************************************
+# %PROCEDURE: handle_recipok
+# %ARGUMENTS:
+#  recipient -- e-mail address of recipient
+#  sender -- e-mail address of sender
+#  ip -- IP address of relay host
+#  name -- name of relay host
+#  firstRecip -- first recipient of message
+#  helo -- arg to SMTP HELO command
+# %RETURNS:
+#  Nothing, but prints "ok 1" if we accept message to this recipient,
+# "ok 0" if not.
+#***********************************************************************
+sub handle_recipok
+{
+	my ($recipient, $sender, $ip, $name, $firstRecip, $helo, $rcpt_mailer, $rcpt_host, $rcpt_addr);
+
+	($recipient, $sender, $ip, $name, $firstRecip, $helo, $CWD, $QueueID, $rcpt_mailer, $rcpt_host, $rcpt_addr, @ESMTPArgs) = @_;
+	$MsgID = $QueueID;
+
+	if(!defined(&filter_recipient)) {
+		send_filter_answer('CONTINUE', "ok", "filter_recipient", "recipient $recipient");
+		return;
+	}
+
+	if (!chdir($CWD)) {
+		send_filter_answer('TEMPFAIL', "could not chdir($CWD): $!", "filter_recipient", "recipient $recipient");
+	}
+
+	# Set up additional globals
+	@Recipients    = ($recipient);
+	$Sender        = $sender;
+	$RelayAddr     = $ip;
+	$RelayHostname = $name;
+	$Helo          = $helo;
+	$RecipientMailers{$recipient} = [ $rcpt_mailer, $rcpt_host, $rcpt_addr ];
+
+	my ($ok, $msg, $code, $dsn, $delay) = filter_recipient($recipient, $sender, $ip, $name, $firstRecip, $helo, $rcpt_mailer, $rcpt_host, $rcpt_addr);
+	send_filter_answer($ok, $msg, "filter_recipient", "recipient $recipient", $code, $dsn, $delay);
+
+	chdir($Features{'Path:SPOOLDIR'});
+}
+
+#***********************************************************************
+# %PROCEDURE: do_scan
+# %ARGUMENTS:
+#  workdir -- working directory to scan
+# %RETURNS:
+#  0 if parse went well; non-zero otherwise.
+# %DESCRIPTION:
+#  Scan a message in working directory.
+#***********************************************************************
+sub do_scan {
+    my($workdir) = @_;
+
+    if (!chdir($workdir)) {
+	fatal("Cannot chdir($workdir): $!");
+	return -1;
+    }
+
+    $CWD = $workdir;
+
+    # Read command file
+    push_status_tag("Reading COMMANDS");
+    read_commands_file('need_F') or return -1;
+    pop_status_tag();
+
+    # We're processing a message
+    $InMessageContext = 1;
+
+    # Set message ID
+    if ($QueueID ne "") {
+	$MsgID = $QueueID;
+    } elsif ($MessageID ne "") {
+	$MsgID = $MessageID;
+    } else {
+	$MsgID = "NOQUEUE";
+    }
+
+    if ($QueueID eq "") {
+	$QueueID = "NOQUEUE";
+    }
+    if ($MessageID eq "") {
+	$MessageID = "NOQUEUE";
+    }
+
+    my($file) = "INPUTMSG";
+
+    # Create a subdirectory for storing all the actual message data
+    my($msgdir) = "Work";
+    if (!mkdir($msgdir, 0750)) {
+	fatal("Cannot mkdir($msgdir): $!");
+	return -1;
+    }
+
+    my $entity;
+    my $parser;
+    if (defined(&filter_create_parser)) {
+	$parser = filter_create_parser();
+	if (!defined($parser) ||
+	    !$parser->isa('MIME::Parser')) {
+	    $parser = builtin_create_parser();
+	}
+    } else {
+	$parser = builtin_create_parser();
+    }
+
+    my $filer = MIME::Parser::FileInto->new($msgdir);
+    # Don't trust any filenames from the message.
+    $filer->ignore_filename(1);
+    $parser->filer($filer);
+
+    # Parse the input stream:
+    if (not -r $file) {
+	fatal("couldn't open $file: $!");
+	signal_complete();
+	return -1;
+    }
+
+    if ($MaxMIMEParts > 0) {
+	$parser->max_parts($MaxMIMEParts);
+    }
+    push_status_tag("Parsing Message");
+    $entity = $parser->parse_open($file);
+    pop_status_tag();
+
+    if (!defined($entity) && $MaxMIMEParts > 0) {
+	# Message is too complex; bounce it
+	action_bounce("Message contained too many MIME parts.  We do not accept such complicated messages.");
+	signal_unchanged();
+	signal_complete();
+	return;
+    }
+
+    if (!$entity) {
+	fatal("Couldn't parse MIME in $file: $!");
+	signal_complete();
+	return -1;
+    }
+
+    # Make entity multipart
+    my ($code);
+    $code = $entity->make_multipart();
+    $WasMultiPart = ($code eq 'ALREADY');
+
+
+    # If there are multiple Subject: lines, delete all but the first
+    if ($SubjectCount > 1) {
+	md_syslog('warning', "Message contains $SubjectCount Subject: headers.  Deleting all but the first");
+	for (my $i=$SubjectCount; $i > 1; $i--) {
+	    action_delete_header("Subject", $i);
+	}
+    }
+
+    # Call pre-scan filter if defined
+    if (defined(&filter_begin)) {
+	push_status_tag("In filter_begin");
+	filter_begin($entity);
+	pop_status_tag();
+	# If stream_by_domain tells us to discard, do so...
+	if ($TerminateAndDiscard) {
+	    write_result_line("D", "");
+	    signal_unchanged();
+	    md_syslog('debug', "filter_begin set TerminateAndDiscard flag.  Don't panic; it's most likely a message being streamed.");
+	    signal_complete();
+	    return;
+	}
+    }
+
+
+    # Now rebuild the message!
+    my($boundary);
+    my($rebuilt);
+    my($rebuilt_flat);
+
+    # Prepare rebuilt container.
+    # We don't want a deep copy here, so do some trickery...
+    my @parts;
+
+    # Save parts
+    @parts = $entity->parts;
+
+    # Clear them out prior to deep copy
+    $entity->parts([]);
+
+    # "Deep" copy (ha ha...)
+    $rebuilt = $entity->dup;
+
+    # And restore parts to original
+    $entity->parts(\@parts);
+
+    # Rebuild
+    $InFilterContext = 1;
+    push_status_tag("In rebuild loop");
+    map { rebuild_entity($rebuilt, $_) } $entity->parts;
+    pop_status_tag();
+
+    if ($#Warnings >= 0) {
+	my $didSomething = 0;
+	my $html_warning;
+	$Changed = 1;
+	if ($AddWarningsInline) {
+	    my $warning = $GeneralWarning . join("\n", @Warnings);
+	    my $ruler = "=" x 75;
+	    $html_warning = $warning;
+	    $html_warning =~ s/&/&amp;/g;
+	    $html_warning =~ s/</&lt;/g;
+	    $html_warning =~ s/>/&gt;/g;
+	    $didSomething = 1
+		if append_text_boilerplate($rebuilt, "$ruler\n$warning", 0);
+	    $didSomething = 1
+		if append_html_boilerplate($rebuilt, "<hr>\n<pre>\n$html_warning</pre>", 0);
+	}
+
+	if (!$didSomething) {
+	    # HACK for Micro$oft "LookOut!"
+	    if ($WasMultiPart &&
+		$Stupidity{"NoMultipleInlines"} &&
+		$WarningLocation == 0) {
+		# Descend into first leaf
+		my($msg) = $rebuilt;
+		my(@parts) = $msg->parts;
+		while($#parts >= 0) {
+		    $msg = $parts[0];
+		    @parts = $msg->parts;
+		}
+		my($head) = $msg->head;
+		my($type) = $msg->mime_type;
+		if (lc($head->mime_type) eq "text/plain") {
+		    $head->mime_attr("Content-Type.name" => "MESSAGE.TXT");
+		    $head->mime_attr("Content-Disposition" => "inline");
+		    $head->mime_attr("Content-Disposition.filename" => "MESSAGE.TXT");
+		    $head->mime_attr("Content-Description" => "MESSAGE.TXT");
+		}
+	    }
+	    my $warns = $GeneralWarning . join("\n", @Warnings);
+	    $WarningCounter++;
+	    action_add_part($rebuilt, "text/plain", "-suggest",
+			    $warns, "warning$WarningCounter.txt", "inline", $WarningLocation);
+	}
+    }
+
+    $InFilterContext = 0;
+
+    # Call post-scan filter if defined
+    if (defined(&filter_end)) {
+	$InFilterEnd = 1;
+	push_status_tag("In filter_end");
+	filter_end($rebuilt);
+	pop_status_tag();
+	$InFilterEnd = 0;
+    }
+
+    if ($Rebuild && defined($FilterEndReplacementEntity)) {
+	$rebuilt = $FilterEndReplacementEntity;
+	undef $FilterEndReplacementEntity;
+    }
+
+    if ($Changed || $Rebuild) {
+	my $fh = IO::File->new("NEWBODY", '>:');
+	if (not $fh) {
+	    fatal("Can't open NEWBODY: $!");
+	    signal_complete();
+	    return -1;
+	}
+
+	# Add any parts inserted by action_add_part
+	$rebuilt = process_added_parts($rebuilt);
+
+	# Trim out useless multiparts.  FIXME: Make this optional?
+	while ((lc($rebuilt->head->mime_type) eq "multipart/mixed" ||
+		lc($rebuilt->head->mime_type) eq "multipart/alternative") &&
+	       $rebuilt->parts == 1 && defined($rebuilt->parts(0))) {
+		$rebuilt->make_singlepart();
+	}
+	push_status_tag("Writing new body");
+	$rebuilt->print_body($fh);
+	pop_status_tag();
+	$fh->close;
+
+	# Write new content-type header in case we've changed the type.
+	my $ct = $rebuilt->head->get('Content-Type');
+	if (!defined($ct)) {
+	    my $type;
+	    $type = $rebuilt->mime_type;
+	    $boundary = $rebuilt->head->multipart_boundary;
+	    if (defined($boundary)) {
+		$ct = "$type; boundary=\"$boundary\"";
+	    } else {
+		$ct = "$type";
+	    }
+	}
+	if (defined($ct)) {
+	    chomp($ct);
+	    write_result_line("M", $ct);
+	}
+	# Write out all the other MIME headers associated with the rebuilt
+	# entity.
+	my($hdr);
+	foreach my $tag (grep {/^content-/i} $rebuilt->head->tags) {
+	    # Already done content-type
+	    next if ($tag =~ /^content-type$/i);
+	    if ($tag =~ /^content-transfer-encoding$/i) {
+		# If it is now multipart, but wasn't before, we will
+		# delete any content-transfer-encoding header.
+		if ($rebuilt->head->mime_type =~ m+^multipart/+i &&
+		    !$WasMultiPart) {
+		    next;
+		}
+	    }
+	    $hdr = $rebuilt->head->get($tag);
+	    if (defined($hdr) && $hdr ne "") {
+		chomp($hdr);
+		action_change_header($tag, $hdr);
+	    }
+	}
+	# If it is now multipart, but wasn't before, delete
+	# content-transfer-encoding header.
+	if ($rebuilt->head->mime_type =~ m+^multipart/+i &&
+	    !$WasMultiPart) {
+	    action_delete_header("Content-Transfer-Encoding");
+	}
+	signal_changed();
+    } else {
+	signal_unchanged();
+    }
+
+    # Call filter_wrapup if defined
+    if (defined(&filter_wrapup)) {
+	$InFilterWrapUp = 1;
+	push_status_tag("In filter_wrapup");
+	filter_wrapup($rebuilt);
+	pop_status_tag();
+	$InFilterWrapUp = 0;
+    }
+
+    signal_complete();
+
+    return 0;
+}
+
+
+#***********************************************************************
+# %PROCEDURE: replace_entire_message
+# %ARGUMENTS:
+#  e -- a MIME::Entity
+# %RETURNS:
+#  1 on success; 0 on failure.
+# %DESCRIPTION:
+#  Replaces entire message with $e
+# %PRECONDITIONS:
+#  Can only be called from filter_end
+#***********************************************************************
+sub replace_entire_message {
+    my($e) = @_;
+    return 0 unless in_filter_end("replace_entire_message");
+
+    if (!defined($e)) {
+	md_syslog('err', "Call to replace_entire_message with undefined argument");
+	return 0;
+    }
+    if (ref($e) ne "MIME::Entity") {
+	md_syslog('err', "Call to replace_entire_message with argument that is not of type MIME::Entity");
+	return 0;
+    }
+    $FilterEndReplacementEntity = $e;
+    $Rebuild = 1;
+    return 1;
+}
+
+#***********************************************************************
+# %PROCEDURE: send_filter_answer
+# %ARGUMENTS:
+#  ok -- 1 = accept, 0 = reject, -1 = tmpfail
+#  msg -- if non-blank, additional message
+#  who -- one of "filter_sender", "filter_relay" or "filter_recipient"
+#  what -- the address or host being adjusted
+#  code -- SMTP reply code
+#  dsn -- DSN code
+#  delay -- number of seconds C code should delay before returning
+# %RETURNS:
+#  Nothing
+# %DESCRIPTION:
+#  Sends an answer back for filter_relay, filter_sender and filter_recipient
+#***********************************************************************
+sub send_filter_answer {
+    my($ok, $msg, $who, $what, $code, $dsn, $delay) = @_;
+
+    my($num_ok);
+    $num_ok = 0;
+    # Did we get an integer?
+
+    $delay = 0 unless (defined($delay) and $delay =~ /^\d+$/);
+
+    if ($ok =~ /^-?\d+$/) {
+	$num_ok = $ok;
+    }
+
+    $msg = "?" if (!defined($msg) or ($msg eq ""));
+
+    if ($ok eq 'ACCEPT_AND_NO_MORE_FILTERING') {
+	md_syslog('debug', "$who said ACCEPT_AND_NO_MORE_FILTERING: No further filtering for this message");
+	$code = 250 unless (defined($code) and $code =~ /^2\d\d$/);
+	$dsn = "2.1.0" unless (defined($dsn) and $dsn =~ /^2\.\d{1,3}\.\d{1,3}$/);
+	$msg = percent_encode($msg);
+	$code = percent_encode($code);
+	$dsn = percent_encode($dsn);
+	print_and_flush("ok 2 $msg $code $dsn $delay");
+    } elsif ($ok eq 'DISCARD') {
+	$code = 250 unless (defined($code) and $code =~ /^2\d\d$/);
+	$dsn = "2.1.0" unless (defined($dsn) and $dsn =~ /^2\.\d{1,3}\.\d{1,3}$/);
+	$msg = percent_encode($msg);
+	$code = percent_encode($code);
+	$dsn = percent_encode($dsn);
+	md_syslog('info', "$who said DISCARD: Discarding this message");
+	print_and_flush("ok 3 $msg $code $dsn $delay");
+    } elsif (($ok eq 'CONTINUE') or ($num_ok > 0)) {
+	$code = 250 unless (defined($code) and $code =~ /^2\d\d$/);
+	$dsn = "2.1.0" unless (defined($dsn) and $dsn =~ /^2\.\d{1,3}\.\d{1,3}$/);
+	$msg = percent_encode($msg);
+	$code = percent_encode($code);
+	$dsn = percent_encode($dsn);
+	print_and_flush("ok 1 $msg $code $dsn $delay");
+    } elsif (($ok eq 'TEMPFAIL') or ($num_ok < 0)) {
+	md_syslog('debug', "$who tempfailed $what");
+	$code = 451 unless (defined($code) and $code =~ /^4\d\d$/);
+	$dsn = "4.3.0" unless (defined($dsn) and $dsn =~ /^4\.\d{1,3}\.\d{1,3}$/);
+	$msg = percent_encode($msg);
+	$code = percent_encode($code);
+	$dsn = percent_encode($dsn);
+	print_and_flush("ok -1 $msg $code $dsn $delay");
+    } else {
+	$code = 554 unless (defined($code) and $code =~ /^5\d\d$/);
+	$dsn = "5.7.1" unless (defined($dsn) and $dsn =~ /^5\.\d{1,3}\.\d{1,3}$/);
+	md_syslog('debug', "$who rejected $what");
+	$msg = percent_encode($msg);
+	$code = percent_encode($code);
+	$dsn = percent_encode($dsn);
+	print_and_flush("ok 0 $msg $code $dsn $delay");
+    }
+}
+
+#***********************************************************************
+# %PROCEDURE: md_graphdefang_log_enable
+# %ARGUMENTS:
+#  SyslogFacility -- (optional) The Syslog facility to which mimedefang
+#                    should log messages when md_graphdefang_log() is called.  If
+#                    this variable is not passed in, a default value
+#                    of 'mail' will be used.
+#  EnumerateRecipients -- (optional) Whether or not to output a syslog
+#                    line for each recipient of a spam message or only
+#                    once per incoming message.  Disabling this will
+#                    reduce the entries to syslog but will reduce
+#                    statistical granularity on a per user basis.
+#
+# %RETURNS:
+#  Nothing
+# %DESCRIPTION:
+#  This is called to enable Mimedefang logging when the md_graphdefang_log()
+#  subroutine is called.  The $SyslogFacility name should be known
+#  to syslog on the machine on which Mimedefang is running.
+#***********************************************************************
+sub md_graphdefang_log_enable
+{
+    $GraphDefangSyslogFacility = shift;
+    $EnumerateRecipients = shift;
+
+    # If we don't have a SyslogFacility from the user,
+    # use the system default
+
+    $GraphDefangSyslogFacility = $SyslogFacility
+	unless defined($GraphDefangSyslogFacility);
+
+    # By default, we want md_graphdefang_log to output a syslog line for each
+    # recipient.  This is useful for per user spam statistics.
+    # i.e. How many spam messages were received by foo@bar.com?
+
+    $EnumerateRecipients = 1 unless defined($EnumerateRecipients);
+}
+
+#***********************************************************************
+# %PROCEDURE: add_ip_validation_header
+# %ARGUMENTS:
+#  None
+# %RETURNS:
+#  1 if header was added; 0 otherwise
+# %DESCRIPTION:
+#  Adds an IP address validation header to preserve relay info.
+#***********************************************************************
+sub add_ip_validation_header {
+    if ($ValidateIPHeader eq "") {
+	md_syslog('warning', 'add_ip_validation_header called, but no validation header available.  Check permissions on @CONFDIR_EVAL@/mimedefang-ip-key');
+	return 0;
+    }
+    action_add_header($ValidateIPHeader, $RelayAddr);
+    return 1;
+}
+
+#***********************************************************************
+# %PROCEDURE: delete_ip_validation_header
+# %ARGUMENTS:
+#  None
+# %RETURNS:
+#  1 if header was deleted; 0 otherwise
+# %DESCRIPTION:
+#  Deletes IP address validation header.
+#***********************************************************************
+sub delete_ip_validation_header {
+    if ($ValidateIPHeader eq "") {
+	md_syslog('warning', 'delete_ip_validation_header called, but no validation header available.  Check permissions on @CONFDIR_EVAL@/mimedefang-ip-key');
+	return 0;
+    }
+    action_delete_all_headers($ValidateIPHeader);
+    return 1;
+}
+
+=over 4
+
+=item read_config(file_path)
+
+Loads a config file where global variables can be stored.
+
+=back
+
+=cut
+
+#***********************************************************************
+# %PROCEDURE: read_config
+# %ARGUMENTS:
+#  configuration file path
+# %RETURNS:
+#  return 1 if configuration file cannot be loaded; 0 otherwise
+# %DESCRIPTION:
+#  loads a configuration file to overwrite global variables values
+#***********************************************************************
+# Derivative work from amavisd-new read_config_file($$)
+# Copyright (C) 2002-2018 Mark Martinec
+sub read_config
+{
+  my($config_file) = @_;
+
+  $config_file = File::Spec->rel2abs($config_file);
+
+  my(@stat_list) = stat($config_file);  # symlinks-friendly
+  my $errn = @stat_list ? 0 : 0+$!;
+  my $owner_uid = $stat_list[4];
+  my $msg;
+
+  if ($errn == ENOENT) { $msg = "does not exist" }
+  elsif ($errn)        { $msg = "is inaccessible: $!" }
+  elsif (-d _)         { $msg = "is a directory" }
+  elsif (-S _ || -b _ || -c _) { $msg = "is not a regular file or pipe" }
+  elsif ($owner_uid) { $msg = "should be owned by root (uid 0)" }
+  if (defined $msg)    {
+    md_syslog("crit", "Config file \"$config_file\" $msg");
+    return 1;
+  }
+  if (defined(do $config_file)) {}
+  return 0;
+}
+
+=over 4
+
+=item rebuild_entity
+
+Method that descends through input entity and rebuilds an output entity.
+The various parts of the input entity may be modified (or even deleted).
+
+=back
+
+=cut
+
+#***********************************************************************
+# %PROCEDURE: rebuild_entity
+# %ARGUMENTS:
+#  out -- output entity to hold rebuilt message
+#  in -- input message
+# %RETURNS:
+#  Nothing useful
+# %DESCRIPTION:
+#  Descends through input entity and rebuilds an output entity.  The
+#  various parts of the input entity may be modified (or even deleted)
+#***********************************************************************
+sub rebuild_entity {
+  my($out, $in) = @_;
+  my @parts = $in->parts;
+  my($type) = $in->mime_type;
+  $type =~ tr/A-Z/a-z/;
+  my($body) = $in->bodyhandle;
+  my($fname) = takeStabAtFilename($in);
+  $fname = "" unless defined($fname);
+  my $extension = "";
+  $extension = $1 if $fname =~ /(\.[^.]*)$/;
+
+  # If no Content-Type: header, add one
+  if (!$in->head->mime_attr('content-type')) {
+	  $in->head->mime_attr('Content-Type', $type);
+  }
+
+  if (!defined($body)) {
+	  $Action = "accept";
+	  if (defined(&filter_multipart)) {
+	    push_status_tag("In filter_multipart routine");
+	    filter_multipart($in, $fname, $extension, $type);
+	    pop_status_tag();
+	  }
+	  if ($Action eq "drop") {
+	    $Changed = 1;
+	    return 0;
+	  }
+
+	  if ($Action eq "replace") {
+	    $Changed = 1;
+	    $out->add_part($ReplacementEntity);
+	    return 0;
+	  }
+
+	  my($subentity);
+	  $subentity = $in->dup;
+	  $subentity->parts([]);
+	  $out->add_part($subentity);
+	  map { rebuild_entity($subentity, $_) } @parts;
+  } else {
+	  # This is where we call out to the user filter.  Get some useful
+	  # info to pass to the filter
+
+	  # Default action is to accept the part
+	  $Action = "accept";
+
+	  if (defined(&filter)) {
+	    push_status_tag("In filter routine");
+	    filter($in, $fname, $extension, $type);
+	    pop_status_tag();
+	  }
+
+ 	  # If action is "drop", just drop it silently;
+	  if ($Action eq "drop") {
+	    $Changed = 1;
+	    return 0;
+	  }
+
+	  # If action is "replace", replace it with $ReplacementEntity;
+	  if ($Action eq "replace") {
+	    $Changed = 1;
+	    $out->add_part($ReplacementEntity);
+	    return 0;
+	  }
+
+	  # Otherwise, accept it
+	  $out->add_part($in);
+  }
+}
+
+exit(&main) unless caller;
+#------------------------------------------------------------
+1;

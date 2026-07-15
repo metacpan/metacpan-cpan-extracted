@@ -1,5 +1,13 @@
 Revision history for Eshu
 
+0.08    2026-07-12
+        - Add include_dir() class method so sibling modules can resolve the
+          Eshu include directory without copying headers.
+        - eshu_hl.h: syntax-highlighting pass for C, Perl, JS, CSS, XML/HTML,
+          and POD — returns malloc'd HTML with <span class="esh-*"> tokens.
+        - Add highlight_string() XS binding exposing eshu_hl.h to Perl.
+	- Add support for TypeScript, Python, Go, Rust, Java, PHP, Ruby, Lua, Bash, SQL, YAML, JSON.
+
 0.07    2026-07-09
         - eshu_file.h: undef Perl's fopen/fclose/fread/fwrite/fprintf macros
           before plain-C static functions; on Windows+MULTIPLICITY Perl

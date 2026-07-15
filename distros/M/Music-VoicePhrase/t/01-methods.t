@@ -17,6 +17,7 @@ subtest defaults => sub {
     is $obj->patch, 0, 'patch';
     is $obj->gate, 1, 'gate';
     is $obj->volume, 100, 'volume';
+    is $obj->rest_prob, 0, 'rest_prob';
     is scalar $obj->pitches->@*, 14, 'pitches';
     is_deeply $obj->intervals, [-3,-2,-1,1,2,3], 'intervals';
     isa_ok $obj->voice, 'Music::VoiceGen';

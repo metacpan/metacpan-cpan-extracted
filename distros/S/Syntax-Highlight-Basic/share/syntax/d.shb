@@ -1,0 +1,188 @@
+# Syntax file for d
+# Converted from: d.vim
+# Conversion date: 2026-07-13
+
+language: d
+extensions: d
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if switch
+
+[keyword:Constant]
+__DATE__ __EOF__ __FILE__ __FUNCTION__ __LINE__ __MODULE__ __PRETTY_FUNCTION__
+__TIMESTAMP__ __TIME__ __VENDOR__ __VERSION__ null
+
+[keyword:Debug]
+deprecated invariant unittest
+
+[keyword:Exception]
+catch finally throw try
+
+[keyword:Identifier]
+AIX ARM Alpha BSD BigEndian C C++ Cygwin D D_Coverage D_Ddoc D_InlineAsm_X86
+D_InlineAsm_X86_64 D_LP64 D_NET D_PIC D_Version2 DigitalMars FreeBSD GNU
+GNU_asm HPPA HPPA64 Hurd IA64 LDC LittleEndian MIPS MIPS64 MinGW OSX
+Objective-C OpenBSD PPC PPC64 Pascal Posix S390 S390X SDC SH SH64 SPARC
+SPARC64 SkyOS Solaris SysV3 SysV4 System Win32 Win64 Windows X86 X86_64
+__argTypes __monitor __overloadset __vptr _argptr _arguments _ctor _dtor aaa
+aad aam aas adc add addpd addps addsd addss addsubpd addsubps all allMembers
+and andnpd andnps andpd andps arpl assert blendpd blendps blendvpd blendvps
+bound bsf bsr bswap bt btc btr bts call cbw cdq classInstanceSize clc cld
+clflush cli clts cmc cmova cmovae cmovb cmovbe cmovc cmove cmovg cmovge cmovl
+cmovle cmovna cmovnae cmovnb cmovnbe cmovnc cmovne cmovng cmovnge cmovnl
+cmovnle cmovno cmovnp cmovns cmovnz cmovo cmovp cmovpe cmovpo cmovs cmovz cmp
+cmppd cmpps cmps cmpsb cmpsd cmpss cmpsw cmpxch8b cmpxchg cmpxchg16b cmpxchg8b
+comisd comiss compiles cpuid crc32 cvtdq2pd cvtdq2ps cvtpd2dq cvtpd2pi
+cvtpd2ps cvtpi2pd cvtpi2ps cvtps2dq cvtps2pd cvtps2pi cvtsd2si cvtsd2ss
+cvtsi2sd cvtsi2ss cvtss2sd cvtss2si cvttpd2dq cvttpd2pi cvttps2dq cvttps2pi
+cvttsd2si cvttss2si cwd cwde da daa das db dd de dec derivedMembers df di div
+divpd divps divsd divss dl dq ds dt dw emms enter exit extractps f2xm1 fabs
+fadd faddp failure fbld fbstp fchs fclex fcmovb fcmovbe fcmove fcmovnb
+fcmovnbe fcmovne fcmovnu fcmovu fcom fcomi fcomip fcomp fcompp fcos fdecstp
+fdisi fdiv fdivp fdivr fdivrp feni ffree fiadd ficom ficomp fidiv fidivr fild
+fimul fincstp finit fist fistp fisttp fisub fisubr fld fld1 fldcw fldenv
+fldl2e fldl2t fldlg2 fldln2 fldpi fldz fmul fmulp fnclex fndisi fneni fninit
+fnop fnsave fnstcw fnstenv fnstsw fpatan fprem fprem1 fptan frndint frstor
+fsave fscale fsetpm fsin fsincos fsqrt fst fstcw fstenv fstp fstsw fsub fsubp
+fsubr fsubrp ftst fucom fucomi fucomip fucomp fucompp fwait fxam fxch fxrstor
+fxsave fxtract fyl2x fyl2xp1 getAliasThis getAttributes getFunctionAttributes
+getMember getOverloads getPointerBitmap getProtection getUnitTests
+getVirtualFunctions getVirtualIndex getVirtualMethods haddpd haddps hasMember
+hlt hsubpd hsubps identifier idiv imul in inc inline ins insb insd insertps
+insw int into invd invlpg iret iretd isAbstractClass isAbstractFunction
+isArithmetic isAssociativeArray isFinalClass isFinalFunction isFloating
+isIntegral isLazy isNested isOut isOverrideFunction isPOD isRef isSame
+isScalar isStaticArray isStaticFunction isTemplate isUnsigned
+isVirtualFunction isVirtualMethod ja jae jb jbe jc jcxz je jecxz jg jge jl jle
+jmp jna jnae jnb jnbe jnc jne jng jnge jnl jnle jno jnp jns jnz jo jp jpe jpo
+js jz lahf lar lddqu ldmxcsr lds lea leave les lfence lfs lgdt lgs lib lidt
+linux lldt lmsw lock lods lodsb lodsd lodsw loop loope loopne loopnz loopz lsl
+lss ltr mangle maskmovdqu maskmovq maxpd maxps maxsd maxss mfence minpd minps
+minsd minss monitor mov movapd movaps movd movddup movdq2q movdqa movdqu
+movhlps movhpd movhps movlhps movlpd movlps movmskpd movmskps movntdq movntdqa
+movnti movntpd movntps movntq movq movq2dq movs movsb movsd movshdup movsldup
+movss movsw movsx movupd movups movzx mpsadbw msg mul mulpd mulps mulsd mulss
+mwait neg none nop not opAdd opAddAssign opAdd_r opAnd opAndAssign opAnd_r
+opApply opApplyReverse opAssign opBinary opBinaryRight opCall opCast opCat
+opCatAssign opCat_r opCmp opCom opDispatch opDiv opDivAssign opDiv_r opDollar
+opDot opEquals opIn opIn_r opIndex opIndexAssign opIndexOpAssign opIndexUnary
+opMod opModAssign opMod_r opMul opMulAssign opMul_r opNeg opOr opOrAssign
+opOr_r opPos opPostDec opPostInc opPow opShl opShlAssign opShl_r opShr
+opShrAssign opShr_r opSlice opSliceAssign opSliceOpAssign opSliceUnary opStar
+opSub opSubAssign opSub_r opUShr opUShrAssign opUShr_r opUnary opXor
+opXorAssign opXor_r or orpd orps out outs outsb outsd outsw pabsb pabsd pabsw
+packssdw packsswb packusdw packuswb paddb paddd paddq paddsb paddsw paddusb
+paddusw paddw palignr pand pandn parent pavgb pavgusb pavgw pblendvb pblendw
+pcmpeqb pcmpeqd pcmpeqq pcmpeqw pcmpestri pcmpestrm pcmpgtb pcmpgtd pcmpgtq
+pcmpgtw pcmpistri pcmpistrm pextrb pextrd pextrq pextrw pf2id pfacc pfadd
+pfcmpeq pfcmpge pfcmpgt pfmax pfmin pfmul pfnacc pfpnacc pfrcp pfrcpit1
+pfrsqit1 pfrsqrt pfsub pfsubr phaddd phaddsw phaddw phminposuw phsubd phsubsw
+phsubw pi2fd pinsrb pinsrd pinsrq pinsrw pmaddubsw pmaddwd pmaxsb pmaxsd
+pmaxsw pmaxub pmaxud pmaxuw pminsb pminsd pminsw pminub pminud pminuw pmovmskb
+pmovsxbd pmovsxbq pmovsxbw pmovsxdq pmovsxwd pmovsxwq pmovzxbq pmovzxbw
+pmovzxdq pmovzxwd pmovzxwq pmuldq pmulhrsw pmulhrw pmulhuw pmulhw pmulld
+pmullw pmuludq pop popa popad popcnt popf popfd popfq por prefetchnta
+prefetcht0 prefetcht1 prefetcht2 psadbw pshufb pshufd pshufhw pshuflw pshufw
+psignb psignd psignw pslld pslldq psllq psllw psrad psraw psrld psrldq psrlq
+psrlw psubb psubd psubq psubsb psubsw psubusb psubusw psubw pswapd ptest
+punpckhbw punpckhdq punpckhqdq punpckhwd punpcklbw punpckldq punpcklqdq
+punpcklwd push pusha pushad pushf pushfd pushfq pxor rcl rcpps rcpss rcr rdmsr
+rdpmc rdtsc rep repe repne repnz repz ret retf rol ror roundpd roundps roundsd
+roundss rsm rsqrtps rsqrtss sahf sal sar sbb scas scasb scasd scasw seta setae
+setb setbe setc sete setg setge setl setle setna setnae setnb setnbe setnc
+setne setng setnge setnl setnle setno setnp setns setnz seto setp setpe setpo
+sets setz sfence sgdt shl shld shr shrd shufpd shufps sidt sldt smsw sqrtpd
+sqrtps sqrtsd sqrtss startaddress stc std sti stmxcsr stos stosb stosd stosw
+str sub subpd subps subsd subss success syscall sysenter sysexit sysret test
+ucomisd ucomiss ud2 unittest unpckhpd unpckhps unpcklpd unpcklps verr verw
+vpmuldq wait wbinvd wrmsr xadd xchg xgetbv xlat xlatb xor xorpd xorps
+
+[keyword:Include]
+import module
+
+[keyword:Label]
+case default
+
+[keyword:Operator]
+align cast delete is new super this typeid typeof
+
+[keyword:Repeat]
+do for foreach foreach_reverse while
+
+[keyword:Statement]
+__ctfe __simd assert body debug delegate function in macro mixin out return
+with
+
+[keyword:StorageClass]
+__gshared __vector abstract auto const disable export final immutable in inout
+lazy nogc nothrow out override package private property protected public pure
+ref safe scope shared static synchronized system trusted volatile
+
+[keyword:Structure]
+class enum interface struct template union
+
+[keyword:Todo]
+BUG FIXME HACK REFACTOR REVIEW TEMP TODO XXX
+
+[keyword:Type]
+AssociativeArray ClassInfo Error Exception Interface MemberInfo
+MemberInfo_field MemberInfo_function ModuleInfo Object OffsetTypeInfo
+Throwable TypeInfo TypeInfo_Array TypeInfo_AssociativeArray TypeInfo_Class
+TypeInfo_Const TypeInfo_Delegate TypeInfo_Enum TypeInfo_Function
+TypeInfo_Inout TypeInfo_Interface TypeInfo_Invariant TypeInfo_Pointer
+TypeInfo_Shared TypeInfo_StaticArray TypeInfo_Struct TypeInfo_Tuple
+TypeInfo_Typedef bool byte cdouble cent cfloat char creal dchar double dstring
+equals_t float hash_t idouble ifloat int ireal long ptrdiff_t real short
+size_t sizediff_t string ubyte ucent uint ulong ushort void wchar wstring
+
+[keyword:Typedef]
+alias typedef
+
+[match:PreProc]
+pattern: \%^#!.*
+
+[match:Statement]
+pattern: \bversion\b
+
+[match:Statement]
+pattern: \bscope\b
+
+[match:Statement]
+pattern: \b__traits\b
+
+[match:PreProc]
+pattern: \bpragma\b
+
+[match:Include]
+pattern: \bextern\b
+
+[match:SpecialChar]
+pattern: \\(?:[0-7]{1,3}|[\"\\'\\?ntbrfva]|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|x[0-9a-fA-F][0-9a-fA-F])
+
+[match:SpecialChar]
+pattern: \\&[^;& \t]+;
+
+[match:Character]
+pattern: '[^\\]'
+
+[match:Special]
+pattern: \[A-Z]\d{4}
+
+[match:Statement]
+pattern: \basm\b
+
+[region:String]
+start: `
+end: `[cwd]\=
+
+[region:String]
+start: r"
+end: "[cwd]\=
+
+[region:String]
+start: x"
+end: "[cwd]\=
+

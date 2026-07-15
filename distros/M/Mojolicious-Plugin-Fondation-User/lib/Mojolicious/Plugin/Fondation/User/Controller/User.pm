@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::User::Controller::User;
-$Mojolicious::Plugin::Fondation::User::Controller::User::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::User::Controller::User::VERSION = '0.02';
 # ABSTRACT: REST controller for User CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -228,7 +228,7 @@ Mojolicious::Plugin::Fondation::User::Controller::User - REST controller for Use
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

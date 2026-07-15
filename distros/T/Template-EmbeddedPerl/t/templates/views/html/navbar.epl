@@ -1,0 +1,1 @@
+<nav>root=<%= $self->root->title %>; parent=<%= $self->parent->title %></nav>

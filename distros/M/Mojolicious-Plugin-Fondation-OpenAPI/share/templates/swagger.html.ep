@@ -1,0 +1,14 @@
+% layout (stash('layout') // 'main');
+
+<div id="swagger-ui"></div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.querySelector('#swagger-ui');
+  if (el && window.SwaggerUIBundle) {
+    SwaggerUIBundle({
+      url: '/openapi.json',
+      dom_id: '#swagger-ui',
+    });
+  }
+});
+</script>

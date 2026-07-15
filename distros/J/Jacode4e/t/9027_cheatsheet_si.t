@@ -2,7 +2,7 @@
 #
 # 9027_cheatsheet_si.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e ඉක්මන් යොමු (සිංහල)
 # මෙම පරීක්ෂණය සිංහල භාෂා පරිශීලකයින් සඳහා ඉක්මන් යොමු ලෙසද ක්‍රියා කරයි.
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm     IBM CP932
 #   cp932nec     NEC CP932
 #   sjis2004     JISC Shift_JIS-2004
+#   sjis         JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004      JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc          JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004      JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis          JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930      IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
 #   keis78       HITACHI KEIS78
 #   keis83       HITACHI KEIS83
@@ -69,7 +74,8 @@ use lib "$FindBin::Bin/../lib";
 # [අනතුරු ඇඟවීම: ද්විදිශානල පරිවර්තනය]
 #
 #   හානිකර පරිවර්තනයන් තිබේ (උදා. CP932 හි ආපසු හැරවිය නොහැකි mapping 398ක් ඇත)。
-#   ද්විදිශානල පරිවර්තනය සඳහා Jacode4e::RoundTrip module භාවිත කරන්න.
+#   ද්විදිශානුගත පරිවර්තනය සඳහා 'ROUND_TRIP' => 1 විකල්පය භාවිත කරන්න.
+#   දෙදිශාවටම 'ROUND_TRIP' => 1 සහ එකම Jacode4e අනුවාදය අවශ්‍යයි.
 #
 # ======================================================================
 

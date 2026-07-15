@@ -2,7 +2,7 @@
 #
 # 9025_cheatsheet_my.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e အမြန်ကိုးကားချက် (မြန်မာဘာသာ)
 # ဤစမ်းသပ်မှုသည် မြန်မာဘာသာသုံးသူများအတွက် အမြန်ကိုးကားချက်အဖြစ်လည်း ဆောင်ရွက်သည်။
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm     IBM CP932
 #   cp932nec     NEC CP932
 #   sjis2004     JISC Shift_JIS-2004
+#   sjis         JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004      JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc          JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004      JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis          JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930      IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
 #   keis78       HITACHI KEIS78
 #   keis83       HITACHI KEIS83
@@ -69,7 +74,8 @@ use lib "$FindBin::Bin/../lib";
 # [သတိပေးချက်: နှစ်ဖက်ပြောင်းလဲမှု]
 #
 #   ဆုံးရှုံးမှုရှိသော ပြောင်းလဲမှုများ ရှိသည် (ဥပမာ CP932 တွင် ပြန်လှန်မရသော mapping ၃၉၈ ခုရှိသည်)။
-#   နှစ်ဖက်ပြောင်းလဲမှုအတွက် Jacode4e::RoundTrip module ကို အသုံးပြုပါ။
+#   နှစ်ဖက်ပြောင်းလဲမှုအတွက် 'ROUND_TRIP' => 1 option ကို အသုံးပြုပါ။
+#   နှစ်ဖက်စလုံးတွင် 'ROUND_TRIP' => 1 နှင့် တူညီသော Jacode4e version လိုအပ်သည်။
 #
 # ======================================================================
 

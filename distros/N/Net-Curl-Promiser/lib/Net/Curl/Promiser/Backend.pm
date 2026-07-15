@@ -16,6 +16,8 @@ sub new {
     }, shift;
 }
 
+sub INIT_PROMISE {}
+
 sub cancel_handle {
     my ($self, $easy, $multi) = @_;
 
@@ -75,6 +77,7 @@ sub add_handle {
         $promise = $self->PROMISE_CLASS()->new( sub {
             $self->{'callbacks'}{$easy} = \@_;
         } );
+        $self->INIT_PROMISE($promise);
     }
 
     return $promise;

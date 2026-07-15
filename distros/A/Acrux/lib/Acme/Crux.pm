@@ -1185,7 +1185,7 @@ sub run_handler {
     }
 
     # Run
-    my %info;
+    my %info = (orig => $name);
     my $func;
     $self->{running} = 1;
     foreach my $k (keys %$meta) {

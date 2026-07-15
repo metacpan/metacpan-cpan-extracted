@@ -1,0 +1,67 @@
+# Syntax file for haskell
+# Converted from: haskell.vim
+# Conversion date: 2026-07-13
+
+language: haskell
+extensions: haskell
+
+[keyword:Boolean]
+False True
+
+[keyword:Conditional]
+else if then
+
+[keyword:Debug]
+error trace undefined
+
+[keyword:Include]
+as hiding import qualified
+
+[keyword:PreProc]
+infix infixl infixr
+
+[keyword:Statement]
+case do in let mdo of
+
+[keyword:Structure]
+class data default deriving family instance module where
+
+[keyword:Type]
+Addr Array Bool Char Complex Double Either ExitCode Float IO IOError IOResult
+Int Integer Maybe Ordering Ratio String Void
+
+[keyword:Typedef]
+newtype type
+
+[match:Operator]
+pattern: (?:\b[A-Z][a-zA-Z0-9_']*\.)?[-!#$%&\*+/<=>\?@\\^|~.][-!#$%&\*+/<=>\?@\\^|~:.]*
+
+[match:Operator]
+pattern: (?:\b[A-Z][a-zA-Z0-9_']*\.)?:[-!#$%&\*+./<=>\?@\\^|~:]*
+
+[match:Operator]
+pattern: `(?:\b[A-Z][a-zA-Z0-9_']*\.)?[a-z][a-zA-Z0-9_']*`
+
+[match:Operator]
+pattern: `(?:\b[A-Z][a-zA-Z0-9_']*\.)?[A-Z][a-zA-Z0-9_']*`
+
+[match:Special]
+pattern: #[a-z][a-zA-Z0-9_']*\b
+
+[match:Delimiter]
+pattern: (|)|\[|\]|,|;|{|}
+
+[match:Number]
+pattern: \v<[0-9]%(_*[0-9])*>|<0[xX]_*[0-9a-fA-F]%(_*[0-9a-fA-F])*>|<0[oO]_*%(_*[0-7])*>|<0[bB]_*[01]%(_*[01])*>
+
+[match:Float]
+pattern: \v<[0-9]%(_*[0-9])*\.[0-9]%(_*[0-9])*%(_*[eE][-+]?[0-9]%(_*[0-9])*)?>|<[0-9]%(_*[0-9])*_*[eE][-+]?[0-9]%(_*[0-9])*>|<0[xX]_*[0-9a-fA-F]%(_*[0-9a-fA-F])*\.[0-9a-fA-F]%(_*[0-9a-fA-F])*%(_*[pP][-+]?[0-9]%(_*[0-9])*)?>|<0[xX]_*[0-9a-fA-F]%(_*[0-9a-fA-F])*_*[pP][-+]?[0-9]%(_*[0-9])*>
+
+[region:SpecialComment]
+start: {-#
+end: #-}
+
+[region:String]
+start: "
+end: "
+

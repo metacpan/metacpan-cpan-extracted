@@ -1,0 +1,638 @@
+# Syntax file for objc
+# Converted from: objc.vim
+# Conversion date: 2026-07-13
+
+language: objc
+extensions: objc
+
+[keyword:Constant]
+NO NSASCIIStringEncoding NSActivityAutomaticTerminationDisabled
+NSActivityBackground NSActivityIdleDisplaySleepDisabled
+NSActivityIdleSystemSleepDisabled NSActivityLatencyCritical
+NSActivitySuddenTerminationDisabled NSActivityUserInitiated
+NSActivityUserInitiatedAllowingIdleSystemSleep NSAdminApplicationDirectory
+NSAlignAllEdgesInward NSAlignAllEdgesNearest NSAlignAllEdgesOutward
+NSAlignHeightInward NSAlignHeightNearest NSAlignHeightOutward
+NSAlignMaxXInward NSAlignMaxXNearest NSAlignMaxXOutward NSAlignMaxYInward
+NSAlignMaxYNearest NSAlignMaxYOutward NSAlignMinXInward NSAlignMinXNearest
+NSAlignMinXOutward NSAlignMinYInward NSAlignMinYNearest NSAlignMinYOutward
+NSAlignRectFlipped NSAlignWidthInward NSAlignWidthNearest NSAlignWidthOutward
+NSAllApplicationsDirectory NSAllDomainsMask NSAllLibrariesDirectory
+NSAnchoredSearch NSApplicationDirectory NSApplicationScriptsDirectory
+NSApplicationSupportDirectory NSArgumentDomain NSAtomicWrite
+NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+NSAttributedStringEnumerationReverse NSAutosavedInformationDirectory
+NSBackwardsSearch NSBinarySearchingFirstEqual NSBinarySearchingInsertionIndex
+NSBinarySearchingLastEqual NSBuddhistCalendar NSBundleDidLoadNotification
+NSBundleExecutableArchitectureI386 NSBundleExecutableArchitecturePPC
+NSBundleExecutableArchitecturePPC64 NSBundleExecutableArchitectureX86_64
+NSBundleResourceRequestLoadingPriorityUrgent
+NSBundleResourceRequestLowDiskSpaceNotification NSCachesDirectory
+NSCalculationDivideByZero NSCalculationLossOfPrecision NSCalculationNoError
+NSCalculationOverflow NSCalculationUnderflow NSCalendarCalendarUnit
+NSCalendarDayChangedNotification NSCalendarIdentifierBuddhist
+NSCalendarIdentifierChinese NSCalendarIdentifierCoptic
+NSCalendarIdentifierEthiopicAmeteAlem NSCalendarIdentifierEthiopicAmeteMihret
+NSCalendarIdentifierGregorian NSCalendarIdentifierHebrew
+NSCalendarIdentifierISO8601 NSCalendarIdentifierIndian
+NSCalendarIdentifierIslamic NSCalendarIdentifierIslamicCivil
+NSCalendarIdentifierIslamicTabular NSCalendarIdentifierIslamicUmmAlQura
+NSCalendarIdentifierJapanese NSCalendarIdentifierPersian
+NSCalendarIdentifierRepublicOfChina NSCalendarMatchFirst NSCalendarMatchLast
+NSCalendarMatchNextTime NSCalendarMatchNextTimePreservingSmallerUnits
+NSCalendarMatchPreviousTimePreservingSmallerUnits NSCalendarMatchStrictly
+NSCalendarSearchBackwards NSCalendarUnitCalendar NSCalendarUnitDay
+NSCalendarUnitEra NSCalendarUnitHour NSCalendarUnitMinute NSCalendarUnitMonth
+NSCalendarUnitNanosecond NSCalendarUnitQuarter NSCalendarUnitSecond
+NSCalendarUnitTimeZone NSCalendarUnitWeekOfMonth NSCalendarUnitWeekOfYear
+NSCalendarUnitWeekday NSCalendarUnitWeekdayOrdinal NSCalendarUnitYear
+NSCalendarUnitYearForWeekOfYear NSCalendarWrapComponents
+NSCaseInsensitiveSearch NSCharacterConversionException NSChineseCalendar
+NSCocoaErrorDomain NSCollectorDisabledOption NSConnectionDidDieNotification
+NSConnectionDidInitializeNotification NSConnectionReplyMode
+NSCoreServiceDirectory NSCurrentLocaleDidChangeNotification
+NSDataBase64DecodingIgnoreUnknownCharacters
+NSDataBase64Encoding64CharacterLineLength
+NSDataBase64Encoding76CharacterLineLength
+NSDataBase64EncodingEndLineWithCarriageReturn
+NSDataBase64EncodingEndLineWithLineFeed NSDataReadingMapped
+NSDataReadingMappedAlways NSDataReadingMappedIfSafe NSDataReadingUncached
+NSDataSearchAnchored NSDataSearchBackwards NSDataWritingAtomic
+NSDataWritingFileProtectionComplete
+NSDataWritingFileProtectionCompleteUnlessOpen
+NSDataWritingFileProtectionCompleteUntilFirstUserAuthentication
+NSDataWritingFileProtectionMask NSDataWritingFileProtectionNone
+NSDataWritingWithoutOverwriting NSDateComponentUndefined
+NSDateFormatterBehavior10_0 NSDateFormatterBehavior10_4
+NSDateFormatterBehaviorDefault NSDateFormatterFullStyle
+NSDateFormatterLongStyle NSDateFormatterMediumStyle NSDateFormatterNoStyle
+NSDateFormatterShortStyle NSDayCalendarUnit NSDecimalMaxSize NSDecimalNoScale
+NSDecimalNumberDivideByZeroException NSDecimalNumberExactnessException
+NSDecimalNumberOverflowException NSDecimalNumberUnderflowException
+NSDefaultRunLoopMode NSDemoApplicationDirectory NSDesktopDirectory
+NSDestinationInvalidException NSDeveloperApplicationDirectory
+NSDeveloperDirectory NSDiacriticInsensitiveSearch
+NSDidBecomeSingleThreadedNotification NSDirectoryEnumerationSkipsHiddenFiles
+NSDirectoryEnumerationSkipsPackageDescendants
+NSDirectoryEnumerationSkipsSubdirectoryDescendants
+NSDistributedNotificationDeliverImmediately
+NSDistributedNotificationPostToAllSessions NSDocumentDirectory
+NSDocumentationDirectory NSDownloadsDirectory NSEdgeInsetsZero
+NSEnumerationConcurrent NSEnumerationReverse NSEraCalendarUnit
+NSFailedAuthenticationException NSFileAppendOnly NSFileBusy NSFileCreationDate
+NSFileDeviceIdentifier NSFileExtensionHidden NSFileGroupOwnerAccountID
+NSFileGroupOwnerAccountName NSFileHFSCreatorCode NSFileHFSTypeCode
+NSFileHandleConnectionAcceptedNotification
+NSFileHandleDataAvailableNotification NSFileHandleNotificationDataItem
+NSFileHandleNotificationFileHandleItem NSFileHandleNotificationMonitorModes
+NSFileHandleOperationException NSFileHandleReadCompletionNotification
+NSFileHandleReadToEndOfFileCompletionNotification NSFileImmutable
+NSFileManagerItemReplacementUsingNewMetadataOnly
+NSFileManagerItemReplacementWithoutDeletingBackupItem
+NSFileManagerUnmountAllPartitionsAndEjectDisk
+NSFileManagerUnmountDissentingProcessIdentifierErrorKey
+NSFileManagerUnmountWithoutUI NSFileModificationDate NSFileOwnerAccountID
+NSFileOwnerAccountName NSFilePathErrorKey NSFilePosixPermissions
+NSFileProtectionComplete NSFileProtectionCompleteUnlessOpen
+NSFileProtectionCompleteUntilFirstUserAuthentication NSFileProtectionKey
+NSFileProtectionNone NSFileReferenceCount NSFileSize NSFileSystemFileNumber
+NSFileSystemFreeNodes NSFileSystemFreeSize NSFileSystemNodes
+NSFileSystemNumber NSFileSystemSize NSFileType NSFileTypeBlockSpecial
+NSFileTypeCharacterSpecial NSFileTypeDirectory NSFileTypeRegular
+NSFileTypeSocket NSFileTypeSymbolicLink NSFileTypeUnknown
+NSForcedOrderingSearch NSFormattingContextBeginningOfSentence
+NSFormattingContextDynamic NSFormattingContextListItem
+NSFormattingContextMiddleOfSentence NSFormattingContextStandalone
+NSFormattingContextUnknown NSFormattingUnitStyleLong
+NSFormattingUnitStyleMedium NSFormattingUnitStyleShort NSGenericException
+NSGlobalDomain NSGregorianCalendar NSHPUXOperatingSystem NSHashTableCopyIn
+NSHashTableObjectPointerPersonality NSHashTableStrongMemory
+NSHashTableWeakMemory NSHashTableZeroingWeakMemory NSHebrewCalendar
+NSHelpAnchorErrorKey NSHourCalendarUnit NSISO2022JPStringEncoding
+NSISO8601Calendar NSISOLatin1StringEncoding NSISOLatin2StringEncoding
+NSInconsistentArchiveException NSIndianCalendar NSInputMethodsDirectory
+NSIntHashCallBacks NSIntMapKeyCallBacks NSIntMapValueCallBacks
+NSIntegerHashCallBacks NSIntegerMapKeyCallBacks NSIntegerMapValueCallBacks
+NSInternalInconsistencyException NSInvalidArchiveOperationException
+NSInvalidArgumentException NSInvalidReceivePortException
+NSInvalidSendPortException NSInvalidUnarchiveOperationException
+NSInvocationOperationCancelledException
+NSInvocationOperationVoidResultException NSIslamicCalendar
+NSIslamicCivilCalendar NSItemReplacementDirectory NSJapaneseCalendar
+NSJapaneseEUCStringEncoding NSKeyedArchiveRootObjectKey NSLibraryDirectory
+NSLiteralSearch NSLoadedClasses NSLocalDomainMask
+NSLocalNotificationCenterType NSLocaleAlternateQuotationBeginDelimiterKey
+NSLocaleAlternateQuotationEndDelimiterKey NSLocaleCalendar
+NSLocaleCollationIdentifier NSLocaleCollatorIdentifier NSLocaleCountryCode
+NSLocaleCurrencyCode NSLocaleCurrencySymbol NSLocaleDecimalSeparator
+NSLocaleExemplarCharacterSet NSLocaleGroupingSeparator NSLocaleIdentifier
+NSLocaleLanguageCode NSLocaleLanguageDirectionBottomToTop
+NSLocaleLanguageDirectionLeftToRight NSLocaleLanguageDirectionRightToLeft
+NSLocaleLanguageDirectionTopToBottom NSLocaleLanguageDirectionUnknown
+NSLocaleMeasurementSystem NSLocaleQuotationBeginDelimiterKey
+NSLocaleQuotationEndDelimiterKey NSLocaleScriptCode NSLocaleUsesMetricSystem
+NSLocaleVariantCode NSLocalizedDescriptionKey NSLocalizedFailureReasonErrorKey
+NSLocalizedRecoveryOptionsErrorKey NSLocalizedRecoverySuggestionErrorKey
+NSMACHOperatingSystem NSMacOSRomanStringEncoding NSMachErrorDomain
+NSMachPortDeallocateNone NSMachPortDeallocateReceiveRight
+NSMachPortDeallocateSendRight NSMallocException NSMapTableCopyIn
+NSMapTableObjectPointerPersonality NSMapTableStrongMemory NSMapTableWeakMemory
+NSMapTableZeroingWeakMemory NSMappedRead NSMaxXEdge NSMaxYEdge NSMinXEdge
+NSMinYEdge NSMinuteCalendarUnit NSMonthCalendarUnit NSMoviesDirectory
+NSMusicDirectory NSNEXTSTEPStringEncoding NSNetworkDomainMask
+NSNonLossyASCIIStringEncoding NSNonOwnedPointerHashCallBacks
+NSNonOwnedPointerMapKeyCallBacks NSNonOwnedPointerMapValueCallBacks
+NSNonOwnedPointerOrNullMapKeyCallBacks NSNonRetainedObjectHashCallBacks
+NSNonRetainedObjectMapKeyCallBacks NSNonRetainedObjectMapValueCallBacks
+NSNotFound NSNotificationCoalescingOnName NSNotificationCoalescingOnSender
+NSNotificationDeliverImmediately NSNotificationNoCoalescing
+NSNotificationPostToAllSessions NSNotificationSuspensionBehaviorCoalesce
+NSNotificationSuspensionBehaviorDeliverImmediately
+NSNotificationSuspensionBehaviorDrop NSNotificationSuspensionBehaviorHold
+NSNumberFormatterBehavior10_0 NSNumberFormatterBehavior10_4
+NSNumberFormatterBehaviorDefault NSNumberFormatterCurrencyAccountingStyle
+NSNumberFormatterCurrencyISOCodeStyle NSNumberFormatterCurrencyPluralStyle
+NSNumberFormatterCurrencyStyle NSNumberFormatterDecimalStyle
+NSNumberFormatterNoStyle NSNumberFormatterOrdinalStyle
+NSNumberFormatterPadAfterPrefix NSNumberFormatterPadAfterSuffix
+NSNumberFormatterPadBeforePrefix NSNumberFormatterPadBeforeSuffix
+NSNumberFormatterPercentStyle NSNumberFormatterRoundCeiling
+NSNumberFormatterRoundDown NSNumberFormatterRoundFloor
+NSNumberFormatterRoundHalfDown NSNumberFormatterRoundHalfEven
+NSNumberFormatterRoundHalfUp NSNumberFormatterRoundUp
+NSNumberFormatterScientificStyle NSNumberFormatterSpellOutStyle
+NSNumericSearch NSOSF1OperatingSystem NSOSStatusErrorDomain
+NSObjectHashCallBacks NSObjectInaccessibleException NSObjectMapKeyCallBacks
+NSObjectMapValueCallBacks NSObjectNotAvailableException NSOldStyleException
+NSOpenStepUnicodeReservedBase
+NSOperationQueueDefaultMaxConcurrentOperationCount
+NSOperationQueuePriorityHigh NSOperationQueuePriorityLow
+NSOperationQueuePriorityNormal NSOperationQueuePriorityVeryHigh
+NSOperationQueuePriorityVeryLow NSOrderedAscending NSOrderedDescending
+NSOrderedSame NSOwnedObjectIdentityHashCallBacks NSOwnedPointerHashCallBacks
+NSOwnedPointerMapKeyCallBacks NSOwnedPointerMapValueCallBacks
+NSPOSIXErrorDomain NSParseErrorException NSPersianCalendar NSPicturesDirectory
+NSPointerFunctionsCStringPersonality NSPointerFunctionsCopyIn
+NSPointerFunctionsIntegerPersonality NSPointerFunctionsMachVirtualMemory
+NSPointerFunctionsMallocMemory NSPointerFunctionsObjectPersonality
+NSPointerFunctionsObjectPointerPersonality NSPointerFunctionsOpaqueMemory
+NSPointerFunctionsOpaquePersonality NSPointerFunctionsStrongMemory
+NSPointerFunctionsStructPersonality NSPointerFunctionsWeakMemory
+NSPointerFunctionsZeroingWeakMemory NSPointerToStructHashCallBacks
+NSPortDidBecomeInvalidNotification NSPortReceiveException NSPortSendException
+NSPortTimeoutException NSPostASAP NSPostNow NSPostWhenIdle
+NSPreferencePanesDirectory NSPrinterDescriptionDirectory
+NSProcessInfoPowerStateDidChangeNotification NSProcessInfoThermalStateCritical
+NSProcessInfoThermalStateDidChangeNotification NSProcessInfoThermalStateFair
+NSProcessInfoThermalStateNominal NSProcessInfoThermalStateSerious
+NSPropertyListBinaryFormat_v1_0 NSPropertyListImmutable
+NSPropertyListMutableContainers NSPropertyListMutableContainersAndLeaves
+NSPropertyListOpenStepFormat NSPropertyListXMLFormat_v1_0
+NSProprietaryStringEncoding NSQualityOfServiceBackground
+NSQualityOfServiceDefault NSQualityOfServiceUserInitiated
+NSQualityOfServiceUserInteractive NSQualityOfServiceUtility
+NSQuarterCalendarUnit NSRangeException NSRecoveryAttempterErrorKey
+NSRectEdgeMaxX NSRectEdgeMaxY NSRectEdgeMinX NSRectEdgeMinY
+NSRegistrationDomain NSRegularExpressionSearch NSRepublicOfChinaCalendar
+NSRoundBankers NSRoundDown NSRoundPlain NSRoundUp NSRunLoopCommonModes
+NSScannedOption NSSecondCalendarUnit NSSharedPublicDirectory
+NSShiftJISStringEncoding NSSolarisOperatingSystem NSSortConcurrent
+NSSortStable NSStringEncodingConversionAllowLossy
+NSStringEncodingConversionExternalRepresentation
+NSStringEncodingDetectionAllowLossyKey
+NSStringEncodingDetectionDisallowedEncodingsKey
+NSStringEncodingDetectionFromWindowsKey
+NSStringEncodingDetectionLikelyLanguageKey
+NSStringEncodingDetectionLossySubstitutionKey
+NSStringEncodingDetectionSuggestedEncodingsKey
+NSStringEncodingDetectionUseOnlySuggestedEncodingsKey NSStringEncodingErrorKey
+NSStringEnumerationByComposedCharacterSequences NSStringEnumerationByLines
+NSStringEnumerationByParagraphs NSStringEnumerationBySentences
+NSStringEnumerationByWords NSStringEnumerationLocalized
+NSStringEnumerationReverse NSStringEnumerationSubstringNotRequired
+NSStringTransformFullwidthToHalfwidth NSStringTransformHiraganaToKatakana
+NSStringTransformLatinToArabic NSStringTransformLatinToCyrillic
+NSStringTransformLatinToGreek NSStringTransformLatinToHangul
+NSStringTransformLatinToHebrew NSStringTransformLatinToHiragana
+NSStringTransformLatinToKatakana NSStringTransformLatinToThai
+NSStringTransformMandarinToLatin NSStringTransformStripCombiningMarks
+NSStringTransformStripDiacritics NSStringTransformToLatin
+NSStringTransformToUnicodeName NSStringTransformToXMLHex
+NSSunOSOperatingSystem NSSymbolStringEncoding
+NSSystemClockDidChangeNotification NSSystemDomainMask
+NSSystemTimeZoneDidChangeNotification NSTaskDidTerminateNotification
+NSTaskTerminationReasonExit NSTaskTerminationReasonUncaughtSignal
+NSThreadWillExitNotification NSThumbnail1024x1024SizeKey
+NSTimeZoneCalendarUnit NSTimeZoneNameStyleDaylightSaving
+NSTimeZoneNameStyleGeneric NSTimeZoneNameStyleShortDaylightSaving
+NSTimeZoneNameStyleShortGeneric NSTimeZoneNameStyleShortStandard
+NSTimeZoneNameStyleStandard NSTrashDirectory NSURLAddedToDirectoryDateKey
+NSURLApplicationIsScriptableKey NSURLAttributeModificationDateKey
+NSURLBookmarkCreationMinimalBookmark
+NSURLBookmarkCreationPreferFileIDResolution
+NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
+NSURLBookmarkCreationSuitableForBookmarkFile
+NSURLBookmarkCreationWithSecurityScope
+NSURLBookmarkResolutionWithSecurityScope
+NSURLBookmarkResolutionWithoutMounting NSURLBookmarkResolutionWithoutUI
+NSURLContentAccessDateKey NSURLContentModificationDateKey NSURLCreationDateKey
+NSURLCustomIconKey NSURLDocumentIdentifierKey NSURLEffectiveIconKey
+NSURLErrorKey NSURLFileAllocatedSizeKey NSURLFileProtectionComplete
+NSURLFileProtectionCompleteUnlessOpen
+NSURLFileProtectionCompleteUntilFirstUserAuthentication NSURLFileProtectionKey
+NSURLFileProtectionNone NSURLFileResourceIdentifierKey
+NSURLFileResourceTypeBlockSpecial NSURLFileResourceTypeCharacterSpecial
+NSURLFileResourceTypeDirectory NSURLFileResourceTypeKey
+NSURLFileResourceTypeNamedPipe NSURLFileResourceTypeRegular
+NSURLFileResourceTypeSocket NSURLFileResourceTypeSymbolicLink
+NSURLFileResourceTypeUnknown NSURLFileScheme NSURLFileSecurityKey
+NSURLFileSizeKey NSURLGenerationIdentifierKey NSURLHasHiddenExtensionKey
+NSURLIsAliasFileKey NSURLIsApplicationKey NSURLIsDirectoryKey
+NSURLIsExcludedFromBackupKey NSURLIsExecutableKey NSURLIsHiddenKey
+NSURLIsMountTriggerKey NSURLIsPackageKey NSURLIsReadableKey
+NSURLIsRegularFileKey NSURLIsSymbolicLinkKey NSURLIsSystemImmutableKey
+NSURLIsUbiquitousItemKey NSURLIsUserImmutableKey NSURLIsVolumeKey
+NSURLIsWritableKey NSURLKeysOfUnsetValuesKey NSURLLabelColorKey
+NSURLLabelNumberKey NSURLLinkCountKey NSURLLocalizedLabelKey
+NSURLLocalizedNameKey NSURLLocalizedTypeDescriptionKey NSURLNameKey
+NSURLParentDirectoryURLKey NSURLPathKey NSURLPreferredIOBlockSizeKey
+NSURLQuarantinePropertiesKey NSURLRelationshipContains NSURLRelationshipOther
+NSURLRelationshipSame NSURLTagNamesKey NSURLThumbnailDictionaryKey
+NSURLThumbnailKey NSURLTotalFileAllocatedSizeKey NSURLTotalFileSizeKey
+NSURLTypeIdentifierKey NSURLUbiquitousItemContainerDisplayNameKey
+NSURLUbiquitousItemDownloadRequestedKey NSURLUbiquitousItemDownloadingErrorKey
+NSURLUbiquitousItemDownloadingStatusCurrent
+NSURLUbiquitousItemDownloadingStatusDownloaded
+NSURLUbiquitousItemDownloadingStatusKey
+NSURLUbiquitousItemDownloadingStatusNotDownloaded
+NSURLUbiquitousItemHasUnresolvedConflictsKey
+NSURLUbiquitousItemIsDownloadedKey NSURLUbiquitousItemIsDownloadingKey
+NSURLUbiquitousItemIsUploadedKey NSURLUbiquitousItemIsUploadingKey
+NSURLUbiquitousItemPercentDownloadedKey NSURLUbiquitousItemPercentUploadedKey
+NSURLUbiquitousItemUploadingErrorKey NSURLVolumeAvailableCapacityKey
+NSURLVolumeCreationDateKey NSURLVolumeIdentifierKey
+NSURLVolumeIsAutomountedKey NSURLVolumeIsBrowsableKey
+NSURLVolumeIsEjectableKey NSURLVolumeIsInternalKey NSURLVolumeIsJournalingKey
+NSURLVolumeIsLocalKey NSURLVolumeIsReadOnlyKey NSURLVolumeIsRemovableKey
+NSURLVolumeLocalizedFormatDescriptionKey NSURLVolumeLocalizedNameKey
+NSURLVolumeMaximumFileSizeKey NSURLVolumeNameKey NSURLVolumeResourceCountKey
+NSURLVolumeSupportsAdvisoryFileLockingKey
+NSURLVolumeSupportsCasePreservedNamesKey
+NSURLVolumeSupportsCaseSensitiveNamesKey
+NSURLVolumeSupportsExtendedSecurityKey NSURLVolumeSupportsHardLinksKey
+NSURLVolumeSupportsJournalingKey NSURLVolumeSupportsPersistentIDsKey
+NSURLVolumeSupportsRenamingKey NSURLVolumeSupportsRootDirectoryDatesKey
+NSURLVolumeSupportsSparseFilesKey NSURLVolumeSupportsSymbolicLinksKey
+NSURLVolumeSupportsVolumeSizesKey NSURLVolumeSupportsZeroRunsKey
+NSURLVolumeTotalCapacityKey NSURLVolumeURLForRemountingKey NSURLVolumeURLKey
+NSURLVolumeUUIDStringKey NSUTF16BigEndianStringEncoding
+NSUTF16LittleEndianStringEncoding NSUTF16StringEncoding
+NSUTF32BigEndianStringEncoding NSUTF32LittleEndianStringEncoding
+NSUTF32StringEncoding NSUTF8StringEncoding
+NSUbiquityIdentityDidChangeNotification NSUncachedRead
+NSUndefinedDateComponent NSUnderlyingErrorKey NSUnicodeStringEncoding
+NSUserDefaultsDidChangeNotification NSUserDirectory NSUserDomainMask
+NSVolumeEnumerationProduceFileReferenceURLs
+NSVolumeEnumerationSkipHiddenVolumes NSWeekCalendarUnit
+NSWeekOfMonthCalendarUnit NSWeekOfYearCalendarUnit NSWeekdayCalendarUnit
+NSWeekdayOrdinalCalendarUnit NSWidthInsensitiveSearch
+NSWillBecomeMultiThreadedNotification NSWindows95OperatingSystem
+NSWindowsCP1250StringEncoding NSWindowsCP1251StringEncoding
+NSWindowsCP1252StringEncoding NSWindowsCP1253StringEncoding
+NSWindowsCP1254StringEncoding NSWindowsNTOperatingSystem
+NSWrapCalendarComponents NSYearCalendarUnit NSYearForWeekOfYearCalendarUnit
+NSZeroPoint NSZeroRect NSZeroSize Nil YES __OBJC2__ __OBJC__ __clang__ assign
+copy nil nonatomic null_resettable readonly readwrite retain strong weak
+
+[keyword:Identifier]
+KeyType ObjectType
+
+[keyword:Macro]
+NSIntegerMax NSIntegerMin NSMaximumStringLength NSNotAPointerMapKey
+NSNotAnIntMapKey NSNotAnIntegerMapKey NSTimeIntervalSince1970 NSUIntegerMax
+NS_AUTOMATED_REFCOUNT_UNAVAILABLE NS_AUTOMATED_REFCOUNT_WEAK_UNAVAILABLE
+NS_BLOCKS_AVAILABLE NS_DESIGNATED_INITIALIZER NS_FORMAT_ARGUMENT
+NS_FORMAT_FUNCTION NS_INLINE NS_NONATOMIC_IOSONLY
+NS_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION NS_RELEASES_ARGUMENT
+NS_REPLACES_RECEIVER NS_REQUIRES_NIL_TERMINATION
+NS_REQUIRES_PROPERTY_DEFINITIONS NS_REQUIRES_SUPER NS_RETURNS_INNER_POINTER
+NS_RETURNS_NOT_RETAINED NS_RETURNS_RETAINED NS_ROOT_CLASS
+NS_VALID_UNTIL_END_OF_SCOPE
+
+[keyword:Statement]
+_cmd self super
+
+[keyword:StorageClass]
+_Nonnull _Null_unspecified _Nullable __autoreleasing __block __bridge
+__bridge_retained __bridge_transfer __nonnull __null_unspecified __nullable
+__strong __unsafe_unretained __weak nonnull null_unspecified nullable
+
+[keyword:Type]
+BOOL CGFloat CGPoint CGRect CGSize Class IMP NSActivityOptions
+NSAlignmentOptions NSAttributedStringEnumerationOptions
+NSBinarySearchingOptions NSCalculationError NSCalendarOptions NSCalendarUnit
+NSComparator NSComparisonResult NSDataBase64DecodingOptions
+NSDataBase64EncodingOptions NSDataReadingOptions NSDataSearchOptions
+NSDataWritingOptions NSDateFormatterBehavior NSDateFormatterStyle NSDecimal
+NSDirectoryEnumerationOptions NSDistributedNotificationOptions NSEdgeInsets
+NSEnumerationOptions NSFastEnumerationState
+NSFileManagerItemReplacementOptions NSFileManagerUnmountOptions
+NSFormattingContext NSFormattingUnitStyle NSHashEnumerator
+NSHashTableCallBacks NSHashTableOptions NSInteger NSLocaleLanguageDirection
+NSMachPortOptions NSMapEnumerator NSMapTableKeyCallBacks NSMapTableOptions
+NSMapTableValueCallBacks NSNotificationCoalescing
+NSNotificationSuspensionBehavior NSNumberFormatterBehavior
+NSNumberFormatterPadPosition NSNumberFormatterRoundingMode
+NSNumberFormatterStyle NSOperatingSystemVersion NSOperationQueuePriority
+NSPoint NSPointArray NSPointPointer NSPointerFunctionsOptions NSPostingStyle
+NSProcessInfoThermalState NSPropertyListFormat NSPropertyListMutabilityOptions
+NSPropertyListReadOptions NSPropertyListWriteOptions NSQualityOfService
+NSRange NSRangePointer NSRect NSRectArray NSRectEdge NSRectPointer
+NSRoundingMode NSSearchPathDirectory NSSearchPathDomainMask NSSize NSSizeArray
+NSSizePointer NSSocketNativeHandle NSSortOptions NSStringCompareOptions
+NSStringEncoding NSStringEncodingConversionOptions NSStringEnumerationOptions
+NSTaskTerminationReason NSTimeInterval NSTimeZoneNameStyle NSUInteger
+NSURLBookmarkCreationOptions NSURLBookmarkFileCreationOptions
+NSURLBookmarkResolutionOptions NSURLRelationship NSUncaughtExceptionHandler
+NSVolumeEnumerationOptions SEL __covariant __kindof id instancetype unichar
+
+[match:Constant]
+pattern: (?:(|\s)nullable(?:,|))
+
+[match:Constant]
+pattern: (?:(|\s)nonnull(?:,|))
+
+[match:Constant]
+pattern: (?:(|\s)null_unspecified(?:,|))
+
+[match:Type]
+pattern: Protocol\s*\*
+
+[match:Type]
+pattern: NSDate\s*\*
+
+[match:Type]
+pattern: NSZone\s*\*
+
+[match:Type]
+pattern: NSError\s*\*
+
+[match:Type]
+pattern: NSException\s*\*
+
+[match:Type]
+pattern: NSAssertionHandler\s*\*
+
+[match:Type]
+pattern: NSNotification\s*\*
+
+[match:Type]
+pattern: NSNotificationCenter\s*\*
+
+[match:Type]
+pattern: NSDistributedNotificationCenter\s*\*
+
+[match:Type]
+pattern: NSNotificationQueue\s*\*
+
+[match:Type]
+pattern: NSEnumerator\s*\*
+
+[match:Type]
+pattern: NSIndexSet\s*\*
+
+[match:Type]
+pattern: NSMutableIndexSet\s*\*
+
+[match:Type]
+pattern: NSCharacterSet\s*\*
+
+[match:Type]
+pattern: NSMutableCharacterSet\s*\*
+
+[match:Type]
+pattern: NSURL\s*\*
+
+[match:Type]
+pattern: NSString\s*\*
+
+[match:Type]
+pattern: NSMutableString\s*\*
+
+[match:Type]
+pattern: NSAttributedString\s*\*
+
+[match:Type]
+pattern: NSMutableAttributedString\s*\*
+
+[match:Type]
+pattern: NSValue\s*\*
+
+[match:Type]
+pattern: NSNumber\s*\*
+
+[match:Type]
+pattern: NSDecimalNumber\s*\*
+
+[match:Type]
+pattern: NSDecimalNumberHandler\s*\*
+
+[match:Type]
+pattern: NSData\s*\*
+
+[match:Type]
+pattern: NSMutableData\s*\*
+
+[match:Type]
+pattern: NSArray\s*\*
+
+[match:Type]
+pattern: NSMutableArray\s*\*
+
+[match:Type]
+pattern: NSDictionary\s*\*
+
+[match:Type]
+pattern: NSMutableDictionary\s*\*
+
+[match:Type]
+pattern: NSSet\s*\*
+
+[match:Type]
+pattern: NSMutableSet\s*\*
+
+[match:Type]
+pattern: NSCountedSet\s*\*
+
+[match:Type]
+pattern: NSOrderedSet\s*\*
+
+[match:Type]
+pattern: NSMutableOrderedSet\s*\*
+
+[match:Type]
+pattern: NSMutableOrderedSet<.*>\s*\*
+
+[match:Type]
+pattern: NSFileManager\s*\*
+
+[match:Type]
+pattern: NSDirectoryEnumerator<.*>\s*\*
+
+[match:Type]
+pattern: NSFileHandle\s*\*
+
+[match:Type]
+pattern: NSPipe\s*\*
+
+[match:Type]
+pattern: NSLocale\s*\*
+
+[match:Type]
+pattern: NSFormatter\s*\*
+
+[match:Type]
+pattern: NSNumberFormatter\s*\*
+
+[match:Type]
+pattern: NSDateFormatter\s*\*
+
+[match:Type]
+pattern: NSCalendar\s*\*
+
+[match:Type]
+pattern: NSDateComponents\s*\*
+
+[match:Type]
+pattern: NSTimeZone\s*\*
+
+[match:Type]
+pattern: NSCoder\s*\*
+
+[match:Type]
+pattern: NSArchiver\s*\*
+
+[match:Type]
+pattern: NSUnarchiver\s*\*
+
+[match:Type]
+pattern: NSKeyedArchiver\s*\*
+
+[match:Type]
+pattern: NSKeyedUnarchiver\s*\*
+
+[match:Type]
+pattern: NSUserDefaults\s*\*
+
+[match:Type]
+pattern: NSBundle\s*\*
+
+[match:Type]
+pattern: NSProcessInfo\s*\*
+
+[match:Type]
+pattern: NSTask\s*\*
+
+[match:Type]
+pattern: NSThread\s*\*
+
+[match:Type]
+pattern: NSLock\s*\*
+
+[match:Type]
+pattern: NSConditionLock\s*\*
+
+[match:Type]
+pattern: NSRecursiveLock\s*\*
+
+[match:Type]
+pattern: NSDistributedLock\s*\*
+
+[match:Type]
+pattern: NSOperation\s*\*
+
+[match:Type]
+pattern: NSBlockOperation\s*\*
+
+[match:Type]
+pattern: NSInvocationOperation\s*\*
+
+[match:Type]
+pattern: NSOperationQueue\s*\*
+
+[match:Type]
+pattern: NSConnection\s*\*
+
+[match:Type]
+pattern: NSPort\s*\*
+
+[match:Type]
+pattern: NSMachPort\s*\*
+
+[match:Type]
+pattern: NSMessagePort\s*\*
+
+[match:Type]
+pattern: NSSocketPort\s*\*
+
+[match:Type]
+pattern: NSPortMessage\s*\*
+
+[match:Type]
+pattern: NSDistantObject\s*\*
+
+[match:Type]
+pattern: NSPortNameServer\s*\*
+
+[match:Type]
+pattern: NSMessagePortNameServer\s*\*
+
+[match:Type]
+pattern: NSSocketPortNameServer\s*\*
+
+[match:Type]
+pattern: NSHost\s*\*
+
+[match:Type]
+pattern: NSInvocation\s*\*
+
+[match:Type]
+pattern: NSMethodSignature\s*\*
+
+[match:Type]
+pattern: NSScanner\s*\*
+
+[match:Type]
+pattern: NSTimer\s*\*
+
+[match:Type]
+pattern: NSAutoreleasePool\s*\*
+
+[match:Type]
+pattern: NSRunLoop\s*\*
+
+[match:Type]
+pattern: NSNull\s*\*
+
+[match:Type]
+pattern: NSProxy\s*\*
+
+[match:Type]
+pattern: NSObject\s*\*
+
+[match:Type]
+pattern: NSCache\s*\*
+
+[match:Type]
+pattern: NSHashTable\s*\*
+
+[match:Type]
+pattern: NSMapTable\s*\*
+
+[match:Type]
+pattern: NSPointerFunctions\s*\*
+
+[region:String]
+start: "
+end: "
+

@@ -1,0 +1,595 @@
+=head1 NAME
+
+Template::EmbeddedPerl::Tutorial - Build a Contacts application step by step
+
+=head1 DESCRIPTION
+
+This tutorial builds a small, framework-neutral Contacts application. It uses
+in-memory data so that the templates, composition rules, and diagnostics are
+the only moving parts.
+
+The complete runnable application is included with the distribution. From the
+distribution root, run:
+
+  perl examples/contacts/untyped/app.pl
+
+The executable source and its exact HTML output are checked by
+C<t/cookbook_examples.t>. Read this tutorial in order, then use the checked-in
+files as the complete working version of each fragment.
+
+=head1 FIRST TEMPLATE
+
+The smallest useful template renders this visible result:
+
+  Hello, Ada!
+
+Compile a string once, then render it with ordinary positional arguments:
+
+  use Template::EmbeddedPerl;
+
+  my $compiled = Template::EmbeddedPerl->from_string(
+      'Hello, <%= shift %>!',
+  );
+  my $output = $compiled->render('Ada');
+
+The C<< <%= ... %> >> form evaluates a Perl expression and appends its value
+to the output. C<shift> reads the first value passed to C<render>. The compiled
+object can be rendered again with another value without reparsing the template.
+
+=head1 THE CONTACTS APPLICATION
+
+The complete application prints this page when it is run:
+
+  <!doctype html>
+  <html>
+  <head>
+  <title>Contacts</title>
+  <meta name="section" content="contacts">
+  </head>
+  <body>
+  <section class="page">
+  <main>
+  <h1>CONTACTS</h1>
+  <p class="badge">2 contacts</p>
+  <ul>
+  <li data-root="Contacts" data-parent="Contacts"><strong>&lt;Ada&gt;</strong> ada@example.test</li>
+  <li data-root="Contacts" data-parent="Contacts"><strong>Grace</strong> grace@example.test</li>
+  </ul>
+  </main>
+  </section>
+  </body>
+  </html>
+
+=head2 Set up the checked-in example
+
+The runnable newcomer endpoint has this exact tree:
+
+  examples/contacts/
+    untyped/
+      app.pl
+      lib/
+        Contacts/
+          Untyped/
+            App.pm
+      templates/
+        contacts/
+          item.epl
+        layouts/
+          application.epl
+        pages/
+          contacts.epl
+
+Run C<perl examples/contacts/untyped/app.pl> from the distribution root. The
+C<app.pl> entry point only constructs C<Contacts::Untyped::App>, renders it,
+and prints the resulting HTML.
+
+The application keeps its deterministic Contacts data in memory. The
+checked-in fixture is:
+
+B<Fragment: application fixture>
+
+  sub contacts {
+      return [
+          {name => '<Ada>', email => 'ada@example.test'},
+          {name => 'Grace', email => 'grace@example.test'},
+      ];
+  }
+
+The checked-in C<Contacts::Untyped::App> is intentionally a small application
+boundary. Its constructor creates one engine with the template directory,
+smart lines, and automatic HTML escaping enabled:
+
+B<Fragment:>
+
+  sub new {
+      my ($class, %args) = @_;
+      my $root = $args{root} || File::Spec->rel2abs(
+          File::Spec->catdir(dirname(__FILE__), qw(.. .. ..)),
+      );
+
+      my $self = bless {
+          root => $root,
+          heading_calls => 0,
+      }, $class;
+
+      $self->{engine} = Template::EmbeddedPerl->new(
+          directories => [File::Spec->catdir($root, 'templates')],
+          smart_lines => 1,
+          auto_escape => 1,
+          use_cache => 1,
+          helpers => {
+              display_heading => sub {
+                  my ($engine, $value) = @_;
+                  $self->{heading_calls}++;
+                  return uc $value;
+              },
+          },
+      );
+
+      return $self;
+  }
+
+The public rendering role is equally small. It supplies the in-memory
+contacts, accepts named overrides, and delegates to the root page:
+
+B<Fragment:>
+
+  sub render {
+      my ($self, %args) = @_;
+      return $self->{engine}->from_file('pages/contacts')->render(
+          contacts => $self->contacts,
+          %args,
+      );
+  }
+
+Run the exact application with C<perl examples/contacts/untyped/app.pl>.
+Its C<new> method accepts C<root =E<gt> $path>, which makes the example simple
+to execute from tests or a different working directory.
+
+Directories are searched in order. The first matching template wins, so put
+application overrides before shared template directories.
+
+=head1 SMART LINES AND NAMED ARGUMENTS
+
+The root Contacts page begins with declarations that render the following
+visible heading and badge:
+
+  <h1>CONTACTS</h1>
+  <p class="badge">2 contacts</p>
+
+With C<smart_lines =E<gt> 1>, a line beginning with C<%> is a Perl directive
+and a line beginning with C<%=> outputs an expression. The root page uses
+these exact declarations:
+
+B<Fragment:>
+
+  % args $contacts, $title = 'Contacts', $heading = sub { display_heading($title) }
+  % layout 'layouts/application', title => $title
+
+  <h1><%= $heading %></h1>
+  <p class="badge"><%= scalar @$contacts %> contacts</p>
+
+The C<args> directive declares named render arguments. It must be the first
+executable directive in a template. Once it is present, call C<render> with
+named key/value pairs rather than depending on positional order:
+
+B<Fragment:>
+
+  $page->render(
+      contacts => $app->contacts,
+      title => 'Directory',
+  );
+
+=head1 DEFAULTS AND LAZY DEFAULTS
+
+For the Contacts page, omitting C<title> and C<heading> produces the visible
+default:
+
+  <h1>CONTACTS</h1>
+
+The declaration has three kinds of argument:
+
+B<Fragment:>
+
+  % args $contacts, $title = 'Contacts', $heading = sub { display_heading($title) }
+
+C<$contacts> has no default, so it is required. The application always passes
+it. C<$title> has a scalar default and becomes C<Contacts> when absent. The
+coderef default for C<$heading> is lazy: it runs only when C<heading> is
+absent, after earlier arguments such as C<$title> have been established.
+
+These calls show the complete behavior:
+
+B<Fragment:>
+
+  $page->render(contacts => $contacts);                    # lazy default runs
+  $page->render(contacts => $contacts, title => 'People');  # heading is PEOPLE
+  $page->render(contacts => $contacts, heading => 'Index'); # lazy default does not run
+  $page->render(contacts => $contacts, heading => undef);   # explicit undef is supplied
+
+An omitted C<$contacts> raises a missing-required-argument error. Passing an
+unknown name, such as C<colour =E<gt> 'blue'>, raises an unknown-argument
+error. An explicit C<undef> is not absence: it suppresses the lazy default and
+renders as an empty value when used in an expression.
+
+The application's C<display_heading> helper increments C<heading_calls>.
+That counter demonstrates the distinction: a default render increments it
+once, while a render with an explicit C<heading> leaves it unchanged.
+
+=head1 ESCAPING HTML SAFELY
+
+The first contact is named C<< <Ada> >>. Automatic escaping makes the visible
+result safe HTML:
+
+  <strong>&lt;Ada&gt;</strong>
+
+The application enables C<auto_escape =E<gt> 1>. Therefore ordinary template
+expressions such as C<< <%= $contact->{name} %> >> escape untrusted values.
+Use this setting for HTML output unless a value has already been made safe for
+its exact output context.
+
+The partial and layout helpers return safe rendered output. Their composed HTML
+is not escaped a second time, so the final list item is still:
+
+  <li data-root="Contacts" data-parent="Contacts"><strong>&lt;Ada&gt;</strong> ada@example.test</li>
+
+Use C<raw> only for HTML that is already trusted and safe. Templates execute
+arbitrary Perl; C<sandbox_ns> isolates unqualified symbols but is not a
+security boundary. Compile templates and accept template paths only from
+trusted sources.
+
+=head1 PARTIALS
+
+Each contact renders as one list item, including its independently escaped
+name:
+
+  <li data-root="Contacts" data-parent="Contacts"><strong>Grace</strong> grace@example.test</li>
+
+The C<contacts/item.epl> file is a partial because it renders an immediate,
+reusable piece of its caller's output. It has its own complete argument
+contract:
+
+  % args $contact, $root_title, $parent_title
+  <li data-root="<%= $root_title %>" data-parent="<%= $parent_title %>"><strong><%= $contact->{name} %></strong> <%= $contact->{email} %></li>
+
+The page invokes it once for each record:
+
+B<Fragment:>
+
+  % for my $contact (@$contacts) {
+  %= partial 'contacts/item', contact => $contact, root_title => $title, parent_title => $title
+  % }
+
+The explicit C<root_title> and C<parent_title> values make the partial's data
+dependencies visible. A partial does not receive lexical variables merely
+because its caller has them. Missing required names and unknown names are
+reported against the partial's own C<args> declaration.
+
+Rendered partial output is safe composition output. With C<auto_escape>, the
+engine escapes C<< <Ada> >> while the partial renders it, then preserves that
+safe result when the page inserts the whole partial.
+
+=head1 LAYOUTS
+
+The page declares its outer wrapper first, but its visible body appears inside
+that wrapper after rendering:
+
+  <body>
+  <section class="page">
+  ...
+  </section>
+  </body>
+
+This is the page declaration:
+
+B<Fragment:>
+
+  % layout 'layouts/application', title => $title
+
+C<layout> registers a deferred wrapper; it does not render the layout at that
+line. Once the page body is complete, the engine renders the registered layout
+around it. The application layout is:
+
+  % args $title
+  <!doctype html>
+  <html>
+  <head>
+  <title><%= $title %></title>
+  %= yield 'head'
+  </head>
+  <body>
+  %= yield
+  </body>
+  </html>
+
+C<yield> receives the page body. C<< yield 'head' >> receives named content
+collected for the C<head> section. Layout arguments are named arguments for
+the layout itself, independent of the page's C<args> contract. Multiple layout
+declarations nest, with the first declaration outermost.
+
+Like a partial, a rendered layout is safe composition output. Its complete
+rendered HTML is inserted once and is not re-escaped by the caller.
+
+=head1 NAMED CONTENT
+
+The Contacts page contributes this visible metadata to the layout's C<head>:
+
+  <meta name="section" content="contacts">
+
+It uses C<content_replace> before writing the page body:
+
+B<Fragment:>
+
+  %= content_replace 'head', sub {
+  <meta name="section" content="contacts">
+  % }
+
+C<content_for $name, sub { ... }> appends captured output in render order.
+C<content_replace $name, sub { ... }> discards earlier content for that name
+and stores its replacement. C<has_content $name> reports whether the named
+content is nonempty, which lets a layout conditionally render an optional
+slot:
+
+B<Fragment:>
+
+  % if (has_content 'head') {
+  %= yield 'head'
+  % }
+
+The application uses C<< yield 'head' >> directly because it always supplies
+that contribution. Captured named content and the page body are safe rendered
+output, so layout composition continues the same once-only escaping rule as
+partials.
+
+Here is the complete final output from
+C<examples/contacts/untyped/app.pl>, exactly as the executable test asserts:
+
+  <!doctype html>
+  <html>
+  <head>
+  <title>Contacts</title>
+  <meta name="section" content="contacts">
+  </head>
+  <body>
+  <section class="page">
+  <main>
+  <h1>CONTACTS</h1>
+  <p class="badge">2 contacts</p>
+  <ul>
+  <li data-root="Contacts" data-parent="Contacts"><strong>&lt;Ada&gt;</strong> ada@example.test</li>
+  <li data-root="Contacts" data-parent="Contacts"><strong>Grace</strong> grace@example.test</li>
+  </ul>
+  </main>
+  </section>
+  </body>
+  </html>
+
+=head1 APPLICATION HELPERS
+
+The Contacts heading is transformed by an application helper, producing:
+
+  CONTACTS
+
+Helpers receive the engine first, followed by the values passed from the
+template. Use this signature:
+
+  sub { my ($engine, @args) = @_; ... }
+
+The application's helper closes over its counter so the lazy default can be
+observed:
+
+B<Fragment:>
+
+  display_heading => sub {
+      my ($engine, $value) = @_;
+      $self->{heading_calls}++;
+      return uc $value;
+  },
+
+The page's C<$heading> lazy default calls C<display_heading($title)>. A default
+render calls the helper once. C<< $app->render(heading =E<gt> 'Directory') >>
+does not call it again because a supplied argument overrides the lazy default.
+
+Keep helpers focused on application policy and pass all input explicitly.
+They run as ordinary trusted Perl code in the application process, not in a
+separate template sandbox.
+
+=head1 DIAGNOSING FAILURES
+
+=head2 Read a diagnostic with its source excerpt
+
+Give string templates a C<source> name so compilation and runtime failures
+identify both the source and original template line. The following incomplete
+fragment deliberately refers to an undeclared variable:
+
+B<Fragment: compile diagnostic>
+
+  my $compile_error = eval {
+      Template::EmbeddedPerl->from_string(
+          "first\n<%= \$missing %>\n",
+          source => 'tutorial-compile.epl',
+      );
+      '';
+  } || $@;
+  print $compile_error;
+
+The current diagnostic is:
+
+  Global symbol "$missing" requires explicit package name (did you forget to declare "my $missing"?) at tutorial-compile.epl line 2
+
+  1: first
+  2: <%= $missing %>
+
+For a runtime failure, the engine also records the top-level render frame:
+
+B<Fragment: runtime diagnostic>
+
+  my $runtime_error = eval {
+      Template::EmbeddedPerl->from_string(
+          "first\n<% die 'tutorial runtime' %>\n",
+          source => 'tutorial-runtime.epl',
+      )->render;
+      '';
+  } || $@;
+  print $runtime_error;
+
+  tutorial runtime at tutorial-runtime.epl line 2
+
+  1: first
+  2: <% die 'tutorial runtime' %>
+
+
+  Render stack:
+    root tutorial-runtime.epl (tutorial-runtime.epl)
+
+Warnings preserve their source and line when captured by the caller. Unlike a
+compile or runtime failure, a warning itself does not include the source
+excerpt, so inspect the named template line beside the message:
+
+B<Fragment: warning diagnostic>
+
+  my @warnings;
+  {
+      local $SIG{__WARN__} = sub { push @warnings, @_ };
+      Template::EmbeddedPerl->from_string(
+          "first\n<% warn 'tutorial warning' %>\n",
+          source => 'tutorial-warning.epl',
+      )->render;
+  }
+  print join '', @warnings;
+
+  tutorial warning at tutorial-warning.epl line 2.
+
+  1: first
+  2: <% warn 'tutorial warning' %>
+
+=head2 Diagnose a file-backed template
+
+Files give the same diagnostics with their resolved absolute path, which is
+usually easier to follow than an anonymous string. Create this scratch file:
+
+B<Complete scratch file: C</tmp/contacts-diagnostics/pages/broken.epl>>
+
+  before
+  <% die 'file-backed runtime' %>
+
+Render it through an engine whose directory is C</tmp/contacts-diagnostics>:
+
+B<Fragment: file-backed diagnostic>
+
+  my $engine = Template::EmbeddedPerl->new(
+      directories => ['/tmp/contacts-diagnostics'],
+      smart_lines => 1,
+  );
+  my $error = eval { $engine->from_file('pages/broken')->render; '' } || $@;
+  print $error;
+
+  file-backed runtime at /tmp/contacts-diagnostics/pages/broken.epl line 2
+
+  1: before
+  2: <% die 'file-backed runtime' %>
+
+
+  Render stack:
+    root pages/broken (/tmp/contacts-diagnostics/pages/broken.epl)
+
+Keep the source name or file path in the diagnostic. It identifies the broken
+template even when the render started in a different application module.
+
+=head2 Read a composed render stack
+
+When composition crosses files, read the render stack from the root toward the
+failure. These two complete scratch files make the relationship explicit:
+
+B<Complete scratch file: C</tmp/contacts-diagnostics/pages/contacts.epl>>
+
+  before
+  %= partial 'partials/broken'
+  after
+
+B<Complete scratch file: C</tmp/contacts-diagnostics/partials/broken.epl>>
+
+  child before
+  <% die 'composed runtime' %>
+
+Render the root page with the same directory configuration:
+
+B<Fragment: composed render diagnostic>
+
+  my $error = eval { $engine->from_file('pages/contacts')->render; '' } || $@;
+  print $error;
+
+  composed runtime at /tmp/contacts-diagnostics/partials/broken.epl line 2
+
+  1: child before
+  2: <% die 'composed runtime' %>
+
+
+  Render stack:
+    root pages/contacts (/tmp/contacts-diagnostics/pages/contacts.epl)
+    partial partials/broken (/tmp/contacts-diagnostics/partials/broken.epl)
+
+Repair the local partial first, then use the preceding root and partial frames
+to find the composition path that reached it. C<preamble> can add a required
+import before the generated template subroutine without changing reported
+template line numbers. The Contacts application needs no preamble; add one only
+for a deliberate import and keep template syntax compatible with the Perl
+version your application supports.
+
+=head1 REUSE AND PRODUCTION CONFIGURATION
+
+For a persistent application, compile a template once and render it many
+times:
+
+  my $compiled = $engine->from_file('pages/contacts');
+  my $html = $compiled->render(contacts => $app->contacts);
+
+Keep the engine and compiled templates alive for the lifetime of the process.
+Retaining C<$compiled> already avoids recompilation when it is rendered again.
+Enable C<use_cache =E<gt> 1> when code repeatedly asks the engine to look up
+or compile the same template with C<from_file> or C<from_string>; it can reuse
+the in-memory compiled code for those repeated engine calls. It helps in
+persistent processes such as PSGI applications; a short-lived command gains
+little from an in-memory cache.
+
+Configure shared and application templates in deliberate order:
+
+B<Fragment: production configuration>
+
+  my $engine = Template::EmbeddedPerl->new(
+      directories => [
+          '/srv/contacts/templates',
+          '/srv/shared/templates',
+      ],
+      smart_lines => 1,
+      auto_escape => 1,
+      use_cache => 1,
+  );
+
+The first matching file wins. This application does not need a C<preamble>.
+Add one only for an explicit import, and use syntax compatible with the Perl
+version your application supports rather than treating a version preamble as a
+template requirement. Do not let request data choose a template path, and do
+not compile templates supplied by untrusted users. Templates can execute
+arbitrary Perl, so path ordering and trusted sources are production security
+boundaries rather than convenience settings.
+
+=head1 CHOOSING THE NEXT ABSTRACTION
+
+For a small page, plain templates with named arguments keep data flow direct.
+Extract a partial when a repeatable fragment needs its own explicit data
+contract. Add a layout and named content when several pages share a wrapper or
+need well-defined slots such as C<head>.
+
+Keep using the untyped approach while data is simple and callers can pass the
+needed values directly. Consider typed views only when application-specific
+object construction, dependency injection, or reusable view relationships
+make those boundaries clearer than named arguments. The untyped Contacts
+application remains a complete and useful production shape for many programs.
+
+=head1 SEE ALSO
+
+L<Template::EmbeddedPerl>, L<Template::EmbeddedPerl::Cookbook>, and
+L<Template::EmbeddedPerl::Cookbook::TypedViews>.
+
+=cut

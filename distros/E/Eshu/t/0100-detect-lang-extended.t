@@ -27,9 +27,9 @@ is(Eshu->detect_lang('app.js'),    'js', '.js -> js');
 is(Eshu->detect_lang('comp.jsx'),  'js', '.jsx -> js');
 is(Eshu->detect_lang('mod.mjs'),   'js', '.mjs -> js');
 is(Eshu->detect_lang('mod.cjs'),   'js', '.cjs -> js');
-is(Eshu->detect_lang('app.ts'),    'js', '.ts -> js');
-is(Eshu->detect_lang('comp.tsx'),  'js', '.tsx -> js');
-is(Eshu->detect_lang('mod.mts'),   'js', '.mts -> js');
+is(Eshu->detect_lang('app.ts'),    'ts', '.ts -> ts');
+is(Eshu->detect_lang('comp.tsx'),  'ts', '.tsx -> ts');
+is(Eshu->detect_lang('mod.mts'),   'ts', '.mts -> ts');
 
 # POD
 is(Eshu->detect_lang('Manual.pod'), 'pod', '.pod -> pod');
@@ -52,7 +52,7 @@ is(Eshu->detect_lang('Makefile'), undef, 'no extension -> undef');
 is(Eshu->detect_lang('foo.txt'),   undef, '.txt -> undef');
 is(Eshu->detect_lang('foo.md'),    undef, '.md -> undef');
 is(Eshu->detect_lang('foo.yaml'),  undef, '.yaml -> undef');
-is(Eshu->detect_lang('foo.json'),  undef, '.json -> undef');
+is(Eshu->detect_lang('foo.json'),  'json', '.json -> json');
 
 # Path with directory components — only extension matters
 is(Eshu->detect_lang('lib/Foo/Bar.pm'), 'perl', 'path/to/File.pm -> perl');

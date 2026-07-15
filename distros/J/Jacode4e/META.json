@@ -1,9 +1,9 @@
 {
     "name" : "Jacode4e",
-    "version" : "2.13.6.22",
+    "version" : "2.13.6.23",
     "abstract" : "Converts Character Encodings for Enterprise in Japan",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
     "generated_by" : "pmake.bat",
@@ -31,33 +31,39 @@
     "prereqs" : {
         "build" : {
             "requires" : {
+                "Test" : "1.122",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
         },
         "configure" : {
             "requires" : {
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
         },
         "runtime" : {
             "requires" : {
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
         },
         "test" : {
             "requires" : {
+                "Test" : "1.122",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
         }
     },
     "provides" : {
         "Jacode4e" : {
             "file" : "lib/Jacode4e.pm",
-            "version" : "2.13.6.22"
+            "version" : "2.13.6.23"
         }
     }
 }

@@ -1,0 +1,125 @@
+# Syntax file for r
+# Converted from: r.vim
+# Conversion date: 2026-07-13
+
+language: r
+extensions: r
+
+[keyword:Boolean]
+FALSE TRUE
+
+[keyword:Conditional]
+else if
+
+[keyword:Constant]
+F LETTERS NULL R.version.string T letters month.abb month.name pi
+
+[keyword:Number]
+Inf NA NA_character_ NA_complex_ NA_integer_ NA_real_ NaN
+
+[keyword:PreProc]
+attach detach library require source
+
+[keyword:Repeat]
+for in repeat while
+
+[keyword:Statement]
+break next return
+
+[keyword:Todo]
+BUG FIXME NOTE TODO
+
+[keyword:Type]
+array category character complex data.frame double function integer list
+logical matrix numeric vector
+
+[match:SpecialComment]
+pattern: (\K. *?)
+
+[match:Number]
+pattern: \b\d+L
+
+[match:Number]
+pattern: \b0x(?:[0-9]|[a-f]|[A-F])+L
+
+[match:Number]
+pattern: \b\d+[Ee]+?\d+L
+
+[match:Number]
+pattern: \b\d+\b
+
+[match:Number]
+pattern: \b0x(?:[0-9]|[a-f]|[A-F])+
+
+[match:Float]
+pattern: \b\d+\.\d*(?:[Ee][-+]?\d+)?
+
+[match:Float]
+pattern: \b\.\d+(?:[Ee][-+]?\d+)?
+
+[match:Float]
+pattern: \b\d+[Ee][-+]?\d+
+
+[match:Number]
+pattern: \b\d+i
+
+[match:Number]
+pattern: \b\d++\d+i
+
+[match:Number]
+pattern: \b0x(?:[0-9]|[a-f]|[A-F])+i
+
+[match:Number]
+pattern: \b\d+\.\d*(?:[Ee][-+]?\d+)?i
+
+[match:Number]
+pattern: \b\.\d+(?:[Ee][-+]?\d+)?i
+
+[match:Number]
+pattern: \b\d+[Ee][-+]?\d+i
+
+[match:Operator]
+pattern: &
+
+[match:Operator]
+pattern: [|!<>^~`/:]
+
+[match:Operator]
+pattern: [|!<>^~/:]
+
+[match:Operator]
+pattern: %{2}|%\S *?%
+
+[match:Statement]
+pattern: <{1,2}-
+
+[match:Statement]
+pattern: ->{1,2}
+
+[match:Delimiter]
+pattern: [,;:]
+
+[match:Error]
+pattern: [)\]}]
+
+[match:Error]
+pattern: [)}]
+
+[match:Error]
+pattern: [)\]]
+
+[match:Error]
+pattern: [\]}]
+
+[match:Type]
+pattern: \\
+
+[match:PreProc]
+pattern: ^#ifdef.*
+
+[match:PreProc]
+pattern: ^#endif.*
+
+[match:PreCondit]
+pattern: \\dontrun\b
+

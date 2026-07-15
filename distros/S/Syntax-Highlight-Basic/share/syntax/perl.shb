@@ -1,0 +1,69 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Perl
+# Manually curated for Syntax::Highlight::Basic
+language: perl
+extensions: pl pm t
+
+[keyword:Conditional]
+if elsif else unless given when default
+
+[keyword:Repeat]
+while for foreach do until continue
+
+[keyword:Statement]
+return last next redo goto break package
+
+[keyword:StorageClass]
+my our local state
+
+[keyword:Include]
+use no require import
+
+[keyword:Operator]
+defined undef eq ne ge gt le lt cmp not and or xor bless ref
+
+[keyword:Exception]
+die eval
+
+[keyword:Todo]
+FIXME FIXME: NOTE NOTE: TBD TBD: TODO TODO: XXX XXX:
+
+[keyword:Function]
+sub
+
+[match:Comment]
+pattern: #.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b
+
+[match:Identifier]
+pattern: [\$@%]\w+
+
+[match:PreProc]
+pattern: ^#!.*
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=!&|^~?:]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:Comment]
+start: =pod
+end: =cut
+
+[region:Comment]
+start: =head1
+end: =cut
+
+[region:Comment]
+start: =head2
+end: =cut

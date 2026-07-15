@@ -1,5 +1,27 @@
 Revision history for Mojolicious-Plugin-Fondation-Setup
 
+0.10      2026-07-14 20:27:19+02:00 Europe/Paris
+    - silence "fondation_meta redefined" warnings from _dev_plugins eval
+    - i18n all template strings
+    - add admin menu entry
+
+0.09      2026-07-14 17:40:39+02:00 Europe/Paris
+    - replace Foundation with Fondation
+
+0.08      2026-07-14 17:30:11+02:00 Europe/Paris
+    - Foundation::SessionStore is required
+
+0.07      2026-07-14 17:24:15+02:00 Europe/Paris
+    - Fix dependency cascade: aggressive uncheck + dev deps extraction
+    - use Foundation::SessionStore dependency to pass the 4kb limit via cookies
+
+0.06      2026-07-14 13:38:09+02:00 Europe/Paris
+    - delete 'Mojolicious::Plugin::Fondation::Workflow' dependency
+
+0.05      2026-07-14 13:34:04+02:00 Europe/Paris
+    - Rewrite Setup plugin: drop Workflow.pm too complex for this case,
+    - use Mojolicious session instead cookie
+
 0.04      2026-07-13 20:32:03+02:00 Europe/Paris
     - add locally-developed plugins
     - forced to install the selected plugins before their configuration

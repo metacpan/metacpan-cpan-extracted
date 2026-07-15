@@ -1,13 +1,15 @@
 ---
-abstract: 'Client for (Lucene) Solr'
+abstract: 'Client for the Solr database'
 author:
   - 'Mark Overmeer'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,6 +19,7 @@ no_index:
   directory:
     - t
     - inc
+recommends: {}
 requires:
   Data::Dumper: '0'
   Encode: '0'
@@ -31,8 +34,30 @@ requires:
   URI: '0'
   XML::LibXML::Simple: '0'
 resources:
-  homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/markov2/perl5-Apache-Solr/issues
+  homepage: https://perl.overmeer.net/CPAN/
+  license: https://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Apache-Solr.git
-version: '1.11'
+version: '1.12'
+x_oodist:
+  email: mark\@overmeer.net
+  first_year: 2012
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include: []
+  oodoc_version: 3.06
+  parser:
+    pmhead: ~
+    skip_links:
+      - WebService::Solr::Query
+      - WebService::Solr
+    syntax: markov
+  raw:
+    publish: ../public_html/apache-solr/raw
+  release:
+    publish: ../public_html/apache-solr/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

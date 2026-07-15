@@ -1,0 +1,56 @@
+# Syntax file for modula3
+# Converted from: modula3.vim
+# Conversion date: 2026-07-13
+
+language: modula3
+extensions: modula3
+
+[keyword:Boolean]
+FALSE TRUE
+
+[keyword:Identifier]
+ABS ADR ADRSIZE BITSIZE BYTESIZE CEILING DEC DISPOSE FIRST FLOAT FLOOR INC
+ISTYPE LAST LOOPHOLE MAX MIN NARROW NEW NUMBER ORD ROUND SUBARRAY TRUNC
+TYPECODE VAL
+
+[keyword:Keyword]
+ANY ARRAY AS BITS BRANDED BY CASE CONST DEFINITION EVAL EXCEPT EXCEPTION EXIT
+EXPORTS FINALLY FROM GENERIC IMPORT LOCK METHOD OF RAISE RAISES READONLY
+RECORD REF RETURN SET TRY TYPE TYPECASE UNSAFE VALUE VAR WITH
+
+[keyword:Operator]
+AND DIV IN MOD NOT OR
+
+[keyword:Statement]
+BEGIN DO ELSE ELSIF END FOR FUNCTION IF INTERFACE LOOP METHODS MODULE OBJECT
+OVERRIDES PROCEDURE RECORD REPEAT REVEAL THEN TO UNTIL WHILE
+
+[keyword:Type]
+ADDRESS BOOLEAN CARDINAL CHAR EXTENDED INTEGER LONGCARD LONGINT LONGREAL MUTEX
+NULL REAL REFANY TEXT WIDECHAR
+
+[match:Operator]
+pattern: \^
+
+[match:Operator]
+pattern: [-+/*]
+
+[match:Operator]
+pattern: &
+
+[match:Number]
+pattern: \b\d+L?\b
+
+[match:Error]
+pattern: \b\d\d?_[0-9a-fA-F]+L?\b
+
+[match:Special]
+pattern: \\[0-7]{3}
+
+[match:Special]
+pattern: \\\\
+
+[region:PreProc]
+start: <\*
+end: \*>
+

@@ -1,0 +1,39 @@
+# Syntax file for csh
+# Converted from: csh.vim
+# Conversion date: 2026-07-13
+
+language: csh
+extensions: csh
+
+[keyword:Conditional]
+break breaksw case default else endif endsw switch
+
+[keyword:Repeat]
+foreach
+
+[keyword:Special]
+HOME LOGNAME PATH TERM USER
+
+[keyword:Statement]
+alias cd chdir continue dirs echo end eval exec exit glob goto history kill
+login logout nice nohup onintr popd pushd rehash repeat setenv shift source
+time umask unalias unhash unsetenv wait
+
+[keyword:Todo]
+todo
+
+[match:Error]
+pattern: \$?[a-zA-Z_][a-zA-Z0-9_]*:(?:h|t|r|q|x|gh|gt|gr)
+
+[match:Error]
+pattern: \${?[a-zA-Z_][a-zA-Z0-9_]*:(?:h|t|r|q|x|gh|gt|gr)}
+
+[match:Error]
+pattern: \$?[0$<]:(?:h|t|r|q|x|gh|gt|gr)
+
+[match:Statement]
+pattern: >>&!|>&!|>>&|>>!|>&|>!|>>|<<|>|<
+
+[match:Number]
+pattern: -?\b\d+\b
+

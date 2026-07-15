@@ -1,0 +1,141 @@
+# Syntax file for mysql
+# Converted from: mysql.vim
+# Conversion date: 2026-07-13
+
+language: mysql
+extensions: mysql
+case: ignore
+
+[keyword:Keyword]
+action add after aggregate all alter as asc auto_increment avg_row_length both
+by cascade change character check checksum column columns comment constraint
+create cross current_date current_time current_timestamp data database
+databases day day_hour day_minute day_second default delay_key_write delayed
+delete desc describe distinct distinctrow drop enclosed escape escaped explain
+fields file first flush for foreign from full function global grant grants
+group having heap high_priority hosts hour hour_minute hour_second identified
+ignore index infile inner insert insert_id into isam join key keys kill
+last_insert_id leading left limit lines load local lock logs long low_priority
+match max_rows middleint min_rows minute minute_second modify month myisam
+natural no on optimize option optionally order outer outfile pack_keys partial
+password primary privileges procedure process processlist read references
+reload rename replace restrict returns revoke right row rows second select
+show shutdown soname sql_big_result sql_big_selects sql_big_tables sql_log_off
+sql_log_update sql_low_priority_updates sql_select_limit sql_small_result
+sql_warnings starting status straight_join string table tables temporary
+terminated to trailing type unique unlock unsigned update usage use using
+values varbinary variables varying where with write year_month zerofill
+
+[keyword:Operator]
+and between binary exists in is like not or regexp rlike
+
+[keyword:Special]
+false null true
+
+[keyword:Statement]
+case else end then when
+
+[keyword:Type]
+bigint bit blob bool date datetime int integer longblob longtext mediumblob
+mediumint mediumtext smallint text time tinyblob tinyint tinytext
+
+[match:Number]
+pattern: -?\b[0-9]*\b
+
+[match:Number]
+pattern: -?\b[0-9]*\.[0-9]*\b
+
+[match:Number]
+pattern: -?\b[0-9][0-9]*e[+-]?[0-9]*\b
+
+[match:Number]
+pattern: -?\b[0-9]*\.[0-9]*e[+-]?[0-9]*\b
+
+[match:Number]
+pattern: \b0x[abcdefABCDEF0-9]*\b
+
+[match:Identifier]
+pattern: @[a-zA-Z]*[A-Za-z0-9]*(?:[._]*[A-Za-z0-9])*
+
+[match:Comment]
+pattern: #.*
+
+[match:Comment]
+pattern: --[\s\n].*
+
+[region:String]
+start: "
+end: "
+
+[region:String]
+start: '
+end: '
+
+[region:Comment]
+start: /\*
+end: \*/
+
+[region:Type]
+start: float\W
+end: .
+
+[region:Type]
+start: float$
+end: .
+
+[region:Type]
+start: double\W
+end: .
+
+[region:Type]
+start: double$
+end: .
+
+[region:Type]
+start: double precision\W
+end: .
+
+[region:Type]
+start: double precision$
+end: .
+
+[region:Type]
+start: real\W
+end: .
+
+[region:Type]
+start: real$
+end: .
+
+[region:Type]
+start: dec\W
+end: .
+
+[region:Type]
+start: dec$
+end: .
+
+[region:Type]
+start: decimal\W
+end: .
+
+[region:Type]
+start: decimal$
+end: .
+
+[region:Type]
+start: \Wtimestamp\W
+end: .
+
+[region:Type]
+start: \Wtimestamp$
+end: .
+
+[region:Type]
+start: timestamp\W
+end: .
+
+[region:Type]
+start: timestamp$
+end: .
+

@@ -177,9 +177,9 @@ END
 	is(Eshu->detect_lang('App.jsx'),       'js', 'detect .jsx');
 	is(Eshu->detect_lang('module.mjs'),    'js', 'detect .mjs');
 	is(Eshu->detect_lang('module.cjs'),    'js', 'detect .cjs');
-	is(Eshu->detect_lang('app.ts'),        'js', 'detect .ts');
-	is(Eshu->detect_lang('App.tsx'),       'js', 'detect .tsx');
-	is(Eshu->detect_lang('types.mts'),     'js', 'detect .mts');
+	is(Eshu->detect_lang('app.ts'),        'ts', 'detect .ts');
+	is(Eshu->detect_lang('App.tsx'),       'ts', 'detect .tsx');
+	is(Eshu->detect_lang('types.mts'),     'ts', 'detect .mts');
 }
 
 # indent_string dispatch

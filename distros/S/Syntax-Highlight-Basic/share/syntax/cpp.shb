@@ -1,0 +1,54 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for C++
+language: cpp
+extensions: cpp cc cxx hpp hh hxx
+
+[keyword:Conditional]
+if else switch
+
+[keyword:Repeat]
+while for do
+
+[keyword:Statement]
+break continue return goto case default
+
+[keyword:Type]
+int long short char float double void unsigned signed bool auto struct union enum class typedef template typename namespace using
+
+[keyword:StorageClass]
+static extern const volatile mutable constexpr thread_local
+
+[keyword:Operator]
+sizeof new delete
+
+[keyword:Exception]
+try catch throw
+
+[keyword:Include]
+include
+
+[match:PreProc]
+pattern: ^#\s*\w+.*
+
+[match:Comment]
+pattern: //.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|0[0-7]*|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?[fFlL]?)\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:]+
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:String]
+start: '
+end: '
+escape: \
+
+[region:Comment]
+start: /*
+end: */

@@ -1,5 +1,8 @@
 Revision history for OpenSearch::Client
 
+3.007009    2026-07-14
+            * Cleaned up 'method_supported_in_version' code.
+
 3.007008    2026-07-13
             * Added property opensearch_version
               a lazy populated property with the version of the current

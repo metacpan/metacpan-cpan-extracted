@@ -1,0 +1,114 @@
+# Syntax file for sml
+# Converted from: sml.vim
+# Conversion date: 2026-07-13
+
+language: sml
+extensions: sml
+
+[keyword:Boolean]
+false true
+
+[keyword:Keyword]
+and andalso case datatype else eqtype exception fn fun handle in infix infixl
+infixr match nonfix of orelse raise type val where while with withtype
+
+[keyword:Operator]
+div mod not or quot rem
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[keyword:Type]
+bool char exn int list option real string unit
+
+[match:Keyword]
+pattern: |
+
+[match:Error]
+pattern: }
+
+[match:Error]
+pattern: \]
+
+[match:Error]
+pattern: \bthen\b
+
+[match:Keyword]
+pattern: \bend\b
+
+[match:Error]
+pattern: \bend\b
+
+[match:Include]
+pattern: \b[A-Z](?:\w|')*\b
+
+[match:Include]
+pattern: \w(?:\w|')*(?:\.\w(?:\w|')*)*
+
+[match:Keyword]
+pattern: =
+
+[match:Include]
+pattern: \b[A-Z](?:\w|')*(?:\.[A-Z](?:\w|')*)*
+
+[match:Include]
+pattern: \b\w(?:\w|')*(?:\.\w(?:\w|')*)*\b
+
+[match:Include]
+pattern: \b(?:[A-Z](?:\w|')*\.)*\w(?:\w|')*\b
+
+[match:Include]
+pattern: =\s*\w(?:\w|')*\b
+
+[match:Include]
+pattern: [A-Z](?:\w|')*\.
+
+[match:Character]
+pattern: #"\\""|#"."|#"\\\d\d\d"
+
+[match:Error]
+pattern: #"\\\d\d"|#"\\\d"
+
+[match:Keyword]
+pattern: =>
+
+[match:Keyword]
+pattern: :=
+
+[match:Keyword]
+pattern: ;;
+
+[match:Operator]
+pattern: \^
+
+[match:Operator]
+pattern: ::
+
+[match:Keyword]
+pattern: \b_\b
+
+[match:Keyword]
+pattern: !
+
+[match:Keyword]
+pattern: ;
+
+[match:Keyword]
+pattern: \*
+
+[match:Keyword]
+pattern: =
+
+[match:Number]
+pattern: \b-?\d+\b
+
+[match:Number]
+pattern: \b-?0[x|X][0-9a-fA-F]+\b
+
+[match:Float]
+pattern: \b-?\d+\.\d*(?:[eE][-+]?\d+)?[fl]?\b
+
+[region:String]
+start: "
+end: "
+

@@ -1,0 +1,158 @@
+################################################################################
+# Jacode4e Tezkor Qo'llanma (UZ)
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
+# https://metacpan.org/dist/Jacode4e
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
+################################################################################
+
+======================================================================
+Jacode4e Tezkor Ma'lumotnoma (O'zbekcha)
+======================================================================
+
+[ASOSIY FOYDALANISH]
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, { %option });
+
+  $line             : o'giriladigan satr (havola orqali uzatiladi, joyida qayta yoziladi)
+  $OUTPUT_encoding  : chiqish kodlash nomi
+  $INPUT_encoding   : kirish kodlash nomi
+  $char_count       : o'girishdan keyingi belgilar soni
+
+[KODLASH NOMLARI RO'YXATI]
+
+  mnemonic    description
+  ---------   ---------------------------------------------------
+  cp932x      CP932X (Extended CP932 to JIS X 0213, single-shift 0x9C5A)
+  cp932       Microsoft CP932 (Windows-31J / IANA registered name)
+  cp932ibm    IBM CP932
+  cp932nec    NEC CP932
+  sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208); year editions below
+  sjis2004    JISC Shift_JIS-2004 (JIS X 0213:2004)
+  euc         JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  euc2004     JISC EUC-JIS-2004 (JIS X 0213 plane 1 and plane 2)
+  jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  jis2004     JISC ISO-2022-JP-2004 (JIS X 0213 plane 1 and plane 2)
+  cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
+  keis78      HITACHI KEIS78
+  keis83      HITACHI KEIS83
+  keis90      HITACHI KEIS90
+  jef         FUJITSU JEF (12pt, use OUTPUT_SHIFTING option for shift codes)
+  jef9p       FUJITSU JEF ( 9pt, use OUTPUT_SHIFTING option for shift codes)
+  jipsj       NEC JIPS(J)
+  jipse       NEC JIPS(E)
+  letsj       UNISYS LetsJ
+  utf8        UTF-8.0 (aka UTF-8)
+  utf8.1      UTF-8.1 (conversion based on Shift_JIS-to-Unicode mapping, not CP932)
+  utf8jp      UTF-8-SPUA-JP (JIS X 0213 on SPUA ordered by JIS level/plane/row/cell)
+
+  sjis / euc / jis yil nashrlari (yilsiz nom 1990 nashridir):
+    sjis1978  euc1978  jis1978   JIS C 6226-1978
+    sjis1983  euc1983  jis1983   JIS X 0208-1983
+    sjis1990  euc1990  jis1990   JIS X 0208-1990  (= sjis / euc / jis)
+    sjis2000  euc2000  jis2000   JIS X 0213:2000
+    sjis2004  euc2004  jis2004   JIS X 0213:2004
+
+[JIS NASHRLARINING YILLAR BO'YICHA FARQLARI (yangi boshlovchilar uchun)]
+
+  Yapon kanjilari bosqichma-bosqich standartlashtirilgan. Bir xil baytlar nashrga qarab boshqa belgini anglatishi mumkin, shuning uchun ma'lumotingizga mos nashrni tanlang. Bilmasangiz, yilsiz sjis / euc / jis dan foydalaning.
+
+  1978 (JIS C 6226-1978) : birinchi kanji standarti (1- va 2-daraja).
+  1983 (JIS X 0208-1983) : 22 juft kanjining kodini almashtirgan va ba'zi shakllarni o'zgartirgan; eski ma'lumot buzilishining eng keng tarqalgan sababi.
+  1990 (JIS X 0208-1990) : faqat 2 ta kanji qo'shgan (U+51DC, U+7199); yilsiz sjis / euc / jis shu nashrni bildiradi.
+  2000 (JIS X 0213:2000) : katta kengaytma; yangi 2-tekislikka 3- va 4-daraja kanji va belgilar qo'shgan.
+  2004 (JIS X 0213:2004) : 10 ta kanji qo'shgan va 168 ta kanjining namunaviy shaklini o'zgartirgan (kod 2000 bilan bir xil, yangi shakllar).
+
+[VARIANTLAR]
+
+  Variantlarni 4-argument sifatida bering: { 'KEY' => qiymat, ... }
+
+  INPUT_LAYOUT
+    'S' (1 baytli SBCS) va 'D' (2 baytli DBCS) bilan qat'iy yozuv tartibi; har harfdan keyin takror soni kelishi mumkin. Standart: avtomatik.
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'INPUT_LAYOUT'=>'S2D2SD'});
+
+  OUTPUT_SHIFTING
+    Rost: DBCS ketma-ketliklari atrofida shift-out/shift-in kodlarini chiqaradi. Standart: yolg'on.
+    e.g. Jacode4e::convert(\$line,'jef','cp932x',{'OUTPUT_SHIFTING'=>1});
+
+  SPACE
+    DBCS/MBCS bo'sh joy to'ldirish kodi (ikkilik satr). Standart: shu kodlashning bo'sh joyi.
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'SPACE'=>"\x81\xA1"});
+
+  GETA
+    Moslashtirib bo'lmaydigan belgilar uchun DBCS/MBCS geta kodi.
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'GETA'=>"\x81\xA2"});
+
+  OVERRIDE_MAPPING
+    Har belgi uchun FROM => TO almashtirish hash havolasi (SPACE ni ham almashtiradi).
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'OVERRIDE_MAPPING'=>{"\x44\x5A"=>"\x81\x7C"}});
+
+  JIS_SOSI
+    Rost: 'jis' kirishida SO (0x0E)/SI (0x0F) JIS X 0201 Katakana ga o'tadi (JIS7 odati). Standart: yolg'on; kirish 'jis'.
+    e.g. Jacode4e::convert(\$line,'utf8','jis',{'JIS_SOSI'=>1});
+
+  JIS_X0212
+    Rost: 'jis' chiqishida JIS X 0212 da bor, JIS X 0208 da yo'q belgi ESC $ ( D bilan yoziladi. OUTPUT_SHIFTING kerak. Standart: yolg'on.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_X0212'=>1,'OUTPUT_SHIFTING'=>1});
+
+  JIS_KANA
+    'jis' chiqishida Katakana uslubi: 'GR' (0xA1..0xDF), 'I' (ESC ( I, OUTPUT_SHIFTING kerak), 'SO' (SO/GL/SI). Standart: 'GR'.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_KANA'=>'SO','OUTPUT_SHIFTING'=>1});
+
+  JIS_DBCS
+    'jis' chiqishida DBCS escape: 'B' (ESC $ B), '@' (ESC $ @), '&@B', '(B', '(@'. Standart: 'B'; chiqish 'jis'.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_DBCS'=>'@'});
+
+  JIS_SBCS
+    'jis' chiqishida SBCS escape: 'B' (ESC ( B ASCII), 'J' (ESC ( J Roman), 'H' (ESC ( H eski). Standart: 'B'; chiqish 'jis'.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_SBCS'=>'J'});
+
+  JIS2004_PLANE1
+    'jis2004' chiqishida 1-tekislik escape: 'Q' (ESC $ ( Q, :2004), 'O' (ESC $ ( O, :2000). Standart: 'Q'; chiqish 'jis2004'.
+    e.g. Jacode4e::convert(\$line,'jis2004','utf8',{'JIS2004_PLANE1'=>'O'});
+
+  ROUND_TRIP
+    Rost: teskari o'girish; o'z kodiga ega bo'lmagan belgi foydalanuvchi belgilagan (GAIJI) sohaga joylashtiriladi, shunda "A dan B ga" va "B dan A ga" aslini tiklaydi. Ikkala yo'nalish ham ROUND_TRIP=>1 va BIR XIL Jacode4e versiyasini talab qiladi. Standart: yolg'on (moslanmagan GETA bo'ladi). Jadval birinchi ishlatishda lazy quriladi.
+    e.g. Jacode4e::convert(\$line,'cp00930','utf8',{'ROUND_TRIP'=>1});
+
+[SHIFT KODLARI MA'LUMOTNOMASI]
+
+  encoding  shift-out (DBCS start)  shift-in (DBCS end)
+  --------  ---------------------   -------------------
+  cp00930   0x0E                    0x0F
+  keis78    0x0A 0x42               0x0A 0x41
+  keis83    0x0A 0x42               0x0A 0x41
+  keis90    0x0A 0x42               0x0A 0x41
+  jef       0x28                    0x29
+  jef9p     0x38                    0x29
+  jipsj     0x1A 0x70               0x1A 0x71
+  jipse     0x3F 0x75               0x3F 0x76
+  letsj     0x93 0x70               0x93 0xF1
+
+[DASTURLASH NAMUNALARI]
+
+  # 1) UTF-8 dan asosiy kompyuter kodlashiga (shift, bo'sh joy, geta bilan)
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+  while (<>) {
+      $char_count = Jacode4e::convert(\$_, 'cp00930', 'utf8', {
+          'OUTPUT_SHIFTING' => 1,
+          'SPACE'           => "\x40\x40",
+          'GETA'            => "\x44\x4B",
+      });
+      print $_;
+  }
+
+  # 2) eski 1978 Shift_JIS dan UTF-8 ga (yilni hisobga olib)
+  Jacode4e::convert(\$line, 'utf8', 'sjis1978');
+
+  # 3) borib-kelish: UTF-8 -> CP00930 -> UTF-8 aslini tiklaydi
+  Jacode4e::convert(\$line, 'cp00930', 'utf8', { 'ROUND_TRIP' => 1 });
+  Jacode4e::convert(\$line, 'utf8', 'cp00930', { 'ROUND_TRIP' => 1 });
+
+======================================================================

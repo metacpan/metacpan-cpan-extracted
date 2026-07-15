@@ -7,6 +7,7 @@ program-extensions = pl psgi t
 [-Modules::RequireExplicitInclusion]
 [-Subroutines::ProhibitCallsToUndeclaredSubs]
 [-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-Modules::ProhibitMultiplePackages]
 
 [Subroutines::ProhibitExcessComplexity]
 max_mccabe = 25

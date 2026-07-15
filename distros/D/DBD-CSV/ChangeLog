@@ -1,3 +1,6 @@
+0.64	- 2026-07-14, H.Merijn Brand
+    * Next version will require perl-5.12, following DBI
+
 0.63	- 2026-06-22, H.Merijn Brand
     * It's 2026
     * New test for DBI-1.648 CVE fix

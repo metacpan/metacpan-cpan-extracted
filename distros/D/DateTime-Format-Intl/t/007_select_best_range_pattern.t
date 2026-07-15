@@ -9,7 +9,7 @@ BEGIN
     use utf8;
     use version;
     use Test::More;
-    use DateTime;
+    use DateTime::Lite;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     $TEST_ID = $ENV{TEST_ID} if( exists( $ENV{TEST_ID} ) );
 };
@@ -810,8 +810,8 @@ for( my $i = 0; $i < scalar( @$tests ); $i++ )
                 diag( "Error instantiating the DateTime::Format::Intl object: ", DateTime::Format::Intl->error );
                 skip( "Unable to instantiate a new DateTime::Format::Intl object.", 1 );
             }
-            my $dt1 = DateTime->new( %{$test->{date1}} );
-            my $dt2 = DateTime->new( %{$test->{date2}} );
+            my $dt1 = DateTime::Lite->new( %{$test->{date1}} );
+            my $dt2 = DateTime::Lite->new( %{$test->{date2}} );
             my $date1 = $dt1->iso8601;
             my $date2 = $dt2->iso8601;
             my $str = $fmt->format_range( $dt1, $dt2 );

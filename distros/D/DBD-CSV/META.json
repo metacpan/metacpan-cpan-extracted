@@ -1,42 +1,52 @@
 {
-   "generated_by" : "Author",
-   "release_status" : "stable",
+   "license" : [
+      "perl_5"
+      ],
    "author" : [
       "Jochen Wiedmann",
       "Jeff Zucker",
       "H.Merijn Brand <hmbrand@cpan.org>",
       "Jens Rehsack <rehsack@cpan.org>"
       ],
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+   "version" : "0.64",
+   "provides" : {
+      "DBD::CSV" : {
+         "file" : "lib/DBD/CSV.pm",
+         "version" : "0.64"
+         }
       },
+   "generated_by" : "Author",
+   "resources" : {
+      "repository" : {
+         "web" : "https://github.com/perl5-dbi/DBD-CSV",
+         "type" : "git",
+         "url" : "https://github.com/perl5-dbi/DBD-CSV"
+         },
+      "bugtracker" : {
+         "web" : "https://github.com/perl5-dbi/DBD-CSV/issues"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
+   "x_installdirs" : "site",
+   "release_status" : "stable",
+   "dynamic_config" : 1,
    "prereqs" : {
-      "configure" : {
+      "test" : {
          "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
+            "Test::More" : "1.302222",
+            "Encode" : "3.12"
+            },
+         "requires" : {
+            "Test::Harness" : "0",
+            "charnames" : "0",
+            "Test::More" : "0.90",
+            "Cwd" : "0",
+            "Encode" : "0"
             },
          "suggests" : {
-            "ExtUtils::MakeMaker" : "7.78"
-            },
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "DBI" : "1.628"
-            }
-         },
-      "runtime" : {
-         "recommends" : {
-            "SQL::Statement" : "1.414",
-            "DBD::File" : "0.45",
-            "DBI" : "1.649",
-            "Text::CSV_XS" : "1.62"
-            },
-         "requires" : {
-            "perl" : "5.008001",
-            "DBD::File" : "0.42",
-            "SQL::Statement" : "1.405",
-            "Text::CSV_XS" : "1.01",
-            "DBI" : "1.628"
+            "Encode" : "3.24"
             }
          },
       "build" : {
@@ -44,48 +54,38 @@
             "Config" : "0"
             }
          },
-      "test" : {
-         "requires" : {
-            "charnames" : "0",
-            "Cwd" : "0",
-            "Encode" : "0",
-            "Test::Harness" : "0",
-            "Test::More" : "0.90"
+      "configure" : {
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.78"
             },
          "recommends" : {
-            "Test::More" : "1.302222",
-            "Encode" : "3.12"
+            "ExtUtils::MakeMaker" : "7.22"
             },
-         "suggests" : {
-            "Encode" : "3.24"
+         "requires" : {
+            "DBI" : "1.628",
+            "ExtUtils::MakeMaker" : "0"
+            }
+         },
+      "runtime" : {
+         "recommends" : {
+            "DBD::File" : "0.45",
+            "SQL::Statement" : "1.414",
+            "DBI" : "1.651",
+            "Text::CSV_XS" : "1.64"
+            },
+         "requires" : {
+            "Text::CSV_XS" : "1.01",
+            "DBI" : "1.628",
+            "perl" : "5.008001",
+            "SQL::Statement" : "1.405",
+            "DBD::File" : "0.42"
             }
          }
       },
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/perl5-dbi/DBD-CSV/issues"
-         },
-      "repository" : {
-         "url" : "https://github.com/perl5-dbi/DBD-CSV",
-         "web" : "https://github.com/perl5-dbi/DBD-CSV",
-         "type" : "git"
-         },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ]
-      },
-   "provides" : {
-      "DBD::CSV" : {
-         "file" : "lib/DBD/CSV.pm",
-         "version" : "0.63"
-         }
-      },
-   "x_installdirs" : "site",
-   "dynamic_config" : 1,
-   "version" : "0.63",
-   "license" : [
-      "perl_5"
-      ],
    "name" : "DBD-CSV",
-   "abstract" : "DBI driver for CSV files"
+   "abstract" : "DBI driver for CSV files",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      }
    }

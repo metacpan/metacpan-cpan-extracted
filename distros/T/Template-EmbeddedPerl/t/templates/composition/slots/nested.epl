@@ -1,0 +1,1 @@
+<% content_for css => sub { raw '<link href="nested.css">' }; %>\

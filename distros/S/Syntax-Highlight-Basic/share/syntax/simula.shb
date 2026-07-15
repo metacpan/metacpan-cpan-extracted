@@ -1,0 +1,86 @@
+# Syntax file for simula
+# Converted from: simula.vim
+# Conversion date: 2026-07-13
+
+language: simula
+extensions: simula
+case: ignore
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if otherwise then until when
+
+[keyword:Constant]
+none notext
+
+[keyword:Error]
+activate after at before delay go goto label prior reactivate switch to
+
+[keyword:Function]
+procedure
+
+[keyword:Operator]
+eq eqv ge gt imp in is le lt ne new not qua
+
+[keyword:Repeat]
+for while
+
+[keyword:Statement]
+begin do end inner inspect step this
+
+[keyword:StorageClass]
+external hidden name protected value
+
+[keyword:Structure]
+class
+
+[keyword:Type]
+array boolean character integer long real short text virtual
+
+[match:Error]
+pattern: '. *?'
+
+[match:Character]
+pattern: '.'
+
+[match:Identifier]
+pattern: \b[a-zA-Z_]\w*\s*(?:(.*))?\s*:(?:=|-)
+
+[match:Operator]
+pattern: [&:=<>+\-*/]
+
+[match:Operator]
+pattern: \band(?:\s+then)?\b
+
+[match:Operator]
+pattern: \bor(?:\s+else)?\b
+
+[match:Type]
+pattern: \bref\s*(. *?)
+
+[match:Statement]
+pattern: ;
+
+[match:Special]
+pattern: [(),.]
+
+[match:Error]
+pattern: !\d *?!
+
+[match:Error]
+pattern: !!
+
+[match:Todo]
+pattern: xxx+
+
+[match:Number]
+pattern: -?\b\d+\b
+
+[match:Float]
+pattern: -?\b\d+(?:\.\d+)?(?:&&?[+-]?\d+)?\b
+
+[match:Float]
+pattern: -?\.\d+(?:&&?[+-]?\d+)?\b
+

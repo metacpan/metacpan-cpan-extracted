@@ -9,7 +9,7 @@ BEGIN
     use utf8;
     use version;
     use Test::More;
-    use DateTime;
+    use DateTime::Lite;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     $TEST_ID = $ENV{TEST_ID} if( exists( $ENV{TEST_ID} ) );
 };
@@ -23,13 +23,13 @@ use strict;
 use warnings;
 use utf8;
 
-my $dt = DateTime->new(
-    year => 2024,
-    month => 9,
-    day => 24,
-    hour => 9,
-    minute => 0,
-    second => 10,
+my $dt = DateTime::Lite->new(
+    year      => 2024,
+    month     => 9,
+    day       => 24,
+    hour      => 9,
+    minute    => 0,
+    second    => 10,
     time_zone => 'UTC',
 );
 my $date = $dt->iso8601;

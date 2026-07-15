@@ -1,0 +1,74 @@
+# Syntax file for rebol
+# Converted from: rebol.vim
+# Conversion date: 2026-07-13
+
+language: rebol
+extensions: rebol
+case: ignore
+
+[keyword:Boolean]
+false no off on true yes
+
+[keyword:Conditional]
+else if
+
+[keyword:Constant]
+none
+
+[keyword:Operator]
+and complement modified? not or size? type? xor
+
+[keyword:Repeat]
+do for forall foreach forskip loop repeat until while
+
+[keyword:Statement]
+alias bind break catch change clear copy delete echo exit fifth find first
+form format fourth free func function halt head help import info? input insert
+last length? load make make-object match mold next parse past pick prin print
+probe read rebol reduce remove return save second secure select send shield
+skip sort tail third trace trim use write
+
+[keyword:Todo]
+TODO
+
+[keyword:Type]
+binary! block! char! date! decimal! email! file! function! integer! issue!
+logic! money! native! none! object! paren! path! port! string! time! tuple!
+url! word!
+
+[match:Number]
+pattern: \b[+-]?\d+(?:'\d*)*\b
+
+[match:Number]
+pattern: [+-]?(?:\d+(?:'\d*)*)?[,.]\d*(?:e[+-]?\d+)?
+
+[match:Number]
+pattern: [+-]?\d+(?:'\d*)*(?:e[+-]?\d+)?
+
+[match:Number]
+pattern: [+-]?(?:\d+(?:'\d*)*\:){1,2}\d+(?:'\d*)*(?:[.,]\d+)?(?:[AP]M)?\b
+
+[match:Number]
+pattern: [+-]?:\d+(?:[.,]\d*)?(?:[AP]M)?\b
+
+[match:Number]
+pattern: \d{4}-\d{1,2}-\d{1,2}\b
+
+[match:Number]
+pattern: \d{1,2}\.\d{1,2}\.\d{4}\b
+
+[match:Number]
+pattern: [a-zA-Z]*\$\d+(?:'\d*)*(?:[,.]\d+)?
+
+[match:Number]
+pattern: #(?:\d+-)*\d+
+
+[match:Number]
+pattern: (?:\d+\.){2,}
+
+[match:Operator]
+pattern: [<>=]=?
+
+[match:Operator]
+pattern: <>
+

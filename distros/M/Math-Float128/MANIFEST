@@ -6,6 +6,7 @@ Float128.pod
 Float128.xs
 Makefile.PL
 math_float128_include.h
+math_float128_unused.h
 quad.in
 Constant/Constant.pm
 Constant/Constant.xs

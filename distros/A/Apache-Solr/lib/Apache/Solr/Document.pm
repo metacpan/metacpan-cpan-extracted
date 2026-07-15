@@ -1,23 +1,28 @@
-# Copyrights 2012-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Apache-Solr.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Apache-Solr version 1.12.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Apache::Solr::Document;{
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 }
 
 
 use warnings;
 use strict;
 
-use Log::Report    qw(solr);
+use Log::Report    qw/solr/;
 
+#--------------------
 
 sub new(@) { my $c = shift; (bless {}, $c)->init({@_}) }
+
 sub init($)
 {	my ($self, $args) = @_;
 
@@ -32,7 +37,7 @@ sub init($)
 sub fromResult($$)
 {	my ($class, $data, $rank) = @_;
 	my (@f, %fh);
-	
+
 	while(my($k, $v) = each %$data)
 	{	my @v = map +{name => $k, content => $_}, ref $v eq 'ARRAY' ? @$v : $v;
 		push @f, @v;
@@ -46,7 +51,7 @@ sub fromResult($$)
 	$self;
 }
 
-#---------------
+#--------------------
 
 sub boost(;$)
 {	my $self = shift;
@@ -58,10 +63,10 @@ sub boost(;$)
 sub fieldNames() { my %c; $c{$_->{name}}++ for shift->fields; sort keys %c }
 
 
-sub uniqueId() {shift->content($Apache::Solr::uniqueKey)}
+sub uniqueId() { $_[0]->content($Apache::Solr::uniqueKey) }
 
 
-sub rank() {shift->{ASD_rank}}
+sub rank() { $_[0]->{ASD_rank} }
 
 
 sub fields(;$)
@@ -90,7 +95,7 @@ sub AUTOLOAD
 {	my $self = shift;
 	(my $fn = $AUTOLOAD) =~ s/.*\:\://;
 
-	  $fn =~ /^_(.*)/    ? $self->content($1)
+	$fn =~ /^_(.*)/    ? $self->content($1)
 	: $fn eq 'DESTROY'   ? undef
 	: panic "Unknown method $AUTOLOAD (hint: fields start with '_')";
 }
@@ -104,9 +109,9 @@ sub addField($$%)
 	my $field = {   # important to minimalize copying of content
 		name    => $name,
 		content => (
-		    !ref $_[0]            ? shift
-		  : ref $_[0] eq 'SCALAR' ? ${shift()}
-		  :                         shift
+			  !ref $_[0]            ? shift
+			: ref $_[0] eq 'SCALAR' ? ${shift()}
+			:                         shift
 		),
 	};
 	my %args  = @_;
@@ -132,7 +137,5 @@ sub addFields($%)
 	}
 	$self;
 }
-
-#--------------------------
 
 1;

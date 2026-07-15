@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::User::UI::Bootstrap - Web UI for Fondation::User
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

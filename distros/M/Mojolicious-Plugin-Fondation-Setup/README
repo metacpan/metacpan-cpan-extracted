@@ -1,7 +1,7 @@
 This archive contains the distribution Mojolicious-Plugin-Fondation-Setup,
-version 0.04:
+version 0.10:
 
-  Setup wizard generator — scans plugins for user-configurable parameters, generates a setup workflow, and serves the wizard UI
+  Setup wizard with session-based state (clean rebuild)
 
 This software is copyright (c) 2026 by Daniel Brosseau.
 

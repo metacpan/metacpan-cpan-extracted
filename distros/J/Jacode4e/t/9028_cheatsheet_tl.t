@@ -2,7 +2,7 @@
 #
 # 9028_cheatsheet_tl.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Mabilis na Sanggunian ng Jacode4e (Filipino/Tagalog)
 # Ang pagsubok na ito ay nagsisilbi ring mabilis na sanggunian para sa mga gumagamit ng Filipino.
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -70,7 +75,8 @@ use lib "$FindBin::Bin/../lib";
 #
 #   Mayroon mga conversion na may pagkawala (hal. ang CP932 ay may 398 na hindi
 #   mababalik na mapping). Para sa dalawang-direksiyong conversion, gamitin ang
-#   module na Jacode4e::RoundTrip.
+#   opsyon na 'ROUND_TRIP' => 1. Kailangan ng 'ROUND_TRIP' => 1
+#   sa dalawang direksyon at parehong bersyon ng Jacode4e.
 #
 # ======================================================================
 

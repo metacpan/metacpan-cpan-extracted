@@ -1,0 +1,86 @@
+# Syntax file for matlab
+# Converted from: matlab.vim
+# Conversion date: 2026-07-13
+
+language: matlab
+extensions: matlab
+
+[keyword:Conditional]
+else elseif end if otherwise
+
+[keyword:Function]
+error eval function
+
+[keyword:Label]
+case switch
+
+[keyword:Operator]
+break ceil clear cov default eye floor margin mean ones rand round size std
+zeros
+
+[keyword:Repeat]
+do for while
+
+[keyword:Statement]
+abs acos asin atan classdef cos cosh events exp log log10 max methods min prod
+properties reshape return sign sin sinh sqrt sum tan
+
+[keyword:Todo]
+TODO
+
+[keyword:Type]
+global persistent
+
+[match:Operator]
+pattern: [-+]
+
+[match:Operator]
+pattern: \.?[*/\\^]
+
+[match:Operator]
+pattern: [=~]=
+
+[match:Operator]
+pattern: [<>]=?
+
+[match:Operator]
+pattern: [&|~]
+
+[match:Special]
+pattern: \.{3}
+
+[match:Number]
+pattern: \b\d+[ij]?\b
+
+[match:Float]
+pattern: \b\d+(?:\.\d*)?(?:[edED][-+]?\d+)?[ij]?\b
+
+[match:Float]
+pattern: \.\d+(?:[edED][-+]?\d+)?[ij]?\b
+
+[match:Delimiter]
+pattern: [][]
+
+[match:Operator]
+pattern: [])a-zA-Z0-9.]'
+
+[match:SpecialChar]
+pattern: ;
+
+[match:Todo]
+pattern: ^%%.*$
+
+[match:Error]
+pattern: -?\b\d+\.\d+\.[^*/\\^]
+
+[match:Error]
+pattern: -?\b\d+\.\d+[eEdD][-+]?\d+\.(?:[^*/\\^])
+
+[region:String]
+start: '
+end: '
+
+[region:String]
+start: "
+end: "
+

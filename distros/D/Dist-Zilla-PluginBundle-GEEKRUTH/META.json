@@ -109,26 +109,26 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::GEEKRUTH" : {
          "file" : "lib/Dist/Zilla/MintingProfile/GEEKRUTH.pm",
-         "version" : "4.0001"
+         "version" : "4.0002"
       },
       "Dist::Zilla::PluginBundle::GEEKRUTH" : {
          "file" : "lib/Dist/Zilla/PluginBundle/GEEKRUTH.pm",
-         "version" : "4.0001"
+         "version" : "4.0002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://codeberg.org/api/v1/repos/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH/-/issues"
+         "web" : "https://codeberg.org/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH/issues"
       },
       "homepage" : "https://p3rl.org/Dist::Zilla::PluginBundle::GEEKRUTH",
       "repository" : {
          "type" : "git",
          "url" : "ssh://git@codeberg.org/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH.git",
-         "web" : "https://codeberg.org/api/v1/repos/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH"
+         "web" : "https://codeberg.org/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH"
       }
    },
-   "version" : "4.0001",
+   "version" : "4.0002",
    "x_author_pledge" : {
       "version" : 1
    },

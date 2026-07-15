@@ -1,11 +1,13 @@
-# ABSTRACT: Git operations for karr sync (all-native via Git::Native + libgit2)
+# ABSTRACT: Git operations for karr sync (native via Git::Native + libgit2, with a git-CLI transport fallback)
 
 package App::karr::Git;
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use strict;
 use warnings;
 use Path::Tiny qw( path );
 use Try::Tiny;
+use IPC::Open3 qw( open3 );
+use Symbol qw( gensym );
 use YAML::XS qw( Dump Load );
 use Git::Native;
 use Git::Native::Signature;
@@ -26,7 +28,8 @@ sub dir {
 
 # The libgit2 exception text from the most recent remote operation that failed
 # (fetch/push/pull). Native operations have no shell exit code, so callers
-# report this instead of $?.
+# report this instead of $?. When the git-CLI transport fallback ran (see
+# _cli_transport below), this instead carries the real git-CLI stderr.
 sub last_error {
     my ($self) = @_;
     return $self->{_last_error};
@@ -251,7 +254,10 @@ sub fetch {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { $self->{_last_error} = "$_"; 0 };
+    } catch {
+        $self->{_last_error} = "$_";
+        $self->_cli_transport( 'fetch', $remote, [] );
+    };
 }
 
 sub push {
@@ -268,7 +274,10 @@ sub push {
             prune       => 1,
         );
         1;
-    } catch { $self->{_last_error} = "$_"; 0 };
+    } catch {
+        $self->{_last_error} = "$_";
+        $self->_cli_transport( 'push', $remote, [$refspec], prune => 1 );
+    };
 }
 
 sub pull {
@@ -283,7 +292,10 @@ sub pull {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { $self->{_last_error} = "$_"; 0 };
+    } catch {
+        $self->{_last_error} = "$_";
+        $self->_cli_transport( 'fetch', $remote, ['refs/karr/*:refs/karr/*'] );
+    };
 }
 
 sub push_ref {
@@ -299,7 +311,10 @@ sub push_ref {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { $self->{_last_error} = "$_"; 0 };
+    } catch {
+        $self->{_last_error} = "$_";
+        $self->_cli_transport( 'push', $remote, ["+$ref:$ref"] );
+    };
 }
 
 sub pull_ref {
@@ -315,7 +330,51 @@ sub pull_ref {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { $self->{_last_error} = "$_"; 0 };
+    } catch {
+        $self->{_last_error} = "$_";
+        $self->_cli_transport( 'fetch', $remote, ["$ref:$ref"] );
+    };
+}
+
+# Fallback transport via the system `git` CLI so that ssh-config directives
+# libgit2 ignores (ProxyCommand, Host aliases, IdentityFile, insteadOf) are
+# honoured. Returns 1 on success, 0 on failure (setting _last_error to the real
+# git-CLI stderr). $verb is 'push' or 'fetch'. @$refspecs may be empty
+# (fetch => configured refspecs). %opt: prune => bool. Disabled by
+# KARR_NO_CLI_FALLBACK=1.
+sub _cli_transport {
+    my ( $self, $verb, $remote, $refspecs, %opt ) = @_;
+    return 0 if $ENV{KARR_NO_CLI_FALLBACK};
+
+    my @cmd = ( 'git', '-C', $self->dir->stringify, $verb );
+    CORE::push @cmd, '--prune' if $opt{prune};
+    CORE::push @cmd, $remote, @$refspecs;
+
+    my ( $err, $exit );
+    my $ok = try {
+        local $ENV{GIT_TERMINAL_PROMPT} = 0;   # never hang on an interactive prompt
+        my $err_fh = gensym;
+        my $pid = open3( my $in, my $out_fh, $err_fh, @cmd );
+        close $in;
+        local $/;
+        my $out = <$out_fh>;                    # drained so the child can exit
+        $err = <$err_fh>;
+        waitpid( $pid, 0 );
+        $exit = $? >> 8;
+        1;
+    } catch {
+        $self->{_last_error} =
+            "git CLI fallback unavailable: $_"
+          . ( defined $self->{_last_error} ? " (native: $self->{_last_error})" : '' );
+        0;
+    };
+    return 0 unless $ok;
+    return 1 if defined $exit && $exit == 0;
+
+    my $detail = defined $err ? $err : '';
+    $detail =~ s/\s+\z//;
+    $self->{_last_error} = "git $verb (CLI fallback) failed: $detail";
+    return 0;
 }
 
 # ----- Task / config refs (sit on top of write_ref/read_ref) -----
@@ -411,11 +470,11 @@ __END__
 
 =head1 NAME
 
-App::karr::Git - Git operations for karr sync (all-native via Git::Native + libgit2)
+App::karr::Git - Git operations for karr sync (native via Git::Native + libgit2, with a git-CLI transport fallback)
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 
@@ -428,10 +487,18 @@ version 0.400
 =head1 DESCRIPTION
 
 L<App::karr::Git> provides the low-level Git interface used by C<karr> for
-syncing board state through C<refs/karr/*>. Everything — local object/ref
-ops and network fetch/push — runs natively via L<Git::Native> (FFI to
-libgit2). No fork/exec per op. SSH-agent and HTTPS-token credentials are
+syncing board state through C<refs/karr/*>. Local object/ref ops (read/write/
+delete of refs, blobs, trees, commits) run natively via L<Git::Native> (FFI
+to libgit2) with no fork/exec. SSH-agent and HTTPS-token credentials are
 supplied through the libgit2 credential-acquire callback.
+
+Network fetch/push (C<fetch>, C<pull>, C<push>, C<push_ref>, C<pull_ref>)
+also try the native libgit2 transport first. If that transport fails, they
+fall back to the system C<git> CLI (via L<IPC::Open3>), because libgit2/
+libssh2 doesn't read C<~/.ssh/config> and can't run a C<ProxyCommand> —
+directives like C<Host> aliases, C<IdentityFile>, and C<insteadOf> only take
+effect through the CLI. Set C<KARR_NO_CLI_FALLBACK=1> to disable the
+fallback and surface native transport failures directly.
 
 =head1 SEE ALSO
 

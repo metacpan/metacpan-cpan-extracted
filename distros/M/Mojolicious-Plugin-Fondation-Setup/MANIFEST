@@ -12,6 +12,7 @@ dist.ini
 lib/Mojolicious/Plugin/Fondation/Setup.pm
 lib/Mojolicious/Plugin/Fondation/Setup/Controller/Setup.pm
 lib/Mojolicious/Plugin/Fondation/Setup/MetaCPAN.pm
+share/menus.json
 share/templates/setup/plugins.html.ep
 share/templates/setup/wizard.html.ep
 share/translations/en.json

@@ -2,7 +2,7 @@
 #
 # EBCDIC_IBM_CPGID00290_by_JIS8.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # CPGID 00290

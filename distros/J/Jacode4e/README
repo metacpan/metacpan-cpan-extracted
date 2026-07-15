@@ -29,6 +29,11 @@ SYNOPSIS
       cp932ibm      IBM CP932
       cp932nec      NEC CP932
       sjis2004      JISC Shift_JIS-2004
+      sjis          JISC Shift_JIS (JIS X 0201, JIS X 0208)
+      euc2004       JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+      euc           JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212)
+      jis2004       JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+      jis           JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212)
       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
       keis78        HITACHI KEIS78
       keis83        HITACHI KEIS83
@@ -60,10 +65,23 @@ SYNOPSIS
       OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
                         { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
                         (CAUTION! override also SPACE option)
+      ROUND_TRIP        true means round-trip (reversible) conversion
+                        a character with no native code is allocated a
+                        code point from the user-defined (GAIJI) area
+                        default is false (ordinary Jacode4e conversion)
       -----------------------------------------------------------------------
 
-    If you need round-trip conversion, you had better use Jacode4e::RoundTrip
-    module.
+    If you need round-trip conversion, specify the "ROUND_TRIP => 1" option
+    (this is the same feature as the separate Jacode4e::RoundTrip module,
+    now built into Jacode4e). The encodings that can be round-tripped are
+    cp932x, cp00930, keis78, keis83, keis90, jef, jef9p, jipsj, jipse,
+    letsj, utf8, utf8.1, and utf8jp.
+
+    CAUTION: to round-trip, both "A to B" and "B to A" must specify
+    "ROUND_TRIP => 1", and must use the SAME VERSION of Jacode4e, because
+    the allocation order of the user-defined area depends on the data
+    table of the version. If the versions differ, the round-trip is not
+    guaranteed.
 
 DEPENDENCIES
 

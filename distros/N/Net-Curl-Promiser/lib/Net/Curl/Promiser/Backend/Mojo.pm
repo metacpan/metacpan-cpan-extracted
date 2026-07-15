@@ -19,6 +19,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
+    $self->{'_loop'} = $loop // Mojo::IOLoop->singleton;
     $self->{'_fhstore'} = Net::Curl::Promiser::FDFHStore->new();
 
     return $self;
@@ -26,10 +27,15 @@ sub new {
 
 #----------------------------------------------------------------------
 
+sub INIT_PROMISE {
+  my ($self, $promise) = @_;
+  $promise->ioloop($self->{'_loop'});
+}
+
 sub SET_TIMER {
     my ($self, $multi, $timeout_ms) = @_;
 
-    $self->{onetimer} = Mojo::IOLoop->timer(
+    $self->{onetimer} = $self->{'_loop'}->timer(
         $timeout_ms / 1000,
         sub {
             $self->time_out($multi);
@@ -38,8 +44,9 @@ sub SET_TIMER {
 }
 
 sub CLEAR_TIMER {
-    my ($ot) = delete $_[0]->{'onetimer'};
-    Mojo::IOLoop->remove($ot) if $ot;
+    my ($self) = @_;
+    my ($ot) = delete $self->{'onetimer'};
+    $self->{'_loop'}->remove($ot) if $ot;
 }
 
 sub _io {
@@ -48,7 +55,7 @@ sub _io {
     my $socket = $self->{'_watched_sockets'}{$fd} ||= do {
         my $s = $self->{'_fhstore'}->get_fh($fd);
 
-        Mojo::IOLoop->singleton->reactor->io(
+        $self->{'_loop'}->reactor->io(
             $s,
             sub {
                 $self->process(
@@ -61,7 +68,7 @@ sub _io {
         $s;
     };
 
-    Mojo::IOLoop->singleton->reactor->watch(
+    $self->{'_loop'}->reactor->watch(
         $socket,
         $read_yn,
         $write_yn,
@@ -98,7 +105,7 @@ sub STOP_POLL {
     my ($self, $fd) = @_;
 
     if (my $socket = delete $self->{'_watched_sockets'}{$fd}) {
-        Mojo::IOLoop->remove($socket);
+        $self->{'_loop'}->remove($socket);
     }
 
     return;

@@ -1,0 +1,159 @@
+# Syntax file for ocaml
+# Converted from: ocaml.vim
+# Conversion date: 2026-07-13
+
+language: ocaml
+extensions: ocaml
+
+[keyword:Boolean]
+False True false true
+
+[keyword:Keyword]
+and as asr assert class constraint do else exception external fun function in
+inherit initializer land lazy let lor lsl lsr lxor match method mod mutable
+new nonrec of or parser private rec try type val value virtual when while with
+
+[keyword:Todo]
+FIXME NOTE TODO XXX
+
+[keyword:Type]
+array bool bytes char exn float format format4 int int32 int64 lazy_t list
+nativeint option string unit
+
+[match:Include]
+pattern: #
+
+[match:Comment]
+pattern: ^#!.*
+
+[match:Include]
+pattern: ^#\b(?:quit|labels|warnings|warn_error|directory|remove_directory|cd|load|load_rec|use|mod_use|install_printer|remove_printer|require|list|ppx|principal|predicates|rectypes|thread|trace|untrace|untrace_all|print_depth|print_length|camlp4o|camlp4r|topfind_log|topfind_verbose)\b
+
+[match:Keyword]
+pattern: |
+
+[match:Error]
+pattern: }
+
+[match:Error]
+pattern: \]
+
+[match:Error]
+pattern: |]
+
+[match:Error]
+pattern: \bdownto\b
+
+[match:Error]
+pattern: \bto\b
+
+[match:Error]
+pattern: \bdo\b
+
+[match:Error]
+pattern: \bdone\b
+
+[match:Error]
+pattern: \bthen\b
+
+[match:Keyword]
+pattern: \bend\b
+
+[match:Error]
+pattern: \bend\b
+
+[match:Keyword]
+pattern: \bopen\b
+
+[match:Keyword]
+pattern: \binclude\b
+
+[match:Include]
+pattern: \b[A-Z](?:\w|')*\b
+
+[match:Include]
+pattern: \w(?:\w|')*(?: *\. *\w(?:\w|')*)*
+
+[match:Keyword]
+pattern: =
+
+[match:Include]
+pattern: \b[A-Z](?:\w|')*(?: *\. *[A-Z](?:\w|')*)*
+
+[match:Include]
+pattern: \b\w(?:\w|')*(?: *\. *\w(?:\w|')*)*\b
+
+[match:Include]
+pattern: \b(?:[A-Z](?:\w|')* *\. *)*\w(?:\w|')*\b
+
+[match:Include]
+pattern: =\s*\w(?:\w|')*\b
+
+[match:Include]
+pattern: [A-Z](?:\w|')* *\.
+
+[match:Character]
+pattern: '\\\d\d\d'|'\\[\'ntbr]'|'.'
+
+[match:Character]
+pattern: '\[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]'
+
+[match:Error]
+pattern: '\\\d\d'|'\\\d'
+
+[match:Error]
+pattern: '\\[^\'ntbr]'
+
+[match:Keyword]
+pattern: ;;
+
+[match:Keyword]
+pattern: \b_\b
+
+[match:Keyword]
+pattern: |[^\]]
+
+[match:Keyword]
+pattern: ;
+
+[match:Operator]
+pattern: #[#~?!.:|&$%<=>@^*/+-]+
+
+[match:Operator]
+pattern: ![~?!.:|&$%<=>@^*/+-]*
+
+[match:Operator]
+pattern: [~?][~?!.:|&$%<=>@^*/+-]+
+
+[match:Operator]
+pattern: [&$%@^/+-][~?!.:|&$%<=>@^*/+-]*
+
+[match:Operator]
+pattern: [|<=>*][~?!.:|&$%<=>@^*/+-]+
+
+[match:Number]
+pattern: -?\b\d(?:_|\d)*[l|L|n]\?\b
+
+[match:Number]
+pattern: -?\b0[x|X](?:[0-9a-fA-F]|_)+[l|L|n]\?\b
+
+[match:Number]
+pattern: -?\b0[o|O](?:[0-7]|_)+[l|L|n]\?\b
+
+[match:Number]
+pattern: -?\b0[b|B](?:[01]|_)+[l|L|n]\?\b
+
+[match:Float]
+pattern: -?\b\d(?:_|\d)*\.\?(?:_|\d)*(?:[eE][-+]?\d(?:_|\d)*)?\b
+
+[match:Label]
+pattern: (?:[a-z]|_)(?:\w|')*
+
+[region:Comment]
+start: (\*
+end: \*)
+
+[region:String]
+start: "
+end: "
+

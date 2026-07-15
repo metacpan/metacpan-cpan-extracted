@@ -1,3 +1,19 @@
+0.401     2026-07-14 14:32:22Z
+
+    - Fix `karr sync` reporting success even when pull or push failed: it
+      discarded the boolean results and printed "Done." unconditionally,
+      exiting 0 regardless of outcome. It now checks the result of each sync
+      step, aborts on the first failure with the underlying error on STDERR,
+      and exits 1 (ADR 0002's runtime-failure code) instead of masking a
+      Git/sync error as success. It also reuses the Git object inherited from
+      the sync lifecycle instead of constructing a second instance.
+    - Remote push/pull now fall back from the native libgit2 transport to the
+      system `git` CLI when libgit2 hits a transport error, so ssh_config
+      directives libgit2 does not honor (ProxyCommand, Host aliases,
+      IdentityFile, insteadOf rewrites) take effect again. Covers push, pull,
+      push_ref, pull_ref, and fetch; set KARR_NO_CLI_FALLBACK=1 to disable
+      the fallback and keep the previous libgit2-only behavior.
+
 0.400     2026-07-07 00:03:01Z
 
     - `karr init` and `karr materialize` now ensure the board-root .gitignore

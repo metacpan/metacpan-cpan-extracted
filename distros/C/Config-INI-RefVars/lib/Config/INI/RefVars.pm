@@ -10,7 +10,7 @@ use Cwd qw(abs_path);
 use File::Spec::Functions qw(catdir catfile file_name_is_absolute splitpath);
 use Config::INI::RefVars::Builtins;
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 use constant DFLT_TOCOPY_SECTION => "__TOCOPY__";
 use constant FLD_KEY_PREFIX      => __PACKAGE__ . ' __ ';
@@ -211,7 +211,7 @@ my $_check_tocopy_vars = sub {
       $tocopy_vars->{$var} = "";
     }
     croak("'tocopy_vars': variable '$var': name is not permitted")
-      if ($var =~ /^\s*$/ || $var =~ /^[[=;]/);
+      if ($var =~ /^\s*$/ || $var =~ /^[=;]/);
   }
   $self->{+TOCOPY_VARS} = {%$tocopy_vars} if $set;
   return $tocopy_vars;
@@ -863,7 +863,7 @@ Config::INI::RefVars - INI file reader with variable references and function cal
 
 =head1 VERSION
 
-Version 1.04
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -2189,7 +2189,7 @@ I<tocopy> section, the hash values become the corresponding variable values. Thi
 allows you to specify variables that you cannot specify in the INI file,
 e.g. variables with a C<=> in the name.
 
-Keys with C<=>, C<[> or C<;> as the first character are not permitted.
+Keys with C<=> or C<;> as the first character are not permitted.
 
 Default is C<undef>.
 
@@ -2202,13 +2202,13 @@ Example:
 
    my $obj = Config::INI::RefVars->new(varname_chk_re => qr/^[A-Z]/);
    my $src = <<'EOT';
-      [the section]
-      A=the value
-      xYZ=123
-      Z1=z2
-      Y=
+     [the section]
+     A=the value
+     xYZ=123
+     Z1=z2
+     Y=
    EOT
-  $obj->parse_ini(src => $src);
+   $obj->parse_ini(src => $src);
 
 This will result in an exception with the message C<'xYZ': var name does not
 match varname_chk_re>.
@@ -2383,14 +2383,14 @@ method argument.
 
    my $cfg = Config::INI::RefVars->new(separator => "/");
 
-   my $ini =<<'INI';
-    [FOO]
-    var=abcde
+   my $ini = <<'INI';
+     [FOO]
+     var=abcde
 
-    [BAR]
-    FOO/var=my var in section BAR
-    a=$(FOO/var)
-    b=$(BAR/FOO/var)
+     [BAR]
+     FOO/var=my var in section BAR
+     a=$(FOO/var)
+     b=$(BAR/FOO/var)
    INI
 
 By specifying the C<separator> argument, qualified variable references use

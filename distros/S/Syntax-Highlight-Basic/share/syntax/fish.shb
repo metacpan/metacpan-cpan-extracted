@@ -1,0 +1,65 @@
+# Syntax file for fish
+# Converted from: fish.vim
+# Conversion date: 2026-07-13
+
+language: fish
+extensions: fish
+
+[keyword:Keyword]
+_ abbr argparse begin bg bind block break breakpoint builtin case cd command
+commandline complete continue count disown echo else emit end eval exec exit
+false fg for function functions history if in jobs math printf pwd random read
+realpath return set set_color source status string switch test time true type
+ulimit wait while
+
+[keyword:Operator]
+and not or
+
+[keyword:Todo]
+TODO
+
+[match:Operator]
+pattern: !
+
+[match:Keyword]
+pattern: \bcontains\b
+
+[match:Operator]
+pattern: ,
+
+[match:Character]
+pattern: \\\\
+
+[match:Character]
+pattern: \\'
+
+[match:Character]
+pattern: \\"
+
+[match:Character]
+pattern: \\\$
+
+[match:Character]
+pattern: \\[0-7]{1,3}
+
+[match:Character]
+pattern: \[A-Z][0-9a-fA-F]{4}
+
+[match:Character]
+pattern: \[^A-Z][0-9a-fA-F]{8}
+
+[match:Character]
+pattern: \[0-9a-fA-F][0-7][0-9a-fA-F]|\[0-9a-fA-F][0-9a-fA-F]
+
+[match:Character]
+pattern: \\X[0-9a-fA-F]{1,2}
+
+[match:Character]
+pattern: \\[abcefnrtv[\](){}<>\\*?~%#$|&;'" ]
+
+[match:Operator]
+pattern: %self\b
+
+[match:Operator]
+pattern: (?:&&|||)
+

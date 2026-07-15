@@ -776,4 +776,467 @@ static char * eshu_indent_pl(const char *src, size_t src_len,
 	return result;
 }
 
+
+#include "eshu_hl_util.h"
+
+/* ══════════════════════════════════════════════════════════════════
+ *  Perl keyword list
+ * ══════════════════════════════════════════════════════════════════ */
+
+static const char * const eshu_hl_pl_kw[] = {
+    "BEGIN", "END", "AUTOLOAD", "DESTROY",
+    "abs", "accept", "alarm", "and", "atan2",
+    "bind", "binmode", "bless",
+    "caller", "chdir", "chmod", "chomp", "chop", "chown", "chr",
+    "chroot", "close", "closedir", "connect", "cos", "crypt",
+    "dbmclose", "dbmopen", "defined", "delete", "die", "do", "dump",
+    "each", "else", "elsif", "endgrent", "endhostent", "endnetent",
+    "endprotoent", "endpwent", "endservent", "eof", "eval", "exec",
+    "exists", "exit", "exp",
+    "fcntl", "fileno", "flock", "for", "foreach", "fork", "format",
+    "formline",
+    "getc", "getgrent", "getgrgid", "getgrnam", "gethostbyaddr",
+    "gethostbyname", "gethostent", "getlogin", "getnetbyaddr",
+    "getnetbyname", "getnetent", "getpeername", "getpgrp", "getppid",
+    "getpriority", "getprotobyname", "getprotobynumber", "getprotoent",
+    "getpwent", "getpwnam", "getpwuid", "getservbyname",
+    "getservbyport", "getservent", "getsockname", "getsockopt",
+    "given", "glob", "gmtime", "goto", "grep",
+    "hex",
+    "if", "import", "index", "int", "ioctl",
+    "join",
+    "keys", "kill",
+    "last", "lc", "lcfirst", "length", "link", "listen", "local",
+    "localtime", "log", "lstat",
+    "m", "map", "mkdir", "msgctl", "msgget", "msgrcv", "msgsnd",
+    "my",
+    "next", "no",
+    "oct", "open", "opendir", "or", "ord", "our",
+    "pack", "package", "pipe", "pop", "pos", "print", "printf",
+    "prototype", "push",
+    "q", "qq", "qr", "quotemeta", "qw", "qx",
+    "rand", "read", "readdir", "readline", "readlink", "readpipe",
+    "recv", "redo", "ref", "rename", "require", "reset", "return",
+    "reverse", "rewinddir", "rindex", "rmdir",
+    "s", "say", "scalar", "seek", "seekdir", "select", "semctl",
+    "semget", "semop", "send", "setgrent", "sethostent", "setnetent",
+    "setpgrp", "setpriority", "setprotoent", "setpwent", "setservent",
+    "setsockopt", "shift", "shmctl", "shmget", "shmread", "shmwrite",
+    "shutdown", "sin", "sleep", "socket", "socketpair", "sort", "splice",
+    "split", "sprintf", "sqrt", "srand", "stat", "state", "study", "sub",
+    "substr", "symlink", "syscall", "sysopen", "sysread", "sysseek",
+    "system", "syswrite",
+    "tell", "telldir", "tie", "tied", "time", "times", "tr",
+    "truncate",
+    "uc", "ucfirst", "umask", "undef", "unless", "unlink", "unpack",
+    "unshift", "untie", "until", "use", "utime",
+    "values", "vec",
+    "wait", "waitpid", "wantarray", "warn", "when", "while", "write",
+    "y",
+    NULL
+};
+
+/* ══════════════════════════════════════════════════════════════════
+ *  Perl highlighter
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* Paired delimiter map: ( → ), [ → ], { → }, < → > */
+static char eshu_hl_paired(char open) {
+    switch (open) {
+    case '(': return ')';
+    case '[': return ']';
+    case '{': return '}';
+    case '<': return '>';
+    default:  return open;
+    }
+}
+
+/* Scan past a quoted construct body using delimiter d_open/d_close.
+ * p points to the first char after the opening delimiter.
+ * Returns pointer past the closing delimiter. */
+static const char *eshu_hl_pl_qbody(const char *p, const char *end,
+                                     char d_open, char d_close) {
+    int depth = 1;
+    int is_paired = (d_open != d_close);
+    while (p < end && depth > 0) {
+        if (*p == '\\') { p++; if (p < end) p++; continue; }
+        if (is_paired && *p == d_open)  { depth++; p++; continue; }
+        if (*p == d_close) { depth--; p++; continue; }
+        p++;
+    }
+    return p;
+}
+
+/* Detect whether '/' at p is a regex delimiter (vs division).
+ * last_was_value: 1 if previous token was an rvalue (number, var, ')' etc.) */
+static int eshu_hl_pl_is_regex(const char *src_start, const char *p,
+                                int last_was_value) {
+    (void)src_start;
+    if (last_was_value) return 0;
+    return 1;
+}
+
+/* Single special Perl variable chars after sigil (no alpha start) */
+static int eshu_hl_pl_special_var(char c) {
+    switch (c) {
+    case '_': case '!': case '@': case '&': case '\'': case '"':
+    case ';': case ',': case '\\': case '/': case '.': case '?':
+    case '|': case '+': case '-': case '^': case '~': case '0':
+    case '$': case '*': case '(': case ')': case '[': case '{':
+    case '}': case '<': case '>': case '=': case '%': case '#':
+        return 1;
+    default:
+        return isdigit((unsigned char)c);
+    }
+}
+
+#define ESHU_HL_HEREDOC_MAX 64
+
+static char *eshu_highlight_pl(const char *src, size_t src_len, size_t *out_len) {
+    eshu_buf_t out;
+    const char *p     = src;
+    const char *end   = src + src_len;
+    const char *plain = p;
+    int last_val      = 0; /* last non-ws was rvalue-like */
+    int past_end_data = 0; /* past __END__ / __DATA__ */
+    int in_pod        = 0;
+    char hd_tag[ESHU_HL_HEREDOC_MAX];
+    int  hd_len       = 0;
+    int  hd_pending   = 0; /* heredoc body starts on next line */
+    int  at_bol       = 1;
+
+    eshu_buf_init(&out, src_len * 2 + 64);
+
+#define PL_SPAN(cls, ts, te) do { \
+    eshu_hl_flush(&out, plain, (ts)); \
+    eshu_hl_span(&out, (cls), (ts), (te)); \
+    p = (te); plain = p; \
+} while(0)
+
+    while (p < end) {
+        char c = *p;
+
+        /* ── past __END__ / __DATA__: dump rest as comment ── */
+        if (past_end_data) {
+            PL_SPAN("esh-c", p, end);
+            break;
+        }
+
+        /* ── POD block ── */
+        if (in_pod) {
+            /* POD ends at '=cut' at start of line */
+            if (at_bol && p + 4 <= end && memcmp(p, "=cut", 4) == 0 &&
+                (p + 4 >= end || *(p + 4) == '\n' || *(p + 4) == '\r' ||
+                 *(p + 4) == ' ')) {
+                const char *ts = p;
+                while (p < end && *p != '\n') p++;
+                if (p < end) p++;
+                PL_SPAN("esh-d", ts, p);
+                in_pod = 0;
+                at_bol = 1;
+            } else {
+                const char *ts = p;
+                while (p < end && *p != '\n') p++;
+                if (p < end) p++;
+                PL_SPAN("esh-d", ts, p);
+                at_bol = 1;
+            }
+            continue;
+        }
+
+        /* ── heredoc body ── */
+        if (hd_pending && at_bol) {
+            /* check if this line is the terminator */
+            if (hd_len > 0 && (size_t)(end - p) >= (size_t)hd_len &&
+                memcmp(p, hd_tag, (size_t)hd_len) == 0 &&
+                (p + hd_len >= end || *(p + hd_len) == '\n' ||
+                 *(p + hd_len) == '\r')) {
+                const char *ts = p;
+                while (p < end && *p != '\n') p++;
+                if (p < end) p++;
+                PL_SPAN("esh-h", ts, p);
+                hd_pending = 0;
+                hd_len = 0;
+                at_bol = 1;
+            } else {
+                const char *ts = p;
+                while (p < end && *p != '\n') p++;
+                if (p < end) p++;
+                PL_SPAN("esh-h", ts, p);
+                at_bol = 1;
+            }
+            continue;
+        }
+
+        /* ── POD start: '=word' at beginning of line ── */
+        if (at_bol && c == '=') {
+            const char *np = p + 1;
+            if (np < end && isalpha((unsigned char)*np)) {
+                /* check it's not '=~' operator */
+                const char *ts = p;
+                while (p < end && *p != '\n') p++;
+                if (p < end) p++;
+                PL_SPAN("esh-d", ts, p);
+                in_pod = 1;
+                at_bol = 1;
+                continue;
+            }
+        }
+
+        /* ── comment: '#' not inside anything ── */
+        if (c == '#') {
+            const char *ts = p;
+            while (p < end && *p != '\n') p++;
+            PL_SPAN("esh-c", ts, p);
+            at_bol = 0;
+            last_val = 0;
+            continue;
+        }
+
+        /* ── heredoc start: << or <<~ ── */
+        if (c == '<' && p + 1 < end && *(p + 1) == '<') {
+            const char *ts = p;
+            p += 2;
+            int indented = 0;
+            if (p < end && *p == '~') { indented = 1; p++; }
+            /* optional quote around tag */
+            char qchar = 0;
+            if (p < end && (*p == '\'' || *p == '"' || *p == '`')) {
+                qchar = *p++;
+            }
+            /* collect tag */
+            const char *tag_start = p;
+            while (p < end && *p != '\n' && *p != '\r' &&
+                   (qchar ? *p != qchar : (isalnum((unsigned char)*p) || *p == '_')))
+                p++;
+            int tl = (int)(p - tag_start);
+            if (tl > 0 && tl < ESHU_HL_HEREDOC_MAX) {
+                memcpy(hd_tag, tag_start, (size_t)tl);
+                hd_tag[tl] = '\0';
+                hd_len = tl;
+                hd_pending = 1;
+            }
+            if (qchar && p < end && *p == qchar) p++;
+            /* the rest of the current line (after <<TAG) continues normally */
+            /* emit the << token as plain; body will be highlighted next line */
+            PL_SPAN("esh-h", ts, p);
+            (void)indented;
+            last_val = 1;
+            continue;
+        }
+
+        /* ── __END__ / __DATA__ ── */
+        if (at_bol && (
+            (p + 7 <= end && memcmp(p, "__END__", 7) == 0 &&
+             (p + 7 >= end || *(p + 7) == '\n' || *(p + 7) == '\r')) ||
+            (p + 8 <= end && memcmp(p, "__DATA__", 8) == 0 &&
+             (p + 8 >= end || *(p + 8) == '\n' || *(p + 8) == '\r')))) {
+            /* consume the token line */
+            const char *ts = p;
+            while (p < end && *p != '\n') p++;
+            if (p < end) p++;
+            PL_SPAN("esh-k", ts, p);
+            past_end_data = 1;
+            at_bol = 1;
+            continue;
+        }
+
+        /* ── string: "..." '...' `...` ── */
+        if (c == '"' || c == '\'' || c == '`') {
+            const char *ts = p++;
+            while (p < end && *p != c) {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                p++;
+            }
+            if (p < end) p++;
+            PL_SPAN("esh-s", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── number: digits ── */
+        if (isdigit((unsigned char)c) ||
+            (c == '.' && p + 1 < end && isdigit((unsigned char)*(p + 1)))) {
+            const char *ts = p;
+            if (c == '0' && p + 1 < end) {
+                char nc = *(p + 1);
+                if (nc == 'x' || nc == 'X') {
+                    p += 2; while (p < end && isxdigit((unsigned char)*p)) p++;
+                } else if (nc == 'b' || nc == 'B') {
+                    p += 2; while (p < end && (*p == '0' || *p == '1')) p++;
+                } else {
+                    while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+            } else {
+                while (p < end && (isdigit((unsigned char)*p) || *p == '_')) p++;
+                if (p < end && *p == '.') {
+                    p++;
+                    while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+                if (p < end && (*p == 'e' || *p == 'E')) {
+                    p++; if (p < end && (*p == '+' || *p == '-')) p++;
+                    while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+            }
+            PL_SPAN("esh-n", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── variable sigil: $, @, % ── */
+        if (c == '$' || c == '@' || c == '%') {
+            const char *ts = p++;
+            /* $# prefix (last-index-of) */
+            if (c == '$' && p < end && *p == '#') {
+                p++;
+                if (p < end && eshu_hl_isalpha_(*p)) {
+                    while (p < end && eshu_hl_isalnum_(*p)) p++;
+                }
+            } else if (p < end && eshu_hl_isalpha_(*p)) {
+                while (p < end && eshu_hl_isalnum_(*p)) p++;
+            } else if (p < end && eshu_hl_pl_special_var(*p)) {
+                p++;
+            } else if (p < end && *p == '{') {
+                p++;
+                while (p < end && *p != '}') p++;
+                if (p < end) p++;
+            }
+            PL_SPAN("esh-v", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── regex / quoted-like starting with m, s, qw, qq, qr, q, tr, y ── */
+        if ((c == 'm' || c == 's' || c == 'q' || c == 'y') &&
+            (p + 1 >= end || !eshu_hl_isalnum_(*(p + 1)))) {
+            /* single-char operator: m/./, s/../., q(.) etc. */
+            const char *ts = p++;
+            char d_open = (p < end) ? *p++ : '/';
+            char d_close = eshu_hl_paired(d_open);
+            p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+            if (c == 's' || c == 'y') {
+                /* s and y always have a second section */
+                if (d_open != d_close) {
+                    /* paired delimiters: consume new opening delimiter */
+                    if (p < end) {
+                        d_open = *p++;
+                        d_close = eshu_hl_paired(d_open);
+                        p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+                    }
+                } else {
+                    /* same delimiter: second section starts immediately */
+                    p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+                }
+            }
+            /* skip flags: gimsxpeodual etc. */
+            while (p < end && isalpha((unsigned char)*p)) p++;
+            PL_SPAN("esh-r", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── qw / qq / qr (multi-char) ── */
+        if (c == 'q' && p + 1 < end &&
+            (*(p + 1) == 'w' || *(p + 1) == 'q' || *(p + 1) == 'r' ||
+             *(p + 1) == 'x') &&
+            (p + 2 >= end || !eshu_hl_isalnum_(*(p + 2)))) {
+            const char *ts = p;
+            p += 2;
+            char d_open = (p < end) ? *p++ : '(';
+            char d_close = eshu_hl_paired(d_open);
+            p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+            PL_SPAN("esh-r", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── tr/y (two-char) ── */
+        if (((c == 't' && p + 1 < end && *(p + 1) == 'r') ||
+             (c == 'y')) &&
+            (p + (c == 'y' ? 1 : 2) >= end ||
+             !eshu_hl_isalnum_(*(p + (c == 'y' ? 1 : 2))))) {
+            const char *ts = p;
+            p += (c == 'y') ? 1 : 2;
+            char d_open = (p < end) ? *p++ : '/';
+            char d_close = eshu_hl_paired(d_open);
+            p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+            if (d_open == d_close) {
+                /* same delimiter: second section starts immediately */
+                p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+            } else {
+                /* paired delimiters: consume opening delimiter of second section */
+                if (p < end) {
+                    d_open = *p++;
+                    d_close = eshu_hl_paired(d_open);
+                    p = eshu_hl_pl_qbody(p, end, d_open, d_close);
+                }
+            }
+            while (p < end && isalpha((unsigned char)*p)) p++;
+            PL_SPAN("esh-r", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── bare regex: / not preceded by rvalue ── */
+        if (c == '/' && !last_val) {
+            const char *ts = p++;
+            while (p < end && *p != '/') {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                if (*p == '\n') { p = ts + 1; goto pl_not_regex; }
+                p++;
+            }
+            if (p < end) p++;
+            while (p < end && isalpha((unsigned char)*p)) p++;
+            PL_SPAN("esh-r", ts, p);
+            last_val = 1;
+            at_bol = 0;
+            continue;
+        pl_not_regex:;
+        }
+
+        /* ── identifier or keyword ── */
+        if (eshu_hl_isalpha_(c)) {
+            const char *ts = p;
+            while (p < end && eshu_hl_isalnum_(*p)) p++;
+            eshu_hl_flush(&out, plain, ts);
+            plain = p;
+            size_t ilen = (size_t)(p - ts);
+            if (eshu_hl_kw(ts, ilen, eshu_hl_pl_kw)) {
+                eshu_hl_span(&out, "esh-k", ts, p);
+                last_val = 0;
+            } else {
+                eshu_hl_write_html(&out, ts, ilen);
+                last_val = 1;
+            }
+            at_bol = 0;
+            continue;
+        }
+
+        /* ── track rvalue context ── */
+        if (c == ')' || c == ']') last_val = 1;
+        else if (c == '(' || c == ',' || c == ';' || c == '=' ||
+                 c == '+' || c == '-' || c == '*' || c == '!' ||
+                 c == '~' || c == ':' || c == '?' || c == '{' ||
+                 c == '[' || c == '&' || c == '|' || c == '^')
+            last_val = 0;
+
+        if (c == '\n') { at_bol = 1; last_val = 0; }
+        else if (c != ' ' && c != '\t') at_bol = 0;
+        p++;
+    }
+
+    eshu_hl_flush(&out, plain, end);
+    eshu_buf_putc(&out, '\0');
+    *out_len = out.len - 1;
+    return out.data;
+
+#undef PL_SPAN
+}
+
 #endif /* ESHU_PL_H */

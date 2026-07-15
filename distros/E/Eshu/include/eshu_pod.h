@@ -172,4 +172,112 @@ static char * eshu_indent_pod(const char *src, size_t src_len,
 	return result;
 }
 
+
+#include "eshu_hl_util.h"
+
+/* forward declaration — eshu_pl.h is included after eshu_pod.h */
+static char *eshu_highlight_pl(const char *src, size_t src_len, size_t *out_len);
+
+/* ══════════════════════════════════════════════════════════════════
+ *  POD highlighter (standalone POD input)
+ *  Verbatim blocks (indented lines) are sub-highlighted as Perl.
+ * ══════════════════════════════════════════════════════════════════ */
+
+static char *eshu_highlight_pod(const char *src, size_t src_len, size_t *out_len) {
+    eshu_buf_t  out;
+    eshu_buf_t  vbuf;   /* accumulates verbatim block lines */
+    const char *p     = src;
+    const char *end   = src + src_len;
+    const char *plain = p;
+    int at_bol        = 1;
+    int in_verbatim   = 0;
+
+    eshu_buf_init(&out,  src_len * 2 + 64);
+    eshu_buf_init(&vbuf, 256);
+
+/* flush non-verbatim plain text up to `upto` (HTML-escaped) */
+#define POD_FLUSH_PLAIN(upto) do { \
+    eshu_hl_flush(&out, plain, (upto)); \
+    plain = (upto); \
+} while(0)
+
+/* emit a =command span and advance plain */
+#define POD_EMIT_CMD(ts, te) do { \
+    eshu_hl_flush(&out, plain, (ts)); \
+    eshu_hl_span(&out, "esh-d", (ts), (te)); \
+    plain = (te); \
+} while(0)
+
+/* run accumulated verbatim block through the Perl highlighter */
+#define POD_FLUSH_VERBATIM() do { \
+    if (vbuf.len > 0) { \
+        size_t _pl_len; \
+        char  *_pl_out = eshu_highlight_pl(vbuf.data, vbuf.len, &_pl_len); \
+        if (_pl_out) { eshu_buf_write(&out, _pl_out, _pl_len); free(_pl_out); } \
+        vbuf.len = 0; \
+    } \
+} while(0)
+
+    while (p < end) {
+        /* POD command: '=word' at beginning of line */
+        if (at_bol && *p == '=') {
+            const char *np = p + 1;
+            if (np < end && isalpha((unsigned char)*np)) {
+                if (in_verbatim) {
+                    POD_FLUSH_VERBATIM();
+                    in_verbatim = 0;
+                    plain = p;
+                }
+                const char *ts = p;
+                while (p < end && *p != '\n') p++;
+                if (p < end) p++;
+                POD_EMIT_CMD(ts, p);
+                at_bol = 1;
+                continue;
+            }
+        }
+
+        /* entering verbatim: first indented line */
+        if (at_bol && !in_verbatim && (*p == ' ' || *p == '\t')) {
+            POD_FLUSH_PLAIN(p);
+            in_verbatim = 1;
+        }
+
+        /* leaving verbatim: non-blank, non-indented line */
+        if (at_bol && in_verbatim && *p != ' ' && *p != '\t' && *p != '\n') {
+            POD_FLUSH_VERBATIM();
+            in_verbatim = 0;
+            plain = p;
+        }
+
+        if (in_verbatim) {
+            /* collect line (or blank line) into vbuf */
+            const char *ts = p;
+            while (p < end && *p != '\n') p++;
+            if (p < end) p++;
+            eshu_buf_write(&vbuf, ts, (size_t)(p - ts));
+            at_bol = 1;
+            continue;
+        }
+
+        if (*p == '\n') { at_bol = 1; }
+        else            { at_bol = 0; }
+        p++;
+    }
+
+    if (in_verbatim)
+        POD_FLUSH_VERBATIM();
+    else
+        eshu_hl_flush(&out, plain, end);
+
+    eshu_buf_free(&vbuf);
+    eshu_buf_putc(&out, '\0');
+    *out_len = out.len - 1;
+    return out.data;
+
+#undef POD_FLUSH_PLAIN
+#undef POD_EMIT_CMD
+#undef POD_FLUSH_VERBATIM
+}
+
 #endif /* ESHU_POD_H */

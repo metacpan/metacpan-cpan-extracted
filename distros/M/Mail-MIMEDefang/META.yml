@@ -1,0 +1,61 @@
+---
+abstract: 'E-mail filtering with Sendmail Milter'
+author:
+  - 'The McGrail Foundation <https://mimedefang.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+keywords:
+  - email
+  - milter
+  - spam
+  - sendmail
+  - postfix
+  - filter
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-MIMEDefang
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  AnyEvent: '0'
+  AnyEvent::DNS: '0'
+  AnyEvent::Socket: '0'
+  Crypt::OpenSSL::X509: '0'
+  HTML::Parser: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Mail::BIMI: '3'
+  Mail::DKIM: '0'
+  Mail::SPF: '0'
+  Mail::SpamAssassin: '0'
+  Sys::Syslog: '0'
+  Unix::Syslog: '0'
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  Errno: '0'
+  File::Spec: '0'
+  IO::File: '0'
+  IO::Socket: '0'
+  MIME::Entity: '0'
+  MIME::Parser: '0'
+  MIME::Tools: '5.412'
+  MIME::Words: '0'
+  Socket: '0'
+  Sys::Hostname: '0'
+  Time::Local: '0'
+  perl: '5.008009'
+resources:
+  bugtracker: https://github.com/The-McGrail-Foundation/MIMEDefang/issues
+  repository: https://github.com/The-McGrail-Foundation/MIMEDefang.git
+version: v3.7.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

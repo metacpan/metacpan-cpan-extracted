@@ -18,14 +18,15 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "Sys-OsRelease",
-  "dist_version" => "0.3.1",
+  "dist_version" => "0.4.0",
   "license" => "artistic_2",
   "module_name" => "Sys::OsRelease",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
     "feature" => 0,
-    "perl" => "5.010",
+    "if" => 0,
+    "perl" => "5.022",
     "strict" => 0,
     "utf8" => 0,
     "version" => 0,

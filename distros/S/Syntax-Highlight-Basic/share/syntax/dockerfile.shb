@@ -1,0 +1,11 @@
+# Syntax file for dockerfile
+# Converted from: dockerfile.vim
+# Conversion date: 2026-07-13
+
+language: dockerfile
+extensions: dockerfile
+
+[keyword:Keyword]
+ADD ARG CMD COPY ENTRYPOINT ENV EXPOSE HEALTHCHECK LABEL MAINTAINER ONBUILD
+RUN SHELL STOPSIGNAL USER VOLUME WORKDIR
+

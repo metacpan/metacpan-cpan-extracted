@@ -1,3 +1,7 @@
+0.75 2026-07-14
+ - Fixed slurp_utf8() leaking the file descriptor if a fatal "utf8" warning
+   (e.g. warnings FATAL => 'utf8') was thrown while reading an ill-formed file.
+
 0.74 2026-07-13
  - Fixed slurp_utf8() failing to link on Windows: PerlIO_openn is not
    exported there. The file is now opened with the unbuffered PerlLIO

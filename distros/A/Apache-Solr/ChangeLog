@@ -4,7 +4,19 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
-version 1.11!  Thu  8 May 11:48:43 CEST 2025
+version 1.12: Wed 15 Jul 10:55:57 CEST 2026
+
+	Fixes:
+	- implement field_key_simplify to be able to support field names
+	  with underscores.
+	  GutHub issue #7 [Clay Fouts]
+
+	Improvements:
+	- converted Makefile.PL to OODoc 3
+	- require Perl 5.16.1 (2012)
+	- convert to my new coding style.
+
+version 1.11: Thu  8 May 11:48:43 CEST 2025
 
 	Changes:
 	- replace http_response from 1.10 by 'result'.

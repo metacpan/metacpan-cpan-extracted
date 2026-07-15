@@ -1,0 +1,51 @@
+# Syntax file for gdscript
+# Converted from: gdscript.vim
+# Conversion date: 2026-07-13
+
+language: gdscript
+extensions: gdscript
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+elif else if match
+
+[keyword:Keyword]
+null owner parent self tool
+
+[keyword:Operator]
+and as in is not or
+
+[keyword:Repeat]
+break continue for while
+
+[keyword:Statement]
+assert breakpoint class class_name const enum export extends func master
+mastersync onready pass puppet puppetsync remote remotesync return setget
+signal static sync var
+
+[keyword:Todo]
+BUG FIXME HACK NOTE TODO XXX
+
+[keyword:Type]
+String bool float int void
+
+[match:Special]
+pattern: :\s*$
+
+[match:Type]
+pattern: :\s*\K[a-zA-Z_]\w*
+
+[match:Type]
+pattern: ->\s*\K[a-zA-Z_]\w*
+
+[match:Comment]
+pattern: #.*$
+
+[match:Special]
+pattern: \\[abfnrtv'"\\]
+
+[match:Special]
+pattern: \\$
+

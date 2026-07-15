@@ -1,0 +1,43 @@
+# Syntax file for avra
+# Converted from: avra.vim
+# Conversion date: 2026-07-13
+
+language: avra
+extensions: avra
+case: ignore
+
+[keyword:Operator]
+byte2 byte3 byte4 exp2 high hwrd log2 low lwrd page
+
+[match:Operator]
+pattern: [-*/+]
+
+[match:Operator]
+pattern: !
+
+[match:Operator]
+pattern: <<|>>|<|<=|>|>=|==|!=
+
+[match:Operator]
+pattern: [~&^|]|&&|||
+
+[match:Number]
+pattern: \b0[bB][0-1]*\b
+
+[match:Number]
+pattern: \b0[xX][0-9a-fA-F]+\b
+
+[match:Number]
+pattern: \b(?:0|[1-9]\d*)\b
+
+[match:Label]
+pattern: ^\s*[^; \t]+:
+
+[region:Comment]
+start: ;
+end: $
+
+[region:String]
+start: "
+end: "\|$
+

@@ -1,3 +1,8 @@
+0.000055  2026-07-14 12:20:42-07:00 America/Los_Angeles
+
+    - Data-dir cleanup is now robust on Windows: remove_tree could leave a SQLite data dir non-empty on MSWin32 (the OS releases file handles asynchronously, so an immediate rmdir gets ENOTEMPTY), which left the stale db behind and made the rebuilt instance die with "table quick_testx already exists". A new remove_tree_robust helper retries on MSWin32 (single pass, no added latency, on Unix), and is used by Driver cleanup and the Pool build/expiry paths. This was the only remaining CPAN Testers failure on 0.000054 (Strawberry Perl, SQLite-only).
+    - Driver cleanup() now disconnects this process's DBI handles before deleting the data dir; the watcher teardown paths already did, but the watcher-less path (SQLite, whose stop() is a no-op) reached cleanup() with handles still open, which on Windows locked the very file it was trying to remove.
+
 0.000054  2026-07-13 10:53:23-07:00 America/Los_Angeles
 
 0.000053  2026-07-10 11:07:52-07:00 America/Los_Angeles

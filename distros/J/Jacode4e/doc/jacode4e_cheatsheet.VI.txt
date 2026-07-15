@@ -1,0 +1,158 @@
+################################################################################
+# To ghi nho Jacode4e (VI)
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
+# https://metacpan.org/dist/Jacode4e
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
+################################################################################
+
+======================================================================
+Tai lieu tham khao nhanh Jacode4e (Tieng Viet)
+======================================================================
+
+[SU DUNG CO BAN]
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, { %option });
+
+  $line             : chuoi can chuyen doi (truyen bang tham chieu, ghi de tai cho)
+  $OUTPUT_encoding  : ten ma hoa dau ra
+  $INPUT_encoding   : ten ma hoa dau vao
+  $char_count       : so ky tu sau khi chuyen doi
+
+[DANH SACH TEN MA HOA]
+
+  mnemonic    description
+  ---------   ---------------------------------------------------
+  cp932x      CP932X (Extended CP932 to JIS X 0213, single-shift 0x9C5A)
+  cp932       Microsoft CP932 (Windows-31J / IANA registered name)
+  cp932ibm    IBM CP932
+  cp932nec    NEC CP932
+  sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208); year editions below
+  sjis2004    JISC Shift_JIS-2004 (JIS X 0213:2004)
+  euc         JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  euc2004     JISC EUC-JIS-2004 (JIS X 0213 plane 1 and plane 2)
+  jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  jis2004     JISC ISO-2022-JP-2004 (JIS X 0213 plane 1 and plane 2)
+  cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
+  keis78      HITACHI KEIS78
+  keis83      HITACHI KEIS83
+  keis90      HITACHI KEIS90
+  jef         FUJITSU JEF (12pt, use OUTPUT_SHIFTING option for shift codes)
+  jef9p       FUJITSU JEF ( 9pt, use OUTPUT_SHIFTING option for shift codes)
+  jipsj       NEC JIPS(J)
+  jipse       NEC JIPS(E)
+  letsj       UNISYS LetsJ
+  utf8        UTF-8.0 (aka UTF-8)
+  utf8.1      UTF-8.1 (conversion based on Shift_JIS-to-Unicode mapping, not CP932)
+  utf8jp      UTF-8-SPUA-JP (JIS X 0213 on SPUA ordered by JIS level/plane/row/cell)
+
+  Cac phien ban theo nam cua sjis / euc / jis (ten khong co nam la ban 1990):
+    sjis1978  euc1978  jis1978   JIS C 6226-1978
+    sjis1983  euc1983  jis1983   JIS X 0208-1983
+    sjis1990  euc1990  jis1990   JIS X 0208-1990  (= sjis / euc / jis)
+    sjis2000  euc2000  jis2000   JIS X 0213:2000
+    sjis2004  euc2004  jis2004   JIS X 0213:2004
+
+[KHAC BIET CAC PHIEN BAN JIS THEO NAM (cho nguoi moi)]
+
+  Kanji Nhat duoc chuan hoa theo tung giai doan. Cung mot chuoi byte co the la ky tu khac nhau giua cac phien ban, vi vay hay chon phien ban khop voi du lieu cua ban. Neu khong ro, hay dung sjis / euc / jis khong co nam.
+
+  1978 (JIS C 6226-1978) : chuan kanji dau tien (cap 1 va cap 2).
+  1983 (JIS X 0208-1983) : hoan doi ma cua 22 cap kanji va thay doi mot so hinh chu; nguyen nhan pho bien nhat gay loi du lieu cu.
+  1990 (JIS X 0208-1990) : chi them 2 kanji (U+51DC, U+7199); sjis / euc / jis khong co nam la ban nay.
+  2000 (JIS X 0213:2000) : mo rong lon; them kanji cap 3 va cap 4 cung ky hieu tren mat phang 2 moi.
+  2004 (JIS X 0213:2004) : them 10 kanji va thay doi hinh mau cua 168 kanji (cung ma voi ban 2000, chi doi hinh chu).
+
+[TUY CHON]
+
+  Truyen tuy chon lam doi so thu 4: { 'KEY' => gia_tri, ... }
+
+  INPUT_LAYOUT
+    Bo cuc ban ghi co dinh bang 'S' (SBCS 1 byte) va 'D' (DBCS 2 byte); moi chu co the theo sau boi so lan lap. Mac dinh: tu dong.
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'INPUT_LAYOUT'=>'S2D2SD'});
+
+  OUTPUT_SHIFTING
+    Dung: phat ma shift-out/shift-in quanh cac doan DBCS. Mac dinh: sai.
+    e.g. Jacode4e::convert(\$line,'jef','cp932x',{'OUTPUT_SHIFTING'=>1});
+
+  SPACE
+    Ma khoang trang DBCS/MBCS (chuoi nhi phan). Mac dinh: khoang trang cua ma hoa.
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'SPACE'=>"\x81\xA1"});
+
+  GETA
+    Ma geta DBCS/MBCS cho ky tu khong the anh xa.
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'GETA'=>"\x81\xA2"});
+
+  OVERRIDE_MAPPING
+    Tham chieu bam ghi de FROM => TO theo tung ky tu (cung ghi de SPACE).
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'OVERRIDE_MAPPING'=>{"\x44\x5A"=>"\x81\x7C"}});
+
+  JIS_SOSI
+    Dung: voi dau vao 'jis', SO (0x0E)/SI (0x0F) chuyen sang katakana JIS X 0201 (thoi quen JIS7). Mac dinh: sai; dau vao la 'jis'.
+    e.g. Jacode4e::convert(\$line,'utf8','jis',{'JIS_SOSI'=>1});
+
+  JIS_X0212
+    Dung: voi dau ra 'jis', ky tu co trong JIS X 0212 nhung khong co trong JIS X 0208 duoc viet ESC $ ( D. Can OUTPUT_SHIFTING. Mac dinh: sai.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_X0212'=>1,'OUTPUT_SHIFTING'=>1});
+
+  JIS_KANA
+    Kieu katakana o dau ra 'jis': 'GR' (0xA1..0xDF), 'I' (ESC ( I, can OUTPUT_SHIFTING), 'SO' (SO/GL/SI). Mac dinh: 'GR'.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_KANA'=>'SO','OUTPUT_SHIFTING'=>1});
+
+  JIS_DBCS
+    Escape DBCS o dau ra 'jis': 'B' (ESC $ B), '@' (ESC $ @), '&@B', '(B', '(@'. Mac dinh: 'B'; dau ra la 'jis'.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_DBCS'=>'@'});
+
+  JIS_SBCS
+    Escape SBCS o dau ra 'jis': 'B' (ESC ( B ASCII), 'J' (ESC ( J Roman), 'H' (ESC ( H cu). Mac dinh: 'B'; dau ra la 'jis'.
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_SBCS'=>'J'});
+
+  JIS2004_PLANE1
+    Escape mat phang 1 o dau ra 'jis2004': 'Q' (ESC $ ( Q, :2004), 'O' (ESC $ ( O, :2000). Mac dinh: 'Q'; dau ra la 'jis2004'.
+    e.g. Jacode4e::convert(\$line,'jis2004','utf8',{'JIS2004_PLANE1'=>'O'});
+
+  ROUND_TRIP
+    Dung: chuyen doi thuan nghich; ky tu khong co ma goc duoc dat vao vung nguoi dung tu dinh nghia (GAIJI) de "A sang B" va "B sang A" khoi phuc du lieu goc. Ca hai chieu can ROUND_TRIP=>1 va CUNG mot phien ban Jacode4e. Mac dinh: sai (khong anh xa duoc thanh GETA). Bang duoc dung lazy o lan goi dau tien.
+    e.g. Jacode4e::convert(\$line,'cp00930','utf8',{'ROUND_TRIP'=>1});
+
+[BANG MA SHIFT]
+
+  encoding  shift-out (DBCS start)  shift-in (DBCS end)
+  --------  ---------------------   -------------------
+  cp00930   0x0E                    0x0F
+  keis78    0x0A 0x42               0x0A 0x41
+  keis83    0x0A 0x42               0x0A 0x41
+  keis90    0x0A 0x42               0x0A 0x41
+  jef       0x28                    0x29
+  jef9p     0x38                    0x29
+  jipsj     0x1A 0x70               0x1A 0x71
+  jipse     0x3F 0x75               0x3F 0x76
+  letsj     0x93 0x70               0x93 0xF1
+
+[VI DU LAP TRINH]
+
+  # 1) UTF-8 sang ma hoa mainframe (co shift, khoang trang, geta)
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+  while (<>) {
+      $char_count = Jacode4e::convert(\$_, 'cp00930', 'utf8', {
+          'OUTPUT_SHIFTING' => 1,
+          'SPACE'           => "\x40\x40",
+          'GETA'            => "\x44\x4B",
+      });
+      print $_;
+  }
+
+  # 2) Shift_JIS 1978 cu sang UTF-8 (theo nam)
+  Jacode4e::convert(\$line, 'utf8', 'sjis1978');
+
+  # 3) khu hoi: UTF-8 -> CP00930 -> UTF-8 khoi phuc du lieu goc
+  Jacode4e::convert(\$line, 'cp00930', 'utf8', { 'ROUND_TRIP' => 1 });
+  Jacode4e::convert(\$line, 'utf8', 'cp00930', { 'ROUND_TRIP' => 1 });
+
+======================================================================

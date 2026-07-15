@@ -21,11 +21,25 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Direct::UBI;
-$OpenSearch::Client::Core::3_0::Direct::UBI::VERSION = '3.007008';
+$OpenSearch::Client::Core::3_0::Direct::UBI::VERSION = '3.007009';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::API';
 with 'OpenSearch::Client::Role::Client::Direct';
 use namespace::clean;
+
+our %_api_method_supported_version_stash;
+
+sub method_supported_in_version {
+    my( $self, @args ) = @_;
+    my %params = ( ref($args[0]) ) ? %{ $args[0] } : @args;
+    my $version = $params{version};
+    my $method  = $params{method};
+    return 0 unless($method && $version);
+    return 0 unless(exists($_api_method_supported_version_stash{$method}));
+    my $supported_version = $_api_method_supported_version_stash{$method};
+    my $checkversion = version->declare('v' . $version)->numify;
+    return ( $checkversion < $supported_version ) ? 0 : 1;
+}
 
 __PACKAGE__->_install_api('ubi');
 
@@ -43,7 +57,7 @@ B<OpenSearch::Client::Core::3_0::Direct::UBI>
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 SYNOPSIS
 

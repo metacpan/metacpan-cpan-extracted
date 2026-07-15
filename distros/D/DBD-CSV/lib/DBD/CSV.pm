@@ -29,7 +29,7 @@ use strict;
 
 our @ISA         = qw( DBD::File );
 
-our $VERSION     = "0.63";
+our $VERSION     = "0.64";
 our $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 our $err      = 0;	# holds error code   for DBI::err

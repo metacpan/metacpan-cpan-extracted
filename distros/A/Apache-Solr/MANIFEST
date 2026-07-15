@@ -1,7 +1,6 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 TODO
 lib/Apache/Solr.pm
@@ -24,6 +23,5 @@ t/21json.t
 t/30result.t
 t/31sequential.t
 t/32version.t
-t/a.pdf
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

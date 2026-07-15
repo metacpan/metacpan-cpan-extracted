@@ -2,7 +2,7 @@
 #
 # not_JIS78.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/78-vs-83-1.sjs

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Client for (Lucene) Solr",
+   "abstract" : "Client for the Solr database",
    "author" : [
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,13 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
+         "recommends" : {},
          "requires" : {
             "Data::Dumper" : "0",
             "Encode" : "0",
@@ -44,14 +50,24 @@
             "Time::HiRes" : "0",
             "URI" : "0",
             "XML::LibXML::Simple" : "0"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-Apache-Solr/issues"
+      },
+      "homepage" : "https://perl.overmeer.net/CPAN/",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
@@ -59,6 +75,34 @@
          "web" : "https://github.com/markov2/perl5-Apache-Solr"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
+   "x_oodist" : {
+      "email" : "mark\\@overmeer.net",
+      "first_year" : 2012,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [],
+      "oodoc_version" : 3.06,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [
+            "WebService::Solr::Query",
+            "WebService::Solr"
+         ],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/apache-solr/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/apache-solr/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

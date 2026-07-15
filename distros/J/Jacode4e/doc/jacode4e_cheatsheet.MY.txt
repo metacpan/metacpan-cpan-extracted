@@ -1,0 +1,158 @@
+################################################################################
+# Jacode4e အမြန်ကိုးကားစာ (MY)
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
+# https://metacpan.org/dist/Jacode4e
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
+################################################################################
+
+======================================================================
+Jacode4e အမြန်ကိုးကားချက် (မြန်မာဘာသာ)
+======================================================================
+
+[အခြေခံအသုံးပြုပုံ]
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  $char_count = Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, { %option });
+
+  $line             : ပြောင်းလဲမည့် စာကြောင်း (ကိုးကားချက်ဖြင့် ပေးပို့၊ နေရာတွင်ပင် ထပ်ရေး)
+  $OUTPUT_encoding  : output encoding အမည်
+  $INPUT_encoding   : input encoding အမည်
+  $char_count       : ပြောင်းလဲပြီးနောက် စာလုံးအရေအတွက်
+
+[Encoding အမည်များ]
+
+  mnemonic    description
+  ---------   ---------------------------------------------------
+  cp932x      CP932X (Extended CP932 to JIS X 0213, single-shift 0x9C5A)
+  cp932       Microsoft CP932 (Windows-31J / IANA registered name)
+  cp932ibm    IBM CP932
+  cp932nec    NEC CP932
+  sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208); year editions below
+  sjis2004    JISC Shift_JIS-2004 (JIS X 0213:2004)
+  euc         JISC EUC-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  euc2004     JISC EUC-JIS-2004 (JIS X 0213 plane 1 and plane 2)
+  jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208, JIS X 0212); year editions below
+  jis2004     JISC ISO-2022-JP-2004 (JIS X 0213 plane 1 and plane 2)
+  cp00930     IBM CP00930 (CP00290+CP00300, CCSID 5026 katakana)
+  keis78      HITACHI KEIS78
+  keis83      HITACHI KEIS83
+  keis90      HITACHI KEIS90
+  jef         FUJITSU JEF (12pt, use OUTPUT_SHIFTING option for shift codes)
+  jef9p       FUJITSU JEF ( 9pt, use OUTPUT_SHIFTING option for shift codes)
+  jipsj       NEC JIPS(J)
+  jipse       NEC JIPS(E)
+  letsj       UNISYS LetsJ
+  utf8        UTF-8.0 (aka UTF-8)
+  utf8.1      UTF-8.1 (conversion based on Shift_JIS-to-Unicode mapping, not CP932)
+  utf8jp      UTF-8-SPUA-JP (JIS X 0213 on SPUA ordered by JIS level/plane/row/cell)
+
+  sjis / euc / jis ၏ နှစ်အလိုက်ဗားရှင်းများ (နှစ်မပါသော အမည်သည် 1990 ဗားရှင်း):
+    sjis1978  euc1978  jis1978   JIS C 6226-1978
+    sjis1983  euc1983  jis1983   JIS X 0208-1983
+    sjis1990  euc1990  jis1990   JIS X 0208-1990  (= sjis / euc / jis)
+    sjis2000  euc2000  jis2000   JIS X 0213:2000
+    sjis2004  euc2004  jis2004   JIS X 0213:2004
+
+[JIS စံနှုန်းများ၏ နှစ်အလိုက် ကွာခြားချက် (စတင်သူများအတွက်)]
+
+  ဂျပန်ခန်ဂျီများကို အဆင့်လိုက် စံသတ်မှတ်ခဲ့သည်။ တူညီသော bytes သည် ဗားရှင်းအလိုက် စာလုံးကွဲပြားနိုင်သဖြင့် သင့်ဒေတာနှင့် ကိုက်ညီသော ဗားရှင်းကို ရွေးပါ။ မသိပါက နှစ်မပါသော sjis / euc / jis ကို သုံးပါ။
+
+  1978 (JIS C 6226-1978) : ပထမဆုံး ခန်ဂျီစံ (အဆင့် 1 နှင့် အဆင့် 2)။
+  1983 (JIS X 0208-1983) : ခန်ဂျီ 22 တွဲ၏ ကုဒ်ကို လဲလှယ်ကာ အချို့ပုံသဏ္ဌာန်ကို ပြောင်းခဲ့သည်; ဒေတာဟောင်း ပျက်ရသည့် အဖြစ်အများဆုံး အကြောင်းရင်း။
+  1990 (JIS X 0208-1990) : ခန်ဂျီ 2 လုံးသာ ထည့်ခဲ့သည် (U+51DC, U+7199); နှစ်မပါသော sjis / euc / jis သည် ဤဗားရှင်းဖြစ်သည်။
+  2000 (JIS X 0213:2000) : ကြီးမားစွာ ချဲ့ထွင်; plane 2 အသစ်တွင် အဆင့် 3 နှင့် 4 ခန်ဂျီများနှင့် သင်္ကေတများ ထည့်ခဲ့သည်။
+  2004 (JIS X 0213:2004) : ခန်ဂျီ 10 လုံး ထည့်ကာ ခန်ဂျီ 168 လုံး၏ နမူနာပုံသဏ္ဌာန်ကို ပြောင်းခဲ့သည် (ကုဒ်မှာ 2000 နှင့်တူ၊ ပုံသဏ္ဌာန်သာ အသစ်)။
+
+[ရွေးချယ်စရာများ]
+
+  ရွေးချယ်စရာများကို စတုတ္ထ argument အဖြစ် ပေးပါ: { 'KEY' => တန်ဖိုး, ... }
+
+  INPUT_LAYOUT
+    'S' (SBCS 1 byte) နှင့် 'D' (DBCS 2 byte) ဖြင့် သတ်မှတ်ထားသော record layout; စာလုံးတစ်ခုစီနောက်တွင် ထပ်ခါအရေအတွက် ပါနိုင်သည်။ မူရင်း: အလိုအလျောက်။
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'INPUT_LAYOUT'=>'S2D2SD'});
+
+  OUTPUT_SHIFTING
+    မှန်: DBCS အပိုင်းများ ပတ်လည်တွင် shift-out/shift-in ကုဒ်များ ထုတ်သည်။ မူရင်း: မှား။
+    e.g. Jacode4e::convert(\$line,'jef','cp932x',{'OUTPUT_SHIFTING'=>1});
+
+  SPACE
+    DBCS/MBCS space ဖြည့်ကုဒ် (binary string)။ မူရင်း: ထို encoding ၏ space။
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'SPACE'=>"\x81\xA1"});
+
+  GETA
+    map မလုပ်နိုင်သော စာလုံးများအတွက် DBCS/MBCS geta ကုဒ်။
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'GETA'=>"\x81\xA2"});
+
+  OVERRIDE_MAPPING
+    စာလုံးအလိုက် FROM => TO override hash ကိုးကားချက် (SPACE ကိုပါ override လုပ်သည်)။
+    e.g. Jacode4e::convert(\$line,'cp932x','cp00930',{'OVERRIDE_MAPPING'=>{"\x44\x5A"=>"\x81\x7C"}});
+
+  JIS_SOSI
+    မှန်: 'jis' input တွင် SO (0x0E)/SI (0x0F) ကို JIS X 0201 Katakana သို့ shift အဖြစ်ယူသည် (JIS7 အလေ့အထ)။ မူရင်း: မှား; input သည် 'jis' ဖြစ်သောအခါ။
+    e.g. Jacode4e::convert(\$line,'utf8','jis',{'JIS_SOSI'=>1});
+
+  JIS_X0212
+    မှန်: 'jis' output တွင် JIS X 0212 ၌ရှိ၍ JIS X 0208 ၌မရှိသော စာလုံးကို ESC $ ( D အဖြစ် ရေးသည်။ OUTPUT_SHIFTING လိုသည်။ မူရင်း: မှား။
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_X0212'=>1,'OUTPUT_SHIFTING'=>1});
+
+  JIS_KANA
+    'jis' output ၏ Katakana ပုံစံ: 'GR' (0xA1..0xDF), 'I' (ESC ( I, OUTPUT_SHIFTING လိုသည်), 'SO' (SO/GL/SI)။ မူရင်း: 'GR'။
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_KANA'=>'SO','OUTPUT_SHIFTING'=>1});
+
+  JIS_DBCS
+    'jis' output ၏ DBCS escape: 'B' (ESC $ B), '@' (ESC $ @), '&@B', '(B', '(@'။ မူရင်း: 'B'; output သည် 'jis' ဖြစ်သောအခါ။
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_DBCS'=>'@'});
+
+  JIS_SBCS
+    'jis' output ၏ SBCS escape: 'B' (ESC ( B ASCII), 'J' (ESC ( J Roman), 'H' (ESC ( H အဟောင်း)။ မူရင်း: 'B'; output သည် 'jis' ဖြစ်သောအခါ။
+    e.g. Jacode4e::convert(\$line,'jis','utf8',{'JIS_SBCS'=>'J'});
+
+  JIS2004_PLANE1
+    'jis2004' output ၏ plane-1 escape: 'Q' (ESC $ ( Q, :2004), 'O' (ESC $ ( O, :2000)။ မူရင်း: 'Q'; output သည် 'jis2004' ဖြစ်သောအခါ။
+    e.g. Jacode4e::convert(\$line,'jis2004','utf8',{'JIS2004_PLANE1'=>'O'});
+
+  ROUND_TRIP
+    မှန်: ပြန်ပြောင်းနိုင်သော ပြောင်းလဲမှု; မူရင်းကုဒ်မရှိသော စာလုံးကို အသုံးပြုသူသတ်မှတ် (GAIJI) နေရာတွင် ထားသဖြင့် "A မှ B" နှင့် "B မှ A" သည် မူရင်းကို ပြန်ရစေသည်။ နှစ်ဖက်စလုံးတွင် ROUND_TRIP=>1 နှင့် တူညီသော Jacode4e ဗားရှင်း လိုသည်။ မူရင်း: မှား (map မလုပ်နိုင်လျှင် GETA)။ ဇယားကို ပထမဆုံးအသုံးပြုချိန်တွင် lazy တည်ဆောက်သည်။
+    e.g. Jacode4e::convert(\$line,'cp00930','utf8',{'ROUND_TRIP'=>1});
+
+[Shift ကုဒ် ကိုးကားချက်]
+
+  encoding  shift-out (DBCS start)  shift-in (DBCS end)
+  --------  ---------------------   -------------------
+  cp00930   0x0E                    0x0F
+  keis78    0x0A 0x42               0x0A 0x41
+  keis83    0x0A 0x42               0x0A 0x41
+  keis90    0x0A 0x42               0x0A 0x41
+  jef       0x28                    0x29
+  jef9p     0x38                    0x29
+  jipsj     0x1A 0x70               0x1A 0x71
+  jipse     0x3F 0x75               0x3F 0x76
+  letsj     0x93 0x70               0x93 0xF1
+
+[ပရိုဂရမ်ရေးသားမှု နမူနာများ]
+
+  # 1) UTF-8 မှ mainframe encoding သို့ (shift, space, geta ဖြင့်)
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+  while (<>) {
+      $char_count = Jacode4e::convert(\$_, 'cp00930', 'utf8', {
+          'OUTPUT_SHIFTING' => 1,
+          'SPACE'           => "\x40\x40",
+          'GETA'            => "\x44\x4B",
+      });
+      print $_;
+  }
+
+  # 2) အဟောင်း 1978 Shift_JIS မှ UTF-8 သို့ (နှစ်အလိုက်)
+  Jacode4e::convert(\$line, 'utf8', 'sjis1978');
+
+  # 3) အသွားအပြန်: UTF-8 -> CP00930 -> UTF-8 မူရင်းကို ပြန်ရစေသည်
+  Jacode4e::convert(\$line, 'cp00930', 'utf8', { 'ROUND_TRIP' => 1 });
+  Jacode4e::convert(\$line, 'utf8', 'cp00930', { 'ROUND_TRIP' => 1 });
+
+======================================================================

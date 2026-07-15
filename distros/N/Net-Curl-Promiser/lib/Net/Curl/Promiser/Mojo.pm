@@ -2,6 +2,7 @@ package Net::Curl::Promiser::Mojo;
 
 use strict;
 use warnings;
+use Mojo::IOLoop;
 
 =encoding utf-8
 
@@ -11,6 +12,7 @@ Net::Curl::Promiser::Mojo - support for L<Mojolicious>
 
 =head1 SYNOPSIS
 
+    # Defaults to Mojo’s default loop but can accept a custom loop:
     my $promiser = Net::Curl::Promiser::Mojo->new();
 
     my $handle = Net::Curl::Easy->new();
@@ -43,6 +45,9 @@ as its promise implementation.
 This alias conforms to Mojo’s convention of postfixing C<_p> onto the end
 of promise-returning functions.
 
+=item * The constructor accepts an optional parameter specifying a particular
+Mojo::IOLoop object to be targeted by the promiser.
+
 =back
 
 =cut
@@ -60,7 +65,8 @@ use Net::Curl::Promiser::Backend::Mojo;
 #----------------------------------------------------------------------
 
 sub _INIT {
-    return Net::Curl::Promiser::Backend::Mojo->new();
+    my ($self, $args) = @_;
+    return Net::Curl::Promiser::Backend::Mojo->new(@$args);
 }
 
 1;

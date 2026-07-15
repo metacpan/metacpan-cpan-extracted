@@ -1,0 +1,8 @@
+<section class="page">
+<header><%= $self->title %></header>
+<p>page-root=<%= $self->root->title %>; page-parent=<%= $self->parent->title %></p>
+%= view 'HTML::Navbar'
+<main>
+%= yield
+</main>
+</section>

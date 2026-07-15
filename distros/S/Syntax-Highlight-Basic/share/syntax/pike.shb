@@ -1,0 +1,84 @@
+# Syntax file for pike
+# Converted from: pike.vim
+# Conversion date: 2026-07-13
+
+language: pike
+extensions: pike
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if switch
+
+[keyword:Constant]
+UNDEFINED _MAJOR__ _REAL_MAJOR__ __AUTO_BIGNUM__ __BUILD__ __COUNTER__
+__DATE__ __DIR__ __FILE__ __LINE__ __MINOR__ __NT__ __PIKE__ __REAL_BUILD__
+__REAL_MINOR__ __REAL_VERSION__ __TIME__ __VERSION__
+
+[keyword:Debug]
+_Static_assert backtrace describe_backtrace gauge static_assert werror
+
+[keyword:Exception]
+catch error throw
+
+[keyword:Label]
+break case continue default return
+
+[keyword:Operator]
+_Pragma __INIT __hash _decode _deserialize _destruct _encode _equal
+_get_iterator _indices _is_type _m_delete _random _refs _search _serialize
+_size_object _sizeof _sprintf _sqrt _typeof _types _values aggregate
+aggregate_mapping aggregate_multiset allocate arrayp callablep cast column
+constant create defined destruct destructedp efun equal filter functionp
+indices intp m_delete map mappingp mkmapping mkmultiset multisetp
+object_variablep objectp programp replace reverse rows search sizeof sort
+stringp typeof undefinedp values zero_type
+
+[keyword:Repeat]
+do for foreach while
+
+[keyword:Statement]
+Date Inet Interval MutexKey Null Range RegGetKeyNames RegGetValue RegGetValues
+Time TimeTZ Timestamp __automap__ __empty_program __handle_sprintf_format
+__parse_pike_type _disable_threads _do_call_outs _exit _gdb_breakpoint abs
+access acos acosh add_constant alarm all_constants array_sscanf asin asinh
+atan atan2 atanh atexit basetype call_function call_out call_out_info cd ceil
+combine_path combine_path_nt combine_path_unix compile copy_value cos cosh cpp
+crypt ctime decode_value delay encode_value encode_value_canonic enumerate
+errno exece exit exp file_stat file_truncate filesystem_stat find_call_out
+floor fork function_name function_object function_program gc
+get_active_compilation_handler get_active_error_handler get_all_groups
+get_all_users get_dir get_groups_for_user get_iterator get_profiling_info
+get_weak_flag getcwd getgrgid getgrnam gethrdtime gethrtime gethrvtime getpid
+getpwnam getpwuid getxattr glob gmtime has_index has_prefix has_suffix
+has_value hash hash_7_0 hash_7_4 hash_8_0 hash_value inf kill limit listxattr
+load_module localtime lock log lower_case master max min mkdir mktime mv nan
+null object_program pow query_num_arg random_seed remove_call_out removexattr
+replace_master rm round set_priority set_weak_flag setxattr sgn signal signame
+signum sin sinh sleep sort sprintf sqrt sscanf strerror
+string_filter_non_unicode string_to_unicode string_to_utf8 tan tanh time trace
+try_lock types ualarm unicode_to_string upper_case utf8_to_string version
+write
+
+[keyword:StorageClass]
+__deprecated__ constant extern final inline lambda optional private protected
+public static variant
+
+[keyword:Structure]
+class enum import inherit typedef
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[keyword:Type]
+array auto bool float function int mapping mixed multiset object program
+sprintf_args sprintf_format sprintf_result strict_sprintf_format string this
+this_object this_program void
+
+[keyword:Typedef]
+typedef
+
+[match:Error]
+pattern: '\\[^'\"?\[a-zA-Z]befnrtv]'
+

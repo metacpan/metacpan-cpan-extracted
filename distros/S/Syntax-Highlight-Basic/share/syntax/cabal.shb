@@ -1,0 +1,50 @@
+# Syntax file for cabal
+# Converted from: cabal.vim
+# Conversion date: 2026-07-13
+
+language: cabal
+extensions: cabal
+case: ignore
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if
+
+[keyword:Function]
+arche flag impl os
+
+[keyword:Keyword]
+configure custom simple
+
+[keyword:Statement]
+asm-options asm-sources author autogen-includes autogen-modules branch
+bug-reports build-depends build-tool-depends build-tools build-type buildable
+c-sources cabal-version category cc-options cmm-options cmm-sources copyright
+cpp-options cxx-options cxx-sources data-dir data-files default
+default-extensions default-language description example executable exposed
+exposed-modules extensions extra-bundled-libraries extra-doc-files
+extra-dynamic-library-flavours extra-framework-dirs extra-ghci-libraries
+extra-lib-dirs extra-lib-dirs-static extra-libraries extra-libraries-static
+extra-library-flavours extra-source-files extra-tmp-files for frameworks
+ghc-options ghc-prof-options ghc-shared-options ghcjs-options
+ghcjs-prof-options ghcjs-shared-options homepage hs-source-dir hs-source-dirs
+hugs-options import include-dirs includes install-includes js-sources
+ld-options lib-version-info lib-version-linux license license-file location
+main-is maintainer manual mixins mod-def-file module name nhc98-options
+options other-extensions other-language other-languages other-modules
+package-url pkgconfig-depends reexported-modules scope setup-depends
+signatures stability subdir synopsis tag test-module tested-with type version
+virtual-modules
+
+[keyword:Type]
+Haskell2010 Haskell98 benchmark common custom-setup executable flag
+foreign-library library source-repository test-suite
+
+[match:Comment]
+pattern: --.*$
+
+[match:Operator]
+pattern: &&||||!
+

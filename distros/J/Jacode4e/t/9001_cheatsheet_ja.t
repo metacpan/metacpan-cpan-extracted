@@ -2,7 +2,7 @@
 #
 # 9001_cheatsheet_ja.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e チートシート（日本語）
 # このテストは日本語話者向けのクイックリファレンスを兼ねています。
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930（CP00290+CP00300、CCSID 5026 カタカナ）
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -70,7 +75,8 @@ use lib "$FindBin::Bin/../lib";
 # 【往復変換の注意】
 #
 #   非可逆変換が存在します（CP932の398文字問題など）。
-#   往復変換が必要な場合は Jacode4e::RoundTrip モジュールを使用してください。
+#   往復変換が必要な場合は 'ROUND_TRIP' => 1 オプションを使用してください。
+#   往路・復路とも 'ROUND_TRIP' => 1 と同一バージョンの Jacode4e が必要です。
 #
 # ======================================================================
 

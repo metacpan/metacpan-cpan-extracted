@@ -1,0 +1,48 @@
+# Syntax file for falcon
+# Converted from: falcon.vim
+# Conversion date: 2026-07-13
+
+language: falcon
+extensions: falcon
+
+[keyword:Conditional]
+and case default elif else end if iff not or select switch
+
+[keyword:Include]
+import load
+
+[keyword:Keyword]
+CloneError CodeError Error InterruprtedError IoError List MathError ParamError
+RangeError SyntaxError TraceStep TypeError all allp any anyp as attributes
+brigade cascade catch choice class const continue def directive do dropping
+enum eq eval exit export from function give global has hasnt in init innerfunc
+lambda launch len list load notin object pass print printl provides raise
+return self sender static to try xamp
+
+[keyword:Repeat]
+break for forfirst forlast formiddle loop while
+
+[keyword:Todo]
+DEBUG FIXME NOTE TODO XXX
+
+[match:Error]
+pattern: \s+$
+
+[match:Error]
+pattern:  +\t
+
+[match:Delimiter]
+pattern: (?:#|@)
+
+[match:Operator]
+pattern: (?:<=|>=|=>|\.\.|<<|>>|\")
+
+[match:Conditional]
+pattern: end\s[a-zA-Z0-9_]f
+
+[match:PreProc]
+pattern: \%^#!.*
+
+[match:Special]
+pattern: \\\\|\\[abefnrstv]|\\[0-7]{1,3}|\[0-9a-fA-F][0-9a-fA-F]{1,2}
+

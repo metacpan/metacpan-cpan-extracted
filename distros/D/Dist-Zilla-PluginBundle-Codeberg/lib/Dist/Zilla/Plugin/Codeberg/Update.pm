@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg::Update 2.0101;
+package Dist::Zilla::Plugin::Codeberg::Update 2.0102;
 
 use Modern::Perl;
 use Carp;
@@ -83,7 +83,7 @@ Dist::Zilla::Plugin::Codeberg::Update - Update a Codeberg repo's info on release
 
 =head1 VERSION
 
-version 2.0101
+version 2.0102
 
 =head1 SYNOPSIS
 

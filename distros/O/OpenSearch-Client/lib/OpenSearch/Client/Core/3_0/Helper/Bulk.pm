@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Helper::Bulk;
-$OpenSearch::Client::Core::3_0::Helper::Bulk::VERSION = '3.007008';
+$OpenSearch::Client::Core::3_0::Helper::Bulk::VERSION = '3.007009';
 use Moo;
 with 'OpenSearch::Client::Core::3_0::Role::Helper::Bulk',
     'OpenSearch::Client::Role::Is_Sync';
@@ -101,7 +101,7 @@ OpenSearch::Client::Core::3_0::Helper::Bulk - A helper module for the Bulk API
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::User;
-$Mojolicious::Plugin::Fondation::User::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::User::VERSION = '0.02';
 # ABSTRACT: User management plugin for Fondation
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -9,6 +9,7 @@ sub fondation_meta {
     return {
         dependencies => [
             'Fondation::Model::DBIx::Async',
+            'Fondation::MigrationDBIx',
             ],
         defaults => {
             title  => 'User Management',
@@ -43,7 +44,7 @@ Mojolicious::Plugin::Fondation::User - User management plugin for Fondation
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

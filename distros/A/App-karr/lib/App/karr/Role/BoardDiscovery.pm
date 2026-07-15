@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing minimal board discovery and config access
 
 package App::karr::Role::BoardDiscovery;
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moo::Role;
 use MooX::Options;
 use Path::Tiny;
@@ -128,7 +128,7 @@ App::karr::Role::BoardDiscovery - Role providing minimal board discovery and con
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 DESCRIPTION
 

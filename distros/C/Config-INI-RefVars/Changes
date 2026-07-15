@@ -1,5 +1,14 @@
 Revision history for Config-INI-RefVars
 
+1.06    2026/07/14
+
+    - Fixed MANIFEST.SKIP.
+
+1.05    2026/07/14
+
+    - Unwanted helper script removed from the distribution.
+    - Constructor argument `copy_vars`: Allow variable names that begin with "[".
+
 1.04    2026/07/13
 
     - Fixed/completed POD.

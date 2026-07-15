@@ -2,7 +2,7 @@
 #
 # 9003_cheatsheet_zh_CN.t
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 # Jacode4e 快速参考手册（简体中文）
 # 本测试同时作为中文用户的快速参考手册。
@@ -43,6 +43,11 @@ use lib "$FindBin::Bin/../lib";
 #   cp932ibm    IBM CP932
 #   cp932nec    NEC CP932
 #   sjis2004    JISC Shift_JIS-2004
+#   sjis        JISC Shift_JIS (JIS X 0201, JIS X 0208)
+#   euc2004     JISC EUC-JIS-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   euc         JISC EUC-JP (JIS X 0201, JIS X 0208)
+#   jis2004     JISC ISO-2022-JP-2004 (JIS X 0201, JIS X 0213 plane 1 and plane 2)
+#   jis         JISC ISO-2022-JP (JIS X 0201, JIS X 0208)
 #   cp00930     IBM CP00930（CP00290+CP00300，CCSID 5026 片假名）
 #   keis78      HITACHI KEIS78
 #   keis83      HITACHI KEIS83
@@ -69,7 +74,8 @@ use lib "$FindBin::Bin/../lib";
 # 【往返转换注意事项】
 #
 #   存在有损转换（例如CP932有398个非往返映射字符）。
-#   需要往返转换时，请使用 Jacode4e::RoundTrip 模块。
+#   需要往返转换时，请使用 'ROUND_TRIP' => 1 选项。
+#   往返两个方向都需要 'ROUND_TRIP' => 1 且使用相同版本的 Jacode4e。
 #
 # ======================================================================
 

@@ -1,0 +1,80 @@
+# Syntax file for make
+# Converted from: make.vim
+# Conversion date: 2026-07-13
+
+language: make
+extensions: make
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[match:Special]
+pattern: ^\s*[@+-]+
+
+[match:Special]
+pattern: \\\n\s*
+
+[match:Include]
+pattern: ^!\s*include\s.*$
+
+[match:PreCondit]
+pattern: ^!\s*(?:cmdswitches|error|message|include|if|ifdef|ifndef|else|else\s*if|else\s*ifdef|else\s*ifndef|endif|undef)\b
+
+[match:Identifier]
+pattern: \$\$\w*
+
+[match:Identifier]
+pattern: \$[^({]
+
+[match:Identifier]
+pattern: ^ *[^:#= \t]*\s*[:+?!*]=
+
+[match:Identifier]
+pattern: ^ *[^:#= \t]*\s*::=
+
+[match:Identifier]
+pattern: ^ *[^:#= \t]*\s*=
+
+[match:Identifier]
+pattern: %
+
+[match:PreCondit]
+pattern: @[A-Za-z0-9_]+@
+
+[match:Function]
+pattern: ^\.[A-Za-z0-9_./\t -]+\s*:$
+
+[match:Function]
+pattern: ^\.[A-Za-z0-9_./\t -]+\s*:[^=]
+
+[match:Error]
+pattern: ^\s+\S.*
+
+[match:Special]
+pattern: \\\n.
+
+[match:PreCondit]
+pattern: ^ *(?:ifn?(?:eq|def)\b|else(?:\s+ifn?(?:eq|def))?\b|endif\b)
+
+[match:Include]
+pattern: ^ *[-s]?include\s.*$
+
+[match:Statement]
+pattern: ^ *vpath
+
+[match:Statement]
+pattern: ^ *(?:export|unexport)\b
+
+[match:Statement]
+pattern: ^ *override\b
+
+[match:Comment]
+pattern: #.*
+
+[match:Comment]
+pattern: #$
+
+[region:Comment]
+start: #
+end: $
+

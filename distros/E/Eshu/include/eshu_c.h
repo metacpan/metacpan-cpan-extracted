@@ -363,4 +363,156 @@ static char * eshu_indent_c(const char *src, size_t src_len,
 	return result;
 }
 
+
+#include "eshu_hl_util.h"
+
+/* ══════════════════════════════════════════════════════════════════
+ *  C / XS keyword list
+ * ══════════════════════════════════════════════════════════════════ */
+
+static const char * const eshu_hl_c_kw[] = {
+    "auto", "break", "case", "char", "const", "continue", "default",
+    "do", "double", "else", "enum", "extern", "float", "for", "goto",
+    "if", "inline", "int", "long", "register", "restrict", "return",
+    "short", "signed", "sizeof", "static", "struct", "switch", "typedef",
+    "union", "unsigned", "void", "volatile", "while",
+    /* C99/C11 */
+    "_Bool", "_Complex", "_Thread_local", "_Atomic", "_Noreturn",
+    "_Alignas", "_Alignof", "_Static_assert",
+    /* common macros treated as keywords */
+    "NULL", "true", "false",
+    NULL
+};
+
+/* ══════════════════════════════════════════════════════════════════
+ *  C / XS highlighter
+ * ══════════════════════════════════════════════════════════════════ */
+
+static char *eshu_highlight_c(const char *src, size_t src_len, size_t *out_len) {
+    eshu_buf_t out;
+    const char *p     = src;
+    const char *end   = src + src_len;
+    const char *plain = p;
+    int at_bol        = 1; /* at beginning of line */
+
+    eshu_buf_init(&out, src_len * 2 + 64);
+
+/* emit plain text up to tok_start, then span, advance p */
+#define C_SPAN(cls, ts, te) do { \
+    eshu_hl_flush(&out, plain, (ts)); \
+    eshu_hl_span(&out, (cls), (ts), (te)); \
+    p = (te); plain = p; \
+} while(0)
+
+    while (p < end) {
+        char c = *p;
+
+        /* preprocessor: '#' at beginning of logical line */
+        if (at_bol && c == '#') {
+            const char *ts = p++;
+            while (p < end) {
+                if (*p == '\n') {
+                    if (p > ts && *(p - 1) == '\\') { p++; continue; }
+                    break;
+                }
+                p++;
+            }
+            C_SPAN("esh-p", ts, p);
+            /* leave '\n' to be handled as next char */
+            continue;
+        }
+
+        /* line comment */
+        if (c == '/' && p + 1 < end && *(p + 1) == '/') {
+            const char *ts = p;
+            p += 2;
+            while (p < end && *p != '\n') p++;
+            C_SPAN("esh-c", ts, p);
+            at_bol = 0;
+            continue;
+        }
+
+        /* block comment */
+        if (c == '/' && p + 1 < end && *(p + 1) == '*') {
+            const char *ts = p;
+            p += 2;
+            while (p + 1 < end && !(*p == '*' && *(p + 1) == '/')) p++;
+            if (p + 1 < end) p += 2;
+            C_SPAN("esh-c", ts, p);
+            at_bol = 0;
+            continue;
+        }
+
+        /* string or char literal */
+        if (c == '"' || c == '\'') {
+            const char *ts = p++;
+            while (p < end && *p != c) {
+                if (*p == '\\') { p++; if (p < end) p++; continue; }
+                if (*p == '\n') break; /* unterminated */
+                p++;
+            }
+            if (p < end && *p == c) p++;
+            C_SPAN("esh-s", ts, p);
+            at_bol = 0;
+            continue;
+        }
+
+        /* number: digit, or '.digit' */
+        if (isdigit((unsigned char)c) ||
+            (c == '.' && p + 1 < end && isdigit((unsigned char)*(p + 1)))) {
+            const char *ts = p;
+            if (c == '0' && p + 1 < end && (*(p + 1) == 'x' || *(p + 1) == 'X')) {
+                p += 2;
+                while (p < end && isxdigit((unsigned char)*p)) p++;
+            } else if (c == '0' && p + 1 < end && (*(p + 1) == 'b' || *(p + 1) == 'B')) {
+                p += 2;
+                while (p < end && (*p == '0' || *p == '1')) p++;
+            } else {
+                while (p < end && isdigit((unsigned char)*p)) p++;
+                if (p < end && *p == '.') {
+                    p++;
+                    while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+                if (p < end && (*p == 'e' || *p == 'E')) {
+                    p++;
+                    if (p < end && (*p == '+' || *p == '-')) p++;
+                    while (p < end && isdigit((unsigned char)*p)) p++;
+                }
+            }
+            /* suffixes: u, l, f, ul, ll, etc. */
+            while (p < end && isalpha((unsigned char)*p)) p++;
+            C_SPAN("esh-n", ts, p);
+            at_bol = 0;
+            continue;
+        }
+
+        /* identifier or keyword */
+        if (eshu_hl_isalpha_(c)) {
+            const char *ts = p;
+            while (p < end && eshu_hl_isalnum_(*p)) p++;
+            eshu_hl_flush(&out, plain, ts);
+            plain = p;
+            if (eshu_hl_kw(ts, (size_t)(p - ts), eshu_hl_c_kw)) {
+                eshu_hl_span(&out, "esh-k", ts, p);
+            } else {
+                eshu_hl_write_html(&out, ts, (size_t)(p - ts));
+            }
+            at_bol = 0;
+            continue;
+        }
+
+        /* track line starts */
+        if (c == '\n') { at_bol = 1; }
+        else if (c != ' ' && c != '\t') { at_bol = 0; }
+        p++;
+    }
+
+    eshu_hl_flush(&out, plain, end);
+    eshu_buf_putc(&out, '\0');
+    *out_len = out.len - 1;
+    return out.data;
+
+#undef C_SPAN
+}
+
 #endif /* ESHU_C_H */

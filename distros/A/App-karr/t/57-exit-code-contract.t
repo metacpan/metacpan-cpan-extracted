@@ -124,6 +124,16 @@ subtest 'runtime failures exit 1' => sub {
     like( $imp->{stderr}, qr/--yes/, 'import refusal stderr mentions --yes' );
 };
 
+subtest 'a Git/sync failure exits 1' => sub {
+    my $repo = _board_repo();
+
+    # A remote that cannot possibly be reached, offline and deterministic.
+    system( 'git', '-C', $repo, 'remote', 'add', 'origin', '/nonexistent/karr-bogus.git' );
+
+    my $rv = _run_karr( $repo, 'sync' );
+    is( $rv->{exit}, 1, 'karr sync against a broken remote exits 1' );
+};
+
 subtest 'not a git repository exits 1' => sub {
     # A directory that is not inside any git repository. tempdir lives under the
     # system temp dir, whose ancestors are not git repos, so discovery fails.

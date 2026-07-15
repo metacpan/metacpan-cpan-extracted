@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Core::3_0::Helper::Scroll;
-$OpenSearch::Client::Core::3_0::Helper::Scroll::VERSION = '3.007008';
+$OpenSearch::Client::Core::3_0::Helper::Scroll::VERSION = '3.007009';
 use Moo;
 use OpenSearch::Client::Util qw(parse_params throw);
 use namespace::clean;
@@ -147,7 +147,7 @@ OpenSearch::Client::Core::3_0::Helper::Scroll - A helper module for scrolled sea
 
 =head1 VERSION
 
-version 3.007008
+version 3.007009
 
 =head1 SYNOPSIS
 

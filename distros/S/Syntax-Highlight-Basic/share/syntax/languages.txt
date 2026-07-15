@@ -1,0 +1,120 @@
+# Programming language Vim syntax files to convert to .shb format
+# Format: vim_basename language_name [extensions...]
+# Lines starting with # are comments
+# This file is used by the regenerate-shb script to regenerate all .shb files
+#
+# To regenerate all .shb files:
+#   perl script/vim-syntax-to-shb --output-dir share/syntax $(perl -ne 'next if /^#/; my ($vim) = split; print "/usr/share/vim/vim91/syntax/$vim.vim "' share/syntax/languages.txt)
+#
+# Languages are organized by category
+
+# === General Purpose Languages ===
+8th
+ada
+awk
+bash
+bc
+c
+clojure
+cmake
+cobol
+cpp
+cs
+d
+dart
+dylan
+eiffel
+elm
+erlang
+falcon
+fish
+forth
+fortran
+freebasic
+gdscript
+go
+groovy
+haskell
+icon
+java
+javascript
+julia
+kotlin
+lisp
+lua
+matlab
+mercury
+mma
+modula3
+moonscript
+nim
+objc
+ocaml
+pascal
+perl
+php
+pike
+python
+r
+racket
+rebol
+ruby
+rust
+scala
+scheme
+sh
+simula
+smalltalk
+sml
+swift
+tcl
+typescript
+verilog
+vim
+zig
+
+# === Scripting / Shell ===
+csh
+ksh
+tcsh
+zsh
+
+# === Assembly ===
+asm
+asm68k
+avra
+fasm
+nasm
+vmasm
+
+# === Web ===
+css
+html
+javascript
+json
+scss
+typescript
+xml
+
+# === Database ===
+mysql
+plsql
+sql
+
+# === Data / Config (with programming constructs) ===
+dockerfile
+make
+yaml
+
+# === Functional / Logic ===
+cabal
+erlang
+haskell
+ocaml
+prolog
+sml
+
+# === Scientific / Math ===
+gnuplot
+matlab
+r

@@ -1,0 +1,22 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for YAML
+language: yaml
+extensions: yaml yml
+
+[match:Comment]
+pattern: #.*$
+
+[match:Number]
+pattern: \b\d+(?:\.\d+)?\b
+
+[match:Keyword]
+pattern: \b(?:true|false|null|yes|no|on|off)\b
+
+[match:String]
+pattern: "[^"]*"|'[^']*'
+
+[match:Special]
+pattern: [{}()\[\];:,\-]+
+
+[match:Identifier]
+pattern: ^\s*[\w-]+(?=\s*:)

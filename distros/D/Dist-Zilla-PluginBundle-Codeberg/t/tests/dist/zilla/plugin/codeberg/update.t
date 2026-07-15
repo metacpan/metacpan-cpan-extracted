@@ -1,6 +1,6 @@
 use Modern::Perl;
-use Test2::V0;
-use Test2::Tools::Compare qw/hash array bag match/;
+use Test2::V1 -ipP;
+use Test2::Tools::Compare qw/hash array bag item field match all_items/;
 use Test2::Tools::Explain;
 use Test2::Tools::JSON;
 use FindBin;
@@ -96,24 +96,23 @@ foreach my $test (@tests) {
       like(
          $tzil->distmeta,
          hash {
-            x_Dist_Zilla => {
-               plugins => bag {
-                  item => {
-                     class  => 'Dist::Zilla::Plugin::Codeberg::Update',
-                     config => {
-                        'Dist::Zilla::Plugin::Codeberg::Update' =>
-                           $test->{config},
-                     },
-                     name => 'Codeberg::Update',
-                  }
-               },
-            },
+            field x_Dist_Zilla => hash {
+               field plugins => bag {
+                  item {
+                     class => 'Dist::Zilla::Plugin::Codeberg::Update',
+                     name  => 'Codeberg::Update',
+                  };
+               };
+            };
          },
          'configs are logged',
       ) or diag explain( $tzil->distmeta );
 
-      like( $tzil->log_messages, bag { $test->{log_messages} },
-         'logged the right things', );
+      like(
+         $tzil->log_messages,
+         bag { item($_) for @{ $test->{log_messages} } },
+         'logged the right things',
+      );
       unlike(
          $tzil->log_messages,
          bag { all_items( match(qr/Error: /) ) },

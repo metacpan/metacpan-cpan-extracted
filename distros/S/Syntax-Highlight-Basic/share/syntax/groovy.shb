@@ -1,0 +1,136 @@
+# Syntax file for groovy
+# Converted from: groovy.vim
+# Conversion date: 2026-07-13
+
+language: groovy
+extensions: groovy
+
+[keyword:Boolean]
+false true
+
+[keyword:Conditional]
+else if switch
+
+[keyword:Constant]
+Closure GroovyObject MetaMethod clone equals finalize getClass hashCode notify
+notifyAll null toString wait
+
+[keyword:Error]
+auto const delete extern friend goto inline operator redeclared register
+signed sizeof struct template typedef union unsigned
+
+[keyword:Exception]
+catch finally throw try
+
+[keyword:Function]
+any append asList asWritable call collect compareTo count dump each eachByte
+eachFile eachLine every find findAll flatten getAt getErr getIn getOut getText
+grep immutable inject inspect intersect invokeMethods isCase join leftShift
+newInputStream newOutputStream newPrintWriter newReader newWriter next pop
+previous print println push putAt read readBytes readLines reverse reverseEach
+size sort splitEachLine step subMap times toInteger toList tokenize upto
+waitForOrKill withPrintWriter withReader withStream withWriter
+withWriterAppend write writeLine
+
+[keyword:Include]
+native package
+
+[keyword:Label]
+default
+
+[keyword:Operator]
+abs div instanceof minus multiply new plus power round
+
+[keyword:Repeat]
+do for while
+
+[keyword:Special]
+as def in
+
+[keyword:Statement]
+assert return
+
+[keyword:StorageClass]
+abstract enum extends final implements interface private protected public
+serializable static strictfp synchronized throws transient volatile
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[keyword:Type]
+Array Boolean Date Double Float Integer List String Vector boolean byte char
+double float int long null short super this void
+
+[keyword:Typedef]
+super this
+
+[match:Include]
+pattern: \bimport\b(?:\s+static\b)\?
+
+[match:Typedef]
+pattern: \.\s*\bclass\b
+
+[match:StorageClass]
+pattern: ^class\b
+
+[match:StorageClass]
+pattern: [^.]\s*\bclass\b
+
+[match:Operator]
+pattern: \.\.
+
+[match:Operator]
+pattern: <{2,3}
+
+[match:Operator]
+pattern: >{2,3}
+
+[match:Operator]
+pattern: ->
+
+[match:Exception]
+pattern: \bException\b|\b[A-Z]{1,}[a-zA-Z0-9]*Exception\b
+
+[match:Error]
+pattern: \s+$
+
+[match:Error]
+pattern:  +\t
+
+[match:Comment]
+pattern: /\*\*/
+
+[match:Identifier]
+pattern: \${. *?}
+
+[match:Number]
+pattern: \b(?:0[0-7]*|0[xX][0-9a-fA-F]+|\d+)[lL]?\b
+
+[match:Number]
+pattern: (?:\b\d+\.\d*|\.\d+)(?:[eE][-+]?\d+)?[fFdD]?
+
+[match:Number]
+pattern: \b\d+[eE][-+]?\d+[fFdD]?\b
+
+[match:Number]
+pattern: \b\d+(?:[eE][-+]?\d+)?[fFdD]\b
+
+[match:Special]
+pattern: \[A-Z]\d{4}
+
+[match:Function]
+pattern: [{}]
+
+[match:Error]
+pattern: "(?:[^"\\]|\\.)*$
+
+[match:Exception]
+pattern: \bException\b|\b[A-Z]{1,}[a-zA-Z0-9]*Exception\b
+
+[match:Error]
+pattern: \]
+
+[region:Special]
+start: {@\(link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)
+end: }
+

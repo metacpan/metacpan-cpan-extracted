@@ -1,0 +1,43 @@
+# @curated — do not overwrite with vim-syntax-to-shb
+# Syntax file for Rust
+language: rust
+extensions: rs
+
+[keyword:Conditional]
+if else match
+
+[keyword:Repeat]
+while for loop in
+
+[keyword:Statement]
+break continue return
+
+[keyword:StorageClass]
+let mut const static
+
+[keyword:Type]
+i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 bool char str String Vec Option Result
+
+[keyword:Keyword]
+fn struct enum impl trait pub use mod as self super crate true false unsafe where dyn
+
+[match:Comment]
+pattern: //.*$
+
+[match:Number]
+pattern: \b(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]*|\d+(?:_?\d+)*(?:\.\d+)?(?:[eE][+-]?\d+)?[iufd]?\d*)\b
+
+[match:Special]
+pattern: [{}()\[\];,.<>+\-*/=%!&|^~?:@]+
+
+[match:Include]
+pattern: ^\s*extern\s+crate.*$|^\s*mod\s+\w+\s*;|^\s*use\s+.*$
+
+[region:String]
+start: "
+end: "
+escape: \
+
+[region:Comment]
+start: /*
+end: */

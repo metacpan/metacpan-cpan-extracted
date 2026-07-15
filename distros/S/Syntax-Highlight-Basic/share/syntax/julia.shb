@@ -1,0 +1,13 @@
+# Syntax file for julia
+# Converted from: julia.vim
+# Conversion date: 2026-07-13
+
+language: julia
+extensions: julia
+
+[keyword:Todo]
+FIXME TODO XXX
+
+[match:Keyword]
+pattern: \bwhere\b
+

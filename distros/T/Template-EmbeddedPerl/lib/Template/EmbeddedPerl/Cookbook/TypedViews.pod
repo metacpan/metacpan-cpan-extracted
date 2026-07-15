@@ -1,0 +1,282 @@
+=head1 NAME
+
+Template::EmbeddedPerl::Cookbook::TypedViews - Refactor Contacts into typed views
+
+=head1 DESCRIPTION
+
+B<Experimental:> Typed view support, including C<render_view>, C<view>, C<view_namespace>, and C<view_factory>, may change as real-world integration needs become clearer.
+
+This document refactors the application from
+L<Template::EmbeddedPerl::Tutorial>. It uses Moo to keep the examples concise,
+but Template::EmbeddedPerl accepts any blessed view object and does not require
+Moo at runtime.
+
+The complete runnable refactor is in C<examples/contacts/typed>. From the
+distribution root, run:
+
+  perl examples/contacts/typed/app.pl
+
+It prints the same HTML as C<examples/contacts/untyped/app.pl>. The checked-in
+C<t/cookbook_examples.t> test runs both commands and verifies byte-for-byte
+output parity. The typed example uses Moo, so install Moo to run that example
+outside this distribution's development environment. Moo is optional and
+example-only for Template::EmbeddedPerl itself.
+
+The files under C<examples/contacts/typed> are the canonical complete example.
+The excerpts below are labeled fragments and should be read with those files.
+
+=head1 WHY INTRODUCE A TYPED VIEW?
+
+The untyped Contacts item has an explicit argument contract:
+
+B<Fragment: C<examples/contacts/untyped/templates/contacts/item.epl>>
+
+  % args $contact, $root_title, $parent_title
+  <li data-root="<%= $root_title %>" data-parent="<%= $parent_title %>"><strong><%= $contact->{name} %></strong> <%= $contact->{email} %></li>
+
+The caller must carry the contact and both identity values through every
+C<partial> call. That is clear for a local template, but a growing list of
+related arguments is an object contract in disguise. The typed item instead
+puts its data and relationships in attributes:
+
+B<Fragment: C<examples/contacts/typed/lib/Contacts/Typed/View/HTML/ContactItem.pm>>
+
+  has contact => (is => 'ro', required => 1);
+  has root => (is => 'ro', required => 1);
+  has parent => (is => 'ro', required => 1);
+
+Typed templates receive their view as lexical C<$self>, so the item can read
+C<$self-E<gt>contact>, C<$self-E<gt>root>, and C<$self-E<gt>parent> directly.
+This moves constructor validation and reusable behavior into ordinary Perl
+objects without changing the template engine's escaping or composition rules.
+
+An object is not required for every template. Keep a small partial or layout
+untyped when its arguments are local to one composition site and an object
+would only add ceremony.
+
+=head1 THE ROOT VIEW
+
+C<Contacts::Typed::View::HTML::ContactList> is the root object. Its C<title>,
+C<contacts>, and prebuilt badge are ordinary Moo attributes in the complete
+C<examples/contacts/typed/lib/Contacts/Typed/View/HTML/ContactList.pm> file.
+The application builds that root and starts typed rendering explicitly:
+
+B<Fragment: C<examples/contacts/typed/lib/Contacts/Typed/App.pm>>
+
+  $self->{root_view} = Contacts::Typed::View::HTML::ContactList->new(
+      title => 'Contacts',
+      contacts => $contacts,
+      prebuilt_badge => Contacts::Typed::View::HTML::Badge->new(
+          label => scalar(@$contacts) . ' contacts',
+      ),
+  );
+  return $self->{engine}->render_view($self->{root_view});
+
+C<render_view> is the root entry point for a typed object and supplies that
+object as lexical C<$self> in its template. Passing a blessed object to a
+legacy C<render> call remains supported, but it remains in C<@_>; it does not
+implicitly become C<$self>.
+
+The engine has C<< view_namespace => 'Contacts::Typed::View' >>. For a root
+class below that namespace, it resolves the package suffix to a template
+identifier by converting each package segment independently to snake case:
+
+  Contacts::Typed::View::HTML::ContactList -> html/contact_list.epl
+
+Thus the root uses
+C<examples/contacts/typed/templates/html/contact_list.epl>. C<HTML> becomes
+C<html>, C<HTMLPage> would become C<html_page>, and C<ContactList> becomes
+C<contact_list>. The same ordered C<directories> search path is used for typed
+views, untyped pages, partials, and layouts; the first matching template wins.
+
+=head1 TYPED CHILD VIEWS
+
+The root template has both kinds of child. Its complete source is
+C<examples/contacts/typed/templates/html/contact_list.epl>. The relevant
+calls are:
+
+B<Fragment: C<html/contact_list.epl>>
+
+  %= view $self->prebuilt_badge
+  % for my $contact (@{$self->contacts}) {
+  %= view 'HTML::ContactItem', contact => $contact
+  % }
+
+The first call renders a preconstructed C<Contacts::Typed::View::HTML::Badge>
+object. The second is a logical child name. The engine prefixes the configured
+C<view_namespace>, loads C<Contacts::Typed::View::HTML::ContactItem>, and
+constructs it with the values from the call.
+
+Logical construction does not require Moo. Without a C<view_factory>, the
+engine uses the class's ordinary C<new> constructor and passes only explicitly
+supplied values. The C<HTML::ContactItem> example uses a factory because its
+C<root> and C<parent> attributes need injection; a simple child with only a
+C<label> can be constructed directly by its own C<new> method.
+
+C<ContactItem> deliberately chooses a template that differs from its
+convention-derived path:
+
+B<Fragment: C<examples/contacts/typed/lib/Contacts/Typed/View/HTML/ContactItem.pm>>
+
+  sub template { 'contacts/item' }
+
+A nonempty C<template> method has precedence over namespace convention lookup.
+Therefore this class renders C<contacts/item.epl>, not its
+C<html/contact_item> convention identifier. The Badge uses the same mechanism
+for C<contacts/badge.epl>. Root C<ContactList> and wrapper C<Page> do not
+define a C<template> method, so they use the convention paths.
+
+=head1 WRAPPER VIEWS
+
+C<Page> is a typed wrapper. The root creates it with a final callback, which
+becomes the wrapper body:
+
+B<Fragment: C<examples/contacts/typed/templates/html/contact_list.epl>>
+
+  %= view 'HTML::Page', title => $self->title, sub {
+  % my ($page) = @_;
+  <main>
+  <h1><%= display_heading $page->title %></h1>
+  %= view $self->prebuilt_badge
+  <ul>
+  % for my $contact (@{$self->contacts}) {
+  %= view 'HTML::ContactItem', contact => $contact
+  % }
+  </ul>
+  </main>
+  % }
+
+Inside that callback, lexical C<$self> remains the caller, the
+C<ContactList>. The portable C<< my ($page) = @_ >> unpacking receives the
+newly constructed C<Page>. This endpoint uses C<< $page->title >> for its
+heading; it is the same title as the ContactList, so the rendered HTML remains
+unchanged. The C<Page> template sees a different C<$self>: it is the Page
+object itself.
+
+B<Fragment: C<examples/contacts/typed/templates/html/page.epl>>
+
+  % layout 'layouts/application', title => $self->title
+  %= content_replace 'head', sub {
+  <meta name="section" content="contacts">
+  % }
+  <section class="page">
+  %= yield
+  </section>
+
+Here C<$self-E<gt>title> is Page's title and C<yield> renders the body captured
+from the callback. The focused typed-view tests also cover nested wrappers:
+each wrapper gets its own body and yields it once.
+
+=head1 INJECTING ROOT AND PARENT
+
+The application configures C<view_factory> when it creates the engine. Its
+three parameters have distinct roles: C<$class> is the fully expanded logical
+class, C<$values> is a hash reference containing exactly the arguments supplied
+by the template, and C<$context> holds the current typed render context.
+
+B<Fragment: C<examples/contacts/typed/lib/Contacts/Typed/App.pm>>
+
+  view_factory => sub {
+      my ($class, $values, $context) = @_;
+      my $view = $class->new(
+          %$values,
+          root => $context->root_view,
+          parent => $context->view,
+      );
+      push @{$self->{factory_calls}}, {
+          class => $class,
+          args => {%$values},
+          context => $context,
+          view => $view,
+      };
+      return $view;
+  },
+
+C<$context-E<gt>root_view> is the original C<ContactList> passed to
+C<render_view>. C<$context-E<gt>view> is the caller at the logical C<view>
+site. C<t/cookbook_examples.t> checks the wrapper, then confirms its root and
+parent are the ContactList. It also confirms that each ContactItem in the Page
+callback receives the ContactList as parent because the callback keeps the
+caller scope. A logical child rendered inside a wrapper template would instead
+receive that wrapper as parent while retaining the original root.
+
+The C<prebuilt_badge> object was constructed by the application, not by a
+logical name. Rendering C<< view $self->prebuilt_badge >> bypasses
+C<view_factory>; C<t/cookbook_examples.t> verifies that no Badge factory record
+was created. Preconstructed objects therefore let application code own special
+construction while logical names remain convenient for regular children.
+
+=head1 COMPOSING THE VIEW TREE
+
+Typed views use the existing composition helpers. In the complete Contacts
+refactor, C<display_heading> is an application helper used from the typed root
+body, C<Page> invokes the untyped C<layouts/application.epl> layout, and
+C<content_replace 'head'> contributes named content that the layout yields.
+The layout remains an ordinary untyped template with its own named argument
+contract:
+
+B<Fragment: C<examples/contacts/typed/templates/layouts/application.epl>>
+
+  % args $title
+  <!doctype html>
+  <html>
+  <head>
+  <title><%= $title %></title>
+  %= yield 'head'
+  </head>
+  <body>
+  %= yield
+  </body>
+  </html>
+
+This is intentional: a typed root or wrapper does not make every surrounding
+template typed. Partials, layouts, named content, helpers, automatic escaping,
+and ordered template lookup compose normally in the same render tree.
+
+Use the complete C<examples/contacts/typed/app.pl> endpoint when trying the
+tree. It constructs C<Contacts::Typed::App>, renders the root, and prints the
+result. C<t/cookbook_examples.t> checks that its output contains escaped
+C<< &lt;Ada&gt; >> exactly once and matches the untyped application byte for byte.
+
+=head1 CHOOSING BETWEEN BOTH DESIGNS
+
+The final untyped application keeps data at its call sites: its root passes
+C<contact>, C<root_title>, and C<parent_title> to the item partial, and its
+layout receives a C<title> argument. This is direct and preferable for a small
+page, a one-off partial, or a layout whose behavior is only local composition.
+
+The typed application moves the page, items, and wrapper into object contracts.
+Use that structure when constructor validation, reusable view methods,
+injected root/parent relationships, or framework-owned construction make the
+extra classes worthwhile. The examples use equivalent separate template trees
+and engine instances. They deliberately demonstrate the same helpers, layouts,
+named content, escaping, and byte-for-byte output while each endpoint remains
+independently runnable.
+
+Moo is a concise implementation choice in the checked-in typed Contacts
+example, not a requirement of Template::EmbeddedPerl. Any blessed object that
+can serve as a view is valid. Typed view support remains experimental; keep
+the untyped design when it is the clearer fit.
+
+=head1 FAILURES AND REUSE
+
+Each top-level C<render>, compiled-template C<render>, or C<render_view> call
+creates one render frame. Partials, layouts, nested views, and wrapper bodies
+share that frame. A cycle is rejected with the active render chain instead of
+recursing indefinitely.
+
+If a nested template or constructor fails, the engine decorates the exception
+with one source-aware C<Render stack>. It then cleans up the frame state, so a
+later top-level render on the same engine does not retain a body, named content,
+layout, or stack entry from the failed request. The typed-view tests cover
+wrapper-body restoration, render-stack diagnostics, cycle detection, and reuse
+after failure.
+
+=head1 SEE ALSO
+
+Start with L<Template::EmbeddedPerl::Tutorial> for the untyped Contacts
+application, then use L<Template::EmbeddedPerl::Cookbook> for independent
+recipes. The C<render_view>, C<view>, C<view_namespace>, and C<view_factory>
+API reference is in L<Template::EmbeddedPerl>.
+
+=cut

@@ -7,9 +7,11 @@ use URI::Escape ();
 use JSON::MaybeXS;
 
 our @EXPORT_OK = qw(
+  diagnostic_source_label
   normalize_linefeeds
   uri_escape
   escape_javascript
+  decorate_render_error
   generate_error_message
 );
 
@@ -49,8 +51,18 @@ sub escape_javascript {
     $escaped =~ s/`/\\`/g;   # Escape backticks
     $escaped =~ s/\$/\\\$/g; # Escape dollar signs
     $escaped =~ s/'/\\'/g;   # Escape single quotes
+    $escaped =~ s{</}{<\\/}g; # Prevent closing an enclosing script element
 
     return $escaped;
+}
+
+sub diagnostic_source_label {
+  my ($source) = @_;
+  my $label = defined($source) && length("$source") ? "$source" : 'unknown';
+  $label =~ s/(?:\r\n?|\n)+/ /g;
+  $label =~ tr/"/'/;
+  $label =~ s/[\x00-\x1f\x7f]/?/g;
+  return $label;
 }
 
 sub generate_error_message {
@@ -58,19 +70,21 @@ sub generate_error_message {
 
   warn "RAW MESSAGE: [$msg]" if $ENV{DEBUG_TEMPLATE_EMBEDDED_PERL};
 
-  $source = $source ? "$source" : 'unknown';
+  return $msg if _has_render_stack($msg);
 
-  my @files;
-  push @files, [$1, $2, $3, $msg] while $msg =~ /^(.+?) at\s+(.+?)\s+line\s+(\d+)/gm;
+  $source = diagnostic_source_label($source);
 
   my $text = '';
-  foreach my $file (@files) {
-    my ($msg, $file, $line, $extra) = @$file; 
-    if($file !~ m/eval/) {
-      $text .= $extra;
+  my $has_template_location = 0;
+  for my $diagnostic_line (split /(?<=\n)/, $msg) {
+    my ($message, $line) = _template_location($diagnostic_line, $source);
+    if (!defined $line) {
+      $text .= $diagnostic_line;
       next;
     }
-    $text .= "$msg at $source line $line\n\n";
+
+    $has_template_location = 1;
+    $text .= "$message at $source line $line\n\n";
 
     $line--;
     my $start = $line -1 >= 0 ? $line -1 : 0;
@@ -81,7 +95,45 @@ sub generate_error_message {
     $text .= "\n";
   }
 
-  return "$text\n";
+  return $has_template_location ? $text : $msg;
+}
+
+sub _template_location {
+  my ($diagnostic_line, $source) = @_;
+  my $source_or_eval = qr/(?:\Q$source\E|\(eval \d+\))/;
+  my ($message, $line);
+
+  while ($diagnostic_line =~ /\s+at\s+$source_or_eval\s+line\s+(\d+)(?:\.\n?\z|,\s+at\s+EOF\n?\z)/g) {
+    ($message, $line) = (substr($diagnostic_line, 0, $-[0]), $1);
+  }
+
+  return ($message, $line);
+}
+
+sub decorate_render_error {
+  my ($error, $stack) = @_;
+
+  return $error if _has_render_stack($error);
+  return $error unless $stack && @$stack;
+
+  my $separator = $error =~ /\n\z/ ? "\n" : "\n\n";
+  my $render_stack = "Render stack:\n";
+  for my $entry (@$stack) {
+    my $kind = $entry->{kind};
+    my $identifier = $entry->{identifier};
+    my $source = defined($entry->{source}) && length($entry->{source})
+      ? $entry->{source}
+      : 'unknown';
+    $render_stack .= "  $kind $identifier ($source)\n";
+  }
+
+  return $error . $separator . $render_stack;
+}
+
+sub _has_render_stack {
+  my ($error) = @_;
+  return defined($error)
+    && $error =~ /(?:\A|\n)Render stack:\n(?:  [^\n]+(?:\n|\z))+\z/;
 }
 
 1;
@@ -113,12 +165,9 @@ Escape the uri string.
 
   my $escaped = escape_javascript($javascript);
 
-Escape the javascript string.  This basically takes a string and escapes it so that it can be 
-embedded in a JavaScript string.  So it escapes single quotes, backticks, and dollar signs and
-that sort of this.   It is not guaranteed to protect against all forms of XSS attacks.  If you
-are embedding user input in a JavaScript string, you should be sure to have cleaned that first
-probably using HTML or URI escaping, or running the string through a JavaScript sanitizer to
-remove any potentially harmful code.
+Escape a value so that it can be embedded in a JavaScript string. This escapes quotes,
+backticks, dollar signs, JSON control characters, and closing HTML tags. It is not a
+general JavaScript sanitizer and does not make untrusted JavaScript code safe to execute.
 
 =head2 generate_error_message
 

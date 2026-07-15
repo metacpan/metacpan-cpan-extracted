@@ -1,0 +1,7 @@
+# Syntax file for scss
+# Converted from: scss.vim
+# Conversion date: 2026-07-13
+
+language: scss
+extensions: scss
+

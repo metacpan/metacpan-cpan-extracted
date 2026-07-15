@@ -1,0 +1,13 @@
+# Syntax file for zig
+# Converted from: zig.vim
+# Conversion date: 2026-07-13
+
+language: zig
+extensions: zig
+
+[keyword:Todo]
+TODO
+
+[match:Type]
+pattern: \v<[iu][1-9]\d*>
+

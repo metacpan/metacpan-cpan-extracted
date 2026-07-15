@@ -220,13 +220,21 @@ sub new {
     $self->{debug}      ||= 0;
     $self->{error}      = "";
     $self->{file}       //= File::Spec->catfile(getcwd, sprintf("%s.lock", basename($0)));
-    $self->{pid}        ||= $$; # Current PID by default
-    $self->{own}        ||= 0; # Owner PID
+    $self->{pid}        //= $$; # Current PID by default
+    $self->{own}        //= 0; # Owner PID
     $self->{auto}       //= 0;
     $self->{retries}    //= RETRIES;
     $self->{delay}      //= DELAY;
     $self->{_is_locked} = 0;
-    croak("Incorrect \"pid\" attribute: " . $self->{pid}) unless $self->{pid} =~ /^[0-9]{1,11}$/;
+
+    # PID normalize
+    my $raw_pid = $self->{pid} || 0;
+       $self->{pid} = abs(int($raw_pid)) if defined($raw_pid) && $raw_pid =~ /^-?\d+$/;
+    unless (defined($self->{pid}) && $self->{pid} =~ /^[0-9]{1,11}$/) { # Protect
+        croak("Incorrect \"pid\" attribute: $raw_pid");
+    }
+
+    # Check etries and delay
     croak("Incorrect \"retries\" attribute: " . $self->{retries}) unless $self->{retries} =~ /^[0-9]{1,5}$/;
     croak("Incorrect \"delay\" attribute: " . $self->{delay}) unless $self->{delay} =~ /^[0-9]{1,5}$/;
 

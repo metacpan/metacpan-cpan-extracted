@@ -9,7 +9,7 @@ BEGIN
     use utf8;
     use version;
     use Test::More;
-    use DateTime;
+    use DateTime::Lite;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     $TEST_ID = $ENV{TEST_ID} if( exists( $ENV{TEST_ID} ) );
 };
@@ -23,13 +23,13 @@ use strict;
 use warnings;
 use utf8;
 
-my $dt = DateTime->new(
-    year => 2024,
-    month => 9,
-    day => 24,
-    hour => 9,
-    minute => 0,
-    second => 10,
+my $dt = DateTime::Lite->new(
+    year      => 2024,
+    month     => 9,
+    day       => 24,
+    hour      => 9,
+    minute    => 0,
+    second    => 10,
     time_zone => 'UTC',
 );
 my $date = $dt->iso8601;
@@ -1111,8 +1111,8 @@ for( my $i = 0; $i < scalar( @$tests ); $i++ )
     }
     my $test = $tests->[$i];
     my @keys = sort( keys( %{$test->{options}} ) );
-    my $dt1 = DateTime->new( %{$test->{date1}} );
-    my $dt2 = DateTime->new( %{$test->{date2}} );
+    my $dt1 = DateTime::Lite->new( %{$test->{date1}} );
+    my $dt2 = DateTime::Lite->new( %{$test->{date2}} );
     my $date1 = $dt1->iso8601;
     my $date2 = $dt2->iso8601;
     local $" = ', ';

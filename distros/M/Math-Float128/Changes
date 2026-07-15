@@ -1,5 +1,11 @@
+0.17
+ - Simplify overloading of '++' and '--'.
+ - Silence pointless warnings.
+ - Enable (hopefully) at least some BSD builds.
+
 0.16
- - Work around perl bug in https://github.com/Perl/perl5/issues/19550
+ - Work around perl bug in https://github.com/Perl/perl5/issues/19550.
+   (Affected only perl-5.35.10.)
 
 0.15
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):

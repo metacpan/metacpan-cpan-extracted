@@ -1,0 +1,400 @@
+# Syntax file for vmasm
+# Converted from: vmasm.vim
+# Conversion date: 2026-07-13
+
+language: vmasm
+extensions: vmasm
+
+[keyword:Identifier]
+ap dv fp iv pc r0 r1 r10 r11 r12 r2 r3 r4 r5 r6 r7 r8 r9 sp
+
+[keyword:Statement]
+adawi addp4 addp6 adwc aobleq aoblss ashl ashp ashq bbc bbcci bbs bbssi
+beql[u] bgtr[u] bicpsw bispsw bitb bitl bitw blbc blbs blss[u] bpt brb brw
+bsbb bsbw bugl bugw callg calls caseb casel casew cmpc3 cmpc5 cmpp3 cmpp4 cmpv
+cmpzv crc cvtlp cvtpl cvtps cvtpt cvtsp cvttp decb decl decw divp editpc ediv
+emul extv extzv ffc ffs halt incb incl incw index insqhi insqti insque insv
+iota jmp jsb ldpctx locc matchc mcomb mcoml mcomw mfpr mfvp movc3 movc5 movp
+movpsl movtc movtuc movzbl movzbw movzwl mtpr mtvp mulp nop popl popr prober
+probew pushl pushr rei remqhi remqti remque ret rotl rsb sbwc scanc skpc
+sobgeq sobgtr spanc subp4 subp6 svpctx vgathl vgathq vldl vldq vscatl vscatq
+vstl vstq vsync vvcvt xfc
+
+[keyword:Todo]
+todo
+
+[match:Statement]
+pattern: \badd[bwlfdgh][23]\b
+
+[match:Statement]
+pattern: \bbi[cs][bwl][23]\b
+
+[match:Statement]
+pattern: \bclr[bwlqofdgh]\b
+
+[match:Statement]
+pattern: \bcmp[bwlfdgh]\b
+
+[match:Statement]
+pattern: \bcvt[bwlfdgh][bwlfdgh]\b
+
+[match:Statement]
+pattern: \bcvtr[fdgh]l\b
+
+[match:Statement]
+pattern: \bdiv[bwlfdgh][23]\b
+
+[match:Statement]
+pattern: \bemod[fdgh]\b
+
+[match:Statement]
+pattern: \bmneg[bwlfdgh]\b
+
+[match:Statement]
+pattern: \bmov[bwlqofdgh]\b
+
+[match:Statement]
+pattern: \bmul[bwlfdgh][23]\b
+
+[match:Statement]
+pattern: \bpoly[fdgh]\b
+
+[match:Statement]
+pattern: \bsub[bwlfdgh][23]\b
+
+[match:Statement]
+pattern: \btst[bwlfdgh]\b
+
+[match:Statement]
+pattern: \bxor[bwl][23]\b
+
+[match:Statement]
+pattern: \bmova[bwlfqdgho]\b
+
+[match:Statement]
+pattern: \bpush[bwlfqdgho]\b
+
+[match:Statement]
+pattern: \bacb[bwlfgdh]\b
+
+[match:Statement]
+pattern: \bb[lng]equ?\b
+
+[match:Statement]
+pattern: \bb[cv][cs]\b
+
+[match:Statement]
+pattern: \bbb[cs][cs]\b
+
+[match:Statement]
+pattern: \bv[vs]add[lfdg]\b
+
+[match:Statement]
+pattern: \bv[vs]cmp[lfdg]\b
+
+[match:Statement]
+pattern: \bv[vs]div[fdg]\b
+
+[match:Statement]
+pattern: \bv[vs]mul[lfdg]\b
+
+[match:Statement]
+pattern: \bv[vs]sub[lfdg]\b
+
+[match:Statement]
+pattern: \bv[vs]bi[cs]l\b
+
+[match:Statement]
+pattern: \bv[vs]xorl\b
+
+[match:Statement]
+pattern: \bv[vs]merge\b
+
+[match:Statement]
+pattern: \bv[vs]s[rl]ll\b
+
+[match:Number]
+pattern: [+-]?[0-9]+\b
+
+[match:Number]
+pattern: ^d[0-9]+\b
+
+[match:Number]
+pattern: ^x[0-9a-f]+\b
+
+[match:Number]
+pattern: ^o[0-7]+\b
+
+[match:Number]
+pattern: ^b[01]+\b
+
+[match:Number]
+pattern: [-+]?[0-9]+E[-+]?[0-9]+
+
+[match:Number]
+pattern: [-+]?[0-9]+\.[0-9]*(?:E[-+]?[0-9]+)?
+
+[match:Label]
+pattern: \b[0-9]{1,5}\$:?
+
+[match:Operator]
+pattern: [-+*/@&!\\]
+
+[match:Operator]
+pattern: =
+
+[match:Operator]
+pattern: ==
+
+[match:Operator]
+pattern: %length(.*)
+
+[match:Operator]
+pattern: %locate(.*)
+
+[match:Operator]
+pattern: %extract(.*)
+
+[match:Operator]
+pattern: ^[amfc]
+
+[match:Operator]
+pattern: [bwlg]^
+
+[match:Operator]
+pattern: \b(?:not_)?equal\b
+
+[match:Operator]
+pattern: \bless_equal\b
+
+[match:Operator]
+pattern: \bgreater(?:_equal)?\b
+
+[match:Operator]
+pattern: \bless_than\b
+
+[match:Operator]
+pattern: \b(?:not_)?defined\b
+
+[match:Operator]
+pattern: \b(?:not_)?blank\b
+
+[match:Operator]
+pattern: \bidentical\b
+
+[match:Operator]
+pattern: \bdifferent\b
+
+[match:Operator]
+pattern: \beq\b
+
+[match:Operator]
+pattern: \b[gl]t\b
+
+[match:Operator]
+pattern: \bn?df\b
+
+[match:Operator]
+pattern: \bn?b\b
+
+[match:Operator]
+pattern: \bidn\b
+
+[match:Operator]
+pattern: \b[nlg]e\b
+
+[match:Operator]
+pattern: \bdif\b
+
+[match:Include]
+pattern: \.library\b
+
+[match:Macro]
+pattern: \.macro\b
+
+[match:Macro]
+pattern: \.mexit\b
+
+[match:Macro]
+pattern: \.endm\b
+
+[match:Macro]
+pattern: \.mcall\b
+
+[match:Macro]
+pattern: \.mdelete\b
+
+[match:Special]
+pattern: \.iff?\b
+
+[match:Special]
+pattern: \.if_false\b
+
+[match:Special]
+pattern: \.iftf?\b
+
+[match:Special]
+pattern: \.if_true(?:_false)?\b
+
+[match:Special]
+pattern: \.iif\b
+
+[match:Repeat]
+pattern: \.irpc?\b
+
+[match:Repeat]
+pattern: \.repeat\b
+
+[match:Repeat]
+pattern: \.rept\b
+
+[match:Repeat]
+pattern: \.endr\b
+
+[match:Special]
+pattern: \.address\b
+
+[match:Special]
+pattern: \.align\b
+
+[match:Special]
+pattern: \.asci[cdiz]\b
+
+[match:Special]
+pattern: \.blk[abdfghloqw]\b
+
+[match:Special]
+pattern: \.(?:signed_)?byte\b
+
+[match:Special]
+pattern: \.(?:no)?cross\b
+
+[match:Special]
+pattern: \.debug\b
+
+[match:Special]
+pattern: \.default displacement\b
+
+[match:Special]
+pattern: \.[dfgh]_floating\b
+
+[match:Special]
+pattern: \.disable\b
+
+[match:Special]
+pattern: \.double\b
+
+[match:Special]
+pattern: \.dsabl\b
+
+[match:Special]
+pattern: \.enable?\b
+
+[match:Special]
+pattern: \.endc?\b
+
+[match:Special]
+pattern: \.entry\b
+
+[match:Special]
+pattern: \.error\b
+
+[match:Special]
+pattern: \.even\b
+
+[match:Special]
+pattern: \.external\b
+
+[match:Special]
+pattern: \.extrn\b
+
+[match:Special]
+pattern: \.float\b
+
+[match:Special]
+pattern: \.globa?l\b
+
+[match:Special]
+pattern: \.ident\b
+
+[match:Special]
+pattern: \.link\b
+
+[match:Special]
+pattern: \.list\b
+
+[match:Special]
+pattern: \.long\b
+
+[match:Special]
+pattern: \.mask\b
+
+[match:Special]
+pattern: \.narg\b
+
+[match:Special]
+pattern: \.nchr\b
+
+[match:Special]
+pattern: \.nlist\b
+
+[match:Special]
+pattern: \.ntype\b
+
+[match:Special]
+pattern: \.octa\b
+
+[match:Special]
+pattern: \.odd\b
+
+[match:Special]
+pattern: \.opdef\b
+
+[match:Special]
+pattern: \.packed\b
+
+[match:Special]
+pattern: \.page\b
+
+[match:Special]
+pattern: \.print\b
+
+[match:Special]
+pattern: \.psect\b
+
+[match:Special]
+pattern: \.quad\b
+
+[match:Special]
+pattern: \.ref[1248]\b
+
+[match:Special]
+pattern: \.ref16\b
+
+[match:Special]
+pattern: \.restore(?:_psect)?\b
+
+[match:Special]
+pattern: \.save(?:_psect)?\b
+
+[match:Special]
+pattern: \.sbttl\b
+
+[match:Special]
+pattern: \.(?:no)?show\b
+
+[match:Special]
+pattern: \.(?:sub)?title\b
+
+[match:Special]
+pattern: \.transfer\b
+
+[match:Special]
+pattern: \.warn\b
+
+[match:Special]
+pattern: \.weak\b
+
+[match:Special]
+pattern: \.(?:signed_)?word\b
+

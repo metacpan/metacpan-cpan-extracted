@@ -21,12 +21,13 @@ requires:
   DBIx::Class::TimeStamp: '0'
   Mojolicious: '9.46'
   Mojolicious::Plugin::Fondation: '0.01'
+  Mojolicious::Plugin::Fondation::MigrationDBIx: '0.01'
   Mojolicious::Plugin::Fondation::Model::DBIx::Async: '0.01'
   perl: '5.026'
 resources:
   homepage: https://github.com/Dabg/Mojolicious-Plugin-Fondation-User
   repository: https://github.com/Dabg/Mojolicious-Plugin-Fondation-User.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

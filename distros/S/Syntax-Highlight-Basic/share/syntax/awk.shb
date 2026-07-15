@@ -1,0 +1,56 @@
+# Syntax file for awk
+# Converted from: awk.vim
+# Conversion date: 2026-07-13
+
+language: awk
+extensions: awk
+
+[keyword:Conditional]
+else if
+
+[keyword:Function]
+and asort asorti atan2 bindtextdomain close compl cos dcgettext dcngetext exp
+fflush gensub gsub index int isarray length log lshift match mktime or
+patsplit rand rshift sin split sprintf sqrt srand strftime strtonum sub substr
+system systime tolower toupper typeof xor
+
+[keyword:Repeat]
+do for while
+
+[keyword:Special]
+ARGC ARGIND ARGV BEGIN BEGINFILE BINMODE CONVFMT END ENDFILE ENVIRON ERRNO
+FIELDWIDTHS FILENAME FNR FPAT FS FUNCTAB IGNORECASE LINT NF NR OFMT OFS ORS
+PREC PROCINFO RLENGTH ROUNDMODE RS RSTART RT SUBSEP SYMTAB TEXTDOMAIN in
+
+[keyword:Statement]
+break case continue default delete exit func function getline next nextfile
+print printf return switch
+
+[keyword:Todo]
+TODO
+
+[match:Operator]
+pattern: \^|\^=
+
+[match:Special]
+pattern: \$\d+
+
+[match:Special]
+pattern: ==|>=|=>|<=|=<|\!=
+
+[match:Special]
+pattern: ;
+
+[match:Special]
+pattern: ,
+
+[match:Comment]
+pattern: #.*
+
+[match:Special]
+pattern: \\$
+
+[region:String]
+start: "
+end: "
+

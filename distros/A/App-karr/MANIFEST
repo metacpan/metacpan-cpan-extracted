@@ -148,6 +148,8 @@ t/56-sync-output-quiet.t
 t/57-exit-code-contract.t
 t/58-import-next-id-seed.t
 t/59-gitignore-file-view.t
+t/60-sync-error-exit.t
+t/61-git-cli-fallback.t
 t/author-pod-syntax.t
 t/lib/MockStore.pm
 t/lib/TestGit.pm

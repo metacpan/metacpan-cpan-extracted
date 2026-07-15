@@ -3,7 +3,7 @@ package Aion::Emitter;
 
 use common::sense;
 
-our $VERSION = "0.1.1";
+our $VERSION = "0.1.2";
 
 use Aion::Pleroma;
 
@@ -18,7 +18,7 @@ use Aion::Env::Etc EVENT => (isa => $event_isa, default => {}, key => 'aion.emit
 has ini => (is => 'ro', isa => Str, default => INI);
 
 # Список слушателей
-has event => (is => 'ro', isa => $event_isa, default => sub {
+has event => (is => 'ro?!', isa => $event_isa, default => sub {
 	my ($self) = @_;
 	my %event = %{EVENT()};
 	
@@ -76,7 +76,7 @@ Aion::Emitter - event dispatcher
 
 =head1 VERSION
 
-0.1.1
+0.1.2
 
 =head1 SYNOPSIS
 

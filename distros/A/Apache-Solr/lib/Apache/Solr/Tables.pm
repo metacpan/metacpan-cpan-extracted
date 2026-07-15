@@ -1,16 +1,22 @@
-# Copyrights 2012-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Apache-Solr.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Apache-Solr version 1.12.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2012-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Apache::Solr::Tables;{
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 }
 
 use base 'Exporter';
+
+use strict;
+use warnings;
 
 our @EXPORT = qw/%boolparams %introduced %deprecated/;
 
@@ -120,7 +126,7 @@ tv.tf_idf
 unicodeAware
 useConfiguredElevatedOrder
 xmlOffsetAdjust
- /;
+/;
 
 our %introduced = qw/
 carrot.fragSize		3.1
@@ -196,3 +202,4 @@ facet.zeros		1.2
 carrot.lexicalResourcesDir 4.5
 /;
 
+1;

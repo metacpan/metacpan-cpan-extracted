@@ -39,4 +39,14 @@ use Template::EmbeddedPerl::Utils 'escape_javascript';
     is(escape_javascript($input), $expected, 'Test Case 10');
 }
 
+{
+    my $input = q{</script><script>alert("xss")</script>};
+    my $expected = q{<\/script><script>alert(\"xss\")<\/script>};
+    is(
+        escape_javascript($input),
+        $expected,
+        'script closing tags cannot terminate an enclosing script element',
+    );
+}
+
 done_testing();
