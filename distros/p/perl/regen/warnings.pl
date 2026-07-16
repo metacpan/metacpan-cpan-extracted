@@ -16,7 +16,7 @@
 #
 # This script is normally invoked from regen.pl.
 
-$VERSION = '1.74';
+$VERSION = '1.78';
 
 BEGIN {
     require './regen/regen_lib.pl';
@@ -80,8 +80,6 @@ our $WARNING_TREE = {
                                 'deprecated::dot_in_inc'               => [ 5.025011, DEFAULT_ON],
                                 'deprecated::version_downgrade'        => [ 5.035009, DEFAULT_ON],
                                 'deprecated::delimiter_will_be_paired' => [ 5.035010, DEFAULT_ON],
-                                'deprecated::missing_import_called_with_args'   
-                                                                       => [ 5.039002, DEFAULT_ON],
                                 'deprecated::subsequent_use_version'   => [ 5.039008, DEFAULT_ON],
                         }],
         'void'          => [ 5.008, DEFAULT_OFF],
@@ -161,6 +159,10 @@ our $WARNING_TREE = {
                                     [ 5.041, DEFAULT_ON ],
                                 'experimental::keyword_all' =>
                                     [ 5.041, DEFAULT_ON ],
+                                'experimental::signature_named_parameters' =>
+                                    [ 5.043, DEFAULT_ON ],
+                                'experimental::enhanced_xx' =>
+                                    [ 5.043, DEFAULT_ON ],
                         }],
 
         'missing'       => [ 5.021, DEFAULT_OFF],
@@ -168,6 +170,7 @@ our $WARNING_TREE = {
         'locale'        => [ 5.021, DEFAULT_ON],
         'shadow'        => [ 5.027, DEFAULT_OFF],
         'scalar'        => [ 5.035, DEFAULT_OFF],
+        'missing_import'  => [ 5.043, DEFAULT_ON ],
 
          #'default'     => [ 5.008, DEFAULT_ON ],
 }]};
@@ -184,9 +187,11 @@ my %VALUE_TO_NAME; # (index_number => [ 'NAME', version ], ...);
 
 my %NAME_TO_VALUE; # ('NAME'       => index_number,       ....);
 
-# the experiments were successful (or abandonned),
+# the experiments were successful (or abandoned),
 # so no warning bit is needed anymore
 my %NO_BIT_FOR = map { ( uc $_ => 1, $_ => 1 ) } qw(
+  deprecated::goto_construct
+  deprecated::missing_import_called_with_args
   deprecated::smartmatch
   experimental::lexical_subs
   experimental::postderef
@@ -461,6 +466,8 @@ sub main {
     print $warn_h tab(6, '#define WARNsize'),   " $warn_size\n" ;
     print $warn_h tab(6, '#define WARN_ALLstring'), ' "', ('\125' x $warn_size) , "\"\n" ;
     print $warn_h tab(6, '#define WARN_NONEstring'), ' "', ('\0' x $warn_size) , "\"\n" ;
+    print $warn_h tab(6, '#define WARN_DEFAULTstring'), ' "',
+                        mkHex($warn_size, map $_ * 2, @DEFAULTS), "\"\n";
 
     print $warn_h warnings_h_boilerplate_2();
 

@@ -146,44 +146,32 @@ io_blocking(pTHX_ InputStream f, int block)
 
 MODULE = IO	PACKAGE = IO::Seekable	PREFIX = f
 
-void
+SV*
 fgetpos(handle)
 	InputStream	handle
     CODE:
 	if (handle) {
 #ifdef PerlIO
-#if PERL_VERSION_LT(5,8,0)
-	    Fpos_t pos;
-	    ST(0) = sv_newmortal();
-	    if (PerlIO_getpos(handle, &pos) != 0) {
-		ST(0) = &PL_sv_undef;
+	    RETVAL = newSV(0);
+	    if (PerlIO_getpos(handle, RETVAL) != 0) {
+		RETVAL = &PL_sv_undef;
 	    }
-	    else {
-		sv_setpvn(ST(0), (char *)&pos, sizeof(Fpos_t));
-	    }
-#else
-	    ST(0) = sv_newmortal();
-	    if (PerlIO_getpos(handle, ST(0)) != 0) {
-		ST(0) = &PL_sv_undef;
-	    }
-#endif
 #else
 	    Fpos_t pos;
 	    if (fgetpos(handle, &pos)) {
-		ST(0) = &PL_sv_undef;
+		RETVAL = &PL_sv_undef;
 	    } else {
-#  if PERL_VERSION_GE(5,11,0)
-		ST(0) = newSVpvn_flags((char*)&pos, sizeof(Fpos_t), SVs_TEMP);
-#  else
-		ST(0) = sv_2mortal(newSVpvn((char*)&pos, sizeof(Fpos_t)));
-#  endif
+		RETVAL = newSVpvn((char*)&pos, sizeof(Fpos_t));
 	    }
 #endif
 	}
 	else {
 	    errno = EINVAL;
-	    ST(0) = &PL_sv_undef;
+	    RETVAL = &PL_sv_undef;
 	}
+
+    OUTPUT: RETVAL
+
 
 SysRet
 fsetpos(handle, pos)
@@ -192,19 +180,7 @@ fsetpos(handle, pos)
     CODE:
 	if (handle) {
 #ifdef PerlIO
-#if PERL_VERSION_LT(5,8,0)
-	    char *p;
-	    STRLEN len;
-	    if (SvOK(pos) && (p = SvPV(pos,len)) && len == sizeof(Fpos_t)) {
-		RETVAL = PerlIO_setpos(handle, (Fpos_t*)p);
-	    }
-	    else {
-		RETVAL = -1;
-		errno = EINVAL;
-	    }
-#else
 	    RETVAL = PerlIO_setpos(handle, pos);
-#endif
 #else
 	    char *p;
 	    STRLEN len;
@@ -226,7 +202,7 @@ fsetpos(handle, pos)
 
 MODULE = IO	PACKAGE = IO::File	PREFIX = f
 
-void
+SV*
 new_tmpfile(packname = "IO::File")
     const char * packname
     PREINIT:
@@ -242,14 +218,17 @@ new_tmpfile(packname = "IO::File")
 	if (gv)
 	    (void) hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
 	if (gv && do_open(gv, "+>&", 3, FALSE, 0, 0, fp)) {
-	    ST(0) = sv_2mortal(newRV_inc((SV*)gv));
-	    sv_bless(ST(0), gv_stashpv(packname, TRUE));
+	    RETVAL = newRV_inc((SV*)gv);
+	    sv_bless(RETVAL, gv_stashpv(packname, TRUE));
 	    SvREFCNT_dec(gv);   /* undo increment in newRV() */
 	}
 	else {
-	    ST(0) = &PL_sv_undef;
+	    RETVAL = &PL_sv_undef;
 	    SvREFCNT_dec(gv);
 	}
+
+    OUTPUT: RETVAL
+
 
 MODULE = IO	PACKAGE = IO::Poll
 
@@ -685,4 +664,3 @@ BOOT:
         newCONSTSUB(stash,"SEEK_END", newSViv(SEEK_END));
 #endif
 }
-

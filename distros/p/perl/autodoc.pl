@@ -7,6 +7,7 @@ use Text::Tabs;
 #
 #    pod/perlintern.pod
 #    pod/perlapi.pod
+# h flag means no details.
 
 my $api = "pod/perlapi.pod";
 my $intern = "pod/perlintern.pod";
@@ -74,14 +75,29 @@ use strict;
 use warnings;
 
 my $known_flags_re =
-                qr/[aA bC dD eE fF Gh iI mM nN oO pP rR sS T uU vW xX y;#?]/xx;
+         qr/[ aA bC dD eE fF h iI mM nN oO pP rR sS T uU v W xX y ;@\#? ] /xx;
 
 # Flags that don't apply to this program, like implementation details.
-my $irrelevant_flags_re = qr/[ab eE G iI P rR vX?]/xx;
+my $irrelevant_flags_re = qr/[ ab eE iI P rR X? ]/xx;
 
 # Only certain flags dealing with what gets displayed, are acceptable for
 # apidoc_item
 my $item_flags_re = qr/[dD fF mM nN oO pT uU Wx;]/xx;
+
+# Only certain flags are acceptable for apidoc_flag
+my $flag_flags_re = qr/[ A C dD eE h m n p u X ] /xx;
+
+# Certain functions have plain and no_context versions, and meet the criteria
+# stated here.  Each of their pods has been modified to have a marker line
+# which this program replaces by this wording.  This way we can tweak the
+# wording in one place, and still have it placed in the individual pod entries
+# where it makes the most sense.
+my $PLAIN_vs_NOCONTEXT_wording = <<~EOT;
+    C<WHICH> and C<WHICH_nocontext> behave identically when called from outside
+    the perl core unless C<PERL_WANT_VARARGS> has been explicitly #defined.
+    When it has, or when called from inside the core, they differ only in that
+    C<WHICH> requires the thread context (C<aTHX>) to be available.
+    EOT
 
 use constant {
               NOT_APIDOC         => -1,
@@ -89,7 +105,8 @@ use constant {
               APIDOC_DEFN        =>  1,
               PLAIN_APIDOC       =>  2,
               APIDOC_ITEM        =>  3,
-              APIDOC_SECTION     =>  4,
+              APIDOC_FLAG        =>  4,
+              APIDOC_SECTION     =>  5,
 
               # This is the line type used for elements parsed in config.h.
               # Since that file is parsed after everything else, everything is
@@ -99,7 +116,7 @@ use constant {
               # doesn't have to get involved.  There are just a few of these,
               # with little likelihood of changes needed.  They were manually
               # added to handy.h via 51b56f5c7c7.
-              CONDITIONAL_APIDOC =>  5,
+              CONDITIONAL_APIDOC =>  6,
              };
 
 my $config_h = 'config.h';
@@ -185,6 +202,7 @@ my $filesystem_scn = 'Filesystem configuration values';
 my $filters_scn = 'Source Filters';
 my $floating_scn = 'Floating point';
 my $genconfig_scn = 'General Configuration';
+my $global_definitions_scn = 'Declaration and Initialization of Globals';
 my $globals_scn = 'Global Variables';
 my $GV_scn = 'GV Handling and Stashes';
 my $hook_scn = 'Hook manipulation';
@@ -232,6 +250,27 @@ my $XS_scn = 'XS';
 # Kept separate at end
 my $undocumented_scn = 'Undocumented elements';
 
+my @has_defs;
+my @has_r_defs;     # Reentrant symbols
+my @include_defs;
+my %list_only = (
+      has_defs     => {
+                        list => \@has_defs,
+                        header => "List of capability C<HAS_I<foo>> symbols",
+                        placement => '__HAS_LIST__',
+                      },
+      has_r_defs   => {
+                        list => \@has_r_defs,
+                        header => "List of capability C<HAS_I<foo>> symbols",
+                        placement => '__HAS_R_LIST__',
+                       },
+      include_defs => {
+                        list => \@include_defs,
+                        header => "List of C<#include> needed symbols",
+                        placement => '__INCLUDE_LIST__',
+                       },
+);
+
 my %valid_sections = (
     $AV_scn => {},
     $callback_scn => {},
@@ -242,7 +281,15 @@ my %valid_sections = (
     $compiler_scn => {},
     $directives_scn => {},
     $concurrency_scn => {},
-    $COP_scn => {},
+    $COP_scn => {
+        header => <<~'EOT',
+            COP stands for "Current Operation".  It is the type used for
+            nextstate and dbstate ops, storing the filename and line number,
+            warning bits, hints bits, feature flags, I<etc>, and a sort of
+            incremental representation of the hints hash for the code that
+            follows.
+            EOT
+    },
     $CV_scn => {
         header => <<~'EOT',
             This section documents functions to manipulate CVs which are
@@ -281,9 +328,9 @@ my %valid_sections = (
 
         footer => <<~EOT,
 
-            =head2 List of capability C<HAS_I<foo>> symbols
+            =head2 $list_only{has_defs}{header}
 
-            This is a list of those symbols that dont appear elsewhere in ths
+            This is a list of those symbols that dont appear elsewhere in this
             document that indicate if the current platform has a certain
             capability.  Their names all begin with C<HAS_>.  Only those
             symbols whose capability is directly derived from the name are
@@ -300,11 +347,11 @@ my %valid_sections = (
             split so that the ones that indicate there is a reentrant version
             of a capability are listed separately
 
-            __HAS_LIST__
+            $list_only{has_defs}{placement}
 
             And, the reentrant capabilities:
 
-            __HAS_R_LIST__
+            $list_only{has_r_defs}{placement}
 
             Example usage:
 
@@ -318,7 +365,7 @@ my %valid_sections = (
 
             =back
 
-            =head2 List of C<#include> needed symbols
+            =head2 $list_only{include_defs}{header}
 
             This list contains symbols that indicate if certain C<#include>
             files are present on the platform.  If your code accesses the
@@ -326,7 +373,7 @@ my %valid_sections = (
             C<#include> it if the symbol on this list is C<#define>d.  For
             more detail, see the corresponding entry in F<$config_h>.
 
-            __INCLUDE_LIST__
+            $list_only{include_defs}{placement}
 
             Example usage:
 
@@ -338,6 +385,49 @@ my %valid_sections = (
 
             =back
             EOT
+      },
+    $global_definitions_scn => {
+        header => <<~'EOT',
+            Global variables are defined and initialized in one place, but
+            referred to from multiple files.  They need to be defined and any
+            initialization done in that one place, but extern declarations
+            made for them in each file that may refer to them.  Note that
+            there is no harm in declaring a global and not using it.
+
+            Perl has a mechanism that allows both purposes to be served while
+            minimizing code duplication.  F<EXTERN.h> and F<INTERN.h> define
+            the same relatively few macros, but their definitions are
+            different.  In F<EXTERN.h>, the macros expand to
+            declarations of the globals as external to the file.  In
+            F<INTERN.h> they actually cause the space to be allocated and
+            possibly initialized.
+
+            Most files will follow this paradigm:
+
+                #include "EXTERN.h"
+                ...
+                #include "perl.h">
+
+            This causes every global symbol that is referred to in F<perl.h>
+            and every file it includes (which is nearly every top level Perl
+            header file) to be declared as external.
+
+            The very few files that define globals will instead do
+
+                #include "INTERN.h"
+                ...
+                #include "perl.h">
+                include the file
+
+            It doesn't work for a file to both define some globals and refer
+            to others as externs.  That is, you can only include one of
+            F<INTERN.h> and F<EXTERN.h>.
+
+            This section documents the macros that are defined in these two
+            header files.  F<perl.h> has many uses of them that can serve as
+            paradigms for you.
+            EOT
+        may_be_empty_in_perlapi => 1,
       },
     $globals_scn => {},
     $GV_scn => {},
@@ -441,6 +531,8 @@ my %initial_file_section = (
                             'gv.c' => $GV_scn,
                             'gv.h' => $GV_scn,
                             'hv.h' => $HV_scn,
+                            'INTERN.h' => $global_definitions_scn,
+                            'invlist_inline.h' => $unicode_scn,
                             'locale.c' => $locale_scn,
                             'malloc.c' => $memory_scn,
                             'numeric.c' => $numeric_scn,
@@ -477,6 +569,20 @@ sub where_from_string ($file, $line_num = 0) {
 
     return "in $file" unless $line_num;
     return "at $file, line $line_num";
+}
+
+sub make_verbatim_list(@entries) {
+
+    # This takes a list and creates an alphabetized verbatim table of its
+    # entries for convenient display
+
+    my @list = sort dictionary_order @entries;
+
+    # Give the table a width one less than you might expect, as we indent each
+    # line by one, to mark it as verbatim.
+    my $table = columnarize_list(\@list, $max_width - 1);
+
+    return $table =~ s/^/ /gmr;
 }
 
 sub check_and_add_proto_defn {
@@ -537,9 +643,27 @@ sub check_and_add_proto_defn {
     }
 
     $flags .= "m" if $flags =~ /M/;
+    $flags .= "U" if $flags =~ /@/;     # No usage output for @arrays
+    $flags .= "n" if $flags =~ /[#v]/;  # No threads, arguments for #ifdef's,
+                                        # plain values
+
+    if ($flags =~ /N/) {
+        state %escapes = (
+                          '<' => 'lt',
+                          '>' => 'gt',
+                          '|' => 'verbar',
+                          '/' => 'sol',
+                          '"' => 'quot'
+                         );
+        my $has_lt = $element =~ /</;
+        $element =~ s/ ([ < > | ]) /E<$escapes{$1}>/gxx;
+
+        # Don't need to escape '/' if there are no '<'s
+        $element =~ s/(\/)/E<$escapes{$1}>/g if $has_lt;
+    }
 
     my @munged_args= $args_ref->@*;
-    s/\b(?:NN|NULLOK)\b\s+//g for @munged_args;
+    s/\b(?:NN|NULLOK|[SM]PTR|EPTR\w+)\b\s+//g for @munged_args;
 
     my $flags_sans_d = $flags;
     my $docs_expected = $flags_sans_d =~ s/d//g;
@@ -708,7 +832,9 @@ sub classify_input_line ($file, $line_num, $input, $is_file_C) {
                        ? APIDOC_DEFN
                        : ($type_name eq 'section')
                          ? APIDOC_SECTION
-                         : ILLEGAL_APIDOC;
+                         : ($type_name eq 'flag')
+                           ? APIDOC_FLAG
+                           : ILLEGAL_APIDOC;
 
         my $mostly_proper_form =
                    (   $type != ILLEGAL_APIDOC
@@ -926,8 +1052,8 @@ sub autodoc ($fh, $file) {  # parse a file and extract documentation info
 
             push @items, $leader_ref;
 
-            # Now look for any 'apidoc_item' lines.  These are in a block
-            # consisting solely of them, or all-blank lines
+            # Now look for any 'apidoc_(flag|item)' lines.  These are in a
+            # block consisting solely of them, or all-blank lines
             while (1) {
                 (my $item_line_type, $arg) = $get_next_line->();
                 last unless defined $item_line_type;
@@ -938,7 +1064,37 @@ sub autodoc ($fh, $file) {  # parse a file and extract documentation info
                     next;
                 }
 
-                last unless $item_line_type == APIDOC_ITEM;
+                # Currently not much is done with these
+                if ($item_line_type == APIDOC_FLAG) {
+                    my @components = split /\|+/, $arg;
+                    my ($name, $flags);
+                    if (@components == 1) {
+                        $name = $components[0];
+                    }
+                    elsif (@components == 2) {
+                        $flags = $components[0];
+                        $name = $components[1];
+                        if (my $illegal = $flags =~ s/$flag_flags_re//gr) {
+                            die "[$illegal] illegal in apidoc_flag "
+                            . where_from_string($file, $line_num)
+                            . " :\n$arg";
+                        }
+
+                        # Only mention the flags that go to the parent's pod
+                        next if destination_pod($flags) ne $destpod;
+                    }
+                    else {
+                        die "Unexpected '| in ", $arg;
+                    }
+
+
+                    # We just make an X<> entry for it.
+                    $docs{$destpod}{$section}{X_tags}{$name} = $file;
+                    next;
+                }
+                else {
+                    last unless $item_line_type == APIDOC_ITEM;
+                }
 
                 # Reset $text; those blank lines it contains merely are
                 # separating 'apidoc_item' lines
@@ -1068,9 +1224,6 @@ sub autodoc ($fh, $file) {  # parse a file and extract documentation info
 }
 
 my %configs;
-my @has_defs;
-my @has_r_defs;     # Reentrant symbols
-my @include_defs;
 
 sub parse_config_h {
     use re '/aa';   # Everything is ASCII in this file
@@ -1741,6 +1894,13 @@ sub docout ($fh, $section_name, $element_name, $docref) {
     }
 
     chomp $pod;     # Make sure prints pod with a single trailing \n
+
+    # Replace this marker line in the pod with what we say it should expand
+    # to.
+    $pod =~ s{ \b __PLAIN_vs_NOCONTEXT_wording__ \( (\w+) \) }{
+        my $this = $1;
+        $PLAIN_vs_NOCONTEXT_wording =~ s/WHICH/$this/gr
+    }xeg;
     print $fh "\n", $pod, "\n";
 
     # Accumulate the usage section of the entry into this array.  Output below
@@ -1819,9 +1979,9 @@ sub docout ($fh, $section_name, $element_name, $docref) {
 
             my $has_args = $flags !~ /n/;
             if (! $has_args) {
-                warn "$name: n flag without m"
+                warn "$name: n flag without [mv#] "
                    . where_from_string($item->{file}, $item->{line_num})
-                                                        unless $flags =~ /m/;
+                                                     unless $flags =~ /[mv#]/;
 
                 if ($item->{args} && $item->{args}->@*) {
                     warn "$name: n flag but apparently has args"
@@ -1854,28 +2014,17 @@ sub docout ($fh, $section_name, $element_name, $docref) {
                 }
 
                 # If only the Perl_foo form is to be displayed, change the
-                # name of this item to be that.  This happens for either of
-                # two reasons:
-                #   1) The flags say we want "Perl_", but also to not create
-                #      an entry in embed.h to #define a short name for it.
+                # name of this item to be that.  This happens when the flags
+                # say we want "Perl_", but also to not create an entry in
+                # embed.h to #define a short name for it.
                 my $needs_Perl_entry = (   $flags =~ /p/
                                         && $flags =~ /o/
                                         && $flags !~ /M/);
 
-                #   2) The function takes a format string and a thread context
-                #      parameter.  We can't cope with that because our macros
-                #      expect both the thread context and the format to be the
-                #      first parameter to the function; and only one can be in
-                #      that position.
-                my $cant_use_short_name = (   $flags =~ /f/
-                                           && $flags !~ /T/
-                                           && $name !~ /strftime/);
-
                 # We also create a 'Perl_foo' entry if $additional_long_form
                 # is set, as that explicitly indicates we want one
                 if (   $additional_long_form
-                    || $needs_Perl_entry
-                    || $cant_use_short_name)
+                    || $needs_Perl_entry)
                 {
                     # An all uppercase macro name gets an uppercase prefix.
                     my $perl = ($flags =~ /m/ && $name !~ /[[:lower:]]/)
@@ -2185,13 +2334,8 @@ sub construct_missings_section ($missings_hdr, $missings_ref) {
     # Sort the elements.
     my @missings = sort dictionary_order $missings_ref->@*;
 
-    # Make a table of the missings in columns.  Give the subroutine a width
-    # one less than you might expect, as we indent each line by one, to mark
-    # it as verbatim.
-    my $table .= columnarize_list(\@missings, $max_width - 1);
-    $table =~ s/^/ /gm;
-
-    return $text . "\n\n" . $table;
+    # Make a table of the missings in columns.
+    return $text . "\n\n" . make_verbatim_list(@missings);
 }
 
 sub dictionary_order {
@@ -2268,10 +2412,14 @@ sub output ($destpod) {  # Output a complete pod file
     for my $section_name (sort dictionary_order keys %valid_sections) {
         my $section_info = $dochash->{$section_name};
 
-        # We allow empty sections in perlintern.
-        if (! $section_info && $podname eq $api) {
-            warn "Empty section '$section_name' for $podname; skipped";
-            next;
+        if (! $section_info) {
+            # We always allow empty sections in perlintern.
+            if (   $podname eq $api
+                && ! $valid_sections{$section_name}{may_be_empty_in_perlapi})
+            {
+                warn "Empty section '$section_name' for $podname; skipped";
+                next;
+            }
         }
 
         print $fh "\n=head1 $section_name\n";
@@ -2282,7 +2430,8 @@ sub output ($destpod) {  # Output a complete pod file
             delete $section_info->{X_tags};
         }
 
-        if ($podname eq $api) {
+        my $has_entries = $section_info && keys $section_info->%*;
+        if ($has_entries) {
             print $fh "\n", $valid_sections{$section_name}{header}, "\n"
                  if defined $valid_sections{$section_name}{header};
 
@@ -2294,7 +2443,7 @@ sub output ($destpod) {  # Output a complete pod file
             }
         }
 
-        if (! $section_info || ! keys $section_info->%*) {
+        if (! $has_entries) {
             my $pod_type = ($podname eq $api) ? "public" : "internal";
             print $fh "\nThere are currently no $pod_type API items in ",
                       $section_name, "\n";
@@ -2401,7 +2550,7 @@ sub output ($destpod) {  # Output a complete pod file
                         goto spliced;
                     }
 
-                    die "Unexpecedly \@items doesn't contain $leaders[$which]";
+                    die "Unexpectedly \@items doesn't contain $leaders[$which]";
 
                  spliced:
                     # The array now includes the out-of-order items.  Save,
@@ -2512,13 +2661,9 @@ foreach (@{(setup_embed())[0]}) {
     my $embed= $_->{embed}
         or next;
     my $file = $_->{source};
-    my ($flags, $ret_type, $func, $args) =
-                                 @{$embed}{qw(flags return_type name args)};
-    check_and_add_proto_defn($func, $file,
-                             # embed.fnc data doesn't currently furnish the
-                             # line number
-                             undef,
-
+    my ($flags, $ret_type, $func, $args, $line_num) =
+                    @{$embed}{qw(flags return_type name args start_line_num)};
+    check_and_add_proto_defn($func, $file, $line_num,
                              $flags, $ret_type, $args,
 
                              # This is like an 'apidoc_defn' line, in that it
@@ -2665,7 +2810,7 @@ for my $which_pod (keys %docs) {
                 # how this item is displayed.
                 if ($element->{flags}) {
                     $element->{flags} .=
-                                       $leader->{flags} =~ s/$item_flags_re//r;
+                                    $leader->{flags} =~ s/$item_flags_re//gr;
                 }
                 else {
                     $element->{flags} = $leader->{flags};
@@ -2704,7 +2849,7 @@ for my $which (\%api, \%intern) {
         next if $which == \%intern && $element->{flags} =~ /A/;
 
         if ($element->{docs_found}) {
-            warn "'$name' missing 'd' flag"
+            warn "'$name' missing 'd' flag "
                . where_from_string($element->{file}, $element->{line_num})
                                                if ! $element->{docs_expected};
         }
@@ -2744,18 +2889,12 @@ my $places_other_than_intern = join ", ",
 my $places_other_than_api = join ", ",
             map { "L<$_>" } sort dictionary_order 'perlintern', @other_places;
 
-# The S< > makes things less densely packed, hence more readable
-my $has_defs_text .= join ",S< > ", map { "C<$_>" }
-                                             sort dictionary_order @has_defs;
-my $has_r_defs_text .= join ",S< > ", map { "C<$_>" }
-                                             sort dictionary_order @has_r_defs;
-$valid_sections{$genconfig_scn}{footer} =~ s/__HAS_LIST__/$has_defs_text/;
-$valid_sections{$genconfig_scn}{footer} =~ s/__HAS_R_LIST__/$has_r_defs_text/;
 
-my $include_defs_text .= join ",S< > ", map { "C<$_>" }
-                                            sort dictionary_order @include_defs;
-$valid_sections{$genconfig_scn}{footer}
-                                      =~ s/__INCLUDE_LIST__/$include_defs_text/;
+foreach my $name (keys %list_only) {
+    my $text = make_verbatim_list($list_only{$name}{list}->@*);
+    $valid_sections{$genconfig_scn}{footer}
+                                    =~ s/$list_only{$name}{placement}/$text/;
+}
 
 my $section_list = join "\n\n", map { "=item L</$_>" }
                                 sort(dictionary_order keys %valid_sections),
@@ -2782,6 +2921,20 @@ $api{hdr} = <<"_EOB_";
 |L<At the end|/$undocumented_scn> is a list of functions which have yet
 |to be documented.  Patches welcome!  The interfaces of these are subject to
 |change without notice.
+|
+|To find out what release an element came into being, use
+|
+| perl dist/ppport.h --api-info=element
+|
+|You may also use a pattern
+|
+| perl dist/ppport.h --api-info=/./
+|
+|displays all possible public api elements, but not items in L<perlintern>.
+|Some elements have been backported in L<Devel::PPPort> so that they are
+|usable in earlier versions than they otherwise would be available.  The
+|display also includes information as to what the earliest possible version
+|such an element may be used in; as well as some hints and cautions.
 |
 |Some of the functions documented here are consolidated so that a single entry
 |serves for multiple functions which all do basically the same thing, but have

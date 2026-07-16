@@ -110,8 +110,8 @@ test in your business logic).
 
 =head2 is_not_unique_msg
 
-The error message / tag used when the value is not true.  Default is _t('is_not_unique')
-which resolves in English to 'choosen is not unique'. 
+The error message / tag used when the value is not unique.  Default is _t('is_not_unique')
+which resolves in English to 'chosen is not unique'.
 
 =head2 skip_if_undef
 

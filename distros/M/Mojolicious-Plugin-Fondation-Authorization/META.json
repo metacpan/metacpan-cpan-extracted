@@ -1,0 +1,64 @@
+{
+   "abstract" : "Authorization plugin \u2014 grants loading and check_perm/check_group helpers",
+   "author" : [
+      "Daniel Brosseau <dab@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Fondation-Authorization",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Perl::Critic" : "1.00",
+            "Perl::Tidy" : "20200000",
+            "Pod::Checker" : "1.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "9.46",
+            "Mojolicious::Plugin::Fondation" : "0.01",
+            "Mojolicious::Plugin::Fondation::Auth" : "0.01",
+            "Mojolicious::Plugin::Fondation::Group" : "0.01",
+            "Mojolicious::Plugin::Fondation::Perm" : "0.01",
+            "Mojolicious::Plugin::Fondation::SessionStore" : "0.01",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "3.00",
+            "File::Temp" : "0.01",
+            "FindBin" : "1.00",
+            "Test::More" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Authorization",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Authorization.git",
+         "web" : "https://github.com/Dabg/Mojolicious-Plugin-Fondation-Authorization"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -28,7 +28,7 @@ sub human_attribute_name {
 
   my @defaults = ();
   my $i18n_scope = $self->i18n_scope;
-  my @parts = split '.', $attribute;
+  my @parts = split /\./, $attribute;
   my $attribute_name = pop @parts;
   my $namespace = join '/', @parts if @parts;
   my $attributes_scope = "${i18n_scope}.attributes";
@@ -38,7 +38,7 @@ sub human_attribute_name {
     if($namespace) {
       @defaults = map {
         my $class = $_;
-        "${attributes_scope}.${\$class->model_name->i18n_key}/${namespace}.${attribute}"     
+        "${attributes_scope}.${\$class->model_name->i18n_key}/${namespace}.${attribute_name}"
       } grep { $_->model_name->can('i18n_key') } $self->i18n_lookup;
     } else {
       @defaults = map {
@@ -80,7 +80,7 @@ sub human_label_name {
 
   my @defaults = ();
   my $i18n_scope = $self->i18n_scope;
-  my @parts = split '.', $attribute;
+  my @parts = split /\./, $attribute;
   my $attribute_name = pop @parts;
   my $namespace = join '/', @parts if @parts;
   my $attributes_scope = "${i18n_scope}.labels";
@@ -90,7 +90,7 @@ sub human_label_name {
     if($namespace) {
       @defaults = map {
         my $class = $_;
-        "${attributes_scope}.${\$class->model_name->i18n_key}/${namespace}.${attribute}"     
+        "${attributes_scope}.${\$class->model_name->i18n_key}/${namespace}.${attribute_name}"
       } grep { $_->model_name->can('i18n_key') } $self->i18n_lookup;
     } else {
       @defaults = map {
@@ -128,7 +128,7 @@ sub _humanize_attribute { shift->_humanize(@_) }
 sub _humanize {
   my ($self, $text) = @_;
   my $humanized = $text;
-  
+
   $humanized =~s/_id$//; # remove trailing _id
   $humanized =~s/_/ /g;
   $humanized = autoformat($humanized, +{case=>'title'});
@@ -138,3 +138,63 @@ sub _humanize {
 }
 
 1;
+
+=head1 NAME
+
+Valiant::Translation - Localized, human readable names for models and attributes
+
+=head1 DESCRIPTION
+
+A role providing the translation glue between your model and L<Valiant::I18N>:
+it turns attribute names into localized, human readable strings for error
+messages and form labels.  You won't usually consume this role directly; it is
+composed into your class via L<Valiant::Validates>.  Documented here is the
+public API it adds to your class.
+
+=head1 ATTRIBUTES
+
+=head2 i18n
+
+An instance of the class named by L</i18n_class>, lazily built.  You can pass
+your own at construction if you need custom translation behavior.
+
+=head1 METHODS
+
+=head2 i18n_class
+
+The class used for translation.  Defaults to C<Valiant::I18N>.  Override this
+method in your class to use a different translation backend.
+
+=head2 i18n_scope
+
+The top level namespace under which translation keys are looked up.  Defaults
+to C<valiant>.  Override to relocate your translations.
+
+=head2 human_attribute_name ($attribute, \%options)
+
+Returns a human readable, localized version of an attribute name, used when
+building full error messages.  Looks for translations under
+C<< {i18n_scope}.attributes.{model}.{attribute} >> across the class hierarchy,
+falling back to any C<default> tags passed in C<\%options> and finally to a
+title cased version of the attribute name itself (with any trailing C<_id>
+removed and underscores turned into spaces).
+
+=head2 human_label_name ($attribute, \%options)
+
+The same lookup as L</human_attribute_name> but under the C<labels> scope
+rather than C<attributes>; used by the form generation code to build field
+labels so labels can be localized separately from error messages.
+
+=head1 SEE ALSO
+
+L<Valiant>, L<Valiant::I18N>, L<Valiant::Validates>.
+
+=head1 AUTHOR
+
+See L<Valiant>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Valiant>
+
+=cut

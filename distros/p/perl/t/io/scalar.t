@@ -12,7 +12,7 @@ use strict;
 use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END); # Not 0, 1, 2 everywhere.
 use Errno qw(EACCES);
 
-plan(128);
+plan(135);
 
 my $fh;
 my $var = "aaa\n";
@@ -527,4 +527,51 @@ SKIP:
     ok(seek($fh, 2**32, SEEK_SET), "seek to a large position");
     select((select($fh), ++$|)[0]);
     ok(!(print $fh "x"), "write to a large offset");
+}
+
+{ # GH #24008
+    open my $fh, '>', \my $str or die $!;
+    print $fh "xxxxx";
+    undef $str;
+    print $fh "y";
+    is($str, "\0\0\0\0\0y", "write to undef'ed variable");
+
+    undef $str;
+    seek $fh, 0, SEEK_SET;
+    print $fh "zz";
+    is($str, "zz", "rewind and write to undef'ed variable");
+
+    print $fh "aaaaa";
+    substr($str, 3) = '';
+    print $fh "b";
+    is($str, "zza\0\0\0\0b", "truncate string while writing");
+}
+
+{
+    open my $fh, '>>', \my $str or die $!;
+    print $fh "xxxxx";
+    undef $str;
+    print $fh "y";
+    is($str, "y", "append to undef'ed variable");
+
+    print $fh "ccccc";
+    substr($str, 3) = '';
+    print $fh "d";
+    is($str, "yccd", "truncate string while appending");
+}
+
+{
+    open my $fh, '>', \my $str or die $!;
+    # Needs a sufficiently long string to trigger string expansion (sv_grow).
+    print $fh "abcdefghijklmnopqrstuvwxyz";
+    print $fh $str;
+    is($str, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+       "write a string to itself");
+}
+
+{ # GH #24199
+    open my $fh, '>', \my $content or die $!;
+    print {$fh} "o";
+    print {$fh} $content for 1..20; # This used to crash with SEGV
+    is(length($content), 2 ** 20, "write a string to itself [GH #24199]");
 }

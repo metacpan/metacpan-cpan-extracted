@@ -245,11 +245,6 @@ my %mg =
 #       prefix the vtable with the specified entry (e.g. '#ifdef FOO')
 #       and suffix it with '#else { 0, 0, 0, 0, 0, 0, 0, 0 } #endif'
 #
-#    const
-#       special-case cast a 'get' function whose signature expects
-#       a pointer to constant magic, so that it can be added to a vtable
-#       which expects pointers to functions without the 'const'.
-#
 #    get
 #    set
 #    len
@@ -277,7 +272,7 @@ my %vtable_conf =
      'dbline' => {set => 'setdbline'},
      'isa' => {set => 'setisa', clear => 'clearisa'},
      'isaelem' => {set => 'setisa'},
-     'arylen' => {get => 'getarylen', set => 'setarylen', const => 1},
+     'arylen' => {get => 'getarylen', set => 'setarylen'},
      'arylen_p' => {clear => 'cleararylen_p', free => 'freearylen_p'},
      'mglob'    => {set   => 'setmglob',
                     free  => 'freemglob' },
@@ -485,13 +480,9 @@ enum {		/* pass one of these to get_vtbl */
     $want
 };
 
-#ifdef DOINIT
-EXTCONST char * const PL_magic_vtable_names[magic_vtable_max] = {
+EXTCONST char * const PL_magic_vtable_names[magic_vtable_max] INIT( {
     "$names"
-};
-#else
-EXTCONST char * const PL_magic_vtable_names[magic_vtable_max];
-#endif
+});
 
 EOH
 }
@@ -528,7 +519,6 @@ while (my $name = shift @names) {
         $data->{$_} ? "Perl_magic_$data->{$_}" : 0;
     } qw(get set len clear free copy dup local);
 
-    $funcs[0] = "(int (*)(pTHX_ SV *, MAGIC *))" . $funcs[0] if $data->{const};
     my $funcs = join ", ", @funcs;
 
     # Because we can't have a , after the last {...}

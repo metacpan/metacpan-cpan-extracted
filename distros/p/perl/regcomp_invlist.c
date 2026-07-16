@@ -64,7 +64,7 @@ Perl_populate_invlist_from_bitmap(pTHX_ const U8 * bitmap, const Size_t bitmap_l
                 i++;
             }
 
-            *invlist = _add_range_to_invlist(*invlist,
+            *invlist = add_range_to_invlist_(*invlist,
                                              start + offset,
                                              i + offset - 1);
         }
@@ -133,8 +133,10 @@ Perl_populate_invlist_from_bitmap(pTHX_ const U8 * bitmap, const Size_t bitmap_l
 #ifndef PERL_IN_XSUB_RE
 
 PERL_STATIC_INLINE UV*
-S__invlist_array_init(SV* const invlist, const bool will_have_0)
+S_invlist_array_init_(SV* const invlist, const bool will_have_0)
 {
+    PERL_ARGS_ASSERT_INVLIST_ARRAY_INIT_;
+
     /* Returns a pointer to the first element in the inversion list's array.
      * This is called upon initialization of an inversion list.  Where the
      * array begins depends on whether the list has the code point U+0000 in it
@@ -146,10 +148,8 @@ S__invlist_array_init(SV* const invlist, const bool will_have_0)
     bool* offset = get_invlist_offset_addr(invlist);
     UV* zero_addr = (UV *) SvPVX(invlist);
 
-    PERL_ARGS_ASSERT__INVLIST_ARRAY_INIT;
-
     /* Must be empty */
-    assert(! _invlist_len(invlist));
+    assert(! invlist_len_(invlist));
 
     *zero_addr = 0;
 
@@ -158,15 +158,17 @@ S__invlist_array_init(SV* const invlist, const bool will_have_0)
     return zero_addr + *offset;
 }
 
-STATIC void
+static void
 S_invlist_replace_list_destroys_src(pTHX_ SV * dest, SV * src)
 {
+    PERL_ARGS_ASSERT_INVLIST_REPLACE_LIST_DESTROYS_SRC;
+
     /* Replaces the inversion list in 'dest' with the one from 'src'.  It
      * steals the list from 'src', so 'src' is made to have a NULL list.  This
      * is similar to what SvSetMagicSV() would do, if it were implemented on
      * inversion lists, though this routine avoids a copy */
 
-    const UV src_len          = _invlist_len(src);
+    const UV src_len          = invlist_len_(src);
     const bool src_offset     = *get_invlist_offset_addr(src);
     const STRLEN src_byte_len = SvLEN(src);
     char * array              = SvPVX(src);
@@ -174,8 +176,6 @@ S_invlist_replace_list_destroys_src(pTHX_ SV * dest, SV * src)
 #ifndef NO_TAINT_SUPPORT
     const int oldtainted = TAINT_get;
 #endif
-
-    PERL_ARGS_ASSERT_INVLIST_REPLACE_LIST_DESTROYS_SRC;
 
     assert(is_invlist(src));
     assert(is_invlist(dest));
@@ -209,9 +209,10 @@ S_invlist_replace_list_destroys_src(pTHX_ SV * dest, SV * src)
 PERL_STATIC_INLINE IV*
 S_get_invlist_previous_index_addr(SV* invlist)
 {
+    PERL_ARGS_ASSERT_GET_INVLIST_PREVIOUS_INDEX_ADDR;
+
     /* Return the address of the IV that is reserved to hold the cached index
      * */
-    PERL_ARGS_ASSERT_GET_INVLIST_PREVIOUS_INDEX_ADDR;
 
     assert(is_invlist(invlist));
 
@@ -221,9 +222,9 @@ S_get_invlist_previous_index_addr(SV* invlist)
 PERL_STATIC_INLINE IV
 S_invlist_previous_index(SV* const invlist)
 {
-    /* Returns cached index of previous search */
-
     PERL_ARGS_ASSERT_INVLIST_PREVIOUS_INDEX;
+
+    /* Returns cached index of previous search */
 
     return *get_invlist_previous_index_addr(invlist);
 }
@@ -231,11 +232,11 @@ S_invlist_previous_index(SV* const invlist)
 PERL_STATIC_INLINE void
 S_invlist_set_previous_index(SV* const invlist, const IV index)
 {
-    /* Caches <index> for later retrieval */
-
     PERL_ARGS_ASSERT_INVLIST_SET_PREVIOUS_INDEX;
 
-    assert(index == 0 || index < (int) _invlist_len(invlist));
+    /* Caches <index> for later retrieval */
+
+    assert(index == 0 || index < (int) invlist_len_(invlist));
 
     *get_invlist_previous_index_addr(invlist) = index;
 }
@@ -243,17 +244,43 @@ S_invlist_set_previous_index(SV* const invlist, const IV index)
 PERL_STATIC_INLINE void
 S_invlist_trim(SV* invlist)
 {
+    PERL_ARGS_ASSERT_INVLIST_TRIM;
+
     /* Free the not currently-being-used space in an inversion list */
 
     /* But don't free up the space needed for the 0 UV that is always at the
-     * beginning of the list, nor the trailing NUL */
-    const UV min_size = TO_INTERNAL_SIZE(1) + 1;
+     * beginning of the list, nor the trailing NUL. The smallest possible
+     * allocation size may or may not be larger than this, depending upon
+     * the malloc implementation in use. */
 
-    PERL_ARGS_ASSERT_INVLIST_TRIM;
+    const STRLEN min_size = MAX(PERL_STRLEN_NEW_MIN, TO_INTERNAL_SIZE(1) + 1);
 
     assert(is_invlist(invlist));
 
-    SvPV_renew(invlist, MAX(min_size, SvCUR(invlist) + 1));
+    /* Notes:
+     *     SvCUR(invlist) can be 0, often is min_size or larger
+     *
+     *     It's very common for SvLEN(invlist) to be equal to:
+     *     (TO_INTERNAL_SIZE(1) + 1)
+     *         ...or the minimum allocation size if larger
+     *     SvCUR(invlist) + 2
+     *     SvCUR(invlist) + "a few"
+     */
+
+    const STRLEN realistic_size = expected_size(
+                                      MAX( min_size, SvCUR(invlist) + 1)  );
+
+    /* It's not clear what proportion of invlists are short lived, with
+     * the malloc() overhead of resizing is more relevant than the
+     * memory briefly saved, versus long lived invlists where memory
+     * savings are definitely desirable and malloc() overhead matters less.
+     *
+     * The 4*PTRSIZE below is an arbitrary fudge-factor added to
+     * attempt to strike a balance.
+     */
+    if ( SvLEN(invlist) > realistic_size + 4*PTRSIZE ) {
+        SvPV_renew(invlist, realistic_size);
+    }
 }
 
 PERL_STATIC_INLINE void
@@ -270,21 +297,21 @@ S_invlist_clear(pTHX_ SV* invlist)    /* Empty the inversion list */
 PERL_STATIC_INLINE UV
 S_invlist_max(const SV* const invlist)
 {
+    PERL_ARGS_ASSERT_INVLIST_MAX;
+
     /* Returns the maximum number of elements storable in the inversion list's
      * array, without having to realloc() */
-
-    PERL_ARGS_ASSERT_INVLIST_MAX;
 
     assert(is_invlist(invlist));
 
     /* Assumes worst case, in which the 0 element is not counted in the
      * inversion list, so subtracts 1 for that */
-    return SvLEN(invlist) == 0  /* This happens under _new_invlist_C_array */
+    return SvLEN(invlist) == 0  /* This happens under new_invlist_C_array_ */
            ? FROM_INTERNAL_SIZE(SvCUR(invlist)) - 1
            : FROM_INTERNAL_SIZE(SvLEN(invlist)) - 1;
 }
 
-STATIC void
+static void
 S_initialize_invlist_guts(pTHX_ SV* invlist, const Size_t initial_size)
 {
     PERL_ARGS_ASSERT_INITIALIZE_INVLIST_GUTS;
@@ -302,8 +329,10 @@ S_initialize_invlist_guts(pTHX_ SV* invlist, const Size_t initial_size)
 }
 
 SV*
-Perl__new_invlist(pTHX_ IV initial_size)
+Perl_new_invlist_(pTHX_ IV initial_size)
 {
+    PERL_ARGS_ASSERT_NEW_INVLIST_;
+
 
     /* Return a pointer to a newly constructed inversion list, with enough
      * space to store 'initial_size' elements.  If that number is negative, a
@@ -322,8 +351,10 @@ Perl__new_invlist(pTHX_ IV initial_size)
 }
 
 SV*
-Perl__new_invlist_C_array(pTHX_ const UV* const list)
+Perl_new_invlist_C_array_(pTHX_ const UV* const list)
 {
+    PERL_ARGS_ASSERT_NEW_INVLIST_C_ARRAY_;
+
     /* Return a pointer to a newly constructed inversion list, initialized to
      * point to <list>, which has to be in the exact correct inversion list
      * form, including internal fields.  Thus this is a dangerous routine that
@@ -347,8 +378,6 @@ Perl__new_invlist_C_array(pTHX_ const UV* const list)
 
     SV* invlist = newSV_type(SVt_INVLIST);
 
-    PERL_ARGS_ASSERT__NEW_INVLIST_C_ARRAY;
-
     if (version_id != INVLIST_VERSION_ID) {
         croak("panic: Incorrect version for previously generated inversion list");
     }
@@ -357,8 +386,8 @@ Perl__new_invlist_C_array(pTHX_ const UV* const list)
      * of the list proper, so start it just after them */
     SvPV_set(invlist, (char *) (list + HEADER_LENGTH));
 
-    SvLEN_set(invlist, 0);  /* Means we own the contents, and the system
-                               shouldn't touch it */
+    assert(SvLEN(invlist) == 0);  /* Means we own the contents, and the system
+                                     shouldn't touch it */
 
     *(get_invlist_offset_addr(invlist)) = offset;
 
@@ -378,24 +407,24 @@ Perl__new_invlist_C_array(pTHX_ const UV* const list)
     return invlist;
 }
 
-STATIC void
-S__append_range_to_invlist(pTHX_ SV* const invlist,
+static void
+S_append_range_to_invlist_(pTHX_ SV* const invlist,
                                  const UV start, const UV end)
 {
+    PERL_ARGS_ASSERT_APPEND_RANGE_TO_INVLIST_;
+
    /* Subject to change or removal.  Append the range from 'start' to 'end' at
     * the end of the inversion list.  The range must be above any existing
     * ones. */
 
     UV* array;
     UV max = invlist_max(invlist);
-    UV len = _invlist_len(invlist);
+    UV len = invlist_len_(invlist);
     bool offset;
-
-    PERL_ARGS_ASSERT__APPEND_RANGE_TO_INVLIST;
 
     if (len == 0) { /* Empty lists must be initialized */
         offset = start != 0;
-        array = _invlist_array_init(invlist, ! offset);
+        array = invlist_array_init_(invlist, ! offset);
     }
     else {
         /* Here, the existing list is non-empty. The current max entry in the
@@ -467,8 +496,10 @@ S__append_range_to_invlist(pTHX_ SV* const invlist,
 }
 
 SSize_t
-Perl__invlist_search(SV* const invlist, const UV cp)
+Perl_invlist_search_(SV* const invlist, const UV cp)
 {
+    PERL_ARGS_ASSERT_INVLIST_SEARCH_;
+
     /* Searches the inversion list for the entry that contains the input code
      * point <cp>.  If <cp> is not in the list, -1 is returned.  Otherwise, the
      * return value is the index into the list's array of the range that
@@ -478,11 +509,9 @@ Perl__invlist_search(SV* const invlist, const UV cp)
 
     IV low = 0;
     IV mid;
-    IV high = _invlist_len(invlist);
+    IV high = invlist_len_(invlist);
     const IV highest_element = high - 1;
     const UV* array;
-
-    PERL_ARGS_ASSERT__INVLIST_SEARCH;
 
     /* If list is empty, return failure. */
     if (UNLIKELY(high == 0)) {
@@ -560,9 +589,11 @@ Perl__invlist_search(SV* const invlist, const UV cp)
 }
 
 void
-Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
+Perl_invlist_union_maybe_complement_2nd_(pTHX_ SV* const a, SV* const b,
                                          const bool complement_b, SV** output)
 {
+    PERL_ARGS_ASSERT_INVLIST_UNION_MAYBE_COMPLEMENT_2ND_;
+
     /* Take the union of two inversion lists and point '*output' to it.  On
      * input, '*output' MUST POINT TO NULL OR TO AN SV* INVERSION LIST (possibly
      * even 'a' or 'b').  If to an inversion list, the contents of the original
@@ -601,11 +632,10 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
      * inputs are in their sets.  */
     UV count = 0;
 
-    PERL_ARGS_ASSERT__INVLIST_UNION_MAYBE_COMPLEMENT_2ND;
     assert(a != b);
     assert(*output == NULL || is_invlist(*output));
 
-    len_b = _invlist_len(b);
+    len_b = invlist_len_(b);
     if (len_b == 0) {
 
         /* Here, 'b' is empty, hence it's complement is all possible code
@@ -613,7 +643,7 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
          * everything, and we need not even look at 'a'.  It's easiest to
          * create a new inversion list that matches everything.  */
         if (complement_b) {
-            SV* everything = _add_range_to_invlist(NULL, 0, UV_MAX);
+            SV* everything = add_range_to_invlist_(NULL, 0, UV_MAX);
 
             if (*output == NULL) { /* If the output didn't exist, just point it
                                       at the new list */
@@ -631,9 +661,9 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
          * the union will come entirely from 'a'.  If 'a' is NULL or empty, the
          * output will be empty */
 
-        if (a == NULL || _invlist_len(a) == 0) {
+        if (a == NULL || invlist_len_(a) == 0) {
             if (*output == NULL) {
-                *output = _new_invlist(0);
+                *output = new_invlist_(0);
             }
             else {
                 invlist_clear(*output);
@@ -665,7 +695,7 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 
     /* Here 'b' is not empty.  See about 'a' */
 
-    if (a == NULL || ((len_a = _invlist_len(a)) == 0)) {
+    if (a == NULL || ((len_a = invlist_len_(a)) == 0)) {
 
         /* Here, 'a' is empty (and b is not).  That means the union will come
          * entirely from 'b'.  If '*output' is NULL, we can directly return a
@@ -675,7 +705,7 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
         SV ** dest = (*output == NULL) ? output : &u;
         *dest = invlist_clone(b, NULL);
         if (complement_b) {
-            _invlist_invert(*dest);
+            invlist_invert_(*dest);
         }
 
         if (dest == &u) {
@@ -711,10 +741,10 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 
     /* Size the union for the worst case: that the sets are completely
      * disjoint */
-    u = _new_invlist(len_a + len_b);
+    u = new_invlist_(len_a + len_b);
 
     /* Will contain U+0000 if either component does */
-    array_u = _invlist_array_init(u, (    len_a > 0 && array_a[0] == 0)
+    array_u = invlist_array_init_(u, (    len_a > 0 && array_a[0] == 0)
                                       || (len_b > 0 && array_b[0] == 0));
 
     /* Go through each input list item by item, stopping when have exhausted
@@ -815,7 +845,7 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
     /* Set the result to the final length, which can change the pointer to
      * array_u, so re-find it.  (Note that it is unlikely that this will
      * change, as we are shrinking the space, not enlarging it) */
-    if (len_u != _invlist_len(u)) {
+    if (len_u != invlist_len_(u)) {
         invlist_set_len(u, len_u, *get_invlist_offset_addr(u));
         invlist_trim(u);
         array_u = invlist_array(u);
@@ -838,9 +868,11 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 }
 
 void
-Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
+Perl_invlist_intersection_maybe_complement_2nd_(pTHX_ SV* const a, SV* const b,
                                                const bool complement_b, SV** i)
 {
+    PERL_ARGS_ASSERT_INVLIST_INTERSECTION_MAYBE_COMPLEMENT_2ND_;
+
     /* Take the intersection of two inversion lists and point '*i' to it.  On
      * input, '*i' MUST POINT TO NULL OR TO AN SV* INVERSION LIST (possibly
      * even 'a' or 'b').  If to an inversion list, the contents of the original
@@ -879,13 +911,12 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
      * Only when it is 2 are we in the intersection. */
     UV count = 0;
 
-    PERL_ARGS_ASSERT__INVLIST_INTERSECTION_MAYBE_COMPLEMENT_2ND;
     assert(a != b);
     assert(*i == NULL || is_invlist(*i));
 
     /* Special case if either one is empty */
-    len_a = (a == NULL) ? 0 : _invlist_len(a);
-    if ((len_a == 0) || ((len_b = _invlist_len(b)) == 0)) {
+    len_a = (a == NULL) ? 0 : invlist_len_(a);
+    if ((len_a == 0) || ((len_b = invlist_len_(b)) == 0)) {
         if (len_a != 0 && complement_b) {
 
             /* Here, 'a' is not empty, therefore from the enclosing 'if', 'b'
@@ -911,7 +942,7 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
         /* Here, 'a' or 'b' is empty and not using the complement of 'b'.  The
          * intersection must be empty */
         if (*i == NULL) {
-            *i = _new_invlist(0);
+            *i = new_invlist_(0);
             return;
         }
 
@@ -944,10 +975,10 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 
     /* Size the intersection for the worst case: that the intersection ends up
      * fragmenting everything to be completely disjoint */
-    r = _new_invlist(len_a + len_b);
+    r = new_invlist_(len_a + len_b);
 
     /* Will contain U+0000 iff both components do */
-    array_r = _invlist_array_init(r,    len_a > 0 && array_a[0] == 0
+    array_r = invlist_array_init_(r,    len_a > 0 && array_a[0] == 0
                                      && len_b > 0 && array_b[0] == 0);
 
     /* Go through each list item by item, stopping when have exhausted one of
@@ -1049,7 +1080,7 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
     /* Set the result to the final length, which can change the pointer to
      * array_r, so re-find it.  (Note that it is unlikely that this will
      * change, as we are shrinking the space, not enlarging it) */
-    if (len_r != _invlist_len(r)) {
+    if (len_r != invlist_len_(r)) {
         invlist_set_len(r, len_r, *get_invlist_offset_addr(r));
         invlist_trim(r);
         array_r = invlist_array(r);
@@ -1076,8 +1107,10 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 }
 
 SV*
-Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
+Perl_add_range_to_invlist_(pTHX_ SV* invlist, UV start, UV end)
 {
+    PERL_ARGS_ASSERT_ADD_RANGE_TO_INVLIST_;
+
     /* Add the range from 'start' to 'end' inclusive to the inversion list's
      * set.  A pointer to the inversion list is returned.  This may actually be
      * a new list, in which case the passed in one has been destroyed.  The
@@ -1101,15 +1134,15 @@ Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
 
     /* This range becomes the whole inversion list if none already existed */
     if (invlist == NULL) {
-        invlist = _new_invlist(2);
-        _append_range_to_invlist(invlist, start, end);
+        invlist = new_invlist_(2);
+        append_range_to_invlist_(invlist, start, end);
         return invlist;
     }
 
     /* Likewise, if the inversion list is currently empty */
-    len = _invlist_len(invlist);
+    len = invlist_len_(invlist);
     if (len == 0) {
-        _append_range_to_invlist(invlist, start, end);
+        append_range_to_invlist_(invlist, start, end);
         return invlist;
     }
 
@@ -1122,12 +1155,12 @@ Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
 
         /* If the whole range is higher, we can just append it */
         if (start > cur_highest) {
-            _append_range_to_invlist(invlist, start, end);
+            append_range_to_invlist_(invlist, start, end);
             return invlist;
         }
 
         /* Otherwise, add the portion that is higher ... */
-        _append_range_to_invlist(invlist, cur_highest + 1, end);
+        append_range_to_invlist_(invlist, cur_highest + 1, end);
 
         /* ... and continue on below to handle the rest.  As a result of the
          * above append, we know that the index of the end of the range is the
@@ -1154,10 +1187,10 @@ Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
         if (UNLIKELY(start == 0)) {
             SV* range_invlist;
 
-            range_invlist = _new_invlist(2);
-            _append_range_to_invlist(range_invlist, start, end);
+            range_invlist = new_invlist_(2);
+            append_range_to_invlist_(range_invlist, start, end);
 
-            _invlist_union(invlist, range_invlist, &invlist);
+            invlist_union_(invlist, range_invlist, &invlist);
 
             SvREFCNT_dec_NN(range_invlist);
 
@@ -1183,7 +1216,7 @@ Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
             * Find where in the list it should go.  This finds i_s, such that:
             *     invlist[i_s] <= start < array[i_s+1]
             */
-        i_s = _invlist_search(invlist, start);
+        i_s = invlist_search_(invlist, start);
     }
 
     /* At this point, any extending before the beginning of the inversion list
@@ -1198,7 +1231,7 @@ Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
     if (i_e == 0) {
         i_e = (start == end)
               ? i_s
-              : _invlist_search(invlist, end);
+              : invlist_search_(invlist, end);
     }
 
     /* Here generally invlist[i_e] <= end < array[i_e+1].  But if invlist[i_e]
@@ -1336,9 +1369,11 @@ Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
 }
 
 SV*
-Perl__setup_canned_invlist(pTHX_ const STRLEN size, const UV element0,
+Perl_setup_canned_invlist_(pTHX_ const STRLEN size, const UV element0,
                                  UV** other_elements_ptr)
 {
+    PERL_ARGS_ASSERT_SETUP_CANNED_INVLIST_;
+
     /* Create and return an inversion list whose contents are to be populated
      * by the caller.  The caller gives the number of elements (in 'size') and
      * the very first element ('element0').  This function will set
@@ -1351,10 +1386,8 @@ Perl__setup_canned_invlist(pTHX_ const STRLEN size, const UV element0,
      * (The first element needs to be passed in, as the underlying code does
      * things differently depending on whether it is zero or non-zero) */
 
-    SV* invlist = _new_invlist(size);
+    SV* invlist = new_invlist_(size);
     bool offset;
-
-    PERL_ARGS_ASSERT__SETUP_CANNED_INVLIST;
 
     invlist = add_cp_to_invlist(invlist, element0);
     offset = *get_invlist_offset_addr(invlist);
@@ -1368,19 +1401,19 @@ Perl__setup_canned_invlist(pTHX_ const STRLEN size, const UV element0,
 
 #ifndef PERL_IN_XSUB_RE
 void
-Perl__invlist_invert(pTHX_ SV* const invlist)
+Perl_invlist_invert_(pTHX_ SV* const invlist)
 {
+    PERL_ARGS_ASSERT_INVLIST_INVERT_;
+
     /* Complement the input inversion list.  This adds a 0 if the list didn't
      * have a zero; removes it otherwise.  As described above, the data
      * structure is set up so that this is very efficient */
 
-    PERL_ARGS_ASSERT__INVLIST_INVERT;
-
     assert(! invlist_is_iterating(invlist));
 
     /* The inverse of matching nothing is matching everything */
-    if (_invlist_len(invlist) == 0) {
-        _append_range_to_invlist(invlist, 0, UV_MAX);
+    if (invlist_len_(invlist) == 0) {
+        append_range_to_invlist_(invlist, 0, UV_MAX);
         return;
     }
 
@@ -1390,17 +1423,17 @@ Perl__invlist_invert(pTHX_ SV* const invlist)
 SV*
 Perl_invlist_clone(pTHX_ SV* const invlist, SV* new_invlist)
 {
+    PERL_ARGS_ASSERT_INVLIST_CLONE;
+
     /* Return a new inversion list that is a copy of the input one, which is
      * unchanged.  The new list will not be mortal even if the old one was. */
 
-    const STRLEN nominal_length = _invlist_len(invlist);
+    const STRLEN nominal_length = invlist_len_(invlist);
     const STRLEN physical_length = SvCUR(invlist);
     const bool offset = *(get_invlist_offset_addr(invlist));
 
-    PERL_ARGS_ASSERT_INVLIST_CLONE;
-
     if (new_invlist == NULL) {
-        new_invlist = _new_invlist(nominal_length);
+        new_invlist = new_invlist_(nominal_length);
     }
     else {
         sv_upgrade(new_invlist, SVt_INVLIST);
@@ -1419,9 +1452,11 @@ Perl_invlist_clone(pTHX_ SV* const invlist, SV* new_invlist)
 
 #ifndef PERL_IN_XSUB_RE
 void
-Perl__invlist_dump(pTHX_ PerlIO *file, I32 level,
+Perl_invlist_dump_(pTHX_ PerlIO *file, I32 level,
                          const char * const indent, SV* const invlist)
 {
+    PERL_ARGS_ASSERT_INVLIST_DUMP_;
+
     /* Designed to be called only by do_sv_dump().  Dumps out the ranges of the
      * inversion list 'invlist' to 'file' at 'level'  Each line is prefixed by
      * the string 'indent'.  The output looks like this:
@@ -1439,10 +1474,8 @@ Perl__invlist_dump(pTHX_ PerlIO *file, I32 level,
     UV start, end;
     STRLEN count = 0;
 
-    PERL_ARGS_ASSERT__INVLIST_DUMP;
-
     if (invlist_is_iterating(invlist)) {
-        Perl_dump_indent(aTHX_ level, file,
+        dump_indent(level, file,
              "%sCan't dump inversion list because is in middle of iterating\n",
              indent);
         return;
@@ -1451,17 +1484,17 @@ Perl__invlist_dump(pTHX_ PerlIO *file, I32 level,
     invlist_iterinit(invlist);
     while (invlist_iternext(invlist, &start, &end)) {
         if (end == UV_MAX) {
-            Perl_dump_indent(aTHX_ level, file,
+            dump_indent(level, file,
                                        "%s[%" UVuf "] 0x%04" UVXf " .. INFTY\n",
                                    indent, (UV)count, start);
         }
         else if (end != start) {
-            Perl_dump_indent(aTHX_ level, file,
+            dump_indent(level, file,
                                     "%s[%" UVuf "] 0x%04" UVXf " .. 0x%04" UVXf "\n",
                                 indent, (UV)count, start,         end);
         }
         else {
-            Perl_dump_indent(aTHX_ level, file, "%s[%" UVuf "] 0x%04" UVXf "\n",
+            dump_indent(level, file, "%s[%" UVuf "] 0x%04" UVXf "\n",
                                             indent, (UV)count, start);
         }
         count += 2;
@@ -1470,21 +1503,21 @@ Perl__invlist_dump(pTHX_ PerlIO *file, I32 level,
 
 #endif
 
-#if defined(PERL_ARGS_ASSERT__INVLISTEQ) && !defined(PERL_IN_XSUB_RE)
+#if defined(PERL_ARGS_ASSERT_INVLISTEQ_) && !defined(PERL_IN_XSUB_RE)
 bool
-Perl__invlistEQ(pTHX_ SV* const a, SV* const b, const bool complement_b)
+Perl_invlistEQ_(pTHX_ SV* const a, SV* const b, const bool complement_b)
 {
+    PERL_ARGS_ASSERT_INVLISTEQ_;
+
     /* Return a boolean as to if the two passed in inversion lists are
      * identical.  The final argument, if true, says to take the complement of
      * the second inversion list before doing the comparison */
 
-    const UV len_a = _invlist_len(a);
-    UV len_b = _invlist_len(b);
+    const UV len_a = invlist_len_(a);
+    UV len_b = invlist_len_(b);
 
     const UV* array_a = NULL;
     const UV* array_b = NULL;
-
-    PERL_ARGS_ASSERT__INVLISTEQ;
 
     /* This code avoids accessing the arrays unless it knows the length is
      * non-zero */

@@ -1,0 +1,13 @@
+<%
+  my $grants = $c->session('grants');
+  my @perms  = $grants && $grants->{permissions} ? @{$grants->{permissions}} : ();
+  my @groups = $grants && $grants->{groups}      ? @{$grants->{groups}}      : ();
+  my $perms_js  = join(', ', map { qq{"$_"} } @perms);
+  my $groups_js = join(', ', map { qq{"$_"} } @groups);
+%>
+<script>
+  window.fondationPerms  = [<%== $perms_js %>];
+  window.fondationGroups = [<%== $groups_js %>];
+  window.fondationCheckPerm  = function(p){ return !window.fondationPerms.length||window.fondationPerms.indexOf(p)!==-1; };
+  window.fondationCheckGroup = function(g){ return !window.fondationGroups.length||window.fondationGroups.indexOf(g)!==-1; };
+</script>

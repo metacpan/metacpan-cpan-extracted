@@ -26,6 +26,7 @@ All text above, and the splash screen below must be included in any redistributi
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "ssd1306_i2c.h"
 
@@ -333,12 +334,25 @@ void ssd1306_display(void)
 #endif
 
 	// I2C
+	// Stream the whole framebuffer in one transaction: a single 0x40
+	// control byte (Co = 0, so every following byte is display data) then
+	// all the data bytes, instead of a control+data pair per byte. This
+	// turns a refresh from ~1024 I2C transactions into one.
 	int i;
-	for (i = 0; i < (SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8); i++) {
-		wiringPiI2CWriteReg8(i2cd, 0x40, buffer[i]); 
-		//This sends byte by byte. 
-		//Better to send all buffer without 0x40 first
-		//Should be optimized
+	int n = SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8;
+	unsigned char buf[1 + (SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8)];
+
+	buf[0] = 0x40;	// Co = 0, D/C = 1: data stream follows
+	for (i = 0; i < n; i++) {
+		buf[i + 1] = (unsigned char) buffer[i];
+	}
+
+	if (write(i2cd, buf, n + 1) != n + 1) {
+		// Fallback for any adapter that caps a single transfer: the
+		// original one-byte-per-frame path.
+		for (i = 0; i < n; i++) {
+			wiringPiI2CWriteReg8(i2cd, 0x40, buffer[i]);
+		}
 	}
 }
 

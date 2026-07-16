@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '3.1801';
+our $VERSION = '3.1802';
 
 require XSLoader;
 XSLoader::load('RPi::OLED::SSD1306::128_64', $VERSION);
@@ -50,13 +50,25 @@ use constant {
 my $oled;
 
 sub new {
-    return $oled if defined $oled;
-
     my ($class, $i2c_addr, $display_splash_screen) = @_;
 
+    $i2c_addr             //= 0x3C;
     $display_splash_screen //= 1;
 
-    $i2c_addr //= 0x3C;
+    # Singleton: only one panel object exists. A second new() returns the live
+    # one, but warn if it asks for a different address or splash setting - those
+    # can't take effect on the already-initialized display, and silently
+    # ignoring them hides the mistake.
+    if (defined $oled){
+        if ($i2c_addr != $oled->{i2c_addr}
+            || $display_splash_screen != $oled->{splash}){
+            warn "RPi::OLED::SSD1306::128_64: new() is a singleton; returning "
+               . "the existing display (addr "
+               . sprintf('0x%02X', $oled->{i2c_addr})
+               . ") and ignoring the new address/splash arguments\n";
+        }
+        return $oled;
+    }
 
     ssd1306_begin(SSD1306_SWITCHCAPVCC, $i2c_addr);
 
@@ -67,7 +79,7 @@ sub new {
 
     ssd1306_clearDisplay();
 
-    my $self = bless {}, $class;
+    my $self = bless { i2c_addr => $i2c_addr, splash => $display_splash_screen }, $class;
     $oled = $self;
     return $self;
 }
@@ -75,6 +87,17 @@ sub clear {
     my ($self) = @_;
     ssd1306_clearDisplay();
     ssd1306_display();
+
+    return 1;
+}
+sub clear_buffer {
+    my ($self) = @_;
+
+    # Zero the in-memory framebuffer and home the cursor WITHOUT pushing to the
+    # panel (unlike clear(), which also calls display()). Pairing this with a
+    # single display() lets a caller rebuild and push a whole frame in one
+    # write, so a continuously-refreshing screen updates with no blank flash.
+    ssd1306_clearDisplay();
 
     return 1;
 }
@@ -141,7 +164,7 @@ sub pixel {
         croak "X must be between 0 and 127";
     }
     if ($y < 0 || $y > 63){
-        croak "Y must be betwen 0 and 63";
+        croak "Y must be between 0 and 63";
     }
 
     ssd1306_drawPixel($x, $y, $colour);
@@ -200,11 +223,45 @@ __END__
 
 RPi::OLED::SSD1306::128_64 - Interface to the SSD1306-esque 128x64 OLED displays
 
+=head1 SYNOPSIS
+
+    use RPi::OLED::SSD1306::128_64;
+
+    # The panel defaults to I2C address 0x3C
+    my $oled = RPi::OLED::SSD1306::128_64->new;
+
+    $oled->text_size(1);
+
+    # Draw text and push it to the screen. A trailing 1 on string() calls
+    # display() for you; "\n" starts a new line, and long lines wrap.
+    $oled->string("Hello, OLED!\nline two", 1);
+
+    # Drawing primitives fill the in-memory buffer; call display() to show them
+    $oled->clear;
+    $oled->rect(0, 0, 40, 20, 1);           # filled rectangle
+    $oled->horizontal_line(0, 32, 128, 1);  # a horizontal line
+    $oled->pixel(64, 40, 1);                # a single pixel
+    $oled->display;
+
+    # Flicker-free continuous refresh: rebuild the whole frame in the buffer
+    # each pass, then push it once (no blank flash between frames)
+    while (1) {
+        $oled->clear_buffer;                     # zero buffer + home cursor
+        $oled->string(sprintf("tick %d", time)); # draw (no auto-display)
+        $oled->display;                          # single push to the panel
+        select(undef, undef, undef, 0.2);
+    }
+
+    $oled->clear;   # blank the panel when done
+
 =head1 DESCRIPTION
 
 Provides the ability to use the 128x64 SSD1306 type OLED displays.
 
-This distribution requires wiringPi version 2.36+ to be installed.
+This distribution requires wiringPi version 3.18+ to be installed (the
+canonical minimum for the whole RPi:: family is published as
+C<WIRINGPI_MIN_VERSION> in L<RPi::Const>, which this distribution's
+C<Makefile.PL> consumes).
 
 =head1 METHODS
 
@@ -226,6 +283,16 @@ which is extremely common.
 
 Wipes the display clean, and sets the cursor to the top-left position on the
 screen.
+
+Returns C<< 1 >> on success.
+
+=head2 clear_buffer
+
+Zeroes the in-memory framebuffer and homes the cursor, but does B<not> push the
+result to the panel (unlike L</clear>, which also refreshes the screen). Pair it
+with a single L</display> to rebuild and draw a whole frame in one write - handy
+for a continuously-updating screen, where clearing straight to the panel each
+frame would flicker.
 
 Returns C<< 1 >> on success.
 
@@ -441,6 +508,103 @@ C<0> will set it back to normal (white on black background). Defaults to C<0> if
 not sent in.
 
 Returns C<1> on success.
+
+=head1 TECHNICAL INFORMATION
+
+The bus work lives in the bundled C layer (C<ssd1306_i2c.c>, a port of
+the Adafruit SSD1306 library); the Perl methods draw into a 1KB
+framebuffer on the Pi and push it to the panel over I2C.
+
+=head2 DEVICE SPECIFICS
+
+    - SSD1306: 128x64 monochrome OLED controller/driver
+    - Graphics RAM is 1KB, arranged as 8 pages of 128 bytes; each byte
+      is a vertical strip of 8 pixels
+    - This driver mirrors that RAM in a Pi-side buffer: the draw calls
+      only touch the buffer, and display() pushes all 1024 bytes out
+    - I2C address 0x3C (the module default), or 0x3D with the SA0 line
+      strapped high
+    - I2C clocks up to 400kHz (t_cycle 2.5us minimum); the Pi's default
+      100kHz works fine
+    - Logic supply 1.65-3.3V; the higher OLED panel voltage is made by
+      the chip's internal charge pump, switched on during init
+    - The bare chip also speaks SPI and parallel buses; I2C breakout
+      boards hardwire the interface-select pins
+
+Wiring a typical 4-pin I2C breakout: VCC to 3.3V, GND to ground, SDA to
+GPIO 2 (pin 3), SCL to GPIO 3 (pin 5). C<i2cdetect -y 1> shows the panel
+at C<0x3C>.
+
+=head2 COMMAND SET
+
+Every byte sent to the chip is framed by a control byte (see
+L</ON THE WIRE>) marking it as either a command or display data - there
+are no addressable registers. The commands this driver uses:
+
+    0xAE / 0xAF   Display off / on
+    0x81 xx       Contrast (init sets 0xCF; dim() sends 0x00)
+    0xA4          Resume displaying the RAM contents
+    0xA6 / 0xA7   Normal / inverted video (invert_display())
+    0x20 00       Memory addressing mode: horizontal, auto-wrapping
+    0x21 s e      Column address window (display() uses 0-127)
+    0x22 s e      Page address window (display() uses 0-7)
+    0x40+n        Display start line (init: line 0)
+    0xA1          Segment remap - X flip (init)
+    0xC8          COM scan direction - Y flip (init)
+    0xA8 3F       Multiplex ratio: 64 rows
+    0xD3 00       Display offset: none
+    0xD5 80       Display clock divide ratio / oscillator
+    0xD9 F1       Precharge periods
+    0xDA 12       COM pins layout for 128x64
+    0xDB 40       VCOMH deselect level
+    0x8D 14       Charge pump on
+    0x2E          Deactivate scroll
+
+C<new()> runs the whole bring-up sequence above; after that the only
+traffic is the odd contrast/invert command and display() pushes.
+
+=head2 ON THE WIRE
+
+The C layer writes through the kernel's C</dev/i2c-1>, and every frame
+is three bytes: the chip address, a control byte, then one payload byte.
+The control byte is C<0x00> for a command and C<0x40> for display data
+(bit 6 is D/C#, bit 7 is Co):
+
+    S = START    P = STOP    A = ACK (receiver pulls SDA low)
+
+A command - here 0xAF (display on) at address 0x3C, which is C<0x78> on
+the wire:
+
+    +---+------+---+------+---+------+---+---+
+    | S | 0x78 | A | 0x00 | A | 0xAF | A | P |
+    +---+------+---+------+---+------+---+---+
+         addr+W     Control    Command
+         (0x3C)     = command
+
+The framebuffer streams out in a single transaction - one 0x40 control
+byte (Co = 0, so every byte after it is display data), then all 1024
+buffer bytes, before the STOP:
+
+    +---+------+---+------+---+------+-- --+------+---+---+
+    | S | 0x78 | A | 0x40 | A | 0xFF | ... | 0x00 | A | P |
+    +---+------+---+------+---+------+-- --+------+---+---+
+         addr+W     Control    1024 data bytes, eight
+                    = data     vertical pixels each
+
+A full display() is six command frames (resetting the column and page
+windows to 0-127 / 0-7) followed by that one 1025-byte data transaction
+- about 0.09s per refresh at the Pi's default 100kHz, which is bus-bound
+(raise C<dtparam=i2c_arm_baudrate> to go faster). Earlier releases sent a
+control+data frame per byte (~1024 transactions, ~0.3s); the driver now
+streams the whole buffer after a single control byte, falling back to the
+byte-by-byte path only if an adapter caps the single transfer.
+
+=head2 DATASHEET
+
+The Solomon Systech SSD1306 datasheet (rev 1.1) is distributed with this
+software as F<docs/datasheet/SSD1306.pdf>. It covers the command set, the
+GDDRAM layout, the I2C control byte framing, and the charge pump this
+driver enables.
 
 =head1 AUTHOR
 

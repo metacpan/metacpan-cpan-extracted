@@ -87,4 +87,47 @@ use Test::Most;
     };
 }
 
+{
+  package Local::Test::Decimals;
+
+  use Moo;
+  use Valiant::Validations;
+
+  has amount => (is=>'ro');
+
+  validates amount => ( numericality => { decimals => 2 } );
+}
+
+{
+  # decimals check must not warn on a value with no decimal point
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_ };
+  ok my $object = Local::Test::Decimals->new(amount => 5);
+  $object->validate;
+  is_deeply \@warnings, [], 'decimals check does not warn on integer value';
+}
+
+{
+  package Local::Test::Numericality::PgSerial;
+
+  use Moo;
+  use Valiant::Validations;
+
+  has id => (is=>'ro');
+
+  validates id => (numericality => 'pg_serial');
+}
+
+{
+  ok my $object = Local::Test::Numericality::PgSerial->new(id=>0);
+  ok $object->validate->invalid, 'serial ids start at 1, so 0 is out of range';
+  is_deeply +{ $object->errors->to_hash(full_messages=>1) },
+    { id => [ "Id is not in acceptable value range" ] };
+}
+
+{
+  ok my $object = Local::Test::Numericality::PgSerial->new(id=>5);
+  ok $object->validate->valid, 'a real pg_serial value like 5 must validate cleanly';
+}
+
 done_testing;

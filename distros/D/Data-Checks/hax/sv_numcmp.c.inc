@@ -3,7 +3,9 @@
 /* We'd like to call Perl_do_ncmp, except that isn't an exported API function
  * Here's a near-copy of it */
 
-#define sv_numcmp(left, right)  S_sv_numcmp(aTHX_ left, right)
+#ifndef sv_numcmp
+
+#  define sv_numcmp(left, right)  S_sv_numcmp(aTHX_ left, right)
 static int S_sv_numcmp(pTHX_ SV *left, SV *right)
 {
 #ifndef HAVE_BOOL_SvIV_please_nomg
@@ -70,3 +72,5 @@ static int S_sv_numcmp(pTHX_ SV *left, SV *right)
     else               return  0;
   }
 }
+
+#endif

@@ -1,5 +1,6 @@
 128_64.xs
 Changes
+docs/datasheet/SSD1306.pdf
 lib/RPi/OLED/SSD1306/128_64.pm
 LICENSE
 Makefile.PL
@@ -10,6 +11,8 @@ README
 ssd1306_i2c.c
 ssd1306_i2c.h
 t/00-load.t
+t/05-unit.t
+t/10-live.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

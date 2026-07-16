@@ -45,6 +45,7 @@
 
 void
 Perl_reentrant_size(pTHX) {
+        PERL_ARGS_ASSERT_REENTRANT_SIZE;
         PERL_UNUSED_CONTEXT;
 
         /* Set the sizes of the reentrant buffers */
@@ -171,6 +172,7 @@ Perl_reentrant_size(pTHX) {
 
 void
 Perl_reentrant_init(pTHX) {
+        PERL_ARGS_ASSERT_REENTRANT_INIT;
         PERL_UNUSED_CONTEXT;
 
         /* Initialize the whole thing */
@@ -276,6 +278,7 @@ Perl_reentrant_init(pTHX) {
 
 void
 Perl_reentrant_free(pTHX) {
+        PERL_ARGS_ASSERT_REENTRANT_FREE;
         PERL_UNUSED_CONTEXT;
 
         /* Tear down */
@@ -371,6 +374,8 @@ Perl_reentrant_free(pTHX) {
 void*
 Perl_reentrant_retry(const char *f, ...)
 {
+    PERL_ARGS_ASSERT_REENTRANT_RETRY;
+
     /* This function is set up to be called if the normal function returns
      * failure with errno ERANGE, which indicates the buffer is too small.
      * This function calls the failing one again with a larger buffer.
@@ -396,7 +401,6 @@ Perl_reentrant_retry(const char *f, ...)
 
     /* Easier to special case this here than in embed.pl. (Look at what it
        generates for proto.h) */
-    PERL_ARGS_ASSERT_REENTRANT_RETRY;
 
 #endif
 

@@ -1,7 +1,7 @@
 # t/xhtml01.t - check basic output from Pod::Simple::XHTML
 use strict;
 use warnings;
-use Test::More tests => 64;
+use Test::More tests => 68;
 
 use_ok('Pod::Simple::XHTML') or exit;
 
@@ -11,7 +11,8 @@ isa_ok ($parser, 'Pod::Simple::XHTML');
 my $results;
 
 my $PERLDOC = "https://metacpan.org/pod";
-my $MANURL = "http://man.he.net/man";
+my $MANURL = "https://man7.org/linux/man-pages/man";
+my $MANURL_POSTFIX = ".html";
 
 initialize($parser, $results);
 $parser->parse_string_document( "=head1 Poit!" );
@@ -457,6 +458,27 @@ is($results, <<'EOHTML', 'multiparagraph nested lists');
 
 EOHTML
 
+
+initialize($parser, $results);
+$parser->parse_string_document(<<'EOPOD');
+=over
+
+Over section without any =item directives.
+
+=back
+
+EOPOD
+
+is($results, <<'EOHTML', 'multiparagraph nested lists');
+<blockquote>
+
+<p>Over section without any =item directives.</p>
+
+</blockquote>
+
+EOHTML
+
+
 initialize($parser, $results);
 $parser->parse_string_document(<<'EOPOD');
 =pod
@@ -622,6 +644,18 @@ is($results, <<"EOHTML", "File name in a paragraph");
 
 EOHTML
 
+initialize($parser, $results);
+$parser->parse_string_document(<<'EOPOD');
+=pod
+
+A plain paragraph with U<underlined text>.
+EOPOD
+is($results, <<"EOHTML", "Underlined text in a paragraph");
+<p>A plain paragraph with <u>underlined text</u>.</p>
+
+EOHTML
+
+
 # It's not important that 's (apostrophes) be encoded for XHTML output.
 initialize($parser, $results);
 $parser->parse_string_document(<<'EOPOD');
@@ -678,7 +712,7 @@ is($results, "$html\n\n", "Text with =begin html");
 
 SKIP: for my $use_html_entities (0, 1) {
   if ($use_html_entities and not $Pod::Simple::XHTML::HAS_HTML_ENTITIES) {
-    skip("HTML::Entities not installed", 3);
+    skip("HTML::Entities not installed", 4);
   }
   local $Pod::Simple::XHTML::HAS_HTML_ENTITIES = $use_html_entities;
   initialize($parser, $results);
@@ -717,11 +751,28 @@ EOHTML
   # Keep =encoding out of content.
   initialize($parser, $results);
   $parser->parse_string_document("=encoding ascii\n\n=head1 NAME\n");
-  is($results, <<"EOHTML", 'Encoding should not be in content')
+  is($results, <<"EOHTML", 'Encoding should not be in content');
 <h1 id="NAME">NAME</h1>
 
 EOHTML
 
+  initialize($parser, $results);
+  $parser->parse_string_document(<<"EOPOD");
+=pod
+
+=encoding UTF-8
+
+The pilcrow, ¶, is used to mark the beginning of a new paragraph.
+
+=cut
+
+EOPOD
+
+  $T = $use_html_entities ? '&para;' : '&#xB6;';
+  is($results, <<"EOHTML", 'Non-ASCII characters are escaped')
+<p>The pilcrow, ${T}, is used to mark the beginning of a new paragraph.</p>
+
+EOHTML
 }
 
 
@@ -755,11 +806,12 @@ is $parser->resolve_pod_page_link('perlpod', 'this that'),
     'POD link with fragment with space';
 
 is $parser->resolve_man_page_link('crontab(5)', 'EXAMPLE CRON FILE'),
-    "${MANURL}5/crontab", 'Man link with fragment';
+    "${MANURL}5/crontab.5${MANURL_POSTFIX}#EXAMPLE_CRON_FILE",
+    'Man link with fragment';
 is $parser->resolve_man_page_link('crontab(5)'),
-    "${MANURL}5/crontab", 'Man link without fragment';
+    "${MANURL}5/crontab.5${MANURL_POSTFIX}", 'Man link without fragment';
 is $parser->resolve_man_page_link('crontab'),
-    "${MANURL}1/crontab", 'Man link without section';
+    "${MANURL}1/crontab.1${MANURL_POSTFIX}", 'Man link without section';
 
 # Make sure that batch_mode_page_object_init() works.
 ok $parser->batch_mode_page_object_init(0, 0, 0, 0, 6),

@@ -263,7 +263,7 @@ Valiant::I18N - Translations
 
     my $translated_string = Valiant::I18N->translate($tag, %args);
 
-    =head1 DESCRIPTION
+=head1 DESCRIPTION
 
 You should see L<Valiant> for some details on how this is used with the core
 validations code.
@@ -294,6 +294,26 @@ key namespace that will be prepended to the translation tag for lookup.
 an integer to specify pluralization subkeys.
 
 =back
+
+=head2 make_tag ($string)
+
+Given a string, returns it blessed as a translation tag (the same thing the
+exported C<_t> function creates).  Translation tags are how Valiant tells
+"this string should be localized" apart from plain strings.
+
+=head2 is_i18n_tag ($value)
+
+Returns true if the given value is a translation tag (as created by L</make_tag>
+or C<_t>), false otherwise.
+
+=head2 set_languages (@languages)
+
+Sets the list of languages (in preference order) used to resolve translations.
+
+=head2 detect_languages_from_header ($header)
+
+Given an HTTP C<Accept-Language> header value, detects and sets the languages
+used to resolve translations.
 
 =head1 SEE ALSO
  

@@ -2,10 +2,20 @@ package Valiant::Validator::Check;
 
 use Moo;
 use Valiant::I18N;
+use Scalar::Util 'blessed';
 
 with 'Valiant::Validator::Each';
 
-has constraint => (is=>'ro', required=>1, isa=>sub {shift->can('check')});
+has constraint => (is=>'ro', required=>1, isa=>sub {
+  my $value = shift;
+  my $ref = ref($value) || '';
+  return if $ref eq 'CODE';
+  my @constraints = $ref eq 'ARRAY' ? @$value : ($value);
+  foreach my $constraint (@constraints) {
+    die "constraint must be an object (or arrayref of objects) that can 'check'"
+      unless blessed($constraint) && $constraint->can('check');
+  }
+});
 has check => (is=>'ro', required=>1, default=>sub {_t 'check'});
 
 sub normalize_shortcut {

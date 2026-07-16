@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Construct measured phrases of notes
 
-our $VERSION = '0.0120';
+our $VERSION = '0.0126';
 
 use v5.36;
 use Moo;
@@ -36,13 +36,6 @@ has octave => (
 );
 
 
-has pitches_name => (
-    is      => 'rw',
-    isa     => sub { croak "$_[0] is not a valid pitches name" unless defined $_[0] },
-    default => sub { '2 octaves' },
-);
-
-
 has pitches => (
     is      => 'rw',
     lazy    => 1,
@@ -58,13 +51,6 @@ sub _build_pitches ($self) {
     say 'Built pitches: ', join ' ', @pitches if $self->verbose;
     return \@pitches;
 }
-
-
-has intervals_name => (
-    is      => 'rw',
-    isa     => sub { croak "$_[0] is not a valid intervals name" unless defined $_[0] },
-    default => sub { '-3..-1,1..3' },
-);
 
 
 has intervals => (
@@ -84,6 +70,7 @@ sub _build_voice ($self) {
     my $voice = Music::VoiceGen->new(
         pitches   => $self->pitches,
         intervals => $self->intervals,
+        verbose   => $self->verbose,
     );
     say "Built voice: $voice" if $self->verbose;
     return $voice;
@@ -129,6 +116,7 @@ sub _build__rhythm ($self) {
       pool    => $self->pool,
       weights => $self->weights,
       groups  => $self->groups,
+      verbose => $self->verbose,
   );
   say "Built rhythm generator: $mdp" if $self->verbose;
   return $mdp;
@@ -154,6 +142,20 @@ has voices => (
     is      => 'rw',
     lazy    => 1,
     builder => 'build_voices',
+);
+
+
+has metadata => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a hash-ref" unless ref $_[0] eq 'HASH' },
+    default => sub { +{} },
+);
+
+
+has verbose => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 0 },
 );
 
 
@@ -227,13 +229,6 @@ has rest_prob => (
 );
 
 
-has verbose => (
-    is      => 'rw',
-    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
-    default => sub { 0 },
-);
-
-
 # sub BUILD ($self, $args) {
 #     $self->_build_motifs;
 # }
@@ -272,7 +267,7 @@ Music::VoicePhrase - Construct measured phrases of notes
 
 =head1 VERSION
 
-version 0.0120
+version 0.0126
 
 =head1 SYNOPSIS
 
@@ -280,20 +275,26 @@ version 0.0120
 
   my $mvp = Music::VoicePhrase->new;
 
+  # or also with external processing metadata:
+  my %metadata = (key => 'value!', color => 'hot-pink');
+  $mvp = Music::VoicePhrase->new(metadata => \%metadata);
+  $mvp->metadata(\%metadata);
+  my $value = $mvp->metadata->{key}; # ghetto access - ugh
+
   my $motifs = $mvp->motifs; # using defaults
   my $voices = $mvp->voices;
 
-  $mvp->motif_num(6); # get fresh
+  # get fresh:
   $motifs = $mvp->build_motifs;
   $voices = $mvp->build_voices;
 
 =head1 DESCRIPTION
 
 A C<Music::VoicePhrase> constructs a measured phrase of voices with
-both pitch and rhythmic value.
+both pitch and rhythmic values.
 
-This module is also equipped with handy attributes to make
-real-time processing work. See the linked script in the
+This module is also equipped with handy attributes to make real-time
+processing work. See the linked phrase generator app in the
 L</"SEE ALSO"> section.
 
 =head1 ATTRIBUTES
@@ -322,30 +323,15 @@ Octave integer from C<0> to C<9>.
 
 Default: C<0>
 
-=head2 pitches_name
-
-  $pitches_name = $mvp->pitches_name;
-
-Name for the given B<pitches>, used in real-time processing.
-
-Default: C<'2 octaves'>
-
 =head2 pitches
 
   $pitches = $mvp->pitches;
 
-The allowed pitches in MIDI number format.
+Pitches that define the L<Music::VoiceGen> selection. (This is just
+an array-ref of midi-numbers.)
 
 Default: 2 consecutive octaves given the B<base> note, B<scale> name,
 and starting B<octave>.
-
-=head2 intervals_name
-
-  $intervals_name = $mvp->intervals_name;
-
-Name for the given B<intervals>, used in real-time processing.
-
-Default: C<'-3..-1,1..3'>
 
 =head2 intervals
 
@@ -361,8 +347,10 @@ Default: [-3, -2, -1, 1, 2, 3]
 
 The number of beats in a phrase. This is usually an integer like C<4>
 beats for a measure. But it can also be a float, as the
-L<Music::Duration::Partition> module takes fractional numbers. For
-instance size C<2.5> represents C<5/8> time. Because a size of <5>
+L<Music::Duration::Partition> module takes fractional numbers to
+represent odd meters.
+
+For instance size C<2.5> represents C<5/8> time. Because a size of <5>
 represents C<5/4> time.
 
 Default: C<4>
@@ -372,7 +360,7 @@ Default: C<4>
   $pool = $mvp->pool;
 
 The pool of note durations, given in Perl L<MIDI> abbreviated
-notation, that define the L<Music::Duration::Partition> phrase.
+notation, that define a L<Music::Duration::Partition> phrase.
 
 Default: ['dhn', 'hn', 'qn']
 
@@ -380,7 +368,7 @@ Default: ['dhn', 'hn', 'qn']
 
   $weights = $mvp->weights;
 
-Weights that define the L<Music::Duration::Partition> phrase.
+Weights that define a L<Music::Duration::Partition> phrase.
 
 Default: [ 1, 2, 2 ]
 
@@ -388,7 +376,7 @@ Default: [ 1, 2, 2 ]
 
   $groups = $mvp->groups;
 
-Groups that define the L<Music::Duration::Partition> phrase.
+Groups that define a L<Music::Duration::Partition> phrase.
 
 Default: [ 0, 0, 0 ]
 
@@ -404,7 +392,8 @@ Default: C<4>
 
   $motifs = $mvp->motifs;
 
-The rhythmic motifs given by L<Music::Duration::Partition>.
+The rhythmic motifs generated by the L<Music::Duration::Partition>
+module.
 
 Default: C<4> motifs
 
@@ -412,15 +401,36 @@ Default: C<4> motifs
 
   $voices = $mvp->voices;
 
-The pitches given by L<Music::VoiceGen>.
+The pitches that are generated by L<Music::VoiceGen> C<rand()> method.
 
 Default: C<4> voices
+
+=head2 metadata
+
+  $metadata = $mvp->metadata;
+  $mvp->metadata(\%data);
+
+Extra, named C<key/value> things!
+
+Default: C<{}> (nothing extra)
+
+=head2 verbose
+
+  $verbose = $mvp->verbose;
+
+Show progress.
+
+Default: C<0>
+
+=head1 Extra
+
+These attributes are used in real-time processing, etc.
 
 =head2 name
 
   $name = $mvp->name;
 
-Name for the given part, used in real-time processing.
+Name for the given part.
 
 Default: C<'part'>
 
@@ -428,8 +438,7 @@ Default: C<'part'>
 
   $patch = $mvp->patch;
 
-Patch / synth program integer from C<0> to C<127> used in real-time
-processing.
+Patch / synth program integer from C<0> to C<127>.
 
 Default: C<0> (GM piano)
 
@@ -441,8 +450,6 @@ A possibly fractional amount representing how long a note-length is
 between C<0> and C<2>. A C<0> value means that the note is not played.
 A C<2> means the note is to be held twice as long.
 
-This is used in real-time processing.
-
 Default: C<1> (unity)
 
 =head2 volume
@@ -450,7 +457,7 @@ Default: C<1> (unity)
   $volume = $mvp->volume;
   $mvp->volume($n);
 
-Computed attribute for the volume that is used in real-time processing.
+Computed attribute for the volume.
 
 Default: C<100>
 
@@ -458,14 +465,14 @@ Default: C<100>
 
   $queue = $mvp->queue;
 
-Computed attribute for the priority queue used in real-time processing.
+Computed attribute for the priority queue.
 
 =head2 index
 
   $index = $mvp->index;
   $mvp->index($n);
 
-Computed attribute for the queue index that is used in real-time processing.
+Computed attribute for the queue index.
 
 Default: C<0>
 
@@ -474,8 +481,7 @@ Default: C<0>
   $note = $mvp->note;
   $mvp->note($n);
 
-Computed attribute for the currently selected note that is used in
-real-time processing.
+Computed attribute for the currently selected note.
 
 Default: C<{}>
 
@@ -483,7 +489,7 @@ Default: C<{}>
 
   $onsets = $mvp->onsets;
 
-Computed attribute for the note onsets used in real-time processing.
+Computed attribute for the note onsets.
 
 =head2 channel
 
@@ -498,19 +504,8 @@ Default: C<0>
   $rest_prob = $mvp->rest_prob;
   $mvp->rest_prob($n);
 
-Computed attribute for the rest probability that is used in real-time
-processing.
-
 A value of C<0> means there is no resting. A 20% chance of a rest
 would be C<0.2>. A value of C<1> means "only rest." Ha!
-
-Default: C<0>
-
-=head2 verbose
-
-  $verbose = $mvp->verbose;
-
-Show progress.
 
 Default: C<0>
 

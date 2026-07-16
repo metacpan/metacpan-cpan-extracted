@@ -21,13 +21,13 @@ requires:
   CryptX: '0.080'
   Future: '0.50'
   JSON::MaybeXS: '1.004003'
-  PAGI: '0.001020'
+  PAGI::Tools: '0.002002'
   perl: '5.018'
 resources:
   bugtracker: https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie/issues
   homepage: https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie
   repository: https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie
-version: '0.001004'
+version: '0.001005'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

@@ -1,5 +1,5 @@
 package PAGI::Middleware::Rewrite;
-$PAGI::Middleware::Rewrite::VERSION = '0.002001';
+$PAGI::Middleware::Rewrite::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

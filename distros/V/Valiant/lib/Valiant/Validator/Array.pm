@@ -131,16 +131,16 @@ Valiant::Validator::Array - Verify items in an arrayref.
     #   car => [
     #     "Car Is Invalid",
     #   ],
-    #   "car.0" => [
+    #   "car[0]" => [
     #     "Car Is Invalid",
     #   ],
-    #   "car.0.make" => [
+    #   "car[0].make" => [
     #     "Car Make is not in the list",
     #   ],
-    #   "car.0.model" => [
+    #   "car[0].model" => [
     #     "Car Model is too short (minimum is 2 characters)",
     #   ],
-    #   "car.0.year" => [
+    #   "car[0].year" => [
     #     "Car Year must be greater than or equal to 1960",
     #   ],
     #   name => [
@@ -149,16 +149,16 @@ Valiant::Validator::Array - Verify items in an arrayref.
     #   status => [
     #     "Status Is Invalid",
     #   ],
-    #   "status.1" => [
+    #   "status[1]" => [
     #     "Status is not in the list",
     #   ],
-    #   "status.4" => [
+    #   "status[4]" => [
     #     "Status is not in the list",
     #   ],
-    #   "status.5" => [
+    #   "status[5]" => [
     #     "Status is not in the list",
     #   ],
-    #   "status.6" => [
+    #   "status[6]" => [
     #     "Status is not in the list",
     #   ],
     #  };
@@ -216,6 +216,22 @@ any validations you define on array items fail to validate.  Default is translat
 An arrayref of validations that are run on each item in the list.  Keep in mind the performance
 inplications of this should the list be very long.
 
+=head2 validator_class
+
+Defaults to L<Valiant::Proxy::Array>, which value should be a subclass of.  You probably
+only need this if you are doing very custom validations.
+
+=head2 validator_class_args
+
+A hashref of args that get passed to the C<new> method of C<validator_class>.
+Defaults to an empty hashref.  You might need this if you build a custom validator
+class and have special arguments it needs.
+
+=head2 not_array_err
+
+The error message used when the value under validation is not an arrayref at all.
+Default is translation tag 'not_array_err'.
+
 =head1 SHORTCUT FORM
 
 This validator supports the follow shortcut forms:
@@ -225,10 +241,12 @@ This validator supports the follow shortcut forms:
 Which is the same as:
 
     validates attribute => (
-      validations => [
-        presence => 1,
-        length => [2,10],
-      ],
+      array => {
+        validations => [
+          presence => 1,
+          length => [2,10],
+        ],
+      },
     );
 
 =head1 GLOBAL PARAMETERS

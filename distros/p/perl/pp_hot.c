@@ -47,7 +47,7 @@
  * args
  */
 
-STATIC void
+static void
 S_pp_xs_wrap_return(pTHX_ I32 nargs, I32 old_sp)
 {
     I32 nret = (I32)(PL_stack_sp - PL_stack_base) - old_sp;
@@ -192,7 +192,6 @@ void
 Perl_rpp_free_2_(pTHX_ SV *const sv1,  SV *const sv2,
                        const U32 rc1,  const U32 rc2)
 {
-
     PERL_ARGS_ASSERT_RPP_FREE_2_;
 
 #ifdef PERL_RC_STACK
@@ -224,7 +223,9 @@ Perl_rpp_free_2_(pTHX_ SV *const sv1,  SV *const sv2,
 
 PP(pp_const)
 {
-    rpp_xpush_1(cSVOP_sv);
+    rpp_extend(1);      /* Keep together all PL_op derefs (cSVOP_sv/NORMAL) */
+    SV* sv = cSVOP_sv;  /* in this hot pp op. stack_grow() is a function. */
+    rpp_push_1(sv);     /* Previously rpp_xpush_1(). */
     return NORMAL;
 }
 
@@ -357,7 +358,7 @@ PP(pp_aelemfastlex_store)
 
     /* inlined av_fetch() for simple cases ... */
     if (!SvRMAGICAL(av) && key >=0 && key <= AvFILLp(av)) {
-        targ = AvARRAY(av)[key];
+        targ = AvARRAY(av)[ (U8) key ];
     }
     /* ... else do it the hard way */
     if (!targ) {
@@ -706,7 +707,8 @@ PP(pp_multiconcat)
         *svpv_p,             /* ptr for looping through svpv_buf */
         *svpv_base,          /* first slot (may be greater than svpv_buf), */
         *svpv_end,           /* and slot after highest result so far, of: */
-        svpv_buf[PERL_MULTICONCAT_MAXARG]; /* buf for storing SvPV() results */
+        /* buf for storing SvPV() results */
+        svpv_buf[PERL_MULTICONCAT_MAXARG] __attribute__uninitialized__;
 
     aux   = cUNOP_AUXx(PL_op)->op_aux;
     stack_adj = nargs = aux[PERL_MULTICONCAT_IX_NARGS].ssize;
@@ -1375,7 +1377,8 @@ PP(pp_multiconcat)
                     )
                 {
                     SV * const tmpsv = amagic_call(left, right, concat_amg,
-                                                (nextappend ? AMGf_assign: 0));
+                                                (nextappend ? AMGf_assign: 0)
+                                                   | AMGf_force_scalar);
                     if (tmpsv) {
                         /* NB: tryAMAGICbin_MG() includes an OPpTARGET_MY test
                          * here, which isn't needed as any implicit
@@ -1436,7 +1439,7 @@ PP(pp_multiconcat)
 /* push the elements of av onto the stack.
  * Returns PL_op->op_next to allow tail-call optimisation of its callers */
 
-STATIC OP*
+static OP*
 S_pushav(pTHX_ AV* const av)
 {
     const SSize_t maxarg = AvFILL(av) + 1;
@@ -1588,7 +1591,7 @@ PP(pp_readline)
         SvGETMAGIC(arg);
 
         /* unrolled tryAMAGICunTARGETlist(iter_amg, 0) */
-        SV *tmpsv;
+        SV *tmpsv = NULL;
         U8 gimme = GIMME_V;
         if (UNLIKELY(SvAMAGIC(arg) &&
             (tmpsv = amagic_call(arg, &PL_sv_undef, iter_amg,
@@ -1811,6 +1814,7 @@ PP(pp_add)
     SV *targ = (PL_op->op_flags & OPf_STACKED)
                     ? PL_stack_sp[-1]
                     : PAD_SV(PL_op->op_targ);
+    NV nv;
 
     if (rpp_try_AMAGIC_2(add_amg, AMGf_assign|AMGf_numeric))
         return NORMAL;
@@ -1826,18 +1830,12 @@ PP(pp_add)
         U32 flags = (svl->sv_flags & svr->sv_flags);
         if (flags & SVf_IOK) {
             /* both args are simple IVs */
-            UV topl, topr;
+            IV result;
             il = SvIVX(svl);
             ir = SvIVX(svr);
           do_iv:
-            topl = ((UV)il) >> (UVSIZE * 8 - 2);
-            topr = ((UV)ir) >> (UVSIZE * 8 - 2);
-
-            /* if both are in a range that can't under/overflow, do a
-             * simple integer add: if the top of both numbers
-             * are 00  or 11, then it's safe */
-            if (!( ((topl+1) | (topr+1)) & 2)) {
-                TARGi(il + ir, 0); /* args not GMG, so can't be tainted */
+            if (!S_iv_add_may_overflow(il, ir, &result)) {
+                TARGi(result, 0); /* args not GMG, so can't be tainted */
                 goto ret;
             }
             goto generic;
@@ -1923,7 +1921,7 @@ PP(pp_add)
         } else {
             /* Left operand is defined, so is it IV? */
             if (SvIV_please_nomg(svl)) {
-                if ((auvok = SvUOK(svl)))
+                if ((auvok = SvIsUV(svl)))
                     auv = SvUVX(svl);
                 else {
                     const IV aiv = SvIVX(svl);
@@ -1941,7 +1939,7 @@ PP(pp_add)
             bool result_good = 0;
             UV result;
             UV buv;
-            bool buvok = SvUOK(svr);
+            bool buvok = SvIsUV(svr); /* svr is always IOK here */
         
             if (buvok)
                 buv = SvUVX(svr);
@@ -1994,7 +1992,8 @@ PP(pp_add)
                         TARGi(NEGATE_2IV(result), 1);
                     else {
                         /* result valid, but out of range for IV.  */
-                        TARGn(-(NV)result, 1);
+                        nv = -(NV)result;
+                        goto ret_nv;
                     }
                 }
                 goto ret;
@@ -2006,16 +2005,13 @@ PP(pp_add)
     useleft = USE_LEFT(svl);
 #endif
 
-    {
-        NV value = SvNV_nomg(svr);
-        if (!useleft) {
-            /* left operand is undef, treat as zero. + 0.0 is identity. */
-            TARGn(value, 1);
-        }
-        else {
-            TARGn(value + SvNV_nomg(svl), 1);
-        }
-    }
+    /* If left operand is undef, treat as zero. */
+    nv = useleft ? SvNV_nomg(svl) : 0.0;
+    /* Separate statements here to ensure SvNV_nomg(svl) is evaluated
+       before SvNV_nomg(svr) */
+    nv += SvNV_nomg(svr);
+  ret_nv:
+    TARGn(nv, 1);
 
   ret:
     rpp_replace_2_1_NN(targ);
@@ -2038,7 +2034,7 @@ PP(pp_aelemfast)
 
     /* inlined av_fetch() for simple cases ... */
     if (!SvRMAGICAL(av) && key >= 0 && key <= AvFILLp(av)) {
-        sv = AvARRAY(av)[key];
+        sv = AvARRAY(av)[ (U8) key ];
         if (sv)
             goto ret;
         if (!lval) {
@@ -2102,7 +2098,7 @@ PP(pp_print)
             *MARK = NULL;
             ++PL_stack_sp;
         }
-        return Perl_tied_method(aTHX_ SV_CONST(PRINT), mark - 1, MUTABLE_SV(io),
+        return tied_method(SV_CONST(PRINT), mark - 1, MUTABLE_SV(io),
                                 mg,
                                 (G_SCALAR | TIED_METHOD_ARGUMENTS_ON_STACK
                                  | (PL_op->op_type == OP_SAY
@@ -2498,7 +2494,7 @@ PP(pp_rv2av)
 }
 
 
-STATIC void
+static void
 S_do_oddball(pTHX_ SV **oddkey, SV **firstkey)
 {
     PERL_ARGS_ASSERT_DO_ODDBALL;
@@ -2709,7 +2705,7 @@ S_aassign_copy_common(pTHX_ SV **firstlelem, SV **lastlelem,
  * PL_delaymagic; now we tell the OS to update the uids/gids atomically.
  */
 
-STATIC void
+static void
 S_aassign_uid(pTHX)
 {
     /* Will be used to set PL_tainting below */
@@ -3151,11 +3147,13 @@ PP(pp_aassign)
         case SVt_PVHV: {				/* normal hash */
 
             SV **svp;
+#ifndef PERL_RC_STACK
             SSize_t i;
+#endif
             SSize_t nelems = lastrelem - relem + 1;
             HV *hash = MUTABLE_HV(lsv);
 
-            if (UNLIKELY(nelems & 1)) {
+            if (UNLIKELY(isODD(nelems))) {
                 do_oddball(lastrelem, relem);
                 /* we have firstlelem to reuse, it's not needed any more */
 #ifdef PERL_RC_STACK
@@ -3330,7 +3328,12 @@ PP(pp_aassign)
                 SV **svp;
                 SV **topelem = relem;
 
-                for (i = 0, svp = relem; svp <= lastrelem; i++, svp++) {
+#ifdef PERL_RC_STACK
+                for (svp = relem; svp <= lastrelem; svp++)
+#else
+                for (i = 0, svp = relem; svp <= lastrelem; i++, svp++)
+#endif
+                {
                     SV *key = *svp++;
                     SV *val = *svp;
                     /* remove duplicates from list we return */
@@ -3375,7 +3378,12 @@ PP(pp_aassign)
             }
             else {
                 SV **svp;
-                for (i = 0, svp = relem; svp <= lastrelem; i++, svp++) {
+#ifdef PERL_RC_STACK
+                for (svp = relem; svp <= lastrelem; svp++)
+#else
+                for (i = 0, svp = relem; svp <= lastrelem; i++, svp++)
+#endif
+                {
                     SV *key = *svp++;
                     SV *val = *svp;
 #ifdef PERL_RC_STACK
@@ -3641,7 +3649,7 @@ PP(pp_qr)
     return NORMAL;
 }
 
-STATIC bool
+static bool
 S_are_we_in_Debug_EXECUTE_r(pTHX)
 {
     /* Given a 'use re' is in effect, does it ask for outputting execution
@@ -3989,7 +3997,8 @@ PP(pp_match)
    is non-blocking but would have blocked if blocking
 */
 PERL_STATIC_INLINE bool
-error_is_would_block(int err) {
+error_is_would_block(int err)
+{
 #ifdef EAGAIN
     if (err == EAGAIN)
         return true;
@@ -4043,6 +4052,7 @@ error_is_would_block(int err) {
 OP *
 Perl_do_readline(pTHX)
 {
+    PERL_ARGS_ASSERT_DO_READLINE;
 
     const I32 type = PL_op->op_type;
 
@@ -4080,7 +4090,7 @@ Perl_do_readline(pTHX)
 
             /* tied_method() frees everything currently above the passed
              * mark, and returns any values at mark[1] onwards */
-            Perl_tied_method(aTHX_ SV_CONST(READLINE),
+            tied_method(SV_CONST(READLINE),
                 /* mark => */ PL_stack_sp,
                               MUTABLE_SV(io), mg, gimme, 0);
 
@@ -4435,7 +4445,7 @@ PP(pp_helem)
 /* a stripped-down version of Perl_softref2xv() for use by
  * pp_multideref(), which doesn't use PL_op->op_flags */
 
-STATIC GV *
+static GV *
 S_softref2xv_lite(pTHX_ SV *const sv, const char *const what,
                 const svtype type)
 {
@@ -4767,6 +4777,7 @@ PP(pp_multideref)
                        || SvTYPE(keysv) >= SVt_PVMG
                        || !SvOK(keysv)
                        || SvROK(keysv)
+                       || SvNOK(keysv)
                        || SvIsCOW_shared_hash(keysv));
 
                 /* this is basically a copy of pp_helem with OPpDEREF skipped */
@@ -4871,6 +4882,11 @@ PP(pp_iter)
     SV **itersvp = CxITERVAR(cx);
     const U8 type = CxTYPE(cx);
     U8 pflags = PL_op->op_private;
+    bool pflag_refalias = (pflags & OPpITER_REFALIAS);
+
+    // TODO: This needs to be an opchecker or compiletime complaint
+    if(pflag_refalias)
+        assert(type == CXt_LOOP_LIST || type == CXt_LOOP_ARY);
 
     /* Classic "for" syntax iterates one-at-a-time.
        Many-at-a-time for loops are only for lexicals declared as part of the
@@ -4882,8 +4898,25 @@ PP(pp_iter)
        for many-at-a-time. We actually store C<how_many - 1>, so that for the
        case of one-at-a-time we have zero (as before), as this makes all the
        logic of the for loop below much simpler, with all the other
-       one-at-a-time cases just falling out of this "naturally". */
+       one-at-a-time cases just falling out of this "naturally".
+
+       If OPpITER_REFALIAS is set, this field actually stores two values.
+       The actual count sits in the lower 8 bits, and the upper 24 bits form a
+       bitmask indicating which of the iterator variables have refalias
+       behaviour */
     PADOFFSET how_many = PL_op->op_targ;
+    U32 refalias_mask = 0;
+    if (pflag_refalias) {
+        refalias_mask = how_many >> 8;
+        how_many &= 0xFF;
+
+        if (!how_many)
+            /* OPpITER_REFALIAS with how_many==0 means that one variable is
+             * refaliased
+             */
+            refalias_mask = 1;
+    }
+
     PADOFFSET i = 0;
 
     assert(itersvp);
@@ -4895,10 +4928,14 @@ PP(pp_iter)
         IV ix;
         IV inc;
 
+        bool refalias_this = refalias_mask & (1<<i);
+
         switch (type) {
 
         case CXt_LOOP_LAZYSV: /* string increment */
             {
+                /* This should have been forbidden by pp_enteriter */
+                assert(!refalias_this);
                 SV* cur = cx->blk_loop.state_u.lazysv.cur;
                 SV *end = cx->blk_loop.state_u.lazysv.end;
                 /* If the maximum is !SvOK(), pp_enteriter substitutes PL_sv_no.
@@ -4961,6 +4998,8 @@ PP(pp_iter)
 
         case CXt_LOOP_LAZYIV: /* integer increment */
             {
+                /* This should have been forbidden by pp_enteriter */
+                assert(!refalias_this);
                 IV cur = cx->blk_loop.state_u.lazyiv.cur;
                 bool pad_it = FALSE;
                 if (UNLIKELY(cur > cx->blk_loop.state_u.lazyiv.end)) {
@@ -5077,6 +5116,38 @@ PP(pp_iter)
             }
 
         loop_ary_common:
+
+            if (refalias_this) {
+                /* TODO(leonerd): pull out this behaviour into a shared place.
+                 * This is mostly copypaste from mg.c's Perl_magic_setlvref */
+                if (!sv || !SvROK(sv)) croak("Assigned value is not a reference");
+                SV *rv = SvRV(sv);
+
+                const char *bad = NULL;
+                /* TODO(leonerd): is it sufficient to use the existing var type? */
+                switch (SvTYPE(*itersvp)) {
+                    case SVt_PVAV:
+                        if(SvTYPE(rv) != SVt_PVAV) bad = "an ARRAY";
+                        break;
+                    case SVt_PVHV:
+                        if(SvTYPE(rv) != SVt_PVHV) bad = "a HASH";
+                        break;
+                    case SVt_PVCV:
+                        if(SvTYPE(rv) != SVt_PVCV) bad = "a CODE";
+                        break;
+                    default:
+                        if(SvTYPE(rv) > SVt_PVLV) bad = "a SCALAR";
+                        break;
+                }
+                if (bad)
+                    croak("Assigned value is not %s reference", bad);
+
+                oldsv = *itersvp;
+                *itersvp = SvREFCNT_inc_NN(rv);
+                SvREFCNT_dec(oldsv);
+
+                break;
+            }
 
             if (UNLIKELY(cx->cx_type & CXp_FOR_LVREF)) {
                 SvSetMagicSV(*itersvp, sv);
@@ -5375,8 +5446,7 @@ PP(pp_subst)
     if (dstr) {
         /* replacement needing upgrading? */
         if (DO_UTF8(TARG) && !doutf8) {
-             nsv = sv_newmortal();
-             SvSetSV(nsv, dstr);
+             nsv = sv_mortalcopy_flags(dstr, SV_GMAGIC|SV_DO_COW_SVSETSV);
              sv_utf8_upgrade(nsv);
              c = SvPV_const(nsv, clen);
              doutf8 = TRUE;
@@ -5841,10 +5911,10 @@ PP(pp_grepwhile)
 void
 Perl_leave_adjust_stacks(pTHX_ SV **from_sp, SV **to_sp, U8 gimme, int pass)
 {
+    PERL_ARGS_ASSERT_LEAVE_ADJUST_STACKS;
+
     SSize_t tmps_base; /* lowest index into tmps stack that needs freeing now */
     SSize_t nargs;
-
-    PERL_ARGS_ASSERT_LEAVE_ADJUST_STACKS;
 
     TAINT_NOT;
 
@@ -6135,7 +6205,7 @@ Perl_leave_adjust_stacks(pTHX_ SV **from_sp, SV **to_sp, U8 gimme, int pass)
     while (PL_tmps_ix >= tmps_base) {
         SV* const sv = PL_tmps_stack[PL_tmps_ix--];
 #ifdef PERL_POISON
-        PoisonWith(PL_tmps_stack + PL_tmps_ix + 1, 1, SV *, 0xAB);
+        PoisonNew(PL_tmps_stack + PL_tmps_ix + 1, 1, SV *);
 #endif
         if (LIKELY(sv)) {
             SvTEMP_off(sv);
@@ -6618,6 +6688,8 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 void
 Perl_croak_caller(const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_CROAK_CALLER;
+
     dTHX;
     va_list args;
     const PERL_CONTEXT *cx = caller_cx(0, NULL);
@@ -6753,6 +6825,8 @@ Perl_vivify_ref(pTHX_ SV *sv, U32 to_what)
 PERL_STATIC_INLINE HV *
 S_opmethod_stash(pTHX_ SV* meth)
 {
+    PERL_ARGS_ASSERT_OPMETHOD_STASH;
+
     SV* ob;
     HV* stash;
 
@@ -6761,8 +6835,6 @@ S_opmethod_stash(pTHX_ SV* meth)
                             "package or object reference", SVfARG(meth)),
            (SV *)NULL)
         : *(PL_stack_base + TOPMARK + 1);
-
-    PERL_ARGS_ASSERT_OPMETHOD_STASH;
 
     if (UNLIKELY(!sv))
        undefined:

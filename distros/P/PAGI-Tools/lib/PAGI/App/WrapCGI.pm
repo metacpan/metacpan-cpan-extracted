@@ -1,5 +1,5 @@
 package PAGI::App::WrapCGI;
-$PAGI::App::WrapCGI::VERSION = '0.002001';
+$PAGI::App::WrapCGI::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

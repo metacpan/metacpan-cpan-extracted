@@ -1,5 +1,5 @@
 package PAGI::Middleware::MethodOverride;
-$PAGI::Middleware::MethodOverride::VERSION = '0.002001';
+$PAGI::Middleware::MethodOverride::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

@@ -5,6 +5,7 @@ Eshu.bs
 Eshu.xs
 ignore.txt
 include/eshu.h
+include/dirent_win.h
 include/eshu_bash.h
 include/eshu_c.h
 include/eshu_css.h

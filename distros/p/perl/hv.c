@@ -152,14 +152,16 @@ STMT_START {                                                            \
 
 #else
 
-STATIC HE*
+static HE*
 S_new_he(pTHX)
 {
+    PERL_ARGS_ASSERT_NEW_HE;
+
     HE* he;
     void ** const root = &PL_body_roots[HE_ARENA_ROOT_IX];
 
     if (!*root)
-        Perl_more_bodies(aTHX_ HE_ARENA_ROOT_IX, sizeof(HE), PERL_ARENA_SIZE);
+        Perl_more_bodies(aTHX_ HE_ARENA_ROOT_IX);
     he = (HE*) *root;
     assert(he);
     *root = HeNEXT(he);
@@ -177,13 +179,13 @@ S_new_he(pTHX)
 
 #endif
 
-STATIC HEK *
+static HEK *
 S_save_hek_flags(const char *str, I32 len, U32 hash, int flags)
 {
+    PERL_ARGS_ASSERT_SAVE_HEK_FLAGS;
+
     char *k;
     HEK *hek;
-
-    PERL_ARGS_ASSERT_SAVE_HEK_FLAGS;
 
     Newx(k, HEK_BASESIZE + len + 2, char);
     hek = (HEK*)k;
@@ -204,6 +206,8 @@ S_save_hek_flags(const char *str, I32 len, U32 hash, int flags)
 void
 Perl_free_tied_hv_pool(pTHX)
 {
+    PERL_ARGS_ASSERT_FREE_TIED_HV_POOL;
+
     HE *he = PL_hv_fetch_ent_mh;
     while (he) {
         HE * const ohe = he;
@@ -218,10 +222,10 @@ Perl_free_tied_hv_pool(pTHX)
 HEK *
 Perl_hek_dup(pTHX_ HEK *source, CLONE_PARAMS* param)
 {
-    HEK *shared;
-
     PERL_ARGS_ASSERT_HEK_DUP;
     PERL_UNUSED_ARG(param);
+
+    HEK *shared;
 
     if (!source)
         return NULL;
@@ -243,9 +247,9 @@ Perl_hek_dup(pTHX_ HEK *source, CLONE_PARAMS* param)
 HE *
 Perl_he_dup(pTHX_ const HE *e, bool shared, CLONE_PARAMS* param)
 {
-    HE *ret;
-
     PERL_ARGS_ASSERT_HE_DUP;
+
+    HE *ret;
 
     /* All the *_dup functions are deemed to be API, despite most being deeply
        tied to the internals. Hence we can't simply remove the parameter
@@ -303,11 +307,11 @@ static void
 S_hv_notallowed(pTHX_ int flags, const char *key, I32 klen,
                 const char *msg)
 {
+    PERL_ARGS_ASSERT_HV_NOTALLOWED;
+
    /* Straight to SVt_PVN here, as needed by sv_setpvn_fresh and
     * sv_usepvn would otherwise call it */
     SV * const sv = newSV_type_mortal(SVt_PV);
-
-    PERL_ARGS_ASSERT_HV_NOTALLOWED;
 
     if (!(flags & HVhek_FREEKEY)) {
         sv_setpvn_fresh(sv, key, klen);
@@ -418,73 +422,59 @@ valid precomputed hash value, or 0 to ask for it to be computed.
 
 =for apidoc      hv_fetch
 =for apidoc_item hv_fetchs
+=for apidoc_item hv_fetch_ent
 
-These each return the SV which corresponds to the specified key in the hash.
-They differ only in how the key is specified.
+These each return the value entry in a hash which corresponds to the specified
+key.
+
+In all, if <hv> is NULL, NULL is returned.
+
+They differ principally in how the key is specified, and the form of the return.
 
 In C<hv_fetchs>, the key must be a C language string literal, enclosed in
 double quotes.  It is never treated as being in UTF-8.  There is no
 length_parameter.
 
-In C<hv_fetch>, the absolute value of C<klen> is the length of the key.  If
-C<klen> is negative the key is assumed to be in UTF-8-encoded Unicode.
-C<key> may contain embedded NUL characters.
+In C<hv_fetch>, C<key> is either NULL or points to the first byte of the string
+specifying the key, and its length in bytes is given by the absolute value of
+an additional parameter, C<klen>.  A NULL key indicates the key is to be
+treated as C<undef>, and C<klen> is ignored.  A non-NULL C<key> may contain
+embedded-NUL characters.  If C<klen> is negative, C<key> is treated as being
+encoded in UTF-8; otherwise not.
 
-In both, if C<lval> is set, then the fetch will be part of a store.  This means
-that if there is no value in the hash associated with the given key, then one
-is created and a pointer to it is returned.  The C<SV*> it points to can be
-assigned to.  But always check that the return value is non-null before
-dereferencing it to an C<SV*>.
+In C<hv_fetch_ent>, the key is stored in the SV C<keysv> which this function
+extracts using C<L</SvPV_const>>.  The key has the same UTF8ness as C<keysv>.
+
+The value entry returned by C<hv_fetch> and C<hv_fetchs> is an SV**.  Always
+check that the return value is non-null before dereferencing it to an C<SV*>.
+
+The value entry returned by C<hv_fetch_ent> is a pointer to a
+L<C<HE>|perlguts/Working with HVs> structure with the all fields set.  When
+C<hv> is a tied hash, the HE structure is in a static location, so be sure to
+make a copy of the structure if you need to store it somewhere.  Also, for
+MAGICAL hashes, the C<hent_val> field in the returned HE structure will be a
+mortal sv.
+
+In all, if C<lval> is non-zero, then the fetch will be part of a store.  This
+means that if there is no value in the hash associated with the given key,
+then a SV* is created, accessible through the returned value.
 
 See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
-information on how to use this function on tied hashes.
+information on how to use these functions on tied hashes.
+
+C<hv_fetch_ent> has an additional parameter, C<hash>.  It must be a valid
+precomputed hash number for the given C<key>, or 0 if you want the function to
+compute it.
 
 =cut
 */
-
-/* returns an HE * structure with the all fields set */
-/* note that hent_val will be a mortal sv for MAGICAL hashes */
-/*
-=for apidoc hv_fetch_ent
-
-Returns the hash entry which corresponds to the specified key in the hash.
-C<hash> must be a valid precomputed hash number for the given C<key>, or 0
-if you want the function to compute it.  IF C<lval> is set then the fetch
-will be part of a store.  Make sure the return value is non-null before
-accessing it.  The return value when C<hv> is a tied hash is a pointer to a
-static location, so be sure to make a copy of the structure if you need to
-store it somewhere.
-
-See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
-information on how to use this function on tied hashes.
-
-=cut
-*/
-
-/* Common code for hv_delete()/hv_exists()/hv_fetch()/hv_store()  */
-void *
-Perl_hv_common_key_len(pTHX_ HV *hv, const char *key, I32 klen_i32,
-                       const int action, SV *val, const U32 hash)
-{
-    STRLEN klen;
-    int flags;
-
-    PERL_ARGS_ASSERT_HV_COMMON_KEY_LEN;
-
-    if (klen_i32 < 0) {
-        klen = -klen_i32;
-        flags = HVhek_UTF8;
-    } else {
-        klen = klen_i32;
-        flags = 0;
-    }
-    return hv_common(hv, NULL, key, klen, flags, action, val, hash);
-}
 
 void *
 Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
                int flags, int action, SV *val, U32 hash)
 {
+    PERL_ARGS_ASSERT_HV_COMMON;
+
     XPVHV* xhv;
     HE *entry;
     HE **oentry;
@@ -545,7 +535,9 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
         key = SvPV_const(keysv, klen);
         is_utf8 = (SvUTF8(keysv) != 0);
         if (SvIsCOW_shared_hash(keysv)) {
-            flags = HVhek_KEYCANONICAL | (is_utf8 ? HVhek_UTF8 : 0);
+            HEK *keysv_hek = SvSHARED_HEK_FROM_PV(SvPVX_const(keysv));
+            unsigned char keysv_flags = HEK_FLAGS(keysv_hek);
+            flags = HVhek_KEYCANONICAL | (keysv_flags & (HVhek_UTF8|HVhek_WASUTF8));
         } else {
             flags = 0;
         }
@@ -1104,12 +1096,12 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     return (void *) entry;
 }
 
-STATIC void
+static void
 S_hv_magic_check(HV *hv, bool *needs_copy, bool *needs_store)
 {
-    const MAGIC *mg = SvMAGIC(hv);
-
     PERL_ARGS_ASSERT_HV_MAGIC_CHECK;
+
+    const MAGIC *mg = SvMAGIC(hv);
 
     *needs_copy = FALSE;
     *needs_store = TRUE;
@@ -1143,10 +1135,10 @@ returned by the hv_bucket_ratio() function.
 SV *
 Perl_hv_scalar(pTHX_ HV *hv)
 {
+    PERL_ARGS_ASSERT_HV_SCALAR;
+
     SV *sv;
     UV u;
-
-    PERL_ARGS_ASSERT_HV_SCALAR;
 
     if (SvRMAGICAL(hv)) {
         MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_tied);
@@ -1193,13 +1185,14 @@ I might unroll the non-tied hv_iternext() in here at some point - DAPM
 void
 Perl_hv_pushkv(pTHX_ HV *hv, U32 flags)
 {
+    PERL_ARGS_ASSERT_HV_PUSHKV;
+
     HE *entry;
     bool tied = SvRMAGICAL(hv) && (mg_find(MUTABLE_SV(hv), PERL_MAGIC_tied)
 #ifdef DYNAMIC_ENV_FETCH  /* might not know number of keys yet */
                                    || mg_find(MUTABLE_SV(hv), PERL_MAGIC_env)
 #endif
                                   );
-    PERL_ARGS_ASSERT_HV_PUSHKV;
     assert(flags); /* must be pushing at least one of keys and values */
 
     (void)hv_iterinit(hv);
@@ -1260,9 +1253,9 @@ In a large hash this could be a lot of buckets.
 SV *
 Perl_hv_bucket_ratio(pTHX_ HV *hv)
 {
-    SV *sv;
-
     PERL_ARGS_ASSERT_HV_BUCKET_RATIO;
+
+    SV *sv;
 
     if (SvRMAGICAL(hv)) {
         MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_tied);
@@ -1308,10 +1301,12 @@ found.
 =cut
 */
 
-STATIC SV *
+static SV *
 S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
                    int k_flags, I32 d_flags, U32 hash)
 {
+    PERL_ARGS_ASSERT_HV_DELETE_COMMON;
+
     XPVHV* xhv;
     HE *entry;
     HE **oentry;
@@ -1645,7 +1640,8 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
 #ifdef PERL_USE_UNSHARED_KEYS_IN_LARGE_HASHES
 static bool
-S_large_hash_heuristic(pTHX_ HV *hv, STRLEN size) {
+S_large_hash_heuristic(pTHX_ HV *hv, STRLEN size)
+{
     if (size > 42
         && !SvOBJECT(hv)
         && !(HvHasAUX(hv) && HvENAME_get(hv))) {
@@ -1657,14 +1653,15 @@ S_large_hash_heuristic(pTHX_ HV *hv, STRLEN size) {
 }
 #endif
 
-STATIC void
+static void
 S_hsplit(pTHX_ HV *hv, STRLEN const oldsize, STRLEN newsize)
 {
+    PERL_ARGS_ASSERT_HSPLIT;
+
     STRLEN i = 0;
     char *a = (char*) HvARRAY(hv);
     HE **aep;
 
-    PERL_ARGS_ASSERT_HSPLIT;
     if (newsize > MAX_BUCKET_MAX+1)
             return;
 
@@ -1757,14 +1754,14 @@ This is the same as doing the following in Perl code:
 void
 Perl_hv_ksplit(pTHX_ HV *hv, IV newmax)
 {
+    PERL_ARGS_ASSERT_HV_KSPLIT;
+
     XPVHV* xhv = (XPVHV*)SvANY(hv);
     const I32 oldsize = (I32) xhv->xhv_max+1;       /* HvMAX(hv)+1 */
     I32 newsize;
     I32 wantsize;
     I32 trysize;
     char *a;
-
-    PERL_ARGS_ASSERT_HV_KSPLIT;
 
     wantsize = (I32) newmax;                            /* possible truncation here */
     if (wantsize != newmax)
@@ -1836,6 +1833,8 @@ returned.
 HV *
 Perl_newHVhv(pTHX_ HV *ohv)
 {
+    PERL_ARGS_ASSERT_NEWHVHV;
+
     HV * const hv = newHV();
     STRLEN hv_max;
 
@@ -1944,6 +1943,8 @@ added to it.  A pointer to the new hash is returned.
 HV *
 Perl_hv_copy_hints_hv(pTHX_ HV *const ohv)
 {
+    PERL_ARGS_ASSERT_HV_COPY_HINTS_HV;
+
     HV * const hv = newHV();
 
     if (ohv) {
@@ -1985,7 +1986,7 @@ Perl_hv_copy_hints_hv(pTHX_ HV *const ohv)
 #undef HV_SET_MAX_ADJUSTED_FOR_KEYS
 
 /* like hv_free_ent, but returns the SV rather than freeing it */
-STATIC SV*
+static SV*
 S_hv_free_ent_ret(pTHX_ HE *entry)
 {
     PERL_ARGS_ASSERT_HV_FREE_ENT_RET;
@@ -2009,6 +2010,7 @@ S_hv_free_ent_ret(pTHX_ HE *entry)
 void
 Perl_hv_free_ent(pTHX_ HV *notused, HE *entry)
 {
+    PERL_ARGS_ASSERT_HV_FREE_ENT;
     PERL_UNUSED_ARG(notused);
 
     if (!entry)
@@ -2022,6 +2024,7 @@ Perl_hv_free_ent(pTHX_ HV *notused, HE *entry)
 void
 Perl_hv_delayfree_ent(pTHX_ HV *notused, HE *entry)
 {
+    PERL_ARGS_ASSERT_HV_DELAYFREE_ENT;
     PERL_UNUSED_ARG(notused);
 
     if (!entry)
@@ -2049,6 +2052,8 @@ return.
 void
 Perl_hv_clear(pTHX_ HV *hv)
 {
+    PERL_ARGS_ASSERT_HV_CLEAR;
+
     SSize_t orig_ix;
 
     if (!hv)
@@ -2124,9 +2129,9 @@ use.
 void
 Perl_hv_clear_placeholders(pTHX_ HV *hv)
 {
-    const U32 items = (U32)HvPLACEHOLDERS_get(hv);
-
     PERL_ARGS_ASSERT_HV_CLEAR_PLACEHOLDERS;
+
+    const U32 items = (U32)HvPLACEHOLDERS_get(hv);
 
     if (items)
         clear_placeholders(hv, items);
@@ -2135,10 +2140,10 @@ Perl_hv_clear_placeholders(pTHX_ HV *hv)
 static void
 S_clear_placeholders(pTHX_ HV *hv, const U32 placeholders)
 {
+    PERL_ARGS_ASSERT_CLEAR_PLACEHOLDERS;
+
     I32 i;
     U32 to_find = placeholders;
-
-    PERL_ARGS_ASSERT_CLEAR_PLACEHOLDERS;
 
     assert(to_find);
 
@@ -2178,13 +2183,13 @@ S_clear_placeholders(pTHX_ HV *hv, const U32 placeholders)
     NOT_REACHED; /* NOTREACHED */
 }
 
-STATIC void
+static void
 S_hv_free_entries(pTHX_ HV *hv)
 {
+    PERL_ARGS_ASSERT_HV_FREE_ENTRIES;
+
     STRLEN index = 0;
     SV *sv;
-
-    PERL_ARGS_ASSERT_HV_FREE_ENTRIES;
 
     while ((sv = Perl_hfree_next_entry(aTHX_ hv, &index)) || HvTOTALKEYS(hv)) {
         SvREFCNT_dec(sv);
@@ -2204,14 +2209,14 @@ S_hv_free_entries(pTHX_ HV *hv)
 SV*
 Perl_hfree_next_entry(pTHX_ HV *hv, STRLEN *indexp)
 {
+    PERL_ARGS_ASSERT_HFREE_NEXT_ENTRY;
+
     struct xpvhv_aux *iter;
     HE *entry;
     HE ** array;
 #ifdef DEBUGGING
     STRLEN orig_index = *indexp;
 #endif
-
-    PERL_ARGS_ASSERT_HFREE_NEXT_ENTRY;
 
     if (HvHasAUX(hv) && ((iter = HvAUX(hv)))) {
         if ((entry = iter->xhv_eiter)) {
@@ -2279,6 +2284,8 @@ return.
 void
 Perl_hv_undef_flags(pTHX_ HV *hv, U32 flags)
 {
+    PERL_ARGS_ASSERT_HV_UNDEF_FLAGS;
+
     bool save;
     SSize_t orig_ix = PL_tmps_ix; /* silence compiler warning about uninitialized vars */
 
@@ -2300,8 +2307,8 @@ Perl_hv_undef_flags(pTHX_ HV *hv, U32 flags)
     if (PL_phase != PERL_PHASE_DESTRUCT && HvHasNAME(hv)) {
         if (PL_stashcache) {
             HEK *hek = HvNAME_HEK(hv);
-            DEBUG_o(Perl_deb(aTHX_ "hv_undef_flags clearing PL_stashcache for '%"
-                             HEKf "'\n", HEKfARG(hek)));
+            DEBUG_o(deb("hv_undef_flags clearing PL_stashcache for '%"
+                        HEKf "'\n", HEKfARG(hek)));
             (void)hv_deletehek(PL_stashcache, hek, G_DISCARD);
         }
         hv_name_set(hv, NULL, 0, 0);
@@ -2341,8 +2348,9 @@ Perl_hv_undef_flags(pTHX_ HV *hv, U32 flags)
         if (PL_phase != PERL_PHASE_DESTRUCT)
             mro_isa_changed_in(hv);
         if (PL_stashcache) {
-            DEBUG_o(Perl_deb(aTHX_ "hv_undef_flags clearing PL_stashcache for effective name '%"
-                             HEKf "'\n", HEKfARG(HvENAME_HEK_NN(hv))));
+            DEBUG_o(deb(
+                "hv_undef_flags clearing PL_stashcache for effective name '%"
+                HEKf "'\n", HEKfARG(HvENAME_HEK_NN(hv))));
             (void)hv_deletehek(PL_stashcache, HvENAME_HEK_NN(hv), G_DISCARD);
         }
       }
@@ -2355,8 +2363,8 @@ Perl_hv_undef_flags(pTHX_ HV *hv, U32 flags)
           : cBOOL(name))
       {
         if (name && PL_stashcache) {
-            DEBUG_o(Perl_deb(aTHX_ "hv_undef_flags clearing PL_stashcache for name '%"
-                             HEKf "'\n", HEKfARG(HvNAME_HEK_NN(hv))));
+            DEBUG_o(deb("hv_undef_flags clearing PL_stashcache for name '%"
+                        HEKf "'\n", HEKfARG(HvNAME_HEK_NN(hv))));
             (void)hv_deletehek(PL_stashcache, HvNAME_HEK_NN(hv), G_DISCARD);
         }
         hv_name_set(hv, NULL, 0, flags);
@@ -2434,12 +2442,12 @@ hash.
 STRLEN
 Perl_hv_fill(pTHX_ HV *const hv)
 {
+    PERL_ARGS_ASSERT_HV_FILL;
+
     STRLEN count = 0;
     HE **ents = HvARRAY(hv);
 
     PERL_UNUSED_CONTEXT;
-    PERL_ARGS_ASSERT_HV_FILL;
-
     /* No keys implies no buckets used.
        One key can only possibly mean one bucket used.  */
     if (HvTOTALKEYS(hv) < 2)
@@ -2463,10 +2471,11 @@ Perl_hv_fill(pTHX_ HV *const hv)
 }
 
 static struct xpvhv_aux*
-S_hv_auxinit(pTHX_ HV *hv) {
-    struct xpvhv_aux *iter;
-
+S_hv_auxinit(pTHX_ HV *hv)
+{
     PERL_ARGS_ASSERT_HV_AUXINIT;
+
+    struct xpvhv_aux *iter;
 
     if (!HvHasAUX(hv)) {
         char *array = (char *) HvARRAY(hv);
@@ -2545,10 +2554,11 @@ Implements C<HvRITER> which you should use instead.
 */
 
 I32 *
-Perl_hv_riter_p(pTHX_ HV *hv) {
-    struct xpvhv_aux *iter;
-
+Perl_hv_riter_p(pTHX_ HV *hv)
+{
     PERL_ARGS_ASSERT_HV_RITER_P;
+
+    struct xpvhv_aux *iter;
 
     iter = HvHasAUX(hv) ? HvAUX(hv) : hv_auxinit(hv);
     return &(iter->xhv_riter);
@@ -2563,10 +2573,11 @@ Implements C<HvEITER> which you should use instead.
 */
 
 HE **
-Perl_hv_eiter_p(pTHX_ HV *hv) {
-    struct xpvhv_aux *iter;
-
+Perl_hv_eiter_p(pTHX_ HV *hv)
+{
     PERL_ARGS_ASSERT_HV_EITER_P;
+
+    struct xpvhv_aux *iter;
 
     iter = HvHasAUX(hv) ? HvAUX(hv) : hv_auxinit(hv);
     return &(iter->xhv_eiter);
@@ -2581,10 +2592,11 @@ Implements C<HvRITER_set> which you should use instead.
 */
 
 void
-Perl_hv_riter_set(pTHX_ HV *hv, I32 riter) {
-    struct xpvhv_aux *iter;
-
+Perl_hv_riter_set(pTHX_ HV *hv, I32 riter)
+{
     PERL_ARGS_ASSERT_HV_RITER_SET;
+
+    struct xpvhv_aux *iter;
 
     if (HvHasAUX(hv)) {
         iter = HvAUX(hv);
@@ -2598,10 +2610,11 @@ Perl_hv_riter_set(pTHX_ HV *hv, I32 riter) {
 }
 
 void
-Perl_hv_rand_set(pTHX_ HV *hv, U32 new_xhv_rand) {
-    struct xpvhv_aux *iter;
-
+Perl_hv_rand_set(pTHX_ HV *hv, U32 new_xhv_rand)
+{
     PERL_ARGS_ASSERT_HV_RAND_SET;
+
+    struct xpvhv_aux *iter;
 
 #ifdef PERL_HASH_RANDOMIZE_KEYS
     if (HvHasAUX(hv)) {
@@ -2624,10 +2637,11 @@ Implements C<HvEITER_set> which you should use instead.
 */
 
 void
-Perl_hv_eiter_set(pTHX_ HV *hv, HE *eiter) {
-    struct xpvhv_aux *iter;
-
+Perl_hv_eiter_set(pTHX_ HV *hv, HE *eiter)
+{
     PERL_ARGS_ASSERT_HV_EITER_SET;
+
+    struct xpvhv_aux *iter;
 
     if (HvHasAUX(hv)) {
         iter = HvAUX(hv);
@@ -2645,6 +2659,7 @@ Perl_hv_eiter_set(pTHX_ HV *hv, HE *eiter) {
 /*
 =for apidoc      hv_name_set
 =for apidoc_item hv_name_sets
+=for apidoc_flag HV_NAME_SETALL
 
 These each set the name of stash C<hv> to the specified name.
 
@@ -2654,7 +2669,7 @@ In C<hv_name_sets>, the name is a literal C string, enclosed in double quotes.
 
 In C<hv_name_set>, C<name> points to the first byte of the name, and an
 additional parameter, C<len>, specifies its length in bytes.  Hence, the name
-may contain embedded-NUL characters.
+may contain embedded NUL characters.
 
 If C<SVf_UTF8> is set in C<flags>, the name is treated as being in UTF-8;
 otherwise not.
@@ -2662,19 +2677,17 @@ otherwise not.
 If C<HV_NAME_SETALL> is set in C<flags>, both the name and the effective name
 are set.
 
-=for apidoc Amnh||HV_NAME_SETALL
-
 =cut
 */
 
 void
 Perl_hv_name_set(pTHX_ HV *hv, const char *name, U32 len, U32 flags)
 {
+    PERL_ARGS_ASSERT_HV_NAME_SET;
+
     struct xpvhv_aux *iter;
     U32 hash;
     HEK **spot;
-
-    PERL_ARGS_ASSERT_HV_NAME_SET;
 
     if (len > I32_MAX)
         croak("panic: hv name too long (%" UVuf ")", (UV) len);
@@ -2743,8 +2756,9 @@ This is basically sv_eq_flags() in sv.c, but we avoid the magic
 and bytes checking.
 */
 
-STATIC I32
-hek_eq_pvn_flags(pTHX_ const HEK *hek, const char* pv, const I32 pvlen, const U32 flags) {
+static I32
+hek_eq_pvn_flags(pTHX_ const HEK *hek, const char* pv, const I32 pvlen, const U32 flags)
+{
     if ( (HEK_UTF8(hek) ? 1 : 0) != (flags & SVf_UTF8 ? 1 : 0) ) {
         if (flags & SVf_UTF8)
             return (bytes_cmp_utf8(
@@ -2775,10 +2789,10 @@ table.
 void
 Perl_hv_ename_add(pTHX_ HV *hv, const char *name, U32 len, U32 flags)
 {
+    PERL_ARGS_ASSERT_HV_ENAME_ADD;
+
     struct xpvhv_aux *aux = HvHasAUX(hv) ? HvAUX(hv) : hv_auxinit(hv);
     U32 hash;
-
-    PERL_ARGS_ASSERT_HV_ENAME_ADD;
 
     if (len > I32_MAX)
         croak("panic: hv name too long (%" UVuf ")", (UV) len);
@@ -2838,9 +2852,9 @@ This is called when a stash is deleted from the symbol table.
 void
 Perl_hv_ename_delete(pTHX_ HV *hv, const char *name, U32 len, U32 flags)
 {
-    struct xpvhv_aux *aux;
-
     PERL_ARGS_ASSERT_HV_ENAME_DELETE;
+
+    struct xpvhv_aux *aux;
 
     if (len > I32_MAX)
         croak("panic: hv name too long (%" UVuf ")", (UV) len);
@@ -2901,7 +2915,8 @@ Perl_hv_ename_delete(pTHX_ HV *hv, const char *name, U32 len, U32 flags)
 }
 
 AV **
-Perl_hv_backreferences_p(pTHX_ HV *hv) {
+Perl_hv_backreferences_p(pTHX_ HV *hv)
+{
     PERL_ARGS_ASSERT_HV_BACKREFERENCES_P;
     /* See also Perl_sv_get_backrefs in sv.c where this logic is unrolled */
     {
@@ -2911,10 +2926,11 @@ Perl_hv_backreferences_p(pTHX_ HV *hv) {
 }
 
 void
-Perl_hv_kill_backrefs(pTHX_ HV *hv) {
-    AV *av;
-
+Perl_hv_kill_backrefs(pTHX_ HV *hv)
+{
     PERL_ARGS_ASSERT_HV_KILL_BACKREFS;
+
+    AV *av;
 
     if (!HvHasAUX(hv))
         return;
@@ -2932,31 +2948,31 @@ Perl_hv_kill_backrefs(pTHX_ HV *hv) {
 /*
 hv_iternext is implemented as a macro in hv.h
 
-=for apidoc hv_iternext
+=for apidoc      hv_iternext
+=for apidoc_item hv_iternext_flags
+=for apidoc_flag HV_ITERNEXT_WANTPLACEHOLDERS
 
-Returns entries from a hash iterator.  See C<L</hv_iterinit>>.
+These each return entries from a hash iterator.  See C<L</hv_iterinit>>.
 
 You may call C<hv_delete> or C<hv_delete_ent> on the hash entry that the
 iterator currently points to, without losing your place or invalidating your
 iterator.  Note that in this case the current entry is deleted from the hash
 with your iterator holding the last reference to it.  Your iterator is flagged
 to free the entry on the next call to C<hv_iternext>, so you must not discard
-your iterator immediately else the entry will leak - call C<hv_iternext> to
+your iterator immediately, else the entry will leak - call C<hv_iternext> to
 trigger the resource deallocation.
 
-=for apidoc hv_iternext_flags
+C<hv_iternext_flags> has an extra C<flags> parameter, which will normally be zero.
+If so, it behaves identically to C<hv_iternext>.
 
-Returns entries from a hash iterator.  See C<L</hv_iterinit>> and
-C<L</hv_iternext>>.
-The C<flags> value will normally be zero; if C<HV_ITERNEXT_WANTPLACEHOLDERS> is
-set the placeholders keys (for restricted hashes) will be returned in addition
-to normal keys.  By default placeholders are automatically skipped over.
+But if the C<HV_ITERNEXT_WANTPLACEHOLDERS> bit is set, the placeholders keys
+(for restricted hashes) will be returned in addition to normal keys.  By
+default placeholders are automatically skipped over.
+
 Currently a placeholder is implemented with a value that is
 C<&PL_sv_placeholder>.  Note that the implementation of placeholders and
 restricted hashes may change, and the implementation currently is
 insufficiently abstracted for any change to be tidy.
-
-=for apidoc Amnh||HV_ITERNEXT_WANTPLACEHOLDERS
 
 =cut
 */
@@ -2964,12 +2980,12 @@ insufficiently abstracted for any change to be tidy.
 HE *
 Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
 {
+    PERL_ARGS_ASSERT_HV_ITERNEXT_FLAGS;
+
     HE *entry;
     HE *oldentry;
     MAGIC* mg;
     struct xpvhv_aux *iter;
-
-    PERL_ARGS_ASSERT_HV_ITERNEXT_FLAGS;
 
     if (!HvHasAUX(hv)) {
         /* Too many things (well, pp_each at least) merrily assume that you can
@@ -3145,10 +3161,18 @@ Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
 }
 
 /*
-=for apidoc hv_iterkey
+=for apidoc      hv_iterkey
+=for apidoc_item hv_iterkeysv
 
-Returns the key from the current position of the hash iterator.  See
+These each return the key from the current position of the hash iterator.  See
 C<L</hv_iterinit>>.
+
+They differ in the form of the return value.
+
+C<hv_iterkey> returns a C language NUL-terminated string.
+
+C<hv_iterkeysv> returns a mortal SV* containing a copy of the key.
+Note that this is unlike L</C<hv_iterval>> whose return isn't mortalized
 
 =cut
 */
@@ -3170,17 +3194,6 @@ Perl_hv_iterkey(pTHX_ HE *entry, I32 *retlen)
     }
 }
 
-/* unlike hv_iterval(), this always returns a mortal copy of the key */
-/*
-=for apidoc hv_iterkeysv
-
-Returns the key as an C<SV*> from the current position of the hash
-iterator.  The return value will always be a mortal copy of the key.  Also
-see C<L</hv_iterinit>>.
-
-=cut
-*/
-
 SV *
 Perl_hv_iterkeysv(pTHX_ HE *entry)
 {
@@ -3192,8 +3205,9 @@ Perl_hv_iterkeysv(pTHX_ HE *entry)
 /*
 =for apidoc hv_iterval
 
-Returns the value from the current position of the hash iterator.  See
-C<L</hv_iterkey>>.
+Returns the value from the current position of the hash iterator.
+
+Note that the return value isn't mortalized, unlike C<L</hv_iterkey>>.
 
 =cut
 */
@@ -3228,9 +3242,9 @@ operation.
 SV *
 Perl_hv_iternextsv(pTHX_ HV *hv, char **key, I32 *retlen)
 {
-    HE * const he = hv_iternext_flags(hv, 0);
-
     PERL_ARGS_ASSERT_HV_ITERNEXTSV;
+
+    HE * const he = hv_iternext_flags(hv, 0);
 
     if (!he)
         return NULL;
@@ -3258,6 +3272,8 @@ C<len> and C<hash> must both be valid for C<str>.
 void
 Perl_unsharepvn(pTHX_ const char *str, I32 len, U32 hash)
 {
+    PERL_ARGS_ASSERT_UNSHAREPVN;
+
     unshare_hek_or_pvn (NULL, str, len, hash);
 }
 
@@ -3265,7 +3281,9 @@ Perl_unsharepvn(pTHX_ const char *str, I32 len, U32 hash)
 void
 Perl_unshare_hek(pTHX_ HEK *hek)
 {
+    PERL_ARGS_ASSERT_UNSHARE_HEK;
     assert(hek);
+
     unshare_hek_or_pvn(hek, NULL, 0, 0);
 }
 
@@ -3273,9 +3291,11 @@ Perl_unshare_hek(pTHX_ HEK *hek)
    hek if non-NULL takes priority over the other 3, else str, len and hash
    are used.  If so, len and hash must both be valid for str.
  */
-STATIC void
+static void
 S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
 {
+    PERL_ARGS_ASSERT_UNSHARE_HEK_OR_PVN;
+
     HE *entry;
     HE **oentry;
     int k_flags = 0;
@@ -3368,9 +3388,9 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
 HEK *
 Perl_share_hek(pTHX_ const char *str, SSize_t len, U32 hash)
 {
-    int flags = 0;
-
     PERL_ARGS_ASSERT_SHARE_HEK;
+
+    int flags = 0;
 
     if (len < 0) {
         len = -len;
@@ -3399,14 +3419,15 @@ Perl_share_hek(pTHX_ const char *str, SSize_t len, U32 hash)
     return share_hek_flags (str, len, hash, flags);
 }
 
-STATIC HEK *
+static HEK *
 S_share_hek_flags(pTHX_ const char *str, STRLEN len, U32 hash, int flags)
 {
+    PERL_ARGS_ASSERT_SHARE_HEK_FLAGS;
+
     HE *entry;
     const U8 flags_masked = flags & HVhek_STORAGE_MASK;
     const U32 hindex = hash & (I32) HvMAX(PL_strtab);
 
-    PERL_ARGS_ASSERT_SHARE_HEK_FLAGS;
     assert(!(flags & HVhek_NOTSHARED));
 
     if (UNLIKELY(len > (STRLEN) I32_MAX)) {
@@ -3491,9 +3512,9 @@ S_share_hek_flags(pTHX_ const char *str, STRLEN len, U32 hash, int flags)
 SSize_t *
 Perl_hv_placeholders_p(pTHX_ HV *hv)
 {
-    MAGIC *mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
-
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_P;
+
+    MAGIC *mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     if (!mg) {
         mg = sv_magicext(MUTABLE_SV(hv), 0, PERL_MAGIC_rhash, 0, 0, 0);
@@ -3516,10 +3537,10 @@ Implements C<HvPLACEHOLDERS_get>, which you should use instead.
 I32
 Perl_hv_placeholders_get(pTHX_ const HV *hv)
 {
-    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
-
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_GET;
     PERL_UNUSED_CONTEXT;
+
+    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     return mg ? mg->mg_len : 0;
 }
@@ -3535,9 +3556,9 @@ Implements C<HvPLACEHOLDERS_set>, which you should use instead.
 void
 Perl_hv_placeholders_set(pTHX_ HV *hv, I32 ph)
 {
-    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
-
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_SET;
+
+    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     if (mg) {
         mg->mg_len = ph;
@@ -3548,12 +3569,12 @@ Perl_hv_placeholders_set(pTHX_ HV *hv, I32 ph)
     /* else we don't need to add magic to record 0 placeholders.  */
 }
 
-STATIC SV *
+static SV *
 S_refcounted_he_value(pTHX_ const struct refcounted_he *he)
 {
-    SV *value;
-
     PERL_ARGS_ASSERT_REFCOUNTED_HE_VALUE;
+
+    SV *value;
 
     switch(he->refcounted_he_data[0] & HVrhek_typemask) {
     case HVrhek_undef:
@@ -3576,7 +3597,7 @@ S_refcounted_he_value(pTHX_ const struct refcounted_he *he)
         SvPV_set(value, (char *) he->refcounted_he_data + 1);
         SvCUR_set(value, he->refcounted_he_val.refcounted_he_u_len);
         /* This stops anything trying to free it  */
-        SvLEN_set(value, 0);
+        assert(SvLEN(value) == 0);
         SvPOK_on(value);
         SvREADONLY_on(value);
         if ((he->refcounted_he_data[0] & HVrhek_typemask) == HVrhek_PV_UTF8)
@@ -3601,6 +3622,8 @@ C<flags> is currently unused and must be zero.
 HV *
 Perl_refcounted_he_chain_2hv(pTHX_ const struct refcounted_he *chain, U32 flags)
 {
+    PERL_ARGS_ASSERT_REFCOUNTED_HE_CHAIN_2HV;
+
     HV *hv;
     U32 placeholders, max;
 
@@ -3701,15 +3724,35 @@ Perl_refcounted_he_chain_2hv(pTHX_ const struct refcounted_he *chain, U32 flags)
 }
 
 /*
-=for apidoc refcounted_he_fetch_pvn
+=for apidoc      refcounted_he_fetch_pv
+=for apidoc_item refcounted_he_fetch_pvn
+=for apidoc_item m||refcounted_he_fetch_pvs
+=for apidoc_item refcounted_he_fetch_sv
 
-Search along a C<refcounted_he> chain for an entry with the key specified
-by C<keypv> and C<keylen>.  If C<flags> has the C<REFCOUNTED_HE_KEY_UTF8>
-bit set, the key octets are interpreted as UTF-8, otherwise they
-are interpreted as Latin-1.  C<hash> is a precomputed hash of the key
-string, or zero if it has not been precomputed.  Returns a mortal scalar
-representing the value associated with the key, or C<&PL_sv_placeholder>
-if there is no value associated with the key.
+These each search along a C<refcounted_he> C<chain> for an entry with the
+specified key.  The return depends on the C<REFCOUNTED_HE_EXISTS> bit in
+C<flags>.  If unset, a mortal scalar representing the value associated with
+the key is returned, or C<&PL_sv_placeholder> if there is no value associated
+with the key.  If set, and there is such a value C<&PL_yes> is returned; if no
+such value, NULL is returned.
+
+C<hash> is a precomputed hash of the key string, or zero if it has not been
+precomputed
+
+The forms differ only in how the key is specified.
+
+In C<refcounted_he_fetch_pv>, C<key> specifies the key as a C language
+NUL-terminated string.
+
+In C<refcounted_he_fetch_pvs>, the key is a C language string literal, enclosed
+in double quotes.
+
+In C<refcounted_he_fetch_pvn>, C<key> points to the first byte of the string
+specifying the key, and an additional parameter, C<keylen>, specifies its
+length in bytes.  Hence, C<key> may contain embedded-NUL characters.
+
+In C<refcounted_he_fetch_sv>, C<*key> is an SV, and the key is the PV
+extracted from that using L<perlapi/C<SvPV_const>>.
 
 =cut
 */
@@ -3765,15 +3808,6 @@ Perl_refcounted_he_fetch_pvn(pTHX_ const struct refcounted_he *chain,
     return flags & REFCOUNTED_HE_EXISTS ? NULL : &PL_sv_placeholder;
 }
 
-/*
-=for apidoc refcounted_he_fetch_pv
-
-Like L</refcounted_he_fetch_pvn>, but takes a nul-terminated string
-instead of a string/length pair.
-
-=cut
-*/
-
 SV *
 Perl_refcounted_he_fetch_pv(pTHX_ const struct refcounted_he *chain,
                          const char *key, U32 hash, U32 flags)
@@ -3782,22 +3816,14 @@ Perl_refcounted_he_fetch_pv(pTHX_ const struct refcounted_he *chain,
     return refcounted_he_fetch_pvn(chain, key, strlen(key), hash, flags);
 }
 
-/*
-=for apidoc refcounted_he_fetch_sv
-
-Like L</refcounted_he_fetch_pvn>, but takes a Perl scalar instead of a
-string/length pair.
-
-=cut
-*/
-
 SV *
 Perl_refcounted_he_fetch_sv(pTHX_ const struct refcounted_he *chain,
                          SV *key, U32 hash, U32 flags)
 {
+    PERL_ARGS_ASSERT_REFCOUNTED_HE_FETCH_SV;
+
     const char *keypv;
     STRLEN keylen;
-    PERL_ARGS_ASSERT_REFCOUNTED_HE_FETCH_SV;
     if (flags & REFCOUNTED_HE_KEY_UTF8)
         croak("panic: refcounted_he_fetch_sv bad flags %" UVxf,
             (UV)flags);
@@ -3810,26 +3836,33 @@ Perl_refcounted_he_fetch_sv(pTHX_ const struct refcounted_he *chain,
 }
 
 /*
-=for apidoc refcounted_he_new_pvn
+=for apidoc         refcounted_he_new_pv
+=for apidoc_item    refcounted_he_new_pvn
+=for apidoc_item m||refcounted_he_new_pvs
+=for apidoc_item    refcounted_he_new_sv
 
-Creates a new C<refcounted_he>.  This consists of a single key/value
-pair and a reference to an existing C<refcounted_he> chain (which may
-be empty), and thus forms a longer chain.  When using the longer chain,
-the new key/value pair takes precedence over any entry for the same key
-further along the chain.
+These each create a new C<refcounted_he>.  This consists of a single key/value
+pair and a reference to an existing C<refcounted_he> chain (which may be
+empty), thus forming a longer chain.  When using the longer chain, the new
+key/value pair takes precedence over any entry for the same key further along
+the chain.
+
+C<hash> is a precomputed hash of the key string, or zero if it has not been
+precomputed.  C<refcounted_he_new_pvs> doesn't have a C<hash> parameter, as
+that is determinable at compile time.
+
+The forms otherwise differ only in how the key is specified.
 
 The new key is specified by C<keypv> and C<keylen>.  If C<flags> has
 the C<REFCOUNTED_HE_KEY_UTF8> bit set, the key octets are interpreted
-as UTF-8, otherwise they are interpreted as Latin-1.  C<hash> is
-a precomputed hash of the key string, or zero if it has not been
-precomputed.
+as UTF-8, otherwise they are interpreted as Latin-1.
 
 C<value> is the scalar value to store for this key.  C<value> is copied
 by this function, which thus does not take ownership of any reference
 to it, and later changes to the scalar will not be reflected in the
 value visible in the C<refcounted_he>.  Complex types of scalar will not
 be stored with referential integrity, but will be coerced to strings.
-C<value> may be either null or C<&PL_sv_placeholder> to indicate that no
+C<value> may be either NULL or C<&PL_sv_placeholder> to indicate that no
 value is to be associated with the key; this, as with any non-null value,
 takes precedence over the existence of a value for the key further along
 the chain.
@@ -3862,7 +3895,7 @@ Perl_refcounted_he_new_pvn(pTHX_ struct refcounted_he *parent,
     } else if (SvPOK(value)) {
         value_type = HVrhek_PV;
     } else if (SvIOK(value)) {
-        value_type = SvUOK((const SV *)value) ? HVrhek_UV : HVrhek_IV;
+        value_type = SvIsUV(value) ? HVrhek_UV : HVrhek_IV;
     } else if (!SvOK(value)) {
         value_type = HVrhek_undef;
     } else {
@@ -3927,15 +3960,6 @@ Perl_refcounted_he_new_pvn(pTHX_ struct refcounted_he *parent,
     return he;
 }
 
-/*
-=for apidoc refcounted_he_new_pv
-
-Like L</refcounted_he_new_pvn>, but takes a nul-terminated string instead
-of a string/length pair.
-
-=cut
-*/
-
 struct refcounted_he *
 Perl_refcounted_he_new_pv(pTHX_ struct refcounted_he *parent,
         const char *key, U32 hash, SV *value, U32 flags)
@@ -3944,22 +3968,14 @@ Perl_refcounted_he_new_pv(pTHX_ struct refcounted_he *parent,
     return refcounted_he_new_pvn(parent, key, strlen(key), hash, value, flags);
 }
 
-/*
-=for apidoc refcounted_he_new_sv
-
-Like L</refcounted_he_new_pvn>, but takes a Perl scalar instead of a
-string/length pair.
-
-=cut
-*/
-
 struct refcounted_he *
 Perl_refcounted_he_new_sv(pTHX_ struct refcounted_he *parent,
         SV *key, U32 hash, SV *value, U32 flags)
 {
+    PERL_ARGS_ASSERT_REFCOUNTED_HE_NEW_SV;
+
     const char *keypv;
     STRLEN keylen;
-    PERL_ARGS_ASSERT_REFCOUNTED_HE_NEW_SV;
     if (flags & REFCOUNTED_HE_KEY_UTF8)
         croak("panic: refcounted_he_new_sv bad flags %" UVxf,
             (UV)flags);
@@ -3985,6 +4001,7 @@ no action occurs in this case.
 
 void
 Perl_refcounted_he_free(pTHX_ struct refcounted_he *he) {
+    PERL_ARGS_ASSERT_REFCOUNTED_HE_FREE;
     PERL_UNUSED_CONTEXT;
 
     while (he) {
@@ -4021,6 +4038,8 @@ to this function: no action occurs and a null pointer is returned.
 struct refcounted_he *
 Perl_refcounted_he_inc(pTHX_ struct refcounted_he *he)
 {
+    PERL_ARGS_ASSERT_REFCOUNTED_HE_INC;
+
     PERL_UNUSED_CONTEXT;
     if (he) {
         HINTS_REFCNT_LOCK;
@@ -4049,11 +4068,12 @@ or if you additionally don't need to know the length, C<L</CopLABEL>>.
 /* pp_entereval is aware that labels are stored with a key ':' at the top of
    the linked list.  */
 const char *
-Perl_cop_fetch_label(pTHX_ COP *const cop, STRLEN *len, U32 *flags) {
-    struct refcounted_he *const chain = cop->cop_hints_hash;
-
+Perl_cop_fetch_label(pTHX_ COP *const cop, STRLEN *len, U32 *flags)
+{
     PERL_ARGS_ASSERT_COP_FETCH_LABEL;
     PERL_UNUSED_CONTEXT;
+
+    struct refcounted_he *const chain = cop->cop_hints_hash;
 
     if (!chain)
         return NULL;
@@ -4097,8 +4117,9 @@ void
 Perl_cop_store_label(pTHX_ COP *const cop, const char *label, STRLEN len,
                      U32 flags)
 {
-    SV *labelsv;
     PERL_ARGS_ASSERT_COP_STORE_LABEL;
+
+    SV *labelsv;
 
     if (flags & ~(SVf_UTF8))
         croak("panic: cop_store_label illegal flag bits 0x%" UVxf,
@@ -4124,6 +4145,8 @@ Check that a hash is in an internally consistent state.
 void
 Perl_hv_assert(pTHX_ HV *hv)
 {
+    PERL_ARGS_ASSERT_HV_ASSERT;
+
     HE* entry;
     int withflags = 0;
     int placeholders = 0;
@@ -4131,8 +4154,6 @@ Perl_hv_assert(pTHX_ HV *hv)
     int bad = 0;
     const I32 riter = HvRITER_get(hv);
     HE *eiter = HvEITER_get(hv);
-
-    PERL_ARGS_ASSERT_HV_ASSERT;
 
     (void)hv_iterinit(hv);
 

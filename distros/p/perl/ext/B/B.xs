@@ -62,7 +62,7 @@ static const char* const opclassnames[] = {
 };
 
 static const size_t opsizes[] = {
-    0,	
+    0,
     sizeof(OP),
     sizeof(UNOP),
     sizeof(BINOP),
@@ -144,9 +144,9 @@ get_overlay_object(pTHX_ const OP *o, const char * const name, U32 namelen)
 
 
 static SV *
-make_sv_object(pTHX_ SV *sv)
+make_sv_object_nonmortal(pTHX_ SV *sv)
 {
-    SV *const arg = sv_newmortal();
+    SV *const arg = newSV(0);
     const char *type = 0;
     IV iv;
     dMY_CXT;
@@ -164,6 +164,14 @@ make_sv_object(pTHX_ SV *sv)
     sv_setiv(newSVrv(arg, type), iv);
     return arg;
 }
+
+
+static SV *
+make_sv_object(pTHX_ SV *sv)
+{
+    return sv_2mortal(make_sv_object_nonmortal(aTHX_ sv));
+}
+
 
 static SV *
 make_temp_object(pTHX_ SV *temp)
@@ -647,7 +655,7 @@ formfeed()
     PPCODE:
 	PUSHs(make_sv_object(aTHX_ GvSV(gv_fetchpvs("\f", GV_ADD, SVt_PV))));
 
-long 
+long
 amagic_generation()
     CODE:
 	RETVAL = PL_amagic_generation;
@@ -723,36 +731,40 @@ svref_2object(sv)
 	    croak("argument is not a reference");
 	PUSHs(make_sv_object(aTHX_ SvRV(sv)));
 
-void
+
+IV
 opnumber(name)
 const char *	name
 CODE:
 {
- int i; 
- IV  result = -1;
- ST(0) = sv_newmortal();
+ int i;
+ RETVAL = -1;
  if (strBEGINs(name,"pp_"))
    name += 3;
  for (i = 0; i < PL_maxo; i++)
   {
    if (strEQ(name, PL_op_name[i]))
     {
-     result = i;
+     RETVAL = i;
      break;
     }
   }
- sv_setiv(ST(0),result);
 }
 
-void
+    OUTPUT: RETVAL
+
+
+SV*
 ppname(opnum)
 	int	opnum
     CODE:
-	ST(0) = sv_newmortal();
-	if (opnum >= 0 && opnum < PL_maxo)
-	    Perl_sv_setpvf(aTHX_ ST(0), "pp_%s", PL_op_name[opnum]);
+        RETVAL = (opnum >= 0 && opnum < PL_maxo)
+                ? Perl_newSVpvf(aTHX_ "pp_%s", PL_op_name[opnum])
+                : &PL_sv_undef;
+    OUTPUT: RETVAL
 
-void
+
+SV*
 hash(sv)
 	SV *	sv
     CODE:
@@ -760,7 +772,9 @@ hash(sv)
 	U32 hash = 0;
 	const char *s = SvPVbyte(sv, len);
 	PERL_HASH(hash, s, len);
-	ST(0) = sv_2mortal(Perl_newSVpvf(aTHX_ "0x%" UVxf, (UV)hash));
+	RETVAL = Perl_newSVpvf(aTHX_ "0x%" UVxf, (UV)hash);
+    OUTPUT: RETVAL
+
 
 #define cast_I32(foo) (I32)foo
 IV
@@ -1033,11 +1047,21 @@ next(o)
                                             - (char*)tbl,
                                             SVs_TEMP);
 		}
-		else
-		    ret = newSVpvn_flags(cPVOPo->op_pv, strlen(cPVOPo->op_pv), SVs_TEMP);
+                else {
+                    U32 label_utf8 = (cPVOPo->op_private & OPpPV_IS_UTF8)
+                        ? SVf_UTF8 : 0;
+
+                    ret = newSVpvn_flags(cPVOPo->op_pv, strlen(cPVOPo->op_pv),
+                                         SVs_TEMP | label_utf8);
+                }
 		break;
 	    case 42: /* B::COP::label */
-		ret = sv_2mortal(newSVpv(CopLABEL(cCOPo),0));
+                {
+                    STRLEN len;
+                    U32 flags;
+                    const char *pv = CopLABEL_len_flags(cCOPo, &len, &flags);
+                    ret = newSVpvn_flags(pv, len, SVs_TEMP | (flags & SVf_UTF8));
+                }
 		break;
 	    case 43: /* B::COP::arybase */
 		ret = sv_2mortal(newSVuv(0));
@@ -1188,6 +1212,49 @@ string(o, cv)
                 ret = sv_2mortal(ret);
                 break;
             }
+
+        case OP_MULTIPARAM:
+        {
+            struct op_multiparam_aux *aux = (struct op_multiparam_aux *)cUNOP_AUXo->op_aux;
+            size_t min_args = aux->min_args;
+            size_t n_positional = aux->n_positional;
+            size_t n_named      = aux->n_named;
+            PADNAME **pns = PadnamelistARRAY(PadlistNAMES(CvPADLIST(cv)));
+
+            ret = newSVpvs_flags("", SVs_TEMP);
+            if(!n_positional && !n_named)
+                sv_catpvf(ret, "0"); /* omit trailing space */
+            else if(min_args < n_positional)
+                sv_catpvf(ret, "%zd..%zd ", min_args, n_positional);
+            else
+                sv_catpvf(ret, "%zd ", n_positional);
+
+            for(size_t i = 0; i < n_positional; i++) {
+                if(i)
+                    sv_catpvs(ret, ",");
+                PADOFFSET padix = aux->param_padix[i];
+                if(padix)
+                    sv_catpvf(ret, "%" PNf, PNfARG(pns[padix]));
+                else
+                    sv_catpvs(ret, "$");
+            }
+
+            for(size_t i = 0; i < n_named; i++) {
+                struct op_multiparam_named_aux *named = aux->named + i;
+                if(n_positional || i)
+                    sv_catpvs(ret, ",");
+
+                sv_catpvf(ret, ":%.*s", (int)named->namelen, named->namepv);
+            }
+
+            if(aux->slurpy) {
+                if(n_positional || n_named)
+                    sv_catpvf(ret, ",");
+                sv_catpvf(ret, "%" PNf, PNfARG(pns[aux->slurpy_padix]));
+            }
+
+            break;
+        }
 
         default:
             ret = sv_2mortal(newSVpvn("", 0));
@@ -1393,6 +1460,20 @@ aux_list(o, cv)
                 XSRETURN(len);
 
             } /* OP_MULTIDEREF */
+
+        case OP_MULTIPARAM:
+            {
+                struct op_multiparam_aux *p = (struct op_multiparam_aux *)aux;
+                size_t nparams = p->n_positional;
+                EXTEND(SP, (IV)(3 + nparams + 1));
+                mPUSHu(p->min_args);
+                mPUSHu(p->n_positional);
+                PUSHs(sv_2mortal(p->slurpy ? newSVpvf("%c", p->slurpy) : &PL_sv_no));
+                for(size_t parami = 0; parami < nparams; parami++)
+                    mPUSHu(p->param_padix[parami]);
+                mPUSHu(p->slurpy_padix);
+                XSRETURN(3 + nparams + 1);
+            }
         } /* switch */
 
 
@@ -1433,7 +1514,7 @@ SvTRUE(sv)
 bool
 SvTRUE_nomg(sv)
     B::SV   sv
-	
+
 MODULE = B	PACKAGE = B::IV		PREFIX = Sv
 
 IV
@@ -1489,7 +1570,7 @@ MODULE = B	PACKAGE = B::IV
 
 #define PVAV_max_ix	sv_SSize_tp | STRUCT_OFFSET(struct xpvav, xav_max)
 
-#define PVCV_stash_ix	sv_SVp | STRUCT_OFFSET(struct xpvcv, xcv_stash) 
+#define PVCV_stash_ix	sv_SVp | STRUCT_OFFSET(struct xpvcv, xcv_stash)
 #define PVCV_gv_ix	sv_SVp | STRUCT_OFFSET(struct xpvcv, xcv_gv_u.xcv_gv)
 #define PVCV_file_ix	sv_char_pp | STRUCT_OFFSET(struct xpvcv, xcv_file)
 #define PVCV_outside_ix	sv_SVp | STRUCT_OFFSET(struct xpvcv, xcv_outside)
@@ -1587,14 +1668,15 @@ IVX(sv)
 	ST(0) = ret;
 	XSRETURN(1);
 
-void
+
+SV*
 packiv(sv)
 	B::IV	sv
     ALIAS:
 	needs64bits = 1
     CODE:
 	if (ix) {
-	    ST(0) = boolSV((I32)SvIVX(sv) != SvIVX(sv));
+	    RETVAL = boolSV((I32)SvIVX(sv) != SvIVX(sv));
 	} else if (sizeof(IV) == 8) {
 	    U32 wp[2];
 	    const IV iv = SvIVX(sv);
@@ -1611,11 +1693,13 @@ packiv(sv)
 	    wp[0] = htonl(((U32)iv) >> (sizeof(UV)*4));
 #endif
 	    wp[1] = htonl(iv & 0xffffffff);
-	    ST(0) = newSVpvn_flags((char *)wp, 8, SVs_TEMP);
+	    RETVAL = newSVpvn((char *)wp, 8);
 	} else {
 	    U32 w = htonl((U32)SvIVX(sv));
-	    ST(0) = newSVpvn_flags((char *)&w, 4, SVs_TEMP);
+	    RETVAL = newSVpvn((char *)&w, 4);
 	}
+    OUTPUT: RETVAL
+
 
 MODULE = B	PACKAGE = B::NV		PREFIX = Sv
 
@@ -1721,7 +1805,8 @@ RV(sv)
             croak( "argument is not SvROK" );
 	PUSHs(make_sv_object(aTHX_ SvRV(sv)));
 
-void
+
+SV*
 PV(sv)
 	B::PV	sv
     ALIAS:
@@ -1777,7 +1862,10 @@ PV(sv)
             /* croak( "argument is not SvPOK" ); */
 	    p = NULL;
         }
-	ST(0) = newSVpvn_flags(p, len, SVs_TEMP | utf8);
+	RETVAL = newSVpvn_flags(p, len, utf8);
+
+    OUTPUT: RETVAL
+
 
 MODULE = B	PACKAGE = B::PVMG
 
@@ -1877,16 +1965,19 @@ BmRARE(sv)
 
 MODULE = B	PACKAGE = B::GV		PREFIX = Gv
 
-void
+
+SV*
 GvNAME(gv)
 	B::GV	gv
     ALIAS:
 	FILE = 1
 	B::HV::NAME = 2
     CODE:
-	ST(0) = sv_2mortal(newSVhek(!ix ? GvNAME_HEK(gv)
-					: (ix == 1 ? GvFILE_HEK(gv)
-						   : HvNAME_HEK((HV *)gv))));
+        RETVAL = newSVhek(!ix   ? GvNAME_HEK(gv)
+                                : (ix == 1 ? GvFILE_HEK(gv)
+                                           : HvNAME_HEK((HV *)gv)));
+    OUTPUT: RETVAL
+
 
 bool
 is_empty(gv)
@@ -2068,18 +2159,21 @@ CvHSCXT(cv)
     OUTPUT:
 	RETVAL
 
-void
+
+SV*
 CvXSUB(cv)
 	B::CV	cv
     ALIAS:
 	XSUBANY = 1
     CODE:
-	ST(0) = ix && CvCONST(cv)
-	    ? make_sv_object(aTHX_ (SV *)CvXSUBANY(cv).any_ptr)
-	    : sv_2mortal(newSViv(CvISXSUB(cv)
+	RETVAL = ix && CvCONST(cv)
+	    ? make_sv_object_nonmortal(aTHX_ (SV *)CvXSUBANY(cv).any_ptr)
+	    : newSViv(CvISXSUB(cv)
 				 ? (ix ? CvXSUBANY(cv).any_iv
 				       : PTR2IV(CvXSUB(cv)))
-				 : 0));
+				 : 0);
+    OUTPUT: RETVAL
+
 
 void
 const_sv(cv)
@@ -2087,11 +2181,12 @@ const_sv(cv)
     PPCODE:
 	PUSHs(make_sv_object(aTHX_ (SV *)cv_const_sv(cv)));
 
-void
+SV*
 GV(cv)
 	B::CV cv
     CODE:
-	ST(0) = make_sv_object(aTHX_ (SV*)CvGV(cv));
+	RETVAL = make_sv_object_nonmortal(aTHX_ (SV*)CvGV(cv));
+    OUTPUT: RETVAL
 
 SV *
 NAME_HEK(cv)

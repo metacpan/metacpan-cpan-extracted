@@ -86,6 +86,12 @@ Checks that a value is absent (undefinef or empty).
 
 See L<Valiant::Validator::Absence> for details.
 
+=head2 Acceptance
+
+Checks that a value was accepted (for example a "terms of service" checkbox).
+
+See L<Valiant::Validator::Acceptance> for details.
+
 =head2 Array
 
 Validations on an array value.  Has options for nested errors when the array contains objects that
@@ -131,6 +137,12 @@ Value must be a string tht matched a given format or regular expression.
 
 See L<Valiant::Validator::Format> for details.
 
+=head2 Hash
+
+Value is a hashref whose values pass a set of validation rules.
+
+See L<Valiant::Validator::Hash> for details.
+
 =head2 Inclusion
 
 Value must be one of a fixed list
@@ -165,7 +177,7 @@ See L<Valiant::Validator::OnlyOf> for details.
 
 That the value is defined and not empty
 
-See L<Valiant::Validator::Absence> for details.
+See L<Valiant::Validator::Presence> for details.
 
 =head2 Unique
 

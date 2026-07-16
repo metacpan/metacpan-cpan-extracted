@@ -36,13 +36,13 @@ This parts are ignored.
 #endif
 
 
-STATIC void
+static void
 outlist(int* a, int* b){
 	*a = 'a';
 	*b = 'b';
 }
 
-STATIC bool
+static bool
 outlist_bool(const char *a, const char *b, char **c)
 {
    dTHX;
@@ -57,7 +57,7 @@ outlist_bool(const char *a, const char *b, char **c)
    return TRUE;
 }
 
-STATIC int
+static int
 outlist_int(const char *a, const char *b, char **c)
 {
    dTHX;
@@ -72,11 +72,20 @@ outlist_int(const char *a, const char *b, char **c)
    return 11;
 }
 
-STATIC int
+static int
 len(const char* const s, int const l){
 	PERL_UNUSED_ARG(s);
 	return l;
 }
+
+static int
+myadd1(int a, int b)
+{ return a + b; }
+
+static int
+myadd2(int a, int b)
+{ return a + b; }
+
 
 MODULE = XSMore         PACKAGE = XSMore
 
@@ -243,6 +252,15 @@ outlist_int(const char *a, const char *b, OUTLIST char *c)
 
 int
 len(char* s, int length(s))
+
+int
+interface1(int a, int b)
+    INTERFACE: myadd1
+
+int
+interface2(int a, int b, int c)
+    INTERFACE: myadd2
+    C_ARGS: a, c
 
 INCLUDE_COMMAND: $^X -Ilib -It/lib -MIncludeTester -e IncludeTester::print_xs
 

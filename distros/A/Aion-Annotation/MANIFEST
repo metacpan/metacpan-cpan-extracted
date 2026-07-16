@@ -6,10 +6,14 @@ README.md
 cpanfile
 doc/badges/total.svg
 i18n/Aion/Annotation.ru-en.po
+i18n/Aion/Annotation/ScannedEvent.ru-en.po
 lib/Aion/Annotation.md
 lib/Aion/Annotation.pm
+lib/Aion/Annotation/ScannedEvent.md
+lib/Aion/Annotation/ScannedEvent.pm
 minil.toml
 script/aion-scan
 t/aion/annotation.t
+t/aion/annotation/scanned-event.t
 META.yml
 MANIFEST

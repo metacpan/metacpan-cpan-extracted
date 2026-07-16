@@ -56,4 +56,13 @@ use Test::Most;
     };
 }
 
+{
+  # 'without' must not warn on an undef value
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_ };
+  ok my $object = Local::Test::Format->new(phone => '212-387-1212');
+  $object->validate;
+  is_deeply \@warnings, [], 'format without does not warn on undef value';
+}
+
 done_testing;

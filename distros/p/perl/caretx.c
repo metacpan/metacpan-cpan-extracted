@@ -21,7 +21,7 @@
 /* This file contains a single function, set_caret_X, to set the $^X
  * variable.  It's only used in perl.c, but has various OS dependencies,
  * so its been moved to its own file to reduce header pollution.
- * See RT 120314 for details.
+ * See GH #13363 for details.
  */
 
 #if defined(PERL_IS_MINIPERL) && !defined(USE_SITECUSTOMIZE)
@@ -41,7 +41,10 @@
 #endif
 
 void
-Perl_set_caret_X(pTHX) {
+Perl_set_caret_X(pTHX)
+{
+    PERL_ARGS_ASSERT_SET_CARET_X;
+
     GV* tmpgv = gv_fetchpvs("\030", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^X */
     SV *const caret_x = GvSV(tmpgv);
 #if defined(OS2)

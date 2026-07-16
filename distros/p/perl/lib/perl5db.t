@@ -3012,6 +3012,10 @@ SKIP:
     local $ENV{LANG} = "C";
     local $ENV{LC_MESSAGES} = "C";
     local $ENV{LC_ALL} = "C";
+    my $out = `/usr/bin/man --version`;
+    if ($out =~ /^This system has been minimized/) {
+        skip "No man. This system has been minimized...", 1;
+    }
     my $wrapper = DebugWrap->new(
         {
             cmds =>
@@ -3660,6 +3664,46 @@ EOS
                                \s+main::problem\s+compile/x,
                             "check compiled breakpoint present");
     $wrapper->contents_like(qr/print "2\\n"/, "break immediately after defining problem");
+}
+
+{
+    # gh #23663 (variant 1)
+    my $wrapper = DebugWrap->new(
+        {
+            cmds =>
+            [
+                'b 4',
+                'X',
+                'c',
+                'q',
+            ],
+            prog => \1,
+        }
+    );
+
+    $wrapper->contents_unlike(
+        qr/Use of each\(\) on hash after insertion without resetting hash iterator results in undefined behavior/,
+        q/gh-23663: 'X' command does not warn about undefined behavior/,
+       );
+
+    # gh #23663 (variant 2)
+    $wrapper = DebugWrap->new(
+        {
+            cmds =>
+            [
+                'b 4',
+                'V main',
+                'c',
+                'q',
+            ],
+            prog => \1,
+        }
+    );
+
+    $wrapper->contents_unlike(
+        qr/Use of each\(\) on hash after insertion without resetting hash iterator results in undefined behavior/,
+        q/gh-23663: 'V main' command does not warn about undefined behavior/,
+       );
 }
 
 done_testing();

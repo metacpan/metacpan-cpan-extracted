@@ -21,8 +21,8 @@ foreach my $pl (map {chomp; "regen/$_"} <DATA>) {
     and die "@command failed: $?" 
 }
 
+# embed.pl must be kept last, as other scripts may affect it.
 __END__
-embed.pl
 feature.pl
 mg_vtable.pl
 miniperlmain.pl
@@ -34,3 +34,4 @@ scope_types.pl
 tidy_embed.pl
 warnings.pl
 locale.pl
+embed.pl

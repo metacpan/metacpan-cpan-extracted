@@ -1,0 +1,36 @@
+[
+  {
+    "title":        "Account",
+    "link":         "",
+    "icon":         "fas fa-user",
+    "icon_color":   "#000000",
+    "menu":         "account_menu",
+    "condition":    "auth",
+    "order":        1,
+    "parent_title": null
+  },
+  {
+    "title":        "Profile",
+    "link":         "/user_profile",
+    "icon":         "fas fa-id-card",
+    "menu":         "account_menu",
+    "condition":    "auth",
+    "parent_title": "Account"
+  },
+  {
+    "title":        "Logout",
+    "link":         "/logout",
+    "icon":         "fas fa-sign-out-alt",
+    "menu":         "account_menu",
+    "condition":    "auth",
+    "parent_title": "Account"
+  },
+  {
+    "title":        "Login",
+    "link":         "/login",
+    "icon":         "fas fa-sign-in-alt",
+    "menu":         "account_menu",
+    "condition":    "!auth",
+    "parent_title": null
+  }
+]

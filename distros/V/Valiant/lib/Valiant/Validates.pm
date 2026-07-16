@@ -85,8 +85,8 @@ sub csrf_token {
   return $arg ? $self : $self->_csrf_token;
 }
 
-has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
-has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
+has 'validated' => (is=>'rw', required=>1, init_arg=>undef, default=>0);
+has 'skip_validation' =>  (is=>'rw', required=>1, init_arg=>undef, default=>0);
 
 sub skip_validate {
   my ($self) = @_;
@@ -398,6 +398,7 @@ sub _run_post_validations {
 sub inject_attribute {
   my ($class, $attribute_to_inject) = @_;
   eval "package $class; has $attribute_to_inject => (is=>'ro');";
+  die $@ if $@;
 }
 
 1;
@@ -417,7 +418,7 @@ The main point of entry for use and documentation currently is L<Valiant>. Here
 we have API level documentation without details or examples.  You should read L<Valiant>
 first and then you can refer to documentation her for further details.
 
-In addition to methods this class provides, it also proves all methods from L<Valiant::Translation>
+In addition to methods this class provides, it also provides all methods from L<Valiant::Translation>
 
 =head1 CLASS METHODS
 
@@ -466,7 +467,7 @@ arguments for the validate set as a whole:
 
 If you use a validator class name then the hashref of arguments that follows is not optional.  If you pass
 an options hashref it should contain arguments that are defined for the validation type you are passing
-or one of the global arguments: C<on>, C<message>, C<if> and C<unless>.  See L</"GLOBAL OPTIONS"> for more.
+or one of the global arguments C<on>, C<message>, C<if> and C<unless> (the shared parameters accepted by every validator).
 
 For subroutine reference and L<Type::Tiny> objects you can or not pass an options hashref depending on your
 needs.  Additionally the three types can be mixed and matched within a single C<validates> clause.
@@ -540,7 +541,7 @@ context.  All other arguments will be passed down to the C<$opts> hashref.
 
 =head2 validate_only
 
-    $obj->vadate_only('name', context=>'create');
+    $obj->validate_only('name', context=>'create');
     $obj->validate_only(['name', 'age'], context=>'update');
 
 Similar to C<validate> but will run only those validations that are associated with the named 
@@ -566,21 +567,39 @@ Returns a boolean indicating if the object currently has errors.   This does not
 check first (unlike C<valid> or C<invalid>).   So if you just want to check the current state of
 the errors list and not tamper with that state you can use this.
 
+=head2 no_errors
+
+The opposite of L</has_errors>: returns true if the object currently has no errors.  Like
+C<has_errors> this does not run a validation check first.
+
+=head2 get_context
+
+Returns the current validation context (an arrayref) as set via C<context>, or undef if
+no context has been set.
+
+=head2 csrf_token
+
+    $object->csrf_token($token);   # set (returns $object for chaining)
+    my $token = $object->csrf_token; # get
+
+Get or set a CSRF token on the object.  This is glue for web frameworks (used for example
+by the form generation code) and has no effect on validation itself.
+
 =head2 clear_validated
 
 Clears any errors and sets the object as though validations hd never been run.
 
 =head2 do_validate
 
-Sets C<skip_validation> to true and returns C<$self>
+Sets C<skip_validation> to false and returns C<$self>
 
 =head2 skip_validate
 
-Sets C<skip_validation> to false and returns C<$self>
+Sets C<skip_validation> to true and returns C<$self>
 
 =head2 context
 
-Set a validation context (or arrayref of contexts) that will be used on an following validations.ß
+Set a validation context (or arrayref of contexts) that will be used on any following validations.
 
 =head1 ATTRIBUTES
 

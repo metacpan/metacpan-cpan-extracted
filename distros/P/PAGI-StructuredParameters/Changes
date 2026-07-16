@@ -1,0 +1,16 @@
+Revision history for PAGI-StructuredParameters
+
+0.001000  2026-07-15
+        - Initial release.
+        - No-dependency port of the core of
+          Catalyst::Utils::StructuredParameters, decoupled from Catalyst.
+        - PAGI::StructuredParameters engine: permitted() (lenient whitelist)
+          and required() (strict, with a mandatory on-missing callback whose
+          return value is thrown). Supports scalar keys, nested hashes, arrays,
+          and arrays-of-hashes with full nesting; array-value flattening and
+          empty-final-index reconstruction for form/query sources; in-place
+          whitelisting for nested body data (JSON).
+        - PAGI::StructuredParameters::Request: request-bound adapters
+          (from_body/from_query/from_data) with asynchronous permitted/required.
+        - Exception hierarchy: StructuredParameter base plus MissingParameter,
+          InvalidArrayLength, and InvalidArrayPointer.

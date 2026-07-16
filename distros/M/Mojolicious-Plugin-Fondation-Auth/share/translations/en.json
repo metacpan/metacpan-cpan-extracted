@@ -1,0 +1,11 @@
+{
+    "Login": "Login",
+    "Logout": "Logout",
+    "Username": "Username",
+    "Password": "Password",
+    "Sign in": "Sign in",
+    "Logged in as": "Logged in as",
+    "Login failed": "Login failed",
+    "Logged out": "Logged out",
+    "Access denied": "Access denied"
+}

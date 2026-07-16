@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000159",
     "Time::HiRes" => "1.9764"
   },
-  "VERSION" => "0.002001",
+  "VERSION" => "0.002002",
   "test" => {
     "TESTS" => "t/*.t t/app/*.t t/context/*.t t/endpoint/*.t t/integration/*.t t/middleware/*.t t/middleware/session/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/test/*.t t/utils/*.t t/websocket/*.t"
   }

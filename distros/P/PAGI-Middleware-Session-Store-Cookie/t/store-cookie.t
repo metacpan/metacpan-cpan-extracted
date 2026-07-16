@@ -8,6 +8,7 @@ use Test2::V0;
 use Future::AsyncAwait;
 use Future;
 use PAGI::Middleware::Session::Store::Cookie;
+use PAGI::Middleware::Session;
 
 sub run_async (&) { $_[0]->()->get }
 
@@ -155,6 +156,105 @@ subtest 'round-trip through middleware pattern' => sub {
         }->();
     };
     is($restored2->{counter}, 1, 'counter updated');
+};
+
+# ===================
+# Regression: mutating an existing session through the real middleware
+# must produce a Set-Cookie carrying the mutated data (the Parley bug —
+# see PAGI-Tools docs/superpowers/specs/2026-07-13-session-mutation-setcookie-design.md).
+# Store::Cookie has no server-side copy, so a discarded transport here is
+# a correctness bug, not just a missed refresh.
+# ===================
+
+subtest 'mutating an existing session round-trips through the real middleware + Store::Cookie' => sub {
+    my $store = PAGI::Middleware::Session::Store::Cookie->new(secret => $SECRET);
+    my $session_mw = PAGI::Middleware::Session->new(
+        secret => $SECRET,
+        store  => $store,
+    );
+
+    my $make_scope = sub {
+        my (%opts) = @_;
+        return {
+            type    => 'http',
+            method  => $opts{method} // 'GET',
+            path    => $opts{path} // '/',
+            headers => $opts{headers} // [],
+        };
+    };
+
+    my $set_cookie = sub {
+        my ($events) = @_;
+        my ($cookie) = map { $_->[1] } grep { lc($_->[0]) eq 'set-cookie' } @{$events->[0]{headers}};
+        return $cookie;
+    };
+
+    # Request 1: create a session and set counter => 1
+    my @events1;
+    my $app1 = async sub {
+        my ($scope, $receive, $send) = @_;
+        $scope->{'pagi.session'}{counter} = 1;
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+    run_async {
+        $session_mw->wrap($app1)->($make_scope->(), async sub { {} }, async sub { push @events1, $_[0] })
+    };
+
+    my $cookie1 = $set_cookie->(\@events1);
+    ok(defined $cookie1, 'request 1 (new session) gets a Set-Cookie');
+    my ($blob1) = $cookie1 =~ /pagi_session=([^;]+)/;
+    ok(defined $blob1, 'session blob extracted from request 1 cookie');
+
+    # Request 2: mutate the existing session (no regenerate) — this is the
+    # exact shape that silently dropped data before the fix.
+    my @events2;
+    my $app2 = async sub {
+        my ($scope, $receive, $send) = @_;
+        $scope->{'pagi.session'}{counter} = 2;
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+    my $scope2 = $make_scope->(headers => [['Cookie', "pagi_session=$blob1"]]);
+    run_async {
+        $session_mw->wrap($app2)->($scope2, async sub { {} }, async sub { push @events2, $_[0] })
+    };
+
+    my $cookie2 = $set_cookie->(\@events2);
+    ok(defined $cookie2, 'request 2 (mutation of existing session) gets a fresh Set-Cookie');
+    my ($blob2) = $cookie2 =~ /pagi_session=([^;]+)/;
+    ok(defined $blob2, 'session blob extracted from request 2 cookie');
+
+    # Decrypt directly via the store's own get() — this is the assertion
+    # that catches the original bug: without the fix, request 2 emits no
+    # Set-Cookie at all, so $blob2 would be undef and this decrypt would
+    # never happen; with the fix, it decrypts to the mutated value.
+    my $decoded;
+    run_async {
+        async sub { $decoded = await $store->get($blob2) }->();
+    };
+    ok(defined $decoded, 'store decrypts the Set-Cookie blob from the mutation response');
+    is($decoded->{counter}, 2, 'decrypted blob carries the mutated value, not the stale one');
+
+    # Request 3: pure read of the existing session — the dirty check must
+    # compare equal through a real Store::Cookie decrypt (numbers, booleans,
+    # and reserved keys included), so no Set-Cookie is emitted. Guards the
+    # inverse regression: a false-dirty here would re-emit the cookie on
+    # every response.
+    my (@events3, $seen);
+    my $app3 = async sub {
+        my ($scope, $receive, $send) = @_;
+        $seen = $scope->{'pagi.session'}{counter};
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+    my $scope3 = $make_scope->(headers => [['Cookie', "pagi_session=$blob2"]]);
+    run_async {
+        $session_mw->wrap($app3)->($scope3, async sub { {} }, async sub { push @events3, $_[0] })
+    };
+
+    is($seen, 2, 'request 3 (pure read) sees the mutated session');
+    ok(!defined $set_cookie->(\@events3), 'pure read of an existing session emits no Set-Cookie');
 };
 
 done_testing;

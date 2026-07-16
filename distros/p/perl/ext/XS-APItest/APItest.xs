@@ -1,3 +1,7 @@
+/*
+ * ex: set ts=8 sts=4 sw=4 et:
+ */
+
 #define PERL_IN_XS_APITEST
 
 /* We want to be able to test things that aren't API yet. */
@@ -192,7 +196,7 @@ S_mycopy_copy(pTHX_ SV *sv, MAGIC* mg, SV *nsv, const char *name, I32 namlen) {
     return 0;
 }
 
-STATIC MGVTBL vtbl_mycopy = { 0, 0, 0, 0, 0, S_mycopy_copy, 0, 0 };
+static MGVTBL vtbl_mycopy = { 0, 0, 0, 0, 0, S_mycopy_copy, 0, 0 };
 
 /* indirect functions to test the [pa]MY_CXT macros */
 
@@ -429,7 +433,7 @@ rot13_key(pTHX_ IV action, SV *field) {
     return 0;
 }
 
-STATIC I32
+static I32
 rmagical_a_dummy(pTHX_ IV idx, SV *sv) {
     PERL_UNUSED_ARG(idx);
     PERL_UNUSED_ARG(sv);
@@ -441,9 +445,9 @@ rmagical_a_dummy(pTHX_ IV idx, SV *sv) {
  * being a bit too paranoid.  But since this is file-static, we can
  * just have it without initializer, since it should get
  * zero-initialized. */
-STATIC MGVTBL rmagical_b;
+static MGVTBL rmagical_b;
 
-STATIC void
+static void
 blockhook_csc_start(pTHX_ int full)
 {
     dMY_CXT;
@@ -466,7 +470,7 @@ blockhook_csc_start(pTHX_ int full)
     }
 }
 
-STATIC void
+static void
 blockhook_csc_pre_end(pTHX_ OP **o)
 {
     dMY_CXT;
@@ -480,7 +484,7 @@ blockhook_csc_pre_end(pTHX_ OP **o)
 
 }
 
-STATIC void
+static void
 blockhook_test_start(pTHX_ int full)
 {
     dMY_CXT;
@@ -494,7 +498,7 @@ blockhook_test_start(pTHX_ int full)
     }
 }
 
-STATIC void
+static void
 blockhook_test_pre_end(pTHX_ OP **o)
 {
     dMY_CXT;
@@ -504,7 +508,7 @@ blockhook_test_pre_end(pTHX_ OP **o)
         av_push(MY_CXT.bhkav, newSVpvs("pre_end"));
 }
 
-STATIC void
+static void
 blockhook_test_post_end(pTHX_ OP **o)
 {
     dMY_CXT;
@@ -514,7 +518,7 @@ blockhook_test_post_end(pTHX_ OP **o)
         av_push(MY_CXT.bhkav, newSVpvs("post_end"));
 }
 
-STATIC void
+static void
 blockhook_test_eval(pTHX_ OP *const o)
 {
     dMY_CXT;
@@ -528,9 +532,9 @@ blockhook_test_eval(pTHX_ OP *const o)
     }
 }
 
-STATIC BHK bhk_csc, bhk_test;
+static BHK bhk_csc, bhk_test;
 
-STATIC void
+static void
 my_peep (pTHX_ OP *o)
 {
     dMY_CXT;
@@ -550,7 +554,7 @@ my_peep (pTHX_ OP *o)
     }
 }
 
-STATIC void
+static void
 my_rpeep (pTHX_ OP *first)
 {
     dMY_CXT;
@@ -576,7 +580,7 @@ my_rpeep (pTHX_ OP *first)
     }
 }
 
-STATIC OP *
+static OP *
 THX_ck_entersub_args_lists(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     PERL_UNUSED_ARG(namegv);
@@ -584,7 +588,7 @@ THX_ck_entersub_args_lists(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     return ck_entersub_args_list(entersubop);
 }
 
-STATIC OP *
+static OP *
 THX_ck_entersub_args_scalars(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *aop = cUNOPx(entersubop)->op_first;
@@ -598,7 +602,7 @@ THX_ck_entersub_args_scalars(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     return entersubop;
 }
 
-STATIC OP *
+static OP *
 THX_ck_entersub_multi_sum(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *sumop = NULL;
@@ -629,8 +633,8 @@ THX_ck_entersub_multi_sum(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     return sumop;
 }
 
-STATIC void test_op_list_describe_part(SV *res, OP *o);
-STATIC void
+static void test_op_list_describe_part(SV *res, OP *o);
+static void
 test_op_list_describe_part(SV *res, OP *o)
 {
     sv_catpv(res, PL_op_name[o->op_type]);
@@ -650,7 +654,7 @@ test_op_list_describe_part(SV *res, OP *o)
     }
 }
 
-STATIC char *
+static char *
 test_op_list_describe(OP *o)
 {
     SV *res = sv_2mortal(newSVpvs(""));
@@ -716,7 +720,7 @@ test_op_linklist_describe(OP *start)
 
 /** establish_cleanup operator, ripped off from Scope::Cleanup **/
 
-STATIC void
+static void
 THX_run_cleanup(pTHX_ void *cleanup_code_ref)
 {
     dSP;
@@ -732,7 +736,7 @@ THX_run_cleanup(pTHX_ void *cleanup_code_ref)
 
 /* Note that this is a pp function attached to an OP */
 
-STATIC OP *
+static OP *
 THX_pp_establish_cleanup(pTHX)
 {
     SV *cleanup_code_ref;
@@ -746,7 +750,7 @@ THX_pp_establish_cleanup(pTHX)
     ;
 }
 
-STATIC OP *
+static OP *
 THX_ck_entersub_establish_cleanup(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *parent, *pushop, *argop, *estop;
@@ -768,7 +772,7 @@ THX_ck_entersub_establish_cleanup(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
     return estop;
 }
 
-STATIC OP *
+static OP *
 THX_ck_entersub_postinc(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *parent, *pushop, *argop;
@@ -786,7 +790,7 @@ THX_ck_entersub_postinc(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
         op_lvalue(op_contextualize(argop, G_SCALAR), OP_POSTINC));
 }
 
-STATIC OP *
+static OP *
 THX_ck_entersub_pad_scalar(pTHX_ OP *entersubop, GV *namegv, SV *ckobj)
 {
     OP *pushop, *argop;
@@ -1181,7 +1185,7 @@ static OP *THX_parse_keyword_subsignature(pTHX)
                 seen_nextstate++;
                 retop = op_append_list(OP_LIST, retop, newSVOP(OP_CONST, 0,
                     /* newSVpvf("nextstate:%s:%d", CopFILE(cCOPx(kid)), cCOPx(kid)->cop_line))); */
-                    newSVpvf("nextstate:%u", (unsigned int)cCOPx(kid)->cop_line)));
+                    newSVpvf("nextstate:%" LINE_Tf, CopLINE(cCOPx(kid)))));
                 break;
             case OP_ARGCHECK: {
                 struct op_argcheck_aux *p =
@@ -1200,9 +1204,27 @@ static OP *THX_parse_keyword_subsignature(pTHX)
                     newSVpvf(kid->op_flags & OPf_KIDS ? "argelem:%s:d" : "argelem:%s", namepv)));
                 break;
             }
-            default:
-                fprintf(stderr, "TODO: examine kid %p (optype=%s)\n", kid, PL_op_name[kid->op_type]);
+            case OP_MULTIPARAM: {
+                struct op_multiparam_aux *p =
+                    (struct op_multiparam_aux *)(cUNOP_AUXx(kid)->op_aux);
+                PADNAMELIST *names = PadlistNAMES(CvPADLIST(find_runcv(0)));
+                SV *retsv = newSVpvf("multiparam:%zu..%zu:%c",
+                        p->min_args, p->n_positional, p->slurpy ? p->slurpy : '-');
+                for (size_t paramidx = 0; paramidx < p->n_positional; paramidx++) {
+                    char *namepv = PadnamePV(padnamelist_fetch(names, p->param_padix[paramidx]));
+                    if(namepv)
+                        sv_catpvf(retsv, ":%s=%zu", namepv, paramidx);
+                    else
+                        sv_catpvf(retsv, ":(anon)=%zu", paramidx);
+                    if(paramidx >= p->min_args)
+                        sv_catpvs(retsv, "?");
+                }
+                if (p->slurpy_padix)
+                    sv_catpvf(retsv, ":%s=*",
+                        PadnamePV(padnamelist_fetch(names, p->slurpy_padix)));
+                retop = op_append_list(OP_LIST, retop, newSVOP(OP_CONST, 0, retsv));
                 break;
+            }
         }
     }
 
@@ -1597,15 +1619,28 @@ XSPP_wrapped(my_pp_anonlist, 0, 1)
 #include "const-c.inc"
 
 void
-destruct_test(pTHX_ void *p) {
-    warn("In destruct_test: %" SVf "\n", (SV*)p);
+destruct_test(pTHX_ SV *p) {
+    warn("In destruct_test: %" SVf "\n", p);
 }
+
+#if defined(USE_ITHREADS) && !defined(WIN32)
+
+static void *
+signal_thread_start(void *arg) {
+  PERL_UNUSED_ARG(arg);
+  raise(SIGUSR1);
+  return NULL;
+}
+
+#endif
 
 #ifdef PERL_USE_HWM
 #  define hwm_checks_enabled() true
 #else
 #  define hwm_checks_enabled() false
 #endif
+
+typedef SV *nullable_SV;
 
 MODULE = XS::APItest            PACKAGE = XS::APItest
 
@@ -1754,7 +1789,7 @@ test_valid_utf8_to_uvchr(s)
          */
         RETVAL = newAV_mortal();
 
-        ret = valid_utf8_to_uvchr((U8*) SvPV_nolen(s), &retlen);
+        ret = valid_utf8_to_uv((U8*) SvPV_nolen(s), &retlen);
 
         /* Returns the return value in [0]; <retlen> in [1] */
         av_push_simple(RETVAL, newSVuv(ret));
@@ -3329,7 +3364,7 @@ END()
     CODE:
         sv_inc(get_sv("XS::APItest::END_called", GV_ADD|GV_ADDMULTI));
 
-void
+SV*
 utf16_to_utf8 (sv, ...)
     SV* sv
         ALIAS:
@@ -3355,10 +3390,14 @@ utf16_to_utf8 (sv, ...)
         SvCUR_set(dest, got);
         SvPVX(dest)[got] = '\0';
         SvPOK_on(dest);
-        ST(0) = dest;
-        XSRETURN(1);
+        /* counteract the second mortalisation the SV* OUTPUT typmap
+         * is about to perform */
+        SvREFCNT_inc(dest);
+        RETVAL = dest;
+    OUTPUT: RETVAL
 
-void
+
+SV*
 utf8_to_utf16 (sv, ...)
     SV* sv
         ALIAS:
@@ -3384,8 +3423,11 @@ utf8_to_utf16 (sv, ...)
         SvCUR_set(dest, got);
         SvPVX(dest)[got] = '\0';
         SvPOK_on(dest);
-        ST(0) = dest;
-        XSRETURN(1);
+        /* counteract the second mortalisation the SV* OUTPUT typmap
+         * is about to perform */
+        SvREFCNT_inc(dest);
+        RETVAL = dest;
+    OUTPUT: RETVAL
 
 void
 my_exit(int exitcode)
@@ -3438,7 +3480,7 @@ void
 test_magic_chain()
     PREINIT:
         SV *sv;
-        MAGIC *callmg, *uvarmg;
+        MAGIC *callmg = NULL, *uvarmg = NULL;
     CODE:
         sv = newSV_type_mortal(SVt_NULL);
         if (SvTYPE(sv) >= SVt_PVMG) croak_fail();
@@ -3851,6 +3893,25 @@ test_coplabel()
         if (len != 4) croak("fail # cop_fetch_label len");
         if (!utf8) croak("fail # cop_fetch_label utf8");
 
+void
+test_cop_warnings(bool already_on)
+    PREINIT:
+        COP *cop = PL_curcop;
+    CODE:
+        if(cop_has_warning(cop, WARN_UNINITIALIZED) ^ already_on)
+            croak("fail # cop_has_warning initial state");
+
+        /* This code modfies PL_curcop which is normally quite rude, but we'll
+         * allow it during the test run.
+         */
+        cop_enable_warning(cop, WARN_UNINITIALIZED);
+        if (!cop_has_warning(cop, WARN_UNINITIALIZED))
+            croak("fail # cop_enable_warning did not enable");
+
+        cop_disable_warning(cop, WARN_UNINITIALIZED);
+        if (cop_has_warning(cop, WARN_UNINITIALIZED))
+            croak("fail # cop_disable_warning did not disable");
+
 
 HV *
 example_cophh_2hv()
@@ -4224,9 +4285,8 @@ multicall_return(block, context)
     SV *block
     I32 context
 PROTOTYPE: &$
-CODE:
+PPCODE:
 {
-    dSP;
     dMULTICALL;
     GV *gv;
     HV *stash;
@@ -4276,9 +4336,8 @@ CODE:
     size = AvFILLp(av) + 1;
     EXTEND(SP, size);
     for (i = 0; i < size; i++)
-        ST(i) = *av_fetch_simple(av, i, FALSE);
+        PUSHs(*av_fetch_simple(av, i, FALSE));
     sv_2mortal((SV*)av);
-    XSRETURN(size);
 }
 
 
@@ -4364,6 +4423,21 @@ thread_id_matches()
 CODE:
     /* pthread_t might not be a scalar type */
     RETVAL = pthread_equal(pthread_self(), PL_main_thread);
+OUTPUT:
+    RETVAL
+
+pthread_t
+make_signal_thread()
+CODE:
+    if (pthread_create(&RETVAL, NULL, signal_thread_start, NULL) != 0)
+        XSRETURN_EMPTY;
+OUTPUT:
+    RETVAL
+
+int
+join_signal_thread(pthread_t tid)
+CODE:
+    RETVAL = pthread_join(tid, NULL);
 OUTPUT:
     RETVAL
 
@@ -4713,6 +4787,29 @@ CODE:
 OUTPUT:
     RETVAL
 
+ # provide access to pregexec, except replace pointers within the
+ # string with offsets from the start of the string
+
+I32
+callpregexec(SV *prog, STRLEN stringarg, STRLEN strend, I32 minend, SV *sv, U32 nosave)
+CODE:
+    {
+        STRLEN len;
+        char *strbeg;
+        if (SvROK(prog))
+            prog = SvRV(prog);
+        strbeg = SvPV_force(sv, len);
+        RETVAL = pregexec((REGEXP *)prog,
+                            strbeg + stringarg,
+                            strbeg + strend,
+                            strbeg,
+                            minend,
+                            sv,
+                            nosave);
+    }
+OUTPUT:
+    RETVAL
+
 void
 lexical_import(SV *name, CV *cv)
     CODE:
@@ -4938,20 +5035,82 @@ test_HvNAMEf_QUOTEDPREFIX(sv)
     OUTPUT:
         RETVAL
 
+TYPEMAP: <<HERE
+
+nullable_SV	T_NULLABLE_SV
+
+INPUT
+
+T_NULLABLE_SV
+    $var = $arg == &PL_sv_undef ? NULL : $arg;
+
+HERE
 
 bool
-sv_numeq(SV *sv1, SV *sv2)
+sv_numeq(nullable_SV sv1, nullable_SV sv2)
     CODE:
         RETVAL = sv_numeq(sv1, sv2);
     OUTPUT:
         RETVAL
 
 bool
-sv_numeq_flags(SV *sv1, SV *sv2, U32 flags)
+sv_numeq_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
     CODE:
         RETVAL = sv_numeq_flags(sv1, sv2, flags);
     OUTPUT:
         RETVAL
+
+# deliberately void context
+void
+void_sv_numeq(nullable_SV sv1, nullable_SV sv2, SV *out)
+    CODE:
+        sv_setbool(out, sv_numeq(sv1, sv2));
+    OUTPUT:
+        out
+
+bool
+sv_numne(nullable_SV sv1, nullable_SV sv2)
+
+# deliberately void context
+void
+void_sv_numne(nullable_SV sv1, nullable_SV sv2, SV *out)
+    CODE:
+        sv_setbool(out, sv_numne(sv1, sv2));
+    OUTPUT:
+        out
+
+bool
+sv_numne_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
+
+I32
+sv_numcmp(nullable_SV sv1, nullable_SV sv2)
+
+I32
+sv_numcmp_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
+
+bool
+sv_numle(nullable_SV sv1, nullable_SV sv2)
+
+bool
+sv_numle_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
+
+bool
+sv_numlt(nullable_SV sv1, nullable_SV sv2)
+
+bool
+sv_numlt_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
+
+bool
+sv_numge(nullable_SV sv1, nullable_SV sv2)
+
+bool
+sv_numge_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
+
+bool
+sv_numgt(nullable_SV sv1, nullable_SV sv2)
+
+bool
+sv_numgt_flags(nullable_SV sv1, nullable_SV sv2, U32 flags)
 
 bool
 sv_streq(SV *sv1, SV *sv2)
@@ -6697,7 +6856,7 @@ test_UTF8_IS_REPLACEMENT(char *s, STRLEN len)
 bool
 test_isQUOTEMETA(UV ord)
     CODE:
-        RETVAL = _isQUOTEMETA(ord);
+        RETVAL = isQUOTEMETA(ord);
     OUTPUT:
         RETVAL
 

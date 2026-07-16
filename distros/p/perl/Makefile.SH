@@ -64,7 +64,7 @@ true)
 				${revision}.${patchlevel}.${subversion}"
 		case "$osvers" in
 	        1[5-9]*|[2-9]*)
-			shrpldflags="$shrpldflags -install_name `pwd`/\$@ -Xlinker -headerpad_max_install_names"
+			shrpldflags="$shrpldflags -install_name `pwd -P`/\$@ -Xlinker -headerpad_max_install_names"
 			exeldflags="-Xlinker -headerpad_max_install_names"
 			;;
 		*)
@@ -126,15 +126,8 @@ true)
 		linklibperl="-L `pwd | sed 's/\/UU$//'` -Wl,+s -Wl,+b$archlibexp/CORE -lperl"
 		;;
 	os390*)
-            case "$use64bitall" in
-            define|true|[yY]*) shrpldflags='-Wl,LP64,dll'
-                   linklibperl='libperl.x'
-                   ;;
-            *)     shrpldflags='-Wl,XPLINK,dll'
-	           linklibperl='libperl.x'
-	           ;;
-            esac
-            ;;
+            shrpldflags='-shared'
+            linklibperl='libperl.x'
 	esac
 	case "$ldlibpthname" in
 	'') ;;
@@ -498,7 +491,10 @@ SH_to_target() {
     echo $@ | sed -e s/\\\.SH//g -e s/_/./g
 }
 
-SH='Makefile.SH cflags.SH config_h.SH makedepend.SH myconfig.SH runtests.SH pod/Makefile.SH'
+# Declare in SH variable all scripts that generate an underlying file.
+# In doing so, it creates a makefile target for each underlying file.
+# This target can be used as a dependency to automatically regenerate the underlying file when the script has been modified.
+SH='Makefile.SH cflags.SH config_h.SH makedependfile.SH makedepend.SH myconfig.SH runtests.SH pod/Makefile.SH'
 shextract=`SH_to_target $SH`
 
 ## In the following dollars and backticks do not need the extra backslash.
@@ -547,8 +543,8 @@ h = \
 
 c_base = \
     av.c builtin.c caretx.c class.c deb.c doio.c doop.c dquote.c dump.c \
-    globals.c gv.c hv.c keywords.c locale.c mathoms.c mg.c mro_core.c \
-    numeric.c op.c pad.c peep.c perl.c perlio.c perly.c \
+    globals.c gv.c hv.c keywords.c locale.c long_names.c mathoms.c mg.c \
+    mro_core.c numeric.c op.c pad.c peep.c perl.c perlio.c perly.c \
     pp.c pp_ctl.c pp_hot.c pp_pack.c pp_sort.c pp_sys.c \
     reentr.c regcomp.c regcomp_debug.c regcomp_invlist.c regcomp_study.c \
     regcomp_trie.c regexec.c run.c scope.c sv.c taint.c time64.c toke.c \
@@ -575,15 +571,15 @@ common_objs = \
     av$(OBJ_EXT) builtin$(OBJ_EXT) caretx$(OBJ_EXT) class$(OBJ_EXT) \
     deb$(OBJ_EXT) doio$(OBJ_EXT) doop$(OBJ_EXT) dquote$(OBJ_EXT) \
     dump$(OBJ_EXT) globals$(OBJ_EXT) gv$(OBJ_EXT) hv$(OBJ_EXT) \
-    keywords$(OBJ_EXT) locale$(OBJ_EXT) mathoms$(OBJ_EXT) mg$(OBJ_EXT) \
-    mro_core$(OBJ_EXT) numeric$(OBJ_EXT) pad$(OBJ_EXT) peep$(OBJ_EXT) \
-    perlio$(OBJ_EXT) perly$(OBJ_EXT) pp$(OBJ_EXT) pp_ctl$(OBJ_EXT) \
-    pp_hot$(OBJ_EXT) pp_pack$(OBJ_EXT) pp_sort$(OBJ_EXT) pp_sys$(OBJ_EXT) \
-    reentr$(OBJ_EXT) regcomp$(OBJ_EXT) regcomp_debug$(OBJ_EXT) \
-    regcomp_invlist$(OBJ_EXT) regcomp_study$(OBJ_EXT) regcomp_trie$(OBJ_EXT) \
-    regexec$(OBJ_EXT) run$(OBJ_EXT) scope$(OBJ_EXT) sv$(OBJ_EXT) \
-    taint$(OBJ_EXT) time64$(OBJ_EXT) toke$(OBJ_EXT) utf8$(OBJ_EXT) \
-    util$(OBJ_EXT) \
+    keywords$(OBJ_EXT) locale$(OBJ_EXT) long_names$(OBJ_EXT) \
+    mathoms$(OBJ_EXT) mg$(OBJ_EXT) mro_core$(OBJ_EXT) numeric$(OBJ_EXT) \
+    pad$(OBJ_EXT) peep$(OBJ_EXT) perlio$(OBJ_EXT) perly$(OBJ_EXT) \
+    pp$(OBJ_EXT) pp_ctl$(OBJ_EXT) pp_hot$(OBJ_EXT) pp_pack$(OBJ_EXT) \
+    pp_sort$(OBJ_EXT) pp_sys$(OBJ_EXT) reentr$(OBJ_EXT) regcomp$(OBJ_EXT) \
+    regcomp_debug$(OBJ_EXT) regcomp_invlist$(OBJ_EXT) \
+    regcomp_study$(OBJ_EXT) regcomp_trie$(OBJ_EXT) regexec$(OBJ_EXT) \
+    run$(OBJ_EXT) scope$(OBJ_EXT) sv$(OBJ_EXT) taint$(OBJ_EXT) \
+    time64$(OBJ_EXT) toke$(OBJ_EXT) utf8$(OBJ_EXT) util$(OBJ_EXT) \
     $(mallocobj) $(ARCHOBJS)
 
 miniperl_objs_nodt = $(mini_only_objs) $(common_objs) miniperlmain$(OBJ_EXT)
@@ -635,7 +631,7 @@ esac
 
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
-perltoc_pod_prereqs = extra.pods pod/perl5422delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
+perltoc_pod_prereqs = extra.pods pod/perl5440delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
 generated_pods = pod/perltoc.pod $(perltoc_pod_prereqs)
 generated_headers = uudmap.h bitcount.h mg_data.h
 
@@ -1144,9 +1140,9 @@ pod/perlintern.pod: $(MINIPERL_EXE) autodoc.pl embed.fnc
 pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
 	$(MINIPERL) pod/perlmodlib.PL -q
 
-pod/perl5422delta.pod: pod/perldelta.pod
-	$(RMS) pod/perl5422delta.pod
-	$(LNS) perldelta.pod pod/perl5422delta.pod
+pod/perl5440delta.pod: pod/perldelta.pod
+	$(RMS) pod/perl5440delta.pod
+	$(LNS) perldelta.pod pod/perl5440delta.pod
 
 extra.pods: $(MINIPERL_EXE)
 	-@test ! -f extra.pods || rm -f `cat extra.pods`
@@ -1367,7 +1363,7 @@ veryclean:	_verycleaner _mopup _clobber
 _mopup:
 	rm -f *$(OBJ_EXT) *$(LIB_EXT) all perlmain.c $(mini_only_src) generate_uudmap$(EXE_EXT) $(generated_headers)
 	-rmdir .depending
-	-rm *.depends makedepend_file
+	-rm *.depends
 	-@test -f extra.pods && rm -f `cat extra.pods`
 	-@test -f vms/README_vms.pod && rm -f vms/README_vms.pod
 	-rm -f perl.exp ext.libs $(generated_pods) uni.data $(mini_only_objs) pod/roffitall
@@ -1427,8 +1423,8 @@ _cleaner2:
 	-rmdir lib/Win32API lib/VMS lib/Unicode/Collate/Locale
 	-rmdir lib/Unicode/Collate/CJK lib/Unicode/Collate lib/Tie/Hash
 	-rmdir lib/Thread lib/Text lib/Test2/Workflow/Task lib/Test2/Workflow
-	-rmdir lib/Test2/Util/Table lib/Test2/Util lib/Test2/Tools
-	-rmdir lib/Test2/Require lib/Test2/Plugin
+	-rmdir lib/Test2/V1 lib/Test2/Util/Table lib/Test2/Util
+	-rmdir lib/Test2/Tools lib/Test2/Require lib/Test2/Plugin
 	-rmdir lib/Test2/Manual/Tooling/Plugin lib/Test2/Manual/Tooling
 	-rmdir lib/Test2/Manual/Testing lib/Test2/Manual/Anatomy
 	-rmdir lib/Test2/Manual lib/Test2/IPC/Driver lib/Test2/IPC
@@ -1495,15 +1491,20 @@ cscopeflags = -Rb  # Recursive, build-only.
 cscope.out cscope: $(c) $(h)
 	cscope $(cscopeflags)
 
-# Need to unset during recursion to go out of loop.
+# $(FIRSTMAKEFILE) is generated by the makedepend script.
+# The makedepend script uses the makedependfile script.
+
+# Need to unset MAKEDEPEND during recursion to go out of loop.
 # The README below ensures that the dependency list is never empty and
 # that when MAKEDEPEND is empty $(FIRSTMAKEFILE) doesn't need rebuilding.
 
-MAKEDEPEND = Makefile makedepend_file makedepend
+MAKEDEPEND = Makefile makedependfile makedepend
 
 $(FIRSTMAKEFILE):	README $(MAKEDEPEND)
 	$(MAKE) depend MAKEDEPEND=
 !NO!SUBS!
+
+# Targets generating the underlying file from the scripts defined in SH variable.
 
 for f in $SH; do
     file=`SH_to_target $f`
@@ -1517,11 +1518,11 @@ done
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
 .PHONY: depend
-depend: makedepend $(DTRACE_H) $(generated_headers)
+depend: makedependfile makedepend $(DTRACE_H) $(generated_headers)
 	sh ./makedepend MAKE="$(MAKE)" cflags
 
 .c.c.depends:
-	sh ./makedepend_file $< $@ cflags
+	sh ./makedependfile $< $@ cflags
 
 .PHONY: test check test_prep test_prep_nodll test_prep_pre \
 	test_prep_reonly test_tty test-tty test_notty test-notty \

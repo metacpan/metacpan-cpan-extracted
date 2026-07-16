@@ -1,0 +1,26 @@
+<script>
+// ─────────────────────────────────────────────────────────
+// Group extension: injects a Groups column into the User
+// DataTable. Reads row.groups (populated by the User
+// controller when Group plugin is active).
+// ─────────────────────────────────────────────────────────
+
+window._userExtraColumns = window._userExtraColumns || [];
+window._userExtraColumns.push({
+    "data": null,
+    "render": function (data, type, row) {
+        var aff = '<ul>';
+        if (row.groups && row.groups.length > 0) {
+            for (var i = 0; i < row.groups.length; i++) {
+                aff += '<li>';
+                if (row.groups[i].active == 0) { aff += '<del>'; }
+                aff += row.groups[i].name;
+                if (row.groups[i].active == 0) { aff += '</del>'; }
+                aff += '</li>';
+            }
+        }
+        aff += '</ul>';
+        return aff;
+    }
+});
+</script>

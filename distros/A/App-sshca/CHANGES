@@ -1,4 +1,12 @@
 
+0.0.8   2026-07-15
+   [Changed]
+     - Certificate store format; run 'sshca init --upgrade'
+   [Added]
+     - Certificate renewal by certificate identity
+   [Fixed]
+     - Exclusive lock on 'serial' file
+
 0.0.7   2026-06-03
    [Fixed]
      - Resolution of 'basedir' argument to 'init' subcommand

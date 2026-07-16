@@ -137,7 +137,6 @@ S_init_tls_and_interp(PerlInterpreter *my_perl)
 void
 Perl_sys_init(int* argc, char*** argv)
 {
-
     PERL_ARGS_ASSERT_SYS_INIT;
 
     PERL_UNUSED_ARG(argc); /* may not be used depending on _BODY macro */
@@ -148,7 +147,6 @@ Perl_sys_init(int* argc, char*** argv)
 void
 Perl_sys_init3(int* argc, char*** argv, char*** env)
 {
-
     PERL_ARGS_ASSERT_SYS_INIT3;
 
     PERL_UNUSED_ARG(argc); /* may not be used depending on _BODY macro */
@@ -160,6 +158,8 @@ Perl_sys_init3(int* argc, char*** argv, char*** env)
 void
 Perl_sys_term(void)
 {
+    PERL_ARGS_ASSERT_SYS_TERM;
+
     if (!PL_veto_cleanup) {
         PERL_SYS_TERM_BODY();
     }
@@ -174,9 +174,9 @@ perl_alloc_using(const struct IPerlMem** ipM, const struct IPerlMem** ipMS,
                  const struct IPerlDir** ipD, const struct IPerlSock** ipS,
                  const struct IPerlProc** ipP)
 {
-    PerlInterpreter *my_perl;
-
     PERL_ARGS_ASSERT_PERL_ALLOC_USING;
+
+    PerlInterpreter *my_perl;
 
     /* Newx() needs interpreter, so call malloc() instead */
     my_perl = (PerlInterpreter*)((*ipM)->pCalloc)(ipM, 1, sizeof(PerlInterpreter));
@@ -209,6 +209,8 @@ Allocates a new Perl interpreter.  See L<perlembed>.
 PerlInterpreter *
 perl_alloc(void)
 {
+    PERL_ARGS_ASSERT_PERL_ALLOC;
+
     PerlInterpreter *my_perl = (PerlInterpreter*)PerlMem_calloc(1, sizeof(PerlInterpreter));
 
     S_init_tls_and_interp(my_perl);
@@ -228,7 +230,6 @@ Initializes a new Perl interpreter.  See L<perlembed>.
 void
 perl_construct(pTHXx)
 {
-
     PERL_ARGS_ASSERT_PERL_CONSTRUCT;
 
 #ifdef MULTIPLICITY
@@ -347,7 +348,7 @@ perl_construct(pTHXx)
     Newxz(PL_stashpad, PL_stashpadmax, HV *);
 #endif
 #ifdef USE_REENTRANT_API
-    Perl_reentrant_init(aTHX);
+    reentrant_init();
 #endif
     if (PL_hash_seed_set == FALSE) {
         /* Initialize the hash seed and state at startup. This must be
@@ -360,7 +361,7 @@ perl_construct(pTHXx)
          */
 #if defined(USE_HASH_SEED)
         /* get the hash seed from the environment or from an RNG */
-        Perl_get_hash_seed(aTHX_ PL_hash_seed);
+        get_hash_seed(PL_hash_seed);
 #else
         /* they want a hard coded seed, check that it is long enough */
         assert( strlen(PERL_HASH_SEED) >= PERL_HASH_SEED_BYTES );
@@ -477,7 +478,9 @@ no threads.
 int
 Perl_nothreadhook(pTHX)
 {
+    PERL_ARGS_ASSERT_NOTHREADHOOK;
     PERL_UNUSED_CONTEXT;
+
     return 0;
 }
 
@@ -492,12 +495,15 @@ Stub that provides shutdown hook.
 void
 Perl_noshutdownhook()
 {
+    PERL_ARGS_ASSERT_NOSHUTDOWNHOOK;
 }
 
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
 void
 Perl_dump_sv_child(pTHX_ SV *sv)
 {
+    PERL_ARGS_ASSERT_DUMP_SV_CHILD;
+
     ssize_t got;
     const int sock = PL_dumper_fd;
     const int debug_fd = PerlIO_fileno(Perl_debug_log);
@@ -507,8 +513,6 @@ Perl_dump_sv_child(pTHX_ SV *sv)
     struct cmsghdr *cmptr;
     int returned_errno;
     unsigned char buffer[256];
-
-    PERL_ARGS_ASSERT_DUMP_SV_CHILD;
 
     if(sock == -1 || debug_fd == -1)
         return;
@@ -629,6 +633,8 @@ interpret specific numeric values as having specific meanings.
 int
 perl_destruct(pTHXx)
 {
+    PERL_ARGS_ASSERT_PERL_DESTRUCT;
+
     volatile signed char destruct_level;  /* see possible values in intrpvar.h */
     HV *hv;
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
@@ -636,7 +642,6 @@ perl_destruct(pTHXx)
 #endif
     int i;
 
-    PERL_ARGS_ASSERT_PERL_DESTRUCT;
 #ifndef MULTIPLICITY
     PERL_UNUSED_ARG(my_perl);
 #endif
@@ -1453,7 +1458,7 @@ perl_destruct(pTHXx)
                         sv->sv_debug_serial
                     );
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-                    Perl_dump_sv_child(aTHX_ sv);
+                    dump_sv_child(sv);
 #endif
                 }
             }
@@ -1521,7 +1526,7 @@ perl_destruct(pTHXx)
     PL_debug = 0;
 
 #ifdef USE_REENTRANT_API
-    Perl_reentrant_free(aTHX);
+    reentrant_free();
 #endif
 
     /* These all point to HVs that are about to be blown away.
@@ -1575,7 +1580,6 @@ Releases a Perl interpreter.  See L<perlembed>.
 void
 perl_free(pTHXx)
 {
-
     PERL_ARGS_ASSERT_PERL_FREE;
 
     if (PL_veto_cleanup)
@@ -1661,6 +1665,8 @@ list is executed each time the current or any descendent thread terminates.
 void
 Perl_call_atexit(pTHX_ ATEXIT_t fn, void *ptr)
 {
+    PERL_ARGS_ASSERT_CALL_ATEXIT;
+
     Renew(PL_exitlist, PL_exitlistlen+1, PerlExitListEntry);
     PL_exitlist[PL_exitlistlen].fn = fn;
     PL_exitlist[PL_exitlistlen].ptr = ptr;
@@ -1781,11 +1787,12 @@ code: one should get that from L</perl_destruct>.
 int
 perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 {
+    PERL_ARGS_ASSERT_PERL_PARSE;
+
     I32 oldscope;
     int ret;
     dJMPENV;
 
-    PERL_ARGS_ASSERT_PERL_PARSE;
 #ifndef MULTIPLICITY
     PERL_UNUSED_ARG(my_perl);
 #endif
@@ -2022,9 +2029,6 @@ S_Internals_V(pTHX_ CV *cv)
 #  ifdef PERL_DISABLE_PMC
                              " PERL_DISABLE_PMC"
 #  endif
-#  ifdef PERL_DONT_CREATE_GVSV
-                             " PERL_DONT_CREATE_GVSV"
-#  endif
 #  ifdef PERL_EXTERNAL_GLOB
                              " PERL_EXTERNAL_GLOB"
 #  endif
@@ -2109,9 +2113,9 @@ S_Internals_V(pTHX_ CV *cv)
     EXTEND(SP, entries);
 
     PUSHs(newSVpvn_flags(PL_bincompat_options, strlen(PL_bincompat_options),
-                              SVs_TEMP));
-    PUSHs(Perl_newSVpvn_flags(aTHX_ non_bincompat_options,
-                              sizeof(non_bincompat_options) - 1, SVs_TEMP));
+                         SVs_TEMP));
+    PUSHs(newSVpvn_flags(non_bincompat_options,
+                         sizeof(non_bincompat_options) - 1, SVs_TEMP));
 
 #ifndef PERL_BUILD_DATE
 #  ifdef __DATE__
@@ -2134,8 +2138,10 @@ S_Internals_V(pTHX_ CV *cv)
     for (i = 1; i <= local_patch_count; i++) {
         /* This will be an undef, if PL_localpatches[i] is NULL.  */
         PUSHs(newSVpvn_flags(PL_localpatches[i],
-            PL_localpatches[i] == NULL ? 0 : strlen(PL_localpatches[i]),
-            SVs_TEMP));
+                             (PL_localpatches[i] == NULL)
+                              ? 0
+                              : strlen(PL_localpatches[i]),
+                             SVs_TEMP));
     }
 
     XSRETURN(entries);
@@ -2200,9 +2206,11 @@ S_moreswitch_m(pTHX_ char option, const char *s)
 #define INCPUSH_ADD_SUB_DIRS	\
     (INCPUSH_ADD_VERSIONED_SUB_DIRS|INCPUSH_ADD_ARCHONLY_SUB_DIRS)
 
-STATIC void *
+static void *
 S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 {
+    PERL_ARGS_ASSERT_PARSE_BODY;
+
     PerlIO *rsfp;
     int argc = PL_origargc;
     char **argv = PL_origargv;
@@ -2356,9 +2364,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
                 }
                 else {
                     ++s;
-                    opts_prog = Perl_newSVpvf(aTHX_
-                                              "use Config; Config::config_vars(qw%c%s%c)",
-                                              0, s, 0);
+                    opts_prog = newSVpvf("use Config; Config::config_vars"
+                                         "(qw%c%s%c)", 0, s, 0);
                     s += strlen(s);
                 }
                 Perl_av_create_and_push(aTHX_ &PL_preambleav, opts_prog);
@@ -2437,7 +2444,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
                 while (++s && *s) {
                     if (isSPACE(*s)) {
                         if (!popt_copy) {
-                            popt_copy = SvPVX(newSVpvn_flags(d, strlen(d), SVs_TEMP));
+                            popt_copy = SvPVX(newSVpvn_flags(d, strlen(d),
+                                                             SVs_TEMP));
                             s = popt_copy + (s - d);
                             d = popt_copy;
                         }
@@ -2503,11 +2511,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
             /* if lib/buildcustomize.pl exists, it should not fail. If it does,
                it should be reported immediately as a build failure.  */
             (void)Perl_av_create_and_unshift_one(aTHX_ &PL_preambleav,
-                                                 Perl_newSVpvf(aTHX_
+                                                 newSVpvf(
                 "BEGIN { my $f = q%c%s%" SVf "/buildcustomize.pl%c; "
                         "do {local $!; -f $f }"
                         " and do $f || die $@ || qq '$f: $!' }",
-                                0, (TAINTING_get ? "./" : ""), SVfARG(*inc0), 0));
+                                0, (TAINTING_get ? "./" : ""),
+                                SVfARG(*inc0), 0));
         }
 #  else
         /* SITELIB_EXP is a function call on Win32.  */
@@ -2518,10 +2527,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
                                            INCPUSH_CAN_RELOCATE);
             const char *const sitelib = SvPVX(sitelib_sv);
             (void)Perl_av_create_and_unshift_one(aTHX_ &PL_preambleav,
-                                                 Perl_newSVpvf(aTHX_
-                                                               "BEGIN { do {local $!; -f q%c%s/sitecustomize.pl%c} && do q%c%s/sitecustomize.pl%c }",
-                                                               0, sitelib, 0,
-                                                               0, sitelib, 0));
+                                                 newSVpvf(
+                "BEGIN { do {local $!; -f q%c%s/sitecustomize.pl%c} &&"
+                         " do q%c%s/sitecustomize.pl%c }",
+                         0, sitelib, 0,
+                         0, sitelib, 0));
             assert (SvREFCNT(sitelib_sv) == 1);
             SvREFCNT_dec(sitelib_sv);
         }
@@ -2597,7 +2607,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     if (xsinit)
         (*xsinit)(aTHX);	/* in case linked C routines want magical variables */
-#if defined(VMS) || defined(WIN32) || defined(__CYGWIN__)
+#if defined(VMS) || defined(WIN32) || defined(__CYGWIN__) || defined(__MVS__)
     init_os_extras();
 #endif
 
@@ -2775,11 +2785,12 @@ one should get that from L</perl_destruct>.
 int
 perl_run(pTHXx)
 {
+    PERL_ARGS_ASSERT_PERL_RUN;
+
     I32 oldscope;
     int ret = 0;
     dJMPENV;
 
-    PERL_ARGS_ASSERT_PERL_RUN;
 #ifndef MULTIPLICITY
     PERL_UNUSED_ARG(my_perl);
 #endif
@@ -2829,9 +2840,11 @@ perl_run(pTHXx)
     return ret;
 }
 
-STATIC void
+static void
 S_run_body(pTHX_ I32 oldscope)
 {
+    PERL_ARGS_ASSERT_RUN_BODY;
+
     DEBUG_r(PerlIO_printf(Perl_debug_log, "%s $` $& $' support (0x%x).\n",
                     PL_sawampersand ? "Enabling" : "Omitting",
                     (unsigned int)(PL_sawampersand)));
@@ -2903,9 +2916,9 @@ and the variable does not exist then NULL is returned.
 SV*
 Perl_get_sv(pTHX_ const char *name, I32 flags)
 {
-    GV *gv;
-
     PERL_ARGS_ASSERT_GET_SV;
+
+    GV *gv;
 
     gv = gv_fetchpv(name, flags, SVt_PV);
     if (gv)
@@ -2933,9 +2946,9 @@ Perl equivalent: C<@{"$name"}>.
 AV*
 Perl_get_av(pTHX_ const char *name, I32 flags)
 {
-    GV* const gv = gv_fetchpv(name, flags, SVt_PVAV);
-
     PERL_ARGS_ASSERT_GET_AV;
+
+    GV* const gv = gv_fetchpv(name, flags, SVt_PVAV);
 
     if (flags & ~SVf_UTF8)
         return GvAVn(gv);
@@ -2961,9 +2974,9 @@ returned.
 HV*
 Perl_get_hv(pTHX_ const char *name, I32 flags)
 {
-    GV* const gv = gv_fetchpv(name, flags, SVt_PVHV);
-
     PERL_ARGS_ASSERT_GET_HV;
+
+    GV* const gv = gv_fetchpv(name, flags, SVt_PVHV);
 
     if (flags & ~SVf_UTF8)
         return GvHVn(gv);
@@ -2978,6 +2991,7 @@ Perl_get_hv(pTHX_ const char *name, I32 flags)
 =for apidoc      get_cv
 =for apidoc_item get_cvn_flags
 =for apidoc_item get_cvs
+=for apidoc_flag GV_ADD
 
 These return the CV of the specified Perl subroutine.  C<flags> are passed to
 C<gv_fetchpvn_flags>.  If C<GV_ADD> is set and the Perl subroutine does not
@@ -2992,17 +3006,15 @@ string.  With C<get_cvn_flags>, the name is also given by the C<name>
 parameter, but it is a Perl string (possibly containing embedded NUL bytes),
 and its length in bytes is contained in the C<len> parameter.
 
-=for apidoc Amnh||GV_ADD
-
 =cut
 */
 
 CV*
 Perl_get_cvn_flags(pTHX_ const char *name, STRLEN len, I32 flags)
 {
-    GV* const gv = gv_fetchpvn_flags(name, len, flags, SVt_PVCV);
-
     PERL_ARGS_ASSERT_GET_CVN_FLAGS;
+
+    GV* const gv = gv_fetchpvn_flags(name, len, flags, SVt_PVCV);
 
     if (gv && UNLIKELY(SvROK(gv)) && SvTYPE(SvRV((SV *)gv)) == SVt_PVCV)
         return (CV*)SvRV((SV *)gv);
@@ -3121,9 +3133,10 @@ Perl_call_method(pTHX_ const char *methname, I32 flags)
                         /* name of the subroutine */
                         /* See G_* flags in cop.h */
 {
+    PERL_ARGS_ASSERT_CALL_METHOD;
+
     STRLEN len;
     SV* sv;
-    PERL_ARGS_ASSERT_CALL_METHOD;
 
     len = strlen(methname);
     sv = flags & G_METHOD_NAMED
@@ -3136,6 +3149,8 @@ Perl_call_method(pTHX_ const char *methname, I32 flags)
 /* May be called with any of a CV, a GV, or an SV containing the name. */
 /*
 =for apidoc call_sv
+=for apidoc_flag G_METHOD
+=for apidoc_flag G_METHOD_NAMED
 
 Performs a callback to the Perl sub specified by the SV.
 
@@ -3154,9 +3169,6 @@ not be depended on.
 
 See L<perlcall>.
 
-=for apidoc Amnh||G_METHOD
-=for apidoc Amnh||G_METHOD_NAMED
-
 =cut
 */
 
@@ -3164,6 +3176,8 @@ SSize_t
 Perl_call_sv(pTHX_ SV *sv, I32 arg_flags)
                         /* See G_* flags in cop.h */
 {
+    PERL_ARGS_ASSERT_CALL_SV;
+
     LOGOP myop;		/* fake syntax tree node */
     METHOP method_op;
     SSize_t oldmark;
@@ -3176,8 +3190,6 @@ Perl_call_sv(pTHX_ SV *sv, I32 arg_flags)
      */
     volatile I32 flags = arg_flags;
     dJMPENV;
-
-    PERL_ARGS_ASSERT_CALL_SV;
 
     if (flags & G_DISCARD) {
         ENTER;
@@ -3317,6 +3329,8 @@ Perl_call_sv(pTHX_ SV *sv, I32 arg_flags)
 
 /*
 =for apidoc eval_sv
+=for apidoc_flag G_RETHROW
+=for apidoc_flag G_USEHINTS
 
 Tells Perl to C<eval> the string in the SV.  It supports the same flags
 as C<call_sv>, with the obvious exception of C<G_EVAL>.  See L<perlcall>.
@@ -3328,8 +3342,6 @@ By default the code is compiled and executed with the default hints,
 such as strict and features.  Set C<G_USEHINTS> in flags to use the
 current hints from C<PL_curcop>.
 
-=for apidoc Amnh||G_RETHROW
-=for apidoc Amnh||G_USEHINTS
 =cut
 */
 
@@ -3338,14 +3350,14 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
                         /* See G_* flags in cop.h */
 {
+    PERL_ARGS_ASSERT_EVAL_SV;
+
     UNOP myop;		/* fake syntax tree node */
     volatile SSize_t oldmark;
     volatile SSize_t retval = 0;
     int ret;
     OP* const oldop = PL_op;
     dJMPENV;
-
-    PERL_ARGS_ASSERT_EVAL_SV;
 
     if (flags & G_DISCARD) {
         ENTER;
@@ -3473,9 +3485,9 @@ Tells Perl to C<eval> the given string in scalar context and return an SV* resul
 SV*
 Perl_eval_pv(pTHX_ const char *p, I32 croak_on_error)
 {
-    SV* sv = newSVpv(p, 0);
-
     PERL_ARGS_ASSERT_EVAL_PV;
+
+    SV* sv = newSVpv(p, 0);
 
     if (croak_on_error) {
         sv_2mortal(sv);
@@ -3509,27 +3521,29 @@ Perl_eval_pv(pTHX_ const char *p, I32 croak_on_error)
 
 Tells Perl to C<require> the file named by the string argument.  It is
 analogous to the Perl code C<eval "require '$file'">.  It's even
-implemented that way; consider using load_module instead.
+implemented that way; consider using C<L</load_module>> instead.
 
 =cut */
 
 void
 Perl_require_pv(pTHX_ const char *pv)
 {
+    PERL_ARGS_ASSERT_REQUIRE_PV;
+
     dSP;
     SV* sv;
 
-    PERL_ARGS_ASSERT_REQUIRE_PV;
-
     PUSHSTACKi(PERLSI_REQUIRE);
-    sv = Perl_newSVpvf(aTHX_ "require q%c%s%c", 0, pv, 0);
+    sv = newSVpvf("require q%c%s%c", 0, pv, 0);
     eval_sv(sv_2mortal(sv), G_DISCARD);
     POPSTACK;
 }
 
-STATIC void
+static void
 S_usage(pTHX)		/* XXX move this out into a module ? */
 {
+    PERL_ARGS_ASSERT_USAGE;
+
     /* This message really ought to be max 23 lines.
      * Removed -h because the user already knows that option. Others? */
 
@@ -3587,6 +3601,8 @@ NULL
 int
 Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
 {
+    PERL_ARGS_ASSERT_GET_DEBUG_OPTS;
+
     static const char * const usage_msgd[] = {
       " Debugging flag values: (see also -d)\n"
       "  p  Tokenizing and parsing (with v, displays parse stack)\n"
@@ -3621,8 +3637,6 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
       NULL
     };
     UV uv = 0;
-
-    PERL_ARGS_ASSERT_GET_DEBUG_OPTS;
 
     if (isALPHA(**s)) {
         /* NOTE:
@@ -3670,10 +3684,10 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
 const char *
 Perl_moreswitches(pTHX_ const char *s)
 {
+    PERL_ARGS_ASSERT_MORESWITCHES;
+
     UV rschar;
     const char option = *s; /* used to remember option in -m/-M code */
-
-    PERL_ARGS_ASSERT_MORESWITCHES;
 
     switch (*s) {
     case '0':
@@ -3976,9 +3990,11 @@ Perl_moreswitches(pTHX_ const char *s)
 }
 
 
-STATIC void
+static void
 S_minus_v(pTHX)
 {
+    PERL_ARGS_ASSERT_MINUS_V;
+
         PerlIO * PIO_stdout;
         {
             const char * const level_str = "v" PERL_VERSION_STRING;
@@ -4071,6 +4087,8 @@ Internet, point your browser at https://www.perl.org/, the Perl Home Page.\n\n")
 void
 Perl_my_unexec(pTHX)
 {
+    PERL_ARGS_ASSERT_MY_UNEXEC;
+
 #ifdef UNEXEC
     SV *    prog = newSVpv(BIN_EXP, 0);
     SV *    file = newSVpv(PL_origfilename, 0);
@@ -4096,9 +4114,11 @@ Perl_my_unexec(pTHX)
 }
 
 /* initialize curinterp */
-STATIC void
+static void
 S_init_interp(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_INTERP;
+
 #ifdef MULTIPLICITY
 #  define PERLVAR(prefix,var,type)
 #  define PERLVARA(prefix,var,n,type)
@@ -4128,9 +4148,11 @@ S_init_interp(pTHX)
 
 }
 
-STATIC void
+static void
 S_init_main_stash(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_MAIN_STASH;
+
     GV *gv;
     HV *hv = newHV();
 
@@ -4164,9 +4186,7 @@ S_init_main_stash(pTHX)
     SvREFCNT_inc_simple_void(PL_replgv);
     GvMULTI_on(PL_replgv);
     (void)form("%240s","");	/* Preallocate temp - for immediate signals. */
-#ifdef PERL_DONT_CREATE_GVSV
     (void)gv_SVadd(PL_errgv);
-#endif
     sv_grow(ERRSV, 240);	/* Preallocate - for immediate signals. */
     CLEAR_ERRSV();
     CopSTASH_set(&PL_compiling, PL_defstash);
@@ -4177,15 +4197,15 @@ S_init_main_stash(pTHX)
     sv_setpvs(get_sv("/", GV_ADD), "\n");
 }
 
-STATIC PerlIO *
+static PerlIO *
 S_open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript)
 {
+    PERL_ARGS_ASSERT_OPEN_SCRIPT;
+
     int fdscript = -1;
     PerlIO *rsfp = NULL;
     Stat_t tmpstatbuf;
     int fd;
-
-    PERL_ARGS_ASSERT_OPEN_SCRIPT;
 
     if (PL_e_script) {
         PL_origfilename = savepvs("-e");
@@ -4315,15 +4335,15 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript)
 #ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
 /* Don't even need this function.  */
 #else
-STATIC void
+static void
 S_validate_suid(pTHX_ PerlIO *rsfp)
 {
+    PERL_ARGS_ASSERT_VALIDATE_SUID;
+
     const Uid_t  my_uid = PerlProc_getuid();
     const Uid_t my_euid = PerlProc_geteuid();
     const Gid_t  my_gid = PerlProc_getgid();
     const Gid_t my_egid = PerlProc_getegid();
-
-    PERL_ARGS_ASSERT_VALIDATE_SUID;
 
     if (my_euid != my_uid || my_egid != my_gid) {	/* (suidperl doesn't exist, in fact) */
         int fd = PerlIO_fileno(rsfp);
@@ -4343,13 +4363,13 @@ FIX YOUR KERNEL, PUT A C WRAPPER AROUND THIS SCRIPT, OR USE -u AND UNDUMP!\n");
 }
 #endif /* SETUID_SCRIPTS_ARE_SECURE_NOW */
 
-STATIC void
+static void
 S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
 {
+    PERL_ARGS_ASSERT_FIND_BEGINNING;
+
     const char *s;
     const char *s2;
-
-    PERL_ARGS_ASSERT_FIND_BEGINNING;
 
     /* skip forward in input to the real script? */
 
@@ -4372,9 +4392,11 @@ S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
 }
 
 
-STATIC void
+static void
 S_init_ids(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_IDS;
+
     /* no need to do anything here any more if we don't
      * do tainting. */
 #ifndef NO_TAINT_SUPPORT
@@ -4406,7 +4428,11 @@ S_init_ids(pTHX)
 bool
 Perl_doing_taint(int argc, char *argv[], char *envp[])
 {
-#ifndef PERL_IMPLICIT_SYS
+    PERL_ARGS_ASSERT_DOING_TAINT;
+
+#ifdef PERL_IMPLICIT_SYS
+    PERL_UNUSED_ARG(envp);
+#else
     /* If we have PERL_IMPLICIT_SYS we can't call getuid() et alia
      * before we have an interpreter-- and the whole point of this
      * function is to be called at such an early stage.  If you are on
@@ -4441,9 +4467,11 @@ Perl_doing_taint(int argc, char *argv[], char *envp[])
    optimisation.  The only message that isn't /^-.$/ is
    "program input from stdin", which is substituted in place of '\0', which
    could never be a command line flag.  */
-STATIC void
+static void
 S_forbid_setid(pTHX_ const char flag, const bool suidscript) /* g */
 {
+    PERL_ARGS_ASSERT_FORBID_SETID;
+
     char string[3] = "-x";
     const char *message = "program input from stdin";
 
@@ -4466,6 +4494,8 @@ S_forbid_setid(pTHX_ const char flag, const bool suidscript) /* g */
 void
 Perl_init_dbargs(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_DBARGS;
+
     AV *const args = PL_dbargs = GvAV(gv_AVadd((gv_fetchpvs("DB::args",
                                                             GV_ADDMULTI,
                                                             SVt_PVAV))));
@@ -4484,6 +4514,8 @@ Perl_init_dbargs(pTHX)
 void
 Perl_init_debugger(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_DEBUGGER;
+
     HV * const ostash = PL_curstash;
     MAGIC *mg;
 
@@ -4529,6 +4561,8 @@ Perl_init_debugger(pTHX)
 void
 Perl_init_stacks(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_STACKS;
+
     SSize_t size;
 
 #ifdef PERL_RC_STACK
@@ -4578,9 +4612,11 @@ Perl_init_stacks(pTHX)
 
 #undef REASONABLE
 
-STATIC void
+static void
 S_nuke_stacks(pTHX)
 {
+    PERL_ARGS_ASSERT_NUKE_STACKS;
+
     while (PL_curstackinfo->si_next)
         PL_curstackinfo = PL_curstackinfo->si_next;
     while (PL_curstackinfo) {
@@ -4602,11 +4638,11 @@ S_nuke_stacks(pTHX)
 void
 Perl_populate_isa(pTHX_ const char *name, STRLEN len, ...)
 {
+    PERL_ARGS_ASSERT_POPULATE_ISA;
+
     GV *const gv = gv_fetchpvn(name, len, GV_ADD | GV_ADDMULTI, SVt_PVAV);
     AV *const isa = GvAVn(gv);
     va_list args;
-
-    PERL_ARGS_ASSERT_POPULATE_ISA;
 
     if(AvFILLp(isa) != -1)
         return;
@@ -4633,9 +4669,11 @@ Perl_populate_isa(pTHX_ const char *name, STRLEN len, ...)
 }
 
 
-STATIC void
+static void
 S_init_predump_symbols(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_PREDUMP_SYMBOLS;
+
     GV *tmpgv;
     IO *io;
 
@@ -4698,8 +4736,13 @@ Perl_init_argv_symbols(pTHX_ int argc, char **argv)
 {
     PERL_ARGS_ASSERT_INIT_ARGV_SYMBOLS;
 
+    const bool mark_args_utf8 =
+        (!(PL_unicode & PERL_UNICODE_LOCALE_FLAG) || PL_utf8locale)
+        && (PL_unicode & PERL_UNICODE_ARGV_FLAG);
+
     argc--,argv++;	/* skip name of script */
     if (PL_doswitches) {
+        const I32 flags = GV_ADD | (mark_args_utf8 ? SVf_UTF8 : 0);
         for (; argc > 0 && **argv == '-'; argc--,argv++) {
             char *s;
             if (!argv[0][1])
@@ -4710,11 +4753,16 @@ Perl_init_argv_symbols(pTHX_ int argc, char **argv)
             }
             if ((s = strchr(argv[0], '='))) {
                 const char *const start_name = argv[0] + 1;
-                sv_setpv(GvSV(gv_fetchpvn_flags(start_name, s - start_name,
-                                                TRUE, SVt_PV)), s + 1);
+                SV *const sv = GvSV(gv_fetchpvn_flags(start_name, s - start_name,
+                                                      flags, SVt_PV));
+                sv_setpv(sv, s + 1);
+                if (mark_args_utf8)
+                    SvUTF8_on(sv);
+                else
+                    SvUTF8_off(sv);
             }
             else
-                sv_setiv(GvSV(gv_fetchpv(argv[0]+1, GV_ADD, SVt_PV)),1);
+                sv_setiv(GvSV(gv_fetchpv(argv[0]+1, flags, SVt_PV)), 1);
         }
     }
     if ((PL_argvgv = gv_fetchpvs("ARGV", GV_ADD|GV_NOTQUAL, SVt_PVAV))) {
@@ -4724,12 +4772,10 @@ Perl_init_argv_symbols(pTHX_ int argc, char **argv)
         for (; argc > 0; argc--,argv++) {
             SV * const sv = newSVpv(argv[0],0);
             av_push(GvAV(PL_argvgv),sv);
-            if (!(PL_unicode & PERL_UNICODE_LOCALE_FLAG) || PL_utf8locale) {
-                 if (PL_unicode & PERL_UNICODE_ARGV_FLAG)
-                      SvUTF8_on(sv);
-            }
+            if (mark_args_utf8)
+                SvUTF8_on(sv);
             if (PL_unicode & PERL_UNICODE_WIDESYSCALLS_FLAG) /* Sarathy? */
-                 (void)sv_utf8_decode(sv);
+                (void)sv_utf8_decode(sv);
         }
     }
 
@@ -4739,12 +4785,12 @@ Perl_init_argv_symbols(pTHX_ int argc, char **argv)
                     "reading from STDIN");
 }
 
-STATIC void
+static void
 S_init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 {
-    GV* tmpgv;
-
     PERL_ARGS_ASSERT_INIT_POSTDUMP_SYMBOLS;
+
+    GV* tmpgv;
 
     PL_toptarget = newSV_type(SVt_PVIV);
     SvPVCLEAR(PL_toptarget);
@@ -4887,9 +4933,11 @@ S_init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
     }
 }
 
-STATIC void
+static void
 S_init_perllib(pTHX)
 {
+    PERL_ARGS_ASSERT_INIT_PERLLIB;
+
 #ifndef VMS
     const char *perl5lib = NULL;
 #endif
@@ -4974,12 +5022,12 @@ S_init_perllib(pTHX)
 /* Push a directory onto @INC if it exists.
    Generate a new SV if we do this, to save needing to copy the SV we push
    onto @INC  */
-STATIC SV *
+static SV *
 S_incpush_if_exists(pTHX_ AV *const av, SV *dir, SV *const stem)
 {
-    Stat_t tmpstatbuf;
-
     PERL_ARGS_ASSERT_INCPUSH_IF_EXISTS;
+
+    Stat_t tmpstatbuf;
 
     if (PerlLIO_stat(SvPVX_const(dir), &tmpstatbuf) >= 0 &&
         S_ISDIR(tmpstatbuf.st_mode)) {
@@ -4993,13 +5041,14 @@ S_incpush_if_exists(pTHX_ AV *const av, SV *dir, SV *const stem)
 }
 #endif
 
-STATIC SV *
+static SV *
 S_mayberelocate(pTHX_ const char *const dir, STRLEN len, U32 flags)
 {
+    PERL_ARGS_ASSERT_MAYBERELOCATE;
+
     const U8 canrelocate = (U8)flags & INCPUSH_CAN_RELOCATE;
     SV *libdir;
 
-    PERL_ARGS_ASSERT_MAYBERELOCATE;
     assert(len > 0);
 
     /* I am not convinced that this is valid when PERLLIB_MANGLE is
@@ -5110,7 +5159,7 @@ S_mayberelocate(pTHX_ const char *const dir, STRLEN len, U32 flags)
                        length. libpath points somewhere into the libdir SV.
                        We need to join the 2 with '/' and drop the result into
                        libdir.  */
-                    tempsv = Perl_newSVpvf(aTHX_ "%s/%s", prefix, libpath);
+                    tempsv = newSVpvf("%s/%s", prefix, libpath);
                     SvREFCNT_dec(libdir);
                     /* And this is the new libdir.  */
                     libdir = tempsv;
@@ -5128,9 +5177,11 @@ S_mayberelocate(pTHX_ const char *const dir, STRLEN len, U32 flags)
     return libdir;
 }
 
-STATIC void
+static void
 S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
 {
+    PERL_ARGS_ASSERT_INCPUSH;
+
 #ifndef PERL_IS_MINIPERL
     const U8 using_sub_dirs
         = (U8)flags & (INCPUSH_ADD_VERSIONED_SUB_DIRS
@@ -5147,7 +5198,6 @@ S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
     const U8 push_basedir = (flags & INCPUSH_NOT_BASEDIR) ? 0 : 1;
     AV *const inc = GvAVn(PL_incgv);
 
-    PERL_ARGS_ASSERT_INCPUSH;
     assert(len > 0);
 
     /* Could remove this vestigial extra block, if we don't mind a lot of
@@ -5172,7 +5222,7 @@ S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
             SV *subdir = newSVsv(libdir);
 #ifdef PERL_INC_VERSION_LIST
             /* Configure terminates PERL_INC_VERSION_LIST with a NULL */
-            const char * const incverlist[] = { PERL_INC_VERSION_LIST };
+            static const char * const incverlist[] = { PERL_INC_VERSION_LIST };
             const char * const *incver;
 #endif
 
@@ -5245,15 +5295,15 @@ S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
     }
 }
 
-STATIC void
+static void
 S_incpush_use_sep(pTHX_ const char *p, STRLEN len, U32 flags)
 {
+    PERL_ARGS_ASSERT_INCPUSH_USE_SEP;
+
     const char *s;
     const char *end;
     /* This logic has been broken out from S_incpush(). It may be possible to
        simplify it.  */
-
-    PERL_ARGS_ASSERT_INCPUSH_USE_SEP;
 
     /* perl compiled with -DPERL_RELOCATABLE_INCPUSH will ignore the len
      * argument to incpush_use_sep.  This allows creation of relocatable
@@ -5289,14 +5339,14 @@ S_incpush_use_sep(pTHX_ const char *p, STRLEN len, U32 flags)
 void
 Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 {
+    PERL_ARGS_ASSERT_CALL_LIST;
+
     SV *atsv;
     volatile const line_t oldline = PL_curcop ? CopLINE(PL_curcop) : 0;
     CV *cv;
     STRLEN len;
     int ret;
     dJMPENV;
-
-    PERL_ARGS_ASSERT_CALL_LIST;
 
     while (av_count(paramList) > 0) {
         cv = MUTABLE_CV(av_shift(paramList));
@@ -5380,6 +5430,8 @@ say to do.
 void
 Perl_my_exit(pTHX_ U32 status)
 {
+    PERL_ARGS_ASSERT_MY_EXIT;
+
     if (PL_exit_flags & PERL_EXIT_ABORT) {
         abort();
     }
@@ -5418,6 +5470,8 @@ On VMS, it takes care to set the appropriate severity bits in the exit status.
 void
 Perl_my_failure_exit(pTHX)
 {
+    PERL_ARGS_ASSERT_MY_FAILURE_EXIT;
+
 #ifdef VMS
      /* We have been called to fall on our sword.  The desired exit code
       * should be already set in STATUS_UNIX, but could be shifted over
@@ -5509,9 +5563,11 @@ Perl_my_failure_exit(pTHX)
     my_exit_jump();
 }
 
-STATIC void
+static void
 S_my_exit_jump(pTHX)
 {
+    PERL_ARGS_ASSERT_MY_EXIT_JUMP;
+
     if (PL_e_script) {
         SvREFCNT_dec(PL_e_script);
         PL_e_script = NULL;
@@ -5551,6 +5607,8 @@ read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen)
 void
 Perl_xs_boot_epilog(pTHX_ const SSize_t ax)
 {
+    PERL_ARGS_ASSERT_XS_BOOT_EPILOG;
+
   if (PL_unitcheckav)
         call_list(PL_scopestack_ix, PL_unitcheckav);
     XSRETURN_YES;

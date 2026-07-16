@@ -1,5 +1,5 @@
 package PAGI::Stash;
-$PAGI::Stash::VERSION = '0.002001';
+$PAGI::Stash::VERSION = '0.002002';
 use strict;
 use warnings;
 use Scalar::Util 'blessed';

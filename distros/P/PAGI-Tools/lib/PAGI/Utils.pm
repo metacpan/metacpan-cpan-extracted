@@ -1,5 +1,5 @@
 package PAGI::Utils;
-$PAGI::Utils::VERSION = '0.002001';
+$PAGI::Utils::VERSION = '0.002002';
 use strict;
 use warnings;
 use Exporter 'import';

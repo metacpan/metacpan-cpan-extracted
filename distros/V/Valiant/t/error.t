@@ -67,4 +67,54 @@ ok $all[0]->equals($all[0]);
 
 ##clone
 
+{
+  # match() must iterate option KEYS only (bug: iterated keys AND values,
+  # so a passed value colliding with another option key forced a false non-match)
+  ok my $err = Valiant::Error->new(
+    object => $model,
+    attribute => 'name',
+    type => 'is too short',
+    options => +{ aaa => 'bbb', bbb => 'xxx' },
+  );
+  ok $err->match(name => 'is too short', +{ aaa => 'bbb' }),
+    'match iterates option keys only';
+}
+
+{
+  package Local::IndexSpy;
+
+  use Moo;
+  use Valiant::Validations;
+
+  has number => (is=>'ro');
+
+  our @seen;
+  around 'human_attribute_name' => sub {
+    my ($orig, $self, $attribute, @rest) = @_;
+    push @seen, $attribute;
+    return $self->$orig($attribute, @rest);
+  };
+
+  sub read_attribute_for_validation { return undef }
+}
+
+{
+  # generate_message must strip a dot-indexed nesting the same way full_message
+  # does, so both build the same i18n namespace for a nested-indexed attribute.
+  @Local::IndexSpy::seen = ();
+  ok my $obj = Local::IndexSpy->new;
+  ok my $err = Valiant::Error->new(
+    object => $obj,
+    attribute => 'credit_cards.0.number',
+    type => _t('invalid'),
+    raw_type => _t('invalid'),
+    i18n => $obj->i18n,
+  );
+  $err->message;
+  ok +(grep { $_ eq 'credit_cards.number' } @Local::IndexSpy::seen),
+    'generate_message strips the dot index (credit_cards.0.number -> credit_cards.number)';
+  ok !+(grep { $_ eq 'credit_cards.0.number' } @Local::IndexSpy::seen),
+    'generate_message does not keep the un-stripped dot index';
+}
+
 done_testing;

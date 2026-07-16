@@ -527,7 +527,7 @@ sub _normalize_if_elif {
         my $not= $2 ? "!" : "";
         $line= "#$if ${not}defined($3)";
     }
-    $line =~ s/#((?:el)?if)\s+//
+    $line =~ s/#((?:el)?if)\b\s*//
         or confess "Bad cond: $line";
     my $if= $1;
     $line =~ s/!\s+/!/g;
@@ -733,50 +733,98 @@ sub parse_fh {
 sub lines { $_[0]->{lines} }
 
 # assuming a line looks like an embed.fnc entry parse it
-# and normalize it, and create and EmbedLine object from it.
+# and normalize it, and create an EmbedLine object from it.
 sub tidy_embed_fnc_entry {
     my ($self, $line_data)= @_;
     my $line= $line_data->{line};
-    return $line if $line =~ /^\s*:/;
-    return $line unless $line_data->{type} eq "content";
-    return $line unless $line =~ /\|/;
 
-    $line =~ s/\s*\\\n/ /g;
-    $line =~ s/\s+\z//;
-    ($line)= expand($line);
+    return $line if $line =~ /^\s*:/;                    # Don't tidy comments
+    return $line unless $line_data->{type} eq "content"; # Nor #if-like
+    return $line unless $line =~ /\|/;                   # Nor non-entries
+
+    $line =~ s/\s*\\\n/ /g;     # Embedded \n to blank
+    $line =~ s/\s+\z//;         # No trailing white space
+    ($line)= expand($line);     # No tabs
+
+    # Remove any assertions, and save them.  This must be done before the
+    # split because the assertions can contain '|'
+    $line =~ s/ \b ( assert \s* \( .* ) \z //x;
+    my $assertions = $1;
+
+    # Split into fields
     my ($flags, $ret, $name, @args)= split /\s*\|\s*/, $line;
+
+    # Sort and remove duplicate flags.  Alpha flags are sorted first
     my %flag_seen;
-    $flags= join "", grep !$flag_seen{$_}++, sort split //, $flags;
-    if ($flags =~ s/^#//) {
-        $flags .= "#";
-    }
-    if ($flags eq "#") {
+    $flags = join "", grep !$flag_seen{$_}++,
+                      sort {
+                             my $a_is_word = $a =~ /\w/;
+                             my $b_is_word = $b =~ /\w/;
+                             return $a cmp $b if $a_is_word == $b_is_word;
+                             return -1 if $a_is_word;
+                             return  1;
+                           } split //, $flags;
+
+    if ($flags eq "#") {    # Could be an attempt at a conditional
         die "Not allowed to use only '#' for flags"
             . "in 'embed.fnc' at line $line_data->{start_line_num}";
     }
+
     if (!$flags) {
         die "Missing flags in function definition"
             . " in 'embed.fnc' at line $line_data->{start_line_num}\n"
             . "Did you a forget a line continuation on the previous line?\n";
     }
+
+    # Normalize the return type and arguments
     for ($ret, @args) {
         s/(\w)\*/$1 */g;
         s/\*\s+(\w)/*$1/g;
         s/\*const/* const/g;
     }
+
+    # Start the output; right justify
     my $head= sprintf "%-8s|%-7s", $flags, $ret;
     $head .= sprintf "|%*s", -(31 - length($head)), $name;
+
+    # Start first argument on next line if $head already extends too far to
+    # the right
     if (@args and length($head) > 32) {
         $head .= "\\\n";
         $head .= " " x 32;
     }
+
+    # Add each argument on a separate line
     foreach my $ix (0 .. $#args) {
         my $arg= $args[$ix];
         $head .= "|$arg";
         $head .= "\\\n" . (" " x 32) if $ix < $#args;
     }
+
+    my @assertions;
+    if ($assertions) {
+        # Put each assertion into a separate array element
+        @assertions = split / \s* assert \s* \( /x, $assertions;
+        shift @assertions;  # The split leaves an empty first element
+
+        # Trim each assertion, including any trailing semicolon
+        foreach my $this_assertion (@assertions) {
+            $this_assertion =~ s/ ^ \s+  //x;
+            $this_assertion =~ s/ \s+ \z //x;
+            $this_assertion =~ s/ ; \z   //x;
+
+            # Restore split delimitter
+            $this_assertion = "assert($this_assertion";
+
+            # Each assertion is on a separate line (for now, anyway)
+            $head .= "\\\n" . (" " x 32);
+            $head .= $this_assertion;
+        }
+    }
+
     $line= $head . "\n";
 
+    # Make all lines in this entry the same length; minimum 72
     if ($line =~ /\\\n/) {
         my @lines= split /\s*\\\n/, $line;
         my $len= length($lines[0]);
@@ -787,14 +835,18 @@ sub tidy_embed_fnc_entry {
             (map { sprintf "%*s", -$len, $_ } @lines[ 0 .. $#lines - 1 ]),
             $lines[-1]);
     }
-    ($line)= unexpand($line);
+
+    ($line)= unexpand($line);   # Back to using tabs
 
     $line_data->{embed}= EmbedLine->new(
-        flags       => $flags,
-        return_type => $ret,
-        name        => $name,
-        args        => \@args,
+        flags          => $flags,
+        return_type    => $ret,
+        name           => $name,
+        args           => \@args,
+        assertions     => \@assertions,
+        start_line_num => $line_data->{start_line_num},
     );
+
     $line =~ s/\s+\z/\n/;
     $line_data->{line}= $line;
     return $line;
@@ -960,7 +1012,7 @@ sub _wrap_and_line_up_cond {
     if ($rest =~ s!(\s*/\*.*?\*/)\s*\z!! || $rest =~ s!(\s*\*/\s*)\z!!) {
         $rest_tail= $1;
     }
-    if ($rest) {
+    if ($rest ne "") {
         $rest= $self->tidy_cond($rest);
         $rest= $rest_head . $rest . $rest_tail;
     }
@@ -1220,7 +1272,7 @@ sub _flatten_cond {
 # into the tree, and want to find the best path for
 # ["E","D","C","B","A"] we should return: ["A","B","C"],["E","D"],
 #
-# This used to reduce the number of conditions in the grouped content,
+# This is used to reduce the number of conditions in the grouped content,
 # and is especially helpful with dealing with DEBUGGING related
 # functionality. It is coupled with careful control over the order
 # that we add paths and conditions to the tree.
@@ -1250,6 +1302,198 @@ sub _best_path {
         }
     }
     return ($best, $rest);
+}
+
+sub HeaderLine::reduce_conds { 
+
+    # Reduce the preprocessor conditionals that guard the HeaderLine $self
+    # object, given a hash that says the values of certain preprocessor
+    # conditions, and a corresponding regular expression pattern that matches
+    # any of those conditions.
+    #
+    # This currently returns 0 if the conditionals as a whole evaluate to
+    # false; and 1 if they might evaluate to true.
+
+    my ($self, $constraints_pat, $constraints_ref) = @_;
+
+    # Short cut the common case of there being no conditions in effect.
+    return 1 if $self->{cond}->@* == 0;
+
+    # We need a copy so we don't destroy the input.
+    my @cond = copy_aoa($self->{cond});
+
+    return _reduce_conds(\@cond, $constraints_pat, $constraints_ref);
+}
+
+sub _reduce_conds {
+    my ($cond_ref, $constraints_pat, $constraints_ref, $recursed) = @_;
+
+    # This does the heavy lifting for HeaderLine::reduce_conds().  It
+    # recursively descends the array $cond_ref of conditions.  These have been
+    # normalized by HeaderParser so that each element is ANDed with all the
+    # other ones.  Hence if any element evaluates to false, the whole array
+    # must.
+    #
+    # Each leaf node will have a series of conditionals (typically linked by
+    # '||') , each of which has been normalized by HeaderParser to look like
+    # either of;
+    #    defined(foo)
+    #   !defined(foo)
+    # All the ones of these that match $constraints_pat are substituted by
+    # their corresponding value in %constraints_ref, which will be either 0 or
+    # 1.  The result is looked at to see if it has to evaluate to 0 or not.
+    # Any term whose definedness isn't known is left as-is, so the result of
+    # this function is a string of those, with the known ones removed.  In
+    # many cases, given the typical inputs we have, the result will be reduced
+    # to just '0' or '1'.
+
+    # At leaf nodes, just change all defined(foo) whose values of foo are
+    # known to be those values, reducing them to "#if 0" or "#if 1".  The
+    # unknown values are left as-is, that is, as strings
+    if (ref $cond_ref ne "ARRAY") {
+        die "Expecting an array at top-level call" unless $recursed;
+
+        $cond_ref =~ s/$constraints_pat/$constraints_ref->{$1}/g;
+        reduce_ones_and_zeros(\$cond_ref);
+
+        return $cond_ref;
+    }
+
+    # Here, the conditions are in an array.  We recurse to handle each
+    # element of the array.
+    my $return = "";
+    for (my $i = 0; $i < $cond_ref->@*; $i++) {
+        my $cond = $cond_ref->[$i];
+        my $this_return =  _reduce_conds($cond,
+                                         $constraints_pat,
+                                         $constraints_ref,
+                                         ($recursed // 0) + 1  # is recursed
+                                        );
+        # Each element is ANDed with the others; so if this is 0, the result
+        # will also be 0.
+        return $this_return if $this_return eq '0';
+
+        if ($return =~ / ^ 1? $ /x) {
+            # Here, value so far contributes nothing to the final result;
+            # replace it with the new one.
+            $return = $this_return;
+        }
+        elsif ($this_return ne '1') {
+
+            # When $this_return is 1, it contributes nothing; so do nothing.
+            # Otherwise we will have to AND this new value with what exists.
+            # Parentheses are needed if this contains lower precedence '||'
+            $return .= " && ";
+            if ($this_return =~ /\Q||/) {
+                $return .= "( $this_return )";
+            }
+            else {
+                $return .= $this_return;
+            }
+        }
+    }
+
+    # Didn't do an early return.  Nothing conclusively evaluated to 0.
+    reduce_ones_and_zeros(\$return);
+    return $return;
+}
+
+sub reduce_ones_and_zeros {
+    my $ref = shift;
+
+    # This reduces as much as possible a symbolic C preprocessor expression
+    # that hopefully has terms that are either 0 or 1.  We know that anything
+    # ANDed with 0 is 0 and anything OR'd with 1 is 1, for example.  By
+    # repeating these and other rules, until nothing more changes, we reduce
+    # it as much as possible, given what is known.  In many cases that this is
+    # called in, the value gets down to simply 0 or 1.
+    #
+    # This is simplistic, not knowing about precedence, for example.  khw took
+    # it from Devel::PPPort.  But it works well enough.  HeaderParser could be
+    # enlisted to make it work better.
+    my $any_changed = 0;
+
+    if (ref $ref eq 'ARRAY') {
+        foreach my $element ($ref->@*) {
+            $any_changed |= reduce_ones_and_zeros(\$element)
+                                    if $element =~ / ^ # \s* (?: if | el ) /x;
+        }
+
+        return $any_changed;
+    }
+
+    my $changed;
+    do {
+        $changed = 0;
+
+        # (0) -> 0
+        $changed |= $$ref =~ s/ \( \s* 0 \s* \) /0/xg;
+
+        # !0 -> 1
+        $changed |= $$ref =~ s/ ! \s* 0 \b /1/xg;
+
+        # '|| 0 ||' -> ||
+        $changed |= $$ref =~ s/ \s* \|\| \s* 0 \s* \|\| /||/xg;
+
+        # '^ 0 || foo' -> foo
+        # '(0 || foo' -> (foo
+        $changed |= $$ref =~ s/ ^  \s* 0 \s* \|\| \s* //xg;
+        $changed |= $$ref =~ s/ \( \s* 0 \s* \|\| \s* /(/xg;
+
+        # 'foo || 0 ) ' -> foo
+        # 'foo || 0 $ ' -> foo
+        $changed |= $$ref =~ s/ \s* \|\| \s* 0 \s* (?= $ | \) ) //xg;
+
+        # '^ 0 && foo' doesn't work because of precedence: '0 && anything || 1'
+        # Similarly for 'foo && 0 $'
+
+        # (1) -> 1
+        $changed |= $$ref =~ s/ \( \s* 1 \s* \) /1/xg;
+
+        # !1 -> 0
+        $changed |= $$ref =~ s/ ! \s* 1 \b /0/xg;
+
+        # '&& 1 &&' -> &&
+        $changed |= $$ref =~ s/ \s* && \s* 1 \s* && /&&/xg;
+
+        # '^ 1 && foo' -> foo
+        # '^ 1 || foo' -> 1     # Works cause || lower precedence than &&
+        $changed |= $$ref =~ s/ ^ \s* 1 \s* && \s* //xg;
+        #$changed |= $$ref =~ s/ ^ \s* 1 \s* \|\| .* /1/xg;
+
+        # '(1 && foo' -> (foo
+        $changed |= $$ref =~ s/ \( \s* 1 \s* && \s* /(/xg;
+
+        # 'foo && 1 [ )$ ] ' -> foo
+        $changed |= $$ref =~ s/ \s* && \s* 1 \s* (?= $ | \) ) //xg;
+
+        # There are other things that could be reduced, but looking for
+        # just the defined(foo) case doesn't involve fancy parsing,
+        # and catches just about everything
+
+        # 'defined(foo) && 0' -> 0
+        $changed |= $$ref
+                    =~ s/ (?: ! \s*)? \b defined \s* \(\w+\)
+                                            \s* && \s* 0 \b /0/xg;
+
+        # 'defined(foo) || 1' -> 1
+        $changed |= $$ref
+                    =~ s/ (?: ! \s*)? \b defined \s* \(\w+\)
+                                            \s* \|\| \s* 1 \b /1/xg;
+
+        # '0 && defined(foo)'  -> 0
+        $changed |= $$ref
+                    =~ s/ \b 0 \s* && \s* (?: ! \s*)? defined
+                                                \s* \(\w+\) /0/xg;
+
+        # '1 || defined(foo)'  -> 1
+        $changed |= $$ref
+                    =~ s/ \b 1 \s* \|\| \s* (?: ! \s*)? defined
+                                                \s* \(\w+\) /1/xg;
+        $any_changed |= $changed;
+    } while ($changed);
+
+    return $any_changed;
 }
 
 # This builds a group content tree from a set of lines. each content line in
@@ -1587,6 +1831,7 @@ sub EmbedLine::flags       { $_[0]->{flags} }
 sub EmbedLine::return_type { $_[0]->{return_type} }
 sub EmbedLine::name        { $_[0]->{name} }
 sub EmbedLine::args        { $_[0]->{args} }          # array ref
+sub EmbedLine::line_num    { $_[0]->{start_line_num} }
 
 1;
 
@@ -1673,8 +1918,8 @@ rearrange its terms so that each line is not longer than this.
 
 =item indent_define
 
-Should #define clauses be indented when contained a clause expression that is
-indented.
+Should #define clauses be indented when contained in a clause expression that
+is indented, default is yes: 1.
 
 =item hug_define
 
@@ -1703,7 +1948,7 @@ based object which contains the following fields:
     bless {
         cond     => [['defined(a)'],['defined(b)']],
         type     => "content",
-        sub_type => undef,
+        sub_type => "#undef",
         raw      => $raw_content_of_line,
         line     => $normalized_content_of_line,
         level    => $level,
@@ -1759,21 +2004,21 @@ it terminates.
 
 =item type
 
-This value indicates the type of the line. This may be one of the following:
-'content', 'cond', 'define', 'include' and 'error'. Several of the types
-have a sub_type.
+This value indicates the type of the line. This may either 'content' or
+'cond'.  The sub_type gives finer detail.
 
 =item sub_type
 
-This value gives more detail on the type of the line where necessary.
-Not all types have a subtype.
+This value gives more detail on the type of the line.
 
     Type    | Sub Type
     --------+----------
     content | text
-            | include
-            | define
-            | error
+            | #include
+            | #define
+            | #error
+            | #pragma
+            | #undef
     cond    | #if
             | #elif
             | #else
@@ -1782,6 +2027,9 @@ Not all types have a subtype.
 Note that there are no '#ifdef' or '#elifndef' or similar expressions. All
 expressions of that form are normalized into the '#if defined' form to
 simplify processing.
+
+For all sub_types except C<#endif>, the C<cond> array gives the conditions
+after the line is executed.
 
 =item raw
 
@@ -1819,7 +2067,8 @@ or input it cannot handle.
 
 =head2 lines_as_str
 
-This function will return a string representation of the lines it is provided.
+This function will return a string representation of the lines it is provided
+via an array of HeaderLines objects produced by parse_fh() or by group_content()
 
 =head2 group_content
 
@@ -1831,7 +2080,7 @@ file.
 Each content line will be grouped into a structure of nested if/else blocks
 (elif will produce a new nested block) such that the content under the control
 of a given set of normalized condition clauses are grouped together in the order
-the occurred in the file, such that each combined conditional clause is output
+they occurred in the file, such that each combined conditional clause is output
 only once.
 
 This means a file like this:
@@ -1887,7 +2136,7 @@ argument, and C<post_process_grouped_content> will be called with an
 array of line hashes for the content in that group, so that the array may be
 modified or sorted.  Callbacks called from inside of C<group_content()>
 (that is C<post_process_content> and C<post_process_grouped_content> will be
-called with an additional argument containing and array specifying the actual
+called with an additional argument containing an array specifying the actual
 conditional "path" to the content  (which may differ somewhat from the data in
 a lines "cond" property).
 

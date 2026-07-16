@@ -1,5 +1,5 @@
 package PAGI::Endpoint::Router;
-$PAGI::Endpoint::Router::VERSION = '0.002001';
+$PAGI::Endpoint::Router::VERSION = '0.002002';
 use strict;
 use warnings;
 
@@ -70,7 +70,7 @@ sub _build_routes {
 
 # Internal route builder that wraps handlers
 package PAGI::Endpoint::Router::RouteBuilder;
-$PAGI::Endpoint::Router::RouteBuilder::VERSION = '0.002001';
+$PAGI::Endpoint::Router::RouteBuilder::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

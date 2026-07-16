@@ -3,7 +3,7 @@ package Valiant;
 use warnings;
 use strict;
 
-our $VERSION = '0.002019';
+our $VERSION = '0.002020';
 $VERSION = eval $VERSION;
 
 1;
@@ -14,8 +14,8 @@ Valiant - Object validation inspired by Ruby on Rails and more.
 
 =begin html
 
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg?tag=0.002012"></a>
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg?tag=0.002012"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg"></a>
 <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
 <a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 
@@ -32,7 +32,7 @@ Valiant - Object validation inspired by Ruby on Rails and more.
     has name => (is=>'ro');
     has age => (is=>'ro');
 
-    filters_with => 'Trim';
+    filters_with 'Trim';
 
     validates name => (
       length => {
@@ -110,7 +110,8 @@ L<https://rubyonrails.org>, L<https://github.com/typestack/class-validator>
 
 Documentation here details using L<Valiant> with L<Moo> or L<Moose> based classes.
 If you want to use L<Valiant> with L<DBIx::Class> you will also wish to review
-L<DBIx::Class::Valiant> which details how L<Valiant> glues into L<DBIx::Class>.
+L<DBIx::Class::Valiant> which details how L<Valiant> glues into L<DBIx::Class> (or
+L<DBIO::Valiant> for L<DBIO>, the asynchronous fork of DBIx::Class).
 
 This document reviews all the bits of the L<Valiant> system as a whole (validations, filters,
 internationalization, errores etc).   You might also like to review API details from the following
@@ -917,8 +918,8 @@ database call insidean eval and wish to add a model error if there's an exceptio
 
 =head2 Error message types.
 
-When adding an error there's four options for what the value of <$error_message> can be and are described
-above L</'GLOBAL ATTRIBUTE VALIDATOR OPTIONS'>
+When adding an error there's four options for what the value of C<$error_message> can be and are described
+above L</GLOBAL ATTRIBUTE VALIDATOR OPTIONS>
 
 =head2 Message priority
 
@@ -1037,9 +1038,9 @@ collection.
 The only difference between C<messages> and C<full_messages> is that the latter will
 combine your error message with a human readable version of your attribute name.  By
 default this is just a title cased version of the attribute name but you can customize
-this via setting a translation (see L</INTERNATONALIZATION>).  C<full_messages> by 
+this via setting a translation (see L</INTERNATIONALIZATION>).  C<full_messages> by 
 default uses the following expansion template: "{{attribute}} {{message}}" however you can
-customize this by setting the C<format> key in your translation file (again see L</INTERNATONALIZATION>).
+customize this by setting the C<format> key in your translation file (again see L</INTERNATIONALIZATION>).
 
 If you just want the model level errors you can use C<model_messages>:
 
@@ -1158,7 +1159,7 @@ two validator classes L<Valiant::Validator::Object> and L<Valiant::Validator::Ar
 You should refer to documentation in each of those validators for API level overview and
 examples.
 
-=head1 INTERNATONALIZATION
+=head1 INTERNATIONALIZATION
 
 Internationalization for L<Valiant> will concern our ability to create tags that represent
 human readable strings for different languages.  Generally we will create tags, which are
@@ -1350,15 +1351,16 @@ error conditions when they are present. However that is not always the best user
 cases where you are willing to accept such input from users but you want to 'clean up' the data
 before trying to validate it you can use filters.
 
-For now please see L<Valiant::Filters> and L<Valiant::Filters> for API level documentations on
+For now please see L<Valiant::Filters> and L<Valiant::Filterable> for API level documentations on
 filters as well as some examples. Also see L<Valiant::Filter> for a list of the prepackaged filter
 that ship with L<Valiant>
 
 =head1 HTML FORM GENERATION
 
 HTML Form generation is not specifically added to the L<Valiant> validation code, but there is
-a set of packages designed to work with L<Valiant> as well as L<DBIx::Class::Valiant> ORM integration:
-L<Valiant::HTML::FormBuilder>, L<Valiant::HTML::Form> and L<Valiant::HTML::FormTags>.  This code
+a set of packages designed to work with L<Valiant> as well as L<DBIx::Class::Valiant> (or
+L<DBIO::Valiant> for L<DBIO> users) ORM integration:
+L<Valiant::HTML::FormBuilder>, L<Valiant::HTML::Util::Form> and L<Valiant::HTML::Util::FormTags>.  This code
 is currently under active development although I expect that the publically documented API
 is very likely to remain stable.  Here's a simple example of what this form integration looks like;
 for now you'll need to refer to the API docs and the example application for more on how to use
@@ -1383,19 +1385,20 @@ Given a model like:
 
 Wrap a formbuilder object around it and generate HTML form field controls:
 
-    use Valiant::HTML::Form 'form_for';
+    use Valiant::HTML::Util::Form;
 
+    my $f = Valiant::HTML::Util::Form->new;
     my $person = Local::Person->new(first_name=>'J', last_name=>'Napiorkowski');
     $person->validate;
 
-    print form_for($person, sub {
-      my $fb = shift;
+    print $f->form_for($person, sub {
+      my ($fb, $person) = @_;
       return  $fb->label('first_name'),
               $fb->input('first_name'),
               $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
               $fb->label('last_name'),
               $fb->input('last_name'),
-              $fb->errors_for('last_name'+{ class=>'invalid-feedback' });
+              $fb->errors_for('last_name', +{ class=>'invalid-feedback' });
     });
 
 Generates something like:
@@ -1424,8 +1427,11 @@ spotted L<Form::Tiny> which is a similar DSL style system as L<Valiant> but with
 footprint and sane looking code.  This list is not exhaustive, just stuff I've either used or 
 reviewed.
 
-L<Valiant>, L<Valiant::Validations>, L<Valiant::Validates>, L<Valiant::Filters>,
-L<Valiant::Filterable>
+L<Valiant::Validations>, L<Valiant::Validates>, L<Valiant::Filters>, L<Valiant::Filterable>,
+L<Valiant::HTML::FormBuilder>, L<Valiant::JSON::JSONBuilder>.
+
+For ORM integration see the separate distributions L<DBIx::Class::Valiant> and
+L<DBIO::Valiant> (the asynchronous DBIO port).
 
 =head1 DEDICATIONS
 
@@ -1451,7 +1457,7 @@ Or to any dog charity that fits best with your personal beliefs and economic mea
 
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2025, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2026, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -28,10 +28,11 @@
 void
 Perl_deb_nocontext(const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_DEB_NOCONTEXT;
+
 #ifdef DEBUGGING
     dTHX;
     va_list args;
-    PERL_ARGS_ASSERT_DEB_NOCONTEXT;
     va_start(args, pat);
     vdeb(pat, &args);
     va_end(args);
@@ -48,16 +49,14 @@ Perl_deb_nocontext(const char *pat, ...)
 
 When perl is compiled with C<-DDEBUGGING>, these each print to STDERR the
 information given by the arguments, prefaced by the name of the file containing
-the script causing the call, and the line number within that file.
+the Perl script causing the call, and the line number within that file.
 
 If the C<v> (verbose) debugging option is in effect, the process id is also
 printed.
 
-C<deb> and C<deb_nocontext> differ only in that C<deb_nocontext> does not take
-a thread context (C<aTHX>) parameter, so is used in situations where the caller
-doesn't already have the thread context.
+__PLAIN_vs_NOCONTEXT_wording__(deb)
 
-C<vdeb> is the same as C<deb> except C<args> are an encapsulated argument list.
+C<vdeb> is the same as C<deb> except C<args> is a pointer to a C<va_list>.
 
 =cut
 */
@@ -65,8 +64,9 @@ C<vdeb> is the same as C<deb> except C<args> are an encapsulated argument list.
 void
 Perl_deb(pTHX_ const char *pat, ...)
 {
-    va_list args;
     PERL_ARGS_ASSERT_DEB;
+
+    va_list args;
     va_start(args, pat);
 #ifdef DEBUGGING
     vdeb(pat, &args);
@@ -79,14 +79,14 @@ Perl_deb(pTHX_ const char *pat, ...)
 void
 Perl_vdeb(pTHX_ const char *pat, va_list *args)
 {
+    PERL_ARGS_ASSERT_VDEB;
+
 #ifdef DEBUGGING
     const char* const file = PL_curcop ? OutCopFILE(PL_curcop) : "<null>";
     const char* const display_file = file ? file : "<free>";
     line_t line = PL_curcop ? CopLINE(PL_curcop) : NOLINE;
     if (line == NOLINE)
         line = 0;
-
-    PERL_ARGS_ASSERT_VDEB;
 
     if (DEBUG_v_TEST)
         PerlIO_printf(Perl_debug_log, "(%ld:%s:%" LINE_Tf ")\t",
@@ -105,6 +105,8 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 I32
 Perl_debstackptrs(pTHX)     /* Currently unused in cpan and core */
 {
+    PERL_ARGS_ASSERT_DEBSTACKPTRS;
+
 #ifdef DEBUGGING
     PerlIO_printf(Perl_debug_log,
                   "%8" UVxf " %8" UVxf " %8" IVdf " %8" IVdf " %8" IVdf "\n",
@@ -135,15 +137,15 @@ Perl_debstackptrs(pTHX)     /* Currently unused in cpan and core */
  * Only displays top 30 max
  */
 
-STATIC void
+static void
 S_deb_stack_n(pTHX_ SV** stack_base, SSize_t stack_min, SSize_t stack_max,
         SSize_t mark_min, SSize_t mark_max, SSize_t nonrc_base)
 {
+    PERL_ARGS_ASSERT_DEB_STACK_N;
+
 #ifdef DEBUGGING
     SSize_t i = stack_max - 30;
     const Stack_off_t *markscan = PL_markstack + mark_min;
-
-    PERL_ARGS_ASSERT_DEB_STACK_N;
 
     if (i < stack_min)
         i = stack_min;
@@ -200,6 +202,8 @@ Dump the current stack
 I32
 Perl_debstack(pTHX)
 {
+    PERL_ARGS_ASSERT_DEBSTACK;
+
 #ifndef SKIP_DEBUGGING
     if (CopSTASH_eq(PL_curcop, PL_debstash) && !DEBUG_J_TEST_)
         return 0;
@@ -249,6 +253,8 @@ static const char * const si_names[] = {
 void
 Perl_deb_stack_all(pTHX)
 {
+    PERL_ARGS_ASSERT_DEB_STACK_ALL;
+
 #ifdef DEBUGGING
     I32 si_ix;
     const PERL_SI *si;

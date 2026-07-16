@@ -4,13 +4,13 @@ use warnings;
 
 use Test2::API qw/test2_add_callback_exit context/;
 use Path::Tiny qw/path/;
-use Storable qw/dclone/;
-use Carp qw/croak/;
+use Scalar::Util qw/reftype/;
+use Carp qw/croak carp/;
 use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -22,7 +22,8 @@ our ($ENABLED, $ROOT, $LOAD_ROOT, %REPORT, @OPENS, $TRACE_OPENS);
 BEGIN {
     $TRACE_OPENS = 0;
     $ENABLED = 0;
-    $LOAD_ROOT = "" . path('.')->realpath;
+    # realpath can die (deleted cwd), never let that kill the module load.
+    $LOAD_ROOT = "" . (eval { path('.')->realpath } // eval { path('.')->absolute } // path('.'));
     $ROOT = $LOAD_ROOT;
 }
 
@@ -56,12 +57,21 @@ sub import {
 
     my $ran = 0;
     $ROOT = "" . $params{root} if $params{root};
-    my $callback = sub { return if $ran++; $class->report(%params, ctx => $_[0], root => $ROOT) };
+
+    # A failed report should not be able to break test teardown, losing the
+    # coverage data (with a warning) is better than breaking the test.
+    my $callback = sub {
+        return if $ran++;
+        local ($@, $!);
+        eval { $class->report(%params, ctx => $_[0], root => $ROOT); 1 }
+            or warn "$class could not send the coverage report: $@";
+    };
 
     test2_add_callback_exit($callback);
 
     # Fallback if we fork.
-    eval 'END { local $?; $callback->() }; 1' or die $@;
+    eval 'END { local $?; $callback->() }; 1'
+        or carp "$class could not install the END block fallback, coverage may be lost in forked processes: $@";
 }
 
 sub reload {
@@ -91,15 +101,46 @@ sub reset_coverage {
 sub set_root { $ROOT = "" . pop };
 
 sub get_from   { $FROM //= '*' }
-sub set_from   { $FROM_MODIFIED++; $FROM = pop }
+sub set_from   { my $from = pop; return unless _validate_from($from); $FROM_MODIFIED++; $FROM = $from }
 sub clear_from { $FROM = '*' }
 sub was_from_modified { $FROM_MODIFIED ? 1 : 0 }
 sub set_from_manager  { $FROM_MODIFIED++; $FROM_MANAGER = pop }
+
+# 'from' values end up serialized into the coverage event, catch things here
+# that cannot survive that. This warns and rejects instead of dying, coverage
+# collection should never introduce new exceptions into the code it is
+# observing, we just collect what data we can.
+sub _validate_from {
+    my ($val, $seen) = @_;
+    return 1 unless ref $val;
+
+    my $type = reftype($val) // '';
+    if ($type eq 'CODE' || $type eq 'GLOB') {
+        carp "'from' values must be serializable, they may not be (or contain) $type references, ignoring this 'from' value";
+        return 0;
+    }
+
+    $seen //= {};
+    return 1 if $seen->{"$val"}++;
+
+    if ($type eq 'HASH') {
+        for my $v (values %$val) { return 0 unless _validate_from($v, $seen) }
+    }
+    elsif ($type eq 'ARRAY') {
+        for my $v (@$val) { return 0 unless _validate_from($v, $seen) }
+    }
+    elsif ($type eq 'SCALAR' || $type eq 'REF') {
+        return 0 unless _validate_from($$val, $seen);
+    }
+
+    return 1;
+}
 
 sub touch_data_file {
     my $class = shift;
     my ($file, $from) = @_;
     croak "A file is required" unless $file;
+    return unless $ENABLED;
     $from //= $FROM;
 
     $REPORT{$file}{'<>'}{$from} = $from;
@@ -110,6 +151,7 @@ sub touch_source_file {
     my $class = shift;
     my ($file, $subs, $from) = @_;
     croak "A file is required" unless $file;
+    return unless $ENABLED;
 
     $subs //= ['*'];
     $subs = [$subs] unless 'ARRAY' eq ref($subs);
@@ -125,13 +167,15 @@ sub filter {
     my $class = shift;
     my ($file, %params) = @_;
 
-    my $root = $params{root} // path('.')->realpath;
-    $root = path($root);
+    my $root = path($params{root} // '.');
+    $root = $root->realpath if $root->exists;
 
     my $path = $INC{$file} ? path($INC{$file}) : path($file);
     $path = $path->realpath if $path->exists;
 
-    return () unless $root->subsumes($file);
+    # Compare the resolved path, not the raw input, so symlinked roots and
+    # files resolve consistently with the relative() call below.
+    return () unless $root->subsumes($path);
 
     return $path->relative($root)->stringify();
 }
@@ -174,7 +218,7 @@ sub extract {
     return if $file =~ m/([\[\]\(\)]|->|\beval\b)/;
 
     # If we have a foo.bar pattern, or a string that contains this platforms
-    # file separator we will condifer it a valid file.
+    # file separator we will consider it a valid file.
     return $file if $file =~ m/\S+\.\S+$/i || $file =~ m/\Q$SEP\E/;
 
     return;
@@ -213,24 +257,34 @@ sub data {
     for my $file (keys %$report) {
         my $rval = $report->{$file} // next;
         my $oval = $out->{$file} = {};
+        my %seen;
 
         for my $sub (keys %$rval) {
             next if $HIDDEN_SUBS{$sub};
 
             my $key = $SPECIAL_SUBS{$sub} ? '*' : $sub;
-            my @add = map { $rval->{$sub}->{$_} } keys %{$rval->{$sub}};
-
-            if ($oval->{$key}) {
-                my %seen;
-                $oval->{$key} = [ sort grep { !$seen{$_}++ } @{$oval->{$key}}, @add ];
-            }
-            else {
-                $oval->{$key} = [ sort @add ];
-            }
+            push @{$oval->{$key}} => grep { !$seen{$key}{_from_key($_)}++ } values %{$rval->{$sub}};
         }
+
+        @$_ = sort { _from_key($a) cmp _from_key($b) } @$_ for values %$oval;
     }
 
     return $out;
+}
+
+# Sort/dedup key for 'from' values. References are keyed by serialized
+# content, not address, so output order is stable between runs and
+# identical structures from separate set_from() calls collapse into one.
+sub _from_key {
+    my ($val) = @_;
+    return "s:$val" unless ref $val;
+
+    require Data::Dumper;
+    local $Data::Dumper::Indent   = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Terse    = 1;
+
+    return "r:" . Data::Dumper::Dumper($val);
 }
 
 sub report {
@@ -266,17 +320,29 @@ sub _process {
     my $filter  = $class->can('filter');
     my $extract = $class->can('extract');
 
-    my $clone = dclone(\%REPORT);
+    my $clone = _clone_report();
     my %report;
 
     for my $raw (keys %$clone) {
         next unless $raw;
         next if $FILTER{$raw};
 
-        my $file = $class->$extract($raw, %params) // next;
+        # A single bad entry (custom extract/filter that dies, a file deleted
+        # mid-processing, etc) must not cost us the rest of the report.
+        my $file;
+        unless (eval { $file = $class->$extract($raw, %params); 1 }) {
+            warn "$class could not extract a filename from '$raw', skipping it: $@";
+            next;
+        }
+        next unless defined $file;
         next if $FILTER{$file};
 
-        my $path = $class->$filter($file, %params) // next;
+        my $path;
+        unless (eval { $path = $class->$filter($file, %params); 1 }) {
+            warn "$class could not filter '$file', skipping it: $@";
+            next;
+        }
+        next unless defined $path;
         next if $FILTER{$path};
 
         my $from = $clone->{$raw};
@@ -285,16 +351,28 @@ sub _process {
         my $into = $report{$path} //= {};
 
         for my $sub (keys %$from) {
-            if ($into->{$sub}) {
-                $into->{$sub} = {%{dclone($into->{$sub})}, %{$from->{$sub}}};
-            }
-            else {
-                $into->{$sub} = dclone($from->{$sub}) if $from->{$sub};
-            }
+            my $src = $from->{$sub} or next;
+            my $dst = $into->{$sub} //= {};
+            %$dst = (%$dst, %$src);
         }
     }
 
     return \%report;
+}
+
+# Copy the fixed 3-level {file}{sub}{from_key} structure of %REPORT so later
+# processing cannot modify the live data. The innermost 'from' values are
+# intentionally shared, not cloned - they can be arbitrary user structures
+# and cloning them (Storable) dies on things like code refs.
+sub _clone_report {
+    my %clone;
+
+    for my $file (keys %REPORT) {
+        my $subs = $REPORT{$file} or next;
+        $clone{$file} = {map { ($_ => {%{$subs->{$_}}}) } keys %$subs};
+    }
+
+    return \%clone;
 }
 
 1;
@@ -318,16 +396,10 @@ Every time a subroutine is called this tool will do its best to find the
 filename the subroutine was defined in, and add it to a list. Also, anytime you
 attempt to open a file with C<open()> or C<sysopen()> the file will be added to
 the list. This list will be attached to a test2 event just before the test
-exits. In most formaters the event will only show up as a comment on STDOUT
+exits. In most formatters the event will only show up as a comment on STDOUT
 C< # This test covered N source files. >. However tools such as
 L<Test2::Harness::UI> can make full use of the coverage information contained
 in the event.
-
-=head2 NOTE: SYSOPEN HOOK DISABLED
-
-The sysopen hook is currently disabled because of an unknown segv error on some
-platforms. I am not certain if it will be enabled again. calls to subs, and
-calls to open are still hooked.
 
 =head1 INTENDED USE CASE
 
@@ -360,11 +432,45 @@ it. C<eval>, XS, Moose, and other magic can sometimes mask the filename, this
 module only makes a minimal attempt to find the filename in these cases.
 
 Originally this module only collected the filenames touched by a test. Now in
-addition to that data it can give you seperate lists of files where subs were
+addition to that data it can give you separate lists of files where subs were
 called, and files that were touched via open(). Additionally the sub list
 includes the info about what subs were called. In all of these cases it is also
-possible to know what secgtions of your test called the subs or opened the
+possible to know what sections of your test called the subs or opened the
 files.
+
+=head2 THINGS THAT WILL NOT SHOW UP
+
+=over 4
+
+=item goto
+
+C<goto &sub> does not enter the sub the normal way, the target sub (and its
+file, if different) will not be recorded. The sub doing the C<goto> is
+recorded normally.
+
+=item constants
+
+Constants created with C<use constant>, and any other subs inlined at compile
+time, never trigger a runtime sub call, so the file defining them will not be
+recorded unless something else in it is called.
+
+=item XS subs
+
+XS subs have no perl source file. Calls to them are recorded against the file
+of the next perl statement that executes, which is usually the caller's file.
+
+=item threads
+
+Coverage data is collected per-thread and is not merged. Data collected inside
+spawned ithreads is lost unless you merge it yourself.
+
+=item exotic open() forms
+
+Only 2 and 3 argument C<open()> calls are recorded. The list form for piping
+to programs (C<< open($fh, '-|', $prog, @args) >>) and 1-arg C<open()> are
+ignored.
+
+=back
 
 =head2 REAL EXAMPLES
 
@@ -419,7 +525,7 @@ For yath:
 
 =head2 SUPPRESS REPORT
 
-You can suppess the final report (only collect data, do not send the Test2
+You can suppress the final report (only collect data, do not send the Test2
 event)
 
 CLI:
@@ -434,10 +540,10 @@ INLINE:
 
 If you use a system like L<Test::Class>, L<Test::Class::Moose>, or
 L<Test2::Tools::Spec> then you divide your tests into subtests (or similar). In
-these cases it would be nice to track what subtest (or equivelent) touched what
+these cases it would be nice to track what subtest (or equivalent) touched what
 files.
 
-There are 3 methods telated to this, C<set_from()>, C<get_from()>, and
+There are 3 methods related to this, C<set_from()>, C<get_from()>, and
 C<clear_from()> which you can use to manage this meta-data:
 
     subtest foo => sub {
@@ -453,7 +559,7 @@ C<clear_from()> which you can use to manage this meta-data:
 
 Doing this manually for all blocks is not ideal, ideally you would hook your
 tool, such as L<Test::Class> to call C<set_from()> and C<clear_from()> for you.
-Adding such a hook is left as an exercide to the reader, and if you make one
+Adding such a hook is left as an exercise to the reader, and if you make one
 for a popular tool please upload it to cpan and add a ticket or send an email
 for me to link to it here.
 
@@ -493,6 +599,8 @@ which is normally determined automatically.
 
 This is the same as calling C<< $class->touch_source_file($file, '<>') >>.
 
+Both touch methods are no-ops while coverage is disabled, see C<disable()>.
+
 =item $class->enable()
 
 =item $class->disable()
@@ -516,6 +624,12 @@ value.
 Set a 'from' value. This can be anything, a string, a hashref, etc. Be advised
 though that it will usually be serialized to JSON, so make sure anything you
 put in it will be serializable as json.
+
+If the value is, or contains, a CODE or GLOB reference it cannot be
+serialized into the final report, so a warning will be issued and the value
+will be ignored (the previous 'from' value stays in effect). This is not
+fatal because enabling coverage should never introduce new exceptions into
+the code being observed.
 
 =item $class->clear_from()
 
@@ -560,7 +674,7 @@ This will be used by L<Test2::Harness> to determine what data needs to be
 passed to a test given a set of 'from' values to instruct the test to run the
 necessary parts/subtests/groups/methods/etc.
 
-The 'argv' data will be prepended befor any other arguments provided to the
+The 'argv' data will be prepended before any other arguments provided to the
 test.
 
 The 'env' hashref will be merged with any other env vars needed, with these
@@ -577,8 +691,36 @@ This will return an arrayref of all files touched so far.
 The list of files will be sorted alphabetically, and duplicates will be
 removed.
 
-If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
-will be used to filter out any files not under the root directory.
+If a root path is provided it may be a L<Path::Tiny> instance or a plain
+string. This path will be used to filter out any files not under the root
+directory.
+
+The running test file (C<$0>) and this plugin's own file are always excluded
+from the results.
+
+=item $hashref = $class->data()
+
+=item $hashref = $class->data(root => $path)
+
+This returns the processed coverage data that goes into the report event:
+
+    {
+        # Files where subs were called
+        'lib/Foo.pm' => {
+            some_sub => [ list of 'from' values that called it ],
+
+            # Called BEGIN/END/etc blocks, or subs whose name could not be
+            # determined, fall under '*'.
+            '*' => [ ... ],
+        },
+
+        # Files opened with open()/sysopen(), or touched as data files
+        'data.json' => { '<>' => [ ... ] },
+    }
+
+Duplicate 'from' values are removed (compared by content, not reference), and
+each list is sorted deterministically. The C<root> parameter behaves as it
+does in C<files()>.
 
 =item $event = $class->report(%options)
 
@@ -593,7 +735,7 @@ Options:
 
 Normally this is set to the current directory at module load-time. This is used
 to filter out any source files that do not live under the current directory.
-This B<MUST> be a L<Path::Tiny> instance, passing a string will not work.
+This may be a L<Path::Tiny> instance or a plain string.
 
 =item verbose => $BOOL
 
@@ -631,8 +773,8 @@ current directory which lets you focus on files in the distribution you are
 testing. You may return a modified filename if you wish to normalize it here,
 the default implementation will turn it into a relative path.
 
-If you provide a custom C<root> parameter, it B<MUST> be a L<Path::Tiny>
-instance, passing a string will not work.
+If you provide a custom C<root> parameter, it may be a L<Path::Tiny> instance
+or a plain string.
 
 A custom filter callback should look something like this:
 
@@ -685,6 +827,22 @@ A custom extract callback should look something like this:
     }
 
 =back
+
+=head1 TRACING OPENS
+
+For debugging you can ask the plugin to record where every C<open()> and
+C<sysopen()> call happened:
+
+    $Test2::Plugin::Cover::TRACE_OPENS = 1;
+
+Every recorded open will push an arrayref onto
+C<@Test2::Plugin::Cover::OPENS>:
+
+    [$filename, $file, $line, $package]
+
+Where C<$filename> is what was being opened, and C<$file>, C<$line> and
+C<$package> describe the code doing the open. This is a debugging aid only,
+the data is not included in coverage events.
 
 =head1 SEE ALSO
 

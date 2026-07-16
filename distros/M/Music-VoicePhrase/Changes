@@ -1,5 +1,26 @@
 Revision history for Music-VoicePhrase
 
+0.0126 2026-07-15 16:23:56
+    - Improve documentation again.
+
+0.0125 2026-07-15 16:02:02
+    - Fix documentation. Argh.
+
+0.0124 2026-07-15 15:55:19
+    - Improve documentation.
+
+0.0123 2026-07-15 15:38:17
+    - Improve documentation.
+
+0.0122 2026-07-15 15:30:08
+    - Pass verbose state through to voice and motif objects.
+    - Add metadata tests.
+    - Improve documentation.
+
+0.0121 2026-07-15 15:17:48
+    - Add a metadata attribute to handle extra bits.
+    - Lose the annoying *_name attributes.
+
 0.0120 2026-07-14 17:01:50
     - Add a rest probability attribute. Maybe this should all be metadata...
 
@@ -42,7 +63,7 @@ Revision history for Music-VoicePhrase
     - Improve tests.
 
 0.0107 2026-06-23 11:18:21
-    - Improve documentatiion.
+    - Improve documentation.
     - Make voice public.
 _
 0.0106 2026-06-22 15:21:03

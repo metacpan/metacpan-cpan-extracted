@@ -1,0 +1,33 @@
+%# Admin child — recursive treeview for admin page
+%# Stash: children => [...], parent_id => $str
+
+<ul class="" aria-labelledby="<%= stash('parent_id') %>">
+% my $children = stash('children') // [];
+% for my $child (@$children) {
+%
+%   my $icon_html = '';
+%   if (defined $child->{icon} && length $child->{icon}) {
+%     my $color_attr = (defined $child->{icon_color} && length $child->{icon_color})
+%       ? qq{ style="color: $child->{icon_color}"} : '';
+%     $icon_html = qq{<i class="$child->{icon}"$color_attr></i> };
+%   }
+%
+%   my $title_esc = $child->{title};
+%   $title_esc =~ s/'/\\'/g;
+%
+%   my $buttons = qq{<i class="fas fa-plus" onclick="add_child_menu($child->{id},'$child->{name}')"></i>&nbsp;};
+%   $buttons   .= qq{<i class="far fa-edit" onclick="edit_child_menu($child->{parent_id},'$child->{name}',$child->{id})"></i>&nbsp;};
+%   $buttons   .= qq{<i class="far fa-trash-alt" onclick="delete_child_menu($child->{id},'$title_esc')"></i>};
+%
+%   my $target = $child->{open_tab} ? ' target="_blank"' : '';
+
+  <li id="<%= $child->{id} %>">
+%   if (@{$child->{children}}) {
+    <span class="node-cpe"><a href="<%= $child->{link} %>" id="parent_<%= $child->{id} %>"<%= $target %> role="button"><%== $icon_html %><%= $child->{title} %></a> <%== $buttons %></span>
+%= include 'menu/admin_child', children => $child->{children}, parent_id => "parent_$child->{id}"
+%   } else {
+    <span class="node-cpe"><a<%= $target %> href="<%= $child->{link} %>"><%== $icon_html %><%= $child->{title} %></a> <%== $buttons %></span>
+%   }
+  </li>
+% }
+</ul>

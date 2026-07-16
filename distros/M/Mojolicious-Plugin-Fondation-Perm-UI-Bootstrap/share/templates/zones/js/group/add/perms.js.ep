@@ -1,0 +1,37 @@
+<script>
+/**
+ * Called by DatatableGroup.js when editing a group.
+ * Fetches all permissions and selects the ones the group has.
+ * @param {object} group - The group object (with group.perms array)
+ */
+function loadPerms(group) {
+    $.getJSON('/api/perm', function(allPerms) {
+        var sel = $('#perms');
+        sel.empty();
+
+        var groupPermIds = {};
+        if (group && group.perms) {
+            for (var i = 0; i < group.perms.length; i++) {
+                groupPermIds[group.perms[i].id] = true;
+            }
+        }
+
+        for (var i = 0; i < allPerms.length; i++) {
+            var p = allPerms[i];
+            var selected = groupPermIds[p.id] ? ' selected' : '';
+            sel.append('<option value="' + p.id + '"' + selected + '>' + p.name + '</option>');
+        }
+
+        sel.selectpicker('refresh');
+        $('#perms-group').show();
+    });
+}
+
+/**
+ * Intercepts the save to collect permission assignments.
+ * Called by validateGroupForm() in DatatableGroup.js before save.
+ */
+function collectPermAssignments() {
+    return $('#perms').val() || [];
+}
+</script>

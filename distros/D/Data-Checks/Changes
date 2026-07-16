@@ -1,5 +1,10 @@
 Revision history for Data-Checks
 
+0.12    2026-07-15
+        [CHANGES]
+         * `sv_numcmp` needs to be conditionally defined, because latest perls
+           now provide a real function
+
 0.11    2025-11-26
         [CHANGES]
          * Added `Can()` constraint

@@ -1,5 +1,5 @@
 package PAGI::Middleware::RequestId;
-$PAGI::Middleware::RequestId::VERSION = '0.002001';
+$PAGI::Middleware::RequestId::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

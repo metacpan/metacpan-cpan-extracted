@@ -1,5 +1,5 @@
 package PAGI::Request::MultiPartHandler;
-$PAGI::Request::MultiPartHandler::VERSION = '0.002001';
+$PAGI::Request::MultiPartHandler::VERSION = '0.002002';
 use strict;
 use warnings;
 

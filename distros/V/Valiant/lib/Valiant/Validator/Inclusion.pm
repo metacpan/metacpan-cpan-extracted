@@ -88,6 +88,19 @@ Valiant::Validator::Inclusion - Value must be one of a list
 Value must be one of a list.  This list can be given as an arrayref or
 as a reference to a method (for when you need to dynamically build the list).
 
+=head1 ATTRIBUTES
+
+This validator supports the following attributes:
+
+=head2 in
+
+The list of allowed values, either an arrayref or a coderef that returns the list.
+
+=head2 inclusion
+
+The error message used when the value is not in the list.  Default is translation
+tag 'inclusion'.
+
 =head1 SHORTCUT FORM
 
 This validator supports the follow shortcut forms:

@@ -2,44 +2,21 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-use version;
-
-my $min_wpi_ver = 2.36;
-
-# RPI_DIST_RELEASE allows cutting release tarballs on non-Pi machines by
-# bypassing the wiringPi presence/version checks below. Without it, a
-# missing wiringPi exits before WriteMakefile so CPAN testers report NA,
-# not FAIL
-
-if (! $ENV{RPI_DIST_RELEASE}){
-    if (! -f '/usr/include/wiringPi.h' && ! -f '/usr/local/include/wiringPi.h'){
-        print "wiringPi is not installed and RPI_DIST_RELEASE is not set, " .
-              "exiting...\n";
-        exit;
-    }
-
-    if (my $path = (grep { -x "$_/gpio" } split /:/, $ENV{PATH})[0]){
-        my $bin = "$path/gpio";
-        my $gpio_info = `$bin -v`;
-
-        if (my ($version) = $gpio_info =~ /version:\s+(\d+\.\d+)/){
-
-            my $installed_ver = version->parse($version);
-
-            if ($installed_ver < $min_wpi_ver){
-                print "\nyou must have wiringPi version $min_wpi_ver" .
-                    " or greater installed to continue.\n\n" .
-                    "You have version $version\n";
-                exit;
-            }
-        }
-    }
-    else {
-        print "\ncan not determine wiringPi version and RPI_DIST_RELEASE " .
-            "is not set. Ensure version 2.36+ is installed. Can't continue\n";
-        exit;
-    }
-}
+# The wiringPi presence + version guard is the family-canonical check in
+# RPi::Const::BuildCheck (pulled in via CONFIGURE_REQUIRES below). It honours
+# RPI_DIST_RELEASE and exits 0 with a message before WriteMakefile when
+# wiringPi is missing or too old, so CPAN testers report NA, not FAIL.
+eval {
+    require RPi::Const::BuildCheck;
+    RPi::Const::BuildCheck::wiringpi_build_check();
+    1;
+} or do {
+    # No RPi::Const::BuildCheck (a bare `perl Makefile.PL` with no CPAN client
+    # to honour CONFIGURE_REQUIRES). Stay NA-safe: exit 0 unless releasing.
+    print "RPi::Const (the build-check dependency) is not installed; install " .
+          "it first, or set RPI_DIST_RELEASE to skip the wiringPi check.\n";
+    exit 0 if ! $ENV{RPI_DIST_RELEASE};
+};
 
 WriteMakefile(
     NAME             => 'RPi::OLED::SSD1306::128_64',
@@ -55,13 +32,13 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'RPi::Const'          => '1.07',
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'RPi::Const' => '1.07',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-OLED-SSD1306-*' },

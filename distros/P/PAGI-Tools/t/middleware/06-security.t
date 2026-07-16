@@ -551,4 +551,191 @@ subtest 'CSRF allows GET without token' => sub {
     is $sent[0]{status}, 200, 'GET succeeds without token';
 };
 
+# =============================================================================
+# Test: CSRF 'enforce' config - 'header' (default) vs 'app' (issue-only)
+# =============================================================================
+
+subtest 'CSRF rejects invalid enforce value' => sub {
+    like(
+        dies { PAGI::Middleware::CSRF->new(secret => 'test-secret', enforce => 'bogus') },
+        qr/enforce/,
+        'constructor dies on an unrecognized enforce value',
+    );
+};
+
+subtest "CSRF enforce => 'header' behaves exactly like the default" => sub {
+    my $mw = PAGI::Middleware::CSRF->new(secret => 'test-secret', enforce => 'header');
+
+    my $app_called = 0;
+    my $app = async sub  {
+        my ($scope, $receive, $send) = @_;
+        $app_called = 1;
+    };
+
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            {
+                type    => 'http',
+                path    => '/submit',
+                method  => 'POST',
+                headers => [],
+            },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    ok !$app_called, 'app not called without token';
+    is $sent[0]{status}, 403, 'status is 403 Forbidden, same as default enforcement';
+};
+
+subtest "CSRF enforce => 'app' passes an unsafe request through with no token" => sub {
+    my $mw = PAGI::Middleware::CSRF->new(secret => 'test-secret', enforce => 'app');
+
+    my $seen_token;
+    my $app_called = 0;
+    my $app = async sub  {
+        my ($scope, $receive, $send) = @_;
+        $app_called   = 1;
+        $seen_token   = $scope->{csrf_token};
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            {
+                type    => 'http',
+                path    => '/submit',
+                method  => 'POST',
+                headers => [],
+            },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    ok $app_called, "app mode: unsafe POST with no submitted token still reaches the app";
+    is $sent[0]{status}, 200, 'no auto-403 in app mode';
+    ok $seen_token, 'a freshly minted token is stashed into scope';
+
+    my ($set_cookie) = grep { lc($_->[0]) eq 'set-cookie' } @{$sent[0]{headers}};
+    ok $set_cookie, 'Set-Cookie issued for the freshly minted token';
+    like $set_cookie->[1], qr/\Q$seen_token\E/, 'Set-Cookie carries the same token stashed in scope';
+};
+
+subtest "CSRF enforce => 'app' stashes the existing COOKIE token, not a new one" => sub {
+    my $mw = PAGI::Middleware::CSRF->new(secret => 'test-secret', enforce => 'app');
+
+    # First, a GET establishes a cookie token.
+    my $cookie_token;
+    my $get_app = async sub  {
+        my ($scope, $receive, $send) = @_;
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+    my @sent1;
+    run_async(async sub {
+        await $mw->wrap($get_app)->(
+            { type => 'http', path => '/', method => 'GET', headers => [] },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent1, $event },
+        );
+    });
+    for my $h (@{$sent1[0]{headers}}) {
+        if (lc($h->[0]) eq 'set-cookie' && $h->[1] =~ /csrf_token=([^;]+)/) {
+            $cookie_token = $1;
+        }
+    }
+    ok $cookie_token, 'cookie token issued on GET';
+
+    # Now an unsafe POST with no submitted token at all (app owns validation) --
+    # scope must carry the SAME cookie token, unchanged, not a regenerated one.
+    my $seen_token;
+    my $post_app = async sub  {
+        my ($scope, $receive, $send) = @_;
+        $seen_token = $scope->{csrf_token};
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'Created', more => 0 });
+    };
+
+    my @sent2;
+    run_async(async sub {
+        await $mw->wrap($post_app)->(
+            {
+                type    => 'http',
+                path    => '/submit',
+                method  => 'POST',
+                headers => [['cookie', "csrf_token=$cookie_token"]],
+            },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent2, $event },
+        );
+    });
+
+    is $sent2[0]{status}, 200, 'app mode never auto-rejects';
+    is $seen_token, $cookie_token, 'scope carries the COOKIE token, not a freshly minted one';
+
+    my @set_cookie = grep { lc($_->[0]) eq 'set-cookie' } @{$sent2[0]{headers}};
+    is scalar(@set_cookie), 0, 'no Set-Cookie re-issued when the cookie token already existed';
+};
+
+subtest 'CSRF cookie has no Secure attribute by default' => sub {
+    my $mw = PAGI::Middleware::CSRF->new(secret => 'test-secret');
+
+    my $app = async sub  {
+        my ($scope, $receive, $send) = @_;
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+
+    my @sent;
+    run_async(async sub {
+        await $mw->wrap($app)->(
+            { type => 'http', path => '/', method => 'GET', headers => [] },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    my ($set_cookie) = grep { lc($_->[0]) eq 'set-cookie' } @{$sent[0]{headers}};
+    ok $set_cookie, 'cookie issued';
+    unlike $set_cookie->[1], qr/;\s*Secure/, 'no Secure attribute by default (would break plain-http dev usage)';
+};
+
+subtest "CSRF cookie includes Secure attribute when secure => 1" => sub {
+    my $mw = PAGI::Middleware::CSRF->new(secret => 'test-secret', secure => 1);
+
+    my $app = async sub  {
+        my ($scope, $receive, $send) = @_;
+        await $send->({ type => 'http.response.start', status => 200, headers => [] });
+        await $send->({ type => 'http.response.body', body => 'OK', more => 0 });
+    };
+
+    my @sent;
+    run_async(async sub {
+        await $mw->wrap($app)->(
+            { type => 'http', path => '/', method => 'GET', headers => [] },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    my ($set_cookie) = grep { lc($_->[0]) eq 'set-cookie' } @{$sent[0]{headers}};
+    ok $set_cookie, 'cookie issued';
+    like $set_cookie->[1], qr/;\s*Secure/, 'Secure attribute present when configured';
+};
+
 done_testing;

@@ -57,8 +57,13 @@ qx.Class.define("callbackery.ui.MsgBox", {
         this.__mk_btn('ok',this.tr("OK"));
         this.__mk_btn('yes',this.tr("Yes"));
         this.__mk_btn('no',this.tr("No"));
+        this.__mk_btn('reload', this.tr("Reload"));
+        this.__mk_btn('retry',  this.tr("Retry"));
 
-        ['ok','cancel','no'].forEach(function(x){
+        // 'reload' is focused on appear so it is the default action in the
+        // commError (Retry/Reload) and sessionExpired (Reload) dialogs - Reload
+        // fully recovers, whereas Retry only re-issues the single failed call.
+        ['ok','cancel','no','reload'].forEach(function(x){
             this.__btn[x].addListener('appear', function(e) {
                 this.__btn[x].focus();
             },this);
@@ -250,6 +255,34 @@ qx.Class.define("callbackery.ui.MsgBox", {
             this.__setIcons(icons);
             this.__show_btn(['yes','no'], icons);
             this.__open(title, text, html, size);
+            return this;
+        }
+
+        ,
+
+        /**
+         * Session-expired prompt: a single Reload action.
+         *
+         * @param title {String} window title
+         * @param text {String} content
+         * @return {void}
+         */
+        sessionExpired : function(title, text) {
+            this.__show_btn(['reload']);
+            this.__open(title, text, false);
+            return this;
+        },
+
+        /**
+         * Communication-problem prompt: Retry (re-issue) or Reload (fresh page).
+         *
+         * @param title {String} window title
+         * @param text {String} content
+         * @return {void}
+         */
+        commError : function(title, text) {
+            this.__show_btn(['retry','reload']);
+            this.__open(title, text, false);
             return this;
         }
     }

@@ -19,18 +19,36 @@ sub values { return map { $_[0]->for->{$_} } $_[0]->keys }
 
 =head1 NAME
 
-Valiant::Result::Hash - Wrap a hashref in a result object for validation.
+Valiant::Proxy::Hash - Wrap a hashref in a result object for validation.
 
 =head1 SYNOPSIS
 
-    TBD
+    my $proxy = Valiant::Proxy::Hash->new(
+      validations => [
+        [ name => presence => 1, length => [2,15] ],
+      ],
+    );
+
+    my $result = $proxy->validate({ name => 'Jo' });
+    $result->valid;
 
 =head1 DESCRIPTION
 
 Allows you to run validations against a HashRef.
 
-You probably won't use this directly (although you can) since we have L<Valiant::Class> to
-encapsulate the most common patterns for this need.
+You probably won't use this directly, although you can.
+
+=head1 METHODS
+
+In addition to the interface defined by L<Valiant::Proxy> this class provides:
+
+=head2 keys
+
+Returns the keys of the wrapped hashref.
+
+=head2 values
+
+Returns the values of the wrapped hashref, in the same order as L</keys>.
 
 =head1 SEE ALSO
 

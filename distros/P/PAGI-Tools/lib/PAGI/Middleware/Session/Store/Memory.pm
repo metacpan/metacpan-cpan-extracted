@@ -1,5 +1,5 @@
 package PAGI::Middleware::Session::Store::Memory;
-$PAGI::Middleware::Session::Store::Memory::VERSION = '0.002001';
+$PAGI::Middleware::Session::Store::Memory::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware::Session::Store';

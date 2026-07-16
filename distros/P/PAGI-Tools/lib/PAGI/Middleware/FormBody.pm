@@ -1,5 +1,5 @@
 package PAGI::Middleware::FormBody;
-$PAGI::Middleware::FormBody::VERSION = '0.002001';
+$PAGI::Middleware::FormBody::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

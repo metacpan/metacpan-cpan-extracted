@@ -162,9 +162,8 @@ condition is true (or while the condition is false):
 
 The C<while> and C<until> modifiers have the usual "C<while> loop"
 semantics (conditional evaluated first), except when applied to a
-C<do>-BLOCK (or to the Perl4 C<do>-SUBROUTINE statement), in
-which case the block executes once before the conditional is
-evaluated.
+C<do>-BLOCK, in which case the block executes once before the
+conditional is evaluated.
 
 This is so that you can write loops like:
 
@@ -543,10 +542,22 @@ the C<foreach> loop index variable is an implicit alias for each item
 in the list that you're looping over.
 X<alias>
 
-If any part of LIST is an array, C<foreach> will get very confused if
+If the LIST is just a single array, C<foreach> will get very confused if
 you add or remove elements within the loop body, for example with
-C<splice>.  So don't do that.
-X<splice>
+C<splice> or C<push>.  So don't do that.
+X<splice>X<push>
+
+  my @arr1 = 1 .. 2;
+  for my $x (@arr1, ()) {
+      push @arr1, 'a' if $x =~ /[0-9]/;
+      print $x;
+  } # Outputs 12
+
+  my @arr2 = 1 .. 2;
+  for my $x (@arr2) {
+      push @arr2, 'b' if $x =~ /[0-9]/;
+      print $x;
+  } # Outputs 12bb
 
 C<foreach> probably won't do what you expect if VAR is a tied or other
 special variable.  Don't do that either.
@@ -732,9 +743,11 @@ rest of the construct has finished.
     }
 
 The C<finally> block is equivalent to using a C<defer> block and will be
-invoked in the same situations; whether the C<try> block completes
-successfully, throws an exception, or transfers control elsewhere by using
-C<return>, a loop control, or C<goto>.
+invoked in the same situations: not only when the C<try> block completes
+successfully or throws an exception, but also (out of the ordinary order
+of execution) immediately before code in the C<try> or C<catch> blocks
+transfers control elsewhere by using C<return>, a loop control, or
+C<goto>.
 
 Unlike the C<try> and C<catch> blocks, a C<finally> block is not permitted to
 C<return>, C<goto> or use any loop controls. The final expression value is

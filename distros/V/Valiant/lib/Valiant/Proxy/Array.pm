@@ -17,22 +17,28 @@ sub read_attribute_for_validation {
 
 =head1 NAME
 
-Valiant::Proxy::Array - Wrap a hashref in a result object for validation.
+Valiant::Proxy::Array - Wrap an arrayref in a result object for validation.
 
 =head1 SYNOPSIS
 
-    TBD
+    my $proxy = Valiant::Proxy::Array->new(
+      validations => [
+        # array elements are addressed by index, e.g. '[0]'
+        [ '[0]' => presence => 1 ],
+      ],
+    );
+
+    my $result = $proxy->validate([ 'first', 'second' ]);
 
 =head1 DESCRIPTION
 
-Allows you to run validations against a HashRef.
+Allows you to run validations against an ArrayRef.
 
-You probably won't use this directly (although you can) since we have L<Valiant::Class> to
-encapsulate the most common patterns for this need.
+You probably won't use this directly, although you can.
 
 =head1 SEE ALSO
 
-This does the interface defined by L<Valiant::Result> so see the docs on that.
+This does the interface defined by L<Valiant::Proxy> so see the docs on that.
  
 Also: L<Valiant>, L<Valiant::Validator>, L<Valiant::Validator::Each>.
 

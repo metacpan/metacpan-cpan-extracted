@@ -8,7 +8,7 @@ BEGIN {
     chdir 't' if -d 't';
 }
 
-print "1..191\n";
+print "1..195\n";
 
 sub failed {
     my ($got, $expected, $name) = @_;
@@ -301,48 +301,73 @@ like($@, qr/BEGIN failed--compilation aborted/, 'BEGIN 7' );
   # RT #70934
   # check both the specific case in the ticket, and a few other paths into
   # S_scan_ident()
-  # simplify long ids
-  my $x100 = "x" x 256;
-  my $xFE = "x" x 254;
-  my $xFD = "x" x 253;
-  my $xFC = "x" x 252;
-  my $xFB = "x" x 251;
+  # The upper length limit for a token is 255 characters.  But some Unicode
+  # characters in UTF-8 take 4 (and even 5 on EBCDIC) bytes each.  Create a
+  # close to maximum length identifier in $plus1.   (The reason it is done
+  # this way is to use the 5-byte code points in EBCDIC, but no such character
+  # as of Unicode 17.0 is an identifier start character; when they start
+  # assigning U+40000 is when there would be a 5-byte EBCDIC IDStart
+  # character.)
+  my $continuation = "\x{E0100}";
+  my $plus1 = "\x{104B0}" . ($continuation x (255 - 1));
 
-  eval qq[ \$#$xFB ];
-  is($@, "", "251 character \$# sigil ident ok");
-  eval qq[ \$#$xFC ];
+  # Here $plus1 has been populated with a 4-byte Identifier Start character,
+  # and 254 continuation characters, each containing the most possible bytes
+  # available on this platform.  This leaves space for a 256th character
+  # containing that maximum number of bytes.  Instead of using that, we fill
+  # it to the brim with single-byte characters that we can chop off for the
+  # tests below.  We need to calculate in byte lengths.
+  my $continuation_as_bytes = $continuation;
+  utf8::encode($continuation_as_bytes);
+  my $continuation_length = length $continuation_as_bytes;
+
+  my $plus1_as_bytes = $plus1;
+  utf8::encode($plus1_as_bytes);
+  my $plus1_length = length $plus1_as_bytes;
+
+  my $capacity = 256 * $continuation_length;
+  my $fill = $capacity - $plus1_length;
+
+  $plus1 .= 'x' x $fill;
+  my $minus1 = substr $plus1, 0, -2;
+  my $minus2 = substr $minus1, 0, -1;
+  my $minus3 = substr $minus2, 0, -1;
+  my $minus4 = substr $minus3, 0, -1;
+
+  eval qq[ \$#$minus4 ];
+  is($@, "", "minus4 character \$# sigil ident ok");
+  eval qq[ \$#$minus3 ];
   like($@, qr/Identifier too long/, "too long id in \$# sigil ctx");
 
-  eval qq[ \$$xFB ];
-  is($@, "", "251 character \$ sigil ident ok");
-  eval qq[ \$$xFC ];
+  eval qq[ \$$minus4 ];
+  is($@, "", "minus4 character \$ sigil ident ok");
+  eval qq[ \$$minus3 ];
   like($@, qr/Identifier too long/, "too long id in \$ sigil ctx");
 
-  eval qq[ %$xFB ];
-  is($@, "", "251 character % sigil ident ok");
-  eval qq[ %$xFC ];
+  eval qq[ %$minus4 ];
+  is($@, "", "minus4 character % sigil ident ok");
+  eval qq[ %$minus3 ];
   like($@, qr/Identifier too long/, "too long id in % sigil ctx");
 
-  eval qq[ \\&$xFB ]; # take a ref since I don't want to call it
-  is($@, "", "251 character & sigil ident ok");
-  eval qq[ \\&$xFC ];
+  eval qq[ \\&$minus4 ]; # take a ref since I don't want to call it
+  is($@, "", "minus4 character & sigil ident ok");
+  eval qq[ \\&$minus3 ];
   like($@, qr/Identifier too long/, "too long id in & sigil ctx");
 
-  eval qq[ *$xFC ];
-  is($@, "", "252 character glob ident ok");
-  eval qq[ *$xFD ];
+  eval qq[ *$minus3 ];
+  is($@, "", "minus3 character glob ident ok");
+  eval qq[ *$minus2 ];
   like($@, qr/Identifier too long/, "too long id in glob ctx");
 
-  eval qq[ for $xFC ];
+  eval qq[ for $minus3 ];
   like($@, qr/^Missing \$ on loop variable /,
-       "252 char id ok, but a different error");
-  eval qq[ for $xFD; ];
+       "minus3 char id ok, but a different error");
+  eval qq[ for $minus2; ];
   like($@, qr/^Missing \$ on loop variable /, "too long id in for ctx");
 
   # the specific case from the ticket
   # however the parsing code in yyl_foreach has now changed
-  my $x = "x" x 257;
-  eval qq[ for $x ];
+  eval qq[ for $plus1 ];
   like($@, qr/^Missing \$ on loop variable /, "too long id ticket case");
 
   # as PL_tokenbuf is now PL_parser->tokenbuf, the "buffer overflow" that was
@@ -354,8 +379,7 @@ like($@, qr/BEGIN failed--compilation aborted/, 'BEGIN 7' );
   # the buggy change to the calculation of the variable `e` in scan_word()
   # instead.
 
-  my $x = "x" x 260;
-  eval qq[ for my $x \$foo ];
+  eval qq[ for my $plus1 \$foo ];
   like($@, qr/at \(eval \d+\) line 1[,.]/, "line number is reported correctly");
 }
 
@@ -509,12 +533,27 @@ BEGIN{ ${"_<".__FILE__} = \1 }
 is __FILE__, $file,
     'no __FILE__ corruption when setting CopFILESV to a ref';
 
-eval 'Fooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
-    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo';
+eval 'Ffffooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+    .'ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo';
+
 like $@, "^Identifier too long at ", 'ident buffer overflow';
 
 eval 'for my a1b $i (1) {}';
@@ -627,6 +666,59 @@ is $@, "", 'substr keys assignment';
     eval 'm(@{if(0){sub d{]]])}return';
     like $@, qr/^syntax error at \(eval \d+\) line 1, near "\{\]"/,
         'RT #130815: null pointer deref';
+}
+
+{   # GH #23861
+    eval 'my @foo = keys %SWISH::3::;';
+    is ($@, "", "Handles all numeric package component after ::");
+}
+
+{
+    my $expected = "this is the way the identifier ends; not with a bang";
+    my $result;
+    eval "use utf8; my \$e\x{1df8}claire = '$expected'; \$result = \${e\x{1df8}claire}";
+    if ($@) {
+        failed($@, "no error", "Didn't crash");
+    }
+    else {
+        is ($result, $expected, "Parser can handle a continuation as 2nd char");
+    }
+}
+
+{
+    # GH#24266 - when a UTF-8 string is used as a hash key, it will
+    # be downgraded to a single-byte encoding if possible. However,
+    # when `keys %hash` returns a list of keys, any keys that started
+    # out as UTF-8 strings must come back out as UTF-8 strings, not
+    # the downgraded representation. The HVhek_WASUTF8 flag on the
+    # relevant HEK is what makes that possible.
+    #
+    # However, this flag was not always included when converting
+    # strings to HEKs ahead of time as an optimization, and when
+    # that did happen, other functions failed to check for the
+    # flag or propagate it correctly.
+
+    # Note: "de" should _not_ get uppercased in real life. It's only
+    #       shown like that below to keep the test case simple.
+    my %lower_to_upper = eval q[use utf8;
+        my %lower_to_upper = ( 'über maus' => 'Über Maus' );
+        $lower_to_upper{'Explicación dél significado de los términos utilizados en "Don Quijote", por capítulo.'}
+                =   'Explicación Dél Significado De Los Términos Utilizados En "Don Quijote", Por Capítulo.';
+        return %lower_to_upper;
+    ];
+
+    my %messages = (
+       'über maus'
+           => 'HVhek_WASUTF8 set on downgraded UTF8 key in hash initialization',
+       'Explicación dél significado de los términos utilizados en "Don Quijote", por capítulo.'
+           => 'HVhek_WASUTF8 set on downgraded UTF8 key in helelm store',
+    );
+
+    foreach (sort keys %lower_to_upper) {
+        my $key = $_;
+        s/\b(.*?)\b/$1 eq uc $1 ? $1 : "\u\L$1"/ge;
+        is($_, $lower_to_upper{$key}, $messages{$key});
+    }
 }
 
 # Add new tests HERE (above this line)

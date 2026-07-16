@@ -1,5 +1,5 @@
 package PAGI::Session;
-$PAGI::Session::VERSION = '0.002001';
+$PAGI::Session::VERSION = '0.002002';
 use strict;
 use warnings;
 use Scalar::Util 'blessed';

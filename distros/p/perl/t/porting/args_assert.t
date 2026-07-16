@@ -33,7 +33,9 @@ unless (-d 't' && -f 'MANIFEST') {
     while (<$fh>) {
         # The trailing '.' distinguishes real from dummy macros that have no
         # real asserts
-	$declared{$1}++ if /^#define\s+(PERL_ARGS_ASSERT[A-Za-z0-9_]+)\s+./;
+	$declared{$1}++ if / ^ \s* \# \s* define \s+
+                               ( PERL_ARGS_ASSERT \w+ ) \b
+                           /ax;
     }
 }
 
@@ -43,15 +45,22 @@ if (!@ARGV) {
     my $manifest = $prefix . 'MANIFEST';
     open my $fh, '<', $manifest or die "Can't open $manifest: $!";
     while (<$fh>) {
-	# *.c or */*.c
-	push @ARGV, $prefix . $1 if m!^((?:[^/]+/)?[^/]+\.c)\t!;
-        # Special case the *inline.h since they behave like *.c
-	push @ARGV, $prefix . $1 if m!^(([^/]+)?inline\.h)\t!;
+        # *.c or */*.c; and special case several .h that have functions
+        # defined in them
+	push @ARGV, $prefix . $1 if m! ^
+                                       ( (?: [^/]+ / )? [^/]*
+                                         (?:             \.c
+                                             |     inline\.h
+                                             | perlstatic\.h
+                                         )
+                                       )
+                                       \t
+                                     !x;
     }
 }
 
 while (<>) {
-    $used{$1}++ if /^\s+(PERL_ARGS_ASSERT_[A-Za-z0-9_]+);$/;
+    $used{$1}++ if / ^ \s+ (PERL_ARGS_ASSERT_ \w+ ) ; /ax;
 }
 
 my %unused;

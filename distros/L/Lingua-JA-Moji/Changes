@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.62 2026-07-16
+
+* is_romaji_semistrict returns a canonical form rather than 1 if valid
+
 0.61 2026-03-26
 
 * Fixed bug in kana2romaji kunrei romanization

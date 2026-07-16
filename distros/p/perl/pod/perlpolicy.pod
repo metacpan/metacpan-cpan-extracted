@@ -69,9 +69,45 @@ For the specifics on how the members of the core team and steering
 council are elected or rotated, consult L<perlgov>, which spells it all
 out in detail.
 
+=head1 VERSIONING
+
+Perl uses a C<5.X.Y> version numbering scheme.
+
+=over
+
+=item *
+
+Even-numbered X values (e.g., 5.40, 5.42) are B<stable> release series.
+
+=item *
+
+Odd-numbered X values (e.g., 5.41, 5.43) are B<development> release
+series, leading up to the next stable release.  Development releases get
+a new Y increment roughly every month.
+
+=item *
+
+Y increments in stable series (e.g., 5.42.1, 5.42.2) are
+B<maintenance> releases that contain critical bug fixes and security
+patches only.
+
+=back
+
+A new stable release series is typically produced once a year.
+
 =head1 MAINTENANCE AND SUPPORT
 
-Perl 5 is developed by a community, not a corporate entity. Every change
+These are the "officially" supported perl versions
+as of the release of Perl 5.42:
+
+    Version track    Start date      Support status
+    -------------    -----------     --------------
+    5.44.x           2026-Jul-15     Full support (current stable)
+    5.42.x           2025-Jul-03     Full support (previous stable)
+    5.40.x           2024-Jun-09     Security fixes only
+    [ Any older stable release ]     End of life
+
+Perl is developed by a community, not a corporate entity. Every change
 contributed to the Perl core is the result of a donation. Typically, these
 donations are contributions of code or time by individual members of our
 community. On occasion, these donations come in the form of corporate
@@ -89,13 +125,6 @@ This document codifies the support and maintenance commitments that
 the Perl community should expect from Perl's developers:
 
 =over
-
-=item *
-
-We "officially" support the two most recent stable release series.  5.38.x
-and earlier are now out of support.  As of the release of 5.44.0, we will
-"officially" end support for Perl 5.40.x, other than providing security
-updates as described below.
 
 =item *
 
@@ -125,7 +154,7 @@ Perl at the time of their code freeze.
 
 As a vendor, you may have a requirement to backport security fixes
 beyond our 3 year support commitment.  We can provide limited support and
-advice to you as you do so and, where possible will try to apply
+advice to you as you do so, and where possible we will try to apply
 those patches to the relevant -maint branches in git, though we may or
 may not choose to make numbered releases or "official" patches
 available. See L<perlsec/SECURITY VULNERABILITY CONTACT INFORMATION>

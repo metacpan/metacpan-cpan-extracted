@@ -15,11 +15,21 @@ use lib "$FindBin::Bin/../../lib";
 # Skips unless PAGI::Server is on @INC, so PAGI-Tools' standalone suite stays
 # independent. Run it with:
 #   prove -I <PAGI-Server>/lib -lr t/integration/sse-decline-end-to-end.t
+#
+# Requires PAGI::Server >= 0.002005: that release added the sse.http.response.*
+# decline protocol this test exercises (PAGI-Server Changes, "0.002005 -
+# 2026-06-30" / Features). Older servers don't recognize
+# 'sse.http.response.start' and crash the connection with a 500 instead of
+# returning 404 (CPAN Testers FAIL against 0.001012, PAGI-Tools 0.002001).
+use constant MIN_SSE_DECLINE_SERVER_VERSION => '0.002005';
 
 eval { require Future::IO::Impl::IOAsync; 1 }
     or plan skip_all => 'Future::IO::Impl::IOAsync required for SSE tests';
 eval { require PAGI::Server; 1 }
     or plan skip_all => 'PAGI::Server not on @INC; run with -I <PAGI-Server>/lib';
+plan skip_all => "PAGI::Server $PAGI::Server::VERSION does not support the sse.http.response.* "
+                . "decline protocol; need >= " . MIN_SSE_DECLINE_SERVER_VERSION
+    unless eval { PAGI::Server->VERSION(MIN_SSE_DECLINE_SERVER_VERSION); 1 };
 
 plan skip_all => "Server integration tests not supported on Windows" if $^O eq 'MSWin32';
 

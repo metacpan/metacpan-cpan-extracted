@@ -1,11 +1,12 @@
 package PAGI::Context;
-$PAGI::Context::VERSION = '0.002001';
+$PAGI::Context::VERSION = '0.002002';
 use strict;
 use warnings;
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use Future::AsyncAwait;
 use Future;
+use PAGI::Utils::SecureCompare qw(secure_compare);
 
 =encoding UTF-8
 
@@ -409,6 +410,39 @@ Returns true if session middleware has populated C<< $scope->{'pagi.session'} >>
 
 Returns C<< $scope->{state} >> - the app/endpoint-level shared state.
 
+=head2 csrf_token
+
+    my $token = $ctx->csrf_token;
+
+Returns C<< $scope->{csrf_token} >>, the token minted or persisted by
+L<PAGI::Middleware::CSRF>. C<undef> if that middleware is not enabled.
+
+Embed it in a form's hidden field so a submitted request can be checked with
+L</csrf_verify>:
+
+    <input type="hidden" name="_csrf_token" value="<%= $ctx->csrf_token %>">
+
+or in a C<< <meta> >> tag for JavaScript to read and send back as a header
+(the cookie itself is C<HttpOnly> and not readable from script):
+
+    <meta name="csrf-token" content="<%= $ctx->csrf_token %>">
+
+=head2 csrf_verify
+
+    if ($ctx->csrf_verify($submitted_token)) { ... }
+
+Timing-safe comparison of C<$submitted_token> against C<< $ctx->csrf_token >>.
+Returns true on a match, false otherwise -- including when either side is
+missing or empty. Intended for C<< enforce => 'app' >> mode on
+L<PAGI::Middleware::CSRF>, where the middleware only issues the token and the
+app validates it once it has parsed the submitted params:
+
+    return $ctx->text('CSRF token validation failed', status => 403)
+        unless $ctx->csrf_verify($params->{_csrf_token});
+
+The app decides the response for a failed check; this method only reports
+match or no match.
+
 =cut
 
 sub stash {
@@ -435,6 +469,19 @@ sub has_session {
 sub state {
     my ($self) = @_;
     return $self->{scope}{state} // {};
+}
+
+sub csrf_token {
+    my ($self) = @_;
+    return $self->{scope}{csrf_token};
+}
+
+sub csrf_verify {
+    my ($self, $submitted) = @_;
+    my $expected = $self->{scope}{csrf_token};
+    return 0 unless defined $submitted && length($submitted);
+    return 0 unless defined $expected && length($expected);
+    return secure_compare($submitted, $expected);
 }
 
 =head2 Connection State
@@ -735,6 +782,13 @@ async sub _trigger_ctx_error {
     }
 }
 
+# Hook for protocol subclasses (Context::WebSocket, Context::SSE) to sync
+# their underlying object's close state when the terminal disconnect event
+# is consumed here in _run() rather than through the object's own
+# receive()/run(). The base class has no underlying object, so this is a
+# no-op; overridden by the subclasses that have one.
+async sub _sync_terminal_disconnect { return; }
+
 # Run the event dispatch loop. A plain sub so a re-entrant call croaks
 # synchronously (rather than as a failed Future); the async loop is in _run().
 # Always resolves (never rejects). Returns reason: 'disconnect', 'stop', 'error'.
@@ -792,6 +846,7 @@ async sub _run {
 
         if ($terminal && $type eq $terminal) {
             $reason = 'disconnect';
+            await $self->_sync_terminal_disconnect($event->{code}, $event->{reason});
             last LOOP;
         }
     }

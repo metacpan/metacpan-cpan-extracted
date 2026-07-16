@@ -43,20 +43,7 @@ in deprecation warnings.
 
 Category: "deprecated::unicode_property_name"
 
-=head2 Perl 5.44
-
-=head3 Calling a missing C<import()> or C<unimport()> method with an argument
-
-Historically calling C<import()> or C<unimport()> on any class which did
-not define such a method would be silently ignored. Effectively Perl
-behaved as though there was an empty method defined in the C<UNIVERSAL>
-package (even when there was no such method actually defined). As of
-Perl version 5.39.2 calling such a method I<with> an argument will
-trigger a warning, and in Perl version 5.44 this warning will be
-upgraded to an error. (Calling such a method with no arguments at all
-will always be safe.)
-
-Category: "deprecated::missing_import_called_with_args"
+=head2 Perl 5.46
 
 =head3 Changing C<use VERSION> while another C<use VERSION> is in scope
 
@@ -69,12 +56,12 @@ prevailing version to another.
 
 Category: "deprecated::subsequent_use_version"
 
-=head2 Perl 5.42
+=head2 Perl 5.44
 
 =head3 Goto Block Construct
 
-C<goto LABEL;> will produce a deprecated warning when jumping into the body
-of a loop or other block construct from outside. For instance
+C<goto LABEL;> now produces an exception when jumping into the body of a loop
+or other block construct from outside. For instance
 
     while (should_loop($x)) {
         LABEL:
@@ -82,11 +69,15 @@ of a loop or other block construct from outside. For instance
     }
     goto LABEL;
 
-will produce a warning that this behavior is deprecated. In general you should
-just avoid doing this; the people that maintain your code will be grateful for
-your restraint.
+now throws an exception indicating that this behavior is no longer permitted.
 
 Category: "deprecated::goto_construct"
+
+=head2 Perl 5.42
+
+There were no deprecations or fatalizations in Perl 5.42.  (There were
+deprecations we I<planned> to do in Perl 5.42 but failed to carry out.  One
+was accomplished in Perl 5.44; one was cancelled; one is now unscheduled.)
 
 =head2 Perl 5.40
 
@@ -408,7 +399,7 @@ points>, those can be delimiters.
 =head3 Attributes C<< :locked >> and C<< :unique >>
 
 The attributes C<< :locked >> (on code references) and C<< :unique >>
-(on array, hash and scalar references) have had no effect since 
+(on array, hash and scalar references) have had no effect since
 Perl 5.005 and Perl 5.8.8 respectively. Their use has been deprecated
 since.
 
@@ -514,7 +505,7 @@ throws a fatal error as of Perl 5.28.
 =head3 C<< B::OP::terse >>
 
 This method, which just calls C<< B::Concise::b_terse >>, has been
-deprecated, and disappeared in Perl 5.28. Please use 
+deprecated, and disappeared in Perl 5.28. Please use
 L<B::Concise> instead.
 
 
@@ -576,7 +567,7 @@ rectify this have been scrapped, as users found that rewriting a
 pending exception is actually a useful feature, and not a bug.
 
 Perl never issued a deprecation warning for this; the deprecation
-was by documentation policy only. But this deprecation has been 
+was by documentation policy only. But this deprecation has been
 lifted as of Perl 5.26.
 
 
@@ -599,7 +590,7 @@ became fatal in Perl 5.26.
 =head3 Use of C<< *glob{FILEHANDLE} >>
 
 The use of C<< *glob{FILEHANDLE} >> was deprecated in Perl 5.8.
-The intention was to use C<< *glob{IO} >> instead, for which 
+The intention was to use C<< *glob{IO} >> instead, for which
 C<< *glob{FILEHANDLE} >> is an alias.
 
 However, this feature was undeprecated in Perl 5.24.
@@ -607,8 +598,8 @@ However, this feature was undeprecated in Perl 5.24.
 =head3 Calling POSIX::%s() is deprecated
 
 The following functions in the C<POSIX> module are no longer available:
-C<isalnum>, C<isalpha>, C<iscntrl>, C<isdigit>, C<isgraph>, C<islower>,  
-C<isprint>, C<ispunct>, C<isspace>, C<isupper>, and C<isxdigit>.  The 
+C<isalnum>, C<isalpha>, C<iscntrl>, C<isdigit>, C<isgraph>, C<islower>,
+C<isprint>, C<ispunct>, C<isspace>, C<isupper>, and C<isxdigit>.  The
 functions are buggy and don't work on UTF-8 encoded strings.  See their
 entries in L<POSIX> for more information.
 
@@ -629,7 +620,6 @@ This was deprecated in Perl 5.14, and the bug was fixed in Perl 5.16.
 So now C<tie $scalar> will always tie the scalar, not the handle it holds.
 To tie the handle, use C<tie *$scalar> (with an explicit asterisk).  The same
 applies to C<tied *$scalar> and C<untie *$scalar>.
-
 
 =head1 SEE ALSO
 

@@ -1,0 +1,22 @@
+[
+  {
+    "title":        "Administration",
+    "link":         "",
+    "icon":         "fas fa-lock-open",
+    "icon_color":   "#000000",
+    "menu":         "admin_menu",
+    "condition":    "group:admin",
+    "order":        1,
+    "parent_title": null,
+    "description":  "Administration panel"
+  },
+  {
+    "title":        "Menus",
+    "link":         "/menus",
+    "icon":         "far fa-caret-square-down",
+    "icon_color":   "#000000",
+    "menu":         "admin_menu",
+    "parent_title": "Administration",
+    "description":  "Manage navigation menus"
+  }
+]

@@ -152,6 +152,7 @@ lib/PAGI/Tools/Cookbook.pod
 lib/PAGI/Tools/Tutorial.pod
 lib/PAGI/Utils.pm
 lib/PAGI/Utils/Random.pm
+lib/PAGI/Utils/SecureCompare.pm
 lib/PAGI/WebSocket.pm
 t/00-load.t
 t/32-middleware-on-error.t
@@ -300,6 +301,7 @@ t/utils-lifespan.t
 t/utils-to-app.t
 t/utils/is-response.t
 t/utils/random.t
+t/utils/secure-compare.t
 t/websocket-heartbeat.t
 t/websocket-query-params.t
 t/websocket-state.t

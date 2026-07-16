@@ -142,12 +142,6 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  */
 #$d_fcntl HAS_FCNTL		/**/
 
-/* HAS_FDOPENDIR:
- * This symbol, if defined, indicates that the fdopendir routine is
- * available to open a directory descriptor.
- */
-#$d_fdopendir HAS_FDOPENDIR		/**/
-
 /* HAS_FGETPOS:
  *	This symbol, if defined, indicates that the fgetpos routine is
  *	available to get the file position indicator, similar to ftell().
@@ -799,9 +793,14 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	This symbol contains the value of sizeof(short) so that the C
  *	preprocessor can make decisions based on it.
  */
+/* INTMAXSIZE:
+ *	This symbol contains the value of sizeof(intmax_t) so that the C
+ *	preprocessor can make decisions based on it.
+ */
 #define INTSIZE $intsize		/**/
 #define LONGSIZE $longsize		/**/
 #define SHORTSIZE $shortsize		/**/
+#define INTMAXSIZE $intmaxsize		/**/
 
 /* MULTIARCH:
  *	This symbol, if defined, signifies that the build
@@ -2526,6 +2525,13 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  */
 #$d_fdim HAS_FDIM		/**/
 
+/* HAS_FDOPENDIR:
+ *	This symbol, if defined, indicates that the fdopendir() routine is
+ *	available to open directories using an opened file descriptor already
+ *	referring to that directory.
+ */
+#$d_fdopendir HAS_FDOPENDIR		/**/
+
 /* HAS_FEGETROUND:
  *	This symbol, if defined, indicates that the fegetround routine is
  *	available to return the macro corresponding to the current rounding
@@ -2766,6 +2772,12 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	available to get the current working directory.
  */
 #$d_getcwd HAS_GETCWD		/**/
+
+/* HAS_GETENTROPY:
+ *	This symbol, if defined, indicates that the getentropy system call
+ *	is available to retrieve fill a buffer with random bytes.
+ */
+#$d_getentropy HAS_GETENTROPY		/**/
 
 /* HAS_GETESPWNAM:
  *	This symbol, if defined, indicates that the getespwnam system call is
@@ -3842,6 +3854,12 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  */
 #$i_stdbool	I_STDBOOL		/**/
 
+/* I_STDCKDINT:
+ *	This symbol, if defined, indicates that <stdckdint.h> exists and
+ *	can be included.
+ */
+#$i_stdckdint I_STDCKDINT		/**/
+
 /* I_STDINT:
  *	This symbol, if defined, indicates that <stdint.h> exists and
  *	should be included.
@@ -3871,6 +3889,12 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	should be included.
  */
 #$i_sysmount	I_SYS_MOUNT		/**/
+
+/* I_SYS_RANDOM:
+ *	This symbol, if defined, indicates that <sys/random.h> exists and
+ *	should be included.
+ */
+#$i_sysrandom	I_SYS_RANDOM		/**/
 
 /* I_SYS_STATFS:
  *	This symbol, if defined, indicates that <sys/statfs.h> exists.

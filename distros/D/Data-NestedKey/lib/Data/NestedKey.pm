@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 use Storable qw(nfreeze);
 use YAML::XS ();
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.2.2';
 
 # Package variables for serialization options
 our $JSON_PRETTY = 1;  # Controls whether JSON output is pretty or compact

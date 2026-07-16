@@ -8,6 +8,10 @@ use Mojo::JSON qw(encode_json decode_json from_json);
 use Syntax::Keyword::Try;
 use Scalar::Util qw(blessed weaken);
 
+# RPC error code the qooxdoo frontend maps to "session expired -> reload".
+# Distinct from code 6 ("login required -> show login dialog").
+use constant RPC_SESSION_EXPIRED => 7;
+
 =head1 NAME
 
 CallBackery::RpcService - RPC services for CallBackery
@@ -28,7 +32,51 @@ has service => 'default';
 
 =head2 allow_rpc_access(method)
 
-is this method accessible?
+Decide whether the current request may invoke C<$method>. Returns C<1> when
+access is granted and C<0> when it is refused (the dispatcher turns a C<0> into a
+code 6 "access denied" reply, which the frontend maps to the login dialog). When
+access is refused specifically because a previously valid session has expired,
+this instead C<die>s a code 7 (C<RPC_SESSION_EXPIRED>) exception so the frontend
+can prompt a reload rather than a fresh login.
+
+The rules are evaluated in order:
+
+=over
+
+=item *
+
+Non-C<POST> requests are refused (C<return 0>).
+
+=item *
+
+Methods not listed in C<%allow> are refused (C<return 0>).
+
+=item *
+
+Public methods (C<%allow> level C<1>) are always allowed.
+
+=item *
+
+Any authenticated user is allowed. Reading C<isUserAuthenticated> forces the
+session cookie to be evaluated, which is also what sets C<sessionExpired> on the
+user object.
+
+=item *
+
+Level C<3> methods are additionally allowed for an unauthenticated user when the
+target plugin opts into anonymous access (C<mayAnonymous>). The plugin
+instantiation is wrapped in C<eval>, because instantiating a plugin as an
+unauthenticated user commonly dies (plugins read user rights/config); such a
+death resolves to "not anonymous" here and must never escape as a generic
+code 9999 error.
+
+=item *
+
+Otherwise the method requires authentication the user does not have: if the
+user's session has merely expired, C<die> a C<RPC_SESSION_EXPIRED> (code 7)
+exception; otherwise C<return 0> for the ordinary login-required path.
+
+=back
 
 =cut
 
@@ -70,14 +118,26 @@ sub allow_rpc_access ($self,$method) {
         return 0;
     }
     for ($allow{$method}){
-        /1/ && return 1;
-        return 1 if ($self->user->isUserAuthenticated);
+        /1/ && return 1;                                 # public method
+        return 1 if ($self->user->isUserAuthenticated); # forces cookieConf (sets sessionExpired)
         /3/ && do {
+            # Level-3: allowed only for plugins that opt into anonymous access.
+            # Guard the instantiation: for an unauthenticated user it commonly
+            # dies (plugins read user rights/config); that death must resolve to
+            # "not anonymous" here, never escape as a generic code-9999 popup.
             my $plugin = $self->rpcParams->[0];
-            if ($self->config->instantiatePlugin($plugin,$self->user)->mayAnonymous){
-                return 1;
-            }
+            my $anon = eval {
+                $self->config->instantiatePlugin($plugin,$self->user)->mayAnonymous
+            };
+            return 1 if $anon;
         };
+        # Method needs auth and the user is not authenticated. If a session was
+        # present and merely expired, signal that distinctly (code 7 -> reload);
+        # otherwise fall through to code 6 (login dialog).
+        die mkerror(RPC_SESSION_EXPIRED,
+            trm('Your session has expired. Please reload to log in.'))
+            if $self->user->sessionExpired;
+        last;
     }
     return 0;
 };

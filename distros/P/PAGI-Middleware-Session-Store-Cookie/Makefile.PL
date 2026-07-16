@@ -20,13 +20,13 @@ my %WriteMakefileArgs = (
     "CryptX" => "0.080",
     "Future" => "0.50",
     "JSON::MaybeXS" => "1.004003",
-    "PAGI" => "0.001020"
+    "PAGI::Tools" => "0.002002"
   },
   "TEST_REQUIRES" => {
     "Future::AsyncAwait" => "0.66",
     "Test2::V0" => "0.000159"
   },
-  "VERSION" => "0.001004",
+  "VERSION" => "0.001005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %FallbackPrereqs = (
   "Future" => "0.50",
   "Future::AsyncAwait" => "0.66",
   "JSON::MaybeXS" => "1.004003",
-  "PAGI" => "0.001020",
+  "PAGI::Tools" => "0.002002",
   "Test2::V0" => "0.000159"
 );
 

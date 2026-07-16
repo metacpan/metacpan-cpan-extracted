@@ -1,5 +1,38 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002020 2026 July 15
+          - *** BREAKING CHANGE *** DBIx::Class::Valiant is no longer bundled; it
+          is now the standalone DBIx-Class-Valiant distribution. 
+          - Now the framework-agnostic core (validations, filters, i18n,
+          HTML/JSON generation); ORM/web integrations ship separately as
+          DBIx-Class-Valiant, Catalyst-View-Valiant, and async DBIO-Valiant.
+          - Fixed: errors->added/of_kind never matched translation-tag errors.
+          - Fixed: numericality pg_serial/pg_bigserial rejected every value but 0.
+          - Fixed: strict => 'My::Class' raised the generic exception, not it.
+          - Fixed: only_of counted empty strings as filled group members.
+          - Fixed: the check validator crashed on its coderef and arrayref forms.
+          - Fixed: Upper/UcFirst filters clobbered defaults and warned on undef.
+          - Fixed: errors->merge/import_error now preserve imported error types.
+          - Fixed: the length validator dropped per-check message overrides.
+          - Fixed: translation keys containing '.' now resolve via nested lookup.
+          - Fixed: form_enctype read the wrong option key, so enctype was ignored.
+          - Fixed: 'validated'/'skip_validation' are no longer constructor-set.
+          - Fixed: format and numericality validators warned on undef values.
+          - Fixed: JSONBuilder->errors, unusable outside Catalyst, now takes
+          content_type (default application/json) and emits a JSON:API 'errors'.
+          - New: acceptance validator (Rails parity) for TOS-style checkboxes.
+          - New: errors->details (raw details by attribute); errors->uniq dedupes.
+          - Behavior change: Valiant::Proxy::Object throws MissingMethod on an
+          absent method, instead of silently returning nothing.
+          - Behavior change: generate_message strips trailing dot indices from
+          attribute names, as full_message always did.
+          - Removed: the dead Valiant::HTML::Tag and Valiant::HTML::Tag::Label
+          modules, plus the unused format 'exclusion' option.
+          - example/ (the Catalyst demo) is no longer shipped (needs the
+          split-out dists); it stays in git.
+          - Documentation truth pass: documented names now exist, undocumented
+          public API is documented, phantom methods removed, SYNOPSIS fixed.
+
 0.002019 2025 July 10
           - This release contains some undocumented changes which are in place for
           testing and compatibility regression with other CPAN modules. This is not

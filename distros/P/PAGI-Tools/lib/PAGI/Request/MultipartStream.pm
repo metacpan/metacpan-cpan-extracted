@@ -1,5 +1,5 @@
 package PAGI::Request::MultipartStream;
-$PAGI::Request::MultipartStream::VERSION = '0.002001';
+$PAGI::Request::MultipartStream::VERSION = '0.002002';
 use strict;
 use warnings;
 

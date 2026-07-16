@@ -149,7 +149,8 @@ dlext='bundle';
 usedl='define';
 
 # 10.4 can use dlopen.
-# 10.4 broke poll().
+# 10.4 broke poll(). - Apple bug number 3710161
+# https://lists.apple.com/archives/Darwin-dev/2005/May/msg00220.html
 case "$osvers" in
 [1-7].*)
     dlsrc='dl_dyld.xs';
@@ -302,7 +303,7 @@ case "$osvers" in  # Note: osvers is the kernel version, not the 10.x
    # We now use MACOSX_DEPLOYMENT_TARGET, if set, as an override by
    # capturing its value and adding it to the flags.
     case "$MACOSX_DEPLOYMENT_TARGET" in
-    [1-9][0-9].*)
+    [1-9][0-9].*|[1-9][0-9])
       add_macosx_version_min ccflags $MACOSX_DEPLOYMENT_TARGET
       add_macosx_version_min ldflags $MACOSX_DEPLOYMENT_TARGET
       add_macosx_version_min lddlflags $MACOSX_DEPLOYMENT_TARGET

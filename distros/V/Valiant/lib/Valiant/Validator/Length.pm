@@ -26,9 +26,9 @@ sub BUILD {
 }
 
 sub validate_each {
-  my ($self, $record, $attribute, $value) = @_;
+  my ($self, $record, $attribute, $value, $options) = @_;
   my $length = length($value||'') || 0; # TODO not sure if this is best behavior
-  my %opts = (%{$self->options});
+  my %opts = (%{$self->options}, %{$options||+{}});
   if($self->has_maximum) {
     my $max = $self->_cb_value($record, $self->maximum);
     $record->errors->add($attribute, $self->too_long, +{%opts, count=>$max})
@@ -108,12 +108,12 @@ This validator supports the following constraints.
 
 =item maximum
 
-Accepts numeric value or coderef.  Returns error message tag V<too_long> if
+Accepts numeric value or coderef.  Returns error message tag C<too_long> if
 the attribute length exceeds the value.
 
 =item minimum
 
-Accepts numeric value or coderef.  Returns error message tag V<too_short> if
+Accepts numeric value or coderef.  Returns error message tag C<too_short> if
 the attribute length is smaller than the value.
 
 =item in
@@ -124,8 +124,8 @@ of either C<too_short> or C<too_long> if the value length is outside the range s
 
 =item is 
 
-Accepts numeric value or coderef.  Returns error message tag V<wrong_length> if
-the attribute value equal to the check value.
+Accepts numeric value or coderef.  Returns error message tag C<wrong_length> unless
+the attribute value's length is exactly the check value.
 
 =back
 

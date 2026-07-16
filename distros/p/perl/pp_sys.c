@@ -222,7 +222,7 @@ void endservent(void);
     && (defined(HAS_SETREUID) || defined(HAS_SETRESUID)		\
         || defined(HAS_SETREGID) || defined(HAS_SETRESGID))
 /* The Hard Way. */
-STATIC int
+static int
 S_emulate_eaccess(pTHX_ const char* path, Mode_t mode)
 {
     const Uid_t ruid = getuid();
@@ -392,7 +392,7 @@ PP(pp_glob)
 
     /* unrolled
       tryAMAGICunTARGETlist(iter_amg, (PL_op->op_flags & OPf_SPECIAL)); */
-    SV *tmpsv;
+    SV *tmpsv = NULL;
     U8 gimme = GIMME_V;
     if (UNLIKELY(SvAMAGIC(arg) &&
         (tmpsv = amagic_call(arg, &PL_sv_undef, iter_amg,
@@ -670,13 +670,13 @@ OP *
 Perl_tied_method(pTHX_ SV *methname, SV **mark, SV *const sv,
                  const MAGIC *const mg, const U32 flags, U32 argc, ...)
 {
+    PERL_ARGS_ASSERT_TIED_METHOD;
+
     I32 ret_args;
     SSize_t extend_size;
 #ifdef PERL_RC_STACK
     bool was_rc = rpp_stack_is_rc();
 #endif
-
-    PERL_ARGS_ASSERT_TIED_METHOD;
 
     /* Ensure that our flag bits do not overlap.  */
     STATIC_ASSERT_STMT((TIED_METHOD_MORTALIZE_NOT_NEEDED & G_WANT) == 0);
@@ -800,11 +800,11 @@ Perl_tied_method(pTHX_ SV *methname, SV **mark, SV *const sv,
 
 
 #define tied_method0(a,b,c,d)		\
-    Perl_tied_method(aTHX_ a,b,c,d,G_SCALAR,0)
+    tied_method(a,b,c,d,G_SCALAR,0)
 #define tied_method1(a,b,c,d,e)		\
-    Perl_tied_method(aTHX_ a,b,c,d,G_SCALAR,1,e)
+    tied_method(a,b,c,d,G_SCALAR,1,e)
 #define tied_method2(a,b,c,d,e,f)	\
-    Perl_tied_method(aTHX_ a,b,c,d,G_SCALAR,2,e,f)
+    tied_method(a,b,c,d,G_SCALAR,2,e,f)
 
 PP_wrapped(pp_open, 0, 1)
 {
@@ -834,7 +834,7 @@ PP_wrapped(pp_open, 0, 1)
         if (mg) {
             /* Method's args are same as ours ... */
             /* ... except handle is replaced by the object */
-            return Perl_tied_method(aTHX_ SV_CONST(OPEN), mark - 1, MUTABLE_SV(io), mg,
+            return tied_method(SV_CONST(OPEN), mark - 1, MUTABLE_SV(io), mg,
                                     G_SCALAR | TIED_METHOD_ARGUMENTS_ON_STACK,
                                     sp - mark);
         }
@@ -1034,7 +1034,7 @@ PP_wrapped(pp_binmode, MAXARG, 0)
                function, which I don't think that the optimiser will be able to
                figure out. Although, as it's a static function, in theory it
                could.  */
-            return Perl_tied_method(aTHX_ SV_CONST(BINMODE), SP, MUTABLE_SV(io), mg,
+            return tied_method(SV_CONST(BINMODE), SP, MUTABLE_SV(io), mg,
                                     G_SCALAR|TIED_METHOD_MORTALIZE_NOT_NEEDED,
                                     discp ? 1 : 0, discp);
         }
@@ -1544,9 +1544,9 @@ See C<L</setdefout>>.
 void
 Perl_setdefout(pTHX_ GV *gv)
 {
-    GV *oldgv = PL_defoutgv;
-
     PERL_ARGS_ASSERT_SETDEFOUT;
+
+    GV *oldgv = PL_defoutgv;
 
     SvREFCNT_inc_simple_void_NN(gv);
     PL_defoutgv = gv;
@@ -1600,7 +1600,7 @@ PP_wrapped(pp_getc, MAXARG, 0)
         const MAGIC * const mg = SvTIED_mg((const SV *)io, PERL_MAGIC_tiedscalar);
         if (mg) {
             const U8 gimme = GIMME_V;
-            Perl_tied_method(aTHX_ SV_CONST(GETC), SP, MUTABLE_SV(io), mg, gimme, 0);
+            tied_method(SV_CONST(GETC), SP, MUTABLE_SV(io), mg, gimme, 0);
             if (gimme == G_SCALAR) {
                 SPAGAIN;
                 SvSetMagicSV_nosteal(TARG, TOPs);
@@ -1632,13 +1632,13 @@ PP_wrapped(pp_getc, MAXARG, 0)
     RETURN;
 }
 
-STATIC OP *
+static OP *
 S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
 {
+    PERL_ARGS_ASSERT_DOFORM;
+
     PERL_CONTEXT *cx;
     const U8 gimme = GIMME_V;
-
-    PERL_ARGS_ASSERT_DOFORM;
 
     if (CvCLONE(cv))
         cv = MUTABLE_CV(sv_2mortal(MUTABLE_SV(cv_clone(cv))));
@@ -1729,8 +1729,8 @@ PP(pp_leavewrite)
                 SV *topname;
                 if (!IoFMT_NAME(io))
                     IoFMT_NAME(io) = savepv(GvNAME(gv));
-                topname = sv_2mortal(Perl_newSVpvf(aTHX_ "%" HEKf "_TOP",
-                                        HEKfARG(GvNAME_HEK(gv))));
+                topname = sv_2mortal(newSVpvf("%" HEKf "_TOP",
+                                              HEKfARG(GvNAME_HEK(gv))));
                 topgv = gv_fetchsv(topname, 0, SVt_PVFM);
                 if ((topgv && GvFORM(topgv)) ||
                   !gv_fetchpvs("top", GV_NOTQUAL, SVt_PVFM))
@@ -1854,7 +1854,7 @@ PP(pp_prtf)
                 *MARK = NULL;
                 ++PL_stack_sp;
             }
-            return Perl_tied_method(aTHX_ SV_CONST(PRINTF), mark - 1, MUTABLE_SV(io),
+            return tied_method(SV_CONST(PRINTF), mark - 1, MUTABLE_SV(io),
                                     mg,
                                     G_SCALAR | TIED_METHOD_ARGUMENTS_ON_STACK,
                                     PL_stack_sp - mark);
@@ -1944,7 +1944,7 @@ PP_wrapped(pp_sysread, 0, 1)
     {
         const MAGIC *const mg = SvTIED_mg((const SV *)io, PERL_MAGIC_tiedscalar);
         if (mg) {
-            return Perl_tied_method(aTHX_ SV_CONST(READ), mark - 1, MUTABLE_SV(io), mg,
+            return tied_method(SV_CONST(READ), mark - 1, MUTABLE_SV(io), mg,
                                     G_SCALAR | TIED_METHOD_ARGUMENTS_ON_STACK,
                                     sp - mark);
         }
@@ -2202,7 +2202,7 @@ PP_wrapped(pp_syswrite, 0, 1)
                 PUTBACK;
             }
 
-            return Perl_tied_method(aTHX_ SV_CONST(WRITE), mark - 1, MUTABLE_SV(io), mg,
+            return tied_method(SV_CONST(WRITE), mark - 1, MUTABLE_SV(io), mg,
                                     G_SCALAR | TIED_METHOD_ARGUMENTS_ON_STACK,
                                     sp - mark);
         }
@@ -2935,7 +2935,24 @@ PP_wrapped(pp_ssockopt,(PL_op->op_type == OP_GSOCKOPT) ? 3 : 4 , 0)
         (void)SvPOK_only(sv);
         SvCUR_set(sv, PERL_GETSOCKOPT_SIZE);
         *SvEND(sv) ='\0';
+
+#ifdef OEMVS
+
+        /* Work around z/OS limitation.  The buffer size parameter on this
+         * platform must be the precise sizeof the type being returned.  Other
+         * platforms, and the POSIX standard, require it to be large enough to
+         * hold the returned value, not necessarily the precise sizeof.  On
+         * z/OS 3.1 all currently handled options but SO_LINGER are of type
+         * int */
+        if (optname == SO_LINGER) {
+            len = sizeof(struct linger);
+        }
+        else {
+            len = sizeof(int);
+        }
+#else
         len = SvCUR(sv);
+#endif
         if (PerlSock_getsockopt(fd, lvl, optname, SvPVX(sv), &len) < 0)
             goto nuts2;
 #if defined(_AIX)
@@ -3303,7 +3320,8 @@ PP_wrapped(pp_stat, !(PL_op->op_flags & OPf_REF), 0)
 */
 
 static OP *
-S_ft_return_false(pTHX_ SV *ret) {
+S_ft_return_false(pTHX_ SV *ret)
+{
     OP *next = NORMAL;
 
     if (PL_op->op_flags & OPf_REF) {
@@ -3321,7 +3339,8 @@ S_ft_return_false(pTHX_ SV *ret) {
 }
 
 PERL_STATIC_INLINE OP *
-S_ft_return_true(pTHX_ SV *ret) {
+S_ft_return_true(pTHX_ SV *ret)
+{
     if (PL_op->op_flags & OPf_REF) {
         rpp_xpush_1((PL_op->op_private & OPpFT_STACKING)
                     ? (SV*)cGVOP_gv : ret);
@@ -3345,8 +3364,9 @@ S_ft_return_true(pTHX_ SV *ret) {
         }						   \
     } STMT_END
 
-STATIC OP *
-S_try_amagic_ftest(pTHX_ char chr) {
+static OP *
+S_try_amagic_ftest(pTHX_ char chr)
+{
     SV *const arg = *PL_stack_sp;
 
     assert(chr != '?');
@@ -4091,17 +4111,17 @@ PP_wrapped(pp_readlink, 1, 0)
 }
 
 #if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
-STATIC int
+static int
 S_dooneliner(pTHX_ const char *cmd, const char *filename)
 {
+    PERL_ARGS_ASSERT_DOONELINER;
+
     char * const save_filename = filename;
     char *cmdline;
     char *s;
     PerlIO *myfp;
     int anum = 1;
     Size_t size = strlen(cmd) + (strlen(filename) * 2) + 10;
-
-    PERL_ARGS_ASSERT_DOONELINER;
 
     Newx(cmdline, size, char);
     my_strlcpy(cmdline, cmd, size);
@@ -4271,7 +4291,10 @@ PP_wrapped(pp_open_dir, 2, 0)
 }
 
 static void
-S_warn_not_dirhandle(pTHX_ GV *gv) {
+S_warn_not_dirhandle(pTHX_ GV *gv)
+{
+    PERL_ARGS_ASSERT_WARN_NOT_DIRHANDLE;
+
     IO *io = GvIOn(gv);
 
     if (IoIFP(io)) {
@@ -4289,6 +4312,7 @@ S_warn_not_dirhandle(pTHX_ GV *gv) {
 
 PP_wrapped(pp_readdir, 1, 0)
 {
+
 #if !defined(Direntry_t) || !defined(HAS_READDIR)
     DIE(aTHX_ PL_no_dir_func, "readdir");
 #else
@@ -5051,7 +5075,7 @@ PP_wrapped(pp_gmtime, MAXARG, 0)
        else {
            dTARGET;
            PUSHs(TARG);
-           Perl_sv_setpvf_mg(aTHX_ TARG, "%s %s %2d %02d:%02d:%02d %" IVdf,
+           sv_setpvf_mg(TARG, "%s %s %2d %02d:%02d:%02d %" IVdf,
                                 dayname[tmbuf.tm_wday],
                                 monname[tmbuf.tm_mon],
                                 tmbuf.tm_mday,
@@ -5123,7 +5147,7 @@ PP_wrapped(pp_sleep, MAXARG, 0)
     if (MAXARG < 1 || (!TOPs && !POPs))
         PerlProc_pause();
     else {
-        const I32 duration = POPi;
+        const IV duration = POPi;
         if (duration < 0) {
           /* diag_listed_as: %s() with negative argument */
           ck_warner_d(packWARN(WARN_MISC),
@@ -5221,6 +5245,8 @@ PP_wrapped(pp_semctl, 0, 1)
 static SV *
 S_space_join_names_mortal(pTHX_ char *const *array)
 {
+    PERL_ARGS_ASSERT_SPACE_JOIN_NAMES_MORTAL;
+
     SV *target;
 
     if (array && *array) {
@@ -5558,6 +5584,7 @@ PP_wrapped(pp_shostent, 1, 0)
 {
     dSP;
     const int stayopen = TOPi;
+    PERL_UNUSED_VAR(stayopen);
     switch(PL_op->op_type) {
     case OP_SHOSTENT:
 #ifdef HAS_SETHOSTENT

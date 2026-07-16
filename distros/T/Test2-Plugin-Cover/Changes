@@ -1,3 +1,71 @@
+0.000028  2026-07-15 09:41:25-07:00 America/Los_Angeles
+
+    - touch_source_file() and touch_data_file() now respect disable(),
+      matching the documented "when disabled no coverage is recorded"
+      behavior.
+    - Internal failures now warn instead of dying, coverage collection
+      should never introduce new exceptions into the code it observes:
+      a dying custom extract()/filter() (or a file racing deletion)
+      only skips that one entry, a failing report() at test exit warns
+      instead of breaking teardown, a failed END-fallback install
+      warns, and a failing realpath at load time falls back instead of
+      aborting the compile. Interface misuse (bad touch_* arguments,
+      importing twice with params) still dies.
+    - set_from() now warns on and ignores values that are (or contain)
+      CODE or GLOB references instead of dying later inside the exit
+      callback that sends the report. Enabling coverage should never
+      introduce new exceptions into the code being observed.
+    - Replace Storable::dclone in report processing with a purpose
+      built copy of the report structure. Unserializable 'from' values
+      can no longer kill report generation, and Storable is no longer
+      a dependency.
+    - data() now deduplicates 'from' values by content instead of by
+      reference, and sorts them deterministically (references are
+      keyed by their serialized form).
+    - filter() now resolves the file path before comparing it to the
+      root, so symlinked roots/files filter and relativize
+      consistently. It also documents (and always supported) plain
+      string roots.
+    - Cache the ENABLED/FROM/ROOT/TRACE_OPENS globs in XS on
+      non-threaded perls instead of doing symbol table lookups on
+      every single sub call. Greatly reduces hook overhead, especially
+      when coverage is disabled.
+    - Document data(), $TRACE_OPENS/@OPENS, the implicit exclusion of
+      $0 and the plugin's own file, and add a LIMITATIONS list for
+      goto, inlined constants, XS subs, threads, and exotic open()
+      forms.
+    - Fix many POD typos.
+    - Declare Scalar::Util, Data::Dumper, and XSLoader prereqs.
+    - New tests: disable semantics, from-value handling, report event
+      structure, module reload regression, memory leak regression,
+      and filter/root handling.
+    - Re-enable the sysopen hook. The old handler assumed pp_sysopen was
+      mark-based, but its pushmark is nulled at compile time; TOPMARK
+      pointed at an enclosing op's mark, so the handler read arbitrary
+      stack slots. That misattributed filenames and was the source of
+      the "unknown segv on some platforms" that got the hook disabled.
+      The filename is now located by fixed-arity offset from the stack
+      top using MAXARG.
+    - Fix memory leak in add_entry(): one SV was leaked on nearly every
+      sub call once a (file, sub, from) entry already existed. Sub-call
+      heavy tests could grow to multi-GB RSS and appear to hang the
+      harness.
+    - Guard BOOT against running twice. Reloading the module (%INC
+      cleared + re-required, e.g. preload reloading) made the hooks
+      capture themselves as the original handlers, causing infinite
+      recursion and a segfault on the next sub call.
+    - Use newRV_noinc() when storing newly created HVs/AVs, fixing
+      small refcount leaks (one per new file/sub entry, one per traced
+      open).
+    - Read the sub SV from the stack before calling the original
+      entersub handler; XS calls could overwrite that stack slot with a
+      return value, causing garbage to be inspected.
+    - Stop invoking get-magic and &{} overload from inside the entersub
+      hook; pp_entersub already ran them, and re-invoking arbitrary
+      perl code from the op hook risked recursion and stack corruption.
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+
 0.000027  2021-11-04 14:18:05-07:00 America/Los_Angeles
 
     - Add ability to trace opens for debugging

@@ -212,8 +212,9 @@ recursive_lock_destroy(pTHX_ recursive_lock_t *lock)
 }
 
 static void
-recursive_lock_release(pTHX_ recursive_lock_t *lock)
+recursive_lock_release(pTHX_ void *ptr)
 {
+    recursive_lock_t *lock = (recursive_lock_t *)ptr;
     MUTEX_LOCK(&lock->mutex);
     if (lock->owner == aTHX) {
         if (--lock->locks == 0) {
@@ -377,15 +378,94 @@ static const MGVTBL sharedsv_userlock_vtbl = {
    the shared thing.
  */
 
-extern const MGVTBL sharedsv_scalar_vtbl;   /* Scalars have this vtable */
-extern const MGVTBL sharedsv_array_vtbl;     /* Hashes and arrays have this
-                                            - like 'tie' */
-extern const MGVTBL sharedsv_elem_vtbl;      /* Elements of hashes and arrays have
-                                          this _AS WELL AS_ the scalar magic:
+static int
+sharedsv_scalar_mg_get(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_scalar_mg_set(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_scalar_mg_free(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_scalar_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param);
+#ifdef MGf_LOCAL
+static int
+sharedsv_scalar_mg_local(pTHX_ SV* nsv, MAGIC *mg);
+#endif
+
+static U32
+sharedsv_array_mg_FETCHSIZE(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_array_mg_CLEAR(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_array_mg_free(pTHX_ SV *sv, MAGIC *mg);
+#if PERL_VERSION_GE(5,11,0)
+static int
+sharedsv_array_mg_copy(pTHX_ SV *sv, MAGIC* mg,
+                       SV *nsv, const char *name, I32 namlen);
+#else
+static int
+sharedsv_array_mg_copy(pTHX_ SV *sv, MAGIC* mg,
+                       SV *nsv, const char *name, int namlen);
+#endif
+static int
+sharedsv_array_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param);
+
+static int
+sharedsv_elem_mg_FETCH(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_elem_mg_STORE(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_elem_mg_DELETE(pTHX_ SV *sv, MAGIC *mg);
+static int
+sharedsv_elem_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param);
+
+/* Scalars have this vtable */
+static const MGVTBL
+sharedsv_scalar_vtbl = {
+    sharedsv_scalar_mg_get,     /* get */
+    sharedsv_scalar_mg_set,     /* set */
+    0,                          /* len */
+    0,                          /* clear */
+    sharedsv_scalar_mg_free,    /* free */
+    0,                          /* copy */
+    sharedsv_scalar_mg_dup,     /* dup */
+#ifdef MGf_LOCAL
+    sharedsv_scalar_mg_local,   /* local */
+#endif
+};
+
+/* Hashes and arrays have this - like 'tie' */
+static const MGVTBL
+sharedsv_array_vtbl = {
+    0,                          /* get */
+    0,                          /* set */
+    sharedsv_array_mg_FETCHSIZE,/* len */
+    sharedsv_array_mg_CLEAR,    /* clear */
+    sharedsv_array_mg_free,     /* free */
+    sharedsv_array_mg_copy,     /* copy */
+    sharedsv_array_mg_dup,      /* dup */
+#ifdef MGf_LOCAL
+    0,                          /* local */
+#endif
+};
+
+/* Elements of hashes and arrays have
+   this _AS WELL AS_ the scalar magic:
    The sharedsv_elem_vtbl associates the element with the array/hash and
    the sharedsv_scalar_vtbl associates it with the value
  */
-
+static const MGVTBL
+sharedsv_elem_vtbl = {
+    sharedsv_elem_mg_FETCH,     /* get */
+    sharedsv_elem_mg_STORE,     /* set */
+    0,                          /* len */
+    sharedsv_elem_mg_DELETE,    /* clear */
+    0,                          /* free */
+    0,                          /* copy */
+    sharedsv_elem_mg_dup,       /* dup */
+#ifdef MGf_LOCAL
+    0,                          /* local */
+#endif
+};
 
 /* Get shared aggregate SV pointed to by threads::shared::tie magic object */
 
@@ -395,7 +475,7 @@ extern const MGVTBL sharedsv_elem_vtbl;      /* Elements of hashes and arrays ha
 /* Return the user_lock structure (if any) associated with a shared SV.
  * If create is true, create one if it doesn't exist
  */
-STATIC user_lock *
+static user_lock *
 S_get_userlock(pTHX_ SV* ssv, bool create)
 {
     MAGIC *mg;
@@ -466,7 +546,7 @@ Perl_sharedsv_find(pTHX_ SV *sv)
     if (SvROK(sv) && sv_derived_from(sv, "threads::shared::tie")) {
         return (SHAREDSV_FROM_OBJ(sv));
     }
-    return (NULL);
+    return NULL;
 }
 
 
@@ -533,7 +613,7 @@ Perl_sharedsv_associate(pTHX_ SV *sv, SV *ssv)
 /* Given a private SV, create and return an associated shared SV.
  * Assumes lock is held.
  */
-STATIC SV *
+static SV *
 S_sharedsv_new_shared(pTHX_ SV *sv)
 {
     dTHXc;
@@ -555,7 +635,7 @@ S_sharedsv_new_shared(pTHX_ SV *sv)
 /* Given a shared SV, create and return an associated private SV.
  * Assumes lock is held.
  */
-STATIC SV *
+static SV *
 S_sharedsv_new_private(pTHX_ SV *ssv)
 {
     SV *sv;
@@ -572,7 +652,7 @@ S_sharedsv_new_private(pTHX_ SV *ssv)
 
 /* A threadsafe version of SvREFCNT_dec(ssv) */
 
-STATIC void
+static void
 S_sharedsv_dec(pTHX_ SV* ssv)
 {
     if (! ssv)
@@ -620,7 +700,7 @@ Perl_sharedsv_share(pTHX_ SV *sv)
 #define EPOCH_BIAS      11644473600000.
 
 /* Returns relative time in milliseconds.  (Adapted from Time::HiRes.) */
-STATIC DWORD
+static DWORD
 S_abs_2_rel_milli(double abs)
 {
     double rel;
@@ -729,7 +809,7 @@ Perl_sharedsv_cond_timedwait(perl_cond *cond, perl_mutex *mut, double abs)
  * If the private side is already an appropriate RV->SV combination, keep
  * it if possible.
  */
-STATIC void
+static void
 S_get_RV(pTHX_ SV *sv, SV *sobj) {
     SV *obj;
     if (! (SvROK(sv) &&
@@ -931,19 +1011,6 @@ sharedsv_scalar_mg_local(pTHX_ SV* nsv, MAGIC *mg)
 }
 #endif
 
-const MGVTBL sharedsv_scalar_vtbl = {
-    sharedsv_scalar_mg_get,     /* get */
-    sharedsv_scalar_mg_set,     /* set */
-    0,                          /* len */
-    0,                          /* clear */
-    sharedsv_scalar_mg_free,    /* free */
-    0,                          /* copy */
-    sharedsv_scalar_mg_dup,     /* dup */
-#ifdef MGf_LOCAL
-    sharedsv_scalar_mg_local,   /* local */
-#endif
-};
-
 /* ------------ PERL_MAGIC_tiedelem(p) functions -------------- */
 
 /* Get magic for PERL_MAGIC_tiedelem(p) */
@@ -1092,19 +1159,6 @@ sharedsv_elem_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param)
     return (0);
 }
 
-const MGVTBL sharedsv_elem_vtbl = {
-    sharedsv_elem_mg_FETCH,     /* get */
-    sharedsv_elem_mg_STORE,     /* set */
-    0,                          /* len */
-    sharedsv_elem_mg_DELETE,    /* clear */
-    0,                          /* free */
-    0,                          /* copy */
-    sharedsv_elem_mg_dup,       /* dup */
-#ifdef MGf_LOCAL
-    0,                          /* local */
-#endif
-};
-
 /* ------------ PERL_MAGIC_tied(P) functions -------------- */
 
 /* Len magic for PERL_MAGIC_tied(P) */
@@ -1206,19 +1260,6 @@ sharedsv_array_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param)
     return (0);
 }
 
-const MGVTBL sharedsv_array_vtbl = {
-    0,                          /* get */
-    0,                          /* set */
-    sharedsv_array_mg_FETCHSIZE,/* len */
-    sharedsv_array_mg_CLEAR,    /* clear */
-    sharedsv_array_mg_free,     /* free */
-    sharedsv_array_mg_copy,     /* copy */
-    sharedsv_array_mg_dup,      /* dup */
-#ifdef MGf_LOCAL
-    0,                          /* local */
-#endif
-};
-
 
 /* Recursive locks on a sharedsv.
  * Locks are dynamically scoped at the level of the first lock.
@@ -1270,9 +1311,9 @@ Perl_shared_object_destroy(pTHX_ SV *sv)
 
 #ifdef PL_signalhook
 
-STATIC despatch_signals_proc_t prev_signal_hook = NULL;
+static despatch_signals_proc_t prev_signal_hook = NULL;
 
-STATIC void
+static void
 S_shared_signal_hook(pTHX) {
     int us;
     MUTEX_LOCK(&PL_sharedsv_lock.mutex);
@@ -1389,7 +1430,7 @@ UNSHIFT(SV *obj, ...)
         LEAVE_LOCK;
 
 
-void
+SV*
 POP(SV *obj)
     CODE:
         dTHXc;
@@ -1399,14 +1440,14 @@ POP(SV *obj)
         SHARED_CONTEXT;
         ssv = av_pop((AV*)sobj);
         CALLER_CONTEXT;
-        ST(0) = sv_newmortal();
-        Perl_sharedsv_associate(aTHX_ ST(0), ssv);
+        RETVAL = newSV(0);
+        Perl_sharedsv_associate(aTHX_ RETVAL, ssv);
         SvREFCNT_dec(ssv);
         LEAVE_LOCK;
-        /* XSRETURN(1); - implied */
+    OUTPUT: RETVAL
 
 
-void
+SV*
 SHIFT(SV *obj)
     CODE:
         dTHXc;
@@ -1416,11 +1457,11 @@ SHIFT(SV *obj)
         SHARED_CONTEXT;
         ssv = av_shift((AV*)sobj);
         CALLER_CONTEXT;
-        ST(0) = sv_newmortal();
-        Perl_sharedsv_associate(aTHX_ ST(0), ssv);
+        RETVAL = newSV(0);
+        Perl_sharedsv_associate(aTHX_ RETVAL, ssv);
         SvREFCNT_dec(ssv);
         LEAVE_LOCK;
-        /* XSRETURN(1); - implied */
+    OUTPUT: RETVAL
 
 
 void
@@ -1464,7 +1505,7 @@ STORESIZE(SV *obj,IV count)
         SHARED_RELEASE;
 
 
-void
+SV*
 EXISTS(SV *obj, SV *index)
     CODE:
         dTHXc;
@@ -1485,11 +1526,11 @@ EXISTS(SV *obj, SV *index)
             exists = hv_exists((HV*) sobj, key, len);
         }
         SHARED_RELEASE;
-        ST(0) = (exists) ? &PL_sv_yes : &PL_sv_no;
-        /* XSRETURN(1); - implied */
+        RETVAL = (exists) ? &PL_sv_yes : &PL_sv_no;
 
+    OUTPUT: RETVAL
 
-void
+SV*
 FIRSTKEY(SV *obj)
     CODE:
         dTHXc;
@@ -1505,16 +1546,16 @@ FIRSTKEY(SV *obj)
             I32 utf8 = HeKUTF8(entry);
             key = hv_iterkey(entry,&len);
             CALLER_CONTEXT;
-            ST(0) = newSVpvn_flags(key, len, SVs_TEMP | (utf8 ? SVf_UTF8 : 0));
+            RETVAL = newSVpvn_flags(key, len, (utf8 ? SVf_UTF8 : 0));
         } else {
             CALLER_CONTEXT;
-            ST(0) = &PL_sv_undef;
+            RETVAL = &PL_sv_undef;
         }
         LEAVE_LOCK;
-        /* XSRETURN(1); - implied */
+    OUTPUT: RETVAL
 
 
-void
+SV*
 NEXTKEY(SV *obj, SV *oldkey)
     CODE:
         dTHXc;
@@ -1532,20 +1573,20 @@ NEXTKEY(SV *obj, SV *oldkey)
             I32 utf8 = HeKUTF8(entry);
             key = hv_iterkey(entry,&len);
             CALLER_CONTEXT;
-            ST(0) = newSVpvn_flags(key, len, SVs_TEMP | (utf8 ? SVf_UTF8 : 0));
+            RETVAL = newSVpvn_flags(key, len, (utf8 ? SVf_UTF8 : 0));
         } else {
             CALLER_CONTEXT;
-            ST(0) = &PL_sv_undef;
+            RETVAL = &PL_sv_undef;
         }
         LEAVE_LOCK;
-        /* XSRETURN(1); - implied */
+    OUTPUT: RETVAL
 
 
 MODULE = threads::shared        PACKAGE = threads::shared
 
 PROTOTYPES: ENABLE
 
-void
+UV
 _id(SV *myref)
     PROTOTYPE: \[$@%]
     PREINIT:
@@ -1559,11 +1600,11 @@ _id(SV *myref)
         ssv = Perl_sharedsv_find(aTHX_ myref);
         if (! ssv)
             XSRETURN_UNDEF;
-        ST(0) = sv_2mortal(newSVuv(PTR2UV(ssv)));
-        /* XSRETURN(1); - implied */
+        RETVAL = PTR2UV(ssv);
+    OUTPUT: RETVAL
 
 
-void
+IV
 _refcnt(SV *myref)
     PROTOTYPE: \[$@%]
     PREINIT:
@@ -1580,11 +1621,11 @@ _refcnt(SV *myref)
             }
             XSRETURN_UNDEF;
         }
-        ST(0) = sv_2mortal(newSViv(SvREFCNT(ssv)));
-        /* XSRETURN(1); - implied */
+        RETVAL = SvREFCNT(ssv);
+    OUTPUT: RETVAL
 
 
-void
+SV*
 share(SV *myref)
     PROTOTYPE: \[$@%]
     CODE:
@@ -1594,8 +1635,8 @@ share(SV *myref)
         if (SvROK(myref))
             myref = SvRV(myref);
         Perl_sharedsv_share(aTHX_ myref);
-        ST(0) = sv_2mortal(newRV_inc(myref));
-        /* XSRETURN(1); - implied */
+        RETVAL = newRV_inc(myref);
+    OUTPUT: RETVAL
 
 
 void
@@ -1751,7 +1792,7 @@ cond_broadcast(SV *myref)
         COND_BROADCAST(&ul->user_cond);
 
 
-void
+SV*
 bless(SV* myref, ...)
     PROTOTYPE: $;$
     PREINIT:
@@ -1781,7 +1822,7 @@ bless(SV* myref, ...)
         }
         SvREFCNT_inc_void(myref);
         (void)sv_bless(myref, stash);
-        ST(0) = sv_2mortal(myref);
+        RETVAL = myref;
         ssv = Perl_sharedsv_find(aTHX_ myref);
         if (ssv) {
             dTHXc;
@@ -1794,7 +1835,8 @@ bless(SV* myref, ...)
             CALLER_CONTEXT;
             LEAVE_LOCK;
         }
-        /* XSRETURN(1); - implied */
+    OUTPUT: RETVAL
+
 
 #endif /* USE_ITHREADS */
 

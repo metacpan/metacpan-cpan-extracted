@@ -1,5 +1,5 @@
 package PAGI::Middleware::Cookie;
-$PAGI::Middleware::Cookie::VERSION = '0.002001';
+$PAGI::Middleware::Cookie::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';
@@ -135,7 +135,7 @@ sub _get_header {
 
 # Simple cookie jar class for method-style access
 package PAGI::Middleware::Cookie::Jar;
-$PAGI::Middleware::Cookie::Jar::VERSION = '0.002001';
+$PAGI::Middleware::Cookie::Jar::VERSION = '0.002002';
 use strict;
 use warnings;
 

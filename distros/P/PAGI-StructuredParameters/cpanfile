@@ -1,0 +1,28 @@
+# PAGI-StructuredParameters dependencies
+# Install with: cpanm --installdeps .
+
+requires 'perl', '5.018';
+
+# The body/query/data adapters build their source from a PAGI::Request.
+requires 'PAGI::Tools', '0.002002';
+
+# Core-Perl deep clone for isolating the parse from the live request data.
+requires 'Storable';
+
+# Testing
+on 'test' => sub {
+    requires 'Test2::V0', '0.000159';
+    # In-process tests drive a real PAGI app under an event loop.
+    requires 'IO::Async', '0.802';
+};
+
+# Development
+on 'develop' => sub {
+    requires 'Dist::Zilla', '6.030';
+    requires 'Dist::Zilla::Plugin::MetaJSON';
+    requires 'Dist::Zilla::Plugin::MetaResources';
+    requires 'Dist::Zilla::Plugin::MetaNoIndex';
+    requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
+    requires 'Dist::Zilla::Plugin::PkgVersion';
+    requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod';
+};

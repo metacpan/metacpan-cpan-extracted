@@ -28,7 +28,7 @@ skip_all_without_unicode_tables();
 my $has_locales = locales_enabled('LC_CTYPE');
 my $utf8_locale = find_utf8_ctype_locale();
 
-plan tests => 1295;  # Update this when adding/deleting tests.
+plan tests => 1298;  # Update this when adding/deleting tests.
 
 run_tests() unless caller;
 
@@ -1388,6 +1388,28 @@ EOP
             fresh_perl_like($prog, qr!Group name must start with a non-digit word character!, {},
                         sprintf("'U+%04X not legal IDFirst'", ord($char)));
         }
+
+        foreach my $char (chr(0x2115), chr(0x24B7)) {
+            my $prog = <<"EOP";
+use utf8;;
+no warnings 'utf8';
+print 0 + "abc" =~ qr/(?<a${char}b>abc)/;
+EOP
+            utf8::encode($prog);
+            if ($char =~ /\p{XID_Continue}/) {
+                fresh_perl_is($prog, 1,
+                                {},
+                                sprintf("U+%04X is legal IDCont",
+                                        ord($char)));
+            }
+            else {
+                my $code_point = sprintf "%04X", ord $char;
+                fresh_perl_like($prog,
+                                qr/\\x\{$code_point} is a \\w char that isn't valid in a name; marked by <-- HERE after /,
+                                {},
+                                $code_point);
+            }
+        }
     }
 
     { # [perl #101710]
@@ -2643,6 +2665,12 @@ local $SIG{__WARN__} = sub { die; };
 eval "qr/()x{/;" for 1..10;
 PROG
     }
+
+    {   # GH 16894 Fixed by acababb42be12ff2986b73c1bfa963b70bb5d54e
+        "abab" =~ /(?:[^b]*(?=(b)|(a))ab)*/;
+        is($1, undef, "GH #16894");
+    }
+
 } # End of sub run_tests
 
 1;

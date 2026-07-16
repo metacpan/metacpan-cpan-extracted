@@ -1,5 +1,5 @@
 package PAGI::Middleware::Debug;
-$PAGI::Middleware::Debug::VERSION = '0.002001';
+$PAGI::Middleware::Debug::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

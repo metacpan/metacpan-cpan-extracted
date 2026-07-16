@@ -1,0 +1,31 @@
+---
+abstract: 'Whitelist and structure incoming request parameters for PAGI'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  IO::Async: '0.802'
+  Test2::V0: '0.000159'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PAGI-StructuredParameters
+no_index:
+  directory:
+    - examples
+requires:
+  PAGI::Tools: '0.002002'
+  Storable: '0'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/jjn1056/PAGI-StructuredParameters/issues
+  homepage: https://github.com/jjn1056/PAGI-StructuredParameters
+  repository: https://github.com/jjn1056/PAGI-StructuredParameters.git
+version: '0.001000'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

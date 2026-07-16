@@ -1,0 +1,4 @@
+Revision history for Mojolicious-Plugin-Fondation-Authorization
+
+0.01      2026-07-15 18:32:18+02:00 Europe/Paris
+    - Initial release: grants loading, check_perm and check_group helpers

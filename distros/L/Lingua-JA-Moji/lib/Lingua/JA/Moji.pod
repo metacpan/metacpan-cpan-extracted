@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.61/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.62/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.61/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.62/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.61
-corresponding to git commit L<81ab61a98b0fd1e9da2be73705ebb72a5e33d47d|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/81ab61a98b0fd1e9da2be73705ebb72a5e33d47d> made on Thu Mar 26 12:41:17 2026 +0900.
+This document describes Lingua::JA::Moji version 0.62
+corresponding to git commit L<397c762aa8e05043d9d5c068665085db33f8cab1|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/397c762aa8e05043d9d5c068665085db33f8cab1> made on Thu Jul 16 15:27:09 2026 +0900.
 
 =head1 DESCRIPTION
 
@@ -135,16 +135,18 @@ converted into wapuro format.
     is_romaji_semistrict ("abcdefg");
     # The following line returns "undef"
     is_romaji_semistrict ('loyehye');
-    # The following line returns a defined value
+    # The following line returns a canonical version of the romaji
     is_romaji_semistrict ("atarimae");
-    # The following line returns a defined value
+    # The following line returns a canonical version of the romaji
+    a defined value
     is_romaji_semistrict ("pinku no dorufin");
 
 
 
 Halfway between L</is_romaji> and L</is_romaji_strict>, this allows
 some formations like "pinku no dorufin" but not the really unlikely
-stuff which "is_romaji" allows.
+stuff which "is_romaji" allows. The return value is a canonical form
+of the romaji.
 
 
 
@@ -1669,7 +1671,7 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.61/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.62/examples/onbiki.pl> in the distribution.)
 
 
 =item L<Lingua::JA::Regular::Unicode>

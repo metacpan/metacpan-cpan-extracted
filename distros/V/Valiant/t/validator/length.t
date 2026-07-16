@@ -33,4 +33,12 @@ use Test::Most;
     };
 }
 
+{
+  # per-call options passed to ->validate must be threaded into Length errors
+  ok my $object = Local::Test::Length->new(name=>'Li');
+  $object->validate(foo => 'BAR');
+  ok scalar(grep { ($_->options->{foo}||'') eq 'BAR' } $object->errors->errors->all),
+    'per-call validate options reach Length errors';
+}
+
 done_testing;

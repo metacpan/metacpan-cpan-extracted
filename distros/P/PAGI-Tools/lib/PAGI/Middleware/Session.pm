@@ -1,10 +1,11 @@
 package PAGI::Middleware::Session;
-$PAGI::Middleware::Session::VERSION = '0.002001';
+$PAGI::Middleware::Session::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';
 use Future::AsyncAwait;
 use Digest::SHA qw(sha256_hex);
+use JSON::MaybeXS;
 use PAGI::Utils::Random qw(secure_random_bytes);
 
 =head1 NAME
@@ -239,6 +240,49 @@ logic instead of stacking multiple Session middleware instances:
             },
         );
 
+=head1 NON-HTTP SCOPES (WebSocket, SSE, ...)
+
+If there is a session, WebSocket and SSE connections see it too: a scope
+whose C<type> is not C<'http'> but which still carries a C<headers> key --
+both a WebSocket upgrade request and an SSE request are typed this way (see
+L<PAGI::Context>'s C<is_websocket>/C<is_sse>; SSE is its own distinct scope
+C<type>, not C<'http'> plus a flag) -- gets a B<read-only> session: the
+same C<state-E<gt>extract> + C<store-E<gt>get> lookup the C<'http'> path
+uses, populating C<< $scope->{'pagi.session'} >> (and
+C<< $scope->{'pagi.session_id'} >>, when a real session was found) before
+calling the wrapped app. This is store-agnostic -- it works with whatever
+C<store>/C<state> pair the middleware was configured with, not just
+cookie-backed setups -- and scope-type-agnostic: any current or future
+scope type with a C<headers> key gets the same treatment, WebSocket and SSE
+are simply the two named, tested cases today.
+
+B<Nothing is ever saved.> There is no C<http.response.start>-shaped event on
+a protocol upgrade to hook a save onto, so C<< store->set >> is never called
+and no transport (e.g. C<Set-Cookie>) is ever injected for one of these
+scopes. Any mutation an application makes to the session hashref during a
+WebSocket/SSE connection is visible for the lifetime of that connection and
+then silently discarded -- it never reaches the store and is never seen
+again, by this connection or any other. Establish or change session state
+(login, logout, regeneration) over a regular C<'http'> request; treat a
+non-http scope's session as read-only.
+
+A session id that resolves to nothing (absent, malformed, or expired)
+populates C<< $scope->{'pagi.session'} >> with an explicit empty hashref
+C<{}> rather than leaving the key missing -- every C<'http'> request is
+guaranteed a usable session (even a brand new, never-before-seen one falls
+through to a freshly created hashref), so application code written against
+that guarantee (e.g. anything that unconditionally builds a
+L<PAGI::Session> from the scope) sees the same guarantee here instead of
+having to special-case "no session key at all" for non-http scopes.
+C<< $scope->{'pagi.session_id'} >> is left unset in this case -- there is no
+real session id to report, and fabricating one for a hashref that was never
+loaded from (or will ever be saved to) the store would be misleading.
+
+A scope with no C<headers> key at all (a C<lifespan> scope, which carries
+no request to extract a session id from) is passed through completely
+unmodified, exactly as every scope type other than C<'http'> always was
+before this feature existed.
+
 =cut
 
 sub _init {
@@ -247,6 +291,7 @@ sub _init {
     $self->{secret} = $config->{secret}
         // die "Session middleware requires 'secret' option";
     $self->{expire} = $config->{expire} // 3600;
+    $self->{_json}  = JSON::MaybeXS->new(canonical => 1);
 
     # State: pluggable session ID transport
     if ($config->{state}) {
@@ -278,12 +323,14 @@ sub wrap {
 
     return async sub  {
         my ($scope, $receive, $send) = @_;
-        if ($scope->{type} ne 'http') {
-            await $app->($scope, $receive, $send);
-            return;
-        }
 
-        # Idempotency: skip if session already exists in scope
+        # Idempotency: skip if session already exists in scope. Checked
+        # before the type/headers branch below, so it now applies uniformly
+        # regardless of scope type -- NOT "same as it always did": before
+        # the non-http read-only support this file added, a non-'http'
+        # scope returned (pass-through, no session at all) before this
+        # check was ever reached, so it was unreachable code for any
+        # non-http scope. This move is what MAKES it apply uniformly.
         if (exists $scope->{'pagi.session'}) {
             warn "Session middleware: pagi.session already in scope, skipping\n"
                 if $ENV{PAGI_DEBUG};
@@ -291,11 +338,15 @@ sub wrap {
             return;
         }
 
+        if ($scope->{type} ne 'http') {
+            return await $self->_wrap_non_http($scope, $receive, $send, $app);
+        }
+
         # Extract session ID via state handler
         my $session_id = $self->{state}->extract($scope);
 
         # Validate and load session
-        my ($session, $is_new) = await $self->_load_or_create_session($session_id);
+        my ($session, $is_new, $snapshot) = await $self->_load_or_create_session($session_id);
         $session_id = $session->{_id};
 
         # Add session to scope
@@ -326,9 +377,16 @@ sub wrap {
                     $self->{state}->inject(\@headers, $transport, {});
                 }
                 else {
-                    # Normal: save and inject if new
+                    # Normal: save always; inject if new or the session's
+                    # data changed since it was loaded (the transport for
+                    # cookie-backed stores IS the data, so a stale client
+                    # copy after mutation is a correctness bug, not just
+                    # a missed refresh).
+                    my $dirty = $is_new
+                        || !defined($snapshot)
+                        || $self->{_json}->encode($session) ne $snapshot;
                     my $transport = await $self->_save_session($session_id, $session);
-                    if ($is_new) {
+                    if ($dirty) {
                         $self->{state}->inject(\@headers, $transport, {});
                     }
                 }
@@ -343,6 +401,58 @@ sub wrap {
     };
 }
 
+# READ-ONLY session support for a non-'http' scope (websocket, sse, ...):
+# store-agnostic, using the SAME state->extract + store->get path the http
+# branch above uses -- never the store->set/state->inject halves, since
+# there is no http.response.start-shaped channel on a protocol upgrade to
+# hook a save onto. A scope with no 'headers' key at all (lifespan -- there
+# is no request to extract a session id FROM) gets the original unconditional
+# pass-through, preserved exactly.
+#
+# A found, unexpired session is loaded as-is (real 'pagi.session_id'
+# included) so a consumer sees precisely what an HTTP request presenting
+# the same cookie/header would have seen. A miss (no id presented, or an
+# id that doesn't resolve/has expired) gets an EXPLICIT EMPTY hashref, not
+# a missing key and not a freshly minted real session -- see this method's
+# own POD-documented rationale: every 'http' request is guaranteed a usable
+# $scope->{'pagi.session'} (even brand new, unauthenticated ones fall
+# through to _load_or_create_session's own "create new" branch), so a
+# consumer written against that guarantee (e.g. code that unconditionally
+# calls PAGI::Session->new($scope)) must see the same guarantee here rather
+# than an absent key it was never taught to check for. Fabricating a real
+# session identity for a connection that presented none would be actively
+# misleading, so the miss case gets {} with no '_id'/'_created' metadata,
+# and 'pagi.session_id' is simply never added to scope in that case.
+#
+# Mutations an app makes to either the loaded or empty hashref during the
+# connection are NEVER persisted anywhere: nothing here ever calls
+# store->set, and there is no response event to carry a fresh transport
+# even if there were. See this method's own SCOPE EXTENSIONS POD note.
+async sub _wrap_non_http {
+    my ($self, $scope, $receive, $send, $app) = @_;
+
+    unless (exists $scope->{headers}) {
+        await $app->($scope, $receive, $send);
+        return;
+    }
+
+    my $session_id = $self->{state}->extract($scope);
+    my $session;
+    if (defined $session_id && length $session_id) {
+        my $loaded = await $self->_get_session($session_id);
+        $session = $loaded if $loaded && !$self->_is_expired($loaded);
+    }
+    $session //= {};
+
+    my $new_scope = $self->modify_scope($scope, {
+        'pagi.session' => $session,
+        (exists $session->{_id} ? ('pagi.session_id' => $session->{_id}) : ()),
+    });
+
+    await $app->($new_scope, $receive, $send);
+    return;
+}
+
 async sub _load_or_create_session {
     my ($self, $session_id) = @_;
 
@@ -353,7 +463,7 @@ async sub _load_or_create_session {
         my $session = await $self->_get_session($session_id);
         if ($session && !$self->_is_expired($session)) {
             $session->{_last_access} = time();
-            return ($session, 0);
+            return ($session, 0, $self->{_json}->encode($session));
         }
     }
 
@@ -365,7 +475,7 @@ async sub _load_or_create_session {
         _last_access => time(),
     };
 
-    return ($session, 1);
+    return ($session, 1, undef);
 }
 
 sub _generate_session_id {
@@ -418,9 +528,16 @@ Keys starting with C<_> are reserved for internal use.
 
 =item * pagi.session_id
 
-The session ID string.
+The session ID string. Absent (not merely undef) for a non-'http' scope
+whose session id didn't resolve to anything -- see L</NON-HTTP SCOPES
+(WebSocket, SSE, ...)>.
 
 =back
+
+This applies to a non-C<'http'> scope too, as long as it carries a
+C<headers> key -- see L</NON-HTTP SCOPES (WebSocket, SSE, ...)> for the
+read-only, never-saved semantics that applies there instead of the full
+load/mutate/save cycle described below.
 
 =head1 SESSION DATA
 
@@ -456,6 +573,26 @@ session data is deleted from the store and the client-side state
 (cookie) is cleared. Use this for logout.
 
 =back
+
+=head1 WHEN THE SESSION TRANSPORT IS EMITTED
+
+On each response, the middleware saves the session unconditionally, but
+only emits the transport (e.g. C<Set-Cookie>) via C<< $state->inject >>
+when the session is B<new>, B<regenerated>, or its data has B<changed
+since it was loaded> at the start of the request. A pure-read request
+against an existing, unmodified session emits no transport.
+
+"Changed" is determined by comparing the session's data at load time
+against its data immediately before saving, regardless of how the
+mutation happened: C<< $session->set(...) >>, C<< $session->data->{...}
+= ... >>, or direct hashref mutation via C<< $scope->{'pagi.session'} >>
+all count. This matters most for transport-is-data stores (e.g.
+L<PAGI::Middleware::Session::Store::Cookie>), where a discarded transport
+after a mutation would leave the client holding stale, incorrect data.
+
+This entire section describes the C<'http'> scope path only. A non-http
+scope (see L</NON-HTTP SCOPES (WebSocket, SSE, ...)>) never saves and never
+emits a transport, regardless of whether its session was mutated.
 
 =head1 SEE ALSO
 

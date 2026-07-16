@@ -73,6 +73,10 @@ not valid for the C<$class>.
 A Filter is created once when the class uses it and exists for the full life cycle
 of the filterable object.
 
+Note that filters run only B<once, at object construction time> - they transform
+the arguments passed to C<new> and do not re-run on later C<rw> writes or on ORM
+update paths (see L<Valiant::Filterable/When filters run>).
+
 Generally you would write a filter class like this when you want a filter that can be applied
 to all the incoming arguments or when the filter itself is dependent on all the arguments.  For writing
 filters that are applied to individual attributes you should create a subclass of L<Valiant::Filter::Each>.

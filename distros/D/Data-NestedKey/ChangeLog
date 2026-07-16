@@ -1,3 +1,13 @@
+Wed Jul 15 07:03:43 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.2]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-1.2.2.md: new
+	* lib/Data/NestedKey/CLI.pm.in
+	(_fetch_data)
+	- compare uc version of format with uc of keys
+
 Thu Jul  9 09:18:49 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.1]:

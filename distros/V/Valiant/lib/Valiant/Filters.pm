@@ -151,37 +151,35 @@ own custom subclass.
 
 =head1 IMPORTS
 
-The following subroutines are imported from L<Valiant::Filters>
+The following subroutines are imported from L<Valiant::Filterable>
 
 =head2 filters_with
 
-Accepts the name of a custom validator or a reference to a function, followed by a list
-of arguments.  
+Accepts the name of a custom filter or a reference to a function, followed by a list
+of arguments.
 
-    filter_with sub {
-      my ($self, $class, $attrs) = @_;
+    filters_with sub {
+      my ($class, $attrs, $opts) = @_;
+      return $attrs;
     };
 
-    filter_with 'SpecialFilters', arg1=>'foo', arg2=>'bar';
+    filters_with 'SpecialFilters', arg1=>'foo', arg2=>'bar';
 
 See C<filters_with> in L<Valiant::Filterable> for more.
 
 =head2 filters
 
-Create validations on an objects attributes.  Accepts the name of an attributes (or an
-arrayref of names) followed by a list of validators and global options.  Validators can
-be a subroutine reference, a type constraint or the name of a Validator class.
+Create filters on an object's attributes.  Accepts the name of an attribute (or an
+arrayref of names) followed by a list of filters and global options.  Filters can
+be a subroutine reference or the name of a Filter class.
 
-    validates name => sub {
-      my ($self, $attribute, $value, $opts) = @_;
-      $self->errors->add($attribute, "Invalid", $opts) if ...
+    filters name => sub {
+      my ($class, $attrs, $attribute_name) = @_;
+      return $attrs->{$attribute_name};  # return the filtered value
     };
 
-    validates name => (
-      length => {
-        maximum => 10,
-        minimum => 3,
-      }
+    filters ['name', 'title'] => (
+      trim => 1,
     );
 
 See C<filters> in L<Valiant::Filterable> for more.
@@ -190,7 +188,7 @@ See C<filters> in L<Valiant::Filterable> for more.
 
 The following class methods are available for subclasses
 
-=head2 default_role
+=head2 default_roles
 
 Roles that are applied when using this class.  Default is L<Valiant::Filterable>.  If
 you are subclassing and wish to apply more roles, or if you've made your own version

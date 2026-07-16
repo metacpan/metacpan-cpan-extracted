@@ -251,6 +251,7 @@ use strict;
                             ops_with_check('ck_stringify'),
                             ops_with_check('ck_tell'),
                             ops_with_check('ck_trunc'),
+                            ops_with_check('ck_anonhash'),
                             ;
 
 
@@ -485,6 +486,11 @@ addbits($_, 7 => qw(OPpPV_IS_UTF8 UTF)) for qw(last redo next goto dump);
 # suppress looking up a class name as an IO handle in a method call
 addbits($_, 1  => qw(OPpMETH_NO_BAREWORD_IO NO_BAREWORD_IO)) for ops_with_flag('.');
 
+# this logical op forms part of an if/elsif/else, rather than
+# ?: or && or ||.
+# Mainly needed to help Deparse.
+addbits($_, 6  => qw(OPpSTATEMENT STMT)) for qw(cond_expr and or);
+
 # ====================================================================
 #
 # OP-SPECIFIC OPpFOO_* flags:
@@ -691,7 +697,8 @@ addbits('enteriter',
                     3 => qw(OPpITER_DEF      DEF),     # 'for $_'
 );
 addbits('iter',     1 => qw(OPpITER_REVERSED REVERSED),
-                    2 => qw(OPpITER_INDEXED  INDEXED));
+                    2 => qw(OPpITER_INDEXED  INDEXED),
+                    3 => qw(OPpITER_REFALIAS REFALIAS));
 
 
 
@@ -925,12 +932,19 @@ addbits('argdefelem',
     6 => qw(OPpARG_IF_FALSE  IF_FALSE),
 );
 
+# These paramtest bits must be in the same place as argdefelem
+addbits('paramtest',
+    7 => qw(OPpPARAM_IF_UNDEF  IF_UNDEF),
+    6 => qw(OPpPARAM_IF_FALSE  IF_FALSE),
+);
+
 addbits('helemexistsor',
     7 => qw(OPpHELEMEXISTSOR_DELETE DELETE),
 );
 
 addbits('methstart',
-    7 => qw(OPpINITFIELDS INITFIELDS),
+    7 => qw(OPpINITFIELDS  INITFIELDS),
+    6 => qw(OPpSELF_IN_PAD SELF_IN_PAD), # $self has already been set up in pad
 );
 
 addbits('initfield',

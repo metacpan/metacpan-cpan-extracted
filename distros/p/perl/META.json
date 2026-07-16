@@ -4,7 +4,7 @@
       "perl5-porters@perl.org"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "CPAN::Meta version 2.150010",
+   "generated_by" : "CPAN::Meta version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -118,6 +118,6 @@
          "url" : "https://github.com/Perl/perl5"
       }
    },
-   "version" : "5.042002",
+   "version" : "5.044000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

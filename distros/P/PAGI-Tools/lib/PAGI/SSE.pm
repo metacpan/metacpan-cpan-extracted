@@ -1,5 +1,5 @@
 package PAGI::SSE;
-$PAGI::SSE::VERSION = '0.002001';
+$PAGI::SSE::VERSION = '0.002002';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -555,6 +555,23 @@ async sub _run_close_callbacks {
     $self->{_on_error} = [];
 }
 
+# Internal: mark closed and fire on_close callbacks for a disconnect that
+# arrived directly off the wire (not via close()). Shared by run()'s own
+# disconnect handling and PAGI::Context::SSE's _sync_terminal_disconnect hook
+# (fired when the disconnect is instead consumed via $ctx->run()). Does NOT
+# send an sse.close wire event -- the peer is already gone.
+async sub _note_disconnected {
+    my ($self, $code, $reason) = @_;
+    # $code is accepted for signature parity with PAGI::WebSocket's version
+    # (Context::WebSocket and Context::SSE both call this positionally) but
+    # unused -- SSE has no RFC6455-style close code, only a reason.
+
+    $self->{_disconnect_reason} = $reason // 'client_closed';
+    $self->_set_closed;
+    await $self->_run_close_callbacks;
+    return;
+}
+
 # Close the connection
 async sub close {
     my ($self, %opts) = @_;
@@ -600,14 +617,30 @@ async sub run {
         my $type = $event->{type} // '';
 
         if ($type eq 'sse.disconnect') {
-            $self->{_disconnect_reason} = $event->{reason} // 'client_closed';
-            $self->_set_closed;
-            await $self->_run_close_callbacks;
+            await $self->_note_disconnected(undef, $event->{reason});
             last;
         }
     }
 
     return;
+}
+
+# Internal: run one per-item callback, running on_close cleanup before
+# re-raising if it dies (idempotent; _run_close_callbacks may already have run).
+# Takes a thunk so each caller's varying callback arg list stays at the call
+# site; awaits the thunk's Future and returns its value for callers that use it.
+async sub _guarded_dispatch {
+    my ($self, $thunk) = @_;
+
+    my $result;
+    my $ok = eval { $result = await $thunk->(); 1 };
+    unless ($ok) {
+        my $err = $@;
+        await $self->_run_close_callbacks;    # idempotent; may already have run
+        die $err;                             # re-raise: caller still sees the error
+    }
+
+    return $result;
 }
 
 # Iterate over items and send events
@@ -623,7 +656,7 @@ async sub each {
         for my $item (@$source) {
             last if $self->is_closed;
 
-            my $result = await $callback->($item, $index++);
+            my $result = await $self->_guarded_dispatch(sub { $callback->($item, $index++) });
 
             # If callback returns a hashref, treat as event spec
             if (ref $result eq 'HASH') {
@@ -637,7 +670,7 @@ async sub each {
             my $item = $source->();
             last unless defined $item;
 
-            my $result = await $callback->($item, $index++);
+            my $result = await $self->_guarded_dispatch(sub { $callback->($item, $index++) });
 
             if (ref $result eq 'HASH') {
                 await $self->send_event(%$result);
@@ -683,7 +716,8 @@ async sub every {
             # Callback failed - connection likely closed or error occurred
             $self->_set_closed;
             await $self->_run_close_callbacks;
-            last;
+            $disconnect_future->cancel if $disconnect_future->can('cancel') && !$disconnect_future->is_ready;
+            die $err;    # re-raise: caller still sees the error, matching each()/each_*
         }
 
         # Race between sleep and disconnect detection

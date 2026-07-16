@@ -1,5 +1,5 @@
 package PAGI::App::Cascade;
-$PAGI::App::Cascade::VERSION = '0.002001';
+$PAGI::App::Cascade::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

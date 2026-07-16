@@ -62,5 +62,17 @@ ok my $validator = Valiant::Proxy::Object->new(
     };
 }
 
+{
+  # AUTOLOAD delegates known methods to the wrapped object, and now fails
+  # loudly on unknown ones (previously returned undef silently)
+  ok my $proxy = Valiant::Proxy::Object->new(validations => []);
+  ok my $user = Local::Test::User->new(name=>'John', age=>15, is_active=>1);
+  ok my $result = $proxy->validate($user);
+
+  is $result->is_active, 1, 'known method delegates through AUTOLOAD';
+  throws_ok { $result->no_such_method } qr/no_such_method/,
+    'unknown delegated method fails loudly';
+}
+
 done_testing;
 

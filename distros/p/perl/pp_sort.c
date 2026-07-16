@@ -333,6 +333,8 @@ typedef struct {
 PERL_STATIC_FORCE_INLINE void
 S_sortsv_flags_impl(pTHX_ gptr *base, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
 {
+    PERL_ARGS_ASSERT_SORTSV_FLAGS_IMPL;
+
     IV i, run, offset;
     I32 sense, level;
     gptr *f1, *f2, *t, *b, *p;
@@ -344,7 +346,6 @@ S_sortsv_flags_impl(pTHX_ gptr *base, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
     off_runs stack[60], *stackp;
 
     PERL_UNUSED_ARG(flags);
-    PERL_ARGS_ASSERT_SORTSV_FLAGS_IMPL;
     if (nmemb <= 1) return;                     /* sorted trivially */
 
     if (nmemb <= SMALLSORT) aux = small;        /* use stack for aux array */
@@ -537,10 +538,29 @@ S_sortsv_flags_impl(pTHX_ gptr *base, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
 }
 
 /*
-=for apidoc sortsv_flags
 
-In-place sort an array of SV pointers with the given comparison routine,
-with various SORTf_* flag options.
+=for apidoc      sortsv
+=for apidoc_item sortsv_flags
+
+These functions are currently identical; they perform an in-place mergesort of
+an array of SV pointers C<base> (length C<nmemb>) with the given comparison
+routine, C<cmp>, which should be declared as C<SVCOMPARE_t>.  It will be
+called as
+
+ ret = cmp(aTHX_ sv_a, sv_b)
+ if (ret < 0) {
+    // sv_a is first
+ }
+ else if (ret > 0) {
+    // sv_b is first
+ }
+ else {
+    // they compare equal
+ }
+
+C<flags> is currently ignored in C<sortsv_flags>.
+
+=for apidoc Ayh ||SVCOMPARE_t
 
 =cut
 */
@@ -661,18 +681,6 @@ sortsv_cmp_locale_desc(pTHX_ gptr *base, size_t nmemb, U32 flags)
 }
 
 #endif
-
-/*
-
-=for apidoc sortsv
-
-In-place sort an array of SV pointers with the given comparison routine.
-
-Currently this always uses mergesort.  See C<L</sortsv_flags>> for a more
-flexible routine.
-
-=cut
-*/
 
 void
 Perl_sortsv(pTHX_ SV **array, size_t nmemb, SVCOMPARE_t cmp)
@@ -966,7 +974,7 @@ PP(pp_sort)
             }
 
             start = p1 - max;
-            Perl_sortsv_flags(aTHX_ start, max,
+            sortsv_flags(start, max,
                     (is_xsub ? S_sortcv_xsub : hasargs ? S_sortcv_stacked : S_sortcv),
                     sort_flags);
 
@@ -1166,14 +1174,13 @@ PP(pp_sort)
 static I32
 S_sortcv(pTHX_ SV *const a, SV *const b)
 {
+    PERL_ARGS_ASSERT_SORTCV;
+
     const I32 oldsaveix = PL_savestack_ix;
-    I32 result;
     PMOP * const pm = PL_curpm;
     COP * const cop = PL_curcop;
     SV *olda, *oldb;
  
-    PERL_ARGS_ASSERT_SORTCV;
-
 #ifdef PERL_RC_STACK
     assert(rpp_stack_is_rc());
 #endif
@@ -1191,7 +1198,11 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
     /* entry zero of a stack is always PL_sv_undef, which
      * simplifies converting a '()' return into undef in scalar context */
     assert(PL_stack_sp > PL_stack_base || *PL_stack_base == &PL_sv_undef);
-    result = SvIV(*PL_stack_sp);
+    const IV iv = SvIV(*PL_stack_sp);
+    const I32 result =
+        iv > 0 ? 1 :
+        iv < 0 ? -1 :
+        0;
     rpp_popfree_to_NN(PL_stack_base);
 
     LEAVE_SCOPE(oldsaveix);
@@ -1205,13 +1216,12 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
 static I32
 S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
 {
+    PERL_ARGS_ASSERT_SORTCV_STACKED;
+
     const I32 oldsaveix = PL_savestack_ix;
-    I32 result;
     AV * const av = GvAV(PL_defgv);
     PMOP * const pm = PL_curpm;
     COP * const cop = PL_curcop;
-
-    PERL_ARGS_ASSERT_SORTCV_STACKED;
 
 #ifdef PERL_RC_STACK
     assert(rpp_stack_is_rc());
@@ -1256,7 +1266,11 @@ S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
     /* entry zero of a stack is always PL_sv_undef, which
      * simplifies converting a '()' return into undef in scalar context */
     assert(PL_stack_sp > PL_stack_base || *PL_stack_base == &PL_sv_undef);
-    result = SvIV(*PL_stack_sp);
+    const IV iv = SvIV(*PL_stack_sp);
+    const I32 result =
+        iv > 0 ? 1 :
+        iv < 0 ? -1 :
+        0;
     rpp_popfree_to_NN(PL_stack_base);
 
     LEAVE_SCOPE(oldsaveix);
@@ -1271,12 +1285,11 @@ S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
 static I32
 S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
 {
+    PERL_ARGS_ASSERT_SORTCV_XSUB;
+
     const I32 oldsaveix = PL_savestack_ix;
     CV * const cv=MUTABLE_CV(PL_sortcop);
-    I32 result;
     PMOP * const pm = PL_curpm;
-
-    PERL_ARGS_ASSERT_SORTCV_XSUB;
 
 #ifdef PERL_RC_STACK
     assert(rpp_stack_is_rc());
@@ -1291,7 +1304,11 @@ S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
     /* entry zero of a stack is always PL_sv_undef, which
      * simplifies converting a '()' return into undef in scalar context */
     assert(PL_stack_sp > PL_stack_base || *PL_stack_base == &PL_sv_undef);
-    result = SvIV(*PL_stack_sp);
+    const IV iv = SvIV(*PL_stack_sp);
+    const I32 result =
+        iv > 0 ? 1 :
+        iv < 0 ? -1 :
+        0;
     rpp_popfree_to_NN(PL_stack_base);
 
     LEAVE_SCOPE(oldsaveix);
@@ -1301,11 +1318,22 @@ S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
 
 
 PERL_STATIC_FORCE_INLINE I32
-S_sv_ncmp(pTHX_ SV *const a, SV *const b)
+S_sv_ncmp(pTHX_ SV *a, SV *b)
 {
-    I32 cmp = do_ncmp(a, b);
-
     PERL_ARGS_ASSERT_SV_NCMP;
+
+    /* Numify since do_ncmp will just SvNV() non-IVs.
+
+       Even for the non-overloading case, if RVs are allocated with
+       large 64-bit addresses (only theoretically possible I think)
+       the bottom bits of the RV might be lost.
+     */
+    if (SvROK(a))
+        a = sv_2num(a);
+    if (SvROK(b))
+        b = sv_2num(b);
+
+    I32 cmp = do_ncmp(a, b);
 
     if (cmp == 2) {
         if (ckWARN(WARN_UNINITIALIZED)) report_uninit(NULL);
@@ -1326,10 +1354,10 @@ S_sv_ncmp_desc(pTHX_ SV *const a, SV *const b)
 PERL_STATIC_FORCE_INLINE I32
 S_sv_i_ncmp(pTHX_ SV *const a, SV *const b)
 {
+    PERL_ARGS_ASSERT_SV_I_NCMP;
+
     const IV iv1 = SvIV(a);
     const IV iv2 = SvIV(b);
-
-    PERL_ARGS_ASSERT_SV_I_NCMP;
 
     return iv1 < iv2 ? -1 : iv1 > iv2 ? 1 : 0;
 }
@@ -1350,11 +1378,11 @@ S_sv_i_ncmp_desc(pTHX_ SV *const a, SV *const b)
 #define SORT_NORMAL_RETURN_VALUE(val)  (((val) > 0) ? 1 : ((val) ? -1 : 0))
 
 PERL_STATIC_FORCE_INLINE I32
-S_amagic_ncmp(pTHX_ SV *const a, SV *const b)
+S_amagic_ncmp(pTHX_ SV *a, SV *b)
 {
-    SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp_amg);
-
     PERL_ARGS_ASSERT_AMAGIC_NCMP;
+
+    SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp_amg);
 
     if (tmpsv) {
         if (SvIOK(tmpsv)) {
@@ -1366,6 +1394,7 @@ S_amagic_ncmp(pTHX_ SV *const a, SV *const b)
             return SORT_NORMAL_RETURN_VALUE(d);
         }
      }
+
      return S_sv_ncmp(aTHX_ a, b);
 }
 
@@ -1380,9 +1409,9 @@ S_amagic_ncmp_desc(pTHX_ SV *const a, SV *const b)
 PERL_STATIC_FORCE_INLINE I32
 S_amagic_i_ncmp(pTHX_ SV *const a, SV *const b)
 {
-    SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp_amg);
-
     PERL_ARGS_ASSERT_AMAGIC_I_NCMP;
+
+    SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp_amg);
 
     if (tmpsv) {
         if (SvIOK(tmpsv)) {
@@ -1408,9 +1437,9 @@ S_amagic_i_ncmp_desc(pTHX_ SV *const a, SV *const b)
 PERL_STATIC_FORCE_INLINE I32
 S_amagic_cmp(pTHX_ SV *const str1, SV *const str2)
 {
-    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp_amg);
-
     PERL_ARGS_ASSERT_AMAGIC_CMP;
+
+    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp_amg);
 
     if (tmpsv) {
         if (SvIOK(tmpsv)) {
@@ -1446,9 +1475,9 @@ S_cmp_desc(pTHX_ SV *const str1, SV *const str2)
 PERL_STATIC_FORCE_INLINE I32
 S_amagic_cmp_locale(pTHX_ SV *const str1, SV *const str2)
 {
-    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp_amg);
-
     PERL_ARGS_ASSERT_AMAGIC_CMP_LOCALE;
+
+    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp_amg);
 
     if (tmpsv) {
         if (SvIOK(tmpsv)) {

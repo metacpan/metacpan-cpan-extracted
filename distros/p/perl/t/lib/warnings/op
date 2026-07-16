@@ -304,7 +304,6 @@ use warnings 'syntax';
 @a[]
 EXPECT
 syntax error at - line 4, near "[]"
-Execution of - aborted due to compilation errors.
 ########
 # op.c
 my %foo;
@@ -2040,13 +2039,6 @@ sub dont_warn_48 { $a //= return $b; }
 sub dont_warn_49 { $a &&= exit $b; }
 EXPECT
 ########
-use feature "signatures";
-sub aaa { 2 }
-sub bbb ($a) { 4 }
-$aaa = sub { 2 };
-$bbb = sub ($a) { 4 };
-EXPECT
-########
 use warnings 'numeric';
 my $c = -4.5;
 my $a = "y" x $c;
@@ -2269,7 +2261,7 @@ use warnings;
 use v5.12;
 use v5.20;
 EXPECT
-Changing use VERSION while another use VERSION is in scope is deprecated, and will become fatal in Perl 5.44 at - line 3.
+Changing use VERSION while another use VERSION is in scope is deprecated, and will become fatal in Perl 5.46 at - line 3.
 ########
 use warnings;
 use v5.8;
@@ -2280,7 +2272,7 @@ use warnings;
 use v5.10;
 use v5.8;
 EXPECT
-Changing use VERSION while another use VERSION is in scope is deprecated, and will become fatal in Perl 5.44 at - line 3.
+Changing use VERSION while another use VERSION is in scope is deprecated, and will become fatal in Perl 5.46 at - line 3.
 ########
 use warnings;
 use v5.12;
@@ -2293,3 +2285,15 @@ use v5.20;
 use test_22121;
 # expect no warning because different scope
 EXPECT
+########
+use feature qw( refaliasing declared_refs );
+foreach my \@arr ( [] ) { }
+EXPECT
+Declaring references is experimental at - line 2.
+Aliasing via reference is experimental at - line 2.
+########
+use feature qw( refaliasing declared_refs );
+foreach my ( \@ax, \@ay ) ( [], [] ) { }
+EXPECT
+Declaring references is experimental at - line 2.
+Aliasing via reference is experimental at - line 2.

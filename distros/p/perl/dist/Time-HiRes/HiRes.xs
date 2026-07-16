@@ -683,7 +683,7 @@ hrstatns(UV *atime_nsec, UV *mtime_nsec, UV *ctime_nsec)
 #  endif
 
 #  ifdef PERL_DARWIN_MUTEX
-STATIC perl_mutex darwin_time_mutex;
+static perl_mutex darwin_time_mutex;
 #  endif
 
 #  include <mach/mach_time.h>
@@ -1019,6 +1019,7 @@ nanosleep(nsec)
 
 NV
 sleep(...)
+PROTOTYPE: ;$
     PREINIT:
         struct timeval Ta, Tb;
     CODE:

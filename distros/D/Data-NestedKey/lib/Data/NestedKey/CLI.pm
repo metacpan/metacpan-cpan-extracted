@@ -118,10 +118,10 @@ sub _fetch_data {
   );
 
   if ( my $format = $self->get_format ) {
-    foreach ( keys %decoders ) {
-      next if $format && $format eq uc $_;
+    foreach my $f ( keys %decoders ) {
+      next if uc $format eq uc $f;
 
-      delete $decoders{$_};
+      delete $decoders{$f};
     }
   }
 

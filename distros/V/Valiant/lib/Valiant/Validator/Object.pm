@@ -192,11 +192,11 @@ Which is the same as:
       }
     );
 
-<B<Note>: you can use the 'nested' alias for '1' here if you want.
+B<Note>: you can use the 'nested' alias for '1' here if you want.
 
 You can also specify a type constraint:
 
-    use use Types::Standard 'Str';
+    use Types::Standard 'Str';
 
     validates attribute => ( object => Str, ... );
 
@@ -279,7 +279,7 @@ in the nested object are imported into the parent object:
 
     my $person_errors = +{ $person->errors->to_hash(full_messages=>1) };
 
-    # $address_errors = +{
+    # $person_errors = +{
     #   name => [
     #       "Name does not match the required pattern",
     #     ],
@@ -296,7 +296,7 @@ in the nested object are imported into the parent object:
     #       "Address Street can't be blank",
     #       "Address Street is too short (minimum is 3 characters)",
     #     ],
-    };
+    # };
 
 When accessing errors for display you'll have to choose which access approach is
 best for your application.

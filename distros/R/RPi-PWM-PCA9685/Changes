@@ -1,0 +1,28 @@
+Revision history for RPi-PWM-PCA9685
+
+0.01    2026-07-15
+    - Auto generated distribution with Dist::Mgr
+    - Added the OO Perl interface; pure Perl, with the I2C transport
+      provided by RPi::I2C
+    - Added examples/fade.pl and examples/servo.pl
+    - Added the ON THE WIRE POD section, with I2C bus transaction diagrams
+    - Added the I2C ADDRESSING POD section
+    - Limited CI to Linux runners; RPi::I2C is a Linux-only XS dependency
+    - Bundled the datasheet as docs/datasheet/PCA9685.pdf and added a
+      DATASHEET POD section pointing to it; moved the datasheet reference
+      out of SEE ALSO (no longer a web URL)
+    - Renamed the distribution from RPi-PCA9685 to RPi-PWM-PCA9685, and the
+      module namespace from RPi::PCA9685 to RPi::PWM::PCA9685 (repo:
+      rpi-pwm-pca9685), before any CPAN release
+    - Restyled the technical-section point forms to leading capitals to match
+      the sibling dists' convention: DEVICE SPECIFICS bullets, the REGISTER
+      MAP description column, the ON THE WIRE legend and diagram captions, and
+      the I2C ADDRESSING captions. Only leading letters changed (identifiers,
+      hex, numbers and the addr+W/addr+R byte tokens left as-is), so every
+      ASCII diagram's column alignment is preserved
+    - Added the drive param to new() ('totem' default, or 'open_drain'), the
+      output drive type, reapplied across reset()
+    - Added sink_mode(), which sets open-drain plus inverted logic for
+      current-sinking LED wiring (eg. a 3.3 V chip sinking 5 V LEDs)
+    - Added the DRIVING LEDS POD section covering sourcing vs sinking wiring
+      and the open-drain requirement

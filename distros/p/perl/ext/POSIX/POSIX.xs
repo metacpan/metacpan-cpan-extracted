@@ -1629,16 +1629,17 @@ not_here(const char *s)
 #include "const-c.inc"
 
 static void
-restore_sigmask(pTHX_ SV *osset_sv)
+restore_sigmask(pTHX_ void *ptr)
 {
-     /* Fortunately, restoring the signal mask can't fail, because
-      * there's nothing we can do about it if it does -- we're not
-      * supposed to return -1 from sigaction unless the disposition
-      * was unaffected.
-      */
+    /* Fortunately, restoring the signal mask can't fail, because
+     * there's nothing we can do about it if it does -- we're not
+     * supposed to return -1 from sigaction unless the disposition
+     * was unaffected.
+     */
 #if !(defined(__amigaos4__) && defined(__NEWLIB__))
-     sigset_t *ossetp = (sigset_t *) SvPV_nolen( osset_sv );
-     (void)sigprocmask(SIG_SETMASK, ossetp, (sigset_t *)0);
+    SV *osset_sv = (SV *)ptr;
+    sigset_t *ossetp = (sigset_t *) SvPV_nolen( osset_sv );
+    (void)sigprocmask(SIG_SETMASK, ossetp, (sigset_t *)0);
 #endif
 }
 
@@ -1775,14 +1776,15 @@ my_tzset(pTHX)
 
 MODULE = SigSet		PACKAGE = POSIX::SigSet		PREFIX = sig
 
-void
+SV*
 new(packname = "POSIX::SigSet", ...)
     const char *	packname
     CODE:
 	{
 	    int i;
 	    sigset_t *const s
-		= (sigset_t *) allocate_struct(aTHX_ (ST(0) = sv_newmortal()),
+		= (sigset_t *) allocate_struct(aTHX_
+                                               (RETVAL = newSV(0)),
 					       sizeof(sigset_t),
 					       packname);
 	    sigemptyset(s);
@@ -1791,8 +1793,9 @@ new(packname = "POSIX::SigSet", ...)
 		if (sigaddset(s, sig) < 0)
                     croak("POSIX::Sigset->new: failed to add signal %" IVdf, sig);
             }
-	    XSRETURN(1);
 	}
+    OUTPUT: RETVAL
+
 
 SysRet
 addset(sigset, sig)
@@ -1822,24 +1825,26 @@ sigismember(sigset, sig)
 
 MODULE = Termios	PACKAGE = POSIX::Termios	PREFIX = cf
 
-void
+SV*
 new(packname = "POSIX::Termios", ...)
     const char *	packname
     CODE:
 	{
 #ifdef I_TERMIOS
-	    void *const p = allocate_struct(aTHX_ (ST(0) = sv_newmortal()),
+	    void *const p = allocate_struct(aTHX_
+                                            (RETVAL = newSV(0)),
 					    sizeof(struct termios), packname);
 	    /* The previous implementation stored a pointer to an uninitialised
 	       struct termios. Seems safer to initialise it, particularly as
 	       this implementation exposes the struct to prying from perl-space.
 	    */
 	    memset(p, 0, 1 + sizeof(struct termios));
-	    XSRETURN(1);
 #else
 	    not_here("termios");
 #endif
 	}
+    OUTPUT: RETVAL
+
 
 SysRet
 getattr(termios_ref, fd = 0)
@@ -3447,7 +3452,7 @@ strtoul(str, base = 0)
             }
         }
 
-void
+SV*
 strxfrm(src)
 	SV *		src
     CODE:
@@ -3457,6 +3462,9 @@ strxfrm(src)
 #else
       ST(0) = src;
 #endif
+      /* skip the mortalising normally done for SV* return */
+      XSRETURN(1);
+    OUTPUT: RETVAL
 
 SysRet
 mkfifo(filename, mode)
@@ -3584,10 +3592,8 @@ difftime(time1, time2)
 	Time_t		time1
 	Time_t		time2
 
-#XXX: if $xsubpp::WantOptimize is always the default
-#     sv_setpv(TARG, ...) could be used rather than
-#     ST(0) = sv_2mortal(newSVpv(...))
-void
+
+SV*
 strftime(fmt, sec, min, hour, mday, mon, year, wday = -1, yday = -1, isdst = -1)
 	SV *		fmt
 	int		sec
@@ -3606,23 +3612,20 @@ strftime(fmt, sec, min, hour, mday, mon, year, wday = -1, yday = -1, isdst = -1)
 
             SV *sv = sv_strftime_ints(fmt, sec, min, hour, mday, mon, year,
                                       isdst);
-	    if (sv) {
-                sv = sv_2mortal(sv);
-            }
-            else {
+	    if (!sv) {
                 /* strftime() doesn't distinguish between errors and just an
                  * empty return, so even though sv_strftime_ints() has figured
                  * out the difference, return an empty string in all cases to
                  * mimic strftime() behavior */
-                sv = newSV_type_mortal(SVt_PV);
+                sv = newSV_type(SVt_PV);
                 SvPV_set(sv, (char *) "");
                 SvPOK_on(sv);
                 SvLEN_set(sv, 0);   /* Won't attempt to free the string when sv
                                        gets destroyed */
             }
-
-            ST(0) = sv;
+            RETVAL = sv;
 	}
+    OUTPUT: RETVAL
 
 void
 tzset()

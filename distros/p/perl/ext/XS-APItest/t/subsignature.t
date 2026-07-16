@@ -16,14 +16,24 @@ eval q{
 	push @t, (subsignature @rest);
 	push @t, (subsignature %rest);
 	push @t, (subsignature $one = 1);
+
+	# these should all appear empty
+	push @t, (subsignature );
+	push @t, (subsignature);
+	push @t, (subsignature #empty
+		    );
 };
 is $@, "";
 is_deeply \@t, [
-	['nextstate:4', 'argcheck:2:0:-', 'argelem:$x', 'argelem:$y'],
-	['nextstate:5', 'argcheck:2:0:-', 'argelem:$z',],
-	['nextstate:6', 'argcheck:0:0:@', 'argelem:@rest'],
-	['nextstate:7', 'argcheck:0:0:%', 'argelem:%rest'],
-	['nextstate:8', 'argcheck:1:1:-', 'argelem:$one:d'],
+	['nextstate:4', 'multiparam:2..2:-:$x=0:$y=1' ],
+	['nextstate:5', 'multiparam:2..2:-:$z=0:(anon)=1',],
+	['nextstate:6', 'multiparam:0..0:@:@rest=*'],
+	['nextstate:7', 'multiparam:0..0:%:%rest=*'],
+	['nextstate:8', 'multiparam:0..1:-:$one=0?'],
+
+	['nextstate:11', 'multiparam:0..0:-'],
+	['nextstate:12', 'multiparam:0..0:-'],
+	['nextstate:13', 'multiparam:0..0:-'],
 ];
 
 done_testing;

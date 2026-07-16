@@ -1,0 +1,11 @@
+<div class="form-group row" id="groups-group" style="display: none;">
+  <label for="groupes" class="col-sm-2 col-form-label text-right">
+    <%= l 'Groups' %>
+  </label>
+  <div class="col-sm-10">
+    <select id="groupes" class="selectpicker form-control" multiple
+            data-live-search="true" title="<%= l 'Select groups' %>">
+    </select>
+  </div>
+  <div class="clearfix"></div>
+</div>

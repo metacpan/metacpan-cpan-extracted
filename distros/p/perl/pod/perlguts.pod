@@ -12,7 +12,7 @@ perlguts - Introduction to the Perl API
 This document attempts to describe how to use the Perl API, as well as
 to provide some info on the basic workings of the Perl core.  It is far
 from complete and probably contains many errors.  Please refer any
-questions or comments to the author below.
+questions or comments to the Perl 5 Porters E<lt>perl5-porters@perl.orgE<gt>.
 
 =head1 Variables
 
@@ -58,7 +58,7 @@ be undefined.  Use IV and UV to declare the largest practicable, and
 C<L<perlapi/WIDEST_UTYPE>> for the absolute maximum unsigned, but which
 may not be usable in all circumstances.
 
-A numeric constant can be specified with L<perlapi/C<INT16_C>>,
+A numeric constant can be specified with the C99 macros like C<INT16_C>,
 L<perlapi/C<UINTMAX_C>>, and similar.
 
 =for apidoc_section $integer
@@ -816,7 +816,7 @@ C<SV*>.  To access the scalar value, you must first dereference the return
 value.  However, you should check to make sure that the return value is
 not NULL before dereferencing it.
 
-The first of these two functions checks if a hash table entry exists, and the 
+The first of these two functions checks if a hash table entry exists, and the
 second deletes it.
 
     bool  hv_exists(HV*, const char* key, U32 klen);
@@ -1784,7 +1784,7 @@ C<MAGIC> pointers can be identified as a particular kind of magic
 using their magic virtual table.  C<mg_findext> provides an easy way
 to do that:
 
-    STATIC MGVTBL my_vtbl = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    static MGVTBL my_vtbl = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     MAGIC *mg;
     if ((mg = mg_findext(sv, PERL_MAGIC_ext, &my_vtbl))) {
@@ -2113,8 +2113,6 @@ Note the I<end of the current statement> may occur much before the
 I<end of the current pseudo-block>.  You may wish to look at the
 C<SAVEDESTRUCTOR_X()> macro instead.
 
-=for apidoc Amh||MORTALSVFUNC_X|SVFUNC_t f|SV *sv
-
 =item C<MORTALDESTRUCTOR_SV(SV *coderef, SV *args)>
 
 At the end of I<the current statement> the Perl function contained in
@@ -2127,8 +2125,6 @@ I<end of the current pseudo-block>.  If you wish to call a perl
 function at the end of the current pseudo block you should use the
 C<SAVEDESTRUCTOR_X()> API instead, which will require you create a
 C wrapper to call the Perl function.
-
-=for apidoc Amh||MORTALDESTRUCTOR_SV|SV *coderef|SV *args
 
 =item C<SAVESTACK_POS()>
 
@@ -2369,7 +2365,7 @@ you can simply write:
 On a related note, if you do use C<(X)PUSH[iunp]>, then you're going to
 need a C<dTARG> in your variable declarations so that the C<*PUSH*>
 macros can make use of the local variable C<TARG>.  See also
-C<dTARGET> and C<dXSTARG>.
+L<perlapi/C<dTARGET>> and C<dXSTARG>.
 
 Be careful with TARG: each non-recursive call to your OP, or XSUB for
 dXSTARG, will use the same SV for TARG for each call, so you can't
@@ -2767,8 +2763,8 @@ As of perl 5.14 it is possible to hook into the compile-time lexical
 scope mechanism using C<Perl_blockhook_register>.  This is used like
 this:
 
-    STATIC void my_start_hook(pTHX_ int full);
-    STATIC BHK my_hooks;
+    static void my_start_hook(pTHX_ int full);
+    static BHK my_hooks;
 
     BOOT:
         BhkENTRY_set(&my_hooks, bhk_start, my_start_hook);
@@ -2875,6 +2871,101 @@ there is no op tree)
 and C<Perl_dump_all>, which dumps all the subroutines in the stash and
 the op tree of the main root.
 
+=head1 Tracing the interpreter execution
+
+Throughout the source code you'll see statements like
+
+ DEBUG_L(PerlIO_printf(Perl_debug_log, "%s\n", msg));
+ DEBUG_l(deb("Entering new RUNOPS level: depth=%d\n", depth));
+ DEBUG_r(if (!PL_colorset) reginitcolors());
+ DEBUG_y(sv_dump(sv));
+
+Each statement executes the code within the outermost pair of
+parentheses, but only under certain circumstances:
+
+=over
+
+=item perl must have been compiled with -DDEBUGGING
+
+If not, each such statement compiles to nothing.
+
+=item The C<$^D> variable must have the appropriate bit set.
+
+To execute, C<DEBUG_y> needs the C<y> bit set.  Similarly, there are
+C<L>, C<l>, and C<r> bits.
+
+Each bit is for a different aspect of the interpreter execution.  C<L>
+is for locale handling, C<l> is for context (loop) stack processing,
+C<r> for regular expressions, and C<y> for C<tr///>.
+
+All possibe bits and their meanings are listed in L<perlrun/-Dletters>,
+or in the F<perl.h> source under, like, C<DEBUG_L_FLAG>.
+
+Setting these is most often done from the command line that started this
+execution of the interpreter, using C<-D...> options, but a Perl
+program can change the value of this variable at will.
+
+=back
+
+So, for example, when perl has been compiled with C<-DEBUGGING>, and
+turned on by passing the C<-Dy> option to perl at startup, any time the
+execution encounters a C language source C<DEBUG_y(sv_dump(sv));>
+statement, C<sv_dump> is called.  (See L<perlapi/C<sv_dump>> for what
+that does.)
+
+Lines like these are strategically placed in the C code to help find
+problems when turned on, but occupy no space at all without
+C<-DDEBUGGING>.
+
+There is also a C<v> modifier bit which requests extra verbosity for the
+other set bits.  In statements like
+
+ DEBUG_Lv(PerlIO_printf(Perl_debug_log, "Entering function(%s);", ...))
+
+C<PerlIO_printf> is executed only when perl has been compiled with
+C<-DDEBUGGING> and BOTH the C<L> and C<v> bits are enabled, such as
+with C<-DLv> or C<-DvL...>.  Only a few main bits are affected by C<v>,
+and currently there is only one level of extra verbosity.  C<-DLvvv> and
+C<-LDv> do exeactly the same thing.
+
+The most commonly used form of these is like
+
+ DEBUG_L(PerlIO_printf(Perl_debug_log, "%s", msg));
+
+When enabled as described above, this statement causes the contents of
+the C language character string C<msg> to be displayed to C<stderr>
+whenever the statement is encountered during the execution of a Perl
+program.  After C<Perl_debug_log> must be a format string, and then any
+number of arguments to that format, just as-if this were a C<printf()>.
+
+C<deb()> as the interior does the same thing, but automatically notes the
+Perl source code line that was the ultimate cause of this C statement
+getting executed.  This is an easy way to associate the Perl code with
+its corresponding C translation.  See L<perlapi/C<deb>>.  Its use in our
+source should actually be more widespread than it is.  Patches Welcome!
+
+Most of these statements are essentially permanently placed in the
+source code, to be turned on, perhaps in the far distant future,
+as-needed.  But there is one bit that is reserved for temporary
+placement during development or handling special situations.  You can
+add C<DEBUG_U> (for "Unofficial") statements for whatever you need.  But
+these should be removed after the code is debugged, or be converted to
+use other bits.
+
+You can write more complex conditions to more finely tune if output will
+be generated, using the C<DEBUG_U_TEST> and C<DEBUG_Uv_TEST> macros.
+They return true if and only if a debug statement of the corresponding
+type would display.  There are corresponding macros for each of the
+bits.
+
+=for apidoc_section $debugging
+=for apidoc      Amh|    |DEBUG_U |const char * format|...
+=for apidoc_item    |    |DEBUG_Uv|const char * format|...
+=for apidoc_item mn|bool|DEBUG_U_TEST
+=for apidoc_item mn|bool|DEBUG_Uv_TEST
+
+=for apidoc     Cmnh|U32 |DEBUG_L_FLAG
+
 =head1 How multiple interpreters and concurrency are supported
 
 =head2 Background and MULTIPLICITY
@@ -2938,14 +3029,8 @@ or pass nothing.  To solve this, the subroutines are named and
 declared in a particular way.  Here's a typical start of a static
 function used within the Perl guts:
 
-  STATIC void
+  static void
   S_incline(pTHX_ char *s)
-
-STATIC becomes "static" in C, and may be #define'd to nothing in some
-configurations in the future.
-
-=for apidoc_section $directives
-=for apidoc Ayh||STATIC
 
 A public function (i.e. part of the internal API, but not necessarily
 sanctioned for use in extensions) begins like this:
@@ -3061,9 +3146,9 @@ your Foo.xs:
         #include "perl.h"
         #include "XSUB.h"
 
-        STATIC void my_private_function(int arg1, int arg2);
+        static void my_private_function(int arg1, int arg2);
 
-        STATIC void
+        static void
         my_private_function(int arg1, int arg2)
         {
             dTHX;       /* fetch context */
@@ -3104,9 +3189,9 @@ the Perl guts:
         #include "XSUB.h"
 
         /* pTHX_ only needed for functions that call Perl API */
-        STATIC void my_private_function(pTHX_ int arg1, int arg2);
+        static void my_private_function(pTHX_ int arg1, int arg2);
 
-        STATIC void
+        static void
         my_private_function(pTHX_ int arg1, int arg2)
         {
             /* dTHX; not needed here, because THX is an argument */
@@ -3290,11 +3375,13 @@ messages where the string is assumed to be a class name.
 
 =for apidoc Amnh||HvNAMEf
 =for apidoc Amnh||HvNAMEf_QUOTEDPREFIX
+=for apidoc Amh||HvNAMEfARG|HV *hv
 
 C<HvNAMEf> and C<HvNAMEf_QUOTEDPREFIX> are similar to C<SVf> except they
-extract the string, length and utf8 flags from the argument using the
-C<HvNAME()>, C<HvNAMELEN()>, C<HvNAMEUTF8()> macros. This is intended
-for stringifying a class name directly from an stash HV.
+extract the string, length and utf8 flags from the argument given to
+C<HvNAMEfARG()> using the C<HvNAME()>, C<HvNAMELEN()>, C<HvNAMEUTF8()>
+macros. This is intended for stringifying a class name directly from an
+stash HV.
 
 =head2 Formatted Printing of Strings
 
@@ -3526,7 +3613,7 @@ you if a string contains only valid UTF-8 characters, and the chances
 of a non-UTF-8 string looking like valid UTF-8 become very small very
 quickly with increasing string length.  On a character-by-character
 basis, C<isUTF8_CHAR>
-will tell you whether the current character in a string is valid UTF-8. 
+will tell you whether the current character in a string is valid UTF-8.
 
 =head2 How does UTF-8 represent Unicode characters?
 
@@ -3550,9 +3637,8 @@ how long the first character in it is with the C<UTF8SKIP> macro:
     len = UTF8SKIP(utf); /* len is 3 here */
 
 Another way to skip over characters in a UTF-8 string is to use
-C<utf8_hop>, which takes a string and a number of characters to skip
-over.  You're on your own about bounds checking, though, so don't use it
-lightly.
+L<perlapi/C<utf8_hop_safe>>, which takes a string and a number of
+characters to skip over.
 
 All bytes in a multi-byte UTF-8 character will have the high bit set,
 so you can test if you need to do something special with this
@@ -3567,20 +3653,23 @@ whether the byte is encoded as a single byte even in UTF-8):
                     char */
     STRLEN len; /* Returned length of character in bytes */
 
-    if (!UTF8_IS_INVARIANT(*utf))
+    if (!UTF8_IS_INVARIANT(*utf)) {
         /* Must treat this as UTF-8 */
-        uv = utf8_to_uvchr_buf(utf, utf_end, &len);
+        if (! utf8_to_uv(utf, utf_end, &uv, &len)) {
+            /* handle error */
+        }
+    }
     else
         /* OK to treat this character as a byte */
         uv = *utf;
 
-You can also see in that example that we use C<utf8_to_uvchr_buf> to get the
-value of the character; the inverse function C<uvchr_to_utf8> is available
+You can also see in that example that we use C<utf8_to_uv> to get the
+value of the character; the inverse function C<uv_to_utf8> is available
 for putting a UV into UTF-8:
 
     if (!UVCHR_IS_INVARIANT(uv))
         /* Must treat this as UTF8 */
-        utf8 = uvchr_to_utf8(utf8, uv);
+        utf8 = uv_to_utf8(utf8, uv);
     else
         /* OK to treat this character as a byte */
         *utf8++ = uv;
@@ -3793,13 +3882,13 @@ the PV to somewhere, pass on the flag too.
 
 =item *
 
-If a string is UTF-8, B<always> use C<utf8_to_uvchr_buf> to get at the value,
+If a string is UTF-8, B<always> use C<utf8_to_uv> to get at the value,
 unless C<UTF8_IS_INVARIANT(*s)> in which case you can use C<*s>.
 
 =item *
 
 When writing a character UV to a UTF-8 string, B<always> use
-C<uvchr_to_utf8>, unless C<UVCHR_IS_INVARIANT(uv))> in which case
+C<uv_to_utf8>, unless C<UVCHR_IS_INVARIANT(uv))> in which case
 you can use C<*s = uv>.
 
 =item *
@@ -3900,11 +3989,13 @@ the C<OA_*> constants from F<op.h>, namely
 =item OA_PVOP_OR_SVOP
 
 This should be interpreted as 'C<PVOP>' only.  The C<_OR_SVOP> is because
-the only core C<PVOP>, C<OP_TRANS>, can sometimes be a C<SVOP> instead.
+one core C<PVOP>, C<OP_TRANS>, can sometimes be a C<SVOP> instead.
 
 =item OA_LOOP
 
 =item OA_COP
+
+=item OA_UNOP_AUX
 
 =for apidoc_section $optree_manipulation
 =for apidoc Amnh||OA_BASEOP
@@ -3934,10 +4025,11 @@ I<oldop> is the previous OP optimized, whose C<op_next> points to I<o>.
 =item xop_dump
 
 This member is a pointer to a function of type
-C<void (pTHX_ OP *, struct OpDumpContext *)>. If set, this function is called
-by C<op_dump()> when dumping a custom operator of this type, after the op's
-basic fields have been printed. This function may make use of
-C<opdump_printf()> to emit additional output that may be useful for debugging.
+C<void (pTHX_ const OP *, struct Perl_OpDumpContext *)>. If set, this
+function is called by C<op_dump()> when dumping a custom operator of this
+type, after the op's basic fields have been printed. This function may make
+use of C<opdump_printf()> to emit additional output that may be useful for
+debugging.
 
 The opaque structure pointer passed in as its final argument should be passed
 directly into C<opdump_printf()>.
@@ -4254,9 +4346,8 @@ and C<CXt_NULL> which represent a basic scope (as pushed by C<pp_enter>)
 and a sort block. The type determines which part of the context union are
 valid.
 
-=for apidoc  Cyh ||cx_type
-
-=for apidoc  Cmnh||CXt_BLOCK
+=for apidoc Cmnh ||cx_type
+=for apidoc_item ||CXt_BLOCK
 =for apidoc_item ||CXt_EVAL
 =for apidoc_item ||CXt_FORMAT
 =for apidoc_item ||CXt_GIVEN
@@ -4710,7 +4801,7 @@ ignored). On RC builds it expands to something like
         return Perl_pp_wrap(aTHX_ S_Perl_pp_foo_norc, nargs, nlists);
     }
 
-    STATIC OP* S_Perl_pp_foo_norc(pTHX)
+    static OP* S_Perl_pp_foo_norc(pTHX)
     {
         ...
     }
@@ -5163,7 +5254,7 @@ freeing is typically of benefit only for programs that make significant use of
 string eval.
 
 =for apidoc_section $concurrency
-=for apidoc Cmnh|    |CVf_SLABBED
+=for apidoc Emnh|    |CVf_SLABBED
 =for apidoc Cmh |OP *|CvROOT|CV * sv
 =for apidoc Cmh |OP *|CvSTART|CV * sv
 

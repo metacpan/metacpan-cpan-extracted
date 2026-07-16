@@ -1,5 +1,5 @@
 package PAGI::App::File;
-$PAGI::App::File::VERSION = '0.002001';
+$PAGI::App::File::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

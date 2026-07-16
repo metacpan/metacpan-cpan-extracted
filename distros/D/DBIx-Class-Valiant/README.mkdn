@@ -1,0 +1,693 @@
+# NAME
+
+DBIx::Class::Valiant - Glue Valiant validations into DBIx::Class
+
+# SYNOPSIS
+
+You need to add the components [DBIx::Class::Valiant::Result](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResult) and [DBIx::Class::Valiant::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResultSet)
+to your result and result classes:
+
+    package Example::Schema::Result::Person;
+
+    use base 'DBIx::Class::Core';
+
+    __PACKAGE__->load_components('Valiant::Result');
+
+    package Example::Schema::ResultSet::Person;
+
+    use base 'DBIx::Class::ResultSet';
+
+    __PACKAGE__->load_components('Valiant::ResultSet');
+
+Alternatively (and likely easier if you wish to use this across your entire DBIC schema) you can set these
+on your base result / resultset classes:
+
+    package Example::Schema::Result;
+
+    use strict;
+    use warnings;
+    use base 'DBIx::Class';
+
+    __PACKAGE__->load_components(qw/
+      Valiant::Result
+      Core
+    /);
+
+    package Example::Schema::ResultSet;
+
+    use strict;
+    use warnings;
+    use base 'DBIx::Class::ResultSet';
+
+    __PACKAGE__->load_components(qw/
+      Valiant::ResultSet
+    /);
+
+There's an example schema under `t/lib/Schema` in the distribution (exercised by the
+test suite in `t/dbic`) to give you some hints.
+
+**NOTE** If you are using more than one component, you need to add these first. Hopefully
+that is a restriction we can figure out how to remove (patches welcomed).
+
+# DESCRIPTION
+
+**NOTE** This is beta software: it works as in 'it passed my existing tests'.  Feel free
+to use it if you are willing to get into the code, review / submit test cases, etc.
+Support for validations at the single result level is pretty firm and I can't imagine
+significant changes.  Support for validating nested results (results that have has\_many
+or similar relationships) is likely to evolve as bugs are reported, and I will feel free
+to break backward compatibility on the nested support until it seems stable.
+
+**NOTE** Update: I consider this code to be beta stage and will now only break things if
+its absolutely necessary to fix critical bugs or security matters.
+
+This provides a base result component and resultset component that when added to your
+classes glue [Valiant](https://metacpan.org/pod/Valiant) into [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).  You can set filters and validations on
+your result source classes very similarily to how you would use [Valiant](https://metacpan.org/pod/Valiant) with [Moo](https://metacpan.org/pod/Moo)
+or [Moose](https://metacpan.org/pod/Moose).  Validations then run when you try to persist a change to the database; if
+validations fail then we will not complete persisting the change (typically via insert
+or update SQL).  Errors can be read via the `errors` method just as on [Moo](https://metacpan.org/pod/Moo) or [Moose](https://metacpan.org/pod/Moose)
+based validations.
+
+Additionally we support nested creates and updates; validations follow any nested changes
+and errors can be aggregated. Errors at any point in the nested create or update (or as
+is often the cases a mixed situation) will cancel the entire changeset (issuing a rollback
+if necessary).  Please note that as stated above nested support is still considered a beta
+feature and bug reports / test cases (or patches) welcomed.
+
+Documentation in this package only covers how [Valiant](https://metacpan.org/pod/Valiant) is glued into your result sources
+and any local differences in behavior.   If you need a comprehensive overview of how
+[Valiant](https://metacpan.org/pod/Valiant) works you should refer to that package.  Additionally if you are looking for how
+to generate HTML forms you should refer to [Valiant::HTML::Util::Form](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AForm),
+[Valiant::HTML::Util::FormTags](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AFormTags) and [Valiant::HTML::FormBuilder](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AFormBuilder).
+
+## Adding validations and filters
+
+Assuming a base result and resultset as described above, you can add [Valiant](https://metacpan.org/pod/Valiant) style
+validations to the result source columns or on the object as a whole.  The helpers described
+in the [Valiant](https://metacpan.org/pod/Valiant) core documentations all work the same on your DBIC result source fields; the
+main difference is that you must call these helpers as class/package methods:
+
+    package Example::Schema::Result::Profile;
+
+    use warnings;
+    use strict;
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("profile");
+    __PACKAGE__->add_columns(
+      id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },
+      person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      state_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      address => { data_type => 'varchar', is_nullable => 0, size => 48 },
+      city => { data_type => 'varchar', is_nullable => 0, size => 32 },
+      zip => { data_type => 'varchar', is_nullable => 0, size => 5 },
+      birthday => { data_type => 'date', is_nullable => 1, datetime_undef_if_invalid => 1 },
+      phone_number => { data_type => 'varchar', is_nullable => 1, size => 32 },
+    );
+
+    __PACKAGE__->set_primary_key("id");
+    __PACKAGE__->add_unique_constraint(['id','person_id']);
+
+    __PACKAGE__->belongs_to(
+      state =>
+      'Example::Schema::Result::State',
+      { 'foreign.id' => 'self.state_id' }
+    );
+
+    __PACKAGE__->belongs_to(
+      person =>
+      'Example::Schema::Result::Person',
+      { 'foreign.id' => 'self.person_id' }
+    );
+
+    __PACKAGE__->validates(address => (presence=>1, length=>[2,48]));
+    __PACKAGE__->validates(city => (presence=>1, length=>[2,32]));
+    __PACKAGE__->validates(zip => (presence=>1, format=>'zip'));
+    __PACKAGE__->validates(phone_number => (presence=>1, length=>[10,32]));
+    __PACKAGE__->validates(state_id => (presence=>1));
+    __PACKAGE__->validates(birthday => (
+        date => {
+          max => sub { pop->now->subtract(days=>1) }, # can't be born yesterday
+          min => sub { pop->years_ago(30) }, # Don't trust anyone over 30
+        }
+      )
+    );
+
+    1;
+
+Besides the requirement of calling `validates`, `validates_with` and `filters` as class
+methods there are a few other changes from the core [Valiant](https://metacpan.org/pod/Valiant) behavior.
+
+First `validate` is automatically run for you when you attempt to `create` or `insert`
+a record (or use related methods such as `find_or_create`).  If validation fails the database
+operation will not occur but you will get a DBIC result with the records in cache along
+with any validation results.  This makes it easier to round trip things like form validation
+since you can use the database result in your form response logic.  For example:
+
+    my $person = $schema->resultset('Person')->first;
+    my $state = $schema->resultset('State')->first;
+
+    my $profile = $person->create_related('profile', +{
+        zip => "78621",
+        city => 'E',
+        address => '15604 Harry Lind Road',
+        birthday => DateTime->now->subtract(years=>55)->ymd,
+        phone_number => '2123879509',
+        state_id => $state->id,
+    });
+
+    $profile->invalid; # TRUE, so the record was NOT created!
+
+But the record does have the attempted values cached as expected, even if its not in
+the storage DB:
+
+    print $profile->zip;      # 78621 
+    print $profile->city;     # E
+
+And you can query for errors:
+
+    Dumper $person_profile->errors->to_hash(full_messages=>1);
+
+Returns:
+
+    city => [
+      "city is too short (minimum is 2 characters)",
+    ],
+    birthday => [
+      "Birthday chosen date can't be before @{[ DateTime->now->subtract(years=>30)->ymd ]}",
+    ],
+
+It might seem strange to have a `$profile` object with invalid data, but it greatly simplifies
+your UI layer since you can use the same model for both valid and invalid data (and to query for
+errors.
+
+## validation context
+
+By default when creating a new record we add a validation context 'create', and for updating we
+add a 'update' context.  This way you can specify different validation rules for create and update
+very easily.  If you want to add a custom context youc an do so with the `context` method which
+is part of your result API.
+
+    $person->context('registration')->update(\%records);
+
+Or you can add the context directly to your `update` or `create` call:
+
+    $person->update(+{ __context=>'registration', %records});
+
+See the core [Valiant](https://metacpan.org/pod/Valiant) documentation for more on validation contexts.
+
+## Combining validations into column definitions
+
+If you are hand writing your table source definitions you can add validations directly
+onto a column definition.   You might prefer this if you think it looks neater and adds
+fewer lines of code.
+
+    package Example::Schema::Result::CreditCard;
+
+    use strict;
+    use warnings;
+
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("credit_card");
+    __PACKAGE__->load_components(qw/Valiant::Result/);
+    __PACKAGE__->set_primary_key("id");
+
+    __PACKAGE__->add_columns(
+      id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1 },
+      person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      card_number => { 
+        data_type => 'varchar', 
+        is_nullable => 0, 
+        size => '20',
+        validates => [ presence=>1, length=>[13,20], with=>'looks_like_a_cc' ],
+        filters => [trim => 1],
+      },
+      expiration => { 
+        data_type => 'date', 
+        is_nullable => 0,
+        validates => [ presence=>1, with=>'looks_like_a_datetime', with=>'is_future' ],
+      },
+    );
+
+As in the example above you can define filters this way as well.
+
+## DBIC Candy
+
+This has [DBIx::Class::Candy](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ACandy) integration if you use that and prefer it:
+
+    package Schema::Create::Result::Person;
+
+    use DBIx::Class::Candy -base => 'Schema::Result';
+
+    table "person";
+
+    column id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 };
+    column username => { data_type => 'varchar', is_nullable => 0, size => 48 };
+    column first_name => { data_type => 'varchar', is_nullable => 0, size => 24 };
+    column last_name => { data_type => 'varchar', is_nullable => 0, size => 48 };
+    column password => { data_type => 'varchar', is_nullable => 0, size => 64 };
+
+    primary_key "id";
+    unique_constraint ['username'];
+
+    might_have profile => (
+      'Schema::Create::Result::Profile',
+      { 'foreign.person_id' => 'self.id' }
+    );
+
+    filters username => (trim => 1);
+
+    validates profile => (result=>+{validations=>1} );
+    validates username => (presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
+    validates first_name => (presence=>1, length=>[2,24]);
+    validates last_name => (presence=>1, length=>[2,48]);
+    validates password => (presence=>1, length=>[8,24]);
+    validates password => (confirmation => { on=>'create' } );
+    validates password => (confirmation => { 
+        on => 'update',
+        if => 'is_column_changed', # This method defined by DBIx::Class::Row
+      });
+     
+    accept_nested_for 'profile', {update_only=>1};
+
+    1;
+
+When using this with [DBIx::Class::Candy](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ACandy) the following class methods are available as exports:
+
+    'filters', 'validates', 'filters_with', 'validates_with', 'accept_nested_for',
+    'auto_validation'
+
+# EXAMPLE
+
+Assuming you have a base result class `Example::Schema::Result` which uses the [DBIx::Class::Valiant::Result](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResult)
+component and a default resultset class which uses the [Example::Schema::ResultSet](https://metacpan.org/pod/Example%3A%3ASchema%3A%3AResultSet) component:
+
+    package Example::Schema::Result::Person;
+
+    use warnings;
+    use strict;
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("person");
+
+    __PACKAGE__->add_columns(
+      id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },
+      username => { data_type => 'varchar', is_nullable => 0, size => 48 },
+      first_name => { data_type => 'varchar', is_nullable => 0, size => 24 },
+      last_name => { data_type => 'varchar', is_nullable => 0, size => 48 },
+    );
+
+    __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
+    __PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
+    __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
+
+We now have [Valiant](https://metacpan.org/pod/Valiant) validations wrapping any method which mutates the database.
+
+    my $person = $schema->resultset('Person')
+      ->create({
+        username => 'jjn',   # for this example we'll say this username is taken in the DB
+        first_name => 'j',   # too short
+        last_name => 'n',    # too short
+      });
+
+In this case since we tried to create a record that is not valid the create will be aborted (not saved
+to the DB and an object will be returned with errors:
+
+    $person->invalid; # true;
+    $person->errors->size; # 3
+    person->errors->full_messages_for('username');  # ['Username is not unique']
+    person->errors->full_messages_for('first_name');  # ['First Name is too short']
+    person->errors->full_messages_for('last_name');  # ['Last Name is too short']
+
+The object will have the invalid values properly populated:
+
+    $person->get_column('username');  # jjn
+
+You might find this useful for building error message responses in for example html forms or other types
+or error responses.
+
+See the test suite in `t/dbic` for worked examples of this.
+
+# NESTED VALIDATIONS
+
+With a properly setup schema you can propagate creates/updates down into related result sources.  Because
+this can be a security issue you must configure your result source classes to allow it.  For example, let's
+say you have a `Person` result source that has a `Profile` (via 'might\_have'), some `Roles` via a 
+'has\_many' bridge result class called `PersonRoles` and finally a list of `CreditCards` directly via
+a 'has\_many'.  For the purposes of this example assume the base result and result set classes are setup
+to consume the Valiant components as in the ["SYNOPSIS"](#synopsis).
+
+    package Example::Schema::Result::Person;
+
+    use warnings;
+    use strict;
+    use base 'Example::Schema::Result';
+
+    # This first part is just the normal DBIC class data you assign to a result class
+    # in order to read and update tables as well as follow relationships:
+
+    __PACKAGE__->table("person");
+
+    __PACKAGE__->add_columns(
+      id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },
+      username => { data_type => 'varchar', is_nullable => 0, size => 48 },
+      first_name => { data_type => 'varchar', is_nullable => 0, size => 24 },
+      last_name => { data_type => 'varchar', is_nullable => 0, size => 48 },
+    );
+
+    __PACKAGE__->set_primary_key("id");
+    __PACKAGE__->add_unique_constraint(['username']);
+
+    __PACKAGE__->might_have(
+      profile =>
+      'Example::Schema::Result::Profile',
+      { 'foreign.person_id' => 'self.id' }
+    );
+
+    __PACKAGE__->has_many(
+      credit_cards =>
+      'Example::Schema::Result::CreditCard',
+      { 'foreign.person_id' => 'self.id' }
+    );
+
+    __PACKAGE__->has_many(
+      person_roles =>
+      'Example::Schema::Result::PersonRole',
+      { 'foreign.person_id' => 'self.id' }
+    );
+
+    __PACKAGE__->many_to_many('roles' => 'person_roles', 'role');
+
+    # In this next part we annotate this class with additional meta data which Valiant will
+    # use to performance validations as well as allow you to follow relationships at create / update
+    # time:
+
+    __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
+    __PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
+    __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
+
+    __PACKAGE__->validates(credit_cards => (set_size=>+{min=>2, max=>4}));
+    __PACKAGE__->accept_nested_for('credit_cards', +{allow_destroy=>1});
+
+    __PACKAGE__->validates(person_roles => (set_size=>+{min=>1}));
+    __PACKAGE__->accept_nested_for('person_roles', {allow_destroy=>1});
+
+    __PACKAGE__->validates(profile => (presence=>1));
+    __PACKAGE__->accept_nested_for('profile');
+
+So in brief we add some simple validations on fields in the `Person` result class to validate
+things like the length of text fields and we added things like requiring a person to have at least
+one `person_role` and two `credit_cards`; we also specify that we want to follow those nested
+relationships and aggregate errors into the `Persons` result class (we'll see the validation
+definitions for those classes below).   Also we allow that we can delete `credit_cards` as well
+as `person_roles`.
+
+Here's how we setup these related classes.  Please note that we in general avoid using the 'many\_to\_many'
+pseudo relationship.  DBIC does not define enough internal meta data for m2m to work reliably and we had
+other issues around caching.  As a result I recommend avoiding m2m for using with [Valiant](https://metacpan.org/pod/Valiant) although it
+seems to work ok for simple use cases.  Test cases and patches to improve this are welcomed (you can see
+there's quite a few m2m test cases already but I was never able to get the type of consistency I felt 
+needed for a data storage layer where integrity is most important).
+
+    package Example::Schema::Result::Profile;
+
+    use warnings;
+    use strict;
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("profile");
+    __PACKAGE__->load_components(qw/Valiant::Result/);
+
+    __PACKAGE__->add_columns(
+      id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },
+      person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      address => { data_type => 'varchar', is_nullable => 0, size => 48 },
+      city => { data_type => 'varchar', is_nullable => 0, size => 32 },
+      zip => { data_type => 'varchar', is_nullable => 0, size => 5 },
+      birthday => { data_type => 'date', is_nullable => 1 },
+      phone_number => { data_type => 'varchar', is_nullable => 1, size => 32 },
+    );
+
+    __PACKAGE__->validates(address => (presence=>1, length=>[2,48]));
+    __PACKAGE__->validates(city => (presence=>1, length=>[2,32]));
+    __PACKAGE__->validates(zip => (presence=>1, format=>'zip'));
+    __PACKAGE__->validates(phone_number => (presence=>1, length=>[10,32]));
+    __PACKAGE__->validates(birthday => (
+        date => {
+          max => sub { pop->now->subtract(days=>1) }, # Can't be born yesterday :)
+          min => sub { pop->years_ago(30) }, # Don't trust anyone over 30
+        }
+      )
+    );
+
+    __PACKAGE__->set_primary_key("id");
+    __PACKAGE__->add_unique_constraint(['id','person_id']);
+
+    __PACKAGE__->belongs_to(
+      person =>
+      'Example::Schema::Result::Person',
+      { 'foreign.id' => 'self.person_id' }
+    );
+
+    package Example::Schema::Result::CreditCard;
+
+    use strict;
+    use warnings;
+    use DateTime;
+    use DateTime::Format::Strptime;
+
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("credit_card");
+    __PACKAGE__->load_components(qw/Valiant::Result/);
+
+    __PACKAGE__->add_columns(
+      id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1 },
+      person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      card_number => { data_type => 'varchar', is_nullable => 0, size => '20' },
+      expiration => { data_type => 'date', is_nullable => 0 },
+    );
+
+    __PACKAGE__->set_primary_key("id");
+
+    __PACKAGE__->validates(card_number => (presence=>1, length=>[13,20], with=>'looks_like_a_cc' ));
+    __PACKAGE__->validates(expiration => (presence=>1, with=>'looks_like_a_datetime', with=>'is_future' ));
+
+    __PACKAGE__->belongs_to(
+      person =>
+      'Example::Schema::Result::Person',
+      { 'foreign.id' => 'self.person_id' }
+    );
+
+    sub looks_like_a_cc {
+      my ($self, $attribute_name, $value) = @_;
+      return if $value =~/^\d{13,20}$/;
+      $self->errors->add($attribute_name, 'does not look like a credit card'); 
+    }
+
+    my $strp = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d');
+
+    sub looks_like_a_datetime {
+      my ($self, $attribute_name, $value) = @_;
+      my $dt = $strp->parse_datetime($value);
+      $self->errors->add($attribute_name, 'does not look like a datetime value') unless $dt;
+    }
+
+    sub is_future {
+      my ($self, $attribute_name, $value) = @_;
+      my $dt = $strp->parse_datetime($value);
+      return unless $dt;  # Skip this validation if the user didn't give us a date time
+                          # format (that's caught by ->looks_like_a_datetime).
+      $self->errors->add($attribute_name, 'must be in the future') unless $dt > DateTime->now;
+    }
+
+    package Example::Schema::Result::PersonRole;
+
+    use strict;
+    use warnings;
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("person_role");
+    __PACKAGE__->load_components(qw/Valiant::Result/);
+
+    __PACKAGE__->add_columns(
+      person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      role_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+    );
+
+    __PACKAGE__->set_primary_key("person_id", "role_id");
+
+    __PACKAGE__->belongs_to(
+      person =>
+      'Example::Schema::Result::Person',
+      { 'foreign.id' => 'self.person_id' }
+    );
+
+    __PACKAGE__->belongs_to(
+      role =>
+      'Example::Schema::Result::Role',
+      { 'foreign.id' => 'self.role_id' }
+    );
+
+    package Example::Schema::Result::Role;
+
+    use strict;
+    use warnings;
+
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("role");
+    __PACKAGE__->load_components(qw/Valiant::Result/);
+
+    __PACKAGE__->add_columns(
+      id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1 },
+      label => { data_type => 'varchar', is_nullable => 0, size => '24' },
+    );
+
+    __PACKAGE__->set_primary_key("id");
+    __PACKAGE__->add_unique_constraint(['label']);
+
+    __PACKAGE__->has_many(
+      person_roles =>
+      'Example::Schema::Result::PersonRole',
+      { 'foreign.role_id' => 'self.id' }
+    );
+
+With this setup you could deeply validate / create a Person and its permitted relationships:
+
+    my $person = $schema
+      ->resultset('Person')
+      ->create({
+        first_name => "john",
+        last_name => "nap",
+        username => "jjn1",
+        profile => {
+          address => "15604 Harry Lind Road",
+          birthday => "2000-02-13",
+          city => "Elgin",
+          phone_number => "16467081837",
+          zip => '10000'
+        },
+        person_roles => [   
+          { role_id => 1 },
+          { role_id => 2 },
+          { role_id => 4 },
+        ],
+        credit_cards => [
+          {
+            card_number => "3423423423423423",
+            expiration => "2222-02-02",
+          },
+          {
+            card_number => "1111222233334444",
+            expiration => "2333-02-02",
+          },
+        ],
+      });
+
+If the proposed data fails validation then you won't create any records, but the errors can
+be viewed via the `errors` collection.
+
+For doing validation on nested updates you need to do a bit more work to make sure you caches
+are properly populated from the database. You need to use 'prefetch' to locally cache all the
+results you are trying to validate:
+
+    my $person = Schema->resultset('Person')->find(
+      { 'me.id'=>$pid },
+      { prefetch => ['profile', 'credit_cards', {person_roles => 'role' }] }
+    );
+    $person->build_related_if_empty('profile');
+
+Then you can do an update:
+
+    $person->update({
+      username => 'jjn2',
+      profile => {
+        city => 'NYC'
+      },
+    });
+
+As before if there's a valiation issue the update won't happen.
+
+**NOTE** Recursion warning!  You cannot currently `accept_nested_for` for a relationship
+whose target result source is setting `accept_nested_for` into yourself.   This is probably
+fixable, patches and use cases welcomed!
+
+## Deleting
+
+If a nested relationship permits deleting (via the 'allow\_destroy' flag) you can mark a row for deletion
+directly using the `_delete` flag:
+
+    $person->update({
+      username => 'jjn2',
+        person_roles => [
+          { role_id => 1 },
+          { role_id => 2, _delete => 1 },
+          { role_id => 4, _delete => 1 },
+        ],
+    });
+
+This works for `has_many` relationships as shown above, and also for single relationships
+(`might_have` / `belongs_to`) declared with `accept_nested_for`:
+
+    $artist->update({ bio => { id => $bio_id, _delete => 1 } });
+
+**Replace-set updates**: By default, rows omitted from a `has_many` update are left alone -- matching
+Rails' `accepts_nested_attributes_for`, the only way to delete a related row is the explicit
+`_delete` flag shown above.  If you want the old "replace the whole set" behavior, where any
+existing related row not mentioned in the update gets deleted, set the `delete_omitted`
+`accept_nested_for` option to true.  This fires whenever the relationship key is present in the
+update on an already-in-storage parent (whether or not the relationship was prefetched), and
+passing `[]` deletes the entire collection.  See
+["delete\_omitted" in DBIx::Class::Valiant::Result](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResult#delete_omitted) for details, including its coderef form.
+
+The full set of `accept_nested_for` options (`allow_destroy`, `delete_omitted`,
+`reject_if`, `limit`, `update_only`, `find_with_uniques`) is documented in
+[DBIx::Class::Valiant::Result](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResult).
+
+This example is far from complete, for now see the many worked examples in the `t/dbic`
+tests directory.  In particular this example doesn't really cover all the
+ins and outs of deleting.  An overall tutorial is in the works but example submission or questions
+(that could eventually lead to a FAQ) are very welcomed.
+
+# WARNINGS & GOTCHAs
+
+You must be careful with how you expose a deeply nested interface.   If you simply pass fields 
+from a web form you are potentially opening yourself to SQL injection and similar types of attacks.  I 
+recommend being very careful to sanitize incoming parameters, especially any related keys.
+
+**NOTE**Be careful when reusing a result that has deeply nested values after you create or update.
+In order to keep data consistent, DBIC will blow away any prefetch caches after create or update.
+So that means if you try to reuse a result you may encounter errors that cause following
+creates or inserts to fails, especially if you have constraints on the related data, such as SetSize.
+
+## Many to Many
+
+Many to Many type relationships are supported to the best of my ability but since these types of
+fake relationships have lots of known issues you are more likely to run into edge cases.  In
+particular its a bad idea to have validations on both a m2m relations and also on the one to many
+relation that it bridges.   This is likely to result in false positive validation errors due to the
+way the resultset cache works (and doesn't work) for m2m.
+
+Happy to take patches for improvements to anyone that feels strongly about it.  FWIW the core DBIC
+development team recommends staying away fron using the many to many code.
+
+# SEE ALSO
+
+[Valiant](https://metacpan.org/pod/Valiant), [DBIx::Class::Valiant::Result](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResult), [DBIx::Class::Valiant::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant%3A%3AResultSet), [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
+
+[DBIO::Valiant](https://metacpan.org/pod/DBIO%3A%3AValiant) is the port of this distribution to DBIO, the asynchronous fork of
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2026, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

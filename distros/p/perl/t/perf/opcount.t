@@ -698,6 +698,21 @@ test_opcount(0, "multiconcat: local assign",
 
 # builtin:: function calls should be replaced with efficient op implementations
 no warnings 'experimental::builtin';
+use builtin qw(
+    blessed
+    ceil
+    false
+    floor
+    indexed
+    is_bool
+    is_tainted
+    is_weak
+    refaddr
+    reftype
+    true
+    unweaken
+    weaken
+);
 
 test_opcount(0, "builtin::true/false are replaced with constants",
                 sub { my $x = builtin::true(); my $y = builtin::false() },
@@ -706,8 +721,24 @@ test_opcount(0, "builtin::true/false are replaced with constants",
                     const    => 2,
                 });
 
+test_opcount(0, "imported true/false are replaced with constants",
+                sub { my $x = true(); my $y = false() },
+                {
+                    entersub => 0,
+                    const    => 2,
+                });
+
 test_opcount(0, "builtin::is_bool is replaced with direct opcode",
                 sub { my $x; my $y; $y = builtin::is_bool($x); 1; },
+                {
+                    entersub => 0,
+                    is_bool  => 1,
+                    padsv    => 3,
+                    padsv_store  => 1,
+                });
+
+test_opcount(0, "imported is_bool is replaced with direct opcode",
+                sub { my $x; my $y; $y = is_bool($x); 1; },
                 {
                     entersub => 0,
                     is_bool  => 1,
@@ -723,8 +754,23 @@ test_opcount(0, "builtin::is_bool gets constant-folded",
                     const    => 1,
                 });
 
+test_opcount(0, "imported is_bool gets constant-folded",
+                sub { is_bool(123); },
+                {
+                    entersub => 0,
+                    is_bool  => 0,
+                    const    => 1,
+                });
+
 test_opcount(0, "builtin::weaken is replaced with direct opcode",
                 sub { my $x = []; builtin::weaken($x); },
+                {
+                    entersub => 0,
+                    weaken   => 1,
+                });
+
+test_opcount(0, "imported weaken is replaced with direct opcode",
+                sub { my $x = []; weaken($x); },
                 {
                     entersub => 0,
                     weaken   => 1,
@@ -737,8 +783,22 @@ test_opcount(0, "builtin::unweaken is replaced with direct opcode",
                     unweaken => 1,
                 });
 
+test_opcount(0, "imported unweaken is replaced with direct opcode",
+                sub { my $x = []; unweaken($x); },
+                {
+                    entersub => 0,
+                    unweaken => 1,
+                });
+
 test_opcount(0, "builtin::is_weak is replaced with direct opcode",
                 sub { builtin::is_weak([]); },
+                {
+                    entersub => 0,
+                    is_weak  => 1,
+                });
+
+test_opcount(0, "imported is_weak is replaced with direct opcode",
+                sub { is_weak([]); },
                 {
                     entersub => 0,
                     is_weak  => 1,
@@ -751,6 +811,13 @@ test_opcount(0, "builtin::blessed is replaced with direct opcode",
                     blessed  => 1,
                 });
 
+test_opcount(0, "imported blessed is replaced with direct opcode",
+                sub { blessed([]); },
+                {
+                    entersub => 0,
+                    blessed  => 1,
+                });
+
 test_opcount(0, "builtin::refaddr is replaced with direct opcode",
                 sub { builtin::refaddr([]); },
                 {
@@ -758,8 +825,22 @@ test_opcount(0, "builtin::refaddr is replaced with direct opcode",
                     refaddr  => 1,
                 });
 
+test_opcount(0, "imported refaddr is replaced with direct opcode",
+                sub { refaddr([]); },
+                {
+                    entersub => 0,
+                    refaddr  => 1,
+                });
+
 test_opcount(0, "builtin::reftype is replaced with direct opcode",
                 sub { builtin::reftype([]); },
+                {
+                    entersub => 0,
+                    reftype  => 1,
+                });
+
+test_opcount(0, "imported reftype is replaced with direct opcode",
+                sub { reftype([]); },
                 {
                     entersub => 0,
                     reftype  => 1,
@@ -773,6 +854,13 @@ test_opcount(0, "builtin::ceil is replaced with direct opcode",
                     ceil     => 1,
                 });
 
+test_opcount(0, "imported ceil is replaced with direct opcode",
+                sub { ceil($one_point_five); },
+                {
+                    entersub => 0,
+                    ceil     => 1,
+                });
+
 test_opcount(0, "builtin::floor is replaced with direct opcode",
                 sub { builtin::floor($one_point_five); },
                 {
@@ -780,8 +868,22 @@ test_opcount(0, "builtin::floor is replaced with direct opcode",
                     floor    => 1,
                 });
 
+test_opcount(0, "imported floor is replaced with direct opcode",
+                sub { floor($one_point_five); },
+                {
+                    entersub => 0,
+                    floor    => 1,
+                });
+
 test_opcount(0, "builtin::is_tainted is replaced with direct opcode",
                 sub { builtin::is_tainted($0); },
+                {
+                    entersub   => 0,
+                    is_tainted => 1,
+                });
+
+test_opcount(0, "imported is_tainted is replaced with direct opcode",
+                sub { is_tainted($0); },
                 {
                     entersub   => 0,
                     is_tainted => 1,
@@ -1014,19 +1116,93 @@ test_opcount(0, "Empty anonhash ref and direct lexical assignment",
 test_opcount(0, "foreach 2 lexicals on builtin::indexed ARRAY",
                 sub { my @input = (); foreach my ($i, $x) (builtin::indexed @input) { } },
                 {
-                    entersub => 0, # no call to builtin::indexed
+                    entersub  => 0, # no call to builtin::indexed
                     enteriter => 1,
-                    iter => 1,
-                    padav => 2,
+                    iter      => 1,
+                    padav     => 2,
+                });
+
+test_opcount(0, "foreach 2 lexicals on imported indexed ARRAY",
+                sub { my @input = (); foreach my ($i, $x) (indexed @input) { } },
+                {
+                    entersub  => 0, # no call to builtin::indexed
+                    enteriter => 1,
+                    iter      => 1,
+                    padav     => 2,
                 });
 
 test_opcount(0, "foreach 2 lexicals on builtin::indexed LIST",
                 sub { foreach my ($i, $x) (builtin::indexed qw( x y z )) { } },
                 {
-                    entersub => 0, # no call to builtin::indexed
+                    entersub  => 0, # no call to builtin::indexed
                     enteriter => 1,
-                    iter => 1,
+                    iter      => 1,
                 });
+
+test_opcount(0, "foreach 2 lexicals on imported indexed LIST",
+                sub { foreach my ($i, $x) (indexed qw( x y z )) { } },
+                {
+                    entersub  => 0, # no call to builtin::indexed
+                    enteriter => 1,
+                    iter      => 1,
+                });
+{
+    use feature qw( signatures );
+
+    test_opcount(0, "Zero-arg empty subroutine uses OP_MULTIPARAM",
+        sub () {},
+        {
+            multiparam => 1,
+            argcheck => 0,
+        });
+
+    test_opcount(0, "Zero-arg subroutine uses OP_MULTIPARAM",
+        sub () { return; },
+        {
+            multiparam => 1,
+            argcheck => 0,
+        });
+
+    test_opcount(0, "Two-arg subroutine uses OP_MULTIPARAM",
+        sub ($x, $y) { return; },
+        {
+            multiparam => 1,
+            argcheck => 0,
+            argelem => 0,
+        });
+
+    test_opcount(0, "Two-arg one-optional subroutine uses OP_MULTIPARAM",
+        sub ($x, $y = "default") { return; },
+        {
+            multiparam => 1,
+            argcheck => 0,
+            argelem => 0,
+        });
+
+    test_opcount(0, "Two-arg one-anon subroutine uses OP_MULTIPARAM",
+        sub ($, $y) { return; },
+        {
+            multiparam => 1,
+            argcheck => 0,
+            argelem => 0,
+        });
+
+    test_opcount(0, "One-arg plus slurpy array subroutine uses OP_MULTIPARAM",
+        sub ($x, @rest) { return; },
+        {
+            multiparam => 1,
+            argcheck => 0,
+            argelem => 0,
+        });
+
+    test_opcount(0, "One-arg plus slurpy hash subroutine uses OP_MULTIPARAM",
+        sub ($x, %rest) { return; },
+        {
+            multiparam => 1,
+            argcheck => 0,
+            argelem => 0,
+        });
+}
 
 # substr with const zero offset and "" replacements
 test_opcount(0, "substr with const zero offset and '' repl (void)",
@@ -1104,6 +1280,63 @@ test_opcount(0, "substr with const zero offset  (gv)",
                     const        => 1,
                     gvsv         => 1,
                     sassign      => 1
+                });
+
+# defined(SOMECONST) gets constant folded
+test_opcount(0, "defined(ABC) gets constant folded",
+                sub { use constant ABC => 1; my $x = (defined(ABC)) ? 1 : 0 },
+                {
+                    cond_expr    => 0,
+                    defined      => 0,
+                });
+
+# Empty condop other/next branch optimizations
+test_opcount(0, "Empty if{} blocks are optimised away",
+                sub { my $x; if ($x) { } else { 1 } },
+                       {
+                    stub => 0
+                });
+
+test_opcount(0, "Empty else{} blocks are optimised away",
+                sub { my $x; if ($x) { 1 } else { } },
+                       {
+                    stub => 0
+                });
+
+test_opcount(0, "Empty ternary true blocks are optimised away",
+                sub { my $x; ($x) ? () : 1 },
+                {
+                    stub => 0
+                });
+
+test_opcount(0, "Empty ternary false blocks are optimised away",
+                sub { my $x; ($x) ? 1 : () },
+                {
+                    stub => 0
+                });
+
+# make sure the code block for an any/all gets optimised
+
+test_opcount(0, "basic any/all",
+                sub {
+                    use feature      'keyword_any', 'keyword_all';
+                    use experimental 'keyword_any', 'keyword_all';
+                    my (@a, @x, @b);
+                    @a = any { $x[0] } @b;
+                    @a = all { $x[0] } @b;
+                },
+                {
+                    aelem          => 0,
+                    aelemfast_lex  => 2,
+                    'ex-aelem'     => 2,
+                }
+            );
+
+# GH #13793, GH #20586
+test_opcount(0, "Don't fold string repetition above a multiplier threshold",
+                sub { my $x = "A" x (2**22) },
+                {
+                    repeat      => 1,
                 });
 
 done_testing();

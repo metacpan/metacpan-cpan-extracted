@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20260601';
+our $VERSION = '5.20260708';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -459,6 +459,7 @@ sub changes_between {
     5.042002 => '2026-03-29',
     5.043010 => '2026-04-20',
     5.043011 => '2026-06-01',
+    5.044000 => '2026-07-22',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -24741,6 +24742,49 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.044000 => {
+        delta_from => 5.043011,
+        changed => {
+            'Archive::Tar'          => '3.12',
+            'Archive::Tar::Constant'=> '3.12',
+            'Archive::Tar::File'    => '3.12',
+            'B::Op_private'         => '5.044000',
+            'Compress::Zlib'        => '2.223',
+            'Config'                => '5.044',
+            'HTTP::Tiny'            => '0.096',
+            'IO::Compress'          => '2.223',
+            'IO::Compress::Adapter::Bzip2'=> '2.223',
+            'IO::Compress::Adapter::Deflate'=> '2.223',
+            'IO::Compress::Adapter::Identity'=> '2.223',
+            'IO::Compress::Base'    => '2.223',
+            'IO::Compress::Base::Common'=> '2.223',
+            'IO::Compress::Bzip2'   => '2.223',
+            'IO::Compress::Deflate' => '2.223',
+            'IO::Compress::Gzip'    => '2.223',
+            'IO::Compress::Gzip::Constants'=> '2.223',
+            'IO::Compress::RawDeflate'=> '2.223',
+            'IO::Compress::Zip'     => '2.223',
+            'IO::Compress::Zip::Constants'=> '2.223',
+            'IO::Compress::Zlib::Constants'=> '2.223',
+            'IO::Compress::Zlib::Extra'=> '2.223',
+            'IO::Uncompress::Adapter::Bunzip2'=> '2.223',
+            'IO::Uncompress::Adapter::Identity'=> '2.223',
+            'IO::Uncompress::Adapter::Inflate'=> '2.223',
+            'IO::Uncompress::AnyInflate'=> '2.223',
+            'IO::Uncompress::AnyUncompress'=> '2.223',
+            'IO::Uncompress::Base'  => '2.223',
+            'IO::Uncompress::Bunzip2'=> '2.223',
+            'IO::Uncompress::Gunzip'=> '2.223',
+            'IO::Uncompress::Inflate'=> '2.223',
+            'IO::Uncompress::RawInflate'=> '2.223',
+            'IO::Uncompress::Unzip' => '2.223',
+            'Module::CoreList'      => '5.20260708',
+            'Module::CoreList::Utils'=> '5.20260708',
+            'UNIVERSAL'             => '1.18',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -26501,6 +26545,13 @@ sub is_core
     },
     5.043011 => {
         delta_from => 5.043010,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.044000 => {
+        delta_from => 5.043011,
         changed => {
         },
         removed => {

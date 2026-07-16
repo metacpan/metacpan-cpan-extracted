@@ -4828,7 +4828,7 @@ Perl_my_waitpid(pTHX_ Pid_t pid, int *statusp, int flags)
         /* remind folks they are asking for non-standard waitpid behavior */
         _ckvmssts(lib$getjpi(&pidcode,0,0,&mypid,0,0));
         if (ownerpid != mypid)
-          Perl_warner(aTHX_ packWARN(WARN_EXEC),
+          warner(packWARN(WARN_EXEC),
                       "waitpid: process %x is not a child of process %x",
                       pid,mypid);
       }
@@ -13341,11 +13341,14 @@ Perl_sys_intern_dup(pTHX_ struct interp_intern *src,
 void  
 Perl_sys_intern_clear(pTHX)
 {
+    PERL_ARGS_ASSERT_SYS_INTERN_CLEAR;
 }
 
 void  
 Perl_sys_intern_init(pTHX)
 {
+    PERL_ARGS_ASSERT_SYS_INTERN_INIT;
+
     unsigned int ix = RAND_MAX;
     double x;
 

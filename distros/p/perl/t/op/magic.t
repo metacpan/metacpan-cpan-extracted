@@ -53,6 +53,7 @@ $Is_MSWin32  = $^O eq 'MSWin32';
 $Is_VMS      = $^O eq 'VMS';
 $Is_os2      = $^O eq 'os2';
 $Is_Cygwin   = $^O eq 'cygwin';
+$Is_ZOS      = $^O eq 'os390';
 
 $PERL =
    ($Is_VMS     ? $^X      :
@@ -74,7 +75,7 @@ sub env_is {
 	Win32::SetConsoleOutputCP($cp);
         like $set, qr/^(?:\Q$key\E=)?\Q$val\E$/, $desc;
     } elsif ($Is_VMS) {
-        my $eqv = `write sys\$output f\$trnlnm("\Q$key\E")`;
+        my $eqv = `write sys\$output f\$trnlnm("$key")`;
         # A single null byte in the equivalence string means
         # an undef value for Perl, so mimic that here.
         $eqv = "\n" if length($eqv) == 2 and $eqv eq "\000\n";
@@ -412,7 +413,8 @@ EOP
     # work (like if the system doesn't have a ps(1) for whatever
     # reason) just bail out gracefully.
     my $maybe_ps = sub {
-        my ($cmd) = @_;
+        my ($cmd) = @_ ;
+        $cmd .= " 2>$::devnull";
         local ($?, $!);
 
         no warnings;
@@ -765,7 +767,7 @@ fresh_perl_is
 # ${^OPEN} and $^H interaction
 # Setting ${^OPEN} causes $^H to change, but setting $^H would only some-
 # times make ${^OPEN} change, depending on whether it was in the same BEGIN
-# block.  Don’t test actual values (subject to change); just test for
+# block.  Don't test actual values (subject to change); just test for
 # consistency.
 my @stuff;
 eval '
@@ -826,8 +828,8 @@ SKIP: {
         if $Is_MSWin32 && is_miniperl;
 
  SKIP: {
-	skip("clearing \%ENV is not safe when running under valgrind or on VMS")
-	    if $ENV{PERL_VALGRIND} || $Is_VMS;
+	skip("clearing \%ENV is not safe when running under valgrind or on VMS or on z/OS in ASCII mode")
+	    if $ENV{PERL_VALGRIND} || $Is_VMS || ($Is_ZOS && ord "A" == 65);
 
 	    $PATH = $ENV{PATH};
 	    $SYSTEMROOT = $ENV{SYSTEMROOT} if exists $ENV{SYSTEMROOT}; # win32

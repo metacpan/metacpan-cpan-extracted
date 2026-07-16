@@ -99,6 +99,10 @@
 #  else /* MSVC noreturn support inside the interp */
 #    ifdef _MSC_VER
 #      define PERL_CALLCONV_NO_RET __declspec(noreturn)
+
+        /* Windows can't cope with a function that isn't supposed to return
+         * declared as having a non-void return value */
+#      define PERL_CALLCONV_NON_VOID_NO_RET(ret_type)
 #    endif
 #  endif
 #endif
@@ -133,7 +137,8 @@
 #    define NOMEMMGR          /* GUI IPC RPC malloc buffers */
 #    define NOMENUS           /* GUI Menu obj */
 #    define NOMETAFILE        /* file format for half rendered graphics */
-#    define NOMINMAX          /* "Macros min(a,b) and max(a,b)" OBSOL/UNIMPL/FUT */
+#    undef NOMINMAX           /* "Macros min(a,b) and max(a,b)" OBSOL/UNIMPL/FUT */
+#    define NOMINMAX
 #    define NOMSG             /* GUI Message loop */
 /* #define NONLS              "Wide" Code Page conversion APIs */
 /* OBSOL/UNIMPL/FUT "OpenFile(), OemToAnsi, AnsiToOem" etc */
@@ -567,7 +572,6 @@ struct interp_intern {
     char *	perlshell_tokens;
     char **	perlshell_vec;
     long	perlshell_items;
-    struct av *	fdpid;
     child_tab *	children;
 #ifdef USE_ITHREADS
     DWORD	pseudo_id;

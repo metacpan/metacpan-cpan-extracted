@@ -25,7 +25,7 @@ use Test::Most;
       is_integer => 1,
       greater_than_or_equal_to => 18,
     },
-    strict => "Too Young",
+    strict => "Local::Test::Strict::TooYoung",
     allow_undef => 1,
   );
 
@@ -46,6 +46,11 @@ use Test::Most;
 }
 
 {
+  package Local::Test::Strict::TooYoung;
+  sub throw { my ($class, $message) = @_; die "Too Young: $message" }
+}
+
+{
   ok my $object = Local::Test::Strict->new(age=>1110);
   ok !eval { $object->validate };
   ok $@ =~m/^Age must be less than 200/;
@@ -54,7 +59,7 @@ use Test::Most;
 {
   ok my $object = Local::Test::Strict->new(age=>11);
   ok !eval { $object->validate };
-  ok $@ =~m/^Too Young/;
+  ok $@ =~m/^Too Young: Age must be greater than or equal to 18/;
 }
 
 {

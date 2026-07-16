@@ -539,7 +539,7 @@ and passed the current C<$view> as an argument).
 
     say $t->hr({omit => sub ($view) { 1 }}); # is empty
 
-=head if
+=head2 if
 
     my $bool = 1;
     say $t->div({id=>'one', if=>$bool}, sub {
@@ -557,7 +557,7 @@ If the processed value of the tag is false, the tag and any of its contents are 
 the output.  Value can be a scalar value or a coderef (which gets the C<$view> as its one
 argument).
 
-=head with
+=head2 with
 
 Create content with a new local context.
 
@@ -623,16 +623,12 @@ or if there are no matches a tag with the C<when_default> attribute.
 The value of C<given=> may be a scalar or a coderef.  If its a coderef we will call it with the current
 view object and expect a scalar.
 
-=head1 AUTHOR
-
-See L<Valiant>
-
 =head1 SEE ALSO
 
 L<Valiant>, L<Valiant::HTML::FormBuilder>
 
 =head1 AUTHOR
- 
+
 See L<Valiant>
 
 =head1 COPYRIGHT & LICENSE

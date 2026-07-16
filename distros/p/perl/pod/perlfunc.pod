@@ -296,7 +296,7 @@ current scope.
 =for Pod::Functions =Namespace
 
 L<C<caller>|/caller EXPR>,
-L<C<class>|/class NAMESPACE>, 
+L<C<class>|/class NAMESPACE>,
 L<C<field>|/field VARNAME>,
 L<C<import>|/import LIST>,
 L<C<local>|/local EXPR>,
@@ -2016,7 +2016,7 @@ first.)
 C<do BLOCK> does I<not> count as a loop, so the loop control statements
 L<C<next>|/next LABEL>, L<C<last>|/last LABEL>, or
 L<C<redo>|/redo LABEL> cannot be used to leave or restart the block.
-See L<perlsyn> for alternative strategies.
+See L<perlsyn/Statement Modifiers> for alternative strategies.
 
 =item do EXPR
 X<do>
@@ -2849,7 +2849,7 @@ Case Charts available at L<https://www.unicode.org/charts/case/>.
 If EXPR is omitted, uses L<C<$_>|perlvar/$_>.
 
 This function behaves the same way under various pragmas, such as within
-L<S<C<"use feature 'unicode_strings">>|feature/The 'unicode_strings' feature>,
+L<S<C<"use feature 'unicode_strings'">>|feature/The 'unicode_strings' feature>,
 as L<C<lc>|/lc EXPR> does, with the single exception of
 C<fc> of I<LATIN CAPITAL LETTER SHARP S> (U+1E9E) within the
 scope of L<S<C<use locale>>|locale>.  The foldcase of this character
@@ -3398,9 +3398,12 @@ X<endnetent> X<endprotoent> X<endservent>
 
 =for Pod::Functions be done using services file
 
-These routines are the same as their counterparts in the
-system C library.  In list context, the return values from the
-various get routines are as follows:
+These routines are the same as their counterparts in the system
+C library. (This means that platform-specific quirks may be
+encountered, please refer to L<perlport> for examples.)
+
+In list context, the return values from the various get routines
+are as follows:
 
  #    0        1          2           3         4
  my ( $name,   $passwd,   $gid,       $members  ) = getgr*
@@ -3723,17 +3726,14 @@ delimit its argument.  C<goto("NE")."XT"> is equivalent to C<goto NEXT>.
 Also, unlike most named operators, this has the same precedence as
 assignment.
 
-Use of C<goto LABEL> or C<goto EXPR> to jump into a construct is
-deprecated and will issue a warning; it will become a fatal error in
-Perl 5.42. While still available, it may not be used to
-go into any construct that requires initialization, such as a
-subroutine, a C<foreach> loop, or a C<given>
-block.  In general, it may not be used to jump into the parameter
-of a binary or list operator, but it may be used to jump into the
-I<first> parameter of a binary operator.  (The C<=>
-assignment operator's "first" operand is its right-hand
-operand.)  It also can't be used to go into a
-construct that is optimized away.
+Use of C<goto LABEL> or C<goto EXPR> to jump into a construct becomes an
+exception in Perl 5.44; a fatal error notification is emitted.  It may not be
+used to go into any construct that requires initialization, such as a
+subroutine, a C<foreach> loop, or a C<given> block.  In general, it may not be
+used to jump into the parameter of a binary or list operator, but it may be
+used to jump into the I<first> parameter of a binary operator.  (The C<=>
+assignment operator's "first" operand is its right-hand operand.)  It also
+can't be used to go into a construct that is optimized away.
 
 The C<goto &NAME> form is quite different from the other forms of
 C<goto>.  In fact, it isn't a goto in the normal sense at
@@ -4121,7 +4121,8 @@ L<C<continue>|/continue BLOCK> block, if any, is not executed:
     }
 
 C<last> cannot return a value from a block that typically
-returns a value, such as C<eval {}>, C<sub {}>, or C<do {}>. It will perform
+returns a value, such as C<eval {}>, C<sub {}>, or C<do {}>.  (For C<do>,
+see L<perlsyn/Statement Modifiers> for workarounds.)  It will perform
 its flow control behavior, which precludes any return value. It should not be
 used to exit a L<C<grep>|/grep BLOCK LIST> or L<C<map>|/map BLOCK LIST>
 operation.
@@ -6671,9 +6672,8 @@ Perl.
 =item *
 
 As of Perl v5.20.0 C<rand()> uses the C<drand48> pseudorandom number generator
-to generate random numbers. As a PRNG C<drand48> should be sufficient for most
-non-cryptographic needs. If you need cryptographic random numbers check CPAN
-for crypto safe alternatives.
+(PRNG) to generate numbers that appear random but are deterministic.
+It is sufficient for games, generating test data or cases where repeatability is needed.
 
 =back
 
@@ -6681,15 +6681,18 @@ for crypto safe alternatives.
 
 =item B<Security:>
 
-B<C<rand> is not cryptographically secure.  You should not rely
-on it in security-sensitive situations.>  As of this writing, a
-number of third-party CPAN modules offer random number generators
-intended by their authors to be cryptographically secure,
-including:
+B<C<rand> is not suitable for anything related to security, authentication or encryption.>
+Do not use it for generating passwords, session ids, authentication tokens, salts, or encryption keys.
+The return values are predictable, and systems that rely on C<rand> are easily broken.
+
+A number of third-party CPAN modules offer access to system sources of randomness,
+or random number generators that are suitable for security purposes, including:
 
 =back
 
 =over
+
+=item * L<Crypt::SysRandom>
 
 =item * L<Crypt::URandom>
 
@@ -7108,6 +7111,7 @@ would have semantics similar to the following:
                 croak $@ ? "$@Compilation failed in require"
                          : "Can't locate $filename: $!\n";
             }
+            return 1 if $feature_module_true_enabled_in_file;
             if (!$result) {
                 delete $INC{$filename};
                 croak "$filename did not return true value";
@@ -7132,6 +7136,11 @@ itself with this issue. See L<feature> for more details. Note that this
 affects the compilation unit within which the feature is used, and using
 it before requiring a module will not change the behavior of existing
 modules that do not themselves also use it.
+
+In this usage, the (truthy) result of the required file will be returned,
+but this should not be relied upon as it will not be returned in subsequent
+C<require> calls on the same file or with the 'module_true' feature enabled.
+To run a file and retrieve its return value, use L<C<do>|/do EXPR>.
 
 If EXPR is a bareword, C<require> assumes a F<.pm>
 extension and replaces C<::> with C</> in the filename for you,
@@ -8481,7 +8490,7 @@ However, this:
 uses empty string matches as separators; thus, the empty string
 may be used to split EXPR into a list of its component characters.
 
-As a special case for C<split>PATTERNE<sol>,EXPR,LIMIT>,
+As a special case for C<split>,
 the empty pattern given in
 L<match operator|perlop/"m/PATTERN/msixpodualngc"> syntax (C<//>)
 specifically matches the empty string, which is contrary to its usual
@@ -8496,7 +8505,7 @@ C<E<sol>m> and any of the other pattern modifiers valid for C<qr>
 specified explicitly.
 
 As another special case,
-C<split>PATTERNE<sol>,EXPR,LIMIT> emulates the default
+C<split> emulates the default
 behavior of the
 command line tool B<awk> when the PATTERN is either omitted or a
 string composed of a single space character (such as S<C<' '>> or
@@ -10407,6 +10416,9 @@ If the specified Perl version is 5.39.0 or higher, builtin functions are
 imported lexically as with L<C<use builtin>|builtin> with a corresponding
 version bundle.
 
+If the specified Perl version is v5.41.0 or higher,
+L<S<C<use source::encoding 'ascii'>>|source::encoding> is enabled lexically.
+
 Use of C<use VERSION> while another is in effect is not allowed with a
 C<use v5.39;> or greater version.  For lower versions, C<use VERSION> will
 override most behavior of a previous C<use VERSION>, possibly removing
@@ -11141,8 +11153,10 @@ documented in L<perlsyn/"Switch Statements">.
 
 =item finally
 
-These flow-control keywords related to the experimental C<try> feature are
-documented in L<perlsyn/"Try Catch Exception Handling">.
+These flow-control keywords related to the C<try> feature are
+documented in L<perlsyn/"Try Catch Exception Handling">.  C<finally> is still
+deemed to be experimental; C<try> and C<catch> are considered non-experimental
+as of perl-5.40.
 
 =back
 

@@ -8,7 +8,7 @@ BEGIN {
     *bar::like = *like;
 }
 
-plan 156;
+plan 160;
 
 # -------------------- our -------------------- #
 
@@ -114,6 +114,24 @@ our sub foo;
 0 if sub { eval "" if 0; \&foo if 0; };
 print "ok";
 PROG
+
+# https://github.com/Perl/perl5/issues/15545
+fresh_perl(<<'PROG', {});
+our sub speak {}
+my sub meow {
+    speak();
+}
+PROG
+is $?, 0, 'referencing our sub from closure sub does not crash; GH 15545';
+fresh_perl(<<'PROG', {});
+our sub speak {}
+package Cat {
+    my sub meow {
+        speak();
+    }
+}
+PROG
+is $?, 0, 'referencing our sub from closure sub in seperate package does not crash; GH 15545';
 
 # -------------------- state -------------------- #
 
@@ -1035,4 +1053,39 @@ my $result =
 say "result=", ($result//"undef");
 EOS
 
+}
+
+{
+    # test case from GH #24131
+    fresh_perl_is(<<'CODE', "ARRAY", {}, "lexical sub call from eval");
+use v5.40;
+sub foo2 {
+sub { eval "say reftype([]);" or die $@ }
+    };
+foo2->();
+CODE
+
+    # adapted test case from GH #24056
+    # may pass on non-threaded perls
+    fresh_perl_is(<<'CODE', "", {}, "another lexical sub call from eval");
+BEGIN {
+    eval <<~'EOS';
+        package eval_bug;
+        $eval_bug::VERSION='0.001';
+        
+        use v5.40;
+        
+        sub do_eval
+        {
+            eval 'use v5.40; true';
+            die $@ if $@;
+        }
+        EOS
+}
+
+{
+    eval_bug::do_eval;
+    die $@ if $@;
+}
+CODE
 }

@@ -3,8 +3,8 @@
 Valiant - Object validation inspired by Ruby on Rails and more.
 
 <div>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg?tag=0.002012"></a>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg?tag=0.002012"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg"></a>
     <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
     <a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 </div>
@@ -20,7 +20,7 @@ Valiant - Object validation inspired by Ruby on Rails and more.
     has name => (is=>'ro');
     has age => (is=>'ro');
 
-    filters_with => 'Trim';
+    filters_with 'Trim';
 
     validates name => (
       length => {
@@ -98,7 +98,8 @@ extensively when writing this code:
 
 Documentation here details using [Valiant](https://metacpan.org/pod/Valiant) with [Moo](https://metacpan.org/pod/Moo) or [Moose](https://metacpan.org/pod/Moose) based classes.
 If you want to use [Valiant](https://metacpan.org/pod/Valiant) with [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) you will also wish to review
-[DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) which details how [Valiant](https://metacpan.org/pod/Valiant) glues into [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
+[DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) which details how [Valiant](https://metacpan.org/pod/Valiant) glues into [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) (or
+[DBIO::Valiant](https://metacpan.org/pod/DBIO%3A%3AValiant) for [DBIO](https://metacpan.org/pod/DBIO), the asynchronous fork of DBIx::Class).
 
 This document reviews all the bits of the [Valiant](https://metacpan.org/pod/Valiant) system as a whole (validations, filters,
 internationalization, errores etc).   You might also like to review API details from the following
@@ -902,8 +903,8 @@ database call insidean eval and wish to add a model error if there's an exceptio
 
 ## Error message types.
 
-When adding an error there's four options for what the value of &lt;$error\_message> can be and are described
-above ["'GLOBAL ATTRIBUTE VALIDATOR OPTIONS'"](#global-attribute-validator-options)
+When adding an error there's four options for what the value of `$error_message` can be and are described
+above ["GLOBAL ATTRIBUTE VALIDATOR OPTIONS"](#global-attribute-validator-options)
 
 ## Message priority
 
@@ -1020,9 +1021,9 @@ there is a model with errors like the following for these examples and discussio
     The only difference between `messages` and `full_messages` is that the latter will
     combine your error message with a human readable version of your attribute name.  By
     default this is just a title cased version of the attribute name but you can customize
-    this via setting a translation (see ["INTERNATONALIZATION"](#internatonalization)).  `full_messages` by 
+    this via setting a translation (see ["INTERNATIONALIZATION"](#internationalization)).  `full_messages` by 
     default uses the following expansion template: "{{attribute}} {{message}}" however you can
-    customize this by setting the `format` key in your translation file (again see ["INTERNATONALIZATION"](#internatonalization)).
+    customize this by setting the `format` key in your translation file (again see ["INTERNATIONALIZATION"](#internationalization)).
 
     If you just want the model level errors you can use `model_messages`:
 
@@ -1139,7 +1140,7 @@ two validator classes [Valiant::Validator::Object](https://metacpan.org/pod/Vali
 You should refer to documentation in each of those validators for API level overview and
 examples.
 
-# INTERNATONALIZATION
+# INTERNATIONALIZATION
 
 Internationalization for [Valiant](https://metacpan.org/pod/Valiant) will concern our ability to create tags that represent
 human readable strings for different languages.  Generally we will create tags, which are
@@ -1326,15 +1327,16 @@ error conditions when they are present. However that is not always the best user
 cases where you are willing to accept such input from users but you want to 'clean up' the data
 before trying to validate it you can use filters.
 
-For now please see [Valiant::Filters](https://metacpan.org/pod/Valiant%3A%3AFilters) and [Valiant::Filters](https://metacpan.org/pod/Valiant%3A%3AFilters) for API level documentations on
+For now please see [Valiant::Filters](https://metacpan.org/pod/Valiant%3A%3AFilters) and [Valiant::Filterable](https://metacpan.org/pod/Valiant%3A%3AFilterable) for API level documentations on
 filters as well as some examples. Also see [Valiant::Filter](https://metacpan.org/pod/Valiant%3A%3AFilter) for a list of the prepackaged filter
 that ship with [Valiant](https://metacpan.org/pod/Valiant)
 
 # HTML FORM GENERATION
 
 HTML Form generation is not specifically added to the [Valiant](https://metacpan.org/pod/Valiant) validation code, but there is
-a set of packages designed to work with [Valiant](https://metacpan.org/pod/Valiant) as well as [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) ORM integration:
-[Valiant::HTML::FormBuilder](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AFormBuilder), [Valiant::HTML::Form](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AForm) and [Valiant::HTML::FormTags](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AFormTags).  This code
+a set of packages designed to work with [Valiant](https://metacpan.org/pod/Valiant) as well as [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) (or
+[DBIO::Valiant](https://metacpan.org/pod/DBIO%3A%3AValiant) for [DBIO](https://metacpan.org/pod/DBIO) users) ORM integration:
+[Valiant::HTML::FormBuilder](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AFormBuilder), [Valiant::HTML::Util::Form](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AForm) and [Valiant::HTML::Util::FormTags](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AUtil%3A%3AFormTags).  This code
 is currently under active development although I expect that the publically documented API
 is very likely to remain stable.  Here's a simple example of what this form integration looks like;
 for now you'll need to refer to the API docs and the example application for more on how to use
@@ -1359,19 +1361,20 @@ Given a model like:
 
 Wrap a formbuilder object around it and generate HTML form field controls:
 
-    use Valiant::HTML::Form 'form_for';
+    use Valiant::HTML::Util::Form;
 
+    my $f = Valiant::HTML::Util::Form->new;
     my $person = Local::Person->new(first_name=>'J', last_name=>'Napiorkowski');
     $person->validate;
 
-    print form_for($person, sub {
-      my $fb = shift;
+    print $f->form_for($person, sub {
+      my ($fb, $person) = @_;
       return  $fb->label('first_name'),
               $fb->input('first_name'),
               $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
               $fb->label('last_name'),
               $fb->input('last_name'),
-              $fb->errors_for('last_name'+{ class=>'invalid-feedback' });
+              $fb->errors_for('last_name', +{ class=>'invalid-feedback' });
     });
 
 Generates something like:
@@ -1400,8 +1403,11 @@ spotted [Form::Tiny](https://metacpan.org/pod/Form%3A%3ATiny) which is a similar
 footprint and sane looking code.  This list is not exhaustive, just stuff I've either used or 
 reviewed.
 
-[Valiant](https://metacpan.org/pod/Valiant), [Valiant::Validations](https://metacpan.org/pod/Valiant%3A%3AValidations), [Valiant::Validates](https://metacpan.org/pod/Valiant%3A%3AValidates), [Valiant::Filters](https://metacpan.org/pod/Valiant%3A%3AFilters),
-[Valiant::Filterable](https://metacpan.org/pod/Valiant%3A%3AFilterable)
+[Valiant::Validations](https://metacpan.org/pod/Valiant%3A%3AValidations), [Valiant::Validates](https://metacpan.org/pod/Valiant%3A%3AValidates), [Valiant::Filters](https://metacpan.org/pod/Valiant%3A%3AFilters), [Valiant::Filterable](https://metacpan.org/pod/Valiant%3A%3AFilterable),
+[Valiant::HTML::FormBuilder](https://metacpan.org/pod/Valiant%3A%3AHTML%3A%3AFormBuilder), [Valiant::JSON::JSONBuilder](https://metacpan.org/pod/Valiant%3A%3AJSON%3A%3AJSONBuilder).
+
+For ORM integration see the separate distributions [DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant) and
+[DBIO::Valiant](https://metacpan.org/pod/DBIO%3A%3AValiant) (the asynchronous DBIO port).
 
 # DEDICATIONS
 
@@ -1427,7 +1433,7 @@ Or to any dog charity that fits best with your personal beliefs and economic mea
 
 # COPYRIGHT & LICENSE
 
-Copyright 2024, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+Copyright 2026, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

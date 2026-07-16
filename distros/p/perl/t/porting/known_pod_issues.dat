@@ -77,6 +77,7 @@ cpanp(1)
 CPANPLUS
 crypt(3)
 Crypt::PRNG
+Crypt::SysRandom
 Crypt::URandom
 ctime(3)
 curl(1)
@@ -123,6 +124,7 @@ exit(3)
 Expect
 Exporter::Easy
 ExtUtils::Constant::ProxySubs
+ExtUtils::CppGuess
 fchdir(2)
 fchmod(2)
 fchown(2)
@@ -255,6 +257,7 @@ Padre
 PadWalker
 Parse::Keyword
 passwd(1)
+Path::Tiny
 pclose(3)
 perl(1)
 Perl4::CoreLibs
@@ -336,6 +339,7 @@ splain
 sprintf(3)
 stat(2)
 strchr(3)
+strdup(3)
 strftime(3)
 strictures
 String::Base
@@ -425,7 +429,6 @@ pod/perlmacosx.pod	Verbatim line length including indents exceeds 78 by	3
 pod/perlmroapi.pod	? Should you be using L<...> instead of	1
 pod/perlos2.pod	? Should you be using L<...> instead of	1
 pod/perlos2.pod	Verbatim line length including indents exceeds 78 by	5
-pod/perlos390.pod	Verbatim line length including indents exceeds 78 by	1
 pod/perlperf.pod	Verbatim line length including indents exceeds 78 by	-1
 pod/perlrun.pod	Verbatim line length including indents exceeds 78 by	3
 pod/perlsolaris.pod	Verbatim line length including indents exceeds 78 by	-1

@@ -1,0 +1,7 @@
+$HASH1 = {
+           name        => 'admin',
+           created_at  => '2026-06-15T00:00:01',
+           description => 'Full administrative access',
+           id          => 1,
+           updated_at  => '2026-06-15T00:00:01'
+         };

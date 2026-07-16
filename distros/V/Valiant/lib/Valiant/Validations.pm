@@ -107,7 +107,7 @@ sub _add_metadata {
 
 =head1 NAME
 
-Valiant::Validations - Addos a validation DSL and API to your Moo/se classes
+Valiant::Validations - Adds a validation DSL and API to your Moo/se classes
 
 =head1 SYNOPSIS
 
@@ -208,7 +208,7 @@ of arguments.
       my ($self, $opts) = @_;
     };
 
-    valiates_with 'SpecialValidator', arg1=>'foo', arg2=>'bar';
+    validates_with 'SpecialValidator', arg1=>'foo', arg2=>'bar';
 
 See C<validates_with> in either L<Valiant> or L<Valiant::Validates> for more.
 
@@ -236,7 +236,7 @@ See C<validates> in either L<Valiant> or L<Valiant::Validates> for more.
 
 The following class methods are available for subclasses
 
-=head2 default_role
+=head2 default_roles
 
 Roles that are applied when using this class.  Default is L<Valiant::Validates>.  If
 you are subclassing and wish to apply more roles, or if you've made your own version

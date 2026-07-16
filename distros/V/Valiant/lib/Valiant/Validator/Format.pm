@@ -12,8 +12,6 @@ has without => (is=>'ro', predicate=>'has_without');
 has invalid_format_match => (is=>'ro', required=>1, default=>sub {_t 'invalid_format_match'});
 has invalid_format_without => (is=>'ro', required=>1, default=>sub {_t 'invalid_format_without'});
 
-has exclusion => (is=>'ro', required=>1, default=>sub {_t 'exclusion'});
-
 sub BUILD {
   my ($self, $args) = @_;
   $self->_requires_one_of($args, 'match', 'without');
@@ -178,7 +176,7 @@ sub validate_each {
   }
   if($self->has_without) {
     my $with = $self->_cb_value($record, $self->without);
-    if($value =~m/$with/) {
+    if(defined($value) && $value =~m/$with/) {
       $record->errors->add($attribute, $self->invalid_format_without, $opts);
     }
   }
@@ -240,7 +238,7 @@ Valiant::Validator::Format - Validate a value based on a regular expression
 
 =head1 DESCRIPTION
 
-Validates that the attribute value either matches a given regular expression (C<match)
+Validates that the attribute value either matches a given regular expression (C<match>)
 or that it fails to match an exclusion expression (C<without>).
 
 Values that fail the C<match> condition (which can be a regular expression or a
@@ -305,7 +303,7 @@ and add error C<not_zip> on failure to match.
 
 Must contain only ASCII characters.  Adds error C<not_ascii> if fails.
 
-=cut
+=back
 
 =head1 SHORTCUT FORM
 

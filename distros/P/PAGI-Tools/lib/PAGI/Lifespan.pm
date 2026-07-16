@@ -1,5 +1,5 @@
 package PAGI::Lifespan;
-$PAGI::Lifespan::VERSION = '0.002001';
+$PAGI::Lifespan::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

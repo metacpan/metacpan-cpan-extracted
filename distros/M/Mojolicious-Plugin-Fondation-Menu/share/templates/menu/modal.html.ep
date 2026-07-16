@@ -1,0 +1,142 @@
+%# Menu modal — add/edit form (included in admin page)
+
+<div class="modal fade" id="menu-modal" tabindex="-1" aria-labelledby="les_menus" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="menu-modal-title"><%= l('Add a menu') %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="menu-form">
+          <input id="id" name="id" type="hidden">
+
+          <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label text-right"><%= l('Menu name') %></label>
+            <div class="col-sm-10">
+              <input id="name" name="name" class="form-control" type="text">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="condition" class="col-sm-2 col-form-label text-right"><%= l('Condition') %></label>
+            <div class="col-sm-10">
+              <input id="condition" name="condition" class="form-control" type="text" placeholder="group:name or perm:name">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="sort_order" class="col-sm-2 col-form-label text-right"><%= l('Order') %></label>
+            <div class="col-sm-10">
+              <input id="sort_order" name="sort_order" class="form-control" type="text">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="title" class="col-sm-2 col-form-label text-right"><%= l('Title') %></label>
+            <div class="col-sm-10">
+              <input id="title" name="title" class="form-control" type="text">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="parents" class="col-sm-2 control-label text-right"><%= l('Parent') %></label>
+            <div class="col-sm-10">
+              <select id="parents" name="parents" class="selectpicker" title="<%= l('Select a parent') %>" data-live-search="true">
+                <option value="0"><%= l('None (root)') %></option>
+% my $cache = $c->menus;
+% if ($cache && $cache->{_by_id}) {
+%   for my $m (sort { $a->{name} cmp $b->{name} || $a->{title} cmp $b->{title} } values %{$cache->{_by_id}}) {
+                <option value="<%= $m->{id} %>"><%= $m->{name} %> / <%= $m->{title} %></option>
+%   }
+% }
+              </select>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="link" class="col-sm-2 col-form-label text-right"><%= l('URL') %></label>
+            <div class="col-sm-10">
+              <input id="link" name="link" class="form-control" type="text">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="description" class="col-sm-2 col-form-label text-right"><%= l('Description') %></label>
+            <div class="col-sm-10">
+              <textarea id="description" name="description" class="form-control form-control-lg"></textarea>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="icon" class="col-sm-2 col-form-label text-right"><%= l('Menu icon') %></label>
+            <div class="col-sm-10">
+              <input id="icon" name="icon" class="form-control" type="text" placeholder="fas fa-home">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="icon_color" class="col-sm-2 col-form-label text-right"><%= l('Icon color') %></label>
+            <div class="col-sm-2" style="padding-top: 10px;">
+              <input id="icon_color" name="icon_color" class="form-control" type="color">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label class="control-label text-right col-sm-2">&nbsp;</label>
+            <div class="col-10">
+              <div class="row">
+                <label for="view_in_menu" class="control-label text-end col-sm-2"><%= l('Show in menu') %></label>
+                <div class="col-sm-1">
+                  <div class="checkbox" style="padding-top: 10px;">
+                    <input name="view_in_menu" id="view_in_menu" type="checkbox">
+                  </div>
+                </div>
+                <label for="open_tab" class="control-label text-end col-sm-3"><%= l('Open in new tab') %></label>
+                <div class="col-sm-1">
+                  <div class="checkbox" style="padding-top: 10px;">
+                    <input name="open_tab" id="open_tab" type="checkbox">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-bs-dismiss="modal"><%= l('Close') %></button>
+            <button type="button" class="btn btn-primary" id="saveMenu"><%= l('Save') %></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete modal -->
+<div id="confirmDeleteMenu" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= l('Are you sure you want to delete this menu and all its submenus?') %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-bs-dismiss="modal" class="btn"><%= l('Cancel') %></button>
+        <button type="button" class="btn btn-primary" id="deleteInt"><%= l('Delete') %></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input id="deleteMenuId" type="hidden">
+<span id="deleteMenuTitle" style="display:none;"></span>

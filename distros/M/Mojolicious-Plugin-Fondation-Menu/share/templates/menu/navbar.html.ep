@@ -1,0 +1,28 @@
+%# Navbar menu - renders Bootstrap navbar dropdowns for a menu group
+%# Stash: menus => [$menu_hashref, ...] (root-level menus)
+
+% my $menus = stash('menus') // [];
+% for my $menu (@$menus) {
+%   my $pass = $c->check_menu_condition($menu->{condition});
+%   next unless $pass;
+%
+%   my $icon_html = '';
+%   if (defined $menu->{icon} && length $menu->{icon}) {
+%     my $color_attr = (defined $menu->{icon_color} && length $menu->{icon_color})
+%       ? qq{ style="color: $menu->{icon_color}"} : '';
+%     $icon_html = qq{<i class="$menu->{icon}"$color_attr></i> };
+%   }
+%
+%   my $target = $menu->{open_tab} ? ' target="_blank"' : '';
+%
+%   if (@{$menu->{children}}) {
+    <li class="nav-item dropdown menu_navbar">
+      <a class="nav-link dropdown-toggle" href="#" id="parent_<%= $menu->{id} %>"<%= $target %> role="button" data-bs-toggle="dropdown" aria-expanded="false"><%== $icon_html %><%= l($menu->{title}) %></a>
+%= include 'menu/navbar_child', children => $menu->{children}
+    </li>
+%   } else {
+    <li class="nav-item menu_navbar">
+      <a class="nav-link"<%= $target %> href="<%= $menu->{link} %>"><%== $icon_html %><%= l($menu->{title}) %></a>
+    </li>
+%   }
+% }

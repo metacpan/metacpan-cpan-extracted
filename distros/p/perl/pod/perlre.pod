@@ -13,7 +13,7 @@ a quick-start introduction is available in L<perlrequick>.
 
 Except for L</The Basics> section, this page assumes you are familiar
 with regular expression basics, like what is a "pattern", what does it
-look like, and how it is basically used.  For a reference on how they
+look like, and how it basically is used.  For a reference on how they
 are used, plus various examples of the same, see discussions of C<m//>,
 C<s///>, C<qr//> and C<"??"> in L<perlop/"Regexp Quote-Like Operators">.
 
@@ -463,6 +463,15 @@ this is very much like an ordinary Perl code comment.  (You can include
 the closing delimiter within the comment only if you precede it with a
 backslash, so be careful!)
 
+For example,
+
+    # Delete (most) C comments.
+    $program =~ s {
+        /\*	# Match the opening delimiter.
+        .*?	# Match a minimal number of characters.
+        \*/	# Match the closing delimiter.
+    } []gsx;
+
 Use of C</x> means that if you want real
 whitespace or C<"#"> characters in the pattern (outside a bracketed character
 class, which is unaffected by C</x>), then you'll either have to
@@ -474,13 +483,6 @@ escaping the C<\n> with a backslash or C<\Q>.
 You can use L</(?#text)> to create a comment that ends earlier than the
 end of the current line, but C<text> also can't contain the closing
 delimiter unless escaped with a backslash.
-
-A common pitfall is to forget that C<"#"> characters (outside a
-bracketed character class) begin a comment under C</x> and are not
-matched literally.  Just keep that in mind when trying to puzzle out why
-a particular C</x> pattern isn't working as expected.
-Inside a bracketed character class, C<"#"> retains its non-special,
-literal meaning.
 
 Starting in Perl v5.26, if the modifier has a second C<"x"> within it,
 the effect of a single C</x> is increased.  The only difference is that
@@ -496,23 +498,47 @@ may be easier to grasp than the squashed equivalents
     /[d-eg-i3-7]/
     /[!@"#$%^&*()=?<>']/
 
-Note that this unfortunately doesn't mean that your bracketed classes
-can contain comments or extend over multiple lines.  A C<#> inside a
-character class is still just a literal C<#>, and doesn't introduce a
-comment.  And, unless the closing bracket is on the same line as the
-opening one, the newline character (and everything on the next line(s)
-until terminated by a C<]> will be part of the class, just as if you'd
-written C<\n>.
+Starting in Perl v5.44, the experimental feature
 
-Taken together, these features go a long way towards
-making Perl's regular expressions more readable.  Here's an example:
+ use feature 'enhanced_xx';
 
-    # Delete (most) C comments.
-    $program =~ s {
-	/\*	# Match the opening delimiter.
-	.*?	# Match a minimal number of characters.
-	\*/	# Match the closing delimiter.
-    } []gsx;
+changes the behavior of C</xx> to allow your bracketed classes to extend
+over multiple lines and to contain comments.
+
+Without this feature being enabled, a C<#> inside a character class is
+still just a literal C<#>; but with it, the C<#> introduces a comment,
+and to get a literal "octothorpe" (the "official" name of this character),
+you must write C<"\#">.  To minimize the chances of an unescaped C<#>
+which was intended to be taken as a literal from being treated as a
+comment, a warning is raised if a C<]> would be absorbed by the comment
+instead of closing the class.  Escape or quote any C<]> intended to be
+part of the comment.
+
+It's best for both clarity and lack of surprises to always spell
+non-printing characters using some printable equivalent, such as C<\0> for
+C<NUL>, C<\n> for newline, I<etc>.  Literal vertical space characters
+have a diffrent meaning when this feature is enabled than when not.
+When enabled, any newline (and any other vertical spacing) characters
+are ignored inside the bracketed class, thus allowing the class to
+extend over as many lines as you like (until terminated by a C<]>).
+When the feature isn't enabled, literal vertical space characters are
+part of the class.  Using C<\n> and its compatriots avoids these
+different behaviors.
+
+This feature also causes an unescaped C<#> that isn't surrounded by
+white space to warn.  This is to catch the common pitfall where you
+forgot to escape it, and silently got a comment instead.  To avoid the
+warning, make sure all comments are of the form S<" # ...">, and escape all
+octothorpes you mean literally with a preceding backslash C<\#>.
+
+To catch further unintentional behaviors, this feature warns if an
+unescaped, unquoted C<#> is inside a comment.  (A check could be added
+that the closing delimiter of the pattern isn't getting absorbed by the
+comment.  But the program likely won't compile anyway in this case.)
+
+It's still easy to forget to escape SPACE characters to get them to
+match literally when C</xx> is in effect.  Keep that in the back of your
+mind for when your pattern isn't behaving as you expect.
 
 Note that anything inside
 a C<\Q...\E> stays unaffected by C</x>.  And note that C</x> doesn't affect
@@ -948,7 +974,7 @@ will never match, as the C<a++> will gobble up all the C<"a">'s in the
 string and won't leave any for the remaining part of the pattern. This
 feature can be extremely useful to give perl hints about where it
 shouldn't backtrack. For instance, the typical "match a double-quoted
-string" problem can be most efficiently performed when written as:
+string" problem can be written as:
 
    /"(?:[^"\\]++|\\.)*+"/
 
@@ -958,7 +984,14 @@ C<L</(?E<gt>I<pattern>)>> for more details;
 possessive quantifiers are just syntactic sugar for that construct. For
 instance the above example could also be written as follows:
 
-   /"(?>(?:(?>[^"\\]+)|\\.)*)"/
+   / " (?> (?: (?> [^"\\]+ ) | \\. )* ) " /x
+
+This example is not the most efficient possible, as it effectively
+loops with alternation inside the loop.  It can be rewritten as:
+
+   / " [^"\\]*+ (?: \\(?s: .) [^"\\]*+ )*+ " /x
+
+which is "unrolled", and has better performance.
 
 Note that the possessive quantifier modifier can not be combined
 with the non-greedy modifier. This is because it would make no sense.
@@ -979,7 +1012,7 @@ also work:
  \n          newline               (LF, NL)
  \r          return                (CR)
  \f          form feed             (FF)
- \a          alarm (bell)          (BEL)
+ \a          alert (bell)          (BEL)
  \e          escape (think troff)  (ESC)
  \cK         control char          (example: VT)
  \x{}, \x00  character whose ordinal is the given hexadecimal number
@@ -1156,10 +1189,12 @@ string:
 =head3 Capture groups
 
 The grouping construct C<( ... )> creates capture groups (also referred to as
-capture buffers). To refer to the current contents of a group later on, within
-the same pattern, use C<\g1> (or C<\g{1}>) for the first, C<\g2> (or C<\g{2}>)
-for the second, and so on.
-This is called a I<backreference>.
+capture buffers).
+
+To refer to the current contents of a group later on, within the same
+pattern, use C<\g1> (or C<\g{1}>) for the first, C<\g2> (or C<\g{2}>)
+for the second, and so on.  This is called a I<backreference>.
+
 X<regex, capture buffer> X<regexp, capture buffer>
 X<regex, capture group> X<regexp, capture group>
 X<regular expression, capture buffer> X<backreference>
@@ -1168,20 +1203,58 @@ X<\g{1}> X<\g{-1}> X<\g{name}> X<relative backreference> X<named backreference>
 X<named capture buffer> X<regular expression, named capture buffer>
 X<named capture group> X<regular expression, named capture group>
 X<%+> X<$+{name}> X<< \k<name> >>
+
 There is no limit to the number of captured substrings that you may use.
-Groups are numbered with the leftmost open parenthesis being number 1, I<etc>.  If
-a group did not match, the associated backreference won't match either. (This
-can happen if the group is optional, or in a different branch of an
-alternation.)
-You can omit the C<"g">, and write C<"\1">, I<etc>, but there are some issues with
-this form, described below.
+Groups are numbered with the leftmost open parenthesis being number 1,
+I<etc>.
 
-You can also refer to capture groups relatively, by using a negative number, so
-that C<\g-1> and C<\g{-1}> both refer to the immediately preceding capture
-group, and C<\g-2> and C<\g{-2}> both refer to the group before it.  For
-example:
+If a group did not match, the associated backreference won't match
+either. (This can happen if the group is optional, or in a different
+branch of an alternation.)
 
-        /
+Note that a quantified group which matches zero things counts as not
+matching, so neither of the following will match:
+
+ "aba" =~ / a (x)* b \g1 a /x;  # Doesn't match
+ "aba" =~ / a (x)? b \g1 a /x;  # Doesn't match
+
+However when the quantifier is on the inside of the group it does match:
+
+ "aba" =~ / a (x*) b \g1 a /x;   # Matches
+ "aba" =~ / a (x?) b \g1 a /x;   # Matches
+
+Put another way, perl's regex engine distinguishes between "captured the
+empty string" and "an optional capture did not match".
+
+You can see this in the following code snippet:
+
+ if ("aba" =~ qr/$ARGV[0]/) {
+     print "matched: ", defined($1) ? "<$1>" : "undef";
+ }
+ else {
+     print "rejected";
+ }
+ print "\n";
+
+This prints as follows:
+
+ Argument       Output
+ 'a(x)*b'    matched: <>
+ 'a(x*)b'    matched: undef
+
+Both patterns match, but leave the contents of the C<$1> capture group
+in different states.  Back references only match when the capture group
+they reference contains a defined value.
+
+You can omit the C<"g">, and write C<"\1">, I<etc>, but there are some
+issues with this form, described below.
+
+You can also refer to capture groups relatively, by using a negative
+number, so that C<\g-1> and C<\g{-1}> both refer to the immediately
+preceding capture group, and C<\g-2> and C<\g{-2}> both refer to the
+group before it.  For example:
+
+       m/
          (Y)            # group 1
          (              # group 2
             (X)         # group 3
@@ -1198,7 +1271,10 @@ You can dispense with numbers altogether and create named capture groups.
 The notation is C<(?E<lt>I<name>E<gt>...)> to declare and C<\g{I<name>}> to
 reference.  (To be compatible with .Net regular expressions, C<\g{I<name>}> may
 also be written as C<\k{I<name>}>, C<\kE<lt>I<name>E<gt>> or C<\k'I<name>'>.)
-I<name> must not begin with a number, nor contain hyphens.
+I<name> must follow the rules for perl identifiers
+(L<perldata/Identifier parsing>) which means, for example, that they
+can't begin with a number, nor contain hyphens.
+
 When different groups within the same pattern have the same name, any reference
 to that name assumes the leftmost defined group.  Named groups count in
 absolute and relative numbering, and so can also be referred to by those

@@ -32,5 +32,12 @@ use Test::Most;
   ok $object->skip_validate->valid;
 }
 
+{
+  # validated/skip_validation are internal state, not constructor-settable
+  ok my $object = Local::Test::Numericality->new(age=>5, validated=>1, skip_validation=>1);
+  is $object->validated, 0, 'validated not settable via constructor';
+  is $object->skip_validation, 0, 'skip_validation not settable via constructor';
+}
+
 
 done_testing;

@@ -54,7 +54,7 @@ Valiant::Validator::Exclusion - Value cannot be in a list
     );
 
     validates country => (
-      inclusion => +{
+      exclusion => +{
         in => \&restricted,
       },
     );

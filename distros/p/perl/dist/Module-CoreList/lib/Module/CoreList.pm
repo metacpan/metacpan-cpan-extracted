@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20260329_42';
+our $VERSION = '5.20260708';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -455,7 +455,11 @@ sub changes_between {
     5.043008 => '2026-02-20',
     5.042001 => '2026-03-08',
     5.043009 => '2026-03-20',
+    5.040004 => '2026-03-29',
     5.042002 => '2026-03-29',
+    5.043010 => '2026-04-20',
+    5.043011 => '2026-06-01',
+    5.044000 => '2026-07-22',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -22531,7 +22535,6 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'DynaLoader'            => '1.54_01',
             'Module::CoreList'      => '5.20250118_38',
             'Module::CoreList::Utils'=> '5.20250118_38',
-            'Pod::Functions::Functions'=> '1.14',
         },
         removed => {
         }
@@ -22545,7 +22548,6 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'File::Spec'            => '3.91',
             'Module::CoreList'      => '5.20250118_40',
             'Module::CoreList::Utils'=> '5.20250118_40',
-            'Pod::Functions::Functions'=> '1.14',
             'warnings'              => '1.70',
         },
         removed => {
@@ -24624,6 +24626,18 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.040004 => {
+        delta_from => 5.040003,
+        changed => {
+            'B::Op_private'         => '5.040004',
+            'Compress::Raw::Zlib'   => '2.222',
+            'Config'                => '5.040004',
+            'Module::CoreList'      => '5.20260329_40',
+            'Module::CoreList::Utils'=> '5.20260329_40',
+        },
+        removed => {
+        }
+    },
     5.042002 => {
         delta_from => 5.042001,
         changed => {
@@ -24632,6 +24646,141 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Config'                => '5.042002',
             'Module::CoreList'      => '5.20260329_42',
             'Module::CoreList::Utils'=> '5.20260329_42',
+        },
+        removed => {
+        }
+    },
+    5.043010 => {
+        delta_from => 5.043009,
+        changed => {
+            'B::Concise'            => '1.012',
+            'B::Op_private'         => '5.043010',
+            'Config'                => '5.04301',
+            'File::Glob'            => '1.44',
+            'Module::CoreList'      => '5.20260420',
+            'Module::CoreList::Utils'=> '5.20260420',
+            'Module::Metadata'      => '1.000039',
+            'Pod::Simple'           => '3.48',
+            'Pod::Simple::BlackBox' => '3.48',
+            'Pod::Simple::Checker'  => '3.48',
+            'Pod::Simple::Debug'    => '3.48',
+            'Pod::Simple::DumpAsText'=> '3.48',
+            'Pod::Simple::DumpAsXML'=> '3.48',
+            'Pod::Simple::HTML'     => '3.48',
+            'Pod::Simple::HTMLBatch'=> '3.48',
+            'Pod::Simple::LinkSection'=> '3.48',
+            'Pod::Simple::Methody'  => '3.48',
+            'Pod::Simple::Progress' => '3.48',
+            'Pod::Simple::PullParser'=> '3.48',
+            'Pod::Simple::PullParserEndToken'=> '3.48',
+            'Pod::Simple::PullParserStartToken'=> '3.48',
+            'Pod::Simple::PullParserTextToken'=> '3.48',
+            'Pod::Simple::PullParserToken'=> '3.48',
+            'Pod::Simple::RTF'      => '3.48',
+            'Pod::Simple::Search'   => '3.48',
+            'Pod::Simple::SimpleTree'=> '3.48',
+            'Pod::Simple::Text'     => '3.48',
+            'Pod::Simple::TextContent'=> '3.48',
+            'Pod::Simple::TiedOutFH'=> '3.48',
+            'Pod::Simple::Transcode'=> '3.48',
+            'Pod::Simple::TranscodeDumb'=> '3.48',
+            'Pod::Simple::TranscodeSmart'=> '3.48',
+            'Pod::Simple::XHTML'    => '3.48',
+            'Pod::Simple::XMLOutStream'=> '3.48',
+            'version'               => '0.9934',
+            'version::regex'        => '0.9934',
+        },
+        removed => {
+        }
+    },
+    5.043011 => {
+        delta_from => 5.043010,
+        changed => {
+            'Archive::Tar'          => '3.10',
+            'Archive::Tar::Constant'=> '3.10',
+            'Archive::Tar::File'    => '3.10',
+            'B::Op_private'         => '5.043011',
+            'Compress::Zlib'        => '2.220',
+            'Config'                => '5.043011',
+            'Encode'                => '3.24',
+            'Errno'                 => '1.39',
+            'HTTP::Tiny'            => '0.094',
+            'IO::Compress'          => '2.220',
+            'IO::Compress::Adapter::Bzip2'=> '2.220',
+            'IO::Compress::Adapter::Deflate'=> '2.220',
+            'IO::Compress::Adapter::Identity'=> '2.220',
+            'IO::Compress::Base'    => '2.220',
+            'IO::Compress::Base::Common'=> '2.220',
+            'IO::Compress::Bzip2'   => '2.220',
+            'IO::Compress::Deflate' => '2.220',
+            'IO::Compress::Gzip'    => '2.220',
+            'IO::Compress::Gzip::Constants'=> '2.220',
+            'IO::Compress::RawDeflate'=> '2.220',
+            'IO::Compress::Zip'     => '2.220',
+            'IO::Compress::Zip::Constants'=> '2.220',
+            'IO::Compress::Zlib::Constants'=> '2.220',
+            'IO::Compress::Zlib::Extra'=> '2.220',
+            'IO::Socket::IP'        => '0.44',
+            'IO::Uncompress::Adapter::Bunzip2'=> '2.220',
+            'IO::Uncompress::Adapter::Identity'=> '2.220',
+            'IO::Uncompress::Adapter::Inflate'=> '2.220',
+            'IO::Uncompress::AnyInflate'=> '2.220',
+            'IO::Uncompress::AnyUncompress'=> '2.220',
+            'IO::Uncompress::Base'  => '2.220',
+            'IO::Uncompress::Bunzip2'=> '2.220',
+            'IO::Uncompress::Gunzip'=> '2.220',
+            'IO::Uncompress::Inflate'=> '2.220',
+            'IO::Uncompress::RawInflate'=> '2.220',
+            'IO::Uncompress::Unzip' => '2.220',
+            'Module::CoreList'      => '5.20260601',
+            'Module::CoreList::Utils'=> '5.20260601',
+            'SelfLoader'            => '1.29',
+            'Socket'                => '2.041',
+            'Storable'              => '3.41',
+            'XS::Typemap'           => '0.22',
+        },
+        removed => {
+        }
+    },
+    5.044000 => {
+        delta_from => 5.043011,
+        changed => {
+            'Archive::Tar'          => '3.12',
+            'Archive::Tar::Constant'=> '3.12',
+            'Archive::Tar::File'    => '3.12',
+            'B::Op_private'         => '5.044000',
+            'Compress::Zlib'        => '2.223',
+            'Config'                => '5.044',
+            'HTTP::Tiny'            => '0.096',
+            'IO::Compress'          => '2.223',
+            'IO::Compress::Adapter::Bzip2'=> '2.223',
+            'IO::Compress::Adapter::Deflate'=> '2.223',
+            'IO::Compress::Adapter::Identity'=> '2.223',
+            'IO::Compress::Base'    => '2.223',
+            'IO::Compress::Base::Common'=> '2.223',
+            'IO::Compress::Bzip2'   => '2.223',
+            'IO::Compress::Deflate' => '2.223',
+            'IO::Compress::Gzip'    => '2.223',
+            'IO::Compress::Gzip::Constants'=> '2.223',
+            'IO::Compress::RawDeflate'=> '2.223',
+            'IO::Compress::Zip'     => '2.223',
+            'IO::Compress::Zip::Constants'=> '2.223',
+            'IO::Compress::Zlib::Constants'=> '2.223',
+            'IO::Compress::Zlib::Extra'=> '2.223',
+            'IO::Uncompress::Adapter::Bunzip2'=> '2.223',
+            'IO::Uncompress::Adapter::Identity'=> '2.223',
+            'IO::Uncompress::Adapter::Inflate'=> '2.223',
+            'IO::Uncompress::AnyInflate'=> '2.223',
+            'IO::Uncompress::AnyUncompress'=> '2.223',
+            'IO::Uncompress::Base'  => '2.223',
+            'IO::Uncompress::Bunzip2'=> '2.223',
+            'IO::Uncompress::Gunzip'=> '2.223',
+            'IO::Uncompress::Inflate'=> '2.223',
+            'IO::Uncompress::RawInflate'=> '2.223',
+            'IO::Uncompress::Unzip' => '2.223',
+            'Module::CoreList'      => '5.20260708',
+            'Module::CoreList::Utils'=> '5.20260708',
+            'UNIVERSAL'             => '1.18',
         },
         removed => {
         }
@@ -26373,8 +26522,36 @@ sub is_core
         removed => {
         }
     },
+    5.040004 => {
+        delta_from => 5.040003,
+        changed => {
+        },
+        removed => {
+        }
+    },
     5.042002 => {
         delta_from => 5.042001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.043010 => {
+        delta_from => 5.043009,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.043011 => {
+        delta_from => 5.043010,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.044000 => {
+        delta_from => 5.043011,
         changed => {
         },
         removed => {
@@ -26791,6 +26968,7 @@ sub is_core
     'Test2::EventFacet::Trace'=> 'cpan',
     'Test2::Formatter'      => 'cpan',
     'Test2::Formatter::TAP' => 'cpan',
+    'Test2::Handle'         => 'cpan',
     'Test2::Hub'            => 'cpan',
     'Test2::Hub::Interceptor'=> 'cpan',
     'Test2::Hub::Interceptor::Terminator'=> 'cpan',
@@ -26887,6 +27065,9 @@ sub is_core
     'Test2::Util::Times'    => 'cpan',
     'Test2::Util::Trace'    => 'cpan',
     'Test2::V0'             => 'cpan',
+    'Test2::V1'             => 'cpan',
+    'Test2::V1::Base'       => 'cpan',
+    'Test2::V1::Handle'     => 'cpan',
     'Test2::Workflow'       => 'cpan',
     'Test2::Workflow::BlockBase'=> 'cpan',
     'Test2::Workflow::Build'=> 'cpan',
@@ -27354,6 +27535,7 @@ sub is_core
     'Test2::EventFacet::Trace'=> 'https://github.com/Test-More/test-more/issues',
     'Test2::Formatter'      => 'https://github.com/Test-More/test-more/issues',
     'Test2::Formatter::TAP' => 'https://github.com/Test-More/test-more/issues',
+    'Test2::Handle'         => 'https://github.com/Test-More/test-more/issues',
     'Test2::Hub'            => 'https://github.com/Test-More/test-more/issues',
     'Test2::Hub::Interceptor'=> 'https://github.com/Test-More/test-more/issues',
     'Test2::Hub::Interceptor::Terminator'=> 'https://github.com/Test-More/test-more/issues',
@@ -27450,6 +27632,9 @@ sub is_core
     'Test2::Util::Times'    => 'https://github.com/Test-More/test-more/issues',
     'Test2::Util::Trace'    => 'https://github.com/Test-More/test-more/issues',
     'Test2::V0'             => 'https://github.com/Test-More/test-more/issues',
+    'Test2::V1'             => 'https://github.com/Test-More/test-more/issues',
+    'Test2::V1::Base'       => 'https://github.com/Test-More/test-more/issues',
+    'Test2::V1::Handle'     => 'https://github.com/Test-More/test-more/issues',
     'Test2::Workflow'       => 'https://github.com/Test-More/test-more/issues',
     'Test2::Workflow::BlockBase'=> 'https://github.com/Test-More/test-more/issues',
     'Test2::Workflow::Build'=> 'https://github.com/Test-More/test-more/issues',

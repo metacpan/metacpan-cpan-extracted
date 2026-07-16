@@ -6,9 +6,6 @@ BEGIN {
     set_up_inc('../lib');
 }
 
-plan tests => 3;
-watchdog(10, $^O eq 'MSWin32' ? "alarm" : '');
-
 use Config;
 $| = 1;
 $SIG{PIPE} = 'IGNORE';
@@ -23,8 +20,26 @@ $killsig = 1 unless $Config{sig_name} =~ /\bHUP\b/;
 
 SKIP:
 {
+    skip("No list form of piped open on $^O", 2)
+        if $^O eq "VMS";
+    # github #4106
+    open my $saveout, ">&", \*STDOUT or die;
+    my $start = time();
+    open STDOUT, "|-", $perl, "-e", "sleep 2"
+        or die;
+    print STDOUT "Hi\n" for 1..2;
+    my $close_ok = close STDOUT;
+    open STDOUT, ">&", $saveout;
+    ok($close_ok, "close pipe to child success");
+    cmp_ok(time(), '>', $start, "close waited at least a bit");
+}
+
+watchdog(10, $^O eq 'MSWin32' ? "alarm" : '');
+
+SKIP:
+{
     skip("Not relevant to $^O", 3)
-      if $^O eq "MSWin32" || $^O eq "VMS";
+        if $^O eq "VMS";
     skip("only matters for waitpid or wait4", 3)
       unless $Config{d_waitpid} || $Config{d_wait4};
     # [perl #119893]
@@ -42,3 +57,7 @@ SKIP:
     kill $killsig, $pid;
     open STDIN, "<&", $savein;
 }
+
+watchdog(0);
+
+done_testing();

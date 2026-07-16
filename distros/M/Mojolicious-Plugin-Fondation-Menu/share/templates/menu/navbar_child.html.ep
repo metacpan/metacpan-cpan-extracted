@@ -1,0 +1,30 @@
+%# Navbar child - recursive dropdown submenu
+%# Stash: children => [$menu_hashref, ...], parent_id => $str (optional)
+
+% my $parent_id = stash('parent_id') // '';
+% my $aria = $parent_id ? qq{ aria-labelledby="$parent_id"} : '';
+
+<ul class="dropdown-menu submenu"<%= $aria %>>
+% my $children = stash('children') // [];
+% for my $child (@$children) {
+%   my $pass = $c->check_menu_condition($child->{condition});
+%   next unless $pass;
+%
+%   my $icon_html = '';
+%   if (defined $child->{icon} && length $child->{icon}) {
+%     my $color_attr = (defined $child->{icon_color} && length $child->{icon_color})
+%       ? qq{ style="color: $child->{icon_color}"} : '';
+%     $icon_html = qq{<i class="$child->{icon}"$color_attr></i> };
+%   }
+%   my $target = $child->{open_tab} ? ' target="_blank"' : '';
+
+  <li class="nav-item dropdown menu_navbar_child">
+%   if (@{$child->{children}}) {
+    <a class="nav-link dropdown-toggle" href="#" id="parent_<%= $child->{id} %>"<%= $target %> role="button" data-bs-toggle="dropdown" aria-expanded="false"><%== $icon_html %><%= l($child->{title}) %></a>
+%= include 'menu/navbar_child', children => $child->{children}, parent_id => "parent_$child->{id}"
+%   } else {
+    <a class="dropdown-item menu_navbar_child"<%= $target %> href="<%= $child->{link} %>"><%== $icon_html %><%= l($child->{title}) %></a>
+%   }
+  </li>
+% }
+</ul>

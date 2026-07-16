@@ -134,11 +134,7 @@ our $debug = $ENV{PERL_DEBUG_FULL_TEST} // 0;
 
 # Certain tests have been shown to be problematical for a few locales.  Don't
 # fail them unless at least this percentage of the tested locales fail.
-# EBCDIC os390 has more locales fail than normal, because it has locales that
-# move various critical characters like '['.
-my $acceptable_failure_percentage = ($os =~ / ^ ( os390 ) $ /x)
-                                    ? 10
-                                    : 5;
+my $acceptable_failure_percentage = 5;
 
 # The list of test numbers of the problematic tests.
 my %problematical_tests;
@@ -148,8 +144,12 @@ my %problematical_tests;
 my %known_bad_locales = (
                           irix => qr/ ^ (?: cs | hu | sk ) $/x,
                           darwin => qr/ ^ lt_LT.ISO8859 /ix,
-                          os390 => qr/ ^ italian /ix,
                           netbsd => qr/\bISO8859-2\b/i,
+
+                          # NBSP is considered graphical in this locale, and
+                          # not a \s.  Other IBM code pages have it be both,
+                          # and handy.h handles that case.
+                          os390 => qr/ IBM-924 /ix,
 
                           # This may be the same bug as the cygwin below; it's
                           # generating malformed UTF-8 on the radix being

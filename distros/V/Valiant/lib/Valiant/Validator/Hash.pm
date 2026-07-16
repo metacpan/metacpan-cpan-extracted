@@ -74,7 +74,7 @@ sub validate_each {
 
 =head1 NAME 
 
-Valiant::Validator::Hash - Verify a related object
+Valiant::Validator::Hash - Verify the values of a hashref
 
 =head1 SYNOPSIS
 
@@ -170,13 +170,13 @@ or custom validator classes.
 
 =head2 validator
 
-This contains an instance of L<Valiant::Class> or subclass. Default value
+This contains an instance of L<Valiant::Proxy::Hash> or subclass. Default value
 does the right thing but you can override if you need a special subclass
 or you need to pass one in that's already constructed.
 
 =head2 validator_class 
 
-Defaults to L<Valiant::Class>, which value should be a subclass of.  You probably
+Defaults to L<Valiant::Proxy::Hash>, which value should be a subclass of.  You probably
 only need this again if you are doing very custom validations.  You probably only
 want do to this if there's no other idea.
 
@@ -185,6 +185,12 @@ want do to this if there's no other idea.
 A hashref of args that get passed to the C<new> method of C<validator_class>.
 Defaults to an empty hashref.  You might need this if you build a custom validator
 class and have special arguments it needs.
+
+=head2 invalid_msg
+
+The message returned when the hash is generically invalid.  A hash becomes invalid
+should any validations you define on its values fail to validate.  Default is
+translation tag 'invalid'.
 
 =head1 SHORTCUT FORM
 

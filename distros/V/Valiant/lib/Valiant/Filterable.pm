@@ -203,7 +203,7 @@ around BUILDARGS => sub {
 
 =head1 NAME
 
-Valiant::Filters - Role that adds class and instance methods supporting field filters
+Valiant::Filterable - Role that adds class and instance methods supporting field filters
 
 =head1 SYNOPSIS
 
@@ -250,7 +250,16 @@ Valiant::Filters - Role that adds class and instance methods supporting field fi
 This is a role that adds class level filtering to you L<Moo> or L<Moose> classes.  Generally
 you may prefer to us L<Valiant::Filters> since that gives you a nice DSL for applying filters
 to your classes but if you have very special or custom needs (or you need to extend the filter
-API itself) you might need to use the role directly.  
+API itself) you might need to use the role directly.
+
+=head2 When filters run
+
+B<Filters run once, at object construction time> (during C<BUILDARGS>).  They
+transform the values passed to the constructor and nothing more.  They do
+B<not> re-run when you later assign to a C<rw> attribute, and they do B<not>
+run on ORM write paths such as L<DBIx::Class> C<update>/C<set_column>.  If you
+need a value coerced on every write, use a Moo/Moose attribute C<coerce> (or a
+type constraint) instead of, or in addition to, a filter.
 
 =head1 CLASS METHODS
 

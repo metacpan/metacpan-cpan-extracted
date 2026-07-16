@@ -3,33 +3,24 @@ use Test2::V0 -target => 'Test2::Plugin::Cover';
 use Path::Tiny qw/path/;
 use Fcntl qw/O_RDONLY/;
 
-skip_all 'disabled';
-
 $CLASS->reset_coverage;
 my $fh;
 
-print STDERR "\nDEBUG A\n";
-STDERR->flush();
 sysopen($fh, 'fff.json', O_RDONLY);
 close($fh);
 
-print STDERR "\nDEBUG B\n";
-STDERR->flush();
 sysopen($fh, 'ggg.json', O_RDONLY, 0);
 close($fh);
 
-print STDERR "\nDEBUG C\n";
-STDERR->flush();
 sysopen($fh, 'hhh.json', O_RDONLY);
 close($fh);
 
-print STDERR "\nDEBUG D\n";
-STDERR->flush();
 sysopen($fh, 'iii.json', O_RDONLY);
 close($fh);
 
-print STDERR "\nDEBUG E\n";
-STDERR->flush();
+# sysopen nested inside other stack activity, this used to read unrelated
+# stack slots (and could segv) when the handler assumed a mark was pushed.
+my @list = ('AAA', 'BBB', do { sysopen($fh, 'jjj.json', O_RDONLY); close($fh); 'CCC' });
 
 like(
     $CLASS->files(root => path('.')),
@@ -38,6 +29,7 @@ like(
         item('ggg.json');
         item('hhh.json');
         item('iii.json');
+        item('jjj.json');
     },
     "Got files we (tried to) open"
 );

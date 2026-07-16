@@ -155,9 +155,32 @@ $r = runperl(
 );
 is( $r, '21-', '-s switch parsing' );
 
+# GH #23377: -s and -CA
+SKIP: {
+    skip 'these UTF-8 switch tests assume ASCII-like environment', 2
+        unless $::IS_ASCII;
+
+    $r = runperl(
+        switches => [ '-C0', '-s' ],
+        prog     => 'printf q(%vx;), $_ for ${qq(\xC5\xB8)}, ${qq(\x{178})}, ${qq(\xC3\xA1)}, ${qq(\xE1)}',
+        args     => [ '--', "-\xC5\xB8", "-\xC3\xA1=\xE2\x82\xAC" ],
+    );
+
+    is( $r, '31;;e2.82.ac;;', '-s bytes in switches are preserved without -CA' );
+
+    $r = runperl(
+        switches => [ '-CA', '-s' ],
+        prog     => 'printf q(%vx;), $_ for ${qq(\xC5\xB8)}, ${qq(\x{178})}, ${qq(\xC3\xA1)}, ${qq(\xE1)}',
+        args     => [ '--', "-\xC5\xB8", "-\xC3\xA1=\xE2\x82\xAC" ],
+    );
+
+    is( $r, ';31;;20ac;', '-s bytes in switches are utf8-decoded with -CA' );
+}
+
+# Bug ID 20011106.084 (RT #7876 / GH #4554): -s on shebang line
 $filename = tempfile();
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", $filename or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -s
 BEGIN { print $x,$y; exit }
@@ -170,10 +193,9 @@ SWTEST
     is( $r, 'foo1', '-s on the shebang line' );
 }
 
-# Bug ID 20011106.084 (#7876)
 $filename = tempfile();
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", $filename or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -sn
 BEGIN { print $x; exit }

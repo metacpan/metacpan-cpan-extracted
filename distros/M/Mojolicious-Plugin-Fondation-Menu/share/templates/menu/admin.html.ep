@@ -1,0 +1,67 @@
+%# Admin — treeview listing all menus (editable via modal)
+%# This template extends the main layout and renders the menu admin page.
+
+% layout (stash('layout') // 'main');
+
+<div class="container mt-4">
+
+  <div class="row">
+    <div class="titre_page">
+      <center><h4><%= l('Menu list') %></h4></center>
+    </div>
+  </div>
+
+  <div id="panel-menu" class="card">
+    <div class="card-header d-flex justify-content-between"><%= l('Menus') %>
+      <span id="menuAddMenu" class="fa fa-2x fa-plus" title="<%= l('Add a menu') %>" data-bs-toggle="modal" data-bs-target="#menu-modal"></span>
+    </div>
+
+    <div class="card-body">
+      <ul id="dragRoot">
+% my $menus_cache  = $c->menus;
+% my $menus_by_name = $menus_cache ? $menus_cache->{_by_name} : undef;
+
+% if ($menus_by_name) {
+%   for my $name (sort keys %$menus_by_name) {
+%     my $menus = $menus_by_name->{$name};
+%     for my $menu (@$menus) {
+%       my $icon_html = '';
+%       if (defined $menu->{icon} && length $menu->{icon}) {
+%         my $color_attr = (defined $menu->{icon_color} && length $menu->{icon_color})
+%           ? qq{ style="color: $menu->{icon_color}"} : '';
+%         $icon_html = qq{<i class="$menu->{icon}"$color_attr></i> };
+%       }
+
+%       my $title_esc = $menu->{title};
+%       $title_esc =~ s/'/\\'/g;
+
+%       my $buttons = qq{<i class="fas fa-plus" onclick="add_child_menu($menu->{id},'$menu->{name}')"></i>&nbsp;};
+%       $buttons   .= qq{<i class="far fa-edit" onclick="edit_child_menu($menu->{parent_id},'$menu->{name}',$menu->{id})"></i>&nbsp;};
+%       $buttons   .= qq{<i class="far fa-trash-alt" onclick="delete_child_menu($menu->{id},'$title_esc')"></i>};
+
+%       my $target = $menu->{open_tab} ? ' target="_blank"' : '';
+
+%       if (@{$menu->{children}}) {
+        <li class="nav-item dropdown">
+          <span class="node-facility"><a class="" href="#" id="parent_<%= $menu->{id} %>"<%= $target %> role="button"><%== $icon_html %><%= $menu->{title} %></a> <%== $buttons %></span>
+%= include 'menu/admin_child', children => $menu->{children}, parent_id => "parent_$menu->{id}"
+        </li>
+%       } else {
+        <li class="">
+          <span class="node-facility"><a class=""<%= $target %> href="<%= $menu->{link} %>"><%== $icon_html %><%= $menu->{title} %></a> <%== $buttons %></span>
+        </li>
+%       }
+%     }
+%   }
+% }
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+%# Modal for add/edit
+%= include 'menu/modal'
+
+%# Menu JS
+<script src="/js/menu.js"></script>

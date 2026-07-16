@@ -1,0 +1,9 @@
+{
+  "Permission management": "Gestion des permissions",
+  "Permission created": "Permission créée",
+  "Permission '%s' has been created.": "Permission '%s' a été créée.",
+  "Permission updated": "Permission mise à jour",
+  "Permission '%s' has been updated.": "Permission '%s' a été mise à jour.",
+  "Permission deleted": "Permission supprimée",
+  "Permission '%s' has been deleted.": "Permission '%s' a été supprimée."
+}

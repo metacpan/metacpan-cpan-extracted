@@ -21,8 +21,8 @@
         negative_integer_err => 'must be a negative integer',
         positive_err => 'must be a positive number',
         negative_err => 'must be a negative number',
-        pg_serial => 'is not in acceptable value range',
-        pg_bigserial => 'is not in acceptable value range',
+        pg_serial_err => 'is not in acceptable value range',
+        pg_bigserial_err => 'is not in acceptable value range',
         # length
         too_short => {
           one => 'is too short (minimum is 1 character)',
@@ -68,6 +68,8 @@
         #boolean
         is_not_true => 'must be a true value',
         is_not_false => 'must be a false value',
+        #acceptance
+        accepted => 'must be accepted',
         #unique
         is_not_unique => 'chosen is not unique',
         #date

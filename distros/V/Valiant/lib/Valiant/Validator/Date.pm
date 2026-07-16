@@ -180,8 +180,8 @@ Valiant::Validator::Date - Verify that a value is is a standard Date (YYY-MM-DD)
 
     $VAR1 = {
       'birthday' => [
-         'chosen date can't be above {{max}}',  # In real life {{max}} would be
-                                                # interpolated as DateTime->now
+         'chosen date can't be later than {{max}}',  # In real life {{max}} would be
+                                                     # interpolated as DateTime->now
       ]
     };
 
@@ -192,7 +192,7 @@ which is commonly used in databases as a Date field and its also the canonical
 pattern for the HTML5 input date type.  
 
 Can accept a 'min' and 'max' attribute, which should be either a string in the 
-standard form or a M<DateTime> object.
+standard form or a L<DateTime> object.
 
 If you are using the Form helpers the max and min attributes can be reflected into
 the date input type automatically.
@@ -255,6 +255,14 @@ If provided set an upper limit on the allowed date.  Either a string in YYYY-MM-
 format or a L<DateTime> object.  The date must be less than or equal to this value.
 
 Value may also be a coderef so that you can set dynamic dates (such as always today)
+
+The coderef receives the object being validated as its first argument (and the
+validator instance as its second, giving access to the date L</HELPERS>), so you
+can also compare against another attribute:
+
+    validates end_date => (
+      date => { min => sub { shift->start_date } },
+    );
 
 =head2 cb
 
@@ -379,14 +387,24 @@ Which is the same as:
 Lastly you can specify that the date must be either future or past with a shortcut:
 
     validates attribute => ( date => 'is_future', ... );
+
+Which is the same as:
+
+    validates attribute => (
+      date => +{
+        min => sub { pop->now },
+      },
+    );
+
+And:
+
     validates attribute => ( date => 'is_past', ... );
 
 Which is the same as:
 
     validates attribute => (
       date => +{
-        min => sub { pop->is_future },
-        max => sub { pop->is_past }
+        max => sub { pop->now },
       },
     );
 

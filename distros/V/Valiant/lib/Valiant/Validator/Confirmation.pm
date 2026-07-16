@@ -86,8 +86,8 @@ their password to the same value).
 
 The error message (if any) will appear associated with the confirmation attribute.
 Error message uses tag C<confirmation> and you can override that with an init arg
-of the same name.  You can also change the prefix used to identify the confirming
-attribute with the C<prefix> init arg (default value is '_confirmation').
+of the same name.  You can also change the suffix used to identify the confirming
+attribute with the C<suffix> init arg (default value is '_confirmation').
 
 B<NOTE:> You don't need to add the confirmation attribute, we inject it for you during 
 validation setup.
@@ -104,7 +104,16 @@ Which is the same as:
       confirmation => +{},
     );
 
-Not a lot of saved typing but it seems to read better.
+Not a lot of saved typing but it seems to read better.  You can also pass a string
+to set the suffix:
+
+    validates attribute => ( confirmation => '_check', ... );
+
+Which is the same as:
+
+    validates attribute => (
+      confirmation => +{ suffix => '_check' },
+    );
  
 =head1 GLOBAL PARAMETERS
 

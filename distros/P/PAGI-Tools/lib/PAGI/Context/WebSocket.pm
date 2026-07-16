@@ -1,7 +1,9 @@
 package PAGI::Context::WebSocket;
-$PAGI::Context::WebSocket::VERSION = '0.002001';
+$PAGI::Context::WebSocket::VERSION = '0.002002';
 use strict;
 use warnings;
+use Carp qw(croak);
+use Future::AsyncAwait;
 
 our @ISA = ('PAGI::Context');
 
@@ -17,10 +19,29 @@ sub websocket {
 
 sub ws { shift->websocket }
 
+# Override of PAGI::Context's no-op hook: when $ctx->run's terminal branch
+# consumes websocket.disconnect directly off $receive, sync the underlying
+# PAGI::WebSocket's close state and fire its on_close callbacks too, so
+# is_closed/is_connected/on_close stay truthful regardless of which API
+# (Context dispatcher or the object itself) observed the disconnect.
+async sub _sync_terminal_disconnect {
+    my ($self, $code, $reason) = @_;
+
+    # Only if the underlying object was actually lazily instantiated, so a
+    # pure-dispatcher context that never touched ->ws pays nothing.
+    return unless exists $self->{_websocket};
+    await $self->{_websocket}->_note_disconnected($code, $reason);
+}
+
+# on_close() is PAGI::WebSocket-specific (see "Methods NOT delegated" below).
+sub on_close { croak "on_close() is on the underlying object: call \$c->websocket->on_close(...)" }
+
 # ── Connection lifecycle ─────────────────────────────────────────────
 
 sub accept   { shift->ws->accept(@_) }
 sub close    { shift->ws->close(@_) }
+sub deny     { shift->ws->deny(@_) }
+sub supports_denial_response { shift->ws->supports_denial_response(@_) }
 
 # ── Send methods ─────────────────────────────────────────────────────
 
@@ -169,9 +190,15 @@ C<message>, C<close>, C<error>.
 =item C<on_error()> — On C<$ctx>, callbacks receive C<($ctx, $error,
 $source)>.  On L<PAGI::WebSocket>, they receive C<($error)>.
 
-=item C<on_close()>, C<on_message()> — L<PAGI::WebSocket>-specific
-callback registration.  Use C<< $ctx->on('websocket.disconnect', ...) >>
-and C<< $ctx->on('websocket.receive', ...) >> instead.
+=item C<on_close()> — L<PAGI::WebSocket>-specific callback registration.
+Calling C<< $ctx->on_close(...) >> croaks with a pointer to
+C<< $ctx->websocket->on_close(...) >>. Use
+C<< $ctx->on('websocket.disconnect', ...) >> for the Context-level
+dispatcher equivalent — both fire on a terminal disconnect seen via
+C<< $ctx->run >>.
+
+=item C<on_message()> — L<PAGI::WebSocket>-specific callback
+registration.  Use C<< $ctx->on('websocket.receive', ...) >> instead.
 
 =item C<run()> — On C<$ctx>, this is the generic event dispatch loop
 (L<PAGI::Context/run>).  On L<PAGI::WebSocket>, it only dispatches
@@ -201,6 +228,24 @@ additional response headers.
 
 Closes the connection.  Default code is 1000 (normal closure).
 Idempotent — calling multiple times only sends close once.
+
+=head2 supports_denial_response
+
+    if ($ctx->supports_denial_response) { ... }
+
+Returns true (1) if the server advertised the C<websocket.http.response>
+extension on the WebSocket scope, false (0) otherwise.
+
+=head2 deny
+
+    await $ctx->deny(status => 401);
+    await $ctx->deny(status => 401, headers => [['www-authenticate', 'Bearer']], body => '{"error":"unauthorized"}');
+
+Rejects the WebSocket handshake with a custom HTTP response instead of the
+bare C<403 Forbidden>.  Valid only before C<accept>.  Marks the connection
+closed on return.  Falls back to a plain C<close> when the server does not
+advertise the C<websocket.http.response> extension.  See
+L<PAGI::WebSocket/deny> for the full option list.
 
 =head1 SEND METHODS
 

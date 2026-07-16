@@ -59,7 +59,7 @@ around BUILDARGS => sub {
 
 sub form_action { shift->options->{html}{action} }
 sub form_method { shift->options->{html}{method} }
-sub form_enctype { shift->options->{html}{method} }
+sub form_enctype { shift->options->{html}{enctype} }
 sub csrf_token { shift->options->{html}{data}{csrf_token} }
 sub containing_view { shift->options->{view} }
 
@@ -253,7 +253,6 @@ sub _default_model_errors_content {
     my (@errors) = @_;
     if( scalar(@errors) == 1 ) {
       return $self->tag_helpers->content_tag('div', $errors[0], $options);
-       return $self->tag_helpers->content_tag('div', $errors[0], $options);
     } else {
        return $self->tag_helpers->content_tag('ol', $options, sub { map { $self->tag_helpers->content_tag('li', $_) } @errors });
     }
@@ -1324,9 +1323,9 @@ Wrap a formbuilder object around it and generate HTML form field controls:
     # <div>First Name is too short (minimum is 3 characters)</div> 
 
 Although you can create a formbuilder instance directly as in the above example you might
-find it easier to use the export helper method L<Valiant::HTML::Form/form_for> which encapsulates
+find it easier to use the helper method L<Valiant::HTML::Util::Form/form_for> which encapsulates
 the display logic needed for creating the C<form> tags.  This builder creates form tag elements
-but not the actual C<form> open and close tags.  
+but not the actual C<form> open and close tags.
 
 =head1 DESCRIPTION
 
@@ -1342,7 +1341,7 @@ you'll need to review the source, test cases and example application bundled wit
 for for hand holding.
 
 Currently this is designed to work mostly with the L<Valiant> model validation framework as well as the
-glue for L<DBIx:Class>, L<DBIx:Class::Valiant>, although I did take pains to try and make the API
+glue for L<DBIx::Class>, L<DBIx::Class::Valiant>, although I did take pains to try and make the API
 agnostic many of the test cases are assuming that stack and getting that integration working well is
 the primary use case for me.  Thoughts and code to make this more stand alone are very welcomed.
 
@@ -1353,11 +1352,11 @@ This class defines the following attributes used in creating an instance.
 =head2 model
 
 This is the data model that the formbuilder inspects for field state and error conditions.   This should be
-a model that does the API described here: L<Valiant::HTML::Form/'REQUIRED MODEL API'>. Required but the API
+a model that does the API described here: L<Valiant::HTML::Util::Form/"REQUIRED MODEL API">. Required but the API
 is pretty flexible (see docs).
 
 Please note that my initial use case for this is using L<Valiant> for validation and L<DBIx::Class> as the
-model (via L<DBIx:Class::Valiant>) so that combination has the most testing and examples.   If you are using
+model (via L<DBIx::Class::Valiant>) so that combination has the most testing and examples.   If you are using
 a different storage or validation setup you need to complete the API described.  Please send test cases
 and pull requests to improve interoperability!
 
@@ -1418,6 +1417,9 @@ on a convention which includes the model name, index and method name.  Setting t
 to true prevents that so you should set C<id> manually unless you don't want them.
 Please note that even if this is false, you can always override the C<id> on a per
 field basis by setting it manually.
+
+B<NOTE> This is a constructor option only; no accessor of this name is provided on
+the builder.
 
 =head2 view
 
@@ -1522,6 +1524,25 @@ name that strictly isn't a method on the model.  This is useful if you want to c
 that doesn't correspond to a model attribute but still respects the current namespace and index.
 
 You can pass this via the options hashref for most tag generating methods.
+
+=head2 tag_id_for_attribute
+
+    $fb->tag_id_for_attribute('name');
+
+Given an attribute, returns the html C<id> attribute value that the builder would
+generate for that attribute's form control, respecting the current namespace and
+index.  Useful when writing custom fields or when you need to reference a control
+from labels or javascript.
+
+=head2 tag_name_for_attribute
+
+    $fb->tag_name_for_attribute('name');
+    $fb->tag_name_for_attribute('name', +{multiple=>1});
+
+Given an attribute, returns the html C<name> attribute value that the builder would
+generate for that attribute's form control, respecting the current namespace and
+index.  Pass C<< multiple=>1 >> in the options hashref for controls that submit
+multiple values (the name gets C<[]> appended).
 
 =head2 form_action_for
 
@@ -2150,32 +2171,53 @@ $attribute.  Allows you to pass some additional HTML attributes to the legend ta
     $fb->legend_for('status', {class=>'foo'})
     # <legend id="status_legend" class="foo" >Status</legend>
 
+=head2 field
+
+B<EXPERIMENTAL / prototype>: C<field> and the
+C<Valiant::HTML::FormBuilder::Proxy> it returns are a prototype API that may
+change or be removed in a future release.
+
+Returns a proxy scoped to a single attribute, giving a fluent way to build that
+field's controls.  Any FormBuilder method called on the proxy is delegated to
+the builder with the attribute supplied automatically, and the accumulated
+parts stringify to the concatenated markup:
+
+    $fb->field('name')->label->input;
+
+A coderef form is also supported; it receives the proxy:
+
+    $fb->field('name', sub {
+      my $f = shift;
+      $f->label;
+      $f->input;
+    });
+
 =head2 fields_for
 
     $fb->fields_for($attribute, sub {
-      my ($nested_fb, $model) = @_;
+      my ($view, $nested_fb, $model) = @_;
     });
 
     $fb->fields_for($attribute, \%options, sub {
-      my ($nested_fb, $model) = @_;
+      my ($view, $nested_fb, $model) = @_;
     });
 
     # With a 'finally' block when $attribute is a collection
 
     $fb->fields_for($attribute, sub {
-      my ($nested_fb, $model) = @_;
+      my ($view, $nested_fb, $model) = @_;
     }, sub {
-      my ($nested_fb, $new_model) = @_;
+      my ($view, $nested_fb, $new_model) = @_;
     });
 
 Where C<$attribute> is a string that refers to a nested object or collection of objects on the model
 OR its an object or collection of objects itself.
 
 Used to create sub form builders under the current one for nested models (either a collection of models
-or a single model.)  This sub form builder will be passed as the first argument to the enclosing subref
-and will encapsulate any indexing or namespacing; its model will be set to the sub model.   You also get
-a second argument which is the sub model for ease of access.  Note that if the $attribute refers to a collection
-then $model will be set to the current item model of that collection.
+or a single model.)  The enclosing subref receives three arguments: the current view (first), a sub form
+builder (second) which will encapsulate any indexing or namespacing and whose model will be set to the
+sub model, and the sub model itself (third) for ease of access.  Note that if the $attribute refers to a
+collection then $model will be set to the current item model of that collection.
 
 When the $attribute refers to a collection the collection object must provide a C<next> method which should
 iterate thru the collection in the order desired and return C<undef> to indicate all records have been rolled
@@ -2240,6 +2282,7 @@ Example of an attribute that refers to a nested object.
     $person->profile(Local::Profile->new(zip=>'78621', address=>'ab'));
 
     $fb->fields_for('profile', sub {
+      my $view = shift;
       my $fb_profile = shift;
       return  $fb_profile->input('address'),
               $fb_profile->errors_for('address'),
@@ -2259,11 +2302,13 @@ Example of an attribute that refers to a nested collection object (and with a "f
     ]);
 
     $fb->fields_for('credit_cards', sub {
+      my $view = shift;
       my $fb_cc = shift;
       return  $fb_cc->input('number'),
               $fb_cc->date_field('expiration'),
               $fb_cc->errors_for('expiration');
     }, sub {
+      my $view = shift;
       my $fb_finally = shift;
       return  $fb_finally->button('add', +{value=>1}, 'Add a New Credit Card');
     });
@@ -2602,7 +2647,7 @@ using the C<container_tag> option.  For example:
 Here's all the values for the '%options' argument.  Any options that are not one of these will be passed to 
 the container tag as html attributes:
 
-=over4
+=over 4
 
 =item checked_value
 
@@ -2664,52 +2709,6 @@ the form builder when needed.  However you might find you need tricky placement 
 (for example some tricky CSS) and in that case you can call this method manually in fields that allow
 you to disable the automatic placement of the hidden fields (for example in C<fields_for>, you can set 
 the C<include_id> option to false and then call this method manually).
-
-=head1 REMOTE FORMS
-
-Remote forms are forms that submit via AJAX.  They are a bit more complex than regular forms because
-they need to handle the AJAX response and update the DOM.  The form builder has some support for
-remote forms but you will need to write some javascript to handle the response.  Here's an example
-
-    $fb->remote_form_for(sub {
-      my $fb = shift;
-      return $fb->input('name'),
-             $fb->submit('Save');
-    }, +{url=>'/person', method=>'POST', remote=>1, success=>'alert("Saved")'});
-
-See L<https://github.com/rails/jquery-ujs> for more information on how to handle the response.
-You can also look at the example application for more examples of how this works.
-
-When adding C<remote=1> to the options hashref we will automatically add the following attributes
-to the form tag:
-
-=over 4
-
-=item data-replace
-
-The ID of the element to replace with the response.  If not provided we will replace the form itself.
-
-=back
-
-B<NOTE> Remote support is evolving and may change in the future.  Please see the release notes for
-changes.  I consider this a beta feature and will break compatibility if needed to fix bugs.  Its
-also possible remote support might be moved to a separate module in the future.
-
-=head1 HELPERS
-
-The following methods don't make form controls but just useful methods to help you build your form.
-
-=head2 escape_javascript
-
-    $fb->escape_javascript($string);
-
-Escapes a string so it can be used in a javascript string.  This is a wrapper around
-The same method from L<Valiant::HTML::Util::TagBuilder/escape_javascript>.
-
-Basically this escapes ' and " and \ and newlines and a few other neaten up so that you can
-use a string as a javascript value.   Helps with injection attackes (but isn't everything
-you need).
-
 
 =head1 THEMING
 

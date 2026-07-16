@@ -1,4 +1,4 @@
-package App::sshca v0.0.7;
+package App::sshca v0.0.8;
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ sshca - A minimal SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.7
+version 0.0.8
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,10 @@ Available options:
 
 Used to override the initial serial number (defaults to 1)
 
+=item * C<< --upgrade >>
+
+Upgrade a previously created certificate store.
+
 =back
 
 =head2 issue
@@ -93,7 +97,7 @@ as the more general concept of tags.
 
 =head2 renew
 
-  sshca [global-options] renew <identifier>
+  sshca [global-options] renew [options] <identifier>
 
 Issues a new certificate using the input data that was provided to generate the
 certificate with serial number C<identifier>, except for the validity period.
@@ -115,7 +119,12 @@ certificate serial number.
 interpreted as a public key finger print; in case multiple certificates have been
 issued for this public key the last issued certificate is renewed.
 
-=item * (planned) C<--identity> indicates the identifier argument is to be
+B<Note>: this is a property of the I<public key>, not the certificate. This
+contrasts the other two options which are certificate properties. There can
+be reasons (e.g. different principals) to have multiple valid certificate
+for the same public key.
+
+=item * C<--identity> indicates the identifier argument is to be
 interpreted as a certificate identity; in case multiple certificates have been
 issued for this identity the last issued certificate is renewed.
 

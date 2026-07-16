@@ -21,19 +21,28 @@ no warnings 'experimental::class';
     is($obj->retself, $obj, '$self inside method');
 }
 
-# methods have signatures; signatures do not capture $self
+# methods have signatures
 {
     # Turn off the 'signatures' feature to prove that 'method' is always
     # signatured even without it
     no feature 'signatures';
+    no warnings 'experimental::signature_named_parameters';
 
     class Testcase2 {
         method retfirst ( $x = 123 ) { return $x; }
+        method retnamed ( :$named = 456 ) { return $named; }
     }
 
     my $obj = Testcase2->new;
     is($obj->retfirst,      123, 'method signature params work');
     is($obj->retfirst(456), 456, 'method signature params skip $self');
+
+    is($obj->retnamed(named => 789), 789, 'method signature supports named parameters');
+
+    # argument counts take account of implicit $self
+    my $e = eval { $obj->retfirst(1, 2) } ? undef : $@;
+    like($e, qr/^Too many arguments for subroutine 'Testcase2::retfirst' \(got 3; expected at most 2\) /,
+        'method signature fails with too many arguments');
 }
 
 # methods can still capture regular package lexicals
@@ -152,6 +161,31 @@ no warnings 'experimental::class';
 
     like(Testcase9->new->test, qr/^X is 123 and Y is 456 for Testcase9=OBJECT\(0x.*\)$/,
         'lexical method with signature counts $self correctly');
+}
+
+{ # came up during GH #24187 review
+    # https://github.com/Perl/perl5/pull/24187#discussion_r2814795858
+    fresh_perl_is(<<'CODE', "OK", {}, "clear the right SV");
+use feature 'class', 'refaliasing';
+no warnings 'experimental::class';
+no warnings 'experimental::refaliasing';
+
+class TestCase10 {
+    field %x : reader;
+    method magic {
+        # this doesn't modify the field itself, just the
+        # lexical slot in the method's pad
+        \%x = \%ENV;
+        $self;
+    }
+}
+
+my $c = TestCase10->new;
+$c->magic;
+# the reference to $x would crash/assert
+$c->x;
+print "OK\n";
+CODE
 }
 
 done_testing;

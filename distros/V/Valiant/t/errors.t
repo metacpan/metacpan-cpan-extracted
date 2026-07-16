@@ -1,4 +1,5 @@
 use Test::Most;
+use Valiant::I18N;
 
 {
   package Local::Object::User;
@@ -108,6 +109,11 @@ is_deeply +{ $user1->errors->to_hash }, +{
 
 ok $user2->errors->of_kind('test01', "Is Invalid");
 ok ! $user2->errors->of_kind('test0x', "Is Invalid");
+
+ok $user2->errors->of_kind('test01', _t('invalid')),
+  'of_kind matches a tag-typed error while ignoring its stored options';
+ok $user2->errors->added('test01', _t('invalid')),
+  'added matches a tag-typed error while ignoring its stored options';
 
 is_deeply [$user2->errors->full_messages], [
     "test01 another test error1",
@@ -291,11 +297,57 @@ is_deeply [$errors->errors->full_attribute_messages], [
   "Name has wrong value",
 ];
 
+my ($imported) = ($errors->errors->errors->all)[-1];
+is $imported->raw_type, 'is always in error!',
+  'import_error preserves the original error type instead of defaulting to invalid';
+
 my @results = map { $_->full_message } $errors->errors->where('name');
 is_deeply \@results, [
   "Name is too short",
   "Name has disallowed characters",
   "Name has wrong value",
 ];
+
+{
+  package Local::Uniq;
+
+  use Moo;
+  use Valiant::Validations;
+
+  has name => (is=>'ro');
+}
+
+{
+  # uniq() returns a flat list of errors with duplicates removed (per Error::equals)
+  my $u = Local::Uniq->new;
+  $u->errors->add(name => 'is too short', +{count=>3});
+  $u->errors->add(name => 'is too short', +{count=>3});   # exact duplicate
+  $u->errors->add(name => 'is invalid');
+
+  is scalar($u->errors->errors->all), 3, 'three raw errors';
+
+  my @uniq = $u->errors->uniq;
+  is scalar(@uniq), 2, 'uniq collapses the exact duplicate';
+  is_deeply [ map { $_->full_message } @uniq ], [
+    'Name is too short',
+    'Name is invalid',
+  ], 'uniq keeps the first of each distinct error';
+}
+
+{
+  # details() groups Error->detail hashes by attribute, like to_hash does
+  my $d = Local::Uniq->new;
+  $d->errors->add(undef, 'Form is invalid');
+  $d->errors->add(name => 'is too short', +{ count => 3 });
+  $d->errors->add(name => 'is invalid');
+
+  is_deeply +{ $d->errors->details }, {
+    '*'  => [ { error => 'Form is invalid' } ],
+    name => [
+      { error => 'is too short', count => 3 },
+      { error => 'is invalid' },
+    ],
+  };
+}
 
 done_testing;

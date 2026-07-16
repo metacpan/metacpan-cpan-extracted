@@ -1,5 +1,5 @@
 package PAGI::Test::SSE;
-$PAGI::Test::SSE::VERSION = '0.002001';
+$PAGI::Test::SSE::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

@@ -38,6 +38,11 @@
 #include <math.h>
 #include <stdlib.h>
 
+/* For get_entropy() on non-Linux systems (MacOS, Android) we need sys/random.h */
+#ifdef I_SYS_RANDOM
+#include <sys/random.h>
+#endif
+
 #ifdef __Lynx__
 /* Missing protos on LynxOS */
 int putenv(char *);
@@ -149,6 +154,8 @@ Paranoid version of system's malloc()
 Malloc_t
 Perl_safesysmalloc(MEM_SIZE size)
 {
+    PERL_ARGS_ASSERT_SAFESYSMALLOC;
+
 #ifdef ALWAYS_NEED_THX
     dTHX;
 #endif
@@ -238,6 +245,8 @@ Paranoid version of system's realloc()
 Malloc_t
 Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
 {
+    PERL_ARGS_ASSERT_SAFESYSREALLOC;
+
 #ifdef ALWAYS_NEED_THX
     dTHX;
 #endif
@@ -374,6 +383,8 @@ Safe version of system's free()
 Free_t
 Perl_safesysfree(Malloc_t where)
 {
+    PERL_ARGS_ASSERT_SAFESYSFREE;
+
 #ifdef ALWAYS_NEED_THX
     dTHX;
 #endif
@@ -445,6 +456,8 @@ Safe version of system's calloc()
 Malloc_t
 Perl_safesyscalloc(MEM_SIZE count, MEM_SIZE size)
 {
+    PERL_ARGS_ASSERT_SAFESYSCALLOC;
+
 #ifdef ALWAYS_NEED_THX
     dTHX;
 #endif
@@ -612,15 +625,12 @@ Perl_delimcpy_no_escape(char *to, const char *to_end,
                         const char *from, const char *from_end,
                         const int delim, I32 *retlen)
 {
+    PERL_ARGS_ASSERT_DELIMCPY_NO_ESCAPE;
+
     const char * delim_pos;
     ptrdiff_t from_len = from_end - from;
     ptrdiff_t to_len = to_end - to;
     SSize_t copy_len;
-
-    PERL_ARGS_ASSERT_DELIMCPY_NO_ESCAPE;
-
-    assert(from_len >= 0);
-    assert(to_len >= 0);
 
     /* Look for the first delimiter in the source */
     delim_pos = (const char *) memchr(from, delim, from_len);
@@ -654,7 +664,7 @@ Perl_delimcpy_no_escape(char *to, const char *to_end,
 Copy a source buffer to a destination buffer, stopping at (but not including)
 the first occurrence in the source of an unescaped (defined below) delimiter
 byte, C<delim>.  The source is the bytes between S<C<from> and C<from_end> -
-1>.  Similarly, the dest is C<to> up to C<to_end>.
+1> inclusive.  Similarly, the dest is C<to> up through C<to_end>.
 
 The number of bytes copied is written to C<*retlen>.
 
@@ -717,13 +727,11 @@ Perl_delimcpy(char *to, const char *to_end,
               const char *from, const char *from_end,
               const int delim, I32 *retlen)
 {
+    PERL_ARGS_ASSERT_DELIMCPY;
+
     const char * const orig_to = to;
     ptrdiff_t copy_len = 0;
     bool stopped_early = FALSE;     /* Ran out of room to copy to */
-
-    PERL_ARGS_ASSERT_DELIMCPY;
-    assert(from_end >= from);
-    assert(to_end >= to);
 
     /* Don't use the loop for the trivial case of the first character being the
      * delimiter; otherwise would have to worry inside the loop about backing
@@ -766,7 +774,7 @@ Perl_delimcpy(char *to, const char *to_end,
             /* If the number of backslashes is even, they just escape one
              * another, leaving the delimiter unescaped, and stopping the copy.
              * */
-            if (! ((delim_pos - (backslash_pos + 1)) & 1)) {
+            if (isEVEN(delim_pos - (backslash_pos + 1))) {
                 copy_len = delim_pos - from;  /* even, copy up to delimiter */
                 break;
             }
@@ -896,10 +904,10 @@ such occurrence.
 char *
 Perl_rninstr(const char *big, const char *bigend, const char *little, const char *lend)
 {
+    PERL_ARGS_ASSERT_RNINSTR;
+
     const ptrdiff_t little_len = lend - little;
     const ptrdiff_t big_len = bigend - big;
-
-    PERL_ARGS_ASSERT_RNINSTR;
 
     /* A non-existent needle trivially matches the rightmost possible position
      * in the haystack */
@@ -1006,12 +1014,12 @@ Analyzes the string in order to make fast searches on it using C<fbm_instr()>
 void
 Perl_fbm_compile(pTHX_ SV *sv, U32 flags)
 {
+    PERL_ARGS_ASSERT_FBM_COMPILE;
+
     const U8 *s;
     STRLEN i;
     STRLEN len;
     MAGIC *mg;
-
-    PERL_ARGS_ASSERT_FBM_COMPILE;
 
     if (isGV_with_GP(sv) || SvROK(sv))
         return;
@@ -1099,6 +1107,8 @@ a littlestr of "ab\n", SvTAIL matches as:
 char *
 Perl_fbm_instr(pTHX_ unsigned char *big, unsigned char *bigend, SV *littlestr, U32 flags)
 {
+    PERL_ARGS_ASSERT_FBM_INSTR;
+
     unsigned char *s;
     STRLEN l;
     const unsigned char *little = (const unsigned char *)SvPV_const(littlestr,l);
@@ -1106,10 +1116,6 @@ Perl_fbm_instr(pTHX_ unsigned char *big, unsigned char *bigend, SV *littlestr, U
     const I32 multiline = flags & FBMrf_MULTILINE;
     bool valid = SvVALID(littlestr);
     bool tail = valid ? cBOOL(SvTAIL(littlestr)) : FALSE;
-
-    PERL_ARGS_ASSERT_FBM_INSTR;
-
-    assert(bigend >= big);
 
     if ((STRLEN)(bigend - big) < littlelen) {
         if (     tail
@@ -1320,6 +1326,8 @@ Perl_fbm_instr(pTHX_ unsigned char *big, unsigned char *bigend, SV *littlestr, U
 const char *
 Perl_cntrl_to_mnemonic(const U8 c)
 {
+    PERL_ARGS_ASSERT_CNTRL_TO_MNEMONIC;
+
     /* Returns the mnemonic string that represents character 'c', if one
      * exists; NULL otherwise.  The only ones that exist for the purposes of
      * this routine are a few control characters */
@@ -1340,6 +1348,8 @@ Perl_cntrl_to_mnemonic(const U8 c)
 char *
 Perl_savesharedpv(pTHX_ const char *pv)
 {
+    PERL_ARGS_ASSERT_SAVESHAREDPV;
+
     char *newaddr;
     STRLEN pvlen;
 
@@ -1359,10 +1369,10 @@ Perl_savesharedpv(pTHX_ const char *pv)
 char *
 Perl_savesharedpvn(pTHX_ const char *const pv, const STRLEN len)
 {
-    char *const newaddr = (char*)PerlMemShared_malloc(len + 1);
-
+    PERL_ARGS_ASSERT_SAVESHAREDPVN;
     PERL_UNUSED_CONTEXT;
-    /* PERL_ARGS_ASSERT_SAVESHAREDPVN; */
+
+    char *const newaddr = (char*)PerlMemShared_malloc(len + 1);
 
     if (!newaddr) {
         croak_no_mem_ext(STR_WITH_LEN("util:savesharedpvn"));
@@ -1373,9 +1383,11 @@ Perl_savesharedpvn(pTHX_ const char *const pv, const STRLEN len)
 
 /* the SV for Perl_form() and mess() is not kept in an arena */
 
-STATIC SV *
+static SV *
 S_mess_alloc(pTHX)
 {
+    PERL_ARGS_ASSERT_MESS_ALLOC;
+
     SV *sv;
     XPVMG *any;
 
@@ -1400,10 +1412,11 @@ S_mess_alloc(pTHX)
 char *
 Perl_form_nocontext(const char* pat, ...)
 {
+    PERL_ARGS_ASSERT_FORM_NOCONTEXT;
+
     dTHX;
     char *retval;
     va_list args;
-    PERL_ARGS_ASSERT_FORM_NOCONTEXT;
     va_start(args, pat);
     retval = vform(pat, &args);
     va_end(args);
@@ -1434,13 +1447,10 @@ This is contrary to the incorrect previous documentation of these that claimed
 that the return was a single per-thread buffer.  That was (and is) actually
 true only when these are called during global destruction.
 
-C<form> and C<form_nocontext> differ only in that C<form_nocontext> does
-not take a thread context (C<aTHX>) parameter, so is used in situations where
-the caller doesn't already have the thread context (and can be called without
-the C<Perl_> prefix.
+__PLAIN_vs_NOCONTEXT_wording__(form)
 
-C<vform> is the same as C<form> except the arguments are an encapsulated
-argument list.  It does need a thread context parameter, but that is supplied
+C<vform> is the same as C<form> except the arguments are a C<va_list>.
+It does need a thread context parameter, but that is supplied
 automatically when called without the C<Perl_> prefix.
 
 =cut
@@ -1449,9 +1459,10 @@ automatically when called without the C<Perl_> prefix.
 char *
 Perl_form(pTHX_ const char* pat, ...)
 {
+    PERL_ARGS_ASSERT_FORM;
+
     char *retval;
     va_list args;
-    PERL_ARGS_ASSERT_FORM;
     va_start(args, pat);
     retval = vform(pat, &args);
     va_end(args);
@@ -1461,8 +1472,9 @@ Perl_form(pTHX_ const char* pat, ...)
 char *
 Perl_vform(pTHX_ const char *pat, va_list *args)
 {
-    SV * const sv = mess_alloc();
     PERL_ARGS_ASSERT_VFORM;
+
+    SV * const sv = mess_alloc();
     sv_vsetpvfn(sv, pat, strlen(pat), args, NULL, 0, NULL);
     return SvPVX(sv);
 }
@@ -1477,12 +1489,10 @@ used to generate a string message.  If the message does not end with a newline,
 then it will be extended with some indication of the current location in the
 code, as described for C<L</mess_sv>>.
 
-C<mess> and C<mess_nocontext> differ only in that C<mess_nocontext> does
-not take a thread context (C<aTHX>) parameter, so is used in situations where
-the caller doesn't already have the thread context.
+__PLAIN_vs_NOCONTEXT_wording__(mess)
 
-C<vmess> is the same as C<mess> except the arguments are an encapsulated
-argument list.  It needs a thread context parameter only when called with the
+C<vmess> is the same as C<mess> except the arguments are a <va_list>.
+It needs a thread context parameter only when called with the
 C<Perl_> prefix.
 
 Normally, the resulting message is returned in a new mortal SV.
@@ -1496,10 +1506,11 @@ this function.
 SV *
 Perl_mess_nocontext(const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_MESS_NOCONTEXT;
+
     dTHX;
     SV *retval;
     va_list args;
-    PERL_ARGS_ASSERT_MESS_NOCONTEXT;
     va_start(args, pat);
     retval = vmess(pat, &args);
     va_end(args);
@@ -1510,9 +1521,10 @@ Perl_mess_nocontext(const char *pat, ...)
 SV *
 Perl_mess(pTHX_ const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_MESS;
+
     SV *retval;
     va_list args;
-    PERL_ARGS_ASSERT_MESS;
     va_start(args, pat);
     retval = vmess(pat, &args);
     va_end(args);
@@ -1523,11 +1535,11 @@ const COP*
 Perl_closest_cop(pTHX_ const COP *cop, const OP *o, const OP *curop,
                        bool opnext)
 {
+    PERL_ARGS_ASSERT_CLOSEST_COP;
+
     /* Look for curop starting from o.  cop is the last COP we've seen. */
     /* opnext means that curop is actually the ->op_next of the op we are
        seeking. */
-
-    PERL_ARGS_ASSERT_CLOSEST_COP;
 
     if (!o || !curop || (
         opnext ? o->op_next == curop && o->op_type != OP_SCOPE : o == curop
@@ -1585,6 +1597,8 @@ required) to modify and return C<basemsg> instead of allocating a new SV.
 SV *
 Perl_mess_sv(pTHX_ SV *basemsg, bool consume)
 {
+    PERL_ARGS_ASSERT_MESS_SV;
+
     SV *sv;
 
 #if defined(USE_C_BACKTRACE) && defined(USE_C_BACKTRACE_ON_ERROR)
@@ -1596,12 +1610,10 @@ Perl_mess_sv(pTHX_ SV *basemsg, bool consume)
             && grok_atoUV(ws, &wi, NULL)
             && wi <= PERL_INT_MAX
         ) {
-            Perl_dump_c_backtrace(aTHX_ Perl_debug_log, (int)wi, 1);
+            dump_c_backtrace(Perl_debug_log, (int)wi, 1);
         }
     }
 #endif
-
-    PERL_ARGS_ASSERT_MESS_SV;
 
     if (SvROK(basemsg)) {
         if (consume) {
@@ -1665,9 +1677,9 @@ Perl_mess_sv(pTHX_ SV *basemsg, bool consume)
 SV *
 Perl_vmess(pTHX_ const char *pat, va_list *args)
 {
-    SV * const sv = mess_alloc();
-
     PERL_ARGS_ASSERT_VMESS;
+
+    SV * const sv = mess_alloc();
 
     sv_vsetpvfn(sv, pat, strlen(pat), args, NULL, 0, NULL);
     return mess_sv(sv, 1);
@@ -1676,15 +1688,15 @@ Perl_vmess(pTHX_ const char *pat, va_list *args)
 void
 Perl_write_to_stderr(pTHX_ SV* msv)
 {
+    PERL_ARGS_ASSERT_WRITE_TO_STDERR;
+
     IO *io;
     MAGIC *mg;
 
-    PERL_ARGS_ASSERT_WRITE_TO_STDERR;
-
-    if (PL_stderrgv && SvREFCNT(PL_stderrgv) 
+    if (PL_stderrgv && SvREFCNT(PL_stderrgv)
         && (io = GvIO(PL_stderrgv))
-        && (mg = SvTIED_mg((const SV *)io, PERL_MAGIC_tiedscalar))) 
-        Perl_magic_methcall(aTHX_ MUTABLE_SV(io), mg, SV_CONST(PRINT),
+        && (mg = SvTIED_mg((const SV *)io, PERL_MAGIC_tiedscalar)))
+        magic_methcall(MUTABLE_SV(io), mg, SV_CONST(PRINT),
                             G_SCALAR | G_DISCARD | G_WRITING_TO_STDERR, 1, msv);
     else {
         PerlIO * const serr = Perl_error_log;
@@ -1700,7 +1712,7 @@ Perl_write_to_stderr(pTHX_ SV* msv)
 
 /* Common code used in dieing and warning */
 
-STATIC SV *
+static SV *
 S_with_queued_errors(pTHX_ SV *ex)
 {
     PERL_ARGS_ASSERT_WITH_QUEUED_ERRORS;
@@ -1715,6 +1727,8 @@ S_with_queued_errors(pTHX_ SV *ex)
 bool
 Perl_invoke_exception_hook(pTHX_ SV *ex, bool warn)
 {
+    PERL_ARGS_ASSERT_INVOKE_EXCEPTION_HOOK;
+
     HV *stash;
     GV *gv;
     CV *cv;
@@ -1757,16 +1771,6 @@ Perl_invoke_exception_hook(pTHX_ SV *ex, bool warn)
     return FALSE;
 }
 
-/*
-=for apidoc die_sv
-
-This behaves the same as L</croak_sv>, except for the return type.
-It should be used only where the C<OP *> return type is required.
-The function never actually returns.
-
-=cut
-*/
-
 /* silence __declspec(noreturn) warnings */
 MSVC_DIAG_IGNORE(4646 4645)
 OP *
@@ -1779,21 +1783,6 @@ Perl_die_sv(pTHX_ SV *baseex)
 }
 MSVC_DIAG_RESTORE
 
-/*
-=for apidoc      die
-=for apidoc_item die_nocontext
-
-These behave the same as L</croak>, except for the return type.
-They should be used only where the C<OP *> return type is required.
-They never actually return.
-
-The two forms differ only in that C<die_nocontext> does not take a thread
-context (C<aTHX>) parameter, so is used in situations where the caller doesn't
-already have the thread context.
-
-=cut
-*/
-
 #if defined(MULTIPLICITY)
 
 /* silence __declspec(noreturn) warnings */
@@ -1801,6 +1790,8 @@ MSVC_DIAG_IGNORE(4646 4645)
 OP *
 Perl_die_nocontext(const char* pat, ...)
 {
+    PERL_ARGS_ASSERT_DIE_NOCONTEXT;
+
     dTHX;
     va_list args;
     va_start(args, pat);
@@ -1818,6 +1809,8 @@ MSVC_DIAG_IGNORE(4646 4645)
 OP *
 Perl_die(pTHX_ const char* pat, ...)
 {
+    PERL_ARGS_ASSERT_DIE;
+
     va_list args;
     va_start(args, pat);
     vcroak(pat, &args);
@@ -1827,95 +1820,71 @@ Perl_die(pTHX_ const char* pat, ...)
 }
 MSVC_DIAG_RESTORE
 
-/*
-=for apidoc croak_sv
-
-This is an XS interface to Perl's C<die> function.
-
-C<baseex> is the error message or object.  If it is a reference, it
-will be used as-is.  Otherwise it is used as a string, and if it does
-not end with a newline then it will be extended with some indication of
-the current location in the code, as described for L</mess_sv>.
-
-The error message or object will be used as an exception, by default
-returning control to the nearest enclosing C<eval>, but subject to
-modification by a C<$SIG{__DIE__}> handler.  In any case, the C<croak_sv>
-function never returns normally.
-
-To die with a simple string message, the L</croak> function may be
-more convenient.
-
-=cut
-*/
-
 void
 Perl_croak_sv(pTHX_ SV *baseex)
 {
-    SV *ex = with_queued_errors(mess_sv(baseex, 0));
     PERL_ARGS_ASSERT_CROAK_SV;
+
+    SV *ex = with_queued_errors(mess_sv(baseex, 0));
     invoke_exception_hook(ex, FALSE);
     die_unwind(ex);
 }
 
-/*
-=for apidoc vcroak
-
-This is an XS interface to Perl's C<die> function.
-
-C<pat> and C<args> are a sprintf-style format pattern and encapsulated
-argument list.  These are used to generate a string message.  If the
-message does not end with a newline, then it will be extended with
-some indication of the current location in the code, as described for
-L</mess_sv>.
-
-The error message will be used as an exception, by default
-returning control to the nearest enclosing C<eval>, but subject to
-modification by a C<$SIG{__DIE__}> handler.  In any case, the C<croak>
-function never returns normally.
-
-For historical reasons, if C<pat> is null then the contents of C<ERRSV>
-(C<$@>) will be used as an error message or object instead of building an
-error message from arguments.  If you want to throw a non-string object,
-or build an error message in an SV yourself, it is preferable to use
-the L</croak_sv> function, which does not involve clobbering C<ERRSV>.
-
-=cut
-*/
-
 void
 Perl_vcroak(pTHX_ const char* pat, va_list *args)
 {
+    PERL_ARGS_ASSERT_VCROAK;
+
     SV *ex = with_queued_errors(pat ? vmess(pat, args) : mess_sv(ERRSV, 0));
     invoke_exception_hook(ex, FALSE);
     die_unwind(ex);
 }
 
 /*
-=for apidoc croak
+=for apidoc      croak
+=for apidoc_item croak_sv
+=for apidoc_item vcroak
+=for apidoc_item die
+=for apidoc_item die_sv
 =for apidoc_item croak_nocontext
+=for apidoc_item die_nocontext
 
 These are XS interfaces to Perl's C<die> function.
 
-They take a sprintf-style format pattern and argument list, which are used to
-generate a string message.  If the message does not end with a newline, then it
-will be extended with some indication of the current location in the code, as
-described for C<L</mess_sv>>.
+The arguments are used to generate a string message.  If the message does not
+end with a newline, it will be extended with some indication of the current
+location in the code, as described for C<L</mess_sv>>.
 
-The error message will be used as an exception, by default
-returning control to the nearest enclosing C<eval>, but subject to
-modification by a C<$SIG{__DIE__}> handler.  In any case, these croak
-functions never return normally.
+The error message will be used as an exception, by default returning control to
+the nearest enclosing C<eval>, but subject to modification by a
+C<$SIG{__DIE__}> handler.  In any case, none of these functions ever actually
+return normally.
 
-For historical reasons, if C<pat> is null then the contents of C<ERRSV>
-(C<$@>) will be used as an error message or object instead of building an
-error message from arguments.  If you want to throw a non-string object,
-or build an error message in an SV yourself, it is preferable to use
-the C<L</croak_sv>> function, which does not involve clobbering C<ERRSV>.
+In C<croak_sv> and C<die_sv>, C<baseex> is the error message or object.  If it
+is a reference, it will be used as-is.  Otherwise it is used as a string.
 
-The two forms differ only in that C<croak_nocontext> does not take a thread
-context (C<aTHX>) parameter.  It is usually preferred as it takes up fewer
-bytes of code than plain C<Perl_croak>, and time is rarely a critical resource
-when you are about to throw an exception.
+To die with a simple string message, one of the other forms may be more
+convenient.  These take a sprintf-style format pattern, with arguments, to
+generate the message.
+
+The arguments to C<vcroak> are specified as a C<va_list>.  The arguments to the
+remaining forms are specified as a sprintf-style list of arguments.
+
+In the non-C<_sv> forms, for historical reasons, if C<pat> is null then the
+contents of C<L</ERRSV>> (C<$@>) will be used as an error message or object
+instead of building an error message from arguments.  Use the C<_sv> forms
+instead if you want to throw a non-string object, or build an error message in
+an SV yourself; these do not involve clobbering C<ERRSV>.
+
+The difference between the C<croak> forms and the C<die> forms is only the
+return type of the functions.  The C<croak> forms return C<void>; the C<die>
+ones are listed as returning (confusingly) an S<C<OP *>>, even though they
+never actually return.  The C<die> forms should only be used when that return
+type is required.
+
+When called from outside the perl core, plain C<croak> and C<die> have always
+been the same as C<croak_nocontext> and C<die_no_context>, respectively.  That
+is now true even when called from within core.
 
 =cut
 */
@@ -1924,6 +1893,8 @@ when you are about to throw an exception.
 void
 Perl_croak_nocontext(const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
+
     dTHX;
     va_list args;
     va_start(args, pat);
@@ -1936,6 +1907,8 @@ Perl_croak_nocontext(const char *pat, ...)
 void
 Perl_croak(pTHX_ const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_CROAK;
+
     va_list args;
     va_start(args, pat);
     vcroak(pat, &args);
@@ -1959,6 +1932,8 @@ Less code used on exception code paths reduces CPU cache pressure.
 void
 Perl_croak_no_modify(void)
 {
+    PERL_ARGS_ASSERT_CROAK_NO_MODIFY;
+
     Perl_croak_nocontext( "%s", PL_no_modify);
 }
 
@@ -1968,9 +1943,9 @@ Perl_croak_no_modify(void)
 void
 Perl_croak_no_mem_ext(const char *context, STRLEN len)
 {
-    dTHX;
-
     PERL_ARGS_ASSERT_CROAK_NO_MEM_EXT;
+
+    dTHX;
 
     int fd = PerlIO_fileno(Perl_error_log);
     if (fd < 0)
@@ -1992,6 +1967,8 @@ Perl_croak_no_mem_ext(const char *context, STRLEN len)
 void
 Perl_croak_no_mem(void)
 {
+    PERL_ARGS_ASSERT_CROAK_NO_MEM;
+
     croak_no_mem_ext(STR_WITH_LEN("???"));
 }
 
@@ -1999,80 +1976,59 @@ Perl_croak_no_mem(void)
 void
 Perl_croak_popstack(void)
 {
+    PERL_ARGS_ASSERT_CROAK_POPSTACK;
+
     dTHX;
     PerlIO_printf(Perl_error_log, "panic: POPSTACK\n");
     my_exit(1);
 }
 
-/*
-=for apidoc warn_sv
-
-This is an XS interface to Perl's C<warn> function.
-
-C<baseex> is the error message or object.  If it is a reference, it
-will be used as-is.  Otherwise it is used as a string, and if it does
-not end with a newline then it will be extended with some indication of
-the current location in the code, as described for L</mess_sv>.
-
-The error message or object will by default be written to standard error,
-but this is subject to modification by a C<$SIG{__WARN__}> handler.
-
-To warn with a simple string message, the L</warn> function may be
-more convenient.
-
-=cut
-*/
-
 void
 Perl_warn_sv(pTHX_ SV *baseex)
 {
-    SV *ex = mess_sv(baseex, 0);
     PERL_ARGS_ASSERT_WARN_SV;
+
+    SV *ex = mess_sv(baseex, 0);
     if (!invoke_exception_hook(ex, TRUE))
         write_to_stderr(ex);
 }
-
-/*
-=for apidoc vwarn
-
-This is an XS interface to Perl's C<warn> function.
-
-This is like C<L</warn>>, but C<args> are an encapsulated
-argument list.
-
-Unlike with L</vcroak>, C<pat> is not permitted to be null.
-
-=cut
-*/
 
 void
 Perl_vwarn(pTHX_ const char* pat, va_list *args)
 {
-    SV *ex = vmess(pat, args);
     PERL_ARGS_ASSERT_VWARN;
+
+    SV *ex = vmess(pat, args);
     if (!invoke_exception_hook(ex, TRUE))
         write_to_stderr(ex);
 }
 
 /*
-=for apidoc warn
+=for apidoc      warn
 =for apidoc_item warn_nocontext
+=for apidoc_item warn_sv
+=for apidoc_item vwarn
 
 These are XS interfaces to Perl's C<warn> function.
 
-They take a sprintf-style format pattern and argument list, which  are used to
-generate a string message.  If the message does not end with a newline, then it
-will be extended with some indication of the current location in the code, as
-described for C<L</mess_sv>>.
+The arguments are used to generate a string message.  If the message does not
+end with a newline, it will be extended with some indication of the current
+location in the code, as described for C<L</mess_sv>>.
 
-The error message or object will by default be written to standard error,
+The message or object will by default be written to standard error,
 but this is subject to modification by a C<$SIG{__WARN__}> handler.
 
-Unlike with C<L</croak>>, C<pat> is not permitted to be null.
+In C<warn_sv>, C<baseex> is the message or object.  If it
+is a reference, it will be used as-is.  Otherwise it is used as a string.
 
-The two forms differ only in that C<warn_nocontext> does not take a thread
-context (C<aTHX>) parameter, so is used in situations where the caller doesn't
-already have the thread context.
+__PLAIN_vs_NOCONTEXT_wording__(warn)
+
+The arguments to C<vwarn> are specified as a C<va_list>.  The arguments to the
+remaining forms are specified as a sprintf-style list of arguments.
+
+Unlike with the C<L</croak>> functions, C<pat> is not permitted to be null.
+
+See also C<L</warner>>.
 
 =cut
 */
@@ -2081,9 +2037,10 @@ already have the thread context.
 void
 Perl_warn_nocontext(const char *pat, ...)
 {
+    PERL_ARGS_ASSERT_WARN_NOCONTEXT;
+
     dTHX;
     va_list args;
-    PERL_ARGS_ASSERT_WARN_NOCONTEXT;
     va_start(args, pat);
     vwarn(pat, &args);
     va_end(args);
@@ -2093,26 +2050,39 @@ Perl_warn_nocontext(const char *pat, ...)
 void
 Perl_warn(pTHX_ const char *pat, ...)
 {
-    va_list args;
     PERL_ARGS_ASSERT_WARN;
+
+    va_list args;
     va_start(args, pat);
     vwarn(pat, &args);
     va_end(args);
 }
 
 /*
-=for apidoc warner
+=for apidoc      warner
 =for apidoc_item warner_nocontext
+=for apidoc_item vwarner
+=for apidoc_item fatal_warner
+=for apidoc_item vfatal_warner
 
-These output a warning of the specified category (or categories) given by
-C<err>, using the sprintf-style format pattern C<pat>, and argument list.
+These each output a warning of the specified category (or categories) given by
+C<err>, using the sprintf-style format pattern C<pat>, and the arguments.
 
 C<err> must be one of the C<L</packWARN>>, C<packWARN2>, C<packWARN3>,
 C<packWARN4> macros populated with the appropriate number of warning
-categories.  If any of the warning categories they specify is fatal, a fatal
+categories.
+
+If any of the warning categories they specify is fatal, a fatal
 exception is thrown.
 
-In any event a message is generated by the pattern and arguments.  If the
+C<fatal_warner> and C<vfatal_warner> act as if fatal warnings are enabled
+for the warning.  If called when there are pending compilation errors these
+functions may actually return.  They are currently used to generate "used only
+once" fatal warnings since the COP where the name being reported is no longer
+the current COP when the warning is generated and may be useful for similar
+cases.
+
+In any event, a message is generated by the pattern and arguments.  If the
 message does not end with a newline, then it will be extended with some
 indication of the current location in the code, as described for L</mess_sv>.
 
@@ -2121,13 +2091,15 @@ but this is subject to modification by a C<$SIG{__WARN__}> handler.
 
 C<pat> is not permitted to be null.
 
-The two forms differ only in that C<warner_nocontext> does not take a thread
-context (C<aTHX>) parameter, so is used in situations where the caller doesn't
-already have the thread context.
+__PLAIN_vs_NOCONTEXT_wording__(warner)
+
+The arguments to C<vwarner> and C<vfatal_warner> are specified as a
+C<va_list>.  The arguments to the remaining forms are specified as a
+sprintf-style list of arguments.
 
 These functions differ from the similarly named C<L</warn>> functions, in that
 the latter are for XS code to unconditionally display a warning, whereas these
-are for code that may be compiling a perl program, and does extra checking to
+are for code that may be compiling a perl program, and do extra checking to
 see if the warning should be fatal.
 
 =for apidoc ck_warner
@@ -2143,29 +2115,6 @@ categories.
 The two forms differ only in that C<ck_warner_d> should be used if warnings for
 any of the categories are by default enabled.
 
-=for apidoc vwarner
-This is like C<L</warner>>, but C<args> are an encapsulated argument list.
-
-=for apidoc fatal_warner
-
-Like L</warner> except that it acts as if fatal warnings are enabled
-for the warning.
-
-If called when there are pending compilation errors this function may
-return.
-
-This is currently used to generate "used only once" fatal warnings
-since the COP where the name being reported is no longer the current
-COP when the warning is generated and may be useful for similar cases.
-
-C<err> must be one of the C<L</packWARN>>, C<packWARN2>, C<packWARN3>,
-C<packWARN4> macros populated with the appropriate number of warning
-categories.
-
-=for apidoc vfatal_warner
-
-This is like C<L</fatal_warner>> but C<args> are an encapsulated
-argument list.
 
 =cut
 */
@@ -2174,9 +2123,10 @@ argument list.
 void
 Perl_warner_nocontext(U32 err, const char *pat, ...)
 {
-    dTHX; 
-    va_list args;
     PERL_ARGS_ASSERT_WARNER_NOCONTEXT;
+
+    dTHX;
+    va_list args;
     va_start(args, pat);
     vwarner(err, pat, &args);
     va_end(args);
@@ -2212,8 +2162,9 @@ Perl_ck_warner(pTHX_ U32 err, const char* pat, ...)
 void
 Perl_warner(pTHX_ U32  err, const char* pat,...)
 {
-    va_list args;
     PERL_ARGS_ASSERT_WARNER;
+
+    va_list args;
     va_start(args, pat);
     vwarner(err, pat, &args);
     va_end(args);
@@ -2255,7 +2206,7 @@ Perl_vfatal_warner(pTHX_ U32 err, const char *pat, va_list *args)
     SV * const msv = vmess(pat, args);
 
     if (PL_parser && PL_parser->error_count) {
-        qerror(msv);
+        defer_error(msv);
     }
     else {
         invoke_exception_hook(msv, FALSE);
@@ -2268,6 +2219,8 @@ Perl_vfatal_warner(pTHX_ U32 err, const char *pat, va_list *args)
 bool
 Perl_ckwarn(pTHX_ U32 w)
 {
+    PERL_ARGS_ASSERT_CKWARN;
+
     /* If lexical warnings have not been set, use $^W.  */
     if (isLEXWARN_off)
         return PL_dowarn & G_WARN_ON;
@@ -2280,6 +2233,8 @@ Perl_ckwarn(pTHX_ U32 w)
 bool
 Perl_ckwarn_d(pTHX_ U32 w)
 {
+    PERL_ARGS_ASSERT_CKWARN_D;
+
     /* If lexical warnings have not been set then default classes warn.  */
     if (isLEXWARN_off)
         return TRUE;
@@ -2290,6 +2245,8 @@ Perl_ckwarn_d(pTHX_ U32 w)
 static bool
 S_ckwarn_common(pTHX_ U32 w)
 {
+    PERL_ARGS_ASSERT_CKWARN_COMMON;
+
     if (PL_curcop->cop_warnings == pWARN_ALL)
         return TRUE;
 
@@ -2307,7 +2264,7 @@ S_ckwarn_common(pTHX_ U32 w)
     } else if (!unpackWARN3(w)) {
         assert(!unpackWARN4(w));
     }
-        
+
     /* Right, dealt with all the special cases, which are implemented as non-
        pointers, so there is a pointer to a real warnings mask.  */
     do {
@@ -2321,9 +2278,10 @@ S_ckwarn_common(pTHX_ U32 w)
 char *
 Perl_new_warnings_bitfield(pTHX_ char *buffer, const char *const bits,
                            STRLEN size) {
-    const MEM_SIZE len_wanted = (size > WARNsize ? size : WARNsize);
-    PERL_UNUSED_CONTEXT;
     PERL_ARGS_ASSERT_NEW_WARNINGS_BITFIELD;
+    PERL_UNUSED_CONTEXT;
+
+    const MEM_SIZE len_wanted = (size > WARNsize ? size : WARNsize);
 
     /* pass in null as the source string as we will do the
      * copy ourselves. */
@@ -2393,6 +2351,8 @@ version has desirable safeguards
 void
 Perl_my_setenv(pTHX_ const char *nam, const char *val)
 {
+    PERL_ARGS_ASSERT_MY_SETENV;
+
 #  if defined(USE_ITHREADS) && !defined(WIN32)
     /* only parent thread can modify process environment */
     if (PL_curinterp != aTHX)
@@ -2454,9 +2414,9 @@ Perl_my_setenv(pTHX_ const char *nam, const char *val)
 I32
 Perl_unlnk(pTHX_ const char *f)	/* unlink all versions of a file */
 {
-    I32 retries = 0;
-
     PERL_ARGS_ASSERT_UNLNK;
+
+    I32 retries = 0;
 
     while (PerlLIO_unlink(f) >= 0)
         retries++;
@@ -2466,7 +2426,7 @@ Perl_unlnk(pTHX_ const char *f)	/* unlink all versions of a file */
 
 #if defined(OEMVS)
   #if (__CHARSET_LIB == 1)
-  static int chgfdccsid(int fd, unsigned short ccsid) 
+  static int chgfdccsid(int fd, unsigned short ccsid)
   {
     attrib_t attr;
     memset(&attr, 0, sizeof(attr));
@@ -2491,6 +2451,8 @@ Implementing function on some systems for PerlProc_popen_list()
 PerlIO *
 Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
 {
+    PERL_ARGS_ASSERT_MY_POPEN_LIST;
+
 #if (!defined(DOSISH) || defined(HAS_FORK)) && !defined(OS2) && !defined(VMS) && !defined(__LIBCATAMOUNT__) && !defined(__amigaos4__)
     int p[2];
     I32 This, that;
@@ -2498,8 +2460,6 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
     SV *sv;
     I32 did_pipes = 0;
     int pp[2];
-
-    PERL_ARGS_ASSERT_MY_POPEN_LIST;
 
     PERL_FLUSHALL_FOR_CHILD;
     This = (*mode == 'w');
@@ -2528,19 +2488,13 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
     }
     if (pid == 0) {
         /* Child */
-#undef THIS
-#undef THAT
-#define THIS that
-#define THAT This
+#  undef THIS
+#  undef THAT
+#  define THIS that
+#  define THAT This
         /* Close parent's end of error status pipe (if any) */
         if (did_pipes)
             PerlLIO_close(pp[0]);
-#if defined(OEMVS)
-  #if (__CHARSET_LIB == 1)
-        chgfdccsid(p[THIS], 819);
-        chgfdccsid(p[THAT], 819);
-  #endif
-#endif
         /* Now dup our end of _the_ pipe to right position */
         if (p[THIS] != (*mode == 'r')) {
             PerlLIO_dup2(p[THIS], *mode == 'r');
@@ -2552,11 +2506,11 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
             setfd_cloexec_or_inhexec_by_sysfdness(p[THIS]);
             PerlLIO_close(p[THAT]);	/* close parent's end of _the_ pipe */
         }
-#if !defined(HAS_FCNTL) || !defined(F_SETFD)
+#  if !defined(HAS_FCNTL) || !defined(F_SETFD)
         /* No automatic close - do it by hand */
-#  ifndef NOFILE
-#  define NOFILE 20
-#  endif
+#    ifndef NOFILE
+#      define NOFILE 20
+#    endif
         {
             int fd;
 
@@ -2565,11 +2519,11 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
                     PerlLIO_close(fd);
             }
         }
-#endif
+#  endif
         do_aexec5(NULL, args-1, args-1+n, pp[1], did_pipes);
         PerlProc__exit(1);
-#undef THIS
-#undef THAT
+#  undef THIS
+#  undef THAT
     }
     /* Parent */
     if (did_pipes)
@@ -2616,20 +2570,7 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
     }
     if (did_pipes)
          PerlLIO_close(pp[0]);
-#if defined(OEMVS)
-  #if (__CHARSET_LIB == 1)
-    PerlIO* io = PerlIO_fdopen(p[This], mode);
-    if (io) {
-      chgfdccsid(p[This], 819);
-    }
-    return io;
-  #else
     return PerlIO_fdopen(p[This], mode);
-  #endif
-#else
-    return PerlIO_fdopen(p[This], mode);
-#endif
-
 #else
 #  if defined(OS2)	/* Same, without fork()ing and all extra overhead... */
     return my_syspopen4(aTHX_ NULL, mode, n, args);
@@ -2658,6 +2599,8 @@ version knows things that interact with the rest of the perl interpreter.
 PerlIO *
 Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
+    PERL_ARGS_ASSERT_MY_POPEN;
+
     int p[2];
     I32 This, that;
     Pid_t pid;
@@ -2665,8 +2608,6 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
     const I32 doexec = !(*cmd == '-' && cmd[1] == '\0');
     I32 did_pipes = 0;
     int pp[2];
-
-    PERL_ARGS_ASSERT_MY_POPEN;
 
     PERL_FLUSHALL_FOR_CHILD;
 #ifdef OS2
@@ -2707,12 +2648,6 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 #define THAT This
         if (did_pipes)
             PerlLIO_close(pp[0]);
-#if defined(OEMVS)
-  #if (__CHARSET_LIB == 1)
-        chgfdccsid(p[THIS], 819);
-        chgfdccsid(p[THAT], 819);
-  #endif
-#endif
         if (p[THIS] != (*mode == 'r')) {
             PerlLIO_dup2(p[THIS], *mode == 'r');
             PerlLIO_close(p[THIS]);
@@ -2748,7 +2683,7 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
       filedescriptors directly, need to manually switch to the
       default, binary, low-level mode; see PerlIOBuf_open(). */
    PerlLIO_setmode((*mode == 'r'), O_BINARY);
-#endif 
+#endif
         PL_forkprocess = 0;
 #ifdef PERL_USES_PL_PIDSTATUS
         hv_clear(PL_pidstatus);	/* we have no children */
@@ -2799,19 +2734,7 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
     }
     if (did_pipes)
          PerlLIO_close(pp[0]);
-#if defined(OEMVS)
-  #if (__CHARSET_LIB == 1)
-    PerlIO* io = PerlIO_fdopen(p[This],	mode);
-    if (io) {
-      chgfdccsid(p[This], 819);
-    }
-    return io;
-  #else
     return PerlIO_fdopen(p[This], mode);
-  #endif
-#else
-    return PerlIO_fdopen(p[This], mode);
-#endif
 }
 #elif defined(__LIBCATAMOUNT__)
 PerlIO *
@@ -2835,6 +2758,8 @@ Perl_atfork_lock(void)
   PERL_TSA_ACQUIRE(PL_op_mutex)
 #endif
 {
+    PERL_ARGS_ASSERT_ATFORK_LOCK;
+
 #if defined(USE_ITHREADS)
     /* locks must be held in locking order (if any) */
 #  ifdef USE_PERLIO
@@ -2860,6 +2785,8 @@ Perl_atfork_unlock(void)
   PERL_TSA_RELEASE(PL_op_mutex)
 #endif
 {
+    PERL_ARGS_ASSERT_ATFORK_UNLOCK;
+
 #if defined(USE_ITHREADS)
     /* locks must be released in same order as in atfork_lock() */
 #  ifdef USE_PERLIO
@@ -2870,6 +2797,21 @@ Perl_atfork_unlock(void)
 #  endif
     OP_REFCNT_UNLOCK;
 #endif
+}
+
+void
+Perl_atfork_child(void)
+{
+    PERL_ARGS_ASSERT_ATFORK_CHILD;
+
+#ifdef USE_ITHREADS
+    /* so we can resend signals received in a non-perl thread to the
+       new main thread
+    */
+    PTHREAD_INIT_SELF(PL_main_thread);
+#endif
+
+    Perl_atfork_unlock();
 }
 
 /*
@@ -2887,6 +2829,8 @@ used except through C<PerlProc_fork>.
 Pid_t
 Perl_my_fork(void)
 {
+    PERL_ARGS_ASSERT_MY_FORK;
+
 #if defined(HAS_FORK)
     Pid_t pid;
 #if defined(USE_ITHREADS) && !defined(HAS_PTHREAD_ATFORK)
@@ -2959,6 +2903,8 @@ rest of the perl interpreter.
 Sighandler_t
 Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
 {
+    PERL_ARGS_ASSERT_RSIGNAL;
+
     struct sigaction act, oact;
 
 #ifdef USE_ITHREADS
@@ -2997,6 +2943,8 @@ See L</C<rsignal>>.
 Sighandler_t
 Perl_rsignal_state(pTHX_ int signo)
 {
+    PERL_ARGS_ASSERT_RSIGNAL_STATE;
+
     struct sigaction oact;
     PERL_UNUSED_CONTEXT;
 
@@ -3009,9 +2957,9 @@ Perl_rsignal_state(pTHX_ int signo)
 int
 Perl_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
 {
-    struct sigaction act;
-
     PERL_ARGS_ASSERT_RSIGNAL_SAVE;
+
+    struct sigaction act;
 
 #ifdef USE_ITHREADS
     /* only "parent" interpreter can diddle signals */
@@ -3036,7 +2984,9 @@ Perl_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
 int
 Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 {
+    PERL_ARGS_ASSERT_RSIGNAL_RESTORE;
     PERL_UNUSED_CONTEXT;
+
 #ifdef USE_ITHREADS
     /* only "parent" interpreter can diddle signals */
     if (PL_curinterp != aTHX)
@@ -3051,6 +3001,8 @@ Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 Sighandler_t
 Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
 {
+    PERL_ARGS_ASSERT_RSIGNAL;
+
 #if defined(USE_ITHREADS) && !defined(WIN32)
     /* only "parent" interpreter can diddle signals */
     if (PL_curinterp != aTHX)
@@ -3063,12 +3015,15 @@ Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
 static Signal_t
 sig_trap(int signo)
 {
+    PERL_UNUSED_ARG(signo);
     PL_sig_trapped++;
 }
 
 Sighandler_t
 Perl_rsignal_state(pTHX_ int signo)
 {
+    PERL_ARGS_ASSERT_RSIGNAL_STATE;
+
     Sighandler_t oldsig;
 
 #if defined(USE_ITHREADS) && !defined(WIN32)
@@ -3100,6 +3055,8 @@ Perl_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
 int
 Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 {
+    PERL_ARGS_ASSERT_RSIGNAL_RESTORE;
+
 #if defined(USE_ITHREADS) && !defined(WIN32)
     /* only "parent" interpreter can diddle signals */
     if (PL_curinterp != aTHX)
@@ -3126,6 +3083,8 @@ version knows things that interact with the rest of the perl interpreter.
 I32
 Perl_my_pclose(pTHX_ PerlIO *ptr)
 {
+    PERL_ARGS_ASSERT_MY_PCLOSE;
+
     int status;
     SV **svp;
     Pid_t pid;
@@ -3176,6 +3135,8 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
 I32
 Perl_my_pclose(pTHX_ PerlIO *ptr)
 {
+    PERL_ARGS_ASSERT_MY_PCLOSE;
+
     return -1;
 }
 #endif /* !DOSISH */
@@ -3184,8 +3145,9 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
 I32
 Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 {
-    I32 result = 0;
     PERL_ARGS_ASSERT_WAIT4PID;
+
+    I32 result = 0;
 #ifdef PERL_USES_PL_PIDSTATUS
     if (!pid) {
         /* PERL_USES_PL_PIDSTATUS is only defined when neither
@@ -3272,9 +3234,11 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 #endif /* !DOSISH || OS2 || WIN32 */
 
 #ifdef PERL_USES_PL_PIDSTATUS
-void
+static void
 S_pidgone(pTHX_ Pid_t pid, int status)
 {
+    PERL_ARGS_ASSERT_PIDGONE;
+
     SV *sv;
 
     sv = *hv_fetch(PL_pidstatus,(const char*)&pid,sizeof(Pid_t),TRUE);
@@ -3295,6 +3259,8 @@ I32
 Perl_my_pclose(pTHX_ PerlIO *ptr)
 #endif
 {
+    PERL_ARGS_ASSERT_MY_PCLOSE;
+
     /* Needs work for PerlIO ! */
     FILE * const f = PerlIO_findFILE(ptr);
     const I32 result = pclose(f);
@@ -3355,13 +3321,13 @@ Perl_repeatcpy(char *to, const char *from, SSize_t len, IV count)
 I32
 Perl_same_dirent(pTHX_ const char *a, const char *b)
 {
+    PERL_ARGS_ASSERT_SAME_DIRENT;
+
     char *fa = strrchr(a,'/');
     char *fb = strrchr(b,'/');
     Stat_t tmpstatbuf1;
     Stat_t tmpstatbuf2;
     SV * const tmpsv = sv_newmortal();
-
-    PERL_ARGS_ASSERT_SAME_DIRENT;
 
     if (fa)
         fa++;
@@ -3394,11 +3360,13 @@ char*
 Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
                  const char *const *const search_ext, I32 flags)
 {
+    PERL_ARGS_ASSERT_FIND_SCRIPT;
+
     const char *xfound = NULL;
     char *xfailed = NULL;
     char tmpbuf[MAXPATHLEN];
     char *s;
-    I32 len = 0;
+    size_t len = 0;
     int retval;
     char *bufend;
 #if defined(DOSISH) && !defined(OS2)
@@ -3423,8 +3391,6 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
     PERL_UNUSED_ARG(search_ext);
 #  define MAX_EXT_LEN 0
 #endif
-
-    PERL_ARGS_ASSERT_FIND_SCRIPT;
 
     /*
      * If dosearch is true and if scriptname does not contain path
@@ -3538,13 +3504,26 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
             if (len < sizeof tmpbuf)
                 tmpbuf[len] = '\0';
 #  else
-            s = delimcpy_no_escape(tmpbuf, tmpbuf + sizeof tmpbuf, s, bufend,
-                                   ':', &len);
+            {
+                I32 n;
+                s = delimcpy_no_escape(tmpbuf, tmpbuf + sizeof tmpbuf, s,
+                                       bufend, ':', &n);
+                assert(n >= 0);
+                len = n;
+            }
 #  endif
             if (s < bufend)
                 s++;
-            if (len + 1 + strlen(scriptname) + MAX_EXT_LEN >= sizeof tmpbuf)
-                continue;	/* don't search dir with too-long name */
+            {
+                const size_t
+                    available_len = sizeof tmpbuf - MAX_EXT_LEN - 1,
+                    scriptname_len = strlen(scriptname);
+                if (
+                    scriptname_len >= available_len ||
+                    len >= available_len - scriptname_len
+                )
+                    continue;   /* don't search dir with too-long name */
+            }
             if (len
 #  ifdef DOSISH
                 && tmpbuf[len - 1] != '/'
@@ -3667,11 +3646,15 @@ Given an opcode from the enum in F<opcodes.h>, C<PL_op_name[opcode]> returns a
 pointer to a C language string giving its name.
 
 =cut
+
+Deprecated since 5.38
 */
 
 char **
 Perl_get_op_names(pTHX)
 {
+    PERL_ARGS_ASSERT_GET_OP_NAMES;
+
     PERL_UNUSED_CONTEXT;
     return (char **)PL_op_name;
 }
@@ -3684,11 +3667,15 @@ Given an opcode from the enum in F<opcodes.h>, C<PL_op_desc[opcode]> returns a
 pointer to a C language string giving its description.
 
 =cut
+
+Deprecated since 5.38
 */
 
 char **
 Perl_get_op_descs(pTHX)
 {
+    PERL_ARGS_ASSERT_GET_OP_DESCS;
+
     PERL_UNUSED_CONTEXT;
     return (char **)PL_op_desc;
 }
@@ -3696,21 +3683,27 @@ Perl_get_op_descs(pTHX)
 const char *
 Perl_get_no_modify(pTHX)
 {
-    PERL_UNUSED_CONTEXT;
+    PERL_ARGS_ASSERT_GET_NO_MODIFY;
+
+    PERL_UNUSED_CONTEXT;    /* Deprecated since 5.38 */
     return PL_no_modify;
 }
 
 U32 *
 Perl_get_opargs(pTHX)
 {
-    PERL_UNUSED_CONTEXT;
+    PERL_ARGS_ASSERT_GET_OPARGS;
+
+    PERL_UNUSED_CONTEXT;    /* Deprecated since 5.38 */
     return (U32 *)PL_opargs;
 }
 
 PPADDR_t*
 Perl_get_ppaddr(pTHX)
 {
-    PERL_UNUSED_CONTEXT;
+    PERL_ARGS_ASSERT_GET_PPADDR;
+
+    PERL_UNUSED_CONTEXT;    /* Deprecated since 5.38 */
     return (PPADDR_t*)PL_ppaddr;
 }
 
@@ -3718,9 +3711,10 @@ Perl_get_ppaddr(pTHX)
 char *
 Perl_getenv_len(pTHX_ const char *env_elem, unsigned long *len)
 {
-    char * const env_trans = PerlEnv_getenv(env_elem);
-    PERL_UNUSED_CONTEXT;
     PERL_ARGS_ASSERT_GETENV_LEN;
+    PERL_UNUSED_CONTEXT;
+
+    char * const env_trans = PerlEnv_getenv(env_elem);
     if (env_trans)
         *len = strlen(env_trans);
     return env_trans;
@@ -3739,6 +3733,8 @@ Implements C<PERL_FLUSHALL_FOR_CHILD> on some platforms.
 I32
 Perl_my_fflush_all(pTHX)
 {
+    PERL_ARGS_ASSERT_MY_FFLUSH_ALL;
+
 #if defined(USE_PERLIO) || defined(FFLUSH_NULL)
     return PerlIO_flush(NULL);
 #else
@@ -3781,6 +3777,8 @@ Perl_my_fflush_all(pTHX)
 void
 Perl_report_wrongway_fh(pTHX_ const GV *gv, const char have)
 {
+    PERL_ARGS_ASSERT_REPORT_WRONGWAY_FH;
+
     if (ckWARN(WARN_IO)) {
         HEK * const name
            = gv && (isGV_with_GP(gv))
@@ -3801,6 +3799,8 @@ Perl_report_wrongway_fh(pTHX_ const GV *gv, const char have)
 void
 Perl_report_evil_fh(pTHX_ const GV *gv)
 {
+    PERL_ARGS_ASSERT_REPORT_EVIL_FH;
+
     const IO *io = gv ? GvIO(gv) : NULL;
     const PERL_BITFIELD16 op = PL_op->op_type;
     const char *vile;
@@ -3837,8 +3837,7 @@ Perl_report_evil_fh(pTHX_ const GV *gv)
                     have_name ? " " : "",
                     SVfARG(have_name ? name : &PL_sv_no));
         if (io && IoDIRP(io) && !(IoFLAGS(io) & IOf_FAKE_DIRP))
-                Perl_warner(
-                            aTHX_ packWARN(warn_type),
+                warner(packWARN(warn_type),
                         "\t(Are you trying to call %s%s on dirhandle%s%" SVf "?)\n",
                         func, pars, have_name ? " " : "",
                         SVfARG(have_name ? name : &PL_sv_no)
@@ -3871,11 +3870,12 @@ Perl_report_evil_fh(pTHX_ const GV *gv)
 void
 Perl_init_tm(pTHX_ struct tm *ptm)	/* see mktime, strftime and asctime */
 {
+    PERL_ARGS_ASSERT_INIT_TM;
+    PERL_UNUSED_CONTEXT;
+
 #ifdef HAS_TM_TM_ZONE
     Time_t now;
     const struct tm* my_tm;
-    PERL_UNUSED_CONTEXT;
-    PERL_ARGS_ASSERT_INIT_TM;
     (void)time(&now);
 
     LOCALTIME_LOCK;
@@ -3884,8 +3884,6 @@ Perl_init_tm(pTHX_ struct tm *ptm)	/* see mktime, strftime and asctime */
         Copy(my_tm, ptm, 1, struct tm);
     LOCALTIME_UNLOCK;
 #else
-    PERL_UNUSED_CONTEXT;
-    PERL_ARGS_ASSERT_INIT_TM;
     PERL_UNUSED_ARG(ptm);
 #endif
 }
@@ -3901,12 +3899,12 @@ overhead) of mktime().
 void
 Perl_mini_mktime(struct tm *ptm)
 {
+    PERL_ARGS_ASSERT_MINI_MKTIME;
+
     int yearday;
     int secs;
     int month, mday, year, jday;
     int odd_cent, odd_year;
-
-    PERL_ARGS_ASSERT_MINI_MKTIME;
 
 #define DAYS_PER_YEAR   365
 #define DAYS_PER_QYEAR  (4*DAYS_PER_YEAR+1)
@@ -4114,9 +4112,9 @@ Fill C<sv> with current working directory
 int
 Perl_getcwd_sv(pTHX_ SV *sv)
 {
-    SvTAINTED_on(sv);
-
     PERL_ARGS_ASSERT_GETCWD_SV;
+
+    SvTAINTED_on(sv);
 
 #ifdef HAS_GETCWD
     {
@@ -4521,6 +4519,8 @@ Perl_my_socketpair (int family, int type, int protocol, int fd[2]) {
  * to the my_socketpair in embed.fnc. */
 int
 Perl_my_socketpair (int family, int type, int protocol, int fd[2]) {
+    PERL_ARGS_ASSERT_MY_SOCKETPAIR;
+
 #ifdef HAS_SOCKETPAIR
     return socketpair(family, type, protocol, fd);
 #else
@@ -4545,6 +4545,7 @@ potentially warn under some level of strict-ness.
 void
 Perl_sv_nosharing(pTHX_ SV *sv)
 {
+    PERL_ARGS_ASSERT_SV_NOSHARING;
     PERL_UNUSED_CONTEXT;
     PERL_UNUSED_ARG(sv);
 }
@@ -4564,18 +4565,20 @@ could potentially warn under some level of strict-ness.
 bool
 Perl_sv_destroyable(pTHX_ SV *sv)
 {
+    PERL_ARGS_ASSERT_SV_DESTROYABLE;
     PERL_UNUSED_CONTEXT;
     PERL_UNUSED_ARG(sv);
+
     return TRUE;
 }
 
 U32
 Perl_parse_unicode_opts(pTHX_ const char **popt)
 {
+  PERL_ARGS_ASSERT_PARSE_UNICODE_OPTS;
+
   const char *p = *popt;
   U32 opt = 0;
-
-  PERL_ARGS_ASSERT_PARSE_UNICODE_OPTS;
 
   if (*p) {
        if (isDIGIT(*p)) {
@@ -4647,72 +4650,30 @@ Perl_parse_unicode_opts(pTHX_ const char **popt)
 #  include <starlet.h>
 #endif
 
-/* hash a pointer and return a U32 */
+/* Splitmix64 is a simple PRNG and integer hashing function. It was
+ * introduced in 2015: https://gee.cs.oswego.edu/dl/papers/oopsla14.pdf
+ * Examples: https://rosettacode.org/wiki/Pseudo-random_numbers/Splitmix64
+ */
+static U64
+splitmix64(U64 *state)
+{
+    U64 z = (*state += 0x9e3779b97f4a7c15);
+    z     = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
+    z     = (z ^ (z >> 27)) * 0x94d049bb133111eb;
 
-PERL_STATIC_INLINE U32 S_ptr_hash(PTRV u) {
-/* 64 bit input */
-#if PTRSIZE == 8
-    /*
-     * This is one of Thomas Wang's hash functions for 64-bit integers from:
-     * https://gist.github.com/scottchiefbaker/9e21877a0c6041fbf54bd583cd1c52b4
-     */
-    u = (~u) + (u << 18);
-    u = u ^ (u >> 31);
-    u = u * 21;
-    u = u ^ (u >> 11);
-    u = u + (u << 6);
-    u = u ^ (u >> 22);
-/* 32 bit input */
-#else
-    /*
-     * This is one of Bob Jenkins' hash functions for 32-bit integers
-     * from: https://burtleburtle.net/bob/hash/integer.html
-     */
-    u = (u + 0x7ed55d16) + (u << 12);
-    u = (u ^ 0xc761c23c) ^ (u >> 19);
-    u = (u + 0x165667b1) + (u << 5);
-    u = (u + 0xd3a2646c) ^ (u << 9);
-    u = (u + 0xfd7046c5) + (u << 3);
-    u = (u ^ 0xb55a4f09) ^ (u >> 16);
-#endif
-    return (U32)u;
+    return z ^ (z >> 31);
 }
 
-
-U32
+U64
 Perl_seed(pTHX)
 {
-    /*
-     * This is really just a quick hack which grabs various garbage
-     * values.  It really should be a real hash algorithm which
-     * spreads the effect of every input bit onto every output bit,
-     * if someone who knows about such things would bother to write it.
-     * Might be a good idea to add that function to CORE as well.
-     * No numbers below come from careful analysis or anything here,
-     * except they are primes and SEED_C1 > 1E6 to get a full-width
-     * value from (tv_sec * SEED_C1 + tv_usec).  The multipliers should
-     * probably be bigger too.
-     */
-#if RANDBITS > 16
-#  define SEED_C1	1000003
-#define   SEED_C4	73819
-#else
-#  define SEED_C1	25747
-#define   SEED_C4	20639
-#endif
-#define   SEED_C2	3
-#define   SEED_C3	269
-#define   SEED_C5	26107
+    PERL_ARGS_ASSERT_SEED;
 
-#ifndef PERL_NO_DEV_RANDOM
-    int fd;
-#endif
-    U32 u;
-#ifdef HAS_GETTIMEOFDAY
-    struct timeval when;
-#else
-    Time_t when;
-#endif
+   /*
+    * Attempt to read from /dev/urandom to generate a pseudo-random number.
+    * If that does not work, or it is unavailable, we fall back to gathering
+    * several state variables and hashing them into a seed value.
+    */
 
 /* This test is an escape hatch, this symbol isn't set by Configure. */
 #ifndef PERL_NO_DEV_RANDOM
@@ -4722,46 +4683,77 @@ Perl_seed(pTHX)
     * PERL_RANDOM_DEVICE to it if you'd prefer Perl to block until there
     * is enough real entropy to fill the seed. */
 #  ifdef __amigaos4__
-#    define PERL_RANDOM_DEVICE "RANDOM:SIZE=4"
+   /* https://wiki.amigaos.net/wiki/AmigaOS_Manual%3A_AmigaDOS_Additional_Amiga_Directories#Random-Handler_(RANDOM:) */
+#    define PERL_RANDOM_DEVICE "RANDOM:"
 #  else
 #    define PERL_RANDOM_DEVICE "/dev/urandom"
 #  endif
 #endif
-    fd = PerlLIO_open_cloexec(PERL_RANDOM_DEVICE, 0);
-    if (fd != -1) {
-        if (PerlLIO_read(fd, (void*)&u, sizeof u) != sizeof u)
-            u = 0;
-        PerlLIO_close(fd);
-        if (u)
-            return u;
+    U64 seed;
+
+#ifdef HAS_GETENTROPY
+    U8 ok = (getentropy(&seed, sizeof(seed)) == 0);
+    /* PerlIO_printf(Perl_debug_log, "Entropy: OK:%i Seed:%lu\n", ok, seed); */
+    if (ok) {
+        return seed;
     }
 #endif
 
+    int fd = PerlLIO_open_cloexec(PERL_RANDOM_DEVICE, 0);
+    if (fd != -1) {
+        if (PerlLIO_read(fd, (void*)&seed, sizeof seed) != sizeof seed) {
+            seed = 0;
+        }
+
+        PerlLIO_close(fd);
+
+        if (seed) {
+            return seed;
+        }
+    }
+#endif
+
+    /* We only get this far if /dev/urandom is not available or the read fails.
+     * Grab several state variables and hash those for randomness instead. */
+
 #ifdef HAS_GETTIMEOFDAY
+    struct timeval when;
+
     PerlProc_gettimeofday(&when,NULL);
-    u = (U32)SEED_C1 * when.tv_sec + (U32)SEED_C2 * when.tv_usec;
+    /* Milliseconds */
+    U64 epoch = ((U64)when.tv_sec * 1000000) + when.tv_usec;
 #else
+    Time_t when;
+
     (void)time(&when);
-    u = (U32)SEED_C1 * when;
+    /* Seconds */
+    U64 epoch = when;
 #endif
-    u += SEED_C3 * (U32)PerlProc_getpid();
-    u += SEED_C4 * (U32)PTR2UV(PL_stack_sp);
-#ifndef PLAN9           /* XXX Plan9 assembler chokes on this; fix needed  */
-    UV ptruv = PTR2UV(&when);
-    u += SEED_C5 * ptr_hash(ptruv);
-#endif
-    return u;
+
+    UV pid       = PerlProc_getpid();
+    UV time_ptr  = PTR2UV(&when);
+    UV stack_ptr = PTR2UV(PL_stack_sp);
+
+    /* epoch in microseconds is ~52 bits, PIDs are ~22 bits, PTRs are ~48 bits.
+     * We mix the bits for all four together to get a good spread of entropy */
+    U64 tmp = ROTL64(time_ptr, 16) ^ ROTL32(pid, 8) ^ epoch ^ stack_ptr;
+    U64 ret = splitmix64(&tmp);
+
+    /* PerlIO_printf(Perl_debug_log, "XXXX: TIME:%lu PID:%lu PTR:%lu\n", epoch, pid, time_ptr); */
+    /* PerlIO_printf(Perl_debug_log, "SEED: %lu\n", ret); */
+
+    return ret;
 }
 
 void
 Perl_get_hash_seed(pTHX_ unsigned char * const seed_buffer)
 {
+    PERL_ARGS_ASSERT_GET_HASH_SEED;
+
 #ifndef NO_PERL_HASH_ENV
     const char *env_pv;
 #endif
     unsigned long i;
-
-    PERL_ARGS_ASSERT_GET_HASH_SEED;
 
     Zero(seed_buffer, PERL_HASH_SEED_BYTES, U8);
     Zero((U8*)PL_hash_state_w, PERL_HASH_STATE_BYTES, U8);
@@ -4930,23 +4922,23 @@ Perl_debug_hash_seed(pTHX_ bool via_debug_h)
 
 # ifdef DEBUG_LEAKING_SCALARS
 #   define SV_LOG_SERIAL_FMT	    " [%lu]"
-#   define _SV_LOG_SERIAL_ARG(sv)   , (unsigned long) (sv)->sv_debug_serial
+#   define SV_LOG_SERIAL_ARG_(sv)   , (unsigned long) (sv)->sv_debug_serial
 # else
 #   define SV_LOG_SERIAL_FMT
-#   define _SV_LOG_SERIAL_ARG(sv)
+#   define SV_LOG_SERIAL_ARG_(sv)
 # endif
 
 static void
-S_mem_log_common(enum mem_log_type mlt, const UV n, 
+S_mem_log_common(enum mem_log_type mlt, const UV n,
                  const UV typesize, const char *type_name, const SV *sv,
                  Malloc_t oldalloc, Malloc_t newalloc,
                  const char *filename, const int linenumber,
                  const char *funcname)
 {
+    PERL_ARGS_ASSERT_MEM_LOG_COMMON;
+
     const char *pmlenv;
     dTHX;
-
-    PERL_ARGS_ASSERT_MEM_LOG_COMMON;
 
     PL_mem_log[0] |= 0x2;   /* Flag that the call is from this code */
     pmlenv = PerlEnv_getenv("PERL_MEM_LOG");
@@ -5020,7 +5012,7 @@ S_mem_log_common(enum mem_log_type mlt, const UV n,
                         "%s_SV: %s:%d:%s: %" UVxf SV_LOG_SERIAL_FMT "\n",
                         mlt == MLT_NEW_SV ? "new" : "del",
                         filename, linenumber, funcname,
-                        PTR2UV(sv) _SV_LOG_SERIAL_ARG(sv));
+                        PTR2UV(sv) SV_LOG_SERIAL_ARG_(sv));
                 break;
             default:
                 len = 0;
@@ -5035,7 +5027,7 @@ S_mem_log_common(enum mem_log_type mlt, const UV n,
                         CopFILE(PL_curcop), CopLINE(PL_curcop));
                 PERL_UNUSED_RESULT(PerlLIO_write(fd, buf, len));
 
-                Perl_c_backtrace *bt = Perl_get_c_backtrace(aTHX_ 3, 3);
+                Perl_c_backtrace *bt = get_c_backtrace(3, 3);
                 Perl_c_backtrace_frame *frame;
                 UV i;
                 for (i = 0, frame = bt->frame_info;
@@ -5073,7 +5065,7 @@ S_mem_log_common(enum mem_log_type mlt, const UV n,
 
 Malloc_t
 Perl_mem_log_alloc(const UV n, const UV typesize, const char *type_name,
-                   Malloc_t newalloc, 
+                   Malloc_t newalloc,
                    const char *filename, const int linenumber,
                    const char *funcname)
 {
@@ -5087,32 +5079,32 @@ Perl_mem_log_alloc(const UV n, const UV typesize, const char *type_name,
 
 Malloc_t
 Perl_mem_log_realloc(const UV n, const UV typesize, const char *type_name,
-                     Malloc_t oldalloc, Malloc_t newalloc, 
-                     const char *filename, const int linenumber, 
+                     Malloc_t oldalloc, Malloc_t newalloc,
+                     const char *filename, const int linenumber,
                      const char *funcname)
 {
     PERL_ARGS_ASSERT_MEM_LOG_REALLOC;
 
     mem_log_common_if(MLT_REALLOC, n, typesize, type_name,
-                      NULL, oldalloc, newalloc, 
+                      NULL, oldalloc, newalloc,
                       filename, linenumber, funcname);
     return newalloc;
 }
 
 Malloc_t
-Perl_mem_log_free(Malloc_t oldalloc, 
-                  const char *filename, const int linenumber, 
+Perl_mem_log_free(Malloc_t oldalloc,
+                  const char *filename, const int linenumber,
                   const char *funcname)
 {
     PERL_ARGS_ASSERT_MEM_LOG_FREE;
 
-    mem_log_common_if(MLT_FREE, 0, 0, "", NULL, oldalloc, NULL, 
+    mem_log_common_if(MLT_FREE, 0, 0, "", NULL, oldalloc, NULL,
                       filename, linenumber, funcname);
     return oldalloc;
 }
 
 void
-Perl_mem_log_new_sv(const SV *sv, 
+Perl_mem_log_new_sv(const SV *sv,
                     const char *filename, const int linenumber,
                     const char *funcname)
 {
@@ -5124,12 +5116,12 @@ Perl_mem_log_new_sv(const SV *sv,
 
 void
 Perl_mem_log_del_sv(const SV *sv,
-                    const char *filename, const int linenumber, 
+                    const char *filename, const int linenumber,
                     const char *funcname)
 {
     PERL_ARGS_ASSERT_MEM_LOG_DEL_SV;
 
-    mem_log_common_if(MLT_DEL_SV, 0, 0, "", sv, NULL, NULL, 
+    mem_log_common_if(MLT_DEL_SV, 0, 0, "", sv, NULL, NULL,
                       filename, linenumber, funcname);
 }
 
@@ -5158,9 +5150,9 @@ See also L</quadmath_format_needed>.
 bool
 Perl_quadmath_format_valid(const char* format)
 {
-    STRLEN len;
-
     PERL_ARGS_ASSERT_QUADMATH_FORMAT_VALID;
+
+    STRLEN len;
 
     if (format[0] != '%' || strchr(format + 1, '%'))
         return FALSE;
@@ -5198,10 +5190,10 @@ In this case, the code should probably fail.
 bool
 Perl_quadmath_format_needed(const char* format)
 {
+  PERL_ARGS_ASSERT_QUADMATH_FORMAT_NEEDED;
+
   const char *p = format;
   const char *q;
-
-  PERL_ARGS_ASSERT_QUADMATH_FORMAT_NEEDED;
 
   while ((q = strchr(p, '%'))) {
     q++;
@@ -5247,11 +5239,12 @@ getting C<vsnprintf>.
 int
 Perl_my_snprintf(char *buffer, const Size_t len, const char *format, ...)
 {
+    PERL_ARGS_ASSERT_MY_SNPRINTF;
+
     int retval = -1;
     va_list ap;
     dTHX;
 
-    PERL_ARGS_ASSERT_MY_SNPRINTF;
 #ifndef HAS_VSNPRINTF
     PERL_UNUSED_VAR(len);
 #endif
@@ -5338,6 +5331,8 @@ C<sv_vcatpvf> instead, or getting C<vsnprintf>.
 int
 Perl_my_vsnprintf(char *buffer, const Size_t len, const char *format, va_list ap)
 {
+    PERL_ARGS_ASSERT_MY_VSNPRINTF;
+
 #ifdef USE_QUADMATH
     PERL_UNUSED_ARG(buffer);
     PERL_UNUSED_ARG(len);
@@ -5353,7 +5348,6 @@ Perl_my_vsnprintf(char *buffer, const Size_t len, const char *format, va_list ap
 #  ifdef NEED_VA_COPY
     va_list apc;
 
-    PERL_ARGS_ASSERT_MY_VSNPRINTF;
     Perl_va_copy(ap, apc);
 #    ifdef HAS_VSNPRINTF
 
@@ -5398,6 +5392,8 @@ Perl_my_vsnprintf(char *buffer, const Size_t len, const char *format, va_list ap
 void
 Perl_my_clearenv(pTHX)
 {
+    PERL_ARGS_ASSERT_MY_CLEARENV;
+
 #  if defined(PERL_IMPLICIT_SYS) || defined(WIN32)
     PerlEnv_clearenv();
 #  else /* ! (PERL_IMPLICIT_SYS || WIN32) */
@@ -5457,10 +5453,10 @@ off, by allocating or extending the interpreter's C<PL_my_cxt_list> array
 void *
 Perl_my_cxt_init(pTHX_ int *indexp, size_t size)
 {
+    PERL_ARGS_ASSERT_MY_CXT_INIT;
+
     void *p;
     int index;
-
-    PERL_ARGS_ASSERT_MY_CXT_INIT;
 
     index = *indexp;
     /* do initial check without locking.
@@ -5552,6 +5548,8 @@ Perl_my_cxt_init(pTHX_ int *indexp, size_t size)
 Stack_off_t
 Perl_xs_handshake(const U32 key, void * v_my_perl, const char * file, ...)
 {
+    PERL_ARGS_ASSERT_XS_HANDSHAKE;
+
     va_list args;
     Stack_off_t items;
     Stack_off_t ax;
@@ -5566,7 +5564,6 @@ Perl_xs_handshake(const U32 key, void * v_my_perl, const char * file, ...)
     CV* cv;
     SV *** xs_spp;
 #endif
-    PERL_ARGS_ASSERT_XS_HANDSHAKE;
     va_start(args, file);
 
     got = INT2PTR(void*, (UV)(key & HSm_KEY_MATCH));
@@ -5691,15 +5688,15 @@ cross platform way to prevent a SEGV.
 }
 
 
-STATIC void
+static void
 S_xs_version_bootcheck(pTHX_ SSize_t items, SSize_t ax, const char *xs_p,
                           STRLEN xs_len)
 {
+    PERL_ARGS_ASSERT_XS_VERSION_BOOTCHECK;
+
     SV *sv;
     const char *vn = NULL;
     SV *const module = PL_stack_base[ax];
-
-    PERL_ARGS_ASSERT_XS_VERSION_BOOTCHECK;
 
     if (items >= 2)	 /* version supplied as bootstrap arg */
         sv = PL_stack_base[ax + 1];
@@ -5713,14 +5710,15 @@ S_xs_version_bootcheck(pTHX_ SSize_t items, SSize_t ax, const char *xs_p,
         }
     }
     if (sv) {
-        SV *xssv = Perl_newSVpvn_flags(aTHX_ xs_p, xs_len, SVs_TEMP);
+        SV *xssv = newSVpvn_flags(xs_p, xs_len, SVs_TEMP);
         SV *pmsv = sv_isobject(sv) && sv_derived_from(sv, "version")
             ? sv : sv_2mortal(new_version(sv));
         xssv = upg_version(xssv, 0);
         if ( vcmp(pmsv,xssv) ) {
             SV *string = vstringify(xssv);
-            SV *xpt = Perl_newSVpvf(aTHX_ "%" SVf " object version %" SVf
-                                    " does not match ", SVfARG(module), SVfARG(string));
+            SV *xpt = newSVpvf("%" SVf " object version %" SVf
+                               " does not match ",
+                               SVfARG(module), SVfARG(string));
 
             SvREFCNT_dec(string);
             string = vstringify(pmsv);
@@ -5733,9 +5731,52 @@ S_xs_version_bootcheck(pTHX_ SSize_t items, SSize_t ax, const char *xs_p,
             }
             SvREFCNT_dec(string);
 
-            Perl_sv_2mortal(aTHX_ xpt);
-            Perl_croak_sv(aTHX_ xpt);
+            sv_2mortal(xpt);
+            croak_sv(xpt);
         }
+    }
+}
+
+/*
+=for apidoc api_version_assert
+
+Used by the PERL_API_VERSION_CHECK macro to compare the perl the
+object was built with and the perl that C<libperl> was built with.
+
+This can be used to ensure that these match and produces a more
+diagnosable than random crashes and mis-behaviour.
+
+=cut
+*/
+
+void
+Perl_api_version_assert(size_t interp_size, void *v_my_perl,
+                        const char *api_version) {
+    PERL_ARGS_ASSERT_API_VERSION_ASSERT;
+
+    dTHX;
+
+    if (interp_size != sizeof(PerlInterpreter)) {
+        /* detects various types of configuration mismatches */
+        /* diag_listed_as: Mismatch between expected and libperl %s */
+        croak("Mismatch between expected and libperl interpreter structure"
+              " size %zd vs %zd", interp_size, sizeof(PerlInterpreter));
+    }
+    if (
+#ifdef MULTIPLICITY
+      v_my_perl != my_perl
+#else
+      v_my_perl != NULL
+#endif
+        ) {
+        /* detect threads vs non-threads mismatch */
+        /* diag_listed_as: Mismatch between expected and libperl %s */
+        croak("Mismatch between expected and libperl interpreter pointer");
+    }
+    if (strNE(api_version, PERL_API_VERSION_STRING)) {
+        /* diag_listed_as: Mismatch between expected and libperl %s */
+        croak("Mismatch between expected and libperl API versions %s vs %s",
+              api_version, PERL_API_VERSION_STRING);
     }
 }
 
@@ -5754,6 +5795,8 @@ S_gv_has_usable_name(pTHX_ GV *gv)
 void
 Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 {
+    PERL_ARGS_ASSERT_GET_DB_SUB;
+
     SV * const dbsv = GvSVn(PL_DBsub);
     const bool save_taint = TAINT_get;
 
@@ -5761,8 +5804,6 @@ Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
      * we do not care about using dbsv to call CV;
      * it's for informational purposes only.
      */
-
-    PERL_ARGS_ASSERT_GET_DB_SUB;
 
     TAINT_set(FALSE);
     save_item(dbsv);
@@ -5780,7 +5821,7 @@ Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
                  !( (SvTYPE(*svp) == SVt_PVGV)
                     && (GvCV((const GV *)*svp) == cv)
                     /* Use GV from the stack as a fallback. */
-                    && S_gv_has_usable_name(aTHX_ gv = (GV *)*svp) 
+                    && S_gv_has_usable_name(aTHX_ gv = (GV *)*svp)
                   )
                 )
         ) {
@@ -5820,7 +5861,9 @@ if not easily emulatable.
 */
 
 int
-Perl_my_dirfd(DIR * dir) {
+Perl_my_dirfd(DIR * dir)
+{
+    PERL_ARGS_ASSERT_MY_DIRFD;
 
     /* Most dirfd implementations have problems when passed NULL. */
     if(!dir)
@@ -5833,7 +5876,7 @@ Perl_my_dirfd(DIR * dir) {
     Perl_croak_nocontext(PL_no_func, "dirfd");
     NOT_REACHED; /* NOTREACHED */
     return 0;
-#endif 
+#endif
 }
 
 #if !defined(HAS_MKOSTEMP) || !defined(HAS_MKSTEMP)
@@ -5842,7 +5885,8 @@ Perl_my_dirfd(DIR * dir) {
 #define TEMP_FILE_CH_COUNT (sizeof(TEMP_FILE_CH)-1)
 
 static int
-S_my_mkostemp(char *templte, int flags) {
+S_my_mkostemp(char *templte, int flags)
+{
     dTHX;
     STRLEN len = strlen(templte);
     int fd;
@@ -5918,7 +5962,9 @@ Perl_my_mkstemp(char *templte)
 #endif
 
 REGEXP *
-Perl_get_re_arg(pTHX_ SV *sv) {
+Perl_get_re_arg(pTHX_ SV *sv)
+{
+    PERL_ARGS_ASSERT_GET_RE_ARG;
 
     if (sv) {
         if (SvMAGICAL(sv))
@@ -5928,7 +5974,7 @@ Perl_get_re_arg(pTHX_ SV *sv) {
         if (SvTYPE(sv) == SVt_REGEXP)
             return (REGEXP*) sv;
     }
- 
+
     return NULL;
 }
 
@@ -5970,12 +6016,12 @@ Perl_get_re_arg(pTHX_ SV *sv) {
 #define FREEBSD_DRAND48_MULT_2   (0x0005)
 #define FREEBSD_DRAND48_ADD      (0x000b)
 
-const unsigned short _rand48_mult[3] = {
-                FREEBSD_DRAND48_MULT_0,
-                FREEBSD_DRAND48_MULT_1,
-                FREEBSD_DRAND48_MULT_2
+static const unsigned short rand48_mult_[3] = {
+    FREEBSD_DRAND48_MULT_0,
+    FREEBSD_DRAND48_MULT_1,
+    FREEBSD_DRAND48_MULT_2
 };
-const unsigned short _rand48_add = FREEBSD_DRAND48_ADD;
+static const unsigned short rand48_add_ = FREEBSD_DRAND48_ADD;
 
 #endif
 
@@ -6008,17 +6054,17 @@ Perl_drand48_r(perl_drand48_t *random_state)
     U32 accu;
     U16 temp[2];
 
-    accu = (U32) _rand48_mult[0] * (U32) random_state->seed[0]
-         + (U32) _rand48_add;
+    accu = (U32) rand48_mult_[0] * (U32) random_state->seed[0]
+         + (U32) rand48_add_;
     temp[0] = (U16) accu;        /* lower 16 bits */
     accu >>= sizeof(U16) * 8;
-    accu += (U32) _rand48_mult[0] * (U32) random_state->seed[1]
-          + (U32) _rand48_mult[1] * (U32) random_state->seed[0];
+    accu += (U32) rand48_mult_[0] * (U32) random_state->seed[1]
+          + (U32) rand48_mult_[1] * (U32) random_state->seed[0];
     temp[1] = (U16) accu;        /* middle 16 bits */
     accu >>= sizeof(U16) * 8;
-    accu += _rand48_mult[0] * random_state->seed[2]
-          + _rand48_mult[1] * random_state->seed[1]
-          + _rand48_mult[2] * random_state->seed[0];
+    accu += rand48_mult_[0] * random_state->seed[2]
+          + rand48_mult_[1] * random_state->seed[1]
+          + rand48_mult_[2] * random_state->seed[0];
     random_state->seed[0] = temp[0];
     random_state->seed[1] = temp[1];
     random_state->seed[2] = (U16) accu;
@@ -6179,11 +6225,11 @@ static void atos_update(atos_context* ctx,
     if (ctx->unavail)
         return;
     if (ctx->tool == NULL) {
-        const char* tools[] = {
+        static const char* const tools[] = {
             "/usr/bin/xcrun",
             "/usr/bin/atos"
         };
-        const char* formats[] = {
+        static const char* const formats[] = {
             "/usr/bin/xcrun atos -o '%s' -l %08x %08x 2>&1",
             "/usr/bin/atos -d -o '%s' -l %08x %08x 2>&1"
         };
@@ -6362,6 +6408,8 @@ returning at most C<depth> frames.
 Perl_c_backtrace*
 Perl_get_c_backtrace(pTHX_ int depth, int skip)
 {
+    PERL_ARGS_ASSERT_GET_C_BACKTRACE;
+
     /* Note that here we must stay as low-level as possible: Newx(),
      * Copy(), Safefree(); since we may be called from anywhere,
      * so we should avoid higher level constructs like SVs or AVs.
@@ -6631,6 +6679,8 @@ if the optimizer has transformed the code by for example inlining.
 SV*
 Perl_get_c_backtrace_dump(pTHX_ int depth, int skip)
 {
+    PERL_ARGS_ASSERT_GET_C_BACKTRACE_DUMP;
+
     Perl_c_backtrace* bt;
 
     bt = get_c_backtrace(depth, skip + 1 /* Hide ourselves. */);
@@ -6694,11 +6744,9 @@ Returns true if a backtrace could be retrieved, false if not.
 bool
 Perl_dump_c_backtrace(pTHX_ PerlIO* fp, int depth, int skip)
 {
-    SV* sv;
-
     PERL_ARGS_ASSERT_DUMP_C_BACKTRACE;
 
-    sv = Perl_get_c_backtrace_dump(aTHX_ depth, skip);
+    SV* sv = get_c_backtrace_dump(depth, skip);
     if (sv) {
         sv_2mortal(sv);
         PerlIO_printf(fp, "%s", SvPV_nolen(sv));
@@ -6738,13 +6786,13 @@ int perl_tsa_mutex_destroy(perl_mutex* mutex)
 void
 Perl_dtrace_probe_call(pTHX_ CV *cv, bool is_call)
 {
+    PERL_ARGS_ASSERT_DTRACE_PROBE_CALL;
+
     const char *func;
     const char *file;
     const char *stash;
     const COP  *start;
     line_t      line;
-
-    PERL_ARGS_ASSERT_DTRACE_PROBE_CALL;
 
     if (CvNAMED(cv)) {
         HEK *hek = CvNAME_HEK(cv);
@@ -6800,6 +6848,8 @@ Perl_dtrace_probe_op(pTHX_ const OP *op)
 void
 Perl_dtrace_probe_phase(pTHX_ enum perl_phase phase)
 {
+    PERL_ARGS_ASSERT_DTRACE_PROBE_PHASE;
+
     const char *ph_old = PL_phase_names[PL_phase];
     const char *ph_new = PL_phase_names[phase];
 

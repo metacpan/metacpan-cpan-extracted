@@ -157,4 +157,31 @@ subtest 'stash shared across protocol helpers' => sub {
     is($direct_stash->get('user'), 'bob', 'stash data shared with direct scope access');
 };
 
+subtest 'csrf_token accessor' => sub {
+    my $ctx_none = PAGI::Context->new({ type => 'http', headers => [] }, sub {}, sub {});
+    is($ctx_none->csrf_token, undef, 'csrf_token undef when middleware not enabled');
+
+    my $ctx = PAGI::Context->new(
+        { type => 'http', headers => [], csrf_token => 'tok-abc123' },
+        sub {}, sub {},
+    );
+    is($ctx->csrf_token, 'tok-abc123', 'csrf_token returns scope value');
+};
+
+subtest 'csrf_verify' => sub {
+    my $ctx = PAGI::Context->new(
+        { type => 'http', headers => [], csrf_token => 'tok-abc123' },
+        sub {}, sub {},
+    );
+
+    ok($ctx->csrf_verify('tok-abc123'), 'true when submitted matches scope token');
+    ok(!$ctx->csrf_verify('wrong-token'), 'false when submitted does not match');
+    ok(!$ctx->csrf_verify(''), 'false when submitted is empty');
+    ok(!$ctx->csrf_verify(undef), 'false when submitted is undef');
+
+    my $ctx_no_token = PAGI::Context->new({ type => 'http', headers => [] }, sub {}, sub {});
+    ok(!$ctx_no_token->csrf_verify('anything'), 'false when scope has no csrf_token');
+    ok(!$ctx_no_token->csrf_verify(''), 'false when both submitted and scope token are empty');
+};
+
 done_testing;

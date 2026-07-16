@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion::Annotation
 
+0.1.0 2026-07-15T15:33:18Z
+
+    - use Aion::Env without config
+
 0.0.3 2025-12-03T18:04:42Z
 
     - added linenos

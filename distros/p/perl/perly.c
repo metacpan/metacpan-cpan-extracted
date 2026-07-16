@@ -128,6 +128,15 @@ yysymprint(pTHX_ PerlIO * const yyoutput, int yytype, const YYSTYPE * const yyva
 }
 
 
+/* common prefixes of token names to strip when displaying in compact form
+ */
+static const char *name_prefixes[] = {
+    "PERLY_",
+    "KW_",
+    "bare_statement_",
+    NULL,
+};
+
 /*  yy_stack_print()
  *  print the top 8 items on the parse stack.
  */
@@ -150,8 +159,21 @@ yy_stack_print (pTHX_ const yy_parser *parser)
         PerlIO_printf(Perl_debug_log, " %8d", ps->state);
 
     PerlIO_printf(Perl_debug_log, "\ntoken:");
-    for (ps = min; ps <= parser->ps; ps++)
-        PerlIO_printf(Perl_debug_log, " %8.8s", ps->name);
+    for (ps = min; ps <= parser->ps; ps++) {
+        const char *name = ps->name;
+        const char **p = name_prefixes;
+        /* strip some common prefixes off the name to better display
+         * truncated names */
+        for (; *p; p++) {
+            const char *prefix = *p;
+            STRLEN l = strlen(prefix);
+            if (strnEQ(name, prefix, l)) {
+                name += l;
+                break;
+            }
+        }
+        PerlIO_printf(Perl_debug_log, " %8.8s", name);
+    }
 
     PerlIO_printf(Perl_debug_log, "\nvalue:");
     for (ps = min; ps <= parser->ps; ps++) {
@@ -220,9 +242,12 @@ do {					\
  * parse stack, thus avoiding leaks if we die  */
 
 static void
-S_clear_yystack(pTHX_  const yy_parser *parser)
+S_clear_yystack(pTHX_ void *arg)
 {
-    yy_stack_frame *ps     = parser->ps;
+    /* arg must be void * for this function to be compatible with
+       SAVEDESTRUCTOR_X/any_dxptr */
+    const yy_parser *parser = (const yy_parser *)arg;
+    yy_stack_frame *ps      = parser->ps;
     int i = 0;
 
     if (!parser->stack)
@@ -265,6 +290,8 @@ S_clear_yystack(pTHX_  const yy_parser *parser)
 int
 Perl_yyparse (pTHX_ int gramtype)
 {
+    PERL_ARGS_ASSERT_YYPARSE;
+
     int yystate;
     int yyn;
     int yyresult;

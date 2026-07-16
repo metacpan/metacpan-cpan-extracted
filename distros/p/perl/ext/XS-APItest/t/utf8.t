@@ -33,8 +33,8 @@ my $offset = 1;  # Start 1 byte past word boundary.
 # We choose an invariant and a variant that are at the boundaries between
 # those two types on ASCII platforms.  And, just in case the EBCDIC ever
 # changes to do per-word, we choose arbitrarily an invariant that has most of
-# its bits set natively, and a variant that has most unset.   First create
-# versions for display in the test names.
+# its bits set natively, and a variant that has most unset.  The variant is a
+# continuation byte.  First create versions for display in the test names.
 my $display_invariant = isASCII ? "7F" : sprintf "%02X", utf8::unicode_to_native(0x9F);
 my $display_variant =   isASCII ? "80" : sprintf "%02X", utf8::unicode_to_native(0xA0);
 my $invariant = chr hex $display_invariant;
@@ -883,12 +883,12 @@ for my $u (sort { utf8::unicode_to_native($a) <=> utf8::unicode_to_native($b) }
 
     $ret_ref = test_valid_utf8_to_uvchr($bytes);
     is($ret_ref->[0], $n,
-                   "Verify valid_utf8_to_uvchr($display_bytes) returns $hex_n");
+                   "Verify valid_utf8_to_uv($display_bytes) returns $hex_n");
     is($ret_ref->[1], $len,
-       "Verify valid_utf8_to_uvchr() for $hex_n returns expected length: $len");
+       "Verify valid_utf8_to_uv() for $hex_n returns expected length: $len");
 
     is(scalar @warnings, 0,
-               "Verify valid_utf8_to_uvchr() for $hex_n generated no warnings")
+               "Verify valid_utf8_to_uv() for $hex_n generated no warnings")
       or output_warnings(@warnings);
 
     # Similarly for uvchr_to_utf8

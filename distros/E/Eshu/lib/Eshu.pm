@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Eshu', $VERSION);
@@ -552,7 +552,7 @@ that need to compile against C<eshu_hl.h> or other Eshu headers without
 copying them — add the returned path to C<INC> in your C<Makefile.PL>:
 
 	eval { require Eshu; $eshu_inc = Eshu->include_dir() };
-	$eshu_inc //= '../Eshu-0.06/include';  # development fallback
+	$eshu_inc //= '../Eshu-0.09/include';  # development fallback
 
 =head2 highlight_string
 

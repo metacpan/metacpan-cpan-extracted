@@ -1,0 +1,30 @@
+The following logs changes for the CPAN distribution DBIx-Class-Valiant
+
+0.001001  2026 July 15
+        - Initial standalone release.  DBIx::Class::Valiant provides
+          Ruby-on-Rails-inspired, Valiant-powered domain validations for
+          DBIx::Class: filter-on-new, validate-on-insert/update, nested
+          creates/updates across relationships (accept_nested_for), and
+          FormBuilder glue.
+        - Extracted from the Valiant distribution with development history
+          preserved.  Two behavior changes versus the version previously
+          bundled with Valiant (through 0.002019):
+        - Fixed: 'allow_destroy' on single relationships (might_have /
+          has_one / belongs_to) never took effect - a nested '_delete'
+          request was silently ignored even when accept_nested_for declared
+          allow_destroy.  It now deletes the related row, matching the
+          existing has_many behavior.  If you were (knowingly or not)
+          relying on those deletes being ignored, review your
+          accept_nested_for configs before upgrading.
+        - Behavior change: nested collection updates no longer implicitly
+          delete rows omitted from the update arguments.  Deleting now
+          always requires either an explicit '_delete' request (under
+          allow_destroy) or the new accept_nested_for option
+          'delete_omitted', which restores the old replace-the-whole-set
+          semantics as a deliberate opt-in.  If you relied on omitted rows
+          being deleted, add delete_omitted => 1 to the relevant
+          accept_nested_for configuration.
+        - Fixed: a non-reference nested relationship value (e.g.
+          roles => 'somestring') was silently ignored via a stray 'next'
+          outside a loop; undef now means nothing-to-do and any other non
+          reference raises an error.

@@ -1,0 +1,37 @@
+<script>
+/**
+ * Called by DatatableUser.js when editing a user.
+ * Fetches all groups and selects the ones the user belongs to.
+ * @param {object} user - The user object (with user.groups array)
+ */
+function loadGroups(user) {
+    $.getJSON('/api/group', function(allGroups) {
+        var sel = $('#groupes');
+        sel.empty();
+
+        var userGroupIds = {};
+        if (user && user.groups) {
+            for (var i = 0; i < user.groups.length; i++) {
+                userGroupIds[user.groups[i].id] = true;
+            }
+        }
+
+        for (var i = 0; i < allGroups.length; i++) {
+            var g = allGroups[i];
+            var selected = userGroupIds[g.id] ? ' selected' : '';
+            sel.append('<option value="' + g.id + '"' + selected + '>' + g.name + '</option>');
+        }
+
+        sel.selectpicker('refresh');
+        $('#groups-group').show();
+    });
+}
+
+/**
+ * Intercepts the save to collect group assignments.
+ * Called by validateUserForm() in DatatableUser.js before save.
+ */
+function collectGroupAssignments() {
+    return $('#groupes').val() || [];
+}
+</script>

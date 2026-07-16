@@ -1,5 +1,5 @@
 package Game::TileMap::Pathfinding::Result;
-$Game::TileMap::Pathfinding::Result::VERSION = '0.001';
+$Game::TileMap::Pathfinding::Result::VERSION = '0.002';
 use v5.14;
 use warnings;
 

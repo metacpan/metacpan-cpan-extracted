@@ -56,9 +56,6 @@ Perl_prescan_version(pTHX_ const char *s, bool strict,
     PERL_ARGS_ASSERT_PRESCAN_VERSION;
     PERL_UNUSED_CONTEXT;
 
-    if (qv && isDIGIT(*d))
-        goto dotted_decimal_version;
-
     if (*d == 'v') { /* explicit v-string */
         d++;
         if (isDIGIT(*d)) {
@@ -68,7 +65,9 @@ Perl_prescan_version(pTHX_ const char *s, bool strict,
             /* requires v1.2.3 */
             BADVERSION(s,errstr,"Invalid version format (dotted-decimal versions require at least three parts)");
         }
+    }
 
+    if (qv && isDIGIT(*d)) {
 dotted_decimal_version:
         if (strict && d[0] == '0' && isDIGIT(d[1])) {
             /* no leading zeros allowed */
@@ -1013,7 +1012,7 @@ Perl_vnumify(pTHX_ SV *vs)
     {
         SV * tsv = *av_fetch(av, i, 0);
         digit = SvIV(tsv);
-        sv_catpvf(sv, "%03d", (int)digit);
+        Perl_sv_catpvf(aTHX_ sv, "%03d", (int)digit);
     }
 
     if ( len == 0 ) {
@@ -1071,7 +1070,7 @@ Perl_vnormal(pTHX_ SV *vs)
     for ( i = 1 ; i <= len ; i++ ) {
         SV * tsv = *av_fetch(av, i, 0);
         digit = SvIV(tsv);
-        sv_catpvf(sv, ".%" IVdf, (IV)digit);
+        Perl_sv_catpvf(aTHX_ sv, ".%" IVdf, (IV)digit);
     }
 
     if ( len <= 2 ) { /* short version, must be at least three */

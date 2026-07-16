@@ -31,4 +31,11 @@ use Test::Most;
   };
 }
 
+{
+  # A sibling field holding '' (the normal HTML-form case for an unfilled
+  # optional field) must NOT count as filled.
+  ok my $object = Local::Test::OnlyOf->new(opt1=>'aaa', opt2=>'');
+  ok $object->validate->valid, 'an empty-string sibling does not count against max_allowed';
+}
+
 done_testing;

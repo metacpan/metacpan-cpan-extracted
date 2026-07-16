@@ -1,5 +1,5 @@
 package PAGI::App::WebSocket::Broadcast;
-$PAGI::App::WebSocket::Broadcast::VERSION = '0.002001';
+$PAGI::App::WebSocket::Broadcast::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

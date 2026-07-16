@@ -1,5 +1,5 @@
 package PAGI::Utils::Random;
-$PAGI::Utils::Random::VERSION = '0.002001';
+$PAGI::Utils::Random::VERSION = '0.002002';
 use strict;
 use warnings;
 use Exporter 'import';

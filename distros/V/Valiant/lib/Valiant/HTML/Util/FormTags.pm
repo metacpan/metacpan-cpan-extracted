@@ -448,13 +448,6 @@ sub field_errors {
     : ();
 }
 
-#sub field_label {
-#  my ($self, $model, $attribute) = @_;
-#  return $model->read_attribute_errors_for($attribute) if $model->can('read_attribute_errors_for');
-#  return $model->errors->full_messages_for($attribute);
-#}
-
-
 1;
 
 =head1 NAME

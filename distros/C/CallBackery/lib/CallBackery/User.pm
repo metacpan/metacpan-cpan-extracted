@@ -121,6 +121,17 @@ has loginName => sub {
     shift->userInfo->{cbuser_login} // '*UNKNOWN*';
 };
 
+=head2 sessionExpired
+
+True when a validly-signed session cookie was presented but is too old. Distinct
+from "not authenticated at all" (no/invalid cookie), which leaves this false. Set
+by whichever layer detects expiry (e.g. a subclass' C<cookieConf> that enforces a
+max cookie age); read by the RPC dispatcher to choose the session-expired signal
+(code 7) over the login-required signal (code 6). Per-request.
+
+=cut
+
+has sessionExpired => 0;
 
 =head2 $self->sessionConf
 

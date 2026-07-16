@@ -13,7 +13,7 @@ BEGIN {
 use warnings;
 use strict;
 
-my $tests = 53; # not counting those in the __DATA__ section
+my $tests = 72; # not counting those in the __DATA__ section
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -26,20 +26,18 @@ $/ = "\n####\n";
 while (<DATA>) {
     chomp;
     $tests ++;
-    # This code is pinched from the t/lib/common.pl for TODO.
-    # It's not clear how to avoid duplication
     my %meta = (context => '');
     foreach my $what (qw(skip todo context options)) {
-	s/^#\s*\U$what\E\s*(.*)\n//m and $meta{$what} = $1;
-	# If the SKIP reason starts ? then it's taken as a code snippet to
-	# evaluate. This provides the flexibility to have conditional SKIPs
-	if ($meta{$what} && $meta{$what} =~ s/^\?//) {
-	    my $temp = eval $meta{$what};
-	    if ($@) {
-		die "# In \U$what\E code reason:\n# $meta{$what}\n$@";
-	    }
-	    $meta{$what} = $temp;
-	}
+        s/^#\s*\U$what\E\s*(.*)\n//m and $meta{$what} = $1;
+        # If the SKIP reason starts ? then it's taken as a code snippet to
+        # evaluate. This provides the flexibility to have conditional SKIPs
+        if ($meta{$what} && $meta{$what} =~ s/^\?//) {
+            my $temp = eval $meta{$what};
+            if ($@) {
+                die "# In \U$what\E code reason:\n# $meta{$what}\n$@";
+            }
+            $meta{$what} = $temp;
+        }
     }
 
     s/^\s*#\s*(.*)$//mg;
@@ -47,51 +45,43 @@ while (<DATA>) {
     die "Missing name in test $_" unless defined $desc;
 
     if ($meta{skip}) {
-	SKIP: { skip($meta{skip}) };
-	next;
+        SKIP: { skip($meta{skip}) };
+        next;
     }
 
     my ($input, $expected);
     if (/(.*)\n>>>>\n(.*)/s) {
-	($input, $expected) = ($1, $2);
+        ($input, $expected) = ($1, $2);
     }
     else {
-	($input, $expected) = ($_, $_);
+        ($input, $expected) = ($_, $_);
     }
 
     # parse options if necessary
     my $deparse = $meta{options}
-	? $deparse{$meta{options}} ||=
-	    B::Deparse->new(split /,/, $meta{options})
-	: $deparse;
+        ? $deparse{$meta{options}} ||=
+            B::Deparse->new(split /,/, $meta{options})
+        : $deparse;
 
     my $code = "$meta{context};\n" . <<'EOC' . "sub {$input\n}";
 # Tell B::Deparse about our ambient pragmas
-my ($hint_bits, $warning_bits, $hinthash);
-BEGIN {
-    ($hint_bits, $warning_bits, $hinthash) = ($^H, ${^WARNING_BITS}, \%^H);
-}
-$deparse->ambient_pragmas (
-    hint_bits    => $hint_bits,
-    warning_bits => $warning_bits,
-    '%^H'        => $hinthash,
-);
+$deparse->ambient_pragmas_from_caller;
 EOC
     my $coderef = eval $code;
 
     local $::TODO = $meta{todo};
     if ($@) {
-	is($@, "", "compilation of $desc")
+        is($@, "", "compilation of $desc")
             or diag "=============================================\n"
                   . "CODE:\n--------\n$code\n--------\n"
                   . "=============================================\n";
     }
     else {
-	my $deparsed = $deparse->coderef2text( $coderef );
-	my $regex = $expected;
-	$regex =~ s/(\S+)/\Q$1/g;
-	$regex =~ s/\s+/\\s+/g;
-	$regex = '^\{\s*' . $regex . '\s*\}$';
+        my $deparsed = $deparse->coderef2text( $coderef );
+        my $regex = $expected;
+        $regex =~ s/(\S+)/\Q$1/g;
+        $regex =~ s/\s+/\\s+/g;
+        $regex = '^\{\s*' . $regex . '\s*\}$';
 
         like($deparsed, qr/$regex/, $desc)
             or diag "=============================================\n"
@@ -103,17 +93,7 @@ EOC
 }
 
 # Reset the ambient pragmas
-{
-    my ($b, $w, $h);
-    BEGIN {
-        ($b, $w, $h) = ($^H, ${^WARNING_BITS}, \%^H);
-    }
-    $deparse->ambient_pragmas (
-        hint_bits    => $b,
-        warning_bits => $w,
-        '%^H'        => $h,
-    );
-}
+$deparse->ambient_pragmas_from_caller;
 
 use constant 'c', 'stuff';
 is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff',
@@ -133,9 +113,9 @@ my $path = join " ", map { qq["-I$_"] } @INC;
 
 $a = `$^X $path "-MO=Deparse" -anlwi.bak -e 1 2>&1`;
 $a =~ s/-e syntax OK\n//g;
-$a =~ s/.*possible typo.*\n//;	   # Remove warning line
-$a =~ s/.*-i used with no filenames.*\n//;	# Remove warning line
-$b = quotemeta <<'EOF';
+$a =~ s/.*possible typo.*\n//;              # Remove warning line
+$a =~ s/.*-i used with no filenames.*\n//;  # Remove warning line
+my $b = quotemeta <<'EOF';
 BEGIN { $^I = ".bak"; }
 BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
@@ -196,7 +176,7 @@ sub test {
    my $val = shift;
    my $res = B::Deparse::Wrapper::getcode($val);
    like($res, qr/use warnings/,
-	'[perl #35857] [PATCH] B::Deparse doesnt handle warnings register properly');
+    '[perl #35857] [PATCH] B::Deparse doesnt handle warnings register properly');
 }
 my ($q,$p);
 my $x=sub { ++$q,++$p };
@@ -285,15 +265,15 @@ unlike($a, qr/BEGIN/,
 SKIP: {
     skip "requires 5.11", 1 unless $] >= 5.011;
     eval q`
-	BEGIN {
-	    # Clear out all hints
-	    %^H = ();
-	    $^H = 0;
-	    B::Deparse->new->ambient_pragmas(strict => 'all');
-	}
-	use 5.011;  # should enable strict
-	ok !eval '$do_noT_create_a_variable_with_this_name = 1',
-	  'ambient_pragmas do not mess with compiling scope';
+    BEGIN {
+        # Clear out all hints
+        %^H = ();
+        $^H = 0;
+        B::Deparse->new->ambient_pragmas(strict => 'all');
+    }
+    use 5.011;  # should enable strict
+    ok !eval '$do_noT_create_a_variable_with_this_name = 1',
+      'ambient_pragmas do not mess with compiling scope';
    `;
 }
 
@@ -584,6 +564,108 @@ EOF
     qr/ +method m \(\) \{\n +\$x\+\+;\n +\}/,
     "feature class method deparses as method";
 
+# GH#23699
+{
+    my $signatured_sub = do {
+        use feature qw( signatures );
+        sub ($x, $y) { return $x + $y; }
+    };
+
+    {
+        no feature qw( signatures );
+        $deparse->ambient_pragmas_from_caller;
+        my $deparsed = $deparse->coderef2text( $signatured_sub );
+        unlike $deparsed, qr/^\(\$x, \$y\) \{/,
+            'Deparsed signatured sub under  no feature qw( signatures )';
+    }
+
+    {
+        use feature qw( signatures );
+        $deparse->ambient_pragmas_from_caller;
+        my $deparsed = $deparse->coderef2text( $signatured_sub );
+        like $deparsed, qr/^\(\$x, \$y\) \{/,
+            'Deparsed signatured sub under  use feature qw( signatures )';
+    }
+
+    {
+        use v5.36;
+        $deparse->ambient_pragmas_from_caller;
+        my $deparsed = $deparse->coderef2text( $signatured_sub );
+        like $deparsed, qr/^\(\$x, \$y\) \{/,
+            'Deparsed signatured sub under  use v5.36';
+    }
+}
+
+{
+    # Ability to deparse various kinds of signature into non-feature signatures
+    # context
+    no feature qw( signatures );
+    $deparse->ambient_pragmas_from_caller;
+
+    use feature qw( signatures );
+    my $deparsed;
+
+    # These tests are all somewhat fragile as they depend on the exact
+    # pure-perl transliteration of OP_MULTIPARAM, as performed by B/Deparse.pm
+
+    $deparsed = $deparse->coderef2text( sub () { } );
+    like $deparsed,
+        qr/die .*Too many arguments for subroutine at.* unless \@_ <= 0/m,
+        'Deparsed signature empty max bounds';
+
+    $deparsed = $deparse->coderef2text( sub ($x, $y) { } );
+    like $deparsed,
+        qr/die .*Too many arguments for subroutine at.* unless \@_ <= 2/m,
+        'Deparsed signature two-args max bounds';
+    like $deparsed,
+        qr/die .*Too few arguments for subroutine at.* unless \@_ >= 2/m,
+        'Deparsed signature two-args min bounds';
+    like $deparsed,
+        qr/my \$x = \$_\[0];/m,
+        'Deparsed signature two-args arg 0';
+    like $deparsed,
+        qr/my \$y = \$_\[1];/m,
+        'Deparsed signature two-args arg 1';
+
+    $deparsed = $deparse->coderef2text( sub ($one = 1, $two //= 2, $three ||= 3) { } );
+    like $deparsed,
+        qr/my \$one = \@_ > 0 \? \$_\[0] : 1;/m,
+        'Deparsed signature with defaults arg 0';
+    like $deparsed,
+        qr/my \$two = \$_\[1] \/\/ 2;/m,
+        'Deparsed signature with defaults arg 1';
+    like $deparsed,
+        qr/my \$three = \$_\[2] \|\| 3;/m,
+        'Deparsed signature with defaults arg 2';
+
+    $deparsed = $deparse->coderef2text( sub ($, $ = IFMISSING(), $ //= IFUNDEF(), $ ||= IFFALSE()) { } );
+    unlike $deparsed,
+        qr/\$_\[0];/m,
+        'Deparsed signature anon args 0';
+    like $deparsed,
+        qr/IFMISSING\(\) unless \@_ > 1;/m,
+        'Deparsed signature anon args 1';
+    like $deparsed,
+        qr/IFUNDEF\(\) unless defined \$_\[2];/m,
+        'Deparsed signature anon args 2';
+    like $deparsed,
+        qr/IFFALSE\(\) unless \$_\[3];/m,
+        'Deparsed signature anon args 3';
+
+    $deparsed = $deparse->coderef2text( sub ($z, @rest) { } );
+    unlike $deparsed,
+        qr/die .*Too many arguments for subroutine at.*/m,
+        'Deparsed signature with slurpy has no max bounds';
+    like $deparsed,
+        qr/die .*Too few arguments for subroutine at.* unless \@_ >= 1/m,
+        'Deparsed signature with slurpy min bounds';
+    like $deparsed,
+        qr/my \$z = \$_\[0];/m,
+        'Deparsed signature with slurpy arg 0';
+    like $deparsed,
+        qr/my \@rest = \@_\[1..\$#_];/m,
+        'Deparsed signature with slurpy slurpy';
+}
 
 done_testing($tests);
 
@@ -616,9 +698,6 @@ tr/\x{345}/\x{370}/;
 # Lexical and simple arithmetic
 my $test;
 ++$test and $test /= 2;
->>>>
-my $test;
-$test /= 2 if ++$test;
 ####
 # list x
 -((1, 2) x 2);
@@ -629,7 +708,7 @@ $test /= 2 if ++$test;
 # lvalue sub
 {
     my $test = sub : lvalue {
-	my $x;
+        my $x;
     }
     ;
 }
@@ -637,7 +716,7 @@ $test /= 2 if ++$test;
 # method
 {
     my $test = sub : method {
-	my $x;
+        my $x;
     }
     ;
 }
@@ -652,6 +731,19 @@ my $z = do { foo: +sub : method { my $a; } };
 }
 continue {
     123;
+}
+####
+# block with empty continue
+{
+    f(234);
+}
+continue { }
+>>>>
+{
+    f(234);
+}
+continue {
+    ();
 }
 ####
 # lexical and package scalars
@@ -851,6 +943,15 @@ print $_ foreach (reverse @a);
 # foreach reverse (not inplace)
 our @a;
 print $_ foreach (reverse 1, 2..5);
+####
+# foreach empty block
+our $foo;
+foreach $foo (1) {}
+>>>>
+our $foo;
+foreach $foo (1) {
+    ();
+}
 ####
 # bug #38684
 our @ary;
@@ -1288,8 +1389,8 @@ no warnings;
 foreach (0..3) {
     my $x = 2;
     {
-	my $x if 0;
-	print ++$x, "\n";
+        my $x if 0;
+        print ++$x, "\n";
     }
 }
 ####
@@ -1421,7 +1522,7 @@ print /a/u, s/b/c/u;
 }
 {
     BEGIN { $^H{'reflags'}         = '0';
-	    $^H{'reflags_charset'} = '2'; }
+        $^H{'reflags_charset'} = '2'; }
     print /a/d, s/b/c/d;
 }
 {
@@ -1612,7 +1713,7 @@ s/@a(??{ die $b; })//;
 ####
 # /(?x)<newline><tab>/
 /(?x)
-	/;
+    /;
 ####
 # y///r
 tr/a/b/r + $a =~ tr/p/q/r;
@@ -2181,7 +2282,7 @@ my sub f {}
 print f();
 >>>>
 my sub f {
-    
+
 }
 print f();
 ####
@@ -2193,7 +2294,7 @@ state sub f {}
 print f();
 >>>>
 state sub f {
-    
+
 }
 print f();
 ####
@@ -2521,51 +2622,6 @@ my %h;
 $_ == 3 ? \$_ : $_ = \3;
 $_ == 3 ? \$_ : \$x = \3;
 \($_ == 3 ? $_ : $x) = \3;
-for \my $topic (\$1, \$2) {
-    die;
-}
-for \state $topic (\$1, \$2) {
-    die;
-}
-for \our $topic (\$1, \$2) {
-    die;
-}
-for \$_ (\$1, \$2) {
-    die;
-}
-for \my @a ([1,2], [3,4]) {
-    die;
-}
-for \state @a ([1,2], [3,4]) {
-    die;
-}
-for \our @a ([1,2], [3,4]) {
-    die;
-}
-for \@_ ([1,2], [3,4]) {
-    die;
-}
-for \my %a ({5,6}, {7,8}) {
-    die;
-}
-for \our %a ({5,6}, {7,8}) {
-    die;
-}
-for \state %a ({5,6}, {7,8}) {
-    die;
-}
-for \%_ ({5,6}, {7,8}) {
-    die;
-}
-{
-    my sub a;
-    for \&a (sub { 9; }, sub { 10; }) {
-        die;
-    }
-}
-for \&a (sub { 9; }, sub { 10; }) {
-    die;
-}
 >>>>
 our $x;
 \$x = \$x;
@@ -2644,6 +2700,55 @@ my %h;
 $_ == 3 ? \$_ : $_ = \3;
 $_ == 3 ? \$_ : \$x = \3;
 ($_ == 3 ? \$_ : \$x) = \3;
+####
+# lvalue reference iteration
+# CONTEXT use feature "state", 'refaliasing', 'lexical_subs'; no warnings 'experimental';
+for \my $topic (\$1, \$2) {
+    die;
+}
+for \state $topic (\$1, \$2) {
+    die;
+}
+for \our $topic (\$1, \$2) {
+    die;
+}
+for \$_ (\$1, \$2) {
+    die;
+}
+for \my @a ([1,2], [3,4]) {
+    die;
+}
+for \state @a ([1,2], [3,4]) {
+    die;
+}
+for \our @a ([1,2], [3,4]) {
+    die;
+}
+for \@_ ([1,2], [3,4]) {
+    die;
+}
+for \my %a ({5,6}, {7,8}) {
+    die;
+}
+for \our %a ({5,6}, {7,8}) {
+    die;
+}
+for \state %a ({5,6}, {7,8}) {
+    die;
+}
+for \%_ ({5,6}, {7,8}) {
+    die;
+}
+{
+    my sub a;
+    for \&a (sub { 9; }, sub { 10; }) {
+        die;
+    }
+}
+for \&a (sub { 9; }, sub { 10; }) {
+    die;
+}
+>>>>
 foreach \my $topic (\$1, \$2) {
     die;
 }
@@ -3455,3 +3560,102 @@ $_ = (!$p) =~ s/1//r;
 my($x, $y, $z);
 $z = 1 + ($x ^^ $y);
 $z = ($x ^^= $y);
+####
+# Empty ? branch of a ternary is optimised away
+my $x;
+my(@y) = $x ? () : [1, 2];
+####
+# Empty : branch of a ternary is optimised away
+my $x;
+my(@y) = $x ? [1, 2] : ();
+####
+# Empty if {} block is optimised away
+my($x, $y);
+if ($x) {
+    ();
+}
+else {
+    $y = 1;
+}
+####
+# Empty else {} block is optimised away
+my($x, $y);
+if ($x) {
+    $y = 1;
+}
+else {
+    ();
+}
+####
+# Empty else {} preceded by an valid elsif
+my($x, $y);
+if ($x) {
+    $y = 1;
+}
+elsif ($y) {
+    $y = 2;
+}
+else {
+    ();
+}
+####
+# Empty elsif {} with valid else
+my($x, $y);
+if ($x) {
+    $y = 1;
+}
+elsif ($y) {
+    ();
+} else {
+    $y = 2;
+}
+####
+# Deparse of empty elsif sandwich (filling)
+my($x, $y);
+if ($x) {
+    $y = 1;
+}
+elsif ($y) {
+    $y = 3;
+}
+elsif ($y) {
+    ();
+}
+elsif ($y) {
+    $y = 4;
+} else {
+    $y = 2;
+}
+####
+# Deparse of empty elsif sandwich (bread)
+my($x, $y);
+if ($x) {
+    $y = 1;
+}
+elsif ($y) {
+    ();
+}
+elsif ($y) {
+    $y = 3;
+}
+elsif ($y) {
+    ();
+} else {
+    $y = 2;
+}
+####
+# Deparse of elsif  with no trailing block
+my($x, $y);
+if ($x) {
+    $x = 1;
+}
+elsif ($y) {
+    $y = 1;
+}
+####
+# empty package block
+{
+    package Foo;
+}
+>>>>
+{;};

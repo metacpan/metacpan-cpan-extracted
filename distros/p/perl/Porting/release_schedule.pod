@@ -19,7 +19,7 @@ deemed necessary by the Steering Council.
 
   2025-07-02  5.42.0  ✓       Philippe Bruhat
   2026-03-08  5.42.1  ✓       Steve Hay
-  2026-03-29  5.42.2          Steve Hay
+  2026-03-29  5.42.2  ✓       Steve Hay
 
 =head2 Perl 5.40
 
@@ -27,7 +27,7 @@ deemed necessary by the Steering Council.
   2025-01-18  5.40.1  ✓       Steve Hay
   2025-04-13  5.40.2  ✓       Steve Hay
   2025-08-03  5.40.3  ✓       Steve Hay
-  2026-03-29  5.40.4          Steve Hay
+  2026-03-29  5.40.4  ✓       Steve Hay
 
 =head1 DEVELOPMENT RELEASE SCHEDULE
 
@@ -57,7 +57,8 @@ you should reset the version numbers to the next blead series.
   2026-03-20  5.43.9  ✓       Eric Herman       User-visible changes to
                                                 correctly functioning
                                                 programs freeze
-  2026-04-20  5.43.10         Philippe Bruhat   Full program freeze
+  2026-04-20  5.43.10 ✓       Philippe Bruhat   Full program freeze
+  2026-06-01  5.43.11 ✓       Paul Evans
   2026-05-20  5.44.0                            New perl!
 
 =head1 VICTIMS
@@ -79,7 +80,7 @@ consent of the Steering Council.)
   Florian Ragwitz <rafl@debian.org>
   Jesse Luehrs <doy@cpan.org>
   Jesse Vincent <jesse@cpan.org>
-  Karen Etheridge <ether@cpan.org>
+  Karen Etheridge <perl@froods.org>
   Leon Brocard <acme@astray.com>
   Matt Trout <mst@shadowcat.co.uk>
   Matthew Horsfall <wolfsage@gmail.com>

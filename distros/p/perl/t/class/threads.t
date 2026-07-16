@@ -21,6 +21,10 @@ class Testcase1 {
     method x { return $x }
 }
 
+class WithNoFields {
+    # a class with no fields, in order to test [GH23771]
+}
+
 {
     my $ret = threads->create(sub {
         pass("Created dummy thread");
@@ -36,6 +40,17 @@ class Testcase1 {
         is($obj->x, 10, '$obj->x inside thread created before');
     })->join;
     next_test(); # account for is() inside thread
+}
+
+class WithTwoMethods {
+    # a class with two methods sharing the same field, in order to test [GH24150]
+    # We don't even need to create any instances; the mere presence of this
+    # class at compiletime would crash a thread join operation if the bug is
+    # present. If this .t file succeeds to the end without crashing it
+    # demonstrates this bug is fixed.
+    field $xxx :param;
+    method xxy { $xxx; }
+    method xxz { $xxx; }
 }
 
 threads->create(sub {

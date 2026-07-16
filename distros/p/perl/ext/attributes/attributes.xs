@@ -98,8 +98,32 @@ modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 			subname = newSVhek_mortal(hek);
 		    else
 			subname=(SV *)CvGV((const CV *)sv);
-		    if (ckWARN(WARN_ILLEGALPROTO))
-			Perl_validate_proto(aTHX_ subname, proto, TRUE, 0);
+                    {
+                        /* Need to check if the caller has WARN_ILLEGALPROTO
+                         * set. That might be PL_curcop or it might be higher
+                         * up, we'll have to check
+                         */
+
+                        COP *cop = PL_curcop;
+                        int caller_level = 0;
+                        const char *stashname;
+                        while (cop && (stashname = HvNAME(CopSTASH(cop))) &&
+                                strEQ(stashname, "attributes")) {
+                            // skip caller frames from attributes.pm itself
+                            caller_level++;
+                            cop = caller_cx(caller_level, NULL)->blk_oldcop;
+                        }
+
+                        if (cop && cop_has_warning(cop, WARN_ILLEGALPROTO)) {
+                            ENTER;
+                            SAVESPTR(PL_curcop);
+                            PL_curcop = cop;
+
+                            Perl_validate_proto(aTHX_ subname, proto, TRUE, 0);
+
+                            LEAVE;
+                        }
+                    }
 		    Perl_cv_ckproto_len_flags(aTHX_ (const CV *)sv,
 		                                    (const GV *)subname,
 		                                    name+10,
@@ -227,29 +251,6 @@ usage:
     }
 
     SvSETMAGIC(TARG);
-    XSRETURN(1);
-
-void
-reftype(...)
-  PROTOTYPE: $
-  PREINIT:
-    SV *rv, *sv;
-    dXSTARG;
-  PPCODE:
-    if (items != 1) {
-usage:
-	croak_xs_usage(cv, "$reference");
-    }
-
-    rv = ST(0);
-    ST(0) = TARG;
-    SvGETMAGIC(rv);
-    if (!(SvOK(rv) && SvROK(rv)))
-	goto usage;
-    sv = SvRV(rv);
-    sv_setpv(TARG, sv_reftype(sv, 0));
-    SvSETMAGIC(TARG);
-
     XSRETURN(1);
 /*
  * ex: set ts=8 sts=4 sw=4 et:

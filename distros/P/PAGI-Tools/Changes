@@ -1,5 +1,50 @@
 # Revision history for PAGI-Tools
 
+0.002002 - 2026-07-15
+  - PAGI::Middleware::Session: non-'http' scopes that carry a headers key
+    (WebSocket, SSE upgrades) now get a READ-ONLY session populated the same
+    way 'http' does, instead of being skipped; nothing is ever saved for them,
+    and an unresolvable id yields an empty hashref rather than a missing key.
+    See the new "NON-HTTP SCOPES" POD section.
+  - PAGI::Middleware::CSRF: new 'enforce' config -- 'header' (default,
+    unchanged: unsafe methods need a matching header token or a 403) or 'app'
+    (issue-only: mint/stash the token for every method, never auto-reject, and
+    let the app validate). 'app' exists because the middleware cannot read
+    form params without buffering the body stream.
+  - PAGI::Context: add csrf_token and csrf_verify (timing-safe token check).
+    Both inherit into PAGI::Nano contexts.
+  - REMOVED PAGI::Middleware::CSRF's 'token_param' config: it was dead (the
+    form-field lookup was never implemented). Use enforce => 'app' with
+    $ctx->csrf_verify for form tokens.
+  - PAGI::Utils::SecureCompare: new module for the constant-time string compare
+    shared by PAGI::Middleware::CSRF and PAGI::Context.
+  - Docs: PAGI::Middleware::CSRF's USAGE section no longer contradicts itself
+    (a JS getCookie() against an HttpOnly cookie); it now documents the header
+    and form flows separately.
+  - t/integration/sse-decline-end-to-end.t now skips unless PAGI::Server is
+    >= 0.002005, the release that added the sse.http.response.* decline
+    protocol it exercises. Fixes a CPAN Testers FAIL against 0.002001 (older
+    servers answer an unmatched SSE route with 500 instead of 404).
+  - PAGI::Middleware::Auth::Bearer: _secure_compare now rejects undef arguments
+    instead of numifying them, so two undef (or undef vs empty) signatures no
+    longer compare equal.
+  - PAGI::Middleware::CSRF: new 'secure' config (default 0) to set the Secure
+    attribute on the CSRF cookie; enable for HTTPS deployments.
+  - PAGI::WebSocket / PAGI::SSE: a per-message callback that dies in the
+    iteration helpers (each_message/each_text/each_bytes/each_json, SSE each()
+    and every()) now runs on_close cleanup before re-raising, instead of
+    bypassing it. WebSocket::run() is unchanged -- it isolates errors and keeps
+    serving.
+  - PAGI::Context::WebSocket / PAGI::Context::SSE: a terminal disconnect driven
+    through $c->run now fires the underlying object's on_close (previously it
+    only recorded the reason, so on_close never fired and is_closed/is_connected
+    lied). Both also gain on_close() stubs pointing at
+    $c->websocket->on_close / $c->sse->on_close.
+  - PAGI::Test::Client: start() now drives the event loop during lifespan
+    startup and dies on failure, instead of busy-waiting a 5s deadline without
+    advancing the loop (which hung off-loop startup hooks and ignored
+    lifespan.startup.failed).
+
 0.002001 - 2026-06-30
   - PAGI::Endpoint / PAGI::Endpoint::Router: route-level event middleware is now
     spec-pure factory form, composed at build time. The vestigial call() and the

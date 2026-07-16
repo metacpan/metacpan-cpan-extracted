@@ -1,5 +1,5 @@
 package PAGI::App::Proxy;
-$PAGI::App::Proxy::VERSION = '0.002001';
+$PAGI::App::Proxy::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

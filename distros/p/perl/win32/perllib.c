@@ -48,6 +48,13 @@ xs_init(pTHX)
 
 #include "perlhost.h"
 
+#define PANIC_THREAD_ID_MSG "panic: thread id mismatch\n"
+
+#define panic_thread_id() \
+    (void)WriteFile(GetStdHandle(STD_ERROR_HANDLE),         \
+        PANIC_THREAD_ID_MSG, sizeof(PANIC_THREAD_ID_MSG)-1, \
+        NULL, NULL)
+
 void
 win32_checkTLS(PerlInterpreter *host_perl)
 {
@@ -63,15 +70,17 @@ win32_checkTLS(PerlInterpreter *host_perl)
     if(tid != host_perl->Isys_intern.cur_tid) {
         dTHX; /* heavyweight */
         if (host_perl != my_perl) {
-            int *nowhere = NULL;
+            panic_thread_id();
+            DebugBreak();
             abort();
         }
         host_perl->Isys_intern.cur_tid = tid;
     }
-#else
+#elif defined(PERL_MULTIPLICITY)
     dTHX;
     if (host_perl != my_perl) {
-        int *nowhere = NULL;
+        panic_thread_id();
+        DebugBreak();
         abort();
     }
 #endif
@@ -254,6 +263,8 @@ DllMain(HINSTANCE hModule,	/* DLL module handle */
         DWORD fdwReason,	/* reason called */
         LPVOID lpvReserved)	/* reserved */
 { 
+    PERL_UNUSED_ARG(lpvReserved);
+
     switch (fdwReason) {
         /* The DLL is attaching to a process due to process
          * initialization or a call to LoadLibrary.

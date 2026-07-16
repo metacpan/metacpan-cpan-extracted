@@ -1,5 +1,5 @@
 package PAGI::Middleware::SecurityHeaders;
-$PAGI::Middleware::SecurityHeaders::VERSION = '0.002001';
+$PAGI::Middleware::SecurityHeaders::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

@@ -1,12 +1,12 @@
 #
 # Makefile to build perl on Windows using GMAKE.
 # Supported compilers:
-#	Microsoft Visual C++ 12.0 or later
+#	Microsoft Visual C++ 2015 / 14.0 or later
 #	MinGW with gcc-3.4.5-5.3.0
 #	MinGW64 with gcc-4.4.3 or later
 #
 # This is set up to build a perl.exe that runs off a shared library
-# (perl542.dll).  Also makes individual DLLs for the XS extensions.
+# (perl544.dll).  Also makes individual DLLs for the XS extensions.
 #
 # The easiest way to customize the build process is to use parameters like this:
 #
@@ -63,7 +63,7 @@ INST_TOP := $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	:= \5.42.2
+#INST_VER	:= \5.44.0
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -168,6 +168,8 @@ DEFAULT_INC_EXCLUDES_DOT := define
 #CCTYPE		:= MSVC142
 # Visual C++ 2022 (aka Visual C++ 14.3) (full version or Community Edition)
 #CCTYPE		:= MSVC143
+# Visual C++ 2026 (aka Visual C++ 14.5) (full version or Community Edition)
+#CCTYPE		:= MSVC145
 # MinGW or mingw-w64 with gcc-3.4.5 or later
 #CCTYPE		:= GCC
 
@@ -222,7 +224,7 @@ DEFAULT_INC_EXCLUDES_DOT := define
 # set this to additionally provide a statically linked perl-static.exe.
 # Note that dynamic loading will not work with this perl, so you must
 # include required modules statically using the STATIC_EXT or ALL_STATIC
-# variables below. A static library perl542s.lib will also be created.
+# variables below. A static library perl544s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
 #BUILD_STATIC	:= define
@@ -899,9 +901,9 @@ ifeq ($(CCTYPE),GCC)
 
 CFGSH_TMPL	= config.gc
 CFGH_TMPL	= config_H.gc
-PERLIMPLIB	= $(COREDIR)\libperl542$(a)
-PERLIMPLIBBASE	= libperl542$(a)
-PERLSTATICLIB	= ..\libperl542s$(a)
+PERLIMPLIB	= $(COREDIR)\libperl544$(a)
+PERLIMPLIBBASE	= libperl544$(a)
+PERLSTATICLIB	= ..\libperl544s$(a)
 INT64		= long long
 
 else
@@ -914,12 +916,12 @@ endif
 
 # makedef.pl must be updated if this changes, and this should normally
 # only change when there is an incompatible revision of the public API.
-PERLIMPLIB	?= $(COREDIR)\perl542$(a)
-PERLIMPLIBBASE	?= perl542$(a)
-PERLEXPLIB	?= $(COREDIR)\perl542.exp
-PERLSTATICLIB	?= ..\perl542s$(a)
-PERLDLL		= ..\perl542.dll
-PERLDLLBASE	= perl542.dll
+PERLIMPLIB	?= $(COREDIR)\perl544$(a)
+PERLIMPLIBBASE	?= perl544$(a)
+PERLEXPLIB	?= $(COREDIR)\perl544.exp
+PERLSTATICLIB	?= ..\perl544s$(a)
+PERLDLL		= ..\perl544.dll
+PERLDLLBASE	= perl544.dll
 
 # don't let "gmake -n all" try to run "miniperl.exe make_ext.pl"
 PLMAKE		= gmake
@@ -961,6 +963,7 @@ MICROCORE_SRC	=		\
 		..\globals.c	\
 		..\mro_core.c	\
 		..\locale.c	\
+		..\long_names.c	\
 		..\keywords.c	\
 		..\mathoms.c    \
 		..\mg.c		\
@@ -1644,7 +1647,7 @@ utils: $(HAVEMINIPERL) ..\utils\Makefile
 	copy ..\README.tw       ..\pod\perltw.pod
 	copy ..\README.vos      ..\pod\perlvos.pod
 	copy ..\README.win32    ..\pod\perlwin32.pod
-	copy ..\pod\perldelta.pod ..\pod\perl5422delta.pod
+	copy ..\pod\perldelta.pod ..\pod\perl5440delta.pod
 	$(MINIPERL) -I..\lib $(PL2BAT) $(UTILS)
 	$(MINIPERL) -I..\lib ..\autodoc.pl -c "win32\$(CONFIG_H)" ..
 	$(MINIPERL) -I..\lib ..\pod\perlmodlib.PL -q ..
@@ -1744,7 +1747,7 @@ distclean: realclean
 	-if exist $(LIBDIR)\Win32API rmdir /s /q $(LIBDIR)\Win32API
 	-if exist $(LIBDIR)\XS rmdir /s /q $(LIBDIR)\XS
 	-cd $(PODDIR) && del /f *.html *.bat roffitall \
-	    perl5422delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
+	    perl5440delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
 	    perlapi.pod perlbs2000.pod perlcn.pod perlcygwin.pod \
 	    perlfreebsd.pod perlhaiku.pod perlhpux.pod perlhurd.pod \
 	    perlintern.pod perlirix.pod perljp.pod perlko.pod perllinux.pod \

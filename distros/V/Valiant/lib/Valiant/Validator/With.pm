@@ -132,7 +132,7 @@ You can pass parameters to the C<$opts> hashref using the C<opts> argument:
       },
     );
 
-    sub not_future_with_opts {
+    sub minimum_year {
       my ($self, $attribute_name, $value, $opts) = @_;
       $self->errors->add($attribute_name, 'Year too low') unless
         $value->year > $opts->{year};

@@ -3,7 +3,7 @@ package PAGI::Middleware::Session::Store::Cookie;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001005';
 
 use parent 'PAGI::Middleware::Session::Store';
 use Future;

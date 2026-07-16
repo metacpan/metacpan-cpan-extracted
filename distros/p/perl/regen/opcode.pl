@@ -823,27 +823,14 @@ sub print_PL_op_private_tables {
     print $fh <<EOF;
 START_EXTERN_C
 
-#ifndef DOINIT
-
-/* data about the flags in op_private */
-
-EXTCONST I16  PL_op_private_bitdef_ix[];
-EXTCONST U16  PL_op_private_bitdefs[];
-EXTCONST char PL_op_private_labels[];
-EXTCONST I16  PL_op_private_bitfields[];
-EXTCONST U8   PL_op_private_valid[];
-
-#else
-
-
 /* PL_op_private_labels[]: the short descriptions of private flags.
  * All labels are concatenated into a single char array
  * (separated by \\0's) for compactness.
  */
 
-EXTCONST char PL_op_private_labels[] = {
+EXTCONST char PL_op_private_labels[] INIT( {
 $PL_op_private_labels
-};
+});
 
 
 
@@ -857,17 +844,17 @@ $PL_op_private_labels
  *    -1
  */
 
-EXTCONST I16 PL_op_private_bitfields[] = {
+EXTCONST I16 PL_op_private_bitfields[] INIT( {
 $PL_op_private_bitfields
-};
+});
 
 
 /* PL_op_private_bitdef_ix[]: map an op number to a starting position
  * in PL_op_private_bitdefs.  If -1, the op has no bits defined */
 
-EXTCONST I16  PL_op_private_bitdef_ix[] = {
+EXTCONST I16  PL_op_private_bitdef_ix[]  INIT( {
 $PL_op_private_bitdef_ix
-};
+});
 
 
 
@@ -883,19 +870,17 @@ $PL_op_private_bitdef_ix
  *              into PL_op_private_bitfields[] (for a bit field)
  */
 
-EXTCONST U16  PL_op_private_bitdefs[] = {
+EXTCONST U16  PL_op_private_bitdefs[] INIT( {
 $PL_op_private_bitdefs
-};
+});
 
 
 /* PL_op_private_valid: for each op, indexed by op_type, indicate which
  * flags bits in op_private are legal */
 
-EXTCONST U8 PL_op_private_valid[] = {
+EXTCONST U8 PL_op_private_valid[] INIT( {
 $PL_op_private_valid
-};
-
-#endif /* !DOINIT */
+});
 
 END_EXTERN_C
 
@@ -1114,13 +1099,40 @@ sub generate_opcode_h_pl_check {
     INIT({
     END
 
+
     for (@ops) {
         print "\t", tab(3, "Perl_$check{$_},"), "\t/* $_ */\n";
     }
 
     print <<~'END';
-    });
+
+    /* The final entries are function pointers not attached to an opcode.
+     * These are to be used to compare with function pointers in the earlier
+     * part of the array, since in some platforms (notably z/OS), it is
+     * undefined behavior to compare function pointers for equality, even
+     * though calling them will invoke the same function.  IBM personnel say
+     * that the comparisons do work when the pointers are compiled in the same
+     * translation unit.  Hence, ck_null in all positions in the array will
+     * have the same value.  See GH #23399 */
     END
+    my @perl_internal_extras = qw(ck_null ck_exists ck_delete);
+    for (@perl_internal_extras) {
+        print "\t", tab(3, "Perl_$_,"), "\n";
+    }
+
+    print <<~'END';
+    });
+
+    /* Indexes into PL_check for the comparison function pointers */
+    #ifdef PERL_IN_PEEP_C
+    END
+
+    for (my $i = 0; $i < @perl_internal_extras; $i++) {
+        my $index = @ops + $i;
+        my $define = uc $perl_internal_extras[$i];
+        print "  #define PERL_$define  $index\n";
+    }
+    print "#endif\n";
 }
 
 sub generate_opcode_h_pl_opargs {

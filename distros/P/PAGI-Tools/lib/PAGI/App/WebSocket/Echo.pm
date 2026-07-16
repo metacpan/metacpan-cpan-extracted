@@ -1,5 +1,5 @@
 package PAGI::App::WebSocket::Echo;
-$PAGI::App::WebSocket::Echo::VERSION = '0.002001';
+$PAGI::App::WebSocket::Echo::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;

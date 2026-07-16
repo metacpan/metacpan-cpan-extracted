@@ -101,6 +101,12 @@ static const char ident_var_zero_multi_digit[] = "Numeric variables with more th
 #define XFAKEEOF   0x40
 #define XFAKEBRACK 0x80
 
+#define FROM_DOLLAR             1
+#define FROM_SNAIL              2
+#define FROM_PERCENT            3
+#define FROM_IDENT              4
+#define FROM_INTERDEPENDMAYBE   5
+
 #ifdef USE_UTF8_SCRIPTS
 #   define UTF cBOOL(!IN_BYTES)
 #else
@@ -166,6 +172,16 @@ static const char ident_var_zero_multi_digit[] = "Numeric variables with more th
    a safe value here.
 */
 #define YYL_RETRY (-1)
+
+/* Bits in the flags parameter of various functions */
+#define CHECK_KEYWORD               (1 << 0)
+#define ALLOW_PACKAGE               (1 << 1)
+#define CHECK_DOLLAR                (1 << 2)
+#define IDFIRST_ONLY                (1 << 3)
+#define STOP_AT_FIRST_NON_DIGIT     (1 << 4)
+#define CHECK_ONLY                  (1 << 5)
+#define CHECK_UNARY                 (1 << 6)
+#define IDCONT_first_OK             (1 << 7)
 
 #ifdef DEBUGGING
 static const char* const lex_state_names[] = {
@@ -238,7 +254,7 @@ static const char* const lex_state_names[] = {
 #define TERM(retval) return (CLINE, PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval))
 #define PHASERBLOCK(f) return (pl_yylval.ival=f, PL_expect = XBLOCK, PL_bufptr = s, REPORT((int)PHASER))
 #define POSTDEREF(f) return (PL_bufptr = s, S_postderef(aTHX_ REPORT(f),s[1]))
-#define LOOPX(f) return (PL_bufptr = force_word(s,BAREWORD,TRUE,FALSE), \
+#define LOOPX(f) return (PL_bufptr = force_word(s, BAREWORD, CHECK_KEYWORD), \
                          pl_yylval.ival=f, \
                          PL_expect = PL_nexttoke ? XOPERATOR : XTERM, \
                          REPORT((int)LOOPEX))
@@ -426,6 +442,7 @@ static struct debug_tokens {
     DEBUG_TOKEN (NONE,  ANDOP),
     DEBUG_TOKEN (NONE,  ARROW),
     DEBUG_TOKEN (OPNUM, ASSIGNOP),
+    DEBUG_TOKEN (OPVAL, ATTRLIST),
     DEBUG_TOKEN (OPNUM, BITANDOP),
     DEBUG_TOKEN (OPNUM, BITOROP),
     DEBUG_TOKEN (OPNUM, BLKLSTOP),
@@ -526,6 +543,7 @@ static struct debug_tokens {
     DEBUG_TOKEN (NONE,  PREDEC),
     DEBUG_TOKEN (NONE,  PREINC),
     DEBUG_TOKEN (OPVAL, PRIVATEREF),
+    DEBUG_TOKEN (OPVAL, PROTOTYPE),
     DEBUG_TOKEN (OPVAL, QWLIST),
     DEBUG_TOKEN (NONE,  REFGEN),
     DEBUG_TOKEN (OPNUM, SHIFTOP),
@@ -544,7 +562,7 @@ static struct debug_tokens {
 
 /* dump the returned token in rv, plus any optional arg in pl_yylval */
 
-STATIC int
+static int
 S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 {
     PERL_ARGS_ASSERT_TOKEREPORT;
@@ -563,7 +581,7 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
             }
         }
         if (name)
-            Perl_sv_catpv(aTHX_ report, name);
+            sv_catpv(report, name);
         else if (isGRAPH(rv))
         {
             sv_catpvf(report, "'%c'", (char)rv);
@@ -609,12 +627,12 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 
 /* print the buffer with suitable escapes */
 
-STATIC void
+static void
 S_printbuf(pTHX_ const char *const fmt, const char *const s)
 {
-    SV* const tmp = newSVpvs("");
-
     PERL_ARGS_ASSERT_PRINTBUF;
+
+    SV* const tmp = newSVpvs("");
 
     GCC_DIAG_IGNORE_STMT(-Wformat-nonliteral); /* fmt checked by caller */
     PerlIO_printf(Perl_debug_log, fmt, pv_display(tmp, s, strlen(s), 0, 60));
@@ -631,9 +649,11 @@ S_printbuf(pTHX_ const char *const fmt, const char *const s)
  * parsed and turns it into an ASSIGNOP if it finds one.
  */
 
-STATIC int
+static int
 S_ao(pTHX_ int toketype)
 {
+    PERL_ARGS_ASSERT_AO;
+
     if (*PL_bufptr == '=') {
         PL_bufptr++;
 
@@ -666,9 +686,11 @@ S_ao(pTHX_ int toketype)
 
 #define POP_OLDBUFPTR TRUE
 
-STATIC void
+static void
 S_warn_expect_operator(pTHX_ const char *const what, char *s, I32 pop_oldbufptr)
 {
+    PERL_ARGS_ASSERT_WARN_EXPECT_OPERATOR;
+
     if (PL_expect != XOPERATOR)
         return;
 
@@ -684,8 +706,6 @@ S_warn_expect_operator(pTHX_ const char *const what, char *s, I32 pop_oldbufptr)
                    what
                   ) );
 
-    PERL_ARGS_ASSERT_WARN_EXPECT_OPERATOR;
-
     if (!s)
         s = oldbp;
     else
@@ -700,23 +720,23 @@ S_warn_expect_operator(pTHX_ const char *const what, char *s, I32 pop_oldbufptr)
         }
         else if (PL_oldoldbufptr) {
             /* yyerror (via yywarn) would do this itself, so we should too */
-            const char *t;
-            for (t = PL_oldoldbufptr;
-                 t < PL_bufptr && isSPACE(*t);
-                 t += UTF ? UTF8SKIP(t) : 1)
-            {
-                NOOP;
+            const char *t = PL_oldoldbufptr;
+            while (t < PL_bufptr && isSPACE(*t)) {
+                 t++;
             }
+
             /* see if we can identify the cause of the warning */
-            if (isIDFIRST_lazy_if_safe(t,PL_bufend,UTF))
-            {
-                const char *t_start= t;
-                for ( ;
-                     (isWORDCHAR_lazy_if_safe(t, PL_bufend, UTF) || *t == ':');
-                     t += UTF ? UTF8SKIP(t) : 1)
-                {
-                    NOOP;
+            Size_t advance;
+            if ((advance = isIDFIRST_lazy_if_safe(t, PL_bufend, UTF))) {
+                const char *t_start = t;
+                do {
+                    t += advance;
                 }
+                while (   (advance = (*t == ':'))
+                       || (advance = isWORDCHAR_lazy_if_safe((U8 *) t,
+                                                             (U8 *) PL_bufend,
+                                                             UTF)));
+
                 if (t < PL_bufptr && isSPACE(*t)) {
                     has_more = TRUE;
                     sv_catpvf( message,
@@ -729,7 +749,7 @@ S_warn_expect_operator(pTHX_ const char *const what, char *s, I32 pop_oldbufptr)
             const char *t= oldbp;
             assert(s >= oldbp);
             while (t < s && isSPACE(*t)) {
-                t += UTF ? UTF8SKIP(t) : 1;
+                t++;
             }
 
             sv_catpvf(message,
@@ -750,9 +770,11 @@ S_warn_expect_operator(pTHX_ const char *const what, char *s, I32 pop_oldbufptr)
  * This is fatal.
  */
 
-STATIC void
+static void
 S_missingterm(pTHX_ char *s, STRLEN len)
 {
+    PERL_ARGS_ASSERT_MISSINGTERM;
+
     char tmpbuf[UTF8_MAXBYTES + 1];
     char q;
     bool uni = FALSE;
@@ -791,8 +813,9 @@ S_missingterm(pTHX_ char *s, STRLEN len)
                      " anywhere before EOF", q, UTF8fARG(uni, len, s), q);
 }
 
-STATIC char *
-S_scan_terminated(pTHX_ char *s, I32 ival) {
+static char *
+S_scan_terminated(pTHX_ char *s, I32 ival)
+{
     s = scan_str(s,FALSE,FALSE,FALSE,NULL);
     if (!s)
         missingterm(NULL, 0);
@@ -804,7 +827,7 @@ S_scan_terminated(pTHX_ char *s, I32 ival) {
 
 #include "feature.h"
 
-STATIC void
+static void
 S_yyerror_non_ascii_message(pTHX_ const U8 * const s)
 {
     PERL_ARGS_ASSERT_YYERROR_NON_ASCII_MESSAGE;
@@ -819,7 +842,7 @@ S_yyerror_non_ascii_message(pTHX_ const U8 * const s)
 #  define is_ascii_string_loc(s, len, ep)                               \
                                 is_utf8_invariant_string_loc(s, len, ep)
 #else
-STATIC bool
+static bool
 S_is_ascii_string_loc(const U8 * const s0, STRLEN len, const U8 ** ep)
 {
     const U8 * s = s0;
@@ -878,6 +901,8 @@ used by perl internally, so extensions should always pass zero.
 void
 Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, U32 flags)
 {
+    PERL_ARGS_ASSERT_LEX_START;
+
     const char *s = NULL;
     yy_parser *parser, *oparser;
 
@@ -1000,8 +1025,9 @@ Perl_parser_free(pTHX_  const yy_parser *parser)
 void
 Perl_parser_free_nexttoke_ops(pTHX_  yy_parser *parser, OPSLAB *slab)
 {
-    I32 nexttoke = parser->nexttoke;
     PERL_ARGS_ASSERT_PARSER_FREE_NEXTTOKE_OPS;
+
+    I32 nexttoke = parser->nexttoke;
     while (nexttoke--) {
         if (S_is_opval_token(parser->nexttype[nexttoke] & 0xffff)
          && parser->nextval[nexttoke].opval
@@ -1015,7 +1041,7 @@ Perl_parser_free_nexttoke_ops(pTHX_  yy_parser *parser, OPSLAB *slab)
 
 
 /*
-=for apidoc AmnxUN|SV *|PL_parser-E<gt>linestr
+=for apidoc AmnxUN|SV *|PL_parser->linestr
 
 Buffer scalar containing the chunk currently under consideration of the
 text currently being lexed.  This is always a plain string scalar (for
@@ -1042,7 +1068,7 @@ lexing position is pointed to by L</PL_parser-E<gt>bufptr>.  Direct use
 of these pointers is usually preferable to examination of the scalar
 through normal scalar means.
 
-=for apidoc AmnxUN|char *|PL_parser-E<gt>bufend
+=for apidoc AmnxUN|char *|PL_parser->bufend
 
 Direct pointer to the end of the chunk of text currently being lexed, the
 end of the lexer buffer.  This is equal to C<SvPVX(PL_parser-E<gt>linestr)
@@ -1050,7 +1076,7 @@ end of the lexer buffer.  This is equal to C<SvPVX(PL_parser-E<gt>linestr)
 always located at the end of the buffer, and does not count as part of
 the buffer's contents.
 
-=for apidoc AmnxUN|char *|PL_parser-E<gt>bufptr
+=for apidoc AmnxUN|char *|PL_parser->bufptr
 
 Points to the current position of lexing inside the lexer buffer.
 Characters around this point may be freely examined, within
@@ -1068,7 +1094,7 @@ Interpretation of the buffer's octets can be abstracted out by
 using the slightly higher-level functions L</lex_peek_unichar> and
 L</lex_read_unichar>.
 
-=for apidoc AmnxUN|char *|PL_parser-E<gt>linestart
+=for apidoc AmnxUN|char *|PL_parser->linestart
 
 Points to the start of the current line inside the lexer buffer.
 This is useful for indicating at which column an error occurred, and
@@ -1106,6 +1132,8 @@ instead of implementing the logic yourself.
 bool
 Perl_lex_bufutf8(pTHX)
 {
+    PERL_ARGS_ASSERT_LEX_BUFUTF8;
+
     return UTF;
 }
 
@@ -1129,6 +1157,8 @@ into the buffer.
 char *
 Perl_lex_grow_linestr(pTHX_ STRLEN len)
 {
+    PERL_ARGS_ASSERT_LEX_GROW_LINESTR;
+
     SV *linestr;
     char *buf;
     STRLEN bufend_pos, bufptr_pos, oldbufptr_pos, oldoldbufptr_pos;
@@ -1177,6 +1207,7 @@ Perl_lex_grow_linestr(pTHX_ STRLEN len)
 =for apidoc_item lex_stuff_pvn
 =for apidoc_item lex_stuff_pvs
 =for apidoc_item lex_stuff_sv
+=for apidoc_flag LEX_STUFF_UTF8
 
 These each insert characters into the lexer buffer
 (L</PL_parser-E<gt>linestr>),
@@ -1205,16 +1236,15 @@ according to whether or not C<sv> has its UTF-8 flag set.
 In all three forms, the characters are recoded for the lexer buffer, according
 to how the buffer is currently being interpreted (L</lex_bufutf8>).
 
-=for apidoc Amnh||LEX_STUFF_UTF8
-
 =cut
 */
 
 void
 Perl_lex_stuff_pvn(pTHX_ const char *pv, STRLEN len, U32 flags)
 {
-    char *bufptr;
     PERL_ARGS_ASSERT_LEX_STUFF_PVN;
+
+    char *bufptr;
     if (flags & ~(LEX_STUFF_UTF8))
         croak("Lexing code internal error (%s)", "lex_stuff_pvn");
     if (UTF) {
@@ -1292,9 +1322,10 @@ Perl_lex_stuff_pv(pTHX_ const char *pv, U32 flags)
 void
 Perl_lex_stuff_sv(pTHX_ SV *sv, U32 flags)
 {
+    PERL_ARGS_ASSERT_LEX_STUFF_SV;
+
     char *pv;
     STRLEN len;
-    PERL_ARGS_ASSERT_LEX_STUFF_SV;
     if (flags)
         croak("Lexing code internal error (%s)", "lex_stuff_sv");
     pv = SvPV(sv, len);
@@ -1318,9 +1349,10 @@ L</lex_read_to>.
 void
 Perl_lex_unstuff(pTHX_ char *ptr)
 {
+    PERL_ARGS_ASSERT_LEX_UNSTUFF;
+
     char *buf, *bufend;
     STRLEN unstuff_len;
-    PERL_ARGS_ASSERT_LEX_UNSTUFF;
     buf = PL_parser->bufptr;
     if (ptr < buf)
         croak("Lexing code internal error (%s)", "lex_unstuff");
@@ -1353,8 +1385,9 @@ L</lex_read_unichar>.
 void
 Perl_lex_read_to(pTHX_ char *ptr)
 {
-    char *s;
     PERL_ARGS_ASSERT_LEX_READ_TO;
+
+    char *s;
     s = PL_parser->bufptr;
     if (ptr < s || ptr > PL_parser->bufend)
         croak("Lexing code internal error (%s)", "lex_read_to");
@@ -1389,9 +1422,10 @@ multi-line tokens growing the buffer without bound.
 void
 Perl_lex_discard_to(pTHX_ char *ptr)
 {
+    PERL_ARGS_ASSERT_LEX_DISCARD_TO;
+
     char *buf;
     STRLEN discard_len;
-    PERL_ARGS_ASSERT_LEX_DISCARD_TO;
     buf = SvPVX(PL_parser->linestr);
     if (ptr < buf)
         croak("Lexing code internal error (%s)", "lex_discard_to");
@@ -1423,6 +1457,8 @@ Perl_lex_discard_to(pTHX_ char *ptr)
 void
 Perl_notify_parser_that_encoding_changed(pTHX)
 {
+    PERL_ARGS_ASSERT_NOTIFY_PARSER_THAT_ENCODING_CHANGED;
+
     /* Called when $^H is changed to indicate that HINT_UTF8 or
      * HINT_ASCII_ENCODING has changed from off to on.  At compile time, this
      * has the effect of entering a 'use utf8' or 'use source::encoding'
@@ -1440,7 +1476,8 @@ Perl_notify_parser_that_encoding_changed(pTHX)
 }
 
 /*
-=for apidoc lex_next_chunk
+=for apidoc      lex_next_chunk
+=for apidoc_flag LEX_KEEP_PREVIOUS
 
 Reads in the next chunk of text to be lexed, appending it to
 L</PL_parser-E<gt>linestr>.  This should be called when lexing code has
@@ -1458,8 +1495,6 @@ consumed, then it will not be discarded regardless of the flag.
 Returns true if some new text was added to the buffer, or false if the
 buffer has reached the end of the input text.
 
-=for apidoc Amnh||LEX_KEEP_PREVIOUS
-
 =cut
 */
 
@@ -1469,6 +1504,8 @@ buffer has reached the end of the input text.
 bool
 Perl_lex_next_chunk(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_LEX_NEXT_CHUNK;
+
     SV *linestr;
     char *buf;
     STRLEN old_bufend_pos, new_bufend_pos;
@@ -1610,6 +1647,8 @@ is encountered, an exception is generated.
 I32
 Perl_lex_peek_unichar(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_LEX_PEEK_UNICHAR;
+
     char *s, *bufend;
     if (flags & ~(LEX_KEEP_PREVIOUS))
         croak("Lexing code internal error (%s)", "lex_peek_unichar");
@@ -1673,6 +1712,8 @@ is encountered, an exception is generated.
 I32
 Perl_lex_read_unichar(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_LEX_READ_UNICHAR;
+
     I32 c;
     if (flags & ~(LEX_KEEP_PREVIOUS))
         croak("Lexing code internal error (%s)", "lex_read_unichar");
@@ -1711,6 +1752,8 @@ chunk will not be discarded.
 void
 Perl_lex_read_space(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_LEX_READ_SPACE;
+
     char *s, *bufend;
     const bool can_incline = !(flags & LEX_NO_INCLINE);
     bool need_incline = 0;
@@ -1784,6 +1827,8 @@ Note that C<NULL> is a valid C<proto> and will always return C<true>.
 bool
 Perl_validate_proto(pTHX_ SV *name, SV *proto, bool warn, bool curstash)
 {
+    PERL_ARGS_ASSERT_VALIDATE_PROTO;
+
     STRLEN len, origlen;
     char *p;
     bool bad_proto = FALSE;
@@ -1794,8 +1839,6 @@ Perl_validate_proto(pTHX_ SV *name, SV *proto, bool warn, bool curstash)
     bool must_be_last = FALSE;
     bool underscore = FALSE;
     bool bad_proto_after_underscore = FALSE;
-
-    PERL_ARGS_ASSERT_VALIDATE_PROTO;
 
     if (!proto)
         return TRUE;
@@ -1882,18 +1925,16 @@ Perl_validate_proto(pTHX_ SV *name, SV *proto, bool warn, bool curstash)
  * If so, it sets the current line number and file to the values in the comment.
  */
 
-STATIC void
+static void
 S_incline(pTHX_ const char *s, const char *end)
 {
+    PERL_ARGS_ASSERT_INCLINE;
+
     const char *t;
     const char *n;
     const char *e;
     line_t line_num;
     UV uv;
-
-    PERL_ARGS_ASSERT_INCLINE;
-
-    assert(end >= s);
 
     COPLINE_INC_WITH_HERELINES;
     if (!PL_rsfp && !PL_parser->filtered && PL_lex_state == LEX_NORMAL
@@ -1907,7 +1948,7 @@ S_incline(pTHX_ const char *s, const char *end)
     while (SPACE_OR_TAB(*s))
         s++;
     if (memBEGINs(s, (STRLEN) (end - s), "line"))
-        s += sizeof("line") - 1;
+        s += STRLENs("line");
     else
         return;
     if (SPACE_OR_TAB(*s))
@@ -1960,7 +2001,7 @@ S_incline(pTHX_ const char *s, const char *end)
                 char *tmpbuf2;
                 GV *gv2;
 
-                if (tmplen2 + 2 <= sizeof smallbuf)
+                if (tmplen2 + 2 <= C_ARRAY_LENGTH(smallbuf))
                     tmpbuf2 = smallbuf;
                 else
                     Newx(tmpbuf2, tmplen2 + 2, char);
@@ -2006,9 +2047,11 @@ S_incline(pTHX_ const char *s, const char *end)
     CopLINE_set(PL_curcop, line_num);
 }
 
-STATIC void
+static void
 S_update_debugger_info(pTHX_ SV *orig_sv, const char *const buf, STRLEN len)
 {
+    PERL_ARGS_ASSERT_UPDATE_DEBUGGER_INFO;
+
     AV *av = CopFILEAVx(PL_curcop);
     if (av) {
         SV * sv;
@@ -2069,7 +2112,7 @@ Perl_skipspace_flags(pTHX_ char *s, U32 flags)
 }
 
 /*
- * S_check_uni
+ * S_check_unary
  * Check the unary operators to ensure there's no ambiguity in how they're
  * used.  An ambiguous piece of code would be:
  *     rand + 5
@@ -2077,9 +2120,11 @@ Perl_skipspace_flags(pTHX_ char *s, U32 flags)
  * the +5 is its argument.
  */
 
-STATIC void
-S_check_uni(pTHX)
+static void
+S_check_unary(pTHX)
 {
+    PERL_ARGS_ASSERT_CHECK_UNARY;
+
     const char *s;
 
     if (PL_oldoldbufptr != PL_last_uni)
@@ -2087,8 +2132,10 @@ S_check_uni(pTHX)
     while (isSPACE(*PL_last_uni))
         PL_last_uni++;
     s = PL_last_uni;
-    while (isWORDCHAR_lazy_if_safe(s, PL_bufend, UTF) || *s == '-')
-        s += UTF ? UTF8SKIP(s) : 1;
+    Size_t advance;
+    while (   (advance = isWORDCHAR_lazy_if_safe(s, PL_bufend, UTF))
+           || (advance = (*s == '-')))
+        s += advance;
     if (s < PL_bufptr && memchr(s, '(', PL_bufptr - s))
         return;
 
@@ -2123,7 +2170,7 @@ S_check_uni(pTHX)
  *  - else it's a list operator
  */
 
-STATIC I32
+static I32
 S_lop(pTHX_ enum yytokentype t, I32 f, U8 x, char *s)
 {
     PERL_ARGS_ASSERT_LOP;
@@ -2158,9 +2205,11 @@ S_lop(pTHX_ enum yytokentype t, I32 f, U8 x, char *s)
  * the lexer handles the token correctly.
  */
 
-STATIC void
+static void
 S_force_next(pTHX_ I32 type)
 {
+    PERL_ARGS_ASSERT_FORCE_NEXT;
+
 #ifdef DEBUGGING
     if (DEBUG_T_TEST) {
         PerlIO_printf(Perl_debug_log, "### forced token:\n");
@@ -2215,6 +2264,8 @@ S_postderef(pTHX_ int const funny, char const next)
 void
 Perl_yyunlex(pTHX)
 {
+    PERL_ARGS_ASSERT_YYUNLEX;
+
     int yyc = PL_parser->yychar;
     if (yyc != YYEMPTY) {
         if (yyc) {
@@ -2233,7 +2284,7 @@ Perl_yyunlex(pTHX)
     }
 }
 
-STATIC SV *
+static SV *
 S_newSV_maybe_utf8(pTHX_ const char *const start, STRLEN len)
 {
     SV * const sv = newSVpvn_utf8(start, len,
@@ -2261,26 +2312,29 @@ S_newSV_maybe_utf8(pTHX_ const char *const start, STRLEN len)
  *       use, etc. do this)
  */
 
-STATIC char *
-S_force_word(pTHX_ char *start, int token, int check_keyword, int allow_pack)
+static char *
+S_force_word(pTHX_ char *start, int token, U32 flags)
 {
+    PERL_ARGS_ASSERT_FORCE_WORD;
+
     char *s;
     STRLEN len;
-
-    PERL_ARGS_ASSERT_FORCE_WORD;
+    const bool check_keyword = flags & CHECK_KEYWORD;
+    const bool allow_pack    = flags & ALLOW_PACKAGE;
 
     start = skipspace(start);
     s = start;
     if (   isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)
         || (allow_pack && *s == ':' && s[1] == ':') )
     {
-        s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, allow_pack, &len);
+        s = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf),
+                      allow_pack, &len);
         if (check_keyword) {
           char *s2 = PL_tokenbuf;
           STRLEN len2 = len;
           if (allow_pack && memBEGINPs(s2, len, "CORE::")) {
-            s2 += sizeof("CORE::") - 1;
-            len2 -= sizeof("CORE::") - 1;
+            s2 += STRLENs("CORE::");
+            len2 -= STRLENs("CORE::");
           }
           if (keyword(s2, len2, 0))
             return start;
@@ -2311,7 +2365,7 @@ S_force_word(pTHX_ char *start, int token, int check_keyword, int allow_pack)
  * Creates the symbol if it didn't already exist (via gv_fetchpv()).
  */
 
-STATIC void
+static void
 S_force_ident(pTHX_ const char *s, int kind)
 {
     PERL_ARGS_ASSERT_FORCE_IDENT;
@@ -2342,6 +2396,8 @@ S_force_ident(pTHX_ const char *s, int kind)
 static void
 S_force_ident_maybe_lex(pTHX_ char pit)
 {
+    PERL_ARGS_ASSERT_FORCE_IDENT_MAYBE_LEX;
+
     NEXTVAL_NEXTTOKE.ival = pit;
     force_next('p');
 }
@@ -2349,14 +2405,14 @@ S_force_ident_maybe_lex(pTHX_ char pit)
 NV
 Perl_str_to_version(pTHX_ SV *sv)
 {
+    PERL_ARGS_ASSERT_STR_TO_VERSION;
+
     NV retval = 0.0;
     NV nshift = 1.0;
     STRLEN len;
     const U8 *start = (const U8 *) SvPV_const(sv,len);
     const U8 * const end = start + len;
     const bool utf = cBOOL(SvUTF8(sv));
-
-    PERL_ARGS_ASSERT_STR_TO_VERSION;
 
     while (start < end) {
         STRLEN skip;
@@ -2382,13 +2438,13 @@ Perl_str_to_version(pTHX_ SV *sv)
  * must use an alternative parsing method).
  */
 
-STATIC char *
+static char *
 S_force_version(pTHX_ char *s, int guessing)
 {
+    PERL_ARGS_ASSERT_FORCE_VERSION;
+
     OP *version = NULL;
     char *d;
-
-    PERL_ARGS_ASSERT_FORCE_VERSION;
 
     s = skipspace(s);
 
@@ -2396,7 +2452,7 @@ S_force_version(pTHX_ char *s, int guessing)
     if (*d == 'v')
         d++;
     if (isDIGIT(*d)) {
-        while (isDIGIT(*d) || *d == '_' || *d == '.')
+        while (isDIGIT_or_UNDERSCORE(*d) || *d == '.')
             d++;
         if (*d == ';' || isSPACE(*d) || *d == '{' || *d == '}' || !*d) {
             SV *ver;
@@ -2426,13 +2482,13 @@ S_force_version(pTHX_ char *s, int guessing)
  * Forces the next token to be a version number using strict syntax rules.
  */
 
-STATIC char *
+static char *
 S_force_strict_version(pTHX_ char *s)
 {
+    PERL_ARGS_ASSERT_FORCE_STRICT_VERSION;
+
     OP *version = NULL;
     const char *errstr = NULL;
-
-    PERL_ARGS_ASSERT_FORCE_STRICT_VERSION;
 
     while (isSPACE(*s)) /* leading whitespace */
         s++;
@@ -2465,15 +2521,15 @@ S_force_strict_version(pTHX_ char *s)
  * unchanged, and a new SV containing the modified input is returned.
  */
 
-STATIC SV *
+static SV *
 S_tokeq(pTHX_ SV *sv)
 {
+    PERL_ARGS_ASSERT_TOKEQ;
+
     char *s;
     char *send;
     char *d;
     SV *pv = sv;
-
-    PERL_ARGS_ASSERT_TOKEQ;
 
     assert (SvPOK(sv));
     assert (SvLEN(sv));
@@ -2535,9 +2591,11 @@ S_tokeq(pTHX_ SV *sv)
  * call to S_sublex_push().
  */
 
-STATIC I32
+static I32
 S_sublex_start(pTHX)
 {
+    PERL_ARGS_ASSERT_SUBLEX_START;
+
     const I32 op_type = pl_yylval.ival;
 
     if (op_type == OP_NULL) {
@@ -2587,9 +2645,11 @@ S_sublex_start(pTHX)
  * Sets PL_lex_state to LEX_INTERPCONCAT.
  */
 
-STATIC I32
+static I32
 S_sublex_push(pTHX)
 {
+    PERL_ARGS_ASSERT_SUBLEX_PUSH;
+
     LEXSHARED *shared;
     const bool is_heredoc = PL_multi_close == '<';
     ENTER;
@@ -2690,9 +2750,11 @@ S_sublex_push(pTHX)
  * Restores lexer state after a S_sublex_push.
  */
 
-STATIC I32
+static I32
 S_sublex_done(pTHX)
 {
+    PERL_ARGS_ASSERT_SUBLEX_DONE;
+
     if (!PL_lex_starts++) {
         SV * const sv = newSVpvs("");
         if (SvUTF8(PL_linestr))
@@ -2765,6 +2827,8 @@ HV *
 Perl_load_charnames(pTHX_ SV * char_name, const char * context,
                           const STRLEN context_len, const char ** error_msg)
 {
+    PERL_ARGS_ASSERT_LOAD_CHARNAMES;
+
     /* Load the official _charnames module if not already there.  The
      * parameters are just to give info for any error messages generated:
      *  char_name   a name to look up which is the reason for loading this
@@ -2778,8 +2842,6 @@ Perl_load_charnames(pTHX_ SV * char_name, const char * context,
     HV * table;
     SV **cvp;
     SV * res;
-
-    PERL_ARGS_ASSERT_LOAD_CHARNAMES;
 
     /* This loop is executed 1 1/2 times.  On the first time through, if it
      * isn't already loaded, try loading it, and iterate just once to see if it
@@ -2796,7 +2858,7 @@ Perl_load_charnames(pTHX_ SV * char_name, const char * context,
         }
 
         if (i == 0) {
-            Perl_load_module(aTHX_
+            load_module(
                 0,
                 newSVpvs("_charnames"),
 
@@ -2819,16 +2881,16 @@ Perl_load_charnames(pTHX_ SV * char_name, const char * context,
     return NULL;
 }
 
-STATIC SV*
+static SV*
 S_get_and_check_backslash_N_name_wrapper(pTHX_ const char* s, const char* const e)
 {
+    PERL_ARGS_ASSERT_GET_AND_CHECK_BACKSLASH_N_NAME_WRAPPER;
+
     /* This justs wraps get_and_check_backslash_N_name() to output any error
      * message it returns. */
 
     const char * error_msg = NULL;
     SV * result;
-
-    PERL_ARGS_ASSERT_GET_AND_CHECK_BACKSLASH_N_NAME_WRAPPER;
 
     /* charnames doesn't work well if there have been errors found */
     if (PL_error_count > 0) {
@@ -2850,6 +2912,9 @@ Perl_get_and_check_backslash_N_name(pTHX_ const char* s,
                                           const bool is_utf8,
                                           const char ** error_msg)
 {
+    PERL_ARGS_ASSERT_GET_AND_CHECK_BACKSLASH_N_NAME;
+    assert(s > (char *) 3);
+
     /* <s> points to first character of interior of \N{}, <e> to one beyond the
      * interior, hence to the "}".  Finds what the name resolves to, returning
      * an SV* containing it; NULL if no valid one found.
@@ -2869,12 +2934,6 @@ Perl_get_and_check_backslash_N_name(pTHX_ const char* s,
      * context of what's failing*/
     const char* context = s - 3;
     STRLEN context_len = e - context + 1; /* include all of \N{...} */
-
-
-    PERL_ARGS_ASSERT_GET_AND_CHECK_BACKSLASH_N_NAME;
-
-    assert(e >= s);
-    assert(s > (char *) 3);
 
     while (s < e && isBLANK(*s)) {
         s++;
@@ -2926,7 +2985,7 @@ Perl_get_and_check_backslash_N_name(pTHX_ const char* s,
     /* Here, it isn't Perl's charname handler.  We can't rely on a
      * user-supplied handler to validate the input name.  For non-ut8 input,
      * look to see that the first character is legal.  Then loop through the
-     * rest checking that each is a continuation */
+     * rest checking that each is a charname continuation */
 
     /* This code makes the reasonable assumption that the only Latin1-range
      * characters that begin a character name alias are alphabetic, otherwise
@@ -2963,14 +3022,15 @@ Perl_get_and_check_backslash_N_name(pTHX_ const char* s,
             s += 2;
         }
         else {
-            if (! _invlist_contains_cp(PL_utf8_charname_begin,
+            Size_t advance;
+            if (! invlist_contains_cp_(PL_utf8_charname_begin,
                                        utf8_to_uv_or_die((const U8 *) s,
                                                          (const U8 *) e,
-                                                         NULL)))
+                                                         &advance)))
             {
                 goto bad_charname;
             }
-            s += UTF8SKIP(s);
+            s += advance;
         }
 
         while (s < e) {
@@ -2991,14 +3051,15 @@ Perl_get_and_check_backslash_N_name(pTHX_ const char* s,
                 s += 2;
             }
             else {
-                if (! _invlist_contains_cp(PL_utf8_charname_continue,
+                Size_t advance;
+                if (! invlist_contains_cp_(PL_utf8_charname_continue,
                                            utf8_to_uv_or_die((const U8 *) s,
                                                              (const U8 *) e,
-                                                             NULL)))
+                                                             &advance)))
                 {
                     goto bad_charname;
                 }
-                s += UTF8SKIP(s);
+                s += advance;
             }
         }
     }
@@ -3152,9 +3213,11 @@ Perl_get_and_check_backslash_N_name(pTHX_ const char* s,
 
 */
 
-STATIC char *
+static char *
 S_scan_const(pTHX_ char *start)
 {
+    PERL_ARGS_ASSERT_SCAN_CONST;
+
     const char * const send = PL_bufend;/* end of the constant */
     SV *sv = newSV(send - start);       /* sv for the constant.  See note below
                                            on sizing. */
@@ -3205,8 +3268,6 @@ S_scan_const(pTHX_ char *start)
     int non_portable_endpoint = 0;  /* ? In a range is an endpoint
                                        platform-specific like \x65 */
 #endif
-
-    PERL_ARGS_ASSERT_SCAN_CONST;
 
     assert(PL_lex_inwhat != OP_TRANSR);
 
@@ -3324,8 +3385,8 @@ S_scan_const(pTHX_ char *start)
                     /* We know the utf8 is valid, because we just constructed
                      * it ourselves in previous loop iterations */
                     min_ptr = (char*) utf8_hop( (U8*) max_ptr, -1);
-                    range_min = valid_utf8_to_uvchr( (U8*) min_ptr, NULL);
-                    range_max = valid_utf8_to_uvchr( (U8*) max_ptr, NULL);
+                    range_min = valid_utf8_to_uv( (U8*) min_ptr, NULL);
+                    range_max = valid_utf8_to_uv( (U8*) max_ptr, NULL);
 
                     /* This compensates for not all code setting
                      * 'has_above_latin1', so that we don't skip stuff that
@@ -3696,10 +3757,7 @@ S_scan_const(pTHX_ char *start)
              * (@foo, @::foo, @'foo, @{foo}, @$foo, @+, @-)
              */
         else if (*s == '@' && s[1]) {
-            if (UTF
-               ? isIDFIRST_utf8_safe(s+1, send)
-               : isWORDCHAR_A(s[1]))
-            {
+            if (isDIGIT_A(s[1]) || isIDFIRST_lazy_if_safe(s+1, send, UTF)) {
                 break;
             }
             if (memCHRs(":'{$", s[1]))
@@ -4082,9 +4140,11 @@ S_scan_const(pTHX_ char *start)
                 }
                 else     /* Here is \N{NAME} but not \N{U+...}. */
                      if (! (res = get_and_check_backslash_N_name_wrapper(s, e)))
-                {   /* Failed.  We should die eventually, but for now use a NUL
-                       to keep parsing */
-                    *d++ = '\0';
+                {   /* Failed.  We used to keep parsing, but error conditions here
+                     * can sometimes result in scope problems, which later manifest
+                     * as the incorrect pad being operated upon. (See GH#16930.)
+                     * Safest to just abort now. */
+                    yyquit();
                 }
                 else {  /* Successfully evaluated the name */
                     STRLEN len;
@@ -4092,9 +4152,9 @@ S_scan_const(pTHX_ char *start)
                     if (PL_lex_inpat) {
 
                         if (! len) { /* The name resolved to an empty string */
-                            const char empty_N[] = "\\N{_}";
-                            Copy(empty_N, d, sizeof(empty_N) - 1, char);
-                            d += sizeof(empty_N) - 1;
+                            const char * const empty_N = "\\N{_}";
+                            Copy(empty_N, d, strlen(empty_N), char);
+                            d += strlen(empty_N);
                         }
                         else {
                             /* In order to not lose information for the regex
@@ -4112,9 +4172,8 @@ S_scan_const(pTHX_ char *start)
                                  * through the string.  Each character takes up
                                  * 2 hex digits plus either a trailing dot or
                                  * the "}" */
-                                const char initial_text[] = "\\N{U+";
-                                const STRLEN initial_len = sizeof(initial_text)
-                                                           - 1;
+                                const char * const initial_text = "\\N{U+";
+                                const STRLEN initial_len = strlen(initial_text);
                                 d = off + SvGROW(sv, off
                                                     + 3 * len
 
@@ -4128,7 +4187,7 @@ S_scan_const(pTHX_ char *start)
                                     char hex_string[4];
                                     int len =
                                         my_snprintf(hex_string,
-                                                  sizeof(hex_string),
+                                                  C_ARRAY_LENGTH(hex_string),
                                                   "%02X.",
 
                                                   /* The regex compiler is
@@ -4136,7 +4195,7 @@ S_scan_const(pTHX_ char *start)
                                                    * native */
                                                   NATIVE_TO_LATIN1(*str));
                                     PERL_MY_SNPRINTF_POST_GUARD(len,
-                                                           sizeof(hex_string));
+                                                   C_ARRAY_LENGTH(hex_string));
                                     Copy(hex_string, d, 3, char);
                                     d += 3;
                                     str++;
@@ -4156,14 +4215,15 @@ S_scan_const(pTHX_ char *start)
                                 char hex_string[2 * UTF8_MAXBYTES + 5];
 
                                 /* Get the first character of the result. */
-                                U32 uv = utf8n_to_uvchr((U8 *) str,
-                                                        len,
-                                                        &char_length,
-                                                        UTF8_ALLOW_ANYUV);
+                                U32 uv = utf8_to_uv_or_die(
+                                                         (const U8 *) str,
+                                                         (const U8 *) str_end,
+                                                         &char_length);
                                 /* Convert first code point to Unicode hex,
                                  * including the boiler plate before it. */
                                 output_length =
-                                    my_snprintf(hex_string, sizeof(hex_string),
+                                    my_snprintf(hex_string,
+                                             C_ARRAY_LENGTH(hex_string),
                                              "\\N{U+%X",
                                              (unsigned int) NATIVE_TO_UNI(uv));
 
@@ -4180,13 +4240,13 @@ S_scan_const(pTHX_ char *start)
                                 * its Unicode code point in hex */
                                 while ((str += char_length) < str_end) {
                                     const STRLEN off = d - SvPVX_const(sv);
-                                    U32 uv = utf8n_to_uvchr((U8 *) str,
-                                                            str_end - str,
-                                                            &char_length,
-                                                            UTF8_ALLOW_ANYUV);
+                                    U32 uv = utf8_to_uv_or_die(
+                                                         (const U8 *) str,
+                                                         (const U8 *) str_end,
+                                                         &char_length);
                                     output_length =
                                         my_snprintf(hex_string,
-                                             sizeof(hex_string),
+                                             C_ARRAY_LENGTH(hex_string),
                                              ".%X",
                                              (unsigned int) NATIVE_TO_UNI(uv));
 
@@ -4422,9 +4482,7 @@ S_scan_const(pTHX_ char *start)
     }
 
     /* shrink the sv if we allocated more than we used */
-    if (SvCUR(sv) + 5 < SvLEN(sv)) {
-        SvPV_shrink_to_cur(sv);
-    }
+    SvPV_shrink_to_cur(sv);
 
     /* return the substring (via pl_yylval) only if we parsed anything */
     if (s > start) {
@@ -4465,6 +4523,33 @@ S_scan_const(pTHX_ char *start)
     return s;
 }
 
+static bool
+S_is_existing_identifier(pTHX_ char *s, Size_t len, char sigil, bool is_utf8)
+{
+    PERL_ARGS_ASSERT_IS_EXISTING_IDENTIFIER;
+
+    /* This returns a boolean indicating if a string represents an identifier
+     * known to the program.  'sigil' is the character indicating the type of
+     * the identifier to look for. (though '%' is currently not specially
+     * handled.) The string from 's + 1' to (s + len) is looked at.  s[0] is
+     * ignored, but must exist; the function overwrites it temporarily,
+     * restoring it before returning */
+
+    char save_sigil = s[0];
+    s[0] = sigil;
+    PADOFFSET slot = pad_findmy_pv(s, 0);
+    s[0] = save_sigil;
+
+    return   slot != NOT_IN_PAD
+          || gv_fetchpvn_flags(s + 1, len - 1,
+                             (is_utf8) ? SVf_UTF8 : 0,
+                             (sigil == '@')
+                              ? SVt_PVAV
+                              : (sigil == '&')
+                                 ? SVt_PVCV
+                                 : SVt_PV);
+}
+
 /* S_intuit_more
  * Returns TRUE if there's more to the expression (e.g., a subscript),
  * FALSE otherwise.
@@ -4487,8 +4572,12 @@ S_scan_const(pTHX_ char *start)
 
 /* This is the one truly awful dwimmer necessary to conflate C and sed. */
 
-STATIC int
-S_intuit_more(pTHX_ char *s, char *e)
+static int
+S_intuit_more(pTHX_ char *s, char *e,
+              U8 caller_context,    /* Who's calling us? basically an enum */
+              char * caller_s,      /* If non-NULL, the name of the identifier
+                                       that resulted in this call */
+              Size_t caller_length) /* And the length of that name */
 {
     PERL_ARGS_ASSERT_INTUIT_MORE;
 
@@ -4496,7 +4585,14 @@ S_intuit_more(pTHX_ char *s, char *e)
      * 'scariness', and lack of comments.  khw has gone through and done some
      * cleanup, while finding various instances of problematic behavior.
      * Rather than change this base-level function immediately, khw has added
-     * commentary to those areas. */
+     * commentary to those areas. 
+     *
+     * khw: $0 in square brackets is never going to mean the expansion of $0.
+     * How could that help in calculating a subscript?  And one would never
+     * want to match any one of the characters in this call to the program.
+     * No, $0 is going to want to mean this a charclass that matches dollar
+     * and digit0.  But, code outside this function chooses the value of the
+     * variable $0.  I think this should be special cased. */
 
     /* If recursed within brackets, there is more to the expression */
     if (PL_lex_brackets)
@@ -4547,10 +4643,53 @@ S_intuit_more(pTHX_ char *s, char *e)
     /* Here is '[': maybe we have a character class.  Examine the guts */
     s++;
 
-    /* '^' implies a character class; An empty '[]' isn't legal, but it does
-     * mean there isn't more to come */
+    /* '^' implies a character class; An empty '[]' isn't legal, and it means
+     * there isn't more to come */
     if (s[0] == ']' || s[0] == '^')
         return FALSE;
+
+    bool under_strict_vars = PL_hints & HINT_STRICT_VARS;
+
+    /* If the input is of the form '$foo[...', and there is a $foo scalar and
+     * no @foo array, then '...' is more likely to be a character class.
+     * (Under 'strict vars', we know at compile time all the accessible
+     * variables, so in that case it MUST be a character class.)  If the
+     * situation is reversed, it is more likely to be (or must be) a
+     * subscript.  */
+    if (caller_context == FROM_DOLLAR) {
+        assert (caller_s);
+
+        /* See if there is a known scalar for the input identifier */
+        bool has_scalar = is_existing_identifier(caller_s, caller_length,
+                                                 '$', UTF);
+
+        /* Repeat to see if there is a known array of the given name */
+        bool has_array = is_existing_identifier(caller_s, caller_length,
+                                                '@', UTF);
+
+        unsigned int count = has_scalar + has_array;
+
+        /* Under strict, we need some variable to be declared. */
+        if (under_strict_vars) {
+
+            /* If none are, is an error.  Return false to stop useless further
+             * parsing. */
+            if (count == 0) {
+                return false;
+            }
+
+            /* When just one variable is declared, the construct has to match
+             * what the variable is.  If it is an array, this must be a
+             * subscript which needs further processing; otherwise it is a
+             * character class needing nothing further. */
+            if (count == 1) {
+                return has_array;
+            }
+
+            /* Here have both an array and a scalar with the same name.  Drop
+             * down to use the heuristics to try to intuit which is meant */
+        }
+    }
 
     /* Find matching ']'.  khw: This means any s[1] below is guaranteed to
      * exist */
@@ -4558,8 +4697,16 @@ S_intuit_more(pTHX_ char *s, char *e)
     if (! send)		/* has to be an expression */
         return TRUE;
 
+    /* Below here, the heuristics start.  One idea from alh is, given 'use
+     * 5.43.x', that for all digits, that if we have to resort to heuristics,
+     * we instead raise an error with an explanation of how to make it
+     * unambiguous: ${foo}[123] */
+
     /* If the construct consists entirely of one or two digits, call it a
-     * subscript. */
+     * subscript.
+     *
+     * khw: No one writes 03 to mean 3.  Any string of digits beginning with
+     * '0' is likely to be a charclass, including length 2 ones. */
     if (isDIGIT(s[0]) && send - s <= 2 && (send - s == 1 || (isDIGIT(s[1])))) {
         return TRUE;
     }
@@ -4594,6 +4741,13 @@ S_intuit_more(pTHX_ char *s, char *e)
     Zero(seen, 256, char);
 
     /* Examine each character in the construct */
+    /* That this knows nothing of UTF-8 can lead to opposite results if the
+     * text is encoded in UTF-8 or not; another relic of the Unicode Bug.
+     * Suppose a string consists of various un-repeated code points between
+     * 0x128 and 0x255.  When encoded in UTF-8 their start bytes will all be
+     * \xC2 or \xC3.  The heuristics below will count those as repeated bytes,
+     * and thus lean more towards this being a character class than when not
+     * in UTF-8. */
     bool first_time = true;
     for (; s < send; s++, first_time = false) {
         unsigned char prev_un_char = un_char;
@@ -4607,23 +4761,76 @@ S_intuit_more(pTHX_ char *s, char *e)
              * indicates it is a subscript */
             weight -= seen[un_char] * 10;
 
-            /* Following one of these characters, we look to see if there is an
+            /* Following one of these sigils, we look to see if there is an
              * identifier already found in the program by that name.  If so,
-             * strongly suspect this isn't a character class */
+             * strongly suspect this isn't a character class
+             *
+             * khw:  But under 'strict' if the identifier doesn't exist, it
+             * has to be a charclass
+             *
+             * khw: [...$0...] is never going to mean the name of the program;
+             * it's always going to be a charclass.  $1 could mean either, but
+             * as the number increases, the more likely to be a charclass, as
+             * the chance of there being a pattern with that many capture
+             * groups goes rapidly down.
+             *
+             * khw: Using \w here misses the possibility of lots of other
+             * syntaxes of variables, like $::foo or ${foo}, that scan_ident
+             * looks for.
+             *
+             */
             if (isWORDCHAR_lazy_if_safe(s+1, PL_bufend, UTF)) {
-                int len;
-                char tmpbuf[sizeof PL_tokenbuf * 4];
-                scan_ident(s, tmpbuf, sizeof tmpbuf, FALSE);
-                len = (int)strlen(tmpbuf);
+                Size_t len;
+
+                /* khw: where did the magic number 4 come from?.  This buffer
+                 * was 4 times as large as tokenbuf in 1997, and had not
+                 * changed since the code was first added */
+                char tmpbuf[ C_ARRAY_LENGTH(PL_tokenbuf) * 4 ];
+
+                if (! scan_ident(s, tmpbuf, C_ARRAY_END(tmpbuf), CHECK_ONLY))
+                {
+                    /* An illegal identifier means this can't be a subscript;
+                     * it's an error or it could be a charclass */
+                    return false;
+                }
+
+                len = strlen(tmpbuf);
+
+                /* khw: This only looks at global variables; lexicals came
+                 * later, and this hasn't been updated.  Ouch!! */
                 if (   len > 1
                     && gv_fetchpvn_flags(tmpbuf,
                                          len,
                                          UTF ? SVf_UTF8 : 0,
                                          SVt_PV))
+                {
                     weight -= 100;
-                else    /* Not a multi-char identifier already known in the
-                           program; is somewhat likely to be a subscript */
+
+                    /* khw: Below we keep track of repeated characters;  People
+                     * rarely say qr/[aba]/, as the second a is pointless.
+                     * (Some do it though as a mnemonic that is meaningful to
+                     * them.)  But generally, repeated characters make things
+                     * more likely to be a charclass.  But here, this an
+                     * identifier so likely a subscript.  Its spelling should
+                     * be irrelevant to the repeated characters test.  So, we
+                     * should advance past it.  Suppose it is a hash element,
+                     * like $subscripts{$which}.  We should advance past the
+                     * braces and key */
+                }
+                else {
+                    /* Not a multi-char identifier already known in the
+                     * program; is somewhat likely to be a subscript.
+                     *
+                     * khw: Our test suite contains several constructs like
+                     * [$A-Z].  Excluding length 1 identifiers in the
+                     * conditional above means such are much less likely to be
+                     * mistaken for subscripts.  I would argue that if the next
+                     * character is a '-' followed by an alpha, that would make
+                     * it much more likely to be a charclass.  It would only
+                     * make sense to be an expression if that alpha string is a
+                     * bareword with meaning; something like [$A-ord] */
                     weight -= 10;
+                }
             }
             else if (   s[0] == '$'
                      && s[1]
@@ -4640,13 +4847,51 @@ S_intuit_more(pTHX_ char *s, char *e)
             }
             break;
 
+          /* khw:  [:blank:] strongly indicates a charclass */
+          /* khw: Z-A definitely subscript
+           *      Z-Z likely subscript
+           *      "x - z" with blanks very likely subscript
+           *      \N without { must be subscript
+           *      \R must be subscript
+           *      \? must be subscript for things like \d, but not \a.
+           */
+
+
           case '\\':
             if (s[1]) {
-                if (memCHRs("wds]", s[1]))
+                if (memCHRs("wds]", s[1])) {
                     weight += 100;  /* \w \d \s => strongly charclass */
-                    /* khw: Why not \W \D \S \h \v, etc as well? */
-                else if (seen[(U8)'\''] || seen[(U8)'"'])
-                    weight += 1;    /* \' => mildly charclass */
+                    /* khw: \] can't happen, as any ']' is beyond our search.
+                     * Why not \W \D \S \h \v, etc as well?  Should they have
+                     * the same weights as \w \d \s or should all or some be
+                     * in the 'abcfnrtvx' below? */
+                } else if (seen[(U8)'\''] || seen[(U8)'"']) {
+                    weight += 1;
+                    /* khw: This is problematic.  Enough so, that I misread
+                     * it, and added a wrong comment about what it does in
+                     * 57ae1f3a8e669082e3d5ec6a8cdffbdc39d87bee.  Note that it
+                     * doesn't look at the current character.  What it
+                     * actually does is: if any quote has been seen in the
+                     * parse, don't do the rest of the else's below, but for
+                     * every subsequent backslashed character encountered
+                     * (except \0 \w \s \d), increment the weight to lean a
+                     * bit more towards being a charclass.  That means that
+                     * every backslash sequence following the first occurrence
+                     * of a quote increments the weight regardless of what the
+                     * sequence is.  Again, \0 \w \d and \s are not controlled
+                     * by this else, so they change the weight by a lot more.
+                     * But what makes them so special that they aren't subject
+                     * to this.  Any why does having a quote change the
+                     * behavior from then on.  And why only backslashed
+                     * sequences get this treatment?  This code has been
+                     * unchanged since this function was added in 1993.  I
+                     * don't get it.  Instead, it does seem to me that it is
+                     * especially unlikely to repeat a quote in a charclass,
+                     * but that having just a single quote is indicative of a
+                     * charclass, and having pairs of quotes is indicative of
+                     * a subscript.  Similarly for things that could indicate
+                     * nesting of braces or parens. */
+                }
                 else if (memCHRs("abcfnrtvx", s[1]))
                     weight += 40;   /* \n, etc => charclass */
                     /* khw: Why not \e etc as well? */
@@ -4655,6 +4900,19 @@ S_intuit_more(pTHX_ char *s, char *e)
                     while (s[1] && isDIGIT(s[1]))
                         s++;
                 }
+
+                /* khw: There are lots more possible escape sequences.  Some,
+                 * like \A,\z have no special meaning to charclasses, so might
+                 * indicate a subscript, but I don't know what they would be
+                 * doing there either.  Some have been added to the language
+                 * after this code was written, but no one thought to, or
+                 * could wade through this function, to add them.  Things like
+                 * \p{} for properties, \N and \N{}, for example.
+                 *
+                 * It's problematic that \a is treated as plain 'a' for
+                 * purposes of the 'seen' array.  Whatever is matched by these
+                 * backslashed sequences should not be added to 'seen'.  That
+                 * includes the backslash. */
             }
             else /* \ followed by NUL strongly indicates character class */
                 weight += 100;
@@ -4700,7 +4958,25 @@ S_intuit_more(pTHX_ char *s, char *e)
                 && isALPHA(s[1]))
             {
                 /* Here it's \W (that isn't [$@&] ) followed immediately by two
-                 * alphas in a row.  Accumulate all the consecutive alphas */
+                 * alphas in a row.  Accumulate all the consecutive alphas.
+                 *
+                 * khw: The code below was changed in 2015 by
+                 * 56f81afc0f2d331537f38e6f12b86a850187cb8a to solve a
+                 * buffer overrun.  Prior to that commit, the code copied all
+                 * the consecutive alphas to a temporary.  The problem was
+                 * that temporary's size could be exceeded, and the temporary
+                 * wasn't even needed (at least by 2015).  The called
+                 * keyword() function doesn't need a copy.  It takes a pointer
+                 * to the first character and a length, hence it can operate
+                 * on the original source text.  It is intended to catch cases
+                 * like $a[ord].  If it does match a keyword, we don't want
+                 * the spelling of that keyword to affect the seen[] array.
+                 * But if it isn't a keyword we do want to fall back to the
+                 * normal behavior.  And the 2015 commit removed that.  It
+                 * absorbs every bareword regardless, defeating the intent of
+                 * the algorithm implementing the heuristics.  That not many
+                 * bugs have surfaced since indicates this whole thing doesn't
+                 * get applied very much */
                 char *d = s;
                 while (isALPHA(s[0]))
                     s++;
@@ -4710,7 +4986,12 @@ S_intuit_more(pTHX_ char *s, char *e)
                 if (keyword(d, s - d, 0))
                     weight -= 150;
 
-                /* khw: Should those alphas be marked as seen? */
+                /* khw: Barewords could also be subroutine calls, and these
+                 * would also indicate a subscript.  Like [green] where
+                 * 'green' has been declared, for example, in 'use constant'
+                 * Or maybe it should just call intuit_method() which checks
+                 * for keyword, subs, and methods.
+                 * */
             }
 
             /* Consecutive chars like [...12...] and [...ab...] are presumed
@@ -4725,23 +5006,36 @@ S_intuit_more(pTHX_ char *s, char *e)
             /* But repeating a character inside a character class does nothing,
              * like [aba], so less likely that someone makes such a class, more
              * likely that it is a subscript; the more repeats, the less
-             * likely. */
+             * likely.
+             *
+             * khw: I think this changes the weight too rapidly.  Each time
+             * through the loop compounds the previous times.  Instead, it
+             * would be better to have a separate loop after all the rest that
+             * changes the weight once based on how many times each character
+             * gets repeated */
             weight -= seen[un_char];
             break;
         }   /* End of switch */
 
         /* khw: 'seen' is declared as a char.  This ++ can cause it to wrap.
          * This gives different results with compilers for which a plain 'char'
-         * is actually unsigned, versus those where it is signed.  I believe it
-         * is undefined behavior to wrap a 'signed'.  I think it should be
-         * instead declared an unsigned int to make the chances of wrapping
-         * essentially zero.
+         * is actually unsigned, versus those where it is signed.  The C99
+         * standard allows a compiler to raise a signal when a 'signed' char
+         * is incremented outside its permissible range.  I think 'seen'
+         * should be instead declared an unsigned, and a conditional added
+         * to prevent wrapping.
          *
          * And I believe that extra backslashes are different from other
-         * repeated characters. */
+         * repeated characters.  There may be others, like I have mentioned
+         * quotes and paired delimiters  */
         seen[un_char]++;
     }   /* End of loop through each character of the construct */
 
+    /* khw: People on #irc have suggested things that I think boil down to:
+     * under 'use 5.43.x', output a warning like existing warnings for
+     * similar situations "Ambiguous use of [], resolved as ..."  Perhaps
+     * suppress the message if all (or maybe almost all) the evidence points
+     * to the same outcome.  This would involve two weight variables */
     if (weight >= 0)	/* probably a character class */
         return FALSE;
 
@@ -4769,11 +5063,16 @@ S_intuit_more(pTHX_ char *s, char *e)
  *   =>
  */
 
-STATIC int
+static int
 S_intuit_method(pTHX_ char *start, SV *ioname, CV *cv)
 {
+    PERL_ARGS_ASSERT_INTUIT_METHOD;
+
+    if (!FEATURE_INDIRECT_IS_ENABLED)
+        return 0;
+
     char *s = start + (*start == '$');
-    char tmpbuf[sizeof PL_tokenbuf];
+    char tmpbuf[C_ARRAY_LENGTH(PL_tokenbuf)];
     STRLEN len;
     GV* indirgv;
         /* Mustn't actually add anything to a symbol table.
@@ -4782,11 +5081,6 @@ S_intuit_method(pTHX_ char *start, SV *ioname, CV *cv)
            blown PVGVs with attached PVCV.  */
     GV * const gv =
         ioname ? gv_fetchsv(ioname, GV_NOADD_NOINIT, SVt_PVCV) : NULL;
-
-    PERL_ARGS_ASSERT_INTUIT_METHOD;
-
-    if (!FEATURE_INDIRECT_IS_ENABLED)
-        return 0;
 
     if (gv && SvTYPE(gv) == SVt_PVGV && GvIO(gv))
             return 0;
@@ -4813,7 +5107,7 @@ S_intuit_method(pTHX_ char *start, SV *ioname, CV *cv)
         return *s == '(' ? METHCALL : METHCALL0;
     }
 
-    s = scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
+    s = scan_word(s, tmpbuf, C_ARRAY_LENGTH(tmpbuf), TRUE, &len);
     /* start is the beginning of the possible filehandle/object,
      * and s is the end of it
      * tmpbuf is a copy of it (but with single quotes as double colons)
@@ -4869,6 +5163,8 @@ S_intuit_method(pTHX_ char *start, SV *ioname, CV *cv)
 SV *
 Perl_filter_add(pTHX_ filter_t funcp, SV *datasv)
 {
+    PERL_ARGS_ASSERT_FILTER_ADD;
+
     if (!funcp)
         return NULL;
 
@@ -4944,9 +5240,9 @@ Delete most recently added instance of the filter function argument
 void
 Perl_filter_del(pTHX_ filter_t funcp)
 {
-    SV *datasv;
-
     PERL_ARGS_ASSERT_FILTER_DEL;
+
+    SV *datasv;
 
 #ifdef DEBUGGING
     DEBUG_P(PerlIO_printf(Perl_debug_log, "filter_del func %p",
@@ -4971,6 +5267,8 @@ Perl_filter_del(pTHX_ filter_t funcp)
 I32
 Perl_filter_read(pTHX_ int idx, SV *buf_sv, int maxlen)
 {
+    PERL_ARGS_ASSERT_FILTER_READ;
+
     filter_t funcp;
     I32 ret;
     SV *datasv = NULL;
@@ -4978,8 +5276,6 @@ Perl_filter_read(pTHX_ int idx, SV *buf_sv, int maxlen)
        Not sure if we want to change the API, but if not we should sanity
        check the value here.  */
     unsigned int correct_length = maxlen < 0 ?  PERL_INT_MAX : maxlen;
-
-    PERL_ARGS_ASSERT_FILTER_READ;
 
     if (!PL_parser || !PL_rsfp_filters)
         return -1;
@@ -5087,7 +5383,7 @@ Perl_filter_read(pTHX_ int idx, SV *buf_sv, int maxlen)
     return ret;
 }
 
-STATIC char *
+static char *
 S_filter_gets(pTHX_ SV *sv, STRLEN append)
 {
     PERL_ARGS_ASSERT_FILTER_GETS;
@@ -5104,12 +5400,12 @@ S_filter_gets(pTHX_ SV *sv, STRLEN append)
         return (sv_gets(sv, PL_rsfp, append));
 }
 
-STATIC HV *
+static HV *
 S_find_in_my_stash(pTHX_ const char *pkgname, STRLEN len)
 {
-    GV *gv;
-
     PERL_ARGS_ASSERT_FIND_IN_MY_STASH;
+
+    GV *gv;
 
     if (memEQs(pkgname, len, "__PACKAGE__"))
         return PL_curstash;
@@ -5135,8 +5431,9 @@ S_find_in_my_stash(pTHX_ const char *pkgname, STRLEN len)
 }
 
 
-STATIC char *
-S_tokenize_use(pTHX_ int is_use, char *s) {
+static char *
+S_tokenize_use(pTHX_ int is_use, char *s)
+{
     PERL_ARGS_ASSERT_TOKENIZE_USE;
 
     if (PL_expect != XSTATE)
@@ -5153,12 +5450,12 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
             force_next(BAREWORD);
         }
         else if (*s == 'v') {
-            s = force_word(s,BAREWORD,FALSE,TRUE);
+            s = force_word(s, BAREWORD, ALLOW_PACKAGE);
             s = force_version(s, FALSE);
         }
     }
     else {
-        s = force_word(s,BAREWORD,FALSE,TRUE);
+        s = force_word(s, BAREWORD, ALLOW_PACKAGE);
         s = force_version(s, FALSE);
     }
     pl_yylval.ival = is_use;
@@ -5173,7 +5470,7 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 #endif
 
 #define word_takes_any_delimiter(p,l) S_word_takes_any_delimiter(p,l)
-STATIC bool
+static bool
 S_word_takes_any_delimiter(char *p, STRLEN len)
 {
     return (len == 1 && memCHRs("msyq", p[0]))
@@ -5193,10 +5490,11 @@ S_check_scalar_slice(pTHX_ char *s)
     {
         return;
     }
-    while (    isWORDCHAR_lazy_if_safe(s, PL_bufend, UTF)
-           || (*s && memCHRs(" \t$#+-'\"", *s)))
+    Size_t advance;
+    while (   (advance = isWORDCHAR_lazy_if_safe(s, PL_bufend, UTF))
+           || (advance = (*s && memCHRs(" \t$#+-'\"", *s))))
     {
-        s += UTF ? UTF8SKIP(s) : 1;
+        s += advance;
     }
     if (*s == '}' || *s == ']')
         pl_yylval.ival = OPpSLICEWARNING;
@@ -5235,13 +5533,21 @@ yyl_sigvar(pTHX_ char *s)
     U8 sigil;
 
     s = skipspace(s);
+
+    bool is_named = false;
+    if(*s == ':') {
+        is_named = true;
+        s++;
+        s = skipspace(s);
+    }
+
     sigil = *s++;
     PL_bufptr = s; /* for error reporting */
     switch (sigil) {
     case '$':
     case '@':
     case '%':
-        /* spot stuff that looks like an prototype */
+        /* spot stuff that looks like a prototype */
         if (memCHRs("$:@%&*;\\[]", *s)) {
             yyerror("Illegal character following sigil in a subroutine signature");
             break;
@@ -5251,17 +5557,24 @@ yyl_sigvar(pTHX_ char *s)
             yyerror("'#' not allowed immediately following a sigil in a subroutine signature");
             break;
         }
+        if (is_named && sigil != '$') {
+            yyerror("A named signature parameter must start with '$'");
+            break;
+        }
         s = skipspace(s);
         if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
             char *dest = PL_tokenbuf + 1;
             /* read var name, including sigil, into PL_tokenbuf */
             PL_tokenbuf[0] = sigil;
-            parse_ident(&s, &dest, dest + sizeof(PL_tokenbuf) - 1,
-                0, cBOOL(UTF), FALSE);
-            *dest = '\0';
+            s = parse_ident(s, PL_bufend, &dest, C_ARRAY_END(PL_tokenbuf),
+                            cBOOL(UTF), NULL, 0);
             assert(PL_tokenbuf[1]); /* we have a variable name */
         }
         else {
+            if (is_named) {
+                yyerror("Named parameters must actually have a name");
+                break;
+            }
             *PL_tokenbuf = 0;
             PL_in_my = 0;
         }
@@ -5323,12 +5636,21 @@ yyl_sigvar(pTHX_ char *s)
 
     default:
         PL_in_my = 0;
-        yyerror("A signature parameter must start with '$', '@' or '%'");
+        if(is_named)
+            yyerror("A named signature parameter must start with '$'");
+        else
+            yyerror("A signature parameter must start with '$', '@' or '%'");
         /* very crude error recovery: skip to likely next signature
          * element */
         while (*s && *s != '$' && *s != '@' && *s != '%' && *s != ')')
             s++;
         break;
+    }
+
+    if (!PL_parser->error_count && is_named) {
+        assert(sigil == '$');
+        force_next(PERLY_DOLLAR);
+        TOKEN (PERLY_COLON);
     }
 
     switch (sigil) {
@@ -5359,8 +5681,7 @@ yyl_dollar(pTHX_ char *s)
             || memCHRs("{$:+-@", s[2])))
     {
         PL_tokenbuf[0] = '@';
-        s = scan_ident(s + 1, PL_tokenbuf + 1,
-                       sizeof PL_tokenbuf - 1, FALSE);
+        s = scan_ident(s + 1, PL_tokenbuf + 1, C_ARRAY_END(PL_tokenbuf), 0);
         S_warn_expect_operator(aTHX_ "Array length", s, POP_OLDBUFPTR);
         if (!PL_tokenbuf[1])
             PREREF(DOLSHARP);
@@ -5370,7 +5691,7 @@ yyl_dollar(pTHX_ char *s)
     }
 
     PL_tokenbuf[0] = '$';
-    s = scan_ident(s, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
+    s = scan_ident(s, PL_tokenbuf + 1, C_ARRAY_END(PL_tokenbuf), 0);
     S_warn_expect_operator(aTHX_ "Scalar", s, POP_OLDBUFPTR);
     if (!PL_tokenbuf[1]) {
         if (s == PL_bufend)
@@ -5378,147 +5699,152 @@ yyl_dollar(pTHX_ char *s)
         PREREF(PERLY_DOLLAR);
     }
 
+    const char tmp = *s;
+    if (PL_lex_state == LEX_NORMAL || PL_lex_brackets)
+        s = skipspace(s);
+
+    if (   (PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
+        && intuit_more(s, PL_bufend, FROM_DOLLAR,
+                       PL_tokenbuf, strlen(PL_tokenbuf)))
     {
-        const char tmp = *s;
-        if (PL_lex_state == LEX_NORMAL || PL_lex_brackets)
-            s = skipspace(s);
+        if (*s == '[') {
+            PL_tokenbuf[0] = '@';
+            if (ckWARN(WARN_SYNTAX)) {
+                char *t = s+1;
 
-        if (   (PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
-            && intuit_more(s, PL_bufend)) {
-            if (*s == '[') {
-                PL_tokenbuf[0] = '@';
-                if (ckWARN(WARN_SYNTAX)) {
-                    char *t = s+1;
+                while ( t < PL_bufend ) {
+                    if (isSPACE(*t)) {
+                        do { t++; } while (t < PL_bufend && isSPACE(*t));
+                        /* consumed one or more space chars */
+                    } else if (*t == '$' || *t == '@') {
+                        /* could be more than one '$' like $$ref or @$ref */
+                        do { t++; } while (t < PL_bufend && *t == '$');
 
-                    while ( t < PL_bufend ) {
-                        if (isSPACE(*t)) {
-                            do { t += UTF ? UTF8SKIP(t) : 1; } while (t < PL_bufend && isSPACE(*t));
-                            /* consumed one or more space chars */
-                        } else if (*t == '$' || *t == '@') {
-                            /* could be more than one '$' like $$ref or @$ref */
-                            do { t++; } while (t < PL_bufend && *t == '$');
+                        /* could be an abigail style identifier like $ foo */
+                        while (t < PL_bufend && *t == ' ') t++;
 
-                            /* could be an abigail style identifier like $ foo */
-                            while (t < PL_bufend && *t == ' ') t++;
-
-                            /* strip off the name of the var */
-                            while (isWORDCHAR_lazy_if_safe(t, PL_bufend, UTF))
-                                t += UTF ? UTF8SKIP(t) : 1;
-                            /* consumed a varname */
-                        } else if (isDIGIT(*t)) {
-                            /* deal with hex constants like 0x11 */
-                            if (t[0] == '0' && t[1] == 'x') {
-                                t += 2;
-                                while (t < PL_bufend && isXDIGIT(*t)) t++;
-                            } else {
-                                /* deal with decimal/octal constants like 1 and 0123 */
-                                do { t++; } while (isDIGIT(*t));
-                                if (t<PL_bufend && *t == '.') {
-                                    do { t++; } while (isDIGIT(*t));
-                                }
-                            }
-                            /* consumed a number */
+                        /* strip off the name of the var */
+                        Size_t advance;
+                        while ((advance = (isWORDCHAR_lazy_if_safe(t,
+                                                                PL_bufend,
+                                                                UTF))))
+                            t += advance;
+                        /* consumed a varname */
+                    } else if (isDIGIT(*t)) {
+                        /* deal with hex constants like 0x11 */
+                        if (t[0] == '0' && t[1] == 'x') {
+                            t += 2;
+                            while (t < PL_bufend && isXDIGIT(*t)) t++;
                         } else {
-                            /* not a var nor a space nor a number */
-                            break;
+                            /* deal with decimal/octal constants like 1 and
+                             * 0123 */
+                            do { t++; } while (isDIGIT(*t));
+                            if (t<PL_bufend && *t == '.') {
+                                do { t++; } while (isDIGIT(*t));
+                            }
                         }
-                    }
-                    if (t < PL_bufend && *t++ == ',') {
-                        PL_bufptr = skipspace(PL_bufptr); /* XXX can realloc */
-                        while (t < PL_bufend && *t != ']')
-                            t++;
-                        warner(packWARN(WARN_SYNTAX),
-                               "Multidimensional syntax %" UTF8f " not supported",
-                               UTF8fARG(UTF,(int)((t - PL_bufptr) + 1), PL_bufptr));
+                        /* consumed a number */
+                    } else {
+                        /* not a var nor a space nor a number */
+                        break;
                     }
                 }
-            }
-            else if (*s == '{') {
-                char *t;
-                PL_tokenbuf[0] = '%';
-                if (    strEQ(PL_tokenbuf+1, "SIG")
-                    && ckWARN(WARN_SYNTAX)
-                    && (t = (char *) memchr(s, '}', PL_bufend - s))
-                    && (t = (char *) memchr(t, '=', PL_bufend - t)))
-                {
-                    char tmpbuf[sizeof PL_tokenbuf];
-                    do {
+                if (t < PL_bufend && *t++ == ',') {
+                    PL_bufptr = skipspace(PL_bufptr); /* XXX can realloc */
+                    while (t < PL_bufend && *t != ']')
                         t++;
-                    } while (isSPACE(*t));
-                    if (isIDFIRST_lazy_if_safe(t, PL_bufend, UTF)) {
-                        STRLEN len;
-                        t = scan_word(t, tmpbuf, sizeof tmpbuf, TRUE, &len);
-                        while (isSPACE(*t))
-                            t++;
-                        if (  *t == ';'
-                            && get_cvn_flags(tmpbuf, len, UTF
-                                                            ? SVf_UTF8
-                                                            : 0))
-                        {
-                            warner(packWARN(WARN_SYNTAX),
-                                   "You need to quote \"%" UTF8f "\"",
-                                   UTF8fARG(UTF, len, tmpbuf));
-                        }
-                    }
+                    warner(packWARN(WARN_SYNTAX),
+                           "Multidimensional syntax %" UTF8f " not supported",
+                           UTF8fARG(UTF,(int)((t - PL_bufptr) + 1), PL_bufptr));
                 }
             }
         }
-
-        PL_expect = XOPERATOR;
-        if ((PL_lex_state == LEX_NORMAL || PL_lex_brackets) && isSPACE((char)tmp)) {
-            const bool islop = (PL_last_lop == PL_oldoldbufptr);
-            if (!islop || PL_last_lop_op == OP_GREPSTART)
-                PL_expect = XOPERATOR;
-            else if (memCHRs("$@\"'`q", *s))
-                PL_expect = XTERM;		/* e.g. print $fh "foo" */
-            else if (   memCHRs("&*<%", *s)
-                     && isIDFIRST_lazy_if_safe(s+1, PL_bufend, UTF))
+        else if (*s == '{') {
+            char *t;
+            PL_tokenbuf[0] = '%';
+            if (    strEQ(PL_tokenbuf+1, "SIG")
+                && ckWARN(WARN_SYNTAX)
+                && (t = (char *) memchr(s, '}', PL_bufend - s))
+                && (t = (char *) memchr(t, '=', PL_bufend - t)))
             {
-                PL_expect = XTERM;		/* e.g. print $fh &sub */
-            }
-            else if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
-                char tmpbuf[sizeof PL_tokenbuf];
-                int t2;
-                STRLEN len;
-                scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
-                if ((t2 = keyword(tmpbuf, len, 0))) {
-                    /* binary operators exclude handle interpretations */
-                    switch (t2) {
-                    case -KEY_x:
-                    case -KEY_eq:
-                    case -KEY_ne:
-                    case -KEY_gt:
-                    case -KEY_lt:
-                    case -KEY_ge:
-                    case -KEY_le:
-                    case -KEY_cmp:
-                        break;
-                    default:
-                        PL_expect = XTERM;	/* e.g. print $fh length() */
-                        break;
+                char tmpbuf[C_ARRAY_LENGTH(PL_tokenbuf)];
+                do {
+                    t++;
+                } while (isSPACE(*t));
+                if (isIDFIRST_lazy_if_safe(t, PL_bufend, UTF)) {
+                    STRLEN len;
+                    t = scan_word(t, tmpbuf, C_ARRAY_LENGTH(tmpbuf), TRUE, &len);
+                    while (isSPACE(*t))
+                        t++;
+                    if (  *t == ';'
+                        && get_cvn_flags(tmpbuf, len, UTF
+                                                        ? SVf_UTF8
+                                                        : 0))
+                    {
+                        warner(packWARN(WARN_SYNTAX),
+                               "You need to quote \"%" UTF8f "\"",
+                               UTF8fARG(UTF, len, tmpbuf));
                     }
                 }
-                else {
-                    PL_expect = XTERM;	/* e.g. print $fh subr() */
-                }
             }
-            else if (isDIGIT(*s))
-                PL_expect = XTERM;		/* e.g. print $fh 3 */
-            else if (*s == '.' && isDIGIT(s[1]))
-                PL_expect = XTERM;		/* e.g. print $fh .3 */
-            else if ((*s == '?' || *s == '-' || *s == '+')
-                && !isSPACE(s[1]) && s[1] != '=')
-                PL_expect = XTERM;		/* e.g. print $fh -1 */
-            else if (*s == '/' && !isSPACE(s[1]) && s[1] != '='
-                     && s[1] != '/')
-                PL_expect = XTERM;		/* e.g. print $fh /.../
-                                               XXX except DORDOR operator
-                                            */
-            else if (*s == '<' && s[1] == '<' && !isSPACE(s[2])
-                     && s[2] != '=')
-                PL_expect = XTERM;		/* print $fh <<"EOF" */
         }
     }
+
+    PL_expect = XOPERATOR;
+    if ((PL_lex_state == LEX_NORMAL || PL_lex_brackets) && isSPACE((char)tmp)) {
+        const bool islop = (PL_last_lop == PL_oldoldbufptr);
+        if (!islop || PL_last_lop_op == OP_GREPSTART)
+            PL_expect = XOPERATOR;
+        else if (memCHRs("$@\"'`q", *s))
+            PL_expect = XTERM;		/* e.g. print $fh "foo" */
+        else if (   memCHRs("&*<%", *s)
+                 && isIDFIRST_lazy_if_safe(s+1, PL_bufend, UTF))
+        {
+            PL_expect = XTERM;		/* e.g. print $fh &sub */
+        }
+        else if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
+            char tmpbuf[C_ARRAY_LENGTH(PL_tokenbuf)];
+            int t2;
+            STRLEN len;
+            scan_word(s, tmpbuf, C_ARRAY_LENGTH(tmpbuf), TRUE, &len);
+            if ((t2 = keyword(tmpbuf, len, 0))) {
+                /* binary operators exclude handle interpretations */
+                switch (t2) {
+                case -KEY_x:
+                case -KEY_eq:
+                case -KEY_ne:
+                case -KEY_gt:
+                case -KEY_lt:
+                case -KEY_ge:
+                case -KEY_le:
+                case -KEY_cmp:
+                    break;
+                default:
+                    PL_expect = XTERM;	/* e.g. print $fh length() */
+                    break;
+                }
+            }
+            else {
+                PL_expect = XTERM;	/* e.g. print $fh subr() */
+            }
+        }
+        else if (isDIGIT(*s))
+            PL_expect = XTERM;		/* e.g. print $fh 3 */
+        else if (*s == '.' && isDIGIT(s[1]))
+            PL_expect = XTERM;		/* e.g. print $fh .3 */
+        else if ((*s == '?' || *s == '-' || *s == '+')
+            && !isSPACE(s[1]) && s[1] != '=')
+            PL_expect = XTERM;		/* e.g. print $fh -1 */
+        else if (*s == '/' && !isSPACE(s[1]) && s[1] != '='
+                 && s[1] != '/')
+            PL_expect = XTERM;		/* e.g. print $fh /.../
+                                           XXX except DORDOR operator
+                                        */
+        else if (*s == '<' && s[1] == '<' && !isSPACE(s[2])
+                 && s[2] != '=')
+            PL_expect = XTERM;		/* print $fh <<"EOF" */
+    }
+
     force_ident_maybe_lex('$');
     TOKEN(PERLY_DOLLAR);
 }
@@ -5551,7 +5877,7 @@ yyl_sub(pTHX_ char *s, const int key)
     {
 
         PL_expect = XATTRBLOCK;
-        d = scan_word(s, tmpbuf, sizeof PL_tokenbuf - 1, TRUE, &len);
+        d = scan_word(s, tmpbuf, C_ARRAY_LENGTH(PL_tokenbuf) - 1, TRUE, &len);
         if (key == KEY_format)
             format_name = S_newSV_maybe_utf8(aTHX_ s, d - s);
         *PL_tokenbuf = '&';
@@ -5617,9 +5943,7 @@ yyl_sub(pTHX_ char *s, const int key)
                key == KEY_INIT || key == KEY_END ||
                key == KEY_my || key == KEY_state ||
                key == KEY_our);
-        if (!have_name)
-            croak("Illegal declaration of anonymous subroutine");
-        else if (*s != ';' && *s != '}')
+        if (have_name && *s != ';' && *s != '}')
             croak("Illegal declaration of subroutine %" SVf, SVfARG(PL_subname));
     }
 
@@ -5627,7 +5951,7 @@ yyl_sub(pTHX_ char *s, const int key)
         NEXTVAL_NEXTTOKE.opval =
             newSVOP(OP_CONST, 0, PL_lex_stuff);
         PL_lex_stuff = NULL;
-        force_next(THING);
+        force_next(PROTOTYPE);
     }
 
     if (!have_name) {
@@ -5821,6 +6145,7 @@ yyl_qw(pTHX_ char *s, STRLEN len)
     if (SvCUR(PL_lex_stuff)) {
         int warned_comma = !ckWARN(WARN_QW);
         int warned_comment = warned_comma;
+        int warned_escape = warned_comma;
         char *d = SvPV_force(PL_lex_stuff, len);
         while (len) {
             for (; isSPACE(*d) && len; --len, ++d)
@@ -5828,7 +6153,7 @@ yyl_qw(pTHX_ char *s, STRLEN len)
             if (len) {
                 SV *sv;
                 const char *b = d;
-                if (!warned_comma || !warned_comment) {
+                if (!warned_comma || !warned_comment || !warned_escape) {
                     for (; !isSPACE(*d) && len; --len, ++d) {
                         if (!warned_comma && *d == ',') {
                             warner(packWARN(WARN_QW),
@@ -5839,6 +6164,16 @@ yyl_qw(pTHX_ char *s, STRLEN len)
                             warner(packWARN(WARN_QW),
                                    "Possible attempt to put comments in qw() list");
                             ++warned_comment;
+                        }
+                        else if (!warned_escape && *d == '\\' && len > 1) {
+                            if (*(d+1) == '\\') {
+                                --len, ++d;
+                            }
+                            else if (isSPACE(*(d+1))) {
+                                warner(packWARN(WARN_QW),
+                                       "Possible attempt to escape whitespace in qw() list");
+                                ++warned_escape;
+                            }
                         }
                     }
                 }
@@ -5876,7 +6211,7 @@ yyl_hyphen(pTHX_ char *s)
             s++;
 
         if (memBEGINs(s, (STRLEN) (PL_bufend - s), "=>")) {
-            s = force_word(PL_bufptr,BAREWORD,FALSE,FALSE);
+            s = force_word(PL_bufptr, BAREWORD, 0);
             DEBUG_T( { printbuf("### Saw unary minus before =>, forcing word %s\n", s); } );
             OPERATOR(PERLY_MINUS);              /* unary minus */
         }
@@ -5958,7 +6293,7 @@ yyl_hyphen(pTHX_ char *s)
                 TOKEN(ARROW);
             }
             if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
-                s = force_word(s,METHCALL0,FALSE,TRUE);
+                s = force_word(s, METHCALL0, ALLOW_PACKAGE);
                 TOKEN(ARROW);
             }
             else if (*s == '$')
@@ -5980,7 +6315,7 @@ yyl_hyphen(pTHX_ char *s)
         }
         else {
             if (isSPACE(*s) || !isSPACE(*PL_bufptr))
-                check_uni();
+                check_unary();
             OPERATOR(PERLY_MINUS);              /* unary minus */
         }
     }
@@ -6009,7 +6344,7 @@ yyl_plus(pTHX_ char *s)
     }
     else {
         if (isSPACE(*s) || !isSPACE(*PL_bufptr))
-            check_uni();
+            check_unary();
         OPERATOR(PERLY_PLUS);
     }
 }
@@ -6021,7 +6356,7 @@ yyl_star(pTHX_ char *s)
         POSTDEREF(PERLY_STAR);
 
     if (PL_expect != XOPERATOR) {
-        s = scan_ident(s, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
+        s = scan_ident(s, PL_tokenbuf, C_ARRAY_END(PL_tokenbuf), CHECK_UNARY);
         PL_expect = XOPERATOR;
         force_ident(PL_tokenbuf, PERLY_STAR);
         if (!*PL_tokenbuf)
@@ -6069,13 +6404,15 @@ yyl_percent(pTHX_ char *s)
         POSTDEREF(PERLY_PERCENT_SIGN);
 
     PL_tokenbuf[0] = '%';
-    s = scan_ident(s, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
+    s = scan_ident(s, PL_tokenbuf + 1, C_ARRAY_END(PL_tokenbuf), 0);
     pl_yylval.ival = 0;
     if (!PL_tokenbuf[1]) {
         PREREF(PERLY_PERCENT_SIGN);
     }
     if (   (PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
-        && intuit_more(s, PL_bufend)) {
+        && intuit_more(s, PL_bufend, FROM_PERCENT,
+                       PL_tokenbuf, strlen(PL_tokenbuf)))
+    {
         if (*s == '[')
             PL_tokenbuf[0] = '@';
     }
@@ -6149,7 +6486,8 @@ yyl_colon(pTHX_ char *s)
             I32 tmp;
             SV *sv;
             STRLEN len;
-            char *d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
+            char *d = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf),
+                                FALSE, &len);
             if (isLOWER(*s) && (tmp = keyword(PL_tokenbuf, len, 0))) {
                 if (tmp < 0) tmp = -tmp;
                 switch (tmp) {
@@ -6232,7 +6570,7 @@ yyl_colon(pTHX_ char *s)
         }
         if (attrs) {
             NEXTVAL_NEXTTOKE.opval = attrs;
-            force_next(THING);
+            force_next(ATTRLIST);
         }
         TOKEN(COLONATTR);
     }
@@ -6328,13 +6666,13 @@ yyl_leftcurly(pTHX_ char *s, const U8 formbrack)
         }
         if (d < PL_bufend && isIDFIRST_lazy_if_safe(d, PL_bufend, UTF)) {
             STRLEN len;
-            d = scan_word(d, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1,
+            d = scan_word(d, PL_tokenbuf + 1, C_ARRAY_LENGTH(PL_tokenbuf) - 1,
                           FALSE, &len);
             while (d < PL_bufend && SPACE_OR_TAB(*d))
                 d++;
             if (*d == '}') {
                 const char minus = (PL_tokenbuf[0] == '-');
-                s = force_word(s + minus, BAREWORD, FALSE, TRUE);
+                s = force_word(s + minus, BAREWORD, ALLOW_PACKAGE);
                 if (minus)
                     force_next(PERLY_MINUS);
             }
@@ -6398,6 +6736,7 @@ yyl_leftcurly(pTHX_ char *s, const U8 formbrack)
              * GSAR 97-07-21
              */
             t = s;
+            Size_t advance;
             if (*s == '\'' || *s == '"' || *s == '`') {
                 /* common case: get past first string, handling escapes */
                 for (t++; t < PL_bufend && *t != *s;)
@@ -6446,20 +6785,24 @@ yyl_leftcurly(pTHX_ char *s, const U8 formbrack)
                     }
                     t++;
                 }
-                else
+                else {
                     /* skip plain q word */
                     while (   t < PL_bufend
-                           && isWORDCHAR_lazy_if_safe(t, PL_bufend, UTF))
+                           && (advance = isWORDCHAR_lazy_if_safe(t,
+                                                                 PL_bufend,
+                                                                 UTF)))
                     {
-                        t += UTF ? UTF8SKIP(t) : 1;
+                        t += advance;
                     }
+                }
             }
-            else if (isWORDCHAR_lazy_if_safe(t, PL_bufend, UTF)) {
-                t += UTF ? UTF8SKIP(t) : 1;
+            else if ((advance = isWORDCHAR_lazy_if_safe(t, PL_bufend, UTF))) {
+                t += advance;
                 while (   t < PL_bufend
-                       && isWORDCHAR_lazy_if_safe(t, PL_bufend, UTF))
+                       && (advance = isWORDCHAR_lazy_if_safe(t, PL_bufend,
+                                                             UTF)))
                 {
-                    t += UTF ? UTF8SKIP(t) : 1;
+                    t += advance;
                 }
             }
             while (t < PL_bufend && isSPACE(*t))
@@ -6598,7 +6941,8 @@ yyl_ampersand(pTHX_ char *s)
     }
 
     PL_tokenbuf[0] = '&';
-    s = scan_ident(s - 1, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, TRUE);
+    s = scan_ident(s - 1, PL_tokenbuf + 1, C_ARRAY_END(PL_tokenbuf),
+                   CHECK_UNARY);
     pl_yylval.ival = (OPpENTERSUB_AMPER<<8);
 
     if (PL_tokenbuf[1])
@@ -6683,7 +7027,7 @@ yyl_snail(pTHX_ char *s)
     if (PL_expect == XPOSTDEREF)
         POSTDEREF(PERLY_SNAIL);
     PL_tokenbuf[0] = '@';
-    s = scan_ident(s, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
+    s = scan_ident(s, PL_tokenbuf + 1, C_ARRAY_END(PL_tokenbuf), 0);
     S_warn_expect_operator(aTHX_ "Array", s, POP_OLDBUFPTR);
     pl_yylval.ival = 0;
     if (!PL_tokenbuf[1]) {
@@ -6692,7 +7036,8 @@ yyl_snail(pTHX_ char *s)
     if (PL_lex_state == LEX_NORMAL || PL_lex_brackets)
         s = skipspace(s);
     if (   (PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
-        && intuit_more(s, PL_bufend))
+        && intuit_more(s, PL_bufend, FROM_SNAIL,
+                       PL_tokenbuf, strlen(PL_tokenbuf)))
     {
         if (*s == '{')
             PL_tokenbuf[0] = '%';
@@ -6736,7 +7081,7 @@ yyl_slash(pTHX_ char *s)
                 || memNE(PL_last_uni, "study", 5)
                 || isWORDCHAR_lazy_if_safe(PL_last_uni+5, PL_bufend, UTF)
          ))
-            check_uni();
+            check_unary();
         s = scan_pat(s,OP_MATCH);
         TERM(sublex_start());
     }
@@ -6827,7 +7172,7 @@ yyl_leftpointy(pTHX_ char *s)
 
     if (PL_expect != XOPERATOR) {
         if (s[1] != '<' && !memchr(s,'>', PL_bufend - s))
-            check_uni();
+            check_unary();
         if (s[1] == '<' && s[2] != '>')
             s = scan_heredoc(s);
         else
@@ -7038,7 +7383,7 @@ yyl_croak_unrecognised(pTHX_ char *s)
         while (d > SvPVX(PL_linestr) && d[-1] && d[-1] != '\n')
             --d;
     }
-    len = UTF ? Perl_utf8_length(aTHX_ (U8 *) d, (U8 *) s) : (STRLEN) (s - d);
+    len = UTF ? utf8_length((U8 *) d, (U8 *) s) : (STRLEN) (s - d);
     if (len > UNRECOGNIZED_PRECEDE_COUNT) {
         d = UTF ? (char *) utf8_hop_back((U8 *) s, -UNRECOGNIZED_PRECEDE_COUNT, (U8 *)d) : s - UNRECOGNIZED_PRECEDE_COUNT;
     }
@@ -7059,9 +7404,9 @@ yyl_require(pTHX_ char *s, I32 orig_keyword)
             || (s = force_version(s, TRUE), *s == 'v'))
     {
         *PL_tokenbuf = '\0';
-        s = force_word(s,BAREWORD,TRUE,TRUE);
+        s = force_word(s, BAREWORD, CHECK_KEYWORD | ALLOW_PACKAGE);
         if (isIDFIRST_lazy_if_safe(PL_tokenbuf,
-                                   PL_tokenbuf + sizeof(PL_tokenbuf),
+                                   C_ARRAY_END(PL_tokenbuf),
                                    UTF))
         {
             gv_stashpvn(PL_tokenbuf, strlen(PL_tokenbuf),
@@ -7141,7 +7486,8 @@ yyl_foreach(pTHX_ char *s)
             /* skip optional package name, as in "for my abc $x (..)" */
             if (UNLIKELY(isIDFIRST_lazy_if_safe(p, PL_bufend, UTF))) {
                 STRLEN len;
-                p = scan_word(p, PL_tokenbuf, sizeof PL_tokenbuf, TRUE, &len);
+                p = scan_word(p, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf),
+                              TRUE, &len);
                 p = skipspace(p);
                 paren_is_valid = FALSE;
             }
@@ -7170,7 +7516,7 @@ yyl_do(pTHX_ char *s, I32 orig_keyword)
         char *d;
         STRLEN len;
         *PL_tokenbuf = '&';
-        d = scan_word(s, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1,
+        d = scan_word(s, PL_tokenbuf + 1, C_ARRAY_LENGTH(PL_tokenbuf) - 1,
                       1, &len);
         if (len && memNEs(PL_tokenbuf+1, len, "CORE")
          && !keyword(PL_tokenbuf + 1, len, 0)) {
@@ -7190,23 +7536,44 @@ yyl_do(pTHX_ char *s, I32 orig_keyword)
     OPERATOR(KW_DO);
 }
 
+static const char *
+declarator_name(I32 k)
+{
+    switch (k) {
+        case KEY_my:    return "my";
+        case KEY_state: return "state";
+        case KEY_our:   return "our";
+        case KEY_field: return "field";
+        case KEY_catch: return "catch";
+        default: return "???";
+    }
+}
+
 static int
 yyl_my(pTHX_ char *s, I32 my)
 {
+    assert(my == KEY_my || my == KEY_state || my == KEY_our);
     if (PL_in_my) {
         PL_bufptr = s;
-        yyerror(form(
-                          "Can't redeclare \"%s\" in \"%s\"",
-                           my       == KEY_my    ? "my" :
-                           my       == KEY_state ? "state" : "our",
-                           PL_in_my == KEY_my    ? "my" :
-                           PL_in_my == KEY_state ? "state" : "our"));
+        if (PL_in_my == KEY_catch) {
+            yyerror(form(
+                "Can't redeclare catch variable as \"%s\"",
+                    declarator_name(my)
+            ));
+        } else {
+            assert(PL_in_my == KEY_my || PL_in_my == KEY_state || PL_in_my == KEY_our);
+            yyerror(form(
+                "Can't redeclare \"%s\" in \"%s\"",
+                    declarator_name(my),
+                    declarator_name(PL_in_my)
+            ));
+        }
     }
     PL_in_my = (U16)my;
     s = skipspace(s);
     if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
         STRLEN len;
-        s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, TRUE, &len);
+        s = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf), TRUE, &len);
         if (memEQs(PL_tokenbuf, len, "sub"))
             /* my sub ... */
             return yyl_sub(aTHX_ s, my);
@@ -7218,8 +7585,9 @@ yyl_my(pTHX_ char *s, I32 my)
             char tmpbuf[1024];
             int i;
             PL_bufptr = s;
-            i = my_snprintf(tmpbuf, sizeof(tmpbuf), "No such class %.1000s", PL_tokenbuf);
-            PERL_MY_SNPRINTF_POST_GUARD(i, sizeof(tmpbuf));
+            i = my_snprintf(tmpbuf, C_ARRAY_LENGTH(tmpbuf),
+                            "No such class %.1000s", PL_tokenbuf);
+            PERL_MY_SNPRINTF_POST_GUARD(i, C_ARRAY_LENGTH(tmpbuf));
             yyerror_pv(tmpbuf, UTF ? SVf_UTF8 : 0);
         }
     }
@@ -7354,8 +7722,8 @@ yyl_fake_eof(pTHX_ U32 fake_eof, bool bof, char *s)
 #ifdef ALTERNATE_SHEBANG
             else {
                 static char const as[] = ALTERNATE_SHEBANG;
-                if (*s == as[0] && strnEQ(s, as, sizeof(as) - 1))
-                    d = s + (sizeof(as) - 1);
+                if (*s == as[0] && strnEQ(s, as, C_ARRAY_LENGTH(as) - 1))
+                    d = s + (C_ARRAY_LENGTH(as) - 1);
             }
 #endif /* ALTERNATE_SHEBANG */
         }
@@ -7680,7 +8048,7 @@ yyl_just_a_word(pTHX_ char *s, STRLEN len, I32 orig_keyword, struct code c)
     if ((*s == '\'' && FEATURE_APOS_AS_NAME_SEP_IS_ENABLED)
         || (*s == ':' && s[1] == ':')) {
         STRLEN morelen;
-        s = scan_word(s, PL_tokenbuf + len, sizeof PL_tokenbuf - len,
+        s = scan_word(s, PL_tokenbuf + len, C_ARRAY_LENGTH(PL_tokenbuf) - len,
                       TRUE, &morelen);
         if (no_op_error) {
             S_warn_expect_operator(aTHX_ "Bareword",s,FALSE);
@@ -7915,7 +8283,7 @@ yyl_word_or_keyword(pTHX_ char *s, STRLEN len, I32 key, I32 orig_keyword, struct
 
     case KEY___LINE__:
         FUN0OP(newSVOP(OP_CONST, OPpCONST_TOKEN_LINE<<8,
-                Perl_newSVpvf(aTHX_ "%" LINE_Tf, CopLINE(PL_curcop))));
+                newSVpvf("%" LINE_Tf, CopLINE(PL_curcop))));
 
     case KEY___PACKAGE__:
         FUN0OP(newSVOP(OP_CONST, OPpCONST_TOKEN_PACKAGE<<8,
@@ -8008,7 +8376,7 @@ yyl_word_or_keyword(pTHX_ char *s, STRLEN len, I32 key, I32 orig_keyword, struct
     case KEY_class:
         ck_warner_d(packWARN(WARN_EXPERIMENTAL__CLASS), "class is experimental");
 
-        s = force_word(s,BAREWORD,FALSE,TRUE);
+        s = force_word(s, BAREWORD, ALLOW_PACKAGE);
         s = skipspace(s);
         s = force_strict_version(s);
         PL_expect = XATTRBLOCK;
@@ -8432,7 +8800,8 @@ yyl_word_or_keyword(pTHX_ char *s, STRLEN len, I32 key, I32 orig_keyword, struct
         s = skipspace(s);
         if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
             const char *t;
-            char *d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
+            char *d = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf),
+                                FALSE, &len);
             for (t=d; isSPACE(*t);)
                 t++;
             if ( *t && memCHRs("|&*+-=!?:.", *t) && ckWARN_d(WARN_PRECEDENCE)
@@ -8487,7 +8856,7 @@ yyl_word_or_keyword(pTHX_ char *s, STRLEN len, I32 key, I32 orig_keyword, struct
         LOP(OP_PACK,XTERM);
 
     case KEY_package:
-        s = force_word(s,BAREWORD,FALSE,TRUE);
+        s = force_word(s, BAREWORD, ALLOW_PACKAGE);
         s = skipspace(s);
         s = force_strict_version(s);
         PREBLOCK(KW_PACKAGE);
@@ -8670,7 +9039,7 @@ yyl_word_or_keyword(pTHX_ char *s, STRLEN len, I32 key, I32 orig_keyword, struct
         checkcomma(s,PL_tokenbuf,"subroutine name");
         s = skipspace(s);
         PL_expect = XTERM;
-        s = force_word(s,BAREWORD,TRUE,TRUE);
+        s = force_word(s, BAREWORD, CHECK_KEYWORD | ALLOW_PACKAGE);
         LOP(OP_SORT,XREF);
 
     case KEY_split:
@@ -8846,7 +9215,7 @@ yyl_word_or_keyword(pTHX_ char *s, STRLEN len, I32 key, I32 orig_keyword, struct
             }
             Mop(OP_REPEAT);
         }
-        check_uni();
+        check_unary();
         return yyl_just_a_word(aTHX_ s, len, orig_keyword, c);
 
     case KEY_xor:
@@ -8865,7 +9234,7 @@ yyl_key_core(pTHX_ char *s, STRLEN len, struct code c)
     STRLEN olen = len;
     char *d = s;
     s += 2;
-    s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
+    s = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf), FALSE, &len);
     if ((*s == ':' && s[1] == ':')
         || (!(key = keyword(PL_tokenbuf, len, 1)) && *s == '\'' &&
             FEATURE_APOS_AS_NAME_SEP_IS_ENABLED))
@@ -8945,7 +9314,7 @@ yyl_keylookup(pTHX_ char *s, GV *gv)
     c.gv = gv;
 
     PL_bufptr = s;
-    s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
+    s = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf), FALSE, &len);
 
     /* Some keywords can be followed by any delimiter, including ':' */
     anydelim = word_takes_any_delimiter(PL_tokenbuf, len);
@@ -9029,7 +9398,7 @@ yyl_keylookup(pTHX_ char *s, GV *gv)
 
     /* Check for lexical sub */
     if (PL_expect != XOPERATOR) {
-        char tmpbuf[sizeof PL_tokenbuf + 1];
+        char tmpbuf[C_ARRAY_LENGTH(PL_tokenbuf) + 1];
         *tmpbuf = '&';
         Copy(PL_tokenbuf, tmpbuf+1, len, char);
         c.off = pad_findmy_pvn(tmpbuf, len+1, 0);
@@ -9102,7 +9471,7 @@ yyl_try(pTHX_ char *s)
         STRLEN len;
 
         /* Copy the longest sequence of isPLUGINFIX() chars into PL_tokenbuf */
-        while(s_end < PL_bufend && d < PL_tokenbuf+sizeof(PL_tokenbuf)-1 && isPLUGINFIX(*s_end))
+        while(s_end < PL_bufend && d < C_ARRAY_END(PL_tokenbuf)-1 && isPLUGINFIX(*s_end))
             *d++ = *s_end++;
         *d = '\0';
 
@@ -9511,7 +9880,7 @@ yyl_try(pTHX_ char *s)
     case 'v':
         if (isDIGIT(s[1]) && PL_expect != XOPERATOR) {
             char *start = s + 2;
-            while (isDIGIT(*start) || *start == '_')
+            while (isDIGIT_or_UNDERSCORE(*start))
                 start++;
             if (*start == '.' && isDIGIT(start[1])) {
                 s = scan_num(s, &pl_yylval);
@@ -9638,6 +10007,8 @@ yyl_try(pTHX_ char *s)
 int
 Perl_yylex(pTHX)
 {
+    PERL_ARGS_ASSERT_YYLEX;
+
     char *s = PL_bufptr;
 
     if (UNLIKELY(PL_parser->recheck_charset_validity)) {
@@ -9755,7 +10126,8 @@ Perl_yylex(pTHX)
         return yylex();
 
     case LEX_INTERPENDMAYBE:
-        if (intuit_more(PL_bufptr, PL_bufend)) {
+        if (intuit_more(PL_bufptr, PL_bufend, FROM_INTERDEPENDMAYBE, NULL, 0))
+        {
             PL_lex_state = LEX_INTERPNORMAL;	/* false alarm, more expr */
             break;
         }
@@ -9886,29 +10258,28 @@ Perl_yylex(pTHX)
         return yyl_sigvar(aTHX_ s);
     }
 
-    {
-        /* yyl_try() and its callees might consult PL_parser->saw_infix_sigil.
-           On its return, we then need to set it to indicate whether the token
-           we just encountered was an infix operator that (if we hadn't been
-           expecting an operator) have been a sigil.
-        */
-        bool expected_operator = (PL_expect == XOPERATOR);
-        int ret = yyl_try(aTHX_ s);
-        switch (pl_yylval.ival) {
-        case OP_BIT_AND:
-        case OP_MODULO:
-        case OP_MULTIPLY:
-        case OP_NBIT_AND:
-            if (expected_operator) {
-                PL_parser->saw_infix_sigil = 1;
-                break;
-            }
-            /* FALLTHROUGH */
-        default:
-            PL_parser->saw_infix_sigil = 0;
+    /* yyl_try() and its callees might consult PL_parser->saw_infix_sigil.
+       On its return, we then need to set it to indicate whether the token we
+       just encountered was an infix operator that (if we hadn't been expecting
+       an operator) have been a sigil.
+    */
+    bool expected_operator = (PL_expect == XOPERATOR);
+    int ret = yyl_try(aTHX_ s);
+    switch (pl_yylval.ival) {
+      case OP_BIT_AND:
+      case OP_MODULO:
+      case OP_MULTIPLY:
+      case OP_NBIT_AND:
+        if (expected_operator) {
+            PL_parser->saw_infix_sigil = 1;
+            break;
         }
-        return ret;
+        /* FALLTHROUGH */
+      default:
+        PL_parser->saw_infix_sigil = 0;
     }
+
+    return ret;
 }
 
 
@@ -9938,6 +10309,8 @@ Perl_yylex(pTHX)
 static int
 S_pending_ident(pTHX)
 {
+    PERL_ARGS_ASSERT_PENDING_IDENT;
+
     PADOFFSET tmp = 0;
     const char pit = (char)pl_yylval.ival;
     const STRLEN tokenbuf_len = strlen(PL_tokenbuf);
@@ -9980,25 +10353,7 @@ S_pending_ident(pTHX)
                 GCC_DIAG_RESTORE_STMT;
             }
 
-            if (PL_in_my == KEY_sigvar) {
-                /* A signature 'padop' needs in addition, an op_first to
-                 * point to a child sigdefelem, and an extra field to hold
-                 * the signature index. We can achieve both by using an
-                 * UNOP_AUX and (ab)using the op_aux field to hold the
-                 * index. If we ever need more fields, use a real malloced
-                 * aux strut instead.
-                 */
-                assert(PL_parser->signature);
-                /* We don't yet know the argindex but subsignature_append_*()
-                 * will fill it in
-                 */
-                o = newUNOP_AUX(OP_ARGELEM, 0, NULL, NULL);
-                o->op_private |= (  PL_tokenbuf[0] == '$' ? OPpARGELEM_SV
-                                  : PL_tokenbuf[0] == '@' ? OPpARGELEM_AV
-                                  :                         OPpARGELEM_HV);
-            }
-            else
-                o = newOP(OP_PADANY, 0);
+            o = newOP(OP_PADANY, 0);
             o->op_targ = allocmy(PL_tokenbuf, tokenbuf_len,
                                                         UTF ? SVf_UTF8 : 0);
             if (PL_in_my == KEY_sigvar)
@@ -10082,7 +10437,7 @@ S_pending_ident(pTHX)
     return BAREWORD;
 }
 
-STATIC void
+static void
 S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
 {
     PERL_ARGS_ASSERT_CHECKCOMMA;
@@ -10114,11 +10469,10 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
         s++;
     while (s < PL_bufend && isSPACE(*s))
         s++;
-    if (isIDFIRST_lazy_if_safe(s, PL_bufend, UTF)) {
+
+    if ((isIDFIRST_lazy_if_safe(s, PL_bufend, UTF))) {
         const char * const w = s;
-        s += UTF ? UTF8SKIP(s) : 1;
-        while (isWORDCHAR_lazy_if_safe(s, PL_bufend, UTF))
-            s += UTF ? UTF8SKIP(s) : 1;
+        s = parse_ident_no_copy(s, PL_bufend, cBOOL(UTF), NULL, IDFIRST_ONLY);
         while (s < PL_bufend && isSPACE(*s))
             s++;
         if (*s == ',') {
@@ -10153,11 +10507,13 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
    If error_msg is not NULL, *error_msg will be set to any error encountered.
    Otherwise yyerror() will be used to output it */
 
-STATIC SV *
+static SV *
 S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
                SV *sv, SV *pv, const char *type, STRLEN typelen,
                const char ** error_msg)
 {
+    PERL_ARGS_ASSERT_NEW_CONSTANT;
+
     dSP;
     HV * table = GvHV(PL_hintgv);		 /* ^H */
     SV *res;
@@ -10168,7 +10524,6 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     const char * optional_colon = ":";  /* Only some messages have a colon */
     char *msg;
 
-    PERL_ARGS_ASSERT_NEW_CONSTANT;
     /* We assume that this is true: */
     assert(type || s);
 
@@ -10261,58 +10616,303 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     return SvREFCNT_inc_simple_NN(sv);
 }
 
-PERL_STATIC_INLINE void
-S_parse_ident(pTHX_ char **s, char **d, char * const e, int allow_package,
-                    bool is_utf8, bool check_dollar)
+static char *
+S_parse_ident(pTHX_ const char *s, const char * const s_end,
+                    char **d, char * const e,
+                    bool is_utf8, HV** failure_details, U32 flags)
 {
     PERL_ARGS_ASSERT_PARSE_IDENT;
 
-    while (*s < PL_bufend) {
-        if (*d >= e)
-            croak("%s", ident_too_long);
-        if (is_utf8 && isIDFIRST_utf8_safe(*s, PL_bufend)) {
-             /* The UTF-8 case must come first, otherwise things
-             * like c\N{COMBINING TILDE} would start failing, as the
-             * isWORDCHAR_A case below would gobble the 'c' up.
-             */
+    /* This function parses the string pointed to by '*s' (whose upper bound
+     * is 's_end') looking for an identifier.  It stops at the first character
+     * that isn't in one of the types of identifiers looked for, which are:
+     *
+     * 1) A normal identifier whose first character matches IDFIRST followed
+     *    by any number of characters which match IDCONT.
+     * 2) An identifier that begins with an ASCII digit followed by any number
+     *    of ASCII \w characters.  As a special case of this, it can
+     *    optionally stop parsing at the first non-digit, returning just the
+     *    initial digits.  */
+    bool stop_at_first_non_digit = flags & STOP_AT_FIRST_NON_DIGIT;
 
-            char *t = *s + UTF8SKIP(*s);
-            while (isIDCONT_utf8_safe((const U8*) t, (const U8*) PL_bufend)) {
-                t += UTF8SKIP(t);
+     /*    This type of identifier can be completely prohibited, so that
+      *    anything that doesn't match type 1) is not considered to be an
+      *    identifier. */
+    const bool idfirst_only = flags & IDFIRST_ONLY;
+    assert((stop_at_first_non_digit && idfirst_only) == 0);
+
+    /* The function copies the identifier into the destination starting at *d
+     * (whose upper bound is 'e') and advances *d to point to just beyond the
+     * end of the identifier, setting **d to a NUL character.  The reason it
+     * needs to copy is that it may convert apostrophe package separators into
+     * double colons.
+     *
+     * Upon success, it returns the position in s just beyond where the
+     * identifier ends in the input.  If no identifier was found, the return
+     * will be the the input 's' unchanged.
+     *
+     * If the identifier is empty (s_end == s), *d is set to the NUL
+     * character; otherwise if the identifier is illegal, the function croaks
+     * unless this flag is passed in: */
+    const bool check_only = flags & CHECK_ONLY;
+
+    /* In this case NULL is returned instead of croaking, and the contents
+     * of '*d' are undefined.
+     *
+     * The possible reasons for failure are:
+     *  1) There is not enough room for the entire source identifier to be
+     *     copied
+     *  2) 'stop_at_first_non_digit' is in effect and the identifier name has
+     *     leading zeros
+     *  3) The identifier contains a character that is illegal in names.
+     *     (These are rare, fewer than 200 in all of Unicode.)
+     *
+     * When 'allow_package' is non-zero, the function parses a full package
+     * variable path.  Each iteration of the loop below picks up one segment
+     * of the path.  If the apostrophe is allowed as a package separator, it
+     * is converted to "::", so later code doesn't have to concern itself with
+     * this possibility. */
+    const bool allow_package = flags & ALLOW_PACKAGE;
+
+    /* 'check_dollar' is used to look for and stop parsing before the dollar
+     * in things like Foo::$bar */
+    const bool check_dollar = flags & CHECK_DOLLAR;
+
+    /* There is a use case for calling this function in the middle of having
+     * parsed a portion of an identifier.  Therefore it should be able to
+     * accept the first character being an IDCont, and not necessarily an
+     * IDFIRST.  The 'IDCONT_first_OK' flag is used to indicate this */
+
+    /* When a normally fatal error occurs, and the 'failure_details' parameter
+     * is set, the function, instead of dieing, returns what would be the
+     * croak message and the position in the source string where it was
+     * encountered.  This variable holds the message text internally. */
+    const char * error;
+
+    /* This causes the CHECK_ONLY flag to also be set. */
+    if (failure_details) {
+        flags |= CHECK_ONLY;
+    }
+
+    /* However, the error position this function knows about is in the
+     * destination, normalized, string and a caller looking to mark where an
+     * error occurred, will want to use the source to report it. This variable
+     * is changed whenever a length change occurs, so that upon return, we can
+     * convert to the source position. */
+    SSize_t position_offset = 0;
+    const char * const s0 = s;  /* First byte, for any error message */
+    const char * d0 = *d;
+
+    while (s < s_end) {
+
+        /* For non-UTF8, variables that match ASCII \w are a superset of
+         * variables that start with IDFIRST, so we have to look at the
+         * Unicode definition only when UTF-8 is in effect.  We have to check
+         * for the subset before checking for the superset. */
+        Size_t advance;
+        if (   (is_utf8 || idfirst_only)
+            && (advance = (flags & IDCONT_first_OK)
+                          ? isIDCONT_lazy_if_safe((U8 *) s, (U8 *) s_end,
+                                                  is_utf8)
+                          : isIDFIRST_lazy_if_safe(s, s_end, is_utf8)))
+        {
+            const char *this_start = s;
+            s += advance;
+
+            /* Find the end of the identifier by accumulating characters until
+             * find a non-identifier character */
+            while (s < s_end) {
+
+                /* Fail if the character is one of those few that look like
+                 * they could be in a name, but are forbidden because of
+                 * Section 5 of Unicode UAX #31 "Unicode Identifiers and
+                 * Syntax". */
+                advance = is_WORD_BUT_NONCONT_safe(s, s_end, is_utf8);
+                if (advance) {
+                    UV cp = valid_utf8_to_uv((U8 *) s, NULL);
+                    const char *error_pos = s + advance;
+
+                    /* Display the whole name */
+                    do {
+                        s += advance;
+                    }
+                    while ((advance = isWORDCHAR_lazy_if_safe(s, s_end,
+                                                              is_utf8)));
+                    error = form("\\x{%04" UVXf "} is a \\w char that isn't"
+                                 " valid in a name; marked by <-- HERE"
+                                 " after %" UTF8f "<-- HERE %" UTF8f,
+                                 cp,
+                                 UTF8fARG(is_utf8, error_pos - s0, s0),
+                                 UTF8fARG(is_utf8, s - error_pos, error_pos));
+                    goto found_error;
+                }
+                else {
+                    advance = isIDCONT_lazy_if_safe((const U8*) s,
+                                                    (const U8*) s_end,
+                                                    is_utf8);
+                    if (advance == 0) { /* Not an identifier character */
+                        break;
+                    }
+                }
+
+                s += advance;
             }
-            if (*d + (t - *s) > e)
-                croak("%s", ident_too_long);
-            Copy(*s, *d, t - *s, char);
-            *d += t - *s;
-            *s = t;
+
+            /* Here we have found the end of the identifier */
+            Size_t this_length = s - this_start;
+
+            if (*d + this_length >= e) {
+                goto too_long;
+            }
+
+            /* And copy the whole thing in one operation */
+            Copy(this_start, *d, this_length, char);
+            *d += this_length;
         }
-        else if ( isWORDCHAR_A(**s) ) {
+        else if (stop_at_first_non_digit && isDIGIT_A(*s)) {
+            bool is_zero = *s == '0';
+            char *digit_start= *d;
+
+            /* Stop at the first non-digit */
             do {
-                *(*d)++ = *(*s)++;
-            } while (isWORDCHAR_A(**s) && *d < e);
+                *(*d)++ = *s++;
+
+                if (*d >= e) {
+                    goto too_long;
+                }
+            } while (isDIGIT_A(*s));
+
+            /* Leading zeros are not permitted */
+            if (is_zero && *d - digit_start > 1) {
+                error = ident_var_zero_multi_digit;
+                goto found_error;
+            }
+
+            /* This option only applies to the first component in a
+             * multi-component package variable name.  So quit the loop before
+             * trying to find a package separator */
+            break;
+        }
+        else if (! idfirst_only && isWORDCHAR_A(*s) ) {
+
+            /* This is the superset; it accepts \w+, including an initial
+             * digit */
+            do {
+                *(*d)++ = *s++;
+
+                if (*d >= e) {
+                    goto too_long;
+                }
+            } while (isWORDCHAR_A(*s));
         }
         else if (   allow_package
-                 && **s == '\''
-                 && FEATURE_APOS_AS_NAME_SEP_IS_ENABLED
-                 && isIDFIRST_lazy_if_safe((*s)+1, PL_bufend, is_utf8))
+                 && (   (   *s == '\''
+                         && FEATURE_APOS_AS_NAME_SEP_IS_ENABLED
+                         && isIDFIRST_lazy_if_safe(s+1, s_end, is_utf8))
+                            /* Below we convert the apostrophe to "::" */
+                     || (   *s == ':' && s[1] == ':'
+                            /* Disallow things like Foo::$bar. For the
+                             * curious, this is the code path that triggers
+                             * the "Bad name after" warning when looking for
+                             * barewords. */
+                          && !(check_dollar && s[2] == '$'))))
         {
+            if (*d >= e - 2) {
+                goto too_long;
+            }
+
             *(*d)++ = ':';
             *(*d)++ = ':';
-            (*s)++;
+            s += (*s == ':') ? 2 : 1;
+
+            /* This option only applies to the first component in a
+             * multi-component package variable name.  For example, in
+             * "SWISH::3::", the '3' is not the first component, and so the
+             * option needs to be turned off before the next loop iteration
+             * parses it. */
+            stop_at_first_non_digit = false;
         }
-        else if (allow_package && **s == ':' && (*s)[1] == ':'
-           /* Disallow things like Foo::$bar. For the curious, this is
-            * the code path that triggers the "Bad name after" warning
-            * when looking for barewords.
-            */
-           && !(check_dollar && (*s)[2] == '$')) {
-            *(*d)++ = *(*s)++;
-            *(*d)++ = *(*s)++;
-        }
-        else
+        else    /* None of the above means have come to the end of any
+                   identifier*/
             break;
     }
-    return;
+
+    **d = '\0';
+
+    /* Cast away const, because many of our callers don't have it; this
+     * function declares it as const so as to indicate that it doesn't change
+     * it, and that it can be called using a const parameter */
+    return (char *) s;
+
+  too_long:
+    error = ident_too_long;
+        /* FALLTHROUGH */
+
+  found_error:
+    if (failure_details) {
+
+        SV * msg_sv = newSVpv(error, 0);
+        SV * position_sv = newSVuv(*d - d0 - position_offset);
+        HV * details = (HV *) newSV_type_mortal(SVt_PVHV);
+
+        (void) hv_stores(details, PARSE_IDENT_ERROR_TEXT, msg_sv);
+        (void) hv_stores(details, PARSE_IDENT_ERROR_POSITION,  position_sv);
+
+        *failure_details = details;
+    }
+
+    if (check_only) {
+        return NULL;
+    }
+
+    croak("%" UTF8f, UTF8fARG(is_utf8, strlen(error), error));
+}
+
+PERL_STATIC_INLINE char *
+S_parse_ident_no_copy(pTHX_ const char *s, const char * const s_end,
+                      bool is_utf8, HV ** failure_details, U32 flags)
+{
+    PERL_ARGS_ASSERT_PARSE_IDENT_NO_COPY;
+
+    /* This just wraps parse_ident for functions that call it and don't need
+     * the actual identifier string returned.  For example, they might just
+     * want to test if the input is valid. */
+
+    char scratch[ PERL_IDENTIFIER_LENGTH ];
+    char * dest = scratch;
+
+    return parse_ident(s, s_end, &dest, C_ARRAY_END(scratch), is_utf8,
+                       failure_details, flags);
+}
+
+/*
+=for apidoc parse_ident_msg
+
+Parse the string pointed to by '*s' (whose upper bound is 's_end') looking for
+a normal identifier whose first character matches \p{XID_Start} followed by any
+number of characters which match \p{XID_Continue}.
+
+It returns a pointer to the first character in 's' beyond the next such
+identifier, or NULL if a serious error was found in the parsed string.
+Currently the only such serious error is that the identifier is too long for
+the perl interpreter to handle (the maximum is guaranteed to be at least 255
+characters).
+
+If 'error_detail' is not NULL, when a serious error is found, it creates a
+mortal hash containing details of the error, as follows:
+
+=cut
+*/
+
+char *
+Perl_parse_ident_msg(pTHX_ const char *s, const char *end,
+                           bool is_utf8, HV ** error_detail, U32 flags)
+{
+    PERL_ARGS_ASSERT_PARSE_IDENT_MSG;
+    assert(flags == 0);     /* Reserved for future use */
+
+    return parse_ident_no_copy(s, end, is_utf8, error_detail,
+                               (IDFIRST_ONLY | flags));
 }
 
 char *
@@ -10324,60 +10924,77 @@ Perl_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_package, STR
     char * const e = d + destlen - 3;  /* two-character token, ending NUL */
     bool is_utf8 = cBOOL(UTF);
 
-    parse_ident(&s, &d, e, allow_package, is_utf8, TRUE);
-    *d = '\0';
+    s = parse_ident(s, PL_bufend, &d, e, is_utf8, NULL,
+                    (CHECK_DOLLAR | ((allow_package) ? ALLOW_PACKAGE : 0)));
     *slp = d - dest;
     return s;
 }
 
-/* scan s and extract an identifier ($var) from it if possible
- * into dest.
- * XXX: This function has subtle implications on parsing, and
- * changing how it behaves can cause a variable to change from
- * being a run time rv2sv call or a compile time binding to a
- * specific variable name.
+/* scan 's' and extract an identifier ($var) from it into 'dest' if possible.
+ *
+ * Unlike S_parse_ident which looks for the more usual types of identifiers
+ * (and which this calls if needed), this looks for every possible identifier
+ * type, such as punctuation ones.
+ *
+ * It returns a pointer into the input buffer pointing to just after all the
+ * bytes this function consumed; or croaks if an invalid identifier is found.
+ *
+ * XXX: This function normally has subtle implications on parsing, and
+ * changing how it behaves can cause a variable to change from being a run
+ * time rv2sv call or a compile time binding to a specific variable name.
+ *
+ * However, it can be called with the CHECK_ONLY flag which keeps it from
+ * making any changes besides populating the memory 'dest' points to.  If the
+ * identifier is illegal, it returns NULL instead of croaking.
+ *
+ * And use the CHECK_UNARY flag to cause this to look for ambiguities with
+ * unary operators.  This is silently overriden if CHECK_ONLY is also
+ * specified.
  */
-STATIC char *
-S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
+static char *
+S_scan_ident(pTHX_ char *s, char *dest, char *dest_end, U32 flags)
 {
+    PERL_ARGS_ASSERT_SCAN_IDENT;
+
     I32 herelines = PL_parser->herelines;
-    SSize_t bracket = -1;
+
+#define NO_BRACE -1
+    SSize_t bracket = NO_BRACE;
+
     char funny = *s++;
     char *d = dest;
-    char * const e = d + destlen - 3;    /* two-character token, ending NUL */
+    char * const e = dest_end - 3;    /* two-character token, ending NUL */
     bool is_utf8 = cBOOL(UTF);
     line_t orig_copline = 0, tmp_copline = 0;
 
-    PERL_ARGS_ASSERT_SCAN_IDENT;
+    /* Leave the flag in its position, so can pass this on without needing to
+     * anything extra */
+    const U32 check_only = flags & CHECK_ONLY;
+
+    const bool chk_unary = ! check_only && (flags & CHECK_UNARY);
 
     if (isSPACE(*s) || !*s)
         s = skipspace(s);
-    if (isDIGIT(*s)) { /* handle $0 and $1 $2 and $10 and etc */
-        bool is_zero= *s == '0' ? TRUE : FALSE;
-        char *digit_start= d;
-        *d++ = *s++;
-        while (s < PL_bufend && isDIGIT(*s)) {
-            if (d >= e)
-                croak("%s", ident_too_long);
-            *d++ = *s++;
-        }
-        if (is_zero && d - digit_start > 1)
-            croak(ident_var_zero_multi_digit);
+
+    /* See if it is a "normal" identifier */
+    s = parse_ident(s, PL_bufend, &d, e, is_utf8, NULL,
+                    (ALLOW_PACKAGE | STOP_AT_FIRST_NON_DIGIT | check_only));
+    if (s == NULL) {
+        return NULL;
     }
-    else {  /* See if it is a "normal" identifier */
-        parse_ident(&s, &d, e, 1, is_utf8, FALSE);
-    }
-    *d = '\0';
+
     d = dest;
     if (*d) {
-        /* Either a digit variable, or parse_ident() found an identifier
+
+        /* Here parse_ident() found a digit variable or an identifier
            (anything valid as a bareword), so job done and return.  */
-        if (PL_lex_state != LEX_NORMAL)
+        if (! check_only && PL_lex_state != LEX_NORMAL)
             PL_lex_state = LEX_INTERPENDMAYBE;
         return s;
     }
 
-    /* Here, it is not a run-of-the-mill identifier name */
+    /* Here, it is not a run-of-the-mill identifier name; maybe not an
+     * identifier at all.  Note *d is a NUL */
 
     if (*s == '$' && s[1]
         && (   isIDFIRST_lazy_if_safe(s+1, PL_bufend, is_utf8)
@@ -10391,9 +11008,13 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
            Using ' as a leading package separator isn't allowed. :: is.   */
         return s;
     }
-    /* Handle the opening { of @{...}, &{...}, *{...}, %{...}, ${...}  */
+
+    /* Handle the opening { of @{...}, &{...}, *{...}, %{...}, ${...}
+     * Skip to the first non-space past the brace */
     if (*s == '{') {
+        /* 'bracket' becomes the offset from the beginning of this chunk */
         bracket = s - SvPVX(PL_linestr);
+
         s++;
         orig_copline = CopLINE(PL_curcop);
         if (s < PL_bufend && isSPACE(*s)) {
@@ -10401,113 +11022,147 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
         }
     }
 
-
-    /* Extract the first character of the variable name from 's' and
-     * copy it, null terminated into 'd'. Note that this does not
-     * involve checking for just IDFIRST characters, as it allows the
-     * '^' for ${^FOO} type variable names, and it allows all the
-     * characters that are legal in a single character variable name.
+    /* Here, 's' points to the next "interesting" character.
+     * Extract the first character of the potential variable name from 's' and
+     * copy it, NUL terminated, into 'd'. Note that this does not involve
+     * checking for just IDFIRST characters, as it allows the '^' for ${^FOO}
+     * type variable names, and it allows all the characters that are legal in
+     * a single character variable name.
      *
      * The legal ones are any of:
      *  a) all ASCII characters except:
      *          1) control and space-type ones, like NUL, SOH, \t, and SPACE;
      *          2) '{'
      *     The final case currently doesn't get this far in the program, so we
-     *     don't test for it.  If that were to change, it would be ok to allow it.
+     *     don't test for it.  If that were to change, it would be ok to allow
+     *     it.
      *  b) When not under Unicode rules, any upper Latin1 character
      *  c) Otherwise, when unicode rules are used, all XIDS characters.
      *
-     *      Because all ASCII characters have the same representation whether
-     *      encoded in UTF-8 or not, we can use the foo_A macros below and '\0' and
-     *      '{' without knowing if is UTF-8 or not. */
-
-    if ((s <= PL_bufend - ((is_utf8)
-                          ? UTF8SKIP(s)
-                          : 1))
-        && (
-            isGRAPH_A(*s)
-            ||
-            ( is_utf8
-              ? isIDFIRST_utf8_safe(s, PL_bufend)
-              : (isGRAPH_L1(*s)
-                 && LIKELY((U8) *s != LATIN1_TO_NATIVE(0xAD))
-                )
-            )
-        )
-    ){
-        if (is_utf8) {
-            const STRLEN skip = UTF8SKIP(s);
-            STRLEN i;
-            d[skip] = '\0';
-            for ( i = 0; i < skip; i++ )
-                d[i] = *s++;
-        }
-        else {
-            *d = *s++;
-            d[1] = '\0';
-        }
+     * Because all ASCII characters have the same representation whether
+     * encoded in UTF-8 or not, we can use the foo_A macros below and '\0' and
+     * '{' without knowing if is UTF-8 or not. */
+    STRLEN advance = 1;
+    if (    s < PL_bufend
+        && (  isGRAPH_A(*s)
+            || (is_utf8 ? (advance = isIDFIRST_utf8_safe(s, PL_bufend))
+                        : (isGRAPH_L1(*s) && LIKELY((U8) *s != SHY_NATIVE)))))
+    {
+        STRLEN i;
+        d[advance] = '\0';
+        for ( i = 0; i < advance; i++ )
+            d[i] = *s++;
     }
 
-    /* special case to handle ${10}, ${11} the same way we handle ${1} etc */
+    /* 'd' has not been advanced, but if 's' pointed to a legal identifier
+     * character, it has been advanced to the next character, and the
+     * character it previously pointed to has been copied to where 'd'
+     * continues to point to.
+     *
+     * If that copied character is a digit, it means we have something like
+     * ${10}, ${1547}, etc.  Handle those the same way we handle $1, etc */
     if (isDIGIT(*d)) {
-        bool is_zero= *d == '0' ? TRUE : FALSE;
-        char *digit_start= d;
-        while (s < PL_bufend && isDIGIT(*s)) {
-            d++;
-            if (d >= e)
-                croak("%s", ident_too_long);
-            *d= *s++;
+        assert(bracket != NO_BRACE);
+        s = parse_ident(s - 1, PL_bufend, &d, e, is_utf8, NULL,
+                        STOP_AT_FIRST_NON_DIGIT | check_only);
+        if (s == NULL) {
+            return NULL;
         }
-        if (is_zero && d - digit_start >= 1) /* d points at the last digit */
-            croak(ident_var_zero_multi_digit);
-        d[1] = '\0';
-    }
 
-    /* Convert $^F, ${^F} and the ^F of ${^FOO} to control characters */
-    else if (*d == '^' && *s && isCONTROLVAR(*s)) {
+        /* The code below is expecting d to point to the final digit */
+        d--;
+    }
+    else  /* Convert $^F, ${^F} and the ^F of ${^FOO} to control characters */
+      if (*d == '^' && *s && isCONTROLVAR(*s)) {
         *d = toCTRL(*s);
         s++;
     }
-    /* Warn about ambiguous code after unary operators if {...} notation isn't
-       used.  There's no difference in ambiguity; it's merely a heuristic
-       about when not to warn.  */
-    else if (ck_uni && bracket == -1)
-        check_uni();
+    else  /* Warn about ambiguous code after unary operators if {...} notation
+             isn't used.  There's no difference in ambiguity; it's merely a
+             heuristic about when not to warn.  */
+      if (chk_unary && bracket == -1) {
+        check_unary();
+    }
 
-    if (bracket != -1) {
-        bool skip;
-        char *s2;
-        /* If we were processing {...} notation then...  */
-        if (isIDFIRST_lazy_if_safe(d, e, is_utf8)
-            || (!isPRINT(*d) /* isCNTRL(d), plus all non-ASCII */
-                 && isWORDCHAR(*s))
-        ) {
-            /* note we have to check for a normal identifier first,
-             * as it handles utf8 symbols, and only after that has
-             * been ruled out can we look at the caret words */
-            if (isIDFIRST_lazy_if_safe(d, e, is_utf8) ) {
-                /* if it starts as a valid identifier, assume that it is one.
-                   (the later check for } being at the expected point will trap
-                   cases where this doesn't pan out.)  */
-                d += is_utf8 ? UTF8SKIP(d) : 1;
-                parse_ident(&s, &d, e, 1, is_utf8, TRUE);
-                *d = '\0';
+    /* Here, 's' points to the next "interesting" character to be parsed. And
+     * *d points to the first byte of the final so-far parsed and copied
+     * character.  This is one of four things:
+     *   1) The only byte of the final character of an all-digit numeric
+     *      variable inside braces. e.g. if the input is ${ 123 }, '123' has
+     *      been copied to 'dest', and 'd' points to the '3'.  We don't know
+     *      yet if there is a closing brace.
+     *   2) A control character
+     *   3) The first (or only) byte of some other identifier
+     *   4) *d is NUL for anything else.
+     */
+
+    if (bracket == NO_BRACE) {
+        if (   ! check_only
+            &&   PL_lex_state == LEX_INTERPNORMAL
+            && ! PL_lex_brackets
+            && ! intuit_more(s, PL_bufend, FROM_IDENT, NULL, 0))
+        PL_lex_state = LEX_INTERPEND;
+    }
+    else {  /* Found a '{' */
+
+        /* Handle the interior of braces.  First look to see if the character
+         * pointed to by 'd' is legal as the start of an identifier. */
+        Size_t advance = isIDFIRST_lazy_if_safe(d, e, is_utf8);
+
+        /* If it isn't a normal identifier, it could be a control-character
+         * one.  Those have to be followed by a \w character. */
+        if (advance || ( ! isPRINT(*d) /* isCNTRL(d), plus all non-ASCII */
+                        && isWORDCHAR(*s)))
+        {
+            /* Prefer a normal identifier, as UTF-8 strings could erroneously
+             * be conflated with a control character identifier. */
+            if (advance) {
+
+                /* Now parse the normal identifier.  But note, we already have
+                 * parsed and copied the first character of it.  That means we
+                 * are jumping into the middle; so tell that to parse_ident.
+                 * */
+                d += advance;
+                s = parse_ident(s, PL_bufend, &d, e, is_utf8, NULL,
+                                (  ALLOW_PACKAGE
+                                 | CHECK_DOLLAR
+                                 | IDCONT_first_OK
+                                 | check_only));
             }
             else { /* caret word: ${^Foo} ${^CAPTURE[0]} */
+
+                /* Now parse the control character identifier.  Again, we have
+                 * already copied the first character.  This routine is
+                 * sufficiently chummy with parse_ident to know that when we
+                 * say the string isn't UTF-8, it will do the right thing in
+                 * looking only for ASCII \w characters as identifier
+                 * continuations */
                 d++;
-                while (isWORDCHAR(*s) && d < e) {
-                    *d++ = *s++;
-                }
-                if (d >= e)
-                    croak("%s", ident_too_long);
-                *d = '\0';
+                s = parse_ident(s, PL_bufend, &d, e,
+                                false,  /* Don't allow UTF-8 */
+                                NULL,
+                                IDCONT_first_OK);
             }
+
+            if (s == NULL) {    /* Can't be NULL unless is check_only */
+                return NULL;
+            }
+
             tmp_copline = CopLINE(PL_curcop);
             if (s < PL_bufend && isSPACE(*s)) {
                 s = skipspace(s);
             }
-            if ((*s == '[' || (*s == '{' && strNE(dest, "sub")))) {
+
+            if (*s == '[' || (*s == '{' && strNE(dest, "sub"))) {
+
+                /* In this branch, 's' is not changed further.  If only
+                 * checking validity, return now before any state changes */
+                if (check_only) {
+                    return s;
+                }
+
                 /* ${foo[0]} and ${foo{bar}} and ${^CAPTURE[0]} notation.  */
+
                 if (ckWARN(WARN_AMBIGUOUS) && keyword(dest, d - dest, 0)) {
                     const char * const brack =
                         (const char *)
@@ -10529,6 +11184,9 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
 
         if ( !tmp_copline )
             tmp_copline = CopLINE(PL_curcop);
+
+        char *s2;
+        bool skip;
         if ((skip = s < PL_bufend && isSPACE(*s))) {
             /* Avoid incrementing line numbers or resetting PL_linestart,
                in case we have to back up.  */
@@ -10539,13 +11197,35 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
         else
             s2 = s;
 
-        /* Expect to find a closing } after consuming any trailing whitespace.
-         */
-        if (*s2 == '}') {
-            /* Now increment line numbers if applicable.  */
+        /* Expect to find a closing '}' after consuming any trailing
+         * whitespace. */
+        if (*s2 != '}') {
+            /* Didn't find the closing '}' at the point we expected, so
+             * restore the state such that the next thing to process is the
+             * opening '{' and let the parser handle it */
+            s = SvPVX(PL_linestr) + bracket;
+
+            /* The final change to 's' has just been made.  If only validity
+             * checking, return before making any state changes */
+            if (check_only) {
+                return s;
+            }
+            CopLINE_set(PL_curcop, orig_copline);
+            PL_parser->herelines = herelines;
+            *dest = '\0';
+            PL_parser->sub_no_recover = TRUE;
+        }
+        else {  /* Now increment line numbers if applicable.  */
             if (skip)
                 s = skipspace(s);
             s++;
+
+            /* The final change to 's' has just been made.  If only validity
+             * checking, return before making any state changes */
+            if (check_only) {
+                return s;
+            }
+
             if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets) {
                 PL_lex_state = LEX_INTERPEND;
                 PL_expect = XREF;
@@ -10570,25 +11250,14 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
                 }
             }
         }
-        else {
-            /* Didn't find the closing } at the point we expected, so restore
-               state such that the next thing to process is the opening { and */
-            s = SvPVX(PL_linestr) + bracket; /* let the parser handle it */
-            CopLINE_set(PL_curcop, orig_copline);
-            PL_parser->herelines = herelines;
-            *dest = '\0';
-            PL_parser->sub_no_recover = TRUE;
-        }
     }
-    else if (   PL_lex_state == LEX_INTERPNORMAL
-             && !PL_lex_brackets
-             && !intuit_more(s, PL_bufend))
-        PL_lex_state = LEX_INTERPEND;
+
     return s;
 }
 
 static bool
-S_pmflag(pTHX_ const char* const valid_flags, U32 * pmfl, char** s, char* charset, unsigned int * x_mod_count) {
+S_pmflag(pTHX_ const char* const valid_flags, U32 * pmfl, char** s, char* charset, unsigned int * x_mod_count)
+{
 
     /* Adds, subtracts to/from 'pmfl' based on the next regex modifier flag
      * found in the parse starting at 's', based on the subset that are valid
@@ -10684,17 +11353,17 @@ S_pmflag(pTHX_ const char* const valid_flags, U32 * pmfl, char** s, char* charse
         return TRUE;
 }
 
-STATIC char *
+static char *
 S_scan_pat(pTHX_ char *start, I32 type)
 {
+    PERL_ARGS_ASSERT_SCAN_PAT;
+
     PMOP *pm;
     char *s;
     const char * const valid_flags =
         (const char *)((type == OP_QR) ? QR_PAT_MODS : M_PAT_MODS);
     char charset = '\0';    /* character set modifier */
     unsigned int x_mod_count = 0;
-
-    PERL_ARGS_ASSERT_SCAN_PAT;
 
     s = scan_str(start,TRUE,FALSE, (PL_in_eval & EVAL_RE_REPARSING), NULL);
     if (!s)
@@ -10755,14 +11424,21 @@ S_scan_pat(pTHX_ char *start, I32 type)
                   "Use of /c modifier is meaningless without /g" );
     }
 
+    if (x_mod_count > 1 && FEATURE_ENHANCED_XX_IS_ENABLED) {
+        ck_warner_d(packWARN(WARN_EXPERIMENTAL__ENHANCED_XX),
+                         "enhanced_xx is experimental");
+    }
+
     PL_lex_op = (OP*)pm;
     pl_yylval.ival = OP_MATCH;
     return s;
 }
 
-STATIC char *
+static char *
 S_scan_subst(pTHX_ char *start)
 {
+    PERL_ARGS_ASSERT_SCAN_SUBST;
+
     char *s;
     PMOP *pm;
     I32 first_start;
@@ -10772,8 +11448,6 @@ S_scan_subst(pTHX_ char *start)
     char charset = '\0';    /* character set modifier */
     unsigned int x_mod_count = 0;
     char *t;
-
-    PERL_ARGS_ASSERT_SCAN_SUBST;
 
     pl_yylval.ival = OP_NULL;
 
@@ -10813,6 +11487,11 @@ S_scan_subst(pTHX_ char *start)
         ck_warner(packWARN(WARN_REGEXP), "Use of /c modifier is meaningless in s///" );
     }
 
+    if (x_mod_count > 1 && FEATURE_ENHANCED_XX_IS_ENABLED) {
+        ck_warner_d(packWARN(WARN_EXPERIMENTAL__ENHANCED_XX),
+                         "enhanced_xx is experimental");
+    }
+
     if (es) {
         SV * const repl = newSVpvs("");
 
@@ -10837,7 +11516,7 @@ S_scan_subst(pTHX_ char *start)
         /* the IVX field indicates that the replacement string is a s///e;
          * the NVX field indicates how many src code lines the replacement
          * spreads over */
-        sv_upgrade(PL_parser->lex_sub_repl, SVt_PVNV);
+        SvUPGRADE(PL_parser->lex_sub_repl, SVt_PVNV);
         ((XPVNV*)SvANY(PL_parser->lex_sub_repl))->xnv_u.xnv_lines = linediff;
         ((XPVIV*)SvANY(PL_parser->lex_sub_repl))->xiv_u.xivu_eval_seen =
                                                                     cBOOL(es);
@@ -10848,9 +11527,11 @@ S_scan_subst(pTHX_ char *start)
     return s;
 }
 
-STATIC char *
+static char *
 S_scan_trans(pTHX_ char *start)
 {
+    PERL_ARGS_ASSERT_SCAN_TRANS;
+
     char* s;
     OP *o;
     U8 squash;
@@ -10858,8 +11539,6 @@ S_scan_trans(pTHX_ char *start)
     U8 complement;
     bool nondestruct = 0;
     char *t;
-
-    PERL_ARGS_ASSERT_SCAN_TRANS;
 
     pl_yylval.ival = OP_NULL;
 
@@ -10933,9 +11612,11 @@ S_scan_trans(pTHX_ char *start)
    Otherwise it is treated as an eval.
 */
 
-STATIC char *
+static char *
 S_scan_heredoc(pTHX_ char *s)
 {
+    PERL_ARGS_ASSERT_SCAN_HEREDOC;
+
     I32 op_type = OP_SCALAR;
     I32 len;
     SV *tmpstr;
@@ -10950,11 +11631,9 @@ S_scan_heredoc(pTHX_ char *s)
     const line_t origline = CopLINE(PL_curcop);
     LEXSHARED *shared = PL_parser->lex_shared;
 
-    PERL_ARGS_ASSERT_SCAN_HEREDOC;
-
     s += 2;
     d = PL_tokenbuf + 1;
-    e = PL_tokenbuf + sizeof PL_tokenbuf - 1;
+    e = C_ARRAY_END(PL_tokenbuf);
     *PL_tokenbuf = '\n';
     peek = s;
 
@@ -10987,8 +11666,9 @@ S_scan_heredoc(pTHX_ char *s)
 
         peek = s;
 
-        while (isWORDCHAR_lazy_if_safe(peek, PL_bufend, UTF)) {
-            peek += UTF ? UTF8SKIP(peek) : 1;
+        Size_t advance;
+        while ((advance = isWORDCHAR_lazy_if_safe(peek, PL_bufend, UTF))) {
+            peek += advance;
         }
 
         len = (peek - s >= e - d) ? (e - d) : (peek - s);
@@ -10997,7 +11677,7 @@ S_scan_heredoc(pTHX_ char *s)
         d += len;
     }
 
-    if (d >= PL_tokenbuf + sizeof PL_tokenbuf - 1)
+    if (d >= C_ARRAY_END(PL_tokenbuf) - 1)
         croak("Delimiter for here document is too long");
 
     *d++ = '\n';
@@ -11348,9 +12028,7 @@ S_scan_heredoc(pTHX_ char *s)
         SvREFCNT_dec_NN(newstr);
     }
 
-    if (SvCUR(tmpstr) + 5 < SvLEN(tmpstr)) {
-        SvPV_shrink_to_cur(tmpstr);
-    }
+    SvPV_shrink_to_cur(tmpstr);
 
     if (!IN_BYTES) {
         if (UTF && is_utf8_string((U8*)SvPVX_const(tmpstr), SvCUR(tmpstr)))
@@ -11366,7 +12044,7 @@ S_scan_heredoc(pTHX_ char *s)
         Safefree(indent);
     SvREFCNT_dec(tmpstr);
     CopLINE_set(PL_curcop, origline);
-    missingterm(PL_tokenbuf + 1, sizeof(PL_tokenbuf) - 1);
+    missingterm(PL_tokenbuf + 1, C_ARRAY_LENGTH(PL_tokenbuf) - 1);
 }
 
 
@@ -11388,17 +12066,17 @@ S_scan_heredoc(pTHX_ char *s)
 
 */
 
-STATIC char *
+static char *
 S_scan_inputsymbol(pTHX_ char *start)
 {
+    PERL_ARGS_ASSERT_SCAN_INPUTSYMBOL;
+
     char *s = start;		/* current position in buffer */
     char *end;
     I32 len;
     bool nomagicopen = FALSE;
     char *d = PL_tokenbuf;					/* start of temp holding space */
-    const char * const e = PL_tokenbuf + sizeof PL_tokenbuf;	/* end of temp holding space */
-
-    PERL_ARGS_ASSERT_SCAN_INPUTSYMBOL;
+    const char * const e = C_ARRAY_END(PL_tokenbuf);	/* end of temp holding space */
 
     end = (char *) memchr(s, '\n', PL_bufend - s);
     if (!end)
@@ -11416,7 +12094,7 @@ S_scan_inputsymbol(pTHX_ char *start)
        or if it didn't end, or if we see a newline
     */
 
-    if (len >= (I32)sizeof PL_tokenbuf)
+    if (len >= (I32) C_ARRAY_LENGTH(PL_tokenbuf))
         croak("Excessively long <> operator");
     if (s >= end)
         croak("Unterminated <> operator");
@@ -11433,10 +12111,7 @@ S_scan_inputsymbol(pTHX_ char *start)
     if (*d == '$' && d[1]) d++;
 
     /* allow <Pkg'VALUE> or <Pkg::VALUE> */
-    while (isWORDCHAR_lazy_if_safe(d, e, UTF) || *d == ':'
-           || (*d == '\'' && FEATURE_APOS_AS_NAME_SEP_IS_ENABLED)) {
-        d += UTF ? UTF8SKIP(d) : 1;
-    }
+    d = parse_ident_no_copy(d, e, cBOOL(UTF), NULL, ALLOW_PACKAGE);
 
     /* If we've tried to read what we allow filehandles to look like, and
        there's still text left, then it must be a glob() and not a getline.
@@ -11534,6 +12209,12 @@ S_scan_inputsymbol(pTHX_ char *start)
     return s;
 }
 
+/* In the function below, it's quite likely that the calls to memEQ() will have
+ * 'len' == 1.  So create a new macro that adds a conditional to skip the libc
+ * call. */
+#define memEQ_1(a, b, len)                                                  \
+   (assert(len >= 1), (*(a) == *(b)) && (   (LIKELY((len) <= 1)             \
+                                         || memEQ((a)+1, (b)+1, (len)-1))))
 
 /* scan_str
    takes:
@@ -11583,15 +12264,17 @@ S_scan_inputsymbol(pTHX_ char *start)
    On success, the SV with the resulting string is put into lex_stuff or,
    if that is already non-NULL, into lex_repl. The second case occurs only
    when parsing the RHS of the special constructs s/// and tr/// (y///).
+
    For convenience, the terminating delimiter character is stuffed into
    SvIVX of the SV.
 */
-
 char *
 Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int re_reparse,
                  char **delimp
     )
 {
+    PERL_ARGS_ASSERT_SCAN_STR;
+
     SV *sv;			/* scalar value: string */
     char *s = start;		/* current position in the buffer */
     char *to;			/* current position in the sv's data */
@@ -11608,7 +12291,6 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
     const char * non_grapheme_msg = "Use of unassigned code point or"
                                     " non-standalone grapheme for a delimiter"
                                     " is not allowed";
-    PERL_ARGS_ASSERT_SCAN_STR;
 
     /* skip space before the delimiter */
     if (isSPACE(*s)) {  /* skipspace can change the buffer 's' is in, so
@@ -11705,7 +12387,7 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
         }
 
         close_delim_code = (UTF)
-                           ? valid_utf8_to_uvchr((U8 *) close_delim_str, NULL)
+                           ? valid_utf8_to_uv((U8 *) close_delim_str, NULL)
                            : * (U8 *) close_delim_str;
     }
     else {  /* Here, the delimiter isn't paired, hence the close is the same as
@@ -11744,9 +12426,11 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
     s += delim_byte_len;
     for (;;) {
         /* extend sv if need be */
-        SvGROW(sv, SvCUR(sv) + (PL_bufend - s) + 1);
+
+        STRLEN sv_len = SvCUR(sv);
+        char * pv = SvGROW(sv, sv_len + (PL_bufend - s) + 1);
         /* set 'to' to the next character in the sv's string */
-        to = SvPVX(sv)+SvCUR(sv);
+        to = pv + sv_len;
 
         /* read until we run out of string, or we find the closing delimiter */
         while (s < PL_bufend) {
@@ -11764,10 +12448,10 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
                  * discard those that escape the closing delimiter, just
                  * discard this one */
                 if (   !  keep_bracketed_quoted
-                    &&   (    memEQ(s + 1,  open_delim_str, delim_byte_len)
+                    &&   (    memEQ_1(s + 1,  open_delim_str, delim_byte_len)
                           ||  (   PL_multi_open == PL_multi_close
                                && re_reparse && s[1] == '\\')
-                          ||  memEQ(s + 1, close_delim_str, delim_byte_len)))
+                          ||  memEQ_1(s + 1, close_delim_str, delim_byte_len)))
                 {
                     s++;
                 }
@@ -11775,7 +12459,7 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
                     *to++ = *s++;
             }
             else if (   s < PL_bufend - (delim_byte_len - 1)
-                     && memEQ(s, close_delim_str, delim_byte_len)
+                     && memEQ_1(s, close_delim_str, delim_byte_len)
                      && --brackets <= 0)
             {
                 /* Found unescaped closing delimiter, unnested if we care about
@@ -11804,7 +12488,7 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
                         /* No nesting if open eq close */
             else if (   PL_multi_open != PL_multi_close
                      && s < PL_bufend - (delim_byte_len - 1)
-                     && memEQ(s, open_delim_str, delim_byte_len))
+                     && memEQ_1(s, open_delim_str, delim_byte_len))
             {
                 brackets++;
             }
@@ -11877,10 +12561,7 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
     PL_parser->herelines = herelines;
 
     /* if we allocated too much space, give some back */
-    if (SvCUR(sv) + 5 < SvLEN(sv)) {
-        SvLEN_set(sv, SvCUR(sv) + 1);
-        SvPV_shrink_to_cur(sv);
-    }
+    SvPV_shrink_to_cur(sv);
 
     /* decide whether this is the first or second quoted string we've read
        for this op
@@ -11900,14 +12581,26 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
   returns: pointer to new position in buffer
   side-effects: builds ops for the constant in pl_yylval.op
 
-  Read a number in any of the formats that Perl accepts:
+  Read a number in any of the formats that Perl accepts (where \x stands for a
+  hexadecimal character [0-9A-Fa-f]):
 
-  \d(_?\d)*(\.(\d(_?\d)*)?)?[Ee][\+\-]?(\d(_?\d)*)	12 12.34 12.
-  \.\d(_?\d)*[Ee][\+\-]?(\d(_?\d)*)			.34
-  0b[01](_?[01])*                                       binary integers
-  0o?[0-7](_?[0-7])*                                    octal integers
-  0x[0-9A-Fa-f](_?[0-9A-Fa-f])*                         hexadecimal integers
-  0x[0-9A-Fa-f](_?[0-9A-Fa-f])*(?:\.\d*)?p[+-]?[0-9]+   hexadecimal floats
+  0b  [0-1] (_* [0-1] )*       binary integers
+  0o? [0-7] (_* [0-7] )*       octal integers
+      \d    (_* \d    )*       decimal integers
+  0x  \x    (_* \x    )*       hexadecimal integers
+
+  And decimal or hex floats
+                      |-----------|                     |--------------|
+    \d (_* \d )* ( \. ( \d (_* \d )* )? )? ( [Ee] [-+]? ( \d (_* \d )* ) )?
+                   \.   \d (_* \d )        ( [Ee] [-+]? ( \d (_* \d)*  ) )?
+  0x\x (_* \x )* ( \. ( \x (_* \x )* )? )? ( [Pp] [-+]? ( \d (_* \d )* ) )
+       |______|  |______________________|  |_____________________________|
+
+  Hex floats require an exponent; the fractional part is optional.  Decimal
+  floats require either or both the fractional part and the exponent part.
+
+  Any number of underscores may separate any two digits, but multiple
+  sequential underscores are warned about.
 
   Like most scan_ routines, it uses the PL_tokenbuf buffer to hold the
   thing it reads.
@@ -11920,24 +12613,66 @@ Perl_scan_str(pTHX_ char *start, int keep_bracketed_quoted, int keep_delims, int
 char *
 Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
 {
+    PERL_ARGS_ASSERT_SCAN_NUM;
+
     const char *s = start;	/* current position in buffer */
     char *d;			/* destination in temp buffer */
     char *e;			/* end of temp buffer */
     NV nv;				/* number read, as a double */
     SV *sv = NULL;			/* place to put the converted number */
     bool floatit;			/* boolean: int or float? */
-    const char *lastub = NULL;		/* position of last underbar */
     static const char* const number_too_long = "Number too long";
     bool warned_about_underscore = 0;
-    I32 shift; /* shift per digit for hex/oct/bin, hoisted here for fp */
-#define WARN_ABOUT_UNDERSCORE() \
-        do { \
-            if (!warned_about_underscore) { \
-                warned_about_underscore = 1; \
-                ck_warner(packWARN(WARN_SYNTAX), \
+    I32 shift = 0; /* shift per digit for hex/oct/bin, hoisted here for fp */
+
+#define WARN_ABOUT_UNDERSCORE()                         \
+        STMT_START {                                    \
+            if (!warned_about_underscore) {             \
+                warned_about_underscore = 1;            \
+                ck_warner(packWARN(WARN_SYNTAX),        \
                           "Misplaced _ in number");     \
-            } \
-        } while(0)
+            }                                           \
+        } STMT_END
+
+/* Call this when we're not expecting an underscore, but are willing to
+ * tolerate one if found, but raising a warning about it.  It absorbs any
+ * adjacent underscores up to PL_bufend, advancing 's' to point to the byte
+ * after the final underscore */
+#define SUFFER_AN_UNDERSCORE_HERE(s)                        \
+        STMT_START {                                        \
+            if (*(s) == '_') {                              \
+                WARN_ABOUT_UNDERSCORE();                    \
+                                                            \
+                /* Absorb any adjacent underscores */       \
+                do {                                        \
+                    (s)++;                                  \
+                } while ((s) < PL_bufend && *(s) == '_');   \
+            }                                               \
+        } STMT_END
+
+/* Call this when we're not expecting an underscore in the previous byte
+ * position, but are willing to tolerate one if found, but raising a warning
+ * about it. */
+#define SUFFER_AN_UNDERSCORE_JUST_BEFORE_HERE(s)            \
+        STMT_START {                                        \
+            if (*((s) - 1) == '_') {                        \
+                WARN_ABOUT_UNDERSCORE();                    \
+            }                                               \
+        } STMT_END
+
+/* Call this when we have an underscore, and a single one is fine.  Tolerate
+ * adjacent subsequent ones, but raise a warning if any are found.  It
+ * advances 's' to point to the byte after the final underscore */
+#define HANDLE_UNDERSCORE(s)                            \
+        STMT_START {                                    \
+            assert(*(s) == '_');                        \
+            (s)++;                                      \
+                                                        \
+            /* Any underscore adjacent to this one is   \
+             * wrong */                                 \
+            SUFFER_AN_UNDERSCORE_HERE(s);               \
+        } STMT_END
+
     /* Hexadecimal floating point.
      *
      * In many places (where we have quads and NV is IEEE 754 double)
@@ -11948,7 +12683,6 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
      * which will probably mean horrible loss of precision due to
      * multiple fp operations. */
     bool hexfp = FALSE;
-    int total_bits = 0;
     int significant_bits = 0;
 #if NVSIZE == 8 && defined(HAS_QUAD) && defined(Uquad_t)
 #  define HEXFP_UQUAD
@@ -11959,11 +12693,7 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
     NV hexfp_nv = 0.0;
 #endif
     int hexfp_exp = 0;
-    UV high_non_zero = 0; /* highest digit */
-    int non_zero_integer_digits = 0;
     bool new_octal = FALSE;     /* octal with "0o" prefix */
-
-    PERL_ARGS_ASSERT_SCAN_NUM;
 
     /* Make sure "int" is wide enough to hold exponent of NV.
        We use "int" (rather than I32 etc.) to be compatible with ldexp() */
@@ -11972,331 +12702,315 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
 
     /* We use the first character to decide what type of number this is */
 
-    switch (*s) {
-    default:
-        croak("panic: scan_num, *s=%d", *s);
+    if (*s == 'v') {
+      vstring:
+        sv = newSV(5); /* preallocate storage space */
+        ENTER_with_name("scan_vstring");
+        SAVEFREESV(sv);
+        s = scan_vstring(s, PL_bufend, sv);
+        SvREFCNT_inc_simple_void_NN(sv);
+        LEAVE_with_name("scan_vstring");
+    }
+    else if (*s == '0') {
 
-    /* if it starts with a 0, it could be an octal number, a decimal in
-       0.13 disguise, or a hexadecimal number, or a binary number. */
-    case '0':
-        {
-          /* variables:
-             u		holds the "number so far"
-             overflowed	was the number more than we can hold?
+        /* if it starts with a 0, it could be an octal number, a decimal in
+           0.13 disguise, or a hexadecimal number, or a binary number.
+         *
+         * variables:
+         * u		holds the "number so far"
+         * overflowed	was the number more than we can hold?
 
-             Shift is used when we add a digit.  It also serves as an "are
-             we in octal/hex/binary?" indicator to disallow hex characters
-             when in octal mode.
-           */
-            NV n = 0.0;
-            UV u = 0;
-            bool overflowed = FALSE;
-            bool just_zero  = TRUE;	/* just plain 0 or binary number? */
-            bool has_digs = FALSE;
-            static const NV nvshift[5] = { 1.0, 2.0, 4.0, 8.0, 16.0 };
-            static const char* const bases[5] =
-              { "", "binary", "", "octal", "hexadecimal" };
-            static const char* const Bases[5] =
-              { "", "Binary", "", "Octal", "Hexadecimal" };
-            static const char* const maxima[5] =
-              { "",
-                "0b11111111111111111111111111111111",
-                "",
-                "037777777777",
-                "0xffffffff" };
+         * Shift is used when we add a digit.  It also serves as an "are
+         * we in octal/hex/binary?" indicator to disallow hex characters
+         * when in octal mode.
+         */
+        NV n = 0.0;
+        UV u = 0;
+        bool overflowed = FALSE;
+        bool just_zero  = TRUE;	/* just plain 0 or binary number? */
+        bool has_digs = FALSE;
+        static const NV nvshift[5] = { 1.0, 2.0, 4.0, 8.0, 16.0 };
+        static const char* const bases[5] =
+          { "", "binary", "", "octal", "hexadecimal" };
 
-            /* check for hex */
-            if (isALPHA_FOLD_EQ(s[1], 'x')) {
-                shift = 4;
-                s += 2;
-                just_zero = FALSE;
-            } else if (isALPHA_FOLD_EQ(s[1], 'b')) {
-                shift = 1;
-                s += 2;
-                just_zero = FALSE;
-            }
-            /* check for a decimal in disguise */
-            else if (s[1] == '.' || isALPHA_FOLD_EQ(s[1], 'e'))
-                goto decimal;
-            /* so it must be octal */
-            else {
-                shift = 3;
+        /* check for hex */
+        if (isALPHA_FOLD_EQ(s[1], 'x')) {
+            shift = 4;
+            s += 2;
+            just_zero = FALSE;
+        } else if (isALPHA_FOLD_EQ(s[1], 'b')) {
+            shift = 1;
+            s += 2;
+            just_zero = FALSE;
+        }
+        /* check for a decimal in disguise */
+        else if (s[1] == '.' || isALPHA_FOLD_EQ(s[1], 'e'))
+            goto decimal;
+        /* so it must be octal */
+        else {
+            shift = 3;
+            s++;
+            if (isALPHA_FOLD_EQ(*s, 'o')) {
                 s++;
-                if (isALPHA_FOLD_EQ(*s, 'o')) {
-                    s++;
-                    just_zero = FALSE;
-                    new_octal = TRUE;
-                }
+                just_zero = FALSE;
+                new_octal = TRUE;
             }
+        }
 
-            if (*s == '_') {
-                WARN_ABOUT_UNDERSCORE();
-               lastub = s++;
-            }
+        SUFFER_AN_UNDERSCORE_HERE(s);
 
-            /* read the rest of the number */
-            for (;;) {
-                /* x is used in the overflow test,
-                   b is the digit we're adding on. */
-                UV x, b;
+        /* read the rest of the number */
+        for (;;) {
+            /* x is used in the overflow test,
+               b is the digit we're adding on. */
+            UV x, b;
 
-                switch (*s) {
+            switch (*s) {
 
-                /* if we don't mention it, we're done */
-                default:
+            /* if we don't mention it, we're done */
+            default:
+                goto out;
+
+            /* _ are ignored -- but warned about if consecutive */
+            case '_':
+                HANDLE_UNDERSCORE(s);
+                break;
+
+            /* 8 and 9 are not octal */
+            case '8': case '9':
+                if (shift == 3)
+                    yyerror(form("Illegal octal digit '%c'", *s));
+                /* FALLTHROUGH */
+
+            /* octal digits */
+            case '2': case '3': case '4':
+            case '5': case '6': case '7':
+                if (shift == 1)
+                    yyerror(form("Illegal binary digit '%c'", *s));
+                /* FALLTHROUGH */
+
+            case '0': case '1':
+                b = *s++ & 15;		/* ASCII digit -> value of digit */
+                goto digit;
+
+            /* hex digits */
+            case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+            case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+                /* make sure they said 0x */
+                if (shift != 4)
                     goto out;
+                b = (*s++ & 7) + 9;
 
-                /* _ are ignored -- but warned about if consecutive */
-                case '_':
-                    if (lastub && s == lastub + 1)
-                        WARN_ABOUT_UNDERSCORE();
-                    lastub = s++;
-                    break;
+                /* Prepare to put the digit we have onto the end
+                   of the number so far.  We check for overflows.
+                */
 
-                /* 8 and 9 are not octal */
-                case '8': case '9':
-                    if (shift == 3)
-                        yyerror(form("Illegal octal digit '%c'", *s));
-                    /* FALLTHROUGH */
+              digit:
+                just_zero = FALSE;
+                has_digs = TRUE;
+                if (!overflowed) {
+                    assert(shift >= 0);
+                    x = u << shift;	/* make room for the digit */
 
-                /* octal digits */
-                case '2': case '3': case '4':
-                case '5': case '6': case '7':
-                    if (shift == 1)
-                        yyerror(form("Illegal binary digit '%c'", *s));
-                    /* FALLTHROUGH */
-
-                case '0': case '1':
-                    b = *s++ & 15;		/* ASCII digit -> value of digit */
-                    goto digit;
-
-                /* hex digits */
-                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-                    /* make sure they said 0x */
-                    if (shift != 4)
-                        goto out;
-                    b = (*s++ & 7) + 9;
-
-                    /* Prepare to put the digit we have onto the end
-                       of the number so far.  We check for overflows.
-                    */
-
-                  digit:
-                    just_zero = FALSE;
-                    has_digs = TRUE;
-                    if (!overflowed) {
-                        assert(shift >= 0);
-                        x = u << shift;	/* make room for the digit */
-
-                        total_bits += shift;
-
-                        if ((x >> shift) != u
-                            && !(PL_hints & HINT_NEW_BINARY)) {
-                            overflowed = TRUE;
-                            n = (NV) u;
-                            ck_warner_d(packWARN(WARN_OVERFLOW),
-                                        "Integer overflow in %s number",
-                                        bases[shift]);
-                        } else
-                            u = x | b;		/* add the digit to the end */
-                    }
-                    if (overflowed) {
-                        n *= nvshift[shift];
-                        /* If an NV has not enough bits in its
-                         * mantissa to represent an UV this summing of
-                         * small low-order numbers is a waste of time
-                         * (because the NV cannot preserve the
-                         * low-order bits anyway): we could just
-                         * remember when did we overflow and in the
-                         * end just multiply n by the right
-                         * amount. */
-                        n += (NV) b;
-                    }
-
-                    if (high_non_zero == 0 && b > 0)
-                        high_non_zero = b;
-
-                    if (high_non_zero)
-                        non_zero_integer_digits++;
-
-                    /* this could be hexfp, but peek ahead
-                     * to avoid matching ".." */
-                    if (UNLIKELY(HEXFP_PEEK(s))) {
-                        goto out;
-                    }
-
-                    break;
+                    if ((x >> shift) != u
+                        && !(PL_hints & HINT_NEW_BINARY)) {
+                        overflowed = TRUE;
+                        n = (NV) u;
+                        ck_warner_d(packWARN(WARN_OVERFLOW),
+                                    "Integer overflow in %s number",
+                                    bases[shift]);
+                    } else
+                        u = x | b;		/* add the digit to the end */
                 }
+                if (overflowed) {
+                    n *= nvshift[shift];
+                    /* If an NV has not enough bits in its
+                     * mantissa to represent an UV this summing of
+                     * small low-order numbers is a waste of time
+                     * (because the NV cannot preserve the
+                     * low-order bits anyway): we could just
+                     * remember when did we overflow and in the
+                     * end just multiply n by the right
+                     * amount. */
+                    n += (NV) b;
+                    significant_bits += shift;
+                }
+
+                /* this could be hexfp, but peek ahead
+                 * to avoid matching ".." */
+                if (UNLIKELY(HEXFP_PEEK(s))) {
+                    goto out;
+                }
+
+                break;
             }
+        }
 
-          /* if we get here, we had success: make a scalar value from
-             the number.
-          */
-          out:
+      /* if we get here, we had success: make a scalar value from
+         the number.
+      */
+      out:
 
-            /* final misplaced underbar check */
-            if (s[-1] == '_')
-                WARN_ABOUT_UNDERSCORE();
+                /* final misplaced underbar check */
+                SUFFER_AN_UNDERSCORE_JUST_BEFORE_HERE(s);
 
-            if (UNLIKELY(HEXFP_PEEK(s))) {
-                /* Do sloppy (on the underbars) but quick detection
-                 * (and value construction) for hexfp, the decimal
-                 * detection will shortly be more thorough with the
-                 * underbar checks. */
-                const char* h = s;
-                significant_bits = non_zero_integer_digits * shift;
+                if (UNLIKELY(HEXFP_PEEK(s))) {
+                    /* Do sloppy (on the underbars) but quick detection
+                     * (and value construction) for hexfp, the decimal
+                     * detection will shortly be more thorough with the
+                     * underbar checks. */
+                    const char* h = s;
+                    if (u != 0)
+                        significant_bits += msbit_pos(u) + 1;
 #ifdef HEXFP_UQUAD
-                hexfp_uquad = u;
+                    hexfp_uquad = overflowed ? (Uquad_t)n : u;
 #else /* HEXFP_NV */
-                hexfp_nv = u;
+                    hexfp_nv = overflowed ? n : (NV)u;
 #endif
-                /* Ignore the leading zero bits of
-                 * the high (first) non-zero digit. */
-                if (high_non_zero) {
-                    if (high_non_zero < 0x8)
-                        significant_bits--;
-                    if (high_non_zero < 0x4)
-                        significant_bits--;
-                    if (high_non_zero < 0x2)
-                        significant_bits--;
-                }
-
-                if (*h == '.') {
+                    if (*h == '.') {
 #ifdef HEXFP_NV
-                    NV nv_mult = 1.0;
+                        NV nv_mult = 1.0;
 #endif
-                    bool accumulate = TRUE;
-                    U8 b = 0; /* silence compiler warning */
-                    int lim = 1 << shift;
-                    for (h++; ((isXDIGIT(*h) && (b = XDIGIT_VALUE(*h)) < lim) ||
-                               *h == '_'); h++) {
-                        if (isXDIGIT(*h)) {
-                            significant_bits += shift;
+                        bool accumulate = TRUE;
+                        U8 b = 0; /* silence compiler warning */
+                        int lim = 1 << shift;
+                        for (h++;
+                             (   (   isXDIGIT(*h)
+                                  && (b = XDIGIT_VALUE(*h)) < lim)
+                              || *h == '_');
+                             h++)
+                        {
+                            if (isXDIGIT(*h)) {
+                                significant_bits += shift;
 #ifdef HEXFP_UQUAD
-                            if (accumulate) {
-                                if (significant_bits < NV_MANT_DIG) {
-                                    /* We are in the long "run" of xdigits,
-                                     * accumulate the full four bits. */
-                                    assert(shift >= 0);
-                                    hexfp_uquad <<= shift;
-                                    hexfp_uquad |= b;
-                                    hexfp_frac_bits += shift;
-                                } else if (significant_bits - shift < NV_MANT_DIG) {
-                                    /* We are at a hexdigit either at,
-                                     * or straddling, the edge of mantissa.
-                                     * We will try grabbing as many as
-                                     * possible bits. */
-                                    int tail =
-                                      significant_bits - NV_MANT_DIG;
-                                    if (tail <= 0)
-                                       tail += shift;
-                                    assert(tail >= 0);
-                                    hexfp_uquad <<= tail;
-                                    assert((shift - tail) >= 0);
-                                    hexfp_uquad |= b >> (shift - tail);
-                                    hexfp_frac_bits += tail;
+                                if (accumulate) {
+                                    if (significant_bits < NV_MANT_DIG) {
+                                        /* We are in the long "run" of xdigits,
+                                         * accumulate the full four bits. */
+                                        assert(shift >= 0);
+                                        hexfp_uquad <<= shift;
+                                        hexfp_uquad |= b;
+                                        hexfp_frac_bits += shift;
+                                    } else if (   significant_bits - shift
+                                               < NV_MANT_DIG)
+                                    {
+                                        /* We are at a hexdigit either at,
+                                         * or straddling, the edge of mantissa.
+                                         * We will try grabbing as many as
+                                         * possible bits. */
+                                        int tail =
+                                          significant_bits - NV_MANT_DIG;
+                                        if (tail <= 0)
+                                           tail += shift;
+                                        assert(tail >= 0);
+                                        hexfp_uquad <<= tail;
+                                        assert((shift - tail) >= 0);
+                                        hexfp_uquad |= b >> (shift - tail);
+                                        hexfp_frac_bits += tail;
 
-                                    /* Ignore the trailing zero bits
-                                     * of the last non-zero xdigit.
-                                     *
-                                     * The assumption here is that if
-                                     * one has input of e.g. the xdigit
-                                     * eight (0x8), there is only one
-                                     * bit being input, not the full
-                                     * four bits.  Conversely, if one
-                                     * specifies a zero xdigit, the
-                                     * assumption is that one really
-                                     * wants all those bits to be zero. */
-                                    if (b) {
-                                        if ((b & 0x1) == 0x0) {
-                                            significant_bits--;
-                                            if ((b & 0x2) == 0x0) {
+                                        /* Ignore the trailing zero bits
+                                         * of the last non-zero xdigit.
+                                         *
+                                         * The assumption here is that if
+                                         * one has input of e.g. the xdigit
+                                         * eight (0x8), there is only one
+                                         * bit being input, not the full
+                                         * four bits.  Conversely, if one
+                                         * specifies a zero xdigit, the
+                                         * assumption is that one really
+                                         * wants all those bits to be zero. */
+                                        if (b) {
+                                            if ((b & 0x1) == 0x0) {
                                                 significant_bits--;
-                                                if ((b & 0x4) == 0x0) {
+                                                if ((b & 0x2) == 0x0) {
                                                     significant_bits--;
+                                                    if ((b & 0x4) == 0x0) {
+                                                        significant_bits--;
+                                                    }
                                                 }
                                             }
                                         }
+
+                                        accumulate = FALSE;
                                     }
-
-                                    accumulate = FALSE;
+                                } else {
+                                    /* Keep skipping the xdigits, and
+                                     * accumulating the significant bits,
+                                     * but do not shift the uquad
+                                     * (which would catastrophically drop
+                                     * high-order bits) or accumulate the
+                                     * xdigits anymore. */
                                 }
-                            } else {
-                                /* Keep skipping the xdigits, and
-                                 * accumulating the significant bits,
-                                 * but do not shift the uquad
-                                 * (which would catastrophically drop
-                                 * high-order bits) or accumulate the
-                                 * xdigits anymore. */
-                            }
 #else /* HEXFP_NV */
-                            if (accumulate) {
-                                nv_mult /= nvshift[shift];
-                                if (nv_mult > 0.0)
-                                    hexfp_nv += b * nv_mult;
-                                else
-                                    accumulate = FALSE;
-                            }
+                                if (accumulate) {
+                                    nv_mult /= nvshift[shift];
+                                    if (nv_mult > 0.0)
+                                        hexfp_nv += b * nv_mult;
+                                    else
+                                        accumulate = FALSE;
+                                }
 #endif
+                            }
+                            if (significant_bits >= NV_MANT_DIG)
+                                accumulate = FALSE;
                         }
-                        if (significant_bits >= NV_MANT_DIG)
-                            accumulate = FALSE;
                     }
-                }
 
-                if ((total_bits > 0 || significant_bits > 0) &&
-                    isALPHA_FOLD_EQ(*h, 'p')) {
-                    bool negexp = FALSE;
-                    h++;
-                    if (*h == '+')
+                    if (   (has_digs || significant_bits > 0)
+                        && isALPHA_FOLD_EQ(*h, 'p'))
+                    {
+                        bool negexp = FALSE;
                         h++;
-                    else if (*h == '-') {
-                        negexp = TRUE;
-                        h++;
-                    }
-                    if (isDIGIT(*h)) {
-                        while (isDIGIT(*h) || *h == '_') {
-                            if (isDIGIT(*h)) {
-                                hexfp_exp *= 10;
-                                hexfp_exp += *h - '0';
-#ifdef NV_MIN_EXP
-                                if (negexp
-                                    && -hexfp_exp < NV_MIN_EXP - 1) {
-                                    /* NOTE: this means that the exponent
-                                     * underflow warning happens for
-                                     * the IEEE 754 subnormals (denormals),
-                                     * because DBL_MIN_EXP etc are the lowest
-                                     * possible binary (or, rather, DBL_RADIX-base)
-                                     * exponent for normals, not subnormals.
-                                     *
-                                     * This may or may not be a good thing. */
-                                    ck_warner(packWARN(WARN_OVERFLOW),
-                                              "Hexadecimal float: exponent underflow");
-                                    break;
-                                }
-#endif
-#ifdef NV_MAX_EXP
-                                if (!negexp
-                                    && hexfp_exp > NV_MAX_EXP - 1) {
-                                    ck_warner(packWARN(WARN_OVERFLOW),
-                                              "Hexadecimal float: exponent overflow");
-                                    break;
-                                }
-#endif
-                            }
+                        if (*h == '+')
+                            h++;
+                        else if (*h == '-') {
+                            negexp = TRUE;
                             h++;
                         }
-                        if (negexp)
-                            hexfp_exp = -hexfp_exp;
-#ifdef HEXFP_UQUAD
-                        hexfp_exp -= hexfp_frac_bits;
+                        if (isDIGIT(*h)) {
+                            while (isDIGIT_or_UNDERSCORE(*h)) {
+                                if (isDIGIT(*h)) {
+                                    hexfp_exp *= 10;
+                                    hexfp_exp += *h - '0';
+#ifdef NV_MIN_EXP
+                                    if (negexp
+                                        && -hexfp_exp < NV_MIN_EXP - 1) {
+                                        /* NOTE: this means that the exponent
+                                         * underflow warning happens for the
+                                         * IEEE 754 subnormals (denormals),
+                                         * because DBL_MIN_EXP etc are the
+                                         * lowest possible binary (or, rather,
+                                         * DBL_RADIX-base) exponent for
+                                         * normals, not subnormals.
+                                         *
+                                         * This may or may not be a good
+                                         * thing. */
+                                        ck_warner(packWARN(WARN_OVERFLOW),
+                                      "Hexadecimal float: exponent underflow");
+                                        break;
+                                    }
 #endif
-                        hexfp = TRUE;
-                        goto decimal;
+#ifdef NV_MAX_EXP
+                                    if (!negexp
+                                        && hexfp_exp > NV_MAX_EXP - 1) {
+                                        ck_warner(packWARN(WARN_OVERFLOW),
+                                      "Hexadecimal float: exponent overflow");
+                                        break;
+                                    }
+#endif
+                                }
+                                h++;
+                            }
+                            if (negexp)
+                                hexfp_exp = -hexfp_exp;
+#ifdef HEXFP_UQUAD
+                            hexfp_exp -= hexfp_frac_bits;
+#endif
+                            hexfp = TRUE;
+                            goto decimal;
+                        }
                     }
                 }
-            }
 
             if (!just_zero && !has_digs) {
                 /* 0x, 0o or 0b with no digits, treat it as an error.
@@ -12315,40 +13029,31 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
 
             if (overflowed) {
                 if (n > 4294967295.0)
-                    ck_warner(packWARN(WARN_PORTABLE),
-                              "%s number > %s non-portable",
-                              Bases[shift],
-                              new_octal ? "0o37777777777" : maxima[shift]);
+                    output_non_portable(1 << shift);
                 sv = newSVnv(n);
             }
             else {
 #if UVSIZE > 4
                 if (u > 0xffffffff)
-                    ck_warner(packWARN(WARN_PORTABLE),
-                              "%s number > %s non-portable",
-                              Bases[shift],
-                              new_octal ? "0o37777777777" : maxima[shift]);
+                    output_non_portable(1 << shift);
 #endif
                 sv = newSVuv(u);
             }
-            if (just_zero && (PL_hints & HINT_NEW_INTEGER))
-                sv = new_constant(start, s - start, "integer",
-                                  sv, NULL, NULL, 0, NULL);
-            else if (PL_hints & HINT_NEW_BINARY)
-                sv = new_constant(start, s - start, "binary",
-                                  sv, NULL, NULL, 0, NULL);
-        }
-        break;
-
-    /*
-      handle decimal numbers.
-      we're also sent here when we read a 0 as the first digit
-    */
-    case '1': case '2': case '3': case '4': case '5':
-    case '6': case '7': case '8': case '9': case '.':
+        if (just_zero && (PL_hints & HINT_NEW_INTEGER))
+            sv = new_constant(start, s - start, "integer",
+                              sv, NULL, NULL, 0, NULL);
+        else if (PL_hints & HINT_NEW_BINARY)
+            sv = new_constant(start, s - start, "binary",
+                              sv, NULL, NULL, 0, NULL);
+    }
+    else if (isDIGIT_A(*s) || *s == '.') {
       decimal:
+
+        /* handle decimal numbers.
+           we're also sent here when we read a 0 as the first digit
+         */
         d = PL_tokenbuf;
-        e = PL_tokenbuf + sizeof PL_tokenbuf - 6; /* room for various punctuation */
+        e = C_ARRAY_END(PL_tokenbuf) - 6; /* room for various punctuation */
         floatit = FALSE;
         if (hexfp) {
             floatit = TRUE;
@@ -12376,17 +13081,14 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
         }
 
         /* read next group of digits and _ and copy into d */
-        while (isDIGIT(*s)
-               || *s == '_'
+        while (   isDIGIT_or_UNDERSCORE(*s)
                || UNLIKELY(hexfp && isXDIGIT(*s)))
         {
             /* skip underscores, checking for misplaced ones
                if -w is on
             */
             if (*s == '_') {
-                if (lastub && s == lastub + 1)
-                    WARN_ABOUT_UNDERSCORE();
-                lastub = s++;
+                HANDLE_UNDERSCORE(s);
             }
             else {
                 /* check for end of fixed-length buffer */
@@ -12398,8 +13100,9 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
         }
 
         /* final misplaced underbar check */
-        if (lastub && s == lastub + 1)
-            WARN_ABOUT_UNDERSCORE();
+        if (s > start) {  /* Can get here without advancing s */
+            SUFFER_AN_UNDERSCORE_JUST_BEFORE_HERE(s);
+        }
 
         /* read a decimal portion if there is one.  avoid
            3..5 being interpreted as the number 3. followed
@@ -12409,32 +13112,25 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
             floatit = TRUE;
             *d++ = *s++;
 
-            if (*s == '_') {
-                WARN_ABOUT_UNDERSCORE();
-                lastub = s;
-            }
+            SUFFER_AN_UNDERSCORE_HERE(s);
 
             /* copy, ignoring underbars, until we run out of digits.
             */
-            for (; isDIGIT(*s)
-                   || *s == '_'
-                   || UNLIKELY(hexfp && isXDIGIT(*s));
-                 s++)
+            while (   isDIGIT_or_UNDERSCORE(*s)
+                   || UNLIKELY(hexfp && isXDIGIT(*s)))
             {
                 /* fixed length buffer check */
                 if (d >= e)
                     croak("%s", number_too_long);
                 if (*s == '_') {
-                   if (lastub && s == lastub + 1)
-                        WARN_ABOUT_UNDERSCORE();
-                   lastub = s;
+                    HANDLE_UNDERSCORE(s);
                 }
                 else
-                    *d++ = *s;
+                    *d++ = *s++;
             }
-            /* fractional part ending in underbar? */
-            if (s[-1] == '_')
-                WARN_ABOUT_UNDERSCORE();
+
+            SUFFER_AN_UNDERSCORE_JUST_BEFORE_HERE(s);
+
             if (*s == '.' && isDIGIT(s[1])) {
                 /* oops, it's really a v-string, but without the "v" */
                 s = start;
@@ -12465,36 +13161,29 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
 
 
             /* stray preinitial _ */
-            if (*s == '_') {
-                WARN_ABOUT_UNDERSCORE();
-                lastub = s++;
-            }
+            SUFFER_AN_UNDERSCORE_HERE(s);
 
             /* allow positive or negative exponent */
             if (*s == '+' || *s == '-')
                 *d++ = *s++;
 
             /* stray initial _ */
-            if (*s == '_') {
-                WARN_ABOUT_UNDERSCORE();
-                lastub = s++;
-            }
+            SUFFER_AN_UNDERSCORE_HERE(s);
 
             /* read digits of exponent */
-            while (isDIGIT(*s) || *s == '_') {
+            while (isDIGIT_or_UNDERSCORE(*s)) {
                 if (isDIGIT(*s)) {
                     ++exp_digits;
                     if (d >= e)
                         croak("%s", number_too_long);
                     *d++ = *s++;
                 }
-                else {
-                   if (((lastub && s == lastub + 1)
-                        || (!isDIGIT(s[1]) && s[1] != '_')))
-                        WARN_ABOUT_UNDERSCORE();
-                   lastub = s++;
+                else {  /* Must be an underscore */
+                    HANDLE_UNDERSCORE(s);
                 }
             }
+
+            SUFFER_AN_UNDERSCORE_JUST_BEFORE_HERE(s);
 
             if (!exp_digits) {
                 /* no exponent digits, the [eEpP] could be for something else,
@@ -12563,18 +13252,9 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
             sv = S_new_constant(aTHX_ PL_tokenbuf, d - PL_tokenbuf,
                                 key, keylen, sv, NULL, NULL, 0, NULL);
         }
-        break;
-
-    /* if it starts with a v, it could be a v-string */
-    case 'v':
-    vstring:
-                sv = newSV(5); /* preallocate storage space */
-                ENTER_with_name("scan_vstring");
-                SAVEFREESV(sv);
-                s = scan_vstring(s, PL_bufend, sv);
-                SvREFCNT_inc_simple_void_NN(sv);
-                LEAVE_with_name("scan_vstring");
-        break;
+    }
+    else {
+        croak("panic: scan_num, *s=%c", *s);
     }
 
     /* make the op for the constant and return */
@@ -12587,14 +13267,14 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
     return (char *)s;
 }
 
-STATIC char *
+static char *
 S_scan_formline(pTHX_ char *s)
 {
+    PERL_ARGS_ASSERT_SCAN_FORMLINE;
+
     SV * const stuff = newSVpvs("");
     bool needargs = FALSE;
     bool eofmt = FALSE;
-
-    PERL_ARGS_ASSERT_SCAN_FORMLINE;
 
     while (!needargs) {
         char *eol;
@@ -12703,6 +13383,8 @@ the function;
 I32
 Perl_start_subparse(pTHX_ I32 is_format, U32 flags)
 {
+    PERL_ARGS_ASSERT_START_SUBPARSE;
+
     const I32 oldsavestack_ix = PL_savestack_ix;
     CV* const outsidecv = PL_compcv;
     bool is_method = flags & CVf_IsMETHOD;
@@ -12733,7 +13415,7 @@ Perl_start_subparse(pTHX_ I32 is_format, U32 flags)
  * Otherwise does nothing and returns false
  */
 
-STATIC bool
+static bool
 S_apply_builtin_cv_attribute(pTHX_ CV *cv, OP *o)
 {
     assert(o->op_type == OP_CONST);
@@ -12881,6 +13563,8 @@ Perl_abort_execution(pTHX_ SV* msg_sv, const char * const name)
 void
 Perl_yyquit(pTHX)
 {
+    PERL_ARGS_ASSERT_YYQUIT;
+
     /* Called, after at least one error has been found, to abort the parse now,
      * instead of trying to forge ahead */
 
@@ -12906,6 +13590,8 @@ Perl_yyerror_pv(pTHX_ const char *const s, U32 flags)
 int
 Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
 {
+    PERL_ARGS_ASSERT_YYERROR_PVN;
+
     const char *context = NULL;
     int contlen = -1;
     SV *msg;
@@ -12968,7 +13654,11 @@ Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
             (PL_parser->preambling == NOLINE
                    ? CopLINE(PL_curcop)
                    : PL_parser->preambling));
-        if (context)
+
+        /* Some syntax errors in an eval to result in a context being set
+         * but contlen being < 0. See GH#16945 for an example. In this
+         * situation, don't try to include context in the error message. */
+        if (context && contlen > 0)
             sv_catpvf(msg, "near \"%" UTF8f "\"\n",
                                  UTF8fARG(UTF, contlen, context));
         else
@@ -12987,25 +13677,25 @@ Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
             ck_warner_d(packWARN(WARN_SYNTAX), "%" SVf, SVfARG(msg));
         }
         else {
-            qerror(msg);
+            defer_error(msg);
         }
     }
     /* if there was no message then this is a yyquit(), which is actualy handled
-     * by qerror() with a NULL argument */
+     * by defer_error() with a NULL argument */
     if (s == NULL)
-        qerror(NULL);
+        defer_error(NULL);
 
     PL_in_my = 0;
     PL_in_my_stash = NULL;
     return 0;
 }
 
-STATIC char*
+static char*
 S_swallow_bom(pTHX_ U8 *s)
 {
-    const STRLEN slen = SvCUR(PL_linestr);
-
     PERL_ARGS_ASSERT_SWALLOW_BOM;
+
+    const STRLEN slen = SvCUR(PL_linestr);
 
     switch (s[0]) {
     case 0xFF:
@@ -13049,7 +13739,7 @@ S_swallow_bom(pTHX_ U8 *s)
 #ifdef DEBUGGING
             if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-8 script encoding (BOM)\n");
 #endif
-            s += sizeof(BOM_UTF8) - 1;                     /* UTF-8 */
+            s += C_ARRAY_LENGTH(BOM_UTF8) - 1;              /* UTF-8 */
         }
         break;
     }
@@ -13108,6 +13798,8 @@ S_swallow_bom(pTHX_ U8 *s)
 static I32
 S_utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 {
+    PERL_ARGS_ASSERT_UTF16_TEXTFILTER;
+
     SV *const filter = FILTER_DATA(idx);
     /* We re-use this each time round, throwing the contents away before we
        return.  */
@@ -13116,8 +13808,6 @@ S_utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
     IV status = IoPAGE(filter);
     const bool reverse = cBOOL(IoLINES(filter));
     I32 retval;
-
-    PERL_ARGS_ASSERT_UTF16_TEXTFILTER;
 
     /* As we're automatically added, at the lowest level, and hence only called
        from this file, we can be sure that we're not called in block mode. Hence
@@ -13235,9 +13925,9 @@ S_utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 static U8 *
 S_add_utf16_textfilter(pTHX_ U8 *const s, bool reversed)
 {
-    SV *filter = filter_add(S_utf16_textfilter, NULL);
-
     PERL_ARGS_ASSERT_ADD_UTF16_TEXTFILTER;
+
+    SV *filter = filter_add(S_utf16_textfilter, NULL);
 
     IoTOP_GV(filter) = MUTABLE_GV(newSVpvn((char *)s, PL_bufend - (char*)s));
     SvPVCLEAR(filter);
@@ -13283,13 +13973,13 @@ sv_2mortal.
 char *
 Perl_scan_vstring(pTHX_ const char *s, const char *const e, SV *sv)
 {
+    PERL_ARGS_ASSERT_SCAN_VSTRING;
+
     const char *pos = s;
     const char *start = s;
 
-    PERL_ARGS_ASSERT_SCAN_VSTRING;
-
     if (*pos == 'v') pos++;  /* get past 'v' */
-    while (pos < e && (isDIGIT(*pos) || *pos == '_'))
+    while (pos < e && isDIGIT_or_UNDERSCORE(*pos))
         pos++;
     if ( *pos != '.') {
         /* this may not be a v-string if followed by => */
@@ -13340,7 +14030,7 @@ Perl_scan_vstring(pTHX_ const char *s, const char *const e, SV *sv)
                  s = pos;
                  break;
             }
-            while (pos < e && (isDIGIT(*pos) || *pos == '_'))
+            while (pos < e && isDIGIT_or_UNDERSCORE(*pos))
                  pos++;
         }
         SvPOK_on(sv);
@@ -13499,7 +14189,7 @@ S_parse_recdescent(pTHX_ int gramtype, I32 fakeeof)
     SAVEI8(PL_lex_fakeeof);
     PL_lex_fakeeof = (U8)fakeeof;
     if(yyparse(gramtype) && !PL_parser->error_count)
-        qerror(Perl_mess(aTHX_ "Parse error"));
+        defer_error(mess("Parse error"));
 }
 
 #define parse_recdescent_for_op(g,p) S_parse_recdescent_for_op(aTHX_ g,p)
@@ -13526,14 +14216,16 @@ S_parse_expr(pTHX_ I32 fakeeof, U32 flags)
     exprop = parse_recdescent_for_op(GRAMEXPR, fakeeof);
     if (!exprop && !(flags & PARSE_OPTIONAL)) {
         if (!PL_parser->error_count)
-            qerror(Perl_mess(aTHX_ "Parse error"));
+            defer_error(mess("Parse error"));
         exprop = newOP(OP_NULL, 0);
     }
     return exprop;
 }
 
 /*
-=for apidoc parse_arithexpr
+=for apidoc      parse_arithexpr
+=for apidoc_flag PARSE_OPTIONAL
+
 
 Parse a Perl arithmetic expression.  This may contain operators of precedence
 down to the bit shift operators.  The expression must be followed (and thus
@@ -13555,8 +14247,6 @@ normally resulting in a single exception at the top level of parsing
 which covers all the compilation errors that occurred.  Some compilation
 errors, however, will throw an exception immediately.
 
-=for apidoc Amnh||PARSE_OPTIONAL
-
 =cut
 
 */
@@ -13564,6 +14254,8 @@ errors, however, will throw an exception immediately.
 OP *
 Perl_parse_arithexpr(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_ARITHEXPR;
+
     return parse_expr(LEX_FAKEEOF_COMPARE, flags);
 }
 
@@ -13596,6 +14288,8 @@ errors, however, will throw an exception immediately.
 OP *
 Perl_parse_termexpr(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_TERMEXPR;
+
     return parse_expr(LEX_FAKEEOF_COMMA, flags);
 }
 
@@ -13628,6 +14322,8 @@ errors, however, will throw an exception immediately.
 OP *
 Perl_parse_listexpr(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_LISTEXPR;
+
     return parse_expr(LEX_FAKEEOF_LOWLOGIC, flags);
 }
 
@@ -13661,6 +14357,8 @@ errors, however, will throw an exception immediately.
 OP *
 Perl_parse_fullexpr(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_FULLEXPR;
+
     return parse_expr(LEX_FAKEEOF_NONEXPR, flags);
 }
 
@@ -13695,6 +14393,8 @@ be zero.
 OP *
 Perl_parse_block(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_BLOCK;
+
     if (flags)
         croak("Parsing code internal error (%s)", "parse_block");
     return parse_recdescent_for_op(GRAMBLOCK, LEX_FAKEEOF_NEVER);
@@ -13733,6 +14433,8 @@ be zero.
 OP *
 Perl_parse_barestmt(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_BARESTMT;
+
     if (flags)
         croak("Parsing code internal error (%s)", "parse_barestmt");
     return parse_recdescent_for_op(GRAMBARESTMT, LEX_FAKEEOF_NEVER);
@@ -13761,6 +14463,8 @@ level of parsing which covers all the compilation errors that occurred.
 SV *
 Perl_parse_label(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_LABEL;
+
     if (flags & ~PARSE_OPTIONAL)
         croak("Parsing code internal error (%s)", "parse_label");
     if (PL_nexttoke) {
@@ -13782,7 +14486,8 @@ Perl_parse_label(pTHX_ U32 flags)
         t = s = PL_bufptr;
         if (!isIDFIRST_lazy_if_safe(s, PL_bufend, UTF))
             goto no_label;
-        t = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &wlen);
+        t = scan_word(s, PL_tokenbuf, C_ARRAY_LENGTH(PL_tokenbuf),
+                      FALSE, &wlen);
         if (word_takes_any_delimiter(s, wlen))
             goto no_label;
         bufptr_pos = s - SvPVX(PL_linestr);
@@ -13801,7 +14506,7 @@ Perl_parse_label(pTHX_ U32 flags)
             if (flags & PARSE_OPTIONAL) {
                 return NULL;
             } else {
-                qerror(Perl_mess(aTHX_ "Parse error"));
+                defer_error(mess("Parse error"));
                 return newSVpvs("x");
             }
         }
@@ -13838,6 +14543,8 @@ be zero.
 OP *
 Perl_parse_fullstmt(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_FULLSTMT;
+
     if (flags)
         croak("Parsing code internal error (%s)", "parse_fullstmt");
     return parse_recdescent_for_op(GRAMFULLSTMT, LEX_FAKEEOF_NEVER);
@@ -13876,6 +14583,8 @@ be zero.
 OP *
 Perl_parse_stmtseq(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_STMTSEQ;
+
     OP *stmtseqop;
     I32 c;
     if (flags)
@@ -13883,7 +14592,7 @@ Perl_parse_stmtseq(pTHX_ U32 flags)
     stmtseqop = parse_recdescent_for_op(GRAMSTMTSEQ, LEX_FAKEEOF_CLOSING);
     c = lex_peek_unichar(0);
     if (c != -1 && c != /*{*/'}')
-        qerror(Perl_mess(aTHX_ "Parse error"));
+        defer_error(mess("Parse error"));
     return stmtseqop;
 }
 
@@ -13914,21 +14623,49 @@ be zero.
 OP *
 Perl_parse_subsignature(pTHX_ U32 flags)
 {
+    PERL_ARGS_ASSERT_PARSE_SUBSIGNATURE;
+
     if (flags)
         croak("Parsing code internal error (%s)", "parse_subsignature");
+    /* sub signatures might be empty, but perly.y can't cope with the
+     * ambiguity of an empty construction. We'll detect it manually and do
+     * something suitable in that case. */
+    lex_read_space(0);
+    if (lex_peek_unichar(0) == ')') {
+        /* pretend we saw an empty signature and do the same steps perly.y
+         * would have performed. */
+        subsignature_start();
+        OP *sigops = subsignature_finish();
+        CvSIGNATURE_on(PL_compcv);
+        return sigops;
+    }
     return parse_recdescent_for_op(GRAMSUBSIGNATURE, LEX_FAKEEOF_NONEXPR);
 }
 
 /*
-=for apidoc valid_identifier_pve
+=for apidoc      valid_identifier_pvn
+=for apidoc_item valid_identifier_pve
+=for apidoc_item valid_identifier_sv
 
-Returns true if the string given by C<s> until C<end> would be considered
-valid as a Perl identifier.  That is, it must begin with a character matching
-C<isIDFIRST>, followed by characters all matching C<isIDCONT>.  An empty
-string (i.e. when C<end> is C<s>) will return false.
+These each return true if the string given by their parameters would be
+considered valid as a Perl identifier.  That is, for non-UTF-8 strings, it must
+begin with a character matching C<L/<isIDFIRST>>, followed by characters all
+matching C<L</isIDCONT>>.  For UTF-8 strings, the characters must match
+C<L</isIDFIRST_utf8>> and C<L</isIDCONT_utf8>>, respectively.
 
-If C<flags> contains the C<SVf_UTF8> bit, then the string is presumed to be
-encoded in UTF-8, and suitable Unicode character test functions will be used.
+An empty string will return false.
+
+They differ only in how the string is specified.
+
+In C<valid_identifier_sv>, the string is extracted from C<sv> using
+C<L</SvPV_const>>, without performing "get" magic.  The string is considered to be encoded in UTF-8 if and only if C<sv> is marked as being UTF-8.
+
+In the other two functions, the first byte of the string is pointed to by
+C<s>.  In C<valid_identifier_pvn> its length is given by C<len>.
+In C<valid_identifier_pve> the final byte of the string is the one before
+C<e>.  If C<flags> contains the C<SVf_UTF8> bit, then the string is presumed
+to be encoded in UTF-8, and suitable Unicode character test functions will be
+used.
 
 =cut
 */
@@ -13941,49 +14678,9 @@ Perl_valid_identifier_pve(pTHX_ const char *s, const char *end, U32 flags)
     if(end <= s)
         return false;
 
-    if(flags & SVf_UTF8) {
-        if(!isIDFIRST_utf8_safe((U8 *)s, (U8 *)end))
-            return false;
-
-        while(s < end) {
-            s += UTF8SKIP((U8 *)s);
-            if(s == end)
-                break;
-            if(!isIDCONT_utf8_safe((U8 *)s, (U8 *)end))
-                return false;
-        }
-        return true;
-    }
-    else {
-        if(!isIDFIRST(s[0]))
-            return false;
-
-        while(s < end) {
-            s += 1;
-            if(s == end)
-                break;
-            if(!isIDCONT(s[0]))
-                return false;
-        }
-        return true;
-    }
-
-    return false;
+    return end == parse_ident_no_copy(s, end, cBOOL(flags & SVf_UTF8),
+                                      NULL, IDFIRST_ONLY);
 }
-
-/*
-=for apidoc valid_identifier_pvn
-
-Returns true if the string given by C<s> whose length is C<len> would be
-considered valid as a Perl identifier.  That is, it must begin with a
-character matching C<isIDFIRST>, followed by characters all matching
-C<isIDCONT>.  An empty string (i.e. when C<len> is zero) will return false.
-
-If C<flags> contains the C<SVf_UTF8> bit, then the string is presumed to be
-encoded in UTF-8, and suitable Unicode character test functions will be used.
-
-=cut
-*/
 
 bool
 Perl_valid_identifier_pvn(pTHX_ const char *s, STRLEN len, U32 flags)
@@ -13992,18 +14689,6 @@ Perl_valid_identifier_pvn(pTHX_ const char *s, STRLEN len, U32 flags)
 
     return valid_identifier_pve(s, s + len, flags);
 }
-
-/*
-=for apidoc valid_identifier_sv
-
-Returns true if the given SV contains a non-empty string whose characters
-match accoding to C<valid_identifier_pvn>.  Returns false if given NULL, an
-undefined SV, or a SV that does not contain a non-empty string.
-
-Does not invoke C<get> magic on the SV beforehand.
-
-=cut
-*/
 
 bool
 Perl_valid_identifier_sv(pTHX_ SV *sv)

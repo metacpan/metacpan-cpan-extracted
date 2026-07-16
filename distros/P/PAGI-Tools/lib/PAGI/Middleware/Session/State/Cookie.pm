@@ -1,5 +1,5 @@
 package PAGI::Middleware::Session::State::Cookie;
-$PAGI::Middleware::Session::State::Cookie::VERSION = '0.002001';
+$PAGI::Middleware::Session::State::Cookie::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware::Session::State';

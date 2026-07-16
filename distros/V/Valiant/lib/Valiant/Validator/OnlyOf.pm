@@ -29,7 +29,7 @@ sub validate_each {
   push @group_values, $value;
 
   my $count_not_blank = grep {
-    defined $_ && ( $_ ne '' || $value !~m/^\s+$/)
+    defined $_ && ( $_ ne '' && $_ !~m/^\s+$/)
   } @group_values;
 
   my $max_allowed = $self->_cb_value($record, $self->max_allowed);
@@ -63,9 +63,9 @@ Valiant::Validator::OnlyOf - Limit the number of fields not blank in a group
     validates opt1 => ( only_of => {
       members => ['opt2','opt3'],
       max_allowed => 1, # This is the default value
-    );
+    });
 
-    my $object = Local::Test::OnlyOf->new();
+    my $object = Local::Test::OnlyOf->new(opt1=>1, opt2=>1);
     $object->validate;
 
     warn $object->errors->_dump;
@@ -87,7 +87,7 @@ Both C<members> and C<max_allowed> can be a subref that gets the first argument
 as the object and is expected to return something valid.  Useful if for example
 you have different rules for the group members or size based on the data.
 
-<Uses C<only_of> as the translation tag and you can set 
+Uses C<only_of> as the translation tag and you can set
 that to override the message.
 
 =head1 SHORTCUT FORM

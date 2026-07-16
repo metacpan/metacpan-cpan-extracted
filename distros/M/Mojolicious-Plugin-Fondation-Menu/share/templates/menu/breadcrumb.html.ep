@@ -1,0 +1,21 @@
+%# Breadcrumb — navigation trail for current URL
+%# Stash: trail => [ {title, link}, ... ]
+%
+% my $trail = stash('trail') // [];
+% return '' unless @$trail;
+%
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb bg-body-tertiary rounded-3 px-3 py-2 mb-3 small">
+% for my $i (0 .. $#$trail) {
+%   my $menu = $trail->[$i];
+%   my $is_last = ($i == $#$trail);
+%   if ($menu->{link} eq '/') {
+    <li class="breadcrumb-item"><a href="<%= $menu->{link} %>"><i class="fas fa-home me-1"></i><%= l('Home') %></a></li>
+%   } elsif ($is_last) {
+    <li class="breadcrumb-item active" aria-current="page"><%= $menu->{title} %></li>
+%   } else {
+    <li class="breadcrumb-item"><a href="<%= $menu->{link} %>"><%= $menu->{title} %></a></li>
+%   }
+% }
+  </ol>
+</nav>

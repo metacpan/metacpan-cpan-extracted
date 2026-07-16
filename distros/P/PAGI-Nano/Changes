@@ -1,0 +1,49 @@
+Revision history for PAGI-Nano
+
+0.001000  2026-07-15
+        - Initial release.
+        - app { } block-scoped collector returning an assembled PAGI app value
+          (no global state), built on PAGI::App::Router, PAGI::Middleware,
+          PAGI::Lifespan, and PAGI::App::File.
+        - Routing verbs get/post/put/patch/del/any; group (prefix + shared
+          middleware) and mount (nest any PAGI app); path placeholders
+          (:name, {name}, {name:regex}, *splat) map to the handler signature.
+        - Return-value coercion: PAGI::Response as-is; hashref/arrayref to JSON
+          (convert_blessed, so nested TO_JSON objects serialize); scalar to
+          text/plain; undef/return; a loud 500. Thrown respond-ables are sent.
+        - enable (app-wide) and [\@middleware] (route/group) event-layer
+          middleware; named middleware resolved like PAGI::Middleware::Builder.
+        - startup/shutdown lifecycle with app-lifetime shared state ($c->state).
+        - static file serving, custom not_found, websocket and sse (imperative),
+          and streaming request/response bodies.
+        - $c->params strong parameters via PAGI::StructuredParameters
+          (PAGI::Nano::Context::HTTP).
+        - Two run shapes: single-file app.pl and a lib/MyApp.pm modulino.
+        - Requires PAGI::Tools 0.002002 (extension-aware default WebSocket
+          declines; stricter Test::Client lifespan-startup) and
+          PAGI::StructuredParameters.
+        - Per-request service makers run at most once per service name per
+          request even when they return undef; memoization is based on cache-key
+          existence rather than value definedness.
+        - ServiceRegistry: a service builder that returns a Future croaks
+          loudly at lifespan startup, naming the service, rather than silently
+          storing the unresolved Future as the "service" (which fails
+          cryptically later at $c->service). Service builders are synchronous
+          by design; use a per-request maker (a plain coderef) or factory(...)
+          for deferred or per-call construction.
+        - PAGI::Nano::resolve_service($app, $name): a test-facing seam to
+          resolve an app-scoped service value after lifespan startup without
+          issuing a request, via a private probe token on the assembled app
+          coderef. Returns the raw app-scoped value (a per-request maker or
+          factory marker comes back as-is, not per-request-resolved).
+        - Custom not_found responses emit protocol-valid decline events:
+          SSE uses sse.http.response.*, and WebSocket uses
+          websocket.http.response.* when the server advertises that extension.
+          WebSockets without it bypass the handler and close for a portable
+          body-less 403. Translated byte bodies may be buffered or streamed;
+          SSE and WebSocket file/fh bodies fail loudly.
+        - Context uri_for percent-encodes decoded strings from UTF-8 bytes.
+          Ordinary placeholders encode one segment and reject slash-containing
+          values in favor of *splat routes; splats preserve separators while
+          encoding each segment. Query keys and values remain sorted and use
+          %20 for spaces.

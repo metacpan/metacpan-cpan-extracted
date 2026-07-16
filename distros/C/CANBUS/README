@@ -1,0 +1,39 @@
+CANBUS version 0.01
+===================
+
+Perl extension for sending and receiving CANBUS messages using
+the Linux CANBUS driver.
+
+Built and tested for a Geschwister Schneider USB CAN adapter
+(OpenMoko, Inc.)
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the Linx CANBUS driver (linux/can.h, linux/can/raw.h)
+It may also require the gs_usb driver for some USB CANBUS adapters,
+which may be missing on some RedHat distributions. 
+
+
+See the SocketCAN Documentation (Linux Kernel)(https://www.kernel.org/doc/Documentation/networking/can.txt)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2026 by Andrew Daviel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -35,6 +35,20 @@ qx.Class.define("callbackery.data.Server", {
 
     members: {
         __client: null,
+        __sessionExpiredHandled: false,
+        __commsErrorHandled: false,
+
+        // Bounded silent retry for transient communication failures.
+        _COMMS_RETRY_MAX: 3,
+        _COMMS_RETRY_BACKOFF_MS: 1300,
+
+        // Idempotent methods that are safe to retry silently. Writes
+        // (processPluginData) and auth calls (login/logout) are excluded.
+        _retrySafe: {
+            ping: true, getBaseConfig: true, getUserConfig: true,
+            getSessionCookie: true, getPluginConfig: true,
+            getPluginData: true, validatePluginData: true
+        },
 
         /**
          * Lazily create the JSON-RPC client and wire the session-cookie header.
@@ -108,6 +122,7 @@ qx.Class.define("callbackery.data.Server", {
          * @param params {Array} positional parameters
          */
         _send: function(handler, methodName, params) {
+            var self = this;
             params = this._jsonSafe(params);
             var invoke = function(ret, exc, id) {
                 try {
@@ -121,6 +136,8 @@ qx.Class.define("callbackery.data.Server", {
             };
             this._getClient().sendRequest(methodName, params).then(
                 function(result) {
+                    // connectivity is healthy again
+                    self.__commsErrorHandled = false;
                     invoke(result, null, null);
                 },
                 function(ex) {
@@ -138,6 +155,42 @@ qx.Class.define("callbackery.data.Server", {
                     };
                     invoke(null, exc, null);
                 }
+            );
+        },
+
+        /**
+         * Handle a communication failure (non-application exception): bounded
+         * silent retry for idempotent methods, otherwise one deduped dialog.
+         *
+         * @param resend {Function} resend(attempt) re-issues the original _send with that attempt number
+         * @param methodName {String} the RPC method (for the retry-safe check)
+         * @param attempt {Integer} 1-based attempt number that just failed
+         */
+        _handleCommsFailure: function(resend, methodName, attempt) {
+            var self = this;
+            if (this._retrySafe[methodName] && attempt < this._COMMS_RETRY_MAX) {
+                qx.event.Timer.once(function() {
+                    resend(attempt + 1);
+                }, this, this._COMMS_RETRY_BACKOFF_MS);
+                return;
+            }
+            // exhausted, or a non-retry-safe (write) call: one dialog owns the UX
+            if (this.__commsErrorHandled) { return; }
+            this.__commsErrorHandled = true;
+            callbackery.ui.Busy.getInstance().vanish();
+            var mb = callbackery.ui.MsgBox.getInstance();
+            mb.addListenerOnce('choice', function(e) {
+                if (e.getData() === 'reload') {
+                    window.location.reload(true);
+                }
+                else { // retry
+                    self.__commsErrorHandled = false;
+                    resend(1);
+                }
+            });
+            mb.commError(
+                mb.tr('Connection problem'),
+                mb.tr('The server is not responding or returned an unexpected answer.')
             );
         },
 
@@ -161,6 +214,9 @@ qx.Class.define("callbackery.data.Server", {
             var origHandler = handler;
             var localeMgr = qx.locale.Manager.getInstance();
             var wrapped = function(ret, exc, id) {
+                // A reload is already committed for this expired session; keep
+                // quiet so late-arriving failures don't pop error boxes.
+                if (origThis.__sessionExpiredHandled) { return; }
                 // only application (JSON-RPC protocol) errors carry the 6/7
                 // codes the login/session logic reacts to; transport errors
                 // fall through to the normal handler.
@@ -179,28 +235,43 @@ qx.Class.define("callbackery.data.Server", {
                             return;
                         }
                         case 7: {
+                            // Session expired: exactly one reload prompt owns the
+                            // UX; every other concurrent expired call is swallowed.
+                            if (origThis.__sessionExpiredHandled) { return; }
+                            origThis.__sessionExpiredHandled = true;
                             if (window.console) {
-                                window.console.log("Session Expired. Reloading page");
+                                window.console.log("Session Expired. Prompting for reload.");
                             }
                             callbackery.ui.Busy.getInstance().vanish();
                             let mb = callbackery.ui.MsgBox.getInstance();
-                            mb.addListenerOnce('choice', (e) => {
-                                if (e.getData() == 'ok') {
-                                    window.location.reload(true);
-                                }
+                            mb.addListenerOnce('choice', () => {
+                                window.location.reload(true);
                             });
-                            mb.info(
-                                mb.tr('Session Expired'),
-                                mb.xtr(exc.message)
-                            );
+                            mb.sessionExpired(mb.tr('Session Expired'), mb.xtr(exc.message));
                             return;
                         }
                     }
                 }
+                if (exc && !exc.application) {
+                    // communication failure -> retry (idempotent) or dialog
+                    origThis._handleCommsFailure(
+                        function(nextAttempt) { doSend(nextAttempt); },
+                        origMethod,
+                        currentAttempt
+                    );
+                    return;
+                }
                 origHandler(ret, exc, id);
             };
             var params = args.concat([{ qxLocale: localeMgr.getLocale() }]);
-            this._send(wrapped, methodName, params);
+            // Per-call attempt counter (closure-local, so concurrent callAsync
+            // invocations never clobber each other's retry state).
+            var currentAttempt = 1;
+            var doSend = function(attempt) {
+                currentAttempt = attempt;
+                origThis._send(wrapped, methodName, params);
+            };
+            doSend(1);
         },
 
         /**

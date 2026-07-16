@@ -1,5 +1,5 @@
 package PAGI::Middleware::Maintenance;
-$PAGI::Middleware::Maintenance::VERSION = '0.002001';
+$PAGI::Middleware::Maintenance::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

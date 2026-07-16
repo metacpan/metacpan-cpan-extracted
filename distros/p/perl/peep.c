@@ -76,8 +76,9 @@ S_scalar_slice_warning(pTHX_ const OP *o)
     if (kid->op_type == OP_NULL && kid->op_targ == OP_LIST)
         return;
 
-    assert(OpSIBLING(kid));
-    name = op_varname(OpSIBLING(kid));
+    OP *varop = OpSIBLING(kid);
+    assert(varop);
+    name = op_varname(varop);
     if (!name) /* XS module fiddling with the op tree */
         return;
     warn_elem_scalar_context(kid, name, is_hash, true);
@@ -108,7 +109,7 @@ struct sprintf_ismc_info {
  * populated.
  */
 
-STATIC bool
+static bool
 S_sprintf_is_multiconcatable(pTHX_ OP *o,struct sprintf_ismc_info *info)
 {
     OP    *pm, *constop, *kid;
@@ -229,7 +230,7 @@ S_sprintf_is_multiconcatable(pTHX_ OP *o,struct sprintf_ismc_info *info)
  * away with OPpTARGET_MY set on the OP_STRINGIFY or OP_CONCAT.
  */
 
-STATIC void
+static void
 S_maybe_multiconcat(pTHX_ OP *o)
 {
     OP *lastkidop;   /* the right-most of any kids unshifted onto o */
@@ -754,7 +755,9 @@ S_maybe_multiconcat(pTHX_ OP *o)
         lastkidop = cLISTOPx(topop)->op_last;
         kid = cUNOPx(topop)->op_first; /* pushmark */
         op_null(kid);
-        op_null(OpSIBLING(kid));       /* const */
+        OP * const const_op = OpSIBLING(kid);
+        ASSUME(const_op);
+        op_null(const_op);       /* const */
         if (o != topop) {
             kid = op_sibling_splice(topop, NULL, -1, NULL); /* cut all args */
             op_sibling_splice(o, NULL, 0, kid); /* and attach to o */
@@ -1064,12 +1067,12 @@ S_warn_implicit_snail_cvsig(pTHX_ OP *o)
  * to optimise any children.
  */
 
-STATIC void
+static void
 S_optimize_op(pTHX_ OP* o)
 {
-    OP *top_op = o;
-
     PERL_ARGS_ASSERT_OPTIMIZE_OP;
+
+    OP *top_op = o;
 
     while (1) {
         OP * next_kid = NULL;
@@ -1210,11 +1213,12 @@ For now it's static, but it may be exposed to the API in the future.
 =cut
 */
 
-STATIC OP*
-S_traverse_op_tree(pTHX_ OP *top, OP *o) {
-    OP *sib;
-
+static OP*
+S_traverse_op_tree(pTHX_ OP *top, OP *o)
+{
     PERL_ARGS_ASSERT_TRAVERSE_OP_TREE;
+
+    OP *sib;
 
     if ((o->op_flags & OPf_KIDS) && cUNOPo->op_first) {
         return cUNOPo->op_first;
@@ -1236,11 +1240,12 @@ S_traverse_op_tree(pTHX_ OP *top, OP *o) {
     }
 }
 
-STATIC void
+static void
 S_finalize_op(pTHX_ OP* o)
 {
-    OP * const top = o;
     PERL_ARGS_ASSERT_FINALIZE_OP;
+
+    OP * const top = o;
 
     do {
         assert(o->op_type != OP_FREED);
@@ -1909,7 +1914,7 @@ S_aassign_scan(pTHX_ OP* o, bool rhs, int *scalars_p)
  * OPpHINT_STRICT_REFS) as found in any rv2av/hv skipped by the caller.
  */
 
-STATIC void
+static void
 S_maybe_multideref(pTHX_ OP *start, OP *orig_o, UV orig_action, U8 hints)
 {
     int pass;
@@ -2205,14 +2210,14 @@ S_maybe_multideref(pTHX_ OP *start, OP *orig_o, UV orig_action, U8 hints)
             /* if a custom array/hash access checker is in scope,
              * abandon optimisation attempt */
             if (  (o->op_type == OP_AELEM || o->op_type == OP_HELEM)
-               && PL_check[o->op_type] != Perl_ck_null)
+               && UNLIKELY(PL_check[o->op_type] != PL_check[PERL_CK_NULL]))
                 return;
             /* similarly for customised exists and delete */
             if (  (o->op_type == OP_EXISTS)
-               && PL_check[o->op_type] != Perl_ck_exists)
+               && UNLIKELY(PL_check[o->op_type] != PL_check[PERL_CK_EXISTS]))
                 return;
             if (  (o->op_type == OP_DELETE)
-               && PL_check[o->op_type] != Perl_ck_delete)
+               && UNLIKELY(PL_check[o->op_type] != PL_check[PERL_CK_DELETE]))
                 return;
 
             if (   o->op_type != OP_AELEM
@@ -2703,6 +2708,8 @@ S_check_for_bool_cxt(OP*o, bool safe_and, U8 bool_flag, U8 maybe_flag)
 void
 Perl_rpeep(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_RPEEP;
+
     OP* oldop = NULL;
     OP* oldoldop = NULL;
     OP** defer_queue[MAX_DEFERRED] = { NULL }; /* small queue of deferred branches */
@@ -3580,14 +3587,150 @@ Perl_rpeep(pTHX_ OP *o)
                 o->op_next = cLOGOPx(o->op_next)->op_other;
             }
             DEFER(cLOGOP->op_other);
-            o->op_opt = 1;
             break;
 
         case OP_GREPWHILE:
             if ((o->op_flags & OPf_WANT) == OPf_WANT_SCALAR)
                 S_check_for_bool_cxt(o, 1, OPpTRUEBOOL, 0);
-            /* FALLTHROUGH */
+            goto generic_logop;
+
         case OP_COND_EXPR:
+            {
+                /* A cond_expr op will usually have three children (all of
+                 * which are sub-trees):
+                 *     cond_expr
+                 *         -condition-
+                 *         -true-
+                 *         -false-
+                 *  with op_other pointing to the start op within the
+                 *  true subtree and op_next to the start op within the
+                 *  false subtree.
+                 *
+                 *  The code in this block looks for stub subtrees
+                 *  (either a single stub op, or far more likely,
+                 *  a stub op as part of an empty scope or entry/leave
+                 *  subtree). If found, the subtree is deleted (so the
+                 *  cond_expr only has two children) and the
+                 *  op_next/op_other as appropriate is made to point to
+                 *  the op following the cond_expr op.
+                 */
+
+                OP *stub = cLOGOP->op_other;
+                OP *trueop  = OpSIBLING( cLOGOP->op_first );
+                OP *falseop = OpSIBLING(trueop);
+
+                /* Is there an empty "if" block or ternary true branch?
+                   If so, optimise away the OP_STUB if safe to do so. */
+                if (   stub->op_type == OP_STUB
+                    && ((stub->op_flags & OPf_WANT) != OPf_WANT_SCALAR)
+                    && (
+                            /* bare stub */
+                            (stub == trueop)
+                            /* stub in scope/enter */
+                        || (   OP_TYPE_IS(trueop, OP_SCOPE)
+                            && stub == cUNOPx(trueop)->op_first
+                               /* doesn't yet handle trailing nulls */
+                            && !OpSIBLING(stub)
+                            )
+                        )
+                ) {
+                        assert(!(stub->op_flags & OPf_KIDS));
+                        cLOGOP->op_other = trueop->op_next;
+                        op_sibling_splice(o, cLOGOP->op_first, 1, NULL);
+                        op_free(trueop);
+                        goto generic_logop;
+                }
+
+                /* Is there an empty "else" block or ternary false branch?
+                   If so, optimise away the OP_STUB if safe to do so. */
+                stub = o->op_next;
+                if ((stub->op_flags & OPf_WANT) != OPf_WANT_SCALAR) {
+                    if (stub->op_type == OP_STUB && !OpSIBLING(stub) ){
+                        OP *stubsib = OpSIBLING(stub);
+                        if ((stub == falseop) && !stubsib) {
+                            /*     cond_expr
+                             *         -condition-
+                             *         - if -
+                             *         stub
+                             */
+                            assert(!(stub->op_flags & OPf_KIDS));
+                            o->op_flags |= OPf_SPECIAL; /* For B::Deparse */
+                            o->op_next = stub->op_next;
+                            op_sibling_splice(o, OpSIBLING(cLOGOP->op_first), 1, NULL);
+                            op_free(stub);
+                    } else { /* Unexpected */ }
+                } else if (OP_TYPE_IS(stub,OP_ENTER) &&
+                               OP_TYPE_IS(falseop, OP_LEAVE)) {
+                        OP *enter = stub;
+                        OP *stub = OpSIBLING(enter);
+                        if (stub && OP_TYPE_IS(stub, OP_STUB) ){
+                            assert(!(stub->op_flags & OPf_KIDS));
+                            OP *stubsib = OpSIBLING(stub);
+                            assert(stubsib);
+                            if (OP_TYPE_IS(stubsib, OP_NULL) &&
+                                !OpSIBLING(stubsib) &&
+                                !(stubsib->op_flags & OPf_KIDS) ) {
+                                    /*     cond_expr
+                                     *         -condition-
+                                     *         - if -
+                                     *         leave
+                                     *             enter
+                                     *             stub
+                                     *             null
+                                     */
+                            /* Ignoring it for now, pending further exploration.*/
+                            /*
+                                o->op_flags |= OPf_SPECIAL; // For B::Deparse
+                                o->op_next = falseop->op_next;
+                                op_sibling_splice(o, OpSIBLING(cLOGOP->op_first), 1, NULL);
+                                op_free(enter);
+                                op_free(stub);
+                                op_free(stubsib);
+                                op_free(falseop);
+                             */
+                            }
+                        }
+                    }
+                }
+
+                goto generic_logop;
+            }
+
+        case OP_ENTERTRY:
+            assert(cLOGOPo->op_other->op_type == OP_LEAVETRY);
+            goto generic_logop;
+
+        case OP_ENTERTRYCATCH:
+            /* catch body is the ->op_other of the OP_CATCH */
+            assert(cLOGOPo->op_other->op_type == OP_CATCH);
+            goto generic_logop;
+
+        /* these LOGOPs' op_other always go to a known op which has alrady
+         * been processed and so don't need to run the peephole optimiser
+         * on it. They are included here for completeness.
+         * If any of the asserts fail then this assumption should be
+         * reconsidered.
+         * */
+
+        case OP_SUBSTCONT:
+            assert(cLOGOPo->op_other->op_type == OP_SUBST);
+            break;
+
+        case OP_REGCOMP:
+            assert((PL_opargs[cLOGOPo->op_other->op_type] & OA_CLASS_MASK)
+                    == OA_PMOP);
+            break;
+
+        case OP_ENTERGIVEN:
+            assert(cLOGOPo->op_other->op_type == OP_LEAVEGIVEN);
+            break;
+
+        case OP_ENTERWHEN:
+            assert(cLOGOPo->op_other->op_type == OP_LEAVEWHEN);
+            break;
+
+        /* general LOGOPs */
+
         case OP_MAPWHILE:
         case OP_ANDASSIGN:
         case OP_ORASSIGN:
@@ -3595,6 +3738,20 @@ Perl_rpeep(pTHX_ OP *o)
         case OP_RANGE:
         case OP_ONCE:
         case OP_ARGDEFELEM:
+        case OP_PARAMTEST:
+        case OP_HELEMEXISTSOR:
+        case OP_ANYWHILE:
+        case OP_CATCH:
+
+        generic_logop:
+
+            /* Handle the stuff generically needed for all LOGOPs:
+             * in particular, process op_other: strip nulls and
+             * run the peephole optimiser on it.
+             *
+             * Note that some LOGOPs, such as OP_AND, do their own
+             * specialised handling and never reach here.
+             */
             while (cLOGOP->op_other->op_type == OP_NULL)
                 cLOGOP->op_other = cLOGOP->op_other->op_next;
             DEFER(cLOGOP->op_other);
@@ -3612,17 +3769,6 @@ Perl_rpeep(pTHX_ OP *o)
              * loop, so we have to explicitly follow the op_lastop to
              * process the rest of the code */
             DEFER(cLOOP->op_lastop);
-            break;
-
-        case OP_ENTERTRY:
-            assert(cLOGOPo->op_other->op_type == OP_LEAVETRY);
-            DEFER(cLOGOPo->op_other);
-            break;
-
-        case OP_ENTERTRYCATCH:
-            assert(cLOGOPo->op_other->op_type == OP_CATCH);
-            /* catch body is the ->op_other of the OP_CATCH */
-            DEFER(cLOGOPx(cLOGOPo->op_other)->op_other);
             break;
 
         case OP_SUBST:
@@ -4283,6 +4429,8 @@ Perl_rpeep(pTHX_ OP *o)
 void
 Perl_peep(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_PEEP;
+
     CALL_RPEEP(o);
 }
 

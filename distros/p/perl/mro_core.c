@@ -38,12 +38,13 @@ SV *
 Perl_mro_get_private_data(pTHX_ struct mro_meta *const smeta,
                           const struct mro_alg *const which)
 {
-    SV **data;
     PERL_ARGS_ASSERT_MRO_GET_PRIVATE_DATA;
 
-    data = (SV **)Perl_hv_common(aTHX_ smeta->mro_linear_all, NULL,
-                                 which->name, which->length, which->kflags,
-                                 HV_FETCH_JUST_SV, NULL, which->hash);
+    SV **data;
+
+    data = (SV **)hv_common(smeta->mro_linear_all, NULL,
+                            which->name, which->length, which->kflags,
+                            HV_FETCH_JUST_SV, NULL, which->hash);
     if (!data)
         return NULL;
 
@@ -92,9 +93,10 @@ Perl_mro_set_private_data(pTHX_ struct mro_meta *const smeta,
         smeta->mro_linear_current = data;
     }
 
-    if (!Perl_hv_common(aTHX_ smeta->mro_linear_all, NULL,
-                        which->name, which->length, which->kflags,
-                        HV_FETCH_ISSTORE, data, which->hash)) {
+    if (!hv_common(smeta->mro_linear_all, NULL,
+                   which->name, which->length, which->kflags,
+                   HV_FETCH_ISSTORE, data, which->hash))
+    {
         croak("panic: hv_store() failed in set_mro_private_data() "
                    "for '%.*s' %d", (int) which->length, which->name,
                    which->kflags);
@@ -113,13 +115,14 @@ registered.  See L</C<mro_register>>.
 */
 
 const struct mro_alg *
-Perl_mro_get_from_name(pTHX_ SV *name) {
-    SV **data;
-
+Perl_mro_get_from_name(pTHX_ SV *name)
+{
     PERL_ARGS_ASSERT_MRO_GET_FROM_NAME;
 
-    data = (SV **)Perl_hv_common(aTHX_ PL_registered_mros, name, NULL, 0, 0,
-                                 HV_FETCH_JUST_SV, NULL, 0);
+    SV **data;
+
+    data = (SV **)hv_common(PL_registered_mros, name, NULL, 0, 0,
+                            HV_FETCH_JUST_SV, NULL, 0);
     if (!data)
         return NULL;
     assert(SvTYPE(*data) == SVt_IV);
@@ -142,9 +145,10 @@ Perl_mro_register(pTHX_ const struct mro_alg *mro) {
     PERL_ARGS_ASSERT_MRO_REGISTER;
 
 
-    if (!Perl_hv_common(aTHX_ PL_registered_mros, NULL,
-                        mro->name, mro->length, mro->kflags,
-                        HV_FETCH_ISSTORE, wrapper, mro->hash)) {
+    if (!hv_common(PL_registered_mros, NULL,
+                   mro->name, mro->length, mro->kflags,
+                   HV_FETCH_ISSTORE, wrapper, mro->hash))
+    {
         SvREFCNT_dec_NN(wrapper);
         croak("panic: hv_store() failed in mro_register() "
                    "for '%.*s' %d", (int) mro->length, mro->name, mro->kflags);
@@ -154,9 +158,10 @@ Perl_mro_register(pTHX_ const struct mro_alg *mro) {
 struct mro_meta*
 Perl_mro_meta_init(pTHX_ HV* stash)
 {
+    PERL_ARGS_ASSERT_MRO_META_INIT;
+
     struct mro_meta* newmeta;
 
-    PERL_ARGS_ASSERT_MRO_META_INIT;
     PERL_UNUSED_CONTEXT;
     assert(HvAUX(stash));
     assert(!(HvAUX(stash)->xhv_mro_meta));
@@ -175,9 +180,9 @@ Perl_mro_meta_init(pTHX_ HV* stash)
 struct mro_meta*
 Perl_mro_meta_dup(pTHX_ struct mro_meta* smeta, CLONE_PARAMS* param)
 {
-    struct mro_meta* newmeta;
-
     PERL_ARGS_ASSERT_MRO_META_DUP;
+
+    struct mro_meta* newmeta;
 
     Newx(newmeta, 1, struct mro_meta);
     Copy(smeta, newmeta, 1, struct mro_meta);
@@ -232,6 +237,8 @@ invalidated).
 static AV*
 S_mro_get_linear_isa_dfs(pTHX_ HV *stash, U32 level)
 {
+    PERL_ARGS_ASSERT_MRO_GET_LINEAR_ISA_DFS;
+
     AV* retval;
     GV** gvp;
     GV* gv;
@@ -241,7 +248,6 @@ S_mro_get_linear_isa_dfs(pTHX_ HV *stash, U32 level)
     SV *our_name;
     HV *stored = NULL;
 
-    PERL_ARGS_ASSERT_MRO_GET_LINEAR_ISA_DFS;
     assert(HvAUX(stash));
 
     stashhek
@@ -413,10 +419,11 @@ invalidated).
 AV*
 Perl_mro_get_linear_isa(pTHX_ HV *stash)
 {
+    PERL_ARGS_ASSERT_MRO_GET_LINEAR_ISA;
+
     struct mro_meta* meta;
     AV *isa;
 
-    PERL_ARGS_ASSERT_MRO_GET_LINEAR_ISA;
     if(!HvHasAUX(stash))
         croak("Can't linearize anonymous symbol table");
 
@@ -505,6 +512,8 @@ by the C<setisa> magic, should not need to invoke directly.
 void
 Perl_mro_isa_changed_in(pTHX_ HV* stash)
 {
+    PERL_ARGS_ASSERT_MRO_ISA_CHANGED_IN;
+
     HV* isarev;
     AV* linear_mro;
     HE* iter;
@@ -517,8 +526,6 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
     const HEK * const stashhek = HvENAME_HEK(stash);
     const char * const stashname = HvENAME_get(stash);
     const STRLEN stashname_len = HvENAMELEN_get(stash);
-
-    PERL_ARGS_ASSERT_MRO_ISA_CHANGED_IN;
 
     if(!stashname)
         croak("Can't call mro_isa_changed_in() on anonymous symbol table");
@@ -701,14 +708,14 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
 /* Deletes name from all the isarev entries listed in isa.
    Don't call this if isa is already empty. */
-STATIC void
+static void
 S_mro_clean_isarev(pTHX_ HV * const isa, const char * const name,
                          const STRLEN len, HV * const exceptions, U32 hash,
                          U32 flags)
 {
-    HE* iter;
-
     PERL_ARGS_ASSERT_MRO_CLEAN_ISAREV;
+
+    HE* iter;
 
     assert(HvTOTALKEYS(isa));
     /* Delete our name from our former parents' isarevs. */
@@ -757,13 +764,14 @@ void
 Perl_mro_package_moved(pTHX_ HV * const stash, HV * const oldstash,
                        const GV * const gv, U32 flags)
 {
+    PERL_ARGS_ASSERT_MRO_PACKAGE_MOVED;
+
     SV *namesv;
     HEK **namep;
     I32 name_count;
     HV *stashes;
     HE* iter;
 
-    PERL_ARGS_ASSERT_MRO_PACKAGE_MOVED;
     assert(stash || oldstash);
 
     /* Determine the name(s) of the location that stash was assigned to
@@ -897,10 +905,12 @@ Perl_mro_package_moved(pTHX_ HV * const stash, HV * const oldstash,
     }
 }
 
-STATIC void
+static void
 S_mro_gather_and_rename(pTHX_ HV * const stashes, HV * const seen_stashes,
                               HV *stash, HV *oldstash, SV *namesv)
 {
+    PERL_ARGS_ASSERT_MRO_GATHER_AND_RENAME;
+
     XPVHV* xhv;
     HE *entry;
     I32 riter = -1;
@@ -910,8 +920,6 @@ S_mro_gather_and_rename(pTHX_ HV * const stashes, HV * const seen_stashes,
     HV *seen = NULL;
     HV *isarev = NULL;
     SV **svp = NULL;
-
-    PERL_ARGS_ASSERT_MRO_GATHER_AND_RENAME;
 
     /* We use the seen_stashes hash to keep track of which packages have
        been encountered so far. This must be separate from the main list of
@@ -933,12 +941,11 @@ S_mro_gather_and_rename(pTHX_ HV * const stashes, HV * const seen_stashes,
     if(oldstash) {
         /* Add to the big list. */
         struct mro_meta * meta;
-        HE * const entry
-         = (HE *)
-             hv_common(
-              seen_stashes, NULL, (const char *)&oldstash, sizeof(HV *), 0,
-              HV_FETCH_LVALUE|HV_FETCH_EMPTY_HE, NULL, 0
-             );
+        HE * const entry =
+            (HE *) hv_common(
+                  seen_stashes, NULL, (const char *)&oldstash, sizeof(HV *),
+                  0, HV_FETCH_LVALUE|HV_FETCH_EMPTY_HE, NULL, 0
+            );
         if(HeVAL(entry) == &PL_sv_undef || HeVAL(entry) == &PL_sv_yes) {
             oldstash = NULL;
             goto check_stash;
@@ -972,8 +979,8 @@ S_mro_gather_and_rename(pTHX_ HV * const stashes, HV * const seen_stashes,
                 STRLEN len;
                 const char *name = SvPVx_const(*svp, len);
                 if(PL_stashcache) {
-                    DEBUG_o(Perl_deb(aTHX_ "mro_gather_and_rename clearing PL_stashcache for '%" SVf "'\n",
-                                     SVfARG(*svp)));
+                    DEBUG_o(deb("mro_gather_and_rename clearing PL_stashcache"
+                                " for '%" SVf "'\n", SVfARG(*svp)));
                     (void)hv_delete_ent(PL_stashcache, *svp, G_DISCARD, 0);
                 }
                 hv_ename_delete(oldstash, name, len, name_utf8);
@@ -1034,8 +1041,8 @@ S_mro_gather_and_rename(pTHX_ HV * const stashes, HV * const seen_stashes,
         entry
          = (HE *)
              hv_common(
-              seen_stashes, NULL, (const char *)&stash, sizeof(HV *), 0,
-              HV_FETCH_LVALUE|HV_FETCH_EMPTY_HE, NULL, 0
+                  seen_stashes, NULL, (const char *)&stash, sizeof(HV *), 0,
+                  HV_FETCH_LVALUE|HV_FETCH_EMPTY_HE, NULL, 0
              );
         if(HeVAL(entry) == &PL_sv_yes || HeVAL(entry) == &PL_sv_no)
             stash = NULL;
@@ -1395,9 +1402,9 @@ Croaks if C<name> hasn't been registered
 void
 Perl_mro_set_mro(pTHX_ struct mro_meta *const meta, SV *const name)
 {
-    const struct mro_alg *const which = Perl_mro_get_from_name(aTHX_ name);
-
     PERL_ARGS_ASSERT_MRO_SET_MRO;
+
+    const struct mro_alg *const which = Perl_mro_get_from_name(aTHX_ name);
 
     if (!which)
         croak("Invalid mro name: '%" SVf "'", name);
@@ -1427,6 +1434,8 @@ XS(XS_mro_method_changed_in);
 void
 Perl_boot_core_mro(pTHX)
 {
+    PERL_ARGS_ASSERT_BOOT_CORE_MRO;
+
     static const char file[] = __FILE__;
 
     Perl_mro_register(aTHX_ &dfs_alg);

@@ -1,0 +1,13 @@
+{
+  "Permissions": "Permissions",
+  "Permissions list": "Liste des permissions",
+  "Add a permission": "Ajouter une permission",
+  "Add permission": "Ajouter permission",
+  "Edit permission": "Modifier permission",
+  "Delete permission": "Supprimer permission",
+  "Permission saved successfully": "Permission enregistrée avec succès",
+  "Are you sure you want to delete this permission?": "Êtes-vous sûr de vouloir supprimer cette permission ?",
+  "Code": "Code",
+  "Description": "Description",
+  "Select permissions": "Sélectionner des permissions"
+}

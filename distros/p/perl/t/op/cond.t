@@ -27,5 +27,24 @@ is( !$x ? 0 : 1, 1, 'run time, false');
     is $@, "", "SEGV in Perl_scalar";
 }
 
+# [GH #22866] The OP_STUB associated with an empty list should not
+# be optimised away if it's in scalar context (as it pushes PL_sv_undef
+# to the stack. In that event, these cases will trigger an assert under
+# DEBUGGING builds.
+
+{
+    my $x;
+    $x = ( $x ) ? "JAPH" : ();
+    $x = ( $x ) ? () : "JAPH";
+}
+
+# [GH #18576] OP_ENTER not having the correct context can cause
+# inappropriate optimisation behaviour.
+
+{
+    my $y = do { if (0) { 5 } elsif (0) { 6 } };
+    ok(defined($y), 'False elsif conditional returns condition, not undef');
+    ok($y == 0, 'False elsif conditional returns correct condition value');
+}
 
 done_testing();

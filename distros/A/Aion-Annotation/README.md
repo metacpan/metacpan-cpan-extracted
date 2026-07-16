@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-annotation/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-annotation/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Annotation.svg)](https://metacpan.org/release/Aion-Annotation) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-annotation/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Annotation+0.0.3)
+[![Actions Status](https://github.com/darviarush/perl-aion-annotation/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-annotation/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-annotation?logo=perl)](https://github.com/darviarush/perl-aion-annotation/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Annotation.svg)](https://metacpan.org/release/Aion-Annotation) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-annotation/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Annotation+0.1.0)
 # NAME
 
 Aion::Annotation - обрабатывает аннотации в модулях perl
 
 # VERSION
 
-0.0.3
+0.1.0
 
 # SYNOPSIS
 
@@ -52,7 +52,7 @@ $modules_mtime[0] # ~> ^For::Test=\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d$
 
 `Aion::Annotation` сканирует модули perl в каталоге **lib** и распечатывает их в соответстующие файлы в каталоге **etc/annotation**.
 
-Сменить **lib** можно через конфиг `LIB`, **etc/annotation** через конфиг `INI`, а **var/cache** через конфиг `CACHE`.
+Сменить **lib** можно через энвайрэнментом `AION_ANNOTATION_LIB`, **etc/annotation** через конфиг `AION_ANNOTATION_INI`, а **var/cache** через конфиг `AION_ANNOTATION_CACHE`.
 
 1. В **modules.mtime.ini** хранятся времена последнего обновления модулей.
 2. В **remarks.ini** сохраняются комментарии к подпрограммам, свойствам и пакетам.
@@ -62,7 +62,7 @@ $modules_mtime[0] # ~> ^For::Test=\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d$
 
 ## scan ()
 
-Сканирует кодовую базу задаваемую конфигом `LIB` (перечень каталогов, по умолчанию `["lib"]`). И достаёт все аннотации и комментарии и распечатывает их в соответстующие файлы в каталоге `INI` (по умолчанию "etc/annotation").
+Сканирует кодовую базу задаваемую конфигом `AION_ANNOTATION_LIB` (перечень каталогов через `:`, по умолчанию `lib`). И достаёт все аннотации и комментарии и распечатывает их в соответстующие файлы в каталоге `AION_ANNOTATION_INI` (по умолчанию "etc/annotation").
 
 # AUTHOR
 

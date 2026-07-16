@@ -444,17 +444,17 @@ Wrap a formbuilder object around it and generate HTML form field controls:
 
     use Valiant::HTML::Util::Form;
 
-    my $f = Valiant::HTML::Util::Form->new()
+    my $f = Valiant::HTML::Util::Form->new(view => $view);
     my $person = Local::Person->new(first_name=>'J', last_name=>'Napiorkowski');
     $person->validate;
 
-    $f->form_for($person, sub($fb, $person) {
+    $f->form_for($person, sub($view, $fb, $person) {
       return  $fb->label('first_name'),
               $fb->input('first_name'),
               $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
               $fb->label('last_name'),
               $fb->input('last_name'),
-              $fb->errors_for('last_name'+{ class=>'invalid-feedback' });
+              $fb->errors_for('last_name', +{ class=>'invalid-feedback' });
     });
 
 Generates something like:
@@ -467,16 +467,24 @@ Generates something like:
       <input id="person_last_name" name="person.last_name" type="text" value="Napiorkowski"/>
     </form>
 
+The required C<view> is an object providing C<safe>, C<raw>, C<escape_html> and
+C<safe_concat> -- normally the template system instance you are rendering
+inside (a L<Template::EmbeddedPerl> object works directly). Use the SAME
+object that renders your page: safe-string marking is class-based, so mixing
+one template system's safe strings into another's output HTML-escapes them a
+second time. The content block receives three arguments -- the view, the
+formbuilder, and the model -- as shown throughout these examples.
+
 Alternatively you can create a form object and then render it later:
 
     my $form = $f->form_for($person);
-    $form->render(sub($fb, $person) {
+    $form->render(sub($view, $fb, $person) {
       return  $fb->label('first_name'),
               $fb->input('first_name'),
               $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
               $fb->label('last_name'),
               $fb->input('last_name'),
-              $fb->errors_for('last_name'+{ class=>'invalid-feedback' });
+              $fb->errors_for('last_name', +{ class=>'invalid-feedback' });
     });
 
 Would return the same output.
@@ -661,7 +669,7 @@ The following public instance methods are provided by this class.
 Canonical xample.  C<$person> is either an object or the name of an attribute on the C<$view> that
 will supply the object.
 
-    $f->form_for($person, sub($fb, $person) {
+    $f->form_for($person, sub($view, $fb, $person) {
       return  $fb->label('name'),
               $fb->input('name');
     });
@@ -788,11 +796,11 @@ You can also provide a string as the first argument to this method and it will b
 overall scope of the formbuilder.  This is useful if you want to use the same formbuilder for
 multiple models.  For example:
 
-    $f->form_for('person', sub($fb, $person) {
+    $f->form_for('person', sub($view, $fb, $person) {
       $fb->input('name');
     });
 
-    $f->form_for('address', sub($fb, $address) {
+    $f->form_for('address', sub($view, $fb, $address) {
       $fb->input('street');
     });
 
@@ -813,7 +821,7 @@ the model data.
 
 Example:
 
-    $f->form_for('foo', $person, sub($fb, $person) {
+    $f->form_for('foo', $person, sub($view, $fb, $person) {
       return  $fb->label('name'),
               $fb->input('name');
     });

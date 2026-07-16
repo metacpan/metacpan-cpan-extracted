@@ -18,6 +18,8 @@ use feature 'state';
 my %known_bad_locales = (   # XXX eventually will need version info if and
                             # when these get fixed.
     solaris => [ 'vi_VN.UTF-8', ],  # Use of U+A8 segfaults: GH #20578
+    cygwin => [ 'bs_BA', 'uz_UZ', ], # As of v5.44 and gcc 14.4.
+                   # See http://nntp.perl.org/group/perl.perl5.porters/271040 
 );
 
 eval { require POSIX; POSIX->import('locale_h'); };
@@ -220,6 +222,9 @@ sub _trylocale ($$$$) { # For use only by other functions in this file!
 
         my $cur_result = setlocale($category, $locale);
         return unless defined $cur_result;
+
+        # Use filename not return value to survive trip through LC_* environment variables
+        $cur_result = $locale if $^O eq 'VMS';
 
         no locale;
 
@@ -568,8 +573,10 @@ sub find_locales ($;$) {
         # Other subversive stuff.
         delete local @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 
-        if (-x "/usr/bin/locale"
-            && open(LOCALES, '-|', "/usr/bin/locale -a 2>/dev/null"))
+        my $locale_cmd = "/usr/bin/locale";
+        $locale_cmd = "/bin/locale" unless -x $locale_cmd;
+        if (   -x $locale_cmd
+            && open(LOCALES, '-|', "$locale_cmd -a 2>/dev/null"))
         {
             while (<LOCALES>) {
 

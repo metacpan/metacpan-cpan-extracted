@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 0.0.2-prealpha
+# 0.0.3
 # 
 # # SYNOPSIS
 # 
@@ -52,7 +52,7 @@ local ($::_g0 = do {\@param}, $::_e0 = do {['For::Test#xyz,12=Int $a', 'For::Tes
 # 
 # `Aion::Annotation` сканирует модули perl в каталоге **lib** и распечатывает их в соответстующие файлы в каталоге **etc/annotation**.
 # 
-# Сменить **lib** можно через конфиг `LIB`, а **etc/annotation** через конфиг `INI`.
+# Сменить **lib** можно через энвайрэнментом `AION_ANNOTATION_LIB`, **etc/annotation** через конфиг `AION_ANNOTATION_INI`, а **var/cache** через конфиг `AION_ANNOTATION_CACHE`.
 # 
 # 1. В **modules.mtime.ini** хранятся времена последнего обновления модулей.
 # 2. В **remarks.ini** сохраняются комментарии к подпрограммам, свойствам и пакетам.
@@ -62,7 +62,7 @@ local ($::_g0 = do {\@param}, $::_e0 = do {['For::Test#xyz,12=Int $a', 'For::Tes
 # 
 # ## scan ()
 # 
-# Сканирует кодовую базу задаваемую конфигом `LIB` (перечень каталогов, по умолчанию `["lib"]`). И достаёт все аннотации и комментарии и распечатывает их в соответстующие файлы в каталоге `INI` (по умолчанию "etc/annotation").
+# Сканирует кодовую базу задаваемую конфигом `AION_ANNOTATION_LIB` (перечень каталогов через `:`, по умолчанию `lib`). И достаёт все аннотации и комментарии и распечатывает их в соответстующие файлы в каталоге `AION_ANNOTATION_INI` (по умолчанию "etc/annotation").
 # 
 # # AUTHOR
 # 

@@ -19,7 +19,7 @@
 # you wish to remove yourself. If you wish to register a new email
 # against one of these names you should update the .mailmap file
 # instead.
--- 
+--
 A. C. Yardley                  <yardley@tanet.net>
 A. Sinan Unur                  <nanis@cpan.org>
 Aaron B. Dossett               <aaron@iglou.com>
@@ -74,6 +74,7 @@ Alexander Gernler              <alexander_gernler@genua.de>
 Alexander Gough                <alex-p5p@earth.li>
 Alexander Hartmaier            <abraxxa@cpan.org>
 Alexander Kanavin              <alex@linutronix.de>
+Alexander Karelas              <karjala@cpan.org>
 Alexander Klimov               <ask@wisdom.weizmann.ac.il>
 Alexander Nikolov              <sasho648@gmail.com>
 Alexander Smishlajev           <als@turnhere.com>
@@ -275,6 +276,7 @@ Chris Lamb                     <lamby@debian.org>
 Chris Lightfoot                <chris@ex-parrot.com>
 Chris Nandor                   <pudge@pobox.com>
 Chris Pepper
+Chris Prather                  <chris@prather.org>
 Chris R. Donnelly              <chris.donnelly@vauto.com>
 Chris Travers                  <chris.travers@gmail.com>
 Chris Tubutis                  <chris@broadband.att.com>
@@ -349,6 +351,7 @@ Daniel Muiño                   <dmuino@afip.gov.ar>
 Daniel P. Berrange             <dan@berrange.com>
 Daniel Perrett                 <perrettdl@googlemail.com>
 Daniel S. Lewart               <lewart@uiuc.edu>
+Daniel Tang                    <danielzgtg.opensource@gmail.com>
 Daniel Yacob                   <perl@geez.org>
 danielnachun                   <daniel.nachun@gmail.com>
 Danny R. Faught                <faught@mailhost.rsn.hp.com>
@@ -360,7 +363,7 @@ Darrell Schiebel               <drs@nrao.edu>
 Darren/Torin/Who Ever...       <torin@daft.com>
 Dave Bailey
 Dave Bianchi
-Dave Cross                     <dave@mag-sol.com>
+Dave Cross                     <dave@perlhacks.com>
 Dave Hartnoll                  <Dave_Hartnoll@3b2.com>
 Dave Lambley                   <dave@lambley.me.uk>
 Dave Liney                     <dave.liney@gbr.conoco.com>
@@ -420,6 +423,7 @@ DH                             <crazyinsomniac@yahoo.com>
 Diab Jerius                    <dj@head-cfa.harvard.edu>
 dLux                           <dlux@spam.sch.bme.hu>
 Dmitri Tikhonov                <dmitri@cpan.org>
+Dmitrii Kuvaiskii              <dimakuv@amazon.de>
 Dmitry Karasik                 <dk@tetsuo.karasik.eu.org>
 Dmitry Ulanov                  <zprogd@gmail.com>
 Dominic Dunlop                 <domo@computer.org>
@@ -471,7 +475,7 @@ Erik                           <erik@cs.uni-jena.de>
 Erik Huelsmann                 <ehuels@gmail.com>
 Eryq                           <eryq@zeegee.com>
 Etienne Grossman               <etienne@isr.isr.ist.utl.pt>
-Eugen Konkov                   <kes-kes@yandex.ru>
+Eugen Konkov
 Eugene Alterman                <Eugene.Alterman@bremer-inc.com>
 Eugene Alvin Villar            <seav80@gmail.com>
 Evan Miller                    <eam@frap.net>
@@ -597,6 +601,7 @@ Ian Phillipps                  <Ian.Phillipps@iname.com>
 Ichinose Shogo                 <shogo82148@gmail.com>
 Ignasi Roca Carrió             <ignasi.roca@fujitsu-siemens.com>
 Igor Sutton                    <izut@cpan.org>
+Igor Todorovski                <itodorov@ca.ibm.com>
 Igor Zaytsev                   <igor.zaytsev@gmail.com>
 Ilmari Karonen                 <iltzu@sci.fi>
 Ilya Martynov                  <ilya@martynov.org>
@@ -629,7 +634,8 @@ James                          <james@rf.net>
 James A. Duncan                <jduncan@fotango.com>
 James Bence
 James Clarke                   <jrtc27@jrtc27.com>
-James E Keenan                 <jkeenan@cpan.org>
+James Cook                     <falsifian@falsifian.org>
+James E Keenan                 <jamesekeenan@yahoo.com>
 James FitzGibbon               <james@ican.net>
 James Jurach                   <muaddib@erf.net>
 James Mastros                  <james@mastros.biz>
@@ -778,6 +784,7 @@ juna                           <ggl.20.jj...@spamgourmet.com>
 Jungshik Shin                  <jshin@mailaps.org>
 Justin Banks                   <justinb@cray.com>
 Justin Case
+Jörg Thomas                    <zebster@spr.at>
 Jörg Walter                    <jwalt@cpan.org>
 Ka-Ping Yee                    <kpyee@aw.sgi.com>
 kafka                          <kafka@madrognon.net>
@@ -936,6 +943,7 @@ Marty Pauley                   <marty+p5p@kasei.com>
 Martyn Pearce                  <martyn@inpharmatica.co.uk>
 Marvin Humphrey                <marvin@rectangular.com>
 Masahiro Honma                 <hira.tara@gmail.com>
+Masahiro Iuchi                 <masahiro.iuchi@gmail.com>
 Masahiro KAJIURA               <masahiro.kajiura@toshiba.co.jp>
 Mashrab Kuvatov                <kmashrab@uni-bremen.de>
 Mathias Kende                  <mathias@cpan.org>
@@ -964,6 +972,7 @@ Mattia Barbon                  <mattia@barbon.org>
 Maurizio Loreti                <maurizio.loreti@pd.infn.it>
 Max Baker                      <max@warped.org>
 Max Maischein                  <corion@corion.net>
+Maxim Vuets                    <maxim.vuets@gmail.com>
 Maxwell Carey                  <maxwellhaydn@gmail.com>
 Merijn Broeren                 <merijnb@iloquent.nl>
 Michael A Chase                <mchase@ix.netcom.com>
@@ -1216,7 +1225,7 @@ Rob Napier                     <rnapier@employees.org>
 Robert May                     <robertmay@cpan.org>
 Robert Millan                  <rmh@debian.org>
 Robert Partington              <rjp@riffraff.plig.net>
-Robert Rothenberg              <rrwo@cpan.org>
+Robert Rothenberg              <perl@rhizomnic.com>
 Robert Sanders                 <Robert.Sanders@linux.org>
 Robert Sebastian Gerus         <arachnist@gmail.com>
 Robert Spier                   <rspier@pobox.com>
@@ -1241,6 +1250,7 @@ Russ Allbery                   <eagle@eyrie.org>
 Russel O'Connor                <roconnor@world.std.com>
 Russell Fulton                 <russell@ccu1.auckland.ac.nz>
 Russell Mosemann               <mose@ccsn.edu>
+Ryan Carsten Schmidt           <git@ryandesign.com>
 Ryan Herbert                   <rherbert@sycamorehq.com>
 Ryan Voots                     <simcop2387@simcop2387.info>
 Salvador Fandiño               <sfandino@yahoo.com>
@@ -1251,6 +1261,7 @@ Sam Vilain                     <sam@vilain.net>
 Samanta Navarro                <ferivoz@riseup.net>
 Samuel Smith                   <esaym@cpan.org>
 Samuel Thibault                <sthibault@debian.org>
+Samuel Young                   <samyoung12788@gmail.com>
 Samuli Kärkkäinen              <skarkkai@woods.iki.fi>
 Santtu Ojanperä                <santtuojanpera98@gmail.com>
 Sascha Blank
@@ -1306,8 +1317,10 @@ Solar Designer                 <solar@openwall.com>
 Spider Boardman                <spider@orb.nashua.nh.us>
 Spiros Denaxas                 <s.denaxas@gmail.com>
 Sreeji K Das                   <sreeji_k@yahoo.com>
+Stan Ulbrych                   <89152624+StanFromIreland@users.noreply.github.com>
 Stanislaw Pusep                <stas@sysd.org>
 Stas Bekman                    <stas@stason.org>
+Stefan Adams                   <s1037989@gmail.com>
 Stefan Seifert                 <nine@detonation.org>
 Steffen Müller                 <smueller@cpan.org>
 Steffen Schwigon               <ss5@renormalist.net>

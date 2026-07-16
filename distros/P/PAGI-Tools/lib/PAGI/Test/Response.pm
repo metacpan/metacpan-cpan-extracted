@@ -1,5 +1,5 @@
 package PAGI::Test::Response;
-$PAGI::Test::Response::VERSION = '0.002001';
+$PAGI::Test::Response::VERSION = '0.002002';
 use strict;
 use warnings;
 use Carp 'croak';

@@ -154,32 +154,32 @@ for (split //, "tTB") {
 }
 
 SKIP: {
-	skip("Could not open file: $!", 2) unless $canopen;
-	isa_ok(File::stat::stat('STAT'), 'File::stat',
-	       '... should be able to find filehandle');
+    skip("Could not open file: $!", 2) unless $canopen;
+    isa_ok(File::stat::stat('STAT'), 'File::stat',
+           '... should be able to find filehandle');
 
-	package foo;
-	local *STAT = *main::STAT;
-	my $stat2 = File::stat::stat('STAT');
-	main::isa_ok($stat2, 'File::stat',
-		     '... and filehandle in another package');
-	close STAT;
+    package foo;
+    local *STAT = *main::STAT;
+    my $stat2 = File::stat::stat('STAT');
+    main::isa_ok($stat2, 'File::stat',
+             '... and filehandle in another package');
+    close STAT;
 
-#	VOS open() updates atime; ignore this error (posix-975).
-	my $stat3 = $stat2;
-	if ($^O eq 'vos') {
-		$$stat3[8] = $$stat[8];
-	}
+#   VOS open() updates atime; ignore this error (posix-975).
+    my $stat3 = $stat2;
+    if ($^O eq 'vos') {
+        $$stat3[8] = $$stat[8];
+    }
 
-	main::skip("Win32: different stat-info on filehandle", 1) if $^O eq 'MSWin32';
+    main::skip("Win32: different stat-info on filehandle", 1) if $^O eq 'MSWin32';
 
-	main::skip("OS/2: inode number is not constant on os/2", 1) if $^O eq 'os2';
+    main::skip("OS/2: inode number is not constant on os/2", 1) if $^O eq 'os2';
 
-	main::is_deeply($stat, $stat3, '... and must match normal stat');
+    main::is_deeply($stat, $stat3, '... and must match normal stat');
 }
 
 SKIP:
-{   # RT #111638
+{   # RT #111638 / GH #11992
     skip "We can't check for FIFOs", 2 unless defined &Fcntl::S_ISFIFO;
     skip "No pipes", 2 unless defined $Config{d_pipe};
     pipe my ($rh, $wh)
@@ -189,6 +189,68 @@ SKIP:
     my $pstat = File::stat::stat($rh);
     ok(!-p($stat), "-p should be false on a file");
     ok(-p($pstat), "check -p detects a pipe");
+}
+
+{
+    # GH #23507
+    {
+        package PathObj;
+        use overload
+            '""'     => sub { $_[0]->to_string },
+            fallback => 1;
+
+        sub new {
+            my $class = shift;
+            bless { path => $_[0] }, $class
+        }
+
+        sub to_string {
+            my $self = shift;
+            $self->{path}
+        }
+    }
+
+    my $good_path = PathObj->new($file);
+    my $bad_path  = PathObj->new('/ no such file');
+
+    # explicit stringification
+    isa_ok stat("$good_path"), 'File::stat', 'stat("$good_path")';
+    is stat("$bad_path"), undef, 'stat("$bad_path") fails by returning undef';
+    # implicit stringification
+    isa_ok stat($good_path), 'File::stat', 'stat($good_path)';
+    is stat($bad_path), undef, 'stat($bad_path) fails by returning undef';
+    # and for good measure, unblessed references
+    is stat(\42), undef, 'stat(\42) fails by returning undef';
+    is stat([]), undef, 'stat([]) fails by returning undef';
+    is stat({}), undef, 'stat({}) fails by returning undef';
+}
+
+{
+    # list context
+
+    my @ret = stat '/ no such file';
+    is scalar(@ret), 1, 'stat returns one value in list context on failure';
+    is $ret[0], undef, 'stat returns undef on failure';
+
+    @ret = stat $file;
+    is scalar(@ret), 1, 'stat returns one value in list context on success';
+    isa_ok $ret[0], 'File::stat', 'successful stat in list context';
+}
+
+{
+    # implicit $_
+    $_ = $file;
+    my $st_1 = stat;
+    isa_ok $st_1, 'File::stat', 'stat()';
+
+    # reuse stat buffer
+    my $st_2 = stat \*_;
+    isa_ok $st_2, 'File::stat', 'stat(\\*_)';
+    # we can't verify directly that no actual stat() was done, but we can check
+    # that the returned device/inode match those of $file even though *_{IO}
+    # (the actual _ handle) was never opened
+    is $st_1->dev, $st_2->dev, 'stat(\\*_)->dev matches that of last stat()';
+    is $st_1->ino, $st_2->ino, 'stat(\\*_)->ino matches that of last stat()';
 }
 
 # Testing pretty much anything else is unportable.

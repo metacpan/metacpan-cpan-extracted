@@ -1,5 +1,5 @@
 package PAGI::Middleware::ETag;
-$PAGI::Middleware::ETag::VERSION = '0.002001';
+$PAGI::Middleware::ETag::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

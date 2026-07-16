@@ -1,5 +1,9 @@
 Revision history for Eshu
 
+0.09    2026-07-15
+        - include/dirent_win.h: add missing MSVC compat header providing
+          opendir/readdir/closedir via FindFirstFile/FindNextFile/FindClose.
+
 0.08    2026-07-12
         - Add include_dir() class method so sibling modules can resolve the
           Eshu include directory without copying headers.

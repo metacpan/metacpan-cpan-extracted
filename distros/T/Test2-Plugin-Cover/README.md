@@ -11,16 +11,10 @@ Every time a subroutine is called this tool will do its best to find the
 filename the subroutine was defined in, and add it to a list. Also, anytime you
 attempt to open a file with `open()` or `sysopen()` the file will be added to
 the list. This list will be attached to a test2 event just before the test
-exits. In most formaters the event will only show up as a comment on STDOUT
+exits. In most formatters the event will only show up as a comment on STDOUT
 ` # This test covered N source files. `. However tools such as
 [Test2::Harness::UI](https://metacpan.org/pod/Test2%3A%3AHarness%3A%3AUI) can make full use of the coverage information contained
 in the event.
-
-## NOTE: SYSOPEN HOOK DISABLED
-
-The sysopen hook is currently disabled because of an unknown segv error on some
-platforms. I am not certain if it will be enabled again. calls to subs, and
-calls to open are still hooked.
 
 # INTENDED USE CASE
 
@@ -53,11 +47,41 @@ it. `eval`, XS, Moose, and other magic can sometimes mask the filename, this
 module only makes a minimal attempt to find the filename in these cases.
 
 Originally this module only collected the filenames touched by a test. Now in
-addition to that data it can give you seperate lists of files where subs were
+addition to that data it can give you separate lists of files where subs were
 called, and files that were touched via open(). Additionally the sub list
 includes the info about what subs were called. In all of these cases it is also
-possible to know what secgtions of your test called the subs or opened the
+possible to know what sections of your test called the subs or opened the
 files.
+
+## THINGS THAT WILL NOT SHOW UP
+
+- goto
+
+    `goto &sub` does not enter the sub the normal way, the target sub (and its
+    file, if different) will not be recorded. The sub doing the `goto` is
+    recorded normally.
+
+- constants
+
+    Constants created with `use constant`, and any other subs inlined at compile
+    time, never trigger a runtime sub call, so the file defining them will not be
+    recorded unless something else in it is called.
+
+- XS subs
+
+    XS subs have no perl source file. Calls to them are recorded against the file
+    of the next perl statement that executes, which is usually the caller's file.
+
+- threads
+
+    Coverage data is collected per-thread and is not merged. Data collected inside
+    spawned ithreads is lost unless you merge it yourself.
+
+- exotic open() forms
+
+    Only 2 and 3 argument `open()` calls are recorded. The list form for piping
+    to programs (`open($fh, '-|', $prog, @args)`) and 1-arg `open()` are
+    ignored.
 
 ## REAL EXAMPLES
 
@@ -112,7 +136,7 @@ For yath:
 
 ## SUPPRESS REPORT
 
-You can suppess the final report (only collect data, do not send the Test2
+You can suppress the final report (only collect data, do not send the Test2
 event)
 
 CLI:
@@ -127,10 +151,10 @@ INLINE:
 
 If you use a system like [Test::Class](https://metacpan.org/pod/Test%3A%3AClass), [Test::Class::Moose](https://metacpan.org/pod/Test%3A%3AClass%3A%3AMoose), or
 [Test2::Tools::Spec](https://metacpan.org/pod/Test2%3A%3ATools%3A%3ASpec) then you divide your tests into subtests (or similar). In
-these cases it would be nice to track what subtest (or equivelent) touched what
+these cases it would be nice to track what subtest (or equivalent) touched what
 files.
 
-There are 3 methods telated to this, `set_from()`, `get_from()`, and
+There are 3 methods related to this, `set_from()`, `get_from()`, and
 `clear_from()` which you can use to manage this meta-data:
 
     subtest foo => sub {
@@ -146,7 +170,7 @@ There are 3 methods telated to this, `set_from()`, `get_from()`, and
 
 Doing this manually for all blocks is not ideal, ideally you would hook your
 tool, such as [Test::Class](https://metacpan.org/pod/Test%3A%3AClass) to call `set_from()` and `clear_from()` for you.
-Adding such a hook is left as an exercide to the reader, and if you make one
+Adding such a hook is left as an exercise to the reader, and if you make one
 for a popular tool please upload it to cpan and add a ticket or send an email
 for me to link to it here.
 
@@ -180,6 +204,8 @@ Please see the `set_from()` documentation for details on values.
 
     This is the same as calling `$class->touch_source_file($file, '<>')`.
 
+    Both touch methods are no-ops while coverage is disabled, see `disable()`.
+
 - $class->enable()
 - $class->disable()
 - $bool = $class->enabled()
@@ -201,6 +227,12 @@ Please see the `set_from()` documentation for details on values.
     Set a 'from' value. This can be anything, a string, a hashref, etc. Be advised
     though that it will usually be serialized to JSON, so make sure anything you
     put in it will be serializable as json.
+
+    If the value is, or contains, a CODE or GLOB reference it cannot be
+    serialized into the final report, so a warning will be issued and the value
+    will be ignored (the previous 'from' value stays in effect). This is not
+    fatal because enabling coverage should never introduce new exceptions into
+    the code being observed.
 
 - $class->clear\_from()
 
@@ -245,7 +277,7 @@ Please see the `set_from()` documentation for details on values.
     passed to a test given a set of 'from' values to instruct the test to run the
     necessary parts/subtests/groups/methods/etc.
 
-    The 'argv' data will be prepended befor any other arguments provided to the
+    The 'argv' data will be prepended before any other arguments provided to the
     test.
 
     The 'env' hashref will be merged with any other env vars needed, with these
@@ -261,8 +293,35 @@ Please see the `set_from()` documentation for details on values.
     The list of files will be sorted alphabetically, and duplicates will be
     removed.
 
-    If a root path is provided it **MUST** be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance. This path
-    will be used to filter out any files not under the root directory.
+    If a root path is provided it may be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance or a plain
+    string. This path will be used to filter out any files not under the root
+    directory.
+
+    The running test file (`$0`) and this plugin's own file are always excluded
+    from the results.
+
+- $hashref = $class->data()
+- $hashref = $class->data(root => $path)
+
+    This returns the processed coverage data that goes into the report event:
+
+        {
+            # Files where subs were called
+            'lib/Foo.pm' => {
+                some_sub => [ list of 'from' values that called it ],
+
+                # Called BEGIN/END/etc blocks, or subs whose name could not be
+                # determined, fall under '*'.
+                '*' => [ ... ],
+            },
+
+            # Files opened with open()/sysopen(), or touched as data files
+            'data.json' => { '<>' => [ ... ] },
+        }
+
+    Duplicate 'from' values are removed (compared by content, not reference), and
+    each list is sorted deterministically. The `root` parameter behaves as it
+    does in `files()`.
 
 - $event = $class->report(%options)
 
@@ -275,7 +334,7 @@ Please see the `set_from()` documentation for details on values.
 
         Normally this is set to the current directory at module load-time. This is used
         to filter out any source files that do not live under the current directory.
-        This **MUST** be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance, passing a string will not work.
+        This may be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance or a plain string.
 
     - verbose => $BOOL
 
@@ -310,8 +369,8 @@ Please see the `set_from()` documentation for details on values.
     testing. You may return a modified filename if you wish to normalize it here,
     the default implementation will turn it into a relative path.
 
-    If you provide a custom `root` parameter, it **MUST** be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny)
-    instance, passing a string will not work.
+    If you provide a custom `root` parameter, it may be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance
+    or a plain string.
 
     A custom filter callback should look something like this:
 
@@ -361,6 +420,22 @@ Please see the `set_from()` documentation for details on values.
             # Cannot find a file here
             return;
         }
+
+# TRACING OPENS
+
+For debugging you can ask the plugin to record where every `open()` and
+`sysopen()` call happened:
+
+    $Test2::Plugin::Cover::TRACE_OPENS = 1;
+
+Every recorded open will push an arrayref onto
+`@Test2::Plugin::Cover::OPENS`:
+
+    [$filename, $file, $line, $package]
+
+Where `$filename` is what was being opened, and `$file`, `$line` and
+`$package` describe the code doing the open. This is a debugging aid only,
+the data is not included in coverage events.
 
 # SEE ALSO
 

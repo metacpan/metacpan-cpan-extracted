@@ -11,7 +11,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 144;
+plan tests => 142;
 
 $a = {};
 bless $a, "Bob";
@@ -195,25 +195,6 @@ ok ! UNIVERSAL::isa("\xff\xff\xff\0", 'HASH');
 my $x = {}; bless $x, 'X';
 ok $x->isa('UNIVERSAL');
 ok $x->isa('UNIVERSAL');
-
-
-{
-    my $err;
-    $SIG{__WARN__}= sub { die $_[0] };
-    eval { Some::Package->import("bar") };
-    my $err = $@;
-    $err=~s!t/op!op!;
-    is $err, "Attempt to call undefined import method with arguments (\"bar\")"
-           . " via package \"Some::Package\" (Perhaps you forgot to load"
-           . " the package?) at op/universal.t line 203.\n";
-    eval { Some::Package->unimport(1.234) };
-    $err = $@;
-    $err=~s!t/op!op!;
-    is $err, "Attempt to call undefined unimport method with arguments (\"1.234\")"
-           . " via package \"Some::Package\" (Perhaps you forgot to load"
-           . " the package?) at op/universal.t line 209.\n";
-
-}
 
 # This segfaulted in a blead.
 fresh_perl_is('package Foo; Foo->VERSION;  print "ok"', 'ok');

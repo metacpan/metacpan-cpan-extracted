@@ -18,7 +18,7 @@ our %CHECKS = (
   even                      => sub { $_[0] % 2 ? 0:1 },
   odd                       => sub { $_[0] % 2 ? 1:0 },
   divisible_by              => sub { $_[0] % $_[1] ? 0:1 },
-  decimals                  => sub { length(($_[0] =~ /\.(\d*)/)[0]) == $_[1] ? 1:0  },
+  decimals                  => sub { length((($_[0] =~ /\.(\d*)/)[0]) // '') == $_[1] ? 1:0  },
   is_integer                => sub { $_[0]=~/\A-?[0-9]+\z/ }, # Taken from Types::Standard
   is_number                 => sub {
                               my $val = shift;
@@ -68,12 +68,12 @@ around BUILDARGS => sub {
     }
 
     if($integer eq 'pg_serial') {
-      $args->{greater_than_or_equal_to} = 0;
-      $args->{less_than_or_equal_to} = 0;
+      $args->{greater_than_or_equal_to} = 1;
+      $args->{less_than_or_equal_to} = 2147483647;
       $args->{message} = _t("pg_serial_err") unless defined $args->{message};
     }
     if($integer eq 'pg_bigserial') {
-      $args->{greater_than_or_equal_to} = 2147483647;
+      $args->{greater_than_or_equal_to} = 1;
       $args->{less_than_or_equal_to} = 9223372036854775807;
       $args->{message} = _t("pg_bigserial_err") unless defined $args->{message};
     }
@@ -187,7 +187,7 @@ Valiant::Validator::Numericality - Validate numeric attributes
 
     validates equals => (numericality => [5, 100]);
 
-    my $object = Local::Test::Numericality->new(age=>8, equal=>40);
+    my $object = Local::Test::Numericality->new(age=>8, equals=>40);
     $object->validate;
 
     warn $object->errors->_dump;
@@ -241,32 +241,32 @@ also set it to the following to get more limited integer types:
 
 =item greater_than
 
-Accepts numeric value or coderef.  Returns error message tag V<greater_than> if
+Accepts numeric value or coderef.  Returns error message tag C<greater_than_err> if
 the attribute value isn't greater.
 
 =item greater_than_or_equal_to
 
-Accepts numeric value or coderef.  Returns error message tag V<greater_than_or_equal_to_err> if
+Accepts numeric value or coderef.  Returns error message tag C<greater_than_or_equal_to_err> if
 the attribute value isn't equal or greater.
 
 =item equal_to
 
-Accepts numeric value or coderef.  Returns error message tag V<equal_to_err> if
+Accepts numeric value or coderef.  Returns error message tag C<equal_to_err> if
 the attribute value isn't equal.
 
 =item other_than
 
-Accepts numeric value or coderef.  Returns error message tag V<other_than_err> if
+Accepts numeric value or coderef.  Returns error message tag C<other_than_err> if
 the attribute value isn't different.
 
 =item less_than
 
-Accepts numeric value or coderef.  Returns error message tag V<less_than_err> if
+Accepts numeric value or coderef.  Returns error message tag C<less_than_err> if
 the attribute value isn't less than.
 
 =item less_than_or_equal_to
 
-Accepts numeric value or coderef.  Returns error message tag V<less_than_or_equal_to_err> if
+Accepts numeric value or coderef.  Returns error message tag C<less_than_or_equal_to_err> if
 the attribute value isn't less than or equal.
 
 =item between
@@ -276,12 +276,12 @@ second is an inclusive upper number bound.
 
 =item even
 
-Accepts numeric value or coderef.  Returns error message tag V<even_err> if
+Accepts numeric value or coderef.  Returns error message tag C<even_err> if
 the attribute value isn't an even number.
 
 =item odd
 
-Accepts numeric value or coderef.  Returns error message tag V<odd_err> if
+Accepts numeric value or coderef.  Returns error message tag C<odd_err> if
 the attribute value isn't an odd number.
 
 =item divisible_by
@@ -293,7 +293,7 @@ divisible value was 4 that woule be false and generate an error message.
 
 =item decimals
 
-Accepts numeric value or coderef.  Returns error message tag V<decimals_err> if
+Accepts numeric value or coderef.  Returns error message tag C<decimals_err> if
 the attribute value doesn't contain exactly the requird number of places after
 the decimal point.
 
@@ -306,6 +306,17 @@ A number greater or equal to zero
 A number less than zero
 
 =back
+
+=head2 Cross-attribute comparison
+
+Any comparison constraint value may be a coderef instead of a constant.  The
+coderef receives the object being validated as its first argument, so you can
+compare one attribute against another.  Valiant ships no separate C<comparison>
+validator because this covers the need:
+
+    validates max_price => (
+      numericality => { greater_than_or_equal_to => sub { shift->min_price } },
+    );
 
 =head1 SHORTCUT FORM
 

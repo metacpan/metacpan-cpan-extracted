@@ -1,5 +1,42 @@
 Revision history for RPi-OLED-SSD1306-128_64
 
+3.1802    2026-07-16
+    - Makefile.PL's minimum wiringPi version now comes from RPi::Const's
+      WIRINGPI_MIN_VERSION (literal 3.18 fallback when RPi::Const isn't
+      installed at configure time), replacing the stale hardcoded 2.36;
+      RPi::Const 1.07 added to PREREQ_PM; DESCRIPTION POD updated to 3.18+
+      and points at the canonical constant
+    - Added TECHNICAL INFORMATION POD (DEVICE SPECIFICS, COMMAND SET, ON THE
+      WIRE, DATASHEET): panel capabilities, wiring, the control/data byte
+      framing with the full init command sequence, and the exact I2C frames
+      the bundled C layer produces, verified against the SSD1306 datasheet
+    - Bundled the datasheet as docs/datasheet/SSD1306.pdf and repointed the
+      DATASHEET POD section at it instead of the web URL
+    - Optimised ssd1306_display() (ssd1306_i2c.c): the framebuffer now streams
+      out in ONE I2C transaction (a single 0x40 control byte then all 1024
+      data bytes) instead of a control+data pair per byte (~1024
+      transactions). Measured on a 128x64 panel at 100kHz: ~325ms -> ~94ms per
+      refresh (3.4x; now bus-bound). Falls back to the byte-by-byte path if an
+      adapter caps the single transfer. ON THE WIRE POD updated to match
+    - Replaced the inline wiringPi presence/version guard in Makefile.PL with
+      the family-canonical RPi::Const::BuildCheck::wiringpi_build_check() (via
+      CONFIGURE_REQUIRES); the minimum still resolves to RPi::Const's
+      WIRINGPI_MIN_VERSION, now enforced from that single source
+    - new() no longer silently ignores its arguments when the singleton already
+      exists: a second new() with a different i2c address or splash setting now
+      warns (it still returns the live display, since those can't be re-applied)
+    - Added t/05-unit.t: HW-free coverage of the text_size/rect/pixel/dim/
+      invert_display bounds and integer croaks, plus the singleton behaviour
+    - Added t/10-live.t: an on-device smoke test (new/clear/text/string/rect/
+      pixel/display/invert/dim) gated on RPI_OLED, for a real SSD1306 panel
+    - Fixed a typo in pixel()'s Y-bound croak ("betwen" -> "between")
+    - Added clear_buffer(): zeroes the framebuffer and homes the cursor without
+      pushing to the panel (unlike clear(), which also calls display()), so a
+      caller can rebuild a whole frame and push it once with display() - a
+      flicker-free redraw for continuously-updating screens
+    - Added a SYNOPSIS to the POD (instantiation, text, drawing primitives, and
+      the flicker-free clear_buffer/string/display refresh loop)
+
 3.1801    2026-06-12
         - Makefile.PL's wiringPi presence/version checks can now be bypassed
           with RPI_DIST_RELEASE=1 so release tarballs can be cut on non-Pi

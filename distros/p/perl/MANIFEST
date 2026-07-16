@@ -61,11 +61,12 @@ keywords.h				The keyword numbers
 l1_char_class_tab.h			256 word bit table of character classes (for handy.h)
 locale.c				locale-specific utility functions
 locale_table.h				header for locale.c
+long_names.c				for use when NO_SHORT_NAMES is defined
 make_ext.pl				Used by Makefile to execute extension Makefiles
 make_patchnum.pl			Script to generate git_version.h and lib/Config_git.pl files for all OS'es
 makedef.pl				Create symbol export lists for linking
 makedepend.SH				Precursor to makedepend
-makedepend_file.SH			Precursor to makedepend_file
+makedependfile.SH			Precursor to makedependfile
 Makefile.SH				A script that generates Makefile
 malloc.c				A version of malloc you might not want
 malloc_ctl.h				A version of malloc you might not want
@@ -489,6 +490,8 @@ cpan/Config-Perl-V/t/43_plv53710rcs.t	Config::Perl::V
 cpan/Config-Perl-V/t/44_plv5380tqm.t	Config::Perl::V
 cpan/Config-Perl-V/t/45_plv5400tqm.t	Config::Perl::V
 cpan/Config-Perl-V/t/46_plv5411tqmrcs.t	Config::Perl::V
+cpan/Config-Perl-V/t/47_plv5420tqm.t	Config-Perl-V
+cpan/Config-Perl-V/t/48_plv5437.t	Config-Perl-V
 cpan/Config-Perl-V/V.pm			Config::Perl::V
 cpan/CPAN/lib/App/Cpan.pm				helper package for CPAN.pm
 cpan/CPAN/lib/CPAN.pm					Interface to Comprehensive Perl Archive Network
@@ -542,110 +545,110 @@ cpan/CPAN/t/03pkgs.t					See if CPAN::Version works
 cpan/CPAN/t/10version.t					See if CPAN the module works
 cpan/CPAN/t/11mirroredby.t				See if CPAN::Mirrored::By works
 cpan/CPAN/t/32pushyhttps.t				Test file related to CPAN
-cpan/CPAN-Meta/corpus/BadMETA.yml
-cpan/CPAN-Meta/corpus/bareyaml.meta
-cpan/CPAN-Meta/corpus/CL018_yaml.meta
-cpan/CPAN-Meta/corpus/json.meta
-cpan/CPAN-Meta/corpus/META-VR.json
-cpan/CPAN-Meta/corpus/META-VR.yml
-cpan/CPAN-Meta/corpus/yaml.meta
-cpan/CPAN-Meta/lib/CPAN/Meta.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/Converter.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/Feature.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/History.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_0.pod
-cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_1.pod
-cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_2.pod
-cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_3.pod
-cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_4.pod
-cpan/CPAN-Meta/lib/CPAN/Meta/Merge.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/Prereqs.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/Spec.pm
-cpan/CPAN-Meta/lib/CPAN/Meta/Validator.pm
-cpan/CPAN-Meta/lib/Parse/CPAN/Meta.pm
-cpan/CPAN-Meta/t/converter.t
-cpan/CPAN-Meta/t/converter-bad.t
-cpan/CPAN-Meta/t/converter-fail.t
-cpan/CPAN-Meta/t/converter-fragments.t
-cpan/CPAN-Meta/t/data-fail/META-1_0.yml
-cpan/CPAN-Meta/t/data-fail/META-1_1.yml
-cpan/CPAN-Meta/t/data-fail/META-1_2.yml
-cpan/CPAN-Meta/t/data-fail/META-1_3.yml
-cpan/CPAN-Meta/t/data-fail/META-1_4.yml
-cpan/CPAN-Meta/t/data-fail/META-2.json
-cpan/CPAN-Meta/t/data-fixable/107650337-META.yml
-cpan/CPAN-Meta/t/data-fixable/1598804075-META.yml
-cpan/CPAN-Meta/t/data-fixable/1927486199-META.yml
-cpan/CPAN-Meta/t/data-fixable/1985980974-META.yml
-cpan/CPAN-Meta/t/data-fixable/2031017050-META.yml
-cpan/CPAN-Meta/t/data-fixable/284247103-META.yml
-cpan/CPAN-Meta/t/data-fixable/344981821-META.yml
-cpan/CPAN-Meta/t/data-fixable/35478989-META.yml
-cpan/CPAN-Meta/t/data-fixable/98042513-META.yml
-cpan/CPAN-Meta/t/data-fixable/invalid-meta-spec-version.json
-cpan/CPAN-Meta/t/data-fixable/invalid-meta-spec-version.yml
-cpan/CPAN-Meta/t/data-fixable/META-1_2.yml
-cpan/CPAN-Meta/t/data-fixable/META-1_3.yml
-cpan/CPAN-Meta/t/data-fixable/META-1_4.yml
-cpan/CPAN-Meta/t/data-fixable/META-2.json
-cpan/CPAN-Meta/t/data-fixable/meta-spec-version-trailing-zeros.json
-cpan/CPAN-Meta/t/data-fixable/meta-spec-version-trailing-zeros.yml
-cpan/CPAN-Meta/t/data-fixable/restrictive-2.json
-cpan/CPAN-Meta/t/data-fixable/version-ranges-2.json
-cpan/CPAN-Meta/t/data-test/gpl-1_4.yml
-cpan/CPAN-Meta/t/data-test/META-1_0.yml
-cpan/CPAN-Meta/t/data-test/META-1_1.yml
-cpan/CPAN-Meta/t/data-test/META-1_2.yml
-cpan/CPAN-Meta/t/data-test/META-1_3.yml
-cpan/CPAN-Meta/t/data-test/META-1_4.yml
-cpan/CPAN-Meta/t/data-test/META-2.json
-cpan/CPAN-Meta/t/data-test/META-2.meta
-cpan/CPAN-Meta/t/data-test/preserve-release-status.yml
-cpan/CPAN-Meta/t/data-test/provides-version-missing.json
-cpan/CPAN-Meta/t/data-test/resources.yml
-cpan/CPAN-Meta/t/data-test/restricted-2.json
-cpan/CPAN-Meta/t/data-test/restrictive-1_4.yml
-cpan/CPAN-Meta/t/data-test/unicode.yml
-cpan/CPAN-Meta/t/data-test/version-not-normal.json
-cpan/CPAN-Meta/t/data-test/version-ranges-1_4.yml
-cpan/CPAN-Meta/t/data-test/version-ranges-2.json
-cpan/CPAN-Meta/t/data-test/x_deprecated-META.json
-cpan/CPAN-Meta/t/data-valid/1122575719-META.yml
-cpan/CPAN-Meta/t/data-valid/1206545041-META.yml
-cpan/CPAN-Meta/t/data-valid/1985684504-META.yml
-cpan/CPAN-Meta/t/data-valid/476602558-META.yml
-cpan/CPAN-Meta/t/data-valid/META-1_0.yml
-cpan/CPAN-Meta/t/data-valid/META-1_1.yml
-cpan/CPAN-Meta/t/data-valid/META-1_4.yml
-cpan/CPAN-Meta/t/data-valid/META-2.json
-cpan/CPAN-Meta/t/data-valid/scalar-meta-spec.yml
-cpan/CPAN-Meta/t/data-valid/x_deprecated-META.yml
-cpan/CPAN-Meta/t/lib/Parse/CPAN/Meta/Test.pm
-cpan/CPAN-Meta/t/load-bad.t
-cpan/CPAN-Meta/t/merge.t
-cpan/CPAN-Meta/t/meta-obj.t
-cpan/CPAN-Meta/t/no-index.t
-cpan/CPAN-Meta/t/optional_feature-merge.t
-cpan/CPAN-Meta/t/parse-cpan-meta/02_api.t
-cpan/CPAN-Meta/t/parse-cpan-meta/03_functions.t
-cpan/CPAN-Meta/t/parse-cpan-meta/04_export.t
-cpan/CPAN-Meta/t/parse-cpan-meta/05_errors.t
-cpan/CPAN-Meta/t/prereqs.t
-cpan/CPAN-Meta/t/prereqs-finalize.t
-cpan/CPAN-Meta/t/prereqs-merge.t
-cpan/CPAN-Meta/t/README-data.txt
-cpan/CPAN-Meta/t/repository.t
-cpan/CPAN-Meta/t/save-load.t
-cpan/CPAN-Meta/t/validator.t
-cpan/CPAN-Meta-Requirements/lib/CPAN/Meta/Requirements.pm
-cpan/CPAN-Meta-Requirements/lib/CPAN/Meta/Requirements/Range.pm
-cpan/CPAN-Meta-Requirements/t/accepts.t
-cpan/CPAN-Meta-Requirements/t/bad_version_hook.t
-cpan/CPAN-Meta-Requirements/t/basic.t
-cpan/CPAN-Meta-Requirements/t/finalize.t
-cpan/CPAN-Meta-Requirements/t/from-hash.t
-cpan/CPAN-Meta-Requirements/t/merge.t
-cpan/CPAN-Meta-Requirements/t/strings.t
+cpan/CPAN-Meta/corpus/BadMETA.yml					CPAN::Meta
+cpan/CPAN-Meta/corpus/bareyaml.meta					CPAN::Meta
+cpan/CPAN-Meta/corpus/CL018_yaml.meta					CPAN::Meta
+cpan/CPAN-Meta/corpus/json.meta						CPAN::Meta
+cpan/CPAN-Meta/corpus/META-VR.json					CPAN::Meta
+cpan/CPAN-Meta/corpus/META-VR.yml					CPAN::Meta
+cpan/CPAN-Meta/corpus/yaml.meta						CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta.pm						Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/Converter.pm				Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/Feature.pm					Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/History.pm					Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_0.pod			CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_1.pod			CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_2.pod			CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_3.pod			CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/History/Meta_1_4.pod			CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/Merge.pm					Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/Prereqs.pm					Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/Spec.pm					Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/CPAN/Meta/Validator.pm				Module related to CPAN::Meta
+cpan/CPAN-Meta/lib/Parse/CPAN/Meta.pm					Module related to CPAN::Meta
+cpan/CPAN-Meta/t/converter.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/converter-bad.t					Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/converter-fail.t					Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/converter-fragments.t					Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/data-fail/META-1_0.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-fail/META-1_1.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-fail/META-1_2.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-fail/META-1_3.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-fail/META-1_4.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-fail/META-2.json					CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/107650337-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/1598804075-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/1927486199-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/1985980974-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/2031017050-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/284247103-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/344981821-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/35478989-META.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/98042513-META.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/invalid-meta-spec-version.json		CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/invalid-meta-spec-version.yml		CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/META-1_2.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/META-1_3.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/META-1_4.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/META-2.json				CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/meta-spec-version-trailing-zeros.json	CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/meta-spec-version-trailing-zeros.yml	CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/restrictive-2.json			CPAN::Meta
+cpan/CPAN-Meta/t/data-fixable/version-ranges-2.json			CPAN::Meta
+cpan/CPAN-Meta/t/data-test/gpl-1_4.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-1_0.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-1_1.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-1_2.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-1_3.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-1_4.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-2.json					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/META-2.meta					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/preserve-release-status.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-test/provides-version-missing.json		CPAN::Meta
+cpan/CPAN-Meta/t/data-test/resources.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-test/restricted-2.json				CPAN::Meta
+cpan/CPAN-Meta/t/data-test/restrictive-1_4.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-test/unicode.yml					CPAN::Meta
+cpan/CPAN-Meta/t/data-test/version-not-normal.json			CPAN::Meta
+cpan/CPAN-Meta/t/data-test/version-ranges-1_4.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-test/version-ranges-2.json			CPAN::Meta
+cpan/CPAN-Meta/t/data-test/x_deprecated-META.json			CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/1122575719-META.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/1206545041-META.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/1985684504-META.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/476602558-META.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/META-1_0.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/META-1_1.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/META-1_4.yml				CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/META-2.json					CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/scalar-meta-spec.yml			CPAN::Meta
+cpan/CPAN-Meta/t/data-valid/x_deprecated-META.yml			CPAN::Meta
+cpan/CPAN-Meta/t/lib/Parse/CPAN/Meta/Test.pm				Module related to CPAN::Meta
+cpan/CPAN-Meta/t/load-bad.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/merge.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/meta-obj.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/no-index.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/optional_feature-merge.t				Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/parse-cpan-meta/02_api.t				Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/parse-cpan-meta/03_functions.t				Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/parse-cpan-meta/04_export.t				Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/parse-cpan-meta/05_errors.t				Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/prereqs.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/prereqs-finalize.t					Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/prereqs-merge.t					Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/README-data.txt					Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/repository.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/save-load.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta/t/validator.t						Test file related to CPAN::Meta
+cpan/CPAN-Meta-Requirements/lib/CPAN/Meta/Requirements.pm	Module related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/lib/CPAN/Meta/Requirements/Range.pm	Module related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/accepts.t				Test file related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/bad_version_hook.t		Test file related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/basic.t				Test file related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/finalize.t			Test file related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/from-hash.t			Test file related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/merge.t				Test file related to CPAN::Meta::Requirements
+cpan/CPAN-Meta-Requirements/t/strings.t				Test file related to CPAN::Meta::Requirements
 cpan/CPAN-Meta-YAML/lib/CPAN/Meta/YAML.pm				CPAN-Meta-YAML files
 cpan/CPAN-Meta-YAML/t/01_api.t						Test file related to CPAN::Meta::YAML
 cpan/CPAN-Meta-YAML/t/01_compile.t					CPAN-Meta-YAML files
@@ -1111,7 +1114,7 @@ cpan/ExtUtils-MakeMaker/t/prereq.t						See if MakeMaker works
 cpan/ExtUtils-MakeMaker/t/prereq_print.t					See if PREREQ_PRINT works
 cpan/ExtUtils-MakeMaker/t/problems.t						How MakeMaker reacts to build problems
 cpan/ExtUtils-MakeMaker/t/prompt.t						See if E::MM::prompt() works
-cpan/ExtUtils-MakeMaker/t/rec_att_keys.t
+cpan/ExtUtils-MakeMaker/t/rec_att_keys.t					Test file related to ExtUtils::MakeMaker
 cpan/ExtUtils-MakeMaker/t/recurs.t						See if recursive builds work
 cpan/ExtUtils-MakeMaker/t/revision.t						See if $Revision is correct
 cpan/ExtUtils-MakeMaker/t/several_authors.t					See if multiple AUTHORs work
@@ -1132,7 +1135,7 @@ cpan/ExtUtils-PL2Bat/lib/ExtUtils/PL2Bat.pm	Implement pl2bat
 cpan/ExtUtils-PL2Bat/t/make_executable.t	Tests if ExtUtils::PL2Bat makes bat files that are executable
 cpan/File-Fetch/lib/File/Fetch.pm	File::Fetch
 cpan/File-Fetch/t/01_File-Fetch.t	File::Fetch tests
-cpan/File-Fetch/t/null_subclass.t
+cpan/File-Fetch/t/null_subclass.t	Test file related to File::Fetch
 cpan/File-Path/lib/File/Path.pm		Do things like 'mkdir -p' and 'rm -r'
 cpan/File-Path/t/FilePathTest.pm	See if File::Path works
 cpan/File-Path/t/Path.t			See if File::Path works
@@ -1154,9 +1157,9 @@ cpan/Filter-Util-Call/Call.pm			Filter::Util::Call extension module
 cpan/Filter-Util-Call/Call.xs			Filter::Util::Call extension external subroutines
 cpan/Filter-Util-Call/filter-util.pl		See if Filter::Util::Call works
 cpan/Filter-Util-Call/t/call.t			See if Filter::Util::Call works
-cpan/Filter-Util-Call/t/rt_101033.pm
-cpan/Filter-Util-Call/t/rt_101033.t
-cpan/Filter-Util-Call/t/rt_54452-rebless.t
+cpan/Filter-Util-Call/t/rt_101033.pm		Module related to Filter::Util::Call
+cpan/Filter-Util-Call/t/rt_101033.t		Test file related to Filter::Util::Call
+cpan/Filter-Util-Call/t/rt_54452-rebless.t	Test file related to Filter::Util::Call
 cpan/Getopt-Long/lib/Getopt/Long.pm		Fetch command options (GetOptions)
 cpan/Getopt-Long/lib/Getopt/Long/Parser.pm	Getopt-Long
 cpan/Getopt-Long/t/gol-basic.t			See if Getopt::Long works
@@ -1240,6 +1243,20 @@ cpan/HTTP-Tiny/corpus/redirect-07.txt	Test file related to HTTP::Tiny
 cpan/HTTP-Tiny/corpus/redirect-08.txt	Test file related to HTTP::Tiny
 cpan/HTTP-Tiny/corpus/redirect-09.txt	Test file related to HTTP::Tiny
 cpan/HTTP-Tiny/corpus/redirect-10.txt	Test file related to HTTP::Tiny
+cpan/HTTP-Tiny/corpus/redirect-11.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-12.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-13.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-14.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-15.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-16.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-17.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-18.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-19.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-20.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-21.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-22.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-23.txt	HTTP-Tiny
+cpan/HTTP-Tiny/corpus/redirect-24.txt	HTTP-Tiny
 cpan/HTTP-Tiny/corpus/snake-oil.crt	Test file related to HTTP::Tiny
 cpan/HTTP-Tiny/lib/HTTP/Tiny.pm		Module related to HTTP::Tiny
 cpan/HTTP-Tiny/t/000_load.t		Test file related to HTTP::Tiny
@@ -1413,6 +1430,8 @@ cpan/IO-Compress/t/files/jar.zip			IO-Compress
 cpan/IO-Compress/t/files/meta.xml			IO-Compress
 cpan/IO-Compress/t/files/test.ods			IO-Compress
 cpan/IO-Compress/t/files/testfile1.odt			IO-Compress
+cpan/IO-Compress/t/files/time-invalid.zip		IO-Compress
+cpan/IO-Compress/t/files/time-zero.zip			IO-Compress
 cpan/IO-Compress/t/globmapper.t				IO::Compress
 cpan/IO-Socket-IP/.editorconfig				IO-Socket-IP
 cpan/IO-Socket-IP/lib/IO/Socket/IP.pm			IO::Socket::IP
@@ -1718,22 +1737,22 @@ cpan/Module-Load-Conditional/t/to_load/NotX.pm			Module::Conditional tests
 cpan/Module-Load-Conditional/t/to_load/ToBeLoaded		Module::Conditional tests
 cpan/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
 cpan/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
-cpan/Module-Metadata/corpus/BOMTest/UTF16BE.pm
-cpan/Module-Metadata/corpus/BOMTest/UTF16LE.pm
-cpan/Module-Metadata/corpus/BOMTest/UTF8.pm
-cpan/Module-Metadata/lib/Module/Metadata.pm
-cpan/Module-Metadata/t/contains_pod.t
-cpan/Module-Metadata/t/encoding.t
-cpan/Module-Metadata/t/endpod.t
-cpan/Module-Metadata/t/extract-package.t
-cpan/Module-Metadata/t/extract-version.t
-cpan/Module-Metadata/t/lib/0_1/Foo.pm
-cpan/Module-Metadata/t/lib/0_2/Foo.pm
-cpan/Module-Metadata/t/lib/ENDPOD.pm
-cpan/Module-Metadata/t/lib/GeneratePackage.pm
-cpan/Module-Metadata/t/metadata.t
-cpan/Module-Metadata/t/taint.t
-cpan/Module-Metadata/t/version.t
+cpan/Module-Metadata/corpus/BOMTest/UTF16BE.pm	Module related to Module::Metadata
+cpan/Module-Metadata/corpus/BOMTest/UTF16LE.pm	Module related to Module::Metadata
+cpan/Module-Metadata/corpus/BOMTest/UTF8.pm	Module related to Module::Metadata
+cpan/Module-Metadata/lib/Module/Metadata.pm	Module related to Module::Metadata
+cpan/Module-Metadata/t/contains_pod.t		Test file related to Module::Metadata
+cpan/Module-Metadata/t/encoding.t		Test file related to Module::Metadata
+cpan/Module-Metadata/t/endpod.t			Test file related to Module::Metadata
+cpan/Module-Metadata/t/extract-package.t	Test file related to Module::Metadata
+cpan/Module-Metadata/t/extract-version.t	Test file related to Module::Metadata
+cpan/Module-Metadata/t/lib/0_1/Foo.pm		Module related to Module::Metadata
+cpan/Module-Metadata/t/lib/0_2/Foo.pm		Module related to Module::Metadata
+cpan/Module-Metadata/t/lib/ENDPOD.pm		Module related to Module::Metadata
+cpan/Module-Metadata/t/lib/GeneratePackage.pm	Module related to Module::Metadata
+cpan/Module-Metadata/t/metadata.t		Test file related to Module::Metadata
+cpan/Module-Metadata/t/taint.t			Test file related to Module::Metadata
+cpan/Module-Metadata/t/version.t		Test file related to Module::Metadata
 cpan/NEXT/lib/NEXT.pm				Pseudo-class NEXT for method redispatch
 cpan/NEXT/t/actual.t				NEXT
 cpan/NEXT/t/actuns.t				NEXT
@@ -1943,6 +1962,8 @@ cpan/Pod-Simple/t/fcodes.t				Pod::Simple test file
 cpan/Pod-Simple/t/fcodes_e.t				Pod::Simple test file
 cpan/Pod-Simple/t/fcodes_l.t				Pod::Simple test file
 cpan/Pod-Simple/t/fcodes_s.t				Pod::Simple test file
+cpan/Pod-Simple/t/filter.t				Pod-Simple
+cpan/Pod-Simple/t/filter-html.t				Pod-Simple
 cpan/Pod-Simple/t/for.t					Pod::Simple test file
 cpan/Pod-Simple/t/fornot.t				Pod::Simple test file
 cpan/Pod-Simple/t/github_issue_79.t			Test file related to Pod::Simple
@@ -2323,6 +2344,8 @@ cpan/Term-Table/t/Table.t			Term-Table
 cpan/Term-Table/t/Table/Cell.t			Term-Table
 cpan/Term-Table/t/Table/CellStack.t		Term-Table
 cpan/Term-Table/t/Table/LineBreak.t		Term-Table
+cpan/Term-Table/t/Term-ReadKey.t		Term-Table
+cpan/Term-Table/t/Term-Size-Any.t		Term-Table
 cpan/Test-Harness/bin/prove					The prove harness utility
 cpan/Test-Harness/lib/App/Prove.pm				Gubbins for the prove utility
 cpan/Test-Harness/lib/App/Prove/State.pm			Gubbins for the prove utility
@@ -2620,6 +2643,7 @@ cpan/Test-Simple/lib/Test2/EventFacet/Render.pm					Module related to Test::Simp
 cpan/Test-Simple/lib/Test2/EventFacet/Trace.pm					Module related to Test::Simple
 cpan/Test-Simple/lib/Test2/Formatter.pm						Module related to Test::Simple
 cpan/Test-Simple/lib/Test2/Formatter/TAP.pm					Module related to Test::Simple
+cpan/Test-Simple/lib/Test2/Handle.pm						Test-Simple
 cpan/Test-Simple/lib/Test2/Hub.pm						Module related to Test::Simple
 cpan/Test-Simple/lib/Test2/Hub/Interceptor.pm					Module related to Test::Simple
 cpan/Test-Simple/lib/Test2/Hub/Interceptor/Terminator.pm			Module related to Test::Simple
@@ -2717,6 +2741,9 @@ cpan/Test-Simple/lib/Test2/Util/Term.pm						Test-Simple
 cpan/Test-Simple/lib/Test2/Util/Times.pm					Test-Simple
 cpan/Test-Simple/lib/Test2/Util/Trace.pm					Module related to Test::Simple
 cpan/Test-Simple/lib/Test2/V0.pm						Test-Simple
+cpan/Test-Simple/lib/Test2/V1.pm						Test-Simple
+cpan/Test-Simple/lib/Test2/V1/Base.pm						Test-Simple
+cpan/Test-Simple/lib/Test2/V1/Handle.pm						Test-Simple
 cpan/Test-Simple/lib/Test2/Workflow.pm						Test-Simple
 cpan/Test-Simple/lib/Test2/Workflow/BlockBase.pm				Test-Simple
 cpan/Test-Simple/lib/Test2/Workflow/Build.pm					Test-Simple
@@ -2939,6 +2966,7 @@ cpan/Test-Simple/t/modules/Compare/Set.t					Test-Simple
 cpan/Test-Simple/t/modules/Compare/String.t					Test-Simple
 cpan/Test-Simple/t/modules/Compare/Undef.t					Test-Simple
 cpan/Test-Simple/t/modules/Compare/Wildcard.t					Test-Simple
+cpan/Test-Simple/t/modules/Handle.t						Test-Simple
 cpan/Test-Simple/t/modules/Mock.t						Test-Simple
 cpan/Test-Simple/t/modules/Plugin.t						Test-Simple
 cpan/Test-Simple/t/modules/Plugin/BailOnFail.t					Test-Simple
@@ -2995,6 +3023,9 @@ cpan/Test-Simple/t/modules/Util/Table/Cell.t					Test-Simple
 cpan/Test-Simple/t/modules/Util/Table/LineBreak.t				Test-Simple
 cpan/Test-Simple/t/modules/Util/Times.t						Test-Simple
 cpan/Test-Simple/t/modules/V0.t							Test-Simple
+cpan/Test-Simple/t/modules/V1.t							Test-Simple
+cpan/Test-Simple/t/modules/V1/Base.t						Test-Simple
+cpan/Test-Simple/t/modules/V1/Handle.t						Test-Simple
 cpan/Test-Simple/t/modules/Workflow.t						Test-Simple
 cpan/Test-Simple/t/modules/Workflow/BlockBase.t					Test-Simple
 cpan/Test-Simple/t/modules/Workflow/Build.t					Test-Simple
@@ -3163,23 +3194,25 @@ cpan/Tie-RefHash/t/storable.t		Test for Tie::RefHash with storable
 cpan/Tie-RefHash/t/threaded.t		Test for Tie::RefHash with threads
 cpan/Time-Local/lib/Time/Local.pm	Reverse translation of localtime, gmtime
 cpan/Time-Local/t/Local.t		See if Time::Local works
-cpan/Time-Piece/Piece.pm			Time::Piece extension
-cpan/Time-Piece/Piece.xs			Time::Piece extension
-cpan/Time-Piece/Seconds.pm			Time::Piece extension
-cpan/Time-Piece/t/01base.t			Test for Time::Piece
-cpan/Time-Piece/t/02core.t			Test for Time::Piece
-cpan/Time-Piece/t/02core_dst.t			Test file related to Time::Piece
-cpan/Time-Piece/t/03compare.t			Test for Time::Piece
-cpan/Time-Piece/t/04mjd.t			Test for Time::Piece
-cpan/Time-Piece/t/05overload.t			Test for Time::Piece
-cpan/Time-Piece/t/06large.t			Test file related to Time::Piece
-cpan/Time-Piece/t/06subclass.t			Test for Time::Piece
-cpan/Time-Piece/t/07arith.t			Test for Time::Piece
-cpan/Time-Piece/t/08truncate.t			Test file related to Time::Piece
-cpan/Time-Piece/t/09locales.t			Test file related to Time::Piece
-cpan/Time-Piece/t/10overload.t			Test file related to Time::Piece
-cpan/Time-Piece/t/99legacy.t			Test file related to Time::Piece
-cpan/Time-Piece/t/lib/Time/Piece/Twin.pm	Module related to Time::Piece
+cpan/Time-Piece/Piece.pm				Time::Piece extension
+cpan/Time-Piece/Piece.xs				Time::Piece extension
+cpan/Time-Piece/Seconds.pm				Time::Piece extension
+cpan/Time-Piece/t/01base.t				Test for Time::Piece
+cpan/Time-Piece/t/02core.t				Test for Time::Piece
+cpan/Time-Piece/t/02core_dst.t				Test file related to Time::Piece
+cpan/Time-Piece/t/03compare.t				Test for Time::Piece
+cpan/Time-Piece/t/04mjd.t				Test for Time::Piece
+cpan/Time-Piece/t/05overload.t				Test for Time::Piece
+cpan/Time-Piece/t/06large.t				Test file related to Time::Piece
+cpan/Time-Piece/t/06subclass.t				Test for Time::Piece
+cpan/Time-Piece/t/07arith.t				Test for Time::Piece
+cpan/Time-Piece/t/08truncate.t				Test file related to Time::Piece
+cpan/Time-Piece/t/09locales.t				Test file related to Time::Piece
+cpan/Time-Piece/t/10overload.t				Test file related to Time::Piece
+cpan/Time-Piece/t/11strptime_defaults.t			Time-Piece
+cpan/Time-Piece/t/12strptime_timezones.t		Time-Piece
+cpan/Time-Piece/t/13date_arithmetic_edge_cases.t	Time-Piece
+cpan/Time-Piece/t/lib/Time/Piece/Twin.pm		Module related to Time::Piece
 cpan/Unicode-Collate/Collate.pm			Unicode::Collate
 cpan/Unicode-Collate/Collate.xs			Unicode::Collate
 cpan/Unicode-Collate/Collate/allkeys.txt	Unicode::Collate
@@ -4187,59 +4220,58 @@ dist/ExtUtils-ParseXS/lib/ExtUtils/xsubpp			External subroutine preprocessor
 dist/ExtUtils-ParseXS/lib/perlxs.pod				Perl XS application programming interface
 dist/ExtUtils-ParseXS/lib/perlxstut.pod				Perl XS tutorial
 dist/ExtUtils-ParseXS/lib/perlxstypemap.pod			Perl XS C/Perl type conversion tools
-dist/ExtUtils-ParseXS/t/001-basic.t				See if ExtUtils::ParseXS works
-dist/ExtUtils-ParseXS/t/002-more.t				Extended ExtUtils::ParseXS testing
-dist/ExtUtils-ParseXS/t/003-usage.t				ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/101-standard_typemap_locations.t	ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/102-trim_whitespace.t			ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/103-tidy_type.t				ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/104-map_type.t				ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/105-valid_proto_string.t		ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/106-process_typemaps.t			ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/108-map_type.t				ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/109-standard_XS_defs.t			ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/111-analyze_preprocessor_statements.t	ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/112-set_cond.t				ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/113-check_cond_preproc_statements.t	ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/114-blurt_death_Warn.t			ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/115-avoid-noise.t			ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/501-t-compile.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/510-t-bare.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/511-t-whitespace.t			ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/512-t-file.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/513-t-merge.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/514-t-embed.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/515-t-cmd.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/516-t-clone.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/517-t-targetable.t			ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/600-t-compat.t				ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/data/b.typemap				ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/combined.typemap			ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/confl_repl.typemap			ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/confl_skip.typemap			ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/conflicting.typemap		ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/other.typemap			ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/perl.typemap			ExtUtils::Typemaps test data
-dist/ExtUtils-ParseXS/t/data/simple.typemap			ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/000-version.t				See if ExtUtils::ParseXS loads and has the right version num
+dist/ExtUtils-ParseXS/t/001-parse-basic.t			See if ExtUtils::ParseXS basic parsing works
+dist/ExtUtils-ParseXS/t/002-parse-file-scope.t			test ExtUtils::ParseXS file-scoped syntax
+dist/ExtUtils-ParseXS/t/003-parse-file-scope-keywords.t		test ExtUtils::ParseXS file-scoped keywords syntax
+dist/ExtUtils-ParseXS/t/004-parse-xsub-declaration.t		test ExtUtils::ParseXS XSUB declaration syntax
+dist/ExtUtils-ParseXS/t/005-parse-parameters.t			test ExtUtils::ParseXS XSUB parameter syntax
+dist/ExtUtils-ParseXS/t/006-parse-return-type.t			test ExtUtils::ParseXS XSUB return type
+dist/ExtUtils-ParseXS/t/007-parse-input-output.t		test ExtUtils::ParseXS XSUB INPUT and OUTPUT keywords
+dist/ExtUtils-ParseXS/t/008-parse-xsub-keywords.t		test ExtUtils::ParseXS XSUB keywords
+dist/ExtUtils-ParseXS/t/009-parse-c-plusplus.t			test ExtUtils::ParseXS C++ support
+dist/ExtUtils-ParseXS/t/101-api-standard_typemap_locations.t	ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/102-api-trim_whitespace.t		ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/103-api-tidy_type.t			ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/104-api-map_type.t			ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/105-api-valid_proto_string.t		ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/106-api-process_typemaps.t		ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/113-api-check_cond_preproc_statements.t	ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/114-api-blurt_death_Warn.t		ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/301-run-basic.t				See if ExtUtils::ParseXS can compile and run a file
+dist/ExtUtils-ParseXS/t/302-run-more.t				Extended ExtUtils::ParseXS compile and run
+dist/ExtUtils-ParseXS/t/303-run-usage.t				ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/501-typemaps-compile.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/510-typemaps-bare.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/511-typemaps-whitespace.t		ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/512-typemaps-file.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/513-typemaps-merge.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/514-typemaps-embed.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/515-typemaps-cmd.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/516-typemaps-clone.t			ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/517-typemaps-targetable.t		ExtUtils::Typemaps tests
+dist/ExtUtils-ParseXS/t/518-typemaps-compat.t			ExtUtils::Typemaps tests
 dist/ExtUtils-ParseXS/t/lib/ExtUtils/Typemaps/Test.pm		ExtUtils::Typemaps tests
 dist/ExtUtils-ParseXS/t/lib/IncludeTester.pm			ExtUtils::ParseXS testing utility
 dist/ExtUtils-ParseXS/t/lib/PrimitiveCapture.pm			Primitive STDOUT/ERR capturing for tests
+dist/ExtUtils-ParseXS/t/lib/TestMany.pm				Tool for running XS parser tests
 dist/ExtUtils-ParseXS/t/lib/TypemapTest/Foo.pm			ExtUtils::Typemaps tests
-dist/ExtUtils-ParseXS/t/pseudotypemap1				A test-typemap
+dist/ExtUtils-ParseXS/t/test_typemaps/b.typemap			ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/combined.typemap		ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/confl_repl.typemap	ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/confl_skip.typemap	ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/conflicting.typemap	ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/other.typemap		ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/perl.typemap		ExtUtils::Typemaps test data
+dist/ExtUtils-ParseXS/t/test_typemaps/simple.typemap		ExtUtils::Typemaps test data
 dist/ExtUtils-ParseXS/t/typemap					Standard typemap for controlled testing
-dist/ExtUtils-ParseXS/t/XSAlias.xs				Test file for ExtUtils::ParseXS ALIAS tests
-dist/ExtUtils-ParseXS/t/XSBroken.xs				Test file for ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/XSFalsePositive.xs			Test file for ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/XSFalsePositive2.xs			Test file for ExtUtils::ParseXS tests
 dist/ExtUtils-ParseXS/t/XSInclude.xsh				Test file for ExtUtils::ParseXS tests
+dist/ExtUtils-ParseXS/t/XSloop.xsh				Test file for ExtUtils::ParseXS tests
 dist/ExtUtils-ParseXS/t/XSMore.xs				Test file for ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/XSNoMap.xs
 dist/ExtUtils-ParseXS/t/XSTest.pm				Test file for ExtUtils::ParseXS tests
 dist/ExtUtils-ParseXS/t/XSTest.xs				Test file for ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/XSTightDirectives.xs			Test file for ExtUtils::ParseXS tests
 dist/ExtUtils-ParseXS/t/XSUsage.pm				ExtUtils::ParseXS tests
 dist/ExtUtils-ParseXS/t/XSUsage.xs				ExtUtils::ParseXS tests
-dist/ExtUtils-ParseXS/t/XSWarn.xs				ExtUtils::ParseXS tests
 dist/Filter-Simple/Changes					History of change for Filter::Simple
 dist/Filter-Simple/lib/Filter/Simple.pm				Simple frontend to Filter::Util::Call
 dist/Filter-Simple/Makefile.PL					Build Filter::Simple
@@ -4743,6 +4775,7 @@ ext/B/Makefile.PL			Compiler backend makefile writer
 ext/B/O.pm				Compiler front-end module (-MO=...)
 ext/B/t/b.t				See if B works
 ext/B/t/B/success.pm			Test module for ext/B/t/o.t
+ext/B/t/b_uni.t				See if B works with Unicode
 ext/B/t/bool.t				See if B works for bool
 ext/B/t/concise.t			See whether B::Concise works
 ext/B/t/concise-xs.t			See whether B::Concise recognizes XS functions
@@ -4758,6 +4791,7 @@ ext/B/t/optree_constants.t		B::Concise rendering of optimized constant subs
 ext/B/t/optree_for.t			for loops
 ext/B/t/optree_misc.t			misc optree tests
 ext/B/t/optree_samples.t		various basic codes: if for while
+ext/B/t/optree_signatures.t		test B output on subroutine signatures
 ext/B/t/optree_sort.t			inplace sort optimization regression
 ext/B/t/optree_specials.t		BEGIN, END, etc code
 ext/B/t/optree_varinit.t		my,our,local var init optimization
@@ -5097,6 +5131,7 @@ ext/XS-APItest/t/callregexec.t			XS::APItest: tests for CALLREGEXEC()
 ext/XS-APItest/t/check_warnings.t		test scope of "Too late for CHECK"
 ext/XS-APItest/t/cleanup.t			test stack behaviour on unwinding
 ext/XS-APItest/t/clone-with-stack.t		test clone with CLONEf_COPY_STACKS works
+ext/XS-APItest/t/cop_warnings.t			test cop_*_warning
 ext/XS-APItest/t/cophh.t			test COPHH API
 ext/XS-APItest/t/coplabel.t			test cop_*_label
 ext/XS-APItest/t/copstash.t			test alloccopstash
@@ -5184,7 +5219,10 @@ ext/XS-APItest/t/stuff_modify_bug.t		test for eval side-effecting source string
 ext/XS-APItest/t/stuff_svcur_bug.t		test for a bug in lex_stuff_pvn
 ext/XS-APItest/t/subcall.t			Test XSUB calls
 ext/XS-APItest/t/subsignature.t			Test parse_subsignature()
+ext/XS-APItest/t/sv_numcmp.t			Test sv_numcmp
 ext/XS-APItest/t/sv_numeq.t			Test sv_numeq
+ext/XS-APItest/t/sv_numlget.t			Test sv_num[lg][et]
+ext/XS-APItest/t/sv_numne.t			Test sv_numne
 ext/XS-APItest/t/sv_streq.t			Test sv_streq
 ext/XS-APItest/t/svcat.t			Test sv_catpvn
 ext/XS-APItest/t/svcatpvf.t			Test sv_catpvf argument reordering
@@ -5662,6 +5700,7 @@ os2/os2thread.h				pthread-like typedefs
 os2/perl2cmd.pl				Corrects installed binaries under OS/2
 os2/perlrexx.c				Support perl interpreter embedded in REXX
 os2/perlrexx.cmd			Test perl interpreter embedded in REXX
+os390/os390.c				z/OS specific code
 plan9/9front.patch			Plan9 port: patch for 9front-specific flavor of Plan 9
 plan9/aperl				Plan9 port: shell to make Perl error messages Acme-friendly
 plan9/arpa/inet.h			Plan9 port: replacement C header file
@@ -5752,8 +5791,10 @@ pod/perl5400delta.pod			Perl changes in version 5.40.0
 pod/perl5401delta.pod			Perl changes in version 5.40.1
 pod/perl5402delta.pod			Perl changes in version 5.40.2
 pod/perl5403delta.pod			Perl changes in version 5.40.3
+pod/perl5404delta.pod			Perl changes in version 5.40.4
 pod/perl5420delta.pod			Perl changes in version 5.42.0
 pod/perl5421delta.pod			Perl changes in version 5.42.1
+pod/perl5422delta.pod			Perl changes in version 5.42.2
 pod/perl561delta.pod			Perl changes in version 5.6.1
 pod/perl56delta.pod			Perl changes in version 5.6
 pod/perl581delta.pod			Perl changes in version 5.8.1
@@ -5914,6 +5955,7 @@ Porting/makerel					Release making utility
 Porting/manicheck				Check against MANIFEST
 Porting/manifest_lib.pl				Library for checking and sorting the MANIFEST
 Porting/manisort				Sort the MANIFEST
+Porting/merge-deltas.pl				Merge developments deltas into the final perldelta
 Porting/mksample				Generate Porting/config_H and Porting/config.sh
 Porting/new-perldelta.pl			Generate a new perldelta
 Porting/newtests-perldelta.pl			Generate Perldelta stub for newly added tests
@@ -5999,6 +6041,7 @@ t/class/accessor.t			See if accessor methods work
 t/class/class.t				See if class declarations work
 t/class/construct.t			See if class constructors work
 t/class/destruct.t			See if class destruction works
+t/class/EndsWithADJUST.pm		Helper module for test for GH#23758 in t/class/phasers.t
 t/class/field.t				See if class field declarations work
 t/class/gh22169.t			Test defining a class that previously failed to define
 t/class/gh23511.t			Test defining a reader after a strict 'vars' violation
@@ -6110,7 +6153,9 @@ t/lib/croak/pp				Test croak calls from pp.c
 t/lib/croak/pp_ctl			Test croak calls from pp_ctl.c
 t/lib/croak/pp_hot			Test croak calls from pp_hot.c
 t/lib/croak/pp_sys			Test croak calls from pp_sys.c
+t/lib/croak/refalias			Test croak calls from refalias-related behaviours
 t/lib/croak/regcomp			Test croak calls from regcomp.c
+t/lib/croak/signatures			Test croak calls from compiling subroutine signatures
 t/lib/croak/toke			Test croak calls from toke.c
 t/lib/croak/toke_l1			Test croak calls from toke.c; file is not UTF-8 encoded
 t/lib/cygwin.t				Builtin cygwin function tests
@@ -6186,6 +6231,7 @@ t/lib/warnings/pp_sys			Tests for pp_sys.c for warnings.t
 t/lib/warnings/regcomp			Tests for regcomp.c for warnings.t
 t/lib/warnings/regexec			Tests for regexec.c for warnings.t
 t/lib/warnings/run			Tests for run.c for warnings.t
+t/lib/warnings/signatures		Tests for signatures-related warnings for warnings.t
 t/lib/warnings/sv			Tests for sv.c for warnings.t
 t/lib/warnings/taint			Tests for taint.c for warnings.t
 t/lib/warnings/toke			Tests for toke.c for warnings.t
@@ -6343,6 +6389,7 @@ t/op/getppid.t				See if getppid works
 t/op/glob.t				See if <*> works
 t/op/gmagic.t				See if GMAGIC works
 t/op/goto.t				See if goto works
+t/op/goto-sub.t				See if goto &NAME works
 t/op/goto_xs.t				See if "goto &sub" works on XSUBs
 t/op/grent.t				See if getgr*() functions work
 t/op/grep.t				See if grep() and map() work
@@ -6545,6 +6592,7 @@ t/porting/libperl.t			Check libperl.a sanity
 t/porting/maintainers.t			Test that Porting/Maintainers.pl is up to date
 t/porting/makerel.t			Test that files used by Porting/makerel exist
 t/porting/manifest.t			Test that this MANIFEST file is well formed
+t/porting/merge-deltas.t		Test that the Porting/merge-deltas.pl script does its job
 t/porting/perlfunc.t			Test that Functions_pm.PL can parse perlfunc.pod
 t/porting/pod_rules.t			Check that various pod lists are consistent
 t/porting/podcheck.t			Test the POD of shipped modules is well formed
@@ -6676,9 +6724,11 @@ t/run/switchx3.aux			Data for switchx.t
 t/run/todo.t				TODO tests
 t/TEST					The regression tester
 t/test.pl				Simple testing library
+t/test_pl.pod				Documentation for test.pl
 t/test_pl/_num_to_alpha.t		Tests for the simple testing library
 t/test_pl/can_isa_ok.t			Tests for the simple testing library
 t/test_pl/display.t			Tests for the simple testing library
+t/test_pl/examples.t			Tests for the simple testing library
 t/test_pl/plan_skip_all.t		Tests for the simple testing library
 t/test_pl/tempfile.t			Tests for the simple testing library
 t/thread_it.pl				Run regression tests in a new thread
@@ -6776,6 +6826,7 @@ win32/config_H.gc			Win32 config header (MinGW build)
 win32/config_h.PL			Perl code to convert Win32 config.sh to config.h
 win32/config_H.vc			Win32 config header (Visual C++ build)
 win32/config_sh.PL			Perl code to update Win32 config.sh from Makefile
+win32/configure/have_stdckdint.c	check for availability of stdckdint.h
 win32/configure/rt.c			identify default runtime
 win32/create_perllibst_h.pl		creates perllibst.h file for inclusion from perllib.c
 win32/distclean.bat			Remove _ALL_ files not listed here in MANIFEST

@@ -1,0 +1,91 @@
+% layout (stash('layout') // 'main');
+
+<div class="container mt-4">
+  <i id="loading-icon" class="fa fa-spinner fa-spin fa-4x"></i>
+
+  <div class="row">
+    <div class="titre_page">
+    </div>
+  </div>
+
+  <div id="panel-perm" class="card" style="display: none;">
+    <div class="card-header d-flex justify-content-between"><%= l 'Permissions list' %>
+      % if ($c->check_perm('perm_create')) {
+      <span id="menuAddPerm" class="fa fa-2x fa-plus" title="<%= l 'Add a permission' %>" data-bs-toggle="modal" data-bs-target="#perm-modal"></span>
+      % }
+    </div>
+
+    <div class="card-body">
+      <BR>
+
+      <table id="table-perm" class="table table-striped hover" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th><%= l 'Name' %></th>
+            <th><%= l 'Description' %></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="perm-modal" tabindex="-1" aria-labelledby="nouvelle_permission" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nouvelle_permission"><%= l 'Add permission' %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="perm-form">
+          <input id="id" name="id" type="hidden">
+
+          <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label text-right">
+              <%= l 'Name' %>
+            </label>
+            <div class="col-sm-10">
+              <input id="name" name="name" class="form-control" type="text">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="form-group row">
+            <label for="description" class="col-sm-2 col-form-label text-right">
+              <%= l 'Description' %>
+            </label>
+            <div class="col-sm-10">
+              <input id="description" name="description" class="form-control" type="text">
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal"><%= l 'Close' %></button>
+        <button type="button" class="btn btn-primary" id="saveObject"><%= l 'Save' %></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="confirmDeletePerm" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= l 'Are you sure you want to delete this permission?' %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-bs-dismiss="modal" class="btn"><%= l 'Cancel' %></button>
+        <button type="button" data-bs-dismiss="modal" class="btn btn-primary" id="deleteInt"><%= l 'Delete' %></button>
+      </div>
+    </div>
+  </div>
+</div>

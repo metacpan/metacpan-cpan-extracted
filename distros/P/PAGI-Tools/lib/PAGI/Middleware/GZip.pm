@@ -1,5 +1,5 @@
 package PAGI::Middleware::GZip;
-$PAGI::Middleware::GZip::VERSION = '0.002001';
+$PAGI::Middleware::GZip::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

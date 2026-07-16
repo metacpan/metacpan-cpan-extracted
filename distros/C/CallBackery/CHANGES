@@ -1,3 +1,26 @@
+0.58.1 2026-07-16 08:39:18 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Frontend ui.plugin.Form: a trigger-field change made while form data
+   was still loading parked its form reconfiguration in _reconfPending
+   and never sent it — the affected form stayed in its stale layout
+   (e.g. fields that the reset should reveal never appeared) until the
+   user toggled the trigger field again. The pending queue is now
+   drained when loading completes.
+
+0.58.0 2026-07-15 17:23:33 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Session expiry now surfaces as a dedicated RPC code 7 ("session
+   expired"), distinct from code 6 ("login required"). allow_rpc_access
+   guards plugin instantiation so an expired session no longer escapes as
+   a generic error. CallBackery::User gains a per-request `sessionExpired`
+   flag for subclasses that enforce a cookie max-age.
+
+ - Frontend data.Server: session expiry shows a single deduplicated
+   "Session Expired -> Reload" prompt instead of a storm of error popups.
+   Communication failures (server unreachable / proxy returning garbage)
+   now retry silently for idempotent reads, then show one "Connection
+   problem" dialog with Retry / Reload. MsgBox gains reload/retry buttons.
+
 0.57.0 2026-06-16 08:58:42 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - We are on JSON-RPC 2.0 now. callbackery.data.Server now uses

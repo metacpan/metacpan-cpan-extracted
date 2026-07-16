@@ -282,7 +282,7 @@ CONSTRAINTS
     Note that if no constraints are given, this accepts all possible
     values. This may be useful as an "accept-all" fallback case for
     generated code, or other situations where it is required to provide a
-    constraint check but you do not wish to constraint allowed values.
+    constraint check but you do not wish to constrain allowed values.
 
 CONSTRAINT METHODS
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024-2025 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.11;
+package Data::Checks 0.12;
 
 use v5.22;
 use warnings;
@@ -315,7 +315,7 @@ Rejects if at least one of them rejects it.
 Note that if no constraints are given, this accepts all possible values. This
 may be useful as an "accept-all" fallback case for generated code, or other
 situations where it is required to provide a constraint check but you do not
-wish to constraint allowed values.
+wish to constrain allowed values.
 
 =head1 CONSTRAINT METHODS
 

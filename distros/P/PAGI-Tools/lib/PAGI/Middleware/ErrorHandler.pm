@@ -1,5 +1,5 @@
 package PAGI::Middleware::ErrorHandler;
-$PAGI::Middleware::ErrorHandler::VERSION = '0.002001';
+$PAGI::Middleware::ErrorHandler::VERSION = '0.002002';
 use strict;
 use warnings;
 use parent 'PAGI::Middleware';

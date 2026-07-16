@@ -7,6 +7,11 @@ on 'develop' => sub {
 	requires 'Minilla', 'v3.1.19';
 	requires 'Liveman', '1.0';
 	requires 'Software::License::GPL_3';
+	requires 'Test::CPAN::Meta';
+	requires 'Test::MinimumVersion::Fast';
+	requires 'Test::PAUSE::Permissions';
+	requires 'Test::Pod';
+	requires 'Test::Spellunker';
 	requires 'V';
 	requires 'Version::Next';
 };
@@ -30,11 +35,13 @@ on 'test' => sub {
 
 requires 'Aion', '1.2';
 requires 'Aion::Carp', '1.6';
-requires 'Aion::Run', '0.0.3';
+requires 'Aion::Env';
+requires 'Aion::Emitter', '0.1.2';
 requires 'Aion::Fs', '0.2.0';
+requires 'Aion::Run', '0.0.3';
 requires 'POSIX';
 requires 'Time::Local';
+requires 'aliased';
 requires 'common::sense';
-requires 'config';
 requires 'open';
 requires 'utf8';

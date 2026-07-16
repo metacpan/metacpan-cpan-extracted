@@ -1,19 +1,10 @@
 package Aion::Annotation;
-use 5.22.0;
-no strict; no warnings; no diagnostics;
+
 use common::sense;
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.1.0";
 
-# Дефолтный путь для сканирования
-use config LIB => ['lib'];
-
-# Директория в которую складывать файлы конфигурации
-use config INI => 'etc/annotation';
-
-# Директория с кешем
-use config CACHE => 'var/cache';
-
+use aliased 'Aion::Annotation::ScannedEvent';
 use Aion::Fs qw/find erase mkpath path mtime from_pkg to_pkg/;
 use POSIX qw/strftime/;
 use Time::Local qw/timelocal/;
@@ -22,11 +13,23 @@ use Aion;
 
 with qw/Aion::Run/;
 
+# Дефолтные пути для сканирования
+use Aion::Env AION_ANNOTATION_LIB => (isa => Str, default => 'lib');
+
+# Директория в которую складывать файлы конфигурации
+use Aion::Env AION_ANNOTATION_INI => (isa => Str, default => 'etc/annotation');
+
+# Директория с кешем
+use Aion::Env AION_ANNOTATION_CACHE => (isa => Str, default => 'var/cache');
+
+# Кодовая база для сканирования в виде строки
+has lib_path => (is => 'ro', isa => Str, arg => '-l', default => AION_ANNOTATION_LIB);
+
 # Кодовая база для сканирования
-has lib => (is => 'ro', isa => ArrayRef[Str], arg => '-l', default => LIB);
+has lib => (is => 'ro', isa => ArrayRef[Str], default => sub { [split /:/, shift->lib_path] });
 
 # Директория куда сохранять файлы аннотаций
-has ini => (is => 'ro', isa => Str, arg => '-i', default => INI);
+has ini => (is => 'ro', isa => Str, arg => '-i', default => AION_ANNOTATION_INI);
 
 # Просто считать аннотации
 has force => (is => 'ro', isa => Bool, arg => '-f', default => 0);
@@ -76,7 +79,7 @@ has remark => (is => 'ro', isa => HashRef[HashRef[Tuple[Int, ArrayRef[Str]]]], d
 });
 
 # Путь к файлу с временем последнего доступа к модулям
-has modules_mtime_path => (is => 'ro', isa => Str, default => CACHE . "/modules.mtime.ini");
+has modules_mtime_path => (is => 'ro', isa => Str, default => AION_ANNOTATION_CACHE . "/modules.mtime.ini");
 
 # Время последнего доступа к модулям: pkg => unixtime
 has modules_mtime => (is => 'ro', isa => HashRef[Int], default => sub {
@@ -97,6 +100,12 @@ has modules_mtime => (is => 'ro', isa => HashRef[Int], default => sub {
 
 	\%mtime
 });
+
+# Совокупность эонов
+has pleroma => (is => 'ro', isa => 'Aion::Pleroma', eon => 1);
+
+# Эмиттер
+has emitter => (is => 'ro?!', isa => 'Aion::Emitter', eon => 1);
 
 # Сканирует модули и сохраняет аннотации
 #@run aion:scan „Scan modules and save annotations”
@@ -174,7 +183,7 @@ sub scan {
 		close $f;
 	}
 	
-	# Удаляем временна файлов, которых уже нет в проекте
+	# Удаляем времена файлов, которых уже нет в проекте
 	for my $pkg (keys %$modules_mtime) {
 		delete $modules_mtime->{$pkg} if !exists $exists{$pkg};
 	}
@@ -198,6 +207,10 @@ sub scan {
 		}
 	}
 	close $f;
+
+	$self->emitter->clear_event if $self->emitter->has_event;
+
+	$self->emitter->emit(ScannedEvent->new);
 	
 	$self
 }
@@ -220,11 +233,11 @@ Aion::Annotation - processes annotations in perl modules
 
 =head1 VERSION
 
-0.0.3
+0.1.0
 
 =head1 SYNOPSIS
 
-lib/For/Test.pm file:
+File lib/For/Test.pm:
 
 	package For::Test;
 	# The package for testing
@@ -266,7 +279,7 @@ lib/For/Test.pm file:
 
 C<Aion::Annotation> scans the perl modules in the B<lib> directory and prints them to the corresponding files in the B<etc/annotation> directory.
 
-You can change B<lib> through the C<LIB> config, and B<etc/annotation> through the C<INI> config.
+You can change B<lib> through the C<AION_ANNOTATION_LIB> environment, B<etc/annotation> through the C<AION_ANNOTATION_INI> config, and B<var/cache> through the C<AION_ANNOTATION_CACHE> config.
 
 =over
 
@@ -282,7 +295,7 @@ You can change B<lib> through the C<LIB> config, and B<etc/annotation> through t
 
 =head2 scan ()
 
-Scans the codebase specified by the C<LIB> config (list of directories, default C<["lib"]>). And it takes out all the annotations and comments and prints them into the corresponding files in the C<INI> directory (by default "etc/annotation").
+Scans the codebase specified by the C<AION_ANNOTATION_LIB> config (list of directories via C<:>, default C<lib>). And it takes out all the annotations and comments and prints them into the appropriate files in the C<AION_ANNOTATION_INI> directory (default "etc/annotation").
 
 =head1 AUTHOR
 

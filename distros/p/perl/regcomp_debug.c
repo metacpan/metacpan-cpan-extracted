@@ -22,10 +22,11 @@
 int
 Perl_re_printf(pTHX_ const char *fmt, ...)
 {
+    PERL_ARGS_ASSERT_RE_PRINTF;
+
     va_list ap;
     int result;
     PerlIO *f= Perl_debug_log;
-    PERL_ARGS_ASSERT_RE_PRINTF;
     va_start(ap, fmt);
     result = PerlIO_vprintf(f, fmt, ap);
     va_end(ap);
@@ -35,10 +36,11 @@ Perl_re_printf(pTHX_ const char *fmt, ...)
 int
 Perl_re_indentf(pTHX_ const char *fmt, U32 depth, ...)
 {
+    PERL_ARGS_ASSERT_RE_INDENTF;
+
     va_list ap;
     int result;
     PerlIO *f= Perl_debug_log;
-    PERL_ARGS_ASSERT_RE_INDENTF;
     va_start(ap, depth);
     PerlIO_printf(f, "%*s", ( (int)depth % 20 ) * 2, "");
     result = PerlIO_vprintf(f, fmt, ap);
@@ -54,7 +56,7 @@ Perl_debug_show_study_flags(pTHX_ U32 flags, const char *open_str,
     if (!flags)
         return;
 
-    Perl_re_printf( aTHX_  "%s", open_str);
+    re_printf("%s", open_str);
     DEBUG_SHOW_STUDY_FLAG(flags, SF_BEFORE_SEOL);
     DEBUG_SHOW_STUDY_FLAG(flags, SF_BEFORE_MEOL);
     DEBUG_SHOW_STUDY_FLAG(flags, SF_IS_INF);
@@ -70,7 +72,7 @@ Perl_debug_show_study_flags(pTHX_ U32 flags, const char *open_str,
     DEBUG_SHOW_STUDY_FLAG(flags, SCF_SEEN_ACCEPT);
     DEBUG_SHOW_STUDY_FLAG(flags, SCF_TRIE_DOING_RESTUDY);
     DEBUG_SHOW_STUDY_FLAG(flags, SCF_IN_DEFINE);
-    Perl_re_printf( aTHX_  "%s", close_str);
+    re_printf("%s", close_str);
 }
 
 void
@@ -83,12 +85,10 @@ Perl_debug_studydata(pTHX_ const char *where, scan_data_t *data,
 
     DEBUG_OPTIMISE_MORE_r({
         if (!data) {
-            Perl_re_indentf(aTHX_  "%s: NO DATA",
-                depth,
-                where);
+            re_indentf("%s: NO DATA", depth, where);
             return;
         }
-        Perl_re_indentf(aTHX_  "%s: M/S/D: %" IVdf "/%" IVdf "/%" IVdf " Pos:%" IVdf "/%" IVdf " Flags: 0x%" UVXf,
+        re_indentf("%s: M/S/D: %" IVdf "/%" IVdf "/%" IVdf " Pos:%" IVdf "/%" IVdf " Flags: 0x%" UVXf,
             depth,
             where,
             min, stopmin, delta,
@@ -97,9 +97,9 @@ Perl_debug_studydata(pTHX_ const char *where, scan_data_t *data,
             (UV)data->flags
         );
 
-        Perl_debug_show_study_flags(aTHX_ data->flags," [","]");
+        debug_show_study_flags(data->flags," [","]");
 
-        Perl_re_printf( aTHX_
+        re_printf(
             " Whilem_c: %" IVdf " Lcp: %" IVdf " %s",
             (IV)data->whilem_c,
             (IV)(data->last_closep ? *((data)->last_closep) : -1),
@@ -108,7 +108,7 @@ Perl_debug_studydata(pTHX_ const char *where, scan_data_t *data,
 
         if (data->last_found) {
             int i;
-            Perl_re_printf(aTHX_
+            re_printf(
                 "Last:'%s' %" IVdf ":%" IVdf "/%" IVdf,
                     SvPVX_const(data->last_found),
                     (IV)data->last_end,
@@ -117,7 +117,7 @@ Perl_debug_studydata(pTHX_ const char *where, scan_data_t *data,
             );
 
             for (i = 0; i < 2; i++) {
-                Perl_re_printf(aTHX_
+                re_printf(
                     " %s%s: '%s' @ %" IVdf "/%" IVdf,
                     data->cur_is_floating == i ? "*" : "",
                     i ? "Float" : "Fixed",
@@ -125,11 +125,11 @@ Perl_debug_studydata(pTHX_ const char *where, scan_data_t *data,
                     (IV)data->substrs[i].min_offset,
                     (IV)data->substrs[i].max_offset
                 );
-                Perl_debug_show_study_flags(aTHX_ data->substrs[i].flags," [","]");
+                debug_show_study_flags(data->substrs[i].flags," [","]");
             }
         }
 
-        Perl_re_printf( aTHX_ "\n");
+        re_printf("\n");
     });
 }
 
@@ -148,13 +148,13 @@ Perl_debug_peep(pTHX_ const char *str, const RExC_state_t *pRExC_state,
             return;
         Next = regnext(scan);
         regprop(RExC_rx, RExC_mysv, scan, NULL, pRExC_state);
-        Perl_re_indentf( aTHX_   "%s>%3d: %s (%d)",
-            depth,
-            str,
-            REG_NODE_NUM(scan), SvPV_nolen_const(RExC_mysv),
-            Next ? (REG_NODE_NUM(Next)) : 0 );
-        Perl_debug_show_study_flags(aTHX_ flags," [ ","]");
-        Perl_re_printf( aTHX_  "\n");
+        re_indentf("%s>%3d: %s (%d)",
+                   depth,
+                   str,
+                   REG_NODE_NUM(scan), SvPV_nolen_const(RExC_mysv),
+                   Next ? (REG_NODE_NUM(Next)) : 0 );
+        debug_show_study_flags(flags," [ ","]");
+        re_printf("\n");
    });
 }
 
@@ -163,16 +163,16 @@ Perl_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
             const regnode *last, const regnode *plast,
             SV* sv, I32 indent, U32 depth)
 {
+    PERL_ARGS_ASSERT_DUMPUNTIL;
+
     const regnode *next;
     const regnode *optstart= NULL;
 
     RXi_GET_DECL(r, ri);
     DECLARE_AND_GET_RE_DEBUG_FLAGS;
 
-    PERL_ARGS_ASSERT_DUMPUNTIL;
-
 #ifdef DEBUG_DUMPUNTIL
-    Perl_re_printf( aTHX_  "--- %d : %d - %d - %d\n", indent, node-start,
+    re_printf("--- %d : %d - %d - %d\n", indent, node-start,
         last ? last-start : 0, plast ? plast-start : 0);
 #endif
 
@@ -197,18 +197,18 @@ Perl_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
             CLEAR_OPTSTART;
 
         regprop(r, sv, node, NULL, NULL);
-        Perl_re_printf( aTHX_  "%4" IVdf ":%*s%s", (IV)(node - start),
+        re_printf("%4" IVdf ":%*s%s", (IV)(node - start),
                       (int)(2*indent + 1), "", SvPVX_const(sv));
 
         if (op != OPTIMIZED) {
             if (next == NULL)           /* Next ptr. */
-                Perl_re_printf( aTHX_  " (0)");
+                re_printf(" (0)");
             else if (REGNODE_TYPE(op) == BRANCH
                      && REGNODE_TYPE(OP(next)) != BRANCH )
-                Perl_re_printf( aTHX_  " (FAIL)");
+                re_printf(" (FAIL)");
             else
-                Perl_re_printf( aTHX_  " (%" IVdf ")", (IV)(next - start));
-            Perl_re_printf( aTHX_ "\n");
+                re_printf(" (%" IVdf ")", (IV)(next - start));
+            re_printf("\n");
         }
 
       after_print:
@@ -243,23 +243,23 @@ Perl_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
             for (word_idx= 0; word_idx < (I32)trie->wordcount; word_idx++) {
                 SV ** const elem_ptr = av_fetch_simple(trie_words, word_idx, 0);
 
-                Perl_re_indentf( aTHX_  "%s ",
-                    indent+3,
-                    elem_ptr
-                    ? pv_pretty(sv, SvPV_nolen_const(*elem_ptr),
-                                SvCUR(*elem_ptr), PL_dump_re_max_len,
-                                PL_colors[0], PL_colors[1],
-                                (SvUTF8(*elem_ptr)
-                                 ? PERL_PV_ESCAPE_UNI
-                                 : 0)
-                                | PERL_PV_PRETTY_ELLIPSES
-                                | PERL_PV_PRETTY_LTGT
-                            )
-                    : "???"
+                re_indentf("%s ",
+                           indent+3,
+                           elem_ptr
+                           ? pv_pretty(sv, SvPV_nolen_const(*elem_ptr),
+                                       SvCUR(*elem_ptr), PL_dump_re_max_len,
+                                       PL_colors[0], PL_colors[1],
+                                       (SvUTF8(*elem_ptr)
+                                        ? PERL_PV_ESCAPE_UNI
+                                        : 0)
+                                       | PERL_PV_PRETTY_ELLIPSES
+                                       | PERL_PV_PRETTY_LTGT
+                                      )
+                           : "???"
                 );
                 if (trie->jump) {
                     U16 dist = trie->jump[word_idx+1];
-                    Perl_re_printf( aTHX_  "(%" UVuf ")\n",
+                    re_printf("(%" UVuf ")\n",
                                (UV)((dist ? this_trie + dist : next) - start));
                     if (dist) {
                         if (!nextbranch)
@@ -269,7 +269,7 @@ Perl_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
                     if (nextbranch && REGNODE_TYPE(OP(nextbranch))==BRANCH)
                         nextbranch = regnext((regnode *)nextbranch);
                 } else {
-                    Perl_re_printf( aTHX_  "\n");
+                    re_printf("\n");
                 }
             }
             if (last && next > last)
@@ -301,7 +301,7 @@ Perl_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
     }
     CLEAR_OPTSTART;
 #ifdef DEBUG_DUMPUNTIL
-    Perl_re_printf( aTHX_  "--- %d\n", (int)indent);
+    re_printf("--- %d\n", (int)indent);
 #endif
     return node;
 }
@@ -315,6 +315,8 @@ Perl_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
 static void
 S_regdump_intflags(pTHX_ const char *lead, const U32 flags)
 {
+    PERL_ARGS_ASSERT_REGDUMP_INTFLAGS;
+
     int bit;
     int set = 0;
 
@@ -323,21 +325,23 @@ S_regdump_intflags(pTHX_ const char *lead, const U32 flags)
     for (bit = 0; bit < REG_INTFLAGS_NAME_SIZE; bit++) {
         if (flags & (1 << bit)) {
             if (!set++ && lead)
-                Perl_re_printf( aTHX_  "%s", lead);
-            Perl_re_printf( aTHX_  "%s ", PL_reg_intflags_name[bit]);
+                re_printf("%s", lead);
+            re_printf("%s ", PL_reg_intflags_name[bit]);
         }
     }
     if (lead)  {
         if (set)
-            Perl_re_printf( aTHX_  "\n");
+            re_printf("\n");
         else
-            Perl_re_printf( aTHX_  "%s[none-set]\n", lead);
+            re_printf("%s[none-set]\n", lead);
     }
 }
 
 static void
 S_regdump_extflags(pTHX_ const char *lead, const U32 flags)
 {
+    PERL_ARGS_ASSERT_REGDUMP_EXTFLAGS;
+
     int bit;
     int set = 0;
     regex_charset cs;
@@ -350,37 +354,37 @@ S_regdump_extflags(pTHX_ const char *lead, const U32 flags)
                 continue;
             }
             if (!set++ && lead)
-                Perl_re_printf( aTHX_  "%s", lead);
-            Perl_re_printf( aTHX_  "%s ", PL_reg_extflags_name[bit]);
+                re_printf("%s", lead);
+            re_printf("%s ", PL_reg_extflags_name[bit]);
         }
     }
     if ((cs = get_regex_charset(flags)) != REGEX_DEPENDS_CHARSET) {
             if (!set++ && lead) {
-                Perl_re_printf( aTHX_  "%s", lead);
+                re_printf("%s", lead);
             }
             switch (cs) {
                 case REGEX_UNICODE_CHARSET:
-                    Perl_re_printf( aTHX_  "UNICODE");
+                    re_printf("UNICODE");
                     break;
                 case REGEX_LOCALE_CHARSET:
-                    Perl_re_printf( aTHX_  "LOCALE");
+                    re_printf("LOCALE");
                     break;
                 case REGEX_ASCII_RESTRICTED_CHARSET:
-                    Perl_re_printf( aTHX_  "ASCII-RESTRICTED");
+                    re_printf("ASCII-RESTRICTED");
                     break;
                 case REGEX_ASCII_MORE_RESTRICTED_CHARSET:
-                    Perl_re_printf( aTHX_  "ASCII-MORE_RESTRICTED");
+                    re_printf("ASCII-MORE_RESTRICTED");
                     break;
                 default:
-                    Perl_re_printf( aTHX_  "UNKNOWN CHARACTER SET");
+                    re_printf("UNKNOWN CHARACTER SET");
                     break;
             }
     }
     if (lead)  {
         if (set)
-            Perl_re_printf( aTHX_  "\n");
+            re_printf("\n");
         else
-            Perl_re_printf( aTHX_  "%s[none-set]\n", lead);
+            re_printf("%s[none-set]\n", lead);
     }
 }
 #endif
@@ -388,6 +392,8 @@ S_regdump_extflags(pTHX_ const char *lead, const U32 flags)
 void
 Perl_regdump(pTHX_ const regexp *r)
 {
+    PERL_ARGS_ASSERT_REGDUMP;
+
 #ifdef DEBUGGING
     int i;
     SV * const sv = sv_newmortal();
@@ -406,7 +412,7 @@ Perl_regdump(pTHX_ const regexp *r)
                             SvPVX_const(r->substrs->data[i].substr),
                             RE_SV_DUMPLEN(r->substrs->data[i].substr),
                             PL_dump_re_max_len);
-            Perl_re_printf( aTHX_
+            re_printf(
                           "%s %s%s at %" IVdf "..%" UVuf " ",
                           i ? "floating" : "anchored",
                           s,
@@ -419,7 +425,7 @@ Perl_regdump(pTHX_ const regexp *r)
                             SvPVX_const(r->substrs->data[i].utf8_substr),
                             RE_SV_DUMPLEN(r->substrs->data[i].utf8_substr),
                             30);
-            Perl_re_printf( aTHX_
+            re_printf(
                           "%s utf8 %s%s at %" IVdf "..%" UVuf " ",
                           i ? "floating" : "anchored",
                           s,
@@ -430,51 +436,51 @@ Perl_regdump(pTHX_ const regexp *r)
     }
 
     if (r->check_substr || r->check_utf8)
-        Perl_re_printf( aTHX_
+        re_printf(
                       (const char *)
                       (   r->check_substr == r->substrs->data[1].substr
                        && r->check_utf8   == r->substrs->data[1].utf8_substr
                        ? "(checking floating" : "(checking anchored"));
     if (r->intflags & PREGf_NOSCAN)
-        Perl_re_printf( aTHX_  " noscan");
+        re_printf(" noscan");
     if (r->extflags & RXf_CHECK_ALL)
-        Perl_re_printf( aTHX_  " isall");
+        re_printf(" isall");
     if (r->check_substr || r->check_utf8)
-        Perl_re_printf( aTHX_  ") ");
+        re_printf(") ");
 
     if (ri->regstclass) {
         regprop(r, sv, ri->regstclass, NULL, NULL);
-        Perl_re_printf( aTHX_  "stclass %s ", SvPVX_const(sv));
+        re_printf("stclass %s ", SvPVX_const(sv));
     }
     if (r->intflags & PREGf_ANCH) {
-        Perl_re_printf( aTHX_  "anchored");
+        re_printf("anchored");
         if (r->intflags & PREGf_ANCH_MBOL)
-            Perl_re_printf( aTHX_  "(MBOL)");
+            re_printf("(MBOL)");
         if (r->intflags & PREGf_ANCH_SBOL)
-            Perl_re_printf( aTHX_  "(SBOL)");
+            re_printf("(SBOL)");
         if (r->intflags & PREGf_ANCH_GPOS)
-            Perl_re_printf( aTHX_  "(GPOS)");
-        Perl_re_printf( aTHX_ " ");
+            re_printf("(GPOS)");
+        re_printf(" ");
     }
     if (r->intflags & PREGf_GPOS_SEEN)
-        Perl_re_printf( aTHX_  "GPOS:%" UVuf " ", (UV)r->gofs);
+        re_printf("GPOS:%" UVuf " ", (UV)r->gofs);
     if (r->intflags & PREGf_SKIP)
-        Perl_re_printf( aTHX_  "plus ");
+        re_printf("plus ");
     if (r->intflags & PREGf_IMPLICIT)
-        Perl_re_printf( aTHX_  "implicit ");
-    Perl_re_printf( aTHX_  "minlen %" IVdf " ", (IV)r->minlen);
+        re_printf("implicit ");
+    re_printf("minlen %" IVdf " ", (IV)r->minlen);
     if (r->extflags & RXf_EVAL_SEEN)
-        Perl_re_printf( aTHX_  "with eval ");
-    Perl_re_printf( aTHX_  "\n");
+        re_printf("with eval ");
+    re_printf("\n");
     DEBUG_FLAGS_r({
         regdump_extflags("r->extflags: ", r->extflags);
         regdump_intflags("r->intflags: ", r->intflags);
     });
 #else
-    PERL_ARGS_ASSERT_REGDUMP;
     PERL_UNUSED_CONTEXT;
     PERL_UNUSED_ARG(r);
 #endif  /* DEBUGGING */
+
 }
 
 /* Should be synchronized with ANYOF_ #defines in regcomp.h */
@@ -531,13 +537,13 @@ static const char * const anyofs[] = {
 void
 Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_info *reginfo, const RExC_state_t *pRExC_state)
 {
+    PERL_ARGS_ASSERT_REGPROP;
+
 #ifdef DEBUGGING
     U8 k;
     const U8 op = OP(o);
     RXi_GET_DECL(prog, progi);
     DECLARE_AND_GET_RE_DEBUG_FLAGS;
-
-    PERL_ARGS_ASSERT_REGPROP;
 
     SvPVCLEAR(sv);
 
@@ -701,8 +707,13 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
             else {
                 const char *s = reginfo->strbeg + ln;
                 sv_catpvf(sv, ": ");
-                Perl_pv_pretty( aTHX_ sv, s, RXp_OFFS_END(prog,n) - RXp_OFFS_START(prog,n), 32, 0, 0,
-                    PERL_PV_ESCAPE_UNI_DETECT|PERL_PV_PRETTY_NOCLEAR|PERL_PV_PRETTY_ELLIPSES|PERL_PV_PRETTY_QUOTE );
+                pv_pretty(sv, s,
+                          RXp_OFFS_END(prog,n) - RXp_OFFS_START(prog,n),
+                          32, 0, 0,
+                          PERL_PV_ESCAPE_UNI_DETECT
+                         |PERL_PV_PRETTY_NOCLEAR
+                         |PERL_PV_PRETTY_ELLIPSES
+                         |PERL_PV_PRETTY_QUOTE );
             }
         }
     } else if (k == GOSUB) {
@@ -783,25 +794,25 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
             if (start < NUM_ANYOF_CODE_POINTS) {
                 if (end < NUM_ANYOF_CODE_POINTS) {
                     bitmap_range_not_in_bitmap
-                          = _add_range_to_invlist(bitmap_range_not_in_bitmap,
+                          = add_range_to_invlist_(bitmap_range_not_in_bitmap,
                                                   start, end);
                 }
                 else {
                     bitmap_range_not_in_bitmap
-                          = _add_range_to_invlist(bitmap_range_not_in_bitmap,
+                          = add_range_to_invlist_(bitmap_range_not_in_bitmap,
                                                   start, NUM_ANYOF_CODE_POINTS);
                     start = NUM_ANYOF_CODE_POINTS;
                 }
             }
 
             if (start >= NUM_ANYOF_CODE_POINTS) {
-                nonbitmap_invlist = _add_range_to_invlist(nonbitmap_invlist,
+                nonbitmap_invlist = add_range_to_invlist_(nonbitmap_invlist,
                                                 ANYOFRbase(o),
                                                 ANYOFRbase(o) + ANYOFRdelta(o));
             }
         }
         else if (ANYOF_MATCHES_ALL_OUTSIDE_BITMAP(o)) {
-            nonbitmap_invlist = _add_range_to_invlist(nonbitmap_invlist,
+            nonbitmap_invlist = add_range_to_invlist_(nonbitmap_invlist,
                                                       NUM_ANYOF_CODE_POINTS,
                                                       UV_MAX);
         }
@@ -816,11 +827,11 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
              * resolved when this call was done; or much more likely because
              * there are matches that require UTF-8 to be valid, and so aren't
              * in the bitmap (or ANYOFR).  This is teased apart later */
-            _invlist_intersection(nonbitmap_invlist,
+            invlist_intersection_(nonbitmap_invlist,
                                   PL_InBitmap,
                                   &bitmap_range_not_in_bitmap);
             /* Leave just the things that don't fit into the bitmap */
-            _invlist_subtract(nonbitmap_invlist,
+            invlist_subtract_(nonbitmap_invlist,
                               PL_InBitmap,
                               &nonbitmap_invlist);
         }
@@ -882,14 +893,14 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
                  * everything above the lower display should also match, but
                  * there is no indication of that.  Add this range so the code
                  * below will add it to the display */
-                _invlist_union_complement_2nd(nonbitmap_invlist,
+                invlist_union_complement_2nd_(nonbitmap_invlist,
                                               PL_InBitmap,
                                               &nonbitmap_invlist);
             }
         }
 
         /* And, finally, add the above-the-bitmap stuff */
-        if (nonbitmap_invlist && _invlist_len(nonbitmap_invlist)) {
+        if (nonbitmap_invlist && invlist_len_(nonbitmap_invlist)) {
             SV* contents;
 
             /* See if truncation size is overridden */
@@ -907,8 +918,8 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
              * there are unresolved items, where the inversion has to be
              * delayed until runtime */
             if (inverted && ! unresolved) {
-                _invlist_invert(nonbitmap_invlist);
-                _invlist_subtract(nonbitmap_invlist, PL_InBitmap, &nonbitmap_invlist);
+                invlist_invert_(nonbitmap_invlist);
+                invlist_subtract_(nonbitmap_invlist, PL_InBitmap, &nonbitmap_invlist);
             }
 
             contents = invlist_contents(nonbitmap_invlist,
@@ -946,7 +957,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
         if (op == ANYOFHs) {
             sv_catpvf(sv, " (Leading UTF-8 bytes = %s", 
-                _byte_dump_string((U8 *) ((struct regnode_anyofhs *) o)->string, 
+                byte_dump_string_((U8 *) ((struct regnode_anyofhs *) o)->string,
                 FLAGS(o), 1));
         }
         else if (REGNODE_TYPE(op) != ANYOF) {
@@ -977,7 +988,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
         sv_catpvf(sv, "[%s", PL_colors[0]);
         if (op == NANYOFM) {
-            _invlist_invert(cp_list);
+            invlist_invert_(cp_list);
         }
 
         put_charclass_bitmap_innards(sv, NULL, cp_list, NULL, NULL, 0, true);
@@ -1057,7 +1068,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
 
 #ifdef DEBUGGING
-STATIC void
+static void
 S_put_code_point(pTHX_ SV *sv, UV c)
 {
     PERL_ARGS_ASSERT_PUT_CODE_POINT;
@@ -1082,9 +1093,11 @@ S_put_code_point(pTHX_ SV *sv, UV c)
     }
 }
 
-STATIC void
+static void
 S_put_range(pTHX_ SV *sv, UV start, const UV end, const bool allow_literals)
 {
+    PERL_ARGS_ASSERT_PUT_RANGE;
+
     /* Appends to 'sv' a displayable version of the range of code points from
      * 'start' to 'end'.  Mnemonics (like '\r') are used for the few controls
      * that have them, when they occur at the beginning or end of the range.
@@ -1099,8 +1112,6 @@ S_put_range(pTHX_ SV *sv, UV start, const UV end, const bool allow_literals)
     const unsigned int min_range_count = 3;
 
     assert(start <= end);
-
-    PERL_ARGS_ASSERT_PUT_RANGE;
 
     while (start <= end) {
         UV this_end;
@@ -1264,16 +1275,16 @@ S_put_range(pTHX_ SV *sv, UV start, const UV end, const bool allow_literals)
     }
 }
 
-STATIC void
+static void
 S_put_charclass_bitmap_innards_invlist(pTHX_ SV *sv, SV* invlist)
 {
+    PERL_ARGS_ASSERT_PUT_CHARCLASS_BITMAP_INNARDS_INVLIST;
+
     /* Concatenate onto the PV in 'sv' a displayable form of the inversion list
      * 'invlist' */
 
     UV start, end;
     bool allow_literals = true;
-
-    PERL_ARGS_ASSERT_PUT_CHARCLASS_BITMAP_INNARDS_INVLIST;
 
     /* Generally, it is more readable if printable characters are output as
      * literals, but if a range (nearly) spans all of them, it's best to output
@@ -1319,7 +1330,7 @@ S_put_charclass_bitmap_innards_invlist(pTHX_ SV *sv, SV* invlist)
     return;
 }
 
-STATIC SV*
+static SV*
 S_put_charclass_bitmap_innards_common(pTHX_
         SV* invlist,            /* The bitmap */
         SV* posixes,            /* Under /l, things like [:word:], \S */
@@ -1329,14 +1340,14 @@ S_put_charclass_bitmap_innards_common(pTHX_
         const bool invert       /* Is the result to be inverted? */
 )
 {
+    PERL_ARGS_ASSERT_PUT_CHARCLASS_BITMAP_INNARDS_COMMON;
+
     /* Create and return an SV containing a displayable version of the bitmap
      * and associated information determined by the input parameters.  If the
      * output would have been only the inversion indicator '^', NULL is instead
      * returned. */
 
     SV * output;
-
-    PERL_ARGS_ASSERT_PUT_CHARCLASS_BITMAP_INNARDS_COMMON;
 
     if (invert) {
         output = newSVpvs("^");
@@ -1353,17 +1364,17 @@ S_put_charclass_bitmap_innards_common(pTHX_
         sv_catsv(output, posixes);
     }
 
-    if (only_utf8 && _invlist_len(only_utf8)) {
+    if (only_utf8 && invlist_len_(only_utf8)) {
         sv_catpvf(output, "%s{utf8}%s", PL_colors[1], PL_colors[0]);
         put_charclass_bitmap_innards_invlist(output, only_utf8);
     }
 
-    if (not_utf8 && _invlist_len(not_utf8)) {
+    if (not_utf8 && invlist_len_(not_utf8)) {
         sv_catpvf(output, "%s{not utf8}%s", PL_colors[1], PL_colors[0]);
         put_charclass_bitmap_innards_invlist(output, not_utf8);
     }
 
-    if (only_utf8_locale && _invlist_len(only_utf8_locale)) {
+    if (only_utf8_locale && invlist_len_(only_utf8_locale)) {
         sv_catpvf(output, "%s{utf8 locale}%s", PL_colors[1], PL_colors[0]);
         put_charclass_bitmap_innards_invlist(output, only_utf8_locale);
 
@@ -1376,7 +1387,7 @@ S_put_charclass_bitmap_innards_common(pTHX_
             UV start, end;
             SV* above_bitmap = NULL;
 
-            _invlist_subtract(only_utf8_locale, PL_InBitmap, &above_bitmap);
+            invlist_subtract_(only_utf8_locale, PL_InBitmap, &above_bitmap);
 
             invlist_iterinit(above_bitmap);
             while (invlist_iternext(above_bitmap, &start, &end)) {
@@ -1398,7 +1409,7 @@ S_put_charclass_bitmap_innards_common(pTHX_
     return output;
 }
 
-STATIC U8
+static U8
 S_put_charclass_bitmap_innards(pTHX_ SV *sv,
                                      char *bitmap,
                                      SV *nonbitmap_invlist,
@@ -1407,6 +1418,8 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
                                      const U8 flags,
                                      const bool force_as_is_display)
 {
+    PERL_ARGS_ASSERT_PUT_CHARCLASS_BITMAP_INNARDS;
+
     /* Appends to 'sv' a displayable version of the innards of the bracketed
      * character class defined by the other arguments:
      *  'bitmap' points to the bitmap, or NULL if to ignore that.
@@ -1467,8 +1480,6 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
      * as that is generally easier to understand */
     const int bias = 5;
 
-    PERL_ARGS_ASSERT_PUT_CHARCLASS_BITMAP_INNARDS;
-
     /* Start off with whatever code points are passed in.  (We clone, so we
      * don't change the caller's list) */
     if (nonbitmap_invlist) {
@@ -1476,7 +1487,7 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
         invlist = invlist_clone(nonbitmap_invlist, NULL);
     }
     else {  /* Worst case size is every other code point is matched */
-        invlist = _new_invlist(NUM_ANYOF_CODE_POINTS / 2);
+        invlist = new_invlist_(NUM_ANYOF_CODE_POINTS / 2);
     }
 
     if (flags) {
@@ -1486,8 +1497,8 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
              * nonbitmap list are precisely the ones that match only when the
              * target is UTF-8 (they should all be non-ASCII). */
             if (flags & ANYOF_HAS_EXTRA_RUNTIME_MATCHES) {
-                _invlist_intersection(invlist, PL_UpperLatin1, &only_utf8);
-                _invlist_subtract(invlist, only_utf8, &invlist);
+                invlist_intersection_(invlist, PL_UpperLatin1, &only_utf8);
+                invlist_subtract_(invlist, only_utf8, &invlist);
             }
 
             /* And this flag for matching all non-ASCII 0xFF and below */
@@ -1528,7 +1539,7 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
                      i < NUM_ANYOF_CODE_POINTS && BITMAP_TEST(bitmap, i);
                      i++)
                 { /* empty */ }
-                invlist = _add_range_to_invlist(invlist, start, i-1);
+                invlist = add_range_to_invlist_(invlist, start, i-1);
             }
         }
     }
@@ -1538,10 +1549,10 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
      * This could happen if the code that populates these misses some
      * duplication. */
     if (only_utf8) {
-        _invlist_subtract(only_utf8, invlist, &only_utf8);
+        invlist_subtract_(only_utf8, invlist, &only_utf8);
     }
     if (not_utf8) {
-        _invlist_subtract(not_utf8, invlist, &not_utf8);
+        invlist_subtract_(not_utf8, invlist, &not_utf8);
     }
 
     if (only_utf8_locale_invlist) {
@@ -1550,7 +1561,7 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
          * modifying it */
         only_utf8_locale = invlist_clone(only_utf8_locale_invlist, NULL);
 
-        _invlist_subtract(only_utf8_locale, invlist, &only_utf8_locale);
+        invlist_subtract_(only_utf8_locale, invlist, &only_utf8_locale);
 
         /* And, it can get really weird for us to try outputting an inverted
          * form of this list when it has things above the bitmap, so don't even
@@ -1600,15 +1611,15 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
         /* For the unconditional inversion list, we have to add in all the
          * conditional code points, so that when inverted, they will be gone
          * from it */
-        _invlist_union(only_utf8, invlist, &invlist);
-        _invlist_union(not_utf8, invlist, &invlist);
-        _invlist_union(only_utf8_locale, invlist, &invlist);
-        _invlist_invert(invlist);
-        _invlist_intersection(invlist, PL_InBitmap, &invlist);
+        invlist_union_(only_utf8, invlist, &invlist);
+        invlist_union_(not_utf8, invlist, &invlist);
+        invlist_union_(only_utf8_locale, invlist, &invlist);
+        invlist_invert_(invlist);
+        invlist_intersection_(invlist, PL_InBitmap, &invlist);
 
         if (only_utf8) {
-            _invlist_invert(only_utf8);
-            _invlist_intersection(only_utf8, PL_UpperLatin1, &only_utf8);
+            invlist_invert_(only_utf8);
+            invlist_intersection_(only_utf8, PL_UpperLatin1, &only_utf8);
         }
         else if (not_utf8) {
 
@@ -1620,8 +1631,8 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
         }
 
         if (only_utf8_locale) {
-            _invlist_invert(only_utf8_locale);
-            _invlist_intersection(only_utf8_locale,
+            invlist_invert_(only_utf8_locale);
+            invlist_intersection_(only_utf8_locale,
                                   PL_InBitmap,
                                   &only_utf8_locale);
         }

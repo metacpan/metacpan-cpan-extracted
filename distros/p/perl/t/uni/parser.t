@@ -10,7 +10,7 @@ BEGIN {
     skip_all_without_unicode_tables();
 }
 
-plan (tests => 58);
+plan (tests => 59);
 
 use utf8;
 use open qw( :utf8 :std );
@@ -261,14 +261,26 @@ SKIP: {
     }
 }
 
-fresh_perl_is(<<'EOS', <<'EXPECT', {}, 'no panic in pad_findmy_pvn (#134061)');
-use utf8;
-eval "sort \x{100}%";
-die $@;
-EOS
-syntax error at (eval 1) line 1, at EOF
-Execution of (eval 1) aborted due to compilation errors.
-EXPECT
+{
+    fresh_perl_is(<<~'EOS', <<~'EXPECT', {}, 'no panic in pad_findmy_pvn (#134061)');
+    use utf8;
+    eval "sort \x{100}%";
+    die $@;
+    EOS
+    syntax error at (eval 1) line 1, at EOF
+    Execution of (eval 1) aborted due to compilation errors.
+    EXPECT
+}
+
+{
+    use utf8;
+    my $expected = '\x{24E6} is a \w char that isn\'t valid in a name;'
+                 . ' marked by <-- HERE after has_illegal_ⓦ<-- HERE'
+                 . ' ordchar_in_identifier_name at';
+    use feature 'unicode_eval';
+    eval "my \$has_illegal_ⓦordchar_in_identifier_name = 0";
+    like $@, qr/\Q$expected/;
+}
 
 # New tests go here ^^^^^
 

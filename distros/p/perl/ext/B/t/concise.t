@@ -10,7 +10,7 @@ BEGIN {
     require 'test.pl';		# we use runperl from 'test.pl', so can't use Test::More
 }
 
-plan tests => 167;
+plan tests => 168;
 
 require_ok("B::Concise");
 
@@ -59,12 +59,12 @@ foreach my $foo (undef, 0) {
     is ($handle, \*STDOUT, "walk_output set to STDOUT (default)");
 }
 
-{   # any object that can print should be ok for walk_output
-    package Hugo;
-    sub new { my $foo = bless {} };
+# any object that can print should be ok for walk_output
+package Hugo {
+    sub new { bless {} };
     sub print { CORE::print @_ }
 }
-my $foo = new Hugo;	# suggested this API fix
+my $foo = Hugo->new;	# suggested this API fix
 eval {  walk_output($foo) };
 is ($@, '', "walk_output() accepts obj that can print");
 
@@ -511,6 +511,14 @@ like $out, qr/$end/, 'OP_AND->op_other points correctly';
     is($hints[0], 'v:{',                           "hints[0]");
     is($hints[1], 'v:*,&,{,x*,x&,x$,$',            "hints[1]");
     is($hints[2], 'v:us,*,&,{,x*,x&,x$,$,fea=15',  "hints[2]");
+}
+
+# test that walk_output() handle is used for stash member names
+{
+    sub Walked::foo {}
+    my $res = render('-basic', '-stash=Walked');
+    like($res, qr/FUNC: \*Walked::foo/,
+         "check stash member name captured");
 }
 
 __END__

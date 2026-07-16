@@ -1,0 +1,7 @@
+% layout (stash('layout') // 'main');
+
+% if (flash('error')) {
+    <div class="error"><%= flash('error') %></div>
+% }
+
+%== auth_form

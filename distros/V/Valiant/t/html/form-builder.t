@@ -133,6 +133,16 @@ ok my $fb = Valiant::HTML::FormBuilder->new(
   model => $person,
   name => 'person');
 
+{
+  # form_enctype must read html.enctype, not html.method
+  ok my $fb_enctype = Valiant::HTML::FormBuilder->new(
+    model => $person,
+    name => 'person',
+    options => { html => { method => 'post', enctype => 'multipart/form-data' } });
+  is $fb_enctype->form_method, 'post', 'form_method reads html.method';
+  is $fb_enctype->form_enctype, 'multipart/form-data', 'form_enctype reads html.enctype';
+}
+
 is $fb->model_errors, '<ol><li>Trouble 1</li><li>Trouble 2</li></ol>';
 is $fb->model_errors({class=>'foo'}), '<ol class="foo"><li>Trouble 1</li><li>Trouble 2</li></ol>';
 is $fb->model_errors({max_errors=>1}), '<div>Trouble 1</div>';

@@ -320,6 +320,13 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     }
                 }
                 that._loading--;
+                // a trigger field changed by the user while we were loading
+                // parks its reconfiguration in _reconfPending; without this
+                // drain the request would never be sent since
+                // _executeReconfPending only runs after a completed reconf.
+                if (that._loading === 0) {
+                    that._executeReconfPending();
+                }
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         },
         _getUrlData: function () {
@@ -374,6 +381,12 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 }
                 busy.vanish();
                 that._loading--;
+                // see _loadDataReadOnly: release reconfigurations parked
+                // while the form was loading (covers the error path too;
+                // on success _reconfForm above picks them up itself).
+                if (that._loading === 0) {
+                    that._executeReconfPending();
+                }
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         }
     },

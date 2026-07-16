@@ -242,7 +242,7 @@ _find_path(self, x1, y1, x2, y2)
 		if (result != NULL)
 			RETVAL = newRV_inc((SV*) result);
 		else
-			RETVAL = NULL;
+			RETVAL = &PL_sv_undef;
 	OUTPUT:
 		RETVAL
 

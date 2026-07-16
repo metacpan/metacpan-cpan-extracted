@@ -19,6 +19,51 @@
 #define    WEEKDAY_BIAS    6    /* (1+6)%7 makes Sunday 0 again */
 #define    TP_BUF_SIZE     160
 
+#  ifndef MIN
+#    define MIN(a,b) ((a) < (b) ? (a) : (b))
+#  endif
+
+#ifdef HAVE_TIMEGM
+
+#    define my_timegm timegm
+
+#elif defined(WIN32)
+
+#    define my_timegm _mkgmtime
+
+#else
+/* Fallback for platforms without timegm() (AIX, HP-UX, QNX, old Solaris) */
+/* Howard Hinnant's algorithm - public domain */
+static int days_from_civil(int y, int m, int d) {
+	y -= m <= 2;
+	const int era = (y >= 0 ? y : y-399) / 400;
+	const int yoe = y - era * 400;
+	const int doy = (153*(m + (m > 2 ? -3 : 9)) + 2)/5 + d-1;
+	const int doe = yoe * 365 + yoe/4 - yoe/100 + doy;
+	return era * 146097 + doe - 719468;
+}
+
+static time_t my_timegm(struct tm *tm) {
+	int year = tm->tm_year + 1900;
+	int month = tm->tm_mon;
+
+	/* Normalize month */
+	if (month > 11) {
+		year += month / 12;
+		month %= 12;
+	} else if (month < 0) {
+		const int years_diff = (11 - month) / 12;
+		year -= years_diff;
+		month += 12 * years_diff;
+	}
+
+	const int days_since_epoch = days_from_civil(year, month + 1, tm->tm_mday);
+
+	return 60 * (60 * (24L * days_since_epoch + tm->tm_hour) + tm->tm_min) + tm->tm_sec;
+}
+
+#endif
+
 #ifdef WIN32
 
 /*
@@ -272,6 +317,26 @@ my_mini_mktime(struct tm *ptm)
     ptm->tm_wday = (jday + WEEKDAY_BIAS) % 7;
 }
 
+static struct tm
+safe_localtime(pTHX_ const time_t *tp)
+{
+    struct tm *result = localtime(tp);
+    if (!result) {
+        croak("localtime failed for invalid time value");
+    }
+    return *result;
+}
+
+static struct tm
+safe_gmtime(pTHX_ const time_t *tp)
+{
+    struct tm *result = gmtime(tp);
+    if (!result) {
+        croak("gmtime failed for invalid time value");
+    }
+    return *result;
+}
+
 #   if defined(WIN32) || (defined(__QNX__) && defined(__WATCOMC__))
 #       define strncasecmp(x,y,n) strnicmp(x,y,n)
 #   endif
@@ -310,38 +375,17 @@ my_mini_mktime(struct tm *ptm)
  * official policies, either expressed or implied, of Powerdog Industries.
  */
 
-#include <time.h>
-#include <ctype.h>
-#include <string.h>
 static char * _strptime(pTHX_ const char *, const char *, struct tm *,
-			int *got_GMT);
+			int *got_GMT, HV *locales);
 
-#define asizeof(a)	(sizeof (a) / sizeof ((a)[0]))
-
-struct lc_time_T {
-    char *  mon[12];
-    char *  month[12];
-    char *  wday[7];
-    char *  weekday[7];
-    char *  am;
-    char *  pm;
-    char *  AM;
-    char *  PM;
-    char *  alt_month[12];
-};
-
-
-static struct lc_time_T _C_time_locale;
-
-#define Locale (&_C_time_locale)
 
 static char *
-_strptime(pTHX_ const char *buf, const char *fmt, struct tm *tm, int *got_GMT)
+_strptime(pTHX_ const char *buf, const char *fmt, struct tm *tm, int *got_GMT, HV *locales)
 {
 	char c;
 	const char *ptr;
 	int i;
-	size_t len;
+	size_t len = 0;
 	int Ealternative, Oalternative;
 
     /* There seems to be a slightly improved version at
@@ -356,11 +400,13 @@ _strptime(pTHX_ const char *buf, const char *fmt, struct tm *tm, int *got_GMT)
 		c = *ptr++;
 		
 		if (c != '%') {
-			if (isspace((unsigned char)c))
-				while (*buf != 0 && isspace((unsigned char)*buf))
+			if (isSPACE((unsigned char)c))
+				while (*buf != 0 && isSPACE((unsigned char)*buf))
 					buf++;
-			else if (c != *buf++)
-				return 0;
+			else if (c != *buf++) {
+				warn("Time string mismatches format string");
+				return NULL;
+			}
 			continue;
 		}
 
@@ -372,44 +418,36 @@ label:
 		case 0:
 		case '%':
 			if (*buf++ != '%')
-				return 0;
+				return NULL;
 			break;
 
 		case '+':
-			buf = _strptime(aTHX_ buf, "%c", tm, got_GMT);
+			buf = _strptime(aTHX_ buf, "%c", tm, got_GMT, locales);
 			if (buf == 0)
-				return 0;
+				return NULL;
 			break;
 
 		case 'C':
-			if (!isdigit((unsigned char)*buf))
-				return 0;
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			/* XXX This will break for 3-digit centuries. */
                         len = 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
 			}
 			if (i < 19)
-				return 0;
+				return NULL;
 
 			tm->tm_year = i * 100 - 1900;
 			break;
 
-		case 'c':
-			/* NOTE: c_fmt is intentionally ignored */
-
-			buf = _strptime(aTHX_ buf, "%a %d %b %Y %I:%M:%S %p %Z", tm, got_GMT);
-			if (buf == 0)
-				return 0;
-			break;
-
 		case 'D':
-			buf = _strptime(aTHX_ buf, "%m/%d/%y", tm, got_GMT);
+			buf = _strptime(aTHX_ buf, "%m/%d/%y", tm, got_GMT, locales);
 			if (buf == 0)
-				return 0;
+				return NULL;
 			break;
 
 		case 'E':
@@ -425,61 +463,56 @@ label:
 			goto label;
 
 		case 'F':
-			buf = _strptime(aTHX_ buf, "%Y-%m-%d", tm, got_GMT);
+			buf = _strptime(aTHX_ buf, "%Y-%m-%d", tm, got_GMT, locales);
 			if (buf == 0)
-				return 0;
+				return NULL;
 			break;
 
 		case 'R':
-			buf = _strptime(aTHX_ buf, "%H:%M", tm, got_GMT);
+			buf = _strptime(aTHX_ buf, "%H:%M", tm, got_GMT, locales);
 			if (buf == 0)
-				return 0;
+				return NULL;
 			break;
 
 		case 'r':
-			buf = _strptime(aTHX_ buf, "%I:%M:%S %p", tm, got_GMT);
+			{
+				SV** am_sv = hv_fetchs(locales, "AM", 0);
+				if (am_sv && SvPOK(*am_sv) && SvCUR(*am_sv) > 0) {
+					buf = _strptime(aTHX_ buf, "%I:%M:%S %p", tm, got_GMT, locales);
+				} else {
+					buf = _strptime(aTHX_ buf, "%H:%M:%S", tm, got_GMT, locales);
+				}
+			}
 			if (buf == 0)
-				return 0;
+				return NULL;
 			break;
 
 		case 'n': /* whitespace */
 		case 't':
-			if (!isspace((unsigned char)*buf))
-				return 0;
-			while (isspace((unsigned char)*buf))
+			if (!isSPACE((unsigned char)*buf))
+				return NULL;
+			while (isSPACE((unsigned char)*buf))
 				buf++;
 			break;
 		
 		case 'T':
-			buf = _strptime(aTHX_ buf, "%H:%M:%S", tm, got_GMT);
+			buf = _strptime(aTHX_ buf, "%H:%M:%S", tm, got_GMT, locales);
 			if (buf == 0)
-				return 0;
-			break;
-
-		case 'X':
-			buf = _strptime(aTHX_ buf, "%I:%M:%S %p", tm, got_GMT);
-			if (buf == 0)
-				return 0;
-			break;
-
-		case 'x':
-			buf = _strptime(aTHX_ buf, "%a %d %b %Y", tm, got_GMT);
-			if (buf == 0)
-				return 0;
+				return NULL;
 			break;
 
 		case 'j':
-			if (!isdigit((unsigned char)*buf))
-				return 0;
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = 3;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
 			}
 			if (i < 1 || i > 366)
-				return 0;
+				return NULL;
 
 			tm->tm_yday = i - 1;
 			tm->tm_mday = 0;
@@ -487,14 +520,14 @@ label:
 
 		case 'M':
 		case 'S':
-			if (*buf == 0 || isspace((unsigned char)*buf))
+			if (*buf == 0 || isSPACE((unsigned char)*buf))
 				break;
 
-			if (!isdigit((unsigned char)*buf))
-				return 0;
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
@@ -502,16 +535,16 @@ label:
 
 			if (c == 'M') {
 				if (i > 59)
-					return 0;
+					return NULL;
 				tm->tm_min = i;
 			} else {
 				if (i > 60)
-					return 0;
+					return NULL;
 				tm->tm_sec = i;
 			}
 
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
 			break;
 
@@ -527,25 +560,27 @@ label:
 			 * XXX The %l specifier may gobble one too many
 			 * digits if used incorrectly.
 			 */
-            if (!isdigit((unsigned char)*buf))
-				return 0;
+            if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
 			}
 			if (c == 'H' || c == 'k') {
 				if (i > 23)
-					return 0;
-			} else if (i > 12)
-				return 0;
+					return NULL;
+			} else if (i > 12) {
+					warn("Hour cannot be >12 with %%I or %%l");
+				return NULL;
+			}
 
 			tm->tm_hour = i;
 
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
 			break;
 
@@ -555,52 +590,98 @@ label:
 			 * XXX This is bogus if parsed before hour-related
 			 * specifiers.
 			 */
-            len = strlen(Locale->am);
-			if (strncasecmp(buf, Locale->am, len) == 0 ||
-					strncasecmp(buf, Locale->AM, len) == 0) {
-				if (tm->tm_hour > 12)
-					return 0;
-				if (tm->tm_hour == 12)
-					tm->tm_hour = 0;
-				buf += len;
-				break;
+			{
+				SV** am_sv = hv_fetchs(locales, "am", 0);
+				SV** AM_sv = hv_fetchs(locales, "AM", 0);
+				if (am_sv && SvPOK(*am_sv) && AM_sv && SvPOK(*AM_sv)) {
+					char* am_str = SvPV_nolen(*am_sv);
+					char* AM_str = SvPV_nolen(*AM_sv);
+					len = MIN(strlen(am_str),strlen(AM_str));
+					if ((strncasecmp(buf, am_str, len) == 0) ||
+							strncasecmp(buf, AM_str, len) == 0) {
+						if (tm->tm_hour > 12) {
+							warn("Hour cannot be >12 with %%p");
+							return NULL;
+						}
+
+						if (tm->tm_hour == 12)
+							tm->tm_hour = 0;
+						buf += len;
+						break;
+					}
+				}
+
+				SV** pm_sv = hv_fetchs(locales, "pm", 0);
+				SV** PM_sv = hv_fetchs(locales, "PM", 0);
+				if (pm_sv && SvPOK(*pm_sv) && PM_sv && SvPOK(*PM_sv)) {
+					char* pm_str = SvPV_nolen(*pm_sv);
+					char* PM_str = SvPV_nolen(*PM_sv);
+					len = MIN(strlen(pm_str),strlen(PM_str));
+					if ((strncasecmp(buf, pm_str, len) == 0) ||
+							strncasecmp(buf, PM_str, len) == 0) {
+						if (tm->tm_hour > 12) {
+							warn("Hour cannot be >12 with %%p");
+							return NULL;
+						}
+						if (tm->tm_hour != 12)
+							tm->tm_hour += 12;
+						buf += len;
+						break;
+					}
+				}
 			}
 
-			len = strlen(Locale->pm);
-			if (strncasecmp(buf, Locale->pm, len) == 0 ||
-					strncasecmp(buf, Locale->PM, len) == 0) {
-				if (tm->tm_hour > 12)
-					return 0;
-				if (tm->tm_hour != 12)
-					tm->tm_hour += 12;
-				buf += len;
-				break;
-			}
-
-			return 0;
+			warn("Failed parsing %%p");
+			return NULL;
 
 		case 'A':
 		case 'a':
-			for (i = 0; i < (int)asizeof(Locale->weekday); i++) {
-				if (c == 'A') {
-					len = strlen(Locale->weekday[i]);
-					if (strncasecmp(buf,
-							Locale->weekday[i],
-							len) == 0)
-						break;
-				} else {
-					len = strlen(Locale->wday[i]);
-					if (strncasecmp(buf,
-							Locale->wday[i],
-							len) == 0)
-						break;
+			{
+			SV** weekday_sv = hv_fetchs(locales, "weekday", 0);
+			SV** wday_sv = hv_fetchs(locales, "wday", 0);
+			if (!weekday_sv || !wday_sv || !SvROK(*weekday_sv) || !SvROK(*wday_sv))
+				return NULL;
+
+			AV* weekday_av = (AV*)SvRV(*weekday_sv);
+			AV* wday_av = (AV*)SvRV(*wday_sv);
+
+			/* Use longest-match to handle ambiguous prefixes
+				(e.g., "Cuma" vs "Cumartesi" in Turkish) */
+			int best_match = -1;
+			size_t best_len = 0;
+
+			for (i = 0; i <= av_len(weekday_av); i++) {
+				SV** day_sv;
+
+				/* Try full weekday name */
+				day_sv = av_fetch(weekday_av, i, 0);
+				if (day_sv && SvPOK(*day_sv)) {
+					char* day_str = SvPV(*day_sv, len);
+					if (len > best_len && strncasecmp(buf, day_str, len) == 0) {
+						best_match = i;
+						best_len = len;
+					}
+				}
+
+				/* Try abbreviated weekday name */
+				day_sv = av_fetch(wday_av, i, 0);
+				if (day_sv && SvPOK(*day_sv)) {
+					char* day_str = SvPV(*day_sv, len);
+					if (len > best_len && strncasecmp(buf, day_str, len) == 0) {
+						best_match = i;
+						best_len = len;
+					}
 				}
 			}
-			if (i == (int)asizeof(Locale->weekday))
-				return 0;
 
-			tm->tm_wday = i;
-			buf += len;
+			if (best_match < 0) {
+				warn("Failed parsing weekday names");
+				return NULL;
+			}
+
+			tm->tm_wday = best_match;
+			buf += best_len;
+			}
 			break;
 
 		case 'U':
@@ -612,39 +693,39 @@ label:
 			 * point to calculate a real value, so just check the
 			 * range for now.
 			 */
-            if (!isdigit((unsigned char)*buf))
-				return 0;
+            if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
 			}
 			if (i > 53)
-				return 0;
+				return NULL;
 
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
 			break;
 
 		case 'u':
 		case 'w':
-			if (!isdigit((unsigned char)*buf))
-				return 0;
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			i = *buf - '0';
 			if (i > 6 + (c == 'u'))
-				return 0;
+				return NULL;
 			if (i == 7)
 				i = 0;
 
 			tm->tm_wday = i;
 
 			buf++;
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
 			break;
 
@@ -658,77 +739,106 @@ label:
 			 * XXX The %e specifier may gobble one too many
 			 * digits if used incorrectly.
 			 */
-                        if (!isdigit((unsigned char)*buf))
-				return 0;
+                        if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
 			}
 			if (i > 31)
-				return 0;
+				return NULL;
 
 			tm->tm_mday = i;
 
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
+			break;
+
+		case 'f':
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
+
+			len = 6;
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
+				i *= 10;
+				i += *buf - '0';
+				len--;
+			}
+			/* Value is discarded - fractional seconds not stored */
 			break;
 
 		case 'B':
 		case 'b':
 		case 'h':
-			for (i = 0; i < (int)asizeof(Locale->month); i++) {
-				if (Oalternative) {
-					if (c == 'B') {
-						len = strlen(Locale->alt_month[i]);
-						if (strncasecmp(buf,
-								Locale->alt_month[i],
-								len) == 0)
-							break;
+			{
+			SV** month_sv = hv_fetchs(locales, "month", 0);
+			SV** mon_sv = hv_fetchs(locales, "mon", 0);
+			if (!month_sv || !mon_sv || !SvROK(*month_sv) || !SvROK(*mon_sv))
+				return NULL;
+
+			AV* month_av = (AV*)SvRV(*month_sv);
+			AV* mon_av = (AV*)SvRV(*mon_sv);
+
+			/* Use longest-match to handle ambiguous prefixes
+				(e.g., "1" vs "10" in Japanese) */
+			int best_match = -1;
+			size_t best_len = 0;
+
+			for (i = 0; i <= av_len(month_av); i++) {
+				SV** month_sv_item;
+
+				/* Try full month name */
+				month_sv_item = av_fetch(month_av, i, 0);
+				if (month_sv_item && SvPOK(*month_sv_item)) {
+					char* month_str = SvPV(*month_sv_item, len);
+					if (len > best_len && strncasecmp(buf, month_str, len) == 0) {
+						best_match = i;
+						best_len = len;
 					}
-				} else {
-					if (c == 'B') {
-						len = strlen(Locale->month[i]);
-						if (strncasecmp(buf,
-								Locale->month[i],
-								len) == 0)
-							break;
-					} else {
-						len = strlen(Locale->mon[i]);
-						if (strncasecmp(buf,
-								Locale->mon[i],
-								len) == 0)
-							break;
+				}
+
+				/* Try abbreviated month name */
+				month_sv_item = av_fetch(mon_av, i, 0);
+				if (month_sv_item && SvPOK(*month_sv_item)) {
+					char* month_str = SvPV(*month_sv_item, len);
+					if (len > best_len && strncasecmp(buf, month_str, len) == 0) {
+						best_match = i;
+						best_len = len;
 					}
 				}
 			}
-			if (i == (int)asizeof(Locale->month))
-				return 0;
 
-			tm->tm_mon = i;
-			buf += len;
+			if (best_match < 0) {
+				warn("Failed parsing month name");
+				return NULL;
+			}
+
+			tm->tm_mon = best_match;
+			buf += best_len;
+			}
 			break;
 
 		case 'm':
-			if (!isdigit((unsigned char)*buf))
-				return 0;
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
 			}
 			if (i < 1 || i > 12)
-				return 0;
+				return NULL;
 
 			tm->tm_mon = i - 1;
 
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
 			break;
 
@@ -742,19 +852,17 @@ label:
 
 			sverrno = errno;
 			errno = 0;
-			n = strtol(buf, &cp, 10);
+			n = Strtol(buf, &cp, 10);
 			if (errno == ERANGE || (long)(t = n) != n) {
 				errno = sverrno;
-				return 0;
+				return NULL;
 			}
 			errno = sverrno;
 			buf = cp;
-            memset(&mytm, 0, sizeof(mytm));
+			Zero(&mytm, 1, struct tm);
 
-            if(*got_GMT == 1)
-                mytm = *localtime(&t);
-            else
-                mytm = *gmtime(&t);
+			mytm = safe_gmtime(aTHX_ &t);
+			*got_GMT = 1;
 
             tm->tm_sec    = mytm.tm_sec;
             tm->tm_min    = mytm.tm_min;
@@ -770,14 +878,14 @@ label:
 
 		case 'Y':
 		case 'y':
-			if (*buf == 0 || isspace((unsigned char)*buf))
+			if (*buf == 0 || isSPACE((unsigned char)*buf))
 				break;
 
-			if (!isdigit((unsigned char)*buf))
-				return 0;
+			if (!isDIGIT((unsigned char)*buf))
+				return NULL;
 
 			len = (c == 'Y') ? 4 : 2;
-			for (i = 0; len && *buf != 0 && isdigit((unsigned char)*buf); buf++) {
+			for (i = 0; len && *buf != 0 && isDIGIT((unsigned char)*buf); buf++) {
 				i *= 10;
 				i += *buf - '0';
 				len--;
@@ -786,13 +894,11 @@ label:
 				i -= 1900;
 			if (c == 'y' && i < 69)
 				i += 100;
-			if (i < 0)
-				return 0;
 
 			tm->tm_year = i;
 
-			if (*buf != 0 && isspace((unsigned char)*buf))
-				while (*ptr != 0 && !isspace((unsigned char)*ptr))
+			if (*buf != 0 && isSPACE((unsigned char)*buf))
+				while (*ptr != 0 && !isSPACE((unsigned char)*ptr))
 					ptr++;
 			break;
 
@@ -801,22 +907,21 @@ label:
 			const char *cp;
 			char *zonestr;
 
-			for (cp = buf; *cp && isupper((unsigned char)*cp); ++cp)
+			for (cp = buf; *cp && isUPPER((unsigned char)*cp); ++cp)
                             {/*empty*/}
 			if (cp - buf) {
-				zonestr = (char *)malloc((size_t) (cp - buf + 1));
+				zonestr = (char *)safemalloc((size_t) (cp - buf + 1));
 				if (!zonestr) {
+					Safefree(zonestr);
 				    errno = ENOMEM;
-				    return 0;
+				    return NULL;
 				}
-				strncpy(zonestr, buf,(size_t) (cp - buf));
-				zonestr[cp - buf] = '\0';
-				my_tzset(aTHX);
-				if (0 == strcmp(zonestr, "GMT")) {
+				my_strlcpy(zonestr, buf,(size_t) (cp - buf)+1);
+				/* my_tzset(aTHX); */
+				if (strEQ(zonestr, "GMT") || strEQ(zonestr, "UTC")) {
 				    *got_GMT = 1;
 				}
-				free(zonestr);
-				if (!*got_GMT) return 0;
+				Safefree(zonestr);
 				buf += cp - buf;
 			}
 			}
@@ -829,20 +934,37 @@ label:
 			if (*buf != '+') {
 				if (*buf == '-')
 					sign = -1;
-				else
-					return 0;
+				else {
+					warn("%%z must contain '-' or '+'");
+					return NULL;
+				}
 			}
 
 			buf++;
 			i = 0;
 			for (len = 4; len > 0; len--) {
-				if (isdigit((int)*buf)) {
+				if (isDIGIT((unsigned char)*buf)) {
 					i *= 10;
 					i += *buf - '0';
 					buf++;
-				} else
-					return 0;
+				} else if (len == 2) {
+					/* Support ISO 8601 HH:MM format in addition to RFC 822 HHMM */
+					if (*buf == ':') {
+						buf++;
+						len++;
+					} else {
+						i *= 100;
+						break;
+					}
+				} else {
+					warn("%%z format mismatch");
+					return NULL;
+				}
 			}
+
+			/* Valid if between UTC+14 and UTC-12 and minutes <= 60 */
+			if (i > 1400 || (sign == -1 && i > 1200) || (i % 100) >= 60)
+				return NULL;
 
 			tm->tm_hour -= sign * (i / 100);
 			tm->tm_min  -= sign * (i % 100);
@@ -912,34 +1034,6 @@ return_11part_tm(pTHX_ SV ** SP, struct tm *mytm)
 }
 
 
-static void _populate_C_time_locale(pTHX_ HV* locales )
-{
-    AV* alt_names   = (AV *) SvRV( *hv_fetch(locales, "alt_month", 9, 0) );
-    AV* long_names  = (AV *) SvRV( *hv_fetch(locales, "month", 5, 0) );
-    AV* short_names = (AV *) SvRV( *hv_fetch(locales, "mon", 3, 0) );
-    int i;
-
-    for (i = 0; i < 1 + (int) av_len( long_names ); i++) {
-        Locale->alt_month[i] = SvPV_nolen( (SV *) *av_fetch(alt_names, i, 0) );
-        Locale->month[i]     = SvPV_nolen( (SV *) *av_fetch(long_names, i, 0) );
-        Locale->mon[i]       = SvPV_nolen( (SV *) *av_fetch(short_names, i, 0) );
-    }
-
-    long_names = (AV *) SvRV( *hv_fetch(locales, "weekday", 7, 0) );
-    short_names = (AV *) SvRV( *hv_fetch(locales, "wday", 4, 0) );
-
-    for (i = 0; i < 1 + (int) av_len( long_names ); i++) {
-        Locale->wday[i]    = SvPV_nolen( (SV *) *av_fetch(short_names, i, 0) );
-        Locale->weekday[i] = SvPV_nolen( (SV *) *av_fetch(long_names, i, 0) );
-    }
-
-    Locale->am = SvPV_nolen( (SV *) *hv_fetch(locales, "am", 2, 0) );
-    Locale->pm = SvPV_nolen( (SV *) *hv_fetch(locales, "pm", 2, 0) );
-    Locale->AM = SvPV_nolen( (SV *) *hv_fetch(locales, "AM", 2, 0) );
-    Locale->PM = SvPV_nolen( (SV *) *hv_fetch(locales, "PM", 2, 0) );
-
-    return;
-}
 
 MODULE = Time::Piece     PACKAGE = Time::Piece
 
@@ -957,9 +1051,9 @@ _strftime(fmt, epoch, islocal = 1)
         size_t len;
 
         if(islocal == 1)
-            mytm = *localtime(&epoch);
+            mytm = safe_localtime(aTHX_ &epoch);
         else
-            mytm = *gmtime(&epoch);
+            mytm = safe_gmtime(aTHX_ &epoch);
 
         len = strftime(tmpbuf, TP_BUF_SIZE, fmt, &mytm);
         /*
@@ -1016,16 +1110,20 @@ _tzset()
     return; /* skip XSUBPP's PUTBACK */
 
 void
-_strptime ( string, format, got_GMT, SV* localization )
+_strptime ( string, format, islocal, localization, defaults_ref )
 	char * string
 	char * format
-	int    got_GMT
+	int    islocal
+	SV   * localization
+	SV   * defaults_ref
   PREINIT:
        struct tm mytm;
+	   int    got_GMT = 0;
        char * remainder;
        HV   * locales;
+       AV   * defaults_av;
   PPCODE:
-       memset(&mytm, 0, sizeof(mytm));
+       Zero(&mytm, 1, struct tm);
 
        /* sensible defaults. */
        mytm.tm_mday = 1;
@@ -1040,16 +1138,45 @@ _strptime ( string, format, got_GMT, SV* localization )
             croak("_strptime requires a Hash Reference of locales");
        }
 
-       /* populate our locale data struct (used for %[AaBbPp] flags) */
-       _populate_C_time_locale(aTHX_ locales );
+       /* Check if defaults array was passed and apply them now */
+       if (SvOK(defaults_ref) && SvROK(defaults_ref) && SvTYPE(SvRV(defaults_ref)) == SVt_PVAV) {
+           defaults_av = (AV*)SvRV(defaults_ref);
+           if (av_len(defaults_av)+1 >= 8) {
 
-       remainder = (char *)_strptime(aTHX_ string, format, &mytm, &got_GMT);
+               SV** elem;
+               elem = av_fetch(defaults_av, 0, 0);
+               if (elem && SvOK(*elem)) mytm.tm_sec = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 1, 0);
+               if (elem && SvOK(*elem)) mytm.tm_min = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 2, 0);
+               if (elem && SvOK(*elem)) mytm.tm_hour = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 3, 0);
+               if (elem && SvOK(*elem)) mytm.tm_mday = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 4, 0);
+               if (elem && SvOK(*elem)) mytm.tm_mon = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 5, 0);
+               if (elem && SvOK(*elem)) mytm.tm_year = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 6, 0);
+               if (elem && SvOK(*elem)) mytm.tm_wday = (int)SvIV(*elem);
+               elem = av_fetch(defaults_av, 7, 0);
+               if (elem && SvOK(*elem)) mytm.tm_yday = (int)SvIV(*elem);
+           }
+       }
+
+       remainder = (char *)_strptime(aTHX_ string, format, &mytm, &got_GMT, locales);
        if (remainder == NULL) {
            croak("Error parsing time");
        }
        if (*remainder != '\0') {
            warn("Garbage at end of string in strptime: %s", remainder);
            warn("Perhaps a format flag did not match the actual input?");
+       }
+
+       /* convert if we have a tm in GMT but were called from a localized object */
+       if (got_GMT == 1 && islocal == 1) {
+           time_t t;
+           t = my_timegm(&mytm);
+           mytm = safe_localtime(aTHX_ &t);
        }
 
        return_11part_tm(aTHX_ SP, &mytm);
@@ -1062,7 +1189,7 @@ _mini_mktime(int sec, int min, int hour, int mday, int mon, int year)
        time_t t;
   PPCODE:
        t = 0;
-       mytm = *gmtime(&t);
+       mytm = safe_gmtime(aTHX_ &t);
 
        mytm.tm_sec = sec;
        mytm.tm_min = min;
@@ -1081,8 +1208,8 @@ _crt_localtime(time_t sec)
     PREINIT:
         struct tm mytm;
     PPCODE:
-        if(ix) mytm = *gmtime(&sec);
-        else mytm = *localtime(&sec);
+        if(ix) mytm = safe_gmtime(aTHX_ &sec);
+        else mytm = safe_localtime(aTHX_ &sec);
         /* Need to get: $s,$n,$h,$d,$m,$y */
 
         EXTEND(SP, 10);
@@ -1108,12 +1235,11 @@ _get_localization()
         AV* weekdays = newAV();
         AV* mons = newAV();
         AV* months = newAV();
-        SV** tmp;
         size_t len;
         char buf[TP_BUF_SIZE];
         size_t i;
         time_t t = 1325386800; /*1325386800 = Sun, 01 Jan 2012 03:00:00 GMT*/
-        struct tm mytm = *gmtime(&t);
+        struct tm mytm = safe_gmtime(aTHX_ &t);
      CODE:
 
         for(i = 0; i < 7; ++i){
@@ -1138,22 +1264,25 @@ _get_localization()
             ++mytm.tm_mon;
         }
 
-        tmp = hv_store(locales, "wday", 4, newRV_noinc((SV *) wdays), 0);
-        tmp = hv_store(locales, "weekday", 7, newRV_noinc((SV *) weekdays), 0);
-        tmp = hv_store(locales, "mon", 3, newRV_noinc((SV *) mons), 0);
-        tmp = hv_store(locales, "month", 5, newRV_noinc((SV *) months), 0);
-        tmp = hv_store(locales, "alt_month", 9, newRV((SV *) months), 0);
+        hv_stores(locales, "wday", newRV_noinc((SV *) wdays));
+        hv_stores(locales, "weekday", newRV_noinc((SV *) weekdays));
+        hv_stores(locales, "mon", newRV_noinc((SV *) mons));
+        hv_stores(locales, "month", newRV_noinc((SV *) months));
+
 
         len = strftime(buf, TP_BUF_SIZE, "%p", &mytm);
-        tmp = hv_store(locales, "AM", 2, newSVpvn(buf,len), 0);
+        hv_stores(locales, "AM", newSVpvn(buf,len));
+#  ifndef WIN32
+        len = strftime(buf, TP_BUF_SIZE, "%P", &mytm);
+        hv_stores(locales, "am", newSVpvn(buf,len));
+#  endif
         mytm.tm_hour = 18;
         len = strftime(buf, TP_BUF_SIZE, "%p", &mytm);
-        tmp = hv_store(locales, "PM", 2, newSVpvn(buf,len), 0);
-
-        if(tmp == NULL || !SvOK( (SV *) *tmp)){
-            croak("Failed to get localization.");
-        }
-
+        hv_stores(locales, "PM", newSVpvn(buf,len));
+#  ifndef WIN32
+        len = strftime(buf, TP_BUF_SIZE, "%P", &mytm);
+        hv_stores(locales, "pm", newSVpvn(buf,len));
+#  endif
         RETVAL = newRV_noinc((SV *)locales);
     OUTPUT:
         RETVAL

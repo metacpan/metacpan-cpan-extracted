@@ -1,0 +1,20 @@
+msgid "Aion::Annotation::ScannedEvent - событие завершения сканирования аннотаций в проекте"
+msgstr "Aion::Annotation::ScannedEvent - event for completing scanning of annotations in the project"
+
+msgid "Файл lib/ScannedListener.pm:"
+msgstr "File lib/ScannedListener.pm:"
+
+msgid "Когда `Aion::Annotation` завершает сканирование проекта и записывает новые аннотации, то оно инициирует это событие.\n"
+"При этом события в эмиттере перечитываются сразу после сканирования и до излучения события."
+msgstr "When `Aion::Annotation` finishes scanning the project and writing new annotations, it fires this event.\n"
+"In this case, events in the emitter are reread immediately after scanning and before the event is emitted."
+
+msgid "Очевидное применение данного события: превращение файла аннотаций в `crontab`."
+msgstr "An obvious use for this event is to turn an annotation file into a `crontab`."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Annotation::ScannedEvent module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Annotation::ScannedEvent module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

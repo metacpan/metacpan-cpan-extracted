@@ -1,0 +1,11 @@
+<div class="form-group row" id="perms-group" style="display: none;">
+  <label for="perms" class="col-sm-2 col-form-label text-right">
+    <%= l 'Permissions' %>
+  </label>
+  <div class="col-sm-10">
+    <select id="perms" class="selectpicker form-control" multiple
+            data-live-search="true" title="<%= l 'Select permissions' %>">
+    </select>
+  </div>
+  <div class="clearfix"></div>
+</div>

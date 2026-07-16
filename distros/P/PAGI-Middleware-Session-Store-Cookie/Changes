@@ -1,5 +1,15 @@
 Revision history for PAGI-Middleware-Session-Store-Cookie
 
+0.001005  2026-07-15
+    - Declare the runtime dependency on PAGI::Tools (>= 0.002002), which
+      provides the PAGI::Middleware::Session::Store base class that
+      Store::Cookie inherits from via 'use parent'. The cpanfile previously
+      declared only PAGI, so a fresh install could fail at runtime when
+      nothing else pulled the base class in.
+    - Add regression tests: mutating an existing session round-trips through
+      the real middleware, and a pure read of an existing session emits no
+      Set-Cookie.
+
 0.001004  2026-03-31
     - SECURITY: Fix insecure rand() fallback in IV generation (CVE-2026-5087)
     - Use Crypt::PRNG (from CryptX) for cryptographically secure random bytes

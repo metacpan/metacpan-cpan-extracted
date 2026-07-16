@@ -348,6 +348,16 @@ subtest 'Auth::Bearer - rejects invalid signature' => sub {
     is $events[0]{status}, 401, 'rejects invalid signature';
 };
 
+subtest 'Auth::Bearer - _secure_compare rejects undef inputs' => sub {
+    my $auth = PAGI::Middleware::Auth::Bearer->new(secret => 'test-secret');
+
+    ok(!$auth->_secure_compare(undef, 'abc'), 'undef vs string returns false');
+    ok(!$auth->_secure_compare('abc', undef), 'string vs undef returns false');
+    ok(!$auth->_secure_compare(undef, undef), 'undef vs undef returns false');
+    ok(!$auth->_secure_compare('', undef), 'empty string vs undef returns false');
+    ok(!$auth->_secure_compare(undef, ''), 'undef vs empty string returns false');
+};
+
 # ===================
 # Session Cookie SameSite Tests
 # ===================

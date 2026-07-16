@@ -1,0 +1,7 @@
+$HASH1 = {
+           name        => 'delete',
+           created_at  => '2026-06-15T00:00:04',
+           description => 'Delete access',
+           id          => 4,
+           updated_at  => '2026-06-15T00:00:04'
+         };

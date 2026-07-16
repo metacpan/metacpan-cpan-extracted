@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "gpl_3"
    ],
@@ -52,12 +52,14 @@
          "requires" : {
             "Aion" : "1.2",
             "Aion::Carp" : "1.6",
+            "Aion::Emitter" : "v0.1.2",
+            "Aion::Env" : "0",
             "Aion::Fs" : "v0.2.0",
             "Aion::Run" : "v0.0.3",
             "POSIX" : "0",
             "Time::Local" : "0",
+            "aliased" : "0",
             "common::sense" : "0",
-            "config" : "0",
             "open" : "0",
             "perl" : "v5.22.0",
             "utf8" : "0"
@@ -83,7 +85,10 @@
    "provides" : {
       "Aion::Annotation" : {
          "file" : "lib/Aion/Annotation.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.1.0"
+      },
+      "Aion::Annotation::ScannedEvent" : {
+         "file" : "lib/Aion/Annotation/ScannedEvent.pm"
       }
    },
    "release_status" : "stable",
@@ -98,7 +103,7 @@
          "web" : "https://github.com/darviarush/perl-aion-annotation"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.1.0",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>"

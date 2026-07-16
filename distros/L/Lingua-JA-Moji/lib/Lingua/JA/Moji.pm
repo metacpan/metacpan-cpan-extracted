@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -749,7 +749,8 @@ sub is_romaji
 sub is_romaji_semistrict
 {
     my ($romaji) = @_;
-    if (! is_romaji ($romaji)) {
+    my $canonical = is_romaji ($romaji);
+    if (! $canonical) {
 	return undef;
     }
     if ($romaji =~ /
@@ -785,7 +786,7 @@ sub is_romaji_semistrict
     /ix) {
         return undef;
     }
-    return 1;
+    return $canonical;
 }
 
 sub is_romaji_strict

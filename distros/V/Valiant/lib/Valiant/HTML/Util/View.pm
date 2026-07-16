@@ -42,7 +42,7 @@ For internal use only
 
 =head1 DESCRIPTION
 
-When using the L<Valiant> HTML packages (L<Valiant::HTML::FormBuilder>, L<Valiant::HTML::FormTags>
+When using the L<Valiant> HTML packages (L<Valiant::HTML::FormBuilder>, L<Valiant::HTML::Util::FormTags>
 and the rest) a default view is required to provide methods for escaping strings
 as well as potentially providing data.  This way we escape strings compatible with your
 view template system.  If you are using these packages outside a view or template system

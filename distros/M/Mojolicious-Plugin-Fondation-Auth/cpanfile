@@ -1,0 +1,29 @@
+# CPAN dependencies for Mojolicious-Plugin-Fondation-Auth
+# This file is used by cpanminus (cpanm) and Carton
+
+# Minimum Perl version required (for Mojolicious signatures feature)
+requires 'perl' => '5.026';
+
+# Runtime dependencies
+requires 'Mojolicious' => '9.46';
+requires 'Mojolicious::Plugin::Authentication';
+requires 'Mojolicious::Plugin::Fondation';
+requires 'Mojolicious::Plugin::Fondation::User';
+requires 'Crypt::Passphrase';
+requires 'Crypt::Passphrase::Argon2';
+requires 'Mojolicious::Plugin::Fondation::Problem';
+
+# Testing dependencies
+on test => sub {
+    requires 'Test::More' => '1.00';
+    requires 'File::Temp' => '0.01';
+    requires 'File::Spec' => '3.00';
+    requires 'FindBin' => '1.00';
+};
+
+# Development dependencies (for author)
+on develop => sub {
+    recommends 'Perl::Critic' => '1.00';
+    recommends 'Perl::Tidy' => '20200000';
+    recommends 'Pod::Checker' => '1.00';
+};

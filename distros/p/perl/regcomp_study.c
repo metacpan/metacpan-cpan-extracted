@@ -24,8 +24,8 @@
     SAVEFREEPV(and_withp)
 
 
-STATIC void
-S_unwind_scan_frames(pTHX_ const void *p)
+static void
+S_unwind_scan_frames(pTHX_ void *p)
 {
     PERL_ARGS_ASSERT_UNWIND_SCAN_FRAMES;
     scan_frame *f= (scan_frame *)p;
@@ -39,7 +39,7 @@ S_unwind_scan_frames(pTHX_ const void *p)
 /* Follow the next-chain of the current node and optimize away
    all the NOTHINGs from it.
  */
-STATIC void
+static void
 S_rck_elide_nothing(pTHX_ regnode *node)
 {
     PERL_ARGS_ASSERT_RCK_ELIDE_NOTHING;
@@ -67,7 +67,7 @@ S_rck_elide_nothing(pTHX_ regnode *node)
         if (REGNODE_OFF_BY_ARG(OP(node)))
             ARG1u(node) = off;
         else
-            NEXT_OFF(node) = off;
+            NEXT_OFF_set(node, off);
     }
     return;
 }
@@ -81,16 +81,16 @@ S_rck_elide_nothing(pTHX_ regnode *node)
  * Returns the invlist as a new SV*; it is the caller's responsibility to
  * call SvREFCNT_dec() when done with it.
  */
-STATIC SV*
+static SV*
 S_make_exactf_invlist(pTHX_ RExC_state_t *pRExC_state, regnode *node)
 {
+    PERL_ARGS_ASSERT_MAKE_EXACTF_INVLIST;
+
     const U8 * s = (U8*)STRING(node);
     SSize_t bytelen = STR_LEN(node);
     UV uc;
     /* Start out big enough for 2 separate code points */
-    SV* invlist = _new_invlist(4);
-
-    PERL_ARGS_ASSERT_MAKE_EXACTF_INVLIST;
+    SV* invlist = new_invlist_(4);
 
     if (! UTF) {
         uc = *s;
@@ -104,14 +104,14 @@ S_make_exactf_invlist(pTHX_ RExC_state_t *pRExC_state, regnode *node)
          *  plus several other things; and making sure we have all the
          *  possibilities is hard. */
         if (is_MULTI_CHAR_FOLD_latin1_safe(s, s + bytelen)) {
-            invlist = _add_range_to_invlist(invlist, 0, UV_MAX);
+            invlist = add_range_to_invlist_(invlist, 0, UV_MAX);
         }
         else {
             /* Any Latin1 range character can potentially match any
              * other depending on the locale, and in Turkic locales, 'I' and
              * 'i' can match U+130 and U+131 */
             if (OP(node) == EXACTFL) {
-                _invlist_union(invlist, PL_Latin1, &invlist);
+                invlist_union_(invlist, PL_Latin1, &invlist);
                 if (isALPHA_FOLD_EQ(uc, 'I')) {
                     invlist = add_cp_to_invlist(invlist,
                                                 LATIN_SMALL_LETTER_DOTLESS_I);
@@ -190,7 +190,7 @@ S_make_exactf_invlist(pTHX_ RExC_state_t *pRExC_state, regnode *node)
          * multi-char fold  */
 
         if (is_MULTI_CHAR_FOLD_utf8_safe(s, e)) {
-            invlist = _add_range_to_invlist(invlist, 0, UV_MAX);
+            invlist = add_range_to_invlist_(invlist, 0, UV_MAX);
         }
         else {  /* Single char fold */
             unsigned int k;
@@ -203,7 +203,7 @@ S_make_exactf_invlist(pTHX_ RExC_state_t *pRExC_state, regnode *node)
 
             /* ... plus all the things that fold to it, which are found in
              * PL_utf8_foldclosures */
-            folds_count = _inverse_folds(fc, &first_fold,
+            folds_count = inverse_folds_(fc, &first_fold,
                                                 &remaining_folds);
             for (k = 0; k < folds_count; k++) {
                 UV c = (k == 0) ? first_fold : remaining_folds[k-1];
@@ -252,12 +252,12 @@ void
 Perl_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data,
                     SSize_t *minlenp, int is_inf)
 {
+    PERL_ARGS_ASSERT_SCAN_COMMIT;
+
     const STRLEN l = CHR_SVLEN(data->last_found);
     SV * const longest_sv = data->substrs[data->cur_is_floating].str;
     const STRLEN old_l = CHR_SVLEN(longest_sv);
     DECLARE_AND_GET_RE_DEBUG_FLAGS;
-
-    PERL_ARGS_ASSERT_SCAN_COMMIT;
 
     if ((l >= old_l) && ((l > old_l) || (data->flags & SF_BEFORE_EOL))) {
         const U8 i = data->cur_is_floating;
@@ -300,23 +300,25 @@ Perl_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data,
 /* An SSC is just a regnode_charclass_posix with an extra field: the inversion
  * list that describes which code points it matches */
 
-STATIC void
+static void
 S_ssc_anything(pTHX_ regnode_ssc *ssc)
 {
-    /* Set the SSC 'ssc' to match an empty string or any code point */
-
     PERL_ARGS_ASSERT_SSC_ANYTHING;
+
+    /* Set the SSC 'ssc' to match an empty string or any code point */
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
     /* mortalize so won't leak */
-    ssc->invlist = sv_2mortal(_add_range_to_invlist(NULL, 0, UV_MAX));
+    ssc->invlist = sv_2mortal(add_range_to_invlist_(NULL, 0, UV_MAX));
     ANYOF_FLAGS(ssc) |= SSC_MATCHES_EMPTY_STRING;  /* Plus matches empty */
 }
 
-STATIC int
+static int
 S_ssc_is_anything(const regnode_ssc *ssc)
 {
+    PERL_ARGS_ASSERT_SSC_IS_ANYTHING;
+
     /* Returns true if the SSC 'ssc' can match the empty string and any code
      * point; false otherwise.  Thus, this is used to see if using 'ssc' buys
      * us anything: if the function returns true, 'ssc' hasn't been restricted
@@ -324,8 +326,6 @@ S_ssc_is_anything(const regnode_ssc *ssc)
 
     UV start = 0, end = 0;  /* Initialize due to messages from dumb compiler */
     bool ret;
-
-    PERL_ARGS_ASSERT_SSC_IS_ANYTHING;
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
@@ -361,10 +361,10 @@ S_ssc_is_anything(const regnode_ssc *ssc)
 void
 Perl_ssc_init(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc)
 {
+    PERL_ARGS_ASSERT_SSC_INIT;
+
     /* Initializes the SSC 'ssc'.  This includes setting it to match an empty
      * string, any code point, or any posix class under locale */
-
-    PERL_ARGS_ASSERT_SSC_INIT;
 
     Zero(ssc, 1, regnode_ssc);
     set_ANYOF_SYNTHETIC(ssc);
@@ -386,18 +386,18 @@ Perl_ssc_init(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc)
     }
 }
 
-STATIC int
+static int
 S_ssc_is_cp_posixl_init(const RExC_state_t *pRExC_state,
                         const regnode_ssc *ssc)
 {
+    PERL_ARGS_ASSERT_SSC_IS_CP_POSIXL_INIT;
+
     /* Returns true if the SSC 'ssc' is in its initial state with regard only
      * to the list of code points matched, and locale posix classes; hence does
      * not check its flags) */
 
     UV start = 0, end = 0;  /* Initialize due to messages from dumb compiler */
     bool ret;
-
-    PERL_ARGS_ASSERT_SSC_IS_CP_POSIXL_INIT;
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
@@ -420,10 +420,12 @@ S_ssc_is_cp_posixl_init(const RExC_state_t *pRExC_state,
 }
 
 
-STATIC SV*
+static SV*
 S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
                                const regnode_charclass* const node)
 {
+    PERL_ARGS_ASSERT_GET_ANYOF_CP_LIST_FOR_SSC;
+
     /* Returns a mortal inversion list defining which code points are matched
      * by 'node', which is of ANYOF-ish type .  Handles complementing the
      * result if appropriate.  If some code points aren't knowable at this
@@ -437,12 +439,10 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
                       ? ANYOF_FLAGS(node)
                       : 0;
 
-    PERL_ARGS_ASSERT_GET_ANYOF_CP_LIST_FOR_SSC;
-
     /* Look at the data structure created by S_set_ANYOF_arg() */
     if (ANYOF_MATCHES_ALL_OUTSIDE_BITMAP(node)) {
-        invlist = sv_2mortal(_new_invlist(1));
-        invlist = _add_range_to_invlist(invlist, NUM_ANYOF_CODE_POINTS, UV_MAX);
+        invlist = sv_2mortal(new_invlist_(1));
+        invlist = add_range_to_invlist_(invlist, NUM_ANYOF_CODE_POINTS, UV_MAX);
     }
     else if (ANYOF_HAS_AUX(node)) {
         const U32 n = ARG1u(node);
@@ -454,8 +454,8 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
 
             /* Here there are things that won't be known until runtime -- we
              * have to assume it could be anything */
-            invlist = sv_2mortal(_new_invlist(1));
-            return _add_range_to_invlist(invlist, 0, UV_MAX);
+            invlist = sv_2mortal(new_invlist_(1));
+            return add_range_to_invlist_(invlist, 0, UV_MAX);
         }
         else if (ary[INVLIST_INDEX]) {
 
@@ -472,7 +472,7 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
     }
 
     if (! invlist) {
-        invlist = sv_2mortal(_new_invlist(0));
+        invlist = sv_2mortal(new_invlist_(0));
     }
 
     /* An ANYOF node contains a bitmap for the first NUM_ANYOF_CODE_POINTS
@@ -486,7 +486,7 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
      * have to do this here before we add the unconditionally matched code
      * points */
     if (flags & ANYOF_INVERT) {
-        _invlist_intersection_complement_2nd(invlist,
+        invlist_intersection_complement_2nd_(invlist,
                                              PL_UpperLatin1,
                                              &invlist);
     }
@@ -502,7 +502,7 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
                 {
                     /* empty */
                 }
-                invlist = _add_range_to_invlist(invlist, start, i-1);
+                invlist = add_range_to_invlist_(invlist, start, i-1);
                 new_node_has_latin1 = true;
             }
         }
@@ -516,39 +516,39 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
         &&  OP(node) == ANYOFD
         && (flags & ANYOFD_NON_UTF8_MATCHES_ALL_NON_ASCII__shared))
     {
-        _invlist_union(invlist, PL_UpperLatin1, &invlist);
+        invlist_union_(invlist, PL_UpperLatin1, &invlist);
     }
 
     /* Similarly for these */
     if (ANYOF_MATCHES_ALL_OUTSIDE_BITMAP(node)) {
-        _invlist_union_complement_2nd(invlist, PL_InBitmap, &invlist);
+        invlist_union_complement_2nd_(invlist, PL_InBitmap, &invlist);
     }
 
     if (flags & ANYOF_INVERT) {
-        _invlist_invert(invlist);
+        invlist_invert_(invlist);
     }
     else if (flags & ANYOFL_FOLD) {
         if (new_node_has_latin1) {
 
             /* These folds are potential in Turkic locales */
-            if (_invlist_contains_cp(invlist, 'i')) {
+            if (invlist_contains_cp_(invlist, 'i')) {
                 invlist = add_cp_to_invlist(invlist,
                                         LATIN_CAPITAL_LETTER_I_WITH_DOT_ABOVE);
             }
-            if (_invlist_contains_cp(invlist, 'I')) {
+            if (invlist_contains_cp_(invlist, 'I')) {
                 invlist = add_cp_to_invlist(invlist,
                                                 LATIN_SMALL_LETTER_DOTLESS_I);
             }
 
             /* Under /li, any 0-255 could fold to any other 0-255, depending on
              * the locale.  We can skip this if there are no 0-255 at all. */
-            _invlist_union(invlist, PL_Latin1, &invlist);
+            invlist_union_(invlist, PL_Latin1, &invlist);
         }
         else {
-            if (_invlist_contains_cp(invlist, LATIN_SMALL_LETTER_DOTLESS_I)) {
+            if (invlist_contains_cp_(invlist, LATIN_SMALL_LETTER_DOTLESS_I)) {
                 invlist = add_cp_to_invlist(invlist, 'I');
             }
-            if (_invlist_contains_cp(invlist,
+            if (invlist_contains_cp_(invlist,
                                         LATIN_CAPITAL_LETTER_I_WITH_DOT_ABOVE))
             {
                 invlist = add_cp_to_invlist(invlist, 'i');
@@ -560,7 +560,7 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
      * deferred until after the non-UTF-8 locale ones are taken care of just
      * above, or it leads to wrong results under ANYOF_INVERT */
     if (only_utf8_locale_invlist) {
-        _invlist_union_maybe_complement_2nd(invlist,
+        invlist_union_maybe_complement_2nd_(invlist,
                                             only_utf8_locale_invlist,
                                             flags & ANYOF_INVERT,
                                             &invlist);
@@ -572,10 +572,12 @@ S_get_ANYOF_cp_list_for_ssc(pTHX_ const RExC_state_t *pRExC_state,
 /* 'AND' a given class with another one.  Can create false positives.  'ssc'
  * should not be inverted. */
 
-STATIC void
+static void
 S_ssc_and(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc,
                 const regnode_charclass *and_with)
 {
+    PERL_ARGS_ASSERT_SSC_AND;
+
     /* Accumulate into SSC 'ssc' its 'AND' with 'and_with', which is either
      * another SSC or a regular ANYOF class.  Can create false positives. */
 
@@ -584,8 +586,6 @@ S_ssc_and(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc,
                           ? ANYOF_FLAGS(and_with)
                           : 0;
     U8  anded_flags;
-
-    PERL_ARGS_ASSERT_SSC_AND;
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
@@ -755,10 +755,12 @@ S_ssc_and(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc,
     }
 }
 
-STATIC void
+static void
 S_ssc_or(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc,
                const regnode_charclass *or_with)
 {
+    PERL_ARGS_ASSERT_SSC_OR;
+
     /* Accumulate into SSC 'ssc' its 'OR' with 'or_with', which is either
      * another SSC or a regular ANYOF class.  Can create false positives if
      * 'or_with' is to be inverted. */
@@ -768,8 +770,6 @@ S_ssc_or(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc,
     U8  or_with_flags = (REGNODE_TYPE(OP(or_with)) == ANYOF)
                          ? ANYOF_FLAGS(or_with)
                          : 0;
-
-    PERL_ARGS_ASSERT_SSC_OR;
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
@@ -838,20 +838,20 @@ S_ssc_or(pTHX_ const RExC_state_t *pRExC_state, regnode_ssc *ssc,
               );
 }
 
-STATIC void
+static void
 S_ssc_union(pTHX_ regnode_ssc *ssc, SV* const invlist, const bool invert2nd)
 {
     PERL_ARGS_ASSERT_SSC_UNION;
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
-    _invlist_union_maybe_complement_2nd(ssc->invlist,
+    invlist_union_maybe_complement_2nd_(ssc->invlist,
                                         invlist,
                                         invert2nd,
                                         &ssc->invlist);
 }
 
-STATIC void
+static void
 S_ssc_intersection(pTHX_ regnode_ssc *ssc,
                          SV* const invlist,
                          const bool invert2nd)
@@ -860,30 +860,30 @@ S_ssc_intersection(pTHX_ regnode_ssc *ssc,
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
-    _invlist_intersection_maybe_complement_2nd(ssc->invlist,
+    invlist_intersection_maybe_complement_2nd_(ssc->invlist,
                                                invlist,
                                                invert2nd,
                                                &ssc->invlist);
 }
 
-STATIC void
+static void
 S_ssc_add_range(pTHX_ regnode_ssc *ssc, const UV start, const UV end)
 {
     PERL_ARGS_ASSERT_SSC_ADD_RANGE;
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
-    ssc->invlist = _add_range_to_invlist(ssc->invlist, start, end);
+    ssc->invlist = add_range_to_invlist_(ssc->invlist, start, end);
 }
 
-STATIC void
+static void
 S_ssc_cp_and(pTHX_ regnode_ssc *ssc, const UV cp)
 {
+    PERL_ARGS_ASSERT_SSC_CP_AND;
+
     /* AND just the single code point 'cp' into the SSC 'ssc' */
 
-    SV* cp_list = _new_invlist(2);
-
-    PERL_ARGS_ASSERT_SSC_CP_AND;
+    SV* cp_list = new_invlist_(2);
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
@@ -894,11 +894,12 @@ S_ssc_cp_and(pTHX_ regnode_ssc *ssc, const UV cp)
     SvREFCNT_dec_NN(cp_list);
 }
 
-STATIC void
+static void
 S_ssc_clear_locale(regnode_ssc *ssc)
 {
-    /* Set the SSC 'ssc' to not match any locale things */
     PERL_ARGS_ASSERT_SSC_CLEAR_LOCALE;
+
+    /* Set the SSC 'ssc' to not match any locale things */
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
@@ -1059,6 +1060,8 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
                    UV *min_subtract, bool *unfolded_multi_char,
                    U32 flags, regnode *val, U32 depth)
 {
+    PERL_ARGS_ASSERT_JOIN_EXACT;
+
     /* Merge several consecutive EXACTish nodes into one. */
 
     regnode *n = regnext(scan);
@@ -1073,7 +1076,6 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
     PERL_UNUSED_ARG(depth);
 #endif
 
-    PERL_ARGS_ASSERT_JOIN_EXACT;
 #ifndef EXPERIMENTAL_INPLACESCAN
     PERL_UNUSED_ARG(flags);
     PERL_UNUSED_ARG(val);
@@ -1095,7 +1097,7 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
             stringok = 0;
         if (REGNODE_TYPE(OP(n)) == NOTHING) {
             DEBUG_PEEP("skip:", n, depth, 0);
-            NEXT_OFF(scan) += NEXT_OFF(n);
+            NEXT_OFF_set(scan, NEXT_OFF(scan) + NEXT_OFF(n));
             next = n + NODE_STEP_REGNODE;
 #ifdef DEBUGGING
             if (stringok)
@@ -1219,7 +1221,7 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
 #endif
 
             next = REGNODE_AFTER_varies(n);
-            NEXT_OFF(scan) += NEXT_OFF(n);
+            NEXT_OFF_set(scan, NEXT_OFF(scan) + NEXT_OFF(n));
             assert( ( STR_LEN(scan) + STR_LEN(n) ) < 256 );
             setSTR_LEN(scan, (U8)(STR_LEN(scan) + STR_LEN(n)));
             /* Now we can overwrite *n : */
@@ -1238,7 +1240,7 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
                 ARG1u_SET(n, val - n);
             }
             else {
-                NEXT_OFF(n) = val - n;
+                NEXT_OFF_set(n, val - n);
             }
             stopnow = 1;
         }
@@ -1311,7 +1313,7 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
                     }
                     else {
                         STRLEN len;
-                        _toFOLD_utf8_flags(s, s_end, d, &len, FOLD_FLAGS_FULL);
+                        toFOLD_utf8_flags_(s, s_end, d, &len, FOLD_FLAGS_FULL);
                         d += len;
                     }
                     s += s_len;
@@ -1454,7 +1456,7 @@ Perl_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
     while (n <= stop) {
         OP(n) = OPTIMIZED;
         FLAGS(n) = 0;
-        NEXT_OFF(n) = 0;
+        NEXT_OFF_set(n, 0);
         n++;
     }
 #endif
@@ -1489,6 +1491,8 @@ Perl_study_chunk(pTHX_
                                a higher caller is holding a ptr to them. */
 )
 {
+    PERL_ARGS_ASSERT_STUDY_CHUNK;
+
     /* vars about the regnodes we are working with */
     regnode *scan = *scanp; /* the current opcode we are inspecting */
     regnode *next = NULL;   /* the next opcode beyond scan, tmp var */
@@ -1526,7 +1530,6 @@ Perl_study_chunk(pTHX_
 
     DECLARE_AND_GET_RE_DEBUG_FLAGS;
 
-    PERL_ARGS_ASSERT_STUDY_CHUNK;
     RExC_study_started = 1;
 
     Zero(&data_fake, 1, scan_data_t);
@@ -1542,7 +1545,7 @@ Perl_study_chunk(pTHX_
     );
     DEBUG_OPTIMISE_MORE_r(
     {
-        Perl_re_indentf( aTHX_  "study_chunk stopparen = %ld recursed_count = %lu "
+        re_indentf("study_chunk stopparen = %ld recursed_count = %lu "
                                 "depth = %lu recursed_depth = %lu scan = %p last = %p",
             depth, (long)stopparen,
             (unsigned long)RExC_study_chunk_recursed_count,
@@ -1555,16 +1558,16 @@ Perl_study_chunk(pTHX_
             for ( j = 0 ; j < recursed_depth ; j++ ) {
                 for ( i = 0 ; i < (U32)RExC_total_parens ; i++ ) {
                     if (PAREN_TEST(j, i) && (!j || !PAREN_TEST(j - 1, i))) {
-                        Perl_re_printf( aTHX_ " %d",(int)i);
+                        re_printf(" %d",(int)i);
                         break;
                     }
                 }
                 if ( j + 1 < recursed_depth ) {
-                    Perl_re_printf( aTHX_  ",");
+                    re_printf(",");
                 }
             }
         }
-        Perl_re_printf( aTHX_ "\n");
+        re_printf("\n");
     }
     );
     while ( scan && OP(scan) != END && scan < last ){
@@ -1841,10 +1844,20 @@ Perl_study_chunk(pTHX_
                             tail = regnext( tail );
                         }
 
+                        /* The code below currently saves the difference from
+                         * start to finish in a 16-bit field, causing
+                         * GH #23388.  This defeats the design of batching
+                         * tries into chunks that each fit.  khw thinks it is
+                         * too late in the 5.44 cycle to relook at the design,
+                         * so for now anyway, don't make a trie that would
+                         * overflow */
+                        if (tail - startbranch >= U16_MAX) {
+                            continue;
+                        }
 
                         DEBUG_TRIE_COMPILE_r({
                             regprop(RExC_rx, RExC_mysv, tail, NULL, pRExC_state);
-                            Perl_re_indentf( aTHX_  "%s %" UVuf ":%s\n",
+                            re_indentf("%s %" UVuf ":%s\n",
                               depth+1,
                               "Looking for TRIE'able sequences. Tail node is ",
                               (UV) REGNODE_OFFSET(tail),
@@ -1940,20 +1953,20 @@ Perl_study_chunk(pTHX_
 
                             DEBUG_TRIE_COMPILE_r({
                                 regprop(RExC_rx, RExC_mysv, cur, NULL, pRExC_state);
-                                Perl_re_indentf( aTHX_  "- %d:%s (%d)",
+                                re_indentf("- %d:%s (%d)",
                                    depth+1,
                                    REG_NODE_NUM(cur), SvPV_nolen_const( RExC_mysv ), REG_NODE_NUM(cur) );
 
                                 regprop(RExC_rx, RExC_mysv, noper, NULL, pRExC_state);
-                                Perl_re_printf( aTHX_  " -> %d:%s",
+                                re_printf(" -> %d:%s",
                                     REG_NODE_NUM(noper), SvPV_nolen_const(RExC_mysv));
 
                                 if ( noper_next ) {
                                   regprop(RExC_rx, RExC_mysv, noper_next, NULL, pRExC_state);
-                                  Perl_re_printf( aTHX_ "\t=> %d:%s\t",
+                                  re_printf("\t=> %d:%s\t",
                                     REG_NODE_NUM(noper_next), SvPV_nolen_const(RExC_mysv));
                                 }
-                                Perl_re_printf( aTHX_  "(First == %d,Last == %d,Cur == %d,tt == %s,ntt == %s,nntt == %s)\n",
+                                re_printf("(First == %d,Last == %d,Cur == %d,tt == %s,ntt == %s,nntt == %s)\n",
                                    REG_NODE_NUM(first), REG_NODE_NUM(prev), REG_NODE_NUM(cur),
                                    REGNODE_NAME(trietype), REGNODE_NAME(noper_trietype), REGNODE_NAME(noper_next_trietype)
                                 );
@@ -2049,9 +2062,9 @@ Perl_study_chunk(pTHX_
                         } /* loop over branches */
                         DEBUG_TRIE_COMPILE_r({
                             regprop(RExC_rx, RExC_mysv, cur, NULL, pRExC_state);
-                            Perl_re_indentf( aTHX_  "- %s (%d) <SCAN FINISHED> ",
+                            re_indentf("- %s (%d) <SCAN FINISHED> ",
                               depth+1, SvPV_nolen_const( RExC_mysv ), REG_NODE_NUM(cur));
-                            Perl_re_printf( aTHX_  "(First == %d, Last == %d, Cur == %d, tt == %s)\n",
+                            re_printf("(First == %d, Last == %d, Cur == %d, tt == %s)\n",
                                REG_NODE_NUM(first), REG_NODE_NUM(prev), REG_NODE_NUM(cur),
                                REGNODE_NAME(trietype)
                             );
@@ -2091,13 +2104,14 @@ Perl_study_chunk(pTHX_
                                      * turn it into a plain NOTHING op. */
                                     DEBUG_TRIE_COMPILE_r({
                                         regprop(RExC_rx, RExC_mysv, cur, NULL, pRExC_state);
-                                        Perl_re_indentf( aTHX_  "- %s (%d) <NOTHING BRANCH SEQUENCE>\n",
+                                        re_indentf("- %s (%d) <NOTHING BRANCH SEQUENCE>\n",
                                           depth+1,
                                           SvPV_nolen_const( RExC_mysv ), REG_NODE_NUM(cur));
 
                                     });
                                     OP(startbranch)= NOTHING;
-                                    NEXT_OFF(startbranch)= tail - startbranch;
+                                    NEXT_OFF_set(startbranch,
+                                                 tail - startbranch);
                                     for ( opt = startbranch + 1; opt < tail ; opt++ )
                                         OP(opt)= OPTIMIZED;
                                 }
@@ -2562,8 +2576,8 @@ Perl_study_chunk(pTHX_
                     && maxcount <= REG_INFTY/3) /* Complement check for big
                                                    count */
                 {
-                    _WARN_HELPER(RExC_precomp_end, packWARN(WARN_REGEXP),
-                        Perl_ck_warner(aTHX_ packWARN(WARN_REGEXP),
+                    WARN_HELPER_(RExC_precomp_end, packWARN(WARN_REGEXP),
+                        ck_warner(packWARN(WARN_REGEXP),
                             "Quantifier unexpected on zero-length expression "
                             "in regex m/%" UTF8f "/",
                              UTF8fARG(UTF, RExC_precomp_end - RExC_precomp,
@@ -2643,11 +2657,11 @@ Perl_study_chunk(pTHX_
 
 #ifdef DEBUGGING
                     OP(nxt1 + 1) = OPTIMIZED; /* was count. */
-                    NEXT_OFF(nxt1+ 1) = 0; /* just for consistency. */
-                    NEXT_OFF(nxt2) = 0; /* just for consistency with CURLY. */
+                    NEXT_OFF_set(nxt1 + 1, 0); /* just for consistency. */
+                    NEXT_OFF_set(nxt2, 0); /* just for consistency with CURLY. */
                     OP(nxt) = OPTIMIZED;        /* was CLOSE. */
                     OP(nxt + 1) = OPTIMIZED; /* was count. */
-                    NEXT_OFF(nxt+ 1) = 0; /* just for consistency. */
+                    NEXT_OFF_set(nxt + 1, 0); /* just for consistency. */
 #endif
                 }
               nogo:
@@ -2701,8 +2715,8 @@ Perl_study_chunk(pTHX_
 #ifdef DEBUGGING
                         OP(nxt1 + 1) = OPTIMIZED; /* was count. */
                         OP(nxt + 1) = OPTIMIZED; /* was count. */
-                        NEXT_OFF(nxt1 + 1) = 0; /* just for consistency. */
-                        NEXT_OFF(nxt + 1) = 0; /* just for consistency. */
+                        NEXT_OFF_set(nxt1 + 1, 0); /* just for consistency. */
+                        NEXT_OFF_set(nxt + 1, 0);  /* just for consistency. */
 #endif
 #if 0
                         while ( nxt1 && (OP(nxt1) != WHILEM)) {
@@ -2711,7 +2725,7 @@ Perl_study_chunk(pTHX_
                                 if (REGNODE_OFF_BY_ARG(OP(nxt1)))
                                     ARG1u_SET(nxt1, nxt2 - nxt1);
                                 else if (nxt2 - nxt1 < U16_MAX)
-                                    NEXT_OFF(nxt1) = nxt2 - nxt1;
+                                    NEXT_OFF_set(nxt1, nxt2 - nxt1);
                                 else
                                     OP(nxt) = NOTHING;  /* Cannot beautify */
                             }
@@ -2770,6 +2784,13 @@ Perl_study_chunk(pTHX_
                                                (U8 *) SvEND(data->last_found))
                                 - (U8*)s;
                         l -= old;
+
+                        if (l > 0 &&
+                            (mincount >= SSize_t_MAX / (SSize_t)l
+                             || old > SSize_t_MAX - mincount * (SSize_t)l)) {
+                            FAIL("Regexp out of space");
+                        }
+
                         /* Get the added string: */
                         last_str = newSVpvn_utf8(s  + old, l, UTF);
                         last_chrs = UTF ? utf8_length((U8*)(s + old),
@@ -2811,14 +2832,14 @@ Perl_study_chunk(pTHX_
                     /* It is counted once already... */
                     data->pos_min += minnext * (mincount - counted);
 #if 0
-    Perl_re_printf( aTHX_  "counted = %" UVuf " deltanext = %" UVuf
+    re_printf("counted = %" UVuf " deltanext = %" UVuf
                               " OPTIMIZE_INFTY = %" UVuf " minnext = %" UVuf
                               " maxcount = %" UVuf " mincount = %" UVuf
                               " data->pos_delta = %" UVuf "\n",
         (UV)counted, (UV)deltanext, (UV)OPTIMIZE_INFTY, (UV)minnext,
         (UV)maxcount, (UV)mincount, (UV)data->pos_delta);
     if (deltanext != OPTIMIZE_INFTY)
-        Perl_re_printf( aTHX_  "LHS = %" UVuf " RHS = %" UVuf "\n",
+        re_printf("LHS = %" UVuf " RHS = %" UVuf "\n",
             (UV)(-counted * deltanext + (minnext + deltanext) * maxcount
             - minnext * mincount), (UV)(OPTIMIZE_INFTY - data->pos_delta));
 #endif
@@ -2948,7 +2969,7 @@ Perl_study_chunk(pTHX_
 
                 case REG_ANY:
                     {
-                        SV* REG_ANY_invlist = _new_invlist(2);
+                        SV* REG_ANY_invlist = new_invlist_(2);
                         REG_ANY_invlist = add_cp_to_invlist(REG_ANY_invlist,
                                                             '\n');
                         if (flags & SCF_DO_STCLASS_OR) {
@@ -3024,7 +3045,7 @@ Perl_study_chunk(pTHX_
                   {
                     SV* cp_list = NULL;
 
-                    cp_list = _add_range_to_invlist(cp_list,
+                    cp_list = add_range_to_invlist_(cp_list,
                                         ANYOFRbase(scan),
                                         ANYOFRbase(scan) + ANYOFRdelta(scan));
 
@@ -3055,7 +3076,7 @@ Perl_study_chunk(pTHX_
                         }
                         /* No individual code points can now match */
                         data->start_class->invlist
-                                                = sv_2mortal(_new_invlist(0));
+                                                = sv_2mortal(new_invlist_(0));
                     }
                     else {
                         int complement = namedclass + ((invert) ? -1 : 1);
@@ -3101,7 +3122,7 @@ Perl_study_chunk(pTHX_
                      * invert, we want to get rid of all of them so that the
                      * inversion will match all */
                     if (OP(scan) == NPOSIXD) {
-                        _invlist_subtract(my_invlist, PL_UpperLatin1,
+                        invlist_subtract_(my_invlist, PL_UpperLatin1,
                                           &my_invlist);
                     }
 
@@ -3201,7 +3222,7 @@ Perl_study_chunk(pTHX_
                      * matches to avoid breakage for those not using this
                      * extension) */
                     if (deltanext)  {
-                        NEXT_OFF(scan) = deltanext;
+                        NEXT_OFF_set(scan, deltanext);
                         if (
                             /* See a CLOSE op inside this lookbehind? */
                             cur_last_close_op != *(data_fake.last_close_opp)
@@ -3317,7 +3338,7 @@ Perl_study_chunk(pTHX_
                     }
 
                     if (deltanext) {
-                        NEXT_OFF(scan) = deltanext;
+                        NEXT_OFF_set(scan, deltanext);
                     }
                     FLAGS(scan) = (U8)*minnextp + deltanext;
                 }

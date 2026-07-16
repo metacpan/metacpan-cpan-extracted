@@ -97,6 +97,45 @@ subtest 'close with code and reason' => sub {
     is($ctx->close_reason, 'Custom reason', 'close_reason accessor');
 };
 
+subtest 'supports_denial_response delegates to ws' => sub {
+    my ($ctx) = make_ws_ctx();
+    ok(!$ctx->supports_denial_response, 'false when extension absent');
+
+    my ($ctx_ext) = make_ws_ctx(
+        extra_scope => { extensions => { 'websocket.http.response' => {} } },
+    );
+    ok($ctx_ext->supports_denial_response, 'true when extension present');
+};
+
+subtest 'deny delegates to ws' => sub {
+    my ($ctx, $sent) = make_ws_ctx(
+        extra_scope => { extensions => { 'websocket.http.response' => {} } },
+    );
+
+    (async sub {
+        await $ctx->deny(status => 401, body => 'no');
+    })->()->get;
+
+    is(scalar @$sent, 2, 'two events sent');
+    is($sent->[0]{type}, 'websocket.http.response.start', 'response.start sent');
+    is($sent->[0]{status}, 401, 'status forwarded');
+    is($sent->[1]{type}, 'websocket.http.response.body', 'response.body sent');
+    is($sent->[1]{body}, 'no', 'body forwarded');
+    ok($ctx->is_closed, 'ctx marked closed after deny');
+};
+
+subtest 'deny falls back to close when extension absent' => sub {
+    my ($ctx, $sent) = make_ws_ctx();
+
+    (async sub {
+        await $ctx->deny(status => 401);
+    })->()->get;
+
+    is(scalar @$sent, 1, 'one event sent');
+    is($sent->[0]{type}, 'websocket.close', 'falls back to websocket.close');
+    ok($ctx->is_closed, 'ctx marked closed after deny fallback');
+};
+
 # ---------------------------------------------------------------------------
 # Send method delegation
 # ---------------------------------------------------------------------------
@@ -500,6 +539,52 @@ subtest 'run() is Context dispatcher, not WS run()' => sub {
 
     is(\@types_seen, ['ws.recv', 'custom'], 'both event types dispatched');
     is($reason, 'disconnect', 'terminated on protocol disconnect');
+};
+
+# ---------------------------------------------------------------------------
+# Terminal disconnect syncs underlying object (B1)
+# ---------------------------------------------------------------------------
+
+subtest 'ws on_close fires and state syncs on $ctx->run terminal disconnect' => sub {
+    my $close_fired = 0;
+    my ($ctx) = make_ws_ctx(events => [
+        { type => 'websocket.disconnect', code => 1001, reason => 'going away' },
+    ]);
+
+    (async sub { await $ctx->accept })->()->get;
+    $ctx->ws->on_close(sub { $close_fired = 1 });
+
+    ok($ctx->is_connected, 'sanity: connected after accept, before run');
+
+    my $reason = (async sub { return await $ctx->run })->()->get;
+
+    is($reason, 'disconnect', 'run resolved with disconnect reason');
+    ok($close_fired, 'ws on_close callback fired');
+    ok($ctx->is_closed, '$ctx->is_closed true after run() terminal disconnect');
+    ok(!$ctx->is_connected, '$ctx->is_connected false after run() terminal disconnect');
+};
+
+subtest '_sync_terminal_disconnect is a no-op when ->ws was never touched' => sub {
+    my ($ctx) = make_ws_ctx(events => [
+        { type => 'websocket.disconnect', code => 1001, reason => 'going away' },
+    ]);
+
+    # Never call $ctx->ws / $ctx->accept - a pure-dispatcher context should
+    # not pay for lazily instantiating the underlying object.
+    my $reason = (async sub { return await $ctx->run })->()->get;
+
+    is($reason, 'disconnect', 'run still resolves with disconnect reason');
+    ok(!exists $ctx->{_websocket}, 'underlying ws object was never instantiated');
+};
+
+subtest 'on_close() croaks with a pointer to the underlying object' => sub {
+    my ($ctx) = make_ws_ctx();
+
+    like(
+        dies { $ctx->on_close(sub {}) },
+        qr/\$c->websocket->on_close/,
+        'on_close explains where the real method lives',
+    );
 };
 
 # ---------------------------------------------------------------------------

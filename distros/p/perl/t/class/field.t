@@ -308,4 +308,47 @@ no warnings 'experimental::class';
     is(Testcase14->new->classname, "Testcase14", '__CLASS__ in field initialisers');
 }
 
+{
+    class Testcase15 {
+        field $scalar = undef;
+        method scalar { return $scalar; }
+
+        field @array = ();
+        method array { return @array; }
+
+        field %hash = ();
+        method hash { return %hash; }
+    }
+
+    my $obj = Testcase15->new;
+
+    is($obj->scalar, undef, 'Scalar field can have redundant initialiser');
+
+    ok(eq_array([$obj->array], []), 'Array field can have redundant initialiser');
+
+    ok(eq_hash({$obj->hash}, {}), 'Hash field can have redundant initialiser');
+}
+
+SKIP: {
+    eval { require XS::APItest; 1 }
+        or skip "XS::APItest not available", 1;
+
+    # sub leak stolen from t/op/svleak.t
+    sub leak {
+        my ($n, $delta, $code, @rest) = @_;
+        my $sv0 = 0;
+        my $sv1 = 0;
+        for my $i (1..$n) {
+            $code->();
+            $sv1 = XS::APItest::sv_count();
+            $sv0 = $sv1 if $i == 1;
+        }
+        cmp_ok($sv1-$sv0, '<=', ($n-1)*$delta, @rest);
+    }
+
+    # Related to GH#24254
+    leak(50, 0, sub { Testcase1->new->incr; },
+        'Object methods that capture fields do not leak SVs');
+}
+
 done_testing;

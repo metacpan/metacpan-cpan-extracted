@@ -80,4 +80,32 @@ use Test::Needs 'Types::Standard';
     };
 }
 
+{
+  ok eval {
+    package Local::Test::Check::Dynamic;
+
+    use Moo;
+    use Valiant::Validations;
+    use Types::Standard 'Int';
+
+    has age => (is=>'ro');
+
+    validates age => (
+      check => { constraint => sub { Int->where('$_ >= 65') } },
+    );
+
+    1;
+  }, 'a coderef constraint can be declared without crashing' or diag $@;
+}
+
+{
+  ok my $object = Local::Test::Check::Dynamic->new(age=>80);
+  ok $object->validate->valid;
+}
+
+{
+  ok my $object = Local::Test::Check::Dynamic->new(age=>40);
+  ok $object->validate->invalid;
+}
+
 done_testing;

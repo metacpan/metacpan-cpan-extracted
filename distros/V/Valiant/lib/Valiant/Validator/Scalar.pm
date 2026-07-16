@@ -14,7 +14,7 @@ sub normalize_shortcut {
 
 sub validate_each {
   my ($self, $record, $attribute, $value, $opts) = @_;
-  return if ref( \$value ) eq 'SCALAR' or ref( \( my $val = $value ) ) eq 'SCALAR';
+  return if ref( \$value ) eq 'SCALAR';
 
   $record->errors->add($attribute, $self->is_not_scalar, $opts)
 }
@@ -49,6 +49,15 @@ Valiant::Validator::Scalar - Validate that a value is a scalar (like a string or
 =head1 DESCRIPTION
 
 Validates that the value in question is a scalar.
+
+=head1 ATTRIBUTES
+
+This validator supports the following attributes:
+
+=head2 is_not_scalar
+
+The error message used when the value is not a scalar.  Default is translation
+tag 'is_not_a_scalar'.
 
 =head1 SHORTCUT FORM
 

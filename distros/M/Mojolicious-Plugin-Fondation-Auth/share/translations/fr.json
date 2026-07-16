@@ -1,0 +1,11 @@
+{
+    "Login": "Connexion",
+    "Logout": "Déconnexion",
+    "Username": "Nom d'utilisateur",
+    "Password": "Mot de passe",
+    "Sign in": "Se connecter",
+    "Logged in as": "Connecté en tant que",
+    "Login failed": "Échec de connexion",
+    "Logged out": "Déconnecté",
+    "Access denied": "Accès refusé"
+}

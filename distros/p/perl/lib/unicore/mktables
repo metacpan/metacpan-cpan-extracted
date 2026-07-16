@@ -50,7 +50,7 @@ sub NON_ASCII_PLATFORM { ord("A") != 65 }
 # expected, a warning will be generated.  If an older version is being
 # compiled, any bounds tests that fail in the generated test file (-maketest
 # option) will be marked as TODO.
-my $version_of_mk_invlist_bounds = v16.0.0;
+my $version_of_mk_invlist_bounds = v17.0.0;
 
 ##########################################################################
 #
@@ -870,15 +870,11 @@ push @tables_that_may_be_empty, 'Grapheme_Cluster_Break=Prepend'
                                                     if $v_version ge v6.1.0;
 push @tables_that_may_be_empty, 'Canonical_Combining_Class=CCC133'
                                                     if $v_version ge v6.2.0;
-
-# These properties of Egyptian hieroglyphs are not handled by Perl.  Their
-# intended audience is only specialist Egyptologists
-push @tables_that_may_be_empty, qw(kEH_Cat kEH_Desc kEH_HG kEH_IFAO
-                                   kEH_JSesh
-                                   kEH_NoMirror kEH_NoMirror=Yes
-                                   kEH_NoMirror=No
-                                   kEH_NoRotate kEH_NoRotate=Yes)
-                                                    if $v_version ge v16.0.0;
+if ($v_version ge v17.0.0) {
+    push @tables_that_may_be_empty, qw(kMandarin
+                                       kTotalStrokes
+                                       kUnihanCore2020);
+}
 
 # The lists below are hashes, so the key is the item in the list, and the
 # value is the reason why it is in the list.  This makes generation of
@@ -1278,6 +1274,9 @@ my $A_bold_stabilized = "An 'B<$STABILIZED>'";
 my $OBSOLETE = 'O';
 my $a_bold_obsolete = "an 'B<$OBSOLETE>'";
 my $A_bold_obsolete = "An 'B<$OBSOLETE>'";
+my $PROVISIONAL = '?';
+my $a_bold_provisional = "a 'B<$PROVISIONAL>'";
+my $A_bold_provisional = "A 'B<$PROVISIONAL>'";
 
 # Aliases can also have an extra status:
 my $INTERNAL_ALIAS = 'P';
@@ -1287,6 +1286,7 @@ my %status_past_participles = (
     $STABILIZED => 'stabilized',
     $OBSOLETE => 'obsolete',
     $DEPRECATED => 'deprecated',
+    $PROVISIONAL => 'provisional',
     $INTERNAL_ALIAS => 'reserved for Perl core internal use only',
 );
 
@@ -12839,7 +12839,7 @@ cjkIRG_KSource; kIRG_KSource
 cjkIRG_TSource; kIRG_TSource
 cjkIRG_VSource; kIRG_VSource
 END
-        push @cjk_property_values, split "\n", <<'END';
+            push @cjk_property_values, split "\n", <<'END';
 # @missing: 0000..10FFFF; cjkIRG_GSource; <none>
 # @missing: 0000..10FFFF; cjkIRG_JSource; <none>
 # @missing: 0000..10FFFF; cjkIRG_KSource; <none>
@@ -13403,17 +13403,35 @@ sub setup_Unikemet{
 
     # These are provisional properties, so aren't in PropAliases.txt
     my %properties = (
-                      Core => $ENUM,
+                      Core => { type => $ENUM, default => 'N' },
                       FVal => $STRING,
                       Func => $STRING,
-                      UniK => $ENUM,
+                      UniK => $STRING,
+                      AltSeq => {
+                                  type => $STRING,
+                                  default => '<code point>'
+                                },
                      );
     for my $property (keys %properties) {
+        my $type = $properties{$property};
+        my $default = "";
+
+        if (ref $type) {
+            $default = $type->{default};
+            $type = $type->{type};
+        }
+
         Property->new("kEH_$property",
-                      Default_Map => "",
-                      Type => $STRING,,
+                      Default_Map => $default,
+                      Type => $type,
+                      Status => $PROVISIONAL,
                      );
     }
+
+
+    my $keH_Core = property_ref('kEH_Core');
+    $keH_Core->add_match_table('C');
+    $keH_Core->add_match_table('L');
 }
 
 sub filter_Unikemet_line {
@@ -15633,8 +15651,10 @@ END
                          };
     }
 
-    if ($v_version ge 16.0.0) {
-        push @lb_splits, { name => 'U2010',
+    # Version 17.0 formalized this split into HH, and added other code points
+    # to it
+    if ($v_version eq 16.0.0) {
+        push @lb_splits, { name => 'HH',
                            ranges => Range_List->new(Initialize
                                   => Range->new(0x2010, 0x2010))
                          };
@@ -15706,6 +15726,19 @@ END
             }
         }
     }
+
+    # This gives the code points that are in \w but not IDContinue.  That such
+    # exist may be surprising.
+    my $idc = property_ref("XIDC") // property_ref("IDC") // $Word;
+    $perl->add_match_table('_Perl_Word_but_NonCont',
+                                           Perl_Extension => 1,
+                                           Fate => $INTERNAL_ONLY,
+
+                                           # Initialize to what's common in
+                                           # all Unicode releases.
+                                           Initialize =>
+                                                ( $Word - $idc->table('Y'))
+                           );
 
     # Here done with all the basic stuff.  Ready to populate the information
     # about each character if annotating them.
@@ -16070,27 +16103,32 @@ sub register_file_for_name($table, $directory_ref, $file) {
         $directory_ref =\@directories;
     }
 
-    # Join all the file path components together, using slashes.
-    my $full_filename = join('/', @$directory_ref, $file);
-
     # All go in the same subdirectory of unicore, or the special
     # pseudo-directory '#'
-    if ($directory_ref->[0] !~ / ^ $matches_directory | \# $ /x) {
+    my $sub_directory;
+    if ($directory_ref->[0] eq '#') {
+        Carp::my_carp("Pseudo-directory '#' should be only directory "
+                .  join('/', @{$directory_ref}, $file))
+                                                    if $directory_ref->@* > 1;
+        $sub_directory = '#';
+    }
+    else {
         Carp::my_carp("Unexpected directory in "
-                .  join('/', @{$directory_ref}, $file));
+                .  join('/', @{$directory_ref}, $file))
+                                if $directory_ref->[0] ne $matches_directory;
+        $sub_directory = join '/', $directory_ref->@[1 .. $#$directory_ref];
     }
 
     # For this table and all its equivalents ...
     foreach my $table ($table, $table->equivalents) {
 
-        # Associate it with its file internally.  Don't include the
-        # $matches_directory first component
+        # Associate it with its file internally.
         $table->set_file_path(@$directory_ref, $file);
 
         # No swash means don't do the rest of this.
         next if $table->isa('Map_Table') && $table->fate != $ORDINARY;
 
-        my $sub_filename = join('/', $directory_ref->[1, -1], $file);
+        my $sub_filename = "$sub_directory/$file";
 
         my $property = $table->property;
         my $property_name = ($property == $perl)
@@ -17524,6 +17562,10 @@ by this property.
 
 =item B<$DISCOURAGED> means use of this form is discouraged, and may not be
 stable.
+
+=item B<$PROVISIONAL> means this property is considered provisional by
+Unicode, and may be changed or removed in some future version of the Unicode
+Standard.
 
 =back
 

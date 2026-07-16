@@ -1,0 +1,11 @@
+[
+  {
+    "title":        "Groups",
+    "link":         "/groups",
+    "icon":         "fas fa-shield-alt",
+    "icon_color":   "#000000",
+    "menu":         "admin_menu",
+    "parent_title": "Administration",
+    "description":  "Manage user groups"
+  }
+]

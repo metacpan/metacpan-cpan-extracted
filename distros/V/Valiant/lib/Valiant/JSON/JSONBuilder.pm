@@ -15,6 +15,8 @@ has view => ( is=>'ro', required=>1);
 
 has namespace => (is=>'ro', required=>1, default=>'');
 
+has content_type => (is=>'ro', required=>1, default=>'application/json');
+
 has data => (is=>'rw', required=>1, default=>sub { +{ data => +{}} });
 has index => (is=>'rw', clearer=>1, predicate=>1);
 
@@ -387,18 +389,21 @@ sub errors {
   my $self = shift;
   my @errors = $self->_errors_for($self->current_model, $self->namespace);
   return $self unless scalar(@errors);
-  $self->data->{errors} = \@errors; 
+  $self->data_pointer unless $self->has_data_pointer;
+  $self->data->{data}{errors} = \@errors;
   return $self;
 }
 
 sub _errors_for {
   my ($self, $model, $ns) = @_;
-  carp "model $model does not support the errors API" unless $model->can('errors');
+  unless($model->can('errors')) {
+    carp "model $model does not support the errors API";
+    return ();
+  }
 
   $ns ||= $model->model_name->param_key if $model->can('model_name');
 
-  # 'multipart/form-data' 
-  my ($content_type, @params) = $self->view->ctx->req->content_type;
+  my $content_type = $self->content_type;
   my $cb;
   if(
     ($content_type eq 'application/x-www-form-urlencoded')
@@ -409,7 +414,8 @@ sub _errors_for {
       my $field = shift;
       return +{ parameter => $field };
     };
-  } elsif($content_type eq 'application/json') {
+  } else {
+    # Anything that isn't a classic form post gets JSON pointer style sources
     $cb = sub {
       my $field = shift;
       $field =~ s/\./\//g;
@@ -421,8 +427,8 @@ sub _errors_for {
 
   my %errors = $model->errors->to_hash(1);
   my @errors = ();
-  foreach my $field (keys %errors) {
-    my @error_messages = $errors{$field};
+  foreach my $field (sort keys %errors) {
+    my @error_messages = @{ $errors{$field} || [] };
     foreach my $error_message (@error_messages) {
       my $info = +{ detail => $error_message };
       if($field eq '*') {
@@ -544,6 +550,14 @@ use the C<model_name> of the object if it has one.  If the object does not have 
 then it will use the class name of the object.  If you want to render the object without a
 top level field then set this to an empty string.
 
+=head2 content_type
+
+The content type of the request this JSON is a response to.  This is used by L</errors> to
+choose the style of its error source references: C<application/x-www-form-urlencoded> and
+C<multipart/form-data> get C<parameter> style sources, anything else (including the default
+of C<application/json>) gets JSON pointer style sources.  If you are using this builder
+inside a web framework you can pass the request content type here.
+
 =head2 view
 
 This is an optional view object.  If provided we can use view attributes to provide models.
@@ -655,8 +669,100 @@ response is:
       }
     }
 
+=head2 object
+
+    $jb->object('profile', sub {
+      my ($jb, $profile) = @_;
+      $jb->string('address')
+        ->string('city');
+    });
+
+Renders a nested JSON object.  The first argument is either an attribute name (whose
+value must be an object) or a blessed object directly (in which case the field name is
+derived from its C<model_name>).  The last argument is a callback which receives the
+builder and the nested model (or C<< ($view, $jb, $model) >> when the builder has a
+custom view) and defines the nested fields; inside the callback the nested model is the
+current model.
+
+Options may be passed as a hashref before the callback: C<namespace> to override the
+field name used, and C<omit_empty> to drop the field entirely if the callback added
+nothing to it.
+
 =head2 array
 
+    $jb->array('credit_cards', sub {
+      my ($jb, $card) = @_;
+      $jb->number('id')
+        ->string('card_number');
+    });
+
+Renders a JSON array with one entry per item.  The first argument is an attribute name
+(whose value must be an arrayref or a collection object responding to C<next>), a raw
+arrayref (in which case you must pass a C<namespace> option to name the field), or a
+collection object.  The last argument is a callback run once per item, receiving the
+builder and the item (or C<< ($view, $jb, $item) >> with a custom view); inside the
+callback the item is the current model.
+
+Return L</skip> from the callback to exclude the current item from the output.  Options
+may be passed as a hashref before the callback: C<namespace> to override the field name
+and C<omit_empty> to drop the field entirely when the resulting array is empty.
+
+=head2 skip
+
+    $jb->array('users', sub {
+      my ($jb, $user) = @_;
+      return $jb->skip if $user->is_hidden;
+      $jb->string('username');
+    });
+
+Returns a sentinel value which, when returned from an L</array> callback, excludes the
+current item from the rendered array.
+
+=head2 if
+
+    $jb->if($boolean, sub { my ($jb) = @_; ... });
+    $jb->if(sub { ... }, sub { my ($jb) = @_; ... });
+
+Conditionally add to the JSON.  The first argument is a boolean or a coderef evaluated
+to one; when true the callback runs (receiving the builder, or C<< ($view, $jb) >> with
+a custom view).
+
+=head2 with_model
+
+    $jb->with_model($other_model, sub {
+      my ($jb, $model) = @_;
+      $jb->string('address');
+    });
+
+Runs the callback with the given model temporarily set as the current model, without
+opening a nested JSON object the way L</object> does.  Fields added inside the callback
+land at the current level but read their values from C<$other_model>.
+
+=head2 errors
+
+    $jb->string('username')->errors;
+
+If the current model has validation errors (it supports the errors API of
+L<Valiant::Validates>) this adds an C<errors> field at the top level of the rendered
+structure, containing one entry per validation message in the style of the JSON:API
+error format:
+
+    {
+      "local_test_user" : { "username" : "" },
+      "errors" : [
+        {
+          "detail" : "Username can't be blank",
+          "source" : { "pointer" : "local_test_user/username" }
+        }
+      ]
+    }
+
+Each entry has a C<detail> (the human readable message) and a C<source> which locates the
+failing input: a JSON pointer style path by default, or a C<parameter> name when
+L</content_type> is a classic HTML form type.  Fields are emitted in sorted order.
+
+If the model has no errors this is a no op; if the model doesn't support the errors API
+it warns and is a no op.
 
 =head1 METHODS FOR OBJECTS
 
@@ -684,6 +790,23 @@ This method is called if you use the C<omit_empty> option on a builder method so
 provide the correct model API to support checking an attribute exists.
 
 =head1 USING WITH A VIEW
+
+If you pass a C<view> object at construction time then every builder callback (for
+L</object>, L</array>, L</if>, L</with_model> and friends) receives the view as its
+first argument, followed by the builder and any model or item:
+
+    my $jb = Valiant::JSON::JSONBuilder->new(model=>$user, view=>$view);
+    $jb->object('profile', sub {
+      my ($view, $jb, $profile) = @_;
+      ...
+    });
+
+Additionally, when you have a view you can pass a string model I<name> instead of a
+model object at construction: the model is then looked up on the view, either via a
+C<get_model_for_json($name)> method if the view provides one, or by calling the method
+of that name on the view.  This is aimed at web framework view classes (for example the
+Catalyst views in the C<Catalyst-View-Valiant> distribution) where the view already
+holds the models being rendered.
 
 =head1 SEE ALSO
  

@@ -1,5 +1,5 @@
 package PAGI::Test::Client;
-$PAGI::Test::Client::VERSION = '0.002001';
+$PAGI::Test::Client::VERSION = '0.002002';
 use strict;
 use warnings;
 use Future::AsyncAwait;
@@ -531,24 +531,59 @@ sub start {
         return await $pending_future;
     };
 
-    my $startup_complete = 0;
+    # Resolves when the app signals startup: done on lifespan.startup.complete,
+    # failed (with the app's message) on lifespan.startup.failed.
+    my $startup = Future->new;
     my $send = async sub {
         my ($event) = @_;
-        if ($event->{type} eq 'lifespan.startup.complete') {
-            $startup_complete = 1;
+        my $type = $event->{type} // '';
+        if ($type eq 'lifespan.startup.complete') {
+            $startup->done unless $startup->is_ready;
         }
-        elsif ($event->{type} eq 'lifespan.shutdown.complete') {
-            # Done
+        elsif ($type eq 'lifespan.startup.failed') {
+            $startup->fail($event->{message} // "lifespan startup failed\n")
+                unless $startup->is_ready;
         }
     };
 
     $self->{lifespan_pending} = \$pending_future;
     $self->{lifespan_future} = $self->{app}->($scope, $receive, $send);
 
-    # Pump until startup complete
-    my $deadline = time + 5;
-    while (!$startup_complete && time < $deadline) {
-        # Just yield - the async code runs synchronously in our setup
+    if ($startup->is_ready) {
+        # A synchronous startup hook has already signaled by the time app()
+        # returned. Rethrow a synchronous lifespan.startup.failed; otherwise
+        # this is a no-op. No event loop is involved in this common path.
+        $startup->get;
+    }
+    elsif ($self->{lifespan_future}->is_ready) {
+        # The app unwound without signaling startup at all. Surface its own
+        # exception if it failed, otherwise report the protocol violation
+        # rather than waiting for a signal that will never come.
+        $self->{lifespan_future}->get;
+        croak "PAGI lifespan app returned without sending "
+            . "lifespan.startup.complete or lifespan.startup.failed";
+    }
+    else {
+        # The startup hook suspended on real off-loop I/O. Drive the event
+        # loop until it signals, the same way _request drives a request with
+        # ->get, instead of busy-waiting a deadline that never advances the
+        # loop. Off-loop I/O is only possible when Future::IO is present, so
+        # require it lazily here (it is a recommended, not required, prereq).
+        require Future::IO;
+        my $timeout = 5;
+        my $drive = async sub {
+            await Future->wait_any(
+                $startup,
+                Future::IO->sleep($timeout)->then(sub {
+                    Future->fail(
+                        "PAGI lifespan startup did not complete within ${timeout} seconds\n"
+                    );
+                }),
+            );
+        };
+        # ->get drives the loop and rethrows on lifespan.startup.failed or the
+        # backstop timeout; on success $startup is now done.
+        $drive->()->get;
     }
 
     $self->{started} = 1;
@@ -1067,6 +1102,13 @@ See L<PAGI::Test::SSE> for the SSE connection API.
 
 Triggers lifespan.startup. Only needed if C<< lifespan => 1 >> was passed
 to the constructor.
+
+Waits for the app to signal C<lifespan.startup.complete> before returning. If
+the startup hook awaits real off-loop I/O (via L<Future::IO>), C<start> drives
+the event loop until it completes rather than giving up. If startup B<fails>
+(the app sends C<lifespan.startup.failed>, e.g. because a startup hook died),
+C<start> C<die>s with the failure message instead of returning silently. A
+startup that never signals within a few seconds C<die>s with a timeout error.
 
 =head2 stop
 
