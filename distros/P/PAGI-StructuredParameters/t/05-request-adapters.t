@@ -1,5 +1,5 @@
-use v5.40;
-use experimental 'signatures';
+use strict;
+use warnings;
 use Test2::V0;
 use Future::AsyncAwait;
 use PAGI::Request;
@@ -14,8 +14,10 @@ use PAGI::StructuredParameters;
 # by the genuine request plumbing, not a mock.
 
 # Build a one-route app that runs $build->($req) and returns its result as JSON.
-sub app_that ($build) {
-    return async sub ($scope, $receive, $send) {
+sub app_that {
+    my ($build) = @_;
+    return async sub {
+        my ($scope, $receive, $send) = @_;
         my $req    = PAGI::Request->new($scope, $receive);
         my $result = await $build->($req);
         await PAGI::Response->json($result)->respond($send);
@@ -23,7 +25,8 @@ sub app_that ($build) {
 }
 
 subtest 'from_body parses form-encoded body and reconstructs structure' => sub {
-    my $client = PAGI::Test::Client->new(app => app_that(async sub ($req) {
+    my $client = PAGI::Test::Client->new(app => app_that(async sub {
+        my ($req) = @_;
         return await PAGI::StructuredParameters->from_body($req)
             ->permitted('username', name => ['first', 'last'], +{ email => [] });
     }));
@@ -46,7 +49,8 @@ subtest 'from_body parses form-encoded body and reconstructs structure' => sub {
 };
 
 subtest 'from_data parses a JSON body and keeps arrays as-is' => sub {
-    my $client = PAGI::Test::Client->new(app => app_that(async sub ($req) {
+    my $client = PAGI::Test::Client->new(app => app_that(async sub {
+        my ($req) = @_;
         return await PAGI::StructuredParameters->from_data($req)
             ->permitted('title', +{ tags => [] });
     }));
@@ -62,7 +66,8 @@ subtest 'from_data parses a JSON body and keeps arrays as-is' => sub {
 };
 
 subtest 'from_query parses the query string' => sub {
-    my $client = PAGI::Test::Client->new(app => app_that(async sub ($req) {
+    my $client = PAGI::Test::Client->new(app => app_that(async sub {
+        my ($req) = @_;
         return await PAGI::StructuredParameters->from_query($req)
             ->permitted('q', 'page');
     }));
@@ -72,12 +77,14 @@ subtest 'from_query parses the query string' => sub {
 };
 
 subtest 'required failure path: callback return value is thrown and sent' => sub {
-    my $client = PAGI::Test::Client->new(app => async sub ($scope, $receive, $send) {
+    my $client = PAGI::Test::Client->new(app => async sub {
+        my ($scope, $receive, $send) = @_;
         my $req = PAGI::Request->new($scope, $receive);
         my $clean = eval {
             await PAGI::StructuredParameters->from_body($req)->required(
                 'title',
-                sub ($ctx, $missing) {
+                sub {
+                    my ($ctx, $missing) = @_;
                     return PAGI::Response->json(
                         { error => 'missing', fields => $missing }, status => 400,
                     );

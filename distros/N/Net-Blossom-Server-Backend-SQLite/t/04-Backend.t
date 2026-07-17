@@ -6,6 +6,7 @@ use Test::More;
 
 use Net::Blossom::Server;
 use Net::Blossom::Server::Backend::SQLite;
+use Net::Blossom::Server::Backend::SQLite::BlobStore;
 
 my $PUBKEY = '79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798';
 
@@ -42,6 +43,58 @@ subtest 'blob descriptors use base URL and SQLite metadata' => sub {
     my $result = $storage->get_blob($sha256);
     isa_ok($result, 'Net::Blossom::Server::BlobResult');
     is($result->body, $body, 'get_blob returns stored bytes');
+
+    is(
+        $storage->get_blob_range($sha256, offset => 7, length => 7),
+        'backend',
+        'backend range retrieval returns requested bytes',
+    );
+};
+
+subtest 'binary ranges use byte offsets' => sub {
+    my $storage = storage();
+    my $body = pack 'C*', 0xc3, 0xa9, 0x41;
+    my $sha256 = sha256_hex($body);
+
+    Net::Blossom::Server->new(storage => $storage)->receive_blob($body);
+
+    is(
+        $storage->dbh->selectrow_array(
+            q{SELECT typeof(body) FROM blossom_blob_data WHERE storage_key = ?},
+            undef,
+            $sha256,
+        ),
+        'blob',
+        'uploaded bytes are stored as a SQLite BLOB',
+    );
+    is(
+        unpack('H*', $storage->get_blob_range($sha256, offset => 1, length => 1)),
+        'a9',
+        'range offsets count bytes rather than UTF-8 characters',
+    );
+};
+
+subtest 'blob store retrieves ranges inside SQLite' => sub {
+    my $dbh = Local::RangeDBH->new(body => 'backend');
+    my $store = Net::Blossom::Server::Backend::SQLite::BlobStore->new(
+        dbh => $dbh,
+    );
+
+    is(
+        $store->get_blob_range('storage-key', offset => 7, length => 7, size => 20),
+        'backend',
+        'blob store returns the database range result',
+    );
+    like(
+        $dbh->{select_calls}[0][0],
+        qr/SELECT substr\(CAST\(body AS BLOB\), \?, \?\)/,
+        'blob store asks SQLite for a BLOB substring',
+    );
+    is_deeply(
+        [@{$dbh->{select_calls}[0]}[2 .. 4]],
+        [8, 7, 'storage-key'],
+        'SQLite receives one-based offset, length, and storage key',
+    );
 };
 
 subtest 'duplicate owner uploads stay unique and update list metadata' => sub {
@@ -211,3 +264,35 @@ subtest 'post-commit temp cleanup failure does not fail committed upload' => sub
 };
 
 done_testing;
+
+{
+    package Local::RangeDBH;
+
+    use Class::Tiny qw(body), {
+        AutoCommit  => 1,
+        RaiseError  => 1,
+        PrintError  => 0,
+        Driver      => sub { {Name => 'SQLite'} },
+        select_calls => sub { [] },
+    };
+
+    sub BUILD {
+        my ($self) = @_;
+        $self->AutoCommit;
+        $self->RaiseError;
+        $self->PrintError;
+        $self->Driver;
+        $self->select_calls;
+        return;
+    }
+
+    sub selectrow_array {
+        my ($self, @args) = @_;
+        push @{$self->{select_calls}}, \@args;
+        return $self->body;
+    }
+
+    sub do {
+        return 1;
+    }
+}

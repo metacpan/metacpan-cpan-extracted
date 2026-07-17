@@ -1,5 +1,11 @@
 Revision history for Concierge-Users
 
+v0.9.3  2026-07-16
+    - Meta.pm: remove 'required' flag from the created_date system field.
+      It is set internally by the service layer, not collected from
+      user input, so callers consulting field hints should not be told
+      it is required.
+
 v0.9.2  2026-06-08
     - Remove 'system' attribute entirely: drop from field definitions,
       get_field_hints(), config_to_yaml() YAML output, POD, __DATA__

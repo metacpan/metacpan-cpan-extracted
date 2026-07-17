@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Catch errors in piped commands
+set -euo pipefail
+
 # see if global variable is set
-# global variable SeismicUnixGui_script locates main folder
+# SeismicUnixGui_script is a global variable for locating the script folder
 
  if [ -z "${SeismicUnixGui_script}" ]; then
 
@@ -12,7 +15,15 @@
  else
 
 	# run iSpectralAnalysis
-	# echo "perl $SeismicUnixGui_script/../big_streams/iSpectralAnalysis.pl"
+
+    # Find the correct perl to use before executing *.pl
+    # Copy paste and executre this file into the current shell
+    # $(...) captures the output
+    source "${SeismicUnixGui_script}/find_system_perl.sh"
+
+    SYSTEM_PERL="$(find_system_perl)"
+    # echo "Using: $SYSTEM_PERL"
+	# echo $SYSTEM_PERL "$SeismicUnixGui_script/../big_streams/iSpectralAnalysis.pl"
+    exec "$SYSTEM_PERL" $SeismicUnixGui_script/../big_streams/iSpectralAnalysis.pl
 	
-     perl $SeismicUnixGui_script/../big_streams/iSpectralAnalysis.pl
 fi

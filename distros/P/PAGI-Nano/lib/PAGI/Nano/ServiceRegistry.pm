@@ -1,5 +1,5 @@
 package PAGI::Nano::ServiceRegistry;
-$PAGI::Nano::ServiceRegistry::VERSION = '0.001000';
+$PAGI::Nano::ServiceRegistry::VERSION = '0.001001';
 use strict;
 use warnings;
 use Carp ();

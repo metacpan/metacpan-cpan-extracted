@@ -1,5 +1,5 @@
 package PAGI::StructuredParameters;
-$PAGI::StructuredParameters::VERSION = '0.001000';
+
 use strict;
 use warnings;
 use Storable ();
@@ -7,6 +7,8 @@ use Carp ();
 use PAGI::StructuredParameters::Exception::MissingParameter;
 use PAGI::StructuredParameters::Exception::InvalidArrayLength;
 use PAGI::StructuredParameters::Exception::InvalidArrayPointer;
+
+our $VERSION = '0.001001';
 
 our $MAX_ARRAY_DEPTH = 1000;
 

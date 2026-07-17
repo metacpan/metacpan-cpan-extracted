@@ -25,23 +25,46 @@ ramp
 0. make sure that the documentation
 exists for the program in the 
 "Stripped"  directory
+Even if you do, make sure that at least
+one parameter exists e.g. "opt=null"
 
-Modify "nameNnumber.txt" with the correct base
+1. Modify "nameNnumber.txt" (in current folder) 
+with the correct base
 file name and number
 e.g. susynlv 7
 
-define program ONLY within a
-developer category in L_SU_global_constants.pm 
-L 234
+Example file contents for nameNnumber.txt:
+Which group number do you want to use to create
+for *.pm, *.config, and *_spec.pm files ?
 
-define program in two locations within
-L_SU_path for hash and the colon definitions
+e.g., for transforms use:
+$sunix_category_number = 14
 
-After running this script
+3. define program (ONLY in one location) within a
+developer category in ~misc/L_SU_global_constants.pm 
+e.g., _suhilb     => $developer_sunix_categories[14]
+
+4. Also, define program in two locations within
+~misc/L_SU_path for hash and the colon definitions
+
+5. Run the current script: sudoc2pm_pt1.pl
+N.B., You may have to run this program from within
+its directory e.g.
+, ~/usr/local/pl/App-SeismicUnixGui/lib/App/SeismicUnixGui/developer/code/sunix
+This program generates "module".pm, "module".config, and "module"_spec.pm
+
+6. After running this script (sudoc2pm_pt1.pl)
 and before running sudoc2pm_pt2.pl:
 modify "module".config file , as needed
 
-modify *_spec to include bindings to directories
+7. Go to ~/usr/local/pl/App-SeismicUnixGui/lib/App/SeismicUnixGui/developer/code/sunix
+A "program_name"_changes.txt file may be needed to set up needed directory
+bindings in the spec file, but it is not always necessary. 
+The current step will prepare the *_spec.pm file
+with the correct bindings for the screen
+parameters.
+
+Now, run sudoc2pm_pt2.pl
 
 
 =head4 Examples:
@@ -70,21 +93,14 @@ $developer_sunix_categories[14] = 'transform';
 $developer_sunix_categories[15] = 'well';
 $developer_sunix_categories[16] = 'unix';
 $developer_sunix_categories[17] = '';
-  	
- 	QUESTION 1:
-Which group number do you want to use to create
-for *.pm, *.config, and *_spec.pm files ?
-
-e.g., for transforms use:
-$sunix_category_number = 15
 	
-
 =head2 CHANGES and their DATES
+V1.1.1 Jan 2 2026 Improved comments
 
 =cut
 
 use Moose;
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 use aliased 'App::SeismicUnixGui::developer::code::sunix::sudoc';
 use aliased 'App::SeismicUnixGui::developer::code::sunix::sunix_package';
@@ -113,19 +129,7 @@ my $sudoc2pm = {
 	_line_contents => '',
 };
 
-=head2 QUESTIONS 1 & 2:
-
-QUESTION 1:
-Which group number do you want ?
-
-QUESTION 2:
-Which program do you want to work on?
-
-For example: 
-'sugetgthr';
-'sugain'; 'suputgthr'; 'suifft';
-'sufctanismod' 'vel2stiff
-'unif2aniso' 'transp' 'suflip'
+=head2 TBD
 
 psgraph thru psmovie
 
@@ -191,10 +195,10 @@ for ( my $i = 0 ; $i < $list_length ; $i++ ) {
 
 		my $ans = scalar @$whole_aref;
 
-#		 print("sudoc2pm_pt1.pl,num_lines= $ans\n");
-#		 for (my $i=0; $i <$ans; $i++) {
-#		 	print("sudoc2pm_pt1.pl,All sunix documentation @{$whole_aref}[$i]\n");
-#		 }
+		 print("sudoc2pm_pt1.pl,num_lines= $ans\n");
+		 for (my $i=0; $i <$ans; $i++) {
+		 	print("sudoc2pm_pt1.pl,All sunix documentation @{$whole_aref}[$i]\n");
+		 }
 
 		$sudoc2pm->{_line_contents} = $sudoc->lines_with('=');
 		my $sudoc_namVal = $sudoc->parameters( $sudoc2pm->{_line_contents} );

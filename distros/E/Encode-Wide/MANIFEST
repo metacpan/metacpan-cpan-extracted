@@ -1,19 +1,28 @@
+bin/wide2html
+bin/wide2xml
 Changes
+cpanfile
 lib/Encode/Wide.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-scripts/generate_index.pl
 t/00-load.t
 t/30-basics.t
 t/edge.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
 t/manifest.t
+t/mutant_killers.t
 t/pod-cm.t
 t/pod-synopsis.t
 t/pod.t
+t/security.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

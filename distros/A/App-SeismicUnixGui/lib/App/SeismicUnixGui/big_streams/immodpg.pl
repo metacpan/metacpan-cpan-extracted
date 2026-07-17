@@ -1,4 +1,4 @@
-=head1 DOCUMENTATION
+=head1 DOCUMENTATION 2600
 
 =head2 SYNOPSIS 
 
@@ -8,7 +8,7 @@
 =head2 CHANGES and their DATES
 
  DATES:    Feb 7 2020
- 				April 4 2021
+ 	   April 4 2021
  
  Version  0.0.1 , 0.0.2
 
@@ -28,7 +28,7 @@
 
  We are using Moose.
  Moose already declares that you need debuggers turned on
- so you don't need a linewlike the following:
+ so you don't need a linew like the following:
  use warnings;
  
  When program starts change file is initialized to "no". --change file 
@@ -66,8 +66,11 @@ April 2021, removed commented lines
 
 use Moose;
 our $VERSION = '0.0.1';
+
 use Time::HiRes qw(gettimeofday tv_interval);
 use Tk;
+
+# Aliases
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use aliased 'App::SeismicUnixGui::configs::big_streams::immodpg_config';
@@ -78,8 +81,8 @@ use aliased 'App::SeismicUnixGui::big_streams::immodpg';
 use aliased 'App::SeismicUnixGui::sunix::shell::xk';
 
 =head2 private anonymous hash 
-used to hand off variables for external printing
-
+Hands off variables for external printing
+Stores GUI widget references for immodpg
 =cut
 
 my $immodpg_Tk = {
@@ -91,7 +94,7 @@ my $immodpg_Tk = {
 	_lower_layerLabel           => '',
 	_min_t_s                    => '',
 	_min_x_m                    => '',
-	_mw						    => '',
+	_mw			    => '',
 	_thickness_increment_m      => '',
 	_thickness_mEntry           => '',
 	_thickness_mLabel           => '',
@@ -124,52 +127,52 @@ my $immodpg_Tk = {
 =cut
 
 my $get_L_SU       	= L_SU_global_constants->new();
-my $get_immodpg    	= immodpg_global_constants->new();
+my $IMMODPG_CONST    	= immodpg_global_constants->new();
 my $immodpg   		= immodpg->new();
 my $immodpg_config 	= immodpg_config->new();
 
 my $premmod 		= premmod->new();
 my $xk      		= xk->new();
-my $Project         = Project_config->new();
+my $Project             = Project_config->new();
 
 my $IMMODPG          	   = $Project->IMMODPG();
 
 my $var_L_SU               = $get_L_SU->var();
-my $global_libs 		   = $get_L_SU->global_libs();
+my $global_libs            = $get_L_SU->global_libs();
 
-my $var_immodpg            = $get_immodpg->var();
-my $change_thickness_m_opt = $var_immodpg->{_thickness_m_opt};
-my $clip_opt               = $var_immodpg->{_clip_opt};
-my $exit_opt               = $var_immodpg->{_exit_opt};
-my $immodpg_model 		   = $var_immodpg ->{_immodpg_model};
-my $move_down_opt          = $var_immodpg->{_move_down_opt};
-my $move_left_opt          = $var_immodpg->{_move_left_opt};
-my $move_minus_opt         = $var_immodpg->{_move_minus_opt};
-my $move_right_opt         = $var_immodpg->{_move_right_opt};
-my $move_up_opt            = $var_immodpg->{_move_up_opt};
-my $thickness_m_minus_opt  = $var_immodpg->{_thickness_m_minus_opt};
-my $thickness_m_plus_opt   = $var_immodpg->{_thickness_m_plus_opt};
-my $zoom_minus_opt         = $var_immodpg->{_zoom_minus_opt};
-my $zoom_plus_opt          = $var_immodpg->{_zoom_plus_opt};
+my $immodpg_var            = $IMMODPG_CONST->var();
+my $change_thickness_m_opt = $immodpg_var->{_thickness_m_opt};
+my $clip_opt               = $immodpg_var->{_clip_opt};
+my $exit_opt               = $immodpg_var->{_exit_opt};
+my $immodpg_model          = $immodpg_var ->{_immodpg_model};
+my $move_down_opt          = $immodpg_var->{_move_down_opt};
+my $move_left_opt          = $immodpg_var->{_move_left_opt};
+my $move_minus_opt         = $immodpg_var->{_move_minus_opt};
+my $move_right_opt         = $immodpg_var->{_move_right_opt};
+my $move_up_opt            = $immodpg_var->{_move_up_opt};
+my $thickness_m_minus_opt  = $immodpg_var->{_thickness_m_minus_opt};
+my $thickness_m_plus_opt   = $immodpg_var->{_thickness_m_plus_opt};
+my $zoom_minus_opt         = $immodpg_var->{_zoom_minus_opt};
+my $zoom_plus_opt          = $immodpg_var->{_zoom_plus_opt};
 
-my $Vbot_opt             = $var_immodpg->{_Vbot_opt};
-my $Vbot_upper_layer_opt = $var_immodpg->{_Vbot_upper_layer_opt};
-my $Vbot_minus_opt       = $var_immodpg->{_Vbot_minus_opt};
-my $Vbot_plus_opt        = $var_immodpg->{_Vbot_plus_opt};
-my $Vtop_opt             = $var_immodpg->{_Vtop_opt};
-my $Vtop_lower_layer_opt = $var_immodpg->{_Vtop_lower_layer_opt};
-my $Vtop_minus_opt       = $var_immodpg->{_Vtop_minus_opt};
-my $Vtop_plus_opt        = $var_immodpg->{_Vtop_plus_opt};
+my $Vbot_opt             = $immodpg_var->{_Vbot_opt};
+my $Vbot_upper_layer_opt = $immodpg_var->{_Vbot_upper_layer_opt};
+my $Vbot_minus_opt       = $immodpg_var->{_Vbot_minus_opt};
+my $Vbot_plus_opt        = $immodpg_var->{_Vbot_plus_opt};
+my $Vtop_opt             = $immodpg_var->{_Vtop_opt};
+my $Vtop_lower_layer_opt = $immodpg_var->{_Vtop_lower_layer_opt};
+my $Vtop_minus_opt       = $immodpg_var->{_Vtop_minus_opt};
+my $Vtop_plus_opt        = $immodpg_var->{_Vtop_plus_opt};
 
-my $VbotNVtop_lower_layer_minus_opt = $var_immodpg->{_VbotNVtop_lower_layer_minus_opt};
-my $VbotNVtop_lower_layer_plus_opt  = $var_immodpg->{_VbotNVtop_lower_layer_plus_opt};
-my $VtopNVbot_upper_layer_minus_opt = $var_immodpg->{_VtopNVbot_upper_layer_minus_opt};
-my $VtopNVbot_upper_layer_plus_opt  = $var_immodpg->{_VtopNVbot_upper_layer_plus_opt};
-my $VbotNtop_multiply_opt           = $var_immodpg->{_VbotNtop_multiply_opt};
-my $VbotNtop_plus_opt               = $var_immodpg->{_VbotNtop_plus_opt};
-my $VbotNtop_minus_opt              = $var_immodpg->{_VbotNtop_minus_opt};
+my $VbotNVtop_lower_layer_minus_opt = $immodpg_var->{_VbotNVtop_lower_layer_minus_opt};
+my $VbotNVtop_lower_layer_plus_opt  = $immodpg_var->{_VbotNVtop_lower_layer_plus_opt};
+my $VtopNVbot_upper_layer_minus_opt = $immodpg_var->{_VtopNVbot_upper_layer_minus_opt};
+my $VtopNVbot_upper_layer_plus_opt  = $immodpg_var->{_VtopNVbot_upper_layer_plus_opt};
+my $VbotNtop_multiply_opt           = $immodpg_var->{_VbotNtop_multiply_opt};
+my $VbotNtop_plus_opt               = $immodpg_var->{_VbotNtop_plus_opt};
+my $VbotNtop_minus_opt              = $immodpg_var->{_VbotNtop_minus_opt};
 
-my $update_opt   = $var_immodpg->{_update_opt};
+my $update_opt   = $immodpg_var->{_update_opt};
 my $yes          = $var_L_SU->{_yes};
 my $empty_string = $var_L_SU->{_empty_string};
 my $on           = $var_L_SU->{_on};
@@ -195,9 +198,9 @@ my ( $exit_button,             $update_button );
 my $rb_value = "red";
 our $mw;
 
-=head2 Declare:
+=head2 DEFAULT VALUES
 
-default values for screen
+Default values for screen
 when the configuration file is missing
 
 =cut
@@ -207,7 +210,7 @@ my $Vbot_default                  = 1600.0;
 my $VbotNtop_factor_default       = 1.;
 my $Vtop_lower_layer_default      = 1600.0;
 my $Vbot_upper_layer_default      = 15000.0;
-my $change_default                = $var_immodpg->{_change_default};
+my $change_default                = $immodpg_var->{_change_default};
 my $clip4plot_default             = 1;
 my $layer_default                 = 2;
 my $lower_layer_default           = 3;
@@ -218,7 +221,7 @@ my $thickness_increment_m_default = 10;
 
 =head2 initialize:
 
-useful variables with defaults
+Useful variables with defaults
 
 =cut
 
@@ -235,6 +238,9 @@ my $thickness_m           = $thickness_m_default;
 my $Vincrement_mps        = $Vincrement_mps_default;
 my $thickness_increment_m = $thickness_increment_m_default;
 
+#---------------------------------------------
+#            Create Main Window
+#---------------------------------------------
 
 =head2 Create Main Window 
 
@@ -244,30 +250,31 @@ my $thickness_increment_m = $thickness_increment_m_default;
  immodpg requires Main window widget to display
  error messages
 
-=cut
-
-=head2 Decide whether to 
-	Start Main widget but temporarily withdraw
-	until checks are complete
-	Window is needed for error messages
+  Decide whether to 
+  Start Main widget but temporarily withdraw
+   until checks are complete
+  Window is needed for error messages
 
 =cut
 
 $mw = MainWindow->new;
 $mw->withdraw;
+
 $immodpg_Tk->{_mw}     = $mw;
 $immodpg->set_widgets($immodpg_Tk);
 $immodpg->initialize_messages();
 
-=head2 clean old files
+=head2 Clean old files
+
 from past sessions
 
 =cut
 
 $immodpg->clean_trash();
 
-=head2 initialize files
-after cleaning trash
+=head2 Initialize files
+
+After cleaning trash
 
 =cut
 my $replacement= $global_libs->{_configs_big_streams}.'/'.$immodpg_model;
@@ -277,8 +284,9 @@ $immodpg->set_replacement4missing($replacement);
 $immodpg->get_replacement4missing();
 
 
-=head2 initialize values
-in modules
+=head2 Initialize values
+
+In modules
 
 =cut
 $immodpg->set_defaults();
@@ -287,7 +295,7 @@ $immodpg->initialize_model();
 
 =head2 Get starting configuration
  
-parameters from a configuration file
+Parameters from a configuration file
 
 =cut
 
@@ -315,8 +323,8 @@ $Vincrement_mps        = $CFG_h->{immodpg}{1}{Vincrement_mps};
 $thickness_increment_m = $CFG_h->{immodpg}{1}{thickness_increment_m};
 
 =head2 Error checks
-Adjust
-working, upper,
+
+Adjust working, upper,
 and lower layer for
 extraneous values
 
@@ -329,8 +337,6 @@ $immodpg->set_layer_control($layer);
 $layer = $immodpg->get_control_layer();
 my $number_of_layers = $immodpg->get_number_of_layers();
 
-#print("immodpg.pl, layer, number_of_layers=$number_of_layers\n");
-
 $upper_layer = $layer - 1;
 
 if ( $upper_layer < 1 ) {
@@ -340,11 +346,8 @@ if ( $upper_layer < 1 ) {
 
 $lower_layer = $layer + 1;
 
-#print("immodpg.pl, upper layer=$upper_layer\n");
-#print("immodpg.pl, layer=$layer\n");
-#print("immodpg.pl, lower layer=$lower_layer\n");
+=head2 Get model values
 
-=head2 Get model values 
 of Vp, thickness, and error switch from
 immodpg.out for initial settings
 in GUI
@@ -355,21 +358,28 @@ $immodpg->set_model_layer($layer);
 
 my ( $Vp_ref, $dz, $error_switch ) = $immodpg->get_initialVp_dz4gui();
 
+# ------------------
+# CASE 1 ALL OK
+# ------------------
 if ( $error_switch eq $off ) {
-	# CASE 1 ALL OK
-	
+
 	my @V = @$Vp_ref;
 
+    # Extract velocity values
 	$Vbot_upper_layer = $V[0];
 	$Vtop             = $V[1];
 	$Vbot             = $V[2];
 	$Vtop_lower_layer = $V[3];
 	
+	# Layer thickness
 	$thickness_m = $dz;
 
+# ------------------
+# CASE 2  BAD MODEL FILE
+# ------------------
 } elsif ( $error_switch eq $on ) {
-		# CASE 2  BAD MODEL FILE
-        print("immodpg.pl, CORRUPT immodpg.out (fortran binary model file)\n");
+
+    print("immodpg.pl, CORRUPT immodpg.out (fortran binary model file)\n");
         
 } else {
 	print("immodpg.pl, unexpected variable\n");
@@ -383,7 +393,6 @@ generate a binary file
 
 $premmod->set_binary_strip();
 $premmod->out_header_values();
-
 
 =head2 Establish Main Window
 
@@ -399,7 +408,7 @@ $mw->configure(
 $mw->focusFollowsMouse;
 
 
-=head2  top_settings frame
+=head2  tTp_settings frame
 
 Contains:
 (1) working layer
@@ -415,9 +424,9 @@ my $Vlayer_frame = $mw->Frame(
 	-relief      => 'groove',
 );
 
-=head2 Create
+=head2 Font Registry
 
-font types
+Font types
 
 =cut
 
@@ -604,13 +613,12 @@ my $VbotNtop_factorEntry = $mw->Entry(
 );
 
 =head2 VbotNtop_factorEntry 
+
 MUST first be created before it can be used by
 a callback subroutine
 =cut
 
 $immodpg_Tk->{_VbotNtop_factorEntry} = $VbotNtop_factorEntry;
-
-# print("immodpg.pl, VbotNtop_factorEntry = $immodpg_Tk->{_VbotNtop_factorEntry}\n");
 
 $VbotNtop_factorEntry->configure(
 	-validate        => 'focus',
@@ -684,9 +692,11 @@ my $layerEntry = $mw->Entry(
 	-textvariable => \$layer,
 );
 
-=head2 layerEntry 
+=head2 layerEntry
+
 MUST first be created before it can be used by
 a callback subroutine
+
 =cut
 
 $immodpg_Tk->{_layerEntry} = $layerEntry;
@@ -731,9 +741,11 @@ my $thickness_increment_mEntry = $mw->Entry(
 	-textvariable => \$thickness_increment_m,
 );
 
-=head2 thickness_increment_mEntry 
+=head2 thickness_increment_mEntry
+
 MUST first be created before it can be used by
 a callback subroutine
+
 =cut
 
 $immodpg_Tk->{_thickness_increment_mEntry} = $thickness_increment_mEntry;
@@ -757,7 +769,8 @@ my $thickness_mEntry = $mw->Entry(
 	-textvariable => \$thickness_m,
 );
 
-=head2 thickness_mEntry 
+=head2 thickness_mEntry
+
 MUST first be created before it can be used by
 a callback subroutine
 =cut
@@ -796,23 +809,15 @@ my $upper_layerLabel = $mw->Label(
 	-textvariable => \$upper_layer,
 );
 
-=head2 upper_layerLabel widget will be update
-in immodpg
+=head2 upper_layerLabel widget 
+
+Is updated  in immodpg
 
 =cut
 
 $immodpg_Tk->{_upper_layerLabel} = $upper_layerLabel;
 
-=head2 Buttons widgets
-
-=cut
-
-=head2 Buttons widgets
-
-=cut
-
-=head2
-row index=0
+=head2 Row index=0
 
 =cut 
 
@@ -834,8 +839,7 @@ $exit_button = $mw->Button(
 	-command            => [ \&_set_exit ],
 );
 
-=head2
-row index
+=head2 Row index
 
 =cut 
 
@@ -857,8 +861,7 @@ $move_down_button = $mw->Button(
 	-command            => [ \&_set_move_down ],
 );
 
-=head2
-row index
+=head2 Row index
 
 =cut 
 
@@ -881,8 +884,7 @@ $move_left_button = $mw->Button(
 	-command            => [ \&_set_move_left ],
 );
 
-=head2
-row index
+=head2 Row index
 
 =cut 
 
@@ -905,8 +907,7 @@ $move_right_button = $mw->Button(
 	-command            => [ \&_set_move_right ],
 );
 
-=head2
-row index
+=head2 Row index
 
 =cut 
 
@@ -929,8 +930,7 @@ $move_up_button = $mw->Button(
 	-command            => [ \&_set_move_up ],
 );
 
-=head2
-row index 1-2 col 3
+=head2 Row index 1-2 col 3
 
 =cut 
 
@@ -953,8 +953,7 @@ $VtopNVbot_upper_layer_plus_button = $mw->Button(
 	-command            => [ \&_setVtopNVbot_upper_layer_plus ],
 );
 
-=head2
-row index 3-4 col 4
+=head2 Row index 3-4 col 4
 
 =cut 
 
@@ -977,8 +976,7 @@ $VtopNVbot_upper_layer_minus_button = $mw->Button(
 	-command            => [ \&_setVtopNVbot_upper_layer_minus ],
 );
 
-=head2
-row index 2, col 6
+=head2 Row index 2, col 6
 
 =cut 
 
@@ -1001,8 +999,7 @@ $Vtop_plus_button = $mw->Button(
 	-command            => [ \&_setVtop_plus ],
 );
 
-=head2
-row index 
+=head2 Row index 
 
 =cut 
 
@@ -1202,8 +1199,7 @@ $Vbot_minus_button = $mw->Button(
 
 );
 
-=head2
-row index
+=head2 Row index
 
 =cut 
 
@@ -1226,8 +1222,7 @@ $thickness_m_minus_button = $mw->Button(
 	-command            => [ \&_set_thickness_m_minus ],
 );
 
-=head2
-row index
+=head2 Row index
 
 =cut 
 
@@ -1250,8 +1245,7 @@ $thickness_m_plus_button = $mw->Button(
 	-command            => [ \&_set_thickness_m_plus ],
 );
 
-=head2
-row index=5
+=head2 Row index=5
 
 =cut 
 
@@ -1321,12 +1315,14 @@ $zoom_plus_button = $mw->Button(
 	-command            => [ \&_set_zoom_plus ],
 );
 
-=head2 Label widgets
+#-------------------------------
+# LABEL WIDGETS
+#-----------------------------
 
-=cut
 
 =head2 Label 
-widget box for Vbot of upper layer
+
+Widget box for Vbot of upper layer
 
 =cut
 
@@ -1341,7 +1337,8 @@ my $Vbot_upper_label = $mw->Label(
 );
 
 =head2 Label 
-widget box for Vincrement
+
+Widget box for Vincrement
 
 =cut
 
@@ -1356,7 +1353,8 @@ my $Vincrement_label = $mw->Label(
 );
 
 =head2 Label 
-#widget box for Vtop
+
+Widget box for Vtop
 
 =cut
 
@@ -1371,7 +1369,8 @@ my $Vtop_label = $mw->Label(
 );
 
 =head2 Label 
-widget box for Vtop of lower layer
+
+Widget box for Vtop of lower layer
 
 =cut
 
@@ -1385,8 +1384,9 @@ my $Vtop_lower_layer_label = $mw->Label(
 	-background  => $var_L_SU->{_light_gray},
 );
 
-=head2 Label 
-widget box for Vbot
+=head2 Label
+
+ for Vbot
 
 =cut
 
@@ -1400,7 +1400,8 @@ my $Vbot_label = $mw->Label(
 	-background  => $var_L_SU->{_light_gray},
 );
 
-=head2 Label 
+=head2 Label
+
  factor
 
 =cut
@@ -1415,7 +1416,8 @@ my $VbotNtop_factor_label = $mw->Label(
 	-background  => $var_L_SU->{_light_gray},
 );
 
-=head2 Label 
+=head2 Label
+
  clip4plot
 
 =cut
@@ -1431,7 +1433,8 @@ my $clip4plot_label = $mw->Label(
 );
 
 =head2 Label 
-widget box for thicknes increment
+
+Widget box for thickness increment
 
 =cut
 
@@ -1461,68 +1464,56 @@ my $empty_label = $mw->Label(
 );
 
 =head2 Label 
-widget box for Layer number
+
+Widget box for Layer number
 
 =cut
 
 my $layerLabel = $mw->Label(
 	-font    => $arial_18_italic,
 	-justify => 'left',
-
-	#	-padx		 => $var_L_SU->{_3_pixels},
-	#	-height      => $var_L_SU->{_1_character},
-	#	-width       => $var_L_SU->{_2_characters},
 	-text        => 'layer',
 	-borderwidth => $var_L_SU->{_1_pixel},
 	-background  => $var_L_SU->{_light_gray},
 );
 
 =head2 Label 
-widget box for Layer number
+
+Widget box for Layer number
 
 =cut
 
 my $move_label = $mw->Label(
 	-font    => $arial_14_italic,
 	-justify => 'center',
-
-	#	-padx		 => $var_L_SU->{_3_pixels},
-	#	-height      => $var_L_SU->{_1_character},
-	#	-width       => $var_L_SU->{_2_characters},
 	-text        => 'move',
 	-borderwidth => $var_L_SU->{_1_pixel},
 	-background  => $var_L_SU->{_light_gray},
 );
 
 =head2 Label 
-widget box for velocity m/s
+
+Widget box for velocity m/s
 
 =cut
 
 my $velocity_label = $mw->Label(
 	-font    => $arial_18_italic,
 	-justify => 'center',
-
-	#	-padx		 => $var_L_SU->{_3_pixels},
-	#	-height      => $var_L_SU->{_1_character},
-	#	-width       => $var_L_SU->{_2_characters},
 	-text        => 'Vp m/s',
 	-borderwidth => $var_L_SU->{_1_pixel},
 	-background  => $var_L_SU->{_light_gray},
 );
 
 =head2 Label 
-widget box for Layer number
+
+Widget box for Layer number
 
 =cut
 
 my $zoom_label = $mw->Label(
 	-font    => $arial_14_italic,
 	-justify => 'center',
-
-	#	-padx		 => $var_L_SU->{_3_pixels},
-	#	-height      => $var_L_SU->{_1_character},
-	#	-width       => $var_L_SU->{_2_characters},
 	-text        => 'zoom',
 	-borderwidth => $var_L_SU->{_1_pixel},
 	-background  => $var_L_SU->{_light_gray},
@@ -1532,8 +1523,7 @@ my $zoom_label = $mw->Label(
 
 =cut
 
-=head2
-row index = 0 col8
+=head2 Row index = 0 col8
 
 =cut
 
@@ -1545,8 +1535,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'ew',
 );
 
-=head2
-row index = 0 col 9
+=head2 Row index = 0 col 9
 
 =cut
 
@@ -1558,8 +1547,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'ew',
 );
 
-=head2
-row index = 0 col 10
+=head2 Row index = 0 col 10
 
 =cut
 
@@ -1571,8 +1559,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'ew',
 );
 
-=head2
-row index = 1-2 col 3
+=head2 Row index = 1-2 col 3
 
 =cut
 
@@ -1584,8 +1571,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 1-2 col4
+=head2 Row index = 1-2 col4
 
 =cut
 
@@ -1597,8 +1583,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 1 col 8
+=head2 Row index = 1 col 8
 
 =cut
 
@@ -1610,8 +1595,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 1 col 9
+=head2 Row index = 1 col 9
 
 =cut
 
@@ -1623,8 +1607,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2 col 8
+=head2 Row index = 2 col 8
 
 =cut
 
@@ -1636,8 +1619,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2 col9
+=head2 Row index = 2 col9
 
 =cut
 
@@ -1649,8 +1631,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2 col10
+=head2 Row index = 2 col10
 
 =cut
 
@@ -1662,8 +1643,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2 col11
+=head2 Row index = 2 col11
 
 =cut
 
@@ -1675,8 +1655,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 3 col11
+=head2 Row index = 3 col11
 
 =cut
 
@@ -1688,8 +1667,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 3 col 8
+=head2 Row index = 3 col 8
 
 =cut
 
@@ -1701,8 +1679,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 4 col 8
+=head2 Row index = 4 col 8
 
 =cut
 
@@ -1714,8 +1691,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 4 col 9
+=head2 Row index = 4 col 9
 
 =cut
 
@@ -1727,8 +1703,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 3-4 col 3
+=head2 Row index = 3-4 col 3
 
 =cut
 
@@ -1740,8 +1715,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 3-4 col 4
+=head2 Row index = 3-4 col 4
 
 =cut
 
@@ -1753,8 +1727,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 1 col 5
+=head2 Row index = 1 col 5
 
 =cut
 
@@ -1766,8 +1739,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2-3 col0
+=head2 Row index = 2-3 col0
 
 =cut
 
@@ -1779,8 +1751,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2-3 col 1
+=head2 Row index = 2-3 col 1
 
 =cut
 
@@ -1792,8 +1763,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index = 2-3 col2
+=head2 Row index = 2-3 col2
 
 =cut
 
@@ -1805,8 +1775,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
- row index 2 col 5
+=head2 Row index 2 col 5
  
 =cut
 
@@ -1817,8 +1786,7 @@ $Vlayer_frame->grid(
 	-rowspan => 1,
 );
 
-=head2
-row index 2 col 6
+=head2 Row index 2 col 6
 
 =cut
 
@@ -1829,8 +1797,7 @@ $Vlayer_frame->grid(
 	-rowspan => 1,
 );
 
-=head2
-row index 2 col 7
+=head2 Row index 2 col 7
 
 =cut
 
@@ -1841,8 +1808,7 @@ $Vlayer_frame->grid(
 	-rowspan => 1,
 );
 
-=head2
-row index 3 col5
+=head2 Row index 3 col5
 
 =cut
 
@@ -1853,8 +1819,7 @@ $Vlayer_frame->grid(
 	-rowspan => 1,
 );
 
-=head2
-row index 3 col 6
+=head2 Row index 3 col 6
 
 =cut
 
@@ -1865,8 +1830,7 @@ $Vlayer_frame->grid(
 	-rowspan => 1,
 );
 
-=head2
-row index 3 col 7
+=head2 Row index 3 col 7
 
 =cut
 
@@ -1877,8 +1841,7 @@ $Vlayer_frame->grid(
 	-rowspan => 1,
 );
 
-=head2
-row index 4 col 5
+=head2 Row index 4 col 5
 =cut
 
 $Vlayer_frame->grid(
@@ -1889,8 +1852,7 @@ $Vlayer_frame->grid(
 	-sticky  => 'nsew',
 );
 
-=head2
-row index 5 col 8
+=head2 Row index 5 col 8
 =cut
 
 $Vlayer_frame->grid(
@@ -1902,8 +1864,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 5 col 4
+=head2 Row index = 5 col 4
 
 =cut
 
@@ -1917,8 +1878,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 0 col 0
+=head2 Row index = 0 col 0
 
 =cut
 
@@ -1932,8 +1892,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 8 col 1
+=head2 Row index = 8 col 1
 
 =cut
 
@@ -1947,8 +1906,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 7 col 0
+=head2 Row index = 7 col 0
 
 =cut
 
@@ -1961,8 +1919,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 7 col 3
+=head2 Row index = 7 col 3
 
 =cut
 
@@ -1975,8 +1932,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 6 col 1
+=head2 Row index = 6 col 1
 
 =cut
 
@@ -1990,8 +1946,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 7 col 1
+=head2 Row index = 7 col 1
 
 =cut
 
@@ -2004,8 +1959,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 7 col 5
+=head2 Row index = 7 col 5
 
 =cut
 
@@ -2018,8 +1972,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 6 col 5
+=head2 Row index = 6 col 5
 
 =cut
 
@@ -2032,8 +1985,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 8 col 5
+=head2 Row index = 8 col 5
 
 =cut
 
@@ -2046,8 +1998,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 6 col 8
+=head2 Row index = 6 col 8
 
 =cut
 
@@ -2060,8 +2011,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 7 col 8
+=head2 Row index = 7 col 8
 
 =cut
 
@@ -2074,8 +2024,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 8 col 8
+=head2 Row index = 8 col 8
 
 =cut
 
@@ -2088,8 +2037,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 9 col 9
+=head2 Row index = 9 col 9
 
 =cut
 
@@ -2102,8 +2050,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 9 col 8
+=head2 Row index = 9 col 8
 
 =cut
 
@@ -2116,8 +2063,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 6 col 9
+=head2 Row index = 6 col 9
 
 =cut
 
@@ -2130,8 +2076,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 7 col 9
+=head2 Row index = 7 col 9
 
 =cut
 
@@ -2144,8 +2089,7 @@ $Vlayer_frame->grid(
 	-sticky     => 'nsew',
 );
 
-=head2
-row index = 9 col 8
+=head2 Row index = 9 col 8
 
 =cut
 
@@ -2167,16 +2111,16 @@ sub _delay {
 	my ($secs_now,$secs_start);
 	
 	($secs_start,$usecs_start) = gettimeofday(); 
-	$time_passed = $var_immodpg->{_time_passed_us_default};
+	$time_passed = $immodpg_var->{_time_passed_us_default};
 	
-	while ( $time_passed < $var_immodpg->{_time_delay_us} ) {
+	while ( $time_passed < $immodpg_var->{_time_delay_us} ) {
 
 		($secs_now,$usecs_now) = gettimeofday();
 	    $time_passed = $usecs_now - $usecs_start;
 
 	}
 	
-#	if( $time_passed > $var_immodpg->{_time_delay_s} ) {
+#	if( $time_passed > $immodpg_var->{_time_delay_s} ) {
 #	 	   print("usecs_now  = $usecs_now\n");
 #           print("time_passed=$time_passed\n");
 #	}
@@ -2184,152 +2128,178 @@ sub _delay {
 	return();
 	 }
 
+
+#----------------------------------------------
+#  Unified callback dispatcher
+#----------------------------------------------
+
+sub _call {
+    my ($method, $return_1) = @_;
+
+    $immodpg->set_widgets($immodpg_Tk);
+
+    # Call the method on the immodpg object
+    $immodpg->$method();
+
+    return 1 if $return_1;   # For Entry-validation subs
+    return;
+}
+
 =head2 sub _setVincrement
-_setVincrement sets
-interaction with immodpg.for
-writes out Vincrement for immodpg to read
+
+Sets interaction with immodpg.for
+Writes out Vincrement for immodpg to read
  return(1) validates command for Entry
  
 =cut
-
-sub _setVincrement {
-
-	# print("immodpg.pl,_Vincrement,$immodpg_Tk->{_VincrementEntry}\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->setVincrement();
-	return (1);
-}
+sub _setVincrement           { _call('setVincrement',           1) }
+# sub _setVincrement {
+# 
+# print("immodpg.pl,_Vincrement,$immodpg_Tk->{_VincrementEntry}\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->setVincrement();
+# 	return (1);
+# }
 
 =head2 sub _setVbotNtop_factor
-_setVbotNtop_factor sets
-interaction with immodpg.for
-writes out VbotNtop_factor for immodpg to read
+
+Sets interaction with immodpg.for
+Writes out VbotNtop_factor for immodpg to read
  return(1) validates command for Entry
  
 =cut
 
-sub _setVbotNtop_factor {
+sub _setVbotNtop_factor      { _call('setVbotNtop_factor',      1) }
 
-	# print("immodpg.pl,_setVbotNtop_factor,$immodpg_Tk->{_VbotNtop_factorEntry}\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->setVbotNtop_factor();
-	return (1);
-}
+# sub _setVbotNtop_factor {
+
+# print("immodpg.pl,_setVbotNtop_factor,$immodpg_Tk->{_VbotNtop_factorEntry}\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->setVbotNtop_factor();
+# 	return (1);
+# }
 
 =head2 sub _set_clip
 _set_clip sets
 interaction with immodpg.for
-writes out clip for immodpg to read
+Writes out clip for immodpg to read
 return(1) validates command for Entry'
+print("immodpg.pl,_set_clip,$immodpg_Tk->{_clip4plotEntry}\n");
 
 =cut
 
 sub _set_clip {
 
-	#	print("immodpg.pl,_set_clip,$immodpg_Tk->{_clip4plotEntry}\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->set_clip();
 	return (1);
 }
 
 =head2 sub _set_layer
- callbacks
- write out message for mmodpg.f
- writes out layer for immodpg to read
+_set_layer
+ Write out message for mmodpg.f
+ Writes out layer for immodpg to read
  return(1) validates command for Entry
  
 =cut
 
-sub _set_layer {
+sub _set_layer               { _call('set_layer',               1) }
+# sub _set_layer {
 
-	#	print("immodpg.pl,_set_layer,$immodpg_Tk->{_layerEntry}\n");
-	#	print("\nimmodpg.pl,_set_layer,layer=$layer\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->set_layer();
-	return (1);
-}
+#  print("immodpg.pl,_set_layer,$immodpg_Tk->{_layerEntry}\n");
+#  print("\nimmodpg.pl,_set_layer,layer=$layer\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->set_layer();
+# 	return (1);
+# }
 
 =head2 sub _setVbot
- callbacks:
- write out message for mmodpg.f
+ 
+ Callbacks:
+ Write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
  return(1) validates command for Entry
  
 =cut
 
-sub _setVbot {
+sub _setVbot                 { _call('setVbot',                 1) }
+# sub _setVbot {
 
-	# print("main,_setVbot, Vbot_opt=$Vbot_opt\n");
-	# print("main,_setVbot, immodpg_Tk->{_VbotEntry}= $immodpg_Tk->{_VbotEntry}\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->setVbot();
-	return (1);
-}
+# print("main,_setVbot, Vbot_opt=$Vbot_opt\n");
+# print("main,_setVbot, immodpg_Tk->{_VbotEntry}= $immodpg_Tk->{_VbotEntry}\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->setVbot();
+# 	return (1);
+# }
 
 =head2 sub _setVbot_upper_layer
- callbacks
- write out message for mmodpg.f
- set_option and set_change
- set interactions with immodpg.f
+
+ Callbacks write out message for mmodpg.f
+   set_option and set_change
+ Set interactions with immodpg.f
  return(1) validates command for Entry
  
 =cut
 
-sub _setVbot_upper_layer {
+sub _setVbot_upper_layer     { _call('setVbot_upper_layer',     1) }
+# sub _setVbot_upper_layer {
 
-	my ($self) = @_;
+# 	my ($self) = @_;
 
-	#	print("main,_setVbot_upper_layer, Vbot_upper_layer_opt=$Vbot_upper_layer_opt\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->setVbot_upper_layer();
-	return (1);
-}
+#  print("main,_setVbot_upper_layer, Vbot_upper_layer_opt=$Vbot_upper_layer_opt\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->setVbot_upper_layer();
+# 	return (1);
+# }
 
 =head2 sub _setVtop
- callbacks
- write out message for mmodpg.f
+
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
  return(1) validates command for Entry
 
 =cut
 
-sub _setVtop {
+sub _setVtop                 { _call('setVtop',                 1) }
+# sub _setVtop {
 
-	# print("main,_setVtop, Vtop_opt=$Vtop_opt\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->setVtop();
-	return (1);
-}
+# print("main,_setVtop, Vtop_opt=$Vtop_opt\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->setVtop();
+# 	return (1);
+# }
 
 =head2 sub _setVtop_lower_layer
- callbacks
- write out message for mmodpg.f
+
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
  return(1) validates command for Entry
  
 =cut
 
-sub _setVtop_lower_layer {
+sub _setVtop_lower_layer     { _call('setVtop_lower_layer',     1) }
+# sub _setVtop_lower_layer {
 
-	my ($self) = @_;
+# 	my ($self) = @_;
 
-	#	print("main,_setVtop_lower_layer, Vtop_lower_layer_opt=$Vtop_lower_layer_opt\n");
-	$immodpg->set_widgets($immodpg_Tk);
-	$immodpg->setVtop_lower_layer();
-	return (1);
-}
+#  print("main,_setVtop_lower_layer, Vtop_lower_layer_opt=$Vtop_lower_layer_opt\n");
+# 	$immodpg->set_widgets($immodpg_Tk);
+# 	$immodpg->setVtop_lower_layer();
+# 	return (1);
+# }
 
 =head2 sub _setVbotNtop_multiply
- callbacks:
+ 
+ Callbacks:
  - provide widgets to immodpg
  -refocus allows other Entries to update (focus)
  -update the gui for factor (_setVbotNtop_factor)
  _setVbotNtop_factor ALSO provides widgets to immodpg
  -update gui velocities (->setVbotNtop_multiply)
- -write out message for mmodpg.f:
+ -Write out message for mmodpg.f:
  	set_option
  	set_change
  	set interactions with immodpg.f
@@ -2338,7 +2308,7 @@ sub _setVtop_lower_layer {
 
 sub _setVbotNtop_multiply {
 
-	# print("main,_setVbotNtop_multiply, VbotNtop_multiply_opt=$VbotNtop_multiply_opt\n");
+  print("main,_setVbotNtop_multiply, VbotNtop_multiply_opt=$VbotNtop_multiply_opt\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->setVbotNtop_multiply();
 
@@ -2346,120 +2316,120 @@ sub _setVbotNtop_multiply {
 
 =head2 sub _setVbot_minus
 
- callbacks
- write out message for mmodpg.f
+ 
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
+ print("write Vbot_minus_opt -, $Vbot_minus_opt\n");
 
 =cut
 
 sub _setVbot_minus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-
-	# print("write Vbot_minus_opt -, $Vbot_minus_opt\n");
 	$immodpg->setVbot_minus();
 
 }
 
 
 =head2 sub _setVbotNVtop_lower_layer_minus
- callbacks
- write out message for mmodpg.f
+ 
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
+ print("write VbotNVtop_lower_layer_minus -, $VbotNVtop_lower_layer_minus_opt \n");
 
 =cut
 
 sub _setVbotNVtop_lower_layer_minus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-
-	#	print("write VbotNVtop_lower_layer_minus -, $VbotNVtop_lower_layer_minus_opt \n");
 	$immodpg->setVbotNVtop_lower_layer_minus();
 
 }
 
 =head2 sub _setVbotNVtop_lower_layer_plus
- callbacks
- write out message for mmodpg.f
+ 
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
 
+  print("write VbotNVtop_lower_layer_plus +, $VbotNVtop_lower_layer_plus_opt \n");
 =cut
 
 sub _setVbotNVtop_lower_layer_plus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-
-	# print("write VbotNVtop_lower_layer_plus +, $VbotNVtop_lower_layer_plus_opt \n");
 	$immodpg->setVbotNVtop_lower_layer_plus();
 
 }
 
 =head2 sub _setVbot_plus
- callbacks
- write out message for mmodpg.f
+ 
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
+ print("main  _setVbot_plus,Vbot_plus_opt +=$Vbot_plus_opt\n");
 
 =cut
 
 sub _setVbot_plus {
 
-	#	print("main  _setVbot_plus,Vbot_plus_opt +=$Vbot_plus_opt\n");
+
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->setVbot_plus();
 
 }
 
 =head2 sub _setVtop_minus
- callbacks
+ 
+ Callbacks
  setVtop_minus:
  modify gui
  set_option: 
- write out message for mmodpg.f
+ Write out message for mmodpg.f
  set_change:
  set interactions with immodpg.f
 
+  print("write Vtop_minus_opt -, $Vtop_minus_opt\n");
 =cut
 
 sub _setVtop_minus {
 
-	# print("write Vtop_minus_opt -, $Vtop_minus_opt\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->setVtop_minus();
 
 }
 
 =head2 sub _setVtop_plus
- callbacks
+ 
+ Callbacks
  setVtop_plus:
  modify gui
  set_option: 
- write out message for mmodpg.f
+ Write out message for mmodpg.f
  set_change:
  set interactions with immodpg.f
 
+  print("write Vtop_plus_opt +,$Vtop_plus_opt\n");
 =cut
 
 sub _setVtop_plus {
 
-	# print("write Vtop_plus_opt +,$Vtop_plus_opt\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->setVtop_plus();
 
 }
 
 =head2 sub _setVbotNtop_minus
- callbacks
+ 
+ Callbacks
  setVtop_plus:
  modify gui
  set_option: 
- write out message for mmodpg.f
+ Write out message for mmodpg.f
  set_change:
  set interactions with immodpg.f
- 
  create pause between Vbot and Vtop changes
 
 =cut
@@ -2473,16 +2443,16 @@ sub _setVbotNtop_minus {
 }
 
 =head2 sub _setVbotNtop_plus
- callbacks
- write out message for mmodpg.f
+ 
+ Callbacks write out message for mmodpg.f
  set_option and set_change
  set interactions with immodpg.f
- 
+ print("write VbotNVtop_plus +\n");
+
 =cut
 
 sub _setVbotNtop_plus {
 
-	# print("write VbotNVtop_plus +\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->setVbotNtop_plus();
 
@@ -2490,177 +2460,185 @@ sub _setVbotNtop_plus {
 
 
 =head2 sub _setVtopNVbot_upper_layer_minus
- callbacks
+ 
+ Callbacks
  setVtop_plus:
  modify gui
  set_option: 
- write out message for mmodpg.f
+ Write out message for mmodpg.f
  set_change:
  set interactions with immodpg.f
+
+ print("main,_setVtopNVbot_upper_layer_minus, write VtopNVbot_upper_layer_minus -,$VtopNVbot_upper_layer_minus_opt \n");
 
 =cut
 
 sub _setVtopNVbot_upper_layer_minus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-	# print("main,_setVtopNVbot_upper_layer_minus, write VtopNVbot_upper_layer_minus -,$VtopNVbot_upper_layer_minus_opt \n");
 	$immodpg->setVtopNVbot_upper_layer_minus();
 }
 
 =head2 sub _setVtopNVbot_upper_layer_plus
- callbacks
+ 
+ Callbacks
  setVtop_plus:
  modify gui
  set_option: 
- write out message for mmodpg.f
+ Write out message for mmodpg.f
  set_change:
  set interactions with immodpg.f
+ print("write VtopNVbot_upper_layer_plus +, $VtopNVbot_upper_layer_plus_opt \n");
 
 =cut
 
 sub _setVtopNVbot_upper_layer_plus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-
-	#	print("write VtopNVbot_upper_layer_plus +, $VtopNVbot_upper_layer_plus_opt \n");
 	$immodpg->setVtopNVbot_upper_layer_plus();
 
 }
 
 =head2 sub _set_exit
 
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
   saying goodbye
   clear old images
   kill window
   stop script
+  print("write_set_exit\n");
+  $exit_button->focus;
 
 =cut
 
 sub _set_exit {
-
 	my ($self) = @_;
 
-	# print("write_set_exit\n");
-	#	$exit_button->focus;
 	$immodpg->set_option($exit_opt);
 	$immodpg->set_change($yes);
 	
-	# kill pgxwin_server
+  kill pgxwin_server
 	$immodpg->exit();
 
-	# kill mw window
+  kill mw window
 	$mw->destroy() if Tk::Exists($mw);
 
 }
 
+#------------------------------
+# MOVEMENT BUTTONS 
+#------------------------------
+
 =head2 sub _set_move_down
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
+ 
+ $move_down_button->focus;
+ print("write _set_move_down -\n");
 
 =cut
 
 sub _set_move_down {
 
-	#	$move_down_button->focus;
-	# print("write _set_move_down -\n");
 	$immodpg->set_option($move_down_opt);
 	$immodpg->set_change($yes);
 
 }
 
 =head2 sub _set_move_left
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
+$move_left_button->focus;
+print("write_set_move_left -\n");
 
 =cut
 
 sub _set_move_left {
 
-	#	$move_left_button->focus;
-	# print("write_set_move_left -\n");
 	$immodpg->set_option($move_left_opt);
 	$immodpg->set_change($yes);
 
 }
 
 =head2 sub _set_move_right
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
+ $move_right_button->focus;
+ print("write_set_move_right -\n");
 
 =cut
 
 sub _set_move_right {
 
-	#	$move_right_button->focus;
-	# print("write_set_move_right -\n");
 	$immodpg->set_option($move_right_opt);
 	$immodpg->set_change($yes);
 
 }
 
 =head2 sub _set_move_up
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
+ print("write_set_move_up -\n");
+ $move_up_button->focus;
 
 =cut
 
 sub _set_move_up {
 
-	# print("write_set_move_up -\n");
-	#	$move_up_button->focus;
 	$immodpg->set_option($move_up_opt);
 	$immodpg->set_change($yes);
 
 }
 
 =head2 sub _set_update
+
 New focus is needed within set_update,
 specifically:
  immodpg,_check_update
+ print("immodpg.pl,_set_update\n");
+
 =cut
 
 sub _set_update {
 
 	my ($self) = @_;
 
-	#print("immodpg.pl,_set_update\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->set_update();
 	return ();
 }
 
 =head2 sub _set_zoom_minus
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
+ print("write_set_zoom_minus -\n");
 
 =cut
 
 sub _set_zoom_minus {
 
-	# print("write_set_zoom_minus -\n");
 	$immodpg->set_option($zoom_minus_opt);
 	$immodpg->set_change($yes);
 
 }
 
 =head2 sub _set_zoom_plus
- callbacks
- write out message for mmodpg.f
- write out
+ 
+ Callbacks write out message for mmodpg.f
+ Write out
+  print("write _set_zoom_plus +\n");
 
 =cut
 
 sub _set_zoom_plus {
 
-	# print("write _set_zoom_plus +\n");
 	$immodpg->set_option($zoom_plus_opt);
 	$immodpg->set_change($yes);
 
@@ -2668,11 +2646,12 @@ sub _set_zoom_plus {
 
 =head2 sub _set_thickness_m
 
+  print("main,_set_thickness_m, change_thickness_m_opt=$change_thickness_m_opt\n");
+
 =cut
 
 sub _set_thickness_m {
 
-	# print("main,_set_thickness_m, change_thickness_m_opt=$change_thickness_m_opt\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->set_thickness_m();
 	return (1);
@@ -2681,37 +2660,38 @@ sub _set_thickness_m {
 
 =head2 sub _set_thickness_m_minus
 
+  print("write _set_thickness_m_minus - \n");
+
 =cut
 
 sub _set_thickness_m_minus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-
-	# print("write _set_thickness_m_minus - \n");
 	$immodpg->set_thickness_m_minus();
 
 }
 
 =head2 sub _set_thickness_m_plus
 
+  print("write _set_thickness_m_plus -\n");
+
 =cut
 
 sub _set_thickness_m_plus {
 
 	$immodpg->set_widgets($immodpg_Tk);
-
-	# print("write _set_thickness_m_plus -\n");
 	$immodpg->set_thickness_m_plus();
 
 }
 
 =head2 sub _set_thickness_increment_m
 
+  print("immodpg.pl,_thickness_increment_m,$immodpg_Tk->{_thickness_increment_mEntry}\n");
+
 =cut
 
 sub _set_thickness_increment_m {
 
-	# print("immodpg.pl,_thickness_increment_m,$immodpg_Tk->{_thickness_increment_mEntry}\n");
 	$immodpg->set_widgets($immodpg_Tk);
 	$immodpg->set_thickness_increment_m();
 	return (1);

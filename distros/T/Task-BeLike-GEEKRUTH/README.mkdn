@@ -4,7 +4,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 # VERSION
 
-version 1.0301
+version 2.0000
 
 # NAME
 
@@ -12,11 +12,13 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 # VERSION
 
-version 1.0301
+version 2.0000
 
 # TASK CONTENTS
 
 ## Infrastructure
+
+### [Git::Repository](https://metacpan.org/pod/Git%3A%3ARepository)
 
 ### [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus)
 
@@ -48,9 +50,7 @@ version 1.0301
 
 ### [Dist::Zilla::PluginBundle::GEEKRUTH](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AGEEKRUTH)
 
-### [Dist::Zilla::PluginBundle::GitLab](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AGitLab)
-
-### [OrePAN2](https://metacpan.org/pod/OrePAN2)
+### [Dist::Zilla::PluginBundle::Codeberg](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3ACodeberg)
 
 ### [Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic)
 
@@ -78,7 +78,11 @@ version 1.0301
 
 ### [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelpers)
 
+### [DBIx::Class::MoreHelpers](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AMoreHelpers)
+
 ### [DBIx::Class::TemporalRelations](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ATemporalRelations)
+
+### [DBIx::QuickORM](https://metacpan.org/pod/DBIx%3A%3AQuickORM)
 
 ## Building Cool Stuff
 
@@ -103,6 +107,8 @@ version 1.0301
 ### [Dancer2::Plugin::Growler](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AGrowler)
 
 ### [Dancer2::Plugin::Minify](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AMinify)
+
+### [Dancer2::Plugin::QuickORM](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AQuickORM)
 
 ### [Dancer2::Plugin::REST](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AREST)
 
@@ -135,9 +141,9 @@ what passes for "retirement" for a workaholic nerd like me. This
 I use Debian-ish systems, mostly.  Here are the packages I install on a bare system, **before** 
 I [perlbrew](https://metacpan.org/pod/perlbrew)brew a perl and try to install this Task:
 
-    sudo apt install build-essential direnv     git \
-                     libexpat1-dev   libssl-dev postgresql\
-                     pq-dev          unzip      vim \
+    sudo apt install build-essential direnv     git        \
+                     libexpat1-dev   libssl-dev postgresql \
+                     pq-dev          unzip      vim        \
                      zlib1g-dev
 
 # TASK CONTENTS
@@ -148,7 +154,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2026 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -159,7 +165,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2026 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -168,21 +174,9 @@ the same terms as the Perl 5 programming language system itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 149:
-
-    Unknown directive: =pkggoup
-
-- Around line 151:
-
-    Unknown directive: =pkg
-
-- Around line 153:
-
-    Unknown directive: =pkg
-
 - Around line 155:
 
-    Unknown directive: =pkg
+    Unknown directive: =pkggoup
 
 - Around line 157:
 
@@ -209,5 +203,17 @@ Hey! **The above document had some coding errors, which are explained below:**
     Unknown directive: =pkg
 
 - Around line 169:
+
+    Unknown directive: =pkg
+
+- Around line 171:
+
+    Unknown directive: =pkg
+
+- Around line 173:
+
+    Unknown directive: =pkg
+
+- Around line 175:
 
     Unknown directive: =pkg

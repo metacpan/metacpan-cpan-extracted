@@ -1,0 +1,29 @@
+.perlcriticrc
+AGENTS.md
+Changes
+CONTRIBUTING.md
+cpanfile
+examples/README.md
+examples/app.psgi
+examples/client.pl
+examples/lib/Example/OAuthRS.pm
+examples/lib/Example/OAuthRS/Controller/Root.pm
+lib/Catalyst/Plugin/OAuth2/ResourceServer.pm
+lib/Catalyst/Plugin/OAuth2/ResourceServer/Error.pm
+lib/Catalyst/Plugin/OAuth2/ResourceServer/Server.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/catalyst-app.t
+t/error.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestAppURN.pm
+t/lib/TestAppURN/Controller/Root.pm
+t/metadata-url.t
+t/perl_critic.t
+t/server-verify.t
+t/urn-resource.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

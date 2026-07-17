@@ -1,5 +1,11 @@
 Revision history for PAGI-Nano
 
+0.001001  2026-07-16
+        - Declare $VERSION in the main module (PAGI::Nano). The dist relied on
+          [PkgVersion] to stamp it at build time, so a raw git/vendor checkout
+          saw an undef version; declare it explicitly (PkgVersion still stamps
+          the sub-modules). No functional changes.
+
 0.001000  2026-07-15
         - Initial release.
         - app { } block-scoped collector returning an assembled PAGI app value

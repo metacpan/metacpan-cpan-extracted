@@ -369,7 +369,7 @@ sub local_set_entry_change_status {
  update for one parameter index 
  in currently active program
  
- Entry widget uses textvariables
+ Entry widget uses text variables
 
 =cut
 

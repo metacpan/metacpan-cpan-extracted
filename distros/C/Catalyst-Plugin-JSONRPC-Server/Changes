@@ -1,0 +1,32 @@
+Revision history for Catalyst-Plugin-JSONRPC-Server
+
+0.003     2026-07-16
+          - Genericise the perl_critic author test comment; no functional
+            change.
+
+0.002     unreleased
+          - Version bump so consumers reliably install the current code over any
+            0.001 already present in an environment (cpanm treats same-version as
+            satisfied); no code change from the 0.001 line below.
+          - Initial version: generic JSON-RPC 2.0 server plugin for Catalyst.
+          - Fixed four dead internal POD links. L</name> does not resolve
+            against a =head2 that carries its signature, because the generated
+            anchor includes the arguments, so the links to
+            jsonrpc_dispatch_with, encode and encode_safe all pointed at
+            anchors that do not exist.
+          - Added jsonrpc_dispatch_with($dispatcher, $body) for request-scoped
+            dispatch against a caller-supplied Dispatcher; jsonrpc_dispatch now
+            delegates to it.
+          - jsonrpc_register/jsonrpc_dispatch now use a per-request dispatcher
+            (cached on the context) instead of a persistent per-application one,
+            so handlers can no longer leak across requests.
+          - jsonrpc_dispatch_with takes an optional $empty_status (default 204)
+            for the nothing-to-send case, so a transport requiring another code
+            (e.g. MCP's 202 Accepted) can set it.
+          - Dispatcher::encode_safe: never dies on a non-serializable handler
+            result (degrades to -32603, per element).
+          - Stricter JSON-RPC 2.0 validation: a structurally-invalid id-less
+            request now returns -32600 (was silently dropped); a structured id
+            is rejected; params:null is treated as no params.
+          - Size limits: Dispatcher max_batch (default 1000) and the plugin's
+            max_body_bytes config (default 10 MiB).

@@ -1,5 +1,37 @@
 Revision history for Concierge
 
+v0.10.0  2026-07-16
+    - Removed Concierge::Desk::Base and Concierge::Desk::RecordsStore.
+      Component.pm (pure POD contract) and UnavailableComponent.pm
+      (AUTOLOAD stand-in for a component that fails to instantiate)
+      now fully replace the old Base.pm split; a component's CRUD
+      methods are its own responsibility, no longer scaffolded or
+      standardized by Concierge.
+    - Added component method promotion: a component's 'promote' config
+      entry (arrayref or hashref, in its components.$name block) exposes
+      a curated subset of its methods directly on $concierge, e.g.
+      $concierge->method(...) instead of $concierge->component->method(...).
+      Convenience/clarity only, never access control -- the bare-accessor
+      escape hatch ($concierge->{name} / $concierge->name) remains
+      unrestricted regardless of promotion. All validation (shape,
+      can(), name collisions against core methods and other components'
+      accessors) happens once, at build_desk() time; open_desk() only
+      replays already-trusted concierge.conf entries. See perldoc
+      Concierge::Desk::Component for the full contract.
+    - build_desk(): setup() failures now self-report the failing
+      top-level component name (name is passed into setup()'s args
+      alongside dir), fixing a build-error message that previously
+      could not identify which optional component failed.
+    - Concierge.pm POD: documented previously-undocumented public
+      methods new_concierge, save_user_keys, and the auth/sessions/users
+      component accessors (raised POD coverage from 71% to 95% on this
+      module).
+    - Fixed stale MANIFEST: was still listing the removed Base.pm and
+      missing Component.pm, UnavailableComponent.pm, and two test files
+      -- the CPAN tarball would have shipped without two required
+      modules.
+    - README.md, SECURITY.md: updated stale version references.
+
 v0.9.0  2026-07-05
     - BREAKING: Auth backend is now selected via a friendly name resolved
       through Desk::Setup's %AUTH_BACKENDS catalog, matching the 5-verb

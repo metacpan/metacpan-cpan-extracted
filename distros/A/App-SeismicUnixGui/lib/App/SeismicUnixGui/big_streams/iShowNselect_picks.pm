@@ -324,14 +324,17 @@ sub calcNdisplay {
 
 	# geopsy plot preference for JML
 	if (    length $iShowNselect_picks->{_purpose}
-		and $iShowNselect_picks->{_purpose} eq 'geopsy'
+		and $iShowNselect_picks->{_purpose} eq $purpose->{_geopsy}
 		and $iShowNselect_picks->{_max_x1} > $iShowNselect_picks->{_min_x1} )
 	{
 
-		$suximage->x1beg( $iShowNselect_picks->{_max_x1} );
-		$suximage->x1end( $iShowNselect_picks->{_min_x1} );
-
-		#		print("iShowNselect_picks, suximage with \'geopsy\' purpose\n");
+		# frequency is hzntl and velocity is vertical in geopsy, 
+        # so the x axis is reversed compared to a normal seismic plot.
+		$suximage->orientation('normal');
+		$suximage->cmap('hsv2');
+		$suximage->box_width(800);
+	    $suximage->box_height(400);
+		# print("iShowNselect_picks, suximage with \'geopsy\' purpose\n");
 
 	}
 	else {
@@ -399,14 +402,14 @@ sub calcNdisplay {
 
 	# geopsy plot preference for JML
 	if (    length $iShowNselect_picks->{_purpose}
-		and $iShowNselect_picks->{_purpose} eq 'geopsy'
+		and $iShowNselect_picks->{_purpose} eq $purpose->{_geopsy}
 		and $iShowNselect_picks->{_max_x1} > $iShowNselect_picks->{_min_x1} )
 	{
 
-		$suxwigb->x1beg( $iShowNselect_picks->{_max_x1} );
-		$suxwigb->x1end( $iShowNselect_picks->{_min_x1} );
-
-		#		print("iShowNselect_picks, suxwigb with \'geopsy\' purpose\n");
+		# frequency is hzntl and velocity is vertical in geopsy, 
+        # so the x axis is reversed compared to a normal seismic plot.
+		$suxwigb->orientation('normal');
+        # print("iShowNselect_picks, suxwigb with \'geopsy\' purpose\n");
 
 	}
 	else {
@@ -537,11 +540,19 @@ sub calcNdisplay {
 
 =cut
 
-	# for suxwigb
-	$run->flow( \$flow[1] );
+	if ( defined $iShowNselect_picks->{_purpose}
+		and $iShowNselect_picks->{_purpose} eq $purpose->{_geopsy} )
+	{
+		# for suximage
+		$run->flow( \$flow[2] );
 
-	# for suximage
-	$run->flow( \$flow[2] );
+	} else {
+	   # for suxwigb
+	   $run->flow( \$flow[1] );
+
+	   # for suximage
+	   $run->flow( \$flow[2] );
+	}
 
 =head2
 
@@ -736,7 +747,7 @@ sub set_purpose {
 		$type = control->get_ticksBgone();
 
 		# print("iShowNselect_picks,set_purpose: $type\n");
-		# print("iShowNselect_picks,set_purpose: $purpose->{_geopsy}\n");
+		print("iShowNselect_picks,set_purpose: $purpose->{_geopsy}\n");
 
 		if ( $type eq $purpose->{_geopsy} ) {
 

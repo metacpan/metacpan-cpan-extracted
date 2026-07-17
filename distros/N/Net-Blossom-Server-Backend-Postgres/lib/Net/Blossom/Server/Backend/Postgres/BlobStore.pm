@@ -43,6 +43,28 @@ sub begin_upload {
 
 sub get_blob {
     my ($self, $storage_key) = @_;
+    return $self->_open_blob_stream($storage_key);
+}
+
+sub get_blob_range {
+    my ($self, $storage_key, %opts) = @_;
+    my %known = map { $_ => 1 } qw(offset length size);
+    my @unknown = grep { !$known{$_} } keys %opts;
+    croak "unknown option(s): " . join(', ', sort @unknown) if @unknown;
+    _range_options(\%opts);
+    croak "range exceeds large-object size"
+        if defined $opts{size}
+        && $opts{offset} + $opts{length} > $opts{size};
+
+    return $self->_open_blob_stream(
+        $storage_key,
+        offset    => $opts{offset},
+        remaining => $opts{length},
+    );
+}
+
+sub _open_blob_stream {
+    my ($self, $storage_key, %stream_opts) = @_;
     my $dbh = $self->_reader_dbh;
     my $data = $dbh->quote_identifier($self->schema, 'blossom_blob_data');
     my ($body_oid, $fd);
@@ -70,6 +92,7 @@ sub get_blob {
     return Net::Blossom::Server::Backend::Postgres::BlobStore::_Stream->new(
         dbh => $dbh,
         fd  => $fd,
+        %stream_opts,
     );
 }
 
@@ -135,6 +158,19 @@ sub _constructor_args {
     return %{$_[0]} if @_ == 1 && ref($_[0]) eq 'HASH';
     croak "constructor arguments must be name/value pairs" if @_ % 2;
     return @_;
+}
+
+sub _range_options {
+    my ($opts) = @_;
+    croak "offset must be a non-negative integer"
+        unless defined $opts->{offset}
+        && !ref($opts->{offset})
+        && $opts->{offset} =~ /\A[0-9]+\z/;
+    croak "length must be a positive integer"
+        unless defined $opts->{length}
+        && !ref($opts->{length})
+        && $opts->{length} =~ /\A[1-9][0-9]*\z/;
+    return;
 }
 
 {
@@ -247,7 +283,7 @@ sub _constructor_args {
     use strictures 2;
 
     use Carp qw(croak);
-    use Class::Tiny qw(dbh fd), {
+    use Class::Tiny qw(dbh fd offset remaining), {
         closed => 0,
         eof    => 0,
     };
@@ -258,6 +294,23 @@ sub _constructor_args {
         my ($self) = @_;
         $self->closed;
         $self->eof;
+        if (defined $self->{offset}) {
+            my $ok = eval {
+                my $position = $self->{dbh}->pg_lo_lseek(
+                    $self->{fd},
+                    $self->{offset},
+                    0,
+                );
+                croak "PostgreSQL large-object seek failed"
+                    unless defined $position && $position == $self->{offset};
+                1;
+            };
+            if (!$ok) {
+                my $error = $@;
+                eval { $self->_finish(0) };
+                die $error;
+            }
+        }
         return;
     }
 
@@ -274,6 +327,8 @@ sub _constructor_args {
             $_[1] = '';
             return 0;
         }
+        $length = $self->{remaining}
+            if defined $self->{remaining} && $length > $self->{remaining};
 
         my $chunk = '';
         my $read;
@@ -289,9 +344,20 @@ sub _constructor_args {
         }
 
         $_[1] = $chunk;
+        if (defined $self->{remaining} && $read == 0) {
+            eval { $self->_finish(0) };
+            croak "PostgreSQL large-object range ended before requested length";
+        }
         if ($read == 0) {
             $self->{eof} = 1;
             $self->_finish(1);
+        }
+        elsif (defined $self->{remaining}) {
+            $self->{remaining} -= $read;
+            if (!$self->{remaining}) {
+                $self->{eof} = 1;
+                $self->_finish(1);
+            }
         }
         return $read;
     }
@@ -401,6 +467,12 @@ the top-level PostgreSQL backend manages this transaction.
 =head2 get_blob
 
 Returns a streaming large-object body by storage key, or C<undef>.
+
+=head2 get_blob_range
+
+Seeks within the PostgreSQL large object and returns a stream bounded to the
+requested zero-based C<offset> and positive C<length>, or C<undef> when absent.
+When C<size> is supplied, a range beyond that size is rejected.
 
 =head2 delete_blob
 

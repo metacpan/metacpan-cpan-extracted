@@ -1,3 +1,6 @@
+0.001003 2026-07-16
+    - Store payloads as SQLite BLOBs and read ranges by byte offset.
+
 0.001002 2026-07-13
     - Separate metadata and blob-byte storage behind public component APIs.
     - Migrate the 0.001000 and 0.001001 combined schemas automatically while

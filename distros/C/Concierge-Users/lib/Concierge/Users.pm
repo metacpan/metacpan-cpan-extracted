@@ -1,4 +1,4 @@
-package Concierge::Users v0.9.2;
+package Concierge::Users v0.9.3;
 use v5.36;
 
 use Carp		qw/ croak carp /;
@@ -374,7 +374,7 @@ Concierge::Users - User data management with multiple storage backends
 
 =head1 VERSION
 
-v0.9.2
+v0.9.3
 
 =head1 SYNOPSIS
 

@@ -7,9 +7,9 @@ plan skip_all => 'AUTHOR_TESTING is not set'
     unless $ENV{AUTHOR_TESTING};
 
 my $dist = "$FindBin::Bin/..";
-my $version = '0.001002';
+my $version = '0.001003';
 my $net_blossom_version = '0.001001';
-my $server_version = '0.001002';
+my $server_version = '0.001003';
 
 my $module = do {
     open my $fh, '<', "$dist/lib/Net/Blossom/Server/Backend/SQLite.pm"

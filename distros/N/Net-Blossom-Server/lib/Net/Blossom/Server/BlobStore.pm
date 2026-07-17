@@ -79,6 +79,20 @@ L<Net::Blossom::Server::Storage/begin_upload>.
 
 Returns blob bytes as a scalar or stream object, or C<undef> when absent.
 
+=head2 get_blob_range
+
+    my $body = $blobs->get_blob_range(
+        $storage_key,
+        offset => $offset,
+        length => $length,
+        size   => $size,
+    );
+
+Optional method for efficient byte-range reads. C<offset> is zero-based and
+C<length> is positive. It returns exactly C<length> bytes as a scalar or stream,
+or C<undef> when the storage key is absent. C<size> may be supplied as the
+expected full blob size.
+
 =head2 delete_blob
 
     my $deleted = $blobs->delete_blob($storage_key);

@@ -10,7 +10,7 @@ lib/Concierge/Users/Meta.pm
 lib/Concierge/Users/YAML.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 SECURITY.md

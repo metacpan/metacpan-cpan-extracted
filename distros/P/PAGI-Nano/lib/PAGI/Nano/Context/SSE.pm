@@ -1,5 +1,5 @@
 package PAGI::Nano::Context::SSE;
-$PAGI::Nano::Context::SSE::VERSION = '0.001000';
+$PAGI::Nano::Context::SSE::VERSION = '0.001001';
 use strict;
 use warnings;
 use parent -norequire, 'PAGI::Context::SSE', 'PAGI::Nano::Context';

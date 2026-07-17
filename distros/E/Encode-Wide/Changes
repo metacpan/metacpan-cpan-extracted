@@ -1,5 +1,54 @@
 Revision history for Encode::Wide
 
+0.07	Thu Jul 16 21:42:03 EDT 2026
+	[ Security ]
+	- Fixed XSS: HTML::Entities::decode is now suppressed when keep_hrefs => 1.
+	  Without this fix, encoded payloads like &lt;script&gt; were decoded to raw
+	  tags that bypassed re-escaping and appeared in the output.
+	- Fixed ReDoS: possessive quantifier (++) now used in the bare-& substitution
+	  regex, preventing O(n^2) backtracking on adversarial inputs.
+	- Removed /e eval flag from _sub_map (hash lookup needs no eval semantics).
+	- Removed /e eval flag from keep_hrefs substitution; uses %_HTML_ESCAPE map.
+	- Removed /gex eval from apos_map substitution; uses alternation regex + /g.
+
+	[ Enhancements ]
+	- Added the ™ (trade mark) character for both HTML (&trade;) and XML (&#x2122;)
+	- Added regression test for č (&ccaron; / &#x10D;)
+	- Added Ž (&Zcaron; / &#x17D;) character support and regression test
+	- Added bin/wide2html and bin/wide2xml command-line scripts
+	- Added t/security.t: regression suite for all security fixes above.
+	- _sub_map internal helper now uses O(1) hash lookup (was O(n) grep per match).
+	- %_EXTRA_ENTITY_MAP / $_EXTRA_ENTITY_RE hoisted to module-level compile-time
+	  constants (were rebuilt on every call).
+
+	[ Bug Fixes ]
+	- Fixed entity_map pre-decode (&ccaron;, &zcaron; etc.) which was silently
+	  ignored due to single-character regex.
+	- Fixed &Iicrc; typo in pass-3 HTML byte_map (correct spelling: &Icirc;).
+	- wide_to_xml() undef error message now reads "wide_to_xml() string not set"
+	  (was "string not set"), consistent with wide_to_html().
+
+	[ Removed ]
+	- Removed Term::ANSIColor runtime dependency (was used only in now-deleted
+	  debug instrumentation).
+	- Removed ~30 commented-out print STDERR debug blocks from source.
+
+	[ Documentation ]
+	- All POD die references corrected to croak (error location is caller's, not
+	  the module's internals).
+	- PSEUDOCODE steps updated to reflect the keep_hrefs entity-decode suppression.
+	- FORMAL SPECIFICATION corrected: wide_to_xml error string and croak vs die.
+	- SYNOPSIS XML example corrected to show actual zero-padded output (&#x0E9;).
+	- keep_hrefs POD documents the XSS-prevention side effect.
+	- DESCRIPTION bullet items fixed (C<< >> form prevents fat-comma rendering bug).
+	- README.md regenerated from POD.
+
+	[ Meta ]
+	- LICENSE field corrected from 'GPL' to 'gpl_2' (CPAN meta-spec v2 identifier).
+	- Repository URL changed from git:// to https:// (git:// dropped by GitHub 2022).
+	- Time::HiRes added to TEST_REQUIRES in Makefile.PL and cpanfile.
+	- Term::ANSIColor removed from PREREQ_PM / cpanfile (no longer used at runtime).
+
 0.06	Thu Sep 25 08:28:23 EDT 2025
 	Added the µ character
 	In HTML, Encode ! as &excl;

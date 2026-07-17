@@ -42,7 +42,7 @@
             "Crypt::PRNG" : "0",
             "Net::Amazon::S3" : "0.992",
             "Net::Blossom" : "0.001001",
-            "Net::Blossom::Server" : "0.001002",
+            "Net::Blossom::Server" : "0.001003",
             "URI" : "0",
             "perl" : "5.016",
             "strictures" : "2"
@@ -70,6 +70,6 @@
          "web" : "https://github.com/NicholasBHubbard/Net-Blossom"
       }
    },
-   "version" : "0.001000",
+   "version" : "0.001001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

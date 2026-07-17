@@ -46,7 +46,7 @@ Global variables
 
 =cut
 
-our (@EXPORT_OK, @ISA); #Global variables
+our (@EXPORT_OK, @ISA); # Global variables
 @ISA    = 'Exporter';  # Take advantage of Exporter's capabilities
 
 # export all; import at will

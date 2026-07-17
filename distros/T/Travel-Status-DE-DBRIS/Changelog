@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.32 - Thu Jul 16 2026
+
+    * Update rolling stock models and train names (patches by Lili Urban)
+    * Fix mis-detected rolling stock models for non-german carriages
+
 Travel::Status::DE::DBRIS 0.31 - Thu Jun 18 2026
 
     * Handle unusually-formatted UIC carriage IDs when requesting carriage

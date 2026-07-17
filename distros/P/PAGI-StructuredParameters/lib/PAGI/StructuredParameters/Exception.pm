@@ -1,5 +1,5 @@
 package PAGI::StructuredParameters::Exception;
-$PAGI::StructuredParameters::Exception::VERSION = '0.001000';
+$PAGI::StructuredParameters::Exception::VERSION = '0.001001';
 use strict;
 use warnings;
 use overload '""' => sub { my ($self) = @_; $self->message }, fallback => 1;

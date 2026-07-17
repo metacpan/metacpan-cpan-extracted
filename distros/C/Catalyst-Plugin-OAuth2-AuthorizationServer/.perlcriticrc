@@ -1,0 +1,22 @@
+severity = 3
+verbose = [%p] %m at %f, line %l, column %c. (Severity: %s)\n
+
+[Modules::RequireExplicitPackage]
+allow_import_of = utf8
+
+[Subroutines::RequireFinalReturn]
+severity = 2
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::signatures
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-Documentation::RequirePODUseEncodingUTF8]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Modules::ProhibitAutomaticExportation]
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-Variables::ProhibitPackageVars]
+[-Variables::ProhibitAugmentedAssignmentInDeclaration]
+[-InputOutput::RequireBriefOpen]

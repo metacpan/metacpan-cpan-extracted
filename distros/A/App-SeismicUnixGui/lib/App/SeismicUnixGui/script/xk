@@ -54,6 +54,14 @@ do
 kill -9 $i &>/dev/null
 done
 
+ps -x |grep figue > tempo
+awk '{print $1}' tempo > tempo2
+for i in `cat tempo2`
+do
+# echo "kill -9" $i
+kill -9 $i &>/dev/null
+done
+
 # clean up
 rm -f tempo
 rm -f tempo2

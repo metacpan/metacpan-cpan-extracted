@@ -1,0 +1,8 @@
+Revision history for Dancer2-Plugin-ContentCache
+
+1.0000 2026-07-16T14:05:37-04:00 America/New_York
+ [MAJOR]
+ - First version, with DBIC/DBIx::Class driver.
+
+ [STATISTICS]
+ - code churn: 19 files changed, 1456 insertions(+), 11 deletions(-)

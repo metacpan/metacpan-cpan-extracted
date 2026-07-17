@@ -86,11 +86,10 @@ my $iBM_Tk = {_prompt => ''};
 
 my $iBM                	= iBottomMute->new();
 my $iBottomMute_config 	= iBottomMute_config->new();
-my $xk				 	= xk->new();
 #my $read               	= readfiles->new();
 my $get                	= L_SU_global_constants->new();
 my $var                	= $get->var();
-
+my $xk				 	= xk->new();
 
 =head2 Get configuration information
 

@@ -1,11 +1,18 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
-4.0002 2026-07-14T18:10:27-04:00 America/New_York
+4.0003 2026-07-16T14:08:27-04:00 America/New_York
  [MAJOR]
  [API CHANGE]
  [MINOR]
  [ENHANCEMENTS]
  [REVISION]
+ - Removed InstallRelease from bundle
+
+ [BUG FIXES]
+ [STATISTICS]
+ - code churn: 2 files changed, 8 insertions(+), 1 deletion(-)
+
+4.0002 2026-07-14T18:10:27-04:00 America/New_York
  [BUG FIXES]
  - Rebuild to fix META info from bugged Codeberg plugin
 

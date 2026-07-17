@@ -1,5 +1,5 @@
-use v5.40;
-use experimental 'signatures';
+use strict;
+use warnings;
 use Test2::V0;
 use PAGI::StructuredParameters;
 
@@ -27,7 +27,8 @@ subtest 'missing required key throws the callback return value' => sub {
     );
 
     my @callback_args;
-    my $on_missing = sub ($context, $missing) {
+    my $on_missing = sub {
+        my ($context, $missing) = @_;
         @callback_args = ($context, $missing);
         return { error => 'missing', fields => $missing };
     };
@@ -46,7 +47,7 @@ subtest 'all missing keys are collected, not just the first' => sub {
         src_data => {},
     );
     my $seen;
-    my $on_missing = sub ($context, $missing) { $seen = $missing; die "boom\n" };
+    my $on_missing = sub { my ($context, $missing) = @_; $seen = $missing; die "boom\n" };
     eval { $sp->required('a', 'b', 'c', $on_missing) };
     is $seen, ['a', 'b', 'c'], 'every missing required key is reported';
 };
@@ -57,7 +58,7 @@ subtest 'an entirely-absent required array key is reported missing' => sub {
         src_data => { title => 'Buy milk' },    # no 'tags' at all
     );
     my $seen;
-    my $on_missing = sub ($context, $missing) { $seen = $missing; die "boom\n" };
+    my $on_missing = sub { my ($context, $missing) = @_; $seen = $missing; die "boom\n" };
     eval { $sp->required('title', +{ tags => [] }, $on_missing) };
     is $seen, ['tags'],
         'a required array rule whose key is wholly absent fires the callback';

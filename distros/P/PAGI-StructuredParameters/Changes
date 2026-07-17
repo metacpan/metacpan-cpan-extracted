@@ -1,5 +1,12 @@
 Revision history for PAGI-StructuredParameters
 
+0.001001  2026-07-16
+        - Tests: port t/*.t off `use v5.40` / signatures to plain 5.18-safe
+          syntax (use strict/warnings + `my (...) = @_`). The library was
+          already 5.18-clean, but the test files declared `use v5.40`, so
+          cpanm's test phase failed to parse them on Perl < 5.40 -- breaking
+          install on the declared 5.018 floor. No library changes.
+
 0.001000  2026-07-15
         - Initial release.
         - No-dependency port of the core of

@@ -24,9 +24,9 @@ copyright_holder = D Ruth Holloway
 
 [ContributorCovenant / Dist::Zilla::PluginBundle::GEEKRUTH/ContributorCovenant]
 
-[GitLab::Update / Dist::Zilla::PluginBundle::GEEKRUTH/GitLab::Update]
+[Codeberg::Update / Dist::Zilla::PluginBundle::GEEKRUTH/Codeberg::Update]
 
-[GitLab::Meta / Dist::Zilla::PluginBundle::GEEKRUTH/GitLab::Meta]
+[Codeberg::Meta / Dist::Zilla::PluginBundle::GEEKRUTH/Codeberg::Meta]
 metacpan = 0
 p3rl = 1
 remote = origin
@@ -67,6 +67,7 @@ locate_comment = 1
 [Test::ReportPrereqs / Dist::Zilla::PluginBundle::GEEKRUTH/Test::ReportPrereqs]
 
 [AutoPrereqs / Dist::Zilla::PluginBundle::GEEKRUTH/AutoPrereqs]
+skip = parent
 
 [Prereqs::Plugins / Dist::Zilla::PluginBundle::GEEKRUTH/Prereqs::Plugins]
 

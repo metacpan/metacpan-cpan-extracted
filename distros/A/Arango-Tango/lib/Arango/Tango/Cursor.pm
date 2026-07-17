@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Cursor object
 package Arango::Tango::Cursor;
-$Arango::Tango::Cursor::VERSION = '0.019';
+$Arango::Tango::Cursor::VERSION = '0.020';
 use warnings;
 use strict;
 
@@ -47,6 +47,11 @@ sub has_more {
   return $self->{hasMore};
 }
 
+sub error {
+    my ($self) = @_;
+    return $self->{arango}->error;
+}
+
 1;
 
 __END__
@@ -61,7 +66,7 @@ Arango::Tango::Cursor - ArangoDB Cursor object
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 USAGE
 
@@ -89,15 +94,21 @@ Returns a boolean stating if there are more results to be fetched.
 
 Deletes the cursor in the server and destroys all the object details.
 
+=item C<error>
+
+    my $error = $collection->error;
+
+Shortcut to get latest L<Arango::Tango> error method.
+
 =back
 
 =head1 AUTHOR
 
-Alberto Simões <ambs@cpan.org>
+Alberto Simões <ambs@zbr.pt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Alberto Simões.
+This software is copyright (c) 2019-2026 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

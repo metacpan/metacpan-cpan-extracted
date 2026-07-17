@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.50",
     "Class::Method::Modifiers" => "2.15",
+    "Config::Any" => 0,
     "Cpanel::JSON::XS" => "4.38",
     "Data::Dumper" => 0,
     "Data::Localize" => "0.00028",
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => "0.38",
     "Test::Needs" => "0.002010"
   },
-  "VERSION" => "0.002020",
+  "VERSION" => "0.002021",
   "test" => {
     "TESTS" => "t/*.t t/examples/*.t t/filters/*.t t/html/*.t t/html/util/*.t t/json/*.t t/validator/*.t"
   }
@@ -55,6 +56,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.50",
   "Class::Method::Modifiers" => "2.15",
+  "Config::Any" => 0,
   "Cpanel::JSON::XS" => "4.38",
   "Data::Dumper" => 0,
   "Data::Localize" => "0.00028",

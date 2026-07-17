@@ -17,6 +17,7 @@ lib/Sisimai.pm
 lib/Sisimai/ARF.pm
 lib/Sisimai/Address.pm
 lib/Sisimai/DateTime.pm
+lib/Sisimai/Eb.pm
 lib/Sisimai/Fact.pm
 lib/Sisimai/Fact/JSON.pm
 lib/Sisimai/Fact/YAML.pm
@@ -492,6 +493,7 @@ set-of-emails/maildir/bsd/lhost-postfix-77.eml
 set-of-emails/maildir/bsd/lhost-postfix-78.eml
 set-of-emails/maildir/bsd/lhost-postfix-79.eml
 set-of-emails/maildir/bsd/lhost-postfix-80.eml
+set-of-emails/maildir/bsd/lhost-postfix-81.eml
 set-of-emails/maildir/bsd/lhost-powermta-01.eml
 set-of-emails/maildir/bsd/lhost-powermta-02.eml
 set-of-emails/maildir/bsd/lhost-powermta-03.eml
@@ -950,6 +952,7 @@ set-of-emails/maildir/tmp/lhost-exim-07.eml
 set-of-emails/maildir/tmp/rfc3464-37.eml
 set-of-emails/maildir/tmp/rfc3464-38.eml
 set-of-emails/maildir/tmp/rfc3464-39.eml
+set-of-emails/should-not-crash/go-423-deeply-nested-mime-parts.eml
 set-of-emails/should-not-crash/p5-664-iomart-mail-filter.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-01.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-02.eml

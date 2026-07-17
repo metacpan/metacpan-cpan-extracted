@@ -106,7 +106,6 @@ $mw = MainWindow->new;
 $mw->geometry( $var->{project_selector_box_position} );
 $mw->resizable( 0, 0 );    #not resizable in either width or height
 
-#$mw->focusFollowsMouse;
 $L_SU_project_selector->{_mw}                = $mw;
 $L_SU_project_selector->{_param_widgets_pkg} = $param_widgets;
 

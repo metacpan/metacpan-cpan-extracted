@@ -1,5 +1,12 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002021 2026 July 16
+          - Declare a hard dependency on Config::Any. Valiant::I18N loads the
+          Data::Localize::MultiLevel localizer, which requires Config::Any, but
+          Data::Localize only 'recommends' it (an optional localizer), so it was
+          absent on minimal Perls and Valiant failed to compile wherever
+          Config::Any was not already installed (CPAN Testers FAIL vs 0.002020).
+
 0.002020 2026 July 15
           - *** BREAKING CHANGE *** DBIx::Class::Valiant is no longer bundled; it
           is now the standalone DBIx-Class-Valiant distribution. 

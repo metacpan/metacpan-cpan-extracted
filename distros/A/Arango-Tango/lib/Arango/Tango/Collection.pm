@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::Tango::Collection;
-$Arango::Tango::Collection::VERSION = '0.019';
+$Arango::Tango::Collection::VERSION = '0.020';
 use warnings;
 use strict;
 
@@ -127,14 +127,22 @@ sub document_paths {              ## FIXME: try to get larger cursors whenever p
 
 sub create_document {
     my ($self, $body) = @_;
-    die "Arango::Tango | Refusing to store undefined body" unless defined($body);
-    return $self->{arango}->_api( create_document => { database => $self->{database}, collection => $self->{name}, _body => $body})
+    if (defined($body)) {
+        return $self->{arango}->_api( create_document => { database => $self->{database}, collection => $self->{name}, _body => $body})
+    } else {
+        $self->{arango}{error} = "Refusing to store undefined body";
+        return -1;
+    }
 }
 
 sub replace_document {
     my ($self, $key, $body) = @_;
-    die "Arango::Tango | Refusing to store undefined body" unless defined($body);
-    return $self->{arango}->_api( replace_document => { database => $self->{database}, collection => $self->{name}, key => $key, _body => $body})
+    if (defined($body)) {
+        return $self->{arango}->_api( replace_document => { database => $self->{database}, collection => $self->{name}, key => $key, _body => $body})
+    } else {
+        $self->{arango}{error} = "Refusing to store undefined body";
+        return -1;
+    }
 }
 
 sub get_access_level {
@@ -157,6 +165,11 @@ sub cursor {
     return Arango::Tango::Cursor->_new(arango => $self->{arango}, database => $self->{database}, query => $aql, %opts);
 }
 
+sub error {
+    my ($self) = @_;
+    return $self->{arango}->error;
+}
+
 1;
 
 __END__
@@ -171,7 +184,7 @@ Arango::Tango::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 USAGE
 
@@ -303,19 +316,19 @@ Lists all collection document as their paths in the database. Returns a hash ref
 
 =head2 C<get_access_level>
 
-    my $perms = $db->get_access_level($user)
+    my $perms = $col->get_access_level($user)
 
 Fetch the collection access level for a specific user.
 
 =head2 C<set_access_level>
 
-    $db->set_access_level($user, 'none')
+    $col->set_access_level($user, 'none')
 
 Sets the collection access level for a specific user.
 
 =head2 C<clear_access_level>
 
-    $db->clear_access_level($user, 'none')
+    $col->clear_access_level($user, 'none')
 
 Clears the collection access level for a specific user.
 
@@ -333,13 +346,19 @@ Performs AQL queries, returning a cursor. An optional hash of
 options can be supplied. Supported hashes corresponds to the different attributes
 available in the ArangoDB REST API (L<https://docs.arangodb.com/3.4/HTTP/AqlQueryCursor/AccessingCursors.html>).
 
+=head2 C<error>
+
+    my $error = $collection->error;
+
+Shortcut to get latest L<Arango::Tango> error method.
+
 =head1 AUTHOR
 
-Alberto Simões <ambs@cpan.org>
+Alberto Simões <ambs@zbr.pt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Alberto Simões.
+This software is copyright (c) 2019-2026 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

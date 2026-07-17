@@ -153,8 +153,8 @@ by adding the program name
 		$evince->{_help}			= '';
 		$evince->{_page}			= '';
 		$evince->{_named}			= '';
-		$evince->{_fullscreen}			= '';
-		$evince->{_presentation}			= '';
+		$evince->{_fullscreen}		= '';
+		$evince->{_presentation}	= '';
 		$evince->{_preview}			= '';
 		$evince->{_find}			= '';
 		$evince->{_display}			= '';

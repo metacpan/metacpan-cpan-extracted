@@ -309,7 +309,7 @@ Version:
 
  Normally, segyread acts on only one file at a time
  
- In V0.0.2 wraps an extension to process an arbitrary
+V0.0.2 wraps an extension to process an arbitrary
  list of trace numbers. The automatic iteration includes
  two additional parameters: list and su_base_file_name
  

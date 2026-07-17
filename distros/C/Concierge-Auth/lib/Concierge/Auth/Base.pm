@@ -1,4 +1,4 @@
-package Concierge::Auth::Base v0.5.0;
+package Concierge::Auth::Base v0.5.1;
 use v5.36;
 
 # ABSTRACT: Base class / contract for Concierge::Auth backends
@@ -52,7 +52,7 @@ Concierge::Auth::Base - Base class / contract for Concierge::Auth backends
 
 =head1 VERSION
 
-v0.5.0
+v0.5.1
 
 =head1 SYNOPSIS
 
@@ -234,23 +234,18 @@ C<(value)>/C<(value, message)> dual-return convention, which is
 distinct from the C<{ success =E<gt> ... }> hashref convention used by
 the five required methods above.
 
-=head2 gen_uuid
+=head2 gen_uuid, gen_random_id, gen_random_token, gen_random_string, gen_word_phrase
 
-=head2 gen_random_id
-
-=head2 gen_random_token
-
-=head2 gen_random_string
-
-=head2 gen_word_phrase
+See the identically-named functions in L<Concierge::Auth::Generators> for
+each one's signature and behavior.
 
 =head2 gen_token
 
-Deprecated alias for L</gen_random_token>.
+Deprecated alias for L<gen_random_token|/"gen_uuid, gen_random_id, gen_random_token, gen_random_string, gen_word_phrase">.
 
 =head2 gen_crypt_token
 
-Deprecated alias for L</gen_random_token>.
+Deprecated alias for L<gen_random_token|/"gen_uuid, gen_random_id, gen_random_token, gen_random_string, gen_word_phrase">.
 
 See L<Concierge::Auth::Generators> for the parameters and return value
 of each.

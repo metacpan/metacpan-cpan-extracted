@@ -75,8 +75,9 @@ int callback_fd( RtMidiInPtr device, int fd ) {
 
 RTMIDIAPI
 void _free_userdata( RtMidiInPtr device ) {
-
-    free( device->data );
+    if ( device->data ) {
+        free( device->data );
+    }
 }
 
 #ifdef __cplusplus

@@ -1,0 +1,5 @@
+0.001001 2026-07-16
+    - Read HTTP byte ranges with positioned, bounded file streams.
+
+0.001000  2026-07-16
+    - Initial CPAN release.

@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '4.0002'; # VERSION
+our $VERSION = '4.0003'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 
 # ABSTRACT: Be like GeekRuthie when you build your dists
@@ -148,7 +148,6 @@ sub configure {
                 'Git::Push' => { push_to => join q{ }, $upstream, $dev_branch, $release_branch }
             ],
             qw/FakeRelease/,
-            [ 'InstallRelease' => { install_command => 'cpanm .' } ],
         );
     }
 
@@ -191,7 +190,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 =head1 VERSION
 
-version 4.0002
+version 4.0003
 
 =head1 DESCRIPTION
 

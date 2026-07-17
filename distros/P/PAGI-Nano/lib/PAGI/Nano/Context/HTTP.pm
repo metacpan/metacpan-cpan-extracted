@@ -1,5 +1,5 @@
 package PAGI::Nano::Context::HTTP;
-$PAGI::Nano::Context::HTTP::VERSION = '0.001000';
+$PAGI::Nano::Context::HTTP::VERSION = '0.001001';
 use strict;
 use warnings;
 use parent -norequire, 'PAGI::Context::HTTP', 'PAGI::Nano::Context';

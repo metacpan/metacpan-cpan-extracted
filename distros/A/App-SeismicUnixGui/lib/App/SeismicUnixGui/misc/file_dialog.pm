@@ -2163,6 +2163,7 @@ sub _user_built_flow_open_perl_file {
 	$file_dialog = $gui_history->get_hash_ref();
 
 # print("1. file_dialog,_user_built_flow_open_perl_file,_flowNsuperflow_name_w:$file_dialog->{_flowNsuperflow_name_w} \n");
+# print("1. file_dialog,_user_built_flow_open_perl_file,_message_w:$file_dialog->{_message_w} \n");
 # if an appropriate entry widget is first selected, ie., Entry
 # get index of entry button pressed
 # find out which entry button has been chosen

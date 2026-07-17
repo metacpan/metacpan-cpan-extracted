@@ -1,5 +1,19 @@
 Revision history for Task::BeLike::GEEKRUTH
 
+2.0000 2026-07-16T14:16:03-04:00 America/New_York
+ [API CHANGES]
+ [BUG FIXES]
+ [DOCUMENTATION]
+ [ENHANCEMENTS]
+ [MAJOR]
+ - Include a few new things, delete some things I don't use much anymore.
+
+ [MINOR]
+ [NEW FEATURES]
+ [REVISION]
+ [STATISTICS]
+ - code churn: 3 files changed, 24 insertions(+), 11 deletions(-)
+
 1.0301 2022-11-13T04:12:40-05:00 America/New_York
  [BUG FIXES]
  - Add two Dzil plugins that aren't picked up by the PluginBundle
@@ -45,7 +59,6 @@ Revision history for Task::BeLike::GEEKRUTH
  - code churn: 1 file changed, 22 insertions(+), 1 deletion(-)
 
 0.0001 2022-01-23T20:06:06-05:00 America/New_York
- - First version.
-
+ [First version.]
  [STATISTICS]
  - code churn: 2 files changed, 130 insertions(+), 1 deletion(-)

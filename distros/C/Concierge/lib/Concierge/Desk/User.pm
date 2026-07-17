@@ -1,7 +1,7 @@
-package Concierge::Desk::User v0.9.0;
+package Concierge::Desk::User v0.10.0;
 use v5.36;
 
-our $VERSION = 'v0.9.0';
+our $VERSION = 'v0.10.0';
 
 # ABSTRACT: User object enabled by Concierge
 
@@ -178,7 +178,7 @@ Concierge::Desk::User - User object enabled by Concierge
 
 =head1 VERSION
 
-v0.9.0
+v0.10.0
 
 =head1 SYNOPSIS
 
@@ -334,13 +334,9 @@ storage. Existing keys not present in C<%updates> are preserved. Returns
 These methods read from the in-memory data snapshot loaded at login time.
 They return C<undef> for visitors and guests.
 
-=head3 moniker
+=head3 moniker, email, user_status, access_level
 
-=head3 email
-
-=head3 user_status
-
-=head3 access_level
+Direct accessors for the corresponding fields in the user data snapshot.
 
 =head3 get_user_field
 

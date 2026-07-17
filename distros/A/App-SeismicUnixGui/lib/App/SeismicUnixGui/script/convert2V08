@@ -10,5 +10,16 @@
  	echo " export SeismicUnixGui_script=/Location/of/script/folder "
  	
  else
-	perl $SeismicUnixGui_script/../developer/code/sunix/convert2V08.pl
+    # run convert2V08.pl
+
+    # Find the correct perl to use before executing *.pl
+    # Copy paste and executre this file into the current shell
+    # $(...) captures the output
+    source "${SeismicUnixGui_script}/find_system_perl.sh"
+
+    SYSTEM_PERL="$(find_system_perl)"
+	# echo "Using: $SYSTEM_PERL"
+	# echo $SYSTEM_PERL "$SeismicUnixGui_script/../developer/code/sunix/convert2V08.pl"	
+	exec "$SYSTEM_PERL" $SeismicUnixGui_script/../developer/code/sunix/convert2V08.pl
+ 
  fi

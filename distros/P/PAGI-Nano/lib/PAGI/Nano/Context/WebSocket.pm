@@ -1,5 +1,5 @@
 package PAGI::Nano::Context::WebSocket;
-$PAGI::Nano::Context::WebSocket::VERSION = '0.001000';
+$PAGI::Nano::Context::WebSocket::VERSION = '0.001001';
 use strict;
 use warnings;
 use parent -norequire, 'PAGI::Context::WebSocket', 'PAGI::Nano::Context';

@@ -1,3 +1,6 @@
+0.001003 2026-07-16
+    - Read HTTP byte ranges by seeking within PostgreSQL large objects.
+
 0.001002 2026-07-13
     - Separate metadata and large-object storage behind public component APIs.
     - Migrate the 0.001001 large-object schema automatically without copying

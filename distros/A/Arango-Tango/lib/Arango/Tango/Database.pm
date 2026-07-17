@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.019';
+$Arango::Tango::Database::VERSION = '0.020';
 use Arango::Tango::Cursor;
 use Arango::Tango::API;
 
@@ -32,6 +32,24 @@ BEGIN {
                 type => { type => 'string', enum => ['ttl'] },
                 fields => { type => 'array', items => { type => 'string' } },
                 expireAfter => { type => 'integer' }
+            }
+        },
+
+        create_index => {
+            rest => [ post => '{{database}}_api/index?collection={colname}' ],
+            signature => [ 'colname' ],
+            inject_properties => [ { prop => 'name', as => 'database' } ],
+            schema => {
+                name         => { type => 'string' },
+                type         => { type => 'string', enum => ['hash', 'skiplist', 'persistent', 'geo'] },
+                fields       => { type => 'array', items => { type => 'string' } },
+                unique       => { type => 'boolean' },
+                sparse       => { type => 'boolean' },
+                deduplicate  => { type => 'boolean' },
+                estimates    => { type => 'boolean' },
+                cacheEnabled => { type => 'boolean' },
+                inBackground => { type => 'boolean' },
+                geoJson      => { type => 'boolean' },
             }
         },
 
@@ -87,19 +105,16 @@ sub cursor {
     return Arango::Tango::Cursor->_new(arango => $self->{arango}, database => $self->{name}, query => $aql, %opts);
 }
 
-
-
-
-
 sub collection {
-   my ($self, $name) = @_;
-   my @match = grep { $_->{name} eq $name } @{$self->list_collections};
-   if (scalar(@match)) {
-      return Arango::Tango::Collection->_new(arango => $self->{arango}, database => $self->{name}, 'name' => $name,);
-   }
-   else {
-      die "Arango::Tango | Collection not found in database $self->{name}."
-   }
+    my ($self, $name) = @_;
+    my @match = grep { $_->{name} eq $name } @{$self->list_collections};
+    if (scalar(@match)) {
+        return Arango::Tango::Collection->_new(arango => $self->{arango}, database => $self->{name}, 'name' => $name,);
+    }
+    else {
+        $self->{arango}{error} = "Collection not found in database $self->{name}";
+        die "-1\n";
+    }
 }
 
 sub list_collections {
@@ -123,6 +138,11 @@ sub set_access_level {
     return $self->{arango}->set_access_level($username, $grant, $self->{name},  $collection);
 }
 
+sub error {
+    my ($self) = @_;
+    return $self->{arango}->error;
+}
+
 1;
 
 __END__
@@ -137,7 +157,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 USAGE
 
@@ -178,6 +198,22 @@ Returns an object containing the id of the created index and the
 confirmation of the provided arguments (C<type>, C<name>, C<fields>
 and C<expireAfter>). If an error occurs the error field will be
 true, otherwise false.
+
+=head2 C<create_index>
+
+   $idx = $db->create_index("col_name", %args);
+
+Creates a new index of type C<hash>, C<skiplist>, C<persistent> or
+C<geo> for the given collection. The mandatory args are C<type> and
+C<fields> (array ref with the names of the document fields to be
+indexed). Optional args include C<name> (human name for the index),
+C<unique>, C<sparse>, C<deduplicate>, C<estimates>, C<cacheEnabled>,
+C<inBackground> and C<geoJson> (this last one relevant only for
+C<geo> indexes); refer to the ArangoDB documentation for which
+options apply to each index type.
+Returns an object containing the id of the created index and the
+confirmation of the provided arguments. If an error occurs the
+error field will be true, otherwise false.
 
 =head2 C<cursor>
 
@@ -226,13 +262,19 @@ Fetch the database or collection access level for a specific user.
 
 Set the database or collection access level for a specific user.
 
+=head2 C<error>
+
+    my $error = $db->error;
+
+Shortcut to get latest L<Arango::Tango> error method.
+
 =head1 AUTHOR
 
-Alberto Simões <ambs@cpan.org>
+Alberto Simões <ambs@zbr.pt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Alberto Simões.
+This software is copyright (c) 2019-2026 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

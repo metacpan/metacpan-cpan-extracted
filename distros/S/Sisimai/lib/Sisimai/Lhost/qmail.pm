@@ -33,6 +33,7 @@ sub inquire {
     }
     return undef if $proceedsto == 0;
 
+    require Sisimai::Eb;
     require Sisimai::SMTP::Command;
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = [
@@ -73,27 +74,27 @@ sub inquire {
     state $commandset = {
         # Error text regular expressions which defined in qmail-remote.c
         # qmail-remote.c:225|  if (smtpcode() != 220) quit("ZConnected to "," but greeting failed");
-        "CONN" => [" but greeting failed."],
+        $Sisimai::Eb::CeCONN => [" but greeting failed."],
         # qmail-remote.c:231|  if (smtpcode() != 250) quit("ZConnected to "," but my name was rejected");
-        "EHLO" => [" but my name was rejected."],
+        $Sisimai::Eb::CeEHLO => [" but my name was rejected."],
         # qmail-remote.c:238|  if (code >= 500) quit("DConnected to "," but sender was rejected");
-        # reason = rejected
-        "MAIL" => [" but sender was rejected."],
+        # reason = Rejected
+        $Sisimai::Eb::CeMAIL => [" but sender was rejected."],
         # qmail-remote.c:249|  out("h"); outhost(); out(" does not like recipient.\n");
         # qmail-remote.c:253|  out("s"); outhost(); out(" does not like recipient.\n");
-        # reason = userunknown
-        "RCPT" => [" does not like recipient."],
+        # reason = UserUnknown
+        $Sisimai::Eb::CeRCPT => [" does not like recipient."],
         # qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
         # qmail-remote.c:266|  if (code >= 400) quit("Z"," failed on DATA command");
         # qmail-remote.c:271|  if (code >= 500) quit("D"," failed after I sent the message");
         # qmail-remote.c:272|  if (code >= 400) quit("Z"," failed after I sent the message");
-        "DATA" => [" failed on DATA command", " failed after I sent the message"],
+        $Sisimai::Eb::CeDATA => [" failed on DATA command", " failed after I sent the message"],
     };
 
     state $messagesof = {
         # notqmail 1.08 returns the following error message when the destination MX is NullMX
-        "notaccept"   => ["Sorry, I couldn't find a mail exchanger or IP address"],
-        "userunknown" => ["no mailbox here by that name"],
+        $Sisimai::Eb::Re00MX => ["Sorry, I couldn't find a mail exchanger or IP address"],
+        $Sisimai::Eb::ReUSER => ["no mailbox here by that name"],
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
@@ -160,9 +161,9 @@ sub inquire {
         }
 
         # Detect the reason of bounce
-        if( $e->{"command"} eq "HELO" || $e->{"command"} eq "EHLO" ) {
+        if( $e->{"command"} eq $Sisimai::Eb::CeHELO || $e->{"command"} eq $Sisimai::Eb::CeEHLO ) {
             # HELO | Connected to 192.0.2.135 but my name was rejected.
-            $e->{"reason"} = "blocked";
+            $e->{"reason"} = $Sisimai::Eb::ReBLOC;
 
         } else {
             # The error message includes any of patterns defined in the variable avobe

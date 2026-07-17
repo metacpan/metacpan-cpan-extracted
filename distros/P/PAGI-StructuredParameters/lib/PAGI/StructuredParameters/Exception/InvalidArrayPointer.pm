@@ -1,5 +1,5 @@
 package PAGI::StructuredParameters::Exception::InvalidArrayPointer;
-$PAGI::StructuredParameters::Exception::InvalidArrayPointer::VERSION = '0.001000';
+$PAGI::StructuredParameters::Exception::InvalidArrayPointer::VERSION = '0.001001';
 use strict;
 use warnings;
 use parent -norequire, 'PAGI::StructuredParameters::Exception';

@@ -1,4 +1,4 @@
-package Concierge::Auth::Pwd v0.5.0;
+package Concierge::Auth::Pwd v0.5.1;
 use v5.36;
 
 # ABSTRACT: Password-file Concierge::Auth backend using Crypt::Passphrase
@@ -438,7 +438,7 @@ Concierge::Auth::Pwd - Password-file Concierge::Auth backend using Crypt::Passph
 
 =head1 VERSION
 
-v0.5.0
+v0.5.1
 
 =head1 SYNOPSIS
 

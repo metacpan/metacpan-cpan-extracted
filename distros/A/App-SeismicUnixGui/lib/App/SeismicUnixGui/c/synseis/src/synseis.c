@@ -9,16 +9,16 @@
 #include <stdlib.h>
 
 /*default values*/
-#define SIZE 5000/*array length*/
+#define SIZE 500000/*array length*/
 #define FALSE 0
-#define FILE_SIZE 50 /*array length for file*/
-#define T_INCREMENT 0.001/*default resampling increment in seconds*/
+/*#define FILE_SIZE 50 array length for file*/
+#define T_INCREMENT 0.0001/*default resampling increment in seconds*/
 /*#define THRESHOLD 1000. threshold for RC going to 0*/
 /* #define TINT 0.001 sampling interval in seconds*/
 #define TRUE 1
 #define XSTART 0.0 /* o/p for first x value in resampling */
 #define TSTART 0.0/* o/p for first t value in resampling */
-#define Z_INCREMENT 0.25 /* default resampling increment in m*/
+#define Z_INCREMENT 0.0001 /* default resampling increment in m*/
 #define ZSTART 0.0 /* o/p for first z value in resampling */
 #define Vp_water_mps 1500. /* velocity of sound in salt water at 0 deg C */
 #define rho_water_gcc 1.035  /* density of salt water at 0 deg C */
@@ -121,7 +121,7 @@ int main (int argc, char **argv)
   num_pts_Vp_reg = 0;
 
   /*threshold = (float)THRESHOLD; default of 1000 */
-  t_increment = (float)T_INCREMENT; /*default of 0.001 s*/
+  t_increment = (float)T_INCREMENT; /*default of 0.0001 s*/
 /*   printf ("tincrement= %f\n",t_increment);*/
 
   xstart = (float)XSTART; /*default of 0.0 */

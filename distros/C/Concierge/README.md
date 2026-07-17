@@ -159,7 +159,11 @@ Concierge safe to use in event-loop and persistent-process environments.
 
 Each identity core component can be replaced with a conforming alternative.
 Additional components (Organizations, Assets, Guides, Catalog, etc.) can be
-added following the same conventions using `Concierge::Desk::Base` as a base class.
+added by satisfying the duck-typed contract documented in
+`Concierge::Desk::Component`, and wired up via a `components` block in
+`build_desk()`. A component may also `promote` a curated subset of its
+methods directly onto `$concierge` for convenience; see `perldoc
+Concierge::Desk::Component` for details.
 
 See the `EXTENSIBILITY` section in `perldoc Concierge` for the method
 contracts and patterns for both substitution and extension.
@@ -190,7 +194,7 @@ Requires Perl 5.36 or later.
 perldoc Concierge          # orchestration API, lifecycle methods, extensibility
 perldoc Concierge::Desk::Setup   # desk creation and configuration
 perldoc Concierge::Desk::User    # user object methods
-perldoc Concierge::Desk::Base    # base class for additional components
+perldoc Concierge::Desk::Component  # contract for additional components
 perldoc Concierge::Auth    # authentication and token generation
 perldoc Concierge::Sessions  # session lifecycle and backends
 perldoc Concierge::Users   # user records, field schema, backends
@@ -198,7 +202,7 @@ perldoc Concierge::Users   # user records, field schema, backends
 
 ## Status
 
-Under active development (v0.8.0). API may change before 1.0.
+Under active development (v0.10.0). API may change before 1.0.
 
 ## Author
 

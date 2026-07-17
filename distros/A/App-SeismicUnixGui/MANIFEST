@@ -381,6 +381,7 @@ lib/App/SeismicUnixGui/configs/transform/sucepstrum.config
 lib/App/SeismicUnixGui/configs/transform/sucwt.config
 lib/App/SeismicUnixGui/configs/transform/sufft.config
 lib/App/SeismicUnixGui/configs/transform/sugabor.config
+lib/App/SeismicUnixGui/configs/transform/suhilb.config
 lib/App/SeismicUnixGui/configs/transform/suicepstrum.config
 lib/App/SeismicUnixGui/configs/transform/suifft.config
 lib/App/SeismicUnixGui/configs/transform/suminphase.config
@@ -1424,6 +1425,7 @@ lib/App/SeismicUnixGui/specs/transform/sucepstrum_spec.pm
 lib/App/SeismicUnixGui/specs/transform/sucwt_spec.pm
 lib/App/SeismicUnixGui/specs/transform/sufft_spec.pm
 lib/App/SeismicUnixGui/specs/transform/sugabor_spec.pm
+lib/App/SeismicUnixGui/specs/transform/suhilb_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suicepstrum_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suifft_spec.pm
 lib/App/SeismicUnixGui/specs/transform/suminphase_spec.pm
@@ -1723,6 +1725,7 @@ lib/App/SeismicUnixGui/sunix/transform/sucepstrum.pm
 lib/App/SeismicUnixGui/sunix/transform/sucwt.pm
 lib/App/SeismicUnixGui/sunix/transform/sufft.pm
 lib/App/SeismicUnixGui/sunix/transform/sugabor.pm
+lib/App/SeismicUnixGui/sunix/transform/suhilb.pm
 lib/App/SeismicUnixGui/sunix/transform/suicepstrum.pm
 lib/App/SeismicUnixGui/sunix/transform/suifft.pm
 lib/App/SeismicUnixGui/sunix/transform/suminphase.pm

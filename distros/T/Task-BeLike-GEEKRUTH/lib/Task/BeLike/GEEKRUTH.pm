@@ -1,6 +1,6 @@
 package Task::BeLike::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '1.0301'; # VERSION
+our $VERSION = '2.0000'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: TIMTOWTDI, but this works for GeekRuthie
 
@@ -18,7 +18,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0301
+version 2.0000
 
 =head1 NAME
 
@@ -26,11 +26,13 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0301
+version 2.0000
 
 =head1 TASK CONTENTS
 
 =head2 Infrastructure
+
+=head3 L<Git::Repository>
 
 =head3 L<App::cpanminus>
 
@@ -62,9 +64,7 @@ version 1.0301
 
 =head3 L<Dist::Zilla::PluginBundle::GEEKRUTH>
 
-=head3 L<Dist::Zilla::PluginBundle::GitLab>
-
-=head3 L<OrePAN2>
+=head3 L<Dist::Zilla::PluginBundle::Codeberg>
 
 =head3 L<Perl::Critic>
 
@@ -92,7 +92,11 @@ version 1.0301
 
 =head3 L<DBIx::Class::Helpers>
 
+=head3 L<DBIx::Class::MoreHelpers>
+
 =head3 L<DBIx::Class::TemporalRelations>
+
+=head3 L<DBIx::QuickORM>
 
 =head2 Building Cool Stuff
 
@@ -117,6 +121,8 @@ version 1.0301
 =head3 L<Dancer2::Plugin::Growler>
 
 =head3 L<Dancer2::Plugin::Minify>
+
+=head3 L<Dancer2::Plugin::QuickORM>
 
 =head3 L<Dancer2::Plugin::REST>
 
@@ -149,9 +155,9 @@ L<Dist::Zilla::Plugin::TaskWeaver> module gathers together the things I use freq
 I use Debian-ish systems, mostly.  Here are the packages I install on a bare system, B<before> 
 I L<perlbrew>brew a perl and try to install this Task:
 
-  sudo apt install build-essential direnv     git \
-                   libexpat1-dev   libssl-dev postgresql\
-                   pq-dev          unzip      vim \
+  sudo apt install build-essential direnv     git        \
+                   libexpat1-dev   libssl-dev postgresql \
+                   pq-dev          unzip      vim        \
                    zlib1g-dev
 
 =head1 TASK CONTENTS
@@ -172,7 +178,7 @@ I L<perlbrew>brew a perl and try to install this Task:
 
 =pkg Test::PostgreSQL
 
-=pkg Test2::V0
+=pkg Test2::V1
 
 =pkg Test2::Tools::Explain;
 
@@ -184,7 +190,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2026 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -195,7 +201,7 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by D Ruth Holloway.
+This software is copyright (c) 2026 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

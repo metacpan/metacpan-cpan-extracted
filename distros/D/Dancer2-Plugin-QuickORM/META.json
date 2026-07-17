@@ -1,0 +1,86 @@
+{
+   "abstract" : "Adds QuickORM syntactic sugar to Dancer2",
+   "author" : [
+      "D Ruth Holloway <ruth@hiruthie.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-QuickORM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2::Core::DSL" : "0",
+            "Dancer2::Plugin" : "0",
+            "Lingua::EN::Inflect::Phrase" : "0",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::MaybeXS" : "0",
+            "Plack::Test" : "0",
+            "Test2::V0" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::QuickORM" : {
+         "file" : "lib/Dancer2/Plugin/QuickORM.pm",
+         "version" : "1.0000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/GeekRuthie/Dancer2-Plugin-QuickORM/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@codeberg.org/GeekRuthie/Dancer2-Plugin-QuickORM.git",
+         "web" : "https://codeberg.org/GeekRuthie/Dancer2-Plugin-QuickORM"
+      }
+   },
+   "version" : "1.0000",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:GEEKRUTH",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

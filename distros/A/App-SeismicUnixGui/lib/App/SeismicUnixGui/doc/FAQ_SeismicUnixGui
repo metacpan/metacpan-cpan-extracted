@@ -1,25 +1,50 @@
 
 
-Abbreviations in this file:
+Abbreviations
 
-',' are methods/subroutines within a module/package
-';' separates entire modules/packages
-.pm is left out in reference to module names in what follows
+| Symbol                    | Meaning                                                  |
+| :------------------------ | :------------------------------------------------------- |
+| `,`                       | separates methods/subroutines within a module or package |
+| `;`                       | separates entire modules or packages                     |
+| `.pm`                     | omitted when referencing module names                    |
+| `sgy`, `txt`, `bin`, `su` | file extensions for data_in                              |
 
-use sgy txt bin su as extensions to data in
 
 
-INDEX to this file
+Overview
 
-Two types of flow types exist-- those built by the user and those that are pre-built 'superflows'.
+Two primary flow types exist within the system:
 
-User-built flows ( 4 colors) diverge from 'grey_flow.pm', pink_flow.pm, etc.
+    User-built flows
 
-sunix_select.pm uses exclusively 'neutral_flow.pm' 
+    Pre-built “superflows”
 
-Superflows diverge from user-build flows in L_SU via pre_built_superflow.pm
 
-User-built flows can be of 4 colors.
+User-Built Flows
+
+    Represented by four colors, each corresponding to its own module (e.g., grey_flow, pink_flow, etc.).
+
+    Diverge from their respective base modules:
+
+        grey_flow.pm
+
+        pink_flow.pm
+
+        green_flow.pm
+
+        blue_flow.pm
+
+    The module sunix_select.pm uses only neutral_flow.pm.
+
+    Each color flow has an independent namespace, mostly isolated from other components (future refactoring planned).
+
+
+ 
+Superflows
+
+Diverge from user-built flows via pre_built_superflow.pm in the L_SU namespace.
+
+Use distinct logic for execution and file management.
 
 The namespaces for each color flow and superflows are independent,
 for the most part (TODO), of other parts of the program. 
@@ -45,8 +70,22 @@ If there are superflow bindings for opening data files, then these use
 In file_dialog,
        iFile->get_Path gets directory path binding uses.
 
+Developer Notes: Bindings
+Bindings in User-Built Programs
+
+User-built programs that include bindings (e.g., MB3) often use sunix programs.
+These programs locate files via _FileDialog_button.
+
+Each color flow module (e.g., grey_flow.pm, pink_flow.pm, etc.) contains its own _FileDialog_button.
+File Types Supported
+Category	Description
+_Flow	User-built flow files
+_Data, _Data_PL_SEISMIC	Seismic (.su), binary, parameter (.par), and text files
+_Path	Directories or superflow definitions
+
 BINDINGS-for DEVELOPERS
-User-built programs containing bindings (e.g., MB3) (e.g.,those that use sunix programs) 
+User-built programs containing bindings (e.g., MB3) when using sunix programs) 
+
 sunix programs use _FileDialog_button to find files. 
  	'color'_flow
 		_FileDialog_button module lies within each of the 'colored' flows: e.g. grey_flow.pm, pink_flow.pm, etc.
@@ -54,12 +93,15 @@ sunix programs use _FileDialog_button to find files.
 		2) data files e.g. su, binary, par, and plain text files {_Data} [_Data_PL_SEISMIC}
 		and (3) pre_built superflows and directories {_Path}
 		
-Q. For a sunix program with a binding how does the FileDialog get activated?
+
+Common Questions
+Q1. How is the FileDialog activated for a sunix program with a binding?
+Some programs, such as segyread, have bindings that automatically open directories containing SEG-Y files.
+
+For directory definitions, see Project_config.pm.
  
- Individual programs can have bindings, e.g. segyread has the file|tape option
- bound to automatically open the directories that contain segy files 
- (See Project_config.pm for a 
- full description of the many pre-defined directory locations)
+Individual programs can also have bindings, e.g., segyread has the file|tape option
+bound to automatically open the directories that contain segy files 
  
  Q. What are the differences between the Save methods between user-built flows and superflows
  A. Superflows use L_SU->save_button
@@ -71,14 +113,33 @@ Q. For a sunix program with a binding how does the FileDialog get activated?
        L_SU
        color_flow.pm->save_button
  
- Q. What are MB1 bindings for colored listboxes?
- Q. How are colored flow listboxes selected?
- Q. how do I select a colored flow listbox?
- 
- When MB1 is clicked over a colored listbox flow (grey, pink, green or blue)
-  then that colored flow is selected;
- e.g. 	L_SUV0.X.C,_L_SU_flow_bindings(color,flow_select); 
- 		            L_SU->user_built_flows(flow_select), grey_flow->flow_select
+
+  What are MB1 bindings for colored listboxes?
+          L_SU.pl
+		 _L_SU_flow_bindings(color,flow_select);
+
+
+  What happens when I select a colored flow listbox?
+  That depends on whether it is empty or contains an existing flow.
+
+Case of an existing flow
+  When MB1 (left mouse button) is clicked on a colored listbox (grey, pink, green, or blue), 
+that contains an existing flow.
+
+ Example call sequence:
+        L_SU.pl
+		 _L_SU_flow_bindings(color,flow_select); 
+ 		 L_SU->user_built_flows(flow_select)
+		 grey_flow->flow_select
+
+ Call sequence for the Case of an empty flow
+When MB1 (left mouse button) is clicked on a colored listbox (grey, pink, green, or blue), 
+Code will skip the listbox if it is empty
+
+ Example call sequence:
+        L_SU.pl
+		 _L_SU_flow_bindings(color,flow_select); 
+        $L_SU->user_built_flows($method=flow_select)
 
 
 Differences between the following packages:
@@ -88,7 +149,7 @@ whereami: temporarily establish the widget you are in
   outside that of the main program
  
 (inherited by gui_history)
-conditions_gui: temporarily establishes the widget in a private hash 
+conditions4flow  or conditions4big_streams: temporarily establishes the widget in a private hash 
   within the namespace of the main program and hence accessible to all 
   local methods
   disables or enables certain widgets
@@ -109,6 +170,7 @@ Big streams/Superflows/Tools read configuration files and write configuration fi
  For example, make sure that your local configuration file also gets updated accordingly if you change
  the master iSpectralAnalysis.config
  
+Superflow Call Hierarchy
 Main, _L_SU_superflows calls pre_built_superflow
 
        pre_built_superflow, select calls config_superflows
@@ -152,7 +214,6 @@ Example 1: parameter "geopsy" in "Project"
 							manage_dirs_by::make_dir($GEOPSY_PARAMS);
  							manage_dirs_by::make_dir($GEOPSY_PICKS); 
  							manage_dirs_by::make_dir($GEOPSY_PROFILES);
- 							manage_dirs_by::make_dir($GEOPSY_REPORTS);
 							manage_dirs_by::make_dir($GEOPSY_TARGETS);
  						}		
  		 
@@ -172,7 +233,6 @@ Example 1: parameter "geopsy" in "Project"
 					_GEOPSY_PARAMS					=> '',
 					_GEOPSY_PICKS					=> '',	
 					_GEOPSY_PROFILES				=> '',
-					_GEOPSY_REPORTS					=> '',
 					_GEOPSY_TARGETS					=> '',
  	
  	Add ~ line 927: 
@@ -180,8 +240,7 @@ Example 1: parameter "geopsy" in "Project"
    my $GEOPSY              	= $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser;
    my $GEOPSY_PARAMS        = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'params';
    my $GEOPSY_PICKS         = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'picks';
-   my $GEOPSY_PROFILES      = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'profiles';
-   my $GEOPSY_REPORTS       = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'reports';       
+   my $GEOPSY_PROFILES      = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'profiles';  
    my $GEOPSY_TARGETS       = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'targets';
  	
  	Add the following ~ line 815: (first time)
@@ -189,7 +248,6 @@ Example 1: parameter "geopsy" in "Project"
  	$Project->{_GEOPSY_PARAMS}				= $GEOPSY_PARAMS;
  	$Project->{_GEOPSY_PICKS}				= $GEOPSY_PICKS;
  	$Project->{_GEOPSY_PROFILES}			= $GEOPSY_PROFILES;
- 	$Project->{_GEOPSY_REPORTS}				= $GEOPSY_REPORTS;
   	$Project->{_GEOPSY_TARGETS}				= $GEOPSY_TARGETS;
  						 
     Add the following ~ line 929:
@@ -199,7 +257,6 @@ Example 1: parameter "geopsy" in "Project"
    my $GEOPSY_PARAMS          = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'params';
    my $GEOPSY_PICKS          = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'picks';
    my $GEOPSY_PROFILES      = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'profiles';
-   my $GEOPSY_REPORTS       = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'reports';       
    my $GEOPSY_TARGETS       = $SEISMIC.'/geopsy/'.$DATE_LINE_COMPONENT_STAGE_PROCESS.'/'.$subUser.'/'.'targets';
     
     
@@ -207,8 +264,7 @@ Example 1: parameter "geopsy" in "Project"
     $Project->{_GEOPSY}						= $GEOPSY;
     $Project->{_GEOPSY_PARAMS}				= $GEOPSY_PARAMS;
  	$Project->{_GEOPSY_PICKS}				= $GEOPSY_PICKS;	
- 	$Project->{_GEOPSY_PROFILES}			= $GEOPSY_PROFILES;
- 	$Project->{_GEOPSY_REPORTS}				= $GEOPSY_REPORTS;	
+ 	$Project->{_GEOPSY_PROFILES}			= $GEOPSY_PROFILES;	
  	$Project->{_GEOPSY_TARGETS}				= $GEOPSY_TARGETS;						
           
     
@@ -242,19 +298,11 @@ sub GEOPSY_PROFILES {
         return ($GEOPSY_PROFILES);
 }
 
-sub GEOPSY_REPORTS {
-	_basic_dirs();
-	_system_dirs();
-		my $GEOPSY_REPORTS= $Project->{_GEOPSY_REPORTS};		
-        return ($GEOPSY_REPORTS);
-}
-	
  	Add the following ~ line: 1873 (third time)
  	my $GEOPSY				= $Project->{_GEOPSY};
 	my $GEOPSY_PARAMS		= $Project->{_GEOPSY_PARAMS};
 	my $GEOPSY_PICKS		= $Project->{_GEOPSY_PICKS};
 	my $GEOPSY_PROFILES		= $Project->{_GEOPSY_PROFILES};	
-	my $GEOPSY_REPORTS		= $Project->{_GEOPSY_REPORTS};
 	my $GEOPSY_TARGETS		= $Project->{_GEOPSY_TARGETS};		    	 
  
 
@@ -265,14 +313,13 @@ sub GEOPSY_REPORTS {
 		manage_dirs_by::make_dir($GEOPSY_PARAMS);
  		manage_dirs_by::make_dir($GEOPSY_PICKS); 
  		manage_dirs_by::make_dir($GEOPSY_PROFILES);
- 		manage_dirs_by::make_dir($GEOPSY_REPORTS);
 		manage_dirs_by::make_dir($GEOPSY_TARGETS);
 	}
   
  
  
  Question: How do I add individual parameters to the GUI for a single specific pre-built stream, 
-Example 2: parameter "purpose" in "iPick".  One parameter value can be "geopsy"
+Example 2: One parameter "purpose" in "iPick".  Anopther parameter value can be "geopsy"
 
  (1) add new variable in
  				   master file:			 ~/configs/iPick.config
@@ -424,7 +471,7 @@ TODO Idea: build program behaviors using spec files
  	so if ($bad)   provide error message 
  	
 
- For the case of big streams, redisplay the values that exist stored in param_flow:
+ For the case of big streams, redisplay the values that exist--stored in param_flow:
                 $param_widgets->set_values($TkPl_SU->{_values_aref});
 		 		$param_widgets->redisplay_values();
 		 		
@@ -446,7 +493,7 @@ The only place that a flow is checked for how correct its parameters are will be
 time the perl file is run. Programs and their paramters are checked out against the requirements of the spec
 files for the individual programs e.g., suximage.spec
 
-How do I modify a "sunix-type" file? July 24 2018
+Q. How do I modify a "sunix-type" file? July 24 2018
 
 e.g., data_in.pm
 
@@ -2160,7 +2207,7 @@ Modify the main program, i.e., immodpg.config.pm
 	  				
 	  Q. If I add a new button, which programs must I update?
 	  
-	  Main, L_SU,neutral_flow,conditions_gui,'color'_flow
+	  Main, L_SU,neutral_flow,conditions4flow ,'color'_flow
 	  
 	  Q. where is gui history stored:
 	  
@@ -2211,29 +2258,43 @@ Modify the main program, i.e., immodpg.config.pm
    		 	set_specs
    		 	
  Oct. 12:  From now on during refactoring:
- conditions_gui will try to establish as many of the dynamic defaults
+ conditions4flow  or conditions4big_streams will try to establish as many of the dynamic defaults
    gui_history will try to incorporate user gui responses
    
    Where are flow selection indices highlighted?
-   In add2flow_button and_add2flow, highlighting occurs
-    inside gui_history, conditions_gui: 
+
+     (1) when we select add2flow, 
+     The highlighting occurs inside conditions4flows, which is inherited by gui_history
+	      conditions4flows calls set4end_of_add2flow_button as follows:
    
-           gui_history->set4end_of_add2flow
-           
+           gui_history->set4end_of_add2flow_button
+
+      (2) When we open a new user-flow:
+	      gui_history->set4end_of_add2flow
+   
+      (3) When we manually select a flow item from the listbox:
+	   (Is that automatically done? Possibly somewhere inside color_flow->flow_select)
+	   
+	   		gui_history->set_button('flow_select')
    The index is selected from the previously highlighted part of the flow
+
+   How many times does highlighting occur?
+   When a new flow is opened, apparently 6 times
+   But not when a user-built flow item is selected from the listbox
      
    Where are the highlight selections recorded?
-   in delete_from_flow_button and
-   in flow_select, where the index is recorded before updating prior parameters: 
+
+   (1) in delete_from_flow_button and
+   (2) in flow_select, where the index is recorded before updating prior parameters: 
    		flow_select, gui_history->set_button('flow_select')
    		
 Q. In color_flows, how are stored flows updated?
  
- The following use _update_prior_param_flow :
+    Via _update_prior_param_flow, as in:
  		
-  	flow_select
+  	     flow_select
  
- The following use _updateNsave_most_recent_param_flow:
+    Via _updateNsave_most_recent_param_flow, in the following:
  
 		_add2flow (used only when reading a perl file)
 		_perl_flow (used only when reading a perl file)
@@ -2243,18 +2304,18 @@ Q. In color_flows, how are stored flows updated?
 		flow_item_up_arrow_button
 
 		
- In color_flow, the following use: _save_most_recent_param_flow :
+    In color_flow, _save_most_recent_param_flow  is used in:
  
- 	FileDialog_button
- 	_FileDialog_button
+ 		FileDialog_button
+ 		_FileDialog_button
  	
- The following use both  _save_most_recent_param_flow and 
- _update_prior_param_flow:
+    As well, _save_most_recent_param_flow and 
+              _update_prior_param_flow are used in the following:
  
- 	save_button
+ 	    save_button
  	
  	
- 1. Where and how many times is set_flow_select_color?
+ 1. Where and how many times is set_flow_select_color used?
  
  1 time in:
  	add2flow_button
@@ -2273,7 +2334,7 @@ Q. In color_flows, how are stored flows updated?
 				sub flow_select2save_most_recent_param_flow();
 							( color->	_save_most_recent_param_flow)
   		
- In all the following subs set_flow_select($color) is run: 		
+ In all the following subroutines, set_flow_select($color) is run: 		
  		pkg color_flow
  			sub _flow_select_director 
  			sub flow_select2save_most_recent_param_flow
@@ -2312,7 +2373,7 @@ What does MANUALLY selecting add2flow do?
 						_updateNsave_most_recent_param_flow		
 				
 						
-Sub Q : what does delete_from_flow_button do?
+Sub Q : What does delete_from_flow_button do?
 		THEN
 			# 
 			_flow_select2save_most_recent_param_flow();
@@ -3075,7 +3136,7 @@ A.  Following on from the previous questions, if MB3 selected,
     TODO
     Deprecation TODO: July 2024
     replace $name with $program_name
-    and consoidate program name definitions into L_SU_global_constants or equivalent
+    and consolidate program name definitions into L_SU_global_constants or equivalent
     Currently progam_name has definitions that are repeated in L_SU_global_constants
     
     Not working??
@@ -3090,3 +3151,7 @@ A.  Following on from the previous questions, if MB3 selected,
     Can not understand ??
      
            
+PROBLEM" TODO
+		   param_flow variable values for the color_flows are sometimes populated with param_flow variable values from t
+		   the pre_built_superflows.
+Q. How and where do pre_built_superflows store their param_flow values?

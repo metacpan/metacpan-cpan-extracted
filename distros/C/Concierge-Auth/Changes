@@ -1,5 +1,27 @@
 Revision history for Concierge-Auth
 
+v0.5.1  2026-07-16
+    - Base.pm: gen_token/gen_crypt_token now call gen_random_token
+      directly instead of going through Generators::gen_token/
+      gen_crypt_token, which are themselves just deprecated aliases for
+      gen_random_token -- skips the redundant indirection. The method
+      names on Base remain deprecated; only the implementation changed.
+      Also tightens a Pwd.pm POD cross-reference to Concierge::Auth.
+    - Added t/06-io-failures.t and t/lib/MockBuiltins.pm: test coverage
+      for open/flock/chmod/unlink failure paths in Pwd.pm via mocked
+      CORE::GLOBAL builtins.
+    - Added t/05-generators.t coverage for gen_random_string edge cases:
+      non-numeric length argument falls back to the default length;
+      a whitespace-only charset argument is treated as no charset.
+    - Fixed packaging: MANIFEST was missing t/06-io-failures.t and
+      t/lib/MockBuiltins.pm.
+    - Fixed a spurious "Argument isn't numeric" warning in
+      MockBuiltins.pm caused by assigning a string message to $!.
+    - Added examples/11-custom-backend-ldap.pl: documentation sketch of
+      a directory-backed (LDAP) Concierge::Auth::Base implementation.
+    - Fixed a pre-existing podchecker "empty section" warning in
+      Base.pm's stacked Generator Methods headings.
+
 v0.5.0  2026-07-05
     - BREAKING: Concierge::Auth is now a thin backend factory, not a
       monolithic password-auth implementation. All prior OO methods

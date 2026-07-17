@@ -201,12 +201,11 @@ tmute=0.128544,0.245747
 
 xmute=73.2464,95.6714
 
-In this particular case, the mute pick coordinates
+For this particular case, the mute pick coordinates
 in the "x" direction are tracr values.
 
 sumute sp_fldr4.su par=par_file key=tracr mode=0 | 
 sugain agc=1 wagc=0.1 | suxwigb clip=1.5 &
-
 
 Now, we have added some options to allow the user to mute a file
 that contains many gathers at one time. You will need to supply 
@@ -214,26 +213,31 @@ a "multi-gather", mute-type parameter file. That is, sumute.pm
 can use a concatenated  collection of the contents of these individual 
 parfiles. The name of this file is called the "multi_gather_par_file"".
 
-Generate the "parfiles" (x,t values in SUnix "par" format) 
-using the iTopMute Tool. iTopMute saves the picked values 
+You can create a multi-gather parameter file in two ways:
+
+(1) Manually concatenate the individual parfiles into one file 
+(e.g.,use the Sucat tool)
+
+(2) Use the Tool: iTop_Mute to interactively pick mute coordinates.
+The iTopMute Tool generates the "parfiles" (x,t values) in SUnix "par" format
+iTopMute saves the picked values 
 into individual "parfiles" named according to
-their corresponding gather.
+their corresponding gather (e.g. ep or cdp etc.)
 
-To create a multi-gather parameter file 
-this composite "parfile" can be concatenated from individual parfiles
-using the Tool: Sucat
-
-We now have added the following options
+wE have added the new following options to su mute
 to sumute:
 
 gather_type           = ep (shotpoint),cdp (cdp gathers),fldr(field data gathers)
 
+---This parameter specifies the type of gather in the multi-gather su file. It is not
+   needed when you are muting single files in the traditional way.	
+
 multi_gather_par_file = a concatenated file of the individual parfiles
 
-multi_gather_su_file  = the su file which was muted interactively to 
+multi_gather_su_file  = the *.su file which was muted interactively to 
 create each of the parfiles, while using the Tool: iTop_Mute 
 
-A multi-parameter-file looks as follows:
+In the case of a cdp gather, a multi-parameter-file looks as follows:
 
 cdp=1,2
 
@@ -272,10 +276,17 @@ tmute=0.141777,0.251418
 xmute=73,96
 
 
-Note, DO NOT include a separate
+Note, when you use a multi-parameter mute paramter file you DO NOT include a separate
 "data_in" file in the flow. The "data_in" is not necessary
-because the new option in 
-sumute reads multi_gather_su_file automatically.
+because the new option in  sumute reads multi_gather_su_file automatically.
+
+--------------------------------------------------------------------
+Interactive top mute picks are made using the Tool: iTopMute
+
+The iTopMute Tool generates the "parfiles" (x,t values) in SUnix "par" format
+iTopMute saves the picked values 
+into individual "parfiles" named according to
+their corresponding gather (e.g. ep or cdp etc.)
 
 =cut
 

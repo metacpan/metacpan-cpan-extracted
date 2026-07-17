@@ -1,4 +1,4 @@
-package Concierge::Sessions v0.11.1;
+package Concierge::Sessions v0.11.2;
 use v5.36;
 
 # ABSTRACT: Session manager with flexible session information storage
@@ -134,7 +134,7 @@ Concierge::Sessions - Session manager with factory pattern and multiple backend 
 
 =head1 VERSION
 
-v0.11.1
+v0.11.2
 
 =head1 SYNOPSIS
 

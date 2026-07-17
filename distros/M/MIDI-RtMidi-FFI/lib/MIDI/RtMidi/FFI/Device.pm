@@ -9,7 +9,7 @@ package MIDI::RtMidi::FFI::Device;
 use MIDI::RtMidi::FFI ':all';
 use Carp qw/ carp croak /;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 
 sub new {
@@ -63,7 +63,7 @@ MIDI::RtMidi::FFI::Device - OO interface for MIDI::RtMidi::FFI
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -432,7 +432,7 @@ approach to callback-driven operation.
 Test coverage, both automated testing and hands-on testing, is limited. Some
 elements of this module (especially around 14 bit CC and (N)RPN) are based on
 reading, and probably often misreading, MIDI specifications, device
-documentation and forum posts. Issues in the GitHub repo are more than
+documentation and forum posts. Issues in the Codeberg.org repo are more than
 welcome, even if just to ask questions. You may also find me in #perl-music
 on irc.perl.org - look for fuzzix.
 
@@ -443,7 +443,7 @@ and failures on this platform.
 NRPN and 14 bit CC have not been tested on real hardware, though they work
 well in the "virtual" domain - for controlling software-defined instruments.
 
-L<Currently open MIDI::RtMidi::FFI issues on GitHub|https://github.com/jbarrett/MIDI-RtMidi-FFI/issues>
+L<Currently open MIDI::RtMidi::FFI issues on Codeberg.org|https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/issues>
 
 =head1 SEE ALSO
 
@@ -461,13 +461,15 @@ L<MIDI::Event>
 
 =head1 CONTRIBUTING
 
-L<https://github.com/jbarrett/MIDI-RtMidi-FFI>
+L<https://codeberg.org/jbarrett/MIDI-RtMidi-FFI>
 
-All comments and contributions welcome.
+LLM-generated (or "assisted") contributions are not welcome.
+
+All other comments and contributions welcome.
 
 =head1 BUGS AND SUPPORT
 
-Please direct all requests to L<https://github.com/jbarrett/MIDI-RtMidi-FFI/issues>
+Please direct all requests to L<https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/issues>
 
 =head1 CONTRIBUTORS
 
@@ -475,7 +477,7 @@ Please direct all requests to L<https://github.com/jbarrett/MIDI-RtMidi-FFI/issu
 
 =item *
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs L<https://metacpan.org/author/GENE>
 
 =back
 

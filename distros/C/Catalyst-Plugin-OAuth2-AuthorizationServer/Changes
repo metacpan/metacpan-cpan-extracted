@@ -1,0 +1,56 @@
+Revision history for Catalyst-Plugin-OAuth2-AuthorizationServer
+
+0.003     2026-07-16
+          - Genericise the example OAuth scopes (now example:*) and remove
+            downstream-application references from the README and the
+            perl_critic author test comment, so the distribution reads as
+            standalone. Examples and tests only; no functional change.
+
+0.002     Unreleased
+          - Version bump so consumers reliably install the current code over any
+            0.001 already present in an environment (cpanm treats same-version as
+            satisfied); no code change from the 0.001 line below.
+          - Initial MCP-profile OAuth 2.1 Authorization Server.
+          - INCOMPATIBLE: code_verifier is now validated as 43-128 characters of
+            the RFC 7636 4.1 unreserved set before the PKCE comparison. A client
+            sending a shorter or otherwise non-conformant verifier that worked
+            before now gets invalid_grant.
+          - INCOMPATIBLE: the Store contract has changed; any implementation of
+            Role::Store must be updated. rotate_refresh_token now returns undef
+            (unknown/expired), { binding => \%binding } (was live, now revoked),
+            or { binding => \%binding, reused => 1 } (a replay), instead of a
+            bare binding or undef. A rotated token must be retained as a
+            tombstone until its original expires_at rather than deleted, or
+            reuse detection silently stops working. create_refresh_token gains
+            family_id in the binding and must return false, persisting nothing,
+            if that family has been revoked. revoke_family($family_id) is a new
+            required verb.
+          - Refresh-token reuse now revokes the whole token family (RFC 9700):
+            replaying a rotated token revokes every token descended from the
+            same authorization, including the one the legitimate client holds.
+            The error is deliberately identical to an unknown token, so it gives
+            an attacker no signal that reuse was detected.
+          - Refresh rotation and family revocation are safe against a concurrent
+            replay: a rotation in flight when revoke_family runs can no longer
+            create its successor into the revoked family. Store implementers
+            must make create_refresh_token's check-and-insert mutually exclusive
+            with revoke_family for a family (SERIALIZABLE or a per-family lock);
+            a bare INSERT ... WHERE NOT EXISTS write-skews under READ COMMITTED.
+          - Access tokens carry a jti claim. Nothing reads it; it exists so a
+            revocation denylist can be added later without changing the token
+            format for tokens already issued.
+          - signing_key length is now validated against the RFC 7518 3.2 minimum
+            for the configured HS algorithm (32/48/64 bytes). A short key was
+            previously accepted and produced brute-forceable tokens.
+          - A request that repeats a parameter is now rejected with
+            invalid_request (RFC 6749 3.2.1) instead of silently taking the last
+            value. On /authorize the rejection renders directly and never
+            redirects, since it happens before redirect_uri is validated.
+          - Dynamic Client Registration rejects unsupported metadata values with
+            invalid_client_metadata (RFC 7591 2) instead of storing them
+            verbatim. The allow-lists are derived from the metadata document, so
+            registration cannot accept what discovery does not advertise.
+          - LIMITATIONS now states that family revocation does not kill access
+            tokens already minted from the family (they are stateless JWTs and
+            live out access_ttl), and that a concurrent double-refresh is
+            indistinguishable from a replay and will revoke the family.

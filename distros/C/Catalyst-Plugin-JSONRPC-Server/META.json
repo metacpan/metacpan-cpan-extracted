@@ -1,0 +1,68 @@
+{
+   "abstract" : "Generic JSON-RPC 2.0 server plugin for Catalyst",
+   "author" : [
+      "Mike Whitaker <mike@altrion.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-JSONRPC-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Catalyst::Runtime" : "5.90000",
+            "JSON::MaybeXS" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.036"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Moose" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server/issues"
+      },
+      "homepage" : "https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server.git",
+         "web" : "https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

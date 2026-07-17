@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+# Run as: perl -T bin/wide2xml <string>  to enable taint mode.
+# env(1) does not forward -T; invoke perl directly when taint mode is needed.
+
+use strict;
+use warnings;
+use Carp qw(croak);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Encode::Wide qw(wide_to_xml);
+
+croak "Usage: wide2xml <string>\n" unless @ARGV;
+
+# Untaint ARGV: accept any printable character so the module can reject
+# specific sequences.  This satisfies taint mode without clamping valid input.
+my @safe_args = map {
+	/\A([\x20-\x7E\x80-\xFF]*)\z/ms ? $1 : croak "wide2xml: unsafe argument\n"
+} @ARGV;
+
+print wide_to_xml(string => join(' ', @safe_args)), "\n";

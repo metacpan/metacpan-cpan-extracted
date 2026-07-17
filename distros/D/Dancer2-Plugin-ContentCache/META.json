@@ -1,0 +1,251 @@
+{
+   "abstract" : "Cache HTML/JSON responses for later use.",
+   "author" : [
+      "D Ruth Holloway <ruth@hiruthie.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-ContentCache",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.20.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::ChangeStats::Git" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::CoalescePod" : "0",
+            "Dist::Zilla::Plugin::Codeberg::Meta" : "0",
+            "Dist::Zilla::Plugin::Codeberg::Update" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::ContributorCovenant" : "0",
+            "Dist::Zilla::Plugin::ContributorsFile" : "0",
+            "Dist::Zilla::Plugin::CopyrightYearFromGit" : "0",
+            "Dist::Zilla::Plugin::Covenant" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::FakeRelease" : "0",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::CommitBuild" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::INI::Baked" : "0",
+            "Dist::Zilla::Plugin::InstallGuide" : "0",
+            "Dist::Zilla::Plugin::InstallRelease" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaData::BuiltWith" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::NextVersion::Semantic" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::Plugins" : "0",
+            "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::SchwartzRatio" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2::Plugin" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Scalar::Util" : "0",
+            "UUID::Tiny" : "0",
+            "perl" : "v5.20.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Dancer2" : "0",
+            "Dancer2::Plugin::DBIC" : "0",
+            "Dancer2::Plugin::DBIx::Class" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack::Test" : "0",
+            "Test2::V1" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::ContentCache" : {
+         "file" : "lib/Dancer2/Plugin/ContentCache.pm",
+         "version" : "1.0000"
+      },
+      "Dancer2::Plugin::ContentCache::CacheEntry" : {
+         "file" : "lib/Dancer2/Plugin/ContentCache/CacheEntry.pm",
+         "version" : "1.0000"
+      },
+      "Dancer2::Plugin::ContentCache::Driver" : {
+         "file" : "lib/Dancer2/Plugin/ContentCache/Driver.pm",
+         "version" : "1.0000"
+      },
+      "Dancer2::Plugin::ContentCache::Driver::DBIC" : {
+         "file" : "lib/Dancer2/Plugin/ContentCache/Driver/DBIC.pm",
+         "version" : "1.0000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/GeekRuthie/Dancer2-Plugin-ContentCache/issues"
+      },
+      "homepage" : "https://p3rl.org/Dancer2::Plugin::ContentCache",
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@codeberg.org/GeekRuthie/Dancer2-Plugin-ContentCache.git",
+         "web" : "https://codeberg.org/GeekRuthie/Dancer2-Plugin-ContentCache"
+      }
+   },
+   "version" : "1.0000",
+   "x_BuiltWith" : {
+      "failures" : {
+         "DBIx::Class::Core" : "Module::MetaData could not parse a version from /usr/local/perl-5.42.0/lib/site_perl/5.42.0/DBIx/Class/Core.pm",
+         "DBIx::Class::Schema" : "Module::MetaData could not parse a version from /usr/local/perl-5.42.0/lib/site_perl/5.42.0/DBIx/Class/Schema.pm",
+         "Plack::Test" : "Module::MetaData could not parse a version from /usr/local/perl-5.42.0/lib/site_perl/5.42.0/Plack/Test.pm"
+      },
+      "modules" : {
+         "CPAN::Meta" : "2.150010",
+         "Carp" : "1.54",
+         "Dancer2" : "2.0.0",
+         "Dancer2::Plugin" : "2.0.0",
+         "Dancer2::Plugin::DBIC" : "0.0100",
+         "Dancer2::Plugin::DBIx::Class" : "1.1001",
+         "DateTime" : "1.66",
+         "DateTime::Format::Strptime" : "1.79",
+         "Dist::Zilla" : "6.033",
+         "Dist::Zilla::Plugin::Authority" : "1.009",
+         "Dist::Zilla::Plugin::AutoPrereqs" : "6.033",
+         "Dist::Zilla::Plugin::CPANFile" : "6.033",
+         "Dist::Zilla::Plugin::ChangeStats::Git" : "0.6.0",
+         "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.011",
+         "Dist::Zilla::Plugin::CoalescePod" : "1.0.0",
+         "Dist::Zilla::Plugin::Codeberg::Meta" : "2.0102",
+         "Dist::Zilla::Plugin::Codeberg::Update" : "2.0102",
+         "Dist::Zilla::Plugin::ConfirmRelease" : "6.033",
+         "Dist::Zilla::Plugin::ContributorCovenant" : "2.000000",
+         "Dist::Zilla::Plugin::ContributorsFile" : "0.3.0",
+         "Dist::Zilla::Plugin::CopyrightYearFromGit" : "0.009",
+         "Dist::Zilla::Plugin::Covenant" : "0.1.3",
+         "Dist::Zilla::Plugin::ExecDir" : "6.033",
+         "Dist::Zilla::Plugin::FakeRelease" : "6.033",
+         "Dist::Zilla::Plugin::Git::Check" : "2.051",
+         "Dist::Zilla::Plugin::Git::Commit" : "2.051",
+         "Dist::Zilla::Plugin::Git::CommitBuild" : "2.051",
+         "Dist::Zilla::Plugin::Git::Contributors" : "0.038",
+         "Dist::Zilla::Plugin::Git::GatherDir" : "2.051",
+         "Dist::Zilla::Plugin::Git::Push" : "2.051",
+         "Dist::Zilla::Plugin::Git::Tag" : "2.051",
+         "Dist::Zilla::Plugin::INI::Baked" : "0.002002",
+         "Dist::Zilla::Plugin::InstallGuide" : "1.200014",
+         "Dist::Zilla::Plugin::InstallRelease" : "0.008",
+         "Dist::Zilla::Plugin::License" : "6.033",
+         "Dist::Zilla::Plugin::MakeMaker" : "6.033",
+         "Dist::Zilla::Plugin::Manifest" : "6.033",
+         "Dist::Zilla::Plugin::ManifestSkip" : "6.033",
+         "Dist::Zilla::Plugin::MetaData::BuiltWith" : "1.004005",
+         "Dist::Zilla::Plugin::MetaJSON" : "6.033",
+         "Dist::Zilla::Plugin::MetaProvides::Package" : "2.004003",
+         "Dist::Zilla::Plugin::MetaYAML" : "6.033",
+         "Dist::Zilla::Plugin::MinimumPerl" : "1.006",
+         "Dist::Zilla::Plugin::NextRelease" : "6.033",
+         "Dist::Zilla::Plugin::NextVersion::Semantic" : "0.2.6",
+         "Dist::Zilla::Plugin::OurPkgVersion" : "0.21",
+         "Dist::Zilla::Plugin::PodWeaver" : "4.010",
+         "Dist::Zilla::Plugin::Prereqs::Plugins" : "1.003003",
+         "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "0.2.6",
+         "Dist::Zilla::Plugin::PruneCruft" : "6.033",
+         "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0.141140",
+         "Dist::Zilla::Plugin::RunExtraTests" : "0.029",
+         "Dist::Zilla::Plugin::SchwartzRatio" : "0.3.4",
+         "Dist::Zilla::Plugin::Test::Compile" : "2.058",
+         "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.029",
+         "Dist::Zilla::Plugin::TestRelease" : "6.033",
+         "ExtUtils::MakeMaker" : "7.76",
+         "File::Spec" : "3.94",
+         "FindBin" : "1.54",
+         "HTTP::Request::Common" : "7.00",
+         "IO::Handle" : "1.55",
+         "IPC::Open3" : "1.24",
+         "JSON::MaybeXS" : "1.004008",
+         "Module::Runtime" : "0.018",
+         "Moo" : "2.005005",
+         "Moo::Role" : "2.005005",
+         "Scalar::Util" : "1.68_01",
+         "Test2::V1" : "1.302222",
+         "Test::More" : "1.302222",
+         "UUID::Tiny" : "1.04",
+         "base" : "2.27",
+         "lib" : "0.65",
+         "strict" : "1.14",
+         "warnings" : "1.74"
+      },
+      "perl" : {
+         "original" : "v5.42.0",
+         "qv" : 1,
+         "version" : [
+            5,
+            42,
+            0
+         ]
+      },
+      "platform" : "linux"
+   },
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:GEEKRUTH",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

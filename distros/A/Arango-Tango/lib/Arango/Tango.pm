@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.019';
+$Arango::Tango::VERSION = '0.020';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -148,7 +148,14 @@ sub new {
     };
     $self->{http} = HTTP::Tiny->new(default_headers => $self->{headers});
 
+    $self->{error} = "";
+
     return $self;
+}
+
+sub error {
+    my $self = shift;
+    return $self->{error};
 }
 
 sub _auth {
@@ -162,7 +169,8 @@ sub database {
     if (grep {$name eq $_} @$databases) {
         return Arango::Tango::Database->_new( arango => $self, name => $name);
     } else {
-        die "Arango::Tango | Database not found."
+        $self->{error} = "Database not found";
+        die "-1\n";
     }
 }
 
@@ -191,7 +199,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSYS
 
@@ -492,6 +500,15 @@ Return status information
 
 Return system time
 
+=item C<error>
+
+    my $error = $db->error;
+
+Get latest Arango::Tango error message. Note that this message is not cleared, thus it should only
+be queried whenever a method dies.
+
+The die value is '-1' for Arango::Tango errors. Otherwise, is the HTTP code returned by the server, if not equal to success.
+
 =back
 
 =head1 CAVEATS
@@ -524,11 +541,11 @@ João Miguel Ferreira
 
 =head1 AUTHOR
 
-Alberto Simões <ambs@cpan.org>
+Alberto Simões <ambs@zbr.pt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Alberto Simões.
+This software is copyright (c) 2019-2026 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

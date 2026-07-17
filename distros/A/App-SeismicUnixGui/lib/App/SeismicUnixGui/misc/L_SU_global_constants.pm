@@ -483,7 +483,7 @@ my $var = {
 	_one_character                 => '1',
 	_one_pixel                     => '1',
 	_one_pixel_borderwidth         => '1',
-	_program_title                 => 'SeismicUnixGui V0.87.5',
+	_program_title                 => 'SeismicUnixGui V0.87.6',
 	_project_selector_title        => 'Project Selector',
 	_l_suplot_title                => 'L_suplot',
 	_project_selector_title        => 'Project Selector',
@@ -845,8 +845,10 @@ sub get_developer_sunix_category_h {
 		_sumax        => $developer_sunix_categories[13],
 		_sumean       => $developer_sunix_categories[13],
 		_sumix        => $developer_sunix_categories[13],
+		_sunormalize  => $developer_sunix_categories[13],
 		_suop         => $developer_sunix_categories[13],
 		_suop2        => $developer_sunix_categories[13],
+		_suweight     => $developer_sunix_categories[13],
 		_suxcor       => $developer_sunix_categories[13],
 		_suxmax       => $developer_sunix_categories[13],
 
@@ -859,6 +861,7 @@ sub get_developer_sunix_category_h {
 		_sufft       => $developer_sunix_categories[14],
 		_sugabor     => $developer_sunix_categories[14],
 		_suicepstrum => $developer_sunix_categories[14],
+		_suhilb      => $developer_sunix_categories[14],
 		_suifft      => $developer_sunix_categories[14],
 		_suminphase  => $developer_sunix_categories[14],		
 		_suphasevel  => $developer_sunix_categories[14],
@@ -987,16 +990,18 @@ my @sunix_shapeNcut_programs = (
 );
 
 my @sunix_statsMath_programs = (
-	"cpftrend",   "entropy",     "farith",       "suacor",
-	"suacorfrac", "sualford",    "suattributes", "suconv",
-	"sufwmix",    "suhistogram", "suhrot",       "suinterp",
-	"sumax",      "sumean",      "sumix",        "suop",
-	"suop2",      "suxcor",      "suxmax",
+	"cpftrend", "entropy", "farith", "suacor",
+	"suacorfrac", "sualford", "suattributes", "suconv",
+	"sufwmix", "suhistogram", "suhrot", "suinterp",
+	"sumax", "sumean", "sumix", "suop",
+	"sunormalize",
+	"suop2", "suweight", "suxcor", "suxmax",
 );
 
 my @sunix_transform_programs = (
 	"dctcomp", "suamp", "succepstrum", "sucepstrum",
 	"sucwt", "succwt", "sufft", "sugabor",
+	"suhilb",
 	"suicepstrum", "suifft", "suphasevel", "suspecfk",
 	"suminphase",
 	"suspecfx", "sutaup",

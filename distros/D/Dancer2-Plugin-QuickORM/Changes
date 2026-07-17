@@ -1,0 +1,18 @@
+Revision history for Dancer2-Plugin-QuickORM
+
+1.0000 2026-07-16T16:13:49-04:00 America/New_York
+ [MAJOR]
+ - Add more tests, and documentation for first major release
+
+ [API CHANGE]
+ [MINOR]
+ [ENHANCEMENTS]
+ [REVISION]
+ [BUG FIXES]
+ [STATISTICS]
+ - code churn: 5 files changed, 289 insertions(+), 2 deletions(-)
+
+0.0001 2026-07-16T14:19:53-04:00 America/New_York
+ [First version.]
+ [STATISTICS]
+ - code churn: 16 files changed, 835 insertions(+), 14 deletions(-)

@@ -1,4 +1,4 @@
-package Concierge::Auth v0.5.0;
+package Concierge::Auth v0.5.1;
 use v5.36;
 
 # ABSTRACT: Factory/dispatcher for Concierge::Auth backends
@@ -30,7 +30,7 @@ Concierge::Auth - Factory/dispatcher for Concierge::Auth backends
 
 =head1 VERSION
 
-v0.5.0
+v0.5.1
 
 =head1 SYNOPSIS
 

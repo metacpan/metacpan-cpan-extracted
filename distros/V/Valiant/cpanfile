@@ -1,5 +1,8 @@
 requires 'Carp', '1.50';
 requires 'Class::Method::Modifiers', '2.15';
+# Valiant::I18N loads Data::Localize::MultiLevel, which hard-uses Config::Any;
+# Data::Localize only 'recommends' it (optional localizer), so declare it here.
+requires 'Config::Any', '0';
 requires 'Data::Localize', '0.00028';
 requires 'Data::Perl::Collection::Array', '0.002011';
 requires 'DateTime', '1.65';

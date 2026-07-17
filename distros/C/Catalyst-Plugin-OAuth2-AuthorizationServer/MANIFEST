@@ -1,0 +1,36 @@
+.perlcriticrc
+AGENTS.md
+Changes
+CONTRIBUTING.md
+cpanfile
+examples/app.psgi
+examples/client.pl
+examples/lib/Example/OAuthAS.pm
+examples/lib/Example/OAuthAS/Controller/Root.pm
+examples/lib/Example/OAuthAS/Model/Store.pm
+examples/README.md
+lib/Catalyst/Plugin/OAuth2/AuthorizationServer.pm
+lib/Catalyst/Plugin/OAuth2/AuthorizationServer/Error.pm
+lib/Catalyst/Plugin/OAuth2/AuthorizationServer/Role/Store.pm
+lib/Catalyst/Plugin/OAuth2/AuthorizationServer/Server.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/catalyst-app.t
+t/error.t
+t/lib/StubStore.pm
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Model/OAuthStore.pm
+t/perl_critic.t
+t/role-store.t
+t/server-authorize.t
+t/server-dcr.t
+t/server-issue-code.t
+t/server-metadata.t
+t/server-refresh-family.t
+t/server-token-mint.t
+t/server-token.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

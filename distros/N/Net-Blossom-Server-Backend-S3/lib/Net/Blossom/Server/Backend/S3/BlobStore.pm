@@ -111,12 +111,8 @@ sub begin_upload {
 
 sub get_blob {
     my ($self, $storage_key, %opts) = @_;
-    my $head = $self->client->head($storage_key);
-    return unless defined $head;
-    croak "object head response has no size" unless defined $head->{size};
-    my $size = 0 + $head->{size};
-    croak "object size does not match metadata"
-        if defined $opts{size} && $size != $opts{size};
+    my $size = $self->_object_size($storage_key, $opts{size});
+    return unless defined $size;
     return '' unless $size;
 
     return Net::Blossom::Server::Backend::S3::BlobStore::_Stream->new(
@@ -125,6 +121,38 @@ sub get_blob {
         size       => $size,
         range_size => $self->range_size,
     );
+}
+
+sub get_blob_range {
+    my ($self, $storage_key, %opts) = @_;
+    my %known = map { $_ => 1 } qw(offset length size);
+    my @unknown = grep { !$known{$_} } keys %opts;
+    croak "unknown option(s): " . join(', ', sort @unknown) if @unknown;
+    _range_options(\%opts);
+
+    my $size = $self->_object_size($storage_key, $opts{size});
+    return unless defined $size;
+    croak "range exceeds object size"
+        if $opts{offset} + $opts{length} > $size;
+
+    return Net::Blossom::Server::Backend::S3::BlobStore::_Stream->new(
+        client      => $self->client,
+        storage_key => $storage_key,
+        size        => $opts{offset} + $opts{length},
+        range_size  => $self->range_size,
+        offset      => $opts{offset},
+    );
+}
+
+sub _object_size {
+    my ($self, $storage_key, $expected) = @_;
+    my $head = $self->client->head($storage_key);
+    return unless defined $head;
+    croak "object head response has no size" unless defined $head->{size};
+    my $size = 0 + $head->{size};
+    croak "object size does not match metadata"
+        if defined $expected && $size != $expected;
+    return $size;
 }
 
 sub delete_blob {
@@ -155,6 +183,19 @@ sub _constructor_args {
     return %{$_[0]} if @_ == 1 && ref($_[0]) eq 'HASH';
     croak "constructor arguments must be name/value pairs" if @_ % 2;
     return @_;
+}
+
+sub _range_options {
+    my ($opts) = @_;
+    croak "offset must be a non-negative integer"
+        unless defined $opts->{offset}
+        && !ref($opts->{offset})
+        && $opts->{offset} =~ /\A[0-9]+\z/;
+    croak "length must be a positive integer"
+        unless defined $opts->{length}
+        && !ref($opts->{length})
+        && $opts->{length} =~ /\A[1-9][0-9]*\z/;
+    return;
 }
 
 {
@@ -404,6 +445,12 @@ Returns a file-backed blob upload writer.
 Returns C<''> for an empty object, a ranged stream for a nonempty object, or
 C<undef> when the object is absent. When C<size> is supplied, a size mismatch
 is an error.
+
+=head2 get_blob_range
+
+Returns a stream for the requested zero-based C<offset> and positive C<length>,
+or C<undef> when the object is absent. Only the requested S3 byte ranges are
+fetched. When C<size> is supplied, a size mismatch is an error.
 
 =head2 delete_blob
 

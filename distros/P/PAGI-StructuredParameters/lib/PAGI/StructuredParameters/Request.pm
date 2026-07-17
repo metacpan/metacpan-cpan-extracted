@@ -1,5 +1,5 @@
 package PAGI::StructuredParameters::Request;
-$PAGI::StructuredParameters::Request::VERSION = '0.001000';
+$PAGI::StructuredParameters::Request::VERSION = '0.001001';
 use strict;
 use warnings;
 use Future::AsyncAwait;

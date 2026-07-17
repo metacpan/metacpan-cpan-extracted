@@ -19,7 +19,7 @@ WriteMakefile(
         'Crypt::PRNG'          => '0',
         'Net::Amazon::S3'      => '0.992',
         'Net::Blossom'         => '0.001001',
-        'Net::Blossom::Server' => '0.001002',
+        'Net::Blossom::Server' => '0.001003',
         'strictures'           => '2',
         'URI'                  => '0',
     },

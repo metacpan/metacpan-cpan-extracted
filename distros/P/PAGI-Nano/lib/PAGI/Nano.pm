@@ -1,5 +1,5 @@
 package PAGI::Nano;
-$PAGI::Nano::VERSION = '0.001000';
+
 use strict;
 use warnings;
 use Future;
@@ -14,6 +14,8 @@ use PAGI::Nano::Context::HTTP;
 use PAGI::Nano::Context::WebSocket;
 use PAGI::Nano::Context::SSE;
 use PAGI::Nano::ServiceRegistry;
+
+our $VERSION = '0.001001';
 
 use Exporter 'import';
 our @EXPORT = qw(

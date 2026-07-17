@@ -1,3 +1,10 @@
+0.020 2026-07-16
+
+     - Refactored behavior on error.
+     - Database.pm
+       - added: 'create_index' to create hash, skiplist, persistent and
+         geo indexes
+
 0.019 2023-02-24
 
      - Collection.pm

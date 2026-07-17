@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::suaddevent;
 
 PERL PROGRAM NAME: 
 
-AUTHOR: Juan Lorenzo (Perl module only)
+AUTHOR:  
 
 DATE:
 
@@ -103,7 +103,7 @@ our $VERSION = '0.0.1';
 
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
-use App::SeismicUnixGui::misc::SeismicUnix qw($in $out $on $go $to $suffix_ascii $off $suffix_su $suffix_bin);
+use App::SeismicUnixGui::misc::SeismicUnix qw($go $in $off $on $out $ps $to $suffix_ascii $suffix_bin $suffix_ps $suffix_segy $suffix_su);
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 
@@ -116,6 +116,8 @@ my $Project				= Project_config->new();
 my $DATA_SEISMIC_SU		= $Project->DATA_SEISMIC_SU();
 my $DATA_SEISMIC_BIN	= $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_TXT	= $Project->DATA_SEISMIC_TXT();
+
+my $PS_SEISMIC      	= $Project->PS_SEISMIC();
 
 my $var				= $get->var();
 my $on				= $var->{_on};
@@ -131,12 +133,9 @@ hash of private variables
 
 my $suaddevent			= {
 	_amp					=> '',
-	_dt					=> '',
-	_f					=> '',
-	_nt					=> '',
-	_t0					=> '',
+	_dt					    => '',
+	_t0					    => '',
 	_type					=> '',
-	_v					=> '',
 	_vel					=> '',
 	_Step					=> '',
 	_note					=> '',
@@ -182,14 +181,11 @@ by adding the program name
 
 		$suaddevent->{_amp}			= '';
 		$suaddevent->{_dt}			= '';
-		$suaddevent->{_f}			= '';
-		$suaddevent->{_nt}			= '';
 		$suaddevent->{_t0}			= '';
-		$suaddevent->{_type}			= '';
-		$suaddevent->{_v}			= '';
+		$suaddevent->{_type}		= '';
 		$suaddevent->{_vel}			= '';
-		$suaddevent->{_Step}			= '';
-		$suaddevent->{_note}			= '';
+		$suaddevent->{_Step}		= '';
+		$suaddevent->{_note}		= '';
  }
 
 
@@ -233,45 +229,6 @@ by adding the program name
  }
 
 
-=head2 sub f 
-
-
-=cut
-
- sub f {
-
-	my ( $self,$f )		= @_;
-	if ( $f ne $empty_string ) {
-
-		$suaddevent->{_f}		= $f;
-		$suaddevent->{_note}		= $suaddevent->{_note}.' f='.$suaddevent->{_f};
-		$suaddevent->{_Step}		= $suaddevent->{_Step}.' f='.$suaddevent->{_f};
-
-	} else { 
-		print("suaddevent, f, missing f,\n");
-	 }
- }
-
-
-=head2 sub nt 
-
-
-=cut
-
- sub nt {
-
-	my ( $self,$nt )		= @_;
-	if ( $nt ne $empty_string ) {
-
-		$suaddevent->{_nt}		= $nt;
-		$suaddevent->{_note}		= $suaddevent->{_note}.' nt='.$suaddevent->{_nt};
-		$suaddevent->{_Step}		= $suaddevent->{_Step}.' nt='.$suaddevent->{_nt};
-
-	} else { 
-		print("suaddevent, nt, missing nt,\n");
-	 }
- }
-
 
 =head2 sub t0 
 
@@ -313,26 +270,6 @@ by adding the program name
  }
 
 
-=head2 sub v 
-
-
-=cut
-
- sub v {
-
-	my ( $self,$v )		= @_;
-	if ( $v ne $empty_string ) {
-
-		$suaddevent->{_v}		= $v;
-		$suaddevent->{_note}		= $suaddevent->{_note}.' v='.$suaddevent->{_v};
-		$suaddevent->{_Step}		= $suaddevent->{_Step}.' v='.$suaddevent->{_v};
-
-	} else { 
-		print("suaddevent, v, missing v,\n");
-	 }
- }
-
-
 =head2 sub vel 
 
 
@@ -361,7 +298,7 @@ max index = number of input variables -1
  
 sub get_max_index {
  	  my ($self) = @_;
-	my $max_index = 7;
+    my $max_index = 4;
 
     return($max_index);
 }

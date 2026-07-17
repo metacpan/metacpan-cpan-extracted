@@ -1,5 +1,10 @@
 Revision history for Concierge-Sessions
 
+v0.11.2  2026-07-16
+    - SQLite.pm: guard DESTROY against an already-undef $self->{dbh}
+      during global destruction (Perl does not guarantee object
+      destruction order at program exit); prevents a fatal error.
+
 v0.11.1  2026-05-25
     - Expand test coverage across all test files
 

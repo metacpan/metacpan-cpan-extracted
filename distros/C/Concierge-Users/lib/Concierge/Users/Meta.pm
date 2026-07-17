@@ -1,4 +1,4 @@
-package Concierge::Users::Meta v0.9.2;
+package Concierge::Users::Meta v0.9.3;
 use v5.36;
 use Carp qw/ croak carp /;
 use YAML::Tiny;
@@ -1023,7 +1023,7 @@ sub validate_name_field {
 		label => 'Created Date',
 		description => 'Timestamp when user account was created',
 		type => 'timestamp',
-		required => 1,
+		required => 0,
 		options => [],
 		default => '0000-00-00 00:00:00',
 		null_value => '0000-00-00 00:00:00',
@@ -1148,7 +1148,7 @@ utilities for Concierge::Users
 
 =head1 VERSION
 
-v0.9.2
+v0.9.3
 
 =head1 SYNOPSIS
 
@@ -1317,8 +1317,7 @@ default C<0000-00-00 00:00:00>
 
 =item B<last_mod_date> -- type C<timestamp>, updated on every write
 
-=item B<created_date> -- type C<timestamp>, set once on creation,
-C<required =E<gt> 1>
+=item B<created_date> -- type C<timestamp>, set once on creation
 
 =back
 
@@ -1773,7 +1772,7 @@ __DATA__
 ################################################################################
 
 Configuration:
-  Version: v0.9.2
+  Version: v0.9.3
   Backend: Concierge::Users::Database  # Default; can be 'database', 'file', or 'yaml'
   Storage Directory: /path/to/storage  # Set during setup
   Generated: 2026-01-06 19:10:18
@@ -2007,7 +2006,7 @@ Field Definitions:
     created_date:
       field_name: created_date
       type: timestamp
-      required: 1
+      required: 0
       default: "0000-00-00 00:00:00"
       description: "Timestamp when user account was created"
       max_length: 19

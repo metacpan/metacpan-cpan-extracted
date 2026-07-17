@@ -26,13 +26,15 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.7.0
+    version: v5.7.1
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
     file: lib/Sisimai/Address.pm
   Sisimai::DateTime:
     file: lib/Sisimai/DateTime.pm
+  Sisimai::Eb:
+    file: lib/Sisimai/Eb.pm
   Sisimai::Fact:
     file: lib/Sisimai/Fact.pm
   Sisimai::Fact::JSON:
@@ -288,7 +290,7 @@ requires:
   Time::Local: '1.19'
   Time::Piece: '1.29'
   perl: v5.26.0
-version: v5.7.0
+version: v5.7.1
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

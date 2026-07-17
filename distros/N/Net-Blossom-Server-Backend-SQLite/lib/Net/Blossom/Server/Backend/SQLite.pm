@@ -14,7 +14,7 @@ use Net::Blossom::Server::BlobResult;
 use Net::Blossom::Server::MetadataStore;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 sub BUILDARGS {
     my $class = shift;
@@ -76,6 +76,17 @@ sub get_blob {
     return Net::Blossom::Server::BlobResult->new(
         descriptor => $self->_descriptor($row),
         body       => $body,
+    );
+}
+
+sub get_blob_range {
+    my ($self, $sha256, %opts) = @_;
+    my $row = $self->metadata_store->find_blob($sha256);
+    return unless defined $row;
+    return $self->blob_store->get_blob_range(
+        $row->{storage_key},
+        %opts,
+        size => $row->{size},
     );
 }
 
@@ -194,7 +205,7 @@ sub _migrate_legacy_schema {
         });
         $dbh->do(q{
             INSERT INTO blossom_blob_data (storage_key, body)
-            SELECT sha256, body FROM blossom_blobs_legacy
+            SELECT sha256, CAST(body AS BLOB) FROM blossom_blobs_legacy
         });
         $dbh->do(q{
             CREATE TABLE blossom_blobs (
@@ -462,6 +473,11 @@ to the writer and later calls C<commit> with validated blob metadata.
 
 Returns a L<Net::Blossom::Server::BlobResult> for C<$sha256>, or C<undef> when
 the blob is absent.
+
+=head2 get_blob_range
+
+Returns one requested byte range as a scalar, or C<undef> when the blob is
+absent. SQLite extracts the range without returning the complete BLOB to Perl.
 
 =head2 head_blob
 

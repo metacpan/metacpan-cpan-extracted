@@ -1,0 +1,33 @@
+Revision history for Catalyst-Plugin-MCP
+
+0.003     2026-07-16
+          - Genericise the perl_critic author test comment.
+          - Require Catalyst::Plugin::JSONRPC::Server 0.003, the first released
+            version carrying the 202 empty-status API that mcp_dispatch needs
+            (0.001 and 0.002 were never released).
+
+0.002     unreleased
+          - Version bump so consumers reliably install the current code over any
+            0.001 already present in an environment (cpanm treats same-version as
+            satisfied); no code change from the 0.001 line below.
+          - Require Catalyst::Plugin::JSONRPC::Server 0.002: mcp_dispatch passes
+            the $empty_status (202) argument to jsonrpc_dispatch_with, which only
+            exists in JSONRPC::Server 0.002. Pinning prevents pairing with an
+            incompatible 0.001 (which would die "Too many arguments").
+          - Initial version: Model Context Protocol (2025-06-18) server plugin
+            for Catalyst, layered on Catalyst::Plugin::JSONRPC::Server.
+          - The default server_info version is derived from the module VERSION
+            instead of a hardcoded 0.001, which had gone stale at the 0.002 bump
+            and advertised the wrong version out of the box.
+          - Catalyst::Plugin::MCP::Server has POD: it is the public engine but
+            carried none, so it had no abstract on MetaCPAN. The plugin itself
+            gains METHODS, CONFIGURATION and SECURITY sections.
+          - SECURITY documents that this plugin ships no authentication and no
+            Origin validation, and that mcp_dispatch runs provider code for
+            anyone who can POST to it. The Streamable HTTP transport requires
+            Origin validation and recommends authentication; both are the
+            application's job and must be layered in front of mcp_dispatch.
+          - mcp_dispatch returns HTTP 202 Accepted (not 204) for a POST that
+            carries only responses/notifications, per the Streamable HTTP
+            transport. Requires the updated Catalyst::Plugin::JSONRPC::Server
+            (the $empty_status argument to jsonrpc_dispatch_with).

@@ -12,11 +12,12 @@ build_requires:
   ok: '0'
   perl: v5.26.0
 configure_requires:
+  Alien::RtMidi: '0.12'
   ExtUtils::MakeMaker: '0'
   FFI::Build::MM: '0.83'
   perl: v5.26.0
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,27 +33,26 @@ no_index:
 provides:
   MIDI::RtMidi::FFI:
     file: lib/MIDI/RtMidi/FFI.pm
-    version: '0.10'
+    version: '0.12'
   MIDI::RtMidi::FFI::AbstractDevice:
     file: lib/MIDI/RtMidi/FFI/AbstractDevice.pm
-    version: '0.10'
+    version: '0.12'
   MIDI::RtMidi::FFI::Device:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.10'
+    version: '0.12'
   MIDI::RtMidi::FFI::Device::In:
     file: lib/MIDI/RtMidi/FFI/Device/In.pm
-    version: '0.10'
+    version: '0.12'
   MIDI::RtMidi::FFI::Device::Out:
     file: lib/MIDI/RtMidi/FFI/Device/Out.pm
-    version: '0.10'
+    version: '0.12'
   RtMidiIn:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.10'
+    version: '0.12'
   RtMidiOut:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.10'
+    version: '0.12'
 requires:
-  Alien::RtMidi: '0.12'
   FFI::CheckLib: '0.25'
   FFI::Platypus: '2.00'
   FFI::Platypus::Buffer: '0'
@@ -69,10 +69,10 @@ requires:
   experimental: '0'
   perl: v5.26.0
 resources:
-  bugtracker: https://github.com/jbarrett/MIDI-RtMidi-FFI/issues
-  homepage: https://github.com/jbarrett/MIDI-RtMidi-FFI
-  repository: https://github.com/jbarrett/MIDI-RtMidi-FFI.git
-version: '0.10'
+  bugtracker: https://codeberg.org/jbarrett/Alien-RtMidi/issues
+  homepage: https://codeberg.org/jbarrett/Alien-RtMidi/
+  repository: https://codeberg.org/jbarrett/Alien-RtMidi.git
+version: '0.12'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

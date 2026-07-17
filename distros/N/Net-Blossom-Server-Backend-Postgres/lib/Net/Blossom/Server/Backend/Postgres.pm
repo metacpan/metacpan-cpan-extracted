@@ -14,7 +14,7 @@ use Net::Blossom::Server::BlobResult;
 use Net::Blossom::Server::MetadataStore;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 sub BUILDARGS {
     my $class = shift;
@@ -81,6 +81,17 @@ sub get_blob {
     return Net::Blossom::Server::BlobResult->new(
         descriptor => $self->_descriptor($row),
         body       => $body,
+    );
+}
+
+sub get_blob_range {
+    my ($self, $sha256, %opts) = @_;
+    my $row = $self->metadata_store->find_blob($sha256);
+    return unless defined $row;
+    return $self->blob_store->get_blob_range(
+        $row->{storage_key},
+        %opts,
+        size => $row->{size},
     );
 }
 
@@ -475,6 +486,12 @@ new blob is imported as a PostgreSQL large object transactionally.
 Returns a L<Net::Blossom::Server::BlobResult> for C<$sha256>, or C<undef> when
 the blob is absent. Its body is a stream backed by a dedicated DBI connection.
 Reading to EOF or calling C<close> releases that connection.
+
+=head2 get_blob_range
+
+Returns one requested byte range as a positioned, bounded large-object stream,
+or C<undef> when the blob is absent. Reading the range or calling C<close>
+releases its dedicated DBI connection.
 
 =head2 head_blob
 

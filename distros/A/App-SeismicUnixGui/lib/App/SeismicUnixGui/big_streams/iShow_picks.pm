@@ -78,6 +78,7 @@ my $suxwigb    = suxwigb->new();
 my $suximage   = suximage->new();
 my $Project    = Project_config->new();
 my $SuMessages = SuMessages->new();
+my $purpose    = $get->purpose();
 
 =head2
 
@@ -312,12 +313,17 @@ sub calcNdisplay {
     
     # geopsy plot preference for JML
 	if (    length $iShow_picks->{_purpose}
-		and $iShow_picks->{_purpose} eq 'geopsy'
+		and $iShow_picks->{_purpose} eq $purpose->{_geopsy}
 		and $iShow_picks->{_max_x1} > $iShow_picks->{_min_x1} ) {
 
-		$suxwigb->x1beg( $iShow_picks->{_max_x1} );
-		$suxwigb->x1end( $iShow_picks->{_min_x1} );
-#		print("iShow_picks, suximage with \'geopsy\' purpose\n");
+		# print("iShow_picks, suximage with \'geopsy\' purpose\n");
+    # frequency is hzntl and velocity is vertical in geopsy, 
+    # so the x axis is reversed compared to a normal seismic plot.
+    $suximage->orientation('normal');
+    $suximage->box_width(800);
+    $suximage->box_height(400);
+    $suximage->ylabel( quotemeta('frequency Hz') );
+    $suximage->cmap('hsv2');
 		
 	} else {
 		$suxwigb->x1beg( $iShow_picks->{_min_x1} );
@@ -384,12 +390,11 @@ sub calcNdisplay {
     
     # geopsy plot preference for JML
 	if (    length $iShow_picks->{_purpose}
-		and $iShow_picks->{_purpose} eq 'geopsy'
+  
+		and $iShow_picks->{_purpose} eq $purpose->{_geopsy}
 		and $iShow_picks->{_max_x1} > $iShow_picks->{_min_x1} ) {
 
-		$suxwigb->x1beg( $iShow_picks->{_max_x1} );
-		$suxwigb->x1end( $iShow_picks->{_min_x1} );
-		print("iShow_picks, suxwigb with \'geopsy\' purpose\n");
+		# print("iShow_picks, suxwigb with \'geopsy\' purpose\n");
 		
 	} else {
 		$suxwigb->x1beg( $iShow_picks->{_min_x1} );
@@ -463,12 +468,18 @@ sub calcNdisplay {
 
 =cut
 
+  if ($iShow_picks->{_purpose} eq $purpose->{_geopsy}) {
+
+    # for suximage
+     $run->flow( \$flow[2] );
+
+  }else {
     # for suxwigb
     $run->flow( \$flow[1] );
 
     # for suximage
     $run->flow( \$flow[2] );
-
+  }
 =head2
 
   LOG FLOW(S)TO SCREEN AND FILE

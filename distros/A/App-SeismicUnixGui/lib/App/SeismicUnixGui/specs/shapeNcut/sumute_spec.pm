@@ -20,7 +20,7 @@ my $flow_type           = $get->flow_type_href();
 my $DATA_SEISMIC_BIN  	= $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_SEGY  	= $Project->DATA_SEISMIC_SEGY();
 my $DATA_SEISMIC_SU  	= $Project->DATA_SEISMIC_SU();    # output data directory
-my $DATA_SEISMIC_TXT  	= $Project->DATA_SEISMIC_TXT();   # output data directory
+my $DATA_SEISMIC_TXT  	= $Project->DATA_SEISMIC_TXT();   # input data directory
 my $PL_SEISMIC		    = $Project->PL_SEISMIC();
 my $PS_SEISMIC  		= $Project->PS_SEISMIC();
 my $max_index           = 16;
@@ -71,7 +71,7 @@ my $max_index           = 16;
 	my @index;
 
 	# first binding index (index=0)
-	# connects to second item (index=1)
+	# connects to fourth item (index=3)
 	# in the parameter list
 	$index[0] = 3; # inbound/outbound item is bound
 	$index[1] = 4; # inbound/outbound item is bound
@@ -111,7 +111,7 @@ one type of dialog for each index
 	# bound index will look for data
 	$type[$index[0]] = $file_dialog_type->{_Data_SEISMIC_TXT};
 	$type[$index[1]] = $file_dialog_type->{_Data};
-	$type[$index[2]] = $file_dialog_type->{_Data_PL_SEISMIC};
+	$type[$index[2]] = $file_dialog_type->{_Data_SEISMIC_TXT};
 	$type[$index[3]] = $file_dialog_type->{_Data_PL_SEISMIC};
 	$type[$index[4]] = $file_dialog_type->{_Data_PL_SEISMIC};
 	$type[$index[5]] = $file_dialog_type->{_Data_PL_SEISMIC};
@@ -351,7 +351,7 @@ are filtered by sunix_pl
 	$prefix[ $index[1] ] =  '$DATA_SEISMIC_SU' . ".'/'.";
  
 	# label 9 in GUI is input/output xx_file and needs a home directory
-	$prefix[ $index[2] ] =  '$PL_SEISMIC' . ".'/'.";
+	$prefix[ $index[2] ] =  '$DATA_SEISMIC_TXT' . ".'/'.";
  
 	# label 10 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[3] ] =  '$PL_SEISMIC' . ".'/'.";

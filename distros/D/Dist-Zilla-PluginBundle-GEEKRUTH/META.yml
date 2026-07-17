@@ -25,10 +25,10 @@ name: Dist-Zilla-PluginBundle-GEEKRUTH
 provides:
   Dist::Zilla::MintingProfile::GEEKRUTH:
     file: lib/Dist/Zilla/MintingProfile/GEEKRUTH.pm
-    version: '4.0002'
+    version: '4.0003'
   Dist::Zilla::PluginBundle::GEEKRUTH:
     file: lib/Dist/Zilla/PluginBundle/GEEKRUTH.pm
-    version: '4.0002'
+    version: '4.0003'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::Authority: '0'
@@ -92,7 +92,7 @@ resources:
   bugtracker: https://codeberg.org/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH/issues
   homepage: https://p3rl.org/Dist::Zilla::PluginBundle::GEEKRUTH
   repository: ssh://git@codeberg.org/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH.git
-version: '4.0002'
+version: '4.0003'
 x_author_pledge:
   version: 1
 x_authority: cpan:GEEKRUTH

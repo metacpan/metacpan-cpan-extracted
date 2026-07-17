@@ -1,0 +1,73 @@
+{
+   "abstract" : "Filesystem storage backend for Net::Blossom::Server",
+   "author" : [
+      "Net::Blossom contributors"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Blossom-Server-Backend-Filesystem",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "strictures" : "2"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.23",
+            "Test::Pod" : "1.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Tiny" : "1.001",
+            "Crypt::PRNG" : "0",
+            "File::Sync" : "0.11",
+            "Net::Blossom" : "0.001001",
+            "Net::Blossom::Server" : "0.001003",
+            "perl" : "5.016",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Net::Blossom::Server::Backend::SQLite" : "0.001002",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/NicholasBHubbard/Net-Blossom/issues"
+      },
+      "homepage" : "https://github.com/NicholasBHubbard/Net-Blossom",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/NicholasBHubbard/Net-Blossom.git",
+         "web" : "https://github.com/NicholasBHubbard/Net-Blossom"
+      }
+   },
+   "version" : "0.001001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

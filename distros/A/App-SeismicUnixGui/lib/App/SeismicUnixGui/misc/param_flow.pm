@@ -288,7 +288,7 @@ sub insert_selection {
 =head2 sub delete_selection
 
  delete parameter names and values
- of on one  selected item
+ belonging to one selected item
 
 =cut
 

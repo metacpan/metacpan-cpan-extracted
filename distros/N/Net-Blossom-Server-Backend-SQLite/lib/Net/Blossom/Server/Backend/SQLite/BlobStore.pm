@@ -48,6 +48,26 @@ sub get_blob {
     return $body;
 }
 
+sub get_blob_range {
+    my ($self, $storage_key, %opts) = @_;
+    my %known = map { $_ => 1 } qw(offset length size);
+    my @unknown = grep { !$known{$_} } keys %opts;
+    croak "unknown option(s): " . join(', ', sort @unknown) if @unknown;
+    _range_options(\%opts);
+    croak "range exceeds BLOB size"
+        if defined $opts{size}
+        && $opts{offset} + $opts{length} > $opts{size};
+
+    my ($body) = $self->dbh->selectrow_array(
+        q{SELECT substr(CAST(body AS BLOB), ?, ?) FROM blossom_blob_data WHERE storage_key = ?},
+        undef,
+        $opts{offset} + 1,
+        $opts{length},
+        $storage_key,
+    );
+    return $body;
+}
+
 sub delete_blob {
     my ($self, $storage_key) = @_;
     croak "blob deletion requires an active transaction"
@@ -82,6 +102,19 @@ sub _constructor_args {
     return %{$_[0]} if @_ == 1 && ref($_[0]) eq 'HASH';
     croak "constructor arguments must be name/value pairs" if @_ % 2;
     return @_;
+}
+
+sub _range_options {
+    my ($opts) = @_;
+    croak "offset must be a non-negative integer"
+        unless defined $opts->{offset}
+        && !ref($opts->{offset})
+        && $opts->{offset} =~ /\A[0-9]+\z/;
+    croak "length must be a positive integer"
+        unless defined $opts->{length}
+        && !ref($opts->{length})
+        && $opts->{length} =~ /\A[1-9][0-9]*\z/;
+    return;
 }
 
 {
@@ -129,7 +162,7 @@ sub _constructor_args {
 
         my $storage_key = $metadata{sha256};
         $self->{store}->dbh->do(
-            q{INSERT OR IGNORE INTO blossom_blob_data (storage_key, body) VALUES (?, ?)},
+            q{INSERT OR IGNORE INTO blossom_blob_data (storage_key, body) VALUES (?, CAST(? AS BLOB))},
             undef,
             $storage_key,
             $body,
@@ -230,6 +263,13 @@ the top-level SQLite backend manages this transaction.
 =head2 get_blob
 
 Returns bytes by storage key or C<undef>.
+
+=head2 get_blob_range
+
+Uses SQLite C<substr> to return the requested zero-based C<offset> and positive
+C<length> without materializing the complete BLOB in Perl. Returns C<undef> when
+the storage key is absent. When C<size> is supplied, a range beyond it is
+rejected.
 
 =head2 delete_blob
 

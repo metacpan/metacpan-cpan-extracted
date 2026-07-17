@@ -1,4 +1,6 @@
 #!/bin/bash
+# Catch errors in piped commands
+set -euo pipefail
 
 # see if global variable is set
 # SeismicUnixGui_script is a global variable for locating the script folder
@@ -10,6 +12,18 @@
  	echo " export SeismicUnixGui_script=/Location/of/script/folder "
  	
  else
-	perl $SeismicUnixGui_script/L_SU_project_selector.pl
-	perl $SeismicUnixGui_script/L_SU.pl
+ 
+   # Find the correct perl to use before executing *.pl
+   # Copy paste and executre this file into the current shell
+   # $(...) captures the output
+    source "${SeismicUnixGui_script}/find_system_perl.sh"
+
+    SYSTEM_PERL="$(find_system_perl)"
+    # echo "Using: $SYSTEM_PERL"
+    # under set -euo pipefail
+    # first script exits with a failure code if user cancels
+    # we need to ignore failure of first script
+	  "$SYSTEM_PERL" "$SeismicUnixGui_script/L_SU_project_selector.pl" || true
+	  "$SYSTEM_PERL" "$SeismicUnixGui_script/L_SU.pl"
+
  fi

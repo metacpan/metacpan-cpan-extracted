@@ -18,7 +18,7 @@
      NEW:   read iTop_Mute3.config text file
      OLD:   import perl variables from 
              *.pm configuration file xi
-            within ta local libAll 
+            within a local libAll 
             subdirectory
     binheader is used for everything serious
     gather is to be used to texting
@@ -84,7 +84,7 @@ my $iTM_Tk = {_prompt => ''};
 
 my $iTM             = iTopMute->new();
 my $iTopMute_config = iTopMute_config->new();
-my $read            = readfiles->new();
+# my $read            = readfiles->new();
 my $get             = L_SU_global_constants->new();
 my $var             = $get->var();
 my $xk      		= xk->new();

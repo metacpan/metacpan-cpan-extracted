@@ -120,6 +120,15 @@ subtest 'legacy combined schema is migrated without data loss' => sub {
         [$sha256, $body],
         'legacy bytes move to the blob table',
     );
+    is(
+        $legacy_dbh->selectrow_array(
+            q{SELECT typeof(body) FROM blossom_blob_data WHERE storage_key = ?},
+            undef,
+            $sha256,
+        ),
+        'blob',
+        'migrated bytes use the SQLite BLOB storage class',
+    );
     is_deeply($legacy_dbh->selectall_arrayref('PRAGMA foreign_key_check'), [],
         'migrated foreign keys are valid');
 };

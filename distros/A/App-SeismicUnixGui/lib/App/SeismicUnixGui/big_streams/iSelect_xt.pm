@@ -253,21 +253,27 @@ sub calcNdisplay {
 	$suximage->ylabel( quotemeta('TWTT s') );
 	$suximage->xlabel( $iSelect_xt->{_offset_type} );
 	$suximage->legend($on);
-	$suximage->cmap('hsv2');
+	$suximage->cmap('rgb0');
 	$suximage->loclip( $iSelect_xt->{_min_amplitude} );
 	$suximage->hiclip( $iSelect_xt->{_max_amplitude} );
 
 	# purposes can refine the style of plots
 	# geopsy plot preference for JML
 	if (    length $iSelect_xt->{_purpose}
-		and $iSelect_xt->{_purpose} eq 'geopsy'
+		and $iSelect_xt->{_purpose} eq $purpose->{_geopsy}
 		and $iSelect_xt->{_max_x1} > $iSelect_xt->{_min_x1} )
 	{
 
-		$suximage->x1beg( $iSelect_xt->{_max_x1} );
-		$suximage->x1end( $iSelect_xt->{_min_x1} );
-
-		#		print("iSelect_xt, \n");
+		# $suximage->x1beg( $iSelect_xt->{_max_x1} );
+		# $suximage->x1end( $iSelect_xt->{_min_x1} );
+	    # frequency is hzntl and velocity is vertical in geopsy, 
+        # so the x axis is reversed compared to a normal seismic plot.
+        $suximage->orientation('normal');
+		$suximage->ylabel( quotemeta('frequency Hz') );
+		$suximage->box_width(800);
+	    $suximage->box_height(400);
+		$suximage->cmap('hsv2');
+		#  print("iSelect_xt, \n");
 
 	}
 	else {
@@ -321,15 +327,19 @@ sub calcNdisplay {
 
 	# purposes can refine the style of plots
 	# geopsy plot preference for JML
-	if (    length $iSelect_xt->{_purpose}
-		and $iSelect_xt->{_purpose} eq 'geopsy'
+	if ( length $iSelect_xt->{_purpose}
+		and $iSelect_xt->{_purpose} eq $purpose->{_geopsy}
 		and $iSelect_xt->{_max_x1} > $iSelect_xt->{_min_x1} )
 	{
 
-		$suxwigb->x1beg( $iSelect_xt->{_max_x1} );
-		$suxwigb->x1end( $iSelect_xt->{_min_x1} );
+		# $suxwigb->x1beg( $iSelect_xt->{_max_x1} );
+		# $suxwigb->x1end( $iSelect_xt->{_min_x1} );
 
-		#		print("iSelect_xt, suxwigb with \'geopsy\' purpose\n");
+		# frequency is hzntl and velocity is vertical in geopsy, 
+        # so the x axis is reversed compared to a normal seismic plot.
+		# $suximage->orientation('normal');
+		# $suximage->ylabel( quotemeta('frequency Hz') );
+        print("iSelect_xt, suxwigb with \'geopsy\' purpose\n");
 
 	}
 	else {
@@ -357,9 +367,9 @@ sub calcNdisplay {
 =head2 DEFINE FLOW(S)
 
 In interactive mode:
-First time you see the image, number_of_tries =0
+First time you see the image, number_of_tries = 0
 For second, third ... times, number_of_tries >0
-The pick file can be saved
+The pick file can be saved.
 
 =cut
 
@@ -374,12 +384,12 @@ The pick file can be saved
 
 			# CASE 1A: With geopsy and no filter
 #			$sugain[1],              $to,
-			@items = (
-				$suwind[1],  $in, $iSelect_xt->{_inbound}, $to,
-				$suwind[2],  $to, 
-				$suxwigb[1], $go
-			);
-			$flow[1] = $run->modules( \@items );
+			# @items = (
+			# 	$suwind[1],  $in, $iSelect_xt->{_inbound}, $to,
+			# 	$suwind[2],  $to, 
+			# 	$suxwigb[1], $go
+			# );
+			# $flow[1] = $run->modules( \@items );
 
 #			print("iSelect_xt,  CASE1: \n $flow[1]\n");
 #							$sugain[1],              $to,
@@ -398,13 +408,13 @@ The pick file can be saved
 		{
 
 			# CASE 2: With geopsy and  filter
-			@items = (
-				$suwind[1],  $in,
-				$iSelect_xt->{_inbound}, $to,
-				$suwind[2],  $to, $sufilter[1],$to,
-				$suxwigb[1], $go
-			);
-			$flow[1] = $run->modules( \@items );
+			# @items = (
+			# 	$suwind[1],  $in,
+			# 	$iSelect_xt->{_inbound}, $to,
+			# 	$suwind[2],  $to, $sufilter[1],$to,
+			# 	$suxwigb[1], $go
+			# );
+			# $flow[1] = $run->modules( \@items );
 #			print("iSelect_xt, CASE2: \n $flow[1]\n");
 
 # 				$sugain[1], $to, 
@@ -472,11 +482,18 @@ The pick file can be saved
 
 =cut
 
-	# for suxwigb
-	$run->flow( \$flow[1] );
+	if($iSelect_xt->{_purpose} eq $purpose->{_geopsy})
+	{	
+		# for suximage
+		$run->flow( \$flow[2] );
 
-	# for suximage
-	$run->flow( \$flow[2] );
+	} else {
+		# for suxwigb
+		$run->flow( \$flow[1] );
+
+		# for suximage
+		$run->flow( \$flow[2] );
+	}
 
 =head2 LOG FLOW(S)
 

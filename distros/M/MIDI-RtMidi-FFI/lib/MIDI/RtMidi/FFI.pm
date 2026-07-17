@@ -11,7 +11,7 @@ use IO::Handle;
 use IO::Socket qw/ AF_UNIX SOCK_STREAM PF_UNSPEC /;
 use Carp;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 # ABSTRACT: Bindings for librtmidi - Realtime MIDI library
 
@@ -292,7 +292,7 @@ MIDI::RtMidi::FFI - Bindings for librtmidi - Realtime MIDI library
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -506,13 +506,15 @@ L<MIDI::Realtime>
 
 =head1 CONTRIBUTING
 
-L<https://github.com/jbarrett/MIDI-RtMidi-FFI>
+L<https://codeberg.org/jbarrett/MIDI-RtMidi-FFI>
 
-All comments and contributions welcome.
+LLM-generated (or "assisted") contributions are not welcome.
+
+All other comments and contributions welcome.
 
 =head1 BUGS AND SUPPORT
 
-Please direct all requests to L<https://github.com/jbarrett/MIDI-RtMidi-FFI/issues>
+Please direct all requests to L<https://codeberg.org/jbarrett/MIDI-RtMidi-FFI/issues>
 
 =head1 AUTHOR
 

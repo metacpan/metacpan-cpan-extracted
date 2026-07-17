@@ -1,0 +1,29 @@
+.perlcriticrc
+AGENTS.md
+Changes
+CONTRIBUTING.md
+cpanfile
+examples/README.md
+examples/app.psgi
+examples/client.pl
+examples/lib/Example/JSONRPC.pm
+examples/lib/Example/JSONRPC/Controller/Root.pm
+lib/Catalyst/Plugin/JSONRPC/Server.pm
+lib/Catalyst/Plugin/JSONRPC/Server/Dispatcher.pm
+lib/Catalyst/Plugin/JSONRPC/Server/Error.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/catalyst-app.t
+t/dispatcher-batch-notifications.t
+t/dispatcher-errors.t
+t/dispatcher-single.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/perl_critic.t
+t/plugin-context.t
+t/plugin-dispatch-with.t
+t/plugin-hardening.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

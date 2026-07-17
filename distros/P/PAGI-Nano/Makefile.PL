@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "IO::Async" => "0.802",
     "Test2::V0" => "0.000159"
   },
-  "VERSION" => "0.001000",
+  "VERSION" => "0.001001",
   "test" => {
     "TESTS" => "t/*.t"
   }

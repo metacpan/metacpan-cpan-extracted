@@ -23,7 +23,7 @@
  ep is an appropriated gather header. 
  If you do not want to have ep defined as a gather header 
  variable, then the following is allowed:
- ep =0
+ ep = 0
  ep max=0
  ep min=0  
  
@@ -34,7 +34,7 @@
 
      base_file_name  	= 30Hz_All_geom_geom;
      gather_header  	= fldr;   (single gather type for picking)
-     offset_type  		= tracl;  (or, e.g., offset but only affects the label *)
+     offset_type  		= tracl;  
      first_gather   	= 1;
      gather_inc    		= 1;
      last_gather    	= 100;
@@ -45,12 +45,17 @@
      min_x1             = 15.873015           (Hz, for geopsy)
      max_x1             = 999.999             (Hz, for geopsy)
      purpose            = geopsy
+
+     In geopsy plotting is in 'normal' and not 'seismic' mode,
+     The x1 axis is frequency and the y axis is phase velocity
+
+     * Label displayed in the plot
+       header parameter value to digitize and use as Y-axis values for picking
+       If you want to digitize as a function of offset,
+       modify the d2 and f2 values prior to picking.
       
-      * if you want offset to be considered when plotting data
-      then modify the d2 and f2 values prior to picking.
-      
-      ** Define family of interactive user messages to use
-          SP or CDP
+     ** Used only to define family of interactive user messages to use
+        and can be either = SP or CDP
 
 =head2 Examples
 

@@ -1,0 +1,31 @@
+Revision history for Catalyst-Plugin-OAuth2-ResourceServer
+
+0.003     2026-07-16
+          - Genericise the example OAuth scopes (now example:*) and remove
+            downstream-application references from the README and the
+            perl_critic author test comment, so the distribution reads as
+            standalone. Examples and tests only; no functional change.
+
+0.002     Unreleased
+          - Version bump so consumers reliably install the current code over any
+            0.001 already present in an environment (cpanm treats same-version as
+            satisfied); no code change from the 0.001 line below.
+          - Initial MCP-profile OAuth 2.1 Resource Server.
+          - The iat claim is now verified. Crypt::JWT's verify_iat is asymmetric
+            with verify_exp/verify_nbf: omitting the key disables the check
+            entirely rather than validating when present, so a token with a
+            far-future iat was accepted. It is now passed as undef, which is the
+            only way to get validate-if-present. verify_nbf is passed explicitly
+            as undef too: same behaviour as before, but it documents itself.
+          - The RFC 9728 resource_metadata URL is derived only when the resource
+            is an http(s) URI with an authority, and omitted otherwise (it is
+            optional per RFC 9728). A non-hierarchical resource such as a URN
+            previously produced a malformed value, which the shipped example
+            emitted.
+          - Token-verification and subject-resolution failures no longer
+            interpolate the exception into the log. Both paths are
+            credential-adjacent: the resolver hook is handed the verified
+            claims, so its exception could carry them.
+          - WWW-Authenticate parameter values are escaped per the RFC 7230
+            quoted-string rules.
+          - t/00-load.t loads ::Server and ::Error as well as the plugin.

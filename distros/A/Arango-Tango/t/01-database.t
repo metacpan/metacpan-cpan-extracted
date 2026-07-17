@@ -68,7 +68,7 @@ ok exists($mode->{mode});
 
 my $id = eval { $arango->server_id };
 SKIP: {
-    skip "Not running in cluster mode" if $@ =~ /Internal Server Error/;
+    skip "Not running in cluster mode" if $arango->error =~ /Internal Server Error/;
 
     is ref($id), "HASH"; ## not sure, until some cluster user can confirm me
 
@@ -104,11 +104,8 @@ $arango->delete_database('tmp_');
 $ans = $arango->list_databases;
 ok !grep { /^tmp_$/ } @$ans, "tmp_ database was deleted";
 
-like(
-    dies { my $system_db = $arango->database("system"); },
-    qr/Arango::Tango.*Database not found/,
-    "Got exception"
-);
+is(dies { my $system_db = $arango->database("system"); }, "-1\n", "Got exception");
+like($arango->error, qr/Database not found/, "Got exception message");
 
 my $system = $arango->database("_system");
 isa_ok($system => "Arango::Tango::Database");

@@ -53,7 +53,7 @@ exists for the program in the
 1. populate the following file:
 ~/developer/code/sunix/nameNnumber.txt
 
-sukdmig3d 6
+e.g., sukdmig3d 6
 
 The first item is the module name
 The second item list is theThe name of the number of

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Catch errors in piped commands
+set -euo pipefail
+
 # starting variable definitions
 starting_points='/home /'
 priority_level='-O3'
@@ -20,9 +23,12 @@ echo -e "\n\tGLOBAL VARIABLES*********************"
  	echo -e " export SeismicUnixGui_script=/Location/of/script/folder \n"
  	
  else
+    
+	# run post_install_scripts.sh"
  	echo " "
         echo -e " Global variable SeismicUnixGui_script currently is:\
  ${SeismicUnixGui_script}\n"
+
  fi
  
 # Parameters to find a needed file
@@ -91,8 +97,15 @@ while [ $choice == $repeat ]; do
 	fi
 
  done
-echo -e "\n perl $script_name\n"
-perl $script_name
+
+# Find the correct perl to use before executing *.pl
+# Copy paste and executre this file into the current shell
+# $(...) captures the output
+source "${SeismicUnixGui_script}/find_system_perl.sh"
+SYSTEM_PERL="$(find_system_perl)"
+# echo "Using: $SYSTEM_PERL"	
+echo -e "\n $SYSTEM_PERL $script_name\n"
+exec "$SYSTEM_PERL" $script_name
 
 # finished with programs in Fortran
 
@@ -101,8 +114,8 @@ c_script_name=$(echo $script_name | sed -e 's/fortran/c/')
 echo -e "\nNow, looking for scripts to compile C code  ..."
 echo -e "\nNext script name=$c_script_name"
 echo "Looking for $c_script_name to compile  C code  ..."
-perl $c_script_name
+# echo "Running $SYSTEM_PERL $c_script_name"	
+exec "$SYSTEM_PERL" $c_script_name
 
 # env_script_name=$(echo $script_name | sed -e 's/fortran_compile/env/')
 # echo -e "environment script=$env_script_name"
-# sudo perl $env_script_name

@@ -1,5 +1,5 @@
-use v5.40;
-use experimental 'signatures';
+use strict;
+use warnings;
 use Test2::V0;
 use PAGI::StructuredParameters;
 use PAGI::StructuredParameters::Exception::InvalidArrayPointer;
@@ -68,7 +68,7 @@ subtest 'required works against data too' => sub {
         src_data => { title => 'x' },
     );
     my $seen;
-    my $cb = sub ($ctx, $missing) { $seen = $missing; die "stop\n" };
+    my $cb = sub { my ($ctx, $missing) = @_; $seen = $missing; die "stop\n" };
     eval { $sp->required('title', 'body', $cb) };
     is $seen, ['body'], 'missing nested-data key is reported';
 };

@@ -1,8 +1,9 @@
 Changes
 CONTRIBUTING.md
 lib/Concierge.pm
-lib/Concierge/Desk/Base.pm
+lib/Concierge/Desk/Component.pm
 lib/Concierge/Desk/Setup.pm
+lib/Concierge/Desk/UnavailableComponent.pm
 lib/Concierge/Desk/User.pm
 LICENSE
 Makefile.PL
@@ -17,6 +18,8 @@ t/03-user-lifecycle.t
 t/04-user-operations.t
 t/05-session-management.t
 t/06-cleanup-sync.t
+t/07-components.t
+t/08-promotion.t
 xt/session-timeout.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

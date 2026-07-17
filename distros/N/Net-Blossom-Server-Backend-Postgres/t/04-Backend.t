@@ -48,6 +48,14 @@ subtest 'blob descriptors use base URL and Postgres metadata' => sub {
     is_deeply(_large_object_oids($DBH), [$body_oid], 'upload creates one PostgreSQL large object');
 
     my $connections = _connection_count($DBH);
+    my $range = $storage->get_blob_range($sha256, offset => 9, length => 7);
+    is(_connection_count($DBH), $connections + 1,
+        'active range download owns a dedicated connection');
+    is(_read_stream($range, 100), 'backend',
+        'backend range retrieval returns only requested bytes');
+    is(_connection_count($DBH), $connections,
+        'range boundary releases the dedicated connection');
+
     my $result = $storage->get_blob($sha256);
     isa_ok($result, 'Net::Blossom::Server::BlobResult');
     my $stream = $result->body;

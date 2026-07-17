@@ -1,4 +1,4 @@
-package Concierge::Users::Database v0.9.2;
+package Concierge::Users::Database v0.9.3;
 use v5.36;
 use Carp qw/ croak /;
 use DBI;

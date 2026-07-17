@@ -1,4 +1,4 @@
-package Concierge::Sessions::SQLite v0.11.1;
+package Concierge::Sessions::SQLite v0.11.2;
 use v5.36;
 
 use parent 'Concierge::Sessions::Base';
@@ -291,7 +291,7 @@ sub delete_user_session {
 
 sub DESTROY {
     my ($self) = @_;
-    $self->{dbh}->disconnect;
+    $self->{dbh}->disconnect if defined $self->{dbh};
 }
 
 1;
@@ -304,7 +304,7 @@ Concierge::Sessions::SQLite - SQLite backend for session storage
 
 =head1 VERSION
 
-v0.11.1
+v0.11.2
 
 =head1 SYNOPSIS
 

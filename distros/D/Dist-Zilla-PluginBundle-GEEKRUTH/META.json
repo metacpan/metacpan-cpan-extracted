@@ -109,11 +109,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::GEEKRUTH" : {
          "file" : "lib/Dist/Zilla/MintingProfile/GEEKRUTH.pm",
-         "version" : "4.0002"
+         "version" : "4.0003"
       },
       "Dist::Zilla::PluginBundle::GEEKRUTH" : {
          "file" : "lib/Dist/Zilla/PluginBundle/GEEKRUTH.pm",
-         "version" : "4.0002"
+         "version" : "4.0003"
       }
    },
    "release_status" : "stable",
@@ -128,7 +128,7 @@
          "web" : "https://codeberg.org/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH"
       }
    },
-   "version" : "4.0002",
+   "version" : "4.0003",
    "x_author_pledge" : {
       "version" : 1
    },

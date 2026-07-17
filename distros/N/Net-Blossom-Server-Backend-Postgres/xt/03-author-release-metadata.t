@@ -7,9 +7,9 @@ plan skip_all => 'AUTHOR_TESTING is not set'
     unless $ENV{AUTHOR_TESTING};
 
 my $dist = "$FindBin::Bin/..";
-my $version = '0.001002';
+my $version = '0.001003';
 my $net_blossom_version = '0.001001';
-my $server_version = '0.001002';
+my $server_version = '0.001003';
 
 my $module = do {
     open my $fh, '<', "$dist/lib/Net/Blossom/Server/Backend/Postgres.pm"
@@ -31,7 +31,7 @@ my $makefile = do {
 like($makefile, qr/^\s*VERSION_FROM\s*=>\s*'lib\/Net\/Blossom\/Server\/Backend\/Postgres\.pm',/m, 'Makefile.PL uses VERSION_FROM');
 like($makefile, qr/^\s*'Net::Blossom'\s*=>\s*'\Q$net_blossom_version\E',/m, 'Makefile.PL depends on the released Net::Blossom version');
 like($makefile, qr/^\s*'Net::Blossom::Server'\s*=>\s*'\Q$server_version\E',/m, 'Makefile.PL depends on the component-contract server version');
-like($makefile, qr/^\s*'DBD::Pg'\s*=>\s*'2\.12\.0',/m, 'Makefile.PL requires pg_lo method support');
+like($makefile, qr/^\s*'DBD::Pg'\s*=>\s*'3\.16\.0',/m, 'Makefile.PL requires 64-bit pg_lo seek support');
 
 my $changes_path = "$dist/Changes";
 ok(-f $changes_path, 'Changes exists');
@@ -45,9 +45,12 @@ if (-f $changes_path) {
     like($changes, qr/^$version\s+\d{4}-\d{2}-\d{2}$/m, 'Changes records release version and date');
 
     my ($release_changes) = $changes =~ /^\Q$version\E\s+\d{4}-\d{2}-\d{2}\n(.*?)(?=^\S|\z)/ms;
-    like($release_changes, qr/metadata and large-object storage/, 'release records the component split');
-    like($release_changes, qr/Migrate the 0\.001001 large-object schema/, 'release records the schema migration');
+    like($release_changes, qr/byte ranges.*PostgreSQL large objects/, 'release records large-object range reads');
     unlike($release_changes, qr/C<[^>]+>/, 'release changes use plain text');
+
+    my ($component_changes) = $changes =~ /^0\.001002\s+2026-07-13\n(.*?)(?=^\S|\z)/ms;
+    like($component_changes, qr/metadata and large-object storage/, 'component release records the component split');
+    like($component_changes, qr/Migrate the 0\.001001 large-object schema/, 'component release records the schema migration');
 
     my ($previous_changes) = $changes =~ /^0\.001001\s+2026-07-13\n(.*?)(?=^\S|\z)/ms;
     like($previous_changes, qr/streamed PostgreSQL large objects/, 'previous release records the large-object migration');

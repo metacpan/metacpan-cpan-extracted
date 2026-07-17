@@ -48,9 +48,9 @@ over the first parameter input (base_file_name)
   	
    Version 0.03  All file without a suffix
   in which case the default PATH is the
-  path of PL_SEISMI	C
+  path of PL_SEISMIC
   
-  V 0.0.4 allows seros at start of file name
+  V 0.0.4 allows zeros at start of file name
 
 =cut 
 

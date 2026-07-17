@@ -54,6 +54,36 @@ my @tests = (
 		input   => 'You are not right!',
 		html	=> 'You are not right&excl;',
 		xml	=> 'You are not right!',
+	}, {
+		name	=> 'Trade mark symbol',
+		input   => "Acme\x{2122}",
+		html	=> 'Acme&trade;',
+		xml	=> 'Acme&#x2122;',
+	}, {
+		name	=> 'c with caron',
+		input   => "\x{010D}",
+		html	=> '&ccaron;',
+		xml	=> '&#x10D;',
+	}, {
+		name	=> 'Z with caron (capital)',
+		input   => "\x{017D}",
+		html	=> '&Zcaron;',
+		xml	=> '&#x17D;',
+	}, {
+		name	=> 'Z with caron in word (XML uses numeric entity)',
+		input   => "SURN \x{017D}ganjar",
+		html	=> 'SURN &Zcaron;ganjar',
+		xml	=> 'SURN &#x17D;ganjar',
+	}, {
+		name	=> 'zcaron HTML entity in input decoded to numeric in XML',
+		input   => 'An&zcaron;link',
+		html	=> 'An&zcaron;link',
+		xml	=> 'An&#x17E;link',
+	}, {
+		name	=> 'I circumflex (U+00CE) HTML named entity correct spelling',
+		input   => "\x{00CE}",
+		html	=> '&Icirc;',
+		xml	=> '&#x0CE;',
 	},
 );
 
@@ -88,7 +118,7 @@ throws_ok {
 } qr/^Usage:.+wide_to_html\(/, 'Missing string param throws';
 
 throws_ok {
-	wide_to_xml()
-} qr/^Usage:.+wide_to_xml\(/, 'Missing string param throws';
+	wide_to_xml(string => undef)
+} qr/Usage: wide_to_xml\(\) string not set/, 'Missing string param throws';
 
 done_testing();

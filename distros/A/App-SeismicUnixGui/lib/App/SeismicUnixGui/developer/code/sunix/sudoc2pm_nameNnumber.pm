@@ -85,9 +85,9 @@ my $inbound = './' . 'nameNnumber'.'.txt';
 		my @sunix_category_number	    = @$sunix_category_number_aref;
 		
 		
-#print("sudoc2pm_nameNnumber,selected_program_name=@{$array[0]}\n");			
-#print("sudoc2pm_nameNnumber,selected_program_name=@selected_program_name\n");
-#print("sudoc2pm_nameNnumber,sunix_category_number=@sunix_category_number\n");		
+# print("sudoc2pm_nameNnumber,selected_program_name=@{$array[0]}\n");			
+# print("sudoc2pm_nameNnumber,selected_program_name=@selected_program_name\n");
+# print("sudoc2pm_nameNnumber,sunix_category_number=@sunix_category_number\n");		
 
 sub get_selected_program_name {
 

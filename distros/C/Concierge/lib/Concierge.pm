@@ -1,7 +1,7 @@
-package Concierge v0.9.0;
+package Concierge v0.10.0;
 use v5.36;
 
-our $VERSION = 'v0.9.0';
+our $VERSION = 'v0.10.0';
 
 # ABSTRACT: Service layer orchestrator for authentication, sessions, and user data
 
@@ -158,6 +158,62 @@ sub open_desk ($class, $desk_location) {
 	};
 	return { success => 0, message => "Failed to initialize auth backend: $@" } if $@;
 	$concierge->{auth} = $auth;
+
+	# Load any additional components declared in concierge.conf's
+	# 'components' block (populated at build time by build_desk() -- see
+	# Concierge::Desk::Setup). Unlike sessions/auth/users above, this is a
+	# generic loop: each component's class is require()d and constructed
+	# with the payload build_desk() persisted for it. A required
+	# component's new() failure is an uncaught exception -- a desk must
+	# never open half-instantiated. An optional component's new() failure
+	# is substituted with a Concierge::Desk::UnavailableComponent stand-in
+	# instead. See Concierge::Desk::Component for the full contract.
+	for my $name (keys %{ $concierge_config->{components} // {} }) {
+		my $entry = $concierge_config->{components}{$name};
+		my $comp;
+		eval {
+			(my $file = $entry->{class}) =~ s{::}{/}g;
+			require "$file.pm";
+			$comp = $entry->{class}->new($entry->{payload});
+		};
+		if ($@) {
+			if ($entry->{optional}) {
+				require Concierge::Desk::UnavailableComponent;
+				$comp = Concierge::Desk::UnavailableComponent->new(
+					name => $name, reason => $@,
+				);
+			} else {
+				croak "Failed to load required component '$name' ($entry->{class}): $@";
+			}
+		}
+		$concierge->{$name} = $comp;
+		unless ($concierge->can($name)) {
+			no strict 'refs';
+			*{"Concierge::$name"} = sub { $_[0]->{$name} };
+		}
+
+		# Replay this component's 'promote' entries, already fully
+		# validated once, at build time, by build_desk() -- shape,
+		# method-existence (can()), and name-collisions. open_desk()
+		# performs none of that validation itself; concierge.conf is
+		# trusted completely. A forwarding sub calling ->$method_name
+		# on an UnavailableComponent stand-in resolves via its
+		# AUTOLOAD and returns the standard failure hashref, with no
+		# special-casing needed here.
+		if (defined $entry->{promote}) {
+			my $promote = $entry->{promote};
+			my @pairs = ref $promote eq 'HASH'
+				? (map { [$_, $promote->{$_}] } keys %$promote)
+				: (map { [$_, $_] } @$promote);
+			for my $pair (@pairs) {
+				my ($top_name, $method_name) = @$pair;
+				unless ($concierge->can($top_name)) {
+					no strict 'refs';
+					*{"Concierge::$top_name"} = sub { shift->{$name}->$method_name(@_) };
+				}
+			}
+		}
+	}
 
 	return { success => 1, message => 'Welcome!', concierge => $concierge };
 }
@@ -800,6 +856,16 @@ sub logout_user ($self, $session_id) {
     };
 }
 
+# Snapshot of Concierge's own method names, taken once when this module
+# is loaded -- i.e. before any component-driven dynamic sub (bare
+# accessors, promoted methods) has ever been installed into this
+# package by open_desk(). Concierge::Desk::Setup::build_desk() uses
+# this list to refuse a 'promote' entry that would shadow a real core
+# method. open_desk() never needs this: by the time a desk is opened,
+# its promote entries were already validated once, at build time, and
+# are trusted as part of concierge.conf.
+my @CORE_METHODS = grep { defined &{"Concierge::$_"} } keys %Concierge::;
+sub core_methods { return @CORE_METHODS }
 
 1;
 
@@ -811,7 +877,7 @@ Concierge - Service layer orchestrator for authentication, sessions, and user da
 
 =head1 VERSION
 
-v0.9.0
+v0.10.0
 
 =head1 SYNOPSIS
 
@@ -1028,6 +1094,45 @@ user_keys mapping, and runs session cleanup.
 Croaks if C<$desk_location> is not an existing directory.
 
 Returns C<< { success => 1, concierge => $obj } >> on success.
+
+=head3 new_concierge
+
+    my $concierge = Concierge->new_concierge();
+
+Low-level constructor: returns a bare, uninitialized C<Concierge> object with
+no components attached. Used internally by C<open_desk()>. Application code
+should use C<open_desk()> (or C<Concierge::Desk::Setup::build_desk()> for
+first-time setup) rather than calling this directly.
+
+=head3 save_user_keys
+
+    my $result = $concierge->save_user_keys();
+
+Writes the in-memory C<user_keys> mapping (user_key => session/user_id
+lookup data, used by C<restore_user()>) to persistent storage as JSON.
+Called automatically after any operation that changes the mapping
+(login, logout, guest promotion, user removal, etc.); applications do
+not normally need to call it directly.
+
+Returns C<< { success => 1 } >> on success, or
+C<< { success => 0, message => '...' } >> if the file cannot be written.
+
+=head2 Component Accessors
+
+=head3 auth, sessions, users
+
+    my $auth_obj     = $concierge->auth;
+    my $sessions_obj = $concierge->sessions;
+    my $users_obj    = $concierge->users;
+
+Read-only accessors returning the live, already-instantiated component
+object ( L<Concierge::Auth>, L<Concierge::Sessions>, or L<Concierge::Users>,
+or a substitute -- see L</EXTENSIBILITY> ) for direct use when an operation
+isn't exposed as a Concierge-level convenience method. This is the same
+"bare accessor" escape hatch described in L</Component Substitution> and
+L<Concierge::Desk::Component>'s C<promote> mechanism -- it remains available
+regardless of what a component chooses to C<promote> onto C<$concierge>
+directly.
 
 =head2 User Lifecycle
 
@@ -1264,49 +1369,123 @@ assign it to the corresponding slot on the concierge object after C<open_desk()>
 
 =head2 Additional Components
 
-To add a new records-store component (Organizations, Assets, Catalog, etc.):
+Beyond the identity core, a desk can declare additional components --
+Organizations, Assets, Catalog, etc. -- via a C<components> block passed
+to C<< Concierge::Desk::Setup::build_desk() >>:
+
+    my $result = Concierge::Desk::Setup::build_desk({
+        base_dir => './desk',
+        auth     => { backend => 'pwd' },
+        sessions => { backend => 'database' },
+        users    => { backend => 'database' },
+        components => {
+            organizations => {
+                class    => 'Concierge::Organizations',
+                optional => 0,
+                dir      => 'organizations',   # optional; resolved like
+                                                # other components' dirs
+                # ...any other setup() args for this component...
+            },
+        },
+    });
+
+Each entry is resolved once, B<at build time>: C<build_desk()> creates
+the component's storage directory, C<require>s C<class>, calls
+C<< $class->new() >>, then calls C<< $comp->setup(\%entry_config) >>. The
+hashref C<setup()> returns is persisted verbatim into C<concierge.conf>
+as that component's C<payload> -- this is never recomputed at
+C<open_desk()>/runtime. A C<setup()> failure always fails the entire
+build, regardless of the C<optional> flag.
+
+At C<open_desk()> time, Concierge reads each component's persisted
+C<payload> back out of C<concierge.conf>, C<require>s its class, and
+calls C<< $class->new($payload) >>:
 
 =over 4
 
-=item 1.
+=item *
 
-Subclass L<Concierge::Desk::Base> and implement its seven stub methods.
-C<Concierge::Desk::Base> documents the method signatures and the
-C<{ success => 1|0, message => '...' }> return convention.
+If C<new()> succeeds, the component is attached at
+C<< $concierge->{$name} >>, and a same-named accessor is installed
+automatically (e.g., C<< $concierge->organizations >>) if one doesn't
+already exist.
 
-=item 2.
+=item *
 
-Add a configuration block for your component in C<concierge.conf>:
+If C<new()> dies and the component is B<not> C<optional>, the exception
+propagates uncaught out of C<open_desk()> -- a desk must never open
+half-instantiated.
 
-    { "organizations_config": { "backend": "sqlite", "db_file": "..." } }
+=item *
 
-=item 3.
-
-After C<open_desk()>, instantiate and attach the component:
-
-    my $result = Concierge->open_desk($desk_dir);
-    my $c = $result->{concierge};
-    my $orgs = Concierge::Organizations->new();
-    $orgs->setup($desk_config->{organizations_config});
-    $c->{organizations} = $orgs;
-
-=item 4.
-
-Access the component through the concierge object:
-
-    my $r = $c->{organizations}->add_record('acme', \%data);
+If C<new()> dies and the component B<is> C<optional>, a
+L<Concierge::Desk::UnavailableComponent> stand-in is attached instead.
+Any method called on it returns
+C<< { success => 0, message => "Component '$name' unavailable: ..." } >>.
 
 =back
 
+Access the component through the concierge object once the desk is open:
+
+    my $c = Concierge->open_desk($desk_dir)->{concierge};
+    my $r = $c->organizations->add_record('acme', \%data);
+    unless ($r->{success}) {
+        # handles both a genuine failure and an UnavailableComponent
+        # substitution identically
+    }
+
+A component only needs to satisfy the duck-typed contract documented in
+L<Concierge::Desk::Component> -- there is no C<isa> check anywhere in
+this mechanism. A component whose job is per-record CRUD is responsible
+for its own CRUD methods; Concierge does not standardize or scaffold
+them.
+
+Sessions, Auth, and Users are not wired through this generic mechanism --
+they remain hardcoded core affordances, loaded unconditionally by
+C<open_desk()> as described above. The C<components> block is only for
+components genuinely additional to that identity core.
+
+=head2 Component Method Promotion
+
+A component's own bare accessor (C<< $concierge->{name}->method(...) >>
+or C<< $concierge->name->method(...) >>) always exposes its complete
+API -- this is the permanent escape hatch and needs no configuration.
+C<promote> is an optional, purely cosmetic convenience on top of it: a
+curated allowlist of a component's methods forwarded directly onto
+C<$concierge>, declared in the same C<components> config block:
+
+    components => {
+        reports => {
+            class   => 'Concierge::Reports',
+            promote => ['get_signal_report'],                   # same-name
+            # or:
+            promote => { get_signal_report => 'fetch_signal_report' },  # aliased
+        },
+    },
+
+    my $c = Concierge->open_desk($desk_dir)->{concierge};
+    $c->get_signal_report(...);                # promoted sugar
+    $c->{reports}->get_signal_report(...);      # escape hatch -- always works,
+                                                 # promoted or not
+
+C<promote> is not access control -- it never restricts what's reachable
+through the escape hatch. All validation (shape, method-existence, and
+name-collision checks against core methods and other components) happens
+once, at C<build_desk()> time; C<open_desk()> trusts the persisted result
+completely. See L<Concierge::Desk::Component/PROMOTION: EXPOSING
+COMPONENT METHODS ON $concierge> for the full contract.
+
 =head2 Future Components
 
-The following illustrate the kinds of components the C<Concierge::> namespace
-is suited for.  These are not roadmap commitments -- they are examples of what
-the component pattern enables:
+L<Concierge::Organizations> is the first component built on this
+mechanism -- a simple JSON-file-backed records store for multi-tenancy
+(users belonging to organizations), installed and namespaced
+independently of this distribution, exactly like Auth/Sessions/Users.
+The following illustrate other kinds of components the C<Concierge::>
+namespace is suited for. These are not roadmap commitments -- they are
+examples of what the component pattern enables:
 
 =over 4
-
-=item * C<Concierge::Organizations> -- multi-tenancy; users belong to orgs
 
 =item * C<Concierge::Assets> -- files, images, or other owned resources
 
@@ -1322,10 +1501,11 @@ the component pattern enables:
 
 If you build a component that might be useful to others, contributions to the
 C<Concierge::> namespace on CPAN are welcome.  The conventions to follow are:
-subclass L<Concierge::Desk::Base>, use the C<{ success => 1|0, message => '...' }>
-return convention, accept a desk config block via C<setup()>, and include
-comprehensive tests and POD.  Open an issue or pull request at
-L<https://github.com/bwva/Concierge> to discuss before publishing.
+satisfy the duck-typed contract in L<Concierge::Desk::Component>, use the
+C<{ success => 1|0, message => '...' }> return convention, accept a desk
+config block via C<setup()>, and include comprehensive tests and POD.
+Open an issue or pull request at L<https://github.com/bwva/Concierge> to
+discuss before publishing.
 
 =head1 SEE ALSO
 
@@ -1333,9 +1513,13 @@ L<Concierge::Desk::Setup> -- desk creation and configuration
 
 L<Concierge::Desk::User> -- user objects returned by lifecycle methods
 
-L<Concierge::Desk::Base> -- records-store base class for additional components
+L<Concierge::Desk::Component> -- contract documentation for additional components
 
-L<Concierge::Auth>, L<Concierge::Sessions>, L<Concierge::Users> -- component modules
+L<Concierge::Desk::UnavailableComponent> -- stand-in for a failed optional component
+
+L<Concierge::Auth>, L<Concierge::Sessions>, L<Concierge::Users> -- identity core component modules
+
+L<Concierge::Organizations> -- example additional component (multi-tenancy records store)
 
 =head1 AUTHOR
 

@@ -10,6 +10,7 @@ examples/07-error-handling.pl
 examples/08-advanced-usage.pl
 examples/09-generators-architecture.pl
 examples/10-architecture-comparison.pl
+examples/11-custom-backend-ldap.pl
 examples/README.md
 lib/Concierge/Auth.pm
 lib/Concierge/Auth/Base.pm
@@ -17,7 +18,7 @@ lib/Concierge/Auth/Generators.pm
 lib/Concierge/Auth/Pwd.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 SECURITY.md
@@ -27,5 +28,7 @@ t/02-validation.t
 t/03-auth.t
 t/04-file-management.t
 t/05-generators.t
+t/06-io-failures.t
+t/lib/MockBuiltins.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -53,6 +53,33 @@ ok !$idx->{error};
 is $idx->{type}, 'ttl';
 is $idx->{name}, 'idx';
 
+my %persistent_idx_opts = (
+    type => 'persistent',
+    name => 'idx_persistent',
+    fields => ['p_x'],
+    unique => 1,
+    sparse => 1,
+);
+
+my $idx2 = $db->create_index("collection", %persistent_idx_opts);
+ok !$idx2->{error};
+is $idx2->{type}, 'persistent';
+is $idx2->{name}, 'idx_persistent';
+ok $idx2->{unique};
+ok $idx2->{sparse};
+
+my %geo_idx_opts = (
+    type => 'geo',
+    name => 'idx_geo',
+    fields => ['latitude', 'longitude'],
+    geoJson => 0,
+);
+
+my $idx3 = $db->create_index("collection", %geo_idx_opts);
+ok !$idx3->{error};
+is $idx3->{type}, 'geo';
+is $idx3->{name}, 'idx_geo';
+
 my $idxs = $db->get_indexes("collection");
 ok !$idxs->{error};
 is $idxs->{code}, 200;
@@ -60,6 +87,10 @@ is $idxs->{indexes}->[0]->{name}, 'primary';
 is $idxs->{indexes}->[0]->{type}, 'primary';
 is $idxs->{indexes}->[1]->{name}, 'idx';
 is $idxs->{indexes}->[1]->{type}, 'ttl';
+is $idxs->{indexes}->[2]->{name}, 'idx_persistent';
+is $idxs->{indexes}->[2]->{type}, 'persistent';
+is $idxs->{indexes}->[3]->{name}, 'idx_geo';
+is $idxs->{indexes}->[3]->{type}, 'geo';
 
 my $ans = $collection->load_indexes;
 ok $ans->{result};
@@ -86,11 +117,8 @@ is $ans->{name}, "newcollectionname";
 # ok $ans->{result};
 
 $db->delete_collection("newcollectionname");
-like(
-    dies { my $system_db = $db->collection("newcollectionname"); },
-    qr/Arango::Tango.*Collection not found in database/,
-    "Got exception"
-);
+is(dies { my $system_db = $db->collection("newcollectionname"); }, "-1\n", "Got exception");
+like($db->error, qr/Collection not found in database/, "Got exception message");
 
 $test_collections = $db->list_collections;
 is scalar(@$test_collections), $nr_db_collections;

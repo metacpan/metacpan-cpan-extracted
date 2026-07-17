@@ -750,10 +750,14 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[13],
 	_sumix => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[13],
+	_sunormalize => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[13],
 	_suop => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[13],
 	_suop2 => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[13],
+	_suweight => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[13], 
 	_suxcor => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[13],
 	_suxmax => $global_libs_w_colon->{_specs} . '::'
@@ -774,6 +778,8 @@ my $specifications_path_w_colon = {
 	_sufft => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[14],
 	_sugabor => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[14],
+	_suhilb => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[14],
 	_suicepstrum => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[14],
@@ -1386,15 +1392,18 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[13],
 	_sumix => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[13],
+	_sunormalize => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[13],
 	_suop => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[13],
 	_suop2 => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[13],
+	_suweight => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[13],
 	_suxcor => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[13],
 	_suxmax => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[13],
-
 	_dctcomp => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[14],
 	_suamp => $global_libs_w_slash->{_specs} . '/'
@@ -1411,6 +1420,8 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[14],
 	_sugabor => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[14],
+	_suhilb => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[14],	  
 	_suicepstrum => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[14],
 	_suifft => $global_libs_w_slash->{_specs} . '/'

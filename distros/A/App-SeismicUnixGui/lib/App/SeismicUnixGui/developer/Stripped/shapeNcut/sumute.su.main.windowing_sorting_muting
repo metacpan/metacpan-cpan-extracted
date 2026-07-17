@@ -81,3 +81,115 @@
  Trace header fields accessed: ns, dt, delrt, key=keyword, trid, d1
  Trace header fields modified: muts or mute
 
+ =head2 User's notes (Juan Lorenzo)
+
+V 0.0.2
+
+Normally, sumute can only apply one set muting coordinates to one gather
+at a time.
+
+In this manner you would use a 
+"par_file" e.g.,
+
+tmute=0.128544,0.245747
+
+xmute=73.2464,95.6714
+
+For this particular case, the mute pick coordinates
+in the "x" direction are tracr values.
+
+sumute sp_fldr4.su par=par_file key=tracr mode=0 | 
+sugain agc=1 wagc=0.1 | suxwigb clip=1.5 &
+
+Now, we have added some options to allow the user to mute a file
+that contains many gathers at one time. You will need to supply 
+a "multi-gather", mute-type parameter file. That is, sumute.pm 
+can use a concatenated  collection of the contents of these individual 
+parfiles. The name of this file is called the "multi_gather_par_file"".
+
+You can create a multi-gather parameter file in two ways:
+
+(1) Manually concatenate the individual parfiles into one file 
+(e.g.,use the Sucat tool)
+
+(2) Use the Tool: iTop_Mute to interactively pick mute coordinates.
+The iTopMute Tool generates the "parfiles" (x,t values) in SUnix "par" format
+iTopMute saves the picked values 
+into individual "parfiles" named according to
+their corresponding gather (e.g. ep or cdp etc.)
+
+wE have added the new following options to su mute
+to sumute:
+
+gather_type           = ep (shotpoint),cdp (cdp gathers),fldr(field data gathers)
+
+---This parameter specifies the type of gather in the multi-gather su file. It is not
+   needed when you are muting single files in the traditional way.	
+
+multi_gather_par_file = a concatenated file of the individual parfiles
+
+multi_gather_su_file  = the *.su file which was muted interactively to 
+create each of the parfiles, while using the Tool: iTop_Mute 
+
+In the case of a cdp gather, a multi-parameter-file looks as follows:
+
+cdp=1,2
+
+tmute=0.141777,0.251418
+xmute=73,96
+
+tmute=0.131777,0.241418
+xmute=85,96
+
+
+Internally, sumute uses "susplit" to break a large multi-gather file into individual
+shotpoint gathers (ep), or cdp gathers or fldr (gathers) according to Segy
+key header words. 
+
+An example:
+
+Data consists of a single CDP gather, digitized in iTopMute as a function
+of tracr (x-co-ordinate)
+
+The parameter values in sumute are:
+gather_type=cdp
+
+header-word=tracr
+
+multi_gather_par_file=list
+
+multi_gather_su_file=sp_fldr4
+
+
+the file "list" is as follows:
+
+cdp=1
+
+tmute=0.141777,0.251418
+
+xmute=73,96
+
+
+Note, when you use a multi-parameter mute paramter file you DO NOT include a separate
+"data_in" file in the flow. The "data_in" is not necessary
+because the new option in  sumute reads multi_gather_su_file automatically.
+
+--------------------------------------------------------------------
+Interactive top mute picks are made using the Tool: iTopMute
+
+The iTopMute Tool generates the "parfiles" (x,t values) in SUnix "par" format
+iTopMute saves the picked values 
+into individual "parfiles" named according to
+their corresponding gather (e.g. ep or cdp etc.)
+
+=cut
+
+=head2 CHANGES and their DATES
+
+Nov. 2022, V 0.0.2
+June 2023, split files are read from DATA_SEISMIC_SU directory
+March, 2024, V 0.0.3
+		corrected error in removal of extra ".su" in output muted file name
+
+=cut
+

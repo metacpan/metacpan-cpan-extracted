@@ -1,4 +1,6 @@
 #!/bin/bash
+# Catch errors in piped commands
+set -euo pipefail
 
 # see if global variable is set
 # global variable SeismicUnixGui_script locates main folder
@@ -11,8 +13,16 @@
 
  else
 	# run immodpg.pl -- a gui
-	# echo "perl $SeismicUnixGui_script/../big_streams/immodpg.pl"
-     	 perl $SeismicUnixGui_script/../big_streams/immodpg.pl &
+
+	#Find the correct perl to use before executing *.pl
+	# Copy paste and executre this file into the current shell
+	# $(...) captures the output
+	source "${SeismicUnixGui_script}/find_system_perl.sh"
+	SYSTEM_PERL="$(find_system_perl)"
+	# echo "Using: $SYSTEM_PERL"
+
+	# echo "$SYSTEM_PERL $SeismicUnixGui_script/../big_streams/immodpg.pl"		
+	exec "$SYSTEM_PERL" $SeismicUnixGui_script/../big_streams/immodpg.pl &
     
     # Wait a second or two before starting 
     # immodpg1.1, a fortran program

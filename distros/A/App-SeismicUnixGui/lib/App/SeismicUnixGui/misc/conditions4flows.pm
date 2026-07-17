@@ -1740,341 +1740,525 @@ sub _get_num_listboxes_occupied {
 	}
 }
 
+# sub set_defaults4end_of_delete_whole_flow_button {
+# 	my ($self) = @_;
+
+# 	my $color = _get_flow_color();
+
+# 	if (   $color eq 'grey'
+# 		|| $color eq 'pink'
+# 		|| $color eq 'green'
+# 		|| $color eq 'blue' ) {
+
+# 		# the last program that was touched is cancelled out
+# 		$last_flow_index_touched = -1;
+
+# 		$flow_item_down_arrow_button->configure( -state => 'disabled', );
+# 		$flow_item_up_arrow_button->configure( -state => 'disabled', );
+# 		$delete_from_flow_button->configure( -state => 'disabled', );
+# 		$delete_whole_flow_button->configure( -state => 'disabled', );
+
+# 	} else {
+# 		print("conditions4flows, set_defaults4delete_whole_flow_button, color missing: $color\n");
+# 	}
+
+# 	if ( $color eq 'grey' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_grey_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[0] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[0]   = $true;
+
+# 		# turn off flow listbox
+# 		$flow_listbox_grey_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_grey} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_grey_w = $false;
+# 		$flow_name_out_grey     = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_grey = $false;
+
+# 	} elsif ( $color eq 'pink' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_pink_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[1] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[1]   = $true;
+
+# 		# turn off flow -listbox
+# 		$flow_listbox_pink_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_pink} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_pink_w = $false;
+# 		$flow_name_out_pink          = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_pink = $false;
+
+# 	} elsif ( $color eq 'green' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_green_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[2] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[2]   = $true;
+
+# 		# turn off flow -listbox
+# 		$flow_listbox_green_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_green} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_green_w = $false;
+# 		$flow_name_out_green           = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_green = $false;
+
+# 	} elsif ( $color eq 'blue' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_blue_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[3] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[3]   = $true;
+
+# 		# turn off flow -listbox
+# 		$flow_listbox_blue_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_blue} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_blue_w = $false;
+# 		$flow_name_out_blue          = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_blue = $false;
+
+# 	} else {
+# 		print("conditions4flows, set_defaults4delete_whole_flow_buttonset, color missing: $color\n");
+# 	}
+
+# 	my $number = _get_num_listboxes_occupied();
+
+# 	# print("conditions4flows, set_defaults4delete_whole_flow_button, number of list boxes occupied=$number\n");
+
+# 	# because the last item in last listbox is deleted
+# 	# print("conditions4flows, set_defaults4delete_whole_flow_button, if number < 0 remove this if statement\n");
+# 	# turn off delete button
+# 	$delete_from_flow_button->configure( -state => 'disabled', );
+
+# 	# turn off delete whole flow button
+# 	$delete_whole_flow_button->configure( -state => 'disabled', );
+
+# 	# turn off up-arrow
+# 	$flow_item_up_arrow_button->configure( -state => 'disabled', );
+
+# 	# turn off down_arrow
+# 	$flow_item_down_arrow_button->configure( -state => 'disabled', );
+
+# 	# turn off run button
+# 	#		$run_button->configure( -state => 'disabled' );
+
+# 	#		# turn off SaveAs menu button
+# 	#		$SaveAs_menubutton->configure( -state => 'disabled' );
+
+# 	#		# turn off Data menu button
+# 	#		$Data_menubutton->configure( -state => 'disabled' );
+
+# 	#		# turn on Flow menu button
+# 	$Open_menubutton->configure( -state => 'normal' );
+
+# 	# turn off save button
+# 	#		$save_button->configure( -state => 'disabled' );
+
+# 	# turn off  check_code_button
+# #	$check_code_button->configure( -state => 'disabled' );
+
+# 	$conditions4flows->{_is_flow_listbox_color_w}        = $false;
+# 	$conditions4flows->{_is_user_built_flow}             = $false;
+# 	$conditions4flows->{_is_sunix_listbox}               = $false;
+# 	$conditions4flows->{_is_delete_from_flow_button}     = $false;
+# 	$conditions4flows->{_is_delete_whole_flow_button}    = $false;
+# 	$conditions4flows->{_is_flow_item_down_arrow_button} = $false;
+# 	$conditions4flows->{_is_flow_item_up_arrow_button}   = $false;
+
+# 	# for export
+# 	$is_delete_from_flow_button     = $false;
+# 	$is_delete_whole_flow_button    = $false;
+# 	$is_flow_item_down_arrow_button = $false;
+# 	$is_flow_item_up_arrow_button   = $false;
+
+# 	$is_flow_listbox_color_w = $false;
+# 	$is_sunix_listbox        = $false;
+# 	$is_user_built_flow      = $false;
+
+# 	return ();
+# }
+
+#------------------------------------------------------------
+# Helper: reset all color-specific states for a given flow color
+#------------------------------------------------------------
+sub _reset_color_state {
+    my ($color) = @_;
+
+    my %color_map = (
+        grey  => { idx => 0, w => $flow_listbox_grey_w,  name_key => '_flow_name_out_grey',
+                   is_w => \$is_flow_listbox_grey_w,     last_touch => \$is_last_flow_index_touched_grey },
+        pink  => { idx => 1, w => $flow_listbox_pink_w,  name_key => '_flow_name_out_pink',
+                   is_w => \$is_flow_listbox_pink_w,     last_touch => \$is_last_flow_index_touched_pink },
+        green => { idx => 2, w => $flow_listbox_green_w, name_key => '_flow_name_out_green',
+                   is_w => \$is_flow_listbox_green_w,    last_touch => \$is_last_flow_index_touched_green },
+        blue  => { idx => 3, w => $flow_listbox_blue_w,  name_key => '_flow_name_out_blue',
+                   is_w => \$is_flow_listbox_blue_w,     last_touch => \$is_last_flow_index_touched_blue },
+    );
+
+    my $ref = $color_map{$color};
+    return unless $ref;   # Unknown color
+
+    my $i   = $ref->{idx};
+
+    # mark listbox vacant
+	my $key = "_is_flow_listbox_${color}_w";
+    $conditions4flows->{$key} = $false;
+    @{ $conditions4flows->{_occupied_listbox_aref} }[$i] = $false;
+    @{ $conditions4flows->{_vacant_listbox_aref} }[$i]   = $true;
+
+    # turn off its widget
+	# turn off flow listbox
+    $ref->{w}->configure( -state => 'disabled' );
+
+    # clear name from namespace
+    $conditions4flows->{ $ref->{name_key} } = $empty_string;
+
+    # export global variables and ...
+    ${ $ref->{is_w} }     = $false;
+	# the last program that was touched is cancelled out
+    ${ $ref->{last_touch} } = $false;
+
+    return;
+}
+
+
 =head2  sub set_defaults4end_of_delete_whole_flow_button 
 
-	when all items are removed from a flow listbox
+	wWen all items are removed from a flow listbox
 	the following conditions are set
 	
-
 =cut
 
 sub set_defaults4end_of_delete_whole_flow_button {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	my $color = _get_flow_color();
+    my $color = _get_flow_color();
 
-	if (   $color eq 'grey'
-		|| $color eq 'pink'
-		|| $color eq 'green'
-		|| $color eq 'blue' ) {
+    unless ($color =~ /^(grey|pink|green|blue)$/ ) {
+        print "conditions4flows, set_defaults4delete_whole_flow_button, color missing: $color\n";
+        return;
+    }
 
-		# the last program that was touched is cancelled out
-		$last_flow_index_touched = -1;
+    # Reset general UI buttons
+	# Last program that was touched is cancelled out
+    $last_flow_index_touched = -1;
+    for my $b ($flow_item_down_arrow_button, $flow_item_up_arrow_button,
+               $delete_from_flow_button, $delete_whole_flow_button) {
+        $b->configure( -state => 'disabled' );
+    }
 
-		$flow_item_down_arrow_button->configure( -state => 'disabled', );
-		$flow_item_up_arrow_button->configure( -state => 'disabled', );
-		$delete_from_flow_button->configure( -state => 'disabled', );
-		$delete_whole_flow_button->configure( -state => 'disabled', );
+    # Handle color-specific reset
+    _reset_color_state($color);
 
-	} else {
-		print("conditions4flows, set_defaults4delete_whole_flow_button, color missing: $color\n");
-	}
-
-	if ( $color eq 'grey' ) {
-
-		$conditions4flows->{_is_flow_listbox_grey_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[0] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[0]   = $true;
-
-		# turn off flow listbox
-		$flow_listbox_grey_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_grey} = $empty_string;
-
-		# for export
-		$is_flow_listbox_grey_w = $false;
-		$flow_name_out_grey     = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_grey = $false;
-
-	} elsif ( $color eq 'pink' ) {
-
-		$conditions4flows->{_is_flow_listbox_pink_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[1] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[1]   = $true;
-
-		# turn off flow -listbox
-		$flow_listbox_pink_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_pink} = $empty_string;
-
-		# for export
-		$is_flow_listbox_pink_w = $false;
-		$flow_name_out_pink          = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_pink = $false;
-
-	} elsif ( $color eq 'green' ) {
-
-		$conditions4flows->{_is_flow_listbox_green_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[2] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[2]   = $true;
-
-		# turn off flow -listbox
-		$flow_listbox_green_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_green} = $empty_string;
-
-		# for export
-		$is_flow_listbox_green_w = $false;
-		$flow_name_out_green           = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_green = $false;
-
-	} elsif ( $color eq 'blue' ) {
-
-		$conditions4flows->{_is_flow_listbox_blue_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[3] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[3]   = $true;
-
-		# turn off flow -listbox
-		$flow_listbox_blue_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_blue} = $empty_string;
-
-		# for export
-		$is_flow_listbox_blue_w = $false;
-		$flow_name_out_blue          = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_blue = $false;
-
-	} else {
-		print("conditions4flows, set_defaults4delete_whole_flow_buttonset, color missing: $color\n");
-	}
-
-	my $number = _get_num_listboxes_occupied();
-
-	# print("conditions4flows, set_defaults4delete_whole_flow_button, number of list boxes occupied=$number\n");
-
-	# because the last item in last listbox is deleted
-	# print("conditions4flows, set_defaults4delete_whole_flow_button, if number < 0 remove this if statement\n");
+    # Turn global buttons
+	# Last item in last listbox is cancelled out
 	# turn off delete button
-	$delete_from_flow_button->configure( -state => 'disabled', );
+    $delete_from_flow_button->configure( -state => 'disabled' );
+    # turn off delete whole flow button
+	$delete_whole_flow_button->configure( -state => 'disabled' );
+    # turn off up-arrow
+	$flow_item_up_arrow_button->configure( -state => 'disabled' );
+    # turn off down_arrow
+	$flow_item_down_arrow_button->configure( -state => 'disabled' );
+    # turn off run button
+    # $run_button->configure( -state => 'disabled' );
+	# turn off SaveAs menu button
+    # $SaveAs_menubutton->configure( -state => 'disabled' );
+   	# turn off Data menu button
+    # $Data_menubutton->configure( -state => 'disabled' );
+ 	# turn off save button
+ 	# $save_button->configure( -state => 'disabled' );
+ 	# turn off check_code_button
+    # $check_code_button->configure( -state => 'disabled' );
 
-	# turn off delete whole flow button
-	$delete_whole_flow_button->configure( -state => 'disabled', );
+    # Re-enable menu access
+	# turn on Flow menu button
+    $Open_menubutton->configure( -state => 'normal' );
 
-	# turn off up-arrow
-	$flow_item_up_arrow_button->configure( -state => 'disabled', );
+    # Clear general conditions
+    $conditions4flows->{$_} = $false for qw(
+        _is_flow_listbox_color_w
+        _is_user_built_flow
+        _is_sunix_listbox
+        _is_delete_from_flow_button
+        _is_delete_whole_flow_button
+        _is_flow_item_down_arrow_button
+        _is_flow_item_up_arrow_button
+    );
 
-	# turn off down_arrow
-	$flow_item_down_arrow_button->configure( -state => 'disabled', );
+    # Export global equivalents
+    $is_delete_from_flow_button     = $false;
+    $is_delete_whole_flow_button    = $false;
+    $is_flow_item_down_arrow_button = $false;
+    $is_flow_item_up_arrow_button   = $false;
 
-	# turn off run button
-	#		$run_button->configure( -state => 'disabled' );
+    $is_flow_listbox_color_w = $false;
+    $is_sunix_listbox        = $false;
+    $is_user_built_flow      = $false;
 
-	#		# turn off SaveAs menu button
-	#		$SaveAs_menubutton->configure( -state => 'disabled' );
-
-	#		# turn off Data menu button
-	#		$Data_menubutton->configure( -state => 'disabled' );
-
-	#		# turn on Flow menu button
-	$Open_menubutton->configure( -state => 'normal' );
-
-	# turn off save button
-	#		$save_button->configure( -state => 'disabled' );
-
-	# turn off  check_code_button
-#	$check_code_button->configure( -state => 'disabled' );
-
-	$conditions4flows->{_is_flow_listbox_color_w}        = $false;
-	$conditions4flows->{_is_user_built_flow}             = $false;
-	$conditions4flows->{_is_sunix_listbox}               = $false;
-	$conditions4flows->{_is_delete_from_flow_button}     = $false;
-	$conditions4flows->{_is_delete_whole_flow_button}    = $false;
-	$conditions4flows->{_is_flow_item_down_arrow_button} = $false;
-	$conditions4flows->{_is_flow_item_up_arrow_button}   = $false;
-
-	# for export
-	$is_delete_from_flow_button     = $false;
-	$is_delete_whole_flow_button    = $false;
-	$is_flow_item_down_arrow_button = $false;
-	$is_flow_item_up_arrow_button   = $false;
-
-	$is_flow_listbox_color_w = $false;
-	$is_sunix_listbox        = $false;
-	$is_user_built_flow      = $false;
-
-	return ();
+    return;
 }
 
 =head2  sub set_defaults4last_delete_from_flow_button 
 
-	when all items are removed from a flow listbox
+	Wen all items are removed from a flow listbox
 	the following conditions are set
 	
-
 =cut
 
 sub set_defaults4last_delete_from_flow_button {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	my $color = _get_flow_color();
+    my $color = _get_flow_color();
 
-	if (   $color eq 'grey'
-		|| $color eq 'pink'
-		|| $color eq 'green'
-		|| $color eq 'blue' ) {
+    unless ($color =~ /^(grey|pink|green|blue)$/ ) {
+        print "conditions4flows, set_defaults4last_delete_from_flow_button, color missing: $color\n";
+        return;
+    }
 
-		# the last program that was touched is cancelled out
-		$last_flow_index_touched = -1;
+    # Reset general state
+	# Last program that was touched is cancelled out
+    $last_flow_index_touched = -1;
+    $flow_item_down_arrow_button->configure( -state => 'disabled' );
+    $flow_item_up_arrow_button->configure( -state => 'disabled' );
+    $delete_whole_flow_button->configure( -state => 'disabled' );
 
-		$flow_item_down_arrow_button->configure( -state => 'disabled', );
-		$flow_item_up_arrow_button->configure( -state => 'disabled', );
-		$delete_whole_flow_button->configure( -state => 'disabled', );
-	} else {
-		print("conditions4flows, set_defaults4last_delete_from_flow_button, color missing: $color\n");
-	}
+    # Reset color-specific state
+    _reset_color_state($color);
 
-	if ( $color eq 'grey' ) {
+    # Check remaining listboxes
+    my $number = _get_num_listboxes_occupied();
 
-		$conditions4flows->{_is_flow_listbox_grey_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[0] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[0]   = $true;
-
-		# turn off flow listbox
-		$flow_listbox_grey_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_grey} = $empty_string;
-
-		# for export
-		$is_flow_listbox_grey_w = $false;
-		$flow_name_out_grey          = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_grey = $false;
-
-	} elsif ( $color eq 'pink' ) {
-
-		$conditions4flows->{_is_flow_listbox_pink_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[1] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[1]   = $true;
-
-		# turn off flow -listbox
-		$flow_listbox_pink_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_pink} = $empty_string;
-
-		# for export
-		$is_flow_listbox_pink_w = $false;
-		$flow_name_out_pink          = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_pink = $false;
-
-	} elsif ( $color eq 'green' ) {
-
-		$conditions4flows->{_is_flow_listbox_green_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[2] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[2]   = $true;
-
-		# turn off flow -listbox
-		$flow_listbox_green_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_green} = $empty_string;
-
-		# for export
-		$is_flow_listbox_green_w = $false;
-		$flow_name_out_green           = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_green = $false;
-
-	} elsif ( $color eq 'blue' ) {
-
-		$conditions4flows->{_is_flow_listbox_blue_w} = $false;
-		@{ $conditions4flows->{_occupied_listbox_aref} }[3] = $false;
-		@{ $conditions4flows->{_vacant_listbox_aref} }[3]   = $true;
-
-		# turn off flow -listbox
-		$flow_listbox_blue_w->configure( -state => 'disabled', );
-
-		# name is removed from the namespace
-		$conditions4flows->{_flow_name_out_blue} = $empty_string;
-
-		# for export
-		$is_flow_listbox_blue_w = $false;
-		$flow_name_out_blue          = $empty_string;
-
-		# the last program that was touched is cancelled out
-		$is_last_flow_index_touched_blue = $false;
-
-	} else {
-		print("conditions4flows, set_defaults4last_delete_from_flow_buttonset, color missing: $color\n");
-	}
-
-	my $number = _get_num_listboxes_occupied();
-
-	# print("conditions4flows, set_defaults4last_delete_from_flow_button, number=$number\n");
-
-	# when last item in last listbox is deleted
-	if ( $number < 0 ) {
-
-		# turn off delete button
-		$delete_from_flow_button->configure( -state => 'disabled', );
-
-		# turn off whole-flow delete button
-		$delete_whole_flow_button->configure( -state => 'disabled', );
-
-		# turn off up-arrow
-		$flow_item_up_arrow_button->configure( -state => 'disabled', );
-
-		# turn off down_arrow
-		$flow_item_down_arrow_button->configure( -state => 'disabled', );
-
-		# turn off run button
+    if ( $number < 0 ) {
+        # Last item in listbox is cleared — shut everything down
+        # turn off delete button
+		$delete_from_flow_button->configure( -state => 'disabled' );
+        # turn off whole-flow delete button
+		$delete_whole_flow_button->configure( -state => 'disabled' );
+        # turn off up-arrow
+		$flow_item_up_arrow_button->configure( -state => 'disabled' );
+        # turn off down_arrow
+		$flow_item_down_arrow_button->configure( -state => 'disabled' );
+        # turn off run button
 		$run_button->configure( -state => 'disabled' );
-
-		$SaveAs_menubutton->configure( -state => 'disabled' );
-
-		# turn off Data menu button
-#		$Data_menubutton->configure( -state => 'disabled' );
-
-		# turn off Flow menu button
-		$Open_menubutton->configure( -state => 'normal' );
-
-		# turn off save button
+        # turn off Data menu button
+        # $Data_menubutton->configure( -state => 'disabled' );
+        $SaveAs_menubutton->configure( -state => 'disabled' );
+        # turn off save button
 		$save_button->configure( -state => 'disabled' );
-
+        # turn off Flow menu button
+		$Open_menubutton->configure( -state => 'normal' );
 		# turn off  check_code_button
-#		$check_code_button->configure( -state => 'disabled' );
-	} else {
+		# $check_code_button->configure( -state => 'disabled' );
+ 	} else {
+ 		# NADA print("conditions4flows,set_defaults4last_delete_from_flow_button, not at the last listbox yet\n");
+ 	}
+    # Clear general conditions
+    $conditions4flows->{$_} = $false for qw(
+        _is_flow_listbox_color_w
+        _is_user_built_flow
+        _is_sunix_listbox
+        _is_delete_from_flow_button
+        _is_delete_whole_flow_button
+        _is_flow_item_down_arrow_button
+        _is_flow_item_up_arrow_button
+    );
 
-		# NADA print("conditions4flows,set_defaults4last_delete_from_flow_button, not at the last listbox yet\n");
-	}
+    # Export global equivalents
+    $is_delete_from_flow_button     = $false;
+    $is_delete_whole_flow_button    = $false;
+    $is_flow_item_down_arrow_button = $false;
+    $is_flow_item_up_arrow_button   = $false;
 
-	$conditions4flows->{_is_flow_listbox_color_w}        = $false;
-	$conditions4flows->{_is_user_built_flow}             = $false;
-	$conditions4flows->{_is_sunix_listbox}               = $false;
-	$conditions4flows->{_is_delete_from_flow_button}     = $false;
-	$conditions4flows->{_is_delete_whole_flow_button}    = $false;
-	$conditions4flows->{_is_flow_item_down_arrow_button} = $false;
-	$conditions4flows->{_is_flow_item_up_arrow_button}   = $false;
+    $is_flow_listbox_color_w = $false;
+    $is_sunix_listbox        = $false;
+    $is_user_built_flow      = $false;
 
-	# for export
-	$is_delete_from_flow_button     = $false;
-	$is_delete_whole_flow_button    = $false;
-	$is_flow_item_down_arrow_button = $false;
-	$is_flow_item_up_arrow_button   = $false;
-
-	$is_flow_listbox_color_w = $false;
-	$is_sunix_listbox        = $false;
-	$is_user_built_flow      = $false;
-
-	return ();
+    return;
 }
+
+
+# sub set_defaults4last_delete_from_flow_button {
+# 	my ($self) = @_;
+
+# 	my $color = _get_flow_color();
+
+# 	if (   $color eq 'grey'
+# 		|| $color eq 'pink'
+# 		|| $color eq 'green'
+# 		|| $color eq 'blue' ) {
+
+# 		# the last program that was touched is cancelled out
+# 		$last_flow_index_touched = -1;
+
+# 		$flow_item_down_arrow_button->configure( -state => 'disabled', );
+# 		$flow_item_up_arrow_button->configure( -state => 'disabled', );
+# 		$delete_whole_flow_button->configure( -state => 'disabled', );
+# 	} else {
+# 		print("conditions4flows, set_defaults4last_delete_from_flow_button, color missing: $color\n");
+# 	}
+
+# 	if ( $color eq 'grey' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_grey_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[0] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[0]   = $true;
+
+# 		# turn off flow listbox
+# 		$flow_listbox_grey_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_grey} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_grey_w = $false;
+# 		$flow_name_out_grey          = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_grey = $false;
+
+# 	} elsif ( $color eq 'pink' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_pink_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[1] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[1]   = $true;
+
+# 		# turn off flow -listbox
+# 		$flow_listbox_pink_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_pink} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_pink_w = $false;
+# 		$flow_name_out_pink          = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_pink = $false;
+
+# 	} elsif ( $color eq 'green' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_green_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[2] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[2]   = $true;
+
+# 		# turn off flow -listbox
+# 		$flow_listbox_green_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_green} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_green_w = $false;
+# 		$flow_name_out_green           = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_green = $false;
+
+# 	} elsif ( $color eq 'blue' ) {
+
+# 		$conditions4flows->{_is_flow_listbox_blue_w} = $false;
+# 		@{ $conditions4flows->{_occupied_listbox_aref} }[3] = $false;
+# 		@{ $conditions4flows->{_vacant_listbox_aref} }[3]   = $true;
+
+# 		# turn off flow -listbox
+# 		$flow_listbox_blue_w->configure( -state => 'disabled', );
+
+# 		# name is removed from the namespace
+# 		$conditions4flows->{_flow_name_out_blue} = $empty_string;
+
+# 		# for export
+# 		$is_flow_listbox_blue_w = $false;
+# 		$flow_name_out_blue          = $empty_string;
+
+# 		# the last program that was touched is cancelled out
+# 		$is_last_flow_index_touched_blue = $false;
+
+# 	} else {
+# 		print("conditions4flows, set_defaults4last_delete_from_flow_buttonset, color missing: $color\n");
+# 	}
+
+# 	my $number = _get_num_listboxes_occupied();
+
+# 	# print("conditions4flows, set_defaults4last_delete_from_flow_button, number=$number\n");
+
+# 	# when last item in last listbox is deleted
+# 	if ( $number < 0 ) {
+
+# 		# turn off delete button
+# 		$delete_from_flow_button->configure( -state => 'disabled', );
+
+# 		# turn off whole-flow delete button
+# 		$delete_whole_flow_button->configure( -state => 'disabled', );
+
+# 		# turn off up-arrow
+# 		$flow_item_up_arrow_button->configure( -state => 'disabled', );
+
+# 		# turn off down_arrow
+# 		$flow_item_down_arrow_button->configure( -state => 'disabled', );
+
+# 		# turn off run button
+# 		$run_button->configure( -state => 'disabled' );
+
+# 		$SaveAs_menubutton->configure( -state => 'disabled' );
+
+# 		# turn off Data menu button
+# #		$Data_menubutton->configure( -state => 'disabled' );
+
+# 		# turn off Flow menu button
+# 		$Open_menubutton->configure( -state => 'normal' );
+
+# 		# turn off save button
+# 		$save_button->configure( -state => 'disabled' );
+
+# 		# turn off  check_code_button
+# #		$check_code_button->configure( -state => 'disabled' );
+# 	} else {
+
+# 		# NADA print("conditions4flows,set_defaults4last_delete_from_flow_button, not at the last listbox yet\n");
+# 	}
+
+# 	$conditions4flows->{_is_flow_listbox_color_w}        = $false;
+# 	$conditions4flows->{_is_user_built_flow}             = $false;
+# 	$conditions4flows->{_is_sunix_listbox}               = $false;
+# 	$conditions4flows->{_is_delete_from_flow_button}     = $false;
+# 	$conditions4flows->{_is_delete_whole_flow_button}    = $false;
+# 	$conditions4flows->{_is_flow_item_down_arrow_button} = $false;
+# 	$conditions4flows->{_is_flow_item_up_arrow_button}   = $false;
+
+# 	# for export
+# 	$is_delete_from_flow_button     = $false;
+# 	$is_delete_whole_flow_button    = $false;
+# 	$is_flow_item_down_arrow_button = $false;
+# 	$is_flow_item_up_arrow_button   = $false;
+
+# 	$is_flow_listbox_color_w = $false;
+# 	$is_sunix_listbox        = $false;
+# 	$is_user_built_flow      = $false;
+
+# 	return ();
+# }
 
 =head2 sub set4run_button 
 
@@ -2355,45 +2539,8 @@ sub set_defaults_4start_of_flow_select {
 		# print("conditions4flows, set_defaults_4start_of_flow_select , color:$color; flow_listbox_color_w =$conditions4flows->{$flow_listbox_color_w_key}\n");
 		_set_flow_listbox_last_touched_txt($flow_listbox_color_w_txt);
 		_set_flow_listbox_last_touched_w($flow_listbox_color_w);
-
-		# print("conditions4flows, set_defaults_4start_of_flow_select , _set_flow_listbox_last_touched_w\n");
-
-		#		# location within GUI
-		#		if ( $color eq 'grey' ) {
-		#
-		#			$conditions4flows->{_is_flow_listbox_grey_w} = $true;
-		#
-		#			# for export to calling module via get_hash_ref
-		#			$is_flow_listbox_grey_w = $true;
-		#
-		#		}
-		#		elsif ( $color eq 'pink' ) {
-		#			$conditions4flows->{_is_flow_listbox_pink_w} = $true;
-		#
-		#			# for export to calling module via get_hash_ref
-		#			$is_flow_listbox_pink_w = $true;
-		#
-		#		}
-		#		elsif ( $color eq 'green' ) {
-		#
-		#			$conditions4flows->{_is_flow_listbox_green_w} = $true;
-		#
-		#			# for export to calling module via get_hash_ref
-		#			$is_flow_listbox_green_w = $true;
-		#
-		#		}
-		#		elsif ( $color eq 'blue' ) {
-		#
-		#			$conditions4flows->{_is_flow_listbox_blue_w} = $true;
-		#
-		#			# for export to calling module via get_hash_ref
-		#			$is_flow_listbox_blue_w = $true;
-		#
-		#		}
-		#		else {
-		#			print("conditions4flows, set_defaults_4start_of_flow_select , missing color\n");
-		#		}
-
+		
+		# clear any and all previous highlighted indices
 		$conditions4flows->{_is_flow_listbox_color_w}    = $true;
 		$conditions4flows->{_is_pre_built_superflow}     = $false;
 		$conditions4flows->{_is_superflow}               = $false;
@@ -2404,6 +2551,7 @@ sub set_defaults_4start_of_flow_select {
 		$delete_whole_flow_button->configure( -state => 'active', );
 		$flow_item_down_arrow_button->configure( -state => 'active', );
 		$flow_item_up_arrow_button->configure( -state => 'active', );
+		# print("2370 conditions4flows, set_defaults_4start_of_flow_select , normalizing list box\n");
 		$flow_listbox_grey_w->configure( -state => 'normal', );
 		$flow_listbox_pink_w->configure( -state => 'normal', );
 		$flow_listbox_green_w->configure( -state => 'normal', );
@@ -2417,7 +2565,7 @@ sub set_defaults_4start_of_flow_select {
 		$is_superflow_select_button = $false;
 		$is_user_built_flow         = $true;
 
-		# spme menu buttons that pre-built superflows turn off
+		# same menu buttons that pre-built superflows turn off
 		$SaveAs_menubutton->configure( -state => 'normal' );
 
 		# keep add2flow buttons turned off
@@ -2428,7 +2576,6 @@ sub set_defaults_4start_of_flow_select {
 		$flow_item_up_arrow_button->configure( -state => 'active', );
 		$flow_item_down_arrow_button->configure( -state => 'active', );
 
-		#	$entry_button->focus
 	} else {
 		print("conditions4flows, set_defaults_4start_of_flow_select , no color:$color\n");
 
@@ -2472,6 +2619,7 @@ sub set4run_button_start {
 			my $color 						= _get_flow_color();
 =cut
 
+
 sub set4end_of_add2flow {
 	my ( $self, $color ) = @_;
 
@@ -2485,8 +2633,8 @@ sub set4end_of_add2flow {
 		my $flow_listbox_color_w_txt    = 'flow_listbox_' . $color . '_w';
 		my $is_flow_listbox_color_w_key = '_is_flow_listbox_' . $color . '_w';
 
-		# print("2 conditions4flows,set4end_of_add2flow  flow_listbox_color_w: $flow_listbox_color_w\n");
-		# print("2 conditions4flows,set4end_of_add2flow  color: $color");
+		# print("2488 conditions4flows,set4end_of_add2flow  flow_listbox_color_w: $flow_listbox_color_w\n");
+		# print("2489 conditions4flows,set4end_of_add2flow  color: $color\n");
 
 		my $flow_listbox_color_w = $conditions4flows->{$flow_listbox_color_w_key};
 
@@ -2497,6 +2645,7 @@ sub set4end_of_add2flow {
 		$flow_listbox_color_w->selectionClear( 0, "end" );
 
 		# highlight new index !!!!!!!!!
+		# print("2464 conditions4flows,set4end_of_add2flow highlight new index TBD\n");
 		$flow_listbox_color_w->selectionSet("end");
 
 		# note the last program that was touched
@@ -2578,12 +2727,13 @@ sub set4end_of_add2flow_button {
 
 		my $flow_listbox_color_w = $conditions4flows->{$flow_listbox_color_w_key};
 
-		#		print("2 conditions4flows,set4end_of_add2flow_button  flow_listbox_color_w: $flow_listbox_color_w\n");
+	     # print("2581 conditions4flows,set4end_of_add2flow_button  flow_listbox_color_w: $flow_listbox_color_w\n");
 
 		_set_flow_listbox_last_touched_w($flow_listbox_color_w);
 		_set_flow_listbox_last_touched_txt($flow_listbox_color_w_txt);
 
 		# highlight new index
+		# print("2552 conditions4flows,set4end_of_add2flow_button highlight new index TBD\n");
 		$flow_listbox_color_w->selectionSet("end");
 
 		# note the last program that was touched
@@ -2818,8 +2968,6 @@ sub set4start_of_add2flow {
 sub set4start_of_add2flow_button {
 	my ( $self, $color ) = @_;
 
-	# _reset();
-	# _set_gui_widgets();
 	_set_flow_listbox_color_w($color);
 
 	my $flow_listbox_color_w = _get_flow_listbox_color_w();
@@ -3181,6 +3329,22 @@ sub set4superflow_Save {
 	$has_used_Save_button    = $false;
 
 	return ();
+
+}
+
+=head2 sub set4superflow2user_flow_transition
+
+Used when transitioning from a pre-built superflow to a user-built flow
+
+=cut 
+
+sub set4superflow2user_flow_transition {
+
+	my ( $self) = @_;
+
+	my $flow_listbox_color_w = _get_flow_listbox_color_w();
+	$flow_listbox_color_w->selectionClear( 0, "end" );
+	$flow_listbox_color_w->selectionSet("end");
 
 }
 

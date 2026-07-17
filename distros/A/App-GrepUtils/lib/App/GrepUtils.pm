@@ -3,9 +3,9 @@ package App::GrepUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-03'; # DATE
+our $DATE = '2026-07-16'; # DATE
 our $DIST = 'App-GrepUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to the Unix command 'grep'
@@ -22,7 +22,7 @@ App::GrepUtils - CLI utilities related to the Unix command 'grep'
 
 =head1 VERSION
 
-This document describes version 0.006 of App::GrepUtils (from Perl distribution App-GrepUtils), released on 2022-05-03.
+This document describes version 0.007 of App::GrepUtils (from Perl distribution App-GrepUtils), released on 2026-07-16.
 
 =head1 DESCRIPTION
 
@@ -30,6 +30,10 @@ This distribution includes the following CLI utilities related to the Unix
 command C<grep>:
 
 =over
+
+=item * L<grep-nonblank>
+
+=item * L<grep-nonblank-clipboard>
 
 =item * L<grep-terms>
 
@@ -47,6 +51,12 @@ Source repository is at L<https://github.com/perlancar/perl-App-GrepUtils>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -60,13 +70,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

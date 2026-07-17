@@ -24,7 +24,7 @@ use JSON ();
 use Scalar::Util qw(blessed);
 use URI ();
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 my $JSON = JSON->new->utf8;
@@ -50,6 +50,7 @@ sub _blob_response_headers {
     my %headers = (
         'Content-Type'   => $descriptor->type,
         'Content-Length' => $descriptor->size,
+        'Accept-Ranges'  => 'bytes',
 
         # Do not let the browser second-guess the declared type: a blob served
         # as text/plain or application/octet-stream must not be sniffed into
@@ -247,17 +248,74 @@ sub handle_get_blob {
     croak "blob request method must be GET" unless $request->method eq 'GET';
 
     my $sha256 = _sha256_from_blob_path($request->path, allow_extension => 1);
+    my $range_spec = _byte_range_spec($request->header('range'));
+    return $self->_get_full_blob($sha256) unless defined $range_spec;
+
+    my ($descriptor, $body);
+    my $native_range = $self->storage->can('head_blob')
+        && $self->storage->can('get_blob_range');
+
+    if ($native_range) {
+        my $head = $self->storage->head_blob($sha256);
+        return Net::Blossom::Server::Response->empty(404) unless defined $head;
+        $descriptor = _descriptor_from_head_result($head);
+    }
+    else {
+        my $result = $self->storage->get_blob($sha256);
+        return Net::Blossom::Server::Response->empty(404) unless defined $result;
+        _validate_blob_result($result, $sha256);
+        $descriptor = $result->descriptor;
+        $body = $result->body;
+    }
+
+    croak "storage returned descriptor sha256 mismatch" unless $descriptor->sha256 eq $sha256;
+    my $range = _resolve_byte_range($range_spec, $descriptor->size);
+    if (!defined $range) {
+        $body->close if blessed($body) && $body->can('close');
+        return _range_not_satisfiable($descriptor->size);
+    }
+
+    if ($native_range) {
+        $body = $self->storage->get_blob_range(
+            $sha256,
+            offset => $range->{offset},
+            length => $range->{length},
+        );
+        return Net::Blossom::Server::Response->empty(404) unless defined $body;
+        $body = _bounded_range_body($body, 0, $range->{length}, $self->chunk_size);
+    }
+    else {
+        $body = _bounded_range_body(
+            $body,
+            $range->{offset},
+            $range->{length},
+            $self->chunk_size,
+        );
+    }
+
+    my $headers = _blob_response_headers($descriptor);
+    $headers->{'Content-Length'} = $range->{length};
+    $headers->{'Content-Range'} = sprintf 'bytes %d-%d/%d',
+        $range->{offset},
+        $range->{offset} + $range->{length} - 1,
+        $descriptor->size;
+
+    return Net::Blossom::Server::Response->new(
+        status  => 206,
+        headers => $headers,
+        body    => $body,
+    );
+}
+
+sub _get_full_blob {
+    my ($self, $sha256) = @_;
     my $result = $self->storage->get_blob($sha256);
     return Net::Blossom::Server::Response->empty(404) unless defined $result;
-
-    croak "storage get_blob must return a Net::Blossom::Server::BlobResult"
-        unless blessed($result) && $result->isa('Net::Blossom::Server::BlobResult');
-    my $descriptor = $result->descriptor;
-    croak "storage returned descriptor sha256 mismatch" unless $descriptor->sha256 eq $sha256;
+    _validate_blob_result($result, $sha256);
 
     return Net::Blossom::Server::Response->new(
         status  => 200,
-        headers => _blob_response_headers($descriptor),
+        headers => _blob_response_headers($result->descriptor),
         body    => $result->body,
     );
 }
@@ -627,10 +685,115 @@ sub _descriptor_from_head_result {
 
     return $result
         if blessed($result) && $result->isa('Net::Blossom::BlobDescriptor');
-    return $result->descriptor
-        if blessed($result) && $result->isa('Net::Blossom::Server::BlobResult');
+    if (blessed($result) && $result->isa('Net::Blossom::Server::BlobResult')) {
+        my $body = $result->body;
+        $body->close if blessed($body) && $body->can('close');
+        return $result->descriptor;
+    }
 
     croak "storage head_blob must return a Net::Blossom::BlobDescriptor or Net::Blossom::Server::BlobResult";
+}
+
+sub _validate_blob_result {
+    my ($result, $sha256) = @_;
+    croak "storage get_blob must return a Net::Blossom::Server::BlobResult"
+        unless blessed($result) && $result->isa('Net::Blossom::Server::BlobResult');
+    croak "storage returned descriptor sha256 mismatch"
+        unless $result->descriptor->sha256 eq $sha256;
+    return 1;
+}
+
+sub _byte_range_spec {
+    my ($header) = @_;
+    return undef unless defined $header && !ref($header);
+    return undef unless $header =~ /\Abytes=(\d*)-(\d*)\z/i;
+
+    my ($first, $last) = ($1, $2);
+    return undef unless length($first) || length($last);
+    return undef if length($first) && length($last) && $last < $first;
+
+    return length($first)
+        ? {
+            first => 0 + $first,
+            (length($last) ? (last => 0 + $last) : ()),
+        }
+        : {suffix => 0 + $last};
+}
+
+sub _resolve_byte_range {
+    my ($spec, $size) = @_;
+
+    if (exists $spec->{suffix}) {
+        return undef unless $spec->{suffix} > 0 && $size > 0;
+        my $length = $spec->{suffix} < $size ? $spec->{suffix} : $size;
+        return {
+            offset => $size - $length,
+            length => $length,
+        };
+    }
+
+    return undef if $spec->{first} >= $size;
+    my $last = exists $spec->{last} && $spec->{last} < $size
+        ? $spec->{last}
+        : $size - 1;
+    return {
+        offset => $spec->{first},
+        length => $last - $spec->{first} + 1,
+    };
+}
+
+sub _range_not_satisfiable {
+    my ($size) = @_;
+    return Net::Blossom::Server::Response->empty(
+        416,
+        headers => {
+            'Accept-Ranges' => 'bytes',
+            'Content-Range' => "bytes */$size",
+        },
+    );
+}
+
+sub _bounded_range_body {
+    my ($body, $offset, $length, $chunk_size) = @_;
+
+    if (!ref($body)) {
+        my $range = substr($body, $offset, $length);
+        croak "range body length must match requested length"
+            unless length($range) == $length;
+        return $range;
+    }
+
+    if (ref($body) eq 'ARRAY') {
+        my @range;
+        my $remaining = $length;
+        my $skip = $offset;
+        for my $chunk (@$body) {
+            croak "range body chunks must be defined" unless defined $chunk;
+            croak "range body chunks must be scalars" if ref($chunk);
+            if ($skip >= length($chunk)) {
+                $skip -= length($chunk);
+                next;
+            }
+
+            my $take = length($chunk) - $skip;
+            $take = $remaining if $take > $remaining;
+            push @range, substr($chunk, $skip, $take) if $take;
+            $remaining -= $take;
+            last unless $remaining;
+            $skip = 0;
+        }
+        croak "range body length must match requested length" if $remaining;
+        return \@range;
+    }
+
+    croak "range body must be a scalar, array reference, or stream object"
+        unless blessed($body) && ($body->can('read') || $body->can('getline'));
+    return Net::Blossom::Server::_RangeStream->new(
+        body       => $body,
+        offset     => $offset,
+        remaining  => $length,
+        chunk_size => $chunk_size,
+    );
 }
 
 sub _typed_error_response {
@@ -879,6 +1042,138 @@ sub _validate_pubkey {
     my ($pubkey) = @_;
     croak "pubkey must be a scalar" if ref($pubkey);
     croak "pubkey must be 64-char lowercase hex" unless $pubkey =~ $HEX64;
+}
+
+{
+    package Net::Blossom::Server::_RangeStream;
+
+    use strictures 2;
+
+    use Carp qw(croak);
+    use Class::Tiny qw(body offset remaining chunk_size), {
+        buffer => '',
+        closed => 0,
+    };
+    use Scalar::Util qw(blessed);
+
+    sub BUILD {
+        my ($self) = @_;
+        croak "range body must be a stream object"
+            unless blessed($self->{body})
+            && ($self->{body}->can('read') || $self->{body}->can('getline'));
+        $self->buffer;
+        $self->closed;
+        return;
+    }
+
+    sub read {
+        my ($self, undef, $length) = @_;
+        croak "read length must be a non-negative integer"
+            unless defined $length && !ref($length) && $length =~ /\A[0-9]+\z/;
+        $_[1] = '';
+        return 0 if $self->{closed} || !$length;
+
+        $self->_skip_prefix;
+        my $want = $length < $self->{remaining} ? $length : $self->{remaining};
+        my $chunk = $self->_read_source($want);
+        if (!length($chunk)) {
+            $self->close;
+            croak "range body ended before requested length";
+        }
+
+        $_[1] = $chunk;
+        $self->{remaining} -= length($chunk);
+        $self->close unless $self->{remaining};
+        return length($chunk);
+    }
+
+    sub getline {
+        my ($self) = @_;
+        my $chunk = '';
+        my $read = $self->read($chunk, $self->{chunk_size});
+        return unless $read;
+        return $chunk;
+    }
+
+    sub close {
+        my ($self) = @_;
+        return 1 if $self->{closed};
+        $self->{body}->close if $self->{body}->can('close');
+        $self->{buffer} = '';
+        $self->{closed} = 1;
+        return 1;
+    }
+
+    sub _skip_prefix {
+        my ($self) = @_;
+        if (!$self->{body}->can('read')) {
+            while ($self->{offset}) {
+                my $chunk = $self->{body}->getline;
+                if (!defined $chunk || !length($chunk)) {
+                    $self->close;
+                    croak "range body ended before requested offset";
+                }
+                croak "range body stream chunks must be scalars" if ref($chunk);
+
+                if (length($chunk) <= $self->{offset}) {
+                    $self->{offset} -= length($chunk);
+                    next;
+                }
+
+                $self->{buffer} = substr(
+                    $chunk,
+                    $self->{offset},
+                    $self->{remaining},
+                );
+                $self->{offset} = 0;
+            }
+            return;
+        }
+
+        while ($self->{offset}) {
+            my $want = $self->{offset} < $self->{chunk_size}
+                ? $self->{offset}
+                : $self->{chunk_size};
+            my $chunk = $self->_read_source($want);
+            if (!length($chunk)) {
+                $self->close;
+                croak "range body ended before requested offset";
+            }
+            $self->{offset} -= length($chunk);
+        }
+        return;
+    }
+
+    sub _read_source {
+        my ($self, $length) = @_;
+        if (length($self->{buffer})) {
+            return substr($self->{buffer}, 0, $length, '');
+        }
+
+        if ($self->{body}->can('read')) {
+            my $chunk = '';
+            my $read = $self->{body}->read($chunk, $length);
+            croak "range body stream read failed" unless defined $read;
+            croak "range body stream returned an invalid length"
+                unless $read == length($chunk) && length($chunk) <= $length;
+            return $chunk;
+        }
+
+        my $chunk = $self->{body}->getline;
+        return '' unless defined $chunk;
+        croak "range body stream chunks must be scalars" if ref($chunk);
+        return $chunk if length($chunk) <= $length;
+        my $buffer_length = $self->{remaining} - $length;
+        $self->{buffer} = substr($chunk, $length, $buffer_length)
+            if $buffer_length;
+        return substr($chunk, 0, $length);
+    }
+
+    sub DEMOLISH {
+        my ($self) = @_;
+        eval { $self->close } unless $self->{closed};
+        return;
+    }
 }
 
 {
@@ -1232,11 +1527,16 @@ Handles a normalized C<GET /E<lt>sha256E<gt>> request and returns a
 C<Net::Blossom::Server::Response>. The request path must contain one lowercase
 64-character SHA-256 hash segment and may include a file extension.
 
-The method calls C<< $server->storage->get_blob($sha256) >>. It returns C<404>
-when storage returns C<undef>. Otherwise, storage must return a
-C<Net::Blossom::Server::BlobResult> whose descriptor C<sha256> matches the
-request path. The response status is C<200>, the response body is the blob body,
-and C<Content-Type> and C<Content-Length> come from the descriptor.
+Without a valid C<Range> header, the method calls
+C<< $server->storage->get_blob($sha256) >> and returns C<200>. A valid single
+byte range returns C<206> with C<Content-Range>. An unsatisfiable range returns
+C<416>. Malformed ranges, unsupported units, and multiple ranges are ignored.
+
+When storage provides both C<head_blob> and C<get_blob_range>, range requests
+use them to avoid reading the complete blob. Older storage implementations fall
+back to C<get_blob> and return only the requested bytes from scalar, array, or
+stream bodies. A stream that implements C<read> is not read past the requested
+range. Successful blob responses include C<Accept-Ranges: bytes>.
 
 =head2 handle_head_blob
 
@@ -1244,12 +1544,13 @@ and C<Content-Type> and C<Content-Length> come from the descriptor.
 
 Handles a normalized C<HEAD /E<lt>sha256E<gt>> request and returns the same
 C<Content-Type> and C<Content-Length> headers as C<GET /E<lt>sha256E<gt>>
-without returning the blob body. The request path may include a file extension.
+without returning the blob body. It also returns C<Accept-Ranges: bytes>. The
+request path may include a file extension.
 
 If storage provides an optional C<head_blob($sha256)> method, that method is
 used and may return either a L<Net::Blossom::BlobDescriptor> or a
 L<Net::Blossom::Server::BlobResult>. Otherwise C<get_blob> is used and the body
-is discarded.
+is discarded. A closeable discarded body is closed.
 
 =head2 handle_media
 

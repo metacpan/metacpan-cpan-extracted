@@ -1,2 +1,5 @@
+0.001001 2026-07-16
+    - Read HTTP byte ranges through bounded S3 ranged requests.
+
 0.001000  2026-07-15
     - Initial CPAN release.

@@ -11,7 +11,7 @@ use Net::Blossom::Server::BlobResult;
 use Net::Blossom::Server::BlobStore;
 use Net::Blossom::Server::MetadataStore;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001001';
 
 my @BLOB_STORE_ARGS = qw(
     bucket endpoint region access_key_id secret_access_key session_token
@@ -85,6 +85,17 @@ sub get_blob {
     return Net::Blossom::Server::BlobResult->new(
         descriptor => $self->_descriptor($row),
         body       => $body,
+    );
+}
+
+sub get_blob_range {
+    my ($self, $sha256, %opts) = @_;
+    my $row = $self->metadata_store->find_blob($sha256);
+    return unless defined $row;
+    return $self->blob_store->get_blob_range(
+        $row->{storage_key},
+        %opts,
+        size => $row->{size},
     );
 }
 
@@ -443,6 +454,11 @@ Starts a blob upload.
 Returns a L<Net::Blossom::Server::BlobResult>, or C<undef> when metadata or
 object bytes are absent. The default byte store returns a ranged-read stream
 for nonempty objects.
+
+=head2 get_blob_range
+
+Returns one requested byte range as a bounded ranged-read stream, or C<undef>
+when metadata or object bytes are absent.
 
 =head2 head_blob
 

@@ -1,0 +1,143 @@
+## name simple literal match
+## failures 1
+## cut
+
+$str =~ /foo/;
+
+## name bare match
+## failures 1
+## cut
+
+/foo/;
+
+## name literal with space
+## failures 1
+## cut
+
+$str =~ /foo bar/;
+
+## name escaped metachar is still literal
+## failures 1
+## cut
+
+$str =~ /foo\./;
+
+## name escaped backslash is still literal
+## failures 1
+## cut
+
+$str =~ /foo\\/;
+
+## name literal with special regex chars escaped
+## failures 1
+## cut
+
+$str =~ /foo\+bar/;
+
+## name multiple literals
+## failures 1
+## cut
+
+$str =~ /hello world/;
+
+## name char class is not simple
+## failures 0
+## cut
+
+$str =~ /[a-z]/;
+
+## name dot is not simple
+## failures 0
+## cut
+
+$str =~ /foo.bar/;
+
+## name quantifier is not simple
+## failures 0
+## cut
+
+$str =~ /fo+/;
+
+## name star quantifier
+## failures 0
+## cut
+
+$str =~ /fo*/;
+
+## name optional is not simple
+## failures 0
+## cut
+
+$str =~ /fo?/;
+
+## name anchor is not simple
+## failures 0
+## cut
+
+$str =~ /^foo/;
+
+## name end anchor
+## failures 0
+## cut
+
+$str =~ /foo$/;
+
+## name alternation is not simple
+## failures 0
+## cut
+
+$str =~ /foo|bar/;
+
+## name capture group is not simple
+## failures 0
+## cut
+
+$str =~ /(foo)/;
+
+## name non-capturing group is not simple
+## failures 0
+## cut
+
+$str =~ /(?:foo)/;
+
+## name interpolation is not simple
+## failures 0
+## cut
+
+$str =~ /$foo/;
+
+## name case insensitive modifier
+## failures 0
+## cut
+
+$str =~ /foo/i;
+
+## name multiline modifier
+## failures 0
+## cut
+
+$str =~ /foo/m;
+
+## name single-line modifier
+## failures 0
+## cut
+
+$str =~ /foo/s;
+
+## name extended modifier
+## failures 0
+## cut
+
+$str =~ /foo/x;
+
+## name empty regex should not flag
+## failures 0
+## cut
+
+$m =~ //;
+
+## name backreference is not simple
+## failures 0
+## cut
+
+$str =~ /(foo)\1/;

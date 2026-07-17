@@ -82,6 +82,14 @@ subtest 'gen_random_string - functional' => sub {
     # Default length
     my ($def, $msg3) = gen_random_string();
     is(length($def), 13, 'default length is 13');
+
+    # Non-numeric length falls back to default
+    my ($bad_len, $msg4) = gen_random_string('abc');
+    is(length($bad_len), 13, 'non-numeric length falls back to default');
+
+    # Whitespace-only charset is treated as no charset
+    my ($ws, $msg5) = gen_random_string(10, ' ');
+    is(length($ws), 10, 'whitespace-only charset: correct length');
 };
 
 subtest 'gen_word_phrase - functional' => sub {

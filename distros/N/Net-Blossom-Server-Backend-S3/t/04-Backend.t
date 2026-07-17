@@ -33,6 +33,13 @@ my $sha256 = sha256_hex($first_body);
 my $first = _upload($storage, $first_body, 1);
 ok($first->created, 'first upload creates bytes');
 my $first_key = $metadata->find_blob($sha256)->{storage_key};
+my $range = $storage->get_blob_range($sha256, offset => 6, length => 4);
+my $range_body = '';
+is($range->read($range_body, 20), 4,
+    'backend range stream is bounded by requested length');
+is($range_body, 'gene', 'backend range retrieval returns requested bytes');
+is_deeply($client->ranges->[-1], [$first_key, 6, 9],
+    'backend range retrieval starts at the requested object offset');
 my $duplicate = _upload($storage, $first_body, 2);
 ok(!$duplicate->created, 'duplicate upload reuses existing bytes');
 is(scalar @{$client->uploads}, 1, 'duplicate upload does not send another object');

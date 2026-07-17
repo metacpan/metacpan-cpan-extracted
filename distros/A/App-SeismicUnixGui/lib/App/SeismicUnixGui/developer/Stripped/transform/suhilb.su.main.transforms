@@ -4,6 +4,11 @@
 
  Note: the transform is computed in the direct (time) domain   
 
+ Optional parameters: none
+
+ Required parameters: none
+
+                   opt=null
 
  Credits:
 	CWP: Jack Cohen   

@@ -31,6 +31,14 @@ sub dies(&) {
         return length $_[2];
     }
 
+    sub pg_lo_lseek {
+        my ($self, $fd, $offset, $whence) = @_;
+        push @{$self->{seek_calls}}, [$fd, $offset, $whence];
+        die "seek failed\n" if $self->{seek_error};
+        $self->{offset} = $offset;
+        return $offset;
+    }
+
     sub pg_lo_close {
         my ($self) = @_;
         $self->{large_object_closed}++;
@@ -59,12 +67,58 @@ sub dies(&) {
 }
 
 sub stream {
-    my ($dbh) = @_;
+    my ($dbh, %args) = @_;
     return Net::Blossom::Server::Backend::Postgres::BlobStore::_Stream->new(
         dbh => $dbh,
         fd  => 7,
+        %args,
     );
 }
+
+subtest 'range stream seeks and closes at the requested boundary' => sub {
+    my $dbh = Local::StreamDBH->new(data => 'abcdefghij');
+    my $stream = stream($dbh, offset => 3, remaining => 4);
+
+    is_deeply($dbh->{seek_calls}, [[7, 3, 0]],
+        'large object is positioned at the requested offset');
+    my $chunk = '';
+    is($stream->read($chunk, 100), 4, 'range read is bounded by requested length');
+    is($chunk, 'defg', 'range read returns only requested bytes');
+    is($dbh->{large_object_closed}, 1, 'range boundary closes the large object');
+    is($dbh->{committed}, 1, 'range boundary commits the read transaction');
+    is($dbh->{disconnected}, 1, 'range boundary disconnects the reader');
+    is($stream->read($chunk, 1), 0, 'range stream remains at EOF');
+};
+
+subtest 'range seek failure rolls back and disconnects' => sub {
+    my $dbh = Local::StreamDBH->new(data => 'abcdefghij', seek_error => 1);
+
+    like(
+        dies { stream($dbh, offset => 3, remaining => 4) },
+        qr/seek failed/,
+        'seek error is preserved',
+    );
+    is($dbh->{large_object_closed}, 1, 'seek failure closes the large object');
+    is($dbh->{rolled_back}, 1, 'seek failure rolls back the transaction');
+    is($dbh->{disconnected}, 1, 'seek failure disconnects the reader');
+};
+
+subtest 'short range rolls back and disconnects' => sub {
+    my $dbh = Local::StreamDBH->new(data => 'abc');
+    my $stream = stream($dbh, offset => 2, remaining => 2);
+    my $chunk = '';
+
+    is($stream->read($chunk, 10), 1, 'available range byte is returned');
+    is($chunk, 'c', 'available range byte is correct');
+    like(
+        dies { $stream->read($chunk, 10) },
+        qr/range ended before requested length/,
+        'early EOF is rejected',
+    );
+    is($dbh->{large_object_closed}, 1, 'short range closes the large object');
+    is($dbh->{rolled_back}, 1, 'short range rolls back the transaction');
+    is($dbh->{disconnected}, 1, 'short range disconnects the reader');
+};
 
 subtest 'getline reaches EOF and commits the read transaction' => sub {
     my $first = 'x' x 65536;

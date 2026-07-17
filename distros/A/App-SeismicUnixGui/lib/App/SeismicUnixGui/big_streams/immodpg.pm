@@ -1,6 +1,6 @@
 package App::SeismicUnixGui::big_streams::immodpg;
 
-=head1 DOCUMENTATION
+=head1 DOCUMENTATION 7985
 
 =head2 SYNOPSIS 
 
@@ -2715,157 +2715,196 @@ variables
 	return ();
 }
 
+
 =head2 sub _set_control
 Correct improper values
-
 =cut
 
 sub _set_control {
+    my ( $name, $value ) = @_;
 
-	my ( $name, $value ) = @_;
+    if ( length($name) && length($value) ) {
 
-	if (   length($name)
-		&& length($value) )
-	{
+        # print("immodpg, _set_control, name=$name, value=$value\n");
 
-		# print("immodpg, _set_control, name=$name, value=$value\n");
-
-		if ( $name eq 'Vtop' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 10;
-
-# print("immodpg, _set_control, new corrected Vtop=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-			}
-
-		}
-		elsif ( $name eq 'Vbot' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 10;
-
-# print("immodpg, _set_control, new corrected Vbot=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-			}
-
-		}
-		elsif ( $name eq 'Vbot_upper_layer' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 10;
-
-# print("immodpg, _set_control, corrected Vbot_upper_layer=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-
-# print("immodpg, _set_control, uncorrected Vbot_upper_layer=$immodpg->{_control_value}\n");
-			}
-
-		}
-		elsif ( $name eq 'VbotNtop_factor' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 1;
-
-# print("immodpg, _set_control, new corrected VbotNtop_factor=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-
-# print("immodpg, _set_control, uncorrected VbotNtop_factor=$immodpg->{_control_value}\n");
-			}
-		}
-		elsif ( $name eq 'Vincrement' ) {
-			if ( $value < 0 ) {
-
-				# Vincrement is wild
-				$immodpg->{_control_value} = $value;
-
-# print("immodpg, _set_control, new corrected Vincrement=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-
-# print("immodpg, _set_control, uncorrected VbotNtop_factor=$immodpg->{_control_value}\n");
-			}
-
-		}
-		elsif ( $name eq 'Vtop_lower_layer' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 10;
-
-# print("immodpg, _set_control, new corrected Vtop_lower_layer=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-			}
-
-		}
-		elsif ( $name eq 'clip4plot' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 0.1;
-
-# print("immodpg, _set_control, new corrected clip4plot=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-
-# print("immodpg, _set_control, uncorrected clip4plot=$immodpg->{_control_value}\n");
-			}
-
-		}
-		elsif ( $name eq 'thickness_m' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 0.1;
-
-# print("immodpg, _set_control, new corrected thickness_m=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-			}
-
-		}
-		elsif ( $name eq 'thickness_increment_m' ) {
-			if ( $value < 0 ) {
-
-				$immodpg->{_control_value} = 1;
-
-# print("immodpg, _set_control, new corrected thicknessincrement_m=$immodpg->{_control_value}\n");
-
-			}
-			else {
-				$immodpg->{_control_value} = $value;
-			}
-		}
-		else {
-			print("immodpg,_setVp_dz, unexpected name \n");
-		}
-
-	}
-	else {
-		print("immodpg, _setVp_dz, missing variable\n");
-		print("immodpg, _setVp_dz, name=$name\n");
-		print("immodpg, _setVp_dz, value=$value\n");
-	}
-	return ();
+        if ( $name eq 'Vtop' or $name eq 'Vbot' or $name eq 'Vbot_upper_layer' or $name eq 'Vtop_lower_layer' ) {
+            $immodpg->{_control_value} = ($value < 0) ? 10 : $value;
+        }
+        elsif ( $name eq 'VbotNtop_factor' ) {
+            $immodpg->{_control_value} = ($value < 0) ? 1 : $value;
+        }
+        elsif ( $name eq 'Vincrement' ) {
+            # Vincrement can be any value (including negative)
+            $immodpg->{_control_value} = $value;
+        }
+        elsif ( $name eq 'clip4plot' or $name eq 'thickness_m' ) {
+            $immodpg->{_control_value} = ($value < 0) ? 0.1 : $value;
+        }
+        elsif ( $name eq 'thickness_increment_m' ) {
+            $immodpg->{_control_value} = ($value < 0) ? 1 : $value;
+        }
+        else {
+            print("immodpg, _set_control, unexpected name: $name\n");
+        }
+    }
+    else {
+        print("immodpg, _set_control, missing variable\n");
+        print("immodpg, _set_control, name=$name\n");
+        print("immodpg, _set_control, value=$value\n");
+    }
+    return ();
 }
+#=head2 sub _set_control
+#Correct improper values
+#
+#=cut
+#
+#sub _set_control {
+#
+#	my ( $name, $value ) = @_;
+#
+#	if (   length($name)
+#		&& length($value) )
+#	{
+#
+#		# print("immodpg, _set_control, name=$name, value=$value\n");
+#
+#		if ( $name eq 'Vtop' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 10;
+#
+## print("immodpg, _set_control, new corrected Vtop=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#			}
+#
+#		}
+#		elsif ( $name eq 'Vbot' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 10;
+#
+## print("immodpg, _set_control, new corrected Vbot=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#			}
+#
+#		}
+#		elsif ( $name eq 'Vbot_upper_layer' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 10;
+#
+## print("immodpg, _set_control, corrected Vbot_upper_layer=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#
+## print("immodpg, _set_control, uncorrected Vbot_upper_layer=$immodpg->{_control_value}\n");
+#			}
+#
+#		}
+#		elsif ( $name eq 'VbotNtop_factor' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 1;
+#
+## print("immodpg, _set_control, new corrected VbotNtop_factor=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#
+## print("immodpg, _set_control, uncorrected VbotNtop_factor=$immodpg->{_control_value}\n");
+#			}
+#		}
+#		elsif ( $name eq 'Vincrement' ) {
+#			if ( $value < 0 ) {
+#
+#				# Vincrement is wild
+#				$immodpg->{_control_value} = $value;
+#
+## print("immodpg, _set_control, new corrected Vincrement=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#
+## print("immodpg, _set_control, uncorrected VbotNtop_factor=$immodpg->{_control_value}\n");
+#			}
+#
+#		}
+#		elsif ( $name eq 'Vtop_lower_layer' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 10;
+#
+## print("immodpg, _set_control, new corrected Vtop_lower_layer=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#			}
+#
+#		}
+#		elsif ( $name eq 'clip4plot' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 0.1;
+#
+## print("immodpg, _set_control, new corrected clip4plot=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#
+## print("immodpg, _set_control, uncorrected clip4plot=$immodpg->{_control_value}\n");
+#			}
+#
+#		}
+#		elsif ( $name eq 'thickness_m' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 0.1;
+#
+## print("immodpg, _set_control, new corrected thickness_m=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#			}
+#
+#		}
+#		elsif ( $name eq 'thickness_increment_m' ) {
+#			if ( $value < 0 ) {
+#
+#				$immodpg->{_control_value} = 1;
+#
+## print("immodpg, _set_control, new corrected thicknessincrement_m=$immodpg->{_control_value}\n");
+#
+#			}
+#			else {
+#				$immodpg->{_control_value} = $value;
+#			}
+#		}
+#		else {
+#			print("immodpg,_setVp_dz, unexpected name \n");
+#		}
+#
+#	}
+#	else {
+#		print("immodpg, _setVp_dz, missing variable\n");
+#		print("immodpg, _setVp_dz, name=$name\n");
+#		print("immodpg, _setVp_dz, value=$value\n");
+#	}
+#	return ();
+#}
 
 =head2 sub _set_initialVp_dz
 Establish the initial values
@@ -3810,8 +3849,7 @@ sub _set_option {
 		my $files   = manage_files_by2->new();
 		my $control = control->new();
 
-=head2 Define local
-variables
+=head2 Define local variables
 
 =cut		
 
@@ -5625,6 +5663,7 @@ sub get_max_index {
 }
 
 =head2 sub initialize_messages
+
 Create widgets that show messages
 Show warnings or errors in a message box
 Message box is defined in main where it is
@@ -5648,7 +5687,8 @@ sub initialize_messages {
 	);
 
 =head2 message box
-withdraw temporarily while filling
+
+Withdraw temporarily while filling
 with widgets
 
 =cut 
@@ -5685,6 +5725,7 @@ with widgets
 	);
 
 =head2 Pack message box
+
 This Toplevel window has 
 geometry that is independent
 of the main window widget.
@@ -5738,7 +5779,7 @@ sub initialize_model {
 
 =head2 sub get_number_of_layers
 
-determine number of layers
+Determine number of layers
 from model.text file
 
 =cut

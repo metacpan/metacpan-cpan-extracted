@@ -78,6 +78,27 @@ sub dies(&) {
     }
 }
 
+{
+    package Local::CloseStream;
+    use strictures 2;
+
+    sub new {
+        my ($class) = @_;
+        return bless {closed => 0}, $class;
+    }
+
+    sub read {
+        $_[1] = '';
+        return 0;
+    }
+
+    sub close {
+        my ($self) = @_;
+        $self->{closed} = 1;
+        return 1;
+    }
+}
+
 sub request {
     my (%args) = @_;
     return Net::Blossom::Server::Request->new(
@@ -154,6 +175,24 @@ subtest 'handle_head_blob uses optional storage head_blob method' => sub {
     is($response->body, '', 'empty body');
     is($storage->{last_head_blob}, $SHA256, 'head_blob receives hash without extension');
     is($storage->{last_get_blob}, undef, 'get_blob not called when head_blob exists');
+};
+
+subtest 'handle_head_blob closes a body returned with head metadata' => sub {
+    my $stream = Local::CloseStream->new;
+    my $storage = Local::HeadStorage->new(blobs => {
+        $SHA256 => blob_result(
+            descriptor => descriptor(size => 99),
+            body       => $stream,
+        ),
+    });
+    my $server = Net::Blossom::Server->new(storage => $storage);
+
+    my $response = $server->handle_head_blob(
+        request(method => 'HEAD', path => "/$SHA256"),
+    );
+
+    is($response->status, 200, 'head blob status');
+    ok($stream->{closed}, 'unused metadata body stream is closed');
 };
 
 subtest 'handle_get_blob accepts optional file extension from BUD-01' => sub {

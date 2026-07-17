@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Bindings for librtmidi - Realtime MIDI library",
   "AUTHOR" => "John Barrett <john\@jbrt.org>",
   "CONFIGURE_REQUIRES" => {
+    "Alien::RtMidi" => "0.12",
     "ExtUtils::MakeMaker" => 0,
     "FFI::Build::MM" => "0.83"
   },
@@ -18,7 +19,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "MIDI::RtMidi::FFI",
   "PREREQ_PM" => {
-    "Alien::RtMidi" => "0.12",
     "FFI::CheckLib" => "0.25",
     "FFI::Platypus" => "2.00",
     "FFI::Platypus::Buffer" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::RtMidi" => "0.12",
   "FFI::CheckLib" => "0.25",
   "FFI::Platypus" => "2.00",
   "FFI::Platypus::Buffer" => 0,

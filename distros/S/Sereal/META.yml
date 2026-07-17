@@ -7,8 +7,8 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Scalar::Util: '0'
-  Sereal::Decoder: '5.008'
-  Sereal::Encoder: '5.008'
+  Sereal::Decoder: '5.009'
+  Sereal::Encoder: '5.009'
   Test::Deep: '0'
   Test::Differences: '0'
   Test::LongString: '0'
@@ -28,11 +28,11 @@ no_index:
     - t
     - inc
 requires:
-  Sereal::Decoder: '5.008'
-  Sereal::Encoder: '5.008'
+  Sereal::Decoder: '5.009'
+  Sereal::Encoder: '5.009'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '5.008'
+version: '5.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.019';
+$Arango::Tango::API::VERSION = '0.020';
 #use Arango::Tango::Database;
 #use Arango::Tango::Collection;
 
@@ -29,11 +29,13 @@ sub _install_methods($$) {
                   "${package}::$method",
                   sub {
                       my $self = shift;
+                      my $arango = ref($self) eq "Arango::Tango" ? $self : $self->{arango};
                       my %required = ();
                       my %optional = ();
                       if (exists($value->{signature})) {
                           if (scalar(@_) < scalar( grep { !/^\?/ } @{$value->{signature}})) {
-                              die sprintf("Arango::Tango | %s | Missing %s", $method, $value->{signature}[scalar(@_) - 1]);
+                              $self->{error} = sprintf("Arango::Tango | %s | Missing %s", $method, $value->{signature}[scalar(@_) - 1]);
+                              die "-1\n";
                           }
                           %required = ( map { $_ => shift @_ } grep { !/^\?/ } @{$value->{signature}} );
                           %optional = ( map {
@@ -47,8 +49,14 @@ sub _install_methods($$) {
                       if (exists($value->{inject_properties})) {
                           foreach my $property (@{$value->{inject_properties}}) {
                               if (ref($property) eq "HASH") {
-                                  die "Property injection without property" unless exists $property->{prop};
-                                  die "Property injection without alias"    unless exists $property->{as};
+                                  unless (exists $property->{prop}) { 
+                                      $arango->{error} = "Property injection without property" ;
+                                      die "-1\n";
+                                  }
+                                  unless (exists $property->{as}) {
+                                      $arango->{error} = "Property injection without alias"    ;
+                                      die "-1\n";
+                                  }
                                   $required{$property->{as}} = $self->{$property->{prop}};
                               }
                               else {
@@ -56,8 +64,10 @@ sub _install_methods($$) {
                               }
                           }
                       }
-                      die sprintf("Arango::Tango | %s | Odd number of elements on options hash", $method) if scalar(@_) % 2;
-                      my $arango = ref($self) eq "Arango::Tango" ? $self : $self->{arango};
+                      if (scalar(@_) % 2) {
+                            $arango->{error} = sprintf("Arango::Tango | %s | Odd number of elements on options hash", $method);
+                            die "-1\n";
+                      }
                       return $arango->__api( $value, { @_, %required });
                   })
           };
@@ -175,9 +185,7 @@ sub __api {
         $body = $params->{_body} if exists $params->{_body};
         $url_opts = $params->{_url_parameters} if exists $params->{_url_parameters} and ref($params->{_url_parameters}) eq "HASH";
         $opts = $params;
-        for (qw._body _parameters.) {
-            delete $opts->{$_} if exists $opts->{$_};
-        }
+        delete $opts->{$_} for (qw._body _parameters.);
     }
     $opts = exists($conf->{schema}) ? _check_options($opts, $conf->{schema}) : {};
     $url_opts = exists($conf->{url_schema}) ? _check_options($url_opts, $conf->{url_schema}) : {};
@@ -192,9 +200,9 @@ sub __api {
         $url .= ($url =~ /\?/ ? "&" : "?") . $url_parameters;
     }
 
-
     if (exists($conf->{require_document}) && !$body) {
-        die "Arango::Tango | Document missing\n    [ $method => $url ]\n";
+        $self->{error} = "Document missing [ $method => $url ]";
+        die "-1\n";
     }
 
     if ($method eq 'GET' && scalar(keys %$opts)) {
@@ -224,8 +232,8 @@ sub __api {
         }
     }
     else {
-
-        die "Arango::Tango | ($response->{status}) $response->{reason}\n    [ $method => $url ]\n";
+        $self->{error} = "$response->{reason} [ $method => $url ]";
+        die "$response->{status}\n";
     }
 }
 
@@ -245,15 +253,15 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 
-Alberto Simões <ambs@cpan.org>
+Alberto Simões <ambs@zbr.pt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2023 by Alberto Simões.
+This software is copyright (c) 2019-2026 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -463,9 +463,9 @@ sub _ok {
 		# CASE 1.C  an existing project is chosen
 		elsif ( $length_check_buttons_on == 1 ) {
 
-#			print(
-#"CASE 1.C: project_selector,_ok, length_check_buttons_on: $length_check_buttons_on\n"
-#			);
+# 			print(
+# "CASE 1.C: project_selector,_ok, length_check_buttons_on: $length_check_buttons_on\n"
+# 			);
 			use File::Copy;
 			my $CONFIGURATION  = $user_constants->get_CONFIGURATION;
 			my $ACTIVE_PROJECT = $user_constants->get_ACTIVE_PROJECT;

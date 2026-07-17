@@ -31,12 +31,38 @@ sub run_storage_contract_tests {
     Test::More::subtest $name => sub {
         _committed_uploads_are_visible($factory);
         _head_blob_returns_metadata_if_supported($factory);
+        _get_blob_range_returns_requested_bytes_if_supported($factory);
         _failed_uploads_are_not_visible($factory);
         _delete_hides_blob($factory);
         _delete_is_pubkey_scoped($factory);
     };
 
     return 1;
+}
+
+sub _get_blob_range_returns_requested_bytes_if_supported {
+    my ($factory) = @_;
+    my $storage = _fresh_storage($factory);
+
+    if (!$storage->can('get_blob_range')) {
+        Test::More::pass('optional get_blob_range is not implemented');
+        return;
+    }
+
+    my $body = "range contract body\n";
+    my $blob = _upload($storage, $body, 1725105921)->descriptor;
+    my $range = $storage->get_blob_range(
+        $blob->sha256,
+        offset => 6,
+        length => 8,
+    );
+    Test::More::is(_body_to_scalar($range), 'contract',
+        'get_blob_range returns only requested bytes');
+    Test::More::is(
+        $storage->get_blob_range($MISSING_SHA256, offset => 0, length => 1),
+        undef,
+        'get_blob_range returns undef for missing blobs',
+    );
 }
 
 sub _committed_uploads_are_visible {
@@ -316,9 +342,9 @@ empty storage object each time it is called. Persistent backends should delete
 test rows or files before returning the storage object.
 
 The tests cover successful uploads, duplicate upload deduplication, retrieval,
-optional C<head_blob>, failed upload abort behavior, owner-scoped deletion,
-shared blobs, list ordering, cursor pagination, unknown cursors, and limit
-handling.
+optional C<head_blob> and C<get_blob_range>, failed upload abort behavior,
+owner-scoped deletion, shared blobs, list ordering, cursor pagination, unknown
+cursors, and limit handling.
 
 =head1 STORAGE EXPECTATIONS
 
@@ -327,7 +353,8 @@ L<Net::Blossom::Server::Storage>. In particular, C<list_blobs> must return
 descriptors ordered by C<uploaded> descending and C<sha256> ascending, and
 C<cursor> must start the next page after the matching descriptor in that order.
 
-Missing blobs return C<undef> from C<get_blob> and optional C<head_blob>.
+Missing blobs return C<undef> from C<get_blob> and optional C<head_blob> and
+C<get_blob_range>.
 C<delete_blob> returns false when there is no matching blob or owner
 relationship. Failed uploads and aborted uploads must not become visible through
 C<get_blob> or C<list_blobs>.

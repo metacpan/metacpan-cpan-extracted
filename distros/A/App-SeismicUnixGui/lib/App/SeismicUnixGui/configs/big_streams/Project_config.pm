@@ -24,6 +24,9 @@ package App::SeismicUnixGui::configs::big_streams::Project_config;
  
  Feb 11, 2019 removed automatic creation of ~segy/raw directory
 
+ TODO Load all the defined directories into the environment on the
+ first use of this program  
+
 =head2 Declare variables in namespace
 
  
@@ -38,7 +41,6 @@ use aliased 'App::SeismicUnixGui::misc::control';
 use aliased 'App::SeismicUnixGui::misc::readfiles';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use aliased 'App::SeismicUnixGui::misc::dirs';
-use aliased 'App::SeismicUnixGui::misc::Project_Variables';
 
 my $readfiles         = readfiles->new();
 my $control           = control->new;
@@ -129,11 +131,12 @@ my $Project = {
 	_DATABASE_SEISMIC_SQLITE   => '',
 	_FAST_TOMO                 => '',
 	_GEOPSY                    => '',
+	_GEOPSY_EARTH_MODEL        => '',
+	_GEOPSY_FORWARD_MODEL      => '',
 	_GEOPSY_PARAMS             => '',
 	_GEOPSY_PICKS              => '',
 	_GEOPSY_PICKS_RAW          => '',
 	_GEOPSY_PROFILES           => '',
-	_GEOPSY_REPORTS            => '',
 	_GEOPSY_TARGETS            => '',
 	_GIF_SEISMIC               => '',
 	_ISOLA                     => '',
@@ -148,6 +151,7 @@ my $Project = {
 	_MMODPG                    => '',
 	_MOD2D_TOMO                => '',
 	_PL_SEISMIC                => '',
+	_PL_SEISMIC_SPECFEM2D      => '',
 	_PL_GEOMAPS                => '',
 	#	_PL_GPR                       => '',
 	_PL_RESISTIVITY_SURFACE       => '',
@@ -212,7 +216,7 @@ sub _get_ACTIVE_PROJECT {
 =head2 sub _basic_dirs
 
     	e.g., $GLOBAL_CONFIG_LIB:  as /usr/local/pl/L_SU/configs/big_streams
-    	first 2 cases should be deprecated
+    	first 2 cases are deprecated 1.17.26
 =cut
 
 sub _basic_dirs {
@@ -222,27 +226,27 @@ sub _basic_dirs {
 
 	my $prog_name        = '';
 	my $prog_name_new    = 'Project';
-	my $prog_name_old    = 'Project_Variables';
+	# my $prog_name_old    = 'Project_Variables';
 	my $prog_name_config = '';
 
-	if ( -e $prog_name_old . '.config' ) {
+# 	if ( -e $prog_name_old . '.config' ) {
 
-   # CASE 1 check local directory first LEGACY Project_Variables file
-#   print("1. CASE 1 Project_config,_basic_dirs,using local $prog_name_old.config\n");
+#    # CASE 1 check local directory first LEGACY Project_Variables file
+# #   print("1. CASE 1 Project_config,_basic_dirs,using local $prog_name_old.config\n");
 
-		$prog_name = $prog_name_old;
+# 		$prog_name = $prog_name_old;
 
-#		print("L 233 Project_config,_basic_dirs,using local $prog_name_old.config \n");
-		$prog_name_config = $prog_name_old . '.config';
-		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-		  $readfiles->configs( ( $prog_name . '.config' ) );
-		$Project->{_ref_DIR} = $ref_DIR;
+# #		print("L 233 Project_config,_basic_dirs,using local $prog_name_old.config \n");
+# 		$prog_name_config = $prog_name_old . '.config';
+# 		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
+# 		  $readfiles->configs( ( $prog_name . '.config' ) );
+# 		$Project->{_ref_DIR} = $ref_DIR;
 
-	#		print(" 1. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
-		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
-		_change_basic_dirs();
+# 	#		print(" 1. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+# 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
+# 		_change_basic_dirs();
 
-	}
+# 	}
 #	elsif ( -e $prog_name_new . '.config' ) {
 #
 #		# CASE2 check local directory for Project.config
@@ -254,7 +258,7 @@ sub _basic_dirs {
 #		$prog_name_config = $prog_name_new . '.config';    # i.e. Project.config
 #
 #	}
-	elsif ( -e $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) {
+    if ( -e $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) {
 
 		# CASE 3 check user configuration directory for Project.config
 
@@ -275,7 +279,7 @@ sub _basic_dirs {
 		# parameter widget values
 		$Project->{_ref_DIR} = $ref_DIR;
 
-	# print(" 2. Project_config,_basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+	    # print(" 2. Project_config,_basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
 
 		# parameter widget labels/names
 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
@@ -383,43 +387,45 @@ sub basic_dirs {
 
 	my $prog_name        = '';
 	my $prog_name_new    = 'Project';
-	my $prog_name_old    = 'Project_Variables';
+	# my $prog_name_old    = 'Project_Variables';
 	my $prog_name_config = '';
 
-	# 1. check local directory first,  LEGACY Project_Variables file
-	if ( -e $prog_name_old . '.config' ) {
+# 	# 1. check local directory first,  LEGACY Project_Variables file
+# refactored 1.17.26 deprecated no local Project_Variables file will be read
+# 	if ( -e $prog_name_old . '.config' ) {
 
-		$prog_name = $prog_name_old;
+# 		$prog_name = $prog_name_old;
 
-#		print("L390 Project_config,basic_dirs,using local $prog_name.config\n");
-		$prog_name_config = $prog_name_old . '.config';
+# #		print("L390 Project_config,basic_dirs,using local $prog_name.config\n");
+# 		$prog_name_config = $prog_name_old . '.config';
 
-		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-		  $readfiles->configs( ( $prog_name . '.config' ) );
-		$Project->{_ref_DIR} = $ref_DIR;
+# 		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
+# 		  $readfiles->configs( ( $prog_name . '.config' ) );
+# 		$Project->{_ref_DIR} = $ref_DIR;
 
-#	print(" 1. L 397 Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
-		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
-		_change_basic_dirs();
+# #	print(" 1. L 397 Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+# 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
+# 		_change_basic_dirs();
 
-		# 2. then, check local directory for Project.config
-	}
-# deprecated 10.27.24 no local Project.config file will be read
-#	elsif ( -e $prog_name_new . '.config' ) {
-#
-#		$prog_name = $prog_name_new;
-#		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-##				print(
-##		" L 408 Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
-#		  $readfiles->configs( ( $prog_name . '.config' ) );
-#		$Project->{_ref_DIR} = $ref_DIR;
-#
-#		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
-#		_change_basic_dirs();
-#
-#		# in local user configuration directory
-#	}
-	elsif ( -e ( $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) ) {
+# 		# 2. then, check local directory for Project.config
+# 	}
+# # deprecated 10.27.24 no local Project.config file will be read
+# #	elsif ( -e $prog_name_new . '.config' ) {
+# #
+# #		$prog_name = $prog_name_new;
+# #		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
+# ##				print(
+# ##		" L 408 Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+# #		  $readfiles->configs( ( $prog_name . '.config' ) );
+# #		$Project->{_ref_DIR} = $ref_DIR;
+# #
+# #		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
+# #		_change_basic_dirs();
+# #
+# #		# in local user configuration directory
+# #	}
+# 	els
+	if ( -e ( $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) ) {
 
 		$prog_name = $prog_name_new;
 
@@ -523,29 +529,31 @@ sub _change_basic_dirs {
 	$process   = $line_bck;
 	$line      = $spare_dir_bck;
 
-=head3 for old-stype Project_Variable files 
+# =head3 for old-stype Project_Variable files 
+# eprecated 1.17.26
 
- defaults in the local directory
+#  defaults in the local directory
 
-=cut
+# =cut
+# 
+# 	my $old_configuration_file = './Project_Variables.pm';
 
-	my $old_configuration_file = './Project_Variables.pm';
+# 	if ( -e $old_configuration_file ) {
 
-	if ( -e $old_configuration_file ) {
+# 		# print ("Looking for old-style configuration file\n\n");
+# 		# print("Using old-style configuration file\n\n");
 
-		# print ("Looking for old-style configuration file\n\n");
-		# print("Using old-style configuration file\n\n");
+# 		use aliased 'App::SeismicUnixGui::misc::Project_Variables';
 
-		my $Project_Variables = Project_Variables->new();
-		($date)         = $Project_Variables->date();
-		($line)         = $Project_Variables->line();
-		($component)    = $Project_Variables->component();
-		($stage)        = $Project_Variables->stage();
-		($process)      = $Project_Variables->process();
-		($PROJECT_HOME) = $Project_Variables->PROJECT_HOME();
-		$subUser = '';    #only in  new configuration files;
-
-	}
+# 		my $Project_Variables = Project_Variables->new();
+# 		($date)         = $Project_Variables->date();
+# 		($line)         = $Project_Variables->line();
+# 		($component)    = $Project_Variables->component();
+# 		($stage)        = $Project_Variables->stage();
+# 		($process)      = $Project_Variables->process();
+# 		($PROJECT_HOME) = $Project_Variables->PROJECT_HOME();
+# 		$subUser = '';    #only in  new configuration files;
+# 	}
 
 	$Project->{_HOME}                = $HOME;
 	$Project->{_date}                = $date;
@@ -661,6 +669,31 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
 
+	# GEOPSY DIRECTORY FORWARD MODELING DISPERSION CURVES
+	my $GEOPSY_EARTH_MODEL =
+		$SEISMIC
+	  . '/geopsy/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser. '/'
+	  . 'dispersion_model' .'/'
+	  . 'earth_model' ; 
+
+	# GEOPSY DIRECTORY FORWARD MODELING DISPERSION CURVES
+	my $GEOPSY_FORWARD_MODEL =
+		$SEISMIC
+	  . '/geopsy/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser. '/'
+	  . 'dispersion_model' .'/'
+	  . 'modes' ;
+
+	my $GEOPSY_MAKEUP =
+		$SEISMIC
+	  . '/geopsy/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser . '/'
+	  . 'makeup';
+
 	my $GEOPSY_PARAMS =
 		$SEISMIC
 	  . '/geopsy/'
@@ -682,13 +715,6 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'profiles';
-
-	my $GEOPSY_REPORTS =
-		$SEISMIC
-	  . '/geopsy/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-	  . $subUser . '/'
-	  . 'reports';
 
 	my $GEOPSY_TARGETS =
 		$SEISMIC
@@ -819,7 +845,7 @@ sub _system_dirs {
 	# FAST DIRECTORY for 2D RAYTRACING
 	my $MOD2D_TOMO = $SEISMIC . '/fast_tomo/All/mod2d';
 
-	#	# PERL DIRECTOIES
+	#	# PERL DIRECTORIES
 	#	my $PL_GPR =
 	#	  $GPR . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 
@@ -827,9 +853,14 @@ sub _system_dirs {
 		$RESISTIVITY_SURFACE . '/pl/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
+
 	my $PL_SEISMIC =
 	  $SEISMIC . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
-	my $PL_GEOMAPS =
+	my $PL_SEISMIC_SPECFEM2D = 
+      $PL_SEISMIC . '/specfem2d';
+	my $PY_SEISMIC =
+	  $SEISMIC . '/SUG_py/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	my $PL_GEOMAPS =	
 	  $GEOMAPS . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 	my $PL_WELL =
 	  $WELL . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
@@ -1185,11 +1216,14 @@ sub _system_dirs {
 	$Project->{_FAST_TOMO}                 = $FAST_TOMO;
 	
 	$Project->{_GEOPSY}                    = $GEOPSY;
+	# GEOPSY DIRECTORY FORWARD MODELING DISPERSION CURVES
+	$Project->{_GEOPSY_FORWARD_MODEL}      = $GEOPSY_FORWARD_MODEL;
+	$Project->{_GEOPSY_EARTH_MODEL}        = $GEOPSY_EARTH_MODEL;
+	$Project->{_GEOPSY_MAKEUP}             = $GEOPSY_MAKEUP;
 	$Project->{_GEOPSY_PARAMS}             = $GEOPSY_PARAMS;
 	$Project->{_GEOPSY_PICKS}              = $GEOPSY_PICKS;
 	$Project->{_GEOPSY_PICKS_RAW}          = $GEOPSY_PICKS_RAW;
 	$Project->{_GEOPSY_PROFILES}           = $GEOPSY_PROFILES;
-	$Project->{_GEOPSY_REPORTS}            = $GEOPSY_REPORTS;
 	$Project->{_GEOPSY_TARGETS}            = $GEOPSY_TARGETS;
 
 	$Project->{_GIF_SEISMIC}               = $GIF_SEISMIC;
@@ -1220,6 +1254,8 @@ sub _system_dirs {
 	#	$Project->{_PS_GPR}                 = $PS_GPR;
 	$Project->{_PL_RESISTIVITY_SURFACE} = $PL_RESISTIVITY_SURFACE;
 	$Project->{_PL_SEISMIC}             = $PL_SEISMIC;
+	$Project->{_PL_SEISMIC_SPECFEM2D}   = $PL_SEISMIC_SPECFEM2D;
+	$Project->{_PY_SEISMIC}             = $PY_SEISMIC;
 	$Project->{_RESISTIVITY_SURFACE}    = $RESISTIVITY_SURFACE;
 	$Project->{_R_GAMMA_WELL}           = $R_GAMMA_WELL;
 	$Project->{_R_RESISTIVITY_SURFACE}  = $R_RESISTIVITY_SURFACE;
@@ -1338,6 +1374,34 @@ sub system_dirs {
 	  . '/geopsy/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
+
+	# GEOPSY DIRECTORY EARTH MODEL
+	my $GEOPSY_EARTH_MODEL =
+		$SEISMIC
+	  . '/geopsy/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser . '/'
+	  . 'dispersion_model' .'/'
+	  . 'earth_model';
+
+	# GEOPSY DIRECTORY FORWARD MODELING DISPERSION CURVES
+	my $GEOPSY_FORWARD_MODEL =
+		$SEISMIC
+	  . '/geopsy/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser . '/'
+	  . 'dispersion_model' . '/'
+	  . 'mode';	
+
+	# GEOPSY DIRECTORY FORWARD MODELING DISPERSION CURVES
+	my $GEOPSY_MAKEUP =
+		$SEISMIC
+	  . '/geopsy/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser . '/'
+	  . 'makeup';	
+
+	# GEOPSY PARAMETERS DIRECTORY
 	my $GEOPSY_PARAMS =
 		$SEISMIC
 	  . '/geopsy/'
@@ -1359,13 +1423,6 @@ sub system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser . '/'
 	  . 'profiles';
-
-	my $GEOPSY_REPORTS =
-		$SEISMIC
-	  . '/geopsy/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-	  . $subUser . '/'
-	  . 'reports';
 
 	my $GEOPSY_TARGETS =
 		$SEISMIC
@@ -1521,12 +1578,18 @@ sub system_dirs {
 		$RESISTIVITY_SURFACE . '/pl/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
 	  . $subUser;
+
 	my $PL_SEISMIC =
 	  $SEISMIC . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	my $PY_SEISMIC =
+	  $SEISMIC . '/SUG_py/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	#	 print("Project_config,system_dirs, PL_SEISMIC =
 	my $PL_GEOMAPS =
 	  $GEOMAPS . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 	my $PL_WELL =
 	  $WELL . '/pl/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+	
+	my $PL_SEISMIC_SPECFEM2D = $PL_SEISMIC . '/specfem2d';
 
 	# R DIRECTORIES
 	my $R_RESISTIVITY_WELL =
@@ -1870,11 +1933,13 @@ sub system_dirs {
 #	$Project->{_DATA_WELL}                 = $DATA_WELL;
 	$Project->{_FAST_TOMO}                 = $FAST_TOMO;
 	$Project->{_GEOPSY}                    = $GEOPSY;
+	$Project->{_GEOPSY_EARTH_MODEL}        = $GEOPSY_EARTH_MODEL;
+	$Project->{_GEOPSY_FORWARD_MODEL}      = $GEOPSY_FORWARD_MODEL;
+	$Project->{_GEOPSY_MAKEUP}             = $GEOPSY_MAKEUP;
 	$Project->{_GEOPSY_PARAMS}             = $GEOPSY_PARAMS;
 	$Project->{_GEOPSY_PICKS}              = $GEOPSY_PICKS;
 	$Project->{_GEOPSY_PICKS_RAW}          = $GEOPSY_PICKS_RAW;
 	$Project->{_GEOPSY_PROFILES}           = $GEOPSY_PROFILES;
-	$Project->{_GEOPSY_REPORTS}            = $GEOPSY_REPORTS;
 	$Project->{_GEOPSY_TARGETS}            = $GEOPSY_TARGETS;
 
 	#	$Project->{_GIF_GPR}                   = $GIF_GPR;
@@ -1898,6 +1963,8 @@ sub system_dirs {
 	#	$Project->{_PL_GPR}                	   = $PL_GPR;
 	$Project->{_PL_RESISTIVITY_SURFACE} = $PL_RESISTIVITY_SURFACE;
 	$Project->{_PL_SEISMIC}             = $PL_SEISMIC;
+	$Project->{_PL_SEISMIC_SPECFEM2D}   = $PL_SEISMIC_SPECFEM2D;
+	$Project->{_PY_SEISMIC}             = $PY_SEISMIC;
 	$Project->{_PL_GEOMAPS}             = $PL_GEOMAPS;
 	$Project->{_PL_WELL}                = $PL_WELL;
 	$Project->{_PNG}                    = $PNG;
@@ -2378,6 +2445,24 @@ sub GEOPSY {
 	return ($GEOPSY);
 }
 
+sub GEOPSY_EARTH_MODEL {
+	_set_dirs();
+	my $GEOPSY_EARTH_MODEL = $Project->{_GEOPSY_EARTH_MODEL};
+	return ($GEOPSY_EARTH_MODEL);
+}
+
+sub GEOPSY_FORWARD_MODEL {
+	_set_dirs();
+	my $GEOPSY_FORWARD_MODEL = $Project->{_GEOPSY_FORWARD_MODEL};
+	return ($GEOPSY_FORWARD_MODEL);
+}
+
+sub GEOPSY_MAKEUP {
+	_set_dirs();
+	my $GEOPSY_MAKEUP = $Project->{_GEOPSY_MAKEUP};
+	return ($GEOPSY_MAKEUP);
+}
+
 sub GEOPSY_PARAMS {
 	_set_dirs();
 	my $GEOPSY_PARAMS = $Project->{_GEOPSY_PARAMS};
@@ -2400,12 +2485,6 @@ sub GEOPSY_PROFILES {
 	_set_dirs();
 	my $GEOPSY_PROFILES = $Project->{_GEOPSY_PROFILES};
 	return ($GEOPSY_PROFILES);
-}
-
-sub GEOPSY_REPORTS {
-	_set_dirs();
-	my $GEOPSY_REPORTS = $Project->{_GEOPSY_REPORTS};
-	return ($GEOPSY_REPORTS);
 }
 
 sub GEOPSY_TARGETS {
@@ -2549,6 +2628,26 @@ sub PL_SEISMIC {
 	# This subroutine returns the value of PL_SEISMIC
 	# print ("\nProject_config, PL_SEISMIC,PL_SEISMIC: $PL_SEISMIC\n");
 	return ($PL_SEISMIC);
+}
+
+sub PL_SEISMIC_SPECFEM2D {
+	_set_dirs();
+	my $PL_SEISMIC_SPECFEM2D = $Project->{_PL_SEISMIC_SPECFEM2D};
+
+	# This subroutine returns the value of PL_SEISMIC_SPECFEM2D
+	# print ("\nProject_config, PL_SEISMIC_SPECFEM2D,PL_SEISMIC_SPECFEM2D: $PL_SEISMIC_SPECFEM2D\n");
+	return ($PL_SEISMIC_SPECFEM2D);
+}
+
+sub PY_SEISMIC {
+	_set_dirs();
+	my $PY_SEISMIC_h = $Project->{_PY_SEISMIC};
+	control->set_infection($PY_SEISMIC_h);
+	my $PY_SEISMIC = $control->get_ticksBgone;
+
+	# This subroutine returns the value of PY_SEISMIC
+	# print ("\nProject_config, PY_SEISMIC,PY_SEISMIC: $PY_SEISMIC\n");
+	return ($PY_SEISMIC);
 }
 
 sub PL_WELL {
@@ -2715,11 +2814,13 @@ sub make_local_dirs {
 	my $GEOMAPS_IMAGES_TIF  = $Project->{_GEOMAPS_IMAGES_TIF};
 	my $GEOMAPS_IMAGES_PS   = $Project->{_GEOMAPS_IMAGES_PS};
 	my $GEOPSY              = $Project->{_GEOPSY};
+	my $GEOPSY_EARTH_MODEL  = $Project->{_GEOPSY_EARTH_MODEL};
+	my $GEOPSY_FORWARD_MODEL = $Project->{_GEOPSY_FORWARD_MODEL};
+	my $GEOPSY_MAKEUP       = $Project->{_GEOPSY_MAKEUP};
 	my $GEOPSY_PARAMS       = $Project->{_GEOPSY_PARAMS};
 	my $GEOPSY_PICKS        = $Project->{_GEOPSY_PICKS};
 	my $GEOPSY_PICKS_RAW    = $Project->{_GEOPSY_PICKS_RAW};
 	my $GEOPSY_PROFILES     = $Project->{_GEOPSY_PROFILES};
-	my $GEOPSY_REPORTS      = $Project->{_GEOPSY_REPORTS};
 	my $GEOPSY_TARGETS      = $Project->{_GEOPSY_TARGETS};
 
 	my $GMT_GEOMAPS    = $Project->{_GMT_GEOMAPS};
@@ -2763,11 +2864,11 @@ sub make_local_dirs {
 
 	if ( $Project->{_geopsy_is_selected} ) {
 		$manage_dirs_by->make_dir($GEOPSY);
+		$manage_dirs_by->make_dir($GEOPSY_MAKEUP);
 		$manage_dirs_by->make_dir($GEOPSY_PARAMS);
 		$manage_dirs_by->make_dir($GEOPSY_PICKS);
 		$manage_dirs_by->make_dir($GEOPSY_PICKS_RAW);
 		$manage_dirs_by->make_dir($GEOPSY_PROFILES);
-		$manage_dirs_by->make_dir($GEOPSY_REPORTS);
 		$manage_dirs_by->make_dir($GEOPSY_TARGETS);
 	}
 
@@ -2824,6 +2925,8 @@ sub make_local_dirs {
 	my $LIBRE_IMPRESS_SEISMIC = $Project->{_LIBRE_IMPRESS_SEISMIC};
 	my $PNG_SEISMIC           = $Project->{_PNG_SEISMIC};
 	my $PL_SEISMIC            = $Project->{_PL_SEISMIC};
+	my $PL_SEISMIC_SPECFEM2D  = $Project->{_PL_SEISMIC_SPECFEM2D};
+	my $PY_SEISMIC            = $Project->{_PY_SEISMIC};
 
 	# $manage_dirs_by->make_dir($GIF_SEISMIC);
 
@@ -2916,6 +3019,11 @@ sub make_local_dirs {
 	# pl programs and seismic data
 	# Always create
 	$manage_dirs_by->make_dir($PL_SEISMIC);
+	$manage_dirs_by->make_dir($PL_SEISMIC_SPECFEM2D);
+
+    # SUG_py programs and seismic data
+	# Always create
+	$manage_dirs_by->make_dir($PY_SEISMIC);
 
 	# Format segy and seismic data
 	my $DATA_SEISMIC_SEGY     = $Project->{_DATA_SEISMIC_SEGY};

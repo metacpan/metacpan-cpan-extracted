@@ -46,8 +46,13 @@ potentially, all packages contain L_SU_global_constants
 my $path;
 my $SeismicUnixGui;
 
-extends 'App::SeismicUnixGui::misc::conditions4flows' => { -version => 0.0.2 };
 use aliased 'App::SeismicUnixGui::misc::conditions4flows';
+# use aliased 'App::SeismicUnixGui::misc::conditions4big_streams';
+
+extends(
+    'App::SeismicUnixGui::misc::conditions4flows'       => { -version => 0.0.2 },
+    # 'App::SeismicUnixGui::misc::conditions4big_streams' => { -version => 0.0.2 },
+);
 
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use aliased 'App::SeismicUnixGui::misc::flow_widgets';
@@ -2310,10 +2315,7 @@ sub view {
 	 contains main hash which contains all the gui history and \n "
 	);
 
-	#attribute values as well\n\n"
-
-# print(" gui_history, view;contains main hash which contains all the gui history and
-# attribute values as well\n\n");
+   print(" gui_history, view;contains main hash which contains all the gui history and attribute values as well\n\n");
 
 	foreach my $key ( sort keys %$gui_history ) {
 

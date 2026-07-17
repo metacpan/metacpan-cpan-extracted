@@ -4,7 +4,6 @@ use v5.36;
 
 use Future::IO;
 use Future::AsyncAwait;
-use Time::HiRes qw/ time /;
 use MIDI::RtMidi::FFI::Device;
 use MIDI::Stream::Decoder;
 
@@ -27,7 +26,7 @@ async sub msg {
 async sub tick {
     my $tick = 0;
     while ( 1 ) {
-        await Future::IO->alarm( time() + 1 );
+        await Future::IO->sleep( 1 );
         say "Tick " . $tick++;
     }
 }

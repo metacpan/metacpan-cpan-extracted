@@ -15,13 +15,34 @@ PROGRAM NAME:  sudoc2pm_pt2.pl
 
 =head2 USE
 
-=head3 NOTES
-
-A *changes file in required
-
 =head4 Examples
 
 =head3 NOTES
+
+A "program_name"_changes.txt file may be needed,
+but is not necessary always.
+If this file is not found, then no changes.
+
+This file will prepare the *_spec.pm file
+with the correct bindings for the screen
+parameters.	
+
+Selected changes are taken from files:
+"program_name"_changes.txt
+i.e., A *changes file in required
+
+A "program_name"_changes.txt file is found
+within the Stripped/"program_group_name"/ directory
+e.g., for suk2mig3d: as ~migration/suk2mig3d_changes.txt:
+
+3 su
+2 bin
+4 su
+7 bin
+
+You are now ready to run the current scripy.
+You may have to run this current script manually
+from within its directory e.g., ~developer/code/sunix/
 
  	Program group array and the directory names:
  		
@@ -43,23 +64,17 @@ $developer_sunix_categories[14] = 'transform';
 $developer_sunix_categories[15] = 'well';
 $developer_sunix_categories[16] = '';
   	
- 	QUESTION 1:
-Which group number do you want to use to create
-for *.pm, *.config, and *_spec.pm files ?
-
-e.g., for transforms use:
-$sunix_category_number = 15
-	
 
 =head2 CHANGES and their DATES
 
-selected changes are taken from files:
-program_name_changes.txt
+Automatically modify *_spec to include bindings to directories by
+in including a file within the correct category directory
+e.g., :
+~/Stripped/migration/sumigps_changes.txt
 
+Bindings are used to link a right-click to a directory
+where the output files are stored.
 
-After running this script do the following:
-
-check the *spec file
 
 =cut
 
@@ -71,24 +86,6 @@ use aliased 'App::SeismicUnixGui::developer::code::sunix::update';
 my $sudoc2pm_nameNnumber    = sudoc2pm_nameNnumber->new();
 my $update = update->new();
 
-=head2 QUESTION 1:
-Which group number do you want ?
-QUESTION 2:
-Which program do you want to work on?
-
-For example=
-'sugetgthr';
-'sugain';
-'suputgthr';
-'suifft';
-'sufctanismod'
-'vel2stiff
-'unif2aniso'
-'transp'
-'suflip'
-
-=cut
-
 my $selected_program_name = $sudoc2pm_nameNnumber->get_selected_program_name();
 my $sunix_category_number = $sudoc2pm_nameNnumber->get_category_number();
 
@@ -99,4 +96,3 @@ $update->set_spec_changes_base_file_name($spec_changes_base_file_name);
 $update->set_spec_changes();
 $update->spec_changes();
 $update->set_changes();
-

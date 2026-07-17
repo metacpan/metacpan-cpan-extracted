@@ -131,7 +131,25 @@ Optional method used by C<HEAD /E<lt>sha256E<gt>>. Storage implementations with
 large blobs should provide this to avoid loading blob bodies for metadata-only
 requests. It may return a C<Net::Blossom::BlobDescriptor>, a
 C<Net::Blossom::Server::BlobResult>, or C<undef> when the blob is unavailable.
-When absent, the server falls back to C<get_blob>.
+When absent, the server falls back to C<get_blob>. The server closes a
+closeable body returned in a C<Net::Blossom::Server::BlobResult>.
+
+=head2 get_blob_range
+
+    my $body = $storage->get_blob_range(
+        $sha256,
+        offset => $offset,
+        length => $length,
+    );
+
+Optional method for efficient byte-range reads. C<offset> is a zero-based,
+non-negative byte offset. C<length> is a positive byte count. It returns exactly
+C<length> bytes in any body form accepted by C<get_blob>, or C<undef> when the
+blob is unavailable.
+
+Implement this together with C<head_blob>. The server only uses the native range
+path when both methods are present. Otherwise it uses C<get_blob> and limits the
+response body to the requested bytes.
 
 =head2 delete_blob
 

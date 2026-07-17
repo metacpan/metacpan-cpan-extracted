@@ -205,8 +205,8 @@ sub _Run_pre_built_superflow {
 		# print("4. run_button,program RUN name is $run_name \n");
 
 		# Instruction runs in system
-#		print("4. run_button,running as sh $global_libs->{_script}$run_name \n");
-		system("sh $global_libs->{_script}$run_name");
+#		print("4. run_button,running as bash $global_libs->{_script}$run_name \n");
+		system("bash $global_libs->{_script}$run_name");
 
 	} else {
 		# print("3. run_button,_Run_pre_built_superflow\n");
@@ -273,8 +273,8 @@ sub _Run_user_built_flow {
 			my $Project    = Project_config->new();
 			my $PL_SEISMIC = $Project->PL_SEISMIC();
 
-#			print("run_button, running: perl $PL_SEISMIC/$run_name\n");
-			system("perl $PL_SEISMIC/$run_name");
+			# print("276: run_button, running: perl $PL_SEISMIC/$run_name\n");
+			system("/usr/bin/perl $PL_SEISMIC/$run_name");
 			
 		} else {
 			print("run_button,_Run_user_built_flow, not ok to run\n");

@@ -49,23 +49,23 @@ WriteMakefile(
         provides => {
             'Concierge::Sessions' => {
                 file    => 'lib/Concierge/Sessions.pm',
-                version => 'v0.11.1',
+                version => 'v0.11.2',
             },
             'Concierge::Sessions::Base' => {
                 file    => 'lib/Concierge/Sessions/Base.pm',
-                version => 'v0.11.1',
+                version => 'v0.11.2',
             },
             'Concierge::Sessions::Session' => {
                 file    => 'lib/Concierge/Sessions/Session.pm',
-                version => 'v0.11.1',
+                version => 'v0.11.2',
             },
             'Concierge::Sessions::SQLite' => {
                 file    => 'lib/Concierge/Sessions/SQLite.pm',
-                version => 'v0.11.1',
+                version => 'v0.11.2',
             },
             'Concierge::Sessions::File' => {
                 file    => 'lib/Concierge/Sessions/File.pm',
-                version => 'v0.11.1',
+                version => 'v0.11.2',
             },
         },
     },

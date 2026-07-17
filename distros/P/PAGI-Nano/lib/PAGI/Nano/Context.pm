@@ -1,5 +1,5 @@
 package PAGI::Nano::Context;
-$PAGI::Nano::Context::VERSION = '0.001000';
+$PAGI::Nano::Context::VERSION = '0.001001';
 use strict;
 use warnings;
 use Carp ();

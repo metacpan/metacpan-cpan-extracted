@@ -1,5 +1,5 @@
 package PAGI::StructuredParameters::Exception::MissingParameter;
-$PAGI::StructuredParameters::Exception::MissingParameter::VERSION = '0.001000';
+$PAGI::StructuredParameters::Exception::MissingParameter::VERSION = '0.001001';
 use strict;
 use warnings;
 use parent -norequire, 'PAGI::StructuredParameters::Exception';

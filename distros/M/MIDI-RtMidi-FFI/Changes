@@ -1,5 +1,10 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.12 2026-07-17
+
+  - Updated prereqs to install Alien::RtMidi more eagerly
+  - Fixed contributer info for Gene Boggs (GENE)
+
 0.10 2026-02-25
 
   - Incompatible change: Minimum Perl version is now 5.26, with Feature::Compat::Class. This means any subclasses of Device will no longer work as expected. The API is otherwise largely compatible with previous versions.
