@@ -1,3 +1,6 @@
+0.001004 2026-07-17
+    - Index owner metadata by blob hash for faster owner counts and deletion.
+
 0.001003 2026-07-16
     - Store payloads as SQLite BLOBs and read ranges by byte offset.
 

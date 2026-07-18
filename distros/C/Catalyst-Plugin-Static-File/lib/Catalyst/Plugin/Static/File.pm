@@ -15,7 +15,7 @@ use Try::Tiny;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.4';
+our $VERSION = 'v0.2.5';
 
 
 sub serve_static_file {
@@ -75,7 +75,7 @@ Catalyst::Plugin::Static::File - Serve a specific static file
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.5
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ L<Catalyst::Plugin::Static::Simple>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Catalyst-Plugin-Static-File>
-and may be cloned from L<git://github.com/robrwo/Catalyst-Plugin-Static-File.git>
+and may be cloned from L<https://github.com/robrwo/Catalyst-Plugin-Static-File.git>
 
 =head1 SUPPORT
 
@@ -163,7 +163,7 @@ years.
 
 This module requires Catalyst v5.90129 or later.
 
-=head2 Bugs
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Catalyst-Plugin-Static-File/issues>
@@ -179,11 +179,11 @@ report security vulnerabilities
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Robert Rothenberg.
+This software is Copyright (c) 2023-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

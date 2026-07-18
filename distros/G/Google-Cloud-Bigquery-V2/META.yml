@@ -1,7 +1,7 @@
 ---
 abstract: 'Auto-generated client library for Google Cloud Services'
 author:
-  - 'C.J. Collier <cjac@google.com>'
+  - 'Google LLC <cjac@google.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: artistic_2
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,6 +18,10 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Google::Cloud::Bigquery::V2:
+    file: lib/Google/Cloud/Bigquery/V2.pm
+    version: '0.01'
 requires:
   Google::Api::Common: '0.01'
   Google::Auth: '0.01'
@@ -27,5 +31,7 @@ requires:
   Net::Curl: '0'
   Protobuf: '0.01'
   perl: '5.008003'
-version: '0.01'
+resources:
+  repository: https://github.com/c9h/google-auth-library-perl.git
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

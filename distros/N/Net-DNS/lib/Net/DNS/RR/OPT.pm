@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 2005 2025-01-28 13:22:10Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 2054 2026-07-10 09:37:11Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -99,8 +99,7 @@ sub _ttl {
 sub generic {				## override RR method
 	my $self = shift;
 	local $self->{class} = $self->udpsize;
-	my @xttl = ( $self->rcode >> 4, $self->version, $self->flags );
-	local $self->{ttl} = unpack 'N', pack( 'C2n', @xttl );
+	local $self->{ttl}   = $self->_ttl;
 	return $self->SUPER::generic;
 }
 
@@ -452,6 +451,7 @@ sub _decompose {
 	my $extra = Net::DNS::Text->decode( \$text, 0, length $text );
 	for ( $extra->value ) {
 		last unless /^[\[\{]/;
+		s/[`]([^`]*)[`]/$1/g;	## suppress backticks
 		s/([\$\@])/\\$1/g;	## Here be dragons!
 		my $REGEX = q/("[^"]*"|[\[\]{}:,]|[-0-9.Ee+]+)|\s+|(.)/;
 		my @split = grep { defined && length } split /$REGEX/o;
@@ -636,7 +636,7 @@ option value:
 
 Copyright (c)2001,2002 RIPE NCC.  Author Olaf M. Kolkman.
 
-Portions Copyright (c)2012,2017-2024 Dick Franks.
+Portions Copyright (c)2012,2017-2026 Dick Franks.
 
 All rights reserved.
 

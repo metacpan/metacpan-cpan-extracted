@@ -19,6 +19,9 @@ no_index:
     - t
     - inc
 requires:
+  File::Which: '0'
+  Module::Starter: '0'
+  Path::Tiny: '0'
   perl: '5.008003'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

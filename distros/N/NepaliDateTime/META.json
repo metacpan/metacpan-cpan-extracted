@@ -1,0 +1,56 @@
+{
+   "abstract" : "Bikram Sambat (B.S.) date and datetime for Perl",
+   "author" : [
+      "Dr Suman Khanal <suman81765@gmail.com> (SUMAN)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "NepaliDateTime",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "POSIX" : "0",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V1" : "1.302218"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sumanstats/NepaliDateTime"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18",
+   "x_static_install" : 1
+}

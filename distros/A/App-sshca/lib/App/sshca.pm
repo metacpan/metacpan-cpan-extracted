@@ -1,4 +1,4 @@
-package App::sshca v0.0.8;
+package App::sshca v0.0.10;
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ sshca - A minimal SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.8
+version 0.0.10
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,10 @@ interpreted as a certificate identity; in case multiple certificates have been
 issued for this identity the last issued certificate is renewed.
 
 =back
+
+=item * C<--new-identity>
+
+Indicates a new identity to be used for the new certificate.
 
 =item * C<--validity>
 

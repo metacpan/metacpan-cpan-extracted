@@ -1,0 +1,249 @@
+## name goto into while loop
+## failures 1
+## cut
+
+while (1) {
+    LABEL:
+        do_stuff();
+}
+goto LABEL;
+
+## name goto into for loop
+## failures 1
+## cut
+
+for my $x (@a) {
+    LABEL:
+        do_stuff();
+}
+goto LABEL;
+
+## name goto into foreach loop
+## failures 1
+## cut
+
+foreach my $x (@a) {
+    LABEL:
+        do_stuff();
+}
+goto LABEL;
+
+## name goto into until loop
+## failures 1
+## cut
+
+until ($done) {
+    LABEL:
+        do_stuff();
+}
+goto LABEL;
+
+## name goto into if block
+## failures 1
+## cut
+
+if ($x) {
+    LABEL:
+        do_stuff();
+}
+goto LABEL;
+
+## name goto into unless block
+## failures 1
+## cut
+
+unless ($x) {
+    LABEL:
+        do_stuff();
+}
+goto LABEL;
+
+## name goto into eval block
+## failures 1
+## cut
+
+eval {
+    LABEL:
+        do_stuff();
+};
+goto LABEL;
+
+## name goto into do block
+## failures 1
+## cut
+
+do {
+    LABEL:
+        do_stuff();
+};
+goto LABEL;
+
+## name goto into sub block
+## failures 1
+## cut
+
+my $sub = sub {
+    LABEL:
+        do_stuff();
+};
+goto LABEL;
+
+## name goto into map block
+## failures 1
+## cut
+
+my @res = map {
+    LABEL:
+        do_stuff();
+} @a;
+goto LABEL;
+
+## name goto into grep block
+## failures 1
+## cut
+
+my @res = grep {
+    LABEL:
+        do_stuff();
+} @a;
+goto LABEL;
+
+## name goto label at same scope (ok)
+## failures 0
+## cut
+
+LABEL:
+    do_stuff();
+goto LABEL;
+
+## name goto &NAME (ok)
+## failures 0
+## cut
+
+goto &some_sub;
+
+## name goto EXPR (ok)
+## failures 0
+## cut
+
+my $label = 'LABEL';
+goto $label;
+
+## name goto into nested loops
+## failures 1
+## cut
+
+while (1) {
+    for my $x (@a) {
+        LABEL:
+            do_stuff();
+    }
+}
+goto LABEL;
+
+## name goto label not in file (ok)
+## failures 0
+## cut
+
+goto NONEXISTENT;
+
+## name label on while loop (ok - label marks the loop)
+## failures 0
+## cut
+
+LABEL:
+while (1) {
+    do_stuff();
+}
+goto LABEL;
+
+## name label on for loop (ok - label marks the loop)
+## failures 0
+## cut
+
+LABEL2:
+for my $x (@a) {
+    do_stuff();
+}
+goto LABEL2;
+
+## name label on if block (ok - label marks the block)
+## failures 0
+## cut
+
+LABEL3:
+if ($x) {
+    do_stuff();
+}
+goto LABEL3;
+
+## name same-construct goto and label (ok)
+## failures 0
+## cut
+
+while (1) {
+    LABEL4:
+        do_stuff();
+    goto LABEL4;
+}
+
+## name same-construct goto and label in sub (ok)
+## failures 0
+## cut
+
+my $sub2 = sub {
+    LABEL5:
+        do_stuff();
+    goto LABEL5;
+};
+
+## name goto into given block
+## failures 1
+## cut
+
+given ($x) {
+    LABEL6:
+        do_stuff();
+}
+
+goto LABEL6;
+
+## name goto into when block
+## failures 1
+## cut
+
+when ($x) {
+    LABEL7:
+        do_stuff();
+}
+
+goto LABEL7;
+
+## name duplicate labels - one outside, one inside (ok)
+## failures 0
+## cut
+
+LABEL8:
+    do_stuff();
+
+while (1) {
+    LABEL8:
+        do_stuff();
+}
+
+goto LABEL8;
+
+## name duplicate labels both inside (violations)
+## failures 1
+## cut
+
+while (1) {
+    LABEL9:
+        do_stuff();
+}
+while (1) {
+    LABEL9:
+        do_stuff();
+}
+
+goto LABEL9;

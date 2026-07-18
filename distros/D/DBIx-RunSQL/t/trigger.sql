@@ -14,3 +14,8 @@ CREATE TRIGGER trg_test_1 AFTER INSERT ON test
 CREATE TRIGGER trg_test_2 AFTER INSERT ON test BEGIN
       UPDATE test SET ts = DATETIME('NOW')  WHERE rowid = new.rowid;
 END;
+
+-- Comments before triggers don't hide the trigger
+CREATE TRIGGER trg_test_3 AFTER INSERT ON test BEGIN
+      UPDATE test SET ts = DATETIME('NOW')  WHERE rowid = new.rowid;
+END;

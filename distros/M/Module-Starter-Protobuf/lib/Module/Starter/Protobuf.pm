@@ -11,10 +11,18 @@ use File::Spec;
 use File::Basename qw(basename);
 use File::Which qw(which);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub create_distro {
     my ($self, %args) = @_;
+
+    $args{license} ||= 'apache_2';
+    $args{author}  ||= 'Google LLC <cjac@google.com>';
+    $args{email}   ||= 'cjac@google.com';
+
+    $self->{license} ||= 'apache_2';
+    $self->{author}  ||= 'Google LLC <cjac@google.com>';
+    $self->{email}   ||= 'cjac@google.com';
 
     # Read protobuf configuration from args, instance properties, or environment
     my $proto_files_str = $args{protos} || $self->{protos} || $ENV{PROTOBUF_FILES};
@@ -50,25 +58,63 @@ sub create_modules {
         }
 
         # Execute protoc using native Perl compiler plugin from PATH or ENV
-        my $plugin_path = $ENV{PROTOC_GEN_PERL_PB} || which('protoc-gen-perl-pb') || 'protoc-gen-perl-pb';
+        my $protoc_bin = $ENV{PROTOC} 
+            || which('protoc') 
+            || which('protoc.exe') 
+            || (-f 'C:\ProgramData\chocolatey\bin\protoc.exe' ? 'C:\ProgramData\chocolatey\bin\protoc.exe' : undef)
+            || (-f 'C:\tools\protoc\bin\protoc.exe' ? 'C:\tools\protoc\bin\protoc.exe' : undef)
+            || 'protoc';
+        my $plugin_path = $ENV{PROTOC_GEN_PERL_PB};
+        if (!defined $plugin_path) {
+            my $perl_dir = File::Basename::dirname($^X);
+            if ($^O eq 'MSWin32') {
+                my $dev_exe  = File::Spec->rel2abs(File::Spec->catfile(File::Spec->updir(), 'Protobuf', 'bin', 'protoc-gen-perl-pb.exe'));
+                my $dev_exe2 = File::Spec->rel2abs(File::Spec->catfile(File::Spec->updir(), File::Spec->updir(), 'Protobuf', 'bin', 'protoc-gen-perl-pb.exe'));
+                my $dev_final = -f $dev_exe ? $dev_exe : (-f $dev_exe2 ? $dev_exe2 : undef);
+                my $found = $dev_final
+                    || which('protoc-gen-perl-pb.exe')
+                    || (-f File::Spec->catfile($perl_dir, 'protoc-gen-perl-pb.exe') ? File::Spec->catfile($perl_dir, 'protoc-gen-perl-pb.exe') : undef)
+                    || which('protoc-gen-perl-pb.bat')
+                    || (-f File::Spec->catfile($perl_dir, 'protoc-gen-perl-pb.bat') ? File::Spec->catfile($perl_dir, 'protoc-gen-perl-pb.bat') : undef);
+                $plugin_path = $found || 'protoc-gen-perl-pb.exe';
+            } else {
+                my $found = which('protoc-gen-perl-pb')
+                    || (-f File::Spec->catfile($perl_dir, 'protoc-gen-perl-pb') ? File::Spec->catfile($perl_dir, 'protoc-gen-perl-pb') : undef);
+                if ($found) {
+                    $plugin_path = $found;
+                } else {
+                    my $dev_bin = File::Spec->catfile(File::Spec->updir(), 'Protobuf', 'bin', 'protoc-gen-perl-pb');
+                    $plugin_path = -f $dev_bin ? File::Spec->rel2abs($dev_bin) : 'protoc-gen-perl-pb';
+                }
+            }
+        }
         
-        my @cmd = ('protoc');
-        push @cmd, '--plugin=protoc-gen-perl-pb=' . $plugin_path;
-        push @cmd, '--perl-pb_out=' . $lib_dir;
-        push @cmd, (
-            '-I', $self->{_protobuf_import_path},
-            '-I', '/usr/include',
-            '-I', '/usr/local/include',
-            $proto_file
-        );
+        $plugin_path = File::Spec->rel2abs($plugin_path) if -f $plugin_path;
+        my $abs_lib_dir = File::Spec->rel2abs($lib_dir);
+        File::Path::make_path($abs_lib_dir) unless -d $abs_lib_dir;
+        (my $norm_lib_dir = $abs_lib_dir) =~ s{\\}{/}g;
+        (my $norm_plugin_path = $plugin_path) =~ s{\\}{/}g;
+        (my $norm_proto_file = $proto_file) =~ s{\\}{/}g;
+        (my $norm_import_path = $self->{_protobuf_import_path}) =~ s{\\}{/}g;
+
+        my $rel_proto = File::Spec->abs2rel($norm_proto_file, $norm_import_path);
+        $rel_proto =~ s{\\}{/}g;
+
+        my @cmd = ($protoc_bin);
+        push @cmd, '--plugin=protoc-gen-perl-pb=' . $norm_plugin_path;
+        push @cmd, '--perl-pb_out=' . $norm_lib_dir;
+        push @cmd, '--perl-pb_opt=embed_descriptors,generate_services';
+        push @cmd, ('-I', $norm_import_path);
+        push @cmd, ('-I', '/usr/include') if -d '/usr/include';
+        push @cmd, ('-I', '/usr/local/include') if -d '/usr/local/include';
+        push @cmd, $rel_proto;
         
-        # Print progress and flush stdout
-        local $| = 1;
-        print "Compiling $proto_file...\n";
+        my $cmd_str = join(' ', map { $_ =~ /\s/ ? qq("$_\") : $_ } @cmd);
+        print "Executing protoc: $cmd_str\n";
 
         my $rc = system(@cmd);
         if ($rc != 0) {
-            croak 'protoc execution failed with code ' . $rc . ' for ' . $proto_file;
+            die "protoc execution failed with code $rc for $norm_proto_file. Command: $cmd_str\n";
         }
     }
 
@@ -251,7 +297,7 @@ EOF
         $methods_pod .= "=back\n\n";
 
         # Generate full gRPC service client wrapper
-        $client_code = sprintf(<<'EOF', $module_name, $bridge_code, $use_statements, $grpc_target, $methods_code, $module_name, $module_name, $module_name, $module_name, $methods_pod);
+        $client_code = sprintf(<<'EOF', $module_name, $bridge_code, $use_statements, $grpc_target, $methods_code, $module_name, $module_name, $module_name, $module_name, $module_name, $methods_pod);
 package %s;
 
 use strict;
@@ -264,7 +310,7 @@ use Carp qw(croak);
 %s
 %s
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -312,18 +358,43 @@ __END__
     use %s;
     use Google::Auth;
 
-    my $auth = Google::Auth->new(...);
-    my $client = %s->new(
-        credentials => $auth
-    );
+    # Initialize Application Default Credentials (ADC) or explicit Google Auth
+    my $auth = Google::Auth->default();
+    my $client = %s->new( credentials => $auth );
+
+    # Execute service methods
+    my $res = $client->some_method( %%params );
 
 =head1 DESCRIPTION
 
 This is an auto-generated Protocol Buffers client library for Google Cloud Services, built on top of high-performance gRPC and Protocol Buffers!
 
-%s=head1 LICENSE
+It provides seamless integration with Google Cloud Application Default Credentials (ADC), support for both HTTP/2 gRPC and REST transports, and fully typed RPC method dispatching.
 
-Apache License 2.0
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = %s->new(
+        credentials => $auth,       # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc',     # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+%s
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
 
 =cut
 EOF
@@ -338,7 +409,7 @@ use warnings;
 %s
 %s
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 1; # End of %s
 
 __END__
@@ -351,9 +422,11 @@ __END__
 
 This is an auto-generated Protocol Buffers schema container module for Google Cloud Services.
 
-=head1 LICENSE
+=head1 LICENSE AND COPYRIGHT
 
-Apache License 2.0
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
 
 =cut
 EOF
@@ -408,6 +481,74 @@ EOF
     }
 
     return $guts;
+}
+
+# 4. Override Changes_guts, README_guts, README_md_guts, and license_guts to remove boilerplate and enforce Apache 2.0
+sub Changes_guts {
+    my ($self, $date) = @_;
+    my $distro = $self->{distro} || $self->{main_module} || 'Module';
+    my $version = $self->{version} || '0.01';
+    return sprintf(<<'EOF', $distro, $version, $date || scalar localtime);
+Revision history for %s
+
+%s  %s
+    - Initial release. Auto-generated from Protocol Buffers schema.
+EOF
+}
+
+sub README_guts {
+    my ($self, $build_fn, $date) = @_;
+    my $module = $self->{main_module} || $self->{distro} || 'Module';
+    return sprintf(<<'EOF', $module, $module);
+# %s
+
+Auto-generated Protocol Buffers client library for Google Cloud Services.
+
+## Installation
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+## Documentation
+
+After installing, you can find documentation for this module with the `perldoc` command:
+
+    perldoc %s
+
+## License and Copyright
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+EOF
+}
+
+sub README_md_guts {
+    my ($self, $build_fn, $date) = @_;
+    return $self->README_guts($build_fn, $date);
+}
+
+sub license_guts {
+    my ($self, $license, $author, $year) = @_;
+    my $holder = 'Google LLC';
+    return sprintf(<<'EOF', $year || '2026', $holder);
+Copyright (C) %s %s
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the specific language
+governing permissions and limitations under the License.
+EOF
 }
 
 # Utility: Convert camelCase/PascalCase to snake_case
@@ -522,8 +663,9 @@ sub get_token {
 package Google::gRPC::Client;
 BEGIN { $INC{'Google/gRPC/Client.pm'} = 1; }
 sub new {
-    my ($class, %%args) = @_;
-    return bless \%%args, $class;
+    my $class = shift;
+    my $args = ( @_ == 1 && ref($_[0]) eq 'HASH' ) ? $_[0] : { @_ };
+    return bless $args, $class;
 }
 sub call {
     my ($self, $args) = @_;
@@ -677,7 +819,7 @@ Generates the low-level protobuf serialization classes and the high-level client
 
 =head2 create_t
 
-Generates the dynamic service integration tests (C<t/01-service.t>) under the target directory.
+Generates the dynamic service integration tests (C<t/01-service.t>) under the target directory, including a mock C<Google::gRPC::Client> constructor that accepts both HashRef and list options.
 
 =head2 Makefile_PL_guts
 
@@ -689,11 +831,9 @@ C.J. Collier <cjac@google.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2026 by C.J. Collier <cjac@google.com>.
+Copyright (C) 2026 Google LLC
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This program is released under the Apache 2.0 license.
 
 =cut
 

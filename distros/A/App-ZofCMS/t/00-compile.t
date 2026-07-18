@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 76 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 75 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ZofCMS.pm',
@@ -50,7 +50,6 @@ my @module_files = (
     'App/ZofCMS/Plugin/GetRemotePageTitle.pm',
     'App/ZofCMS/Plugin/GoogleCalculator.pm',
     'App/ZofCMS/Plugin/GooglePageRank.pm',
-    'App/ZofCMS/Plugin/GoogleTime.pm',
     'App/ZofCMS/Plugin/HTMLFactory/Entry.pm',
     'App/ZofCMS/Plugin/HTMLFactory/PageToBodyId.pm',
     'App/ZofCMS/Plugin/HTMLMailer.pm',

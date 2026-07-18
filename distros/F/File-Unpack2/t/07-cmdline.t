@@ -5,6 +5,9 @@ use FindBin;
 BEGIN { unshift @INC, "$1/../blib/lib" if $FindBin::Bin =~ m{(.*)} };
 use File::Temp;
 use JSON;
+
+# Fail fast if a regression makes the unpacker hang, instead of hanging CI forever.
+$SIG{ALRM} = sub { die "TIMEOUT: possible unpacker hang in ".__FILE__."\n" }; alarm 300;
 $ENV{PATH} = "/bin:/usr/bin";
 delete $ENV{ENV};
 

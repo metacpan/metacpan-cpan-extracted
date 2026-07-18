@@ -41,6 +41,10 @@ sub deploy_schema {
         CREATE INDEX IF NOT EXISTS blossom_owners_pubkey_order
             ON blossom_owners (pubkey, uploaded DESC, sha256 ASC)
     });
+    $dbh->do(q{
+        CREATE INDEX IF NOT EXISTS blossom_owners_sha256
+            ON blossom_owners (sha256)
+    });
 
     return 1;
 }
@@ -279,7 +283,7 @@ Returns the SQLite DBI handle.
 
 =head2 deploy_schema
 
-Creates the metadata tables and owner ordering index.
+Creates the metadata tables and owner lookup indexes.
 
 =head2 with_transaction
 

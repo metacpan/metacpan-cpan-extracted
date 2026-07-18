@@ -21,12 +21,15 @@ requires 'Type::Tiny', '0';
 requires 'Types::Standard', '0';
 requires 'MIME::Base64', '0';
 requires 'Const::Fast', '0';
+requires 'Log::Any', '0';
 
 # Test requirements
 on 'test' => sub {
   requires 'Test::More', '0';
   requires 'Test::MockModule', '0';
-  requires 'Test::Valgrind', '0'; # Optional
-  requires 'Coro',           '0'; # Optional
+  if ($^O ne 'MSWin32') {
+      requires 'Test::Valgrind', '0'; # Optional
+      requires 'Coro',           '0'; # Optional
+  }
   requires 'Capture::Tiny',  '0';
 };

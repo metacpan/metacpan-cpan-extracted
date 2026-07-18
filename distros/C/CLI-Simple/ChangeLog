@@ -1,3 +1,26 @@
+Fri Jul 17 11:22:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.15]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.1.0.md: new
+	* README.md: generated
+	* VERSION: bump, feature release (auto-color)
+	* project.mk: new
+	* .includes/git.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* lib/CLI/Simple.pm.in
+	- exit code
+	- POD updates
+	(use_log4perl)
+	- add support for color appender
+	(init_logger): likewise
+	* lib/CLI/Simple/Constants.pm.in
+	($LOG4PERL_CONF): new
+	* requires.skip
+	- make Term::ANSIColor optional
+	* recommends: +Term::ANSIColor
+
 Mon Jul 13 13:38:12 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.14]:

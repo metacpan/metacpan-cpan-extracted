@@ -9,4 +9,6 @@ Revision history for Module-Generate-Hash
 0.04    2020-04-29
 	Update Module::Generate dependency version
 
+1.01    2026-07-18
+	Remove PAX headers
 

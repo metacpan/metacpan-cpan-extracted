@@ -14,7 +14,7 @@ use Net::Blossom::Server::BlobResult;
 use Net::Blossom::Server::MetadataStore;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 
 sub BUILDARGS {
     my $class = shift;

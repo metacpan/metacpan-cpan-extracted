@@ -3,50 +3,67 @@ package App::CSVUtils::csv_shuf_rows;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-04'; # DATE
+our $DATE = '2026-07-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.036'; # VERSION
+our $VERSION = '1.038'; # VERSION
 
-use App::CSVUtils::csv_sort_rows;
-use Perinci::Sub::Util qw(gen_modified_sub);
+use App::CSVUtils qw(
+                        gen_csv_util
+                );
 
-my $res = gen_modified_sub(
-    output_name => 'csv_shuf_rows',
-    base_name => 'App::CSVUtils::csv_sort_rows::csv_sort_rows',
+gen_csv_util(
+    name => 'csv_shuf_rows',
     summary => 'Shuffle CSV rows',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-This is basically like Unix command `shuf` except it does not shuffle the header
-row.
+This utility shuffle the rows in the CSV. Example input CSV:
 
-_
+    name,age
+    Andy,20
+    Dennis,15
+    Ben,30
+    Jerry,30
 
-    remove_args => [qw/by_code by_fields by_sortsub sortsub_args key ci reverse hash/],
-    modify_meta => sub {
-        my $meta = shift;
-        delete $meta->{args_rels};
-        $meta->{examples} = [
-            {
-                summary => 'Shuffle a CSV file',
-                argv => ['file.csv'],
-                test => 0,
-                'x.doc.show_result' => 0,
-            },
-        ];
+Example output CSV:
+
+    name,age
+    Ben,30
+    Andy,20
+    Jerry,30
+    Dennis,15
+
+MARKDOWN
+
+    add_args => {
     },
-    tags => ['category:munging', 'random'],
 
-    output_code => sub {
-        App::CSVUtils::csv_sort_rows::csv_sort_rows(
-            @_,
-            # TODO: this feels less shuffled
-            by_code => sub { int(rand 3)-1 }, # return -1,0,1 randomly
-        );
+    tags => ['category:sorting'],
+
+    on_input_data_row => sub {
+        my $r = shift;
+
+        # keys we add to the stash
+        $r->{input_rows} //= [];
+
+        push @{ $r->{input_rows} }, $r->{input_row};
+    },
+
+    after_close_input_files => sub {
+        my $r = shift;
+
+        # we do the actual shuffling here after collecting all the rows
+
+        require List::Util;
+        my $shuffled_rows = [List::Util::shuffle(@{$r->{input_rows}})];
+
+        for my $row (@$shuffled_rows) {
+            $r->{code_print_row}->($row);
+        }
     },
 );
-die "Can't generate sub: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
 1;
 # ABSTRACT: Shuffle CSV rows
@@ -63,7 +80,7 @@ App::CSVUtils::csv_shuf_rows - Shuffle CSV rows
 
 =head1 VERSION
 
-This document describes version 1.036 of App::CSVUtils::csv_shuf_rows (from Perl distribution App-CSVUtils), released on 2025-02-04.
+This document describes version 1.038 of App::CSVUtils::csv_shuf_rows (from Perl distribution App-CSVUtils), released on 2026-07-09.
 
 =head1 FUNCTIONS
 
@@ -76,18 +93,21 @@ Usage:
 
 Shuffle CSV rows.
 
-Examples:
+This utility shuffle the rows in the CSV. Example input CSV:
 
-=over
+ name,age
+ Andy,20
+ Dennis,15
+ Ben,30
+ Jerry,30
 
-=item * Shuffle a CSV file:
+Example output CSV:
 
- csv_shuf_rows(input_filename => "file.csv");
-
-=back
-
-This is basically like Unix command C<shuf> except it does not shuffle the header
-row.
+ name,age
+ Ben,30
+ Andy,20
+ Jerry,30
+ Dennis,15
 
 This function is not exported.
 
@@ -164,6 +184,22 @@ Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--input-tsv> option.
+
+=item * B<input_skip_before_num_data_rows> => I<uint>
+
+Skip a certain number of data rows for each input file.
+
+This option can be used to skip the first certain number of data rows. If set to
+1, for example, will only process 1 data row for each input file. This option is
+a convenient alternative to composing with L<csv-tail>.
+
+=item * B<input_skip_file_after_num_data_rows> => I<uint>
+
+Limit processing each input file to this number of data rows.
+
+This option can be used to limit processing only to a certain number of data
+rows. If set to 1, for example, will only process 1 data row for each input
+file. This option is a convenient alternative to composing with L<csv-head>.
 
 =item * B<input_skip_num_lines> => I<posint>
 
@@ -323,7 +359,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

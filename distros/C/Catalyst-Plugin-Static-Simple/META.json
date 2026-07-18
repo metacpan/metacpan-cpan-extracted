@@ -4,7 +4,7 @@
       "Andy Grundman <andy@hybridized.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -50,18 +50,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Catalyst-Plugin-Static-Simple@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Static-Simple"
+         "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Static-Simple/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Static-Simple.git",
-         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Plugin-Static-Simple.git"
+         "url" : "https://github.com/perl-catalyst/Catalyst-Plugin-Static-Simple.git",
+         "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Static-Simple"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004008"
 }

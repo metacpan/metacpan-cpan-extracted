@@ -58,7 +58,6 @@ my %WriteMakefileArgs = (
     "WWW::GetPageTitle" => 0,
     "WWW::Google::Calculator" => 0,
     "WWW::Google::PageRank" => 0,
-    "WWW::Google::Time" => 0,
     "WebService::Validator::HTML::W3C" => 0,
     "base" => 0,
     "lib" => 0,
@@ -71,7 +70,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.001009",
+  "VERSION" => "1.001010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -120,7 +119,6 @@ my %FallbackPrereqs = (
   "WWW::GetPageTitle" => 0,
   "WWW::Google::Calculator" => 0,
   "WWW::Google::PageRank" => 0,
-  "WWW::Google::Time" => 0,
   "WebService::Validator::HTML::W3C" => 0,
   "base" => 0,
   "lib" => 0,

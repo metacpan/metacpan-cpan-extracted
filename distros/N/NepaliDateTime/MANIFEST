@@ -1,0 +1,18 @@
+Changes
+cpanfile
+examples/demo.pl
+lib/NepaliDateTime.pm
+lib/NepaliDateTime/Data.pm
+lib/NepaliDateTime/Date.pm
+lib/NepaliDateTime/DateTime.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/01_date.t
+t/02_datetime.t
+t/03_strftime_strptime.t
+t/04_data.t
+t/05_edge_cases.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

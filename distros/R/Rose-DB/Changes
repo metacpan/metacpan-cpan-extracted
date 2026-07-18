@@ -1,3 +1,7 @@
+0.788 (07.17.2026) - John Siracusa <siracusa@gmail.com>
+
+    * Fixed a bug in refine_dbi_foreign_key_info. (Patch by Bernd Bleßmann)
+
 0.787 (05.04.2026) - John Siracusa <siracusa@gmail.com>
 
     * Adjusted MySQL column auto-generation to better handle the

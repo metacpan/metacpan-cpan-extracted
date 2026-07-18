@@ -25,7 +25,7 @@ our @EXPORT_OK = qw(
   to_snake_case
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.1.0';
 
 sub toPascalCase { goto &_toCamelCase; }
 sub ToCamelCase  { goto &_toCamelCase; }

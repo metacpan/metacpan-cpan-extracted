@@ -9,7 +9,6 @@ WriteMakefile(
     HTML::Tiny => 0,
   },
   TEST_REQUIRES => {
-    Moose                => 0,
     Test::More           => 0,
     namespace::autoclean => 0,
     Test::Pod            => 0,
@@ -23,11 +22,11 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url => 'git://github.com/davorg-cpan/moox-role-opengraph.git',
-        web => 'https://github.com/davorg-cpan/moox-role-opengraph',
+        url => 'git://github.com/davorg-cpan/moox-role-seotags.git',
+        web => 'https://github.com/davorg-cpan/moox-role-seotags',
       },
       bugtracker => {
-        "web" => "https://github.com/davorg-cpan/moox-role-opengraph/issues"
+        "web" => "https://github.com/davorg-cpan/moox-role-seotags/issues"
       }
     },
     x_contributors => [

@@ -32,7 +32,10 @@ sub init {
   $basedir //= abs_path(getcwd);
   $self->set_basedir( abs_path($basedir) );
 
-  if ( $self->get_import ) {
+  my $importdir = $self->get_import // [];
+  $self->set_import($importdir);
+
+  if ( @{$importdir} ) {
     $self->_import_file_listing;
     $self->get_logger->debug( Dumper( [ listing => $self->get_import_file_listing ] ) );
   }
@@ -40,12 +43,13 @@ sub init {
   $self->set_max_diff_files( $self->get_max_diff_files // $MAX_DIFF_FILES );
 
   if ( $self->get_color ) {
-    eval {
+    my $color = eval {
       require Term::ANSIColor;
       Term::ANSIColor->import('colored');
-      $self->set_color($TRUE);
+      return $TRUE;
     };
 
+    $self->set_color($color);
   }
 
   return;

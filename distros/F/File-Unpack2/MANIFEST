@@ -3,6 +3,7 @@ children_fuser2.pl
 contrib/multipart_mime.pl
 contrib/stringsx.c
 contrib/stringsx.pl
+file_unpack2
 file_unpack2.pl
 FIXME.txt
 helper/application=msword
@@ -25,6 +26,8 @@ t/06-logfile.t
 t/07-cmdline.t
 t/08-survive-corrupt.t
 t/09-no-intermediate-tar.t
+t/10-stall-timeout.t
+t/11-adversarial.t
 t/boilerplate.t
 t/data/Archive.pax
 t/data/bad34.pdf

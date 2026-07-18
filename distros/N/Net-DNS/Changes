@@ -1,4 +1,19 @@
-$Id: Changes 2052 2026-06-11 14:08:37Z willem $                       -*-text-*-
+$Id: Changes 2058 2026-07-17 10:09:31Z willem $                       -*-text-*-
+
+
+**** 1.56 Jul 18, 2027
+
+Fix rt.cpan.org #180088
+	Documentation issue for Net::DNS::RR::RRSIG::verify()
+
+Fix rt.cpan.org #179946
+	Denial of Service via long DNS compression chains
+
+Fix rt.cpan.org #179945
+	Remote code injection via EDNS EXTENDED ERROR
+
+Fix rt.cpan.org #179692/#176900
+	UNIX.pm: Unreachable code warning using Apache/mod_perl
 
 
 **** 1.55 Jun 11, 2026

@@ -12,7 +12,6 @@ my @fragments = qw(
     lib/Protobuf/Internal/Map.xs.part
     lib/Protobuf/Internal/Repeated.xs.part
     lib/Protobuf/Internal/MapIterator.xs.part
-    lib/Protobuf/Internal/ThreadSafeString.xs.part
     lib/Protobuf/Descriptor/Field.xs.part
     lib/Protobuf/Descriptor/OneofDef.xs.part
     lib/Protobuf/Descriptor/File.xs.part

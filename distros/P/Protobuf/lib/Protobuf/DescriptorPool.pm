@@ -6,7 +6,7 @@ Protobuf::DescriptorPool - Manages a collection of Protocol Buffer descriptors
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ use warnings;
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Protobuf::Descriptor::File;
 use Protobuf::Descriptor::MessageDef;
@@ -194,7 +194,7 @@ sub add_serialized_file {
                     eval { _xs_add_serialized_file($self, $raw_dep) };
                     next;
                 }
-                elsif ($err =~ /couldn['"]t resolve name ['"]\.?([^'"]+)['"]/) {
+                elsif ($err =~ /(?:couldn['"]t resolve name|Message type not resolved for field .*? of type) ['"]\.?([^'"]+)['"]/) {
                     my $sym = $1;
                     my ($pkg, $msg_name) = ($sym =~ /^(?:(.+)\.)?([^.]+)$/);
                     $pkg ||= '';
@@ -208,12 +208,14 @@ sub add_serialized_file {
                                  . pack("C*", 0x22, length($msg_proto)) . $msg_proto
                                  . pack("C*", 0x62, 6) . "proto3";
                     eval { _xs_add_serialized_file($self, $raw_stub) };
+                    warn "STUB CREATION FAILED FOR $sym ($fn): $@\n" if $@;
                     next;
                 }
                 elsif ($err =~ /has no extension range in message/) {
                     # WKT extension range error on custom google.protobuf options. Safe to ignore.
                     last;
                 }
+                warn "ATTEMPT FAILED: err='$err'\n";
                 die $err;
             }
             last;

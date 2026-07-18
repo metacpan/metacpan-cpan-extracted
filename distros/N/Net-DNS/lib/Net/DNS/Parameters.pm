@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2026-04-28)
+##	(last updated 2026-07-06)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 2046 2026-06-01 13:23:01Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 2054 2026-07-10 09:37:11Z willem $)[2];
 
 use integer;
 use Carp;
@@ -307,6 +307,8 @@ my @dnserrorbyval = (
 	30 => 'Invalid Query Type',				# RFC9824
 	31 => 'Rate Limited',					# draft-muks-dns-ede-rate-limited-02
 	32 => 'Over Quota',					# draft-muks-dns-ede-rate-limited-02
+	33 => 'Negative Trust Anchor',				# draft-farrokhi-dnsop-ede-nta-00
+	34 => 'New Delegation Only',				# draft-ietf-deleg-10
 	);
 our %dnserrorbyval = @dnserrorbyval;
 

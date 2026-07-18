@@ -1,0 +1,29 @@
+---
+abstract: 'Bikram Sambat (B.S.) date and datetime for Perl'
+author:
+  - 'Dr Suman Khanal <suman81765@gmail.com> (SUMAN)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V1: '1.302218'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NepaliDateTime
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  POSIX: '0'
+  perl: '5.012000'
+resources:
+  repository: https://github.com/sumanstats/NepaliDateTime
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

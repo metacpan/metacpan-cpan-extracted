@@ -25,18 +25,21 @@ Readonly::Scalar our $DISPOSITIONS => {
   REJECT             => 1,
   WRONG              => 1,
   'WRONG-RECONSIDER' => 1,
+  '-'                => 1,
 };
 
 Readonly::Scalar our $COLORS => {
   high               => 'red',
   medium             => 'yellow',
   low                => 'white',
+  informational      => 'white',
   ACCEPT             => 'green',
   REJECT             => 'magenta',
   CONFIRM            => 'green',
   DEFER              => 'yellow',
   WRONG              => 'cyan',
   'WRONG-RECONSIDER' => 'cyan',
+  '-'                => 'white',
 };
 
 Readonly::Scalar our $DEFAULT_POD_REVIEW_MODEL  => 'claude-haiku-4-5-20251001';

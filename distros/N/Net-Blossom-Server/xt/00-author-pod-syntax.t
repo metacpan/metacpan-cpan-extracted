@@ -36,7 +36,7 @@ like(
 );
 like(
     _description_opening("$FindBin::Bin/../lib/Net/Blossom/Server.pm"),
-    qr{L<Net::Blossom::Server::Backend namespace\|https://metacpan\.org/search\?q=module%3ANet%3A%3ABlossom%3A%3AServer%3A%3ABackend\+NOT\+distribution%3ANet-Blossom-Server>},
+    qr{L<Net::Blossom::Server::Backend namespace\|https://metacpan\.org/search\?q=module%3ANet%3A%3ABlossom%3A%3AServer%3A%3ABackend\+level%3A5\+NOT\+distribution%3ANet-Blossom-Server>},
     'top-level description links to the backend namespace search',
 );
 like(

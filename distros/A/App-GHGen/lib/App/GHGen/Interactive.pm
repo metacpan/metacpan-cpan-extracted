@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 	customize_workflow
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -27,11 +27,73 @@ App::GHGen::Interactive - Interactive workflow customization
     my $config = customize_workflow('perl');
     # Returns hash of user choices
 
+=encoding utf-8
+
 =head1 FUNCTIONS
 
 =head2 prompt_yes_no($question, $default)
 
-Prompt for yes/no answer. Default is 'y' or 'n'.
+Prompt the user for a yes/no answer and return a boolean.
+
+=head3 Purpose
+
+Print C<$question> followed by a bracket hint (C<[Y/n]> or C<[y/N]>),
+read one line from STDIN, and return C<1> for yes or C<0> for no.  An
+empty response uses C<$default>.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$question> (Str, required)
+
+The question text to display.
+
+=item C<$default> (Str, optional, default C<'y'>)
+
+The default answer when the user presses Enter without typing.
+Must be C<'y'> or C<'n'>.
+
+=back
+
+=head3 Returns
+
+C<1> when the answer is affirmative (C<y> or C<yes>, case-insensitive) or
+when the empty response maps to a C<'y'> default.
+
+C<0> when the answer is negative (C<n> or C<no>, case-insensitive) or
+when the empty response maps to an C<'n'> default.
+
+=head3 Side Effects
+
+Reads one line from STDIN; prints to STDOUT.
+
+=head3 Usage Example
+
+    my $ok = prompt_yes_no("Enable coverage?", 'y');
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        question => { type => 'scalar', required => 1 },
+        default  => { type => 'scalar', default  => 'y' },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }   # 1 or 0
+
+=head3 FORMAL SPECIFICATION
+
+    prompt_yes_no : ℤ* × {'y','n'} → 𝔹
+
+    answer ≔ chomp(readline(STDIN))
+    result ≔
+        answer =~ /^y(es)?$/i → 1
+        answer =~ /^n(o)?$/i  → 0
+        answer = ""           → default = 'y' → 1  |  default = 'n' → 0
 
 =cut
 
@@ -47,7 +109,68 @@ sub prompt_yes_no($question, $default = 'y') {
 
 =head2 prompt_choice($question, $choices, $default)
 
-Prompt user to select one option from a list.
+Prompt the user to select one item from a numbered list.
+
+=head3 Purpose
+
+Display C<$question> followed by a numbered list of C<$choices>, read one
+line from STDIN, and return the zero-based index of the selected item.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$question> (Str, required)
+
+The selection prompt text.
+
+=item C<$choices> (ArrayRef[Str], required)
+
+The available options, displayed numbered from 1.
+
+=item C<$default> (Int, optional, default C<0>)
+
+Zero-based index of the pre-selected option shown in the prompt.
+
+=back
+
+=head3 Returns
+
+A zero-based integer index.  Returns C<$default> when the user presses Enter
+without input or when the input is out of range (less than 1 or greater than
+the number of choices).
+
+=head3 Side Effects
+
+Reads one line from STDIN; prints to STDOUT.
+
+=head3 Usage Example
+
+    my $idx = prompt_choice("Package manager?", ['npm','yarn','pnpm'], 0);
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        question => { type => 'scalar',  required => 1 },
+        choices  => { type => 'arrayref', required => 1 },
+        default  => { type => 'scalar',  default  => 0 },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }   # integer 0 .. |choices|-1
+
+=head3 FORMAL SPECIFICATION
+
+    prompt_choice : ℤ* × seq ℤ* × ℕ → ℕ
+
+    answer ≔ chomp(readline(STDIN))
+    result ≔
+        answer = ""                       → default
+        answer ∈ ℕ ∧ 1 ≤ answer ≤ |choices| → answer − 1
+        otherwise                         → default
 
 =cut
 
@@ -68,7 +191,84 @@ sub prompt_choice($question, $choices, $default = 0) {
 
 =head2 prompt_multiselect($question, $options, $defaults)
 
-Prompt user to select multiple options. Returns array ref of selected items.
+Prompt the user to select zero or more items from a numbered list.
+
+=head3 Purpose
+
+Display C<$question> and a numbered list of C<$options>, accept
+comma-separated numbers or the keyword C<all>, and return an array reference
+of the selected option strings.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$question> (Str, required)
+
+The multi-select prompt text.
+
+=item C<$options> (ArrayRef[Str], required)
+
+All available options, displayed numbered from 1.
+
+=item C<$defaults> (ArrayRef[Str], optional, default C<[]>)
+
+The pre-selected options (by value, not index).
+
+=back
+
+=head3 Returns
+
+An array reference of selected option strings.  Possible values:
+
+=over 4
+
+=item *
+
+The full C<$options> list when the user types C<all>.
+
+=item *
+
+A subset derived from the comma/space-separated numbers the user entered.
+
+=item *
+
+C<$defaults> when the user presses Enter without typing.
+
+=back
+
+=head3 Side Effects
+
+Reads one line from STDIN; prints to STDOUT.
+
+=head3 Usage Example
+
+    my $sel = prompt_multiselect("OS?", ['ubuntu-latest','macos-latest','windows-latest'], []);
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        question => { type => 'scalar',  required => 1 },
+        options  => { type => 'arrayref', required => 1 },
+        defaults => { type => 'arrayref', default  => [] },
+    }
+
+=head4 Output
+
+    { type => 'arrayref' }
+
+=head3 FORMAL SPECIFICATION
+
+    prompt_multiselect : ℤ* × seq ℤ* × seq ℤ* → seq ℤ*
+
+    answer ≔ chomp(readline(STDIN))
+    result ≔
+        answer = ""           → defaults
+        answer =~ /^all$/i   → options
+        otherwise            → [ options[n−1] ∣ n ∈ split(/[,\s]+/, answer), 1 ≤ n ≤ |options| ]
+                                   ?? defaults (when result = ∅)
 
 =cut
 
@@ -104,7 +304,58 @@ sub prompt_multiselect($question, $options, $defaults = []) {
 
 =head2 prompt_text($question, $default)
 
-Prompt for text input.
+Prompt the user for a free-form text answer.
+
+=head3 Purpose
+
+Display C<$question> optionally followed by C<[$default]>, read one line
+from STDIN, and return the user's answer or C<$default> when empty.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$question> (Str, required)
+
+The prompt text.
+
+=item C<$default> (Str, optional, default C<''>)
+
+Returned as-is when the user presses Enter without typing anything.
+
+=back
+
+=head3 Returns
+
+The trimmed line the user typed, or C<$default> when the input is empty.
+
+=head3 Side Effects
+
+Reads one line from STDIN; prints to STDOUT.
+
+=head3 Usage Example
+
+    my $name = prompt_text("Project name", 'my-project');
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        question => { type => 'scalar', required => 1 },
+        default  => { type => 'scalar', default  => '' },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }
+
+=head3 FORMAL SPECIFICATION
+
+    prompt_text : ℤ* × ℤ* → ℤ*
+
+    answer ≔ chomp(readline(STDIN))
+    result ≔ answer = "" → default  |  otherwise → answer
 
 =cut
 
@@ -118,8 +369,57 @@ sub prompt_text($question, $default = '') {
 
 =head2 customize_workflow($type)
 
-Interactive customization for a specific workflow type.
-Returns hash of configuration options.
+Drive an interactive customization session for the given workflow type.
+
+=head3 Purpose
+
+Display a series of prompts relevant to C<$type> and collect user preferences.
+Dispatches to a private C<_customize_*> helper; returns an empty hash when
+the type is not supported.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$type> (Str, required)
+
+The workflow type to customise.  Supported: C<perl>, C<node>, C<python>,
+C<rust>, C<go>, C<ruby>, C<docker>, C<static>.
+
+=back
+
+=head3 Returns
+
+A hash reference of configuration key/value pairs collected from the user.
+Returns an empty hash reference (C<{}>) when C<$type> is not recognised.
+
+=head3 Side Effects
+
+Reads multiple lines from STDIN; prints to STDOUT.
+
+=head3 Usage Example
+
+    my $config = customize_workflow('perl');
+    # $config->{enable_critic}, $config->{perl_versions}, etc.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    { type => { type => 'scalar', required => 1 } }
+
+=head4 Output
+
+    { type => 'hashref' }   # empty or populated with type-specific keys
+
+=head3 FORMAL SPECIFICATION
+
+    SupportedCustomTypes ≔ { perl, node, python, rust, go, ruby, docker, static }
+
+    customize_workflow : ℤ* → Config
+
+    t ∈ SupportedCustomTypes → _customize_t()
+    t ∉ SupportedCustomTypes → {}
 
 =cut
 
@@ -175,6 +475,18 @@ sub _customize_perl() {
 
     # Code quality
     say colored(['bold'], "Code Quality Tools:");
+    $config{enable_linter} = prompt_yes_no(
+        "Enable syntax linting (perl -c on all matrix cells)?",
+        'y'
+    );
+    say '';
+
+    $config{enable_linter_unused} = prompt_yes_no(
+        "Enable unused-variable check (warnings::unused, latest+ubuntu only)?",
+        'n'
+    );
+    say '';
+
     $config{enable_critic} = prompt_yes_no(
         "Enable Perl::Critic?",
         'y'
@@ -427,7 +739,7 @@ sub _customize_static() {
 
 	say colored(['bold'], "Static Site Deployment:");
 
-	my $build_dir = prompt_text("Build output directory", './public');
+	my $build_dir = prompt_text('Build output directory', './public');
 	$config{build_dir} = $build_dir;
 	say '';
 
@@ -444,10 +756,13 @@ Nigel Horne E<lt>njh@nigelhorne.comE<gt>
 
 L<https://github.com/nigelhorne>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,6 @@
       },
       "test" : {
          "requires" : {
-            "Moose" : "0",
             "Test::More" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -50,15 +49,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/davorg-cpan/moox-role-opengraph/issues"
+         "web" : "https://github.com/davorg-cpan/moox-role-seotags/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/davorg-cpan/moox-role-opengraph.git",
-         "web" : "https://github.com/davorg-cpan/moox-role-opengraph"
+         "url" : "git://github.com/davorg-cpan/moox-role-seotags.git",
+         "web" : "https://github.com/davorg-cpan/moox-role-seotags"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.1.1",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

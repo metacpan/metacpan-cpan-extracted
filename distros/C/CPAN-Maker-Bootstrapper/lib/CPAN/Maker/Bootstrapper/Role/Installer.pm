@@ -16,71 +16,65 @@ use File::Temp;
 use File::Find;
 use Role::Tiny;
 
+our $VERSION = '2.0.9';
+
 ########################################################################
 sub cmd_install {
 ########################################################################
   my ($self) = @_;
 
+  $self->get_logger->info( sprintf 'CPAN::Maker::Bootstrapper v%s', $VERSION );
+  $self->get_logger->info( sprintf 'Copyright 2026 Robert C. Lauer, All Rights Reserved.' );
+  $self->get_logger->info(
+    sprintf 'This is free software and may be redistributed and/or modified under the same terms as Perl itself.' );
+
   my $module_name = $self->get_module;
 
   my $stub = $self->get_stub;
 
-  die "ERROR: set --stub or --import but not both\n"
-    if $stub && $self->get_import;
+  if ( $stub && @{ $self->get_import } ) {
+    $self->get_logger->error('ERROR: set --stub or --import but not both');
+    return $FAILURE;
+  }
 
   if ( !$module_name && $stub && -f $stub ) {
     $module_name = $self->_find_package_name($stub);
-    die "ERROR: could not find a package inside $stub\n"
-      if !$module_name;
+    if ( !$module_name ) {
+      $self->get_logger->error( 'ERROR: could not find a package inside %s', $stub );
+      return $FAILURE;
+    }
   }
 
-  die "ERROR: --module is a required argument\n"
-    if !$module_name;
+  if ( !$module_name ) {
+    $self->get_logger->error('ERROR: --module is a required argument');
+    return $FAILURE;
+  }
 
   ## Note to LLM carefully consider this regex it IS correct
-  die "ERROR: '$module_name' is not a valid Perl module name\n"
-    if $module_name !~ /\A[[:alpha:]]\w*(?:::[[:alpha:]]\w*)*\z/xsm;
-
-  my $module_path = $module_name;
-  $module_path =~ s/::/\//xsmg;
-
-  my $import_paths = $self->get_import;
-  $import_paths = ref $import_paths ? $import_paths : [$import_paths];
-
-  my $found;
-
-  find(
-    sub {
-      return if $File::Find::name !~ /\Q$module_path\E/xsm;
-      $found = $File::Find::name;
-    },
-    @{$import_paths}
-  );
-
-  die "ERROR: $module_name not found in import paths.\n"
-    if !$found;
-
-  $self->get_logger->info( sprintf 'found %s at %s', $module_name, $module_path );
-
-  my $installdir = $self->get_installdir;
-  $installdir = $installdir ? abs_path($installdir) : q{};
-
-  if ( !$installdir && $module_name ) {
-    $installdir = $module_name;
-    $installdir =~ s/::/-/gxsm;
-    $installdir = sprintf '%s/%s', $self->get_basedir, $installdir;
-    $self->set_installdir($installdir);
+  if ( $module_name !~ /\A[[:alpha:]]\w*(?:::[[:alpha:]]\w*)*\z/xsm ) {
+    $self->get_logger->error( q{ERROR: '%s' is not a valid Perl module name}, $module_name );
+    return $FAILURE;
   }
 
-  make_path($installdir);
+  if ( my $path = $self->_validate_module($module_name) ) {
+    if ( ref $path ) {
+      $self->get_logger->info( sprintf 'found %s at %s', $module_name, @{$path} );
+    }
+    elsif ($path) {
+      $self->get_logger->warn('no import paths specified...creating new project from stub...');
+    }
+  }
+  else {
+    $self->get_logger->error( sprintf 'ERROR: %s not found in import paths.', $module_name );
+    return $FAILURE;
+  }
 
-  die "ERROR: Found '$installdir/Makefile' - project may already exist! Use --force to overwrite\n"
-    if !$self->get_force && -e "$installdir/Makefile";
+  my $installdir = eval { return $self->_create_install_dir($module_name); } or do {
+    $self->get_logger->error($EVAL_ERROR);
+    return $FAILURE;
+  };
 
-  die "ERROR: could not create $installdir\n"
-    if !-d $installdir;
-
-  my $tmpdir = File::Temp::tempdir( CLEANUP => $TRUE );
+  my $tmpdir = File::Temp::tempdir( CLEANUP => !$self->get_debug );
 
   # all installation work happens in tmpdir - set_installdir temporarily
   # so _create_dirs, _install_files, _import_files all target tmpdir
@@ -98,7 +92,12 @@ sub cmd_install {
     $self->_create_resources_file( $module_name, $tmpdir );
   }
 
-  $self->_import_files;
+  eval { $self->_import_files; };
+
+  if ($EVAL_ERROR) {
+    $self->get_logger->error( sprintf "error importing files: %s\n", $EVAL_ERROR );
+    return $FAILURE;
+  }
 
   my $dist_dir = $self->get_dist_dir;
 
@@ -116,13 +115,21 @@ sub cmd_install {
     return sprintf 'STUB=%s', $stub
       if -f abs_path($stub);
 
-    die sprintf "ERROR: stub '%s' not found\n", $stub
+    return;
   };
+
+  if ( !$stub_arg && $stub ) {
+    $self->get_logger->error( sprintf 'ERROR: Stub %s not found', $stub );
+    return $FAILURE;
+  }
 
   my $pwd = getcwd;
 
   chdir $tmpdir
-    or die "ERROR: could not change to $tmpdir: $OS_ERROR\n";
+    or do {
+    $self->get_logger->error( sprintf 'ERROR: could not change to %s: %s', $tmpdir, $OS_ERROR );
+    return $FAILURE;
+    };
 
   # MODULE_NAME=
   my $module_name_arg = sprintf 'MODULE_NAME=%s', $module_name;
@@ -132,8 +139,8 @@ sub cmd_install {
   open my $old_stdout, '>&', \*STDOUT or die $OS_ERROR;
   open my $old_stderr, '>&', \*STDERR or die $OS_ERROR;
 
-  my ( $ofh, $logfile ) = File::Temp::tempfile( 'make-XXXX', SUFFIX => '.log', UNLINK => 1 );
-  my ( $efh, $errfile ) = File::Temp::tempfile( 'make-XXXX', SUFFIX => '.err', UNLINK => 1 );
+  my ( $ofh, $logfile ) = File::Temp::tempfile( 'make-XXXX', SUFFIX => '.log', UNLINK => $FALSE );
+  my ( $efh, $errfile ) = File::Temp::tempfile( 'make-XXXX', SUFFIX => '.err', UNLINK => $FALSE );
 
   open STDOUT, '>', $logfile or die $OS_ERROR;
   open STDERR, '>', $errfile or die $OS_ERROR;
@@ -144,6 +151,10 @@ sub cmd_install {
     SYNTAX_CHECKING=on
     SCAN=on
   );
+
+  if ( $ENV{NO_ECHO} ) {
+    push @args, sprintf q{NO_ECHO='%s'}, $ENV{NO_ECHO};
+  }
 
   @args = grep {defined} $module_name_arg, $stub_arg;
 
@@ -160,55 +171,134 @@ sub cmd_install {
   }
   else {
     $self->get_logger->error('Error creating distribution (see make.err, make.log)');
-    copy $errfile, "$pwd/make.err";
-    copy $logfile, "$pwd/make.log";
-    $self->check_return_code($rc);
+    $self->get_logger->warn( sprintf 'temporary install directory (%s) not removed', $tmpdir );
+
+    eval { $self->check_return_code($rc); 1; } or do {
+      $self->get_logger->error($EVAL_ERROR);
+      return $FAILURE;
+    };
   }
 
   $self->get_logger->info('cleaning up...');
 
+  open STDERR, '>>', $errfile or die $OS_ERROR;
+  open STDOUT, '>>', $logfile or die $OS_ERROR;
+
   $rc = system 'make clean';
+
+  open STDERR, '>&', $old_stderr or die $OS_ERROR;
+  open STDOUT, '>&', $old_stdout or die $OS_ERROR;
+
   rename 'tarball', $tarball;
 
-  my @defaults = ( 'SYNTAX_CHECKING ?= on', 'SCAN            ?= on', 'MODULE_NAME     ?= ' . $module_name, );
-  {
-    open my $fh, '>', 'config.mk'
-      or die "ERROR: could not open config.mk for writing\n$OS_ERROR";
+  $self->get_logger->info(q{creating default 'config.mk'...edit to customize make defaults});
 
-    print {$fh} join "\n", @defaults;
+  $self->_create_default_config($module_name);
 
-    close $fh;
-  }
-
-  if ( $self->get_log_level ne 'debug' && ( !exists $ENV{NO_ECHO} || $ENV{NO_ECHO} ne q{} ) ) {
-    unlink "$tmpdir/$logfile";
-    unlink "$tmpdir/$errfile";
+  if ( $self->get_log_level eq 'debug' && $self->get_debug ) {
+    $self->get_logger->warn( sprintf 'debug level set...leaving files in %s', $tmpdir );
   }
 
   # copy contents of tmpdir into installdir then clean up
   $self->get_logger->info("installing project to $installdir...");
   require File::Copy::Recursive;
 
-  # cleanup intermediate build files
+  # cleanup intermediate and possibly existing files
   foreach my $f (qw(resources buildspec.yml.tmpl test.t.tmpl provides module.pm.tmpl extra-files)) {
     unlink $f;
   }
 
   File::Copy::Recursive::dircopy( $tmpdir, $installdir )
-    or die "ERROR: could not copy $tmpdir to $installdir: $OS_ERROR\n";
+    or do {
+    $self->get_logger->error( sprintf "ERROR: could not copy $tmpdir to $installdir: %s\n", $OS_ERROR );
+    return $FAILURE;
+    };
+
+  rename "$installdir/$errfile", "$installdir/make.err";
+  rename "$installdir/$logfile", "$installdir/make.log";
 
   $self->get_logger->info("successfully imported $module_name");
   $self->get_logger->info('next steps:');
-  $self->get_logger->info('+------------------------------------------+');
-  $self->get_logger->info('| 1. Review source tree                    |');
-  $self->get_logger->info('| 2. Review `buildspec.yml`                |');
-  $self->get_logger->info('| 3. Edit/Add files to lib, bin, t or root |');
-  $self->get_logger->info('| 4. run `make`                            |');
-  $self->get_logger->info('+------------------------------------------+');
-  $self->get_logger->info('| Tip: make help to see all make targets   |');
-  $self->get_logger->info('+------------------------------------------+');
+  $self->get_logger->info('+---------------------------------------------------+');
+  $self->get_logger->info('| 1. Review source tree                             |');
+  $self->get_logger->info('| 2. Review `buildspec.yml`                         |');
+  $self->get_logger->info('| 3. Edit/Add files to lib, bin, t or root          |');
+  $self->get_logger->info('| 4. run `make`                                     |');
+  $self->get_logger->info('+---------------------------------------------------+');
+  $self->get_logger->info('| Tip: make help to see all make targets            |');
+  $self->get_logger->info('| See perldoc CPAN::Maker to learn more             |');
+  $self->get_logger->info('+---------------------------------------------------+');
+  $self->get_logger->info('| https://github.com/rlauer/CPAN-Maker-Bootstrapper |');
+  $self->get_logger->info('+---------------------------------------------------+');
 
   return $SUCCESS;
+}
+
+########################################################################
+sub _create_default_config {
+########################################################################
+  my ( $self, $module_name ) = @_;
+
+  my $default_config = <<"END_OF_CONFIG";
+SYNTAX_CHECKING ?= on
+LINT            ?= on
+SCAN            ?= on
+MODULE_NAME     ?= $module_name
+END_OF_CONFIG
+
+  {
+    open my $fh, '>', 'config.mk'
+      or do {
+      $self->get_logger->warn( sprintf q{WARN: could not open 'config.mk' for writing: %s}, $OS_ERROR );
+      };
+
+    print {$fh} $default_config;
+
+    close $fh;
+  }
+
+  return;
+}
+
+########################################################################
+sub _create_install_dir {
+########################################################################
+  my ( $self, $module_name ) = @_;
+
+  my $installdir = $self->get_installdir;
+  $installdir = $installdir ? abs_path($installdir) : q{};
+
+  if ( !$installdir && $module_name ) {
+    $installdir = $module_name;
+    $installdir =~ s/::/-/gxsm;
+    $installdir = sprintf '%s/%s', $self->get_basedir, $installdir;
+    $self->set_installdir($installdir);
+  }
+
+  make_path($installdir);
+
+  $self->get_logger->info( sprintf 'attempting to install module %s into %s', $module_name, $installdir );
+
+  return $installdir
+    if -d $installdir && !-e "$installdir/Makefile";
+
+  die sprintf 'ERROR: could not create %s', $installdir
+    if !-d $installdir;
+
+  die sprintf q{ERROR: Found '%s/Makefile' - project may already exist! Use --force to overwrite}, $installdir
+    if !$self->get_force;
+
+  # remove existing files
+  unlink "$installdir/Makefile";
+  unlink "$installdir/buildspec.yml";
+
+  foreach ( glob "$installdir/.includes/*" ) {
+    unlink $_;
+  }
+
+  $self->get_logger->warn('existing files will be overwritten...you have been warned');
+
+  return $installdir;
 }
 
 ########################################################################
@@ -226,6 +316,39 @@ sub check_return_code {
     if $rc >> 8;
 
   return;
+}
+
+########################################################################
+# returns:
+#   undef if import paths but NOT found
+#   $module_path if no import dirs
+#   [ $module_path ] if import dirs and found
+########################################################################
+sub _validate_module {
+########################################################################
+  my ( $self, $module_name ) = @_;
+
+  my $module_path = $module_name;
+  $module_path =~ s/::/\//xsmg;
+
+  my $import_paths = $self->get_import // [];
+
+  $import_paths = ref $import_paths ? $import_paths : [$import_paths];
+
+  return $module_name
+    if !@{$import_paths};
+
+  my $found;
+
+  find(
+    sub {
+      return if $File::Find::name !~ /\Q$module_path\E/xsm;
+      $found = [$File::Find::name];
+    },
+    @{$import_paths}
+  );
+
+  return $found;
 }
 
 ########################################################################
@@ -301,18 +424,23 @@ sub _import_files {
   return
     if !$import_listing;
 
+  $self->get_logger->info('Importing files...');
+
   # directory structure is derived from the primary package name, not the
   # source path - the source may have arbitrary leading path components
   my ( $packages, $scripts, $tests ) = @{$import_listing}{qw(packages scripts tests)};
 
   if ( $scripts && @{$scripts} ) {
+
     # add built files in bin/ to .gitgnore
     my $gitignore = slurp("$installdir/.gitignore");
     $gitignore .= join "\n", map {"bin/$_"} @{$scripts};
 
     open my $fh, '>', "$installdir/.gitignore"
       or die "ERROR: could not replace .gitignore: $OS_ERROR\n";
+
     print {$fh} $gitignore;
+
     close $fh;
 
     # copy scripts to bin
@@ -344,7 +472,7 @@ sub _import_files {
     my $primary = $self->_find_primary_package( $p, $packages->{$p} );
 
     if ( !$primary ) {
-      warn "WARNING: could not determine primary package for $p...skipping.\n";
+      $self->get_logger->warn( sprintf 'WARNING: could not determine primary package for %s...skipping.', $p );
       next;
     }
 
@@ -354,7 +482,8 @@ sub _import_files {
     my $lib_path = sprintf '%s/lib/%s', $installdir, dirname($path);
 
     make_path($lib_path);
-    die "ERROR: could not create $lib_path\n" if !-d $lib_path;
+    die "ERROR: could not create $lib_path\n"
+      if !-d $lib_path;
 
     my $dest = sprintf '%s/%s.in', $lib_path, basename($p);
     die "ERROR: could not copy $p to $dest\n"

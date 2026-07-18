@@ -7,7 +7,7 @@ plan skip_all => 'AUTHOR_TESTING is not set'
     unless $ENV{AUTHOR_TESTING};
 
 my $dist = "$FindBin::Bin/..";
-my $version = '0.001003';
+my $version = '0.001004';
 my $net_blossom_version = '0.001001';
 
 my $module = do {

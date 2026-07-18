@@ -1,0 +1,4 @@
+Revision history for Perl-Critic-Policy-ErrorHandling-RequireReturnFromEval
+
+1.00  2026-07-17
+    - GH-1: add initial version

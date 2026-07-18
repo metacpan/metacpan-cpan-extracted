@@ -3,7 +3,7 @@ package App::ZofCMS::Plugin::CRUD;
 use strict;
 use warnings;
 
-our $VERSION = '1.001009'; # VERSION
+our $VERSION = '1.001010'; # VERSION
 
 use DBI;
 use Carp;

@@ -1,5 +1,8 @@
 Revision history for Archive-Libarchive-Peek
 
+0.06      2026-07-17 18:20:57 +0000
+  - Minimum required Perl is 5.22, drop prereq on Alias::Any
+
 0.05      2024-11-15 11:57:29 -0700
   - Add support for Perl 5.20
 

@@ -2,6 +2,17 @@ Revision history for Perl extension Cpanel::JSON::XS
 
 TODO: http://stevehanov.ca/blog/index.php?id=104 compression
 
+4.43 2026-07-18 (rurban)
+	- Fix canonical sort: compare by UTF-16 code units per RFC 8785 (GH #248, leont)
+        - Fix canonical sort on Perl 5.8-5.18: utf16_cmp now always attempts
+          UTF-8 decoding instead of checking SvUTF8 flag, since older Perls
+          may store valid UTF-8 hash keys without the flag set.
+        - Fix quadmath encode dropping ".0" for large floats (GH #246, reported by Tux).
+          The .0 guard condition that suppressed appending for NV values > UV_MAX was
+          incorrect on high-precision FP (quadmath, 128-bit long double on arm64) where
+          %g uses fixed-point notation for values like 1.01e30. Guarded with #if NV_DIG < 31
+          to skip only on double/80-bit-ld where %g naturally uses %e for large values.
+
 4.42 2026-06-27 (rurban)
 	- Ensure encode with a type spec hashref does not change the hashref argument (GH #240)
         - Fix -e docs: "written" → "read" (GH #239, reported by Ron Savage).

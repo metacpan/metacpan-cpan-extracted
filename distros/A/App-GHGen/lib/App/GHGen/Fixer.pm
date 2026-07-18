@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	fix_workflow
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -29,7 +29,55 @@ App::GHGen::Fixer - Auto-fix workflow issues
 
 =head2 can_auto_fix($issue)
 
-Check if an issue can be automatically fixed.
+Determine whether a given issue can be automatically resolved.
+
+=head3 Purpose
+
+Act as a capability gate before calling C<apply_fixes>.  Returns true only
+for the four issue types that the Fixer knows how to handle.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$issue> (HashRef, required)
+
+An issue hash with at least a C<type> key.  Recognised types are
+C<performance>, C<security>, C<cost>, and C<maintenance>.
+
+=back
+
+=head3 Returns
+
+C<1> (true) when the issue type is auto-fixable; C<0> (false) otherwise.
+
+=head3 Side Effects
+
+None.  Pure predicate.
+
+=head3 Usage Example
+
+    if (can_auto_fix($issue)) {
+        apply_fixes($workflow, [$issue]);
+    }
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    { issue => { type => 'hashref', required => 1 } }
+
+=head4 Output
+
+    { type => 'scalar' }   # boolean: 1 or 0
+
+=head3 FORMAL SPECIFICATION
+
+    can_auto_fix : Issue → 𝔹
+
+    FixableTypes ≔ { performance, security, cost, maintenance }
+
+    can_auto_fix(i) ≡ i.type ∈ FixableTypes
 
 =cut
 
@@ -46,7 +94,62 @@ sub can_auto_fix($issue) {
 
 =head2 apply_fixes($workflow, $issues)
 
-Apply automatic fixes to a workflow. Returns modified workflow hashref.
+Apply all auto-fixable changes from C<$issues> directly to C<$workflow>.
+
+=head3 Purpose
+
+Iterate over C<$issues>, skip issues that are not auto-fixable, and call
+the appropriate internal fix routine for each fixable type/message
+combination.  Modifies C<$workflow> in place.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$workflow> (HashRef, required)
+
+The parsed workflow hash to be mutated.
+
+=item C<$issues> (ArrayRef[HashRef], required)
+
+The issues to process.  Each must have C<type> and C<message> keys.
+
+=back
+
+=head3 Returns
+
+The number of individual fix operations applied (an integer ≥ 0).
+
+=head3 Side Effects
+
+Modifies C<$workflow> in place.
+
+=head3 Usage Example
+
+    my $n = apply_fixes($workflow, \@issues);
+    say "$n fix(es) applied.";
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        workflow => { type => 'hashref',  required => 1 },
+        issues   => { type => 'arrayref', required => 1 },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }   # non-negative integer
+
+=head3 FORMAL SPECIFICATION
+
+    apply_fixes : Workflow × seq Issue → ℕ
+
+    applied ≔ ∑ { fix(w, i) ∣ i ∈ issues, can_auto_fix(i) }
+    result  ≔ applied
+
+    Mutates w by applying each fix in sequence.
 
 =cut
 
@@ -86,7 +189,64 @@ sub apply_fixes($workflow, $issues) {
 
 =head2 fix_workflow($file, $issues)
 
-Fix a workflow file in place. Returns number of fixes applied.
+Load a workflow YAML file, apply fixes, and write it back to disk.
+
+=head3 Purpose
+
+Persist the results of C<apply_fixes> by reading the workflow from C<$file>
+with C<YAML::XS::LoadFile>, calling C<apply_fixes>, and rewriting the file
+with C<YAML::XS::DumpFile> when at least one fix was applied.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$file> (Str, required)
+
+Path to a YAML workflow file.  Passed directly to C<YAML::XS::LoadFile>.
+
+=item C<$issues> (ArrayRef[HashRef], required)
+
+Issues to fix, each with C<type> and C<message> keys.
+
+=back
+
+=head3 Returns
+
+The number of fixes applied (an integer ≥ 0).  The file is only rewritten
+when the count is greater than zero.
+
+=head3 Side Effects
+
+Reads C<$file> from disk; rewrites C<$file> in place when fixes are applied.
+
+=head3 Usage Example
+
+    my $n = fix_workflow('.github/workflows/ci.yml', \@issues);
+    say "$n fix(es) written to ci.yml.";
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        file   => { type => 'scalar',  required => 1 },
+        issues => { type => 'arrayref', required => 1 },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }   # non-negative integer
+
+=head3 FORMAL SPECIFICATION
+
+    fix_workflow : Path × seq Issue → ℕ
+
+    w       ≔ LoadFile(file)
+    fixes   ≔ apply_fixes(w, issues)
+    fixes > 0 → DumpFile(file, w)
+
+    result ≔ fixes
 
 =cut
 

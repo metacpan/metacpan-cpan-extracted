@@ -1,7 +1,5 @@
 #requires 'DateTime ';
 requires 'Moo';
-
-requires 'Mutex';
 requires 'Throwable::Error';
 requires 'Perl::Critic';
 requires 'JSON::PP';

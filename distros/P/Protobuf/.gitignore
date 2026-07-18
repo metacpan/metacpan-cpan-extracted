@@ -8,6 +8,7 @@
 /pm_to_blib
 /_build/
 /Build
+/third_party/
 .Bsort.tmp
 *.o
 *.a
@@ -16,6 +17,7 @@
 *.x
 *.xsc
 *.bin
+!t/data/*.bin
 lib/**/*.c
 *.BUILD
 BUILD.bazel
@@ -24,6 +26,8 @@ src_google_protobuf_descriptor.pb.cc
 /Protobuf.c
 /Protobuf.c.test
 /protoc-gen-perl-pb
+/bin/protoc-gen-perl-pb
+/bin/protoc-gen-perl-pb.exe
 /maint/generate_xs.pl.bak
 /stderr.txt
 /debug

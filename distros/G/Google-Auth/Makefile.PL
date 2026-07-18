@@ -32,8 +32,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
-    BUILD_REQUIRES => {
-        'Test::Deep'           => '0',
+    TEST_REQUIRES => {
         'Test::Exception'      => '0',
         'Test::LWP::UserAgent' => '0',
         'Test::More'           => '0',

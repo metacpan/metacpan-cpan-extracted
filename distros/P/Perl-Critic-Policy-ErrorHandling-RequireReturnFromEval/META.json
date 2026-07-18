@@ -1,0 +1,63 @@
+{
+   "abstract" : "Require explicit return in eval blocks",
+   "author" : [
+      "Blaine Motsinger <blaine@renderorange.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-ErrorHandling-RequireReturnFromEval",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "1.126",
+            "Perl::Critic::Utils" : "0",
+            "parent" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic" : "1.126",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/renderorange/perl-critic-policy-errorhandling-requirereturnfromeval/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/renderorange/perl-critic-policy-errorhandling-requirereturnfromeval.git",
+         "web" : "https://github.com/renderorange/perl-critic-policy-errorhandling-requirereturnfromeval"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

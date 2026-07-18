@@ -26,10 +26,10 @@ The simplest useful case: run a command and confirm it produced its output:
 
     use SimpleFlow qw(task say2);
 
-    my $t = task({
+    my $t = task(
         cmd            => 'which ls',
         'output.files' => '/tmp/AFK3mnEK8L.log',
-    });
+    );
 
 `task` returns a hash reference describing exactly what happened:
 
@@ -76,12 +76,15 @@ Runs one shell command with checking, timing, capture and logging. Takes a
 | `dry.run`      | bool             | `0`     | Print the command (and log it) but do not execute it. |
 | `input.files`  | scalar or array  | `undef` | File(s) that must exist and be readable **before** running; otherwise `task` dies. |
 | `output.files` | scalar or array  | `undef` | File(s) expected to exist **after** running; used both for the missing-output check and for [skip detection](#skipping-completed-work). |
+| `output.file`  | scalar           | `undef` | Convenience form of `output.files` for a **single** file. Must be a plain filename (not a reference). Cannot be combined with `output.files`. |
 | `log.fh`       | open filehandle  | `undef` | If given, the full result record is also written here. Must be a real, open filehandle. |
 | `note`         | scalar           | `''`    | Free-text note copied into the result and the log. |
 | `overwrite`    | bool             | `0`     | If false and all `output.files` already exist, the command is skipped. Set true to always run. |
 
 Passing an unrecognised key, an empty filename, or a non-filehandle `log.fh`
-causes `task` to die: these are usually mistakes worth catching early.
+causes `task` to die: these are usually mistakes worth catching early. Giving
+both `output.file` and `output.files`, or a reference to `output.file`, dies for
+the same reason.
 
 ## Return value
 
@@ -100,7 +103,7 @@ omit the execution-only fields (`exit`, `signal`, `stdout`, `stderr`).
 | `signal`           | Signal number if the command process was killed by a signal, else `0`. Always `0` on Windows (no POSIX signals). |
 | `stdout`, `stderr` | Captured output, with trailing whitespace stripped. |
 | `die`, `dry.run`, `overwrite`, `note` | The (defaulted) argument values used. |
-| `output.files`     | Array ref of the output files (a scalar argument is normalised to a one-element array). |
+| `output.files`     | Array ref of the output files (a scalar argument, or an `output.file`, is normalised to a one-element array). |
 | `output.file.size` | Hash of `filename => size in bytes` for the outputs. |
 | `input.files`      | The input argument, as given (present only if you passed `input.files`). |
 | `input.file.size`  | Hash of `filename => size in bytes` for the inputs (present only if you passed `input.files`). |
@@ -113,12 +116,12 @@ exists, `task` does **not** re-run the command. This makes pipelines
 restartable: re-running the script picks up where it left off.
 
     open my $log, '>', 'logfile.txt';
-    my $t = task({
+    my $t = task(
         cmd            => 'gmx grompp -f em.mdp -c box.gro -p topol.top -o em.tpr',
         'input.files'  => ['em.mdp', 'box.gro', 'topol.top'],
         'output.files' => 'em.tpr',
         'log.fh'       => $log,
-    });
+    );
     close $log;
 
 On the first run `done` is `"now"`; on a re-run (with `em.tpr` present) `done`
@@ -128,11 +131,11 @@ is `"before"` and `will.do` is `"no"`. Pass `overwrite => 1` to force it.
 
 Useful for inspecting a pipeline without executing anything expensive:
 
-    my $t = task({
+    my $t = task(
         cmd       => 'a long-running, time-consuming command',
         'dry.run' => 1,
         'log.fh'  => $fh,
-    });
+    );
 
 The command is printed (and logged) but not run; `will.do` is `"no: dry run"`.
 
@@ -162,19 +165,28 @@ Core/runtime modules used by SimpleFlow:
 - [`Capture::Tiny`](https://metacpan.org/pod/Capture::Tiny) captures `stdout`/`stderr`
 - [`Data::Printer`](https://metacpan.org/pod/Data::Printer) (`DDP`) pretty result/record printing
 - [`Devel::Confess`](https://metacpan.org/pod/Devel::Confess) better backtraces on death
-- [`Term::ANSIColor`](https://metacpan.org/pod/Term::ANSIColor) coloured terminal output
 - `List::Util`, `Scalar::Util`, `Time::HiRes`, `Cwd` core utilities
 
 The test suite additionally uses `Test::More` and
 [`Test::Exception`](https://metacpan.org/pod/Test::Exception).
 
-# Change log
+# Changes
 
-## 0.14 (2026-06-29) (Claude Opus 4.8 helped)
+## 0.15 2026-07-17 (Claude Opus 4.8 helped)
+
+addition of `output.file`, a single-file convenience form of `output.files`. It
+takes one plain filename, cannot be combined with `output.files`, and dies if
+given a reference or an empty name.
+
+removal of Term::ANSIColor dependency
+
+improved coverage testing
+
+## 0.14 2026-06-29 (Claude Opus 4.8 helped)
 
 ### `task`
 - **New:** accepts a flat key/value list as well as a hash ref —
-  `task(cmd => ...)` and `task({ cmd => ... })` are now equivalent. A lone
+  `task(cmd => ...)` and `task( cmd => ... )` are now equivalent. A lone
   non-hashref scalar or any odd-length argument list is fatal.
 - **Bug fix:** the default `die => 1` was ignored when checking for missing
   `output.files`. The block tested the raw `$args->{'die'}` (undef when the
@@ -188,7 +200,7 @@ The test suite additionally uses `Test::More` and
   array branch and the `output.files` empty-name check. Both now guard with
   `(defined $_) && (length $_ == 0)`, matching the `input.files` scalar branch.
 
-## 0.13 (2026-06-11)
+## 0.13 2026-06-11
 
 ### Fixed (Claude Opus 4.8 helped)
 
@@ -239,13 +251,17 @@ The test suite additionally uses `Test::More` and
   (including trailing-whitespace stripping), and argument validation (missing
   `cmd`, unknown keys, bad `log.fh`, missing input files).
 
-## 0.12
+## 0.12 2026-02-14
 
 exit code now matches what shell would show it as; signal now appears
 
-## 0.11
+## 0.11 2026-01-13
 
 max string length now corresponds to max of output strings, no more truncated output
 added List::Util dependency for string length maxes
 memory size now shows when output
 directory is now output during dry runs
+
+# COPYRIGHT AND LICENSE
+
+This software is free.  It is licensed under the same terms as Perl itself

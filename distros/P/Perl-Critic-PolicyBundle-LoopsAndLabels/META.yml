@@ -1,0 +1,49 @@
+---
+abstract: 'Bundle of policies for loop control flow and labels'
+author:
+  - 'Dean Hamstead <dean@fragfest.com.au>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-PolicyBundle-LoopsAndLabels
+no_index:
+  directory:
+    - t
+provides:
+  Perl::Critic::Policy::ControlStructures::LoopsRequireLabels:
+    file: lib/Perl/Critic/Policy/ControlStructures/LoopsRequireLabels.pm
+    version: '0.07'
+  Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls:
+    file: lib/Perl/Critic/Policy/ControlStructures/ProhibitBareBlockLoopControls.pm
+    version: '0.07'
+  Perl::Critic::Policy::ControlStructures::ProhibitGotoIntoConstruct:
+    file: lib/Perl/Critic/Policy/ControlStructures/ProhibitGotoIntoConstruct.pm
+    version: '0.07'
+  Perl::Critic::PolicyBundle::LoopsAndLabels:
+    file: lib/Perl/Critic/PolicyBundle/LoopsAndLabels.pm
+    version: '0.07'
+requires:
+  Perl::Critic: '0'
+  namespace::clean: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/djzort/perl-critic-policy-loopsandlabels/issues
+  homepage: https://github.com/djzort/perl-critic-policy-loopsandlabels
+  repository: https://github.com/djzort/perl-critic-policy-loopsandlabels.git
+version: '0.07'
+x_generated_by_perl: v5.40.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

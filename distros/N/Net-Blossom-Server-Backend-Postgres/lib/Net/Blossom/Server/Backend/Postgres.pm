@@ -14,7 +14,7 @@ use Net::Blossom::Server::BlobResult;
 use Net::Blossom::Server::MetadataStore;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 
 sub BUILDARGS {
     my $class = shift;
@@ -469,7 +469,10 @@ Returns the PostgreSQL large-object store component.
 
 Creates the required Postgres tables and indexes if they do not already exist.
 They are created in the schema captured by C<new>. This method is safe to call
-more than once. It migrates the C<0.001001> schema automatically.
+more than once. Metadata indexes are built concurrently, so existing tables
+remain writable while an index is added. The method requires C<AutoCommit> and
+repairs an invalid index left by an interrupted build. It migrates the
+C<0.001001> schema automatically.
 
 =head2 begin_upload
 

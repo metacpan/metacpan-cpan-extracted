@@ -9,12 +9,14 @@ use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp);
 use CPAN::Maker::Bootstrapper::Constants qw(:all);
 use Cwd qw(getcwd abs_path);
+use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Basename qw(basename);
 use File::Copy qw(copy);
 use File::Find;
 use File::Path qw(make_path);
 use Role::Tiny;
+use JSON;
 
 ########################################################################
 sub _get_review_prompt {
@@ -89,9 +91,6 @@ sub _get_latest_review {
 ########################################################################
   my ( $self, $file, $review_type ) = @_;
 
-  return ( undef, undef )
-    if !$self->get_history;
-
   my $name = basename($file);
   $name =~ s/[.]in\z//xsm;
   $name =~ s/[.][^.]+\z//xsm;
@@ -117,7 +116,7 @@ sub _get_latest_review {
   die "ERROR: no content for $review_file\n"
     if !length $content;
 
-  my $review = JSON::PP->new->decode($content);
+  my $review = JSON->new->decode($content);
 
   return ( $review, $review_file );
 }
@@ -269,8 +268,9 @@ sub _cmd_review {
 
   push @prompt, $llm->text($prompt_str);
 
-  my $text  = $review_type eq 'pod' ? slurp( abs_path($file) ) : $self->_strip_pod($file);
-  my $title = $review_type eq 'pod' ? basename($file)          : 'primary: ' . basename($file);
+  my $text = $review_type eq 'pod' ? slurp( abs_path($file) ) : $self->_strip_pod( slurp( abs_path($file) ) );
+
+  my $title = $review_type eq 'pod' ? basename($file) : 'primary: ' . basename($file);
 
   push @prompt,
     $llm->document(
@@ -289,7 +289,7 @@ sub _cmd_review {
   if ($review) {
     push @prompt,
       $llm->document(
-      data  => JSON::PP->new->utf8->encode($review),
+      data  => JSON->new->utf8->encode($review),
       title => 'annotations:' . basename($file),
       );
   }
@@ -300,7 +300,7 @@ sub _cmd_review {
     type          => $review_type,
     prompt        => $prompt_str,
     text          => $text,
-    annotations   => $review ? JSON::PP->new->utf8->encode($review) : undef,
+    annotations   => $review ? JSON->new->utf8->encode($review) : undef,
     context_files => \@context_files,
     max_tokens    => $self->get_max_tokens // 4096,
     input_tokens  => $input_tokens,
@@ -336,7 +336,7 @@ sub _cmd_review {
   $json_text =~ s/\A\s*```(?:json)?\s*\n?//xsm;
   $json_text =~ s/\s*```\s*\z//xsm;
 
-  $review = eval { JSON::PP->new->decode($json_text); };
+  $review = eval { JSON->new->decode($json_text); };
 
   die "ERROR: unable to decode JSON\n$EVAL_ERROR\nresponse was:\n" . $content->text
     if $EVAL_ERROR;
@@ -357,13 +357,14 @@ sub _cmd_review {
   open my $fh, '>', $review_file
     or die "ERROR: could not open $review_file for writing.\n$OS_ERROR";
 
-  print {$fh} JSON::PP->new->utf8->pretty->encode($review);
+  print {$fh} JSON->new->utf8->pretty->encode($review);
 
   close $fh
     or warn "WARNING: could not close $review_file: $OS_ERROR";
 
   return $llm_rsp;
 }
+
 ########################################################################
 sub cmd_code_finding {
 ########################################################################

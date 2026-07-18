@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Moo;
-use JSON::XS;
+use JSON::MaybeXS;
 use MIME::Base64 qw(decode_base64);
 use Google::Auth;
 use Google::Auth::IDTokens::KeySources;
@@ -64,7 +64,7 @@ sub verify
     }
     my ( $header_b64, $payload_b64, $signature_b64 ) = @parts;
 
-    my $coder = JSON::XS->new->utf8->allow_nonref;
+    my $coder = JSON::MaybeXS->new->utf8->allow_nonref;
     my $header = eval { $coder->decode( _decode_base64url($header_b64) ) };
     if ($@)
     {

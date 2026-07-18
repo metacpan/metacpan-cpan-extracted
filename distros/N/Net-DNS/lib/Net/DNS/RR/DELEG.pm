@@ -2,7 +2,7 @@ package Net::DNS::RR::DELEG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DELEG.pm 2046 2026-06-01 13:23:01Z willem $)[2];
+our $VERSION = (qw$Id: DELEG.pm 2053 2026-07-07 10:18:23Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -74,7 +74,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 		my $val = shift @parameters;
 		if ( my $name = $keybycode{$key} ) {
 			my @val = grep {length} $self->$name;
-			s/,/\\,/g foreach @val;			# escape embedded commas
+			s/,/\\044/g foreach @val;		# escape embedded commas
 			my @rhs = grep {length} join ',', @val;
 			push @rdata, join '=', $name, @rhs;
 		} else {
@@ -377,6 +377,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-draft-ietf-deleg-08
+draft-ietf-deleg-10
 
 =cut

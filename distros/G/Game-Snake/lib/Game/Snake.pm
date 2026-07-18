@@ -1,9 +1,9 @@
 use 5.38.0;
 use experimental 'class';
 
-package Game::Snake 0.10;
+package Game::Snake 0.11;
 class Game::Snake {
-	our $VERSION = 0.10;
+	our $VERSION = 0.11;
 	use Raylib::App;	
 	use Raylib::FFI;
 	use Raylib::Color;
@@ -275,7 +275,7 @@ Game::Snake - A clone of the classic snake game using raylib
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

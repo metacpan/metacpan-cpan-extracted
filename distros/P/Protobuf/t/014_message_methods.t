@@ -2,13 +2,14 @@ use strict;
 use warnings;
 use Test::More;
 use Protobuf;
-use Protobuf::DescriptorPool;
-use Path::Tiny;
+use lib 't/lib';
+use lib 't/generated';
+use TestHelpers;
+use String::StringBytes;
+use Protobuf::Types;
 
-# Use the compat_descriptor.bin for tests
-my $pool = Protobuf::DescriptorPool->generated_pool;
-my $bin = path('t/data/compat_descriptor.bin')->slurp_raw;
-$pool->add_serialized_file_descriptor_set($bin);
+my $pool = TestHelpers->get_generated_pool();
+TestHelpers->load_test_protos($pool, 't/data/test_descriptor.bin');
 
 ok(String::StringBytes::Bytes->can('new'), 'String::StringBytes::Bytes can new');
 

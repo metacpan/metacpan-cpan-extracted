@@ -114,7 +114,7 @@ ADVANCED CONFIGURATION
     The include path can contain a subroutine reference to dynamically
     return a list of available directories. This method will receive the $c
     object as a parameter and should return a reference to a list of
-    directories. Errors can be reported using "die()". This method will be
+    directories. Errors can be reported using die(). This method will be
     called every time a file is requested that appears to be a static file
     (i.e. it has an extension).
 

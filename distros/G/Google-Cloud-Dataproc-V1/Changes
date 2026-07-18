@@ -1,2 +1,8 @@
+0.02    Fri Jul 17 2026
+        [CI & Code Generation]
+        - Upgraded package version to 0.02.
+        - Corrected copyright assignment to Google LLC in generated module headers.
+        - Pruned redundant sub-module $VERSION declarations.
+
 0.01  Mon Jul 13 22:30:27 2026
         - Initial distribution release.

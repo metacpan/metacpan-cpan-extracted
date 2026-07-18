@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(
 	estimate_savings
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -27,7 +27,64 @@ App::GHGen::Reporter - Generate reports for GitHub integration
 
 =head2 generate_markdown_report($issues, $fixes)
 
-Generate a markdown report of issues and fixes.
+Produce a Markdown-formatted report of workflow issues and applied fixes.
+
+=head3 Purpose
+
+Render a structured Markdown document that summarises detected issues grouped
+by category, includes suggested fixes, and appends an estimated savings
+section when applicable.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$issues> (ArrayRef[HashRef], required)
+
+Issues to report.  Each must have C<type>, C<severity>, C<message>; an
+optional C<fix> key renders a collapsible C<E<lt>detailsE<gt>> block.
+
+=item C<$fixes> (ArrayRef, optional, default C<[]>)
+
+List of fixes already applied (used only for the summary count).
+
+=back
+
+=head3 Returns
+
+A non-empty Markdown string beginning with C<# GHGen Workflow Analysis>.
+
+=head3 Side Effects
+
+None.  Pure function.
+
+=head3 Usage Example
+
+    my $md = generate_markdown_report(\@issues, \@fixes);
+    path('report.md')->spew_utf8($md);
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        issues => { type => 'arrayref', required => 1 },
+        fixes  => { type => 'arrayref', default  => [] },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }   # Markdown string
+
+=head3 FORMAL SPECIFICATION
+
+    generate_markdown_report : seq Issue × seq Fix → ℤ*
+
+    result begins with "# GHGen Workflow Analysis"
+    |issues| > 0 ⇒ result contains "## Issues by Category"
+    |issues| = 0 ⇒ result does not contain "## Issues by Category"
+    |fixes|  > 0 ⇒ result contains "Fixes applied"
+    savings.minutes > 0 ⇒ result contains "## 💰 Estimated Savings"
 
 =cut
 
@@ -88,7 +145,72 @@ sub generate_markdown_report($issues, $fixes = []) {
 
 =head2 generate_github_comment($issues, $fixes, $options)
 
-Generate a GitHub-friendly comment with issues and recommendations.
+Generate a GitHub Pull-Request comment summarising workflow issues.
+
+=head3 Purpose
+
+Produce a compact Markdown comment suitable for posting as a PR review
+comment.  Includes a summary table, a collapsible detail block, a how-to-fix
+section when no fixes were applied, and a potential savings estimate.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$issues> (ArrayRef[HashRef], required)
+
+Issues to display.  Each must have C<type>, C<severity>, C<message>; an
+optional C<file> key adds a file reference line.
+
+=item C<$fixes> (ArrayRef, optional, default C<[]>)
+
+Fixes already applied (used only for the applied-fix count in the header).
+
+=item C<$options> (HashRef, optional, default C<{}>)
+
+Reserved for future use; currently unused.
+
+=back
+
+=head3 Returns
+
+A non-empty Markdown string starting with C<## 🔍 GHGen Workflow Analysis>.
+
+When C<$issues> is empty, the comment contains the phrase
+C<No issues found!> and is returned early without a table or details block.
+
+=head3 Side Effects
+
+None.  Pure function.
+
+=head3 Usage Example
+
+    my $comment = generate_github_comment(\@issues, \@fixes);
+    # Post $comment via GitHub API
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        issues  => { type => 'arrayref', required => 1 },
+        fixes   => { type => 'arrayref', default  => [] },
+        options => { type => 'hashref',  default  => {} },
+    }
+
+=head4 Output
+
+    { type => 'scalar' }   # Markdown string
+
+=head3 FORMAL SPECIFICATION
+
+    generate_github_comment : seq Issue × seq Fix × Options → ℤ*
+
+    result begins with "## 🔍 GHGen Workflow Analysis"
+    |issues| = 0 ⇒ result contains "No issues found!" ∧ early return
+    |fixes|  > 0 ⇒ result contains "Applied" ∧ fix count
+    |issues| > 0 ∧ |fixes| = 0 ⇒ result contains "How to Fix"
+    ∃ i ∈ issues: i.file defined ⇒ result contains i.file
 
 =cut
 
@@ -186,7 +308,71 @@ sub generate_github_comment($issues, $fixes = [], $options = {}) {
 
 =head2 estimate_savings($issues)
 
-Estimate potential CI minutes and cost savings from fixing issues.
+Estimate CI-minute savings and associated cost reduction from fixing a set of issues.
+
+=head3 Purpose
+
+For each C<performance> (caching) or C<cost> (concurrency, triggers) issue,
+add a fixed minute estimate to the running total and compute the equivalent
+USD saving at the GitHub private-repo rate of $0.008/minute.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$issues> (ArrayRef[HashRef], required)
+
+Issue hashes with at least C<type> and C<message>.
+
+=back
+
+=head3 Returns
+
+A hash reference:
+
+    {
+        minutes => Int,   # total estimated minutes saved per month; 0 when no savings
+        cost    => Int,   # floor(minutes * 0.008); 0 when no savings
+    }
+
+=head3 Side Effects
+
+None.  Pure function.
+
+=head3 Usage Example
+
+    my $s = estimate_savings(\@issues);
+    say "Save $s->{minutes} min/month";
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    { issues => { type => 'arrayref', required => 1 } }
+
+=head4 Output
+
+    {
+        type => 'hashref',
+        keys => {
+            minutes => { type => 'scalar' },
+            cost    => { type => 'scalar' },
+        },
+    }
+
+=head3 FORMAL SPECIFICATION
+
+    estimate_savings : seq Issue → { minutes: ℕ, cost: ℕ }
+
+    RATE ≔ 0.008
+    savings(i) ≔
+        i.type = performance ∧ i.message =~ /caching/     → 500
+        i.type = cost        ∧ i.message =~ /concurrency/ → 50
+        i.type = cost        ∧ i.message =~ /triggers/    → 100
+        otherwise                                          → 0
+
+    total  ≔ ∑ { savings(i) ∣ i ∈ issues }
+    result ≔ { minutes ↦ total, cost ↦ floor(total × RATE) }
 
 =cut
 

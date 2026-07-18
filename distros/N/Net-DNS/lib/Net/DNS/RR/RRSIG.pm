@@ -2,7 +2,7 @@ package Net::DNS::RR::RRSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: RRSIG.pm 2042 2025-12-24 10:23:11Z willem $)[2];
+our $VERSION = (qw$Id: RRSIG.pm 2057 2026-07-16 10:05:04Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -750,7 +750,7 @@ $rrsetref contains a reference to an array of RR objects and the
 method verifies the RRset against the signature contained in the
 $sigrr object itself using the public key in $keyrr.
 
-The second argument can either be a Net::DNS::RR::KEYRR object or a
+The second argument can either be a Net::DNS::RR::DNSKEY object or a
 reference to an array of such objects. Verification will return
 successful as soon as one of the keys in the array leads to positive
 validation.

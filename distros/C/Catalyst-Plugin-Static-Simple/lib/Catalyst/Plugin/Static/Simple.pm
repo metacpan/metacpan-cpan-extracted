@@ -8,7 +8,7 @@ use MIME::Types ();
 use Catalyst::Utils;
 use namespace::autoclean;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 has _static_file => ( is => 'rw' );
 has _static_debug_message => ( is => 'rw', isa => 'ArrayRef[Str]' );

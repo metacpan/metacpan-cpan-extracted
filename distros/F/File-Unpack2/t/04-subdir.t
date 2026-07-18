@@ -4,6 +4,9 @@ use Test::More;
 use FindBin;
 BEGIN { unshift @INC, "$1/../blib/lib" if $FindBin::Bin =~ m{(.*)} };
 use File::Unpack2;
+
+# Fail fast if a regression makes an unpacker hang, instead of hanging CI forever.
+$SIG{ALRM} = sub { die "TIMEOUT: possible unpacker hang in ".__FILE__."\n" }; alarm 300;
 use File::Temp;
 
 my $have_unzip =  -f '/usr/bin/unzip';

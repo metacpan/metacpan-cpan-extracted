@@ -1,8 +1,81 @@
+Tue Jul 14 16:57:28 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.8]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.7.md: new
+	* .includes/git.mk: +NO_COMMIT
+	* README.md: generated
+	* VERSION: bump
+	* lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm.in: new
+	* .gitignore: *.bak, buildspec.yml.current
+	* cpan-maker-bootstrapper.yml: + extra-files commands
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- pod updates
+
+Tue Jul 14 06:49:24 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.7]:
+	* Makefile
+	- make buildspec.yml 0644
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.7.md: new
+	* README.md: generated
+	* VERSION: bump
+	* requires
+	- CLI::Simple 2.0.14, CPAN::Maker 2.0.1
+	* cpanfile: likewise
+	* class-module.pm.tmpl: tidy
+	* cli-module.pm.tmpl
+	- exit __PACKAGE__->main
+	- default_options
+	* cpan-maker-bootstrapper.yml
+	- make color the default
+	- add --debug option
+	* lib/CPAN/Maker/Bootstrapper/Constants.pm.in
+	($COLORS): +informational, '-'
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- pod tweaks and updates
+	- add log4perl configuration (color)
+	(init_logger): new, turn off color if !color
+	* lib/CPAN/Maker/Bootstrapper/Role/Init.pm.in
+	(init)
+	- set import directory to empty list
+	- turn color off if no Term::ANSIColor available
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	(cmd_install)
+	- more log messages
+	- send fatal errors to log
+	- refactor to move some code to subs
+	- remove previously instaled files to avoid permission errors
+	- update permissions on buildspec.yml
+	- use NO_ECHO env var
+	(_validate_module): new
+	(_create_install_dir): new
+	(_create_default_config): new
+	* lib/Text/ASCIITable/FixANSI.pm.in: new
+	* project.mk: add dependency recipe for above
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm.in
+	(cmd_udpate_annotations)
+	- JSON, not JSON::PP
+	- use Text::ASCIITable, ASCIITable::FixANSI
+	(cmd_annotate)
+	- don't both rewriting file if no annoations
+	(_show_annotations)
+	- provide default color in case of new dispositions
+	(_annotate): return undef if no annotations
+	(_finalize_annotations: JSON, not JSON::PP
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	(_strip_pod): allow to be called as instannce method
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in
+	(_get_latest_review)
+	- JSON, not JSON::PP
+	- --history not relevant anymore?
+
 Mon Jul 13 14:09:23 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.6]:
 	* release-notes.md: updated
-	* release-notes/release-notes-2.0.5.md: new
+	* release-notes/release-notes-2.0.6.md: new
 	* .includes/perl.mk
 	- check pod as part of syntax checks
 	* Makefile

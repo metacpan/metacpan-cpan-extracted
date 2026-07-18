@@ -6,6 +6,7 @@ use Object;
 
 my $obj = Object->new({
   title => 'title',
+  author => 'Someone',
   type => 'object',
   desc => 'description of the object',
   url => 'https://example.com/object/',
@@ -19,6 +20,13 @@ my @tests = ({
   tag    => 'title',
   attrs  => [],
   text   => 'title',
+}, {
+  method => 'author_tag',
+  tag    => 'meta',
+  attrs  => [qw(
+    name="author"
+    content="Someone"
+  )],
 }, {
   method => 'canonical_tag',
   tag    => 'link',
@@ -39,6 +47,13 @@ my @tests = ({
   attrs  => [qw(
     property="og:type"
     content="object"
+  )],
+}, {
+  method => 'og_image_alt_tag',
+  tag    => 'meta',
+  attrs  => [qw( 
+    property="og:image:alt"
+    content="title"
   )],
 }, {
   method => 'twitter_card_tag',

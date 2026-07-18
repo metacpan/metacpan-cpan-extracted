@@ -32,12 +32,15 @@ ok(-f $starter_script, 'protobuf-starter script exists');
 # We must pass the generator lib path in the environment via PERL5LIB.
 # We pass the proto parameters directly as command-line arguments!
 my $plugin_lib = File::Spec->catdir('lib');
+my $sep = $^O eq 'MSWin32' ? ';' : ':';
+local $ENV{PERL5LIB} = defined $ENV{PERL5LIB} ? "$plugin_lib$sep$ENV{PERL5LIB}" : $plugin_lib;
+
 my $starter_cmd = sprintf(
-    'PERL5LIB=%s:$PERL5LIB perl %s --module=Google::Cloud::Test --protos=%s --import-path=%s --grpc-target=test.googleapis.com --dir=%s --author="C.J. Collier <cjac@google.com>" --force',
-    $plugin_lib,
+    '"%s" "%s" --module=Google::Cloud::Test --protos="%s" --import-path="%s" --grpc-target=test.googleapis.com --dir="%s" --author="Google LLC <cjac@google.com>" --force',
+    $^X,
     $starter_script,
-    $proto_file,
-    $import_path,
+    File::Spec->rel2abs($proto_file),
+    File::Spec->rel2abs($import_path),
     $tmp_dir
 );
 
@@ -134,12 +137,16 @@ EOF
 close $fh_runner;
 
 # 5. Execute the integration test runner in a sub-process
-my $gen_lib = File::Spec->catdir($tmp_dir, 'lib');
+my $gen_lib = File::Spec->rel2abs(File::Spec->catdir($tmp_dir, 'lib'));
 File::Path::make_path('tmp');
 my $log_file = File::Spec->catfile('tmp', 'integration-test-starter.log');
+local $ENV{PERL5LIB} = defined $ENV{PERL5LIB} ? "$gen_lib$sep$ENV{PERL5LIB}" : $gen_lib;
+local $ENV{PACKAGE_STASH_IMPLEMENTATION} = 'PP';
+local $ENV{MOO_XS_DISABLE} = 1;
+local $ENV{TEMPLATE_STASH} = 'pureperl';
 my $test_runner_cmd = sprintf(
-    'PERL5LIB=%s:$PERL5LIB perl %s > %s 2>&1',
-    $gen_lib,
+    '"%s" "%s" > "%s" 2>&1',
+    $^X,
     $runner_file,
     $log_file
 );

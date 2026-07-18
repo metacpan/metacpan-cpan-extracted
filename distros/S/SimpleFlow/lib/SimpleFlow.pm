@@ -7,9 +7,8 @@ use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
 use Devel::Confess 'color';
 use Cwd 'getcwd';
 package SimpleFlow;
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 use Time::HiRes;
-use Term::ANSIColor;
 # Windows portability: the legacy Windows console (cmd.exe) prints raw ANSI
 # escape sequences as garbage. Disable colouring there unless a terminal that
 # understands ANSI is in use (Windows Terminal, ConEmu, ANSICON). Unix and
@@ -20,6 +19,29 @@ BEGIN {
 		&& !$ENV{WT_SESSION} # Windows Terminal
 		&& !$ENV{ConEmuANSI} # ConEmu
 		&& !$ENV{ANSICON};   # ANSICON
+}
+
+# Minimal drop-in for Term::ANSIColor's colored(\@attrs, $text): map the few
+# colour names we use to SGR codes so Perl core alone can colour the output.
+# Honours $ENV{ANSI_COLORS_DISABLED} at call time (set above and by the caller).
+my %ANSI_CODE = (
+	reset         =>   0,
+	black         =>  30,
+	red           =>  31,
+	green         =>  32,
+	blue          =>  34,
+	on_black      =>  40,
+	on_green      =>  42,
+	on_bright_red => 101,
+);
+sub colored {
+	my ($attrs, $text) = @_;
+	return $text if $ENV{ANSI_COLORS_DISABLED};
+	my @codes = map {
+		$ANSI_CODE{$_} // die "unknown colour attribute '$_'"
+	} split ' ', join ' ', @$attrs;
+	return $text unless @codes;
+	return "\e[" . join(';', @codes) . 'm' . $text . "\e[0m";
 }
 use Scalar::Util 'openhandle';
 use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
@@ -68,13 +90,14 @@ sub task {
 		die 'the above args are necessary, but were not defined.';
 	}
 	my @defined_args = ( @reqd_args,
-		'die',			  # die if not successful; 0 or 1
-		'dry.run',       # dry run or not
-		'input.files',   # check for input files; SCALAR or ARRAY
+		'die',			# die if not successful; 0 or 1
+		'dry.run',     # dry run or not
+		'input.files', # check for input files; SCALAR or ARRAY
 		'log.fh',
-		'note',          # a note for the log
-		'overwrite',     # 
-		'output.files'	  # product files that need to be checked; can be scalar or array
+		'note',        # a note for the log
+		'overwrite',   # bool
+		'output.file', # for a single file, gets pushed into output.files anyway
+		'output.files'	# product files that need to be checked; can be scalar or array
 	);
 	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $args };
 	if (scalar @bad_args > 0) {
@@ -121,6 +144,13 @@ sub task {
 	my $msg = "\@ $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
 	say $msg;
 	say {$args->{'log.fh'}} "\@ $c[1] line $c[2] The command is:\n$args->{cmd}" if defined $args->{'log.fh'};
+	# "output.file" is the single-file convenience form of "output.files".
+	# The two are mutually exclusive: mixing them is almost always a mistake
+	# (which one holds the truth?), so refuse it outright.
+	if ((defined $args->{'output.file'}) && (defined $args->{'output.files'})) {
+		p $args;
+		die '"output.file" and "output.files" cannot both be given; use one or the other';
+	}
 	if (defined $args->{'output.files'}) { # avoid "uninitialized value" warning
 		my $ref = ref $args->{'output.files'};
 		if ($ref eq 'ARRAY') {
@@ -131,6 +161,14 @@ sub task {
 			p $args;
 			die "$ref isn't allowed for \"output.files\"";
 		}
+	}
+	if (defined $args->{'output.file'}) { # a single file only, never a ref
+		my $ref = ref $args->{'output.file'};
+		if ($ref ne '') {
+			p $args;
+			die "$ref isn't allowed for \"output.file\"; it takes a single filename (use \"output.files\" for a list)";
+		}
+		push @output_files, $args->{'output.file'};
 	}
 	@empty_filenames = grep {(defined $_) && (length $_ == 0)} @output_files; # 0-length filenames aren't allowed
 	if (scalar @empty_filenames > 0) {
@@ -279,10 +317,10 @@ The simplest useful case: run a command and confirm it produced its output:
 
  use SimpleFlow qw(task say2);
  
- my $t = task({
+ my $t = task(
      cmd            => 'which ls',
      'output.files' => '/tmp/AFK3mnEK8L.log',
- });
+ );
 
 C<task> returns a hash reference describing exactly what happened:
 
@@ -311,7 +349,7 @@ C<task> returns a hash reference describing exactly what happened:
  > C<system()>, so the I<commands themselves> are your responsibility to keep
  > cross-platform (e.g. C<which ls> is Unix-only). SimpleFlow's own behaviour
  > exit/signal decoding and coloured output is cross-platform; see the
- > L<change log|/"Change log">.
+ > change log.
 
 =head1 C<task>
 
@@ -367,6 +405,12 @@ B<single hash reference>; the only required key is C<cmd>.
   <td>File(s) expected to exist <b>after</b> running; used both for the missing-output check and for skip detection.</td>
 </tr>
 <tr>
+  <td><code>output.file</code></td>
+  <td>scalar</td>
+  <td><code>undef</code></td>
+  <td>Convenience form of <code>output.files</code> for a <b>single</b> file. Must be a plain filename (not a reference). Cannot be combined with <code>output.files</code>.</td>
+</tr>
+<tr>
   <td><code>log.fh</code></td>
   <td>open filehandle</td>
   <td><code>undef</code></td>
@@ -392,7 +436,9 @@ B<single hash reference>; the only required key is C<cmd>.
 
 
 Passing an unrecognised key, an empty filename, or a non-filehandle C<log.fh>
-causes C<task> to die: these are usually mistakes worth catching early.
+causes C<task> to die: these are usually mistakes worth catching early. Giving
+both C<output.file> and C<output.files>, or a reference to C<output.file>, dies for
+the same reason.
 
 =head2 Return value
 
@@ -450,7 +496,7 @@ omit the execution-only fields (C<exit>, C<signal>, C<stdout>, C<stderr>).
 </tr>
 <tr>
   <td><code>output.files</code></td>
-  <td>Array ref of the output files (a scalar argument is normalised to a one-element array).</td>
+  <td>Array ref of the output files (a scalar argument, or an <code>output.file</code>, is normalised to a one-element array).</td>
 </tr>
 <tr>
   <td><code>output.file.size</code></td>
@@ -482,12 +528,12 @@ exists, C<task> does B<not> re-run the command. This makes pipelines
 restartable: re-running the script picks up where it left off.
 
  open my $log, '>', 'logfile.txt';
- my $t = task({
+ my $t = task(
      cmd            => 'gmx grompp -f em.mdp -c box.gro -p topol.top -o em.tpr',
      'input.files'  => ['em.mdp', 'box.gro', 'topol.top'],
      'output.files' => 'em.tpr',
      'log.fh'       => $log,
- });
+ );
  close $log;
 
 On the first run C<done> is C<"now">; on a re-run (with C<em.tpr> present) C<done>
@@ -497,11 +543,11 @@ is C<"before"> and C<will.do> is C<"no">. Pass C<< overwrite =E<gt> 1 >> to forc
 
 Useful for inspecting a pipeline without executing anything expensive:
 
- my $t = task({
+ my $t = task(
      cmd       => 'a long-running, time-consuming command',
      'dry.run' => 1,
      'log.fh'  => $fh,
- });
+ );
 
 The command is printed (and logged) but not run; C<will.do> is C<"no: dry run">.
 
@@ -536,8 +582,6 @@ Core/runtime modules used by SimpleFlow:
 
 =item * L<Devel::Confess> better backtraces on death
 
-=item * L<Term::ANSIColor> coloured terminal output
-
 =item * C<List::Util>, C<Scalar::Util>, C<Time::HiRes>, C<Cwd> core utilities
 
 =back
@@ -545,16 +589,26 @@ Core/runtime modules used by SimpleFlow:
 The test suite additionally uses C<Test::More> and
 L<Test::Exception>.
 
-=head1 Change log
+=head1 Changes
 
-=head2 0.14 (2026-06-29) (Claude Opus 4.8 helped)
+=head2 0.15 2026-07-17 (Claude Opus 4.8 helped)
+
+addition of C<output.file>, a single-file convenience form of C<output.files>. It
+takes one plain filename, cannot be combined with C<output.files>, and dies if
+given a reference or an empty name.
+
+removal of Term::ANSIColor dependency
+
+improved coverage testing
+
+=head2 0.14 2026-06-29 (Claude Opus 4.8 helped)
 
 =head3 C<task>
 
 =over
 
 =item * B<New:> accepts a flat key/value list as well as a hash ref —
-C<< task(cmd =E<gt> ...) >> and C<< task({ cmd =E<gt> ... }) >> are now equivalent. A lone
+C<< task(cmd =E<gt> ...) >> and C<< task( cmd =E<gt> ... ) >> are now equivalent. A lone
 non-hashref scalar or any odd-length argument list is fatal.
 
 =item * B<Bug fix:> the default C<< die =E<gt> 1 >> was ignored when checking for missing
@@ -573,7 +627,7 @@ C<(defined $_) && (length $_ == 0)>, matching the C<input.files> scalar branch.
 
 =back
 
-=head2 0.13 (2026-06-11)
+=head2 0.13 2026-06-11
 
 =head3 Fixed (Claude Opus 4.8 helped)
 
@@ -638,13 +692,17 @@ C<cmd>, unknown keys, bad C<log.fh>, missing input files).
 
 =back
 
-=head2 0.12
+=head2 0.12 2026-02-14
 
 exit code now matches what shell would show it as; signal now appears
 
-=head2 0.11
+=head2 0.11 2026-01-13
 
 max string length now corresponds to max of output strings, no more truncated output
 added List::Util dependency for string length maxes
 memory size now shows when output
 directory is now output during dry runs
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is free.  It is licensed under the same terms as Perl itself

@@ -15,7 +15,12 @@
 #include <openssl/obj_mac.h>
 #include <string.h>
 
-static int generate_mock_cert(char **cert_pem_out, char **key_pem_out) {
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/param_build.h>
+#include <openssl/core_names.h>
+#endif
+
+static int generate_mock_cert(pTHX_ char **cert_pem_out, char **key_pem_out) {
     EVP_PKEY *pkey = NULL;
     EVP_PKEY_CTX *pctx = NULL;
     X509 *x509 = NULL;
@@ -66,11 +71,13 @@ static int generate_mock_cert(char **cert_pem_out, char **key_pem_out) {
     if (PEM_write_bio_X509(cert_bio, x509) <= 0) goto cleanup;
     cert_len = BIO_get_mem_data(cert_bio, &cert_pem);
 
-    *cert_pem_out = (char *)malloc(cert_len + 1);
+    Newx(*cert_pem_out, cert_len + 1, char);
     memcpy(*cert_pem_out, cert_pem, cert_len);
     (*cert_pem_out)[cert_len] = '\0';
 
-    *key_pem_out = (char *)malloc(key_len + 1);
+    Newx(*key_pem_out, key_len + 1, char);
+    memcpy(*key_pem_out, key_pem, key_len);
+    (*key_pem_out)[key_len] = '\0';
     memcpy(*key_pem_out, key_pem, key_len);
     (*key_pem_out)[key_len] = '\0';
 
@@ -97,7 +104,7 @@ generate_self_signed_cert()
         HV *hv = NULL;
         SV *result = NULL;
     CODE:
-        if (generate_mock_cert(&cert_pem, &key_pem)) {
+        if (generate_mock_cert(aTHX_ &cert_pem, &key_pem)) {
             hv = newHV();
             hv_stores(hv, "cert", newSVpv(cert_pem, 0));
             hv_stores(hv, "key", newSVpv(key_pem, 0));
@@ -126,6 +133,46 @@ load_rsa_pubkey(SV *n_sv, SV *e_sv)
         n_bin = (unsigned char *)SvPV(n_sv, n_len);
         e_bin = (unsigned char *)SvPV(e_sv, e_len);
 
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+        OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+        OSSL_PARAM *params = NULL;
+        EVP_PKEY_CTX *pctx = NULL;
+
+        if (!bld) XSRETURN_UNDEF;
+
+        n_bn = BN_bin2bn(n_bin, n_len, NULL);
+        e_bn = BN_bin2bn(e_bin, e_len, NULL);
+        if (!n_bn || !e_bn) {
+            if (n_bn) BN_free(n_bn);
+            if (e_bn) BN_free(e_bn);
+            OSSL_PARAM_BLD_free(bld);
+            XSRETURN_UNDEF;
+        }
+
+        if (!OSSL_PARAM_BLD_push_BN(bld, OSSL_PKEY_PARAM_RSA_N, n_bn) ||
+            !OSSL_PARAM_BLD_push_BN(bld, OSSL_PKEY_PARAM_RSA_E, e_bn)) {
+            BN_free(n_bn);
+            BN_free(e_bn);
+            OSSL_PARAM_BLD_free(bld);
+            XSRETURN_UNDEF;
+        }
+
+        params = OSSL_PARAM_BLD_to_param(bld);
+        pctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
+        if (pctx && params) {
+            if (EVP_PKEY_fromdata_init(pctx) > 0) {
+                EVP_PKEY_fromdata(pctx, &pkey, EVP_PKEY_PUBLIC_KEY, params);
+            }
+        }
+
+        if (params) OSSL_PARAM_free(params);
+        if (bld) OSSL_PARAM_BLD_free(bld);
+        if (pctx) EVP_PKEY_CTX_free(pctx);
+        BN_free(n_bn);
+        BN_free(e_bn);
+
+        if (!pkey) XSRETURN_UNDEF;
+ #else
         rsa = RSA_new();
         if (!rsa) XSRETURN_UNDEF;
 
@@ -156,6 +203,7 @@ load_rsa_pubkey(SV *n_sv, SV *e_sv)
             EVP_PKEY_free(pkey);
             XSRETURN_UNDEF;
         }
+ #endif
 
         retval = newSViv(PTR2IV(pkey));
         retval = newRV_noinc(retval);
@@ -189,7 +237,42 @@ load_ec_pubkey(const char *curve_name, SV *x_sv, SV *y_sv)
         }
         if (nid == NID_undef) XSRETURN_UNDEF;
 
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+        OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+        OSSL_PARAM *params = NULL;
+        EVP_PKEY_CTX *pctx = NULL;
+        unsigned char point_bin[1 + 256];
+        size_t point_len = 1 + x_len + y_len;
 
+        if (!bld || point_len > sizeof(point_bin)) {
+            if (bld) OSSL_PARAM_BLD_free(bld);
+            XSRETURN_UNDEF;
+        }
+
+        point_bin[0] = 0x04;
+        memcpy(point_bin + 1, x_bin, x_len);
+        memcpy(point_bin + 1 + x_len, y_bin, y_len);
+
+        if (!OSSL_PARAM_BLD_push_utf8_string(bld, OSSL_PKEY_PARAM_GROUP_NAME, (char *)curve_name, 0) ||
+            !OSSL_PARAM_BLD_push_octet_string(bld, OSSL_PKEY_PARAM_PUB_KEY, point_bin, point_len)) {
+            OSSL_PARAM_BLD_free(bld);
+            XSRETURN_UNDEF;
+        }
+
+        params = OSSL_PARAM_BLD_to_param(bld);
+        pctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
+        if (pctx && params) {
+            if (EVP_PKEY_fromdata_init(pctx) > 0) {
+                EVP_PKEY_fromdata(pctx, &pkey, EVP_PKEY_PUBLIC_KEY, params);
+            }
+        }
+
+        if (params) OSSL_PARAM_free(params);
+        if (bld) OSSL_PARAM_BLD_free(bld);
+        if (pctx) EVP_PKEY_CTX_free(pctx);
+
+        if (!pkey) XSRETURN_UNDEF;
+ #else
         eckey = EC_KEY_new();
         if (!eckey) XSRETURN_UNDEF;
 
@@ -265,6 +348,7 @@ load_ec_pubkey(const char *curve_name, SV *x_sv, SV *y_sv)
         BN_free(y_bn);
         EC_POINT_free(point);
         EC_GROUP_free(group);
+ #endif
 
         retval = newSViv(PTR2IV(pkey));
         retval = newRV_noinc(retval);

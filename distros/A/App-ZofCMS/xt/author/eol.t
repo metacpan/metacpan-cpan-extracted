@@ -50,7 +50,6 @@ my @files = (
     'lib/App/ZofCMS/Plugin/GetRemotePageTitle.pm',
     'lib/App/ZofCMS/Plugin/GoogleCalculator.pm',
     'lib/App/ZofCMS/Plugin/GooglePageRank.pm',
-    'lib/App/ZofCMS/Plugin/GoogleTime.pm',
     'lib/App/ZofCMS/Plugin/HTMLFactory/Entry.pm',
     'lib/App/ZofCMS/Plugin/HTMLFactory/PageToBodyId.pm',
     'lib/App/ZofCMS/Plugin/HTMLMailer.pm',

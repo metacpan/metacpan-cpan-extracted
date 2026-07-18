@@ -14,10 +14,10 @@
 
 package Google::Auth::IAMCredentials;
 
-use JSON::XS;
+use JSON::MaybeXS;
 use strict;
 
-my $coder = JSON::XS->new->ascii->pretty->allow_nonref;
+my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 
 our $VERSION = 0.02;
 

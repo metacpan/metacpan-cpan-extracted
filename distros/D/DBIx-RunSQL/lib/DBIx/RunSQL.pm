@@ -6,7 +6,7 @@ use DBI;
 use Module::Load 'load';
 use Carp 'croak';
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =encoding utf8
 
@@ -521,9 +521,9 @@ sub split_sql {
     my $statement = $iterator->();
     return undef
         if not defined $statement;
-    my $trigger;
 
-    if( $statement =~ /^\s*CREATE\s+TRIGGER\b/i ) {
+    if( $statement =~ /^\s*CREATE\s+TRIGGER\b/mi ) {
+        my $trigger;
         if( $statement !~ /END$/i ) {
             # Multiline CREATE TRIGGER statement
             $trigger = $statement;
@@ -532,9 +532,12 @@ sub split_sql {
             do {
                 $next = $iterator->();
                 $trigger .= ";" if $trigger !~ /;$/;
-                $trigger .= "\n$next"
-                    if defined $next;
-            } until (! defined $next or $next =~ /END$/i);
+                if( defined $next ) {
+                    $trigger .= "\n"
+                        unless $trigger =~ /\n\z/;
+                    $trigger .= $next
+                };
+            } until ((! defined $next) or ($next =~ /END;?$/i));
         } else {
             # Single-line CREATE TRIGGER statement
             $trigger = $statement;

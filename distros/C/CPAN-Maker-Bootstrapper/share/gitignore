@@ -1,6 +1,7 @@
 **/*.sh
 module.pm.tmpl
 buildspec.yml.tmpl
+buildspec.yml.current
 test.t.tmpl
 **/*.pl
 **/*.pm

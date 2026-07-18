@@ -7,7 +7,7 @@ plan skip_all => 'AUTHOR_TESTING is not set'
     unless $ENV{AUTHOR_TESTING};
 
 my $dist = "$FindBin::Bin/..";
-my $version = '0.001003';
+my $version = '0.001004';
 my $net_blossom_version = '0.001001';
 my $server_version = '0.001003';
 
@@ -50,20 +50,6 @@ done_testing;
 
 sub _check_manifest_files {
     my ($dist) = @_;
-    my $skip_path = "$dist/MANIFEST.SKIP";
-
-    ok(-f $skip_path, 'MANIFEST.SKIP exists');
-    return unless -f $skip_path;
-
-    my $skip = do {
-        open my $fh, '<', $skip_path or die "Unable to read MANIFEST.SKIP: $!";
-        local $/;
-        <$fh>;
-    };
-    like($skip, qr/^#!include_default$/m, 'MANIFEST.SKIP includes default rules');
-    ok((grep { $_ eq '\.tar\.gz\z' } split /\n/, $skip), 'MANIFEST.SKIP excludes release archives');
-    ok((grep { $_ eq '^Net-Blossom.*-\d' } split /\n/, $skip), 'MANIFEST.SKIP excludes distribution directories');
-
     my $manifest = do {
         open my $fh, '<', "$dist/MANIFEST" or die "Unable to read MANIFEST: $!";
         local $/;

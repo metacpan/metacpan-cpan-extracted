@@ -1,3 +1,7 @@
+0.001004 2026-07-17
+    - Improve the backend discovery link in the POD.
+    - Strengthen storage tests with split metadata and blob components.
+
 0.001003 2026-07-16
     - Support single HTTP byte ranges with native reads and compatibility fallback.
     - Add optional storage and blob-store range-read contracts.

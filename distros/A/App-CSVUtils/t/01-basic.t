@@ -553,14 +553,14 @@ subtest csv_setop => sub {
 
 subtest csv_lookup_fields => sub {
     require App::CSVUtils::csv_lookup_fields;
-    write_text("$dir/report.csv", <<'_');
+    write_text("$dir/report.csv", <<'CSV');
 client_id,followup_staff,followup_note,client_email,client_phone
 101,Jerry,not renewing,
 299,Jerry,still thinking over,
 734,Elaine,renewing,
-_
+CSV
 
-    write_text("$dir/clients.csv", <<'_');
+    write_text("$dir/clients.csv", <<'CSV');
 id,name,email,client_phone
 101,Andy,andy@example.com,555-2983
 102,Bob,bob@acme.example.com,555-2523
@@ -568,17 +568,17 @@ id,name,email,client_phone
 400,Derek,derek@example.com,555-9018
 701,Edward,edward@example.com,555-5833
 734,Felipe,felipe@example.com,555-9067
-_
+CSV
 
     my ($res, $stdout);
 
     $stdout = capture_stdout { $res = App::CSVUtils::csv_lookup_fields::csv_lookup_fields(input_filenames=>["$dir/report.csv", "$dir/clients.csv"], lookup_fields=>"client_id:id", fill_fields=>"client_email:email,client_phone") };
-    is($stdout, <<'_');
+    is($stdout, <<'CSV');
 client_id,followup_staff,followup_note,client_email,client_phone
 101,Jerry,"not renewing",andy@example.com,555-2983
 299,Jerry,"still thinking over",cindy@example.com,555-7892
 734,Elaine,renewing,felipe@example.com,555-9067
-_
+CSV
 
     # XXX test opt:ignore_case
 };

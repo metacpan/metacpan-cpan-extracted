@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 	get_project_indicators
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -29,8 +29,60 @@ App::GHGen::Detector - Detect project type from repository contents
 
 =head2 detect_project_type()
 
-Detect the project type by examining files in the current directory.
-Returns the detected type string or undef if unable to detect.
+Detect the project type by examining indicator files in the current directory.
+
+=head3 Purpose
+
+Score the current working directory against ten known project types
+(perl, node, python, rust, go, ruby, php, java, cpp, docker) and return
+the highest-scoring type.
+
+=head3 Arguments
+
+None.
+
+=head3 Returns
+
+In scalar context: the type string (e.g. C<'perl'>) of the best match, or
+C<undef> when no type scores above zero.
+
+In list context: a list of C<{ type => Str, score => Int, indicators => [] }>
+hash references sorted by descending score.
+
+=head3 Side Effects
+
+Reads the filesystem; results depend on the current working directory.
+
+=head3 Usage Example
+
+    use App::GHGen::Detector qw(detect_project_type);
+    my $type = detect_project_type();
+    say $type // 'unknown';
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    # No parameters.
+
+=head4 Output (scalar context)
+
+    { type => 'scalar' }   # may be undef
+
+=head4 Output (list context)
+
+    { type => 'array', element => { type => 'hashref' } }
+
+=head3 FORMAL SPECIFICATION
+
+    detect_project_type : → ℤ* ∪ { ⊥ } | seq Detection
+
+    Detection ≔ { type: ProjectType, score: ℕ, indicators: seq ℤ* }
+    detections ≔ [ { type: t, score: score(t) } ∣ t ∈ Types, score(t) > 0 ]
+    ranked     ≔ sort desc-score detections
+
+    scalar context: ranked = ∅ → ⊥  |  ranked ≠ ∅ → ranked[0].type
+    list context:   ranked
 
 =cut
 
@@ -53,7 +105,67 @@ sub detect_project_type() {
 
 =head2 get_project_indicators($type)
 
-Get a list of indicators (files/patterns) that suggest a project type.
+Return the indicator file patterns associated with a given project type.
+
+=head3 Purpose
+
+Provide a human-readable or programmatic list of the files and patterns that
+the detector uses to score each project type.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$type> (Str, optional)
+
+A project type string such as C<'perl'>, C<'node'>, C<'python'>, etc.
+When omitted or C<undef>, the full indicator table is returned.
+
+=back
+
+=head3 Returns
+
+When C<$type> is given and known: an array reference of strings (file names /
+glob patterns).
+
+When C<$type> is C<undef> or omitted: a hash reference mapping every known
+type to its indicator list.
+
+When C<$type> is given but unknown: C<undef>.
+
+=head3 Side Effects
+
+None.  Pure lookup function.
+
+=head3 Usage Example
+
+    my $indicators = get_project_indicators('perl');
+    say for @$indicators;
+
+    my $all = get_project_indicators();
+    for my $type (sort keys %$all) {
+        say "$type: " . join(', ', @{$all->{$type}});
+    }
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    { type => { type => 'scalar', optional => 1 } }
+
+=head4 Output
+
+    known type  → { type => 'arrayref' }
+    all types   → { type => 'hashref'  }
+    unknown type → undef
+
+=head3 FORMAL SPECIFICATION
+
+    get_project_indicators : ℤ* ∪ { ⊥ } → seq ℤ* ∪ (ℤ* → seq ℤ*) ∪ { ⊥ }
+
+    t given ∧ t ∈ KnownTypes → indicators[t]      (ArrayRef)
+    t given ∧ t ∉ KnownTypes → ⊥                  (undef)
+    t absent                  → indicators          (HashRef of all types)
 
 =cut
 

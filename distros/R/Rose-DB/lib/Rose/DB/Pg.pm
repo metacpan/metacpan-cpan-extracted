@@ -717,6 +717,8 @@ sub refine_dbi_foreign_key_info
 {
   my($self, $fk_info) = @_;
 
+  $self->Rose::DB::refine_dbi_foreign_key_info($fk_info);
+
   if(!defined $DBD_PG_AFTER_380 && defined $DBD::Pg::VERSION)
   {
     $DBD_PG_AFTER_380 = ($DBD::Pg::VERSION =~ /^(\d+)\.(\d+)/ && ($1 >=3 && $2 >= 8)) ? 1 : 0;

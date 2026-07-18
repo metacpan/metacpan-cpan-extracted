@@ -1,8 +1,3 @@
-.github/dependabot.yml
-.github/workflows/dashboard.yml
-.github/workflows/ghgen-check.yml
-.github/workflows/ghgen-comment.yml
-.github/workflows/perl-ci.yml
 action.yml
 bin/ghgen
 Changes
@@ -26,10 +21,16 @@ t/30-basics.t
 t/detector.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
 t/kwalitee.t
+t/linter.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
+t/pull_6.t
 t/timeout.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

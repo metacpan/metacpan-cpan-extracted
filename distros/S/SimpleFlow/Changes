@@ -1,0 +1,93 @@
+Revision history for SimpleFlow
+
+
+0.15 2026-07-17 (Claude Opus 4.8 helped)
+
+ - addition of `output.file`, a single-file convenience form of `output.files`. It
+   takes one plain filename, cannot be combined with `output.files`, and dies if
+   given a reference or an empty name.
+
+ - removal of Term::ANSIColor dependency
+
+ - improved coverage testing
+
+0.14 2026-06-29 (Claude Opus 4.8 helped)
+
+ [`task`]
+ - **New:** accepts a flat key/value list as well as a hash ref —
+     `task(cmd => ...)` and `task( cmd => ... )` are now equivalent. A lone
+     non-hashref scalar or any odd-length argument list is fatal.
+ - **Bug fix:** the default `die => 1` was ignored when checking for missing
+     `output.files`. The block tested the raw `$args->{'die'}` (undef when the
+     caller omitted it) instead of the resolved `$r{'die'}`, so a command that
+     failed to produce its declared outputs only warned instead of dying. Now
+     consistent with the exit-code check.
+ - **Bug fix:** removed a stray `)` (and an extraneous leading space) from the
+     "command is" line written to the log file; it now matches the on-screen form.
+ - **Bug fix:** `length $_ == 0` could throw a fatal uninitialized-value warning
+     (under `warnings FATAL => 'all'`) on an undef element of the `input.files`
+     array branch and the `output.files` empty-name check. Both now guard with
+     `(defined $_) && (length $_ == 0)`, matching the `input.files` scalar branch.
+
+0.13 2026-06-11
+
+ [Fixed (Claude Opus 4.8 helped)]
+
+ - **Exit status and signal are now decoded correctly.** `task()` previously
+     computed the exit code (`$status >> 8`) and *then* derived the signal as
+     `$exit & 127`. Because the signal lives in the low byte of the raw wait
+     status, which `>> 8` discards the `signal` field was always wrong: a clean
+     `exit 42` was reported as `signal 42`, and a process actually killed by a
+     signal reported `signal 0`. The signal is now read from the raw status before
+     shifting, so `exit` and `signal` are independent and accurate.
+
+ - **No longer dies on a missing output file when `die => 0`.** The zero-size
+     check did `(-s $file) == 0`, which is `undef == 0` when a declared output file
+     is absent. Under `use warnings FATAL => 'all'` that "uninitialized value"
+     warning was fatal, so a task that was meant to *warn* about missing output
+     (with `die => 0`) crashed instead. Missing sizes are now treated as `0`, so
+     the task warns and returns its result hash as intended.
+
+ - **The "already done" result is now logged with its `duration`.** In the
+     short-circuit path (output files already exist), `duration` was set *after*
+     the record was written to the log, so the logged hash was missing it; the
+     duplicate `done => 'before'` assignment was also removed.
+
+ [Changed / Windows support]
+
+ - **Portable exit-status handling.** Decoding now branches on `$^O`: Windows has
+     no POSIX signals (`signal` is reported as `0` there), and a `system()` that
+     fails to launch the command (`-1`) yields `exit => -1` instead of a garbage
+     value from shifting `-1`.
+
+ - **ANSI colour is disabled on the legacy Windows console.** `Term::ANSIColor`
+     output is suppressed on `MSWin32` unless an ANSI-capable terminal is detected
+     (Windows Terminal, ConEmu, or ANSICON), so `cmd.exe` no longer prints raw
+     escape sequences and redirected logs stay clean. Unix and modern Windows
+     terminals are unaffected.
+
+ [Tests]
+
+ - Rewrote `t/01.t` to be cross-platform: shell commands now invoke the running
+     Perl interpreter (`"$^X" -e ...`) instead of Unix-only tools (`which`, `ls`,
+     `ln`, `cp`), and temp files use the system temp directory instead of a
+     hard-coded `/tmp`.
+ - Added regression tests for both fixed bugs (exit/signal decoding; surviving a
+     missing output file with `die => 0`).
+ - Added coverage for the `note` field, the `input.file.size` / `output.file.size`
+     hashes, scalar-vs-array normalisation of `input.files` / `output.files`, the
+     `dir` / `source.file` / `source.line` metadata, captured `stdout` / `stderr`
+     (including trailing-whitespace stripping), and argument validation (missing
+     `cmd`, unknown keys, bad `log.fh`, missing input files).
+
+0.12 2026-02-14
+
+ - exit code now matches what shell would show it as; signal now appears
+
+0.11 2026-01-13
+
+ - max string length now corresponds to max of output strings, no more truncated output
+   added List::Util dependency for string length maxes
+   memory size now shows when output
+   directory is now output during dry runs
+

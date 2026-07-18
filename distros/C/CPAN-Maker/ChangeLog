@@ -1,3 +1,38 @@
+Sat Jul 18 05:39:34 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.4]:
+	* requires: bump version of CLI::Simple to 2.1.0
+	* VERSION: bump
+
+Fri Jul 17 13:40:08 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.3]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.3.md: new
+	* VERSION: bump
+	* .includes/git.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/perl.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* cpanfile: modified
+	* lib/CPAN/Maker.pm.in
+	- default color to off
+	- add --color option
+
+Mon Jul  6 05:42:46 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.2]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.2.md: new
+	* VERSION: bump
+	* lib/CPAN/Maker.pm.in
+	(_run_cmd)
+	- merge STDOUT/STDERR to avoid deadlock on large builds
+	* .includes/perl.mk: updated by CPAN::Bootstrap::Maker
+	* .includes/release-notes.md: likewise
+	* Makefile: likewise
+	* builder: likewise
+
 Thu Jul  2 09:10:51 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.1]:

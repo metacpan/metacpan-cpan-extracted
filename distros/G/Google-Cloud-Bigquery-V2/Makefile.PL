@@ -5,11 +5,27 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Google::Cloud::Bigquery::V2',
-    AUTHOR           => ['C.J. Collier <cjac@google.com>'],
+    AUTHOR           => 'Google LLC <cjac@google.com>',
     VERSION_FROM     => 'lib/Google/Cloud/Bigquery/V2.pm',
     ABSTRACT_FROM    => 'lib/Google/Cloud/Bigquery/V2.pm',
-    LICENSE          => 'artistic_2',
+    LICENSE          => 'apache_2',
     MIN_PERL_VERSION => '5.008003',
+    META_MERGE       => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/c9h/google-auth-library-perl.git',
+                web  => 'https://github.com/c9h/google-auth-library-perl',
+            },
+        },
+        provides => {
+            'Google::Cloud::Bigquery::V2' => {
+                file    => 'lib/Google/Cloud/Bigquery/V2.pm',
+                version => '0.01',
+            },
+        },
+    },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

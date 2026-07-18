@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-04'; # DATE
+our $DATE = '2026-07-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.036'; # VERSION
+our $VERSION = '1.038'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -56,14 +56,14 @@ sub _parse_para {
 gen_csv_util(
     name => 'paras2csv',
     summary => 'Convert paragraphs to CSV',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility is the counterpart of the <prog:csv2paras> utility. See its
 documentation for more details.
 
 Keywords: paragraphs, cards, pages, headers
 
-_
+MARKDOWN
     add_args => {
         input_file => {
             schema => 'filename*',
@@ -151,7 +151,7 @@ App::CSVUtils::paras2csv - Convert paragraphs to CSV
 
 =head1 VERSION
 
-This document describes version 1.036 of App::CSVUtils::paras2csv (from Perl distribution App-CSVUtils), released on 2025-02-04.
+This document describes version 1.038 of App::CSVUtils::paras2csv (from Perl distribution App-CSVUtils), released on 2026-07-09.
 
 =head1 FUNCTIONS
 
@@ -318,7 +318,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

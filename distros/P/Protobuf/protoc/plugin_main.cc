@@ -18,7 +18,16 @@
 #include "google/protobuf/compiler/plugin.upb.h"
 #endif
 
+#if defined(_WIN32) || defined(_WIN64) || defined(MSWin32)
+#include <fcntl.h>
+#include <io.h>
+#endif
+
 int main(int argc, char** argv) {
+#if defined(_WIN32) || defined(_WIN64) || defined(MSWin32)
+  _setmode(_fileno(stdin), _O_BINARY);
+  _setmode(_fileno(stdout), _O_BINARY);
+#endif
   upb_Arena* arena = upb_Arena_New();
 
   std::string input;

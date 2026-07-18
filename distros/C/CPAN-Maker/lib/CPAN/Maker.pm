@@ -36,9 +36,9 @@ use Role::Tiny::With;
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.4';
 
-__PACKAGE__->use_log4perl( level => 'info' );
+__PACKAGE__->use_log4perl( level => 'info', color => $FALSE );
 
 use parent qw(CLI::Simple);
 
@@ -1439,25 +1439,46 @@ sub _apply_buildspec_args {
 }
 
 ########################################################################
+# _run_cmd: run an external command, logging its output.
+#
+# STDERR is deliberately merged into STDOUT (via '>&STDOUT') so we read
+# a SINGLE pipe with a SINGLE loop below. This is not cosmetic -- it
+# avoids a classic IPC::Open3 deadlock.
+#
+# The deadlock we are avoiding: open3 connects the child's STDOUT and
+# STDERR to two separate pipes, each with a fixed (~64K) kernel buffer.
+# If the parent drains one pipe to EOF *before* reading the other (e.g.
+# `while (<$out>) {...} while (<$err>) {...}`), a child that emits more
+# than a buffer's worth on the *second* stream blocks in write(), the
+# parent won't read that stream until the first hits EOF, and the first
+# never EOFs because the child can't exit -- both sides wait forever.
+#
+# This stayed hidden for small services (output < one buffer) and only
+# surfaced on large APIs like CloudFront, whose `make manifest`/`make
+# dist` emit enough output to fill a pipe. Merging the streams removes
+# the second pipe entirely, so there is nothing to block on.
+#
+# Do NOT "fix" this by making the handles hot/autoflush -- that changes
+# WHEN bytes are written, not the pipe capacity or who drains it, and if
+# anything makes the deadlock more reliable. The only real fixes are to
+# drain both streams concurrently or to merge them (done here). If the
+# STDERR/STDOUT split is ever needed back, switch to IPC::Run3, which
+# spools each stream to a temp file and sidesteps the deadlock that way.
+########################################################################
+
+########################################################################
 sub _run_cmd {
 ########################################################################
   my ( $self, @cmd ) = @_;
 
   $self->get_logger->info( join $SPACE, @cmd );
 
-  my $err = gensym;
-  my $pid = open3( my $in, my $out, $err, @cmd );
-
+  my $pid = open3( my $in, my $out, '>&STDOUT', @cmd );  # child STDERR dup'd onto STDOUT
   close $in;
 
   while ( my $line = <$out> ) {
     chomp $line;
     $self->get_logger->info($line);
-  }
-
-  while ( my $line = <$err> ) {
-    chomp $line;
-    $self->get_logger->warn($line);
   }
 
   waitpid $pid, 0;
@@ -1629,6 +1650,7 @@ sub main {
     buildspec|b=s
     cleanup!
     core-modules!
+    color!
     create-buildspec=s
     debug|D
     dryrun

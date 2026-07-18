@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	estimate_workflow_cost
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -30,6 +30,81 @@ App::GHGen::CostEstimator - Estimate CI costs and savings
 =head2 estimate_current_usage($workflows)
 
 Estimate current monthly CI usage based on workflow configurations.
+
+=head3 Purpose
+
+Load and analyse every workflow file in C<$workflows>, then aggregate
+estimated runs, minutes, and cost into a single summary hash.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$workflows> (ArrayRef[Path::Tiny], required)
+
+Array reference of L<Path::Tiny> objects pointing to YAML workflow files.
+Each file is loaded with C<YAML::XS::LoadFile>.
+
+=back
+
+=head3 Returns
+
+A hash reference with keys:
+
+    {
+        total_minutes    => Num,
+        billable_minutes => Num,   # 0 when within free tier (2 000 min/month)
+        monthly_cost     => Num,   # USD; 0 when within free tier
+        workflows        => ArrayRef[ estimate_workflow_cost result ],
+    }
+
+=head3 Side Effects
+
+Reads each workflow file from disk via C<YAML::XS::LoadFile>.
+
+=head3 Usage Example
+
+    use App::GHGen::CostEstimator qw(estimate_current_usage);
+    use App::GHGen::Analyzer      qw(find_workflows);
+
+    my @wfs   = find_workflows();
+    my $usage = estimate_current_usage(\@wfs);
+    printf "Monthly cost: \$%.2f\n", $usage->{monthly_cost};
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    { workflows => { type => 'arrayref', required => 1 } }
+
+=head4 Output
+
+    {
+        type => 'hashref',
+        keys => {
+            total_minutes    => { type => 'scalar' },
+            billable_minutes => { type => 'scalar' },
+            monthly_cost     => { type => 'scalar' },
+            workflows        => { type => 'arrayref' },
+        },
+    }
+
+=head3 FORMAL SPECIFICATION
+
+    FREE_TIER      ≔ 2000
+    COST_PER_MIN   ≔ 0.008
+
+    estimate_current_usage : seq Path → UsageSummary
+
+    total    ≔ ∑ { estimate_workflow_cost(f).minutes_per_month ∣ f ∈ workflows }
+    billable ≔ max(0, total − FREE_TIER)
+
+    result ≔ {
+        total_minutes    ↦ total,
+        billable_minutes ↦ billable,
+        monthly_cost     ↦ billable × COST_PER_MIN,
+        workflows        ↦ [ estimate_workflow_cost(f) ∣ f ∈ workflows ],
+    }
 
 =cut
 
@@ -65,7 +140,85 @@ sub estimate_current_usage($workflows) {
 
 =head2 estimate_workflow_cost($workflow, $filename)
 
-Estimate the cost of a single workflow.
+Estimate the monthly CI cost of a single parsed workflow.
+
+=head3 Purpose
+
+Compute estimated runs per month, average run duration, and total minute
+usage for one workflow, based on its trigger configuration and step complexity.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$workflow> (HashRef, required)
+
+A parsed workflow hash (e.g. from C<YAML::XS::LoadFile>).
+
+=item C<$filename> (Str, required)
+
+Filename string used as a display label when C<$workflow-E<gt>{name}> is absent.
+
+=back
+
+=head3 Returns
+
+A hash reference:
+
+    {
+        name              => Str,
+        file              => Str,
+        runs_per_month    => Num,
+        minutes_per_run   => Num,
+        minutes_per_month => Num,   # == runs_per_month * minutes_per_run
+    }
+
+=head3 Side Effects
+
+None.  Pure function.
+
+=head3 Usage Example
+
+    my $cost = estimate_workflow_cost($workflow, 'ci.yml');
+    printf "%s: %d min/month\n", $cost->{name}, $cost->{minutes_per_month};
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        workflow => { type => 'hashref', required => 1 },
+        filename => { type => 'scalar',  required => 1 },
+    }
+
+=head4 Output
+
+    {
+        type => 'hashref',
+        keys => {
+            name              => { type => 'scalar' },
+            file              => { type => 'scalar' },
+            runs_per_month    => { type => 'scalar' },
+            minutes_per_run   => { type => 'scalar' },
+            minutes_per_month => { type => 'scalar' },
+        },
+    }
+
+=head3 FORMAL SPECIFICATION
+
+    estimate_workflow_cost : Workflow × ℤ* → CostRecord
+
+    runs    ≔ estimate_runs_per_month(w)
+    dur     ≔ estimate_duration(w)
+    result  ≔ {
+        name              ↦ w.name ?? f,
+        file              ↦ f,
+        runs_per_month    ↦ runs,
+        minutes_per_run   ↦ dur,
+        minutes_per_month ↦ runs × dur,
+    }
+
+    invariant: result.minutes_per_month = result.runs_per_month × result.minutes_per_run
 
 =cut
 
@@ -92,7 +245,87 @@ sub estimate_workflow_cost($workflow, $filename) {
 
 =head2 estimate_savings($issues, $workflows)
 
-Estimate potential savings from fixing issues.
+Estimate potential CI-minute and cost savings from resolving a set of issues.
+
+=head3 Purpose
+
+For each issue in C<$issues>, compute how many CI minutes per month would be
+saved by fixing it.  Optionally uses C<$workflows> to proportion savings
+against actual current usage.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$issues> (ArrayRef[HashRef], required)
+
+Array reference of issue hashes, each with at least C<type> and C<message>.
+
+=item C<$workflows> (ArrayRef[Path::Tiny], optional, default C<[]>)
+
+Workflow files used to compute current usage for percentage calculations.
+
+=back
+
+=head3 Returns
+
+A hash reference:
+
+    {
+        minutes    => Int,    # total minutes saved per month
+        percentage => Int,    # 0–100; 0 when no current usage available
+        cost       => Str,    # formatted as "NN.NN" (USD)
+        details    => ArrayRef[{ description => Str, minutes => Int, issue_type => Str }],
+    }
+
+=head3 Side Effects
+
+May read workflow files from disk when C<$workflows> is non-empty.
+
+=head3 Usage Example
+
+    my $savings = estimate_savings(\@issues, \@workflow_paths);
+    printf "Save %d min/month (\$%s)\n",
+        $savings->{minutes}, $savings->{cost};
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        issues    => { type => 'arrayref', required => 1 },
+        workflows => { type => 'arrayref', default  => [] },
+    }
+
+=head4 Output
+
+    {
+        type => 'hashref',
+        keys => {
+            minutes    => { type => 'scalar' },
+            percentage => { type => 'scalar' },
+            cost       => { type => 'scalar' },
+            details    => { type => 'arrayref' },
+        },
+    }
+
+=head3 FORMAL SPECIFICATION
+
+    estimate_savings : seq Issue × seq Path → SavingsSummary
+
+    savings(i) ≔
+        i.type = performance ∧ i.message =~ /caching/ → 75
+        i.type = cost        ∧ i.message =~ /concurrency/ → 50 | usage×0.15
+        i.type = cost        ∧ i.message =~ /triggers/    → 100 | usage×0.25
+        otherwise → 0
+
+    total  ≔ ∑ { savings(i) ∣ i ∈ issues }
+    result ≔ {
+        minutes    ↦ floor(total),
+        percentage ↦ floor(total / usage × 100) | 30 (if total > 0, no usage),
+        cost       ↦ sprintf("%.2f", total × 0.008),
+        details    ↦ [ { description, minutes, issue_type } ∣ savings(i) > 0 ],
+    }
 
 =cut
 

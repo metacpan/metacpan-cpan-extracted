@@ -119,7 +119,7 @@ subtest 'Pluggable credentials WIF Logging' => sub {
         token_url          => 'https://sts.googleapis.com/v1/token',
         credential_source  => {
             executable => {
-                command => 'echo \'{"id_token":"mock_pluggable_token"}\'',
+                command => sprintf('"%s" -e "print q({\"id_token\":\"mock_pluggable_token\"})"', $^X),
             },
         },
     );

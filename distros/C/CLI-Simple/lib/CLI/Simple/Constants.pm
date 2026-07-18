@@ -7,9 +7,22 @@ use Log::Log4perl::Level;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.1.0';
 
 use Readonly;
+Readonly::Scalar our $LOG4PERL_CONF => <<'END_OF_CONF';
+log4perl.logger = INFO, Screen
+log4perl.appender.Screen = Log::Log4perl::Appender::ScreenColoredLevels
+log4perl.appender.Screen.stderr = 1
+log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.Screen.layout.ConversionPattern = [%d] %m%n
+log4perl.appender.Screen.color.DEBUG=magenta
+log4perl.appender.Screen.color.INFO=green
+log4perl.appender.Screen.color.WARN=yellow
+log4perl.appender.Screen.color.ERROR=red
+log4perl.appender.Screen.color.FATAL=bold red
+log4perl.appender.Screen.color.TRACE=bold white
+END_OF_CONF
 
 Readonly::Hash our %LOG_LEVELS => (
   debug => $DEBUG,
@@ -105,7 +118,7 @@ Readonly::Array our @VALID_OPTIONS => qw(
 );
 
 foreach my $k ( keys %EXPORT_TAGS ) {
-  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, '@VALID_OPTIONS';
+  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, '@VALID_OPTIONS', '$LOG4PERL_CONF';
 }
 
 $EXPORT_TAGS{'all'} = [@EXPORT_OK];

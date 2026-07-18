@@ -1,23 +1,25 @@
 ---
 commands:
-  annotate: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
-  code-finding: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  code-review: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  create-config: CPAN::Maker::Bootstrapper::Role::CreateConfig
-  default: cmd_install
-  install: CPAN::Maker::Bootstrapper::Role::Installer
-  import-scaffold:  CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
-  models: CPAN::Maker::Bootstrapper::Role::LLM::Models
-  pod-finding: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  pod-review: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  release-notes: CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
+  annotate:           CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+  code-finding:       CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  code-review:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  create-config:      CPAN::Maker::Bootstrapper::Role::CreateConfig
+  default:            cmd_install
+  install:            CPAN::Maker::Bootstrapper::Role::Installer
+  import-scaffold:    CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
+  models:             CPAN::Maker::Bootstrapper::Role::LLM::Models
+  pod-finding:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  pod-review:         CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  release-notes:      CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
   update-annotations: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+  extra-files:        CPAN::Maker::Bootstrapper::Role::ExtraFiles
 options:
 - auto-annotate|A
 - annotate|a=s@
 - color!
 - comment|co=s
 - context|C=s@
+- debug|d
 - dry-run|D
 - finalize-annotations|F
 - history!
@@ -45,6 +47,7 @@ extra_options:
   - import_file_listing
   - help_sections
 default_options:
+  color: 1
   help_sections:
       - SYNOPSIS
       - COMMANDS

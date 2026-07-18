@@ -21,229 +21,226 @@ name: App-ZofCMS
 provides:
   App::ZofCMS:
     file: lib/App/ZofCMS.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Config:
     file: lib/App/ZofCMS/Config.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Output:
     file: lib/App/ZofCMS/Output.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin:
     file: lib/App/ZofCMS/Plugin.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::AccessDenied:
     file: lib/App/ZofCMS/Plugin/AccessDenied.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::AntiSpamMailTo:
     file: lib/App/ZofCMS/Plugin/AntiSpamMailTo.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::AutoDump:
     file: lib/App/ZofCMS/Plugin/AutoDump.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::AutoEmptyQueryDelete:
     file: lib/App/ZofCMS/Plugin/AutoEmptyQueryDelete.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::AutoIMGSize:
     file: lib/App/ZofCMS/Plugin/AutoIMGSize.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Barcode:
     file: lib/App/ZofCMS/Plugin/Barcode.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Base:
     file: lib/App/ZofCMS/Plugin/Base.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::BasicLWP:
     file: lib/App/ZofCMS/Plugin/BasicLWP.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::BoolSettingsManager:
     file: lib/App/ZofCMS/Plugin/BoolSettingsManager.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::BreadCrumbs:
     file: lib/App/ZofCMS/Plugin/BreadCrumbs.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::CRUD:
     file: lib/App/ZofCMS/Plugin/CRUD.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::CSSMinifier:
     file: lib/App/ZofCMS/Plugin/CSSMinifier.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Comments:
     file: lib/App/ZofCMS/Plugin/Comments.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::ConditionalRedirect:
     file: lib/App/ZofCMS/Plugin/ConditionalRedirect.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::ConfigToTemplate:
     file: lib/App/ZofCMS/Plugin/ConfigToTemplate.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Cookies:
     file: lib/App/ZofCMS/Plugin/Cookies.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::CurrentPageURI:
     file: lib/App/ZofCMS/Plugin/CurrentPageURI.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::DBI:
     file: lib/App/ZofCMS/Plugin/DBI.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::DBIPPT:
     file: lib/App/ZofCMS/Plugin/DBIPPT.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::DataToExcel:
     file: lib/App/ZofCMS/Plugin/DataToExcel.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::DateSelector:
     file: lib/App/ZofCMS/Plugin/DateSelector.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Debug::Dumper:
     file: lib/App/ZofCMS/Plugin/Debug/Dumper.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Debug::Validator::HTML:
     file: lib/App/ZofCMS/Plugin/Debug/Validator/HTML.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::DirTreeBrowse:
     file: lib/App/ZofCMS/Plugin/DirTreeBrowse.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Doctypes:
     file: lib/App/ZofCMS/Plugin/Doctypes.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FeatureSuggestionBox:
     file: lib/App/ZofCMS/Plugin/FeatureSuggestionBox.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FileList:
     file: lib/App/ZofCMS/Plugin/FileList.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FileToTemplate:
     file: lib/App/ZofCMS/Plugin/FileToTemplate.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FileTypeIcon:
     file: lib/App/ZofCMS/Plugin/FileTypeIcon.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FileUpload:
     file: lib/App/ZofCMS/Plugin/FileUpload.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FloodControl:
     file: lib/App/ZofCMS/Plugin/FloodControl.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FormChecker:
     file: lib/App/ZofCMS/Plugin/FormChecker.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FormFiller:
     file: lib/App/ZofCMS/Plugin/FormFiller.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FormMailer:
     file: lib/App/ZofCMS/Plugin/FormMailer.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::FormToDatabase:
     file: lib/App/ZofCMS/Plugin/FormToDatabase.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::GetRemotePageTitle:
     file: lib/App/ZofCMS/Plugin/GetRemotePageTitle.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::GoogleCalculator:
     file: lib/App/ZofCMS/Plugin/GoogleCalculator.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::GooglePageRank:
     file: lib/App/ZofCMS/Plugin/GooglePageRank.pm
-    version: '1.001009'
-  App::ZofCMS::Plugin::GoogleTime:
-    file: lib/App/ZofCMS/Plugin/GoogleTime.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::HTMLFactory::Entry:
     file: lib/App/ZofCMS/Plugin/HTMLFactory/Entry.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::HTMLFactory::PageToBodyId:
     file: lib/App/ZofCMS/Plugin/HTMLFactory/PageToBodyId.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::HTMLMailer:
     file: lib/App/ZofCMS/Plugin/HTMLMailer.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::InstalledModuleChecker:
     file: lib/App/ZofCMS/Plugin/InstalledModuleChecker.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::JavaScriptMinifier:
     file: lib/App/ZofCMS/Plugin/JavaScriptMinifier.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::LinkifyText:
     file: lib/App/ZofCMS/Plugin/LinkifyText.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::LinksToSpecs::CSS:
     file: lib/App/ZofCMS/Plugin/LinksToSpecs/CSS.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::LinksToSpecs::HTML:
     file: lib/App/ZofCMS/Plugin/LinksToSpecs/HTML.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::NavMaker:
     file: lib/App/ZofCMS/Plugin/NavMaker.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::PreferentialOrder:
     file: lib/App/ZofCMS/Plugin/PreferentialOrder.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::QueryToTemplate:
     file: lib/App/ZofCMS/Plugin/QueryToTemplate.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::QuickNote:
     file: lib/App/ZofCMS/Plugin/QuickNote.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::RandomBashOrgQuote:
     file: lib/App/ZofCMS/Plugin/RandomBashOrgQuote.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::RandomPasswordGeneratorPurePerl:
     file: lib/App/ZofCMS/Plugin/RandomPasswordGeneratorPurePerl.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::SendFile:
     file: lib/App/ZofCMS/Plugin/SendFile.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Session:
     file: lib/App/ZofCMS/Plugin/Session.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::SplitPriceSelect:
     file: lib/App/ZofCMS/Plugin/SplitPriceSelect.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::StartPage:
     file: lib/App/ZofCMS/Plugin/StartPage.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::StyleSwitcher:
     file: lib/App/ZofCMS/Plugin/StyleSwitcher.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Sub:
     file: lib/App/ZofCMS/Plugin/Sub.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Syntax::Highlight::CSS:
     file: lib/App/ZofCMS/Plugin/Syntax/Highlight/CSS.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Syntax::Highlight::HTML:
     file: lib/App/ZofCMS/Plugin/Syntax/Highlight/HTML.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::TOC:
     file: lib/App/ZofCMS/Plugin/TOC.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::TagCloud:
     file: lib/App/ZofCMS/Plugin/TagCloud.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::Tagged:
     file: lib/App/ZofCMS/Plugin/Tagged.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::UserLogin:
     file: lib/App/ZofCMS/Plugin/UserLogin.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::UserLogin::ChangePassword:
     file: lib/App/ZofCMS/Plugin/UserLogin/ChangePassword.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::UserLogin::ForgotPassword:
     file: lib/App/ZofCMS/Plugin/UserLogin/ForgotPassword.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::ValidationLinks:
     file: lib/App/ZofCMS/Plugin/ValidationLinks.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Plugin::YouTube:
     file: lib/App/ZofCMS/Plugin/YouTube.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Template:
     file: lib/App/ZofCMS/Template.pm
-    version: '1.001009'
+    version: '1.001010'
   App::ZofCMS::Test::Plugin:
     file: lib/App/ZofCMS/Test/Plugin.pm
-    version: '1.001009'
+    version: '1.001010'
 requires:
   CGI: '0'
   CSS::Minifier: '0'
@@ -283,7 +280,6 @@ requires:
   WWW::GetPageTitle: '0'
   WWW::Google::Calculator: '0'
   WWW::Google::PageRank: '0'
-  WWW::Google::Time: '0'
   WebService::Validator::HTML::W3C: '0'
   base: '0'
   lib: '0'
@@ -294,7 +290,7 @@ resources:
   bugtracker: https://github.com/zoffixznet/app-zofcms/issues
   homepage: http://metacpan.org/release/App-ZofCMS
   repository: git://github.com/zoffixznet/app-zofcms.git
-version: '1.001009'
+version: '1.001010'
 x_Dist_Zilla:
   perl:
     version: '5.042002'
@@ -607,7 +603,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.001009
+          tag: v1.001010
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

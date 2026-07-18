@@ -37,25 +37,51 @@ modifications.
 
 ## Prerequisites
 
-This Perl module requires Bazel to build the `protoc-gen-perl-pb` plugin. Ensure
-you have Bazel installed. The necessary C++ Protobuf libraries used by the
-plugin are typically fetched and built by Bazel as part of the main project's
-workspace setup.
+This Perl module requires a C/C++ compiler (`gcc`/`g++`), `make`, `pkg-config`, `protoc` (Protobuf compiler), and native header libraries (`libssl`, `libnghttp2`, `libpcre2`, `libabseil`).
 
-Additionally, you'll need a C++ compiler (like g++), Make, and the Perl
-development headers.
+### System Package Installation
 
-To install Perl module dependencies, you can use `cpanm`:
+Depending on your operating system and package manager, install the required build tools and libraries:
+
+#### Debian / Ubuntu (`apt-get`)
+```bash
+sudo apt-get update
+sudo apt-get install -y perl perl-modules cpanminus liblocal-lib-perl libtemplate-perl \
+                        gcc g++ make libssl-dev libnghttp2-dev libpcre2-dev libabsl-dev \
+                        pkg-config protobuf-compiler
+```
+
+#### RHEL / Rocky Linux / Fedora (`dnf`)
+```bash
+sudo dnf install -y dnf-plugins-core epel-release
+sudo dnf config-manager --set-enabled crb 2>/dev/null || true
+sudo dnf install --enablerepo=epel -y perl perl-core perl-App-cpanminus perl-local-lib perl-Template-Toolkit \
+                 gcc gcc-c++ make openssl-devel libnghttp2-devel pcre2-devel \
+                 abseil-cpp-devel pkgconfig protobuf-compiler protobuf-devel
+```
+
+#### macOS (`brew` - Homebrew)
+```bash
+brew install perl cpanm gcc make openssl@3 nghttp2 pcre2 abseil pkg-config protobuf
+```
+
+#### Windows (`choco` - Chocolatey)
+```cmd
+choco install strawberryperl gcc make openssl nghttp2 pcre2 protoc
+```
+
+### Perl Module Dependencies
+
+To install Perl module dependencies using `cpanm`:
 
 ```bash
 # Install cpanminus and Carton
 cpanm App::cpanminus Carton
 
-# From the perl/ directory
-carton install
+# From the Protobuf/ directory
+cpanm --installdeps .
 ```
 
-This will install dependencies listed in the `cpanfile`.
 
 ## Building the Plugin
 

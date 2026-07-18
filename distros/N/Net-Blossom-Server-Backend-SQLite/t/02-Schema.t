@@ -28,6 +28,11 @@ my @tables = sort map { $_->[0] } @{$dbh->selectall_arrayref(
 )};
 is_deeply(\@tables, [qw(blossom_blob_data blossom_blobs blossom_owners)],
     'schema creates separate metadata and byte tables');
+is_deeply(
+    [_index_columns($dbh, 'blossom_owners_sha256')],
+    [qw(sha256)],
+    'schema indexes owner lookups by blob hash',
+);
 
 is_deeply(
     [_column_names($dbh, 'blossom_blobs')],
@@ -99,6 +104,11 @@ subtest 'legacy combined schema is migrated without data loss' => sub {
     );
     ok($legacy->deploy_schema, 'legacy schema migration succeeds');
     ok($legacy->deploy_schema, 'migrated schema remains idempotent');
+    is_deeply(
+        [_index_columns($legacy_dbh, 'blossom_owners_sha256')],
+        [qw(sha256)],
+        'legacy schema migration creates owner hash index',
+    );
 
     is($legacy->get_blob($sha256)->body, $body, 'legacy blob bytes survive migration');
     is_deeply(
@@ -197,4 +207,9 @@ done_testing;
 sub _column_names {
     my ($dbh, $table) = @_;
     return map { $_->[1] } @{$dbh->selectall_arrayref("PRAGMA table_info($table)")};
+}
+
+sub _index_columns {
+    my ($dbh, $index) = @_;
+    return map { $_->[2] } @{$dbh->selectall_arrayref("PRAGMA index_info($index)")};
 }

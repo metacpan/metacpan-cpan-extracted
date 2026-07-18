@@ -1,3 +1,10 @@
+0.28 2026-07-17
+    * Properly handle triggers with immediately preceding comments
+      These would have been stuffed together with the next statement(s).
+    * Better detect where a trigger ends
+      This was another cause for triggers not getting passed to the database
+      separately
+
 0.27 2026-05-26
     * Fix Github repo URL (fix by niceperl, thanks!)
 

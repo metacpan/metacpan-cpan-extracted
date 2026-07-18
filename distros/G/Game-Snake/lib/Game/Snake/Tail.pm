@@ -1,9 +1,9 @@
 use 5.38.0;
 use experimental 'class';
 
-package Game::Snake::Tail 0.10;
+package Game::Snake::Tail 0.11;
 class Game::Snake::Tail :isa(Game::Snake::Head) {
-	our $VERSION = 0.10;
+	our $VERSION = 0.11;
 	use Raylib::FFI;
 
 	method draw () {

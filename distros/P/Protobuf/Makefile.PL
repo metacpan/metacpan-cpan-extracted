@@ -1,6 +1,15 @@
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
+BEGIN {
+    $ENV{PACKAGE_STASH_IMPLEMENTATION} ||= 'PP';
+    $ENV{MOO_XS_DISABLE} ||= '1';
+    $ENV{TEMPLATE_STASH} ||= 'pureperl';
+    eval {
+        require Template::Config;
+        $Template::Config::STASH = 'Template::Stash';
+    };
+}
 use lib 'local/lib';
 use lib 'xlib';
 use ExtUtils::MakeMaker;
@@ -8,7 +17,7 @@ use Config;
 use File::Spec;
 use File::Find;
 use ExtUtils::Embed;
-use JSON::MaybeXS;
+use JSON::PP qw(decode_json);
 use Template;
 use Sideload::Build::FileLists qw(
     get_upb_c_files
@@ -97,9 +106,8 @@ if ($is_dev) {
 # or because we just generated it above), we ALWAYS define the project root as 'vendor'
 # for the build phase. This ensures we compile entirely against clean, stripped headers
 # and avoid any header shadowing (e.g., endian.h) or Google3 include prefix issues.
-my $raw_root = -d 'vendor' ? 'vendor' : '..';
-our $project_root = File::Spec->abs2rel(abs_path($raw_root), $cwd);
-our $using_vendor = ($raw_root eq 'vendor');
+our $project_root = -d 'vendor' ? 'vendor' : '.';
+our $using_vendor = ($project_root eq 'vendor');
 
 our $upb_dir = File::Spec->catdir($project_root, 'upb');
 our $upb_generator_dir = File::Spec->catdir($project_root, 'upb_generator');
@@ -154,8 +162,24 @@ if (!$is_google3_dev) {
     my $abs_protoc_dir = File::Spec->rel2abs('protoc');
     eval { symlink($abs_protoc_dir, $symlink_target) }
         or do {
-            warn "WARNING: Failed to create symlink $symlink_target -> $abs_protoc_dir: $!\n" .
-                 "C++ plugin compilation might fail due to missing Google3-style headers.\n";
+            print "Symlink failed ($!); copying directory 'protoc' -> '$symlink_target'...\n";
+            require File::Copy;
+            File::Path::make_path($symlink_target) unless -d $symlink_target;
+            use File::Find qw(find);
+            find({
+                wanted => sub {
+                    my $src = $File::Find::name;
+                    my $rel = File::Spec->abs2rel($src, 'protoc');
+                    return if $rel eq '.';
+                    my $dest = File::Spec->catfile($symlink_target, $rel);
+                    if (-d $src) {
+                        File::Path::make_path($dest) unless -d $dest;
+                    } elsif (-f $src) {
+                        File::Copy::copy($src, $dest);
+                    }
+                },
+                no_chdir => 1
+            }, 'protoc');
         };
 }
 
@@ -167,7 +191,9 @@ our $cmake_gen_include = $is_google3_dev
     : File::Spec->catdir($upb_dir, "reflection", "cmake");
 
 our $our_protoc_path = 'protoc';
-if ($is_darwin) {
+if ($is_win32) {
+    $our_protoc_path = 'cmd /c protoc';
+} elsif ($is_darwin) {
     if (-x '/opt/homebrew/bin/protoc') {
         $our_protoc_path = '/opt/homebrew/bin/protoc';
     } elsif (-x '/usr/local/bin/protoc') {
@@ -189,6 +215,7 @@ sub _render_tt {
     $vars->{is_win32} = $is_win32;
     $vars->{is_darwin} = $is_darwin;
     if (!$tt) {
+        $ENV{TEMPLATE_STASH} = 'pureperl';
         $tt = Template->new({
             INCLUDE_PATH => [ 'inc/templates' ],
             PRE_PROCESS  => 'makefile.tt',
@@ -196,6 +223,9 @@ sub _render_tt {
             POST_CHOMP   => 0,
             TRIM         => 0,
         });
+        if (!$tt) {
+            die "Failed to instantiate Template Toolkit: " . (Template->error() || 'unknown error');
+        }
     }
     my $output = '';
     my $template_string = "[% PROCESS $block_name %]";
@@ -274,15 +304,25 @@ sub _get_adjusted_embed_flags {
     chomp $embed_cflags;
     chomp $embed_ldflags;
 
-    # Replace -lperl with the actual path to libperl
     my $archlib = $Config{archlib};
     my $libperl = $Config{libperl};
-    my $perl_lib_path = File::Spec->catfile($Config{archlibexp}, 'CORE', $libperl);
-    if (!-f $perl_lib_path) {
-        my ($lib_base) = $archlib =~ m{^(.+)/perl/};
-        $perl_lib_path = File::Spec->catfile($lib_base, $libperl);
+    my @candidate_paths = (
+        File::Spec->catfile($Config{archlibexp}, 'CORE', $libperl),
+        File::Spec->catfile('/usr/lib/x86_64-linux-gnu', $libperl),
+        File::Spec->catfile('/usr/lib', $libperl),
+    );
+    my $found_libperl;
+    for my $p (@candidate_paths) {
+        if (-f $p) {
+            $found_libperl = $p;
+            last;
+        }
     }
-    $embed_ldflags =~ s{-lperl}{$perl_lib_path}g;
+    if ($found_libperl) {
+        $embed_ldflags =~ s{-lperl}{$found_libperl}g;
+    } else {
+        $embed_ldflags =~ s{-lperl}{}g;
+    }
 
     return ($embed_cflags, $embed_ldflags);
 }
@@ -292,7 +332,7 @@ sub MY::postamble {
     my $self = shift;
     use Config;
     use File::Spec;
-    use JSON::MaybeXS;
+    use JSON::PP qw(decode_json);
     use Path::Tiny;
 
     my ($embed_cflags, $embed_ldflags) = main::_get_adjusted_embed_flags();
@@ -323,6 +363,7 @@ sub MY::postamble {
         # Using global $bazel_gen_include and $cmake_gen_include
         my $bootstrap_define = "-DUPB_BOOTSTRAP_STAGE=0";
         my $base_flags = "-I. -I$project_root -I$upb_dir -I$src_dir -I$third_party_dir -I" . File::Spec->catdir($third_party_dir, 'utf8_range') . " -I$bazel_gen_include -I$cmake_gen_include $bootstrap_define";
+        $base_flags =~ s{\\}{/}g if $main::is_win32;
 
         my $cflags = "";
         if ($c_file =~ /\.cc$/) {
@@ -608,6 +649,9 @@ all :: $protoc_plugin_exe
 
 EOF
 
+    if ($main::is_win32) {
+        $make_frag .= "\nconfig ::\n\t\$(NOECHO) \$(MKPATH) \$(INST_AUTODIR) \$(INST_LIBDIR)\n";
+    }
     return $make_frag;
 
     }
@@ -636,9 +680,9 @@ my %clean_files_map = map { $_ => 1 } @clean_targets;
 
 # Add C test binaries and their objects
 if (-f 't/c/c_test_config.json') {
-    require JSON::MaybeXS;
+    require JSON::PP;
     require Path::Tiny;
-    my $c_test_config = JSON::MaybeXS::decode_json(Path::Tiny::path('t/c/c_test_config.json')->slurp_utf8);
+    my $c_test_config = JSON::PP::decode_json(Path::Tiny::path('t/c/c_test_config.json')->slurp_utf8);
     foreach my $test_key (keys %$c_test_config) {
         $clean_files_map{"t/c/$test_key"} = 1;
         $clean_files_map{"t/c/$test_key.o"} = 1;
@@ -665,8 +709,8 @@ our $extra_ldflags = '';
 our $mac_inc = '';
 our $mac_libs = '';
 if ($is_linux) {
-    $common_lib_link_flags = '-Wl,--version-script=libprotobufperl.map';
-    $extra_ldflags = " -Wl,-rpath,'\$\$ORIGIN:\$\$ORIGIN/../../..'";
+    $common_lib_link_flags = '-Wl,-z,origin -Wl,-soname,libprotobufperl.so -Wl,--version-script=libprotobufperl.map';
+    $extra_ldflags = ' -Wl,-z,origin -Wl,-rpath,$$ORIGIN:$$ORIGIN/../../..';
 } elsif ($is_darwin) {
     $common_lib_link_flags = "-Wl,-install_name,\@rpath/libprotobufperl.$extlib_ext -Wl,-undefined,dynamic_lookup";
     $extra_ldflags = ' -Wl,-rpath,@loader_path';
@@ -683,11 +727,17 @@ if (!-f 'Protobuf.xs' && -f 'maint/generate_xs.pl') {
     system($perl, 'maint/generate_xs.pl') == 0 or die "Failed to generate Protobuf.xs: $!";
 }
 
+sub MY::fixin {
+    my $self = shift;
+    return '' if $is_win32;
+    return $self->SUPER::fixin(@_);
+}
+
 WriteMakefile(
     NAME              => 'Protobuf',
     VERSION           => $VERSION,
     MIN_PERL_VERSION  => '5.014',
-    EXE_FILES         => ['bin/protoc-gen-perl-pb'],
+    EXE_FILES         => ($is_win32 ? ['bin/protoc-gen-perl-pb.exe'] : ['bin/protoc-gen-perl-pb']),
     ABSTRACT          => 'High-performance Protocol Buffers implementation using upb',
     PREREQ_PM         => {
       'Moo'             => 0,
@@ -713,7 +763,6 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
       'Test::More'       => 0,
-      'Test::MockModule' => 0,
       'File::Spec'       => 0,
       'Path::Tiny'       => 0,
       'Capture::Tiny'    => 0,
@@ -733,7 +782,11 @@ WriteMakefile(
     AUTHOR            => 'C.J. Collier <cjac@colliertech.org>',
     LICENSE           => 'apache_2_0',
     DEFINE            => '-DUPB_BOOTSTRAP_STAGE=0' . ($is_google3_dev ? ' -DGOOGLE3' : ''),
-    INC               => "-I. -I$project_root -I$upb_dir -I$src_dir -I$third_party_dir -I$libcoro_dir -I" . File::Spec->catdir($third_party_dir, 'utf8_range') . " -I$bazel_gen_include -I$cmake_gen_include -I\$(PERL_INC)$mac_inc",
+    INC               => do {
+        my $inc = "-I. -I$project_root -I$upb_dir -I$src_dir -I$third_party_dir -I$libcoro_dir -I" . File::Spec->catdir($third_party_dir, 'utf8_range') . " -I$bazel_gen_include -I$cmake_gen_include -I\$(PERL_INC)$mac_inc";
+        $inc =~ s{\\}{/}g if $is_win32;
+        $inc;
+    },
     MYEXTLIB          => "libprotobufperl.$extlib_ext",
     CCFLAGS           => "-g $Config{ccflags} -fPIC $sanitizer_flags",
     LIBS              => ['-L$(CURDIR) -lprotobufperl' . $mac_libs],
@@ -752,6 +805,7 @@ WriteMakefile(
 package MY;
 
 # Modify the MY::test subroutine
+
 sub test {
     my $self = shift;
     return main::_render_tt('my_test', {

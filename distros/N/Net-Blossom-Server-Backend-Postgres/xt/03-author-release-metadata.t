@@ -7,7 +7,7 @@ plan skip_all => 'AUTHOR_TESTING is not set'
     unless $ENV{AUTHOR_TESTING};
 
 my $dist = "$FindBin::Bin/..";
-my $version = '0.001003';
+my $version = '0.001004';
 my $net_blossom_version = '0.001001';
 my $server_version = '0.001003';
 
@@ -45,8 +45,11 @@ if (-f $changes_path) {
     like($changes, qr/^$version\s+\d{4}-\d{2}-\d{2}$/m, 'Changes records release version and date');
 
     my ($release_changes) = $changes =~ /^\Q$version\E\s+\d{4}-\d{2}-\d{2}\n(.*?)(?=^\S|\z)/ms;
-    like($release_changes, qr/byte ranges.*PostgreSQL large objects/, 'release records large-object range reads');
+    like($release_changes, qr/Index owner metadata by blob hash/, 'release records the owner hash index');
     unlike($release_changes, qr/C<[^>]+>/, 'release changes use plain text');
+
+    my ($range_changes) = $changes =~ /^0\.001003\s+2026-07-16\n(.*?)(?=^\S|\z)/ms;
+    like($range_changes, qr/byte ranges.*PostgreSQL large objects/, 'previous release records large-object range reads');
 
     my ($component_changes) = $changes =~ /^0\.001002\s+2026-07-13\n(.*?)(?=^\S|\z)/ms;
     like($component_changes, qr/metadata and large-object storage/, 'component release records the component split');
@@ -67,20 +70,6 @@ done_testing;
 
 sub _check_manifest_files {
     my ($dist) = @_;
-    my $skip_path = "$dist/MANIFEST.SKIP";
-
-    ok(-f $skip_path, 'MANIFEST.SKIP exists');
-    return unless -f $skip_path;
-
-    my $skip = do {
-        open my $fh, '<', $skip_path or die "Unable to read MANIFEST.SKIP: $!";
-        local $/;
-        <$fh>;
-    };
-    like($skip, qr/^#!include_default$/m, 'MANIFEST.SKIP includes default rules');
-    ok((grep { $_ eq '\.tar\.gz\z' } split /\n/, $skip), 'MANIFEST.SKIP excludes release archives');
-    ok((grep { $_ eq '^Net-Blossom.*-\d' } split /\n/, $skip), 'MANIFEST.SKIP excludes distribution directories');
-
     my $manifest = do {
         open my $fh, '<', "$dist/MANIFEST" or die "Unable to read MANIFEST: $!";
         local $/;

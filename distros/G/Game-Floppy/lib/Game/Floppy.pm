@@ -1,9 +1,9 @@
 use 5.38.0;
 use experimental 'class';
 
-package Game::Floppy 0.07;
+package Game::Floppy 0.08;
 class Game::Floppy {
-	our $VERSION = 0.07;
+	our $VERSION = 0.08;
 	use Raylib::App;
 	use Raylib::FFI;
 	use Raylib::Color;
@@ -144,7 +144,7 @@ Game::Floppy - Floppy bird using raylib
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

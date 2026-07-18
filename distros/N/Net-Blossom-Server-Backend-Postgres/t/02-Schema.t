@@ -32,14 +32,31 @@ my @tables = sort map { $_->[0] } @{$dbh->selectall_arrayref(q{
 is_deeply(\@tables, [qw(blossom_blob_data blossom_blobs blossom_owners)],
     'schema creates separate metadata and large-object tables');
 
-my ($index_exists) = $dbh->selectrow_array(q{
-    SELECT 1
+my ($ordering_index_definition) = $dbh->selectrow_array(q{
+    SELECT indexdef
       FROM pg_indexes
      WHERE schemaname = current_schema()
        AND tablename = 'blossom_owners'
        AND indexname = 'blossom_owners_pubkey_order'
 });
-ok($index_exists, 'schema creates owner ordering index');
+like(
+    $ordering_index_definition // '',
+    qr/\(pubkey, uploaded DESC, sha256\)\z/,
+    'schema creates the expected owner ordering index',
+);
+
+my ($hash_index_definition) = $dbh->selectrow_array(q{
+    SELECT indexdef
+      FROM pg_indexes
+     WHERE schemaname = current_schema()
+       AND tablename = 'blossom_owners'
+       AND indexname = 'blossom_owners_sha256'
+});
+like(
+    $hash_index_definition // '',
+    qr/\(sha256\)\z/,
+    'schema indexes owner lookups by blob hash',
+);
 
 my $columns = $dbh->selectall_arrayref(q{
     SELECT column_name, udt_name
@@ -119,6 +136,14 @@ $dbh->commit;
 
 ok($storage->deploy_schema, 'legacy large-object schema migration succeeds');
 ok($storage->deploy_schema, 'migrated schema remains idempotent');
+my ($migrated_hash_index) = $dbh->selectrow_array(q{
+    SELECT 1
+      FROM pg_indexes
+     WHERE schemaname = current_schema()
+       AND tablename = 'blossom_owners'
+       AND indexname = 'blossom_owners_sha256'
+});
+ok($migrated_hash_index, 'legacy schema migration creates owner hash index');
 is(_body_to_scalar($storage->get_blob($legacy_sha256)->body), $legacy_body,
     'legacy large-object bytes survive migration');
 is_deeply(

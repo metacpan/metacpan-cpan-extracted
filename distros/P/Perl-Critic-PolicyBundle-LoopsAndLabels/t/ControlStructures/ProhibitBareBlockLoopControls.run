@@ -1,0 +1,259 @@
+## name bare block next unlabeled
+## failures 1
+## cut
+
+{
+    next;
+}
+
+## name bare block next labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+{
+    next LOOP;
+}
+
+## name bare block last unlabeled
+## failures 1
+## cut
+
+{
+    last;
+}
+
+## name bare block last labeled
+## failures 0
+## cut
+
+{
+    last LOOP;
+}
+
+## name bare block redo unlabeled
+## failures 1
+## cut
+
+{
+    redo;
+}
+
+## name bare block redo labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+{
+    redo LOOP;
+}
+
+## name do block next unlabeled
+## failures 1
+## cut
+
+do {
+    next;
+};
+
+## name do block next labeled
+## failures 1
+## cut
+
+do {
+    next LOOP;
+};
+
+## name do block last labeled still fails
+## failures 1
+## cut
+
+do {
+    last LOOP;
+};
+
+## name do block redo unlabeled
+## failures 1
+## cut
+
+do {
+    redo;
+};
+
+## name while loop next safe
+## failures 0
+## cut
+
+while (1) {
+    next;
+}
+
+## name for loop last safe
+## failures 0
+## cut
+
+for my $x (@a) {
+    last;
+}
+
+## name while-if-next safe
+## failures 0
+## cut
+
+while (1) {
+    if ($x) {
+        next;
+    }
+}
+
+## name sub block next
+## failures 1
+## cut
+
+sub {
+    next;
+};
+
+## name eval block last
+## failures 1
+## cut
+
+eval { last; };
+
+## name map block next
+## failures 1
+## cut
+
+map { next; } @list;
+
+## name grep block redo
+## failures 1
+## cut
+
+grep { redo; } @list;
+
+## name next conditional ok (not a label)
+## failures 1
+## cut
+
+{
+    next if $x;
+}
+
+## name next EXPR form still flagged (forbid ignores labels)
+## failures 1
+## cut
+
+my $label = 'LOOP';
+{
+    next $label;
+}
+
+## name parms next allow
+## parms { next => 'allow' }
+## failures 0
+## cut
+
+{
+    next;
+}
+
+## name parms last forbid in bare block
+## parms { last => 'forbid', bare_block => 'follow' }
+## failures 1
+## cut
+
+{
+    last LABEL;
+}
+
+## name parms do_block follow with next require_label
+## parms { do_block => 'follow', next => 'require_label' }
+## failures 1
+## cut
+
+do {
+    next;
+};
+
+## name parms do_block follow with next require_label labeled
+## parms { do_block => 'follow', next => 'require_label' }
+## failures 0
+## cut
+
+do {
+    next LOOP;
+};
+
+## name parms bare_block forbid
+## parms { bare_block => 'forbid', next => 'require_label' }
+## failures 1
+## cut
+
+{
+    next LOOP;    # labeled but bare_block forbid overrides
+}
+
+## name labeled while loop next safe
+## failures 0
+## cut
+
+ELEM:
+while (1) {
+    next ELEM;
+}
+
+## name sub block last labeled
+## failures 0
+## cut
+
+sub {
+    last LABEL;
+};
+
+## name sub block redo labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+sub {
+    redo LABEL;
+};
+
+## name eval block last labeled
+## failures 0
+## cut
+
+eval { last LABEL; };
+
+## name eval block next labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+eval { next LABEL; };
+
+## name map block last labeled
+## failures 0
+## cut
+
+map { last LABEL; } @list;
+
+## name map block next labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+map { next LABEL; } @list;
+
+## name grep block redo labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+grep { redo LABEL; } @list;
+
+## name bare block next labeled targets outer loop (safe)
+## failures 0
+## cut
+
+BAR:
+for my $x (@a) {
+    {
+        next BAR;
+    }
+}

@@ -6,12 +6,11 @@ use Archive::Libarchive 0.03 qw( ARCHIVE_OK ARCHIVE_WARN ARCHIVE_EOF );
 use Ref::Util qw( is_plain_coderef is_plain_arrayref is_plain_scalarref is_ref );
 use Carp ();
 use Path::Tiny ();
-use 5.020;
-use Alias::Any;
-use experimental qw( signatures postderef );
+use 5.022;
+use experimental qw( signatures postderef refaliasing );
 
 # ABSTRACT: Peek into archives without extracting them
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub new ($class, %options)
@@ -203,7 +202,7 @@ sub as_hash ($self)
     {
       if(defined $hash{$target})
       {
-        alias $hash{$path} = $hash{$target};
+        \$hash{$path} = \$hash{$target};
       }
       else
       {
@@ -257,7 +256,7 @@ Archive::Libarchive::Peek - Peek into archives without extracting them
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -416,7 +415,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021-2022 by Graham Ollis.
+This software is copyright (c) 2021-2026 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

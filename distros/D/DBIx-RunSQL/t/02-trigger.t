@@ -13,8 +13,6 @@ if (not $can_run) {
     plan skip_all => "SQLite not installed";
 }
 
-plan tests => 2;
-
 my $sql = do { local (@ARGV,$/) = 't/trigger.sql'; <> };
 my @statements;
 while( defined( my $frag = DBIx::RunSQL->split_sql( $sql ))) {
@@ -35,17 +33,25 @@ is \@statements, [
     "CREATE TRIGGER trg_test_2 AFTER INSERT ON test BEGIN\r\n"
   . "      UPDATE test SET ts = DATETIME('NOW')  WHERE rowid = new.rowid;\n"
   . "END",
+  , "-- Comments before triggers don't hide the trigger\r\n"
+  . "CREATE TRIGGER trg_test_3 AFTER INSERT ON test BEGIN\r\n"
+  . "      UPDATE test SET ts = DATETIME('NOW')  WHERE rowid = new.rowid;\n"
+  . "END"
 ], "We split the statements in the expected fashion";
 
+@statements = ();
 my $lives = eval {
     my $test_dbh = DBIx::RunSQL->create(
         dsn     => 'dbi:SQLite:dbname=:memory:',
         sql     => 't/trigger.sql',
-        #verbose => 1,
+        verbose => 1,
+        verbose_handler => sub { push @statements, @_ },
     );
     1;
 };
 my $err = $@;
 ok $lives, "We can parse triggers"
     or diag $err;
+is 0+@statements, 4, "We also split a file into 4 statements";
 
+done_testing;

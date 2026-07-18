@@ -66,7 +66,9 @@ sub retrieve_subject_token {
     my $token;
     if ( $format_type eq 'json' ) {
         $log->tracef('Parsing JSON output from Pluggable command...');
-        my $data = eval { decode_json($stdout) };
+        my $clean_stdout = $stdout;
+        $clean_stdout =~ s/^\s*['"]?|['"]?\s*$//g;
+        my $data = eval { decode_json($stdout) } || eval { decode_json($clean_stdout) };
         if ($@) {
             $log->errorf('Pluggable JSON parsing failed: %s', $@);
             Google::Auth::Error->throw('Failed to parse JSON from pluggable command output: ' . $@);

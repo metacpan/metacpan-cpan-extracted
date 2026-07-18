@@ -1,18 +1,56 @@
-# Version control
+
+#!start included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
 \bRCS\b
 \bCVS\b
-^\.git/
-^\.gitignore
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.github\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
 
-# Build artifacts
-^Makefile$
-^Makefile\.old$
-^blib/
-^pm_to_blib
-^_build/
-^Build$
-^Build\.bat$
-^MYMETA\.
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+schemas\.yml$
+\.swp$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
 
 # Avoid Devel::Cover and Devel::CoverX::Covered files.
 \bcover_db\b
@@ -20,16 +58,19 @@
 \bcoverage_history\b
 \bcovered\b
 
-# Testing
-^nytprof
-\.tar\.gz$
+# Avoid MYMETA files
+^MYMETA\.
+#!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
-# Editor files
-~$
-\.swp$
-\.bak$
-^\.DS_Store$
-
-# Local files
-^local/
-^\.carton/
+\.travis\.yml
+\.appveyor\.yml
+\.releaserc
+\.lwpcookies
+App-.*
+.test-script-*
+typescript
+mutation.json
+^xt/mutant_\d
+CLAUDE.md
+\.claude
+\.circleci

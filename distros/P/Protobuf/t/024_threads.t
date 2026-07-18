@@ -5,8 +5,8 @@ use Config;
 use Protobuf::DescriptorPool;
 
 BEGIN {
-    if (!$Config{useithreads}) {
-        plan skip_all => "Perl not compiled with 'useithreads'";
+    if (!$Config{useithreads} || $^O eq 'MSWin32') {
+        plan skip_all => "ithreads skipped on $^O";
     }
 }
 

@@ -49,3 +49,7 @@ Revision history for Module-Generate
 1.03    2025-04-22
 	- Remove AnnoCPAN and CPAN Rating links from generated modules
 	- Fix generated POD version to match module version
+
+1.04    2026-07-18
+	- Remove PAX headers
+	

@@ -121,7 +121,12 @@ test_pureperl :: all t/data/test_descriptor.bin t/data/wkt_descriptor.bin t/data
 
 [% BLOCK protoc_plugin_link %]
 [% exe %]: [% obj %] [% common_o %]
+[% IF is_win32 %]
+	$(MKPATH) bin
+	$(CXX) $(LDFLAGS) -o [% exe %] [% obj %] [% common_o %] -lstdc++ [% absl_libs %] [% sanitizer_flags %]
+[% ELSE %]
 	$(CXX) $(LDFLAGS) -fPIE -pie -o [% exe %] [% obj %] [% common_o %] -lstdc++ [% absl_libs %] [% sanitizer_flags %]
+[% END %]
 
 .PHONY: build_protoc_plugin
 build_protoc_plugin: [% exe %]
@@ -182,31 +187,44 @@ bench: build_bench $(COMMON_LIB)
 [% END %]
 
 [% BLOCK test_descriptor_bin %]
+pure_all :: t/data/test_descriptor.bin t/data/compat_descriptor.bin t/data/wkt_descriptor.bin t/data/types_descriptor.bin
+
 t/data/test_descriptor.bin: t/c/test.proto
 	@echo "Generating t/data/test_descriptor.bin from t/c/test.proto"
 	$(MKPATH) t/data
-	[% PROTOC %] --descriptor_set_out=t/data/test_descriptor.bin --include_imports --proto_path=t/c --proto_path=. --proto_path=vendor/third_party --proto_path=vendor t/c/test.proto
+	- [% PROTOC %] --descriptor_set_out=t/data/test_descriptor.bin --include_imports --proto_path=t/c --proto_path=. --proto_path=vendor/third_party --proto_path=vendor t/c/test.proto
 
 t/data/compat_descriptor.bin: $(wildcard t/protos/*.proto)
 	@echo "Generating t/data/compat_descriptor.bin"
 	$(MKPATH) t/data
-	[% PROTOC %] --descriptor_set_out=t/data/compat_descriptor.bin --include_imports --proto_path=t/protos --proto_path=. $(wildcard t/protos/*.proto)
+	- [% PROTOC %] --descriptor_set_out=t/data/compat_descriptor.bin --include_imports --proto_path=t/protos --proto_path=. $(wildcard t/protos/*.proto)
 
 t/data/wkt_descriptor.bin:
 	@echo "Generating t/data/wkt_descriptor.bin"
 	$(MKPATH) t/data
-	[% PROTOC %] --descriptor_set_out=t/data/wkt_descriptor.bin --include_imports --proto_path=[% project_root %]/src \
+[% IF is_win32 %]
+	- [% PROTOC %] -Ivendor/src -Ivendor/third_party -Ivendor --descriptor_set_out=t/data/wkt_descriptor.bin --include_imports google/protobuf/any.proto google/protobuf/duration.proto google/protobuf/timestamp.proto google/protobuf/field_mask.proto google/protobuf/struct.proto google/protobuf/wrappers.proto
+[% ELSE %]
+	-INC_FLAG=""; \
+	if [ -f /usr/include/google/protobuf/any.proto ]; then INC_FLAG="-I/usr/include"; \
+	elif [ -f /usr/local/include/google/protobuf/any.proto ]; then INC_FLAG="-I/usr/local/include"; \
+	elif [ -f /opt/homebrew/include/google/protobuf/any.proto ]; then INC_FLAG="-I/opt/homebrew/include"; \
+	elif [ -f vendor/src/google/protobuf/any.proto ]; then INC_FLAG="-Ivendor/src"; \
+	elif [ -f vendor/third_party/protobuf/src/google/protobuf/any.proto ]; then INC_FLAG="-Ivendor/third_party/protobuf/src"; \
+	fi; \
+	[% PROTOC %] $$INC_FLAG --descriptor_set_out=t/data/wkt_descriptor.bin --include_imports \
 		google/protobuf/any.proto \
 		google/protobuf/duration.proto \
 		google/protobuf/timestamp.proto \
 		google/protobuf/field_mask.proto \
 		google/protobuf/struct.proto \
 		google/protobuf/wrappers.proto
+[% END %]
 
 t/data/types_descriptor.bin: t/protos/types.proto
 	@echo "Generating t/data/types_descriptor.bin from t/protos/types.proto"
 	$(MKPATH) t/data
-	[% PROTOC %] --descriptor_set_out=t/data/types_descriptor.bin --include_imports --proto_path=t/protos --proto_path=[% project_root %] t/protos/types.proto
+	- [% PROTOC %] --descriptor_set_out=t/data/types_descriptor.bin --include_imports --proto_path=t/protos --proto_path=. t/protos/types.proto
 [% END %]
 
 [% BLOCK tsan_test %]

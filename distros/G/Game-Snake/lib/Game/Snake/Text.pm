@@ -1,8 +1,8 @@
 use 5.38.0;
 use experimental 'class';
-package Game::Snake::Text 0.10;
+package Game::Snake::Text 0.11;
 class Game::Snake::Text {
-	our $VERSION = 0.10;
+	our $VERSION = 0.11;
         use Raylib::FFI;
         use Raylib::Color;
 

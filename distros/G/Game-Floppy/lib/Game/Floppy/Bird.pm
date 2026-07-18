@@ -1,9 +1,9 @@
 use 5.38.0;
 use experimental 'class';
 
-package Game::Floppy::Bird 0.07;
+package Game::Floppy::Bird 0.08;
 class Game::Floppy::Bird {
-	our $VERSION = 0.07;
+	our $VERSION = 0.08;
 	use Raylib::FFI;
 	use Raylib::Color;
 	use Game::Floppy::Sprite;

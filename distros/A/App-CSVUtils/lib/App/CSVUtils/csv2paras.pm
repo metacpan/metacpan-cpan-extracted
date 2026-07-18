@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-04'; # DATE
+our $DATE = '2026-07-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.036'; # VERSION
+our $VERSION = '1.038'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 use String::Pad qw(pad);
@@ -27,7 +27,7 @@ sub _escape_header {
 gen_csv_util(
     name => 'csv2paras',
     summary => 'Convert CSV to paragraphs',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility converts CSV format like this:
 
@@ -100,7 +100,7 @@ align the ":" header separator.
 
 Keywords: paragraphs, cards, pages, headers
 
-_
+MARKDOWN
     add_args => {
         width => {
             summary => 'The width at which to fold long lines, -1 means to never fold',
@@ -114,13 +114,13 @@ _
         align => {
             summary => 'Whether to align header separator across lines',
             schema => 'bool*',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Note that if you want to convert the paragraphs back to CSV later using
 <prog:paras2csv>, the padding spaces added by this option will become part of
 header value, unless you use its `--trim-header` or `--rtrim-header` option.
 
-_
+MARKDOWN
         },
     },
     links => [
@@ -193,7 +193,7 @@ App::CSVUtils::csv2paras - Convert CSV to paragraphs
 
 =head1 VERSION
 
-This document describes version 1.036 of App::CSVUtils::csv2paras (from Perl distribution App-CSVUtils), released on 2025-02-04.
+This document describes version 1.038 of App::CSVUtils::csv2paras (from Perl distribution App-CSVUtils), released on 2026-07-09.
 
 =head1 FUNCTIONS
 
@@ -331,6 +331,22 @@ Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--input-tsv> option.
 
+=item * B<input_skip_before_num_data_rows> => I<uint>
+
+Skip a certain number of data rows for each input file.
+
+This option can be used to skip the first certain number of data rows. If set to
+1, for example, will only process 1 data row for each input file. This option is
+a convenient alternative to composing with L<csv-tail>.
+
+=item * B<input_skip_file_after_num_data_rows> => I<uint>
+
+Limit processing each input file to this number of data rows.
+
+This option can be used to limit processing only to a certain number of data
+rows. If set to 1, for example, will only process 1 data row for each input
+file. This option is a convenient alternative to composing with L<csv-head>.
+
 =item * B<input_skip_num_lines> => I<posint>
 
 Number of lines to skip before header row.
@@ -416,7 +432,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

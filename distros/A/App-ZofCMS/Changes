@@ -1,5 +1,9 @@
 Revision history for App-ZofCMS
 
+1.001010  2026-07-17
+        - Removed App::ZofCMS::Plugin::GoogleTime; the WWW::Google::Time
+            module it relied on is no longer available on CPAN (Fixes #12)
+
 1.001009  2026-07-13
         - Maintenance update - verified module is still working
 

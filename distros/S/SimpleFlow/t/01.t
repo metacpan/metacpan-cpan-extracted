@@ -8,23 +8,22 @@ use Test::More;
 use Test::Exception; # die_ok / lives_ok
 use File::Temp 'tempfile';
 use Cwd 'getcwd';
-use DDP;             # make p() explicit instead of relying on the DDP-into-main
-                     # leak from SimpleFlow.pm
+use DDP;
 use SimpleFlow qw(task say2);
 
-# ---------------------------------------------------------------------------
+#
 # Portability: the original tests called Unix-only tools (which/ls/ln/cp) and
 # hard-coded /tmp, which fails on Windows CPAN testers. Use the running Perl
 # interpreter instead -- it is always present -- and let File::Temp pick the
 # system temp dir. $^X is quoted in case its path contains spaces (Windows).
 # NB: the $code passed to perl_cmd() must not itself contain double quotes.
-# ---------------------------------------------------------------------------
+#
 my $PERL = qq{"$^X"};
 sub perl_cmd { my $code = shift; return qq{$PERL -e "$code"} }
 
 my ($simple_task, $log_write, $stopping, $dry_run, $overwrite) = (0,0,0,0,0);
 
-# --- a simple, successful task -------------------------------------------
+# --- a simple, successful task
 my $r = task({
 	cmd => perl_cmd('exit 0')
 });
@@ -42,7 +41,7 @@ if (
 	die 'test failed';
 }
 
-# --- writing to a log file + say2 ----------------------------------------
+# --- writing to a log file + say2
 my ($fh, $fname) = tempfile( UNLINK => 0, SUFFIX => '.log' );
 $r = task({
 	cmd            => perl_cmd('exit 0'),
@@ -54,7 +53,7 @@ say2('Testing say2', $fh);
 close $fh;
 $log_write = 1 if ((-f $fname) && (-s $fname > 0));
 
-# --- re-run: task must notice the output already exists ------------------
+# --- re-run: task must notice the output already exists
 $r = task({
 	cmd            => perl_cmd('exit 0'),
 	'output.files' => $fname,
@@ -134,9 +133,9 @@ if (
 	die 'output files are not overwritten when "overwrite" is true"';
 }
 
-# ===========================================================================
+#
 # Regression tests for bugs fixed in SimpleFlow.pm
-# ===========================================================================
+#
 
 # --- BUG 1: exit/signal decoding -----------------------------------------
 # The old code did $exit = $status >> 8 and THEN $signal = $exit & 127, so the
@@ -190,10 +189,10 @@ lives_ok {
 } 'task survives a missing output file when die => 0 (regression: undef == 0 was fatal)';
 ok(defined $r2 && ref $r2 eq 'HASH', 'task still returned its result hash');
 
-# ===========================================================================
+#
 # Additional coverage: note, *.file.size hashes, normalisation, metadata,
 # captured I/O and argument validation.
-# ===========================================================================
+#
 
 # --- note passthrough + default -----------------------------------------
 subtest 'note field' => sub {
@@ -216,6 +215,56 @@ subtest 'output.files normalisation and output.file.size' => sub {
 	is($t->{'output.file.size'}{$o1}, 5,      'output.file.size reports the byte count');
 	is($t->{'output.file.size'}{$o1}, -s $o1, 'output.file.size matches -s on disk');
 	unlink $o1;
+};
+
+# --- output.file: single-file convenience form ---------------------------
+subtest 'output.file (single file)' => sub {
+	my (undef, $o1) = tempfile(UNLINK => 0, SUFFIX => '.dat');
+	my $t = task({
+		cmd           => qq{$PERL -e "print 12345" > "$o1"}, # writes exactly 5 bytes
+		'output.file' => $o1,
+		overwrite     => 'true',
+	});
+	is(ref $t->{'output.files'}, 'ARRAY', 'output.file is folded into the output.files arrayref');
+	is_deeply($t->{'output.files'}, [$o1], 'output.files arrayref holds the single filename');
+	is($t->{'output.file.size'}{$o1}, 5,      'output.file.size reports the byte count');
+	is($t->{'output.file.size'}{$o1}, -s $o1, 'output.file.size matches -s on disk');
+
+	# it must drive the "already done" skip logic just like output.files does
+	my $again = task({
+		cmd           => qq{$PERL -e "print 12345" > "$o1"},
+		'output.file' => $o1,
+		overwrite     => 0,
+	});
+	is($again->{done}, 'before', 'output.file that already exists is detected as done before');
+
+	unlink $o1;
+};
+
+# --- output.file / output.files are mutually exclusive and single-valued --
+subtest 'output.file validation' => sub {
+	dies_ok {
+		task({
+			cmd            => perl_cmd('exit 0'),
+			'output.file'  => 'a.dat',
+			'output.files' => 'b.dat',
+		})
+	} 'dies when both output.file and output.files are given';
+
+	dies_ok {
+		task({
+			cmd           => perl_cmd('exit 0'),
+			'output.file' => ['a.dat', 'b.dat'], # a list is not allowed here
+		})
+	} 'dies when output.file is given a reference instead of a single filename';
+
+	throws_ok {
+		task({
+			cmd           => perl_cmd('exit 0'),
+			'output.file' => '', # 0-length filename
+			die           => 0,
+		})
+	} qr/0-length filenames/, 'dies on a 0-length output.file';
 };
 
 # --- input.files: scalar + array forms, and input.file.size --------------

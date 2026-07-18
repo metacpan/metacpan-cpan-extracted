@@ -110,8 +110,7 @@ sub from_env {
     my ( $self, $scopes, %options ) = @_;
     $self = ref $self ? $self : $self->new();
 
-    my $env              = $self->environment;
-    my $credentials_path = $env->CREDENTIALS;
+    my $credentials_path = $ENV{GOOGLE_APPLICATION_CREDENTIALS} || $self->environment->CREDENTIALS;
 
     if ( $credentials_path && -f $credentials_path ) {
         return $self->make_creds(

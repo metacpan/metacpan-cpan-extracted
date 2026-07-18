@@ -1,3 +1,16 @@
+1.038   2026-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Change the implementation of csv-shuf-{rows,fields} to
+          use List::Util::shuffle() instead of basing on sort which is much
+          less shuffled.
+
+
+1.037   2026-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --input-skip-before-num-data-rows,
+          --input-skip-file-after-num-data-rows.
+
+
 1.036   2025-02-04  Released-By: PERLANCAR; Urgency: medium
 
         - Add options: --input-skip-num-lines, --input-skip-until-pattern.

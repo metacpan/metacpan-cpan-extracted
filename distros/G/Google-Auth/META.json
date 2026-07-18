@@ -22,11 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Deep" : "0",
-            "Test::Exception" : "0",
-            "Test::LWP::UserAgent" : "0",
-            "Test::More" : "0",
-            "Test::Perl::Critic" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -43,9 +39,17 @@
             "URI" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -8,13 +8,9 @@ use Protobuf;
 use TestHelpers;
 
 subtest 'Check active engine' => sub {
-    plan tests => 2;
-
     ok($Protobuf::HAS_XS, "XS engine is loaded!") 
         or diag("Error: XS failed to load, fell back to PurePerl");
     isa_ok(Protobuf->engine, 'Protobuf::Engine::XS', "Active engine");
-
-    done_testing();
 };
 
 done_testing();

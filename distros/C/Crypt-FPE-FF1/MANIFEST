@@ -1,0 +1,18 @@
+csrc/ff1.c
+csrc/ff3.c
+csrc/fpe.h
+csrc/fpe_locl.c
+csrc/fpe_locl.h
+FF1.xs
+lib/Crypt/FPE/FF1.pm
+lib/Crypt/FPE/FF1/Format.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README.md
+t/01-ff1.t
+test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

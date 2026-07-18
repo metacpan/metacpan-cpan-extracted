@@ -1,5 +1,16 @@
 Revision history for Google-Api-Common
 
+0.02    Fri Jul 17 2026
+        [REST Transport & Response Handling]
+        - Consolidated REST HTTP client transport in Google::Cloud::REST::Client with unified OAuth2 token injection.
+        - Fixed $VERSION evaluation and stringification in Google::Cloud::REST::Client.
+        - Hardened PageIterator pagination helpers to seamlessly support both JSON REST objects and Protobuf response messages.
+        - Added standardized GCP API error status translation and error mapping (Google::Api::Common::Status).
+
+        [Architecture & CPAN Cleanup]
+        - Upgraded package version to 0.02 (lib/Google/Api/Common.pm).
+        - Streamlined $VERSION declarations across sub-modules.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

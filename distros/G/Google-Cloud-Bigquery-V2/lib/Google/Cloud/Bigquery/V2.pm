@@ -68,7 +68,7 @@ use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
 use Google::Cloud::Bigquery::V2::IcebergManagedTableConfig;
 use Google::Cloud::Bigquery::V2::ThriftOptions;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -873,7 +873,7 @@ Google::Cloud::Bigquery::V2 - Auto-generated client library for Google Cloud Ser
 
 This is an auto-generated Protocol Buffers client library for Google Cloud Services, built on top of high-performance gRPC and Protocol Buffers!
 
-=head2 METHODS
+=head1 METHODS
 
 The following RPC methods are available in this client:
 
@@ -1057,8 +1057,10 @@ Calls the RPC method C<BatchDeleteRowAccessPolicies> on the service. Takes a has
 
 =back
 
-=head1 LICENSE
+=head1 LICENSE AND COPYRIGHT
 
-Apache License 2.0
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
 
 =cut

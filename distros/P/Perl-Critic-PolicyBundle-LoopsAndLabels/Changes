@@ -1,0 +1,51 @@
+Revision history for Perl-Critic-PolicyBundle-LoopsAndLabels
+
+0.07    2026-07-17
+    - Converted to policy bundle: Perl::Critic::PolicyBundle::LoopsAndLabels
+    - Merged ProhibitBareBlockLoopControls policy (v0.06)
+    - Added ProhibitGotoIntoConstruct policy
+
+0.01    2026-06-18
+    - Initial release of LoopsRequireLabels
+    - Require labels on loops and their break keywords
+
+Revision history for Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls
+
+0.06    2026-06-18
+    - Restructured POD DESCRIPTION to separate bare-block (real loops, surprising
+      semantics) from non-loop constructs (controls leak or fail at runtime).
+    - Acknowledged map/grep as iteration constructs while explaining loop controls
+      escape rather than targeting the map/grep iteration.
+    - Fixed _make_explanation for map/grep blocks (previously claimed controls
+      "skip to the next element" -- incorrect).
+    - Added fatal-error-at-runtime mention to sub/eval/do explanations.
+    - Added outer-loop capture scenario to bare-block forbid messages.
+    - Added action-at-a-distance examples for do {} and map/grep with enclosing
+      loops.
+
+0.05    2026-06-15
+    - Changed bare_block default from require_label to follow (defers to per-keyword defaults).
+    - Fixed labeled loop detection: labels are now skipped when identifying compound types.
+    - Added break-label targeting logic: labeled controls targeting an outer real loop
+      from a bare block are now permitted.
+    - Moved perlcriticrc to t/.perlcriticrc, configured via [Test::Perl::Critic].
+    - Repaired author-critic test violations (ASCII, labels, naming, qq, regex, no critic).
+    - Switched fixed-string regex patterns to constant hash lookups.
+
+0.04    2026-06-15
+    - Clarified the default policy in POD documentation with an effective defaults table
+    - Added examples for bare blocks inside real loops
+    - Added labeled "ok" examples for bare blocks
+    - Pod changes only
+
+0.03    2026-06-13
+    - Adjust package name and hopefully cpan will index it
+0.02    2026-06-13
+    - Improved violation explanations (per-block-type, forbid vs require-label).
+    - Added t/explanation-messages.t (26 unit tests).
+    - Fixed POD inaccuracies around bare blocks and do blocks.
+    - Restricted releases to trunk branch.
+
+0.01    2026-06-13
+    - Initial release. Author Dean Hamstead
+    - Policy to prohibit unlabeled next/last/redo in non-loop blocks.

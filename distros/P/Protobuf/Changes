@@ -1,5 +1,20 @@
 Revision history for Protobuf
 
+0.06    Fri Jul 17 2026
+        [Windows & Multi-Platform Build Hardening]
+        - Enhanced Makefile.PL to search system library paths for libperl across Debian, Ubuntu, Fedora, and Arch layouts.
+        - Hardened protoc/plugin_main.cc on Windows by setting stdin and stdout to binary mode (_setmode O_BINARY), preventing line-ending corruption during protoc IPC.
+        - Sanitized backslashes in compiler include paths (-I) for MinGW and MSWin32 environments.
+        - Overrode MY::fixin in Makefile.PL to prevent script rewriting issues on Windows.
+
+        [Code Generator & Type System]
+        - Hardened Protobuf::ClassGenerator::_get_type_tiny_code to handle unresolved message type references via capitalized fallback class naming and Any type coercion instead of dying.
+        - Updated protoc-gen-perl-pb (protoc/generator.cc) to emit standard Apache 2.0 copyright headers in generated module headers.
+
+        [Architecture & CPAN Cleanup]
+        - Streamlined $VERSION declarations: pruned redundant $VERSION variables from generated sub-modules and schema files so CPAN toolchains track versioning exclusively through primary distribution entrypoints.
+
+
 0.05    Mon Jul  6 2026
         [Windows Portability & Build Hardening]
         - Fixed building and linking of libprotobufperl on Windows (MinGW/Strawberry Perl) by linking with embed_ldflags (containing libperl542.a) and explicitly using .dll extension instead of $Config{dlext} (.xs.dll) for the helper library.

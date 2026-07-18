@@ -11,13 +11,17 @@ use CLI::Simple::Utils qw(slurp);
 use CPAN::Maker::Bootstrapper::Constants qw(:all);
 
 use Cwd qw(getcwd abs_path);
+use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Basename qw(basename);
 use File::Copy;
 use File::Temp qw(tempfile);
-use JSON::PP;
+use JSON;
 use List::Util qw(none);
 use Role::Tiny;
+use Term::ANSIColor qw(colored);
+use Text::ASCIITable;
+use Text::ASCIITable::FixANSI;
 
 ########################################################################
 sub cmd_update_annotations {
@@ -53,7 +57,7 @@ sub cmd_update_annotations {
   die "ERROR: could not create temporary annotations file\n$OS_ERROR\n"
     if !$fh;
 
-  print {$fh} JSON::PP->new->pretty->utf8->encode($review);
+  print {$fh} JSON->new->pretty->utf8->encode($review);
 
   close $fh
     or die "ERROR: could not close temporary annotations file\n";
@@ -86,20 +90,22 @@ sub cmd_annotate {
   die "ERROR: nothing to annotate. No review file found.\n"
     if !$review_file;
 
-  $review = $self->_annotate($review);
+  # only save if things have changed
+  if ( $self->_annotate($review) ) {
 
-  my ( $fh, $tempfile ) = tempfile( 'annotations-XXXX', DIR => getcwd );
+    my ( $fh, $tempfile ) = tempfile( 'annotations-XXXX', DIR => getcwd );
 
-  die "ERROR: could not create temporary annotations file\n$OS_ERROR\n"
-    if !$fh;
+    die "ERROR: could not create temporary annotations file\n$OS_ERROR\n"
+      if !$fh;
 
-  print {$fh} JSON::PP->new->pretty->utf8->encode($review);
+    print {$fh} JSON->new->pretty->utf8->encode($review);
 
-  close $fh
-    or die "ERROR: could not close temporary annotations file!\n";
+    close $fh
+      or die "ERROR: could not close temporary annotations file!\n";
 
-  rename $tempfile, $review_file
-    or die "ERROR: could not save $review_file\n$OS_ERROR\n";
+    rename $tempfile, $review_file
+      or die "ERROR: could not save $review_file\n$OS_ERROR\n";
+  }
 
   $self->_show_annotations( $review, $review_file );
 
@@ -107,6 +113,7 @@ sub cmd_annotate {
     $self->_finalize_annotations( $review, $review_file );
   }
   elsif ( $self->get_auto_annotate ) {
+    # resubmit for review
     my $llm_rsp = $self->_cmd_review(
       type          => 'code',
       file          => $file,
@@ -136,7 +143,6 @@ sub _show_annotations {
 ########################################################################
   my ( $self, $review, $review_file ) = @_;
 
-  require Text::ASCIITable;
   my $color_on = $self->get_color;
 
   my $t = Text::ASCIITable->new( { headingText => "Annotations: $review_file", allowANSI => $color_on } );
@@ -162,8 +168,8 @@ sub _show_annotations {
     my $severity = $f->{severity};
     $t->addRow(
       $f->{id}, $f->{function},
-      $color_on ? colored( [ $COLORS->{$severity} ],         $severity )    : $severity,
-      $color_on ? colored( [ $COLORS->{ uc $disposition } ], $disposition ) : $disposition,
+      $color_on ? colored( [ $COLORS->{$severity}         // 'white' ], $severity )    : $severity,
+      $color_on ? colored( [ $COLORS->{ uc $disposition } // 'white' ], $disposition ) : $disposition,
       $f->{description},
     );
   }
@@ -205,6 +211,7 @@ sub _generate_annotate_file {
 
   return $annotate_file;
 }
+
 ########################################################################
 sub _parse_annotate_file {
 ########################################################################
@@ -297,7 +304,7 @@ sub _annotate {
 
   my @annotations = @{ $self->get_annotate || [] };
 
-  return $review
+  return
     if !@annotations;
 
   my $batch_comment = $self->get_comment;  # may be undef
@@ -367,7 +374,7 @@ sub _finalize_annotations {
   open my $fh, '>', $final_review_file
     or die "ERROR: could not open $final_review_file for writing: $OS_ERROR\n";
 
-  print {$fh} JSON::PP->new->pretty->utf8->encode($review);
+  print {$fh} JSON->new->pretty->utf8->encode($review);
 
   close $fh
     or warn "WARNING: could not close $final_review_file: $OS_ERROR\n";

@@ -9,6 +9,7 @@ use Archive::Tar;
 use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp);
 use CPAN::Maker::Bootstrapper::Constants qw(:all);
+use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Path qw(make_path);
 use Git::ReleaseDiffs;
@@ -96,6 +97,7 @@ sub cmd_release_notes {
       if $file_limit && $file_count == $file_limit;
 
     my $file_content = $file->get_content;
+
     next if !defined $file_content || $file_content eq q{};
 
     # strip POD from Perl sources to reduce token cost
@@ -174,9 +176,13 @@ sub _extract_changelog_section {
 ########################################################################
 sub _strip_pod {
 ########################################################################
-  my ($content) = @_;
+  my (@args) = @_;
 
-  my $fh = IO::Scalar->new( \$content );
+  my $content = @args > 1 && ref $args[0] ? $args[1] : $args[0];
+
+  my $obj = ref $content ? ${$content} : $content;
+
+  my $fh = IO::Scalar->new( \$obj );
 
   my ( undef, $code ) = extract_pod($fh);
 

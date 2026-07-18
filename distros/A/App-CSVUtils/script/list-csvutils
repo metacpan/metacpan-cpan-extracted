@@ -9,9 +9,9 @@ use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 use Module::List::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-04'; # DATE
+our $DATE = '2026-07-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.036'; # VERSION
+our $VERSION = '1.038'; # VERSION
 
 my $res = gen_read_table_func(
     name => 'list_csvutils',
@@ -129,7 +129,7 @@ list-csvutils - List CSV utilities in App::CSVUtils::*
 
 =head1 VERSION
 
-This document describes version 1.036 of list-csvutils (from Perl distribution App-CSVUtils), released on 2025-02-04.
+This document describes version 1.038 of list-csvutils (from Perl distribution App-CSVUtils), released on 2026-07-09.
 
 =head1 SYNOPSIS
 
@@ -753,11 +753,11 @@ For fish and zsh, install L<shcompgen> as described above.
  | name                | summary                                                                 | category | reads_csv | reads_multiple_csv | writes_csv | writes_multiple_csv | tags            |
  +---------------------+-------------------------------------------------------------------------+----------+-----------+--------------------+------------+---------------------+-----------------+
  | csv-add-fields      | Add one or more fields to CSV file                                      | munging  |         1 |                  0 |          1 |                   0 | adds-fields     |
- | csv-csv             | Convert CSV to CSV                                                      | munging  |         1 |                  0 |          1 |                   0 |                 |
  | csv-delete-fields   | Delete one or more fields from CSV file                                 | munging  |         1 |                  0 |          1 |                   0 | deletes-fields  |
  | csv-ltrim           | Left-trim (remove leading whitespace) values and/or fields in CSV       | munging  |         1 |                  0 |          1 |                   0 | modifies-values |
  | csv-munge-field     | Munge a field in every row of CSV file with Perl code                   | munging  |         1 |                  0 |          1 |                   0 | modifies-field  |
  | csv-munge-rows      | Modify CSV data rows using Perl code                                    | munging  |         1 |                  0 |          1 |                   0 | modifies-rows   |
+ | csv-quote           | Make sure values of CSV are quoted                                      | munging  |         1 |                  0 |          1 |                   0 |                 |
  | csv-replace-newline | Replace newlines in CSV values                                          | munging  |         1 |                  0 |          1 |                   0 | modifies-rows   |
  | csv-rtrim           | Right-trim (remove trailing whitespace) values and/or fields in CSV     | munging  |         1 |                  0 |          1 |                   0 | modifies-values |
  | csv-transpose       | Transpose a CSV                                                         | munging  |         1 |                  0 |          1 |                   0 |                 |
@@ -772,7 +772,9 @@ For fish and zsh, install L<shcompgen> as described above.
  +-------------------+----------------------------------------------------------------------------------------------------------------------------+------------+-----------+--------------------+------------+---------------------+---------------+
  | csv-cmp           | Compare two CSV files value by value                                                                                       | comparing  |         1 |                  1 |          1 |                   0 | accepts-regex |
  | csv-concat        | Concatenate several CSV files together, collecting all the fields                                                          | combining  |         1 |                  1 |          1 |                   0 | join, merge   |
+ | csv-join          | Join fields from one CSV to another                                                                                        | templating |         1 |                  1 |          1 |                   0 |               |
  | csv-lookup-fields | Fill fields of a CSV file from another                                                                                     | templating |         1 |                  1 |          1 |                   0 |               |
+ | csv-mix-formulas  | Mix several formulas/recipes (lists of ingredients and their weights/volumes) into one, and output the combined formula    | combining  |         1 |                  1 |          1 |                   0 |               |
  | csv-setop         | Set operation (union/unique concatenation of rows, intersection/common rows, difference of rows) against several CSV files | combining  |         1 |                  1 |          1 |                   0 | set           |
  +-------------------+----------------------------------------------------------------------------------------------------------------------------+------------+-----------+--------------------+------------+---------------------+---------------+
 
@@ -814,7 +816,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

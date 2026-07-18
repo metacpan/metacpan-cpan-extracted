@@ -3,3 +3,5 @@ Revision history for Mojo-DOM-Role-Restrict
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.07	2026-07-18
+	Remove PAX headers

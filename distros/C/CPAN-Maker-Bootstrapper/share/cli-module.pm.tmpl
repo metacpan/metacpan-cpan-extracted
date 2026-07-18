@@ -13,7 +13,7 @@ use parent qw(CLI::Simple);
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
-caller or __PACKAGE__->main;
+caller or exit __PACKAGE__->main;
 
 ########################################################################
 sub init {
@@ -44,9 +44,10 @@ sub main {
   );
 
   my $cli = __PACKAGE__->new(
-    commands      => \%commands,
-    option_specs  => \@option_specs,
-    extra_options => [],
+    commands        => \%commands,
+    option_specs    => \@option_specs,
+    extra_options   => [],
+    default_options => {},
   );
 
   return $cli->run();
@@ -73,5 +74,7 @@ __END__
 @GIT_NAME@ - @GIT_EMAIL@
 
 =head1 SEE ALSO
+
+L<CLI::Simple>
 
 =cut

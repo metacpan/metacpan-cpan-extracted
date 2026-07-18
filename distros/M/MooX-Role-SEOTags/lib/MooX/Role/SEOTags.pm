@@ -65,6 +65,10 @@ generate all tags at once.
 
 Returns the HTML title tag.
 
+=head2 author_tag
+
+Returns the optional HTML meta author tag.
+
 =head2 canonical_tag
 
 Returns the HTML canonical link tag.
@@ -89,9 +93,18 @@ Returns the OpenGraph description meta tag.
 
 Returns the OpenGraph URL meta tag.
 
+=head2 og_site_name_tag
+
+Returns the optional OpenGraph site name meta tag
+
 =head2 og_image_tag
 
 Returns the OpenGraph image meta tag if the og_image attribute is provided.
+
+=head2 og_image_alt_tag
+
+Returns the OpenGraph image alt meta tag is the og_image_alt attribute is
+provided.
 
 =head2 og_tags
 
@@ -124,15 +137,16 @@ Returns all tags (title, canonical, and OpenGraph) as a single string.
 =cut
 
 use feature qw[signatures];
+no if $] <= 5.036, 'warnings', 'experimental::signatures';
 use Moo::Role;
 use HTML::Tiny;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.1.1';
 
 requires qw[og_title og_type og_description og_url];
 
 has _html => (
-  is => 'ro',
+  is => 'lazy',
   default => sub { HTML::Tiny->new(mode => 'html') },
 );
 
@@ -142,6 +156,11 @@ sub _tag($self, $tag, @args) {
 
 sub title_tag($self) {
   return $self->_tag('title', {}, $self->og_title);
+}
+
+sub author_tag($self) {
+  return '' unless $self->can('author');
+  return $self->_tag('meta', { name => 'author', content => $self->og_author });
 }
 
 sub canonical_tag($self) {
@@ -168,6 +187,11 @@ sub og_url_tag($self) {
   return $self->_tag('meta', { property => "og:url", content => $self->og_url });
 }
 
+sub og_site_name_tag($self) {
+  return '' unless $self->can('og_site_name');
+  return $self->_tag('meta', { property => "og:site_name", content => $self->og_site_name });
+}
+
 sub og_image_tag($self) {
   return '' unless $self->can('og_image');
   my $img = $self->og_image;
@@ -175,12 +199,19 @@ sub og_image_tag($self) {
   return $self->_tag('meta', { property => "og:image", content => $img });
 }
 
+sub og_image_alt_tag($self) {
+  return '' unless $self->can('og_image_alt');
+  return $self->_tag('meta', { property => "og:image:alt", content => $self->og_image_alt });
+}
+
 sub og_tags($self) {
   return join "\n", $self->og_title_tag,
                     $self->og_type_tag,
                     $self->og_description_tag,
                     $self->og_url_tag,
-                   ($self->og_image_tag || ());
+                   ($self->og_image_tag || ()),
+                   ($self->og_image_alt_tag || ()),
+                   ($self->og_site_name_tag || ());
 }
 
 sub twitter_card_tag($self) {
@@ -215,6 +246,7 @@ sub twitter_tags($self) {
 
 sub tags($self) {
   return join "\n", $self->title_tag,
+                   ($self->author_tag || ()),
                     $self->description_tag,
                     $self->canonical_tag,
                     $self->og_tags,

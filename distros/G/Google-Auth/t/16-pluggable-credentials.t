@@ -42,7 +42,7 @@ subtest 'Pluggable WIF Initialization and Factory' => sub {
 };
 
 subtest 'Pluggable WIF Success JSON Output' => sub {
-    my $command = 'echo \'{"my_token_field":"mock_pluggable_token"}\'';
+    my $command = sprintf('"%s" -e "print q({\"my_token_field\":\"mock_pluggable_token\"})"', $^X);
     my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
         audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
         subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
@@ -63,7 +63,7 @@ subtest 'Pluggable WIF Success JSON Output' => sub {
 };
 
 subtest 'Pluggable WIF Success Text Output' => sub {
-    my $command = 'echo \'raw-plain-text-token\'';
+    my $command = '"' . $^X . '" -e "print q(raw-plain-text-token)"';
     my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
         audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
         subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
@@ -85,7 +85,8 @@ subtest 'Pluggable WIF Success Text Output' => sub {
 subtest 'Pluggable WIF Environment Variable Injection' => sub {
     # Command that prints a JSON containing the value of the environment variable MOCK_ENV_VAR
     # We use perl to print it portably
-    my $command = 'perl -e \'print "{\\"id_token\\":\\"" . $ENV{MOCK_ENV_VAR} . "\\"}"\'';
+    my $env_sigil = $^O eq 'MSWin32' ? '$' : '\$';
+    my $command = '"' . $^X . '" -e "print q({) . chr(34) . q(id_token) . chr(34) . q(:) . chr(34) . ' . $env_sigil . 'ENV{MOCK_ENV_VAR} . chr(34) . q(})"';
 
     my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
         audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
@@ -107,7 +108,7 @@ subtest 'Pluggable WIF Environment Variable Injection' => sub {
 
 subtest 'Pluggable WIF Error Handling' => sub {
     # Command that produces invalid JSON
-    my $bad_json_command = 'echo \'{"invalid_json:\'';
+    my $bad_json_command = '"' . $^X . '" -e "print q({) . chr(34) . q(invalid_json:)"';
     my $creds_bad_json = Google::Auth::ExternalAccountCredentials->make_creds(
         audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
         subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',

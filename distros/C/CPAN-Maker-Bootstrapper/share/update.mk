@@ -16,7 +16,7 @@ INCLUDES_DIR = .includes
 
 .PHONY: post-update
 post-update: 
-	@mkdir -p $(INCLUDES_DIR); \
+	$(NO_ECHO)mkdir -p $(INCLUDES_DIR); \
 	for f in $(MANAGED_FILES); do \
 	  src="$(BOOTSTRAPPER_DIST_DIR)/$$f"; \
 	  test -e "$$src" || continue; \
@@ -27,7 +27,7 @@ post-update:
 
 .PHONY: update  ## update managed project files from the installed bootstrapper
 update:
-	@if [[ -e builder ]]; then \
+	$(NO_ECHO)if [[ -e builder ]]; then \
 	  chmod +w builder; \
 	  cp $(BOOTSTRAPPER_DIST_DIR)/builder builder; \
 	  chmod 0555 builder; \
@@ -42,15 +42,32 @@ update:
 
 .PHONY: update-available
 update-available:
-	@if [[ -n "$(BOOTSTRAPPER_VERSION)" && "$(PROJECT_NAME)" != "CPAN-Maker-Bootstrapper" ]]; then \
-	  dist=$$(cpanm --info -l /dev/null 2>/dev/null CPAN::Maker::Bootstrapper || true); \
-	  if [[ "$$dist" =~ -([0-9.]+)\.tar\.gz$$ ]]; then \
-	    version="$${BASH_REMATCH[1]}"; \
-	    update_available=$$(current="$(BOOTSTRAPPER_VERSION)" cpan="$$version" perl -Mversion -e 'print version->parse($$ENV{cpan}) > version->parse($$ENV{current});'); \
-	    if [[ -z "$$update_available" ]]; then \
-	      echo "CPAN::Maker::Bootstrapper $$version is up-to-date."; \
-	    else \
-	      echo "CPAN::Maker::Bootstrapper $$version available!"; \
+	$(NO_ECHO)if [[ -n "$(BOOTSTRAPPER_VERSION)" && "$(PROJECT_NAME)" != "CPAN-Maker-Bootstrapper" ]]; then \
+	  if [[ "$(CMB_UPDATE_CHECK)" = "on" ]]; then \
+	    dist=$$(cpanm --info -l /dev/null 2>/dev/null CPAN::Maker::Bootstrapper || true); \
+	    if [[ "$$dist" =~ -([0-9.]+)\.tar\.gz$$ ]]; then \
+	      cpan_version="$${BASH_REMATCH[1]}"; \
+	      update_available=$$(current="$(BOOTSTRAPPER_VERSION)" cpan="$$cpan_version" perl -Mversion -e 'print version->parse($$ENV{cpan}) > version->parse($$ENV{current});'); \
+	      if [[ -n "$$update_available" ]]; then \
+	        echo "WARNING: CPAN::Maker::Bootstrapper $$cpan_version available! Run 'make upgrade'"; \
+	      else \
+	        echo "CPAN::Maker::Bootstrapper $(BOOTSTRAPPER_VERSION) is up-to-date with published version ($$cpan_version)."; \
+	      fi; \
 	    fi; \
+	  else \
+	    echo "CPAN::Maker::Bootstrapper update check skipped (CMB_UPDATE_CHECK=$(CMB_UPDATE_CHECK))."; \
+	  fi; \
+	  if [[ "$(CMB_VERSION_DRIFT)" != "ignore" ]]; then \
+	    cmb_md5sums="$$(perl -MFile::ShareDir=dist_file -e 'print dist_file(q{CPAN-Maker-Bootstrapper}, q{cmb_md5sums.txt});')"; \
+	    if md5sum --status --check "$$cmb_md5sums" 2>/dev/null; then \
+	      echo "CPAN::Maker::Bootstrapper (local) is up-to-date with the installed version."; \
+	    elif [[ "$(CMB_VERSION_DRIFT)" = "warn" ]]; then \
+	      echo "WARNING: CPAN::Maker::Bootstrapper (local) has drifted from the installed version. Run 'make update'"; \
+	    else \
+	      echo "ERROR: CPAN::Maker::Bootstrapper (local) has drifted from the installed version. Run 'make update', or set CMB_VERSION_DRIFT=warn (or =ignore) in config.mk to downgrade this check." >&2; \
+	      exit 1; \
+	    fi; \
+	  else \
+	    echo "CPAN::Maker::Bootstrapper drift check skipped (CMB_VERSION_DRIFT=ignore)."; \
 	  fi; \
 	fi

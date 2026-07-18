@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'File::Which'     => '0',
+        'Module::Starter' => '0',
+        'Path::Tiny'      => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Module-Starter-Protobuf-*' },

@@ -1,0 +1,13 @@
+^blib/
+^Makefile(\.old)?$
+^MYMETA\.
+^pm_to_blib$
+^.*\.o$
+^FF1\.c$
+^FF1\.o$
+^FF1\.bs$
+^\.git/
+^\.gitignore$
+^.*\.swp$
+^MANIFEST\.bak$
+^Crypt-FPE-FF1-.*\.tar\.gz$

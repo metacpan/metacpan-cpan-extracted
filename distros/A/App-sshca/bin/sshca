@@ -5,7 +5,7 @@ use experimental qw(signatures);
 use Syntax::Operator::In;
 
 use Digest;
-use Fcntl;
+use Fcntl qw(:flock O_RDONLY O_RDWR);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp;
@@ -205,14 +205,6 @@ sub cert_load_from_identity($id) {
     return cert_load_from_path($path);
 }
 
-#sub fingerprint_path($fp_or_cert) {
-#    my $fp = (ref  $fp_or_cert)
-#        ? $fp_or_cert->{...}
-#}
-
-#sub cert_load_from_fingerprint($fp) {
-#}
-
 sub _cert_save_identity_link($cert, $replace) {
     my $id_path = identity_path($cert);
     unlink $id_path if $replace and -e $id_path;
@@ -289,14 +281,19 @@ sub conf_curr_serial() {
     my $serialpath = opt( 'caserial' );
     sysopen(my $fh, $serialpath, O_RDONLY)
         or die "Unable to read current serial value; can't open '$serialpath': $!\n";
+    flock( $fh, LOCK_SH )
+        or die "Unable to lock the serial file for reading: $!\n";
+
     chomp( my $serial = <$fh> );
     return $serial;
 }
 
 sub conf_next_serial() {
     my $serialpath = opt( 'caserial' );
-    sysopen(my $fh, $serialpath, O_RDWR|O_EXLOCK)
+    sysopen(my $fh, $serialpath, O_RDWR)
         or die "Unable to generate new cert serial number; can't open '$serialpath': $!\n";
+    flock( $fh, LOCK_EX )
+        or die "Unable to lock the serial file for update: $!\n";
     chomp( my $serial = <$fh> );
     seek( $fh, SEEK_SET, 0 )
         or die "Unable to update certificate serial number: $!\n"; # back to start
@@ -368,13 +365,21 @@ sub ssh_cert_parse($cert) {
     my $fh = File::Temp->new;
     my $fn = $fh->filename;
 
-    say $fh $cert->{certkey};
+    my $certkey = cert_certkey( $cert );
+    say $fh $certkey;
     $fh->flush;
 
     my %rv;
     my $indent = '';
     my $multivalue = '';
-    for my $line (qx|ssh-keygen -q -L -f $fn|) {
+    my @lines = qx|ssh-keygen -q -L -f $fn|;
+    if ($?) {
+        my $code = $? >> 8;
+        my $id = cert_identity( $cert );
+        my $serial = cert_serial( $cert );
+        die "Failed to parse certificate '$id' (serial '$serial'); ssh-keygen exit code: $code\ncertificate: $certkey\n";
+    }
+    for my $line (@lines) {
         if ($multivalue) {
             if ($line =~ m/$indent\s+(.*)$/) {
                 push $rv{$multivalue}->@*, $1;
@@ -500,6 +505,10 @@ sub cmd_init(@args) {
 
 sub _validity_for_cert( $cert ) {
     return $options{validity} if defined $options{validity};
+    my $cert_validity = cert_validity( $cert );
+    return $cert_validity
+        if (defined $cert_validity
+            and $cert_validity =~ m/^[+-]/); # relative validity
     if (cert_type( $cert ) eq 'host') {
         return opt( 'hostcert_validity' );
     }
@@ -574,6 +583,8 @@ sub cmd_renew(@args) {
     my $new_serial  = conf_next_serial;
     my $renewed     = cert_renew( $cert, $new_serial );
     cert_validity( $renewed, _validity_for_cert( $renewed ) );
+    cert_identity( $renewed, $options{new_identity} )
+        if $options{new_identity};
     ssh_cert_issue( $renewed );
     cert_save( $renewed );
 
@@ -649,22 +660,60 @@ sub cmd_list(@args) {
     return ($matched ? 0 : 1);
 }
 
+sub _cleanup_remove_cert( $cert ) {
+    my $i = identity_path( $cert );
+    if (-s $i) {
+        my $loc = cert_local_path( $cert );
+        my $tgt = readlink( $i );
+        die "Unable to read symlink '$i': $!\n"
+            unless $tgt;
+
+        my $cert_link = File::Spec->catfile( File::Spec->updir, $loc );
+        say STDERR "$tgt == $cert_link" if $DEBUG;
+        if ($tgt eq $cert_link) {
+            if (not $options{'dry-run'}
+                and unlink( $i ) != 1) {
+                die "Unable to remove certificate identity path '$i': $!\n";
+            }
+        }
+    }
+
+    my $path = cert_path( $cert );
+    if (-e $path) {
+        if (-f $path) {
+            if (not $options{'dry-run'}
+                and unlink( $path ) != 1) {
+                die "Unable to remove certificate path '$path': $!\n";
+            }
+        }
+        else {
+            die "Failed to remove certificate '$path': file expected\n";
+        }
+    }
+}
+
 sub cmd_cleanup(@args) {
     my $now = gmtime();
     say "Dry-run cleanup\n" if $options{"dry-run"};
     map_certs(
         sub ($cert, $path, @) {
+            my $certkey = cert_certkey( $cert );
+            unless ( $certkey ) { # defined and non-zero length
+                my $serial = cert_serial( $cert );
+                say STDERR "Internal structure error: certificate '$serial' has no data  (path: $path)";
+                say "Removing certificate '$serial'";
+
+                _cleanup_remove_cert( $cert );
+                return;
+            }
+
+
             my $data = ssh_cert_parse( $cert );
             my $enddate = $data->{Valid}->{to};
             if ($enddate
                 and $enddate < $now) {
                 say "Removing expired cert with serial '$cert->{serial}'";
-                unless ($options{"dry-run"}) {
-                    my $p = cert_path( $cert );
-                    unless (unlink( $p ) == 1) {
-                        die "Unable to remove certificate path '$p' (reported: $path)";
-                    }
-                }
+                _cleanup_remove_cert( $cert );
             }
         });
 
@@ -721,8 +770,9 @@ my %cmd_opts = (
                %common_opts },
     renew =>  { 'serial'      => sub { $options{renewal} = 'serial' },
                 'fingerprint' => sub { $options{renewal} = 'fingerprint'; die "Fingerprint renewals are planned\n" },
-                'identity'    => sub { $options{renewal} = 'identity'; },
-                'validity=s'  => \$options{certvalidity},
+                'identity'       => sub { $options{renewal} = 'identity'; },
+                'new-identity=s' => \$options{new_identity},
+                'validity=s'     => \$options{certvalidity},
                 %common_opts },
     revoke => { 'serial'      => sub { $options{renewal} = 'serial' },
                 'fingerprint' => sub { $options{renewal} = 'fingerprint'; die "Fingerprint renewals are planned\n" },
@@ -767,7 +817,7 @@ sshca - Minimalistic SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.8
+version 0.0.10
 
 =head1 SYNOPSIS
 

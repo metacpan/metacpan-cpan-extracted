@@ -5,18 +5,18 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-04'; # DATE
+our $DATE = '2026-07-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.036'; # VERSION
+our $VERSION = '1.038'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
 gen_csv_util(
     name => 'csv_convert_to_hash',
     summary => 'Return a hash of field names as keys and first data row as values',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-_
+MARKDOWN
 
     add_args => {
         rownum => {
@@ -77,7 +77,7 @@ App::CSVUtils::csv_convert_to_hash - Return a hash of field names as keys and fi
 
 =head1 VERSION
 
-This document describes version 1.036 of App::CSVUtils::csv_convert_to_hash (from Perl distribution App-CSVUtils), released on 2025-02-04.
+This document describes version 1.038 of App::CSVUtils::csv_convert_to_hash (from Perl distribution App-CSVUtils), released on 2026-07-09.
 
 =head1 FUNCTIONS
 
@@ -141,6 +141,22 @@ Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--input-tsv> option.
+
+=item * B<input_skip_before_num_data_rows> => I<uint>
+
+Skip a certain number of data rows for each input file.
+
+This option can be used to skip the first certain number of data rows. If set to
+1, for example, will only process 1 data row for each input file. This option is
+a convenient alternative to composing with L<csv-tail>.
+
+=item * B<input_skip_file_after_num_data_rows> => I<uint>
+
+Limit processing each input file to this number of data rows.
+
+This option can be used to limit processing only to a certain number of data
+rows. If set to 1, for example, will only process 1 data row for each input
+file. This option is a convenient alternative to composing with L<csv-head>.
 
 =item * B<input_skip_num_lines> => I<posint>
 
@@ -223,7 +239,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -12,6 +12,7 @@ t/03-StorageContract.t
 t/04-Backend.t
 t/05-Concurrency.t
 t/06-Stream.t
+t/07-OnlineSchema.t
 xt/00-author-pod-syntax.t
 xt/01-author-license-metadata.t
 xt/02-author-pod-coverage.t

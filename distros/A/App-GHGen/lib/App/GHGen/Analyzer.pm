@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 	get_cache_suggestion
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -31,7 +31,51 @@ App::GHGen::Analyzer - Analyze GitHub Actions workflows
 =head2 find_workflows()
 
 Find all workflow files in .github/workflows directory.
-Returns a list of Path::Tiny objects.
+Returns a sorted list of L<Path::Tiny> objects.
+
+=head3 Purpose
+
+Discover every GitHub Actions workflow file under C<.github/workflows> in
+the current working directory.
+
+=head3 Arguments
+
+None.
+
+=head3 Returns
+
+A sorted list of L<Path::Tiny> objects, one per C<.yml> or C<.yaml> file
+found.  Returns an empty list when the directory does not exist or is empty.
+
+=head3 Side Effects
+
+None.  Performs read-only filesystem access.
+
+=head3 Usage Example
+
+    use App::GHGen::Analyzer qw(find_workflows);
+    chdir '/path/to/repo';
+    my @wfs = find_workflows();
+    say $_->basename for @wfs;
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    # No parameters.
+
+=head4 Output
+
+    { type => 'array', element => { isa => 'Path::Tiny' } }
+
+=head3 FORMAL SPECIFICATION
+
+    FindWorkflows : → seq Path
+
+    dir ≔ .github/workflows
+    FindWorkflows ≡
+        ¬dir.exists ∨ ¬dir.is_dir  →  ⟨⟩
+        | otherwise  →  sort(lex) { f ∈ dir.children ∣ f.name =~ /\.ya?ml$/i }
 
 =cut
 
@@ -46,7 +90,96 @@ sub find_workflows() {
 
 Analyze a workflow hash for issues. Returns array of issue hashes.
 
-Each issue has: type, severity, message, fix (optional)
+Each issue has: C<type>, C<severity>, C<message>, and an optional C<fix>.
+
+=head3 Purpose
+
+Inspect a parsed GitHub Actions workflow and return a list of detected
+issues covering performance, security, cost, and maintenance concerns.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$workflow> (HashRef, required)
+
+A hash reference representing the parsed workflow (e.g. from C<YAML::XS::LoadFile>).
+Must contain at least a C<jobs> key whose value is a hash of job definitions.
+
+=item C<$filename> (Str, required)
+
+The filename of the workflow, used only as context in issue messages.
+
+=back
+
+=head3 Returns
+
+A list (not an array reference) of issue hash references.  Each issue has:
+
+    {
+        type     => Str,  # 'performance' | 'security' | 'cost' | 'maintenance'
+        severity => Str,  # 'high' | 'medium' | 'low'
+        message  => Str,
+        fix      => Str,  # optional: suggested YAML snippet
+    }
+
+Returns an empty list when no issues are detected.
+
+=head3 Side Effects
+
+None.  Pure function; does not modify its arguments.
+
+=head3 Usage Example
+
+    use App::GHGen::Analyzer qw(analyze_workflow);
+    use YAML::XS qw(LoadFile);
+
+    my $wf     = LoadFile('.github/workflows/ci.yml');
+    my @issues = analyze_workflow($wf, 'ci.yml');
+    for my $issue (@issues) {
+        say "$issue->{severity}: $issue->{message}";
+    }
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        workflow => { type => 'hashref', required => 1 },
+        filename => { type => 'scalar',  required => 1 },
+    }
+
+=head4 Output
+
+    {
+        type    => 'array',
+        element => {
+            type => 'hashref',
+            keys => {
+                type     => { type => 'scalar' },
+                severity => { type => 'scalar' },
+                message  => { type => 'scalar' },
+                fix      => { type => 'scalar', optional => 1 },
+            },
+        },
+    }
+
+=head3 FORMAL SPECIFICATION
+
+    Issue ≔ { type: IssueType, severity: Severity, message: ℤ*, fix?: ℤ* }
+    IssueType  ≔ performance | security | cost | maintenance
+    Severity   ≔ high | medium | low
+
+    analyze_workflow : Workflow × ℤ* → seq Issue
+
+    ∀ w: Workflow, f: ℤ*:
+      ¬has_caching(w)           ⇒ performance∈medium ∈ result(w,f)
+      find_unpinned_actions(w)≠∅ ⇒ security∈high     ∈ result(w,f)
+      find_outdated_actions(w)≠∅ ⇒ maintenance∈medium ∈ result(w,f)
+      has_broad_triggers(w)     ⇒ cost∈medium        ∈ result(w,f)
+      ¬w.concurrency            ⇒ cost∈low           ∈ result(w,f)
+      has_outdated_runners(w)   ⇒ maintenance∈low    ∈ result(w,f)
+      ∃ j∈w.jobs: ¬j.timeout-minutes ⇒ performance∈low ∈ result(w,f)
 
 =cut
 
@@ -148,6 +281,58 @@ for my $job_name (keys %$jobs) {
 =head2 get_cache_suggestion($workflow)
 
 Generate a caching suggestion based on detected project type.
+
+=head3 Purpose
+
+Inspect a workflow for known package-manager commands and return a ready-to-paste
+C<actions/cache> YAML snippet that matches the detected ecosystem.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$workflow> (HashRef, required)
+
+A parsed workflow hash.  The function inspects each job's C<steps[].run>
+commands to detect C<npm>, C<pip>, C<cargo>, or C<bundle>.
+
+=back
+
+=head3 Returns
+
+A non-empty string.  When the ecosystem is recognised the string is an
+C<actions/cache> YAML step snippet; otherwise a generic guidance message.
+
+=head3 Side Effects
+
+None.  Pure function.
+
+=head3 Usage Example
+
+    my $suggestion = get_cache_suggestion($workflow);
+    say $suggestion;
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    { workflow => { type => 'hashref', required => 1 } }
+
+=head4 Output
+
+    { type => 'scalar' }
+
+=head3 FORMAL SPECIFICATION
+
+    Ecosystem ≔ npm | pip | cargo | bundler | unknown
+
+    get_cache_suggestion : Workflow → ℤ*
+
+    ecosystem(w) = npm     ⇒ result contains ~/.npm cache path
+    ecosystem(w) = pip     ⇒ result contains ~/.cache/pip path
+    ecosystem(w) = cargo   ⇒ result contains ~/.cargo path
+    ecosystem(w) = bundler ⇒ result contains vendor/bundle path
+    ecosystem(w) = unknown ⇒ result is a generic guidance message
 
 =cut
 

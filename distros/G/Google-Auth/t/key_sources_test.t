@@ -18,9 +18,8 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
-use Test::Deep;
 
-use JSON::XS;
+use JSON::MaybeXS;
 use Test::LWP::UserAgent;
 use Test::More;
 
@@ -185,7 +184,7 @@ my $cert2_pem = join("\n",
 
 my ( $id1, $id2 ) = ( '1234', '5678' );
 
-my $coder = JSON::XS->new->ascii->pretty->allow_nonref;
+my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 
 $certs_body = {
     $id1 => $cert1_pem,

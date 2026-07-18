@@ -19,8 +19,9 @@ sub get_token {
 package Google::gRPC::Client;
 BEGIN { $INC{'Google/gRPC/Client.pm'} = 1; }
 sub new {
-    my ($class, %args) = @_;
-    return bless \%args, $class;
+    my $class = shift;
+    my $args = ( @_ == 1 && ref($_[0]) eq 'HASH' ) ? $_[0] : { @_ };
+    return bless $args, $class;
 }
 sub call {
     my ($self, $args) = @_;

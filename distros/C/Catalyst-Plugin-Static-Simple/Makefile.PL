@@ -32,13 +32,12 @@ my %META = (
   },
   resources => {
     repository => {
-      url => 'git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Static-Simple.git',
-      web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Plugin-Static-Simple.git',
+      url => 'https://github.com/perl-catalyst/Catalyst-Plugin-Static-Simple.git',
+      web => 'https://github.com/perl-catalyst/Catalyst-Plugin-Static-Simple',
       type => 'git',
     },
     bugtracker => {
-      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Static-Simple',
-      mailto => 'bug-Catalyst-Plugin-Static-Simple@rt.cpan.org',
+      web => 'https://github.com/perl-catalyst/Catalyst-Plugin-Static-Simple/issues',
     },
     license => [ 'http://dev.perl.org/licenses/' ],
   },

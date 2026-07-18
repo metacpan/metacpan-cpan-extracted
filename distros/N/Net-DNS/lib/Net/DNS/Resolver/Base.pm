@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 2049 2026-06-08 10:44:36Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 2057 2026-07-16 10:05:04Z willem $)[2];
 
 
 #
@@ -862,15 +862,15 @@ sub _create_tcp_socket {
 		$self->_diag('socket disconnected (trying to connect)');
 	}
 
+	my $port = $self->{port};
 	Carp::confess 'Insecure dependency while running with -T switch'
-			if TAINT && Scalar::Util::tainted( $ip || $self->{port} );
+			if TAINT && Scalar::Util::tainted("$ip $port");
 
-	my $ip6_addr = IPv6 && _ipv6($ip);
 	$socket = IO::Socket::IP->new(
-		LocalAddr	 => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
+		LocalAddr	 => _ipv6($ip) ? $self->{srcaddr6} : $self->{srcaddr4},
 		LocalPort	 => $self->{srcport},
 		PeerAddr	 => $ip,
-		PeerPort	 => $self->{port},
+		PeerPort	 => $port,
 		Proto		 => 'tcp',
 		Timeout		 => $self->{tcp_timeout},
 		GetAddrInfoFlags => AI_NUMERICHOST,
@@ -878,17 +878,16 @@ sub _create_tcp_socket {
 		)
 			if USE_SOCKET_IP;
 
-	unless ( USE_SOCKET_IP or $ip6_addr ) {
-		$socket = IO::Socket::INET->new(
-			LocalAddr => $self->{srcaddr4},
-			LocalPort => $self->{srcport} || undef,
-			PeerAddr  => $ip,
-			PeerPort  => $self->{port},
-			Proto	  => 'tcp',
-			Timeout	  => $self->{tcp_timeout},
-			@sockopt
-			);
-	}
+	$socket = IO::Socket::INET->new(
+		LocalAddr => $self->{srcaddr4},
+		LocalPort => $self->{srcport} || undef,
+		PeerAddr  => $ip,
+		PeerPort  => $port,
+		Proto	  => 'tcp',
+		Timeout	  => $self->{tcp_timeout},
+		@sockopt
+		)
+			unless USE_SOCKET_IP;
 
 	$self->{persistent}{$sock_key} = $socket if $self->{persistent_tcp};
 	return $socket;
@@ -902,9 +901,8 @@ sub _create_udp_socket {
 	my $sock_key = "UDP[$ip]";
 	return $socket if $socket = $self->{persistent}{$sock_key};
 
-	my $ip6_addr = IPv6 && _ipv6($ip);
 	$socket = IO::Socket::IP->new(
-		LocalAddr	 => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
+		LocalAddr	 => _ipv6($ip) ? $self->{srcaddr6} : $self->{srcaddr4},
 		LocalPort	 => $self->{srcport},
 		Proto		 => 'udp',
 		Type		 => SOCK_DGRAM,
@@ -913,7 +911,7 @@ sub _create_udp_socket {
 		)
 			if USE_SOCKET_IP;
 
-	unless ( USE_SOCKET_IP or $ip6_addr ) {
+	unless ( USE_SOCKET_IP or _ipv6($ip) ) {
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
 			LocalPort => $self->{srcport} || undef,

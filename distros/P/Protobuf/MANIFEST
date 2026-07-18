@@ -150,7 +150,6 @@ t/900_integration.t
 t/98-generated.t
 t/98-protoc-plugin.t
 t/980_generated.t
-t/99-dataproc.t
 t/c/benchmark/obj_cache.c
 t/c/benchmark/serialize.c
 t/c/c_test_config.json

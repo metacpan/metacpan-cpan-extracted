@@ -60,7 +60,6 @@
             "Capture::Tiny" : "0",
             "File::Spec" : "0",
             "Path::Tiny" : "0",
-            "Test::MockModule" : "0",
             "Test::More" : "0"
          }
       }
@@ -73,6 +72,6 @@
          "web" : "https://github.com/LLC-Technologies-Collier/protobuf"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

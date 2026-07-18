@@ -9,6 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Module/Generate/Hash.pm',
     ABSTRACT_FROM    => 'lib/Module/Generate/Hash.pm',
     LICENSE          => 'artistic_2',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

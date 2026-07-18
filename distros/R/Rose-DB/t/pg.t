@@ -15,7 +15,7 @@ BEGIN
   }
   else
   {
-    Test::More->import(tests => 295);
+    Test::More->import(tests => 296);
   }
 }
 
@@ -566,4 +566,20 @@ SELECT_LOCK: {
 
   $sql = $db->format_select_lock('Rose::DB_Test::Object', { type => 'shared' });
   is($sql, 'FOR SHARE', 'shared');
+}
+
+REFINE_FK_INFO: {
+  Rose::DB->register_db(
+      type     => 'refine_fk',
+      driver   => 'pg',
+      database => 'test',
+    );
+  
+  $db = Rose::DB->new('refine_fk');
+
+  my $fk_info = { FK_NAME => '"key"' };
+
+  $db->refine_dbi_foreign_key_info($fk_info);
+
+  is($fk_info->{FK_NAME}, 'key', 'refine_dbi_foreign_key_info 1');
 }

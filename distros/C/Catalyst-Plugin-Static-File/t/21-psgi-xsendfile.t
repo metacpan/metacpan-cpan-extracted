@@ -2,10 +2,12 @@
 
 use Test::Most;
 
+eval "use Plack::Middleware::XSendfile";
+plan skip_all => "Plack::Middleware::XSendfile is not installed" if $@;
+
 use FindBin qw/ $Bin /;
 use Path::Tiny;
 use Plack::Builder;
-use Plack::Middleware::XSendfile;
 use Test::WWW::Mechanize::PSGI;
 
 use lib 't/lib';

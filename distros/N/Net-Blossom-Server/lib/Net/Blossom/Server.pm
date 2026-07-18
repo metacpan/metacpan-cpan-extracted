@@ -24,7 +24,7 @@ use JSON ();
 use Scalar::Util qw(blessed);
 use URI ();
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
 my $JSON = JSON->new->utf8;
@@ -1327,7 +1327,7 @@ into C<Net::Blossom::Server::Request> objects and translate
 C<Net::Blossom::Server::Response> objects back to their gateway format. It uses
 shared protocol types from L<Net::Blossom>, which also provides the client.
 Storage implementations are published under the
-L<Net::Blossom::Server::Backend namespace|https://metacpan.org/search?q=module%3ANet%3A%3ABlossom%3A%3AServer%3A%3ABackend+NOT+distribution%3ANet-Blossom-Server>
+L<Net::Blossom::Server::Backend namespace|https://metacpan.org/search?q=module%3ANet%3A%3ABlossom%3A%3AServer%3A%3ABackend+level%3A5+NOT+distribution%3ANet-Blossom-Server>
 and implement L<Net::Blossom::Server::Storage>.
 
 Server support lives in a separate CPAN distribution so client users do not need

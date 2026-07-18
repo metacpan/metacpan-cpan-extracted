@@ -6,7 +6,7 @@ Protobuf::WKT::Struct - Mixin for google.protobuf.Struct, Value, and ListValue
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ Populates the C<Value> message from a Perl scalar, ARRAY ref, or HASH ref.
 
 =item * C<undef>: sets C<null_value>
 
-=item * HASH ref: sets C<struct_value> (recursively converted)
+=item * HASH ref: sets explicit value fields if keys like C<string_value>, C<number_value>, C<bool_value>, C<null_value>, C<struct_value>, or C<list_value> are present; otherwise sets C<struct_value> (recursively converted)
 
 =item * ARRAY ref: sets C<list_value> (recursively converted)
 
@@ -212,9 +212,27 @@ sub get_injected_methods {
         my $rt = reftype($val) || '';
         if (!defined $val) { $self->null_value(0); }
         elsif ($rt eq 'HASH') {
-            my $s = 'Google::Protobuf::Struct::Struct'->new();
-            $s->from_perl($val);
-            $self->struct_value($s);
+            if (exists $val->{string_value}) {
+                $self->string_value($val->{string_value});
+            } elsif (exists $val->{number_value}) {
+                $self->number_value($val->{number_value});
+            } elsif (exists $val->{bool_value}) {
+                $self->bool_value($val->{bool_value});
+            } elsif (exists $val->{null_value}) {
+                $self->null_value($val->{null_value});
+            } elsif (exists $val->{struct_value}) {
+                my $s = 'Google::Protobuf::Struct::Struct'->new();
+                $s->from_perl($val->{struct_value});
+                $self->struct_value($s);
+            } elsif (exists $val->{list_value}) {
+                my $l = 'Google::Protobuf::Struct::ListValue'->new();
+                $l->from_perl($val->{list_value});
+                $self->list_value($l);
+            } else {
+                my $s = 'Google::Protobuf::Struct::Struct'->new();
+                $s->from_perl($val);
+                $self->struct_value($s);
+            }
         }
         elsif ($rt eq 'ARRAY') {
             my $l = 'Google::Protobuf::Struct::ListValue'->new();

@@ -3,7 +3,7 @@ package App::ZofCMS::Plugin::Session;
 use warnings;
 use strict;
 
-our $VERSION = '1.001009'; # VERSION
+our $VERSION = '1.001010'; # VERSION
 
 use Storable (qw/freeze thaw/);
 use DBI;

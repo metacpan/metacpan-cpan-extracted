@@ -1,17 +1,22 @@
-Revision history for Google-Auth-Library-Perl
+Revision history for Google-Auth
 
-0.04    2025-12-21
-    - Refactored project structure: core Google::Auth code moved into google-auth/ directory.
-    - Added protobuf submodule containing a fork of the official Protocol Buffers repository.
-    - Vendored protobuf is currently based on v22.3.
-    - Perl implementation for Protocol Buffers is ongoing within protobuf/perl/.
+0.03    Fri Jul 17 2026
+        [OpenSSL 3.0 & Cryptographic Modernization]
+        - Modernized XS.xs C bindings to use OpenSSL 3.0 high-level EVP_PKEY_fromdata and OSSL_PARAM_BLD APIs in load_rsa_pubkey and load_ec_pubkey, eliminating all OpenSSL 3.0 deprecation warnings.
+        - Retained backward-compatible fallback paths for OpenSSL 1.1.1 installations.
+        - Properly indented C preprocessor directives inside XS CODE: blocks for xsubpp parser compatibility.
 
-0.03    2023-06-22
-	Nothing to report at this time, but work is planned.
+        [Authentication & Workload Identity Federation]
+        - Expanded Workload Identity Federation (WIF) support with Pluggable credentials (Google::Auth::ExternalAccountCredentials::Pluggable) and AWS IAM authentication (Google::Auth::ExternalAccountCredentials::Aws).
+        - Hardened Service Account, Impersonated Credentials, and Compute Engine metadata server token refresh loops.
+
+        [Architecture & Versioning]
+        - Upgraded distribution version to 0.03 (lib/Google/Auth.pm).
+        - Streamlined package versioning to single entrypoint $VERSION.
 
 0.02    2022-03-16
-        Release approved by Google OSPO
+        - Release approved by Google OSPO
 
 0.01    2022-03-02
-        First version, including a translation from ruby into lib/Google/Auth/IDTokens/KeySources.pm
-        Included are also the tests translated from ruby into t/key_sources_test.t and expanded upon
+        - First version, including translation from Ruby into lib/Google/Auth/IDTokens/KeySources.pm
+        - Included tests translated from Ruby into t/key_sources_test.t and expanded upon

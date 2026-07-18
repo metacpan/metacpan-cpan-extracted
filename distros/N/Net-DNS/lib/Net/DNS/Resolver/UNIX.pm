@@ -2,7 +2,7 @@ package Net::DNS::Resolver::UNIX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: UNIX.pm 2046 2026-06-01 13:23:01Z willem $)[2];
+our $VERSION = (qw$Id: UNIX.pm 2053 2026-07-07 10:18:23Z willem $)[2];
 
 
 =head1 NAME
@@ -39,13 +39,14 @@ sub _init {
 
 sub _nosh {				## shell-free backtick emulation
 	my ( $prog, @arg ) = @_;
-	if ( open( PIPE, '-|' ) ) {
-		my @retval = <PIPE>;
-		close PIPE;
+	if ( open( my $pipe, '-|' ) ) {
+		my @retval = ( <$pipe>, '' );
+		close $pipe;
 		return @retval;
 	} else {
-		$ENV{PATH} = '/bin:/usr/bin';
-		exec $prog, @arg;
+		local $SIG{__WARN__} = sub { };
+		warn 'child process fails without warning';
+		eval { exec $prog, @arg };
 		exit;			## uncoverable statement
 	}
 }

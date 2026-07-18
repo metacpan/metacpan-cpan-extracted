@@ -84,7 +84,7 @@ Version 0.69
 
 # We'll have 1.x versions only after minfree() has a baseline implementation.
 # Please run perl Makefile.PL after changing the version here.
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 POSIX::setlocale(&POSIX::LC_ALL, 'C');
 $ENV{PATH} = '/usr/bin:/bin';
@@ -118,10 +118,10 @@ my @builtin_mime_helpers = (
 
   # Requires: xz bzip2 gzip unzip lzip
   [ 'application=x-lzip',    qr{(?:lz)},           [qw(/usr/bin/lzip -dc       %(src)s)], qw(> %(destfile)s) ],
-  [ 'application=xz',        qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/lzcat)],  qw(< %(src)s       > %(destfile)s) ],
-  [ 'application=xz',        qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/xz   -dc       %(src)s)], qw(> %(destfile)s) ],
-  [ 'application=lzma',      qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/lzcat)],  qw(< %(src)s       > %(destfile)s) ],
-  [ 'application=lzma',      qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/xz   -dc       %(src)s)], qw(> %(destfile)s) ],
+  [ 'application=xz',        qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/lzcat --memlimit-decompress=60%)],  qw(< %(src)s       > %(destfile)s) ],
+  [ 'application=xz',        qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/xz   -dc --memlimit-decompress=60% %(src)s)], qw(> %(destfile)s) ],
+  [ 'application=lzma',      qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/lzcat --memlimit-decompress=60%)],  qw(< %(src)s       > %(destfile)s) ],
+  [ 'application=lzma',      qr{(?:xz|lz(ma)?)},   [qw(/usr/bin/xz   -dc --memlimit-decompress=60% %(src)s)], qw(> %(destfile)s) ],
   [ 'application=bzip2',     qr{bz2},           [qw(/usr/bin/bunzip2 -dc -f    %(src)s)], qw(> %(destfile)s) ],
   [ 'application=gzip',      qr{(?:gz|Z)},         [qw(/usr/bin/gzip -dc -f    %(src)s)], qw(> %(destfile)s) ],
   [ 'application=compress',  qr{(?:gz|Z)},         [qw(/usr/bin/gzip -dc -f    %(src)s)], qw(> %(destfile)s) ],
@@ -156,8 +156,8 @@ my @builtin_mime_helpers = (
   [ 'application=tar+bzip2', qr{(?:tar\.bz2|tbz)}, [\&_locate_tar, qw(-jxf %(src)s)] ],
   [ 'application=tar+gzip',  qr{t(?:ar\.gz|gz)},   [\&_locate_tar, qw(-zxf %(src)s)] ],
 #  [ 'application=tar+gzip',  qr{t(?:ar\.gz|gz)},      [qw(/home/testy/src/C/slowcat)], qw(< %(src)s |), [\&_locate_tar, qw(-zxf -)] ],
-  [ 'application=tar+lzma',  qr{tar\.(?:xz|lzma|lz)}, [qw(/usr/bin/lzcat)], qw(< %(src)s |), [\&_locate_tar, qw(-xf -)] ],
-  [ 'application=tar+lzma',  qr{tar\.(?:xz|lzma|lz)}, [qw(/usr/bin/xz -dc -f %(src)s)], '|', [\&_locate_tar, qw(-xf -)] ],
+  [ 'application=tar+lzma',  qr{tar\.(?:xz|lzma|lz)}, [qw(/usr/bin/lzcat --memlimit-decompress=60%)], qw(< %(src)s |), [\&_locate_tar, qw(-xf -)] ],
+  [ 'application=tar+lzma',  qr{tar\.(?:xz|lzma|lz)}, [qw(/usr/bin/xz -dc --memlimit-decompress=60% -f %(src)s)], '|', [\&_locate_tar, qw(-xf -)] ],
   [ 'application=rpm',       qr{(?:src\.r|s|r)pm}, [qw(/usr/bin/rpm2cpio %(src)s)], '|', [\&_locate_cpio_i] ],
   [ 'application=cpio',      qr{cpio},             [\&_locate_cpio_i], qw(< %(src)s) ],
 
@@ -583,6 +583,38 @@ sub new
   $obj{maxfilesize} = _bytes_unit($obj{maxfilesize});
   $ENV{'FILE_UNPACK2_MAXFILESIZE'} = $obj{maxfilesize};	# so that children see the same.
 
+  # Kill a mime-helper that makes no I/O progress for this many seconds, so a stuck helper
+  # (blocked on a fifo, deadlocked pipe, ...) can never hang unpacking forever. 0 disables.
+  # An env value of "0" must disable it, so we cannot use the ||= idiom here.
+  unless (defined $obj{stall_timeout})
+    {
+      $obj{stall_timeout} = defined $ENV{'FILE_UNPACK2_STALL_TIMEOUT'}
+        ? $ENV{'FILE_UNPACK2_STALL_TIMEOUT'} : 120;
+    }
+  $obj{stall_timeout} += 0;	# numeric seconds
+  $ENV{'FILE_UNPACK2_STALL_TIMEOUT'} = $obj{stall_timeout};	# so that children see the same.
+
+  # Opt-in absolute caps against breadth/slow bombs. All default OFF (0), because legitimate inputs
+  # can be huge (e.g. a 30G chromium tarball) and these would clip them. Enable per-deployment.
+  #   max_files       - stop after this many files have been unpacked in one top-level run
+  #   max_total_bytes - stop after this many bytes have been processed in one top-level run
+  #   helper_timeout  - absolute wall-clock per mime helper (catches "slow bombs" that keep
+  #                     progressing and so never trip the no-progress stall watchdog)
+  # Read env for opt-in defaults, but (unlike maxfilesize/RLIMIT) do NOT write it back: these caps
+  # are enforced in-process during the recursion, so a process-global env value would leak between
+  # File::Unpack2 instances (e.g. across packages in a long-lived worker).
+  for my $cap (qw(max_files max_total_bytes helper_timeout))
+    {
+      my $env = 'FILE_UNPACK2_' . uc($cap);
+      $obj{$cap} = defined $ENV{$env} ? $ENV{$env} : 0 unless defined $obj{$cap};
+    }
+  # Only max_total_bytes takes a size suffix (1G/500M/...). max_files (a count) and helper_timeout
+  # (seconds) are plain numbers - do NOT run them through _bytes_unit, or "30m" would be read as
+  # 30 megabytes/megaseconds instead of what the user meant.
+  $obj{max_total_bytes} = _bytes_unit($obj{max_total_bytes});
+  $obj{max_files}      += 0;
+  $obj{helper_timeout} += 0;
+
   mkpath($obj{destdir}); # abs_path is unreliable if destdir does not exist
   $obj{destdir} = Cwd::fast_abs_path($obj{destdir});
   $obj{destdir} =~ s{(.)/+$}{$1}; #  assert no trailing '/'.
@@ -860,6 +892,21 @@ sub unpack
       return 1;
     }
 
+  # Opt-in breadth-bomb caps (default off). Stop descending once a limit is reached, but do it
+  # gracefully - log once, then quietly skip the rest so the run still finishes with a valid log.
+  if (   ($self->{max_files}       and ($self->{file_count}||0)  >= $self->{max_files})
+      or ($self->{max_total_bytes} and ($self->{total_bytes}||0) >= $self->{max_total_bytes}))
+    {
+      unless ($self->{_capped}++)
+        {
+	  my $why = ($self->{max_files} and ($self->{file_count}||0) >= $self->{max_files})
+	    ? "max_files=$self->{max_files}" : "max_total_bytes=$self->{max_total_bytes}";
+	  warn "File::Unpack2: $why reached - skipping remaining files\n";
+	  push @{$self->{error}}, "resource cap reached ($why); ";
+	}
+      return 1;
+    }
+
   if ($archive !~ m{^/} or $archive !~ m{^\Q$self->{destdir}\E/})
     {
       # Cwd::fast_abs_path($archive) not only makes nice absolute paths, but it also expands 
@@ -905,6 +952,8 @@ sub unpack
       #          how do we assert, that this code only runs at the start,
       #          and not once again at the end?
       $self->{inside_archives} = 0;
+      $self->{total_bytes}     = 0;    # for the opt-in max_total_bytes cap
+      $self->{_capped}         = 0;
       $self->{json} ||= JSON->new()->ascii(1);	# used often, create it unconditionally here and once.
       $self->{iput} = $archive;
       $self->{progress_tstamp} = $start_time;
@@ -988,8 +1037,8 @@ sub unpack
                   $self->{skipped}{symlink}++;
                 }
               elsif (-f $new_in or -d _)
-                { 
-                  $self->unpack($new_in, $new_destdir);
+                {
+                  $self->_safe_unpack($new_in, $new_destdir);
                 }
 	      else
 	        {
@@ -1010,6 +1059,7 @@ sub unpack
           !defined($self->{done}{$archive}))
 	{
           $self->_chmod_add($archive, @{$self->{readable_file_modes}});
+	  $self->{total_bytes} += (-s $archive || 0);    # for the opt-in max_total_bytes cap
 
 	  my $m = $self->mime($archive);
 	  my ($h, $more) = $self->find_mime_helper($m);
@@ -1161,11 +1211,11 @@ sub unpack
 		      local $self->{mime_orcish};
 		      local $self->{mime_helper};
 
-		      $self->unpack($unpacked, $newdestdir);
+		      $self->_safe_unpack($unpacked, $newdestdir);
 		    }
 		  else
 		    {
-		      $self->unpack($unpacked, $newdestdir);
+		      $self->_safe_unpack($unpacked, $newdestdir);
 		    }
                   $self->{progress_tstamp} = time;
 		  $self->{inside_archives}--;
@@ -1284,7 +1334,22 @@ sub run
   $opt->{out} ||= sub { print "O: ($cmdname) @_\n"; };
   $opt->{err} ||= sub { print "E: ($cmdname) @_\n"; };
 
-  my $has_i_redir = 0; 
+  # When a watchdog is active: (1) treat ANY helper output as progress - pipes/sockets have no fd
+  # "pos" for the stall detector to see, so a helper streaming to a pipe would otherwise look
+  # stalled and be killed; (2) run each helper in its own process group so _kill_family can reap the
+  # whole family (including grandchildren) instead of leaving a pipe-holder that hangs finish().
+  if ($opt->{stall_timeout} or $opt->{helper_timeout})
+    {
+      for my $ch (qw(out err))
+        {
+	  next unless ref $opt->{$ch} eq 'CODE';    # leave file/handle redirects (e.g. '/dev/null') alone
+	  my $orig = $opt->{$ch};
+	  $opt->{$ch} = sub { $opt->{last_progress} = time; $orig->(@_) };
+	}
+      $opt->{init} ||= sub { setpgrp(0, 0) };    # builtin; POSIX::setpgrp is unimplemented on modern perl
+    }
+
+  my $has_i_redir = 0;
   my $has_o_redir = 0;
   my $has_e_redir = 0;
 
@@ -1334,6 +1399,18 @@ sub run
   my $h = eval { IPC::Run::start @run; };
   return wantarray ? (undef, $@) : undef unless $h;
 
+  # Each helper stage put itself in its own process group (setpgrp in init), so its PID is its
+  # pgid. Capture them now: killing these groups later reaps grandchildren even after a stage exits
+  # and its children reparent to init (they keep the group). Guarded - falls back to the live
+  # descendant walk if IPC::Run's internals ever change.
+  my @pgids;
+  if ($opt->{stall_timeout} or $opt->{helper_timeout})
+    {
+      @pgids = eval { grep { $_ and $_ > 1 } map { $_->{PID} } @{$h->{KIDS} || []} };
+    }
+
+  my $killed  = 0;
+  my $started = time;
   while ($h->pumpable)
     {
       # eval {} guards against 'process ended prematurely' errors.
@@ -1342,15 +1419,31 @@ sub run
       if ($t && $t->is_expired)
         {
 	  $t->{has_fired}++;
-	  $opt->{prog}->($h, $opt);
+	  $opt->{prog}->($h, $opt) if $opt->{prog};
+	  # Absolute per-helper cap (opt-in) catches "slow bombs" that always make progress and so
+	  # never trip the no-progress stall watchdog. Off by default.
+	  if (!$opt->{stalled} and $opt->{helper_timeout} and time - $started >= $opt->{helper_timeout})
+	    {
+	      $opt->{stalled} = "helper timeout: no completion within $opt->{helper_timeout}s";
+	    }
+	  if ($opt->{stalled})
+	    {
+	      # A stalled helper (blocked on a fifo, deadlocked pipe, slow bomb, ...) would pump
+	      # forever. Kill its whole family so pumpable() clears, then stop.
+	      _kill_family($h, \@pgids);
+	      $killed = 1;
+	      last;
+	    }
 	  $t->start($opt->{every});
 	}
     }
-  $h->finish;
+  # finish() throws when a child died on a signal (our kill), so guard it on the killed path only,
+  # keeping the normal path's behaviour unchanged.
+  if ($killed) { eval { $h->finish } } else { $h->finish }
   $opt->{finished} = 1;
 
   ## call it once more, to get the 100% printout, or somthing else...
-  $opt->{prog}->($h, $opt) if $t->{has_fired};
+  $opt->{prog}->($h, $opt) if $opt->{prog} && $t && $t->{has_fired};
 
   return wantarray ? $h->full_results : $h->result;
 }
@@ -1486,14 +1579,36 @@ sub _run_mime_helper
 
 
   my $run_error = undef;	# we capture the first error line for the logfile.
-  my @r = $self->run(@cmd, 
-    {
-      debug => ($self->{verbose} > 2) ? $self->{verbose} - 2 : 0, 
-      watch => $args->{src}, every => 5, fu_obj => $self, mime_helper => $h, 
+  # Watchdog cadence: tick several times within the smaller of the two timeouts so both the
+  # no-progress stall and the absolute helper_timeout are caught promptly; default to the historic 5s.
+  my $stall_timeout = $self->{stall_timeout}  || 0;
+  my $ht            = $self->{helper_timeout} || 0;
+  my $window        = $stall_timeout;
+  $window = $ht if $ht and (!$window or $ht < $window);
+  my $every = 5;
+  if ($window) { $every = int($window / 4); $every = 1 if $every < 1; $every = 5 if $every > 5; }
+
+  my %run_opts = (
+      debug => ($self->{verbose} > 2) ? $self->{verbose} - 2 : 0,
+      watch          => $args->{src}, every => $every, stall_timeout => $stall_timeout,
+      helper_timeout => ($self->{helper_timeout} || 0), fu_obj => $self, mime_helper => $h,
       err => sub { print "E: @_\n" if $self->{verbose}; $run_error = "@_" unless length $run_error },
-      prog => sub 
+      prog => sub
 {
-  $_[1]{tick}++; 
+  # Stall watchdog: if no descendant helper advances any fd (reads input or writes output) for
+  # stall_timeout seconds, flag it so run() can kill the family. Runs unconditionally (in every
+  # branch) - a helper that finished reading its input but is stuck writing output would otherwise
+  # look idle to the source-only progress display below.
+  if ($_[1]{stall_timeout})
+    {
+      my $now = _family_fd_positions(POSIX::getpid());
+      if (_fd_progress($_[1]{fdpos}, $now)) { $_[1]{last_progress} = time }
+      elsif (time - ($_[1]{last_progress} ||= time) >= $_[1]{stall_timeout})
+        { $_[1]{stalled} = "stall timeout: mime helper made no progress for $_[1]{stall_timeout}s" }
+      $_[1]{fdpos} = $now;
+    }
+
+  $_[1]{tick}++;
   my $name = $_[1]{watch}; $name =~ s{.*/}{};
   if ($_[1]{finished})
     {
@@ -1532,8 +1647,9 @@ sub _run_mime_helper
         if $self->{verbose};
     }
 },
-    });
-    
+  );
+  my @r = $self->run(@cmd, \%run_opts);
+
   # system("ls -la $jail_base/..; find $jail_base");
   # print STDERR Dumper \@r;
 
@@ -1551,11 +1667,15 @@ sub _run_mime_helper
   # t/data/pdftxt-a.txt is really plain/text altthough it begins with "PDF-1.4..." and
   # thus fools the mime-type tests.
   # should run other helpers, and finally 'strings -' as a trivial fallback.
-  if ($nonzero[0])
+  if ($nonzero[0] or $run_opts{stalled})
     {
+      warn "File::Unpack2: $run_opts{stalled} (" . fmt_run_shellcmd(@cmd) . ")\n" if $run_opts{stalled};
       rmtree($jail_base);	# empty or has unusable contents now.
       ## FIXME: we should at least copy in the original file as is...
-      return { error => "nonzero retval:\n " . Dumper(\@r), stderr => $run_error };
+      my $error = $run_opts{stalled}
+        ? "$run_opts{stalled}: " . fmt_run_shellcmd(@cmd)
+        : "nonzero retval:\n " . Dumper(\@r);
+      return { error => $error, stderr => $run_error };
     }
 
   # loop through all _: if it only contains one item , replace it with this item,
@@ -1782,6 +1902,145 @@ sub _fuser_offset
 	  $p->{$pid}{fd}{$fd}{size} = -s $p->{$pid}{fd}{$fd}{file};
 	}
     }
+}
+
+# Strict list of PIDs descended from $ppid (children, grandchildren, ...), walking /proc ppid
+# chains. Unlike _children_fuser this deliberately does NOT include reparented (ppid==1) processes:
+# it is used to *kill* a stalled helper family, so it must never reach outside our own descendants.
+sub _descendant_pids
+{
+  my ($ppid) = @_;
+  return () unless $ppid and $ppid > 1;
+
+  opendir my $dir, "/proc" or return ();
+  my @all = grep { /^\d+$/ } readdir $dir;
+  closedir $dir;
+
+  my %parent;
+  for my $p (@all)
+    {
+      next unless open my $in, "<", "/proc/$p/stat";
+      my $text = join '', <$in>;
+      close $in;
+      $parent{$p} = $3 if $text =~ m{\((.*)\)\s+(\w)\s+(\d+)}s;
+    }
+
+  my @family;
+  for my $p (@all)
+    {
+      my $pid = $p;
+      my %seen;
+      while ($pid and $pid > 1 and !$seen{$pid}++)
+        {
+	  if ($pid == $ppid) { push @family, $p; last }
+	  last unless defined $parent{$pid};
+	  $pid = $parent{$pid};
+	}
+    }
+  return grep { $_ != $ppid } @family;
+}
+
+# Snapshot of byte offsets ("pid:fd" => pos) for every open fd of $ppid's descendant helpers.
+# Used to tell whether a helper is making any I/O progress at all: a stalled helper leaves every
+# offset unchanged. Pipes/fifos report pos 0 and therefore simply never count as progress.
+sub _family_fd_positions
+{
+  my ($ppid) = @_;
+  my %pos;
+  for my $pid (_descendant_pids($ppid))
+    {
+      opendir my $d, "/proc/$pid/fd" or next;
+      my @fds = grep { /^\d+$/ } readdir $d;
+      closedir $d;
+      for my $fd (@fds)
+        {
+	  next unless open my $in, "<", "/proc/$pid/fdinfo/$fd";
+	  while (defined (my $line = <$in>))
+	    {
+	      if ($line =~ m{^pos:\s+(\d+)}) { $pos{"$pid:$fd"} = $1; last }
+	    }
+	  close $in;
+	}
+    }
+  return \%pos;
+}
+
+# True if any fd advanced, opened, or closed between two _family_fd_positions() snapshots.
+sub _fd_progress
+{
+  my ($prev, $cur) = @_;
+  return 1 unless defined $prev;
+  for my $k (keys %$cur)  { return 1 if !exists $prev->{$k} or $cur->{$k} > $prev->{$k} }
+  for my $k (keys %$prev) { return 1 unless exists $cur->{$k} }
+  return 0;
+}
+
+# Process group id of $pid (field 5 of /proc/PID/stat, after "(comm) state ppid"), or undef.
+sub _process_pgrp
+{
+  my ($pid) = @_;
+  open my $in, "<", "/proc/$pid/stat" or return undef;
+  my $text = join '', <$in>;
+  close $in;
+  return $1 if $text =~ m{\)\s+\S+\s+\d+\s+(\d+)}s;
+  return undef;
+}
+
+# Forcibly terminate a stalled helper and its whole descendant family, so pump()/finish() can
+# unwind. Grandchildren must die too: a survivor still holding the helper's pipe would keep the
+# harness pumpable and hang finish() forever. Helpers are started in their own process group
+# (setpgrp in run()), so we signal those groups as well - that reaches grandchildren (even ones
+# reparented to init, which keep the group) that the ppid walk cannot see. We never signal our own
+# process group.
+sub _kill_family
+{
+  my ($h, $pgids) = @_;
+  my $me      = POSIX::getpid();
+  my $my_pgrp = getpgrp(0);
+
+  for my $sig ('TERM', 'KILL')
+    {
+      my @pids = _descendant_pids($me);
+
+      my %pgrp;
+      # Groups captured at start (each helper stage is its own leader): reaches grandchildren even
+      # if a stage exited and they reparented to init - they keep the group.
+      for my $pg (@{$pgids || []}) { $pgrp{$pg} = 1 if $pg > 1 and $pg != $my_pgrp }
+      # Plus the group of any still-live descendant, as a backstop.
+      for my $pid (@pids)
+        {
+	  my $pg = _process_pgrp($pid);
+	  $pgrp{$pg} = 1 if defined $pg and $pg > 1 and $pg != $my_pgrp;
+	}
+      kill $sig, map { -$_ } keys %pgrp;    # negative pid => whole process group
+      kill $sig, @pids;                     # and the processes directly, as a backstop
+      select undef, undef, undef, 0.3 if $sig eq 'TERM';
+    }
+  eval { $h->kill_kill(grace => 1) };
+}
+
+# Recurse into a child, isolating faults: a crafted/hostile archive can make the child unpack() die
+# (path escape, rename/chdir/assert failure, mime death, ...). We must skip just that item and keep
+# going, never abort the whole run. On a die we restore cwd (a die inside a helper may have left us
+# in a jail dir) and the recursion counters the aborted subtree leaked, so the top-level JSON epilog
+# still runs and the log stays valid. Returns 1 on success, 0 if the child was skipped.
+sub _safe_unpack
+{
+  my ($self, $child, $childdestdir) = @_;
+  my $lvl = $self->{recursion_level};
+  my $ia  = $self->{inside_archives};
+  my $cwd = Cwd::getcwd();
+  return 1 if eval { $self->unpack($child, $childdestdir); 1 };
+
+  my $err = $@ || 'unknown error';
+  chomp $err;
+  chdir $cwd if defined $cwd;
+  $self->{recursion_level} = $lvl;
+  $self->{inside_archives} = $ia;
+  push @{$self->{error}}, "unpack('$child') aborted: $err; ";
+  $self->logf($child => {error => "aborted: $err", skipped => 'unpack error'});
+  warn "File::Unpack2: unpack('$child') aborted: $err\n" if $self->{verbose};
+  return 0;
 }
 
 
@@ -2582,7 +2841,10 @@ sub mime
 	  # upx refuses to read symlinks. Work around this.
 	  my $in_file = $in{file};
 	  $in_file = readlink($in{file}) if -l $in{file};
-	  $r[0] .= '+upx' unless run(['/usr/bin/upx', '-q', '-q', '-t', $in_file]);
+	  # Bound this probe: a hostile executable could hang upx. helper_timeout kills it cleanly
+	  # (whole process group); a timeout just skips the cosmetic '+upx' classification.
+	  $r[0] .= '+upx'
+	    unless run(['/usr/bin/upx', '-q', '-q', '-t', $in_file], {every => 2, helper_timeout => 30, out_err => '/dev/null'});
 	}
     }
 

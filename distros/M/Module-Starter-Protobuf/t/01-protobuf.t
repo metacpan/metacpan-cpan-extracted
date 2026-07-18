@@ -30,11 +30,18 @@ ok(-f $proto_file, 'Official test service proto exists');
 # We must pass the plugin path and proto configuration in the environment via PERL5LIB
 # Do NOT use -I on the command line, as per SOP guidelines.
 my $plugin_lib = File::Spec->catdir('lib');
+my $sep = $^O eq 'MSWin32' ? ';' : ':';
+local $ENV{PROTOBUF_FILES}       = File::Spec->rel2abs($proto_file);
+local $ENV{PROTOBUF_IMPORT_PATH}  = File::Spec->rel2abs($import_path);
+local $ENV{PROTOBUF_GRPC_TARGET} = 'test.googleapis.com';
+local $ENV{PERL5LIB}            = defined $ENV{PERL5LIB} ? "$plugin_lib$sep$ENV{PERL5LIB}" : $plugin_lib;
+
+use File::Which qw(which);
+my $starter_bin = $^O eq 'MSWin32' ? (which('module-starter.bat') || which('module-starter') || 'module-starter') : 'module-starter';
+
 my $module_starter_cmd = sprintf(
-    'PROTOBUF_FILES=%s PROTOBUF_IMPORT_PATH=%s PROTOBUF_GRPC_TARGET=test.googleapis.com PERL5LIB=%s:$PERL5LIB module-starter --module=Google::Cloud::Test --plugin=Module::Starter::Protobuf --dir=%s --author="C.J. Collier <cjac@google.com>" --force',
-    $proto_file,
-    $import_path,
-    $plugin_lib,
+    '"%s" --module=Google::Cloud::Test --plugin=Module::Starter::Protobuf --dir="%s" --author="Google LLC <cjac@google.com>" --force',
+    $starter_bin,
     $tmp_dir
 );
 
@@ -136,12 +143,16 @@ ok(-f $runner_file, 'Created integration test runner script');
 # We must append the generated lib path to PERL5LIB.
 # We also inherit the parent PERL5LIB so it can find the real Protobuf C/XS module!
 # Do NOT use -I on the command line.
-my $gen_lib = File::Spec->catdir($tmp_dir, 'lib');
+my $gen_lib = File::Spec->rel2abs(File::Spec->catdir($tmp_dir, 'lib'));
 File::Path::make_path('tmp');
 my $log_file = File::Spec->catfile('tmp', 'integration-test.log');
+local $ENV{PERL5LIB} = defined $ENV{PERL5LIB} ? "$gen_lib$sep$ENV{PERL5LIB}" : $gen_lib;
+local $ENV{PACKAGE_STASH_IMPLEMENTATION} = 'PP';
+local $ENV{MOO_XS_DISABLE} = 1;
+local $ENV{TEMPLATE_STASH} = 'pureperl';
 my $test_runner_cmd = sprintf(
-    'PERL5LIB=%s:$PERL5LIB perl %s > %s 2>&1',
-    $gen_lib,
+    '"%s" "%s" > "%s" 2>&1',
+    $^X,
     $runner_file,
     $log_file
 );

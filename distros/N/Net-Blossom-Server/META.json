@@ -60,6 +60,6 @@
          "web" : "https://github.com/NicholasBHubbard/Net-Blossom"
       }
    },
-   "version" : "0.001003",
+   "version" : "0.001004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

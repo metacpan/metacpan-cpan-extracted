@@ -1,5 +1,13 @@
 Revision history for Module-Starter-Protobuf
 
+0.02    Fri Jul 17 2026
+        [Code Generation & License Headers]
+        - Updated starter templates to automatically append Apache 2.0 copyright headers to all generated client libraries and schema modules.
+        - Pruned redundant $VERSION declarations from generated client and schema container templates.
+
+        [Architecture]
+        - Upgraded package version to 0.02 (lib/Module/Starter/Protobuf.pm).
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

@@ -59,7 +59,11 @@ sub load_test_protos {
 
     my $last_result;
     foreach my $file_path (@files) {
-        open my $fh, '<:raw', $file_path or die "Could not open '$file_path': $!";
+        my $target = $file_path;
+        if (!-f $target && -f "Protobuf/$file_path") {
+            $target = "Protobuf/$file_path";
+        }
+        open my $fh, '<:raw', $target or die "Could not open '$file_path' (resolved as '$target'): $!";
         my $data = do { local $/; <$fh> };
         close $fh;
         $last_result = $pool->add_serialized_file_descriptor_set($data);
