@@ -15,4 +15,6 @@ Revision history for Salus
 0.07	2024-05-12
 	- Adds combine method to merge multiple csvs of the same class
 	- Fix error handling in Salus::Command.
-
+0.10 	2026-07-18
+	- Remove PAX headers
+	- use strict/warnings

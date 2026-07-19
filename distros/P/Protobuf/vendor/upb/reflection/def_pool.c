@@ -27,6 +27,7 @@
 #include "upb/mini_table/generated_registry.h"
 #include "upb/mini_table/message.h"
 #include "upb/reflection/def.h"
+#include "upb/reflection/def_pool.h"
 #include "upb/reflection/def_type.h"
 #include "upb/reflection/file_def.h"
 #include "upb/reflection/internal/def_builder.h"
@@ -238,25 +239,25 @@ const upb_MessageDef* upb_DefPool_FindMessageByNameWithSize(
   return _upb_DefPool_Unpack(s, sym, len, UPB_DEFTYPE_MSG);
 }
 
-const upb_EnumDef* upb_DefPool_FindEnumByName(const upb_DefPool* s,
-                                              const char* sym) {
-  return upb_DefPool_FindEnumByNameWithSize(s, sym, strlen(sym));
-}
-
 const upb_EnumDef* upb_DefPool_FindEnumByNameWithSize(const upb_DefPool* s,
                                                       const char* sym,
                                                       size_t len) {
   return _upb_DefPool_Unpack(s, sym, len, UPB_DEFTYPE_ENUM);
 }
 
-const upb_EnumValueDef* upb_DefPool_FindEnumValueByName(const upb_DefPool* s,
-                                                        const char* sym) {
-  return upb_DefPool_FindEnumValueByNameWithSize(s, sym, strlen(sym));
+const upb_EnumDef* upb_DefPool_FindEnumByName(const upb_DefPool* s,
+                                              const char* sym) {
+  return upb_DefPool_FindEnumByNameWithSize(s, sym, strlen(sym));
 }
 
 const upb_EnumValueDef* upb_DefPool_FindEnumValueByNameWithSize(
     const upb_DefPool* s, const char* sym, size_t len) {
   return _upb_DefPool_Unpack(s, sym, len, UPB_DEFTYPE_ENUMVAL);
+}
+
+const upb_EnumValueDef* upb_DefPool_FindEnumValueByName(const upb_DefPool* s,
+                                                        const char* sym) {
+  return upb_DefPool_FindEnumValueByNameWithSize(s, sym, strlen(sym));
 }
 
 const upb_FileDef* upb_DefPool_FindFileByName(const upb_DefPool* s,

@@ -37,11 +37,12 @@ my @cases = (
 	['AFT 1965', '1969', -1],  # not fully handled, expect tolerance
 
 	# Mixed format
-	# ['5/27/1872', '1872', 0],
+	['5/27/1871', '1872', -1],
+	['5/27/1873', '1872', 1],
 	['26 Aug 1744', '1673-02-22T00:00:00', 1],
 );
 
-plan tests => scalar(@cases) * 4;
+plan tests => scalar(@cases) * 6;
 
 for my $case (@cases) {
 	my ($left, $right, $expected) = @{$case};
@@ -51,6 +52,13 @@ for my $case (@cases) {
 	returns_is($actual, { 'type' => 'integer', 'min' => -1, 'max' => 1 });
 
 	is($actual, $expected, "'$left' <=> '$right' => $expected" . ($complaints ? " [warned: $complaints]" : ''));
+
+	$complaints = '';
+	$actual = datecmp({ 'date' => $left }, { 'date' => $right}, sub { $complaints .= "@_\n" });
+
+	returns_is($actual, { 'type' => 'integer', 'min' => -1, 'max' => 1 });
+
+	is($actual, $expected, "'$left' <=> '$right' => $expected" . ($complaints ? "hasharg: [warned: $complaints]" : ''));
 
 	# Invert the test
 	$complaints = '';

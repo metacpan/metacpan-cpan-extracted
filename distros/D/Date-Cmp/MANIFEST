@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Date/Cmp.pm
 LICENSE
 Makefile.PL
@@ -8,11 +9,17 @@ README.md
 t/30-basics.t
 t/cmp.t
 t/datecmp.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
+t/locales.t
 t/pod-cm.t
 t/pod-snippets.t
 t/pod-synopsis.t
 t/pod.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

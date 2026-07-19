@@ -1,5 +1,36 @@
 Revision history for Protobuf
 
+0.09    Sat Jul 18 2026
+        [Compatibility & API Layer]
+        - Added Google::ProtocolBuffers::Dynamic compatibility API shim (Google::ProtocolBuffers::Dynamic) backed by the high-performance upb C engine.
+        - Supported load_file, load_string, map_package, map_message, encode, and decode methods.
+        - Enabled automatic dynamic package mapping and class generation for mapped Perl namespaces.
+        - Added comprehensive compatibility unit test suite (t/025_dynamic_compat.t).
+        - Refactored App::EvalServerAdvanced::Protocol to utilize the new compatibility layer with File::ShareDir path resolution.
+        - Special thanks to Ryan Voots (@simcop2387) for testing, feedback, and driving compatibility requirements for App::EvalServerAdvanced.
+
+        [Bug Fixes & Smoker Hardening]
+        - Added RT bug tracker URL (https://rt.cpan.org/Dist/Display.html?Queue=Protobuf) to POD documentation across distribution modules.
+        - Fixed non-system perl (perlbrew/plenv/custom prefixes) linking errors caused by hardcoded static libperl.a search paths in Makefile.PL (CPAN RT #180139 & RT #178734 reported by Slaven Rezić / @srezic; with key build insights from Ryan Voots / @simcop2387).
+        - Added -fPIC $Config{cccdlflags} to all C and C++ object compilation rules in Makefile.PL to prevent R_X86_64_TPOFF32 and R_X86_64_PC32 relocation errors under LTO (-flto=auto) and ithread builds (thanks to Lukas Mai / @mauke for catching and debugging).
+        - Added Xcode SDK Perl CORE header search fallback in Makefile.PL for macOS Apple Silicon system Perl builds.
+
+0.08    Sat Jul 18 2026
+        [CPAN Metadata Correction]
+        - Corrected repository URL to GoogleCloudPlatform/google-auth-library-perl.git and added bugtracker URL in Makefile.PL META_MERGE (thanks to Lukas Mai / @mauke for catching stale metadata).
+
+        [Build Systems & Clean Target Hardening]
+        - Enhanced Makefile.PL to automatically include bin/protoc-gen-perl-pb in standard Makefile 'all' and 'install' targets via EXE_FILES.
+        - Removed tracked ELF 64-bit binary bin/protoc-gen-perl-pb from Git tracking and added to .gitignore.
+        - Hardened Makefile.PL realclean target to preserve vendor/ C source headers and output object directory paths.
+        - Added git vendor auto-restoration fallback (git checkout -- vendor/) to Makefile.PL when vendor/ directory is missing in a Git workspace.
+
+0.07    Fri Jul 17 2026
+        [Core Runtime & Descriptor Engine]
+        - Internal release prep and descriptor pool synchronization updates.
+        - Improved upb memory arena lifecycle management and string handling across XS calls.
+
+
 0.06    Fri Jul 17 2026
         [Windows & Multi-Platform Build Hardening]
         - Enhanced Makefile.PL to search system library paths for libperl across Debian, Ubuntu, Fedora, and Arch layouts.

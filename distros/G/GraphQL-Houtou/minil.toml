@@ -1,0 +1,5 @@
+name = "GraphQL-Houtou"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuild"
+c_source = ["src"]
+static_install = "auto"

@@ -14,24 +14,24 @@ my $project_root = abs_path(File::Spec->catdir($perl_dir, '..'));
 
 my $vendor_dir = File::Spec->catdir($perl_dir, 'vendor');
 
-# Check if we are in a Google3 dev environment (where upb is a sibling to protobuf)
-my $is_google3 = -d abs_path(File::Spec->catdir($perl_dir, '..', '..', 'upb'));
+# Check if we are in a Google3 dev environment
+my $is_google3 = ($perl_dir =~ m{^/google/src/cloud/});
 
-my $upb_src_dir = $is_google3
-    ? abs_path(File::Spec->catdir($perl_dir, '..', '..', 'upb'))
-    : File::Spec->catdir($project_root, 'upb');
+my $upb_src_dir = (-d File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'upb'))
+    ? File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'upb')
+    : File::Spec->catdir($vendor_dir, 'upb');
 
-my $upb_generator_src_dir = $is_google3
-    ? abs_path(File::Spec->catdir($perl_dir, '..', '..', 'upb', 'upb_generator'))
-    : File::Spec->catdir($project_root, 'upb_generator');
+my $upb_generator_src_dir = (-d File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'upb_generator'))
+    ? File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'upb_generator')
+    : File::Spec->catdir($vendor_dir, 'upb_generator');
 
-my $utf8_range_src_dir = $is_google3
-    ? abs_path(File::Spec->catdir($perl_dir, '..', '..', 'utf8_range'))
-    : File::Spec->catdir($project_root, 'third_party', 'utf8_range');
+my $utf8_range_src_dir = (-d File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'third_party', 'utf8_range'))
+    ? File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'third_party', 'utf8_range')
+    : File::Spec->catdir($vendor_dir, 'third_party', 'utf8_range');
 
-my $proto_src_dir = $is_google3
-    ? abs_path(File::Spec->catdir($perl_dir, '..', '..', '..', 'google', 'protobuf'))
-    : File::Spec->catdir($project_root, 'src', 'google', 'protobuf');
+my $proto_src_dir = (-d File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'src', 'google', 'protobuf'))
+    ? File::Spec->catdir($perl_dir, 'third_party', 'protobuf', 'src', 'google', 'protobuf')
+    : File::Spec->catdir($vendor_dir, 'src', 'google', 'protobuf');
 
 print "Vendoring upb and third_party into $vendor_dir...\n";
 if ($is_google3) {

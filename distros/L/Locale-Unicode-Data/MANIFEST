@@ -21,6 +21,7 @@ t/02.fatal.t
 t/03.plural_rules.t
 t/04.cldr_to_gettext.t
 t/05.threads.t
+t/06.person_names.t
 t/90.pod.t
 t/91.coverage.t
 t/92.signature.t

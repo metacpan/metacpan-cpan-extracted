@@ -1,12 +1,12 @@
 {
     "name" : "mb",
-    "version" : "0.65",
+    "version" : "0.66",
     "abstract" : "Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...",
     "author" : [
         "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat version 0.39",
+    "generated_by" : "pmake.bat version 0.40",
     "license" : [
         "perl_5"
     ],
@@ -57,7 +57,7 @@
     "provides" : {
         "mb" : {
             "file" : "lib/mb.pm",
-            "version" : "0.65"
+            "version" : "0.66"
         }
     }
 }

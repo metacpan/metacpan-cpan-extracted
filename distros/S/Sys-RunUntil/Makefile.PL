@@ -7,7 +7,7 @@ WriteMakefile (
  AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT	=> 'make sure script only runs for the given time',
  VERSION_FROM	=> 'lib/Sys/RunUntil.pm',
-
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> {qw(
                    )},
 );

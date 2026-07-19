@@ -1,0 +1,83 @@
+{
+   "abstract" : "LLM::API",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LLM-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLI::Simple::Constants" : "v2.0.1",
+            "CLI::Simple::Utils" : "v2.0.1",
+            "Class::Accessor::Fast" : "0.51",
+            "HTTP::Tiny" : "0.088",
+            "JSON::PP" : "4.16",
+            "Readonly" : "2.05",
+            "URI::Encode" : "v1.1.1",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "provides" : {
+      "LLM::API" : {
+         "file" : "lib/LLM/API.pm",
+         "version" : "v1.0.1"
+      },
+      "LLM::API::Content" : {
+         "file" : "lib/LLM/API/Content.pm",
+         "version" : "v1.0.1"
+      },
+      "LLM::API::Response" : {
+         "file" : "lib/LLM/API/Response.pm",
+         "version" : "v1.0.0"
+      },
+      "LLM::API::Usage" : {
+         "file" : "lib/LLM/API/Usage.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/LLM-API/issues"
+      },
+      "homepage" : "https://github.com/rlauer6/LLM-API",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rlauer6/LLM-API"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

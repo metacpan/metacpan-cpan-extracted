@@ -6,7 +6,7 @@ Protobuf::Internal::MapIterator - Internal XS implementation for map iterators
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 
 sub next_key {

@@ -31,6 +31,7 @@ lib/Google/Protobuf/Timestamp.pm
 lib/Google/Protobuf/Timestamp/Types.pm
 lib/Google/Protobuf/Wrappers.pm
 lib/Google/Protobuf/Wrappers/Types.pm
+lib/Google/ProtocolBuffers/Dynamic.pm
 lib/Protobuf.pm
 lib/Protobuf/Arena.pm
 lib/Protobuf/Arena.xs.part
@@ -133,6 +134,7 @@ t/021_wrappers.t
 t/022_text_format.t
 t/023_json_format.t
 t/024_threads.t
+t/025_dynamic_compat.t
 t/025_type_tiny.t
 t/026_compatibility_aliases.t
 t/027_pureperl_kernels.t

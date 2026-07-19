@@ -1,0 +1,33 @@
+Revision history for Perl extension GraphQL-Houtou
+
+0.01 2026-07-19T04:40:06Z
+
+    - Added an XS-backed GraphQL parser, schema compiler, validation engine,
+      and query/mutation runtime.
+    - Added synchronous and Promise::XS execution, DataLoader batching,
+      mutation serialization, direct JSON responses, and a PSGI adapter.
+    - Added SDL schema construction, printing, type-system extensions,
+      modern introspection, OneOf input objects, and custom directives.
+    - Implemented the September 2025 executable-document validation rules
+      and the query/mutation type-system validation profile.
+    - Added native program and persisted-bundle caches, weighted query cost,
+      depth, node, token, and request-body limits.
+    - Added fail-closed subscription handling across dynamic and persisted
+      execution paths; subscription streaming remains unsupported in 0.01.
+    - Added Apollo Federation 2 subgraph schema construction, service SDL,
+      bounded entity resolution, and key validation.
+    - Omitted the `errors` response entry when execution completed without
+      errors, as required by the GraphQL response specification.
+    - Made the default field resolver invoke hash coderefs and blessed source
+      methods with the graphql-perl-compatible argument contract.
+    - Added an `allow_introspection` runtime and PSGI policy for public
+      endpoints while retaining `__typename` support.
+    - Replaced the obsolete execution implementation selector with the
+      explicit `strict_sync` request option; execution is always native.
+    - Named the failing variable in variable coercion request errors, with
+      a bounded rendering of the invalid value, and rejected missing
+      Non-Null variables at variable preparation with the declared type.
+    - Added ASan, Valgrind, fuzz, soak, compiler-warning, XS ownership, POD,
+      metadata, and Perl 5.24 through 5.44 CI coverage.
+    - Added production-oriented examples, benchmark tooling, architecture
+      documentation, and XS memory-ownership guidance.

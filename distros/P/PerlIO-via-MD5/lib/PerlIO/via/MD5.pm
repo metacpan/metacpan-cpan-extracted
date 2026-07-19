@@ -1,6 +1,6 @@
 package PerlIO::via::MD5;
 
-$VERSION= '0.09';
+$VERSION= '0.10';
 
 # be as strict as possible
 use strict;
@@ -105,7 +105,7 @@ PerlIO::via::MD5 - PerlIO layer for creating an MD5 digest of a file
 
 =head1 VERSION
 
-This documentation describes version 0.09.
+This documentation describes version 0.10.
 
 =head1 DESCRIPTION
 

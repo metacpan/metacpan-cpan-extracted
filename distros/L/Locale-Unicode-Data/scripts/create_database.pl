@@ -1,13 +1,12 @@
 #!/usr/bin/env perl
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/scripts/create_database.pl
-## Version v0.2.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2024-2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2025/01/01
+## Modified 2026/07/14
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -40,7 +39,7 @@ use Module::Generic::Array;
 use Pod::Usage;
 use Scalar::Util qw( looks_like_number );
 use XML::LibXML;
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 our $DEBUG = 0;
 our $VERBOSE = 0;
 our $LOG_LEVEL = 0;
@@ -326,6 +325,14 @@ sub process
         number_systems => "INSERT INTO number_systems (number_system, digits, type) VALUES(?, ?, ?)",
         number_systems_l10n => "INSERT INTO number_systems_l10n (locale, number_system, locale_name, alt) VALUES(?, ?, ?, ?)",
         person_name_defaults => "INSERT INTO person_name_defaults (locale, value) VALUES(?, ?)",
+        # Added on 2026-07-14 in v0.3.0
+        person_name_formats => "INSERT INTO person_name_formats (locale, name_index, name_order, name_length, name_usage, name_formality, alt, name_pattern) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+        # Added on 2026-07-14 in v0.3.0
+        person_name_initial_patterns => "INSERT INTO person_name_initial_patterns (locale, pattern_type, pattern_value, is_draft) VALUES(?, ?, ?, ?)",
+        # Added on 2026-07-14 in v0.3.0
+        person_name_order_locales => "INSERT INTO person_name_order_locales (locale, name_locale, name_order, is_draft) VALUES(?, ?, ?, ?)",
+        # Added on 2026-07-14 in v0.3.0
+        person_name_samples => "INSERT INTO person_name_samples (locale, sample_type, field_type, field_value) VALUES(?, ?, ?, ?)",
         plural_ranges => "INSERT INTO plural_ranges (locale, aliases, start, stop, result) VALUES(?, ?, ?, ?, ?)",
         plural_rules => "INSERT INTO plural_rules (locale, aliases, count, rule) VALUES(?, ?, ?, ?)",
         rbnf => "INSERT INTO rbnf (locale, grouping, ruleset, rule_id, rule_value) VALUES(?, ?, ?, ?, ?)",
@@ -3845,31 +3852,35 @@ sub process
     &log( "Loading localised data." );
     $n = 0;
     $main_dir->open || die( $main_dir->error );
-    my $sth_locale = $sths->{locales_l10n} || die( "No SQL statement object for locales_l10n" );
-    my $sth_script = $sths->{scripts_l10n} || die( "No SQL statement object for scripts_l10n" );
-    my $sth_territory = $sths->{territories_l10n} || die( "No SQL statement object for territories_l10n" );
-    my $sth_variant = $sths->{variants_l10n} || die( "No SQL statement object for variants_l10n" );
-    my $sth_currency = $sths->{currencies_l10n} || die( "No SQL statement object for currencies_l10n" );
-    my $sth_cal_term = $sths->{calendar_terms} || die( "No SQL statement object for calendar_terms" );
-    my $sth_cal_era = $sths->{calendar_eras_l10n} || die( "No SQL statement object for calendar_eras_l10n" );
-    my $sth_dt_fmt = $sths->{calendar_formats_l10n} || die( "No SQL statement object for calendar_formats_l10n" );
-    my $sth_dt_pat_fmt = $sths->{calendar_datetime_formats} || die( "No SQL statement object for calendar_datetime_formats" );
-    my $sth_avail_fmt = $sths->{calendar_available_formats} || die( "No SQL statement object for calendar_available_formats" );
-    my $sth_append_fmt = $sths->{calendar_append_formats} || die( "No SQL statement object for calendar_append_formats" );
-    my $sth_inter_fmt = $sths->{calendar_interval_formats} || die( "No SQL statement object for calendar_interval_formats" );
-    my $sth_cyclic = $sths->{calendar_cyclics_l10n} || die( "No SQL statement object for calendar_cyclics_l10n" );
-    my $sth_field = $sths->{date_fields_l10n} || die( "No SQL statement object for date_fields_l10n" );
-    my $sth_time_rel = $sths->{time_relative_l10n} || die( "No SQL statement object for time_relative_l10n" );
-    my $sth_date_term = $sths->{date_terms} || die( "No SQL statement object for date_terms" );
-    my $sth_locale_info = $sths->{locales_info} || die( "No SQL statement object for locales_info" );
-    my $sth_locale_num_sys = $sths->{locale_number_systems} || die( "No SQL statement object for locale_number_systems" );
-    my $sth_num_sys_l10n = $sths->{number_systems_l10n} || die( "No SQL statement object for number_systems_l10n" );
-    my $sth_cals_l10n = $sths->{calendars_l10n} || die( "No SQL statement object for calendars_l10n" );
-    my $sth_collation_l10n = $sths->{collations_l10n} || die( "No SQL statement object for collations_l10n" );
-    my $sth_timezone_city = $sths->{timezones_cities} || die( "No SQL statement object for timezones_cities" );
-    my $sth_tz_formats = $sths->{timezones_formats} || die( "No SQL statement object for timezones_formats" );
-    my $sth_tz_names = $sths->{timezones_names} || die( "No SQL statement object for timezones_names" );
-    my $sth_metatz_names = $sths->{metazones_names} || die( "No SQL statement object for metazones_names" );
+    my $sth_locale            = $sths->{locales_l10n}                 || die( "No SQL statement object for locales_l10n" );
+    my $sth_script            = $sths->{scripts_l10n}                 || die( "No SQL statement object for scripts_l10n" );
+    my $sth_territory         = $sths->{territories_l10n}             || die( "No SQL statement object for territories_l10n" );
+    my $sth_variant           = $sths->{variants_l10n}                || die( "No SQL statement object for variants_l10n" );
+    my $sth_currency          = $sths->{currencies_l10n}              || die( "No SQL statement object for currencies_l10n" );
+    my $sth_cal_term          = $sths->{calendar_terms}               || die( "No SQL statement object for calendar_terms" );
+    my $sth_cal_era           = $sths->{calendar_eras_l10n}           || die( "No SQL statement object for calendar_eras_l10n" );
+    my $sth_dt_fmt            = $sths->{calendar_formats_l10n}        || die( "No SQL statement object for calendar_formats_l10n" );
+    my $sth_dt_pat_fmt        = $sths->{calendar_datetime_formats}    || die( "No SQL statement object for calendar_datetime_formats" );
+    my $sth_avail_fmt         = $sths->{calendar_available_formats}   || die( "No SQL statement object for calendar_available_formats" );
+    my $sth_append_fmt        = $sths->{calendar_append_formats}      || die( "No SQL statement object for calendar_append_formats" );
+    my $sth_inter_fmt         = $sths->{calendar_interval_formats}    || die( "No SQL statement object for calendar_interval_formats" );
+    my $sth_cyclic            = $sths->{calendar_cyclics_l10n}        || die( "No SQL statement object for calendar_cyclics_l10n" );
+    my $sth_field             = $sths->{date_fields_l10n}             || die( "No SQL statement object for date_fields_l10n" );
+    my $sth_time_rel          = $sths->{time_relative_l10n}           || die( "No SQL statement object for time_relative_l10n" );
+    my $sth_date_term         = $sths->{date_terms}                   || die( "No SQL statement object for date_terms" );
+    my $sth_locale_info       = $sths->{locales_info}                 || die( "No SQL statement object for locales_info" );
+    my $sth_locale_num_sys    = $sths->{locale_number_systems}        || die( "No SQL statement object for locale_number_systems" );
+    my $sth_num_sys_l10n      = $sths->{number_systems_l10n}          || die( "No SQL statement object for number_systems_l10n" );
+    my $sth_cals_l10n         = $sths->{calendars_l10n}               || die( "No SQL statement object for calendars_l10n" );
+    my $sth_collation_l10n    = $sths->{collations_l10n}              || die( "No SQL statement object for collations_l10n" );
+    my $sth_timezone_city     = $sths->{timezones_cities}             || die( "No SQL statement object for timezones_cities" );
+    my $sth_tz_formats        = $sths->{timezones_formats}            || die( "No SQL statement object for timezones_formats" );
+    my $sth_tz_names          = $sths->{timezones_names}              || die( "No SQL statement object for timezones_names" );
+    my $sth_metatz_names      = $sths->{metazones_names}              || die( "No SQL statement object for metazones_names" );
+    my $sth_pers_name_fmt     = $sths->{person_name_formats}          || die( "No SQL statement object for person_name_formats" );
+    my $sth_pers_name_init    = $sths->{person_name_initial_patterns} || die( "No SQL statement object for person_name_initial_patterns" );
+    my $sth_pers_name_ord_loc = $sths->{person_name_order_locales}    || die( "No SQL statement object for person_name_order_locales" );
+    my $sth_pers_name_samp    = $sths->{person_name_samples}          || die( "No SQL statement object for person_name_samples" );
     my $patch =
     {
         '45.0' =>
@@ -6010,6 +6021,230 @@ sub process
             $j++;
         }
         $out->printf( "\t%d locale collation ID information added.\n", $j ) if( $DEBUG );
+
+        # NOTE: Checking for person name formatting data
+        &log( "\tChecking for person name data." );
+        my $personNamesEl = $mainDoc->findnodes( '/ldml/personNames' );
+        if( $personNamesEl->size )
+        {
+            my $pn_root = $personNamesEl->shift;
+            my $j = 0;
+
+            # NOTE: nameOrderLocales
+            # Records how the display locale orders names from each source locale.
+            # The 'und' value is the catch-all fallback; 'und-XX' scopes the fallback to a specific region (e.g. 'und-JP').
+            # Each locale listed in the element text is stored as a separate row, so that queries can look up a single name_locale at a time.
+            # Example: <nameOrderLocales order="surnameFirst">hu ja km ko mn vi yue zh</nameOrderLocales>
+            my $nameOrderLocalesRes = $pn_root->findnodes( 'nameOrderLocales' );
+            while( my $el = $nameOrderLocalesRes->shift )
+            {
+                my $name_order = $el->getAttribute( 'order' );
+                if( !defined( $name_order ) || !length( $name_order ) )
+                {
+                    die( "Missing 'order' attribute on <nameOrderLocales> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+                my $is_draft = ( ( $el->getAttribute( 'draft' ) // '' ) eq 'unconfirmed' ) ? 1 : 0;
+                my $raw = $el->textContent;
+                if( !defined( $raw ) || !length( trim( $raw ) ) )
+                {
+                    # An empty element is valid: it explicitly unsets this ordering for the locale
+                    $out->print( "\t<nameOrderLocales order='${name_order}'> is empty for locale ${locale} - skipping.\n" ) if( $DEBUG );
+                    next;
+                }
+                my @name_locales = split( /[[:blank:]\h\v]+/, trim( $raw ) );
+                foreach my $name_locale ( @name_locales )
+                {
+                    $name_locale =~ tr/_/-/;
+                    eval
+                    {
+                        $sth_pers_name_ord_loc->execute( $locale, $name_locale, $name_order, $is_draft );
+                    } || die( "Error adding person name order locale record (locale='${locale}', name_locale='${name_locale}', name_order='${name_order}') in file ${f}: ", ( $@ || $sth_pers_name_ord_loc->errstr ), "\nwith query: ", $sth_pers_name_ord_loc->{Statement} );
+                    $j++;
+                }
+            }
+            $out->printf( "\t%d person name order-locale records added.\n", $j ) if( $DEBUG );
+
+            # NOTE: parameterDefault
+            # Locale-level parameter overrides for 'formality' and 'length'.
+            # Stored in locales_info under keys 'person_name_default_formality'
+            # and 'person_name_default_length'. The 'draft' attribute is not stored
+            # because locales_info has no such column; unconfirmed entries are included.
+            my $paramDefaultRes = $pn_root->findnodes( 'parameterDefault' );
+            $j = 0;
+            while( my $el = $paramDefaultRes->shift )
+            {
+                my $parameter = $el->getAttribute( 'parameter' );
+                if( !defined( $parameter ) || !length( $parameter ) )
+                {
+                    die( "Missing 'parameter' attribute on <parameterDefault> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+                my $val = trim( $el->textContent );
+                if( !defined( $val ) || !length( $val ) )
+                {
+                    die( "Empty text content in <parameterDefault parameter='${parameter}'> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+                my $prop_key = "person_name_default_${parameter}";
+                eval
+                {
+                    $sth_locale_info->execute( $locale, $prop_key, $val );
+                } || die( "Error adding locale info for person name parameter default (property='${prop_key}', value='${val}') for locale '${locale}' in file ${f}: ", ( $@ || $sth_locale_info->errstr ), "\nwith query: ", $sth_locale_info->{Statement} );
+                $j++;
+            }
+            $out->printf( "\t%d person name parameter default records added.\n", $j ) if( $DEBUG );
+
+            # NOTE: nativeSpaceReplacement and foreignSpaceReplacement
+            # Stored in locales_info under keys 'person_name_native_space' and 'person_name_foreign_space'. An empty element (textContent = undef) means "use no separator" (e.g. Japanese native names). This is intentional and distinct from "not defined": we store '' explicitly.
+            # The xml:space="preserve" attribute is an XML processing directive only.
+            my %space_repl_map = (
+                nativeSpaceReplacement  => 'person_name_native_space',
+                foreignSpaceReplacement => 'person_name_foreign_space',
+            );
+            $j = 0;
+            foreach my $tag ( sort( keys( %space_repl_map ) ) )
+            {
+                my $spaceRes = $pn_root->findnodes( $tag );
+                next unless( $spaceRes->size );
+                my $el = $spaceRes->shift;
+                my $val = $el->textContent // '';
+                my $prop_key = $space_repl_map{ $tag };
+                eval
+                {
+                    $sth_locale_info->execute( $locale, $prop_key, $val );
+                } || die( "Error adding locale info for space replacement (property='${prop_key}', value='${val}') for locale '${locale}' in file ${f}: ", ( $@ || $sth_locale_info->errstr ), "\nwith query: ", $sth_locale_info->{Statement} );
+                $j++;
+            }
+            $out->printf( "\t%d person name space replacement records added.\n", $j ) if( $DEBUG );
+
+            # NOTE: initialPattern elements
+            # Patterns for rendering name initials and sequences of initials.
+            # Known types: 'initial' (single initial) and 'initialSequence' (joining multiple).
+            # Only ~19 locales define these; all others inherit from root.xml defaults:
+            #   initial='{0}.', initialSequence='{0} {1}'.
+            my $initPatternRes = $pn_root->findnodes( 'initialPattern' );
+            $j = 0;
+            while( my $el = $initPatternRes->shift )
+            {
+                my $pattern_type = $el->getAttribute( 'type' );
+                if( !defined( $pattern_type ) || !length( $pattern_type ) )
+                {
+                    die( "Missing 'type' attribute on <initialPattern> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+                my $pattern_value = $el->textContent;
+                if( !defined( $pattern_value ) || !length( $pattern_value ) )
+                {
+                    die( "Empty text content in <initialPattern type='${pattern_type}'> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+                my $is_draft = ( ( $el->getAttribute( 'draft' ) // '' ) eq 'unconfirmed' ) ? 1 : 0;
+                eval
+                {
+                    $sth_pers_name_init->execute( $locale, $pattern_type, $pattern_value, $is_draft );
+                } || die( "Error adding person name initial pattern (type='${pattern_type}', value='${pattern_value}') for locale '${locale}' in file ${f}: ", ( $@ || $sth_pers_name_init->errstr ), "\nwith query: ", $sth_pers_name_init->{Statement} );
+                $j++;
+            }
+            $out->printf( "\t%d person name initial pattern records added.\n", $j ) if( $DEBUG );
+
+            # NOTE: personName elements
+            # One row per <namePattern> child. name_index preserves the source order and grouping of <personName> elements, whose first-match semantics are significant to the CLDR person name formatting algorithm.
+            # A personName element may contain more than one <namePattern> child: the primary pattern has no 'alt' attribute (stored as NULL); alternate patterns carry alt='1'. Alternates allow the locale to provide two patterns for the same context, e.g. one including surname2 and one without.
+            my $personNameRes = $pn_root->findnodes( 'personName' );
+            my $name_index = 0;
+            $j = 0;
+            while( my $el = $personNameRes->shift )
+            {
+                my $name_order     = $el->getAttribute( 'order' );
+                my $name_length    = $el->getAttribute( 'length' );
+                my $name_usage     = $el->getAttribute( 'usage' );
+                my $name_formality = $el->getAttribute( 'formality' );
+                $name_order     = undef unless( defined( $name_order )     && length( $name_order ) );
+                $name_length    = undef unless( defined( $name_length )    && length( $name_length ) );
+                $name_usage     = undef unless( defined( $name_usage )     && length( $name_usage ) );
+                $name_formality = undef unless( defined( $name_formality ) && length( $name_formality ) );
+
+                # NOTE: Some <personName> elements carry an <alias> child instead of a <namePattern> child.
+                # The alias is resolved to obtain its <namePattern> children, while the attributes and source position of the original <personName> element are retained.
+                # These alias paths are relative XPath expressions pointing to a sibling <personName> element within the same <personNames> container, for example:
+                # <alias source="locale" path="../personName[@order='givenFirst'][@length='long'][@usage='referring'][@formality='formal']"/>
+                # We resolve them using resolve_alias() exactly as elsewhere in this script.
+                my $personNameHasAliasRes = $el->findnodes( './alias[@path]' );
+                if( $personNameHasAliasRes->size )
+                {
+                    $out->print( "\t\t<personName order='", ( $name_order // '' ), "' length='", ( $name_length // '' ), "' usage='", ( $name_usage // '' ), "' formality='", ( $name_formality // '' ), "'> is aliased for locale '${locale}'. Resolving it... " ) if( $DEBUG );
+                    $el = resolve_alias( $personNameHasAliasRes ) ||
+                        die( "<personName order='", ( $name_order // '' ), "' length='", ( $name_length // '' ), "' usage='", ( $name_usage // '' ), "' formality='", ( $name_formality // '' ), "'> is aliased but could not be resolved for locale '${locale}' in file ${f}" );
+                    $out->print( "ok\n" ) if( $DEBUG );
+                }
+
+                my $namePatternRes = $el->findnodes( 'namePattern' );
+                if( !$namePatternRes->size )
+                {
+                    die( "No <namePattern> child found in <personName order='", ( $name_order // '' ), "' length='", ( $name_length // '' ), "' usage='", ( $name_usage // '' ), "' formality='", ( $name_formality // '' ), "'> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+
+                while( my $patternEl = $namePatternRes->shift )
+                {
+                    my $alt = $patternEl->getAttribute( 'alt' );
+                    $alt = undef unless( defined( $alt ) && length( $alt ) );
+                    my $name_pattern = $patternEl->textContent;
+                    if( !defined( $name_pattern ) || !length( $name_pattern ) )
+                    {
+                        die( "Empty <namePattern> (alt=", ( $alt // 'undef' ), ") in <personName order='", ( $name_order // '' ), "' length='", ( $name_length // '' ), "' usage='", ( $name_usage // '' ), "' formality='", ( $name_formality // '' ), "'> for locale '${locale}' in file ${f}" );
+                    }
+
+                    eval
+                    {
+                        $sth_pers_name_fmt->execute( $locale, $name_index, $name_order, $name_length, $name_usage, $name_formality, $alt, $name_pattern );
+                    } || die( "Error adding person name format (name_index=${name_index}, order='", ( $name_order // '' ), "', length='", ( $name_length // '' ), "', usage='", ( $name_usage // '' ), "', formality='", ( $name_formality // '' ), "', alt=", ( $alt // 'NULL' ), ") for locale '${locale}' in file ${f}: ", ( $@ || $sth_pers_name_fmt->errstr ), "\nwith query: ", $sth_pers_name_fmt->{Statement} );
+                    $j++;
+                }
+                $name_index++;
+            }
+            $out->printf( "\t%d person name format patterns added.\n", $j ) if( $DEBUG );
+
+            # NOTE: sampleName elements
+            # Example names for CLDR testing and survey tooling. Each sampleName has an item attribute (e.g. nativeG, foreignFull) and one or more nameField children.
+            # Each nameField is stored as a separate row.
+            # These must NOT be used as UI placeholders in production software.
+            my $sampleNameRes = $pn_root->findnodes( 'sampleName' );
+            $j = 0;
+            while( my $el = $sampleNameRes->shift )
+            {
+                my $sample_type = $el->getAttribute( 'item' );
+                if( !defined( $sample_type ) || !length( $sample_type ) )
+                {
+                    die( "Missing 'item' attribute on <sampleName> for locale '${locale}' in file ${f}: ", $el->toString() );
+                }
+                my $nameFieldRes = $el->findnodes( 'nameField' );
+                if( !$nameFieldRes->size )
+                {
+                    warn( "Warning only: no <nameField> children in <sampleName item='${sample_type}'> for locale '${locale}' in file ${f}" );
+                    next;
+                }
+                while( my $nf = $nameFieldRes->shift )
+                {
+                    my $field_type = $nf->getAttribute( 'type' );
+                    if( !defined( $field_type ) || !length( $field_type ) )
+                    {
+                        die( "Missing 'type' attribute on <nameField> in <sampleName item='${sample_type}'> for locale '${locale}' in file ${f}: ", $nf->toString() );
+                    }
+                    my $field_value = $nf->textContent;
+                    if( !defined( $field_value ) || !length( $field_value ) )
+                    {
+                        warn( "Warning only: empty <nameField type='${field_type}'> in <sampleName item='${sample_type}'> for locale '${locale}' in file ${f}" );
+                        next;
+                    }
+                    eval
+                    {
+                        $sth_pers_name_samp->execute( $locale, $sample_type, $field_type, $field_value );
+                    } || die( "Error adding person name sample (sample_type='${sample_type}', field_type='${field_type}') for locale '${locale}' in file ${f}: ", ( $@ || $sth_pers_name_samp->errstr ), "\nwith query: ", $sth_pers_name_samp->{Statement} );
+                    $j++;
+                }
+            }
+            $out->printf( "\t%d person name sample field records added.\n", $j ) if( $DEBUG );
+        }
+        else
+        {
+            $out->print( "\tNo person name data found.\n" ) if( $DEBUG );
+        }
         $n++;
     }
     &log( "${n} locales information processed." );

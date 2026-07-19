@@ -1,0 +1,24 @@
+# Google::Ai::Generativelanguage::V1
+
+Auto-generated Protocol Buffers client library for Google Cloud Services.
+
+## Installation
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+## Documentation
+
+After installing, you can find documentation for this module with the `perldoc` command:
+
+    perldoc Google::Ai::Generativelanguage::V1
+
+## License and Copyright
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.

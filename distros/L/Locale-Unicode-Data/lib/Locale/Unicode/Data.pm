@@ -1,16 +1,16 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.8.6
+## Unicode Locale Identifier - ~/lib/m
+## Version v1.9.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/06/09
+## Modified 2026/07/15
 ## All rights reserved
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Locale::Unicode::Data;
 BEGIN
 {
@@ -40,7 +40,7 @@ BEGIN
     our $CLDR_VERSION = '48.2';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.8.6';
+    our $VERSION = 'v1.9.0';
 };
 
 use strict;
@@ -1450,6 +1450,204 @@ sub person_name_defaults { return( shift->_fetch_all({
     id          => 'person_name_defaults',
     table       => 'person_name_defaults',
 }, @_ ) ); }
+
+# These methods implement key steps of the CLDR person name formatting algorithm
+# described in UTS #35 Part 8. Insert them alongside PART 1 (in alphabetical order
+# within the person_name_* group).
+
+# person_name_derive_order( formatting_locale => 'ja', name_locale => 'ko' )
+# -> returns 'givenFirst' or 'surnameFirst', by consulting person_name_order_locales
+#    for the formatting locale, matching against the name locale's base language
+#    and the 'und' catch-all.
+#
+# This implements step 3 of the CLDR "Derive the name order" algorithm, full lookup
+# (base language + 'und') with the full parent-locale chain traversal, which requires
+# the parentLocales supplemental data. For the full algorithm see UTS #35 Part 8 section
+# "Derive the name order".
+# The default when no match is found is 'givenFirst', as specified by CLDR.
+#
+# NOTE: The caller should pass a preferredOrder from the PersonName object when
+# available (step 2 of the algorithm), as that takes precedence over this method.
+sub person_name_derive_order
+{
+    my $self = shift( @_ );
+    my %args = @_;
+    my $fmt_locale = $args{formatting_locale} ||
+        return( $self->error( "Missing required argument 'formatting_locale'" ) );
+    my $name_locale = $args{name_locale} ||
+        return( $self->error( "Missing required argument 'name_locale'" ) );
+    my $fmt_tree = $self->make_inheritance_tree( $fmt_locale ) ||
+        return( $self->pass_error );
+    my $name_tree = $self->make_inheritance_tree( $name_locale ) ||
+        return( $self->pass_error );
+    my $rules = {};
+
+    foreach my $locale ( @$fmt_tree )
+    {
+        my $refs = $self->person_name_order_locales(
+            locale => $locale,
+        );
+        return( $self->pass_error ) if( !defined( $refs ) && $self->error );
+        next unless( ref( $refs ) eq 'ARRAY' );
+
+        foreach my $ref ( @$refs )
+        {
+            my $key = lc( $ref->{name_locale} );
+            next if( exists( $rules->{ $key } ) );
+            $rules->{ $key } = $ref->{name_order};
+        }
+    }
+
+    foreach my $name ( @$name_tree )
+    {
+        my $locale = $self->_locale_object( $name ) ||
+            return( $self->pass_error );
+        my @lookup = ( lc( "$locale" ) );
+
+        my $language = $locale->language_id;
+        if( defined( $language ) &&
+            lc( $language ) ne 'und' )
+        {
+            my $und = $locale->clone;
+            $und->language_id( 'und' );
+            push( @lookup, lc( "$und" ) );
+        }
+
+        foreach my $candidate ( @lookup )
+        {
+            return( $rules->{ $candidate } )
+                if( exists( $rules->{ $candidate } ) );
+        }
+    }
+
+    # CLDR default when neither the name locale nor 'und' is found
+    return( 'givenFirst' );
+}
+
+sub person_name_format { return( shift->_fetch_one({
+    id          => 'get_person_name_format',
+    field       => 'name_order',
+    table       => 'person_name_formats',
+    requires    => [qw( locale name_length name_usage name_formality alt )],
+    default     => { alt => undef },
+}, @_ ) ); }
+
+sub person_name_formats { return( shift->_fetch_all({
+    id          => 'person_name_formats',
+    table       => 'person_name_formats',
+    by          => [qw( locale name_index name_order name_length name_usage name_formality alt )],
+    order       => 'name_index, pers_name_fmt_id',
+}, @_ ) ); }
+
+sub person_name_initial_pattern { return( shift->_fetch_one({
+    id          => 'get_person_name_initial_pattern',
+    field       => 'pattern_type',
+    table       => 'person_name_initial_patterns',
+    requires    => [qw( locale )],
+}, @_ ) ); }
+
+sub person_name_initial_patterns { return( shift->_fetch_all({
+    id          => 'person_name_initial_patterns',
+    table       => 'person_name_initial_patterns',
+    by          => [qw( locale )],
+    order       => 'pattern_type',
+}, @_ ) ); }
+
+sub person_name_order_locale { return( shift->_fetch_one({
+    id          => 'get_person_name_order_locale',
+    field       => 'name_locale',
+    table       => 'person_name_order_locales',
+    requires    => [qw( locale )],
+}, @_ ) ); }
+
+sub person_name_order_locales { return( shift->_fetch_all({
+    id          => 'person_name_order_locales',
+    table       => 'person_name_order_locales',
+    by          => [qw( locale name_order )],
+    order       => 'name_locale',
+}, @_ ) ); }
+
+sub person_name_sample { return( shift->_fetch_one({
+    id          => 'get_person_name_sample',
+    field       => 'field_type',
+    table       => 'person_name_samples',
+    requires    => [qw( locale sample_type )],
+}, @_ ) ); }
+
+sub person_name_samples { return( shift->_fetch_all({
+    id          => 'person_name_samples',
+    table       => 'person_name_samples',
+    by          => [qw( locale sample_type )],
+    order       => 'pers_name_samp_id',
+}, @_ ) ); }
+
+# person_name_space_replacement( formatting_locale => 'ja', name_locale => 'de' )
+# -> returns the correct space replacement string for this locale pair, fetched from
+#    locales_info (keys person_name_native_space / person_name_foreign_space), applying
+#    CLDR defaults when no explicit value is stored.
+#
+# Per the spec (Setting the spaceReplacement):
+#   1. foreignSpaceReplacement default is SPACE (" ").
+#   2. nativeSpaceReplacement  default is SPACE (" ").
+#   3. If formatter base language matches name base language -> nativeSpaceReplacement,
+#      else -> foreignSpaceReplacement.
+#   4. Two base languages "match" when identical, or both in {ja, zh, yue}.
+#
+# NOTE: This method compares base languages only (the first subtag of the BCP 47 locale
+# tag). The caller is responsible for deriving the correct base languages from the full
+# locale identifiers, including script switching as described in the spec section
+# "Switch the formatting locale if necessary".
+sub person_name_space_replacement
+{
+    my $self = shift( @_ );
+    my %args = @_;
+    unless( exists( $args{formatting_locale} ) &&
+            defined( $args{formatting_locale} ) )
+    {
+        return( $self->error( "Missing required argument 'formatting_locale'" ) );
+    }
+    unless( exists( $args{name_locale} ) &&
+            defined( $args{name_locale} ) )
+    {
+        return( $self->error( "Missing required argument 'name_locale'" ) );
+    }
+    my $fmt_locale = Locale::Unicode->new( $args{formatting_locale} ) ||
+        return( $self->pass_error( Locale::Unicode->error ) );
+    my $name_locale = Locale::Unicode->new( $args{name_locale} ) ||
+        return( $self->pass_error( Locale::Unicode->error ) );
+    # A locale is composed, possibly, of a language-script-territory.
+    # Locale::Unicode->language_id() returns either the two-character or three-character language portion.
+    my $fmt_lang  = $fmt_locale->language_id;
+    my $name_lang = $name_locale->language_id;
+    $fmt_lang     = lc( $fmt_lang );
+    $name_lang    = lc( $name_lang );
+    my %cjk_group = map{ $_ => 1 } qw( ja zh yue );
+    my $languages_match =
+        ( $fmt_lang eq $name_lang ) ||
+        ( exists( $cjk_group{ $fmt_lang } ) && exists( $cjk_group{ $name_lang } ) );
+    my $prop_key = $languages_match
+        ? 'person_name_native_space'
+        : 'person_name_foreign_space';
+    my $tree = $self->make_inheritance_tree( $fmt_locale ) ||
+        return( $self->pass_error );
+
+    foreach my $locale ( @$tree )
+    {
+        my $ref = $self->locales_info(
+            locale   => $locale,
+            property => $prop_key,
+        );
+
+        if( defined( $ref ) &&
+            scalar( keys( %$ref ) ) &&
+            defined( $ref->{value} ) )
+        {
+            return( $ref->{value} );
+        }
+    }
+
+    return( ' ' );
+}
 
 # NOTE: plural rules for 222 locales based on the Unicode CDR rules set out in supplemental/plurals.xml
 # This is for the method plural_count()
@@ -3860,6 +4058,7 @@ sub _locale_object
     }
     return( $locale );
 }
+
 sub _set_cached_statement
 {
     my $self = shift( @_ );
@@ -4884,6 +5083,57 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     my $all = $cldr->number_systems;
     my $ref = $cldr->person_name_default( locale => 'ja' );
     my $all = $cldr->person_name_defaults;
+    my $ref = $cldr->person_name_format(
+        locale          => 'ja',
+        name_order      => 'surnameFirst',
+        name_length     => 'long',
+        name_usage      => 'referring',
+        name_formality  => 'formal',
+    );
+    my $all = $cldr->person_name_formats( locale => 'ja' );
+    my $all = $cldr->person_name_formats(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+    my $ref = $cldr->person_name_initial_pattern(
+        locale          => 'en',
+        pattern_type    => 'initial',
+    );
+    my $all = $cldr->person_name_initial_patterns( locale => 'en' );
+    my $ref = $cldr->person_name_order_locale(
+        locale      => 'ja',
+        name_locale => 'ko',
+    );
+    my $all = $cldr->person_name_order_locales( locale => 'ja' );
+    my $all = $cldr->person_name_order_locales(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+    my $ref = $cldr->person_name_sample(
+        locale      => 'ja',
+        sample_type => 'nativeFull',
+        field_type  => 'given',
+    );
+    my $all = $cldr->person_name_samples( locale => 'ja' );
+    my $all = $cldr->person_name_samples(
+        locale      => 'ja',
+        sample_type => 'foreignFull',
+    );
+    my $order = $cldr->person_name_derive_order(
+        formatting_locale   => 'ja',
+        name_locale         => 'ko',
+    );
+    # 'surnameFirst'
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'de',
+    );
+    # '・'
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'ja',
+    );
+    # ''
     my $ref = $cldr->rbnf(
         locale  => 'ja',
         ruleset => 'spellout-cardinal',
@@ -5085,7 +5335,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.8.6
+    v1.9.0
 
 =head1 DESCRIPTION
 
@@ -5218,6 +5468,22 @@ This serves to map territory or currency codes with their well known equivalent 
 =item * L<Person name defaults|/"Table person_name_defaults">
 
 This specifies, for a given C<locale>, whether a person's given name comes first before the surname, or after.
+
+=item * L<Person name format patterns|/"Table person_name_formats">
+
+This stores the locale-specific name format patterns for each combination of ordering (C<givenFirst>, C<surnameFirst>, C<sorting>), length (C<long>, C<medium>, C<short>), usage (C<referring>, C<addressing>, C<monogram>), and formality (C<formal>, C<informal>). Where a locale provides alternate patterns for the same context, these are distinguished by the C<alt> column.
+
+=item * L<Person name initial patterns|/"Table person_name_initial_patterns">
+
+This stores locale-specific patterns for rendering name initials. The C<initial> type controls how a single initial is produced (e.g. C<{0}.> giving C<W.>), and C<initialSequence> controls how multiple initials are joined (e.g. C<{0} {1}> giving C<W. J.>). Only approximately 19 locales define these; all others inherit the root defaults.
+
+=item * L<Person name order locales|/"Table person_name_order_locales">
+
+This records, for a given display locale, which ordering convention (C<givenFirst> or C<surnameFirst>) applies to names from a given source locale. The value C<und> is the catch-all fallback; C<und-XX> scopes the fallback to a specific region.
+
+=item * L<Person name samples|/"Table person_name_samples">
+
+This stores sample names used to illustrate how format patterns render in practice. Each sample is identified by a category (such as C<nativeFull> or C<foreignGS>) and contains individual name field values. These are for CLDR testing and survey tooling only; they must not be used as UI prompts in production software.
 
 =item * L<References|/"Table refs">
 
@@ -8333,7 +8599,7 @@ A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Tabl
 
 A string representing a property.
 
-Known properties are: C<char_orientation>, C<quotation2_end>, C<quotation2_start>, C<quotation_end>, C<quotation_start>, C<yes> and C<no>
+Known properties are: C<char_orientation>, C<person_name_default_formality>, C<person_name_default_length>, C<person_name_foreign_space>, C<person_name_native_space>, C<quotation2_end>, C<quotation2_start>, C<quotation_end>, C<quotation_start>, C<yes> and C<no>
 
 =item * C<value>
 
@@ -9386,6 +9652,226 @@ This is the way the Unicode CLDR data is structured.
     my $all = $cldr->person_name_defaults;
 
 Returns all person name defaults information from L<table person_name_defaults|/"Table person_name_defaults"> as an array reference of hash reference.
+
+=head2 person_name_derive_order
+
+    my $order = $cldr->person_name_derive_order(
+        formatting_locale   => 'ja',
+        name_locale         => 'ko',
+    );
+    # Returns 'surnameFirst'
+
+    my $order = $cldr->person_name_derive_order(
+        formatting_locale   => 'en',
+        name_locale         => 'fr',
+    );
+    # Returns 'givenFirst'
+
+Returns either C<givenFirst> or C<surnameFirst> by consulting the L<person_name_order_locales|/"Table person_name_order_locales"> table for C<formatting_locale>, looking for a match on the base language of C<name_locale>, then falling back to C<und> if no explicit entry is found.
+
+This implements step 3 of the CLDR B<Derive the name order> algorithm (L<UTS #35 Part 8|https://www.unicode.org/reports/tr35/tr35-personNames.html#derive-the-name-order>). The default return value when neither the base language nor C<und> is found is C<givenFirst>, as specified by CLDR.
+
+B<Important:> This method implements a simplified single-level lookup. The full CLDR algorithm traverses the entire parent locale chain and also considers region subtags (e.g. C<und-JP>). For complete correctness with locale tags that include script or region subtags, the caller should iterate through the parent chain manually and call this method for each ancestor.
+
+The caller is also responsible for handling steps 1 and 2 of the algorithm: if the calling API has requested sorting order, that takes priority; if the PersonName object itself supplies a C<preferredOrder> field, that takes priority over the result of this method.
+
+=head2 person_name_space_replacement
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'de',
+    );
+    # Returns '・'  (KATAKANA MIDDLE DOT, for foreign names in Japanese)
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'ja',
+    );
+    # Returns ''  (empty string, for native Japanese names)
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'en',
+        name_locale         => 'fr',
+    );
+    # Returns ' '  (space, default for most locales)
+
+Returns the string that should replace each space character in a formatted name, according to the CLDR B<Setting the spaceReplacement> algorithm (UTS #35 Part 8).
+
+The CLDR algorithm is:
+
+=over 4
+
+=item 1.
+
+If the formatting base language matches the name base language, the C<nativeSpaceReplacement> applies; otherwise the C<foreignSpaceReplacement>
+applies.
+
+=item 2.
+
+Two base languages B<match> when they are identical, or when both belong to the group C<{ja, zh, yue}>. This reflects the fact that Japanese, Mandarin Chinese, and Cantonese share the same spacing conventions for names.
+
+=item 3.
+
+If the relevant replacement value is not explicitly defined for the formatting locale (i.e. not present in L<locales_info|/"Table locales_info"> under the key C<person_name_native_space> or C<person_name_foreign_space>), the default is a single SPACE character C<" ">, as specified by CLDR.
+
+=back
+
+In practice, only locales that do not require spaces between words (such as C<ja>, C<zh>, C<yue>) define non-default values. For C<ja>, the C<nativeSpaceReplacement> is an empty string C<""> (native Japanese names have no separator between name parts), and the C<foreignSpaceReplacement> is C<"・"> (U+30FB KATAKANA MIDDLE DOT, used to separate words in foreign names rendered in Japanese).
+
+The values are stored in the L<locales_info|/"Table locales_info"> table under the property keys C<person_name_native_space> and C<person_name_foreign_space>.
+
+B<Note:> This method compares base languages only (the first BCP 47 subtag).
+The caller is responsible for deriving the correct base languages after applying the B<Switch the formatting locale if necessary> step of the CLDR algorithm, which may change the effective formatting locale when the name script differs from the formatting script.
+
+After obtaining the replacement string, apply it by replacing every sequence of whitespace in the formatted name with this value:
+
+    my $sep = $cldr->person_name_space_replacement(
+        formatting_locale   => 'ja',
+        name_locale         => 'de',
+    );
+    # $formatted_name = 'アルベルト アインシュタイン'
+    $formatted_name =~ s/[[:blank:]]+/$sep/g;
+    # $formatted_name = 'アルベルト・アインシュタイン'
+
+=head2 person_name_format
+
+    my $ref = $cldr->person_name_format(
+        locale          => 'ja',
+        name_order      => 'surnameFirst',
+        name_length     => 'long',
+        name_usage      => 'referring',
+        name_formality  => 'formal',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_fmt_id    => 12,
+        locale              => 'ja',
+        name_order          => 'surnameFirst',
+        name_length         => 'long',
+        name_usage          => 'referring',
+        name_formality      => 'formal',
+        alt                 => undef,
+        name_pattern        => '{surname} {given2} {given}{title}',
+    }
+
+Returns an hash reference of a person name format pattern from the table L<person_name_formats|/"Table person_name_formats"> for the given combination of C<locale>, C<name_order>, C<name_length>, C<name_usage>, C<name_formality>, and optionally C<alt>.
+
+The C<alt> parameter defaults to C<undef> (primary pattern). Pass C<< alt => '1' >> to retrieve the alternate pattern where one exists.
+
+The C<name_pattern> value uses CLDR placeholder notation.
+
+Known field placeholders include: C<{given}>, C<{given2}>, C<{given-informal}>, C<{given-initial}>, C<{given2-initial}>, C<{given-monogram-allCaps}>, C<{surname}>, C<{surname-core}>, C<{surname-prefix}>, C<{surname2}>, C<{title}>, C<{generation}>, C<{credentials}>, and locale-specific modifier combinations such as C<{surname-allCaps}> or C<{given-informal-monogram-allCaps}>.
+
+=head2 person_name_formats
+
+    my $all = $cldr->person_name_formats;
+    my $all = $cldr->person_name_formats( locale => 'ja' );
+    my $all = $cldr->person_name_formats(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+
+Returns all person name format patterns from the table L<person_name_formats|/"Table person_name_formats"> as an array reference of hash references. Optionally filter by C<locale>, C<name_order>, C<name_length>, C<name_usage>, C<name_formality>, and/or C<alt>.
+
+=head2 person_name_initial_pattern
+
+    my $ref = $cldr->person_name_initial_pattern(
+        locale          => 'en',
+        pattern_type    => 'initial',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_init_id   => 3,
+        locale              => 'en',
+        pattern_type        => 'initial',
+        pattern_value       => '{0}.',
+        is_draft            => 0,
+    }
+
+Returns an hash reference of a person name initial pattern from the table L<person_name_initial_patterns|/"Table person_name_initial_patterns"> for the given C<locale> and C<pattern_type>.
+
+Only approximately 19 locales define these explicitly. For all others, the root locale defaults apply: C<< initial => '{0}.' >> and C<< initialSequence => '{0} {1}' >>.
+
+The C<pattern_type> is either C<initial> (pattern for a single initial, such as C<{0}.> producing C<W.>) or C<initialSequence> (pattern for joining multiple initials, such as C<{0} {1}> producing C<W. J.> or C<{0}{1}> producing C<WJ>).
+
+=head2 person_name_initial_patterns
+
+    my $all = $cldr->person_name_initial_patterns;
+    my $all = $cldr->person_name_initial_patterns( locale => 'en' );
+
+Returns all person name initial pattern records from the table L<person_name_initial_patterns|/"Table person_name_initial_patterns"> as an array reference of hash references. Optionally filter by C<locale>.
+
+=head2 person_name_order_locale
+
+    my $ref = $cldr->person_name_order_locale(
+        locale      => 'ja',
+        name_locale => 'ko',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_ord_id    => 8,
+        locale              => 'ja',
+        name_locale         => 'ko',
+        name_order          => 'surnameFirst',
+        is_draft            => 0,
+    }
+
+Returns an hash reference from the table L<person_name_order_locales|/"Table person_name_order_locales"> for the given C<locale> and C<name_locale>.
+
+This table records how a given display C<locale> orders names whose origin locale is C<name_locale>. For example, when rendering names in Japanese (C<locale = 'ja'>), names of Korean origin (C<name_locale = 'ko'>) should be ordered C<surnameFirst>.
+
+The C<name_locale> may be C<und> (catch-all fallback for any locale not otherwise listed) or C<und-XX> (region-scoped fallback, e.g. C<und-JP>).
+
+This is semantically distinct from L</person_name_default>, which records the global default ordering for a given locale as defined in the supplemental data.
+
+=head2 person_name_order_locales
+
+    my $all = $cldr->person_name_order_locales;
+    my $all = $cldr->person_name_order_locales( locale => 'ja' );
+    my $all = $cldr->person_name_order_locales(
+        locale      => 'ja',
+        name_order  => 'surnameFirst',
+    );
+
+Returns all person name order locale records from the table L<person_name_order_locales|/"Table person_name_order_locales"> as an array reference of hash references. Optionally filter by C<locale> and/or C<name_order>.
+
+=head2 person_name_sample
+
+    my $ref = $cldr->person_name_sample(
+        locale      => 'ja',
+        sample_type => 'nativeFull',
+        field_type  => 'given',
+    );
+    # Returns an hash reference like this:
+    {
+        pers_name_samp_id   => 42,
+        locale              => 'ja',
+        sample_type         => 'nativeFull',
+        field_type          => 'given',
+        field_value         => '恵子',
+    }
+
+Returns an hash reference of one name field from a sample name, from the table L<person_name_samples|/"Table person_name_samples"> for the given C<locale>, C<sample_type>, and C<field_type>.
+
+Note: sample names are provided for CLDR testing and the CLDR Survey Tool only.
+They must not be used as prompts or placeholders in production software.
+
+Known C<sample_type> values: C<nativeG>, C<nativeGS>, C<nativeGGS>, C<nativeFull>, C<foreignG>, C<foreignGS>, C<foreignGGS>, C<foreignFull>.
+
+Known C<field_type> values: C<given>, C<given2>, C<given-informal>, C<surname>, C<surname-prefix>, C<surname-core>, C<surname2>, C<title>, C<generation>, C<credentials>.
+
+The field value C<∅∅∅> is a CLDR convention indicating that the field is explicitly absent in this sample (as opposed to simply not specified).
+
+=head2 person_name_samples
+
+    my $all = $cldr->person_name_samples;
+    my $all = $cldr->person_name_samples( locale => 'ja' );
+    my $all = $cldr->person_name_samples(
+        locale      => 'ja',
+        sample_type => 'nativeFull',
+    );
+
+Returns all person name sample fields from the table L<person_name_samples|/"Table person_name_samples"> as an array reference of hash references. Optionally filter by C<locale> and/or C<sample_type>.
 
 =head2 plural_count
 
@@ -14395,6 +14881,127 @@ A string field.
 =item * C<value>
 
 A string field.
+
+=back
+
+=head2 Table person_name_formats
+
+=over 4
+
+=item * C<pers_name_fmt_id>
+
+An integer field. Primary key, automatically generated by SQLite.
+
+=item * C<locale>
+
+A string field. The locale to which this format pattern applies. Foreign key into table L<locales|/"Table locales">.
+
+=item * C<name_order>
+
+A string field. The ordering convention for this pattern. Known values: C<givenFirst>, C<surnameFirst>, C<sorting>.
+
+=item * C<name_length>
+
+A string field. The relative length of the formatted name. Known values: C<long>, C<medium>, C<short>.
+
+=item * C<name_usage>
+
+A string field. The context of use. Known values: C<referring>, C<addressing>, C<monogram>.
+
+=item * C<name_formality>
+
+A string field. The social register. Known values: C<formal>, C<informal>.
+
+=item * C<alt>
+
+A nullable string field. C<NULL> for the primary pattern. The value C<1> identifies an alternate pattern within the same context, used when a locale provides two patterns covering different combinations of name fields (such as one including C<surname2> and one without).
+
+=item * C<name_pattern>
+
+A string field of up to 120 characters. The format pattern using CLDR placeholder notation. Example: C<{surname} {given2} {given}{title}>
+
+=back
+
+=head2 Table person_name_initial_patterns
+
+=over 4
+
+=item * C<pers_name_init_id>
+
+An integer field. Primary key, automatically generated by SQLite.
+
+=item * C<locale>
+
+A string field. The locale for which this initial pattern applies. Foreign key into table L<locales|/"Table locales">. Only approximately 19 locales define these explicitly; all others use the root locale defaults.
+
+=item * C<pattern_type>
+
+A string field. Known values: C<initial> and C<initialSequence>.
+
+C<initial> is the pattern used to render a single initial from one word, for example C<{0}.> produces C<W.> from C<Wolcott>.
+
+C<initialSequence> is the pattern for joining multiple initials from a multi-word field, for example C<{0} {1}> produces C<W. J.> from C<Wolcott Janus>, while C<{0}{1}> (no space) produces C<WJ>.
+
+=item * C<pattern_value>
+
+A string field. The pattern itself, using C<{0}> and C<{1}> as positional placeholders.
+
+=item * C<is_draft>
+
+A boolean field. C<TRUE> if the CLDR entry is marked C<draft="unconfirmed">.
+
+=back
+
+=head2 Table person_name_order_locales
+
+=over 4
+
+=item * C<pers_name_ord_id>
+
+An integer field. Primary key, automatically generated by SQLite.
+
+=item * C<locale>
+
+A string field. The display locale, i.e. the locale doing the rendering.
+Foreign key into table L<locales|/"Table locales">.
+
+=item * C<name_locale>
+
+A string field. The locale whose names are being ordered. May be C<und> for the catch-all fallback, or C<und-XX> for a region-scoped fallback such as C<und-JP>. Not a foreign key because C<und> and region-scoped values are not always present as rows in the locales table.
+
+=item * C<name_order>
+
+A string field. The ordering to apply to names from C<name_locale> when displaying them in C<locale>. Known values: C<givenFirst>, C<surnameFirst>.
+
+=item * C<is_draft>
+
+A boolean field. C<TRUE> if the CLDR entry is marked C<draft="unconfirmed">.
+
+=back
+
+=head2 Table person_name_samples
+
+=over 4
+
+=item * C<pers_name_samp_id>
+
+An integer field. Primary key, automatically generated by SQLite.
+
+=item * C<locale>
+
+A string field. The locale to which this sample belongs. Foreign key into table L<locales|/"Table locales">.
+
+=item * C<sample_type>
+
+A string field. The category of the sample name. Known values: C<nativeG>, C<nativeGS>, C<nativeGGS>, C<nativeFull>, C<foreignG>, C<foreignGS>, C<foreignGGS>, C<foreignFull>. These may change in future CLDR versions.
+
+=item * C<field_type>
+
+A string field. The name component type. Known values: C<given>, C<given2>, C<given-informal>, C<surname>, C<surname-prefix>, C<surname-core>, C<surname2>, C<title>, C<generation>, C<credentials>.
+
+=item * C<field_value>
+
+A text field. The sample value for this name component. The value C<∅∅∅> is a CLDR convention indicating an explicitly absent field.
 
 =back
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 BEGIN {
     $ENV{PACKAGE_STASH_IMPLEMENTATION} ||= 'PP';
     $ENV{MOO_XS_DISABLE} ||= '1';
@@ -10,6 +10,7 @@ BEGIN {
         $Template::Config::STASH = 'Template::Stash';
     };
 }
+BEGIN { unshift @INC, "$ENV{HOME}/perl5/lib/perl5" if $ENV{HOME} && -d "$ENV{HOME}/perl5/lib/perl5"; }
 use lib 'local/lib';
 use lib 'xlib';
 use ExtUtils::MakeMaker;
@@ -18,7 +19,7 @@ use File::Spec;
 use File::Find;
 use ExtUtils::Embed;
 use JSON::PP qw(decode_json);
-use Template;
+eval { require Template; };
 use Sideload::Build::FileLists qw(
     get_upb_c_files
     get_utf8_c_files
@@ -50,9 +51,14 @@ $num_cores = int($num_cores) || 1;
 
 my $perl = $ENV{PERL} || $^X;
 
-if (!-d 'vendor' && (-d '../upb' || -d '../../upb')) {
-    print "vendor/ directory is missing. Bootstrapping upb...\n";
-    system($^X, 'maint/vendor_upb.pl') == 0 or die "Failed to bootstrap upb: $!";
+if (!-d 'vendor') {
+    if (-d '../upb' || -d '../../upb') {
+        print "vendor/ directory is missing. Bootstrapping upb...\n";
+        system($^X, 'maint/vendor_upb.pl') == 0 or die "Failed to bootstrap upb: $!";
+    } elsif (-d '.git' || -d '../.git') {
+        print "vendor/ directory missing. Restoring from git...\n";
+        system('git', 'checkout', '--', 'vendor/');
+    }
 }
 
 if ($is_dev) {
@@ -89,9 +95,14 @@ if ($is_dev) {
     system($perl, 'maint/generate_xs.pl') == 0 or die "Failed to run generate_xs.pl: $!";
 
     # 2. Update the local vendor directory with core components
-    if (-f 'maint/vendor_upb.pl') {
-        print "Updating vendor/ directory...\n";
-        system($perl, 'maint/vendor_upb.pl') == 0 or die "Failed to run vendor_upb.pl: $!";
+    unless (-f 'vendor/upb/mem/arena.h') {
+        print "vendor/upb headers missing. Rebuilding vendor/ directory...\n";
+        if (-f 'maint/vendor_upb.pl') {
+            system($perl, 'maint/vendor_upb.pl');
+        }
+        if (!-f 'vendor/upb/mem/arena.h') {
+            system('git', 'submodule', 'update', '--init', '--recursive');
+        }
     }
 
     # 3. Clean and regenerate MANIFEST from scratch to remove dead references
@@ -155,8 +166,10 @@ if (!$is_google3_dev) {
     File::Path::make_path('third_party/protobuf/perl') unless -d 'third_party/protobuf/perl';
 
     my $symlink_target = 'third_party/protobuf/perl/protoc';
-    if (-e $symlink_target || -l $symlink_target) {
-        unlink $symlink_target or warn "Failed to remove old symlink $symlink_target: $!";
+    if (-d $symlink_target && ! -l $symlink_target) {
+        File::Path::remove_tree($symlink_target);
+    } elsif (-e $symlink_target || -l $symlink_target) {
+        unlink $symlink_target;
     }
 
     my $abs_protoc_dir = File::Spec->rel2abs('protoc');
@@ -216,6 +229,8 @@ sub _render_tt {
     $vars->{is_darwin} = $is_darwin;
     if (!$tt) {
         $ENV{TEMPLATE_STASH} = 'pureperl';
+        require Template;
+        Template->import() if Template->can('import');
         $tt = Template->new({
             INCLUDE_PATH => [ 'inc/templates' ],
             PRE_PROCESS  => 'makefile.tt',
@@ -304,24 +319,37 @@ sub _get_adjusted_embed_flags {
     chomp $embed_cflags;
     chomp $embed_ldflags;
 
-    my $archlib = $Config{archlib};
+    # Dynamic shared/static libperl resolution for non-system perls (perlbrew, plenv, custom prefixes)
+    # and non-x86_64 architectures
     my $libperl = $Config{libperl};
-    my @candidate_paths = (
-        File::Spec->catfile($Config{archlibexp}, 'CORE', $libperl),
-        File::Spec->catfile('/usr/lib/x86_64-linux-gnu', $libperl),
-        File::Spec->catfile('/usr/lib', $libperl),
-    );
-    my $found_libperl;
-    for my $p (@candidate_paths) {
-        if (-f $p) {
-            $found_libperl = $p;
-            last;
+    my $so = $Config{so} || 'so';
+    my $useshrplib = $Config{useshrplib} || '';
+
+    if ($useshrplib eq 'true' || $useshrplib eq 'define' || $useshrplib eq '1') {
+        my $shared_libperl = $libperl;
+        $shared_libperl =~ s/\.a$/.$so/i;
+        my @search_dirs = (
+            File::Spec->catdir($Config{archlibexp}, 'CORE'),
+            split(' ', $Config{shrlibpth} || ''),
+            split(' ', $Config{libpth} || ''),
+        );
+        my $found_shared;
+        for my $dir (@search_dirs) {
+            next unless $dir && -d $dir;
+            my $full = File::Spec->catfile($dir, $shared_libperl);
+            if (-f $full) {
+                $found_shared = $full;
+                last;
+            }
         }
-    }
-    if ($found_libperl) {
-        $embed_ldflags =~ s{-lperl}{$found_libperl}g;
+        if ($found_shared) {
+            $embed_ldflags =~ s{-lperl}{$found_shared}g;
+        }
     } else {
-        $embed_ldflags =~ s{-lperl}{}g;
+        my $core_libperl = File::Spec->catfile($Config{archlibexp}, 'CORE', $libperl);
+        if (-f $core_libperl) {
+            $embed_ldflags =~ s{-lperl}{$core_libperl}g;
+        }
     }
 
     return ($embed_cflags, $embed_ldflags);
@@ -366,11 +394,12 @@ sub MY::postamble {
         $base_flags =~ s{\\}{/}g if $main::is_win32;
 
         my $cflags = "";
+        my $pic_flags = "-fPIC " . ($Config{cccdlflags} // '');
         if ($c_file =~ /\.cc$/) {
             $compiler = '$(CXX)';
-            $cflags = "-Wno-error=attributes -I" . File::Spec->catdir($third_party_dir, 'abseil-cpp');
+            $cflags = "$pic_flags -Wno-error=attributes -I" . File::Spec->catdir($third_party_dir, 'abseil-cpp');
         } else {
-            $cflags = "-D_GNU_SOURCE -Werror=incompatible-pointer-types -Wno-error=attributes -std=c99 -Wall -Wstrict-prototypes";
+            $cflags = "$pic_flags -D_GNU_SOURCE -Werror=incompatible-pointer-types -Wno-error=attributes -std=c99 -Wall -Wstrict-prototypes";
         }
         push @obj_rules, main::_render_tt('common_obj_rule', {
             c => $c_file,
@@ -715,8 +744,15 @@ if ($is_linux) {
     $common_lib_link_flags = "-Wl,-install_name,\@rpath/libprotobufperl.$extlib_ext -Wl,-undefined,dynamic_lookup";
     $extra_ldflags = ' -Wl,-rpath,@loader_path';
     if (-d '/opt/homebrew/include') {
-        $mac_inc = ' -I/opt/homebrew/include';
+        $mac_inc .= ' -I/opt/homebrew/include';
         $mac_libs = ' -L/opt/homebrew/lib';
+    }
+    if (! -f "$Config{archlibexp}/CORE/EXTERN.h") {
+        my $sdk_path = `xcrun --show-sdk-path 2>/dev/null`;
+        chomp $sdk_path if $sdk_path;
+        if ($sdk_path && -d "$sdk_path/$Config{archlibexp}/CORE") {
+            $mac_inc .= " -I$sdk_path/$Config{archlibexp}/CORE";
+        }
     }
 }
 
@@ -753,8 +789,11 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/LLC-Technologies-Collier/protobuf.git',
-                web  => 'https://github.com/LLC-Technologies-Collier/protobuf',
+                url  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl.git',
+                web  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl',
+            },
+            bugtracker => {
+                web  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues',
             },
         },
         no_index => {
@@ -795,7 +834,7 @@ WriteMakefile(
 
     # Clean the generated object files and the static library
     clean             => { FILES => join(' ', sort @clean_files) },
-    realclean         => { FILES => 'vendor upb Protobuf-*.tar.gz lua ruby perl local MANIFEST MANIFEST.bak make.log test_c.log Protobuf.xs BUILD.bazel META.json META.yml' },
+    realclean         => { FILES => 'Protobuf-*.tar.gz lua ruby perl local MANIFEST MANIFEST.bak make.log test_c.log Protobuf.xs BUILD.bazel META.json META.yml' },
 
     dist              => {
         PREOP => '$(PERL) -MExtUtils::Manifest=mkmanifest -e "mkmanifest"',

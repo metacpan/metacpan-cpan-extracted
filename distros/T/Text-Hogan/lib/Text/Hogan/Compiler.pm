@@ -1,5 +1,5 @@
 package Text::Hogan::Compiler;
-$Text::Hogan::Compiler::VERSION = '2.04';
+$Text::Hogan::Compiler::VERSION = '2.05';
 use Text::Hogan::Template;
 
 use 5.10.0;
@@ -348,9 +348,15 @@ sub generate {
     return $self->make_template($context, $text, $options);
 }
 
+sub fuse {
+    my ($c) = @_;
+    1 while $c =~ s/\);\$t->b\(/ . /g;
+    return $c;
+}
+
 sub wrap_main {
     my ($code) = @_;
-    return sprintf('$t->b($i = $i || ""); %s return $t->fl();', $code);
+    return fuse(sprintf('$t->b($i = $i || ""); %s return $t->fl();', $code));
 }
 
 sub make_template {
@@ -561,7 +567,7 @@ Text::Hogan::Compiler - parse templates and output Perl code
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Hogan
 
+2.05 2026-07-19
+    * update dependencies for Clone (0.50), Scalar::Util (1.70), Text::Trim (1.04) previous requirements were ancient
+    * various speed ups
+
 2.04 2026-06-08
     * replace eval in find_in_scope
     * use HTML::Escape

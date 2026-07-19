@@ -44,6 +44,7 @@ requires:
   Types::Standard: '0'
   perl: '5.014'
 resources:
-  repository: https://github.com/LLC-Technologies-Collier/protobuf.git
-version: '0.06'
+  bugtracker: https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
+  repository: https://github.com/GoogleCloudPlatform/google-auth-library-perl.git
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

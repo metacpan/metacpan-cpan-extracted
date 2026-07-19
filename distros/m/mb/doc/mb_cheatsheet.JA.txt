@@ -4,7 +4,7 @@
 
 [ 1. ロード ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15 / johab
 
 [ 2. 文字単位の length / substr ]
   mb::length($str)              # 文字数（バイト数ではない）
@@ -35,7 +35,7 @@
   mb::tr($str, $from, $to)      # 文字の置換（tr/y の多バイト版）
 
 [ 7. サポートエンコーディング ]
-  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15  johab
 
 [ 8. 使用例 ]
   use mb;

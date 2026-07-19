@@ -1,5 +1,5 @@
 package Glitch;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use 5.006; use strict; use warnings;
 use Data::Dumper; use feature qw/state/;
 state (%META);
@@ -160,7 +160,7 @@ Glitch - Exception Handling.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

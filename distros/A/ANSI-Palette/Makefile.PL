@@ -11,6 +11,7 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
     EXE_FILES        => [ 'colour_palette_256', 'colour_palette_16', 'colour_palette_8' ],
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

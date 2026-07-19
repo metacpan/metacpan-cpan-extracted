@@ -4,7 +4,7 @@
 
 [ 1. मॉड्यूल लोड करें ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15 / johab
 
 [ 2. अक्षर-आधारित length / substr ]
   mb::length($str)              # अक्षरों की संख्या (बाइट नहीं)
@@ -26,7 +26,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. समर्थित एन्कोडिंग ]
-  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15  johab
 
 [ 8. उदाहरण ]
   use mb;

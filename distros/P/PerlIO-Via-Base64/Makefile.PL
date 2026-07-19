@@ -15,6 +15,7 @@ WriteMakefile (
  (AUTHOR	=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
   ABSTRACT	=> 'PerlIO Layer for quoted-printable encoding') : (),
  VERSION_FROM	=> 'lib/PerlIO/Via/Base64.pm',
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> {
                     'MIME::Base64' => 0,
                    },

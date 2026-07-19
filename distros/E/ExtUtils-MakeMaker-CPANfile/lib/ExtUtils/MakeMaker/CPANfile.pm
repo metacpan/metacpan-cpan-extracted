@@ -5,9 +5,10 @@ use warnings;
 use ExtUtils::MakeMaker ();
 use File::Spec::Functions qw/catfile rel2abs/;
 use Module::CPANfile;
+use CPAN::Meta::Requirements;
 use version;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 sub import {
   my $class = shift;
@@ -54,7 +55,7 @@ sub import {
       # Add myself to configure requires (if possible)
       _merge(
          \%params,
-         {'ExtUtils::MakeMaker::CPANfile' => $VERSION},
+         _req('ExtUtils::MakeMaker::CPANfile' => $VERSION),
          _eumm('6.52') ? 'CONFIGURE_REQUIRES' : undef,
       );
 
@@ -158,42 +159,27 @@ sub _eumm {
 
 sub _get {
   my $prereqs = shift;
-  eval { $prereqs->requirements_for(@_)->as_string_hash };
+  eval { $prereqs->requirements_for(@_) };
+}
+
+sub _req {
+  my $requires = CPAN::Meta::Requirements->new;
+  $requires->add_string_requirement(@_);
+  $requires;
 }
 
 sub _merge {
   my ($params, $requires, $key) = @_;
 
-  return unless $key;
+  return unless $key && $requires;
 
-  for (keys %{$requires || {}}) {
-    my $version = _normalize_version($requires->{$_});
-    next unless defined $version;
-
-    if (not exists $params->{$key}{$_}) {
-      $params->{$key}{$_} = $version;
-    } else {
-      my $prev = $params->{$key}{$_};
-      if (version->parse($prev) < version->parse($version)) {
-        $params->{$key}{$_} = $version;
-      }
-    }
+  for my $module (keys %{ $params->{$key} || {} }) {
+    $requires->add_string_requirement($module => $params->{$key}{$module});
   }
-}
+  my $new_hash = $requires->as_string_hash;
+  return unless %$new_hash;
 
-sub _normalize_version {
-  my $version = shift;
-
-  # shortcuts
-  return unless defined $version;
-  return $version unless $version =~ /\s/;
-
-  # TODO: better range handling
-  $version =~ s/(?:>=|==)\s*//;
-  $version =~ s/,.+$//;
-
-  return $version unless $version =~ /\s/;
-  return;
+  $params->{$key} = $new_hash;
 }
 
 1;

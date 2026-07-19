@@ -1,6 +1,6 @@
 package WebService::Chroma;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use 5.006;
 use strict;
@@ -145,7 +145,7 @@ WebService::Chroma - chromadb client
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

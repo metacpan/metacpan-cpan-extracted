@@ -5,7 +5,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 
 sub name {

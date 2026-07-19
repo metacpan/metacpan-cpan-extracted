@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GraphQL::Houtou SQLite Blog</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { max-width: 70rem; margin: 2rem auto; padding: 0 1rem; }
+    header, form, article { border: 1px solid #8886; border-radius: .7rem; padding: 1rem; margin: 1rem 0; }
+    label { display: block; margin: .6rem 0; }
+    input, textarea, select, button { font: inherit; padding: .45rem; }
+    input, textarea { box-sizing: border-box; width: 100%; }
+    textarea { min-height: 7rem; }
+    .meta { opacity: .72; font-size: .9rem; }
+    .error { color: #d33; white-space: pre-wrap; }
+    code { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GraphQL::Houtou Blog / ブログ</h1>
+    <p>Every request sends a persisted operation id and variables—never GraphQL source.</p>
+    <p id="stats" class="meta">Loading…</p>
+  </header>
+
+  <form id="create">
+    <h2>New post / 新規投稿</h2>
+    <label>Author <select name="authorId"><option value="1">Alice</option><option value="2">ボブ</option><option value="3">Carol / キャロル</option></select></label>
+    <label>Language <select name="language"><option>EN</option><option>JA</option></select></label>
+    <label>Title / タイトル <input name="title" required></label>
+    <label>Body / 本文 <textarea name="body" required></textarea></label>
+    <label>Tags (comma separated) <input name="tags" value="graphql,perl"></label>
+    <button>Publish / 投稿</button>
+    <div id="create-error" class="error"></div>
+  </form>
+
+  <main id="feed">Loading…</main>
+
+  <script>
+    async function persisted(id, variables = {}) {
+      const response = await fetch('/graphql', {
+        method: 'POST', headers: {'content-type': 'application/json'},
+        body: JSON.stringify({id, variables})
+      });
+      const payload = await response.json();
+      if (!response.ok || payload.errors) throw new Error(JSON.stringify(payload, null, 2));
+      return payload.data;
+    }
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    async function refresh() {
+      const [data, summary] = await Promise.all([persisted('Feed', {limit: 30}), persisted('Stats')]);
+      document.querySelector('#stats').textContent = `${summary.health} — ${summary.stats.posts} posts / ${summary.stats.authors} authors / ${summary.stats.comments} comments`;
+      document.querySelector('#feed').innerHTML = data.feed.map(post => `<article>
+        <h2>${escapeHtml(post.title)}</h2>
+        <div class="meta">${escapeHtml(post.language)} · ${escapeHtml(post.author.name)} · ${escapeHtml(post.publishedAt)} · ${post.tags.map(t => '#' + escapeHtml(t.name)).join(' ')}</div>
+        <p>${escapeHtml(post.body).replace(/\n/g, '<br>')}</p>
+        <details><summary>${post.comments.length} comments</summary>${post.comments.map(c => `<p><b>${escapeHtml(c.author.name)}</b>: ${escapeHtml(c.body)}</p>`).join('')}</details>
+      </article>`).join('');
+    }
+    document.querySelector('#create').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const input = Object.fromEntries(form.entries());
+      input.tags = input.tags.split(',').map(x => x.trim()).filter(Boolean);
+      try {
+        await persisted('CreatePost', {input});
+        event.currentTarget.reset();
+        await refresh();
+      } catch (error) { document.querySelector('#create-error').textContent = error.message; }
+    });
+    refresh().catch(error => document.querySelector('#feed').textContent = error.message);
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 [ 1. මොඩියුලය පූරණය කිරීම ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15 / johab
 
 [ 2. අක්ෂර-පදනම් length / substr ]
   mb::length($str)              # අක්ෂර ගණන (bytes නොවේ)
@@ -26,7 +26,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. සහාය දක්වන කේතීකරණ ]
-  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15  johab
 
 [ 8. උදාහරණය ]
   use mb;

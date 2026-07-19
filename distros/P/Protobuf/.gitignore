@@ -1,68 +1,63 @@
-# Editor/OS
-*~
-.DS_Store
-.#*
 
-# Build
-/blib/
-/pm_to_blib
-/_build/
-/Build
-/third_party/
-.Bsort.tmp
-*.o
+*~
+.#*
 *.a
-*.so
-*.bs
-*.x
-*.xsc
+*.bak
 *.bin
-!t/data/*.bin
-lib/**/*.c
+/bin/protoc-gen-perl-pb
+bin/protoc-gen-perl-pb
+/bin/protoc-gen-perl-pb.exe
+/blib/
+*.bs
+.Bsort.tmp
+/_build/
+# Build
+/Build
 *.BUILD
 BUILD.bazel
-src_google_protobuf_descriptor.pb.cc
-/Protobuf.xs
-/Protobuf.c
-/Protobuf.c.test
-/protoc-gen-perl-pb
-/bin/protoc-gen-perl-pb
-/bin/protoc-gen-perl-pb.exe
-/maint/generate_xs.pl.bak
-/stderr.txt
-/debug
-/tmp_debug/
-/tmp_gen/
-
-# Test
-/cover_db/
-# Ignore all files and directories within t/c by default
-t/c/**
-
 # BUT, don't ignore directories within t/c, so Git can traverse into them
-!t/c/**/
-
-# Now, re-include the specific file types you want to track
-!t/c/**/*.h
-!t/c/**/*.c
-!t/c/**/*.proto
-!t/c/**/*.json
-
-# Ignore these test-related files
-*.gcov
-*.gcno
-*.gcda
-
+/cover_db/
+/debug
 # Distribution
-Protobuf-*
-MYMETA.*
+.DS_Store
+# Editor/OS
+*.gcda
+*.gcno
+*.gcov
+# Ignore all files and directories within t/c by default
+# Ignore these test-related files
+lib/**/*.c
+local/cache/authors/id/H/HA/HAARG/
+/maint/generate_xs.pl.bak
 Makefile
 Makefile.old
 MANIFEST
 MANIFEST.bak
+MYMETA.*
+# Now, re-include the specific file types you want to track
+*.o
+/pm_to_blib
 ppport.h
-
-*.bak
-vgcore.*
+Protobuf-*
+/Protobuf.c
+/Protobuf.c.test
+/Protobuf.xs
+/protoc-gen-perl-pb
+*.so
+src_google_protobuf_descriptor.pb.cc
+/stderr.txt
+!t/c/**/
+t/c/**
+!t/c/**/*.c
+!t/c/**/*.h
+!t/c/**/*.json
+!t/c/**/*.proto
+!t/data/*.bin
+# Test
+/third_party/
 tmp/
-local/cache/authors/id/H/HA/HAARG/
+/tmp_debug/
+/tmp_gen/
+vgcore.*
+*.x
+*.xsc

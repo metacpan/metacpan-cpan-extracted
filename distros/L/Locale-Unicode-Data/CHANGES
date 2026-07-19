@@ -1,5 +1,50 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.9.0 2026-07-15T07:46:50+0900
+    - Added support for Person Name Formatting - CLDR UTS #35 Part 8
+    - Added four new SQLite tables covering person name formatting data extracted from
+      main/*.xml/ldml/personNames:
+      - person_name_formats: name format patterns keyed by locale, order (givenFirst,
+        surnameFirst, sorting), length (long, medium, short), usage (referring,
+        addressing, monogram), formality (formal, informal), and an optional 'alt'
+        discriminator for locales that supply two patterns for the same context.
+      - person_name_initial_patterns: locale-specific patterns for rendering name
+        initials (types 'initial' and 'initialSequence').
+      - person_name_order_locales: per-display-locale ordering rules recording whether
+        names from a given source locale should be rendered givenFirst or surnameFirst.
+        This is semantically distinct from the existing person_name_defaults table,
+        which records the global supplemental default.
+      - person_name_samples: sample name fields (nativeG, nativeGS, nativeGGS,
+        nativeFull, foreignG, foreignGS, foreignGGS, foreignFull) used by the CLDR
+        Survey Tool. Not intended for use as UI placeholders.
+    - Stored three additional per-locale properties in the locales_info table:
+      - person_name_native_space: space replacement for native names (e.g. empty string
+        for Japanese, where name parts are written without any separator).
+      - person_name_foreign_space: space replacement for foreign names (e.g. '・'
+        U+30FB for Japanese, '·' U+00B7 for Chinese).
+      - person_name_default_formality and person_name_default_length: locale-level
+        parameter defaults from parameterDefault elements (e.g. formality=informal and
+        length=medium for English).
+    - Added eight new accessor methods corresponding to the new tables:
+      person_name_format, person_name_formats, person_name_initial_pattern,
+      person_name_initial_patterns, person_name_order_locale,
+      person_name_order_locales, person_name_sample, person_name_samples.
+    - Added two higher-level helper methods implementing key steps of the CLDR
+      person name formatting algorithm (UTS #35 Part 8):
+      - person_name_derive_order: derives givenFirst or surnameFirst for a
+        (formatting_locale, name_locale) pair by consulting
+        person_name_order_locales and falling back to 'und'.
+      - person_name_space_replacement: returns the correct space replacement string for
+        a (formatting_locale, name_locale) pair, applying the CLDR native/foreign
+        distinction and the CJK equivalence rule ({ja, zh, yue}).
+    - Updated create_database.pl to extract personNames data from all main/*.xml files,
+      including proper resolution of <alias> elements via the existing resolve_alias()
+      function (currently needed for root.xml, which provides the 'und' locale fallback
+      patterns via intra-document XPath references rather than inline namePattern elements).
+    - Added t/06.person_names.t: test suite covering all new methods, the locales_info
+      person name properties, person_name_derive_order, and person_name_space_replacement
+      (including the CJK group matching rule).
+
 v1.8.6 2026-06-09T21:41:51+0900
     - Test-only maintenance release; no changes to the bundled CLDR data.
     - Reduced the default CPAN Testers workload in t/01.locale-data.t by making the most

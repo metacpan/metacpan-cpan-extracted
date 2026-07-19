@@ -17,19 +17,30 @@ WriteMakefile(
 	VERSION_FROM => 'lib/Date/Cmp.pm',	# Automatically fetch version from the module
 	ABSTRACT_FROM	=> 'lib/Date/Cmp.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl')
 		: ()),
-	PREREQ_PM	=> {						# Dependencies (with versions)
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES support
+	},
+	PREREQ_PM	=> {						# Runtime dependencies (with minimum versions)
+		'autodie' => 2.06,
+		'Carp' => 0,
 		'DateTime::Format::Genealogy' => 0.11,
+		'Readonly' => 0,
 		'Scalar::Util' => 0,
 		'Term::ANSIColor' => 0
 	}, TEST_REQUIRES => {
+		'FindBin' => 0,
+		'IPC::System::Simple' => 0,
+		'Readonly' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
+		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::Returns' => 0,
-		'Test::Warnings' => 0
+		'Test::Returns' => 0.03,
+		'Test::Warnings' => 0,
+		'Test::Without::Module' => 0,
 	}, dist => $dist,
 	clean => {
 		FILES => 'Date-Cmp-*',
@@ -38,7 +49,6 @@ WriteMakefile(
 		resources => {
 			homepage => 'https://metacpan.org/pod/Date::Cmp',
 			repository => {
-				repository => 'https://github.com/nigelhorne/Date-Cmp',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Date-Cmp.git',
 				web => 'https://github.com/nigelhorne/Date-Cmp'

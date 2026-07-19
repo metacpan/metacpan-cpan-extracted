@@ -1,5 +1,10 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.9994 2026-07-19
+      - Text::Hogan 2.05
+      - Clone no longer a runtime prereq
+      - various speed ups
+
 1.9993 2026-06-08
       - increment required versions of Text::Hogan, Clone, YAML::LibYAML
 

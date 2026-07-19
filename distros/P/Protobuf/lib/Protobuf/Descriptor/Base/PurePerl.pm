@@ -3,7 +3,7 @@ package Protobuf::Descriptor::Base::PurePerl;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 sub new {
     my ($class, $data) = @_;

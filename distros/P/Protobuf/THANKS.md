@@ -50,6 +50,17 @@ We would like to especially thank:
 *   **Subinoy Dutta** - For his support in testing and exercising the build and
     test suite on Ubuntu and Windows.
 
+*   **Ryan Voots** ([@simcop2387](https://github.com/simcop2387)) - For
+    testing, feedback, and driving the compatibility requirements for
+    `App::EvalServerAdvanced` and `Google::ProtocolBuffers::Dynamic`.
+
+*   **Lukas Mai** ([@mauke](https://github.com/mauke)) - For
+    spotting stale repository links and missing bugtracker URLs in the CPAN
+    `META.json` metadata.
+
+*   **Slaven Rezić** ([@srezic](https://github.com/srezic) / Slaven_Rezic) - For
+    reporting CPAN RT tickets #180139 and #178734, helping improve build system stability across diverse Perl environments and platform architectures.
+
 *   The **p5p community** - For their engagement and suggestions.
 
 *   The authors and maintainers of the **upb** library.

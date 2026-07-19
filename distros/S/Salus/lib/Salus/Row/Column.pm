@@ -1,5 +1,8 @@
 package Salus::Row::Column;
 
+use strict;
+use warnings;
+
 use Rope;
 use Rope::Autoload;
 use Types::Standard qw/Str Object/; 

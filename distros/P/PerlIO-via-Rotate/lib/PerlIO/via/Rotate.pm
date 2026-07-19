@@ -1,6 +1,6 @@
 package PerlIO::via::Rotate;
 
-$VERSION= '0.10';
+$VERSION= '0.11';
 
 # be strict and do everything on octets
 use strict;
@@ -178,7 +178,7 @@ PerlIO::via::Rotate - PerlIO layer for encoding using rotational deviation
 
 =head1 VERSION
 
-This documentation describes version 0.10.
+This documentation describes version 0.11.
 
 =head1 DESCRIPTION
 

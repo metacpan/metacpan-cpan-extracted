@@ -1,5 +1,257 @@
 Revision history for this software.
 
+0.66  2026-07-18 JST (Japan Standard Time)
+  - fix t/6101-6106 filetest tests: eliminate the sporadic MSWin32-only FAIL
+    reported by CPAN Testers for mb-0.65 (t/6102_filetest.t, exactly 1 of
+    4200 subtests, at a different subtest number in every report -- 1257,
+    2048, 2150, 2636 on perl 5.16.3 / 5.10.1 / 5.22.2 / 5.8.9, all four on
+    the same Windows smoker family; all other perl versions on the same
+    machines and every non-Windows platform PASS).  Root cause was in the
+    tests, not in lib/mb.pm: every subtest re-created its testee files and
+    directories under ONE fixed name ("$tempdir/testee.A" etc.), unlinked
+    them, and re-created the same name back-to-back thousands of times with
+    the open()/mkdir() return value unchecked.  On MSWin32, unlink() is
+    asynchronous (the name stays delete-pending for a moment and a same-name
+    open() is rejected with access denied) and on-access virus scanners can
+    hold a just-created file open, so once in a few thousand iterations one
+    side of the CORE-vs-mb comparison saw a missing file, returned undef
+    against a defined value, and that single subtest failed.  Fixed by
+    (1) giving every subtest a serial-numbered testee name (no same-name
+    re-creation, so a delete-pending name can never collide with the next
+    create), (2) routing all creation through new make_testee_file() /
+    make_testee_dir() helpers that check the result, retry briefly
+    (5 x 0.1s), and on persistent transient failure return 'SKIP' for the
+    subtest instead of FAIL, and (3) changing the END cleanup from rmdir()
+    to File::Path::rmtree() so a leftover testee from a transient unlink
+    failure cannot break the cleanup.  This change by itself leaves the test
+    counts and the scalar(@test) plans unchanged (4200/4200/4200/5/4); the
+    speed-up item (3) below then reduces the first three to 1134 each.  No
+    lib/mb.pm code changed.
+  - speed up the slowest tests so slow CPAN smokers (the same Windows
+    machines as above) cannot hit the harness timeout:
+    (1) t/3023_charclass_hyphen_gb18030.t, t/3026_charclass_hyphen_sjis.t,
+    t/3027_charclass_hyphen_utf8_1of2.t, t/3028_charclass_hyphen_utf8_2of2.t
+    generated their subtests in an n**3 loop that called mb::parse() and
+    eval-compiled the result once PER SUBTEST although the transpiled
+    character class depends only on the ($i,$j) range pair, not on the
+    probed octet $lk; the transpilation and the eval compilation are now
+    hoisted out of the $k loop (n**3 -> n**2 transpilations, one compiled
+    closure pair per range).  Every subtest still exercises the same
+    transpiled pattern against the same octets with the same expected
+    result; the TAP output of all four files is byte-for-byte identical to
+    the previous version (verified), the scalar(@test) plans are unchanged
+    (18252/8400/33792/56316), and the four files together now run in about
+    2 seconds instead of 34 seconds on the reference machine (whole suite:
+    55 -> 17 seconds).
+    (2) t/9082-examples.t spawned one child perl for every one of the 106
+    eg/**/*.pl examples; under AUTOMATED_TESTING / NONINTERACTIVE_TESTING
+    it now runs the first (sorted) example of each eg/ subdirectory (22
+    children instead of 106) -- still smoke-testing every language
+    directory -- and announces the sampling in a TAP comment.  Interactive
+    runs and runs with PERL_MB_TEST_ALL_EG=1 keep executing all 106
+    examples.  The plan is derived from scalar(@script) as before, so it
+    always matches the mode.  No lib/mb.pm code changed.
+    (3) t/6101_filetest.t, t/6102_filetest.t and t/6103_filetest.t ran 4200
+    subtests each although only 1134 of them were distinct.  @tester listed
+    all 27 file test operators of Perl and was then padded with 73 further
+    copies of -A to round the subtest count up to 100 x 42 = 4200.  @tester
+    is used one element at a time (it is never stacked as -X -Y -Z), so every
+    padding copy merely re-ran the 42 subtests of -A -- 73% of the run time
+    of each file for no extra coverage.  The padding is dropped: 27 x 42 =
+    1134 subtests, every one of them distinct, and the plans follow
+    scalar(@test) as before, so they adjust by themselves.  In addition
+    t/6101_filetest.t sets $endchar = 'A', which makes "$filename.A" and
+    "$filename.$endchar" one and the same file, so every subtest created that
+    single testee twice and removed it twice; the second name is now touched
+    only when it really is a second name.  Together these cut the testee files
+    created by t/6101_filetest.t from 5100 to 729 and the testee directories
+    from 2400 to 324, and -- because the duplicate was a same-name
+    re-creation -- they also remove from t/6101_filetest.t the very MSWin32
+    delete-pending / on-access virus scanner race that the first item of this
+    release works around.  The TAP verdict of every retained subtest is
+    identical to the previous version (verified subtest by subtest for all
+    three files), and the three files together run about 3 times faster on the
+    reference machine; the gain is larger on MSWin32, where the testee file
+    I/O, not mb::eval(), dominates.  No lib/mb.pm code changed.
+  - add encoding 'johab' (Johab, code page 1361 / KS X 1001:1992 annex 3): the
+    two-octet DBCS with a DISCONTINUOUS lead [\x81-\xD3\xD8-\xDE\xE0-\xF9]
+    (hangul \x81-\xD3, symbols \xD8-\xDE, hanja \xE0-\xF9) plus one trailing
+    octet, verified against Microsoft's C run-time cp1361 lead/trail table
+    (mbctype.c: lead 81..D3, D8..DE, E0..F9; trail 31..7E, 81..FE) and against
+    Perl's Encode 'johab' mapping (which confirms 89 real characters carry the
+    trailing octet \x5C).  No johab high byte is a single octet: \x00-\x7F are
+    the only one-octet units, and the inter-region gaps \xD4-\xD7 and \xDF
+    (plus \x80 and \xFA-\xFF) are not leads.  uhc (the sister two-octet Korean
+    encoding) was the first template; every touchpoint that 0.65 added for
+    hp15/informixv6als was followed.  $over_ascii, the multibyte anchor (all
+    perl-version branches, discontinuous-lead form as hp15), mb::getc (a lead
+    reads one more octet), the encoding allow-lists and "use one of" messages,
+    and the old-package map (JOHAB::*) all gained johab.  Because the trailing
+    octet 31..7E includes \x5C, johab also joined the MSWin32 trailing-\x5C
+    filename paths (with its own discontinuous lead set added to mb::_chdir)
+    and got a dedicated [A-Z]-hyphen routine list_all_by_hyphen_johab_like that
+    intersects ranges with the exact discontinuous lead / US-ASCII single-octet
+    sets (the contiguous-lead sjis/big5 helpers would mis-split; hp15 needed a
+    dedicated helper for the same reason).  johab is never auto-detected and
+    must be selected with -e.  POD: new "=head2 johab (Johab, code page 1361)"
+    catalog entry with primary-source URLs; a Char-JOHAB / JOHAB row in the
+    "Legacy single-encoding distributions mapped to mb encoding names" table;
+    new "=head2 on johab encoding" sections in both the DAMEMOJI-escaping table
+    (2nd octet [ \ ] { | } demonstrated on hangul lead \x89) and the
+    qr'[[:class:]]' transpilation table; the encoding "supported ..." lists
+    gained the name.  New t/1029_johab_structure.t (exercising mb::getc through
+    a real filehandle, all three lead regions, buried \x5C and \x41, and
+    truncation guards via $SIG{__WARN__}), t/3033_charclass_hyphen_johab.t
+    (3600 boundary subtests across the three lead regions, both gaps, and the
+    \x5C DAMEMOJI) and t/8114_old_package_johab.t; t/1013_valid_encodings.t
+    gained johab accept cases; the 21 doc/mb_cheatsheet.*.txt encoding lists
+    gained the name.
+  - doc only: UTF8::R2-0.30 feature-parity review found the porting docs
+    incomplete/misleading in three ways; all three fixed in lib/mb.pm POD,
+    no code changes
+    - "Porting from script with UTF8::R2 module": added a "Migration
+      checklist" head2 spelling out that the port is mechanical, not
+      automatic (mb.pm does not detect a pre-existing "use UTF8::R2" line)
+    - same section: documented that "utf8" must be written explicitly in
+      "use mb qw( *mb utf8 );" -- UTF8::R2 is always RFC3629(UTF-8) with no
+      fallback, whereas "use mb qw( *mb );" without an encoding argument
+      falls back to detect_system_encoding(), silently changing behaviour
+      on a non-UTF-8 locale. this was the most likely porting mistake and
+      was previously undocumented
+    - "Using mb.pm Modulino vs. Using UTF8::R2 Module": added a note that
+      the listed disadvantages of mb.pm (wrapper command, obtrusive
+      *.oo.pl file) apply only to path 2 (modulino); path 1 (filter) and
+      path 3 (runtime) carry neither disadvantage and were previously
+      unmentioned in that comparison
+  - eg only (Track A, no code changes to lib/mb.pm): added a set of runnable
+    basic example scripts under eg/en/ (English) and eg/ja/ (Japanese) to
+    make the "student -> CPAN contributor" path concrete.  Five scripts per
+    language, each demonstrating one core feature against its CORE
+    counterpart: mb_length.pl (mb::length/substr/index in character units vs
+    CORE byte length), mb_split.pl (mb::split on character boundaries and on
+    an MBCS delimiter vs CORE split //), mb_regexp.pl (mb::qr "." / class
+    range / capture in whole characters), mb_tr.pl (mb::tr full-width ->
+    half-width and DAMEMOJI safety, incl. the /r modifier) and
+    mb_practical.pl (fixed-column trimming at a 1:2 half/full-width ratio
+    without splitting a double-byte character).  All follow the eg/mb_length.pl
+    convention: US-ASCII source with \xHH byte-escaped multibyte data (eg/ja/
+    additionally carries Japanese-language POD/comments and is therefore
+    UTF-8, like doc/), FindBin-based "use lib" so they run straight from the
+    distribution root, and an explicit mb::set_script_encoding('sjis').  New
+    t/9082-examples.t runs every eg/**/*.pl under -w in a child perl and
+    requires a zero exit status and an empty STDERR (no warnings); its plan
+    is derived from the discovered file count, not hardcoded.  MANIFEST gained
+    the six new entries and t/9030-distribution.t exempts eg/ja/ from the
+    US-ASCII check (eg/en/ stays strictly US-ASCII).
+  - eg only (Track A, no code changes to lib/mb.pm): localized the five basic
+    example scripts into the first batch of student mother tongues, matching
+    the doc/mb_cheatsheet.*.txt language set: eg/ne/ (Nepali), eg/bn/ (Bengali),
+    eg/vi/ (Vietnamese), eg/si/ (Sinhala), eg/my/ (Burmese) and eg/zh/ (Chinese,
+    simplified).  Each dir carries the same five scripts (mb_length.pl,
+    mb_split.pl, mb_regexp.pl, mb_tr.pl, mb_practical.pl).  Only the natural-
+    language POD/comments are translated: the code body, the \xHH byte-escaped
+    multibyte DATA, the logic and the numeric result annotations are byte-for-
+    byte identical to eg/en/ (each script prints exactly the same output as its
+    eg/en/ counterpart), so a student reads the explanation in the mother tongue
+    while running identical code.  The scripts stay set_script_encoding('sjis')
+    with FindBin-based "use lib".  Because the comments use non-Latin scripts,
+    these dirs are UTF-8 (a US-ASCII / UTF-8 note is stated in each file header,
+    as eg/ja/ already is); the mb source-encoding directive and DATA remain
+    \xHH.  t/9082-examples.t needed no change (it already recurses eg/**/*.pl
+    and derives its plan from the file count); it now runs all 30 new scripts
+    under -w with a zero exit and empty STDERR.  MANIFEST gained the 30 new
+    entries and t/9030-distribution.t's $utf8_ok now also exempts eg/ne|bn|vi|
+    si|my|zh/ from the US-ASCII check (eg/en/ and eg/mb_length.pl stay strictly
+    US-ASCII).  Remaining cheatsheet languages (HI UR TH TL ID KM MN TR UZ FR
+    KO TW BM) are planned as follow-up batches of the same shape.
+  - eg only (Track A, no code changes to lib/mb.pm): second localization batch
+    of the five basic example scripts into the next set of student mother
+    tongues from the doc/mb_cheatsheet.*.txt set: eg/hi/ (Hindi), eg/ur/ (Urdu,
+    Roman Urdu), eg/th/ (Thai), eg/tl/ (Tagalog), eg/id/ (Indonesian),
+    eg/km/ (Khmer) and eg/mn/ (Mongolian, Cyrillic).  Each dir carries the same
+    five scripts (mb_length.pl, mb_split.pl, mb_regexp.pl, mb_tr.pl,
+    mb_practical.pl).  As before, only the natural-language POD/comments are
+    translated: the code body, the \xHH byte-escaped multibyte DATA, the logic
+    and the numeric result annotations are byte-for-byte identical to eg/en/
+    (each script prints exactly the same output as its eg/en/ counterpart), so
+    a student reads the explanation in the mother tongue while running identical
+    code.  The scripts stay set_script_encoding('sjis') with FindBin-based
+    "use lib".  hi/th/km/mn use a non-Latin native script and are therefore
+    UTF-8 (a US-ASCII/UTF-8 note is stated in each file header, as eg/ja/ is);
+    id/tl/ur are written in a Latin/romanized form (Roman Urdu for ur) and stay
+    strictly US-ASCII, matching the eg/vi/ precedent.  In every file the mb
+    source-encoding directive and DATA remain \xHH.  t/9082-examples.t needed
+    no change (it already recurses eg/**/*.pl and derives its plan from the
+    file count); it now also runs these 35 new scripts under -w with a zero
+    exit and empty STDERR.  MANIFEST gained the 35 new entries and
+    t/9030-distribution.t's $utf8_ok now also exempts eg/hi|th|km|mn/ from the
+    US-ASCII check (the Latin/romanized eg/id|tl|ur/ are intentionally left
+    under the strict US-ASCII check).  Remaining cheatsheet languages (TR UZ
+    FR KO TW BM) are planned as follow-up batches of the same shape.
+  - eg only (Track A, no code changes to lib/mb.pm): third and final
+    localization batch of the five basic example scripts, completing the
+    doc/mb_cheatsheet.*.txt language set: eg/tr/ (Turkish), eg/uz/ (Uzbek,
+    Latin), eg/fr/ (French), eg/ko/ (Korean), eg/tw/ (Chinese, traditional)
+    and eg/bm/ (labelled Bamanankan in doc/, whose cheatsheet body text is
+    Malay, so eg/bm/ is written in Malay to match what a student reads
+    alongside it).  Each dir carries the same five scripts (mb_length.pl,
+    mb_split.pl, mb_regexp.pl, mb_tr.pl, mb_practical.pl).  As before, only the
+    natural-language POD/comments are translated: the code body, the \xHH
+    byte-escaped multibyte DATA, the logic and the numeric result annotations
+    are byte-for-byte identical to eg/en/ (each script prints exactly the same
+    output as its eg/en/ counterpart), so a student reads the explanation in
+    the mother tongue while running identical code.  The scripts stay
+    set_script_encoding('sjis') with FindBin-based "use lib".  tr/fr use a
+    Latin script whose diacritics are essential (Turkce, francais) and ko/tw
+    use a non-Latin native script, so those four dirs are UTF-8 (a US-ASCII/
+    UTF-8 note is stated in each file header, as eg/ja/ is); uz (written with
+    ASCII o'/g'/sh/ch) and bm (Malay, no diacritics) are plain Latin and stay
+    strictly US-ASCII, matching the eg/id|tl|ur/ precedent.  In every file the
+    mb source-encoding directive and DATA remain \xHH.  t/9082-examples.t
+    needed no change (it already recurses eg/**/*.pl and derives its plan from
+    the file count); it now also runs these 30 new scripts under -w with a
+    zero exit and empty STDERR.  MANIFEST gained the 30 new entries and
+    t/9030-distribution.t's $utf8_ok now also exempts eg/tr|fr|ko|tw/ from the
+    US-ASCII check (the ASCII Latin eg/uz|bm/ stay under the strict US-ASCII
+    check).  With this batch the eg/ examples cover all 21 cheatsheet
+    languages.
+  - maintainer tooling: self-verify the regex transpilation catalog in the
+    lib/mb.pm POD ("Each elements in regular expressions are transpiled as
+    follows") against the live mb::parse() output, so that adding an encoding
+    (johab was the trigger) can no longer let the hand-maintained "=head2 on
+    every encodings" / "=head2 on <enc> encoding" tables drift out of sync
+    without a test noticing.  New t/9070-pod_transpile_parity.t extracts the
+    catalog region (anchored on the heading and the following =head1), takes
+    the encoding list from the authoritative import allow-list and the pattern
+    list from each table's own left column (no second copy kept in the test),
+    then re-derives every transpiled column: qr/PATTERN/ for the
+    encoding-independent "every" table and qr'PATTERN' with the matching
+    script encoding selected for each per-encoding table.  Each of the 660
+    rows is compared byte for byte with sprintf("  %-43s%s", input, got) so a
+    single changed \\xHH byte, a lost column-alignment space, or a missing/
+    extra encoding table fails with an expected-vs-actual diff; the plan count
+    is derived from the walk, never hardcoded.  New development helper
+    devtool/gen_pod_transpile_catalog.pl regenerates the whole catalog section
+    (intro prose and table framing carried through verbatim, transpiled
+    columns produced by mb::parse()) to STDOUT for diffing or for bootstrapping
+    a new encoding's table; it is a hand-managed tool, not a pmake product.
+    MANIFEST gained both entries.  Both files are US-ASCII, run warning-clean
+    under -w, and target perl 5.005_03 through the latest.
+  - add GitHub Actions CI (.github/workflows/ci.yml, repository-only, not
+    shipped to CPAN and not in MANIFEST) with two tiers.  Tier 1 is a runtime
+    regression matrix running "perl Makefile.PL && make && make test" on perl
+    5.8 through the latest (5.42 included, exercised by t/9025); because
+    "make test" already runs t/9020-perl5compat.t and t/9040-style.t, each
+    matrix leg doubles as a static-compat check.  Tier 2 is a dedicated
+    Perl 5.005_03 static gate that runs "perl -x pmake.bat selfcheck" (the
+    embedded checker carried over from Perl500503Syntax::OrDie) plus a
+    build-free "prove" of t/9020 + t/9040 over the sources.  Perl 5.005_03 is
+    not a matrix leg (no runner ships it); its rules are enforced statically
+    instead.  Wiring the separate Perl500503Syntax-OrDie distribution as an
+    extra independent gate is left as a documented TODO in the workflow, its
+    CLI not being present in this repository.
+  - created by INABA Hitoshi
+
 0.65  2026-07-05 JST (Japan Standard Time)
   - add encoding 'hp15' (HP-15, HP-UX Japanese): the two-octet DBCS
     [\x80-\xA0\xE0-\xFE][\x00-\xFF], verified against the legacy Char-HP15 /

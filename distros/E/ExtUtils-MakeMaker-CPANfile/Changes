@@ -1,5 +1,8 @@
 Revision history for Perl extension ExtUtils-MakeMaker-CPANfile
 
+0.10  2026/07/19
+    - merge prereqs using CPAN::Meta::Requirements (GH#1, XSven++)
+
 0.09  2018/12/28
     - fixed tests not to fail when $^X contains spaces
       (RT-125074)

@@ -24,7 +24,7 @@ package pmake;
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$PMAKE_BAT_VERSION = '0.39';
+$PMAKE_BAT_VERSION = '0.40';
 $PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -1923,7 +1923,8 @@ sub _dist_check_sources {
         || /^t\/.*\.t$/i
         || /^t\/lib\/.+\.pm$/i
         || /^xt\/.*\.t$/i
-        || /^eg\/.*\.pl$/i
+        || m{^eg\/[^/]*\.pl$}i
+        || /^eg\/en\/.*\.pl$/i
         || /^bin\/.*\.(pl|pm)$/i
     } @{$files_ref};
 

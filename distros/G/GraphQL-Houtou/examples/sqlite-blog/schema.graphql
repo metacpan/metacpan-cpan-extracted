@@ -1,0 +1,97 @@
+"""A globally identifiable blog resource."""
+interface Node {
+  """Stable database identifier."""
+  id: ID!
+}
+
+"""An author. Author values are plain Perl hash references."""
+type Author implements Node {
+  id: ID!
+  """Public display name in Japanese or English."""
+  name: String!
+  posts: [Post!]!
+}
+
+"""A blog post. Post values are blessed Perl objects."""
+type Post implements Node {
+  id: ID!
+  title: String!
+  body: String!
+  language: Language!
+  publishedAt: String!
+  author: Author!
+  tags: [Tag!]!
+  comments: [Comment!]!
+  """Use title. Retained to exercise deprecated field introspection."""
+  legacyTitle: String! @deprecated(reason: "Use title")
+}
+
+"""A tag returned as a plain Perl hash reference."""
+type Tag implements Node {
+  id: ID!
+  name: String!
+}
+
+"""A comment loaded in a second DataLoader wave."""
+type Comment implements Node {
+  id: ID!
+  body: String!
+  author: Author!
+}
+
+"""Values returned by full-text-like search."""
+union SearchResult = Post | Author
+
+"""Language selected by a post author."""
+enum Language {
+  EN
+  JA
+}
+
+"""Exactly one post locator must be supplied."""
+input PostReference @oneOf {
+  id: ID
+  title: String
+}
+
+"""Input used to publish an English or Japanese post."""
+input CreatePostInput {
+  authorId: ID!
+  title: String!
+  body: String!
+  language: Language!
+  tags: [String!]!
+}
+
+"""Input used to attach a comment to a post."""
+input AddCommentInput {
+  postId: ID!
+  authorId: ID!
+  body: String!
+}
+
+"""A deliberately hash-backed operational summary."""
+type BlogStats {
+  posts: Int!
+  authors: Int!
+  comments: Int!
+}
+
+"""Read operations compiled once at application startup."""
+type Query {
+  """Recent posts. Relations are resolved through request-scoped loaders."""
+  feed(limit: Int = 20): [Post!]!
+  post(ref: PostReference!): Post
+  """Return a post through the Node interface."""
+  node(ref: PostReference!): Node
+  search(text: String!): [SearchResult!]!
+  stats: BlogStats!
+  """A scalar-backed health value."""
+  health: String!
+}
+
+"""Write operations compiled once and executed with variables."""
+type Mutation {
+  createPost(input: CreatePostInput!): Post!
+  addComment(input: AddCommentInput!): Comment!
+}

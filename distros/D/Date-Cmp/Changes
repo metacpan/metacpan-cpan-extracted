@@ -1,5 +1,22 @@
 Revision history for Date::Cmp
 
+0.06	Sat Jul 18 13:48:01 EDT 2026
+	[ Bug Fixes ]
+	- Fix crash when a DateTime object (parsed from a complex left-hand date such as
+	  '1 Jan 1996') was compared against a year-range right-hand value ('1996-2000'
+	  or 'BET 1996 AND 2000'): DateTime's overloaded == rejected the plain integer.
+	  Move the ref($left)->year() unwrap before the first range comparison.
+	- Fix crash when a right-hand range had equal endpoints (e.g. '1900-1900'):
+	  after collapsing to a single year the code fell through to the DFG fallback
+	  path, which cannot parse a bare integer and died. Return the comparison
+	  immediately after the complain callback instead.
+	- More stringent validation
+	- Bumped minimum Test::Returns for https://www.cpantesters.org/cpan/report/271a9e76-9ff9-11f0-ac80-9a301de8b9fd
+
+	[ Enhancements ]
+	- Added test dashboard
+	- Allow the dates to be hashrefs, in which case use the date element of the hash
+
 0.05	Fri Aug  8 15:41:55 EDT 2025
 	Ensure datecmp('BET 1830 AND 1832', '1831') and datecmp('1830-1832', '1831') give the same result
 

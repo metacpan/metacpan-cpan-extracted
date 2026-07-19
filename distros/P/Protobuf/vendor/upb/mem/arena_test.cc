@@ -270,7 +270,7 @@ TEST(OverheadTest, SingleMassiveBlockThenLittle) {
   }
   if (!UPB_ASAN) {
 #ifdef __ANDROID__
-    EXPECT_NEAR(test.WastePct(), 0.075, 0.025);
+    EXPECT_NEAR(test.WastePct(), 0.085, 0.025);
     EXPECT_NEAR(test.AmortizedAlloc(), 0.09, 0.025);
 #else
     EXPECT_NEAR(test.WastePct(), 0.08, 0.125);

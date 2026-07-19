@@ -1,0 +1,249 @@
+{
+   "abstract" : "XS-backed GraphQL parser and execution toolkit for Perl",
+   "author" : [
+      "anatofuz <anatofuz@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.29",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GraphQL-Houtou",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "GraphQL" : "0.54",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "Promise::XS" : "0.21",
+            "Role::Tiny" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.024000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "1.205",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "GraphQL::Houtou" : {
+         "file" : "lib/GraphQL/Houtou.pm",
+         "version" : "0.01"
+      },
+      "GraphQL::Houtou::DataLoader" : {
+         "file" : "lib/GraphQL/Houtou/DataLoader.pm",
+         "version" : "0.01"
+      },
+      "GraphQL::Houtou::DataLoader::Error" : {
+         "file" : "lib/GraphQL/Houtou/DataLoader.pm"
+      },
+      "GraphQL::Houtou::Directive" : {
+         "file" : "lib/GraphQL/Houtou/Directive.pm"
+      },
+      "GraphQL::Houtou::Error" : {
+         "file" : "lib/GraphQL/Houtou/Error.pm",
+         "version" : "0.01"
+      },
+      "GraphQL::Houtou::Federation" : {
+         "file" : "lib/GraphQL/Houtou/Federation.pm",
+         "version" : "0"
+      },
+      "GraphQL::Houtou::Internal::TypeSupport" : {
+         "file" : "lib/GraphQL/Houtou/Internal/TypeSupport.pm"
+      },
+      "GraphQL::Houtou::Introspection" : {
+         "file" : "lib/GraphQL/Houtou/Introspection.pm"
+      },
+      "GraphQL::Houtou::PSGI" : {
+         "file" : "lib/GraphQL/Houtou/PSGI.pm",
+         "version" : "0"
+      },
+      "GraphQL::Houtou::Parser::Internal" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm"
+      },
+      "GraphQL::Houtou::Parser::Internal::LazyArray::Arguments" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm"
+      },
+      "GraphQL::Houtou::Parser::Internal::LazyArray::Directives" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm"
+      },
+      "GraphQL::Houtou::Parser::Internal::LazyArray::ObjectFields" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm"
+      },
+      "GraphQL::Houtou::Parser::Internal::LazyArray::VariableDefinitions" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm"
+      },
+      "GraphQL::Houtou::Parser::Internal::LazyLoc" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm"
+      },
+      "GraphQL::Houtou::Promise::PromiseXS" : {
+         "file" : "lib/GraphQL/Houtou/Promise/PromiseXS.pm"
+      },
+      "GraphQL::Houtou::Role::Abstract" : {
+         "file" : "lib/GraphQL/Houtou/Role/Abstract.pm"
+      },
+      "GraphQL::Houtou::Role::Composite" : {
+         "file" : "lib/GraphQL/Houtou/Role/Composite.pm"
+      },
+      "GraphQL::Houtou::Role::FieldDeprecation" : {
+         "file" : "lib/GraphQL/Houtou/Role/FieldDeprecation.pm"
+      },
+      "GraphQL::Houtou::Role::FieldsEither" : {
+         "file" : "lib/GraphQL/Houtou/Role/FieldsEither.pm"
+      },
+      "GraphQL::Houtou::Role::FieldsInput" : {
+         "file" : "lib/GraphQL/Houtou/Role/FieldsInput.pm"
+      },
+      "GraphQL::Houtou::Role::FieldsOutput" : {
+         "file" : "lib/GraphQL/Houtou/Role/FieldsOutput.pm"
+      },
+      "GraphQL::Houtou::Role::HashMappable" : {
+         "file" : "lib/GraphQL/Houtou/Role/HashMappable.pm"
+      },
+      "GraphQL::Houtou::Role::Input" : {
+         "file" : "lib/GraphQL/Houtou/Role/Input.pm"
+      },
+      "GraphQL::Houtou::Role::Leaf" : {
+         "file" : "lib/GraphQL/Houtou/Role/Leaf.pm"
+      },
+      "GraphQL::Houtou::Role::Named" : {
+         "file" : "lib/GraphQL/Houtou/Role/Named.pm"
+      },
+      "GraphQL::Houtou::Role::Output" : {
+         "file" : "lib/GraphQL/Houtou/Role/Output.pm"
+      },
+      "GraphQL::Houtou::Runtime::DirectiveRuntime" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/DirectiveRuntime.pm"
+      },
+      "GraphQL::Houtou::Runtime::ExecState" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/ExecState.pm"
+      },
+      "GraphQL::Houtou::Runtime::InputCoercion" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/InputCoercion.pm"
+      },
+      "GraphQL::Houtou::Runtime::LazyInfo" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/LazyInfo.pm"
+      },
+      "GraphQL::Houtou::Runtime::NativeRuntime" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/NativeRuntime.pm"
+      },
+      "GraphQL::Houtou::Runtime::OperationCompiler" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/OperationCompiler.pm"
+      },
+      "GraphQL::Houtou::Runtime::SchemaBlock" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/SchemaBlock.pm"
+      },
+      "GraphQL::Houtou::Runtime::SchemaGraph" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/SchemaGraph.pm"
+      },
+      "GraphQL::Houtou::Runtime::Slot" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/Slot.pm"
+      },
+      "GraphQL::Houtou::Runtime::VMBlock" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/VMBlock.pm"
+      },
+      "GraphQL::Houtou::Runtime::VMCompiler" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/VMCompiler.pm"
+      },
+      "GraphQL::Houtou::Runtime::VMOp" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/VMOp.pm"
+      },
+      "GraphQL::Houtou::Runtime::VMProgram" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/VMProgram.pm"
+      },
+      "GraphQL::Houtou::Runtime::VMProgram::PayloadCatalog" : {
+         "file" : "lib/GraphQL/Houtou/Runtime/VMProgram.pm"
+      },
+      "GraphQL::Houtou::Schema" : {
+         "file" : "lib/GraphQL/Houtou/Schema.pm"
+      },
+      "GraphQL::Houtou::Type" : {
+         "file" : "lib/GraphQL/Houtou/Type.pm"
+      },
+      "GraphQL::Houtou::Type::Enum" : {
+         "file" : "lib/GraphQL/Houtou/Type/Enum.pm"
+      },
+      "GraphQL::Houtou::Type::InputObject" : {
+         "file" : "lib/GraphQL/Houtou/Type/InputObject.pm"
+      },
+      "GraphQL::Houtou::Type::Interface" : {
+         "file" : "lib/GraphQL/Houtou/Type/Interface.pm"
+      },
+      "GraphQL::Houtou::Type::List" : {
+         "file" : "lib/GraphQL/Houtou/Type/List.pm"
+      },
+      "GraphQL::Houtou::Type::NonNull" : {
+         "file" : "lib/GraphQL/Houtou/Type/NonNull.pm"
+      },
+      "GraphQL::Houtou::Type::Object" : {
+         "file" : "lib/GraphQL/Houtou/Type/Object.pm"
+      },
+      "GraphQL::Houtou::Type::Scalar" : {
+         "file" : "lib/GraphQL/Houtou/Type/Scalar.pm"
+      },
+      "GraphQL::Houtou::Type::Union" : {
+         "file" : "lib/GraphQL/Houtou/Type/Union.pm"
+      },
+      "GraphQL::Houtou::Validation" : {
+         "file" : "lib/GraphQL/Houtou/Validation.pm"
+      },
+      "GraphQL::Houtou::Validation::DepthLimit" : {
+         "file" : "lib/GraphQL/Houtou/Validation/DepthLimit.pm"
+      },
+      "GraphQL::Houtou::Validation::NodeLimit" : {
+         "file" : "lib/GraphQL/Houtou/Validation/NodeLimit.pm"
+      },
+      "GraphQL::Houtou::XS::Parser" : {
+         "file" : "lib/GraphQL/Houtou/XS/Parser.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/AnaTofuZ/GraphQL-Houtou/issues"
+      },
+      "homepage" : "https://github.com/AnaTofuZ/GraphQL-Houtou",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/AnaTofuZ/GraphQL-Houtou.git",
+         "web" : "https://github.com/AnaTofuZ/GraphQL-Houtou"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-JobScheduler
 
+0.007     2026-07-18 18:55:49+02:00 Europe/Stockholm
+            * Remove Log::Any hooks.
+            * Demand Cpanel::JSON::XS as JSON backend.
+
 0.006     2024-03-24 22:15:52+02:00 Europe/Helsinki
             * Add dependencies and specific versions.
 

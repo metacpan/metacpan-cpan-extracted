@@ -1,5 +1,17 @@
 Revision history for CPAN-Test-Dummy-Perl5-SKAJI
 
+v0.0.24  2026-07-19 18:04:17 JST
+  - Make github releases immutable
+
+v0.0.23  2026-07-19 18:01:22 JST
+  - No functional change; update authoring tools
+
+v0.0.22  2026-05-18 (TRIAL RELEASE)
+  - Add "ARTIFACT ATTESTATIONS" section to pod
+
+v0.0.21  2026-05-17 (TRIAL RELEASE)
+  - Add "ARTIFACT ATTESTATIONS" section to pod
+
 v0.0.12  2026-05-10
   - Use skaji/action-pause-upload
 

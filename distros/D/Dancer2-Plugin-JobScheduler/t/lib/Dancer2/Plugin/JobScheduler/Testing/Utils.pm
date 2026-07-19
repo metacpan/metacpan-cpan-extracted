@@ -9,21 +9,20 @@ use warnings;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
-  init_db
-  build_test_dbs
-  db_2_managed_handle_config
-  db_2_dancer2_plugin_database_config
-);
+        init_db
+        build_test_dbs
+        db_2_managed_handle_config
+        db_2_dancer2_plugin_database_config
+        );
 our %EXPORT_TAGS = (
-    'all' => [
-        qw(
-          init_db
-          build_test_dbs
-          db_2_managed_handle_config
-          db_2_dancer2_plugin_database_config
-        )
-    ],
+    'all'          => [qw(
+        init_db
+        build_test_dbs
+        db_2_managed_handle_config
+        db_2_dancer2_plugin_database_config
+    )],
 );
+
 
 use Carp;
 use Module::Load qw( load );
@@ -33,18 +32,17 @@ use Test2::V0;
 use Test::Database::Temp;
 
 sub init_db {
-    my ( $driver, $dbh, $name ) = @_;
+    my ($driver, $dbh, $name) = @_;
     my $module = "Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::Database::Schemas::${driver}";
     load $module;
     my $schema = $module->new->schema;
     $dbh->begin_work();
-    foreach my $row ( split qr/;\s*/msx, $schema ) {
-        $dbh->do($row);
+    foreach my $row (split qr/;\s*/msx, $schema) {
+        $dbh->do( $row );
     }
     $dbh->commit;
     return;
 }
-
 sub build_test_dbs {
     my (@drivers) = @_;
     diag 'Create temp databases';
@@ -52,9 +50,9 @@ sub build_test_dbs {
     foreach my $driver (@drivers) {
         my $test_db = Test::Database::Temp->new(
             driver => $driver,
-            init   => sub {
-                my ( $dbh, $name ) = @_;
-                init_db( $driver, $dbh, $name );
+            init => sub {
+                my ($dbh, $name) = @_;
+                init_db( $driver, $dbh, $name);
             },
         );
         diag 'Test database (' . $test_db->driver . ') ' . $test_db->name . " created.\n";
@@ -66,24 +64,26 @@ sub build_test_dbs {
 sub db_2_managed_handle_config {
     my ($db) = @_;
     my $name = $db->name();
-    my @info = $db->connection_info();
+    my @conn_info = $db->connection_info();
     my %c;
-    @c{ 'dsn', 'username', 'password', 'attr' } = @info;
+    @c{'dsn','username','password','attr'} = @conn_info;
     return %c;
 }
 
 sub db_2_dancer2_plugin_database_config {
     my ($db) = @_;
     my %c;
-    if ( $db->driver eq 'SQLite' ) {
-        $c{'driver'}   = 'SQLite';
+    if( $db->driver eq 'SQLite' ) {
+        $c{'driver'} = 'SQLite';
         $c{'database'} = $db->info->{'filepath'};
-    }
-    else {
+    } else {
         croak 'Unknown driver';
     }
     return %c;
 }
+
+1;
+__END__
 
 # ##############################################################################
 # BEGIN {
@@ -108,4 +108,3 @@ sub db_2_dancer2_plugin_database_config {
 #     use Database::ManagedHandle;
 # }
 
-1;

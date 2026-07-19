@@ -5,7 +5,7 @@ use warnings;
 use Moo;
 
 has schema => (
-    is      => 'ro',
+    is => 'ro',
     default => sub {
         return <<'EOL';
     CREATE TABLE funcmap (

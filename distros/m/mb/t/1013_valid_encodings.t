@@ -45,6 +45,13 @@ use vars qw(@test);
     sub { mb::set_script_encoding('euctw');   mb::get_script_encoding() eq 'euctw' },
     sub { mb::set_script_encoding('hp15');    mb::get_script_encoding() eq 'hp15' },
     sub { mb::set_script_encoding('informixv6als'); mb::get_script_encoding() eq 'informixv6als' },
+    sub { mb::set_script_encoding('johab');   mb::get_script_encoding() eq 'johab' },
+# johab (code page 1361): the three discontinuous lead regions are accepted,
+# a well-formed two-octet char is valid, and an inter-region gap octet is not
+    sub { mb::set_script_encoding('johab');   mb::valid("\x89\x5C")         == 1 }, # hangul, trailing \x5C
+    sub { mb::set_script_encoding('johab');   mb::valid("\xD9\x31")         == 1 }, # symbol region
+    sub { mb::set_script_encoding('johab');   mb::valid("\xE0\x5C")         == 1 }, # hanja, trailing \x5C
+    sub { mb::set_script_encoding('johab');   mb::valid("\xD4")             == 0 }, # gap \xD4-\xD7
     sub { mb::set_script_encoding('utf8');    mb::get_script_encoding() eq 'utf8' },
 #
 );

@@ -1,0 +1,67 @@
+# Valgrind suppressions for running the test suite under perl (R5).
+#
+# The perl interpreter deliberately does not free every allocation at exit
+# unless PERL_DESTRUCT_LEVEL=2, and even then its arena/COW/environment
+# bookkeeping produces "still reachable" and a handful of "possibly lost"
+# reports that are interpreter noise, not GraphQL::Houtou leaks. These
+# suppressions silence that noise so a genuine leak in our XS stands out.
+# Kept deliberately narrow: matched on perl-internal frames only, never on
+# gql_* frames.
+
+{
+   perl-cwd-abs-path-overlapping-copy
+   Memcheck:Overlap
+   fun:__memcpy_chk
+   fun:XS_Cwd_abs_path
+}
+
+{
+   perl-interpreter-startup-reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   obj:*/libperl.so*
+}
+
+{
+   perl-parse-and-compile-reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable,possible
+   fun:Perl_safesysmalloc
+   ...
+   fun:perl_parse
+}
+
+{
+   perl-my-cxt-and-env
+   Memcheck:Leak
+   match-leak-kinds: reachable,possible
+   fun:Perl_safesysmalloc
+   ...
+   fun:Perl_get_context
+}
+
+{
+   perl-regex-cache
+   Memcheck:Leak
+   match-leak-kinds: reachable,possible
+   ...
+   fun:Perl_pregcomp
+}
+
+{
+   perl-cow-shared-string-headers
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:Perl_safesysmalloc
+   ...
+   fun:Perl_sv_grow
+}
+
+{
+   dynaloader-shared-object-handles
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:dl_load_file
+}

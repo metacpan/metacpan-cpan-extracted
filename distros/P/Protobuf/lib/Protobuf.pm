@@ -6,7 +6,7 @@ Protobuf - High-performance Google Protocol Buffers implementation
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 our $HAS_XS;
 {
@@ -122,3 +122,40 @@ sub engine {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Protobuf - Fast Protocol Buffers implementation for Perl using upb
+
+=head1 SYNOPSIS
+
+    use Protobuf;
+
+=head1 DESCRIPTION
+
+Protobuf provides high-performance Protocol Buffers serialization and deserialization
+for Perl using the Google upb C library.
+
+=head1 SUPPORT AND BUG TRACKING
+
+Please report any bugs or feature requests to the CPAN Bug Tracker at:
+
+L<https://rt.cpan.org/Dist/Display.html?Queue=Protobuf>
+
+Or via email to C<bug-Protobuf@rt.cpan.org>.
+
+You can also visit the GitHub repository at:
+
+L<https://github.com/GoogleCloudDataproc/google-auth-library-perl>
+
+=head1 AUTHOR
+
+C.J. Collier E<lt>cjac@colliertech.orgE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 Google LLC. Apache License, Version 2.0.
+
+=cut

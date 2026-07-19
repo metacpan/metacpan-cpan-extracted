@@ -5,7 +5,7 @@
 [ 1. Tải mô-đun ]
   use mb;
   # Tiếng Việt: mô-đun mb cho xử lý chuỗi theo ký tự
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15 / johab
 
 [ 2. Độ dài / substr theo ký tự ]
   mb::length($str)              # number of characters (not bytes)
@@ -36,7 +36,7 @@
   mb::tr($str, $from, $to)      # transliterate characters
 
 [ 7. Các bảng mã được hỗ trợ ]
-  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15  johab
 
 [ 8. Ví dụ ]
   use mb;

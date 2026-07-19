@@ -66,12 +66,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/LLC-Technologies-Collier/protobuf.git",
-         "web" : "https://github.com/LLC-Technologies-Collier/protobuf"
+         "url" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl.git",
+         "web" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl"
       }
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

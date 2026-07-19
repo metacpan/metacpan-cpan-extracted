@@ -53,7 +53,7 @@ COMMON_LIB = [% COMMON_LIB %]
 
 [% BLOCK common_lib_link_rule %]
 # Rule to build the static library
-[% COMMON_LIB %]: [% COMMON_O_STRING %] [% IF is_linux %]libprotobufperl.map[% END %]
+[% COMMON_LIB %]: [% COMMON_O_STRING %]
 	$(RM_F) [% COMMON_LIB %]
 	$(CC) -shared [% common_lib_link_flags %] -o [% COMMON_LIB %] [% COMMON_O_STRING %] $(LDFLAGS) [% embed_ldflags %]
 [% END %]

@@ -1,0 +1,50 @@
+Sat Jul 18 08:34:07 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* release-notes.md: new
+	* release-notes/release-notes.md: new
+	* .includes/git.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* README.md: generated
+	* VERSION: bump
+	* lib/LLM/API.pm.in
+	($LLM_PRICING): updated pricing + new models
+	* lib/LLM/API/Content.pm.in
+	- API changes force refactor
+	- POD update
+	(text): new
+	(thinking): new
+	(tool_uses): new
+
+Wed May 06 13:08:10  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+
+	* .gitignore: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* buildspec.yml.current: new
+	* buildspec.yml.tmpl: new
+	* buildspec.yml: new
+	* cpanfile: new
+	* lib/LLM/API.pm.in: new
+	* lib/LLM/API/Content.pm.in: new
+	* lib/LLM/API/Response.pm.in: new
+	* lib/LLM/API/Usage.pm.in: new
+	* requires: new
+	* resources: new
+	* t/00-llm-api.t: new
+	* test-requires: new
+	* test.t.tmpl: new

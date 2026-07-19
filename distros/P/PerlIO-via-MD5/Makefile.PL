@@ -15,6 +15,7 @@ WriteMakefile (
  AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT	=> 'PerlIO Layer for MD5 Digests',
  VERSION_FROM	=> 'lib/PerlIO/via/MD5.pm',
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> {
                     'Digest::MD5' => 0,
                    },

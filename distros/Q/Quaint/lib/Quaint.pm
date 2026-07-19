@@ -7,7 +7,7 @@ use meta;
 use Module::Runtime qw/use_module/;
 use Types::Standard qw/Any Bool Str Int Num HashRef ArrayRef Object/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub import {
 	my ($caller) = caller();
@@ -313,7 +313,7 @@ Quaint - Unusual Object Orientation
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

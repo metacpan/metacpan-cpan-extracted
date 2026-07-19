@@ -25,9 +25,49 @@ use vars qw($tempdir $scriptno);
 $tempdir = "$FindBin::Bin/$scriptno.$$.temp";
 File::Path::mkpath($tempdir, 0, 0777);
 
+# On MSWin32, unlink() of the previous testee is asynchronous (the name
+# stays delete-pending for a moment) and on-access virus scanners can hold
+# a just-created file open, so re-creating the same name back-to-back
+# thousands of times fails sporadically (mb-0.65 CPAN Testers FAIL:
+# exactly 1 of 4200 subtests, at a different subtest number per report).
+# Therefore every subtest gets a serial-numbered testee name, creation is
+# checked and briefly retried, and a persistent transient failure skips
+# the subtest instead of failing it.
+use vars qw($testee_serial);
+$testee_serial = 0;
+
+sub make_testee_file {
+    my($file,$content,$mode) = @_;
+    for my $retry (1..5) {
+        if (open(TESTEE,">$file")) {
+            binmode(TESTEE);
+            print TESTEE $content;
+            close(TESTEE);
+            chmod($mode, $file);
+            if (-e $file) {
+                return 1;
+            }
+        }
+        select(undef,undef,undef,0.1);
+    }
+    return 0;
+}
+
+sub make_testee_dir {
+    my($dir,$mode) = @_;
+    for my $retry (1..5) {
+        mkdir($dir, $mode);
+        if (-d $dir) {
+            return 1;
+        }
+        select(undef,undef,undef,0.1);
+    }
+    return 0;
+}
+
 END {
-    # remove testee file
-    rmdir($tempdir);
+    # remove testee files (a transient unlink failure may leave some)
+    File::Path::rmtree($tempdir, 0, 0);
 }
 
 my @tester = ();
@@ -49,12 +89,8 @@ for my $tester (
             return 'SKIP' if $^O =~ /cygwin/;
 
             # make testee file
-            my $filename = "$tempdir/testee";
-            open(FILE,">$filename.A");
-            binmode(FILE);
-            print FILE $content;
-            close(FILE);
-            chmod($mode, "$filename.A");
+            my $filename = "$tempdir/testee" . (++$testee_serial);
+            make_testee_file("$filename.A", $content, $mode) or return 'SKIP';
 
             # do test file
             my $a = $want;

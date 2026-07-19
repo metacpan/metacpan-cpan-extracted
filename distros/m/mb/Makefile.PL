@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{mb},
-    'VERSION'   => q{0.65},
+    'VERSION'   => q{0.66},
     'ABSTRACT'  => q{Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -42,7 +42,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'mb' => {
                 'file'    => 'lib/mb.pm',
-                'version' => '0.65',
+                'version' => '0.66',
             }
         },
     };

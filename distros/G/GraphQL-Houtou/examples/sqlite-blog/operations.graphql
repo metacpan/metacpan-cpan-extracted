@@ -1,0 +1,55 @@
+"""Render the blog front page with two DataLoader relation levels."""
+query Feed($limit: Int = 20) {
+  feed(limit: $limit) {
+    id title body language publishedAt legacyTitle
+    author { id name }
+    tags { id name }
+    comments { id body author { id name } }
+  }
+}
+
+"""Exercise the @oneOf post locator with an id variable."""
+query PostById($ref: PostReference!) {
+  post(ref: $ref) {
+    id title body language publishedAt
+    author { id name posts { id title } }
+    tags { id name }
+    comments { id body author { id name } }
+  }
+}
+
+query NodeById($ref: PostReference!) {
+  node(ref: $ref) {
+    __typename id
+    ... on Post { title language }
+  }
+}
+
+"""Return both members of the SearchResult union."""
+query Search($text: String!) {
+  search(text: $text) {
+    __typename
+    ... on Post { id title language author { id name } }
+    ... on Author { id name posts { id title } }
+  }
+}
+
+query Stats {
+  health
+  stats { posts authors comments }
+}
+
+"""Publish a variable-bearing English or Japanese post."""
+mutation CreatePost($input: CreatePostInput!) {
+  createPost(input: $input) {
+    id title body language publishedAt
+    author { id name }
+    tags { id name }
+  }
+}
+
+mutation AddComment($input: AddCommentInput!) {
+  addComment(input: $input) {
+    id body author { id name }
+  }
+}

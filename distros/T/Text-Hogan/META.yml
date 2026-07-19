@@ -13,23 +13,23 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Text-Hogan
 requires:
-  Clone: '0.37'
+  Clone: '0.50'
   HTML::Escape: '1.11'
   Ref::Util: '0.204'
-  Scalar::Util: '1.41'
-  Text::Trim: '1.02'
+  Scalar::Util: '1.70'
+  Text::Trim: '1.04'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/kaoru/Text-Hogan/issues
   repository: git://github.com/kaoru/Text-Hogan
-version: '2.04'
-x_generated_by_perl: v5.34.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '2.05'
+x_generated_by_perl: v5.38.4
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

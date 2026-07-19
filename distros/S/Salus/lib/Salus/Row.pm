@@ -1,5 +1,8 @@
 package Salus::Row;
 
+use strict;
+use warnings;
+
 use Rope;
 use Rope::Autoload;
 use Types::Standard qw/ArrayRef/; 

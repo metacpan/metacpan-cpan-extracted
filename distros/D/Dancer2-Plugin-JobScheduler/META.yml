@@ -3,6 +3,7 @@ abstract: 'Plugin for Dancer2 web app to send and query jobs in different job sc
 author:
   - 'Mikko Koivunalho <mikkoi@cpan.org>'
 build_requires:
+  Cpanel::JSON::XS: '0'
   Crypt::JWT: '0'
   Dancer2: '0.301'
   Dancer2::Plugin::Database: '0'
@@ -13,8 +14,6 @@ build_requires:
   FindBin: '1.51'
   HTTP::Request::Common: '0'
   HTTP::Status: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
   JSON: '0'
   Test2::V0: '0'
   Test::Database::Temp: '0'
@@ -27,7 +26,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 keywords:
   - dancer
   - dancer2
@@ -44,9 +43,9 @@ requires:
   Database::ManagedHandle: '0.003'
   English: '0'
   Log::Any: '0'
-  Log::Any::Adapter::Util: '0'
   Module::Load: '0'
   Moo: '0'
+  Test::Perl::Critic: '0'
   TheSchwartz::JobScheduler: '0.002'
   TheSchwartz::JobScheduler::Job: '0'
   perl: '5.014'
@@ -55,8 +54,8 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer2-Plugin-JobScheduler
   homepage: https://metacpan.org/release/Dancer2-Plugin-JobScheduler
-  repository: https://github.com/mikkoi/Dancer2-Plugin-JobScheduler.git
-version: '0.006'
-x_generated_by_perl: v5.36.0
+  repository: git://github.com/mikkoi/Dancer2-Plugin-JobScheduler.git
+version: '0.007'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

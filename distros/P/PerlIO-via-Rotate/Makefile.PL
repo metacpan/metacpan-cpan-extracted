@@ -15,6 +15,7 @@ WriteMakefile (
  AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT	=> 'PerlIO Layer for rotational deviation',
  VERSION_FROM	=> 'lib/PerlIO/via/Rotate.pm',
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> {
                    },
 );

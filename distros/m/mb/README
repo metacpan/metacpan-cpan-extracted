@@ -13,6 +13,7 @@ SYNOPSIS
   $ perl mb.pm -e gbk           script_by_gbk.pl
   $ perl mb.pm -e hp15          script_by_hp15.pl
   $ perl mb.pm -e informixv6als script_by_informixv6als.pl
+  $ perl mb.pm -e johab         script_by_johab.pl
   $ perl mb.pm -e rfc2279       script_by_rfc2279.pl
   $ perl mb.pm -e sjis          script_by_sjis.pl
   $ perl mb.pm -e sjis          script_by_cp932.pl
@@ -68,6 +69,7 @@ SYNOPSIS
     GBK
     HP-15
     INFORMIX V6 ALS
+    Johab(code page 1361)
     Sjis(also CP932)
     UHC
     UTF-8
@@ -216,10 +218,10 @@ CHEATSHEET
 
   Quick reference guides (cheatsheets) are available in 21 languages:
 
-    BN Bengali         EN English        KM Khmer          NE Nepali         TR Turkish
+    BN Bengali        EN English        KM Khmer         NE Nepali         TR Turkish
     BM Malay          FR Français       KO 한국어          SI Sinhala        TW 粵語
-    HI Hindi          ID Indonesian     MN Монгол         TH Thai           UR اردو
-    MY Burmese        JA Japanese       TL Tagalog        UZ Uzbek          VI Tiếng Việt
+    HI Hindi          ID Indonesian     MN Монгол  TH Thai           UR اردو
+    MY Burmese        JA Japanese       TL Tagalog       UZ Uzbek          VI Tiếng Việt
     ZH 中文
 
   Each cheatsheet covers:

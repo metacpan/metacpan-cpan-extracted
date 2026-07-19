@@ -58,29 +58,43 @@ for my $limit (@limit_hex) {
 
 for (my $i=0; $i <= $#limit; $i++) {
     for (my $j=$i; $j <= $#limit; $j++) {
+        my $li = $limit[$i];
+        my $lj = $limit[$j];
+
+        # Transpile and eval-compile the two character classes once per
+        # ($i,$j) instead of once per subtest.  The regular expression
+        # depends only on ($li,$lj), not on $lk, so hoisting mb::parse()
+        # and the eval compilation out of the $k loop cuts the number of
+        # transpilations from n**3 to n**2 while every subtest still
+        # exercises exactly the same transpiled pattern against exactly
+        # the same octets with the same expected result (CPAN smokers on
+        # slow machines timed out on the n**3 version).  A compilation
+        # failure makes the closure undef, so every subtest of that
+        # ($i,$j) reports not ok -- the same visible result as before.
+        my $match_in  = eval('sub { local $_ = $_[0]; (' . mb::parse(q{$_ =~  /[} . $li . '-' . $lj . q{]/}) . ') }');
+        my $match_out = eval('sub { local $_ = $_[0]; (' . mb::parse(q{$_ =~ /[^} . $li . '-' . $lj . q{]/}) . ') }');
+
         for (my $k=0; $k <= $#limit; $k++) {
-            my $li = $limit[$i];
-            my $lj = $limit[$j];
             my $lk = $limit[$k];
             if (
                 ((CORE::length($lk) < CORE::length($li)) or ((CORE::length($lk) == CORE::length($li)) and ($lk lt $li)))
             ) {
-                push @test, sub { eval mb::parse(qq{"$lk" =~ /[^$li-$lj]/}) };
-                push @test, sub { eval mb::parse(qq{"$lk" !~  /[$li-$lj]/}) };
+                push @test, sub { $match_out and     $match_out->($lk) };
+                push @test, sub { $match_in  and not $match_in->($lk)  };
             }
             elsif (
                 ((CORE::length($li) < CORE::length($lk)) or ((CORE::length($li) == CORE::length($lk)) and ($li le $lk)))
                 and
                 ((CORE::length($lk) < CORE::length($lj)) or ((CORE::length($lk) == CORE::length($lj)) and ($lk le $lj)))
             ) {
-                push @test, sub { eval mb::parse(qq{"$lk" =~  /[$li-$lj]/}) };
-                push @test, sub { eval mb::parse(qq{"$lk" !~ /[^$li-$lj]/}) };
+                push @test, sub { $match_in  and     $match_in->($lk)  };
+                push @test, sub { $match_out and not $match_out->($lk) };
             }
             elsif (
                 ((CORE::length($lj) < CORE::length($lk)) or ((CORE::length($lj) == CORE::length($lk)) and ($lj lt $lk)))
             ) {
-                push @test, sub { eval mb::parse(qq{"$lk" =~ /[^$li-$lj]/}) };
-                push @test, sub { eval mb::parse(qq{"$lk" !~  /[$li-$lj]/}) };
+                push @test, sub { $match_out and     $match_out->($lk) };
+                push @test, sub { $match_in  and not $match_in->($lk)  };
             }
             else {
                 die;

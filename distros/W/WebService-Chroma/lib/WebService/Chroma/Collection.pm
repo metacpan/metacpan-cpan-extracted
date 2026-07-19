@@ -185,7 +185,7 @@ WebService::Chroma::Collection - chromadb collection
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

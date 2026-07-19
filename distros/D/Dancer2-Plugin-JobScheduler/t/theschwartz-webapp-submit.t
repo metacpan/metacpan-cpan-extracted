@@ -21,7 +21,15 @@ use lib "$lib_path";
 use Test::WWW::Mechanize::PSGI;
 use HTTP::Request::Common;
 use Crypt::JWT qw(encode_jwt decode_jwt);
-use JSON       qw( to_json );
+
+# We have had problems with some JSON backends in keeping numbers numerical.
+# So we force the backend by first loading Cpanel::JSON::XS
+# and then explicitly demanding JSON to use it
+BEGIN {
+    use Cpanel::JSON::XS ();
+    $ENV{PERL_JSON_BACKEND}='Cpanel::JSON::XS'; ## no critic (Variables::RequireLocalizedPunctuationVars)
+}
+use JSON;
 
 # Activate for testing
 # use Log::Any::Adapter ('Stdout', log_level => 'debug' );
@@ -79,14 +87,13 @@ my %plugin_config = (
                 dbh_callback => 'Database::ManagedHandle->instance',
                 databases    => {
                     theschwartz_db1 => {},
-                }
-            }
-        }
-    }
+                },
+            },
+        },
+    },
 );
 
 {
-
     package Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::WebApp::Submit;
     use Dancer2;
     use HTTP::Status qw( :constants status_message );
@@ -130,11 +137,13 @@ my %plugin_config = (
         status HTTP_OK;
         return to_json( \%r, { utf8 => 1, canonical => 1, } );
     };
-
+    1;
 }
 
 my $app = Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::WebApp::Submit->to_app;
 is( ref $app, 'CODE', 'Initialized the test app' );
+
+my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 
 # Activate web app
 my $mech = Test::WWW::Mechanize::PSGI->new( app => $app );
@@ -144,41 +153,39 @@ $mech->content_is( q{OK}, 'Correct return' );
 
 # Check configuration
 $mech->get_ok(q{/config});
-$mech->content_is( to_json( \%plugin_config, { utf8 => 1, canonical => 1, } ), 'Correct return' );
+$mech->content_is( $json->encode( \%plugin_config, ), 'Correct return config' );
 
 # List jobs, get 0
 $mech->get_ok(q{/list_jobs});
 $mech->content_is(
-    to_json(
+    $json->encode(
         {
             error   => undef,
             status  => 'OK',
             success => 1,
-            jobs    => []
+            jobs    => [ ]
         },
-        { utf8 => 1, canonical => 1, }
     ),
-    'Correct return'
+    'Correct return list_jobs'
 );
 
 # Submit a job
 $mech->get_ok(q{/submit_job});
-$mech->content_is( to_json( { error => undef, status => 'OK', success => 1, id => 1, }, { utf8 => 1, canonical => 1, } ),
-    'Correct return' );
+$mech->content_is( $json->encode( { error => undef, status => 'OK', success => 1, id => 1, }, ),
+    'Correct return submit_job' );
 
 # List jobs, get 1
 $mech->get_ok(q{/list_jobs});
 $mech->content_is(
-    to_json(
+    $json->encode(
         {
             error   => undef,
             status  => 'OK',
             success => 1,
             jobs    => [ { task => 'task1', args => { name => 'Mikko', age => 123 }, opts => {}, }, ]
         },
-        { utf8 => 1, canonical => 1, }
     ),
-    'Correct return'
+    'Correct return list_jobs'
 );
 
 # Undefine all Database::Temp objects explicitly to demolish

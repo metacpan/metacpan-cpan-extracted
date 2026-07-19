@@ -1297,3 +1297,111 @@ CREATE TABLE plural_ranges (
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_plural_ranges_unique ON plural_ranges(locale, start, stop);
+
+-- NOTE: Source: main/*.xml/ldml/personNames/nameOrderLocales
+-- This table stores the locale-specific name ordering rules, i.e. when displaying names
+-- using the locale 'locale', names from 'name_locale' should be ordered according to
+-- 'name_order'. This is semantically distinct from person_name_defaults, which records
+-- the global default ordering for a given locale as defined in supplemental data.
+-- Example in ja.xml: <nameOrderLocales order="surnameFirst">hu ja km ko mn vi yue zh</nameOrderLocales>
+-- means "when rendering names in Japanese, treat names from hu/ja/km/ko/mn/vi/yue/zh as surnameFirst".
+CREATE TABLE person_name_order_locales (
+     pers_name_ord_id   INTEGER
+    -- The display locale (i.e. the locale doing the rendering)
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- The locale whose names are being ordered (may be 'und' for the fallback default,
+    -- or 'und-XX' for region-scoped fallbacks such as 'und-JP')
+    ,name_locale        VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- givenFirst, surnameFirst
+    ,name_order         VARCHAR(12) NOT NULL COLLATE NOCASE
+    -- Whether this entry is marked as unconfirmed CLDR draft data
+    ,is_draft           BOOLEAN DEFAULT FALSE
+    ,PRIMARY KEY(pers_name_ord_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,CHECK( name_locale REGEXP '^[a-zA-Z][a-zA-Z]{1,2}(\-[a-zA-Z0-9]+)*$' )
+    ,CHECK( name_order REGEXP '^[a-zA-Z]+$' )
+);
+CREATE UNIQUE INDEX idx_person_name_order_locales_unique ON person_name_order_locales(locale, name_locale);
+
+-- NOTE: Source: main/*.xml/ldml/personNames/personName/namePattern
+-- Each row is one name-format pattern for a given locale, characterised by the four axes:
+-- order (givenFirst, surnameFirst, sorting), length (long, medium, short),
+-- usage (referring, addressing, monogram), and formality (formal, informal).
+-- The pattern uses CLDR field placeholders such as {given}, {surname}, {given-initial}, etc.
+-- The 'alt' column is NULL for the primary pattern, or '1' for an alternate pattern within
+-- the same personName element (used when a locale provides two patterns covering different
+-- field combinations, such as with and without surname2). Maximum observed pattern length
+-- is 102 characters.
+CREATE TABLE person_name_formats (
+     pers_name_fmt_id   INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- Source position of the <personName> element within /ldml/personNames.
+    ,name_index         INTEGER NOT NULL
+    -- givenFirst, surnameFirst, sorting
+    ,name_order         VARCHAR(12) COLLATE NOCASE
+    -- long, medium, short
+    ,name_length        VARCHAR(10) COLLATE NOCASE
+    -- referring, addressing, monogram
+    ,name_usage         VARCHAR(12) COLLATE NOCASE
+    -- formal, informal
+    ,name_formality     VARCHAR(10) COLLATE NOCASE
+    -- NULL for the primary pattern; '1' for an alternate pattern within the same personName element
+    ,alt                VARCHAR(5) COLLATE NOCASE
+    -- Example: {given} {given2} {surname} {generation}{title}
+    ,name_pattern       VARCHAR(120) NOT NULL
+    ,PRIMARY KEY(pers_name_fmt_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,CHECK( name_order REGEXP '^[a-zA-Z]+$' )
+    ,CHECK( name_length REGEXP '^[a-zA-Z]+$' )
+    ,CHECK( name_usage REGEXP '^[a-zA-Z]+$' )
+    ,CHECK( name_formality REGEXP '^[a-zA-Z]+$' )
+    ,CHECK( alt REGEXP '^[a-zA-Z0-9]+$' )
+);
+CREATE UNIQUE INDEX idx_person_name_formats_unique ON person_name_formats(locale, IFNULL(name_order, ''), IFNULL(name_length, ''), IFNULL(name_usage, ''), IFNULL(name_formality, ''), IFNULL(alt, ''));
+
+-- NOTE: Source: main/*.xml/ldml/personNames/sampleName
+-- Each row is one field within a sample name. A sample name is identified by its item
+-- type (nativeG, nativeGS, nativeGGS, nativeFull, foreignG, foreignGS, foreignGGS,
+-- foreignFull), and contains one or more name fields keyed by field type.
+-- Known field types: given, given2, given-informal, surname, surname-prefix, surname-core,
+-- surname2, title, generation, credentials.
+-- The value '∅∅∅' is a CLDR convention signalling an explicitly absent field.
+-- Note: sampleName items are for testing/survey tooling only and must not be used as
+-- UI prompts or placeholders in production software.
+CREATE TABLE person_name_samples (
+     pers_name_samp_id  INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- nativeG, nativeGS, nativeGGS, nativeFull, foreignG, foreignGS, foreignGGS, foreignFull
+    ,sample_type        VARCHAR(15) NOT NULL COLLATE NOCASE
+    -- given, given2, given-informal, surname, surname-prefix, surname-core, surname2,
+    -- title, generation, credentials
+    ,field_type         VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- The sample value. '∅∅∅' indicates an explicitly absent field (CLDR convention).
+    ,field_value        TEXT NOT NULL
+    ,PRIMARY KEY(pers_name_samp_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,CHECK( sample_type REGEXP '^[a-zA-Z]+$' )
+    ,CHECK( field_type REGEXP '^[a-zA-Z]+[0-9]*(?:\-[a-zA-Z]+[0-9]*)*$' )
+);
+CREATE UNIQUE INDEX idx_person_name_samples_unique ON person_name_samples(locale, sample_type, field_type);
+
+-- NOTE: Source: main/*.xml/ldml/personNames/initialPattern
+-- Stores locale-specific patterns for rendering name initials.
+-- type='initial'  : pattern for a single initial, e.g. '{0}.' -> 'W.'
+-- type='initialSequence': pattern for joining multiple initials, e.g. '{0} {1}' -> 'W. J.'
+-- Only 19 locales define these; most locales inherit from root.xml which provides
+-- the global defaults: initial='{0}.', initialSequence='{0} {1}'.
+CREATE TABLE person_name_initial_patterns (
+     pers_name_init_id  INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- initial, initialSequence
+    ,pattern_type       VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- Example: '{0}.' or '{0} {1}' or '{0}{1}'
+    ,pattern_value      VARCHAR(20) NOT NULL
+    -- Whether this entry is marked as unconfirmed CLDR draft data
+    ,is_draft           BOOLEAN DEFAULT FALSE
+    ,PRIMARY KEY(pers_name_init_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,CHECK( pattern_type REGEXP '^[a-zA-Z]+$' )
+);
+CREATE UNIQUE INDEX idx_person_name_initial_patterns_unique ON person_name_initial_patterns(locale, pattern_type);

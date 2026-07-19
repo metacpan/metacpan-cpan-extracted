@@ -3,7 +3,7 @@ package Google::Protobuf::Wrappers;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;

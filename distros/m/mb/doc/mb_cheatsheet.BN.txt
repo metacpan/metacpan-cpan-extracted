@@ -4,7 +4,7 @@
 
 [ 1. মডিউল লোড করুন ]
   use mb;
-  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / euctw / big5 / big5hkscs / gbk / uhc / gb18030 / rfc2279 / wtf8 / informixv6als / hp15 / johab
 
 [ 2. অক্ষর-ভিত্তিক length / substr ]
   mb::length($str)              # অক্ষরের সংখ্যা (বাইট নয়)
@@ -26,7 +26,7 @@
   mb::getc(FH)     mb::tr($str,$from,$to)
 
 [ 7. সমর্থিত এনকোডিং ]
-  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15
+  utf8  sjis  eucjp  euctw  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8  informixv6als  hp15  johab
 
 [ 8. উদাহরণ ]
   use mb;

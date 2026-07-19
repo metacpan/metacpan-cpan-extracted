@@ -1,0 +1,87 @@
+NAME
+    Complete::KDEActivity - Completion routines related to KDE activities
+
+VERSION
+    This document describes version 0.001 of Complete::KDEActivity (from
+    Perl distribution Complete-KDEActivity), released on 2026-04-07.
+
+FUNCTIONS
+  complete_kde_activity_guid
+    Usage:
+
+     complete_kde_activity_guid(%args) -> any
+
+    Complete from a list of existing KDE activity GUIDs.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str*
+
+        (No description)
+
+    Return value: (any)
+
+  complete_kde_activity_name
+    Usage:
+
+     complete_kde_activity_name(%args) -> any
+
+    Complete from a list of existing KDE activity names.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str*
+
+        (No description)
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-KDEActivity>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-KDEActivity>.
+
+SEE ALSO
+    Complete
+
+    Other "Complete::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-KDEActivity>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
