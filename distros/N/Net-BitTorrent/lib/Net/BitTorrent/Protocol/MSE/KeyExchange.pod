@@ -220,7 +220,7 @@ The snapshot data.
 
 =head1 AUTHOR
 
-Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Sanko Robinson - L<https://github.com/sanko>
 
 =head1 COPYRIGHT
 

@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 
 use 5.020;
 use strictures 2;
@@ -23,7 +23,7 @@ use Mojo::Util qw(url_unescape url_escape);
 use Carp 'croak';
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use JSON::Schema::Modern::Utilities 0.625 qw(register_schema load_cached_document true false);
+use JSON::Schema::Modern::Utilities qw(register_schema load_cached_document true false);
 use namespace::clean;
 
 use Exporter 'import';
@@ -42,6 +42,7 @@ our @EXPORT = qw(
 our @EXPORT_OK = qw(
   OAS_SCHEMAS
   add_vocab_and_default_schemas
+  add_formats
   uri_decode
   uri_encode
   uri_encode_strict
@@ -133,7 +134,20 @@ use constant OAS_SCHEMAS => {
 
 
 sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
+  return if ($evaluator->{__openapi_vocabs_loaded}//={})->{$version}++;
+
   $evaluator->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
+
+  foreach my $uri (OAS_SCHEMAS->{$version}->@*) {
+    my $document = load_cached_document($evaluator, $uri);
+
+    # add "latest" alias for each of these documents, mapping to the same document object
+    $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}\z}{}r).'/latest', $document);
+  }
+}
+
+sub add_formats ($evaluator, $version = OAS_VERSIONS->[-1]) {
+  return if ($evaluator->{__openapi_formats_loaded}//={})->{$version}++;
 
   $evaluator->add_format_validation(int32 => +{
     type => 'number',
@@ -144,7 +158,7 @@ sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
       my $bound = Math::BigInt->new(2) ** 31;
       $x >= -$bound && $x < $bound;
     }
-  });
+  }) if not $evaluator->_get_format_validation('int32');
 
   $evaluator->add_format_validation(int64 => +{
     type => 'number',
@@ -155,29 +169,25 @@ sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
       my $bound = Math::BigInt->new(2) ** 63;
       $x >= -$bound && $x < $bound;
     }
-  });
+  }) if not $evaluator->_get_format_validation('int64');
 
-  $evaluator->add_format_validation(float => +{ type => 'number', sub => sub ($x) { 1 } });
-  $evaluator->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } });
-  $evaluator->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
+  $evaluator->add_format_validation(float => +{ type => 'number', sub => sub ($x) { 1 } })
+    if not $evaluator->_get_format_validation('float');
+  $evaluator->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } })
+    if not $evaluator->_get_format_validation('double');
+  $evaluator->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } })
+    if not $evaluator->_get_format_validation('password');
 
   my $OWS = q{[\x09\x20]*};
   my $TOKEN = q{[a-zA-Z0-9!#$%&'*+.^_`|~-]+};
-  my $QUOTED_STRING = q{"(?:[\x09\20\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|\x5C[\x09\x20-\x7E\x80-\xFF])*"};
+  my $QUOTED_STRING = q{"(?:[\x09\x20\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|\x5C[\x09\x20-\x7E\x80-\xFF])*"};
   $evaluator->add_format_validation('media-range' => +{
     type => 'string',
     sub => sub ($x) {
       # see ABNF at RFC9110 Appendix A
       return 0+!!($x =~ m{^$TOKEN/$TOKEN(?:$OWS;$OWS$TOKEN=(?:$TOKEN|$QUOTED_STRING))*\z});
     },
-  });
-
-  foreach my $uri (OAS_SCHEMAS->{$version}->@*) {
-    my $document = load_cached_document($evaluator, $uri);
-
-    # add "latest" alias for each of these documents, mapping to the same document object
-    $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}\z}{}r).'/latest', $document);
-  }
+  }) if not $evaluator->_get_format_validation('media-range');
 }
 
 # url-percent-decode and UTF-8-decode a string
@@ -280,7 +290,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.141
+version 0.142
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -303,6 +313,7 @@ STRICT_DIALECT
 STRICT_METASCHEMA
 SUPPORTED_OAD_VERSIONS
 add_vocab_and_default_schemas
+add_formats
 uri_decode
 uri_encode
 uri_encode_strict

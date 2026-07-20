@@ -77,13 +77,13 @@ subtest 'new media-type handler' => sub {
 
   like(
     dies { add_media_type('FOO-BAR' => sub {}) },
-    qr/bad media-type string "FOO-BAR"/,
+    qr/^bad media-type string "FOO-BAR"/,
     'bad media-type strings are rejected',
   );
 
   like(
     dies { add_media_type('MYTEXT/PLAIN; CHARSET=UTF-8' => sub {}) },
-    qr/duplicate media-type found/,
+    qr/^duplicate media-type found/,
     'cannot add a type twice (when comparing normalized forms)',
   );
 
@@ -97,6 +97,12 @@ subtest 'new media-type handler' => sub {
     scalar encode_media_type('foo/bar', \'hi'),
     undef,
     'unknown media-type encoder returns undef, not a reference',
+  );
+
+  like(
+    dies { add_media_type('multipart/furble' => sub {}) },
+    qr{^multipart encoders/decoders cannot be defined here: use OpenAPI::Modern},
+    'cannot create an entry for anything multipart here',
   );
 };
 
@@ -115,7 +121,7 @@ subtest 'application/json' => sub {
 
   die_result(
     sub { decode_media_type('application/json', \'blargh') },
-    qr/malformed JSON string/,
+    qr/^malformed JSON string/,
     'decoder for "application/json" throws an exception for bad data',
   );
 
@@ -180,6 +186,19 @@ subtest 'application/x-www-form-urlencoded'=> sub {
     encode_media_type('application/x-www-form-urlencoded', \{ a => [qw(x y z)], b => [qw(1 2)] })->$*,
     'a=x&a=y&a=z&b=1&b=2',
     'application/x-www-form-urlencoded encoder with array values, normalized',
+  );
+
+  is_equal(
+    decode_media_type('application/x-www-form-urlencoded; type=array', \'a=x&a=y&b=1&a=z&b=2')->$*,
+    [ { a => 'x' }, { a => 'y' }, { b => '1' }, { a => 'z' }, { b => '2' } ],
+    'application/x-www-form-urlencoded decoder preserves order, when decoded to an array of tuples',
+  );
+
+  is_equal(
+    encode_media_type('application/x-www-form-urlencoded',
+      \[ { a => 'x' }, { a => 'y' }, { b => '1' }, { a => 'z' }, { b => '2' } ])->$*,
+    'a=x&a=y&b=1&a=z&b=2',
+    'application/x-www-form-urlencoded encoder, from an array of tuples',
   );
 };
 

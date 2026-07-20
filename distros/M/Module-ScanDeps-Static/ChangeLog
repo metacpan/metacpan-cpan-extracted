@@ -1,0 +1,325 @@
+Sun Jul 19 09:17:46 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.1]:
+	* release-notes/release-notes-1.8.1.md: new
+	* release-notes.md: new
+	* .gitignore: +buildspec.yml.current
+	* .includes/git.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* VERSION: bump
+	* buildspec.yml: _ => -
+	* lib/Module/ScanDeps/Static.pm.in
+	- POD updates
+	(parse_line)
+	- support for Moo/Role::Tiny::With 'with'
+	(to_rpm): fixed
+	* requires: -version, CLI::Simple 2.1.0
+	* cpanfile: likewise
+        * bin/find-requires.in: refactored
+
+Tue Apr 28 05:42:41 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.0]: CPAN::Maker::Bootstrapper
+	* release-notes-1.8.0.md: new
+	* .gitignore
+	- + buildspec.yml.tmpl, test.t.tmpl
+	* lib/Module/ScanDeps/FindRequires.pm.in: renamed
+	* lib/Module/ScanDeps/Static.pm.in: renamed
+	* Makefile
+	- essentially a new Makefile from CPAN::Maker::Bootstrapper
+	- uses make-cpan-dist.pl & buildspec.yml
+	* README.md: generated (with TOC)
+	* test-requires: removed Test::More
+
+	[1.8.0]: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* VERSION: new
+	* buildspec.yml: new
+	* cpanfile: new
+
+	[1.8.0]: removed
+	* lib/Module/ScanDeps/Static/VERSION.pm
+	- deleted, use @PACKAGE_VERSION@
+	* provides: deleted
+
+	[1.8.0]: renamed
+	* bin/find-requires.in: renamed
+	* bin/find-requires.ps1.in: renamed
+	* bin/scandeps-static.pl.in: renamed
+
+Sun Sep 28 15:06:51 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.7.8]:
+	* Makefile: get rid of postambe
+	* bin/find-requires.ps1: new
+	* bin/find-requires: new
+	* lib/Module/ScanDeps/FindRequires.pm: bump version
+	* lib/Module/ScanDeps/Static.pm: likewise
+
+Sun Sep 28 07:50:25 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.7.7]:
+	* lib/Module/ScanDeps/Static.pm: version bump
+	* lib/Module/ScanDeps/Static/VERSION.pm: likewise
+	* lib/Module/ScanDeps/Static/FindRequires.pm
+	* postamble: remove pass DESTDIR as env var
+	* requires: require CLI::Simple 1.0.6
+
+Thu Apr  3 13:22:59 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.7.6]:
+	* lib/Module/ScanDeps/Static.pm: version bump
+	* lib/Module/ScanDeps/Static/VERSION.pm: likewise
+	* lib/Module/ScanDeps/Static/FindRequires.pm
+	- likewise
+	- keys % not supported anymore
+	* Makefile: make bump
+
+	[1.7.5]:
+	* lib/Module/ScanDeps/Static.pm: version bump
+	* lib/Module/ScanDeps/Static/VERSION.pm: likewise
+	* lib/Module/ScanDeps/Static/FindRequires.pm: likewise
+	* bin/scandeps-static.pl: Module::ScanDeps::Static::VERSION
+	* postamble: fix $(DESTDIR)
+
+	[1.7.4]:
+	* lib/Module/ScanDeps/Static.pm: version bump
+	* lib/Module/ScanDeps/Static/VERSION.pm: likewise
+	* lib/Module/ScanDeps/Static/FindRequires.pm: likewise
+	* bin/scandeps-static.pl: Module::ScanDeps::Static::VERSION
+
+	[1.7.3]:
+	* lib/Module/ScanDeps/Static.pm: version bump
+	* lib/Module/ScanDeps/Static/VERSION.pm: likewise
+	* requires: +Progress::Any::*
+
+Sat Nov 23 07:37:37 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.7.1]:
+	* Makefile
+	- get version from .pm for target tarball name
+	* lib/Module/ScanDeps/Static.pm
+	- require Module::ScanDeps::Static::VERSION
+	- min core version = $PERL_VERSION
+	(min_core_version): new
+	(is_core): fix version comparisons
+	(main): cleanup help
+	* lib/Module/ScanDeps/Static/VERSION.pm: new
+	* lib/Module/ScanDeps/FindRequires
+	- require Module::ScanDeps::Static::VERSION
+	* bin/scandeps-static.pl: get version from ::VERSION file
+	* provides: + Module::ScanDeps::Static::VERSION
+
+Thu Nov 21 09:14:28 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.006]:
+	* lib/Module/ScanDeps/FindRequires.pm
+	- version bump
+	- + --include-require (--no-include-require)
+	- filter provided for list-requires
+	* lib/Module/ScanDeps/Static.pm
+	- version bump
+	- minor refactoring
+	* requires: +Pod::Find - no longer core
+
+Thu Nov 14 09:34:05 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.005]:
+	* bin/scandeps-static.pl: bump version
+	* README: generated
+	* lib/Module/ScanDeps/FindRequires.pm: new
+	- pod updates
+	- new progress bar format
+	- new command dump-requires
+	(main)
+	- new options: core, exclude, exclude-path, min-perl-version, output, progress
+	(find_requires)
+	- use include-core setting
+	- min core version
+	(get_abs_include_paths): new
+	(get_file_listing)
+	- exclude paths
+	(get_package_list): remove pod
+	(get_output_handle): new
+	(_format): remove dupes, fix text format
+	(create_requires)
+	- use fh
+	- add ;
+	(dump_require): new
+	(dump_map)
+	- use fh
+	- filter list
+	(check_requires): use fh
+	(add_requires): likewise
+	(delete_requires): likewise
+	* lib/Module/ScanDeps/Static.pm
+	- pod tweaks
+	(new): check for bad options
+	* t/01-scandeps.t: format changes
+
+Sun May 19 10:27:35 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.004]:
+	* Module/ScanDeps/Static.pm
+	- pod tweaks
+	(parse_line): don't convert / to :: for .pl files
+	(get_dependencies): make default 'text'
+	* README: generated
+	* lib/Module/ScanDeps/Static.pm
+	- use JSON, no JSON::PP
+	* lib/Module/ScanDeps/FindRequires.pm: new
+	* lib/Module/ScanDeps/Static.pm
+	- use JSON, no JSON::PP
+	* Makefile: added above to build
+	* provides: likewise
+	* requires
+	- JSON, not JSON::PP
+	- CLI::Simple
+	* postamble: new
+
+Sun May 14 19:01:29 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.003]:
+	* bin/scandeps-static.pl
+	- update version
+	- chmod +x so it gets included in distribution
+	* lib/Module/ScanDeps/Static.pm: update version
+
+Tue Feb 21 17:22:50 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.002 - undef]:
+	* lib/Module/ScanDeps/Static.pm
+	(get_module_version): 0 if version eq undef
+	* README.md: generated
+	* bin/scandeps-static.pl: bump version
+
+Tue Jan 24 10:13:41 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.001 - inheritance]:
+	* lib/Module/ScanDeps/Static.pm
+	- bump verion
+	(parse_line)
+	- recoginize multiple modules in inheritance chain
+	* bin/scandeps-static.pl: bump version
+
+Mon Nov 21 12:26:27 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.9 - require]:
+	* lib/Module/ScanDeps/Static.pm
+	(parse_line): don't include a require with a $
+	* bin/scandeps-static.pl: bump version
+	* README.md: likewise
+
+Fri Nov 18 16:29:43 2022  Rob Lauer  <rlauer@usgn.net>
+
+	[0.8 - use base 'module']:
+	* lib/Module/ScanDeps/Static.pm
+	(parse_line): allow for use base 'module-name'
+	* bin/scandeps-static.pl: bump version
+	* README.md: likewise
+
+Fri Jul 15 09:56:49 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.7 - unit tests]:
+	* requires: Pod::Find
+	* bin/scandeps.pl: bump version
+	* lib/Module/ScanDeps/Static.pm: bump version
+
+Wed Jul 13 15:36:11 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.6 - version comparison]:
+	* lib/Module/ScanDeps/Static.pm
+	(is_core): version->parse to compare versions
+	* Makefile
+	* test-requires: just Test::More
+	* requires: +core modules introduced > 5.010
+
+Tue Jun 21 11:36:18 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.5 - perl version]:
+	* Makefile
+	- -D requires
+	- remove -c (don't add core files)
+	* lib/Module/ScanDeps/Static.pm
+	- pod spelling tweak
+	- always add perl version to output if found
+	- bump version
+	* bin/scandeps-static.pl: bump version
+	* README.md: generated file
+
+Sat May 14 06:47:00 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.4 - failed tests on CHORNY]:
+	* t/01-scandep.st: --add-version = FALSE, he has a FOO::Bar?
+	* bin/scandeps-static.pl: bump version
+	* lib/Module/ScanDeps/Stati.pm
+	- bump version
+	- add use $DEFAULT_MIN_CORE_VERSION instead of magic value
+	- update pod
+	(parse): don't return followed by sort
+
+Fri May 13 10:44:27 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.3 - use base qw()]:
+	* lib/Modules/ScanDeps/Static.pm
+	- pod tweaks
+	- bump version
+	- --no-include-require, --no-add-version, --min-core-version
+	(get_module_version): consider < 5.8 core
+	(is_core): check min-core-version
+	(parse_line): find qw{(/'" for use base/parent
+	(parse): return sorted keys of dependencies
+	* requires
+	- + JSON::PP, version, Pod::Find
+	* Makefile
+	- don't clean up README.md, it will get built anyway
+	- -c flag to make-cpan-dist to use 'requires' file explicitly
+	* bin/scandeps-static.pl: bump version
+	* t/01-scandeps.t: test new return values of parse()
+	* README-BUILD.md: new
+	* test-requires: in case someone does tests only?
+
+Thu May 12 14:08:57 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.2 - output formatting]:
+	* lib/Module/ScanDeps/Static.pm
+	- help
+	- + --separator, --raw, --version
+	(add_require): trim module names
+	(get_dependencies): no method 'format', use get_json, get_text
+	(format_text): format ala scandeps.pl
+	* Makefile
+	- new targets: check, test, install
+	* requires: +IO::Scalar
+	* bin/scandeps-static.pl: bump version
+
+Thu May 12 10:08:34 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[__DATA__]:
+	* Makefile: add README.md to build
+	* lib/Module/ScanDeps/Static.pm
+	(parse_line): return if we hit __DATA__ or __END__
+
+Mon May  9 12:35:04 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+	* Makefile: new
+	* .gitignore: new
+	* provides: new
+	* requires: new
+	* lib/Module/ScanDeps/Static.pm: new
+	* bin/scandeps-static.pl: new
+	* README.md: new
+	* ChangeLog: new
+	* t/00-scandeps.t: new
+	* t/01-scandeps.t: new
+

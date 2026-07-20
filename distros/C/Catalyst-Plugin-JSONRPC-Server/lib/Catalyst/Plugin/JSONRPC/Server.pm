@@ -2,7 +2,7 @@ package Catalyst::Plugin::JSONRPC::Server;
 use v5.36;
 use Catalyst::Plugin::JSONRPC::Server::Dispatcher;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =encoding utf8
 

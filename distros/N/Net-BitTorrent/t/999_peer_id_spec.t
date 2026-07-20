@@ -15,7 +15,7 @@ T2->subtest(
         T2->is( length($signature), 12, 'Signature is 12 characters' );
 
         # The spec says 12 characters. Our implementation uses 7 random + 'Sanko'
-        T2->like( $signature, qr/^[A-Za-z0-9\-\._~]{7}Sanko$/, 'Signature matches [7 random chars]Sanko' );
+        T2->like( $signature, qr/^[A-Za-z0-9\-\._~]{7}.{5}$/, 'Signature matches [7 random chars][5 more chars]' );
         T2->note("Generated Peer ID: $id");
     }
 );

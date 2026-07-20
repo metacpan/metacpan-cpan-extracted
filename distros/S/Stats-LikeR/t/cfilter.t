@@ -94,6 +94,23 @@ is_deeply( cols_of( cfilter( \@aoh, 'keep' => sub { sd( $_[0] ) == 0 }, 'na' => 
 is_deeply( cfilter( \%hoa, 'keep' => [ 'y' ] ), { 'y' => [ 2, undef, 6, 8, 10 ] }, 'kept column keeps its undef cells' );
 is_deeply( \%hoa, { 'x' => [ 1, 2, 3, 4, 5 ], 'y' => [ 2, undef, 6, 8, 10 ], 'z' => [ 7, 7, 7, undef, undef ] }, 'input is left untouched' );
 
+# 7b. qr// selector: keep/remove columns whose NAME matches the pattern, all
+#     three shapes. A bare pattern matches anywhere in the name (no anchoring).
+is_deeply( cfilter( \%choa, 'keep' => qr/^[xy]$/ ), { 'x' => [ 1, 2, 3 ], 'y' => [ 4, 5, 6 ] }, 'HoA: keep by regex' );
+is_deeply( cfilter( \%choa, 'remove' => qr/z/ ), { 'x' => [ 1, 2, 3 ], 'y' => [ 4, 5, 6 ] }, 'HoA: remove by regex' );
+is_deeply( cols_of( cfilter( \%choh, 'keep' => qr/x/ ) ), [ 'x' ], 'HoH: keep by regex trims each row' );
+is_deeply( cols_of( cfilter( \@caoh, 'remove' => qr/y/ ) ), [ 'x', 'z' ], 'AoH: remove by regex' );
+# a real-world shape: drop the columns whose name contains step or bias_
+{
+	my %md = ( 'y' => [ 1, 2 ], 'step_1' => [ 3, 4 ], 'step_2' => [ 5, 6 ], 'bias_a' => [ 7, 8 ] );
+	is_deeply( cols_of( cfilter( \%md, 'remove' => qr/(?:step|bias_)/ ) ), [ 'y' ], 'remove => qr/step|bias_/ drops the matching columns' );
+}
+# regex, like the by-name selector, does not inspect the data: na/against die.
+dies_ok { cfilter( \%hoa, 'keep' => qr/x/, 'na' => 'omit' ) } 'na with a regex selector dies';
+dies_ok { cfilter( \%hoa, 'keep' => qr/x/, 'against' => 'x' ) } 'against with a regex selector dies';
+# input is left untouched.
+is_deeply( \%choa, { 'x' => [ 1, 2, 3 ], 'y' => [ 4, 5, 6 ], 'z' => [ 0, 0, 0 ] }, 'regex: input is left untouched' );
+
 # 8. Bad inputs / option misuse die.
 dies_ok { cfilter( \%hoa ) } 'no keep/remove dies';
 dies_ok { cfilter( \%hoa, 'keep' => [ 'x' ], 'remove' => [ 'y' ] ) } 'both keep and remove dies';
@@ -108,7 +125,11 @@ dies_ok { cfilter( \%hoa, 'keep' => sub { 1 }, 'against' => 'nope' ) } 'against 
 dies_ok { cfilter( 42, 'keep' => [ 'x' ] ) } 'non-reference data dies';
 
 # 9. No memory leaks across the by-name, default, omit and against paths.
+# Test::LeakTrace reports Devel::Cover's instrumentation SVs as leaks, so skip
+# the leak checks (which are the last tests here) when running under coverage.
+if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok { cfilter( \%hoa, 'keep' => [ 'x', 'y' ] ) } 'no leaks: keep by name';
+no_leaks_ok { cfilter( \%hoa, 'remove' => qr/(?:step|z)/ ) } 'no leaks: remove by regex';
 no_leaks_ok { cfilter( \%hoa, 'keep' => sub { 1 } ) } 'no leaks: default predicate (sees undef)';
 no_leaks_ok { cfilter( \%hoa, 'keep' => sub { sd( $_[0] ) == 0 }, 'na' => 'omit' ) } 'no leaks: na=omit';
 no_leaks_ok { cfilter( \%corr, 'keep' => sub { cor( $_[0], $_[1] ) > 0 }, 'against' => 'a' ) } 'no leaks: against';

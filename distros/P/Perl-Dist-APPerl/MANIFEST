@@ -10,6 +10,8 @@ share/5.36-cosmo.patch
 share/5.36-cosmo3.patch
 share/5.38-cosmo3.patch
 share/5.40-cosmo3.patch
+share/5.44-apperl.patch
+share/5.44-cosmo3.patch
 t/tests.t
 xt/author/build.t
 xt/author/pod_linkcheck.t

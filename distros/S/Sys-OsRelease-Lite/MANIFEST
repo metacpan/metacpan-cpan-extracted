@@ -1,0 +1,34 @@
+build_tools/get_semver.pl
+build_tools/input/001_module_load.t
+build_tools/input/002_basic.t
+build_tools/input/003_samples.t
+build_tools/input/004_import.t
+build_tools/input/dist.ini
+build_tools/input/OsRelease.pm
+build_tools/src_filter.pl
+Changes
+lib/README.md
+lib/Sys/OsRelease/Lite.pm
+Makefile.PL
+MANIFEST			This list of files
+perlcritic.rc
+Sys-OsRelease-Lite-0.4.1+lite.tar.gz
+t/001_module_load.t
+t/002_basic.t
+t/003_samples.t
+t/004_import.t
+t/README.md
+t/test-inputs/003_samples/gen-sample
+t/test-inputs/003_samples/os-release-almalinux
+t/test-inputs/003_samples/os-release-alpine
+t/test-inputs/003_samples/os-release-archlinux
+t/test-inputs/003_samples/os-release-debian
+t/test-inputs/003_samples/os-release-fedora
+t/test-inputs/003_samples/os-release-kalilinux-kali-last-release
+t/test-inputs/003_samples/os-release-opensuse-leap
+t/test-inputs/003_samples/os-release-rockylinux
+t/test-inputs/003_samples/os-release-ubuntu
+t/test-inputs/003_samples/samples2config.pl
+t/test-inputs/003_samples/test-config.yaml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

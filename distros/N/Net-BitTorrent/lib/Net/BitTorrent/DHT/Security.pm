@@ -15,8 +15,9 @@ sub _init_table {
 #
 _init_table();
 #
-class Net::BitTorrent::DHT::Security v2.0.6 {
+class Net::BitTorrent::DHT::Security v2.1.0 {
     use Socket qw[inet_aton inet_pton AF_INET AF_INET6];
+    use Crypt::URandom qw[urandom];
 
     method _crc32c ($data) {
         my $crc = 0xFFFFFFFF;
@@ -25,19 +26,21 @@ class Net::BitTorrent::DHT::Security v2.0.6 {
     }
 
     method generate_node_id ( $ip, $seed //= undef ) {
-        $seed //= int rand 256;
+        $seed //= unpack( 'C', urandom(1) );
         my $ip_bin;
         my @v4_mask   = ( 0x03, 0x0f, 0x3f, 0xff );
         my @v6_mask   = ( 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff );
         my $ip_masked = '';
         if ( $ip !~ /:/ ) {
             $ip_bin = inet_aton($ip);
+            return undef unless defined $ip_bin && length($ip_bin) == 4;
             my @bytes = unpack( 'C*', $ip_bin );
             $bytes[$_] &= $v4_mask[$_] for 0 .. 3;
             $ip_masked = pack( 'C*', @bytes );
         }
         else {
             $ip_bin = inet_pton( AF_INET6, $ip );
+            return undef unless defined $ip_bin && length($ip_bin) == 16;
             my @bytes = unpack( 'C*', $ip_bin );
             $bytes[$_] &= $v6_mask[$_] for 0 .. 7;
             $ip_masked = pack 'C*', @bytes[ 0 .. 7 ];
@@ -47,8 +50,8 @@ class Net::BitTorrent::DHT::Security v2.0.6 {
         my @id;
         $id[0]  = ( $crc >> 24 ) & 0xFF;
         $id[1]  = ( $crc >> 16 ) & 0xFF;
-        $id[2]  = ( ( $crc >> 8 ) & 0xF8 ) | ( int( rand(256) ) & 0x07 );
-        $id[$_] = int rand(256) for 3 .. 18;
+        $id[2]  = ( ( $crc >> 8 ) & 0xF8 ) | ( unpack( 'C', urandom(1) ) & 0x07 );
+        $id[$_] = unpack( 'C', urandom(1) ) for 3 .. 18;
         $id[19] = $seed & 0xFF;
         pack 'C*', @id;
     }

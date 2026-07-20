@@ -1,6 +1,6 @@
 package YAML::Ordered::Conditional;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.04';
+use 5.006; use strict; use warnings; our $VERSION = '0.05';
 use YAML::As::Parsed qw/Dump DumpFile Load LoadFile/; use base 'Struct::Conditional';
 use Tie::IxHash;
 
@@ -52,7 +52,7 @@ YAML::Ordered::Conditional - A conditional language within an ordered YAML struc
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

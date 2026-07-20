@@ -10,17 +10,24 @@ class Net::BitTorrent::DHT::Peer v2.0.6 {
     method to_string () {"$ip:$port"}
 };
 #
-class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::DHT v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use Algorithm::Kademlia;
     use Net::BitTorrent::DHT::Security;
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
     use IO::Socket::IP;
     use Socket
-        qw[sockaddr_family pack_sockaddr_in unpack_sockaddr_in inet_aton inet_ntoa AF_INET AF_INET6 pack_sockaddr_in6 unpack_sockaddr_in6 inet_pton inet_ntop getaddrinfo SOCK_DGRAM];
+        qw[sockaddr_family pack_sockaddr_in unpack_sockaddr_in inet_aton inet_ntoa AF_INET AF_INET6 pack_sockaddr_in6 unpack_sockaddr_in6 inet_pton inet_ntop getaddrinfo getnameinfo NI_NUMERICHOST SOCK_DGRAM];
     use IO::Select;
-    use Digest::SHA qw[sha1];
+    use Digest::SHA           qw[sha1];
+    use Crypt::URandom        qw[urandom];
+    use Net::BitTorrent::SSRF qw[is_safe_ip is_safe_host];
     #
-    field $node_id_bin : param : reader //= pack 'C*', map { int( rand(256) ) } 1 .. 20;
+    use constant MAX_STORAGE_ENTRIES      => 10000;             # Max total entries in peer+data storage
+    use constant MAX_IMMUTABLE_VALUE_SIZE => 1024 * 1024;       # 1 MB max for BEP44 immutable data values
+    use constant MAX_UNPACK_NODES         => 200;               # Max nodes unpacked from a single response
+    use constant MAX_IMPORT_NODES         => 2000;
+    use constant MAX_IMPORT_ENTRIES       => 5000;
+    field $node_id_bin : param : reader //= urandom(20);
     field $port             : param : reader = 6881;
     field $address          : param //= undef;
     field $want_v4          : param : reader //= 1;
@@ -31,6 +38,7 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
     field $bep44            : param : reader //= 1;
     field $bep51            : param : reader //= 1;
     field $read_only        : param  = 0;
+    field $ssrf_bypass      : param  = 0;
     field $security         : reader = Net::BitTorrent::DHT::Security->new();
     field $routing_table_v4 : reader = Algorithm::Kademlia::RoutingTable->new( local_id_bin => $node_id_bin, k => 8 );
     field $routing_table_v6 : reader = Algorithm::Kademlia::RoutingTable->new( local_id_bin => $node_id_bin, k => 8 );
@@ -38,11 +46,12 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
     field $data_storage     : reader = Algorithm::Kademlia::Storage->new( ttl => 7200 );
     field $socket           : param : reader //= IO::Socket::IP->new( LocalAddr => $address, LocalPort => $port, Proto => 'udp', Blocking => 0 );
     field $select //= IO::Select->new($socket);
-    field $token_secret                      = pack( 'N', rand( 2**32 ) ) . pack( 'N', rand( 2**32 ) );
+    field $token_secret                      = urandom(32);
     field $token_old_secret                  = $token_secret;
     field $last_rotation                     = time;
-    field $node_id_rotation_interval : param = 7200;                                                      # 2 hours
+    field $node_id_rotation_interval : param = 7200;            # 2 hours
     field $last_node_id_rotation             = time;
+    field $last_external_ip_change           = 0;
     field $boot_nodes : param : reader : writer //= [ [ 'router.bittorrent.com', 6881 ], [ 'router.utorrent.com', 6881 ],
         [ 'dht.transmissionbt.com', 6881 ] ];
     field @_resolved_boot_nodes;
@@ -51,24 +60,26 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
     field $_ed25519_backend = ();
     field $running          = 0;
     field %_blacklist;
-    field %ip_votes;                                                                                      # external_ip => count
+    field %_query_rate;                                         # ip => [ timestamps ] for per-IP rate limiting
+    field %ip_votes;                                            # external_ip => count
     field $external_ip : reader = undef;
     field %_pending_queries;
     field $_tid_counter = 0;
 
     method set_node_id ($new_id) {
+        return unless defined $new_id && length($new_id) == 20;
         $node_id_bin = $new_id;
         $routing_table_v4->set_local_id_bin($new_id);
         $routing_table_v6->set_local_id_bin($new_id);
     }
     ADJUST {
-        $socket // die "Could not create UDP socket: $!";
+        $socket // $self->_emit_log( 'fatal', 'Could not create UDP socket: ' . $! );
 
         # Pre-resolve bootstrap nodes
         for my $r (@$boot_nodes) {
             my ( $err, @res ) = getaddrinfo( $r->[0], $r->[1], { socktype => SOCK_DGRAM } );
             if ($err) {
-                warn "[WARN] Could not resolve bootstrap node $r->[0]:$r->[1]: $err" if $debug;
+                $self->_emit_log( 'warn', "Could not resolve bootstrap node $r->[0]:$r->[1]: $err" );
                 next;
             }
             push @_resolved_boot_nodes, $res[0]{addr};
@@ -136,31 +147,51 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
     }
 
     method import_state ($state) {
-        $node_id_bin = $state->{id} if defined $state->{id};
-        if ( $state->{nodes} ) {
-            my @to_import = map { { id => $_->{id}, data => { ip => $_->{ip}, port => $_->{port} } } } $state->{nodes}->@*;
-            $routing_table_v4->import_peers( \@to_import );
-        }
-        if ( $state->{nodes6} ) {
-            my @to_import = map { { id => $_->{id}, data => { ip => $_->{ip}, port => $_->{port} } } } $state->{nodes6}->@*;
-            $routing_table_v6->import_peers( \@to_import );
-        }
-        if ( $state->{peers} ) {
-            for my $hash ( keys $state->{peers}->%* ) {
-                $peer_storage->put( $hash, $state->{peers}{$hash}{value} );
+        return unless ref $state eq 'HASH';
+        try {
+            $node_id_bin = $state->{id} if defined $state->{id} && length( $state->{id} ) == 20;
+            if ( $state->{nodes} && ref $state->{nodes} eq 'ARRAY' ) {
+                my @to_import;
+                for my $n ( $state->{nodes}->@* ) {
+                    next unless ref $n eq 'HASH' && defined $n->{id};
+                    last if scalar @to_import >= MAX_IMPORT_NODES;
+                    push @to_import, { id => $n->{id}, data => { ip => $n->{ip} // '', port => $n->{port} // 0 } };
+                }
+                $routing_table_v4->import_peers( \@to_import ) if @to_import;
+            }
+            if ( $state->{nodes6} && ref $state->{nodes6} eq 'ARRAY' ) {
+                my @to_import;
+                for my $n ( $state->{nodes6}->@* ) {
+                    next unless ref $n eq 'HASH' && defined $n->{id};
+                    last if scalar @to_import >= MAX_IMPORT_NODES;
+                    push @to_import, { id => $n->{id}, data => { ip => $n->{ip} // '', port => $n->{port} // 0 } };
+                }
+                $routing_table_v6->import_peers( \@to_import ) if @to_import;
+            }
+            my $count = 0;
+            if ( $state->{peers} && ref $state->{peers} eq 'HASH' ) {
+                for my $hash ( keys $state->{peers}->%* ) {
+                    last if ++$count > MAX_IMPORT_ENTRIES;
+                    my $entry = $state->{peers}{$hash};
+                    $peer_storage->put( $hash, $entry->{value} ) if ref $entry eq 'HASH' && defined $entry->{value};
+                }
+            }
+            if ( $state->{data} && ref $state->{data} eq 'HASH' ) {
+                for my $hash ( keys $state->{data}->%* ) {
+                    last                                               if ++$count > MAX_IMPORT_ENTRIES;
+                    $data_storage->put( $hash, $state->{data}{$hash} ) if defined $state->{data}{$hash};
+                }
             }
         }
-        if ( $state->{data} ) {
-            for my $hash ( keys $state->{data}->%* ) {
-                $data_storage->put( $hash, $state->{data}{$hash} );
-            }
+        catch ($e) {
+            $self->_emit_log( 'warn', "Failed to import state: $e" );
         }
     }
 
     method _rotate_tokens () {
         if ( time - $last_rotation > 300 ) {
             $token_old_secret = $token_secret;
-            $token_secret     = pack( 'N', rand( 2**32 ) ) . pack( 'N', rand( 2**32 ) );
+            $token_secret     = urandom(32);
             $last_rotation    = time;
         }
     }
@@ -169,7 +200,7 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         if ( $external_ip && $bep42 ) {
             my $new_id = $security->generate_node_id($external_ip);
             if ( $new_id ne $node_id_bin ) {
-                warn "    [DHT] Rotating Node ID for $external_ip\n" if $debug;
+                $self->_emit_log( 'debug', 'Rotating Node ID for ' . $external_ip );
                 $self->set_node_id($new_id);
             }
         }
@@ -182,13 +213,22 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
     }
 
     method _verify_token ( $ip, $token ) {
-        return 1 if $token eq $self->_generate_token( $ip, $token_secret );
-        return 1 if $token eq $self->_generate_token( $ip, $token_old_secret );
-        return 0;
+
+        # Use constant-time comparison to prevent timing attacks on tokens
+        return 0 unless defined $token && length($token) == 20;
+        my $t1  = $self->_generate_token( $ip, $token_secret );
+        my $t2  = $self->_generate_token( $ip, $token_old_secret );
+        my $ok1 = 0;
+        my $ok2 = 0;
+        for my $i ( 0 .. 19 ) {
+            $ok1 |= ord( substr( $t1, $i, 1 ) ) ^ ord( substr( $token, $i, 1 ) );
+            $ok2 |= ord( substr( $t2, $i, 1 ) ) ^ ord( substr( $token, $i, 1 ) );
+        }
+        return $ok1 == 0 || $ok2 == 0;
     }
 
     method bootstrap () {
-        for my $addr (@$boot_nodes) {
+        for my $addr (@_resolved_boot_nodes) {
             $self->_send( { t => 'pn', y => 'q', q => 'ping',      a => { id => $node_id_bin } },                         $addr );
             $self->_send( { t => 'fn', y => 'q', q => 'find_node', a => { id => $node_id_bin, target => $node_id_bin } }, $addr );
         }
@@ -309,26 +349,38 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         return ( [], [], undef ) unless $ip;
 
         if ($debug) {
-            my $type = ( $msg->{y} // '' ) eq 'q' ? "QUERY ($msg->{q})" : "RESPONSE";
-            say "[DEBUG] RECV $type from $ip:$port";
+            my $qname = $msg->{q} // '';
+            $qname =~ s/[^\x20-\x7E]/./g;
+            my $type = ( $msg->{y} // '' ) eq 'q' ? "QUERY ($qname)" : 'RESPONSE';
+            $self->_emit_log( 'debug', "RECV $type from $ip:$port" );
         }
         if ( ( $msg->{y} // '' ) eq 'q' ) {
-            my $node = $self->_handle_query( $msg, $sender, $ip, $port );
+            my $node;
+            try { $node = $self->_handle_query( $msg, $sender, $ip, $port ); }
+            catch ($e) { $self->_emit_log( 'warning', "Query handler error from $ip:$port: $e" ); }
             return ( $node ? [$node] : [], [], undef );    # Return flat format
         }
         if ( ( $msg->{y} // '' ) eq 'e' ) {
             if ($debug) {
                 my $code = $msg->{e}->[0] // 'unknown';
                 my $text = $msg->{e}->[1] // 'no message';
-                say "[DEBUG] RECV ERROR $code: $text from $ip:$port";
+                $text = substr( "$text", 0, 200 );    # Truncate
+                $text =~ s/[^\x20-\x7E]/./g;          # Sanitize non-printable
+                $self->_emit_log( 'debug', "RECV ERROR $code: $text from $ip:$port" );
             }
             return ( [], [], undef );
         }
-        return $self->_handle_response( $msg, $sender, $ip, $port ) if ( $msg->{y} // '' ) eq 'r';
+        if ( ( $msg->{y} // '' ) eq 'r' ) {
+            my @result;
+            try { @result = $self->_handle_response( $msg, $sender, $ip, $port ); }
+            catch ($e) { $self->_emit_log( 'warning', "Response handler error from $ip:$port: $e" ); return ( [], [], undef ) }
+            return @result;
+        }
         return ( [], [], undef );
     }
 
     method _unpack_address ($sockaddr) {
+        return () unless defined $sockaddr;
         my $family;
         try { $family = sockaddr_family($sockaddr) }
         catch ($e) { return () }
@@ -345,9 +397,36 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
 
     method _handle_query ( $msg, $sender, $ip, $port ) {
         return if $_blacklist{$ip};
+
+        # Cap blacklist size to prevent memory exhaustion from spoofed IPs
+        if ( keys %_blacklist > 10000 ) {
+            my @oldest = ( sort { ( $_blacklist{$a} // 0 ) <=> ( $_blacklist{$b} // 0 ) } keys %_blacklist )[ 0 .. 999 ];
+            delete @_blacklist{@oldest};
+        }
+
+        # Max 20 queries per IP in a given 10s window
+        my $now = time;
+        $_query_rate{$ip} //= [];
+        @{ $_query_rate{$ip} } = grep { $_ > $now - 10 } @{ $_query_rate{$ip} };
+        if ( scalar @{ $_query_rate{$ip} } >= 20 ) {
+            $_blacklist{$ip} = $now;
+            $self->_emit_log( 'debug', "Rate-limited DHT query from $ip (exceeded 20/10s)" ) if $debug;
+            return;
+        }
+        push @{ $_query_rate{$ip} }, $now;
+
+        # Cap _query_rate to prevent memory exhaustion from spoofed IPs
+        if ( keys %_query_rate > 10000 ) {
+            my @stale = grep { $_query_rate{$_}[-1] < $now - 60 } keys %_query_rate;
+            if (@stale) {
+                my $delete = @stale > 1000 ? 1000 : scalar @stale;
+                delete @_query_rate{ @stale[ 0 .. $delete - 1 ] };
+            }
+        }
         my $q  = $msg->{q} // return;
         my $a  = $msg->{a} // return;
         my $id = $a->{id}  // return;
+        return unless defined $msg->{t} && !ref $msg->{t} && length( $msg->{t} ) > 0;
 
         # BEP 42: Reject nodes with invalid IDs
         return if $bep42 && !$security->validate_node_id( $id, $ip );
@@ -362,7 +441,8 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
             $res->{ip} = $ip_bin;
         }
         my $w = $a->{want} // [];
-        $w = [$w] unless ref $w;
+        $w = [$w] if defined $w && !ref $w;
+        $w = [] unless ref $w eq 'ARRAY';
         my %want = map { $_ => 1 } @$w;
         if ( !@$w ) {    # Default: same family as query
             if   ( $ip =~ /:/ ) { $want{n6} = 1 }
@@ -379,6 +459,9 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         }
         elsif ( $q eq 'get_peers' ) {
             my $info_hash = $a->{info_hash};
+
+            # info_hash must be 20 or 32 bytes
+            return if !defined $info_hash || ( length($info_hash) != 20 && length($info_hash) != 32 );
             $res->{r}{token} = $self->_generate_token($ip);
             my $peers_obj = $peer_storage->get($info_hash);
             if ( $peers_obj && @{ $peers_obj->value } ) {
@@ -396,22 +479,36 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         }
         elsif ( $q eq 'announce_peer' ) {
             my $info_hash = $a->{info_hash};
+
+            # Validate info_hash length
+            return if !defined $info_hash || ( length($info_hash) != 20 && length($info_hash) != 32 );
             if ( $self->_verify_token( $ip, $a->{token} ) ) {
                 my $peers_obj = $peer_storage->get($info_hash);
-                my @peers     = $peers_obj ? @{ $peers_obj->value } : ();
-                my $new_peer  = {
-                    ip => $ip,
-                    port => ( $a->{implied_port} ? $port : $a->{port} ),
-                    ( $bep33 && defined $a->{seed} ? ( seed => $a->{seed} ) : () )
-                };
+                my @peers     = $peers_obj         ? @{ $peers_obj->value } : ();
+                my $peer_port = $a->{implied_port} ? $port                  : $a->{port};
+
+                # Validate peer port is defined and within range
+                return if ( !defined $peer_port || $peer_port < 1 || $peer_port > 65535 );
+                my $new_peer = { ip => $ip, port => $peer_port, ( $bep33 && defined $a->{seed} ? ( seed => $a->{seed} ) : () ) };
                 @peers = grep { $_->{ip} ne $ip } @peers;
                 push @peers, $new_peer;
+                splice( @peers, 0, @peers - 50 ) if @peers > 50;    # Cap peers per info_hash
                 $peer_storage->put( $info_hash, \@peers );
+
+                # Cap total storage entries to prevent memory exhaustion
+                my %peers_entries = $peer_storage->entries;
+                if ( keys %peers_entries > MAX_STORAGE_ENTRIES ) {
+                    my @oldest = ( sort { $peers_entries{$a} cmp $peers_entries{$b} } keys %peers_entries )[ 0 .. 999 ];
+                    $peer_storage->delete($_) for @oldest;
+                }
             }
         }
         elsif ( $q eq 'scrape_peers' ) {
             if ($bep33) {
                 my $info_hash = $a->{info_hash};
+
+                # Validate info_hash length for scrape_peers
+                return if !defined $info_hash || ( length($info_hash) != 20 && length($info_hash) != 32 );
                 my $peers_obj = $peer_storage->get($info_hash);
                 my $peers     = $peers_obj ? $peers_obj->value : [];
                 my $seeders   = grep { $_->{seed} } @$peers;
@@ -426,7 +523,10 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         }
         elsif ( $q eq 'get' ) {
             if ($bep44) {
-                my $target   = $a->{target};
+                my $target = $a->{target};
+
+                # Validate target length (must be 20 or 32 bytes)
+                return if !defined $target || ( length($target) != 20 && length($target) != 32 );
                 my $data_obj = $data_storage->get($target);
                 if ($data_obj) {
                     $res->{r} = { %{ $res->{r} }, %{ $data_obj->value } };
@@ -444,10 +544,33 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         }
         elsif ( $q eq 'put' ) {
             if ( $bep44 && $self->_verify_token( $ip, $a->{token} ) ) {
-                my $v          = $a->{v};
+                my $v = $a->{v};
+
+                # BEP44 mutable values must be <= 1000 bytes
+                return unless defined $v && !ref $v;
+                if ( defined $a->{k} && length($v) > 1000 ) {
+                    $_blacklist{$ip} = time;
+                    return;
+                }
                 my $target     = sha1($v);
                 my $is_mutable = defined $a->{k};
                 if ($is_mutable) {
+
+                    # Validate key length and seq upper bound
+                    my $seq_val = $a->{seq} // 0;
+                    if (
+                        !defined $a->{sig}        ||
+                        !defined $a->{k}          ||
+                        !defined $a->{seq}        ||
+                        length( $a->{k} ) != 32   ||
+                        length( $a->{sig} ) != 64 ||
+                        $a->{seq} !~ /^\d+$/      ||
+                        $seq_val > ( 1 << 53 )    ||    # L4: Reject seq > 2^53 (lossy float precision)
+                        ( defined $a->{cas} && $a->{cas} !~ /^\d+$/ )
+                    ) {
+                        $_blacklist{$ip} = time;
+                        return;
+                    }
                     $target = sha1( $a->{k} . ( $a->{salt} // '' ) );
 
                     # Validate signature
@@ -480,19 +603,43 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
                     }
                 }
                 else {    # Immutable
+
+                    # Validate immutable data size to prevent memory exhaustion
+                    if ( length($v) > MAX_IMMUTABLE_VALUE_SIZE ) {
+                        $self->_emit_log( 'warn', "Immutable data value too large (" . length($v) . " bytes), rejecting" );
+                        return;
+                    }
                     $data_storage->put( $target, { v => $v } );
+
+                    # Cap total data storage entries
+                    my %data_entries = $data_storage->entries;
+                    if ( keys %data_entries > MAX_STORAGE_ENTRIES ) {
+                        my @oldest = ( sort { $data_entries{$a} cmp $data_entries{$b} } keys %data_entries )[ 0 .. 999 ];
+                        $data_storage->delete($_) for @oldest;
+                    }
                 }
             }
         }
         elsif ( $q eq 'sample_infohashes' ) {
             if ($bep51) {
-                my $target   = $a->{target};
+                my $target = $a->{target};
+
+                # Validate target length
+                return if !defined $target || ( length($target) != 20 && length($target) != 32 );
                 my %entries  = $peer_storage->entries;
                 my @all_keys = keys %entries;
                 my $num      = scalar @all_keys;
 
                 # BEP 51: return up to 20 samples closest to target
-                my @sorted  = sort { ( $a^.$target ) cmp( $b^.$target ) } @all_keys;
+                my @sorted = sort {
+                    my ( $a_dist, $b_dist ) = ( 0, 0 );
+                    for my $i ( 0 .. 19 ) {
+                        my $ab = ord( substr( $a, $i, 1 ) ) ^ ord( substr( $target, $i, 1 ) );
+                        my $bb = ord( substr( $b, $i, 1 ) ) ^ ord( substr( $target, $i, 1 ) );
+                        if ( $ab != $bb ) { $a_dist = $ab; $b_dist = $bb; last }
+                    }
+                    $a_dist <=> $b_dist;
+                } @all_keys;
                 my @samples = splice( @sorted, 0, 20 );
                 $res->{r}{samples}  = join( '', @samples );
                 $res->{r}{num}      = $num;
@@ -505,21 +652,21 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
                 $res->{r}{nodes6} = $v6 if $v6 && $want_v6 && $bep32;
             }
         }
-        $self->_check_external_ip( $msg->{ip} ) if exists $msg->{ip};
+        $self->_check_external_ip( $msg->{ip}, $ip ) if exists $msg->{ip};
         $self->_send_raw( bencode($res), $sender );
         return { id => $id, ip => $ip, port => $port };
     }
 
     method _handle_response ( $msg, $sender, $ip, $port ) {
-        $self->_check_external_ip( $msg->{ip} ) if exists $msg->{ip};
-        return ( [], [], undef )                if $_blacklist{$ip};
+        $self->_check_external_ip( $msg->{ip}, $ip ) if exists $msg->{ip};
+        return ( [], [], undef )                     if $_blacklist{$ip};
         my $r = $msg->{r};
         return ( [], [], undef ) unless $r && $r->{id};
         my $tid     = $msg->{t} // '';
         my $pending = delete $_pending_queries{$tid};
 
-        # Periodic cleanup of old pending queries (older than 30s)
-        if ( rand() < 0.01 ) {
+        # Deterministic cleanup of old pending queries (older than 30s)
+        {
             my $now = time;
             for my $k ( keys %_pending_queries ) {
                 delete $_pending_queries{$k} if $now - $_pending_queries{$k}{time} > 30;
@@ -579,27 +726,50 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         $msg->{v}     = $v if defined $v;
         $msg->{a}{ro} = 1  if $read_only && $msg->{y} eq 'q';
         if ( !defined $port && !ref $addr && length($addr) >= 16 ) {
+            if ( !$ssrf_bypass ) {
+                my ( $gerr, $ip ) = getnameinfo( $addr, NI_NUMERICHOST );
+                if ( !$gerr && defined $ip && !is_safe_ip($ip) ) {
+                    $self->_emit_log( 'warn', "DHT send blocked by SSRF policy: $ip" );
+                    return;
+                }
+            }
             $self->_send_raw( bencode($msg), $addr );
             return;
         }
         ( $addr, $port ) = @$addr if ref $addr eq 'ARRAY';
+        if ( !$ssrf_bypass && !is_safe_host($addr) ) {
+            $self->_emit_log( 'debug', 'DHT send blocked by SSRF policy: ' . $addr );
+            return;
+        }
         my ( $err, @res ) = getaddrinfo( $addr, $port, { socktype => SOCK_DGRAM } );
         if ($err) {
-            warn "[WARN] getaddrinfo failed for $addr" . ( defined $port ? ":$port" : "" ) . ": $err" if $debug;
+            $self->_emit_log( 'debug', 'getaddrinfo failed for ' . $addr . ( defined $port ? ":$port" : '' ) . ': ' . $err );
             return;
         }
         for my $res (@res) {
             my $family = sockaddr_family( $res->{addr} );
-            $self->_send_raw( bencode($msg), $res->{addr} ) if ( ( $family == AF_INET && $want_v4 ) || ( $family == AF_INET6 && $want_v6 ) );
+            next unless ( $family == AF_INET && $want_v4 ) || ( $family == AF_INET6 && $want_v6 );
+            if ( !$ssrf_bypass ) {
+                my ( $gerr, $ip ) = getnameinfo( $res->{addr}, NI_NUMERICHOST );
+                if ( !$gerr && defined $ip && !is_safe_ip($ip) ) {
+                    $self->_emit_log( 'debug', 'DHT send blocked by SSRF policy: ' . $ip );
+                    next;
+                }
+            }
+            $self->_send_raw( bencode($msg), $res->{addr} );
         }
     }
 
     method _send_raw ( $data, $dest ) {
         if ($debug) {
             my ( $port, $ip ) = $self->_unpack_address($dest);
-            say "[DEBUG] SEND to $ip:$port";
+            $self->_emit_log( 'debug', "SEND to $ip:$port" );
         }
-        $socket->send( $data, 0, $dest );
+        my $sent = $socket->send( $data, 0, $dest );
+        if ( !defined $sent ) {
+            $self->_emit_log( 'warn', "DHT UDP send failed: $!" ) if $debug;
+        }
+        return $sent;
     }
 
     method _pack_nodes ($peers) {
@@ -626,12 +796,13 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         my @nodes;
         my $stride = ( $family == AF_INET ) ? 26 : 38;
         my $ip_len = ( $family == AF_INET ) ? 4  : 16;
-        while ( length($blob) >= $stride ) {
+        while ( length($blob) >= $stride && @nodes < MAX_UNPACK_NODES ) {
             my $chunk  = substr( $blob,  0,  $stride, '' );
             my $id     = substr( $chunk, 0,  20 );
             my $ip_bin = substr( $chunk, 20, $ip_len );
             my $port   = unpack( 'n', substr( $chunk, 20 + $ip_len, 2 ) );
-            my $ip     = ( $family == AF_INET ) ? inet_ntoa($ip_bin) : inet_ntop( AF_INET6, $ip_bin );
+            next if $port == 0;
+            my $ip = ( $family == AF_INET ) ? inet_ntoa($ip_bin) : inet_ntop( AF_INET6, $ip_bin );
             push @nodes, { id => $id, ip => $ip, port => $port };
         }
         return \@nodes;
@@ -676,7 +847,7 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         ];
     }
 
-    method _check_external_ip ( $ip_bin, $self_addr = undef ) {
+    method _check_external_ip ( $ip_bin, $source_ip = undef ) {
         if ( length($ip_bin) == 6 ) {
             $ip_bin = substr( $ip_bin, 0, 4 );
         }
@@ -685,13 +856,39 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         }
         my $ip = length($ip_bin) == 4 ? inet_ntoa($ip_bin) : length($ip_bin) == 16 ? inet_ntop( AF_INET6, $ip_bin ) : undef;
         return unless $ip;
-        $ip_votes{$ip}++;
-        if ( $ip_votes{$ip} >= 5 ) {    # Threshold for consensus
+
+        # Only accept public IPs as external IP
+        return unless is_safe_ip($ip);
+        my $consensus = 0;
+        if ($source_ip) {
+
+            # Track votes by source IP to prevent colluding-node manipulation.
+            # Each source IP can only contribute one vote for one candidate IP.
+            return if exists $ip_votes{$source_ip} && $ip_votes{$source_ip} eq $ip;
+            $ip_votes{$source_ip} = $ip;
+            my @matching = grep { $_ eq $ip } values %ip_votes;
+            $consensus = 1 if scalar @matching >= 5;
+        }
+        else {
+            # Fallback for direct/internal calls without source IP
+            $ip_votes{$ip}++;
+            $consensus = 1 if $ip_votes{$ip} >= 5;
+        }
+        if ($consensus) {
             if ( !defined $external_ip || $external_ip ne $ip ) {
-                $external_ip = $ip;
-                $self->_emit( 'external_ip_detected', $ip );
+                if ( time - $last_external_ip_change >= 300 ) {    # 5-min cooldown between changes
+                    $external_ip             = $ip;
+                    $last_external_ip_change = time;
+                    $self->_emit( external_ip_detected => $ip );
+                }
             }
-            %ip_votes = ();             # Reset votes after consensus
+            %ip_votes = ();                                        # Reset votes after consensus
+        }
+
+        # Cap ip_votes hash
+        if ( keys %ip_votes > 500 ) {
+            my @keys = keys %ip_votes;
+            delete @ip_votes{ @keys[ 0 .. 49 ] };
         }
     }
 
@@ -701,5 +898,4 @@ class Net::BitTorrent::DHT v2.0.6 : isa(Net::BitTorrent::Emitter) {
         $self->tick(1) while $running;
     }
 };
-#
 1;

@@ -2,7 +2,37 @@ Revision history for Stats-LikeR
 
    # Changes
 
-0.23 2026-07-08 CDT
+0.25 2026-07-19 CDT
+
+ - https://www.cpantesters.org/cpan/report/3376f80e-83bf-11f1-a5f3-44496e8775ea
+
+ - Fixed a use-after-free in `fisher_test` on the hash (HoH) input path: the "row is missing column key" error freed its scratch arrays and then read the key strings back out of them to build the croak message. This was harmless on glibc but crashed (`SIGBUS`) under stricter allocators such as FreeBSD's, failing `t/fisher_test.t` on CPAN smokers. The key pointers are now captured before the arrays are freed.
+
+0.24 2026-07-19 CDT
+
+ - `interpolate`'s numeric core moved from pure Perl to XS (`_interp_column_xs`): ~5× faster for `linear` on large columns, ~11× for `pchip`, and ~50× for the spline methods whose dense solve dominates. Results are unchanged (bit-for-bit versus the former Perl kernels).
+
+ - `Ronly` now accepts one or more array references (like `Lonly`), returning the values found only in the last reference; the two-argument form is unchanged, and `Ronly(@refs)` equals `Lonly(reverse @refs)`.
+
+ - `interpolate` gains full `pandas.DataFrame.interpolate` method parity: `nearest`, `zero`, `slinear`, `pad`/`ffill`, `bfill`/`backfill`, `quadratic`, `cubic`, `cubicspline`, `pchip`, `akima`, `barycentric`, `krogh`, `polynomial`, `spline`, and `index`/`values`/`time`, plus an `x` argument for custom abscissae and an `order` argument. Matched to pandas/scipy within 1e-6.
+
+ - `t/transpose.t` no longer loads `Devel::Confess` in its leak tests: its `$SIG{__DIE__}` stack-trace objects landed in `$@` and were reported as leaks by `Test::LeakTrace` on the croak paths under older perls (e.g. 5.12.3). The die-path leak checks now also clear `$@` so the exception object cannot be miscounted.
+
+ - `cfilter` simplification, use of `qr///` filtering on columns
+
+ - `summary` output now looks more like `view`, and accepts HoH
+
+ - `fisher_test` can compute larger tables than just 2x2
+
+ - `read_table` reads xlsx files significantly faster and with less RAM.
+
+ - Addition of `bfill`, `drop_duplicates`, `ffill`, `melt`, and `pivot_table`
+
+ - Original `Lonly` code removed, as it was a special case of `get_unique`, and `get_unique` was re-named to `Lonly`.
+
+ - Removal of `Devel::Confess` from testing and dependencies.
+
+0.23 2026-07-10 CDT
 
  - `rename_cols` takes HoH as input
 
@@ -190,8 +220,7 @@ Revision history for Stats-LikeR
    | Three-way `NV` comparator | `compare_rank`, `cmp_rank_item`, `cmp_rank_info`, `compare_NVs` | single `cmp_nv3` (reads the leading `NV` member, valid for `RankInfo`/`RankItem`/raw `NV`) |
    | Average-rank routine | `compute_ranks` + `compare_index` restoration sort | existing `rank_data` (scatters ranks into `out[idx]`, no second sort) |
    | String comparator | `cmp_string_wt`, `lm_str_qsort` (byte-identical) | single `cmp_string_wt` |
-   | Set difference | `Lonly` + `Ronly` (duplicated bodies) | shared `set_difference()`; `Ronly` passes the arrays swapped |
-   | Multiplicity filter | `intersection` + `get_unique` (~90% shared) | shared `set_multiplicity()` with an "all vs. one" mode flag |
+   | Multiplicity filter & set difference | `intersection` + `get_unique` (~90% shared); `Lonly`/`Ronly` duplicated bodies; a separate `set_difference()` | one shared `set_multiplicity()` with an "all vs. one" mode flag and a `from_last` flag: `intersection` (all), `Lonly` (one, first array), `Ronly` (one, last array) |
 
  - All merges were confirmed behavior-preserving: the collapsed comparators are
    equivalent on ordinary values, `NaN`, and infinities, and `compute_ranks` and

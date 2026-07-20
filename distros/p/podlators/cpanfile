@@ -5,6 +5,7 @@ on 'test' => sub {
     requires 'Perl6::Slurp';
     suggests 'Perl::Critic';
     suggests 'Perl::Critic::Community';
+    suggests 'Perl::Critic::Pulp';
     suggests 'Test::CPAN::Changes';
     suggests 'Test::Kwalitee';
     suggests 'Test::MinimumVersion';

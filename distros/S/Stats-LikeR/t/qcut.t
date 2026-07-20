@@ -98,6 +98,9 @@ sub is_approx {
 }
 
 # --- leak checks (assignments hoisted out for Devel::Cover) ------------------
+# Test::LeakTrace flags Devel::Cover's instrumentation SVs as leaks, so skip
+# the leak checks (the last tests here) when running under coverage.
+if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 {
 	my @data  = map { $_ / 7 } 1 .. 500;
 	my @tied  = ((0) x 50, 1, 2, 3, 4, 5);

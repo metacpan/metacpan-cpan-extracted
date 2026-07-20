@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server/issues
   homepage: https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server
   repository: https://github.com/fleetfootmike/Catalyst-Plugin-JSONRPC-Server.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -173,6 +173,9 @@ is(ref value_counts([qw/a b/]), 'HASH', 'returns a HASH ref');
 # ---------------------------------------------------------------------------
 # Leak checks: representative success AND croak paths
 # ---------------------------------------------------------------------------
+# Test::LeakTrace flags Devel::Cover's instrumentation SVs as leaks, so skip
+# the leak checks (the last tests here) when running under coverage.
+if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok { value_counts(\@aoh, 'dept') }             'no leak: Array of Hashes';
 no_leaks_ok { value_counts(\@aoa, 1) }                  'no leak: Array of Arrays';
 no_leaks_ok { value_counts([qw/a b a c/]) }             'no leak: flat array ref';

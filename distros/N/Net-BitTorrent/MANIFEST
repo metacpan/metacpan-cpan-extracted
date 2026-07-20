@@ -8,6 +8,7 @@ META.json
 META.yml
 README.md
 SECURITY.md
+cpanfile
 eg/bencode/bench.pl
 eg/bencode/simple.pl
 eg/bencode/torrent_info.pl
@@ -63,6 +64,8 @@ lib/Net/BitTorrent/Protocol/PeerHandler.pm
 lib/Net/BitTorrent/Protocol/PeerHandler.pod
 lib/Net/BitTorrent/Protocol/Simulation.pm
 lib/Net/BitTorrent/Protocol/Simulation.pod
+lib/Net/BitTorrent/SSRF.pm
+lib/Net/BitTorrent/SSRF.pod
 lib/Net/BitTorrent/Storage.pm
 lib/Net/BitTorrent/Storage.pod
 lib/Net/BitTorrent/Storage/File.pm
@@ -140,6 +143,12 @@ t/610_dht_bep33.t
 t/611_dht_bep44.t
 t/613_dht_bep51.t
 t/615_dht_node_id_rotation.t
+t/700_security_csprng.t
+t/701_security_path_traversal.t
+t/702_security_message_limits.t
+t/703_security_metadata_limits.t
+t/704_security_ssrf.t
+t/705_security_connection_limits.t
 t/900_data/EndeavourOS_Endeavour_neo-2024.09.22.iso.torrent
 t/900_data/Qubes-R4.2.3-x86_64.torrent
 t/900_data/archlinux-2024.10.01-x86_64.iso.torrent

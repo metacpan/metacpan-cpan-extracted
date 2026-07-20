@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
     use Net::BitTorrent::Storage;
     use Net::BitTorrent::Tracker;
@@ -14,6 +14,16 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     use IO::Select;
     use IO::Socket::IP;
     use Net::BitTorrent::Types qw[:state :pick];
+    use Algorithm::RateLimiter::TokenBucket;
+
+    # Security limits
+    use constant MAX_METADATA_SIZE     => 10 * 1024 * 1024;    # 10 MB which would be... massive
+    use constant MAX_FILE_TREE_DEPTH   => 128;
+    use constant MAX_BLOCK_CACHE       => 32;                  # Max cached incomplete pieces per torrent (~8MB worst case)
+    use constant MAX_PEERS             => 10_000;              # Max discovered peers per torrent
+    use constant MAX_ATTEMPTED         => 5000;                # Max attempted connection entries
+    use constant ENDGAME_STALL_TIMEOUT => 60;                  # Seconds without piece verification before endgame fallback
+
     #
     field $path             : param = undef;
     field $base_path        : param;
@@ -36,15 +46,16 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     method peer_objects_hash () { \%peer_objects }
     field %peer_bitfields;     # Peer object => Bitfield object
     method peer_bitfields () { \%peer_bitfields }
-    field %blocks_pending;     # piece_index => { offset => 1 }
+    field %blocks_pending;     # piece_index => { offset => Peer }
     method blocks_pending () { \%blocks_pending }
     field %blocks_received;    # piece_index => { offset => 1 }
     method blocks_received () { \%blocks_received }
     field %block_sources;      # piece_index => { offset => Peer }
     field $is_private : reader;
     field $dht_nodes;
-    field %test_data;           # For simulation
-    field %block_cache;         # piece_index => { offset => data }
+    field $last_piece_verified_at = 0;    # Timestamp of last successful piece verification (for endgame stall detection)
+    field %test_data;                     # For simulation
+    field %block_cache;                   # piece_index => { offset => data }
     field $bytes_downloaded = 0;
     field $bytes_uploaded   = 0;
     field $bytes_left       = 0;
@@ -52,8 +63,9 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     field $picking_strategy = PICK_RAREST_FIRST;
     field $is_partial_seed : reader : writer(set_partial_seed) = 0;
     field $is_superseed    : reader : writer(set_superseed)    = 0;
-    field %superseed_offers;    # Peer object => piece_index
+    field %superseed_offers;              # Peer object => piece_index
     field $debug : param = 0;
+    field $max_peers : param : reader : writer = 100;
     #
     method get_superseed_piece ($peer) {
         return undef unless $is_superseed;
@@ -129,7 +141,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     method is_finished () {
         return 0 unless $self->is_metadata_complete;
         return 0 if $state == STATE_METADATA;
-        return $bytes_left == 0;
+        return $self->is_seed;
     }
 
     method is_seed () {
@@ -151,10 +163,9 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method progress () {
         return 0 unless $self->is_metadata_complete;
-        return 0 if $state == STATE_METADATA;
-        my $total = $self->_calculate_total_size();
-        return 100 if $total == 0;
-        return ( ( $total - $bytes_left ) / $total ) * 100;
+        return 0                                                if $state == STATE_METADATA;
+        return ( ( $bitfield->count / $bitfield->size ) * 100 ) if $bitfield && $bitfield->size > 0;
+        return 0;
     }
 
     method start () {
@@ -176,7 +187,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
         if ( !$metadata ) {
             $state = STATE_METADATA;
-            $self->_emit( log => "  [DEBUG] Torrent starting in METADATA mode\n", level => 'debug' ) if $debug;
+            $self->_emit_log( 'debug', 'Torrent starting in METADATA mode' ) if $debug;
         }
         else {
             $state = STATE_RUNNING;
@@ -210,25 +221,22 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     }
     ADJUST {
         $self->set_parent_emitter($client);
-        $self->_emit(
-            log => "    [DEBUG] Torrent::ADJUST path=" .
-                ( $path        // 'undef' ) . " ih=" .
-                ( $infohash    // 'undef' ) . " v1=" .
-                ( $infohash_v1 // 'undef' ) . " v2=" .
-                ( $infohash_v2 // 'undef' ) . "\n",
-            level => 'debug'
-        ) if $debug;
+        $self->_emit_log( 'debug',
+            'Torrent::ADJUST path=' .
+                ( $path        // 'undef' ) . ' ih=' .
+                ( $infohash    // 'undef' ) . ' v1=' .
+                ( $infohash_v1 // 'undef' ) . ' v2=' .
+                ( $infohash_v2 // 'undef' ) )
+            if $debug;
         builtin::weaken($client) if defined $client;
         $features = { %{ $client->features // {} } };
         $peer_id //= $client->node_id;
-        use Algorithm::RateLimiter::TokenBucket;
         $limit_up   = Algorithm::RateLimiter::TokenBucket->new( limit => 0 );
         $limit_down = Algorithm::RateLimiter::TokenBucket->new( limit => 0 );
-
         if ($path) {
             my $data = path($path)->slurp_raw;
             $metadata = bdecode($data);
-            $self->_emit( log => 'Missing info dictionary', level => 'fatal' ) unless ref $metadata eq 'HASH' && ref $metadata->{info} eq 'HASH';
+            $self->_emit_log( 'error', 'Missing info dictionary' ) unless ref $metadata eq 'HASH' && ref $metadata->{info} eq 'HASH';
             $self->_init_from_metadata();
         }
         elsif ( $infohash || $infohash_v1 || $infohash_v2 ) {
@@ -240,7 +248,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
                     $infohash_v2 = $infohash;
                 }
                 else {
-                    $self->_emit( log => 'Invalid infohash length', level => 'fatal' );
+                    $self->_emit_log( 'error', 'Invalid infohash length' );
                 }
             }
             my @tiers = map { [$_] } @$initial_trackers;
@@ -252,53 +260,66 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
             }
         }
         else {
-            $self->_emit( log => 'Either path or infohash required', level => 'fatal' );
+            $self->_emit_log( 'error', 'Either path or infohash required' );
         }
     }
 
-    method _validate_file_tree ($tree) {
+    method _validate_file_tree ( $tree, $depth = 0 ) {
+        if ( $depth > MAX_FILE_TREE_DEPTH ) {
+            $self->_emit_log( 'error', 'File tree depth limit exceeded (max ' . MAX_FILE_TREE_DEPTH . ' levels)' );
+            return;
+        }
         if ( ref $tree ne 'HASH' ) {
-            $self->_emit( log => 'Invalid file tree', level => 'fatal' );
+            $self->_emit_log( 'error', 'Invalid file tree' );
             return;
         }
         for my $name ( keys %$tree ) {
-            if ( $name eq '' || $name eq '.' || $name eq '..' || $name =~ /[\\\/]/ ) {
-                $self->_emit( log => 'Invalid path element', level => 'fatal' );
+            if ( $name eq '' || $name eq '.' || $name eq '..' || $name =~ /[\\\/]/ || $name =~ /\0/ ) {
+                $self->_emit_log( 'error', 'Invalid path element' );
                 return;
             }
             my $node = $tree->{$name};
             if ( exists $node->{''} ) {
                 if ( ref $node->{''} ne 'HASH' ) {
-                    $self->_emit( log => 'Invalid file metadata', level => 'fatal' );
+                    $self->_emit_log( 'error', 'Invalid file metadata' );
                     return;
                 }
                 if ( ( $node->{''}{length} // -1 ) < 0 ) {
-                    $self->_emit( log => 'Invalid file length', level => 'fatal' );
+                    $self->_emit_log( 'error', 'Invalid file length' );
                     return;
                 }
             }
             else {
-                $self->_validate_file_tree($node);
+                $self->_validate_file_tree( $node, $depth + 1 );
             }
         }
     }
 
     method _init_from_metadata () {
         if ( !$metadata || ref $metadata->{info} ne 'HASH' ) {
-            $self->_emit( log => 'Missing info dictionary', level => 'fatal' );
+            $self->_emit_log( 'error', 'Missing info dictionary' );
             return;
         }
         my $info = $metadata->{info};
         if ( ( $info->{'piece length'} // 0 ) <= 0 ) {
-            $self->_emit( log => 'Invalid piece length', level => 'fatal' );
+            $self->_emit_log( 'error', 'Invalid piece length' );
             return;
         }
         if ( !defined $info->{name} || !length $info->{name} ) {
-            $self->_emit( log => 'Missing name', level => 'fatal' );
+            $self->_emit_log( 'error', 'Missing name' );
+            return;
+        }
+        if ( $info->{name} =~ /[\\\/]/ || $info->{name} eq '..' || $info->{name} =~ /\0/ ) {
+            $self->_emit_log( 'error', 'Invalid name: path traversal characters detected' );
+            return;
+        }
+        require File::Spec;
+        if ( File::Spec->file_name_is_absolute( $info->{name} ) ) {
+            $self->_emit_log( 'error', 'Invalid name: absolute path' );
             return;
         }
         if ( !$info->{pieces} && !$info->{'file tree'} ) {
-            $self->_emit( log => 'Torrent must have either \'pieces\' (v1) or \'file tree\' (v2)', level => 'fatal' );
+            $self->_emit_log( 'error', 'Torrent must have either \'pieces\' (v1) or \'file tree\' (v2)' );
             return;
         }
 
@@ -308,21 +329,21 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
         elsif ( $info->{files} ) {
             if ( ref $info->{files} ne 'ARRAY' || !@{ $info->{files} } ) {
-                $self->_emit( log => 'Invalid files list', level => 'fatal' );
+                $self->_emit_log( 'error', 'Invalid files list' );
                 return;
             }
             for my $f ( @{ $info->{files} } ) {
                 if ( ( $f->{length} // -1 ) < 0 ) {
-                    $self->_emit( log => 'Invalid file length', level => 'fatal' );
+                    $self->_emit_log( 'error', 'Invalid file length' );
                     return;
                 }
                 if ( ref $f->{path} ne 'ARRAY' || !@{ $f->{path} } ) {
-                    $self->_emit( log => 'Missing path', level => 'fatal' );
+                    $self->_emit_log( 'error', 'Missing path' );
                     return;
                 }
                 for my $p ( @{ $f->{path} } ) {
-                    if ( $p eq '' || $p eq '.' || $p eq '..' || $p =~ /[\\\/]/ ) {
-                        $self->_emit( log => 'Invalid path element', level => 'fatal' );
+                    if ( $p eq '' || $p eq '.' || $p eq '..' || $p =~ /[\\\/]/ || $p =~ /\0/ ) {
+                        $self->_emit_log( 'error', 'Invalid path element' );
                         return;
                     }
                 }
@@ -336,11 +357,11 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
                 # Actually, BEP 03 says length is required for single-file.
                 # But some tests use minimal dictionaries.
                 # Let's be lenient for v1 minimal tests if pieces is present.
-                # (Optional: we could default to 0)
+                # (Optionally, we could default to 0)
             }
             else {
                 if ( ( $info->{length} // -1 ) < 0 ) {
-                    $self->_emit( log => 'Invalid file length', level => 'fatal' );
+                    $self->_emit_log( 'error', 'Invalid file length' );
                     return;
                 }
             }
@@ -426,12 +447,9 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     method handle_dht_scrape ($res) {
         $dht_seeders  = $res->{sn} if exists $res->{sn};
         $dht_leechers = $res->{ln} if exists $res->{ln};
-        $self->_emit(
-            log => '    [DHT] Scrape results for ' .
-                ( $metadata ? $metadata->{info}{name} : 'unknown' ) .
-                ": $dht_seeders seeds, $dht_leechers leechers\n",
-            level => 'info'
-        ) if $debug;
+        $self->_emit_log( 'info',
+            'Scrape results for ' . ( $metadata ? $metadata->{info}{name} : 'unknown' ) . ": $dht_seeders seeds, $dht_leechers leechers" )
+            if $debug;
     }
 
     method tick ( $delta = 0.1 ) {
@@ -443,7 +461,11 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
         # Attempt to connect to discovered peers if we need more
         $self->_attempt_connections() if keys %peer_objects < 50;
-        for my $peer ( values %peer_objects ) {
+
+        # Snapshot peer list to avoid hash mutation during iteration
+        # (tick may trigger disconnect which modifies %peer_objects)
+        my @peers_snapshot = values %peer_objects;
+        for my $peer (@peers_snapshot) {
             $peer->tick();
             if ( $state == STATE_METADATA ) {
                 $self->_request_metadata($peer);
@@ -460,9 +482,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
                 }
 
                 # Request pieces if not choked
-                if ( !$peer->peer_choking && $peer->am_interested ) {
-                    $self->_request_pieces($peer);
-                }
+                $self->_request_pieces($peer) if !$peer->peer_choking && $peer->am_interested;
             }
         }
         $choke_timer += $delta;
@@ -515,7 +535,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method _evaluate_choking () {
-        $self->_emit( log => "    [DEBUG] Evaluating choking for " . scalar( keys %peer_objects ) . " peers\n", level => 'debug' ) if $debug;
+        $self->_emit_log( 'debug', 'Evaluating choking for ' . scalar( keys %peer_objects ) . ' peers' ) if $debug;
         my @interested = grep { $_->peer_interested } values %peer_objects;
 
         # Even if nobody is interested in US, we should still unchoke some if we want pieces?
@@ -562,7 +582,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         return unless $m_size > 0;
         if ( $metadata_size == 0 ) {
             $metadata_size = $m_size;
-            $self->_emit( log => "    [DEBUG] Metadata size identified: $metadata_size bytes\n", level => 'debug' ) if $debug;
+            $self->_emit_log( 'debug', "Metadata size identified: $metadata_size bytes" ) if $debug;
         }
 
         # How many pieces? (BEP 09 uses 16KiB pieces)
@@ -603,39 +623,58 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
             unless ( defined $index ) {
                 last;
             }
-            $blocks_pending{$index}{$begin} = 1;
+            $blocks_pending{$index}{$begin} = $peer;
             $block_sources{$index}{$begin}  = $peer;
             $peer->request( $index, $begin, $len );
-            $self->_emit( log => "    [DEBUG] Requested block at $begin of piece $index from " . $peer->ip . "\n", level => 'debug' ) if $debug;
+            $self->_emit_log( 'debug', "Requested block at $begin of piece $index from " . $peer->ip ) if $debug;
         }
     }
 
     method handle_metadata_request ( $peer, $piece ) {
         return unless $metadata;
         my $info_encoded = bencode( $metadata->{info} );
-        my $piece_data   = substr( $info_encoded, $piece * 16384, 16384 );
+        my $num_pieces   = int( ( length($info_encoded) + 16383 ) / 16384 );
+        return if $piece < 0 || $piece >= $num_pieces;
+        my $piece_data = substr( $info_encoded, $piece * 16384, 16384 );
         $peer->protocol->send_metadata_data( $piece, length($info_encoded), $piece_data );
     }
 
     method handle_metadata_data ( $peer, $piece, $total_size, $data ) {
         delete $metadata_pending{$peer} if defined $peer;
-        $metadata_size = $total_size    if $metadata_size == 0;
-        $self->_emit(
-            log   => "    [DEBUG] Received metadata piece $piece (len " . length($data) . ") from " . ( $peer ? $peer->ip : "unknown" ) . "\n",
-            level => 'debug'
-        ) if $debug;
-        $metadata_pieces{$piece} = $data;
+        if ( $metadata_size == 0 ) {
+            if ( $total_size > MAX_METADATA_SIZE ) {
+                $self->_emit_log( 'fatal', "Metadata too large ($total_size bytes, max " . MAX_METADATA_SIZE . ')' );
+                return;
+            }
+            $metadata_size = $total_size;
+        }
         my $num_pieces = int( ( $metadata_size + 16383 ) / 16384 );
-        $self->_emit( log => "    [DEBUG] Metadata progress: " . scalar( keys %metadata_pieces ) . "/$num_pieces pieces\n", level => 'debug' )
-            if $debug;
+        if ( $piece < 0 || $piece >= $num_pieces ) {
+            $self->_emit_log( 'warning', "Received out-of-range metadata piece index $piece (max " . ( $num_pieces - 1 ) . ')' );
+            return;
+        }
+        $self->_emit_log( 'debug', "Received metadata piece $piece (len " . length($data) . ') from ' . ( $peer ? $peer->ip : 'unknown' ) ) if $debug;
+        $metadata_pieces{$piece} = $data;
+        $self->_emit_log( 'debug', 'Metadata progress: ' . scalar( keys %metadata_pieces ) . "/$num_pieces pieces" ) if $debug;
         if ( scalar keys %metadata_pieces == $num_pieces ) {
             my $full_info = join( '', map { $metadata_pieces{$_} } sort { $a <=> $b } keys %metadata_pieces );
 
             # Verify hash
             my $calculated_ih = sha1($full_info);
-            if ( $calculated_ih ne $infohash_v1 ) {
-                $self->_emit( log => "  [ERROR] Metadata verification FAILED! Hash mismatch.\n", level => 'error' );
-                %metadata_pieces = ();
+            my $verified      = 0;
+            if ( $infohash_v1 && $calculated_ih eq $infohash_v1 ) {
+                $verified = 1;
+            }
+            elsif ($infohash_v2) {
+                if ( sha256($full_info) eq $infohash_v2 ) {
+                    $verified = 1;
+                }
+            }
+            if ( !$verified ) {
+                $self->_emit_log( 'error', 'Metadata verification FAILED! Hash mismatch.' );
+                %metadata_pieces  = ();
+                %metadata_pending = ();
+                $metadata_size    = 0;
                 return;
             }
 
@@ -647,12 +686,28 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method handle_metadata_reject ( $peer, $piece ) {
-        delete $metadata_pending{$peer}                                                                          if defined $peer;
-        $self->_emit( log => "    [DEBUG] Peer rejected metadata request for piece $piece\n", level => 'debug' ) if $debug;
+        delete $metadata_pending{$peer}                                                if defined $peer;
+        $self->_emit_log( 'debug', "Peer rejected metadata request for piece $piece" ) if $debug;
     }
 
     method _on_metadata_received () {
-        $self->_emit( log => "    [DEBUG] Metadata fully received and verified\n", level => 'debug' ) if $debug;
+        $self->_emit_log( 'debug', 'Metadata fully received and verified' ) if $debug;
+
+        # Validate name for path traversal before using it
+        my $name = $metadata->{info}{name};
+        if ( !defined $name || !length $name ) {
+            $self->_emit_log( 'error', 'Missing name in metadata' );
+            return;
+        }
+        if ( $name =~ /[\\\/]/ || $name eq '..' || $name =~ /\0/ ) {
+            $self->_emit_log( 'error', 'Invalid name: path traversal characters detected' );
+            return;
+        }
+        require File::Spec;
+        if ( File::Spec->file_name_is_absolute($name) ) {
+            $self->_emit_log( 'error', 'Invalid name: absolute path' );
+            return;
+        }
 
         # Multi-file torrents should be in a directory named after the torrent
         my $storage_path = $base_path;
@@ -661,7 +716,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
 
         # Initialize storage
-        $self->_emit( log => "    [DEBUG] Initializing storage at $storage_path\n", level => 'debug' ) if $debug;
+        $self->_emit_log( 'debug', "Initializing storage at $storage_path" ) if $debug;
         $storage = Net::BitTorrent::Storage->new(
             base_path  => $storage_path,
             piece_size => $metadata->{info}{'piece length'},
@@ -684,21 +739,18 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
         # Initialize bitfield
         my $num_pieces = 0;
-        if ( exists $metadata->{info}{pieces} ) {
-            $num_pieces = length( $metadata->{info}{pieces} ) / 20;
-        }
+        $num_pieces = length( $metadata->{info}{pieces} ) / 20 if exists $metadata->{info}{pieces};
         $num_pieces ||= $storage->piece_count;
         $bitfield = Acme::Bitfield->new( size => $num_pieces );
 
         # Initialize picker
-        $picker = Net::BitTorrent::Torrent::PiecePicker->new( bitfield => $bitfield, );
-        $state  = STATE_RUNNING;
+        $picker     = Net::BitTorrent::Torrent::PiecePicker->new( bitfield => $bitfield, );
+        $bytes_left = $self->_calculate_total_size();
+        $state      = STATE_RUNNING;
         $self->_emit('started');
 
         # Re-initialize peer bitfields now that we have the size
-        for my $peer ( values %peer_objects ) {
-            $self->init_peer_bitfield($peer);
-        }
+        $self->init_peer_bitfield($_) for values %peer_objects;
 
         # Announce to trackers now that we have full infohash info
         $self->announce();
@@ -710,9 +762,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
         # If we've already received this block, or the piece is already being verified, skip.
         # We use blocks_received as an indicator that the piece is complete/queued.
-        if ( exists $blocks_received{$index} && $self->is_piece_complete($index) ) {
-            return 0;
-        }
+        return 0 if exists $blocks_received{$index} && $self->is_piece_complete($index);
 
         # v2 Block-level verification (if we have pieces root)
         my ( $root, $rel_piece ) = $storage->map_v2_piece($index);
@@ -720,18 +770,15 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
             my $info        = $metadata->{info};
             my $block_index = ( $rel_piece * ( $info->{'piece length'} / 16384 ) ) + ( $begin / 16384 );
             if ( !$storage->verify_block( $root, $block_index, $data ) ) {
-                $self->_emit(
-                    log   => "  [ERROR] v2 block verification FAILED for block $block_index of root " . unpack( 'H*', $root ) . "\n",
-                    level => 'error'
-                ) if $debug;
-                $peer->adjust_reputation(-50) if $peer;
+                $self->_emit_log( 'error', "v2 block verification FAILED for block $block_index of root " . unpack( 'H*', $root ) ) if $debug;
+                $peer->adjust_reputation(-50)                                                                                       if $peer;
                 return 0;
             }
         }
         $self->_store_block( $peer, $index, $begin, $data );
         if ( $self->is_piece_complete($index) ) {
-            $self->_emit( log => "    [DEBUG] Piece $index is COMPLETE\n", level => 'debug' ) if $debug;
-            return 0                                                                          if $bitfield->get($index);
+            $self->_emit_log( 'debug', "Piece $index is COMPLETE" ) if $debug;
+            return 0                                                if $bitfield->get($index);
             my $piece_data = $self->_get_full_piece($index);
             if ($piece_data) {
                 $self->_clear_piece_data($index);
@@ -741,10 +788,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
         return 0;
     }
-
-    method _clear_piece_data ($index) {
-        delete $block_cache{$index};
-    }
+    method _clear_piece_data ($index) { delete $block_cache{$index} }
 
     method _verify_queued_piece ( $index, $piece_data ) {
         my $sources  = delete $block_sources{$index} // {};
@@ -771,17 +815,18 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
             $bitfield->set($index);
             $bytes_downloaded += length($piece_data);
             $bytes_left       -= length($piece_data);
-            $self->_emit( log => "\n  [DEBUG] Piece $index VERIFIED successfully via throttled queue\n", level => 'debug' ) if $debug;
+            $last_piece_verified_at = time;
+            $self->_emit_log( 'debug', "Piece $index VERIFIED successfully via throttled queue" ) if $debug;
             $self->_clear_piece_cache($index);
             $self->_emit( 'piece_verified', $index );
+
             for my $peer ( values %$sources ) {
                 $peer->adjust_reputation(1) if defined $peer;
             }
             return 1;
         }
         else {
-            $self->_emit( log => "\n  [DEBUG] Piece $index FAILED verification (len " . length( $piece_data // '' ) . ")\n", level => 'debug' )
-                if $debug;
+            $self->_emit_log( 'debug', "\nPiece $index FAILED verification (len " . length( $piece_data // '' ) . ')' ) if $debug;
             $self->_clear_piece_cache($index);
             $self->_emit( 'piece_failed', $index );
             for my $peer ( values %$sources ) {
@@ -791,8 +836,25 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
     }
 
+    method _cancel_duplicate_requests ( $sender, $index, $begin ) {
+        return unless $picker && $picker->end_game;
+        for my $peer ( values %peer_objects ) {
+            next if $peer == $sender;
+            $peer->cancel_request( $index, $begin );
+        }
+    }
+
     method _store_block ( $peer, $index, $begin, $data ) {
+        delete $blocks_pending{$index}{$begin};
         return if $blocks_received{$index}{$begin};
+        $self->_cancel_duplicate_requests( $peer, $index, $begin );
+        if ( keys %block_cache >= MAX_BLOCK_CACHE ) {
+            my @oldest  = sort { $a <=> $b } keys %block_cache;
+            my $evicted = shift @oldest;
+            delete $block_cache{$evicted};
+            delete $blocks_received{$evicted};
+            delete $block_sources{$evicted};
+        }
         $block_cache{$index} //= {};
         $block_cache{$index}{$begin}     = $data;
         $blocks_received{$index}{$begin} = 1;
@@ -832,6 +894,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method _clear_piece_cache ($index) {
         $self->_clear_piece_data($index);
+        delete $blocks_received{$index};
         delete $blocks_pending{$index};
         delete $block_sources{$index};
     }
@@ -846,8 +909,9 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
         if ( !$picker->end_game ) {
             my $missing = $bitfield->size - $bitfield->count;
-            if ( $missing <= 3 || $missing < ( $bitfield->size / 100 ) ) {
-                $self->_emit( log => "  [DEBUG] Entering END-GAME mode\n", level => 'debug' ) if $debug;
+            my $stalled = ( $last_piece_verified_at > 0 && ( time - $last_piece_verified_at ) >= ENDGAME_STALL_TIMEOUT );
+            if ( $missing <= 3 || $missing < ( $bitfield->size / 100 ) || $stalled ) {
+                $self->_emit_log( 'debug', 'Entering END-GAME mode' . ( $stalled ? ' (stall detected)' : '' ) ) if $debug;
                 $picker->enter_end_game();
             }
         }
@@ -863,8 +927,10 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method peer_disconnected ($peer) {
         my $ip_port = $peer->ip . ':' . $peer->port;
-        $self->_emit( log => "  [DEBUG] Peer disconnected: $ip_port\n", level => 'debug' ) if $debug;
-        delete $metadata_pending{$peer}                                                    if defined $peer;
+        $self->_emit_log( 'debug', "Peer disconnected: $ip_port" ) if $debug;
+        $client->on_peer_disconnected( $peer->ip )                 if $client;
+        $client->_emit( 'peer_disconnected', $peer )               if $client;
+        delete $metadata_pending{$peer}                            if defined $peer;
         $pex_dropped{$ip_port} = { ip => $peer->ip, port => $peer->port };
         delete $pex_added{$ip_port};
         if ( my $bf = $peer_bitfields{$peer} ) {
@@ -983,6 +1049,9 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
                 if ( $storage->verify_piece_v1( $index, $data ) ) {
                     $storage->write_piece_v1( $index, $data );
                     $bitfield->set($index);
+                    $bytes_downloaded += length($data);
+                    $bytes_left       -= length($data);
+                    $self->_emit( 'piece_verified', $index );
                     return 1;
                 }
             }
@@ -1007,8 +1076,10 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
         return undef;
     }
+    field $_cached_total_size = undef;
 
     method _calculate_total_size () {
+        return $_cached_total_size if defined $_cached_total_size;
         my $total = 0;
         my $info  = $metadata->{info};
         if ( $info->{'file tree'} ) {
@@ -1022,6 +1093,7 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
                 }
             }
         }
+        $_cached_total_size = $total;
         return $total;
     }
 
@@ -1039,13 +1111,14 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method announce ( $event = undef, $cb = undef ) {
+        return unless defined $tracker_manager;
         my @ihs;
         push @ihs, $infohash_v2 if $infohash_v2;
         push @ihs, $infohash_v1 if $infohash_v1;
         my $params = {
             infohash   => \@ihs,
             peer_id    => $peer_id,
-            port       => 6881,
+            port       => ( $client && $client->can('listen_port') ? $client->listen_port : 6881 ),
             uploaded   => $bytes_uploaded,
             downloaded => $bytes_downloaded,
             left       => $bytes_left,
@@ -1079,9 +1152,12 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         catch ($e) {
             $port = $peer->{port};
         }
-        $self->_emit( log => "    [DEBUG] Torrent::add_peer: $ip:$port\n", level => 'debug' ) if $debug;
+        $self->_emit_log( 'debug', "Torrent::add_peer: $ip:$port" ) if $debug;
         return unless $ip && $port;
         my $key = "$ip:$port";
+
+        # Cap discovered peers to prevent memory exhaustion
+        return if keys %peers >= MAX_PEERS && !$peers{$key};
         unless ( $peers{$key} ) {
             my $flags = 0;
             try {
@@ -1142,6 +1218,11 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
                 delete $attempted_connections{$key};
             }
         }
+        if ( keys %attempted_connections > MAX_ATTEMPTED ) {
+            my $to_delete = scalar( keys %attempted_connections ) - MAX_ATTEMPTED;
+            my @oldest    = ( sort { $attempted_connections{$a} <=> $attempted_connections{$b} } keys %attempted_connections )[ 0 .. $to_delete - 1 ];
+            delete @attempted_connections{@oldest};
+        }
     }
 
     method register_peer_object ($peer_obj) {
@@ -1161,13 +1242,9 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         # This forces a query even if the local routing table is empty.
         my @boot_nodes = ( [ 'router.bittorrent.com', 6881 ], [ 'router.utorrent.com', 6881 ], [ 'dht.transmissionbt.com', 6881 ], );
         for my $ih (@ihs) {
-            $self->_emit( log => "  [DEBUG] Starting DHT peer search for " . unpack( 'H*', $ih ) . "\n", level => 'debug' ) if $debug;
-
-            # 1. Query local routing table
-            $dht->find_peers($ih);
-
-            # 2. Force query to bootstrap nodes
-            for my $node (@boot_nodes) {
+            $self->_emit_log( 'debug', 'Starting DHT peer search for ' . unpack( 'H*', $ih ) ) if $debug;
+            $dht->find_peers($ih);          # Query local routing table
+            for my $node (@boot_nodes) {    # Force query to bootstrap nodes
 
                 # Resolve hostname if needed (get_peers expects IP)
                 # But dht->get_peers might handle hostnames if IO::Socket::IP does?
@@ -1202,25 +1279,20 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
             # Pick the top N closest unvisited candidates
             # Note: ^. is bitwise XOR on strings in Modern Perl
-            my @to_query = sort { ( $a->{id} ^.$ih ) cmp( $b->{id} ^.$ih ) } grep { !$_->{visited} && $_->{ip} } values %dht_frontier;
+            my @to_query = sort { ( $a->{id} ^.$ih ) cmp ( $b->{id} ^.$ih ) } grep { !$_->{visited} && $_->{ip} } values %dht_frontier;
             if (@to_query) {
                 my $best_dist = unpack( 'H*', $to_query[0]{id} ^.$ih );
-                $self->_emit(
-                    log   => sprintf( "  [DEBUG] DHT Frontier: %d nodes. Best dist: %s\n", scalar( keys %dht_frontier ), $best_dist ),
-                    level => 'debug'
-                ) if $debug;
+                $self->_emit_log( 'debug', sprintf( 'DHT Frontier: %d nodes. Best dist: %s', scalar( keys %dht_frontier ), $best_dist ) ) if $debug;
                 my $count = 0;
                 for my $c (@to_query) {
-                    $self->_emit( log => "    [DEBUG] DHT Querying: " . unpack( 'H*', $c->{id} ) . " at $c->{ip}:$c->{port}\n", level => 'debug' )
-                        if $debug;
+                    $self->_emit_log( 'debug', 'DHT Querying: ' . unpack( 'H*', $c->{id} ) . " at $c->{ip}:$c->{port}" ) if $debug;
                     $dht->get_peers( $ih, $c->{ip}, $c->{port} );
                     $c->{visited} = 1;
                     last if ++$count >= 8;
                 }
             }
             else {
-                $self->_emit( log => "  [DEBUG] DHT Frontier exhausted for " . unpack( 'H*', $ih ) . ". Re-bootstrapping...\n", level => 'debug' )
-                    if $debug;
+                $self->_emit_log( 'debug', 'DHT Frontier exhausted for ' . unpack( 'H*', $ih ) . '. Re-bootstrapping...' ) if $debug;
                 $self->start_dht_lookup();
 
                 # Fallback: If we are starving, try adding a public tracker if not already present
@@ -1269,6 +1341,13 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
     method peer_id ()     {$peer_id}
     method trackers ()    { return $tracker_manager->trackers() }
 
+    method DESTROY () {
+        return unless $state != STATE_STOPPED;
+        for my $peer ( grep {defined} values %peer_objects ) {
+            $peer->disconnected();
+        }
+    }
+
     method files () {
         return [] unless $storage;
         return [ map { $_->path->absolute->stringify } $storage->files_ordered->@* ];
@@ -1280,23 +1359,32 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
             bitfield   => $bitfield->data,
             storage    => $storage->dump_state(),
             downloaded => $bytes_downloaded,
-            uploaded   => $bytes_uploaded,
+            uploaded   => $bytes_uploaded
         };
     }
 
     method load_state ($state) {
-        if ( $state->{metadata} ) {
-            $metadata = $state->{metadata};
-            $self->_init_from_metadata();
+        return unless ref $state eq 'HASH';
+        if ( exists $state->{metadata} ) {
+            if ( ref $state->{metadata} eq 'HASH' && ref $state->{metadata}{info} eq 'HASH' ) {
+                $metadata = $state->{metadata};
+                $self->_init_from_metadata();
+            }
+            else {
+                $self->_emit_log( 'warn', 'load_state: invalid metadata structure, skipping' );
+            }
         }
-        if ( $state->{bitfield} ) {
-            $bitfield->set_data( $state->{bitfield} );
-            my $piece_len = $metadata->{info}{'piece length'} // 16384;
-            $bytes_left = ( $bitfield->size - $bitfield->count ) * $piece_len;
+        if ( exists $state->{bitfield} && defined $state->{bitfield} && $bitfield ) {
+            if ( length( $state->{bitfield} ) == int( ( $bitfield->size + 7 ) / 8 ) ) {
+                $bitfield->set_data( $state->{bitfield} );
+                my $piece_len = $metadata->{info}{'piece length'} // 16384;
+                $bytes_left = ( $bitfield->size - $bitfield->count ) * $piece_len;
+            }
+            else {
+                $self->_emit_log( 'warn', 'load_state: bitfield size mismatch, skipping' );
+            }
         }
-        if ( $state->{storage} && $storage ) {
-            $storage->load_state( $state->{storage} );
-        }
+        $storage->load_state( $state->{storage} ) if exists $state->{storage} && $storage;
         $bytes_downloaded = $state->{downloaded} // 0;
         $bytes_uploaded   = $state->{uploaded}   // 0;
     }
@@ -1325,4 +1413,5 @@ class Net::BitTorrent::Torrent v2.0.0 : isa(Net::BitTorrent::Emitter) {
         }
         return $tree;
     }
-} 1;
+};
+1;

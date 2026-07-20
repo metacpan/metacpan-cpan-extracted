@@ -25,7 +25,10 @@ sub parse_query {
         }
         elsif ($_ =~ /^\.(.+)$/) {
             my $rest = $1;
-            if ($rest =~ /,/) {
+            if ($rest eq 'count') {
+                $_;    # distinguish field access from the count filter
+            }
+            elsif ($rest =~ /,/) {
                 $_;    # preserve leading dot when sequence filters are present
             }
             elsif ($rest =~ /^\s*\[/) {

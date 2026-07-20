@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.641';
+our $VERSION = '0.642';
 
 use 5.020;
 use Moo;
@@ -269,7 +269,10 @@ sub _eval_keyword_format ($class, $data, $schema, $state) {
       and ref $spec->{type} eq 'ARRAY' ? any { $_ eq 'number' } $spec->{type}->@* : $spec->{type} eq 'number'
       and looks_like_number($data));
 
-  return E($state, 'not a valid %s', $schema->{format}) if not $spec->{sub}->($data);
+  return E($state, 'not a valid %s %s', $schema->{format},
+      ref $spec->{type} eq 'ARRAY' ? join(', ', $spec->{type}->@*) : $spec->{type})
+    if not $spec->{sub}->($data);
+
   return 1;
 }
 
@@ -287,7 +290,10 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.641
+version 0.642
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 DESCRIPTION
 

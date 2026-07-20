@@ -54,7 +54,7 @@ is_equal(
 
 is_equal(
   $js->evaluate(1, 'https://my_schema')->TO_JSON,
-  my $result = {
+  my $pass_result = {
     valid => true,
     annotations => [
       map +{
@@ -70,7 +70,7 @@ is_equal(
 
 is_equal(
   $js->evaluate('foo', 'https://my_schema')->TO_JSON,
-  $result,
+  $pass_result,
   'evaluate data against schema with custom dialect; format-annotation is used',
 );
 
@@ -162,10 +162,13 @@ if ("$]" >= '5.022' or $^O ne 'MSWin32') {
   close $child_in;
 
   my $hub = Test2::API::test2_stack->top;
-  $hub->set_count($hub->count + ($ENV{AUTHOR_TESTING} ? 2 : 1));
+  $hub->set_count($hub->count + 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0));
 
   is($? >> 8, 0, 'child process finished successfully');
 }
+
+# skip the END block which would normally try to print a plan
+Test2::API::test2_stack->top->set_no_ending(1);
 
 had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

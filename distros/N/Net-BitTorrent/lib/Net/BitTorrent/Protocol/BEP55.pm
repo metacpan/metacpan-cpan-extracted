@@ -24,11 +24,11 @@ class Net::BitTorrent::Protocol::BEP55 v2.0.0 : isa(Net::BitTorrent::Protocol::B
                     }
                 }
                 catch ($e) {
-                    $self->_emit( log => "  [ERROR] Malformed ut_holepunch message: $e\n", level => 'error' );
+                    $self->_emit_log( 'error', "Malformed ut_holepunch message: $e" );
                     return;
                 }
                 if ( ref $dict ne 'HASH' ) {
-                    $self->_emit( log => "  [ERROR] Malformed ut_holepunch message: dict is not a hash\n", level => 'error' );
+                    $self->_emit_log( 'error', 'Malformed ut_holepunch message: dict is not a hash' );
                     return;
                 }
                 if ( $type == HP_RENDEZVOUS ) {

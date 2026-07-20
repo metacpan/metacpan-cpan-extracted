@@ -1,4 +1,5 @@
 use v5.42;
+use lib 'lib';
 use feature 'class';
 use Test2::V1 -ipP;
 no warnings;
@@ -76,5 +77,13 @@ subtest 'Options' => sub {
     is $torrent->{info}{private}, 1,                    'Private flag set';
     is $torrent->{nodes}[0][0],   'router.example.com', 'Bootstrap node host correct';
     is $torrent->{nodes}[0][1],   6881,                 'Bootstrap node port correct';
+};
+#
+subtest 'add_file path stays within base_path' => sub {
+    my $temp = Path::Tiny->tempdir;
+    $temp->child('safe.txt')->spew('hello');
+    my $gen = Net::BitTorrent::Torrent::Generator->new( base_path => $temp );
+    $gen->add_file('safe.txt');
+    pass 'normal file added successfully within base_path';
 };
 done_testing;

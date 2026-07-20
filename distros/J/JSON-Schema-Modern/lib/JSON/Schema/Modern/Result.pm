@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.641';
+our $VERSION = '0.642';
 
 use 5.020;
 use Moo;
@@ -225,7 +225,7 @@ sub format ($self, $style, $formatted_annotations = undef) {
 sub count { $_[0]->valid ? $_[0]->annotation_count : $_[0]->error_count }
 
 sub combine ($self, $other, $swap) {
-  croak 'wrong type for & operation' if not (blessed($other) and $other->isa(__PACKAGE__));
+  croak 'wrong type for & operation' if not blessed($other) or not $other->isa(__PACKAGE__);
 
   return $self if refaddr($other) == refaddr($self);
 
@@ -291,7 +291,10 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.641
+version 0.642
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,118 @@
+Change log for Sys::OsRelease
+
+{{$NEXT}}
+ - MAJOR
+ - API CHANGE
+ - MINOR
+ - ENHANCEMENTS
+ - SECURITY
+ - REVISION
+ - BUG FIXES
+ - DOCS
+
+0.4.2 2026-07-19T23:34:29-07:00 America/Los_Angeles
+ [REVISION]
+ - add 'provides' metadata for Sys::OsRelease::Lite (for CPAN upload)
+
+0.4.1 2026-07-19T22:08:34-07:00 America/Los_Angeles
+ [REVISION]
+ - rearrange Sys::OsRelease::Lite delivery from symlink to filtering source
+   to avoid CPAN namespace conflict
+
+0.4.0 2026-07-14T16:52:41-07:00 America/Los_Angeles
+ [MINOR]
+ - add Sys::OsRelease::Lite for Perl <5.22 stranded by Dist::Zilla bump
+
+0.3.1 2026-05-11T21:51:22-07:00 America/Los_Angeles
+ [REVISION]
+ - bump minimum Perl version from 5.6 (2000) to 5.10 (2007) to use the
+   version module
+ - add test data for Kali Linux
+ - update Dist::Zilla config to remove git-related metadata conflict
+   (forwarded from WebFetch)
+ - catch up with attributes added to os-release standard since 2022 (from
+   systemd 231 to 260)
+ - enumerate documentation of auto-generated methods from Freedesktop
+   standard
+
+0.3.0 2022-05-15T21:58:03-07:00 America/Los_Angeles
+ [DOCS]
+ - document auto-generated accessor methods for standard attributes
+ - reorganize POD docs to separate methods into subsections for class,
+   auto-generated and instance methods
+ - remove NAME section from source POD. I didn't notice until now that
+   Pod::Weaver was adding a duplicate.
+
+ [MINOR]
+ - remove auto-generation of non-standard attribute accessor methods
+   (writing docs, couldn't recommend using them)
+
+ [REVISION]
+ - add found_attrs() method with 100+ test cases
+
+0.2.3 2022-05-15T00:46:55-07:00 America/Los_Angeles
+ [DOCS]
+ - remove NAME section from source POD. I didn't notice until now that
+   Pod::Weaver was adding a duplicate.
+
+0.2.2 2022-05-13T15:49:53-07:00 America/Los_Angeles
+ [DOCS]
+ - minor updates to POD docs
+
+ [REVISION]
+ - build updates
+
+0.2.1 2022-05-12T23:39:12-07:00 America/Los_Angeles
+ [DOCS]
+ - add reciprocal see-also link to System::Info
+
+ [REVISION]
+ - add Dist::Zilla plugin Test::UnusedVars and fix one function which it
+   flagged
+ - update t/test-inputs/003_samples/gen-sample to regenerate sample data
+   from all distros if no arguments
+ - add more Open Source community distros recongized as common
+ - update tests for sample os-release from opensuse/leap
+ - add basic tests for import of singleton-management methods (just check
+   if they landed)
+
+0.2.0 2022-04-28T22:58:00-07:00 America/Los_Angeles
+ [ENHANCEMENTS]
+ - add import_singleton() so new module Sys::OsPackage can import rather
+   than copy the singleton-management methods
+
+0.1.1 2022-04-28T16:04:09-07:00 America/Los_Angeles
+ [REVISION]
+ - based on CPAN Testers feedback, remove occurrences of // operator which
+   did not exist prior to Perl 5.10 (in keeping with module's minimal
+   prerequisites)
+
+0.1.0 2022-04-27T14:47:00-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - all methods now correctly handle being called via class name in addition
+   to instance reference
+
+ [MINOR]
+ - prefixed "_" on private internal method names
+
+ [REVISION]
+ - added tests for method calls from the class name in addition to object
+   reference
+
+0.0.2 2022-04-26T23:22:00-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - fix from CPAN Testers results: on mswin32 init empty rather than bail
+   out
+
+ [DOCS]
+ - expand POD docs with method descriptions
+
+ [REVISION]
+ - add platform method and configuration items to expand systems recognized
+   as common in ID_LIKE
+ - add unit tests for empty configurations simulating systems where
+   os-release doesn't exist (using empty search path)
+
+0.0.1 2022-04-26T00:18:04-07:00 America/Los_Angeles
+ [REVISION]
+ - initial revision

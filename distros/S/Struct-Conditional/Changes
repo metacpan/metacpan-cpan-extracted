@@ -8,3 +8,6 @@ Revision history for Struct-Conditional
 
 1.02    2024-04-06
 	- Extend to allow custom instantiating of hashes so that they can become ordered.
+
+1.04    2026-07-19
+	- Remove PAX headers

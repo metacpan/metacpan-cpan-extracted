@@ -1,4 +1,5 @@
 use v5.42;
+use lib 'lib';
 use feature 'class';
 use Test2::V1 -ipP;
 no warnings;
@@ -43,7 +44,14 @@ subtest 'Adaptive Choking (Leecher Mode)' => sub {
     # Peer 5: 50 KB
     my @bytes = ( 100, 500, 300, 400, 200, 50 );
     for my $i ( 0 .. 5 ) {
-        $peers[$i]->handle_message( 7, pack( 'N N', 0, 0 ) . ( 'A' x ( $bytes[$i] * 1024 ) ) );
+        my $total  = $bytes[$i] * 1024;
+        my $offset = 0;
+        while ($total) {
+            my $chunk = $total > 131072 ? 131072 : $total;
+            $peers[$i]->handle_message( 7, pack( 'N N', 0, $offset ) . ( 'A' x $chunk ) );
+            $offset += $chunk;
+            $total  -= $chunk;
+        }
         $peers[$i]->tick();    # Calculate rate
     }
 

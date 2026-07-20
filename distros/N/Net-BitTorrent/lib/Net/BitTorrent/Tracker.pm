@@ -34,7 +34,7 @@ class Net::BitTorrent::Tracker v2.0.0 : isa(Net::BitTorrent::Emitter) {
     method _create_tracker ($url) {
         if    ( $url =~ /^udp:/ )    { return Net::BitTorrent::Tracker::UDP->new( url => $url ) }
         elsif ( $url =~ /^https?:/ ) { return Net::BitTorrent::Tracker::HTTP->new( url => $url ) }
-        $self->_emit( log => "Unsupported tracker protocol: $url", level => 'fatal' );
+        $self->_emit_log( 'fatal', "Unsupported tracker protocol: $url" );
         return undef;
     }
 
@@ -84,7 +84,7 @@ class Net::BitTorrent::Tracker v2.0.0 : isa(Net::BitTorrent::Emitter) {
                         $tier_success = 1;
                     }
                     catch ($e) {
-                        $self->_emit( log => '  [DEBUG] Announce to ' . $entry->{obj}->url . " failed: $e\n", level => 'debug' ) if $debug;
+                        $self->_emit_log( 'debug', 'Announce to ' . $entry->{obj}->url . " failed: $e" ) if $debug;
                         $entry->{consecutive_failures}++;
                         $pending_ihs--;
                     }

@@ -1,19 +1,68 @@
                       Revision history for podlators
 
+v6.1.0 - 2026-07-19
+
+- groff 1.24.0 broke use of the .IP macro for tag list formatting by
+  removing the mandatory spacing between the tag and the paragraph. Work
+  around this by using .TP for lists other than bullet or numbered
+  lists. Be aware that groff 1.24 and later defaults to a minimum gap of
+  two spaces between the tag and the paragraph for .TP instead of one
+  space as in previous pod2man and groff releases. POD documents that want
+  an indent just wide enough for tags to format on the same line as the
+  paragraph may need to increase the indent level for the =over command by
+  one to render as desired with those versions of groff.
+
+- Change the default fixed-width font from CW to CR. This avoids warnings
+  with groff 1.24.0 or later at the cost of breaking troff output on
+  Solaris 10. nroff output and troff output on Solaris 11 are
+  unaffected. The pod2man option --fixed=CW will restore the previous
+  behavior. Thanks to G. Branden Robinson for the analysis and assistance.
+  (GitHub #43)
+
+- Move the Pod::Man override of the AD string (needed to request left
+  justification) after .TH, and also clear the HY register to request no
+  hyphenation. This positioning also works with groff 1.23.0 and is
+  required by groff 1.24.0 to disable hyphenation and use left
+  justification by default without overriding user preferences. Many
+  thanks to G. Branden Robinson for the discussion and assistance.
+
+- Pod::Text now supports setting the encoding option to "none" to disable
+  output encoding. This only makes sense when calling output_string() to
+  direct the formatted output to a scalar. It is intended for special
+  cases where the formatted output is held in memory for further
+  processing and will encoded for output at a later step. Thanks to
+  djerius for the suggestion. (GitHub #38)
+
+- Fix Pod::Text quoting heuristics for C<> when the contents contains
+  newlines. Thanks to van-de-bugger for the report. (GitHub #39)
+
+- Suppress adding double quotes around C<> text in Pod::Man and Pod::Text
+  if the contents are quoted with Unicode double quotes or consist of a
+  single character followed by an ASCII double quote.
+
+- Fix the documentation for the date and release options to Pod::Man and
+  the corresponding --date and --release options to pod2man. The positions
+  of the footers controlled by these options were reversed in podlators
+  1.12 but the documentation was never updated.
+
+- Update the Pod::Man discussion of intersentence spacing to reflect groff
+  changes around double quotes and to recommend against attempting to
+  manage the spacing for *roff output.
+
 v6.0.2 - 2024-07-14
 
  - Fix removal of scripts/pod2man and scripts/pod2text by make realclean,
-   broken in the v6.0.0 release.  Thanks to James E Keenan for the report.
+   broken in the v6.0.0 release. Thanks to James E Keenan for the report.
 
 v6.0.1 - 2024-07-12
 
- - Remove autodie from the module build process.  When built as part of
-   Perl core, podlators is built before autodie is available.  Thanks to
-   James E Keenan for the report and a draft patch.  (GitHub #33)
+ - Remove autodie from the module build process. When built as part of
+   Perl core, podlators is built before autodie is available. Thanks to
+   James E Keenan for the report and a draft patch. (GitHub #33)
 
 v6.0.0 - 2024-07-10
 
- - Drop support for Perl 5.10.  podlators now requires Perl 5.12 or later.
+ - Drop support for Perl 5.10. podlators now requires Perl 5.12 or later.
 
  - podlators now uses semantic versioning for the package and module
    versions, with a v prefix to work with Perl's packaging system.
@@ -21,17 +70,17 @@ v6.0.0 - 2024-07-10
  - Pod::Man now translates all "-" characters in the input into *roff "\-"
    escapes (normally rendered as an ASCII hyphen-minus, U+002D) rather
    than using fragile heuristics to decide which characters represent true
-   hyphens and which represent ASCII hyphen-minus.  The previous
-   heuristics misrendered command names such as apt-get, causing search
-   and cut-and-paste issues.  This change may cause line-break issues with
-   long hyphenated phrases.  In cases where the intent is a true hyphen,
+   hyphens and which represent ASCII hyphen-minus. The previous heuristics
+   misrendered command names such as apt-get, causing search and
+   cut-and-paste issues. This change may cause line-break issues with long
+   hyphenated phrases. In cases where the intent is a true hyphen,
    consider using UTF-8 as the POD character set (declared with =encoding)
    and using true Unicode hyphens instead of the ASCII "-" character.
 
  - Pod::Man now disables the special *roff interpretation of "`" and "'"
    characters as paired quotes everywhere, not just in verbatim text, thus
-   forcing them to be interpreted as the regular ASCII characters.  This
-   also disables the use of "``" and "''" for paired double-quotes.  The
+   forcing them to be interpreted as the regular ASCII characters. This
+   also disables the use of "``" and "''" for paired double-quotes. The
    rationale is similar to that for hyphens: there is no way to tell from
    the POD source that the special interpretation as quotes is intended.
    To produce paired typographic quotes in the output, use UTF-8 and
@@ -39,46 +88,46 @@ v6.0.0 - 2024-07-10
 
  - Man page references in L<> that are detected as such by Pod::Simple are
    now always formatted as man page references even if our normal
-   heuristic would not detect them.  This fixes the formatting of
+   heuristic would not detect them. This fixes the formatting of
    constructions such as @@RXVT_NAME@@perl(3), which are used by packages
    that format a man page with POD and then substitute variables into it
-   at build time.  Thanks to Marco Sirabella for the analysis and an
-   initial patch.  (GitHub #21)
+   at build time. Thanks to Marco Sirabella for the analysis and an
+   initial patch. (GitHub #21)
 
  - Add a workaround to Pod::Man to force persistent ragged-right
-   justification under nroff with groff 1.23.0.  Thanks to Guillem Jover
-   for the report and G. Branden Robinson for the analysis.  (GitHub #23)
+   justification under nroff with groff 1.23.0. Thanks to Guillem Jover
+   for the report and G. Branden Robinson for the analysis. (GitHub #23)
 
  - Fix wrapping of text with S<> markup in all subclasses of Pod::Text.
-   Thanks to Jim Avera for the report.  (GitHub #24)
+   Thanks to Jim Avera for the report. (GitHub #24)
 
  - Pod::Man now forces a blank line after a nested list contains only
-   =item tags without bodies.  In previous versions, the blank line before
-   the next item in the surrounding =over block was not included.  Thanks
-   to Julien ÉLIE for the report.  (GitHub #26)
+   =item tags without bodies. In previous versions, the blank line before
+   the next item in the surrounding =over block was not included. Thanks
+   to Julien ÉLIE for the report. (GitHub #26)
 
  - Import PerlIO before checking for layers so that PerlIO::F_UTF8 is
    available, which fixes double-encoding of output when a :utf8 layer is
-   in place and PerlIO is not imported.  Thanks to youpong for the bug
+   in place and PerlIO is not imported. Thanks to youpong for the bug
    report, James Keenan for the elaboration, and Graham Knop for the fix.
    (GitHub #25)
 
  - pod2text --help now exits with status 0, not 1, matching normal UNIX
-   command behavior and the behavior of pod2man.  (GitHub #19)
+   command behavior and the behavior of pod2man. (GitHub #19)
 
- - Fix tests when NO_COLOR is set in the environment.  (GitHub #20)
+ - Fix tests when NO_COLOR is set in the environment. (GitHub #20)
 
 5.01 - 2022-12-25
 
  - Guesswork (formatting rules based on heuristics intended for Perl
    documentation) can now be disabled or selectively enabled in Pod::Text
-   with the guesswork option (--guesswork to pod2text).  This is similar
-   to the support added to Pod::Man in 5.00, except there is only one type
-   of guesswork currently (quoting).
+   with the guesswork option (--guesswork to pod2text). This is similar to
+   the support added to Pod::Man in 5.00, except there is only one type of
+   guesswork currently (quoting).
 
  - Pod::Text suppresses quote marks around some additional cases of Perl
    code in C<> where the intent had been to suppress the quotes but there
-   were various bugs in the matching regular expressions.  This primarily
+   were various bugs in the matching regular expressions. This primarily
    affects function and method calls.
 
  - Fix an escaping issue in Pod::Man with complex lquote, rquote, and
@@ -92,58 +141,58 @@ v6.0.0 - 2024-07-10
 
 5.00 - 2022-11-25
 
- - Drop support for Perl 5.8.  The minimum required version is Perl 5.10.
+ - Drop support for Perl 5.8. The minimum required version is Perl 5.10.
 
  - The default output encoding of Pod::Man on non-EBCDIC systems is now
-   UTF-8.  The utf8 option (-u or --utf8 to pod2man) is now ignored, since
-   it is the default.  See the ENCODING section of its documentation for
-   testing results and further discussion.  (#68741)
+   UTF-8. The utf8 option (-u or --utf8 to pod2man) is now ignored, since
+   it is the default. See the ENCODING section of its documentation for
+   testing results and further discussion. (#68741)
 
  - Pod::Man now supports an encoding option (-e or --encoding to pod2man),
    to change the output encoding to any encoding recognized by Encode, or
-   the special values groff or roff.  Setting it to roff requests the old
+   the special values groff or roff. Setting it to roff requests the old
    behavior of using character substitutions and *roff escapes to generate
    ASCII-only output (the default prior to this version).
 
  - Pod::Man now supports the groff output encoding, which replaces all
-   non-ASCII characters with \[uNNNN] escapes.  This escape was not
+   non-ASCII characters with \[uNNNN] escapes. This escape was not
    supported by the originally *roff implementation, but it is supported
    by groff and mandoc and allows proper representation of Unicode
-   characters.  This output format has no known advantages in portability
-   over UTF-8 on non-EBCDIC systems.  It is the default output format on
-   EBCDIC systems, and when the Encode module is not available.  (#73804)
+   characters. This output format has no known advantages in portability
+   over UTF-8 on non-EBCDIC systems. It is the default output format on
+   EBCDIC systems, and when the Encode module is not available. (#73804)
 
  - Pod::Man no longer does guesswork transformations that only affected
-   troff output.  Formatting manual pages with troff is exceptionally
-   rare, and this magic caused constant maintenance issues.  This means
-   "--" is no longer changed to an em-dash, strings of capital letters
-   aren't made a bit smaller, no attempt is made to change double quotes
-   to paired quotes, and no special formatting is done for C++.  (#132007)
+   troff output. Formatting manual pages with troff is exceptionally rare,
+   and this magic caused constant maintenance issues. This means "--" is
+   no longer changed to an em-dash, strings of capital letters aren't made
+   a bit smaller, no attempt is made to change double quotes to paired
+   quotes, and no special formatting is done for C++. (#132007)
 
  - Guesswork (formatting rules based on heuristics intended for Perl
    documentation) can now be disabled or selectively enabled in Pod::Man
-   with the guesswork option (--guesswork to pod2man).  (#143668)
+   with the guesswork option (--guesswork to pod2man). (#143668)
 
  - Pod::Text now supports an encoding option (-e or --encoding to
-   pod2text) to force the output encoding, similar to Pod::Man.  The utf8
+   pod2text) to force the output encoding, similar to Pod::Man. The utf8
    option (-u or --utf8 to pod2text) is still supported and is equivalent
    to setting encoding to UTF-8.
 
  - Pod::Text now defaults to UTF-8 encoding if it sees a non-ASCII
    character on a non-EBCDIC system and the input encoding is not
-   specified.  This should fix rendering of E<> escapes of non-ASCII
+   specified. This should fix rendering of E<> escapes of non-ASCII
    characters in POD files that don't specify an input encoding, at the
-   cost of assuming UTF-8 output.  Pod::Text also now commits to an
+   cost of assuming UTF-8 output. Pod::Text also now commits to an
    encoding the first time it outputs a non-ASCII character and sticks
    with that encoding for the rest of the file, even if the detected or
-   declared input encoding changes.  (#102631)
+   declared input encoding changes. (#102631)
 
- - Stop using a PerlIO encoding layer for Pod::Text output and instead
-   use Encode.  If a PerlIO encoding layer is already set, trust it and do
-   no encoding.  This fixes encoding problems with output to a string.
+ - Stop using a PerlIO encoding layer for Pod::Text output and instead use
+   Encode. If a PerlIO encoding layer is already set, trust it and do no
+   encoding. This fixes encoding problems with output to a string.
 
  - Add a coding tag comment to the start of Pod::Man output if the output
-   encoding is not ASCII.  groff's preconv program and FreeBSD's mandoc
+   encoding is not ASCII. groff's preconv program and FreeBSD's mandoc
    will use this line to determine the input encoding.
 
  - Pod::Man now supports a language option (--language to pod2man) that
@@ -152,37 +201,36 @@ v6.0.0 - 2024-07-10
    when the manual page is not installed in a language-specific directory
    so that the man program knows to add that configuration automatically.
    Unfortunately, the commands added when this option is used are
-   groff-specific.  Thanks to zynldyx for the bug report and suggested
-   fix.
+   groff-specific. Thanks to zynldyx for the bug report and suggested fix.
 
  - Pod::Man now converts Unicode zero-width spaces (U+200B) to the *roff
    escape \:, which indicates a line break point without a space or
-   hyphen.  (Unfortunately, groff does not honor U+200B itself as a line
-   break point.)  This escape is not part of the language defined in CSTR
+   hyphen. (Unfortunately, groff does not honor U+200B itself as a line
+   break point.) This escape is not part of the language defined in CSTR
    #54, but is supported by both groff and mandoc, so hopefully use of
-   this escape won't cause problems.  (Debian Bug#941980)
+   this escape won't cause problems. (Debian Bug#941980)
 
  - Pod::Man and Pod::Text now correctly honor S<> wrapping L<> with an
    anchor and URL, and make the space between the anchor and URL
-   nonbreaking.  (#143768)
+   nonbreaking. (#143768)
 
  - Clear the current font before changing fonts in all Pod::Man output,
-   not just headings.  groff 1.22.4 does not clear bold or italic when
+   not just headings. groff 1.22.4 does not clear bold or italic when
    seeing \f(CW font change, which meant bold and italic were extending
-   farther than they should without this change.  (#143667)
+   farther than they should without this change. (#143667)
 
  - Honor the quotes, lquote, and rquote configuration parameters to
-   Pod::Man for C<> text inside the special NAME section.  (#143967)
+   Pod::Man for C<> text inside the special NAME section. (#143967)
 
  - Pod::Man suppresses quote marks around some additional cases of Perl
    code in C<> where the intent had been to suppress the quotes but there
-   were various bugs in the matching regular expressions.  This primarily
+   were various bugs in the matching regular expressions. This primarily
    affects method calls and negative numbers.
 
  - Avoid non-standard *roff escape in the troff accent mark definition for
-   an acute accent.  \h"..." was used instead of \h'...' as seen in the
-   other accent mark definitions.  This error appears to have existed
-   since the first version of Pod::Man.  Thanks, Paul Evans.  (GitHub #14)
+   an acute accent. \h"..." was used instead of \h'...' as seen in the
+   other accent mark definitions. This error appears to have existed since
+   the first version of Pod::Man. Thanks, Paul Evans. (GitHub #14)
 
  - Document that nroff adds two spaces after each sentence when reflowing,
    and therefore if you want formatted Pod::Man output to consistently
@@ -196,15 +244,15 @@ v6.0.0 - 2024-07-10
 
  - Fix the test suite use of parse_string_document to pass in raw bytes
    rather than decoded characters, which will hopefully fix test failures
-   with versions of Pod::Simple older than 3.22 and is a more correct
-   test of encoding handling.
+   with versions of Pod::Simple older than 3.22 and is a more correct test
+   of encoding handling.
 
 4.13 - 2019-12-25
 
- - Drop support for Perl 5.6.  The minimum supported version is now Perl
-   5.8.  Perl 5.6 had not been tested even by CPAN Testers in some time
-   and isn't supported by Travis-CI, so true support is dubious.  Dropping
-   that version allows cleaning up some old compatibility code.
+ - Drop support for Perl 5.6. The minimum supported version is now Perl
+   5.8. Perl 5.6 had not been tested even by CPAN Testers in some time and
+   isn't supported by Travis-CI, so true support is dubious. Dropping that
+   version allows cleaning up some old compatibility code.
 
  - Fix a warning when outputting to something without a PerlIO layer, such
    as when output_string is used.
@@ -217,19 +265,19 @@ v6.0.0 - 2024-07-10
  - Remove an ancient workaround in Pod::Text::Termcap that set the
    TERMPATH environment variable whenever a Pod::Text::Termcap object was
    created in order to add /usr/share/lib/termcap, necessary on some
-   ancient Solaris systems.  Setting environment variables is bad behavior
+   ancient Solaris systems. Setting environment variables is bad behavior
    for a module, and the Solaris systems requiring this workaround are
    long obsolete.
 
  - Remove the Pod::Text::Termcap fallback to VT100 escape sequences if
    Term::Cap was not able to find sequences for bold, underline, or normal
-   text, and instead skip that part of the formatting.  This will produce
+   text, and instead skip that part of the formatting. This will produce
    more correct behavior on dumb terminals at the possible cost of losing
    formatting on systems with malfunctioning terminal databases, which
-   seems like an improvement.  Thanks, Zenin.  (#131124)
+   seems like an improvement. Thanks, Zenin. (#131124)
 
  - Further improve the man/no-encode.t test to not care whether Encode was
-   already loaded or not.  Thanks, Martin Becker.
+   already loaded or not. Thanks, Martin Becker.
 
  - Improve logic for showing large test failures to avoid spurious
    failures on systems without diff.
@@ -244,21 +292,21 @@ v6.0.0 - 2024-07-10
 
  - Fix the Pod::Text documentation to reflect that the default value of
    the sentence option is false, not true, and has been since at least
-   2.0.0.  Thanks, eponymous alias.  (#124461)
+   2.0.0. Thanks, eponymous alias. (#124461)
 
  - Correctly honor the width option in Pod::Text::Termcap, which was
    previously ignored due to a bug in interpreting user-supplied options.
-   Thanks, eponymous alias.  (#124447)
+   Thanks, eponymous alias. (#124447)
 
  - Fix a subtle wrapping bug in Pod::Text::Color and Pod::Text::Termcap
    with long =item text that would cause lines to be wrapped when they
-   didn't need to be.  Thanks, eponymous alias.
+   didn't need to be. Thanks, eponymous alias.
 
  - In Pod::Text::Color and Pod::Text::Termcap, clear any text attributes
    at the end of each line and reinstate them at the start of the next
    line, since some pagers (less -R in particular) clear all text
    attributes at the end of each line and were therefore not correctly
-   showing attributes in wrapped text.  Thanks, eponymous alias.
+   showing attributes in wrapped text. Thanks, eponymous alias.
 
  - Correctly get the terminal width for Pod::Text::Termcap from Term::Cap
    information when COLUMNS isn't set, instead of getting a string value
@@ -266,7 +314,7 @@ v6.0.0 - 2024-07-10
 
  - Specifying "none" for the errors option of Pod::Man and Pod::Text no
    longer results in an errata section in the generated documentation,
-   matching the documented behavior.  Thanks, Olly Betts.
+   matching the documented behavior. Thanks, Olly Betts.
 
  - Fix order of SEE ALSO section in manual pages to match the
    recommendation of perlpodstyle.
@@ -275,31 +323,31 @@ v6.0.0 - 2024-07-10
 
  - Change manual page references and function names to bold instead of
    italic in *roff output following the current Linux manual page
-   standard.  The previous formatting was taken from Solaris, and it seems
+   standard. The previous formatting was taken from Solaris, and it seems
    safe to say that the Linux manual page formatting conventions are now
-   much more widely followed than Solaris's.  Patch from Guillem Jover.
+   much more widely followed than Solaris's. Patch from Guillem Jover.
 
  - Revert the .IX handling code in Pod::Man to the earlier version from
    Bjarni Ingi Gislason but add the trailing backslashes that should
-   hopefully avoid blank page issues on HP-UX.  This fixes a warning
-   regression when man is run with warnings enabled.  (Debian Bug#847972)
+   hopefully avoid blank page issues on HP-UX. This fixes a warning
+   regression when man is run with warnings enabled. (Debian Bug#847972)
 
  - In Pod::Man, wrap the output file descriptor in a glob before passing
    it to PerlIO::get_layers so that the layer check works properly.
    Previously, this code would throw a warning if given a scalar not
-   wrapped in a glob and not detect layers properly.  Patch from Zefram.
+   wrapped in a glob and not detect layers properly. Patch from Zefram.
    (#122521)
 
  - Produce a proper diagnostic when given empty input on standard input
-   with no other arguments to pod2man or pod2text.  Reported by Guillem
+   with no other arguments to pod2man or pod2text. Reported by Guillem
    Jover.
 
 4.09 - 2016-11-05
 
  - Use Pod::Simple's logic to determine the native code points for NO
    BREAK SPACE and SOFT HYPHEN in Pod::Text instead of hard-coding the
-   ASCII values.  Hopefully fixes the case of mysterious disappearing open
-   brackets on EBCDIC systems.  (#118240)
+   ASCII values. Hopefully fixes the case of mysterious disappearing open
+   brackets on EBCDIC systems. (#118240)
 
 4.08 - 2016-09-24
 
@@ -307,50 +355,50 @@ v6.0.0 - 2024-07-10
    pod2man) when generating manual pages from standard input.
    Historically, pod2man silently tolerated this, and there turned out to
    be a lot of software that depended on this, making the change too
-   disruptive.  Instead, silently set the manual page title to STDIN in
-   this case, but warn about it in the documentation.  (#117990)
+   disruptive. Instead, silently set the manual page title to STDIN in
+   this case, but warn about it in the documentation. (#117990)
 
  - Fix rendering bug for "TRUE (1)" in Pod::Man, which was recognized as
    needing small caps and then erroneously as a manual page reference,
-   resulting in escaped nroff.  (Found by Dan Jacobson with the
-   XML::LibXML::Element manual page.)  (Debian Bug#836831)
+   resulting in escaped nroff. (Found by Dan Jacobson with the
+   XML::LibXML::Element manual page.) (Debian Bug#836831)
 
  - Fix rendering bug causing "\s0(1)" to be mistakenly marked as a man
    page reference in Pod::Man, later confusing backslash escaping.
 
  - Add new lquote and rquote options to Pod::Man (and corresponding
    --lquote and --rquote flags to pod2man) to set the left and right
-   quotes for C<> text independently.  (#103298)
+   quotes for C<> text independently. (#103298)
 
  - Remove test for nested L<> markup, since an upcoming version of
-   Pod::Simple will drop support for this.  (#114075)
+   Pod::Simple will drop support for this. (#114075)
 
 4.07 - 2016-03-20
 
  - Avoid undefined variable warnings when determining the title for a Perl
-   module at the top level of a distribution.  Thanks, Dave Mitchell.
+   module at the top level of a distribution. Thanks, Dave Mitchell.
    (#112625)
 
  - Fix font resets with nroff when fixed-width fonts are used in the label
-   for an =item.  Previously, italic was being ended with \f(CW even in
+   for an =item. Previously, italic was being ended with \f(CW even in
    nroff mode, which, with groff, only changes the font to fixed-width and
-   doesn't reset to a non-italic font.  Thanks, Paul Townsend.  (#98199)
+   doesn't reset to a non-italic font. Thanks, Paul Townsend. (#98199)
 
  - Suppress warnings about a missing Encode module if PERL_CORE is set in
-   the environment.  Due to build ordering during Perl core builds, Encode
+   the environment. Due to build ordering during Perl core builds, Encode
    is expected to not yet be available during the build step that sets
-   PERL_CORE.  Thanks, Dave Mitchell.
+   PERL_CORE. Thanks, Dave Mitchell.
 
 4.06 - 2016-01-31
 
  - Handle scripts ending in .com on VMS systems and don't generate the man
-   page for perlpodstyle when built as part of Perl core.  These are
+   page for perlpodstyle when built as part of Perl core. These are
    hopefully the last two changes required to fully merge with Perl core
-   without core having to maintain a separate build system.  Thanks, Craig
+   without core having to maintain a separate build system. Thanks, Craig
    A. Berry.
 
  - During build, generate the pod2text and pod2man manual pages from the
-   *.PL files rather than the generated scripts.  This may be required due
+   *.PL files rather than the generated scripts. This may be required due
    to the different script extensions on VMS hosts.
 
  - Rename perlpodstyle back to perlpodstyle.pod, since we no longer need
@@ -358,20 +406,20 @@ v6.0.0 - 2024-07-10
 
 4.05 - 2016-01-16
 
- - Switch back to generating pod2man and pod2text from *.PL files.  While
+ - Switch back to generating pod2man and pod2text from *.PL files. While
    ExtUtils::MakeMaker can fix the #! line, it can't handle all non-UNIX
-   operating systems, and the *.PL script generation code can.  This will
+   operating systems, and the *.PL script generation code can. This will
    hopefully remove the need for Perl core to maintain a separate copy of
-   the *.PL wrapper scripts as well.  Thanks, Craig A. Berry.
+   the *.PL wrapper scripts as well. Thanks, Craig A. Berry.
 
  - Fall back (with a warning) to non-utf8 behavior in Pod::Man if the utf8
-   option is specified but the Encode module is not available.  This is
-   useful in some cross-compilation situations.  Thanks, Niko Tyni.
+   option is specified but the Encode module is not available. This is
+   useful in some cross-compilation situations. Thanks, Niko Tyni.
 
 4.04 - 2016-01-02
 
  - Don't include .travis.yml in the distribution so that it isn't picked
-   up by Perl core.  Thanks, Karen Etheridge.  (#110385)
+   up by Perl core. Thanks, Karen Etheridge. (#110385)
 
  - Add homepage information to the CPAN metadata and change the canonical
    repository location to GitHub.
@@ -379,59 +427,59 @@ v6.0.0 - 2024-07-10
 4.03 - 2015-12-06
 
  - Fix tests when POD_MAN_DATE or SOURCE_DATE_EPOCH are already set in the
-   environment.  Thanks, Niko Tyni.  (Debian Bug#807086)
+   environment. Thanks, Niko Tyni. (Debian Bug#807086)
 
 4.02 - 2015-12-02
 
  - For versions of Perl prior to 5.11, install the modules into the Perl
    core module directories, since in those versions site modules did not
-   take precedence over Perl core modules.  Thanks, Peter Rabbitson.
+   take precedence over Perl core modules. Thanks, Peter Rabbitson.
    (#110024)
 
 4.01 - 2015-12-01
 
  - Do not override the TERMPATH environment variable in Pod::Text::Termcap
-   if it's already set.  This should fix the test suite with Term::Cap
-   1.16 (which has a bug in termcap handling if TERMPATH doesn't point to
-   a valid file).  Also document the manipulation of TERMPATH.
+   if it's already set. This should fix the test suite with Term::Cap 1.16
+   (which has a bug in termcap handling if TERMPATH doesn't point to a
+   valid file). Also document the manipulation of TERMPATH.
 
- - Revert the switch to Module::Build as the build system.  This creates a
+ - Revert the switch to Module::Build as the build system. This creates a
    circular dependency with Module::Build, since it wants a newer version
-   of Pod::Man than in Perl versions prior to 5.10.1.  Instead, add the
-   new metadata to Makefile.PL and stick with a single build system that
-   will also work inside Perl core.
+   of Pod::Man than in Perl versions prior to 5.10.1. Instead, add the new
+   metadata to Makefile.PL and stick with a single build system that will
+   also work inside Perl core.
 
 4.00 - 2015-11-28
 
  - Increase the version number of the package to be larger than any of the
    previous version numbers of any of the modules, and change all modules
-   to use the same version as the overall podlators package.  Switch to a
+   to use the same version as the overall podlators package. Switch to a
    simple decimal version number to avoid complexity with v-strings and
    portability to old versions of Perl.
 
- - podlators now requires Perl 5.006 or later.  All modules enable
-   warnings.  Please report any unexpected or confusing warnings as bugs
-   in the bug tracker.
+ - podlators now requires Perl 5.006 or later. All modules enable
+   warnings. Please report any unexpected or confusing warnings as bugs in
+   the bug tracker.
 
  - In previous versions, the -r or --release option to pod2man could be
    specified without an argument and was interpreted as setting that value
-   to the empty string.  That never made a great deal of sense, and the
+   to the empty string. That never made a great deal of sense, and the
    original change to Perl was apparently because no one realized one
-   could pass the empty string as the argument value.  The argument is now
+   could pass the empty string as the argument value. The argument is now
    mandatory, but may be the empty string, which will cause some *roff
    implementations to use the system default.
 
  - Allow any even number of characters to be specified as the quote marks
    for Pod::Text and Pod::Man (and the corresponding --quotes options of
    pod2text and pod2man), rather than being artificially limited to one-
-   or two-character quotes.  The first half of the string will be used as
-   the left quote and the second half as the right quote.  This allows
+   or two-character quotes. The first half of the string will be used as
+   the left quote and the second half as the right quote. This allows
    Unicode characters or groff escapes like \(lq and \(rq to be used.
    (Partly addresses #103298)
 
  - Attempt to detect if the Pod::Man input came from a pipe and therefore
    has a completely unhelpful (and nonreproducible) source file name, and
-   diagnose this as an error.  Document that the name option (--name to
+   diagnose this as an error. Document that the name option (--name to
    pod2man) is required when processing POD source from standard input.
    (Debian Bug#777405)
 
@@ -439,21 +487,21 @@ v6.0.0 - 2024-07-10
    timestamp from which to derive the left-hand footer in *roff output if
    the date option is not set, overriding the timestamp of the input file.
    Also use the value of the environment variable POD_MAN_DATE as the
-   left-hand footer if it is set.  (This is an earlier version of the
-   SOURCE_DATE_EPOCH support.)  These changes are primarily useful to
+   left-hand footer if it is set. (This is an earlier version of the
+   SOURCE_DATE_EPOCH support.) These changes are primarily useful to
    ensure reproducible builds of the same output file given the same
    source and Pod::Man version, even when file timestamps may not be
-   consistent.  Thanks, Niko Tyni.  (Debian Bug#801621)
+   consistent. Thanks, Niko Tyni. (Debian Bug#801621)
 
  - The default left-hand footer date in *roff output is now based on UTC
    rather than the local time zone to make the output more reproducible.
-   Thanks, Chris Lamb.  (Debian Bug#780259)
+   Thanks, Chris Lamb. (Debian Bug#780259)
 
  - Simplify the *roff preamble code for handling the F register and index
    entries, and add backslashes after the braces in the preamble code for
    handling the F register to avoid introducing a spurious page break
-   before at the first page with AT&T *roff.  Thanks, Carsten Kunze and
-   Daphne Pfister.  (#92979)
+   before at the first page with AT&T *roff. Thanks, Carsten Kunze and
+   Daphne Pfister. (#92979)
 
  - Support setting the left-hand footer in *roff output to the empty
    string.
@@ -463,21 +511,21 @@ v6.0.0 - 2024-07-10
    Pod::Simple now autodetects Latin-1 and UTF-8 but warns.
 
  - More clearly document the options that set values in the .TH header in
-   the pod2man and Pod::Man documentation.  Thanks, Guillem Jover.
+   the pod2man and Pod::Man documentation. Thanks, Guillem Jover.
    (#103297)
 
  - Fix encoding handling in Pod::Text of documents that start without an
    encoding declaration and then declare an encoding partway through.
    Previously, this would result in attempts to print wide characters if
-   there were non-ASCII characters in the document.  Thanks, Magnolia K.
+   there were non-ASCII characters in the document. Thanks, Magnolia K.
    (#101722)
 
  - Change the documentation to not say Pod::Text only generates ASCII
-   text.  (#89355)
+   text. (#89355)
 
  - Switch the preferred module build system to Module::Build, but still
    provide a Makefile.PL file for backward compatibility and for the use
-   of Perl core.  (#108714)
+   of Perl core. (#108714)
 
  - Installation of this package no longer tries to overwrite the Pod::Man
    and Pod::Text modules that come with Perl core, and instead relies on
@@ -486,7 +534,7 @@ v6.0.0 - 2024-07-10
 
  - Work around a bug in Term::Cap 1.16 that caused the test suite to fail
    by forcing a setting of TERMPATH to a termcap file provided by the test
-   suite while running tests.  (#98272)
+   suite while running tests. (#98272)
 
 2.5.3 - 2013-10-05
 
@@ -494,7 +542,7 @@ v6.0.0 - 2024-07-10
 
  - Skip the empty text and manual page errors tests if Pod::Simple didn't
    produce any errors, which happens with the version shipped with Perl
-   versions prior to 5.18.  Catch warnings as well as exceptions in these
+   versions prior to 5.18. Catch warnings as well as exceptions in these
    tests.
 
 2.5.2 - 2013-09-22
@@ -506,20 +554,20 @@ v6.0.0 - 2024-07-10
  - Perform document initialization even if the document is contentless.
    Documents with only errors are shown as contentless but then have a POD
    ERRORS section, and previously this led to internal errors because
-   state variables weren't properly initialized.  Thanks, Andreas Koenig.
+   state variables weren't properly initialized. Thanks, Andreas Koenig.
    (#88724)
 
  - Apply various optimization improvements from Dagfinn Ilmari Mannsåker.
-   There should be no changes in the output.  (#83253)
+   There should be no changes in the output. (#83253)
 
  - Fix an erroneous output_fh reference in the Pod::Man documentation.
-   Thanks, Andreas Koenig.  (#88723)
+   Thanks, Andreas Koenig. (#88723)
 
- - Fix various comment typos.  Thanks, David Steinbrunner.  (#85683)
+ - Fix various comment typos. Thanks, David Steinbrunner. (#85683)
 
  - In perlpodstyle, wrap verbatim license line in POD that was over 79
-   characters after nroff indentation.  Thanks, Brian Gottreu and Steve
-   Hay.  (#87440)
+   characters after nroff indentation. Thanks, Brian Gottreu and Steve
+   Hay. (#87440)
 
 2.5.1 - 2013-02-27
 
@@ -528,14 +576,14 @@ v6.0.0 - 2024-07-10
 
 2.5.0 - 2013-01-02
 
- - Support a new errors option in Pod::Man and Pod::Text.  Valid values
-   are die, stderr, pod, and none.  Convert the stderr option to the
-   errors option with value stderr.  Add the corresponding --errors option
-   to pod2man and pod2text.  (#39007)
+ - Support a new errors option in Pod::Man and Pod::Text. Valid values are
+   die, stderr, pod, and none. Convert the stderr option to the errors
+   option with value stderr. Add the corresponding --errors option to
+   pod2man and pod2text. (#39007)
 
  - Add a new nourls option to Pod::Man and Pod::Text to suppress the URL
    from L<> formatting codes that contain anchor text, and add the
-   corresponding --nourls option to pod2man and pod2text.  (#62210)
+   corresponding --nourls option to pod2man and pod2text. (#62210)
 
  - Extend a small-caps section in *roff output through the punctuation
    that commonly appears in license disclaimers so that small caps isn't
@@ -543,70 +591,70 @@ v6.0.0 - 2024-07-10
    *roff.
 
  - Collapse consecutive whitespace and remove newlines in index term text
-   in *roff output.  Thanks, Kevin Ryde.  (#82332)
+   in *roff output. Thanks, Kevin Ryde. (#82332)
 
 2.4.2 - 2012-06-01
 
- - Remove the test of a POD document without an encoding.  We previously
+ - Remove the test of a POD document without an encoding. We previously
    tested that this interpreted the document as ISO 8859-1, but
    Pod::Simple behavior has changed so that the test started failing, plus
-   Pod::Simple now warns about a missing =encoding.  (#77553)
+   Pod::Simple now warns about a missing =encoding. (#77553)
 
 2.4.1 - 2012-05-30
 
  - Fix detection of PerlIO UTF-8 handling by requesting details on PerlIO
    layers to look for the UTF8 flag, which is not a layer in its own
-   right.  Thanks, Leon Timmermans.  (#76440)
+   right. Thanks, Leon Timmermans. (#76440)
 
  - Fix handling of the F register in *roff output when processing multiple
-   documents at once.  .IX will now continue to be defined for documents
+   documents at once. .IX will now continue to be defined for documents
    after the first, and the page number will not be reset at the start of
-   each document.  Thanks to Nicholas Clark for the analysis.  (perl
+   each document. Thanks to Nicholas Clark for the analysis. (perl
    #103202)
 
  - In the pod2man and pod2text driver scripts, report an error and remove
    the empty output file if the input file had no content (if it did not
-   exist, for example).  Exit with non-zero status if there were any
-   errors.  Track contentless status inside Pod::Man and Pod::Text.
-   Thanks, Dmitry Smirnov.  (#75099)
+   exist, for example). Exit with non-zero status if there were any
+   errors. Track contentless status inside Pod::Man and Pod::Text. Thanks,
+   Dmitry Smirnov. (#75099)
 
  - Override parse_file in Pod::Man and Pod::Text to set output_fh to
-   STDOUT if it is not already set.  (#77530)
+   STDOUT if it is not already set. (#77530)
 
  - Format the URL text in Pod::Man before comparing it to the anchor when
-   deciding whether to show separate anchor text.  This avoids spurious
+   deciding whether to show separate anchor text. This avoids spurious
    mismatches between the URL target and anchor text because the anchor
    text was already formatted and has (for example) hyphens escaped.
    (#76396)
 
  - Define \*(C` and \*(C' to the empty string in *roff output when
-   processed through troff to avoid groff warnings.  Avoid warnings from
+   processed through troff to avoid groff warnings. Avoid warnings from
    checking the F register (used to enable index output) when running
-   under groff.  Patch from Bjarni Ingi Gislason.  (#75434)
+   under groff. Patch from Bjarni Ingi Gislason. (#75434)
 
  - Fix the ASCII fallback string for the AE ligature in *roff output to
    use the string that was actually defined.
 
  - Stop removing pod2man and pod2text on make realclean, left over from
-   when they were generated from *.PL scripts.  (#74848)
+   when they were generated from *.PL scripts. (#74848)
 
  - Embed the PID in file names generated by the test suite to avoid
-   conflicts when running the test suite in parallel.  (#62083)
+   conflicts when running the test suite in parallel. (#62083)
 
 2.4.0 - 2010-10-10
 
  - Switch UTF-8 output encoding to use Encode directly instead of adding a
-   PerlIO layer.  Probe the PerlIO layers with protection for Perl
-   versions without PerlIO and set a flag indicating whether we also need
-   to encode, to avoid double-encoding when writing to a file handle that
-   is already doing UTF-8 encoding via PerlIO.
+   PerlIO layer. Probe the PerlIO layers with protection for Perl versions
+   without PerlIO and set a flag indicating whether we also need to
+   encode, to avoid double-encoding when writing to a file handle that is
+   already doing UTF-8 encoding via PerlIO.
 
  - Do not strip escaped trailing whitespace in *roff output such as that
    created by S<> at the end of a line, since the backslash is then taken
-   by *roff as escaping the newline.  Thanks, Kevin Ryde.  (#61781)
+   by *roff as escaping the newline. Thanks, Kevin Ryde. (#61781)
 
  - Add perlpodstyle, a new style guide for POD documentation, split mostly
-   from the NOTES section of the pod2man manual page.  Remove the NOTES
+   from the NOTES section of the pod2man manual page. Remove the NOTES
    section of pod2man's documentation.
 
  - Convert pod2man and pod2text from scripts generated from *.PL files to
@@ -615,57 +663,57 @@ v6.0.0 - 2024-07-10
 
 2.3.1 - 2010-02-17
 
- - Increase $VERSION in Pod::Text::Color and Pod::Text::Termcap, missed
-   in the previous release.
+ - Increase $VERSION in Pod::Text::Color and Pod::Text::Termcap, missed in
+   the previous release.
 
 2.3.0 - 2009-12-28
 
  - Support anchor text for L<> links of type URL by rendering the anchor
-   text and then the URL in angle brackets.  Now requires Pod::Simple 3.06
+   text and then the URL in angle brackets. Now requires Pod::Simple 3.06
    or later.
 
  - When formatting item tags in Pod::Text, use the width of the tag
-   without formatting codes.  This fixes formatting issues with
+   without formatting codes. This fixes formatting issues with
    Pod::Text::Color, Pod::Text::Termcap, and Pod::Text::Overstrike.
 
  - Suppress all formatting in the NAME section in *roff output to avoid
-   confusing lexgrog and fix mishandling of C<> markup in NAME.  Clarify
-   in the pod2man documentation that no markup should be used in the NAME
-   section of a manual page.  Thanks, Niko Tyni.
+   confusing lexgrog and fix mishandling of C<> markup in NAME. Clarify in
+   the pod2man documentation that no markup should be used in the NAME
+   section of a manual page. Thanks, Niko Tyni.
 
  - Escape backslashes in the quoted text of .IX macros generated from X<>
    formatting code in *roff output.
 
  - Avoid using POSIX::strftime in Pod::Man because POSIX requires Fcntl,
-   which is an XS module, and hence can't build in miniperl.  This allows
-   ExtUtils::MakeMaker to build as a normal module in Perl core.  Thanks,
+   which is an XS module, and hence can't build in miniperl. This allows
+   ExtUtils::MakeMaker to build as a normal module in Perl core. Thanks,
    Michael G Schwern.
 
- - Allow anchor text for URLs in Pod::ParseLink.  Fix the check of the
+ - Allow anchor text for URLs in Pod::ParseLink. Fix the check of the
    anchor text to not think no text was provided when the text was "0".
 
  - Remove the temporary files created by the test suite in a loop to
-   ensure that all versions are deleted on VMS.  Thanks, John E. Malmberg.
+   ensure that all versions are deleted on VMS. Thanks, John E. Malmberg.
 
 2.2.2 - 2009-01-17
 
  - In Pod::Text, correctly handle indentation of verbatim paragraphs that
-   contain lines with only whitespace.  Thanks, Renee Baecker.
+   contain lines with only whitespace. Thanks, Renee Baecker.
 
 2.2.1 - 2008-12-19
 
  - In the legacy pod2text method, properly initialize the output file
-   handle when called with only one argument.  Thanks, Michael G Schwern.
+   handle when called with only one argument. Thanks, Michael G Schwern.
 
  - Fix the t/text-encoding.t test on Windows by setting raw encoding on
-   the output file handle.  Thanks, Steve Hay.
+   the output file handle. Thanks, Steve Hay.
 
 2.2.0 - 2008-10-05
 
  - Try to preserve the previous Pod::Text behavior of setting the output
    encoding to match the input encoding if utf8 is not set, but support
-   forcing an output encoding of utf8 with the utf8 option.  Add a
-   corresponding --utf8 option to pod2text.  Document the PerlIO
+   forcing an output encoding of utf8 with the utf8 option. Add a
+   corresponding --utf8 option to pod2text. Document the PerlIO
    limitations of the current utf8 support.
 
  - Quote all module version numbers to preserve any trailing zeroes.
@@ -678,12 +726,12 @@ v6.0.0 - 2024-07-10
 
  - Add a stderr option to Pod::Man and Pod::Text that sends POD errors to
    standard error instead of adding a POD ERRORS section to the generated
-   documentation.  Add a corresponding --stderr option to pod2man and
+   documentation. Add a corresponding --stderr option to pod2man and
    pod2text.
 
- - Stop remapping the code point for non-breaking space in Pod::Man.  This
+ - Stop remapping the code point for non-breaking space in Pod::Man. This
    should not be necessary and was wrong when the string from Pod::Simple
-   was a character string and not a byte string.  It was papering over a
+   was a character string and not a byte string. It was papering over a
    bug in setting the encoding of an input POD file.
 
 2.1.2 - 2008-07-20
@@ -706,9 +754,9 @@ v6.0.0 - 2024-07-10
 
 2.1.0 - 2008-06-01
 
- - Add a new utf8 option to Pod::Man.  If set, do not convert non-ASCII
+ - Add a new utf8 option to Pod::Man. If set, do not convert non-ASCII
    characters to *roff escapes or X, and instead output literal UTF-8
-   characters.  Add a new --utf8 option to pod2man.
+   characters. Add a new --utf8 option to pod2man.
 
  - In Pod::Man, match text between \f(CW and \fP or \fR in headings
    non-greedily to get the fonts right with multiple C<> formatting codes.
@@ -719,8 +767,8 @@ v6.0.0 - 2024-07-10
 
  - In Pod::Man, escape backslashes separately from processing non-ASCII
    characters and do that, dash escaping, and underscore adjustment before
-   processing non-ASCII characters.  Otherwise, we escape the hyphen in
-   eth characters.
+   processing non-ASCII characters. Otherwise, we escape the hyphen in eth
+   characters.
 
 2.0.6 - 2007-11-28
 
@@ -737,9 +785,9 @@ v6.0.0 - 2024-07-10
 2.0.5 - 2006-09-16
 
  - Accept and mostly ignore a hash of options as the first option to
-   parse_from_file.  Support an option of -cutting and configure
-   Pod::Simple to assume the POD has already started.  This is for
-   backward compatibility with Pod::Parser.
+   parse_from_file. Support an option of -cutting and configure
+   Pod::Simple to assume the POD has already started. This is for backward
+   compatibility with Pod::Parser.
 
  - Recognize more uses of hyphens in regular English text and allow them
    to be regular hyphens in *roff output.
@@ -748,7 +796,7 @@ v6.0.0 - 2024-07-10
    since that's where groff turns them on.
 
  - Stop mapping vertical bar to \(bv in *roff output, since it produces
-   Unicode characters where they aren't desirable.  Remove the preamble
+   Unicode characters where they aren't desirable. Remove the preamble
    reference to the Tr string, which was never defined.
 
 2.0.4 - 2006-02-19
@@ -763,15 +811,14 @@ v6.0.0 - 2024-07-10
 2.0.3 - 2006-01-28
 
  - In the test suite, pass in a file handle for Pod::Simple output and
-   then close it afterwards.  This works around Pod::Simple leaving file
-   handles open and preventing removal of temporary files on Windows.
-   This is temporary until a new Pod::Simple release offers a better
-   approach.
+   then close it afterwards. This works around Pod::Simple leaving file
+   handles open and preventing removal of temporary files on Windows. This
+   is temporary until a new Pod::Simple release offers a better approach.
 
 2.0.2 - 2006-01-25
 
  - In the parse_from_file method, flush the output file handle rather than
-   closing it.  Closing it is unexpected and could break callers.
+   closing it. Closing it is unexpected and could break callers.
 
  - In Pod::Text::Termcap and Pod::Text::Color, use additional temporary
    variables to avoid ${char}{0,$width} in regexes, which only works in
@@ -781,11 +828,11 @@ v6.0.0 - 2024-07-10
 
  - Call reinit before calling the Pod::Simple parse_from_file method to
    preserve the previous capability of reusing the same Pod::Man object
-   for multiple documents.  Close the output file handle after Pod::Simple
+   for multiple documents. Close the output file handle after Pod::Simple
    returns to force the output to flush.
 
  - The legacy pod2text method was broken because Pod::Simple's parse_file
-   method only takes one argument.  Pass the second argument to output_fh
+   method only takes one argument. Pass the second argument to output_fh
    instead.
 
  - Fix portability issues with Perl 5.005.
@@ -796,9 +843,9 @@ v6.0.0 - 2024-07-10
 2.00 - 2005-11-28
 
  - Rewrite all modules and driver scripts to use Pod::Simple instead of
-   Pod::Parser.  The output should be identical except that C<> with no
+   Pod::Parser. The output should be identical except that C<> with no
    content outputs quotes for Pod::Text-based parsers, E<> handling is
-   improved, and various small bugs have been fixed.  Thanks, Sean Burke.
+   improved, and various small bugs have been fixed. Thanks, Sean Burke.
 
  - Create a new parser for each file in pod2man since Pod::Simple parsers
    are not reusable.
@@ -807,7 +854,7 @@ v6.0.0 - 2024-07-10
    similar to pod2man.
 
  - Strip vendor_perl as well as site_perl when determining the manual page
-   title.  Thanks, Alexey Tourbin.
+   title. Thanks, Alexey Tourbin.
 
  - Count text lengths correctly when wrapping in Pod::Text::Color and
    Pod::Text::Termcap when there are multiple adjacent escape sequences.
@@ -830,15 +877,14 @@ v6.0.0 - 2024-07-10
 1.25 - 2003-01-04
 
  - In Pod::Man, track the type of items in an =over list and only map
-   asterisk to a real bullet if the item type is bullet.  Fix a bug where
+   asterisk to a real bullet if the item type is bullet. Fix a bug where
    =item 0 was treated the same as =item with no tag.
 
 1.24 - 2002-08-03
 
  - Support a margin option in Pod::Text and use it to set the initial
-   indentation level.  Fix handling of the colon in the margin when the
-   alt format is enabled.  Add a new -m option to pod2text to set the
-   margin.
+   indentation level. Fix handling of the colon in the margin when the alt
+   format is enabled. Add a new -m option to pod2text to set the margin.
 
 1.23 - 2002-07-14
 
@@ -868,8 +914,8 @@ v6.0.0 - 2024-07-10
 1.19 - 2002-01-02
 
  - Do not apply Pod::Man guesswork to the text inside the NAME section,
-   since it may confuse programs like catman.  Do not output .UC after the
-   .TH macro.  catman doesn't like anything between the NAME section and
+   since it may confuse programs like catman. Do not output .UC after the
+   .TH macro. catman doesn't like anything between the NAME section and
    .TH, and .UC doesn't appear to actually do anything on any modern
    platform.
 
@@ -879,8 +925,8 @@ v6.0.0 - 2024-07-10
  - Fix error reporting in Pod::Text for unknown sequences and unknown
    commands to be more consistent and update the documentation to match.
 
- - Change terminal speed to a number in Pod::Text::Termcap.  Also fall
-   back on a hard-coded terminal speed if getospeed doesn't work.
+ - Change terminal speed to a number in Pod::Text::Termcap. Also fall back
+   on a hard-coded terminal speed if getospeed doesn't work.
 
 1.18 - 2001-11-30
 
@@ -892,10 +938,10 @@ v6.0.0 - 2024-07-10
 1.17 - 2001-11-27
 
  - In Pod::Man, return references to arrays rather than references to
-   scalars for already-formatted text.  There are too many odd bugs with
-   scalar references in older versions of Perl.  No longer bless
-   references since the current Pod::Parser doesn't require it.  Now
-   requires Pod::Parser 1.13 or later.
+   scalars for already-formatted text. There are too many odd bugs with
+   scalar references in older versions of Perl. No longer bless references
+   since the current Pod::Parser doesn't require it. Now requires
+   Pod::Parser 1.13 or later.
 
  - Change all documentation references from interior sequences to
    formatting codes to match the terminology of perlpodspec.
@@ -908,9 +954,9 @@ v6.0.0 - 2024-07-10
 1.15 - 2001-11-26
 
  - Wrap the call to Term::Cap in Pod::Text::Termcap with eval because it
-   throws exceptions if the terminal can't be found.  Fall back on the
-   ANSI escape sequences rather than dying if the termcap entry is
-   incomplete.  Note the fallback in the documentation.
+   throws exceptions if the terminal can't be found. Fall back on the ANSI
+   escape sequences rather than dying if the termcap entry is incomplete.
+   Note the fallback in the documentation.
 
  - Delete the lax option in pod2man before calling Pod::Man and document
    that it is obsolete and podchecker should be used instead.
@@ -926,8 +972,8 @@ v6.0.0 - 2024-07-10
    formatting before applying new formatting.
 
  - Use font escapes in Pod::Man rather than .I to avoid strange problems
-   with quoting, at least for =head3.  =head1 and =head2 likely still have
-   troubles with repeated double-quotes.  Fix all fixed-width font changes
+   with quoting, at least for =head3. =head1 and =head2 likely still have
+   troubles with repeated double-quotes. Fix all fixed-width font changes
    for nroff, not just the simple ones, and don't hard-code the value of
    any fixed-width font.
 
@@ -938,13 +984,13 @@ v6.0.0 - 2024-07-10
    dash and other text.
 
  - Fix handling of =for or =begin/=end in =item paragraphs in Pod::Text.
-   Default to a tag of "*" if none is given.  Insert some whitespace for
+   Default to a tag of "*" if none is given. Insert some whitespace for
    empty item paragraphs to keep them from blending into subsequent text.
 
  - Fix a Pod::ParseLink bug in the handling of link text that's entirely
-   in quotes.  Double quotes are now only removed around sections, not
-   names.  Text enclosed entirely in double quotes is interpreted as a
-   link to a section.
+   in quotes. Double quotes are now only removed around sections, not
+   names. Text enclosed entirely in double quotes is interpreted as a link
+   to a section.
 
  - Fix various -w warnings.
 
@@ -955,8 +1001,8 @@ v6.0.0 - 2024-07-10
 1.12 - 2001-11-15
 
  - Add a new module, Pod::ParseLink, to parse the contents of an L<>
-   sequence.  Use it everywhere.  Defer expansion of formatting escapes
-   inside L<> until after L<> is processed.  Surround URLs with angle
+   sequence. Use it everywhere. Defer expansion of formatting escapes
+   inside L<> until after L<> is processed. Surround URLs with angle
    brackets in the output.
 
  - Remove the special handling of consecutive L</section> links.
@@ -964,12 +1010,12 @@ v6.0.0 - 2024-07-10
  - Support E<apos>, E<nbsp>, and E<shy>.
 
  - Completely rewrite the name parsing code for modules in Pod::Man to use
-   File::Spec.  In the process, fix a bug in dealing with the new
-   three-component version number directories.  Swap the order of date and
+   File::Spec. In the process, fix a bug in dealing with the new
+   three-component version number directories. Swap the order of date and
    release in the .TH line to better comply with the man macro
    documentation.
 
- - Rewrite the handling of dashes and hyphens in Pod::Man.  Be much more
+ - Rewrite the handling of dashes and hyphens in Pod::Man. Be much more
    conservative about which hyphens are turned into dashes, and make all
    hyphens non-breaking unless we can be fairly sure that they're inside
    normal words.
@@ -981,7 +1027,7 @@ v6.0.0 - 2024-07-10
  - Only try to determine a module name from the path for the manual page
    name if the manual page we're generating is in section 3.
 
- - No longer insert a timestamp into the generated manual page.  It just
+ - No longer insert a timestamp into the generated manual page. It just
    causes unnecessary differences and merge conflicts.
 
  - Inside S<> in Pod::Man, convert all whitespace to non-breaking spaces,
@@ -991,22 +1037,22 @@ v6.0.0 - 2024-07-10
    Pod::Man.
 
  - Use L<> for all manual page references in the documentation that should
-   be highlighted.  Switch the rest to bold versions of the program name.
+   be highlighted. Switch the rest to bold versions of the program name.
    Change func(n) to func(3) in the example of things that are
-   automatically formatted so that it will be formatted.  Remove from BUGS
+   automatically formatted so that it will be formatted. Remove from BUGS
    the note that some of the path mangling assumes Unix directory
-   separators.  Don't give anchor text for L<> links that no longer
-   require it.
+   separators. Don't give anchor text for L<> links that no longer require
+   it.
 
  - Update the documentation in Pod::Text and subclasses to use
-   now-allowable POD constructs like C<< >>.  Don't escape angle brackets
-   that don't require escaping.  Don't give anchor text for L<> links that
+   now-allowable POD constructs like C<< >>. Don't escape angle brackets
+   that don't require escaping. Don't give anchor text for L<> links that
    no longer require it.
 
 1.11 - 2001-10-20
 
  - Add the code option to Pod::Text to include the non-POD text of the
-   input file and document it.  Add the corresponding --code flag to
+   input file and document it. Add the corresponding --code flag to
    pod2text.
 
  - Convert warnings for unknown escapes, unknown sequences, and unmatched
@@ -1028,16 +1074,16 @@ v6.0.0 - 2024-07-10
  - Add heuristics to decide whether to quote the argument of C<>.
 
  - Remove font changes for nroff with C<> to work around a bug in the
-   Solaris 2.6 version of nroff's handling of \fP in headings.  No longer
+   Solaris 2.6 version of nroff's handling of \fP in headings. No longer
    add an extra level of quoting for =item; it isn't necessary.
 
- - Remove the Pod::Man logic turning PI into a pretty pi character.  It
+ - Remove the Pod::Man logic turning PI into a pretty pi character. It
    produces too many false positives.
 
- - Remove the definition .Ip from the preamble of *roff output.  Remove
+ - Remove the definition .Ip from the preamble of *roff output. Remove
    .bd B 3 from the preamble; this isn't part of the accent mark
    definitions but instead changes the way bolding is done, confusing some
-   other translators.  Use .IP instead of .Ip everywhere.
+   other translators. Use .IP instead of .Ip everywhere.
 
  - In the POD style section of pod2man, add a description of the COPYRIGHT
    AND LICENSE section, add a mention of a mailing list in SEE ALSO, and
@@ -1046,15 +1092,15 @@ v6.0.0 - 2024-07-10
 
 1.09 - 2001-04-09
 
- - Fine-tune *roff formatting guesswork.  Don't allow colons after
+ - Fine-tune *roff formatting guesswork. Don't allow colons after
    sequences to put in small caps since they're already handled by being
    rolled into the sequence and were causing weird things to happen in
-   references to functions.  Allow small caps before an open paren.  Teach
+   references to functions. Allow small caps before an open paren. Teach
    the handling of functions and manual page references about small caps
    escapes, and be pickier about what constitutes a manual page reference.
 
  - Fix again the incorrect mappings for E<Iacute> and E<iacute> in
-   Pod::Text, and this time for E<Igrave> and E<igrave> too.  Thanks, Sean
+   Pod::Text, and this time for E<Igrave> and E<igrave> too. Thanks, Sean
    Burke.
 
 1.08 - 2001-02-09
@@ -1070,11 +1116,11 @@ v6.0.0 - 2024-07-10
 
 1.06 - 2000-12-25
 
- - New Pod::Text::Overstrike contributed by Joe Smith.  Pass -o or
+ - New Pod::Text::Overstrike contributed by Joe Smith. Pass -o or
    --overstrike to pod2text to use it for formatting.
 
  - Add another level of quoting of double quotes for =item text in *roff
-   output.  This was already present but not working for C<> text because
+   output. This was already present but not working for C<> text because
    it was in the wrong order.
 
 1.05 - 2000-11-18
@@ -1091,12 +1137,12 @@ v6.0.0 - 2024-07-10
  - Switch \*C` and \*C' sequences in *roff output from C<> as well as
    literal double-quotes if the quote character contains double quotes.
    Not doing this was causing weird output on some systems in some
-   circumstances.  Use a separate quote mapping function for text blocks
-   to work around a Solaris 2.6 nroff bug.
+   circumstances. Use a separate quote mapping function for text blocks to
+   work around a Solaris 2.6 nroff bug.
 
  - Use \fP to switch back to the default font in *roff output rather than
    changing back to \fR so that font changes work correctly in headings
-   using a different font.  Sprinkle \fP through all font changes so that
+   using a different font. Sprinkle \fP through all font changes so that
    the default font is always the "previous" font so that the above works.
 
 1.04 - 2000-10-09
@@ -1110,8 +1156,8 @@ v6.0.0 - 2024-07-10
 
 1.03 - 2000-09-03
 
- - Support configuration of what quote characters to use around C<>
-   text.  Add a new --quotes option to pod2man and pod2text.
+ - Support configuration of what quote characters to use around C<> text.
+   Add a new --quotes option to pod2man and pod2text.
 
  - Report nicer errors when encountering an unknown paragraph command.
 
@@ -1148,19 +1194,19 @@ v6.0.0 - 2024-07-10
    Pod::Parser will interpret them as STDIN or STDOUT.
 
  - Protect any line in *roff output that starts with a backlash and
-   leading periods following font escapes.  Replace embedded newlines in
+   leading periods following font escapes. Replace embedded newlines in
    titles with spaces.
 
  - Use "perl v5.6.0" instead of "perl 5.6, patch 0" for the default
    release string in *roff output, and handle both pre-5.6 and post-5.6
-   version numbering schemes.  Zero-pad the month and day in the
-   modification date.  Avoid warnings when center, date, or release aren't
+   version numbering schemes. Zero-pad the month and day in the
+   modification date. Avoid warnings when center, date, or release aren't
    set.
 
  - Allow for two-character fonts in *roff output.
 
  - Work around a Perl 5.6 bug affecting L<> text generation in *roff
-   output.  Fix Z<> handling with current Perl.
+   output. Fix Z<> handling with current Perl.
 
  - Make filename munging safe in *roff output even when $* is set and the
    filenames contain embedded newlines.
@@ -1168,7 +1214,7 @@ v6.0.0 - 2024-07-10
  - Fix the regex to concatenate multiple L<> section links in *roff
    output, and fix whitespace handling for it around "and".
 
- - Add the remaining ISO 8859-1 HTML entities to Pod::Text.  Thanks, Tim
+ - Add the remaining ISO 8859-1 HTML entities to Pod::Text. Thanks, Tim
    Jenness.
 
  - Change Getopt::Long config in pod2man from bundling to
@@ -1195,9 +1241,9 @@ v6.0.0 - 2024-07-10
    escapes until just before output, *roff output is generated by the
    interior sequence parsing and the result is passed up the parse trees
    as Pod::Man::String objects instead of scalars to mark the output as
-   already processed.  In the process, clean up what *roff escaping and
+   already processed. In the process, clean up what *roff escaping and
    guesswork is applied where, and clean up the whole process of applying
-   guesswork.  Improve the escaping of dashes and hyphens to use a single
+   guesswork. Improve the escaping of dashes and hyphens to use a single
    pass.
 
  - Improve the small caps guesswork for *roff output to allow for more

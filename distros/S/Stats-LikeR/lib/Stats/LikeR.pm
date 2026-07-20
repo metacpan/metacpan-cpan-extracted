@@ -2,27 +2,16 @@
 # ABSTRACT: Get basic statistical functions, like in R, but with Perl using XS for performance
 require 5.010;
 use strict;
-use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.23;
+our $VERSION = 0.25;
 require XSLoader;
 use warnings FATAL => 'all';
 use autodie ':default';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(add_data agg anova aoh2hoa aoh2hoh aov assign binom_test cfilter chisq_test chunk col col2col colnames concat cor cor_test cov csort dnorm drop_cols dropna filter fisher_test get_union get_unique glm group_by hoa2aoh hoa2hoh hoh2hoa hist intersection is_equivalent kruskal_test ks_test Lonly ljoin lm map_cell matrix max mean median min mode ncol nrow oneway_test p_adjust pnorm power_t_test predict prcomp ptukey qcut qtukey quantile rank Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test sum summary t_test transpose TukeyHSD uniq vals value_counts var var_test view wilcox_test write_table);
+our @EXPORT_OK = qw(add_data agg anova aoh2hoa aoh2hoh aov assign bfill binom_test cfilter chisq_test chunk col col2col colnames concat cor cor_test cov csort dnorm drop_cols drop_duplicates dropna ffill fillna filter fisher_test get_union glm group_by hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm power_t_test predict prcomp ptukey qcut qtukey quantile rank Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test sum summary t_test transpose TukeyHSD uniq vals value_counts var var_test view wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
-
-# =====================================================================
-# 1) Add to @EXPORT_OK (line 14).  @EXPORT = @EXPORT_OK, so nothing else
-#    to touch.  Insert `colnames` after `col2col` and `rownames` after
-#    `rnorm` to keep the run roughly alphabetical:
-#
-#    ... chunk col col2col colnames concat cor cor_test ...
-#    ... rbinom read_table rnorm rownames runif sample ...
-# =====================================================================
-
 
 # colnames($df) / rownames($df)
 #
@@ -1011,6 +1000,30 @@ sub col { Stats::LikeR::col::_new(@_) }
 			unless ref $c eq 'CODE';
 		return bless { code => sub { $c->($_[0]) ? 0 : 1 } }, __PACKAGE__;
 	}
+
+	# regex predicates.  Perl cannot overload =~, so col('x') =~ /re/ can never
+	# be intercepted; these methods give the same deferred, composable predicate
+	# instead.  The pattern is a qr// or a string (compiled with qr//); an undef
+	# cell never matches (mirroring the string comparisons).
+	#   filter($df, col('id')->match(qr/^5iz/));
+	#   filter($df, col('id')->nomatch('^5iz'));            # string pattern ok
+	#   filter($df, col('id')->match(qr/^5iz/) & (col('res') < 2.5));
+	sub _match {
+		my ($self, $re, $want, $how) = @_;
+		die "col(): ->$how must start from a bare column, e.g. col('x')->$how(qr/.../)\n"
+			unless defined $self->{name};
+		die "col(): ->$how needs a pattern (a qr// or a string)\n" unless defined $re;
+		my $qr   = ref $re eq 'Regexp' ? $re : qr/$re/;
+		my $name = $self->{name};
+		my $code = sub {
+			my $c = $_[0]{$name};
+			return 0 unless defined $c;
+			return ( ($c =~ $qr) ? 1 : 0 ) == $want ? 1 : 0;
+		};
+		return bless { code => $code }, __PACKAGE__;
+	}
+	sub match   { _match($_[0], $_[1], 1, 'match') }
+	sub nomatch { _match($_[0], $_[1], 0, 'nomatch') }
 }
 
 # ---------------------------------------------------------------------------
@@ -1259,6 +1272,92 @@ sub dropna {
 	}
 
 	die "dropna: data frame must be an arrayref (AoH) or hashref (HoA/HoH)\n";
+}
+
+# drop_duplicates($df, subset => $col | \@cols, keep => 'first' | 'last' | 0)
+#
+# Remove duplicate rows, loosely modeled on pandas' DataFrame.drop_duplicates.
+# Works on the three positional/columnar shapes -- AoA, AoH, HoA -- but NOT
+# HoH (its rows are labeled, so "drop_duplicates" has no natural meaning; call
+# hoh2aoh/hoh2hoa first).  Two rows are duplicates when their cells are equal
+# in every subset column; comparison is by stringified value with a distinct
+# undef (NA), exactly the key semantics merge() uses, so 1 and "1.0" differ.
+#
+#   subset  scalar or arrayref of the columns that define a row's identity;
+#           default every column.  For AoA these are 0-based integer positions
+#           (default 0 .. widest-row-1); for AoH/HoA they are column names
+#           (AoH default: the sorted union of row keys; HoA: the sorted keys).
+#   keep    which occurrence to keep: 'first' (default) keeps the earliest,
+#           'last' the latest, 0 (or 'none') drops every row that has a dup.
+#
+# Row order is preserved (first-seen positions for the survivors).  Returns a
+# NEW top-level frame of the same family; the original is never modified.  For
+# AoA/AoH the surviving row refs are reused (cells shared, not deep-copied);
+# for HoA the columns are rebuilt with the surviving cells copied.
+sub drop_duplicates {
+	my $df = shift;
+	die "drop_duplicates: undefined data in first position\n" unless defined $df;
+	die "drop_duplicates: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+	my %known = ( subset => 1, keep => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "drop_duplicates: unknown argument(s): @bad\n" if @bad;
+
+	my $shape = _df_shape($df, 'drop_duplicates');
+	die "drop_duplicates: an HoH data frame is not supported (convert to AoH/HoA/AoA first)\n"
+		if $shape eq 'HoH';
+
+	# keep -> code: 1 = first, -1 = last, 0 = drop every duplicate
+	my $keep = exists $arg{keep} ? $arg{keep} : 'first';
+	die "drop_duplicates: 'keep' is undefined (use 'first', 'last', or 0)\n"
+		unless defined $keep;
+	my $kc;
+	if    ($keep eq 'first') { $kc =  1 }
+	elsif ($keep eq 'last')  { $kc = -1 }
+	elsif ($keep eq 'none' || $keep eq '' || (looks_like_number($keep) && $keep == 0)) { $kc = 0 }
+	else  { die "drop_duplicates: 'keep' must be 'first', 'last', or 0 (got '$keep')\n" }
+
+	# subset -> ordered column list
+	my @sub;
+	if (exists $arg{subset} && defined $arg{subset}) {
+		my $s = $arg{subset};
+		if    (ref $s eq 'ARRAY') { @sub = @$s }
+		elsif (!ref $s)           { @sub = ($s) }
+		else { die "drop_duplicates: 'subset' must be a column or an arrayref of columns\n" }
+		die "drop_duplicates: 'subset' is empty\n" unless @sub;
+		my %seen;
+		for my $c (@sub) {
+			die "drop_duplicates: undefined column in 'subset'\n" unless defined $c;
+			die "drop_duplicates: duplicate column '$c' in 'subset'\n" if $seen{$c}++;
+		}
+	}
+
+	if ($shape eq 'AoA') {
+		if (@sub) { _aoa_int_cols('drop_duplicates', $df, @sub) }
+		else      { @sub = (0 .. _aoa_width($df) - 1) }
+		return _drop_dups_core($df, 3, [ @sub ], $kc);
+	}
+	if ($shape eq 'AoH') {
+		my $present = _present_keys($df, 'AoH');
+		if (@sub) {
+			for my $c (@sub) {
+				die "drop_duplicates: column '$c' not found\n" unless $present->{$c};
+			}
+		} else {
+			@sub = sort keys %$present;
+		}
+		return _drop_dups_core($df, 1, [ @sub ], $kc);
+	}
+	# HoA
+	if (@sub) {
+		for my $c (@sub) {
+			die "drop_duplicates: column '$c' not found\n" unless exists $df->{$c};
+		}
+	} else {
+		@sub = sort keys %$df;
+	}
+	return _drop_dups_core($df, 4, [ @sub ], $kc);
 }
 # Count rows across Stats::LikeR frame forms: AoH, AoA, HoA, HoH.
 
@@ -1512,100 +1611,136 @@ HELP
 	return $want_edges ? ($out, $edges) : $out;
 }
 
+# summary($data, %opts) -- R-style five-number-plus-mean summary.
+#
+# Accepts every shape view() does and computes one statistics row per numeric
+# "variable": a flat vector (one row); an AoA (one row per inner array, labelled
+# by Index); a HoA (one row per key); and -- like view() -- an AoH or HoH (one
+# row per column, gathered across the rows). Non-numeric and undefined cells are
+# ignored (they never count toward '# values'); an all-non-numeric variable
+# shows 0 values and 'na' statistics. Output, colour, and the display options
+# are rendered exactly like view() via the shared _render_grid().
 sub summary {
-	my ($data, %args);
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
+	# options view() understands, plus the row-cap synonyms
+	my %opt_key = map { $_ => 1 } qw(
+		nrows nrow n rows
+		na color colors max_width ellipsis gap width to return_only
+	);
+	my ($data, %args);
 	if (@_ && ref $_[0]) {
-	  # Handles: summary(\@arr) or summary(\@arr, nrows => 5) or summary(\%h, nrow => 3)
-	  $data = shift;
-	  %args = @_; # capture any trailing key/value pairs
+		# summary(\@arr, ...) / summary(\%h, ...)
+		$data = shift;
+		%args = @_;
 	} else {
-	  # Handles: summary(@runif) or summary(@runif, nrows => 2)
-	  # Extract known trailing named arguments from the flat list
-	  while (@_ >= 2 && defined $_[-2] && !ref($_[-2]) && $_[-2] =~ /^(?:nrows|nrow)$/) {
-	  	  my $val = pop @_;
-		  my $key = pop @_;
-		  $args{$key} = $val;
-	  }
-	  # The remaining items in @_ make up the actual data array
-	  my @list = @_;
-	  $data = \@list;
-	}
-	# Normalize nrow -> nrows, default to 10
-	$args{nrows} //= delete($args{nrow}) // 10;
-	my $ref_type = ref $data;
-	if (($ref_type ne 'ARRAY') && ($ref_type ne 'HASH')) {
-		die "$current_sub: data must either be a hash or an array, not \"$ref_type\"";
-	}
-	my $single_arr = 0;
-	if (($ref_type eq 'ARRAY') && (ref $data->[0] eq '')) {
-		$single_arr = 1;
-	}
-	my @header = ('# values', 'Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.');
-	my @out;
-	if ($single_arr == 1) {
-		push @out, '-' x 75;
-		my $header = sprintf('%9s ' x scalar @header, @header);
-		push @out, $header;
-		push @out, '-' x 75;
-		my @undef = grep {!defined $data->[$_]} 0..scalar @{ $data }-1;
-		if (scalar @undef > 0) {
-			say STDERR join (',', @undef);
-			die "The above indices are not defined in $current_sub";
+		# summary(@vector) / summary(@vector, nrows => N): peel recognised
+		# trailing key/value option pairs off the flat list; the rest is data.
+		while (@_ >= 2 && defined $_[-2] && !ref($_[-2]) && $opt_key{ $_[-2] }) {
+			my $val = pop @_;
+			my $key = pop @_;
+			$args{$key} = $val;
 		}
-		my @numeric = grep {looks_like_number($_)} @{ $data };
+		my @list = @_;
+		$data = \@list;
+	}
+	my @bad = sort grep { !$opt_key{$_} } keys %args;
+	die "$current_sub: unknown argument(s): @bad\n" if @bad;
+	# row cap: nrows / nrow / n / rows are synonyms (default 10)
+	my $nrows = exists $args{nrows} ? $args{nrows} : exists $args{nrow} ? $args{nrow}
+			  : exists $args{n}     ? $args{n}     : exists $args{rows} ? $args{rows}
+			  :                       10;
+	die "$current_sub: 'nrows' must be a non-negative integer\n"
+		unless defined $nrows && $nrows =~ /^\d+$/;
+
+	my $rt = ref $data;
+	die "$current_sub: data must either be a hash or an array, not \"$rt\"\n"
+		unless $rt eq 'ARRAY' or $rt eq 'HASH';
+
+	# --- resolve the data shape into (label, numeric-vector) series ---
+	my (@labels, @vecs, $lab_header);
+	if ($rt eq 'ARRAY') {
+		my $first;
+		for my $e (@$data) { if (defined $e) { $first = $e; last } }
+		my $ft = ref $first;
+		if ($ft eq 'HASH') {			# AoH: one series per column
+			$lab_header = 'Column';
+			my %seen;
+			for my $row (@$data) { next unless ref $row eq 'HASH'; $seen{$_} = 1 for keys %$row }
+			for my $col (sort keys %seen) {
+				push @labels, $col;
+				push @vecs, [ map { ref $_ eq 'HASH' ? $_->{$col} : undef } @$data ];
+			}
+		} elsif ($ft eq 'ARRAY') {		# AoA: one series per inner array
+			$lab_header = 'Index';
+			for my $i (0 .. $#$data) {
+				push @labels, $i;
+				push @vecs, (ref $data->[$i] eq 'ARRAY' ? [ @{ $data->[$i] } ] : []);
+			}
+		} else {						# flat vector: a single series
+			$lab_header = '';
+			push @labels, '';
+			push @vecs, [ @$data ];
+		}
+	} else { # HASH
+		my @keys = keys %$data;
+		my $sample;
+		for my $k (@keys) { $sample = $data->{$k}; last if defined $sample }
+		my $vt = ref $sample;
+		if ($vt eq 'ARRAY') {			# HoA: one series per key
+			$lab_header = 'Key';
+			for my $k (sort { lc $a cmp lc $b } @keys) {
+				push @labels, $k;
+				push @vecs, (ref $data->{$k} eq 'ARRAY' ? [ @{ $data->{$k} } ] : []);
+			}
+		} elsif ($vt eq 'HASH') {		# HoH: one series per column (inner key)
+			$lab_header = 'Column';
+			my %seen;
+			for my $k (@keys) { next unless ref $data->{$k} eq 'HASH'; $seen{$_} = 1 for keys %{ $data->{$k} } }
+			for my $col (sort keys %seen) {
+				push @labels, $col;
+				push @vecs, [ map { ref $data->{$_} eq 'HASH' ? $data->{$_}{$col} : undef } @keys ];
+			}
+		} else {						# flat hash: its values as one series
+			$lab_header = '';
+			push @labels, '';
+			push @vecs, [ map { $data->{$_} } @keys ];
+		}
+	}
+
+	# --- compute the statistics grid ---
+	my @colnames = ('# values', 'Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.');
+	my @raw;
+	for my $vec (@vecs) {
+		my @numeric = grep { defined $_ && looks_like_number($_) } @$vec;
+		if (!@numeric) { push @raw, [ 0, (undef) x 6 ]; next }	# empty -> na stats
 		my $q = quantile(\@numeric, probs => [0.25, 0.75]);
-		my $vals = sprintf('%9.4g ' x scalar @header, scalar @numeric, min(\@numeric), $q->{'25%'}, median(\@numeric), mean(\@numeric), $q->{'75%'}, max(\@numeric));
-		push @out, $vals;
-	} elsif ($ref_type eq 'ARRAY') {
-		push @out, '-' x 75;
-		my $header = sprintf('%9s ' x scalar @header, @header);
-		unshift @header, 'Index';
-		$header = 'Index ' . $header;
-		push @out, $header;
-		push @out, '-' x 75;
-		my $rows_printed = 0;
-		foreach my $index (0..$#$data) {
-			my @undef = grep {!defined $data->[$index][$_]} 0..scalar @{ $data->[$index] }-1;
-			if (scalar @undef > 0) {
-				say STDERR join (',', @undef);
-				die "The above indices are not defined for index $index in $current_sub";
-			}
-			my @numeric = grep {looks_like_number($_)} @{ $data->[$index] };
-			my $q = quantile(\@numeric, probs => [0.25, 0.75]);
-			my $vals = sprintf('%6.4g', $index) . sprintf('%9.4g ' x (scalar @header - 1), scalar @numeric, min(\@numeric), $q->{'25%'}, median(\@numeric), mean(\@numeric), $q->{'75%'}, max(\@numeric));
-			push @out, $vals;
-			$rows_printed++;
-			last if $rows_printed >= $args{nrows}; # Changed to >= just to be safe
-		}
-	} elsif ($ref_type eq 'HASH') {
-		push @out, '-' x 78;
-		my $header = sprintf('%9s ' x scalar @header, @header);
-		unshift @header, 'Key';
-		$header = '  Key    ' . $header;
-		push @out, $header;
-		push @out, '-' x 78;
-		my $rows_printed = 0;
-		foreach my $key (sort {lc $a cmp lc $b} keys %{ $data }) {
-			my @undef = grep {!defined $data->{$key}[$_]} 0..scalar @{ $data->{$key} }-1;
-			if (scalar @undef > 0) {
-				say STDERR join (',', @undef);
-				die "The above indices are not defined for key $key in $current_sub";
-			}
-			my @numeric = grep {looks_like_number($_)} @{ $data->{$key} };
-			my $q = quantile(\@numeric, probs => [0.25, 0.75]);
-			my $print_key = substr($key, 0, 9);
-			if ((length $print_key) < 9) { # make sure that short keys line up correctly
-				$print_key .= ' ' x (9 - length $print_key);
-			}
-			my $vals = $print_key . sprintf('%9.4g ' x (scalar @header - 1), scalar @numeric, min(\@numeric), $q->{'25%'}, median(\@numeric), mean(\@numeric), $q->{'75%'}, max(\@numeric));
-			push @out, $vals;
-			$rows_printed++;
-			last if $rows_printed >= $args{nrows};
-		}
+		# format as %.4g strings; they still look numeric, so _render_grid
+		# right-aligns and colours them as numbers.
+		push @raw, [
+			scalar @numeric,
+			sprintf('%.4g', min(\@numeric)),    sprintf('%.4g', $q->{'25%'}),
+			sprintf('%.4g', median(\@numeric)), sprintf('%.4g', mean(\@numeric)),
+			sprintf('%.4g', $q->{'75%'}),       sprintf('%.4g', max(\@numeric)),
+		];
 	}
-	say join ("\n", @out);
-	return \@out;
+
+	# cap the number of series shown (keep the true total for the "... more" note)
+	my $total = scalar @labels;
+	if ($nrows < $total) { $#labels = $nrows - 1; $#raw = $nrows - 1; }
+
+	return _render_grid(
+		kind => 'summary', total => $total,
+		cols => \@colnames, labels => \@labels, raw => \@raw, lab_header => $lab_header,
+		na          => $args{na},
+		max_width   => $args{max_width},
+		ellipsis    => $args{ellipsis},
+		gap         => (exists $args{gap} ? ' ' x $args{gap} : undef),
+		width       => $args{width},
+		to          => $args{to},
+		return_only => $args{return_only},
+		color       => (exists $args{color} ? $args{color} : undef),
+		colors      => $args{colors},
+	);
 }
 
 # --- .xlsx support (pure Perl, no CPAN deps) -------------------------------
@@ -1647,11 +1782,18 @@ sub _xml_unescape {
 }
 
 # "AB12" (or "AB") -> 0-based column index (A=0, Z=25, AA=26, ...).
+# Hot path (called once per cell): walk the leading letters by ordinal and stop
+# at the first non-letter (the row number), avoiding a regex substitution and a
+# split // on every call.
 sub _xlsx_col_idx {
 	my ($ref) = @_;
-	(my $letters = $ref) =~ s/[^A-Za-z].*\z//s;
 	my $idx = 0;
-	$idx = $idx * 26 + (ord(uc $_) - ord('A') + 1) for split //, $letters;
+	for my $i (0 .. length($ref) - 1) {
+		my $o = ord(substr($ref, $i, 1));
+		if    ($o >= 65 && $o <=  90) { $idx = $idx * 26 + ($o - 64) }	# A-Z
+		elsif ($o >= 97 && $o <= 122) { $idx = $idx * 26 + ($o - 96) }	# a-z
+		else  { last }							# reached the digits
+	}
 	return $idx - 1;
 }
 
@@ -1746,24 +1888,49 @@ sub _parse_xlsx_sheet {
 		my $rowxml = $1;
 		my @cells;
 		my $maxc = -1;
-		while ($rowxml =~ m{<c\b([^>]*?)(?:/>|>(.*?)</c>)}gs) {
-			my ($cattrs, $cbody) = ($1, $2);
-			my ($r) = $cattrs =~ /\br="([^"]*)"/;
-			my ($t) = $cattrs =~ /\bt="([^"]*)"/;
-			my $ci  = defined $r ? _xlsx_col_idx($r) : $maxc + 1;
+		# The r="A1" reference is almost always the first attribute, so the
+		# tokenizer captures its column letters ($1) directly -- computing the
+		# index from a group the match already produced is the single biggest
+		# win in this loop. If the capture misses (r= absent, not first, or a
+		# non-standard lowercase ref), $cattrs still holds the full attributes
+		# and we parse r= from there; only then do we fall back to sequential.
+		while ($rowxml =~ m{<c(?:\s+r="([A-Z]+)\d+")?([^>]*?)(?:/>|>(.*?)</c>)}gs) {
+			my ($ref, $cattrs, $cbody) = ($1, $2, $3);
+			my $ci;
+			if (defined $ref) {
+				$ci = 0;
+				$ci = $ci * 26 + (ord(substr($ref, $_, 1)) - 64)
+					for 0 .. length($ref) - 1;
+				$ci--;
+			} elsif ($cattrs =~ /\br="([A-Za-z]+)/) {
+				$ci = _xlsx_col_idx($1);
+			} else {
+				$ci = $maxc + 1;
+			}
+			# Cell type: a plain substring test on the (short) attribute run is
+			# markedly cheaper than a capturing /\bt="..."/ match run once per
+			# cell. Only "s" and "inlineStr" denote strings; every other type
+			# value (str/b/e/n) and a missing t= take the raw <v> path, exactly
+			# as the previous /\bt="..."/ dispatch did. Cell-element attribute
+			# names are a fixed set (r,s,t,cm,vm,ph) whose other values are
+			# numeric refs, so 't="s"' / 't="inlineStr"' can only ever appear as
+			# the genuine type attribute -- no false substring match is possible.
 			my $val = '';
-			if (!defined $cbody) {			# <c .../> -- empty cell
-				$val = '';
-			} elsif (defined $t && $t eq 's') {	# shared-string index
-				my ($v) = $cbody =~ m{<v\b[^>]*>(.*?)</v>}s;
-				$val = (defined $v && $v =~ /^\d+\z/) ? ($sst->[$v] // '') : '';
-			} elsif (defined $t && $t eq 'inlineStr') {
-				my $s = '';
-				$s .= _xml_unescape($1) while $cbody =~ m{<t\b[^>]*>(.*?)</t>}gs;
-				$val = $s;
-			} else {				# number / formula str / bool / error
-				my ($v) = $cbody =~ m{<v\b[^>]*>(.*?)</v>}s;
-				$val = defined $v ? _xml_unescape($v) : '';
+			if (defined $cbody) {
+				if (index($cattrs, 't="s"') >= 0) {		# shared-string index
+					# Almost every string cell body is exactly <v>DIGITS</v>; an
+					# anchored match reads it in one step, falling back to the
+					# general <v ...> scan only for the rare attributed <v>.
+					my $v = ($cbody =~ m{\A<v>([^<]*)</v>\z})
+						? $1 : ($cbody =~ m{<v\b[^>]*>(.*?)</v>}s)[0];
+					$val = (defined $v && $v =~ /^\d+\z/) ? ($sst->[$v] // '') : '';
+				} elsif (index($cattrs, 't="inlineStr"') >= 0) {
+					$val .= _xml_unescape($1) while $cbody =~ m{<t\b[^>]*>(.*?)</t>}gs;
+				} else {			# number / formula str / bool / error
+					my $v = ($cbody =~ m{\A<v>([^<]*)</v>\z})
+						? $1 : ($cbody =~ m{<v\b[^>]*>(.*?)</v>}s)[0];
+					$val = defined $v ? _xml_unescape($v) : '';
+				}
 			}
 			$cells[$ci] = $val;
 			$maxc = $ci if $ci > $maxc;
@@ -1771,11 +1938,18 @@ sub _parse_xlsx_sheet {
 		push @rows, \@cells;
 		$global_max = $maxc if $maxc > $global_max;
 	}
+	undef $ws;	# free the (potentially large) worksheet XML before emitting
 
-	for my $cells (@rows) {
-		my @line = map { defined $_ ? $_ : '' } @{$cells}[0 .. $global_max];
-		next unless grep { length } @line;	# skip fully blank rows, as CSV does
-		$callback->(\@line);
+	# Emit each row padded to the widest row seen, consuming @rows as we go
+	# (shift, not foreach) so the parsed AoA and the caller's growing structure
+	# never both sit fully in memory at once. Pad and fill holes in place -- the
+	# callback reads by index and never retains the ref -- so this is a light
+	# touch, not a second full copy.
+	while (my $cells = shift @rows) {
+		$#$cells = $global_max;			# extend to the common width
+		$_ //= '' for @$cells;			# fill gaps + padding in place
+		next unless grep { length } @$cells;	# skip fully blank rows, as CSV does
+		$callback->($cells);
 	}
 	return;
 }
@@ -1802,6 +1976,10 @@ sub read_table {
 	my %allowed_args = map { $_ => 1 } (
 		'comment', 'output.type', 'filter', 'row.names', 'sep',
 		'auto.row.names', 'sheet',
+		# private, undocumented: the multi-sheet expansion passes an already
+		# parsed worksheet list / shared-string table to each per-sheet recursion
+		# so a big sharedStrings.xml is not re-decompressed once per worksheet.
+		'_xlsx_sheets', '_sst',
 	);
 	my @undef_args = sort grep { !$allowed_args{$_} } keys %args;
 	if (@undef_args) {
@@ -1817,14 +1995,27 @@ sub read_table {
 	# options (recursing one sheet at a time keeps every table's state, and any
 	# hoh row.names default, independent). A single-worksheet workbook, or an
 	# explicit 'sheet', still returns that one table directly.
-	if ($is_xlsx && !defined $args{sheet}) {
-		my $sheets = _xlsx_sheets($file);
-		if (@$sheets > 1) {
+	# Resolve the worksheet list once and reuse it below (it decompresses and
+	# parses workbook.xml + its rels, so recomputing it in the main xlsx branch
+	# would double that work for every single-sheet / explicit-sheet read).
+	my $xlsx_sheets;
+	if ($is_xlsx) {
+		# Reuse a caller-supplied worksheet list (from the multi-sheet expansion
+		# below) rather than re-parsing workbook.xml + its rels for every sheet.
+		$xlsx_sheets = $args{_xlsx_sheets} // _xlsx_sheets($file);
+		if (!defined $args{sheet} && @$xlsx_sheets > 1) {
+			# Decompress + parse the shared-string table once for the whole
+			# workbook and hand it to each per-sheet read, instead of every
+			# recursion re-reading (a potentially large) sharedStrings.xml.
+			my $sst = _xlsx_shared_strings($file);
 			my %book;
-			for my $i (0 .. $#$sheets) {
-				my $name = $sheets->[$i]{name};
+			for my $i (0 .. $#$xlsx_sheets) {
+				my $name = $xlsx_sheets->[$i]{name};
 				$name = 'Sheet' . ($i + 1) unless defined $name;
-				$book{$name} = read_table($file, %input_args, sheet => $i + 1);
+				$book{$name} = read_table($file, %input_args,
+					sheet        => $i + 1,
+					_xlsx_sheets => $xlsx_sheets,
+					_sst         => $sst);
 			}
 			return \%book;
 		}
@@ -2028,9 +2219,8 @@ sub read_table {
 		}
 	};
 	if ($is_xlsx) {
-		my $sst    = _xlsx_shared_strings($file);
-		my $sheets = _xlsx_sheets($file);
-		my $chosen = _xlsx_choose_sheet($file, $sheets, $args{sheet});
+		my $sst    = $args{_sst} // _xlsx_shared_strings($file);
+		my $chosen = _xlsx_choose_sheet($file, $xlsx_sheets, $args{sheet});
 		_parse_xlsx_sheet($file, $sst, $chosen->{path}, $on_line);
 	} else {
 		_parse_csv_file($file, $args{sep} // '', $args{comment} // '', $on_line);
@@ -2219,6 +2409,39 @@ sub view {
 		}
 	}
 
+	return _render_grid(
+		kind => $kind, total => $total,
+		cols => \@cols, labels => \@labels, raw => \@raw, lab_header => $lab_header,
+		na => $na, max_width => $maxw, ellipsis => $ell, gap => $gap,
+		width => $tw, to => $fh, return_only => $quiet,
+		color => (exists $args{color} ? $args{color} : undef), colors => $args{colors},
+	);
+}
+
+# _render_grid(%spec) -- shared, colourised table renderer used by view() and
+# summary(). Given a fully-resolved grid (row labels + column headers + a
+# row-major @raw of cell values) plus the display options, it produces the
+# output view() has always emitted: a "# Kind: R rows x C cols" banner,
+# wide-char-aware column widths, R-style column chunking to fit the terminal,
+# optional Data::Printer-style colour, and a trailing "... N more rows" note.
+sub _render_grid {
+	my %s = @_;
+	my $kind       = $s{kind};
+	my $total      = $s{total};
+	my @cols       = @{ $s{cols}   || [] };
+	my @labels     = @{ $s{labels} || [] };
+	my @raw        = @{ $s{raw}    || [] };
+	my $lab_header = defined $s{lab_header} ? $s{lab_header} : '';
+	my $na    = defined $s{na}        ? $s{na}        : 'undef';
+	my $maxw  = defined $s{max_width} ? $s{max_width} : 80;
+	my $ell   = defined $s{ellipsis}  ? $s{ellipsis}  : '...';
+	my $gap   = defined $s{gap}       ? $s{gap}       : '  ';
+	my $tw    = defined $s{width}     ? $s{width}     : 80;
+	my $fh    = $s{to};
+	my $quiet = $s{return_only};
+	my $color  = $s{color};
+	my $colors = $s{colors};
+
 	# ---- display helpers (UTF-8 / wide-char aware) ----
 	my $RESET = "\e[0m";
 	my $decode = sub {
@@ -2276,7 +2499,7 @@ sub view {
 		undef		=> 'bright_red',	hash   => 'magenta',
 		caller_info => 'bright_cyan',	separator => 'white',
 	);
-	my %color = (%default_colors, %{ $args{colors} || {} });
+	my %color = (%default_colors, %{ $colors || {} });
 	my %fg = (
 		black=>30, red=>31, green=>32, yellow=>33, blue=>34, magenta=>35, cyan=>36, white=>37,
 		bright_black=>90, bright_red=>91, bright_green=>92, bright_yellow=>93,
@@ -2294,11 +2517,11 @@ sub view {
 		return '';
 	};
 	my $want_color;
-	if (!defined $args{color} || (!ref $args{color} && $args{color} eq 'auto')) {
+	if (!defined $color || (!ref $color && $color eq 'auto')) {
 		my $target = defined $fh ? $fh : \*STDOUT;
 		$want_color = (!$quiet && -t $target) ? 1 : 0;
 	} else {
-		$want_color = $args{color} ? 1 : 0;
+		$want_color = $color ? 1 : 0;
 	}
 	my $paint = sub {
 		my ($text, $type) = @_;
@@ -2601,6 +2824,797 @@ sub _tukey_compare {
 	return \@rows;
 }
 
+# =======================================================================
+# melt / pivot_table / fillna / ffill / bfill
+#   pure-Perl additions to lib/Stats/LikeR.pm
+#
+# Placement: splice the reshape pair (melt, pivot_table) in after concat/
+# rbind, and the impute trio (fillna, ffill, bfill) in after dropna.  Add
+#   melt pivot_table fillna ffill bfill
+# to @EXPORT_OK (== @EXPORT).  All five reshape/impute at the Perl level
+# only; the sole numeric work is in pivot_table, which reuses the XS
+# reducers through _agg_reduce, so there is no XS/ABI surface added here.
+#
+# NA is undef throughout, exactly as dropna() treats it (a missing hash key
+# counts as NA).  Every function returns a NEW top-level frame and never
+# mutates its input.  Shape is classified by _df_shape (the agg()/view()
+# detector); 'output.type' defaults to the input family, like agg().
+# =======================================================================
+
+# _frame_cols($df, $shape, \@need) -> (\%col, $R)
+#
+# Extract the named columns once, aligned to row positions 0 .. R-1, using
+# the same per-shape access agg() uses.  For HoA the column arrays are
+# aliased (read-only callers), not rebuilt; every other shape materialises
+# a fresh per-column slice.  HoH rows are visited in string-sorted key
+# order so a positional axis exists.  Not exported.
+sub _frame_cols {
+	my ($df, $shape, $need) = @_;
+	my (%col, $R);
+	if ($shape eq 'AoA') {
+		my @h = grep { defined } @$df;
+		$R = scalar @h;
+		for my $c (@$need) { $col{$c} = [ map { $_->[$c] } @h ] }
+	} elsif ($shape eq 'AoH') {
+		my @h = grep { defined } @$df;
+		$R = scalar @h;
+		for my $c (@$need) { $col{$c} = [ map { $_->{$c} } @h ] }
+	} elsif ($shape eq 'HoA') {
+		$R = 0;
+		for my $v (values %$df) { $R = @$v if ref $v eq 'ARRAY' && @$v > $R }
+		for my $c (@$need) { $col{$c} = ref $df->{$c} eq 'ARRAY' ? $df->{$c} : [] }
+	} else {                                     # HoH
+		my @h = map { $df->{$_} } sort keys %$df;
+		$R = scalar @h;
+		for my $c (@$need) { $col{$c} = [ map { $_->{$c} } @h ] }
+	}
+	return (\%col, $R);
+}
+
+# _sort_group_keys(\@order, \%repr) -> \@sorted
+#
+# Order group keys by their representative value tuple, numerically when
+# every tuple element (across every group) looks like a number, else as
+# strings (undef sorts as ''); the same rule agg() uses for its groups.
+# Not exported.
+sub _sort_group_keys {
+	my ($order, $repr) = @_;
+	my $all_num = 1;
+	SORTNUM: for my $k (@$order) {
+		for my $v (@{ $repr->{$k} }) {
+			unless (defined $v && looks_like_number($v)) { $all_num = 0; last SORTNUM }
+		}
+	}
+	if ($all_num) {
+		return [ sort {
+			my ($ra, $rb) = ($repr->{$a}, $repr->{$b});
+			my $c = 0;
+			for my $j (0 .. $#$ra) { last if $c = $ra->[$j] <=> $rb->[$j] }
+			$c;
+		} @$order ];
+	}
+	return [ sort {
+		my ($ra, $rb) = ($repr->{$a}, $repr->{$b});
+		my $c = 0;
+		for my $j (0 .. $#$ra) {
+			my $x = defined $ra->[$j] ? $ra->[$j] : '';
+			my $y = defined $rb->[$j] ? $rb->[$j] : '';
+			last if $c = $x cmp $y;
+		}
+		$c;
+	} @$order ];
+}
+
+# melt($df, id_vars => $col|\@cols, value_vars => $col|\@cols,
+#      var_name => 'variable', value_name => 'value', 'output.type' => aoa|aoh|hoa|hoh)
+#
+# Wide -> long, like pandas DataFrame.melt.  Each cell of the value_vars
+# columns becomes its own output row: the id_vars are copied across, the
+# var_name column holds the source column identifier and the value_name
+# column holds the cell.  Column identifiers are names for AoH/HoA/HoH and
+# 0-based integer positions for AoA.
+#
+#   id_vars      scalar or arrayref; default none.
+#   value_vars   scalar or arrayref; default every column not in id_vars
+#                (column universe and order come from colnames()).
+#   var_name     name of the variable column; default 'variable'.
+#   value_name   name of the value column;    default 'value'.
+#   'output.type' aoa|aoh|hoa|hoh; default the input family.  For aoa output
+#                the columns are positional (id_vars.., variable, value) so
+#                var_name/value_name are not used.  For hoh output the row
+#                labels are reset to 0 .. N-1 (like pandas' RangeIndex).
+#
+# Row order is column-major, matching pandas: all rows for value_vars[0],
+# then all rows for value_vars[1], and so on, preserving input row order
+# within each block.  The original frame is never modified.
+sub melt {
+	my $df = shift;
+	die 'melt: undefined data in first position' unless defined $df;
+	my $shape = _df_shape($df, 'melt');
+	die "melt: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+	my %known = ( id_vars => 1, value_vars => 1, var_name => 1,
+	              value_name => 1, 'output.type' => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "melt: unknown argument(s): @bad\n" if @bad;
+
+	my @id = !defined $arg{id_vars}        ? ()
+	       : ref $arg{id_vars} eq 'ARRAY'  ? @{ $arg{id_vars} }
+	       :                                 ( $arg{id_vars} );
+	my $var_name   = defined $arg{var_name}   ? $arg{var_name}   : 'variable';
+	my $value_name = defined $arg{value_name} ? $arg{value_name} : 'value';
+	my $otype = defined $arg{'output.type'} ? lc $arg{'output.type'} : lc $shape;
+	my %ok_otype = ( aoa => 1, aoh => 1, hoa => 1, hoh => 1 );
+	die "melt: output.type '$otype' isn't allowed (aoa, aoh, hoa, hoh)\n"
+		unless $ok_otype{$otype};
+
+	my @universe = colnames($df);
+	my %uni = map { $_ => 1 } @universe;
+	my %is_id = map { $_ => 1 } @id;
+	my @val = !defined $arg{value_vars}        ? ( grep { !$is_id{$_} } @universe )
+	        : ref $arg{value_vars} eq 'ARRAY'  ? @{ $arg{value_vars} }
+	        :                                    ( $arg{value_vars} );
+	for my $c (@id, @val) {
+		die "melt: column '$c' not found\n" unless $uni{$c};
+	}
+	# name hygiene: the emitted variable/value columns must not collide
+	die "melt: var_name and value_name must differ\n"
+		if $var_name eq $value_name;
+	if ($otype ne 'aoa') {
+		for my $c (@id) {
+			die "melt: var_name '$var_name' collides with an id_vars column\n"
+				if $c eq $var_name;
+			die "melt: value_name '$value_name' collides with an id_vars column\n"
+				if $c eq $value_name;
+		}
+	}
+
+	my %need; $need{$_} = 1 for @id, @val;
+	my ($col, $R) = _frame_cols($df, $shape, [ keys %need ]);
+
+	# column-major stack: [ \@id_values, variable, value ]
+	my @rec;
+	for my $v (@val) {
+		for (my $i = 0; $i < $R; $i++) {
+			my @idvals = map { $col->{$_}[$i] } @id;
+			push @rec, [ \@idvals, $v, $col->{$v}[$i] ];
+		}
+	}
+
+	if ($otype eq 'aoa') {
+		return [ map { [ @{ $_->[0] }, $_->[1], $_->[2] ] } @rec ];
+	} elsif ($otype eq 'aoh') {
+		my @out;
+		for my $r (@rec) {
+			my %h;
+			@h{ @id } = @{ $r->[0] };
+			$h{$var_name}   = $r->[1];
+			$h{$value_name} = $r->[2];
+			push @out, \%h;
+		}
+		return \@out;
+	} elsif ($otype eq 'hoa') {
+		my %out = map { $_ => [] } @id, $var_name, $value_name;
+		for my $r (@rec) {
+			push @{ $out{ $id[$_] } }, $r->[0][$_] for 0 .. $#id;
+			push @{ $out{$var_name} },   $r->[1];
+			push @{ $out{$value_name} }, $r->[2];
+		}
+		return \%out;
+	} else {                                     # hoh, RangeIndex 0..N-1
+		my %out;
+		my $n = 0;
+		for my $r (@rec) {
+			my %h;
+			@h{ @id } = @{ $r->[0] };
+			$h{$var_name}   = $r->[1];
+			$h{$value_name} = $r->[2];
+			$out{ $n++ } = \%h;
+		}
+		return \%out;
+	}
+}
+
+# pivot_table($df, index => $col|\@cols, columns => $col|\@cols,
+#             values => $col|\@cols, aggfunc => 'mean', fill_value => undef,
+#             skipna => 1, sort => 1, sep => '.', 'output.type' => ...)
+#
+# Long -> wide with aggregation, like pandas DataFrame.pivot_table.  Rows are
+# the distinct `index` tuples; the distinct `columns` tuples spread into new
+# output columns; each cell is `aggfunc` applied to the `values` that fall in
+# that (index, columns) bucket.  This is the combine half of agg() with the
+# group value spread across columns instead of down rows, and it reuses the
+# same aggregator vocabulary.
+#
+#   index        scalar/arrayref of columns that become output rows; default
+#                none (a single aggregated row).
+#   columns      scalar/arrayref whose distinct value tuples become output
+#                columns.  REQUIRED.  A row whose `columns` tuple has any NA
+#                is skipped (no column can be named from it).
+#   values       scalar/arrayref of columns to aggregate; default every column
+#                not used by index/columns.
+#   aggfunc      one aggregator name, an arrayref of names, or a coderef;
+#                default 'mean'.  Named: mean median sum sd var min max count
+#                n nunique first last mode (the agg() set).  A coderef is
+#                called as $code->(\@cells) with every cell (NA included).
+#   fill_value   substituted for any NA result cell (missing bucket, or an
+#                aggregate that came back undef); default leaves undef.
+#   skipna       0|1, default 1; forwarded to the numeric reducers as in agg.
+#   sort         0|1, default 1; sort output rows and columns by their key
+#                (numeric if every key looks numeric, else string).
+#   sep          separator for generated column names; default '.'.
+#   'output.type' aoa|aoh|hoa|hoh; default input family.  For hoh the row
+#                label is the index tuple joined with '.', uniquified with .N.
+#
+# Generated column names join, with `sep` and in this order, only the pieces
+# that vary: the aggregator name (only when >1 aggregator), the value column
+# (only when >1 value), and always the `columns` tuple.  With a single value
+# and single aggregator the name is exactly the `columns` tuple, matching
+# pandas' flat output.  A duplicate generated name is an error (raise `sep`).
+# The original frame is never modified.
+sub pivot_table {
+	my $df = shift;
+	die 'pivot_table: undefined data in first position' unless defined $df;
+	my $shape = _df_shape($df, 'pivot_table');
+	die "pivot_table: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+	my %known = ( index => 1, columns => 1, values => 1, aggfunc => 1,
+	              fill_value => 1, skipna => 1, sort => 1, sep => 1,
+	              'output.type' => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "pivot_table: unknown argument(s): @bad\n" if @bad;
+	die "pivot_table: 'columns' is required\n" unless defined $arg{columns};
+
+	my @index   = !defined $arg{index}       ? ()
+	            : ref $arg{index} eq 'ARRAY'  ? @{ $arg{index} }
+	            :                               ( $arg{index} );
+	my @columns = ref $arg{columns} eq 'ARRAY' ? @{ $arg{columns} } : ( $arg{columns} );
+	die "pivot_table: 'columns' must name at least one column\n" unless @columns;
+
+	my $sep      = defined $arg{sep} ? $arg{sep} : '.';
+	my $skipna   = exists $arg{skipna} ? ($arg{skipna} ? 1 : 0) : 1;
+	my $dosort   = exists $arg{sort}   ? ($arg{sort}   ? 1 : 0) : 1;
+	my $has_fill = exists $arg{fill_value};
+	my $fill     = $arg{fill_value};
+	my $otype    = defined $arg{'output.type'} ? lc $arg{'output.type'} : lc $shape;
+	my %ok_otype = ( aoa => 1, aoh => 1, hoa => 1, hoh => 1 );
+	die "pivot_table: output.type '$otype' isn't allowed (aoa, aoh, hoa, hoh)\n"
+		unless $ok_otype{$otype};
+
+	my $af = exists $arg{aggfunc} ? $arg{aggfunc} : 'mean';
+	my @funcs = ref $af eq 'ARRAY' ? @$af : ( $af );
+	die "pivot_table: empty aggfunc list\n" unless @funcs;
+	my %known_agg = map { $_ => 1 }
+		qw(mean median sum sd var min max count n nunique first last mode);
+	for my $f (@funcs) {
+		next if ref $f eq 'CODE';
+		die "pivot_table: unknown aggfunc '$f'\n" unless $known_agg{$f};
+	}
+
+	my @universe = colnames($df);
+	my %uni = map { $_ => 1 } @universe;
+	my %reserved = map { $_ => 1 } @index, @columns;
+	my @values = !defined $arg{values}       ? ( grep { !$reserved{$_} } @universe )
+	           : ref $arg{values} eq 'ARRAY'  ? @{ $arg{values} }
+	           :                                ( $arg{values} );
+	die "pivot_table: no value columns to aggregate\n" unless @values;
+	for my $c (@index, @columns, @values) {
+		die "pivot_table: column '$c' not found\n" unless $uni{$c};
+	}
+
+	my %need; $need{$_} = 1 for @index, @columns, @values;
+	my ($col, $R) = _frame_cols($df, $shape, [ keys %need ]);
+
+	# bucket every row under (index tuple, columns tuple), first-seen order
+	my (%rrepr, @rorder, %rseen, %crepr, @corder, %cseen, %bucket);
+	for (my $i = 0; $i < $R; $i++) {
+		my @cv = map { $col->{$_}[$i] } @columns;
+		next if grep { !defined } @cv;           # NA columns tuple -> unnameable
+		my $ck = join "\x1e", map { "v$_" } @cv;
+		unless ($cseen{$ck}) {
+			$cseen{$ck} = 1; push @corder, $ck; $crepr{$ck} = [ @cv ];
+		}
+		my @iv = map { $col->{$_}[$i] } @index;
+		my $rk = @index
+			? join("\x1e", map { defined $_ ? "v$_" : "\0" } @iv)
+			: "\0all";
+		unless ($rseen{$rk}) {
+			$rseen{$rk} = 1; push @rorder, $rk; $rrepr{$rk} = [ @iv ];
+		}
+		push @{ $bucket{$rk}{$ck}{$_} }, $col->{$_}[$i] for @values;
+	}
+	if ($dosort) {
+		@rorder = @{ _sort_group_keys(\@rorder, \%rrepr) } if @index;
+		@corder = @{ _sort_group_keys(\@corder, \%crepr) };
+	}
+
+	# output column plan: aggfunc-major, then value, then columns tuple
+	my $multi_f = @funcs > 1;
+	my $multi_v = @values > 1;
+	my @colplan;                                 # [ ck, value, func, outname ]
+	for my $f (@funcs) {
+		my $fl = ref $f eq 'CODE' ? 'fn' : $f;
+		for my $vv (@values) {
+			for my $ck (@corder) {
+				my $cstr = join $sep, map { defined $_ ? $_ : '' } @{ $crepr{$ck} };
+				my @pieces;
+				push @pieces, $fl if $multi_f;
+				push @pieces, $vv if $multi_v;
+				push @pieces, $cstr;
+				push @colplan, [ $ck, $vv, $f, join($sep, @pieces) ];
+			}
+		}
+	}
+	my @out_names = ( @index, map { $_->[3] } @colplan );
+	{
+		my (%seen, @dup);
+		for my $n (@out_names) { push @dup, $n if $seen{$n}++ == 1 }
+		die "pivot_table: generated duplicate column name(s): @dup; "
+		  . "pass a different 'sep' or rename inputs\n" if @dup;
+	}
+
+	# materialise straight into the requested shape
+	my (@aoa, @aoh, %hoa, %hoh, %lseen);
+	if ($otype eq 'hoa') { $hoa{$_} = [] for @out_names }
+	for my $rk (@rorder) {
+		my @vals = @{ $rrepr{$rk} };              # index values
+		for my $cp (@colplan) {
+			my ($ck, $vv, $f) = @$cp;
+			my $raw = $bucket{$rk}{$ck}{$vv};
+			my $cell;
+			if (defined $raw && @$raw) {
+				my @def = grep { defined } @$raw;
+				$cell = _agg_reduce($f, $raw, \@def, $skipna);
+			}
+			$cell = $fill if !defined $cell && $has_fill;
+			push @vals, $cell;
+		}
+		if ($otype eq 'aoa') {
+			push @aoa, \@vals;
+		} elsif ($otype eq 'aoh') {
+			my %h; @h{ @out_names } = @vals; push @aoh, \%h;
+		} elsif ($otype eq 'hoa') {
+			push @{ $hoa{ $out_names[$_] } }, $vals[$_] for 0 .. $#out_names;
+		} else {                                  # hoh
+			my $label = @index
+				? join('.', map { defined $_ ? $_ : '' } @{ $rrepr{$rk} })
+				: 'all';
+			my $uniq = $label; my $j = 0;
+			while (exists $lseen{$uniq}) { $uniq = $label . '.' . (++$j) }
+			$lseen{$uniq} = 1;
+			my %h; @h{ @out_names } = @vals; $hoh{$uniq} = \%h;
+		}
+	}
+	return \@aoa if $otype eq 'aoa';
+	return \@aoh if $otype eq 'aoh';
+	return \%hoa if $otype eq 'hoa';
+	return \%hoh;
+}
+
+# fillna($df, value => $scalar | { col => val, ... }, cols => \@cols)
+#
+# Replace NA (undef) cells with a constant, like pandas DataFrame.fillna with
+# a scalar or a dict.  `value` is REQUIRED and is either a single scalar (fill
+# every NA in the frame, or only within `cols` when given) or a hashref mapping
+# column => fill value (only those columns are touched; a dict key that names
+# no existing column is ignored, matching pandas, and `cols` is then forbidden).
+# For a scalar `value`, an explicit `cols` that names a missing column dies,
+# like dropna().  Column identifiers are names for AoH/HoA/HoH and 0-based
+# integer positions for AoA.
+#
+# A targeted column's missing hash key counts as NA and is materialised on
+# fill (as in dropna's NA view).  AoA rows are not extended past their own
+# length.  A structurally-undef (non-ref) row is passed through unchanged, not
+# fabricated into a data row, matching ffill()/bfill().  For propagation instead
+# of a constant use ffill()/bfill().  Returns
+# a NEW frame (rows/columns rebuilt as needed); the original is never modified.
+sub fillna {
+	my $df = shift;
+	die 'fillna: undefined data in first position' unless defined $df;
+	my $shape = _df_shape($df, 'fillna');
+	die "fillna: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+	my %known = ( value => 1, cols => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "fillna: unknown argument(s): @bad\n" if @bad;
+	die "fillna: a 'value' is required\n" unless exists $arg{value};
+
+	my $value   = $arg{value};
+	my $per_col = ref $value eq 'HASH';
+	die "fillna: 'cols' cannot be combined with a per-column 'value' hashref\n"
+		if $per_col && exists $arg{cols};
+
+	my @universe = colnames($df);
+	my %uni = map { $_ => 1 } @universe;
+
+	my (%fillmap, $scalar_fill, %tset, @targets);
+	if ($per_col) {
+		%fillmap = %$value;
+		@targets = grep { $uni{$_} } keys %fillmap;   # ignore unknown dict keys
+	} else {
+		$scalar_fill = $value;
+		if (exists $arg{cols}) {
+			die "fillna: 'cols' must be an arrayref\n"
+				unless ref $arg{cols} eq 'ARRAY';
+			for my $c (@{ $arg{cols} }) {
+				die "fillna: column '$c' not found\n" unless $uni{$c};
+			}
+			@targets = @{ $arg{cols} };
+		} else {
+			@targets = @universe;
+		}
+	}
+	%tset = map { $_ => 1 } @targets;
+	my $tv = sub { $per_col ? $fillmap{ $_[0] } : $scalar_fill };
+
+	if ($shape eq 'AoH') {
+		my @out;
+		for my $row (@$df) {
+			unless (ref $row eq 'HASH') { push @out, $row; next }
+			my %h = %$row;
+			for my $c (@targets) { $h{$c} = $tv->($c) unless defined $h{$c} }
+			push @out, \%h;
+		}
+		return \@out;
+	}
+	if ($shape eq 'HoH') {
+		my %out;
+		for my $rk (keys %$df) {
+			my $row = $df->{$rk};
+			unless (ref $row eq 'HASH') { $out{$rk} = $row; next }
+			my %h = %$row;
+			for my $c (@targets) { $h{$c} = $tv->($c) unless defined $h{$c} }
+			$out{$rk} = \%h;
+		}
+		return \%out;
+	}
+	if ($shape eq 'HoA') {
+		my $R = 0;
+		for my $v (values %$df) { $R = @$v if ref $v eq 'ARRAY' && @$v > $R }
+		my %out;
+		for my $c (keys %$df) {
+			my $arr = ref $df->{$c} eq 'ARRAY' ? $df->{$c} : [];
+			if ($tset{$c}) {
+				my $fv = $tv->($c);
+				$out{$c} = [ map { defined $arr->[$_] ? $arr->[$_] : $fv } 0 .. $R - 1 ];
+			} else {
+				$out{$c} = [ @$arr ];
+			}
+		}
+		return \%out;
+	}
+	# AoA
+	my @out;
+	for my $row (@$df) {
+		unless (ref $row eq 'ARRAY') { push @out, $row; next }
+		my @r = @$row;
+		for my $c (@targets) {
+			$r[$c] = $tv->($c) if $c <= $#r && !defined $r[$c];
+		}
+		push @out, \@r;
+	}
+	return \@out;
+}
+
+# _fill_seq(\@vals, $dir, $limit) -> \@vals   (modifies in place)
+#
+# Propagate the last (dir=1, forward) or next (dir=-1, backward) defined value
+# over runs of undef.  With a defined `limit`, at most `limit` consecutive
+# undefs are filled per gap; the rest stay undef.  Not exported.
+sub _fill_seq {
+	my ($vals, $dir, $limit) = @_;
+	my $n = scalar @$vals;
+	my @idx = $dir > 0 ? ( 0 .. $n - 1 ) : reverse( 0 .. $n - 1 );
+	my ($last, $have, $run) = (undef, 0, 0);
+	for my $i (@idx) {
+		if (defined $vals->[$i]) {
+			$last = $vals->[$i]; $have = 1; $run = 0;
+		} elsif ($have) {
+			next if defined $limit && $run >= $limit;
+			$vals->[$i] = $last; $run++;
+		}
+	}
+	return $vals;
+}
+
+# _impute_prop($df, $name, $dir, %opts) -- shared core of ffill/bfill.
+#
+# Propagate defined values along the row axis within each targeted column.
+# Row order is positional for AoA/AoH/HoA and string-sorted key order for HoH
+# (the only deterministic order a HoH has).  Options: cols => \@cols (default
+# every column; an unknown column dies), limit => positive int (max fills per
+# gap).  Fills within each column's existing length only (ragged HoA columns
+# are not extended); AoA rows are not extended past their own length.  Returns
+# a NEW frame; the original is never modified.  Not exported.
+sub _impute_prop {
+	my $df   = shift;
+	my $name = shift;
+	my $dir  = shift;
+	die "$name: undefined data in first position" unless defined $df;
+	my $shape = _df_shape($df, $name);
+	die "$name: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+	my %known = ( cols => 1, limit => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "$name: unknown argument(s): @bad\n" if @bad;
+
+	my $limit = $arg{limit};
+	die "$name: 'limit' must be a positive integer\n"
+		if defined $limit
+		&& ( !looks_like_number($limit) || $limit < 1 || $limit != int $limit );
+
+	my @universe = colnames($df);
+	my %uni = map { $_ => 1 } @universe;
+	my @targets;
+	if (exists $arg{cols}) {
+		die "$name: 'cols' must be an arrayref\n" unless ref $arg{cols} eq 'ARRAY';
+		for my $c (@{ $arg{cols} }) {
+			die "$name: column '$c' not found\n" unless $uni{$c};
+		}
+		@targets = @{ $arg{cols} };
+	} else {
+		@targets = @universe;
+	}
+	my %tset = map { $_ => 1 } @targets;
+
+	if ($shape eq 'AoH') {
+		my @out = map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$df;
+		for my $c (@targets) {
+			my @vals = map { ref $_ eq 'HASH' ? $_->{$c} : undef } @out;
+			_fill_seq(\@vals, $dir, $limit);
+			for my $i (0 .. $#out) {
+				next unless ref $out[$i] eq 'HASH';
+				$out[$i]{$c} = $vals[$i] if defined $vals[$i];
+			}
+		}
+		return \@out;
+	}
+	if ($shape eq 'HoH') {
+		my @keys = sort keys %$df;
+		my %out = map {
+			$_ => ( ref $df->{$_} eq 'HASH' ? { %{ $df->{$_} } } : $df->{$_} )
+		} keys %$df;
+		for my $c (@targets) {
+			my @vals = map { ref $out{$_} eq 'HASH' ? $out{$_}{$c} : undef } @keys;
+			_fill_seq(\@vals, $dir, $limit);
+			for my $j (0 .. $#keys) {
+				my $rk = $keys[$j];
+				next unless ref $out{$rk} eq 'HASH';
+				$out{$rk}{$c} = $vals[$j] if defined $vals[$j];
+			}
+		}
+		return \%out;
+	}
+	if ($shape eq 'HoA') {
+		my %out;
+		for my $c (keys %$df) {
+			my $arr = ref $df->{$c} eq 'ARRAY' ? [ @{ $df->{$c} } ] : [];
+			_fill_seq($arr, $dir, $limit) if $tset{$c};
+			$out{$c} = $arr;
+		}
+		return \%out;
+	}
+	# AoA
+	my @out = map { ref $_ eq 'ARRAY' ? [ @$_ ] : $_ } @$df;
+	for my $c (@targets) {
+		my @vals = map { ref $_ eq 'ARRAY' ? $_->[$c] : undef } @out;
+		_fill_seq(\@vals, $dir, $limit);
+		for my $i (0 .. $#out) {
+			next unless ref $out[$i] eq 'ARRAY';
+			$out[$i][$c] = $vals[$i] if $c <= $#{ $out[$i] } && defined $vals[$i];
+		}
+	}
+	return \@out;
+}
+
+# ffill($df, cols => \@cols, limit => $n)  -- forward-fill NA (last valid obs).
+# bfill($df, cols => \@cols, limit => $n)  -- back-fill NA (next valid obs).
+# See _impute_prop for the row-axis and shape semantics.
+sub ffill { _impute_prop( shift, 'ffill',  1, @_ ) }
+sub bfill { _impute_prop( shift, 'bfill', -1, @_ ) }
+
+# The interpolate() numeric kernels now live in XS (see ip_fill_column and the
+# _interp_column_xs XSUB in LikeR.xs); it is called once per target column below.
+
+# interpolate($df, method => 'linear', cols => \@cols, x => ...,
+#             order => $k, limit => $n,
+#             limit_direction => 'forward'|'backward'|'both',
+#             limit_area => 'inside'|'outside')
+#
+# Fill NA (undef) cells along the row axis, like pandas DataFrame.interpolate.
+# It is the numeric sibling of ffill/bfill.  Row order and the four shapes match
+# ffill/bfill (positional for AoA/AoH/HoA, sorted-key order for HoH), and it
+# returns a NEW frame; the original is never modified.
+#
+#   method  the interpolant.  All of pandas' methods are supported:
+#             linear (default), index, values, time  -- straight line; the
+#               first three use `x`, 'linear' uses equal spacing.
+#             slinear, nearest, zero                 -- piecewise, interior only.
+#             pad/ffill, bfill/backfill              -- hold the last/next value.
+#             quadratic, cubic                       -- interp1d B-splines.
+#             cubicspline, pchip, akima, spline      -- SciPy-named splines.
+#             polynomial, spline (need `order`)      -- degree-k spline.
+#             barycentric, krogh                     -- global polynomial.
+#   order   required for method 'polynomial' / 'spline' (degree 1, 2 or 3).
+#   x       abscissae: an arrayref (one per row) or a column name/index whose
+#           numeric values are the coordinates (default: equal spacing 0,1,2..).
+#           Must be strictly increasing.  Used by every method except 'linear'.
+#   limit_direction  'forward' (default), 'backward', or 'both'.
+#   limit_area       'inside' fills only interior gaps, 'outside' only leading/
+#                    trailing gaps, undef (default) fills both.
+#   limit            max cells filled per undef run.
+#   cols             columns to interpolate; default every column.
+#
+# The pipeline follows pandas exactly: fill every gap with the method, then
+# blank the cells limit/direction/area forbid.  Only 'linear' and the hold/
+# global methods reach leading/trailing gaps (the interp1d and akima methods
+# are interior-only, matching SciPy).  Only numeric cells anchor a fill; a
+# defined non-numeric cell is preserved (and, for the piecewise-local methods,
+# blocks interpolation across it).  Interpolated cells are floats.  Fills within
+# each column's existing length only; a non-ref row is passed through untouched.
+sub interpolate {
+	my $df = shift;
+	die "interpolate: undefined data in first position" unless defined $df;
+	my $shape = _df_shape($df, 'interpolate');
+	die "interpolate: arguments after the data frame must be name => value pairs\n"
+		if @_ % 2;
+	my %arg = @_;
+	my %known = ( cols => 1, limit => 1, limit_direction => 1,
+	              limit_area => 1, method => 1, order => 1, x => 1 );
+	my @bad = sort grep { !$known{$_} } keys %arg;
+	die "interpolate: unknown argument(s): @bad\n" if @bad;
+
+	my %known_method = map { $_ => 1 } qw(
+		linear index values time slinear nearest zero pad ffill bfill backfill
+		quadratic cubic cubicspline pchip akima barycentric krogh polynomial spline );
+	my $method = defined $arg{method} ? lc $arg{method} : 'linear';
+	die "interpolate: unknown method '$method'\n" unless $known_method{$method};
+
+	my $order = $arg{order};
+	if ($method eq 'polynomial' || $method eq 'spline') {
+		die "interpolate: method '$method' requires an integer 'order' >= 1\n"
+			unless defined $order && looks_like_number($order)
+			    && $order >= 1 && $order == int $order;
+	}
+
+	my $limit = $arg{limit};
+	die "interpolate: 'limit' must be a positive integer\n"
+		if defined $limit
+		&& ( !looks_like_number($limit) || $limit < 1 || $limit != int $limit );
+
+	my $dir = defined $arg{limit_direction} ? lc $arg{limit_direction} : 'forward';
+	my %okdir = ( forward => 1, backward => 1, both => 1 );
+	die "interpolate: 'limit_direction' must be 'forward', 'backward', or 'both'\n"
+		unless $okdir{$dir};
+	# the directional-hold methods pin their own direction
+	$dir = 'forward'  if $method eq 'pad'   || $method eq 'ffill';
+	$dir = 'backward' if $method eq 'bfill' || $method eq 'backfill';
+
+	my $area;
+	if (defined $arg{limit_area}) {
+		$area = lc $arg{limit_area};
+		die "interpolate: 'limit_area' must be 'inside' or 'outside'\n"
+			unless $area eq 'inside' || $area eq 'outside';
+	}
+
+	my @universe = colnames($df);
+	my %uni = map { $_ => 1 } @universe;
+	my @targets;
+	if (exists $arg{cols}) {
+		die "interpolate: 'cols' must be an arrayref\n" unless ref $arg{cols} eq 'ARRAY';
+		for my $c (@{ $arg{cols} }) {
+			die "interpolate: column '$c' not found\n" unless $uni{$c};
+		}
+		@targets = @{ $arg{cols} };
+	} else {
+		@targets = @universe;
+	}
+	my %tset = map { $_ => 1 } @targets;
+
+	# x coordinate: arrayref, or a column key whose values are the coordinates
+	my ($x_is_col, $x_col);
+	if (defined $arg{x} && ref $arg{x} ne 'ARRAY') {
+		$x_is_col = 1;
+		$x_col = $arg{x};
+		die "interpolate: x column '$x_col' not found\n" unless $uni{$x_col};
+	}
+	# validated coordinates of length $len; $xcolseq is the x column pulled in
+	# the same row order (only consulted when x is a column key).
+	my $mkcoords = sub {
+		my ($len, $xcolseq) = @_;
+		my @x;
+		if    ($x_is_col)            {
+			die "interpolate: x column '$x_col' length (${\ scalar @$xcolseq}) != column length ($len)\n"
+				unless scalar @$xcolseq == $len;
+			@x = @$xcolseq;
+		}
+		elsif (ref $arg{x} eq 'ARRAY') {
+			die "interpolate: 'x' arrayref length (${\ scalar @{$arg{x}}}) != column length ($len)\n"
+				unless scalar @{ $arg{x} } == $len;
+			@x = @{ $arg{x} };
+		} else                       { @x = (0 .. $len - 1); }
+		for my $v (@x) {
+			die "interpolate: 'x' coordinates must all be defined and numeric\n"
+				unless defined $v && looks_like_number($v);
+		}
+		if (defined $arg{x}) {
+			for my $i (1 .. $#x) {
+				die "interpolate: 'x' coordinates must be strictly increasing\n"
+					unless $x[$i] > $x[$i - 1];
+			}
+		}
+		return \@x;
+	};
+	# shape dispatch mirrors _impute_prop (ffill/bfill).  The per-column numeric
+	# fill (all methods, the dense solve, the preserve mask) is done in XS by
+	# _interp_column_xs, which modifies the extracted @vals in place.
+	# shape dispatch mirrors _impute_prop (ffill/bfill)
+	if ($shape eq 'AoH') {
+		my @out = map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$df;
+		my $xcolseq = $x_is_col ? [ map { ref $_ eq 'HASH' ? $_->{$x_col} : undef } @out ] : undef;
+		my $coords = $mkcoords->(scalar @out, $xcolseq);
+		for my $c (@targets) {
+			my @vals = map { ref $_ eq 'HASH' ? $_->{$c} : undef } @out;
+			_interp_column_xs(\@vals, $coords, $method, $order, $dir, $limit, $area);
+			for my $i (0 .. $#out) {
+				next unless ref $out[$i] eq 'HASH';
+				$out[$i]{$c} = $vals[$i] if defined $vals[$i];
+			}
+		}
+		return \@out;
+	}
+	if ($shape eq 'HoH') {
+		my @keys = sort keys %$df;
+		my %out = map {
+			$_ => ( ref $df->{$_} eq 'HASH' ? { %{ $df->{$_} } } : $df->{$_} )
+		} keys %$df;
+		my $xcolseq = $x_is_col ? [ map { ref $out{$_} eq 'HASH' ? $out{$_}{$x_col} : undef } @keys ] : undef;
+		my $coords = $mkcoords->(scalar @keys, $xcolseq);
+		for my $c (@targets) {
+			my @vals = map { ref $out{$_} eq 'HASH' ? $out{$_}{$c} : undef } @keys;
+			_interp_column_xs(\@vals, $coords, $method, $order, $dir, $limit, $area);
+			for my $j (0 .. $#keys) {
+				my $rk = $keys[$j];
+				next unless ref $out{$rk} eq 'HASH';
+				$out{$rk}{$c} = $vals[$j] if defined $vals[$j];
+			}
+		}
+		return \%out;
+	}
+	if ($shape eq 'HoA') {
+		my %out;
+		for my $c (keys %$df) {
+			$out{$c} = ref $df->{$c} eq 'ARRAY' ? [ @{ $df->{$c} } ] : [];
+		}
+		for my $c (@targets) {
+			my $arr = $out{$c};
+			my $xcolseq = $x_is_col
+				? [ @{ ref $df->{$x_col} eq 'ARRAY' ? $df->{$x_col} : [] } ]
+				: undef;
+			my $coords = $mkcoords->(scalar @$arr, $xcolseq);
+			_interp_column_xs($arr, $coords, $method, $order, $dir, $limit, $area);
+		}
+		return \%out;
+	}
+	# AoA
+	my @out = map { ref $_ eq 'ARRAY' ? [ @$_ ] : $_ } @$df;
+	my $xcolseq = $x_is_col ? [ map { ref $_ eq 'ARRAY' ? $_->[$x_col] : undef } @out ] : undef;
+	my $coords = $mkcoords->(scalar @out, $xcolseq);
+	for my $c (@targets) {
+		my @vals = map { ref $_ eq 'ARRAY' ? $_->[$c] : undef } @out;
+		_interp_column_xs(\@vals, $coords, $method, $order, $dir, $limit, $area);
+		for my $i (0 .. $#out) {
+			next unless ref $out[$i] eq 'ARRAY';
+			$out[$i][$c] = $vals[$i] if $c <= $#{ $out[$i] } && defined $vals[$i];
+		}
+	}
+	return \@out;
+}
+
 # _tukey_col($data, $col) -- pull one column's cells, in row order, from any
 # of the three data-frame shapes (AoH arrayref, HoA/HoH hashref).
 sub _tukey_col {
@@ -2635,7 +3649,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.23
+version 0.25
 
 =head1 Synopsis
 
@@ -3583,6 +4597,43 @@ Notes:
 
 =back
 
+=head2 bfill
+
+Back-fill NA (undef) cells with the next valid value seen below them along the
+row axis, like C<pandas.DataFrame.bfill>. See C<ffill> for the forward direction
+and C<fillna> for constant fills.
+
+ bfill($df,
+     cols  => [ 'v' ],   # restrict to these columns (default: every column)
+     limit => 2,         # max consecutive fills per gap (default: unlimited)
+ );
+
+Column identifiers are names for AoH/HoA/HoH and 0-based positions for AoA. The
+row axis is positional for AoA/AoH/HoA and string-sorted key order for HoH (the
+only deterministic order a HoH has). Filling stays within each column's
+existing length: ragged HoA columns are not extended, and AoA rows are not
+extended past their own length.
+
+C<limit> caps the number of consecutive NA cells filled in a single gap; the
+remaining cells in an over-long gap stay NA, and the count resets after the
+next real value. A trailing run of NA (with nothing below it) is left as NA.
+
+Returns a NEW frame; the input is never modified.
+
+=head3 Example
+
+ bfill([ { v => undef }, { v => 2 }, { v => undef } ], cols => [ 'v' ]);
+ # [ { v => 2 }, { v => 2 }, { v => undef } ]   # trailing NA stays
+ 
+ bfill({ b => { x => undef }, a => { x => 5 }, c => { x => undef } }, cols => [ 'x' ]);
+ # sorted-key order a,b,c; nothing after a to pull back, so:
+ # { a => { x => 5 }, b => { x => undef }, c => { x => undef } }
+
+=head3 Errors
+
+Dies on: undefined data; an odd trailing argument list; an unknown argument; a
+C<cols> column that does not exist; or a C<limit> that is not a positive integer.
+
 =head2 binom_test
 
 C<binom_test> answers one question: you ran a yes/no experiment C<n> times and
@@ -3682,6 +4733,21 @@ matching columns; C<remove> returns everything except them. The result is the
 same shape as the input (HoH → HoH, HoA → HoA, AoH → AoH), with cell values
 copied and the original structure left untouched.
 
+The selector — the value of C<keep> or C<remove> — can be given three ways:
+
+=over
+
+=item * an B<array ref> of exact column names,
+
+=item * a B<< C<qr//> regex >> matched against column names,
+
+=item * a B<predicate> (CODE ref or function name) evaluated against a column's
+values.
+
+=back
+
+The first two select by name; the predicate is the one that looks at the data.
+
 =head3 Selecting by name
 
 Pass an array ref of column names. Naming a column that is not present in the
@@ -3690,6 +4756,20 @@ kept column simply comes back without it:
 
  my @aoh = ( { a => 1, b => 2 }, { a => 3 } );
  cfilter(\@aoh, keep => ['b']);   # [ { b => 2 }, {} ]
+
+=head3 Selecting by a name pattern
+
+Pass a C<qr//> regex, and columns are kept (or removed) according to whether
+their B<name> matches. This is the concise way to act on a family of columns:
+
+ # drop every column whose name contains "step" or "bias_"
+ cfilter(\%md, remove => qr/(?:step|bias_)/);
+ # keep only the y0, y1, ... columns
+ cfilter(\%md, keep => qr/^y\d+$/);
+
+The pattern matches anywhere in the name (it is not anchored), exactly like
+Perl's C<=~>. Unlike a named column, a pattern that matches nothing is not an
+error — it simply keeps or removes nothing.
 
 =head3 Selecting by a predicate
 
@@ -3723,8 +4803,11 @@ C<cfilter> dies (via C<croak>) when:
 
 =item * a named column is not present in the data,
 
-=item * the selector is neither an array ref nor a code ref / function name, or the
-function name cannot be resolved,
+=item * the selector is not an array ref, a C<qr//> regex, or a code ref / function
+name, or the function name cannot be resolved,
+
+=item * C<na> or C<against> is given with a by-name or regex selector (they apply only
+to a value predicate),
 
 =item * an unknown option is given, or the options are not C<< name =E<gt> value >> pairs,
 
@@ -4625,6 +5708,79 @@ so a ragged frame stays ragged:
  drop_cols([ {a=>1,b=>2}, {a=>3,c=>9} ], 'a');
  # [ { b => 2 }, { c => 9 } ]
 
+=head2 drop_duplicates
+
+Remove duplicate rows, loosely modeled on pandas' C<DataFrame.drop_duplicates>.
+Works on the three positional/columnar shapes — AoA C<[ [..], .. ]>, AoH
+C<< [ {A=E<gt>..}, .. ] >>, and HoA C<< { A=E<gt>[..], .. } >> — but B<not> HoH: its rows are
+labeled, so row-level de-duplication has no natural meaning (convert with
+C<hoh2aoh>/C<hoh2hoa> first).
+
+=head3 Usage
+
+ drop_duplicates($df);                          # dedupe on every column
+ drop_duplicates($df, subset => 'id');          # only look at column 'id'
+ drop_duplicates($df, subset => ['a', 'b']);    # a composite key
+ drop_duplicates($df, keep => 'last');          # keep the last occurrence
+ drop_duplicates($df, keep => 0);               # drop EVERY duplicated row
+
+Two rows are duplicates when their cells are equal in every C<subset> column.
+Comparison is by B<stringified value with a distinct undef (NA)> — the same
+key semantics C<merge> uses — so C<1> and C<"1.0"> are I<not> equal, while two
+undef cells I<are> equal to each other.
+
+=head3 C<subset> — which columns define a row's identity
+
+Defaults to every column. Column identifiers are B<0-based integer positions>
+for AoA and B<names> for AoH/HoA. Pass a single column as a scalar or several
+as an arrayref. The default column set is the widest row's positions for AoA,
+the sorted union of row keys for AoH, and the sorted keys for HoA.
+
+ my $aoh = [ { id => 1, v => 'a' }, { id => 1, v => 'b' }, { id => 2, v => 'c' } ];
+ drop_duplicates($aoh, subset => 'id');
+ # [ { id => 1, v => 'a' }, { id => 2, v => 'c' } ]
+
+Columns outside C<subset> are not compared, but they stay aligned — a surviving
+row keeps all of its columns.
+
+=head3 C<keep> — which occurrence survives
+
+=over
+
+=item * B<< C<'first'> >> (default) — keep the earliest occurrence of each row.
+
+=item * B<< C<'last'> >> — keep the latest occurrence.
+
+=item * B<< C<0> >> (or C<'none'>) — drop I<every> row that has a duplicate, keeping only
+rows that were unique.
+
+my $df = { id => [1, 1, 2], v => [10, 20, 30] };
+drop_duplicates($df, subset => 'id');                 # { id => [1, 2], v => [10, 30] }
+drop_duplicates($df, subset => 'id', keep => 'last'); # { id => [1, 2], v => [20, 30] }
+
+=back
+
+Row order is preserved: the survivors come out in their original first-seen
+positions.
+
+=head3 Good to know
+
+=over
+
+=item * B<Returns a new data frame; the original is never modified.> For HoA the
+columns are rebuilt (cell values copied); for AoA and AoH the surviving row
+references are reused, not deep-copied. Clone the result if you need full
+independence.
+
+=item * B<It dies> on: undefined or non-ref data; an HoH frame; an unknown argument;
+an empty or duplicated C<subset>; an invalid C<keep>; an AoA position that is
+not a non-negative integer or is out of range; or a C<subset> name absent from
+an AoH or HoA.
+
+=item * An empty frame returns empty rather than erroring.
+
+=back
+
 =head2 dropna
 
 Drop missing data from a data frame, loosely modeled on pandas' C<dropna>. Works
@@ -4693,6 +5849,86 @@ values (ambiguous HoA vs HoH).
 =item * HoH results come back in hash order, since HoH rows are unordered.
 
 =back
+
+=head2 ffill
+
+Forward-fill NA (undef) cells with the last valid value seen above them along
+the row axis, like C<pandas.DataFrame.ffill>. See C<bfill> for the backward
+direction and C<fillna> for constant fills.
+
+ ffill($df,
+     cols  => [ 'v' ],   # restrict to these columns (default: every column)
+     limit => 2,         # max consecutive fills per gap (default: unlimited)
+ );
+
+Column identifiers are names for AoH/HoA/HoH and 0-based positions for AoA. The
+row axis is positional for AoA/AoH/HoA and string-sorted key order for HoH (the
+only deterministic order a HoH has). Filling stays within each column's
+existing length: ragged HoA columns are not extended, and AoA rows are not
+extended past their own length.
+
+C<limit> caps the number of consecutive NA cells filled in a single gap; the
+remaining cells in an over-long gap stay NA, and the count resets after the
+next real value. A leading run of NA (with nothing above it) is left as NA.
+
+Returns a NEW frame; the input is never modified.
+
+=head3 Example
+
+ ffill([ { v => 1 }, { v => undef }, { v => undef }, { v => 4 }, { v => undef } ],
+     cols => [ 'v' ]);
+ # [ { v => 1 }, { v => 1 }, { v => 1 }, { v => 4 }, { v => 4 } ]
+ 
+ ffill([ { v => 1 }, { v => undef }, { v => undef }, { v => 4 } ],
+     cols => [ 'v' ], limit => 1);
+ # [ { v => 1 }, { v => 1 }, { v => undef }, { v => 4 } ]
+
+=head3 Errors
+
+Dies on: undefined data; an odd trailing argument list; an unknown argument; a
+C<cols> column that does not exist; or a C<limit> that is not a positive integer.
+
+=head2 fillna
+
+Replace NA (undef) cells with a constant, like C<pandas.DataFrame.fillna> with
+a scalar or a dict. For propagation from neighbouring rows instead of a
+constant, use C<ffill>/C<bfill>.
+
+ fillna($df,
+     value => 0,                    # scalar: fill every NA (or only within C<cols>)
+     value => { a => 9, b => -1 },  # dict: fill only these columns
+     cols  => [ 'a', 'b' ],         # restrict a scalar fill (forbidden with a dict)
+ );
+
+C<value> is required. Column identifiers are names for AoH/HoA/HoH and 0-based
+positions for AoA. A missing hash key counts as NA and is materialised when
+filled (as in C<dropna>'s NA view). AoA rows are never extended past their own
+length. Ragged HoA columns are extended to the longest column's length before
+filling.
+
+A B<scalar> C<value> fills every NA in the frame, or — with C<cols> — only NA
+cells in the named columns. A B<hashref> C<value> fills only the columns it
+names; a dict key that matches no existing column is ignored (matching
+pandas), and C<cols> may not be combined with a dict.
+
+Returns a NEW frame; the input is never modified.
+
+=head3 Example
+
+ fillna([ { a => 1, b => undef }, { a => undef, b => 4 } ], value => 0);
+ # [ { a => 1, b => 0 }, { a => 0, b => 4 } ]
+ 
+ fillna([ { a => undef, b => undef } ], value => { a => 9, Z => 1 });
+ # [ { a => 9, b => undef } ]   # Z ignored, b left NA
+ 
+ fillna([ { a => undef, b => undef } ], value => 7, cols => [ 'b' ]);
+ # [ { a => undef, b => 7 } ]
+
+=head3 Errors
+
+Dies on: undefined data; an odd trailing argument list; an unknown argument; a
+missing C<value>; combining C<cols> with a dict C<value>; or a scalar-fill C<cols>
+naming a column that does not exist.
 
 =head2 filter
 
@@ -4916,6 +6152,36 @@ which returns a hash reference:
      }
  });
 
+=head3 larger (R x C) tables
+
+Any table of at least 2x2 counts is accepted, as either a 2D array reference or a 2D hash reference:
+
+ my $res = fisher_test([
+     [5, 3, 2],
+     [1, 4, 6],
+     [7, 2, 1],
+ ]);
+
+For tables larger than 2x2 the p-value is computed by exact enumeration of
+every contingency table sharing the observed row and column margins (the
+multivariate hypergeometric distribution), and matches R's C<fisher.test> to
+full precision. Only the two-sided test is defined in this case, so
+C<alternative> is ignored and the returned hash reference omits C<conf_int> and
+C<estimate> (the conditional-MLE odds ratio and its confidence interval are
+reported for 2x2 tables only):
+
+ {
+ alternative   "two.sided",
+ conf_level    0.95,
+ method        "Fisher's Exact Test for Count Data",
+ p_value       0.0540892411303451
+ }
+
+As with the 2x2 case, a hash-of-hashes input orders rows by their sorted keys
+and columns by the sorted keys of the first row, so the result is deterministic;
+every row must expose the same set of column keys, and every row of an array
+input must have the same number of columns.
+
 =head2 get_union
 
  my @all   = get_union(\@a, \@b, \@c); # every distinct value, any list
@@ -4932,24 +6198,6 @@ C<List::Compare>'s C<get_union>.
  my @a = (1, 2, 3, 3);
  my @b = (3, 4);
  my @u = get_union(\@a, \@b);            # (1, 2, 3, 4)
-
-=head2 get_unique
-
- my @only_first = get_unique(\@a, \@b, \@c);
- my $count      = get_unique(\@a, \@b, \@c);
-
-Takes one or more array references and returns the values that appear in the
-B<first> reference and in B<no other> reference; with a single reference it
-returns that list's distinct values. Duplicates collapse, the result keeps
-first-appearance order, and scalar context returns the count. Values are
-compared by string form (see C<get_union>). A non-array-ref argument or an
-C<undef> element is fatal. Mirrors C<List::Compare>'s C<get_unique>, which
-likewise defaults to the first list.
-
- my @a = (1, 2, 3);
- my @b = (3, 4, 5);
- my @c = (5, 6);
- my @u = get_unique(\@a, \@b, \@c);      # (1, 2)  -- 3 is also in @b
 
 =head2 glm
 
@@ -5375,6 +6623,192 @@ Computes the histogram of the given data values, operating in single $O(N)$ pass
 
 If C<breaks> is not explicitly provided, it defaults to calculating the number of bins using Sturges' formula.
 
+=head2 interpolate
+
+Fill NA (undef) cells along the row axis, like C<pandas.DataFrame.interpolate>.
+It is the numeric sibling of C<ffill>/C<bfill>: rather than only propagating a
+neighbour's value into a gap, it can fit a curve (line, spline, polynomial…)
+through the surrounding numeric values and read the gap off that curve. B<Every
+one of pandas' interpolation methods is supported> and matched to pandas /
+scipy within C<1e-6> (see I<Method accuracy> below).
+
+ interpolate($df,
+     method          => 'cubic',      # any method below (default: 'linear')
+     cols            => [ 'v' ],      # restrict to these columns (default: every column)
+     order           => 3,            # degree, required by 'polynomial' / 'spline'
+     x               => 't',          # abscissae: column name/index or arrayref
+     limit           => 2,            # max cells filled per NA run (default: unlimited)
+     limit_direction => 'forward',    # 'forward' (default), 'backward', or 'both'
+     limit_area      => 'inside',     # 'inside', 'outside', or omit for both
+ );
+
+Column identifiers are names for AoH/HoA/HoH and 0-based positions for AoA. The
+row axis is positional for AoA/AoH/HoA and string-sorted key order for HoH — the
+same shape and ordering rules as C<ffill>/C<bfill>. Returns a NEW frame; the input
+is never modified.
+
+=head3 Methods
+
+=for html <table>
+<thead>
+<tr>
+  <th>`method`</th>
+  <th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>linear</code> <i>(default)</i></td>
+  <td>straight line between the nearest anchors, rows equally spaced</td>
+</tr>
+<tr>
+  <td><code>index</code>, <code>values</code>, <code>time</code></td>
+  <td>straight line, but spaced by the <code>x</code> coordinates</td>
+</tr>
+<tr>
+  <td><code>slinear</code></td>
+  <td>piecewise linear, interior gaps only</td>
+</tr>
+<tr>
+  <td><code>nearest</code></td>
+  <td>value of the nearer anchor, interior only</td>
+</tr>
+<tr>
+  <td><code>zero</code></td>
+  <td>value of the left anchor (zero-order hold), interior only</td>
+</tr>
+<tr>
+  <td><code>pad</code> / <code>ffill</code></td>
+  <td>hold the last value forward</td>
+</tr>
+<tr>
+  <td><code>bfill</code> / <code>backfill</code></td>
+  <td>hold the next value backward</td>
+</tr>
+<tr>
+  <td><code>quadratic</code>, <code>cubic</code></td>
+  <td>degree-2 / degree-3 interpolating B-spline (scipy <code>interp1d</code>)</td>
+</tr>
+<tr>
+  <td><code>cubicspline</code></td>
+  <td>not-a-knot cubic spline (scipy <code>CubicSpline</code>)</td>
+</tr>
+<tr>
+  <td><code>pchip</code></td>
+  <td>monotone piecewise cubic Hermite (Fritsch–Carlson)</td>
+</tr>
+<tr>
+  <td><code>akima</code></td>
+  <td>Akima piecewise cubic</td>
+</tr>
+<tr>
+  <td><code>barycentric</code>, <code>krogh</code></td>
+  <td>single global polynomial through all anchors</td>
+</tr>
+<tr>
+  <td><code>polynomial</code></td>
+  <td>degree-<code>order</code> interpolating spline (<code>order</code> required)</td>
+</tr>
+<tr>
+  <td><code>spline</code></td>
+  <td>interpolating spline of degree <code>order</code> (<code>order</code> required)</td>
+</tr>
+</tbody>
+</table>
+
+=head3 How gaps and edges are filled
+
+Interpolation follows pandas exactly: every gap is filled from the method, then
+cells that C<limit> / C<limit_direction> / C<limit_area> forbid are blanked back to
+NA. Only numeric cells B<anchor> a fill; a defined non-numeric cell is preserved
+(and, for the piecewise-local methods, blocks interpolation across it).
+
+B<Interior gaps> (anchors on both sides) are always filled. B<Leading/trailing
+gaps> (an edge with anchors on one side only) behave by method family:
+
+=over
+
+=item * C<linear> and the hold methods (C<pad>/C<bfill>) fill the edge with the held
+constant, subject to C<limit_direction>.
+
+=item * C<barycentric>, C<krogh>, C<cubicspline>, C<pchip> B<extrapolate> the edge from
+the fitted curve, again subject to C<limit_direction>.
+
+=item * the C<interp1d> family (C<nearest>, C<zero>, C<slinear>, C<quadratic>, C<cubic>,
+C<polynomial>), C<akima>, and C<spline> are B<interior-only> — they leave
+leading/trailing gaps as NA, matching scipy.
+
+=back
+
+C<limit_direction> chooses which edge is filled (C<forward> → trailing, C<backward>
+→ leading, C<both> → both) and, with C<limit>, which cells a run's cap reaches.
+C<limit_area> restricts filling to C<'inside'> (interior) or C<'outside'>
+(edges only). Interpolated cells are floats; filling stays within each column's
+existing length (ragged HoA columns and short AoA rows are not extended).
+
+=head3 The C<x> argument
+
+By default rows are equally spaced (C<0, 1, 2, …>). Pass C<x> to interpolate
+against real abscissae — either an arrayref (one coordinate per row) or a column
+name/index whose numeric values are the coordinates. C<x> must be strictly
+increasing and is used by every method except plain C<linear> semantics (use
+C<index>/C<values> for a line on unequal spacing).
+
+ # linear fit on unequal spacing
+ interpolate({ v => [ 0, undef, undef, 10 ] }, method => 'index', x => [ 0, 1, 3, 4 ]);
+ # { v => [ 0, 2.5, 7.5, 10 ] }
+ 
+ # interpolate v against a time column t
+ interpolate($df, cols => [ 'v' ], x => 't', method => 'index');
+
+=head3 Examples
+
+ # linear: interior interpolated, trailing held (forward default), leading NA
+ interpolate({ v => [ undef, 1, undef, undef, 4, undef ] });
+ # { v => [ undef, 1, 2, 3, 4, 4 ] }
+ 
+ # cubic spline through four anchors that lie on x^2, so the fit is exact
+ interpolate({ v => [ 0, undef, undef, 9, 16, 25 ] }, method => 'cubic', limit_direction => 'both');
+ # { v => [ 0, 1, 4, 9, 16, 25 ] }
+ 
+ # monotone pchip vs. a global polynomial on the same gaps
+ interpolate({ v => [ 2, undef, 3, undef, undef, 2, 5, undef, 0 ] }, method => 'pchip', limit_direction => 'both');
+
+=head3 Method accuracy
+
+C<linear>, C<index>/C<values>/C<time>, C<slinear>, C<nearest>, C<zero>, C<pad>/C<ffill>,
+C<bfill>/C<backfill>, C<quadratic>, C<cubic>, C<cubicspline>, C<pchip>, C<akima>,
+C<barycentric>, C<krogh>, and C<polynomial> reproduce pandas/scipy to machine
+precision (the test suite compares against pandas 2.2.3 / scipy 1.15.2).
+
+Two deliberate departures from pandas:
+
+=over
+
+=item * B<< C<spline> >> is the I<interpolating> spline of degree C<order> (equivalent to
+pandas' C<spline> with C<s=0>), because pandas' default C<spline> is a FITPACK
+I<smoothing> spline that is not reproducible without FITPACK. It does not
+extrapolate edges. C<polynomial>/C<spline> support C<order> 1, 2, or 3.
+
+=item * A defined B<non-numeric> cell is treated as a barrier by the piecewise-local
+methods; pandas has no equivalent (its columns are all-numeric).
+
+=back
+
+ > Performance: the per-column numeric core (every method, the linear solve and
+ > the preserve mask) runs in XS. Versus the former pure-Perl kernels this is
+ > roughly 5× faster for C<linear> on a large column, ~11× for C<pchip>, and ~50×
+ > for the spline methods whose dense solve dominates. The fit-based methods
+ > still use a dense solve, so they target modest per-column anchor counts.
+
+=head3 Errors
+
+Dies on: undefined data; an odd trailing argument list; an unknown argument or
+method; C<polynomial>/C<spline> without an integer C<order> in 1–3; a C<cols> or C<x>
+column that does not exist; too few anchors for the chosen method; an C<x> that is
+not strictly increasing or whose length does not match; a C<limit> that is not a
+positive integer; or an invalid C<limit_direction>/C<limit_area>.
+
 =head2 intersection
 
 Returns the set intersection (∩) of a list of array references: the values
@@ -5469,12 +6903,6 @@ same, but C<2> and C<"2.0"> are not.
 calling, rather than letting it silently match.
 
 =back
-
-=head3 Why it's cheap
-
-One pass over each list. Memory is just the first list's set plus one small
-reusable set for de-duping the list currently being checked. A mismatch bails
-out immediately, so unequal lists are usually rejected quickly
 
 =head2 kruskal_test
 
@@ -5649,19 +7077,22 @@ the dot operator also works:
 
 =head2 Lonly
 
- my @left_only = Lonly(\@left, \@right);
- my $count     = Lonly(\@left, \@right);
+ my @only_first = Lonly(\@a, \@b, \@c);
+ my $count      = Lonly(\@a, \@b, \@c);
 
-Takes B<exactly two> array references and returns the values in the left list
-that are absent from the right list. Duplicates collapse, the result keeps
-left-list order, and scalar context returns the count. Values are compared by
-string form (see C<get_union>). A non-array-ref argument, an C<undef> element,
-or anything other than two references is fatal. Mirrors C<List::Compare>'s
-C<get_Lonly>.
+Takes one or more array references and returns the values that appear in the
+B<first> reference and in B<no other> reference; with a single reference it
+returns that list's distinct values. Duplicates collapse, the result keeps
+first-appearance order, and scalar context returns the count. Values are
+compared by string form (see C<get_union>). A non-array-ref argument or an
+C<undef> element is fatal. With exactly two references this is the left-only
+set difference. Mirrors C<List::Compare>'s C<get_unique>, which likewise
+defaults to the first list.
 
- my @a = (1, 2, 3, 4);
+ my @a = (1, 2, 3);
  my @b = (3, 4, 5);
- my @l = Lonly(\@a, \@b);                # (1, 2)
+ my @c = (5, 6);
+ my @u = Lonly(\@a, \@b, \@c);           # (1, 2)  -- 3 is also in @b
 
 =head2 matrix
 
@@ -5711,6 +7142,111 @@ works like mean, taking array references and arrays:
  median( $test_data[$i][0] )
 
 as of version 0.02, median will die if any undefined values are provided
+
+=head2 melt
+
+Reshape a wide frame to long form, like C<pandas.DataFrame.melt>. One or more
+identifier columns (C<id_vars>) are repeated down the output; every other
+selected column (C<value_vars>) is unpivoted into a C<variable>/C<value> pair.
+
+ melt($df,
+     id_vars      => 'A' | [ 'A', 'B' ],   # kept, repeated (default: none)
+     value_vars   => 'C' | [ 'C', 'D' ],   # unpivoted (default: all non-id cols)
+     var_name     => 'variable',           # name of the column-name column
+     value_name   => 'value',              # name of the value column
+     'output.type' => 'aoh',               # aoa|aoh|hoa|hoh (default: input family)
+ );
+
+Column identifiers are names for AoH/HoA/HoH frames and 0-based integer
+positions for AoA. C<value_vars> defaults to every column not in C<id_vars>, in
+C<colnames()> order.
+
+Output row order is B<column-major>: all rows for C<value_vars[0]>, then all
+rows for C<value_vars[1]>, and so on, preserving input row order within each
+block. HoH output has no natural row axis, so labels are reset to a
+C<0 .. N-1> range index.
+
+Returns a NEW frame; the input is never modified.
+
+=head3 Example
+
+ my $df = [ { A => 'a', B => 1, C => 2 },
+            { A => 'b', B => 3, C => 4 } ];
+ melt($df, id_vars => 'A', value_vars => [ 'B', 'C' ]);
+ # [ { A => 'a', variable => 'B', value => 1 },
+ #   { A => 'b', variable => 'B', value => 3 },
+ #   { A => 'a', variable => 'C', value => 2 },
+ #   { A => 'b', variable => 'C', value => 4 } ]
+
+NA cells (undef, or a missing hash key) melt through to C<< value =E<gt> undef >>.
+
+=head3 Errors
+
+Dies on: undefined data; an odd trailing argument list; an unknown argument; an
+unknown C<output.type>; a C<value_vars>/C<id_vars> column that does not exist;
+C<var_name> equal to C<value_name>; or C<var_name>/C<value_name> colliding with an
+C<id_vars> column name.
+
+=head2 merge
+
+A full relational join of two data frames, in the spirit of R's C<merge> and pandas' C<DataFrame.merge>. Where L<#ljoin> only does an in-place left join of a hash-of-hashes keyed by row name, C<merge> supports every common join type, single- or multi-column keys, keys with different names on each side, column-collision suffixes, and any mix of input/output shapes.
+
+ my $joined = merge($left, $right, how => 'inner', on => 'id');
+
+C<$left> and C<$right> may each be an B<AoH> (array of row hash references), a B<HoA> (hash of column array references), or a B<HoH> (hash of row hash references; the outer key is treated as a row and is B<not> used as a join key). Both frames are read non-destructively.
+
+=head3 Join types (C<how>)
+
+=over
+
+=item * C<inner> (default) — only rows whose keys match in both frames.
+
+=item * C<left> — every C<$left> row, plus matching C<$right> columns (unmatched C<$right> columns become C<undef>).
+
+=item * C<right> — every C<$right> row; the mirror image of C<left>.
+
+=item * C<outer> (alias C<full>) — the union: all rows from both frames.
+
+=item * C<cross> — the Cartesian product of the two frames; takes no keys.
+
+=back
+
+=head3 Choosing the keys
+
+=over
+
+=item * C<< on =E<gt> 'col' >> or C<< on =E<gt> ['c1', 'c2'] >> — join on one or more columns present under the same name in both frames. C<by> is an accepted synonym (R spelling).
+
+=item * C<< 'left.on' =E<gt> .., 'right.on' =E<gt> .. >> — keys with different names on each side (each a name or an array reference of equal length). C<by.x>/C<by.y> and C<left_on>/C<right_on> are accepted synonyms. The result carries a single key column under the B<left> name.
+
+=item * If neither is given, C<merge> performs a B<natural join> on the sorted intersection of the two frames' column names (it dies if that intersection is empty).
+
+=back
+
+Keys are matched on the B<stringified> cell value. A row whose key cell is C<undef> (or absent) never matches — the pandas C<NaN> rule — so such a row is dropped by an inner/right join and appears only as a left- or right-only row in a left/outer/right join.
+
+=head3 Colliding columns (C<suffixes>)
+
+A non-key column that appears in B<both> frames would collide, so each copy is renamed by appending a suffix: C<.x> to the left copy and C<.y> to the right by default (R's convention). Override with C<< suffixes =E<gt> ['_left', '_right'] >>.
+
+=head3 Output shape
+
+By default the result matches the shape of C<$left> (a HoH left frame yields an AoH, since a joined frame has no single row-name key). Force it with C<< 'output.type' =E<gt> 'aoh' >> or C<< 'output.type' =E<gt> 'hoa' >>.
+
+=head3 Example
+
+ my $emp  = [ { id => 1, name => 'Alice', dept => 10 },
+              { id => 2, name => 'Bob',   dept => 20 },
+              { id => 3, name => 'Carol', dept => 30 } ];
+ my $dept = [ { dept => 10, dname => 'Sales' },
+              { dept => 20, dname => 'Engineering' } ];
+ 
+ my $left = merge($emp, $dept, how => 'left', on => 'dept');
+ #  [ { id => 1, name => 'Alice', dept => 10, dname => 'Sales' },
+ #    { id => 2, name => 'Bob',   dept => 20, dname => 'Engineering' },
+ #    { id => 3, name => 'Carol', dept => 30, dname => undef } ]
+
+See also L<#ljoin> (in-place HoH left join), L<#concat> / L<#rbind> (stacking frames row-wise), and L<#group_by>.
 
 =head2 min
 
@@ -6029,6 +7565,74 @@ are reserved top-level keys in the result.
 Returns array of false-discovery-rate-corrected p-values, where methods available are "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"
 
  my @q = p_adjust(\@pvalues, $method);
+
+=head2 pivot_table
+
+Aggregate a long frame into a wide one, like C<pandas.pivot_table>. Rows are
+grouped by an C<index> key, spread across columns generated from a C<columns>
+key, and reduced with C<aggfunc>.
+
+ pivot_table($df,
+     index       => 'city' | [ 'city', 'q' ],  # row key (default: none -> one row)
+     columns     => 'year' | [ 'a', 'b' ],      # REQUIRED, generates output columns
+     values      => 'temp' | [ 't', 'h' ],      # aggregated (default: all remaining cols)
+     aggfunc     => 'mean' | [ 'sum', ... ] | sub { ... },
+     skipna      => 1,        # 0 -> any NA in a bucket poisons a numeric reducer
+     fill_value  => 0,        # substitute for NA result cells (default: leave undef)
+     sort        => 1,        # 0 -> keep first-seen row/column order
+     sep         => '.',      # joins pieces of generated column names
+     'output.type' => 'aoh',  # aoa|aoh|hoa|hoh (default: input family)
+ );
+
+C<columns> is required. C<values> defaults to every column that is neither
+C<index> nor C<columns>. Column identifiers are names for AoH/HoA/HoH and
+0-based positions for AoA.
+
+C<aggfunc> accepts the same vocabulary as C<agg()> — C<mean median sum sd var min
+max count n nunique first last mode> — or a coderef (called as
+C<< $code-E<gt>(\@cells) >> with every cell in the bucket, including undef), or an
+arrayref of any of these. With C<< skipna =E<gt> 1 >> (default) undef cells are dropped
+before a numeric reduction; C<< skipna =E<gt> 0 >> makes a numeric reducer return NA if
+its bucket contains any NA.
+
+Rows whose C<columns>-tuple contains NA are skipped (an unnameable column).
+With no C<index>, all rows collapse to a single C<all> row.
+
+=head3 Generated column names
+
+A single value column reduced by a single function names each output column
+after the C<columns>-tuple value alone (flat, pandas-like). Multiple functions
+and/or multiple value columns prefix the function and/or value, joined by
+C<sep>, in B<aggfunc-major> order (function, then value, then columns-tuple).
+A collision between two generated names dies — pass a different C<sep> or
+rename inputs.
+
+=head3 Example
+
+ my $df = [ { city => 'NY', year => 2020, temp => 10 },
+            { city => 'NY', year => 2020, temp => 20 },
+            { city => 'NY', year => 2021, temp => 30 },
+            { city => 'LA', year => 2020, temp => 40 } ];
+ pivot_table($df, index => 'city', columns => 'year', values => 'temp');
+ # [ { city => 'LA', 2020 => 40,  2021 => undef },
+ #   { city => 'NY', 2020 => 15,  2021 => 30    } ]
+ 
+ pivot_table($df, index => 'city', columns => 'year', values => 'temp',
+     aggfunc => [ 'count', 'sum' ]);
+ # names: count.2020 count.2021 sum.2020 sum.2021
+
+Rows and columns are sorted by default (numeric if every key is numeric, else
+string); C<< sort =E<gt> 0 >> keeps first-seen order. HoH output labels come from the
+C<index> values (C<'all'> with no index) and are uniquified with a numeric
+suffix if two joined labels collide. Returns a NEW frame; the input is never
+modified.
+
+=head3 Errors
+
+Dies on: undefined data; an odd trailing argument list; an unknown argument; a
+missing C<columns>; an C<index>/C<columns>/C<values> column that does not exist; an
+unknown C<aggfunc> string; an empty C<aggfunc> list; an unknown C<output.type>; or
+a generated duplicate column name.
 
 =head2 power_t_test
 
@@ -6639,20 +8243,22 @@ How C<undef>/NaN elements are placed (default C<true>):
 
 =head2 Ronly
 
- my @right_only = Ronly(\@left, \@right);
- my $count      = Ronly(\@left, \@right);
+ my @only_last = Ronly(\@a, \@b, \@c);
+ my $count     = Ronly(\@a, \@b, \@c);
 
-Takes B<exactly two> array references and returns the values in the right list
-that are absent from the left list. Duplicates collapse, the result keeps
-right-list order, and scalar context returns the count. Values are compared by
-string form (see C<get_union>). A non-array-ref argument, an C<undef> element,
-or anything other than two references is fatal. Mirrors C<List::Compare>'s
-C<get_Ronly>, and is the reverse of C<Lonly>: C<Ronly(\@a, \@b)> equals
-C<Lonly(\@b, \@a)>.
+The mirror of C<Lonly>: takes one or more array references and returns the values
+that appear in the B<last> reference and in B<no other> reference; with a
+single reference it returns that list's distinct values. Duplicates collapse,
+the result keeps the last list's first-appearance order, and scalar context
+returns the count. Values are compared by string form (see C<get_union>). A
+non-array-ref argument or an C<undef> element is fatal. With exactly two
+references this is the right-only set difference, so C<Ronly(\@a, \@b)> equals
+C<Lonly(\@b, \@a)>; more generally C<Ronly(@refs)> equals C<Lonly(reverse @refs)>.
 
- my @a = (1, 2, 3, 4);
- my @b = (3, 4, 5);
- my @r = Ronly(\@a, \@b); # (5)
+ my @a = (1, 2, 3, 4, 5);
+ my @b = (3, 4, 5, 6, 7);
+ my @c = (5, 6, 7, 8);
+ my @r = Ronly(\@a, \@b, \@c);           # (8)  -- 5,6,7 also appear in @a or @b
 
 =head2 rbinom
 
@@ -7044,38 +8650,57 @@ as of version 0.02, C<sum> will cause the script to die if any undefined values 
 
 =head2 summary
 
-Analogous to R's C<summary>, but does not deal with outputs from other functions.
-C<summary> only describes data as it is entered.
-An option C<nrows> or its synonym C<nrow> specifies the maximum number of rows that will print.
+Analogous to R's C<summary>: a five-number-plus-mean description (C<# values>, C<Min.>, C<1st Qu.>, C<Median>, C<Mean>, C<3rd Qu.>, C<Max.>) of the data as entered (it does not summarise fitted-model objects). It produces one statistics row per numeric I<variable> and renders the table exactly like L<#view> — the same colourised, wide-character-aware, terminal-fitting output — through the same internal renderer, so all of C<view>'s display options apply.
 
-=head3 array of array input
+Which variable becomes a row depends on the shape (every shape C<view> accepts is accepted here):
 
- my @arr;
- foreach my $i (0..18) {
-     push @arr, runif(22);
- }
+=for html <table>
+<thead>
+<tr>
+  <th>input</th>
+  <th>one row per…</th>
+  <th>label column</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>flat vector — <code>summary(@x)</code>, <code>summary(\@x)</code>, or a bare list</td>
+  <td>the whole vector</td>
+  <td><i>(none)</i></td>
+</tr>
+<tr>
+  <td>array of arrays (AoA)</td>
+  <td>inner array</td>
+  <td><code>Index</code></td>
+</tr>
+<tr>
+  <td>hash of arrays (HoA)</td>
+  <td>key</td>
+  <td><code>Key</code></td>
+</tr>
+<tr>
+  <td>array of hashes (AoH) / hash of hashes (HoH)</td>
+  <td>column, gathered across rows</td>
+  <td><code>Column</code></td>
+</tr>
+</tbody>
+</table>
 
-and then C<summary(\@arr)>, or C<summary(@arr)>
+The AoH/HoH case is the per-column summary R gives for a data frame — so the array-of-hashes that C<read_table> returns by default summarises column-by-column:
 
- ---------------------------------------------------------------------------
- 
- Index  # values      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
- ---------------------------------------------------------------------------
-      0       22   0.04312     0.286    0.4975    0.5121    0.7296    0.9633 
-      1       22   0.05932    0.1483     0.495    0.4737    0.7699    0.9371 
-      2       22   0.02742    0.1588    0.4045    0.4325    0.6682    0.9878 
-      3       22  0.009233    0.2552    0.5398    0.5147    0.7755    0.9808 
-      4       22   0.06727    0.2432    0.5019    0.4855    0.7121    0.9043 
-      5       22  0.001032    0.1646    0.3021    0.3727    0.5704    0.9556 
+ summary(read_table('data.csv'));       # one row per column
+ summary(\%hoh, nrows => 20);            # cap the rows shown
+ summary(\@x, color => 1);               # force colour (default: auto on a TTY)
+ my $txt = summary(\%hoa, return_only => 1);   # capture instead of printing
 
-=head3 hash of array input
+Non-numeric and undefined cells are ignored: they never count toward C<# values>, and a variable with no numeric values shows C<0> and C<na>. For example, C<summary> of an AoH:
 
- $test_data = summary(
-     {
-         A => runif(9),
-         B => runif(9)
-     },
- );
+ # summary: 2 rows x 7 cols  (showing 2)
+ Column  # values  Min.  1st Qu.  Median  Mean  3rd Qu.  Max.
+ x              3     1      1.5       2     2      2.5     3
+ y              3    10       15      20    20       25    30
+
+C<summary> prints the table (unless C<return_only> is set) and returns it as a string. C<nrows> (synonyms C<nrow>, C<n>, C<rows>) caps the rows shown, and the C<view> display options C<na>, C<color>, C<colors>, C<max_width>, C<ellipsis>, C<gap>, C<width>, C<to>, and C<return_only> all apply.
 
 =head2 t_test
 
@@ -7981,7 +9606,37 @@ C<read_table>.
 
 =head1 Changes
 
-=head2 0.23 2026-07-08 CDT
+=head2 0.25 2026-07-19 CDT
+
+https://www.cpantesters.org/cpan/report/3376f80e-83bf-11f1-a5f3-44496e8775ea
+
+Fixed a use-after-free in C<fisher_test> on the hash (HoH) input path: the "row is missing column key" error freed its scratch arrays and then read the key strings back out of them to build the croak message. This was harmless on glibc but crashed (C<SIGBUS>) under stricter allocators such as FreeBSD's, failing C<t/fisher_test.t> on CPAN smokers. The key pointers are now captured before the arrays are freed.
+
+=head2 0.24 2026-07-19 CDT
+
+C<interpolate>'s numeric core moved from pure Perl to XS (C<_interp_column_xs>): ~5× faster for C<linear> on large columns, ~11× for C<pchip>, and ~50× for the spline methods whose dense solve dominates. Results are unchanged (bit-for-bit versus the former Perl kernels).
+
+C<Ronly> now accepts one or more array references (like C<Lonly>), returning the values found only in the B<last> reference; the two-argument form is unchanged, and C<Ronly(@refs)> equals C<Lonly(reverse @refs)>.
+
+C<interpolate> gains full C<pandas.DataFrame.interpolate> method parity: C<nearest>, C<zero>, C<slinear>, C<pad>/C<ffill>, C<bfill>/C<backfill>, C<quadratic>, C<cubic>, C<cubicspline>, C<pchip>, C<akima>, C<barycentric>, C<krogh>, C<polynomial>, C<spline>, and C<index>/C<values>/C<time>, plus an C<x> argument for custom abscissae and an C<order> argument. Matched to pandas/scipy within 1e-6.
+
+C<t/transpose.t> no longer loads C<Devel::Confess> in its leak tests: its C<$SIG{__DIE__}> stack-trace objects landed in C<$@> and were reported as leaks by C<Test::LeakTrace> on the croak paths under older perls (e.g. 5.12.3). The die-path leak checks now also clear C<$@> so the exception object cannot be miscounted.
+
+C<cfilter> simplification, use of C<qr///> filtering on columns
+
+C<summary> output now looks more like C<view>, and accepts HoH
+
+C<fisher_test> can compute larger tables than just 2x2
+
+C<read_table> reads xlsx files significantly faster and with less RAM.
+
+Addition of C<bfill>, C<drop_duplicates>, C<ffill>, C<melt>, and C<pivot_table>
+
+Original C<Lonly> code removed, as it was a special case of C<get_unique>, and C<get_unique> was re-named to C<Lonly>.
+
+Removal of C<Devel::Confess> from testing and dependencies.
+
+=head2 0.23 2026-07-10 CDT
 
 C<rename_cols> takes HoH as input
 
@@ -8228,14 +9883,9 @@ with the module's own C<ccflags>.
   <td>single <code>cmp_string_wt</code></td>
 </tr>
 <tr>
-  <td>Set difference</td>
-  <td><code>Lonly</code> + <code>Ronly</code> (duplicated bodies)</td>
-  <td>shared <code>set_difference()</code>; <code>Ronly</code> passes the arrays swapped</td>
-</tr>
-<tr>
-  <td>Multiplicity filter</td>
-  <td><code>intersection</code> + <code>get_unique</code> (~90% shared)</td>
-  <td>shared <code>set_multiplicity()</code> with an "all vs. one" mode flag</td>
+  <td>Multiplicity filter & set difference</td>
+  <td><code>intersection</code> + <code>get_unique</code> (~90% shared); <code>Lonly</code>/<code>Ronly</code> duplicated bodies; a separate <code>set_difference()</code></td>
+  <td>one shared <code>set_multiplicity()</code> with an "all vs. one" mode flag and a <code>from_last</code> flag: <code>intersection</code> (all), <code>Lonly</code> (one, first array), <code>Ronly</code> (one, last array)</td>
 </tr>
 </tbody>
 </table>

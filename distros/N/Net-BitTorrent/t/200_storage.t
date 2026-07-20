@@ -3,6 +3,7 @@ use Test2::V1 -ipP;
 no warnings;
 use lib 'lib', '../lib';
 use Net::BitTorrent::Storage;
+use Net::BitTorrent::Storage::File;
 use Path::Tiny;
 use Digest::SHA qw[sha256];
 #
@@ -126,4 +127,34 @@ subtest 'Audit Path Verification' => sub {
     ok $storage->verify_block_audit( $root2,  1, $data2,  [$h1] ), 'Audit verification passes for 2-block file (block 1)';
     ok !$storage->verify_block_audit( $root2, 0, 'wrong', [$h2] ), 'Audit verification fails with wrong data';
 };
+#
+subtest 'Storage::File read/write bounds validation' => sub {
+    my $temp = Path::Tiny->tempdir;
+    my $file = $temp->child('test.bin');
+    $file->spew_raw( 'X' x 1024 );
+    my $sf   = Net::BitTorrent::Storage::File->new( path => $file, size => 1024 );
+    my $data = $sf->read( 0, 100 );
+    is length($data), 100, 'read within bounds returns correct length';
+    $data = $sf->read( 900, 200 );
+    is length($data), 124, 'read beyond EOF clamped to file size';
+    $data = $sf->read( -1, 10 );
+    is $data, '', 'negative offset returns empty string';
+    $sf->write( 0, 'Y' x 100 );
+    $data = $sf->read( 0, 100 );
+    is $data, 'Y' x 100, 'write then read matches';
+    $sf->write( 1020, 'Z' x 20 );
+    $data = $sf->read( 1020, 10 );
+    is length($data), 4, 'write beyond size is clamped';
+};
+#
+subtest 'Storage::File resolves symlinks via realpath' => sub {
+    my $temp = Path::Tiny->tempdir;
+    my $file = $temp->child('test.bin');
+    $file->spew_raw( 'X' x 100 );
+    my $link = $temp->child('link.bin');
+    symlink( $file->stringify, $link->stringify );
+    my $sf = Net::BitTorrent::Storage::File->new( path => $link, size => 100 );
+    ok $sf->path->exists, 'symlink resolved to real path';
+};
+#
 done_testing;

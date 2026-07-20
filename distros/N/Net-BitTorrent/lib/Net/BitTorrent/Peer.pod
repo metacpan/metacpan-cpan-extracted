@@ -47,7 +47,7 @@ This class implements peer reputation tracking to protect the swarm from malicio
 
 =item * Providing a corrupt piece (failed hash) decreases reputation by 20.
 
-=item * If reputation falls to B<50 or below>, the peer is automatically disconnected and blacklisted for the session.
+=item * If reputation falls to B<20 or below>, the peer is automatically disconnected and blacklisted for the session.
 
 =item * The score is capped only by the number of successful transfers (can exceed 100).
 
@@ -500,7 +500,7 @@ The status string.
 
 =head1 AUTHOR
 
-Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Sanko Robinson - L<https://github.com/sanko>
 
 =head1 COPYRIGHT
 

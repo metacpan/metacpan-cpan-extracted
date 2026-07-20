@@ -233,4 +233,81 @@ YAML
   );
 };
 
+subtest 'proof of concept for a null definition in 3.0' => sub {
+  # see https://github.com/OAI/OpenAPI-Specification/issues/1368
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(<<'YAML'));
+---
+openapi: 3.0.4
+info:
+  title: Test API
+  version: 1.2.3
+paths:
+  /test1:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NullablePet_1'
+      responses:
+        2XX:
+          description: success
+  /test2:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NullablePet_2'
+      responses:
+        2XX:
+          description: success
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+    null_1:
+      allOf:
+        - type: string
+          nullable: true
+        - type: object
+          nullable: true
+    null_2:
+      enum: [ null ]
+    NullablePet_1:
+      anyOf:
+        - $ref: "#/components/schemas/Pet"
+        - $ref: "#/components/schemas/null_1"
+    NullablePet_2:
+      anyOf:
+        - $ref: "#/components/schemas/Pet"
+        - $ref: "#/components/schemas/null_2"
+YAML
+
+  my $request = request('POST', 'http://example.com/test1',
+    [ 'Content-Type' => 'application/json' ], 'null');
+
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'null is an acceptable payload with the first null type',
+  );
+
+  $request = request('POST', 'http://example.com/test2',
+    [ 'Content-Type' => 'application/json' ], 'null');
+
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'null is an acceptable payload with the second null type',
+  );
+};
+
 done_testing;

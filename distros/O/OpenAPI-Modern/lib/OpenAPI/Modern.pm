@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.140-4-g79ec3e50
+package OpenAPI::Modern; # git description: v0.141-11-gddf5720f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 
 use 5.020;
 use utf8;
@@ -21,15 +21,15 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Carp qw(carp croak);
-use List::Util qw(first pairs);
+use List::Util qw(first pairs uniq);
 use if "$]" < 5.041010, 'List::Util' => qw(all any);
 use if "$]" >= 5.041010, experimental => qw(keyword_all keyword_any);
 use builtin::compat qw(indexed blessed);
 use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
-use JSON::Schema::Modern::Utilities 0.638 qw(jsonp unjsonp canonical_uri E abort is_equal true false get_type is_type jsonp_set jsonp_get decode_media_type match_media_type);
-use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_cookie_name is_cookie_value elem);
+use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal true false get_type is_type jsonp_set jsonp_get decode_media_type match_media_type);
+use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas add_formats uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_cookie_name is_cookie_value elem);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(InstanceOf Bool);
@@ -93,7 +93,10 @@ around BUILDARGS => sub ($orig, $class, @args) {
   );
 
   # add the OpenAPI vacabulary, formats and metaschemas to the evaluator if they weren't there already
-  add_vocab_and_default_schemas($args->{evaluator}) if $had_document;
+  if ($had_document) {
+    add_vocab_and_default_schemas($args->{evaluator}, $args->{openapi_document}->oas_version);
+    add_formats($args->{evaluator}, $args->{openapi_document}->oas_version);
+  }
 
   # if there were errors, this will die with a JSON::Schema::Modern::Result object
   $args->{evaluator}->add_document($args->{openapi_document});
@@ -678,7 +681,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
   # RFC9112 §3.2.1-3: "If the target URI's path component is empty, the client MUST send "/" as the
   # path within the origin-form of request-target." This also lets us match a path template of "/".
-  $uri->path->leading_slash(1); # no effect on stringified URI unless path is empty
+  # we don't call $uri->path->leading_slash(1) because it normalizes escaped characters like /
+  $uri->path('/') if $uri->path eq '';
 
   # v3.2.0 §4.8.2, "Path Templating": "The value for these path parameters MUST NOT contain any
   # unescaped “generic syntax” characters described by RFC3986 Section 3: forward slashes (/),
@@ -2280,6 +2284,14 @@ sub THAW ($class, $serializer, $data) {
       if not exists $self->{$attr};
   }
 
+  my @versions = uniq map $_->oas_version,
+    grep $_->isa('JSON::Schema::Modern::Document::OpenAPI'),
+    map $_->{document},
+    $self->evaluator->_canonical_resources;
+
+  delete $self->evaluator->@{ grep /^__openapi_/, keys $self->evaluator->%* };
+  add_formats($self->evaluator, $_) foreach @versions;
+
   return $self;
 }
 
@@ -2297,7 +2309,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.141
+version 0.142
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

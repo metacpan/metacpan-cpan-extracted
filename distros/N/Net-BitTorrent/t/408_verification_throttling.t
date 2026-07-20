@@ -3,7 +3,7 @@ use Test2::V1 -ipP;
 use lib 'lib';
 use Net::BitTorrent;
 use Path::Tiny;
-use Digest::SHA                               qw[sha1];
+use Digest::SHA                               qw[sha1 sha256];
 use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode];
 #
 my $temp         = Path::Tiny->tempdir;
@@ -36,5 +36,60 @@ ok !$t->bitfield->get(1), 'Piece 1 still pending';
 # Tick another 1.0s -> should finish piece 1
 $client->tick(0.1) for 1 .. 10;
 ok $t->bitfield->get(1), 'Piece 1 verified after 2.1s';
+#
+subtest 'Hashing queue drains before accepting when full' => sub {
+    my $temp2   = Path::Tiny->tempdir;
+    my $client2 = Net::BitTorrent->new();
+    my $data2   = 'Q' x 16384;
+    my $info2   = {
+        name           => 'queue_test.txt',
+        'piece length' => 16384,
+        pieces         => sha1($data2),
+        'file tree'    => { 'queue_test.txt' => { '' => { length => 16384, 'pieces root' => sha256($data2) } } }
+    };
+    my $torrent_file2 = $temp2->child('test.torrent');
+    $torrent_file2->spew_raw( bencode( { info => $info2 } ) );
+    my $t2 = $client2->add_torrent( $torrent_file2, $temp2 );
+    $client2->queue_verification( $t2, $_, $data2 ) for 0 .. 31;
+    is $client2->hashing_queue_size(), 32, 'hashing queue at max capacity (32)';
+
+    # With no hashing allowance, drain cannot process anything, so 33rd is dropped
+    $client2->queue_verification( $t2, 32, $data2 );
+    is $client2->hashing_queue_size(), 32, '33rd piece dropped when queue cannot drain';
+
+    # With enough allowance, drain makes room for the next piece
+    my $client3 = Net::BitTorrent->new();
+    my $t3      = $client3->add_torrent( $temp2->child('test.torrent'), $temp2 );
+    $client3->queue_verification( $t3, $_, $data2 ) for 0 .. 31;
+    is $client3->hashing_queue_size(), 32, 'second client queue at max capacity';
+
+    # Give enough allowance to drain one piece (16384 bytes)
+    $client3->set_hashing_rate_limit( 16384 * 1000 );
+    $client3->_process_hashing_queue(1.0);
+    ok $client3->hashing_queue_size() < 32, 'queue drained after processing with allowance';
+
+    # Now the 33rd should be accepted
+    $client3->queue_verification( $t3, 32, $data2 );
+    ok $client3->hashing_queue_size() <= 32, '33rd piece accepted after drain';
+};
+#
+subtest 'Hashing queue allows processing to reduce size' => sub {
+    my $temp3   = Path::Tiny->tempdir;
+    my $client3 = Net::BitTorrent->new();
+    my $data3   = 'R' x 16384;
+    my $info3   = {
+        name           => 'queue_test2.txt',
+        'piece length' => 16384,
+        pieces         => sha1($data3),
+        'file tree'    => { 'queue_test2.txt' => { '' => { length => 16384, 'pieces root' => sha256($data3) } } }
+    };
+    my $torrent_file3 = $temp3->child('test2.torrent');
+    $torrent_file3->spew_raw( bencode( { info => $info3 } ) );
+    my $t3 = $client3->add_torrent( $torrent_file3, $temp3 );
+    $client3->queue_verification( $t3, $_, $data3 ) for 0 .. 9;
+    is $client3->hashing_queue_size(), 10, '10 pieces queued';
+    $client3->_process_hashing_queue(10.0);
+    ok $client3->hashing_queue_size() < 10, 'hashing queue drained after processing';
+};
 #
 done_testing;

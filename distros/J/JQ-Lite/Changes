@@ -1,3 +1,9 @@
+2.48  2026-07-19
+
+  - Fix comparisons evaluated against values produced by pipe filters.
+  - Preserve access to object fields named "count".
+  - Bump module version to 2.48.
+
 2.47  2026-05-29
 
   - Centralize CLI error exit handling to reduce duplicated code.

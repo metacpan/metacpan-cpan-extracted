@@ -304,6 +304,108 @@ static void calculate_exact_stats(long a, long b, long c, long d, NV conf,
 	Safefree(sc); ft_free(&S);
 }
 
+/* --- General R x C exact test (used for anything that is not 2x2) ---------
+ *
+ * The 2x2 machinery above cannot describe larger tables, so the R x C case
+ * is handled by direct enumeration of every contingency table that shares
+ * the observed row and column margins.  Under the null the probability of a
+ * table T with fixed margins is the multivariate hypergeometric
+ *
+ *      P(T) = (prod_i R_i!)(prod_j C_j!) / ( N! prod_ij t_ij! )
+ *
+ * The (two-sided) p-value is the sum of P(T) over all such T whose
+ * probability is <= P(observed).  Only two-sided is defined for R x C, so
+ * 'alternative' is ignored for larger tables (matching R's fisher.test). */
+typedef struct {
+	int nrow, ncol;
+	const long *restrict R;   /* fixed row totals                       */
+	long *restrict C_rem;     /* remaining column totals (mutated)      */
+	NV const_term;            /* sum lgamma(R_i+1)+lgamma(C_j+1)-lgamma(N+1) */
+	NV log_p_obs_tol;         /* log P(observed) + log1p(relErr)        */
+	NV p_total;               /* accumulated p-value                    */
+	long long nodes, cap;     /* leaf counter + overflow guard          */
+	int aborted;              /* set once cap is exceeded               */
+} ft_rxc_ctx;
+
+static void ft_rxc_row(ft_rxc_ctx *restrict X, int row, int col, long row_rem, NV cur_lc);
+
+/* Finish the current row; either recurse to the next free row, or (once the
+ * last free row is placed) derive the final row from the column residuals. */
+static void ft_rxc_after_row(ft_rxc_ctx *restrict X, int row, NV cur_lc) {
+	if (row == X->nrow - 2) {
+		NV lc = cur_lc;
+		for (int j = 0; j < X->ncol; j++) lc += lgamma((NV)X->C_rem[j] + 1.0);
+		NV logP = X->const_term - lc;
+		if (logP <= X->log_p_obs_tol) X->p_total += exp(logP);
+		if (++X->nodes > X->cap) X->aborted = 1;
+		return;
+	}
+	ft_rxc_row(X, row + 1, 0, X->R[row + 1], cur_lc);
+}
+
+/* Distribute row `row`'s total across the columns.  The last column of the
+ * row is fixed by the remaining row total; interior columns range over every
+ * value that keeps both the row and the column residuals nonnegative. */
+static void ft_rxc_row(ft_rxc_ctx *restrict X, int row, int col, long row_rem, NV cur_lc) {
+	if (X->aborted) return;
+	if (col == X->ncol - 1) {
+		long v = row_rem;
+		if (v < 0 || v > X->C_rem[col]) return;
+		X->C_rem[col] -= v;
+		ft_rxc_after_row(X, row, cur_lc + lgamma((NV)v + 1.0));
+		X->C_rem[col] += v;
+		return;
+	}
+	long maxv = row_rem < X->C_rem[col] ? row_rem : X->C_rem[col];
+	for (long v = 0; v <= maxv; v++) {
+		X->C_rem[col] -= v;
+		ft_rxc_row(X, row, col + 1, row_rem - v, cur_lc + lgamma((NV)v + 1.0));
+		X->C_rem[col] += v;
+		if (X->aborted) return;
+	}
+}
+
+/* Returns the two-sided exact p-value, or -1.0 if the enumeration exceeded
+ * the safety cap (the caller turns that into a croak). */
+static NV fisher_rxc_pvalue(pTHX_ const long *restrict cells, int nrow, int ncol) {
+	long *restrict R = NULL, *restrict C = NULL;
+	Newxz(R, nrow, long);
+	Newxz(C, ncol, long);
+	long N = 0;
+	for (int i = 0; i < nrow; i++)
+		for (int j = 0; j < ncol; j++) {
+			long v = cells[i * ncol + j];
+			R[i] += v; C[j] += v; N += v;
+		}
+
+	NV const_term = -lgamma((NV)N + 1.0);
+	for (int i = 0; i < nrow; i++) const_term += lgamma((NV)R[i] + 1.0);
+	for (int j = 0; j < ncol; j++) const_term += lgamma((NV)C[j] + 1.0);
+
+	NV obs_lc = 0.0;
+	for (int i = 0; i < nrow * ncol; i++) obs_lc += lgamma((NV)cells[i] + 1.0);
+
+	ft_rxc_ctx X;
+	X.nrow = nrow; X.ncol = ncol; X.R = R; X.C_rem = C;
+	X.const_term = const_term;
+	X.log_p_obs_tol = (const_term - obs_lc) + log1p(1e-7);
+	X.p_total = 0.0;
+	X.nodes = 0; X.cap = 200000000LL; X.aborted = 0;
+
+	ft_rxc_row(&X, 0, 0, R[0], 0.0);
+
+	NV p = X.aborted ? -1.0 : X.p_total;
+	if (p > 1.0) p = 1.0;
+	Safefree(R); Safefree(C);
+	return p;
+}
+
+/* qsort comparator: order (key,value) pairs by their string key. */
+typedef struct { const char *restrict k; SV *restrict v; } ft_kv;
+static int ft_kv_cmp(const void *a, const void *b) {
+	return strcmp(((const ft_kv *)a)->k, ((const ft_kv *)b)->k);
+}
+
 // small helper: fetch a nonnegative integer cell from an SV, with validation
 static long ft_cell(pTHX_ SV *sv, const char *what) {
 	if (!sv || !SvOK(sv)) croak("fisher_test: %s is undef", what);
@@ -3335,47 +3437,6 @@ static NV st_qtukey(NV p, NV rr, NV cc, NV df)
  * XPUSHs/EXTEND operate on the local `sp`, hence the in/out pointer.
  */
 
-/* Backs Lonly() and Ronly(): the values in `keep` (deduped, first-seen order)
- * that do not occur in `other`. Ronly is just Lonly with the two arrays
- * swapped, so both XSUBs call this. */
-static SV** set_difference(pTHX_ SV **sp, SV *keep_sv, SV *other_sv,
-                           const char *keep_side, const char *other_side,
-                           const char *name, int gimme) {
-	HV *restrict inOther = (HV*)sv_2mortal((SV*)newHV());
-	HV *restrict seen    = (HV*)sv_2mortal((SV*)newHV());
-	AV *restrict other   = (AV*)SvRV(other_sv);
-	AV *restrict keep    = (AV*)SvRV(keep_sv);
-	size_t olen = (size_t)(av_len(other) + 1);
-	size_t klen_a, n = 0;
-	/* keep_side/other_side name the physical (left/right) position of each
-	 * array so the croak matches how the value was passed, regardless of the
-	 * keep/subtract role (Ronly swaps the roles but not the positions). */
-	for (size_t j = 0; j < olen; j++) {
-		SV **restrict tv = av_fetch(other, j, 0);
-		STRLEN klen; const char *restrict key; I32 hklen;
-		if (!(tv && SvOK(*tv)))
-			croak("%s: undefined value in %s array ref at index %" UVuf, name, other_side, (UV)j);
-		key   = SvPV(*tv, klen);
-		hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
-		(void)hv_store(inOther, key, hklen, &PL_sv_undef, 0);
-	}
-	klen_a = (size_t)(av_len(keep) + 1);
-	for (size_t j = 0; j < klen_a; j++) {
-		SV **restrict tv = av_fetch(keep, j, 0);
-		STRLEN klen; const char *restrict key; I32 hklen;
-		if (!(tv && SvOK(*tv)))
-			croak("%s: undefined value in %s array ref at index %" UVuf, name, keep_side, (UV)j);
-		key   = SvPV(*tv, klen);
-		hklen = SvUTF8(*tv) ? -(I32)klen : (I32)klen;
-		if (hv_exists(inOther, key, hklen)) continue;   /* present in other set   */
-		if (hv_exists(seen,    key, hklen)) continue;   /* dedup within keep set  */
-		(void)hv_store(seen, key, hklen, &PL_sv_undef, 0);
-		n++;
-		if (gimme != G_SCALAR) XPUSHs(sv_2mortal(newSVsv(*tv)));
-	}
-	if (gimme == G_SCALAR) XPUSHs(sv_2mortal(newSVuv(n)));
-	return sp;
-}
 /* Backs is_equivalent(). Returns 1 iff all `nrefs` array refs share one
  * distinct-value set (multiplicity/order ignored), matching List::Compare's
  * is_LequivalentR() generalised to N lists; else 0. Equivalence is transitive,
@@ -3426,17 +3487,19 @@ static int set_equivalent(pTHX_ SV **restrict args, size_t nrefs, const char *na
 	}
 	return 1;
 }
-/* Backs intersection() and get_unique(). For every distinct value it counts
+/* Backs intersection(), Lonly() and Ronly(). For every distinct value it counts
  * how many of the input arrays contain it (per-array dedup via `loc`), building
- * the candidate list `order` from the FIRST array only, in first-appearance
- * order, then emits the candidates whose count matches the wanted multiplicity:
+ * the candidate list `order` from one chosen array in first-appearance order,
+ * then emits the candidates whose count matches the wanted multiplicity:
  *   want_all != 0 -> count == nrefs (in every array: intersection)
- *   want_all == 0 -> count == 1     (in the first array and no other: get_unique)
- * Both semantics only ever return values present in the first array, so
- * collecting candidates from the first array is correct and matches the
- * historical behaviour of both functions. */
+ *   want_all == 0 -> count == 1     (in the chosen array and no other)
+ * `from_last` picks which array supplies the candidates: the FIRST (0) for
+ * intersection/Lonly, or the LAST (1) for Ronly. With want_all == 0 that makes
+ * Lonly "only in the first array" and Ronly "only in the last array", so the
+ * two-array Ronly(a,b) still equals Lonly(b,a). Every emitted value is present
+ * in the chosen array, so drawing candidates from it is correct for all three. */
 static SV** set_multiplicity(pTHX_ SV **sp, SV **restrict args, size_t nrefs,
-                             int want_all, const char *name, int gimme) {
+                             int want_all, int from_last, const char *name, int gimme) {
 	HV *restrict count = (HV*)sv_2mortal((SV*)newHV());
 	AV *restrict order = (AV*)sv_2mortal((SV*)newAV());
 	size_t n = 0, olen;
@@ -3460,7 +3523,7 @@ static SV** set_multiplicity(pTHX_ SV **sp, SV **restrict args, size_t nrefs,
 			(void)hv_store(loc, key, hklen, &PL_sv_undef, 0);
 			cv = hv_fetch(count, key, hklen, 1);
 			if (cv && *cv) sv_setiv(*cv, SvOK(*cv) ? SvIV(*cv) + 1 : 1);
-			if (i == 0)                                 /* candidates: first ref only */
+			if (i == (from_last ? nrefs - 1 : 0))       /* candidates: chosen ref only */
 				av_push(order, newSVsv(*tv));
 		}
 	}
@@ -4118,26 +4181,686 @@ static AV *rowA_select(pTHX_ AV *src, IV *idx, SSize_t n) {
 	return out;
 }
 
+/* ======================================================================
+ * merge() helpers -- full relational join (R merge / pandas merge).
+ *
+ * Every frame is normalised to an AoH (array of row hashrefs); the join is
+ * performed on that and the result materialised back to AoH or HoA.  Join
+ * keys match on the *stringified* cell value (canonical, length-prefixed),
+ * the natural Perl hash-join semantics; an undef/missing key cell never
+ * matches (pandas NaN rule).
+ * ====================================================================== */
+#define MG_KEYSEP "\x1e"
+#define MG_INNER 0
+#define MG_LEFT  1
+#define MG_RIGHT 2
+#define MG_OUTER 3
+#define MG_CROSS 4
+
+/* Normalise any supported frame shape to a mortal AV of row hashrefs.
+ * AoH rows are aliased (shared by ref); HoA/HoH rows are freshly built. */
+static AV *
+mg_to_aoh(pTHX_ SV *restrict frame, const char *restrict side) {
+	if (!frame || !SvROK(frame))
+		croak("merge: %s frame must be an array-ref (AoH) or hash-ref (HoA/HoH)", side);
+	SV *restrict rv = SvRV(frame);
+	AV *restrict out = (AV *)sv_2mortal((SV *)newAV());
+	if (SvTYPE(rv) == SVt_PVAV) {			/* AoH */
+		AV *restrict av = (AV *)rv;
+		SSize_t n = av_len(av) + 1;
+		for (SSize_t i = 0; i < n; i++) {
+			SV **restrict rp = av_fetch(av, i, 0);
+			if (!rp || !*rp || !SvOK(*rp)) continue;
+			SV *restrict r = *rp;
+			if (!SvROK(r) || SvTYPE(SvRV(r)) != SVt_PVHV) {
+				if (SvROK(r) && SvTYPE(SvRV(r)) == SVt_PVAV)
+					croak("merge: %s frame is an array-of-arrays; merge needs "
+					      "named columns (give it an AoH, HoA, or HoH)", side);
+				croak("merge: %s frame row %ld is not a hash-ref (need an AoH)",
+				      side, (long)i);
+			}
+			av_push(out, SvREFCNT_inc_simple_NN(r));
+		}
+		return out;
+	}
+	if (SvTYPE(rv) != SVt_PVHV)
+		croak("merge: %s frame must be AoH/HoA/HoH", side);
+	HV *restrict hv = (HV *)rv;
+	hv_iterinit(hv);
+	HE *restrict e0 = hv_iternext(hv);
+	if (!e0) return out;				/* empty hash -> empty frame */
+	SV *restrict v0 = HeVAL(e0);
+	if (SvROK(v0) && SvTYPE(SvRV(v0)) == SVt_PVHV) {	/* HoH: inner hashes are rows */
+		HE *restrict e;
+		hv_iterinit(hv);
+		while ((e = hv_iternext(hv))) {
+			SV *restrict v = HeVAL(e);
+			if (!SvROK(v) || SvTYPE(SvRV(v)) != SVt_PVHV)
+				croak("merge: %s frame (HoH) value for row '%s' is not a hash-ref",
+				      side, HePV(e, PL_na));
+			av_push(out, SvREFCNT_inc_simple_NN(v));
+		}
+		return out;
+	}
+	if (!(SvROK(v0) && SvTYPE(SvRV(v0)) == SVt_PVAV))
+		croak("merge: %s frame hash values must be array-refs (HoA) or hash-refs (HoH)", side);
+	/* HoA -> transpose to AoH */
+	AV *restrict colk = (AV *)sv_2mortal((SV *)newAV());
+	SSize_t maxlen = 0;
+	HE *restrict e;
+	hv_iterinit(hv);
+	while ((e = hv_iternext(hv))) {
+		SV *restrict v = HeVAL(e);
+		if (!SvROK(v) || SvTYPE(SvRV(v)) != SVt_PVAV)
+			croak("merge: %s frame (HoA) column '%s' is not an array-ref",
+			      side, HePV(e, PL_na));
+		SSize_t l = av_len((AV *)SvRV(v)) + 1;
+		if (l > maxlen) maxlen = l;
+		av_push(colk, newSVsv(hv_iterkeysv(e)));
+	}
+	SSize_t nc = av_len(colk) + 1;
+	for (SSize_t i = 0; i < maxlen; i++) {
+		HV *restrict row = newHV();
+		for (SSize_t c = 0; c < nc; c++) {
+			SV *restrict ck = *av_fetch(colk, c, 0);
+			HE *restrict che = hv_fetch_ent(hv, ck, 0, 0);
+			SV *restrict cell = NULL;
+			if (che) {
+				SV **restrict cp = av_fetch((AV *)SvRV(HeVAL(che)), i, 0);
+				if (cp && *cp) cell = *cp;
+			}
+			(void)hv_store_ent(row, ck, cell ? newSVsv(cell) : newSV(0), 0);
+		}
+		av_push(out, newRV_noinc((SV *)row));
+	}
+	return out;
+}
+
+/* 0 = AoH, 1 = HoA, 2 = HoH (used only to pick the default output shape). */
+static int
+mg_shape(pTHX_ SV *restrict frame) {
+	SV *restrict rv = SvRV(frame);
+	if (SvTYPE(rv) == SVt_PVAV) return 0;
+	HV *restrict hv = (HV *)rv;
+	hv_iterinit(hv);
+	HE *restrict e = hv_iternext(hv);
+	if (!e) return 1;
+	SV *restrict v = HeVAL(e);
+	if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV) return 2;
+	return 1;
+}
+
+/* Expand a scalar-or-arrayref option into a mortal AV of name SVs. */
+static AV *
+mg_names(pTHX_ SV *restrict v) {
+	AV *restrict a = (AV *)sv_2mortal((SV *)newAV());
+	if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) {
+		AV *restrict s = (AV *)SvRV(v);
+		SSize_t n = av_len(s) + 1;
+		for (SSize_t i = 0; i < n; i++) {
+			SV **restrict p = av_fetch(s, i, 0);
+			av_push(a, newSVsv((p && *p) ? *p : &PL_sv_undef));
+		}
+	} else {
+		av_push(a, newSVsv(v));
+	}
+	return a;
+}
+
+/* Canonical, length-prefixed join key over `nkeys` columns of `row`.
+ * Returns a mortal SV; sets *ok = 0 if any key cell is missing/undef. */
+static SV *
+mg_key(pTHX_ HV *restrict row, AV *restrict keys, SSize_t nkeys, int *restrict ok) {
+	SV *restrict k = sv_2mortal(newSVpvs(""));
+	*ok = 1;
+	for (SSize_t j = 0; j < nkeys; j++) {
+		SV *restrict kn = *av_fetch(keys, j, 0);
+		HE *restrict e = hv_fetch_ent(row, kn, 0, 0);
+		if (!e || !SvOK(HeVAL(e))) { *ok = 0; break; }
+		STRLEN l;
+		const char *restrict p = SvPV(HeVAL(e), l);
+		sv_catpvf(k, "%lu" MG_KEYSEP, (unsigned long)l);
+		sv_catpvn(k, p, l);
+		sv_catpvn(k, MG_KEYSEP, 1);
+	}
+	return k;
+}
+
+/* Build one output row hashref from a left row (or NULL) and a right row
+ * (or NULL) and push it onto `result`. */
+static void
+mg_emit(pTHX_ AV *restrict result, HV *restrict li, HV *restrict ri,
+        AV *restrict lkeys, AV *restrict rkeys, SSize_t nkeys,
+        AV *restrict lc_src, AV *restrict lc_out, SSize_t nlc,
+        AV *restrict rc_src, AV *restrict rc_out, SSize_t nrc) {
+	HV *restrict row = newHV();
+	for (SSize_t k = 0; k < nkeys; k++) {
+		SV *restrict outn = *av_fetch(lkeys, k, 0);
+		SV *restrict val = NULL;
+		if (li) {
+			HE *restrict e = hv_fetch_ent(li, *av_fetch(lkeys, k, 0), 0, 0);
+			if (e && SvOK(HeVAL(e))) val = HeVAL(e);
+		}
+		if (!val && ri) {
+			HE *restrict e = hv_fetch_ent(ri, *av_fetch(rkeys, k, 0), 0, 0);
+			if (e) val = HeVAL(e);
+		}
+		(void)hv_store_ent(row, outn, val ? newSVsv(val) : newSV(0), 0);
+	}
+	for (SSize_t c = 0; c < nlc; c++) {
+		SV *restrict src = *av_fetch(lc_src, c, 0);
+		SV *restrict outn = *av_fetch(lc_out, c, 0);
+		SV *restrict val = NULL;
+		if (li) { HE *restrict e = hv_fetch_ent(li, src, 0, 0); if (e) val = HeVAL(e); }
+		(void)hv_store_ent(row, outn, val ? newSVsv(val) : newSV(0), 0);
+	}
+	for (SSize_t c = 0; c < nrc; c++) {
+		SV *restrict src = *av_fetch(rc_src, c, 0);
+		SV *restrict outn = *av_fetch(rc_out, c, 0);
+		SV *restrict val = NULL;
+		if (ri) { HE *restrict e = hv_fetch_ent(ri, src, 0, 0); if (e) val = HeVAL(e); }
+		(void)hv_store_ent(row, outn, val ? newSVsv(val) : newSV(0), 0);
+	}
+	av_push(result, newRV_noinc((SV *)row));
+}
+
+/* ======================================================================
+ * drop_duplicates() helper -- row-level de-duplication for AoA / AoH / HoA.
+ *
+ * A row's identity is a canonical, length-prefixed key over the subset
+ * cells, exactly the hash-join semantics merge() uses (mg_key): two cells
+ * are "the same" iff they stringify equally, an undef cell gets its own
+ * sentinel that never collides with a real value (a real cell always opens
+ * with a decimal length, the undef token opens with '~'). HoH is handled
+ * entirely in the Perl wrapper (it dies) so there is no code path for it.
+ * ====================================================================== */
+static SV *
+dd_key(pTHX_ SV **restrict cells, SSize_t n) {
+	SV *restrict k = sv_2mortal(newSVpvs(""));
+	for (SSize_t j = 0; j < n; j++) {
+		SV *restrict c = cells[j];
+		if (c && SvOK(c)) {
+			STRLEN l;
+			const char *restrict p = SvPV(c, l);
+			sv_catpvf(k, "%lu" MG_KEYSEP, (unsigned long)l);
+			sv_catpvn(k, p, l);
+			sv_catpvn(k, MG_KEYSEP, 1);
+		} else {
+			sv_catpvn(k, "~" MG_KEYSEP, 2);   /* undef sentinel */
+		}
+	}
+	return k;
+}
+
+/* ===========================================================================
+ * interpolate() numeric core.  Backs Stats::LikeR::_interp_column_xs, which
+ * fills the undef gaps of one already-extracted column (an AV of numbers /
+ * undef gaps / defined non-numeric barriers) in place.  A direct C port of the
+ * former pure-Perl kernels (_interp_* in LikeR.pm); the per-method maths is
+ * validated against pandas/scipy by t/interpolate*.t.  All scratch is Newx +
+ * SAVEFREEPV so it is freed at the XSUB's LEAVE, on normal and croak exits.
+ *
+ * kind[i]: 0 = undef gap (fillable), 1 = numeric anchor, 2 = defined non-numeric
+ * barrier (preserved; blocks the piecewise-local fits, ignored by the fits).
+ * ========================================================================= */
+
+#define IP_LINEAR   1   /* interior fill rules */
+#define IP_NEAREST  2
+#define IP_LEFT     3
+#define IP_RIGHT    4
+#define IP_EDGE_NONE  0 /* leading/trailing hold rules */
+#define IP_EDGE_BOTH  1
+#define IP_EDGE_LEFT  2
+#define IP_EDGE_RIGHT 3
+#define IP_KLINEAR 1    /* fit-kernel types */
+#define IP_KCUBIC  2
+#define IP_KQUAD   3
+#define IP_KPCHIP  4
+#define IP_KAKIMA  5
+#define IP_KBARY   6
+
+/* largest i with xa[i] <= t, clamped to a valid interval [0, n-2] */
+static IV ip_seg(const NV *xa, IV n, NV t) {
+	IV lo = 0, hi = n - 1;
+	while (lo < hi) {
+		IV mid = (lo + hi + 1) / 2;
+		if (xa[mid] <= t) lo = mid; else hi = mid - 1;
+	}
+	if (lo > n - 2) lo = n - 2;
+	if (lo < 0)     lo = 0;
+	return lo;
+}
+
+/* dense Gaussian elimination with partial pivoting: solve A x = b (A row-major
+ * n*n, both overwritten), writing the solution into out.  Croaks if singular. */
+static void ip_solve(pTHX_ NV *A, NV *b, IV n, NV *out) {
+	for (IV col = 0; col < n; col++) {
+		IV piv = col; NV best = fabs(A[col * n + col]);
+		for (IV r = col + 1; r < n; r++) {
+			NV a = fabs(A[r * n + col]);
+			if (a > best) { best = a; piv = r; }
+		}
+		if (piv != col) {
+			for (IV k = 0; k < n; k++) {
+				NV t = A[col * n + k]; A[col * n + k] = A[piv * n + k]; A[piv * n + k] = t;
+			}
+			NV t = b[col]; b[col] = b[piv]; b[piv] = t;
+		}
+		NV d = A[col * n + col];
+		if (d == 0) croak("interpolate: singular system in spline solve");
+		for (IV r = col + 1; r < n; r++) {
+			NV f = A[r * n + col] / d;
+			if (f == 0) continue;
+			for (IV k = col; k < n; k++) A[r * n + k] -= f * A[col * n + k];
+			b[r] -= f * b[col];
+		}
+	}
+	for (IV i = n - 1; i >= 0; i--) {
+		NV s = b[i];
+		for (IV k = i + 1; k < n; k++) s -= A[i * n + k] * out[k];
+		out[i] = s / A[i * n + i];
+	}
+}
+
+/* nearest numeric anchor strictly below / above each index, or -1 across a
+ * barrier or the edge (kind==2 resets the search; kind==0 leaves it running). */
+static void ip_prevnext(const char *kind, IV n, IV *prev, IV *next) {
+	IV p = -1;
+	for (IV i = 0; i < n; i++) {
+		prev[i] = p;
+		if (kind[i] == 1) p = i; else if (kind[i] == 2) p = -1;
+	}
+	IV q = -1;
+	for (IV i = n - 1; i >= 0; i--) {
+		next[i] = q;
+		if (kind[i] == 1) q = i; else if (kind[i] == 2) q = -1;
+	}
+}
+
+// Cox-de Boor B-spline basis B_{j,kk}(tv) over knot vector t (length nt)
+static NV ip_bspline(const NV *t, IV nt, IV j, int kk, NV tv) {
+	if (kk == 0) {
+		if ((t[j] <= tv && tv < t[j + 1])
+		 || (tv == t[nt - 1] && t[j] <= tv && tv <= t[j + 1])) return 1.0;
+		return 0.0;
+	}
+	NV d1 = t[j + kk]     - t[j];
+	NV d2 = t[j + kk + 1] - t[j + 1];
+	NV c1 = d1 > 0 ? (tv - t[j]) / d1 * ip_bspline(t, nt, j, kk - 1, tv) : 0.0;
+	NV c2 = d2 > 0 ? (t[j + kk + 1] - tv) / d2 * ip_bspline(t, nt, j + 1, kk - 1, tv) : 0.0;
+	return c1 + c2;
+}
+
+// scipy PchipInterpolator's one-sided endpoint slope
+static NV ip_pchip_edge(NV h0, NV h1, NV d0, NV d1) {
+	NV d = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);
+	int sd = (d > 0) - (d < 0), s0 = (d0 > 0) - (d0 < 0), s1 = (d1 > 0) - (d1 < 0);
+	if (sd != s0)                                        d = 0;
+	else if (s0 != s1 && fabs(d) > 3 * fabs(d0))         d = 3 * d0;
+	return d;
+}
+
+typedef struct {
+	int type;          // IP_K*
+	IV  na;            // anchor count
+	const NV *xa, *ya; // anchors (borrowed)
+	NV *h;             // spacings (cubic/pchip/akima)
+	NV *M;             // cubic second derivatives
+	NV *d;             // pchip slopes / akima tangents
+	NV *w;             // barycentric weights
+	NV *knots, *coef;  // quadratic B-spline
+	IV  nknots;
+} ip_fit;
+
+/* not-a-knot interpolating cubic spline (== scipy CubicSpline / interp1d cubic) */
+static void ip_build_cubic(pTHX_ ip_fit *F) {
+	IV n = F->na; const NV *xa = F->xa, *ya = F->ya;
+	Newx(F->h, n > 1 ? n - 1 : 1, NV); SAVEFREEPV(F->h);
+	for (IV i = 0; i < n - 1; i++) F->h[i] = xa[i + 1] - xa[i];
+	if (n <= 3) { F->M = NULL; return; }        /* eval handles 2 / 3 directly */
+	NV *A; Newxz(A, n * n, NV); SAVEFREEPV(A);
+	NV *b; Newxz(b, n, NV);     SAVEFREEPV(b);
+	for (IV i = 1; i <= n - 2; i++) {
+		A[i * n + (i - 1)] = F->h[i - 1];
+		A[i * n + i]       = 2 * (F->h[i - 1] + F->h[i]);
+		A[i * n + (i + 1)] = F->h[i];
+		b[i] = 6 * ((ya[i + 1] - ya[i]) / F->h[i] - (ya[i] - ya[i - 1]) / F->h[i - 1]);
+	}
+	A[0]           = -F->h[1]; A[1] = F->h[0] + F->h[1]; A[2] = -F->h[0];
+	A[(n - 1) * n + (n - 3)] = -F->h[n - 2];
+	A[(n - 1) * n + (n - 2)] =  F->h[n - 3] + F->h[n - 2];
+	A[(n - 1) * n + (n - 1)] = -F->h[n - 3];
+	Newx(F->M, n, NV); SAVEFREEPV(F->M);
+	ip_solve(aTHX_ A, b, n, F->M);
+}
+static NV ip_eval_cubic(const ip_fit *F, NV t) {
+	IV n = F->na; const NV *xa = F->xa, *ya = F->ya, *h = F->h;
+	if (n == 2) return ya[0] + (ya[1] - ya[0]) * (t - xa[0]) / h[0];
+	if (n == 3)
+		return ya[0] * (t - xa[1]) * (t - xa[2]) / ((xa[0] - xa[1]) * (xa[0] - xa[2]))
+		     + ya[1] * (t - xa[0]) * (t - xa[2]) / ((xa[1] - xa[0]) * (xa[1] - xa[2]))
+		     + ya[2] * (t - xa[0]) * (t - xa[1]) / ((xa[2] - xa[0]) * (xa[2] - xa[1]));
+	IV i = ip_seg(xa, n, t);
+	NV hi = h[i], A_ = (xa[i + 1] - t) / hi, B_ = (t - xa[i]) / hi;
+	return A_ * ya[i] + B_ * ya[i + 1]
+	     + ((A_ * A_ * A_ - A_) * F->M[i] + (B_ * B_ * B_ - B_) * F->M[i + 1]) * hi * hi / 6;
+}
+
+// degree-2 interpolating B-spline, scipy's midpoint interior knots
+static void ip_build_quad(pTHX_ ip_fit *F) {
+	IV n = F->na; const NV *restrict xa = F->xa, *ya = F->ya; int k = 2;
+	IV nk = n + 3, idx = 0;
+	Newx(F->knots, nk, NV); SAVEFREEPV(F->knots);
+	for (int r = 0; r < k + 1; r++)  F->knots[idx++] = xa[0];
+	for (IV i = 1; i <= n - 3; i++)  F->knots[idx++] = (xa[i] + xa[i + 1]) / 2;
+	for (int r = 0; r < k + 1; r++)  F->knots[idx++] = xa[n - 1];
+	F->nknots = nk;
+	IV m = nk - k - 1;                            /* == n */
+	NV *restrict A; Newxz(A, n * n, NV); SAVEFREEPV(A);
+	NV *restrict b; Newx(b, n, NV);      SAVEFREEPV(b);
+	for (IV i = 0; i < n; i++) {
+		for (IV j = 0; j < m; j++) A[i * n + j] = ip_bspline(F->knots, nk, j, k, xa[i]);
+		b[i] = ya[i];
+	}
+	Newx(F->coef, m, NV); SAVEFREEPV(F->coef);
+	ip_solve(aTHX_ A, b, n, F->coef);
+}
+static NV ip_eval_quad(const ip_fit *F, NV t) {
+	IV m = F->na; NV s = 0;
+	for (IV j = 0; j < m; j++) s += F->coef[j] * ip_bspline(F->knots, F->nknots, j, 2, t);
+	return s;
+}
+
+// monotone piecewise cubic Hermite (Fritsch-Carlson; == scipy Pchip)
+static void ip_build_pchip(pTHX_ ip_fit *F) {
+	IV n = F->na; const NV *xa = F->xa, *ya = F->ya;
+	Newx(F->h, n - 1, NV); SAVEFREEPV(F->h);
+	NV *dk; Newx(dk, n - 1, NV); SAVEFREEPV(dk);
+	for (IV i = 0; i < n - 1; i++) { F->h[i] = xa[i + 1] - xa[i]; dk[i] = (ya[i + 1] - ya[i]) / F->h[i]; }
+	Newx(F->d, n, NV); SAVEFREEPV(F->d);
+	if (n == 2) { F->d[0] = dk[0]; F->d[1] = dk[0]; return; }
+	F->d[0]     = ip_pchip_edge(F->h[0], F->h[1], dk[0], dk[1]);
+	F->d[n - 1] = ip_pchip_edge(F->h[n - 2], F->h[n - 3], dk[n - 2], dk[n - 3]);
+	for (IV i = 1; i <= n - 2; i++) {
+		if (dk[i - 1] * dk[i] <= 0) F->d[i] = 0;
+		else {
+			NV w1 = 2 * F->h[i] + F->h[i - 1], w2 = F->h[i] + 2 * F->h[i - 1];
+			F->d[i] = (w1 + w2) / (w1 / dk[i - 1] + w2 / dk[i]);
+		}
+	}
+}
+static NV ip_eval_pchip(const ip_fit *F, NV t) {
+	IV n = F->na; const NV *xa = F->xa, *ya = F->ya, *h = F->h, *d = F->d;
+	IV i = ip_seg(xa, n, t); NV hi = h[i], s = (t - xa[i]) / hi, s2 = s * s, s3 = s2 * s;
+	NV h00 = 2 * s3 - 3 * s2 + 1, h10 = s3 - 2 * s2 + s, h01 = -2 * s3 + 3 * s2, h11 = s3 - s2;
+	return h00 * ya[i] + h10 * hi * d[i] + h01 * ya[i + 1] + h11 * hi * d[i + 1];
+}
+
+/* Akima piecewise cubic (== scipy Akima1DInterpolator); needs >= 3 anchors */
+static void ip_build_akima(pTHX_ ip_fit *F) {
+	IV n = F->na; const NV *restrict xa = F->xa, *restrict ya = F->ya;
+	Newx(F->h, n - 1, NV); SAVEFREEPV(F->h);
+	NV *restrict m; Newx(m, n - 1, NV); SAVEFREEPV(m);
+	for (IV i = 0; i < n - 1; i++) { F->h[i] = xa[i + 1] - xa[i]; m[i] = (ya[i + 1] - ya[i]) / F->h[i]; }
+	NV *mm; Newx(mm, n + 3, NV); SAVEFREEPV(mm); // slopes extended two each side
+	for (IV i = 0; i < n - 1; i++) mm[i + 2] = m[i];
+	mm[1] = 2 * mm[2] - mm[3];
+	mm[0] = 2 * mm[1] - mm[2];
+	mm[n + 1] = 2 * mm[n]     - mm[n - 1];
+	mm[n + 2] = 2 * mm[n + 1] - mm[n];
+	Newx(F->d, n, NV); SAVEFREEPV(F->d); // tangents
+	for (IV i = 0; i < n; i++) {
+		NV m1 = mm[i], m2 = mm[i + 1], m3 = mm[i + 2], m4 = mm[i + 3];
+		NV d1 = fabs(m4 - m3), d2 = fabs(m2 - m1);
+		F->d[i] = (d1 + d2 == 0) ? (m2 + m3) / 2 : (d1 * m2 + d2 * m3) / (d1 + d2);
+	}
+}
+static NV ip_eval_akima(const ip_fit *F, NV t) {
+	IV n = F->na; const NV *xa = F->xa, *ya = F->ya, *h = F->h, *tk = F->d;
+	IV i = ip_seg(xa, n, t); NV hi = h[i], s = t - xa[i];
+	NV c2 = (3 * (ya[i + 1] - ya[i]) / hi - 2 * tk[i] - tk[i + 1]) / hi;
+	NV c3 = (tk[i] + tk[i + 1] - 2 * (ya[i + 1] - ya[i]) / hi) / (hi * hi);
+	return ya[i] + tk[i] * s + c2 * s * s + c3 * s * s * s;
+}
+
+// global interpolating polynomial in barycentric form (== scipy barycentric/krogh)
+static void ip_build_bary(pTHX_ ip_fit *F) {
+	IV n = F->na; const NV *restrict xa = F->xa;
+	Newx(F->w, n, NV); SAVEFREEPV(F->w);
+	for (IV j = 0; j < n; j++) {
+		NV wj = 1.0;
+		for (IV k = 0; k < n; k++) if (k != j) wj /= (xa[j] - xa[k]);
+		F->w[j] = wj;
+	}
+}
+static NV ip_eval_bary(const ip_fit *F, NV t) {
+	IV n = F->na; const NV *restrict xa = F->xa, *restrict ya = F->ya, *restrict w = F->w;
+	NV num = 0, den = 0;
+	for (IV j = 0; j < n; j++) {
+		if (t == xa[j]) return ya[j];
+		NV c = w[j] / (t - xa[j]);
+		num += c * ya[j]; den += c;
+	}
+	return num / den;
+}
+
+static NV ip_eval_linear(const ip_fit *F, NV t) {
+	IV n = F->na; const NV *restrict xa = F->xa, *restrict ya = F->ya;
+	IV i = ip_seg(xa, n, t);
+	return ya[i] + (ya[i + 1] - ya[i]) * (t - xa[i]) / (xa[i + 1] - xa[i]);
+}
+
+static NV ip_eval(const ip_fit *F, NV t) {
+	switch (F->type) {
+		case IP_KLINEAR: return ip_eval_linear(F, t);
+		case IP_KCUBIC:  return ip_eval_cubic(F, t);
+		case IP_KQUAD:   return ip_eval_quad(F, t);
+		case IP_KPCHIP:  return ip_eval_pchip(F, t);
+		case IP_KAKIMA:  return ip_eval_akima(F, t);
+		case IP_KBARY:   return ip_eval_bary(F, t);
+	}
+	return 0;
+}
+
+/* map a piecewise-local method name to its (interior rule, edge rule); returns
+ * 0 for the fit-based methods */
+static int ip_local_rule(const char *m, int *rule, int *edge) {
+	if (!strcmp(m, "linear") || !strcmp(m, "index") || !strcmp(m, "values") || !strcmp(m, "time"))
+		{ *rule = IP_LINEAR; *edge = IP_EDGE_BOTH; return 1; }
+	if (!strcmp(m, "slinear")) { *rule = IP_LINEAR;  *edge = IP_EDGE_NONE;  return 1; }
+	if (!strcmp(m, "nearest")) { *rule = IP_NEAREST; *edge = IP_EDGE_NONE;  return 1; }
+	if (!strcmp(m, "zero"))    { *rule = IP_LEFT;    *edge = IP_EDGE_NONE;  return 1; }
+	if (!strcmp(m, "pad") || !strcmp(m, "ffill"))    { *rule = IP_LEFT;  *edge = IP_EDGE_LEFT;  return 1; }
+	if (!strcmp(m, "bfill") || !strcmp(m, "backfill")) { *rule = IP_RIGHT; *edge = IP_EDGE_RIGHT; return 1; }
+	return 0;
+}
+
+/* pandas _interp_limit (readable form): mark every gap whose [i-fw .. i+bw]
+ * window is entirely gaps */
+static void ip_far(const char *kind, IV n, IV fw, IV bw, char *pre) {
+	for (IV i = 0; i < n; i++) {
+		if (kind[i] != 0) continue;
+		IV lo = i - fw; if (lo < 0) lo = 0;
+		IV hi = i + bw; if (hi > n - 1) hi = n - 1;
+		bool all = 1;
+		for (IV k = lo; k <= hi; k++) if (kind[k] != 0) { all = 0; break; }
+		if (all) pre[i] = 1;
+	}
+}
+
+/* fill the undef gaps of one column in place (see block header) */
+static void ip_fill_column(pTHX_ AV *vals, AV *xav, const char *method,
+                           SV *order_sv, const char *dir, SV *limit_sv, SV *area_sv) {
+	IV n = av_len(vals) + 1;
+	if (n <= 0) return;
+
+	NV  *restrict x, *restrict y; char *restrict kind;
+	Newx(x, n, NV);       SAVEFREEPV(x);
+	Newx(y, n, NV);       SAVEFREEPV(y);
+	Newx(kind, n, char);  SAVEFREEPV(kind);
+	IV anchors = 0;
+	for (IV i = 0; i < n; i++) {
+		SV **restrict xp = av_fetch(xav, i, 0);
+		x[i] = (xp && *xp) ? SvNV(*xp) : 0;
+		SV **restrict vp = av_fetch(vals, i, 0);
+		SV  *restrict v  = (vp && *vp) ? *vp : NULL;
+		if (!v || !SvOK(v))            kind[i] = 0; // gap
+		else if (looks_like_number(v)) { kind[i] = 1; y[i] = SvNV(v); anchors++; } // anchor
+		else                           kind[i] = 2; // barrier
+	}
+	if (anchors == 0) return;
+
+	NV   *restrict cand; Newx(cand, n, NV);   SAVEFREEPV(cand);
+	char *restrict has;  Newxz(has, n, char); SAVEFREEPV(has);
+
+	int rule, edge;
+	if (ip_local_rule(method, &rule, &edge)) {
+		IV *restrict prev, *restrict next;
+		Newx(prev, n, IV); SAVEFREEPV(prev);
+		Newx(next, n, IV); SAVEFREEPV(next);
+		ip_prevnext(kind, n, prev, next);
+		for (IV i = 0; i < n; i++) {
+			if (kind[i] != 0) continue;
+			IV l = prev[i], r = next[i];
+			if (l >= 0 && r >= 0) {
+				NV vl = y[l], vr = y[r];
+				if      (rule == IP_LINEAR)  cand[i] = vl + (vr - vl) * (x[i] - x[l]) / (x[r] - x[l]);
+				else if (rule == IP_NEAREST) cand[i] = (x[i] - x[l] <= x[r] - x[i]) ? vl : vr;
+				else if (rule == IP_LEFT)    cand[i] = vl;
+				else                         cand[i] = vr;
+				has[i] = 1;
+			} else if (l >= 0) {
+				if (edge == IP_EDGE_BOTH || edge == IP_EDGE_LEFT)  { cand[i] = y[l]; has[i] = 1; }
+			} else if (r >= 0) {
+				if (edge == IP_EDGE_BOTH || edge == IP_EDGE_RIGHT) { cand[i] = y[r]; has[i] = 1; }
+			}
+		}
+	} else if (anchors >= 2) {
+		NV *restrict xa, *restrict ya;
+		Newx(xa, anchors, NV); SAVEFREEPV(xa);
+		Newx(ya, anchors, NV); SAVEFREEPV(ya);
+		IV na = 0;
+		for (IV i = 0; i < n; i++) if (kind[i] == 1) { xa[na] = x[i]; ya[na] = y[i]; na++; }
+		for (IV i = 1; i < na; i++)
+			if (!(xa[i] > xa[i - 1]))
+				croak("interpolate: method '%s' needs strictly increasing x coordinates", method);
+
+		IV order = SvOK(order_sv) ? SvIV(order_sv) : 0;
+		int deg = -1, extrap = 0, ktype = 0;
+		if      (!strcmp(method, "pchip")) { ktype = IP_KPCHIP; extrap = 1; }
+		else if (!strcmp(method, "akima")) { ktype = IP_KAKIMA; extrap = 0; }
+		else if (!strcmp(method, "barycentric") || !strcmp(method, "krogh")) { ktype = IP_KBARY; extrap = 1; }
+		else {
+			if      (!strcmp(method, "cubicspline")) { extrap = 1; deg = 3; }
+			else if (!strcmp(method, "spline"))      { extrap = 0; deg = order; }
+			else if (!strcmp(method, "polynomial"))  { extrap = 0; deg = order; }
+			else if (!strcmp(method, "quadratic"))   { extrap = 0; deg = 2; }
+			else if (!strcmp(method, "cubic"))       { extrap = 0; deg = 3; }
+			if      (deg == 1) ktype = IP_KLINEAR;
+			else if (deg == 2) {
+				if (na < 3) croak("interpolate: method '%s' (degree 2) needs at least 3 numeric anchors", method);
+				ktype = IP_KQUAD;
+			} else if (deg == 3) {
+				if (na < 4 && strcmp(method, "cubicspline") != 0)
+					croak("interpolate: method '%s' (degree 3) needs at least 4 numeric anchors", method);
+				ktype = IP_KCUBIC;
+			} else
+				croak("interpolate: method '%s' supports order 1, 2, or 3 (got %ld)", method, (long)order);
+		}
+		if (ktype == IP_KAKIMA && na == 2) ktype = IP_KCUBIC;// akima degenerates to the line
+
+		ip_fit F; Zero(&F, 1, ip_fit);
+		F.na = na; F.xa = xa; F.ya = ya; F.type = ktype;
+		switch (ktype) {
+			case IP_KLINEAR: break;
+			case IP_KCUBIC:  ip_build_cubic(aTHX_ &F); break;
+			case IP_KQUAD:   ip_build_quad(aTHX_ &F);  break;
+			case IP_KPCHIP:  ip_build_pchip(aTHX_ &F); break;
+			case IP_KAKIMA:  ip_build_akima(aTHX_ &F); break;
+			case IP_KBARY:   ip_build_bary(aTHX_ &F);  break;
+		}
+		NV xmin = xa[0], xmax = xa[na - 1];
+		for (IV i = 0; i < n; i++) {
+			if (kind[i] != 0) continue;
+			NV xv = x[i];
+			if      (xv >= xmin && xv <= xmax) { cand[i] = ip_eval(&F, xv); has[i] = 1; }
+			else if (extrap)                   { cand[i] = ip_eval(&F, xv); has[i] = 1; }
+		}
+	}
+
+	/* pandas preserve_nans: which gaps must stay NA under limit/direction/area */
+	char *restrict pre; Newxz(pre, n, char); SAVEFREEPV(pre);
+	IV first = n, last = -1;
+	for (IV i = 0; i < n; i++)     if (kind[i] == 1) { first = i; break; }
+	for (IV i = n - 1; i >= 0; i--) if (kind[i] == 1) { last = i; break; }
+	int have_limit = SvOK(limit_sv);
+	IV  limit = have_limit ? SvIV(limit_sv) : 0;
+	if (!strcmp(dir, "forward")) {
+		for (IV i = 0; i < first; i++) pre[i] = 1;
+		if (have_limit) ip_far(kind, n, limit, 0, pre);
+	} else if (!strcmp(dir, "backward")) {
+		for (IV i = last + 1; i < n; i++) pre[i] = 1;
+		if (have_limit) ip_far(kind, n, 0, limit, pre);
+	} else { // both
+		if (have_limit) ip_far(kind, n, limit, limit, pre);
+	}
+	if (SvOK(area_sv)) {
+		const char *area = SvPV_nolen(area_sv);
+		if (!strcmp(area, "inside")) {
+			for (IV i = 0; i < first; i++)    pre[i] = 1;
+			for (IV i = last + 1; i < n; i++) pre[i] = 1;
+		} else if (!strcmp(area, "outside")) {
+			for (IV i = 0; i < n; i++) if (kind[i] == 0 && i >= first && i <= last) pre[i] = 1;
+		}
+	}
+
+	for (IV i = 0; i < n; i++) {
+		if (kind[i] != 0 || !has[i] || pre[i]) continue;
+		SV *nsv = newSVnv(cand[i]);
+		if (av_store(vals, i, nsv) == NULL) SvREFCNT_dec(nsv);
+	}
+}
+
 // --- XS SECTION ---
 MODULE = Stats::LikeR  PACKAGE = Stats::LikeR
+
+void
+_interp_column_xs(vals_ref, x_ref, method, order_sv, dir, limit_sv, area_sv)
+	SV *vals_ref
+	SV *x_ref
+	const char *method
+	SV *order_sv
+	const char *dir
+	SV *limit_sv
+	SV *area_sv
+	PPCODE:
+		if (!(SvROK(vals_ref) && SvTYPE(SvRV(vals_ref)) == SVt_PVAV))
+			croak("_interp_column_xs: values must be an array reference");
+		if (!(SvROK(x_ref) && SvTYPE(SvRV(x_ref)) == SVt_PVAV))
+			croak("_interp_column_xs: x must be an array reference");
+		ENTER; SAVETMPS;
+		ip_fill_column(aTHX_ (AV *)SvRV(vals_ref), (AV *)SvRV(x_ref),
+		               method, order_sv, dir, limit_sv, area_sv);
+		FREETMPS; LEAVE;
+		XSRETURN_EMPTY;
 
 SV *_cols_select(df, shape, spec)
 	SV *df
 	IV shape
 	SV *spec
   PREINIT:
-	SV *retval; AV *spec_av; SSize_t n, i;
+	SV *restrict retval; AV *restrict spec_av; SSize_t n, i;
   CODE:
 {
 	spec_av = (AV *)SvRV(spec);
 	n = av_len(spec_av) + 1;
-	if (shape == 3) {                                          // ---- AoA ----
-		IV *idx; Newx(idx, n > 0 ? n : 1, IV);
+	if (shape == 3) { // ---- AoA ----
+		IV *restrict idx; Newx(idx, n > 0 ? n : 1, IV);
 		for (i = 0; i < n; i++) { SV **e = av_fetch(spec_av, i, 0); idx[i] = SvIV(*e); }
-		AV *src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
-		AV *out = newAV(); if (R > 0) av_extend(out, R - 1);
+		AV *restrict src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
+		AV *restrict out = newAV(); if (R > 0) av_extend(out, R - 1);
 		for (i = 0; i < R; i++) {
-			SV **rp = av_fetch(src, i, 0); AV *inner;
+			SV **restrict rp = av_fetch(src, i, 0); AV *inner;
 			if (rp && *rp && SvROK(*rp) && SvTYPE(SvRV(*rp)) == SVt_PVAV)
 				inner = rowA_select(aTHX_ (AV *)SvRV(*rp), idx, n);
 			else
@@ -4147,9 +4870,9 @@ SV *_cols_select(df, shape, spec)
 		Safefree(idx);
 		retval = sv_2mortal(newRV_noinc((SV *)out));
 	} else {
-		SV **keys; Newx(keys, n > 0 ? n : 1, SV *);
+		SV **restrict keys; Newx(keys, n > 0 ? n : 1, SV *);
 		for (i = 0; i < n; i++) { SV **e = av_fetch(spec_av, i, 0); keys[i] = *e; }
-		if (shape == 1) {                                      // ---- AoH ----
+		if (shape == 1) { // ---- AoH ----
 			AV *src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
 			AV *out = newAV(); if (R > 0) av_extend(out, R - 1);
 			for (i = 0; i < R; i++) {
@@ -4161,12 +4884,12 @@ SV *_cols_select(df, shape, spec)
 				av_store(out, i, newRV_noinc((SV *)inner));
 			}
 			retval = sv_2mortal(newRV_noinc((SV *)out));
-		} else {                                               // ---- HoH ----
-			HV *src = (HV *)SvRV(df); HV *out = newHV();
-			hv_iterinit(src); HE *he;
+		} else { // ---- HoH ----
+			HV *restrict src = (HV *)SvRV(df); HV *out = newHV();
+			hv_iterinit(src); HE *restrict he;
 			while ((he = hv_iternext(src))) {
 				STRLEN kl; char *kp = HePV(he, kl); I32 sk = HeUTF8(he) ? -(I32)kl : (I32)kl;
-				SV *rv = HeVAL(he); HV *inner;
+				SV *restrict rv = HeVAL(he); HV *inner;
 				if (rv && SvROK(rv) && SvTYPE(SvRV(rv)) == SVt_PVHV)
 					inner = row_select(aTHX_ (HV *)SvRV(rv), keys, n);
 				else
@@ -4189,15 +4912,15 @@ _cols_drop(df, shape, dropset)
 	IV shape
 	SV *dropset
   PREINIT:
-	SV *retval; HV *drop_hv; SSize_t i;
+	SV *restrict retval; HV *restrict drop_hv; SSize_t i;
   CODE:
 {
 	drop_hv = (HV *)SvRV(dropset);
-	if (shape == 1) {                                          // ---- AoH ----
-		AV *src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
-		AV *out = newAV(); if (R > 0) av_extend(out, R - 1);
+	if (shape == 1) { // AoH
+		AV *restrict src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
+		AV *restrict out = newAV(); if (R > 0) av_extend(out, R - 1);
 		for (i = 0; i < R; i++) {
-			SV **rp = av_fetch(src, i, 0); HV *inner;
+			SV **restrict rp = av_fetch(src, i, 0); HV *inner;
 			if (rp && *rp && SvROK(*rp) && SvTYPE(SvRV(*rp)) == SVt_PVHV)
 				inner = row_drop(aTHX_ (HV *)SvRV(*rp), drop_hv);
 			else
@@ -4205,12 +4928,12 @@ _cols_drop(df, shape, dropset)
 			av_store(out, i, newRV_noinc((SV *)inner));
 		}
 		retval = sv_2mortal(newRV_noinc((SV *)out));
-	} else {                                                   // ---- HoH ----
-		HV *src = (HV *)SvRV(df); HV *out = newHV();
+	} else { // HoH
+		HV *restrict src = (HV *)SvRV(df); HV *out = newHV();
 		hv_iterinit(src); HE *he;
 		while ((he = hv_iternext(src))) {
 			STRLEN kl; char *kp = HePV(he, kl); I32 sk = HeUTF8(he) ? -(I32)kl : (I32)kl;
-			SV *rv = HeVAL(he); HV *inner;
+			SV *restrict rv = HeVAL(he); HV *inner;
 			if (rv && SvROK(rv) && SvTYPE(SvRV(rv)) == SVt_PVHV)
 				inner = row_drop(aTHX_ (HV *)SvRV(rv), drop_hv);
 			else
@@ -4231,15 +4954,15 @@ _cols_rename(df, shape, map)
 	IV shape
 	SV *map
   PREINIT:
-	SV *retval; HV *map_hv; SSize_t i;
+	SV *restrict retval; HV *restrict map_hv; SSize_t i;
   CODE:
 {
 	map_hv = (HV *)SvRV(map);
-	if (shape == 1) {                                          // ---- AoH ----
-		AV *src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
-		AV *out = newAV(); if (R > 0) av_extend(out, R - 1);
+	if (shape == 1) { // ---- AoH ----
+		AV *restrict src = (AV *)SvRV(df); SSize_t R = av_len(src) + 1;
+		AV *restrict out = newAV(); if (R > 0) av_extend(out, R - 1);
 		for (i = 0; i < R; i++) {
-			SV **rp = av_fetch(src, i, 0); HV *inner;
+			SV **restrict rp = av_fetch(src, i, 0); HV *inner;
 			if (rp && *rp && SvROK(*rp) && SvTYPE(SvRV(*rp)) == SVt_PVHV)
 				inner = row_rename(aTHX_ (HV *)SvRV(*rp), map_hv);
 			else
@@ -4247,12 +4970,12 @@ _cols_rename(df, shape, map)
 			av_store(out, i, newRV_noinc((SV *)inner));
 		}
 		retval = sv_2mortal(newRV_noinc((SV *)out));
-	} else {                                                   // ---- HoH ----
-		HV *src = (HV *)SvRV(df); HV *out = newHV();
+	} else { // ---- HoH ----
+		HV *restrict src = (HV *)SvRV(df); HV *out = newHV();
 		hv_iterinit(src); HE *he;
 		while ((he = hv_iternext(src))) {
 			STRLEN kl; char *kp = HePV(he, kl); I32 sk = HeUTF8(he) ? -(I32)kl : (I32)kl;
-			SV *rv = HeVAL(he); HV *inner;
+			SV *restrict rv = HeVAL(he); HV *inner;
 			if (rv && SvROK(rv) && SvTYPE(SvRV(rv)) == SVt_PVHV)
 				inner = row_rename(aTHX_ (HV *)SvRV(rv), map_hv);
 			else
@@ -4261,6 +4984,150 @@ _cols_rename(df, shape, map)
 		}
 		retval = sv_2mortal(newRV_noinc((SV *)out));
 	}
+	RETVAL = SvREFCNT_inc(retval);
+}
+  OUTPUT:
+	RETVAL
+
+# Row-level de-duplication core for drop_duplicates().  The Perl wrapper
+# validates the frame, rejects HoH, and resolves `subset` into an ordered
+# list of column identifiers (integer positions for AoA, names for AoH/HoA).
+#   shape: 1 = AoH, 3 = AoA, 4 = HoA
+#   subset: arrayref of the columns whose cells define a row's identity
+#   keep:  1 = first occurrence, -1 = last occurrence, 0 = drop every dup
+# AoA/AoH survivors reuse the original row refs (cells shared, like dropna);
+# HoA rebuilds every column sliced to the surviving row positions.
+SV *
+_drop_dups_core(df, shape, subset, keep)
+	SV *df
+	IV shape
+	SV *subset
+	IV keep
+  PREINIT:
+	SV *restrict retval; AV *restrict sub_av; SSize_t ns, i, j, R = 0, nsurv = 0;
+	SV **restrict keys = NULL; SV **restrict cells; IV *restrict surv; HV *restrict seen;
+  CODE:
+{
+	sub_av = (AV *)SvRV(subset);
+	ns = av_len(sub_av) + 1;
+	Newx(cells, ns > 0 ? ns : 1, SV *);
+
+	if (shape == 3) { // ---- AoA ----
+		AV *restrict src = (AV *)SvRV(df);
+		R = av_len(src) + 1;
+		IV *restrict pos; Newx(pos, ns > 0 ? ns : 1, IV);
+		for (j = 0; j < ns; j++) pos[j] = SvIV(*av_fetch(sub_av, j, 0));
+		Newx(keys, R > 0 ? R : 1, SV *);
+		for (i = 0; i < R; i++) {
+			SV **restrict rp = av_fetch(src, i, 0);
+			AV *restrict inner = (rp && *rp && SvROK(*rp) && SvTYPE(SvRV(*rp)) == SVt_PVAV)
+			          ? (AV *)SvRV(*rp) : NULL;
+			for (j = 0; j < ns; j++) {
+				SV **restrict cp = inner ? av_fetch(inner, pos[j], 0) : NULL;
+				cells[j] = (cp && *cp) ? *cp : NULL;
+			}
+			keys[i] = dd_key(aTHX_ cells, ns);
+		}
+		Safefree(pos);
+	} else if (shape == 1) { // ---- AoH ----
+		AV *restrict src = (AV *)SvRV(df);
+		R = av_len(src) + 1;
+		Newx(keys, R > 0 ? R : 1, SV *);
+		for (i = 0; i < R; i++) {
+			SV **restrict rp = av_fetch(src, i, 0);
+			HV *restrict inner = (rp && *rp && SvROK(*rp) && SvTYPE(SvRV(*rp)) == SVt_PVHV)
+			          ? (HV *)SvRV(*rp) : NULL;
+			for (j = 0; j < ns; j++) {
+				SV *restrict kn = *av_fetch(sub_av, j, 0);
+				HE *restrict he = inner ? hv_fetch_ent(inner, kn, 0, 0) : NULL;
+				cells[j] = he ? HeVAL(he) : NULL;
+			}
+			keys[i] = dd_key(aTHX_ cells, ns);
+		}
+	} else { // ---- HoA ----
+		HV *restrict src = (HV *)SvRV(df);
+		HE *restrict he; hv_iterinit(src);
+		while ((he = hv_iternext(src))) { // R = longest column
+			SV *v = HeVAL(he);
+			if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) {
+				SSize_t l = av_len((AV *)SvRV(v)) + 1;
+				if (l > R) R = l;
+			}
+		}
+		AV **restrict cols; Newx(cols, ns > 0 ? ns : 1, AV *);
+		for (j = 0; j < ns; j++) {
+			SV *restrict kn = *av_fetch(sub_av, j, 0);
+			HE *restrict ce = hv_fetch_ent(src, kn, 0, 0);
+			cols[j] = (ce && SvROK(HeVAL(ce)) && SvTYPE(SvRV(HeVAL(ce))) == SVt_PVAV)
+			        ? (AV *)SvRV(HeVAL(ce)) : NULL;
+		}
+		Newx(keys, R > 0 ? R : 1, SV *);
+		for (i = 0; i < R; i++) {
+			for (j = 0; j < ns; j++) {
+				SV **restrict cp = cols[j] ? av_fetch(cols[j], i, 0) : NULL;
+				cells[j] = (cp && *cp) ? *cp : NULL;
+			}
+			keys[i] = dd_key(aTHX_ cells, ns);
+		}
+		Safefree(cols);
+	}
+	Safefree(cells);
+	// choose the surviving row positions, preserving input order
+	Newx(surv, R > 0 ? R : 1, IV);
+	seen = (HV *)sv_2mortal((SV *)newHV());
+	if (keep == 1) { // keep first occurrence
+		for (i = 0; i < R; i++) {
+			if (!hv_exists_ent(seen, keys[i], 0)) {
+				(void)hv_store_ent(seen, keys[i], newSViv(1), 0);
+				surv[nsurv++] = i;
+			}
+		}
+	} else if (keep == -1) { // keep last occurrence
+		for (i = 0; i < R; i++)
+			(void)hv_store_ent(seen, keys[i], newSViv(i), 0);
+		for (i = 0; i < R; i++) {
+			HE *restrict e = hv_fetch_ent(seen, keys[i], 0, 0);
+			if (e && SvIV(HeVAL(e)) == i) surv[nsurv++] = i;
+		}
+	} else { // drop every duplicate
+		for (i = 0; i < R; i++) {
+			HE *restrict e = hv_fetch_ent(seen, keys[i], 0, 0);
+			if (e) sv_inc(HeVAL(e));
+			else (void)hv_store_ent(seen, keys[i], newSViv(1), 0);
+		}
+		for (i = 0; i < R; i++) {
+			HE *restrict e = hv_fetch_ent(seen, keys[i], 0, 0);
+			if (e && SvIV(HeVAL(e)) == 1) surv[nsurv++] = i;
+		}
+	}
+	Safefree(keys);
+	// materialise the survivors back into the input's shape
+	if (shape == 4) { // ---- HoA ----
+		HV *restrict src = (HV *)SvRV(df);
+		HV *restrict out = newHV();
+		HE *restrict he; hv_iterinit(src);
+		while ((he = hv_iternext(src))) {
+			SV *restrict v = HeVAL(he);
+			AV *restrict col = (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) ? (AV *)SvRV(v) : NULL;
+			AV *restrict nc = newAV(); if (nsurv > 0) av_extend(nc, nsurv - 1);
+			for (SSize_t k = 0; k < nsurv; k++) {
+				SV **restrict cp = col ? av_fetch(col, surv[k], 0) : NULL;
+				av_push(nc, (cp && *cp) ? newSVsv(*cp) : newSV(0));
+			}
+			STRLEN kl; char *kp = HePV(he, kl); I32 sk = HeUTF8(he) ? -(I32)kl : (I32)kl;
+			(void)hv_store(out, kp, sk, newRV_noinc((SV *)nc), HeHASH(he));
+		}
+		retval = sv_2mortal(newRV_noinc((SV *)out));
+	} else { // AoA / AoH
+		AV *restrict src = (AV *)SvRV(df);
+		AV *restrict out = newAV(); if (nsurv > 0) av_extend(out, nsurv - 1);
+		for (SSize_t k = 0; k < nsurv; k++) {
+			SV **restrict rp = av_fetch(src, surv[k], 0);
+			av_push(out, newSVsv((rp && *rp) ? *rp : &PL_sv_undef));
+		}
+		retval = sv_2mortal(newRV_noinc((SV *)out));
+	}
+	Safefree(surv);
 	RETVAL = SvREFCNT_inc(retval);
 }
   OUTPUT:
@@ -5439,12 +6306,13 @@ SV *cfilter(data, ...)
 		if (!keep_sv && !remove_sv) croak("cfilter: need a keep or remove argument");
 		bool removing = (remove_sv != NULL);
 		SV *restrict sel = removing ? remove_sv : keep_sv;
-		// classify the selector: array ref of names, or a value predicate.
-		bool by_name;
+		// classify the selector: array ref of names, a qr// name pattern, or a
+		// value predicate.
+		bool by_name = FALSE, by_regex = FALSE;
 		SV *restrict cv_sv = NULL;
 		if (SvROK(sel) && SvTYPE(SvRV(sel)) == SVt_PVAV) by_name = TRUE;
+		else if (SvRXOK(sel)) by_regex = TRUE;
 		else if ((SvROK(sel) && SvTYPE(SvRV(sel)) == SVt_PVCV) || (SvOK(sel) && !SvROK(sel))) {
-			by_name = FALSE;
 			if (SvROK(sel)) cv_sv = SvRV(sel);
 			else {
 				STRLEN nl;
@@ -5456,7 +6324,7 @@ SV *cfilter(data, ...)
 				cv_sv = (SV*)cv;
 			}
 		}
-		else croak("cfilter: keep/remove must be an array ref of column names or a code ref / function name");
+		else croak("cfilter: keep/remove must be an array ref of column names, a qr// regex, or a code ref / function name");
 		// decode the undef policy (predicate only).
 		bool na_omit = FALSE;
 		if (na_sv && SvOK(na_sv)) {
@@ -5466,7 +6334,7 @@ SV *cfilter(data, ...)
 			else if (nl == 4 && memEQ(nv, "keep", 4)) na_omit = FALSE;
 			else croak("cfilter: na must be 'keep' or 'omit'");
 		}
-		if (by_name && (na_sv || against_sv)) croak("cfilter: na/against only apply to a predicate selector");
+		if ((by_name || by_regex) && (na_sv || against_sv)) croak("cfilter: na/against only apply to a predicate selector");
 		if (against_sv && na_sv) croak("cfilter: give na or against, not both");
 		// 1. detect the data shape.
 		if (!SvROK(data)) croak("cfilter: data must be a reference");
@@ -5490,7 +6358,7 @@ SV *cfilter(data, ...)
     alignment lets `against` pair two columns by row.*/
 		HV *restrict universe = newHV();
 		AV *restrict colnames = newAV();
-		HV *restrict cellmap = by_name ? NULL : newHV();
+		HV *restrict cellmap = (by_name || by_regex) ? NULL : newHV();
 		SSize_t nrows = 0;
 		if (kind == 1) {
 			HV *restrict h = (HV*)rv;
@@ -5507,7 +6375,7 @@ SV *cfilter(data, ...)
 				SV *restrict ck = hv_iterkeysv(e);
 				(void)hv_store_ent(universe, ck, newSViv(1), 0);
 				av_push(colnames, newSVsv(ck));
-				if (!by_name) {
+				if (!by_name && !by_regex) {
 					AV *restrict src = (AV*)SvRV(hv_iterval(h, e)), *restrict col = newAV();
 					if (nrows > 0) av_extend(col, nrows - 1);
 					for (SSize_t r = 0; r < nrows; r++) {
@@ -5557,7 +6425,7 @@ SV *cfilter(data, ...)
 				}
 				SvREFCNT_dec((SV*)seen);
 			}
-			if (!by_name) {
+			if (!by_name && !by_regex) {
 				SSize_t nc = av_len(colnames) + 1;
 				for (SSize_t c = 0; c < nc; c++) {
 					SV *restrict ck = *av_fetch(colnames, c, 0);
@@ -5600,6 +6468,18 @@ SV *cfilter(data, ...)
 				if (removing ? !in_list : in_list) (void)hv_store_ent(keepset, ck, newSViv(1), 0);
 			}
 			SvREFCNT_dec((SV*)listed);
+		} else if (by_regex) {
+			// name pattern: keep/drop each column by matching its name against
+			// the compiled qr//. No data is inspected, so na/against don't apply.
+			REGEXP *restrict rx = SvRX(sel);
+			SSize_t nc = av_len(colnames) + 1;
+			for (SSize_t c = 0; c < nc; c++) {
+				SV *restrict ck = *av_fetch(colnames, c, 0);
+				STRLEN len;
+				char *restrict s = SvPV(ck, len);
+				bool match = cBOOL(pregexec(rx, s, s + len, s, 0, ck, 1));
+				if (removing ? !match : match) (void)hv_store_ent(keepset, ck, newSViv(1), 0);
+			}
 		} else {
 			// predicate over the flat colnames list (never a live hash iterator
 			// across call_sv). Apply the undef policy per column.
@@ -9972,8 +10852,8 @@ NV sd(...)
 	INIT:
 	  NV mean = 0.0, M2 = 0.0;
 	  size_t count = 0;
-	CODE: /* Single Pass Standard Deviation via Welford's Algorithm */
-		for (size_t i = 0; i < items; i++) {
+	CODE:
+		for (size_t i = 0; i < items; i++) { // Single Pass Standard Deviation via Welford's Algorithm
 			SV* restrict arg = ST(i);
 			if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
 				AV* restrict av = (AV*)SvRV(arg);
@@ -10456,7 +11336,7 @@ void intersection(...)
 	PPCODE:
 		if (items == 0)
 			croak("intersection needs >= 1 array ref");
-		SP = set_multiplicity(aTHX_ SP, &ST(0), (size_t)items, 1,
+		SP = set_multiplicity(aTHX_ SP, &ST(0), (size_t)items, 1, 0,
 		                      "intersection", GIMME_V);
 
 SV* cor(SV* x_sv, SV* y_sv = &PL_sv_undef, const char* method = "pearson")
@@ -12112,7 +12992,10 @@ CODE:
 	if (items < 1) croak("fisher_test requires at least a data reference");
 
 	SV *restrict data_ref = ST(0);
-	NV conf_level = 0.95;
+	/* long-double literal: on a long-double-NV build a bare 0.95 is a double
+	 * that widens to 0.949999999999999956, so the echoed default would not
+	 * stringify back to "0.95". 0.95L is the nearest NV to 0.95 in either build. */
+	NV conf_level = 0.95L;
 	const char *restrict alternative = "two.sided";
 
 	for (unsigned int i = 1; i < items; i += 2) {
@@ -12132,74 +13015,137 @@ CODE:
 			croak("fisher_test: unknown argument '%s'", key);
 		}
 	}
-	if (!SvROK(data_ref)) croak("fisher_test requires a reference to a 2x2 Array or Hash");
+	if (!SvROK(data_ref)) croak("fisher_test requires a reference to a 2D Array or Hash");
 	SV *restrict deref = SvRV(data_ref);
-	long a = 0, b = 0, c = 0, d = 0;
+
+	/* Parse the input into a flat nrow x ncol table of nonnegative counts.
+	 * Both a 2D array-of-arrays and a 2D hash-of-hashes are accepted, and any
+	 * dimensions >= 2x2 are supported (2x2 keeps the exact odds-ratio path;
+	 * everything else uses the R x C enumeration below). */
+	unsigned nrow = 0, ncol = 0;
+	long *restrict cells = NULL;
+
 	if (SvTYPE(deref) == SVt_PVAV) {
 	  AV *restrict outer = (AV *)deref;
-	  if (av_len(outer) != 1) croak("Outer array must have exactly 2 rows");
-	  SV **restrict r1p = av_fetch(outer, 0, 0);
-	  SV **restrict r2p = av_fetch(outer, 1, 0);
-	  if (!(r1p && r2p && SvROK(*r1p) && SvROK(*r2p)
-			 && SvTYPE(SvRV(*r1p)) == SVt_PVAV && SvTYPE(SvRV(*r2p)) == SVt_PVAV))
-		   croak("Invalid 2D array structure: need two array-ref rows");
-	  AV *restrict r1 = (AV *)SvRV(*r1p), *r2 = (AV *)SvRV(*r2p);
-	  if (av_len(r1) != 1 || av_len(r2) != 1)
-		   croak("Each row must have exactly 2 columns");
-	  a = ft_cell(aTHX_ *av_fetch(r1, 0, 0), "cell [0][0]");
-	  b = ft_cell(aTHX_ *av_fetch(r1, 1, 0), "cell [0][1]");
-	  c = ft_cell(aTHX_ *av_fetch(r2, 0, 0), "cell [1][0]");
-	  d = ft_cell(aTHX_ *av_fetch(r2, 1, 0), "cell [1][1]");
-	} else if (SvTYPE(deref) == SVt_PVHV) {
-	  /* 2x2 hash; rows and columns are ordered by lexical key sort so the
-		* result is deterministic regardless of Perl's hash randomization. */
-	  HV *restrict outer = (HV *)deref;
-	  if (HvUSEDKEYS(outer) != 2) croak("Outer hash must have exactly 2 keys");
-	  hv_iterinit(outer);
-	  HE *restrict e1 = hv_iternext(outer), *e2 = hv_iternext(outer);
-	  const char *restrict ok1 = SvPV_nolen(hv_iterkeysv(e1));
-	  int swap_rows = strcmp(ok1, SvPV_nolen(hv_iterkeysv(e2))) > 0;
-	  SV *restrict row1_sv = hv_iterval(outer, swap_rows ? e2 : e1);
-	  SV *restrict row2_sv = hv_iterval(outer, swap_rows ? e1 : e2);
-	  if (!SvROK(row1_sv) || SvTYPE(SvRV(row1_sv)) != SVt_PVHV ||
-		   !SvROK(row2_sv) || SvTYPE(SvRV(row2_sv)) != SVt_PVHV)
-		   croak("Inner elements must be hash refs");
-
-	  HV *restrict rows[2]; rows[0] = (HV *)SvRV(row1_sv); rows[1] = (HV *)SvRV(row2_sv);
-	  long cells[2][2];
-	  for (unsigned int rr = 0; rr < 2; rr++) {
-		   HV *restrict in = rows[rr];
-		   if (HvUSEDKEYS(in) != 2) croak("Inner hashes must have exactly 2 keys");
-		   hv_iterinit(in);
-		   HE *c1 = hv_iternext(in), *c2 = hv_iternext(in);
-		   const char *k1 = SvPV_nolen(hv_iterkeysv(c1));
-		   int swap_cols = strcmp(k1, SvPV_nolen(hv_iterkeysv(c2))) > 0;
-		   HE *col0 = swap_cols ? c2 : c1;
-		   HE *col1 = swap_cols ? c1 : c2;
-		   cells[rr][0] = ft_cell(aTHX_ hv_iterval(in, col0), "hash cell");
-		   cells[rr][1] = ft_cell(aTHX_ hv_iterval(in, col1), "hash cell");
+	  nrow = (int)(av_len(outer) + 1);
+	  if (nrow < 2) croak("Outer array must have at least 2 rows");
+	  SV **restrict r0p = av_fetch(outer, 0, 0);
+	  if (!r0p || !SvROK(*r0p) || SvTYPE(SvRV(*r0p)) != SVt_PVAV)
+		   croak("Invalid 2D array structure: each row must be an array ref");
+	  ncol = (int)(av_len((AV *)SvRV(*r0p)) + 1);
+	  if (ncol < 2) croak("Each row must have at least 2 columns");
+	  Newx(cells, (size_t)nrow * ncol, long);
+	  for (unsigned int rr = 0; rr < nrow; rr++) {
+		   SV **restrict rp = av_fetch(outer, rr, 0);
+		   if (!rp || !SvROK(*rp) || SvTYPE(SvRV(*rp)) != SVt_PVAV) {
+			   Safefree(cells);
+			   croak("Invalid 2D array structure: each row must be an array ref");
+		   }
+		   AV *restrict row = (AV *)SvRV(*rp);
+		   if ((int)(av_len(row) + 1) != ncol) {
+			   Safefree(cells);
+			   croak("All rows must have the same number of columns (%d)", ncol);
+		   }
+		   for (int cc = 0; cc < ncol; cc++)
+			   cells[rr * ncol + cc] = ft_cell(aTHX_ *av_fetch(row, cc, 0), "array cell");
 	  }
-	  a = cells[0][0]; b = cells[0][1]; c = cells[1][0]; d = cells[1][1];
+	} else if (SvTYPE(deref) == SVt_PVHV) {
+	  /* Rows are ordered by lexical key sort, and columns by the sorted keys
+		* of the first row, so the result is deterministic regardless of
+		* Perl's hash randomization.  Every row must expose that same column
+		* key set. */
+	  HV *restrict outer = (HV *)deref;
+	  nrow = (int)HvUSEDKEYS(outer);
+	  if (nrow < 2) croak("Outer hash must have at least 2 keys");
+	  ft_kv *restrict rows = NULL; Newx(rows, nrow, ft_kv);
+	  hv_iterinit(outer);
+	  for (unsigned int i = 0; i < nrow; i++) {
+		   HE *restrict e = hv_iternext(outer);
+		   rows[i].k = SvPV_nolen(hv_iterkeysv(e));
+		   rows[i].v = hv_iterval(outer, e);
+	  }
+	  qsort(rows, nrow, sizeof(ft_kv), ft_kv_cmp);
+
+	  if (!SvROK(rows[0].v) || SvTYPE(SvRV(rows[0].v)) != SVt_PVHV) {
+		   Safefree(rows); croak("Inner elements must be hash refs");
+	  }
+	  HV *restrict first = (HV *)SvRV(rows[0].v);
+	  ncol = (int)HvUSEDKEYS(first);
+	  if (ncol < 2) { Safefree(rows); croak("Inner hashes must have at least 2 keys"); }
+	  ft_kv *restrict cols = NULL; Newx(cols, ncol, ft_kv);
+	  hv_iterinit(first);
+	  for (unsigned int j = 0; j < ncol; j++) {
+		   HE *restrict e = hv_iternext(first);
+		   cols[j].k = SvPV_nolen(hv_iterkeysv(e));
+		   cols[j].v = NULL;
+	  }
+	  qsort(cols, ncol, sizeof(ft_kv), ft_kv_cmp);
+
+	  Newx(cells, (size_t)nrow * ncol, long);
+	  for (unsigned int rr = 0; rr < nrow; rr++) {
+		   if (!SvROK(rows[rr].v) || SvTYPE(SvRV(rows[rr].v)) != SVt_PVHV) {
+			   Safefree(cells); Safefree(cols); Safefree(rows);
+			   croak("Inner elements must be hash refs");
+		   }
+		   HV *restrict in = (HV *)SvRV(rows[rr].v);
+		   if ((int)HvUSEDKEYS(in) != ncol) {
+			   Safefree(cells); Safefree(cols); Safefree(rows);
+			   croak("All rows must have the same %d column keys", ncol);
+		   }
+		   for (unsigned int cc = 0; cc < ncol; cc++) {
+			   SV **restrict vp = hv_fetch(in, cols[cc].k, (I32)strlen(cols[cc].k), 0);
+			   if (!vp) {
+				   /* Capture the key pointers (they point into still-live mortal SV
+				    * buffers, not into rows/cols) before freeing the arrays --
+				    * otherwise croak() reads freed memory, which SIGBUSes on
+				    * strict allocators such as FreeBSD's. */
+				   const char *restrict rk = rows[rr].k;
+				   const char *restrict ck = cols[cc].k;
+				   Safefree(cells); Safefree(cols); Safefree(rows);
+				   croak("Row '%s' is missing column key '%s'", rk, ck);
+			   }
+			   cells[rr * ncol + cc] = ft_cell(aTHX_ *vp, "hash cell");
+		   }
+	  }
+	  Safefree(cols); Safefree(rows);
 	} else {
 	  croak("Input must be a 2D Array or 2D Hash");
 	}
-	if (a + b + c + d == 0) croak("fisher_test: table is all zeros");
-	NV p_val = exact_p_value(a, b, c, d, alternative);
-	NV mle_or, ci_low, ci_high;
-	calculate_exact_stats(a, b, c, d, conf_level, alternative, &mle_or, &ci_low, &ci_high);
+
+	long total = 0;
+	for (unsigned int i = 0; i < nrow * ncol; i++) total += cells[i];
+	if (total == 0) { Safefree(cells); croak("fisher_test: table is all zeros"); }
 
 	HV *restrict ret = newHV();
 	hv_stores(ret, "method", newSVpv("Fisher's Exact Test for Count Data", 0));
-	hv_stores(ret, "alternative", newSVpv(alternative, 0));
-	AV *restrict ci = newAV();
-	av_push(ci, newSVnv(ci_low));
-	av_push(ci, newSVnv(ci_high));
-	hv_stores(ret, "conf_int", newRV_noinc((SV *)ci));
-	HV *restrict est = newHV();
-	hv_stores(est, "odds ratio", newSVnv(mle_or));
-	hv_stores(ret, "estimate", newRV_noinc((SV *)est));
-	hv_stores(ret, "p_value", newSVnv(p_val));
 	hv_stores(ret, "conf_level", newSVnv(conf_level));
+
+	if (nrow == 2 && ncol == 2) {
+	  /* 2x2: full exact test with the conditional MLE odds ratio and CI. */
+	  long a = cells[0], b = cells[1], c = cells[2], d = cells[3];
+	  NV p_val = exact_p_value(a, b, c, d, alternative);
+	  NV mle_or, ci_low, ci_high;
+	  calculate_exact_stats(a, b, c, d, conf_level, alternative, &mle_or, &ci_low, &ci_high);
+	  hv_stores(ret, "alternative", newSVpv(alternative, 0));
+	  AV *restrict ci = newAV();
+	  av_push(ci, newSVnv(ci_low));
+	  av_push(ci, newSVnv(ci_high));
+	  hv_stores(ret, "conf_int", newRV_noinc((SV *)ci));
+	  HV *restrict est = newHV();
+	  hv_stores(est, "odds ratio", newSVnv(mle_or));
+	  hv_stores(ret, "estimate", newRV_noinc((SV *)est));
+	  hv_stores(ret, "p_value", newSVnv(p_val));
+	} else {
+	  /* R x C: only the two-sided p-value is defined (no odds ratio / CI). */
+	  NV p_val = fisher_rxc_pvalue(aTHX_ cells, nrow, ncol);
+	  if (p_val < 0) {
+		   Safefree(cells);
+		   croak("fisher_test: %dx%d table is too large for exact enumeration", nrow, ncol);
+	  }
+	  hv_stores(ret, "alternative", newSVpv("two.sided", 0));
+	  hv_stores(ret, "p_value", newSVnv(p_val));
+	}
+	Safefree(cells);
 	RETVAL = newRV_noinc((SV *)ret);
 }
 OUTPUT:
@@ -12790,6 +13736,341 @@ CODE:
 	}
 OUTPUT:
 	RETVAL
+
+void merge(...)
+PPCODE:
+{
+	if (items < 2)
+		croak("Usage: merge($left, $right, how => 'inner'|'left'|'right'|"
+		      "'outer'|'cross', on => 'col' | ['c1','c2'] "
+		      "[, 'left.on' => .., 'right.on' => ..] "
+		      "[, suffixes => ['.x','.y']] [, 'output.type' => 'aoh'|'hoa'])");
+	if ((items - 2) & 1)
+		croak("merge: options after the two frames must be name => value pairs");
+
+	SV *restrict left  = ST(0);
+	SV *restrict right = ST(1);
+
+	SV *restrict how_sv = NULL, *restrict on_sv = NULL;
+	SV *restrict lon_sv = NULL, *restrict ron_sv = NULL;
+	SV *restrict suf_sv = NULL, *restrict out_sv = NULL;
+	for (int oi = 2; oi < items; oi += 2) {
+		STRLEN ol;
+		const char *restrict on = SvPV(ST(oi), ol);
+		SV *restrict ov = ST(oi + 1);
+		if      (strEQ(on, "how"))                              how_sv = ov;
+		else if (strEQ(on, "on") || strEQ(on, "by"))            on_sv  = ov;
+		else if (strEQ(on, "left.on")  || strEQ(on, "left_on")
+		      || strEQ(on, "by.x"))                             lon_sv = ov;
+		else if (strEQ(on, "right.on") || strEQ(on, "right_on")
+		      || strEQ(on, "by.y"))                             ron_sv = ov;
+		else if (strEQ(on, "suffixes"))                         suf_sv = ov;
+		else if (strEQ(on, "output.type") || strEQ(on, "output_type")
+		      || strEQ(on, "out"))                              out_sv = ov;
+		else croak("merge: unknown option '%s'", on);
+	}
+
+	/* how */
+	int how = MG_INNER;
+	if (how_sv && SvOK(how_sv)) {
+		const char *restrict h = SvPV_nolen(how_sv);
+		if      (strEQ(h, "inner"))                 how = MG_INNER;
+		else if (strEQ(h, "left"))                  how = MG_LEFT;
+		else if (strEQ(h, "right"))                 how = MG_RIGHT;
+		else if (strEQ(h, "outer") || strEQ(h, "full")) how = MG_OUTER;
+		else if (strEQ(h, "cross"))                 how = MG_CROSS;
+		else croak("merge: how must be 'inner', 'left', 'right', 'outer', or "
+		           "'cross' (got '%s')", h);
+	}
+
+	if (on_sv && (lon_sv || ron_sv))
+		croak("merge: give either 'on'/'by' or 'left.on'/'right.on', not both");
+	if ((lon_sv && !ron_sv) || (ron_sv && !lon_sv))
+		croak("merge: 'left.on' and 'right.on' must be given together");
+	if (how == MG_CROSS && (on_sv || lon_sv || ron_sv))
+		croak("merge: a cross join takes no join keys");
+
+	ENTER; SAVETMPS;
+
+	/* suffixes */
+	SV *restrict suf0 = NULL, *restrict suf1 = NULL;
+	if (suf_sv) {
+		if (!SvROK(suf_sv) || SvTYPE(SvRV(suf_sv)) != SVt_PVAV
+		    || av_len((AV *)SvRV(suf_sv)) != 1)
+			croak("merge: suffixes must be a two-element array-ref, e.g. ['.x','.y']");
+		AV *restrict sa = (AV *)SvRV(suf_sv);
+		suf0 = *av_fetch(sa, 0, 0);
+		suf1 = *av_fetch(sa, 1, 0);
+	} else {
+		suf0 = sv_2mortal(newSVpvs(".x"));
+		suf1 = sv_2mortal(newSVpvs(".y"));
+	}
+
+	/* default output shape follows the left frame */
+	int def_shape = SvROK(left) ? mg_shape(aTHX_ left) : 0;
+	int out_hoa = (def_shape == 1);		/* AoH & HoH default to AoH */
+	if (out_sv && SvOK(out_sv)) {
+		const char *restrict os = SvPV_nolen(out_sv);
+		if      (strEQ(os, "aoh")) out_hoa = 0;
+		else if (strEQ(os, "hoa")) out_hoa = 1;
+		else croak("merge: output.type must be 'aoh' or 'hoa' (got '%s')", os);
+	}
+
+	AV *restrict Lrows = mg_to_aoh(aTHX_ left,  "left");
+	AV *restrict Rrows = mg_to_aoh(aTHX_ right, "right");
+	SSize_t nL = av_len(Lrows) + 1;
+	SSize_t nR = av_len(Rrows) + 1;
+
+	/* column-name universes (first-seen order) for each frame */
+	AV *restrict Lall = (AV *)sv_2mortal((SV *)newAV());
+	HV *restrict Lseen = (HV *)sv_2mortal((SV *)newHV());
+	for (SSize_t i = 0; i < nL; i++) {
+		HV *restrict r = (HV *)SvRV(*av_fetch(Lrows, i, 0));
+		HE *restrict e; hv_iterinit(r);
+		while ((e = hv_iternext(r))) {
+			SV *restrict kn = hv_iterkeysv(e);
+			if (!hv_exists_ent(Lseen, kn, 0)) {
+				(void)hv_store_ent(Lseen, kn, newSViv(1), 0);
+				av_push(Lall, newSVsv(kn));
+			}
+		}
+	}
+	AV *restrict Rall = (AV *)sv_2mortal((SV *)newAV());
+	HV *restrict Rseen = (HV *)sv_2mortal((SV *)newHV());
+	for (SSize_t i = 0; i < nR; i++) {
+		HV *restrict r = (HV *)SvRV(*av_fetch(Rrows, i, 0));
+		HE *restrict e; hv_iterinit(r);
+		while ((e = hv_iternext(r))) {
+			SV *restrict kn = hv_iterkeysv(e);
+			if (!hv_exists_ent(Rseen, kn, 0)) {
+				(void)hv_store_ent(Rseen, kn, newSViv(1), 0);
+				av_push(Rall, newSVsv(kn));
+			}
+		}
+	}
+
+	/* resolve join keys into lkeys / rkeys */
+	AV *restrict lkeys, *restrict rkeys;
+	if (how == MG_CROSS) {
+		lkeys = (AV *)sv_2mortal((SV *)newAV());
+		rkeys = (AV *)sv_2mortal((SV *)newAV());
+	} else if (lon_sv) {
+		lkeys = mg_names(aTHX_ lon_sv);
+		rkeys = mg_names(aTHX_ ron_sv);
+		if (av_len(lkeys) != av_len(rkeys))
+			croak("merge: 'left.on' and 'right.on' must name the same number of columns");
+	} else if (on_sv) {
+		lkeys = mg_names(aTHX_ on_sv);
+		rkeys = lkeys;
+	} else {
+		/* natural join: sorted intersection of column names. Gather the
+		 * shared names (aliases into Lall), insertion-sort the pointers,
+		 * then copy them into lkeys. */
+		lkeys = (AV *)sv_2mortal((SV *)newAV());
+		SSize_t na = av_len(Lall) + 1;
+		SV **restrict names;
+		Newx(names, (size_t)(na > 0 ? na : 1), SV *);
+		SAVEFREEPV(names);
+		SSize_t cnt = 0;
+		for (SSize_t i = 0; i < na; i++) {
+			SV *restrict kn = *av_fetch(Lall, i, 0);
+			if (hv_exists_ent(Rseen, kn, 0)) names[cnt++] = kn;
+		}
+		if (cnt == 0)
+			croak("merge: no common columns to join on; pass 'on' or "
+			      "'left.on'/'right.on'");
+		for (SSize_t a = 1; a < cnt; a++) {
+			SV *restrict cur = names[a];
+			STRLEN al; const char *restrict ap = SvPV_const(cur, al);
+			SSize_t b = a - 1;
+			while (b >= 0) {
+				STRLEN bl; const char *restrict bp = SvPV_const(names[b], bl);
+				int cmp = memcmp(bp, ap, bl < al ? bl : al);
+				if (cmp == 0) cmp = (bl > al) - (bl < al);
+				if (cmp <= 0) break;
+				names[b + 1] = names[b];
+				b--;
+			}
+			names[b + 1] = cur;
+		}
+		for (SSize_t c = 0; c < cnt; c++) av_push(lkeys, newSVsv(names[c]));
+		rkeys = lkeys;
+	}
+	SSize_t nkeys = av_len(lkeys) + 1;
+
+	/* validate that the named keys exist in each frame */
+	for (SSize_t j = 0; j < nkeys; j++) {
+		SV *restrict kn = *av_fetch(lkeys, j, 0);
+		if (!hv_exists_ent(Lseen, kn, 0))
+			croak("merge: left frame has no join column '%s'", SvPV_nolen(kn));
+	}
+	for (SSize_t j = 0; j < nkeys; j++) {
+		SV *restrict kn = *av_fetch(rkeys, j, 0);
+		if (!hv_exists_ent(Rseen, kn, 0))
+			croak("merge: right frame has no join column '%s'", SvPV_nolen(kn));
+	}
+
+	/* key-name sets, to exclude keys from the data-column universe */
+	HV *restrict lkset = (HV *)sv_2mortal((SV *)newHV());
+	HV *restrict rkset = (HV *)sv_2mortal((SV *)newHV());
+	for (SSize_t j = 0; j < nkeys; j++) {
+		(void)hv_store_ent(lkset, *av_fetch(lkeys, j, 0), newSViv(1), 0);
+		(void)hv_store_ent(rkset, *av_fetch(rkeys, j, 0), newSViv(1), 0);
+	}
+
+	/* non-key data columns for each side, plus name-membership sets */
+	AV *restrict lc_src = (AV *)sv_2mortal((SV *)newAV());
+	HV *restrict lc_set = (HV *)sv_2mortal((SV *)newHV());
+	for (SSize_t i = 0, n = av_len(Lall) + 1; i < n; i++) {
+		SV *restrict kn = *av_fetch(Lall, i, 0);
+		if (hv_exists_ent(lkset, kn, 0)) continue;
+		av_push(lc_src, newSVsv(kn));
+		(void)hv_store_ent(lc_set, kn, newSViv(1), 0);
+	}
+	AV *restrict rc_src = (AV *)sv_2mortal((SV *)newAV());
+	HV *restrict rc_set = (HV *)sv_2mortal((SV *)newHV());
+	for (SSize_t i = 0, n = av_len(Rall) + 1; i < n; i++) {
+		SV *restrict kn = *av_fetch(Rall, i, 0);
+		if (hv_exists_ent(rkset, kn, 0)) continue;
+		av_push(rc_src, newSVsv(kn));
+		(void)hv_store_ent(rc_set, kn, newSViv(1), 0);
+	}
+	SSize_t nlc = av_len(lc_src) + 1;
+	SSize_t nrc = av_len(rc_src) + 1;
+
+	/* output column names: overlapping non-key columns get suffixed. Guard
+	 * the resulting universe against accidental collisions. */
+	AV *restrict lc_out = (AV *)sv_2mortal((SV *)newAV());
+	AV *restrict rc_out = (AV *)sv_2mortal((SV *)newAV());
+	HV *restrict uni = (HV *)sv_2mortal((SV *)newHV());
+	for (SSize_t j = 0; j < nkeys; j++) {
+		SV *restrict kn = *av_fetch(lkeys, j, 0);
+		if (hv_exists_ent(uni, kn, 0))
+			croak("merge: duplicate join column '%s'", SvPV_nolen(kn));
+		(void)hv_store_ent(uni, kn, newSViv(1), 0);
+	}
+	for (SSize_t c = 0; c < nlc; c++) {
+		SV *restrict kn = *av_fetch(lc_src, c, 0);
+		SV *restrict outn;
+		if (hv_exists_ent(rc_set, kn, 0)) {
+			outn = newSVsv(kn); sv_catsv(outn, suf0);
+		} else outn = newSVsv(kn);
+		if (hv_exists_ent(uni, outn, 0))
+			croak("merge: output column '%s' collides; adjust 'suffixes'",
+			      SvPV_nolen(outn));
+		(void)hv_store_ent(uni, outn, newSViv(1), 0);
+		av_push(lc_out, outn);
+	}
+	for (SSize_t c = 0; c < nrc; c++) {
+		SV *restrict kn = *av_fetch(rc_src, c, 0);
+		SV *restrict outn;
+		if (hv_exists_ent(lc_set, kn, 0)) {
+			outn = newSVsv(kn); sv_catsv(outn, suf1);
+		} else outn = newSVsv(kn);
+		if (hv_exists_ent(uni, outn, 0))
+			croak("merge: output column '%s' collides; adjust 'suffixes'",
+			      SvPV_nolen(outn));
+		(void)hv_store_ent(uni, outn, newSViv(1), 0);
+		av_push(rc_out, outn);
+	}
+
+	/* ---- perform the join, building an AoH result ---- */
+	AV *restrict result = (AV *)sv_2mortal((SV *)newAV());
+
+	if (how == MG_CROSS) {
+		for (SSize_t i = 0; i < nL; i++) {
+			HV *restrict li = (HV *)SvRV(*av_fetch(Lrows, i, 0));
+			for (SSize_t j = 0; j < nR; j++) {
+				HV *restrict ri = (HV *)SvRV(*av_fetch(Rrows, j, 0));
+				mg_emit(aTHX_ result, li, ri, lkeys, rkeys, nkeys,
+				        lc_src, lc_out, nlc, rc_src, rc_out, nrc);
+			}
+		}
+	} else {
+		/* index the right frame: key -> arrayref of row indices */
+		HV *restrict ridx = (HV *)sv_2mortal((SV *)newHV());
+		for (SSize_t j = 0; j < nR; j++) {
+			HV *restrict ri = (HV *)SvRV(*av_fetch(Rrows, j, 0));
+			int ok;
+			SV *restrict key = mg_key(aTHX_ ri, rkeys, nkeys, &ok);
+			if (!ok) continue;
+			HE *restrict he = hv_fetch_ent(ridx, key, 1, 0);
+			SV *restrict slot = HeVAL(he);
+			if (!SvROK(slot)) {
+				SV *restrict rvv = newRV_noinc((SV *)newAV());
+				sv_setsv(slot, rvv);
+				SvREFCNT_dec(rvv);
+			}
+			av_push((AV *)SvRV(slot), newSViv(j));
+		}
+
+		char *restrict matched = NULL;
+		Newxz(matched, (size_t)(nR > 0 ? nR : 1), char);
+		SAVEFREEPV(matched);
+
+		for (SSize_t i = 0; i < nL; i++) {
+			HV *restrict li = (HV *)SvRV(*av_fetch(Lrows, i, 0));
+			int ok;
+			SV *restrict key = mg_key(aTHX_ li, lkeys, nkeys, &ok);
+			HE *restrict he = ok ? hv_fetch_ent(ridx, key, 0, 0) : NULL;
+			if (he) {
+				AV *restrict matches = (AV *)SvRV(HeVAL(he));
+				SSize_t m = av_len(matches) + 1;
+				for (SSize_t t = 0; t < m; t++) {
+					IV j = SvIV(*av_fetch(matches, t, 0));
+					HV *restrict ri = (HV *)SvRV(*av_fetch(Rrows, j, 0));
+					mg_emit(aTHX_ result, li, ri, lkeys, rkeys, nkeys,
+					        lc_src, lc_out, nlc, rc_src, rc_out, nrc);
+					matched[j] = 1;
+				}
+			} else if (how == MG_LEFT || how == MG_OUTER) {
+				mg_emit(aTHX_ result, li, NULL, lkeys, rkeys, nkeys,
+				        lc_src, lc_out, nlc, rc_src, rc_out, nrc);
+			}
+		}
+		if (how == MG_RIGHT || how == MG_OUTER) {
+			for (SSize_t j = 0; j < nR; j++) {
+				if (matched[j]) continue;
+				HV *restrict ri = (HV *)SvRV(*av_fetch(Rrows, j, 0));
+				mg_emit(aTHX_ result, NULL, ri, lkeys, rkeys, nkeys,
+				        lc_src, lc_out, nlc, rc_src, rc_out, nrc);
+			}
+		}
+	}
+
+	/* ---- materialise ---- */
+	SV *restrict retval;
+	if (!out_hoa) {
+		SvREFCNT_inc((SV *)result);	/* survive FREETMPS */
+		retval = newRV_noinc((SV *)result);
+	} else {
+		/* transpose the AoH result to a HoA over the full column universe */
+		SSize_t nrows = av_len(result) + 1;
+		HV *restrict out = newHV();
+		/* ordered universe: keys, then left cols, then right cols */
+		AV *restrict order = (AV *)sv_2mortal((SV *)newAV());
+		for (SSize_t j = 0; j < nkeys; j++) av_push(order, newSVsv(*av_fetch(lkeys, j, 0)));
+		for (SSize_t c = 0; c < nlc; c++)   av_push(order, newSVsv(*av_fetch(lc_out, c, 0)));
+		for (SSize_t c = 0; c < nrc; c++)   av_push(order, newSVsv(*av_fetch(rc_out, c, 0)));
+		SSize_t nu = av_len(order) + 1;
+		for (SSize_t c = 0; c < nu; c++) {
+			SV *restrict cn = *av_fetch(order, c, 0);
+			AV *restrict col = newAV();
+			if (nrows) av_extend(col, nrows - 1);
+			for (SSize_t i = 0; i < nrows; i++) {
+				HV *restrict r = (HV *)SvRV(*av_fetch(result, i, 0));
+				HE *restrict e = hv_fetch_ent(r, cn, 0, 0);
+				av_push(col, (e && SvOK(HeVAL(e))) ? newSVsv(HeVAL(e)) : newSV(0));
+			}
+			(void)hv_store_ent(out, cn, newRV_noinc((SV *)col), 0);
+		}
+		retval = newRV_noinc((SV *)out);
+	}
+
+	FREETMPS; LEAVE;
+	XPUSHs(sv_2mortal(retval));
+	XSRETURN(1);
+}
 
 void ljoin(h_ref, i_ref)
 	SV *h_ref;
@@ -14323,37 +15604,23 @@ void get_union(...)
 			}
 		}
 
-void get_unique(...)
+void Lonly(...)
 	PROTOTYPE: @
 	PPCODE:
 		if (items == 0)
-			croak("get_unique needs >= 1 array ref");
-		SP = set_multiplicity(aTHX_ SP, &ST(0), (size_t)items, 0,
-		                      "get_unique", GIMME_V);
-
-void Lonly(...)
-	PROTOTYPE: $$
-	PPCODE:
-		if (items != 2)
-			croak("Lonly needs exactly 2 array refs (got %" UVuf ")", (UV)items);
-		if (!(SvROK(ST(0)) && SvTYPE(SvRV(ST(0))) == SVt_PVAV))
-			croak("Lonly: first (left) argument is not an array reference");
-		if (!(SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVAV))
-			croak("Lonly: second (right) argument is not an array reference");
-		/* keep = left (ST0), other = right (ST1) */
-		SP = set_difference(aTHX_ SP, ST(0), ST(1), "left", "right", "Lonly", GIMME_V);
+			croak("Lonly needs >= 1 array ref");
+		SP = set_multiplicity(aTHX_ SP, &ST(0), (size_t)items, 0, 0,
+		                      "Lonly", GIMME_V);
 
 void Ronly(...)
-	PROTOTYPE: $$
+	PROTOTYPE: @
 	PPCODE:
-		if (items != 2)
-			croak("Ronly needs exactly 2 array refs (got %" UVuf ")", (UV)items);
-		if (!(SvROK(ST(0)) && SvTYPE(SvRV(ST(0))) == SVt_PVAV))
-			croak("Ronly: first (left) argument is not an array reference");
-		if (!(SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVAV))
-			croak("Ronly: second (right) argument is not an array reference");
-		/* Ronly(a,b) == Lonly(b,a): keep = right (ST1), other = left (ST0) */
-		SP = set_difference(aTHX_ SP, ST(1), ST(0), "right", "left", "Ronly", GIMME_V);
+		if (items == 0)
+			croak("Ronly needs >= 1 array ref");
+		/* mirror of Lonly: values only in the LAST array (from_last = 1), so
+		 * the two-array Ronly(a,b) still equals Lonly(b,a). */
+		SP = set_multiplicity(aTHX_ SP, &ST(0), (size_t)items, 0, 1,
+		                      "Ronly", GIMME_V);
 
 void is_equivalent(...)
 	PROTOTYPE: @

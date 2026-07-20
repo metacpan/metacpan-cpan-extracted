@@ -1,6 +1,7 @@
 use v5.42;
 use Test2::V1 -ipP;
 no warnings;
+use blib;
 use Net::BitTorrent::Protocol::BEP23;
 subtest 'IPv4 Packing' => sub {
     my @peers  = ( { ip => '127.0.0.1', port => 6881 }, { ip => '192.168.0.1', port => 8080 } );

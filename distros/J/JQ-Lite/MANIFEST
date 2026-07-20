@@ -103,6 +103,7 @@ t/path.t
 t/paths.t
 t/percentile.t
 t/pick.t
+t/pipe_comparison.t
 t/pipe_select_name.t
 t/pluck.t
 t/quoted_field_access.t

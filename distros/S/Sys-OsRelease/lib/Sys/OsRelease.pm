@@ -14,8 +14,8 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.4.0';
-use if $] >= 5.016, "feature", "fc";  # retain even though 5.22 is minimum Perl, same code in Sys::OsRelease::Lite
+$Sys::OsRelease::VERSION = '0.4.2';
+use if $] >= 5.016, "feature", "fc";  # retain even though 5.22 is minimum Perl, same code in ...::Lite
 use feature qw(say);
 use Config;
 use Carp qw(carp croak);
@@ -404,6 +404,8 @@ sub _clear_accessor
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -414,19 +416,39 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.2
 
 =head1 SYNOPSIS
 
-non-object-oriented:
+non-object-oriented (Perl 5.22 and later):
+
+  use Sys::OsRelease;
 
   Sys::OsRelease->init();
   my $id = Sys::OsRelease->id();
   my $id_like = Sys::OsRelease->id_like();
 
-object-oriented:
+object-oriented (Perl 5.22 and later):
+
+  use Sys::OsRelease;
 
   my $osrelease = Sys::OsRelease->instance();
+  my $id = $osrelease->id();
+  my $id_like = $osrelease->id_like();
+
+non-object-oriented (Perl up to 5.20):
+
+  use Sys::OsRelease::Lite;
+
+  Sys::OsRelease::Lite->init();
+  my $id = Sys::OsRelease::Lite->id();
+  my $id_like = Sys::OsRelease::Lite->id_like();
+
+object-oriented (Perl up to 5.20):
+
+  use Sys::OsRelease::Lite;
+
+  my $osrelease = Sys::OsRelease::Lite->instance();
   my $id = $osrelease->id();
   my $id_like = $osrelease->id_like();
 
@@ -726,7 +748,8 @@ A repackaging of Sys::OsRelease for older versions of Perl before 5.22.
 This was made because dependencies of Dist::Zilla forced it to bump its minimum Perl version to 5.22,
 which in turn forced Sys::OsRelease to follow.
 Sys::OsRelease::Lite provides Sys::OsRelease with the same source code,
-implemented as a symbolic link in the common Git repository that houses both modules.
+implemented with a filter on the source code changing the name of the module.
+The name change is just to prevent a namespace collision in CPAN, otherwise the same module.
 It is packaged with L<ExtUtils::MakeMaker> to maintain availability back to Perl 5.10.
 Compatibility was at time time still being maintained via CPAN testing was back to 5.10.
 The use case was systems with RHEL 6 on Perl 5.10.1 and RHEL 7 on Perl 5.16,
@@ -757,7 +780,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-__END__
-
-# POD documentation

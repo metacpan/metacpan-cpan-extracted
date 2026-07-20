@@ -1,3 +1,5 @@
+=for stopwords Allbery Christiansen FSFAP SPDX perlpodstyle
+
 =head1 NAME
 
 perlpodstyle - Perl POD style guide

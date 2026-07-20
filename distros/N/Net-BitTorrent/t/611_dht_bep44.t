@@ -1,10 +1,12 @@
 use v5.40;
 use lib 'lib', '../lib';
-use Test2::V0;
+use Test2::V1 -ipP;
+no warnings;
 use Net::BitTorrent::DHT;
 use Net::BitTorrent::DHT::Security;
 use Net::BitTorrent::Protocol::BEP03::Bencode qw[bdecode bencode];
 use Digest::SHA                               qw[sha1];
+use Socket                                    qw[pack_sockaddr_in inet_aton AF_INET];
 #
 my $sec = Net::BitTorrent::DHT::Security->new();
 my $id  = $sec->generate_node_id('127.0.0.1');
@@ -252,6 +254,206 @@ subtest 'Mutable data' => sub {
             is $sent_data, 'no_change', 'No response packet sent to blacklisted IP';
         };
     };
+};
+subtest 'malformed want field does not crash DHT' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    for my $want ( {}, [], 42, 'string', undef ) {
+        my $a = { id => 'B' x 20 };
+        $a->{want} = $want if defined $want;
+        my $msg    = bencode( { t => 'xx', y => 'q', q => 'ping', a => $a } );
+        my $sender = pack_sockaddr_in( 6881, inet_aton('10.0.0.1') );
+        my @result = $dht->handle_incoming( $msg, $sender );
+        ok @result == 3, 'handle_incoming returned 3-element list for want=' . ( defined $want ? ref($want) || "$want" : 'undef' );
+    }
+};
+subtest '_query_rate capped at 10000 entries' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    for my $i ( 1 .. 100 ) {
+        my $ip     = sprintf( "10.0.%d.%d", int( $i / 256 ), $i % 256 );
+        my $msg    = bencode( { t => 'xx', y => 'q', q => 'ping', a => { id => 'C' x 20 } } );
+        my $sender = pack_sockaddr_in( 6881, inet_aton($ip) );
+        $dht->handle_incoming( $msg, $sender );
+    }
+    ok 1, 'DHT survived 100 queries from different IPs';
+    my $msg    = bencode( { t => 'xx', y => 'q', q => 'ping', a => { id => 'C' x 20 } } );
+    my $sender = pack_sockaddr_in( 6881, inet_aton('10.0.0.1') );
+    my @result = $dht->handle_incoming( $msg, $sender );
+    ok @result == 3, 'DHT still responds after many queries';
+};
+subtest 'peers per info_hash capped at 50' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1, bep42 => 0 );
+    my $ih  = 'A' x 20;
+    for my $i ( 1 .. 100 ) {
+        my $ip    = "10.0.$i.1";
+        my $token = $dht->_generate_token($ip);
+        my $msg = bencode( { t => 'xx', y => 'q', q => 'announce_peer', a => { id => 'B' x 20, info_hash => $ih, port => 6881, token => $token } } );
+        my $sender = pack_sockaddr_in( 6881, inet_aton($ip) );
+        $dht->handle_incoming( $msg, $sender );
+    }
+    my $peers_obj = $dht->peer_storage->get($ih);
+    ok defined $peers_obj, 'peers entry exists for info_hash';
+    my $peers = $peers_obj->value;
+    ok @$peers <= 50, 'peers per info_hash capped at 50 (got ' . scalar(@$peers) . ')';
+};
+subtest 'bootstrap uses pre-resolved nodes' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    my $ok  = eval { $dht->bootstrap(); 1 };
+    ok $ok, 'bootstrap did not crash';
+};
+subtest 'import_state handles invalid data gracefully' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0 );
+    my $ok  = eval { $dht->import_state("not a hash"); 1 };
+    ok $ok, 'import_state with string input did not crash';
+    $ok = eval { $dht->import_state( { nodes => "not an array" } ); 1 };
+    ok $ok, 'import_state with invalid nodes did not crash';
+    $ok = eval { $dht->import_state( { nodes => [ "not a hash", 42, undef ] } ); 1 };
+    ok $ok, 'import_state with invalid node entries did not crash';
+    $ok = eval { $dht->import_state( { peers => { a => "not a hash" } } ); 1 };
+    ok $ok, 'import_state with invalid peer entries did not crash';
+    $ok = eval { $dht->import_state( { data => { a => undef } } ); 1 };
+    ok $ok, 'import_state with undef data entry did not crash';
+    $ok = eval { $dht->import_state( { id => 'A' x 20, nodes => [], nodes6 => [], peers => {}, data => {} } ); 1 };
+    ok $ok, 'import_state with valid state did not crash';
+};
+subtest 'external IP change rate-limited to once per 5 minutes' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0 );
+    for ( 1 .. 5 ) {
+        $dht->_check_external_ip( inet_aton('8.8.8.8') );
+    }
+    is $dht->external_ip, '8.8.8.8', 'first external IP established';
+    for ( 1 .. 5 ) {
+        $dht->_check_external_ip( inet_aton('1.1.1.1') );
+    }
+    is $dht->external_ip, '8.8.8.8', 'external IP unchanged within cooldown';
+};
+subtest 'debug log sanitizes non-printable characters' => sub {
+    my $dht    = Net::BitTorrent::DHT->new( port => 0, debug => 1, ssrf_bypass => 1 );
+    my $msg    = bencode( { t => 'xx', y => 'q', q => "ping\x00\x01\x02\x7F", a => { id => 'C' x 20 } } );
+    my $sender = pack_sockaddr_in( 6881, inet_aton('10.0.0.1') );
+    my @result = $dht->handle_incoming( $msg, $sender );
+    ok 1, 'DHT survived debug log with non-printable characters';
+};
+subtest 'mutable put rejects non-integer seq' => sub {
+    my $dht   = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    my $ip    = '10.0.0.1';
+    my $token = $dht->_generate_token($ip);
+    my $msg   = bencode(
+        {   t => 'xx',
+            y => 'q',
+            q => 'put',
+            a => { id => 'D' x 20, v => 'some value', k => 'E' x 32, sig => 'F' x 64, seq => 'not a number', token => $token }
+        }
+    );
+    my $sender = pack_sockaddr_in( 6881, inet_aton($ip) );
+    $dht->handle_incoming( $msg, $sender );
+    ok 1, 'mutable put with non-integer seq did not crash';
+    my $state = $dht->export_state();
+    ok !keys $state->{data}->%*, 'no data stored from invalid mutable put';
+};
+subtest 'mutable put rejects non-integer cas' => sub {
+    my $dht   = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    my $ip    = '10.0.0.1';
+    my $token = $dht->_generate_token($ip);
+    my $msg   = bencode(
+        {   t => 'xx',
+            y => 'q',
+            q => 'put',
+            a => { id => 'D' x 20, v => 'some value', k => 'E' x 32, sig => 'F' x 64, seq => 1, cas => 'bad', token => $token }
+        }
+    );
+    my $sender = pack_sockaddr_in( 6881, inet_aton($ip) );
+    $dht->handle_incoming( $msg, $sender );
+    ok 1, 'mutable put with non-integer cas did not crash';
+    my $state = $dht->export_state();
+    ok !keys $state->{data}->%*, 'no data stored from invalid mutable put';
+};
+subtest 'mutable put rejects short key' => sub {
+    my $dht   = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    my $ip    = '10.0.0.1';
+    my $token = $dht->_generate_token($ip);
+    my $msg   = bencode(
+        { t => 'xx', y => 'q', q => 'put', a => { id => 'D' x 20, v => 'some value', k => 'short', sig => 'F' x 64, seq => 1, token => $token } } );
+    my $sender = pack_sockaddr_in( 6881, inet_aton($ip) );
+    $dht->handle_incoming( $msg, $sender );
+    ok 1, 'mutable put with short key did not crash';
+    my $state = $dht->export_state();
+    ok !keys $state->{data}->%*, 'no data stored from invalid mutable put';
+};
+subtest 'mutable put rejects short signature' => sub {
+    my $dht   = Net::BitTorrent::DHT->new( port => 0, ssrf_bypass => 1 );
+    my $ip    = '10.0.0.1';
+    my $token = $dht->_generate_token($ip);
+    my $msg   = bencode(
+        { t => 'xx', y => 'q', q => 'put', a => { id => 'D' x 20, v => 'some value', k => 'E' x 32, sig => 'short', seq => 1, token => $token } } );
+    my $sender = pack_sockaddr_in( 6881, inet_aton($ip) );
+    $dht->handle_incoming( $msg, $sender );
+    ok 1, 'mutable put with short signature did not crash';
+    my $state = $dht->export_state();
+    ok !keys $state->{data}->%*, 'no data stored from invalid mutable put';
+};
+#
+subtest 'DHT mutable put value size limit defined' => sub {
+    ok defined Net::BitTorrent::DHT::MAX_IMMUTABLE_VALUE_SIZE(), 'MAX_IMMUTABLE_VALUE_SIZE defined';
+    is Net::BitTorrent::DHT::MAX_IMMUTABLE_VALUE_SIZE(), 1024 * 1024, 'immutable limit is 1MB';
+};
+#
+subtest 'DHT handle_incoming does not crash on malformed data' => sub {
+    my $dht    = Net::BitTorrent::DHT->new( port => 0, bep42 => 0 );
+    my @result = $dht->handle_incoming( 'not-bencode-data', undef );
+    is scalar @result, 3, 'handle_incoming returns 3-element list for malformed data';
+    @result = $dht->handle_incoming( bencode( { y => 'q', q => 'ping' } ), undef );
+    is scalar @result, 3, 'handle_incoming returns 3-element list for bad query (no a dict)';
+};
+#
+subtest 'DHT set_node_id validates input' => sub {
+    my $dht     = Net::BitTorrent::DHT->new( port => 0, bep42 => 0 );
+    my $orig_id = $dht->node_id_bin;
+    $dht->set_node_id(undef);
+    is $dht->node_id_bin, $orig_id, 'set_node_id(undef) does not change ID';
+    $dht->set_node_id('short');
+    is $dht->node_id_bin, $orig_id, 'set_node_id with wrong length does not change ID';
+    my $valid_id = 'A' x 20;
+    $dht->set_node_id($valid_id);
+    is $dht->node_id_bin, $valid_id, 'set_node_id with valid 20-byte ID works';
+};
+#
+subtest 'DHT import_state caps nodes and entries' => sub {
+    my $dht        = Net::BitTorrent::DHT->new( port => 0, bep42 => 0 );
+    my @many_nodes = map { { id => sha1("node$_"), ip => "1.2.3.$_%256", port => 6881 } } 1 .. 3000;
+    my $state      = { id => $dht->node_id_bin, nodes => \@many_nodes };
+    $dht->import_state($state);
+    pass 'import_state with 3000 nodes completed without crash';
+};
+#
+subtest 'DHT _unpack_nodes filters port 0' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0, bep42 => 0 );
+    use Socket qw[AF_INET inet_aton];
+    my $id     = 'A' x 20;
+    my $ip_bin = inet_aton('1.2.3.4');
+    my $node   = $id . $ip_bin . pack( 'n', 0 );
+    my $nodes  = $dht->_unpack_nodes( $node, AF_INET );
+    is scalar @$nodes, 0, 'node with port 0 filtered out';
+};
+#
+subtest 'DHT transaction ID validated' => sub {
+    my $dht = Net::BitTorrent::DHT->new( port => 0, bep42 => 0 );
+    my $msg = { y => 'q', q => 'ping', a => { id => 'A' x 20 } };
+    delete $msg->{t};
+    my @result = $dht->handle_incoming( bencode($msg), undef );
+    is scalar @result, 3, 'query with undef t is rejected (returns empty result)';
+};
+#
+subtest 'DHT _unpack_nodes caps at MAX_UNPACK_NODES' => sub {
+    my $dht  = Net::BitTorrent::DHT->new( port => 0, bep42 => 0 );
+    my $blob = '';
+    for my $i ( 1 .. 300 ) {
+        my $id   = pack( 'a20', substr( pack( 'N', $i ) x 5, 0, 20 ) );
+        my $ip   = pack( 'C4',  10, 0, 0, ( $i % 254 ) + 1 );
+        my $port = pack( 'n',   6881 );
+        $blob .= $id . $ip . $port;
+    }
+    my $nodes = $dht->_unpack_nodes( $blob, AF_INET );
+    ok @$nodes <= 200, '_unpack_nodes caps at MAX_UNPACK_NODES (got ' . scalar(@$nodes) . ')';
 };
 #
 done_testing;

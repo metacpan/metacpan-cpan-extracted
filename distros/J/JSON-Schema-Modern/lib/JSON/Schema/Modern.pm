@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.640-7-g1b0501d9
+package JSON::Schema::Modern; # git description: v0.641-14-g088d22be
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.641';
+our $VERSION = '0.642';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1275,6 +1275,15 @@ sub THAW ($class, $serializer, $data) {
       (map $_->{vocabularies}->@*, $self->_canonical_resources),
       (map $_->[1], values $self->__vocabulary_classes->%*));
 
+  # populate the global cache from our existing resources (otherwise already-existing resources
+  # may be loaded from disk again)
+  foreach my $resource ($self->_canonical_resources) {
+    JSON::Schema::Modern::Utilities::__populate_cached_document($self, $resource->{canonical_uri}, $resource->{document});
+
+    # also update our existing resources from the global cache, to avoid future refaddr errors
+    load_cached_document($self, $resource->{canonical_uri});
+  }
+
   return $self;
 }
 
@@ -1294,7 +1303,10 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.641
+version 0.642
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 

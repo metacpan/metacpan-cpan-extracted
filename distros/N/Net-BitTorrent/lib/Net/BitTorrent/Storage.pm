@@ -18,10 +18,10 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
     field %piece_layers;           # pieces_root => piece layer data
 
     # Async Disk Cache (LRU)
-    field %cache;                                     # file_id => { offset => data }
-    field %cache_dirty;                               # file_id => { offset => 1 }
-    field @lru_list;                                  # [[file_id, offset], ...]
-    field $max_cache_size     = 1024 * 1024 * 128;    # 128MiB default cache limit
+    field %cache;                                    # file_id => { offset => data }
+    field %cache_dirty;                              # file_id => { offset => 1 }
+    field @lru_list;                                 # [[file_id, offset], ...]
+    field $max_cache_size     = 1024 * 1024 * 16;    # 16MiB cache limit
     field $current_cache_size = 0;
     ADJUST {
         $base_path = Path::Tiny::path($base_path);
@@ -75,7 +75,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
     method verify_block ( $root, $index, $data ) {
         my $file = $files{$root};
         if ( !$file ) {
-            $self->_emit( log => 'Unknown file root', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'Unknown file root' );
             return;
         }
         return $file->verify_block( $index, $data );
@@ -84,7 +84,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
     method verify_block_audit ( $root, $index, $data, $audit_path ) {
         my $file = $files{$root};
         if ( !$file ) {
-            $self->_emit( log => 'Unknown file root', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'Unknown file root' );
             return;
         }
         return $file->verify_block_audit( $index, $data, $audit_path );
@@ -93,7 +93,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
     method verify_piece_v2 ( $root, $index, $data ) {
         my $file = $files{$root};
         if ( !$file ) {
-            $self->_emit( log => 'Unknown file root', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'Unknown file root' );
             return;
         }
         my $layer    = $piece_layers{$root} or return undef;
@@ -105,7 +105,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
     method write_block ( $root, $offset, $data ) {
         my $file = $files{$root};
         if ( !$file ) {
-            $self->_emit( log => 'Unknown file root', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'Unknown file root' );
             return;
         }
         $self->_write_to_cache( $file, $offset, $data );
@@ -115,7 +115,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
     method read_block ( $root, $offset, $length ) {
         my $file = $files{$root};
         if ( !$file ) {
-            $self->_emit( log => 'Unknown file root', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'Unknown file root' );
             return;
         }
         return $self->_read_from_cache( $file, $offset, $length );
@@ -141,7 +141,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
 
     method _write_to_cache ( $file, $offset, $data ) {
         my $id = refaddr($file);
-        $self->_emit( log => "    [DEBUG] Adding " . length($data) . " bytes to cache for file $id at offset $offset (dirty)\n", level => 'debug' );
+        $self->_emit_log( 'debug', "Adding " . length($data) . " bytes to cache for file $id at offset $offset (dirty)" );
         if ( exists $cache{$id}{$offset} ) {
             $current_cache_size -= length( $cache{$id}{$offset} );
             $self->_lru_bump( $id, $offset );
@@ -173,7 +173,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
         # Cache miss - read from disk and add to clean cache
         my $data = $file->read( $offset, $length );
         if ( defined $data && length($data) > 0 ) {
-            $self->_emit( log => "    [DEBUG] Cache miss for file $id at offset $offset, caching read\n", level => 'debug' );
+            $self->_emit_log( 'debug', "Cache miss for file $id at offset $offset, caching read" );
             push @lru_list, [ $id, $offset ];
             $cache{$id}{$offset} = $data;
             $current_cache_size += length($data);
@@ -262,7 +262,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
         if ( defined $root ) {
             my $file = $files{$root};
             if ( !$file ) {
-                $self->_emit( log => 'Unknown file root', level => 'fatal' );
+                $self->_emit_log( 'fatal', 'Unknown file root' );
                 return [];
             }
             push @segments, { file => $file, offset => $offset, length => $length };
@@ -287,7 +287,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
 
     method map_v1_piece ($index) {
         if ( !$piece_size ) {
-            $self->_emit( log => 'piece_size not set', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'piece_size not set' );
             return [];
         }
         my $piece_start = $index * $piece_size;
@@ -319,7 +319,7 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
 
     method write_piece_v1 ( $index, $data ) {
         my $segments = $self->map_v1_piece($index);
-        $self->_emit( log => "    [DEBUG] write_piece_v1: Piece $index mapped to " . scalar(@$segments) . " segments\n", level => 'debug' );
+        $self->_emit_log( 'debug', "write_piece_v1: Piece $index mapped to " . scalar(@$segments) . " segments" );
         my $data_offset = 0;
         for my $seg (@$segments) {
             $self->_write_to_cache( $seg->{file}, $seg->{offset}, substr( $data, $data_offset, $seg->{length} ) );
@@ -338,13 +338,15 @@ class Net::BitTorrent::Storage v2.0.1 : isa(Net::BitTorrent::Emitter) {
 
     method verify_piece_v1 ( $index, $data ) {
         return undef unless $pieces_v1;
-        my $expected = substr( $pieces_v1, $index * 20, 20 );
+        my $offset = $index * 20;
+        return undef if $offset + 20 > length($pieces_v1);
+        my $expected = substr( $pieces_v1, $offset, 20 );
         return sha1($data) eq $expected;
     }
 
     method map_v2_piece ($index) {
         if ( !$piece_size ) {
-            $self->_emit( log => 'piece_size not set', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'piece_size not set' );
             return ( undef, undef );
         }
         my $offset = 0;

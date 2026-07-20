@@ -48,25 +48,25 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.141'
+    version: '0.142'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.141'
+    version: '0.142'
   JSON::Schema::Modern::Vocabulary::OpenAPI_3_0:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm
-    version: '0.141'
+    version: '0.142'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.141'
+    version: '0.142'
   OpenAPI::Modern::Utilities:
     file: lib/OpenAPI/Modern/Utilities.pm
-    version: '0.141'
+    version: '0.142'
 requires:
   Clone: '0'
   Encode: '2.89'
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
-  JSON::Schema::Modern: '0.641'
+  JSON::Schema::Modern: '0.642'
   List::Util: '1.45'
   Math::BigInt: '1.999701'
   Moo: '0'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.141'
+version: '0.142'
 x_Dist_Zilla:
   perl:
     version: '5.044000'
@@ -342,10 +342,6 @@ x_Dist_Zilla:
               name: 'COPYRIGHT AND LICENCE'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::GenerateSection
-              name: VERSION
-              version: '4.020'
-            -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@Author::ETHER/EnsurePod5'
               version: '4.020'
@@ -452,10 +448,6 @@ x_Dist_Zilla:
             -
               class: inc::AppendSection
               name: AppendCopyright
-              version: ~
-            -
-              class: inc::AppendSection
-              name: AppendVersion
               version: ~
       name: '@Author::ETHER/PodWeaver'
       version: '4.010'
@@ -781,9 +773,9 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.141
+          tag: v0.142
           tag_format: v%V
-          tag_message: v%v%t
+          tag_message: v%v%t%n%n%c
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.52.0
           repo_root: .

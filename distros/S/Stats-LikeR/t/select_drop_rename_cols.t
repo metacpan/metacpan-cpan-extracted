@@ -160,7 +160,7 @@ dies_ok { drop_cols(\my $s, 0) }   'drop scalar ref dies';
 # no memory leaks (guarded under Devel::Cover; the XS paths were also verified
 # via a net-zero PL_sv_count delta over 20k iterations during development).
 #
-done_testing() if $INC{'Devel/Cover.pm'};
+if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok { select_cols([ [1,2,3], [4,5,6] ], 0, 2) }             'select_cols(): AoA, no leaks';
 no_leaks_ok { select_cols([ {a=>1,b=>2}, {a=>3,b=>4} ], 'a') }      'select_cols(): AoH, no leaks';
 no_leaks_ok { select_cols([ {a=>1}, {b=>2} ], 'a','b') }            'select_cols(): AoH ragged, no leaks';

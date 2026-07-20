@@ -348,7 +348,7 @@ END_TEX
 # By now an earlier tex write has already loaded Cwd (used for the provenance
 # line), so no module-load allocations are mistaken for leaks here.
 #--------
-done_testing() if $INC{'Devel/Cover.pm'};
+if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok {
 	my ($csv, $tex) = paths();
 	eval {

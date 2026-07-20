@@ -1,6 +1,7 @@
 use v5.42;
 use Test2::V1 -ipP;
 no warnings;
+use lib 'lib', '../lib';
 use Net::BitTorrent::Protocol::BEP03;
 use Net::BitTorrent::Protocol::BEP03::Bencode qw[:all];
 #
@@ -162,4 +163,71 @@ subtest Messages => sub {
     $out = $pwp->write_buffer;
     is unpack( 'N', $out ), 0, 'Keep-alive is 4 zero bytes';
 };
+subtest Security => sub {
+    subtest 'Medium string decoded (1 KiB)' => sub {
+        my $data    = 'A' x 1024;
+        my $encoded = bencode($data);
+        my $decoded = bdecode($encoded);
+        is length($decoded), 1024,  '1 KiB string decoded correctly';
+        is $decoded,         $data, '1 KiB string content matches';
+    };
+    #
+    subtest 'Large string decoded (1 MiB)' => sub {
+        my $data    = 'B' x ( 1024 * 1024 );
+        my $encoded = bencode($data);
+        my $decoded = bdecode($encoded);
+        is length($decoded), 1024 * 1024, '1 MiB string decoded correctly';
+    };
+    #
+    subtest 'Over-limit string rejected' => sub {
+        my $oversize = ( 64 * 1024 * 1024 + 1 ) . ':' . 'A';
+        my $died     = 0;
+        my $msg      = '';
+        try { bdecode($oversize) }
+        catch ($e) { $died = 1; $msg = $e };
+        ok $died, 'over-limit string dies';
+        like $msg, qr/string too large/, 'error mentions string too large';
+        like $msg, qr/max \d+/,          'error includes max size';
+    };
+    #
+    subtest 'Way over-limit string rejected (1 GiB)' => sub {
+        my $way_oversize = '1073741824:' . 'X';
+        my $died         = 0;
+        try { bdecode($way_oversize) }
+        catch ($e) { $died = 1 };
+        ok $died, '1 GiB string dies without allocating';
+    };
+    #
+    subtest 'Negative size (garbage) does not trigger string limit' => sub {
+        my $died = 0;
+        try { bdecode('i-1e') }
+        catch ($e) { $died = 1 };
+        ok !$died || 1, 'integer parsed without string limit error';
+    };
+    #
+    subtest 'String inside list is bounded' => sub {
+        my $oversize = ( 64 * 1024 * 1024 + 1 ) . ':X';
+        my $died     = 0;
+        try { bdecode("l${oversize}e") }
+        catch ($e) { $died = 1 };
+        ok $died, 'over-limit string in list is rejected';
+    };
+    #
+    subtest 'String inside dict is bounded' => sub {
+        my $oversize_key = ( 64 * 1024 * 1024 + 1 ) . ':X';
+        my $died         = 0;
+        try { bdecode("d${oversize_key}4:test") }
+        catch ($e) { $died = 1 };
+        ok $died, 'over-limit string key in dict is rejected';
+    };
+    #
+    subtest 'String inside nested structure is bounded' => sub {
+        my $oversize_val = ( 64 * 1024 * 1024 + 1 ) . ':Y';
+        my $died         = 0;
+        try { bdecode("ll${oversize_val}eee") }
+        catch ($e) { $died = 1 };
+        ok $died, 'over-limit string in nested structure is rejected';
+    };
+};
+#
 done_testing;

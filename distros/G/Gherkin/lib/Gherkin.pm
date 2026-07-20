@@ -1,5 +1,5 @@
 package Gherkin;
-$Gherkin::VERSION = '41.0.0';
+$Gherkin::VERSION = '42.0.0';
 use strict;
 use warnings;
 use Encode qw(encode_utf8 find_encoding);

@@ -1,4 +1,5 @@
 use v5.42;
+use lib 'lib';
 use feature 'class';
 no warnings 'experimental::class';
 use Test2::V1 -ipP;
@@ -62,4 +63,59 @@ subtest 'PEX Logic Verification' => sub {
     }
     ok $found{'3.3.3.3:3333'}, 'Peer discovered via incoming PEX';
 };
+#
+subtest 'Malformed PEX compact data handled gracefully' => sub {
+    my $temp    = Path::Tiny->tempdir;
+    my $client  = Net::BitTorrent->new();
+    my $ih      = '2' x 20;
+    my $torrent = $client->add_magnet( 'magnet:?xt=urn:btih:' . unpack( 'H*', $ih ), $temp );
+    $torrent->start();
+    my $p_handler = Net::BitTorrent::Protocol::PeerHandler->new( infohash => $ih, peer_id => 'PEER_M3' . ( '0' x 11 ), features => { bep11 => 1 } );
+    my $transport = MockTransport->new();
+    my $peer      = Net::BitTorrent::Peer->new( protocol => $p_handler, torrent => $torrent, transport => $transport, ip => '9.9.9.9', port => 9999 );
+    $p_handler->set_peer($peer);
+    $torrent->register_peer_object($peer);
+
+    # Build malformed PEX compact data (not multiple of 6 bytes)
+    my $malformed_data = 'A' x 7;    # 7 bytes = invalid for IPv4 unpack
+    require Net::BitTorrent::Protocol::BEP03::Bencode;
+    my $payload = Net::BitTorrent::Protocol::BEP03::Bencode::bencode( { added => $malformed_data } );
+
+    # Capture pex events
+    my @pex_events;
+    $p_handler->on( pex => sub ( $self, $added, $dropped, $added6, $dropped6 ) { push @pex_events, { added => $added, dropped => $dropped } } );
+
+    # Trigger the PEX handler via extended_message event
+    my $ok = eval { $p_handler->_emit( 'extended_message', 'ut_pex', $payload ); 1 };
+    ok $ok, 'malformed PEX compact data did not crash';
+    is scalar @pex_events, 0, 'no pex event emitted for malformed data';
+};
+#
+subtest 'PEX truncation caps peers at MAX_PEX_PEERS' => sub {
+    my $temp    = Path::Tiny->tempdir;
+    my $client  = Net::BitTorrent->new();
+    my $ih      = '3' x 20;
+    my $torrent = $client->add_magnet( 'magnet:?xt=urn:btih:' . unpack( 'H*', $ih ), $temp );
+    $torrent->start();
+    my $p_handler = Net::BitTorrent::Protocol::PeerHandler->new( infohash => $ih, peer_id => 'PEER_M4' . ( '0' x 11 ), features => { bep11 => 1 } );
+    my $transport = MockTransport->new();
+    my $peer = Net::BitTorrent::Peer->new( protocol => $p_handler, torrent => $torrent, transport => $transport, ip => '10.10.10.10', port => 10101 );
+    $p_handler->set_peer($peer);
+    $torrent->register_peer_object($peer);
+
+    # Build PEX compact data with 150 IPv4 peers (150 * 6 = 900 bytes)
+    require Net::BitTorrent::Protocol::BEP23;
+    my @peers  = map { { ip => "10.0.$_.1", port => 6881 + $_ } } 1 .. 150;
+    my $packed = Net::BitTorrent::Protocol::BEP23::pack_peers_ipv4(@peers);
+    is length($packed), 150 * 6, 'packed 150 IPv4 peers correctly';
+    require Net::BitTorrent::Protocol::BEP03::Bencode;
+    my $payload = Net::BitTorrent::Protocol::BEP03::Bencode::bencode( { added => $packed } );
+    my @pex_events;
+    $p_handler->on( pex => sub ( $self, $added, $dropped, $added6, $dropped6 ) { push @pex_events, { added => $added } } );
+    $p_handler->_emit( 'extended_message', 'ut_pex', $payload );
+    is scalar @pex_events, 1, 'one pex event emitted';
+    ok scalar @{ $pex_events[0]{added} } <= 100, 'added peers capped at MAX_PEX_PEERS (100)';
+    ok scalar @{ $pex_events[0]{added} } > 0,    'some peers were still parsed';
+};
+#
 done_testing;

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 
 use 5.020;
 use utf8;
@@ -19,9 +19,9 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use JSON::Schema::Modern::Utilities 0.625 qw(E canonical_uri jsonp unjsonp is_equal json_pointer_type assert_keyword_type assert_uri_reference load_cached_document get_type);
-use JSON::Schema::Modern::Result 0.630;
-use OpenAPI::Modern::Utilities qw(:constants add_vocab_and_default_schemas);
+use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp unjsonp is_equal json_pointer_type assert_keyword_type assert_uri_reference load_cached_document get_type);
+use JSON::Schema::Modern::Result;
+use OpenAPI::Modern::Utilities qw(:constants add_vocab_and_default_schemas add_formats);
 use Carp qw(croak carp);
 use Digest::MD5 'md5_hex';
 use Clone 'clone';
@@ -60,8 +60,6 @@ sub _add_operationId { $_[0]->_operationIds->{$_[1]} = json_pointer_type->($_[2]
 has _tags => (
   is => 'bare',
   isa => HashRef[json_pointer_type],
-  lazy => 1,
-  default => sub { {} },
 );
 
 sub tag_path { $_[0]->{_tags}{$_[1]} }
@@ -70,8 +68,6 @@ sub tag_path { $_[0]->{_tags}{$_[1]} }
 has _operation_tags => (
   is => 'bare',
   isa => HashRef[ArrayRef[json_pointer_type]],
-  lazy => 1,
-  default => sub { {} },
 );
 
 sub operations_with_tag { ($_[0]->{_operation_tags}{$_[1]}//[])->@* }
@@ -129,7 +125,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     errors => [],
     evaluator => $evaluator,
     identifiers => {},
-    # note that this is the JSON Schema specification version, not OpenAPI version
+    # note that this is the version of the JSON Schema dialect used to define the OpenAPI document,
+    # not the OpenAPI specification version
     specification_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
@@ -160,6 +157,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     if defined $oad_version[2] and (split(/\./, $max_supported))[2] < $oad_version[2];
 
   add_vocab_and_default_schemas($evaluator, $self->oas_version);
+  add_formats($evaluator, $self->oas_version);
 
   if (exists $schema->{'$self'}) {
     my $state = { %$state, keyword => '$self', initial_schema_uri => Mojo::URL->new };
@@ -725,14 +723,14 @@ sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
 
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
-  delete $data->{evaluator};
+  delete $data->{evaluator};  # no longer exists on this class
 
   if (defined(my $dialect = delete $data->{json_schema_dialect})) {
     carp "use of no-longer-supported constructor argument: json_schema_dialect = \"$dialect\"; use \"jsonSchemaDialect\": \"...\"  in your OpenAPI document itself";
   }
 
   my $self = bless($data, $class);
-  $self->{oas_version} = OAS_VERSIONS->[-1] if not exists $self->{oas_version};
+  $self->oas_version(OAS_VERSIONS->[-1]) if not defined $self->oas_version;
 
   foreach my $attr (qw(schema _entities)) {
     croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
@@ -756,7 +754,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.141
+version 0.142
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

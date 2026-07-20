@@ -1250,6 +1250,10 @@ paths:
     get: {}
 YAML
 
+  @request = (method => 'GET', uri => 'http://example.com/foo/text%2Fpl%5Dain');
+  ok($openapi->find_path_item($options = { @request }), to_str(@request).': lookup succeeded');
+  is_equal($options->{path_captures}{foo_id}, 'text%2Fpl%5Dain', 'got path variable, still encoded');
+
   @request = (method => 'GET', uri => 'http://example.com/foo/bar');
   ok($openapi->find_path_item($options = { @request }), to_str(@request).': lookup succeeded');
   cmp_result(
@@ -2870,13 +2874,13 @@ YAML
     {
       uri => isa('Mojo::URL'),
       method => 'GET',
-      path_template => '/login/~ether',
-      path_captures => {},
-      uri_captures => {},
+      path_template => '/login/{username}',
+      path_captures => { username => '%7Eether' },
+      uri_captures => { username => '%7Eether' },
       _path_item => { get => ignore },
       _operation => ignore,
       _operation_path_suffix => '/get',
-      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /login/~ether get)))),
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /login/{username} get)))),
       errors => [],
     },
     'url-escaped characters in the URI can still be matched against an unescaped template',
@@ -2890,8 +2894,8 @@ YAML
       uri => isa('Mojo::URL'),
       method => 'GET',
       path_template => '/login/{username}',
-      path_captures => { username => '_ether' },
-      uri_captures => { username => '_ether' },
+      path_captures => { username => '%5Fether' },
+      uri_captures => { username => '%5Fether' },
       _path_item => { get => ignore },
       _operation => ignore,
       _operation_path_suffix => '/get',

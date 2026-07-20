@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Storage::File v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use Digest::Merkle::SHA256;
     use Path::Tiny  qw();
     use Digest::SHA qw[sha256];
@@ -11,8 +11,10 @@ class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
     field $pieces_root : param       : reader = undef;
     field $piece_size  : param       : reader = 0;
     field $merkle      : reader;
+    use constant MAX_FILE_SIZE => 100 * 1024 * 1024 * 1024;    # 100GB
     ADJUST {
-        $file_path = Path::Tiny::path($file_path);
+        $file_path = Path::Tiny::path($file_path)->absolute;
+        $file_path = $file_path->realpath if $file_path->exists;
         if ($pieces_root) {
             $merkle = Digest::Merkle::SHA256->new( file_size => $size );
         }
@@ -20,7 +22,7 @@ class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method verify_block ( $index, $data ) {
         if ( !$merkle ) {
-            $self->_emit( log => 'File does not have Merkle tree (no pieces root)', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'File does not have Merkle tree (no pieces root)' );
             return 0;
         }
         my $old_hash = $merkle->get_node( $merkle->height, $index );
@@ -37,7 +39,7 @@ class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method verify_block_audit ( $index, $data, $audit_path ) {
         if ( !$pieces_root ) {
-            $self->_emit( log => 'File does not have pieces root', level => 'fatal' );
+            $self->_emit_log( 'fatal', 'File does not have pieces root' );
             return 0;
         }
         return Digest::Merkle::SHA256->verify_hash( $index, sha256($data), $audit_path, $pieces_root );
@@ -76,8 +78,11 @@ class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method read ( $offset, $length ) {
-        return '' if $length <= 0;
-        return undef unless $file_path->exists;
+        return ''                 if $length <= 0;
+        return ''                 if $offset < 0;
+        $length = $size - $offset if $offset + $length > $size;
+        return ''                 if $length <= 0;
+        return undef unless $file_path->is_file;
         my $fh = $file_path->openr_raw;
         seek $fh, $offset, 0;
         read( $fh, my $chunk, $length );
@@ -86,11 +91,14 @@ class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method write ( $offset, $data ) {
         $self->_ensure_exists();
-        $self->_emit( log => "    [DEBUG] Writing " . length($data) . " bytes to $file_path at offset $offset\n", level => 'debug' );
+        return if $offset < 0 || $offset > $size;
+        my $max_write = $size - $offset;
+        $data = substr( $data, 0, $max_write ) if length($data) > $max_write;
+        $self->_emit_log( 'debug', 'Writing ' . length($data) . " bytes to $file_path at offset $offset" );
         my $fh = $file_path->openrw_raw;
         seek $fh, $offset, 0;
         print {$fh} $data or do {
-            $self->_emit( log => "Failed to write to $file_path: $!", level => 'fatal' );
+            $self->_emit_log( 'fatal', "Failed to write to $file_path: $!" );
             return;
         };
         $fh->flush();
@@ -98,6 +106,10 @@ class Net::BitTorrent::Storage::File v2.0.0 : isa(Net::BitTorrent::Emitter) {
 
     method _ensure_exists () {
         return if $file_path->exists;
+        if ( $size > MAX_FILE_SIZE ) {
+            $self->_emit_log( 'error', "File size $size exceeds maximum allowed (" . MAX_FILE_SIZE . ")" );
+            return;
+        }
         $file_path->parent->mkpath;
         if ( $^O eq 'MSWin32' ) {
             try {

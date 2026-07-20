@@ -34,12 +34,15 @@ class Net::BitTorrent::Protocol::BEP06 v2.0.0 : isa(Net::BitTorrent::Protocol::B
             $self->_emit('have_none');
         }
         elsif ( $id == SUGGEST_PIECE ) {
+            return $self->_emit_log( 'warn', 'SUGGEST_PIECE payload too short' ) if length($payload) != 4;
             $self->_emit( suggest => unpack( 'N', $payload ) );
         }
         elsif ( $id == REJECT_REQUEST ) {
+            return $self->_emit_log( 'warn', 'REJECT payload too short' ) if length($payload) != 12;
             $self->_emit( reject => unpack( 'N N N', $payload ) );
         }
         elsif ( $id == ALLOWED_FAST ) {
+            return $self->_emit_log( 'warn', 'ALLOWED_FAST payload too short' ) if length($payload) != 4;
             $self->_emit( allowed_fast => unpack( 'N', $payload ) );
         }
         else {

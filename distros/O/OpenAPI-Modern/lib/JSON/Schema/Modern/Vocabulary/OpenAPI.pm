@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 
 use 5.020;
 use utf8;
@@ -100,19 +100,27 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
 
 sub _traverse_keyword_example { 1 }
 
-sub _eval_keyword_example ($self, $data, $schema, $state) {
-  annotate_self($state, $schema);
+sub _traverse_keyword_externalDocs ($self, $schema, $state) {
+  return if not assert_keyword_type($state, $schema, 'object');
+
+  ()= E($state, 'url is required', $state->{keyword}) if not exists $schema->{$state->{keyword}}{url};
+  ()= E($state, 'url is not a string') if not is_type('string', $schema->{$state->{keyword}}{url});
+  1;
 }
 
-# until we do something with these values, we do not bother checking the structure
-sub _traverse_keyword_externalDocs { 1 }
+sub _traverse_keyword_xml ($self, $schema, $state) {
+  return if not assert_keyword_type($state, $schema, 'object');
 
-sub _eval_keyword_externalDocs { goto \&_eval_keyword_example }
+  foreach my $field (qw(nodeType name namespace prefix)) {
+    ()= E($state, '%s is not a string', $field)
+      if not is_type('string', $schema->{$state->{keyword}}{$field});
+  }
 
-# until we do something with these values, we do not bother checking the structure
-sub _traverse_keyword_xml { 1 }
-
-sub _eval_keyword_xml { goto \&_eval_keyword_example }
+  foreach my $field (qw(attribute wrapped)) {
+    ()= E($state, '%s is not a boolean', $field)
+      if not is_type('boolean', $schema->{$state->{keyword}}{$field});
+  }
+}
 
 1;
 
@@ -128,7 +136,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.141
+version 0.142
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

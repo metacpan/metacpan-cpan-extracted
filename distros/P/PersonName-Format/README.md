@@ -1,0 +1,149 @@
+# NAME
+
+PersonName::Format - CLDR person-name formatter for Perl
+
+# SYNOPSIS
+
+    my $formatter = PersonName::Format->new(
+        'ja-JP',
+        length         => 'long',
+        usage          => 'referring',
+        formality      => 'formal',
+        displayOrder   => 'default',
+        surnameAllCaps => 0,
+    );
+
+    # Native Japanese order: 宮崎駿
+    my $native = $formatter->format(
+        given      => '駿',
+        surname    => '宮崎',
+        nameLocale => 'ja-JP',
+    );
+
+    # Japanese formatter switching to Latin conventions for a foreign name
+    my $foreign = $formatter->format(
+        given      => 'Albert',
+        surname    => 'Einstein',
+        nameLocale => 'de-CH',
+    );
+
+    # Pass a hash reference instead of a flat list
+    my $by_ref = $formatter->format({
+        given      => 'Albert',
+        surname    => 'Einstein',
+        nameLocale => 'de-CH',
+    });
+
+    # Or pass any object that satisfies the name contract
+    my $by_obj = $formatter->format( $my_name_object );
+
+# DESCRIPTION
+
+`PersonName::Format` formats structured personal names using CLDR person-name patterns provided by [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData).
+
+The formatter derives the name script by inspecting the surname and then the given name, derives or adjusts the name locale using likely-subtag data, compares the name and formatting scripts, and switches to an effective formatting locale when required by UTS #35 Part 8.
+
+The implementation is pure Perl. Script detection is intentionally isolated so it can later be replaced by an optional XS backend without changing the public API.
+
+# CONSTRUCTOR
+
+## new
+
+    my $formatter = PersonName::Format->new( $locale, %options );
+
+Creates a new formatter. The first positional argument is the BCP 47 formatting locale tag (required). All remaining arguments are named options documented under ["CONSTRUCTOR OPTIONS"](#constructor-options).
+
+# CONSTRUCTOR OPTIONS
+
+## display\_order
+
+## displayOrder
+
+`default`, `givenFirst`, `surnameFirst`, or `sorting`.
+
+## formality
+
+`formal` or `informal`. When omitted, the CLDR default inherited by the formatter locale is used.
+
+## length
+
+`long`, `medium`, or `short`. When omitted, the CLDR default inherited by the formatter locale is used.
+
+## surname\_all\_caps
+
+## surnameAllCaps
+
+Boolean option causing surname fields to be rendered in uppercase.
+
+## usage
+
+`referring`, `addressing`, or `monogram`. Defaults to `referring`.
+
+# METHODS
+
+## compile
+
+    my $compiled = $formatter->compile(
+        nameLocale => 'fr-FR',
+        nameScript => 'Latn',
+    );
+
+Returns a [PersonName::Format::Compiled](https://metacpan.org/pod/PersonName%3A%3AFormat%3A%3ACompiled) object with the name identity and resolved CLDR context frozen. `nameScript` is required. `nameLocale` and `preferredOrder` are optional but, when supplied, are enforced for every name formatted by the compiled object.
+
+## format
+
+    my $string = $formatter->format( $name_object );
+    my $string = $formatter->format( \%fields );
+    my $string = $formatter->format( given => 'John', surname => 'Doe' );
+
+Formats a name and returns the resulting string. The argument may be:
+
+- any object satisfying the name contract (see ["implements\_name\_contract" in PersonName::Format::Name](https://metacpan.org/pod/PersonName%3A%3AFormat%3A%3AName#implements_name_contract))
+- a hash reference of name fields
+- a flat key/value list of name fields
+
+The name locale may be omitted. When present, its language and region are retained and its script is replaced by the script detected in the name data.
+
+## format\_to\_parts
+
+    my $parts = $formatter->format_to_parts( \%fields );
+
+Returns an array reference of hash references describing the generated parts.
+Literal spacing replacement is applied only to literal parts.
+Each hash has the following keys:
+
+- `type`
+
+    For field parts, the CLDR pattern field expression such as `given` or `given-initial`. For spacing between fields, the value is `literal`.
+
+- `value`
+
+    The rendered text for this part.
+
+- `field`
+
+    Present on non-literal parts. The base CLDR field name such as `given` or `surname`.
+
+- `modifiers`
+
+    Present on non-literal parts when modifiers were resolved. An array reference of modifier names.
+
+## resolved\_options
+
+Returns the resolved constructor options. Per-name derived locales are not constructor options and are therefore not included.
+
+## resolvedOptions
+
+Alias for `resolved_options()`.
+
+# AUTHOR
+
+Jacques Deguest <`jack@deguest.jp`>
+
+# COPYRIGHT & LICENSE
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

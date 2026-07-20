@@ -1,0 +1,158 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Net::BitTorrent::SSRF - Server-Side Request Forgery Protection
+
+=head1 SYNOPSIS
+
+    use Net::BitTorrent::SSRF qw[is_safe_ip is_safe_host is_safe_url resolve_and_pin];
+
+    # Check a raw IP address
+    die 'unsafe' unless is_safe_ip('8.8.8.8');
+
+    # Check a hostname (resolves DNS and validates all IPs)
+    die 'unsafe' unless is_safe_host('tracker.example.com');
+
+    # Check a full URL (extracts host, resolves, validates)
+    die 'unsafe' unless is_safe_url('http://tracker.example.com/announce');
+
+    # Resolve a hostname to a validated safe IP + port (DNS pinning)
+    my ($ip, $port) = resolve_and_pin('tracker.example.com', 80)
+        or die 'could not resolve to a safe address';
+
+=head1 DESCRIPTION
+
+C<Net::BitTorrent::SSRF> provides utility functions to detect and block outbound connections to RFC 1918 private
+ranges, loopback, link-local, multicast, cloud metadata endpoints, and other address spaces that should never be
+contacted by a BitTorrent client on behalf of untrusted input.
+
+This module is used by the tracker, web seed, and DHT subsystems to prevent Server-Side Request Forgery (SSRF) attacks
+where a malicious torrent file, magnet link, tracker response, or DHT node tricks the client into probing internal
+networks.
+
+=head1 FUNCTIONS
+
+=head2 C<is_safe_ip( $ip )>
+
+Returns true if C<$ip> is a public (non-private) IP address string. Returns false for loopback, RFC 1918 private,
+link-local, ULA, multicast, unspecified, and unparseable inputs.
+
+    if ( is_safe_ip( $ip ) ) {
+        # safe to connect
+    }
+
+Blocked ranges:
+
+=over
+
+=item * C<127.0.0.0/8> - IPv4 loopback
+
+=item * C<10.0.0.0/8> - RFC 1918 private
+
+=item * C<172.16.0.0/12> - RFC 1918 private
+
+=item * C<192.168.0.0/16> - RFC 1918 private
+
+=item * C<169.254.0.0/16> - Link-local (includes C<169.254.169.254> cloud metadata)
+
+=item * C<224.0.0.0/4> - IPv4 multicast
+
+=item * C<0.0.0.0> - Unspecified
+
+=item * C<::1> - IPv6 loopback
+
+=item * C<fe80::/10> - IPv6 link-local
+
+=item * C<fc00::/7> - IPv6 ULA
+
+=item * C<ff00::/8> - IPv6 multicast
+
+=item * C<::> - IPv6 unspecified
+
+=back
+
+=head2 C<is_safe_host( $host )>
+
+Returns true if C<$host> (an IP address or hostname) resolves exclusively to public IP addresses. If C<$host> is
+already a valid IP, this behaves identically to C<is_safe_ip>. Otherwise, C<$host> is resolved via C<getaddrinfo> and
+every resulting IP is checked with C<is_safe_ip>.
+
+    unless ( is_safe_host( $tracker_host ) ) {
+        warn 'refusing to connect to ' .$tracker_host;
+    }
+
+=head2 C<is_safe_url( $url )>
+
+Extracts the hostname from C<$url> using L<URI> and passes it to C<is_safe_host>. Returns true if the URL's host
+resolves to only public IPs.
+
+    my $http = HTTP::Tiny->new();
+    if ( is_safe_url( $target_url ) ) {
+        my $res = $http->get( $target_url );
+    }
+
+=head2 C<resolve_and_pin( $host, $port = undef )>
+
+Resolves C<$host> via C<getaddrinfo>, validates every resolved IP with C<is_safe_ip>, and returns C<($safe_ip, $port)>
+for the first safe result. Returns an empty list on failure (DNS error, no results, or all resolved IPs are unsafe).
+
+    my ($ip, $port) = resolve_and_pin('tracker.example.com', 80)
+        or die 'could not resolve to a safe address';
+    # $ip is now a validated public IP, $port is the resolved or original port
+
+If C<$host> is already a valid safe IP (passes C<is_safe_ip>), it is returned immediately without DNS resolution. This
+function is intended for DNS pinning: resolve once, validate, and use the result for the actual connection to minimize
+the TOCTOU window between resolution and connection.
+
+A full TOCTOU elimination would require overriding L<HTTP::Tiny>'s internal connection logic. The residual window when
+using this function is sub-millisecond and requires attacker-controlled DNS.
+
+=head1 INTEGRATION
+
+This module is consumed by the following classes:
+
+=over
+
+=item * L<Net::BitTorrent::Tracker::WebSeed> - validates web seed URLs before HTTP fetch
+
+=item * L<Net::BitTorrent::Tracker::HTTP> - validates tracker announce/scrape URLs
+
+=item * L<Net::BitTorrent::Tracker::UDP> - validates UDP tracker host at construction
+
+=item * L<Net::BitTorrent::DHT> - validates resolved DHT node addresses before sending
+
+=item * L<Net::BitTorrent::Peer> - validates HP_CONNECT addresses (BEP 55)
+
+=back
+
+All tracker and DHT classes accept a C<ssrf_bypass> constructor parameter for testing. This parameter defaults to C<0>
+(protection enabled) and should B<never> be set to C<1> in production.
+
+=head1 SPECIFICATIONS
+
+=over
+
+=item * B<RFC 1918> - Address Allocation for Private Internets
+
+=item * B<RFC 3927> - Dynamic Configuration of IPv4 Link-Local Addresses
+
+=item * B<RFC 4193> - Unique Local IPv6 Unicast Addresses
+
+=item * B<BEP 55> - Holepunching via UDP (SSRF vector via C<HP_CONNECT>)
+
+=back
+
+=head1 AUTHOR
+
+Sanko Robinson - L<https://github.com/sanko>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008-2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

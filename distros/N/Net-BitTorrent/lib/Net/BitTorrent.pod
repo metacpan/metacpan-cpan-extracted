@@ -107,6 +107,11 @@ The port to listen on for incoming connections. Defaults to a random port in the
 
 The user agent string reported to trackers and peers.
 
+=item C<max_peers> - optional
+
+The maximum number of connected peers across all active torents. If you'd rather set per-torrent limits, see
+L<Net::BitTorrent::Torrent>'s C<max_peers> field.
+
 =item C<encryption> - optional
 
 The encryption requirement level. Can be C<none>, C<preferred>, or C<required> (default).
@@ -512,7 +517,7 @@ The piece data.
 
 =head1 AUTHOR
 
-Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Sanko Robinson - L<https://github.com/sanko>
 
 =head1 COPYRIGHT
 

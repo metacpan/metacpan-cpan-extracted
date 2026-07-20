@@ -106,7 +106,7 @@ like($@, qr/group_by: "Ghost" is not present in the dataset/,
 #--------
 # No memory leaks on the HoH + filter path (including the empty-result case).
 #--------
-done_testing() if $INC{'Devel/Cover.pm'};
+if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 no_leaks_ok {
 	group_by($hoh,  'Testosterone', 'Gender', { Sex  => sub { $_ eq 'f'    } });
 	group_by($hoh,  'Testosterone', 'Gender', { Sex  => sub { $_ eq 'nope' } });

@@ -240,13 +240,20 @@ continued farther than they should in Pod::Man output if they were
 combined with C<> and fixed-width fonts, and for finding a subtle spacing
 bug with nested =items without bodies.
 
-G. Branden Robinson, for his assistance in understanding *roff syntax and
-analysis of groff justification changes.
+G. Branden Robinson, for his assistance in understanding *roff syntax,
+analysis of groff justification and hyphenation changes, collaboration on
+finding an approach to set a default for hyphenation and justification
+without overriding user preferences, assistance with fixed-with fonts, and
+his general helpfulness with all things related to groff.
 
 youpong, for reporting a double-encoding bug with a :utf8 output layer.
 
 Graham Knop, for fixing a tricky bug in detecting output PerlIO UTF-8
-layers.
+layers and simplifying the build system.
 
 Jim Avera, for finding a bug in wrapping in Pod::Text subclasses when S<>
 is used in combination with a UTF-8 input encoding.
+
+van-de-bugger, for finding a bug in C<> heuristics for adding quotes that
+made the wrong decision in some cases where the contents of C<> included
+newlines.

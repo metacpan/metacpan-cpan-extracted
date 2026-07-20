@@ -2,7 +2,7 @@
 X_No_Archive: Yes
 abstract: 'Pure Perl BitTorrent Client'
 author:
-  - 'Sanko Robinson <sanko@cpan.org>'
+  - 'Sanko Robinson'
 build_requires:
   Module::Build::Tiny: '0'
   Test2::V1: '0'
@@ -10,7 +10,7 @@ configure_requires:
   Module::Build::Tiny: '0'
   perl: v5.42.0
 dynamic_config: 0
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
 keywords:
   - dht
   - kademlia
@@ -41,28 +41,28 @@ optional_features:
 provides:
   Net::BitTorrent:
     file: lib/Net/BitTorrent.pm
-    version: v2.0.1
+    version: v2.1.0
   Net::BitTorrent::DHT:
     file: lib/Net/BitTorrent/DHT.pm
-    version: v2.0.6
+    version: v2.1.0
   Net::BitTorrent::DHT::Peer:
     file: lib/Net/BitTorrent/DHT.pm
     version: v2.0.6
   Net::BitTorrent::DHT::Security:
     file: lib/Net/BitTorrent/DHT/Security.pm
-    version: v2.0.6
+    version: v2.1.0
   Net::BitTorrent::Emitter:
     file: lib/Net/BitTorrent/Emitter.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Peer:
     file: lib/Net/BitTorrent/Peer.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Protocol::BEP03:
     file: lib/Net/BitTorrent/Protocol/BEP03.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Protocol::BEP03::Bencode:
     file: lib/Net/BitTorrent/Protocol/BEP03/Bencode.pm
-    version: v2.0.1
+    version: v2.1.0
   Net::BitTorrent::Protocol::BEP06:
     file: lib/Net/BitTorrent/Protocol/BEP06.pm
     version: v2.0.0
@@ -74,7 +74,7 @@ provides:
     version: v2.0.0
   Net::BitTorrent::Protocol::BEP11:
     file: lib/Net/BitTorrent/Protocol/BEP11.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Protocol::BEP23:
     file: lib/Net/BitTorrent/Protocol/BEP23.pm
     version: v2.0.0
@@ -83,7 +83,7 @@ provides:
     version: v2.0.0
   Net::BitTorrent::Protocol::BEP53:
     file: lib/Net/BitTorrent/Protocol/BEP53.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Protocol::BEP55:
     file: lib/Net/BitTorrent/Protocol/BEP55.pm
     version: v2.0.0
@@ -92,10 +92,10 @@ provides:
     version: v2.0.0
   Net::BitTorrent::Protocol::MSE:
     file: lib/Net/BitTorrent/Protocol/MSE.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Protocol::MSE::KeyExchange:
     file: lib/Net/BitTorrent/Protocol/MSE/KeyExchange.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Protocol::MSE::RC4:
     file: lib/Net/BitTorrent/Protocol/MSE/KeyExchange.pm
     version: v2.0.0
@@ -105,15 +105,18 @@ provides:
   Net::BitTorrent::Protocol::Simulation:
     file: lib/Net/BitTorrent/Protocol/Simulation.pm
     version: v2.0.0
+  Net::BitTorrent::SSRF:
+    file: lib/Net/BitTorrent/SSRF.pm
+    version: v2.1.0
   Net::BitTorrent::Storage:
     file: lib/Net/BitTorrent/Storage.pm
     version: v2.0.1
   Net::BitTorrent::Storage::File:
     file: lib/Net/BitTorrent/Storage/File.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Torrent:
     file: lib/Net/BitTorrent/Torrent.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Torrent::Generator:
     file: lib/Net/BitTorrent/Torrent/Generator.pm
     version: v2.0.0
@@ -125,19 +128,19 @@ provides:
     version: v2.0.0
   Net::BitTorrent::Tracker::Base:
     file: lib/Net/BitTorrent/Tracker/Base.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Tracker::HTTP:
     file: lib/Net/BitTorrent/Tracker/HTTP.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Tracker::UDP:
     file: lib/Net/BitTorrent/Tracker/UDP.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Tracker::WebSeed:
     file: lib/Net/BitTorrent/Tracker/WebSeed.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Transport::TCP:
     file: lib/Net/BitTorrent/Transport/TCP.pm
-    version: v2.0.0
+    version: v2.1.0
   Net::BitTorrent::Types:
     file: lib/Net/BitTorrent/Types.pm
     version: v2.0.0
@@ -153,6 +156,7 @@ requires:
   Acme::UPnP: '0'
   Algorithm::Kademlia: v1.0.1
   Algorithm::RateLimiter::TokenBucket: '0'
+  Crypt::URandom: '0.55'
   Digest::Merkle::SHA256: '0'
   Digest::SHA: '0'
   HTTP::Tiny: '0'
@@ -163,6 +167,7 @@ requires:
   Net::uTP: '0'
   Path::Tiny: '0'
   Socket: '0'
+  URI: '0'
   URI::Escape: '0'
   perl: v5.42.0
 resources:
@@ -170,7 +175,7 @@ resources:
   homepage: https://github.com/sanko/Net-BitTorrent.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Net-BitTorrent.pm.git
-version: v2.0.1
+version: v2.1.0
 x_help_wanted:
   - Tester
   - Documenter

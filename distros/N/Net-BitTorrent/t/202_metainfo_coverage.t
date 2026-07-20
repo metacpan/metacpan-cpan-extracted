@@ -36,31 +36,23 @@ subtest 'Malformed: Negative File Size' => sub {
 };
 subtest 'Malformed: Missing Path List' => sub {
     my $path = $torrent_dir->child('missing_path_list.torrent');
-    my $error;
-    try { Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() ) }
-    catch ($e) { $error = $e; }
-    ok $error, 'Caught missing path list' or diag 'Failed to catch missing path list';
+    my $t    = Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() );
+    is $t->storage, U(), 'Missing path list torrent has no storage';
 };
 subtest 'Malformed: No Name' => sub {
     my $path = $torrent_dir->child('no_name.torrent');
-    my $error;
-    try { Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() ) }
-    catch ($e) { $error = $e; }
-    ok $error, 'Caught missing name' or diag 'Failed to catch missing name';
+    my $t    = Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() );
+    is $t->storage, U(), 'No name torrent has no storage';
 };
 subtest 'Malformed: No Files' => sub {
     my $path = $torrent_dir->child('no_files.torrent');
-    my $error;
-    try { Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() ) }
-    catch ($e) { $error = $e; }
-    ok $error, 'Caught no files' or diag 'Failed to catch no files';
+    my $t    = Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() );
+    is $t->storage, U(), 'No files torrent has no storage';
 };
 subtest 'Security: Path Traversal (absolute_filename.torrent)' => sub {
     my $path = $torrent_dir->child('absolute_filename.torrent');
-    my $error;
-    try { Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() ) }
-    catch ($e) { $error = $e; }
-    like $error, qr/Invalid path element/, 'Caught absolute path in v1 torrent';
+    my $t    = Net::BitTorrent::Torrent->new( path => $path, base_path => '.', client => Net::BitTorrent->new() );
+    is $t->storage, U(), 'Absolute path torrent has no storage';
 };
 subtest 'Malformed v2: Invalid File (v2_invalid_file.torrent)' => sub {
     my $path = $torrent_dir->child('v2_invalid_file.torrent');

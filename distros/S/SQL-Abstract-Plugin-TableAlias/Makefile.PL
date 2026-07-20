@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
         'SQL::Abstract' => '2.000000',
 	'Moo' => '2.000000'
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'SQL-Abstract-Plugin-TableAlias-*' },
     META_MERGE => {

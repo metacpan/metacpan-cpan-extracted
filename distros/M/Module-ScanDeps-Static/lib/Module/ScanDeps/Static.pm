@@ -62,7 +62,7 @@ our $HAVE_VERSION = eval {
   return $TRUE;
 };
 
-our $VERSION = '1.7.8';
+our $VERSION = '1.8.1';
 
 caller or __PACKAGE__->main();
 
@@ -90,6 +90,7 @@ sub new {
   $options{include_require}  //= $FALSE;
   $options{add_version}      //= $TRUE;
   $options{min_core_version} //= $DEFAULT_MIN_CORE_VERSION;
+  $options{text}             //= $TRUE;
 
   # check for unknown options
   foreach my $o ( keys %options ) {
@@ -202,7 +203,7 @@ sub is_core {
 }
 
 ########################################################################
-sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
+sub parse_line { ## no critic (Subroutines::ProhibitExcessComplexity)
 ########################################################################
   my ( $self, $line ) = @_;
 
@@ -305,6 +306,48 @@ sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
     $line = <$fh>;
 
     return if !$line;
+  }
+
+  # Role::Tiny::With / Moo::with-style role composition:
+  #
+  #   use Role::Tiny::With;
+  #   with 'Foo';
+  #
+  #   with 'Foo', 'Bar';
+  #   with qw(Foo Bar);
+  #
+  # 'with' is not a use/require statement so it never enters the
+  # require|use branch below. Anchor on 'with' as the leading token
+  # (whitespace immediately after) so we don't match "without", a
+  # hash key 'with => ...', or prose in comments/POD.
+  if ( $line =~ /\A\s*with\b\s*(.*?)\s*;?\s*\z/xsm ) {
+
+    my $args = $1;
+
+    # with('Foo') / with ('Foo', 'Bar') -- strip an enclosing call
+    # paren, but only when it isn't the paren belonging to qw(...).
+    if ( $args =~ /\A[(](.*)[)]\z/xsm && $args !~ /\Aqw\b/xsm ) {
+      $args = $1;
+    }
+
+    if ( $args =~ /\Aqw\s*[{(\/'"]\s*([^)}\/'"]+)\s*[)}\/'"]/xsm ) {
+      foreach ( split $SPACE, $1 ) {
+        $self->add_require( $_, undef );
+      }
+
+      return $line;
+    }
+    elsif ( $args =~ /\A(["'])[\w:]+\1(\s*,\s*(["'])[\w:]+\3)*\z/xsm ) {
+      while ( $args =~ /(["'])([\w:]+)\1/gxsm ) {
+        $self->add_require( $2, undef );
+      }
+
+      return $line;
+    }
+
+    # doesn't look like a role list after all (e.g. "with the
+    # following caveats" in a comment/doc line that slipped through)
+    # -- fall through to normal processing below.
   }
 
   # ouch could be in a eval, perhaps we do not want these since we catch
@@ -486,7 +529,7 @@ sub parse {
   if ( my $file = $self->get_path ) {
     chomp $file;
 
-    open my $fh, '<', $file  ## no critic (InputOutput::RequireBriefOpen)
+    open my $fh, '<', $file ## no critic (InputOutput::RequireBriefOpen)
       or croak "could not open file '$file' for reading: $OS_ERROR";
 
     $self->set_handle($fh);
@@ -496,7 +539,7 @@ sub parse {
     $self->set_handle( IO::Scalar->new($script) );
   }
   elsif ( !$self->get_handle ) {
-    open my $fh, '<&STDIN'   ## no critic (InputOutput::RequireBriefOpen)
+    open my $fh, '<', \*STDIN ## no critic (InputOutput::RequireBriefOpen)
       or croak 'could not open STDIN';
 
     $self->set_handle($fh);
@@ -688,7 +731,7 @@ sub to_rpm {
 
   my @rpm_deps = ();
 
-  foreach my $perlver ( sort keys %{ $self->get_perlreq } ) {
+  foreach my $perlver ( sort values %{ $self->get_perlreq } ) {
     push @rpm_deps, "perl >= $perlver";
   }
 
@@ -705,7 +748,7 @@ sub to_rpm {
         if ( $m->{'version'} ) {
           $require{$module} = $m->{'version'};
 
-          push @rpm_deps, "perl($module) >= %s", $m->{'version'};
+          push @rpm_deps, "perl($module) >= $m->{'version'}";
         }
       }
 
@@ -718,7 +761,7 @@ sub to_rpm {
     }
   }
 
-  return join $EMPTY, @rpm_deps;
+  return join $NEWLINE, @rpm_deps, $EMPTY;
 }
 
 ########################################################################
@@ -737,7 +780,7 @@ sub main {
 
   my @option_specs = qw(
     add-version|a!
-    core!
+    core|c!
     help|h
     include-require|i!
     json|j
@@ -821,7 +864,7 @@ could use some polishing, but it works on a broad enough set of
 situations as to be useful.
 
 I<Only direct dependencies are returned by this module. If you
-want a recursive search for dependencies, use C<find-requires.pl>
+want a recursive search for dependencies, use C<find-requires>
 included in this distribution.>
 
 =head1 OPTIONS
@@ -838,7 +881,7 @@ included in this distribution.>
  --raw, -r                raw output
  --separator, -s          separator for output (default: =>)
  --text, -t               output as text (default)
- --version, -v            verion
+ --version, -v            version
 
 =head2 Examples
 
@@ -876,7 +919,7 @@ Show usage.
 Include statements that have C<Require> in them but are not
 necessarily on the left edge of the code (possibly in tests).
 
-default: <--include-require>
+default: B<--include-require>
 
 =item --json, -j
 
@@ -895,7 +938,9 @@ identify the dependencies for your script B<AND> you know you will be
 using a specific version of Perl, then set the C<min-core-version> to
 that version of Perl.
 
-default: $PERL_VERSION
+default: C<5.8.9> (the C<Module::ScanDeps::Static> constructor's
+C<min_core_version> option defaults this to the running Perl's version
+instead)
 
 =item --separator, -s
 
@@ -974,19 +1019,20 @@ Returns a C<Module::ScanDeps::Static> object.
 
 =over 5
 
-=item include_require
+=item path
 
-Boolean value that determines whether to consider C<require>
-statements that are not left-aligned to be considered dependencies.
+Path to a file to scan. When set, C<parse()> opens this file and reads
+from it.
 
-default: B<false>
+default: B<none> (if neither C<path> nor C<handle> is given, C<parse()>
+reads from C<STDIN>)
 
-=item add_version
+=item handle
 
-Boolean value that determines whether to include the version of the
-module currently installed if there is no version specified.
+An open filehandle (or any C<IO::Handle>-like object) to read from
+instead of a file. Ignored when C<path> is set.
 
-default: B<false>
+default: B<none>
 
 =item core
 
@@ -995,39 +1041,57 @@ of the dependency listing.
 
 default: B<true>
 
+=item include_require
+
+Boolean value that determines whether to consider C<require>
+statements that are not left-aligned to be considered dependencies.
+
+default: B<false> (the C<scandeps-static.pl> CLI defaults this to true)
+
+=item add_version
+
+Boolean value that determines whether to include the version of the
+module currently installed if there is no version specified.
+
+default: B<true>
+
+=item min_core_version
+
+The minimum version of Perl which will be used to decide if a module
+is included in Perl core. See C<is_core> and the C<--min-core-version>
+option for details.
+
+default: B<the running Perl's version> (C<$PERL_VERSION>). The
+C<scandeps-static.pl> CLI defaults this to C<5.8.9>.
+
 =item json
 
 Boolean value that indicates output should be in JSON format.
 
 default: B<false>
 
-=item min_core_version
-
-The minimum version of Perl which will be used to decide if a module
-is included in Perl core.
-
-default: 5.8.9
-
-=item separator
-
-Character string to use formatting dependency list as text. This
-string will be used to separate the module name from the version.
-
-default: ' => '
-
- Module::ScanDeps::Static 0.1
-
 =item text
 
-Boolean value that indicates output should be in the same format as C<scandeps.pl>.
+Boolean value that indicates output should be in the same format as
+C<scandeps.pl>. This is the default output format for C<get_dependencies>
+when neither C<json> nor C<raw> is set.
 
-dafault: B<true>
+default: B<true>
 
 =item raw
 
-Boolean value that indicates output should be in raw format (module version).
+Boolean value that indicates output should be in raw format
+(module version).
 
 default: B<false>
+
+=item separator
+
+Character string used to separate the module name from the version in
+text output.
+
+default: B<none> from the constructor; C<format_text> falls back to a
+single space. The C<scandeps-static.pl> CLI sets this to C< => >.
 
 =back
 
@@ -1040,6 +1104,15 @@ numbers.
  $scanner->parse;
  my $requires = $scanner->get_require;
 
+=head2 get_perlreq
+
+Returns a hash ref of Perl version requirements discovered while
+parsing (keyed by C<'perl'>). Populated for C<use 5.010;> /
+C<require 5.010;> style statements. Pair with C<get_require>.
+
+ $scanner->parse;
+ my $perlreq = $scanner->get_perlreq;  # { perl => '5.010', ... }
+
 =head2 parse
 
 =over 5
@@ -1051,7 +1124,7 @@ numbers.
 =item parse from file handle
 
  my @dependencies = Module::ScanDeps::Static->new({ handle => $path })->parse;
- 
+
 =item parse STDIN
 
  my @dependencies = Module::ScanDeps::Static->new->parse(\$script);
@@ -1083,7 +1156,7 @@ As JSON:
  [
    {
     "name" : "Module::Name",
-    "version" "version"
+    "version" : "version"
    },
    ...
  ]
@@ -1099,9 +1172,85 @@ In scalar context in the absence of an argument returns a JSON
 formatted string. In list context will return a list of hashes that
 contain the keys "name" and "version" for each dependency.
 
+Note: this context-sensitivity only applies when none of C<json>,
+C<text>, or C<raw> is set (or when C<< format => 'json' >> /
+C<< format => 'text' >> is passed explicitly). If the C<json> option is
+true, C<get_dependencies> always returns a scalar JSON string, even
+when called in list context.
+
+=head2 format_text
+
+ $scanner->parse;
+ print $scanner->format_text;
+
+Returns the dependency list as a formatted text string, one module per
+line, honoring the C<separator> and C<raw> options. Core modules are
+omitted when C<core> is false.
+
+=head2 format_json
+
+ my $json     = $scanner->format_json;   # scalar context
+ my @requires = $scanner->format_json;   # list context
+
+In scalar context returns a pretty-printed JSON string; in list context
+returns a list of hash refs of the form C<< { name => ..., version =>
+... } >>. Core modules are omitted when C<core> is false. Any arguments
+are treated as a seed list and prepended to the results.
+
+=head2 is_core
+
+ my $bool = $scanner->is_core($module);
+ my $bool = $scanner->is_core("$module $version");
+
+Returns true if C<$module> is considered a core module. A module is
+core when C<Module::CoreList> reports its first release at or before
+C<min_core_version> (and, if it was later removed from core, only if it
+was removed after that version).
+
+=head2 min_core_version
+
+ my $numified = $scanner->min_core_version;
+
+Returns the C<min_core_version> option numified via C<version> (e.g.
+C<5.008009>) for comparison inside C<is_core>. Note this is distinct
+from the generated C<get_min_core_version> accessor, which returns the
+raw stored value.
+
+=head2 get_module_version
+
+ my $info = $scanner->get_module_version($module, @include_path);
+
+Returns a hash ref describing C<$module>:
+
+ { module => ..., version => ..., path => ..., file => ... }
+
+Searches C<@include_path> (defaulting to C<@INC>) for the module and
+extracts its version via C<ExtUtils::MM->parse_version>. If C<$module>
+already carries a version (C<"Foo::Bar 1.23">), that version is returned
+without a filesystem lookup.
+
+=head2 add_require
+
+ $scanner->add_require($module);
+ $scanner->add_require($module, $version);
+
+Registers C<$module> as a dependency, optionally with C<$version>. When
+no version is supplied and the C<add_version> option is true, the
+installed version is looked up. Retains the higher of two versions if
+the module is added more than once. Returns C<$self>.
+
+=head2 to_rpm
+
+ my $deps = $scanner->to_rpm;
+
+Returns the dependency list as RPM-style requirement expressions
+(C<perl(Module) E<gt>= version>, plus C<perl E<gt>= version> for any
+Perl version requirement). Core modules are omitted when C<core> is
+false.
+
 =head1 VERSION
 
-1.007
+This documentation refers to version 1.8.1
 
 =head1 AUTHOR
 

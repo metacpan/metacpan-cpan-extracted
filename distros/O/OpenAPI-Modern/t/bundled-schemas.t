@@ -14,7 +14,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 use JSON::Schema::Modern::Document::OpenAPI;
-use JSON::Schema::Modern::Utilities 0.625 'load_cached_document';
+use JSON::Schema::Modern::Utilities 'load_cached_document';
 
 my $oad_schema = {
   openapi => OAD_VERSION,

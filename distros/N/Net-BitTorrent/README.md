@@ -99,6 +99,11 @@ Expected parameters:
 
     The user agent string reported to trackers and peers.
 
+- `max_peers` - optional
+
+    The maximum number of connected peers across all active torents. If you'd rather set per-torrent limits, see
+    [Net::BitTorrent::Torrent](https://metacpan.org/pod/Net%3A%3ABitTorrent%3A%3ATorrent)'s `max_peers` field.
+
 - `encryption` - optional
 
     The encryption requirement level. Can be `none`, `preferred`, or `required` (default).
@@ -470,7 +475,7 @@ Expected parameters:
 
 # AUTHOR
 
-Sanko Robinson <sanko@cpan.org>
+Sanko Robinson - [https://github.com/sanko](https://github.com/sanko)
 
 # COPYRIGHT
 

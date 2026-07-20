@@ -419,6 +419,83 @@ sub _split_top_level_operator {
     return;
 }
 
+sub _split_top_level_comparison {
+    my ($text) = @_;
+    return unless defined $text;
+
+    my %close = ('(' => ')', '[' => ']', '{' => '}');
+    my %open = reverse %close;
+    my (@stack, $quote, $escape, @comparison);
+
+    for (my $i = 0; $i < length($text); $i++) {
+        my $char = substr($text, $i, 1);
+        if (defined $quote) {
+            if ($escape) { $escape = 0; next; }
+            if ($char eq '\\') { $escape = 1; next; }
+            undef $quote if $char eq $quote;
+            next;
+        }
+        if ($char eq q{"} || $char eq q{'}) { $quote = $char; next; }
+        if (exists $close{$char}) { push @stack, $char; next; }
+        if (exists $open{$char}) { pop @stack if @stack; next; }
+        next if @stack;
+
+        my $tail = substr($text, $i);
+        my $previous = $i > 0 ? substr($text, $i - 1, 1) : '';
+        if (($i == 0 || $previous =~ /\s/)
+            && $tail =~ /^(?:and|or)(?=\s|$)/)
+        {
+            # Compound boolean expressions are handled by the condition
+            # evaluator, which applies jq's logical precedence.  Splitting
+            # only their first comparison would make the rest an operand.
+            return;
+        }
+        if (!@comparison && $tail =~ /^(==|!=|>=|<=|>|<)/) {
+            my $operator = $1;
+            @comparison = (substr($text, 0, $i), $operator, substr($text, $i + length($operator)));
+        }
+    }
+    return @comparison;
+}
+
+sub _split_top_level_keyword {
+    my ($text, $keyword) = @_;
+    return ($text) unless defined $text && defined $keyword && length $keyword;
+
+    my %close = ('(' => ')', '[' => ']', '{' => '}');
+    my %open = reverse %close;
+    my (@stack, $quote, $escape, @parts);
+    my $start = 0;
+
+    for (my $i = 0; $i < length($text); $i++) {
+        my $char = substr($text, $i, 1);
+        if (defined $quote) {
+            if ($escape) { $escape = 0; next; }
+            if ($char eq '\\') { $escape = 1; next; }
+            undef $quote if $char eq $quote;
+            next;
+        }
+        if ($char eq q{"} || $char eq q{'}) { $quote = $char; next; }
+        if (exists $close{$char}) { push @stack, $char; next; }
+        if (exists $open{$char}) { pop @stack if @stack; next; }
+        next if @stack;
+
+        my $before = $i > 0 ? substr($text, $i - 1, 1) : '';
+        my $after_pos = $i + length($keyword);
+        my $after = $after_pos < length($text) ? substr($text, $after_pos, 1) : '';
+        next unless substr($text, $i, length($keyword)) eq $keyword;
+        next unless ($i == 0 || $before =~ /\s/);
+        next unless ($after_pos == length($text) || $after =~ /\s/);
+
+        push @parts, substr($text, $start, $i - $start);
+        $start = $after_pos;
+        $i = $after_pos - 1;
+    }
+
+    push @parts, substr($text, $start);
+    return @parts;
+}
+
 sub _split_top_level_colon {
     my ($text) = @_;
 

@@ -3,7 +3,7 @@ use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
 #
-class Net::BitTorrent::Protocol::BEP53 v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Protocol::BEP53 v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use URI::Escape qw[uri_unescape uri_escape];
     #
     field $infohash_v1 : reader : param = undef;
@@ -63,6 +63,7 @@ class Net::BitTorrent::Protocol::BEP53 v2.0.0 : isa(Net::BitTorrent::Emitter) {
             if ( $bits >= 8 ) {
                 $bits -= 8;
                 $res .= chr( ( $buffer >> $bits ) & 0xFF );
+                $buffer &= ( 1 << $bits ) - 1;
             }
         }
         return $res;

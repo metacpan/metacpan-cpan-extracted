@@ -1,0 +1,118 @@
+---
+count: 336
+files:
+  os-release-almalinux:
+    almalinux_mantisbt_project: AlmaLinux-10
+    almalinux_mantisbt_project_version: 10.1
+    ansi_color: 0;34
+    bug_report_url: https://bugs.almalinux.org/
+    cpe_name: cpe:/o:almalinux:almalinux:10.1
+    documentation_url: https://wiki.almalinux.org/
+    home_url: https://almalinux.org/
+    id: almalinux
+    id_like: rhel centos fedora
+    logo: fedora-logo-icon
+    name: AlmaLinux
+    platform_id: platform:el10
+    pretty_name: AlmaLinux 10.1 (Heliotrope Lion)
+    redhat_support_product: AlmaLinux
+    redhat_support_product_version: 10.1
+    support_end: 2035-06-01
+    vendor_name: AlmaLinux
+    vendor_url: https://almalinux.org/
+    version: 10.1 (Heliotrope Lion)
+    version_id: 10.1
+  os-release-alpine:
+    bug_report_url: https://gitlab.alpinelinux.org/alpine/aports/-/issues
+    home_url: https://alpinelinux.org/
+    id: alpine
+    name: Alpine Linux
+    pretty_name: Alpine Linux v3.21
+    version_id: 3.21.3
+  os-release-archlinux:
+    ansi_color: 38;2;23;147;209
+    bug_report_url: https://gitlab.archlinux.org/groups/archlinux/-/issues
+    build_id: rolling
+    documentation_url: https://wiki.archlinux.org/
+    home_url: https://archlinux.org/
+    id: arch
+    logo: archlinux-logo
+    name: Arch Linux
+    pretty_name: Arch Linux
+    privacy_policy_url: https://terms.archlinux.org/docs/privacy-policy/
+    support_url: https://bbs.archlinux.org/
+    version_id: 20250420.0.338771
+  os-release-debian:
+    bug_report_url: https://bugs.debian.org/
+    home_url: https://www.debian.org/
+    id: debian
+    name: Debian GNU/Linux
+    pretty_name: Debian GNU/Linux 12 (bookworm)
+    support_url: https://www.debian.org/support
+    version: 12 (bookworm)
+    version_codename: bookworm
+    version_id: 12
+  os-release-fedora:
+    ansi_color: 0;38;2;60;110;180
+    bug_report_url: https://bugzilla.redhat.com/
+    cpe_name: cpe:/o:fedoraproject:fedora:42
+    default_hostname: fedora
+    documentation_url: https://docs.fedoraproject.org/en-US/fedora/f42/system-administrators-guide/
+    home_url: https://fedoraproject.org/
+    id: fedora
+    logo: fedora-logo-icon
+    name: Fedora Linux
+    platform_id: platform:f42
+    pretty_name: Fedora Linux 42 (Container Image)
+    redhat_bugzilla_product: Fedora
+    redhat_bugzilla_product_version: 42
+    redhat_support_product: Fedora
+    redhat_support_product_version: 42
+    release_type: stable
+    support_end: 2026-05-13
+    support_url: https://ask.fedoraproject.org/
+    variant: Container Image
+    variant_id: container
+    version: 42 (Container Image)
+    version_codename: ''
+    version_id: 42
+  os-release-kalilinux-kali-last-release:
+    ansi_color: 1;31
+    bug_report_url: https://bugs.kali.org/
+    home_url: https://www.kali.org/
+    id: kali
+    id_like: debian
+    name: Kali GNU/Linux
+    pretty_name: Kali GNU/Linux Rolling
+    support_url: https://forums.kali.org/
+    version: 2025.1
+    version_codename: kali-rolling
+    version_id: 2025.1
+  os-release-opensuse-leap:
+    ansi_color: 0;32
+    bug_report_url: https://bugs.opensuse.org
+    cpe_name: cpe:/o:opensuse:leap:15.6
+    documentation_url: https://en.opensuse.org/Portal:Leap
+    home_url: https://www.opensuse.org/
+    id: opensuse-leap
+    id_like: suse opensuse
+    logo: distributor-logo-Leap
+    name: openSUSE Leap
+    pretty_name: openSUSE Leap 15.6
+    version: 15.6
+    version_id: 15.6
+  os-release-rockylinux: {}
+  os-release-ubuntu:
+    bug_report_url: https://bugs.launchpad.net/ubuntu/
+    home_url: https://www.ubuntu.com/
+    id: ubuntu
+    id_like: debian
+    logo: ubuntu-logo
+    name: Ubuntu
+    pretty_name: Ubuntu 26.04 LTS
+    privacy_policy_url: https://www.ubuntu.com/legal/terms-and-policies/privacy-policy
+    support_url: https://help.ubuntu.com/
+    ubuntu_codename: resolute
+    version: 26.04 (Resolute Raccoon)
+    version_codename: resolute
+    version_id: 26.04

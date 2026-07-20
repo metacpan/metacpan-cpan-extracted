@@ -8,3 +8,6 @@ Revision history for YAML-Conditional
 
 1.01	2024-03-31
 	- Fix the decode method to handle files correctly
+
+1.03	2026-07-19
+	- Remove PAX headers

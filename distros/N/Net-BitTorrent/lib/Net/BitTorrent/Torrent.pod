@@ -459,6 +459,14 @@ The L<Net::BitTorrent::Peer> object.
 
 =back
 
+=head2 C<set_max_peers( ... )>
+
+Set the maximum number of peers allowed for this torrent.
+
+    $torrent->set_max_peers( 1000 );
+
+See L<Net::BitTorrent>'s C<max_peers> field for a client wide limit.
+
 =head2 C<start_dht_lookup( )>
 
 Manually triggers a DHT lookup for peers.
@@ -505,7 +513,7 @@ This method returns an array reference of L<Net::BitTorrent::Tracker::Base> obje
 
 =head1 AUTHOR
 
-Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Sanko Robinson - L<https://github.com/sanko>
 
 =head1 COPYRIGHT
 

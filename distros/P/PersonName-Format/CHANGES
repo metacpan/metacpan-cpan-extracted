@@ -1,0 +1,20 @@
+Revision history for Perl module PersonName::Format
+
+v0.1.0 2026-07-16T13:16:33+0900
+    - Initial public release.
+    [New Features]
+    - Implements the Unicode CLDR Person Names specification.
+    - Formats personal names according to locale-specific conventions.
+    - Supports given-first, surname-first, and sorting name orders.
+    - Supports CLDR length, usage, and formality options.
+    - Supports locale-aware script detection and multiscript names.
+    - Supports CLDR field modifiers, including initials, monograms,
+      all-caps surnames, and informal given names.
+    - Provides format() and formatToParts() APIs.
+    - Provides reusable compiled formatters for high-throughput applications.
+    - Includes interchangeable Pure-Perl and XS backends.
+    - Supports Perl v5.10.1 and later.
+
+    [Compatibility]
+    - Differentially tested against the ICU4J reference implementation.
+    - Fully based on CLDR data provided by Locale::Unicode::Data.

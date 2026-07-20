@@ -1,6 +1,9 @@
 Revision history for Perl module CBOR::Free
 
-0.34
+0.35 19 July 2026
+- Skip CBOR::XS comparison test when running on a quadmath perl.
+
+0.34 14 July 2026
 - Fix longstanding pointer bug on i386; add CI for various other platforms.
 
 0.33 12 July 2026

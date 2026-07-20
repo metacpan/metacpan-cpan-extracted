@@ -28,7 +28,14 @@ knowledge of Catalyst or of any application domain.
 has _handlers => ( is => 'ro', default => sub { {} } );
 has _json => (
     is      => 'lazy',
-    builder => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) },
+    # allow_nonref is REQUIRED: a top-level JSON scalar (e.g. '"x"' or '1') is
+    # valid JSON per RFC 8259, and must decode so dispatch() can reject it as a
+    # non-object with -32600 (Invalid Request). Without it, backends that
+    # default allow_nonref off (JSON::XS, older JSON::PP/Cpanel::JSON::XS) throw
+    # on decode, misreporting -32700 (Parse error). Seen as a CPAN Testers
+    # failure of t/dispatcher-errors.t "non-object request is invalid".
+    builder =>
+        sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1, allow_nonref => 1 ) },
 );
 
 # Maximum number of elements accepted in a batch array; 0 = unlimited. A finite

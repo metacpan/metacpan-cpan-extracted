@@ -26,14 +26,14 @@ my %WriteMakefileArgs = (
         'warnings'          => 0,
         'parent'            => 0,
         'Clone'             => '0.46',
-        'DateTime::Lite'    => 'v0.7.3',
+        'DateTime::Lite'    => 'v0.8.0',
         'DateTime::Format::Lite' => 'v0.1.3',
         # 'Devel::Confess'=> '0.009004',
         'Getopt::Long'      => '0.44',
-        'Module::Generic'   => 'v1.6.0',
-		# 'Nice::Try'		=> 'v1.3.5',
+        'Module::Generic'   => 'v1.6.2',
+        # 'Nice::Try'       => 'v1.3.5',
         'Scalar::Util'      => '1.54',
-    	'Tie::Hash'         => '1.04',
+        'Tie::Hash'         => '1.04',
     },
     TEST_REQUIRES       =>
     {

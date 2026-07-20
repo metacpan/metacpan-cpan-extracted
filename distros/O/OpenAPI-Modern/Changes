@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.142     2026-07-20 02:07:32Z
+          - fix path matching with URIs containing url-escaped characters
+          - properly restore cached documents and OpenAPI formats after
+            deserializing an OpenAPI::Modern document in a new process
+
 0.141     2026-07-12 22:33:35Z
           - fix a prereq declaration
 

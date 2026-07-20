@@ -14,7 +14,7 @@ diag sprintf 'Creating %d nodes...', $node_count;
 
 for my $i ( 0 .. $node_count - 1 ) {
     my $id  = $sec->generate_node_id('127.0.0.1');
-    my $dht = Net::BitTorrent::DHT->new( node_id_bin => $id, port => 17000 + $i, address => '127.0.0.1' );
+    my $dht = Net::BitTorrent::DHT->new( node_id_bin => $id, port => 17000 + $i, address => '127.0.0.1', ssrf_bypass => 1 );
     push @nodes, $dht;
 }
 diag 'Seeding target peer on Node ' . ( $node_count - 1 );
@@ -48,7 +48,7 @@ while ( time - $start < 30 && !$found ) {
                 $found = 1;
                 last;
             }
-            my @unvisited = sort { ( $a->{id} ^.$info_hash ) cmp( $b->{id} ^.$info_hash ) } grep { !$_->{visited} } values %candidates;
+            my @unvisited = sort { ( $a->{id} ^.$info_hash ) cmp ( $b->{id} ^.$info_hash ) } grep { !$_->{visited} } values %candidates;
             if (@unvisited) {
                 my $next     = $unvisited[0];
                 my $next_hex = unpack( 'H*', $next->{id} );

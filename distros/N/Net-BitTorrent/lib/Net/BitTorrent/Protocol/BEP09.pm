@@ -22,33 +22,30 @@ class Net::BitTorrent::Protocol::BEP09 v2.0.0 : isa(Net::BitTorrent::Protocol::B
                     }
                 }
                 catch ($e) {
-                    $self->_emit( log => "  [ERROR] Malformed ut_metadata message: $e\n", level => 'error' );
+                    $self->_emit_log( 'error', "Malformed ut_metadata message: $e" );
                     return;
                 }
                 if ( ref $dict ne 'HASH' ) {
-                    $self->_emit( log => "  [ERROR] Malformed ut_metadata message: dict is not a hash\n", level => 'error' );
+                    $self->_emit_log( 'error', 'Malformed ut_metadata message: dict is not a hash' );
                     return;
                 }
                 my $type = $dict->{msg_type};
                 if ( !defined $type ) {
-                    $self->_emit( log => "  [ERROR] ut_metadata message missing msg_type\n", level => 'error' );
+                    $self->_emit_log( 'error', 'ut_metadata message missing msg_type' );
                     return;
                 }
                 if ( $type == METADATA_REQUEST ) {
                     $self->_emit( metadata_request => $dict->{piece} );
                 }
                 elsif ( $type == METADATA_DATA ) {
-                    $self->_emit(
-                        log   => "    [DEBUG] Received metadata data for piece $dict->{piece} (len " . length($remaining) . ")\n",
-                        level => 'debug'
-                    ) if $self->debug;
+                    $self->_emit_log( 'debug', "Received metadata data for piece $dict->{piece} (len " . length($remaining) . ')' ) if $self->debug;
                     $self->_emit( metadata_data => $dict->{piece}, $dict->{total_size}, $remaining );
                 }
                 elsif ( $type == METADATA_REJECT ) {
                     $self->_emit( metadata_reject => $dict->{piece} );
                 }
                 else {
-                    $self->_emit( log => "  [DEBUG] Unknown ut_metadata msg_type: $type\n", level => 'debug' ) if $self->debug;
+                    $self->_emit_log( 'debug', "Unknown ut_metadata msg_type: $type" ) if $self->debug;
                 }
             }
         );
@@ -56,7 +53,7 @@ class Net::BitTorrent::Protocol::BEP09 v2.0.0 : isa(Net::BitTorrent::Protocol::B
 
     method send_metadata_request ($piece) {
         return unless exists $self->remote_extensions->{ut_metadata};
-        $self->_emit( log => "    [DEBUG] Sending metadata request for piece $piece\n", level => 'debug' ) if $self->debug;
+        $self->_emit_log( 'debug', "Sending metadata request for piece $piece" ) if $self->debug;
         my $payload = bencode( { msg_type => METADATA_REQUEST, piece => $piece, } );
         $self->send_ext_message( 'ut_metadata', $payload );
     }

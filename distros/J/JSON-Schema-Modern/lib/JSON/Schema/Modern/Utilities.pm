@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.641';
+our $VERSION = '0.642';
 
 use 5.020;
 use strictures 2;
@@ -22,6 +22,7 @@ use B;
 use Carp qw(carp croak);
 use builtin::compat qw(blessed created_as_number);
 use Scalar::Util 'looks_like_number';
+use List::Util 'pairmap';
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Clone 'clone';
@@ -341,7 +342,7 @@ sub jsonp_elements ($data, $prefix = '') {
   # recursively walk the structure..
   my $hash = +{
       ref $data eq '' ? ($prefix => $data)
-    : ref $data eq 'HASH' ? map jsonp_elements($data->{$_}, $prefix.'/'.$_)->%*, keys %$data
+    : ref $data eq 'HASH' ? map jsonp_elements($data->{$_}, $prefix.'/'.(s!~!~0!gr =~ s!/!~1!gr))->%*, keys %$data
     : ref $data eq 'ARRAY' ? map jsonp_elements($data->[$_], $prefix.'/'.$_)->%*, 0..$data->$#*
     : croak 'unrecognized type: '. ref $data
   };
@@ -422,6 +423,13 @@ sub core_formats_type () {
 # simple runtime-wide cache of $ids to schema document objects that are sourced from disk
 {
   my $document_cache = {};
+
+  # adds a document to the cache, if its URI is in the cacheable list
+  # for internal use only!!
+  sub __populate_cached_document ($evaluator, $uri, $doc) {
+    $document_cache->{$uri} = $doc
+      if not exists $document_cache->{$uri} and get_schema_filename($uri);
+  }
 
   # Fetches a document from the cache (reading it from disk and creating the document if necessary),
   # and add it to the evaluator.
@@ -552,6 +560,7 @@ sub core_formats_type () {
       type => 'text', subtype => '*',
       decode => sub ($content_ref, $parameters = {}, @) {
         # RFC2046 §4.1.2: charset is case-insensitive
+        # RFC6657 §4: default charset for text/plain is "US-ASCII"
         return $parameters->{charset} ?
           \ Encode::decode($parameters->{charset}, $content_ref->$*, Encode::DIE_ON_ERR | Encode::LEAVE_SRC)
           : $content_ref;
@@ -568,12 +577,31 @@ sub core_formats_type () {
     return +{
       type => 'application',
       subtype => 'x-www-form-urlencoded',
-      decode => sub ($content_ref, @) {
-        \ Mojo::Parameters->new->charset('UTF-8')->parse($content_ref->$*)->to_hash;
+      decode => sub ($content_ref, $parameters = {}) {
+        my $parsed = Mojo::Parameters->new->charset('UTF-8')->parse($content_ref->$*);
+
+        if (($parameters->{type}//'object') eq 'array') {
+          \ [ pairmap { +{ $a, $b } } $parsed->pairs->@* ];
+        }
+        elsif (($parameters->{type}//'object') eq 'object') {
+          \ $parsed->to_hash;
+        }
+        else {
+          die 'unrecognized "type": ', $parameters->{type};
+        }
       },
       encode => sub ($content_ref, @) {
-        \ Mojo::Parameters->new->charset('UTF-8')
-          ->parse(map +($_ => $content_ref->$*->{$_}), sort keys $content_ref->$*->%*)->to_string;
+        if (ref $content_ref->$* eq 'ARRAY') {
+          \ Mojo::Parameters->new->charset('UTF-8')
+            ->parse(map %$_, $content_ref->$*->@*)->to_string;
+        }
+        elsif (ref $content_ref->$* eq 'HASH') {
+          \ Mojo::Parameters->new->charset('UTF-8')
+            ->parse(map +($_ => $content_ref->$*->{$_}), sort keys $content_ref->$*->%*)->to_string;
+        }
+        else {
+          die 'unrecognized data type: ', ref $content_ref->$*;
+        }
       },
       owner_addr => 1,
     }
@@ -621,6 +649,9 @@ sub core_formats_type () {
 
     my $type = _parse_media_type($media_type_string);
     croak "bad media-type string \"$media_type_string\"" if not $type;
+
+    croak 'multipart encoders/decoders cannot be defined here: use OpenAPI::Modern'
+      if match_media_type($media_type_string, ['multipart/*']);
 
     # populate the cache if it's a bundled type that hasn't been defined yet
     _predefined_media_types($media_type_string) if not exists $MEDIA_TYPES->{$media_type_string};
@@ -960,7 +991,10 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.641
+version 0.642
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 
@@ -985,7 +1019,7 @@ register_schema get_schema_filename
 
 Returns a boolean indicating whether the provided value is of the specified core type (C<null>,
 C<boolean>, C<string>, C<number>, C<object>, C<array>) or C<integer>. Also optionally takes a hashref
-C<{ legacy_ints => 1 }> indicating that draft4 number semantics should apply (where unlike later
+C<< { legacy_ints => 1 } >> indicating that draft4 number semantics should apply (where unlike later
 drafts, C<2.0> is B<not> an integer).
 
 =head2 get_type
@@ -993,7 +1027,7 @@ drafts, C<2.0> is B<not> an integer).
   my $type = get_type($value);
 
 Returns one of the core types (C<null>, C<boolean>, C<string>, C<number>, C<object>, C<array>) or
-C<integer>. Also optionally takes a hashref C<{ legacy_ints => 1 }> indicating that draft4 number
+C<integer>. Also optionally takes a hashref C<< { legacy_ints => 1 } >> indicating that draft4 number
 semantics should apply. Behaviour is consistent with L</is_type>.
 
 =head2 is_bool
@@ -1066,7 +1100,7 @@ C<equal_indices> (populated by function): if result is false, the list of indice
 
 Constructs a json pointer string from a list of path components, with correct escaping; the first
 argument must be C<''> or an already-escaped json pointer, to which the rest of the path components
-are appended.
+are appended after being escaped.
 
 =head2 unjsonp
 
@@ -1080,7 +1114,7 @@ Splits a json pointer string into its path components, with correct unescaping.
   # 4
   my $val = jsonp_get({ a => 1, b => { c => 3, d => 4 } }, '/b/d');
 
-Fetches the value of a data structure at a particular json pointer location.
+Returns the value of a data structure at a particular json pointer location.
 
 =head2 jsonp_elements
 
@@ -1091,7 +1125,7 @@ Fetches the value of a data structure at a particular json pointer location.
   # }
   jsonp_elements({ a => { b => [ 'x', 'y' ], c => { d => 'e' } } });
 
-Fetches all the ( json pointer => value ) tuples of a data structure as a hashref.
+Returns all the ( json pointer => value ) tuples of a data structure as a hashref.
 
 =head2 jsonp_set
 
@@ -1231,7 +1265,7 @@ encoded.
   my $ad_hoc_media_type = match_media_type('text/html', [ 'text/plain', 'text/*' ]);
 
 Finds the best match for a C<Content-Type> header value from the media-types in the registry,
-or from an ad-hoc list reference provided in the remaining arguments.
+or from an ad-hoc list reference provided in the second argument.
 
 Types with structured suffixes will match more generic types when an exact match is not available
 (e.g. C<application/schema+json> will match an entry for C<application/json>).
@@ -1240,7 +1274,8 @@ Exact matches to the C<type/subtype> name are preferred over wildcard matches (e
 if parameters are present in the value being matched against (the list of registered media-types,
 or the list provided to this sub), all parameters must be present and match exactly.
 
-All comparisons are done case-insensitively.
+Comparisons of type and subtype are done case-insensitively; parameter comparison is case-sensitive,
+with the exception of C<charset> in C<text/plain>.
 
 =head1 GIVING THANKS
 

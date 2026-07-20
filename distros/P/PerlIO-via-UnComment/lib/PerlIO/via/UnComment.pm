@@ -1,6 +1,6 @@
 package PerlIO::via::UnComment;
 
-$VERSION= '0.06';
+$VERSION= '0.07';
 
 # be as strict as possible
 use strict;
@@ -77,7 +77,7 @@ PerlIO::via::UnComment - PerlIO layer for removing comments
 
 =head1 VERSION
 
-This documentation describes version 0.06.
+This documentation describes version 0.07.
 
 =head1 DESCRIPTION
 

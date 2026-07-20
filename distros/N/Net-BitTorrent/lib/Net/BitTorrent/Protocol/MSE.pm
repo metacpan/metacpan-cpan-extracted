@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Protocol::MSE v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Protocol::MSE v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use Net::BitTorrent::Protocol::MSE::KeyExchange;
     use Digest::SHA qw[sha1];
     #
@@ -17,11 +17,13 @@ class Net::BitTorrent::Protocol::MSE v2.0.0 : isa(Net::BitTorrent::Emitter) {
     field $wait_len      = 0;
     field $crypto_select = 0;
     #
-    my $VC               = "\0" x 8;
-    my $CRYPTO_PLAINTEXT = 0x01;
-    my $CRYPTO_RC4       = 0x02;
+    my $VC                        = "\0" x 8;
+    my $CRYPTO_PLAINTEXT          = 0x01;
+    my $CRYPTO_RC4                = 0x02;
+    my $MAX_HANDSHAKE_BUFFER_SIZE = 32 * 1024;    # 32KB
+
     #
-    method supported () { 1; }
+    method supported () {1}
     ADJUST {
         $kx = Net::BitTorrent::Protocol::MSE::KeyExchange->new( infohash => $infohash, is_initiator => $is_initiator );
         if ($is_initiator) {
@@ -35,8 +37,10 @@ class Net::BitTorrent::Protocol::MSE v2.0.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method _random_pad () {
-        my $len = int( rand(513) );
-        return pack( 'C*', map { int( rand(256) ) } 1 .. $len );
+        use Crypt::URandom qw[urandom];
+        my $len_bytes = urandom(2);
+        my $len       = unpack( 'n', $len_bytes ) % 513;
+        return urandom($len);
     }
 
     method write_buffer () {
@@ -59,6 +63,10 @@ class Net::BitTorrent::Protocol::MSE v2.0.0 : isa(Net::BitTorrent::Emitter) {
             return $kx->decrypt_rc4->crypt($data);
         }
         $buffer_in .= $data;
+        if ( length($buffer_in) > $MAX_HANDSHAKE_BUFFER_SIZE ) {
+            $state = 'FAILED';
+            return undef;
+        }
         my $continue = 1;
         while ( $continue && $state ne 'PAYLOAD' && $state ne 'FAILED' && $state ne 'PLAINTEXT_FALLBACK' ) {
             $continue = 0;
@@ -193,7 +201,11 @@ class Net::BitTorrent::Protocol::MSE v2.0.0 : isa(Net::BitTorrent::Emitter) {
     method _b_wait_vc () {
         return 0 if length($buffer_in) < 8;
         my $vc_check = $kx->decrypt_rc4->crypt( substr( $buffer_in, 0, 8, '' ) );
-        if ( $vc_check ne $VC ) {
+        my $ok       = 0;
+        for my $i ( 0 .. 7 ) {
+            $ok |= ord( substr( $vc_check, $i, 1 ) ) ^ ord( substr( $VC, $i, 1 ) );
+        }
+        if ( $ok != 0 ) {
             $state = 'FAILED';
             return 0;
         }
@@ -244,4 +256,5 @@ class Net::BitTorrent::Protocol::MSE v2.0.0 : isa(Net::BitTorrent::Emitter) {
         $state = 'PAYLOAD';
         return 0;
     }
-} 1;
+};
+1;

@@ -1,5 +1,14 @@
 Revision history for Catalyst-Plugin-JSONRPC-Server
 
+0.004     2026-07-19
+          - Build the JSON parser with allow_nonref so a top-level JSON scalar
+            (valid JSON per RFC 8259) decodes and is rejected as -32600 (Invalid
+            Request), rather than throwing in the decoder and being misreported
+            as -32700 (Parse error). Without it, backends that default
+            allow_nonref off (JSON::XS, older JSON::PP/Cpanel::JSON::XS) failed
+            t/dispatcher-errors.t "non-object request is invalid" on CPAN
+            Testers.
+
 0.003     2026-07-16
           - Genericise the perl_critic author test comment; no functional
             change.

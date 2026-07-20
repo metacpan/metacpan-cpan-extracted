@@ -1,0 +1,37 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  CPAN::Changes: '0'
+  Config::Tiny: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurp: '0'
+  FindBin: '0'
+  Readonly: '0'
+  Test::More: '0'
+  Versioning::Scheme::Semantic: '0'
+  YAML: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-OsRelease-Lite
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Sys::OsRelease::Lite:
+    file: lib/Sys/OsRelease/Lite.pm
+requires:
+  perl: '5.010001'
+version: v0.4.2+lite
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

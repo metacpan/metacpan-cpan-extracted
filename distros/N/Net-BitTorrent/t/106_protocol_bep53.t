@@ -28,4 +28,14 @@ my $gen = Net::BitTorrent::Protocol::BEP53->new(
 );
 like( $gen->to_string, qr/xt=urn:btmh:12206bc800aa218f10cc8d6651604758b66ad80fb2cfa3efff66d1892a8af7ade868/, 'v2 IH generated' );
 like( $gen->to_string, qr/dn=Test/,                                                                          'Name generated' );
+#
+subtest 'base32 decode handles long inputs without overflow' => sub {
+    my $decoded = Net::BitTorrent::Protocol::BEP53::_decode_base32( 'A' x 32 );
+    is length($decoded), 20, 'base32 decode of 32 chars produces 20 bytes';
+    my $decoded2 = Net::BitTorrent::Protocol::BEP53::_decode_base32('MFRGGZDF');
+    is length($decoded2), 5, 'base32 decode of 8 chars produces 5 bytes';
+    my $decoded3 = Net::BitTorrent::Protocol::BEP53::_decode_base32('ABCDEFGHIJKLMNOP');
+    is length($decoded3), 10, 'base32 decode of 16 chars produces 10 bytes';
+};
+#
 done_testing();

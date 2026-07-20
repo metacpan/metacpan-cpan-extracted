@@ -1,4 +1,5 @@
 use v5.42;
+use lib 'lib';
 use feature 'class';
 no warnings 'experimental::class';
 use Test2::V1 -ipP;
@@ -44,7 +45,7 @@ subtest 'Peer Reputation Tracking' => sub {
     $t->receive_block( $peer, 0, 0, $data );
     $client->tick(0.1);    # Process hashing queue
     ok $t->bitfield->get(0), 'Piece verified';
-    is $peer->reputation, 101, 'Reputation increased after valid piece';
+    is $peer->reputation, 100, 'Reputation capped at 100 after valid piece';
 
     # Test failure and blacklisting
     my $bad_data      = 'B' x 16384;
@@ -71,9 +72,9 @@ subtest 'Peer Reputation Tracking' => sub {
     ok !$t2->bitfield->get(0), 'Piece failed verification';
     is $peer2->reputation, 80, 'Reputation decreased significantly after bad data (-20)';
 
-    # Drop reputation until blacklist threshold (50)
-    $peer2->adjust_reputation(-30);
-    is $peer2->reputation, 50, 'Reputation at threshold';
+    # Drop reputation until blacklist threshold (20)
+    $peer2->adjust_reputation(-60);
+    is $peer2->reputation, 20, 'Reputation at threshold';
     my $key = '2.2.2.2:2222';
     ok !exists $t2->peer_objects_hash->{$key}, 'Peer blacklisted and removed from torrent';
 };

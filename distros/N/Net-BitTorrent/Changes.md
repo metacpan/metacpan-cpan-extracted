@@ -5,6 +5,80 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.0] - 2026-07-19
+
+### Fixed
+- [CVE-2026-57082](https://github.com/sanko/Net-BitTorrent.pm/security/advisories/GHSA-g444-x2c5-94hc) - Require `Crypt::URandom` to replace Perl's `CORE::rand(...)` for CSPRNG-safe random number generation across the entire codebase
+- [CVE-2026-57079](https://github.com/sanko/Net-BitTorrent.pm/security/advisories/GHSA-5wc6-r65f-62rr) - Validate metadata file paths with `realpath` to prevent directory traversal via crafted metadata
+- [CVE-2026-57080](https://github.com/sanko/Net-BitTorrent.pm/security/advisories/GHSA-7jr6-2jf4-6qc4) - Reject BitTorrent messages exceeding 16 MB to prevent memory exhaustion via oversized payloads
+- [CVE-2026-57081](https://github.com/sanko/Net-BitTorrent.pm/security/advisories/GHSA-mv44-v82p-89xv) - Various protocol-level hardening against remote peer exploitation
+- New `Net::BitTorrent::SSRF` module with `is_safe_ip`, `is_safe_host`, `is_safe_url`, and `resolve_and_pin` for IP/URL safety validation and DNS pinning
+- Block outbound connections to RFC 1918 private ranges, loopback, link-local, multicast, cloud metadata endpoints, and IPv4-mapped IPv6 addresses
+- HTTP tracker announce and scrape now resolve DNS and pin the IP before connecting to prevent TOCTOU DNS rebinding attacks
+- UDP tracker validates sender IP matches the expected resolved address
+- HTTP and UDP tracker response sizes are now capped (1 MB or 500 peers)
+- Rate-limit MSE handshakes per-IP and `HP_CONNECT` messages (10/minute)
+- Limit concurrent DHT queries per IP and cap pending UDP tracker transactions at 100
+- Limit incoming PEX packets to 100 entries per list with validation of port ranges
+- Limit BEP 10 remote extension maps to 50 and validate `metadata_size` field
+- Cap DHT node unpacking at 200 nodes per response, filter port-0 nodes
+- Cap per-torrent discovered peers at 10,000 and attempted connections at 5,000
+- Cap block cache at 32 incomplete pieces and hashing queue at 32 entries
+- Reject metadata exceeding `MAX_METADATA_SIZE` (10 MB) early in BEP 09 processing
+- Track and limit inbound TCP buffer growth (4 MB per-connection limit)
+- Validate payload length for every BitTorrent message type (CHOKE, UNCHOKE, HAVE, REQUEST, PIECE, etc.)
+- Validate HAVE index is within piece count, REQUEST index/begin/len within piece bounds
+- Validate BEP 44 mutable data fields (key length, sig length, seq range) and immutable data size
+- Cap BEP 44 storage entries and `ip_votes` hash at 500
+- Validate `sample_infohashes` target length (20 or 32 bytes)
+- Rate-limit DHT external IP changes to once per 5 minutes
+- Constant-time VC comparison in MSE to prevent timing attacks
+- Sanitize UDP tracker error messages and WebSeed `rel_path` to prevent injection
+- WebSeed follows redirects manually with SSRF re-validation at each hop
+- DHT sends are blocked by SSRF policy for unsafe destination IPs
+- Log messages triggered by peer/tracker data are no longer fatal (won't kill the client based on bad data from a peer)
+- Memory leak from `Torrent->Peer->parent_emitter->Torrent` reference cycle (weakened `parent_emitter`)
+- Shared `%_requested_blocks` class variable across all Peer instances (now per-instance field)
+- `blocks_pending` inconsistency where `_request_pieces` stored `1` but `peer_disconnected` compared with `== $peer`
+- `_clear_piece_cache` not deleting `blocks_received`, causing stale entries after failed verification
+- `is_finished` and `progress` returning wrong values due to `bytes_left` discrepancies with bitfield count
+- `fetch_from_webseeds` not accounting `bytes_downloaded`, `bytes_left` decrement, or `piece_verified` event
+- `_on_metadata_received` not setting `bytes_left` before transitioning to `STATE_RUNNING`
+- `_request_next_block` not marking requested blocks in `requested_blocks` hash
+- `_handle_piece_data` not tracking unsolicited PIECE messages or validating data length
+- `_handle_reject` not cleaning up `blocks_pending` or decrementing `requested_blocks`
+- `_check_interest` always sent `INTERESTED` regardless of whether peer actually has needed pieces
+
+### Added
+- `Net::BitTorrent->remove_torrent($thing)` accepts a Torrent object, hex infohash, or packed infohash for safe torrent removal
+- `Net::BitTorrent::Peer` `cancel_request($index, $begin)` method for endgame duplicate cancellation
+- `Net::BitTorrent::Emitter` `off($event, $cb)` method for removing callbacks
+- `Net::BitTorrent::Torrent::DESTROY` disconnects peers and clears all data structures on garbage collection
+
+### Changed
+- Peer reputation blacklist threshold lowered from 50 to 20; `adjust_reputation` now caps at 0–100 and is a no-op after disconnect
+- `Net::BitTorrent::Emitter` weakens `$parent_emitter` via `builtin::weaken` to break `Torrent->Peer->Emitter->Torrent` reference cycles causing memory leaks (I hope)
+- Endgame mode now enters on a 60-second stall (no piece verification) in addition to the existing piece-count triggers
+- Endgame duplicate request cancellation: when a block arrives, all other peers' inflight requests for that same block are immediately cancelled
+- `_request_pieces` and `get_next_request` now consistently store peer objects in `%blocks_pending` (was inconsistent `1` vs peer object)
+- `is_finished()` and `progress()` are now bitfield-based (`count/size`) instead of relying on `bytes_left`
+- `_calculate_total_size()` result is cached to avoid repeated O(N) file tree traversal (especially with V2 metadata)
+- `MAX_BLOCK_CACHE` reduced from 2048 to 32, `MAX_HASHING_QUEUE_SIZE` reduced from 128 to 32
+- Storage write cache reduced from 128 MB to 16 MB
+- Peer `requested_blocks` is now a per-instance hashref (was a class-level hash shared across all Peer instances)
+- Zombie peer detection: peers are disconnected after 30s without response (with inflight requests) or 120s idle
+- Peer `tick()` and `disconnected()` are idempotent via `$_disconnected` guard
+- `Torrent::tick()` snapshots the peer list before iteration to prevent hash mutation during disconnect callbacks
+- `_clear_piece_cache` now also deletes `blocks_received` to prevent stale entries after failed verification
+- `load_state` validates bitfield size and metadata structure before applying
+- `Torrent::announce` uses the client's *actual* `listen_port` and guards against missing `tracker_manager`
+- DHT pending query cleanup is now deterministic (runs on every response) instead of probabilistic (1% chance)
+- DHT `_check_external_ip` requires public IPs and per-source voting to prevent colluding-node manipulation
+- `Net::BitTorrent::Protocol::BEP03` catches protocol processing errors and transitions to `CLOSED` state instead of crashing
+- `Net::BitTorrent::Transport::TCP` calls `shutdown(2)` before `close()` and enforces 4 MB write/read buffer limits
+- WebSeed auto-disables for unsafe URLs at construction time
+- DHT `_unpack_nodes` filters out port-0 entries
+
 ## [v2.0.1] - 2026-02-14
 
 ### Fixed
@@ -317,7 +391,8 @@ This is a documentation update.  100% coverage.
 - It actually exists
 - See above
 
-[Unreleased]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.1.0...HEAD
+[v2.1.0]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.0.1...v2.1.0
 [v2.0.1]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.0.0...v2.0.1
 [v2.0.0]: https://github.com/sanko/Net-BitTorrent.pm/compare/0.052...v2.0.0
 [0.052]: https://github.com/sanko/Net-BitTorrent.pm/compare/0.051...0.052

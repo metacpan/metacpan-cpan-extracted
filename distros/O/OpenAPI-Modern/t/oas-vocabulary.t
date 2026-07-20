@@ -31,6 +31,7 @@ foreach my $oas_version (map $_->basename, path('t/oas-vocabulary')->list({dir=>
   );
 
   OpenAPI::Modern::Utilities::add_vocab_and_default_schemas($js, $oas_version);
+  OpenAPI::Modern::Utilities::add_formats($js, $oas_version);
 
   $accepter->acceptance(
     validate_data => sub ($schema, $instance_data) {

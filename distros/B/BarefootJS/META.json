@@ -53,6 +53,6 @@
          "web" : "https://github.com/piconic-ai/barefootjs"
       }
    },
-   "version" : "v0.21.4",
+   "version" : "v0.24.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

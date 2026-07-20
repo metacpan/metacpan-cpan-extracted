@@ -19,16 +19,26 @@ class Net::BitTorrent::Torrent::Generator v2.0.0 : isa(Net::BitTorrent::Emitter)
     method add_node        ( $h, $p ) { push @nodes,    [ $h, $p ] }
 
     method add_file ($rel_path) {
-        my $abs = path($base_path)->child($rel_path);
-        if ( !$abs->exists ) {
-            $self->_emit( log => "File does not exist: $abs", level => 'fatal' );
+        my $bp = path($base_path)->absolute;
+        $bp = $bp->realpath if $bp->exists;
+        my $abs = $bp->child($rel_path)->absolute;
+
+        # Canonicalize and check containment
+        my $abs_real = $abs->realpath if $abs->exists;
+        $abs_real //= $abs;
+        if ( $abs_real !~ /^\Q$bp\E/ ) {
+            $self->_emit_log( 'fatal', "Path traversal attempt blocked: $rel_path resolves outside base_path" );
+            return;
+        }
+        if ( !$abs_real->is_file ) {
+            $self->_emit_log( 'fatal', "File does not exist or is not a regular file: $abs_real" );
             return;
         }
         if ( $align_files && @files && $files[-1]{size} % $piece_length != 0 ) {
             my $pad = $piece_length - ( $files[-1]{size} % $piece_length );
             push @files, { rel => ".pad/$pad", size => $pad, padding => 1 };
         }
-        push @files, { rel => $rel_path, abs => $abs, size => $abs->stat->size };
+        push @files, { rel => $rel_path, abs => $abs_real, size => $abs_real->stat->size };
     }
 
     method generate_v1 () {

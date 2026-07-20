@@ -1,4 +1,5 @@
 use v5.40;
+use lib 'lib';
 use Test::More;
 use Net::BitTorrent::DHT;
 use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
@@ -9,6 +10,7 @@ my $dht     = Net::BitTorrent::DHT->new(
     node_id_bin => $node_id,
     port        => 0,          # Random port
     bep42       => 0,          # Disable security for testing
+    ssrf_bypass => 1
 );
 subtest 'Outgoing sample_infohashes' => sub {
     my $target = pack( 'H*', '2' x 40 );

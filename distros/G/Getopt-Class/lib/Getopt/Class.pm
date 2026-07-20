@@ -1,15 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/m
-## Version v1.1.5
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2026/07/04
+## Modified 2026/07/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package Getopt::Class;
 BEGIN
 {
@@ -25,7 +25,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Module::Generic::Scalar;
     use Scalar::Util;
-    our $VERSION = 'v1.1.5';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;
@@ -287,6 +287,10 @@ sub init
             $suff = '=s';
         }
         elsif( $def->{type} eq 'uri' )
+        {
+            $suff = '=s';
+        }
+        elsif( $def->{type} eq 'version' )
         {
             $suff = '=s';
         }
@@ -642,18 +646,23 @@ sub postprocess
         }
         elsif( $def->{type} eq 'uri' )
         {
-            my $uri_class = exists( $def->{package} ) ? $def->{package} : 'URI';
+            my $uri_class = exists( $def->{package} ) ? $def->{package} : exists( $def->{class} ) ? $def->{class} : 'URI';
             $opts->{ $k } = $uri_class->new( $opts->{ $k } );
         }
         elsif( $def->{type} eq 'uri-array' )
         {
-            my $uri_class = exists( $def->{package} ) ? $def->{package} : 'URI';
+            my $uri_class = exists( $def->{package} ) ? $def->{package} : exists( $def->{class} ) ? $def->{class} : 'URI';
             my $arr = Module::Generic::Array->new;
             foreach( @{$opts->{ $k }} )
             {
                 push( @$arr, $uri_class->new( $_ ) );
             }
             $opts->{ $k } = $arr;
+        }
+        elsif( $def->{type} eq 'version' )
+        {
+            my $vers_class = exists( $def->{package} ) ? $def->{package} : exists( $def->{class} ) ? $def->{class} : 'version';
+            $opts->{ $k } = $vers_class->new( $opts->{ $k } );
         }
    }
    return( $self );
@@ -1221,7 +1230,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v1.1.5
+    v1.2.0
 
 =head1 DESCRIPTION
 

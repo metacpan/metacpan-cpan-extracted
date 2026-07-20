@@ -8,6 +8,21 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [42.0.0] - 2026-07-19
+### Added
+- (i18n) Added Persian translation of "Rule" ([#642](https://github.com/cucumber/gherkin/pull/642))
+- (i18n) Added new synonyms for existing Persian keywords  ([#642](https://github.com/cucumber/gherkin/pull/642))
+- [Dart] Revived Dart implementation as `cucumber_gherkin` ([#640](https://github.com/cucumber/gherkin/pull/640))
+
+### Changed
+- Allow steps to have both a DocString and a Datatable argument ([#599](https://github.com/cucumber/gherkin/pull/599), [#643](https://github.com/cucumber/gherkin/pull/643))
+- Update dependency messages to at-least v34 ([#652](https://github.com/cucumber/gherkin/pull/652), [#643](https://github.com/cucumber/gherkin/pull/643))
+- [cpp] Removed cmate and all related files. ([#617](https://github.com/cucumber/gherkin/pull/617))
+- [Ruby] Require Ruby 3.3
+
+### Fixed
+- [testdata] removed stray \r\n line endings, replaced with \n. ([#617](https://github.com/cucumber/gherkin/pull/617))
+
 ## [41.0.0] - 2026-06-20
 ### Changed
 - [PHP] BREAKING CHANGE: Require PHP 8.4
@@ -923,7 +938,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v41.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v42.0.0...HEAD
+[42.0.0]: https://github.com/cucumber/gherkin/compare/v41.0.0...v42.0.0
 [41.0.0]: https://github.com/cucumber/gherkin/compare/v40.0.0...v41.0.0
 [40.0.0]: https://github.com/cucumber/gherkin/compare/v39.1.0...v40.0.0
 [39.1.0]: https://github.com/cucumber/gherkin/compare/v39.0.0...v39.1.0

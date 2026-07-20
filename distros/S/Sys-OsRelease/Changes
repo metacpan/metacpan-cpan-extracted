@@ -1,16 +1,25 @@
 Change log for Sys::OsRelease
 
-0.4.0 2026-07-14T16:52:41-07:00 America/Los_Angeles
+0.4.2 2026-07-19T23:34:29-07:00 America/Los_Angeles
  [MAJOR]
  [API CHANGE]
  [MINOR]
- - add Sys::OsRelease::Lite for Perl <5.22 stranded by Dist::Zilla bump
-
  [ENHANCEMENTS]
  [SECURITY]
  [REVISION]
+ - add 'provides' metadata for Sys::OsRelease::Lite (for CPAN upload)
+
  [BUG FIXES]
  [DOCS]
+
+0.4.1 2026-07-19T22:08:34-07:00 America/Los_Angeles
+ [REVISION]
+ - rearrange Sys::OsRelease::Lite delivery from symlink to filtering source
+   to avoid CPAN namespace conflict
+
+0.4.0 2026-07-14T16:52:41-07:00 America/Los_Angeles
+ [MINOR]
+ - add Sys::OsRelease::Lite for Perl <5.22 stranded by Dist::Zilla bump
 
 0.3.1 2026-05-11T21:51:22-07:00 America/Los_Angeles
  [REVISION]

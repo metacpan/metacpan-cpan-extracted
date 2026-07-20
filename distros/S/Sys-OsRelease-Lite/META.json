@@ -1,0 +1,64 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sys-OsRelease-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Changes" : "0",
+            "Config::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "Readonly" : "0",
+            "Versioning::Scheme::Semantic" : "0",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::OsRelease::Lite" : {
+         "file" : "lib/Sys/OsRelease/Lite.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.4.2+lite",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

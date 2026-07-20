@@ -5,3 +5,6 @@ Revision history for SQL-Abstract-Plugin-TableAlias
 
 0.02    2022-02-23
 	Fix aliasing of columns - { column => { -as => "thing" } }
+
+0.06	2026-07-19
+	Remove PAX headers

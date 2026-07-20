@@ -299,6 +299,11 @@
                 "description": "parameter with structured suffix and parameter",
                 "data": "application/openapi+json; schema=\"https://example.com/myschema/v1\"",
                 "valid": true
+            },
+            {
+                "description": "parameter is quoted string with commas and whitespace",
+                "data": "text/plain ; x=\"a, b, c, d\"",
+                "valid": true
             }
         ]
     }

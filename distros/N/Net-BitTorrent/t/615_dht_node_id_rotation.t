@@ -1,6 +1,6 @@
 use v5.40;
 use Test2::V0;
-use lib '../lib';
+use lib 'lib', '../lib';
 use Net::BitTorrent::DHT;
 use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode];
 use Socket                                    qw[pack_sockaddr_in inet_aton];
@@ -14,10 +14,13 @@ my $dht     = Net::BitTorrent::DHT->new(
 my $old_id = $dht->node_id_bin;
 
 # Simulate receiving DHT responses from 5 different "nodes" reporting a new external IP
-my $new_ip_bin = pack( 'C4', 8, 8, 8, 8 );                         # 8.8.8.8
-my $addr       = pack_sockaddr_in( 6881, inet_aton('1.2.3.4') );
-for ( 1 .. 5 ) {
-    my $response = bencode( { t => 'aa', y => 'r', r => { id => "NODE" . $_ . ( "0" x 15 ) }, ip => $new_ip_bin } );
+my $new_ip_bin = pack( 'C4', 8, 8, 8, 8 );    # 8.8.8.8
+
+# Each source IP gets one vote, so we need 5 distinct source IPs (all public)
+my @src_ips = ( '1.2.3.4', '198.51.100.1', '198.51.100.2', '203.0.113.1', '203.0.113.2' );
+for my $src_ip (@src_ips) {
+    my $addr     = pack_sockaddr_in( 6881, inet_aton($src_ip) );
+    my $response = bencode( { t => 'aa', y => 'r', r => { id => "NODE" . $src_ip . ( "0" x 10 ) }, ip => $new_ip_bin } );
     $dht->handle_incoming( $response, $addr );
 }
 my $new_id = $dht->node_id_bin;

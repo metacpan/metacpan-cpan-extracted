@@ -1,4 +1,5 @@
 use v5.42;
+use lib 'lib';
 use feature 'class';
 
 # Mock Acme::UPnP before anything else loads it

@@ -227,6 +227,56 @@ sub apply {
             return 1;
         }
 
+        # Comparisons treat each operand as a filter evaluated against the
+        # current input.  This is important after a pipe, where `length > 0`
+        # must compare the length of the piped array rather than look for a
+        # field named "length" on the original document.
+        my ($comparison_lhs, $comparison_operator, $comparison_rhs)
+            = JQ::Lite::Util::_split_top_level_comparison($normalized);
+        if (defined($comparison_operator)
+            && $comparison_lhs !~ /\b(?:if|then|elif|else|end|try|catch)\b/)
+        {
+            my ($lhs_expr, $operator, $rhs_expr)
+                = ($comparison_lhs, $comparison_operator, $comparison_rhs);
+            $lhs_expr =~ s/^\s+|\s+$//g;
+            $rhs_expr =~ s/^\s+|\s+$//g;
+
+            if (length($lhs_expr) && length($rhs_expr)) {
+                @next_results = ();
+                for my $item (@results) {
+                    my $json = JQ::Lite::Util::_encode_json($item);
+                    my ($lhs_values, $lhs_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $item, $lhs_expr);
+                    my ($rhs_values, $rhs_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $item, $rhs_expr);
+                    if (!$lhs_ok) {
+                        my @values = $self->run_query($json, $lhs_expr);
+                        $lhs_values = \@values;
+                    }
+                    if (!$rhs_ok) {
+                        my @values = $self->run_query($json, $rhs_expr);
+                        $rhs_values = \@values;
+                    }
+
+                    # A missing path participates in a comparison as null;
+                    # it must not turn the comparison into an empty stream.
+                    # This also preserves the expected result for `!=` and
+                    # comparisons against an explicit null literal.
+                    $lhs_values = [undef] unless @$lhs_values;
+                    $rhs_values = [undef] unless @$rhs_values;
+
+                    for my $lhs (@$lhs_values) {
+                        for my $rhs (@$rhs_values) {
+                            push @next_results,
+                                JQ::Lite::Util::_compare_values($lhs, $operator, $rhs)
+                                ? JSON::PP::true
+                                : JSON::PP::false;
+                        }
+                    }
+                }
+                @$out_ref = @next_results;
+                return 1;
+            }
+        }
+
         if (JQ::Lite::Util::_looks_like_expression($normalized)) {
             my @evaluated;
             my $all_ok = 1;

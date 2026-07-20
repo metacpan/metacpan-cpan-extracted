@@ -2,20 +2,21 @@ use v5.40;
 use feature 'class';
 no warnings qw[experimental::class experimental::builtin];
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Protocol::MSE::KeyExchange v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Protocol::MSE::KeyExchange v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use Digest::SHA qw[sha1];
+    use Crypt::URandom qw[urandom];
     use Math::BigInt try => 'GMP';
 
-    # -- Parameters --
+    # Parameters
     field $infohash     : param : reader;
     field $is_initiator : param : reader;
 
-    # -- Internal State --
+    # Internal state
     field $private_key;
     field $public_key : reader;
     field $shared_secret;
 
-    # -- Cipher State --
+    # Cipher state
     field $encrypt_rc4 : reader;
     field $decrypt_rc4 : reader;
 
@@ -33,8 +34,7 @@ class Net::BitTorrent::Protocol::MSE::KeyExchange v2.0.0 : isa(Net::BitTorrent::
         my $g = Math::BigInt->new(2);
 
         # Private Key: Random 160 bits
-        my $priv_hex = join '', map { sprintf "%02x", rand(256) } 1 .. 20;
-        $private_key = Math::BigInt->from_hex($priv_hex);
+        $private_key = Math::BigInt->from_bytes( urandom(20) );
 
         # Public Key: Y = G^X mod P
         my $pub_val = $g->copy->bmodpow( $private_key, $p );
@@ -57,11 +57,19 @@ class Net::BitTorrent::Protocol::MSE::KeyExchange v2.0.0 : isa(Net::BitTorrent::
 
     method compute_secret ($remote_pub_bytes) {
         if ( length($remote_pub_bytes) != 96 ) {
-            $self->_emit( log => "Remote public key must be 96 bytes", level => 'fatal' );
+            $self->_emit_log( 'fatal', 'Remote public key must be 96 bytes' );
             return undef;
         }
         my $p          = Math::BigInt->from_hex($P_STR);
         my $remote_val = Math::BigInt->from_bytes($remote_pub_bytes);
+
+        # Reject degenerate keys that defeat forward secrecy (RFC 2631 / FIPS 186-4)
+        my $two       = Math::BigInt->new(2);
+        my $p_minus_2 = $p->copy->bsub($two);
+        if ( $remote_val < $two || $remote_val > $p_minus_2 ) {
+            $self->_emit_log( 'fatal', 'Remote public key out of valid range [2, P-2]' );
+            return undef;
+        }
 
         # S = Y_remote ^ X_local mod P
         my $s_val = $remote_val->copy->bmodpow( $private_key, $p );
@@ -87,13 +95,18 @@ class Net::BitTorrent::Protocol::MSE::KeyExchange v2.0.0 : isa(Net::BitTorrent::
         my $req3_hash   = sha1( 'req3' . $s );
         my $target_req2 = $xor_block^.$req3_hash;
         my $check       = sha1( 'req2' . $candidate_ih );
-        return $check eq $target_req2;
+        #
+        my $ok = 0;
+        for my $i ( 0 .. 19 ) {
+            $ok |= ord( substr( $check, $i, 1 ) ) ^ ord( substr( $target_req2, $i, 1 ) );
+        }
+        return $ok == 0;
     }
 
     method init_rc4 ($ih) {
         $infohash = $ih;
-        my $keyA = sha1( "keyA" . $shared_secret . $infohash );
-        my $keyB = sha1( "keyB" . $shared_secret . $infohash );
+        my $keyA = sha1( 'keyA' . $shared_secret . $infohash );
+        my $keyB = sha1( 'keyB' . $shared_secret . $infohash );
         my ( $key_enc, $key_dec );
         if ($is_initiator) {
             $key_enc = $keyA;
@@ -146,7 +159,7 @@ class Net::BitTorrent::Protocol::MSE::KeyExchange v2.0.0 : isa(Net::BitTorrent::
     }
     }
 
-    # -- Pure Perl RC4 Implementation --
+    # Pure Perl RC4 Implementation
     class Net::BitTorrent::Protocol::MSE::RC4 v2.0.0 : isa(Net::BitTorrent::Emitter) {
     field @S;
     field $x = 0;

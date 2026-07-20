@@ -134,10 +134,13 @@ subtest 'Peer Reputation (Bad Requests)' => sub {
     );
     $t->register_peer_object($peer);
 
-    # Process handshake
+    # Process handshake; feed a fake remote handshake with a DIFFERENT peer_id
+    # to avoid self-connection detection (which would call disconnected() and set $_disconnected)
     $peer->transport->_emit('connected');
-    $p_handler->receive_data( $p_handler->write_buffer );
-    $peer->unchoke();    # We must unchoke them to receive requests
+    my $pstr      = 'BitTorrent protocol';
+    my $remote_id = 'REMOTE' . ( '0' x 14 );    # Exactly 20 bytes
+    $p_handler->receive_data( pack( 'C', length($pstr) ) . $pstr . ( "\0" x 8 ) . $t->infohash_v1 . $remote_id );
+    $peer->unchoke();                           # We must unchoke them to receive requests
     is $peer->reputation, 100, 'Initial reputation is 100';
 
     # Peer requests a piece we don't have

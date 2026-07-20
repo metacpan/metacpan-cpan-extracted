@@ -15,6 +15,7 @@ WriteMakefile (
  AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT	=> 'PerlIO Layer for removing comments',
  VERSION_FROM	=> 'lib/PerlIO/via/UnComment.pm',
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> {
                    },
 );

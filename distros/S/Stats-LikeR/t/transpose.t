@@ -6,7 +6,6 @@ use Stats::LikeR;
 use Test::Exception; # die_ok
 use Test::More;
 use Test::LeakTrace 'no_leaks_ok';
-use Devel::Confess 'color';
 
 # Hash-of-Hashes — return type
 
@@ -215,16 +214,21 @@ no_leaks_ok {
 	eval { $result = transpose([[1,2],[3,4]]); };
 } 'transpose AoA: no memory leaks on scoped assignment (RETVAL check)' unless $INC{'Devel/Cover.pm'};
 
+# On the croak paths, clear $@ inside the traced block: the exception object
+# (a plain string, or a stack-trace object if a $SIG{__DIE__} handler such as
+# Carp/Devel::Confess is installed) otherwise survives in $@ and is counted as
+# a leak by Test::LeakTrace on some older perls.  Releasing it here keeps the
+# check version-independent while still catching a real leak in transpose().
 no_leaks_ok {
-	eval { transpose(42) }
+	eval { transpose(42) }; $@ = '';
 } 'transpose: no leaks on invalid input' unless $INC{'Devel/Cover.pm'};
 
 no_leaks_ok {
-	eval { transpose({ a => 42 }) }
+	eval { transpose({ a => 42 }) }; $@ = '';
 } 'transpose HoH: no leaks on invalid inner value' unless $INC{'Devel/Cover.pm'};
 
 no_leaks_ok {
-	eval { transpose([[1,2],[3]]) }
+	eval { transpose([[1,2],[3]]) }; $@ = '';
 } 'transpose AoA: no leaks on ragged array' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

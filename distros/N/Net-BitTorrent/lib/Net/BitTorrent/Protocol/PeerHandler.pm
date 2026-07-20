@@ -35,7 +35,7 @@ class Net::BitTorrent::Protocol::PeerHandler v2.0.1 : isa(Net::BitTorrent::Proto
         $self->on(
             handshake => sub ( $self, $ih, $id ) {
                 if ( $id eq $self->peer_id ) {
-                    $self->_emit( log => "  [DEBUG] Closing self-connection and banning endpoint\n", level => 'debug' ) if $self->debug;
+                    $self->_emit_log( 'debug', 'Closing self-connection and banning endpoint' ) if $self->debug;
                     if ( $peer && $peer->torrent ) {
                         $peer->torrent->ban_peer( $peer->ip, $peer->port );
                     }
@@ -45,7 +45,7 @@ class Net::BitTorrent::Protocol::PeerHandler v2.0.1 : isa(Net::BitTorrent::Proto
                 if ( $features->{bep10} ) {
                     my $res = $self->reserved;
                     if ( ord( substr( $res, 5, 1 ) ) & 0x10 ) {
-                        $self->_emit( log => "    [DEBUG] Remote supports BEP 10, sending extended handshake\n", level => 'debug' ) if $self->debug;
+                        $self->_emit_log( 'debug', 'Remote supports BEP 10, sending extended handshake' ) if $self->debug;
                         $self->send_ext_handshake();
                     }
                 }
@@ -54,7 +54,7 @@ class Net::BitTorrent::Protocol::PeerHandler v2.0.1 : isa(Net::BitTorrent::Proto
         );
         $self->on(
             ext_handshake => sub ( $self, $data ) {
-                $self->_emit( log => "    [DEBUG] Received extended handshake from peer\n", level => 'debug' ) if $self->debug;
+                $self->_emit_log( 'debug', 'Received extended handshake from peer' ) if $self->debug;
             }
         );
         $self->on( metadata_request => sub ( $self, $piece ) { $peer->handle_metadata_request($piece) if $peer } );

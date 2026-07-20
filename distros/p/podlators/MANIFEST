@@ -111,6 +111,7 @@ t/data/snippets/termcap/term-unknown
 t/data/snippets/termcap/width
 t/data/snippets/termcap/wrapping
 t/data/snippets/text/alt
+t/data/snippets/text/c-with-newline
 t/data/snippets/text/c-with-spaces
 t/data/snippets/text/code
 t/data/snippets/text/cpp
@@ -179,6 +180,7 @@ t/style/strict.t
 t/text/color.t
 t/text/invalid.t
 t/text/iso-8859-1.t
+t/text/no-encoding.t
 t/text/overstrike.t
 t/text/snippets.t
 t/text/termcap.t

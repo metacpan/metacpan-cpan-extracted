@@ -1,0 +1,73 @@
+{
+   "abstract" : "CLDR person-name formatter for Perl",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PersonName-Format",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::Unicode" : "v0.4.3",
+            "Locale::Unicode::Data" : "v1.9.0",
+            "Scalar::Util" : "0",
+            "Unicode::UCD" : "0",
+            "Wanted" : "v0.1.2",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0",
+            "warnings::register" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302120",
+            "Test::Pod" : "1.52",
+            "lib" : "0",
+            "open" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/deguest/PersonName-Format/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/deguest/PersonName-Format"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

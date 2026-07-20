@@ -22,13 +22,17 @@ class Net::BitTorrent::Protocol::BEP52 v2.0.0 : isa(Net::BitTorrent::Protocol::B
 
     method _handle_message ( $id, $payload ) {
         if ( $id == $self->HASH_REQUEST ) {
+            return $self->_emit_log( 'warn', 'HASH_REQUEST payload too short' ) if length($payload) != 42;
             $self->_emit( hash_request => unpack( 'a32 C C N N', $payload ) );
         }
         elsif ( $id == $self->HASHES ) {
+            my $plen = length($payload);
+            return $self->_emit_log( 'warn', 'HASHES payload too short' ) if $plen < 42;
             my ( $root, $proof, $base, $idx, $len, $hashes ) = unpack( 'a32 C C N N a*', $payload );
             $self->_emit( hashes => $root, $proof, $base, $idx, $len, $hashes );
         }
         elsif ( $id == $self->HASH_REJECT ) {
+            return $self->_emit_log( 'warn', 'HASH_REJECT payload too short' ) if length($payload) != 42;
             $self->_emit( hash_reject => unpack( 'a32 C C N N', $payload ) );
         }
         else {

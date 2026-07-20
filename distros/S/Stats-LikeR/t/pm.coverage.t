@@ -234,25 +234,32 @@ dies_ok { dropna({ a => [1], r => { x => 1 } }) } 'dropna: dies on mixed HoA/HoH
 #============================================================
 # summary
 #============================================================
+# summary() now renders a view()-style string; capture it with return_only.
 {	# single flat array (ref form)
-	my $out = summary([1, 2, 3, 4, 5], nrows => 5);
-	is(ref $out, 'ARRAY', 'summary: single array returns arrayref of lines');
-	like($out->[1], qr/Min\./, 'summary: header present');
+	my $out = summary([1, 2, 3, 4, 5], nrows => 5, return_only => 1, color => 0);
+	ok(!ref $out, 'summary: returns a string (view-style)');
+	like($out, qr/Min\./, 'summary: header present');
 }
 {	# flat list form with trailing nrows
-	my $out = summary(1, 2, 3, 4, nrows => 2);
-	is(ref $out, 'ARRAY', 'summary: flat list form works');
+	my $out = summary(1, 2, 3, 4, nrows => 2, return_only => 1, color => 0);
+	like($out, qr/# summary:/, 'summary: flat list form works');
 }
-{	# AoH of arrays (array-of-arrays)
-	my $out = summary([ [1, 2, 3], [4, 5, 6] ], nrows => 2);
-	like($out->[1], qr/Index/, 'summary: AoA header has Index column');
+{	# array-of-arrays
+	my $out = summary([ [1, 2, 3], [4, 5, 6] ], nrows => 2, return_only => 1, color => 0);
+	like($out, qr/Index/, 'summary: AoA header has Index column');
 }
 {	# HoA
-	my $out = summary({ x => [1, 2, 3], y => [4, 5, 6] });
-	like($out->[1], qr/Key/, 'summary: HoA header has Key column');
+	my $out = summary({ x => [1, 2, 3], y => [4, 5, 6] }, return_only => 1, color => 0);
+	like($out, qr/Key/, 'summary: HoA header has Key column');
 }
-dies_ok { summary(\1) } 'summary: dies when data is neither array nor hash';
-dies_ok { summary([1, undef, 3]) } 'summary: dies on undef in single array';
+{	# HoH: one row per (inner) column
+	my $out = summary({ r1 => { a => 1, b => 2 }, r2 => { a => 3, b => 4 } },
+		return_only => 1, color => 0);
+	like($out, qr/Column/, 'summary: HoH header has Column label');
+}
+dies_ok { summary(\1, return_only => 1) } 'summary: dies when data is neither array nor hash';
+# undef / non-numeric values are now ignored rather than fatal
+lives_ok { summary([1, undef, 3], return_only => 1) } 'summary: tolerates undef in a vector';
 
 #============================================================
 # read_table  (write small temp files)

@@ -3,3 +3,5 @@ Revision history for YAML-Ordered-Conditional
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.05	2026-07-19
+	- Remove PAX headers
