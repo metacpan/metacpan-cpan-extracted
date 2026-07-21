@@ -336,16 +336,51 @@ It accepts a hash reference or a flat key/value list. Public input may use CLDR-
 
 =head1 NAME FIELDS
 
-    title
-    given
-    given2
-    given_informal
-    surname
-    surname2
-    surname_prefix
-    surname_core
-    generation
-    credentials
+The following fields correspond directly to the CLDR person-name field identifiers defined in L<UTS #35 Part 8|https://www.unicode.org/reports/tr35/tr35-personNames.html>. All fields are optional; supply only the ones relevant to the name being represented.
+
+=over 4
+
+=item C<title>
+
+Honorific prefix such as C<Dr.>, C<Prof.>, or C<Mr.>.
+
+=item C<given>
+
+Primary given name (first name in most Western cultures).
+
+=item C<given2>
+
+Additional given name(s), often the middle name or names. When a monogram or initial is requested, each word in this field contributes one initial.
+
+=item C<given_informal>
+
+Informal or familiar given name, such as C<Johnny> for C<John>. Used when the formatter selects the C<informal> usage variant.
+
+=item C<surname>
+
+Primary family name. When C<surname_prefix> and C<surname_core> are both absent, the full C<surname> value is used for all surname references.
+
+=item C<surname2>
+
+Secondary family name, used in cultures where a person has two surnames (for example, in Spanish-speaking countries).
+
+=item C<surname_prefix>
+
+Surname prefix that sorts separately from the core, such as C<van> in Dutch names or C<de> in French names.
+
+=item C<surname_core>
+
+The sortable core of the surname, without its prefix.
+
+=item C<generation>
+
+Generational suffix such as C<Jr.>, C<Sr.>, or C<III>.
+
+=item C<credentials>
+
+Post-nominal credentials such as C<PhD>, C<MD>, or C<CBE>.
+
+=back
 
 =head1 METHODS
 

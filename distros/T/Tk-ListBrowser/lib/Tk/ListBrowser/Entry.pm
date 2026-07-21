@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.14;
+$VERSION = 0.15;
 
 use base qw(Tk::ListBrowser::Item);
 
@@ -28,7 +28,6 @@ use base qw(Tk::ListBrowser::Item);
 Inherits L<Tk::ListBrowser::Item>.
 
 This module creates an object that holds all information of every entry.
-You will never need to create an entry object yourself.
 
 You can use the same options as it's ancestors. You can also use
 the -hidden option, if you want an entry to remain hidden upon addition.
@@ -46,6 +45,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 
 	$self->anchored(0);
+	$self->drawrect(0) unless $self->configSet('-drawrect');
 	$self->hidden(0) unless defined $self->hidden;
 	$self->priority(0) unless defined $self->priority;
 	$self->opened(1);
@@ -122,6 +122,13 @@ sub clear {
 	$self->SUPER::clear;
 }
 
+sub clickregion {
+	my $self = shift;
+	my @coords = $self->region;
+	$coords[2] = 3000 if $self->listMode;
+	return @coords;
+}
+
 sub ctext {
 	my $self = shift;
 	$self->{CTEXT} = shift if @_;
@@ -138,27 +145,26 @@ sub deleteAnchor {
 	$self->canchor(undef);
 }
 
+sub deleteSelect {
+	my $self = shift;
+	$self->deleteRect;
+}
+
 sub draw {
 	my $self = shift;
+	my ($x, $y) = @_;
 	$self->SUPER::draw(@_);
-	$self->drawAnchor if $self->anchored
+	my $sel = $self->selected and $self->ismapped;
+	$self->drawSelect if $sel;
 }
 
 sub drawAnchor {
 	my ($self, $force) = @_;
 	return unless $self->ismapped;
 	
-	my @coords = $self->getRegion;
+	my @coords = $self->elementCoords;
 	$self->deleteAnchor;
 	my $c = $self->Subwidget('Canvas');
-	if ($self->listMode) {
-		$coords[0] = $self->cget('-marginleft');
-		my $col = $self->columnList;
-		$coords[2] = $coords[2] + $col;
-		unless ($col) {
-			($coords[2]) = $self->canvasSize;
-		}
-	}
 	my $a = $c->createRectangle(@coords,
 		-fill => undef,
 		-dash => [3, 2],
@@ -166,6 +172,63 @@ sub drawAnchor {
 	);
 	$self->canchor($a);
 	$c->raise('guides', 'anchor');
+}
+
+sub drawSelect {
+	my ($self) = @_;
+	my $left = 1;
+	my $right = 1;
+	$self->deleteSelect;
+	
+	my $lb = $self->listbrowser;
+	return unless $lb->ismapped;
+	return unless $self->selected;
+	my $c = $lb->Subwidget('Canvas');
+	my $si = Tk::ListBrowser::SelectXPM->new($lb);
+
+	my @coords = $self->elementCoords;
+	return if $coords[0] >= $coords[2];
+	return if $coords[1] >= $coords[3];
+
+	my ($x, $y) = @coords;
+	my $pixmap = $si->selectimage(@coords, $left, $right);
+	my $image = $c->createImage($x, $y,
+		-image => $pixmap,
+		-anchor => 'nw',
+		-tags => ['sel', 'rect', $self->name],
+	);
+	$self->crect($image);
+	my @guides = $c->find('withtag', 'guides');
+	$c->raise('guides', 'sel') if @guides;
+	$c->raise('indicator', 'sel');
+	$c->raise('indicator', 'guides') if @guides;
+	$c->raise($self->cimage, $image);
+	$c->raise($self->ctext, $image);
+}
+
+sub elementCoords {
+	my $self = shift;
+	my $lb = $self->listbrowser;
+	my $c = $lb->Subwidget('Canvas');
+
+	my @coords = $self->region;
+
+	if ($self->listMode) {
+
+		my ($width) = $lb->lastScrollRegion;
+		my ($cw) = $self->canvasSize;
+
+		my ($xv) = $c->xview;
+
+		my $x1 = int($width * $xv);
+		$coords[0] = $x1;
+		my $x2 = $cw;
+		if ($xv > 0) {
+			$x2 = $x1 + $cw
+		}
+		$coords[2] = $x2;
+	}
+	return @coords
 }
 
 sub hasChildren {
@@ -189,6 +252,16 @@ sub inindicator {
 	my @coords = $c->coords($i);
 	return 1 if ($coords[0] > $x) and ($coords[2] < $x) and ($coords[1] > $y) and ($coords[3] < $y);
 	return ''
+}
+
+sub inregion {
+	my ($self, $x, $y) = @_;
+	my ($cx, $cy, $cdx, $cdy) = $self->clickregion;
+	return '' unless $x >= $cx;
+	return '' unless $x <= $cdx;
+	return '' unless $y >= $cy;
+	return '' unless $y <= $cdy;
+	return 1
 }
 
 sub noshow {

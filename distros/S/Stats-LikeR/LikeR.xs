@@ -5856,7 +5856,9 @@ CODE:
 		croak("binom_test: number of trials n is required when x is a scalar");
 
 	NV   p          = 0.5;
-	NV   conf_level = 0.95;
+	/* parse through Perl so the echoed default is the exact nearest NV to
+	 * 0.95 on every build (see fisher_test for the full rationale). */
+	NV   conf_level = SvNV(sv_2mortal(newSVpvs("0.95")));
 	const char *restrict alternative = "two.sided";
 
 	for (unsigned int i = pos; i < items; i += 2) {
@@ -12992,10 +12994,12 @@ CODE:
 	if (items < 1) croak("fisher_test requires at least a data reference");
 
 	SV *restrict data_ref = ST(0);
-	/* long-double literal: on a long-double-NV build a bare 0.95 is a double
-	 * that widens to 0.949999999999999956, so the echoed default would not
-	 * stringify back to "0.95". 0.95L is the nearest NV to 0.95 in either build. */
-	NV conf_level = 0.95L;
+	/* Derive the default through Perl's own number parser so it is the exact
+	 * nearest NV to 0.95 in every build (double, long double, or __float128).
+	 * A bare 0.95 mismatches on long-double builds and 0.95L mismatches on
+	 * quadmath builds; either way the echoed default would fail to stringify
+	 * back to "0.95". SvNV("0.95") is identical to the Perl-side literal 0.95. */
+	NV conf_level = SvNV(sv_2mortal(newSVpvs("0.95")));
 	const char *restrict alternative = "two.sided";
 
 	for (unsigned int i = 1; i < items; i += 2) {

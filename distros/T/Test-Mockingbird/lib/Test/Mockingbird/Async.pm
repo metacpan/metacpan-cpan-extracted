@@ -21,11 +21,11 @@ Test::Mockingbird::Async - Future-based async mocking for Test::Mockingbird
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -353,6 +353,8 @@ sub _require_future {
 
 =head1 SUPPORT
 
+This module is provided as-is without any warranty.
+
 Please report bugs at L<https://github.com/nigelhorne/Test-Mockingbird/issues>.
 
 =head1 AUTHOR
@@ -375,7 +377,9 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to GPL2 licence terms.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

@@ -13,6 +13,8 @@ BEGIN
     use utf8;
     use Test::More;
     use Config;
+    use File::Spec ();
+    use File::Temp qw( tempfile );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -21,8 +23,8 @@ use warnings;
 use utf8;
 
 my $perl = $^X;
-my $lib = 'blib/lib';
-my $arch = 'blib/arch';
+my $lib  = File::Spec->catdir( 'blib', 'lib' );
+my $arch = File::Spec->catdir( 'blib', 'arch' );
 my $code = <<'PERL';
 use utf8;
 use PersonName::Format;
@@ -34,13 +36,21 @@ die( "Unexpected grapheme\n" )
     unless( $got eq "\x{1F469}\x{200D}\x{1F4BB}" );
 PERL
 
+# NOTE: Write the test code to a temp file rather than passing it via -e.
+# On Windows, passing multi-line code via -e through system() is unreliable: cmd.exe and
+# CreateProcess() handle embedded newlines and escape sequences inconsistently, causing
+# 'syntax error at -e line 1, at EOF' failures.
+# Using a temp file avoids the quoting issue entirely and works on all platforms.
+my( $fh, $tmpfile ) = tempfile( SUFFIX => '.pl', UNLINK => 1 );
+print( $fh $code );
+close( $fh );
+
 local $ENV{PERSONNAME_FORMAT_PUREPERL} = 1;
 my $status = system(
     $perl,
     '-I' . $lib,
     '-I' . $arch,
-    '-e',
-    $code,
+    $tmpfile,
 );
 is( $status, 0, 'Pure-Perl grapheme backend works in a fresh interpreter' );
 

@@ -46,6 +46,7 @@ extern mds_arena_profile mds_last_arena_profile;
 #define MDS_FLAG_NO_HTML            (1u << 20)  /* raw HTML blocks + inline */
 #define MDS_FLAG_NO_REFERENCES      (1u << 21)  /* `[id]: url` definitions */
 #define MDS_FLAG_FOOTNOTES          (1u << 23)  /* GFM `[^label]` footnotes */
+#define MDS_FLAG_HIGHLIGHT          (1u << 24)  /* syntax-highlight fenced code blocks via Eshu */
 
 /* GFM-superset preset. NOTE: HARD_BREAKS is NOT part of GFM defaults
  * (CommonMark §6.8 keeps softbreaks as newlines). Callers can OR it in. */

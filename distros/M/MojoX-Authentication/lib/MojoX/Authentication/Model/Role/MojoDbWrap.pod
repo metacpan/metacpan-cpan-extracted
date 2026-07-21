@@ -1,0 +1,40 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Model::Role::MojoDbWrap
+
+
+=head1 SYNOPSIS
+
+   package Some::Class;
+   use Moo;
+   with 'MojoX::Authentication::Model::Role::MojoDbWrap';
+   sub foo ($self) { $self->wmdb->db->select(...) }
+   ...
+
+=head1 DESCRIPTION
+
+Role to hold a L<MojoX::MojoDbWrap> object. Provides a L</wmdb> method
+to access that object.
+
+=head1 INTERFACE
+
+=head2 B<< wmdb >>
+
+   my $wrap = $provider->wmdb;
+
+Accessor for the L<MojoX::MojoDbWrap> object.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

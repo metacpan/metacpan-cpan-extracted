@@ -7,11 +7,12 @@ use Markdown::Simple;
 use Search::Trigram;
 use Chandra::Element;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has app         => (is_ro, req);
 has gfm         => (is_ro, default => 1);
 has hard_breaks => (is_ro, default => 0);
+has highlight   => (is_ro, default => 1);
 has id          => (is_ro, default => 'chandra-markdown');
 has css         => (is_ro, default => 1);
 has _renderer   => (is_rw, lzy, bld);
@@ -24,6 +25,7 @@ sub _build__renderer {
     Markdown::Simple->new({
         gfm         => $self->gfm,
         hard_breaks => $self->hard_breaks,
+        highlight   => $self->highlight,
     });
 }
 
@@ -396,6 +398,17 @@ my $CSS = <<'END_CSS';
     line-height: 1.45;
 }
 .chandra-markdown pre code { background: none; padding: 0; }
+.chandra-markdown .esh-k { color: var(--esh-keyword,  #cf222e); }
+.chandra-markdown .esh-s { color: var(--esh-string,   #0a3069); }
+.chandra-markdown .esh-c { color: var(--esh-comment,  #6e7781); font-style: italic; }
+.chandra-markdown .esh-n { color: var(--esh-number,   #0550ae); }
+.chandra-markdown .esh-p { color: var(--esh-preproc,  #8250df); }
+.chandra-markdown .esh-r { color: var(--esh-regex,    #116329); }
+.chandra-markdown .esh-v { color: var(--esh-variable, #953800); }
+.chandra-markdown .esh-h { color: var(--esh-heredoc,  #0a3069); }
+.chandra-markdown .esh-d { color: var(--esh-doc,      #6e7781); font-style: italic; }
+.chandra-markdown .esh-g { color: var(--esh-tag,      #116329); }
+.chandra-markdown .esh-a { color: var(--esh-attr,     #0550ae); }
 .chandra-markdown blockquote {
     border-left: 4px solid var(--chandra-border, #d0d7de);
     color: var(--chandra-muted, #656d76);
@@ -552,8 +565,37 @@ Chandra::Markdown - Render Markdown in Chandra apps
 
 =head2 new(%opts)
 
-C<app> is required. Options: C<gfm> (default 1), C<hard_breaks> (default 0),
-C<id> (default C<chandra-markdown>), C<css> (default 1).
+C<app> is required. Available options:
+
+=over 4
+
+=item C<gfm> (default 1)
+
+Enable GFM extensions: tables, strikethrough, task lists, autolinks, and raw
+HTML sanitisation. Set to C<0> for strict CommonMark.
+
+=item C<hard_breaks> (default 0)
+
+Emit C<< <br /> >> for soft line breaks inside paragraphs.
+
+=item C<highlight> (default 1)
+
+Syntax-highlight fenced code blocks that carry a language tag (e.g.
+C<< ```perl >>). Tokens are wrapped in C<< <span class="esh-X"> >> elements
+styled by the injected CSS. Blocks with no language tag are unaffected.
+Set to C<0> to emit plain HTML-escaped code.
+
+=item C<id> (default C<chandra-markdown>)
+
+DOM element id targeted by L</set> and L</append>.
+
+=item C<css> (default 1)
+
+Inject the built-in stylesheet (C<.chandra-markdown> layout rules plus
+C<.esh-*> token colours) into the app on construction. Set to C<0> to
+supply your own styles.
+
+=back
 
 =head2 render($markdown)
 

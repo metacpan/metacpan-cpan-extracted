@@ -13,7 +13,7 @@ authentication in Mojolicious applications (local and SAML2)
 
 =head1 VERSION
 
-This document describes MojoX::Authentication version 0.003.
+This document describes MojoX::Authentication version 0.004.
 
 =begin html
 
@@ -151,15 +151,18 @@ retrieve the correct value for this member.
 Constructor.
 
 Accepts initialization values for L</app>, L</model>,
-L</saml2_provider_name>, and L</user_stash_key>.
+L</provider_name>, and L</user_stash_key>.
 
-=head2 B<< saml2_provider_name >>
+=head2 B<< provider_name >>
 
-   my $string = $ma->saml2_provider_name;
+   my $string = $ma->provider_name;
 
-Accessor to the (default) provider name for SAML2 logins. This works
-under the assumption that there will only be one identity provider;
-otherwise you will have to do some more coding on your side.
+Accessor to the (default) provider name, mainly used for SAML 2.0. This
+works under the assumption that there will only be one identity
+provider; otherwise you will have to do some more coding on your side.
+
+If defined, it takes the precedence over the C<provider> parameter, this
+behaviour is subject to change.
 
 =head2 B<< user_stash_key >>
 

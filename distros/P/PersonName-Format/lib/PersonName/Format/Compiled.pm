@@ -234,15 +234,14 @@ PersonName::Format::Compiled - Precompiled CLDR person name formatter
 =head1 DESCRIPTION
 
 This class represents a precompiled formatter created by L<PersonName::Format/compile>.
-It freezes the locale, script, order, CLDR pattern group, space replacement rules, and field modifier resolver. Pattern selection still occurs per name because CLDR chooses the best pattern according to the fields actually populated in that name.
 
-A compiled formatter freezes all formatting decisions that depend only on the formatter configuration and the characteristics of the names being formatted, such as the formatting locale, the name locale, the script, the preferred name order, the selected CLDR pattern group and the applicable field modifiers.
+Compiling a formatter freezes all context-resolution steps that depend only on the formatter configuration and the name characteristics: the formatting locale, the name locale, the script, the preferred name order, the selected CLDR pattern group, the space replacement rules, and the field modifier resolver.
 
-The final CLDR pattern is still selected for each formatted name, since it depends on which fields are actually present.
+The final CLDR pattern is still selected for each individual name, since CLDR chooses the best pattern according to the fields actually present in that name.
 
 Compiled formatters are intended for high-throughput applications that format many names sharing the same locale and script characteristics.
 
-Objects of this class are created by L<PersonName::Format/compile>; they should not normally be instantiated directly.
+Objects of this class are created by L<PersonName::Format/compile> and should not normally be instantiated directly.
 
 =head1 METHODS
 
@@ -254,20 +253,28 @@ Formats a name and returns the resulting string.
 
 This method behaves identically to L<PersonName::Format/format>, but avoids repeating the context derivation performed during normal formatting.
 
-=head2 formatToParts
+=head2 format_to_parts
 
-    my $parts = $compiled->formatToParts( $name );
+    my $parts = $compiled->format_to_parts( $name );
 
     my $parts = $compiled->format_to_parts( $name );
 
 Formats a name and returns an array reference describing the generated parts.
 
+The returned structure is identical to that returned by L<PersonName::Format/format_to_parts>.
+
+=head2 formatToParts
+
+This is an alias for L</format_to_parts>
+
 The returned structure is identical to that returned by L<PersonName::Format/formatToParts>.
+
+=for Pod::Coverage resolved_options
 
 =head2 resolvedOptions
 
     my $options = $compiled->resolvedOptions;
-
+    # or
     my $options = $compiled->resolved_options;
 
 Returns a hash reference describing the effective formatting options frozen into this compiled formatter.

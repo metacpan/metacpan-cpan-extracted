@@ -1,5 +1,20 @@
 Revision history for Perl extension App::Codit.
 
+0.21 Mon Jul 20 2026
+	- Corrected documntation.
+	- Git plugin ignores non existing files in the git file list.
+	- Added plugins Critic and Diff.
+	- Console text widget focuses on Control-Button-1.
+	- Plugin SearchReplace has resumed reporting and also properly clears find tags in all documents.
+	- Plugin PodViewer saves it's zoom level on exit.
+	- Fixed log messages from Tk::CodeText coming through.
+	- File browser widget in plugin FileBrowser shows the icons from the icon library.
+	- Plugin Icons now always show a filter.
+	- Plugin Sessions ignores non existing files when opening a session.
+	- Fixed bug in Plugin FileBrowser
+	- Fixed bug in plugin Bookmarks.
+	- Greatly simplified font setting in plugin Snippets.
+
 0.20 Wed Jul 08 2026
 	- Facilitated the use of Tk::FileBrowser version 0.13.
 	- Plugin Snippets needed some more time to fetch fonts now.

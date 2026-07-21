@@ -167,8 +167,27 @@ print "OPTIMIZE: $OPTIMIZE_FLAGS\n";
 my $EXTRA_LDDLFLAGS = defined $ENV{MDS_PGO_LDFLAGS} ? $ENV{MDS_PGO_LDFLAGS} : '';
 print "LDDLFLAGS extras: $EXTRA_LDDLFLAGS\n" if length $EXTRA_LDDLFLAGS;
 
+# Resolve Eshu include directory:
+#   1. Try installed Eshu module
+#   2. Fall back to sibling directory (development)
+my $eshu_inc;
+eval {
+    no warnings 'redefine';
+    local *XSLoader::load = sub {};
+    require Eshu;
+    my $dir = Eshu->include_dir();
+    $eshu_inc = $dir if $dir && -d $dir;
+};
+if (!$eshu_inc && -d '../Eshu-0.06/include') {
+    $eshu_inc = '../Eshu-0.06/include';
+}
+die "Cannot find Eshu include directory. Install Eshu or place it as a sibling directory.\n"
+    unless $eshu_inc;
+print "Eshu include: $eshu_inc\n";
+
 my %WriteMakefileArgs = (
     OPTIMIZE         => $OPTIMIZE_FLAGS,
+    INC              => "-Isrc -I$eshu_inc",
     ($EXTRA_LDDLFLAGS ne '' ? (LDDLFLAGS => "$Config{lddlflags} $EXTRA_LDDLFLAGS") : ()),
     NAME             => 'Markdown::Simple',
     AUTHOR           => q{LNATION <email@lnation.org>},

@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 require XSLoader;
 use warnings FATAL => 'all';
 use autodie ':default';
@@ -151,14 +151,14 @@ sub _cols_arg {                         # normalise + validate a column list
 	return @cols;
 }
 
-sub _aoa_width {                        # widest row of an AoA (ragged-safe)
+sub _aoa_width { # widest row of an AoA (ragged-safe)
 	my $df = shift;
 	my $w = 0;
 	for my $r (@$df) { $w = scalar @$r if ref $r eq 'ARRAY' && @$r > $w }
 	return $w;
 }
 
-sub _aoa_int_cols {                     # validate integer positions in range
+sub _aoa_int_cols { # validate integer positions in range
 	my ($fn, $df, @cols) = @_;
 	my $w = _aoa_width($df);
 	for my $c (@cols) {
@@ -170,7 +170,7 @@ sub _aoa_int_cols {                     # validate integer positions in range
 	return $w;
 }
 
-sub _present_keys {                     # union of keys over AoH/HoH rows
+sub _present_keys { # union of keys over AoH/HoH rows
 	my ($df, $shape) = @_;
 	my @rows = $shape eq 'AoH' ? @$df : values %$df;
 	my %seen;
@@ -178,9 +178,9 @@ sub _present_keys {                     # union of keys over AoH/HoH rows
 	return \%seen;
 }
 
-sub _rename_inplace {                   # VOID-context rename: mutate the source
+sub _rename_inplace { # VOID-context rename: mutate the source
 	my ($df, $shape, $map) = @_;
-	if ($shape eq 'HoA') {                          # rename the column keys
+	if ($shape eq 'HoA') { # rename the column keys
 		my %vals;                                   # gather-then-set = swap-safe
 		for my $o (keys %$map) {
 			next unless exists $df->{$o};
@@ -202,8 +202,7 @@ sub _rename_inplace {                   # VOID-context rename: mutate the source
 	return;
 }
 
-# shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
-sub select_cols {
+sub select_cols {# shape code passed to the XS: 1 = AoH, 2 = HoH, 3 = AoA
 	my $df = shift;
 	die "select_cols: undefined data in first position\n" unless defined $df;
 	my @cols  = _cols_arg('select_cols', @_);
@@ -3649,7 +3648,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 Synopsis
 
@@ -9605,6 +9604,11 @@ C<read_table>.
 </table>
 
 =head1 Changes
+
+=head2 0.26 2026-07-20 CDT
+
+https://www.cpantesters.org/cpan/report/fc7d01a0-83f4-11f1-b543-8a9ac547de9a
+Fixed a long-double issue
 
 =head2 0.25 2026-07-19 CDT
 

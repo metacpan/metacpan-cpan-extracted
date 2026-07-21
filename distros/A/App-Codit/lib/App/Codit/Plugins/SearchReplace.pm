@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 use Tk;
@@ -189,7 +189,7 @@ sub new {
 	$results->autosetmode;
 	$self->{RESULTSLIST} = $results;
 	
-	$self->cmdHookAfter('doc_select', 'ShowResults', $self);
+	$self->cmdHookAfter('doc_select', 'DocResults', $self);
 
 	return $self;
 }
@@ -273,7 +273,15 @@ sub Clear {
 	$self->repl(0);
 	$self->skipped(0);
 	$self->FindActive(0);
-#	$self->ShowResults;
+	my $mdi = $self->mdi;
+	for (@c) {
+		my $doc = $_;
+		unless ($mdi->deferredExists($doc)) {
+			my $widg = $mdi->docGet($doc);
+			$widg->FindClear;
+		}
+	}
+	$self->ShowResults;
 }
 
 sub Current {
@@ -286,6 +294,22 @@ sub DocSelected {
 	my $self = shift;
 	my $mdi = $self->extGet('CoditMDI');
 	return $mdi->docSelected;
+}
+
+sub DocResults {
+	my $self = shift;
+	$self->ShowResults;
+	return unless $self->FindActive;
+	my $name = $self->mdi->docSelected;
+	return unless defined $name;
+	my $list = $self->{RESULTSLIST};
+	if ($list->infoExists($name)) {
+		my @c = $list->infoChildren($name);
+		my $num = @c;
+		$self->after(10, sub {
+			$self->log("$num results in $name")
+		})
+	}
 }
 
 sub DocWidget {
@@ -319,8 +343,8 @@ sub Find {
 	} elsif ($$mode eq $srchres) {
 		$self->FindInResults;
 	}
-	$self->ShowResults(1);
 	$self->FindActive(1);
+	$self->ShowResults(1);
 }
 
 sub FindActive {
@@ -655,7 +679,9 @@ sub ShowResults {
 		my $nhits = @hits;
 		my @e = $list->infoChildren('');
 		my $ndocs = @e;
-		$self->log("$nhits hits in $ndocs documents");
+		$self->after(10, sub {
+			$self->log("$nhits hits in $ndocs documents");
+		})
 	}
 }
 
@@ -684,7 +710,7 @@ sub skipped {
 sub Unload {
 	my $self = shift;
 	$self->ToolRightPageRemove('SearchReplace');
-	$self->cmdUnhookAfter('doc_select', 'ShowResults', $self);
+	$self->cmdUnhookAfter('doc_select', 'DocResults', $self);
 	return $self->SUPER::Unload
 }
 

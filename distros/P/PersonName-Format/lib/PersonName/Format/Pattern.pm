@@ -774,6 +774,10 @@ Modifiers consumed by the name object are not passed to that callback.
         },
     );
 
+=for Pod::Coverage format_to_parts
+
+=for Pod::Coverage formatToParts
+
 =head2 num_empty_fields
 
 Returns the number of field tokens whose resolved value is undefined or empty.
@@ -788,7 +792,9 @@ Returns the original pattern text.
 
 =head2 select_best
 
-Selects the pattern with the greatest number of populated fields, then the fewest empty fields, then the alphabetically least pattern text.
+    my $best = $pattern->select_best( \@patterns, $name );
+
+Given an array reference of L<PersonName::Format::Pattern> objects (or plain pattern strings) and a name object, evaluates each candidate against C<$name> and returns the one with the greatest number of populated fields. Ties are broken by the fewest empty fields, then by the alphabetically earliest pattern text.
 
 =head2 tokens
 

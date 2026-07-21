@@ -1,10 +1,20 @@
 Revision history for Business-NAB
 
+0.06
+        - Protect against possible rounding errors. This includes both
+          changes to the way records are serialised and to internal checks
+          for zero-values. There should be no user-facing changes here,
+          only more robust operation against very unusual edge cases.
+        - Protect against the possibility of writing a partial payments
+          file. The code now only writes if we can be sure that the entire
+          file can be successfully written.
+
 0.05
         - Make sure account numbers shorter than 9 characters
           are left-padded with zeroes to match bank's expectations.
 
-0.04 ??
+0.04
+        - distzillafy the dist
 
 0.03     2025-03-09
         - Handle signed amounts in BAI files

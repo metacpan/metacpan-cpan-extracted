@@ -107,15 +107,13 @@ PersonName::Format::NullObject - Null Value Chaining Object Class
 
 =head1 DESCRIPTION
 
-Normally the call above would have triggered a perl error like C<Cannot call method name on an undefined value>, but since L<PersonName::Format/"error"> returns a L<PersonName::Format::NullObject> object, the method B<format> in our example is called without triggering an error, and returns the right value based on the expectation of the caller which will ultimately result in C<undef> in scalar context or an empty list in list context.
+Without this mechanism, a failing constructor call in a method chain would set C<$obj> to C<undef> and the subsequent C<< ->format() >> call would immediately die with C<< Can't call method "format" on an undefined value >>. Because L<PersonName::Format/error> returns a L<PersonName::Format::NullObject> object instead of C<undef>, the chain can continue gracefully: any method called on a C<NullObject> returns the object itself in chaining context, C<undef> in scalar context, or an empty list in list context, so the error is surfaced at the end of the chain rather than mid-expression.
 
-L<PersonName::Format::NullObject> uses C<AUTOLOAD> to allow any method to work in chaining, but contains the original error within its object.
-
-When the C<AUTOLOAD> is called, it checks the call context and returns the current object in object (chaining context), or C<undef> in scalar context or an empty list in list context.
+L<PersonName::Format::NullObject> uses C<AUTOLOAD> to accept any method call. It retains the original exception within its object so it can be retrieved later.
 
 =head1 METHODS
 
-There is only 1 method. This module makes it possible to call it with any method to fake original data flow.
+This module exposes a single public method. C<AUTOLOAD> makes every other method call a no-op that propagates the null state through the chain.
 
 =head2 new
 

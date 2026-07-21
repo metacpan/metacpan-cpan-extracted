@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Object::Proto;
 use PDF::Make::Builder::Layout::Cell;
+use Layout::Flex;
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder::Layout::Row',
@@ -39,33 +40,89 @@ sub render {
     my @cells = @{cells $self};
     return unless @cells;
 
-    my $canvas = $page->canvas;
-    my $font = $builder->font;
-    my $cx = $page->content_x;
+    my $canvas  = $page->canvas;
+    my $font    = $builder->font;
+    my $cx      = $page->content_x;
     my $total_w = $page->width;
-    my $cursor = $page->cursor_y;
-    my $margin = margin $self;
+    my $cursor  = $page->cursor_y;
+    my $margin  = margin $self;
+    my $gap     = gap $self;
 
-    my $total_weight = 0;
-    $total_weight += $_->weight for @cells;
-    my $gap = gap $self;
-    my $available = $total_w - ($#cells * $gap);
+    my $measure = sub {
+        my ($item, $avail_w) = @_;
+        my $cell = $cells[$item->{_idx}];
+        my $h    = 0;
+
+        for my $ci (@{$cell->content}) {
+            if ($ci->{type} eq 'text') {
+                my $item_font = $cell->_resolve_item_font($font, $ci);
+                my $sz = $ci->{size}        // $item_font->size;
+                my $lh = $ci->{line_height} // $sz;
+
+                if (defined $avail_w) {
+                    my $inner_w = $avail_w - 2 * $cell->pad;
+                    $inner_w    = 1 if $inner_w < 1;
+                    my $slack   = $cell->wrap_slack;
+                    my @words   = split /\s+/, $ci->{text};
+                    my $line    = '';
+                    my $lines   = @words ? 1 : 0;
+                    for my $word (@words) {
+                        my $candidate = $line eq '' ? $word : ($line . ' ' . $word);
+                        my $test      = $item_font->measure_text($candidate);
+                        if ($test > $inner_w + $slack && $line ne '') {
+                            $lines++;
+                            $line = $word;
+                        } else {
+                            $line = $candidate;
+                        }
+                    }
+                    $h += $lines * $lh;
+                } else {
+                    $h += $ci->{line_height} // $sz;
+                }
+            } elsif ($ci->{type} eq 'image') {
+                $h += $ci->{h} // 50;
+            }
+        }
+
+        return (0, $h);
+    };
+
+    my @flex_items;
+    for my $i (0 .. $#cells) {
+        push @flex_items, {
+            grow      => $cells[$i]->weight,
+            basis     => 0,
+            text      => '1',
+            wrap_text => 1,
+            _idx      => $i,
+        };
+    }
+
+    my @rects = Layout::Flex->compute(
+        main_size  => $total_w,
+        cross_size => 10000,
+        align      => 'start',
+        gap        => $gap,
+        measure    => $measure,
+        items      => \@flex_items,
+    );
 
     my $row_h = height $self;
     unless ($row_h) {
         $row_h = 0;
-        for my $cell (@cells) {
-            my $ch = $cell->measure_height($font, $available * $cell->weight / $total_weight);
-            $row_h = $ch if $ch > $row_h;
+        for my $i (0 .. $#rects) {
+            my $h = $rects[$i][3] + 2 * $cells[$i]->pad;
+            $row_h = $h if $h > $row_h;
         }
-        $row_h += 10;
     }
 
     my $cell_y = $cursor - $row_h;
-    my $cell_x = $cx;
 
-    for my $cell (@cells) {
-        my $cell_w = $available * $cell->weight / $total_weight;
+    for my $i (0 .. $#cells) {
+        my $cell   = $cells[$i];
+        my $cell_x = $cx + $rects[$i][0];
+        my $cell_w = $rects[$i][2];
 
         if (defined $cell->bg) {
             my ($r, $g, $b) = $font->hex_to_rgb($cell->bg);
@@ -80,8 +137,6 @@ sub render {
 
         $cell->render_content($canvas, $font, $page,
             $cell_x + $cell->pad, $cell_y, $cell_w - 2 * $cell->pad, $row_h);
-
-        $cell_x += $cell_w + $gap;
     }
 
     $page->advance_y($row_h + $margin);

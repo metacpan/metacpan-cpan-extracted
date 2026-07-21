@@ -11,7 +11,7 @@ build_requires:
   Test::Memory::Cycle: '0'
   Test::Most: '0'
   Test::Needs: '0'
-  Test::Returns: '0'
+  Test::Returns: '0.03'
   Test::Strict: '0'
   Test::Vars: '0'
   Test::Warnings: '0'
@@ -40,5 +40,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mockingbird
   repository: git://github.com/nigelhorne/Test-Mockingbird.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

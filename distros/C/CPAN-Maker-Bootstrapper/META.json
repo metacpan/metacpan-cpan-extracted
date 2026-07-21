@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "Git::Raw" : "0",
             "LLM::API" : "v1.0.0",
             "Term::ANSIColor" : "0"
          },
@@ -46,11 +47,11 @@
             "File::Copy::Recursive" : "0.45",
             "File::HomeDir" : "1.006",
             "File::ShareDir" : "1.118",
-            "Git::Raw" : "0",
             "IO::Scalar" : "2.113",
             "JSON" : "4.10",
             "Markdown::Render" : "0",
             "Module::Metadata" : "0",
+            "Module::ScanDeps::Static" : "v1.8.2",
             "Pod::Extract" : "0",
             "Pod::Markdown" : "0",
             "Readonly" : "2.05",
@@ -69,7 +70,7 @@
    "provides" : {
       "CPAN::Maker::Bootstrapper" : {
          "file" : "lib/CPAN/Maker/Bootstrapper.pm",
-         "version" : "v2.0.9"
+         "version" : "v2.0.11"
       },
       "CPAN::Maker::Bootstrapper::ConfigReader" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/ConfigReader.pm",
@@ -83,6 +84,10 @@
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm",
          "version" : "0"
       },
+      "CPAN::Maker::Bootstrapper::Role::CreateDeps" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm",
+         "version" : "0"
+      },
       "CPAN::Maker::Bootstrapper::Role::ExtraFiles" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm",
          "version" : "0"
@@ -93,7 +98,7 @@
       },
       "CPAN::Maker::Bootstrapper::Role::Installer" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/Installer.pm",
-         "version" : "v2.0.9"
+         "version" : "v2.0.11"
       },
       "CPAN::Maker::Bootstrapper::Role::LLM::Annotator" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm",
@@ -141,6 +146,6 @@
          "web" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper"
       }
    },
-   "version" : "v2.0.9",
+   "version" : "v2.0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

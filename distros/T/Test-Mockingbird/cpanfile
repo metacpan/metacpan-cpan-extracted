@@ -16,7 +16,7 @@ on 'test' => sub {
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Most';
 	requires 'Test::Needs';
-	requires 'Test::Returns';
+	requires 'Test::Returns', '0.03';
 	requires 'Test::Strict';
 	requires 'Test::Vars';
 	requires 'Test::Warnings';

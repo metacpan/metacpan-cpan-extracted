@@ -1,0 +1,74 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+MojoX::Authentication::Util
+
+
+=head1 SYNOPSIS
+
+   use Moo;
+   use MojoX::Authentication::Util qw< coercer_for >;
+   
+   has foo => (is => 'ro', coerce => coercer_for(foo => 'Some::Class'));
+
+
+=head1 DESCRIPTION
+
+Utility functions for the distribution.
+
+
+=head1 INTERFACE
+
+This module exports the following functions.
+
+=head2 B<< coercer_for >>
+
+   use Moo;
+   has foo => (is => 'ro', coerce => coercer_for(foo => 'Some::Class'));
+
+Generate a function suitable for C<coerce> in a L<Moo> member. The
+function takes two positional arguments, respectively a I<name> and a
+I<class> and returns a function accepting a single input argument:
+
+   sub ($x) { ... }
+
+The input C<$x> is used as follows:
+
+=over
+
+=item *
+
+If it's blessed and supports a method named as I<name>, then it will be
+called and its output returned by the coercer. In other terms, in this
+case it's used as a factory object.
+
+=item *
+
+Otherwise, if it's blessed, it's assumed to be good as output and
+returned as-is.
+
+=item *
+
+Otherwise, if it's a sub reference then it's called and its output
+returned by the coercer. In other terms, in this case it's used as a
+factory function.
+
+=item *
+
+As the last resort, the I<class> is C<require>d and its C<new> method
+called, passing the input as the only parameter.
+
+=back
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<MojoX::Authentication>.
+
+
+=cut

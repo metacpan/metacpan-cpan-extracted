@@ -1,8 +1,101 @@
+Mon Jul 20 13:13:47 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.11]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.11.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .includes/perl.mk
+	- use compile.skip + PERLWC_SKIP to avoid syntax checking some files
+	* Makefile
+	- make check-syntax a dependency of $(TARBALL)
+	* gitignore: *.checked
+	* .gitignore: likewise
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	- lazy load Git::Raw to see if it is available
+	* lib/Git/ReleaseDiffs.pm.in: likewise
+	* recommends: +Git::Raw
+	* requires.skip: likewise
+	* cpanfile: -Git::Raw
+	* requires: likewise
+
+Sun Jul 19 15:50:26 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.10]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.10.md: new
+	* README.md: generated
+	* VERSION: bump
+	* deps.mk: new
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm.in: new
+	* .includes/perl.mk
+	- disconnect syntax checking from linting
+	- avoid rebuilding .pm files on make clean, distclean
+	* Makefile
+	- use SKIP_TESTS flag to skip test (useful when importing)
+	(dep.mk): new recipe to create intra project dependencies
+	* buildspec.yml.tmpl: '_' => '-'
+	* cpan-maker-bootstrapper.yml: + new command create-deps
+	* deps.mk: modified
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	(cmd_install)
+	- tee make output
+	- allow override for NO_ECHO, SYNTAX_CHECKING to args
+	- warn that we always run the scanner
+	- notify user how to preserve directory on errors
+	(tail_file): new, but not used, might come in handly some day
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm.in
+	(_show_models): _fmt_tokens is not exported
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in
+	(cmd_release_notes)
+	- print raw response on error
+	- warn user if max tokens hit
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in
+	(_cmd_review)
+	- default max tokens = 8192
+	- warn user if max tokens hit
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm.in
+	(_fmt_tokens): fix output when tokens <1M
+	* requires: +Module::ScanDeps::Static
+	* cpanfile: likewise
+
+Fri Jul 17 11:45:48 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.9]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.9.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .gitignore: +cmb_md5sums.txt
+	* .includes/git.mk
+	- $(NO_ECHO)
+	- NO_COMMIT=1 to prevent auto-commit
+	* .includes/update.mk
+	- $(NO_ECHO) to recipes
+	(update_available)
+	- new flags for controlling version and drift detection
+	* Makefile
+	- support NO_COLOR option
+	- +CMB_UPDATE_CHECK, CMB_VERSION_DRIFT flags to control	version/drift detection
+	(DEPS): +update-available to trigger version/drift detection
+	(TARBALL): make color the default for logging
+	(CLEANFILES): + cmb_md5sums.txt
+	* buildspec.yml
+	- +cmb_md5sums.txt
+	* buildspec.yml.tmpl: use hyphens instead of deprecated '_'
+	* gitignore: +buildspec.yml.current
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD updates
+	* project.mk
+	- add cmb_md5sums.txt to DEPS
+	- add same to CLEANFILES
+	(cmd_md5sums.txt): new recipe
+
 Tue Jul 14 16:57:28 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.8]:
 	* release-notes.md: updated
-	* release-notes/release-notes-2.0.7.md: new
+	* release-notes/release-notes-2.0.8.md: new
 	* .includes/git.mk: +NO_COMMIT
 	* README.md: generated
 	* VERSION: bump

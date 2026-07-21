@@ -4,6 +4,7 @@ commands:
   code-finding:       CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
   code-review:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
   create-config:      CPAN::Maker::Bootstrapper::Role::CreateConfig
+  create-deps:        CPAN::Maker::Bootstrapper::Role::CreateDeps
   default:            cmd_install
   install:            CPAN::Maker::Bootstrapper::Role::Installer
   import-scaffold:    CPAN::Maker::Bootstrapper::Role::ScaffoldImporter

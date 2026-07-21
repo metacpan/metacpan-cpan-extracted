@@ -5,7 +5,7 @@
 # Unicode::UCD::charscript()) to ISO 15924 four-letter codes.
 #
 # Regenerate with:
-#   perl tools/generate_script_names.pl > lib/PersonName/Format/ScriptNames.pl
+#   perl scripts/generate_script_names.pl > lib/PersonName/Format/ScriptNames.pl
 
 %PersonName::Format::PP::SCRIPT_NAME_TO_CODE = (
     'Adlam'                             => 'Adlm',

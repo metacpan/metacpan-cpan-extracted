@@ -36,7 +36,7 @@ use Role::Tiny::With;
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 __PACKAGE__->use_log4perl( level => 'info', color => $FALSE );
 
@@ -185,7 +185,7 @@ sub cmd_create_cpanfile {
     }
 
     if ( keys %{$req} == 2 ) {
-      print {$fh} sprintf qq{requires "%s", "%s";\n}, @{$req}{qw(module version)};
+      print {$fh} sprintf qq{requires "%s", "%s";\n}, $req->{module} // q{}, $req->{version} // q{};
     }
     else {
       my @extra;
@@ -194,14 +194,16 @@ sub cmd_create_cpanfile {
         push @extra, sprintf '  %s => "%s"', $_, $req->{$_};
       }
 
-      print {$fh} sprintf qq{requires "%s", "%s"}, @{$req}{qw(module version)};
+      print {$fh} sprintf qq{requires "%s", "%s";\n}, $req->{module} // q{}, $req->{version} // q{};
+
       print {$fh} sprintf ",\n%s", join ",\n", @extra;
       print {$fh} ";\n";
     }
   }
 
-  close $fh
-    if $self->get_outfile ne '-';
+  if ( $self->get_outfile ne '-' ) {
+    close $fh;
+  }
 
   return $SUCCESS;
 }

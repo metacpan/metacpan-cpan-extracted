@@ -1,0 +1,26 @@
+Changes
+ignore.txt
+include/flex.h
+lib/Layout/Flex.pm
+lib/Layout/Flex.xs
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-direction.t
+t/02-grow.t
+t/03-shrink.t
+t/04-justify.t
+t/05-align.t
+t/06-constraints.t
+t/07-wrap.t
+t/08-align-content.t
+t/09-gap.t
+t/10-margin.t
+t/11-content.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

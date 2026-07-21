@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::SAML2::Db;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo;
@@ -8,8 +8,9 @@ use JSON::PP qw< encode_json decode_json >;
 use constant DEFAULT_TABLE => 'logged_in';
 use namespace::clean;
 
+with 'MojoX::Authentication::Model::Role::MojoDbWrap';
+
 has table => (is => 'ro', default => DEFAULT_TABLE);
-has wmdb => (is => 'ro', required => 1);
 
 sub get ($self, $key) {
    my $res = $self->wmdb->db->select($self->table, '*', { k => $key });

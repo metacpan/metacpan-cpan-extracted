@@ -236,6 +236,19 @@ __END__
 
 PersonName::Format::PP - Pure-Perl backend for PersonName::Format
 
+=head1 SYNOPSIS
+
+    # Loaded automatically by PersonName::Format; not intended for direct use.
+    # Force the pure-Perl path at runtime:
+    BEGIN { $ENV{PERSONNAME_FORMAT_PUREPERL} = 1 }
+    use PersonName::Format;
+
+    # Or call the primitives directly in tests or tooling:
+    use PersonName::Format::PP;
+
+    my $grapheme = PersonName::Format::PP::_first_grapheme( $string );
+    my $script   = PersonName::Format::PP::_get_name_script( $surname, $given );
+
 =head1 DESCRIPTION
 
 This module provides the pure-Perl implementations of internal Unicode primitives used by L<PersonName::Format>. It is not part of the public API.

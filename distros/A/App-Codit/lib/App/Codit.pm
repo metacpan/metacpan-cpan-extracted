@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.20';
+$VERSION = '0.21';
 use Tk;
 use App::Codit::CodeTextManager;
 use Config;
@@ -120,7 +120,7 @@ If Codit launches without any icons do one or more of the following:
 
 =over 4
 
-=item Check if your icon theme is based on scalable vectors. Install Icons::LibRSVG if so. See also the Readme.md that comes with this distribution.
+=item Check if your icon theme is based on scalable vectors. Install Image::LibRSVG if so. See also the Readme.md that comes with this distribution.
 
 =item Locate where your icons are located on your system and use the -iconpath command line option to point there.
 

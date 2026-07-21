@@ -7,7 +7,7 @@
 
 =head1 NAME
 
-MojoX::Authentication::Model::Role::Local;
+MojoX::Authentication::Model::Role::Local
 
 
 =head1 SYNOPSIS

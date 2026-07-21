@@ -1,5 +1,34 @@
 Revision history for Email-Abuse-Investigator
 
+0.14	Mon Jul 20 08:32:19 EDT 2026
+	[Enhancements]
+	- %PROVIDER_ABUSE: added gappssmtp.com, translate.goog, and
+	  googleusercontent.com, all pointing to abuse@google.com.  Google
+	  Workspace SMTP-signed messages and Google Translate cloaker URLs now
+	  resolve to an actionable abuse contact without requiring a live WHOIS
+	  lookup (Route 5 / DKIM signer has no WHOIS fallback, so a table entry
+	  is the only path to a contact for gappssmtp.com domains).
+
+	- @REDIRECT_HOST_SUFFIXES: added .translate.goog.  Google Translate is
+	  commonly used by spammers to proxy phishing pages; URLs on this suffix
+	  now trigger the MEDIUM redirect_cloaker risk flag in risk_assessment().
+
+	[Bug fixes]
+	- t/submit_script.t subtest 5: strip pod2text overstrike-bold sequences
+	  (char + \x08 + char) from the captured --help output before matching
+	  /interactive/i.  On headless CPAN tester environments pod2text renders
+	  bold text using overstrike, turning "interactive" into
+	  "iinntteerraaccttiivvee" and causing a false failure.
+	  Fixes https://www.cpantesters.org/cpan/report/5be8844e-7f4e-11f1-bd91-d4036e8775ea
+
+	- unresolved_contacts(): URL hosts and contact domains that match an
+	  entry in %PROVIDER_ABUSE are now correctly excluded from the
+	  "no abuse contact determined" listing.  Previously only hosts whose
+	  IP WHOIS resolved an abuse address were marked as covered; a
+	  PROVIDER_ABUSE hit (e.g. translate.goog, gappssmtp.com) left the
+	  domain in the unresolved list even though abuse_contacts() had already
+	  found a contact for it.
+
 0.13	Mon Jul 13 20:56:19 EDT 2026
 	[Security]
 	- _raw_whois(): strip all C0/C1 ASCII control characters (\x00-\x1F,
@@ -18,7 +47,7 @@ Revision history for Email-Abuse-Investigator
 	  message.  This also makes the scripts safe under perl -T (taint mode).
 
 	[Bug fixes]
-	Fix RT#176347
+	- Fix RT#176347
 
 0.12	Sat Jun 27 13:17:32 EDT 2026
 	[Bug Fixes]

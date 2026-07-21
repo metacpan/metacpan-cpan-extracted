@@ -302,7 +302,7 @@ sub _cmd_review {
     text          => $text,
     annotations   => $review ? JSON->new->utf8->encode($review) : undef,
     context_files => \@context_files,
-    max_tokens    => $self->get_max_tokens // 4096,
+    max_tokens    => $self->get_max_tokens // 8192,
     input_tokens  => $input_tokens,
     input_cost    => $input_cost,
   );
@@ -319,6 +319,10 @@ sub _cmd_review {
   if ( !$content->text ) {
     warn "WARNING: LLM did not return any text from request.\n";
     return;
+  }
+
+  if ( $llm_rsp->was_cutoff ) {
+    warn "WARNING: response was truncated (hit max_tokens). Increase --max-tokens for a complete response.\n";
   }
 
   my $name = basename($file);

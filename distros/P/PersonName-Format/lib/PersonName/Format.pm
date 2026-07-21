@@ -1,15 +1,16 @@
 ##----------------------------------------------------------------------------
 ## Person Name Format - ~/lib/PersonName/Format.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/07/16
-## Modified 2026/07/17
+## Modified 2026/07/21
 ## All rights reserved
 ## 
+## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package PersonName::Format;
 BEGIN
 {
@@ -27,7 +28,7 @@ BEGIN
     use PersonName::Format::PP ();
     use PersonName::Format::SimpleName;
     use Scalar::Util ();
-    our( $VERSION ) = 'v0.1.0';
+    our( $VERSION ) = 'v0.1.1';
     our( $IsPurePerl );
 
     unless( defined( $IsPurePerl ) )
@@ -1025,7 +1026,7 @@ C<PersonName::Format> formats structured personal names using CLDR person-name p
 
 The formatter derives the name script by inspecting the surname and then the given name, derives or adjusts the name locale using likely-subtag data, compares the name and formatting scripts, and switches to an effective formatting locale when required by UTS #35 Part 8.
 
-The implementation is pure Perl. Script detection is intentionally isolated so it can later be replaced by an optional XS backend without changing the public API.
+Script detection and grapheme extraction have an optional XS backend loaded automatically when available; the pure-Perl path is used as fallback.
 
 =head1 CONSTRUCTOR
 
@@ -1072,6 +1073,8 @@ C<referring>, C<addressing>, or C<monogram>. Defaults to C<referring>.
 
 Returns a L<PersonName::Format::Compiled> object with the name identity and resolved CLDR context frozen. C<nameScript> is required. C<nameLocale> and C<preferredOrder> are optional but, when supplied, are enforced for every name formatted by the compiled object.
 
+=for Pod::Coverage data
+
 =head2 format
 
     my $string = $formatter->format( $name_object );
@@ -1095,6 +1098,8 @@ The name locale may be omitted. When present, its language and region are retain
 =head2 format_to_parts
 
     my $parts = $formatter->format_to_parts( \%fields );
+    # or
+    my $parts = $formatter->formatToParts( \%fields );
 
 Returns an array reference of hash references describing the generated parts.
 Literal spacing replacement is applied only to literal parts.
@@ -1119,6 +1124,12 @@ Present on non-literal parts. The base CLDR field name such as C<given> or C<sur
 Present on non-literal parts when modifiers were resolved. An array reference of modifier names.
 
 =back
+
+=head2 formatToParts
+
+Alias for L</format_to_parts>
+
+=for Pod::Coverage locale
 
 =head2 resolved_options
 

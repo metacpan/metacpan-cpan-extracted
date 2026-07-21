@@ -9,7 +9,7 @@ App::Codit::Plugins::Console - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
@@ -83,6 +83,7 @@ sub new {
 		-linkreg => qr/[^\s]+\sline\s\d+/,
 	)->pack(@pad, -expand => 1, -fill => 'both');
 	$text->bind('<Button-3>', [$self, 'popMenu']);
+	$text->bind('<Control-Button-1>', [$text, 'focus']);
 	$self->{TXT} = $text;
 	$workdir = $text->cget('-workdir');
 	my $sb = $self->sidebars;

@@ -52,7 +52,8 @@ if (defined $app) {
 #	$app->DynaMouseWheelBind('Tk::ListBrowser::LBCanvas');
 
 	$ib = $app->ListBrowser(
-		-arrange => 'hlist',
+#		-arrange => 'hlist',
+		-arrange => 'tree',
 		-itemtype => 'text',
 		-textanchor => 'w',
 		-textside => 'right',

@@ -4,6 +4,7 @@ examples/01_basics/hello_world.pl
 examples/01_basics/multi_page.pl
 examples/01_basics/styled_text.pl
 examples/02_layout/columns.pl
+examples/02_layout/flex_layout.pl
 examples/02_layout/header_footer_ctx.pl
 examples/02_layout/layout_rows_and_cells.pl
 examples/02_layout/overflow_and_paging.pl
@@ -89,6 +90,7 @@ include/pdfmake_watermark.h
 include/pdfmake_writer.h
 include/pdfmake_x509.h
 include/xop_compat.h
+Install/Files.pm
 lib/PDF/Make.pm
 lib/PDF/Make/Action.pm
 lib/PDF/Make/Arena.pm

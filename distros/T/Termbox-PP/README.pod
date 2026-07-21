@@ -1,0 +1,83 @@
+=head1 Termbox::PP
+
+Termbox::PP is a minimalistic terminal UI library in pure Perl
+
+=head2 Description
+
+B<Termbox::PP> provides a small and consistent API for building
+text-based user interfaces in Perl.
+
+It focuses on the common subset of functionality shared across
+modern terminal emulators, offering a simple and portable abstraction.
+
+=head2 Features
+
+=over
+
+=item * Portable abstraction
+
+Provides a minimal set of functions that work consistently across
+different terminal environments.
+
+=item * Small and simple API
+
+The limited API surface makes the module easy to learn, test, and maintain.
+
+=item * Pure Perl implementation
+
+The module is implemented entirely in Perl and does not require XS or any 
+external C libraries. On Unix platforms it only depends on core modules 
+available since Perl L<v5.10|https://metacpan.org/release/DAPM/perl-5.10.1>. 
+
+On Windows additional C<Win32::*> modules may be required for console and file 
+handling; these are typically available with Strawberry Perl.
+
+=back
+
+=head2 Warning
+
+This port of termbox2 is still quite new and still has to prove itself in 
+production use and possibly be improved.
+
+=head2 Install
+
+To install the B<Termbox::PP> module type the following:
+
+  cpan Termbox::PP
+
+Manual install:
+
+  perl Makefile.PL
+  make
+  make install
+
+=head2 Examples
+
+For examples of what you can do, see the various examples in the C<example/> 
+directory. You can try them out via:
+  
+  perl example/hello_world.pl
+
+=head1 Credits
+
+B<Termbox::PP> is a port of L<termbox2|https://github.com/termbox/termbox2>.
+
+=head2 Author
+
+=over
+
+=item * 2024-2026 J. Schneider E<lt>L<http://github.com/brickpool>E<gt>
+
+=back
+
+=head2 Copyright and Licence
+
+=over
+
+=item * Copyright (c) 2010-2026 by termbox developers
+
+=item * MIT License
+
+=back
+
+=cut

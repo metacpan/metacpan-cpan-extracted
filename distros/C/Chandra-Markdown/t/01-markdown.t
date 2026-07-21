@@ -531,6 +531,92 @@ sub mock_renderer {
     like($widget, qr/Find something/, 'search_widget uses custom placeholder');
 }
 
+# ---------------------------------------------------------------
+# highlight attribute
+# ---------------------------------------------------------------
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app);
+    is($md->highlight, 1, 'highlight defaults to 1');
+}
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app, highlight => 0);
+    is($md->highlight, 0, 'highlight => 0 stored');
+}
+
+# ---------------------------------------------------------------
+# highlight rendering — flag on (default)
+# ---------------------------------------------------------------
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app, css => 0);
+    my $out = $md->render("```perl\nmy \$x = 1;\n```\n");
+    like($out, qr{<span class="esh-k">my</span>},   'highlight on: perl keyword my');
+    like($out, qr{<span class="esh-v">\$x</span>},  'highlight on: perl variable $x');
+    like($out, qr{<span class="esh-n">1</span>},     'highlight on: number 1');
+}
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app, css => 0);
+    my $out = $md->render("```c\nint main(void) { return 0; }\n```\n");
+    like($out, qr{<span class="esh-k">int</span>},    'highlight on: c keyword int');
+    like($out, qr{<span class="esh-k">return</span>}, 'highlight on: c keyword return');
+}
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app, css => 0);
+    my $out = $md->render("```js\nconst x = null;\n```\n");
+    like($out, qr{<span class="esh-k">const</span>}, 'highlight on: js keyword const');
+    like($out, qr{<span class="esh-k">null</span>},  'highlight on: js keyword null');
+}
+
+# ---------------------------------------------------------------
+# highlight rendering — flag off
+# ---------------------------------------------------------------
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app, css => 0, highlight => 0);
+    my $out = $md->render("```perl\nmy \$x = 1;\n```\n");
+    unlike($out, qr{<span},          'highlight off: no spans emitted');
+    like($out,   qr{my \$x = 1;},    'highlight off: content still present');
+}
+
+# ---------------------------------------------------------------
+# fenced block with no language: plain passthrough regardless of flag
+# ---------------------------------------------------------------
+
+{
+    my $app = mock_app();
+    my $md  = Chandra::Markdown->new(app => $app, css => 0);
+    my $out = $md->render("```\nplain code\n```\n");
+    unlike($out, qr{<span},           'no lang tag: no spans even with highlight on');
+    like($out,   qr{plain code},      'no lang tag: content preserved');
+}
+
+# ---------------------------------------------------------------
+# highlight CSS is injected
+# ---------------------------------------------------------------
+
+{
+    my $app = mock_app();
+    Chandra::Markdown->new(app => $app, css => 1);
+    my $css = $app->{_css}[0];
+    like($css, qr/\.esh-k/,  'injected CSS contains .esh-k rule');
+    like($css, qr/\.esh-s/,  'injected CSS contains .esh-s rule');
+    like($css, qr/\.esh-c/,  'injected CSS contains .esh-c rule');
+    like($css, qr/\.esh-n/,  'injected CSS contains .esh-n rule');
+    like($css, qr/\.esh-v/,  'injected CSS contains .esh-v rule');
+    like($css, qr/\.esh-g/,  'injected CSS contains .esh-g rule');
+    like($css, qr/--esh-keyword/, 'CSS uses CSS custom properties for theming');
+}
+
 done_testing;
 
 sub _write_file {

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -486,14 +486,14 @@ sub Populate {
 	#horizontal scroll for headers
 	my $xscroll = $canv->Subwidget('xscrollbar');
 	$self->Advertise('XScrollbar', $xscroll);
-	my $call = $xscroll->cget('-command');
-	$xscroll->configure(
-		-command => sub {
+	if (defined $xscroll) {
+		my $call = $xscroll->cget('-command');	
+		$xscroll->configure(-command => sub {
 			$call->Call(@_);
 			$self->headerPlace;
-		}
-	);
-	
+			$self->xScrollCheck(@_);
+		});
+	}
 	#keep track of verticle scroll
 	my $yscroll = $canv->Subwidget('yscrollbar');
 	$self->Advertise('YScrollbar', $yscroll);
@@ -519,6 +519,7 @@ sub Populate {
 	$self->{COLUMNS} = [];
 	$self->{HANDLER} = undef;
 	$self->{POOL} = new Tk::ListBrowser::HashList;
+	$self->{SCROLLREGION} = [0,0];
 	$self->{SORTACTIVE} = '';
 	$self->geoSave(0,0);
 	$self->listWidth(100);
@@ -1524,8 +1525,9 @@ sub filterEscape {
 	my $e = $self->Subwidget('FilterEntry');
 	$e->reset;
 #	$e->filter;
-	$self->filterFlip;
+	$self->filterFlip unless $self->cget('-filterforce');
 	$self->filterRefresh;
+	$self->CanvasFocus;
 }
 
 sub filterHide {
@@ -1600,12 +1602,15 @@ sub filterShow {
 		unless (defined $cf) {
 			my @menu = ();
 			my $filteron = $self->cget('-filteron');
+			$filteron = $self->headerCget('', '-text') if $self->headerAvailable and $filteron eq 'main';
 			$cf = $f->Frame;
 			$cf->Label(-text => 'On:')->pack(-side => 'left');
 			my $fl;
 			my $fb = $cf->Button(
 				-command => sub {
-					my @list = ('main', $self->columnList);
+					my $name = 'main';
+					$name = $self->headerCget('', '-text') if $self->headerAvailable;
+					my @list = ($name, $self->columnList);
 					$fl->configure(-values => \@list);
 					$fl->popUp;
 				},
@@ -1618,6 +1623,9 @@ sub filterShow {
 				-confine => 1,
 				-selectcall => sub {
 					$filteron = shift;
+					my $name = 'main';
+					$name = $self->headerCget('', '-text') if $self->headerAvailable;
+					$filteron = 'main' if $filteron eq $name;
 					$self->configure(-filteron => $filteron)
 				},
 				-widget => $fb,
@@ -2594,6 +2602,14 @@ sub itemRemove {
 	$col->itemRemove($entry)
 }
 
+sub lastScrollRegion {
+	my $self = shift;
+	$self->{SCROLLREGION} = [@_] if @_;
+	my $r = $self->{SCROLLREGION};
+	return @$r;
+}
+
+
 sub KeyArrowNavig {
 	my ($self, $dcol, $drow) = @_;
 	return undef if $self->anchorInitialize;
@@ -2958,16 +2974,46 @@ sub OnConfigure {
 	my ($sx, $sy) = $self->geoSave;
 	my ($x, $y) = $self->canvasSize;
 	return if ($sx eq $x) and ($sy eq $y);
-
 	$self->geoSave($x, $y);
 
+	if (my $id = $self->{'timer_id'}) {
+		$self->afterCancel($id);
+		my $nid = $self->after(50, ['OnConfigureTimer', $self]);
+		$self->{'timer_id'} = $nid;
+	}
+
+	unless (defined $timer) {
+		$self->update;
+		my $id = $self->after(100, ['OnConfigureTimer', $self]);
+		$self->{'timer_id'} = $id;
+		return
+	}
+
 	#redraw headers in list mode
+	my @sel;
 	if ($self->listMode) {
+		my @col = $self->columnList;
+		if (@col) {
+			@sel = $self->selectionGet;
+			$self->selectionClear;
+			$self->setScrollRegion;
+		}
 		$self->headerPlace;
 	}
 
 	$self->refreshPurge;
+	for (@sel) {
+		$self->selectionSet($_)
+	}
 }
+
+sub OnConfigureTimer {
+	my $self = shift;
+	delete $self->{'timer_id'};
+	$self->OnConfigure(1);
+}
+
+
 
 =item B<open>I<($name)>
 
@@ -3090,6 +3136,13 @@ sub refresh {
 		$self->cellSize;
 	}
 
+	if (($self->listMode) and (! $nocellsize)) {
+		my @columns = $self->columnList;
+		for (@columns) {
+			my $col = $self->columnGet($_)->cellSize;
+		}
+	}
+
 	my $anch = $self->anchorGet;
 	$self->refreshSaveView;
 	
@@ -3112,6 +3165,25 @@ sub refresh {
 
 	$self->refreshRestoreView;
 	$self->anchorSet($anch) if defined $anch;
+
+	if ($self->listMode) {
+#		@columns = reverse @columns;
+#		my $c = $self->Subwidget('Canvas');
+#		while (@columns) {
+#			my $last = shift @columns;
+#			my $tag;
+#			my $prev = $columns[0];
+#			if (defined $prev) {
+#				my $col = $self->columnGet($prev);
+#				$tag = $col->crect;
+#			} else {
+#				$tag = 'main'
+#			}
+#			my $rlast = $self->columnGet($last)->crect;
+#			$c->lower($tag, $rlast);
+#		}
+		$self->headerPlace;
+	}
 }
 
 sub refreshCheck {
@@ -3276,7 +3348,6 @@ sub refreshView {
 	my $v = $self->{REFRESHVIEW};
 	return @$v
 }
-
 
 =item B<see>I<($name)>
 
@@ -3461,10 +3532,12 @@ sub setScrollRegion {
 	$y = 0 unless defined $y;
 	$x = $x + $self->cget('-marginright');
 	$y = $y + $self->cget('-marginbottom');
+	$self->lastScrollRegion($x, $y);
 
 	#preventing the mouse wheel from scrolling the list when there are no scrollbars.
 	my ($sx, $sy) = $self->canvasSize;
 	$sy ++;
+#	$x = 20 if $x < $sx;
 	$y = $sy if $y < $sy;
 
 	$self->configure(-scrollregion => [0, 0, $x, $y]);
@@ -3641,6 +3714,17 @@ sub wraplength {
 	return $self->{WRAPLENGTH}
 }
 
+sub xScrollCheck {
+	my ($self, $fr1, $fr2) = @_;
+	if ($self->listMode) {
+		my @sel = $self->selectionGet;
+		for (@sel) {
+			$self->refreshSingle($_)
+		}
+		$self->anchorRefresh;
+	}
+}
+
 =back
 
 =head1 USING THE KEYBOARD
@@ -3682,6 +3766,12 @@ Hans Jeuken (hanje at cpan dot org)
 =head1 BUGS AND CAVEATS
 
 Setting a custom font greatly decreases the speed of refresh.
+
+This list module is suitable for small to medium size lists, like a couple of hundreds of entries.
+If you have a large list, adding and deleting entries will take longer. It has to rebuild it's
+index everytime for the remainder of the list. This affects adding and deleting at the beginning
+of the list more than near the end of the list. The plus size of this is when the index has been built,
+looking up entries is blazingly fast, also on large lists.
 
 If you find any bugs, please report them here: L<https://github.com/haje61/Tk-ListBrowser/issues>.
 

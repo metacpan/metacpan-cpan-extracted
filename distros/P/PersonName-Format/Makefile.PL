@@ -69,6 +69,8 @@ my %WriteMakefileArgs = (
         'lib'               => 0,
         'open'              => 0,
         'utf8'              => 0,
+        'File::Spec'        => 0,
+        'File::Temp'        => 0,
         'Test::More'        => '1.302120',
         'Test::Pod'         => '1.52',
         # On Perl 5.14+, JSON::PP is in core. We still auto-detect faster backends

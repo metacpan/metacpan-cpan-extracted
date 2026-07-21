@@ -615,7 +615,7 @@ sub _parse_implicit {
     # remove trailing comments and whitespace
     $value =~ s/^#.*$//;
     $value =~ s/\s+#.*$//;
-    $value =~ s/\s*$//;
+    $value =~ s/\s+$//;
     return $value if $value eq '';
     return undef if $value =~ /^~$/;
     return $value

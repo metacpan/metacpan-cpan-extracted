@@ -50,6 +50,8 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
             "Test::More" : "1.302120",
             "Test::Pod" : "1.52",
             "lib" : "0",
@@ -68,6 +70,6 @@
          "web" : "https://gitlab.com/deguest/PersonName-Format"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

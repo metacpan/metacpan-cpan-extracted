@@ -1,3 +1,12 @@
+Mon Jul 20 06:18:39 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.2]:
+	* .includes/perl.mk: updated by CPAN::Maker::Bootstrapper
+	* requires: +Pod::Find
+	* cpanfile: likewise
+	* VERSION: bump
+         * README.md: generated
+
 Sun Jul 19 09:17:46 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.8.1]:

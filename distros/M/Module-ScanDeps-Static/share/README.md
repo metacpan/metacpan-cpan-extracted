@@ -428,7 +428,7 @@ false.
 
 # VERSION
 
-This documentation refers to version 1.8.1
+This documentation refers to version 1.8.2
 
 # AUTHOR
 

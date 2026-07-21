@@ -4,6 +4,8 @@ author:
   - 'Jacques Deguest (jack@deguest.jp)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   Test::More: '1.302120'
   Test::Pod: '1.52'
   lib: '0'
@@ -40,5 +42,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/deguest/PersonName-Format/issues
   repository: https://gitlab.com/deguest/PersonName-Format
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

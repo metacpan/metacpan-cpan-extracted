@@ -15,7 +15,7 @@ use Scalar::Util qw(reftype);
 
 use Role::Tiny;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 ########################################################################
 sub fetch_file_list {

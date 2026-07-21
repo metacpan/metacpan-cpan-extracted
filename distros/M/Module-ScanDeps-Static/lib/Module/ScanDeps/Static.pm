@@ -62,7 +62,7 @@ our $HAVE_VERSION = eval {
   return $TRUE;
 };
 
-our $VERSION = '1.8.1';
+our $VERSION = '1.8.2';
 
 caller or __PACKAGE__->main();
 
@@ -1250,7 +1250,7 @@ false.
 
 =head1 VERSION
 
-This documentation refers to version 1.8.1
+This documentation refers to version 1.8.2
 
 =head1 AUTHOR
 

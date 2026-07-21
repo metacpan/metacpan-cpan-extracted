@@ -6,6 +6,7 @@ use warnings;
 use open ':std', ':encoding(UTF-8)';
 
 use CLI::Simple::Constants qw(:booleans);
+use CPAN::Maker::Bootstrapper::Role::LLM::Utils;
 
 use Role::Tiny;
 
@@ -50,8 +51,8 @@ sub _show_models {
     my $caps = $m->{capabilities} // {};
 
     my $display  = $m->{display_name} // q{-};
-    my $context  = _fmt_tokens( $m->{max_input_tokens} );
-    my $output   = _fmt_tokens( $m->{max_tokens} );
+    my $context  = CPAN::Maker::Bootstrapper::Role::LLM::Utils::_fmt_tokens( $m->{max_input_tokens} );
+    my $output   = CPAN::Maker::Bootstrapper::Role::LLM::Utils::_fmt_tokens( $m->{max_tokens} );
     my $released = ( $m->{created_at} // q{} ) =~ s/T.+//xsmr;
 
     my $cap_str = join q{ }, grep {defined} ( $caps->{thinking}{supported} ? 'think' : undef ),

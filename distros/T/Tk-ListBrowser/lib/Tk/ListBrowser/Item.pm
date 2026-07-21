@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.14;
+$VERSION = 0.15;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -46,7 +46,7 @@ and I<-text> options.
 sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
-	$self->owner($self->listbrowser) unless defined $self->owner;
+	$self->drawrect(1) unless $self->configSet('-drawrect');
 	$self->rectX(0);
 	$self->rectY(0);
 	return $self
@@ -61,7 +61,7 @@ sub cimage {
 sub clear {
 	my $self = shift;
 	my $c = $self->Subwidget('Canvas');
-	for ($self->cimage, $self->ctext, $self->cselectr, $self->cselectr) {
+	for ($self->cimage, $self->ctext) {
 		$c->delete($_) if defined $_;
 	}
 
@@ -69,7 +69,6 @@ sub clear {
 	$self->ctext(undef);
 	$self->row(undef);
 	$self->column(undef);
-	$self->cselectr(undef);
 	$self->rectX(0);
 	$self->rectY(0);
 	$self->SUPER::clear;
@@ -79,12 +78,6 @@ sub column {
 	my $self = shift;
 	$self->{COLUMN} = shift if @_;
 	return $self->{COLUMN}
-}
-
-sub cselectr {
-	my $self = shift;
-	$self->{CSELECTR} = shift if @_;
-	return $self->{CSELECTR}
 }
 
 sub ctext {
@@ -117,16 +110,6 @@ sub deleteRect {
 	my $c = $self->Subwidget('Canvas');
 	$c->delete($r);
 	$self->crect(undef);
-}
-
-sub deleteSelect {
-	my $self = shift;
-	$self->deleteRect;
-	my $c = $self->Subwidget('Canvas');
-
-	my $r = $self->cselectr;
-	$c->delete($r) if defined $r;
-	$self->cselectr(undef);
 }
 
 sub deleteText {
@@ -249,8 +232,8 @@ sub draw {
 	my $entry = $self->get($n);
 	my $e = ref $entry;
 	my $sel = $entry->selected and $self->ismapped;
+	$self->setRegion;
 	$self->drawRect($x, $y) unless $sel;
-	$self->drawSelect($x, $y) if $sel;
 	$self->drawImage;
 	$self->drawText;
 
@@ -281,87 +264,18 @@ sub drawImage {
 sub drawRect {
 	my $self = shift;
 	$self->deleteRect;
+	return unless $self->drawrect;
 	my $owner = $self->owner;
 	my $c = $self->Subwidget('Canvas');
 
-	my ($x, $y, $dx, $dy) = $self->getRegion;
+	my ($x, $y, $dx, $dy) = $self->region;
 	my $rtag = $c->createRectangle($x, $y, $dx, $dy,
 		-fill => $self->background,
 		-outline => $self->background,
 		-tags => ['rect'],
 	);
-
-	$self->setRegion($x, $y, $dx, $dy);
 #	$self->anchorRaise($rtag);
 	$self->crect($rtag);
-}
-
-sub drawSelect {
-	my ($self) = @_;
-	my $left = 1;
-	my $right = 1;
-	$self->deleteSelect;
-	
-	my $owner = $self->owner;
-	my $lb = $self->listbrowser;
-	return unless $self->get($self->name)->selected ;
-	my $c = $lb->Subwidget('Canvas');
-	my $si = Tk::ListBrowser::SelectXPM->new($lb);
-
-	my @coords = $self->getRegion;
-	my ($x, $y) = @coords;
-	$self->setRegion(@coords);
-
-	my $flagl = 0;
-	my $flagh = 0;
-	if ($self->listMode) {
-		$left = 0;
-		$right = 0;
-		my @col = $self->columnList;
-		if ($owner eq $lb) {
-			if ($self->hierarchy) {
-				$x = $self->cget('-marginleft');
-				$coords[0] = $x;
-			}
-			$left = 1;
-			unless (@col) {
-				$flagl = 1 if $owner eq $lb
-			}
-		} else {
-			my $last = pop @col;
-			$right = 1 if (defined $last) and ($last eq $owner->name);
-		}
-	}
-	my $pixmap = $si->selectimage(@coords, $left, $right);
-	my $image = $c->createImage($x, $y,
-		-image => $pixmap,
-		-anchor => 'nw',
-		-tags => ['sel', 'rect', $self->name],
-	);
-	$self->crect($image);
-	my $srimg;
-	if ($flagl) { #there are no columns, we draw a selectXPM till the end of the window.
-		my $rx1 = $coords[2];
-		my ($rx2) = $lb->canvasSize;
-		my $ry1 = $coords[1];
-		my $ry2 = $coords[3];
-		$rx2 = 1000 unless $lb->ismapped; #a little hack to prevent segfault exit when unmapped.
-		if ($rx2 > $rx1) {
-			my $srpix = $si->selectimage($rx1, $ry1, $rx2, $ry2, 0, 1);
-			$srimg = $c->createImage($rx1, $ry1,
-				-image => $srpix,
-				-anchor => 'nw',
-				-tags => ['sel', $self->name],
-			);
-			$self->cselectr($srimg);
-		}
-	}
-	my @guides = $c->find('withtag', 'guides');
-	$c->raise('guides', 'sel') if @guides;
-	$c->raise('indicator', 'sel');
-	$c->raise('indicator', 'guides') if @guides;
-
-#	$self->anchorRaise($image);
 }
 
 sub drawText {
@@ -390,29 +304,35 @@ sub drawText {
 #	$self->anchorRaise($ttag);
 	$self->ctext($ttag);
 
-	if ($self->listMode) {
-		my $owner = $self->owner;
-		my @cl = $self->columnList;
-		if ($owner eq $lb) {
-			for (@cl) {
-				my $col = $self->columnGet($_);
-				my $colrect = $col->crect;
-			}
-		}
-	}
+#	if ($self->listMode) {
+#		my $owner = $self->owner;
+#		my @cl = $self->columnList;
+#		if ($owner eq $lb) {
+#			for (@cl) {
+#				my $col = $self->columnGet($_);
+#				my $colrect = $col->crect;
+#			}
+#		}
+#	}
 }
 
 sub getRegion {
 	my $self = shift;
 	my $owner = $self->owner;
+	my $lb = $self->listbrowser;
 	my $x1 = $self->rectX;
 	my $y1 = $self->rectY;
 	my $x2 = $x1 + $owner->cget('-cellwidth');
 	my $y2 = $y1 + $owner->cget('-cellheight');
-	if (($self->listMode) and ($owner eq $self->listbrowser)) {
+	if (($self->listMode) and ($owner eq $lb)) {
 		if ($self->hierarchy){
-			$x1 = $self->cget('-marginleft');
-			$x2 = $x1 + $owner->cget('-cellwidth');
+			$x2 = $x1 + $self->cget('-cellwidth');
+			my $indent = $lb->cget('-indent');
+			my $arrange = $lb->cget('-arrange');
+			if (($arrange eq 'HList') or ($arrange eq 'Tree')) {
+				$x2 = $x2 + ($indent * $lb->handler->calculateIndent($self));
+				$x2 = $x2 + $indent if $arrange eq 'Tree';
+			}
 		}
 		my @col = $self->columnList;
 		for (@col) {
@@ -427,7 +347,7 @@ sub image {
 	my $self = shift;
 	if (@_) {
 		$self->{IMAGE} = shift;
-		$self->drawImage if defined $self->crect;
+		$self->drawImage if $self->ismapped;
 	}
 	return $self->{IMAGE}
 }
@@ -442,16 +362,6 @@ sub imageY {
 	my $self = shift;
 	$self->{IMAGEY} = shift if @_;
 	return $self->{IMAGEY}
-}
-
-sub inregion {
-	my ($self, $x, $y) = @_;
-	my ($cx, $cy, $cdx, $cdy) = $self->region;
-	return '' unless $x >= $cx;
-	return '' unless $x <= $cdx;
-	return '' unless $y >= $cy;
-	return '' unless $y <= $cdy;
-	return 1
 }
 
 sub isentry {
@@ -499,12 +409,16 @@ sub requestedSize {
 		$textheight = $self->textHeight($text);
 		$textwidth = $self->textWidth($text);
 	}
-	my $pad = 6;
+	my $lb = $self->listbrowser;
+#	my $padx = $lb->cget('-itempadx');
+#	my $pady = $lb->cget('-itempady');
+	my $padx = 6;
+	my $pady = 6;
 #	$pad = 6 if $itemtype ne 'imagetext';
-	$imageheight = $imageheight + $pad if $imageheight > 0;
-	$imagewidth = $imagewidth + $pad if $imagewidth > 0;
-	$textheight = $textheight + $pad if $textheight > 0;
-	$textwidth = $textwidth + $pad if $textwidth > 0;
+	$imageheight = $imageheight + $pady if $imageheight > 0;
+	$imagewidth = $imagewidth + $padx if $imagewidth > 0;
+	$textheight = $textheight + $pady if $textheight > 0;
+	$textwidth = $textwidth + $padx if $textwidth > 0;
 	my $itemtype = $self->cget('-itemtype');
 
 	if ($itemtype eq 'image') {
@@ -543,20 +457,8 @@ sub selected {
 }
 
 sub setRegion {
-	my ($self, $x, $y, $dx, $dy) = @_;
-	my $owner = $self->owner;
-	my $lb = $self->listbrowser;
-	if (($owner eq $lb) and ($self->listMode)) {
-		my @columns = $self->columnList;
-		for (@columns) {
-			my $col = $self->columnGet($_);
-			$dx = $dx + $col->cget('-cellwidth') + 1;
-		}
-		unless (@columns) {
-			my ($cw) = $self->canvasSize;
-			$dx = $cw if $lb->ismapped;
-		}
-	}
+	my $self = shift;
+	my ($x, $y, $dx, $dy) = $self->getRegion;
 	$self->region($x, $y, $dx, $dy);
 }
 
@@ -577,7 +479,7 @@ sub text {
 	if (@_) {
 		my $t = shift;
 		$self->{TEXT} = $t;
-		if ((defined $t) and (defined $self->crect)) {
+		if ((defined $t) and ($self->ismapped)) {
 			$self->textFormatted($self->textFormat($t));
 			$self->drawText
 		}

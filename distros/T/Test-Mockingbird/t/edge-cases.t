@@ -26,6 +26,9 @@ Readonly my $ERR_TT_CODE     => 'with_frozen_time() requires a coderef';
 Readonly my $ERR_TT_TS       => 'with_frozen_time() requires a timestamp';
 Readonly my $ERR_TT_INVALID  => 'Invalid timestamp format for TimeTravel';
 Readonly my $ERR_PROTO_NAME  => 'Invalid fully-qualified name';
+Readonly my $ERR_BEFORE      => 'Package, method and hook are required for before()';
+Readonly my $ERR_AFTER       => 'Package, method and hook are required for after()';
+Readonly my $ERR_AROUND      => 'Package, method and hook are required for around()';
 
 Readonly my $TS_2025_JAN1    => '2025-01-01T00:00:00Z';
 Readonly my $TS_2025_JUN1    => '2025-06-01T00:00:00Z';
@@ -1060,6 +1063,127 @@ subtest 'Async: async_spy() missing target croaks' => sub {
 		qr/Package and method are required for async_spy/,
 		'empty target croaks';
 	restore_all();
+};
+
+# ===========================================================================
+# before() / after() / around() -- hostile and boundary cases
+# ===========================================================================
+
+subtest 'before(): hook that throws prevents original from being called' => sub {
+	{ package EC::BeforeDie; our $orig_called = 0; sub fn { $orig_called++ } }
+	before 'EC::BeforeDie::fn' => sub { die "hook exploded\n" };
+
+	throws_ok { EC::BeforeDie::fn() } qr/hook exploded/,
+		'before hook exception propagates';
+	is $EC::BeforeDie::orig_called, 0,
+		'original not called when before hook dies';
+	restore_all();
+};
+
+subtest 'after(): hook that throws loses the original return value' => sub {
+	# The original runs and its return is captured, but the after hook's
+	# exception propagates before the caller receives the value.
+	{ package EC::AfterDie; sub fn { 'captured_but_lost' } }
+	after 'EC::AfterDie::fn' => sub { die "after hook exploded\n" };
+
+	my $result;
+	throws_ok { $result = EC::AfterDie::fn() } qr/after hook exploded/,
+		'after hook exception propagates';
+	ok !defined $result, 'return value never reached caller';
+	restore_all();
+};
+
+subtest 'before(): on a method that does not yet exist (never-defined)' => sub {
+	# \&{name} for a non-existent function captures a GV-slot reference, not a
+	# stable snapshot.  After mock() installs the before-wrapper into that slot,
+	# $orig points at the wrapper itself -- calling through would infinite-loop.
+	# Only test that the layer is installed; do NOT call the method.
+	before 'EC::Ghost::phantom' => sub { };
+
+	my $d = diagnose_mocks();
+	ok exists $d->{'EC::Ghost::phantom'}, 'before layer installed on never-defined method';
+	is $d->{'EC::Ghost::phantom'}{layers}[0]{type}, 'before', 'layer type is before';
+	restore_all();
+};
+
+subtest 'around(): hook that calls $orig multiple times' => sub {
+	{ package EC::AroundMulti; our $calls = 0; sub fn { $calls++; 'x' } }
+	around 'EC::AroundMulti::fn' => sub {
+		my ($orig) = @_;
+		$orig->(); $orig->(); $orig->();
+		return 'done';
+	};
+
+	my $r = EC::AroundMulti::fn();
+	is $r, 'done', 'around return value used';
+	is $EC::AroundMulti::calls, 3, 'original called three times';
+	restore_all();
+};
+
+subtest 'around(): hook that never calls $orig' => sub {
+	{ package EC::AroundNoOrig; our $called = 0; sub fn { $called++ } }
+	around 'EC::AroundNoOrig::fn' => sub { 'bypass' };
+
+	my $r = EC::AroundNoOrig::fn();
+	is $r, 'bypass', 'around return value returned';
+	is $EC::AroundNoOrig::called, 0, 'original never invoked';
+	restore_all();
+};
+
+subtest 'before() + after() + around() stacked on same method all interoperate' => sub {
+	# Install order: before, after, around.  around is outermost (LIFO).
+	# LIFO means: around wraps after, after wraps before, before wraps orig.
+	# Execution: around-pre → (after called) → (before called) → before-hook
+	#            → orig → after-hook → (returns to around) → around-post
+	{ package EC::Mixed; sub fn { 'orig' } }
+	my @order;
+	before 'EC::Mixed::fn' => sub { push @order, 'before' };
+	after  'EC::Mixed::fn' => sub { push @order, 'after'  };
+	around 'EC::Mixed::fn' => sub {
+		my ($orig, @args) = @_;
+		push @order, 'around-pre';
+		my $r = $orig->(@args);
+		push @order, 'around-post';
+		return $r;
+	};
+
+	my $r = EC::Mixed::fn();
+
+	is $r, 'orig', 'original return flows through all layers';
+	is_deeply \@order,
+		['around-pre', 'before', 'after', 'around-post'],
+		'execution order: around-pre → before-hook → after-hook → around-post';
+	restore_all();
+};
+
+subtest 'unmock() removes before/after/around layers one at a time' => sub {
+	{ package EC::UnmockBAA; sub fn { 0 } }
+	before 'EC::UnmockBAA::fn' => sub { };
+	after  'EC::UnmockBAA::fn' => sub { };
+	around 'EC::UnmockBAA::fn' => sub { my ($o) = @_; $o->() + 1 };
+
+	is EC::UnmockBAA::fn(), 1, 'around active: 0+1=1';
+	unmock 'EC::UnmockBAA::fn';          # peel around
+	is EC::UnmockBAA::fn(), 0, 'around removed; before+after wrappers pass through';
+	unmock 'EC::UnmockBAA::fn';          # peel after
+	unmock 'EC::UnmockBAA::fn';          # peel before
+	is EC::UnmockBAA::fn(), 0, 'all layers removed; original returns 0';
+	restore_all();
+};
+
+subtest 'before(): empty string method croaks' => sub {
+	throws_ok { before('EC::SomePkg', '', sub { }) }
+		qr/\Q$ERR_BEFORE\E/, 'empty method string croaks';
+};
+
+subtest 'after(): empty string method croaks' => sub {
+	throws_ok { after('EC::SomePkg', '', sub { }) }
+		qr/\Q$ERR_AFTER\E/, 'empty method string croaks';
+};
+
+subtest 'around(): empty string method croaks' => sub {
+	throws_ok { around('EC::SomePkg', '', sub { }) }
+		qr/\Q$ERR_AROUND\E/, 'empty method string croaks';
 };
 
 done_testing();

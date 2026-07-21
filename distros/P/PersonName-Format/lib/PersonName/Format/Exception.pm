@@ -199,17 +199,21 @@ PersonName::Format::Exception - Exception object for PersonName::Format
 
     use PersonName::Format;
 
-    # Exceptions are created automatically by the error() method in various modules
+    # Exceptions are created automatically by the error() method.
 
-    # Exception object propagates through method chains
-    # When a method fails, it returns a PersonName::Format::NullObject in chaining
-    # (object) context so the chain does not die with "Can't call method on undef":
+    # When a method fails, it sets an exception and returns undef.
+    # In method-chaining context, it returns a NullObject so the chain
+    # does not die with "Can't call method on undef":
+    my $result = PersonName::Format->new( 'ja-JP' )->format(
+        given   => 'Albert',
+        surname => 'Einstein',
+    ) || die( PersonName::Format->error );
 
-    # pass_error: forwarding an existing exception
+    # pass_error: forwarding an existing exception from a helper method
     sub my_helper
     {
         my $self = shift( @_ );
-        my $fmt = PersonName::Format->new( $faulty_args ) ||
+        my $fmt = PersonName::Format->new( 'en-US' ) ||
             return( $self->pass_error );  # re-raise PersonName::Format's error
         return( $fmt );
     }
@@ -217,9 +221,9 @@ PersonName::Format::Exception - Exception object for PersonName::Format
     my $obj = My::Class->new->my_helper ||
         die( My::Class->error );
 
-    # Fatal mode: turn warnings into exceptions
-    my $fmt2 = PersonName::Format->new( $some_args );
-    $fmt2->fatal(1);  # any subsequent error will die() instead of warn()
+    # Fatal mode: subsequent errors call die() instead of returning undef
+    my $fmt = PersonName::Format->new( 'en-US' );
+    $fmt->fatal(1);
 
 =head1 VERSION
 
@@ -269,25 +273,47 @@ Default: C<0>.
 
 Returns the stringified form of the exception, including file and line information. This method is also invoked by the C<""> overload.
 
+=head2 clone
+
+Returns a cloned version of the current instance.
+
+=head2 code
+
+Sets or gets the exception code.
+
 =head2 file
 
-Returns the source file associated with the exception.
+Sets or gets the source file associated with the exception.
 
 =head2 line
 
-Returns the line number associated with the exception.
+Sets or gets the line number associated with the exception.
 
 =head2 message
 
-Returns the error message string.
+Sets or gets the error message string.
 
 =head2 package
 
-Returns the package name associated with the exception.
+Sets or gets the package name associated with the exception.
+
+=head2 rethrow
+
+Triggers a C<die> using the current instance.
+
+=head2 retry_after
+
+Sets or gets the exception property C<retry_after>.
 
 =head2 throw( %args | $message )
 
 Creates a new exception object and immediately calls C<die()> with it.
+
+=head2 type
+
+Sets or gets the exception property C<type>.
+
+=for Pod::Coverage PROPAGATE
 
 =head1 SEE ALSO
 

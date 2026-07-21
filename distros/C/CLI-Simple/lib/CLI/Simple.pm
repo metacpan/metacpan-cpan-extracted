@@ -19,12 +19,13 @@ use FindBin qw($RealBin $RealScript);
 use File::Basename qw(basename);
 use File::Which qw(which);
 use Getopt::Long qw(:config no_ignore_case);
+use IO::Interactive;
 use List::Util qw(zip none pairs any);
 use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -567,7 +568,7 @@ sub usage {
 
   my $input = $wrapper eq 'cli-simple' ? $INC{'CLI/Simple/Shell.pm'} : $self->get__program;
 
-  if ($PAGER) {
+  if ( $PAGER && IO::Interactive::is_interactive ) {
     eval {
       require IO::Pager;
       IO::Pager->new(*STDOUT);
@@ -928,7 +929,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.1.0.
+This documentation refers to version 2.1.1.
 
 =head1 FEATURES
 

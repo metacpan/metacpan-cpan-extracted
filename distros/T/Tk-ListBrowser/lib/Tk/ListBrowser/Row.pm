@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION =  0.14;
+$VERSION =  0.15;
 use Carp;
 use Math::Round;
 
@@ -51,6 +51,7 @@ sub AUTOLOAD {
 sub draw {
 	my ($self, $item, $x, $y, $column, $row) = @_;
 	$item->draw($x, $y, $column, $row, $self->cget('-itemtype'));
+	$item->drawAnchor if $item->anchored;
 }
 
 sub listbrowser { return $_[0]->{LISTBROWSER} }

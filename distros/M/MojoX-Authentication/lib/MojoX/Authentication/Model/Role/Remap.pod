@@ -7,7 +7,7 @@
 
 =head1 NAME
 
-MojoX::Authentication::Model::Role::Remap;
+MojoX::Authentication::Model::Role::Remap
 
 
 =head1 SYNOPSIS

@@ -9,8 +9,8 @@ use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
-$delay = 3000;
-$delay = 5000 if $mswin;
+$delay = 5000;
+$delay = 7000 if $mswin;
 $quitdelay = 1000;
 
 BEGIN { use_ok('App::Codit::Plugins::Backups') };

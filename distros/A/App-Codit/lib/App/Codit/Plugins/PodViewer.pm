@@ -9,7 +9,7 @@ App::Codit::Plugins::PodViewer - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
@@ -79,6 +79,7 @@ sub new {
 	my $sb = $self->sidebars;
 	$sb->pageSelectCall('Pod', sub { $self->after(100, ['Refresh', $self]) });
 	$self->{PODWIDGET} = $pod;
+	$self->zoomLoad;
 
 	return $self;
 }
@@ -87,6 +88,12 @@ sub new {
 sub _visible {
 	my $self = shift;
 	return $self->{PODWIDGET}->ismapped;
+}
+
+sub CanQuit {
+	my $self = shift;
+	$self->zoomSave;
+	return 1
 }
 
 sub docBefore {
@@ -127,6 +134,24 @@ sub Unload {
 	my $self = shift;
 	$self->ToolBottomPageRemove('Pod');
 	return $self->SUPER::Unload
+}
+
+sub zoomLoad {
+	my $self = shift;
+	my $file = "podviewer_zoom";
+	my $cff = $self->extGet('ConfigFolder');
+	my $widg = $self->{PODWIDGET};
+	my ($zoom) = $cff->loadList($file, 'podviewer_zoom');
+	$widg->configure('-zoom', $zoom) if defined $zoom;
+}
+
+sub zoomSave {
+	my $self = shift;
+	my $file = "podviewer_zoom";
+	my $cff = $self->extGet('ConfigFolder');
+	my $widg = $self->{PODWIDGET};
+	my $zoom = $widg->cget('-zoom');
+	$cff->saveList($file, 'podviewer_zoom', ($zoom));
 }
 
 =head1 LICENSE

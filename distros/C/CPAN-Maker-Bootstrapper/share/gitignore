@@ -1,3 +1,4 @@
+**/*.checked
 **/*.sh
 module.pm.tmpl
 buildspec.yml.tmpl

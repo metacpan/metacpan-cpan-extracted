@@ -6,7 +6,7 @@ use warnings;
 use CLI::Simple qw(:roles);
 use parent qw(CLI::Simple);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.11';
 
 use Role::Tiny::With;
 with 'CPAN::Maker::Bootstrapper::Role::Init';
@@ -2294,7 +2294,7 @@ C<make requires> and C<make test-requires> to analyze your source files
 
 =head1 VERSION
 
-This documentation refers to version 2.0.9
+This documentation refers to version 2.0.11
 
 =head1 AUTHOR
 

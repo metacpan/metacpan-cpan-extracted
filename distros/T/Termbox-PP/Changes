@@ -1,0 +1,159 @@
+Revision history for Termbox
+
+0.005001
+        2026-07-20
+        - Fix :colors export for TB_OPT_ATTR_W (32->16); thanks to David Cantrell
+        - Fix CRLF handling in t/00-begin.t (__DATA__ parsing broke on Unix)
+        - Ensure safe handling of global termbox filehandles during init/deinit
+        - Add TB_LIB_OPTS compile-time option to enforce consistent library defaults
+
+0.005
+        2026-07-17
+        - Terminal: add Windows Virtual Terminal support (again, see v0.3)
+        - Change default wcwidth backend to builtin-based version
+        - Fix escape sequence handling in extract_event (correct TB_ERR propagation)
+        - Fix use :colors (as FFI) instead of :color when importing constants
+        - Improve Unicode::UCD backend (long property names, emoji fallback)
+        - Optimize tb_present by removing accessor overhead and inlining logic
+
+0.004007
+        2026-07-13
+        - Fix missing Unicode::UCD::search_invlist on older Perl
+        - Fix Perl 5.10 syntax error with consecutive labels (DEFAULT:/case:)
+
+0.004006
+        2026-07-12
+        - Terminal: keep a live filehandle so that the assigned fd stays reliable
+        - Terminal: restore tty state through the open filehandle during shutdown
+        - Fix: route tb_printf through tb_printf_inner
+        - Fix: use global->{outbuf} consistently
+        - API: first argument for send_literal and send_num can be undefined
+
+0.004005
+        2026-07-10
+        - Fix POD type definitions
+        - Align subroutine call signatures closer to C implementation
+        - Normalize version numbers of builtin modules for consistency
+        - Add strict and warnings to all modules
+        - Add additional eXTended tests to the package
+
+0.004004
+        2026-07-07
+        - Fix on older Perl versions where Unicode::UCD::prop_invmap is not available
+        - Automatically fall back to bundled wcwidth implementation if needed
+        - Hide Termbox compatibility package from PAUSE (no_index + source annotation)
+        - Avoid UNAUTHORIZED indexing warnings for Termbox namespace
+
+0.004003
+        2026-07-01
+        - Change: store cell contents as Perl strings instead of codepoints
+        - Change: treat tb_set_cell*/tb_extend_cell as a Perl string
+        - Add: exported constant definition documented in the POD
+
+0.004002
+        2026-06-18
+        - Validation: refactor to compiled signatures, remove check() calls
+        - API/Templates: stricter validation, refactor type definitions
+        - Dependencies: reduce non-core dependencies
+        - Fix: consistent return values and improved undef handling
+        - Add: comprehensive POD documentation
+        
+0.004001
+        2026-06-03
+        - Tests: stabilize terminfo tests for CI environments
+        - Terminal: fix resize handling (ioctl, SIGWINCH, ESC fallback)
+
+0.004
+        2026-06-03
+        - API: refactor from termbox-go to termbox2 (C API)
+        - API: remove Go API compatibility layer; use termbox2 semantics
+        - Platform: remove Win32 support
+        - Threads: drop threads support/dependency (no longer required)
+        - Build: reduce non-core dependencies (now near-zero)
+        - Compat: adjust behavior to match termbox2.h (events/resize/terminfo paths)
+
+0.003010
+        2026-06-02
+        - Tests: remove incorrect skip logic; terminal tests run reliably on real TTY
+        - Terminal: fix SIGIO crash during shutdown (async I/O signal on fd close)
+        - Terminal: ignore SIGIO in Close() to match termbox-go shutdown semantics
+        - Tests: restore stable done_testing; full test suite completes reliably
+
+0.003009
+        2026-05-16
+        - Terminal: fix get_term_size re-adjustment (see GH #7)
+        - Tests: convert terminal tests to headless-capable CI skip logic
+        - Build: add threads dependency to Makefile.PL
+
+0.003008
+        2026-05-15
+        - Terminal: fix syncing changed cells back into front buffer during Flush (GH #4)
+        - Terminal: adjust UTF-8 decoding behavior in extract_event
+
+0.003007
+        2026-05-15
+        - Terminfo: preserve Go-like errno flow; clear stale errno before reads
+        - Terminfo: make builtin compatibility matching deterministic
+        - Terminfo: harden binary parsing against short reads and EOF; set EIO
+        - Terminal::Backend: align X10 mouse decoding with Go Cb/Cx/Cy offsets
+        - Terminal::Backend: make extract_raw_event a no-op on empty dst buffer
+        - Terminal::Backend: guard flush against zero-byte writes
+        - Terminal::Backend: replace invalid UTF-8 with U+FFFD and consume one byte
+        - Tests: update terminal parse expectations for Go X10 decoding
+
+0.003006
+        2026-05-14
+        - Win32: fix tb_peek_event timeout mapping undef to EventNone
+        - Terminal: fix Init() F_SETOWN handling to use getpid()
+        - Build: fix missing Import::Into dependency
+        - Threads: add timer to main loop (remove yield)
+        - Tests: clean up legacy resize and peek_event tests
+        - Tests: document Test2/Test::Builder PID warning noise in ithreads tests
+
+0.003005
+        2026-05-03
+        - Terminal: fix RGB background rendering bug
+        - Terminal: fix get_term_size ioctl buffer layout and field order
+        - Terminal: fix unsynchronized access to $inbuf
+        - Threads: update Thread::Queue usage; :shared no longer required
+        - Unicode: update WCWidth tables to 17.0.0
+        - Threads: add threads->yield() to main loop
+        - Terminal: handle partial writes during flush
+
+0.003004
+        2025-11-02
+        - Win32: switch from error codes
+
+0.003003
+        2025-05-14
+        - Win32: change legacy tb_peek_event behavior
+
+0.003002
+        2025-04-30
+        - Win32: fix SIGIO handling for Windows VT
+        - Win32: fix INPUT_RECORD EventType padding
+
+0.003001
+        2024-06-17
+        - Win32: encapsulate Win32::API imports
+        - Terminal: fix Unicode handling
+
+0.003
+        2024-06-06
+        - Terminal: add Windows VT support
+        - Misc: bug fixes
+
+0.002
+        2024-05-31
+        - Terminal: add initial terminal support
+
+0.001001
+        2024-05-16
+        - Project: initial GitHub upload
+        - Release: first public version
+        - Misc: improvements and bug fixes
+
+0.001
+        2024-04-24
+        - Release: first version (Win32-only)
+        - Legacy: add legacy support

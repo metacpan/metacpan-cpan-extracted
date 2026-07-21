@@ -23,6 +23,10 @@ sub cmd_release_notes {
 ########################################################################
   my ($self) = @_;
 
+  eval { require Git::Raw; 1; } or do {
+    die "ERROR: Git::Raw must be installed to use this command.\n";
+  };
+
   my ( $version, $api_key ) = $self->get_args;
 
   if ( !$version ) {
@@ -118,9 +122,13 @@ sub cmd_release_notes {
 
   my $content = $llm_rsp->content;
 
-  if ( !defined $content ) {
+  if ( !$content || !$content->text ) {
     print {*STDERR} $llm_rsp->raw_content;
     return $FAILURE;
+  }
+
+  if ( $llm_rsp->was_cutoff ) {
+    warn "WARNING: response was truncated (hit max_tokens). Increase --max-tokens for a complete response.\n";
   }
 
   my $release_notes_dir  = 'release-notes';

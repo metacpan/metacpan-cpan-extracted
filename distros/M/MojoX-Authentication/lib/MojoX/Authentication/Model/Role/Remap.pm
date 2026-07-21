@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::Role::Remap;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo::Role;

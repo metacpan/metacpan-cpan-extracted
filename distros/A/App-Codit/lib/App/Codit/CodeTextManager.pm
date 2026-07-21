@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.19';
+$VERSION = '0.21';
 use Tk;
 require Tk::CodeText;
 
@@ -150,15 +150,17 @@ sub KeyReleased {
 
 sub log {
 	my ($self, $message, $type) = @_;
-	$type = 'message' unless defined $type;
-	my $ext = $self->Extension;
-	if ($type eq 'message') {
-		$ext->log($message)
-	} elsif ($type eq 'error') {
-		$ext->logError($message)
-	} elsif ($type eq 'warning') {
-		$ext->logWarning($message)
-	}
+	$self->after(20, sub {
+		$type = 'message' unless defined $type;
+		my $ext = $self->Extension;
+		if ($type eq 'message') {
+			$ext->log($message)
+		} elsif ($type eq 'error') {
+			$ext->logError($message)
+		} elsif ($type eq 'warning') {
+			$ext->logWarning($message)
+		}
+	});
 }
 
 sub Modified {

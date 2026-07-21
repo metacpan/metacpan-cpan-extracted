@@ -368,6 +368,17 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                         }
                     }
                     if (that._form) {
+                        // A triggerFormReset field the user changed while this
+                        // initial load was in flight is parked in _reconfPending.
+                        // Don't let the backend snapshot clobber the user's value:
+                        // the drain below (#244) re-fires the parked reconfiguration,
+                        // but it runs against currentFormData, so a clobbered value
+                        // leaves the fields it should reveal hidden.
+                        if (data) {
+                            for (let key of that._reconfPending.keys()) {
+                                delete data[key];
+                            }
+                        }
                         that._form.setData(data,true);
                         if (that._hasTrigger) {
                             that._reconfForm();

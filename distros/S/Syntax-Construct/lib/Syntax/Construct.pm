@@ -4,10 +4,13 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.045';
+our $VERSION = '1.046';
 
 my %introduces = do { no warnings 'qw';
-                 ( '5.042' => [qw[
+                 ( '5.044' => [qw[
+                                  named-params multi-for-ref unicode17.0
+                             ]],
+                   '5.042' => [qw[
                                   :writer my_method ->& unicode16.0 ^^=
                              ]],
                    '5.040' => [qw[
@@ -311,7 +314,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.045
+Version 1.046
 
 =head1 SYNOPSIS
 
@@ -1020,6 +1023,20 @@ L<perl5420delta/Unicode 16.0 supported>
 L<perl5420delta/Assigning logical xor ^^= operator>
 
 Alias: assign-logical-xor
+
+=head2 5.044
+
+=head3 named-params
+
+L<perldelta/Named Parameters in Signatures>
+
+=head3 multi-for-ref
+
+L<perldelta/Multi-variable foreach can now use aliased references>
+
+=head3 unicode17.0
+
+<perldelta/Unicode 17.0 is supported>
 
 =for completeness
 =head2 old

@@ -9,7 +9,7 @@ App::Codit::Plugins::Icons - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 require Tk::ListBrowser;
 use base qw( Tk::AppWindow::BaseClasses::PluginJobs );
@@ -70,6 +70,7 @@ sub new {
 	$list = $page->ListBrowser(
 		-arrange => 'row',
 		-itemtype => 'imagetext',
+		-filterforce => 1,
 		-wraplength => 70,
 		-textside => 'bottom',
 	)->pack(-expand => 1, -fill => 'both');

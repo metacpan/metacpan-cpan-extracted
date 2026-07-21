@@ -1,5 +1,12 @@
 Revision history for Chandra-Markdown
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.02    2026-07-12
+        - Add highlight attribute (default 1): passes highlight => 1 to
+          the Markdown::Simple session, enabling syntax highlighting for
+          fenced code blocks with a language tag.
+        - Add CSS rules for all esh-* token classes using CSS custom
+          properties (--esh-keyword, --esh-string, etc.) for theme overrides.
+
+0.01    2026-04-01
+        - First version.
 

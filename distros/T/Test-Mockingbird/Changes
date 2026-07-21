@@ -1,5 +1,54 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.12	Mon Jul 20 11:01:43 EDT 2026
+
+  [New features]
+
+  - Added before($target, $hook): installs a wrapper that calls $hook->(@args)
+    (return value discarded) before invoking the original method.  Return value
+    and calling context (list, scalar, void) are fully preserved via explicit
+    three-way wantarray dispatch -- no goto required.
+
+  - Added after($target, $hook): installs a wrapper that calls the original
+    method first, capturing its return value, then calls $hook->(@args).  If
+    the original throws, the exception propagates immediately and the hook is
+    not called.
+
+  - Added around($target, $hook): installs a wrapper that passes
+    ($orig_coderef, @args) to $hook.  The hook controls whether and how the
+    original is called, and its return value becomes the method's return value.
+    Preferred alternative to mock() when call-through is needed.
+
+    All three functions:
+      - Accept both shorthand ('Pkg::method' => $hook) and longhand
+        ('Pkg', 'method', $hook) forms.
+      - Go through mock() and participate in the same %mocked/%mock_meta
+        stack; unmock() and restore_all() clean them up identically.
+      - Record the correct layer type ('before', 'after', 'around') in
+        diagnose_mocks() output.
+      - Capture $orig at install time (outside mock()), so stacking multiple
+        before/after/around layers on the same method is safe and predictable.
+      - Croak with a clear message if package, method, or hook is missing.
+
+    Stacking order with LIFO: the last-installed wrapper is outermost.
+    Mixed stacking example (install order: before, after, around):
+      around wraps after wraps before wraps orig.
+      Execution: around-pre → before-hook → orig → after-hook → around-post.
+
+  [Tests]
+
+  - Added t/before_after.t (36 subtests) covering before(), after(), and
+    around(): shorthand/longhand forms, return-value pass-through, hook
+    return discarded, list/scalar/void context, LIFO stacking, unmock()
+    peeling, diagnose_mocks() layer type, exception propagation, mixed
+    before+after+around interoperation, and all croak paths.
+
+  - Added before/after/around coverage to t/unit.t (15 new subtests),
+    t/function.t (8 new white-box subtests), t/edge-cases.t (10 new
+    subtests including never-defined method and mixed stacking order
+    verification), t/extended_tests.t (4 new branch-coverage subtests),
+    and t/integration.t (4 new integration subtests).
+
 0.11	Wed Jul  8 12:43:17 EDT 2026
 
   [Bug fixes]

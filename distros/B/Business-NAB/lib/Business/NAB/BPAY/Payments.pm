@@ -1,5 +1,5 @@
 package Business::NAB::BPAY::Payments;
-$Business::NAB::BPAY::Payments::VERSION = '0.05';
+$Business::NAB::BPAY::Payments::VERSION = '0.06';
 =head1 NAME
 
 Business::NAB::BPAY::Payments

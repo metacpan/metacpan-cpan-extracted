@@ -20,12 +20,18 @@ use constant {
 	_T_MOCK_ONCE     => 'mock_once',
 	_T_MOCK_SCOPED   => 'mock_scoped',
 	_T_INTERCEPT_NEW => 'intercept_new',
+	_T_BEFORE        => 'before',
+	_T_AFTER         => 'after',
+	_T_AROUND        => 'around',
 };
 
 our @EXPORT = qw(
 	mock
 	unmock
 	mock_scoped
+	before
+	after
+	around
 	spy
 	inject
 	inject_all
@@ -60,11 +66,11 @@ async Future mocking
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -343,6 +349,226 @@ sub unmock {
 		delete $mocked{$full_method};
 		delete $mock_meta{$full_method};
 	}
+
+	return;
+}
+
+=head2 before
+
+Run a hook before a method, then call the original and return its value.
+
+    before 'My::Module::method' => sub { my @args = @_; ... };
+    before('My::Module', 'method', sub { ... });
+
+The hook receives the same C<@_> that the original would have received. Its
+return value is discarded. The original is always called and its return value
+is passed to the caller unchanged. Context (list / scalar / void) is
+preserved.
+
+Uses the same LIFO mock stack as C<mock()>: C<unmock()> peels one layer,
+C<restore_all()> drains all. C<diagnose_mocks()> records the layer type as
+C<'before'>.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    target -- Str, 'Pkg::method' or ('Pkg', 'method')
+    hook   -- CodeRef; receives (@original_args), return value discarded
+
+=head4 Output
+
+    returns: undef
+
+=head3 MESSAGES
+
+  "Package, method and hook are required for before()" -- target or hook missing or non-CODE
+
+=cut
+
+sub before {
+	my ($arg1, $arg2, $arg3) = @_;
+
+	my ($package, $method, $hook);
+	if (defined $arg1 && !defined $arg3 && $arg1 =~ /^(.*)::([^:]+)$/) {
+		($package, $method, $hook) = ($1, $2, $arg2);
+	} else {
+		($package, $method, $hook) = ($arg1, $arg2, $arg3);
+	}
+
+	croak 'Package, method and hook are required for before()'
+		unless $package && $method && ref($hook) eq 'CODE';
+
+	my $full_method = "${package}::${method}";
+	my $orig;
+	{
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		$orig = \&{$full_method};
+	}
+
+	local $TYPE = _T_BEFORE;
+	mock($package, $method, sub {
+		my @args = @_;
+		$hook->(@args);
+		if (wantarray) {
+			return $orig->(@args);
+		} elsif (defined wantarray) {
+			return scalar $orig->(@args);
+		} else {
+			$orig->(@args);
+			return;
+		}
+	});
+
+	return;
+}
+
+=head2 after
+
+Run a hook after a method and return the original's value.
+
+    after 'My::Module::method' => sub { my @args = @_; ... };
+    after('My::Module', 'method', sub { ... });
+
+The original is called first. Its return value is captured, then the hook is
+called with the same C<@_> that the original received. The hook's return
+value is discarded and the original's return value is passed to the caller
+unchanged. Context (list / scalar / void) is preserved.
+
+If the original throws, the exception propagates immediately and the hook is
+B<not> called. Use C<around()> if you need to run code unconditionally after
+the original.
+
+Uses the same LIFO mock stack as C<mock()>: C<unmock()> peels one layer,
+C<restore_all()> drains all. C<diagnose_mocks()> records the layer type as
+C<'after'>.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    target -- Str, 'Pkg::method' or ('Pkg', 'method')
+    hook   -- CodeRef; receives (@original_args), return value discarded
+
+=head4 Output
+
+    returns: undef
+
+=head3 MESSAGES
+
+  "Package, method and hook are required for after()" -- target or hook missing or non-CODE
+
+=cut
+
+sub after {
+	my ($arg1, $arg2, $arg3) = @_;
+
+	my ($package, $method, $hook);
+	if (defined $arg1 && !defined $arg3 && $arg1 =~ /^(.*)::([^:]+)$/) {
+		($package, $method, $hook) = ($1, $2, $arg2);
+	} else {
+		($package, $method, $hook) = ($arg1, $arg2, $arg3);
+	}
+
+	croak 'Package, method and hook are required for after()'
+		unless $package && $method && ref($hook) eq 'CODE';
+
+	my $full_method = "${package}::${method}";
+	my $orig;
+	{
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		$orig = \&{$full_method};
+	}
+
+	local $TYPE = _T_AFTER;
+	mock($package, $method, sub {
+		my @args = @_;
+		if (wantarray) {
+			my @ret = $orig->(@args);
+			$hook->(@args);
+			return @ret;
+		} elsif (defined wantarray) {
+			my $ret = $orig->(@args);
+			$hook->(@args);
+			return $ret;
+		} else {
+			$orig->(@args);
+			$hook->(@args);
+			return;
+		}
+	});
+
+	return;
+}
+
+=head2 around
+
+Replace a method with a hook that receives the original coderef as its first
+argument.
+
+    around 'My::Module::method' => sub {
+        my ($orig, @args) = @_;
+        my $result = $orig->(@args);   # call original
+        return $result * 2;            # modify return value
+    };
+
+    around('My::Module', 'method', sub {
+        my ($orig, @args) = @_;
+        return $orig->(@args);
+    });
+
+The hook receives C<($orig_coderef, @original_args)>. It may call C<$orig>
+zero or more times with any arguments. Its return value becomes the return
+value of the method. The hook is responsible for context handling when that
+matters.
+
+C<around()> is the preferred alternative to C<mock()> when you need to call
+through to the original: it captures the original and passes it as the first
+argument, avoiding the boilerplate of a separate C<\&{...}> capture.
+
+Uses the same LIFO mock stack as C<mock()>: C<unmock()> peels one layer,
+C<restore_all()> drains all. C<diagnose_mocks()> records the layer type as
+C<'around'>.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    target -- Str, 'Pkg::method' or ('Pkg', 'method')
+    hook   -- CodeRef; receives ($orig_coderef, @original_args)
+
+=head4 Output
+
+    returns: undef
+
+=head3 MESSAGES
+
+  "Package, method and hook are required for around()" -- target or hook missing or non-CODE
+
+=cut
+
+sub around {
+	my ($arg1, $arg2, $arg3) = @_;
+
+	my ($package, $method, $hook);
+	if (defined $arg1 && !defined $arg3 && $arg1 =~ /^(.*)::([^:]+)$/) {
+		($package, $method, $hook) = ($1, $2, $arg2);
+	} else {
+		($package, $method, $hook) = ($arg1, $arg2, $arg3);
+	}
+
+	croak 'Package, method and hook are required for around()'
+		unless $package && $method && ref($hook) eq 'CODE';
+
+	my $full_method = "${package}::${method}";
+	my $orig;
+	{
+		no strict 'refs';    ## no critic (ProhibitNoStrict)
+		$orig = \&{$full_method};
+	}
+
+	local $TYPE = _T_AROUND;
+	mock($package, $method, sub { $hook->($orig, @_) });
 
 	return;
 }
@@ -1236,6 +1462,33 @@ L<https://github.com/nigelhorne/Test-Mockingbird>
                ∧ sym_table'[target].CODE = prev
                ∧ mock_meta'[target] = tail(mock_meta[target])
 
+=head2 before
+
+    before ≙
+      ∀ target : Str; hook : CodeRef •
+        pre  target ≠ '' ∧ ref(hook) = 'CODE'
+        let orig = sym_table[target].CODE •
+          post sym_table'[target].CODE = wrapper
+               ∧ wrapper(@args) ≙ hook(@args); orig(@args)
+
+=head2 after
+
+    after ≙
+      ∀ target : Str; hook : CodeRef •
+        pre  target ≠ '' ∧ ref(hook) = 'CODE'
+        let orig = sym_table[target].CODE •
+          post sym_table'[target].CODE = wrapper
+               ∧ wrapper(@args) ≙ let ret = orig(@args) • hook(@args); ret
+
+=head2 around
+
+    around ≙
+      ∀ target : Str; hook : CodeRef •
+        pre  target ≠ '' ∧ ref(hook) = 'CODE'
+        let orig = sym_table[target].CODE •
+          post sym_table'[target].CODE = wrapper
+               ∧ wrapper(@args) ≙ hook(orig, @args)
+
 =head2 mock_scoped
 
     mock_scoped ≙
@@ -1335,6 +1588,36 @@ L<https://github.com/nigelhorne/Test-Mockingbird>
 =head2 diagnose_mocks_pretty
 
     diagnose_mocks_pretty ≙ stringify(diagnose_mocks())
+
+=head2 before
+
+    before ≙
+      ∀ target : Str; hook : CodeRef •
+        pre  target ≠ '' ∧ ref(hook) = 'CODE'
+        let orig = sym_table[target].CODE •
+          post sym_table'[target].CODE = wrapper
+               ∧ wrapper(@args) ≙ hook(@args); orig(@args)
+
+=head2 after
+
+    after ≙
+      ∀ target : Str; hook : CodeRef •
+        pre  target ≠ '' ∧ ref(hook) = 'CODE'
+        let orig = sym_table[target].CODE •
+          post sym_table'[target].CODE = wrapper
+               ∧ wrapper(@args) ≙
+                   let ret = orig(@args) •
+                   hook(@args);
+                   ret
+
+=head2 around
+
+    around ≙
+      ∀ target : Str; hook : CodeRef •
+        pre  target ≠ '' ∧ ref(hook) = 'CODE'
+        let orig = sym_table[target].CODE •
+          post sym_table'[target].CODE = wrapper
+               ∧ wrapper(@args) ≙ hook(orig, @args)
 
 =head1 LICENCE AND COPYRIGHT
 

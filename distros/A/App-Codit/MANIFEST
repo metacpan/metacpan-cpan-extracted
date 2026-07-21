@@ -15,6 +15,7 @@ lib/App/Codit/Icons/bookmark_next.png
 lib/App/Codit/Icons/bookmark_previous.png
 lib/App/Codit/Icons/bookmark_remove.png
 lib/App/Codit/Icons/bookmarks.png
+lib/App/Codit/Icons/diff.png
 lib/App/Codit/Icons/git-icon.png
 lib/App/Codit/Icons/show-spaces.png
 lib/App/Codit/Macro.pm
@@ -22,6 +23,8 @@ lib/App/Codit/Plugins/Backups.pm
 lib/App/Codit/Plugins/Bookmarks.pm
 lib/App/Codit/Plugins/Colors.pm
 lib/App/Codit/Plugins/Console.pm
+lib/App/Codit/Plugins/Critic.pm
+lib/App/Codit/Plugins/Diff.pm
 lib/App/Codit/Plugins/Exporter.pm
 lib/App/Codit/Plugins/FileBrowser.pm
 lib/App/Codit/Plugins/Git.pm
@@ -35,6 +38,7 @@ lib/App/Codit/Plugins/SplitView.pm
 lib/App/Codit/SessionManager.pm
 LICENSE
 Makefile.PL
+Makefile.PL.png
 MANIFEST			This list of files
 README.md
 t/010-App-Codit-CodeTextManager.t
@@ -46,7 +50,9 @@ t/050-App-Codit-Plugins-Backups.t
 t/060-App-Codit-Plugins-Bookmarks.t
 t/070-App-Codit-Plugins-Colors.t
 t/075-App-Codit-Plugins-Console.t
+t/077-App-Codit-Plugins-Critic.t
 t/078-App-Codit-Plugins-Exporter.t
+t/079-App-Codit-Plugins-Diff.t
 t/080-App-Codit-Plugins-FileBrowser.t
 t/085-App-Codit-Plugins-Icons.t
 t/090-App-Codit-Plugins-Git.t

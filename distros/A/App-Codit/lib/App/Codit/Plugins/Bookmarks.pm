@@ -9,7 +9,7 @@ App::Codit::Plugins::Bookmarks - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 use Data::Compare;
 require Tk::ITree;
@@ -257,7 +257,7 @@ sub docRefresh {
 	}
 	$self->bmAdd($name, @new) if @new;
 
-	$t->selectionSet($cursel) if (defined $cursel);
+	$t->selectionSet($cursel) if (defined $cursel) and $t->infoExists($cursel);
 }
 
 sub histClearNext {

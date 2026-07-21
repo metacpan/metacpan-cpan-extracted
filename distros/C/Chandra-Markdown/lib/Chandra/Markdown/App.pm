@@ -57,13 +57,13 @@ sub BUILD {
         my $shell = Chandra::Element->new({ tag => 'div', id => 'chandra-shell' });
 
         my $sidebar = Chandra::Element->new({ tag => 'aside', id => 'chandra-sidebar' });
-        $sidebar->add_child(Chandra::Element->new({ tag => 'div', raw => $search }));
-	$sidebar->add_child(Chandra::Element->new({
+        $sidebar->add_child(Chandra::Element->new({
             tag  => 'div',
             id   => 'chandra-sidebar-brand',
             data => $brand,
         }));
         $sidebar->add_child(Chandra::Element->new({ tag => 'div', raw => $nav }));
+        $sidebar->add_child(Chandra::Element->new({ tag => 'div', raw => $search }));
         $shell->add_child($sidebar);
 
         my $pane = Chandra::Element->new({ tag => 'div', id => 'chandra-content-pane' });

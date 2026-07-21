@@ -4,7 +4,6 @@ package Git::ReleaseDiffs;
 use strict;
 use warnings;
 
-use Git::Raw;
 use Archive::Tar;
 use Cwd qw(getcwd);
 use Data::Dumper;
@@ -39,6 +38,8 @@ sub _last_tag {
 sub new {
 ########################################################################
   my ( $class, @args ) = @_;
+
+  require Git::Raw;
 
   my $options = ref $args[0] ? $args[0] : {@args};
 

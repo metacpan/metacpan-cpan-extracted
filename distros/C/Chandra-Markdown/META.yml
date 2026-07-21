@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Markdown::Simple: '0.16'
+  Chandra: '0.29'
+  Markdown::Simple: '0.17'
   Object::Proto::Sugar: '0.05'
   Search::Trigram: '0.01'
   perl: '5.010'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

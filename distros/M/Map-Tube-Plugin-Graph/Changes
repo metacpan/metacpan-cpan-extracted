@@ -1,15 +1,58 @@
 Revision history for Map::Tube::Plugin::Graph
 
+1.1.0   2026-07-21
+        This release entirely belongs to @GWS.
+        [API Enhancements]
+        - Added new flexible render() method supporting customizable parameters:
+          - format (e.g., png, svg, pdf, dot, gv).
+          - driver (e.g., neato, fdp).
+          - output_file path (with automatic naming fallback if set to undef).
+          - base64 boolean encoding.
+          - line_name (optional positional or named parameter).
+        - The output file name fallback for single lines now includes the map
+          name, too.
+        - The output file name fallback is cleaned from non-word characters,
+          making file names more readable and preventing clobbering of files
+          outside the current folder even for (hypothetical) malicious tube maps.
+        - Refactored existing methods as_png() and as_image() to act as
+          clean, modern wrappers around render().
+        - Added metadata querying methods list_drivers() and list_formats()
+          to list GraphViz capabilities.
+        - Added helper get_graphviz_supported() using IPC::Run3 and File::Which
+          to introspect local dot binaries.
+
+        [Prerequisites]
+        - Bumped minimum Perl requirement to v5.14.
+        - Added dependency on File::Which and IPC::Run3 (which have always
+          been required implicitly, because GraphViz2 requires them).
+        - Removed direct usage of Data::Dumper.
+
+        [Test Suite]
+        - Reorganised and expanded the test suite into modular scripts under t/:
+          - t/01-render.t: Comprehensive unit coverage for the new render()
+            parameters, drivers, and output file behavior.
+          - t/02-as_image.t: Modernised verification of base64 PNG rendering.
+          - t/03-as_png.t: Validation of raw binary output formatting.
+          - t/04-as_graph.t: Isolated validation of graph representations.
+          - t/05-graphviz-meta.t: Verification of GraphViz introspection features.
+          - t/06-unusual-station-name.t: Cleaned up version of station name
+            parsing using the new render() implementation.
+        - Removed deprecated monolithic test files t/as_image.t and
+          t/unusual-station-name.t.
+
+        [Others]
+        - Updated README file.
+
 v1.0.0  2026-07-10
         - The function as_graph() now takes into account the data regarding
           the per-link line restrictions from the class Map::Tube (see
           version 5.1.0 of Map::Tube); that is, the method now is able to
-          figure out which lines an edge belongs to. until now an edge was
+          figure out which lines an edge belongs to. Until now an edge was
           created for each line that the two stations had in common despite
           the fact that the physical link did not go through all those lines
           in one direction which caused the two-way edges to be created for
           a link that was actually one-directed.
-          The function as_graph() previouslly created a directed graph for
+          The function as_graph() previously created a directed graph for
           each link defined in the link object, therefore, no changes to the
           graph structure is required, however, now the processing of the
           link restrictions means that no edges are created for lines that

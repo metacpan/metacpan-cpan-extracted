@@ -27,6 +27,8 @@ lib/MojoX/Authentication/Model/Role/Creator.pm
 lib/MojoX/Authentication/Model/Role/Creator.pod
 lib/MojoX/Authentication/Model/Role/Local.pm
 lib/MojoX/Authentication/Model/Role/Local.pod
+lib/MojoX/Authentication/Model/Role/MojoDbWrap.pm
+lib/MojoX/Authentication/Model/Role/MojoDbWrap.pod
 lib/MojoX/Authentication/Model/Role/Remap.pm
 lib/MojoX/Authentication/Model/Role/Remap.pod
 lib/MojoX/Authentication/Model/SAML2.pm
@@ -35,6 +37,8 @@ lib/MojoX/Authentication/Model/SAML2/Db.pm
 lib/MojoX/Authentication/Model/SAML2/Db.pod
 lib/MojoX/Authentication/Model/SAML2/Hash.pm
 lib/MojoX/Authentication/Model/SAML2/Hash.pod
+lib/MojoX/Authentication/Util.pm
+lib/MojoX/Authentication/Util.pod
 t/00-load.t
 t/author-pod-syntax.t
 t/author-pod-version.t

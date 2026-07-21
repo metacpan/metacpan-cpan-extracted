@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Payments::TotalRecord;
-$Business::NAB::Australian::DirectEntry::Payments::TotalRecord::VERSION = '0.05';
+$Business::NAB::Australian::DirectEntry::Payments::TotalRecord::VERSION = '0.06';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Payments::TotalRecord
@@ -148,11 +148,11 @@ sub to_record ( $self ) {
         $self->record_type,
         $self->bsb_number,
         "",
-        sprintf( "%010s", $self->net_total_amount ),
-        sprintf( "%010s", $self->credit_total_amount ),
-        sprintf( "%010s", $self->debit_total_amount ),
+        sprintf( "%010.0f", $self->net_total_amount ),
+        sprintf( "%010.0f", $self->credit_total_amount ),
+        sprintf( "%010.0f", $self->debit_total_amount ),
         "",
-        sprintf( "%06s", $self->record_count ),
+        sprintf( "%06.0f", $self->record_count ),
         "",
     );
 

@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Payments::DetailRecord;
-$Business::NAB::Australian::DirectEntry::Payments::DetailRecord::VERSION = '0.05';
+$Business::NAB::Australian::DirectEntry::Payments::DetailRecord::VERSION = '0.06';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Payments::DetailRecord
@@ -235,7 +235,7 @@ sub to_record ( $self ) {
         : $self->return_code,
 
         $self->transaction_code,
-        sprintf( "%010s", $self->amount ),
+        sprintf( "%010.0f", $self->amount ),
         $self->title_of_account,
         $self->lodgement_reference,
         $self->bsb_number_trace,

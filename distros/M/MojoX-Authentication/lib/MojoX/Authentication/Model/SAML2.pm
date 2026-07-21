@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::SAML2;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo;
@@ -116,7 +116,9 @@ sub _cache_user ($self, $user, $ttl = undef) {
 
 sub create ($class, $config, %args) {
    %args = $class->_create_args(DEFAULT_FOR->{name}, $config, %args);
-   return unless defined($args{idp}) && defined($args{sp_configuration});
+   ouch 404, 'missing argument for idp' unless defined($args{idp});
+   ouch 404, 'missing argument for sp_configuration'
+      unless defined($args{sp_configuration});
    return $class->new(%args);
 }
 

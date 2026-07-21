@@ -58,7 +58,7 @@ if (defined $app) {
 #		-selectmode => 'exclusive',
 		-selectmode => 'multiple',
 		-filtercolumns => 1,
-#		-filterforce => 1,
+		-filterforce => 1,
 		-sortcase => 0,
 
 		-marginleft => 80,

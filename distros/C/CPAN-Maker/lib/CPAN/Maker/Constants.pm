@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw( Exporter );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.5';
 
 our @EXPORT_OK = ();
 

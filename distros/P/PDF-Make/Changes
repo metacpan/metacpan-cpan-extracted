@@ -1,5 +1,11 @@
 Revision history for PDF::Make
 
+0.08  2026-07-21
+      - Builder::Layout::Row::render now uses Layout::Flex for both width
+        distribution and height computation. 
+      - Added examples/02_layout/flex_layout.pl demonstrating auto height,
+        weighted columns, gap, mixed font sizes, and explicit height override.
+
 0.07  2026-07-11
       - Fix "Free to wrong pool" on Strawberry Perl (Windows): xs/crypt.xs
         (encrypt_stream, decrypt_stream) and xs/watermark.xs (next_bates,

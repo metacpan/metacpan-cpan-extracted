@@ -11,7 +11,7 @@ use warnings;
 use vars qw($VERSION $AUTOLOAD);
 use Carp;
 
-$VERSION =  0.10;
+$VERSION =  0.15;
 
 =head1 SYNOPSIS
 
@@ -28,11 +28,14 @@ You never do this yourself. But this is how it works.
 Provides a base class for modules L<Tk::ListBrowser::Item> and L<Tk::ListBrowser::SidePanel>.
 It provides a method overload to the L<Tk::ListBrowser> object.
 
-Available options are I<background>, I<font>, I<foreground>, I<-owner>, I<itemtype>, I<textanchor>,
-I<textjustify>, I<textlength>,  I<textside> and I<wraplength>.
+Available options are I<-background>, I<-drawrect>, I<-font>, I<-foreground>, I<-owner>,
+I<-itemtype>, I<-textanchor>, I<-textjustify>, I<-textlength>,  I<-textside> and I<-wraplength>.
 
-The I<-owner> option is not a standard option. It specifies which object (side column or ListBrowser widget)
+The I<-owner> option specifies which object (side column or ListBrowser widget)
 is holding this item. By default it is set to the ListBrowser widget.
+
+The I<-drawrect> option specifies whether a rectangle, in the background color should be drawn
+as area indicator.
 
 If an option is not defined this module will look for the corresponding option in it's owner.
 
@@ -62,10 +65,14 @@ sub new {
 	};
 	bless($self, $class);
 	
+	my %configset;
 	for (keys %args) {
-		$self->configure($_, $args{$_})
+		$self->configure($_, $args{$_});
+		$configset{$_} = 1;
 	}
+	$self->{CONFIGSET} = \%configset;
 
+	$self->drawrect(0) unless defined $self->drawrect;
 	$self->owner($self->listbrowser) unless defined $self->owner;
 
 	return $self
@@ -140,10 +147,22 @@ sub configure {
 	}
 }
 
+sub configSet {
+	my ($self, $option) = @_;
+	my $cs = $self->{CONFIGSET};
+	return exists $cs->{$option};
+}
+
 sub crect {
 	my $self = shift;
 	$self->{CRECT} = shift if @_;
 	return $self->{CRECT}
+}
+
+sub drawrect {
+	my $self = shift;
+	$self->{DRAWRECT} = shift if @_;
+	return $self->{DRAWRECT}
 }
 
 sub font {
@@ -283,3 +302,4 @@ If you find any bugs, please report them here: L<https://github.com/haje61/Tk-Li
 
 =cut
 
+1;

@@ -1,5 +1,16 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.15  Mon Jul 20 2026
+	- Fixed anchor drawing in a multi column setup.
+	- Fixed bad startXY when headers are present.
+	- Added option -drawrect to BaseItem.
+	- Set default -drawrect to 1 for Item and SideColumn.
+	- Set default -drawrect to 0 for Entry.
+	- Modified selection drawing.
+	- List receives focus when escaping the filter entry.
+	- Re-introduced the configure timer.
+	- Removed method cselectr.
+
 0.14 Sat jul 11 2026
 	- Set the canvas widget to a small default width and height.
 	- Fixed selection drawing in list mode when unmapped.

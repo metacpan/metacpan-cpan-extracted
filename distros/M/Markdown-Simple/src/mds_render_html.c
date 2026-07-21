@@ -13,6 +13,7 @@
 #include "mds_ir.h"
 #include "mds.h"
 #include "mds_entity.h"
+#include "eshu_hl.h"
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -45,6 +46,7 @@ typedef enum {
     CLOSE_FN_SECTION,
     CLOSE_FN_DEF,
     CLOSE_FN_DEF_SKIP,
+    CLOSE_CODE_FENCED_HL,
     CLOSE_NOOP
 } close_kind;
 
@@ -99,6 +101,12 @@ typedef struct {
     unsigned    fn_in_def;        /* 1-based ordinal of current def, 0 if none */
     const char* fn_in_def_label;  /* label of current def (for backref) */
     size_t      fn_in_def_label_len;
+    /* Syntax-highlighting accumulator for MDS_FLAG_HIGHLIGHT fenced blocks. */
+    char*       hl_buf;
+    size_t      hl_len;
+    size_t      hl_cap;
+    char        hl_lang[64];
+    int         in_fenced_hl;
 } render_state;
 
 /* Forward decls for helpers defined later but used by early callbacks. */
@@ -442,14 +450,25 @@ static void cb_enter_block(void* ud, mds_block_type t, const mds_block_detail* d
         size_t lang_len = 0;
         while (lang_len < il && info[lang_len] != ' ' && info[lang_len] != '\t')
             lang_len++;
-        if (lang_len > 0) {
-            MDS_BUF_LIT(b, "<pre><code class=\"language-");
-            html_escape_unesc(aTHX_ b, info, lang_len);
-            MDS_BUF_LIT(b, "\">");
+        if ((st->flags & MDS_FLAG_HIGHLIGHT) && lang_len > 0 && lang_len < 63) {
+            /* Accumulate raw code text; highlight at leave time. */
+            size_t i;
+            for (i = 0; i < lang_len; i++)
+                st->hl_lang[i] = (char)tolower((unsigned char)info[i]);
+            st->hl_lang[lang_len] = '\0';
+            st->hl_len = 0;
+            st->in_fenced_hl = 1;
+            push_close(st, CLOSE_CODE_FENCED_HL);
         } else {
-            MDS_BUF_LIT(b, "<pre><code>");
+            if (lang_len > 0) {
+                MDS_BUF_LIT(b, "<pre><code class=\"language-");
+                html_escape_unesc(aTHX_ b, info, lang_len);
+                MDS_BUF_LIT(b, "\">");
+            } else {
+                MDS_BUF_LIT(b, "<pre><code>");
+            }
+            push_close(st, CLOSE_CODE_FENCED);
         }
-        push_close(st, CLOSE_CODE_FENCED);
         break;
     }
     case MDS_BLK_CODE_INDENTED:
@@ -596,6 +615,24 @@ static void cb_leave_block(void* ud, mds_block_type t) {
     case CLOSE_H6:          MDS_BUF_LIT(b, "</h6>\n"); break;
     case CLOSE_CODE_FENCED: MDS_BUF_LIT(b, "</code></pre>\n"); break;
     case CLOSE_CODE_INDENTED: MDS_BUF_LIT(b, "</code></pre>\n"); break;
+    case CLOSE_CODE_FENCED_HL: {
+        size_t out_len = 0;
+        char* hl_out = eshu_highlight(st->hl_buf ? st->hl_buf : "",
+                                      st->hl_len, st->hl_lang, &out_len);
+        MDS_BUF_LIT(b, "<pre><code class=\"language-");
+        mds_buf_write(aTHX_ b, st->hl_lang, strlen(st->hl_lang));
+        MDS_BUF_LIT(b, "\">");
+        if (hl_out) {
+            mds_buf_write(aTHX_ b, hl_out, out_len);
+            free(hl_out);
+        } else {
+            html_escape(aTHX_ b, st->hl_buf ? st->hl_buf : "", st->hl_len);
+        }
+        MDS_BUF_LIT(b, "</code></pre>\n");
+        st->in_fenced_hl = 0;
+        st->hl_len = 0;
+        break;
+    }
     case CLOSE_BLOCKQUOTE:  MDS_BUF_LIT(b, "</blockquote>\n");
                             if (st->tight_top > 0) st->tight_top--; break;
     case CLOSE_OL:          MDS_BUF_LIT(b, "</ol>\n");
@@ -1109,6 +1146,21 @@ static void cb_text(void* ud, const char* s, size_t n) {
         alt_append(st, s, n);
         return;
     }
+    if (st->in_fenced_hl) {
+        /* Accumulate raw bytes for later syntax-highlighting at leave time. */
+        size_t need = st->hl_len + n;
+        if (need > st->hl_cap) {
+            size_t nc = st->hl_cap ? st->hl_cap : 256;
+            char*  np;
+            while (nc < need) nc *= 2;
+            np = (char*)realloc(st->hl_buf, nc);
+            if (np) { st->hl_buf = np; st->hl_cap = nc; }
+            else { html_escape(aTHX_ st->buf, s, n); return; } /* OOM fallback */
+        }
+        memcpy(st->hl_buf + st->hl_len, s, n);
+        st->hl_len += n;
+        return;
+    }
     if (st->flags & MDS_FLAG_AUTOLINK) {
         /* Accumulate; flushed by any non-text callback. */
         size_t need = st->pending_len + n;
@@ -1456,6 +1508,11 @@ void mds_render_html_install(mds_callbacks* cb, void** ud_out, mds_buf* buf,
     st->fn_in_def = 0;
     st->fn_in_def_label = NULL;
     st->fn_in_def_label_len = 0;
+    st->hl_buf = NULL;
+    st->hl_len = 0;
+    st->hl_cap = 0;
+    st->hl_lang[0] = '\0';
+    st->in_fenced_hl = 0;
     g_img_stack_top = 0;
 
     cb->enter_block  = cb_enter_block;

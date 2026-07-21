@@ -9,7 +9,7 @@ App::Codit::Plugins::Sessions - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -156,16 +156,15 @@ sub consoleDir {
 sub MenuItems {
 	my $self = shift;
 	return (
-#This table is best viewed with tabsize 3.
-#			 type					menupath			label						cmd						icon					keyb			config variable
-		[	'menu', 				undef,			"~Session"],
-		[	'menu', 				'Session::',	"~Open session",		'session_fill_menu'],
-		[	'menu_normal',		'Session::',	"~New session",		'session_new',			'document-new'],
+#			type            menupath			 label             cmd                 icon
+		[	'menu', 				     undef,			    '~Session'],
+		[	'menu', 				     'Session::',	'~Open session',		  'session_fill_menu'],
+		[	'menu_normal',		  'Session::',	'~New session',		   'session_new',			     'document-new'],
 		[	'menu_separator',	'Session::',	'se1'],
-		[	'menu_normal',		'Session::',	"~Save session",		'session_save',		'document-save'],
-		[	'menu_normal',		'Session::',	"~Save session as",	'session_save_as',	'document-save'],
-		[	'menu_separator',	'Session::',	'se1'],
-		[	'menu_normal',		'Session::',	"~Manage sessions",	'session_dialog',		'configure'],
+		[	'menu_normal',		  'Session::',	'~Save session',		  'session_save',		     'document-save'],
+		[	'menu_normal',		  'Session::',	'~Save session as',	'session_save_as',	   'document-save'],
+		[	'menu_separator',	'Session::',	'se2'],
+		[	'menu_normal',		  'Session::',	'~Manage sessions',	'session_dialog',	   	'configure'],
 	)
 }
 
@@ -323,6 +322,7 @@ sub sessionOpen {
 			$browserdir = $options->{'browserdir'};
 			$count ++
 		} else {
+			next unless -e $file;
 			if ($self->cmdExecute('doc_open', $file)) {
 				$mdi->deferredOptions($file, $options);
 			}
@@ -385,7 +385,7 @@ sub sessionSave {
 			my %h = %$options;
 			push @list, [$item, \%h]
 		} else {
-			next if $item =~/^Untitled/;
+			next unless -e $item;
 			my $doc = $mdi->docGet($item);
 			my %h = ();
 			for (@saveoptions) { $h{$_} = $doc->cget($_) }

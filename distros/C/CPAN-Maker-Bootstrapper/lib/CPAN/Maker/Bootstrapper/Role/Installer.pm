@@ -15,8 +15,9 @@ use File::Copy qw(copy);
 use File::Temp;
 use File::Find;
 use Role::Tiny;
+use List::Util qw(max);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.11';
 
 ########################################################################
 sub cmd_install {
@@ -142,18 +143,29 @@ sub cmd_install {
   my ( $ofh, $logfile ) = File::Temp::tempfile( 'make-XXXX', SUFFIX => '.log', UNLINK => $FALSE );
   my ( $efh, $errfile ) = File::Temp::tempfile( 'make-XXXX', SUFFIX => '.err', UNLINK => $FALSE );
 
-  open STDOUT, '>', $logfile or die $OS_ERROR;
-  open STDERR, '>', $errfile or die $OS_ERROR;
+  {
+    ## no critic
+    open STDOUT, "| tee $logfile" or die $OS_ERROR;
+    open STDERR, "| tee $errfile" or die $OS_ERROR;
+  }
 
   my @args = qw(
     PERLTIDYRC=''
     PERLCRITICRC=''
-    SYNTAX_CHECKING=on
     SCAN=on
   );
 
-  if ( $ENV{NO_ECHO} ) {
+  if ( exists $ENV{NO_ECHO} ) {
     push @args, sprintf q{NO_ECHO='%s'}, $ENV{NO_ECHO};
+  }
+
+  if ( exists $ENV{SYNTAX_CHECKING} ) {
+    push @args, sprintf q{SYNTAX_CHECKING='%s'}, $ENV{SYNTAX_CHECKING};
+  }
+
+  if ( exists $ENV{SCAN} ) {
+    $ENV{SCAN} = 'on';
+    $self->get_logger->warn('SCAN is always on');
   }
 
   @args = grep {defined} $module_name_arg, $stub_arg;
@@ -170,13 +182,20 @@ sub cmd_install {
     rename $tarball, 'tarball';
   }
   else {
-    $self->get_logger->error('Error creating distribution (see make.err, make.log)');
-    $self->get_logger->warn( sprintf 'temporary install directory (%s) not removed', $tmpdir );
+    $self->get_logger->error('Error creating distribution!');
+
+    if ( !$self->get_debug ) {
+      $self->get_logger->warn('to keep temporary install directory use --debug');
+    }
+    else {
+      $self->get_logger->warn( sprintf 'temporary directory %s. (see %s, %s)', $tmpdir, $logfile, $errfile );
+    }
 
     eval { $self->check_return_code($rc); 1; } or do {
       $self->get_logger->error($EVAL_ERROR);
-      return $FAILURE;
     };
+
+    return $FAILURE;
   }
 
   $self->get_logger->info('cleaning up...');
@@ -637,6 +656,22 @@ sub _find_primary_package {
     my $candidate = join '::', @reversed_key[ 0 .. $len - 1 ];
     return $reversed_packages{$candidate}
       if exists $reversed_packages{$candidate};
+  }
+
+  return;
+}
+
+########################################################################
+sub _tail_file {
+########################################################################
+  my ( $self, $file, $nlines ) = @_;
+
+  my @lines = split /\n/, slurp($file);
+
+  my $start = max( 0, scalar(@lines) - $nlines );
+
+  foreach my $line ( splice @lines, $start, $nlines ) {
+    $self->get_logger->error($line);
   }
 
   return;

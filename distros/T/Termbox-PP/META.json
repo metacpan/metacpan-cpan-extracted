@@ -1,0 +1,82 @@
+{
+   "abstract" : "Perl port of the termbox2 terminal library",
+   "author" : [
+      "J. Schneider"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Termbox-PP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Termbox"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Encode" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "Pod::Usage" : "0",
+            "Time::HiRes" : "0",
+            "Unicode::EastAsianWidth::Detect" : "0",
+            "lib" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "IO::File" : "0",
+            "Params::Check" : "0",
+            "Scalar::Util" : "0",
+            "Win32::API" : "0.75",
+            "Win32::Console" : "0.1",
+            "Win32::IPC" : "1.11",
+            "Win32API::File" : "0.1201",
+            "constant" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "1.302188"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brickpool/Termbox/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brickpool/Termbox.git",
+         "web" : "https://github.com/brickpool/Termbox"
+      }
+   },
+   "version" : "v0.5.1",
+   "x_homepage" : "http://brickpool.de",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

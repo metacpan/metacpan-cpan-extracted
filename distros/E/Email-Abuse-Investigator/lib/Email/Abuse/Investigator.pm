@@ -27,11 +27,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -306,6 +306,7 @@ Readonly::Array my @REDIRECT_HOST_SUFFIXES => qw(
 	.github.io
 	.firebaseapp.com
 	.web.app
+	.translate.goog
 );
 
 # -----------------------------------------------------------------------
@@ -326,6 +327,9 @@ my %PROVIDER_ABUSE = (
 	'blogger.com'       => { email => 'abuse@google.com',      note => 'Blogger platform abuse' },
 	'sites.google.com'        => { email => 'abuse@google.com',               note => 'Google Sites hosted content' },
 	'storage.googleapis.com'  => { email => 'google-cloud-compliance@google.com', note => 'Google Cloud Storage bucket abuse -- also report via https://support.google.com/code/go/gce_abuse_report' },
+	'gappssmtp.com'           => { email => 'abuse@google.com',               note => 'Google Workspace SMTP signing service -- report account abuse' },
+	'translate.goog'          => { email => 'abuse@google.com',               note => 'Google Translate URL proxy used to cloak phishing URLs -- report via https://support.google.com/translate/answer/4431190' },
+	'googleusercontent.com'   => { email => 'abuse@google.com',               note => 'Google user content hosting (Docs, Drive, Sites) -- also report via https://support.google.com/drive/answer/2408000' },
 	# Microsoft
 	'microsoft.com'     => { email => 'abuse@microsoft.com',   note => 'Also report via https://www.microsoft.com/en-us/wdsi/support/report-unsafe-site' },
 	'outlook.com'       => { email => 'abuse@microsoft.com',   note => 'Report Outlook spam: https://support.microsoft.com/en-us/office/report-phishing' },
@@ -1148,6 +1152,7 @@ sub unresolved_contacts {
 	for my $u ($self->embedded_urls()) {
 		(my $bare = lc $u->{host}) =~ s/^www\.//;
 		next if $covered{$bare};
+		next if $self->_provider_abuse_for_host($bare);
 		next if $seen{"url:$bare"}++;
 		push @out, {
 			domain => $u->{host},
@@ -1162,6 +1167,7 @@ sub unresolved_contacts {
 		my $source = $d->{source} // '';
 		next if $source =~ /^(?:From:|Return-Path:|Sender:) header$/;
 		next if $covered{lc $dom};
+		next if $self->_provider_abuse_for_host($dom);
 		next if $seen{"dom:$dom"}++;
 		push @out, {
 			domain => $dom,

@@ -2,8 +2,8 @@ NAME
     Org::Parser - Parse Org documents
 
 VERSION
-    This document describes version 0.561 of Org::Parser (from Perl
-    distribution Org-Parser), released on 2023-11-06.
+    This document describes version 0.563 of Org::Parser (from Perl
+    distribution Org-Parser), released on 2026-07-21.
 
 SYNOPSIS
      use 5.010;
@@ -149,7 +149,9 @@ CONTRIBUTORS
 
     *   Karl Williamson <khw@cpan.org>
 
-    *   Steven Haryanto <stevenharyanto@gmail.com>
+    *   perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+    *   Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
     *   Tekki <tekki@tekki.ch>
 
@@ -176,8 +178,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016,
-    2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

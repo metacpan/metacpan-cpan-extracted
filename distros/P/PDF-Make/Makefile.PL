@@ -84,7 +84,8 @@ my %WriteMakefileArgs = (
         'Test2::Bundle::Numerical'  => '0.03',
     },
     PREREQ_PM => {
-        'Object::Proto' => '0.16',
+        'Object::Proto'  => '0.16',
+        'Layout::Flex'   => '0.01',
     },
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },

@@ -18,8 +18,9 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Object::Proto::Sugar' => '0.05',
-        'Markdown::Simple'     => '0.16',
+        'Chandra'              => '0.29',
+	'Object::Proto::Sugar' => '0.05',
+        'Markdown::Simple'     => '0.17',
         'Search::Trigram'      => '0.01',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

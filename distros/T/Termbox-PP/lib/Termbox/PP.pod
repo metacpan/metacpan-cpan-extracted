@@ -1,0 +1,2289 @@
+=pod
+
+=head1 NAME
+
+Termbox::PP - minimalistic terminal UI library in pure Perl
+
+=head1 SYNOPSIS
+
+  # Load pure-Perl implementation (provides Termbox.pm)
+  require Termbox::PP;
+
+  # Import API
+  use Termbox qw(:all);
+
+  # Initialize termbox
+  my $rv = tb_init();
+  die "Failed to initialize termbox" if $rv != TB_OK;
+
+  # Ensure cleanup on exit
+  END {
+    tb_shutdown();
+  }
+
+  # Create event object
+  my $event = Termbox::Event->new();
+
+  # Main loop
+  while (1) {
+
+    # Clear back buffer
+    tb_clear();
+
+    # Draw content
+    tb_print(0, 0, TB_WHITE, TB_DEFAULT, "Hello Termbox");
+    tb_print(0, 1, TB_CYAN,  TB_DEFAULT, "Press 'q' to quit");
+
+    # Present to screen
+    tb_present();
+
+    # Wait for event
+    my $rv = tb_poll_event($event);
+    last if $rv != TB_OK;
+
+    # Handle key events
+    if ($event->type == TB_EVENT_KEY) {
+
+      # Quit on 'q'
+      last if $event->ch && chr($event->ch) eq 'q';
+    }
+  }
+
+=head1 DESCRIPTION
+
+C<Termbox::PP> is a lightweight, minimalistic library for building
+text-based user interfaces in Perl.
+
+It provides a small and consistent API for working with terminal output,
+input events, and screen buffers, focusing on the common functionality
+shared across modern terminal emulators.
+
+The module offers a simple abstraction layer for:
+
+=over
+
+=item * rendering text using a cell-based back buffer
+
+=item * handling keyboard, mouse, and resize events
+
+=item * working with colors and terminal attributes
+
+=back
+
+The module is implemented entirely in Perl and does not require XS or any 
+external C libraries. On Unix platforms it only depends on core modules 
+available since Perl L<v5.10|https://metacpan.org/release/DAPM/perl-5.10.1>. 
+
+On Windows platforms, the module requires additional dependencies for console 
+and file handling (usually included with Strawberry Perl), and L<Win32::IPC> for 
+event handling, which is available on CPAN.
+
+=head2 Features
+
+=over
+
+=item * B<Portable abstraction>
+
+Provides a consistent API across different terminal environments.
+
+=item * B<Small and simple API>
+
+The limited API surface makes the module easy to learn, use, and maintain.
+
+=item * B<Pure Perl implementation>
+
+No XS dependencies or external libraries required.
+
+=back
+
+=head2 Usage Note
+
+The module provides a pure Perl implementation of C<Termbox> by
+registering itself as C<Termbox.pm> at runtime.
+
+Therefore, it must be loaded before using C<Termbox>:
+
+  require Termbox::PP;
+  use Termbox qw(:all);
+
+=head2 Status
+
+This module is a Perl port of L<termbox2.h|https://github.com/termbox/termbox2> 
+and is still relatively new. While it aims to be feature-complete, it should be 
+considered experimental and may evolve based on real-world usage.
+
+=head1 API OVERVIEW
+
+  require Termbox::PP;
+  use Termbox qw(:api);
+
+The following list provides an overview of the public API,
+grouped by functionality:
+
+  # Initialize the termbox library
+  tb_init
+  tb_init_file
+  tb_init_fd
+  tb_init_rwfd
+  tb_shutdown
+
+  # Return the size of the internal back buffer
+  tb_width
+  tb_height
+
+  # Clear and update the screen
+  tb_clear
+  tb_set_clear_attrs
+  tb_present
+  tb_invalidate
+
+  # Cursor handling
+  tb_set_cursor
+  tb_hide_cursor
+
+  # Cell operations
+  tb_set_cell
+  tb_set_cell_ex
+  tb_extend_cell
+  tb_get_cell
+
+  # Input and output modes
+  tb_set_input_mode
+  tb_set_output_mode
+
+  # Event handling
+  tb_peek_event
+  tb_poll_event
+  tb_get_fds
+
+  # Printing functions
+  tb_print
+  tb_printf
+  tb_print_ex
+  tb_printf_ex
+
+  # Raw output
+  tb_send
+  tb_sendf
+
+  # UTF-8 utility functions
+  tb_utf8_char_length
+  tb_utf8_char_to_unicode
+  tb_utf8_unicode_to_char
+
+  # Utility functions
+  tb_last_errno
+  tb_strerror
+  tb_has_truecolor
+  tb_has_egc
+  tb_attr_width
+  tb_version
+  tb_iswprint
+  tb_wcwidth
+
+  # Deprecated
+  tb_cell_buffer
+  tb_set_func
+
+=head1 PUBLIC API
+
+=head2 tb_init
+
+  my $rv = tb_init();
+
+Initializes the termbox library using C</dev/tty>.
+
+This is the most common entry point and should be called before any other
+API function. Internally, it is equivalent to:
+
+  tb_init_file('/dev/tty');
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_init_file
+
+  my $rv = tb_init_file($path);
+
+Initializes the termbox library using the specified tty device path.
+
+Arguments:
+
+=over
+
+=item * C<$path> (B<Str>)
+
+Path to the tty device (e.g. C</dev/tty>).
+
+=back
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_init_fd
+
+  my $rv = tb_init_fd($ttyfd);
+
+Initializes the termbox library using an existing file descriptor.
+
+Arguments:
+
+=over
+
+=item * C<$ttyfd> (B<Int>)
+
+File descriptor referring to a tty device.
+
+=back
+
+This is a convenience wrapper for C<tb_init_rwfd($ttyfd, $ttyfd)>.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_init_rwfd
+
+  my $rv = tb_init_rwfd($rfd, $wfd);
+
+Initializes the termbox library using separate read and write
+file descriptors.
+
+Arguments:
+
+=over
+
+=item * C<$rfd> (B<Int>)
+
+File descriptor used for reading input.
+
+=item * C<$wfd> (B<Int>)
+
+File descriptor used for writing output.
+
+=back
+
+This is the most flexible initialization method and is typically used when
+integrating termbox into custom I/O setups.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_shutdown
+
+  my $rv = tb_shutdown();
+
+Finalizes the termbox library and restores the terminal state.
+
+This function must be called after successful initialization to ensure that
+the terminal is returned to its normal mode (cursor visibility, input mode,
+etc.).
+
+Returns C<TB_OK> on success or C<TB_ERR_NOT_INIT> if termbox was not
+initialized.
+
+=head2 tb_width
+
+  my $cols = tb_width();
+
+Returns the width of the internal back buffer in columns (B<Int>).
+
+This value corresponds to the current terminal width. It is updated after
+initialization and whenever the terminal size changes (e.g. after a resize
+event).
+
+Returns a negative error code (C<TB_ERR_NOT_INIT>) if the library has not
+been initialized.
+
+=head2 tb_height
+
+  my $rows = tb_height();
+
+Returns the height of the internal back buffer in rows (B<Int>).
+
+This value corresponds to the current terminal height. It is updated after
+initialization and whenever the terminal size changes.
+
+Returns a negative error code (C<TB_ERR_NOT_INIT>) if the library has not
+been initialized.
+
+=head2 tb_clear
+
+  my $rv = tb_clear();
+
+Clears the internal back buffer using the currently configured
+foreground/background clear attributes.
+
+This does not immediately update the terminal. Call C<tb_present()> to
+flush the changes to the screen.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_set_clear_attrs
+
+  my $rv = tb_set_clear_attrs($fg, $bg);
+
+Sets the foreground and background attributes used by C<tb_clear()>.
+
+Arguments:
+
+=over
+
+=item * C<$fg> (B<PositiveOrZeroInt>)
+
+Foreground color/attribute (bitmask of C<TB_*> constants).
+
+=item * C<$bg> (B<PositiveOrZeroInt>)
+
+Background color/attribute (bitmask of C<TB_*> constants).
+
+=back
+
+Returns C<TB_OK> on success or a negative error code if termbox is not
+initialized.
+
+=head2 tb_present
+
+  my $rv = tb_present();
+
+Flushes the internal back buffer to the terminal.
+
+All changes made via functions like C<tb_set_cell()> or C<tb_print()>
+become visible only after calling this function.
+
+Typically, applications perform rendering in a loop:
+
+  tb_clear();
+  # draw content
+  tb_present();
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_invalidate
+
+  my $rv = tb_invalidate();
+
+Invalidates the internal front buffer and forces a full redraw on the next
+C<tb_present()> call.
+
+This is usually not required in normal operation but can be useful after
+terminal inconsistencies (e.g. external redraws or unsupported escape
+sequences).
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_set_cursor
+
+  my $rv = tb_set_cursor($cx, $cy);
+
+Sets the position of the cursor.
+
+Arguments:
+
+=over
+
+=item * C<$cx> (B<Int>)
+
+Column position (0-based).
+
+=item * C<$cy> (B<Int>)
+
+Row position (0-based).
+
+=back
+
+The top-left corner of the terminal is (0, 0).
+
+Passing negative values will clamp the cursor to (0, 0).
+
+Returns C<TB_OK> on success or a negative error code if termbox is not
+initialized.
+
+=head2 tb_hide_cursor
+
+  my $rv = tb_hide_cursor();
+
+Hides the terminal cursor.
+
+Returns C<TB_OK> on success or a negative error code if termbox is not
+initialized.
+
+=head2 tb_set_cell
+
+  my $rv = tb_set_cell($x, $y, $ch, $fg, $bg);
+
+Sets a single cell in the internal back buffer.
+
+Arguments:
+
+=over
+
+=item * C<$x> (B<Int>)
+
+Column position (0-based).
+
+=item * C<$y> (B<Int>)
+
+Row position (0-based).
+
+=item * C<$ch> (B<Str>)
+
+UTF-8 string, only the first character is used.
+
+=item * C<$fg> (B<PositiveOrZeroInt>)
+
+Foreground color/attribute (bitmask of C<TB_*> constants).
+
+=item * C<$bg> (B<PositiveOrZeroInt>)
+
+Background color/attribute (bitmask of C<TB_*> constants).
+
+=back
+
+This is a convenience wrapper around C<tb_set_cell_ex()>.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_set_cell_ex
+
+  my $rv = tb_set_cell_ex($x, $y, $ch, $nch, $fg, $bg);
+
+Sets a cell using one or more characters (extended grapheme cluster).
+
+Arguments:
+
+=over
+
+=item * C<$x>, C<$y> (B<Int>)
+
+Cell position (0-based).
+
+=item * C<$ch> (B<Str>)
+
+UTF-8 string containing one or more characters.
+
+=item * C<$nch> (B<PositiveOrZeroInt>)
+
+Number of codepoints in C<$ch>.
+
+=item * C<$fg>, C<$bg> (B<PositiveOrZeroInt>)
+
+Foreground/background attributes.
+
+=back
+
+This function allows setting extended grapheme clusters when
+C<TB_OPT_EGC> is enabled.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_extend_cell
+
+  my $rv = tb_extend_cell($x, $y, $ch);
+
+Appends a single character to an existing cell, extending its grapheme cluster.
+
+This is used to build extended grapheme clusters incrementally.
+
+Arguments:
+
+=over
+
+=item * C<$x>, C<$y> (B<Int>)
+
+Cell position.
+
+=item * C<$ch> (B<Str>)
+
+UTF-8 string containing a single character to append.
+
+=back
+
+This function requires C<TB_OPT_EGC> support.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_get_cell
+
+  my $rv = tb_get_cell($x, $y, $back, \$cell);
+
+Returns a reference to a cell at the given position.
+
+Arguments:
+
+=over
+
+=item * C<$x>, C<$y> (B<Int>)
+
+Cell position.
+
+=item * C<$back> (B<Bool>)
+
+If true, access the back buffer; otherwise the front buffer.
+
+=item * C<\$cell> (B<Ref>)
+
+Output parameter receiving the cell object reference.
+
+=back
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_set_input_mode
+
+  my $rv = tb_set_input_mode($mode);
+
+Sets the input mode for keyboard and mouse handling.
+
+Arguments:
+
+=over
+
+=item * C<$mode> (B<Int>)
+
+Bitmask of input mode flags.
+
+Supported flags:
+
+  TB_INPUT_ESC
+  TB_INPUT_ALT
+  TB_INPUT_MOUSE
+
+=back
+
+Behavior:
+
+=over
+
+=item * C<TB_INPUT_ESC>
+
+Escape (C<\x1b>) is returned as a standalone key event.
+
+=item * C<TB_INPUT_ALT>
+
+Escape prefixes are interpreted as ALT-modified key events.
+
+=item * C<TB_INPUT_MOUSE>
+
+Enables mouse input events.
+
+=back
+
+Notes:
+
+=over
+
+=item * If neither C<TB_INPUT_ESC> nor C<TB_INPUT_ALT> is set, C<TB_INPUT_ESC> is used.
+
+=item * If both C<TB_INPUT_ESC> and C<TB_INPUT_ALT> are set, only C<TB_INPUT_ESC> is used.
+
+=item * Pass C<TB_INPUT_CURRENT> to query the current mode.
+
+=back
+
+Returns the current mode if C<TB_INPUT_CURRENT> is passed, otherwise
+C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_set_output_mode
+
+  my $rv = tb_set_output_mode($mode);
+
+Sets the rendering output mode (color capabilities).
+
+Arguments:
+
+=over
+
+=item * C<$mode> (B<Int>)
+
+One of:
+
+  TB_OUTPUT_NORMAL
+  TB_OUTPUT_256
+  TB_OUTPUT_216
+  TB_OUTPUT_GRAYSCALE
+
+Optional (depending on build):
+
+  TB_OUTPUT_TRUECOLOR
+
+=back
+
+Behavior:
+
+=over
+
+=item * C<TB_OUTPUT_NORMAL>
+
+8 basic colors + attributes.
+
+=item * C<TB_OUTPUT_256>
+
+256-color palette.
+
+=item * C<TB_OUTPUT_216>
+
+216-color subset.
+
+=item * C<TB_OUTPUT_GRAYSCALE>
+
+24 grayscale levels.
+
+=item * C<TB_OUTPUT_TRUECOLOR>
+
+24-bit RGB color (if supported).
+
+=back
+
+Notes:
+
+=over
+
+=item * Pass C<TB_OUTPUT_CURRENT> to retrieve the current mode.
+
+=item * Color interpretation depends on terminal capabilities.
+
+=item * Switching modes does not automatically re-render existing cells.
+
+=back
+
+Returns the current mode if C<TB_OUTPUT_CURRENT> is passed, otherwise
+C<TB_OK> on success or C<TB_ERR> on invalid mode.
+
+=head2 tb_peek_event
+
+  my $rv = tb_peek_event($event, $timeout_ms);
+
+Waits for an event with a timeout.
+
+Arguments:
+
+=over
+
+=item * C<$event> (B<Object>)
+
+Event object that will be populated.
+
+=item * C<$timeout_ms> (B<Int>)
+
+Timeout in milliseconds.
+
+=back
+
+Returns:
+
+=over
+
+=item * C<TB_OK> if an event was received
+
+=item * C<TB_ERR_NO_EVENT> if the timeout expired
+
+=item * negative error code on failure
+
+=back
+
+=head2 tb_poll_event
+
+  my $rv = tb_poll_event($event);
+
+Waits indefinitely for the next event.
+
+Arguments:
+
+=over
+
+=item * C<$event> (B<Object>)
+
+Event object that will be populated.
+
+=back
+
+This is equivalent to:
+
+  tb_peek_event($event, -1);
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_get_fds
+
+  my $rv = tb_get_fds($ttyfd, $resizefd);
+
+Returns internal file descriptors used by termbox.
+
+Arguments:
+
+=over
+
+=item * C<$ttyfd> (B<ScalarRef>)
+
+Receives the tty file descriptor.
+
+=item * C<$resizefd> (B<ScalarRef>)
+
+Receives the resize event file descriptor.
+
+=back
+
+These descriptors can be used with C<select()>, C<poll()> or similar
+mechanisms for integrating termbox into custom event loops.
+
+Returns C<TB_OK> on success or C<TB_ERR_NOT_INIT> if termbox is not initialized.
+
+=head2 tb_print
+
+  my $rv = tb_print($x, $y, $fg, $bg, $str);
+
+Writes a string to the internal back buffer at the given position.
+
+Arguments:
+
+=over
+
+=item * C<$x>, C<$y> (B<Int>)
+
+Starting position (0-based).
+
+=item * C<$fg> (B<PositiveOrZeroInt>)
+
+Foreground color/attribute (bitmask of C<TB_*> constants).
+
+=item * C<$bg> (B<PositiveOrZeroInt>)
+
+Background color/attribute (bitmask of C<TB_*> constants).
+
+=item * C<$str> (B<Str>)
+
+String to render.
+
+=back
+
+This is a convenience wrapper around C<tb_print_ex()>.
+
+The text is written into the back buffer and becomes visible only after
+calling C<tb_present()>.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_printf
+
+  my $rv = tb_printf($x, $y, $fg, $bg, $fmt, @args);
+
+Formatted print function (like C<sprintf>).
+
+Arguments:
+
+=over
+
+=item * C<$fmt> (B<Str>)
+
+Format string.
+
+=item * C<@args>
+
+Arguments for formatting.
+
+=back
+
+This is a convenience wrapper around C<tb_print_ex()>.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_print_ex
+
+  my $rv = tb_print_ex($x, $y, $fg, $bg, \$out_width|undef, $str);
+
+Extended print function with optional width output.
+
+Arguments:
+
+=over
+
+=item * C<$x>, C<$y> (B<Int>)
+
+Starting position.
+
+=item * C<$fg>, C<$bg> (B<PositiveOrZeroInt>)
+
+Foreground/background attributes.
+
+=item * C<\$out_width> (B<ScalarRef> or C<undef>)
+
+Optional output parameter receiving the rendered width.
+
+=item * C<$str> (B<Str>)
+
+String to render.
+
+=back
+
+This function converts the string into Unicode codepoints and writes them
+into the back buffer.
+
+If C<$out_width> is provided, it will be set to the number of columns used.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_printf_ex
+
+  my $rv = tb_printf_ex($x, $y, $fg, $bg, \$out_width|undef, $fmt, @args);
+
+Extended formatted print function.
+
+Arguments:
+
+=over
+
+=item * C<$x>, C<$y> (B<Int>)
+
+Starting position.
+
+=item * C<$fg>, C<$bg> (B<PositiveOrZeroInt>)
+
+Foreground/background attributes.
+
+=item * C<\$out_width> (B<ScalarRef> or C<undef>)
+
+Optional output parameter receiving the rendered width.
+
+=item * C<$fmt> (B<Str>)
+
+Format string.
+
+=item * C<@args>
+
+Arguments for formatting.
+
+=back
+
+This function behaves like C<tb_printf()> but allows retrieving the output
+width via C<$out_width>.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_send
+
+  my $rv = tb_send($buf, $len);
+
+Sends raw bytes directly to the terminal.
+
+Arguments:
+
+=over
+
+=item * C<$buf> (B<Str>)
+
+Buffer containing raw bytes.
+
+=item * C<$len> (B<PositiveOrZeroInt>)
+
+Number of bytes to send.
+
+=back
+
+This function bypasses the cell buffer and writes directly to the output
+buffer.
+
+Use with care, as it may interfere with termbox's internal state.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 tb_sendf
+
+  my $rv = tb_sendf($fmt, @args);
+
+Formatted version of C<tb_send()>.
+
+Arguments:
+
+=over
+
+=item * C<$fmt> (B<Str>)
+
+Format string.
+
+=item * C<@args>
+
+Arguments for formatting.
+
+=back
+
+The formatted string is sent directly to the terminal as raw bytes.
+
+The output length must not exceed the internal buffer size
+(C<TB_OPT_PRINTF_BUF>), otherwise an error is returned.
+
+Returns C<TB_OK> on success or C<TB_ERR> on failure.
+
+=head2 tb_utf8_char_length
+
+  my $len = tb_utf8_char_length($str);
+
+Returns the byte length of the first UTF-8 character in the given string.
+
+Arguments:
+
+=over
+
+=item * C<$str> (B<Str>)
+
+Input string.
+
+=back
+
+If the string is empty, returns 0.
+
+The result is between 1 and 6 bytes.
+
+Returns 0 on empty input.
+
+=head2 tb_utf8_char_to_unicode
+
+  my $len = tb_utf8_char_to_unicode(\$out, $str);
+
+Converts a UTF-8 encoded character into a Unicode codepoint.
+
+Arguments:
+
+=over
+
+=item * C<\$out> (B<ScalarRef>)
+
+Output parameter receiving the Unicode codepoint.
+
+=item * C<$str> (B<Str>)
+
+Input string containing at least one UTF-8 character.
+
+=back
+
+Behavior:
+
+=over
+
+=item * Returns 0 if the input string is empty.
+
+=item * Returns a negative value on decoding error.
+
+=item * Otherwise returns the number of bytes consumed.
+
+=back
+
+=head2 tb_utf8_unicode_to_char
+
+  my $len = tb_utf8_unicode_to_char(\$out, $codepoint);
+
+Converts a Unicode codepoint into a UTF-8 encoded string.
+
+Arguments:
+
+=over
+
+=item * C<\$out> (B<ScalarRef>)
+
+Output parameter receiving the UTF-8 encoded string.
+
+=item * C<$codepoint> (B<PositiveOrZeroInt>)
+
+Unicode codepoint.
+
+=back
+
+Returns the number of bytes written (1-6 bytes).
+
+Supports standard Unicode range as well as extended UTF-8 encoding.
+
+=head2 tb_last_errno
+
+  my $err = tb_last_errno();
+
+Returns the last error number produced by termbox.
+
+This value can be used together with C<tb_strerror()> to obtain a
+human-readable error message.
+
+=head2 tb_strerror
+
+  my $msg = tb_strerror($err);
+
+Returns a string describing the given error code.
+
+Arguments:
+
+=over
+
+=item * C<$err> (B<Int>)
+
+Error code returned by a termbox function.
+
+=back
+
+For system-level errors, the underlying C<$!> value is used.
+
+=head2 tb_has_truecolor
+
+  my $bool = tb_has_truecolor();
+
+Returns whether truecolor (24-bit color) is supported by the build.
+
+Returns 1 if available, otherwise 0
+
+=head2 tb_has_egc
+
+  my $bool = tb_has_egc();
+
+Returns whether extended grapheme cluster (EGC) support is enabled.
+
+Returns 1 if enabled, otherwise 0.
+
+=head2 tb_attr_width
+
+  my $bits = tb_attr_width();
+
+Returns the bit width used for attribute encoding.
+
+Typical values are 16, 32, or 64 depending on build configuration.
+
+=head2 tb_iswprint
+
+  my $bool = tb_iswprint($codepoint);
+
+Checks whether a Unicode codepoint is printable.
+
+Arguments:
+
+=over
+
+=item * C<$codepoint> (B<PositiveOrZeroInt>)
+
+Unicode codepoint.
+
+=back
+
+Returns a boolean value.
+
+=head2 tb_wcwidth
+
+  my $width = tb_wcwidth($codepoint);
+
+Returns the display width of a Unicode codepoint.
+
+Arguments:
+
+=over
+
+=item * C<$codepoint> (B<PositiveOrZeroInt>)
+
+Unicode codepoint.
+
+=back
+
+Returns:
+
+=over
+
+=item * -1 for non-printable characters
+
+=item * 0 for zero-width characters
+
+=item * 1 or 2 for printable characters
+
+=back
+
+Width calculation depends on Unicode properties and locale settings.
+
+=head2 tb_cell_buffer
+
+  my $cells = tb_cell_buffer();
+
+B<DEPRECATED>
+
+Returns a reference to the internal back buffer.
+
+This function is deprecated and may be removed in a future release.
+
+Instead, use:
+
+  tb_get_cell()
+
+and related APIs to access cell data.
+
+Returns an array reference of C<Termbox::Cell> objects.
+
+=head2 tb_set_func
+
+  my $rv = tb_set_func($fn_type, $fn);
+
+B<DEPRECATED>
+
+Sets a custom callback for escape sequence processing.
+
+Arguments:
+
+=over
+
+=item * C<$fn_type> (B<Int>)
+
+One of:
+
+  TB_FUNC_EXTRACT_PRE
+  TB_FUNC_EXTRACT_POST
+
+=item * C<$fn> (B<CodeRef>)
+
+Callback function.
+
+=back
+
+This function is deprecated and may be removed in a future release.
+
+Returns C<TB_OK> on success or a negative error code on failure.
+
+=head2 Termbox::Cell
+
+Represents a single cell in the terminal.
+
+Fields:
+
+=over
+
+=item * C<ch> (B<Int>)
+
+Unicode codepoint.
+
+=item * C<fg> (B<Int>)
+
+Foreground attributes.
+
+=item * C<bg> (B<Int>)
+
+Background attributes.
+
+=back
+
+=head3 Extended Grapheme Cluster Methods
+
+The following methods are available when C<TB_OPT_EGC> is enabled:
+
+=over
+
+=item * C<ech> (B<ArrayRef>)
+
+  my $aref = $cell->ech();
+
+Returns an array reference containing the Unicode codepoints of the
+extended grapheme cluster stored in the cell.
+
+Returns C<undef> if the cell does not contain a multi-codepoint cluster.
+
+Example usage:
+
+  my $cell;
+  tb_get_cell(0, 0, 1, \$cell);
+
+  if (my $cluster = $cell->ech()) {
+    print "Cluster size: ", scalar(@$cluster), "\n";
+  }
+
+=item * C<nech> (B<Int>)
+
+  my $n = $cell->nech();
+
+Returns the length of the extended grapheme cluster if it contains more
+than one codepoint, otherwise returns 0.
+
+=item * C<cech> (B<Int>)
+
+  my $count = $cell->cech();
+
+Returns the number of codepoints in the extended grapheme cluster.
+
+Returns 0 if no cluster is present.
+
+=back
+
+=head3 Constructor
+
+  my $cell = Termbox::Cell->new();
+
+Creates a new cell object.
+
+A cell represents a single position in the terminal and contains:
+
+=over
+
+=item * character (UTF-8 string / codepoint)
+
+=item * foreground attributes
+
+=item * background attributes
+
+=back
+
+The returned object can be used internally by termbox functions or
+retrieved via C<tb_get_cell()>.
+
+Returns a new C<Termbox::Cell> instance.
+
+=head2 Termbox::Event
+
+Represents an input event from the terminal.
+
+Event objects are populated by C<tb_peek_event()> and
+C<tb_poll_event()>.
+
+Fields:
+
+=over
+
+=item * C<type> (B<Int>)
+
+Event type:
+
+  TB_EVENT_KEY
+  TB_EVENT_RESIZE
+  TB_EVENT_MOUSE
+
+=item * C<key> (B<Int>)
+
+Key constant (C<TB_KEY_*>). Used for special keys.
+
+=item * C<ch> (B<Int>)
+
+Unicode codepoint (for character input).
+
+=item * C<mod> (B<Int>)
+
+Modifier flags (bitmask of C<TB_MOD_*>):
+
+  TB_MOD_ALT
+  TB_MOD_CTRL
+  TB_MOD_SHIFT
+
+=item * C<w> (B<Int>)
+
+Width of the terminal after resize (only valid for resize events).
+
+=item * C<h> (B<Int>)
+
+Height of the terminal after resize.
+
+=item * C<x> (B<Int>)
+
+Mouse X position (for mouse events).
+
+=item * C<y> (B<Int>)
+
+Mouse Y position (for mouse events).
+
+=back
+
+=head3 Constructor
+
+  my $event = Termbox::Event->new();
+
+Creates a new event object.
+
+The event structure is used with C<tb_peek_event()> and
+C<tb_poll_event()> to receive input events.
+
+Depending on the event type, the following fields are populated:
+
+=over
+
+=item * C<type> (B<Int>)
+
+One of:
+
+  TB_EVENT_KEY
+  TB_EVENT_RESIZE
+  TB_EVENT_MOUSE
+
+=item * C<key> (B<Int>)
+
+Key constant (C<TB_KEY_*>).
+
+=item * C<ch> (B<Int>)
+
+Unicode codepoint (for character input).
+
+=item * C<mod> (B<Int>)
+
+Modifier flags (C<TB_MOD_*>).
+
+=item * C<w,h> (B<Int>)
+
+New terminal size (resize events).
+
+=item * C<x,y> (B<Int>)
+
+Mouse coordinates.
+
+=back
+
+Returns a new C<Termbox::Event> instance.
+
+=head1 COMPILE-TIME OPTIONS
+
+C<Termbox::PP> provides several compile-time options that influence its
+behavior. These options are typically controlled via environment variables
+and are evaluated when the module is loaded.
+
+B<Note:> Most applications do not need to modify these settings. The defaults 
+are suitable for typical terminal applications.
+
+=head2 STRICT
+
+  PERL_STRICT=1 perl your_script.pl
+
+Enables strict argument validation for internal API calls.
+
+If enabled, function arguments are checked more rigorously and invalid
+input may cause exceptions.
+
+By default, STRICT mode is enabled automatically when one of the following
+environment variables is set:
+
+  PERL_STRICT
+  EXTENDED_TESTING
+  AUTHOR_TESTING
+  RELEASE_TESTING
+
+=head2 TB_OPT_EGC
+
+  TB_OPT_EGC=0 perl your_script.pl
+
+Controls support for extended grapheme clusters (EGC). 
+
+Default: disabled.
+
+=over
+
+=item * Enabled (default)
+
+Cells may contain multi-codepoint grapheme clusters (e.g. emoji,
+combining characters).
+
+=item * Disabled
+
+Cells are restricted to a single codepoint.
+
+=back
+
+=head2 TB_OPT_PRINTF_BUF
+
+  TB_OPT_PRINTF_BUF=8192 perl your_script.pl
+
+Defines the maximum buffer size used by C<tb_printf()> and C<tb_sendf()>.
+
+If the formatted output exceeds this size, the operation will fail.
+
+Default: 4096 bytes.
+
+=head2 TB_OPT_READ_BUF
+
+  TB_OPT_READ_BUF=128 perl your_script.pl
+
+Defines the size of the input buffer used when reading from the terminal.
+
+Increasing this value may improve performance for high-throughput input
+scenarios.
+
+Default: 64 bytes.
+
+=head2 TB_OPT_LIBC_WCHAR
+
+  TB_OPT_LIBC_WCHAR=0 perl your_script.pl
+
+Selects the backend used for Unicode width calculations.
+
+=over
+
+=item * Enabled (if available)
+
+Uses C<Unicode::UCD>-based width calculation when 
+C<Unicode::UCD::prop_invmap> and C<Unicode::UCD::search_invlist> is available.
+
+=item * Disabled (default)
+
+Uses the bundled fallback implementation.
+
+=back
+
+=head2 TB_OPT_ATTR_W
+
+Controls the bit width used for attribute encoding.
+
+Typical values are:
+
+  16   (basic attributes)
+  32   (extended / truecolor)
+  64   (additional style attributes)
+
+Default: 16 bits.
+
+=head2 TB_TERMINFO_DIR
+
+  TB_TERMINFO_DIR=/custom/path perl your_script.pl
+
+Specifies a custom directory for terminfo database lookup.
+
+If not set, standard system locations are used.
+
+=head2 TB_RESIZE_FALLBACK_MS
+
+  TB_RESIZE_FALLBACK_MS=500 perl your_script.pl
+
+Defines the timeout (in milliseconds) used for fallback terminal size
+detection.
+
+Default: 1000 ms.
+
+=head2 TB_OPT_TRUECOLOR
+
+B<DEPRECATED>
+
+Legacy option for enabling truecolor support.
+
+This option is retained for backward compatibility and should not be used
+in new code.
+
+=head1 CONSTANTS
+
+The following constants may be imported individually by name or by using
+one of the export tags.
+
+For example:
+
+    use Termbox qw(:keys :colors :event :return :func);
+
+Some constants are aliases for the same numeric value. This mirrors the
+underlying terminal input model where different key names may produce the
+same byte value.
+
+=head2 C<:keys>
+
+Imports key constants used with C<< $tb_event->key >>.
+
+This includes ASCII control-key constants, printable ASCII key constants,
+terminal-dependent key constants, and terminfo capability constants.
+
+=head3 ASCII key constants
+
+These constants represent ASCII control characters and selected printable
+ASCII keys.
+
+Several names intentionally share the same value. For example,
+C<TB_KEY_CTRL_H> and C<TB_KEY_BACKSPACE> both represent C<0x08>.
+
+=over 4
+
+=item C<TB_KEY_CTRL_TILDE> C<(0x00)>
+
+Control-tilde.
+
+=item C<TB_KEY_CTRL_2> C<(0x00)>
+
+Alias for C<TB_KEY_CTRL_TILDE>.
+
+=item C<TB_KEY_CTRL_A> C<(0x01)>
+
+Control-A.
+
+=item C<TB_KEY_CTRL_B> C<(0x02)>
+
+Control-B.
+
+=item C<TB_KEY_CTRL_C> C<(0x03)>
+
+Control-C.
+
+=item C<TB_KEY_CTRL_D> C<(0x04)>
+
+Control-D.
+
+=item C<TB_KEY_CTRL_E> C<(0x05)>
+
+Control-E.
+
+=item C<TB_KEY_CTRL_F> C<(0x06)>
+
+Control-F.
+
+=item C<TB_KEY_CTRL_G> C<(0x07)>
+
+Control-G.
+
+=item C<TB_KEY_BACKSPACE> C<(0x08)>
+
+Backspace.
+
+=item C<TB_KEY_CTRL_H> C<(0x08)>
+
+Alias for C<TB_KEY_BACKSPACE>.
+
+=item C<TB_KEY_TAB> C<(0x09)>
+
+Tab.
+
+=item C<TB_KEY_CTRL_I> C<(0x09)>
+
+Alias for C<TB_KEY_TAB>.
+
+=item C<TB_KEY_CTRL_J> C<(0x0a)>
+
+Control-J.
+
+=item C<TB_KEY_CTRL_K> C<(0x0b)>
+
+Control-K.
+
+=item C<TB_KEY_CTRL_L> C<(0x0c)>
+
+Control-L.
+
+=item C<TB_KEY_ENTER> C<(0x0d)>
+
+Enter.
+
+=item C<TB_KEY_CTRL_M> C<(0x0d)>
+
+Alias for C<TB_KEY_ENTER>.
+
+=item C<TB_KEY_CTRL_N> C<(0x0e)>
+
+Control-N.
+
+=item C<TB_KEY_CTRL_O> C<(0x0f)>
+
+Control-O.
+
+=item C<TB_KEY_CTRL_P> C<(0x10)>
+
+Control-P.
+
+=item C<TB_KEY_CTRL_Q> C<(0x11)>
+
+Control-Q.
+
+=item C<TB_KEY_CTRL_R> C<(0x12)>
+
+Control-R.
+
+=item C<TB_KEY_CTRL_S> C<(0x13)>
+
+Control-S.
+
+=item C<TB_KEY_CTRL_T> C<(0x14)>
+
+Control-T.
+
+=item C<TB_KEY_CTRL_U> C<(0x15)>
+
+Control-U.
+
+=item C<TB_KEY_CTRL_V> C<(0x16)>
+
+Control-V.
+
+=item C<TB_KEY_CTRL_W> C<(0x17)>
+
+Control-W.
+
+=item C<TB_KEY_CTRL_X> C<(0x18)>
+
+Control-X.
+
+=item C<TB_KEY_CTRL_Y> C<(0x19)>
+
+Control-Y.
+
+=item C<TB_KEY_CTRL_Z> C<(0x1a)>
+
+Control-Z.
+
+=item C<TB_KEY_ESC> C<(0x1b)>
+
+Escape.
+
+=item C<TB_KEY_CTRL_LSQ_BRACKET> C<(0x1b)>
+
+Alias for C<TB_KEY_ESC>.
+
+=item C<TB_KEY_CTRL_3> C<(0x1b)>
+
+Alias for C<TB_KEY_ESC>.
+
+=item C<TB_KEY_CTRL_4> C<(0x1c)>
+
+Control-4.
+
+=item C<TB_KEY_CTRL_BACKSLASH> C<(0x1c)>
+
+Alias for C<TB_KEY_CTRL_4>.
+
+=item C<TB_KEY_CTRL_5> C<(0x1d)>
+
+Control-5.
+
+=item C<TB_KEY_CTRL_RSQ_BRACKET> C<(0x1d)>
+
+Alias for C<TB_KEY_CTRL_5>.
+
+=item C<TB_KEY_CTRL_6> C<(0x1e)>
+
+Control-6.
+
+=item C<TB_KEY_CTRL_7> C<(0x1f)>
+
+Control-7.
+
+=item C<TB_KEY_CTRL_SLASH> C<(0x1f)>
+
+Alias for C<TB_KEY_CTRL_7>.
+
+=item C<TB_KEY_CTRL_UNDERSCORE> C<(0x1f)>
+
+Alias for C<TB_KEY_CTRL_7>.
+
+=item C<TB_KEY_SPACE> C<(0x20)>
+
+Space.
+
+=item C<TB_KEY_BACKSPACE2> C<(0x7f)>
+
+Alternative Backspace value.
+
+=item C<TB_KEY_CTRL_8> C<(0x7f)>
+
+Alias for C<TB_KEY_BACKSPACE2>.
+
+=back
+
+=head3 Terminal-dependent key constants
+
+These constants are used with C<< $tb_event->key >> for keys that are not
+represented by simple ASCII values.
+
+The numeric values are allocated from the upper end of the 16-bit range.
+
+=over 4
+
+=item C<TB_KEY_F1> .. C<TB_KEY_F12>
+
+Function keys F1 through F12.
+
+=item C<TB_KEY_INSERT>
+
+Insert key.
+
+=item C<TB_KEY_DELETE>
+
+Delete key.
+
+=item C<TB_KEY_HOME>
+
+Home key.
+
+=item C<TB_KEY_END>
+
+End key.
+
+=item C<TB_KEY_PGUP>
+
+Page Up key.
+
+=item C<TB_KEY_PGDN>
+
+Page Down key.
+
+=item C<TB_KEY_ARROW_UP>
+
+Arrow Up key.
+
+=item C<TB_KEY_ARROW_DOWN>
+
+Arrow Down key.
+
+=item C<TB_KEY_ARROW_LEFT>
+
+Arrow Left key.
+
+=item C<TB_KEY_ARROW_RIGHT>
+
+Arrow Right key.
+
+=item C<TB_KEY_BACK_TAB>
+
+Back Tab key, usually Shift-Tab.
+
+=item C<TB_KEY_MOUSE_LEFT>
+
+Left mouse button.
+
+=item C<TB_KEY_MOUSE_RIGHT>
+
+Right mouse button.
+
+=item C<TB_KEY_MOUSE_MIDDLE>
+
+Middle mouse button.
+
+=item C<TB_KEY_MOUSE_RELEASE>
+
+Mouse button release.
+
+=item C<TB_KEY_MOUSE_WHEEL_UP>
+
+Mouse wheel up.
+
+=item C<TB_KEY_MOUSE_WHEEL_DOWN>
+
+Mouse wheel down.
+
+=back
+
+=head3 Terminfo capability constants
+
+These constants identify terminal capabilities.
+
+They are mostly useful internally or when working directly with lower-level
+capability handling.
+
+=over 4
+
+=item C<TB_CAP_F1> .. C<TB_CAP_F12>
+
+Capabilities for function keys F1 through F12.
+
+=item C<TB_CAP_INSERT>
+
+Insert key capability.
+
+=item C<TB_CAP_DELETE>
+
+Delete key capability.
+
+=item C<TB_CAP_HOME>
+
+Home key capability.
+
+=item C<TB_CAP_END>
+
+End key capability.
+
+=item C<TB_CAP_PGUP>
+
+Page Up key capability.
+
+=item C<TB_CAP_PGDN>
+
+Page Down key capability.
+
+=item C<TB_CAP_ARROW_UP>
+
+Arrow Up key capability.
+
+=item C<TB_CAP_ARROW_DOWN>
+
+Arrow Down key capability.
+
+=item C<TB_CAP_ARROW_LEFT>
+
+Arrow Left key capability.
+
+=item C<TB_CAP_ARROW_RIGHT>
+
+Arrow Right key capability.
+
+=item C<TB_CAP_BACK_TAB>
+
+Back Tab key capability.
+
+=item C<TB_CAP__COUNT_KEYS>
+
+Number of key capabilities.
+
+=item C<TB_CAP_ENTER_CA>
+
+Enter cursor addressing mode.
+
+=item C<TB_CAP_EXIT_CA>
+
+Exit cursor addressing mode.
+
+=item C<TB_CAP_SHOW_CURSOR>
+
+Show the terminal cursor.
+
+=item C<TB_CAP_HIDE_CURSOR>
+
+Hide the terminal cursor.
+
+=item C<TB_CAP_CLEAR_SCREEN>
+
+Clear the screen.
+
+=item C<TB_CAP_SGR0>
+
+Reset terminal attributes.
+
+=item C<TB_CAP_UNDERLINE>
+
+Enable underline attribute.
+
+=item C<TB_CAP_BOLD>
+
+Enable bold attribute.
+
+=item C<TB_CAP_BLINK>
+
+Enable blink attribute.
+
+=item C<TB_CAP_ITALIC>
+
+Enable italic attribute.
+
+=item C<TB_CAP_REVERSE>
+
+Enable reverse-video attribute.
+
+=item C<TB_CAP_ENTER_KEYPAD>
+
+Enter keypad mode.
+
+=item C<TB_CAP_EXIT_KEYPAD>
+
+Exit keypad mode.
+
+=item C<TB_CAP_DIM>
+
+Enable dim attribute.
+
+=item C<TB_CAP_INVISIBLE>
+
+Enable invisible attribute.
+
+=item C<TB_CAP__COUNT>
+
+Number of known capabilities.
+
+=back
+
+For the upstream definition see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/605398fa79108412976191e062ea14bd4bd30213/termbox2.h#L127>.
+
+=head2 C<:colors>
+
+Imports foreground and background color constants as well as text
+attribute constants.
+
+Color constants can be combined with attribute constants using bitwise
+or.
+
+For example:
+
+    my $fg = TB_RED | TB_BOLD;
+    my $bg = TB_DEFAULT;
+
+=head3 Basic colors
+
+=over 4
+
+=item C<TB_DEFAULT>
+
+Default terminal color.
+
+=item C<TB_BLACK>
+
+Black.
+
+=item C<TB_RED>
+
+Red.
+
+=item C<TB_GREEN>
+
+Green.
+
+=item C<TB_YELLOW>
+
+Yellow.
+
+=item C<TB_BLUE>
+
+Blue.
+
+=item C<TB_MAGENTA>
+
+Magenta.
+
+=item C<TB_CYAN>
+
+Cyan.
+
+=item C<TB_WHITE>
+
+White.
+
+=back
+
+=head3 Text attributes
+
+=over 4
+
+=item C<TB_BOLD>
+
+Bold text.
+
+=item C<TB_UNDERLINE>
+
+Underlined text.
+
+=item C<TB_REVERSE>
+
+Reverse-video text.
+
+=item C<TB_ITALIC>
+
+Italic text.
+
+=item C<TB_BLINK>
+
+Blinking text.
+
+=back
+
+=head3 Extended color support
+
+=over 4
+
+=item C<TB_256_BLACK>
+
+Base value for 256-color mode.
+
+=back
+
+=head3 Truecolor attributes
+
+These constants are only available when truecolor support is enabled.
+
+=over 4
+
+=item C<TB_TRUECOLOR_BOLD>
+
+Bold text in truecolor mode.
+
+=item C<TB_TRUECOLOR_UNDERLINE>
+
+Underlined text in truecolor mode.
+
+=item C<TB_TRUECOLOR_REVERSE>
+
+Reverse-video text in truecolor mode.
+
+=item C<TB_TRUECOLOR_ITALIC>
+
+Italic text in truecolor mode.
+
+=item C<TB_TRUECOLOR_BLINK>
+
+Blinking text in truecolor mode.
+
+=item C<TB_TRUECOLOR_BLACK>
+
+Base value for truecolor black.
+
+=back
+
+For the upstream definition see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/605398fa79108412976191e062ea14bd4bd30213/termbox2.h#L257>.
+
+=head2 C<:event>
+
+Imports event type constants, key modifier constants, input mode
+constants, and output mode constants.
+
+=head3 Event types
+
+These constants are used with C<tb_event.type>.
+
+=over 4
+
+=item C<TB_EVENT_KEY>
+
+Keyboard event.
+
+=item C<TB_EVENT_RESIZE>
+
+Terminal resize event.
+
+=item C<TB_EVENT_MOUSE>
+
+Mouse event.
+
+=back
+
+=head3 Key modifiers
+
+These constants are bit flags used with C<tb_event.mod>.
+
+=over 4
+
+=item C<TB_MOD_ALT>
+
+Alt modifier.
+
+=item C<TB_MOD_CTRL>
+
+Control modifier.
+
+=item C<TB_MOD_SHIFT>
+
+Shift modifier.
+
+=item C<TB_MOD_MOTION>
+
+Mouse motion modifier.
+
+=back
+
+=head3 Input modes
+
+These constants are used with C<tb_set_input_mode>.
+
+=over 4
+
+=item C<TB_INPUT_CURRENT>
+
+Return or keep the current input mode.
+
+=item C<TB_INPUT_ESC>
+
+Use escape-based input mode.
+
+=item C<TB_INPUT_ALT>
+
+Use Alt-key input mode.
+
+=item C<TB_INPUT_MOUSE>
+
+Enable mouse input.
+
+=back
+
+=head3 Output modes
+
+These constants are used with C<tb_set_output_mode>.
+
+=over 4
+
+=item C<TB_OUTPUT_CURRENT>
+
+Return or keep the current output mode.
+
+=item C<TB_OUTPUT_NORMAL>
+
+Normal 8-color output mode.
+
+=item C<TB_OUTPUT_256>
+
+256-color output mode.
+
+=item C<TB_OUTPUT_216>
+
+216-color output mode.
+
+=item C<TB_OUTPUT_GRAYSCALE>
+
+Grayscale output mode.
+
+=item C<TB_OUTPUT_TRUECOLOR>
+
+Truecolor output mode.
+
+This constant is only available when truecolor support is enabled.
+
+=back
+
+For the upstream definition see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/605398fa79108412976191e062ea14bd4bd30213/termbox2.h#L303>.
+
+=head2 C<:return>
+
+Imports common function return values.
+
+Most Termbox functions return C<TB_OK> on success or a negative
+C<TB_ERR_*> value on failure unless documented otherwise.
+
+Library behavior is undefined after receiving C<TB_ERR_MEM>. Callers may
+attempt to recover, calling C<tb_shutdown>, and then calling C<tb_init> again.
+
+=head3 Return values
+
+=over 4
+
+=item C<TB_OK>
+
+Operation completed successfully.
+
+=item C<TB_ERR>
+
+Generic error.
+
+=item C<TB_ERR_NEED_MORE>
+
+More input is required.
+
+=item C<TB_ERR_INIT_ALREADY>
+
+Termbox has already been initialized.
+
+=item C<TB_ERR_INIT_OPEN>
+
+Failed to open the terminal.
+
+=item C<TB_ERR_MEM>
+
+Memory allocation failed.
+
+=item C<TB_ERR_NO_EVENT>
+
+No event is available.
+
+=item C<TB_ERR_NO_TERM>
+
+No terminal is available.
+
+=item C<TB_ERR_NOT_INIT>
+
+Termbox has not been initialized.
+
+=item C<TB_ERR_OUT_OF_BOUNDS>
+
+Coordinates are outside the valid screen area.
+
+=item C<TB_ERR_READ>
+
+Read operation failed.
+
+=item C<TB_ERR_RESIZE_IOCTL>
+
+Resize ioctl operation failed.
+
+=item C<TB_ERR_RESIZE_PIPE>
+
+Resize pipe operation failed.
+
+=item C<TB_ERR_RESIZE_SIGACTION>
+
+Resize signal handler setup failed.
+
+=item C<TB_ERR_POLL>
+
+Poll operation failed.
+
+=item C<TB_ERR_TCGETATTR>
+
+Failed to read terminal attributes.
+
+=item C<TB_ERR_TCSETATTR>
+
+Failed to set terminal attributes.
+
+=item C<TB_ERR_UNSUPPORTED_TERM>
+
+Unsupported terminal.
+
+=item C<TB_ERR_RESIZE_WRITE>
+
+Resize write operation failed.
+
+=item C<TB_ERR_RESIZE_POLL>
+
+Resize poll operation failed.
+
+=item C<TB_ERR_RESIZE_READ>
+
+Resize read operation failed.
+
+=item C<TB_ERR_RESIZE_SSCANF>
+
+Resize parsing failed.
+
+=item C<TB_ERR_CAP_COLLISION>
+
+Capability collision detected.
+
+=back
+
+=head3 Compatibility aliases
+
+=over 4
+
+=item C<TB_ERR_SELECT>
+
+Alias for C<TB_ERR_POLL>.
+
+=item C<TB_ERR_RESIZE_SELECT>
+
+Alias for C<TB_ERR_RESIZE_POLL>.
+
+=back
+
+For the upstream definition see
+L<termbox2.h|https://github.com/termbox/termbox2/blob/605398fa79108412976191e062ea14bd4bd30213/termbox2.h#L330>.
+
+=head2 C<:func>
+
+Imports function hook type constants for use with
+C<tb_set_func($fn_type, $func)>.
+
+=over 4
+
+=item C<TB_FUNC_EXTRACT_PRE>
+
+Function hook called before extraction.
+
+=item C<TB_FUNC_EXTRACT_POST>
+
+Function hook called after extraction.
+
+=back
+
+=head1 AUTHOR
+
+J. Schneider E<lt>L<http://github.com/brickpool>E<gt>
+
+=head1 COPYRIGHT AND LICENCE
+
+ Copyright (C) 2012 by termbox-go authors
+               2010-2020 nsf <no.smile.face@gmail.com>
+               2015-2024,2025 Adam Saponara <as@php.net>
+               2024-2026 J. Schneider <http://github.com/brickpool>
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS IN THE SOFTWARE.
+
+=head1 REQUIRES
+
+L<5.010|https://metacpan.org/release/DAPM/perl-5.10.1>.
+
+=head1 SEE ALSO
+
+L<Termbox>
+
+L<termbox2.h|https://github.com/termbox/termbox2>
+
+=cut

@@ -228,6 +228,7 @@ static unsigned mds_flags_from_hv(pTHX_ HV* h) {
 	if ((v = hv_fetch(h, "indented_code",   13, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_INDENTED_CODE;
 	if ((v = hv_fetch(h, "html",            4,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_HTML;
 	if ((v = hv_fetch(h, "references",      10, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_REFERENCES;
+	if ((v = hv_fetch(h, "highlight",        9, 0)) && SvTRUE(*v))  flags |= MDS_FLAG_HIGHLIGHT;
 	return flags;
 }
 

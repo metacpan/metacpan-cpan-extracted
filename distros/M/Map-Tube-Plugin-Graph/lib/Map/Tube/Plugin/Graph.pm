@@ -2,7 +2,7 @@ package Map::Tube::Plugin::Graph;
 
 use version;
 
-our $VERSION   = qv('v1.0.0');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,13 +11,12 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version v1.0.0
+Version v1.1.0
 
 =cut
 
-use 5.006;
-use Data::Dumper;
-use Map::Tube::Plugin::Graph::Utils qw(graph_line_image graph_map_image);
+use 5.014;
+use Map::Tube::Plugin::Graph::Utils qw(graph_line_image graph_map_image get_graphviz_supported);
 use MIME::Base64;
 use Graph;
 
@@ -26,8 +25,9 @@ use namespace::autoclean;
 
 =head1 DESCRIPTION
 
-It's a graph plugin for L<Map::Tube> to create map of individual lines defined as
-Moo Role. Once installed, it gets plugged into Map::Tube::* family.
+This is a graph plugin for L<Map::Tube> to create maps of individual tube lines
+or of a complete tube network. This module is defined as a Moo Role. Once
+installed, it gets plugged into the Map::Tube::* family.
 
 =head1 SYNOPSIS
 
@@ -39,28 +39,24 @@ Moo Role. Once installed, it gets plugged into Map::Tube::* family.
 
     # Entire map image to STDOUT
     binmode(STDOUT);
-    print STDOUT $tube->as_png;
+    print STDOUT $tube->as_png();
 
-    # Entire map image
-    my $name = $tube->name;
-    open(my $MAP_IMAGE, ">", "$name.png")
-        or die "ERROR: Can't open [$name.png]: $!";
-    binmode($MAP_IMAGE);
-    print $MAP_IMAGE decode_base64($tube->as_image);
-    close($MAP_IMAGE);
+    # Entire binary map image
+    my (undef, $name_bin) = $tube->render( output_file => undef );
+    # print "Image written to $name_bin";
 
-    # Just a particular line map image
-    my $line = 'Bakerloo';
-    open(my $LINE_IMAGE, ">", "$line.png")
-        or die "ERROR: Can't open [$line.png]: $!";
-    binmode($LINE_IMAGE);
-    print $LINE_IMAGE decode_base64($tube->as_image($line));
-    close($LINE_IMAGE);
+    # Entire base64-encoded map image
+    my ($base64_string, $name_txt) = $tube->render( output_file => undef, base64 => 1 );
+
+    # Just a particular line map image in binary format
+    my (undef, $name_lin) = $tube->render( 'Bakerloo', output_file => undef );
+    # print "Image written to $name_lin";
 
 =head1 INSTALLATION
 
-The plugin primarily depends on GraphViz2 library. But GraphViz2 as of 2.61 can
-only be installed on perl v5.008008 or above.
+The plugin primarily depends on the GraphViz2 library, which provides an
+interface to the external GraphViz tool. GraphViz2 as of 2.61 can only be
+installed on Perl v5.008008 or above.
 
 For example, on my Windows 11 box running WSL2 (Ubuntu 24.04 LTS), try this:
 
@@ -165,35 +161,136 @@ sub _line_restricted_out {
   return !(grep { uc($_) eq uc($line_id) } @$allowed);
 }
 
-=head2 as_png($line_name)
+=head2 render([ $line_name] [, more_parameters...] )
 
-The C<$line_name> param is optional. If it's passed, the method returns
-the given line map. Otherwise you get the entire map.
+All parameters are optional. If the C<$line_name> is passed in, the method returns
+a map for the given line. Otherwise you get the entire tube map.
 
-See L</SYNOPSIS> for more details on how it can be used.
+There are a number of parameters that influence the rendering process and the result:
+
+=over 4
+
+=item * C<format =E<gt> ...>
+
+By default, output is in the PNG bitmap format.  This can be changed by passing
+the C<format=> parameter. GraphViz supports many output formats, among them SVG
+and PDF and the native GraphViz DOT (or GV) format. While DOT and GV are formally
+identical, there is an important difference: GV yields the raw, un-layouted graph
+description, whereas DOT yields a graph description where each element is already
+precisely placed. -- For a list of supported formats, see the L<list_formats()> method.
+
+=item * C<driver =E<gt> ...>
+
+GraphViz also supports a number of layout engines, or drivers, which can be
+customised through the C<driver=> parameter. Usually, the C<dot> driver (which
+is the default) or the C<neato> driver will produce good results. -- For a
+list of supported drivers, see the L<list_drivers()> method.
+
+=item * C<output_file =E<gt> ...>
+
+If the C<output_file> parameter passes in the name of a file, output will be
+written to a file of this name. If its value is C<undef>, a name is
+automatically chosen, based on the name of the map or the chosen line. If the
+parameter is missing, no output will be written. In this case, the calling
+software is responsible for further processing of the output. In particular,
+when writing binary output, care must be taken to open the output file in
+binary mode on systems (like Windows) that differentiate between text and binary
+files.
+
+=item * C<base64 =E<gt> 0|1>
+
+Most of the output formats will produce a binary stream. If the output is meant
+to be embedded in a text file (like a web page source), it is useful to
+transform it into a purely textual representation. This can be achieved by
+passing C<base64 =E<gt> 1>.
+
+=item * C<line_name =E<gt> ...>
+
+The name of the tube line (if any) may be given as the first parameter, as shown
+above, but also, alternatively, as a named parameter C<line_name=>. If both are
+given, the value of the first parameter will take precedence.
+
+=back
+
+In scalar context, the method will return the representation of the graph
+in the desired format (which may be binary). In array context, the method will
+return an array of two elements: first the repesentation of the graph, then the
+name of the output file (or undef if no file output was requested).
+
+See L</SYNOPSIS> for more details on how this method can be used.
+
+=cut
+
+sub render {
+  my ($self, @args) = @_;
+  my $line_name = ( scalar(@args) & 1 ) ? shift(@args) : undef;
+  my %args = @args;
+  $line_name //= $args{line_name} if exists $args{line_name};
+  delete $args{line_name};
+  my $base64 = $args{base64};
+  delete $args{base64};
+  my @result = defined $line_name ? graph_line_image($self, $line_name, %args)
+                                  : graph_map_image($self, %args);
+  $result[0] = encode_base64($result[0]) if $base64 && @result;
+  return wantarray ? @result : $result[0];
+}
+
+=head2 as_png($line_name [, ...])
+
+The C<$line_name> parameter is optional. If it is passed, the method returns the
+given line map as a PNG bitmap. Otherwise you get the entire map.
+
+(In fact, this method is almost an alias for the L<render()> method. However, it always
+returns only the graph representation, never an output file name.)
+
+See "SYNOPSIS" for more details on how it can be used.
 
 =cut
 
 sub as_png {
-  my ($self, $line_name) = @_;
-  defined $line_name
-    ? graph_line_image($self, $line_name)
-    : graph_map_image($self);
+  my ($self, @args) = @_;
+  return scalar($self->render(@args));
 }
 
-=head2 as_image($line_name)
+=head2 as_image($line_name, [, ...])
 
-The C<$line_name> param is optional. If it's passed, the method returns the base64
-encoded string of the given line map. Otherwise you would get the entire map as
-base64 encoded string.
+The C<$line_name> parameter is optional. If it is passed, the method returns the
+base64 encoded string of a PNG bitmap showing the given line map. Otherwise you
+get the entire map as a base64 encoded string.
+
+(In fact, this method is almost an alias for the L<render()> method. One
+difference is that the C<base64=> parameter is set to TRUE. And it always
+returns only the graph representation, never an output file name.)
 
 See L</SYNOPSIS> for more details on how it can be used.
 
 =cut
 
 sub as_image {
-  my ($self, $line_name) = @_;
-  encode_base64($self->as_png($line_name));
+  my ($self, @args) = @_;
+  push( @args, base64 => 1 );
+  return scalar($self->render(@args));
+}
+
+=head2 list_drivers()
+
+Returns a list of drivers (formatters) that GraphViz supports on your machine.
+The basic C<dot> driver must be available via the search path for executables.
+
+=cut
+
+sub list_drivers {
+  return get_graphviz_supported('-K?');
+}
+
+=head2 list_formats()
+
+Returns a list of output formats that GraphViz supports on your machine.
+
+=cut
+
+sub list_formats {
+  return get_graphviz_supported('-T?');
 }
 
 =head1 AUTHOR

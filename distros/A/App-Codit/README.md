@@ -118,7 +118,7 @@ If you encounter problems and error message using Codit, here are some general t
 
 If Codit launches without any icons do one or more of the following:
 
-Install __Icons::LibRSVG__. If your icon theme is a scalable vectors graphics theme, Codit is not able to load icons if you do not install this.
+Install __Image::LibRSVG__. If your icon theme is a scalable vectors graphics theme, Codit is not able to load icons if you do not install this.
 
 Locate where your icons are located on your system and use the __-iconpath__ command line option to point there.
 

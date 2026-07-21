@@ -13,6 +13,7 @@ README.md
 t/00-load.t
 t/30-basic.t
 t/async.t
+t/before_after.t
 t/call_order.t
 t/class.t
 t/comment-spelling.t

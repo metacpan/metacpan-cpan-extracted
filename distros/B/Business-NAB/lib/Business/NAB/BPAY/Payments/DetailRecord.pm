@@ -1,5 +1,5 @@
 package Business::NAB::BPAY::Payments::DetailRecord;
-$Business::NAB::BPAY::Payments::DetailRecord::VERSION = '0.05';
+$Business::NAB::BPAY::Payments::DetailRecord::VERSION = '0.06';
 =head1 NAME
 
 Business::NAB::BPAY::Payments::DetailRecord
@@ -183,7 +183,7 @@ sub to_record ( $self ) {
         $bsb,
         $self->payment_account_number,
         $self->customer_reference_number,
-        sprintf( "%013s", $self->amount ),
+        sprintf( "%013.0f", $self->amount ),
         $self->lodgement_reference_1 // '',
         $self->lodgement_reference_2 // '',
         $self->lodgement_reference_3 // '',

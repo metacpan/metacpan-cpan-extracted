@@ -27,6 +27,25 @@ sub skippable {
 
 
 my %tests = (
+    '5.044' => [
+        [ 'named-params',
+          'use feature "signatures";
+           no warnings "experimental::signature_named_parameters";
+           sub My::Add($x, :$y) { $x + $y }
+           My::Add(2, y => 3)',
+           5 ],
+        [ 'multi-for-ref',
+          'use feature qw( refaliasing declared_refs );
+           no warnings qw( experimental::declared_refs
+                           experimental::refaliasing );
+           my %h = (k1 => [2, 3], k2 => [0, 1]);
+           my $s = 0;
+           for my ($k, \@v) (%h) { $s += $_ for @v } $s',
+           6
+      ],
+        [ 'unicode17.0',
+          '"\N{PSYCHE}" eq "\N{U+1CEC9}"', 1]
+    ],
     '5.042' => [
         [ ':writer',
           'use experimental qw{ class };
@@ -421,6 +440,7 @@ for my $version (keys %tests) {
                 $count += 2;
             } else {
                 if ('SKIPPED' ne ($value || "")) {
+                    # warn "RE: $run_error if $run_error";
                     is($value, $triple->[2], $triple->[0]);
                 }
             }

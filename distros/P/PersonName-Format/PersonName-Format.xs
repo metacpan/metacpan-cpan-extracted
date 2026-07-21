@@ -7,7 +7,7 @@
  * Modified 2026/07/19
  * All rights reserved
  *
- * XS implementations of keys functions for PersonName-Format.
+ * XS implementations of key functions for PersonName-Format.
  *
  * This program is free software; you can redistribute  it  and/or  modify  it
  * under the same terms as Perl itself.
@@ -189,7 +189,7 @@ MODULE = PersonName::Format    PACKAGE = PersonName::Format
 PROTOTYPES: DISABLE
 
 #-------------------------------------------------------------------
-# _first_grapheme()
+# _first_grapheme( value )
 #
 # Returns the first Unicode extended grapheme cluster from the
 # input string, or an empty string for an undefined or empty value.

@@ -7,7 +7,7 @@ use Log::Log4perl::Level;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 use Readonly;
 Readonly::Scalar our $LOG4PERL_CONF => <<'END_OF_CONF';

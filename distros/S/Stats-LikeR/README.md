@@ -4400,6 +4400,11 @@ raw values (no cell number formats), matching the round-trip behaviour of
 
 # Changes
 
+## 0.26 2026-07-20 CDT
+
+https://www.cpantesters.org/cpan/report/fc7d01a0-83f4-11f1-b543-8a9ac547de9a
+Fixed a long-double issue
+
 ## 0.25 2026-07-19 CDT
 
 https://www.cpantesters.org/cpan/report/3376f80e-83bf-11f1-a5f3-44496e8775ea

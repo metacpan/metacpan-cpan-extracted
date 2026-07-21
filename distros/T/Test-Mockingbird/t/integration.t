@@ -1327,4 +1327,89 @@ subtest 'Async: croaks with install message when Future unavailable' => sub {
 	}
 };
 
+# ===========================================================================
+# before() / after() / around() integration scenarios
+# ===========================================================================
+
+subtest 'before() + spy(): spy records calls that pass through before wrapper' => sub {
+	# Realistic scenario: spy on a method to record call args while a before
+	# hook validates preconditions.  Both must see the call.
+	{ package Int::BeforeSpy; sub process { "processed:$_[0]" } }
+	my @precondition_args;
+	before 'Int::BeforeSpy::process' => sub { @precondition_args = @_ };
+	my $spy = spy 'Int::BeforeSpy::process';
+
+	my $r = Int::BeforeSpy::process('item');
+
+	is $r, 'processed:item', 'original return value reaches caller';
+	is_deeply \@precondition_args, ['item'], 'before hook saw args';
+	my @calls = $spy->();
+	is scalar @calls, 1, 'spy recorded the call';
+	is_deeply $calls[0], ['Int::BeforeSpy::process', 'item'],
+		'spy call record is correct';
+	Test::Mockingbird::restore_all();
+};
+
+subtest 'around(): realistic service-double pattern' => sub {
+	# A service method normally makes an expensive call; around() replaces it
+	# during testing while still calling the original for fast inputs.
+	{ package Int::Service;
+		sub fetch {
+			my ($self, $id) = @_;
+			return "db:$id";   # pretend DB call
+		}
+	}
+	my @bypassed;
+	around 'Int::Service::fetch' => sub {
+		my ($orig, $self, $id) = @_;
+		if ($id > 100) {
+			push @bypassed, $id;
+			return "cached:$id";   # short-circuit expensive path
+		}
+		return $orig->($self, $id);
+	};
+
+	is Int::Service::fetch(undef, 5),   'db:5',       'small id goes to original';
+	is Int::Service::fetch(undef, 200), 'cached:200', 'large id short-circuited';
+	is_deeply \@bypassed, [200], 'bypass list recorded correctly';
+	Test::Mockingbird::restore_all();
+};
+
+subtest 'after() collects return values across multiple calls' => sub {
+	# Realistic: audit trail — record every return value without changing
+	# production code.
+	{ package Int::Audit; sub compute { $_[0] ** 2 } }
+	my @results;
+	after 'Int::Audit::compute' => sub { };   # hook just verifies it runs
+	# Use around to capture return value in a realistic audit pattern
+	around 'Int::Audit::compute' => sub {
+		my ($orig, @args) = @_;
+		my $r = $orig->(@args);
+		push @results, $r;
+		return $r;
+	};
+
+	Int::Audit::compute(3);
+	Int::Audit::compute(4);
+	Int::Audit::compute(5);
+
+	is_deeply \@results, [9, 16, 25], 'around captured all return values';
+	Test::Mockingbird::restore_all();
+};
+
+subtest 'before() / after() / around() all cleaned up by restore_all() in integration context' => sub {
+	{ package Int::CleanUp; sub fn { 'real' } }
+	before 'Int::CleanUp::fn' => sub { };
+	after  'Int::CleanUp::fn' => sub { };
+	around 'Int::CleanUp::fn' => sub { my ($o) = @_; $o->() };
+
+	Test::Mockingbird::restore_all();
+
+	is Int::CleanUp::fn(), 'real',
+		'original restored; no wrapper overhead after restore_all';
+	my $d = diagnose_mocks();
+	ok !exists $d->{'Int::CleanUp::fn'},
+		'no mock state leaked after restore_all';
+};
+
 done_testing();

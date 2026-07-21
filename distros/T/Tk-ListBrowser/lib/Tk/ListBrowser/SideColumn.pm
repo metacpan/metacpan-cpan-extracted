@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use vars qw ($VERSION);
 use Carp;
-$VERSION =  0.12;
+$VERSION =  0.15;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -45,7 +45,7 @@ sub new {
 
 	$self->filterfield('text') unless defined $self->filterfield;
 	$self->itemtype('text') unless defined $self->itemtype;
-	$self->drawrect(0) unless defined $self->drawrect;
+	$self->drawrect(1) unless defined $self->drawrect;
 	$self->sortcase('') unless defined $self->sortcase;
 	$self->sortfield('text') unless defined $self->sortfield;
 	$self->sortnumerical('') unless defined $self->sortnumerical;
@@ -129,8 +129,6 @@ sub draw {
 		-outline => undef,
 		-tags => [$self->name],
 	);
-#	$self->anchorRaise($rtag);
-	$c->lower($rtag);
 	$self->crect($rtag);
 }
 

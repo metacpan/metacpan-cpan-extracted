@@ -12,8 +12,8 @@ $mwclass = 'App::Codit';
 
 $quitdelay = 1000;
 $quitdelay = 3000 if $mswin;
-$delay = 3000;
-$delay = 5000 if $mswin;
+$delay = 5000;
+$delay = 7000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::Icons') };
 

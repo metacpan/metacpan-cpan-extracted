@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -251,7 +251,7 @@ sub gitFileList {
 	my @items = ();
 	while ($list =~ s/([^\n]*)\n//) {
 		my $file = "$folder$sep$1";
-		push @items, $file
+		push @items, $file if -e $file
 	}
 	return @items
 }

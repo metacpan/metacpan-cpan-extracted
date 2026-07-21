@@ -17,8 +17,8 @@ $gitsupport = $git =~ /^git\sversion/;
 print "No git support\n" unless $gitsupport;
 
 $quitdelay = 1000;
-$delay = 3000;
-$delay = 5000 if $mswin;
+$delay = 5000;
+$delay = 7000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::Git') };
 

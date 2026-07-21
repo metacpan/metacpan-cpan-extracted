@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    This document describes MojoX::Authentication version 0.003.
+    This document describes MojoX::Authentication version 0.004.
 
 SYNOPSIS
 
@@ -106,16 +106,19 @@ INTERFACE
 
     Constructor.
 
-    Accepts initialization values for "app", "model",
-    "saml2_provider_name", and "user_stash_key".
+    Accepts initialization values for "app", "model", "provider_name", and
+    "user_stash_key".
 
- saml2_provider_name
+ provider_name
 
-       my $string = $ma->saml2_provider_name;
+       my $string = $ma->provider_name;
 
-    Accessor to the (default) provider name for SAML2 logins. This works
-    under the assumption that there will only be one identity provider;
-    otherwise you will have to do some more coding on your side.
+    Accessor to the (default) provider name, mainly used for SAML 2.0. This
+    works under the assumption that there will only be one identity
+    provider; otherwise you will have to do some more coding on your side.
+
+    If defined, it takes the precedence over the provider parameter, this
+    behaviour is subject to change.
 
  user_stash_key
 

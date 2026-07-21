@@ -1,5 +1,20 @@
 Revision history for Perl module PersonName::Format
 
+v0.1.1 2026-07-21T15:01:54+0900
+    [Bug Fixes]
+    - t/20.pureperl_grapheme.t: replaced the -e one-liner with a temp file
+      (File::Temp) to fix a Windows incompatibility where multi-line code
+      passed via system() and -e is mangled by CreateProcess(), resulting in
+      a syntax error and a false test failure.
+
+    [Documentation]
+    - Expanded POD across all submodules: refactored description, rewrote
+      description and methods intro in PersonName::Format::Compiled, improved
+      synopsis in PersonName::Format::Exception with concrete examples, added
+      signatures and descriptions to PersonName::Format::Pattern and
+      PersonName::Format::SimpleName, added a SYNOPSIS to PersonName::Format::PP.
+    - PersonName-Format.xs: fixed some typos and improved functions comments.
+
 v0.1.0 2026-07-16T13:16:33+0900
     - Initial public release.
     [New Features]

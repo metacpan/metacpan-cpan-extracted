@@ -163,8 +163,8 @@ sub _fmt_tokens {
 ########################################################################
   my ($n) = @_;
 
-  return q{-}    if !defined $n;
-  return "${n}K" if $n < 1_000_000;
+  return q{-}                         if !defined $n;
+  return sprintf( '%dK', $n / 1_000 ) if $n < 1_000_000;
   return sprintf '%.1fM', $n / 1_000_000;
 }
 

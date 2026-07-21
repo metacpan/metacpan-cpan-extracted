@@ -1,12 +1,11 @@
 package MojoX::Authentication::Model::Db;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo;
 use experimental qw< signatures >;
 use English;
 use Ouch qw< :trytiny_var >;
-use Scalar::Util qw< blessed >;
 
 use constant DEFAULT_FOR => {
    name => 'dby',
@@ -14,16 +13,11 @@ use constant DEFAULT_FOR => {
    username_column => 'name',
 };
 
-sub coerce_wmdb ($x) {
-   return $x if blessed($x);
-   require MojoX::MojoDbWrap;
-   return MojoX::MojoDbWrap->new($x);
-}
-
 use namespace::clean;
 
 with 'MojoX::Authentication::Model::Role::Creator';
 with 'MojoX::Authentication::Model::Role::Local';
+with 'MojoX::Authentication::Model::Role::MojoDbWrap';
 with 'MojoX::Authentication::Model::Role::Remap';
 
 has name => (is => 'ro', default => DEFAULT_FOR->{name});
@@ -31,11 +25,10 @@ has username_column
    => (is => 'ro', default => DEFAULT_FOR->{username_column});
 has remaps => (is => 'ro', default => sub { return [] });
 has table => (is => 'ro', default => DEFAULT_FOR->{table});
-has wmdb => (is => 'ro', required => 1, coerce => \&coerce_wmdb);
 
 sub create ($class, $config, %args) {
    %args = $class->_create_args(DEFAULT_FOR->{name}, $config, %args);
-   return unless defined($args{wmdb}); # no wmdb, no party
+   ouch 404, 'missing argument for wmdb' unless defined($args{wmdb});
    my $self = $class->new(%args);
    # FIXME possibly address stuff like creating the table, ecc.
    return $self;

@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::Hash;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo;
@@ -31,7 +31,7 @@ has _secrets_are_cleartext => (is => 'ro', default => 0,
 
 sub create ($class, $config, %args) {
    %args = $class->_create_args(DEFAULT_NAME, $config, %args);
-   return unless defined($args{db}); # no db, no party
+   ouch 404, 'missing argument for db' unless defined($args{db});
    my $self = $class->new(%args);
    $self->_adjust_db;
    return $self;

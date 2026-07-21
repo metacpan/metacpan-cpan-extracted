@@ -27,7 +27,13 @@ Readonly my $T_MOCK_SEQ     => 'mock_sequence';
 Readonly my $T_MOCK_ONCE    => 'mock_once';
 Readonly my $T_MOCK_SCOPED  => 'mock_scoped';
 Readonly my $T_INTERCEPT    => 'intercept_new';
+Readonly my $T_BEFORE       => 'before';
+Readonly my $T_AFTER        => 'after';
+Readonly my $T_AROUND       => 'around';
 
+Readonly my $ERR_BEFORE    => 'Package, method and hook are required for before()';
+Readonly my $ERR_AFTER     => 'Package, method and hook are required for after()';
+Readonly my $ERR_AROUND    => 'Package, method and hook are required for around()';
 Readonly my $ERR_MOCK      => 'Package, method and replacement are required for mocking';
 Readonly my $ERR_UNMOCK    => 'Package and method are required for unmocking';
 Readonly my $ERR_SCOPED    => 'mock_scoped: unrecognised argument form';
@@ -457,6 +463,182 @@ subtest 'unmock(): pops only ONE meta entry per call' => sub {
 	is scalar @{ $d->{'UM::Meta::fn'}{layers} }, 1,
 		'exactly one meta entry (not zero, not two)';
 	restore_all();
+};
+
+# ============================================================================
+#  SECTION 3.5 -- before(), after(), around()
+# ============================================================================
+
+subtest 'before(): shorthand — hook fires before original, original return returned' => sub {
+	# POD: "hook receives same @_ … return value discarded … original's return
+	# value is passed to the caller unchanged"
+	{ package U::Before; sub greet { "hello $_[0]" } }
+	my @seen;
+	before 'U::Before::greet' => sub { push @seen, \@_ };
+
+	my $r = U::Before::greet('world');
+
+	is $r, 'hello world', 'original return value unchanged';
+	is scalar @seen, 1,   'hook called exactly once';
+	is_deeply $seen[0], ['world'], 'hook received original args';
+	restore_all();
+};
+
+subtest 'before(): longhand three-arg form' => sub {
+	{ package U::BeforeLH; sub val { 42 } }
+	my $ran = 0;
+	before('U::BeforeLH', 'val', sub { $ran++ });
+
+	U::BeforeLH::val();
+
+	is $ran, 1, 'longhand before hook called';
+	restore_all();
+};
+
+subtest 'before(): hook return value is discarded' => sub {
+	{ package U::BeforeRet; sub val { 7 } }
+	before 'U::BeforeRet::val' => sub { return 999 };
+
+	is U::BeforeRet::val(), 7, 'original return, not hook return';
+	restore_all();
+};
+
+subtest 'before(): records layer type "before" in meta' => sub {
+	{ package U::BeforeMeta; sub fn { 1 } }
+	before 'U::BeforeMeta::fn' => sub { };
+
+	my $d = diagnose_mocks();
+	is $d->{'U::BeforeMeta::fn'}{layers}[0]{type}, $T_BEFORE,
+		'layer type is "before"';
+	restore_all();
+};
+
+subtest 'before(): croaks when target missing' => sub {
+	throws_ok { before(undef, 'fn', sub { }) }
+		qr/\Q$ERR_BEFORE\E/, 'undef package croaks';
+};
+
+subtest 'before(): croaks when hook is not a coderef' => sub {
+	{ package U::BeforeBadHook; sub fn { 1 } }
+	throws_ok { before 'U::BeforeBadHook::fn' => 'not_code' }
+		qr/\Q$ERR_BEFORE\E/, 'non-CODE hook croaks';
+};
+
+subtest 'after(): shorthand — original called first, hook fires after, return preserved' => sub {
+	# POD: "The original is called first … hook is called with the same @_
+	# … The hook's return value is discarded"
+	{ package U::After; sub mul { $_[0] * $_[1] } }
+	my (@hook_args, $hook_after_call);
+	after 'U::After::mul' => sub { @hook_args = @_; $hook_after_call = 1 };
+
+	my $r = U::After::mul(3, 4);
+
+	is $r, 12, 'original return value returned';
+	ok $hook_after_call, 'hook was called';
+	is_deeply \@hook_args, [3, 4], 'hook received original args';
+	restore_all();
+};
+
+subtest 'after(): longhand three-arg form' => sub {
+	{ package U::AfterLH; sub val { 5 } }
+	my $ran = 0;
+	after('U::AfterLH', 'val', sub { $ran++ });
+
+	U::AfterLH::val();
+
+	is $ran, 1, 'longhand after hook called';
+	restore_all();
+};
+
+subtest 'after(): hook return value is discarded' => sub {
+	{ package U::AfterRet; sub val { 7 } }
+	after 'U::AfterRet::val' => sub { return 999 };
+
+	is U::AfterRet::val(), 7, 'original return value, not hook return';
+	restore_all();
+};
+
+subtest 'after(): records layer type "after" in meta' => sub {
+	{ package U::AfterMeta; sub fn { 1 } }
+	after 'U::AfterMeta::fn' => sub { };
+
+	my $d = diagnose_mocks();
+	is $d->{'U::AfterMeta::fn'}{layers}[0]{type}, $T_AFTER,
+		'layer type is "after"';
+	restore_all();
+};
+
+subtest 'after(): exception from original propagates; hook is not called' => sub {
+	# POD: "If the original throws, the exception propagates immediately and
+	# the hook is not called."
+	{ package U::AfterDie; sub boom { die "bang\n" } }
+	my $hook_ran = 0;
+	after 'U::AfterDie::boom' => sub { $hook_ran++ };
+
+	throws_ok { U::AfterDie::boom() } qr/bang/, 'exception propagates';
+	is $hook_ran, 0, 'after hook not called when original dies';
+	restore_all();
+};
+
+subtest 'after(): croaks when target missing' => sub {
+	throws_ok { after(undef, 'fn', sub { }) }
+		qr/\Q$ERR_AFTER\E/, 'undef package croaks';
+};
+
+subtest 'after(): croaks when hook is not a coderef' => sub {
+	{ package U::AfterBadHook; sub fn { 1 } }
+	throws_ok { after 'U::AfterBadHook::fn' => 42 }
+		qr/\Q$ERR_AFTER\E/, 'non-CODE hook croaks';
+};
+
+subtest 'around(): hook receives ($orig, @args); return value used as method return' => sub {
+	# POD: "The hook receives ($orig_coderef, @original_args) … its return value
+	# becomes the return value of the method"
+	{ package U::Around; sub add { $_[0] + $_[1] } }
+	around 'U::Around::add' => sub {
+		my ($orig, @args) = @_;
+		return $orig->(@args) * 2;
+	};
+
+	is U::Around::add(3, 4), 14, 'around can modify return value (7*2)';
+	restore_all();
+};
+
+subtest 'around(): longhand three-arg form' => sub {
+	{ package U::AroundLH; sub val { 10 } }
+	around('U::AroundLH', 'val', sub { my ($o) = @_; $o->() + 1 });
+
+	is U::AroundLH::val(), 11, 'longhand around works';
+	restore_all();
+};
+
+subtest 'around(): hook may skip calling $orig entirely' => sub {
+	{ package U::AroundSkip; sub val { 'original' } }
+	around 'U::AroundSkip::val' => sub { 'replaced' };
+
+	is U::AroundSkip::val(), 'replaced', 'original not called';
+	restore_all();
+};
+
+subtest 'around(): records layer type "around" in meta' => sub {
+	{ package U::AroundMeta; sub fn { 1 } }
+	around 'U::AroundMeta::fn' => sub { my ($o, @a) = @_; $o->(@a) };
+
+	my $d = diagnose_mocks();
+	is $d->{'U::AroundMeta::fn'}{layers}[0]{type}, $T_AROUND,
+		'layer type is "around"';
+	restore_all();
+};
+
+subtest 'around(): croaks when target missing' => sub {
+	throws_ok { around('', 'fn', sub { }) }
+		qr/\Q$ERR_AROUND\E/, 'empty package croaks';
+};
+
+subtest 'around(): croaks when hook is not a coderef' => sub {
+	{ package U::AroundBadHook; sub fn { 1 } }
+	throws_ok { around 'U::AroundBadHook::fn' => 'not_code' }
+		qr/\Q$ERR_AROUND\E/, 'non-CODE hook croaks';
 };
 
 # ============================================================================

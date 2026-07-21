@@ -1,3 +1,8 @@
+0.58.2 2026-07-20 12:54:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Frontend ui.plugin.Form: make sure trigger load does not overwrite
+   fix for automated testing which fills forms very quickly
+
 0.58.1 2026-07-16 08:39:18 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Frontend ui.plugin.Form: a trigger-field change made while form data

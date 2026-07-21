@@ -3,7 +3,7 @@ package Markdown::Simple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 use Exporter ();
 our @ISA = qw(Exporter);
 
@@ -104,6 +104,12 @@ otherwise-stripped dangerous content (default: off)
 
 =item * strict_utf8 - reject input that is not well-formed UTF-8 with a
 fatal C<croak> instead of silently producing best-effort output (default: off)
+
+=item * highlight - syntax-highlight fenced code blocks that carry a language
+tag (e.g. C<< ```perl >>). Recognised tokens are wrapped in
+C<< <span class="esh-X"> >> elements; the content remains fully HTML-safe.
+Requires Eshu to be installed. Blocks with no language tag are unaffected.
+(default: off)
 
 =back
 

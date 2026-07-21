@@ -117,12 +117,16 @@ cpanfile: requires test-requires
 	fi
 
 $(TARBALL): $(DEPS) \
+    check-syntax \
     $(if $(tidy_on), $(PERL_MODULES:%=%.tdy) $(PERL_BIN_FILES:%=%.tdy)) \
     $(if $(critic_on), $(PERL_MODULES:%=%.crit) $(PERL_BIN_FILES:%=%.crit))
 	$(NO_ECHO)if [[ -z "$(NO_COLOR)" ]]; then \
 	  COLOR='--color'; \
 	fi; \
-	$(CPAN_MAKER) -l $(LOG_LEVEL) $$COLOR -b $<
+	if [[ -n "$$SKIP_TESTS" ]]; then \
+	  SKIP_TESTS="--skip-tests"; \
+	fi; \
+	$(CPAN_MAKER) $$SKIP_TESTS -l $(LOG_LEVEL) $$COLOR -b $<
 
 module.pm.tmpl:
 	$(NO_ECHO)if [[ -n "$(STUB)" ]]; then \
@@ -419,3 +423,7 @@ test: $(GSOURCE_FILES) ## run unit tests
 	prove -I lib -v t/
 
 check: $(GSOURCE_FILES) ## syntax check and create source from .in file
+
+deps.mk: $(PERL_MODULES)
+	$(NO_ECHO)cmb create-deps > $@
+

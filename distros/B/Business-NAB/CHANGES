@@ -1,10 +1,109 @@
 ==================================================
-Changes from 2025-07-08 00:00:00 +0000 to present.
+Changes from 2025-07-20 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.05 at 2026-07-08 06:52:55 +0000
+version 0.06 at 2026-07-20 11:29:46 +0000
 -----------------------------------------
+
+  Change: 7a5bd869710d30be74913af0cd5111d650f56048
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-07-20 13:29:28 +0000
+
+    bump VERSION and Changes for CPAN release 
+
+  Change: 222eb03406a00ee2cb8f6e10072bd6e645a0412f
+  Author: Lee J <lee@payprop.com>
+  Date : 2026-07-20 13:24:07 +0000
+
+    Merge pull request #3 from jjatria/check-first
+
+    Make sure payments file can be written before writing 
+
+  Change: 35dea513977056e6e1e6a60973cb663b00952724
+  Author: JosÃ© JoaquÃ­n Atria <joaquin.atria@payprop.com>
+  Date : 2026-07-20 11:58:29 +0000
+
+    Use integer formatting when formatting integers
+
+    While we use internal value contraints to try to force the code to
+    operate only in minor units, this does not entirely mean that those
+    values can actually only hold integers. This applies of course to
+    values that are assigned manually to the "internal" fields without
+    going to the getters / setters, but also to files that appear as
+    integers but are not:
+
+    $ perl -ML -Ilib -MDevel::Peek -E '
+
+    my $p cBusiness::NAB::BPAY::Payments::DetailRecord->new(
+
+    amount => 1305.11 * 100,
+
+    biller_code => 7773,
+
+    customer_reference_number => 1234455667,
+
+    payment_account_bsb => "012345",
+
+    payment_account_number => 12345667
+
+    );
+
+    Dump $p->amount;
+
+    '
+
+    SV = NV(0x104f18500) at 0x104f18518
+
+    REFCNT = 1
+
+    FLAGS = (TEMP,NOK,pNOK)
+
+    NV = 130510.99999999999
+
+    The code was working around this by formatting the fields as strings:
+
+    $ perl -E 'say sprintf "%s", 1305.11 * 100'
+
+    130511
+
+    But now that we know that some rounding errors might sneak past our
+    checks, this might not give the correct result:
+
+    $ perl -E 'say sprintf "%s", 1e-8'
+
+    1e-08
+
+    This commit changes the formatting mode of the values we understand
+    to be integers to use `%.0f`, which minimises this risk and provides
+    a little more semantic guidance into what we actually want:
+
+    $ perl -E 'say sprintf "%.0f", 1e-8'
+
+    0
+
+    $ perl -E 'say sprintf "%.0f", 1305.11 * 100'
+
+    130511
+
+    Note that this specifically does not use `%i` because that does not
+    behave well with numbers that look like integers but are not:
+
+    $ perl -E 'say sprintf "%i", 1305.11 * 100'
+
+    130510 
+
+  Change: 9d7e5297619e4c434e41068eac96771fff963574
+  Author: JosÃ© JoaquÃ­n Atria <joaquin.atria@payprop.com>
+  Date : 2026-07-18 22:04:56 +0000
+
+    Round net total before checking payments integrity 
+
+  Change: a63709925f6e459cc6a7ba2c9c66e082f9f56c9e
+  Author: JosÃ© JoaquÃ­n Atria <joaquin.atria@payprop.com>
+  Date : 2026-07-18 22:04:56 +0000
+
+    Verify payments before writing to file 
 
   Change: 577cc23bdfaadd3ef125a0b18b51fa49ce2cc539
   Author: Lee J <lee@payprop.com>

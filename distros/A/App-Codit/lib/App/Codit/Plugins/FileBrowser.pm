@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -66,6 +66,9 @@ sub new {
 
 	my $page = $self->ToolLeftPageAdd('FileBrowser', 'folder', undef, 'Browse your file system', 400);
 	my @images = (
+		['-compactimage', 'view-list-details', 16],
+		['-detailsimage', 'view-list-tree', 16],
+		['-iconviewimage', 'view-list-icons', 16],
 		['-msgimage', 'dialog-information', 32],
 		['-newfolderimage', 'folder-new', 16],
 		['-reloadimage', 'appointment-recurring', 16],
@@ -121,7 +124,7 @@ sub fbOpen {
 	$mdi->silentMode(1);
 	my @sel = $b->infoSelection;
 	for (@sel) {
-		my $d = $b->infoData($_);
+		my $d = $b->get($_);
 		$b->Invoke($_) unless $d->isDir;
 	}
 	$mdi->silentMode(0);

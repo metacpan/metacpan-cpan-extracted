@@ -11,9 +11,9 @@ use List::MoreUtils qw(firstidx);
 use Time::HiRes qw(gettimeofday tv_interval);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-06'; # DATE
+our $DATE = '2026-07-21'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.561'; # VERSION
+our $VERSION = '0.563'; # VERSION
 
 has _srclabel               => (is => 'rw');
 has tags                    => (is => 'rw');
@@ -27,6 +27,7 @@ has radio_targets           => (is => 'rw');
 has time_zone               => (is => 'rw');
 
 has ignore_unknown_settings => (is => 'rw');
+has ignore_unknown_drawers  => (is => 'rw');
 
 our $tags_re       = qr/:(?:[\w@]+:)+/u;
 my  $ls_re         = qr/(?:(?<=[\015\012])|\A)/; # line start
@@ -810,7 +811,7 @@ Org::Document - Represent an Org document
 
 =head1 VERSION
 
-This document describes version 0.561 of Org::Document (from Perl distribution Org-Parser), released on 2023-11-06.
+This document describes version 0.563 of Org::Document (from Perl distribution Org-Parser), released on 2026-07-21.
 
 =head1 SYNOPSIS
 
@@ -865,6 +866,10 @@ If set, will be passed to DateTime->new() (e.g. by L<Org::Element::Timestamp>).
 =head2 ignore_unknown_settings => bool
 
 If set to true, unknown settings will not cause a parse failure.
+
+=head2 ignore_unknown_drawers => bool
+
+If set to true, unknown drawer names will not cause a parse failure.
 
 =head1 METHODS
 
@@ -944,7 +949,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

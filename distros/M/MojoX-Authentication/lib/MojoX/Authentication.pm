@@ -1,5 +1,5 @@
 package MojoX::Authentication;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 
 use v5.24;
 use Moo;
@@ -9,38 +9,36 @@ use Ouch qw< :trytiny_var >;
 use MojoX::Authentication::Model;
 use Scalar::Util qw< blessed >;
 use Data::Dumper;
+use MojoX::Authentication::Util qw< coercer_for >;
 
 use constant DEFAULT_ROUTE_FOR => {
    ok => 'protected_root',
    t_ok => 'public_root',
 };
 
+use constant DEFAULT_PROVIDER_NAME => 'saml2';
+
 use namespace::clean;
 
-has app   => (is => 'rwp', weak_ref => 1, default => sub { ... });
-has model => (is => 'rwp', lazy => 1);
-has saml2_provider_name => (is => 'ro', default => 'saml2');
+has model => (is => 'ro', required => 1,
+   coerce
+     => coercer_for(authentication_model => 'MojoX::Authentication::Model')
+);
+has provider_name  => (is => 'ro', default => undef);
 has user_stash_key => (is => 'ro', default => 'user');
-
-# if we're building, we assume that it's in the app. Convention over
-# configuration. This is most probably never called actually
-sub _build_model ($self) { $self->app->model->authentication }
 
 around BUILDARGS => sub ($orig, $class, @args) {
    my $hash = { @args == 1 ? $args[0]->%* : @args };
-   $hash->{model} = MojoX::Authentication::Model->new($hash->{model})
-      if exists($hash->{model}) && ! blessed($hash->{model});
    return $hash;
 };
 
 sub BUILD ($self, $hash) {
-   $self->app_startup if $hash->{'-startup'};
+   $self->_app_startup($hash->{'-startup'} // undef);
    return $self;
 };
 
-sub app_startup ($self, $app = undef) {
-   $self->_set_app($app) if defined($app);
-   $app = $self->app;
+sub _app_startup ($self, $app) {
+   return unless $app;
    my $authn = $self->model;
 
    # add Mojolicious::Plugin::Authentication with the "right" callbacks
@@ -64,7 +62,7 @@ sub app_startup ($self, $app = undef) {
    return $self;
 }
 
-sub ctr_logout ($self, $c) {
+sub ctr_logout ($self, $c, $redirect_route) {
    return unless $c->is_user_authenticated;
 
    my $user = $c->current_user;
@@ -75,6 +73,8 @@ sub ctr_logout ($self, $c) {
       if $provider && $provider->can('logout');
 
    $c->logout; # just make Mojolicious::Plugin::Authentication happy
+
+   $c->redirect_to($redirect_route) if defined($redirect_route);
    return;
 }
 
@@ -100,8 +100,10 @@ sub ctr_credentials_login ($self, $c, $route_for = undef) {
 }
 
 sub _get_provider ($self, $c) {
-   my $pname = $c->param('provider') // $self->saml2_provider_name;
-   return $self->model->provider_named($pname);
+   my $provider_name = $c->provider_name
+      // $c->param('provider')
+      // DEFAULT_PROVIDER_NAME;
+   return $self->model->provider_named($provider_name);
 }
 
 sub _route_for ($self, $route_for, $outcome) {

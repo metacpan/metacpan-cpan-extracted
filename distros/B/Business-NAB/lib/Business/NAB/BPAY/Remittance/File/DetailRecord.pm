@@ -1,5 +1,5 @@
 package Business::NAB::BPAY::Remittance::File::DetailRecord;
-$Business::NAB::BPAY::Remittance::File::DetailRecord::VERSION = '0.05';
+$Business::NAB::BPAY::Remittance::File::DetailRecord::VERSION = '0.06';
 =head1 NAME
 
 Business::NAB::BPAY::Remittance::File::DetailRecord

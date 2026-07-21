@@ -26,6 +26,9 @@ Readonly my $T_MOCK_SEQ    => 'mock_sequence';
 Readonly my $T_MOCK_ONCE   => 'mock_once';
 Readonly my $T_MOCK_SCOPED => 'mock_scoped';
 Readonly my $T_INTERCEPT   => 'intercept_new';
+Readonly my $T_BEFORE      => 'before';
+Readonly my $T_AFTER       => 'after';
+Readonly my $T_AROUND      => 'around';
 
 # ---------------------------------------------------------------------------
 # Shortcuts to private helpers (white-box access).  These functions are
@@ -275,6 +278,124 @@ subtest 'unmock(): croaks when target is missing' => sub {
 	throws_ok { unmock(undef) }
 		qr/Package and method are required for unmocking/,
 		'undef target croaks';
+};
+
+# ============================================================================
+#  SECTION 2.5 -- before(), after(), around()
+# ============================================================================
+
+subtest 'before(): $TYPE is set to "before" in the mock layer' => sub {
+	# White-box: local $TYPE = _T_BEFORE is set before the mock() call;
+	# diagnose_mocks() must report 'before', not 'mock'.
+	{ package F::Before; sub fn { 'orig' } }
+	before 'F::Before::fn' => sub { };
+
+	my $d = diagnose_mocks();
+	is $d->{'F::Before::fn'}{layers}[0]{type}, $T_BEFORE,
+		'$TYPE propagated correctly to meta layer';
+	restore_all();
+};
+
+subtest 'before(): $orig captured at install time, not at call time' => sub {
+	# White-box: $orig = \&{$full_method} before mock() installs the wrapper.
+	# Subsequent mocks must not affect what $orig points to.
+	{ package F::BeforeCapture; sub fn { 'original' } }
+	before 'F::BeforeCapture::fn' => sub { };
+	# Stack another mock on top -- before's $orig must still see the real fn
+	mock 'F::BeforeCapture::fn' => sub { 'layer2' };
+
+	unmock 'F::BeforeCapture::fn';   # peel the mock layer
+
+	# Now the active slot is the before wrapper; its $orig is the real fn
+	is F::BeforeCapture::fn(), 'original',
+		'before wrapper still calls the real original after mock is peeled';
+	restore_all();
+};
+
+subtest 'before(): list / scalar / void context dispatch' => sub {
+	{ package F::BeforeCtx; sub multi { wantarray ? (1, 2, 3) : 'scalar' } }
+	before 'F::BeforeCtx::multi' => sub { };
+
+	my @list   = F::BeforeCtx::multi();
+	my $scalar = F::BeforeCtx::multi();
+	lives_ok { F::BeforeCtx::multi() } 'void context does not die';
+
+	is_deeply \@list, [1, 2, 3], 'list context forwarded correctly';
+	is $scalar, 'scalar',        'scalar context forwarded correctly';
+	restore_all();
+};
+
+subtest 'after(): $TYPE is set to "after" in the mock layer' => sub {
+	{ package F::After; sub fn { 'orig' } }
+	after 'F::After::fn' => sub { };
+
+	my $d = diagnose_mocks();
+	is $d->{'F::After::fn'}{layers}[0]{type}, $T_AFTER,
+		'$TYPE propagated correctly to meta layer';
+	restore_all();
+};
+
+subtest 'after(): $orig captured at install time' => sub {
+	{ package F::AfterCapture; sub fn { 'original' } }
+	after 'F::AfterCapture::fn' => sub { };
+	mock 'F::AfterCapture::fn' => sub { 'layer2' };
+
+	unmock 'F::AfterCapture::fn';
+
+	is F::AfterCapture::fn(), 'original',
+		'after wrapper calls real original after mock is peeled';
+	restore_all();
+};
+
+subtest 'after(): list / scalar / void context dispatch' => sub {
+	{ package F::AfterCtx; sub multi { wantarray ? ('a', 'b') : 'scalar' } }
+	after 'F::AfterCtx::multi' => sub { };
+
+	my @list   = F::AfterCtx::multi();
+	my $scalar = F::AfterCtx::multi();
+	lives_ok { F::AfterCtx::multi() } 'void context does not die';
+
+	is_deeply \@list, ['a', 'b'], 'list context forwarded correctly';
+	is $scalar, 'scalar',         'scalar context forwarded correctly';
+	restore_all();
+};
+
+subtest 'around(): $TYPE is set to "around" in the mock layer' => sub {
+	{ package F::Around; sub fn { 'orig' } }
+	around 'F::Around::fn' => sub { my ($o, @a) = @_; $o->(@a) };
+
+	my $d = diagnose_mocks();
+	is $d->{'F::Around::fn'}{layers}[0]{type}, $T_AROUND,
+		'$TYPE propagated correctly to meta layer';
+	restore_all();
+};
+
+subtest 'around(): $orig is the pre-install slot, not the wrapper itself' => sub {
+	# White-box: $orig must point to what existed BEFORE mock() ran.
+	# If it pointed at the installed wrapper we'd have infinite recursion.
+	{ package F::AroundOrig; sub fn { 'real' } }
+	my $calls = 0;
+	around 'F::AroundOrig::fn' => sub {
+		my ($orig, @args) = @_;
+		$calls++;
+		return $orig->(@args);   # must reach the real fn, not loop
+	};
+
+	my $r = F::AroundOrig::fn();
+	is $calls, 1, 'wrapper called exactly once (no infinite recursion)';
+	is $r, 'real', 'original return value returned';
+	restore_all();
+};
+
+subtest 'around(): stacking — each layer gets the previous layer as $orig' => sub {
+	{ package F::AroundStack; sub fn { 1 } }
+	around 'F::AroundStack::fn' => sub { my ($o) = @_; $o->() + 10 };  # +10
+	around 'F::AroundStack::fn' => sub { my ($o) = @_; $o->() * 3  };  # *3
+
+	# Call: *3 wrapper; $orig = +10 wrapper; +10's $orig = real fn returning 1
+	# 1 + 10 = 11; 11 * 3 = 33
+	is F::AroundStack::fn(), 33, 'stacked around layers compose via $orig chain';
+	restore_all();
 };
 
 # ============================================================================

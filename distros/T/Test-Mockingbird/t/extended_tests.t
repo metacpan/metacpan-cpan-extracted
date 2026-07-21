@@ -1318,6 +1318,74 @@ subtest 'DeepMock: unknown mock type in plan croaks' => sub {
 };
 
 # ===========================================================================
+# 11. before() / after() / around() -- branch coverage
+#
+# The three-way wantarray dispatch in before() and after() has three branches
+# each (list / scalar / void).  before_after.t exercises them for simple
+# returns; the subtests below target methods whose return value CHANGES with
+# context to confirm all three arms return the right thing.
+# ===========================================================================
+
+subtest 'before(): all three wantarray branches return correct values (context-sensitive method)' => sub {
+	{ package ET::BeforeCtx; sub fn { wantarray ? (10, 20) : 30 } }
+	before 'ET::BeforeCtx::fn' => sub { };
+
+	my @list   = ET::BeforeCtx::fn();
+	my $scalar = ET::BeforeCtx::fn();
+	my $void_ok = 1;
+	ET::BeforeCtx::fn();   # must not die in void context
+
+	is_deeply \@list, [10, 20], 'list branch: full list returned';
+	is $scalar, 30,             'scalar branch: scalar value returned';
+	ok $void_ok,                'void branch: no exception';
+	restore_all();
+};
+
+subtest 'after(): all three wantarray branches return correct values (context-sensitive method)' => sub {
+	{ package ET::AfterCtx; sub fn { wantarray ? ('a', 'b', 'c') : 'scalar' } }
+	after 'ET::AfterCtx::fn' => sub { };
+
+	my @list   = ET::AfterCtx::fn();
+	my $scalar = ET::AfterCtx::fn();
+	lives_ok { ET::AfterCtx::fn() } 'void branch does not die';
+
+	is_deeply \@list, ['a', 'b', 'c'], 'list branch correct';
+	is $scalar, 'scalar',              'scalar branch correct';
+	restore_all();
+};
+
+subtest 'around(): $orig propagation preserves identity across stacked calls' => sub {
+	# Each around layer's $orig must be the immediately preceding slot, not
+	# the outermost.  Verify by accumulating values from each layer.
+	{ package ET::AroundProp; sub fn { 1 } }
+	around 'ET::AroundProp::fn' => sub { my ($o) = @_; $o->() + 100 };  # +100
+	around 'ET::AroundProp::fn' => sub { my ($o) = @_; $o->() * 5   };  # *5
+
+	# outer(*5): $orig = +100 wrapper; inner(+100): $orig = real fn
+	# real=1, +100=101, *5=505
+	is ET::AroundProp::fn(), 505, 'layered $orig chain composes correctly';
+	restore_all();
+};
+
+subtest 'before() / after() / around() use the same LIFO stack as mock()' => sub {
+	# Confirm that restore_all() removes all three layer types and restores
+	# the original, with correct stack depth reported by diagnose_mocks.
+	{ package ET::BAA; sub fn { 'orig' } }
+	before 'ET::BAA::fn' => sub { };
+	after  'ET::BAA::fn' => sub { };
+	around 'ET::BAA::fn' => sub { my ($o, @a) = @_; $o->(@a) };
+
+	my $d = diagnose_mocks();
+	is $d->{'ET::BAA::fn'}{depth}, 3, 'three layers on the stack';
+
+	restore_all();
+
+	$d = diagnose_mocks();
+	ok !exists $d->{'ET::BAA::fn'}, 'all layers removed by restore_all';
+	is ET::BAA::fn(), 'orig', 'original callable and correct';
+};
+
+# ===========================================================================
 # DEAD CODE ANNOTATIONS
 # The following conditions are unreachable via the public API and cannot be
 # covered by tests without manipulating internal state directly.

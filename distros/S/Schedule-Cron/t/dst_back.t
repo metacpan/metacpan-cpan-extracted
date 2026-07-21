@@ -13,7 +13,7 @@ my %available = ();
 my @refs = ( 
             [ "MET", 1256432100, 1256436000],
             [ "Europe/Berlin", 1256432100, 1256436000],
-            [ "PST8PDT", 1257065700, 1257062400]
+            [ "America/Los_Angeles", 1257065700, 1257062400]
            );
 
 # First check for timezones available:

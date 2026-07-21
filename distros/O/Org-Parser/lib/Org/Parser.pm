@@ -7,9 +7,9 @@ use Org::Document;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-06'; # DATE
+our $DATE = '2026-07-21'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.561'; # VERSION
+our $VERSION = '0.563'; # VERSION
 
 sub parse {
     my ($self, $arg, $opts) = @_;
@@ -45,6 +45,7 @@ sub parse {
         from_string=>$str,
         time_zone=>$opts->{time_zone},
         ignore_unknown_settings=>$opts->{ignore_unknown_settings},
+        ignore_unknown_drawers =>$opts->{ignore_unknown_drawers},
     );
 }
 
@@ -119,7 +120,7 @@ Org::Parser - Parse Org documents
 
 =head1 VERSION
 
-This document describes version 0.561 of Org::Parser (from Perl distribution Org-Parser), released on 2023-11-06.
+This document describes version 0.563 of Org::Parser (from Perl distribution Org-Parser), released on 2026-07-21.
 
 =head1 SYNOPSIS
 
@@ -284,7 +285,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex White Karl Williamson Steven Haryanto Tekki Trent Fisher William Lindley Wong Meng Weng
+=for stopwords Alex White Karl Williamson perlancar (on netbook-dell-xps13) Steven Haryanto PC) Tekki Trent Fisher William Lindley Wong Meng Weng
 
 =over 4
 
@@ -298,7 +299,11 @@ Karl Williamson <khw@cpan.org>
 
 =item *
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+=item *
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
 =item *
 
@@ -338,7 +343,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

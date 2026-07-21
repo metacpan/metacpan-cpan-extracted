@@ -3,6 +3,12 @@
 use strict;
 use warnings;
 
+our $abs;
+BEGIN {
+    $abs = \&CORE::abs;
+    *CORE::GLOBAL::abs = sub { goto $abs };
+}
+
 use DateTime;
 use Test::Most;
 use FindBin qw/ $Bin /;
@@ -92,6 +98,8 @@ subtest 'instantiation + add attributes' => sub {
         qr/you have debits missing a credit/,
     );
 
+    file_contents_eq( $tmp_file, '', 'Wrote nothing to file on failure' );
+
     $Payments->add_detail_record( {
         bsb_number           => '083-047',
         account_number       => '123456789',
@@ -127,6 +135,29 @@ subtest 'instantiation + add attributes' => sub {
         $Payments->to_file( $tmp_file );
 
         files_eq_or_diff( $tmp_file, $example_file, { style => 'Unified' } );
+    };
+};
+
+subtest 'rounding' => sub {
+    my $Payments = $class->new_from_file( $example_file );
+
+    subtest 'Within tolerance' => sub {
+        local $abs = sub { 1e-9 };
+
+        my $fh       = File::Temp->new;
+        my $tmp_file = $fh->filename;
+        ok $Payments->to_file( $tmp_file ), 'to_file succeeds';
+
+        files_eq_or_diff( $tmp_file, $example_file, { style => 'Unified' } );
+    };
+
+    subtest 'Outside tolerance' => sub {
+        local $abs = sub { 1e-8 };
+
+        throws_ok(
+            sub { $Payments->to_file('some_file'); },
+            qr/you have debits missing a credit/,
+        );
     };
 };
 

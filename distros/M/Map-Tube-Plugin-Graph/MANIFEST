@@ -7,8 +7,12 @@ MANIFEST
 MANIFEST.SKIP
 README
 t/00-load.t
-t/as_image.t
-t/unusual-station-name.t
+t/01-render.t
+t/02-as_image.t
+t/03-as_png.t
+t/04-as_graph.t
+t/05-graphviz-meta.t
+t/06-unusual-station-name.t
 t/unusual-station-name.xml
 t/lib/Sample.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

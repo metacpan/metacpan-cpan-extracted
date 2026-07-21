@@ -50,6 +50,7 @@ sub draw {
 		$i = $self->itemCreate($entry, $_) unless defined $i;
 		$i->draw($cx, $y, $column, $row, $col->cget('-itemtype'));
 	}
+	$item->drawAnchor if $item->anchored;
 }
 
 sub listHeight {
@@ -101,6 +102,13 @@ sub refresh {
 
 sub scroll {
 	return 'vertical'
+}
+
+sub startXY {
+	my $self = shift;
+	my ($x, $y) = $self->SUPER::startXY;
+	$y = $y + $self->cget('-headerheight') if $self->headerAvailable;
+	return ($x, $y)
 }
 
 sub type {

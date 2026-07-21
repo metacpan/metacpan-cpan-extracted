@@ -1,5 +1,13 @@
 Revision history for Markdown-Simple
 
+0.17    2026-07-12
+        - Add highlight => 1 render option: fenced code blocks with a
+          language tag are syntax-highlighted via Eshu's eshu_hl.h pass,
+          wrapping tokens in <span class="esh-*"> elements.
+
+0.16    2026-07-03
+        - No changes recorded.
+
 0.15    2026-06-22
         - Fix "unsupported TLS program header" load failure on OpenBSD.
         - Fix more C89 build failures 

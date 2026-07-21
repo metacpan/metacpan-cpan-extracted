@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Payments;
-$Business::NAB::Australian::DirectEntry::Payments::VERSION = '0.05';
+$Business::NAB::Australian::DirectEntry::Payments::VERSION = '0.06';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Payments
@@ -151,27 +151,20 @@ sub to_file (
     $bsb_number = "999-999",
     $sep = "\r\n",
 ) {
-
-    open( my $fh, '>', $file );
-
-    print $fh $self->descriptive_record->[ 0 ]->to_record . $sep;
-    print $fh $_->to_record . $sep foreach $self->detail_record->@*;
-
-    my $record_count = scalar( $self->detail_record->@* );
-
     my $credit_total = sum0 map { $_->amount }
         grep { $_->is_credit } $self->detail_record->@*;
     my $debit_total = sum0 map { $_->amount }
         grep { $_->is_debit } $self->detail_record->@*;
 
     my $net_total = abs( $credit_total - $debit_total );
+    my $rounded_total = sprintf '%.8f', $net_total;
 
     # net total should be zero as it is the net of credit - debit records
     # and there should always be a record that nets off the other record
     # type totals (to describe where funds go to/from). however if this is
     # a returns file then this check does not apply
     if (
-        $net_total != 0
+        $rounded_total != 0
         && $self->blessed !~ /::Returns$/
     ) {
         croak(
@@ -180,11 +173,18 @@ sub to_file (
         );
     }
 
+    open( my $fh, '>', $file );
+
+    print $fh $self->descriptive_record->[ 0 ]->to_record . $sep;
+    print $fh $_->to_record . $sep foreach $self->detail_record->@*;
+
     if ( my $TotalRecord = $self->total_record->[ 0 ] ) {
         print $fh $TotalRecord->to_record . $sep;
     } else {
         croak( "BSB number is required if total_record is not set" )
             if !$bsb_number;
+
+        my $record_count = scalar( $self->detail_record->@* );
 
         my $TotalRecord = Business::NAB::Australian::DirectEntry::Payments::TotalRecord->new(
             bsb_number          => $bsb_number,

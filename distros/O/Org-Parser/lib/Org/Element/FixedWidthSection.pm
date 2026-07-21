@@ -8,9 +8,9 @@ with 'Org::ElementRole';
 with 'Org::ElementRole::Block';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-06'; # DATE
+our $DATE = '2026-07-21'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.561'; # VERSION
+our $VERSION = '0.563'; # VERSION
 
 sub text {
     my ($self) = @_;
@@ -34,7 +34,7 @@ Org::Element::FixedWidthSection - Represent Org fixed-width section
 
 =head1 VERSION
 
-This document describes version 0.561 of Org::Element::FixedWidthSection (from Perl distribution Org-Parser), released on 2023-11-06.
+This document describes version 0.563 of Org::Element::FixedWidthSection (from Perl distribution Org-Parser), released on 2026-07-21.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
