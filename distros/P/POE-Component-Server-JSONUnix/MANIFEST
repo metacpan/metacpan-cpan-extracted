@@ -1,5 +1,7 @@
 Changes
 lib/POE/Component/Server/JSONUnix.pm
+lib/POE/Component/Server/JSONUnix/BlockingClient.pm
+lib/POE/Component/Server/JSONUnix/Client.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
@@ -7,8 +9,21 @@ t/00-load.t
 t/01-register.t
 t/02-context.t
 t/03-server.t
+t/04-auth-context.t
+t/05-auth-server.t
+t/06-client.t
+t/07-blocking-client.t
+t/08-permissions.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+examples/auth_client.pl
+examples/auth_server.pl
+examples/blocking_client.pl
+examples/client.pl
+examples/permissions_client.pl
+examples/permissions_server.pl
+examples/poe_auth_client.pl
+examples/server.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -20,7 +20,7 @@ requires 'IPC::Run3';
 requires 'JSON::MaybeXS';
 requires 'Module::Load::Conditional';
 requires 'PPI';
-requires 'Params::Get', '0.13';
+requires 'Params::Get', '0.15';
 requires 'Params::Validate::Strict', '0.30';
 requires 'Pod::Simple';
 requires 'Pod::Usage';
@@ -48,6 +48,7 @@ on 'test' => sub {
 	requires 'Symbol';
 	requires 'Test::DescribeMe';
 	requires 'Test::LectroTest';
+	requires 'Test::LectroTest::Compat';
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.10';
 	requires 'Test::Most';

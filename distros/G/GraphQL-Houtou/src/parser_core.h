@@ -182,6 +182,16 @@ gql_throw_sv(pTHX_ gql_parser_t *p, STRLEN pos, SV *msg) {
   croak_sv(err);
 }
 
+static void
+gql_throw_simple_error(pTHX_ const char *msg) {
+  HV *err_hv = newHV();
+  SV *err_sv = newRV_noinc((SV *)err_hv);
+
+  hv_stores(err_hv, "message", newSVpv(msg, 0));
+  sv_bless(err_sv, gv_stashpv("GraphQL::Houtou::Error", GV_ADD));
+  croak_sv(sv_2mortal(err_sv));
+}
+
 static const char *
 gql_expected_token_label(gql_token_kind_t kind) {
   switch (kind) {

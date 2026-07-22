@@ -54,9 +54,10 @@ Mnet::Log supports generating the following types of log entries
 
 The following options can be used to control log outputs:
 
-    debug   enable dbg log outputs
-    quiet   disable all stdout log outputs
-    silent  disable all stdout and stderr log outputs
+    debug         enable dbg log outputs
+    debug-error   enable debug error file
+    quiet         disable all stdout log outputs
+    silent        disable all stdout and stderr log outputs
 
 Note that this module also installs __DIE__, __WARN__, INT, and TERM signal
 handlers, in order to augment the logging of these events. These are made so
@@ -64,7 +65,7 @@ that compile and eval signals are processed by perl as normal.
 
 Note that timestamps and other varying data are filtered out of log outputs
 when the --record, --replay, or --test cli options are enabled or if the
-L<Mnet::Log::Test> module is otherwise loaded.
+L<Mnet::Log::Test> module has been used.
 
 The signal handlers used in this module require perl 5.8 or newer.
 
@@ -184,6 +185,7 @@ INIT {
         help_tip    => 'set to display extra debug log entries',
         help_text   => '
             note that the --quiet and --silent options override this option
+            use --debug-error for debug error file, see --help debug-error
             refer also to the Mnet::Opts::Set::Debug pragma module
             refer to perldoc Mnet::Log for more information
         ',

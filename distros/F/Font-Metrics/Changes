@@ -1,0 +1,10 @@
+Revision history for Font-Metrics
+
+0.01    2026-07-21
+	Initial release
+        - Standard 14 (PDF) font metrics: char_width, string_width,
+          ascender, descender, cap_height, x_height, line_height,
+          kern_pair — data from Adobe AFM files.
+        - TrueType/OpenType font loader: cmap formats 4 and 12, hmtx,
+          hhea, OS/2, and kern (format 0) table parsing.
+

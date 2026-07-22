@@ -23,7 +23,9 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
+
+require BATsh::MB;
 
 use File::Spec ();
 BEGIN { eval { require Cwd } }
@@ -55,7 +57,13 @@ sub get        { my ($c,$n)=@_; return $STORE{_key($n)} }
 sub set        { my ($c,$n,$v)=@_; $STORE{_key($n)} = defined $v ? $v : '' }
 sub unset      { my ($c,$n)=@_; delete $STORE{_key($n)} }
 sub exists_var { my ($c,$n)=@_; return exists $STORE{_key($n)} ? 1 : 0 }
-sub sync_to_env { %ENV = %STORE }
+sub sync_to_env {
+    %ENV = ();
+    for my $k (keys %STORE) {
+        next if index($k, '%') >= 0;   # %0..%9, %*, %%V: not env names
+        $ENV{$k} = BATsh::MB::dec($STORE{$k});
+    }
+}
 sub snapshot   { my %s = %STORE; return { %s } }
 sub restore    { my ($c,$s)=@_; %STORE = %{$s} }
 sub delayed_expansion { return $DELAYED_EXPANSION }
@@ -159,7 +167,7 @@ sub _expand_named_var {
         return sprintf('%02d:%02d:%02d.%02d', $t[2], $t[1], $t[0], 0);
     }
     if ($upper eq 'CD') {
-        return defined(&Cwd::cwd) ? Cwd::cwd() : '.';
+        return BATsh::MB::enc(defined(&Cwd::cwd) ? Cwd::cwd() : '.');
     }
     if ($upper eq 'CMDCMDLINE') {
         return '';
@@ -194,12 +202,12 @@ sub _expand_var_modifier {
     # Substring: ~n  or  ~n,m
     if ($modifier =~ /\A~(-?\d+)(?:,(-?\d+))?\z/) {
         my ($n, $m) = ($1, $2);
-        my $len = length($val);
+        my $len = BATsh::MB::mb_length($val);
         my $start = ($n < 0) ? $len + $n : $n;
         $start = 0 if $start < 0;
         return '' if $start >= $len;
         if (!defined $m) {
-            return substr($val, $start);
+            return BATsh::MB::mb_substr($val, $start);
         }
         my $end;
         if ($m < 0) {
@@ -210,7 +218,7 @@ sub _expand_var_modifier {
         }
         $end = $len if $end > $len;
         return '' if $end <= $start;
-        return substr($val, $start, $end - $start);
+        return BATsh::MB::mb_substr($val, $start, $end - $start);
     }
 
     # Substitution: str1=str2  or  *str1=str2
@@ -267,7 +275,7 @@ sub _expand_tilde_param {
     if ($mods =~ /[fdp]/) {
         unless ($path =~ m{\A/} || $drv ne '') {
             # relative Unix path: prepend cwd
-            my $cwd = defined(&Cwd::cwd) ? Cwd::cwd() : '.';
+            my $cwd = BATsh::MB::enc(defined(&Cwd::cwd) ? Cwd::cwd() : '.');
             $cwd =~ s{\\}{/}g;
             $cwd =~ s{/+\z}{};
             $path = "$cwd/$path";

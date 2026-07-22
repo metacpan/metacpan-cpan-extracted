@@ -1,5 +1,10 @@
 Revision history for Google-Auth
 
+0.04    Mon Jul 20 2026
+        [CPAN RT #180157 Fix]
+        - Replaced system free() with Perl's Safefree() for memory allocated via Newx() in XS.xs generate_self_signed_cert() and verify_signature().
+        - Fixes "invalid pointer" and "double free or corruption" test failures on Perls compiled with -DDEBUGGING and MULTIPLICITY.
+
 0.03    Fri Jul 17 2026
         [OpenSSL 3.0 & Cryptographic Modernization]
         - Modernized XS.xs C bindings to use OpenSSL 3.0 high-level EVP_PKEY_fromdata and OSSL_PARAM_BLD APIs in load_rsa_pubkey and load_ec_pubkey, eliminating all OpenSSL 3.0 deprecation warnings.

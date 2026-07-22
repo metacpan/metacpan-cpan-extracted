@@ -170,6 +170,12 @@ typedef struct call_base {
     call_type_t type;
 } call_base_t;
 
+/* Sentinel tag for fire-and-forget batches (e.g. watch cancel SEND_MESSAGE,
+ * keepalive renewal SEND_MESSAGE). gRPC's GRPC_CQ_NEXT contract requires a
+ * non-NULL tag; we use this dummy call_base_t so the completion can be
+ * identified and skipped (process_grpc_event returns on CALL_TYPE_NONE). */
+extern call_base_t cancel_sentinel;
+
 /* Pending call structure (for unary RPCs) */
 typedef struct pending_call {
     call_base_t base;  /* Must be first */
@@ -238,6 +244,7 @@ typedef struct keepalive_call {
     int auto_reconnect;
     int reconnect_attempt;
     ev_timer reconnect_timer;  /* Backoff timer for reconnection */
+    ev_timer renew_timer;      /* Periodic lease renewal (ttl/3, min 0.5s) */
     int client_owns;           /* See watch_call_t — same dual-ownership */
     int perl_owns;
 } keepalive_call_t;

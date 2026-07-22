@@ -1,0 +1,56 @@
+#!/bin/sh
+# BATsh example 14: SH getopts option parsing (BATsh::SH, v0.07)
+# Run: perl lib/BATsh.pm eg/14_sh_getopts.batsh
+
+# A function that parses its own options with getopts.  It resets OPTIND
+# to 1 first so it can be called more than once, and uses "shift
+# $((OPTIND - 1))" to drop the parsed options and leave the operands in
+# "$@".  The optstring "vo:f" means: -v is a flag, -o takes an argument,
+# -f is a flag.
+run() {
+    OPTIND=1
+    verbose=0
+    outfile=-
+    force=0
+    while getopts "vo:f" opt; do
+        case $opt in
+            v) verbose=1 ;;
+            o) outfile=$OPTARG ;;
+            f) force=1 ;;
+            \?) echo "  (unknown option ignored)" ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    echo "  verbose=$verbose outfile=$outfile force=$force"
+    echo "  operands: $*"
+}
+
+echo "separate option argument (-o out.txt):"
+run -v -o out.txt file1 file2
+
+echo "attached option argument (-oout.txt):"
+run -oout.txt file3
+
+echo "clustered flags (-vf):"
+run -vf file4
+
+# Silent error reporting: a leading ':' in the optstring suppresses the
+# built-in diagnostic and reports the offending letter through OPTARG,
+# so the script can print its own message.
+echo "silent error handling:"
+scan() {
+    OPTIND=1
+    while getopts ":ab:" o; do
+        case $o in
+            a) echo "  got -a" ;;
+            b) echo "  got -b with arg '$OPTARG'" ;;
+            :) echo "  option -$OPTARG needs an argument" ;;
+            \?) echo "  unknown option -$OPTARG" ;;
+        esac
+    done
+}
+scan -a -b value
+scan -x
+scan -b
+
+echo "done."

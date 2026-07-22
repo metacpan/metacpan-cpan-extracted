@@ -146,17 +146,23 @@ plan tests => 11;
 
     my $prefix = "/test-retry2-$$-" . time();
     my $events = 0;
+    my $put_sent = 0;
 
     my $watch = $client->watch("$prefix/key", { auto_reconnect => 0 }, sub {
         my ($resp, $err) = @_;
         return if $err;
+        # The created confirmation surfaces as the first callback (created=1,
+        # empty events) — only put once the watch is registered server-side,
+        # otherwise the put can commit before registration and be missed.
+        if ($resp->{created} && !$put_sent) {
+            $put_sent = 1;
+            $client->put("$prefix/key", "value", sub {});
+            return;
+        }
         $events++ if $resp->{events} && @{$resp->{events}};
     });
 
     ok($watch, 'watch created with auto_reconnect disabled');
-
-    # Fire an event
-    $client->put("$prefix/key", "value", sub {});
 
     # Wait for event
     my $check;

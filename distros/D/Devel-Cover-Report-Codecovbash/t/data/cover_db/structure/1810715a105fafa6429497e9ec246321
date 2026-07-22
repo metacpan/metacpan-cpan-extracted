@@ -1,0 +1,1 @@
+{"file":"t/dummy","start":{"2":{"BEGIN":[{"statement":10}]},"10":{"__ANON__":[{"statement":19}]},"3":{"BEGIN":[{"statement":13}]},"-1":{"__COVER__":[{"statement":19}]},"5":{"BEGIN":[{"statement":16}]},"1":{"BEGIN":[{"statement":8}]}},"digest":"1810715a105fafa6429497e9ec246321","statement":[7,17,10,11,14,16,16,19,1,1,2,2,2,3,3,3,5,5,5]}

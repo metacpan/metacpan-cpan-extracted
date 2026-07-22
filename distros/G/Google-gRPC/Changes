@@ -1,0 +1,19 @@
+Revision history for Google::gRPC
+
+0.04    Wed Jul 22 2026
+        [POD Documentation & Quality Modernization]
+        - Added comprehensive POD documentation (NAME, SYNOPSIS, DESCRIPTION, AUTHOR, LICENSE) across all Google::gRPC submodules.
+        - Added main package module Google::gRPC.pm ($VERSION = 0.04) and t/99-pod-coverage.t test suite.
+
+0.03    Fri Jul 17 2026
+        [Engine Architecture & Cross-Platform Support]
+        - Hardened C/XS NGHTTP2 transport engine configuration and added dynamic fallback to Pure-Perl Protocol::HTTP2 engine when libnghttp2 development headers are absent.
+        - Updated Makefile.PL auto-detection for cross-platform Linux, macOS, and Windows runners.
+
+        [Architecture & CPAN Cleanup]
+        - Upgraded package version to 0.03 (lib/Google/gRPC/Client.pm and lib/Google/gRPC/Engine/NGHTTP2.pm).
+        - Pruned redundant $VERSION declarations from sub-module files.
+
+0.02    2026-06-24
+        - Extracted from Google::Auth distribution into its own standalone package.
+        - Enforced strict Single Responsibility Principle (SRP) separation.

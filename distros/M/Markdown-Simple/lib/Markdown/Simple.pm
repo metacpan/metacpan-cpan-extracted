@@ -3,12 +3,12 @@ package Markdown::Simple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 use Exporter ();
 our @ISA = qw(Exporter);
 
 require XSLoader;
-XSLoader::load('Markdown::Simple', $Markdown::Simple::VERSION);
+XSLoader::load('Markdown::Simple', $VERSION);
 
 our @EXPORT = qw/markdown_to_html strip_markdown/;
 
@@ -24,7 +24,7 @@ Markdown::Simple - Markdown to HTML
 
 =head1 VERSION
 
-Version 0.16
+Version 0.18
 
 =cut
 

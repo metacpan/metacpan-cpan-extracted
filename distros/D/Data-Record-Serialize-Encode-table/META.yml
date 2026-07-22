@@ -1,0 +1,43 @@
+---
+abstract: 'encode records as a formatted table and output it'
+author:
+  - 'Diab Jerius <djerius@cfa.harvard.edu>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Record-Serialize-Encode-table
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Data::Record::Serialize::Encode::table:
+    file: lib/Data/Record/Serialize/Encode/table.pm
+    version: '0.01'
+requires:
+  Data::Record::Serialize: '1.06'
+  Term::Table: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize-Encode-table
+  repository: https://codeberg.com/djerius/data-record-serialize-encode-table.git
+version: '0.01'
+x_generated_by_perl: v5.42.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: GPL-3.0-only

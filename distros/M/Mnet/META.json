@@ -4,7 +4,7 @@
       "Mike Menza <mmenza@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/menzascripting/Mnet"
       }
    },
-   "version" : "5.25",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "5.26",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

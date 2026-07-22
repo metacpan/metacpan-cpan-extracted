@@ -24,7 +24,7 @@ use Google::Auth::ComputeEngine;
 use Google::Auth::Exceptions;
 use XSLoader;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 XSLoader::load( 'Google::Auth', $VERSION );
 
 

@@ -1,5 +1,492 @@
 Revision history for BATsh
 
+0.07  2026-07-21 JST (Japan Standard Time)
+
+    - SECURITY / SH REDIRECTIONS: fixed two defects in the pure-Perl SH
+      interpreter's I/O redirection target handling (both present through
+      0.06; the CMD interpreter was unaffected -- it already dequoted its
+      redirection targets).
+
+      (1) Quoting.  A quoted redirection target kept its quote characters
+          and was split on whitespace inside the quotes, so
+
+              echo hi > "out.txt"      wrote to a file named  "out.txt"
+                                       (quotes included), not  out.txt
+              echo hi > "a b.txt"      broke at the space
+
+          Redirection targets are now read with quote/backslash awareness
+          (new internal _read_redir_word) and dequoted with the same
+          _arr_dequote() the command words already use, so a quoted space
+          stays part of the one filename and the quotes are removed.
+
+      (2) Command injection.  Redirection targets reached a 2-argument
+          open() unprotected, so a target that ended in "|" was run as a
+          pipe and one that began with ">" was re-parsed as a mode:
+
+              f="date|"; cat < $f      ran `date` (a pipe), not open a file
+              ... > ">name"            appended to "name" (leading > lost)
+
+          Every plain-filename redirection open() (stdin/stdout/stderr in
+          the exec-redirect path, the while-loop input redirect, subshell
+          "( ... ) >file / <file", and the general _sh_exec_with_redirs
+          path) now uses sysopen() with explicit O_RDONLY / O_WRONLY |
+          O_CREAT | (O_APPEND|O_TRUNC) flags.  sysopen() takes the name
+          literally, so a leading ">"/"<" or a trailing "|" is never
+          treated as a mode or a pipe command.  The file-descriptor
+          duplication forms (2>&1, 1>&2, >&STDERR) are unchanged.
+
+          Fcntl (already a dependency) supplies the extra O_* constants
+          (O_RDONLY, O_TRUNC, O_APPEND added to the existing import).
+
+      New test t/0024-sh-redirect-quoting.t (7 checks: quoted output /
+      input / append targets, a quoted target containing a space, and the
+      two injection cases).  All Perl 5.005_03 compatible (index/substr
+      scanning, sysopen with Fcntl O_* flags, no prototypes, no 3-arg
+      open, no lexical filehandles).
+
+    - SH SUBSHELL REDIRECTIONS: a trailing redirection on a subshell,
+      "( ... ) > file" / ">> file" / "< file", extracted its target with a
+      bare \S+ match, so a quoted target with a space broke and quotes were
+      kept.  It now runs through the same quote-aware redirection parser as
+      every other command, so "( ... ) > \"a b.txt\"" and "( ... ) > \$var"
+      behave correctly; the target reaches the same sysopen() and so cannot
+      be mis-parsed as a pipe/mode either.  (t/0024 RQ08, RQ09.)
+
+    - SH ASSIGNMENT VALUES: a variable assignment dequoted its value by
+      stripping only a single OUTERMOST "..." or '...' pair, which left
+      concatenated quotes intact and split a backslash-escaped space:
+
+          y=a'b'c     stored  a'b'c    (now abc)
+          w=a\ b      ran "b" as a command   (now the value is "a b")
+
+      Both the standalone form (VAR=value) and the prefix form
+      (VAR=value command) now dequote with the same _arr_dequote() used for
+      command words, and the prefix-assignment value reader honours "\ " so
+      an escaped space no longer ends the value word.  New test
+      t/0025-sh-assign-quoting.t (6 checks).  Perl 5.005_03 compatible.
+
+    - SH PROCESS SUBSTITUTION path quoting: now that redirection targets
+      (and, as before, command words) are dequoted, the temp-file path that
+      <(cmd) / >(cmd) substitutes into the line is emitted quoted, so it is
+      taken literally.  Without this, a Windows temp path
+      (C:\...\Temp\batsh_ps_NN.tmp) lost its backslashes to backslash-escape
+      processing, and a space in the temp directory split the word; on
+      Unix (/tmp/...) the bug was invisible.  Also fixes process
+      substitution used as a command argument (diff <(a) <(b)) when the temp
+      directory contains spaces.
+
+    - SH `cd` QUOTING: the cd builtin now dequotes its argument like every
+      other command word, so cd "a b", cd 'dir', and cd "$VAR/x" reach
+      chdir() as a plain path.  Previously the quote characters were kept
+      and cd failed with "No such file or directory".  (t/0026 CD01-CD03.)
+
+    - SH SUBSHELL REDIRECT FAILURE: a subshell whose redirection cannot be
+      opened, e.g. "( read L ) < /no/such/file", now reports the error and
+      returns a non-zero status WITHOUT running its body.  Previously it
+      fell through and ran the body against the inherited stdin, which
+      blocks forever when the body reads stdin (cat, read).  Any handle
+      already redirected is restored before returning.  (t/0026 RF01; RF02
+      guards that a working redirect still reads the file.)  New test
+      t/0026-sh-cd-and-redir-fail.t (5 checks).  Perl 5.005_03 compatible.
+
+    - NEW SH BUILTIN getopts: the POSIX single-character option parser,
+      the last remaining builtin previously listed as unimplemented.
+
+        getopts optstring name [arg ...]
+
+      Called in a loop, it sets the variable named by "name" to each
+      option letter in turn (and OPTARG to an option's argument), tracks
+      progress through the argument list in OPTIND (1-based, reset to 1
+      by the script before an independent parse), and returns non-zero
+      when the options are exhausted so a "while getopts ...; do ...;
+      done" loop ends by itself.  Supports: a ':' after a letter in the
+      optstring to mark an argument-taking option; the separate
+      (-o value) and attached (-ovalue) option-argument forms; clustered
+      flags (-abc == -a -b -c); the "--" end-of-options marker (consumed)
+      and a leading non-option word (stops parsing, left in place);
+      parsing the positional parameters when no explicit args are given;
+      and both error-reporting modes -- the default (a diagnostic to
+      STDERR and name='?') and the silent mode selected by a leading ':'
+      in the optstring (no message; name='?' for an unknown option or
+      ':' for a missing argument, with the offending letter in OPTARG).
+      The intra-argument character offset used for clustered options is
+      internal state that is restarted whenever the script resets OPTIND,
+      matching bash's behaviour for a fresh getopts loop; it is also
+      reset between top-level runs so one script's half-finished loop
+      cannot leak into the next.  All Perl 5.005_03 compatible
+      (index/substr scanning, no prototypes, package-variable state).
+      New test t/0023-sh-getopts.t (23 checks).
+
+    - Fixed SH "shift N": the builtin accepted an optional count in its
+      implementation (shift 1..9 positions) but the dispatcher called it
+      with no argument, so "shift 3" and "shift $((OPTIND-1))" always
+      shifted by exactly one -- silently corrupting any script that
+      shifted more than one positional parameter at a time, including the
+      idiomatic "shift $((OPTIND - 1))" that follows a getopts loop.  The
+      dispatcher now passes the count through.  (t/0023: GO16/GO17.)
+
+    - Fixed inline single-line function bodies that contain a control
+      structure.  A body such as
+
+        loop() { for x in a b c; do echo "$x"; done; }
+        count() { i=0; while [ $i -lt 3 ]; do echo $i; i=$((i+1)); done; }
+        chk()  { if [ "$1" = yes ]; then echo Y; else echo N; fi; }
+
+      was split naively on ';' at definition time, tearing the loop or
+      conditional into fragments ("while C" / "do B" / "done") that no
+      longer reassembled into a runnable block -- the construct silently
+      produced no output, or ran "done"/"fi" as an external command.
+      _parse_function() now detects a control-structure keyword in
+      command position in an inline body (new helper
+      _inline_body_has_control(), quote/substitution aware) and, when
+      present, keeps the whole body as one line so _run_lines() applies
+      the same inline-control handling it already uses for a control
+      structure typed directly on one physical line (including the
+      "prefix; control" split, so "setup; while ...; do ...; done"
+      works).  A trailing ';' before the closing brace is dropped so the
+      inline "; done"/"; fi"/"; esac" terminator sits where the block
+      parsers expect it.  Bodies of only simple commands
+      (greet() { echo hi; echo bye; }) still split on ';' exactly as
+      before.  All Perl 5.005_03 compatible.  (t/0023: GO14/GO15 exercise
+      getopts inside such a function; the fix is general to all inline
+      function bodies.)
+
+    - Fixed the SH "$*" special parameter, which was never expanded and
+      printed literally: the expansion pass substituted "$@" but not
+      "$*", despite the code comment naming both.  "$*" now expands to
+      the space-joined positional parameters, like "$@".  This is the
+      parameter a script reads after "shift $((OPTIND - 1))" to see the
+      operands left by a getopts loop.  (t/0023: GO19.)
+
+    - Fixed the SH "echo" builtin's glob decision, which inspected the
+      raw source text for *, ?, or [ with a plain pattern match.  That
+      match also fired on the '*' of the "$*" parameter, on the '?' of
+      "$?", and on any metacharacter inside quotes -- so
+      echo "  x: $*" was needlessly run through word-splitting/globbing,
+      collapsing its leading and internal whitespace, and a quoted
+      echo "*.txt" risked being globbed against the current directory.
+      A new quote- and parameter-aware scanner (_raw_has_glob) triggers
+      globbing only on a genuine unquoted glob metacharacter that was
+      actually written in the script, skipping quoted regions, $NAME /
+      $* / $? parameter references, and ${...} expansions.  Unquoted
+      "echo *.txt" still globs as before.  (t/0023: GO20/GO21.)
+
+    - Extended shell features: extglob, brace expansion, here-strings,
+      process substitution, select, alias/unalias, exec, and subshell
+      command groups (v0.07).
+        * shopt -s/-u extglob enables ?(),*(),+(),@(),!() pattern-list
+          operators in case patterns and in the ${VAR%pat}-family
+          parameter-expansion patterns (_extglob_scan/_extglob_split_alts,
+          shared by _case_glob_to_re() and _glob_to_re()). Fixed two
+          existing case-pattern parsers (_case_split_patterns and
+          _case_parse_clause) to be paren-depth-aware so an extglob
+          group's internal '|' and ')' are not mistaken for the
+          pattern-separator '|' or the clause-terminator ')'.
+        * {a,b,c} and {1..5}/{a..e}[..step] brace expansion runs
+          lexically on the raw line (_brace_expand_line and friends),
+          protecting quotes, ${...}, $(...), $((...)), `...`, and
+          <(...)/>(...) as opaque regions; wired into _exec_line and
+          _expand_word_list (for-loop lists).
+        * cmd <<< word here-strings (_sh_strip_herestring), reusing the
+          here-document temp-file machinery. Fixed a pre-existing
+          _hd_detect() bug where "<<<" was only rejected as a
+          here-document opener when matched starting at its FIRST '<';
+          the scan then re-tried from the second '<' and matched "<<"
+          there, silently mistreating "cmd <<< word" as a broken
+          here-document. _hd_detect() now skips all three characters.
+        * <(cmd) and >(cmd) process substitution
+          (_replace_process_subst/_procsub_capture/_procsub_tempfile).
+          <(cmd) is captured eagerly into a kept temp file, like $(cmd)
+          without the final read-back; >(cmd) defers cmd until after the
+          current simple command finishes. _exec_line was split into
+          _exec_line_impl plus a thin _exec_line wrapper that drains
+          per-nesting-level process-substitution bookkeeping. Fixed
+          _split_sh_compound() and _split_sh_pipe(), which both split a
+          line on ';'/'&&'/'||'/'|' BEFORE expansion and only tracked
+          $(...) nesting: a ';' or '|' inside a <(...)/>(...) body (e.g.
+          ">(read LINE; echo $LINE)") was mistaken for the OUTER line's
+          separator, corrupting the command. Both now also track <(/>(
+          nesting the same way they already tracked $(.
+        * select VAR in LIST; do ... done (_parse_select): numbered
+          menu to STDERR, $PS3 prompt, REPLY/VAR from STDIN.
+        * alias/unalias builtins (_cmd_alias/_cmd_unalias) and
+          first-word alias expansion (_alias_expand_line) at the top of
+          _exec_line, with a chain-length guard against self-reference.
+        * exec (_cmd_exec): "exec > file" (etc.) applies redirections
+          permanently to the current shell; "exec cmd" runs cmd and then
+          ends the script with cmd's status, approximating process
+          replacement (this interpreter never forks).
+        * ( cmd1; cmd2 ) subshell command groups (_parse_subshell):
+          variable, array, function, and alias changes, and cd, are
+          isolated via snapshot/restore of BATsh::Env, %_SH_ARRAY,
+          %_SH_ARRAY_TYPE, %_SH_FUNCTIONS, %_SH_ALIAS, and Cwd::cwd()
+          around the body; a trailing >, >>, or < on the closing ")" is
+          honoured.
+      All Perl 5.005_03 compatible (2-argument open()/opendir() with
+      bareword filehandles throughout; sysopen(O_CREAT|O_EXCL) for every
+      new temp-file class, matching the existing here-document /
+      command-substitution / pipeline-stage helpers). New test
+      t/0021-sh-extended-features.t (24 tests); all previously existing
+      tests continue to pass unmodified.
+
+    - Security hardening: command-substitution capture files and SH
+      pipeline stage files are now created with the same symlink-race-
+      resistant sysopen(O_CREAT|O_EXCL, 0600) discipline already used by
+      _bg_tempfile() (background-job pidfiles) and _hd_tempfile()
+      (here-documents). Previously _cmd_subst() ($( ... ) / `...` output
+      capture) and _exec_sh_pipe() (per-stage stdout->stdin bridge files)
+      opened a predictable path in the shared temp directory with a plain
+      open(FH, "> $path"), which (a) relied on umask for the file mode
+      (typically world-readable, 0644) and (b) followed a pre-existing
+      symlink at that path instead of refusing to open it. Both code
+      paths are exercised by nearly every non-trivial script (any $(...),
+      backtick, or | pipeline), so the exposure was broad on shared
+      multi-user hosts. New helpers BATsh::SH::_subst_tempfile() and
+      BATsh::SH::_shp_tempfile() mirror the existing _bg_tempfile() /
+      _hd_tempfile() retry-on-EEXIST pattern (sequence-numbered names,
+      1000 attempts, 0600 mode); the file is opened once by the helper
+      and reused (no separate create-then-reopen step), removing the
+      brief window in the old code between creation and use. Stray files
+      from an abnormal exit are still tracked for END-time failsafe
+      cleanup, as for the existing temp-file classes. No externally
+      visible behaviour change; all 890 existing tests pass unmodified.
+      Perl 5.005_03 compatible (same sysopen/Fcntl usage as the existing
+      helpers; no new dependencies). New test t/0019-tempfile-security.t.
+
+    - Tilde expansion ~/path, ~user/path (v0.07). POSIX word-initial,
+      unquoted tilde expansion is now performed on the RAW source line
+      inside BATsh::SH::_expand() -- via a new _tilde_prepass() pass
+      that runs BEFORE $VAR / $(...) / `...` substitution -- so that a
+      literal ~ typed in the script is expanded exactly once, while a
+      $VAR that merely happens to hold a string starting with "~" is
+      never re-expanded (matching bash: only the source word is
+      eligible, not values produced by substitution). Covers cd, word-
+      split command arguments (echo, eval, external commands), test/[
+      file-test operands, and the right-hand side of NAME=value
+      assignments (both the pure "NAME=value" form and the prefix
+      "NAME=value command" form, including the extra tilde-eligible
+      position right after the assignment '=', as in VAR=~/sub).
+      ~user resolves via getpwnam and is a documented no-op on Win32,
+      where the word is left literal (same as bash's behaviour for an
+      unresolvable login name). NOT implemented: tilde expansion after
+      ':' in colon-list assignments (PATH=~/a:~/b); documented as a
+      limitation. New test t/0020-tilde-expansion.t (11 tests).
+
+    - Script exit-code propagation and $? <-> %ERRORLEVEL% bridge.
+      run() / run_string() / run_lines() now RETURN the script's final
+      exit status: "exit 3" gives 3, "EXIT /B 5" gives 5, otherwise the
+      status of the last command.  The modulino exits with that code
+      (exit(BATsh->main(@ARGV))), so OS-level %ERRORLEVEL% / $? of
+      "perl lib/BATsh.pm script.batsh" is the script's own status.
+      At every CMD<->SH section boundary the status is mirrored both
+      ways, so a failing SH command is visible as %ERRORLEVEL% in the
+      next CMD section and vice versa.  New public accessor
+      BATsh->last_status.  New sub main() handles --help, --version,
+      -e 'source', and "-" (read script from STDIN, remaining arguments
+      become %1../$1..).  EXIT with no code keeps the current
+      ERRORLEVEL.  "exit N" now also ends the REPL.  NEW FILE
+      bin/batsh.pl (EXE_FILES); installed as "batsh".
+
+    - $(( )) arithmetic rewritten as a recursive-descent parser.
+      Now supported: comparison and logical operators (result 0/1),
+      assignment operators = += -= *= /= %= <<= >>= &= ^= |= (written
+      back to the variable store), prefix/postfix ++ and --, the
+      ternary ?: and comma operators, ** (right-associative), bitwise
+      & ^ | ~ << >> (~ is signed: -v-1), hex 0x.. and octal 0..
+      literals, and C-style truncation toward zero for / and %
+      (-7/2 = -3, -7%2 = -1).  Errors warn and yield 0.  Fixed a
+      here-document false positive on $((1<<4)) ("<<" inside $(( ))
+      is no longer taken as a heredoc opener).
+
+    - SH shell options set -e / -u / -x (and set -o errexit /
+      nounset / xtrace; +e/+u/+x to turn off; options combinable as
+      in "set -eux").  set -e stops the script with the failing
+      command's status; if/while/until conditions and non-final
+      members of && / || lists are exempt.  set -u makes expansion of
+      an unset variable an error (warning + exit status 1;
+      ${VAR:-default} is exempt).  set -x traces each simple command
+      to STDERR with a "+ " prefix.  Options are reset at the start
+      of each top-level run so "set -e" cannot leak into a later
+      run() in the same process.  Limitations are documented in POD:
+      -x traces the raw pre-expansion line (expanding a copy would
+      run $(...) twice), and -u stops after the current command
+      completes with the empty expansion.
+
+    - NEW SH BUILTIN eval: one level of quote removal, concatenation,
+      and re-execution with a second round of expansion (POSIX
+      semantics).  Previously "eval" fell through to external-command
+      execution and only worked by accident where /bin/sh handled it.
+
+    - New tests: t/0016-exit-status.t, t/0017-sh-arith.t,
+      t/0018-sh-set-options.t.
+
+    - Fixed t/0016-exit-status.t (ES12-ES14) on real Windows: the
+      child-process helpers used a single quoted shell string for
+      system(), which cmd.exe re-wraps in an extra pair of double
+      quotes and mis-parses ("filename, directory name, or volume
+      label syntax is incorrect"). Rewritten to use LIST-form
+      system() (bypasses the shell entirely) with STDIN/STDOUT
+      redirected at the Perl level via dup/reopen instead of a
+      shell "<"/">" string. lib/BATsh.pm itself was unaffected; this
+      was a test-harness-only bug. Re-verified on Linux (16/16).
+
+      Desk review of the Win32-specific code paths (no Windows host
+      available in this environment): BATsh::SH::_bg_launch_decoded()
+      uses system(1, $cmdline) (P_NOWAIT) to background a job on
+      Win32; the success/failure check (defined $pid && $pid > 0)
+      matches the documented Win32 system(1, ...) contract (PID on
+      success, 0 on failure). t/0016's _run_child() LIST-form
+      system($^X, "-I$lib", $pm, $prog, @args) calls CreateProcess
+      directly and does not re-enter cmd.exe, so the original
+      quote-re-wrapping failure mode cannot recur. _bg_tempfile()'s
+      temp-directory selection already accounts for %TEMP%/%TMP% and
+      backslash path separators. No logic defects found in review;
+      confirmation on an actual Windows host (locale, path-length,
+      %TEMP% permission variables that cannot be reviewed statically)
+      remains pending.
+
+    - CP932 (Shift_JIS) multibyte-safe execution: NEW MODULE BATsh::MB.
+      A .batsh script written in CP932 -- the encoding of Japanese
+      Windows -- now runs correctly even when its characters contain
+      trail bytes that collide with ASCII shell metacharacters (the
+      classic "dame-moji" / 0x5C problem). Affected characters are
+      extremely common: SO (0x835C), HYOU (0x955C), NOH (0x945C) end
+      in a backslash; PO (0x837C) in a pipe; CHI (0x8360) in a
+      backtick; DA (0x835E) in the cmd.exe caret escape; and many
+      trail bytes fall in a-z/A-Z where uc()/lc() corrupt them.
+
+      Design: instead of teaching every byte-oriented scanner in
+      BATsh::CMD / BATsh::SH about lead and trail bytes, the script
+      text passes through a reversible GUARD TRANSFORM on input. Each
+      two-byte character LEAD+TRAIL whose TRAIL is in the dangerous
+      ASCII range 0x40-0x7E is rewritten to the three-byte form
+      \x01 LEAD (TRAIL+0x80), which contains no ASCII bytes; a literal
+      \x01 becomes \x01\x01, making the transform bijective. All
+      existing parsing (caret escapes, pipelines, quotes, redirects,
+      globs, case patterns, uc/lc variable handling, SETLOCAL
+      snapshots, ...) is then automatically DBCS-safe with no scanner
+      changes. The inverse transform is applied at the output
+      boundaries only:
+
+        print sinks   ECHO/echo/printf/SET display, prompts, _warn
+        exec sinks    system() for external commands, background jobs,
+                      FOR /F ('command') input pipes
+        file sinks    redirect targets, CD/DIR/COPY/DEL/MOVE/MKDIR/
+                      RMDIR/REN/TYPE paths, IF EXIST, test -e/-f/-d...,
+                      glob patterns, here-document bodies, CALL/source
+                      script filenames
+        env sink      BATsh::Env::sync_to_env (raw bytes into %ENV)
+
+      and input re-entry points guard incoming raw bytes again:
+      SET /P and read line input, FOR /F file/command lines, $(...)
+      and `...` captured output, glob results, Cwd for %CD%/PWD.
+
+    - Encoding selection (BATsh::MB): 'auto' is the default -- a
+      non-UTF-8 source containing bytes >= 0x80 is detected as CP932
+      and the guard switches on (and then stays on for the process,
+      because Env may hold guarded values; only an explicit
+      set_encoding deactivates it). Pure-ASCII and well-formed UTF-8
+      sources need no guarding and are byte-for-byte unaffected, so
+      existing behaviour is preserved exactly. Explicit selection:
+
+        BATsh->run($file, encoding => 'cp932');
+        BATsh->run_string($src, encoding => 'sjis');
+        BATsh->set_encoding('cp932');
+        set BATSH_ENCODING=cp932        (environment variable)
+        perl lib/BATsh.pm --encoding=cp932 script.batsh
+
+      Supported: cp932/sjis, gbk/cp936, uhc/cp949, big5/cp950 (all
+      sharing the same trail-byte hazard), utf8, none, auto. A UTF-8
+      BOM on the first line is stripped.
+
+    - Character semantics for substring/length operators under the
+      guard: ${#VAR}, ${VAR:N:L}, ${VAR:N} (SH) and %VAR:~n,m% (CMD)
+      now count CP932 CHARACTERS, not bytes, via BATsh::MB::mb_length
+      / mb_substr. Byte semantics are unchanged while the guard is
+      inactive (ASCII/UTF-8 operation identical to 0.06).
+
+    - Modulino command line (perl lib/BATsh.pm ...): new options
+      --encoding=ENC and --version; script arguments after the script
+      name are now passed through as %1..%9 / %* (previously they
+      were dropped).
+
+    - BATsh::Env::sync_to_env no longer copies the batch-parameter
+      pseudo keys (%0..%9, %*, %%V FOR variables) into %ENV; they are
+      not legal environment variable names and polluted the child
+      environment of external commands.
+
+    - t/0015-cp932.t: new regression suite (20 checks, US-ASCII
+      source with \xNN escapes) covering echo/ECHO of dame-moji,
+      %VAR% and Env-bridge round-trips, pipeline/backtick/caret
+      false-positive protection, uc() safety, character-based
+      ${#VAR} / ${VAR:N:L} / %VAR:~n,m%, case patterns, redirects,
+      CP932 filenames (test -f, IF EXIST), FOR /F over a CP932 file,
+      ${VAR^^}, IF string comparison, %ENV export, auto-detection,
+      UTF-8 pass-through, and enc/dec bijectivity.
+
+    - eg/13_cp932_demo.pl: runnable demonstration (US-ASCII source)
+      of a CP932 mixed CMD/SH script.
+
+    - t/9010-encoding.t: BATsh::MB added to the US-ASCII source
+      check list.
+
+    - Fixed a pre-existing echo bug: the SH "echo" builtin decided
+      whether to apply filename globbing by testing the already
+      variable-expanded $rest for * ? [ characters. This meant a
+      variable whose *value* happened to be a glob metacharacter
+      (e.g. getopts setting $opt to "?" on an unknown option, or ":"
+      on a missing argument) could be silently glob-matched against
+      the current directory and replaced by whatever single-character
+      filename happened to match, instead of being echoed literally.
+      The glob-or-not decision is now made from the raw, pre-expansion
+      source text instead, so only a glob metacharacter actually
+      written in the script (e.g. "echo *.txt") triggers globbing;
+      a variable's expanded value is never re-subject to globbing,
+      matching the same "expansion results are not re-expanded"
+      principle already used for tilde expansion. (t/0021:
+      EF25/EF26 regression tests.)
+
+    - Practical-level fixes to the pure-Perl SH and CMD interpreters
+      (bugs found by exercising real scripts; all covered by the new
+      t/0022-sh-compound-fixes.t regression suite, 16 checks):
+        * A simple-command prefix followed on the SAME physical line by
+          a control structure introduced with ';' now dispatches the
+          control structure through its block parser instead of handing
+          the pieces to /bin/sh -- e.g. x=""; if [ -z "$x" ]; then ...;
+          fi, i=0; while ...; done, v=cat; case ...; esac
+          (_run_lines/_find_control_split).
+        * Inline "if COND; then A; else B; fi" (and elif) now honours
+          the else/elif branch; the old single-line parser dropped it
+          (_parse_if via _inline_has_terminator/_inline_expand).
+        * Nested "if ... fi" is depth-aware so an inner fi no longer
+          closes the outer if, both multi-line and inline
+          (_parse_if body collector + _if_depth_delta).
+        * Escaped double quotes inside a double-quoted word are handled
+          per POSIX: echo "she said \"hi\"" -> she said "hi"
+          (_arr_dequote rewritten with backslash escaping).
+        * A for-loop / array list built from $(...) no longer leaks a
+          stray ")" token: for f in $(echo a b c); do ...; done, and
+          arr=($(echo x y z)) (_arr_split_words made substitution-aware).
+        * A trailing "# comment" is stripped from SH command lines when
+          the '#' begins a word and is unquoted, while $#, ${#var},
+          ${var#pat}, an in-word '#' (a#b, http://h#frag) and quoted
+          '#' are left intact, and here-document bodies keep their '#'
+          (_strip_sh_comment, applied per physical line in _run_lines).
+        * A control structure used as a pipeline element or && / ||
+          operand now runs correctly: cmd | while read x; do ...; done,
+          cmd | for i in ...; do ...; done, true && for ...; done.
+          _split_sh_compound became control-structure-grouping aware so
+          a ';' / && / || inside a while/for/if/case/until/select block
+          is no longer treated as a top-level separator, and a single
+          compound command reaching _exec_line_impl as a pipe/operand is
+          routed through the block runner (_seg_is_control). (The
+          multi-line form with "do" on its own line after a pipe remains
+          a known limitation; the inline "; do" form is supported.)
+        * Single-line CMD "IF cond (body) ELSE (body)" (and IF EXIST /
+          IF DEFINED / negated forms) now parses both branches on one
+          physical line instead of echoing the raw ") ELSE (" text
+          (_parse_if_bodies via _match_paren).
+
 0.06  2026-06-27 JST (Japan Standard Time)
 
     - SH indexed and associative arrays (BATsh::SH). The single most useful

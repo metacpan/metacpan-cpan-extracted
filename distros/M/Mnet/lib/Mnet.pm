@@ -3,7 +3,7 @@ package Mnet;
 # version number used by Makefile.PL
 #   these should be set to "dev", expect when creating a new release
 #   refer to developer build notes in Makefile.PL for more info
-our $VERSION = "5.25";
+our $VERSION = "5.26";
 
 =head1 NAME
 
@@ -128,12 +128,6 @@ The main features are:
 
 =item *
 
-L<Mnet::Test> module can record and replay L<Mnet> script options, connected
-expect sessions, and compare outputs, speeding development and allowing for
-integration and regression testing of complex automation scripts.
-
-=item *
-
 L<Mnet::Expect::Cli::Ios> and L<Mnet::Expect::Cli> modules for reliable
 automation of cisco ios and other command line sessions, including
 authentication and command prompt handling.
@@ -142,6 +136,17 @@ authentication and command prompt handling.
 
 L<Mnet::Stanza> module for templated config parsing and generation on cisco ios
 devices and other similar indented stanza text data.
+
+=item *
+
+L<Mnet::Report::Table> module for aggregating report data from scripts,
+supporting output in formats such as csv, json, and sql.
+
+=item *
+
+L<Mnet::Test> module can record and replay L<Mnet> script options, connected
+expect sessions, and compare outputs, speeding development and allowing for
+integration and regression testing of complex automation scripts.
 
 =item *
 
@@ -157,13 +162,12 @@ output files.
 =item *
 
 L<Mnet::Opts::Cli> module for config settings via command line, environment
-variable, and/or batch scripts, with help, tips, and password redaction.
-device list files.
+variable, and/or batch device list files, with help, tips, and password
+redaction.
 
 =item *
 
-L<Mnet::Report::Table> module for aggregating report data from scripts,
-supporting output in formats such as csv, json, and sql.
+L<Mnet::IP> module to parse IPv4 and IPv6 addresses and network masks.
 
 =back
 
@@ -182,7 +186,7 @@ The latest release can be installed from CPAN
 
     cpan install Mnet
 
-Or download and install from L<https://github.com/menzascripting/Mnet>
+Or downloaded and installed from L<https://github.com/menzascripting/Mnet>
 
     tar -xzf Mnet-X.y.tar.gz
     cd Mnet-X.y
@@ -206,9 +210,10 @@ troubleshoot execution.
 
 =head2 What's the easiest way to get more log output?
 
-Use both the L<Mnet::Log> and L<Mnet::Opts::Set::Debug> modules in your script
-for more output, mostly from other Mnet modules unless you add L<Mnet::Log>
-calls, which are a compatible subset of log4perl calls, to your script.
+Add 'use' commands for both L<Mnet::Log> and L<Mnet::Opts::Set::Debug> to the
+beginning of your script for more output, mostly from other Mnet modules unless
+you add L<Mnet::Log> calls, which are a compatible subset of log4perl calls,
+to your script.
 
 =head2 How should passwords be secured?
 
@@ -217,20 +222,20 @@ command line options. Command line options can be seen in the system process
 list by other users.
 
 The L<Mnet::Opts::Cli> new method allows a named environment variable to be
-specified that will also be parsed for command line options. Your script can
-be called from a shell script containing authentication, which is accessible
-only to authorized users, such as in the example below:
+specified that will also be parsed for command line options. Your perl network
+automation script can be called from a secured shell script that contains the
+usernames and passwords, this secure shell script accessible only to authorized
+users, such as in the example below:
 
     #!/bin/sh
-    #   sample.sh script, chmod 700 to restrict access to current user
+    #   sample.sh script, chmod 700 to restrict access to owner user
     #   works with Mnet::Opts calls in above SYNOPISIS sample.pl script
-    #   "$@" passes throuh all command line options, modify as needed
+    #   "$@" passes through all command line options, modify as needed
     export Mnet='--username <user> --password <secret>'
     perl -- sample.pl "$@"
 
 The L<Mnet::Opts::Cli> module define function has a redact property that should
-be set for password options so that the value of the option is value is always
-redacted form L<Mnet::Log> outputs.
+be set for password options that should be hidden in L<Mnet::Log> output.
 
 Also note that the L<Mnet::Expect> module log_expect method is used by the
 L<Mnet::Expect::Cli> modules to temporarily disable expect session logging
@@ -241,13 +246,13 @@ L<Mnet::Expect> module, may need to do the same.
 =head2 Why should I use the Mnet::Expect module?
 
 The L<Mnet::Expect> module works with the L<Mnet::Log> and L<Mnet::Opts::Cli>
-modules, for easy logging of normal L<Expect> module activity, with extra
-options for logging, debugging, raw pty, and session tty rows and columns.
+modules, for easy logging of normal L<Expect> module activity, with options
+to control logging, debugging, raw pty, and session tty rows and columns.
 
 However, you still have to handle all the expect session details, including
-send and expect calls for logging in, detecting of command prompts, capturing
-output, etc. It's easier to use the L<Mnet::Expect::Cli> module which handles
-all of this, if you can.
+send and expect calls for logging in, detection of command prompts, capturing
+device output, etc. It's easier to use the L<Mnet::Expect::Cli> module which
+handles all of this, if you can.
 
 =head2 Why should I use the Mnet::Expect::Cli module?
 
@@ -259,7 +264,7 @@ caching of session command output.
 
 This module also works with the L<Mnet::Test> module, allowing expect session
 activity to be recorded and replayed while offline. This can be of tremendous
-value, both during development, and for sustainability.
+value, during development and for sustainability.
 
 Refer also the the L<Mnet::Expect::Cli::Ios> module mentioned below, which has
 a couple of features relevant when working with cisco ios and other similar

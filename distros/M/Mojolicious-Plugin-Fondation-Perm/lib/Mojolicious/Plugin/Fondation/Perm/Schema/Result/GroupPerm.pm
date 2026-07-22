@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Perm::Schema::Result::GroupPerm;
-$Mojolicious::Plugin::Fondation::Perm::Schema::Result::GroupPerm::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Perm::Schema::Result::GroupPerm::VERSION = '0.02';
 # ABSTRACT: DBIx::Class Result class for group_perm pivot table
 
 use strict;
@@ -41,7 +41,7 @@ Mojolicious::Plugin::Fondation::Perm::Schema::Result::GroupPerm - DBIx::Class Re
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

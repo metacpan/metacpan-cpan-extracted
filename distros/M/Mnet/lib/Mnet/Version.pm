@@ -29,7 +29,7 @@ use warnings;
 use strict;
 use Config;
 use Cwd;
-use POSIX;
+use POSIX qw(uname);
 use Mnet;
 
 

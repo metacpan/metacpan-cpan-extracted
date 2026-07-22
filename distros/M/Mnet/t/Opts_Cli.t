@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Mnet::T;
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 # display --version
 Mnet::T::test_perl({
@@ -147,6 +147,26 @@ Mnet::T::test_perl({
         --- - Mnet::Log - started
         inf - Mnet::Opts::Cli new parsed opt cli test-opt = "test"
         --- - Mnet::Log finished, no errors
+    expect-eof
+});
+
+# env var deleted
+Mnet::T::test_perl({
+    name    => 'cli env var delete',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Opts::Cli;
+        $ENV{Mnet} = "--test-opt test";
+        Mnet::Opts::Cli::define({ getopt => "test-opt=s" });
+        Mnet::Opts::Cli->new("Mnet");
+        print "test-opt=test\n";
+        system("echo Mnet=\$Mnet");
+    perl-eof
+    args    => '--test-opt test',
+    expect  => <<'    expect-eof',
+        test-opt=test
+        Mnet=
     expect-eof
 });
 

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Perm::Controller::Perm;
-$Mojolicious::Plugin::Fondation::Perm::Controller::Perm::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Perm::Controller::Perm::VERSION = '0.02';
 # ABSTRACT: REST controller for Perm CRUD via DBIx::Class::Async
 
 use Mojo::Base 'Mojolicious::Plugin::Fondation::Controller::Base', -signatures;
@@ -151,7 +151,7 @@ Mojolicious::Plugin::Fondation::Perm::Controller::Perm - REST controller for Per
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

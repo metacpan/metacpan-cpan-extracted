@@ -7,7 +7,7 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ expressions to expose missing assertion coverage
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =head1 METHODS
 

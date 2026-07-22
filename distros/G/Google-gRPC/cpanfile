@@ -1,0 +1,8 @@
+requires 'Moo', '0';
+requires 'Protocol::HTTP2', '0.13';
+requires 'Log::Any', '0';
+
+on 'test' => sub {
+    requires 'Test::More', '0';
+    requires 'Test::MockModule', '0';
+};

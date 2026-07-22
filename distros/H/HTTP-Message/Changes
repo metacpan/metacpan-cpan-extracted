@@ -1,5 +1,9 @@
 Revision history for HTTP-Message
 
+7.03      2026-07-21 20:45:16Z
+    - Fix max_body_size for Content-Encoding: br, which made every brotli
+      response fail to decode whenever a limit was set (GH#229)
+
 7.02      2026-06-05 23:28:36Z
     - now handling HTTP method '0' (GH#211) (Karen Etheridge)
 

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{BATsh},
-    'VERSION'   => q{0.06},
+    'VERSION'   => q{0.07},
     'ABSTRACT'  => q{Bilingual Shell for cmd.exe and bash in one script},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -18,6 +18,16 @@ my %args = (
     },
     'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
+
+# Install bin/*.pl as executables (EUMM creates .bat wrappers on Win32).
+if (-d 'bin') {
+    local *BINDIR;
+    if (opendir(BINDIR, 'bin')) {
+        $args{EXE_FILES} =
+            [map { "bin/$_" } sort grep { /\.pl\z/ && -f "bin/$_" } readdir(BINDIR)];
+        closedir(BINDIR);
+    }
+}
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
 # Passing it to older versions produces an "is not a known parameter" warning
@@ -47,19 +57,23 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'BATsh' => {
                 'file'    => 'lib/BATsh.pm',
-                'version' => '0.06',
+                'version' => '0.07',
             },
             'BATsh::CMD' => {
                 'file'    => 'lib/BATsh/CMD.pm',
-                'version' => '0.06',
+                'version' => '0.07',
             },
             'BATsh::Env' => {
                 'file'    => 'lib/BATsh/Env.pm',
-                'version' => '0.06',
+                'version' => '0.07',
+            },
+            'BATsh::MB' => {
+                'file'    => 'lib/BATsh/MB.pm',
+                'version' => '0.07',
             },
             'BATsh::SH' => {
                 'file'    => 'lib/BATsh/SH.pm',
-                'version' => '0.06',
+                'version' => '0.07',
             }
         },
     };

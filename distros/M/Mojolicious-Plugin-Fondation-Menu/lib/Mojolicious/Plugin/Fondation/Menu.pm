@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu;
-$Mojolicious::Plugin::Fondation::Menu::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Menu::VERSION = '0.02';
 # ABSTRACT: Dynamic menu management plugin for Fondation — navbar, breadcrumb
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -60,7 +60,7 @@ Mojolicious::Plugin::Fondation::Menu - Dynamic menu management plugin for Fondat
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

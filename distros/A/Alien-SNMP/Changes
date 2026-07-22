@@ -1,3 +1,13 @@
+4.0509050200 - 2026-07-18
+
+  * Migrate from legacy Alien::Base::ModuleBuild to the modern alienfile /
+    Alien::Build::MM (Makefile.PL) toolchain (major-revision / series bump)
+  * Replace Build.PL + inc/My/ with an alienfile build recipe
+  * Pin the Net-SNMP source tarball with a SHA256 digest
+  * Preload libnetsnmp at use-time so the bundled SNMP XS module resolves it
+    from the Alien share dir without a system-level library; fixes test
+    failures during install when no compatible libnetsnmp is present
+
 3.0509050200 - 2026-06-30
 
   * update to net-snmp 5.9.5.2

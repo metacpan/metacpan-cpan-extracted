@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm;
-$Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm::VERSION = '0.02';
 # ABSTRACT: DBIx::Class Result class for perms table
 
 use strict;
@@ -59,7 +59,7 @@ Mojolicious::Plugin::Fondation::Perm::Schema::Result::Perm - DBIx::Class Result 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

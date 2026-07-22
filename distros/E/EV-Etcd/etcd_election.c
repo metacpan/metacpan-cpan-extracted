@@ -10,6 +10,13 @@
 #include "etcd_common.h"
 #include "etcd_election.h"
 
+/* EVAPI.h's GEVAPI function table is a per-translation-unit static: every
+ * file that calls into EV must bind its own copy, or ev_timer_start & co
+ * dereference a NULL table. Called once from BOOT in Etcd.xs. */
+void election_init_ev_api(pTHX) {
+    I_EV_API("EV::Etcd");
+}
+
 /* Helper to convert LeaderKey to hash */
 HV *leader_key_to_hv(pTHX_ V3electionpb__LeaderKey *lk) {
     if (!lk) return NULL;
@@ -136,8 +143,8 @@ void cleanup_observe(pTHX_ observe_call_t *oc) {
         op = &(*op)->next;
     }
 
-    if (ev_is_active(&oc->reconnect_timer))
-        ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+    /* Unconditional: also clears an inactive-but-pending fired timer */
+    ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
     grpc_metadata_array_destroy(&oc->initial_metadata);
     grpc_metadata_array_destroy(&oc->trailing_metadata);
     if (oc->recv_buffer) {

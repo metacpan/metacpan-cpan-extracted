@@ -1,5 +1,8 @@
 Revision history for Eshu
 
+0.10	2026-07-21
+	- Switch to ExtUtils::Depends
+
 0.09    2026-07-15
         - include/dirent_win.h: add missing MSVC compat header providing
           opendir/readdir/closedir via FindFirstFile/FindNextFile/FindClose.

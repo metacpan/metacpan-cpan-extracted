@@ -4,16 +4,10 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Eshu', $VERSION);
-
-sub include_dir {
-    my $dir = $INC{'Eshu.pm'};
-    $dir =~ s{Eshu\.pm$}{Eshu/include};
-    return $dir;
-}
 
 1;
 
@@ -542,17 +536,6 @@ Dispatch to the appropriate engine based on the C<lang> parameter:
 =item C<yaml>, C<yml> — calls L</indent_yaml>
 
 =back
-
-=head2 include_dir
-
-	my $dir = Eshu->include_dir();
-
-Returns the path to the Eshu C header directory. Useful for sibling modules
-that need to compile against C<eshu_hl.h> or other Eshu headers without
-copying them — add the returned path to C<INC> in your C<Makefile.PL>:
-
-	eval { require Eshu; $eshu_inc = Eshu->include_dir() };
-	$eshu_inc //= '../Eshu-0.09/include';  # development fallback
 
 =head2 highlight_string
 

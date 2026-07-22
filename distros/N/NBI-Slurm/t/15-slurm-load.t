@@ -1,21 +1,23 @@
 use strict;
 use warnings;
 use FindBin qw($RealBin);
+use lib "$RealBin/lib";
 use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use Cwd qw(abs_path);
+use NBI::Test::MockCommand qw(prepend_mock_path write_mock_command);
 
 my $tmpdir = tempdir(CLEANUP => 1);
 my $mock_dir = File::Spec->catdir($tmpdir, 'mock_bin');
 make_path($mock_dir);
 
-my $sinfo_path = File::Spec->catfile($mock_dir, 'sinfo');
-open(my $sinfo_fh, '>', $sinfo_path) or die $!;
-print {$sinfo_fh} <<'MOCK';
-#!/bin/sh
-cat <<'EOF'
+write_mock_command(
+    dir => $mock_dir,
+    name => 'sinfo',
+    source => <<'MOCK',
+print <<'EOF';
 alpha|2|idle
 alpha|1|mix@
 alpha|1|down
@@ -23,28 +25,26 @@ beta|1|alloc
 beta|2|idle~
 EOF
 MOCK
-close $sinfo_fh;
-chmod 0755, $sinfo_path;
+);
 
-my $squeue_path = File::Spec->catfile($mock_dir, 'squeue');
-open(my $squeue_fh, '>', $squeue_path) or die $!;
-print {$squeue_fh} <<'MOCK';
-#!/bin/sh
-cat <<'EOF'
+write_mock_command(
+    dir => $mock_dir,
+    name => 'squeue',
+    source => <<'MOCK',
+print <<'EOF';
 alpha|R|1
 alpha|PD|2
 beta|CG|1
 EOF
 MOCK
-close $squeue_fh;
-chmod 0755, $squeue_path;
+);
 
 my $script = abs_path(File::Spec->catfile($RealBin, '..', 'bin', 'slurm-load'));
 ok(-e $script, 'slurm-load exists');
 
 my $output;
 {
-    local $ENV{PATH} = "$mock_dir:$ENV{PATH}";
+    local $ENV{PATH} = prepend_mock_path($mock_dir);
     $output = qx{$^X "$script" --tab 2>&1};
 }
 my $exit_code = $? >> 8;
@@ -58,7 +58,7 @@ is($lines[3], "TOTAL\t7\t6\t4\t1\t1\t1\t2\t1\t2\t2\t33%", 'total row is summaris
 
 my $help_output;
 {
-    local $ENV{PATH} = "$mock_dir:$ENV{PATH}";
+    local $ENV{PATH} = prepend_mock_path($mock_dir);
     $help_output = qx{$^X "$script" --help 2>&1};
 }
 my $help_exit = $? >> 8;

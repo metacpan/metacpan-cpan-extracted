@@ -8,7 +8,7 @@ use Module::CPANfile;
 use CPAN::Meta::Requirements;
 use version;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 sub import {
   my $class = shift;

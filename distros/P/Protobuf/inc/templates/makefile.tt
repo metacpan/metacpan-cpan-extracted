@@ -3,6 +3,17 @@
 all :: [% COMMON_LIB %]
 [% END %]
 
+[% BLOCK blib_libprotobufperl_copy %]
+# Make the shared library a dependency of the blib copy
+$(INST_ARCHAUTODIR)/libprotobufperl.[% ext %] : libprotobufperl.[% ext %]
+	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
+	$(CP) libprotobufperl.[% ext %] $(INST_ARCHAUTODIR)/libprotobufperl.[% ext %]
+
+# Ensure the copy and plugin build happen during standard make
+all :: $(INST_ARCHAUTODIR)/libprotobufperl.[% ext %]
+all :: [% protoc_plugin_exe %]
+[% END %]
+
 [% BLOCK bazel_protoc_plugin %]
 BUILD.bazel: maint/gen_build_bazel.pl inc/templates/BUILD.bazel.tt inc/templates/bazel.tt
 	$(PERL) maint/gen_build_bazel.pl
@@ -187,7 +198,12 @@ bench: build_bench $(COMMON_LIB)
 [% END %]
 
 [% BLOCK test_descriptor_bin %]
-pure_all :: t/data/test_descriptor.bin t/data/compat_descriptor.bin t/data/wkt_descriptor.bin t/data/types_descriptor.bin
+pure_all :: t/data/test_descriptor.bin t/data/compat_descriptor.bin t/data/wkt_descriptor.bin t/data/types_descriptor.bin generate_test_protos
+
+.PHONY: generate_test_protos
+generate_test_protos: build_protoc_plugin
+	$(MKPATH) t/generated
+	- [% PROTOC %] --plugin=protoc-gen-perl-pb=bin/protoc-gen-perl-pb --perl-pb_out=t/generated --proto_path=t/protos t/protos/*.proto
 
 t/data/test_descriptor.bin: t/c/test.proto
 	@echo "Generating t/data/test_descriptor.bin from t/c/test.proto"

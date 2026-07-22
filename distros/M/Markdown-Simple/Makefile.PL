@@ -4,6 +4,7 @@ use warnings;
 use Config;
 use File::Temp ();
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 use Devel::CheckLib;
 
 sub _probe {
@@ -167,27 +168,16 @@ print "OPTIMIZE: $OPTIMIZE_FLAGS\n";
 my $EXTRA_LDDLFLAGS = defined $ENV{MDS_PGO_LDFLAGS} ? $ENV{MDS_PGO_LDFLAGS} : '';
 print "LDDLFLAGS extras: $EXTRA_LDDLFLAGS\n" if length $EXTRA_LDDLFLAGS;
 
-# Resolve Eshu include directory:
-#   1. Try installed Eshu module
-#   2. Fall back to sibling directory (development)
-my $eshu_inc;
-eval {
-    no warnings 'redefine';
-    local *XSLoader::load = sub {};
-    require Eshu;
-    my $dir = Eshu->include_dir();
-    $eshu_inc = $dir if $dir && -d $dir;
-};
-if (!$eshu_inc && -d '../Eshu-0.06/include') {
-    $eshu_inc = '../Eshu-0.06/include';
-}
-die "Cannot find Eshu include directory. Install Eshu or place it as a sibling directory.\n"
-    unless $eshu_inc;
-print "Eshu include: $eshu_inc\n";
+my $pkg = ExtUtils::Depends->new('Markdown::Simple', 'Eshu');
+$pkg->set_inc('-Isrc');
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %dep_vars = $pkg->get_makefile_vars;
+delete $dep_vars{LDFROM};  # XSMULTI computes LDFROM per-target; don't override
+$dep_vars{PM}{'lib/Markdown/Simple.pm'} = '$(INST_LIB)/Markdown/Simple.pm';
 
 my %WriteMakefileArgs = (
     OPTIMIZE         => $OPTIMIZE_FLAGS,
-    INC              => "-Isrc -I$eshu_inc",
     ($EXTRA_LDDLFLAGS ne '' ? (LDDLFLAGS => "$Config{lddlflags} $EXTRA_LDDLFLAGS") : ()),
     NAME             => 'Markdown::Simple',
     AUTHOR           => q{LNATION <email@lnation.org>},
@@ -200,17 +190,23 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'Devel::CheckLib'     => '0',
+        'ExtUtils::Depends'   => '0.404',
+        'Eshu'                => '0.10',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+	'Eshu'		      => '0.10' 
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Markdown-Simple-*' },
+    clean => { FILES => 'Markdown-Simple-* Install/Files.pm' },
+    %dep_vars,
 );
+# ExtUtils::Depends sets PM explicitly, which causes init_PM to return early
+# without running its File::Find scan — that scan is where XSMULTI discovers
+# XS files under lib/. Supply the mapping directly so EUMM doesn't need to.
+$WriteMakefileArgs{XS} = { 'lib/Markdown/Simple.xs' => 'lib/Markdown/Simple.c' };
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

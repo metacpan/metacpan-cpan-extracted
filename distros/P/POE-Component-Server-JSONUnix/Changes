@@ -1,5 +1,23 @@
 Revision history for POE-Component-Server-JSONUnix
 
+0.1.0   2026-07-21/20:30
+        - Add Unix-ownership authentication: auth_start/auth_verify built-in
+          commands, the auth_required and auth_temp_dir spawn arguments, and
+          the authenticated/uid/username context accessors.
+        - Add POE::Component::Server::JSONUnix::Client, a POE-based client
+          with request/response correlation, callback and event dispatch,
+          per-request timeouts, and support for the auth handshake.
+        - Add POE::Component::Server::JSONUnix::BlockingClient, a simple
+          blocking (non-POE) client with the same auth support.
+        - Add an optional user/group permission system via the 'permissions'
+          spawn argument: per-command allow/deny rules by user or group
+          (resolved through NSS, secondary groups included, cached per
+          connection), machine-readable 'code' fields on refusals, and the
+          groups/in_group/may context accessors. A '%DEFAULT%' entry under
+          permissions commands supplies a full fallback rule for commands
+          without one of their own. Without the argument the server behaves
+          exactly as before.
+
 0.0.1   2026-06-21/04:30
         - Initial release.
 

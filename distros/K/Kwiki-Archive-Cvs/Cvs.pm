@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Kwiki::Archive -Base;
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 # It will try to add files to CVS every time they're changed; this
 #  fails silently when they're already present.
@@ -155,7 +155,7 @@ __DATA__
 
 =head1 NAME 
 
-Kwiki::Archive::Cvs - Kwiki Page Archival Using CVS
+Kwiki::Archive::Cvs - Kwiki Page Archival Using CVS (DEPRECATED)
 
 =head1 SYNOPSIS
 

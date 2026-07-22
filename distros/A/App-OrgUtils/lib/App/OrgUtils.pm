@@ -10,9 +10,9 @@ use Org::Parser::Tiny;
 use Sort::Sub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-09'; # DATE
+our $DATE = '2026-07-22'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.487'; # VERSION
+our $VERSION = '0.489'; # VERSION
 
 our %SPEC;
 
@@ -27,22 +27,22 @@ our %common_args1 = (
     time_zone => {
         schema => ['date::tz_name'],
         summary => 'Will be passed to parser\'s options',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 If not set, TZ environment variable will be picked as default.
 
-_
+MARKDOWN
     },
 );
 
 our %arg0_file = (
     file => {
         summary => 'Path to an Org file',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 "-" means standard input.
 
-_
+MARKDOWN
         schema => 'filename*',
         default => '-',
         pos => 0,
@@ -159,7 +159,10 @@ sub _load_org_files {
     my ($files, $opts0) = @_;
     $files or die "Please specify files";
 
-    my $orgp = Org::Parser->new;
+    my $orgp = Org::Parser->new(
+        ignore_unknown_settings => 1,
+        ignore_unknown_drawers => 1,
+    );
     my %docs;
     for my $file (@$files) {
         my $opts = { %{$opts0 // {}} };
@@ -287,7 +290,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.487 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2024-01-09.
+This document describes version 0.489 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2026-07-22.
 
 =head1 DESCRIPTION
 
@@ -426,11 +429,21 @@ L<orgsel> in L<App::orgsel>
 
 perlancar <perlancar@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Steven Haryanto
+=for stopwords perlancar (@pc-office) Steven Haryanto (on PC)
 
-Steven Haryanto <stevenharyanto@gmail.com>
+=over 4
+
+=item *
+
+perlancar (@pc-office) <perlancar@gmail.com>
+
+=item *
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+
+=back
 
 =head1 CONTRIBUTING
 
@@ -452,7 +465,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

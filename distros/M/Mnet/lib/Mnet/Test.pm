@@ -36,7 +36,8 @@ file, which can be replayed later to show any changes.
 Other L<Mnet> modules are designed to detect and make use of Mnet::Test, if it
 is being used by a script. Refer to the perldoc TESTING sections of the other
 modules for explanations of how each module supports Mnet::Test usage. Also
-refer to the --test, --record, and --replay options for more information.
+refer to the --test, --record, --replay and --test-reset options for more
+information.
 
 Scripts or modules that need to save additional data to --record test data
 files can call the Mnet::Test::data function to get a referenced hash key that
@@ -109,7 +110,7 @@ INIT {
             files recorded can be replayed using the --replay option
             data is saved with a .new suffix, then renamed after writing
             set null to update --replay filename with new --test diff outputs
-            use --test-reset option to remove opts/args from --replay files
+            use --test-reset option to remove opts/args from --record files
             refer to perldoc Mnet::Test for more info
         ',
     }) if $INC{"Mnet/Opts/Cli.pm"};
@@ -144,6 +145,7 @@ INIT {
         help_tip    => 'reset options/args to their defaults',
         help_text   => '
             this option works from the command line only
+            use to reset options in specified test record/replay file
             use --test-reset with an option name to reset option to default
             use --test-reset with no option to reset extra args to default
             use --help for individual options to check if they are recordable

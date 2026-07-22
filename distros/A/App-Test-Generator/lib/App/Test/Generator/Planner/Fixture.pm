@@ -16,11 +16,11 @@ Readonly my $MODE_SHARED_FIXTURE => 'shared_fixture';
 Readonly my $FIXTURE_SHARED       => 'shared';
 Readonly my $FIXTURE_NEW_PER_TEST => 'new_per_test';
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =head1 DESCRIPTION
 

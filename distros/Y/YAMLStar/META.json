@@ -4,7 +4,7 @@
       "Ingy dÃ¶t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -53,6 +53,6 @@
          "web" : "https://github.com/yaml/yamlstar"
       }
    },
-   "version" : "v0.1.15",
+   "version" : "v0.1.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

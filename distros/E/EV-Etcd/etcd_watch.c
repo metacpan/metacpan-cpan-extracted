@@ -10,6 +10,13 @@
 #include "etcd_common.h"
 #include "etcd_watch.h"
 
+/* EVAPI.h's GEVAPI function table is a per-translation-unit static: every
+ * file that calls into EV must bind its own copy, or ev_timer_start & co
+ * dereference a NULL table. Called once from BOOT in Etcd.xs. */
+void watch_init_ev_api(pTHX) {
+    I_EV_API("EV::Etcd");
+}
+
 /* Re-arm watch to receive next message */
 void watch_rearm_recv(pTHX_ watch_call_t *wc) {
     if (!wc->active) return;
@@ -55,8 +62,8 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
         wp = &(*wp)->next;
     }
 
-    if (ev_is_active(&wc->reconnect_timer))
-        ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+    /* Unconditional: also clears an inactive-but-pending fired timer */
+    ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
     grpc_metadata_array_destroy(&wc->initial_metadata);
     grpc_metadata_array_destroy(&wc->trailing_metadata);
     if (wc->recv_buffer) {

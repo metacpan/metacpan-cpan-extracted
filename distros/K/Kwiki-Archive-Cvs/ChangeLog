@@ -1,3 +1,7 @@
+2026-07-22: version 0.105
+
+	* Mark the module as deprecated.
+
 2008-11-20: version 0.104
 
 	* Include ChangeLog (#38278)

@@ -13,3 +13,11 @@ cpanfile
 dist.ini
 lib/Devel/Cover/Report/Codecovbash.pm
 t/00.compile.t
+t/10.basic.t
+t/data/cover_db/cover.14
+t/data/cover_db/cover.14.lock
+t/data/cover_db/structure/1810715a105fafa6429497e9ec246321
+t/data/cover_db/structure/1810715a105fafa6429497e9ec246321.lock
+t/data/report1-cover.yaml
+t/dummy
+xt/04.pod.t

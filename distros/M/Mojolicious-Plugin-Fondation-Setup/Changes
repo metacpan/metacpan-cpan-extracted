@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-Fondation-Setup
 
+0.11      2026-07-21 17:25:48+02:00 Europe/Paris
+    - delete NAME in POD
+    - Replace MetaCPAN dependencies with dev
+    - add simple test
+
 0.10      2026-07-14 20:27:19+02:00 Europe/Paris
     - silence "fondation_meta redefined" warnings from _dev_plugins eval
     - i18n all template strings

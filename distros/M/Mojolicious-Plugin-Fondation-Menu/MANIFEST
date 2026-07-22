@@ -26,5 +26,6 @@ share/translations/en.json
 share/translations/fr.json
 t/01-menu-model.t
 t/02-menu-conditions.t
+t/data/session_store_secret
 t/lib/TestMenuApp.pm
 t/lib/TestMenuSchema.pm

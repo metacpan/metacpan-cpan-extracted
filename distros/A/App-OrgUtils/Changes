@@ -1,3 +1,15 @@
+0.489   2026-07-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Use ignore_unknown_drawers & ignore_unknown_settings for all Org
+          files.
+
+
+0.488   2026-07-21  Released-By: PERLANCAR; Urgency: medium
+
+        - list-org-anniversaries: Use ignore_unknown_drawers Org parse
+          option by default.
+
+
 0.487   2024-01-09  Released-By: PERLANCAR; Urgency: medium
 
         - Recognize 'dob' and 'date of birth' as anniversary field.

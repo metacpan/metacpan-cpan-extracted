@@ -1540,7 +1540,7 @@ gql_runtime_vm_native_args_payload_destroy(pTHX_ gql_runtime_vm_native_args_payl
   }
   for (i = 0; i < payload->count; i++) {
     Safefree(payload->names ? payload->names[i] : NULL);
-    gql_runtime_vm_native_dynamic_value_destroy(payload->values ? payload->values[i] : NULL);
+    gql_runtime_vm_native_dynamic_value_destroy(aTHX_ payload->values ? payload->values[i] : NULL);
   }
   if (payload->static_args_sv) {
     SvREFCNT_dec(payload->static_args_sv);
@@ -2703,7 +2703,7 @@ gql_runtime_vm_outcome_kind_sv(pTHX_ const gql_runtime_vm_outcome_t *outcome)
 }
 
 static gql_runtime_vm_writer_t *
-gql_runtime_vm_new_writer_struct(pTHX_)
+gql_runtime_vm_new_writer_struct(pTHX)
 {
   gql_runtime_vm_writer_t *writer;
 

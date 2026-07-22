@@ -10,7 +10,7 @@ use Promise::XS ();
 use GraphQL::Houtou::Promise::PromiseXS ();
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Reference batching loader for GraphQL::Houtou, following the semantics of
 # Facebook's dataloader. It is written strictly against the public batching

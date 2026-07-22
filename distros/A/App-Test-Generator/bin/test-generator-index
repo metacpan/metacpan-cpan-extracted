@@ -1349,46 +1349,6 @@ if($version) {
 				push @html, '</ul>';
 			}
 
-			if($perl_cliff) {
-				my $perl_cutoff = parse_version($perl_cliff->{fails_up_to});
-
-				my $fail_support = 0;
-				my $pass_contra = 0;
-
-				for my $r (@fail_reports) {
-					next unless $r->{perl};
-					$fail_support++ if parse_version($r->{perl}) < $perl_cutoff;
-				}
-
-				for my $r (@pass_reports) {
-					next unless $r->{perl};
-					$pass_contra++ if parse_version($r->{perl}) < $perl_cutoff;
-				}
-				my ($score, $label) = confidence_score(
-					fail => $fail_support,
-					pass => $pass_contra,
-				);
-
-				my $confidence_html = confidence_badge_html(
-					$score, $label,
-					$fail_support, $pass_contra,
-				);
-
-				my $delta = perldelta_url($perl_cliff->{passes_from});
-
-				push @html,
-					'<p class="notice perl-version-cliff">',
-					sprintf(
-						'Fails on Perl &leq; %s; passes on Perl &geq; %s. ',
-						$perl_cliff->{fails_up_to},
-						$perl_cliff->{passes_from},
-					),
-					sprintf(
-						'<a href="%s" target="_blank">See perldelta for this release</a>',
-						$delta,
-					),
-					" $confidence_html</p>";
-			}
 			push @html, '<h3>Failure Summary (all reports)</h3>';
 			push @html, '<ul>';
 
@@ -1631,6 +1591,45 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+HTML
+
+	if($perl_cliff) {
+		my $perl_cutoff = parse_version($perl_cliff->{fails_up_to});
+
+		my $fail_support = 0;
+		my $pass_contra  = 0;
+
+		for my $r (@fail_reports) {
+			next unless $r->{perl};
+			$fail_support++ if parse_version($r->{perl}) < $perl_cutoff;
+		}
+		for my $r (@pass_reports) {
+			next unless $r->{perl};
+			$pass_contra++ if parse_version($r->{perl}) < $perl_cutoff;
+		}
+
+		my ($score, $label) = confidence_score(
+			fail => $fail_support,
+			pass => $pass_contra,
+		);
+		my $confidence_html = confidence_badge_html($score, $label, $fail_support, $pass_contra);
+		my $delta = perldelta_url($perl_cliff->{passes_from});
+
+		push @html,
+			'<div class="notice perl-version-cliff">',
+			sprintf(
+				'<strong>Perl version cliff detected.</strong> Fails on Perl &leq; %s; passes on Perl &geq; %s. ',
+				$perl_cliff->{fails_up_to},
+				$perl_cliff->{passes_from},
+			),
+			sprintf(
+				'<a href="%s" target="_blank">See perldelta for this release</a>',
+				$delta,
+			),
+			" $confidence_html</div>";
+	}
+
+	push @html, <<"HTML";
 <p><em>Showing one failure per OS/Perl combination.</em></p>
 <div style="margin-bottom: 0.5em;">
 	<label>
@@ -1749,7 +1748,7 @@ HTML
 		}
 
 		if($cliff_skipped) {
-			push @html, sprintf('<p><em>%d report(s) on Perl &leq; %s omitted — expected failures, see version cliff notice above.</em></p>',
+			push @html, sprintf('<tr><td colspan="7"><em>%d report(s) on Perl &leq; %s omitted — expected failures, see version cliff notice above.</em></td></tr>',
 				$cliff_skipped,
 				$perl_cliff->{fails_up_to},
 			);

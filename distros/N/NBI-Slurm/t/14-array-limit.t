@@ -1,11 +1,13 @@
 use strict;
 use warnings;
 use FindBin qw($RealBin);
+use lib "$RealBin/lib";
 use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use Cwd qw(abs_path);
+use NBI::Test::MockCommand qw(prepend_mock_path write_mock_command);
 
 use_ok 'NBI::Job';
 use_ok 'NBI::Opts';
@@ -43,35 +45,32 @@ like($script, qr/perl -e .*"\$nbi_array_index"/, 'params loader reads the global
 my $mock_dir = File::Spec->catdir($tmpdir, 'mock_bin');
 make_path($mock_dir);
 my $sbatch_log = File::Spec->catfile($tmpdir, 'sbatch_calls.log');
-open(my $sbatch_fh, '>', File::Spec->catfile($mock_dir, 'sbatch')) or die $!;
-print {$sbatch_fh} <<'MOCK';
-#!/bin/sh
-LOG="SBATCH_LOG"
-count=0
-[ -f "$LOG" ] && count=$(wc -l < "$LOG")
-ID=$((9000 + count + 1))
-echo "$1" >> "$LOG"
-echo "Submitted batch job $ID"
+write_mock_command(
+    dir => $mock_dir,
+    name => 'sbatch',
+    source => <<'MOCK',
+my $log = $ENV{SBATCH_LOG} or die "SBATCH_LOG not set\n";
+my $count = 0;
+if (open(my $in, '<', $log)) {
+    $count++ while <$in>;
+    close $in;
+}
+my $id = 9000 + $count + 1;
+open(my $out, '>>', $log) or die "Cannot write $log: $!\n";
+print {$out} ($ARGV[0] // ''), "\n";
+close $out;
+print "Submitted batch job $id\n";
 MOCK
-close $sbatch_fh;
-
-my $sbatch_path = File::Spec->catfile($mock_dir, 'sbatch');
-open($sbatch_fh, '+<', $sbatch_path) or die $!;
-my $mock = do { local $/; <$sbatch_fh> };
-$mock =~ s/SBATCH_LOG/$sbatch_log/;
-seek $sbatch_fh, 0, 0;
-truncate $sbatch_fh, 0;
-print {$sbatch_fh} $mock;
-close $sbatch_fh;
-chmod 0755, $sbatch_path;
+);
 
 my $runjob = abs_path(File::Spec->catfile($RealBin, '..', 'bin', 'runjob'));
 my $output;
 {
-    local $ENV{PATH} = "$mock_dir:$ENV{PATH}";
+    local $ENV{PATH} = prepend_mock_path($mock_dir);
     local $ENV{HOME} = $tmpdir;
     local $ENV{SKIP_SLURM_CHECK} = 1;
     local $ENV{NBI_MAX_ARRAY_SIZE} = 3;
+    local $ENV{SBATCH_LOG} = $sbatch_log;
     $output = qx{$^X "$runjob" --name split-array --queue short --tmpdir "$tmpdir" --no-eco --params-array "$params_file" --run "echo ##1##" 2>&1};
 }
 

@@ -24,7 +24,7 @@ package pmake;
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$PMAKE_BAT_VERSION = '0.39';
+$PMAKE_BAT_VERSION = '0.40';
 $PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -302,6 +302,16 @@ my %%args = (
     },
     'AUTHOR'    => q{%s},
 );
+
+# Install bin/*.pl as executables (EUMM creates .bat wrappers on Win32).
+if (-d 'bin') {
+    local *BINDIR;
+    if (opendir(BINDIR, 'bin')) {
+        $args{EXE_FILES} =
+            [map { "bin/$_" } sort grep { /\.pl\z/ && -f "bin/$_" } readdir(BINDIR)];
+        closedir(BINDIR);
+    }
+}
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
 # Passing it to older versions produces an "is not a known parameter" warning

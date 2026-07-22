@@ -6,7 +6,7 @@ Protobuf::Arena - Memory arena for Protocol Buffer messages
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ use Protobuf::Internal; # Ensure audit logging is available
 require Protobuf;
 use Carp qw(croak);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has '_arena_ptr' => (
     is       => 'ro',

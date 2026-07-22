@@ -1,0 +1,19 @@
+use 5.006;
+use strict;
+use warnings;
+
+use Test::More;
+
+my $switch = 0;
+
+subtest switch => sub {
+    if ($switch) {
+        pass "This is covered";
+    }
+    else {
+        pass "This is uncovered";
+    }
+    return unless $switch; pass "unovered";
+};
+
+done_testing;

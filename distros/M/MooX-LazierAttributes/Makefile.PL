@@ -26,6 +26,7 @@ WriteMakefile(
 	'Clone' => '0.39',
         'constant' => 0,
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-LazierAttributes-*' },
     META_MERGE => {

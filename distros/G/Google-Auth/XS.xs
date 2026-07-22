@@ -109,8 +109,8 @@ generate_self_signed_cert()
             hv_stores(hv, "cert", newSVpv(cert_pem, 0));
             hv_stores(hv, "key", newSVpv(key_pem, 0));
             result = newRV_noinc((SV *)hv);
-            free(cert_pem);
-            free(key_pem);
+            Safefree(cert_pem);
+            Safefree(key_pem);
         } else {
             XSRETURN_UNDEF;
         }
@@ -425,7 +425,7 @@ verify_signature(SV *key_obj_sv, SV *message_sv, SV *signature_sv)
                         ECDSA_SIG_set0(ec_sig, r_bn, s_bn);
                         int der_len = i2d_ECDSA_SIG(ec_sig, NULL);
                         if (der_len > 0) {
-                            der_buf = (unsigned char *)malloc(der_len);
+                            Newx(der_buf, der_len, unsigned char);
                             if (der_buf) {
                                 unsigned char *p = der_buf;
                                 i2d_ECDSA_SIG(ec_sig, &p);
@@ -451,7 +451,7 @@ verify_signature(SV *key_obj_sv, SV *message_sv, SV *signature_sv)
         }
 
         if (ec_sig) ECDSA_SIG_free(ec_sig);
-        if (der_buf) free(der_buf);
+        if (der_buf) Safefree(der_buf);
 
         if (verify_res > 0) {
             XSRETURN_YES;

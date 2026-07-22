@@ -10,7 +10,7 @@ Mnet::Tee - Redirect stdout and stderr to a file
     use Mnet::Tee;
     Mnet::Tee::file($file);
 
-    # or use with Mnet command line options
+    # or use --tee with Mnet command line options
     use Mnet::Tee;
     use Mnet::Opts::Cli;
     my $cli = Mnet::Opts::Cli->new;

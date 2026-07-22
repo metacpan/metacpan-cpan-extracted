@@ -72,6 +72,7 @@ t/error_structure.t
 t/fork.t
 t/kv.t
 t/kv_advanced.t
+t/keepalive_renewal.t
 t/lease.t
 t/limits.t
 t/lock.t
@@ -94,6 +95,7 @@ xt/leak.t
 xt/manifest.t
 xt/pod-coverage.t
 xt/pod.t
+xt/reconnect_backoff.t
 xt/spelling.t
 xt/synopsis.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

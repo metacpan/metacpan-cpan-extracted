@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-09'; # DATE
+our $DATE = '2026-07-22'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.487'; # VERSION
+our $VERSION = '0.489'; # VERSION
 
 our %SPEC;
 
@@ -29,20 +29,20 @@ sub _match {
 $SPEC{filter_org_by_headlines} = {
     v => 1.1,
     summary => 'Filter Org by headlines',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This routine uses simple regex instead of Org::Parser, for faster performance.
 
-_
+MARKDOWN
     args => {
         input => {
             #schema => ['any*', of => ['str*', ['array*', of => 'str*']]],
             schema => ['str*'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Value is either a string or an array of strings.
 
-_
+MARKDOWN
             req => 1,
             pos => 0,
             cmdline_src => 'stdin_or_files',
@@ -62,34 +62,34 @@ _
         match => {
             schema => ['any*', of=>['str*', 're*']],
             summary => 'Only include headline which matches this',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Value is either a string or a regex. If string is in the form of `/.../` or
 `/.../i` it is assumed to be a regex.
 
-_
+MARKDOWN
             tags => ['category:filtering'],
         },
         parent_match => {
             schema => ['any*', of=>['str*', 're*']],
             summary => 'Only include headline whose parent matches this',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Value is either a string or a regex. If string is in the form of `/.../` or
 `/.../i` it is assumed to be a regex.
 
-_
+MARKDOWN
             tags => ['category:filtering'],
         },
         ascendant_match => {
             schema => ['any*', of=>['str*', 're*']],
             summary => 'Only include headline whose ascendant matches this',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Value is either a string or a regex. If string is in the form of `/.../` or
 `/.../i` it is assumed to be a regex.
 
-_
+MARKDOWN
             tags => ['category:filtering'],
         },
         is_todo => {
@@ -303,7 +303,7 @@ App::FilterOrgByHeadlines - Filter Org by headlines
 
 =head1 VERSION
 
-This document describes version 0.487 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2024-01-09.
+This document describes version 0.489 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2026-07-22.
 
 =head1 FUNCTIONS
 
@@ -426,7 +426,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

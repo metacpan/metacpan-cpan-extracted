@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
+		'File::Temp'    => '0.2310',    # tempfile's PERMS option, used by the client
 		'JSON::MaybeXS' => '0',
 		'POE'           => '0',
 	},

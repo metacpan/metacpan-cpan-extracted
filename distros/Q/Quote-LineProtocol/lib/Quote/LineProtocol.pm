@@ -9,7 +9,7 @@ use Syntax::Keyword::Match;
 use Exporter 'import';
 our @EXPORT_OK = qw(measurement tags fields timestamp);
 
-our $VERSION = "0.1.4";
+our $VERSION = "0.1.5";
 our $TELEGRAF = $ENV{QUOTE_TELEGRAF} // 0; # Telegraf requires special quoting
 
 my $qr = qr{([,=\s])};    # Match tag and field keys, and tag values
@@ -209,7 +209,7 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-vague E<lt>vague@cpan.orgE<gt>
+vague E<lt>4Qt9Ma7@proton.meE<gt>
 
 =cut
 

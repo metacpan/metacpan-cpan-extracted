@@ -2,6 +2,7 @@ bin/find-requires
 bin/find-requires.in
 bin/find-requires.ps1
 bin/find-requires.ps1.in
+bin/scandeps-static
 bin/scandeps-static.pl
 bin/scandeps-static.pl.in
 ChangeLog
@@ -11,8 +12,10 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 share/README.md
+share/release-notes.md
 t/00-module-scandeps-static.t
 t/00-scandeps.t
 t/01-scandeps.t
+t/02-new-compat.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

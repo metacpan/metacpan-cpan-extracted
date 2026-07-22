@@ -1,5 +1,15 @@
 Revision history for EV-Etcd
 
+0.09  2026-07-21
+    - Fix lease_keepalive never renewing the lease (resend at TTL/3)
+    - Reconnect streams on any stream end, not only batch failure
+    - Fix NULL EV API table crash in stream reconnect timers
+    - Fix cancel() during reconnect backoff leaking the handle
+    - Fix END-time grpc_shutdown() hanging forked children
+    - Croak on odd number of options in new()
+    - Document callback reference-cycle caveat
+    - Test reliability fixes; new renewal and reconnect tests
+
 0.08  2026-06-02
     - Fix election observe never delivering events (missing client half-close)
     - Validate txn ops before allocation; doc and test fixes

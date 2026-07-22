@@ -1,0 +1,24 @@
+Changes
+fm_metrics.c
+fm_std14.c
+fm_truetype.c
+ignore.txt
+include/fm.h
+lib/Font/Metrics.pm
+Makefile.PL
+MANIFEST			This list of files
+Metrics.xs
+README
+t/00-load.t
+t/01-std14.t
+t/02-truetype.t
+t/03-utf8.t
+t/04-gpos.t
+t/05-string-width.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/TrebuchetMS.ttf
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

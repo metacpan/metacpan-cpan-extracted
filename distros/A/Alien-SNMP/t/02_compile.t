@@ -21,8 +21,15 @@ netsnmp_get_version()
 XS_CODE
 , with_subtest {
   my $version;
-  ok $version = SNMP::netsnmp_get_version();
+  ok $version = SNMP::netsnmp_get_version(), 'netsnmp_get_version returns a value';
   note "version = $version";
+
+  # Guards the "system libnetsnmp silently masks our build" class of bug: the
+  # version reported by the library we actually compiled+linked against must be
+  # the one this Alien declares.  If the loader resolved a system libnetsnmp of
+  # a different version instead, this fails.
+  is $version, Alien::SNMP->version,
+    'netsnmp_version__compiled_against_alien_share__matches_declared_version';
 };
 
 done_testing;

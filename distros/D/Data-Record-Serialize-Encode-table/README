@@ -1,0 +1,88 @@
+NAME
+    Data::Record::Serialize::Encode::table - encode records as a formatted
+    table and output it
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Data::Record::Serialize;
+        my $s = Data::Record::Serialize->new( encode => 'table', ... );
+        $s->send( \%record );
+
+DESCRIPTION
+    Data::Record::Serialize::Encode::table encodes records into table form
+    using Term::Table.
+
+    It performs both the Data::Record::Serialize::Role::Encode and
+    Data::Record::Serialize::Role::Sink roles.
+
+    Do not construct this directly; use "new" in Data::Record::Serialize.
+    The following named parameters may be passed to it:
+
+    output
+        This parameter is required. One of the following:
+
+        *   The name of an output file (which will be created). If it is the
+            string "-", output will be written to the standard output
+            stream. Must not be the empty string.
+
+        *   a reference to a scalar to which the records will be written.
+
+        *   a GLOB (i.e. "\*STDOUT"), or a reference to an object which
+            derives from IO::Handle (e.g. IO::File, FileHandle, etc.). These
+            will *not* be closed upon destruction of the serializer or when
+            the "close" method is called.
+
+    create_output_dir => *Boolean*
+        If *true*, the directory which will contain the output file is
+        created. Defaults to *false*.
+
+    The following parameters are passed as-is to "new" in Term::Table.
+
+    allow_overflow
+    auto_columns
+    collapse
+    mark_tail
+    max_width
+    no_collapse
+    pad
+    sanitize
+    show_header
+
+SUPPORT
+  Bugs
+    Please report any bugs or feature requests to
+    bug-data-record-serialize-encode-table@rt.cpan.org or through the web
+    interface at:
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+    -Encode-table>
+
+  Source
+    Source is available at
+
+      https://codeberg.com/djerius/data-record-serialize-encode-table
+
+    and may be cloned from
+
+      https://codeberg.com/djerius/data-record-serialize-encode-table.git
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Data::Record::Serialize
+
+    *   Term::Table
+
+AUTHOR
+    Diab Jerius <djerius@cfa.harvard.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2026 by Smithsonian Astrophysical
+    Observatory.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007
+

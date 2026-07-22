@@ -167,7 +167,7 @@ NBI::Manifest - Provenance record for a single nbilaunch job run
 
 =head1 VERSION
 
-version 0.21.0
+version 0.22.0
 
 =head1 SYNOPSIS
 

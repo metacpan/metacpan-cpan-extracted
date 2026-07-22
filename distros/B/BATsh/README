@@ -2,14 +2,27 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.06
+    Version 0.07
 
 SYNOPSIS
       use BATsh;
 
-      # Run a bilingual .batsh script
-      BATsh->run('myscript.batsh');
+      # Run a bilingual .batsh script; the return value is the script's
+      # exit status ("exit 3" -> 3, "EXIT /B 5" -> 5, else last command)
+      my $rc = BATsh->run('myscript.batsh');
       BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
+      print BATsh->last_status;    # same value, queried later
+
+      # From the command line (bin/batsh.pl is installed as "batsh"):
+      #   batsh script.batsh arg1 arg2      exit code = script status
+      #   batsh -e 'echo hi'                run inline source
+      #   ... | batsh - arg1                read the script from STDIN
+      #   batsh --help / --version
+
+      # CP932 (Shift_JIS) scripts on Japanese Windows: auto-detected,
+      # or select the encoding explicitly
+      BATsh->run('nihongo.batsh', encoding => 'cp932');
+      BATsh->set_encoding('cp932');    # also: sjis gbk uhc big5 utf8 auto
 
       # Run source inline
       BATsh->run_string('echo hello from sh');
@@ -37,11 +50,11 @@ SYNOPSIS
 
 DESCRIPTION
   Executive Summary
-    BATsh is a bilingual shell interpreter written in pure
-    Perl. It runs cmd.exe batch syntax and bash/sh syntax in the same script
-    file, switching automatically between CMD mode and SH mode on a
-    line-by-line basis. No external cmd.exe, bash, or sh is required --
-    everything runs inside Perl.
+    BATsh is a bilingual shell interpreter written in pure Perl. It runs
+    cmd.exe batch syntax and bash/sh syntax in the same script file,
+    switching automatically between CMD mode and SH mode on a line-by-line
+    basis. No external cmd.exe, bash, or sh is required -- everything runs
+    inside Perl.
 
   Mixed-Mode Sample
     The following script demonstrates cmd.exe and bash sections coexisting
@@ -71,9 +84,9 @@ DESCRIPTION
     shift, local.
 
 FULL DESCRIPTION
-    BATsh is a bilingual shell interpreter written in pure
-    Perl. It implements both the cmd.exe command set and the sh/bash command
-    set entirely in Perl -- no external cmd.exe, bash, or sh is required.
+    BATsh is a bilingual shell interpreter written in pure Perl. It
+    implements both the cmd.exe command set and the sh/bash command set
+    entirely in Perl -- no external cmd.exe, bash, or sh is required.
 
     Scripts are divided into CMD sections (uppercase first token) and SH
     sections (lowercase first token). Both sections share a common variable
@@ -119,9 +132,21 @@ CMD MODE
 
   Batch Parameters
     %0 is the script path (absolute); %1..%9 are positional arguments; "%*"
-    is all arguments joined by space. "SHIFT" / "SHIFT /N" shifts the
-    positional parameters. "CALL :label" saves and restores caller's
-    arguments.
+    is all arguments joined by space.
+
+    "CALL :label arg1 arg2 ..." invokes a subroutine as a true call frame:
+    the subroutine receives its own %0 (the ":label" token), %1..%9 (the
+    call arguments) and "%*" (their join), and the caller's parameters are
+    saved before the call and restored on return. Arguments are "%"-expanded
+    before the call and split with double-quote awareness, so "CALL :sub "a
+    b" %FILE%" passes "a b" as one argument and the expanded value of
+    "%FILE%" as the next. Nested calls each get an independent frame. The
+    same arguments are also visible as $1..$9 / $@ when the subroutine body
+    is written in SH mode.
+
+    "SHIFT" moves %2 into %1, %3 into %2, and so on, clears %9, and rebuilds
+    "%*"; "SHIFT /N" begins the shift at %N (%1.."%(N-1)" are left
+    unchanged).
 
     Batch-parameter tilde modifiers expand %0..%9 components:
 
@@ -159,21 +184,25 @@ SH MODE
       while condition; do ... done
       until condition; do ... done
       case $var in pat1|pat2) ... ;; *) ... ;; esac
-        (case: |-patterns, * ? [abc] [a-z] [!abc] globs, quoted/literal
-         patterns, and the bash ;& / ;;& fall-through terminators)
-      trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]
-        (EXIT pseudo-signal plus a pure-Perl %SIG bridge for real signals)
+        (|-patterns, * ? [abc] [a-z] [!abc] globs, ;& and ;;& fall-through)
       test / [ ... ]  (file, string, and integer comparisons)
       cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
-      $(( arithmetic )) -- +, -, *, /, %, and $1..$9 inside
+      eval  (quote removal + re-execution with a second expansion)
+      set -e / -u / -x, set +e/+u/+x, set -o errexit|nounset|xtrace
+      trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG)
+      $(( arithmetic )) -- full C-style operator set:
+        + - * / % **  (** right-assoc; / % truncate toward zero)
+        == != < <= > >=  && || !  (results 0/1)
+        & ^ | ~ << >>  (bitwise; ~ is signed)
+        = += -= *= /= %= <<= >>= &= ^= |=  (write back to the variable)
+        ++ --  (prefix and postfix), ?: (ternary), comma
+        0xNN hex and 0NN octal literals, $1..$9 inside
       $( command ) and `command`  (command substitution, nested)
       cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
       cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
       > >> < 2> 2>> 2>&1 1>&2  (I/O redirection)
-      cmd << DELIM ... DELIM    (here-document; <<-DELIM, <<'DELIM' too)
-      cmd &                     (background execution; external commands)
       name() { ... }, function name { ... }  (function definitions)
-      $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0, $!
+      $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0
       ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
       ${VAR%pat}, ${VAR%%pat}   -- shortest/longest suffix removal
       ${VAR#pat}, ${VAR##pat}   -- shortest/longest prefix removal
@@ -181,27 +210,69 @@ SH MODE
       ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
       ${VAR:N:L}, ${VAR:N}  -- substring
       ${#VAR}  -- string length
-      arr=(a b c), arr+=(d e), arr[i]=v  -- indexed arrays
-      declare -a arr, declare -A map, typeset ...  -- array declaration
-      map=([k]=v ...), map[k]=v  -- associative arrays
-      ${arr[i]}, ${map[key]}, $arr (== ${arr[0]})  -- element access
+      arr=(a b c), arr+=(d e), arr[i]=v, arr[i]+=v  -- indexed arrays
+      declare -a arr, declare -A map, typeset ...   -- array declaration
+      map=([k]=v ...), map[k]=v                     -- associative arrays
+      ${arr[i]}, ${map[key]}, $arr (== ${arr[0]})   -- element access
       ${arr[@]}, ${arr[*]}, ${#arr[@]}, ${#arr[i]}, ${!arr[@]}
       unset arr, unset arr[i]
       source / . file
+      {a,b,c}, {1..5}, {a..e}[..step]  -- brace expansion
+      shopt -s/-u extglob; ?(),*(),+(),@(),!()  -- extended pattern
+        matching in case patterns and ${VAR%pat}-family patterns
+      cmd <<< word  -- here-string
+      <(cmd), >(cmd)  -- process substitution via temp file
+      select VAR in list; do ... done  -- menu loop
+      alias name=value, alias, unalias
+      exec cmd, exec > file ...
+      ( cmd1; cmd2 )  -- subshell command group, isolated scope
 
-INSTALLATION
-    To install from CPAN:
+ENCODING (CP932 / Shift_JIS SUPPORT)
+    Scripts written in CP932 -- the ANSI encoding of Japanese Windows -- run
+    correctly as of version 0.07, including the notorious "dame-moji" whose
+    second byte collides with an ASCII shell metacharacter:
 
-        cpan BATsh
+      SO   (0x83 0x5C)  trail byte = backslash
+      HYOU (0x95 0x5C)  trail byte = backslash
+      PO   (0x83 0x7C)  trail byte = pipe
+      CHI  (0x83 0x60)  trail byte = backtick
+      DA   (0x83 0x5E)  trail byte = caret (the cmd.exe escape)
 
-    To install from a distribution tarball:
+    The encoding is auto-detected by default: a non-UTF-8 source containing
+    bytes above 0x7F is treated as CP932. Pure-ASCII and UTF-8 scripts are
+    unaffected. Explicit selection:
 
-        perl Makefile.PL
-        make
-        make test
-        make install
+      BATsh->run($file, encoding => 'cp932');   # per run
+      BATsh->set_encoding('cp932');             # for the process
+      set BATSH_ENCODING=cp932                  # environment variable
+      perl lib/BATsh.pm --encoding=cp932 script.batsh
 
-    No non-core dependencies are required.
+    Supported names: cp932 (sjis), gbk (cp936), uhc (cp949), big5 (cp950),
+    utf8, none, auto. Under an active DBCS encoding the substring and length
+    operators "${#VAR}", "${VAR:N:L}" and "%VAR:~n,m%" count characters
+    rather than bytes. A UTF-8 BOM on the first line is stripped. See
+    BATsh::MB for the mechanism.
+
+EXIT STATUS
+    "run", "run_string" and "run_lines" return the script's final exit
+    status as an integer: the argument of SH "exit N" or CMD "EXIT [/B] N"
+    if one was executed, otherwise the status of the last command. "EXIT"
+    with no code keeps the current "ERRORLEVEL" (so "false" then "EXIT /B"
+    returns 1). The same value is available afterwards as
+    "BATsh->last_status".
+
+    At every CMD/SH section boundary the status is mirrored in both
+    directions, so an SH failure is immediately visible as "%ERRORLEVEL%"
+    (and "IF ERRORLEVEL n") in the following CMD section, and a CMD failure
+    is visible as $? in the following SH section.
+
+    "BATsh->main(@ARGV)" implements the command-line interface used by the
+    modulino ("perl lib/BATsh.pm ...") and by bin/batsh.pl (installed as
+    "batsh"): "--help", "--version", "-e 'source'", a script filename, or
+    "-" to read the script from STDIN; remaining arguments become %1..%9 /
+    $1..$9. The modulino calls "exit(BATsh->main(@ARGV))", so the OS-level
+    exit code of the process is the script's own status. In the REPL, "exit
+    N" / "EXIT N" ends the session.
 
 REQUIREMENTS
     Perl 5.005_03 or later. Core modules only. No external shell required.
@@ -209,88 +280,99 @@ REQUIREMENTS
 BUGS AND LIMITATIONS
     Commands that are not built in -- "FINDSTR", "SORT", "MORE", "CHOICE",
     "TIMEOUT", "XCOPY", "ROBOCOPY" and the like in CMD mode, and any
-    non-builtin program in SH mode -- are NOT reimplemented in Perl. They
+    non-builtin program in SH mode -- are not reimplemented in Perl. They
     are invoked as external programs (via Perl's "system"), so they work
     only where the host operating system provides the corresponding
-    executable (e.g. FINDSTR.EXE on Windows). Only the built-in command set
-    is guaranteed to run identically on every platform.
+    executable (e.g. FINDSTR.EXE on Windows). This is by design: only the
+    built-in command set is guaranteed to run identically on every platform.
 
     The built-in CMD interpreter does not implement:
-
-    Variable substring "%VAR:~n,m%" / "%VAR:~n%" / "%VAR:~-n%" and
-    substitution "%VAR:str1=str2%" / "%VAR:*str1=str2%" are supported as of
-    version 0.05. Dynamic pseudo-variables "%DATE%" (YYYY-MM-DD), "%TIME%"
-    (HH:MM:SS.cc), "%CD%", "%RANDOM%" (0-32767), "%ERRORLEVEL%", and
-    "%CMDCMDLINE%" are also supported as of version 0.05.
 
     *   "FOR /F" with "usebackq" backtick-quoted commands on Windows (the
         "cmd /c" subprocess path is untested on Windows).
 
-    The built-in SH interpreter does not support:
+    Variable substring "%VAR:~n,m%" / "%VAR:~n%" / "%VAR:~-n%" /
+    "%VAR:~n,-m%" and in-place substitution "%VAR:str1=str2%" /
+    "%VAR:*str1=str2%" are now supported as of version 0.05 (see
+    BATsh::Env).
 
-    *   Filename (pathname) globbing such as "echo *.txt" or "for f in
-        *.pl". The "*", "?" and "[abc]" metacharacters are honoured in
-        "case" patterns and in "${VAR%pat}" / "${VAR#pat}" expansion only,
-        not for expanding filenames on the command line.
+    Dynamic pseudo-variables "%DATE%" (YYYY-MM-DD), "%TIME%" (HH:MM:SS.cc),
+    "%CD%" (current directory), "%RANDOM%" (0-32767), "%ERRORLEVEL%", and
+    "%CMDCMDLINE%" are now supported as of version 0.05.
 
-    *   Tilde expansion "~/path" and "~user" (only "cd" with no argument
-        uses "$HOME").
+    Indexed and associative arrays -- "arr=(a b c)", "arr+=(...)",
+    "arr[i]=v", "declare -A map", "map=([k]=v ...)", "${arr[i]}",
+    "${arr[@]}", "${#arr[@]}", "${!arr[@]}", and "unset arr[i]" -- are now
+    supported as of version 0.06 (see BATsh::SH). Element ordering for
+    "${arr[@]}" is ascending numeric index for indexed arrays and sorted key
+    order for associative arrays (bash leaves the latter unspecified);
+    "${arr[@]}" word-splits to one item per element in "for" lists.
 
-    *   Brace expansion "{a,b}" and "{1..5}".
+    Tilde expansion "~/path" and "~user/path" are supported as of version
+    0.07: word-initial, unquoted "~" in "cd", in unquoted words produced by
+    word-splitting (external command arguments, "echo", "eval"), in
+    "test"/"[" file-test operands, and in the right-hand side of a plain
+    "VAR=value" or prefix "VAR=value command" assignment. "~user" resolves
+    via getpwnam and is therefore Unix-like only (a no-op on Win32).
 
-    *   Here-strings ("<<< word") and process substitution ("<(cmd)",
-        ">(cmd)").
+    Brace expansion "{a,b,c}" and "{1..5}"/"{a..e}[..step]", extended
+    pattern matching ("shopt -s extglob"; "?()", "*()", "+()", "@()",
+    "!()" in case patterns and in "${VAR%pat}"-family patterns),
+    here-strings ("<<< word"), process substitution ("<(cmd)", ">(cmd)"),
+    and the "select", "alias"/"unalias", and "exec" builtins are now
+    supported as of version 0.07 (see BATsh::SH).
 
-    *   The shell options "set -e", "set -u", "set -x", and the builtins
-        "getopts", "select", "alias", "eval" and "exec".
+    The built-in SH interpreter does not implement:
 
-    Common to both modes: a parenthesised group "( ... )" does not run in a
-    separate sub-shell; it shares the one variable store, so there is no
-    variable-scope isolation.
+    *   The builtin "getopts".
 
-    Here-documents ("<<", "<<-", "<<'DELIM'") ARE supported on STDIN, with
-    these limitations:
+    The shell options "set -e" (errexit), "set -u" (nounset) and "set -x"
+    (xtrace) are supported as of version 0.07, including the long forms "set
+    -o errexit|nounset|xtrace", the "+e/+u/+x" off switches, and combined
+    letters ("set -eux"). Known limitations: "set -x" traces the raw
+    pre-expansion command line (tracing an expanded copy would execute
+    "$(...)" substitutions twice), and under "set -u" the offending command
+    first completes with the empty expansion before the script stops with
+    status 1. The options are reset at the start of each top-level
+    "run"/"run_string"/"run_lines", so "set -e" does not leak into a later
+    run in the same process.
 
-    *   Recognised only in SH mode; "<<" has no meaning in CMD mode.
+    The builtin "eval" is supported as of version 0.07: one level of quote
+    removal, concatenation, and re-execution with a second round of
+    expansion (POSIX semantics).
 
-    *   One here-document per command line only (no "cmd <<A <<B").
+    "trap" is supported in SH mode: "trap 'cmd' SIGSPEC..." registers a
+    handler, "trap - SIGSPEC" resets to default, "trap '' SIGSPEC" ignores,
+    and "trap" / "trap -p" lists. Real signals are bridged to Perl's %SIG;
+    the "EXIT" pseudo-signal (also 0) runs when the script ends or on
+    "exit". The handler is expanded when it fires. See "Traps and Signals"
+    in BATsh::SH.
 
-    *   Here-strings ("<<< word") are not supported.
-
-    *   Combining a here-document with a pipeline or compound operator on
-        the same line is best-effort only; use a separate command.
-
-    *   The closing delimiter must be on a line by itself and match
-        exactly (after tab stripping for "<<-").
-
-    Background execution (a trailing "&") IS supported in SH mode, with
-    these limitations:
-
-    *   Applies to external commands only. A trailing "&" on a built-in, a
-        defined function, a variable assignment, or a control keyword is
-        ignored and the command runs in the foreground. In CMD mode "&"
-        keeps its cmd.exe meaning as a sequential separator (unchanged).
-
-    *   Only a trailing "&" is recognised; a mid-line "&" (e.g. "a & b")
-        is not supported. An "&" inside "&&", in ">&"/"2>&1" fd
-        duplication, in quotes, or escaped as "\&" is not background.
-
-    *   No job control: "jobs", "wait", "wait %n", "fg", "bg" and "%n"
-        job specifications are not implemented; signals are not delivered
-        to background jobs.
-
-    *   A backgrounded pipeline or compound list is delegated as a unit to
-        the OS shell after BATsh expands variables and substitutions, so
-        its redirections and operators follow OS-shell rules.
-
-    *   On a successful launch "$?" is 0; the job's own exit status is not
-        awaited. "$!" holds the most recent background PID (empty before
-        any job). On Win32 the job is spawned via "system(1, ...)"; on
-        Unix it is started through /bin/sh without using a Perl fork.
+    In SH mode, a parenthesised group "( ... )" is a subshell command group
+    as of version 0.07: variable, array, function, and alias changes, and
+    "cd", made inside it do not affect the calling shell (approximated by
+    snapshot/restore around the body, since this interpreter never forks).
+    In CMD mode, "( ... )" is only recognised as an IF/FOR block delimiter
+    (as in cmd.exe); it is not a general-purpose command group and has no
+    associated variable-scope isolation.
 
     Pipeline ("|"), I/O redirection (">" ">>" "<" "2>" "2>>" "2>&1"),
-    compound commands ("&&" "||" ";"), and function definitions are all
-    supported.
+    compound commands ("&&" "||" ";"), and function definitions are
+    supported in both modes.
+
+    Here-documents ("<<EOF", "<<'EOF'", "<<-EOF") are supported in SH mode,
+    with the limitations described in BATsh::SH: one here-document per
+    command line, and best-effort behaviour when combined with a pipeline
+    or compound operator on the same line. Here-strings ("<<< word") are a
+    separate feature (also supported as of version 0.07; see above).
+
+    Background execution (a trailing "&") is supported in SH mode for
+    external commands only, with the limitations described in BATsh::SH:
+    only a trailing "&" is recognised, built-ins/functions/
+    assignments/control words ignore it, there is no job control ("jobs",
+    "wait", "fg", "bg", %n), and no signals are delivered to background
+    jobs. In CMD mode "&" keeps its cmd.exe meaning as a sequential
+    separator.
 
     Section boundary detection is token-based (uppercase vs. lowercase first
     token). Mixed-case first tokens are treated as SH.
@@ -314,6 +396,8 @@ EXAMPLES
       eg/10_sh_case.batsh           SH case..esac pattern branching
       eg/11_sh_trap.batsh           SH trap / signal handling
       eg/12_cmd_vs_sh.batsh         cmd and sh side by side (for students)
+      eg/13_cp932_demo.pl           CP932 (Shift_JIS) Japanese script demo
+      eg/14_sh_getopts.batsh        SH getopts option parsing (v0.07)
 
     Run a .batsh example with:
 

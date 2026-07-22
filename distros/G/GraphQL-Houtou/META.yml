@@ -28,17 +28,17 @@ no_index:
 provides:
   GraphQL::Houtou:
     file: lib/GraphQL/Houtou.pm
-    version: '0.01'
+    version: '0.02'
   GraphQL::Houtou::DataLoader:
     file: lib/GraphQL/Houtou/DataLoader.pm
-    version: '0.01'
+    version: '0.02'
   GraphQL::Houtou::DataLoader::Error:
     file: lib/GraphQL/Houtou/DataLoader.pm
   GraphQL::Houtou::Directive:
     file: lib/GraphQL/Houtou/Directive.pm
   GraphQL::Houtou::Error:
     file: lib/GraphQL/Houtou/Error.pm
-    version: '0.01'
+    version: '0.02'
   GraphQL::Houtou::Federation:
     file: lib/GraphQL/Houtou/Federation.pm
     version: '0'
@@ -141,7 +141,7 @@ provides:
     file: lib/GraphQL/Houtou/Validation/NodeLimit.pm
   GraphQL::Houtou::XS::Parser:
     file: lib/GraphQL/Houtou/XS/Parser.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   JSON::MaybeXS: '0'
   Promise::XS: '0.21'
@@ -152,6 +152,6 @@ resources:
   bugtracker: https://github.com/AnaTofuZ/GraphQL-Houtou/issues
   homepage: https://github.com/AnaTofuZ/GraphQL-Houtou
   repository: https://github.com/AnaTofuZ/GraphQL-Houtou.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 0

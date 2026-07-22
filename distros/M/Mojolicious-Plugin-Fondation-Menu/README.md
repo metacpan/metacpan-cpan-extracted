@@ -4,7 +4,7 @@ Mojolicious::Plugin::Fondation::Menu - Dynamic menu management plugin for Fondat
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

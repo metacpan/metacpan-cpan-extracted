@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Setup::Controller::Setup;
-$Mojolicious::Plugin::Fondation::Setup::Controller::Setup::VERSION = '0.10';
+$Mojolicious::Plugin::Fondation::Setup::Controller::Setup::VERSION = '0.11';
 # ABSTRACT: Session-based setup wizard — no Workflow, no file persister
 
 use Mojo::Base 'Mojolicious::Controller', -signatures;
@@ -295,11 +295,8 @@ sub _discover ($self, $cb) {
                 $p->{is_dev}            = 1;
                 $p->{installed}         = 1;
                 $p->{installed_version} = $d->{installed_version};
-                # Merge dev dependencies into CPAN deps (union)
-                my %seen = map { $_ => 1 } @{ $p->{dependencies} // [] };
-                for my $dd (@{ $d->{dependencies} // [] }) {
-                    push @{ $p->{dependencies} }, $dd unless $seen{$dd}++;
-                }
+                # Replace MetaCPAN dependencies with dev (dev is the source of truth)
+                $p->{dependencies} = $d->{dependencies};
             }
             $p->{upgrade_available} = 0;
             $p->{release_pending}   = 0;
@@ -692,7 +689,7 @@ Mojolicious::Plugin::Fondation::Setup::Controller::Setup - Session-based setup w
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

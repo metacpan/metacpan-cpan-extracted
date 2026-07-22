@@ -51,7 +51,7 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our $HAS_XS;
 {

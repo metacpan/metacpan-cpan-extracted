@@ -50,6 +50,15 @@ package BATsh::SH;
 #   ${!arr[@]}, ${!map[@]}   (indices / keys)
 #   unset arr, unset arr[i]  (whole array / single element)
 #   source / . file
+#   {a,b,c}, {1..5}, {a..e}[..step]  (brace expansion, v0.07)
+#   shopt -s/-u extglob; ?(),*(),+(),@(),!()  (extended pattern matching
+#     in case patterns and ${VAR%pat}-family patterns, v0.07)
+#   cmd <<< word  (here-string, v0.07)
+#   <(cmd), >(cmd)  (process substitution via temp file, v0.07)
+#   select VAR in list; do ... done  (menu loop, v0.07)
+#   alias name=value, alias, unalias  (v0.07)
+#   exec cmd, exec > file ...  (v0.07)
+#   ( cmd1; cmd2 )  (subshell command group with isolated scope, v0.07)
 #
 ######################################################################
 
@@ -60,10 +69,12 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use File::Spec ();
 use Carp qw(croak);
-use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
+use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_EXCL O_TRUNC O_APPEND);
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 $VERSION = $VERSION;
+
+require BATsh::MB;
 
 # Bareword filehandle globs for SH pipeline (Perl 5.005_03 compatible)
 use vars qw(*_SH_PIPE_SAVOUT *_SH_PIPE_SAVIN *_SH_PIPE_WFH *_SH_PIPE_RFH);
@@ -100,6 +111,20 @@ $_PIPE_DEPTH = 0;
 # SH function registry -- must be package-level for access from _expand and _exec_line
 use vars qw(%_SH_FUNCTIONS);
 
+# SH alias registry (v0.07).  NAME (case-sensitive, as bash) => raw
+# replacement text.  Populated by the "alias" builtin, consumed by
+# _alias_expand_line() at the top of _exec_line().
+use vars qw(%_SH_ALIAS);
+
+# Process-substitution bookkeeping (v0.07).  <(cmd) is captured eagerly
+# into a temp file during _expand(); >(cmd) defers cmd until after the
+# current simple command finishes.  Both use unique sysopen(O_CREAT|
+# O_EXCL) temp files, mirroring _hd_tempfile() / _subst_tempfile().
+use vars qw($_PROCSUB_SEQ @_PROCSUB_TMPFILES @_PROCSUB_DEFERRED);
+$_PROCSUB_SEQ      = 0;
+@_PROCSUB_TMPFILES = ();
+@_PROCSUB_DEFERRED = ();
+
 # SH array storage (v0.06).  Indexed and associative arrays.
 #   %_SH_ARRAY      : NAME (uppercased) => hashref { subscript => value }
 #   %_SH_ARRAY_TYPE : NAME (uppercased) => 'indexed' | 'assoc'
@@ -117,8 +142,30 @@ use vars qw(%_SH_ARRAY %_SH_ARRAY_TYPE);
 # bridged to Perl's %SIG (see _sh_set_os_sig); the EXIT pseudo-signal is run
 # internally when the script exits (see fire_exit_trap / _cmd_exit).
 use vars qw(%_SH_TRAP);
+
+# getopts state (v0.07).  POSIX getopts tracks its position across the
+# argument list with the OPTIND shell variable (1-based, stored in the
+# Env), but the offset of the next option CHARACTER inside a clustered
+# argument such as "-abc" is internal state that the shell does not
+# expose.  We keep that character offset in $_GETOPTS_CHARPOS and detect
+# an external reset of the loop (the script setting OPTIND=1 before a
+# fresh getopts loop) by remembering, in $_GETOPTS_LAST_OPTIND, the
+# OPTIND value getopts itself last stored: if the OPTIND we read back
+# differs, the caller reset the loop and the character offset restarts.
+use vars qw($_GETOPTS_CHARPOS $_GETOPTS_LAST_OPTIND);
+$_GETOPTS_CHARPOS     = 0;
+$_GETOPTS_LAST_OPTIND = 0;
 # ----------------------------------------------------------------
 my $LAST_STATUS = 0;   # $?
+
+# Shell options (set -e / -u / -x), process-persistent like the Env store;
+# reset by reset_sh_options() at the start of each top-level run.
+my $_OPT_ERREXIT = 0;   # set -e: exit on a failing simple command
+my $_OPT_NOUNSET = 0;   # set -u: error on expanding an unset variable
+my $_OPT_XTRACE  = 0;   # set -x: trace each simple command to STDERR
+my $_OPT_EXTGLOB = 0;   # shopt -s extglob: ?(),*(),+(),@(),!() in patterns
+my $_ERREXIT_HOLD = 0;  # >0: -e suppressed (condition / non-final &&-|| member)
+my $_ERREXIT_DONE = 0;  # set by _exec_sh_compound: -e already adjudicated
 my @FUNCTION_STACK = ();   # for 'local' variable scoping
 
 # Signal: pending exit
@@ -135,10 +182,37 @@ my @_HD_TMPFILES  = ();       # tempfiles to remove on END (failsafe cleanup)
 my $_BG_SEQ       = 0;        # per-process counter for unique pidfile names
 my @_BG_TMPFILES  = ();       # pidfiles to remove on END (failsafe cleanup)
 
+# Command-substitution capture state (Perl 5.005_03 compatible)
+my $_SUBST_SEQ      = 0;      # per-process counter for unique capture names
+my @_SUBST_TMPFILES = ();     # capture files to remove on END (failsafe cleanup)
+
+# SH pipeline stage state (Perl 5.005_03 compatible)
+my $_PIPE_SEQ      = 0;       # per-process counter for unique stage names
+my @_SHP_TMPFILES  = ();      # stage files to remove on END (failsafe cleanup)
+
 # ----------------------------------------------------------------
 # Public: execute an array of SH lines
 # Returns exit status (0 = success)
 # ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# get_status / set_status: read or set the SH-side $? from outside
+# the interpreter.  Used by BATsh.pm to bridge $? <-> %ERRORLEVEL%
+# at every CMD<->SH section boundary.  Call as plain functions.
+# ----------------------------------------------------------------
+sub get_status { return $LAST_STATUS }
+sub set_status {
+    $LAST_STATUS = defined $_[0] ? int($_[0]) : 0;
+    return $LAST_STATUS;
+}
+
+# ----------------------------------------------------------------
+# exit_code_pending: the exit code set by the SH "exit" builtin in the
+# most recent exec_block, or undef when no exit was executed.  The value
+# stays readable until the next exec_block resets it; BATsh.pm reads it
+# right after each SH block to terminate the whole script.
+# ----------------------------------------------------------------
+sub exit_code_pending { return $_EXIT_CODE }
+
 sub exec_block {
     my ($class, $lines_ref, %opts) = @_;
     $_EXIT_CODE = undef;
@@ -168,6 +242,10 @@ sub _run_lines {
         $i++;
         # Normalise
         $line =~ s/\r?\n\z//;
+        # Strip a trailing "# comment" (word-initial, unquoted) and write
+        # the cleaned line back so downstream block parsers see it too.
+        my $nocmt = _strip_sh_comment($line);
+        if ($nocmt ne $line) { $line = $nocmt; $lines[$i - 1] = $line; }
         # Skip empty and comment lines
         next if $line =~ /\A\s*\z/;
         next if $line =~ /\A\s*#/;
@@ -187,12 +265,25 @@ sub _run_lines {
             ($status, $i) = _parse_for($class, \@lines, $i - 1, $opts_ref);
             next;
         }
+        if ($first eq 'select') {
+            ($status, $i) = _parse_select($class, \@lines, $i - 1, $opts_ref);
+            next;
+        }
         if ($first eq 'while' || $first eq 'until') {
             ($status, $i) = _parse_while($class, \@lines, $i - 1, $opts_ref);
             next;
         }
         if ($first eq 'case') {
             ($status, $i) = _parse_case($class, \@lines, $i - 1, $opts_ref);
+            next;
+        }
+
+        # Subshell command group: "( commands )" [redir].  A leading "(("
+        # is arithmetic-expansion-flavoured, not a subshell group, and is
+        # left alone (standalone "((...))" arithmetic commands are not
+        # implemented; only "$((...))" as an expansion is).
+        if ($stripped =~ /\A\(/ && $stripped !~ /\A\(\(/) {
+            ($status, $i) = _parse_subshell($class, \@lines, $i - 1, $opts_ref);
             next;
         }
 
@@ -230,7 +321,37 @@ sub _run_lines {
             next;
         }
 
+        # A simple-command prefix followed on the SAME physical line by a
+        # control structure introduced with ';' -- e.g.
+        #   x=""; if [ -z "$x" ]; then echo empty; fi
+        #   i=0; while [ $i -lt 3 ]; do ...; done
+        #   v=cat; case $v in ...; esac
+        # The first token is not a control keyword, so the block-opener
+        # dispatch above did not fire.  Run the prefix now, then rewrite
+        # the current slot to the control structure and reprocess it, so
+        # the proper _parse_* handles it (and may consume following
+        # physical lines for a multi-line body).
+        my $ctl_off = _find_control_split($line);
+        if (defined $ctl_off) {
+            my $prefix = substr($line, 0, $ctl_off);
+            my $rest   = substr($line, $ctl_off);
+            $prefix =~ s/\s*;\s*\z//;
+            if ($prefix =~ /\S/) {
+                $_ERREXIT_DONE = 0;
+                $status = _exec_line($class, $prefix, $opts_ref);
+                _errexit_check($status) unless $_ERREXIT_DONE;
+                $_ERREXIT_DONE = 0;
+            }
+            last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+            $lines[$i - 1] = $rest;
+            $i--;
+            next;
+        }
+
+        $_ERREXIT_DONE = 0;
         $status = _exec_line($class, $line, $opts_ref);
+        _errexit_check($status) unless $_ERREXIT_DONE;
+        $_ERREXIT_DONE = 0;
         $_CONTINUE = 0 if $_CONTINUE;
     }
     return $status;
@@ -239,7 +360,35 @@ sub _run_lines {
 # ----------------------------------------------------------------
 # Execute one SH line
 # ----------------------------------------------------------------
+# _exec_line: thin wrapper around _exec_line_impl() that drains any
+# process-substitution bookkeeping (v0.07) added while executing THIS
+# call's line -- running deferred >(cmd) jobs and removing <(cmd) temp
+# files -- after the simple command has run.  Because _exec_line_impl()
+# itself calls back into _exec_line() (never _exec_line_impl() directly)
+# for background execution, redirection wrapping, compound/pipeline
+# segments, and exec, each nesting level drains only the entries it
+# introduced, using the before/after array-length markers below.
+# ----------------------------------------------------------------
 sub _exec_line {
+    my ($class, $raw, $opts_ref) = @_;
+    my $tmp_before = scalar(@_PROCSUB_TMPFILES);
+    my $def_before = scalar(@_PROCSUB_DEFERRED);
+    my $rc = _exec_line_impl($class, $raw, $opts_ref);
+    if (@_PROCSUB_DEFERRED > $def_before) {
+        my @jobs = splice(@_PROCSUB_DEFERRED, $def_before);
+        for my $job (@jobs) {
+            my ($tmp, $cmd) = @{$job};
+            _sh_exec_with_redirs($class, $cmd, [[0, 0, $tmp]], $opts_ref);
+        }
+    }
+    if (@_PROCSUB_TMPFILES > $tmp_before) {
+        my @files = splice(@_PROCSUB_TMPFILES, $tmp_before);
+        for my $f (@files) { unlink $f if defined $f }
+    }
+    return $rc;
+}
+
+sub _exec_line_impl {
     my ($class, $raw, $opts_ref) = @_;
 
     my $line = $raw;
@@ -249,6 +398,24 @@ sub _exec_line {
 
     # Shebang: treat as comment
     return 0 if $line =~ /\A#!/;
+
+    # Alias expansion (v0.07): replace a leading command word that names
+    # an active alias with its stored text, re-checking the new leading
+    # word up to a small bounded number of times so that alias chains
+    # (alias ll=ls; alias ls='ls -la') resolve.  A name is expanded at
+    # most once per line to guard against a self-referential alias
+    # (alias ls=ls) looping forever.  Only the first word of the line is
+    # considered -- bash's "trailing space in the alias value also makes
+    # the next word alias-eligible" refinement is not modelled.
+    $line = _alias_expand_line($line);
+
+    # Brace expansion (v0.07): {a,b,c} and {1..5}/{a..e} word-generation,
+    # performed lexically on the raw line before any other expansion, so
+    # that e.g. "echo a{b,c}d" becomes two arguments "abd acd".  Regions
+    # that are quoted, or that belong to ${...}/$(...)/$((...))/`...`,
+    # are left untouched (their braces/parens are not brace-expansion
+    # syntax).
+    $line = _brace_expand_line($line);
 
     # ----------------------------------------------------------------
     # Background execution: an unquoted trailing & (v1).
@@ -284,12 +451,27 @@ sub _exec_line {
         return _exec_sh_compound($class, \@compound, $opts_ref);
     }
 
+    # set -x: trace the simple command to STDERR (the raw, pre-expansion
+    # line -- expanding a copy here would run $(...) substitutions twice).
+    print STDERR '+ ', BATsh::MB::dec($line), "\n" if $_OPT_XTRACE;
+
     # Detect pipeline BEFORE variable expansion to avoid expanding
     # pipe-like characters inside command substitutions prematurely.
     # _split_sh_pipe returns >1 segment only when bare | is present.
     my @pipe_segs = _split_sh_pipe($line);
     if (@pipe_segs > 1) {
         return _exec_sh_pipe($class, \@pipe_segs, $opts_ref);
+    }
+
+    # A single control/compound command (while/for/if/until/case/select or
+    # a "( subshell )") may reach here as a pipeline element or && / ||
+    # operand -- e.g. the right side of  cmd | while read x; do ...; done,
+    # or  true && for i in ..; do ..; done.  Route it through the block
+    # runner so its inline ';'-separated body is parsed by the proper
+    # _parse_* handler instead of being split and exec'd as external words.
+    if (_seg_is_control($line)) {
+        my @one = ($line);
+        return _run_lines($class, \@one, $opts_ref);
     }
 
     # Array / associative-array operations (v0.06).  Detected on the RAW line
@@ -320,20 +502,58 @@ sub _exec_line {
         if ($pairs_ref && defined $remainder && $remainder ne '') {
             for my $p (@{$pairs_ref}) {
                 my ($var, $rawval) = @{$p};
-                my $val = _expand($class, $rawval);
-                $val =~ s/\A"(.*)"\z/$1/s;
-                $val =~ s/\A'(.*)'\z/$1/s;
+                my $val = _arr_dequote(_expand($class, $rawval));
                 BATsh::Env->set($var, $val);
             }
             return _exec_line($class, $remainder, $opts_ref);
         }
     }
 
+    # Keep the pre-expansion text around.  It is used below (echo) to
+    # decide whether filename globbing should even be attempted: that
+    # decision must be based on glob metacharacters that were literally
+    # present in the source line, never on characters that merely ended
+    # up looking like "*", "?" or "[" because a variable's *value*
+    # happened to contain them (e.g. a getopts "?"/":" result).  This is
+    # the same principle the tilde-prepass above already relies on:
+    # expansion results are not themselves subject to re-expansion.
+    my $_raw_pre_expand = $line;
+
     # Expand variables and command substitutions
     $line = _expand($class, $line);
 
     # Strip trailing ;
     $line =~ s/\s*;\s*\z//;
+
+    # exec (v0.07): "exec > file" (etc.) applies its redirections
+    # permanently to the current shell (no restore); "exec cmd ..." runs
+    # cmd with those redirections and then terminates the whole script
+    # with cmd's exit status, approximating process replacement without
+    # a real fork/exec (this interpreter has no fork, by design -- see
+    # the pipeline / background-job implementation notes above).
+    if ($line =~ /\Aexec(?:\s+(.*)|\s*)\z/is) {
+        my $exec_rest = defined $1 ? $1 : '';
+        return _cmd_exec($class, $exec_rest, $opts_ref);
+    }
+
+    # Here-string: cmd <<< word (v0.07).  Detected after expansion (the
+    # word is fully variable/command/arithmetic-expanded, like any other
+    # word) and turned into an ordinary "< tempfile" stdin redirection,
+    # reusing the here-document temp-file machinery.
+    {
+        my ($hs_line, $hs_content) = _sh_strip_herestring($line);
+        if (defined $hs_content) {
+            my $tmp = _hd_tempfile($hs_content . "\n");
+            if (!defined $tmp) { $LAST_STATUS = 2; return 2 }
+            my ($clean_line, $redirs_ref) = _sh_strip_redirects($hs_line);
+            unshift @{$redirs_ref}, [0, 0, $tmp]
+                unless grep { $_->[0] == 0 } @{$redirs_ref};
+            my $rc = _sh_exec_with_redirs($class, $clean_line, $redirs_ref, $opts_ref);
+            unlink $tmp;
+            @_HD_TMPFILES = grep { $_ ne $tmp } @_HD_TMPFILES;
+            return $rc;
+        }
+    }
 
     # Detect I/O redirections: >, >>, <, 2>, 2>>, 2>&1
     # Must be done after expansion so that variable-in-filename works.
@@ -354,9 +574,10 @@ sub _exec_line {
     # (expanded) line so values containing spaces are preserved in full.
     if ($line =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
         my ($var, $val) = ($1, $2);   # capture before $1 is clobbered
-        # Strip outermost quotes from value
-        $val =~ s/\A"(.*)"\z/$1/s;
-        $val =~ s/\A'(.*)'\z/$1/s;
+        # Dequote the value the same way command words are dequoted, so
+        # concatenated quotes (a"b"c, x'y'z) and backslash escapes resolve
+        # correctly -- not just a single outermost "..." / '...' pair.
+        $val = _arr_dequote($val);
         BATsh::Env->set($var, $val);
         $LAST_STATUS = 0;
         return 0;
@@ -366,7 +587,23 @@ sub _exec_line {
     if ($lc_cmd eq 'unset')   { return _cmd_unset($rest) }
     if ($lc_cmd eq 'echo') {
         # Apply word-splitting and glob expansion to unquoted tokens
-        if ($rest =~ /[*?\[]/) {
+        # (tilde expansion already happened earlier, in _expand()).
+        #
+        # Whether to glob at all is decided from the RAW, pre-expansion
+        # source text -- NOT from the already-expanded $rest.  By this
+        # point $rest has had all $VAR / ${VAR} / $(...) substitutions
+        # applied, so a variable whose *value* happens to be "?" (as
+        # getopts sets $opt on an unknown option, or ":" on a missing
+        # argument) would otherwise be indistinguishable from a literal
+        # "?" glob pattern typed in the script -- and get run through
+        # _parse_args()/glob() against the current directory, silently
+        # replacing the echoed value with whatever 1-character filename
+        # happened to match.  Checking the raw text instead means only
+        # a glob metacharacter that was actually written in the source
+        # (e.g. "echo *.txt") triggers globbing.
+        my (undef, $raw_rest) = _split_sh($_raw_pre_expand);
+        $raw_rest = '' unless defined $raw_rest;
+        if (_raw_has_glob($raw_rest)) {
             my @words = _parse_args($rest);
             $rest = join(' ', @words);
         }
@@ -385,9 +622,22 @@ sub _exec_line {
     if ($lc_cmd eq 'return')  { $_RETURN = 1; $LAST_STATUS = ($rest =~ /\A\s*(\d+)/) ? int($1) : 0; return $LAST_STATUS }
     if ($lc_cmd eq 'break')   { $_BREAK = 1; return 0 }
     if ($lc_cmd eq 'continue') { $_CONTINUE = 1; return 0 }
-    if ($lc_cmd eq 'shift')   { return _cmd_shift() }
+    if ($lc_cmd eq 'shift')   { return _cmd_shift($rest) }
+    if ($lc_cmd eq 'getopts') { return _cmd_getopts($rest) }
     if ($lc_cmd eq 'local')   { return _cmd_local($rest) }
     if ($lc_cmd eq 'set')     { return _cmd_set_sh($rest) }
+    if ($lc_cmd eq 'shopt')   { return _cmd_shopt($rest) }
+    if ($lc_cmd eq 'alias')   { return _cmd_alias($rest) }
+    if ($lc_cmd eq 'unalias') { return _cmd_unalias($rest) }
+    if ($lc_cmd eq 'eval') {
+        # POSIX eval: the (already expanded) arguments are stripped of one
+        # level of quoting, concatenated, and executed as a new command
+        # line -- which re-parses and re-expands, giving the double
+        # expansion eval exists for.  "eval" with no arguments is a noop.
+        if (!defined $rest || $rest =~ /\A\s*\z/) { $LAST_STATUS = 0; return 0 }
+        my @words = _parse_args($rest);
+        return _exec_line($class, join(' ', @words), $opts_ref);
+    }
 
     # Defined SH function
     if (exists $_SH_FUNCTIONS{$cmd}) {
@@ -405,6 +655,15 @@ sub _expand {
     my ($class, $str) = @_;
     return '' unless defined $str;
 
+    # Tilde expansion (v0.07) MUST run before variable / command
+    # substitution below: POSIX expands ~word from the literal source
+    # text only, once, at the start of a word (or right after the '='
+    # of a leading NAME= assignment).  A ~ that only appears because a
+    # $VAR happened to hold a string starting with "~" must NOT be
+    # re-expanded -- doing tilde expansion after $VAR substitution
+    # cannot tell the two cases apart, so it must happen first here.
+    $str = _tilde_prepass($str);
+
     # Protect backslash escapes before any expansion.  In POSIX shells the
     # backslash inside double quotes keeps its special meaning only before
     # $ ` " \ and newline, so "\$" is a literal dollar (NO expansion), "\`"
@@ -421,6 +680,12 @@ sub _expand {
 
     # $(( arithmetic ))
     $str =~ s/\$\(\(\s*(.*?)\s*\)\)/_eval_arith($1)/ge;
+
+    # <(cmd) / >(cmd) process substitution (v0.07) -- MUST run before
+    # $(...) below, and before backtick substitution, so that <(...) is
+    # never mistaken for a stray "<" redirection operator by the later
+    # redirect-stripping stage.
+    $str = _replace_process_subst($class, $str);
 
     # $( command ) substitution
     # Use _extract_cmd_subst to correctly handle nested () and quoted ) chars.
@@ -465,9 +730,10 @@ sub _expand {
     /ge;
     # ----------------------------------------------------------------
 
-    # ${#VAR} -- length of value
+    # ${#VAR} -- length of value (characters, not bytes, under DBCS guard)
     $str =~ s/\$\{#([A-Za-z_][A-Za-z0-9_]*)\}/
-        do { my $v = BATsh::Env->get($1); defined $v ? length($v) : 0 }
+        do { my $v = BATsh::Env->get($1);
+             defined $v ? BATsh::MB::mb_length($v) : 0 }
     /ge;
 
     # ${VAR%%pattern} -- remove longest suffix   (MUST be before single %)
@@ -524,19 +790,13 @@ sub _expand {
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):(-?\d+):(\d+)\}/
         do {
             my $v = BATsh::Env->get($1); $v = defined $v ? $v : '';
-            my $off = int($2); my $len = int($3);
-            $off = length($v) + $off if $off < 0;
-            $off = 0 if $off < 0;
-            substr($v, $off, $len)
+            BATsh::MB::mb_substr($v, int($2), int($3))
         }
     /ge;
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):(-?\d+)\}/
         do {
             my $v = BATsh::Env->get($1); $v = defined $v ? $v : '';
-            my $off = int($2);
-            $off = length($v) + $off if $off < 0;
-            $off = 0 if $off < 0;
-            substr($v, $off)
+            BATsh::MB::mb_substr($v, int($2))
         }
     /ge;
 
@@ -563,7 +823,9 @@ sub _expand {
                 my $v = _arr_get_element($n, 0); defined $v ? $v : ''
             }
             else {
-                my $v = BATsh::Env->get($n); defined $v ? $v : ''
+                my $v = BATsh::Env->get($n);
+                _nounset_hit($n) if !defined $v;
+                defined $v ? $v : ''
             }
         }
     /ge;
@@ -591,8 +853,12 @@ sub _expand {
         }
     /ge;
 
-    # $@ and $* all positional parameters
+    # $@ and $* all positional parameters (both join with a space here).
+    # Historically only $@ was substituted; $* fell through unexpanded and
+    # printed literally.  Both now expand to the space-joined parameter
+    # list held in %*.
     $str =~ s/\$\@/do { my $v=BATsh::Env->get('%*'); defined $v ? $v : '' }/ge;
+    $str =~ s/\$\*/do { my $v=BATsh::Env->get('%*'); defined $v ? $v : '' }/ge;
 
     # $# number of positional parameters
     $str =~ s/\$#/
@@ -616,7 +882,9 @@ sub _expand {
                 my $v = _arr_get_element($n, 0); defined $v ? $v : ''
             }
             else {
-                my $v = BATsh::Env->get($n); defined $v ? $v : ''
+                my $v = BATsh::Env->get($n);
+                _nounset_hit($n) if !defined $v;
+                defined $v ? $v : ''
             }
         }
     /ge;
@@ -633,20 +901,326 @@ sub _expand {
 # ----------------------------------------------------------------
 # Arithmetic evaluator
 # ----------------------------------------------------------------
+use vars qw(@_A_TOK $_A_POS $_A_ERR);
+
 sub _eval_arith {
     my ($expr) = @_;
-    # Expand $1..$9 positional params before further processing
-    $expr =~ s/\$([1-9])/_arith_pos($1)/ge;
-    # Expand $VAR names with numeric values
-    $expr =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/_arith_var($1)/ge;
-    # Replace bare VAR names with numeric values
-    $expr =~ s/([A-Za-z_][A-Za-z0-9_]*)/_arith_var($1)/ge;
-    # Safe eval: digits, operators, parens, spaces only
-    if ($expr =~ /\A[\d\s\+\-\*\/\%\(\)]+\z/) {
-        my $result = eval $expr;
-        return defined $result ? int($result) : 0;
+    # Full shell-arithmetic evaluator (bash semantics, Perl 5.005_03 safe):
+    #   , = += -= *= /= %= <<= >>= &= ^= |= ?: || && | ^ & == != < <= > >=
+    #   << >> + - * / % ** (right assoc) unary ! ~ + - prefix/postfix ++ --
+    # Comparisons and logical operators yield 1/0; / and % truncate toward
+    # zero; assignments and ++/-- on a bare NAME write back to the variable
+    # store.  $N and $NAME are resolved to their numeric values while
+    # tokenizing; a bare NAME stays assignable.  Numbers may be decimal,
+    # hex (0x..), or octal (0..).  On any syntax error or division by zero
+    # a warning is printed and 0 is returned (matching the old behaviour
+    # of returning 0 on an unsupported expression).
+    local @_A_TOK = _arith_tokenize(defined $expr ? $expr : '');
+    local $_A_POS = 0;
+    local $_A_ERR = 0;
+    my ($v) = _a_comma();
+    $_A_ERR = 1 if !$_A_ERR && $_A_POS < scalar(@_A_TOK);   # trailing junk
+    if ($_A_ERR) {
+        warn "sh: arithmetic: syntax error or division by zero: $expr\n";
+        return 0;
     }
-    return 0;
+    return int($v);
+}
+
+# Tokenize into [TYPE, VALUE] pairs: TYPE 'n' number, 'v' name, 'o' operator.
+sub _arith_tokenize {
+    my ($s) = @_;
+    my @tok = ();
+    my $i = 0;
+    my $n = length($s);
+    while ($i < $n) {
+        my $c = substr($s, $i, 1);
+        if ($c =~ /\s/) { $i++; next }
+        # $N positional / $NAME -- resolve to a numeric value now
+        if ($c eq '$') {
+            if (substr($s, $i+1, 1) =~ /\A[1-9]\z/) {
+                push @tok, ['n', _arith_pos(substr($s, $i+1, 1))];
+                $i += 2; next;
+            }
+            if (substr($s, $i+1) =~ /\A([A-Za-z_][A-Za-z0-9_]*)/) {
+                push @tok, ['n', _arith_var($1)];
+                $i += 1 + length($1); next;
+            }
+            return (['o', '?ERR?']);   # lone $: force a syntax error
+        }
+        # Numbers: hex 0x.., octal 0.., decimal
+        if ($c =~ /\d/) {
+            if ($c eq '0' && substr($s, $i+1, 1) =~ /\A[xX]\z/
+                && substr($s, $i+2) =~ /\A([0-9A-Fa-f]+)/) {
+                push @tok, ['n', hex($1)];
+                $i += 2 + length($1); next;
+            }
+            substr($s, $i) =~ /\A(\d+)/;
+            my $num = $1;
+            if ($num =~ /\A0[0-7]+\z/) { push @tok, ['n', oct($num)] }
+            else                       { push @tok, ['n', int($num)] }
+            $i += length($num); next;
+        }
+        # Bare NAME (assignable lvalue)
+        if ($c =~ /[A-Za-z_]/) {
+            substr($s, $i) =~ /\A([A-Za-z_][A-Za-z0-9_]*)/;
+            push @tok, ['v', $1];
+            $i += length($1); next;
+        }
+        # Operators: longest match first
+        my $three = substr($s, $i, 3);
+        if ($three eq '<<=' || $three eq '>>=') {
+            push @tok, ['o', $three]; $i += 3; next;
+        }
+        my $two = substr($s, $i, 2);
+        if ($two =~ /\A(?:\*\*|<<|>>|<=|>=|==|!=|&&|\|\||\+=|-=|\*=|\/=|%=|&=|\^=|\|=|\+\+|--)\z/) {
+            push @tok, ['o', $two]; $i += 2; next;
+        }
+        if ($c =~ /\A[-+*\/%()<>=!&|^~?:,]\z/) {
+            push @tok, ['o', $c]; $i++; next;
+        }
+        return (['o', '?ERR?']);   # unknown character: force a syntax error
+    }
+    return @tok;
+}
+
+sub _a_peek  { return $_A_POS < @_A_TOK ? $_A_TOK[$_A_POS] : undef }
+sub _a_isop  {
+    my ($op) = @_;
+    my $t = _a_peek();
+    return defined $t && $t->[0] eq 'o' && $t->[1] eq $op;
+}
+sub _a_next  { return $_A_TOK[$_A_POS++] }
+
+# Each _a_* returns (value, lvalue_name_or_undef).
+
+sub _a_comma {
+    my ($v, $lv) = _a_assign();
+    while (_a_isop(',')) {
+        _a_next();
+        ($v, $lv) = _a_assign();
+    }
+    return ($v, undef);
+}
+
+sub _a_assign {
+    # Lookahead: NAME followed by an assignment operator
+    my $t = _a_peek();
+    if (defined $t && $t->[0] eq 'v' && $_A_POS + 1 < @_A_TOK) {
+        my $op = $_A_TOK[$_A_POS + 1];
+        if ($op->[0] eq 'o' && $op->[1] =~ /\A(?:=|\+=|-=|\*=|\/=|%=|<<=|>>=|&=|\^=|\|=)\z/) {
+            my $name = $t->[1];
+            _a_next(); _a_next();
+            my ($rhs) = _a_assign();
+            my $val;
+            if ($op->[1] eq '=') { $val = $rhs }
+            else {
+                my $cur = _arith_var($name);
+                my $o = $op->[1];
+                if    ($o eq '+=')  { $val = $cur +  $rhs }
+                elsif ($o eq '-=')  { $val = $cur -  $rhs }
+                elsif ($o eq '*=')  { $val = $cur *  $rhs }
+                elsif ($o eq '/=')  { if ($rhs == 0) { $_A_ERR = 1; return (0, undef) }
+                                      $val = int($cur / $rhs) }
+                elsif ($o eq '%=')  { if ($rhs == 0) { $_A_ERR = 1; return (0, undef) }
+                                      $val = $cur %  $rhs }
+                elsif ($o eq '<<=') { $val = $cur << $rhs }
+                elsif ($o eq '>>=') { $val = $cur >> $rhs }
+                elsif ($o eq '&=')  { $val = $cur &  $rhs }
+                elsif ($o eq '^=')  { $val = $cur ^  $rhs }
+                else                { $val = $cur |  $rhs }
+            }
+            $val = int($val);
+            BATsh::Env->set($name, $val);
+            return ($val, undef);
+        }
+    }
+    return _a_ternary();
+}
+
+sub _a_ternary {
+    my ($c) = _a_lor();
+    if (_a_isop('?')) {
+        _a_next();
+        my ($tv) = _a_assign();
+        if (!_a_isop(':')) { $_A_ERR = 1; return (0, undef) }
+        _a_next();
+        my ($fv) = _a_ternary();
+        return (($c != 0) ? $tv : $fv, undef);
+    }
+    return ($c, undef);
+}
+
+sub _a_lor {
+    my ($v) = _a_land();
+    while (_a_isop('||')) {
+        _a_next();
+        my ($r) = _a_land();
+        $v = (($v != 0) || ($r != 0)) ? 1 : 0;
+    }
+    return ($v, undef);
+}
+
+sub _a_land {
+    my ($v) = _a_bor();
+    while (_a_isop('&&')) {
+        _a_next();
+        my ($r) = _a_bor();
+        $v = (($v != 0) && ($r != 0)) ? 1 : 0;
+    }
+    return ($v, undef);
+}
+
+sub _a_bor {
+    my ($v) = _a_bxor();
+    while (_a_isop('|')) {
+        _a_next();
+        my ($r) = _a_bxor();
+        $v = $v | $r;
+    }
+    return ($v, undef);
+}
+
+sub _a_bxor {
+    my ($v) = _a_band();
+    while (_a_isop('^')) {
+        _a_next();
+        my ($r) = _a_band();
+        $v = $v ^ $r;
+    }
+    return ($v, undef);
+}
+
+sub _a_band {
+    my ($v) = _a_eqne();
+    while (_a_isop('&')) {
+        _a_next();
+        my ($r) = _a_eqne();
+        $v = $v & $r;
+    }
+    return ($v, undef);
+}
+
+sub _a_eqne {
+    my ($v) = _a_rel();
+    while (_a_isop('==') || _a_isop('!=')) {
+        my $op = _a_next()->[1];
+        my ($r) = _a_rel();
+        $v = ($op eq '==') ? (($v == $r) ? 1 : 0) : (($v != $r) ? 1 : 0);
+    }
+    return ($v, undef);
+}
+
+sub _a_rel {
+    my ($v) = _a_shiftop();
+    while (_a_isop('<') || _a_isop('<=') || _a_isop('>') || _a_isop('>=')) {
+        my $op = _a_next()->[1];
+        my ($r) = _a_shiftop();
+        if    ($op eq '<')  { $v = ($v <  $r) ? 1 : 0 }
+        elsif ($op eq '<=') { $v = ($v <= $r) ? 1 : 0 }
+        elsif ($op eq '>')  { $v = ($v >  $r) ? 1 : 0 }
+        else                { $v = ($v >= $r) ? 1 : 0 }
+    }
+    return ($v, undef);
+}
+
+sub _a_shiftop {
+    my ($v) = _a_add();
+    while (_a_isop('<<') || _a_isop('>>')) {
+        my $op = _a_next()->[1];
+        my ($r) = _a_add();
+        $v = ($op eq '<<') ? ($v << $r) : ($v >> $r);
+    }
+    return ($v, undef);
+}
+
+sub _a_add {
+    my ($v) = _a_mul();
+    while (_a_isop('+') || _a_isop('-')) {
+        my $op = _a_next()->[1];
+        my ($r) = _a_mul();
+        $v = ($op eq '+') ? ($v + $r) : ($v - $r);
+    }
+    return ($v, undef);
+}
+
+sub _a_mul {
+    my ($v) = _a_pow();
+    while (_a_isop('*') || _a_isop('/') || _a_isop('%')) {
+        my $op = _a_next()->[1];
+        my ($r) = _a_pow();
+        if ($op eq '*') { $v = $v * $r }
+        else {
+            if ($r == 0) { $_A_ERR = 1; return (0, undef) }
+            # bash / and % truncate toward zero
+            if ($op eq '/') {
+                my $q = abs(int($v)) - (abs(int($v)) % abs(int($r)));
+                $q /= abs(int($r));
+                $q = -$q if (($v < 0) ne ($r < 0)) && $q != 0;
+                $v = $q;
+            }
+            else {
+                my $m = abs(int($v)) % abs(int($r));
+                $m = -$m if $v < 0;
+                $v = $m;
+            }
+        }
+    }
+    return ($v, undef);
+}
+
+sub _a_pow {
+    my ($v, $lv) = _a_unary();
+    if (_a_isop('**')) {
+        _a_next();
+        my ($r) = _a_pow();   # right associative
+        return (int($v ** $r), undef);
+    }
+    return ($v, $lv);
+}
+
+sub _a_unary {
+    if (_a_isop('!')) { _a_next(); my ($v) = _a_unary(); return (($v == 0) ? 1 : 0, undef) }
+    if (_a_isop('~')) { _a_next(); my ($v) = _a_unary(); return (-int($v) - 1, undef) }
+    if (_a_isop('+')) { _a_next(); my ($v) = _a_unary(); return (+$v, undef) }
+    if (_a_isop('-')) { _a_next(); my ($v) = _a_unary(); return (-$v, undef) }
+    # Prefix ++NAME / --NAME
+    if (_a_isop('++') || _a_isop('--')) {
+        my $op = _a_next()->[1];
+        my $t = _a_peek();
+        if (!defined $t || $t->[0] ne 'v') { $_A_ERR = 1; return (0, undef) }
+        _a_next();
+        my $val = _arith_var($t->[1]) + (($op eq '++') ? 1 : -1);
+        BATsh::Env->set($t->[1], $val);
+        return ($val, undef);
+    }
+    return _a_postfix();
+}
+
+sub _a_postfix {
+    my ($v, $lv) = _a_primary();
+    if (defined $lv && (_a_isop('++') || _a_isop('--'))) {
+        my $op = _a_next()->[1];
+        BATsh::Env->set($lv, $v + (($op eq '++') ? 1 : -1));
+        return ($v, undef);   # postfix returns the OLD value
+    }
+    return ($v, $lv);
+}
+
+sub _a_primary {
+    my $t = _a_peek();
+    if (!defined $t) { $_A_ERR = 1; return (0, undef) }
+    if ($t->[0] eq 'o' && $t->[1] eq '(') {
+        _a_next();
+        my ($v) = _a_comma();
+        if (!_a_isop(')')) { $_A_ERR = 1; return (0, undef) }
+        _a_next();
+        return ($v, undef);
+    }
+    if ($t->[0] eq 'n') { _a_next(); return ($t->[1], undef) }
+    if ($t->[0] eq 'v') { _a_next(); return (_arith_var($t->[1]), $t->[1]) }
+    $_A_ERR = 1;
+    return (0, undef);
 }
 
 sub _arith_pos {
@@ -742,16 +1316,18 @@ sub _cmd_subst {
     # $( ... $( ... ) ) gets a distinct file per level (the inner level
     # must not truncate/unlink the file the outer level captures into).
     local $_SUBST_DEPTH = $_SUBST_DEPTH + 1;
-    my $tmpfile = File::Spec->catfile(
-        File::Spec->tmpdir(),
-        'batsh_cap_' . $$ . '_' . $_SUBST_DEPTH . '.tmp');
     local *_SUBST_SAVOUT;
     open(_SUBST_SAVOUT, '>&STDOUT') or return '';
     local *_SUBST_CAPFH;
-    open(_SUBST_CAPFH, "> $tmpfile")
-        or do { open(STDOUT, '>&_SUBST_SAVOUT'); return '' };
+    my $tmpfile = _subst_tempfile();
+    if (!defined $tmpfile) {
+        open(STDOUT, '>&_SUBST_SAVOUT'); close(_SUBST_SAVOUT); return '';
+    }
     open(STDOUT, '>&_SUBST_CAPFH')
-        or do { close(_SUBST_CAPFH); open(STDOUT, '>&_SUBST_SAVOUT'); return '' };
+        or do {
+            close(_SUBST_CAPFH); unlink $tmpfile;
+            open(STDOUT, '>&_SUBST_SAVOUT'); close(_SUBST_SAVOUT); return '';
+        };
     close(_SUBST_CAPFH);
     eval {
         # Use _run_lines for full recursive BATsh::SH execution.
@@ -769,9 +1345,177 @@ sub _cmd_subst {
         close(_SUBST_READFH);
     }
     unlink $tmpfile;
+    @_SUBST_TMPFILES = grep { $_ ne $tmpfile } @_SUBST_TMPFILES;
     $output = '' unless defined $output;
     $output =~ s/\n+\z//;   # strip trailing newlines (like shell)
-    return $output;
+    return BATsh::MB::enc($output);
+}
+
+# _subst_tempfile: create a unique, empty temp file (O_CREAT|O_EXCL to
+# avoid symlink races -- mirrors _bg_tempfile / _hd_tempfile) for capturing
+# one command-substitution's stdout output, and open it as the package
+# bareword filehandle _SUBST_CAPFH.  Returns the path, or undef on failure.
+sub _subst_tempfile {
+    my $dir = File::Spec->tmpdir();
+    $dir = '.' if !(-d $dir && -w $dir);
+
+    my $attempt = 0;
+    while ($attempt < 1000) {
+        $_SUBST_SEQ++;
+        $attempt++;
+        my $path = File::Spec->catfile($dir,
+            'batsh_cap_' . $$ . '_' . $_SUBST_DEPTH . '_' . $_SUBST_SEQ . '.tmp');
+        if (sysopen(_SUBST_CAPFH, $path, O_WRONLY | O_CREAT | O_EXCL, 0600)) {
+            push @_SUBST_TMPFILES, $path;
+            return $path;
+        }
+        # EEXIST or transient error: retry with next sequence number
+    }
+    return undef;
+}
+
+# ----------------------------------------------------------------
+# Process substitution (v0.07): <(cmd) and >(cmd).
+#
+# This interpreter never forks (see the pipeline / background-job notes
+# elsewhere in this file), so neither form uses a real named pipe.
+# Instead:
+#
+#   <(cmd)   cmd's stdout is captured into a temp file (exactly like
+#            $(cmd), but the file is kept instead of being read back
+#            into a scalar) and <(cmd) is replaced by that file's path.
+#            This covers the common case of feeding a whole command's
+#            output to something that wants a filename, e.g.
+#            "diff <(sort a) <(sort b)".
+#
+#   >(cmd)   an empty temp file is created and >(cmd) is replaced by its
+#            path immediately; cmd itself is deferred and run with that
+#            file as its stdin only after the current simple command
+#            finishes (see the _exec_line wrapper), e.g.
+#            "generate | tee >(gzip > out.gz)". Because cmd runs after
+#            (not concurrently with) the writer, this is a best-effort
+#            approximation of real, streaming >(...) and does not suit
+#            writers that expect the reader to keep up in real time.
+#
+# Both temp files are removed by the _exec_line wrapper once the current
+# simple command (and, for >(cmd), its deferred job) has finished; a
+# process substitution used INSIDE another command substitution / loop
+# condition is cleaned up at that inner level, not held open for the
+# rest of the script.
+# ----------------------------------------------------------------
+sub _replace_process_subst {
+    my ($class, $str) = @_;
+    return $str unless defined $str && $str =~ /[<>]\(/;
+
+    my $result = '';
+    my @chars  = split //, $str;
+    my $n      = scalar @chars;
+    my $i      = 0;
+    my $in_sq  = 0;
+    my $in_dq  = 0;
+
+    while ($i < $n) {
+        my $ch = $chars[$i];
+
+        if ($in_sq) {
+            if ($ch eq "'") { $in_sq = 0 }
+            $result .= $ch; $i++; next;
+        }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $result .= $ch; $i++; next }
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $result .= $ch; $i++; next }
+        if (!$in_dq && $ch eq '\\') {
+            $result .= $ch; $i++;
+            $result .= $chars[$i] if $i < $n; $i++; next;
+        }
+
+        if (!$in_sq && !$in_dq && ($ch eq '<' || $ch eq '>')
+                && $i+1 < $n && $chars[$i+1] eq '(') {
+            my $dir   = $ch;
+            my $depth = 1;
+            my $j     = $i + 2;
+            my $body  = '';
+            while ($j < $n && $depth > 0) {
+                my $c = $chars[$j];
+                if    ($c eq '(') { $depth++; $body .= $c; $j++ }
+                elsif ($c eq ')') { $depth--; $j++; $body .= $c if $depth > 0 }
+                else               { $body .= $c; $j++ }
+            }
+            if ($depth != 0) { $result .= $ch; $i++; next }   # unterminated: literal '<'/'>'
+
+            if ($dir eq '<') {
+                # Quote the generated path: it is a literal filename that
+                # must survive the dequoting applied later to redirection
+                # targets and command words -- otherwise a Windows temp
+                # path (C:\...\batsh_ps.tmp) would lose its backslashes,
+                # or a space in the temp dir would split the word.
+                $result .= '"' . _procsub_capture($class, $body) . '"';
+            }
+            else {
+                my $tmp = _procsub_tempfile();
+                if (defined $tmp) {
+                    close(_PROCSUB_CAPFH);
+                    push @_PROCSUB_DEFERRED, [$tmp, $body];
+                    $result .= '"' . $tmp . '"';
+                }
+            }
+            $i = $j; next;
+        }
+
+        $result .= $ch; $i++;
+    }
+
+    return $result;
+}
+
+# _procsub_capture: run $cmd_str now, capturing its stdout into a fresh
+# temp file kept on disk, and return the file's path.  Mirrors
+# _cmd_subst() but keeps the file instead of reading it back.
+sub _procsub_capture {
+    my ($class, $cmd_str) = @_;
+    local *_PROCSUB_SAVOUT;
+    open(_PROCSUB_SAVOUT, '>&STDOUT') or return '';
+    my $tmpfile = _procsub_tempfile();
+    if (!defined $tmpfile) {
+        open(STDOUT, '>&_PROCSUB_SAVOUT'); close(_PROCSUB_SAVOUT); return '';
+    }
+    open(STDOUT, '>&_PROCSUB_CAPFH')
+        or do {
+            close(_PROCSUB_CAPFH); unlink $tmpfile;
+            @_PROCSUB_TMPFILES = grep { $_ ne $tmpfile } @_PROCSUB_TMPFILES;
+            open(STDOUT, '>&_PROCSUB_SAVOUT'); close(_PROCSUB_SAVOUT); return '';
+        };
+    close(_PROCSUB_CAPFH);
+    eval {
+        my @sub_lines = split /\n/, $cmd_str;
+        _run_lines($class, \@sub_lines, {});
+    };
+    open(STDOUT, '>&_PROCSUB_SAVOUT');
+    close(_PROCSUB_SAVOUT);
+    return $tmpfile;
+}
+
+# _procsub_tempfile: create a unique, empty temp file (O_CREAT|O_EXCL to
+# avoid symlink races, mirroring _subst_tempfile()) and open it as the
+# package bareword filehandle _PROCSUB_CAPFH.  Returns the path, or
+# undef on failure.  The path is tracked in @_PROCSUB_TMPFILES for the
+# _exec_line wrapper (normal cleanup) and the END-block failsafe.
+sub _procsub_tempfile {
+    my $dir = File::Spec->tmpdir();
+    $dir = '.' if !(-d $dir && -w $dir);
+
+    my $attempt = 0;
+    while ($attempt < 1000) {
+        $_PROCSUB_SEQ++;
+        $attempt++;
+        my $path = File::Spec->catfile($dir,
+            'batsh_ps_' . $$ . '_' . $_PROCSUB_SEQ . '.tmp');
+        if (sysopen(_PROCSUB_CAPFH, $path, O_WRONLY | O_CREAT | O_EXCL, 0600)) {
+            push @_PROCSUB_TMPFILES, $path;
+            return $path;
+        }
+        # EEXIST or transient error: retry with next sequence number
+    }
+    return undef;
 }
 
 # ----------------------------------------------------------------
@@ -857,6 +1601,7 @@ sub _cmd_echo {
     # argument list are dropped (e.g. echo "${arr[@]}" tail), not only when
     # the whole string is wrapped in one pair of quotes.
     $rest = _arr_dequote($rest);
+    $rest = BATsh::MB::dec($rest);
     if ($no_newline) { print $rest }
     else             { print "$rest\n" }
     $LAST_STATUS = 0;
@@ -884,9 +1629,314 @@ sub _cmd_printf {
     @args = split /\s+/, $rest;
     $fmt =~ s/\\n/\n/g;
     $fmt =~ s/\\t/\t/g;
+    $fmt  = BATsh::MB::dec($fmt);
+    @args = map { BATsh::MB::dec($_) } @args;
     eval { printf $fmt, @args };
     $LAST_STATUS = 0;
     return 0;
+}
+
+# ----------------------------------------------------------------
+# Tilde expansion (v0.07): ~/path and ~user/path.
+#
+# POSIX word-initial tilde expansion.  Only applied to a word that
+# begins with an UNQUOTED ~ (callers are responsible for that check);
+# the tilde-prefix itself is never subject to variable / command
+# substitution.  Forms:
+#   ~          -> $HOME
+#   ~/rest     -> $HOME . '/rest'
+#   ~user      -> user's home directory (getpwnam; Unix-like only)
+#   ~user/rest -> that directory . '/rest'
+# If the login name is unknown (or getpwnam is unavailable, as on
+# Win32) the word is returned unchanged, matching bash's behaviour of
+# leaving an unresolvable ~name literal.
+# NOT implemented: colon-list tilde expansion in PATH-like assignments
+# (bash also tilde-expands after ':' in PATH=~/a:~/b); documented as a
+# limitation in the POD.
+# ----------------------------------------------------------------
+sub _tilde_expand {
+    my ($word) = @_;
+    return $word unless defined $word && $word =~ /\A~/;
+    my ($tag, $rest) = ($word =~ /\A~([^\/]*)(.*)\z/s);
+    $tag  = '' unless defined $tag;
+    $rest = '' unless defined $rest;
+    my $home;
+    if ($tag eq '') {
+        $home = $ENV{'HOME'};
+        $home = BATsh::Env->get('HOME') unless defined $home && $home ne '';
+    }
+    elsif ($^O !~ /MSWin32/i) {
+        my @pw = eval { getpwnam($tag) };
+        $home = (!$@ && @pw) ? $pw[7] : undef;
+    }
+    return $word unless defined $home && $home ne '';
+    return $home . $rest;
+}
+
+# _tilde_prepass: scan a RAW (not-yet-variable-expanded) string and
+# expand every unquoted, word-initial "~..." run using _tilde_expand().
+# A "word start" is: the very beginning of the string, any position
+# right after unquoted whitespace, or (once, at the very beginning of
+# the string only) the position right after the '=' of a leading
+# NAME= assignment token -- matching bash's extra tilde-expansion spot
+# for VAR=~/path.  Quoted text (single or double quotes) is copied
+# through untouched and never considered a word start for tilde
+# purposes.  Everything else in the string (variables, command
+# substitution, arithmetic, ...) is left as-is for the rest of
+# _expand() to process afterwards.
+sub _tilde_prepass {
+    my ($str) = @_;
+    return $str unless defined $str && $str =~ /~/;
+
+    my @chars = split //, $str;
+    my $n     = scalar @chars;
+    my $out   = '';
+    my $i     = 0;
+
+    # Leading NAME= assignment token: the char right after '=' is also
+    # a valid tilde-expansion start, but only for this one leading token.
+    if ($str =~ /\A([A-Za-z_][A-Za-z0-9_]*=)/) {
+        my $prefix = $1;
+        $out .= $prefix;
+        $i = length($prefix);
+    }
+
+    my $at_word_start = 1;
+    my $in_sq = 0;
+    my $in_dq = 0;
+    while ($i < $n) {
+        my $c = $chars[$i];
+        if ($in_sq) { $out .= $c; $in_sq = 0 if $c eq "'"; $i++; $at_word_start = 0; next }
+        if ($in_dq) { $out .= $c; $in_dq = 0 if $c eq '"'; $i++; $at_word_start = 0; next }
+        if ($c eq "'") { $in_sq = 1; $out .= $c; $i++; $at_word_start = 0; next }
+        if ($c eq '"') { $in_dq = 1; $out .= $c; $i++; $at_word_start = 0; next }
+        if ($c =~ /\s/) { $out .= $c; $i++; $at_word_start = 1; next }
+        if ($at_word_start && $c eq '~') {
+            my $j = $i + 1;
+            my $tag = '';
+            while ($j < $n && $chars[$j] !~ /[\s\/'"]/) { $tag .= $chars[$j]; $j++ }
+            $out .= _tilde_expand('~' . $tag);
+            $i = $j;
+            $at_word_start = 0;
+            next;
+        }
+        $out .= $c;
+        $i++;
+        $at_word_start = 0;
+    }
+    return $out;
+}
+
+# ----------------------------------------------------------------
+# Brace expansion (v0.07): {a,b,c} and {1..5} / {a..e} [..step] word
+# generation.  Runs on the RAW source line, lexically, before any other
+# expansion -- exactly like the tilde prepass above.  Quoted text and
+# anything that is opaque shell syntax (${...}, $(...), $((...)), `...`,
+# <(...), >(...), and backslash-escaped characters) is protected behind
+# a NUL-delimited sentinel so its content is copied through untouched
+# and its internal whitespace never becomes a false word boundary.
+# ----------------------------------------------------------------
+sub _brace_expand_line {
+    my ($line) = @_;
+    return $line unless defined $line && $line =~ /\{/;
+
+    my @protected;
+    my $safe = '';
+    my @c = split //, $line;
+    my $n = scalar @c;
+    my $i = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+
+        if ($ch eq '\\') {
+            my $seg = $ch . (($i+1 < $n) ? $c[$i+1] : '');
+            push @protected, $seg;
+            $safe .= "\x00BR" . $#protected . "\x00";
+            $i += 2; next;
+        }
+        if ($ch eq "'") {
+            my $j = $i + 1;
+            while ($j < $n && $c[$j] ne "'") { $j++ }
+            $j++ if $j < $n;
+            my $seg = join('', @c[$i .. $j-1]);
+            push @protected, $seg;
+            $safe .= "\x00BR" . $#protected . "\x00";
+            $i = $j; next;
+        }
+        if ($ch eq '"') {
+            my $j = $i + 1;
+            while ($j < $n && $c[$j] ne '"') {
+                $j += ($c[$j] eq '\\' && $j+1 < $n) ? 2 : 1;
+            }
+            $j++ if $j < $n;
+            my $seg = join('', @c[$i .. $j-1]);
+            push @protected, $seg;
+            $safe .= "\x00BR" . $#protected . "\x00";
+            $i = $j; next;
+        }
+        if ($ch eq '$' && $i+1 < $n && ($c[$i+1] eq '(' || $c[$i+1] eq '{')) {
+            my $openc  = $c[$i+1];
+            my $closec = ($openc eq '(') ? ')' : '}';
+            my $depth  = 1;
+            my $j      = $i + 2;
+            while ($j < $n && $depth > 0) {
+                if    ($c[$j] eq $openc)  { $depth++ }
+                elsif ($c[$j] eq $closec) { $depth-- }
+                $j++;
+            }
+            my $seg = join('', @c[$i .. $j-1]);
+            push @protected, $seg;
+            $safe .= "\x00BR" . $#protected . "\x00";
+            $i = $j; next;
+        }
+        if (($ch eq '<' || $ch eq '>') && $i+1 < $n && $c[$i+1] eq '(') {
+            my $depth = 1;
+            my $j     = $i + 2;
+            while ($j < $n && $depth > 0) {
+                if    ($c[$j] eq '(') { $depth++ }
+                elsif ($c[$j] eq ')') { $depth-- }
+                $j++;
+            }
+            my $seg = join('', @c[$i .. $j-1]);
+            push @protected, $seg;
+            $safe .= "\x00BR" . $#protected . "\x00";
+            $i = $j; next;
+        }
+        if ($ch eq '`') {
+            my $j = $i + 1;
+            while ($j < $n && $c[$j] ne '`') { $j++ }
+            $j++ if $j < $n;
+            my $seg = join('', @c[$i .. $j-1]);
+            push @protected, $seg;
+            $safe .= "\x00BR" . $#protected . "\x00";
+            $i = $j; next;
+        }
+
+        $safe .= $ch; $i++;
+    }
+
+    my @pieces = split /(\s+)/, $safe;
+    my $out = '';
+    for my $w (@pieces) {
+        if ($w eq '' || $w =~ /\A\s+\z/) { $out .= $w; next }
+        my @exp = ($w =~ /\{/) ? _brace_expand_word($w) : ($w);
+        $out .= join(' ', @exp);
+    }
+
+    $out =~ s/\x00BR(\d+)\x00/$protected[$1]/ge;
+    return $out;
+}
+
+# _brace_expand_word: expand all brace groups in one already-protected
+# word, returning the list of resulting words (a single-element list
+# containing the word unchanged when it holds no valid brace group).
+sub _brace_expand_word {
+    my ($word) = @_;
+    return ($word) unless defined $word && $word =~ /\{/;
+    my @found = _brace_find_group($word, 0);
+    return ($word) unless @found;
+    my ($open, $close, $alts_ref) = @found;
+    my $prefix = substr($word, 0, $open);
+    my $suffix = substr($word, $close + 1);
+    my @suffix_words = _brace_expand_word($suffix);
+    my @out;
+    for my $a (@{$alts_ref}) {
+        for my $aw (_brace_expand_word($a)) {
+            for my $sw (@suffix_words) {
+                push @out, $prefix . $aw . $sw;
+            }
+        }
+    }
+    return @out;
+}
+
+# _brace_find_group: locate the first VALID brace group at or after
+# $start (a comma-list or a range -- a bare "{word}" with neither is
+# left as literal text and scanning continues past it).  Returns
+# ($open_pos, $close_pos, \@alternatives) or () when none remain.
+sub _brace_find_group {
+    my ($word, $start) = @_;
+    my @c = split //, $word;
+    my $n = scalar @c;
+    my $i = $start;
+    while ($i < $n) {
+        if ($c[$i] eq '\\') { $i += 2; next }
+        if ($c[$i] ne '{')  { $i++; next }
+
+        my $open   = $i;
+        my $depth  = 1;
+        my $j      = $i + 1;
+        my @commas;
+        while ($j < $n && $depth > 0) {
+            if ($c[$j] eq '\\') { $j += 2; next }
+            if ($c[$j] eq '{')  { $depth++; $j++; next }
+            if ($c[$j] eq '}')  { $depth--; $j++; next }
+            if ($c[$j] eq ',' && $depth == 1) { push @commas, $j }
+            $j++;
+        }
+        if ($depth != 0) { $i = $open + 1; next }   # unmatched '{'
+
+        my $close = $j - 1;
+        my @alts;
+        if (@commas) {
+            my $prev = $open + 1;
+            for my $pos (@commas) {
+                push @alts, substr($word, $prev, $pos - $prev);
+                $prev = $pos + 1;
+            }
+            push @alts, substr($word, $prev, $close - $prev);
+        }
+        else {
+            @alts = _brace_expand_range(substr($word, $open + 1, $close - $open - 1));
+        }
+        return ($open, $close, \@alts) if @alts;
+        $i = $open + 1;   # not a valid group: keep scanning past it
+    }
+    return ();
+}
+
+# _brace_expand_range: expand "X..Y" or "X..Y..STEP" -- integer (with
+# optional zero-padding taken from the wider operand) or single-letter.
+# Returns () when $inner is not a recognised range expression.
+sub _brace_expand_range {
+    my ($inner) = @_;
+    $inner = '' unless defined $inner;
+
+    if ($inner =~ /\A(-?\d+)\.\.(-?\d+)(?:\.\.(-?\d+))?\z/) {
+        my ($from, $to, $step) = ($1, $2, $3);
+        my $pad = 0;
+        if ($from =~ /\A-?0\d/ || $to =~ /\A-?0\d/) {
+            my $w1 = length($from); $w1-- if substr($from, 0, 1) eq '-';
+            my $w2 = length($to);   $w2-- if substr($to, 0, 1)   eq '-';
+            $pad = ($w1 > $w2) ? $w1 : $w2;
+        }
+        $step = 1 unless defined $step && $step != 0;
+        $step = -$step if $step > 0 && $from > $to;
+        $step = -$step if $step < 0 && $from < $to;
+        my @out;
+        if ($step > 0) { for (my $v=$from; $v<=$to; $v+=$step) { push @out, _brace_pad($v, $pad) } }
+        else            { for (my $v=$from; $v>=$to; $v+=$step) { push @out, _brace_pad($v, $pad) } }
+        return @out;
+    }
+    if ($inner =~ /\A([A-Za-z])\.\.([A-Za-z])(?:\.\.(-?\d+))?\z/) {
+        my ($from, $to, $step) = ($1, $2, $3);
+        $step = 1 unless defined $step && $step != 0;
+        $step = abs($step);
+        my ($fo, $to_o) = (ord($from), ord($to));
+        my @out;
+        if ($fo <= $to_o) { for (my $v=$fo; $v<=$to_o; $v+=$step) { push @out, chr($v) } }
+        else               { for (my $v=$fo; $v>=$to_o; $v-=$step) { push @out, chr($v) } }
+        return @out;
+    }
+    return ();
+}
+
+sub _brace_pad {
+    my ($v, $pad) = @_;
+    return $v unless $pad;
+    my $neg = ($v < 0) ? 1 : 0;
+    my $s = sprintf('%0' . $pad . 'd', $neg ? -$v : $v);
+    return $neg ? "-$s" : $s;
 }
 
 # ----------------------------------------------------------------
@@ -896,7 +1946,11 @@ sub _cmd_cd {
     my ($rest) = @_;
     $rest =~ s/\A\s+//;
     $rest =~ s/\s+\z//;
-    if ($rest eq '' || $rest eq '~') {
+    # Strip quotes the same way command words are dequoted, so
+    # cd "a b" / cd 'dir' / cd "$HOME/x" reach chdir() as a plain path.
+    $rest = _arr_dequote($rest);
+    $rest = BATsh::MB::dec($rest);
+    if ($rest eq '') {
         $rest = $ENV{'HOME'} || BATsh::Env->get('HOME') || '.';
     }
     unless (chdir($rest)) {
@@ -904,7 +1958,7 @@ sub _cmd_cd {
         $LAST_STATUS = 1;
         return 1;
     }
-    BATsh::Env->set('PWD', Cwd::cwd());
+    BATsh::Env->set('PWD', BATsh::MB::enc(Cwd::cwd()));
     $LAST_STATUS = 0;
     return 0;
 }
@@ -927,6 +1981,70 @@ sub _cmd_exit {
     $_EXIT_CODE = $code;
     $LAST_STATUS = $code;
     return $code;
+}
+
+# ----------------------------------------------------------------
+# exec (v0.07)
+#
+#   exec > file / exec 2>&1 / ...   apply redirection(s) permanently to
+#                                    the current shell (no save/restore)
+#   exec cmd args...                run cmd (with its own redirections,
+#                                    if any) then terminate the whole
+#                                    script with cmd's exit status
+#
+# There is no real fork/exec here (this interpreter is Pure Perl and
+# never forks -- see the Background Execution / Compound Commands notes
+# above); "replacing the shell" is approximated by ending the script
+# immediately afterward, and redirections are applied by permanently
+# reassigning the STDIN/STDOUT/STDERR bareword globs instead of the
+# save-and-restore dance _sh_exec_with_redirs() uses for ordinary
+# commands.
+# ----------------------------------------------------------------
+sub _cmd_exec {
+    my ($class, $rest, $opts_ref) = @_;
+    $rest = '' unless defined $rest;
+    my ($clean, $redirs_ref) = _sh_strip_redirects($rest);
+
+    for my $r (@{$redirs_ref}) {
+        my ($fd, $append, $file) = @{$r};
+        $file = BATsh::MB::dec($file) unless $file =~ /\A&[12]\z/;
+        my $ok = 1;
+        if ($fd == 0) {
+            # sysopen() takes the filename literally -- a leading '>' or a
+            # trailing '|' is never treated as a mode or a pipe command.
+            $ok = sysopen(STDIN, $file, O_RDONLY);
+        }
+        elsif ($fd == 1) {
+            $ok = ($file eq '&2')
+                ? open(STDOUT, '>&STDERR')
+                : sysopen(STDOUT, $file,
+                    O_WRONLY | O_CREAT | ($append ? O_APPEND : O_TRUNC), 0666);
+        }
+        else {
+            $ok = ($file eq '&1')
+                ? open(STDERR, '>&STDOUT')
+                : sysopen(STDERR, $file,
+                    O_WRONLY | O_CREAT | ($append ? O_APPEND : O_TRUNC), 0666);
+        }
+        unless ($ok) {
+            warn "sh: exec: $file: $!\n";
+            $LAST_STATUS = 1;
+            return 1;
+        }
+    }
+
+    $clean =~ s/\A\s+//; $clean =~ s/\s+\z//;
+    if ($clean eq '') {
+        # "exec" with only redirections: they now apply for the rest of
+        # the script; exec itself does not terminate anything.
+        $LAST_STATUS = 0;
+        return 0;
+    }
+
+    my $rc = _exec_line($class, $clean, $opts_ref);
+    $_EXIT_CODE  = $rc;   # exec replaces the shell: end the script here
+    $LAST_STATUS = $rc;
+    return $rc;
 }
 
 # ----------------------------------------------------------------
@@ -1087,6 +2205,7 @@ sub _cmd_read {
     my @vars = grep { length && !/\A-/ } split /\s+/, $rest;
 
     my $line = <STDIN>;
+    $line = BATsh::MB::enc($line) if defined $line;
     if (!defined $line) {
         # End of input.  POSIX read returns non-zero at EOF so that a
         # 'while read VAR; do ...; done < file' loop terminates instead
@@ -1151,6 +2270,201 @@ sub _cmd_shift {
 }
 
 # ----------------------------------------------------------------
+# getopts optstring name [arg ...]
+# ----------------------------------------------------------------
+# POSIX option parser.  Called once per option in a loop:
+#
+#   while getopts "ab:c" opt; do
+#       case $opt in
+#           a) ... ;;
+#           b) echo "$OPTARG" ;;
+#           c) ... ;;
+#           \?) echo "bad option" >&2 ;;
+#       esac
+#   done
+#   shift $((OPTIND - 1))
+#
+# Sets the variable named by the second argument to the option letter
+# found (or '?' on an unknown option, or ':' on a missing argument when
+# the optstring begins with ':').  OPTARG receives an option's argument;
+# OPTIND advances to the next argument to be processed.  Returns 0 while
+# an option was parsed, non-zero when the option list is exhausted.
+#
+# A leading ':' in optstring selects "silent" error reporting: getopts
+# does not print a diagnostic, sets the name variable to ':' for a
+# missing argument and '?' for an unknown option, and puts the offending
+# letter in OPTARG.  Otherwise getopts prints a message to STDERR, sets
+# the name variable to '?', and unsets OPTARG.
+#
+# If no [arg ...] words are given, the positional parameters $1..$9 are
+# parsed (BATsh stores them as %1..%9; the same first-empty-terminates
+# convention used elsewhere in this module applies, so an intentionally
+# empty positional parameter is not representable).
+#
+# All Perl 5.005_03 compatible: substr/index scanning, no regex features
+# beyond \A \z, no prototypes, 2-argument state via package variables.
+sub _cmd_getopts {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//;
+    $rest =~ s/\s+\z//;
+
+    # Split off optstring and name; the remainder (if any) are explicit
+    # args.  _parse_args handles quoting/word-splitting consistently with
+    # the rest of the interpreter.
+    my @words = _parse_args($rest);
+    if (@words < 2) {
+        print STDERR "getopts: usage: getopts optstring name [arg ...]\n";
+        $LAST_STATUS = 2;
+        return 2;
+    }
+    my $optstring = shift @words;
+    my $name      = shift @words;
+
+    # Argument list: explicit words, else the positional parameters.
+    my @args;
+    if (@words) {
+        @args = @words;
+    }
+    else {
+        for my $n (1 .. 9) {
+            my $v = BATsh::Env->get("%$n");
+            $v = BATsh::Env->get("BATSH_ARG$n") unless defined $v && $v ne '';
+            last unless defined $v && $v ne '';
+            push @args, $v;
+        }
+    }
+
+    # Silent-error mode: a leading ':' in the optstring.
+    my $silent = 0;
+    if (index($optstring, ':') == 0) {
+        $silent = 1;
+        $optstring = substr($optstring, 1);
+    }
+
+    # OPTIND is 1-based and defaults to 1.  If the caller reset it (or it
+    # has never been set), restart the intra-argument character offset.
+    my $optind = BATsh::Env->get('OPTIND');
+    $optind = 1 unless defined $optind && $optind =~ /\A\d+\z/ && $optind >= 1;
+    if ($optind != $_GETOPTS_LAST_OPTIND) {
+        $_GETOPTS_CHARPOS = 0;   # fresh loop, or manual OPTIND change
+    }
+
+    # End of arguments?
+    if ($optind > scalar(@args)) {
+        $_GETOPTS_CHARPOS = 0;
+        BATsh::Env->set('OPTIND', $optind);
+        $_GETOPTS_LAST_OPTIND = $optind;
+        $LAST_STATUS = 1;
+        return 1;
+    }
+
+    my $cur = $args[$optind - 1];
+    $cur = '' unless defined $cur;
+
+    # Starting a new argument: must begin with '-' and not be a bare '-'.
+    if ($_GETOPTS_CHARPOS == 0) {
+        if (index($cur, '-') != 0 || $cur eq '-') {
+            # Not an option word: stop (leave OPTIND on it).
+            BATsh::Env->set('OPTIND', $optind);
+            $_GETOPTS_LAST_OPTIND = $optind;
+            $LAST_STATUS = 1;
+            return 1;
+        }
+        if ($cur eq '--') {
+            # Explicit end of options: consume it and stop.
+            $optind++;
+            BATsh::Env->set('OPTIND', $optind);
+            $_GETOPTS_LAST_OPTIND = $optind;
+            $_GETOPTS_CHARPOS = 0;
+            $LAST_STATUS = 1;
+            return 1;
+        }
+        $_GETOPTS_CHARPOS = 1;   # skip the leading '-'
+    }
+
+    my $optchar = substr($cur, $_GETOPTS_CHARPOS, 1);
+    $_GETOPTS_CHARPOS++;
+    my $is_last_char = ($_GETOPTS_CHARPOS >= length($cur));
+
+    # Advance OPTIND past $cur once its last option character is consumed.
+    my $advance = sub {
+        $optind++;
+        $_GETOPTS_CHARPOS = 0;
+    };
+
+    # Look the option character up in the optstring.  ':' and '?' are
+    # never valid option letters.
+    my $pos = ($optchar eq ':' || $optchar eq '?') ? -1
+            : index($optstring, $optchar);
+
+    if ($pos < 0) {
+        # Unknown option.
+        if ($silent) {
+            BATsh::Env->set($name, '?');
+            BATsh::Env->set('OPTARG', $optchar);
+        }
+        else {
+            print STDERR BATsh::MB::dec("getopts: illegal option -- $optchar") . "\n";
+            BATsh::Env->set($name, '?');
+            BATsh::Env->set('OPTARG', '');
+        }
+        $advance->() if $is_last_char;
+        BATsh::Env->set('OPTIND', $optind);
+        $_GETOPTS_LAST_OPTIND = $optind;
+        $LAST_STATUS = 0;
+        return 0;
+    }
+
+    # Does this option take an argument?  (a ':' follows it in optstring)
+    my $needs_arg = (substr($optstring, $pos + 1, 1) eq ':');
+
+    if ($needs_arg) {
+        if (!$is_last_char) {
+            # -oVALUE : remainder of the current word is the argument.
+            BATsh::Env->set('OPTARG', substr($cur, $_GETOPTS_CHARPOS));
+            BATsh::Env->set($name, $optchar);
+            $advance->();
+        }
+        else {
+            # -o VALUE : the next word is the argument.
+            if ($optind + 1 > scalar(@args)) {
+                # Missing argument.
+                $advance->();
+                if ($silent) {
+                    BATsh::Env->set($name, ':');
+                    BATsh::Env->set('OPTARG', $optchar);
+                }
+                else {
+                    print STDERR BATsh::MB::dec("getopts: option requires an argument -- $optchar") . "\n";
+                    BATsh::Env->set($name, '?');
+                    BATsh::Env->set('OPTARG', '');
+                }
+                BATsh::Env->set('OPTIND', $optind);
+                $_GETOPTS_LAST_OPTIND = $optind;
+                $LAST_STATUS = 0;
+                return 0;
+            }
+            BATsh::Env->set('OPTARG', $args[$optind]);   # 0-based next word
+            BATsh::Env->set($name, $optchar);
+            $optind += 2;
+            $_GETOPTS_CHARPOS = 0;
+        }
+    }
+    else {
+        # Flag option, no argument.  bash unsets OPTARG; we clear it.
+        BATsh::Env->set($name, $optchar);
+        BATsh::Env->set('OPTARG', '');
+        $advance->() if $is_last_char;
+    }
+
+    BATsh::Env->set('OPTIND', $optind);
+    $_GETOPTS_LAST_OPTIND = $optind;
+    $LAST_STATUS = 0;
+    return 0;
+}
+
+# ----------------------------------------------------------------
 # local
 # ----------------------------------------------------------------
 sub _cmd_local {
@@ -1194,9 +2508,216 @@ sub _cmd_local {
 sub _cmd_set_sh {
     my ($rest) = @_;
     $rest =~ s/\A\s+//;
-    # set -e, set +e, set -x, set +x: accepted silently
+    $rest =~ s/\s+\z//;
+    # set -e/+e -u/+u -x/+x, combinable (-eux), and set -o/+o NAME
+    # (errexit / nounset / xtrace).  Unknown letters and other forms are
+    # accepted silently (set is also a noop for positional-parameter use).
+    my @words = split /\s+/, $rest;
+    while (@words) {
+        my $w = shift @words;
+        if ($w =~ /\A([-+])o\z/ && @words) {
+            my $on = ($1 eq '-') ? 1 : 0;
+            my $name = lc(shift @words);
+            if    ($name eq 'errexit') { $_OPT_ERREXIT = $on }
+            elsif ($name eq 'nounset') { $_OPT_NOUNSET = $on }
+            elsif ($name eq 'xtrace')  { $_OPT_XTRACE  = $on }
+            next;
+        }
+        if ($w =~ /\A([-+])([a-zA-Z]+)\z/) {
+            my $on = ($1 eq '-') ? 1 : 0;
+            for my $ch (split //, $2) {
+                if    ($ch eq 'e') { $_OPT_ERREXIT = $on }
+                elsif ($ch eq 'u') { $_OPT_NOUNSET = $on }
+                elsif ($ch eq 'x') { $_OPT_XTRACE  = $on }
+            }
+            next;
+        }
+    }
     $LAST_STATUS = 0;
     return 0;
+}
+
+# ----------------------------------------------------------------
+# shopt -- bash shell option toggle (v0.07, minimal implementation)
+#
+# Recognised forms:
+#   shopt -s extglob     enable extended pattern matching operators
+#                         ?(...) *(...) +(...) @(...) !(...) in case
+#                         patterns and in ${VAR#pat}/${VAR%pat}/... patterns
+#   shopt -u extglob      disable it (the bash default)
+#   shopt -p extglob      print "shopt -s extglob" or "shopt -u extglob"
+#   shopt extglob         print "extglob   on" / "extglob   off"
+#   shopt                 print the state of all known options
+#
+# Only "extglob" is modelled; any other option name is accepted silently
+# (queried as "off") so scripts that probe unrelated options do not abort.
+# ----------------------------------------------------------------
+sub _cmd_shopt {
+    my ($rest) = @_;
+    $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
+    my @words = split /\s+/, $rest;
+    if (!@words) {
+        print "extglob        " . ($_OPT_EXTGLOB ? 'on' : 'off') . "\n";
+        $LAST_STATUS = 0;
+        return 0;
+    }
+    my $mode = '';   # '-s' / '-u' / '-p' / '' (bare query)
+    if ($words[0] =~ /\A-[sup]\z/) { $mode = shift(@words) }
+    if (!@words) {
+        # "shopt -p" / "shopt -s" / "shopt -u" with no names: report/no-op
+        if ($mode eq '-p') {
+            print 'shopt -' . ($_OPT_EXTGLOB ? 's' : 'u') . " extglob\n";
+        }
+        $LAST_STATUS = 0;
+        return 0;
+    }
+    my $status = 0;
+    for my $name (@words) {
+        my $lc_name = lc($name);
+        if ($lc_name ne 'extglob') {
+            # Unknown option name: treated as always-off, matching bash's
+            # exit-status-1-on-unknown-name behaviour without aborting.
+            if ($mode eq '') { print "$name           off\n" }
+            $status = 1;
+            next;
+        }
+        if    ($mode eq '-s') { $_OPT_EXTGLOB = 1 }
+        elsif ($mode eq '-u') { $_OPT_EXTGLOB = 0 }
+        elsif ($mode eq '-p') { print 'shopt -' . ($_OPT_EXTGLOB ? 's' : 'u') . " extglob\n" }
+        else                  { print "extglob        " . ($_OPT_EXTGLOB ? 'on' : 'off') . "\n" }
+    }
+    $LAST_STATUS = $status;
+    return $status;
+}
+
+# ----------------------------------------------------------------
+# alias / unalias (v0.07, minimal implementation)
+#
+#   alias                    list all aliases as alias NAME='VALUE'
+#   alias NAME               print one alias, or an error if not set
+#   alias NAME=VALUE ...     define one or more aliases (quote-aware)
+#   unalias NAME ...         remove one or more aliases
+#   unalias -a               remove all aliases
+# ----------------------------------------------------------------
+sub _cmd_alias {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
+    if ($rest eq '') {
+        for my $name (sort keys %_SH_ALIAS) {
+            print "alias $name='" . $_SH_ALIAS{$name} . "'\n";
+        }
+        $LAST_STATUS = 0;
+        return 0;
+    }
+    my @tok = _arr_split_words($rest);
+    my $status = 0;
+    for my $t (@tok) {
+        if ($t =~ /\A([A-Za-z_][A-Za-z0-9_.:-]*)=(.*)\z/s) {
+            my ($name, $val) = ($1, $2);
+            $_SH_ALIAS{$name} = _arr_dequote($val);
+        }
+        elsif ($t =~ /\A([A-Za-z_][A-Za-z0-9_.:-]*)\z/) {
+            my $name = $1;
+            if (exists $_SH_ALIAS{$name}) {
+                print "alias $name='" . $_SH_ALIAS{$name} . "'\n";
+            }
+            else {
+                print STDERR "sh: alias: $name: not found\n";
+                $status = 1;
+            }
+        }
+    }
+    $LAST_STATUS = $status;
+    return $status;
+}
+
+sub _cmd_unalias {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
+    if ($rest eq '-a') { %_SH_ALIAS = (); $LAST_STATUS = 0; return 0 }
+    my $status = 0;
+    for my $name (split /\s+/, $rest) {
+        next if $name eq '';
+        if (exists $_SH_ALIAS{$name}) { delete $_SH_ALIAS{$name} }
+        else { print STDERR "sh: unalias: $name: not found\n"; $status = 1 }
+    }
+    $LAST_STATUS = $status;
+    return $status;
+}
+
+# _alias_expand_line: replace a leading alias name with its stored text.
+# See the call site in _exec_line() for the chaining / loop-guard notes.
+sub _alias_expand_line {
+    my ($line) = @_;
+    return $line unless %_SH_ALIAS;
+    my %seen;
+    my $out = $line;
+    my $guard = 0;
+    while ($guard < 20) {
+        $guard++;
+        last unless $out =~ /\A(\s*)(\S+)(.*)\z/s;
+        my ($lead, $w0, $tail) = ($1, $2, $3);
+        last unless exists $_SH_ALIAS{$w0};
+        last if $seen{$w0};
+        $seen{$w0} = 1;
+        $out = $lead . $_SH_ALIAS{$w0} . $tail;
+    }
+    return $out;
+}
+
+# ----------------------------------------------------------------
+# reset_sh_options: restore default shell options.  Called by BATsh.pm
+# at the start of each top-level run so one script's "set -e" does not
+# leak into the next.  Call as a plain function.
+# ----------------------------------------------------------------
+sub reset_sh_options {
+    $_OPT_ERREXIT = 0;
+    $_OPT_NOUNSET = 0;
+    $_OPT_XTRACE  = 0;
+    $_OPT_EXTGLOB = 0;
+    $_ERREXIT_HOLD = 0;
+    $_ERREXIT_DONE = 0;
+    # getopts loop state (v0.07): a fresh top-level run restarts option
+    # parsing from the first argument, so one script's half-finished
+    # getopts loop cannot leak its position into the next run.
+    $_GETOPTS_CHARPOS     = 0;
+    $_GETOPTS_LAST_OPTIND = 0;
+    return 0;
+}
+
+# ----------------------------------------------------------------
+# _errexit_check: under set -e, a failing simple command terminates the
+# script with its status.  Suppressed while $_ERREXIT_HOLD > 0 (an if/
+# while/until condition, or a non-final member of a && / || list) and
+# when a control transfer (exit/break/continue/return) is already active.
+# ----------------------------------------------------------------
+sub _errexit_check {
+    my ($rc) = @_;
+    return $rc unless $_OPT_ERREXIT;
+    return $rc if $_ERREXIT_HOLD;
+    return $rc unless defined $rc && $rc =~ /\A-?\d+\z/ && $rc != 0;
+    return $rc if defined $_EXIT_CODE || $_BREAK || $_CONTINUE || $_RETURN;
+    $_EXIT_CODE  = $rc;
+    $LAST_STATUS = $rc;
+    return $rc;
+}
+
+# ----------------------------------------------------------------
+# _nounset_hit: under set -u, expanding an unset variable is an error
+# that terminates the script with status 1 (bash prints the message and
+# aborts; here the current command still completes with '' before the
+# script stops -- see BUGS AND LIMITATIONS).  A noop while -u is off.
+# ----------------------------------------------------------------
+sub _nounset_hit {
+    my ($name) = @_;
+    return 0 unless $_OPT_NOUNSET;
+    return 0 if defined $_EXIT_CODE;   # report only the first hit
+    warn "sh: $name: unbound variable\n";
+    $_EXIT_CODE  = 1;
+    $LAST_STATUS = 1;
+    return 1;
 }
 
 # ----------------------------------------------------------------
@@ -1246,6 +2767,7 @@ sub _eval_test {
     if ($expr =~ /\A(-[a-z])\s+(.+)\z/) {
         my ($op, $path) = ($1, $2);
         $path =~ s/\A"//; $path =~ s/"\z//;
+        $path = BATsh::MB::dec($path);
         if ($op eq '-e') { return -e $path ? 1 : 0 }
         if ($op eq '-f') { return -f $path ? 1 : 0 }
         if ($op eq '-d') { return -d $path ? 1 : 0 }
@@ -1317,27 +2839,35 @@ sub _parse_if {
     my $if_line = $lines[$i]; $i++;
     $if_line =~ s/\r?\n\z//; $if_line =~ s/\A\s+//;
 
+    # Fully-inline form on ONE physical line:
+    #   if COND; then BODY... [elif COND; then BODY...] [else BODY...]; fi
+    # Detected by a bare "fi" appearing as a top-level ';' segment.  The
+    # line is expanded into the logical-line shape the multi-line block
+    # collector below already understands (with then/do/else peeled onto
+    # their own lines), then re-parsed; this correctly handles elif and
+    # else, which the previous narrow single-line regex silently dropped.
+    if (_inline_has_terminator($if_line, 'fi')) {
+        my @work = _inline_expand($if_line);
+        my ($st) = _parse_if($class, \@work, 0, $opts_ref);
+        return ($st, $i);
+    }
+
     # Extract condition (after 'if', before 'then' or ';')
     my $cond_str = $if_line;
     $cond_str =~ s/\Aif\s+//i;
-
-    # 1-line form: if COND; then BODY [; BODY ...]; fi
-    # Detect by presence of "; then " and trailing "; fi" on the same line
-    if ($cond_str =~ /\A(.+?)\s*;\s*then\s+(.+?)\s*;\s*fi\s*\z/i) {
-        my ($cond_part, $body_part) = ($1, $2);
-        my $cond_status = _run_lines($class, [$cond_part], $opts_ref);
-        if ($cond_status == 0) {
-            _run_lines($class, [split /\s*;\s*/, $body_part], $opts_ref);
-        }
-        return ($cond_status, $i);
-    }
 
     $cond_str =~ s/\s*;\s*then\s*\z//i;
     $cond_str =~ s/\s+then\s*\z//i;
 
     my @cond_lines = ($cond_str);
     my @body_lines = ();
-    my $state = 'body';   # reading body of if
+    my $in_else    = 0;   # collecting the else-branch body
+    # Nested if/fi depth: a nested "if ... fi" inside a branch body (on
+    # its own lines or written inline) must not have its "fi"/"elif"/
+    # "else" mistaken for the outer if's.  Only the depth-1 keywords are
+    # the outer if's; deeper ones travel with the body and are re-parsed
+    # when the body runs.
+    my $depth = 1;
 
     while ($i <= $#lines) {
         my $l = $lines[$i]; $i++;
@@ -1345,11 +2875,12 @@ sub _parse_if {
         my $ls = $l; $ls =~ s/\A\s+//;
         my $lc_first = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
 
-        if ($lc_first eq 'fi') {
-            push @branches, [ [@cond_lines], [@body_lines] ];
+        if ($depth == 1 && $lc_first eq 'fi') {
+            push @branches, [ [@cond_lines], [@body_lines] ] unless $in_else;
+            $else_body = [@body_lines] if $in_else;
             last;
         }
-        elsif ($lc_first eq 'elif') {
+        elsif ($depth == 1 && !$in_else && $lc_first eq 'elif') {
             push @branches, [ [@cond_lines], [@body_lines] ];
             $cond_str = $ls;
             $cond_str =~ s/\Aelif\s+//i;
@@ -1358,26 +2889,18 @@ sub _parse_if {
             @cond_lines = ($cond_str);
             @body_lines = ();
         }
-        elsif ($lc_first eq 'else') {
+        elsif ($depth == 1 && !$in_else && $lc_first eq 'else') {
             push @branches, [ [@cond_lines], [@body_lines] ];
             @body_lines = ();
-            # Read until fi
-            while ($i <= $#lines) {
-                my $el = $lines[$i]; $i++;
-                $el =~ s/\r?\n\z//;
-                my $els = $el; $els =~ s/\A\s+//;
-                if (lc(($els =~ /\A(\S+)/) ? $1 : '') eq 'fi') { last }
-                push @body_lines, $el;
-            }
-            $else_body = [@body_lines];
-            last;
+            $in_else = 1;
         }
-        elsif ($lc_first eq 'then') {
+        elsif ($depth == 1 && $lc_first eq 'then') {
             # 'then' on its own line: continue collecting body
             next;
         }
         else {
             push @body_lines, $l;
+            $depth += _if_depth_delta($l);
         }
     }
 
@@ -1386,7 +2909,9 @@ sub _parse_if {
     my $executed = 0;
     for my $branch (@branches) {
         my ($cond_ref, $body_ref) = @{$branch};
+        $_ERREXIT_HOLD++;
         my $cond_status = _run_lines($class, $cond_ref, $opts_ref);
+        $_ERREXIT_HOLD--;
         if ($cond_status == 0) {
             $status = _run_lines($class, $body_ref, $opts_ref);
             $executed = 1;
@@ -1467,6 +2992,99 @@ sub _parse_for {
     my $status = 0;
     for my $val (@items) {
         BATsh::Env->set($var, $val);
+        $_BREAK = 0; $_CONTINUE = 0;
+        $status = _run_lines($class, \@body, $opts_ref);
+        last if $_BREAK || defined $_EXIT_CODE;
+    }
+    $_BREAK = 0;
+
+    return ($status, $i);
+}
+
+# ----------------------------------------------------------------
+# select VAR in LIST ; do ... done  (v0.07)
+#
+# Prints a numbered menu of LIST (one item per line, to STDERR), prompts
+# with $PS3 (default "#? "), and reads one line from STDIN into REPLY:
+#   - a number in range 1..#items sets VAR to that item and runs BODY
+#   - anything else (including a blank line) sets VAR to '' and still
+#     runs BODY, matching bash (the menu is then reprinted next
+#     iteration)
+#   - end of input (STDIN closed) ends the loop, as does break
+# There is no multi-column menu layout (bash chooses columns based on
+# terminal width and item count); every item is printed on its own line.
+# ----------------------------------------------------------------
+sub _parse_select {
+    my ($class, $lines_ref, $start, $opts_ref) = @_;
+    my @lines = @{$lines_ref};
+    my $i = $start;
+
+    my $sel_line = $lines[$i]; $i++;
+    $sel_line =~ s/\r?\n\z//; $sel_line =~ s/\A\s+//;
+
+    my ($var, $list_str) = ('', '');
+    my $inline_body;
+    my $inline_closed = 0;
+    if ($sel_line =~ /\Aselect\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+(.*?)\s*;\s*do\b\s*(.*)\z/is) {
+        my $tail;
+        ($var, $list_str, $tail) = ($1, $2, $3);
+        $tail =~ s/\s+\z//;
+        if    ($tail eq '')     { $inline_body = undef }
+        elsif ($tail =~ /\A(.*);\s*done\b\s*\z/s) { $inline_body = $1; $inline_closed = 1 }
+        elsif ($tail eq 'done') { $inline_body = ''; $inline_closed = 1 }
+        else                     { $inline_body = $tail }
+    }
+    elsif ($sel_line =~ /\Aselect\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+(.*?)\s*\z/i) {
+        ($var, $list_str) = ($1, $2);
+    }
+    elsif ($sel_line =~ /\Aselect\s+([A-Za-z_][A-Za-z0-9_]*)\s*\z/i) {
+        ($var, $list_str) = ($1, '"$@"');   # "select VAR" alone: positional params
+    }
+    else {
+        return (0, $i);   # malformed header: nothing to do
+    }
+
+    my @body = ();
+    if (defined $inline_body) {
+        push @body, $inline_body unless $inline_body eq '';
+    }
+    if (!$inline_closed) {
+        my $depth = 1;
+        while ($i <= $#lines) {
+            my $l = $lines[$i]; $i++;
+            $l =~ s/\r?\n\z//;
+            my $ls = $l; $ls =~ s/\A\s+//;
+            my $lc_f = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
+            if ($lc_f eq 'for' || $lc_f eq 'while' || $lc_f eq 'until' || $lc_f eq 'select') { $depth++ }
+            if ($lc_f eq 'done') { $depth--; last if $depth == 0 }
+            push @body, $l unless ($lc_f eq 'do' && $depth == 1);
+        }
+    }
+
+    my @items = _expand_word_list($class, $list_str);
+    my $status = 0;
+    return ($status, $i) unless @items;
+
+    my $ps3 = BATsh::Env->get('PS3');
+    $ps3 = '#? ' unless defined $ps3 && $ps3 ne '';
+
+    my $max_iter = 100_000;   # safety guard, mirrors _parse_while
+    while ($max_iter-- > 0) {
+        last if defined $_EXIT_CODE;
+        for my $idx (0 .. $#items) {
+            print STDERR ($idx + 1) . ') ' . $items[$idx] . "\n";
+        }
+        print STDERR BATsh::MB::dec($ps3);
+        my $answer = <STDIN>;
+        last unless defined $answer;   # EOF on STDIN ends the loop
+        $answer =~ s/\r?\n\z//;
+        BATsh::Env->set('REPLY', BATsh::MB::enc($answer));
+        if ($answer =~ /\A[0-9]+\z/ && $answer >= 1 && $answer <= scalar(@items)) {
+            BATsh::Env->set($var, $items[$answer - 1]);
+        }
+        else {
+            BATsh::Env->set($var, '');
+        }
         $_BREAK = 0; $_CONTINUE = 0;
         $status = _run_lines($class, \@body, $opts_ref);
         last if $_BREAK || defined $_EXIT_CODE;
@@ -1564,7 +3182,7 @@ sub _parse_while {
                 $in_file = $file if $fd == 0;
             }
             if (defined $in_file && $in_file ne '') {
-                if (open(_WH_REDIR_SRC, "< $in_file")) {
+                if (sysopen(_WH_REDIR_SRC, $in_file, O_RDONLY)) {
                     if (open(_WH_REDIR_SAVIN, '<&STDIN')) {
                         if (open(STDIN, '<&_WH_REDIR_SRC')) { $saved_in = 1 }
                     }
@@ -1581,7 +3199,9 @@ sub _parse_while {
     my $max_iter = 100_000;   # safety guard
     while ($max_iter-- > 0) {
         last if defined $_EXIT_CODE;
+        $_ERREXIT_HOLD++;
         my $cond_status = _run_lines($class, [$cond_str], $opts_ref);
+        $_ERREXIT_HOLD--;
         my $cond_true = ($cond_status == 0);
         last if $is_until  && $cond_true;
         last if !$is_until && !$cond_true;
@@ -1691,6 +3311,187 @@ sub _parse_case {
     return ($status, $i);
 }
 
+# ----------------------------------------------------------------
+# ( commands )  --  subshell command group with isolated scope (v0.07)
+#
+# There is no real fork here (this interpreter never forks -- see the
+# pipeline / background-job / exec notes elsewhere in this file), so
+# isolation is approximated by snapshotting every piece of state a real
+# subshell would not leak changes from -- variables, indexed/associative
+# arrays, function definitions, aliases, and the working directory --
+# running the body, and restoring all of it afterward regardless of how
+# the body finished.  "exit" inside the group ends only the group (its
+# status becomes the group's status); break/continue/return still
+# propagate to an enclosing loop/function exactly as bash's ( ... ) does
+# NOT contain them.
+#
+# Both the single-line form "( cmd1; cmd2 )" and the multi-line form
+# (bare "(" ending the first line, matching bare ")" ending the last)
+# are recognised.  A trailing ">" / ">>" / "<" redirection after the
+# closing ")" is honoured; other trailing redirections (2>, 2>&1, ...)
+# and a trailing "&" are not -- documented as known limitations.
+# ----------------------------------------------------------------
+sub _parse_subshell {
+    my ($class, $lines_ref, $start, $opts_ref) = @_;
+    my @lines = @{$lines_ref};
+    my $i = $start;
+
+    my $first_line = $lines[$i]; $i++;
+    $first_line =~ s/\r?\n\z//;
+    my $stripped = $first_line;
+    $stripped =~ s/\A\s+//;
+
+    my @body_lines;
+    my $trailer = '';
+    my $found_close = 0;
+
+    # Try the single-line form first: a quote-aware paren-depth scan for
+    # the ')' that matches this line's opening '('.
+    {
+        my @c = split //, $stripped;
+        my $n = scalar @c;
+        my $in_sq = 0;
+        my $in_dq = 0;
+        my $d = 0;
+        my $close_pos;
+        for (my $k = 0; $k < $n; $k++) {
+            my $ch = $c[$k];
+            if ($in_sq) { $in_sq = 0 if $ch eq "'"; next }
+            if ($ch eq "'" && !$in_dq) { $in_sq = 1; next }
+            if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; next }
+            next if $in_sq || $in_dq;
+            if    ($ch eq '(') { $d++ }
+            elsif ($ch eq ')') { $d--; if ($d == 0) { $close_pos = $k; last } }
+        }
+        if (defined $close_pos) {
+            push @body_lines, substr($stripped, 1, $close_pos - 1);
+            $trailer = substr($stripped, $close_pos + 1);
+            $found_close = 1;
+        }
+    }
+
+    if (!$found_close) {
+        # Multi-line form: accumulate lines, counting '(' / ')' globally
+        # per line (not quote-aware, matching the existing _parse_function
+        # brace-counter's level of rigor) until the depth returns to 0.
+        my $accum = substr($stripped, 1);
+        my $opens  = () = ($accum =~ /\(/g);
+        my $closes = () = ($accum =~ /\)/g);
+        my $depth = 1 + $opens - $closes;
+        push @body_lines, $accum if $accum =~ /\S/;
+        if ($depth <= 0) {
+            $found_close = 1;
+            if (@body_lines && $body_lines[-1] =~ /\A(.*)\)([^)]*)\z/s) {
+                $body_lines[-1] = $1;
+                $trailer = $2;
+            }
+        }
+        else {
+            while ($i <= $#lines) {
+                my $l = $lines[$i]; $i++;
+                $l =~ s/\r?\n\z//;
+                my $o = () = ($l =~ /\(/g);
+                my $c2 = () = ($l =~ /\)/g);
+                $depth += $o - $c2;
+                if ($depth <= 0) {
+                    if ($l =~ /\A(.*)\)([^)]*)\z/s) {
+                        push @body_lines, $1 if $1 =~ /\S/;
+                        $trailer = $2;
+                    }
+                    $found_close = 1;
+                    last;
+                }
+                push @body_lines, $l;
+            }
+        }
+    }
+
+    my @body;
+    for my $bl (@body_lines) {
+        for my $part (split /;/, $bl) {
+            push @body, $part if $part =~ /\S/;
+        }
+    }
+
+    # Trailing "> file" / ">> file" / "< file" on the closing ')' line.
+    $trailer =~ s/\A\s+//; $trailer =~ s/\s+\z//;
+    my ($subsh_out_file, $subsh_out_append, $subsh_in_file);
+    if ($trailer ne '') {
+        my $texp = _expand($class, $trailer);
+        # Reuse the main redirection parser so a quoted target ("a b",
+        # ">name", "cmd|") is read and dequoted exactly as elsewhere.
+        my (undef, $tr_redirs) = _sh_strip_redirects($texp);
+        for my $r (@{$tr_redirs}) {
+            my ($fd, $app, $file) = @{$r};
+            next if $file =~ /\A&[12]\z/;   # dup forms handled in body
+            if    ($fd == 0) { $subsh_in_file  = $file }
+            elsif ($fd == 1) { $subsh_out_file = $file; $subsh_out_append = $app }
+        }
+    }
+
+    my $saved_out = 0;
+    my $saved_in  = 0;
+    my $redir_failed = 0;
+    if (defined $subsh_out_file) {
+        if (sysopen(_SH_SUBSH_DST, BATsh::MB::dec($subsh_out_file),
+                    O_WRONLY | O_CREAT | ($subsh_out_append ? O_APPEND : O_TRUNC),
+                    0666)) {
+            if (open(_SH_SUBSH_SAVOUT, '>&STDOUT')) {
+                if (open(STDOUT, '>&_SH_SUBSH_DST')) { $saved_out = 1 }
+            }
+            close(_SH_SUBSH_DST);
+        }
+        else { warn "sh: $subsh_out_file: $!\n"; $redir_failed = 1 }
+    }
+    if (defined $subsh_in_file) {
+        if (sysopen(_SH_SUBSH_SRC, BATsh::MB::dec($subsh_in_file), O_RDONLY)) {
+            if (open(_SH_SUBSH_SAVIN, '<&STDIN')) {
+                if (open(STDIN, '<&_SH_SUBSH_SRC')) { $saved_in = 1 }
+            }
+            close(_SH_SUBSH_SRC);
+        }
+        else { warn "sh: $subsh_in_file: $!\n"; $redir_failed = 1 }
+    }
+
+    # A failed redirection aborts the group without running its body -- as
+    # the shell does for "( cat ) < missing": it reports the error and does
+    # NOT fall through to read the terminal (which would hang).  Restore any
+    # handle already swapped, then return failure.
+    if ($redir_failed) {
+        if ($saved_out) { open(STDOUT, '>&_SH_SUBSH_SAVOUT'); close(_SH_SUBSH_SAVOUT) }
+        if ($saved_in)  { open(STDIN,  '<&_SH_SUBSH_SAVIN');  close(_SH_SUBSH_SAVIN)  }
+        $LAST_STATUS = 1;
+        return (1, $i);
+    }
+
+    # Snapshot everything the subshell must not leak changes to.
+    my $env_snap    = BATsh::Env->snapshot();
+    my %arr_snap    = %_SH_ARRAY;
+    my %arrty_snap  = %_SH_ARRAY_TYPE;
+    my %fn_snap     = %_SH_FUNCTIONS;
+    my %alias_snap  = %_SH_ALIAS;
+    my $cwd_snap    = defined(&Cwd::cwd) ? Cwd::cwd() : undef;
+
+    $_BREAK = 0; $_CONTINUE = 0;
+    my $status = _run_lines($class, \@body, $opts_ref);
+    my $subshell_exit = $_EXIT_CODE;   # "exit" inside ( ... ) ends only the group
+    $_EXIT_CODE = undef;
+    $status = $subshell_exit if defined $subshell_exit;
+
+    BATsh::Env->restore($env_snap);
+    %_SH_ARRAY      = %arr_snap;
+    %_SH_ARRAY_TYPE = %arrty_snap;
+    %_SH_FUNCTIONS  = %fn_snap;
+    %_SH_ALIAS      = %alias_snap;
+    chdir($cwd_snap) if defined $cwd_snap && $cwd_snap ne '';
+
+    if ($saved_out) { open(STDOUT, '>&_SH_SUBSH_SAVOUT'); close(_SH_SUBSH_SAVOUT) }
+    if ($saved_in)  { open(STDIN,  '<&_SH_SUBSH_SAVIN');  close(_SH_SUBSH_SAVIN)  }
+
+    $LAST_STATUS = $status;
+    return ($status, $i);
+}
+
 # Locate a clause-boundary "esac" at the top level of $s (outside quotes).
 # Returns its character offset, or -1.  An esac is only at a clause boundary
 # when the preceding non-blank character is a ';', '&', or newline, or it is
@@ -1761,7 +3562,7 @@ sub _case_parse_clause {
     $s =~ s/\A\(//;   # optional leading (
     my @c = split //, $s;
     my $n = scalar @c;
-    my $i = 0; my $sq = 0; my $dq = 0; my $cls = 0;
+    my $i = 0; my $sq = 0; my $dq = 0; my $cls = 0; my $paren = 0;
     my $found = -1;
     while ($i < $n) {
         my $ch = $c[$i];
@@ -1771,7 +3572,15 @@ sub _case_parse_clause {
         if (!$sq && !$dq) {
             if    ($ch eq '[') { $cls = 1 }
             elsif ($ch eq ']') { $cls = 0 }
-            elsif ($ch eq ')' && !$cls) { $found = $i; last }
+            # An extglob group (?(...)/*(.../@(.../!(...)) contributes a
+            # balanced '(' ... ')' pair inside the pattern text; only a
+            # ')' at $paren == 0 is the clause terminator.  Tracked
+            # unconditionally, harmless when there is no '(' present.
+            elsif ($ch eq '(' && !$cls) { $paren++ }
+            elsif ($ch eq ')' && !$cls) {
+                if ($paren > 0) { $paren-- }
+                else             { $found = $i; last }
+            }
         }
         $i++;
     }
@@ -1788,7 +3597,7 @@ sub _case_split_patterns {
     my $cur = '';
     my @c   = split //, $s;
     my $n   = scalar @c;
-    my $i = 0; my $sq = 0; my $dq = 0; my $cls = 0;
+    my $i = 0; my $sq = 0; my $dq = 0; my $cls = 0; my $paren = 0;
     while ($i < $n) {
         my $ch = $c[$i];
         if ($sq) { $cur .= $ch; $sq = 0 if $ch eq "'"; $i++; next }
@@ -1797,7 +3606,14 @@ sub _case_split_patterns {
         if (!$sq && !$dq) {
             if    ($ch eq '[') { $cls = 1 }
             elsif ($ch eq ']') { $cls = 0 }
-            elsif ($ch eq '|' && !$cls) { push @out, $cur; $cur = ''; $i++; next }
+            # Parenthesis depth: keeps an extglob group's internal '|'
+            # (e.g. @(abc|def)) from being mistaken for a pattern
+            # separator.  Tracked unconditionally -- harmless when
+            # extglob is off, since ordinary patterns rarely contain a
+            # literal unescaped '('.
+            elsif ($ch eq '(' && !$cls) { $paren++ }
+            elsif ($ch eq ')' && !$cls && $paren > 0) { $paren-- }
+            elsif ($ch eq '|' && !$cls && !$paren) { push @out, $cur; $cur = ''; $i++; next }
         }
         $cur .= $ch; $i++;
     }
@@ -1824,6 +3640,10 @@ sub _case_glob_to_re {
     my $i = 0;
     while ($i < $n) {
         my $ch = $c[$i];
+        if ($_OPT_EXTGLOB && $ch =~ /[?*+\@!]/ && $i+1 < $n && $c[$i+1] eq '(') {
+            my @eg = _extglob_scan(\@c, $i, \&_case_glob_to_re);
+            if (@eg) { $re .= $eg[1]; $i = $eg[0]; next }
+        }
         if ($ch eq "'") {                       # literal single-quoted run
             $i++;
             while ($i < $n && $c[$i] ne "'") { $re .= quotemeta($c[$i]); $i++ }
@@ -1872,6 +3692,77 @@ sub _case_glob_to_re {
 }
 
 # ----------------------------------------------------------------
+# extglob (v0.07): ?(list) *(list) +(list) @(list) !(list) pattern-list
+# operators, active only while "shopt -s extglob" is on.  Shared by
+# _case_glob_to_re() (case patterns) and _glob_to_re() (${VAR%pat} and
+# friends).  $convert_sub converts one pattern-list alternative (which
+# may itself contain nested extglob groups) to a regex fragment.
+#
+# Returns ($pos_after_close_paren, $regex_fragment), or () when the
+# text at $i is not a well-formed extglob group (extglob is then left
+# to fall through to its ordinary, literal meaning for that character).
+#
+# !(list) is approximated as "any run of characters that never forms a
+# complete match of one of the alternatives" via a negative lookahead
+# repeated per character; this matches the common "exclude these whole
+# patterns" usage (e.g. !(*.jpg|*.png)) but, unlike real extglob, is not
+# exact when !(...) is combined with more pattern after it in the same
+# glob -- documented as a known limitation.
+# ----------------------------------------------------------------
+sub _extglob_scan {
+    my ($chars_ref, $i, $convert_sub) = @_;
+    my @c = @{$chars_ref};
+    my $n = scalar @c;
+    return () unless $i+1 < $n && $c[$i+1] eq '(';
+    my $op    = $c[$i];
+    my $depth = 1;
+    my $j     = $i + 2;
+    my $body  = '';
+    while ($j < $n && $depth > 0) {
+        my $cc = $c[$j];
+        if    ($cc eq '(') { $depth++; $body .= $cc; $j++ }
+        elsif ($cc eq ')') { $depth--; $j++; $body .= $cc if $depth > 0 }
+        elsif ($cc eq '\\' && $j+1 < $n) { $body .= $cc . $c[$j+1]; $j += 2 }
+        else                { $body .= $cc; $j++ }
+    }
+    return () if $depth != 0;
+
+    my @alts    = _extglob_split_alts($body);
+    my @re_alts = map { $convert_sub->($_) } @alts;
+    my $inner   = '(?:' . join('|', @re_alts) . ')';
+    my $frag;
+    if    ($op eq '?') { $frag = $inner . '?' }
+    elsif ($op eq '*') { $frag = $inner . '*' }
+    elsif ($op eq '+') { $frag = $inner . '+' }
+    elsif ($op eq '@') { $frag = $inner }
+    elsif ($op eq '!') { $frag = '(?:(?!' . $inner . ').)*' }
+    else                { return () }
+    return ($j, $frag);
+}
+
+# _extglob_split_alts: split an extglob pattern-list body on top-level
+# '|' (respecting nested parens and backslash escapes).
+sub _extglob_split_alts {
+    my ($body) = @_;
+    my @out;
+    my $cur   = '';
+    my @c     = split //, $body;
+    my $n     = scalar @c;
+    my $i     = 0;
+    my $depth = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($ch eq '\\' && $i+1 < $n) { $cur .= $ch . $c[$i+1]; $i += 2; next }
+        if ($ch eq '(') { $depth++; $cur .= $ch; $i++; next }
+        if ($ch eq ')') { $depth--; $cur .= $ch; $i++; next }
+        if ($ch eq '|' && $depth == 0) { push @out, $cur; $cur = ''; $i++; next }
+        $cur .= $ch; $i++;
+    }
+    push @out, $cur;
+    return @out;
+}
+
+# ----------------------------------------------------------------
 # External command
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
@@ -1898,6 +3789,84 @@ sub _case_glob_to_re {
 # Returns ($clean_cmd, \@redirs) where each redir is [fd, append, file].
 # Parsing respects single-quotes, double-quotes, and backslash escapes.
 # ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# _sh_strip_herestring: detect an unquoted "<<< word" (here-string) on
+# an already variable-expanded line.  Returns ($line_without_it,
+# $dequoted_word) when found, or ($line, undef) otherwise.  Only the
+# first occurrence on the line is honoured (one here-string per
+# command, matching the existing single-here-document limitation).
+# ----------------------------------------------------------------
+sub _sh_strip_herestring {
+    my ($line) = @_;
+    my @c = split //, $line;
+    my $n = scalar @c;
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my $i = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($in_sq) { $in_sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $i++; next }
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $i++; next }
+        if (!$in_sq && !$in_dq && $ch eq '\\') { $i += 2; next }
+        if (!$in_sq && !$in_dq && $ch eq '<' && $i+2 < $n
+                && $c[$i+1] eq '<' && $c[$i+2] eq '<'
+                && !($i+3 < $n && $c[$i+3] eq '<')) {
+            my $before = join('', @c[0 .. $i-1]);
+            my $j = $i + 3;
+            $j++ while $j < $n && ($c[$j] eq ' ' || $c[$j] eq "\t");
+            my $wsq = 0;
+            my $wdq = 0;
+            my $word = '';
+            while ($j < $n) {
+                my $cc = $c[$j];
+                if ($wsq) { $word .= $cc; $wsq = 0 if $cc eq "'"; $j++; next }
+                if ($cc eq "'" && !$wdq) { $wsq = 1; $word .= $cc; $j++; next }
+                if ($cc eq '"' && !$wsq) { $wdq = !$wdq; $word .= $cc; $j++; next }
+                last if !$wsq && !$wdq && $cc =~ /\s/;
+                $word .= $cc; $j++;
+            }
+            my $after = join('', @c[$j .. $n-1]);
+            return ($before . $after, _arr_dequote($word));
+        }
+        $i++;
+    }
+    return ($line, undef);
+}
+
+# _read_redir_word: read a redirection target starting at index $start,
+# honouring '...' and "..." quoting and backslash escapes so that a
+# quoted space stays part of the single filename.  Stops at the first
+# UNQUOTED whitespace or '<'/'>'.  Returns ($raw, $next_index); $raw
+# still carries its quote characters -- pass it through _arr_dequote()
+# before use.  Perl 5.005_03 compatible (index-based scan, no regex on
+# the whole word, no prototypes).
+sub _read_redir_word {
+    my ($chars, $start, $n) = @_;
+    my $raw = '';
+    my $j   = $start;
+    my $sq  = 0;
+    my $dq  = 0;
+    while ($j < $n) {
+        my $c = $chars->[$j];
+        if ($sq) {
+            $raw .= $c;
+            $sq = 0 if $c eq "'";
+            $j++; next;
+        }
+        if ($c eq "'" && !$dq) { $sq = 1; $raw .= $c; $j++; next }
+        if ($c eq '"' && !$sq) { $dq = !$dq; $raw .= $c; $j++; next }
+        if ($c eq "\\" && !$sq) {
+            $raw .= $c; $j++;
+            $raw .= $chars->[$j] if $j < $n;
+            $j++; next;
+        }
+        last if !$dq && $c =~ /[\s<>]/;
+        $raw .= $c; $j++;
+    }
+    return ($raw, $j);
+}
+
 sub _sh_strip_redirects {
     my ($line) = @_;
     my @chars  = split //, $line;
@@ -1968,10 +3937,9 @@ sub _sh_strip_redirects {
             # < file  (stdin)
             my $j = $i + 1;
             $j++ while $j < $n && $chars[$j] eq ' ';
-            my $file = '';
-            while ($j < $n && $chars[$j] !~ /[\s<>]/) { $file .= $chars[$j]; $j++ }
-            push @found, [0, 0, $file] if $file ne '';
-            $i = $j; next;
+            my ($raw, $nj) = _read_redir_word(\@chars, $j, $n);
+            push @found, [0, 0, _arr_dequote($raw)] if $raw ne '';
+            $i = $nj; next;
         }
         elsif ($ch eq '>') {
             $redir_fd = 1;
@@ -1984,12 +3952,11 @@ sub _sh_strip_redirects {
             # Skip spaces
             $i++;
             $i++ while $i < $n && $chars[$i] eq ' ';
-            my $file = '';
-            # Read filename (stop at space unless quoted)
-            while ($i < $n && $chars[$i] !~ /[\s<>]/) {
-                $file .= $chars[$i]; $i++;
-            }
-            push @found, [$redir_fd, $append, $file] if $file ne '';
+            # Read filename, honouring quotes (so a quoted space stays in
+            # the name), then strip the quotes.
+            my ($raw, $nj) = _read_redir_word(\@chars, $i, $n);
+            push @found, [$redir_fd, $append, _arr_dequote($raw)] if $raw ne '';
+            $i = $nj;
             next;
         }
 
@@ -2015,6 +3982,7 @@ sub _sh_exec_with_redirs {
 
     for my $r (@{$redirs_ref}) {
         my ($fd, $append, $file) = @{$r};
+        $file = BATsh::MB::dec($file) unless $file =~ /\A&[12]\z/;
         if    ($fd == 0) { $in_file  = $file; }
         elsif ($fd == 1) {
             if ($file eq '&2') { $out_to_stderr = 1 }
@@ -2031,7 +3999,7 @@ sub _sh_exec_with_redirs {
 
     # --- stdin ---
     if (defined $in_file && $ok) {
-        open(_SH_REDIR_SRC, $in_file)
+        sysopen(_SH_REDIR_SRC, $in_file, O_RDONLY)
             or do { warn "sh: $in_file: $!\n"; $ok = 0 };
         if ($ok) {
             open(_SH_REDIR_SAVIN, '<&STDIN')  or do { $ok = 0 };
@@ -2045,8 +4013,8 @@ sub _sh_exec_with_redirs {
 
     # --- stdout ---
     if (defined $out_file && $ok) {
-        my $mode = $out_app ? '>>' : '>';
-        open(_SH_REDIR_DST, "$mode$out_file")
+        sysopen(_SH_REDIR_DST, $out_file,
+                O_WRONLY | O_CREAT | ($out_app ? O_APPEND : O_TRUNC), 0666)
             or do { warn "sh: $out_file: $!\n"; $ok = 0 };
         if ($ok) {
             open(_SH_REDIR_SAVOUT, '>&STDOUT') or do { $ok = 0 };
@@ -2067,8 +4035,8 @@ sub _sh_exec_with_redirs {
 
     # --- stderr ---
     if (defined $err_file && $ok) {
-        my $mode = $err_app ? '>>' : '>';
-        open(_SH_REDIR_DST, "$mode$err_file")
+        sysopen(_SH_REDIR_DST, $err_file,
+                O_WRONLY | O_CREAT | ($err_app ? O_APPEND : O_TRUNC), 0666)
             or do { warn "sh: $err_file: $!\n"; $ok = 0 };
         if ($ok) {
             open(_SH_REDIR_SAVERR, '>&STDERR') or do { $ok = 0 };
@@ -2102,13 +4070,247 @@ sub _sh_exec_with_redirs {
 }
 
 # ----------------------------------------------------------------
+# _split_top_semi: split a physical line on TOP-LEVEL ';' only, keeping
+# single/double quotes, backticks, $(...) / ${...} / <(...) / >(...)
+# and plain (...) groups opaque.  Returns the ';'-separated segments
+# (the ';' itself is not included).  Used by the inline-control
+# expander (_inline_expand) and by _inline_has_terminator.  Pure Perl
+# 5.005_03 (hand-rolled char scan; no regex features).
+# ----------------------------------------------------------------
+sub _split_top_semi {
+    my ($line) = @_;
+    my @segs;
+    my $cur   = '';
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my $in_bt = 0;     # backtick `...`
+    my $pdep  = 0;     # ( ) depth  (covers $(  <(  >(  and plain ( )
+    my $bdep  = 0;     # ${ } depth
+    my @c     = split //, $line;
+    my $n     = scalar @c;
+    my $i     = 0;
+
+    while ($i < $n) {
+        my $ch = $c[$i];
+
+        if ($in_sq) {
+            $cur .= $ch; $in_sq = 0 if $ch eq "'"; $i++; next;
+        }
+        if ($ch eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $cur .= $ch; $i++; next }
+        if ($ch eq '"' && !$in_bt) { $in_dq = !$in_dq; $cur .= $ch; $i++; next }
+
+        # Backslash escape: copy the next char verbatim
+        if ($ch eq '\\') {
+            $cur .= $ch; $i++;
+            $cur .= $c[$i] if $i < $n; $i++; next;
+        }
+
+        if ($ch eq '`') { $in_bt = !$in_bt; $cur .= $ch; $i++; next }
+
+        if (!$in_dq) {
+            if ($ch eq '$' && $i+1 < $n && $c[$i+1] eq '{') {
+                $bdep++; $cur .= '${'; $i += 2; next;
+            }
+            if ($bdep > 0 && $ch eq '}') { $bdep--; $cur .= $ch; $i++; next }
+            if ($ch eq '(') { $pdep++; $cur .= $ch; $i++; next }
+            if ($ch eq ')' && $pdep > 0) { $pdep--; $cur .= $ch; $i++; next }
+        }
+
+        if (!$in_dq && !$in_bt && $pdep == 0 && $bdep == 0 && $ch eq ';') {
+            push @segs, $cur; $cur = ''; $i++;
+            # collapse a following ';' (e.g. ";;") into the same split so
+            # empty segments are not produced for the common cases
+            next;
+        }
+
+        $cur .= $ch; $i++;
+    }
+    push @segs, $cur;
+    return @segs;
+}
+
+# _inline_has_terminator: does the SINGLE physical line hold, as a
+# top-level ';'-delimited segment, a bare terminator word ($term, e.g.
+# 'fi' / 'done' / 'esac')?  Used to detect a fully-inline control
+# structure written on one physical line.
+sub _inline_has_terminator {
+    my ($line, $term) = @_;
+    return 0 unless defined $line;
+    for my $seg (_split_top_semi($line)) {
+        my $s = $seg;
+        $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+        return 1 if lc($s) eq lc($term);
+    }
+    return 0;
+}
+
+# _inline_expand: turn a fully-inline control-structure physical line
+# into the list of "logical lines" the multi-line block parsers expect.
+# It splits on top-level ';' and then peels a leading 'then'/'do'/'else'
+# keyword off its segment onto its own logical line (so "then echo a"
+# becomes "then" + "echo a"), which is exactly the shape _parse_if /
+# _parse_for / _parse_while consume line-by-line.
+sub _inline_expand {
+    my ($line) = @_;
+    my @out;
+    for my $seg (_split_top_semi($line)) {
+        my $s = $seg;
+        $s =~ s/\A\s+//; $s =~ s/\s+\z//;
+        next if $s eq '';
+        if ($s =~ /\A(then|do|else)\b\s*(.*)\z/is) {
+            my ($kw, $tail) = (lc($1), $2);
+            push @out, $kw;
+            push @out, $tail if defined $tail && $tail =~ /\S/;
+        }
+        else {
+            push @out, $s;
+        }
+    }
+    return @out;
+}
+
+# _strip_sh_comment: remove a trailing "# ..." comment from one SH
+# physical line.  A '#' introduces a comment only when it is unquoted,
+# outside any $(...)/${...}/`...` region, and begins a word (preceded by
+# the start of line or by whitespace / ; / & / | / '(' ).  This leaves
+# parameter forms such as $#, ${#var}, ${var#pat} and an in-word '#'
+# (echo a#b, http://h#frag) untouched, matching POSIX shells.  Pure Perl
+# 5.005_03 (hand-rolled scan; no regex features).
+sub _strip_sh_comment {
+    my ($line) = @_;
+    return $line unless defined $line && index($line, '#') >= 0;
+    my @c     = split //, $line;
+    my $n     = scalar @c;
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my $in_bt = 0;
+    my $pdep  = 0;
+    my $bdep  = 0;
+    my $prev  = '';    # previous scanned char (for word-boundary test)
+    my $i     = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($in_sq) { $in_sq = 0 if $ch eq "'"; $prev = $ch; $i++; next }
+        if ($ch eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $prev = $ch; $i++; next }
+        if ($ch eq '"' && !$in_bt) { $in_dq = !$in_dq; $prev = $ch; $i++; next }
+        if ($ch eq '\\') { $prev = 'x'; $i += 2; next }
+        if ($ch eq '`') { $in_bt = !$in_bt; $prev = $ch; $i++; next }
+        if (!$in_dq && !$in_bt) {
+            if ($ch eq '$' && $i+1 < $n && $c[$i+1] eq '{') { $bdep++; $prev = '{'; $i += 2; next }
+            if ($bdep > 0 && $ch eq '}') { $bdep--; $prev = $ch; $i++; next }
+            if ($ch eq '(') { $pdep++; $prev = $ch; $i++; next }
+            if ($ch eq ')' && $pdep > 0) { $pdep--; $prev = $ch; $i++; next }
+        }
+        if ($ch eq '#' && !$in_sq && !$in_dq && !$in_bt && $pdep == 0 && $bdep == 0) {
+            if ($prev eq '' || $prev =~ /\s/
+                || $prev eq ';' || $prev eq '&' || $prev eq '|' || $prev eq '(') {
+                my $out = ($i > 0) ? join('', @c[0 .. $i-1]) : '';
+                $out =~ s/\s+\z//;
+                return $out;
+            }
+        }
+        $prev = $ch; $i++;
+    }
+    return $line;
+}
+
+# _if_depth_delta: net change in if/fi nesting contributed by one
+# physical line, counting only command-position 'if' openers (+1) and
+# 'fi' closers (-1).  A fully-inline "if ...; then ...; fi" nets to 0.
+# Used by _parse_if's body collector so a nested if is not closed by the
+# outer 'fi'.  Other block types (for/while/case) use different
+# terminators (done/esac) and so never affect the if/fi balance.
+sub _if_depth_delta {
+    my ($line) = @_;
+    my $d = 0;
+    for my $seg (_split_top_semi($line)) {
+        my $s = $seg;
+        $s =~ s/\A\s+//;
+        $s =~ s/\A(?:then|do|else)\b\s*//i;   # peel a leading block keyword
+        my ($w) = ($s =~ /\A(\S+)/);
+        $w = defined($w) ? lc($w) : '';
+        $d++ if $w eq 'if';
+        $d-- if $w eq 'fi';
+    }
+    return $d;
+}
+
+# _find_control_split: when a physical line does NOT begin with a
+# control-structure keyword but a control opener (if/for/while/until/
+# case/select) appears later in COMMAND position immediately after a
+# top-level ';' separator (e.g.  x=""; if [ -z "$x" ]; then ...; fi),
+# return the byte offset at which that opener begins so the caller can
+# run the prefix and then re-dispatch the control structure through the
+# normal block parser.  Only a ';' separator is honoured (sequential,
+# so splitting is semantically safe); a control opener after && / || is
+# left alone.  Returns undef when there is nothing to split.
+sub _find_control_split {
+    my ($line) = @_;
+    return undef unless defined $line;
+    my @c     = split //, $line;
+    my $n     = scalar @c;
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my $in_bt = 0;
+    my $pdep  = 0;
+    my $bdep  = 0;
+    my $i     = 0;
+    my $cmd_pos = 1;     # are we at the start of a command word?
+
+    while ($i < $n) {
+        my $ch = $c[$i];
+
+        if ($in_sq) { $in_sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $cmd_pos = 0; $i++; next }
+        if ($ch eq '"' && !$in_bt) { $in_dq = !$in_dq; $cmd_pos = 0; $i++; next }
+        if ($ch eq '\\') { $i += 2; $cmd_pos = 0; next }
+        if ($ch eq '`') { $in_bt = !$in_bt; $cmd_pos = 0; $i++; next }
+
+        if (!$in_dq && !$in_bt) {
+            if ($ch eq '$' && $i+1 < $n && $c[$i+1] eq '{') { $bdep++; $i += 2; $cmd_pos = 0; next }
+            if ($bdep > 0 && $ch eq '}') { $bdep--; $i++; next }
+            if ($ch eq '(') { $pdep++; $i++; $cmd_pos = 1; next }
+            if ($ch eq ')' && $pdep > 0) { $pdep--; $i++; next }
+        }
+
+        if (!$in_dq && !$in_bt && $pdep == 0 && $bdep == 0) {
+            if ($ch eq ';') { $cmd_pos = 1; $i++; next }
+            if ($ch eq '&' && $i+1 < $n && $c[$i+1] eq '&') { $cmd_pos = 0; $i += 2; next }
+            if ($ch eq '|' && $i+1 < $n && $c[$i+1] eq '|') { $cmd_pos = 0; $i += 2; next }
+            if ($ch eq '|' || $ch eq '&') { $cmd_pos = 0; $i++; next }
+            if ($ch =~ /\s/) { $i++; next }   # whitespace keeps command position
+
+            # A non-space, non-separator byte: if we are at command
+            # position and NOT at the very start (offset 0), test for a
+            # control opener keyword here.
+            if ($cmd_pos && $i > 0) {
+                my $tail = join('', @c[$i .. $n-1]);
+                if ($tail =~ /\A(if|for|while|until|case|select)\b/i) {
+                    return $i;
+                }
+            }
+            $cmd_pos = 0; $i++; next;
+        }
+
+        $i++;
+    }
+    return undef;
+}
+
+# ----------------------------------------------------------------
 sub _split_sh_compound {
     my ($line) = @_;
     my @parts;
     my $cur   = '';
     my $in_sq = 0;
     my $in_dq = 0;
-    my $depth = 0;   # $( nesting
+    my $depth = 0;   # $( / <( / >( nesting
+    my $ctl   = 0;   # control-structure nesting: if/for/while/until/case/
+                     # select ... fi/done/esac.  While >0, a ';' / && / ||
+                     # belongs to the compound command and is NOT a
+                     # top-level separator (so  cmd | while x; do y; done
+                     # and  a && for i in ..; do ..; done  stay intact).
+    my $cmdpos = 1;  # true when the next word is in command position
     my @chars = split //, $line;
     my $n     = scalar @chars;
     my $i     = 0;
@@ -2121,10 +4323,10 @@ sub _split_sh_compound {
             if ($ch eq "'") { $in_sq = 0 }
             $cur .= $ch; $i++; next;
         }
-        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $cur .= $ch; $i++; next }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $cur .= $ch; $i++; $cmdpos = 0; next }
 
         # Double-quote toggle
-        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $cur .= $ch; $i++; next }
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $cur .= $ch; $i++; $cmdpos = 0; next }
 
         # $( nesting inside double-quotes
         if ($in_dq) {
@@ -2135,43 +4337,96 @@ sub _split_sh_compound {
 
         # Track $( nesting outside quotes
         if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
-            $depth++; $cur .= $ch; $i++; next;
-        }
-        if ($ch eq ')' && $depth > 0) {
-            $depth--; $cur .= $ch; $i++; next;
+            $depth++; $cur .= $ch; $i++; $cmdpos = 0; next;
         }
 
-        # Inside $(...) don't split on operators
+        # Track <( / >( process-substitution nesting outside quotes
+        if (($ch eq '<' || $ch eq '>') && $i+1 < $n && $chars[$i+1] eq '(') {
+            $depth++; $cur .= $ch; $i++; $cmdpos = 0; next;
+        }
+        if ($ch eq ')' && $depth > 0) {
+            $depth--; $cur .= $ch; $i++; $cmdpos = 0; next;
+        }
+
+        # Inside $(...) don't split on operators or track control words
         if ($depth > 0) { $cur .= $ch; $i++; next }
 
         # Backslash escape
         if ($ch eq '\\') {
             $cur .= $ch; $i++;
-            $cur .= $chars[$i] if $i < $n; $i++; next;
+            $cur .= $chars[$i] if $i < $n; $i++; $cmdpos = 0; next;
         }
 
         # && operator
         if ($ch eq '&' && $i+1 < $n && $chars[$i+1] eq '&') {
-            push @parts, { op => '', cmd => $cur };
-            push @parts, { op => '&&', cmd => '' };
-            $cur = ''; $i += 2; next;
+            if ($ctl == 0) {
+                push @parts, { op => '', cmd => $cur };
+                push @parts, { op => '&&', cmd => '' };
+                $cur = '';
+            }
+            else { $cur .= '&&' }
+            $i += 2; $cmdpos = 1; next;
         }
 
         # || operator
         if ($ch eq '|' && $i+1 < $n && $chars[$i+1] eq '|') {
-            push @parts, { op => '', cmd => $cur };
-            push @parts, { op => '||', cmd => '' };
-            $cur = ''; $i += 2; next;
+            if ($ctl == 0) {
+                push @parts, { op => '', cmd => $cur };
+                push @parts, { op => '||', cmd => '' };
+                $cur = '';
+            }
+            else { $cur .= '||' }
+            $i += 2; $cmdpos = 1; next;
         }
 
         # ; separator (not inside any quote or subst)
         if ($ch eq ';') {
-            push @parts, { op => '', cmd => $cur };
-            push @parts, { op => ';', cmd => '' };
-            $cur = ''; $i++; next;
+            if ($ctl == 0) {
+                push @parts, { op => '', cmd => $cur };
+                push @parts, { op => ';', cmd => '' };
+                $cur = '';
+            }
+            else { $cur .= ';' }
+            $i++; $cmdpos = 1; next;
         }
 
-        $cur .= $ch; $i++;
+        # Single | (pipe): not a compound separator here, but the word that
+        # follows it is in command position (so  x | while ...  is tracked).
+        if ($ch eq '|') { $cur .= $ch; $i++; $cmdpos = 1; next }
+
+        # '(' opens a group; the next word is in command position.
+        if ($ch eq '(') { $cur .= $ch; $i++; $cmdpos = 1; next }
+
+        # Whitespace: preserved; does not itself change command position.
+        if ($ch =~ /\s/) { $cur .= $ch; $i++; next }
+
+        # A word starting in command position may be a control keyword.
+        if ($cmdpos && $ch =~ /[A-Za-z]/) {
+            my $j = $i;
+            my $w = '';
+            while ($j < $n && $chars[$j] =~ /[A-Za-z]/) { $w .= $chars[$j]; $j++ }
+            my $after = ($j < $n) ? $chars[$j] : '';
+            # A full word only if the next char terminates it.
+            if ($after eq '' || $after =~ /[\s;&|)]/) {
+                my $lw = lc $w;
+                if (   $lw eq 'if'   || $lw eq 'for'  || $lw eq 'while'
+                    || $lw eq 'until'|| $lw eq 'case' || $lw eq 'select') {
+                    $ctl++;
+                }
+                elsif ($lw eq 'fi' || $lw eq 'done' || $lw eq 'esac') {
+                    $ctl-- if $ctl > 0;
+                }
+                $cur .= $w;
+                $i = $j;
+                # do/then/else/elif introduce a fresh command position.
+                $cmdpos = ($lw eq 'do' || $lw eq 'then'
+                           || $lw eq 'else' || $lw eq 'elif') ? 1 : 0;
+                next;
+            }
+        }
+
+        # Ordinary character (part of a word / argument).
+        $cur .= $ch; $i++; $cmdpos = 0;
     }
     push @parts, { op => '', cmd => $cur };
 
@@ -2190,28 +4445,58 @@ sub _exec_sh_compound {
     my $pending_op = '';
     my $rc = 0;
 
-    for my $part (@{$parts}) {
+    # set -e semantics for lists: a command is EXEMPT when a && or ||
+    # operator appears anywhere AFTER it in the list (bash: every command
+    # of a && / || list except the one following the final && or ||).
+    # Commands separated only by ; are ordinary statements and DO trigger.
+    # Adjudication happens here, per member, so _run_lines must not check
+    # the list's overall status again: signal that via $_ERREXIT_DONE.
+    my $ncmd = 0;
+    for my $part (@{$parts}) { $ncmd++ if $part->{op} eq '' }
+    $_ERREXIT_DONE = 1 if $ncmd > 1;
+
+    my $seen_cmds = 0;
+    for my $k (0 .. $#{$parts}) {
+        my $part = $parts->[$k];
         my $op  = $part->{op};
         my $cmd = $part->{cmd};
         $cmd =~ s/\A\s+//; $cmd =~ s/\s+\z//;
 
+        # A prior member executed exit / errexit / break / return: stop.
+        last if defined $_EXIT_CODE || $_BREAK || $_RETURN;
+
         if ($op eq '') {
+            $seen_cmds++;
+            # Exempt from set -e when a && or || follows later in the list
+            my $exempt = 0;
+            for my $j ($k + 1 .. $#{$parts}) {
+                my $later = $parts->[$j]{op};
+                if ($later eq '&&' || $later eq '||') { $exempt = 1; last }
+            }
+            my $ran = 0;
             # Execute according to pending operator
             if ($pending_op eq '') {
-                $rc = _exec_line($class, $cmd, $opts_ref) if $cmd =~ /\S/;
+                if ($cmd =~ /\S/) { $ran = 1 }
             }
             elsif ($pending_op eq '&&') {
-                if ($LAST_STATUS == 0 && $cmd =~ /\S/) {
-                    $rc = _exec_line($class, $cmd, $opts_ref);
-                }
+                if ($LAST_STATUS == 0 && $cmd =~ /\S/) { $ran = 1 }
             }
             elsif ($pending_op eq '||') {
-                if ($LAST_STATUS != 0 && $cmd =~ /\S/) {
-                    $rc = _exec_line($class, $cmd, $opts_ref);
-                }
+                if ($LAST_STATUS != 0 && $cmd =~ /\S/) { $ran = 1 }
             }
             elsif ($pending_op eq ';') {
-                $rc = _exec_line($class, $cmd, $opts_ref) if $cmd =~ /\S/;
+                if ($cmd =~ /\S/) { $ran = 1 }
+            }
+            if ($ran) {
+                if ($exempt) {
+                    $_ERREXIT_HOLD++;
+                    $rc = _exec_line($class, $cmd, $opts_ref);
+                    $_ERREXIT_HOLD--;
+                }
+                else {
+                    $rc = _exec_line($class, $cmd, $opts_ref);
+                    _errexit_check($rc);
+                }
             }
             $pending_op = '';
         }
@@ -2276,6 +4561,14 @@ sub _split_sh_pipe {
         if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
             $depth++; $cur .= '$('; $i += 2; next;
         }
+
+        # <( / >( process substitution (v0.07): same "consume both
+        # characters, bump depth exactly once" treatment as $( above, so
+        # a '|' inside its body is not mistaken for the outer pipeline's
+        # separator.
+        if (($ch eq '<' || $ch eq '>') && $i+1 < $n && $chars[$i+1] eq '(') {
+            $depth++; $cur .= $ch . '('; $i += 2; next;
+        }
         if ($ch eq '(' ) { $depth++ if $depth > 0; $cur .= $ch; $i++; next }
         if ($ch eq ')' ) {
             if ($depth > 0) { $depth-- }
@@ -2306,6 +4599,25 @@ sub _split_sh_pipe {
 }
 
 # ----------------------------------------------------------------
+# _seg_is_control: true when a pipeline segment is a compound/control
+# construct that must be run through _run_lines (the block dispatcher)
+# rather than _exec_line (which would try to exec "while"/"for"/... as an
+# external command).  Recognises the command-position control keywords and
+# a "( subshell )" group.  Enables the common  cmd | while read ... ; done
+# and  cmd | for x in ...; done  idioms.  Pure Perl 5.005_03.
+sub _seg_is_control {
+    my ($seg) = @_;
+    my $s = defined($seg) ? $seg : '';
+    $s =~ s/\A\s+//;
+    my ($w) = ($s =~ /\A(\S+)/);
+    return 0 unless defined $w;
+    $w = lc $w;
+    return 1 if $w eq 'while' || $w eq 'until' || $w eq 'for'
+             || $w eq 'if'    || $w eq 'case'  || $w eq 'select';
+    return 1 if $s =~ /\A\(/ && $s !~ /\A\(\(/;   # ( subshell ) group
+    return 0;
+}
+
 # _exec_sh_pipe: run a SH pipeline via temporary files.
 # Each segment's stdout feeds the next segment's stdin.
 # Perl 5.005_03 compatible: bareword FHs, 2-arg open.
@@ -2333,7 +4645,7 @@ sub _exec_sh_pipe {
         next unless $seg =~ /\S/;
 
         my $is_last  = ($idx == $n_segs - 1) ? 1 : 0;
-        my $output_f = $is_last ? undef : "${base}_${idx}.tmp";
+        my $output_f = undef;
 
         # --- redirect STDIN from previous segment's output ---
         my $saved_in = 0;
@@ -2354,15 +4666,15 @@ sub _exec_sh_pipe {
 
         # --- redirect STDOUT to next segment's input file ---
         my $saved_out = 0;
-        if (defined $output_f) {
-            open(_SH_PIPE_WFH, ">$output_f")
-                or do {
-                    if ($saved_in) {
-                        open(STDIN, '<&_SH_PIPE_SAVIN'); close(_SH_PIPE_SAVIN);
-                    }
-                    warn "SH pipe: open $output_f: $!\n";
-                    last;
-                };
+        unless ($is_last) {
+            $output_f = _shp_tempfile("${base}_${idx}");
+            if (!defined $output_f) {
+                if ($saved_in) {
+                    open(STDIN, '<&_SH_PIPE_SAVIN'); close(_SH_PIPE_SAVIN);
+                }
+                warn "SH pipe: cannot create stage temp file\n";
+                last;
+            }
             open(_SH_PIPE_SAVOUT, '>&STDOUT')
                 or do {
                     close(_SH_PIPE_WFH);
@@ -2385,6 +4697,9 @@ sub _exec_sh_pipe {
         }
 
         # --- execute the segment as a SH line ---
+        # (_exec_line_impl routes a control/compound segment such as
+        #  "while read ...; do ...; done" through the block runner, so the
+        #  common  cmd | while read ...  idiom works.)
         $rc = _exec_line($class, $seg, $opts_ref);
 
         # --- restore STDOUT ---
@@ -2398,13 +4713,40 @@ sub _exec_sh_pipe {
             open(STDIN, '<&_SH_PIPE_SAVIN');
             close(_SH_PIPE_SAVIN);
             unlink $input_f;
+            @_SHP_TMPFILES = grep { $_ ne $input_f } @_SHP_TMPFILES;
         }
 
         $input_f = $output_f;
     }
 
-    unlink $input_f if defined $input_f && -f $input_f;
+    if (defined $input_f && -f $input_f) {
+        unlink $input_f;
+        @_SHP_TMPFILES = grep { $_ ne $input_f } @_SHP_TMPFILES;
+    }
     return $rc;
+}
+
+# _shp_tempfile: create a unique, empty temp file for one pipeline stage's
+# stdout->stdin bridge, using sysopen(...O_CREAT|O_EXCL...) to avoid symlink
+# races (mirrors _bg_tempfile / _hd_tempfile / _subst_tempfile).  Opens the
+# package bareword filehandle _SH_PIPE_WFH and returns the final path, or
+# undef on failure.  $stub is the depth/index-tagged path prefix so stage
+# files stay distinguishable for debugging; a sequence number is appended
+# to make the final name unique and unpredictable.
+sub _shp_tempfile {
+    my ($stub) = @_;
+    my $attempt = 0;
+    while ($attempt < 1000) {
+        $_PIPE_SEQ++;
+        $attempt++;
+        my $path = $stub . '_' . $_PIPE_SEQ . '.tmp';
+        if (sysopen(_SH_PIPE_WFH, $path, O_WRONLY | O_CREAT | O_EXCL, 0600)) {
+            push @_SHP_TMPFILES, $path;
+            return $path;
+        }
+        # EEXIST or transient error: retry with next sequence number
+    }
+    return undef;
 }
 
 # ----------------------------------------------------------------
@@ -2423,8 +4765,59 @@ sub _glob_expand {
     my ($word) = @_;
     # Fast path: no metacharacters
     return ($word) unless $word =~ /[*?\[]/;
-    my @matches = glob($word);
+    my @matches = map { BATsh::MB::enc($_) } glob(BATsh::MB::dec($word));
     return @matches ? @matches : ($word);
+}
+
+# ----------------------------------------------------------------
+# _raw_has_glob: true when the RAW (pre-expansion) argument text contains
+# a genuine, eligible filename-glob metacharacter (*, ?, [) -- one that
+# was actually written in the script and would trigger pathname
+# expansion.  Used by the "echo" builtin to decide whether to run its
+# arguments through glob expansion, WITHOUT being fooled by:
+#   * a metacharacter inside single or double quotes (echo "*.txt" is
+#     literal in bash),
+#   * the '*' of the $* / "$*" special parameter or the '?' of $? (these
+#     are parameter references, not globs), or
+#   * a metacharacter inside a ${...} parameter expansion (${arr[*]},
+#     ${VAR?}), which is likewise not a glob.
+# The previous test -- a plain /[*?\[]/ match on the raw text -- fired on
+# all of these, so "echo \"  x: $*\"" was needlessly re-parsed and its
+# leading whitespace and internal spacing collapsed.
+# Perl 5.005_03 compatible: single character scan, no regex features.
+# ----------------------------------------------------------------
+sub _raw_has_glob {
+    my ($raw) = @_;
+    return 0 unless defined $raw && $raw =~ /\S/;
+    my @c    = split //, $raw;
+    my $n    = scalar @c;
+    my $in_sq = 0; my $in_dq = 0;
+    my $bdep  = 0;          # depth inside ${ ... }
+    my $i     = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($in_sq) { $in_sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $i++; next }
+        if ($ch eq '"') { $in_dq = !$in_dq; $i++; next }
+        if ($ch eq '\\') { $i += 2; next }          # backslash escape
+        # Parameter expansion: $* $? $@ ... and ${ ... }
+        if ($ch eq '$' && $i + 1 < $n) {
+            if ($c[$i+1] eq '{') { $bdep++; $i += 2; next }
+            # $ followed by a single special char (including * and ?) is a
+            # parameter reference, not a glob -- skip both characters.
+            $i += 2; next;
+        }
+        if ($bdep > 0) {
+            $bdep-- if $ch eq '}';
+            $i++; next;
+        }
+        # An unquoted, non-parameter glob metacharacter counts.
+        if (!$in_sq && !$in_dq && ($ch eq '*' || $ch eq '?' || $ch eq '[')) {
+            return 1;
+        }
+        $i++;
+    }
+    return 0;
 }
 
 # ----------------------------------------------------------------
@@ -2451,6 +4844,10 @@ sub _glob_to_re {
     my $i = 0;
     while ($i < $n) {
         my $c = $chars[$i];
+        if ($_OPT_EXTGLOB && $c =~ /[?*+\@!]/ && $i+1 < $n && $chars[$i+1] eq '(') {
+            my @eg = _extglob_scan(\@chars, $i, sub { _glob_to_re($_[0], $greedy) });
+            if (@eg) { $re .= $eg[1]; $i = $eg[0]; next }
+        }
         if ($c eq '*') {
             $re .= $greedy ? '.*' : '.*?';
         }
@@ -2510,6 +4907,62 @@ sub _sh_replace {
 # ----------------------------------------------------------------
 
 # ----------------------------------------------------------------
+# _inline_body_has_control: true when a single-line function body
+# (the text between the braces of "name() { ... }") contains a shell
+# control-structure keyword in command position -- if/for/while/until/
+# case/select as the first word, or after a ';', '&&', '||' or '|'.
+# Such a body must not be torn apart on ';' (that would split
+# "while C; do B; done" into unusable fragments); the caller keeps it
+# as one line so _run_lines()'s inline-control handling parses it.
+# Quotes, $(...), `...` and ${...} are skipped so a keyword appearing
+# only inside them (echo "done", VAR=$(case ...)) does not count.
+# Perl 5.005_03 compatible: character scan, no regex features beyond
+# \A and \b.
+# ----------------------------------------------------------------
+sub _inline_body_has_control {
+    my ($body) = @_;
+    return 0 unless defined $body && $body =~ /\S/;
+    my @c    = split //, $body;
+    my $n    = scalar @c;
+    my $in_sq = 0; my $in_dq = 0; my $in_bt = 0;
+    my $pdep = 0;  my $bdep = 0;
+    my $i    = 0;
+    my $cmd_pos = 1;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($in_sq) { $in_sq = 0 if $ch eq "'"; $i++; next }
+        if ($ch eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $cmd_pos = 0; $i++; next }
+        if ($ch eq '"' && !$in_bt) { $in_dq = !$in_dq; $cmd_pos = 0; $i++; next }
+        if ($ch eq '\\') { $i += 2; $cmd_pos = 0; next }
+        if ($ch eq '`') { $in_bt = !$in_bt; $cmd_pos = 0; $i++; next }
+        if (!$in_dq && !$in_bt) {
+            if ($ch eq '$' && $i+1 < $n && $c[$i+1] eq '{') { $bdep++; $i += 2; $cmd_pos = 0; next }
+            if ($bdep > 0 && $ch eq '}') { $bdep--; $i++; next }
+            if ($ch eq '$' && $i+1 < $n && $c[$i+1] eq '(') { $pdep++; $i += 2; $cmd_pos = 0; next }
+            if ($ch eq '(') { $pdep++; $i++; $cmd_pos = 1; next }
+            if ($ch eq ')' && $pdep > 0) { $pdep--; $i++; next }
+        }
+        if (!$in_dq && !$in_bt && $pdep == 0 && $bdep == 0) {
+            if ($ch eq ';') { $cmd_pos = 1; $i++; next }
+            if ($ch eq '&' && $i+1 < $n && $c[$i+1] eq '&') { $cmd_pos = 1; $i += 2; next }
+            if ($ch eq '|' && $i+1 < $n && $c[$i+1] eq '|') { $cmd_pos = 1; $i += 2; next }
+            if ($ch eq '|') { $cmd_pos = 1; $i++; next }
+            if ($ch eq '&') { $cmd_pos = 1; $i++; next }
+            if ($ch =~ /\s/) { $i++; next }
+            if ($cmd_pos) {
+                my $tail = join('', @c[$i .. $n-1]);
+                if ($tail =~ /\A(?:if|for|while|until|case|select)\b/i) {
+                    return 1;
+                }
+            }
+            $cmd_pos = 0; $i++; next;
+        }
+        $i++;
+    }
+    return 0;
+}
+
+# ----------------------------------------------------------------
 # _parse_function: parse "name() {" or "function name {" blocks
 # Returns ($status, $new_i).
 # ----------------------------------------------------------------
@@ -2540,10 +4993,33 @@ sub _parse_function {
     if ($depth >= 1 && $line =~ /\{(.*)\}\s*\z/s) {
         my $inline = $1;
         $inline =~ s/\A\s+//; $inline =~ s/\s+\z//;
-        # Split on ; to get individual commands
-        for my $part (split /;/, $inline) {
-            $part =~ s/\A\s+//; $part =~ s/\s+\z//;
-            push @body, $part if $part =~ /\S/;
+        # A trailing ';' just before the closing brace (name() { ...; })
+        # is an empty separator; drop it so an inline control structure's
+        # "; done"/"; fi"/"; esac" terminator sits at end-of-string where
+        # the block parsers expect it.
+        $inline =~ s/;\s*\z//;
+        $inline =~ s/\s+\z//;
+        # A naive split on ';' is correct for a body of simple commands
+        # (name() { cmd1; cmd2; }) but WRONG for an inline control
+        # structure: "while C; do B; done" would be torn into the four
+        # pieces "while C" / "do B" / ... / "done", and the reassembled
+        # multi-line form ("do" glued to a command on one line) is not a
+        # shape the block parsers accept, so the loop silently ran
+        # nothing.  When the inline body contains a control-structure
+        # keyword in command position, keep it as a SINGLE body line and
+        # let _run_lines() apply the same inline-control handling it uses
+        # for a control structure typed directly on one physical line
+        # (this also drives the "prefix; control" split via
+        # _find_control_split, so "cmd; while ...; do ...; done" works).
+        if (_inline_body_has_control($inline)) {
+            push @body, $inline if $inline =~ /\S/;
+        }
+        else {
+            # Split on ; to get individual commands
+            for my $part (split /;/, $inline) {
+                $part =~ s/\A\s+//; $part =~ s/\s+\z//;
+                push @body, $part if $part =~ /\S/;
+            }
         }
         $_SH_FUNCTIONS{$name} = [ @body ];
         return (0, $i);
@@ -2683,6 +5159,7 @@ sub _cmd_external {
     $rest = '' unless defined $rest;
     $rest =~ s/\A\s+//;
     my $full = $rest ne '' ? "$cmd $rest" : $cmd;
+    $full = BATsh::MB::dec($full);
     BATsh::Env->sync_to_env();
     my $rc = system($full);
     $LAST_STATUS = ($rc == 0) ? 0 : (($rc >> 8) || 1);
@@ -2822,7 +5299,14 @@ sub _bg_tempfile {
 #                temp file and read back into BATsh's own $!.
 # On a successful launch $? (LAST_STATUS) is 0; the exit code of the
 # background job itself is not awaited (sh semantics).
+# _bg_launch: un-guard the command line, then hand it to the platform-
+# specific spawner below (system(1,...) on Win32, "&" on POSIX).
 sub _bg_launch {
+    my ($class, $cmdline) = @_;
+    return _bg_launch_decoded($class, BATsh::MB::dec($cmdline));
+}
+
+sub _bg_launch_decoded {
     my ($class, $cmdline) = @_;
     $cmdline = '' unless defined $cmdline;
     return 0 if $cmdline =~ /\A\s*\z/;
@@ -2924,6 +5408,14 @@ sub _sh_assign_prefix {
         while ($j < $n) {
             my $c = $chars[$j];
             if ($in_sq) { $val .= $c; $in_sq = 0 if $c eq "'"; $j++; next }
+            # Backslash escape (outside single quotes): the backslash and
+            # the char it protects are both kept verbatim -- so "\ " does
+            # not end the value word.  _arr_dequote() resolves them later.
+            if ($c eq "\\" && !$in_sq) {
+                $val .= $c; $j++;
+                $val .= $chars[$j] if $j < $n;
+                $j++; next;
+            }
             if ($c eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $val .= $c; $j++; next }
             if ($c eq '"' && !$in_bt) { $in_dq = !$in_dq; $val .= $c; $j++; next }
             if (!$in_dq && $c eq '`') { $in_bt = !$in_bt; $val .= $c; $j++; next }
@@ -2988,6 +5480,7 @@ sub _hd_detect {
     my $n     = scalar @chars;
     my $in_sq = 0;
     my $in_dq = 0;
+    my $arith = 0;   # inside $(( ... )): << there is a shift, not a heredoc
     my $i     = 0;
 
     while ($i < $n) {
@@ -3001,9 +5494,24 @@ sub _hd_detect {
         if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $i++; next }
         if ($ch eq '\\') { $i += 2; next }
 
-        # Unquoted << (but not <<<, which is a here-string: not supported)
+        # Arithmetic expansion $(( ... )): skip its body entirely
+        if ($ch eq '$' && $i+2 < $n && $chars[$i+1] eq '(' && $chars[$i+2] eq '(') {
+            $arith++; $i += 3; next;
+        }
+        if ($arith && $ch eq ')' && $i+1 < $n && $chars[$i+1] eq ')') {
+            $arith--; $i += 2; next;
+        }
+        if ($arith) { $i++; next }
+
+        # Unquoted << starts a here-document; unquoted <<< is a
+        # here-string (v0.07: handled later, after expansion, by
+        # _sh_strip_herestring -- skip all three characters here so the
+        # scan does not re-match starting at the second '<').
         if (!$in_dq && $ch eq '<' && $i+1 < $n && $chars[$i+1] eq '<'
-                && !($i+2 < $n && $chars[$i+2] eq '<')) {
+                && $i+2 < $n && $chars[$i+2] eq '<') {
+            $i += 3; next;
+        }
+        if (!$in_dq && $ch eq '<' && $i+1 < $n && $chars[$i+1] eq '<') {
             my $cmd_part = join('', @chars[0 .. $i-1]);
             my $j = $i + 2;
             my $dash = 0;
@@ -3075,7 +5583,7 @@ sub _hd_run {
         for my $b (@body) { $b = _expand($class, $b) }
     }
     my $text = '';
-    for my $b (@body) { $text .= $b . "\n" }
+    for my $b (@body) { $text .= BATsh::MB::dec($b) . "\n" }
 
     my $tmp = _hd_tempfile($text);
     if (!defined $tmp) { $LAST_STATUS = 2; return 2 }
@@ -3090,6 +5598,9 @@ sub _hd_run {
 
 # Failsafe: remove any here-document temp files left behind on abnormal exit.
 END { for my $f (@_HD_TMPFILES) { unlink $f if defined $f } }
+END { for my $f (@_SUBST_TMPFILES) { unlink $f if defined $f } }
+END { for my $f (@_SHP_TMPFILES) { unlink $f if defined $f } }
+END { for my $f (@_PROCSUB_TMPFILES) { unlink $f if defined $f } }
 
 # Failsafe: remove any background-job pidfiles left behind on abnormal exit.
 END { for my $f (@_BG_TMPFILES) { unlink $f if defined $f } }
@@ -3198,11 +5709,34 @@ sub _arr_dequote {
     my $out   = '';
     my $in_sq = 0;
     my $in_dq = 0;
-    for my $c (split //, $v) {
-        if ($in_sq) { if ($c eq "'") { $in_sq = 0 } else { $out .= $c } next }
-        if ($c eq "'" && !$in_dq) { $in_sq = 1; next }
-        if ($c eq '"' && !$in_sq) { $in_dq = !$in_dq; next }
-        $out .= $c;
+    my @c     = split //, $v;
+    my $n     = scalar @c;
+    my $i     = 0;
+    while ($i < $n) {
+        my $c = $c[$i];
+        # Single quotes: everything literal, no escapes, until the closer.
+        if ($in_sq) {
+            if ($c eq "'") { $in_sq = 0 } else { $out .= $c }
+            $i++; next;
+        }
+        if ($c eq "'" && !$in_dq) { $in_sq = 1; $i++; next }
+        # Backslash: escape processing (POSIX).
+        if ($c eq '\\') {
+            my $nx = ($i+1 < $n) ? $c[$i+1] : '';
+            if ($in_dq) {
+                # Inside "..." backslash is literal EXCEPT before $ ` " \.
+                if ($nx eq '"' || $nx eq '\\' || $nx eq '`' || $nx eq '$') {
+                    $out .= $nx; $i += 2; next;
+                }
+                $out .= '\\'; $i++; next;
+            }
+            # Unquoted: backslash quotes the following char (so \" is a
+            # literal quote and does NOT open a quoted region).
+            if ($nx ne '') { $out .= $nx; $i += 2; next }
+            $out .= '\\'; $i++; next;
+        }
+        if ($c eq '"' && !$in_sq) { $in_dq = !$in_dq; $i++; next }
+        $out .= $c; $i++;
     }
     return $out;
 }
@@ -3217,15 +5751,29 @@ sub _arr_split_words {
     my $have  = 0;
     my $in_sq = 0;
     my $in_dq = 0;
+    my $in_bt = 0;    # backtick `...`
+    my $pdep  = 0;    # $( ...  and  <( >(  and plain ( )  depth
+    my $bdep  = 0;    # ${ ... } depth
     my @chars = split //, $s;
     my $n     = scalar @chars;
     my $i     = 0;
     while ($i < $n) {
         my $c = $chars[$i];
         if ($in_sq) { $cur .= $c; $in_sq = 0 if $c eq "'"; $have = 1; $i++; next }
-        if ($c eq "'" && !$in_dq) { $in_sq = 1; $cur .= $c; $have = 1; $i++; next }
-        if ($c eq '"' && !$in_sq) { $in_dq = !$in_dq; $cur .= $c; $have = 1; $i++; next }
-        if (!$in_sq && !$in_dq && $c =~ /\s/) {
+        if ($c eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $cur .= $c; $have = 1; $i++; next }
+        if ($c eq '"' && !$in_bt) { $in_dq = !$in_dq; $cur .= $c; $have = 1; $i++; next }
+        # Backslash escape keeps the next char attached to this word.
+        if ($c eq '\\') { $cur .= $c; $have = 1; $i++; $cur .= $chars[$i] if $i < $n; $i++; next }
+        if ($c eq '`') { $in_bt = !$in_bt; $cur .= $c; $have = 1; $i++; next }
+        # Command / parameter substitution regions are opaque so their
+        # internal whitespace does not word-split (e.g. $(echo a b c)).
+        if (!$in_dq) {
+            if ($c eq '$' && $i+1 < $n && $chars[$i+1] eq '{') { $bdep++; $cur .= '${'; $have = 1; $i += 2; next }
+            if ($bdep > 0 && $c eq '}') { $bdep--; $cur .= $c; $have = 1; $i++; next }
+            if ($c eq '(') { $pdep++; $cur .= $c; $have = 1; $i++; next }
+            if ($c eq ')' && $pdep > 0) { $pdep--; $cur .= $c; $have = 1; $i++; next }
+        }
+        if (!$in_sq && !$in_dq && !$in_bt && $pdep == 0 && $bdep == 0 && $c =~ /\s/) {
             if ($have) { push @words, $cur; $cur = ''; $have = 0 }
             $i++; next;
         }
@@ -3442,6 +5990,7 @@ sub _sh_try_array_op {
 # reference (quoted or not) to one item per array element.
 sub _expand_word_list {
     my ($class, $list_str) = @_;
+    $list_str = _brace_expand_line($list_str) if defined $list_str && $list_str =~ /\{/;
     my @raw = _arr_split_words($list_str);
     my @items;
     for my $tok (@raw) {
@@ -3565,9 +6114,13 @@ No external sh or bash is required.
   (case: |-separated patterns, * ? [abc] [a-z] [!abc] globs, quoted/literal
    patterns, and the bash ;& / ;;& fall-through terminators)
   test / [ ... ]  (file tests, string, integer comparisons)
-  cd, pwd, exit, true, false, :, read, shift, local, set
+  cd, pwd, exit, true, false, :, read, shift, local, set, eval
+  shift [N]  -- shift positional parameters left by N (default 1)
+  getopts optstring name [arg ...]  -- POSIX option parser (v0.07)
+  set -e / -u / -x, +e/+u/+x, set -o errexit|nounset|xtrace
   trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]
-  $(( arithmetic )) -- supports $1..$9 positional params
+  $(( arithmetic )) -- full C-style operator set (see Arithmetic
+   Expansion below); supports $1..$9 positional params
   $( command substitution ), `backtick substitution`
   $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0, $!
   ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
@@ -3602,6 +6155,15 @@ No external sh or bash is required.
   cmd &                    (background execution; external commands)
   echo *.txt               (filename glob expansion: *, ?, [abc])
   for f in *.pl; do ...    (glob expansion in for-loop word list)
+  {a,b,c}, {1..5}, {a..e}[..step]  -- brace expansion (v0.07)
+  shopt -s/-u extglob; ?(),*(),+(),@(),!()  -- extended pattern matching
+   in case patterns and ${VAR%pat}-family patterns (v0.07)
+  cmd <<< word              -- here-string (v0.07)
+  <(cmd), >(cmd)            -- process substitution via temp file (v0.07)
+  select VAR in list; do ... done  -- menu loop (v0.07)
+  alias name=value, alias, unalias  (v0.07)
+  exec cmd, exec > file ...  (v0.07)
+  ( cmd1; cmd2 )            -- subshell command group, isolated scope (v0.07)
 
 =head2 Variable Expansion
 
@@ -3633,6 +6195,114 @@ The following parameter expansion forms are supported:
 
 Patterns use shell glob syntax: C<*> matches any string, C<?>
 matches any single character, C<[abc]> matches a character class.
+
+=head2 Arithmetic Expansion
+
+C<$(( expression ))> is evaluated by a recursive-descent parser with the
+full C-style operator set, in decreasing precedence:
+
+  ( )  grouping
+  var++ var--        postfix increment / decrement (write back)
+  ++var --var + - ! ~  prefix (~ is signed bitwise NOT: -v-1)
+  **                 exponentiation (right-associative)
+  * / %              / and % truncate toward zero (-7/2=-3, -7%2=-1)
+  + -
+  << >>              bit shifts
+  < <= > >=          comparisons (result 0 or 1)
+  == !=
+  &                  bitwise AND
+  ^                  bitwise XOR
+  |                  bitwise OR
+  &&                 logical AND (result 0 or 1)
+  ||                 logical OR  (result 0 or 1)
+  ?:                 ternary conditional
+  = += -= *= /= %= <<= >>= &= ^= |=   assignment (write back)
+  ,                  comma (evaluate both, yield the right)
+
+Operands are decimal, hexadecimal C<0xNN>, or octal C<0NN> literals,
+variable names (an unset variable reads as 0), and C<$1>..C<$9>.
+Assignment and C<++>/C<--> write the result back to the variable store.
+A syntax error emits a warning and the expression yields 0.
+
+=head2 Shell Options (set -e / -u / -x)
+
+C<set> with option letters controls execution modes; letters combine
+(C<set -eux>), C<+> turns an option off, and the long forms
+C<set -o errexit>, C<set -o nounset>, C<set -o xtrace> are accepted.
+
+C<set -e> (errexit): a simple command that exits with a non-zero status
+terminates the script with that status.  Exempt, as in POSIX shells: the
+condition of C<if>/C<while>/C<until>, and every member of a C<&&> / C<||>
+list except the last (so C<false && echo x> does not stop the script,
+while C<true && false> does).
+
+C<set -u> (nounset): expanding an unset variable (C<$VAR> or C<${VAR}>)
+prints C<sh: VAR: unbound variable> on STDERR and stops the script with
+status 1.  Forms with a fallback such as C<${VAR:-default}> are exempt.
+Limitation: the command containing the expansion first completes with the
+empty string before the script stops.
+
+C<set -x> (xtrace): each simple command is traced to STDERR with a
+C<+ > prefix before execution.  Limitation: the B<raw pre-expansion>
+line is traced (tracing an expanded copy would execute C<$(...)>
+command substitutions twice).
+
+All three options are reset at the start of each top-level
+C<BATsh-E<gt>run> / C<run_string> / C<run_lines>, so C<set -e> in one
+script does not leak into a later run in the same process.
+
+=head2 eval
+
+C<eval [args...]> removes one level of quoting from its (already
+expanded) arguments, concatenates them, and executes the result as a new
+command line -- which is parsed and expanded again, giving the double
+expansion C<eval> exists for:
+
+  a=b
+  b=deep
+  eval echo \$$a     # prints "deep"
+
+C<eval> with no arguments does nothing and sets status 0.
+
+=head2 getopts
+
+C<getopts optstring name [arg ...]> is the POSIX option parser.  Called
+repeatedly (usually as the condition of a C<while> loop), it walks the
+argument list one option at a time, setting the variable named by
+C<name> to the option letter found and, for an option that takes an
+argument, setting C<OPTARG> to that argument.  C<OPTIND> holds the index
+(1-based) of the next argument to be processed; it starts at 1 and must
+be reset to 1 by hand before a second, independent parse (for example at
+the top of a function that parses its own arguments).  C<getopts> returns
+0 while an option was found and non-zero when the options are exhausted,
+so the loop ends naturally.
+
+C<optstring> lists the recognised option letters; a letter followed by
+C<:> takes an argument.  When no C<[arg ...]> operands are given, the
+positional parameters are parsed.
+
+  while getopts "ab:c" opt; do
+      case $opt in
+          a) all=1 ;;
+          b) file=$OPTARG ;;
+          c) count=1 ;;
+          \?) echo "usage: ..." >&2; exit 2 ;;
+      esac
+  done
+  shift $((OPTIND - 1))     # drop the parsed options; "$@" is the operands
+
+Both option-argument forms are accepted: C<-b file> (separate word) and
+C<-bfile> (attached).  Flags may be clustered: C<-ac> is the same as
+C<-a -c>.  A C<--> argument ends option processing (and is consumed); the
+first non-option word ends it too (and is left in place).
+
+Error reporting has two modes.  By default C<getopts> prints a diagnostic
+to STDERR and sets C<name> to C<?> for an unknown option or a missing
+required argument.  If C<optstring> begins with a colon (C<:ab:c>),
+"silent" mode is selected instead: no message is printed, C<name> is set
+to C<?> (unknown option) or C<:> (missing argument), and C<OPTARG>
+receives the offending option letter, so the script can report the error
+itself.
 
 =head2 Arrays and Associative Arrays
 
@@ -3818,8 +6488,10 @@ supported.
 
 =item *
 
-Here-strings (C<E<lt>E<lt>E<lt> word>) are not supported; C<E<lt>E<lt>E<lt>>
-is deliberately not treated as a here-document opener.
+C<E<lt>E<lt>E<lt>> is deliberately not treated as a here-document opener
+(it is a here-string -- see L</Here-Strings> below -- which is handled
+separately, after expansion, once the ordinary C<E<lt>E<lt>> scan here
+has stepped past it).
 
 =item *
 
@@ -3943,6 +6615,203 @@ Functions are registered in a package-level hash C<%_SH_FUNCTIONS>.
 The caller's positional parameters (C<$1>..C<$9>, C<$*>) are saved before
 the call and restored on return.  C<local VAR=value> saves the existing
 value of C<VAR> in the function's stack frame and restores it on return.
+
+=head2 Brace Expansion
+
+  echo a{b,c,d}e        # abe ace ade
+  echo {1..5}            # 1 2 3 4 5
+  echo {5..1}             # 5 4 3 2 1
+  echo {01..03}            # 01 02 03  (zero-padded from the wider operand)
+  echo {a..e}               # a b c d e
+  echo {1..10..2}            # 1 3 5 7 9  (numeric step)
+  echo {a..e..2}               # a c e     (alpha step)
+  echo pre{a,b}mid{c,d}post      # preamidcpost preamidcpost ...
+
+Brace expansion (v0.07) runs lexically on the raw source line, before any
+other expansion, exactly like tilde expansion.  A brace group is only
+expanded when it contains a top-level comma or a valid C<..> range;
+otherwise it -- and any earlier literal braces on the same word -- is
+left untouched (C<echo x{foo}y> prints C<x{foo}y>).  Quoted text and
+C<${...}>, C<$(...)>, C<$((...))>, C<`...`>, C<E<lt>(...)>, C<E<gt>(...)>
+regions are protected and copied through unexpanded, matching the fact
+that these are not brace-expansion syntax even though some of them also
+use C<{> C<}> or C<(> C<)>.  Nested and nested nested groups are
+supported (each alternative is itself recursively brace-expanded).
+
+=head2 Extended Pattern Matching (extglob)
+
+  shopt -s extglob        # enable; "shopt -u extglob" disables (the default)
+  shopt extglob            # query; "shopt" alone lists all known options
+  shopt -p extglob          # print in "shopt -s/-u extglob" form
+
+  case $f in
+    @(*.tar.gz|*.tgz)) echo archive ;;
+    !(*.jpg|*.png))     echo not-an-image ;;
+  esac
+
+  echo ${name%%+([0-9])}   # strip a trailing run of digits
+
+While C<shopt -s extglob> is active, C<?(list)>, C<*(list)>, C<+(list)>,
+C<@(list)>, and C<!(list)> pattern-list operators (C<|>-separated
+alternatives, each itself an ordinary glob or a nested extglob group) are
+recognised in case patterns and in the C<${VAR%pat}> / C<${VAR%%pat}> /
+C<${VAR#pat}> / C<${VAR##pat}> / C<${VAR/pat/rep}> / C<${VAR//pat/rep}>
+pattern operand.  C<extglob> is off by default, matching bash, and is
+reset to off by C<reset_sh_options()> between top-level runs, alongside
+C<set -e> / C<-u> / C<-x>.
+
+=head3 Extended Pattern Matching Limitations
+
+=over 4
+
+=item *
+
+Extglob operators are recognised in case patterns and in the
+C<${VAR#pat}>-family parameter-expansion patterns only; pathname
+(filename) globbing (C<echo *.@(jpg|png)>) does not expand them, since
+filename globbing is delegated to Perl's built-in C<glob()>, which has
+no extglob support of its own.
+
+=item *
+
+C<!(list)> is approximated with a repeated negative-lookahead regex
+fragment ("any run of characters that never forms a complete match of
+one of the alternatives").  This matches the common "exclude these whole
+patterns" usage exactly, but is not a byte-for-byte reimplementation of
+bash's extglob matcher when C<!(...)> is combined with further pattern
+text after it in the same glob.
+
+=back
+
+=head2 Here-Strings
+
+  cat <<< "$greeting"
+  read LINE <<< hello
+
+A here-string (C<E<lt>E<lt>E<lt> word>, v0.07) supplies I<word> -- after
+tilde, parameter, command, and arithmetic expansion, and quote removal,
+exactly like any other word -- as the command's standard input, with a
+trailing newline appended.  Unlike a here-document body, I<word> is not
+further word-split.  Implementation-wise this reuses the here-document
+temporary-file machinery: the expanded content is written to a uniquely
+named C<sysopen(...,O_CREAT|O_EXCL,...)> temp file and supplied through
+the same redirection path as C<E<lt> file>, removed immediately after the
+command finishes.  As with here-documents, only one here-string (or
+here-document) per command line is handled.
+
+=head2 Process Substitution
+
+  diff <(sort a.txt) <(sort b.txt)
+  generate | tee >(gzip > out.gz)
+
+This interpreter never forks (see L</Background Execution> above), so
+neither form of process substitution (v0.07) uses a real named pipe:
+
+=over 4
+
+=item C<E<lt>(cmd)>
+
+I<cmd> is run immediately, its standard output captured into a fresh
+temporary file (exactly like C<$(cmd)>, but the file is kept rather than
+read back into a scalar), and C<E<lt>(cmd)> is replaced by that file's
+path -- suitable for anything that wants a filename to read from.
+
+=item C<E<gt>(cmd)>
+
+An empty temporary file is created immediately and C<E<gt>(cmd)> is
+replaced by its path; I<cmd> itself is deferred and run with that file as
+its standard input only after the current simple command has finished.
+Because I<cmd> runs after, rather than concurrently with, the writer,
+this is a best-effort approximation of real streaming C<E<gt>(...)> and
+does not suit a writer that expects the reader to keep up in real time.
+
+=back
+
+Both temporary files are removed once the current simple command (and,
+for C<E<gt>(cmd)>, its deferred job) has finished; a process substitution
+used inside a nested command substitution or loop condition is cleaned
+up at that inner level, not held open for the rest of the script.
+
+=head2 select
+
+  select CHOICE in one two three
+  do
+      echo "you picked: $CHOICE"
+      break
+  done
+
+C<select> (v0.07) prints a numbered menu of I<list> -- one item per line,
+to STDERR -- prompts with C<$PS3> (default C<"#? ">), and reads one line
+from STDIN into C<REPLY>: a number in range sets I<VAR> to the
+corresponding item and runs the body; anything else (including a blank
+line) sets I<VAR> to the empty string and still runs the body, after
+which the menu is shown again.  End of input on STDIN ends the loop, as
+does C<break>.  Unlike bash, the menu is always one item per line; there
+is no terminal-width-based multi-column layout.
+
+=head2 alias / unalias
+
+  alias ll='ls -la'
+  alias grep='grep --color=auto'
+  alias
+  unalias ll
+  unalias -a
+
+C<alias> (v0.07) with no arguments lists all aliases; C<alias NAME>
+prints one; C<alias NAME=VALUE ...> defines one or more (quote-aware,
+like a normal command line).  C<unalias NAME ...> removes the named
+aliases; C<unalias -a> removes all of them.  Only the first word of a
+simple command is checked against the alias table, with chained aliases
+(an alias whose value's first word is itself an alias) resolved up to a
+bounded number of times; a name is only ever expanded once per line, so
+a self-referential alias (C<alias ls=ls>) cannot loop forever.  Unlike
+bash, a trailing space in the alias value does not make the following
+word alias-eligible as well.
+
+=head2 exec
+
+  exec > logfile 2>&1     # (stderr-merge form not yet honoured; see below)
+  exec > logfile
+  exec cmd arg1 arg2
+
+C<exec> (v0.07) with only redirections (no command word) applies them
+I<permanently> to the current shell -- future output goes to the new
+target for the rest of the script, with no save/restore.  C<exec cmd>
+runs I<cmd> (with its own redirections, if any) and then terminates the
+whole script with I<cmd>'s exit status, approximating "exec replaces the
+shell" without a real fork/exec.  Only C<E<gt>>, C<E<gt>E<gt>>, and
+C<E<lt>> trailers on C<exec> are honoured; C<2E<gt>>, C<2E<gt>&1>, and
+C<1E<gt>&2> forms are not yet supported on C<exec> itself (they work
+normally on an ordinary command).
+
+=head2 Subshell Command Groups
+
+  ( cd /tmp; VAR=1; echo "in subshell: $VAR" )
+  echo "back out here: $VAR"    # unaffected by the subshell's VAR=1 and cd
+
+  (
+      f() { echo "defined only inside"; }
+      f
+  )
+  f    # "f: command not found" -- the function did not leak out
+
+A parenthesised command group (v0.07) runs its body with an isolated
+scope: variable assignments, array changes, function and alias
+definitions, and C<cd> made inside C<( ... )> do not affect the calling
+shell.  Because this interpreter never forks, isolation is approximated
+by snapshotting C<BATsh::Env>, the array tables, C<%_SH_FUNCTIONS>,
+C<%_SH_ALIAS>, and the working directory before running the body, and
+restoring all of it afterward regardless of how the body finished.  An
+C<exit> inside the group ends only the group (its status becomes the
+group's exit status, and the script continues after it); C<break> /
+C<continue> / C<return> still propagate outward to an enclosing loop or
+function, since bash's C<( ... )> does not stop them either.  Both the
+single-line form (C<( cmd1; cmd2 )>) and the multi-line form (a bare
+C<(> ending one line, a matching bare C<)> ending a later one) are
+recognised; a trailing C<E<gt>>, C<E<gt>E<gt>>, or C<E<lt>> redirection
+on the closing C<)> line is honoured, but a trailing C<&> and C<2>>-style
+redirections on that line are not (documented limitations, mirroring the
+ones noted for C<exec> above).
 
 =head1 AUTHOR
 

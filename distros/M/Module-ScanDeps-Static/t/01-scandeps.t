@@ -10,59 +10,80 @@ plan tests => 3;
 
 use_ok qw( Module::ScanDeps::Static );
 
-my $data_start_pos = tell DATA;
+our $CODE = <<'END_OF_CODE';
+use Buz::Baz 1.0;
+use Foo::Bar;
+
+require Carp;
+END_OF_CODE
 
 ########################################################################
 subtest 'use' => sub {
 ########################################################################
-  my $scanner = Module::ScanDeps::Static->new( { handle => *DATA, add_version => 1 } );
+  local @ARGV = ( '--add-version', 'scan' );
 
-  my @dependencies = $scanner->parse;
-  my $require      = $scanner->get_require;
+  no strict 'refs'; ## no critic
+  no warnings 'redefine'; ## no critic
 
-  ok( scalar @dependencies > 0, 'found dependencies' );
-  isa_ok( $require, 'HASH', 'require is a HASH' );
+  *{'Module::ScanDeps::Static::cmd_scan'} = sub {
+    my ($scanner) = @_;
 
-  my $module_names = join q{}, @dependencies;
+    open my $fh, '<', \$CODE;
+    $scanner->set_handle($fh);
 
-  is( $module_names, 'Buz::BazCarpFoo::Bar', 'sorted dependencies' );
+    my @dependencies = $scanner->parse;
+    my $require      = $scanner->get_require;
 
-  is( $dependencies[2], 'Foo::Bar', 'Foo::Bar' );
+    ok( scalar @dependencies > 0, 'found dependencies' );
+    isa_ok( $require, 'HASH', 'require is a HASH' );
 
-  ok( exists $require->{'Foo::Bar'}, 'version for Foo::Bar in hash' );
+    my $module_names = join q{}, @dependencies;
 
-  is( $require->{'Foo::Bar'}, q{}, 'version is empty string' )
-    or diag( Dumper( [ require => $require ] ) );
+    is( $module_names, 'Buz::BazCarpFoo::Bar', 'sorted dependencies' );
 
-  is( $require->{'Buz::Baz'}, q{1.0}, 'version of Buz::Baz is 1.0' )
-    or diag( Dumper \@dependencies );
+    is( $dependencies[2], 'Foo::Bar', 'Foo::Bar' );
 
+    ok( exists $require->{'Foo::Bar'}, 'version for Foo::Bar in hash' );
+
+    is( $require->{'Foo::Bar'}, q{}, 'version is empty string' )
+      or diag( Dumper( [ require => $require ] ) );
+
+    is( $require->{'Buz::Baz'}, q{1.0}, 'version of Buz::Baz is 1.0' )
+      or diag( Dumper \@dependencies );
+  };
+
+  Module::ScanDeps::Static->main();
 };
 
 ########################################################################
 subtest 'require' => sub {
 ########################################################################
-  seek DATA, $data_start_pos, 0;
 
-  my $scanner = Module::ScanDeps::Static->new( { handle => *DATA } );
+  no strict 'refs'; ## no critic
+  no warnings 'redefine'; ## no critic
 
-  my @dependencies = $scanner->parse;
-  my $require      = $scanner->get_require;
+  local @ARGV = qw(scan);
 
-  ok( @dependencies, 'found 3 dependencies' )
-    or diag( Dumper \@dependencies );
+  *{'Module::ScanDeps::Static::cmd_scan'} = sub {
+    my ($scanner) = @_;
+    open my $fh, '<', \$CODE;
 
-  ok( grep {/Carp/xsm} @dependencies, 'found require Carp' )
-    or diag( Dumper \@dependencies );
+    $scanner->set_handle($fh);
 
-  ok( defined $require->{'Carp'}, 'version defined' );
+    my @dependencies = $scanner->parse;
+    my $require      = $scanner->get_require;
 
+    ok( @dependencies, 'found 3 dependencies' )
+      or diag( Dumper \@dependencies );
+
+    ok( grep {/Carp/xsm} @dependencies, 'found require Carp' )
+      or diag( Dumper \@dependencies );
+
+    ok( defined $require->{'Carp'}, 'version defined' );
+  };
+
+  Module::ScanDeps::Static->main();
 };
 
 1;
 
-__DATA__
-use Buz::Baz 1.0;
-use Foo::Bar;
-
-require Carp;

@@ -49,7 +49,7 @@ WriteMakefile(
 		'IPC::Run3' => 0,
 		'JSON::MaybeXS' => 0,
 		'Module::Load::Conditional' => 0,
-		'Params::Get' => 0.13,
+		'Params::Get' => 0.15,
 		'Params::Validate::Strict' => 0.30,
 		'PPI' => 0,
 		'Pod::Simple' => 0,

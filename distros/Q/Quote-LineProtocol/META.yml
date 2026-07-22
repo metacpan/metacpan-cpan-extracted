@@ -1,7 +1,7 @@
 ---
 abstract: 'Helper module for Lineprotocol quoting'
 author:
-  - 'vague <vague@cpan.org>'
+  - 'vague <4Qt9Ma7@proton.me>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Quote::LineProtocol:
     file: lib/Quote/LineProtocol.pm
-    version: v0.1.4
+    version: v0.1.5
 requires:
   Syntax::Keyword::Match: '0.08'
   Time::Moment: '0.13'
@@ -35,8 +35,9 @@ resources:
   bugtracker: https://github.com/vague666/Quote-LineProtocol/issues
   homepage: https://github.com/vague666/Quote-LineProtocol
   repository: https://github.com/vague666/Quote-LineProtocol.git
-version: 0.1.4
+version: 0.1.5
 x_contributors:
   - 'Jari Matilainen <vague666@users.noreply.github.com>'
+  - 'vague666 <vague@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

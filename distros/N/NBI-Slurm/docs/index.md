@@ -212,7 +212,7 @@ runjob -r "echo hello world"</code></pre>
 
 - Perl 5.16 or newer
 - A SLURM cluster (or at least `sbatch`/`squeue` in your PATH)
-- CPAN modules: `Capture::Tiny`, `JSON::PP`, `Text::ASCIITable`
+- CPAN modules: `JSON::PP`, `Text::ASCIITable`
 
 <span class="chip">v0.17.2</span> &nbsp;
 <span class="chip chip-green">MIT License</span>

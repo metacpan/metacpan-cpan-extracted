@@ -11,6 +11,10 @@
 
 #include "etcd_common.h"
 
+/* See etcd_common.h — defined here so all modules can tag fire-and-forget
+ * batches (watch cancel send, keepalive renewal send). */
+call_base_t cancel_sentinel = { CALL_TYPE_NONE };
+
 /* gRPC status code names for error reporting - O(1) lookup table */
 static const char * const grpc_status_names[] = {
     [GRPC_STATUS_OK] = "OK",

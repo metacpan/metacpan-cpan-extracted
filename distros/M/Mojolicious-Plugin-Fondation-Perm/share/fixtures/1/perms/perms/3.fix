@@ -1,7 +1,0 @@
-$HASH1 = {
-           name        => 'write',
-           created_at  => '2026-06-15T00:00:03',
-           description => 'Write access',
-           id          => 3,
-           updated_at  => '2026-06-15T00:00:03'
-         };

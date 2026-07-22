@@ -340,8 +340,8 @@ reflected that there was an error, as in the example below:
     # row_on_error output at exit for unpreported errors
     exit;
 
-This ensures that a script does not die after the row_on_error call without
-any indication of an error in the report output.
+This ensures that a script does not exit with error  after the row_on_error
+call without any indication of an error in the report output.
 
 The default is to output all report data rows when the script exits. At this
 time all error columns for all rows will be set with the first of any prior
@@ -350,10 +350,10 @@ was an error and the row method was never called.
 
 If the nodefer option was set when a new Mnet::Report::Table object was created
 then row data is output immediately each time the row method is called, with
-the error column set only if there was an error before the row method call. Any
-errors afterward could go unreported. In this case row_on_error will output an
-extra row at script exit if there was an error after the last row method call,
-or the row method was never called.
+the error column set only if there was a prior error before. Any errors after
+the last row method call could go unreported unless row_on_error was used. If
+row_on_error is used then an extra row is output at script exit if there was an
+error after the last row method call, or an error with no row method calls.
 
 =cut
 
@@ -601,7 +601,7 @@ sub _output_dump {
 =head2 output dump
 
     dump
-    dump $var
+    dump:$var
     dump:$var:$file
 
 The dump output option writes one row per line in L<Data::Dumper> format

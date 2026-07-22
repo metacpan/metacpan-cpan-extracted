@@ -6,7 +6,7 @@ use FindBin;
 use Cwd ();
 
 my $cwd = Cwd::cwd();
-my $testdir = "$FindBin::Bin/tmp";
+my $testdir = "$FindBin::Bin/tmp-$$";
 eval {
   mkpath $testdir;
   chdir $testdir;

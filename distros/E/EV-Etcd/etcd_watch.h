@@ -6,6 +6,9 @@
 
 #include "etcd_common.h"
 
+/* Bind this translation unit's EVAPI table (call once from BOOT) */
+void watch_init_ev_api(pTHX);
+
 /* Watch operation handlers */
 void process_watch_response(pTHX_ watch_call_t *wc);
 void watch_rearm_recv(pTHX_ watch_call_t *wc);

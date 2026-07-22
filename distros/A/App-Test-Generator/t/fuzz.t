@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::Needs {
-	'App::Test::Generator' => '0.33',
+	'App::Test::Generator' => '0.43',
 	'perl' => 5.036,	# Later A::T::G need this version
 };
 

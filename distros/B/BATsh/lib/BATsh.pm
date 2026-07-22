@@ -22,9 +22,10 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 $VERSION = $VERSION;
 
+require BATsh::MB;
 require BATsh::Env;
 require BATsh::CMD;
 require BATsh::SH;
@@ -64,6 +65,13 @@ my $_TMPCOUNT = 0;
 # Subroutine registry: { LABEL => \@lines }
 my %_SUBROUTINES = ();
 
+# Script-level exit state: set (to the exit code) the moment an SH "exit"
+# or a CMD "EXIT" executes in any section, including inside a sourced file
+# or a CALL'd subroutine.  Once set, no further section is executed, and
+# run()/run_string()/run_lines() return this code.  Reset at the start of
+# each top-level run.
+my $_SCRIPT_EXIT = undef;
+
 ###############################################################################
 # Constructor
 ###############################################################################
@@ -83,36 +91,117 @@ sub run {
     open(SRCFH, $file) or croak "BATsh->run: cannot open $file: $!";
     my @lines = <SRCFH>;
     close(SRCFH);
+    _prepare_source(\@lines, $args{encoding});
     _ensure_env_init();
     # Set batch positional parameters: %0 = script path, %1..%9 = args, %* = all args
     my @script_args = defined($args{args}) ? @{$args{args}} : ();
     _set_batch_args($file, @script_args);
+    $_SCRIPT_EXIT = undef;
+    BATsh::SH::reset_sh_options() if defined &BATsh::SH::reset_sh_options;
     _process_lines(@lines);
+    my $rc = _final_status();
     BATsh::SH::fire_exit_trap("BATsh::SH") if defined &BATsh::SH::fire_exit_trap;
-    return 1;
+    return $rc;
 }
 
 sub run_string {
-    my ($class_or_self, $source) = @_;
+    my ($class_or_self, $source, %args) = @_;
     croak "BATsh->run_string: source required" unless defined $source;
     my @lines = map { "$_\n" } split(/\n/, $source, -1);
+    _prepare_source(\@lines, $args{encoding});
     _ensure_env_init();
+    # Optional positional parameters (used by "batsh - args..." and by
+    # callers that feed a script body as a string): %0 defaults to '-'.
+    if (defined $args{args}) {
+        _set_batch_args(defined $args{script_name} ? $args{script_name} : '-',
+                        @{$args{args}});
+    }
+    $_SCRIPT_EXIT = undef;
+    BATsh::SH::reset_sh_options() if defined &BATsh::SH::reset_sh_options;
     _process_lines(@lines);
+    my $rc = _final_status();
     BATsh::SH::fire_exit_trap("BATsh::SH") if defined &BATsh::SH::fire_exit_trap;
-    return 1;
+    return $rc;
 }
 
 sub run_lines {
     my ($class_or_self, @lines) = @_;
+    _prepare_source(\@lines, undef);
     _ensure_env_init();
+    $_SCRIPT_EXIT = undef;
+    BATsh::SH::reset_sh_options() if defined &BATsh::SH::reset_sh_options;
     _process_lines(@lines);
+    my $rc = _final_status();
     BATsh::SH::fire_exit_trap("BATsh::SH") if defined &BATsh::SH::fire_exit_trap;
-    return 1;
+    return $rc;
 }
+
+# ----------------------------------------------------------------
+# _final_status -- the exit status of the run just finished: the code of
+# an executed exit/EXIT if any, else the last command's status.  After
+# every section flush both interpreters hold the same value (see
+# _flush_cmd/_flush_sh), so the SH side is authoritative here.
+# ----------------------------------------------------------------
+sub _final_status {
+    return $_SCRIPT_EXIT if defined $_SCRIPT_EXIT;
+    return BATsh::SH::get_status();
+}
+
+# ----------------------------------------------------------------
+# last_status -- public accessor: the unified $? / %ERRORLEVEL% value.
+# ----------------------------------------------------------------
+sub last_status { return _final_status() }
 
 sub _ensure_env_init {
     # Init only once per process
     BATsh::Env::init() unless %BATsh::Env::STORE;
+}
+
+###############################################################################
+# set_encoding -- select the script encoding for multibyte-safe execution
+#   BATsh->set_encoding('cp932');   # also: sjis gbk uhc big5 utf8 none auto
+# The default is 'auto': a non-UTF-8 script containing bytes >= 0x80 is
+# treated as CP932 and guarded (see BATsh::MB).  The environment variable
+# BATSH_ENCODING, when set, overrides the default before the first run.
+###############################################################################
+my $_ENV_ENCODING_APPLIED = 0;
+
+sub set_encoding {
+    my ($class_or_self, $enc) = @_;
+    $enc = $class_or_self
+        if !defined($enc) && defined($class_or_self)
+        && $class_or_self !~ /\ABATsh\b/;
+    $_ENV_ENCODING_APPLIED = 1;   # explicit choice beats BATSH_ENCODING
+    return BATsh::MB::set_encoding($enc);
+}
+
+sub encoding { return BATsh::MB::encoding() }
+
+###############################################################################
+# _prepare_source -- per-run encoding setup on the raw script lines
+#   1. strip a UTF-8 BOM from the first line
+#   2. apply an explicit per-run encoding, or BATSH_ENCODING (once),
+#      or leave the current ('auto' by default) setting in place
+#   3. under 'auto', detect the source encoding and activate the guard
+#   4. guard-transform every line in place (identity when inactive)
+###############################################################################
+sub _prepare_source {
+    my ($lines_ref, $encoding) = @_;
+    $lines_ref->[0] = BATsh::MB::strip_bom($lines_ref->[0]) if @{$lines_ref};
+    if (defined $encoding && $encoding ne '') {
+        BATsh::MB::set_encoding($encoding);
+        $_ENV_ENCODING_APPLIED = 1;
+    }
+    elsif (!$_ENV_ENCODING_APPLIED
+        && defined $ENV{BATSH_ENCODING} && $ENV{BATSH_ENCODING} ne '') {
+        BATsh::MB::set_encoding($ENV{BATSH_ENCODING});
+        $_ENV_ENCODING_APPLIED = 1;
+    }
+    BATsh::MB::activate_for(join('', @{$lines_ref}));
+    if (BATsh::MB::active()) {
+        for my $l (@{$lines_ref}) { $l = BATsh::MB::enc($l) }
+    }
+    return 1;
 }
 
 ###############################################################################
@@ -123,13 +212,16 @@ sub _ensure_env_init {
 ###############################################################################
 sub _set_batch_args {
     my ($script, @args) = @_;
+    # Arguments arrive as RAW bytes from outside the interpreter
+    # (command line / caller); guard them before they enter the store.
+    @args = map { BATsh::MB::enc(defined $_ ? $_ : '') } @args;
     # Normalise $0: resolve to absolute path using File::Spec
     my $abs_script = defined $script ? $script : '';
     if ($abs_script ne '' && !File::Spec->file_name_is_absolute($abs_script)) {
         my $cwd = defined(&Cwd::cwd) ? Cwd::cwd() : '.';
         $abs_script = File::Spec->catfile($cwd, $abs_script);
     }
-    BATsh::Env->set('%0', $abs_script);
+    BATsh::Env->set('%0', BATsh::MB::enc($abs_script));
     for my $n (1 .. 9) {
         BATsh::Env->set("%$n", defined($args[$n - 1]) ? $args[$n - 1] : '');
     }
@@ -434,11 +526,15 @@ sub call_sub {
 
 sub source_file {
     my ($class_or_self, $file) = @_;
+    # The filename may arrive guard-transformed (from a CALL/source line
+    # inside a DBCS script); un-guard it before touching the filesystem.
+    $file = BATsh::MB::dec($file);
     croak "BATsh->source_file: file not found: $file" unless -f $file;
     local *SFHH;
     open(SFHH, $file) or croak "BATsh->source_file: cannot open $file: $!";
     my @src = <SFHH>;
     close(SFHH);
+    _prepare_source(\@src, undef);
     _process_lines(@src);
     return 1;
 }
@@ -454,6 +550,7 @@ sub endlocal  { BATsh::Env::endlocal()  }
 ###############################################################################
 sub _exec_cmd_section {
     my (@lines) = @_;
+    return if defined $_SCRIPT_EXIT;   # exit/EXIT already executed
     # Handle BATsh-native directives before CMD interpreter
     my @batch = ();
     for my $line (@lines) {
@@ -485,10 +582,19 @@ sub _exec_cmd_section {
 sub _flush_cmd {
     my ($lines_ref) = @_;
     return unless @{$lines_ref};
+    return if defined $_SCRIPT_EXIT;
     BATsh::CMD::exec_block('BATsh::CMD', $lines_ref,
         _batsh => __PACKAGE__,
         _pushd_stack => [],
     );
+    # Status bridge: mirror the CMD-side ERRORLEVEL into the SH-side $?
+    # so the next SH section sees the outcome of this CMD section.
+    BATsh::SH::set_status(BATsh::CMD::_get_errorlevel());
+    # EXIT executed: terminate the whole script with ERRORLEVEL.
+    if (BATsh::CMD::_exit_requested()) {
+        BATsh::CMD::_clear_exit_requested();
+        $_SCRIPT_EXIT = BATsh::CMD::_get_errorlevel();
+    }
 }
 
 ###############################################################################
@@ -496,6 +602,7 @@ sub _flush_cmd {
 ###############################################################################
 sub _exec_sh_section {
     my (@lines) = @_;
+    return if defined $_SCRIPT_EXIT;   # exit/EXIT already executed
     my @batch = ();
     for my $line (@lines) {
         (my $s = $line) =~ s/\r?\n\z//;
@@ -515,9 +622,17 @@ sub _exec_sh_section {
 sub _flush_sh {
     my ($lines_ref) = @_;
     return unless @{$lines_ref};
+    return if defined $_SCRIPT_EXIT;
     BATsh::SH::exec_block('BATsh::SH', $lines_ref,
         _batsh => __PACKAGE__,
     );
+    # Status bridge: mirror the SH-side $? into the CMD-side ERRORLEVEL
+    # so the next CMD section sees the outcome of this SH section
+    # (ECHO %ERRORLEVEL%, IF ERRORLEVEL n, ...).
+    BATsh::CMD::_set_errorlevel(BATsh::SH::get_status());
+    # exit executed: terminate the whole script with its code.
+    my $ec = BATsh::SH::exit_code_pending();
+    $_SCRIPT_EXIT = $ec if defined $ec;
 }
 
 ###############################################################################
@@ -623,6 +738,8 @@ sub _flush_section {
 sub repl {
     my ($class_or_self) = @_;
     _ensure_env_init();
+    $_SCRIPT_EXIT = undef;
+    BATsh::SH::reset_sh_options() if defined &BATsh::SH::reset_sh_options;
     print "BATsh $VERSION - Bilingual Shell\n";
     print "Uppercase => CMD mode, lowercase => SH mode. EXIT/exit to quit.\n\n";
 
@@ -634,6 +751,10 @@ sub repl {
         my $line = <STDIN>;
         last unless defined $line;
         chomp $line;
+
+        # Guard-transform DBCS input (auto-activates on first DBCS line)
+        BATsh::MB::activate_for($line);
+        $line = BATsh::MB::enc($line);
 
         # Promote pending here-document (trigger already buffered)
         if (defined $pending_hd_delim) {
@@ -649,6 +770,7 @@ sub repl {
             if (!defined($hd_delim) && $depth == 0) {
                 _flush_section($cur_mode, @buf);
                 @buf = (); $cur_mode = ''; $depth = 0;
+                last if defined $_SCRIPT_EXIT;   # "exit N" ends the REPL
             }
             next;
         }
@@ -668,8 +790,10 @@ sub repl {
         if ($depth == 0 && !defined($pending_hd_delim)) {
             _flush_section($cur_mode, @buf);
             @buf = (); $cur_mode = ''; $depth = 0;
+            last if defined $_SCRIPT_EXIT;   # "exit N" / "EXIT N" ends the REPL
         }
     }
+    return _final_status();
 }
 
 ###############################################################################
@@ -679,13 +803,57 @@ sub version      { return $VERSION }
 sub sh_available { return 1 }   # always: built-in SH interpreter
 
 ###############################################################################
+# main -- command-line entry point (used by bin/batsh.pl and the modulino).
+# Returns the process exit code.
+###############################################################################
+sub main {
+    my ($class_or_self, @argv) = @_;
+    BATsh::Env::init();
+    # --encoding=ENC / --encoding ENC : cp932 sjis gbk uhc big5 utf8 none auto
+    while (@argv && $argv[0] =~ /\A--encoding(?:=(.*))?\z/) {
+        my $e = $1;
+        shift @argv;
+        $e = shift @argv if !defined $e && @argv;
+        BATsh->set_encoding($e) if defined $e;
+    }
+    if (@argv && ($argv[0] eq '--version' || $argv[0] eq '-v')) {
+        print "BATsh $VERSION\n";
+        return 0;
+    }
+    if (@argv && ($argv[0] eq '--help' || $argv[0] eq '-h')) {
+        print <<"END_OF_USAGE";
+usage: batsh [--encoding=ENC] script.batsh [args...]
+       batsh [--encoding=ENC] -            (read the script from STDIN)
+       batsh [--encoding=ENC] -e 'source'  (run inline source)
+       batsh                               (interactive REPL)
+       batsh --version | --help
+
+ENC: cp932 sjis gbk uhc big5 utf8 none auto (default: auto)
+The process exit code is the script's exit code (exit N / EXIT [/B] N,
+or the status of the last command).
+END_OF_USAGE
+        return 0;
+    }
+    if (@argv == 0) { return BATsh->repl() }
+    if ($argv[0] eq '-e') {
+        shift @argv;
+        return BATsh->run_string(join("\n", @argv));
+    }
+    if ($argv[0] eq '-') {
+        shift @argv;
+        my @lines = <STDIN>;
+        return BATsh->run_string(join('', @lines),
+                                 script_name => '-', args => [@argv]);
+    }
+    my $f = shift @argv;
+    return BATsh->run($f, args => [@argv]);
+}
+
+###############################################################################
 # Run as script
 ###############################################################################
 unless (caller) {
-    BATsh::Env::init();
-    if (@ARGV == 0) { BATsh->repl() }
-    elsif ($ARGV[0] eq '-e') { shift @ARGV; BATsh->run_string(join("\n", @ARGV)) }
-    else { BATsh->run($ARGV[0]) }
+    exit(BATsh->main(@ARGV));
 }
 
 1;
@@ -698,15 +866,28 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
   use BATsh;
 
-  # Run a bilingual .batsh script
-  BATsh->run('myscript.batsh');
+  # Run a bilingual .batsh script; the return value is the script's
+  # exit status ("exit 3" -> 3, "EXIT /B 5" -> 5, else last command)
+  my $rc = BATsh->run('myscript.batsh');
   BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
+  print BATsh->last_status;    # same value, queried later
+
+  # From the command line (bin/batsh.pl is installed as "batsh"):
+  #   batsh script.batsh arg1 arg2      exit code = script status
+  #   batsh -e 'echo hi'                run inline source
+  #   ... | batsh - arg1                read the script from STDIN
+  #   batsh --help / --version
+
+  # CP932 (Shift_JIS) scripts on Japanese Windows: auto-detected,
+  # or select the encoding explicitly
+  BATsh->run('nihongo.batsh', encoding => 'cp932');
+  BATsh->set_encoding('cp932');    # also: sjis gbk uhc big5 utf8 auto
 
   # Run source inline
   BATsh->run_string('echo hello from sh');
@@ -878,8 +1059,16 @@ SH sections are executed by BATsh::SH, which implements:
     (|-patterns, * ? [abc] [a-z] [!abc] globs, ;& and ;;& fall-through)
   test / [ ... ]  (file, string, and integer comparisons)
   cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
+  eval  (quote removal + re-execution with a second expansion)
+  set -e / -u / -x, set +e/+u/+x, set -o errexit|nounset|xtrace
   trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG)
-  $(( arithmetic )) -- +, -, *, /, %, and $1..$9 inside
+  $(( arithmetic )) -- full C-style operator set:
+    + - * / % **  (** right-assoc; / % truncate toward zero)
+    == != < <= > >=  && || !  (results 0/1)
+    & ^ | ~ << >>  (bitwise; ~ is signed)
+    = += -= *= /= %= <<= >>= &= ^= |=  (write back to the variable)
+    ++ --  (prefix and postfix), ?: (ternary), comma
+    0xNN hex and 0NN octal literals, $1..$9 inside
   $( command ) and `command`  (command substitution, nested)
   cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
   cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
@@ -900,6 +1089,56 @@ SH sections are executed by BATsh::SH, which implements:
   ${arr[@]}, ${arr[*]}, ${#arr[@]}, ${#arr[i]}, ${!arr[@]}
   unset arr, unset arr[i]
   source / . file
+
+=head1 ENCODING (CP932 / Shift_JIS SUPPORT)
+
+Scripts written in CP932 -- the ANSI encoding of Japanese Windows --
+run correctly as of version 0.07, including the notorious "dame-moji"
+whose second byte collides with an ASCII shell metacharacter:
+
+  SO   (0x83 0x5C)  trail byte = backslash
+  HYOU (0x95 0x5C)  trail byte = backslash
+  PO   (0x83 0x7C)  trail byte = pipe
+  CHI  (0x83 0x60)  trail byte = backtick
+  DA   (0x83 0x5E)  trail byte = caret (the cmd.exe escape)
+
+The encoding is B<auto-detected> by default: a non-UTF-8 source
+containing bytes above 0x7F is treated as CP932.  Pure-ASCII and
+UTF-8 scripts are unaffected.  Explicit selection:
+
+  BATsh->run($file, encoding => 'cp932');   # per run
+  BATsh->set_encoding('cp932');             # for the process
+  set BATSH_ENCODING=cp932                  # environment variable
+  perl lib/BATsh.pm --encoding=cp932 script.batsh
+
+Supported names: cp932 (sjis), gbk (cp936), uhc (cp949), big5
+(cp950), utf8, none, auto.  Under an active DBCS encoding the
+substring and length operators C<${#VAR}>, C<${VAR:N:L}> and
+C<%VAR:~n,m%> count characters rather than bytes.  A UTF-8 BOM on
+the first line is stripped.  See L<BATsh::MB> for the mechanism.
+
+=head1 EXIT STATUS
+
+C<run>, C<run_string> and C<run_lines> return the script's B<final exit
+status> as an integer: the argument of SH C<exit N> or CMD C<EXIT [/B] N>
+if one was executed, otherwise the status of the last command.  C<EXIT>
+with no code keeps the current C<ERRORLEVEL> (so C<false> then C<EXIT /B>
+returns 1).  The same value is available afterwards as
+C<BATsh-E<gt>last_status>.
+
+At every CMD/SH section boundary the status is mirrored in both
+directions, so an SH failure is immediately visible as C<%ERRORLEVEL%>
+(and C<IF ERRORLEVEL n>) in the following CMD section, and a CMD failure
+is visible as C<$?> in the following SH section.
+
+C<BATsh-E<gt>main(@ARGV)> implements the command-line interface used by
+the modulino (C<perl lib/BATsh.pm ...>) and by F<bin/batsh.pl> (installed
+as C<batsh>): C<--help>, C<--version>, C<-e 'source'>, a script filename,
+or C<-> to read the script from STDIN; remaining arguments become
+C<%1>..C<%9> / C<$1>..C<$9>.  The modulino calls
+C<exit(BATsh-E<gt>main(@ARGV))>, so the OS-level exit code of the process
+is the script's own status.  In the REPL, C<exit N> / C<EXIT N> ends the
+session.
 
 =head1 REQUIREMENTS
 
@@ -940,22 +1179,48 @@ for C<${arr[@]}> is ascending numeric index for indexed arrays and sorted
 key order for associative arrays (bash leaves the latter unspecified);
 C<"${arr[@]}"> word-splits to one item per element in C<for> lists.
 
-The built-in SH interpreter does not implement:
+Tilde expansion C<~/path> and C<~user/path> B<are supported> as of
+version 0.07: word-initial, unquoted C<~> in C<cd>, in unquoted words
+produced by word-splitting (external command arguments, C<echo>,
+C<eval>), in C<test>/C<[> file-test operands, and in the right-hand
+side of a plain C<VAR=value> or prefix C<VAR=value command> assignment.
+C<~user> resolves via C<getpwnam> and is therefore Unix-like only (a
+no-op on Win32, where the word is left literal, matching bash's
+behaviour for an unresolvable login name). B<Not> implemented: tilde
+expansion after C<:> in colon-list assignments such as
+C<PATH=~/a:~/b> (bash expands each colon-separated tilde in
+C<PATH>/C<CDPATH>/C<MAILPATH> specifically); such values pass through
+unexpanded.
 
-=over
+Brace expansion C<{a,b,c}> and C<{1..5}>/C<{a..e}[..step]>, extended
+pattern matching (C<shopt -s extglob>; C<?()>, C<*()>, C<+()>, C<@()>,
+C<!()> in case patterns and in C<${VAR%pat}>-family patterns),
+here-strings (C<E<lt>E<lt>E<lt> word>), process substitution
+(C<E<lt>(cmd)>, C<E<gt>(cmd)>), and the C<select>, C<alias>/C<unalias>,
+and C<exec> builtins B<are now supported> as of version 0.07 (see
+L<BATsh::SH>).
 
-=item * Tilde expansion C<~/path> and C<~user> (only C<cd> with no
-argument uses C<$HOME>).
+The builtin C<getopts> B<is supported> as of version 0.07: it parses
+single-character options with the usual C<OPTIND>/C<OPTARG> protocol,
+clustered flags (C<-abc>), attached (C<-oVALUE>) and separate
+(C<-o VALUE>) option arguments, the C<--> end-of-options marker, and
+both the default (diagnostic on STDERR) and silent (leading C<:> in the
+optstring) error-reporting modes.  See L<BATsh::SH/"getopts">.
 
-=item * Brace expansion C<{a,b}> and C<{1..5}>.
+The shell options C<set -e> (errexit), C<set -u> (nounset) and C<set -x>
+(xtrace) B<are supported> as of version 0.07, including the long forms
+C<set -o errexit|nounset|xtrace>, the C<+e/+u/+x> off switches, and
+combined letters (C<set -eux>).  Known limitations: C<set -x> traces the
+B<raw pre-expansion> command line (tracing an expanded copy would execute
+C<$(...)> substitutions twice), and under C<set -u> the offending command
+first completes with the empty expansion before the script stops with
+status 1.  The options are reset at the start of each top-level
+C<run>/C<run_string>/C<run_lines>, so C<set -e> does not leak into a
+later run in the same process.
 
-=item * Here-strings (C<E<lt>E<lt>E<lt> word>) and process substitution
-(C<E<lt>(cmd)>, C<E<gt>(cmd)>).
-
-=item * The shell options C<set -e>, C<set -u>, C<set -x>, and the
-builtins C<getopts>, C<select>, C<alias>, C<eval> and C<exec>.
-
-=back
+The builtin C<eval> B<is supported> as of version 0.07: one level of
+quote removal, concatenation, and re-execution with a second round of
+expansion (POSIX semantics).
 
 C<trap> B<is> supported in SH mode: C<trap 'cmd' SIGSPEC...> registers a
 handler, C<trap - SIGSPEC> resets to default, C<trap '' SIGSPEC> ignores,
@@ -964,9 +1229,14 @@ the C<EXIT> pseudo-signal (also C<0>) runs when the script ends or on
 C<exit>.  The handler is expanded when it fires.  See L<BATsh::SH/"Traps and
 Signals">.
 
-Common to both modes: a parenthesised group C<( ... )> does not run in a
-separate sub-shell; it shares the one variable store, so there is no
-variable-scope isolation.
+In SH mode, a parenthesised group C<( ... )> B<is> a subshell command
+group as of version 0.07: variable, array, function, and alias changes,
+and C<cd>, made inside it do not affect the calling shell (approximated
+by snapshot/restore around the body, since this interpreter never
+forks -- see L<BATsh::SH/"Subshell Command Groups">).  In CMD mode,
+C<( ... )> is only recognised as an C<IF>/C<FOR> block delimiter (as in
+cmd.exe); it is not a general-purpose command group and has no
+associated variable-scope isolation.
 
 Pipeline (C<|>), I/O redirection (C<E<gt>> C<E<gt>E<gt>> C<E<lt>>
 C<2E<gt>> C<2E<gt>E<gt>> C<2E<gt>&1>), compound commands
@@ -974,9 +1244,10 @@ C<2E<gt>> C<2E<gt>E<gt>> C<2E<gt>&1>), compound commands
 
 Here-documents (C<E<lt>E<lt>EOF>, C<E<lt>E<lt>'EOF'>, C<E<lt>E<lt>-EOF>)
 B<are> supported in SH mode, with the limitations described in
-L<BATsh::SH>: one here-document per command line, no here-strings, and
-best-effort behaviour when combined with a pipeline or compound operator
-on the same line.
+L<BATsh::SH>: one here-document per command line, and best-effort
+behaviour when combined with a pipeline or compound operator on the
+same line.  Here-strings (C<E<lt>E<lt>E<lt> word>) are a separate
+feature (also supported as of version 0.07; see above).
 
 Background execution (a trailing C<&>) B<is> supported in SH mode for
 B<external> commands only, with the limitations described in

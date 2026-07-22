@@ -13,9 +13,9 @@ use Exporter 'import';
 use Lingua::EN::Numbers::Ordinate;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-09'; # DATE
+our $DATE = '2026-07-22'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.487'; # VERSION
+our $VERSION = '0.489'; # VERSION
 
 our @EXPORT_OK = qw(list_org_anniversaries);
 
@@ -150,7 +150,7 @@ sub _process_hl {
 $SPEC{list_org_anniversaries} = {
     v => 1.1,
     summary => 'List all anniversaries in Org files',
-    description => <<'_',
+    description => <<'MARKDOWN',
 This function expects contacts in the following format:
 
     * First last                              :office:friend:
@@ -201,7 +201,7 @@ or:
 
 and the reminder will not be shown again.
 
-_
+MARKDOWN
     args    => {
         %App::OrgUtils::common_args1,
         field_pattern => {
@@ -240,12 +240,12 @@ _
         today => {
             summary => 'Assume today\'s date',
             schema  => [obj => isa=>'DateTime'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 You can provide Unix timestamp or DateTime object. If you provide a DateTime
 object, remember to set the correct time zone.
 
-_
+MARKDOWN
         },
         sort => {
             summary => 'Specify sorting',
@@ -256,7 +256,7 @@ _
                 ],
                 default => 'due_date',
             }],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 If string, must be one of 'date', '-date' (descending).
 
@@ -264,7 +264,7 @@ If code, sorting code will get [REC, DUE_DATE] as the items to compare, where
 REC is the final record that will be returned as final result (can be a string
 or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
 
-_
+MARKDOWN
         },
     },
 };
@@ -283,7 +283,9 @@ sub list_org_anniversaries {
 
     $yest  = $today->clone->add(days => -1);
 
-    my $orgp = Org::Parser->new;
+    my $orgp = Org::Parser->new(
+        ignore_unknown_drawers => 1,
+    );
     my @res;
 
     my %docs = App::OrgUtils::_load_org_files(
@@ -330,7 +332,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.487 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2024-01-09.
+This document describes version 0.489 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2026-07-22.
 
 =head1 SYNOPSIS
 
@@ -504,7 +506,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,30 @@ use warnings;
 use 5.010001;
 use parent qw(Alien::Base);
 
-our $VERSION = '3.0509050200';
+our $VERSION = '4.0509050200';
+
+# Preload the dynamic Net-SNMP library with global symbol visibility so that
+# the bundled SNMP XS module -- which has `use Alien::SNMP;` injected ahead of
+# its XSLoader call -- and any downstream XS resolve libnetsnmp by SONAME from
+# our share dir, independent of a baked-in RUNPATH.  This is what lets the test
+# suite pass before `make install` populates the final share dir (the window
+# CPAN Testers run in), and lets the distribution work with no system-level
+# libnetsnmp present.
+# Best-effort: never let a failure here break `use Alien::SNMP` (e.g. when the
+# module is loaded from source before the share dir exists) -- the baked-in
+# RUNPATH still resolves libnetsnmp once the share is installed.
+eval { __PACKAGE__->_preload_netsnmp };
+
+sub _preload_netsnmp {
+    my ($class) = @_;
+    return unless $class->install_type eq 'share';
+    require DynaLoader;
+    for my $shared_lib ($class->dynamic_libs) {
+        # Capture (untaint) the trusted share-dir path; skip non-libnetsnmp libs.
+        next unless $shared_lib =~ m{(/.*/libnetsnmp\.so(?:\.[0-9]+)*)\z};
+        DynaLoader::dl_load_file($1, 0x01);   # 0x01 = RTLD_GLOBAL
+    }
+}
 
 1;
 
@@ -102,7 +125,7 @@ Eric A. Miller, C<< <emiller at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Eric A. Miller.
+Copyright 2026 Eric A. Miller.
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

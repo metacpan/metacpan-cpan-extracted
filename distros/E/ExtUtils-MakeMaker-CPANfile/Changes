@@ -1,5 +1,8 @@
 Revision history for Perl extension ExtUtils-MakeMaker-CPANfile
 
+0.11  2026/07/22
+    - include PID in temp dir name for testing (GH#4, mauke++)
+
 0.10  2026/07/19
     - merge prereqs using CPAN::Meta::Requirements (GH#1, XSven++)
 

@@ -80,12 +80,13 @@ subtest 'a huge but flat document is capped by the token limit' => sub {
     return $code == 0 ? 'parsed' : $code == 3 ? 'too-many' : 'other-error';
   }
 
-  # ~600k sibling fields stays under the 1M-token cap (width is fine).
-  my $under = '{ ' . join(' ', map { "f$_" } 1 .. 600_000) . ' }';
+  # Use the shortest legal field name so the smoke test stays memory-light
+  # while still exercising a very wide document.
+  my $under = '{ ' . join(' ', ('f') x 600_000) . ' }';
   is token_outcome($under), 'parsed', '600k sibling fields parse';
 
   # ~1.1M tokens is a multi-MB adversarial document, not a real request.
-  my $over = '{ ' . join(' ', map { "f$_" } 1 .. 1_100_000) . ' }';
+  my $over = '{ ' . join(' ', ('f') x 1_100_000) . ' }';
   is token_outcome($over), 'too-many', 'a 1.1M-token document is a clean error';
 };
 

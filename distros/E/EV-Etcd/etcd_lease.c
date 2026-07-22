@@ -10,6 +10,13 @@
 #include "etcd_common.h"
 #include "etcd_lease.h"
 
+/* EVAPI.h's GEVAPI function table is a per-translation-unit static: every
+ * file that calls into EV must bind its own copy, or ev_timer_start & co
+ * dereference a NULL table. Called once from BOOT in Etcd.xs. */
+void lease_init_ev_api(pTHX) {
+    I_EV_API("EV::Etcd");
+}
+
 /* Process LeaseGrantResponse */
 void process_lease_grant_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "lease_grant");
@@ -141,8 +148,9 @@ void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
         kp = &(*kp)->next;
     }
 
-    if (ev_is_active(&kc->reconnect_timer))
-        ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+    /* Unconditional: also clears an inactive-but-pending fired timer */
+    ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+    ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
     grpc_metadata_array_destroy(&kc->initial_metadata);
     grpc_metadata_array_destroy(&kc->trailing_metadata);
     if (kc->recv_buffer) {
@@ -165,6 +173,39 @@ void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
 void keepalive_call_perl_release(pTHX_ keepalive_call_t *kc) {
     kc->perl_owns = 0;
     if (!kc->client_owns) keepalive_call_free(aTHX_ kc);
+}
+
+/* Renew timer callback: send the next LeaseKeepAliveRequest on the open
+ * stream. Fire-and-forget (cancel_sentinel tag; the completion is discarded
+ * by process_grpc_event). A failed batch just skips this tick — a pending
+ * previous SEND can legitimately yield TOO_MANY_OPERATIONS — and never
+ * tears down the stream. */
+static void keepalive_renew_cb(struct ev_loop *loop, ev_timer *w, int revents) {
+    dTHX;
+    (void)loop;
+    (void)revents;
+
+    keepalive_call_t *kc = (keepalive_call_t *)((char *)w - offsetof(keepalive_call_t, renew_timer));
+
+    if (!kc->active || !kc->client->active) return;
+
+    Etcdserverpb__LeaseKeepAliveRequest keep_req = ETCDSERVERPB__LEASE_KEEP_ALIVE_REQUEST__INIT;
+    keep_req.id = kc->lease_id;
+
+    grpc_slice req_slice;
+    SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
+        etcdserverpb__lease_keep_alive_request__get_packed_size,
+        etcdserverpb__lease_keep_alive_request__pack, &keep_req);
+    grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
+    grpc_slice_unref(req_slice);
+
+    grpc_op op;
+    memset(&op, 0, sizeof(op));
+    op.op = GRPC_OP_SEND_MESSAGE;
+    op.data.send_message.send_message = send_buffer;
+
+    (void)grpc_call_start_batch(kc->call, &op, 1, &cancel_sentinel, NULL);
+    grpc_byte_buffer_destroy(send_buffer);
 }
 
 /* Process LeaseKeepAliveResponse */
@@ -202,6 +243,17 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
         CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_NOT_FOUND, "Lease expired", "keepalive");
         etcdserverpb__lease_keep_alive_response__free_unpacked(resp, NULL);
         return;
+    }
+
+    /* Re-arm the renewal timer at ttl/3 (min 0.5s), repeating. Re-arming on
+     * each response keeps the period fresh if the server changes the ttl.
+     * Armed before the callback so a re-entrant cancel() can stop it. */
+    {
+        ev_tstamp renew_period = (ev_tstamp)resp->ttl / 3.0;
+        if (renew_period < 0.5) renew_period = 0.5;
+        ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
+        ev_timer_init(&kc->renew_timer, keepalive_renew_cb, renew_period, renew_period);
+        ev_timer_start(EV_DEFAULT, &kc->renew_timer);
     }
 
     HV *result = newHV();

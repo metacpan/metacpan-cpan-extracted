@@ -49,8 +49,8 @@ exit 0;
 
 sub load_sinfo {
     my %partitions;
-    my @lines = `sinfo --noheader --format='%P|%D|%T' 2>/dev/null`;
-    if ($? != 0) {
+    my ($ok, @lines) = _command_output('sinfo', '--noheader', '--format=%P|%D|%T');
+    if (!$ok) {
         die "ERROR slurm-load: sinfo failed\n";
     }
 
@@ -74,10 +74,10 @@ sub load_squeue {
     my ($user) = @_;
     my %jobs;
 
-    my $cmd = "squeue --noheader --format='%P|%t|%D'";
-    $cmd .= " --user='$user'" if defined $user;
-    my @lines = `$cmd 2>/dev/null`;
-    if ($? != 0) {
+    my @cmd = ('squeue', '--noheader', '--format=%P|%t|%D');
+    push @cmd, "--user=$user" if defined $user;
+    my ($ok, @lines) = _command_output(@cmd);
+    if (!$ok) {
         die "ERROR slurm-load: squeue failed\n";
     }
 
@@ -254,8 +254,18 @@ sub print_table {
 
 sub _has_command {
     my ($cmd) = @_;
-    my $path = `command -v $cmd 2>/dev/null`;
-    return $? == 0 && $path =~ /\S/;
+    if ($^O eq 'MSWin32') {
+        return system("where $cmd >nul 2>nul") == 0;
+    }
+    return system("command -v $cmd >/dev/null 2>&1") == 0;
+}
+
+sub _command_output {
+    my (@cmd) = @_;
+    open(my $fh, '-|', @cmd) or die "ERROR slurm-load: cannot execute $cmd[0]: $!\n";
+    my @lines = <$fh>;
+    close $fh;
+    return ($? == 0, @lines);
 }
 
 sub usage {
@@ -287,7 +297,7 @@ slurm-load - Summarise Slurm workload by combining sinfo node states with squeue
 
 =head1 VERSION
 
-version 0.21.0
+version 0.22.0
 
 =head1 SYNOPSIS
 

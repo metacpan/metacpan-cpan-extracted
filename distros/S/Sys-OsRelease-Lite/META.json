@@ -22,7 +22,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "CPAN::Changes" : "0",
             "Config::Tiny" : "0",
             "Data::Dumper" : "0",
             "File::Basename" : "0",
@@ -30,13 +29,15 @@
             "File::Slurp" : "0",
             "FindBin" : "0",
             "Readonly" : "0",
-            "Versioning::Scheme::Semantic" : "0",
             "YAML" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "CPAN::Changes" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Readonly" : "0",
+            "Versioning::Scheme::Semantic" : "0"
          }
       },
       "runtime" : {
@@ -59,6 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.2+lite",
+   "version" : "v0.4.3+lite",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

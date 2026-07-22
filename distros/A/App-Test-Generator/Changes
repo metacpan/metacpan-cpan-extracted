@@ -1,7 +1,91 @@
 Revision history for App-Test-Generator
 
+0.44	Tue Jul 21 20:28:19 EDT 2026
+	[Bug fixes]
+	- Fix fuzz harness leaving stray files in the current directory when
+	  testing functions such as generate() that write an output file: the
+	  generated run_test() now snapshots the CWD file listing before each
+	  call and unlinks any new files afterward, so file-writing side effects
+	  are cleaned up regardless of which parameter caused them.
+	- Fix SchemaExtractor::_merge_parameter_analyses silently applying code
+	  heuristic type inference to parameters declared in a formal =head4 Input
+	  spec that intentionally omit a type: when _from_input_spec is set and
+	  no type is present in the spec, the code-analysis type is now suppressed
+	  so the author's intent (no type constraint) is preserved.
+	- Fix SchemaExtractor::_find_methods running _extract_class_methods on the
+	  raw file content including POD blocks and line comments, causing false
+	  positives: the comment "# Simple pattern: find class Name { blocks"
+	  matched the class/method regex and extracted the Perl keyword 'if' as a
+	  spurious method name. POD blocks and line comments are now stripped from
+	  the content before the class/method scan.
+	- Fix Generator.pm POD =head4 input spec for render_args_hash,
+	  render_arrayref_map, and render_hash: changed type => 'hashref' to
+	  type => 'any' for the href parameter, matching the documented and
+	  implemented behaviour that each function returns '' (or '()') for
+	  non-hashref inputs rather than dying.
+	- Fix SchemaExtractor::_find_methods incorrectly extracting cross-package
+	  sub declarations (e.g. sub DB::DB { }) as module methods. Subs whose
+	  name contains '::' are now skipped immediately, so the Perl debugger
+	  hook in LCSAJ/Runtime.pm no longer appears as a fuzz target.
+	- Fix SchemaExtractor::_map_formal_input_type not recognising unquoted
+	  Params::Validate constants (OBJECT, SCALAR, HASHREF, ARRAYREF, CODEREF)
+	  in formal =head4 Input specs. The type regex now accepts both quoted
+	  strings ('object') and uppercase constants (OBJECT), so 'type => OBJECT,
+	  isa => ...' specs in Mutation/*.pm PODs now correctly produce
+	  type: object in the schema.
+	- Fix SchemaExtractor::_analyze_pod named-format Input spec parser not
+	  capturing the isa key (e.g. isa => 'PPI::Document'). The isa value is
+	  now extracted and stored alongside the type so the fuzz harness can
+	  construct a real object of the right class for mandatory object params
+	  (Template.pm already supported this via use_ok/new_ok when isa is set).
+	[New features]
+	- Add t/self-fuzz.t: end-to-end CLI self-test that runs extract-schemas
+	  then fuzz-harness-generator -r on every .pm under lib/, verifying that
+	  ATG can fuzz-test its own modules. Requires EXTENDED_TESTING=1.
+	- Fix SchemaExtractor::_compile_signature_isolated to degrade gracefully
+	  when the isolated subprocess fails. Previously a subprocess error
+	  (stderr) triggered an unconditional croak, propagating a fatal
+	  exception through _extract_type_params_schema's "or return" guard
+	  (which catches falsy returns but not exceptions). The croak now
+	  becomes a verbose-gated carp followed by a plain return so the caller
+	  falls back to heuristic analysis as intended. A secondary guard in the
+	  subprocess heredoc now checks that the return value of signature_for()
+	  is a blessed object with a parameters() method before calling it, so
+	  older Type::Params (< 2.x) installations — which install the
+	  constraint but return undef rather than the signature object — no
+	  longer cause the subprocess to die and write to stderr. Reported via
+	  CPAN Testers (t/integration.t "degrades gracefully without
+	  BSD::Resource" subtest, App-Test-Generator-0.41).
+	- Fix bin/test-generator-index Perl version cliff notice being omitted
+	  when NO_NETWORK_TESTING=1 (i.e. in CI): the notice block was nested
+	  inside if($ENABLE_DEP_ANALYSIS), which is disabled under that flag,
+	  so it was never emitted even though the "N report(s) omitted" footnote
+	  referenced it. The notice is now emitted unconditionally whenever a
+	  cliff is detected, regardless of whether dependency analysis is
+	  enabled. Also fix the omitted-reports footnote using a bare <p> tag
+	  inside <tbody>, which browsers silently eject from the table making
+	  the message invisible; changed to a <tr><td colspan="7"> row.
+	- Fix Template.pm generate_tests() intermediate push inside test_empty
+	  block using \%case_input (a shared reference) instead of {%case_input}
+	  (a snapshot copy). Both the intermediate push and the final push pointed
+	  to the same hashref; run_test()'s delete calls on the first case emptied
+	  the hash before the second case ran, producing @alist=() and the
+	  spurious "greet() survives (position test)" failure.
+	- Fix Sample::Module::greet() to reject reference types for the $name
+	  and $greeting parameters (croak 'Name must be a string' / 'Greeting
+	  must be a string'), matching the harness's expectation that passing
+	  ARRAY/HASH/SCALAR/CODE/blessed refs dies.
+	- Fix SchemaExtractor to resolve Readonly/use-constant numeric RHS when
+	  detecting length constraints: the previous regex only matched literal
+	  digits in e.g. length($name) >= $MIN_NAME_LEN; add _module_constants()
+	  helper and an extended regex so Readonly-based bounds populate min/max
+	  in the schema, raising greet's input confidence from MEDIUM to HIGH.
+	- Bumped minimum Params::Get requirement to 0.15, which introduced the
+	  $args->[0] eq $default guard that correctly handles this case.
+	  Should fix https://www.cpantesters.org/cpan/report/7e161ec6-7e0b-11f1-a19a-e92102ddcf6e
+
 0.43	Sat Jul 11 20:55:21 EDT 2026
-	[ Bug Fixes]
+	[Bug fixes]
 	- Fix number/float tests when min is set to <= 0
 
 0.42	Tue Jul  7 08:23:44 EDT 2026

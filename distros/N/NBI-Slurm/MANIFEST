@@ -29,6 +29,7 @@ bin/rm_package
 bin/runjob
 bin/session
 bin/shelf
+bin/slurm-efficiency
 bin/slurm-load
 bin/viewjobs
 bin/waitjobs
@@ -80,6 +81,7 @@ t/12-array.t
 t/13-params-array.t
 t/14-array-limit.t
 t/15-slurm-load.t
+t/16-slurm-efficiency.t
 t/20-intensive.t
 t/29-bins-pod.t
 t/30-misc.t
@@ -88,6 +90,7 @@ t/50-manifest.t
 t/51-launcher-base.t
 t/52-launcher-kraken2.t
 t/53-pipeline.t
+t/lib/NBI/Test/MockCommand.pm
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

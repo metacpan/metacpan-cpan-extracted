@@ -65,11 +65,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 SYNOPSIS
 
@@ -1551,6 +1551,7 @@ sub _find_methods {
 
 		next unless defined $name;	# Skip anonymous routines
 		next if $name =~ /^(BEGIN|END|DESTROY|AUTOLOAD|CHECK|INIT|UNITCHECK)$/;
+		next if $name =~ /::/;		# cross-package sub (e.g. sub DB::DB { })
 
 		# Skip private methods unless explicitly included, or they're special
 		if ($name =~ /^_/ && $name !~ /^_(new|init|build)/) {
@@ -1573,7 +1574,13 @@ sub _find_methods {
 	my $content = $document->content();
 	if ($content =~ /\bclass\b/) {
 		$self->_log('  Detecting class/method syntax...');
-		$self->_extract_class_methods($content, \@methods);
+		# Strip POD blocks and line comments before the regex scan so that
+		# patterns like  class Name {  inside documentation examples or
+		# the comment  # find "class Name {" blocks  don't produce
+		# spurious method names (e.g. the keyword 'if').
+		(my $code_only = $content) =~ s/^=\w[^\n]*.*?^=cut[^\n]*\n//gms;
+		$code_only =~ s/\s*#[^\n]*//g;
+		$self->_extract_class_methods($code_only, \@methods);
 	}
 
 	# Process method modifiers (Moose)
@@ -1877,6 +1884,20 @@ sub _analyze_method {
 		$schema->{_analysis}{confidence_factors}{input} = [
 			'Input schema extracted from validator'
 		];
+		# =head4 Input spec overrides take highest priority — apply them on top of
+		# the validator schema so authors can tune test constraints (optional,
+		# memberof, matches) without altering the runtime validation call.
+		for my $name (keys %$pod_params) {
+			next unless $pod_params->{$name}{_from_input_spec};
+			my $pod_p = $pod_params->{$name};
+			$schema->{input}{$name} //= {};
+			$schema->{input}{$name}{optional}  = $pod_p->{optional}  if defined $pod_p->{optional};
+			$schema->{input}{$name}{memberof}  = $pod_p->{memberof}  if defined $pod_p->{memberof};
+			$schema->{input}{$name}{matches}   = $pod_p->{matches}   if defined $pod_p->{matches};
+			$schema->{input}{$name}{type}      = $pod_p->{type}      if defined $pod_p->{type};
+			$schema->{input}{$name}{min}       = $pod_p->{min}       if defined $pod_p->{min};
+			$schema->{input}{$name}{max}       = $pod_p->{max}       if defined $pod_p->{max};
+		}
 	} else {
 		# Merge field declarations into code_params before merging analyses
 		if (keys %$fields) {
@@ -3701,6 +3722,23 @@ sub _analyze_pod {
 				if ($spec =~ /\boptional\s*=>\s*(0|1)/i) {
 					$params{$name}{optional} = $1 + 0;
 				}
+				if ($spec =~ /\bmemberof\s*=>\s*\[([^\]]*)\]/i) {
+					my $list_str = $1;
+					my @vals;
+					while ($list_str =~ /['"]([^'"]*)['"]/g) {
+						push @vals, $1;
+					}
+					$params{$name}{memberof} = \@vals if @vals;
+				}
+				if ($spec =~ /\bmin\s*=>\s*(\d+)/i) {
+					$params{$name}{min} = $1 + 0;
+				}
+				if ($spec =~ /\bmax\s*=>\s*(\d+)/i) {
+					$params{$name}{max} = $1 + 0;
+				}
+				if ($spec =~ /\bisa\s*=>\s*['"]([^'"]+)['"]/i) {
+					$params{$name}{isa} = $1;
+				}
 			}
 			# A named-format Input spec signals a hash/named API.  Positional
 			# info from signature analysis is not meaningful here and causes
@@ -3731,8 +3769,10 @@ sub _analyze_pod {
 # --------------------------------------------------
 sub _map_formal_input_type {
 	my ($self, $spec) = @_;
-	return undef unless $spec =~ /\btype\s*=>\s*['"]([^'"]+)['"]/i;
-	my $raw = lc($1);
+	# Accept both quoted  type => 'scalar'  and unquoted Params::Validate
+	# constants  type => OBJECT  (no quotes around the constant name).
+	return undef unless $spec =~ /\btype\s*=>\s*(?:['"]([^'"]+)['"]|([A-Z_]+))/i;
+	my $raw = lc(defined($1) ? $1 : $2);
 	$raw =~ s/\s+//g;
 
 	my %map = (
@@ -6589,6 +6629,52 @@ sub _format_default {
 }
 
 # --------------------------------------------------
+# _module_constants
+#
+# Purpose:    Build and cache a hash of numeric
+#             constant values declared in the target
+#             module source, covering both Readonly
+#             lexicals and 'use constant' barewords.
+#             Used by _analyze_parameter_constraints
+#             to resolve right-hand sides like
+#             $MIN_NAME_LEN that are not literals.
+#
+# Entry:      None (uses $self->{_document}).
+#
+# Exit:       Returns a hashref { NAME => value }.
+#             Returns {} if the PPI document is not
+#             yet loaded.
+#
+# Side effects: Caches result in $self->{_constants}.
+# --------------------------------------------------
+sub _module_constants {
+	my ($self) = @_;
+	return $self->{_constants} if exists $self->{_constants};
+
+	my %c;
+	my $doc = $self->{_document};
+	unless ($doc) {
+		$self->{_constants} = \%c;
+		return \%c;
+	}
+
+	my $src = $doc->serialize();
+
+	# Readonly my $CONST => numeric_value;
+	while ($src =~ /Readonly\s+(?:my|our)\s+\$(\w+)\s*=>\s*([+-]?\d+(?:\.\d+)?)/g) {
+		$c{$1} = $2;
+	}
+
+	# use constant CONST => numeric_value;
+	while ($src =~ /use\s+constant\s+(\w+)\s*=>\s*([+-]?\d+(?:\.\d+)?)/g) {
+		$c{$1} = $2;
+	}
+
+	$self->{_constants} = \%c;
+	return \%c;
+}
+
+# --------------------------------------------------
 # _analyze_parameter_constraints
 #
 # Purpose:    Infer min, max, and regex match
@@ -6624,7 +6710,7 @@ sub _analyze_parameter_constraints {
 		$guarded = 1;
 	}
 
-	# Length checks for strings
+	# Length checks for strings — literal numeric RHS
 	if ($code =~ /length\s*\(\s*\$$param\s*\)\s*([<>]=?)\s*(\d+)/) {
 		my ($op, $val) = ($1, $2);
 		$p->{type} ||= 'string';
@@ -6638,6 +6724,24 @@ sub _analyze_parameter_constraints {
 			$p->{min} = $val;
 		}
 		$self->_log("  CODE: $param length constraint $op $val");
+	}
+
+	# Length checks for strings — Readonly / use-constant RHS ($CONST_NAME)
+	while ($code =~ /length\s*\(\s*\$$param\s*\)\s*([<>]=?)\s*\$(\w+)/g) {
+		my ($op, $const) = ($1, $2);
+		my $val = $self->_module_constants()->{$const};
+		next unless defined $val;
+		$p->{type} ||= 'string';
+		if ($op eq '<') {
+			$p->{max} = $val - 1;
+		} elsif ($op eq '<=') {
+			$p->{max} = $val;
+		} elsif ($op eq '>') {
+			$p->{min} = $val + 1;
+		} elsif ($op eq '>=') {
+			$p->{min} = $val;
+		}
+		$self->_log("  CODE: $param length constraint $op \$$const ($val)");
 	}
 
 	# Numeric range checks (only if NOT part of error guard)
@@ -6827,6 +6931,10 @@ sub _merge_parameter_analyses {
 			foreach my $key (keys %{$code->{$param}}) {
 				next if $key eq '_source';
 				next if $key eq 'position';
+				# Formal input-spec declared this param without a type — author
+				# intentionally left it unconstrained; don't let code heuristics
+				# silently fill in a type that would cause wrong-type die tests.
+				next if $key eq 'type' && $pod->{$param} && $pod->{$param}{_from_input_spec} && !defined $pod->{$param}{type};
 
 				# Only override if POD didn't provide this info or it's a stronger signal
 				my $from_pod = exists $pod->{$param};

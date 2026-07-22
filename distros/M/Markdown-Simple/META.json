@@ -28,11 +28,14 @@
       "configure" : {
          "requires" : {
             "Devel::CheckLib" : "0",
+            "Eshu" : "0.10",
+            "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Eshu" : "0.10",
             "perl" : "5.006"
          }
       },
@@ -43,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

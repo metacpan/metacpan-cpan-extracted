@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Setup;
-$Mojolicious::Plugin::Fondation::Setup::VERSION = '0.10';
+$Mojolicious::Plugin::Fondation::Setup::VERSION = '0.11';
 # ABSTRACT: Setup wizard with session-based state (clean rebuild)
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -41,7 +41,7 @@ Mojolicious::Plugin::Fondation::Setup - Setup wizard with session-based state (c
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -102,10 +102,6 @@ All wizard state (selected plugins, current step, form values) is
 stored in Mojolicious sessions — no database or file persister needed.
 Clicking "Reset" or visiting C</setup/reset> clears the session.
 
-=head1 NAME
-
-Mojolicious::Plugin::Fondation::Setup — Interactive web wizard for configuring Fondation applications
-
 =head1 QUICK START
 
   # 1. Create a new application directory
@@ -113,8 +109,20 @@ Mojolicious::Plugin::Fondation::Setup — Interactive web wizard for configuring
 
   # 2. Create myapp.pl
   echo 'use Mojolicious::Lite;
-  plugin "Fondation" => { dependencies => ["Fondation::Setup"] };
+  use lib 'lib';
+  plugin "Config";
+  plugin "Fondation";
   app->start;' > myapp.pl
+
+  # 2. Create myapp.conf
+  {
+    Fondation => {
+      dependencies => [
+        'Fondation::Setup',
+      ]
+    },
+  }
+
 
   # 3. Initialize (creates assets, etc.)
   perl myapp.pl fondation init

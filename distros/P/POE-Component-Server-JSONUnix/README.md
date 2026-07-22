@@ -10,6 +10,15 @@ It is suitable as a local control or RPC endpoint for a daemon -- the
 sort of thing you talk to from a command-line tool, a cron job, or
 another process on the same host.
 
+The distribution ships with two clients, both of which also implement
+the optional Unix-ownership authentication handshake:
+
+- `POE::Component::Server::JSONUnix::Client` -- an event-driven POE
+  client with request/response correlation, callback or event dispatch,
+  and per-request timeouts.
+- `POE::Component::Server::JSONUnix::BlockingClient` -- a simple
+  blocking client for scripts and tools that do not use POE.
+
 # INSTALL
 
 ## Source

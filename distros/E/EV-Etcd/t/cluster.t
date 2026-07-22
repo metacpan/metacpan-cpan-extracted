@@ -80,7 +80,10 @@ SKIP: {
 # step times out.
 our $added_member_id;
 our $cluster_client = $client;
-$client->member_add(['http://127.0.0.1:12380'], { is_learner => 1 }, sub {
+# Per-run peer URL: it is never bound (the learner is never started), it
+# just must not collide with leftover members or other etcd instances.
+my $peer_url = sprintf 'http://127.0.0.1:%d', 20000 + $$ % 10000;
+$client->member_add([$peer_url], { is_learner => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'member_add (learner) succeeded');
     ok($resp->{header}, 'member_add response has header');

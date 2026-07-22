@@ -1,5 +1,9 @@
 Revision history for Perl extension GraphQL-Houtou
 
+0.02 2026-07-21T10:19:16Z
+    - Fix vm runtime context passing (#83)
+    - Handle token limit errors without full source copy (#84)
+
 0.01 2026-07-19T04:40:06Z
 
     - Added an XS-backed GraphQL parser, schema compiler, validation engine,

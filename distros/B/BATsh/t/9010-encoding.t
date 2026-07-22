@@ -19,7 +19,7 @@ my $ROOT = File::Spec->rel2abs(
     File::Spec->catdir($FindBin::RealBin, File::Spec->updir));
 
 my @pm_files = grep { -f "$ROOT/$_" } map { "lib/$_" }
-    qw(BATsh.pm BATsh/Env.pm BATsh/CMD.pm BATsh/SH.pm);
+    qw(BATsh.pm BATsh/Env.pm BATsh/CMD.pm BATsh/SH.pm BATsh/MB.pm);
 
 plan_skip('no .pm files found') unless @pm_files;
 plan_tests(scalar(@pm_files));

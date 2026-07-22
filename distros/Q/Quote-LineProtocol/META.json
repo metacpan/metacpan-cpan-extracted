@@ -1,7 +1,7 @@
 {
    "abstract" : "Helper module for Lineprotocol quoting",
    "author" : [
-      "vague <vague@cpan.org>"
+      "vague <4Qt9Ma7@proton.me>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.28",
@@ -56,7 +56,7 @@
    "provides" : {
       "Quote::LineProtocol" : {
          "file" : "lib/Quote/LineProtocol.pm",
-         "version" : "v0.1.4"
+         "version" : "v0.1.5"
       }
    },
    "release_status" : "stable",
@@ -71,9 +71,10 @@
          "web" : "https://github.com/vague666/Quote-LineProtocol"
       }
    },
-   "version" : "0.1.4",
+   "version" : "0.1.5",
    "x_contributors" : [
-      "Jari Matilainen <vague666@users.noreply.github.com>"
+      "Jari Matilainen <vague666@users.noreply.github.com>",
+      "vague666 <vague@cpan.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1

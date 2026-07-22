@@ -114,17 +114,20 @@ DESCRIPTION
 
     The main features are:
 
-    *   Mnet::Test module can record and replay Mnet script options, connected
-        expect sessions, and compare outputs, speeding development and
-        allowing for integration and regression testing of complex automation
-        scripts.
-
     *   Mnet::Expect::Cli::Ios and Mnet::Expect::Cli modules for reliable
         automation of cisco ios and other command line sessions, including
         authentication and command prompt handling.
 
     *   Mnet::Stanza module for templated config parsing and generation on
         cisco ios devices and other similar indented stanza text data.
+
+    *   Mnet::Report::Table module for aggregating report data from scripts,
+        supporting output in formats such as csv, json, and sql.
+
+    *   Mnet::Test module can record and replay Mnet script options, connected
+        expect sessions, and compare outputs, speeding development and
+        allowing for integration and regression testing of complex automation
+        scripts.
 
     *   Mnet::Batch can run automation scripts in batch mode to concurrently
         process a list of devices, using command line arguments and a device
@@ -135,11 +138,10 @@ DESCRIPTION
         per-device output files.
 
     *   Mnet::Opts::Cli module for config settings via command line,
-        environment variable, and/or batch scripts, with help, tips, and
-        password redaction. device list files.
+        environment variable, and/or batch device list files, with help, tips,
+        and password redaction.
 
-    *   Mnet::Report::Table module for aggregating report data from scripts,
-        supporting output in formats such as csv, json, and sql.
+    *   Mnet::IP module to parse IPv4 and IPv6 addresses and network masks.
 
     Most of the Mnet sub-modules can be used independently of each other,
     unless otherwise noted.
@@ -155,7 +157,7 @@ INSTALLATION
 
         cpan install Mnet
 
-    Or download and install from <https://github.com/menzascripting/Mnet>
+    Or downloaded and installed from <https://github.com/menzascripting/Mnet>
 
         tar -xzf Mnet-X.y.tar.gz
         cd Mnet-X.y
@@ -176,9 +178,10 @@ FAQ
     option to troubleshoot execution.
 
   What's the easiest way to get more log output?
-    Use both the Mnet::Log and Mnet::Opts::Set::Debug modules in your script
-    for more output, mostly from other Mnet modules unless you add Mnet::Log
-    calls, which are a compatible subset of log4perl calls, to your script.
+    Add 'use' commands for both Mnet::Log and Mnet::Opts::Set::Debug to the
+    beginning of your script for more output, mostly from other Mnet modules
+    unless you add Mnet::Log calls, which are a compatible subset of log4perl
+    calls, to your script.
 
   How should passwords be secured?
     Environment variables should be used to provide passwords for scripts, not
@@ -186,20 +189,21 @@ FAQ
     process list by other users.
 
     The Mnet::Opts::Cli new method allows a named environment variable to be
-    specified that will also be parsed for command line options. Your script
-    can be called from a shell script containing authentication, which is
-    accessible only to authorized users, such as in the example below:
+    specified that will also be parsed for command line options. Your perl
+    network automation script can be called from a secured shell script that
+    contains the usernames and passwords, this secure shell script accessible
+    only to authorized users, such as in the example below:
 
         #!/bin/sh
-        #   sample.sh script, chmod 700 to restrict access to current user
+        #   sample.sh script, chmod 700 to restrict access to owner user
         #   works with Mnet::Opts calls in above SYNOPISIS sample.pl script
-        #   "$@" passes throuh all command line options, modify as needed
+        #   "$@" passes through all command line options, modify as needed
         export Mnet='--username <user> --password <secret>'
         perl -- sample.pl "$@"
 
     The Mnet::Opts::Cli module define function has a redact property that
-    should be set for password options so that the value of the option is
-    value is always redacted form Mnet::Log outputs.
+    should be set for password options that should be hidden in Mnet::Log
+    output.
 
     Also note that the Mnet::Expect module log_expect method is used by the
     Mnet::Expect::Cli modules to temporarily disable expect session logging
@@ -209,13 +213,13 @@ FAQ
 
   Why should I use the Mnet::Expect module?
     The Mnet::Expect module works with the Mnet::Log and Mnet::Opts::Cli
-    modules, for easy logging of normal Expect module activity, with extra
-    options for logging, debugging, raw pty, and session tty rows and columns.
+    modules, for easy logging of normal Expect module activity, with options
+    to control logging, debugging, raw pty, and session tty rows and columns.
 
     However, you still have to handle all the expect session details,
-    including send and expect calls for logging in, detecting of command
-    prompts, capturing output, etc. It's easier to use the Mnet::Expect::Cli
-    module which handles all of this, if you can.
+    including send and expect calls for logging in, detection of command
+    prompts, capturing device output, etc. It's easier to use the
+    Mnet::Expect::Cli module which handles all of this, if you can.
 
   Why should I use the Mnet::Expect::Cli module?
     The Mnet::Expect::Cli module makes it easy to login and obtain outputs
@@ -226,7 +230,7 @@ FAQ
 
     This module also works with the Mnet::Test module, allowing expect session
     activity to be recorded and replayed while offline. This can be of
-    tremendous value, both during development, and for sustainability.
+    tremendous value, during development and for sustainability.
 
     Refer also the the Mnet::Expect::Cli::Ios module mentioned below, which
     has a couple of features relevant when working with cisco ios and other

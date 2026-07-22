@@ -1,16 +1,21 @@
 Change log for Sys::OsRelease
 
-0.4.2 2026-07-19T23:34:29-07:00 America/Los_Angeles
+0.4.3 2026-07-21T18:44:36-07:00 America/Los_Angeles
  [MAJOR]
  [API CHANGE]
  [MINOR]
  [ENHANCEMENTS]
  [SECURITY]
  [REVISION]
- - add 'provides' metadata for Sys::OsRelease::Lite (for CPAN upload)
-
  [BUG FIXES]
+ - move some Sys::OsRelease::Lite dependency declarations from build to
+   configure stage (found by CPAN Testers)
+
  [DOCS]
+
+0.4.2 2026-07-19T23:34:29-07:00 America/Los_Angeles
+ [REVISION]
+ - add 'provides' metadata for Sys::OsRelease::Lite (for CPAN upload)
 
 0.4.1 2026-07-19T22:08:34-07:00 America/Los_Angeles
  [REVISION]

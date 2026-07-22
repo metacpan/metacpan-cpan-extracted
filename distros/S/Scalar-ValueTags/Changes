@@ -8,3 +8,5 @@ NOTE: Odd versions are trial versions; even versions are release versions
 0.002 2026-07-13
  - First release version
 
+0.004 2026-07-21
+ - fix _PTHx bug breaking threaded perl (Leonerd)

@@ -6,6 +6,8 @@ use warnings;
 use 5.010;
 
 use Carp;
+use CLI::Simple::Utils qw(slurp);
+use CLI::Simple::Constants qw(:booleans :chars);
 use Data::Dumper;
 use English qw( -no_match_vars );
 use ExtUtils::MM;
@@ -14,97 +16,20 @@ use JSON;
 use Module::CoreList;
 use Pod::Usage;
 use Pod::Find qw( pod_where );
-use Readonly;
 use IO::Scalar;
 use List::Util qw( max none );
 use version;
 
-use parent qw( Class::Accessor::Fast );
+use parent qw( CLI::Simple);
 
-our @OPTIONS = qw(
-  add_version
-  core
-  handle
-  include_require
-  json
-  min_core_version
-  path
-  perlreq
-  raw
-  require
-  separator
-  text
-);
+use Readonly;
+Readonly::Scalar my $DEFAULT_MIN_CORE_VERSION => $PERL_VERSION;
 
-__PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_accessors(@OPTIONS);
+our $VERSION = '1.9.1';
 
-# booleans
-Readonly my $TRUE  => 1;
-Readonly my $FALSE => 0;
+__PACKAGE__->use_log4perl( level => 'info' );
 
-# shell success/failure
-Readonly my $SUCCESS => 0;
-Readonly my $FAILURE => 1;
-
-# chars
-Readonly my $COMMA        => q{,};
-Readonly my $DOUBLE_COLON => q{::};
-Readonly my $EMPTY        => q{};
-Readonly my $NEWLINE      => qq{\n};
-Readonly my $SLASH        => q{/};
-Readonly my $SPACE        => q{ };
-
-Readonly my $DEFAULT_MIN_CORE_VERSION => $PERL_VERSION;
-
-our $HAVE_VERSION = eval {
-  require version;
-  return $TRUE;
-};
-
-our $VERSION = '1.8.2';
-
-caller or __PACKAGE__->main();
-
-########################################################################
-sub new {
-########################################################################
-  my ( $class, $args ) = @_;
-
-  $args = $args || {};
-
-  my %options = %{$args};
-
-  foreach my $k ( keys %options ) {
-    my $v = $options{$k};
-
-    delete $options{$k};
-
-    $k =~ s/-/_/gxsm;
-
-    $options{$k} = $v;
-  }
-
-  # defaults
-  $options{core}             //= $TRUE;
-  $options{include_require}  //= $FALSE;
-  $options{add_version}      //= $TRUE;
-  $options{min_core_version} //= $DEFAULT_MIN_CORE_VERSION;
-  $options{text}             //= $TRUE;
-
-  # check for unknown options
-  foreach my $o ( keys %options ) {
-    die "unknown option $o\n"
-      if none { $_ eq $o } @OPTIONS;
-  }
-
-  my $self = $class->SUPER::new( \%options );
-
-  $self->set_perlreq( {} );
-  $self->set_require( {} );
-
-  return $self;
-}
+caller or exit __PACKAGE__->main();
 
 ########################################################################
 sub make_path_from_module {
@@ -177,27 +102,31 @@ sub is_core {
 
   my $core = $FALSE;
 
-  my @ms = Module::CoreList->find_modules(qr/\A$module\z/xsm);
+  my $first_release = Module::CoreList->first_release($module);
 
-  if (@ms) {
-    my $first_release = Module::CoreList->first_release($module);
+  my $removed_version = Module::CoreList->removed_from($module);
 
-    my $removed_version = Module::CoreList->removed_from($module);
+  my $min_core_version = $self->min_core_version();
 
-    my $min_core_version = $self->min_core_version();
+  $self->get_logger->debug(
+    sprintf 'module: %s first_release: %s removed_version: %s min_core_version: %s',
+    $module_w_version,
+    $first_release   // q{-},
+    $removed_version // q{-},
+    $min_core_version,
+  );
 
-    # consider a module core if its first release was less than some
-    # version of Perl. This is done because CPAN testers don't seem to
-    # test modules against Perls that are older than 5.8.9 - however,
-    # some modules like JSON::PP did not appear until after 5.10
+  # consider a module core if its first release was less than some
+  # version of Perl. This is done because CPAN testers don't seem to
+  # test modules against Perls that are older than 5.8.9 - however,
+  # some modules like JSON::PP did not appear until after 5.10
 
-    if ($removed_version) {
-      $core = $removed_version > $min_core_version;
-    }
-    elsif ($first_release) {
-      $core = $first_release <= $min_core_version;
-    }
+  # any removed module must be considered non-core
+  if ( !$removed_version && $first_release ) {
+    $core = $first_release <= $min_core_version;
   }
+
+  $self->get_logger->debug( sprintf 'module: %s is %score', $module_w_version, $core ? q{} : 'NOT ' );
 
   return $core;
 }
@@ -612,7 +541,7 @@ sub add_require {
   my $oldver = $require->{$module};
 
   if ($oldver) {
-    if ( $HAVE_VERSION && $newver && version->new($oldver) < $newver ) {
+    if ( $newver && version->new($oldver) < $newver ) {
       $require->{$module} = $newver;
     }
   }
@@ -721,7 +650,7 @@ sub format_text {
     push @output, sprintf $format, $name, $separator, $version // $EMPTY;
   }
 
-  return join $NEWLINE, @output, $EMPTY;
+  return join "\n", @output, $EMPTY;
 }
 
 ########################################################################
@@ -761,68 +690,221 @@ sub to_rpm {
     }
   }
 
-  return join $NEWLINE, @rpm_deps, $EMPTY;
+  return join "\n", @rpm_deps, $EMPTY;
+}
+
+########################################################################
+sub _extra_options {
+########################################################################
+  return [qw(perlreq require handle files)];
+}
+
+########################################################################
+sub _option_specs {
+########################################################################
+  return [
+    qw(
+      add-version|a!
+      core|c!
+      help|h
+      include-require|i!
+      json|j
+      log-level|l
+      min-core-version|m=s
+      raw|r
+      separator|s=s
+      text|t
+      version|v
+      path|p=s
+      file-list|L=s
+    )
+  ];
+}
+
+########################################################################
+sub _default_options {
+########################################################################
+  return {
+    add_version      => $TRUE,
+    core             => $TRUE,
+    include_require  => $TRUE,
+    json             => $FALSE,
+    min_core_version => '5.8.9',
+    separator        => q{ => },
+    text             => $TRUE,
+  };
+}
+
+########################################################################
+sub new {
+########################################################################
+  my ( $class, $options ) = @_;
+
+  # extra_options (perlreq, require, handle, files) are accessor-only
+  # fields -- CLI::Simple creates get_X/set_X for them but never
+  # populates them via GetOptions, since they aren't part of
+  # option_specs at all (and in handle's case, can't be: a filehandle
+  # reference isn't representable as a command-line string). Pull
+  # these out before building @argv and set them directly on the
+  # constructed object instead.
+  my %is_extra = map { $_ => 1 } @{ _extra_options() };
+
+  my %extra_values;
+  my %cli_values;
+
+  foreach my $o ( keys %{$options} ) {
+    if ( $is_extra{$o} ) {
+      $extra_values{$o} = $options->{$o};
+    }
+    else {
+      $cli_values{$o} = $options->{$o};
+    }
+  }
+
+  # classify each known option_spec as negatable ('!'), plain boolean
+  # (no type suffix at all -- presence-only, no --no-X form), or
+  # value-taking ('=s' etc.), so the hashref -> @ARGV translation below
+  # can represent each key correctly instead of treating them all the
+  # same way.
+  my %spec_type;
+
+  foreach my $spec ( @{ _option_specs() } ) {
+    my ($name) = split /[^\w-]/xsm, $spec;
+
+    if ( $spec =~ /[!]\z/xsm ) {
+      $spec_type{$name} = 'negatable';
+    }
+    elsif ( $spec =~ /[=:]/xsm ) {
+      $spec_type{$name} = 'value';
+    }
+    else {
+      $spec_type{$name} = 'boolean';
+    }
+  }
+
+  my @argv;
+
+  foreach my $o ( keys %cli_values ) {
+    ( my $dashed = $o ) =~ s/_/-/gxsm;
+
+    my $arg_name = length $dashed == 1 ? "-$dashed" : "--$dashed";
+
+    my $type = $spec_type{$dashed};
+
+    if ( !defined $type ) {
+      # unrecognized key that isn't an extra_options field either --
+      # not something we know how to represent; pass through as-is
+      # and let GetOptions report the error.
+      push @argv, ( $arg_name => $cli_values{$o} );
+    }
+    elsif ( $type eq 'negatable' ) {
+      push @argv, $cli_values{$o} ? $arg_name : "--no-$dashed";
+    }
+    elsif ( $type eq 'boolean' ) {
+      # no negated form exists for these -- omit entirely when false
+      # rather than emitting a flag GetOptions won't recognize.
+      push @argv, $arg_name if $cli_values{$o};
+    }
+    elsif ( defined $cli_values{$o} ) {
+      push @argv, ( $arg_name => $cli_values{$o} );
+    }
+    else {
+      push @argv, $arg_name;
+    }
+  }
+
+  local @ARGV = @argv;
+
+  my $self = __PACKAGE__->main($TRUE);
+
+  foreach my $k ( keys %extra_values ) {
+    my $setter = "set_$k";
+    $self->$setter( $extra_values{$k} );
+  }
+
+  return $self;
 }
 
 ########################################################################
 sub main {
 ########################################################################
+  my ( $class, $setup ) = @_;
 
-  my %options = (
-    core               => $TRUE,
-    'add-version'      => $TRUE,
-    'include-require'  => $TRUE,
-    'json'             => $FALSE,
-    'text'             => $TRUE,
-    'separator'        => q{ => },
-    'min-core-version' => '5.8.9',
+  my $cli = __PACKAGE__->SUPER::new(
+    commands         => { scan => \&cmd_scan },
+    option_specs     => _option_specs(),
+    default_options  => _default_options(),
+    extra_options    => _extra_options(),
+    validate_command => $FALSE,
   );
 
-  my @option_specs = qw(
-    add-version|a!
-    core|c!
-    help|h
-    include-require|i!
-    json|j
-    min-core-version|m=s
-    raw|r
-    separator|s=s
-    text|t
-    version|v
-  );
+  return $setup ? $cli : return $cli->run;
+}
 
-  GetOptions( \%options, @option_specs );
+########################################################################
+sub init {
+########################################################################
+  my ($self) = @_;
 
-  if ( $options{'version'} ) {
-    pod2usage(
-      -exitval  => 1,
-      -input    => pod_where( { -inc => 1 }, __PACKAGE__ ),
-      -sections => 'VERSION|NAME|AUTHOR',
-      -verbose  => 99,
-    );
-  }
+  my @args = $self->get_args;
 
-  if ( $options{'help'} ) {
-    pod2usage(
-      -exitval => 1,
-      -input   => pod_where( { -inc => 1 }, __PACKAGE__ ),
-      -verbose => 1,
-    );
-  }
-
-  $options{'path'} = shift @ARGV;
-
-  my $scanner = Module::ScanDeps::Static->new( {%options} );
-  $scanner->parse;
-
-  if ( $options{'json'} ) {
-    print $scanner->get_dependencies( format => 'json' );
+  if ( !@args ) {
+    $self->command_args( $self->command() );  # set the args to the command
+    $self->command('scan');  # set the command to your default
   }
   else {
-    print $scanner->get_dependencies( format => 'text' );
+    die "ERROR: unknown command\n"
+      if !$self->commands->{ $self->command };  # validate the command
   }
 
-  exit $SUCCESS;
+  my @file_list = eval {
+
+    if ( my $file_list = $self->get_file_list ) {
+      my $list = slurp($file_list);
+
+      $self->set_json($FALSE);
+
+      return split /\n/xsm, $list;
+    }
+
+    return $self->get_path
+      if $self->get_path;
+
+    return $self->get_args;
+  };
+
+  $self->set_files( \@file_list );
+
+  $self->set_perlreq( {} );
+
+  $self->set_require( {} );
+
+  return;
+}
+
+########################################################################
+sub cmd_scan {
+########################################################################
+  my ($self) = @_;
+
+  my @deps;
+
+  foreach my $file ( @{ $self->get_files } ) {
+    $self->set_path($file);
+
+    $self->parse;
+
+    if ( $self->get_json ) {
+      push @deps, $self->get_dependencies( format => 'json' );
+    }
+    else {
+      push @deps, $self->get_dependencies( format => 'text' );
+    }
+  }
+
+  print {*STDOUT} "@deps";
+
+  return $SUCCESS;
 }
 
 1;
@@ -837,7 +919,7 @@ Module::ScanDeps::Static - a cleanup of rpmbuild's perl.req
 
 =head1 SYNOPSIS
 
- scandeps-static.pl [options] Module
+ scandeps-static [options] Module
 
 If "Module" is not provided, the script will read from STDIN.
 
@@ -873,11 +955,13 @@ included in this distribution.>
  --no-add-version         don't add version numbers to output
  --core                   include core modules (default)
  --no-core                don't include core modules
+ --file-list, -L PATH     scan a batch of files listed one per line in PATH
  --help, -h               help
  --include-require, -i    include 'require'd modules
  --no-include-require     don't include required modules
  --json, -j               output JSON formatted list
  --min-core-version, -m   minimum version of perl to consider core
+ --path, -p PATH          file to scan (alternative to the positional argument)
  --raw, -r                raw output
  --separator, -s          separator for output (default: =>)
  --text, -t               output as text (default)
@@ -885,9 +969,9 @@ included in this distribution.>
 
 =head2 Examples
 
- scandeps-static.pl --no-core $(which scandeps-static.pl)
+ scandeps-static --no-core lib/Some/Module.pm
 
- scandeps-static.pl --json $(which scandeps-static.pl)
+ scandeps-static --json lib/Some/Module.pm
 
 I<Use the C<find-requires> script included in this distribution to
 recurse directories and create dependency files like C<cpanfile>>.
@@ -910,6 +994,26 @@ description of how core modules are identified.
 
 default: B<--core>
 
+=item --file-list, -L PATH
+
+Scan a batch of files in a single process instead of one file per
+invocation. C<PATH> is a file containing one source file path per
+line (relative or absolute); each listed file is scanned in turn and
+the results are aggregated. There is currently no way to supply the
+list via C<STDIN> - C<PATH> must be a real file.
+
+Batching this way avoids paying Perl's own process-startup cost and
+the C<Module::CoreList> module-load cost (non-trivial - loading
+C<Module::CoreList> alone is roughly an order of magnitude slower
+than a bare C<perl> startup) once per file scanned, which matters a
+great deal once a project has more than a handful of source files.
+
+Because more than one JSON document cannot be safely concatenated
+into a single valid JSON result, C<--json> is silently ignored
+whenever C<--file-list> resolves to more than one file - output is
+always text in that case. If the list happens to contain exactly one
+file, C<--json> is honored normally.
+
 =item --help, -h
 
 Show usage.
@@ -923,7 +1027,9 @@ default: B<--include-require>
 
 =item --json, -j
 
-Output the dependency list as a JSON encode string.
+Output the dependency list as a JSON encode string. Silently ignored
+in favor of text output when combined with C<--file-list> and more
+than one file is being scanned - see L</--file-list, -L PATH>.
 
 =item --min-core-version, -m
 
@@ -932,19 +1038,34 @@ consider some modules non-core if they did not appear until after the
 C<min-core-version>.
 
 Core modules are identified using C<Module::CoreList> and comparing
-the first release value of the module with the the minimum version of
+the first release value of the module with the minimum version of
 Perl considered as a baseline.  If you're using this module to
 identify the dependencies for your script B<AND> you know you will be
 using a specific version of Perl, then set the C<min-core-version> to
 that version of Perl.
 
+Note: this only governs the "not yet in core as of my baseline" case.
+A module that was core at some point but has since been B<removed>
+from core is always treated as non-core, regardless of
+C<min-core-version> - there is no way to know which specific Perl an
+end user actually has installed, so the only safe answer once a
+module has ever been removed is to require it explicitly. See
+L</is_core> for details.
+
 default: C<5.8.9> (the C<Module::ScanDeps::Static> constructor's
 C<min_core_version> option defaults this to the running Perl's version
 instead)
 
+=item --path, -p PATH
+
+Path to the file to scan. Equivalent to supplying the path as a bare
+positional argument; provided as a named option for clarity in
+scripts that build up the command line programmatically. Ignored if
+C<--file-list> is also given.
+
 =item --separator, -s
 
-Use the specified sting to separate modules and version numbers in formatted output.
+Use the specified string to separate modules and version numbers in formatted output.
 
 default: ' => '
 
@@ -967,7 +1088,8 @@ character.
 
 For the purposes of this module, dependencies are identified by
 looking for Perl modules and other Perl artifacts declared using
-C<use>, C<require>, C<parent>, or C<base>.
+C<use>, C<require>, C<parent>, or C<base>. The script will also
+consider Moo/Role::Tiny modules include using C<with>.
 
 If the module contains a C<require> statement, by default the
 C<require> must be flush up against the left edge of your script
@@ -1202,10 +1324,19 @@ are treated as a seed list and prepended to the results.
  my $bool = $scanner->is_core($module);
  my $bool = $scanner->is_core("$module $version");
 
-Returns true if C<$module> is considered a core module. A module is
-core when C<Module::CoreList> reports its first release at or before
-C<min_core_version> (and, if it was later removed from core, only if it
-was removed after that version).
+Returns true if C<$module> is considered core. A module is core when
+C<Module::CoreList> reports its first release at or before
+C<min_core_version> B<and> the module has never been removed from
+core at any point in its history.
+
+A module that was core at some earlier Perl but has since been
+removed is always treated as non-core, regardless of how
+C<min_core_version> compares to the version it was removed at. There
+is no way to know which Perl an end user actually has installed - a
+version comparison against a single reference point only protects
+against removals that happen to fall on one particular side of it, so
+the only safe answer once a module has ever been removed is to always
+require it explicitly.
 
 =head2 min_core_version
 

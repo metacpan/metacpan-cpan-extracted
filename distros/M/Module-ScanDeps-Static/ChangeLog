@@ -1,3 +1,49 @@
+Tue Jul 21 16:28:10 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.9.1]:
+	* release-notes/release-notes-1.9.0.md: new
+	* release-notes.md: new
+	* bin/scandeps-static.in: new
+	* project.mk: new
+	* .gitignore: +bin/scandeps-static
+	* VERSION: bump
+	* lib/Module/ScanDeps/Static.pm.in
+	- refactored to use CLI::Simple
+	(_extra_options): new
+	(_option_specs): new
+	(new)
+	- refactored to translate args into options for cmd_scan
+	* requires: CLI::Simple 2.1.1, -Class::Accessor::Fast
+	* cpanfile: likewise
+	* t/01-scandeps.t
+	- refactored
+	* test-requires: nothing
+	* t/02-new-compat.t: new
+	* deps.mk: generated
+
+Tue Jul 21 07:53:17 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.9.0]:
+	* release-notes/release-notes-1.9.0.md: new
+	* release-notes.md: new
+	* .includes/perl.mk: updated by CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* VERSION: bump
+	* deps.mk
+	- +bin/scandeps-static.pl.in
+	* lib/Module/ScanDeps/Static.pm.in
+	- pod updates
+	- use utils, constants from CLI::Simple
+	(is_core)
+	- performance optimiation (remove unnecessary call to find_modules)
+	- consider any module removed from core, non-core
+	(main)
+	- support for a batch of files
+	* requires
+	- +CLI::Simple::Constants, ::Utils
+	* cpanfile: likewise
+	* bin/scandeps-static.pl.in: explicit exit
+
 Mon Jul 20 06:18:39 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.8.2]:

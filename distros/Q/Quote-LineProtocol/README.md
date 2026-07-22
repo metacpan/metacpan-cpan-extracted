@@ -80,4 +80,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-vague <vague@cpan.org>
+vague <4Qt9Ma7@proton.me>

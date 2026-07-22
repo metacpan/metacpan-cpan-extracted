@@ -40,10 +40,11 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 $VERSION = $VERSION;
 
 require BATsh::Env;
+require BATsh::MB;
 
 # ----------------------------------------------------------------
 # Module-level state
@@ -51,6 +52,7 @@ require BATsh::Env;
 my $ECHO_ON    = 1;
 my $ERRORLEVEL = 0;
 my $_GOTO_LABEL = '';
+my $_EXIT_REQUESTED = 0;   # set by EXIT; consumed by BATsh.pm (script exit)
 
 # ----------------------------------------------------------------
 # Public: execute an array of CMD lines
@@ -106,6 +108,25 @@ sub exec_block {
 # Used by BATsh::Env::_expand_named_var for %ERRORLEVEL% expansion.
 # ----------------------------------------------------------------
 sub _get_errorlevel { return $ERRORLEVEL }
+
+# ----------------------------------------------------------------
+# _set_errorlevel: set ERRORLEVEL from outside the CMD interpreter.
+# Used by BATsh.pm to bridge the SH-side $? into %ERRORLEVEL% at
+# every SH->CMD section boundary.  Call as a plain function.
+# ----------------------------------------------------------------
+sub _set_errorlevel {
+    $ERRORLEVEL = defined $_[0] ? int($_[0]) : 0;
+    return $ERRORLEVEL;
+}
+
+# ----------------------------------------------------------------
+# _exit_requested / _clear_exit_requested: EXIT was executed in a CMD
+# section.  BATsh.pm polls the flag after each CMD block to terminate
+# the whole script with ERRORLEVEL as the process exit code, then
+# clears it.  Call as plain functions.
+# ----------------------------------------------------------------
+sub _exit_requested       { return $_EXIT_REQUESTED }
+sub _clear_exit_requested { $_EXIT_REQUESTED = 0; return 0 }
 
 # ----------------------------------------------------------------
 # _join_continuations: merge lines ending with bare ^ (not ^^ or "^")
@@ -520,6 +541,7 @@ sub _dispatch_with_redirs {
     my ($in_file, $out_file, $out_app, $err_file, $err_app);
     for my $r (@{$redirs}) {
         my ($fd, $append, $file) = @{$r};
+        $file = BATsh::MB::dec($file);
         if    ($fd == 0) { $in_file  = $file }
         elsif ($fd == 1) { $out_file = $file; $out_app = $append }
         else             { $err_file = $file; $err_app = $append }
@@ -629,7 +651,11 @@ sub _dispatch {
         $rest =~ s/\A\s+//;
         my $is_b = ($rest =~ s{/B\s*}{}i) ? 1 : 0;
         $rest =~ s/\A\s+//;
-        $ERRORLEVEL = ($rest =~ /\A\d+\z/) ? int($rest) : 0;
+        # EXIT n / EXIT /B n set the exit code; a bare EXIT [/B] keeps the
+        # current ERRORLEVEL (cmd.exe: exit code of the batch is the last
+        # ERRORLEVEL when no code is given).
+        $ERRORLEVEL = int($rest) if $rest =~ /\A\d+\z/;
+        $_EXIT_REQUESTED = 1;
         return '__EXIT__';
     }
     if ($CMD eq 'CLS')   { print "\033[2J\033[H"; return 0 }
@@ -664,7 +690,7 @@ sub _cmd_echo {
 
     # Remove ^ escapes for display (they were protection, not content)
     $rest = _unescape_caret($rest);
-    print "$rest\n";
+    print BATsh::MB::dec($rest), "\n";
     # ERRORLEVEL intentionally NOT modified here
     return 0;
 }
@@ -680,11 +706,11 @@ sub _cmd_set {
     if ($rest =~ s/\A\/P\s*//i) {
         if ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)/) {
             my ($var, $prompt) = ($1, $2);
-            print $prompt;
+            print BATsh::MB::dec($prompt);
             my $input = <STDIN>;
             $input = '' unless defined $input;
             chomp $input;
-            BATsh::Env->set($var, $input);
+            BATsh::Env->set($var, BATsh::MB::enc($input));
             $ERRORLEVEL = 0;
         }
         return 0;
@@ -705,7 +731,7 @@ sub _cmd_set {
     # SET with no args: display all
     if ($rest =~ /\A\s*\z/) {
         for my $k (sort keys %BATsh::Env::STORE) {
-            print "$k=$BATsh::Env::STORE{$k}\n";
+            print "$k=", BATsh::MB::dec($BATsh::Env::STORE{$k}), "\n";
         }
         return 0;
     }
@@ -722,7 +748,7 @@ sub _cmd_set {
         my $prefix = uc($1);
         for my $k (sort keys %BATsh::Env::STORE) {
             if (index(uc($k), $prefix) == 0) {
-                print "$k=$BATsh::Env::STORE{$k}\n";
+                print "$k=", BATsh::MB::dec($BATsh::Env::STORE{$k}), "\n";
             }
         }
         return 0;
@@ -804,7 +830,7 @@ sub _cmd_if {
         elsif ($rest =~ s/\A(\S+)\s*//) {
             $path = $1;
         }
-        $condition = (defined $path && -e $path) ? 1 : 0;
+        $condition = (defined $path && -e BATsh::MB::dec($path)) ? 1 : 0;
     }
     # DEFINED var
     elsif ($rest =~ s/\ADEFINED\s+(\S+)\s*//i) {
@@ -865,13 +891,67 @@ sub _parse_if_bodies {
     my ($then_body, $else_body);
     $rest =~ s/\A\s+//;
     if ($rest =~ s/\A\(//) {
-        $then_body = _read_paren_block($rest, $lines_ref, $i_ref, \$else_body);
+        # First try the fully-inline single-line form on THIS physical
+        # line:  ( then-body ) [ ELSE ( else-body ) | ELSE else-body ]
+        # _match_paren finds the ')' that closes the just-opened '(' on
+        # the same line (quote- and nesting-aware).  If the block instead
+        # spans following lines (no closing ')' here), fall back to the
+        # multi-line reader.
+        my ($inner, $after) = _match_paren($rest);
+        if (defined $inner) {
+            $then_body = $inner;
+            $after =~ s/\A\s+//;
+            if ($after =~ s/\AELSE\s*//i) {
+                if ($after =~ /\A\(/) {
+                    $after =~ s/\A\(//;
+                    my ($einner) = _match_paren($after);
+                    $else_body = defined($einner) ? $einner : $after;
+                }
+                elsif ($after =~ /\S/) {
+                    $else_body = $after;
+                }
+            }
+        }
+        else {
+            $then_body = _read_paren_block($rest, $lines_ref, $i_ref, \$else_body);
+        }
     }
     else {
         if ($rest =~ s/\s+ELSE\s+(.+)\z//i) { $else_body = $1 }
         $then_body = $rest;
     }
     return ($then_body, $else_body);
+}
+
+# _match_paren: $str begins with the content right AFTER an opening '('
+# (depth already 1).  Scan for the matching ')' at depth 0, honouring
+# double quotes.  Returns (inside_content, remainder_after_close) when
+# the paren closes within $str, or (undef, undef) when it does not
+# (i.e. the block continues on following physical lines).
+sub _match_paren {
+    my ($str) = @_;
+    my @c    = split //, $str;
+    my $n    = scalar @c;
+    my $dep  = 0;
+    my $in_q = 0;
+    my $i    = 0;
+    while ($i < $n) {
+        my $ch = $c[$i];
+        if ($ch eq '"') { $in_q = !$in_q; $i++; next }
+        if (!$in_q) {
+            if ($ch eq '(') { $dep++; $i++; next }
+            if ($ch eq ')') {
+                if ($dep == 0) {
+                    my $inside = join('', @c[0 .. $i-1]);
+                    my $after  = ($i+1 <= $n-1) ? join('', @c[$i+1 .. $n-1]) : '';
+                    return ($inside, $after);
+                }
+                $dep--; $i++; next;
+            }
+        }
+        $i++;
+    }
+    return (undef, undef);
 }
 
 sub _read_paren_block {
@@ -982,7 +1062,7 @@ sub _cmd_for {
             $item =~ s/\A\s+//; $item =~ s/\s+\z//;
             next if $item eq '';
             if ($item =~ /[*?]/) {
-                my @g = glob($item);
+                my @g = map { BATsh::MB::enc($_) } glob(BATsh::MB::dec($item));
                 push @expanded, @g ? @g : ($item);
             }
             else { push @expanded, $item }
@@ -1109,19 +1189,19 @@ sub _cmd_for_f {
 
     if ($source_str =~ /\A'([^']*)'\z/ || ($usebackq && $source_str =~ /\A`([^`]*)`\z/)) {
         # Command output
-        my $cmd = $1;
+        my $cmd = BATsh::MB::dec($1);
         BATsh::Env->sync_to_env();
         local *CMDOUT;
         open(CMDOUT, "$cmd |") or return 1;
-        @lines_to_process = <CMDOUT>;
+        @lines_to_process = map { BATsh::MB::enc($_) } <CMDOUT>;
         close(CMDOUT);
     }
     elsif ($usebackq && $source_str =~ /\A"([^"]*)"\z/) {
         # usebackq: "..." = filename
-        my $file = $1;
+        my $file = BATsh::MB::dec($1);
         local *FFH;
         open(FFH, $file) or do { _warn("FOR /F: cannot open $file"); return 1 };
-        @lines_to_process = <FFH>;
+        @lines_to_process = map { BATsh::MB::enc($_) } <FFH>;
         close(FFH);
     }
     elsif ($source_str =~ /\A"([^"]*)"\z/ && !$usebackq) {
@@ -1130,10 +1210,10 @@ sub _cmd_for_f {
     }
     elsif ($source_str =~ /\A(\S+)\z/) {
         # Bare filename
-        my $file = $1;
+        my $file = BATsh::MB::dec($1);
         local *FFH2;
         open(FFH2, $file) or do { _warn("FOR /F: cannot open $file"); return 1 };
-        @lines_to_process = <FFH2>;
+        @lines_to_process = map { BATsh::MB::enc($_) } <FFH2>;
         close(FFH2);
     }
     else {
@@ -1351,6 +1431,7 @@ sub _cmd_shift {
 # ----------------------------------------------------------------
 sub _cmd_cd {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
     $rest =~ s/\A"//; $rest =~ s/"\z//;
     if ($rest eq '' || $rest =~ /\A\/D\s*\z/i) {
@@ -1363,7 +1444,7 @@ sub _cmd_cd {
         $ERRORLEVEL = 1;
         return 1;
     }
-    BATsh::Env->set('CD', Cwd::cwd());
+    BATsh::Env->set('CD', BATsh::MB::enc(Cwd::cwd()));
     $ERRORLEVEL = 0;
     return 0;
 }
@@ -1373,6 +1454,7 @@ sub _cmd_cd {
 # ----------------------------------------------------------------
 sub _cmd_dir {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
     my $target = $rest eq '' ? '.' : $rest;
     $target =~ s/\s*\/[A-Za-z:]+//g;
@@ -1403,6 +1485,7 @@ sub _cmd_dir {
 # ----------------------------------------------------------------
 sub _cmd_copy {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s*\/[YN]\s*//gi;
     my ($src, $dst) = split /\s+/, $rest, 2;
     unless (defined $src && defined $dst) { print "The syntax of the command is incorrect.\n"; return 1 }
@@ -1416,6 +1499,7 @@ sub _cmd_copy {
 
 sub _cmd_del {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s*\/[A-Za-z:]+//g; $rest =~ s/\s+\z//;
     $rest =~ s/\A"//; $rest =~ s/"\z//;
     my @files = glob($rest);
@@ -1428,6 +1512,7 @@ sub _cmd_del {
 
 sub _cmd_move {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s*\/[YN]\s*//gi;
     my ($src, $dst) = split /\s+/, $rest, 2;
     unless (defined $src && defined $dst) { print "The syntax of the command is incorrect.\n"; return 1 }
@@ -1441,6 +1526,7 @@ sub _cmd_move {
 
 sub _cmd_mkdir {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s+\z//; $rest =~ s/\A"//; $rest =~ s/"\z//;
     if (-d $rest) { print "A subdirectory or file $rest already exists.\n"; $ERRORLEVEL = 1; return 1 }
     File::Path::mkpath($rest); $ERRORLEVEL = 0; return 0;
@@ -1448,6 +1534,7 @@ sub _cmd_mkdir {
 
 sub _cmd_rmdir {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//;
     my $recurse = ($rest =~ s/\s*\/S\s*//i) ? 1 : 0;
     $rest =~ s/\s*\/Q\s*//i; $rest =~ s/\s+\z//; $rest =~ s/\A"//; $rest =~ s/"\z//;
@@ -1462,6 +1549,7 @@ sub _cmd_rmdir {
 
 sub _cmd_rename {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//;
     my ($src, $dst) = split /\s+/, $rest, 2;
     unless (defined $src && defined $dst) { print "The syntax of the command is incorrect.\n"; return 1 }
@@ -1473,6 +1561,7 @@ sub _cmd_rename {
 
 sub _cmd_type {
     my ($rest) = @_;
+    $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s+\z//; $rest =~ s/\A"//; $rest =~ s/"\z//;
     local *TFH;
     unless (open(TFH, $rest)) {
@@ -1492,6 +1581,7 @@ sub _cmd_external {
     $rest =~ s/\A\s+//;
     my $full = $rest ne '' ? "$cmd $rest" : $cmd;
     $full = _unescape_caret($full);
+    $full = BATsh::MB::dec($full);
     BATsh::Env->sync_to_env();
     my $rc = system($full);
     $ERRORLEVEL = ($rc == 0) ? 0 : (($rc >> 8) || 1);
@@ -1509,7 +1599,7 @@ sub _split_cmd {
     return ($line, '');
 }
 
-sub _warn { print STDERR "[BATsh::CMD] $_[0]\n" }
+sub _warn { print STDERR "[BATsh::CMD] ", BATsh::MB::dec($_[0]), "\n" }
 
 # ----------------------------------------------------------------
 # Accessors

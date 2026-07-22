@@ -21,4 +21,8 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+# Alien::SNMP::Install::Files is a machine-generated back-compat shim emitted by
+# Alien::Build::MM into blib; it has no POD by design, so exclude it.
+my @modules = grep { !/::Install::Files$/ } all_modules();
+plan tests => scalar @modules;
+pod_coverage_ok($_, "Pod coverage on $_") for @modules;

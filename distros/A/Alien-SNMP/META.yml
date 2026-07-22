@@ -3,39 +3,55 @@ abstract: 'Build and install Net-SNMP'
 author:
   - 'Eric A. Miller <emiller AT cpan DOT org>'
 build_requires:
-  Alien::Base: '0.020'
+  Alien::Build: '2.84'
+  Alien::Build::MM: '0.25'
+  Archive::Tar: '0'
+  Config: '0'
+  Devel::FindPerl: '0'
+  HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mozilla::CA: '0'
   Net::SSLeay: '1.49'
-  Software::License: '0'
-  Test::Alien: '0.16'
+  Test::Alien: '2.84'
   Test::More: '0.94'
-  perl: '5.010001'
+  URI: '0'
 configure_requires:
-  Alien::Base::ModuleBuild: '0'
-  File::ShareDir: '1.03'
-  Module::Build: '0.42'
-  PkgConfig: '0.14026'
-  Test2::Suite: '0.000067'
-  perl: '5.010001'
+  Alien::Build: '2.84'
+  Alien::Build::MM: '2.84'
+  Alien::Build::Plugin::Digest::Negotiate: '0'
+  ExtUtils::MakeMaker: '7.30'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-SNMP
-provides:
-  Alien::SNMP:
-    file: lib/Alien/SNMP.pm
-    version: '3.0509050200'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Alien::Base: '0.020'
-  File::ShareDir: '1.03'
-  parent: '0'
+  Alien::Base: '2.84'
+  Alien::Build: '0.25'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/ollyg/Alien-SNMP/issues
-  license: http://opensource.org/licenses/BSD-3-Clause
-  repository: http://github.com/ollyg/Alien-SNMP
-version: '3.0509050200'
+  repository: https://github.com/ollyg/Alien-SNMP.git
+version: '4.0509050200'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      Devel::FindPerl: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

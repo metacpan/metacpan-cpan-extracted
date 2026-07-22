@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 BEGIN {
     $ENV{PACKAGE_STASH_IMPLEMENTATION} ||= 'PP';
     $ENV{MOO_XS_DISABLE} ||= '1';
@@ -664,19 +664,10 @@ sub MY::postamble {
     $make_frag .= $/;
 
     # Copy libprotobufperl to blib so it can be found via Rpath without LD_LIBRARY_PATH
-    my $ext = $main::extlib_ext;
-    $make_frag .= <<"EOF";
-
-# Make the shared library a dependency of the blib copy
-\$(INST_ARCHAUTODIR)/libprotobufperl.$ext : libprotobufperl.$ext
-	\$(NOECHO) \$(MKPATH) \$(INST_ARCHAUTODIR)
-	\$(CP) libprotobufperl.$ext \$(INST_ARCHAUTODIR)/libprotobufperl.$ext
-
-# Ensure the copy and plugin build happen during standard make
-all :: \$(INST_ARCHAUTODIR)/libprotobufperl.$ext
-all :: $protoc_plugin_exe
-
-EOF
+    $make_frag .= main::_render_tt('blib_libprotobufperl_copy', {
+        ext               => $main::extlib_ext,
+        protoc_plugin_exe => $protoc_plugin_exe,
+    });
 
     if ($main::is_win32) {
         $make_frag .= "\nconfig ::\n\t\$(NOECHO) \$(MKPATH) \$(INST_AUTODIR) \$(INST_LIBDIR)\n";
@@ -739,7 +730,7 @@ our $mac_inc = '';
 our $mac_libs = '';
 if ($is_linux) {
     $common_lib_link_flags = '-Wl,-z,origin -Wl,-soname,libprotobufperl.so -Wl,--version-script=libprotobufperl.map';
-    $extra_ldflags = ' -Wl,-z,origin -Wl,-rpath,$$ORIGIN:$$ORIGIN/../../..';
+    $extra_ldflags = ' -Wl,-z,origin -Wl,-rpath,\$$ORIGIN:\$$ORIGIN/../../..';
 } elsif ($is_darwin) {
     $common_lib_link_flags = "-Wl,-install_name,\@rpath/libprotobufperl.$extlib_ext -Wl,-undefined,dynamic_lookup";
     $extra_ldflags = ' -Wl,-rpath,@loader_path';
@@ -797,7 +788,19 @@ WriteMakefile(
             },
         },
         no_index => {
-            directory => [ 'xlib', 't', 'inc', 'local' ],
+            directory => [ 'xlib', 't', 'inc', 'local', 'lib/Google', 'lib/Conformance', 'lib/Protobuf_test_messages' ],
+            package   => [
+                'Google::ProtocolBuffers::Dynamic',
+                'Google::Protobuf',
+                'Google::Protobuf::Any',
+                'Google::Protobuf::Duration',
+                'Google::Protobuf::Timestamp',
+                'Google::Protobuf::FieldMask',
+                'Google::Protobuf::Struct',
+                'Google::Protobuf::Wrappers',
+                'Google::Protobuf::Empty',
+                'Conformance',
+            ],
         },
     },
     TEST_REQUIRES => {

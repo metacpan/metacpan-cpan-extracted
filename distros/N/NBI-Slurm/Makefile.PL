@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "bin/runjob",
     "bin/session",
     "bin/shelf",
+    "bin/slurm-efficiency",
     "bin/slurm-load",
     "bin/viewjobs",
     "bin/waitjobs",
@@ -35,7 +36,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016",
   "NAME" => "NBI::Slurm",
   "PREREQ_PM" => {
-    "Capture::Tiny" => "0.40",
     "Carp" => "1.2",
     "Data::Dumper" => "2.1",
     "FindBin" => "1.3",
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Text::ASCIITable" => "0.22"
   },
-  "VERSION" => "0.21.0",
+  "VERSION" => "0.22.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Capture::Tiny" => "0.40",
   "Carp" => "1.2",
   "Data::Dumper" => "2.1",
   "FindBin" => "1.3",

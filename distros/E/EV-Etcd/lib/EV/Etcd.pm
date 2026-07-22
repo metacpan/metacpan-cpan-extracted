@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use EV ();
 require XSLoader;
@@ -194,9 +194,41 @@ Errors are returned as hash references with the following structure:
 The C<retryable> field indicates whether the error is transient (status codes:
 UNAVAILABLE, RESOURCE_EXHAUSTED, ABORTED, DEADLINE_EXCEEDED).
 Streaming operations (watch, keepalive, observe) automatically reconnect
-on transient failures according to the C<max_retries> configuration.
-Unary RPCs (get, put, delete, etc.) do not retry automatically; use the
-C<retryable> field to implement application-level retry logic.
+with linear backoff whenever the stream ends for any reason other than an
+explicit cancel — connection loss, server restart, graceful close — up to
+C<max_retries> attempts (the attempt counter resets as the stream makes
+progress). The error callback fires once reconnection is disabled or
+exhausted. Errors the server sends I<on> the stream — a watch cancelled or
+compacted away, an expired lease — are reported immediately and do not
+reconnect. A fully silent network partition (no FIN/RST reaching the
+client) is indistinguishable from an idle stream: no gRPC keepalive pings
+are configured, so such an outage surfaces only once connectivity returns
+or the OS abandons the connection. Unary RPCs (get, put, delete, etc.) do
+not retry automatically; use the C<retryable> field to implement
+application-level retry logic.
+
+=head1 CALLBACK LIFETIMES
+
+Callbacks are stored in C structures that are invisible to Perl's garbage
+collector. A callback closure that captures the client (or its own stream
+handle) forms a reference cycle that Perl cannot reclaim: the objects stay
+alive until the stream is cancelled or the client is destroyed, even if all
+Perl-side references are dropped.
+
+For long-lived streams, capture a weakened client reference and call
+C<cancel()> when the stream is no longer needed:
+
+    use Scalar::Util 'weaken';
+
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    weaken(my $weak = $client);
+    my $watch = $client->watch('/my/key', sub {
+        my ($resp, $err) = @_;
+        return if $err;
+        $weak->put('/my/seen', 1, sub {}) if $weak;
+    });
+    # ... later:
+    $watch->cancel(sub { });
 
 =head1 KEY-VALUE OPERATIONS
 
@@ -508,7 +540,7 @@ Options:
 =item auto_reconnect
 
 If true, the keepalive stream will automatically reconnect after a connection
-failure, with exponential backoff up to C<max_retries> (set on the client).
+failure, with linear backoff up to C<max_retries> (set on the client).
 Default is 1 (enabled). Pass C<0> to disable.
 
 =back

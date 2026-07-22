@@ -32,7 +32,7 @@ Module::ScanDeps::Static - a cleanup of rpmbuild's perl.req
 
 # SYNOPSIS
 
-    scandeps-static.pl [options] Module
+    scandeps-static [options] Module
 
 If "Module" is not provided, the script will read from STDIN.
 
@@ -68,11 +68,13 @@ included in this distribution._
     --no-add-version         don't add version numbers to output
     --core                   include core modules (default)
     --no-core                don't include core modules
+    --file-list, -L PATH     scan a batch of files listed one per line in PATH
     --help, -h               help
     --include-require, -i    include 'require'd modules
     --no-include-require     don't include required modules
     --json, -j               output JSON formatted list
     --min-core-version, -m   minimum version of perl to consider core
+    --path, -p PATH          file to scan (alternative to the positional argument)
     --raw, -r                raw output
     --separator, -s          separator for output (default: =>)
     --text, -t               output as text (default)
@@ -80,9 +82,9 @@ included in this distribution._
 
 ## Examples
 
-    scandeps-static.pl --no-core $(which scandeps-static.pl)
+    scandeps-static --no-core lib/Some/Module.pm
 
-    scandeps-static.pl --json $(which scandeps-static.pl)
+    scandeps-static --json lib/Some/Module.pm
 
 _Use the `find-requires` script included in this distribution to
 recurse directories and create dependency files like `cpanfile`_.
@@ -103,6 +105,26 @@ recurse directories and create dependency files like `cpanfile`_.
 
     default: **--core**
 
+- --file-list, -L PATH
+
+    Scan a batch of files in a single process instead of one file per
+    invocation. `PATH` is a file containing one source file path per
+    line (relative or absolute); each listed file is scanned in turn and
+    the results are aggregated. There is currently no way to supply the
+    list via `STDIN` - `PATH` must be a real file.
+
+    Batching this way avoids paying Perl's own process-startup cost and
+    the `Module::CoreList` module-load cost (non-trivial - loading
+    `Module::CoreList` alone is roughly an order of magnitude slower
+    than a bare `perl` startup) once per file scanned, which matters a
+    great deal once a project has more than a handful of source files.
+
+    Because more than one JSON document cannot be safely concatenated
+    into a single valid JSON result, `--json` is silently ignored
+    whenever `--file-list` resolves to more than one file - output is
+    always text in that case. If the list happens to contain exactly one
+    file, `--json` is honored normally.
+
 - --help, -h
 
     Show usage.
@@ -116,7 +138,9 @@ recurse directories and create dependency files like `cpanfile`_.
 
 - --json, -j
 
-    Output the dependency list as a JSON encode string.
+    Output the dependency list as a JSON encode string. Silently ignored
+    in favor of text output when combined with `--file-list` and more
+    than one file is being scanned - see ["--file-list, -L PATH"](#file-list-l-path).
 
 - --min-core-version, -m
 
@@ -125,19 +149,34 @@ recurse directories and create dependency files like `cpanfile`_.
     `min-core-version`.
 
     Core modules are identified using `Module::CoreList` and comparing
-    the first release value of the module with the the minimum version of
+    the first release value of the module with the minimum version of
     Perl considered as a baseline.  If you're using this module to
     identify the dependencies for your script **AND** you know you will be
     using a specific version of Perl, then set the `min-core-version` to
     that version of Perl.
 
+    Note: this only governs the "not yet in core as of my baseline" case.
+    A module that was core at some point but has since been **removed**
+    from core is always treated as non-core, regardless of
+    `min-core-version` - there is no way to know which specific Perl an
+    end user actually has installed, so the only safe answer once a
+    module has ever been removed is to require it explicitly. See
+    ["is\_core"](#is_core) for details.
+
     default: `5.8.9` (the `Module::ScanDeps::Static` constructor's
     `min_core_version` option defaults this to the running Perl's version
     instead)
 
+- --path, -p PATH
+
+    Path to the file to scan. Equivalent to supplying the path as a bare
+    positional argument; provided as a named option for clarity in
+    scripts that build up the command line programmatically. Ignored if
+    `--file-list` is also given.
+
 - --separator, -s
 
-    Use the specified sting to separate modules and version numbers in formatted output.
+    Use the specified string to separate modules and version numbers in formatted output.
 
     default: ' => '
 
@@ -157,7 +196,8 @@ recurse directories and create dependency files like `cpanfile`_.
 
 For the purposes of this module, dependencies are identified by
 looking for Perl modules and other Perl artifacts declared using
-`use`, `require`, `parent`, or `base`.
+`use`, `require`, `parent`, or `base`. The script will also
+consider Moo/Role::Tiny modules include using `with`.
 
 If the module contains a `require` statement, by default the
 `require` must be flush up against the left edge of your script
@@ -380,10 +420,19 @@ are treated as a seed list and prepended to the results.
     my $bool = $scanner->is_core($module);
     my $bool = $scanner->is_core("$module $version");
 
-Returns true if `$module` is considered a core module. A module is
-core when `Module::CoreList` reports its first release at or before
-`min_core_version` (and, if it was later removed from core, only if it
-was removed after that version).
+Returns true if `$module` is considered core. A module is core when
+`Module::CoreList` reports its first release at or before
+`min_core_version` **and** the module has never been removed from
+core at any point in its history.
+
+A module that was core at some earlier Perl but has since been
+removed is always treated as non-core, regardless of how
+`min_core_version` compares to the version it was removed at. There
+is no way to know which Perl an end user actually has installed - a
+version comparison against a single reference point only protects
+against removals that happen to fall on one particular side of it, so
+the only safe answer once a module has ever been removed is to always
+require it explicitly.
 
 ## min\_core\_version
 

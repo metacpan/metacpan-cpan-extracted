@@ -1,3 +1,8 @@
+v0.43.0 2026-07-21 13:39:37+02:00
+
+- feature: Add DEVEL_COVER_CODECOVBASH_COVER_ALL_STATEMENTS to require
+  having all statements in a line covered
+
 v0.42.0 2026-07-07 11:20:41+02:00
 
 - fix: Report lines with any covered statement as covered

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu;
-$Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu::VERSION = '0.01';
+$Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu::VERSION = '0.02';
 # ABSTRACT: DBIx::Class Result class for menus table
 
 use strict;
@@ -107,8 +107,7 @@ __PACKAGE__->add_columns(
 
     parent_id => {
         data_type     => 'integer',
-        is_nullable   => 0,
-        default_value => 0,
+        is_nullable   => 1,
         extra         => {
             openapi => {
                 description => 'Parent menu ID (0 for root)',
@@ -201,7 +200,7 @@ Mojolicious::Plugin::Fondation::Menu::Schema::Result::Menu - DBIx::Class Result 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

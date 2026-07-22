@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::MigrationDBIx;
-$Mojolicious::Plugin::Fondation::MigrationDBIx::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::MigrationDBIx::VERSION = '0.04';
 # ABSTRACT: Migration and fixture management for DBIx::Class backends
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
@@ -230,7 +230,7 @@ Mojolicious::Plugin::Fondation::MigrationDBIx - Migration and fixture management
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

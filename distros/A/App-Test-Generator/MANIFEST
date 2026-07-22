@@ -139,6 +139,7 @@ t/SchemaExtractor.t
 t/SchemaExtractor_function.t
 t/SchemaExtractor_signature_exec.t
 t/SchemaExtractor_unit.t
+t/self-fuzz.t
 t/strict_pod.t
 t/Template.t
 t/Template_unit.t

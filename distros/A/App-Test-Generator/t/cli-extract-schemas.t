@@ -233,4 +233,69 @@ END_PM
 		or diag("stdout: $out2\nstderr: $err2");
 }
 
+# --------------------------------------------------------------------
+# Readonly-constant length bounds resolve to min/max in schema
+# (regression test for _module_constants helper added to
+# SchemaExtractor::_analyze_parameter_constraints — previously the
+# length-constraint regex only matched literal digits, so bounds
+# expressed via Readonly constants like $MIN_NAME_LEN were silently
+# ignored and the schema omitted min/max entirely)
+# --------------------------------------------------------------------
+
+{
+	my $const_dir    = File::Spec->catdir($tmpdir, 'const-schemas');
+	my $const_module = File::Spec->catfile($tmpdir, 'TestConstModule.pm');
+
+	open my $fh3, '>', $const_module or die "Cannot write $const_module: $!";
+	print $fh3 <<'END_PM';
+package TestConstModule;
+use Carp    qw(croak);
+use Readonly;
+
+Readonly my $MIN_NAME_LEN => 2;
+Readonly my $MAX_NAME_LEN => 30;
+
+=head2 greet
+
+Generate a greeting for a person.
+
+=cut
+
+sub greet {
+	my ($class, $name) = @_;
+	croak 'Name is required' unless defined $name;
+	croak 'Name too short'   unless length($name) >= $MIN_NAME_LEN;
+	croak 'Name too long'    unless length($name) <= $MAX_NAME_LEN;
+	return "Hello, $name!";
+}
+
+1;
+END_PM
+	close $fh3;
+
+	my ($exit, $out, $err) = run_cmd(
+		$script,
+		'--output-dir', $const_dir,
+		$const_module,
+	);
+
+	is($exit, 0, 'Readonly-constant extraction exits cleanly')
+		or diag("stdout: $out\nstderr: $err");
+
+	my @yml = glob("$const_dir/*.yml");
+	ok(scalar(@yml) >= 1, 'at least one schema file generated for Readonly module');
+
+	my $schema_text = '';
+	for my $f (@yml) {
+		open my $yf, '<', $f or next;
+		$schema_text .= do { local $/; <$yf> };
+		close $yf;
+	}
+
+	like($schema_text, qr/min:\s*2\b/, 'min constraint resolved from Readonly constant ($MIN_NAME_LEN => 2)')
+		or diag("schema content:\n$schema_text");
+	like($schema_text, qr/max:\s*30\b/, 'max constraint resolved from Readonly constant ($MAX_NAME_LEN => 30)')
+		or diag("schema content:\n$schema_text");
+}
+
 done_testing();

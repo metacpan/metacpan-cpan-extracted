@@ -1,3 +1,8 @@
+v5.26   2026-07-21
+
+  - delete env var used with Mnet::Opts::Cli after parsing, for security
+  - fixed Mnet::Version getcwd redefined warning
+
 
 v5.25   2023-06-13
 

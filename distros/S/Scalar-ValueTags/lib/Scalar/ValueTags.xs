@@ -218,7 +218,7 @@ static void remove_tag_hash_count(pTHX_ SV *tags, SV *tag)
     }
 }
 
-static void merge_tags_hash_count(pTHX_ SV *src_tags, pTHX_ SV *dst_tags)
+static void merge_tags_hash_count(pTHX_ SV *src_tags, SV *dst_tags)
 {
     assert(VALID_HV_TAGS(src_tags));
     assert(VALID_HV_TAGS(dst_tags));
@@ -267,7 +267,7 @@ static void remove_tag_unique_hash(pTHX_ SV *tags, SV *tag)
     }
 }
 
-static void merge_tags_unique_hash(pTHX_ SV *src_tags, pTHX_ SV *dst_tags)
+static void merge_tags_unique_hash(pTHX_ SV *src_tags, SV *dst_tags)
 {
     assert(VALID_HV_TAGS(src_tags));
     assert(VALID_HV_TAGS(dst_tags));

@@ -1,0 +1,124 @@
+use alienfile;
+
+# Net-SNMP is built deliberately minimal and from a pinned source tarball; we never
+# probe for / use a system copy. This forces a share (source) build, equivalent to
+# the legacy alien_check_installed_version returning nothing.
+probe sub { 'share' };
+
+share {
+  # Canonical raw URL serves the tarball directly (no GitHub blob-page redirects).
+  # The netdisco mirror is byte-for-byte identical to the official Net-SNMP
+  # release on SourceForge.
+  start_url 'https://raw.githubusercontent.com/netdisco/upstream-sources/master/net-snmp/net-snmp-5.9.5.2.tar.gz';
+
+  plugin 'Download';   # https fetch requires a TLS-capable fetcher (Net::SSLeay/IO::Socket::SSL or curl/wget)
+
+  # Verify integrity independent of host. We pin SHA256 (SourceForge publishes only
+  # SHA1, which is collision-broken and too weak to trust a third-party mirror against).
+  # On every Net-SNMP version bump, regenerate this line with:
+  #   maintainer/update-netsnmp-digest --version <x.y.z> --sha1 <sha1-from-sourceforge>
+  # That verifies the tarball against SourceForge's published SHA1 (the human trust
+  # anchor), computes this SHA256 from the verified file, and confirms the netdisco
+  # mirror is byte-identical.
+  digest 'SHA256', '16707719f833184a4b72835dac359ae188123b06b5e42817c00790d7dc1384bf';
+
+  plugin 'Extract' => 'tar.gz';
+
+  # Inject `use Alien::SNMP;` into the bundled Perl module before it is built, so the
+  # installed SNMP.pm pulls in this Alien at use-time to locate the dynamic libnetsnmp.
+  # (Was inc/My/AlienPatch.pm.)  cwd here is the extracted source root.
+  patch sub {
+    my $file = 'perl/SNMP/SNMP.pm';
+    open my $in, '<', $file or die "can't read $file: $!";
+    my @lines = <$in>;
+    close $in;
+    for my $line (@lines) {
+      if ($line =~ /use warnings;/) {
+        $line .= "\nuse Alien::SNMP;\n";
+        last;
+      }
+    }
+    open my $out, '>', $file or die "can't write $file: $!";
+    print {$out} @lines;
+    close $out;
+  };
+
+  # Provides %{configure} (adds --prefix and --with-pic) and %{make}.  We keep the
+  # plugin's default DESTDIR staging (meta destdir=1) so %{configure} uses
+  # --prefix=<final runtime share dir>.  That final prefix is what net-snmp bakes into
+  # the bundled SNMP XS module's rpath, so the installed SNMP.so finds *our* libnetsnmp
+  # in the installed share (not a system copy or the temporary build dir).
+  plugin 'Build::Autoconf';
+
+  build [
+    # Same configure flags as the legacy $conf_cmd, minus --with-pic and --prefix
+    # which the Autoconf plugin supplies via %{configure}.  --with-perl-modules builds
+    # the bundled SNMP XS module against the just-built libnetsnmp.
+    '%{configure}'
+      . ' --disable-agent --disable-scripts --disable-mibs'
+      . ' --enable-ipv6 --with-mibs=""'
+      . ' --with-perl-modules --disable-embedded-perl'
+      . ' --disable-manuals --enable-blumenthal-aes --with-defaults',
+    '%{make}',
+    # Net-SNMP ignores the DESTDIR *environment* variable Alien::Build sets, so pass it
+    # explicitly (its Makefile honors $(DESTDIR)).  This stages everything -- the C
+    # library/headers/bin AND the bundled Perl modules -- under $DESTDIR with the final
+    # install paths baked in (SNMP.so's rpath points at the installed share).  Gather
+    # then relocates $DESTDIR/<prefix> (the C library) into the share dir.
+    '%{make} install DESTDIR=$DESTDIR',
+    # The Perl modules need to live in the real perl site_lib (that is how downstream
+    # `use SNMP;` works), but the line above staged them under $DESTDIR.  Copy the staged
+    # files into the real filesystem, skipping the Alien share itself (Gather installs
+    # that via blib, so copying it here would double-install / pollute).  We use a small
+    # File::Find copier rather than `tar -C / -x` because tar aborts trying to chmod
+    # pre-existing top-level dirs (/, /home, ...) it does not own; this creates parent
+    # dirs with make_path and never touches existing directory metadata.
+    q{%{perl} -MFile::Find -MFile::Path -MFile::Copy -e '
+        my $destdir = $ENV{DESTDIR};
+        my $share   = q[%{.install.prefix}];   # the Alien share prefix, installed separately via blib
+
+        File::Find::find({
+            no_chdir => 1,
+            wanted   => sub {
+                my $src = $File::Find::name;
+                return if $src eq $destdir;             # skip the staging root itself
+
+                # Strip $DESTDIR to recover the real (absolute) install path.
+                (my $dst = $src) =~ s/^\Q$destdir\E//;
+
+                # Do not copy the Alien share tree; Gather installs that via blib,
+                # so copying it here would double-install / pollute the share.
+                if ($dst =~ m{^\Q$share\E(?:/|$)}) {
+                    $File::Find::prune = 1;
+                    return;
+                }
+
+                return if -d $src;                     # make_path recreates dirs as needed
+
+                # Ensure the destination parent dir exists, then replace any old file.
+                (my $parent = $dst) =~ s{/[^/]+$}{};
+                File::Path::make_path($parent);
+                unlink $dst;
+
+                if (-l $src) {                         # preserve symlinks as symlinks
+                    symlink readlink($src), $dst;
+                }
+                else {
+                    File::Copy::copy($src, $dst) or die qq[copy $src: $!];
+                    chmod((stat $src)[2] & 0777, $dst);   # preserve permission bits
+                }
+            },
+        }, $destdir);
+    '},
+  ];
+
+  gather sub {
+    my ($build) = @_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{version} = '5.9.5.2';
+    # Headers are referenced as net-snmp/xxx.h under <prefix>/include.
+    $build->runtime_prop->{cflags}  = "-I$prefix/include";
+    # default_store library is needed dynamically for the XS module.
+    $build->runtime_prop->{libs}    = "-L$prefix/lib -lnetsnmp";
+  };
+};

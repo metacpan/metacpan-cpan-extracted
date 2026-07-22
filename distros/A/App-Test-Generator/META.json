@@ -62,7 +62,7 @@
             "JSON::MaybeXS" : "0",
             "Module::Load::Conditional" : "0",
             "PPI" : "0",
-            "Params::Get" : "0.13",
+            "Params::Get" : "0.15",
             "Params::Validate::Strict" : "0.3",
             "Pod::Simple" : "0",
             "Pod::Usage" : "0",
@@ -120,6 +120,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

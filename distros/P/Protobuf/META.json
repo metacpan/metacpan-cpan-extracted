@@ -20,7 +20,22 @@
          "xlib",
          "t",
          "inc",
-         "local"
+         "local",
+         "lib/Google",
+         "lib/Conformance",
+         "lib/Protobuf_test_messages"
+      ],
+      "package" : [
+         "Google::ProtocolBuffers::Dynamic",
+         "Google::Protobuf",
+         "Google::Protobuf::Any",
+         "Google::Protobuf::Duration",
+         "Google::Protobuf::Timestamp",
+         "Google::Protobuf::FieldMask",
+         "Google::Protobuf::Struct",
+         "Google::Protobuf::Wrappers",
+         "Google::Protobuf::Empty",
+         "Conformance"
       ]
    },
    "prereqs" : {
@@ -75,6 +90,6 @@
          "web" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

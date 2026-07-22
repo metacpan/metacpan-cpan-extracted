@@ -24,12 +24,16 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Devel::Cover::DB" => 0,
     "File::Spec" => 0,
+    "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98"
+    "Test::MockModule" => "0.13",
+    "Test::More" => "0.98",
+    "YAML::PP::Perl" => 0
   },
-  "VERSION" => "v0.42.0",
+  "VERSION" => "v0.43.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,11 +41,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Devel::Cover::DB" => 0,
   "File::Spec" => 0,
+  "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
+  "Test::MockModule" => "0.13",
   "Test::More" => "0.98",
+  "YAML::PP::Perl" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0

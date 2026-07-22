@@ -18,6 +18,24 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $inc_flags  = '-I.';
+my $libs_flags = '-lcrypto';
+
+my @ssl_search_dirs = (
+    '/opt/homebrew/opt/openssl@3',
+    '/opt/homebrew/opt/openssl',
+    '/usr/local/opt/openssl@3',
+    '/usr/local/opt/openssl',
+);
+
+for my $dir (@ssl_search_dirs) {
+    if (-f "$dir/include/openssl/evp.h") {
+        $inc_flags  = "-I. -I$dir/include";
+        $libs_flags = "-L$dir/lib -lcrypto";
+        last;
+    }
+}
+
 WriteMakefile(
     NAME             => 'Google::Auth',
     AUTHOR           => q{C.J. Collier <CJCOLLIER@CPAN.ORG>},
@@ -25,8 +43,8 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Google/Auth.pm',
     LICENSE          => 'Apache 2.0',
     PL_FILES         => {},
-    LIBS             => ['-lcrypto'],
-    INC              => '-I.',
+    LIBS             => [$libs_flags],
+    INC              => $inc_flags,
     OBJECT           => '$(O_FILES)',
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {

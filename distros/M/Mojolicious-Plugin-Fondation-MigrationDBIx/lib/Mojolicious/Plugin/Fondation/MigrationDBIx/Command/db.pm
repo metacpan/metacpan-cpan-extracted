@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db;
-$Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db::VERSION = '0.03';
+$Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db::VERSION = '0.04';
 # ABSTRACT: Database migration and fixture commands for DBIx::Class backends
 
 use Mojo::Base 'Mojolicious::Command', -signatures;
@@ -56,11 +56,13 @@ sub _build_dh ($self, $app, $config) {
 
     my $mig_dir = path($config->{migrations_dir});
 
-    # Derive database type from DSN (e.g. dbi:SQLite:... -> SQLite, dbi:Pg:... -> Pg)
+    # Derive database type from DSN (e.g. dbi:SQLite:... -> SQLite, dbi:Pg:... -> PostgreSQL)
     my $c    = $app->build_controller;
     my $bdef = $c->backend_config($config->{backend});
     my ($driver) = $bdef->{dsn} =~ /^dbi:([^:]+):/i
         or die "Cannot parse DSN: $bdef->{dsn}\n";
+    $driver = 'MySQL'      if lc $driver eq 'mysql'    || lc $driver eq 'mariadb';
+    $driver = 'PostgreSQL' if lc $driver eq 'pg'       || lc $driver eq 'postgresql';
 
     require DBIx::Class::DeploymentHandler;
     return DBIx::Class::DeploymentHandler->new(
@@ -209,7 +211,6 @@ SCHEMA
         }
         else {
             say "Schema class '$class_name' is ready.";
-            say "Run: myapp.pl db prepare";
         }
     }
     else {
@@ -338,8 +339,10 @@ sub _copy_tree_from_plugins ($self, $app, $subdir, $target_dir, $force) {
     $target_dir->remove_tree({ keep_root => 1 }) if $force && -d $target_dir;
     $target_dir->make_path unless -d $target_dir;
 
-    for my $long (sort keys %{$manager->registry}) {
-        my $entry = $manager->registry->{$long};
+    my $load_order = $manager->load_order // [sort keys %{$manager->registry}];
+
+    for my $long (@$load_order) {
+        my $entry = $manager->registry->{$long} or next;
         my $share = $entry->{share_dir} or next;
         my $src_root = $share->child($subdir);
         next unless -d $src_root;
@@ -498,6 +501,12 @@ sub _populate ($self, $app, $config, @args) {
     my $dh = $self->_build_dh($app, $config)
         or return;
 
+    my $c      = $app->build_controller;
+    my $bdef   = $c->backend_config($config->{backend});
+    my ($driver) = $bdef->{dsn} =~ /^dbi:([^:]+):/i;
+    $driver = 'MySQL'      if lc $driver eq 'mysql'    || lc $driver eq 'mariadb';
+    $driver = 'PostgreSQL' if lc $driver eq 'pg'       || lc $driver eq 'postgresql';
+
     my $set_version = $dh->version_storage_is_installed
         ? $dh->database_version : 0;
     die "No database version. Run 'db install' or 'db upgrade' first.\n"
@@ -587,7 +596,75 @@ SQL
         config_dir => $conf_dir->to_string,
     });
 
+    # Build set → DBIC class mapping from conf JSON files.
+    # The 'class' field in conf JSON is a TABLE name (e.g. 'api_tokens'),
+    # not a DBIC source name (e.g. 'ApiToken'). We build a bidirectional
+    # map so we can resolve belongs_to relationships between sets.
+    my %set_table;   # set → table name
+    my %table_set;   # table name → set
+    for my $set (@sets) {
+        my $conf_file = $conf_dir->child("$set.json");
+        my $conf = eval { decode_json($conf_file->slurp) } or next;
+        my $table = $conf->{sets}[0]{class} or next;
+        $set_table{$set}  = $table;
+        $table_set{$table} = $set;
+    }
+
+    # Build table → source mapping from the live schema
+    my %table_source;
+    for my $source_name ($native->sources) {
+        my $source = $native->source($source_name);
+        $table_source{$source->name} = $source_name;
+    }
+
+    # Resolve belongs_to dependencies between sets
+    my %depends_on;
+    for my $set (keys %set_table) {
+        my $table  = $set_table{$set};
+        my $source_name = $table_source{$table};
+        next unless $source_name;
+        my $source = eval { $native->source($source_name) };
+        next unless $source;
+        for my $rel_name ($source->relationships) {
+            my $rel = $source->relationship_info($rel_name);
+            next unless $rel->{attrs}{is_foreign_key_constraint};
+            # $rel->{class} is a DBIC Result class — find its table name
+            my $parent_source = eval { $native->source($rel->{class}) };
+            next unless $parent_source;
+            my $parent_table = $parent_source->name;
+            my $parent_set   = $table_set{$parent_table};
+            next unless $parent_set;
+            next if $parent_set eq $set;
+            push @{$depends_on{$set}}, $parent_set;
+        }
+    }
+
+    # Topological sort (Kahn's algorithm) so dependencies load first
+    if (%depends_on) {
+        my %in_degree;
+        my %children;
+        $in_degree{$_} //= 0 for @sets;
+        for my $set (keys %depends_on) {
+            for my $dep (@{$depends_on{$set}}) {
+                $in_degree{$set}++;
+                push @{$children{$dep}}, $set;
+            }
+        }
+        my @sorted;
+        my @queue = grep { $in_degree{$_} == 0 } @sets;
+        while (@queue) {
+            my $node = shift @queue;
+            push @sorted, $node;
+            for my $child (@{$children{$node} // []}) {
+                $in_degree{$child}--;
+                push @queue, $child if $in_degree{$child} == 0;
+            }
+        }
+        @sets = @sorted;
+    }
+
     say "Populating set(s): " . join(', ', @sets);
+
     for my $set (@sets) {
         my $set_dir = $app->home->child(
             'share', 'fixtures', $set_version, $set)->to_string;
@@ -603,11 +680,19 @@ SQL
         # Record that this set has been loaded
         $storage->dbh_do(sub {
             my ($storage, $dbh) = @_;
-            $dbh->do(
-                'INSERT OR REPLACE INTO fixtures_loaded (set_name) VALUES (?)',
-                undef, $set);
+            my $sql;
+            if ($driver eq 'MySQL') {
+                $sql = 'REPLACE INTO fixtures_loaded (set_name) VALUES (?)';
+            } elsif ($driver eq 'PostgreSQL') {
+                $sql = 'INSERT INTO fixtures_loaded (set_name) VALUES (?)'
+                    . ' ON CONFLICT (set_name) DO UPDATE SET set_name = EXCLUDED.set_name, loaded_at = CURRENT_TIMESTAMP';
+            } else {
+                $sql = 'INSERT OR REPLACE INTO fixtures_loaded (set_name) VALUES (?)';
+            }
+            $dbh->do($sql, undef, $set);
         });
     }
+
     say "Populate complete.";
 }
 
@@ -657,11 +742,14 @@ sub _build_native_schema ($self, $app, $config) {
         $dir->make_path unless -d $dir;
     }
 
+    my %extra;
+    $extra{quote_char} = $bdef->{quote_char} if $bdef->{quote_char};
     my $native = $schema_class->connect(
         $bdef->{dsn},
         $bdef->{user}      // '',
         $bdef->{pass}      // '',
         $bdef->{dbi_attrs} // {},
+        \%extra,
     );
 
     return $native;
@@ -771,7 +859,7 @@ Mojolicious::Plugin::Fondation::MigrationDBIx::Command::db - Database migration 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

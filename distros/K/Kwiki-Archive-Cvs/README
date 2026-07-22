@@ -1,5 +1,5 @@
 NAME
-    Kwiki::Archive::Cvs - Kwiki Page Archival Using CVS
+    Kwiki::Archive::Cvs - Kwiki Page Archival Using CVS (DEPRECATED)
 
 SYNOPSIS
     A Kwiki::Archive that stores changes in a CVS repository.

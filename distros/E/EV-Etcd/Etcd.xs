@@ -31,10 +31,13 @@ static void *cq_thread_func(void *arg);
 static void cq_async_callback(EV_P_ ev_async *w, int revents);
 static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success);
 
-/* Sentinel tag for fire-and-forget batches (e.g. watch cancel SEND_MESSAGE).
- * gRPC's GRPC_CQ_NEXT contract requires a non-NULL tag; we use this dummy
- * call_base_t so the completion can be identified and skipped. */
-static call_base_t cancel_sentinel = { CALL_TYPE_NONE };
+/* cancel_sentinel (fire-and-forget batch tag) is defined in etcd_common.c */
+
+/* PID of the process that loaded the module — END only shuts down gRPC in
+ * that process; grpc_shutdown() hangs in forked children because gRPC's
+ * background threads don't survive fork(). */
+static pid_t ev_etcd_boot_pid;
+
 static void process_txn_response(pTHX_ pending_call_t *pc);
 static void process_auth_response(pTHX_ pending_call_t *pc);
 static void process_user_add_response(pTHX_ pending_call_t *pc);
@@ -320,7 +323,7 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
             /* Watch receive completion */
             watch_call_t *wc = (watch_call_t *)base;
 
-            if (success && wc->active) {
+            if (success && wc->active && wc->recv_buffer) {
                     process_watch_response(aTHX_ wc);
                     if (!client->active) return; /* DESTROY called in callback */
                     /* Re-arm receive if still active */
@@ -330,8 +333,11 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         /* Response handler set active=0 (e.g., server cancel) */
                         cleanup_watch(aTHX_ wc);
                     }
-                } else if (!success && wc->active) {
-                    /* Stream ended or error - try to reconnect */
+                } else if (wc->active) {
+                    /* Batch failed, or stream ended without a message — every
+                     * real disconnect (FIN/RST/GOAWAY) surfaces as success=1
+                     * with a NULL recv_buffer, so both routes reconnect
+                     * (clientv3 semantics) */
                     wc->active = 0;
                     /* Try automatic reconnection */
                     if (try_reconnect_watch(aTHX_ wc)) {
@@ -363,16 +369,26 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 } else {
                     if (wc->active) {
-                        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch setup failed", "watch");
-                        if (!client->active) return;
+                        /* Setup/reconnect batch failed (e.g. server still
+                         * down) — chain into the retry budget instead of
+                         * terminating on the first failed attempt */
+                        wc->active = 0;
+                        if (try_reconnect_watch(aTHX_ wc)) {
+                            /* Next attempt scheduled, don't notify yet */
+                        } else {
+                            CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_UNAVAILABLE, "Watch setup failed", "watch");
+                            if (!client->active) return;
+                            cleanup_watch(aTHX_ wc);
+                        }
+                    } else {
+                        cleanup_watch(aTHX_ wc);
                     }
-                    cleanup_watch(aTHX_ wc);
                 }
             } else if (base->type == CALL_TYPE_LEASE_KEEPALIVE_RECV) {
             /* Keepalive receive completion */
             keepalive_call_t *kc = (keepalive_call_t *)base;
 
-            if (success && kc->active) {
+            if (success && kc->active && kc->recv_buffer) {
                     process_keepalive_response(aTHX_ kc);
                     if (!client->active) return;
                     /* Re-arm receive if still active */
@@ -382,8 +398,11 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         /* Response handler set active=0 (e.g., lease expired) */
                         cleanup_keepalive(aTHX_ kc);
                     }
-                } else if (!success && kc->active) {
-                    /* Stream ended or error - try to reconnect */
+                } else if (kc->active) {
+                    /* Batch failed, or stream ended without a message — every
+                     * real disconnect (FIN/RST/GOAWAY) surfaces as success=1
+                     * with a NULL recv_buffer, so both routes reconnect
+                     * (clientv3 semantics) */
                     kc->active = 0;
                     /* Try automatic reconnection */
                     if (try_reconnect_keepalive(aTHX_ kc)) {
@@ -416,16 +435,26 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 } else {
                     if (kc->active) {
-                        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive setup failed", "keepalive");
-                        if (!client->active) return;
+                        /* Setup/reconnect batch failed (e.g. server still
+                         * down) — chain into the retry budget instead of
+                         * terminating on the first failed attempt */
+                        kc->active = 0;
+                        if (try_reconnect_keepalive(aTHX_ kc)) {
+                            /* Next attempt scheduled, don't notify yet */
+                        } else {
+                            CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_UNAVAILABLE, "Keepalive setup failed", "keepalive");
+                            if (!client->active) return;
+                            cleanup_keepalive(aTHX_ kc);
+                        }
+                    } else {
+                        cleanup_keepalive(aTHX_ kc);
                     }
-                    cleanup_keepalive(aTHX_ kc);
                 }
             } else if (base->type == CALL_TYPE_ELECTION_OBSERVE_RECV) {
             /* Election observe receive completion */
             observe_call_t *oc = (observe_call_t *)base;
 
-            if (success && oc->active) {
+            if (success && oc->active && oc->recv_buffer) {
                     process_observe_response(aTHX_ oc);
                     if (!client->active) return;
                     /* Re-arm receive if still active */
@@ -435,8 +464,11 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         /* Response handler set active=0 */
                         cleanup_observe(aTHX_ oc);
                     }
-                } else if (!success && oc->active) {
-                    /* Stream ended or error - try to reconnect */
+                } else if (oc->active) {
+                    /* Batch failed, or stream ended without a message — every
+                     * real disconnect (FIN/RST/GOAWAY) surfaces as success=1
+                     * with a NULL recv_buffer, so both routes reconnect
+                     * (clientv3 semantics) */
                     oc->active = 0;
                     /* Try automatic reconnection */
                     if (try_reconnect_observe(aTHX_ oc)) {
@@ -469,10 +501,20 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 } else {
                     if (oc->active) {
-                        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe setup failed", "observe");
-                        if (!client->active) return;
+                        /* Setup/reconnect batch failed (e.g. server still
+                         * down) — chain into the retry budget instead of
+                         * terminating on the first failed attempt */
+                        oc->active = 0;
+                        if (try_reconnect_observe(aTHX_ oc)) {
+                            /* Next attempt scheduled, don't notify yet */
+                        } else {
+                            CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_UNAVAILABLE, "Observe setup failed", "observe");
+                            if (!client->active) return;
+                            cleanup_observe(aTHX_ oc);
+                        }
+                    } else {
+                        cleanup_observe(aTHX_ oc);
                     }
-                    cleanup_observe(aTHX_ oc);
                 }
             } else {
             /* Unary RPC completion */
@@ -1116,8 +1158,12 @@ PROTOTYPES: DISABLE
 
 BOOT:
     I_EV_API("EV::Etcd");
+    watch_init_ev_api(aTHX);
+    lease_init_ev_api(aTHX);
+    election_init_ev_api(aTHX);
     grpc_init();
     init_method_slices();
+    ev_etcd_boot_pid = getpid();
 
 EV::Etcd
 ev_etcd_new(class, ...)
@@ -1133,6 +1179,9 @@ CODE:
     char *init_auth_token = NULL;
     STRLEN init_auth_token_len = 0;
     int i;
+
+    /* Reject a trailing key with no value instead of silently dropping it */
+    if ((items - 1) % 2) croak("Odd number of options in EV::Etcd->new");
 
     /* Parse options */
     for (i = 1; i < items; i += 2) {
@@ -5865,8 +5914,7 @@ CODE:
         watch_call_t *wc = client->watches;
         while (wc) {
             watch_call_t *next = wc->next;
-            if (ev_is_active(&wc->reconnect_timer))
-                ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+            ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
             SvREFCNT_dec(wc->callback);
             wc->callback = NULL;
             wc->client_owns = 0;
@@ -5880,8 +5928,8 @@ CODE:
         keepalive_call_t *kc = client->keepalives;
         while (kc) {
             keepalive_call_t *next = kc->next;
-            if (ev_is_active(&kc->reconnect_timer))
-                ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+            ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+            ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
             SvREFCNT_dec(kc->callback);
             kc->callback = NULL;
             kc->client_owns = 0;
@@ -5891,8 +5939,7 @@ CODE:
         observe_call_t *oc = client->observes;
         while (oc) {
             observe_call_t *next = oc->next;
-            if (ev_is_active(&oc->reconnect_timer))
-                ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+            ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
             SvREFCNT_dec(oc->callback);
             oc->callback = NULL;
             oc->client_owns = 0;
@@ -5925,8 +5972,7 @@ CODE:
     watch_call_t *wc = client->watches;
     while (wc) {
         wc->active = 0;
-        if (ev_is_active(&wc->reconnect_timer))
-            ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+        ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
         if (wc->call) {
             grpc_call_cancel(wc->call, NULL);
         }
@@ -5936,8 +5982,8 @@ CODE:
     keepalive_call_t *kc = client->keepalives;
     while (kc) {
         kc->active = 0;
-        if (ev_is_active(&kc->reconnect_timer))
-            ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+        ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+        ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
         if (kc->call) {
             grpc_call_cancel(kc->call, NULL);
         }
@@ -5947,8 +5993,7 @@ CODE:
     observe_call_t *oc = client->observes;
     while (oc) {
         oc->active = 0;
-        if (ev_is_active(&oc->reconnect_timer))
-            ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+        ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
         if (oc->call) {
             grpc_call_cancel(oc->call, NULL);
         }
@@ -6077,10 +6122,21 @@ CODE:
         return;
     }
 
-    if (ev_is_active(&wc->reconnect_timer))
-        ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+    /* A fired one-shot timer is inactive-but-PENDING until its callback
+     * runs; treat pending as armed (reconnect_cb has not run, so no batch
+     * is in flight) and stop unconditionally so the pending callback
+     * cannot resurrect the stream after this cancel. */
+    int timer_was_armed = ev_is_active(&wc->reconnect_timer)
+                       || ev_is_pending(&wc->reconnect_timer);
+    ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
 
     if (!wc->active) {
+        /* timer armed == reconnect backoff: stream batch already completed,
+         * none in flight, so the struct is safe to reap; otherwise a cancel
+         * is already in progress and the pending RECV completion owns
+         * cleanup. */
+        if (timer_was_armed)
+            cleanup_watch(aTHX_ wc);
         CALL_SUCCESS_CALLBACK(callback, newHV());
         return;
     }
@@ -6143,10 +6199,22 @@ CODE:
         return;
     }
 
-    if (ev_is_active(&kc->reconnect_timer))
-        ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+    /* A fired one-shot timer is inactive-but-PENDING until its callback
+     * runs; treat pending as armed (reconnect_cb has not run, so no batch
+     * is in flight) and stop unconditionally so the pending callback
+     * cannot resurrect the stream after this cancel. */
+    int timer_was_armed = ev_is_active(&kc->reconnect_timer)
+                       || ev_is_pending(&kc->reconnect_timer);
+    ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+    ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
 
     if (!kc->active) {
+        /* timer armed == reconnect backoff: stream batch already completed,
+         * none in flight, so the struct is safe to reap; otherwise a cancel
+         * is already in progress and the pending RECV completion owns
+         * cleanup. */
+        if (timer_was_armed)
+            cleanup_keepalive(aTHX_ kc);
         CALL_SUCCESS_CALLBACK(callback, newHV());
         return;
     }
@@ -6184,10 +6252,21 @@ CODE:
         return;
     }
 
-    if (ev_is_active(&oc->reconnect_timer))
-        ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+    /* A fired one-shot timer is inactive-but-PENDING until its callback
+     * runs; treat pending as armed (reconnect_cb has not run, so no batch
+     * is in flight) and stop unconditionally so the pending callback
+     * cannot resurrect the stream after this cancel. */
+    int timer_was_armed = ev_is_active(&oc->reconnect_timer)
+                       || ev_is_pending(&oc->reconnect_timer);
+    ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
 
     if (!oc->active) {
+        /* timer armed == reconnect backoff: stream batch already completed,
+         * none in flight, so the struct is safe to reap; otherwise a cancel
+         * is already in progress and the pending RECV completion owns
+         * cleanup. */
+        if (timer_was_armed)
+            cleanup_observe(aTHX_ oc);
         CALL_SUCCESS_CALLBACK(callback, newHV());
         return;
     }
@@ -6213,4 +6292,7 @@ MODULE = EV::Etcd  PACKAGE = EV::Etcd  PREFIX = ev_etcd_
 void
 END()
 CODE:
-    grpc_shutdown();
+    /* Only the process that loaded the module shuts down gRPC — in forked
+     * children grpc_shutdown() blocks forever (see ev_etcd_boot_pid). */
+    if (getpid() == ev_etcd_boot_pid)
+        grpc_shutdown();

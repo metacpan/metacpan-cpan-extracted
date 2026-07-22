@@ -3,10 +3,15 @@ abstract: 'Generate a JSON file to be uploaded with the codecov bash script.'
 author:
   - 'Tina Müller <tinita@cpan.org>'
 build_requires:
+  Devel::Cover::DB: '0'
   File::Spec: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::MockModule: '0.13'
   Test::More: '0.98'
+  YAML::PP::Perl: '0'
+  perl: v5.8.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,7 +24,7 @@ name: Devel-Cover-Report-Codecovbash
 provides:
   Devel::Cover::Report::Codecovbash:
     file: lib/Devel/Cover/Report/Codecovbash.pm
-    version: v0.42.0
+    version: v0.43.0
 requires:
   File::Spec: '0'
   JSON::MaybeXS: '0'
@@ -30,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/Devel-Cover-Report-Codecovbash/issues
   repository: https://github.com/perlpunk/Devel-Cover-Report-Codecovbash
-version: v0.42.0
+version: v0.43.0
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

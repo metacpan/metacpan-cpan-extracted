@@ -6,7 +6,7 @@ Protobuf::WKT::Any - Mixin for google.protobuf.Any message
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -141,18 +141,27 @@ SV* PerlUpb_DescriptorPool_GetFile(pTHX_ SV* sv, int index) {
     return &PL_sv_undef;
 }
 
+#include <unistd.h>
+
+static pid_t generated_pool_pid = 0;
+
 SV* PerlUpb_DescriptorPool_GeneratedPool(pTHX) {
+
+    pid_t current_pid = getpid();
+    if (generated_pool_pid != current_pid) {
+        generated_pool_ptr = NULL;
+        generated_pool_pid = current_pid;
+    }
     if (!generated_pool_ptr) {
         SV* global_pool_sv = get_sv("Protobuf::DescriptorPool::_generated_pool_ptr", GV_ADD);
-        if (SvIOK(global_pool_sv)) {
+        if (SvIOK(global_pool_sv) && generated_pool_pid == current_pid) {
             generated_pool_ptr = INT2PTR(upb_DefPool*, SvIV(global_pool_sv));
         } else {
             generated_pool_ptr = upb_DefPool_New();
             sv_setiv(global_pool_sv, PTR2IV(generated_pool_ptr));
-            // Add magic to the global SV to ensure it's not tampered with
-            // and we can potentially hook its destruction.
             sv_magicext(global_pool_sv, NULL, PERL_MAGIC_ext, NULL, (const char*)NULL, 0);
         }
     }
     return PerlUpb_DescriptorPool_GetWrapper(aTHX_ generated_pool_ptr);
 }
+

@@ -44,6 +44,9 @@ process table, as below:
     export Mnet="--password secret"
     script.pl
 
+The environment variable is deleted after it is parsed, to avoid sub-processes
+called by user script having access to its contents.
+
 Note that the specified environment variable is not parsed if the --test option
 is set on the command line. Refer to L<Mnet::Test> for more information.
 
@@ -230,7 +233,8 @@ defined options parsed from the command line and an array contining any extra
 command line arguments.
 
 The env_var argument is optional, and can be set to the name of an environment
-variable where additional command line options can be securely set.
+variable where additional command line options can be securely set. This gets
+deleted after it is parsed to avoid sub-processes being able to access it.
 
 If called in list context this method will return an opts object containing
 values for defined options parsed from the command line followed by a list of
@@ -406,6 +410,13 @@ The perl ARGV array is not modified by this module.
             );
         }
     }
+
+    # delete env var after reading it
+    #   env_var is meant to be used to securely pass secrets to mnet scripts
+    #   user script cmd line options can be seen in ps ouptut, env vars cannot
+    #   deleting env var here so that user script sub-processes can't access
+    #   refer also to https://security.stackexchange.com/questions/197784
+    delete $ENV{$env_var} if defined $env_var and defined $ENV{$env_var};
 
     # prepare list to hold log entries, which will be output later
     #   log_entries keyed by opt name, set source keyword followed by dump

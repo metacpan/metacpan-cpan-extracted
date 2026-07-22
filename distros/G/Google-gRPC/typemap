@@ -1,0 +1,4 @@
+TYPEMAP
+perl_nghttp2_session_t *	T_PTROBJ
+int32_t	T_IV
+uint32_t	T_UV

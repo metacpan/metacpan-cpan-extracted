@@ -2,9 +2,12 @@ use strict;
 use warnings;
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
+use lib "$RealBin/lib";
 use Test::More;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
+use File::Spec;
+use NBI::Test::MockCommand qw(prepend_mock_path write_mock_command);
 
 use_ok 'NBI::Job';
 use_ok 'NBI::Opts';
@@ -14,33 +17,30 @@ my $tmpdir = tempdir(CLEANUP => 1);
 
 # ── Mock sbatch ───────────────────────────────────────────────────────────────
 # Create a fake sbatch that echoes "Submitted batch job N" with incrementing IDs.
-my $mock_dir  = "$tmpdir/mock_bin";
-my $sbatch_log = "$tmpdir/sbatch_calls.log";
+my $mock_dir  = File::Spec->catdir($tmpdir, 'mock_bin');
+my $sbatch_log = File::Spec->catfile($tmpdir, 'sbatch_calls.log');
 make_path($mock_dir);
 
-open(my $fh, '>', "$mock_dir/sbatch") or die $!;
-print $fh <<'MOCK';
-#!/bin/sh
-# Fake sbatch: reads the script, echoes a job ID, and logs the call.
-LOG="SBATCH_LOG"
-count=0
-[ -f "$LOG" ] && count=$(wc -l < "$LOG")
-ID=$((9000 + count + 1))
-echo "$*" >> "$LOG"
-echo "Submitted batch job $ID"
+write_mock_command(
+    dir => $mock_dir,
+    name => 'sbatch',
+    source => <<'MOCK',
+my $log = $ENV{SBATCH_LOG} or die "SBATCH_LOG not set\n";
+my $count = 0;
+if (open(my $in, '<', $log)) {
+    $count++ while <$in>;
+    close $in;
+}
+my $id = 9000 + $count + 1;
+open(my $out, '>>', $log) or die "Cannot write $log: $!\n";
+print {$out} join(' ', @ARGV), "\n";
+close $out;
+print "Submitted batch job $id\n";
 MOCK
-$fh->close if $fh->can('close');
-close $fh;
-$sbatch_log =~ s|/|\/|g;
-open($fh, '+<', "$mock_dir/sbatch") or die $!;
-my $content = do { local $/; <$fh> };
-$content =~ s/SBATCH_LOG/$sbatch_log/;
-seek $fh, 0, 0; truncate $fh, 0;
-print $fh $content;
-close $fh;
-chmod 0755, "$mock_dir/sbatch";
+);
 
-local $ENV{PATH} = "$mock_dir:$ENV{PATH}";
+local $ENV{PATH} = prepend_mock_path($mock_dir);
+local $ENV{SBATCH_LOG} = $sbatch_log;
 
 # ── Helper: build a minimal NBI::Job ─────────────────────────────────────────
 sub make_job {
@@ -61,9 +61,9 @@ sub make_job {
 }
 
 # ── new() and add_job() ───────────────────────────────────────────────────────
-my $j1 = make_job('step1', "$tmpdir/step1");
-my $j2 = make_job('step2', "$tmpdir/step2");
-my $j3 = make_job('step3', "$tmpdir/step3");
+my $j1 = make_job('step1', File::Spec->catdir($tmpdir, 'step1'));
+my $j2 = make_job('step2', File::Spec->catdir($tmpdir, 'step2'));
+my $j3 = make_job('step3', File::Spec->catdir($tmpdir, 'step3'));
 
 my $p = NBI::Pipeline->new(jobs => [$j1, $j2]);
 isa_ok($p, 'NBI::Pipeline', 'new() returns NBI::Pipeline');
@@ -78,8 +78,8 @@ ok($@, 'new() dies when jobs contains non-NBI::Job');
 
 # ── run() without dependencies ────────────────────────────────────────────────
 my $pa = NBI::Pipeline->new(jobs => [
-    make_job('jobA', "$tmpdir/jobA"),
-    make_job('jobB', "$tmpdir/jobB"),
+    make_job('jobA', File::Spec->catdir($tmpdir, 'jobA')),
+    make_job('jobB', File::Spec->catdir($tmpdir, 'jobB')),
 ]);
 
 my @ids = $pa->run();
@@ -91,8 +91,8 @@ ok($ids[0] != $ids[1],  'job IDs are distinct');
 # ── run() with afterok dependency ─────────────────────────────────────────────
 unlink $sbatch_log if -f $sbatch_log;
 
-my $dep1 = make_job('dep1', "$tmpdir/dep1");
-my $dep2 = make_job('dep2', "$tmpdir/dep2");
+my $dep1 = make_job('dep1', File::Spec->catdir($tmpdir, 'dep1'));
+my $dep2 = make_job('dep2', File::Spec->catdir($tmpdir, 'dep2'));
 $dep2->{_nbi_depends_on} = $dep1;
 
 my $pb = NBI::Pipeline->new(jobs => [$dep1, $dep2]);
@@ -111,8 +111,8 @@ like($dep2_script, qr/#SBATCH --dependency=afterok:$first_id/,
      "dep2 script has afterok:$first_id dependency");
 
 # ── print_summary() ───────────────────────────────────────────────────────────
-my $jx = make_job('x', "$tmpdir/x");
-my $jy = make_job('y', "$tmpdir/y");
+my $jx = make_job('x', File::Spec->catdir($tmpdir, 'x'));
+my $jy = make_job('y', File::Spec->catdir($tmpdir, 'y'));
 $jy->{_nbi_depends_on} = $jx;
 my $pc = NBI::Pipeline->new(jobs => [$jx, $jy]);
 

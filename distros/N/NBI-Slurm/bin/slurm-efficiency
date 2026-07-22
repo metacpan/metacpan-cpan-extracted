@@ -1,0 +1,503 @@
+#!/usr/bin/env perl
+#ABSTRACT: Report time and memory efficiency (requested vs used) of recently finished Slurm jobs
+#PODNAME: slurm-efficiency
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use POSIX qw(strftime);
+use Term::ANSIColor qw(:constants);
+
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+}
+
+use NBI::Slurm qw(execute_command);
+
+my @FIELDS = qw(JobID JobName State Elapsed Timelimit ReqMem MaxRSS AllocCPUS NNodes);
+
+# memory unit -> factor to megabytes (faithful to the reference implementation)
+my %MEM_FACTOR_MB = (
+    ''  => 1 / 1024,
+    'K' => 1 / 1024,
+    'M' => 1.0,
+    'G' => 1024.0,
+    'T' => 1024.0 ** 2,
+    'P' => 1024.0 ** 3,
+);
+
+my $opt_days     = 7;
+my $opt_start;
+my $opt_end;
+my $opt_state;
+my $opt_sort     = 'id';
+my $opt_csv      = 0;
+my $opt_no_color = 0;
+my $opt_help     = 0;
+
+GetOptions(
+    'd|days=i'   => \$opt_days,
+    'S|start=s'  => \$opt_start,
+    'E|end=s'    => \$opt_end,
+    's|state=s'  => \$opt_state,
+    'sort=s'     => \$opt_sort,
+    'csv'        => \$opt_csv,
+    'n|no-color' => \$opt_no_color,
+    'version'    => sub { say "slurm-efficiency v", $NBI::Slurm::VERSION; exit 0 },
+    'h|help'     => \$opt_help,
+) or usage(1);
+
+usage(0) if $opt_help;
+
+unless ($opt_sort =~ /^(id|time|mem)$/) {
+    say STDERR RED, "Error: ", RESET, "--sort must be one of: id, time, mem";
+    exit 1;
+}
+
+# Disable colours if requested or if output is not a terminal (for CSV/pipes)
+$ENV{ANSI_COLORS_DISABLED} = 1 if ($opt_no_color || $opt_csv || !-t STDOUT);
+
+my $start = $opt_start;
+unless (defined $start) {
+    if ($opt_days < 0) {
+        say STDERR RED, "Error: ", RESET, "--days must be a positive integer";
+        exit 1;
+    }
+    $start = strftime("%Y-%m-%d", localtime(time - $opt_days * 86400));
+}
+
+my $raw  = run_sacct($start, $opt_end, $opt_state);
+my $jobs = collect($raw);
+
+my @rows = map { summarise($_, $jobs->{$_}) } keys %{$jobs};
+
+# drop still-running / pending / stateless
+@rows = grep { $_->{state} ne 'RUNNING' && $_->{state} ne 'PENDING' && $_->{state} ne '' } @rows;
+
+if ($opt_sort eq 'time') {
+    @rows = sort { pct_key($a->{pct_time}) <=> pct_key($b->{pct_time}) } @rows;
+} elsif ($opt_sort eq 'mem') {
+    @rows = sort { pct_key($a->{pct_mem}) <=> pct_key($b->{pct_mem}) } @rows;
+} else {
+    @rows = sort { $a->{id} cmp $b->{id} } @rows;
+}
+
+if ($opt_csv) {
+    print_csv(\@rows);
+    exit 0;
+}
+
+if (!@rows) {
+    say "No finished jobs found since $start.";
+    exit 0;
+}
+
+print_table(\@rows);
+exit 0;
+
+# ----------------------------------------------------------------------------- sacct
+sub run_sacct {
+    my ($s, $e, $state) = @_;
+    my @cmd = ("sacct", "-S", $s, "--parsable2", "--noheader",
+               "--format=" . join(",", @FIELDS));
+    push @cmd, "-E", $e     if defined $e;
+    push @cmd, "--state", $state if defined $state;
+
+    # Pre-check: friendly error if sacct is not installed (matches the
+    # behaviour of the other NBI::Slurm tools, which shell out directly).
+    if (system("command -v sacct >/dev/null 2>&1") != 0) {
+        say STDERR RED, "Error: ", RESET, "'sacct' not found - run this on the HPC (a login node).";
+        exit 1;
+    }
+
+    my $res = execute_command(join(' ', @cmd));
+    my $stdout    = $res->{stdout}    // '';
+    my $stderr    = $res->{stderr}    // '';
+    my $exit_code = $res->{exit_code};
+
+    if ($exit_code != 0) {
+        if ($stderr =~ /too wide of a date range/i) {
+            say STDERR RED, "Error: ", RESET,
+                "sacct rejected the query: the date range is too wide.";
+            say STDERR "Try a smaller window, e.g. --days 7 (currently starting at $s).";
+            exit 1;
+        }
+        chomp(my $msg = $stderr);
+        $msg ||= "sacct exited with code $exit_code";
+        say STDERR RED, "Error: ", RESET, "sacct failed:";
+        say STDERR $msg;
+        exit 1;
+    }
+
+    return $stdout;
+}
+
+# ----------------------------------------------------------------------------- folding
+sub collect {
+    my ($raw) = @_;
+    my %jobs;
+    for my $line (split /\n/, $raw) {
+        next unless $line =~ /\S/;
+        my %f;
+        @f{@FIELDS} = split /\|/, $line, scalar(@FIELDS);
+        my $jid  = $f{JobID} // '';
+        my $base = (split /\./, $jid, 2)[0];   # strip .batch/.extern/.<step>; keep 123_4 arrays
+        my $is_step = ($jid =~ /\./) ? 1 : 0;
+
+        my $rec = $jobs{$base} ||= {
+            name => '', state => '', elapsed => undef, timelimit => undef,
+            reqmem_mb => undef, reqmem_per => '', alloc_cpus => 1, nnodes => 1,
+            maxrss_mb => undef,
+        };
+
+        # The main (dotless) row carries request info; step rows carry MaxRSS.
+        unless ($is_step) {
+            $rec->{name}      = $f{JobName} // '';
+            $rec->{state}     = $f{State} // '';
+            $rec->{elapsed}   = parse_duration($f{Elapsed});
+            $rec->{timelimit} = parse_duration($f{Timelimit});
+            my ($mem, $per) = parse_mem_to_mb($f{ReqMem});
+            $rec->{reqmem_mb}  = $mem;
+            $rec->{reqmem_per} = $per;
+            my $cpus = int($f{AllocCPUS} // 0);
+            $rec->{alloc_cpus} = $cpus if $cpus;
+            my $nnodes = int($f{NNodes} // 0);
+            $rec->{nnodes} = $nnodes if $nnodes;
+        }
+
+        my ($rss) = parse_mem_to_mb($f{MaxRSS});
+        if (defined $rss) {
+            $rec->{maxrss_mb} = (!defined $rec->{maxrss_mb} || $rss > $rec->{maxrss_mb})
+                ? $rss : $rec->{maxrss_mb};
+        }
+    }
+    return \%jobs;
+}
+
+sub summarise {
+    my ($base, $rec) = @_;
+
+    my $req = $rec->{reqmem_mb};
+    if (defined $req) {
+        if ($rec->{reqmem_per} eq 'c') {
+            $req *= $rec->{alloc_cpus};
+        } elsif ($rec->{reqmem_per} eq 'n') {
+            $req *= $rec->{nnodes};
+        }
+    }
+
+    my $pct_time;
+    if (defined $rec->{elapsed} && $rec->{timelimit}) {
+        $pct_time = $rec->{elapsed} / $rec->{timelimit} * 100;
+    }
+
+    my $pct_mem;
+    if (defined $rec->{maxrss_mb} && $req) {
+        $pct_mem = $rec->{maxrss_mb} / $req * 100;
+    }
+
+    my $state = $rec->{state} // '';
+    $state = (split /\s+/, $state)[0] // '' if $state ne '';   # 'CANCELLED by X' -> 'CANCELLED'
+
+    return {
+        id       => $base,
+        name     => $rec->{name},
+        state    => $state,
+        elapsed  => fmt_hms($rec->{elapsed}),
+        pct_time => $pct_time,
+        maxrss   => fmt_mem_mb($rec->{maxrss_mb}),
+        pct_mem  => $pct_mem,
+    };
+}
+
+# ----------------------------------------------------------------------------- parsing helpers
+sub parse_duration {
+    my ($s) = @_;
+    $s = defined $s ? $s : '';
+    $s =~ s/^\s+|\s+$//g;
+    return undef if ($s eq '' || $s =~ /^(UNLIMITED|PARTITION_LIMIT|INVALID)$/i);
+    my $days = 0;
+    if ($s =~ /-/) {
+        (my $d, $s) = split /-/, $s, 2;
+        $days = int($d);
+    }
+    my @parts = split /:/, $s;
+    my ($h, $m, $sec);
+    if (@parts == 3) {
+        ($h, $m, $sec) = @parts;
+    } elsif (@parts == 2) {
+        ($h, $m, $sec) = (0, @parts);
+    } elsif (@parts == 1) {
+        ($h, $m, $sec) = (0, 0, @parts);
+    } else {
+        return undef;
+    }
+    return $days * 86400 + $h * 3600 + $m * 60 + $sec;
+}
+
+sub parse_mem_to_mb {
+    my ($s) = @_;
+    $s = defined $s ? $s : '';
+    $s =~ s/^\s+|\s+$//g;
+    return (undef, '') if ($s eq '' || $s eq '0');
+    my $per = '';
+    if ($s =~ /([cn])$/i) {
+        $per = lc($1);
+        $s = substr($s, 0, -1);
+    }
+    return (undef, '') unless $s =~ /^([\d.]+)\s*([KMGTP]?)/i;
+    my $val  = $1;
+    my $unit = uc($2 // '');
+    return (undef, '') unless exists $MEM_FACTOR_MB{$unit};
+    return ($val * $MEM_FACTOR_MB{$unit}, $per);
+}
+
+sub fmt_mem_mb {
+    my ($mb) = @_;
+    return '-' unless defined $mb;
+    return sprintf("%.2fT", $mb / 1024 / 1024) if $mb >= 1024 * 1024;
+    return sprintf("%.2fG", $mb / 1024)         if $mb >= 1024;
+    return sprintf("%.0fM", $mb);
+}
+
+sub fmt_hms {
+    my ($sec) = @_;
+    return '-' unless defined $sec;
+    $sec = int($sec);
+    my $d = int($sec / 86400);
+    my $rem = $sec % 86400;
+    my $h = int($rem / 3600);
+    $rem = $rem % 3600;
+    my $m = int($rem / 60);
+    my $s = $rem % 60;
+    return $d ? sprintf("%d-%02d:%02d:%02d", $d, $h, $m, $s)
+              : sprintf("%02d:%02d:%02d", $h, $m, $s);
+}
+
+sub fmt_pct {
+    my ($x) = @_;
+    return defined $x ? sprintf("%.1f%%", $x) : '-';
+}
+
+sub pct_key {
+    # undef sorts last (large), keeping the "None -> True" behaviour of the reference
+    my ($x) = @_;
+    return defined $x ? $x : 1e12;
+}
+
+# ----------------------------------------------------------------------------- state colours
+sub state_color {
+    my ($state) = @_;
+    return GREEN   if $state eq 'COMPLETED';
+    return RED     if $state eq 'FAILED';
+    return YELLOW  if $state eq 'TIMEOUT';
+    return MAGENTA if $state eq 'OUT_OF_MEMORY' || $state eq 'OUT_OF_ME+';
+    return CYAN    if $state eq 'CANCELLED';
+    return BLUE    if $state eq 'NODE_FAIL' || $state eq 'PREEMPTED' || $state eq 'BOOT_FAIL';
+    return '';
+}
+
+sub colored_field {
+    my ($text, $width) = @_;
+    my $color = state_color($text);
+    my $pad = $width - length($text);
+    $pad = 0 if $pad < 0;
+    if ($color) {
+        return $color . $text . RESET . (' ' x $pad);
+    }
+    return $text . (' ' x $pad);
+}
+
+# ----------------------------------------------------------------------------- output
+sub print_table {
+    my ($rows) = @_;
+    printf "%-14s %-18s %-13s %15s %8s %10s %8s\n",
+        "ID", "Name", "State", "Actual_Dur", "%Time", "MaxMem", "%Mem";
+    say "-" x 92;
+    for my $r (@{$rows}) {
+        my $name = $r->{name} // '';
+        $name = substr($name, 0, 17) . "\x{2026}" if length($name) > 18;
+        printf "%-14s %-18s ", $r->{id}, $name;
+        print colored_field($r->{state}, 13);
+        printf " %15s %8s %10s %8s\n",
+            $r->{elapsed}, fmt_pct($r->{pct_time}), $r->{maxrss}, fmt_pct($r->{pct_mem});
+    }
+}
+
+sub print_csv {
+    my ($rows) = @_;
+    say csv_row("ID", "Name", "State", "Actual_Duration",
+                "Perc_Allocated_Duration", "MaxMemory", "Perc_Allocated_Memory");
+    for my $r (@{$rows}) {
+        say csv_row(
+            $r->{id}, $r->{name}, $r->{state}, $r->{elapsed},
+            defined $r->{pct_time} ? sprintf("%.1f", $r->{pct_time}) : "",
+            $r->{maxrss},
+            defined $r->{pct_mem} ? sprintf("%.1f", $r->{pct_mem}) : "",
+        );
+    }
+}
+
+sub csv_row {
+    my @fields = @_;
+    return join(",", map {
+        my $v = defined $_ ? $_ : "";
+        if ($v =~ /[",\n]/) {
+            $v =~ s/"/""/g;
+            $v = qq{"$v"};
+        }
+        $v;
+    } @fields);
+}
+
+sub usage {
+    my ($exit_code) = @_;
+    print STDERR <<'END';
+slurm-efficiency - Requested-vs-used time & memory for finished Slurm jobs
+
+Usage:
+  slurm-efficiency [options]
+
+Options:
+  -d, --days INT     Look back N days (default: 7)
+  -S, --start DATE   Start date YYYY-MM-DD (overrides --days)
+  -E, --end DATE     End date YYYY-MM-DD
+  -s, --state LIST   Filter by state, e.g. COMPLETED,FAILED,TIMEOUT,OUT_OF_MEMORY
+      --sort KEY     Sort by: id (default), time, mem
+      --csv          Emit CSV instead of a coloured table
+  -n, --no-color     Do not use colours
+      --version      Show version and exit
+  -h, --help         Show this help and exit
+END
+    exit $exit_code;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+slurm-efficiency - Report time and memory efficiency (requested vs used) of recently finished Slurm jobs
+
+=head1 VERSION
+
+version 0.22.0
+
+=head1 SYNOPSIS
+
+  slurm-efficiency [options]
+
+=head1 DESCRIPTION
+
+C<slurm-efficiency> reads C<sacct> and reports, for each recently finished job,
+how much of the requested wall-clock time and memory was actually used.
+
+It stitches together the main allocation row (which carries the requested time
+limit and requested memory) with the step rows (which carry the peak resident
+memory, C<MaxRSS>) and reports per job:
+
+  ID | Name | State | Actual_Duration | %Time | MaxMem | %Mem
+
+State labels are colour-coded (COMPLETED, FAILED, TIMEOUT, OUT_OF_MEMORY,
+CANCELLED, ...) unless colour is disabled or output is not a terminal.
+
+If C<sacct> rejects the query because the date range is too wide, the error is
+captured and a friendly hint to reduce C<--days> is shown.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d, --days INT>
+
+Look back N days from now (default: 7). Ignored if C<--start> is given.
+
+=item B<-S, --start DATE>
+
+Start date in C<YYYY-MM-DD> format. Overrides C<--days>.
+
+=item B<-E, --end DATE>
+
+End date in C<YYYY-MM-DD> format.
+
+=item B<-s, --state LIST>
+
+Filter by Slurm state, e.g. C<COMPLETED,FAILED,TIMEOUT,OUT_OF_MEMORY>.
+
+=item B<--sort KEY>
+
+Sort rows by C<id> (default), C<time> (percentage of time used), or C<mem>
+(percentage of memory used). Sorting by C<mem> helps spot over-allocation.
+
+=item B<--csv>
+
+Emit CSV to STDOUT instead of the aligned, coloured table.
+
+=item B<-n, --no-color>
+
+Disable colour output.
+
+=item B<--version>
+
+Show the version of the script.
+
+=item B<-h, --help>
+
+Show help and exit.
+
+=back
+
+=head1 NOTES
+
+=over 4
+
+=item *
+
+C<%Time> = Elapsed / Timelimit. Jobs on an UNLIMITED partition show C<->.
+
+=item *
+
+C<%Mem> = MaxRSS / requested memory. C<ReqMem> is scaled by allocated CPUs or
+nodes when it is expressed per-CPU (C<...c>) or per-node (C<...n>).
+
+=item *
+
+Very short jobs sometimes record no MaxRSS; those show C<->.
+
+=back
+
+=head1 EXAMPLES
+
+  # Last 7 days (default)
+  slurm-efficiency
+
+  # Last 14 days
+  slurm-efficiency --days 14
+
+  # Only failed / timed-out / OOM jobs
+  slurm-efficiency --state FAILED,TIMEOUT,OUT_OF_MEMORY
+
+  # Spot over-allocated memory
+  slurm-efficiency --sort mem
+
+  # Machine-readable
+  slurm-efficiency --csv > efficiency.csv
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

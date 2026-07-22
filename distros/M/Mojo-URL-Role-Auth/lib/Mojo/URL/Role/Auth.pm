@@ -3,7 +3,7 @@ package Mojo::URL::Role::Auth;
 use Mojo::Base -role, -signatures;
 has [qw(username password)];
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 sub auth {
   my ($self, $user, $pass)  = @_;
@@ -58,7 +58,7 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-vague E<lt>vague@cpan.orgE<gt>
+vague E<lt>4Qt9Ma7@proton.meE<gt>
 
 =cut
 

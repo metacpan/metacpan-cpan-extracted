@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000055';
+our $VERSION = '0.000056';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -27,6 +27,7 @@ use DBIx::QuickDB::Util::HashBase qw{
     <watcher
     <cloned_from
     -fast_destroy
+    -no_disconnect_handles
 };
 
 sub viable { (0, "viable() is not implemented for the " . $_[0]->name . " driver") }
@@ -165,6 +166,8 @@ sub clone_data {
         cleanup => $self->{+_CLEANUP},
 
         FAST_DESTROY() => $self->{+FAST_DESTROY},
+
+        NO_DISCONNECT_HANDLES() => $self->{+NO_DISCONNECT_HANDLES},
 
         ENV_VARS() => {%{$self->{+ENV_VARS}}},
     );
@@ -402,8 +405,17 @@ sub start {
 # DBI's own structures are already being torn down (DBI->visit_handles dies
 # with "Can't call method visit_child_handles on an undefined value"), and
 # retaining broken handles no longer matters because the process is exiting.
+#
+# Skipped entirely when the no_disconnect_handles attribute is set: some callers
+# (e.g. a test framework running teardown queries) hold their OWN active handles
+# to this same db, and ripping those out mid-query surfaces as "Lost connection
+# ... during query". MySQL/MariaDB shut down fine with clients still connected,
+# so such callers can opt out. PostgreSQL's smart shutdown waits for clients
+# indefinitely, so opting out there risks a stalled stop -- caller's choice.
 sub _disconnect_handles {
     my $self = shift;
+
+    return if $self->{+NO_DISCONNECT_HANDLES};
 
     return unless $INC{'DBI.pm'} && ${^GLOBAL_PHASE} ne 'DESTRUCT';
 
@@ -747,6 +759,27 @@ the graceful path is used, so a reusable data dir is never hard-killed.
 
 The attribute is inherited by clones via C<clone_data()>, so a clone of a
 fast_destroy database is itself fast_destroy.
+
+=item $bool = $db->no_disconnect_handles
+
+True if this db was created with C<< no_disconnect_handles => 1 >>. When set, the
+teardown paths (C<stop()>, C<DESTROY>, C<destroy_quietly()>, and C<cleanup()>) skip
+the internal C<_disconnect_handles()> step that would otherwise close every DBI
+handle in this process whose connection points at this db's data dir.
+
+That disconnect exists to keep a connected client from stalling a graceful
+shutdown (PostgreSQL's smart shutdown waits for clients indefinitely). But when
+the caller's own code holds active handles to the same db being stopped -- e.g. a
+test framework running sanity-check queries in teardown and then destroying the
+clone -- the disconnect rips those handles out mid-query, surfacing as "Lost
+connection to MySQL server during query". MySQL/MariaDB shut down cleanly with
+clients still connected, so those callers can safely opt out; do B<not> set this
+for PostgreSQL unless you are certain no handle will linger, or teardown may hang.
+
+The attribute is inherited by clones via C<clone_data()>, so a clone of a
+no_disconnect_handles database is itself no_disconnect_handles. Set it once in a
+Pool's C<driver_args>/C<clone_args> to propagate to every clone. Default false
+(the disconnect happens, preserving prior behavior).
 
 =item $db->resync
 

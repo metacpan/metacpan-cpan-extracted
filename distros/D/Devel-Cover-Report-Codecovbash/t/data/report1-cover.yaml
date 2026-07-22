@@ -1,0 +1,12 @@
+--- !perl/hash:Devel::Cover::DB::File
+statement: !perl/hash:Devel::Cover::DB::Criterion
+  '1':
+  - !perl/array:Devel::Cover::Statement [ 1, null ]
+  '2':
+  - !perl/array:Devel::Cover::Statement [ 0, null ]
+  '3':
+  - !perl/array:Devel::Cover::Statement [ 0, null ]
+  - !perl/array:Devel::Cover::Statement [ 1, null ]
+  '4':
+  - !perl/array:Devel::Cover::Statement [ 1, null ]
+  - !perl/array:Devel::Cover::Statement [ 0, null ]

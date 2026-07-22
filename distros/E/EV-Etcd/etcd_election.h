@@ -7,6 +7,9 @@
 #include "etcd_common.h"
 #include "election.pb-c.h"
 
+/* Bind this translation unit's EVAPI table (call once from BOOT) */
+void election_init_ev_api(pTHX);
+
 /* Election response handlers */
 void process_campaign_response(pTHX_ pending_call_t *pc);
 void process_proclaim_response(pTHX_ pending_call_t *pc);
