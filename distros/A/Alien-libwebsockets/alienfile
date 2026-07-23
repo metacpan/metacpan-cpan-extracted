@@ -6,10 +6,17 @@ plugin 'PkgConfig' => (
 );
 
 share {
-    plugin 'Download' => (
-        url     => 'https://github.com/warmcat/libwebsockets/tags',
-        version => qr/v([\d\.]+)/,
-        filter  => qr/\.tar\.gz$/,
+    # Use the GitHub API, not /tags HTML scraping (GitHub serves anonymous
+    # scrapers a login page). Set ALIEN_BUILD_GITHUB_TOKEN to lift the API rate
+    # limit. prefer => 1 sorts by version, otherwise GitHub's own ordering wins
+    # and picks the repo's non-release "valgrind-clean" tag; the version regex
+    # only extracts, so it is anchored to real releases.
+    plugin 'Download::GitHub' => (
+        github_user => 'warmcat',
+        github_repo => 'libwebsockets',
+        tags_only   => 1,
+        version     => qr/^v([0-9]+\.[0-9]+\.[0-9]+)$/,
+        prefer      => 1,
     );
 
     plugin 'Extract' => 'tar.gz';

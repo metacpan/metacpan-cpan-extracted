@@ -1,29 +1,29 @@
---- 
+---
 abstract: Structured data retrieval of perl -V output
-author: 
+author:
   - H.Merijn Brand <hmbrand@cpan.org>
-build_requires: 
+build_requires:
   perl: '5.006'
-configure_requires: 
-  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150011
+generated_by: Author, CPAN::Meta::Converter version 2.150013
 license: perl
-meta-spec: 
+meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Config-Perl-V
-provides: 
-  Config::Perl::V: 
+provides:
+  Config::Perl::V:
     file: V.pm
-    version: '0.39'
-requires: 
-  Config: 0
-  Test::More: 0
-  Test::NoWarnings: 0
+    version: '0.40'
+requires:
+  Config: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
   perl: '5.006'
-resources: 
+resources:
   bugtracker: https://github.com/Tux/Config-Perl-V/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Config-Perl-V
-version: '0.39'
+version: '0.40'

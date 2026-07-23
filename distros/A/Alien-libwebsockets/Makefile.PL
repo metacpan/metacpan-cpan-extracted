@@ -15,9 +15,10 @@ WriteMakefile($abmm->mm_args(
     MIN_PERL_VERSION => '5.010',
 
     CONFIGURE_REQUIRES => {
-        'Alien::Build'                       => '2.37',
-        'Alien::Build::MM'                   => '2.37',
-        'Alien::Build::Plugin::Build::CMake' => '0.99',
+        'Alien::Build'                           => '2.37',
+        'Alien::Build::MM'                       => '2.37',
+        'Alien::Build::Plugin::Build::CMake'     => '0.99',
+        'Alien::Build::Plugin::Download::GitHub' => '0.10',
     },
     PREREQ_PM => {
         'Alien::Base'  => '2.37',

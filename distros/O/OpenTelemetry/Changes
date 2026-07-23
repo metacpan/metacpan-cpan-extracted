@@ -1,5 +1,17 @@
 Revision history for OpenTelemetry
 
+0.035     2026-07-22 14:06:15 BST
+
+    * The HTTP::Tiny and LWP::UserAgent instrumentations now only
+      set the 'user_agent.original' attribute if an agent is available,
+      which should silence some possible warnings.
+
+0.034     2026-07-22 12:54:56 BST
+
+    * Fixed an issue in OpenTelemetry::Trace::Tracer::in_span where
+      manually specifying a parent context was ignored and the current
+      context was used instead in error.
+
 0.033     2025-11-21 23:36:19 GMT
 
     * Modified instrumentation tests so they pass under coverage.

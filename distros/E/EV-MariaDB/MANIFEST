@@ -33,6 +33,7 @@ t/12_coverage_final.t
 t/13_extra_coverage.t
 t/14_new_features.t
 t/15_review_gaps.t
+t/16_review_fixes.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

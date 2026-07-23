@@ -1,5 +1,28 @@
 Revision history for POSIX::2008.
 
+0.27  2026-07-22
+  - This module now also covers POSIX.1 editions after 2008.
+  - Math functions use quadmath or long doubles if enabled and available.
+  - Added work-around for Bessel functions bricked by MinGW with C99 and later.
+  - Added fabs(), frexp(), lrint(), pow(), rint(), sqrt(),
+    pause(), posix_openpt(), grantpt(), unlockpt().
+  - Added, among others, *LONG_(MAX|MIN) constants. These are strings when
+    outside the UV/IV range (addresses GH#13406).
+  - Added :errno_h export tag and all POSIX errno constants.
+  - Added a bunch of constants new in POSIX.1-2024.
+  - Added some interfaces new in POSIX.1-2024:
+    * getentropy()
+    * getresgid(), getresuid(), setresgid(), setresuid()
+    * mkostemp()
+    * ppoll()
+    * strptime() supports tm_gmtoff and tm_zone.
+  - confstr() no longer returns the trailing NUL byte.
+  - lround(), remainder(), remquo() no longer return undef/empty on error.
+  - writev(), pwritev(), pwritev2() accept array refs as buffer elements.
+  - openat() allows dirfd to be a reference to an NV or PV, not only IV.
+  - @EXPORT_OK now only includes symbols actually available.
+  - Added some happy little tests.
+
 0.26  2025-07-25
   - _readv50c(): Use SVt_RV for sv_upgrade() w/ Perl < 5.12 to please DEBUGGING.
   - poll():
@@ -27,10 +50,10 @@ Revision history for POSIX::2008.
 
 0.24  2024-06-14
   - Updated ppport.h to version 3.72.
-  - Fixed potential env buffer overflow in _execve50c().
+  - Cope w/ env change during iteration in _execve50c().
   - Flush I/O buffers before calling fexecve()/execveat().
   - Support magic function arguments.
-  - Support arrayref argument for strptime() (addresses foreign RT#66519).
+  - Support arrayref argument for strptime() (addresses RT#66519).
   - Call readlinkat() for readlink() if available to avoid a branch.
   - Don't write to SvPV(sv)[SvLEN(sv)-1], otherwise Perl >= 5.20 tends to
     segfault because it abuses this char for COW counting. [facepalm.gif]

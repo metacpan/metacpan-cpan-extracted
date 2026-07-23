@@ -1,0 +1,65 @@
+{
+   "abstract" : "Next-generation license pattern matcher for Cavil",
+   "author" : [
+      "Sebastian Riedel <sriedel@suse.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cavil-Matcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Spooky::Patterns::XS" : "0"
+         },
+         "requires" : {
+            "Cpanel::JSON::XS" : "4.09",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/openSUSE/cavil-matcher/issues"
+      },
+      "license" : [
+         "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/openSUSE/cavil-matcher.git",
+         "web" : "https://github.com/openSUSE/cavil-matcher"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

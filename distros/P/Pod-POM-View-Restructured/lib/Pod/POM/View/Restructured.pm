@@ -1,9 +1,9 @@
 # AUTHOR: Don Owens <don@regexguy.com>
 # AUTHOR: Jeff Fearn <Jeff.Fearn@gmail.com>
-# AUTHOR: Alex Muntada <alexm@cpan.org>
+# AUTHOR: Alex Muntada <alexm@alexm.org>
 # OWNER: 2010 Don Owens <don@regexguy.com>
 # OWNER: 2016 Jeff Fearn <Jeff.Fearn@gmail.com>
-# OWNER: 2016-2021 Alex Muntada <alexm@cpan.org>
+# OWNER: 2016-2026 Alex Muntada <alexm@alexm.org>
 # LICENSE: Perl_5
 
 
@@ -15,7 +15,7 @@ use Pod::POM;
 
 package Pod::POM::View::Restructured;
 
-our $VERSION = '1.000003'; # VERSION
+our $VERSION = '1.000004'; # VERSION
 
 use base 'Pod::POM::View::Text';
 
@@ -219,7 +219,7 @@ sub _build_header {
     my $namespace = $self->{namespace};
     if($namespace) {
             my $a = $text;
-            # prepend the namesspace to gaurantee document wide unique names
+            # prepend the namesspace to guarantee document wide unique names
             $a = "$namespace\:\:$a" unless($text =~ /^$namespace/);
             $a =~ s/(?:\s)/-/g;
 
@@ -493,7 +493,7 @@ sub view_seq_link {
             $module = $2;
         }
 
-        # Links in this namespace are cross refereneces
+        # Links in this namespace are cross references
         if (($namespace) and ($text =~ /^$namespace/)) {
             $module = qq{$namespace\:\:$module} unless($module =~ /^$namespace/);
             $module =~ s/(?:\s)/-/g;
@@ -501,7 +501,7 @@ sub view_seq_link {
         }
         else {
             $module = $self->_url_encode($module);
-            my $url = "http://search.cpan.org/search?query=$module&mode=module";
+            my $url = "https://metacpan.org/search?q=$module";
             $text = qq{`$label <$url>`_};
         }
     }
@@ -720,16 +720,16 @@ Don Owens <don@regexguy.com>
 
 Jeff Fearn <Jeff.Fearn@gmail.com>
 
-Alex Muntada <alexm@cpan.org>
+Alex Muntada <alexm@alexm.org>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2010 by Don Owens <don@regexguy.com>, 2016 by Jeff Fearn <Jeff.Fearn@gmail.com>, and 2016-2021 by Alex Muntada <alexm@cpan.org>.
+This software is copyright (c) 2010 by Don Owens <don@regexguy.com>, 2016 by Jeff Fearn <Jeff.Fearn@gmail.com>, and 2016-2026 by Alex Muntada <alexm@alexm.org>.
 
 This software is available under the same terms as the perl 5 programming language system itself.
 
 =head1 VERSION
 
-1.000003
+1.000004
 
 =cut

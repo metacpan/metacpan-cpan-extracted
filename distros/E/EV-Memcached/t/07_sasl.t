@@ -136,25 +136,60 @@ my $prefix = "ev_mc_sasl_$$\_";
 # --- wrong password ---
 {
     my $error_msg;
+    my $connect_fired = 0;
     my $mc = EV::Memcached->new(
         host     => $host,
         port     => $port,
         username => $user,
         password => 'wrong_password',
         on_error => sub { $error_msg = $_[0] },
+        on_connect => sub { $connect_fired = 1 },
     );
-    $mc->on_connect(sub {
-        # After connect, auth is pipelined — wait for error
-        my $w; $w = EV::timer 1, 0, sub {
-            undef $w;
-            ok($error_msg, "wrong password: on_error fired");
-            like($error_msg // '', qr/SASL auth failed|AUTH/,
-                "wrong password: error message");
-            ok(!$mc->is_connected, "wrong password: disconnected");
-            EV::break;
-        };
-    });
+    # on_connect must NOT fire when auto-auth fails: the assertion timer
+    # is armed directly, not from inside on_connect.
+    my $w; $w = EV::timer 1, 0, sub {
+        undef $w;
+        ok($error_msg, "wrong password: on_error fired");
+        like($error_msg // '', qr/SASL auth failed|AUTH/,
+            "wrong password: error message");
+        ok(!$connect_fired, "wrong password: on_connect never fired");
+        ok(!$mc->is_connected, "wrong password: disconnected");
+        EV::break;
+    };
     run_ev();
+}
+
+# --- on_connect ordering: fires only after SASL auth completes ---
+{
+    my @order;
+    my $pending_at_connect = -1;
+    my $mc;
+    $mc = EV::Memcached->new(
+        host     => $host,
+        port     => $port,
+        username => $user,
+        password => $pass,
+        on_error => sub { diag "error: @_" },
+        on_connect => sub {
+            # 0 means the SASL exchange already finished (its queue
+            # entry was consumed); pre-fix it was still in flight (1).
+            $pending_at_connect = $mc->pending_count;
+            push @order, 'on_connect';
+        },
+    );
+    # Queued before connect completes: must be held until after auth.
+    $mc->set("${prefix}order", 'v', sub {
+        my ($ok, $err) = @_;
+        push @order, $err ? "set err=$err" : 'set ok';
+        EV::break;
+    });
+    my $t = EV::timer 5, 0, sub { fail("timeout"); EV::break };
+    EV::run;
+    is($pending_at_connect, 0,
+        'on_connect fires after the SASL exchange completed');
+    is_deeply(\@order, ['on_connect', 'set ok'],
+        'on_connect precedes post-auth commands; queued op works')
+        or diag "order: @order";
 }
 
 # --- command without auth on SASL server ---

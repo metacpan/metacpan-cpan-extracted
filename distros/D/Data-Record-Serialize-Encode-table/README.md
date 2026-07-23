@@ -4,7 +4,7 @@ Data::Record::Serialize::Encode::table - encode records as a formatted table and
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

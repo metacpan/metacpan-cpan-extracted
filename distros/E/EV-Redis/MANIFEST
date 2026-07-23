@@ -23,6 +23,7 @@ deps/hiredis/dict.c
 deps/hiredis/dict.h
 deps/hiredis/fmacros.h
 deps/hiredis/hiredis.c
+deps/hiredis/ffc.h
 deps/hiredis/hiredis.h
 deps/hiredis/hiredis_ssl.h
 deps/hiredis/Makefile
@@ -83,6 +84,7 @@ t/reconnect.t
 t/regression_leaks.t
 t/resp3.t
 t/tls.t
+t/uaf_deferred_disconnect.t
 t/uaf_skip_pending.t
 typemap
 xt/pod.t

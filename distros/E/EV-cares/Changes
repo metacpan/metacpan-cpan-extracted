@@ -1,5 +1,11 @@
 Revision history for EV::cares.
 
+0.04  2026-07-23
+    - fix use-after-free when the last resolver reference is dropped from
+      inside a callback while other queries are still pending
+    - require c-ares >= 1.24 at configure time; add Socket 1.94 prereq
+    - concurrent t/02 queries; valgrind CI job
+
 0.03  2026-06-02
     - fix use-after-free when the resolver is destroyed from within a callback
       (defer channel teardown until the ares_* call unwinds; surfaced as a

@@ -4,7 +4,12 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+# Export our C symbols (fm_*) into the global namespace so downstream XS
+# modules (e.g. Layout::Flex) can link against them at load time rather than
+# recompiling the C sources. Consumers must load Font::Metrics first.
+sub dl_load_flags { 0x01 }   # RTLD_GLOBAL
 
 require XSLoader;
 XSLoader::load('Font::Metrics', $VERSION);

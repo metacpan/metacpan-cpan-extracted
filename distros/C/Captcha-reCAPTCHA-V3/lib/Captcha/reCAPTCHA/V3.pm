@@ -3,10 +3,11 @@ require 5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.12";
+our $VERSION = "0.14";
 
 use Carp qw(carp croak);
-use JSON::PP qw(decode_json);
+use JSON::MaybeXS;
+use Try::Tiny;
 
 use overload(
     '""'  => sub { $_[0]->name() },
@@ -41,41 +42,51 @@ sub sitekey {
 }
 
 # verifiers =======================================================================
+sub get_json_with_curl {
+    my $self     = shift;
+    my $response = shift;
+    croak "Extra arguments have been set." if @_;
+
+    my $cmd = sprintf(
+        q{curl -sS -X POST %s -d secret=%s -d response=%s},
+        $self->{verify_api},
+        _shell_escape($self->{secret}),
+        _shell_escape($response),
+    );
+
+    my $json = try { qx{$cmd} } catch { carp "Failed to execute curl" and return {} };
+    return decode_json($json) || {};
+}
+
+sub get_json_with_http_tiny {
+    my $self     = shift;
+    my $response = shift;
+    croak "Extra arguments have been set." if @_;
+
+    return {} unless eval { require HTTP::Tiny };
+    my $ua  = HTTP::Tiny->new;
+    return {} unless $ua->can_ssl();
+
+    my $res = try { $ua->post_form(
+        $self->{verify_api},
+        {
+            secret   => $self->{secret},
+            response => $response,
+        },
+    )} catch { carp "Failed to execute HTTP::Tiny" and return {} };
+    return {} unless $res->{success};
+    return decode_json($res->{content}) || {};
+}
+
 sub verify {
     my $self     = shift;
     my $response = shift;
     croak "Extra arguments have been set." if @_;
 
-    if ( _has_curl() ) {
-        my $cmd = sprintf(
-            q{curl -sS -X POST %s -d secret=%s -d response=%s},
-            $self->{verify_api},
-            _shell_escape($self->{secret}),
-            _shell_escape($response),
-        );
-
-        my $json = `$cmd`or croak "Failed to execute curl command: $cmd";
-        return decode_json($json);
-    }elsif ( !_has_lwp_https() ) {
-        croak "LWP::UserAgent and LWP::Protocol::https are required to verify reCAPTCHA response."; 
-    }
-
-    eval {
-        require LWP::UserAgent;
-        require LWP::Protocol::https;
-    } or croak "LWP::UserAgent and LWP::Protocol::https are required to verify reCAPTCHA response.";
-
-    my $ua = LWP::UserAgent->new;
-    my $res = $ua->post(
-        $self->{verify_api},{
-            secret   => $self->{secret},
-            response => $response,
-        },
-    );
-
-    my $json = $res->decoded_content;
-    return decode_json($json);
+    my $content = _has_curl()? $self->get_json_with_curl($response):
+        $self->get_json_with_http_tiny($response);
 }
+
 
 sub deny_by_score {
     my $self     = shift;
@@ -112,7 +123,7 @@ sub scriptTag {
     my %attr    = @_;
     my $sitekey = $attr{sitekey} || $self->{sitekey} || croak "missing 'sitekey'";
     my $url     = $self->scriptURL( sitekey => $sitekey );
-    return qq|<script src="$url" defer></script>|;
+    return qq|<script src="$url" async defer></script>|;
 }
 
 sub scripts {
@@ -125,7 +136,7 @@ sub scripts {
     my $comment = $attr{'debug'} ? '' : '// ';
     return <<"EOL";
 $simple
-<script defer>
+<script async defer>
 let rf = document.getElementById("$id");
 rf.onsubmit = function(event){
     grecaptcha.ready(function() {
@@ -157,6 +168,14 @@ sub _has_curl {
          return 1 if system("curl --version >/dev/null 2>&1") == 0;
     }
     return 0;
+}
+
+sub _has_lwp_https {
+    return eval {
+        require LWP::UserAgent;
+        require LWP::Protocol::https;
+        1;
+    };
 }
 
 1;
@@ -311,6 +330,6 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-worthmine E<lt>worthmine@gmail.comE<gt>
+Yuki Yoshida (worthmine) E<lt>2944869+worthmine@users.noreply.github.comE<gt>
 
 =cut

@@ -28,10 +28,20 @@ use lib "$Bin/../lib";
 use Term::ANSIColor qw(:constants);
 use Convert::Pheno;
 use Convert::Pheno::CLI::Args qw(build_cli_request);
+use Convert::Pheno::IO::Atomic qw(
+  commit_staged_path
+  create_staged_path
+  discard_staged_path
+  write_atomically
+);
 use Convert::Pheno::IO::CSVHandler;
 use Convert::Pheno::OMOP::Definitions;
 
 $Data::Dumper::Sortkeys = 1;
+
+# Error decoration belongs to the CLI process, not to module consumers.
+$SIG{__WARN__} = sub { warn "Warn: ", @_ };
+$SIG{__DIE__}  = sub { die "Error: ", @_ };
 
 # Defining a few variables
 my $out_dir     = '.';
@@ -97,19 +107,22 @@ Mapping and search:
                                   Default: 0.1, range: 0-1
   --print-hidden-labels|-phl      Preserve original text labels in output
   --search-audit-tsv <file>       Write a TSV audit of ontology search results
+  --source-info|--no-source-info  Preserve or omit raw source provenance in BFF
+                                  output [source-info]
 
 OMOP:
   --ohdsi-db                      Enable Athena-OHDSI lookup
   --path-to-ohdsi-db <dir>        Directory containing <ohdsi.db>
   --omop-tables <list>            Restrict OMOP tables
   --exposures-file <file>         OMOP concept_id list treated as exposures
-  --stream                        Incremental OMOP processing with single-file
-                                  line-delimited JSON output
+  --stream|--no-stream            Incremental OMOP processing with single-file
+                                  line-delimited JSON output [no-stream]
                                   Supports individuals-only <-obff FILE>, or
                                   entity-aware <-obff --entities individuals
                                   biosamples --out-dir DIR>
   --sql2csv                       Print SQL tables instead of converting
-  --max-lines-sql <n>             Maximum SQL lines per table [500]
+  --max-lines-sql <n>             OMOP processing cap: rows per SQL table and
+                                  individuals in non-stream mode [500]
 
 Other useful options:
   --default-vital-status <s>   Fallback PXF subject vitalStatus
@@ -119,6 +132,10 @@ Other useful options:
   --separator|--sep <char>        Delimiter for CSV input [; for .csv]
   --username|-u <name>            Override username stored in metadata
   --test                          Skip time-varying metadata for stable tests
+  --log [file]                    Write resolved request JSON log
+                                  [convert-pheno-log.json]
+  --color|--no-color              Enable or disable colored terminal output
+                                  [color]
   --debug <level>                 Print internal request/debug data
                                   (level >= 2 also prints DB lookup summary)
   --verbose|-v                    Print progress information
@@ -133,6 +150,7 @@ Examples:
   convert-pheno -ipxf pxf.json -obff --entities individuals biosamples --out-dir out/ --out-name biosamples=samples.json
   convert-pheno -ipxf pxf.json -obff --entities individuals datasets cohorts --out-dir out/
   convert-pheno -icsv data.csv --mapping-file mapping.yaml -obff --entities individuals datasets cohorts --out-dir out/
+  convert-pheno -iomop PERSON.csv CONCEPT.csv SPECIMEN.csv -obff --entities biosamples --out-dir out/
   convert-pheno -ibff individuals.json -oomop --out-dir omop_out/
   convert-pheno -ibff individuals.json -oomop --out-dir omop_out/ --out-name PERSON=patients.csv
   convert-pheno -iomop dump.sql.gz -opxf phenopackets.json.gz --default-vital-status UNKNOWN_STATUS --ohdsi-db
@@ -304,24 +322,14 @@ sub prepare_output_targets {
     if ($entity_mode) {
         for my $entity ( @{ $l_data->{entities} } ) {
             my $entity_file = resolve_entity_output_file( $l_data, $entity );
-            if ($overwrite) {
-                unlink($entity_file) if -e $entity_file;
-            }
-            else {
-                ask_overwrite($entity_file);
-            }
+            ask_overwrite($entity_file) unless $overwrite;
         }
         return;
     }
 
     return if $l_data->{method} =~ /2omop$/;
 
-    if ($overwrite) {
-        unlink($o_file) if -e $o_file;
-    }
-    else {
-        ask_overwrite($o_file);
-    }
+    ask_overwrite($o_file) unless $overwrite;
 }
 
 sub execute_conversion {
@@ -329,7 +337,12 @@ sub execute_conversion {
     my $method = $l_data->{method};
 
     if ( $stream && $method eq 'omop2bff' ) {
-        $convert->$method;
+        if ($entity_mode) {
+            $convert->$method;
+        }
+        else {
+            run_conversion_to_atomic_output( $convert, $method, $o_file );
+        }
         return ( undef, undef );
     }
 
@@ -341,12 +354,50 @@ sub execute_conversion {
     # For omop2bff and omop2pxf we serialize to JSON (not YAML) by individual.
     if ( $stream || $method eq 'omop2bff' || $method eq 'omop2pxf' ) {
         say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
-        $convert->$method;
+        run_conversion_to_atomic_output( $convert, $method, $o_file );
         return ( undef, undef );
     }
 
     my $data = $convert->$method;
     return ( $data, undef );
+}
+
+sub run_conversion_to_atomic_output {
+    my ( $convert, $method, $target ) = @_;
+    my $staged = create_staged_path($target);
+    my $had_out_file = exists $convert->{out_file};
+    my $previous_out_file = $convert->{out_file};
+    $convert->{out_file} = $staged;
+
+    my $ok = eval {
+        $convert->$method;
+        1;
+    };
+    my $error = $@;
+
+    if ($had_out_file) {
+        $convert->{out_file} = $previous_out_file;
+    }
+    else {
+        delete $convert->{out_file};
+    }
+
+    unless ($ok) {
+        discard_staged_path($staged);
+        die $error;
+    }
+
+    my $committed = eval {
+        commit_staged_path( $staged, $target );
+        1;
+    };
+    unless ($committed) {
+        my $commit_error = $@;
+        discard_staged_path($staged);
+        die $commit_error;
+    }
+
+    return 1;
 }
 
 sub write_conversion_result {
@@ -357,11 +408,17 @@ sub write_conversion_result {
         for my $entity ( @{ $l_data->{entities} } ) {
             my $entity_file = resolve_entity_output_file( $l_data, $entity );
             say BOLD GREEN "Writing <$entity_file> file\n", RESET if $verbose;
-            io_yaml_or_json(
-                {
-                    filepath => $entity_file,
-                    mode     => 'write',
-                    data     => $bundle->entities($entity),
+            write_atomically(
+                $entity_file,
+                sub {
+                    my ($staged) = @_;
+                    io_yaml_or_json(
+                        {
+                            filepath => $staged,
+                            mode     => 'write',
+                            data     => $bundle->entities($entity),
+                        }
+                    );
                 }
             );
         }
@@ -373,12 +430,18 @@ sub write_conversion_result {
     say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
 
     if ( $method eq 'bff2csv' || $method eq 'pxf2csv' ) {
-        write_csv(
-            {
-                sep      => $l_data->{sep} // ';',
-                filepath => $o_file,
-                headers  => get_headers($data),
-                data     => $data,
+        write_atomically(
+            $o_file,
+            sub {
+                my ($staged) = @_;
+                write_csv(
+                    {
+                        sep      => $l_data->{sep} // ';',
+                        filepath => $staged,
+                        headers  => get_headers($data),
+                        data     => $data,
+                    }
+                );
             }
         );
         return;
@@ -387,30 +450,37 @@ sub write_conversion_result {
     if ( $method =~ /2omop$/ ) {
         for my $table ( sort keys %$data ) {
             my $filepath = resolve_omop_table_output_file( $l_data, $table );
-            if ($overwrite) {
-                unlink($filepath) if -e $filepath;
-            }
-            else {
-                ask_overwrite($filepath);
-            }
+            ask_overwrite($filepath) unless $overwrite;
             my @headers  = @{ $omop_headers->{$table} };
-            write_csv(
-                {
-                    sep      => ";",
-                    filepath => $filepath,
-                    headers  => \@headers,
-                    data     => $data->{$table},
+            write_atomically(
+                $filepath,
+                sub {
+                    my ($staged) = @_;
+                    write_csv(
+                        {
+                            sep      => ";",
+                            filepath => $staged,
+                            headers  => \@headers,
+                            data     => $data->{$table},
+                        }
+                    );
                 }
             );
         }
         return;
     }
 
-    io_yaml_or_json(
-        {
-            filepath => $o_file,
-            mode     => 'write',
-            data     => $data,
+    write_atomically(
+        $o_file,
+        sub {
+            my ($staged) = @_;
+            io_yaml_or_json(
+                {
+                    filepath => $staged,
+                    mode     => 'write',
+                    data     => $data,
+                }
+            );
         }
     );
 }
@@ -493,11 +563,17 @@ sub write_log {
 
     # Saving file
     say BOLD GREEN "Writing <$log> file\n" if $verbose;
-    io_yaml_or_json(
-        {
-            filepath => $log,
-            mode     => 'write',
-            data     => { info => $info, data => $data }
+    write_atomically(
+        $log,
+        sub {
+            my ($staged) = @_;
+            io_yaml_or_json(
+                {
+                    filepath => $staged,
+                    mode     => 'write',
+                    data     => { info => $info, data => $data }
+                }
+            );
         }
     );
 }
@@ -516,8 +592,6 @@ sub ask_overwrite {
             chomp $input;
 
             if ( $input eq 'Y' ) {
-                unlink($filepath)
-                  or die "Failed to delete <$filepath>: $!\n";
                 print RESET;
                 return;    # Exit after successful deletion
             }

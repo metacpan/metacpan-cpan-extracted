@@ -47,6 +47,7 @@ enum ev_mariadb_state {
 struct ev_mariadb_s {
     unsigned int magic;
     struct ev_loop *loop;
+    SV *loop_sv;
     MYSQL *conn;
 
     ev_io    rio, wio;
@@ -70,6 +71,7 @@ struct ev_mariadb_s {
     MYSQL_STMT  *op_stmt;
     ev_mariadb_stmt_t *op_stmt_ctx;  /* per-stmt wrapper for bind_params cleanup */
     ev_mariadb_stmt_t *stmt_list;    /* all allocated stmt wrappers */
+    IV next_stmt_id;   /* monotonic counter for statement handle ids */
     MYSQL       *op_conn_ret;
     my_bool      op_bool_ret;
     MYSQL_ROW    op_row;        /* for streaming fetch_row result */
@@ -127,6 +129,7 @@ struct ev_mariadb_stmt_s {
     MYSQL_BIND  *bind_params;
     int          bind_param_count;
     int          closed;      /* invalidated by cleanup_connection */
+    IV           id;          /* opaque handle id, monotonic, never 0 */
     ev_mariadb_stmt_t *next;  /* linked list of all stmts on this connection */
 };
 
@@ -816,6 +819,9 @@ static void on_next_result_done(ev_mariadb_t *self) {
 /* --- Pipeline: send_query + read_query_result state machine --- */
 
 static void handle_send_failure(ev_mariadb_t *self, ev_mariadb_send_t *send) {
+    /* Any send failure tears down the connection below. Conservative: fires
+       even for client-side errors (e.g. CR_NET_PACKET_TOO_LARGE) where nothing
+       was sent and the session is still healthy. */
     char errbuf[512];
     SV *cb = send->cb;
     Safefree(send->sql);
@@ -1130,9 +1136,10 @@ static void on_stmt_prepare_done(ev_mariadb_t *self) {
         ev_mariadb_stmt_t *ctx;
         Newxz(ctx, 1, ev_mariadb_stmt_t);
         ctx->stmt = stmt;
+        ctx->id = ++self->next_stmt_id;
         ctx->next = self->stmt_list;
         self->stmt_list = ctx;
-        if (deliver_value(self, newSViv(PTR2IV(ctx)))) return;
+        if (deliver_value(self, newSViv(ctx->id))) return;
     }
     maybe_pipeline(self);
 }
@@ -1277,6 +1284,17 @@ static void on_stmt_store_done(ev_mariadb_t *self) {
         return;
     }
     on_stmt_execute_done(self);
+}
+
+/* Resolve an opaque statement-handle id to its live wrapper, or NULL if none
+   matches (stale/closed/fabricated). Never dereferences the user's value. */
+static ev_mariadb_stmt_t *find_stmt(ev_mariadb_t *self, IV id) {
+    ev_mariadb_stmt_t *ctx = self->stmt_list;
+    while (ctx) {
+        if (ctx->id == id) return ctx;
+        ctx = ctx->next;
+    }
+    return NULL;
 }
 
 static void unlink_stmt(ev_mariadb_t *self, ev_mariadb_stmt_t *ctx) {
@@ -2075,6 +2093,7 @@ CODE:
     Newxz(RETVAL, 1, ev_mariadb_t);
     RETVAL->magic = EV_MARIADB_MAGIC;
     RETVAL->loop = loop;
+    RETVAL->loop_sv = SvREFCNT_inc(ST(1));   /* keep the EV::Loop object alive */
     RETVAL->fd = -1;
     RETVAL->state = STATE_IDLE;
     ngx_queue_init(&RETVAL->cb_queue);
@@ -2122,6 +2141,7 @@ CODE:
         Safefree(self->pending_database);
         Safefree(self->pending_charset);
         self->stream_cb = NULL;
+        /* skip loop_sv dec: global destruction, like the other SVs here */
         {
             ev_mariadb_stmt_t *ctx = self->stmt_list;
             while (ctx) {
@@ -2209,6 +2229,7 @@ CODE:
         if ((cb = self->on_error))   { self->on_error   = NULL; SvREFCNT_dec(cb); }
     }
 
+    if (self->loop_sv) { SvREFCNT_dec(self->loop_sv); self->loop_sv = NULL; }
     self->loop = NULL;
     self->fd = -1;
 
@@ -2359,7 +2380,7 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    ctx = find_stmt(self, stmt_iv);
     CHECK_STMT(ctx);
 
     if (SvOK(params_ref)) {
@@ -2398,7 +2419,7 @@ CODE:
     if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV)
         croak("params must be an ARRAY reference");
 
-    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    ctx = find_stmt(self, stmt_iv);
     CHECK_STMT(ctx);
     setup_bind_params(ctx, (AV *)SvRV(params_ref));
 }
@@ -2412,7 +2433,7 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    ctx = find_stmt(self, stmt_iv);
     if (!ctx) croak("invalid statement handle");
     if (ctx->closed) {
         /* already closed by cleanup_connection — just free the wrapper */
@@ -2446,7 +2467,7 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    ctx = find_stmt(self, stmt_iv);
     CHECK_STMT(ctx);
     push_cb(self, cb);
     self->op_stmt = ctx->stmt;
@@ -2484,7 +2505,8 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    db = (SvOK(db_sv)) ? SvPV_nolen(db_sv) : NULL;
+    /* undef $db keeps the current database (POD contract); NULL would drop it. */
+    db = (SvOK(db_sv)) ? SvPV_nolen(db_sv) : self->database;
 
     /* Stash the new credentials; on_utility_done commits them on success or
        discards on failure so reset() never sees credentials we couldn't use.
@@ -2651,7 +2673,7 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    ctx = find_stmt(self, stmt_iv);
     CHECK_STMT(ctx);
     {
         const char *src = SvPV(data_sv, data_len);

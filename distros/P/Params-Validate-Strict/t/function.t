@@ -1073,7 +1073,7 @@ subtest 'validate_strict: min > max in schema → croaks on schema error' => sub
 subtest 'validate_strict: min — arrayref shorter than min → croaks' => sub {
 	_vs_throws(
 		{ schema => { a => { type => 'arrayref', min => 3 } }, input => { a => [1] } },
-		qr/must be at least length/,
+		qr/must have at least /,
 		'croaks when arrayref has fewer elements than min'
 	);
 };

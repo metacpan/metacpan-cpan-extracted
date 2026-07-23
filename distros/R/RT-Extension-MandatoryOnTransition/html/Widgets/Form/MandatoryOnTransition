@@ -458,6 +458,19 @@ foreach my $queue ( sort keys %$config ) {
                 object   => $queueObj,
             };
         }
+        else {
+            # The configured queue no longer loads (renamed or deleted).
+            # Still render a tab so the existing config is visible and can be
+            # removed, flagged as missing so the add-requirement forms (which
+            # need a real queue object) are skipped.
+            RT->Logger->warning(
+                "MandatoryOnTransition config references queue '$queue' which could not be loaded"
+            );
+            $add_queue = {
+                name    => $queue,
+                missing => 1,
+            };
+        }
     }
 
     my @rules       = ();

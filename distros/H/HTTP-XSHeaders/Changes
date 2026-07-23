@@ -1,3 +1,7 @@
+1.000002    2026-07-22
+            * Add official dependency on HTTP::Headers.
+            * Fix old-style package declration so old Perls stop complaining.
+
 1.000001    2026-06-24
             * Doc fixes.
 

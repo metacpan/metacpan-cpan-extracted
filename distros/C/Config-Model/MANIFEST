@@ -122,6 +122,7 @@ t/iterator.t
 t/lib/Config/Model/Backend/Mini.pm
 t/lib/Config/Model/models/Master.pl
 t/lib/DummyNode.pm
+t/lib/ListWithCheck.pm
 t/lib/dump_load_model.pl
 t/lib/load-data.ini
 t/lib/load-data.json

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::IniFile 2.165;
+package Config::Model::Backend::IniFile 2.166;
 
 use Carp;
 use Mouse;
@@ -427,7 +427,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -471,7 +471,7 @@ version 2.165
  my $inst = $model->instance(root_class_name => 'MyClass' );
  my $root = $inst->config_root ;
 
- $root->load('ini_class:ONE foo=FOO1 bar=BAR1 - 
+ $root->load('ini_class:ONE foo=FOO1 bar=BAR1 -
               ini_class:TWO foo=FOO2' );
 
  $inst->write_back ;
@@ -493,8 +493,8 @@ This module is used directly by L<Config::Model> to read or write the
 content of a configuration tree written with INI syntax in
 C<Config::Model> configuration tree.
 
-This INI file can have arbitrary comment delimiter. See the example 
-in the SYNOPSIS that sets a semi-column as comment delimiter. 
+This INI file can have arbitrary comment delimiter. See the example
+in the SYNOPSIS that sets a semi-column as comment delimiter.
 By default the comment delimiter is '#' like in Shell or Perl.
 
 Note that undefined values are skipped for list element. I.e. when a
@@ -564,7 +564,7 @@ Boolean. When set, sections names are converted to lowercase.
 
 =head2 force_lc_key
 
-Idem for key name 
+Idem for key name
 
 =head2 force_lc_value
 
@@ -596,9 +596,9 @@ with C<join_check_list_value>.
 
 =head2 write_boolean_as
 
-Array ref. Reserved for boolean value. Specify how to write a boolean value. 
-Default is C<[0,1]> which may not be the most readable. C<write_boolean_as> can be 
-specified as C<['false','true']> or C<['no','yes']>. 
+Array ref. Reserved for boolean value. Specify how to write a boolean value.
+Default is C<[0,1]> which may not be the most readable. C<write_boolean_as> can be
+specified as C<['false','true']> or C<['no','yes']>.
 
 =head2 assign_char
 
@@ -628,12 +628,12 @@ written back:
 
 =head1 Mapping between INI structure and model
 
-INI file typically have the same structure with 2 different conventions. 
+INI file typically have the same structure with 2 different conventions.
 The class names can be imposed by the application or may be chosen by user.
 
 =head2 Imposed class name
 
-In this case, the class names must match what is expected by the application. 
+In this case, the class names must match what is expected by the application.
 The elements of each class can be different. For instance:
 
   foo = foo_v
@@ -646,7 +646,7 @@ In this case, class C<A> and class C<B> do not use the same configuration class.
 
 The model has this structure:
 
- Root class 
+ Root class
  |- leaf element foo
  |- node element A of class_A
  |  \- leaf element bar
@@ -667,7 +667,7 @@ elements. For instance:
 In this case, class C<A> and class C<B> do not use the same configuration class.
 The model has this structure:
 
- Root class 
+ Root class
  |- leaf foo
  \- hash element my_class_holder
     |- key A (value is node of class_A)
@@ -675,7 +675,7 @@ The model has this structure:
     \- key B (value is node of class_A)
        \- element-bar
 
-In this case, the C<my_class_holder> name is specified in C<rw_config> with C<store_class_in_hash> 
+In this case, the C<my_class_holder> name is specified in C<rw_config> with C<store_class_in_hash>
 parameter:
 
     rw_config  => {
@@ -685,9 +685,9 @@ parameter:
       store_class_in_hash => 'my_class_holder',
     }
 
-Of course they are exceptions. For instance, in late C<Multistrap>, the C<[General]> 
+Of course they are exceptions. For instance, in late C<Multistrap>, the C<[General]>
 INI class must be mapped to a specific node object. This can be specified
-with the C<section_map> parameter: 
+with the C<section_map> parameter:
 
     rw_config  => }
        backend => 'IniFile',
@@ -754,14 +754,14 @@ C<write> returns 1.
 
 =head1 AUTHOR
 
-Dominique Dumont, (ddumont at cpan dot org); 
+Dominique Dumont, (ddumont at cpan dot org);
 Krzysztof Tyszecki, (krzysztof.tyszecki at gmail dot com)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::BackendMgr>, 
-L<Config::Model::Backend::Any>, 
+L<Config::Model>,
+L<Config::Model::BackendMgr>,
+L<Config::Model::Backend::Any>,
 
 =head1 AUTHOR
 

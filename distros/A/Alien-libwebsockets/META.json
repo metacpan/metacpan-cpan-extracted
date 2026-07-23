@@ -41,7 +41,8 @@
          "requires" : {
             "Alien::Build" : "2.37",
             "Alien::Build::MM" : "2.37",
-            "Alien::Build::Plugin::Build::CMake" : "0.99"
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "Alien::Build::Plugin::Download::GitHub" : "0.10"
          }
       },
       "runtime" : {
@@ -61,7 +62,7 @@
    "provides" : {
       "Alien::libwebsockets" : {
          "file" : "lib/Alien/libwebsockets.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -75,7 +76,7 @@
          "web" : "https://github.com/vividsnow/perl5-alien-libwebsockets"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

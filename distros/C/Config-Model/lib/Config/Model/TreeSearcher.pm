@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TreeSearcher 2.165;
+package Config::Model::TreeSearcher 2.166;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -153,7 +153,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -163,13 +163,13 @@ version 2.165
  my $model = Config::Model->new ;
  $model ->create_config_class (
     name => "MyClass",
-    element => [ 
+    element => [
         foo => {
             type       => 'leaf',
             value_type => 'string'
         },
         bar => '*foo',
-        baz => { 
+        baz => {
             type => 'hash',
             index_type => 'string' ,
             cargo => {
@@ -189,13 +189,13 @@ version 2.165
 
  my @result = $root->tree_searcher(type => 'value')->search('jour');
  print join("\n",@result),"\n" ;
- # print 
+ # print
  #  baz:fr
  #  foo
 
 =head1 DESCRIPTION
 
-This class provides a way to search the content of a configuration tree. 
+This class provides a way to search the content of a configuration tree.
 Given a keyword or a pattern, the search method scans the tree to find
 a value, a description or anything that match the given pattern (or keyword).
 
@@ -207,15 +207,15 @@ Creates a new searcher object. The C<type> parameter can be:
 
 =over
 
-=item element 
+=item element
 
-=item value 
+=item value
 
-=item key 
+=item key
 
-=item summary 
+=item summary
 
-=item description 
+=item description
 
 =item help
 
@@ -238,7 +238,7 @@ on the path syntax.
 
 =head1 BUGS
 
-Creating a class with just one search method may be overkill. OTOH, it may 
+Creating a class with just one search method may be overkill. OTOH, it may
 be extended later to provide iterative search.
 
 =head1 AUTHOR

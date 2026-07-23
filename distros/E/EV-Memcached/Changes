@@ -1,5 +1,14 @@
 Revision history for EV::Memcached
 
+0.05  2026-07-23
+    - Fix reentrancy at the callback/connection boundary: read-buffer corruption
+      on reconnect-from-callback, teardown drains swallowing new-session commands,
+      skip_pending breaking the connection, deferred DESTROY dropping callbacks
+    - Fix the loop option (segfaulted); suppress SIGPIPE; drain the waiting queue
+      on terminal connect failure; quit() no longer errors/reconnects
+    - on_connect fires after SASL and always from the event loop; validate
+      callback arguments; POD corrections
+
 0.04  2026-06-02
     - Fix use-after-free when a callback clears its own handler
 

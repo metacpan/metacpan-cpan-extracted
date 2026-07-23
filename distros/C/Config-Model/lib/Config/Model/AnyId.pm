@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.165;
+package Config::Model::AnyId 2.166;
 
 use 5.020;
 
@@ -468,7 +468,7 @@ around notify_change => sub ($orig, $self, %args) {
 # the number of checks is becoming confusing. We have
 # - check_idx to check whether an index is fine. This is called when creating
 #   a new index
-# - check_content: a more expensive check that runs all content checker registered
+# - check_or_fix_content: a more expensive check that runs all content checker registered
 #   in this object. By default, none. A plain AnyId can contains a duplicated_content
 #   checker if configured
 # - a deep_check (for lack of a better name): a also expensive check that involve index
@@ -490,17 +490,17 @@ sub deep_check ($self, @args) {
         $self->check_idx(@args, index => $_);
     }
 
-    $self->check_content(@args, logger => $deep_check_logger);
+    $self->check_or_fix_content(@args, logger => $deep_check_logger);
     return;
 }
 
 # check globally the list or hash, called by apply_fix or deep_check
-sub check_content ($self, %args) {
+sub check_or_fix_content ($self, %args) {
     my $silent    = $args{silent} || 0;
     my $apply_fix = $args{fix}    || 0;
     my $local_logger = $args{logger} || $logger;
 
-    if ( $self-> needs_content_check ) {
+    if ( $apply_fix or $self-> needs_content_check ) {
 
         $local_logger->trace( "Running check_content on ",$self->location );
         # need to keep track to update GUI
@@ -510,7 +510,7 @@ sub check_content ($self, %args) {
         my @warn;
 
         foreach my $sub ( $self-> get_all_content_checks ) {
-            $sub->( \@error, \@warn, $apply_fix, $silent );
+            $sub->( \@error, \@warn, $apply_fix );
         }
 
         my $nb = $self->fetch_size;
@@ -870,7 +870,7 @@ sub fetch_all_values ($self, @args) {
     my @keys = $self->fetch_all_indexes;
 
     # verify content restrictions applied to List (e.g. no duplicate values)
-    my $ok = $check eq 'no' ? 1 : $self->check_content();
+    my $ok = $check eq 'no' ? 1 : $self->check_or_fix_content();
 
     if ( $ok or $check eq 'no' ) {
         return grep { defined $_ }
@@ -1079,7 +1079,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -1150,7 +1150,7 @@ version 2.165
 
  # put data
  my $steps = 'plain_hash:foo=boo bounded_list=foo,bar,baz
-   bounded_hash:3=foo bounded_hash:30=baz 
+   bounded_hash:3=foo bounded_hash:30=baz
    hash_of_nodes:"foo node" foo="in foo node" -
    hash_of_nodes:"bar node" bar="in bar node" ';
  $root->load( steps => $steps );
@@ -1233,7 +1233,7 @@ valid when C<cargo> C<type> is C<node>.
 =item <other>
 
 Constructor arguments passed to the cargo object. See
-L<Config::Model::Node> when C<< cargo->type >> is C<node>. See 
+L<Config::Model::Node> when C<< cargo->type >> is C<node>. See
 L<Config::Model::Value> when C<< cargo->type >> is C<leaf>.
 
 =back
@@ -1244,7 +1244,7 @@ Specify the minimum value (optional, only for hash and for integer index)
 
 =item max_index
 
-Specify the maximum value (optional, only for list or for hash with 
+Specify the maximum value (optional, only for list or for hash with
 integer index)
 
 =item max_nb
@@ -1258,12 +1258,12 @@ When set, the default parameter (or set of parameters) are used as
 default keys hashes and created automatically when the C<keys> or C<exists>
 functions are used on an I<empty> hash.
 
-You can use C<< default_keys => 'foo' >>, 
+You can use C<< default_keys => 'foo' >>,
 or C<< default_keys => ['foo', 'bar'] >>.
 
 =item default_with_init
 
-To perform special set-up on children nodes you can also use 
+To perform special set-up on children nodes you can also use
 
    default_with_init =>  {
       foo => 'X=Av Y=Bv',
@@ -1288,7 +1288,7 @@ With a list, you must use numeric keys:
 
 Specifies that the keys of the hash are copied from another hash in
 the configuration tree only when the hash is read for the first time after
-initial load (i.e. once the configuration files are completely read). 
+initial load (i.e. once the configuration files are completely read).
 
    migrate_keys_from => '- another_hash'
 
@@ -1296,7 +1296,7 @@ initial load (i.e. once the configuration files are completely read).
 
 Specifies that the values of the hash (or list) are copied from another hash (or list) in
 the configuration tree only when the hash (or list) is read for the first time after
-initial load (i.e. once the configuration files are completely read). 
+initial load (i.e. once the configuration files are completely read).
 
    migrate_values_from => '- another_hash_or_list'
 
@@ -1332,7 +1332,7 @@ Keys must match the specified regular expression. For instance:
 When set, the default parameter (or set of parameters) are used as
 keys hashes and created automatically. (valid only for hash elements)
 
-Called with C<< auto_create_keys => ['foo'] >>, or 
+Called with C<< auto_create_keys => ['foo'] >>, or
 C<< auto_create_keys => ['foo', 'bar'] >>.
 
 =item warn_if_key_match
@@ -1462,11 +1462,11 @@ Derived classes can register more global checker with the following method.
 
 =head2 add_check_content
 
-This method expects a sub ref with signature C<( $self, $error, $warn,
+This method expects a sub ref with signature C<( $error, $warn,
 $apply_fix )>.  Where C<$error> and C<$warn> are array ref. You can
 push error or warning messages there.  C<$apply_fix> is a
 boolean. When set to 1, the passed method can fix the warning or the
-error. Please make sure to weaken C<$self> to avoid memory cycles.
+error.
 
 Example:
 
@@ -1475,11 +1475,27 @@ Example:
  extends qw/Config::Model::HashId/;
  use Scalar::Util qw/weaken/;
 
- sub setup {
-    my $self = shift;
+ sub my_check ($self, $error, $warn, $apply_fix) {
+     # check => 'no' is required to avoid deep recursion
+     my @values = $self->fetch_all_values(check => 'no');
+
+     return if $my_condition; # up to you
+
+     if ($apply_fix) {
+         $self->fix_this(); # to be defined by you
+     }
+     else {
+         push $warn->@*, "this data needs to be fixed because bla bla bla.";
+         $self->inc_fixes;
+     }
+     return;
+ }
+
+ sub BUILD ($self, $) {
+    # $self to avoid memory cycles.
     weaken($self);
-    $self-> add_check_content( sub { $self->check_usused_licenses(@_);} )
-}
+    $self-> add_check_content( sub { $self->my_check(@_);} )
+ }
 
 =head1 Introspection methods
 
@@ -1488,17 +1504,17 @@ object (as declared in the model unless they were warped):
 
 =over
 
-=item min_index 
+=item min_index
 
-=item max_index 
+=item max_index
 
-=item max_nb 
+=item max_nb
 
-=item index_type 
+=item index_type
 
-=item default_keys 
+=item default_keys
 
-=item default_with_init 
+=item default_with_init
 
 =item follow_keys_from
 
@@ -1546,7 +1562,7 @@ This method returns undef if C<cargo> C<type> is not C<node>.
 
 =head2 has_fixes
 
-Returns the number of fixes that can be applied to the current value. 
+Returns the number of fixes that can be applied to the current value.
 
 =head1 Information management
 
@@ -1569,11 +1585,11 @@ Poor man's version of XPath style path. This string is in the form:
 
  /foo/bar/4
 
-Each word between the '/' is either an element name or a hash key or a list index. 
+Each word between the '/' is either an element name or a hash key or a list index.
 
 =item mode
 
-Either C<default>, C<custom>, C<user>,... 
+Either C<default>, C<custom>, C<user>,...
 See C<mode> parameter in <Config::Model::Value/"fetch( ... )">
 
 =item check
@@ -1582,8 +1598,8 @@ Either C<skip>, C<no>
 
 =item get_obj
 
-If the path leads to a leaf, this parameter tell whether to return 
-the stored value or the value object. 
+If the path leads to a leaf, this parameter tell whether to return
+the stored value or the value object.
 
 =item autoadd
 
@@ -1708,7 +1724,7 @@ Return true if the array or hash is not empty.
 
 Parameters: C<( index )>
 
-Delete the C<index>ed value 
+Delete the C<index>ed value
 
 =head2 clear
 
@@ -1722,9 +1738,13 @@ Delete all values (without deleting underlying value objects).
 
 Parameters: C<( [index] )>
 
-Returns warnings concerning indexes of this hash. 
-Without parameter, returns a string containing all warnings or undef. With an index, return the warnings
-concerning this index or undef.
+With an index parameter, this function returns warnings concerning this index.
+For instance a warning about index greater than max_nb.
+
+Without parameter, returns a string containing warnings about the content of a hash or list.
+For instance a missing value is a list.
+
+Return an empty string if no warnings are found.
 
 =head2 has_warning
 

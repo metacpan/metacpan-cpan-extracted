@@ -22,9 +22,10 @@ no_index:
 requires:
   Exporter: '5.57'
   HTTP::Date: '0'
+  HTTP::Headers: '0'
   XSLoader: '0'
   perl: '5.008009'
 resources:
   repository: https://github.com/p5pclub/http-xsheaders
-version: '1.000001'
+version: '1.000002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

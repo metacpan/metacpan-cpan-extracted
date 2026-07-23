@@ -27,11 +27,13 @@
       },
       "configure" : {
          "requires" : {
+            "ExtUtils::Depends" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Font::Metrics" : "0.02",
             "perl" : "5.008003"
          }
       },
@@ -43,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

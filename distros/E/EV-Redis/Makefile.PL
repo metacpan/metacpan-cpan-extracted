@@ -68,6 +68,15 @@ print $has_ssl
 
 # --- Build hiredis static library ---
 
+die <<'EOM' unless -f 'deps/hiredis/Makefile';
+deps/hiredis is missing or empty. This distribution bundles hiredis as a
+git submodule; run:
+
+    git submodule update --init
+
+and then re-run: perl Makefile.PL
+EOM
+
 my $make;
 if ($^O =~ m/bsd$/ && $^O !~ m/gnukfreebsd$/) {
     $make = which('gmake');
@@ -79,7 +88,9 @@ if ($^O =~ m/bsd$/ && $^O !~ m/gnukfreebsd$/) {
     $make = $Config{make};
 }
 
-my @make_args = ('-C', 'deps/hiredis', 'static');
+# Build hiredis with perl's compiler (not the hiredis Makefile's default)
+# and without -Werror, which breaks the build on new-compiler warnings.
+my @make_args = ('-C', 'deps/hiredis', "CC=$Config{cc}", 'USE_WERROR=0', 'static');
 if ($has_ssl) {
     push @make_args, 'USE_SSL=1';
     if (defined $ssl_detected && !ref $ssl_detected) {
@@ -143,8 +154,10 @@ WriteMakefile(
     DEFINE   => join(' ', @define),
     MYEXTLIB => join(' ', @myextlib),
     LIBS     => [join(' ', @libs)],
-    # Hide hiredis symbols to avoid clashes with other modules bundling hiredis
-    ($^O !~ /darwin/ ? (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL") : ()),
+    # Hide hiredis symbols to avoid clashes with other modules bundling
+    # hiredis. GNU ld/gold/lld only — Solaris/AIX linkers reject it.
+    ($^O =~ /^(?:linux|gnukfreebsd|freebsd|midnightbsd|dragonfly|openbsd|netbsd)$/
+        ? (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL") : ()),
 
     clean => { FILES => 'Redis.xs Redis.c' },
 

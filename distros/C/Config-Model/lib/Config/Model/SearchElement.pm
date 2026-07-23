@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SearchElement 2.165;
+package Config::Model::SearchElement 2.166;
 use v5.20;
 
 use Log::Log4perl qw(get_logger :levels);
@@ -302,7 +302,7 @@ Config::Model::SearchElement - Search an element in a configuration model
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 

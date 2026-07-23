@@ -2,8 +2,10 @@ use 5.008003;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 
-my $has_xsmulti = eval { ExtUtils::MakeMaker->VERSION('7.12'); 1 };
+my $dep  = ExtUtils::Depends->new('Layout::Flex', 'Font::Metrics');
+my %deps = $dep->get_makefile_vars;
 
 my %WriteMakefileArgs = (
     NAME             => 'Layout::Flex',
@@ -12,28 +14,23 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Layout/Flex.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
-    INC              => '-I. -Iinclude',
+    INC              => join(' ', '-I. -Iinclude', $deps{INC} // ()),
+    XS               => { 'Flex.xs' => 'Flex.c' },
     macro            => { TARFLAGS => '--format=ustar -c -v -f' },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0',
+    },
+    PREREQ_PM => {
+        'Font::Metrics' => '0.02',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
-    	'Test2::Bundle::Numerical' => '0.03'
+        'Test::More'               => '0',
+        'Test2::Bundle::Numerical' => '0.03',
     },
-    PREREQ_PM => {},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-    clean => { FILES => 'Layout-Flex-* lib/Layout/Flex.c lib/Layout/Flex.o lib/Layout/Flex.bs' },
+    clean => { FILES => 'Layout-Flex-* Flex.c Flex.bs' },
 );
-
-if ($has_xsmulti) {
-    $WriteMakefileArgs{XSMULTI} = 1;
-    $WriteMakefileArgs{XS}      = { 'lib/Layout/Flex.xs' => 'lib/Layout/Flex.c' };
-    $WriteMakefileArgs{OBJECT}  = 'lib/Layout/Flex$(OBJ_EXT)';
-} else {
-    $WriteMakefileArgs{XS}     = { 'lib/Layout/Flex.xs' => 'lib/Layout/Flex.c' };
-    $WriteMakefileArgs{OBJECT} = 'lib/Layout/Flex$(OBJ_EXT)';
-}
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
     my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
@@ -53,11 +50,3 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-sub MY::postamble {
-    return '' if $has_xsmulti;
-    return <<'MAKE';
-lib/Layout/Flex$(OBJ_EXT): lib/Layout/Flex.c
-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $< -o $@
-MAKE
-}

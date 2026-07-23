@@ -29,15 +29,19 @@ no_index:
 provides:
   Data::Record::Serialize::Encode::table:
     file: lib/Data/Record/Serialize/Encode/table.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Data::Record::Serialize: '1.06'
+  Moo::Role: '0'
   Term::Table: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
   perl: '5.012'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize-Encode-table
   repository: https://codeberg.com/djerius/data-record-serialize-encode-table.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

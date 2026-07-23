@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value::UpdateFromFile 2.165;
+package Config::Model::Value::UpdateFromFile 2.166;
 
 use v5.20;
 use Mouse;
@@ -120,7 +120,7 @@ Config::Model::Value::UpdateFromFile - Retrieve data from external file
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -189,7 +189,7 @@ File path from currrent directory.
 
 =item type
 
-File type in lower case, either C<ini>, C<json>, C<yaml> or C<toml>. 
+File type in lower case, either C<ini>, C<json>, C<yaml> or C<toml>.
 
 =item subpath
 

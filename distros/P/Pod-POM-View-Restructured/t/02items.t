@@ -18,7 +18,7 @@ my $rv = $conv->convert_file("$dir/t/test.pod");
 ok($rv);
 
 # An array of RST strings we should get in the output
-# You will ahve to escape any quanity chars. e.g. ?, *, etc.
+# You will have to escape any quanity chars. e.g. ?, *, etc.
 my @expected = (
     '- item1',
     '- item2',

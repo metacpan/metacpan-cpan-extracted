@@ -1228,7 +1228,7 @@ for my $c (
 	{ type => 'integer', min => 5, pass => '10',    fail => '3',   pass_re => undef, fail_re => qr/must be at least 5/ },
 	{ type => 'number',  min => 2, pass => '3.5',   fail => '1.0', pass_re => undef, fail_re => qr/must be at least 2/ },
 	{ type => 'float',   min => 2, pass => '3.5',   fail => '1.0', pass_re => undef, fail_re => qr/must be at least 2/ },
-	{ type => 'arrayref',min => 2, pass => [1,2,3], fail => [1],   pass_re => undef, fail_re => qr/must be at least length 2/ },
+	{ type => 'arrayref',min => 2, pass => [1,2,3], fail => [1],   pass_re => undef, fail_re => qr/must have at least 2/ },
 	{ type => 'hashref', min => 2, pass => {a=>1,b=>2}, fail => {a=>1}, pass_re => undef, fail_re => qr/must contain at least 2/ },
 ) {
 	my ($type, $min) = @{$c}{'type','min'};
@@ -1298,7 +1298,7 @@ for my $c (
 	  lo_re=>qr/must be at least 1/, hi_re=>qr/must be no more than 5/ },
 	{ type => 'arrayref',min=>2, max=>4,
 	  ok=>[1,2,3], low=>[1], high=>[1,2,3,4,5],
-	  lo_re=>qr/must be at least length 2/, hi_re=>qr/must contain no more than 4/ },
+	  lo_re=>qr/must have at least /, hi_re=>qr/must contain no more than 4/ },
 	{ type => 'hashref', min=>2, max=>3,
 	  ok=>{a=>1,b=>2}, low=>{a=>1}, high=>{a=>1,b=>2,c=>3,d=>4},
 	  lo_re=>qr/must contain at least 2/, hi_re=>qr/must contain no more than 3/ },
@@ -2507,7 +2507,7 @@ subtest 'arrayref + element_type=string + min: below-min array rejected' => sub 
 			schema => { tags => { type => 'arrayref', element_type => 'string', min => 3 } },
 			input  => { tags => ['only_one'] },
 		)
-	} qr/must be at least length 3/, 'element_type + min: short array rejected';
+	} qr/must have at least 3/, 'element_type + min: short array rejected';
 };
 
 subtest 'arrayref + element_type=string + max: all-string array within max passes' => sub {

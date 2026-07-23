@@ -17,7 +17,11 @@ sub get_redis_version {
             ($major, $minor) = ($1, $2);
         }
         $r->disconnect;
+        EV::break;
     });
+    # Guard timer: never depend on ambient loop state (an idle caller
+    # connection would otherwise keep this EV::run from returning).
+    my $t = EV::timer 5, 0, sub { EV::break };
     EV::run;
     return ($major, $minor);
 }

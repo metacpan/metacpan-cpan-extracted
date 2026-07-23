@@ -154,4 +154,55 @@ subtest 'stall_timeout config: default 120, env override, and 0 disables' => sub
   is($mk->(stall_timeout => 0)->{stall_timeout}, 0, 'explicit 0 disables');
 };
 
+subtest 'a helper does not outlive a killed parent worker (PR_SET_PDEATHSIG, when available)' => sub {
+  # The optional PR_SET_PDEATHSIG safeguard: a worker (Minion job) spawns a long-running helper, then
+  # the worker itself is force-killed (Minion "stop job", a deploy, a crash, the OOM killer). setpgrp
+  # put the helper in its own process group, so a signal aimed at the worker never reaches it - and
+  # once the worker is gone the stall watchdog is gone too. PR_SET_PDEATHSIG is what makes the kernel
+  # SIGKILL the helper the instant its parent dies. Only run where syscall.ph gave us the number
+  # (production perls have it); slimmed perls without it skip the safeguard AND this test.
+  plan skip_all => 'stall detection needs Linux /proc'       unless -d '/proc' && -r "/proc/$$/fd";
+  plan skip_all => 'no syscall.ph: PR_SET_PDEATHSIG not armed here' unless $File::Unpack2::SYS_PRCTL;
+
+  my $pdir    = tempdir("FU_10p_XXXXXX", TMPDIR => 1, CLEANUP => 1);
+  my $pidfile = "$pdir/helper.pid";                        # absolute: readable whatever the helper cwd
+  my ($u, $src) = stall_setup(['/bin/sh', '-c', "echo \$\$ > '$pidfile'; exec sleep 999"]);
+  plan skip_all => 'could not build fixture' unless $u;
+  $u->{stall_timeout} = 60;    # long enough that the watchdog can't fire before we kill the worker
+
+  my $worker = fork();
+  defined $worker or die "fork: $!";
+  if (!$worker) {
+    # the "worker": spawn the helper via a normal unpack, then block so the parent can signal us.
+    $u->unpack($src);
+    POSIX::_exit(0);           # _exit: never run END/DESTROY (would double-flush TAP / kill helper)
+  }
+
+  # Wait (bounded) for the helper to record its pid.
+  my $hpid;
+  for (1 .. 100) {
+    if (-s $pidfile && open(my $f, '<', $pidfile)) {
+      chomp($hpid = <$f>);
+      close $f;
+      last if $hpid;
+    }
+    select undef, undef, undef, 0.1;
+  }
+  unless ($hpid && kill 0, $hpid) {
+    kill 'KILL', $worker; waitpid $worker, 0;
+    plan skip_all => 'helper did not start (fixture/timing)';
+  }
+  ok(1, 'helper started and is alive while the worker runs');
+
+  # "stop job" kills the WORKER (not its process group). The helper is in its own group, so this
+  # signal does not reach it - PR_SET_PDEATHSIG is what must take it down.
+  kill 'KILL', $worker;
+  waitpid $worker, 0;
+
+  my $alive = 1;
+  for (1 .. 100) { $alive = kill 0, $hpid; last unless $alive; select undef, undef, undef, 0.1 }
+  ok(!$alive, 'helper was SIGKILLed when its parent worker died - not orphaned to spin forever');
+  kill 'KILL', $hpid if $alive;    # cleanup only if the safeguard regressed
+};
+
 done_testing;

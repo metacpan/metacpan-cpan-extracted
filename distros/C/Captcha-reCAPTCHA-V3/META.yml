@@ -1,13 +1,13 @@
 ---
 abstract: 'A Perl implementation of reCAPTCHA API version v3'
 author:
-  - 'worthmine <worthmine@gmail.com>'
+  - 'Yuki Yoshida (worthmine) <2944869+worthmine@users.noreply.github.com>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,21 +26,20 @@ no_index:
 provides:
   Captcha::reCAPTCHA::V3:
     file: lib/Captcha/reCAPTCHA/V3.pm
-    version: '0.12'
-recommends:
-  JSON::PP: '0'
+    version: '0.14'
 requires:
-  JSON: '2.0'
+  JSON::MaybeXS: '1.004008'
   Module::Build::Tiny: '0.039'
+  Try::Tiny: '0.32'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/worthmine/Captcha-reCAPTCHA-V3/issues
   homepage: https://github.com/worthmine/Captcha-reCAPTCHA-V3
   repository: https://github.com/worthmine/Captcha-reCAPTCHA-V3.git
-version: '0.12'
+version: '0.14'
 x_authority: cpan:WORTHMINE
 x_contributors:
-  - 'Yuki Yoshida(worthmine) <2944869+worthmine@users.noreply.github.com>'
   - 'worthmine <worthmine@cpan.org>'
+  - 'worthmine <worthmine@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

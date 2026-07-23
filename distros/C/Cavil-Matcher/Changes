@@ -1,0 +1,16 @@
+Revision history for Cavil::Matcher
+
+1.00   2026-07-22
+        - Initial release: the next-generation license pattern matcher for Cavil.
+        - Segmented, incrementally-updatable index: adding or removing a pattern no longer
+          rebuilds the whole compiled cache (base + append-only delta segments + tombstones).
+        - Versioned, CRC-checksummed, fully-validated on-disk segment format (no unchecked
+          reinterpret_cast); corrupt or hostile segments are rejected, never mis-read.
+        - Segments are memory-mapped read-only and queried in place, so index workers on a host
+          share one physical copy instead of each materialising its own.
+        - Pure-Perl manifest / segment lifecycle (Cavil::Matcher::Index, ::Manifest); a small,
+          frozen C++ core (tokenizer, scan, SpookyV2 hashing) kept bit-for-bit compatible with
+          Spooky::Patterns::XS, so no database migration is needed to switch engines.
+        - Hardened against arbitrary input (binaries, malformed samples): never crashes.
+        - 100% statement/branch/condition coverage of the Perl surface; developer-only
+          differential tests against the previous engine in xt/.

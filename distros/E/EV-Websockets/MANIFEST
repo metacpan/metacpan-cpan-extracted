@@ -60,6 +60,8 @@ t/30-control-frame-limits.t
 t/31-stash-isolation.t
 t/32-idle-loop.t
 t/33-compression.t
+t/34-listener-guards.t
+t/35-input-validation.t
 typemap
 Websockets.xs
 xt/author/autobahn.t

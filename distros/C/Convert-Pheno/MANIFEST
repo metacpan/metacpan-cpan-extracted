@@ -1,5 +1,23 @@
+.dockerignore
 .gitattributes
 .gitignore
+api/perl/bigdata.json
+api/perl/cpanfile
+api/perl/data.json
+api/perl/json_bridge.pl
+api/perl/main.pl
+api/perl/omop.json
+api/perl/openapi.json
+api/perl/README.md
+api/perl/t/main.t
+api/perl/t/mojo.t
+api/perl/t/simplest.t
+api/python/data.json
+api/python/install.sh
+api/python/main.py
+api/python/README.md
+api/python/test_api.py
+api/python/test_binding.py
 bin/convert-pheno
 Changes
 CITATION.cff
@@ -15,6 +33,7 @@ lib/Convert/Pheno/CSV.pm
 lib/Convert/Pheno/DB/Similarity.pm
 lib/Convert/Pheno/DB/SQLite.pm
 lib/Convert/Pheno/Emit/OMOP.pm
+lib/Convert/Pheno/IO/Atomic.pm
 lib/Convert/Pheno/IO/CSVHandler.pm
 lib/Convert/Pheno/IO/FileIO.pm
 lib/Convert/Pheno/JSONLD.pm
@@ -28,6 +47,7 @@ lib/Convert/Pheno/OMOP/ToBFF.pm
 lib/Convert/Pheno/OMOP/ToBFF/Biosamples.pm
 lib/Convert/Pheno/OMOP/ToBFF/Individuals.pm
 lib/Convert/Pheno/OpenEHR/ToBFF.pm
+lib/Convert/Pheno/Operations.pm
 lib/Convert/Pheno/PXF/ToBFF.pm
 lib/Convert/Pheno/PXF/ToBFF/Biosamples.pm
 lib/Convert/Pheno/PXF/ToBFF/Individuals.pm
@@ -41,7 +61,6 @@ lib/convertpheno.py
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-mkdocs.yml
 share/db/cdisc.db
 share/db/concepts_candidates_2_exposure.csv
 share/db/hpo.db
@@ -52,6 +71,7 @@ share/db/README
 share/ex/perl.pl
 share/ex/python.py
 share/schema/mapping.json
+share/schema/public-conversions.json
 t/00-load.t
 t/01-api-bff-pxf.t
 t/02-api-tabular.t
@@ -80,6 +100,9 @@ t/23-cli-help.t
 t/24-tabular-raw-values.t
 t/25-json-bridge.t
 t/26-omop-biosamples.t
+t/27-operation-registry.t
+t/28-ontology-cache.t
+t/29-atomic-output.t
 t/bff2csv/out/individuals.csv
 t/bff2jsonf/out/individuals.fold.json
 t/bff2omop/in/individuals.json
@@ -111,14 +134,16 @@ t/omop2bff/in/gz/CONCEPT.csv.gz
 t/omop2bff/in/gz/DRUG_EXPOSURE.csv.gz
 t/omop2bff/in/gz/omop_cdm_eunomia.sql.gz
 t/omop2bff/in/gz/PERSON.csv.gz
-t/omop2bff/in/mimic_specimen/biosamples.json
 t/omop2bff/in/mimic_specimen/CONCEPT.csv
-t/omop2bff/in/mimic_specimen/individuals.json
 t/omop2bff/in/mimic_specimen/PERSON.csv
 t/omop2bff/in/mimic_specimen/SPECIMEN.csv
 t/omop2bff/in/omop_cdm_eunomia.sql
 t/omop2bff/in/PERSON.csv
 t/omop2bff/in/README.md
+t/omop2bff/in/specimen_quantity/CONCEPT.csv
+t/omop2bff/in/specimen_quantity/PERSON.csv
+t/omop2bff/in/specimen_quantity/SPECIMEN.csv
+t/omop2bff/out/biosamples.json
 t/omop2bff/out/individuals.json
 t/omop2bff/out/individuals_csv.json
 t/omop2bff/out/individuals_csv.json.gz

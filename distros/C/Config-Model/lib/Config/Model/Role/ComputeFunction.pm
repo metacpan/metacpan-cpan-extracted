@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::ComputeFunction 2.165;
+package Config::Model::Role::ComputeFunction 2.166;
 
 # ABSTRACT: compute &index or &element functions
 
@@ -90,7 +90,7 @@ Config::Model::Role::ComputeFunction - compute &index or &element functions
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -129,7 +129,7 @@ Optional parameter to indicate how many level to go up before
 retrieving the index or element name. Each C<-> is equivalent to a
 call to C<parent|Config::Model::Node/parent>. Can be repeated dashes
 ("C<->", "C<- ->", ...)
-or a dash with a multiplier 
+or a dash with a multiplier
 ("C<->", "C<-2>", ...). White spaces are ignored.
 
 =back

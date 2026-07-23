@@ -1,72 +1,53 @@
+use strict;
+use warnings;
 use Test::Most;
-use File::Slurp;
 use File::Temp qw(tempdir);
+use Path::Tiny;
 
 BEGIN { use_ok('App::makefilepl2cpanfile') }
 
-# ----------------------------
-# Setup temporary directory
-# ----------------------------
 my $dir = tempdir(CLEANUP => 1);
 chdir $dir;
 
-# Write a representative Makefile.PL with runtime, test, and configure deps
-write_file 'Makefile.PL', <<'EOF';
+path('Makefile.PL')->spew_utf8(<<'END_MF');
 use ExtUtils::MakeMaker;
-
 WriteMakefile(
-    NAME => 'Test::Dummy',
-    PREREQ_PM => {
-        'Foo::Bar' => 0,
-        'Baz::Qux' => '1.23',
-    },
-    TEST_REQUIRES => {
-        'Test::More' => 0,
-        'Test::Exception' => 0,
-    },
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '6.64',
-    },
-    MIN_PERL_VERSION => '5.008',
+	NAME      => 'Test::Dummy',
+	PREREQ_PM => {
+		'Foo::Bar' => 0,
+		'Baz::Qux' => '1.23',
+	},
+	TEST_REQUIRES => {
+		'Test::More'      => 0,
+		'Test::Exception' => 0,
+	},
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => '6.64',
+	},
+	MIN_PERL_VERSION => '5.008',
 );
-EOF
+END_MF
 
-# ----------------------------
-# Generate cpanfile
-# ----------------------------
-my $cpanfile_text = App::makefilepl2cpanfile::generate(
-    makefile => 'Makefile.PL',
-    with_develop => 0,  # skip develop for this test
+my $out = App::makefilepl2cpanfile::generate(
+	makefile     => 'Makefile.PL',
+	with_develop => 0,
 );
 
-# ----------------------------
-# Parse Makefile.PL to get expected modules
-# ----------------------------
-my $content = read_file('Makefile.PL');
-my %expected;
+# Use parse_prereqs() to enumerate expected modules — avoids duplicating
+# the extraction regex in the test.
+my $content  = path('Makefile.PL')->slurp_utf8;
+my $expected = App::makefilepl2cpanfile::parse_prereqs($content);
 
-for my $key (qw(PREREQ_PM TEST_REQUIRES CONFIGURE_REQUIRES)) {
-    while ($content =~ /
-        $key \s*=>\s*\{
-        ( (?: [^{}] | \{[^}]*\} )*? )
-        \}
-    /gsx) {
-        my $block = $1;
-        while ($block =~ /
-            ['"]([^'"]+)['"]
-            \s*=>\s*
-            ['"]?([\d._]+)?['"]?
-        /gx) {
-            $expected{$1} = $2 // 0;
-        }
-    }
+for my $phase (sort keys %{$expected}) {
+	for my $rel (sort keys %{ $expected->{$phase} }) {
+		for my $mod (sort keys %{ $expected->{$phase}{$rel} }) {
+			like $out, qr/\b\Q$mod\E\b/,
+				"module '$mod' ($phase/$rel) appears in output";
+		}
+	}
 }
 
-# ----------------------------
-# Verify all expected modules appear in the generated cpanfile
-# ----------------------------
-for my $mod (sort keys %expected) {
-    like($cpanfile_text, qr/\b\Q$mod\E\b/, "Module $mod appears in cpanfile");
-}
+like $out, qr/requires 'Baz::Qux', '1\.23'/, 'Baz::Qux version constraint emitted';
+like $out, qr/'perl', '5\.008'/,              'MIN_PERL_VERSION emitted';
 
 done_testing;

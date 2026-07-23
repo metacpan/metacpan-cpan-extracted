@@ -3,7 +3,7 @@ NAME
     table and output it
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
         use Data::Record::Serialize;

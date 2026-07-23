@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Fstab 2.165;
+package Config::Model::Backend::Fstab 2.166;
 
 use Mouse;
 use Carp;
@@ -174,7 +174,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -193,7 +193,7 @@ This backend is able to read and write comments in the C</etc/fstab> file.
 
 =head1 STOP
 
-The documentation below describes methods that are currently used only by 
+The documentation below describes methods that are currently used only by
 L<Config::Model>. You don't need to read it to write a model.
 
 =head1 CONSTRUCTOR
@@ -225,9 +225,9 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::BackendMgr>, 
-L<Config::Model::Backend::Any>, 
+L<Config::Model>,
+L<Config::Model::BackendMgr>,
+L<Config::Model::Backend::Any>,
 
 =head1 AUTHOR
 

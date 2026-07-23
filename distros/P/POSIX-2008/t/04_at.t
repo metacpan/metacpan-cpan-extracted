@@ -23,7 +23,6 @@ my $HAVE_WEIRD_DIR_MODE = $^O =~ /^(?:MSWin32|cygwin)$/ || do {
 };
 
 my $rv;
-my $atfdcwd = defined &AT_FDCWD ? &AT_FDCWD : undef;
 my $tmpname = mktemp('tmpXXXXX');
 rmtree($tmpname);
 
@@ -36,22 +35,24 @@ SKIP: {
   opendir my $dot, File::Spec->curdir() or die "Could not opendir(.): $!";
 
   $rv = openat(undef, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
-  ok(!defined $rv, 'openat with undef fd');
+  is($rv, undef, 'openat with undef fd');
 
   $rv = eval { openat('xyz', $tmpname, O_RDWR|O_CREAT|O_TRUNC) };
-  ok(!defined $rv, 'openat with invalid fd');
+  is($rv, undef, 'openat with invalid fd');
 
   $rv = openat($dot, "\0", O_RDWR|O_CREAT|O_TRUNC);
-  ok(!defined $rv, 'openat with invalid path');
+  is($rv, undef, 'openat with invalid path');
 
-  $rv = openat(AT_FDCWD, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
+  # Use AT_FDCWD() as a function instead of a bareword
+  # to avoid compile errors if it's not present.
+  $rv = openat(AT_FDCWD(), $tmpname, O_RDWR|O_CREAT|O_TRUNC);
   ok(looks_like_number($rv),
-     "openat(AT_FDCWD=$atfdcwd, $tmpname) returns file descriptor");
+     "openat(AT_FDCWD=${\AT_FDCWD()}, $tmpname) returns file descriptor");
   ok(-e $tmpname, "$tmpname exists");
 
-  $rv = openat(\AT_FDCWD, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
+  $rv = openat(\AT_FDCWD(), $tmpname, O_RDWR|O_CREAT|O_TRUNC);
   like(blessed($rv), qr/^IO::File/,
-       "openat(\\AT_FDCWD=\\$atfdcwd, $tmpname) returns file handle");
+       "openat(\\AT_FDCWD=\\${\AT_FDCWD()}, $tmpname) returns file handle");
 
   # Perl < 5.22 doesn't support fileno for directory handles
   if (defined(my $fndot = fileno $dot)) {
@@ -101,7 +102,7 @@ SKIP: {
   ok(readdir $rv, 'readdir() on handle from openat()');
   ok(unlinkat($rv, $tmpname), 'unlinkat() in subdir');
 
-  ok(unlinkat($dot, $tmpname, AT_REMOVEDIR), "unlinkat: directory $tmpname");
+  ok(unlinkat($dot, $tmpname, AT_REMOVEDIR()), "unlinkat: directory $tmpname");
 }
 
 END {

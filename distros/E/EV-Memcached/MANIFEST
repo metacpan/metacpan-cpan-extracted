@@ -38,6 +38,16 @@ t/05_leak.t
 t/06_edge_cases.t
 t/07_sasl.t
 t/08_command_timeout.t
+t/09_reentrancy.t
+t/10_skip_pending_late_response.t
+t/11_destroy_in_callback.t
+t/12_connect_fail_waiting.t
+t/13_quit_intentional.t
+t/14_loop_option.t
+t/15_api_validation.t
+t/16_drain_reentrancy.t
+t/17_connect_deferred.t
+t/lib/FakeMemcached.pm
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

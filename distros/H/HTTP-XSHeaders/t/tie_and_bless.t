@@ -1,4 +1,5 @@
-package FakeHash {
+{
+    package FakeHash;
     use strict;
     use warnings;
     use Tie::Hash;

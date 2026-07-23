@@ -6,7 +6,7 @@ use Carp 'croak';
 use EV;
 
 BEGIN {
-    our $VERSION = '0.07';
+    our $VERSION = '0.08';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -772,6 +772,12 @@ the connection charset matches the encoding of the bytes (i.e.,
 C<< charset => 'utf8mb4' >> for UTF-8 data), the server stores them
 correctly. This applies to both text queries (C<query>, C<escape>) and
 prepared-statement parameters (C<execute>, C<bind_params>).
+
+=head1 CAVEATS
+
+EV::MariaDB uses process-global freelists and is B<not> safe for concurrent
+use from multiple ithreads. Use one interpreter thread, or a separate
+process per thread.
 
 =head1 SEE ALSO
 

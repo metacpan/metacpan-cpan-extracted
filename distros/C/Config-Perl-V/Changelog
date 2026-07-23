@@ -1,3 +1,9 @@
+0.40	- 22 Jul 2026, H.Merijn Brand
+    * Skip ASCII centric tests (khw, for EBCDIC, PR#6)
+    * Add 5.45.1's PERL_USE_ATOMIC
+    * Add 5.44.0 test
+    * Add 5.45.1 test with USE_ATOMIC
+
 0.39	- 25 Jan 2026, H.Merijn Brand
     * It's 2026
     * Add 5.42.0 test

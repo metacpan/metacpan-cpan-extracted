@@ -1,5 +1,10 @@
 Revision history for Perl extension GraphQL-Houtou
 
+0.03 2026-07-22T10:49:34Z
+    - Preflight oversized parser inputs and add heaptrack gate (#86)
+    - Acknowledge graphql-perl influence (#87)
+    - Fix quadmath JSON float formatting (#88)
+
 0.02 2026-07-21T10:19:16Z
     - Fix vm runtime context passing (#83)
     - Handle token limit errors without full source copy (#84)

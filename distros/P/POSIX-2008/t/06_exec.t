@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -82,7 +82,9 @@ SKIP: {
 
   $rv = POSIX::2008::fexecve(1337, [], {});
   # ENOENT occurs when fexecve() uses execveat() with a /proc filesystem path.
-  ok(!$rv && ($!{ENOENT} || $!{EBADF} || $!{EINVAL}), 'fexecve fails with invalid fd');
+  ok(!$rv && ($!{ENOENT} || $!{EBADF} || $!{EINVAL}),
+     'fexecve fails with invalid fd');
+  diag('(/proc not mounted?)') if $!{ENOSYS};
 
   my $pid = fork();
   if ($pid) {
@@ -99,7 +101,7 @@ SKIP: {
     }
     else {
       POSIX::2008::fexecve($fh, $argv, $envp);
-      diag("fexecve() failed: $!");
+      diag("fexecve() failed: $!".($!{ENOSYS}?' (/proc not mounted?)':''));
     }
     exit(1);
   }

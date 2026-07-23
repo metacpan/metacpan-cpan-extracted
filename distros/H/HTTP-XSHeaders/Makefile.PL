@@ -8,9 +8,10 @@ WriteMakefile(
     LICENSE        => 'mit',
     MIN_PERL_VERSION => 5.008009,
     PREREQ_PM      => {
-        'Exporter'   => '5.57',
-        'XSLoader'   => 0,
-        'HTTP::Date' => 0,
+        'Exporter'      => '5.57',
+        'XSLoader'      => 0,
+        'HTTP::Date'    => 0,
+        'HTTP::Headers' => 0,
     },
     TEST_REQUIRES  => {
         'Test::More' => 0,

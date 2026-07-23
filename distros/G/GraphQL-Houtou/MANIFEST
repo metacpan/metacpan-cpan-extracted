@@ -149,6 +149,8 @@ t/swapi-schema.graphql
 util/execution-benchmark-checkpoint.pl
 util/execution-benchmark.pl
 util/generate-nytprof-snapshot.pl
+util/heaptrack-leak-gate.pl
+util/heaptrack-perl.supp
 util/leak-check.pl
 util/lint-xs-ownership.pl
 util/parser-benchmark.pl

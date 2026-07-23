@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Grab 2.165;
+package Config::Model::Role::Grab 2.166;
 
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
@@ -387,7 +387,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -442,7 +442,7 @@ Examples:
 =item C<autoadd>
 
 When set to 1, C<hash> or C<list> configuration elements are created
-when requested by the passed steps. (default is 1). 
+when requested by the passed steps. (default is 1).
 
 =item grab_non_available
 
@@ -466,7 +466,7 @@ Go to the root node.
 
 =item !Foo
 
-Go up the configuration tree until the C<Foo> configuration class is found. Raise an exception if 
+Go up the configuration tree until the C<Foo> configuration class is found. Raise an exception if
 no C<Foo> class is found when root node is reached.
 
 =item xxx

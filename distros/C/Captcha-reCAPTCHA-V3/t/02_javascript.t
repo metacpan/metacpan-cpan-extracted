@@ -5,10 +5,10 @@ use Captcha::reCAPTCHA::V3;
 
 my %correct = (
     url => 'https://www.google.com/recaptcha/api.js?render=Dummy',
-    tag => qq|<script src="https://www.google.com/recaptcha/api.js?render=Dummy" defer></script>|,
+    tag => qq|<script src="https://www.google.com/recaptcha/api.js?render=Dummy" async defer></script>|,
     scripts => <<EOL,
-<script src="https://www.google.com/recaptcha/api.js?render=Dummy" defer></script>
-<script defer>
+<script src="https://www.google.com/recaptcha/api.js?render=Dummy" async defer></script>
+<script async defer>
 let rf = document.getElementById("Form");
 rf.onsubmit = function(event){
     grecaptcha.ready(function() {

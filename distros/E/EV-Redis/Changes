@@ -1,5 +1,19 @@
 Revision history for Perl extension EV::Redis
 
+0.13 2026-07-22
+     - Fix multiple use-after-free/double-free windows around deferred
+       disconnects, failed connects, and destruction (drain-context
+       tracking, per-connection callback cleanup)
+     - Refuse ssubscribe/sunsubscribe (no sharded pub/sub in hiredis;
+       RESP2 smessage aborted the process) and MONITOR command mixing;
+       immediate teardown for monitor connections on disconnect
+     - Immediate command_timeout re-arm, EV loop object pinning,
+       nested-loop abort guard, per-event mortal cleanup, SvPVbyte args,
+       writable error strings, TLS-reconfig and reconnect(0) fixes,
+       CLONE_SKIP
+     - Update bundled hiredis to v1.4.0; Makefile.PL portability fixes
+     - Fix leaked guard timers in tests (EV pitfall, not a module bug)
+
 0.12 2026-06-02
      - Fix use-after-free when a callback clears its own handler
      - Add AUTH test

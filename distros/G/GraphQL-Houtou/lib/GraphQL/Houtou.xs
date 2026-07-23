@@ -8520,6 +8520,21 @@ gql_runtime_vm_json_cat_string(pTHX_ SV *out, const char *pv, STRLEN len)
 }
 
 static void
+gql_runtime_vm_json_cat_nv(pTHX_ SV *out, NV nv)
+{
+  if (Perl_isnan(nv) || Perl_isinf(nv)) {
+    sv_catpvs(out, "null");
+    return;
+  }
+
+  /* Perl's formatter understands the configured NV type, including
+   * __float128 in USE_QUADMATH builds. Gconvert may pass an NV through the
+   * platform printf family as a double, which turns valid quadmath values
+   * into undefined output. */
+  sv_catpvf(out, "%.*" NVgf, NV_DIG, nv);
+}
+
+static void
 gql_runtime_vm_json_cat_scalar(pTHX_ gql_runtime_vm_exec_state_t *state, SV *out, SV *value)
 {
   if (!value || !SvOK(value)) {
@@ -8577,16 +8592,7 @@ gql_runtime_vm_json_cat_scalar(pTHX_ gql_runtime_vm_exec_state_t *state, SV *out
     return;
   }
   if (SvNOKp(value)) {
-    NV nv = SvNV(value);
-    if (Perl_isnan(nv) || Perl_isinf(nv)) {
-      sv_catpvs(out, "null");
-      return;
-    }
-    {
-      char nbuf[NV_DIG + 32];
-      Gconvert(nv, NV_DIG, 0, nbuf);
-      sv_catpv(out, nbuf);
-    }
+    gql_runtime_vm_json_cat_nv(aTHX_ out, SvNV(value));
     return;
   }
   {
@@ -9177,13 +9183,7 @@ gql_runtime_vm_native_value_cat_json(pTHX_ SV *out, const gql_runtime_vm_native_
           sv_catpvf(out, "%" IVdf, value->scalar_iv);
           return;
         case GQL_VM_NATIVE_SCALAR_NV:
-          if (Perl_isnan(value->scalar_nv) || Perl_isinf(value->scalar_nv)) {
-            sv_catpvs(out, "null");
-          } else {
-            char nbuf[NV_DIG + 32];
-            Gconvert(value->scalar_nv, NV_DIG, 0, nbuf);
-            sv_catpv(out, nbuf);
-          }
+          gql_runtime_vm_json_cat_nv(aTHX_ out, value->scalar_nv);
           return;
         case GQL_VM_NATIVE_SCALAR_PV:
           gql_runtime_vm_json_cat_string(

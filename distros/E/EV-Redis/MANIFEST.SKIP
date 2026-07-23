@@ -31,3 +31,4 @@
 ^deps/hiredis/hiredis\.targets$
 ^deps/hiredis/fuzzing/
 ^bench/
+^\.pcg/

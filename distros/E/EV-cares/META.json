@@ -38,6 +38,7 @@
          "requires" : {
             "Alien::cares" : "0",
             "EV" : "4.11",
+            "Socket" : "1.94",
             "perl" : "5.012"
          }
       },
@@ -58,6 +59,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-cares"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

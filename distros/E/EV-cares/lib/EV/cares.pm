@@ -5,7 +5,7 @@ use warnings;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -605,7 +605,8 @@ L<Socket/pack_sockaddr_in> or L<Socket/pack_sockaddr_in6>.
 C<$flags> is a bitmask of C<ARES_NI_*> constants.  Note that
 C<ARES_NI_TCP> is C<0> (TCP is the default); pass C<ARES_NI_DGRAM>
 or equivalently C<ARES_NI_UDP> (both denote the same value) to select
-datagram-mode lookups.
+datagram-mode lookups.  On failure the callback receives only C<$status>;
+C<$node> and C<$service> are simply absent.
 
 =head1 CHANNEL METHODS
 

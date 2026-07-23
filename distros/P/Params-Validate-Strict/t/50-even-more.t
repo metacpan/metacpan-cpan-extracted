@@ -9,9 +9,9 @@ use Params::Validate::Strict qw(validate_strict);
 {
 	package Test::Logger;
 	sub new { bless { messages => [] }, shift }
-	sub error { push @{$_[0]->{messages}}, { type => 'error', message => $_[2] }; die $_[2] }
-	sub warn { push @{$_[0]->{messages}}, { type => 'warn', message => $_[2] } }
-	sub debug { push @{$_[0]->{messages}}, { type => 'debug', message => $_[2] } }
+	sub error { push @{$_[0]->{messages}}, { type => 'error', message => join('', @_[1..$#_]) } }
+	sub warn { push @{$_[0]->{messages}}, { type => 'warn', message => join('', @_[1..$#_]) } }
+	sub debug { push @{$_[0]->{messages}}, { type => 'debug', message => join('', @_[1..$#_]) } }
 	sub get_messages { @{$_[0]->{messages}} }
 	sub clear { $_[0]->{messages} = [] }
 }
@@ -352,7 +352,7 @@ subtest 'invalid regex' => sub {
 	my $input = { test => 'hello' };
 
 	eval { validate_strict(schema => $schema, input => $input, logger => $logger) };
-	like $@, qr/invalid regex/, 'should handle invalid regex gracefully';
+	like $@, qr/regex.*error/i, 'should report regex error when pattern does not match';
 };
 
 # coderef validation

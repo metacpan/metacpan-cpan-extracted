@@ -3,6 +3,7 @@ package Params::Validate::Strict;
 # FIXME: {max} doesn't play ball with non-ascii strings
 # TODO: better use of the description parameter in error messages
 # FIXME: ensure paramaters such as min => 1 length constraint applies to all values. In this case, undef should not pass through without a croak.
+# TODO: As well as type => [ 'string', 'arrayref' ], allow type => 'string|arrayref'
 
 use strict;
 use warnings;
@@ -25,11 +26,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 SYNOPSIS
 
@@ -1425,12 +1426,11 @@ sub validate_strict
 							} else {
 								_error($logger, "$rule_description: Parameter '$key' must be an arrayref, not " . ref($value));
 							}
-						}
-						if(scalar(@{$value}) < $rule_value) {
+						} elsif(scalar(@{$value}) < $rule_value) {
 							if($rules->{'error_msg'}) {
 								_error($logger, $rules->{'error_msg'});
 							} else {
-								_error($logger, "$rule_description: Parameter '$key' must be at least length $rule_value");
+								_error($logger, "$rule_description: Parameter '$key' must have at least $rule_value member" . (($rule_value > 1) ? 's' : ''));
 							}
 							$invalid_args{$key} = 1;
 						}

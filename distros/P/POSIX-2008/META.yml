@@ -1,13 +1,36 @@
 ---
-abstract: 'Perl interface to POSIX.1-2008'
+abstract: 'Perl interface to POSIX.1-2008 and beyond'
 author:
   - 'Carsten Gaebler'
 build_requires:
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Errno: '0'
+  Exporter: '0'
   ExtUtils::MakeMaker: '0'
+  Fcntl: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Dir: '0'
+  IO::File: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  XSLoader: '0'
 configure_requires:
+  Config: '0'
+  Errno: '0'
+  ExtUtils::Constant: '0'
   ExtUtils::MakeMaker: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  MIME::Base64: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +41,11 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Dir: '0'
+  IO::File: '0'
+  XSLoader: '0'
   perl: '5.008009'
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

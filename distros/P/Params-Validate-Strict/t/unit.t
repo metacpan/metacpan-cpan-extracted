@@ -774,7 +774,7 @@ subtest 'min: arrayref shorter than minimum → croaks' => sub {
 			schema => { a => { type => 'arrayref', min => 3 } },
 			input  => { a => [1] },
 		)
-	} qr/must be at least length/, 'croaks when array has fewer than min elements';
+	} qr/must have at least /, 'croaks when array has fewer than min elements';
 };
 
 subtest 'max: arrayref longer than maximum → croaks' => sub {

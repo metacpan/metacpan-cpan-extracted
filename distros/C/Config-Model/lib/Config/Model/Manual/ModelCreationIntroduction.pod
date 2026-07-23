@@ -13,12 +13,12 @@ Config::Model::Manual::ModelCreationIntroduction - Introduction to model creatio
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 Introduction
 
 This page describes how to write a simple configuration
-model. Creation of more complex models are described in 
+model. Creation of more complex models are described in
 L<Creating a model with advanced features|Config::Model::Manual::ModelCreationAdvanced>.
 
 Note that this document shows a lot of Perl data structure to
@@ -114,7 +114,7 @@ For instance, consider this C<xorg.conf> snippet:
     Identifier     "Device0"
     Driver         "nvidia"
  EndSection
- 
+
  Section "Screen"
     Identifier     "Screen0"
     Device         "Device0"
@@ -182,21 +182,21 @@ Each class contains several elements. An element can be:
 
 =over
 
-=item * 
+=item *
 
 A leaf to represent one configuration parameter
 
-=item * 
+=item *
 
 A list of hash of leaves to represent several parameter
 
-=item * 
+=item *
 
 A node to hold a node of a configuration tree
 
-=item * 
+=item *
 
-A list or hash of nodes 
+A list or hash of nodes
 
 =back
 
@@ -207,13 +207,13 @@ configuration tree.
 
 If we refer to the C<approx.conf> example mentioned above, one only
 class is required (let's say the C<Approx> class). This class must
-contain (see approx.conf man page): 
+contain (see approx.conf man page):
 
 =over
 
 =item *
 
-A boolean leaf for C<pdiff> (1 if not specified) 
+A boolean leaf for C<pdiff> (1 if not specified)
 
 =item *
 
@@ -256,23 +256,23 @@ The C<Xorg> example leads to a slightly more complex model with several classes:
 
 =over
 
-=item * 
+=item *
 
 C<Xorg> (root class)
 
-=item * 
+=item *
 
 C<Xorg::Device>
 
-=item * 
+=item *
 
 C<Xorg::Screen>
 
-=item * 
+=item *
 
 C<Xorg::Screen::Option> for the Screen options
 
-=item * 
+=item *
 
 C<Xorg::Screen::Display> for theC<Display> subsection
 
@@ -337,7 +337,7 @@ read the documentation of the target application to :
 
 =item *
 
-Find the structure of the configuration tree 
+Find the structure of the configuration tree
 
 =item *
 
@@ -403,7 +403,7 @@ name: mandatory name of the class
 
 =item *
 
-class_description: Description of the configuration class. 
+class_description: Description of the configuration class.
 
 =item *
 
@@ -488,7 +488,7 @@ See L<Config::Model/Configuration_class> for details.
 Leaf element is the most common type to represent configuration data.
 A leaf element represents a specific configuration parameter.
 
-In more details, a leaf element have the following attributes (See 
+In more details, a leaf element have the following attributes (See
 L<Config::Model::Value/Value_model_declaration> doc):
 
 =over
@@ -657,7 +657,7 @@ C<Identifier> parameter:
    Driver         "nvidia"
    BusID          "PCI:3:0:1"
  EndSection
- 
+
  Section "Screen"
    Identifier     "Screen0"
    Device         "Device0"
@@ -795,7 +795,7 @@ L<Config::Model::Backend::Any> and provide the following methods:
 
 =back
 
-Their signatures are explained in 
+Their signatures are explained in
 L<Config::Model::BackendMgr doc on plugin backends|Config::Model::BackendMgr/Plugin_backend_classes>
 
 =head1 SEE ALSO

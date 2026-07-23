@@ -1,0 +1,7 @@
+# Real production snippets (via Cavil MCP), used as closest-match regression fixtures.
+# snippet_id  production-assigned closest license
+2606847  GPL-2.0-only
+2586980  GPL-1.0-only (Sonar Source-Available)
+2613942  CC-BY-SA-4.0 WITH Material-Exception
+2754440  Any Proprietary (BSD/MIT warranty disclaimer body)
+2511572  QT-Indie-License-Agreement-3.2

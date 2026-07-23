@@ -10,7 +10,7 @@ my $secret   = $ENV{RECAPTCHA_TEST_SECRET}   // '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuo
 my $response = $ENV{RECAPTCHA_TEST_RESPONSE} // 'dummy-token-for-test-key';
 
 my $rc = Captcha::reCAPTCHA::V3->new( secret => $secret );
-my $content = eval { $rc->verify($response) };
+my $content = $rc->verify($response);
 
 ok !$@,                       'verify call does not die';
 is ref($content), 'HASH',     'verify returns hashref';

@@ -1,0 +1,22 @@
+# Heaptrack leak suppressions (R5 gate, migrated from util/valgrind-perl.supp).
+#
+# heaptrack_print's --suppressions file uses the LSAN suppression format:
+# one "leak:<pattern>" line per rule. Unlike valgrind's ordered `fun:` call
+# chains, a heaptrack pattern is matched against every individual frame of a
+# leaked allocation's backtrace independently (see
+# AccumulatedTraceData::applyLeakSuppressions upstream) - there is no way to
+# require a specific caller/callee order. So these patterns name perl-
+# internal entry points that are specific enough not to swallow real XS
+# leaks (never the generic allocator wrapper Perl_safesysmalloc, which sits
+# under nearly every allocation and would blind the gate entirely), matching
+# the same interpreter-noise sources documented in util/valgrind-perl.supp:
+# arena/env bookkeeping, the regex cache, COW string headers, and
+# dynaloader's held-open shared objects. Kept deliberately narrow: never
+# suppress on gql_* frames.
+
+leak:libperl.so*
+leak:perl_parse
+leak:Perl_get_context
+leak:Perl_pregcomp
+leak:Perl_sv_grow
+leak:dl_load_file

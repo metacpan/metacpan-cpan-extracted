@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -680,7 +680,7 @@ sub CheckMandatoryFields {
                           grep { $_->id != $RT::Nobody->id } @{ $role_values->UserMembersObj->ItemsArrayRef };
                     }
                     else {
-                        push @errors, $CurrentUser->loc("Failed to load role $role for ticket");
+                        push @errors, $CurrentUser->loc("Failed to load role [_1] for ticket", $role);
                     }
                 }
             }
@@ -834,7 +834,7 @@ sub CheckMandatoryFields {
 
             if ( not scalar @role_values ) {
                 push @errors, $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",
-                    $role_name,
+                    $CurrentUser->loc($role_name),
                     $CurrentUser->loc($transition),
                     $CurrentUser->loc( $args{'To'} )
                 );
@@ -942,12 +942,12 @@ sub CheckMandatoryFields {
                 if ( @must_be > 1 ){
                     push @errors,
                         $CurrentUser->loc("[_1] must be one of: [_4] when changing [_2] to [_3]",
-                        $cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values);
+                        $CurrentUser->loc($cf->Name), $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 else{
                     push @errors,
                         $CurrentUser->loc("[_1] must be [_4] when changing [_2] to [_3]",
-                        $cf->Name, $CurrentUser->loc($transition),  $CurrentUser->loc($field_label{$transition}), $valid_values);
+                        $CurrentUser->loc($cf->Name), $CurrentUser->loc($transition),  $CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 next;
             }
@@ -961,12 +961,12 @@ sub CheckMandatoryFields {
                 if ( @must_not_be > 1 ){
                     push @errors,
                         $CurrentUser->loc("[_1] must not be one of: [_4] when changing [_2] to [_3]",
-                        $cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values);
+                        $CurrentUser->loc($cf->Name), $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 else{
                     push @errors,
                         $CurrentUser->loc("[_1] must not be [_4] when changing [_2] to [_3]",
-                        $cf->Name, $CurrentUser->loc($transition),$CurrentUser->loc($field_label{$transition}), $valid_values);
+                        $CurrentUser->loc($cf->Name), $CurrentUser->loc($transition),$CurrentUser->loc($field_label{$transition}), $valid_values);
                 }
                 next;
             }
@@ -984,7 +984,7 @@ sub CheckMandatoryFields {
 
         push @errors,
           $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",
-                                     $cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}));
+                                     $CurrentUser->loc($cf->Name), $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}));
     }
 
     return \@errors;

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Any 2.165;
+package Config::Model::Backend::Any 2.166;
 
 use v5.20;
 
@@ -195,7 +195,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -225,7 +225,7 @@ version 2.165
         s/#.*// ; # remove any comment
         next unless /\S/; # skip blank line
 
-        # $data is 'foo=bar' which is compatible with load 
+        # $data is 'foo=bar' which is compatible with load
         $self->node->load(steps => $_, check => $args{check} ) ;
     }
     return 1 ;
@@ -238,7 +238,7 @@ version 2.165
 
     # args are:
     # root       => './my_test',  # fake root directory, used for tests
-    # config_dir => /etc/foo',    # absolute path 
+    # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => Path::Tiny object for './my_test/etc/foo/foo.conf'
     # check      => yes|no|skip
@@ -544,9 +544,9 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::BackendMgr>, 
-L<Config::Model::Node>, 
+L<Config::Model>,
+L<Config::Model::BackendMgr>,
+L<Config::Model::Node>,
 
 =head1 AUTHOR
 

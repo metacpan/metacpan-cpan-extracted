@@ -1462,6 +1462,25 @@ gql_parse_definitions(pTHX_ gql_parser_t *p) {
   return av;
 }
 
+/* A token cannot occupy less than one source byte.  Only documents large
+ * enough to possibly exceed the token cap need this allocation-free
+ * preflight.  Without it, an extremely wide document can exhaust memory
+ * building its AST before the incremental lexer limit is reached. */
+static void
+gql_preflight_token_limit(pTHX_ SV *source_sv) {
+  gql_parser_t scan;
+
+  if (SvCUR(source_sv) <= GQL_PARSER_MAX_TOKENS) {
+    return;
+  }
+
+  gql_parser_init(aTHX_ &scan, source_sv, 1);
+  do {
+    gql_advance(aTHX_ &scan);
+  } while (scan.kind != TOK_EOF);
+  gql_parser_invalidate(&scan);
+}
+
 static SV *
 gql_parse_document(pTHX_ SV *source_sv, SV *no_location_sv) {
   gql_parser_t p;
@@ -1469,6 +1488,7 @@ gql_parse_document(pTHX_ SV *source_sv, SV *no_location_sv) {
 
   ENTER;
   SAVETMPS;
+  gql_preflight_token_limit(aTHX_ source_sv);
   gql_parser_init(aTHX_ &p, source_sv, SvTRUE(no_location_sv) ? 1 : 0);
   gql_advance(aTHX_ &p);
   ret = newRV_noinc((SV *)gql_parse_definitions(aTHX_ &p));
@@ -1487,6 +1507,7 @@ gql_parse_document_for_validation(
 
   ENTER;
   SAVETMPS;
+  gql_preflight_token_limit(aTHX_ source_sv);
   gql_parser_init(aTHX_ &p, source_sv, SvTRUE(no_location_sv) ? 1 : 0);
   p.validation_errors = validation_errors;
   gql_advance(aTHX_ &p);

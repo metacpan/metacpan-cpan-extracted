@@ -2,9 +2,10 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
-use Getopt::Long;
-use File::Slurp qw(read_file);
+use Getopt::Long qw(GetOptions);
+use Path::Tiny;
 use Text::Diff;
 use App::makefilepl2cpanfile;
 
@@ -27,15 +28,12 @@ Options:
 
 =head1 DESCRIPTION
 
-This script reads a Makefile.PL and generates a corresponding cpanfile.
-It preserves existing develop blocks and allows post-processing checks to ensure
-no dependencies are dropped.
+Reads a F<Makefile.PL> in the current directory and generates a corresponding
+F<cpanfile>.  Existing C<develop> blocks in a pre-existing F<cpanfile> are
+preserved and merged.
 
 =cut
 
-# ----------------------------
-# Parse CLI options
-# ----------------------------
 my ($with_dev, $no_dev, $dry, $diff, $check, $help);
 
 GetOptions(
@@ -45,108 +43,77 @@ GetOptions(
 	'diff'         => \$diff,
 	'check'        => \$check,
 	'help'         => \$help,
-) or usage();
+) or _usage();
 
-usage() if $help;
+_usage() if $help;
 
-die '--with-develop and --no-develop are mutually exclusive' if $with_dev && $no_dev;
+die "--with-develop and --no-develop are mutually exclusive\n"
+	if $with_dev && $no_dev;
 
 $with_dev //= !$no_dev;
 
-# ----------------------------
-# Read existing cpanfile if it exists
-# ----------------------------
-my $existing = -r 'cpanfile' ? read_file('cpanfile') : '';
+# Read existing cpanfile so its develop block can be preserved during merge.
+my $cpanfile_path = path('cpanfile');
+my $existing = $cpanfile_path->is_file ? $cpanfile_path->slurp_utf8 : '';
 
-# ----------------------------
-# Generate cpanfile content
-# ----------------------------
 my $out = App::makefilepl2cpanfile::generate(
-	makefile      => 'Makefile.PL',
-	existing      => $existing,
-	with_develop  => $with_dev,
+	makefile     => 'Makefile.PL',
+	existing     => $existing,
+	with_develop => $with_dev,
 );
 
-# ----------------------------
-# Check flag: ensure all Makefile.PL deps are present
-# ----------------------------
+# --check: reuse the library's parser to verify nothing was dropped.
+# This avoids duplicating the extraction regex in the script.
 if ($check) {
-	my $content = read_file('Makefile.PL');
-	my %expected;
+	my $content  = path('Makefile.PL')->slurp_utf8;
+	my $expected = App::makefilepl2cpanfile::parse_prereqs($content);
 
-    for my $key (qw(BUILD_REQUIRES PREREQ_PM TEST_REQUIRES CONFIGURE_REQUIRES)) {
-        while ($content =~ /
-            $key\s*=>\s*\{
-            ( (?: [^{}] | \{[^}]*\} )*? )
-            \}
-        /gsx) {
-            my $block = $1;
-            while ($block =~ /
-                ['"]([^'"]+)['"]
-                \s*=>\s*
-                ['"]?([\d._]+)?['"]?
-            /gx) {
-                $expected{$1} = $2 // 0;
-            }
-        }
-    }
+	my @missing;
+	for my $phase (keys %{$expected}) {
+		for my $rel (keys %{ $expected->{$phase} }) {
+			for my $mod (sort keys %{ $expected->{$phase}{$rel} }) {
+				push @missing, $mod unless $out =~ /\b\Q$mod\E\b/;
+			}
+		}
+	}
 
-    my @missing;
-    for my $mod (sort keys %expected) {
-        push @missing, $mod unless $out =~ /\b\Q$mod\E\b/;
-    }
-
-    if (@missing) {
-        warn "WARNING: The following modules from Makefile.PL did not appear in the cpanfile output:\n";
-        warn "  $_\n" for @missing;
-    } else {
-        print "All Makefile.PL prerequisites are present in the output.\n";
-    }
+	if (@missing) {
+		warn "WARNING: The following modules from Makefile.PL did not appear in the output:\n";
+		warn "  $_\n" for @missing;
+	} else {
+		print "All Makefile.PL prerequisites are present in the output.\n";
+	}
 }
 
-# ----------------------------
-# Show diff if requested
-# ----------------------------
+# --diff: show unified diff against the existing file, then exit.
 if ($diff && $existing) {
-	print diff \$existing, \$out, { STYLE => 'Unified' };
-	exit;
+	print diff(\$existing, \$out, { STYLE => 'Unified' });
+	exit 0;
 }
 
-# ----------------------------
-# Dry-run: print to STDOUT
-# ----------------------------
+# --dry-run: print to STDOUT instead of writing to disk.
 if ($dry) {
 	print $out;
-	exit;
+	exit 0;
 }
 
-# ----------------------------
-# Write cpanfile to disk
-# ----------------------------
-open my $fh, '>', 'cpanfile' or die "Cannot write cpanfile: $!";
-print $fh $out;
-close $fh;
-
+$cpanfile_path->spew_utf8($out);
 print "cpanfile written successfully.\n";
 
-# ----------------------------
-# Usage subroutine
-# ----------------------------
-sub usage {
-	print <<"EOF";
+sub _usage {
+	print <<"END_USAGE";
 
 Usage: $0 [options]
 
-Options:
-    --with-develop    Include author/development dependencies (default)
-    --no-develop      Exclude author/development dependencies
-    --dry-run         Print output instead of writing cpanfile
-    --diff            Show diff against existing cpanfile
-    --check           Verify all Makefile.PL dependencies appear in output
-    --help            Show this help message
+  --with-develop    Include author/development dependencies (default)
+  --no-develop      Exclude author/development dependencies
+  --dry-run         Print output instead of writing cpanfile
+  --diff            Show diff against existing cpanfile
+  --check           Verify all Makefile.PL dependencies appear in output
+  --help            Show this help message
 
-EOF
-    exit;
+END_USAGE
+	exit 0;
 }
 
 __END__
@@ -157,24 +124,13 @@ This program is provided as-is without any warranty.
 
 =head1 AUTHOR
 
-Nigel Horne <njh@nigelhorne.com>
+Nigel Horne E<lt>njh@nigelhorne.comE<gt>
 
 =head1 LICENCE AND COPYRIGHT
 
 Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Personal single user, single computer use: GPL2.
+All other users must apply in writing for a licence.
 
 =cut

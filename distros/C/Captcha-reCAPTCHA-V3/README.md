@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/worthmine/Captcha-reCAPTCHA-V3/actions/workflows/test.yml/badge.svg)](https://github.com/worthmine/Captcha-reCAPTCHA-V3/actions)
+[![Actions Status](https://github.com/worthmine/Captcha-reCAPTCHA-V3/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/worthmine/Captcha-reCAPTCHA-V3/actions?workflow=test)
 # NAME
 
 Captcha::reCAPTCHA::V3 - A Perl implementation of reCAPTCHA API version v3
@@ -141,4 +141,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-worthmine <worthmine@gmail.com>
+Yuki Yoshida (worthmine) <2944869+worthmine@users.noreply.github.com>

@@ -11,7 +11,7 @@ Config::Model::models::Fstab - Configuration class Fstab
 
 Configuration classes used by L<Config::Model>
 
-static information about the filesystems. fstab contains descriptive information about the various file systems. 
+static information about the filesystems. fstab contains descriptive information about the various file systems.
 
 
 =head1 Elements

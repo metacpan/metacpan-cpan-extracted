@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Report 2.165;
+package Config::Model::Report 2.166;
 
 use Carp;
 use strict;
@@ -90,7 +90,7 @@ Config::Model::Report - Reports data from config tree
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -155,14 +155,14 @@ version 2.165
 
  print $root->report ;
  #  foo = FOO
- # 
+ #
  #  my_enum = B
  #         DESCRIPTION: some letters
  #         SELECTED: second letter
- # 
+ #
  # hash_of_nodes:en foo = hello
  #         DESCRIPTION: some foo explanation
- # 
+ #
  # hash_of_nodes:fr foo = bonjour
  #         DESCRIPTION: some foo explanation
 

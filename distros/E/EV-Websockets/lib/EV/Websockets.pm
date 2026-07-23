@@ -6,7 +6,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.09';
+    our $VERSION = '0.10';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -200,6 +200,14 @@ Create a WebSocket listener. Returns the port number being listened on
 C<protocol> sets the WebSocket subprotocol name advertised by the server vhost.
 The vhost name C<default> is reserved and will croak if used.
 
+C<ssl_cert> and C<ssl_key> must be given together; supplying only one croaks
+rather than silently falling back to a plaintext listener.
+
+Listeners do not negotiate C<permessage-deflate>: compression is offered on
+outgoing client connections (see C<connect>) but not by the server side, so
+messages sent to clients are uncompressed. A plain (non-upgrade) HTTP request
+to a listener is answered with C<426 Upgrade Required> and closed.
+
 C<$headers> in C<on_connect> is a hashref of client request headers
 (Path, Host, Origin, Cookie, Authorization, Sec-WebSocket-Protocol,
 User-Agent, X-Forwarded-For).
@@ -227,7 +235,8 @@ C<"closed">/C<"destroyed"> are omitted.
 
 =head3 adopt(%options)
 
-Adopt an existing IO handle (socket).
+Adopt an existing IO handle. C<fh> must be a connected socket; any other
+handle (pipe, file, terminal) croaks rather than being taken over.
 
     my $conn = $ctx->adopt(
         fh               => $socket_handle,
@@ -325,6 +334,11 @@ Initiate a clean WebSocket close. Sends a Close frame with C<$code> (default
 1000, normal closure) and an optional UTF-8 C<$reason> (truncated by lws to
 fit the frame). Pending sends are drained first, then the connection is torn
 down and C<on_close> fires.
+
+C<$code> is validated against RFC 6455: only 1000-1003, 1007-1014 and
+3000-4999 may be sent. Anything else (including the reserved 1004, 1005,
+1006 and 1015, or a value outside 16 bits) croaks rather than putting an
+invalid code on the wire.
 
 This is a no-op (does not croak) if the connection is already closed,
 closing, or destroyed. It is also a no-op while the connection is still

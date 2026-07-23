@@ -290,7 +290,7 @@ use Params::Validate::Strict qw(validate_strict);
             input => { tags => [] },
             custom_types => $custom_types
         );
-    } qr/must be at least length 1/, 'Empty array fails min constraint';
+    } qr/must have at least 1/, 'Empty array fails min constraint';
 }
 
 # Overriding custom type constraints in schema

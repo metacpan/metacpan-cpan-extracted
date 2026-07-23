@@ -1,3 +1,8 @@
+1.5	kraih Tue Jul 22 14:30:00 CEST 2026
+  - Fixed non-portable tests failing.
+
+1.4	kraih Tue Jul 22 14:00:00 CEST 2026
+  - Improved service restart handling.
 
 1.3	kraih Tue Jul 16 14:00:00 CEST 2026
   - Improved handling of malicious archives.

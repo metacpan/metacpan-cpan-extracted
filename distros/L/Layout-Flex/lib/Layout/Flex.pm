@@ -4,7 +4,9 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+
+use Font::Metrics ();
 
 require XSLoader;
 XSLoader::load('Layout::Flex', $VERSION);
@@ -21,7 +23,7 @@ Layout::Flex - CSS flexbox layout engine with wrap, gap, margin, and content dri
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -333,6 +335,39 @@ The item hashref contains C<text>, C<font_size>, and any other keys you set on
 the item.
 
 =back
+
+=back
+
+=head2 font_metrics_measure(%args)
+
+    use Font::Metrics;
+    my $fm      = Font::Metrics->new(name => 'Helvetica');
+    my $measure = Layout::Flex->font_metrics_measure(fm => $fm, size => 12);
+
+    my @rects = Layout::Flex->compute(
+        main_size => 400,
+        measure   => $measure,
+        items     => [ { text => 'Hello World', grow => 1, wrap_text => 1 } ],
+    );
+
+Returns a C<measure> code-ref backed by a L<Font::Metrics> object. Replaces the
+built-in C<'simple'> approximation with exact per-glyph advance widths.
+
+Arguments:
+
+=over 4
+
+=item C<fm> (required)
+
+A L<Font::Metrics> instance.
+
+=item C<size>
+
+Font size in points (default C<12>).
+
+=item C<line_height>
+
+Line height in points (default C<size * 1.2>).
 
 =back
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::IdElementReference 2.165;
+package Config::Model::IdElementReference 2.166;
 
 use Mouse;
 
@@ -190,7 +190,7 @@ Config::Model::IdElementReference - Refer to id element(s) and extract keys
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -216,7 +216,7 @@ version 2.165
  );
 
  # model to choose a master host and a master NIC (whatever that may be)
- # among configured hosts. Once these 2 are configured, the model computes 
+ # among configured hosts. Once these 2 are configured, the model computes
  # the master IP
 
  $model->create_config_class(
@@ -277,14 +277,14 @@ version 2.165
  $root->load( steps => $steps );
 
  print "master host can be one of ",
-   join(' ',$root->fetch_element('master_host')->get_choice),"\n" ; 
+   join(' ',$root->fetch_element('master_host')->get_choice),"\n" ;
  # prints: master host can be one of bar baz foo
 
  # choose master host
  $root->load('master_host=bar') ;
 
  print "master NIC of master host can be one of ",
- join(' ',$root->fetch_element('master_nic')->get_choice),"\n" ; 
+ join(' ',$root->fetch_element('master_nic')->get_choice),"\n" ;
  # prints: master NIC of master host can be one of eth0 eth1
 
  # choose master nic
@@ -306,7 +306,7 @@ checklist items from the keys of another hash (or content of a list).
 
 =head1 CONSTRUCTOR
 
-Construction is handled by the calling object (L<Config::Model::Node>). 
+Construction is handled by the calling object (L<Config::Model::Node>).
 
 =head1 Config class parameters
 

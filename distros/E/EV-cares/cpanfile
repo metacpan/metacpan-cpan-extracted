@@ -1,6 +1,7 @@
 requires 'perl', '5.012000';
 requires 'EV', '4.11';
 requires 'Alien::cares';
+requires 'Socket', '1.94';
 
 on configure => sub {
     requires 'Alien::cares';

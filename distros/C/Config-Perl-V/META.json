@@ -1,67 +1,67 @@
 {
-   "abstract" : "Structured data retrieval of perl -V output",
    "generated_by" : "Author",
-   "author" : [
-      "H.Merijn Brand <hmbrand@cpan.org>"
-   ],
-   "version" : "0.39",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "license" : [
+      "perl_5"
+      ],
+   "abstract" : "Structured data retrieval of perl -V output",
+   "dynamic_config" : 1,
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Config-Perl-V/issues"
+         },
+      "repository" : {
+         "url" : "https://github.com/Tux/Config-Perl-V",
+         "web" : "https://github.com/Tux/Config-Perl-V",
+         "type" : "git"
+         }
+      },
    "prereqs" : {
       "test" : {
          "requires" : {
             "Test::More" : "0",
             "Test::NoWarnings" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            }
          },
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
-         },
-         "suggests" : {
-            "ExtUtils::MakeMaker" : "7.76"
-         }
-      },
-      "build" : {
-         "requires" : {
-            "perl" : "5.006"
-         }
-      },
       "runtime" : {
          "requires" : {
             "perl" : "5.006",
             "Config" : "0"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+            },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.78"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "perl" : "5.006"
+            }
          }
-      }
-   },
-   "release_status" : "stable",
-   "license" : [
-      "perl_5"
-   ],
-   "name" : "Config-Perl-V",
-   "resources" : {
-      "repository" : {
-         "url" : "https://github.com/Tux/Config-Perl-V",
-         "web" : "https://github.com/Tux/Config-Perl-V",
-         "type" : "git"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Config-Perl-V/issues"
-      }
-   },
    "provides" : {
       "Config::Perl::V" : {
-         "version" : "0.39",
-         "file" : "V.pm"
-      }
-   },
-   "dynamic_config" : 1,
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+         "file" : "V.pm",
+         "version" : "0.40"
+         }
+      },
+   "release_status" : "stable",
+   "version" : "0.40",
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+      ],
+   "name" : "Config-Perl-V"
    }
-}

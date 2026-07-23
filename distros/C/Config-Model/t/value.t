@@ -193,7 +193,7 @@ check: token (oper token)(s?) <reject:$failed>
 oper: 'and' | 'or'
 token: 'Apache' | 'CC-BY' | 'Perl' {
 my $v = $arg[0]->grab("! prd_test_action")->fetch || '';
-$failed++ unless $v =~ /$item[1]/ ; 
+$failed++ unless $v =~ /$item[1]/ ;
 }
 ^,
         },
@@ -229,7 +229,7 @@ $failed++ unless $v =~ /$item[1]/ ;
             warn_if => {
                 warn_test => {
                     code => 'defined $_ && /\d/;',
-                    msg  => 'should not have numbers',
+                    msg  => 'value $_ should not have numbers',
                     fix  => 's/\d//g;'
                 }
             },
@@ -251,7 +251,7 @@ $failed++ unless $v =~ /$item[1]/ ;
             warn_unless => {
                 warn_test => {
                     code => 'defined $_ and /\w/',
-                    msg  => 'should not be empty',
+                    msg  => 'value $_ should contain alphanum',
                     fix  => '$_ = "foobar";'
                 }
             },
@@ -948,7 +948,7 @@ subtest "warn_if_number with a regexp" => sub {
     {
         my $xp = Test::Log::Log4perl->expect(
             ignore_priority => 'info',
-            ['User', warn => qr/should not have numbers/]
+            ['User', warn => qr/value bar51 should not have numbers/]
         );
         $win->store('bar51');
     }
@@ -1088,7 +1088,7 @@ subtest "warn_unless" => sub {
 
     my $xp = Test::Log::Log4perl->expect(
         ignore_priority => 'info',
-        ['User', warn => qr/should not be empty/]
+        ['User', warn => qr/value <undef> should contain alphanum/]
     );
     $warn_unless->fetch();
 

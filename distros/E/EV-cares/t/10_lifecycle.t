@@ -101,4 +101,30 @@ use EV::cares qw(:all);
        'no callback got ARES_SUCCESS after cancel');
 }
 
+# regression: dropping the last reference inside a callback with queries
+# still pending used to UAF/double-free the resolver
+{
+    my $r = EV::cares->new(servers => '192.0.2.1', timeout => 1, tries => 1);
+    my $edestruction = 0;
+    # 192.0.2.1 is a blackhole (TEST-NET-1): the queries stay in flight
+    $r->resolve('p1.blackhole.example.com',
+                sub { $edestruction++ if $_[0] == ARES_EDESTRUCTION });
+    $r->resolve('p2.blackhole.example.com',
+                sub { $edestruction++ if $_[0] == ARES_EDESTRUCTION });
+    is($r->active_queries, 2, 'two blackholed queries in flight');
+
+    my $done;
+    # drops the LAST reference from inside a c-ares callback
+    $r->resolve('localhost', sub { undef $r; $done = 1 });
+
+    # localhost normally resolves inline via the hosts file; if a future
+    # c-ares defers it, pump the loop so the drop still happens inside a
+    # c-ares callback through the io/timer bracket (same code path)
+    my $t = EV::timer 5, 0, sub { $done = 1 };
+    EV::run until $done;
+
+    pass('survived dropping the last reference inside a callback');
+    is($edestruction, 2, 'stranded callbacks fired with ARES_EDESTRUCTION');
+}
+
 done_testing;

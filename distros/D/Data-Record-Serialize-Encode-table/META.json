@@ -85,7 +85,11 @@
       "runtime" : {
          "requires" : {
             "Data::Record::Serialize" : "1.06",
+            "Moo::Role" : "0",
             "Term::Table" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
+            "namespace::clean" : "0",
             "perl" : "5.012"
          }
       },
@@ -106,7 +110,7 @@
    "provides" : {
       "Data::Record::Serialize::Encode::table" : {
          "file" : "lib/Data/Record/Serialize/Encode/table.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -121,7 +125,7 @@
          "web" : "https://codeberg.com/djerius/data-record-serialize-encode-table"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.42.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "GPL-3.0-only"

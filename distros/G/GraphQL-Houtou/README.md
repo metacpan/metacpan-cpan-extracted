@@ -502,6 +502,14 @@ The name `Houtou` comes from several overlapping references:
 - Yamanashi's noodle dish `houtou` (ほうとう)
 - the VTuber `宝灯桃汁` (Houtou Momojiru)
 
+# ACKNOWLEDGEMENTS
+
+GraphQL::Houtou is strongly influenced by GraphQL for Perl
+(`graphql-perl`). We gratefully acknowledge its design and implementation
+as an important foundation for this project. See
+[GraphQL on MetaCPAN](https://metacpan.org/pod/GraphQL) and the
+[graphql-perl source repository](https://github.com/graphql-perl/graphql-perl).
+
 # LICENSE
 
 Copyright (C) anatofuz.

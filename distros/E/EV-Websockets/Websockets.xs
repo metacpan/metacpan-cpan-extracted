@@ -68,6 +68,8 @@ struct ev_ws_ctx_s {
     ev_ws_conn_t* connections;
     ev_ws_conn_t* flush_head; /* conns with a buffered, fully-received message
                                  awaiting delivery once the service call drains */
+    ev_ws_conn_t* flush_tail; /* append point, so delivery across connections
+                                 follows queue order; reset with flush_head */
     ev_ws_fd_t** fd_table;
     int fd_table_size;
     ev_timer timer;
@@ -148,6 +150,20 @@ static const struct lws_extension extensions[] = {
 #endif
 
 static int ev_ws_debug = 0;
+
+/* Strict decimal port parse: 1..65535 with no trailing junk, else -1. atoi()
+   silently yielded 0 for input like "notaport", which surfaced later as an
+   obscure asynchronous connect failure instead of a clear error. */
+static int parse_port_strict(const char* s) {
+    long v = 0;
+    if (!s || !*s) return -1;
+    for (; *s; s++) {
+        if (*s < '0' || *s > '9') return -1;
+        v = v * 10 + (*s - '0');
+        if (v > 65535) return -1;
+    }
+    return v >= 1 ? (int)v : -1;
+}
 
 /* Bridges userdata into ws_callback() before lws_adopt returns. */
 static ev_ws_conn_t* pending_adoption = NULL;
@@ -406,6 +422,8 @@ static void emit_message(ev_ws_conn_t* conn, const char* data, size_t len, int i
 static void flush_recv_messages(ev_ws_ctx_t* ctx) {
     ev_ws_conn_t* conn = ctx->flush_head;
     ctx->flush_head = NULL;
+    ctx->flush_tail = NULL; /* must clear with the head: a stale tail would be
+                               appended to (use-after-free) on the next queue */
     while (conn) {
         ev_ws_conn_t* next = conn->flush_next;
         conn->flush_next = NULL;
@@ -989,9 +1007,14 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                    branch above when the next message starts, or at flush time.
                    The flush-list ref keeps conn alive until then. */
                 if (!conn->on_flush) {
+                    ev_ws_ctx_t* fctx = conn->ctx;
                     conn_ref(conn);
-                    conn->flush_next = conn->ctx->flush_head;
-                    conn->ctx->flush_head = conn;
+                    conn->flush_next = NULL;
+                    if (fctx->flush_tail)
+                        fctx->flush_tail->flush_next = conn;
+                    else
+                        fctx->flush_head = conn;
+                    fctx->flush_tail = conn;
                     conn->on_flush = 1;
                 }
             }
@@ -1134,6 +1157,16 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                 conn_unref(conn); /* drop wsi ref; frees resources when refcnt hits 0 */
             }
             break;
+
+        case LWS_CALLBACK_HTTP:
+            /* A plain (non-upgrade) HTTP request arrived on a WebSocket
+               listener. Without this case it fell through to "default: return
+               0", which tells lws the transaction was handled -- but we never
+               send a response, so the connection sat open until the peer gave
+               up. Port scanners, health checks and browsers all hit this and
+               accumulated half-open connections. Answer 426 and close. */
+            lws_return_http_status(wsi, 426, "Upgrade Required");
+            return -1;
 
         default:
             break;
@@ -1300,6 +1333,7 @@ CODE:
         conn->flush_next = NULL;
         conn_unref(conn); /* release the flush-list ref */
     }
+    self->flush_tail = NULL;
 
     /* Close all connections */
     for (conn = self->connections; conn != NULL; conn = next) {
@@ -1354,6 +1388,14 @@ CODE:
 {
     if (self->magic != EV_WS_CTX_MAGIC) {
         croak("Context has been destroyed");
+    }
+
+    /* Options are key => value pairs. A dangling key used to be silently
+       ignored, hiding typos and truncated argument lists. Checked before any
+       callback SV is retained, so croaking here leaks nothing. */
+    if (((items - 1) % 2) != 0) {
+        croak("odd number of options: key '%s' has no value",
+              SvPV_nolen(ST(items - 1)));
     }
 
     for (i = 1; i < items; i += 2) {
@@ -1432,7 +1474,12 @@ CODE:
             int hport = 0;
             host++;    /* skip '[' */
             if (*(p + 1) == ':') {
-                hport = atoi(p + 2);
+                hport = parse_port_strict(p + 2);
+                if (hport < 0) {
+                    Safefree(url_copy); Safefree(path);
+                    free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
+                    croak("connect: invalid port in url (expected 1-65535)");
+                }
                 port = hport;
             }
             *p = '\0'; /* terminate IPv6 address */
@@ -1446,7 +1493,12 @@ CODE:
         p = strchr(host, ':');
         if (p) {
             *p = '\0';
-            port = atoi(p + 1);
+            port = parse_port_strict(p + 1);
+            if (port < 0) {
+                Safefree(url_copy); Safefree(path);
+                free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
+                croak("connect: invalid port in url (expected 1-65535)");
+            }
         }
     }
 
@@ -1530,6 +1582,7 @@ PREINIT:
     SV* headers_hv = NULL;
     size_t max_message_size = 0;
     const char *protocol_name = NULL;
+    const char *undef_opt = NULL;
     ev_ws_server_t *srv;
     struct lws_vhost *vh;
     int i;
@@ -1537,6 +1590,14 @@ CODE:
 {
     if (self->magic != EV_WS_CTX_MAGIC) {
         croak("Context has been destroyed");
+    }
+
+    /* Options are key => value pairs. A dangling key used to be silently
+       ignored, hiding typos and truncated argument lists. Checked before any
+       callback SV is retained, so croaking here leaks nothing. */
+    if (((items - 1) % 2) != 0) {
+        croak("odd number of options: key '%s' has no value",
+              SvPV_nolen(ST(items - 1)));
     }
 
     for (i = 1; i < items; i += 2) {
@@ -1547,15 +1608,20 @@ CODE:
         if (strcmp(key, "port") == 0) {
             port = SvIV(val);
         } else if (strcmp(key, "name") == 0) {
-            name = SvPV_nolen(val);
+            if (!SvOK(val)) { if (!undef_opt) undef_opt = "name"; }
+            else name = SvPV_nolen(val);
         } else if (strcmp(key, "protocol") == 0) {
-            protocol_name = SvPV_nolen(val);
+            if (!SvOK(val)) { if (!undef_opt) undef_opt = "protocol"; }
+            else protocol_name = SvPV_nolen(val);
         } else if (strcmp(key, "ssl_cert") == 0) {
-            ssl_cert = SvPV_nolen(val);
+            if (!SvOK(val)) { if (!undef_opt) undef_opt = "ssl_cert"; }
+            else ssl_cert = SvPV_nolen(val);
         } else if (strcmp(key, "ssl_key") == 0) {
-            ssl_key = SvPV_nolen(val);
+            if (!SvOK(val)) { if (!undef_opt) undef_opt = "ssl_key"; }
+            else ssl_key = SvPV_nolen(val);
         } else if (strcmp(key, "ssl_ca") == 0) {
-            ssl_ca = SvPV_nolen(val);
+            if (!SvOK(val)) { if (!undef_opt) undef_opt = "ssl_ca"; }
+            else ssl_ca = SvPV_nolen(val);
         } else if (strcmp(key, "max_message_size") == 0) {
             max_message_size = (size_t)SvUV(val);
         } else if (strcmp(key, "headers") == 0 && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
@@ -1577,9 +1643,26 @@ CODE:
         }
     }
 
+    /* An undef string option used to stringify to "" (with an "uninitialized
+       value" warning), e.g. name => undef silently created a vhost named "". */
+    if (undef_opt) {
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, on_handshake);
+        croak("listen: option '%s' must be a defined string", undef_opt);
+    }
+
     if (strcmp(name, "default") == 0) {
         free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, on_handshake);
         croak("listen: vhost name 'default' is reserved");
+    }
+
+    /* TLS needs both halves. Accepting just one used to silently create a
+       PLAINTEXT listener, serving cleartext on a port the caller believes is
+       encrypted -- fail loudly instead. */
+    if ((ssl_cert && *ssl_cert) != (ssl_key && *ssl_key)) {
+        int have_cert = ssl_cert && *ssl_cert;
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, on_handshake);
+        croak("listen: ssl_cert and ssl_key must both be set for TLS (only %s was given)",
+              have_cert ? "ssl_cert" : "ssl_key");
     }
 
     Newxz(srv, 1, ev_ws_server_t);
@@ -1611,10 +1694,10 @@ CODE:
     info.user = srv;
     info.options = 0;
 
-    if (ssl_cert && ssl_key) {
+    if (ssl_cert && *ssl_cert && ssl_key && *ssl_key) {
         info.ssl_cert_filepath = ssl_cert;
         info.ssl_private_key_filepath = ssl_key;
-        if (ssl_ca)
+        if (ssl_ca && *ssl_ca)
             info.ssl_ca_filepath = ssl_ca;
         info.options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
         ensure_ssl_keepalive(); /* pin global init so vhost/context teardown won't OPENSSL_cleanup */
@@ -1665,6 +1748,14 @@ CODE:
         croak("Context has been destroyed");
     }
 
+    /* Options are key => value pairs. A dangling key used to be silently
+       ignored, hiding typos and truncated argument lists. Checked before any
+       callback SV is retained, so croaking here leaks nothing. */
+    if (((items - 1) % 2) != 0) {
+        croak("odd number of options: key '%s' has no value",
+              SvPV_nolen(ST(items - 1)));
+    }
+
     for (i = 1; i < items; i += 2) {
         if (i + 1 >= items) break;
         const char* key = SvPV_nolen(ST(i));
@@ -1701,6 +1792,18 @@ CODE:
     if (!ifp || (fd = PerlIO_fileno(ifp)) < 0) {
         free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
         croak("Invalid filehandle");
+    }
+
+    {   /* lws happily adopts a pipe (or any fd it can poll) and then takes it
+           over -- adopting STDOUT, for instance, breaks the process's stdout.
+           getsockname() fails with ENOTSOCK for non-sockets, so use it to fail
+           fast on misuse. */
+        struct sockaddr_storage ss;
+        socklen_t sslen = (socklen_t)sizeof(ss);
+        if (getsockname(fd, (struct sockaddr*)&ss, &sslen) != 0) {
+            free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
+            croak("adopt: file handle is not a socket");
+        }
     }
 
     Newxz(RETVAL, 1, ev_ws_conn_t);
@@ -1942,6 +2045,17 @@ void
 close(EV::Websockets::Connection self, int code = 1000, const char* reason = NULL);
 CODE:
 {
+    /* RFC 6455 7.4: only these may be sent on the wire. 1004/1005/1006/1015 are
+       reserved and MUST NOT be sent, and anything outside the ranges is invalid
+       -- previously any int was passed straight through, so close(1005) went out
+       verbatim and close(70000) silently wrapped to 4464. */
+    if (!((code >= 1000 && code <= 1003) ||
+          (code >= 1007 && code <= 1014) ||
+          (code >= 3000 && code <= 4999))) {
+        croak("close: invalid close code %d "
+              "(RFC 6455 allows 1000-1003, 1007-1014, 3000-4999)", code);
+    }
+
     if (self->magic != EV_WS_CONN_MAGIC) {
         return;
     }

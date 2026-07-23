@@ -1,5 +1,10 @@
 Revision history for EV::Websockets
 
+0.10    2026-07-22
+        - Plain HTTP to a listener is answered 426 and closed (it used to hang)
+        - listen() croaks on ssl_cert without ssl_key (it used to serve plaintext)
+        - Validate close codes, option values, URL ports and adopt() handles
+
 0.09    2026-06-29
         - Fixed permessage-deflate messages split across multiple on_message
           callbacks; compressed frames are reassembled into one message

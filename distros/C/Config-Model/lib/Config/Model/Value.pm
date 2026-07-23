@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.165;
+package Config::Model::Value 2.166;
 
 use v5.20;
 
@@ -1080,7 +1080,7 @@ sub run_code_on_value {
 
     unless ($ret) {
         $logger->debug("run_code_on_value sub returned false");
-        $msg =~ s/\$_/$$value_r/g if defined $$value_r;
+        $msg =~ s!\$_!$$value_r // '<undef>'!ge;
         if ($msg =~ /\$std_value/) {
             my $std = $self->_fetch_std_no_check ;
             $msg =~ s/\$std_value/$std/g if defined $std;
@@ -2027,7 +2027,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 

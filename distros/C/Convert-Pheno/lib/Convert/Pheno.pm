@@ -55,12 +55,8 @@ our @EXPORT =
 
 use constant DEVEL_MODE => 0;
 
-# Personalize warn and die functions
-$SIG{__WARN__} = sub { warn "Warn: ", @_ };
-$SIG{__DIE__}  = sub { die "Error: ", @_ };
-
 # Global variables:
-our $VERSION   = '0.31';
+our $VERSION   = '0.32';
 our $share_dir = dist_dir('Convert-Pheno');
 
 # SQLite database
@@ -161,6 +157,7 @@ has [qw /test print_hidden_labels self_validate_schema path_to_ohdsi_db/] =>
   ( default => undef, is => 'ro' );
 
 has [qw /stream ohdsi_db/] => ( default => 0, is => 'ro' );
+has source_info => ( default => 1, is => 'ro' );
 
 has default_vital_status => (
     is     => 'ro',
@@ -292,17 +289,7 @@ sub redcap2omop {
 
 sub _with_temp_self_field {
     my ( $self, $field, $value, $code ) = @_;
-
-    my $had = exists $self->{$field} ? 1 : 0;
-    my $old = $had ? $self->{$field} : undef;
-
-    $self->{$field} = $value;
-    my $ret = $code->();
-
-    if ($had) { $self->{$field} = $old }
-    else      { delete $self->{$field} }
-
-    return $ret;
+    return _with_temp_self_fields( $self, { $field => $value }, $code );
 }
 
 sub _omop_collect_input {

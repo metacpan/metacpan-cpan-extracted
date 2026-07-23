@@ -171,12 +171,16 @@ static void cleanup_now(ev_cares_t *self);
  * referenced further up the C stack until then (destroying it inline is a
  * use-after-free that musl turns into a hard crash; glibc only tolerates it). */
 #define ARES_CALL_BEGIN(self)  (self)->in_callback++
+/* Deferred teardown at the outermost unwind: cleanup_now may free self
+   (it consumes free_pending), so nothing may touch self after it runs. */
 #define ARES_CALL_END(self)   \
     STMT_START { \
         if (--(self)->in_callback == 0) { \
             if ((self)->cleanup_pending) cleanup_now(self); \
-            if ((self)->free_pending) Safefree(self); \
-            else update_timer(self); \
+            else if ((self)->free_pending) { \
+                (self)->free_pending = 0; \
+                Safefree(self); \
+            } else update_timer(self); \
         } else { \
             update_timer(self); \
         } \
@@ -339,7 +343,11 @@ update_timer(ev_cares_t *self) {
 }
 
 /* Actual teardown: stop watchers, destroy the channel, release the loop.
-   Only safe when not inside an ares_* call (see cleanup()). */
+   Only safe when not inside an ares_* call (see cleanup()).  ares_destroy
+   fires each still-pending callback inline (ARES_EDESTRUCTION); bracketing
+   it with in_callback++/-- keeps those nested epilogues off the teardown
+   branches.  This is also the single site that consumes free_pending, so
+   cleanup_now may free self -- callers must not touch self afterwards. */
 static void
 cleanup_now(ev_cares_t *self) {
     int i;
@@ -354,7 +362,10 @@ cleanup_now(ev_cares_t *self) {
         }
     }
 
+    /* Nested epilogues fired by ares_destroy must see in_callback > 0. */
+    self->in_callback++;
     ares_destroy(self->channel);
+    self->in_callback--;
     self->channel = NULL;
 
     /* Release our hold on a user-supplied EV::Loop. Doing this only after
@@ -363,6 +374,12 @@ cleanup_now(ev_cares_t *self) {
         dTHX;
         SvREFCNT_dec(self->loop_sv);
         self->loop_sv = NULL;
+    }
+
+    /* single consumer of free_pending; nothing may touch self after */
+    if (self->free_pending) {
+        self->free_pending = 0;
+        Safefree(self);
     }
 }
 
@@ -413,11 +430,12 @@ cleanup(ev_cares_t *self) {
     FREETMPS; LEAVE; \
     free_req(aTHX_ req); \
     if (--self->in_callback == 0) { \
-        /* Outermost callback frame unwound: run any teardown the callback */ \
-        /* deferred (channel destroy), then free self if it asked to. */ \
+        /* outermost frame: deferred teardown; cleanup_now may free self */ \
         if (self->cleanup_pending) cleanup_now(self); \
-        if (self->free_pending) Safefree(self); \
-        else update_timer(self); \
+        else if (self->free_pending) { \
+            self->free_pending = 0; \
+            Safefree(self); \
+        } else update_timer(self); \
     } else { \
         update_timer(self); \
     }

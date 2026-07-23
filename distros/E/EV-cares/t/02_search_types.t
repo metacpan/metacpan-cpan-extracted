@@ -22,22 +22,59 @@ unless ($can_resolve) {
     plan skip_all => 'no network connectivity';
 }
 
-# helper: run a single query with timeout
-sub run_query {
+# Fire all queries up front and pump a single EV::run (serial run_query
+# burned its full guard timer per query).  A slot still undone when the
+# global guard fires reads as status=undef -> its block skips like a timeout.
+my (@result, @done);
+
+sub fire_query {
     my ($code) = @_;
-    my @result;
-    my $done;
-    $code->(sub { @result = @_; $done = 1 });
-    my $t = EV::timer 10, 0, sub { $done = 1 };
-    EV::run until $done;
-    return @result;
+    my $i = @done;
+    push @done, 0;
+    $code->(sub {
+        $result[$i] = [@_];
+        $done[$i] = 1;
+        EV::break(EV::BREAK_ALL) unless grep { !$_ } @done;
+    });
+    return $i;
 }
+
+use Socket qw(pack_sockaddr_in inet_aton);
+my $sa = pack_sockaddr_in(80, inet_aton('8.8.8.8'));
+
+# DNSSEC types use fresh resolver instances each.  c-ares 1.34 has a
+# caching/parser quirk where querying multiple DNSSEC types (DS, DNSKEY,
+# RRSIG) for the same name on the same channel returns zero records for
+# every type past the first, even though status is ARES_SUCCESS.  Using a
+# separate channel per type sidesteps it.
+my $r_ds     = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
+my $r_dnskey = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
+my $r_rrsig  = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
+my $r_tlsa   = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
+
+my $q_t_a      = fire_query(sub { $r->search('google.com', T_A, $_[0]) });
+my $q_t_aaaa   = fire_query(sub { $r->search('google.com', T_AAAA, $_[0]) });
+my $q_t_mx     = fire_query(sub { $r->search('google.com', T_MX, $_[0]) });
+my $q_t_ns     = fire_query(sub { $r->search('google.com', T_NS, $_[0]) });
+my $q_t_txt    = fire_query(sub { $r->search('google.com', T_TXT, $_[0]) });
+my $q_t_soa    = fire_query(sub { $r->search('google.com', T_SOA, $_[0]) });
+my $q_t_srv    = fire_query(sub { $r->search('_imaps._tcp.gmail.com', T_SRV, $_[0]) });
+my $q_t_naptr  = fire_query(sub { $r->search('sip2sip.info', T_NAPTR, $_[0]) });
+my $q_t_caa    = fire_query(sub { $r->search('cloudflare.com', T_CAA, $_[0]) });
+my $q_t_ds     = fire_query(sub { $r_ds->search('cloudflare.com', T_DS, $_[0]) });
+my $q_t_dnskey = fire_query(sub { $r_dnskey->search('cloudflare.com', T_DNSKEY, $_[0]) });
+my $q_t_rrsig  = fire_query(sub { $r_rrsig->search('cloudflare.com', T_RRSIG, $_[0]) });
+my $q_t_tlsa   = fire_query(sub { $r_tlsa->search('_25._tcp.mail.protonmail.ch', T_TLSA, $_[0]) });
+my $q_reverse  = fire_query(sub { $r->reverse('8.8.8.8', $_[0]) });
+my $q_raw      = fire_query(sub { $r->query('google.com', C_IN, T_A, $_[0]) });
+my $q_nameinfo = fire_query(sub { $r->getnameinfo($sa, ARES_NI_NUMERICSERV, $_[0]) });
+
+my $guard = EV::timer 15, 0, sub { EV::break(EV::BREAK_ALL) };
+EV::run;
 
 # T_A
 {
-    my ($status, @addrs) = run_query(sub {
-        $r->search('google.com', T_A, $_[0]);
-    });
+    my ($status, @addrs) = @{ $result[$q_t_a] || [] };
     SKIP: {
         skip 'T_A unavailable: ' . EV::cares::strerror($status), 3
             if $status != ARES_SUCCESS;
@@ -49,9 +86,7 @@ sub run_query {
 
 # T_AAAA
 {
-    my ($status, @addrs) = run_query(sub {
-        $r->search('google.com', T_AAAA, $_[0]);
-    });
+    my ($status, @addrs) = @{ $result[$q_t_aaaa] || [] };
     if ($status == ARES_SUCCESS) {
         ok(@addrs > 0, 'T_AAAA returned addresses');
         like($addrs[0], qr/:/, 'T_AAAA returned IPv6');
@@ -63,9 +98,7 @@ sub run_query {
 
 # T_MX
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('google.com', T_MX, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_mx] || [] };
     SKIP: {
         skip 'T_MX unavailable: ' . EV::cares::strerror($status), 5
             if $status != ARES_SUCCESS;
@@ -79,9 +112,7 @@ sub run_query {
 
 # T_NS
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('google.com', T_NS, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_ns] || [] };
     SKIP: {
         skip 'T_NS unavailable: ' . EV::cares::strerror($status), 3
             if $status != ARES_SUCCESS;
@@ -93,9 +124,7 @@ sub run_query {
 
 # T_TXT
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('google.com', T_TXT, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_txt] || [] };
     SKIP: {
         skip 'T_TXT unavailable: ' . EV::cares::strerror($status), 3
             if $status != ARES_SUCCESS;
@@ -107,9 +136,7 @@ sub run_query {
 
 # T_SOA
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('google.com', T_SOA, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_soa] || [] };
     SKIP: {
         skip 'T_SOA unavailable: ' . EV::cares::strerror($status), 10
             if $status != ARES_SUCCESS;
@@ -124,9 +151,7 @@ sub run_query {
 
 # T_SRV
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('_imaps._tcp.gmail.com', T_SRV, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_srv] || [] };
     SKIP: {
         skip 'T_SRV unavailable: ' . EV::cares::strerror($status), 7
             if $status != ARES_SUCCESS;
@@ -141,9 +166,7 @@ sub run_query {
 
 # T_NAPTR (sip2sip.info commonly publishes NAPTR for SIP discovery)
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('sip2sip.info', T_NAPTR, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_naptr] || [] };
     SKIP: {
         skip 'T_NAPTR unavailable: ' . EV::cares::strerror($status), 7
             unless $status == ARES_SUCCESS && @records;
@@ -156,9 +179,7 @@ sub run_query {
 
 # T_CAA
 {
-    my ($status, @records) = run_query(sub {
-        $r->search('cloudflare.com', T_CAA, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_caa] || [] };
     SKIP: {
         skip 'T_CAA unavailable: ' . EV::cares::strerror($status), 6
             if $status != ARES_SUCCESS;
@@ -171,18 +192,9 @@ sub run_query {
     }
 }
 
-# DNSSEC types use fresh resolver instances each.  c-ares 1.34 has a
-# caching/parser quirk where querying multiple DNSSEC types (DS, DNSKEY,
-# RRSIG) for the same name on the same channel returns zero records for
-# every type past the first, even though status is ARES_SUCCESS.  Using a
-# separate channel per type sidesteps it.
-
 # T_DS (DNSSEC delegation signer)
 {
-    my $r2 = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
-    my ($status, @records) = run_query(sub {
-        $r2->search('cloudflare.com', T_DS, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_ds] || [] };
     SKIP: {
         skip 'T_DS unavailable: ' . EV::cares::strerror($status), 5
             unless $status == ARES_SUCCESS && @records;
@@ -195,10 +207,7 @@ sub run_query {
 
 # T_DNSKEY (DNSSEC public keys at zone apex)
 {
-    my $r2 = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
-    my ($status, @records) = run_query(sub {
-        $r2->search('cloudflare.com', T_DNSKEY, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_dnskey] || [] };
     SKIP: {
         skip 'T_DNSKEY unavailable: ' . EV::cares::strerror($status), 5
             unless $status == ARES_SUCCESS && @records;
@@ -215,10 +224,7 @@ sub run_query {
 # it because the parser is the hand-written signer-name decoder we most
 # want to exercise; just be tolerant of upstream refusal.
 {
-    my $r2 = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
-    my ($status, @records) = run_query(sub {
-        $r2->search('cloudflare.com', T_RRSIG, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_rrsig] || [] };
     SKIP: {
         skip 'T_RRSIG unavailable: ' . EV::cares::strerror($status), 6
             unless $status == ARES_SUCCESS && @records && ref $records[0];
@@ -233,10 +239,7 @@ sub run_query {
 
 # T_TLSA (DANE TLSA at a DANE-publishing service)
 {
-    my $r2 = EV::cares->new(timeout=>5, tries=>2, flags => ARES_FLAG_EDNS);
-    my ($status, @records) = run_query(sub {
-        $r2->search('_25._tcp.mail.protonmail.ch', T_TLSA, $_[0]);
-    });
+    my ($status, @records) = @{ $result[$q_t_tlsa] || [] };
     SKIP: {
         skip 'T_TLSA unavailable: ' . EV::cares::strerror($status), 5
             unless $status == ARES_SUCCESS && @records && ref $records[0];
@@ -249,9 +252,7 @@ sub run_query {
 
 # reverse (may fail if PTR not available from this resolver)
 {
-    my ($status, @hosts) = run_query(sub {
-        $r->reverse('8.8.8.8', $_[0]);
-    });
+    my ($status, @hosts) = @{ $result[$q_reverse] || [] };
     ok(defined $status, 'reverse returned status');
     if ($status == ARES_SUCCESS) {
         ok(@hosts > 0, 'reverse returned hostnames');
@@ -263,20 +264,14 @@ sub run_query {
 
 # raw query
 {
-    my ($status, $buf) = run_query(sub {
-        $r->query('google.com', C_IN, T_A, $_[0]);
-    });
+    my ($status, $buf) = @{ $result[$q_raw] || [] };
     is($status, ARES_SUCCESS, 'raw query T_A');
     ok(length($buf) > 12, 'raw response has DNS header + data');
 }
 
 # getnameinfo
 {
-    use Socket qw(pack_sockaddr_in inet_aton);
-    my $sa = pack_sockaddr_in(80, inet_aton('8.8.8.8'));
-    my ($status, $node, $service) = run_query(sub {
-        $r->getnameinfo($sa, ARES_NI_NUMERICSERV, $_[0]);
-    });
+    my ($status, $node, $service) = @{ $result[$q_nameinfo] || [] };
     ok(defined $status, 'getnameinfo returned status');
     if ($status == ARES_SUCCESS) {
         ok(defined $node, "getnameinfo node: $node");

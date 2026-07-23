@@ -1,5 +1,9 @@
 Revision history for Font-Metrics
 
+0.02    2026-07-23
+	- Export fm_* C symbols with dl_load_flags (RTLD_GLOBAL) so downstream
+	  XS modules can link against them at load time.
+
 0.01    2026-07-21
 	Initial release
         - Standard 14 (PDF) font metrics: char_width, string_width,

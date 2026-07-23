@@ -1,4 +1,21 @@
-Revision history for CGI-makefile2cpanfile
+Revision history for App-makefilepl2cpanfile
+
+0.03	Wed Jul 22 20:12:54 EDT 2026
+	[ Enhancements ]
+
+	Extract parse_prereqs() as a public API function
+	Preserve inline comments from Makefile.PL entries in generated cpanfile
+	Parse structured prereqs => { phase => { rel => { ... } } } blocks,
+	  including those nested under META_MERGE
+	Extract recommends and suggests relationships into cpanfile output
+	Support brace nesting up to four levels deep in dependency blocks
+	Replace File::Slurp with Path::Tiny throughout
+	Add Carp (croak/carp) in place of die/warn in library code
+	Add Readonly constants for phase map, phase order, and develop defaults
+	Guard against directories being passed as the makefile path
+
+	[ Tests ]
+	Add t/parse_prereqs.t, t/error_paths.t, t/locales.t
 
 0.02	Mon Mar 30 19:22:57 EDT 2026
 	Added which tool created it

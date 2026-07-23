@@ -1,0 +1,4 @@
+Cavil::Matcher::Engine T_PTROBJ
+Cavil::Matcher::Hash   T_PTROBJ
+Cavil::Matcher::Bag    T_PTROBJ
+AV*                    T_AVREF_REFCOUNT_FIXED

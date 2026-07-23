@@ -61,6 +61,7 @@ my $timeout; $timeout = EV::timer 5, 0, sub {
 };
 
 EV::run;
+undef $timeout;  # kill pending timeout: an active leaked timer would EV::break a later EV::run
 
 # Test: multi-channel subscribe
 {
@@ -101,6 +102,7 @@ EV::run;
     };
 
     EV::run;
+    undef $timeout;  # kill pending timeout (see above)
 
     my @subscribe_msgs = grep { $_->[0] eq 'subscribe' } @received;
     is scalar(@subscribe_msgs), 2, 'multi-subscribe: got 2 subscribe confirmations';
@@ -204,55 +206,96 @@ EV::run;
     };
 
     EV::run;
+    undef $timeout;  # kill pending timeout (see above)
 
     ok $monitor_started, 'monitor command acknowledged with OK';
     ok $captured_set, 'monitor captured SET command';
 }
 
-# Test: ssubscribe (sharded pub/sub, Redis 7+)
-# Note: spublish may trigger assertion failure in some hiredis versions
-SKIP: {
+# Test: sharded pub/sub is refused. hiredis has no ssubscribe/smessage
+# support: an incoming smessage would abort the process (RESP2 assert) or be
+# misrouted to on_push (RESP3), so command() croaks instead of crashing.
+# SPUBLISH is a regular command and stays allowed.
+{
+    # Fetch the version BEFORE creating $r: get_redis_version runs a timerless
+    # EV::run that only returns when no active watchers remain; an idle
+    # connected $r would keep its read watcher active and hang it forever.
+    # (Previously this was masked by a leaked block-4 guard timer whose
+    # EV::break ended the helper's loop after ~2s.)
     my ($redis_version) = get_redis_version($connect_info{sock});
 
-    # Sharded pubsub requires Redis 7.0+
-    skip 'ssubscribe requires Redis 7+', 5 if $redis_version < 7;
+    my $r = EV::Redis->new( path => $connect_info{sock} );
 
-    # Testing only ssubscribe basic functionality (spublish may cause assertion failure)
-    my $subscriber = EV::Redis->new( path => $connect_info{sock} );
+    eval { $r->ssubscribe('sharded_channel', sub {}) };
+    like $@, qr/ssubscribe is not supported/, 'ssubscribe croaks';
 
-    my $subscribed = 0;
+    eval { $r->sunsubscribe('sharded_channel', sub {}) };
+    like $@, qr/sunsubscribe is not supported/, 'sunsubscribe croaks';
+    SKIP: {
+        skip 'spublish requires Redis 7+', 1 if $redis_version < 7;
+        my $spublish_res;
+        $r->spublish('sharded_channel', 'msg', sub {
+            my ($res, $err) = @_;
+            $spublish_res = defined $res ? $res : "err:$err";
+            EV::break;
+        });
+        my $timeout; $timeout = EV::timer 2, 0, sub { undef $timeout; EV::break };
+        EV::run;
+        undef $timeout;  # kill pending timeout (see above)
+        is $spublish_res, 0, 'spublish works as a regular command (0 receivers)';
+    }
+    $r->disconnect;
+}
 
-    $subscriber->ssubscribe('sharded_channel', sub {
-        my ($r, $e) = @_;
+# Test: MONITOR mixing guards — monitor needs an idle connection, and no
+# commands may follow while it is active (hiredis repushes callback records
+# in monitor mode; mixing would be a use-after-free).
+{
+    my $r = EV::Redis->new( path => $connect_info{sock} );
 
-        if ($e && !defined $r) {
-            return;
-        }
+    $r->command('set', 'mon_guard_key', 1, sub { EV::break });
+    eval { $r->monitor(sub {}) };
+    like $@, qr/idle connection/, 'monitor with a pending command croaks';
+    EV::run;  # drain the pending SET
 
-        if (ref($r) eq 'ARRAY' && $r->[0] eq 'ssubscribe') {
-            is $r->[1], 'sharded_channel', 'ssubscribe channel correct';
-            is $r->[2], 1, 'ssubscribe count correct';
-            $subscribed = 1;
-            # Unsubscribe immediately to avoid state issues
-            $subscriber->sunsubscribe('sharded_channel');
-        } elsif (ref($r) eq 'ARRAY' && $r->[0] eq 'sunsubscribe') {
-            $subscriber->disconnect;
+    is $r->pending_count, 0, 'connection idle again';
+    my $mon_ok;
+    $r->monitor(sub {
+        my ($res, $err) = @_;
+        if (!$mon_ok && defined $res && $res eq 'OK') {
+            $mon_ok = 1;
             EV::break;
         }
     });
-
-    my $timeout; $timeout = EV::timer 2, 0, sub {
-        undef $timeout;
-        $subscriber->disconnect;
-        EV::break;
-    };
-
+    my $t1; $t1 = EV::timer 2, 0, sub { undef $t1; EV::break };
     EV::run;
+    undef $t1;  # kill pending timeout (see above)
+    ok $mon_ok, 'monitor on idle connection works';
 
-    ok $subscribed, 'ssubscribe basic functionality works';
-    # Skip the spublish/smessage tests due to hiredis compatibility issues
-    pass 'skipping spublish test due to hiredis compatibility';
-    pass 'skipping smessage test due to hiredis compatibility';
+    eval { $r->ping(sub {}) };
+    like $@, qr/MONITOR is active/, 'command while monitoring croaks';
+
+    # Flag clears with the connection
+    $r->disconnect;
+    $r->connect_unix($connect_info{sock});
+    my $pong;
+    $r->ping(sub { $pong = $_[0]; EV::break });
+    my $t2; $t2 = EV::timer 2, 0, sub { undef $t2; EV::break };
+    EV::run;
+    undef $t2;  # kill pending timeout (see above)
+    is $pong, 'PONG', 'commands work again after reconnect clears monitor state';
+    $r->disconnect;
+}
+
+# Test: subscribe with no channels croaks (server would reject it and the
+# persistent tracking entry would strand until disconnect).
+{
+    my $r = EV::Redis->new( path => $connect_info{sock} );
+    eval { $r->subscribe(sub {}) };
+    like $@, qr/subscribe requires at least one channel/, 'no-arg subscribe croaks';
+    eval { $r->psubscribe(sub {}) };
+    like $@, qr/psubscribe requires at least one channel/, 'no-arg psubscribe croaks';
+    $r->disconnect;
 }
 
 # Test: disconnect with active subscription — callback should fire exactly once
@@ -276,6 +319,7 @@ SKIP: {
 
     my $t; $t = EV::timer 2, 0, sub { undef $t; EV::break };
     EV::run;
+    undef $t;  # kill pending timeout (see above)
 
     ok $subscribed, 'subscribed before disconnect';
     # Expect: subscribe confirmation + exactly one disconnect error
@@ -285,13 +329,18 @@ SKIP: {
     like $errors[0][1], qr/disconnected/, 'error string is "disconnected"';
 }
 
-# Test: multi-channel subscribe + disconnect — one error callback total
+# Test: multi-channel subscribe + disconnect — one error callback total.
+# (Historically flaky here: guard timers leaked by earlier blocks — kept
+# alive by their self-capturing callbacks — fired their deferred EV::break
+# inside this block's run, ending it before the subscriber's read interest
+# was registered. Fixed by the undef-after-EV::run lines above; a failure
+# here now means a real regression.)
 {
     my $sub = EV::Redis->new(path => $connect_info{sock});
     my @cb_calls;
     my $sub_count = 0;
 
-    $sub->on_error(sub {}); # suppress
+    $sub->on_error(sub { warn "MULTIDC on_error: @_\n" if $ENV{EV_REDIS_DIAG} });
 
     $sub->subscribe('multi_dc_ch1', 'multi_dc_ch2', sub {
         my ($result, $error) = @_;
@@ -304,18 +353,18 @@ SKIP: {
         }
     });
 
-    my $t; $t = EV::timer 2, 0, sub { undef $t; EV::break };
+    my $t; $t = EV::timer 5, 0, sub { undef $t; EV::break };
     EV::run;
+    undef $t;  # kill pending timeout (see above)
 
     is $sub_count, 2, 'both channels subscribed';
     my @errors = grep { defined $_->[1] } @cb_calls;
     # With multi-channel, hiredis fires once per channel on teardown.
-    # Each should have a meaningful error, no duplicates from remove_cb_queue_sv.
     for my $e (@errors) {
         ok $e->[1], 'error string is truthy (not empty)';
     }
-    # Total callbacks: 2 subscribe confirmations + N disconnect errors (one per channel)
-    # No extra invocation from remove_cb_queue_sv
+    # 2 subscribe confirmations + at most one error per channel;
+    # no extra invocation from remove_cb_queue_sv
     ok scalar(@errors) <= 2, 'no more than 2 error callbacks for 2-channel subscribe';
 }
 

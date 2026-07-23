@@ -7,7 +7,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.12';
+    our $VERSION = '0.13';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -76,6 +76,10 @@ sub new {
     $self;
 }
 
+# The XS object is a bare C pointer; a cloned interpreter would double-free
+# it at thread teardown.
+sub CLONE_SKIP { 1 }
+
 our $AUTOLOAD;
 
 sub AUTOLOAD {
@@ -143,7 +147,11 @@ L<AnyEvent> has a support for EV as its one of backends, so L<EV::Redis> can be 
 
 Unlike other redis modules, this module doesn't support utf-8 string.
 
-This module handle all variables as bytes. You should encode your utf-8 string before passing commands like following:
+This module handle all variables as bytes: command arguments are sent as
+their byte representation regardless of Perl's internal string encoding
+(upgraded strings are downgraded), and passing a string with characters
+above C<0xFF> croaks with a "Wide character" error. You should encode your
+utf-8 string before passing commands like following:
 
     use Encode;
     
@@ -179,8 +187,12 @@ UNIX socket path to connect. Mutually exclusive with C<host>.
 
 Error callback will be called when a connection level error occurs.
 If not provided (or C<undef>), a default handler that calls C<die> is
-installed. To have no error handler, call C<< $obj->on_error(undef) >>
-after construction.
+installed. Note that exceptions thrown inside any handler (including this
+default) are caught and reported as warnings -- they do not propagate out
+of the event loop. In practice the default handler therefore turns
+connection errors into warnings; install your own C<on_error> to handle
+them programmatically. To have no error handler, call
+C<< $obj->on_error(undef) >> after construction.
 
 This callback can be set by C<< $obj->on_error($cb) >> method any time.
 
@@ -378,11 +390,30 @@ is active (reconnect timer running). In that case, commands are
 automatically queued and sent after successful reconnection. Queued
 commands respect C<waiting_timeout> if set.
 
-B<Pub/Sub note:> For C<subscribe>, C<psubscribe>, and C<ssubscribe>, the
-callback is persistent and receives all messages. For C<unsubscribe>,
-C<punsubscribe>, and C<sunsubscribe>, the confirmation is delivered through
-the original subscribe callback (this is hiredis behavior). Any callback
-passed to unsubscribe commands is silently discarded.
+B<Pub/Sub note:> For C<subscribe> and C<psubscribe>, the callback is
+persistent and receives all messages; at least one channel/pattern argument
+is required. For C<unsubscribe> and C<punsubscribe>, the confirmation is
+delivered through the original subscribe callback (this is hiredis
+behavior). Any callback passed to unsubscribe commands is silently
+discarded.
+
+B<Sharded pub/sub note:> C<ssubscribe> and C<sunsubscribe> are not
+supported and croak: the bundled hiredis has no sharded pub/sub support, so
+an incoming C<smessage> would abort the process. C<spublish> works as a
+regular command.
+
+B<MONITOR note:> C<monitor> requires an idle connection (no pending,
+waiting, or subscribed commands), and once active no further commands may
+be sent on that connection -- C<command()> croaks. Both restrictions exist
+because hiredis's monitor mode re-queues callback records in a way that is
+unsafe to mix with other traffic. Use a dedicated connection; the state
+clears on disconnect.
+
+B<Nested event loop note:> while a callback is running, this connection's
+own I/O watchers are skipped, so a nested C<EV::run> (or condvar-style
+wait) inside a callback cannot process replies for the same connection --
+they are delivered after the outer callback returns. Use a separate
+connection if you must wait for Redis inside a callback.
 
 =head2 disconnect
 
@@ -419,7 +450,8 @@ constructor.
 Get or set the command timeout in milliseconds. Pass C<0> to disable.
 Returns the current value, or undef if never set. Can also be set via
 constructor. When changed while connected, takes effect immediately on
-the active connection.
+the active connection, including re-arming (or stopping, for C<0>) an
+already-scheduled timeout for commands currently in flight.
 
 =head2 on_error([$cb->($errstr)])
 

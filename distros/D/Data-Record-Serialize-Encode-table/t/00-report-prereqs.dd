@@ -60,7 +60,11 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Data::Record::Serialize' => '1.06',
+                                      'Moo::Role' => '0',
                                       'Term::Table' => '0',
+                                      'Types::Common::Numeric' => '0',
+                                      'Types::Standard' => '0',
+                                      'namespace::clean' => '0',
                                       'perl' => '5.012'
                                     }
                     },

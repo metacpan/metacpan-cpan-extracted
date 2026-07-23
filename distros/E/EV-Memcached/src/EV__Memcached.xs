@@ -99,6 +99,8 @@
             croak("not connected"); \
     } while(0)
 
+#define MC_MAX_VALUE_LEN 0x40000000  /* 1 GiB — wire length is u32 */
+
 /* ================================================================
  * Type declarations
  * ================================================================ */
@@ -144,7 +146,9 @@ struct ev_mc_wait_s {
 
 struct ev_mc_s {
     unsigned int magic;
+    unsigned int conn_gen;    /* bumped by cleanup_connection: stale-session guard */
     struct ev_loop *loop;
+    SV *loop_sv;              /* held ref on a user-supplied EV::Loop (NULL = default) */
     int fd;
     int connected;
     int connecting;
@@ -333,6 +337,29 @@ static const char* mc_status_str(uint16_t status) {
 }
 
 /* ================================================================
+ * Callback argument validation
+ * ================================================================ */
+
+/* Command-callback argument: undef = no callback; a CODE ref = callback;
+   any other ref is a usage error. Defined non-refs are NOT callbacks
+   (trailing positional args in the sniffing XSUBs) and return NULL. */
+static SV* mc_cb_arg(pTHX_ SV *sv) {
+    if (!SvOK(sv)) return NULL;
+    if (!SvROK(sv)) return NULL;
+    if (SvTYPE(SvRV(sv)) != SVt_PVCV)
+        croak("callback must be a code reference");
+    return sv;
+}
+
+/* on_* handler argument: undef = clear; anything else must be a CODE
+   ref. Returns the validated SV or NULL. */
+static SV* mc_handler_arg(pTHX_ SV *sv) {
+    if (!SvOK(sv)) return NULL;
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVCV) return sv;
+    croak("callback must be a code reference");
+}
+
+/* ================================================================
  * Buffer management
  * ================================================================ */
 
@@ -503,29 +530,36 @@ static void report_connect_error(pTHX_ ev_mc_t *self, const char *errbuf) {
     emit_error(aTHX_ self, errbuf);
     self->callback_depth--;
     if (check_destroyed(self)) return;
-    if (!self->intentional_disconnect && self->reconnect)
+    if (!self->intentional_disconnect && self->reconnect) {
         schedule_reconnect(aTHX_ self);
+    } else {
+        /* terminal failure: waiting commands would otherwise hang until DESTROY */
+        self->callback_depth++;
+        cancel_waiting(aTHX_ self, err_disconnected);
+        self->callback_depth--;
+        check_destroyed(self);
+    }
 }
 
-/* Shared post-connect-success path used by both on_connect_complete (after
-   async EINPROGRESS resolves) and start_connect (when connect(2) returns
-   immediately). Caller must already have set self->connected = 1 and
-   stopped/initialized the io watchers as required by its path. */
+/* Shared post-connect-success path. Caller must already have set
+   self->connected = 1 and stopped/initialized the io watchers. */
 static void finish_connect_success(pTHX_ ev_mc_t *self) {
     self->reconnect_attempts = 0;
 
     start_reading(self);
     apply_keepalive(self);
 
-    mc_send_sasl_auth(aTHX_ self, NULL);
+    if (self->username && self->password) {
+        /* Auto-auth: on_connect fires from the SASL_AUTH success path;
+           on failure the connection drops without it ever firing. */
+        mc_send_sasl_auth(aTHX_ self, NULL);
+        return;
+    }
 
     emit_connect(aTHX_ self);
     if (check_destroyed(self)) return;
 
-    /* Drain wait_queue immediately unless we are waiting for SASL_AUTH
-       to complete; the SASL response handler calls send_next_waiting. */
-    if (!self->username || !self->password)
-        send_next_waiting(aTHX_ self);
+    send_next_waiting(aTHX_ self);
 }
 
 /* ================================================================
@@ -589,49 +623,101 @@ static void free_all_queues(pTHX_ ev_mc_t *self) {
  * Cancel pending/waiting commands (on disconnect)
  * ================================================================ */
 
-/* mark_skipped: if true, set cbt->skipped=1 and invoke ALL callbacks (skip_pending behavior).
- * if false, only invoke non-skipped callbacks (cancel_pending behavior).
- *
- * Callers MUST bump callback_depth before calling this (and call
- * check_destroyed after) — DESTROY sets magic=FREED before running
- * us, so an unconditional check_destroyed here would Safefree(self)
- * mid-loop. The depth bump pins self until the caller is done. */
-static void cancel_pending_impl(pTHX_ ev_mc_t *self, SV *err_sv, int mark_skipped) {
-    if (self->in_cb_cleanup) return;
-    self->in_cb_cleanup = 1;
-
-    while (!ngx_queue_empty(&self->cb_queue)) {
-        ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+/* Snapshot-drain cancellation: the live queue is spliced into a local
+ * list first, so commands enqueued by cancellation callbacks survive.
+ * The _list halves let handle_disconnect snapshot BOTH queues before
+ * any callback runs. Callers MUST bump callback_depth before calling
+ * these (and check_destroyed after): DESTROY sets magic=FREED before
+ * running us, so a check_destroyed here would Safefree(self) mid-loop. */
+static void cancel_pending_list(pTHX_ ev_mc_t *self, ngx_queue_t *local, SV *err_sv) {
+    while (!ngx_queue_empty(local)) {
+        ngx_queue_t *q = ngx_queue_head(local);
         ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
         ngx_queue_remove(q);
-        if (cbt->counted) self->pending_count--;
+        if (cbt->counted) { self->pending_count--; cbt->counted = 0; }
 
-        int already_skipped = cbt->skipped;
-        if (mark_skipped) cbt->skipped = 1;
-        if (cbt->cb && !already_skipped) {
+        if (cbt->cb && !cbt->skipped) {
             invoke_cb(aTHX_ self, cbt->cb, NULL, newSVsv(err_sv));
             if (self->magic == MC_MAGIC_FREED) {
+                /* parked entries are invisible to free_all_queues */
                 cleanup_cbt(aTHX_ cbt);
-                self->in_cb_cleanup = 0;
+                while (!ngx_queue_empty(local)) {
+                    ngx_queue_t *r = ngx_queue_head(local);
+                    ev_mc_cb_t *rest = ngx_queue_data(r, ev_mc_cb_t, queue);
+                    ngx_queue_remove(r);
+                    if (rest->counted) { rest->counted = 0; }
+                    cleanup_cbt(aTHX_ rest);
+                }
                 return;
             }
         }
         cleanup_cbt(aTHX_ cbt);
     }
-    self->pending_count = 0;
-    self->in_cb_cleanup = 0;
 }
 
 static void cancel_pending(pTHX_ ev_mc_t *self, SV *err_sv) {
-    cancel_pending_impl(aTHX_ self, err_sv, 0);
+    if (self->in_cb_cleanup) return;   /* nested: outer scope owns the splice */
+    self->in_cb_cleanup = 1;
+
+    ngx_queue_t local;
+    ngx_queue_init(&local);
+    while (!ngx_queue_empty(&self->cb_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+        ngx_queue_remove(q);
+        ngx_queue_insert_tail(&local, q);
+    }
+
+    cancel_pending_list(aTHX_ self, &local, err_sv);
+    self->in_cb_cleanup = 0;
 }
 
-static void cancel_waiting(pTHX_ ev_mc_t *self, SV *err_sv) {
-    if (self->in_wait_cleanup) return;
-    self->in_wait_cleanup = 1;
+/* skip_pending: mark + detach first (no Perl calls, queue immutable),
+   then fire the detached callbacks. Entries stay on cb_queue so their
+   late responses are consumed by FIFO opaque matching and discarded;
+   commands enqueued by the callbacks arrive unmarked and survive. */
+static void skip_pending_impl(pTHX_ ev_mc_t *self, SV *err_sv) {
+    if (self->in_cb_cleanup) return;
+    self->in_cb_cleanup = 1;
 
-    while (!ngx_queue_empty(&self->wait_queue)) {
-        ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
+    /* Phase 1: mark + detach */
+    SV **cbs = NULL;
+    int n = 0, cap = 0;
+    ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+    while (q != ngx_queue_sentinel(&self->cb_queue)) {
+        ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
+        q = ngx_queue_next(q);
+        if (cbt->skipped) continue;
+        cbt->skipped = 1;
+        if (cbt->counted) { self->pending_count--; cbt->counted = 0; }
+        if (cbt->cb) {
+            if (n == cap) {
+                cap = cap ? cap * 2 : 8;
+                Renew(cbs, cap, SV *);
+            }
+            cbs[n++] = cbt->cb;
+            cbt->cb = NULL;
+        }
+    }
+
+    /* Phase 2: fire detached callbacks; entries stay owned by the queue */
+    unsigned int gen = self->conn_gen;
+    int i;
+    for (i = 0; i < n; i++) {
+        invoke_cb(aTHX_ self, cbs[i], NULL, newSVsv(err_sv));
+        SvREFCNT_dec(cbs[i]);
+        if (self->magic == MC_MAGIC_FREED || self->conn_gen != gen) {
+            /* queue torn down by the callback: release the rest */
+            for (i++; i < n; i++) SvREFCNT_dec(cbs[i]);
+            break;
+        }
+    }
+    Safefree(cbs);
+    self->in_cb_cleanup = 0;
+}
+
+static void cancel_waiting_list(pTHX_ ev_mc_t *self, ngx_queue_t *local, SV *err_sv) {
+    while (!ngx_queue_empty(local)) {
+        ngx_queue_t *q = ngx_queue_head(local);
         ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
         ngx_queue_remove(q);
         self->waiting_count--;
@@ -640,17 +726,35 @@ static void cancel_waiting(pTHX_ ev_mc_t *self, SV *err_sv) {
             invoke_cb(aTHX_ self, wt->cb, NULL, newSVsv(err_sv));
             if (self->magic == MC_MAGIC_FREED) {
                 cleanup_wait(aTHX_ wt);
-                self->in_wait_cleanup = 0;
-                /* Caller bumps depth before calling us (disconnect XS,
-                   skip_waiting XS, or io_cb path), so check_destroyed
-                   here would prematurely free during DESTROY where
-                   magic is already FREED before we run. */
+                /* parked entries are invisible to free_all_queues */
+                while (!ngx_queue_empty(local)) {
+                    ngx_queue_t *r = ngx_queue_head(local);
+                    ev_mc_wait_t *rest = ngx_queue_data(r, ev_mc_wait_t, queue);
+                    ngx_queue_remove(r);
+                    cleanup_wait(aTHX_ rest);
+                }
                 return;
             }
         }
         cleanup_wait(aTHX_ wt);
     }
-    self->waiting_count = 0;
+}
+
+static void cancel_waiting(pTHX_ ev_mc_t *self, SV *err_sv) {
+    if (self->in_wait_cleanup) return;   /* nested: outer scope owns the splice */
+    self->in_wait_cleanup = 1;
+
+    /* Snapshot-drain: commands queued by cancellation callbacks land on
+       the (now empty) live wait_queue and survive. */
+    ngx_queue_t local;
+    ngx_queue_init(&local);
+    while (!ngx_queue_empty(&self->wait_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
+        ngx_queue_remove(q);
+        ngx_queue_insert_tail(&local, q);
+    }
+
+    cancel_waiting_list(aTHX_ self, &local, err_sv);
     self->in_wait_cleanup = 0;
 }
 
@@ -659,6 +763,8 @@ static void cancel_waiting(pTHX_ ev_mc_t *self, SV *err_sv) {
  * ================================================================ */
 
 static void cleanup_connection(pTHX_ ev_mc_t *self) {
+    self->conn_gen++;   /* invalidates in-flight session state (see process_responses) */
+
     stop_reading(self);
     stop_writing(self);
 
@@ -683,14 +789,54 @@ static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason) {
 
     cleanup_connection(aTHX_ self);
 
-    /* Cancel pending commands */
-    cancel_pending(aTHX_ self, err_disconnected);
-    if (self->magic == MC_MAGIC_FREED) return;
+    /* Snapshot BOTH queues before any teardown callback runs: commands
+       enqueued by cancellation callbacks land on the live queues and
+       survive. The flags stay set across the span so nested cancels
+       no-op instead of splicing (and stranding) a fresh local list. */
+    ngx_queue_t localP, localW;
+    int haveP = 0, haveW = 0;
 
-    if (!self->resume_waiting_on_reconnect) {
-        cancel_waiting(aTHX_ self, err_disconnected);
-        if (self->magic == MC_MAGIC_FREED) return;
+    if (!self->in_cb_cleanup) {
+        self->in_cb_cleanup = 1;
+        haveP = 1;
+        ngx_queue_init(&localP);
+        while (!ngx_queue_empty(&self->cb_queue)) {
+            ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+            ngx_queue_remove(q);
+            ngx_queue_insert_tail(&localP, q);
+        }
     }
+    if (!self->resume_waiting_on_reconnect && !self->in_wait_cleanup) {
+        self->in_wait_cleanup = 1;
+        haveW = 1;
+        ngx_queue_init(&localW);
+        while (!ngx_queue_empty(&self->wait_queue)) {
+            ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
+            ngx_queue_remove(q);
+            ngx_queue_insert_tail(&localW, q);
+        }
+    }
+
+    if (haveP) {
+        cancel_pending_list(aTHX_ self, &localP, err_disconnected);
+        self->in_cb_cleanup = 0;
+    }
+    if (haveW) {
+        if (self->magic == MC_MAGIC_FREED) {
+            /* died during the pending drain: free parked entries silently */
+            while (!ngx_queue_empty(&localW)) {
+                ngx_queue_t *q = ngx_queue_head(&localW);
+                ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
+                ngx_queue_remove(q);
+                self->waiting_count--;
+                cleanup_wait(aTHX_ wt);
+            }
+        } else {
+            cancel_waiting_list(aTHX_ self, &localW, err_disconnected);
+        }
+        self->in_wait_cleanup = 0;
+    }
+    if (self->magic == MC_MAGIC_FREED) return;
 
     if (was_connected) {
         emit_disconnect(aTHX_ self);
@@ -715,7 +861,13 @@ static void schedule_reconnect(pTHX_ ev_mc_t *self) {
     if (self->reconnect_timer_active) return;
     if (self->max_reconnect_attempts > 0 &&
         self->reconnect_attempts >= self->max_reconnect_attempts) {
+        /* giving up for good: the waiting queue must not hang forever */
+        self->callback_depth++;
         emit_error(aTHX_ self, "max reconnect attempts reached");
+        if (self->magic != MC_MAGIC_FREED)
+            cancel_waiting(aTHX_ self, err_disconnected);
+        self->callback_depth--;
+        check_destroyed(self);
         return;
     }
 
@@ -990,6 +1142,9 @@ static void mc_fire_and_forget(pTHX_ ev_mc_t *self,
 {
     if (key_len > MC_MAX_KEY_LEN)
         croak("key too long (%d bytes, max %d)", (int)key_len, MC_MAX_KEY_LEN);
+    if (value_len > MC_MAX_VALUE_LEN)
+        croak("value too large (%"UVuf" bytes, max %"UVuf")",
+              (UV)value_len, (UV)MC_MAX_VALUE_LEN);
 
     uint32_t body_len = extras_len + (uint32_t)key_len + (uint32_t)value_len;
     size_t packet_len = MC_HEADER_SIZE + body_len;
@@ -1029,6 +1184,9 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
 {
     if (key_len > MC_MAX_KEY_LEN)
         croak("key too long (%d bytes, max %d)", (int)key_len, MC_MAX_KEY_LEN);
+    if (value_len > MC_MAX_VALUE_LEN)
+        croak("value too large (%"UVuf" bytes, max %"UVuf")",
+              (UV)value_len, (UV)MC_MAX_VALUE_LEN);
 
     uint32_t opaque = mc_next_opaque(self);
     uint32_t body_len = extras_len + (uint32_t)key_len + (uint32_t)value_len;
@@ -1426,10 +1584,14 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
         break;
 
     case CB_CMD_SASL_AUTH:
-        if (cbt->cb)
+        if (cbt->cb) {
             invoke_cb(aTHX_ self, cbt->cb, newSViv(1), NULL);
-        /* Auto-auth (cb==NULL): wait queue is drained by the common
-           send_next_waiting call at the end of this switch. */
+        } else {
+            /* Auto-auth completed: the connection is now fully
+               established — fire on_connect before the common tail
+               drains the wait queue. */
+            emit_connect(aTHX_ self);
+        }
         break;
 
     case CB_CMD_STATS:
@@ -1500,9 +1662,12 @@ static void process_responses(pTHX_ ev_mc_t *self) {
 
         if (self->rbuf_len < total_len) break; /* incomplete packet */
 
+        unsigned int gen = self->conn_gen;
         handle_response_packet(aTHX_ self);
         if (self->magic == MC_MAGIC_FREED) return;
+        if (self->conn_gen != gen) return; /* connection torn down/replaced by callback */
         if (!self->connected) return; /* disconnect() called from callback */
+        if (self->rbuf_len < total_len) return; /* buffer reset mid-callback */
 
         /* Consume from buffer */
         self->rbuf_len -= total_len;
@@ -1532,7 +1697,9 @@ static void on_readable(pTHX_ ev_mc_t *self) {
         self->rbuf_len += n;
         process_responses(aTHX_ self);
     } else if (n == 0) {
-        handle_disconnect(aTHX_ self, "connection closed by server");
+        /* EOF; expected after quit()/disconnect() — no error reason then */
+        handle_disconnect(aTHX_ self,
+            self->intentional_disconnect ? NULL : "connection closed by server");
     } else {
         if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
             return;
@@ -1544,11 +1711,19 @@ static void on_readable(pTHX_ ev_mc_t *self) {
 
 static int try_write(ev_mc_t *self) {
     while (self->wbuf_off < self->wbuf_len) {
+#ifdef MSG_NOSIGNAL
+        /* a peer close must yield EPIPE, not SIGPIPE */
+        ssize_t n = send(self->fd, self->wbuf + self->wbuf_off,
+                         self->wbuf_len - self->wbuf_off, MSG_NOSIGNAL);
+#else
         ssize_t n = write(self->fd, self->wbuf + self->wbuf_off,
                           self->wbuf_len - self->wbuf_off);
+#endif
         if (n > 0) {
             self->wbuf_off += n;
-        } else if (n < 0) {
+        } else if (n == 0) {
+            return 0; /* nothing written — retry on next writable event */
+        } else {
             if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
                 return 0; /* try again later */
             return -1; /* error */
@@ -1651,6 +1826,12 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             report_connect_error(aTHX_ self, errbuf);
             return;
         }
+#ifdef SO_NOSIGPIPE
+        {   /* no MSG_NOSIGNAL on macOS/BSD */
+            int one_ns = 1;
+            setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one_ns, sizeof one_ns);
+        }
+#endif
 
         /* non-blocking */
         {
@@ -1690,6 +1871,12 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             report_connect_error(aTHX_ self, errbuf);
             return;
         }
+#ifdef SO_NOSIGPIPE
+        {   /* no MSG_NOSIGNAL on macOS/BSD */
+            int one_ns = 1;
+            setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one_ns, sizeof one_ns);
+        }
+#endif
 
         /* non-blocking */
         {
@@ -1714,16 +1901,19 @@ static void start_connect(pTHX_ ev_mc_t *self) {
     }
 
     if (ret == 0) {
-        /* Connected immediately (localhost) */
-        self->connected = 1;
+        /* Connected immediately (unix / loopback). Complete via the
+           event loop, never synchronously: the armed EV_WRITE watcher
+           fires on the next iteration (a connected socket is writable)
+           and drives the normal on_connect_complete path. EVAPI exports
+           no ev_feed_event. No connect_timer for immediate connects. */
+        self->connecting = 1;
         ev_io_init(&self->rio, io_cb, self->fd, EV_READ);
         self->rio.data = (void *)self;
         ev_io_init(&self->wio, io_cb, self->fd, EV_WRITE);
         self->wio.data = (void *)self;
         ev_set_priority(&self->rio, self->priority);
         ev_set_priority(&self->wio, self->priority);
-
-        finish_connect_success(aTHX_ self);
+        start_writing(self);
         return;
     }
 
@@ -1779,6 +1969,21 @@ CODE:
     PERL_UNUSED_VAR(class);
     if ((items - 1) % 2 != 0) croak("odd number of arguments");
 
+    /* validate loop before allocating RETVAL so the croak leaks nothing */
+    {
+        int j;
+        for (j = 1; j < items; j += 2) {
+            const char *k = SvPV_nolen(ST(j));
+            SV *v = ST(j + 1);
+            if (strEQ(k, "loop") &&
+                !(SvROK(v) && SvOBJECT(SvRV(v)) && sv_derived_from(v, "EV::Loop")))
+                croak("loop must be an EV::Loop object");
+            if ((strEQ(k, "on_error") || strEQ(k, "on_connect") ||
+                 strEQ(k, "on_disconnect")))
+                (void)mc_handler_arg(aTHX_ v);   /* croaks on bad value */
+        }
+    }
+
     Newxz(RETVAL, 1, ev_mc_t);
     RETVAL->magic = MC_MAGIC_ALIVE;
     RETVAL->fd = -1;
@@ -1813,13 +2018,16 @@ CODE:
         else if (strEQ(k, "path"))                   path_sv = v;
         else if (strEQ(k, "on_error")) {
             CLEAR_HANDLER(RETVAL->on_error);
-            if (SvOK(v) && SvROK(v)) RETVAL->on_error = newSVsv(v);
+            SV *h = mc_handler_arg(aTHX_ v);
+            if (h) RETVAL->on_error = newSVsv(h);
         }
         else if (strEQ(k, "on_connect")) {
-            if (SvOK(v) && SvROK(v)) RETVAL->on_connect = newSVsv(v);
+            SV *h = mc_handler_arg(aTHX_ v);
+            if (h) RETVAL->on_connect = newSVsv(h);
         }
         else if (strEQ(k, "on_disconnect")) {
-            if (SvOK(v) && SvROK(v)) RETVAL->on_disconnect = newSVsv(v);
+            SV *h = mc_handler_arg(aTHX_ v);
+            if (h) RETVAL->on_disconnect = newSVsv(h);
         }
         else if (strEQ(k, "max_pending"))            RETVAL->max_pending = SvIV(v);
         else if (strEQ(k, "waiting_timeout"))        RETVAL->waiting_timeout_ms = SvIV(v);
@@ -1838,7 +2046,10 @@ CODE:
             if (SvOK(v)) RETVAL->password = savepv(SvPV_nolen(v));
         }
         else if (strEQ(k, "loop")) {
-            RETVAL->loop = (struct ev_loop *)SvPVX(SvRV(v));
+            /* EV's T_LOOP convention: pointer in the IV slot of the
+               blessed referent (SvPVX there is NULL) */
+            RETVAL->loop = INT2PTR(struct ev_loop *, SvIVX(SvRV(v)));
+            RETVAL->loop_sv = newSVsv(v); /* keep a user loop alive */
         }
     }
 
@@ -1848,6 +2059,7 @@ CODE:
         CLEAR_HANDLER(RETVAL->on_error);
         CLEAR_HANDLER(RETVAL->on_connect);
         CLEAR_HANDLER(RETVAL->on_disconnect);
+        CLEAR_HANDLER(RETVAL->loop_sv);
         if (RETVAL->username) Safefree(RETVAL->username);
         if (RETVAL->password) Safefree(RETVAL->password);
         Safefree(RETVAL);
@@ -1882,6 +2094,15 @@ CODE:
     /* If we're inside a callback, defer destruction.
      * check_destroyed() in io_cb/timer_cb will Safefree after unwind. */
     if (self->callback_depth > 0) {
+        /* Fire pending/waiting callbacks once with "disconnected" (the
+           DESTRUCTION contract). callback_depth is already >0 and pins
+           self; refcount 0 means no callback can resurrect it. Under
+           global destruction, calling into Perl is unsafe: free silently. */
+        if (!PL_dirty) {
+            cancel_pending(aTHX_ self, err_disconnected);
+            cancel_waiting(aTHX_ self, err_disconnected);
+        }
+
         self->magic = MC_MAGIC_FREED;
 
         /* Stop watchers */
@@ -1899,6 +2120,7 @@ CODE:
         CLEAR_HANDLER(self->on_error);
         CLEAR_HANDLER(self->on_connect);
         CLEAR_HANDLER(self->on_disconnect);
+        CLEAR_HANDLER(self->loop_sv);
         Safefree(self->host);     self->host = NULL;
         Safefree(self->path);     self->path = NULL;
         Safefree(self->username); self->username = NULL;
@@ -1917,7 +2139,7 @@ CODE:
     cleanup_connection(aTHX_ self);
 
     /* Cancel pending/waiting with disconnected error.
-       Don't pre-set magic=FREED here: cancel_pending_impl bails its
+       Don't pre-set magic=FREED here: cancel_pending bails its
        loop on FREED, which would leak every entry past the first if
        any callback was set. Bump callback_depth so any nested DESTROY
        (e.g. a callback drops a separate strong ref) takes the deferred
@@ -1937,6 +2159,7 @@ CODE:
     CLEAR_HANDLER(self->on_error);
     CLEAR_HANDLER(self->on_connect);
     CLEAR_HANDLER(self->on_disconnect);
+    CLEAR_HANDLER(self->loop_sv);
 
     Safefree(self->host);
     Safefree(self->path);
@@ -2018,10 +2241,9 @@ on_error(EV::Memcached self, ...)
 CODE:
 {
     if (items > 1) {
+        SV *h = mc_handler_arg(aTHX_ ST(1));
         CLEAR_HANDLER(self->on_error);
-        if (SvOK(ST(1)) && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVCV) {
-            self->on_error = newSVsv(ST(1));
-        }
+        if (h) self->on_error = newSVsv(h);
     }
     RETVAL = self->on_error ? newSVsv(self->on_error) : &PL_sv_undef;
 }
@@ -2033,10 +2255,9 @@ on_connect(EV::Memcached self, ...)
 CODE:
 {
     if (items > 1) {
+        SV *h = mc_handler_arg(aTHX_ ST(1));
         CLEAR_HANDLER(self->on_connect);
-        if (SvOK(ST(1)) && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVCV) {
-            self->on_connect = newSVsv(ST(1));
-        }
+        if (h) self->on_connect = newSVsv(h);
     }
     RETVAL = self->on_connect ? newSVsv(self->on_connect) : &PL_sv_undef;
 }
@@ -2048,10 +2269,9 @@ on_disconnect(EV::Memcached self, ...)
 CODE:
 {
     if (items > 1) {
+        SV *h = mc_handler_arg(aTHX_ ST(1));
         CLEAR_HANDLER(self->on_disconnect);
-        if (SvOK(ST(1)) && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVCV) {
-            self->on_disconnect = newSVsv(ST(1));
-        }
+        if (h) self->on_disconnect = newSVsv(h);
     }
     RETVAL = self->on_disconnect ? newSVsv(self->on_disconnect) : &PL_sv_undef;
 }
@@ -2074,9 +2294,9 @@ CODE:
 
     int extra = items - 3;
     SV *cb = NULL;
-    if (extra > 0 && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV) {
-        cb = ST(items-1);
-        extra--;
+    if (extra > 0) {
+        SV *cand = mc_cb_arg(aTHX_ ST(items-1));
+        if (cand) { cb = cand; extra--; }
     }
     UV expiry = extra > 0 ? SvUV(ST(3)) : 0;
     UV flags  = extra > 1 ? SvUV(ST(4)) : 0;
@@ -2109,9 +2329,9 @@ CODE:
 
     int extra = items - 4;
     SV *cb = NULL;
-    if (extra > 0 && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV) {
-        cb = ST(items-1);
-        extra--;
+    if (extra > 0) {
+        SV *cand = mc_cb_arg(aTHX_ ST(items-1));
+        if (cand) { cb = cand; extra--; }
     }
     UV expiry = extra > 0 ? SvUV(ST(4)) : 0;
     UV flags  = extra > 1 ? SvUV(ST(5)) : 0;
@@ -2134,7 +2354,7 @@ CODE:
 
     STRLEN key_len;
     const char *key = SvPV(key_sv, key_len);
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     mc_enqueue_cmd(aTHX_ self, MC_OP_GET, key, key_len, NULL, 0,
                    NULL, 0, 0, ix == 0 ? CB_CMD_GET : CB_CMD_GETS, 0, cb);
@@ -2148,7 +2368,7 @@ CODE:
 
     STRLEN key_len;
     const char *key = SvPV(key_sv, key_len);
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     mc_enqueue_cmd(aTHX_ self, MC_OP_DELETE, key, key_len, NULL, 0,
                    NULL, 0, 0, CB_CMD_DELETE, 0, cb);
@@ -2167,9 +2387,9 @@ CODE:
 
     int extra = items - 2;
     SV *cb = NULL;
-    if (extra > 0 && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV) {
-        cb = ST(items-1);
-        extra--;
+    if (extra > 0) {
+        SV *cand = mc_cb_arg(aTHX_ ST(items-1));
+        if (cand) { cb = cand; extra--; }
     }
     UV delta   = extra > 0 ? SvUV(ST(2)) : 1;
     UV initial = extra > 1 ? SvUV(ST(3)) : 0;
@@ -2195,7 +2415,7 @@ CODE:
     STRLEN key_len, value_len;
     const char *key = SvPV(key_sv, key_len);
     const char *value = SvPV(value_sv, value_len);
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     mc_enqueue_cmd(aTHX_ self, ix == 0 ? MC_OP_APPEND : MC_OP_PREPEND,
                    key, key_len, value, value_len, NULL, 0, 0, CB_CMD_STORE, 0, cb);
@@ -2212,7 +2432,7 @@ CODE:
 
     STRLEN key_len;
     const char *key = SvPV(key_sv, key_len);
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     char extras[4];
     mc_write_u32(extras, (uint32_t)expiry);
@@ -2235,9 +2455,9 @@ CODE:
 
     int extra = items - 1;
     SV *cb = NULL;
-    if (extra > 0 && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV) {
-        cb = ST(items-1);
-        extra--;
+    if (extra > 0) {
+        SV *cand = mc_cb_arg(aTHX_ ST(items-1));
+        if (cand) { cb = cand; extra--; }
     }
     UV expiry = extra > 0 ? SvUV(ST(1)) : 0;
 
@@ -2267,10 +2487,15 @@ CODE:
 {
     MC_CROAK_UNLESS_CONNECTED(self);
 
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     static const uint8_t ops[] = { MC_OP_VERSION, MC_OP_NOOP, MC_OP_QUIT };
     static const int cmds[]    = { CB_CMD_VERSION, CB_CMD_NOOP, CB_CMD_QUIT };
+
+    if (ix == 2) {
+        /* quit = intentional teardown: no on_error / reconnect on close */
+        self->intentional_disconnect = 1;
+    }
 
     mc_enqueue_cmd(aTHX_ self, ops[ix], NULL, 0, NULL, 0,
                    NULL, 0, 0, cmds[ix], 0, cb);
@@ -2284,9 +2509,9 @@ CODE:
 
     int extra = items - 1;
     SV *cb = NULL;
-    if (extra > 0 && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV) {
-        cb = ST(items-1);
-        extra--;
+    if (extra > 0) {
+        SV *cand = mc_cb_arg(aTHX_ ST(items-1));
+        if (cand) { cb = cand; extra--; }
     }
 
     STRLEN name_len = 0;
@@ -2310,7 +2535,7 @@ CODE:
     if (!SvROK(keys_sv) || SvTYPE(SvRV(keys_sv)) != SVt_PVAV)
         croak("mget requires an array reference");
 
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
     AV *keys_av = (AV *)SvRV(keys_sv);
 
     mc_enqueue_mget(aTHX_ self, keys_av, cb, ix);
@@ -2325,7 +2550,7 @@ CODE:
     STRLEN ulen, plen;
     const char *user = SvPV(user_sv, ulen);
     const char *pass = SvPV(pass_sv, plen);
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     size_t vlen = 1 + ulen + 1 + plen;
     char *authdata;
@@ -2346,7 +2571,7 @@ CODE:
 {
     MC_CROAK_UNLESS_CONNECTED(self);
 
-    SV *cb = (SvOK(cb_sv) && SvROK(cb_sv)) ? cb_sv : NULL;
+    SV *cb = mc_cb_arg(aTHX_ cb_sv);
 
     mc_enqueue_cmd(aTHX_ self, MC_OP_SASL_LIST_MECHS, NULL, 0, NULL, 0,
                    NULL, 0, 0, CB_CMD_SASL_LIST, 0, cb);
@@ -2390,6 +2615,10 @@ CODE:
     if (items > 1) {
         self->waiting_timeout_ms = SvIV(ST(1));
         if (self->waiting_timeout_ms < 0) self->waiting_timeout_ms = 0;
+        if (self->waiting_timeout_ms == 0)
+            stop_waiting_timer(self);
+        else if (!ngx_queue_empty(&self->wait_queue))
+            schedule_waiting_timer(self);
     }
     RETVAL = self->waiting_timeout_ms;
 }
@@ -2507,7 +2736,7 @@ skip_pending(EV::Memcached self)
 CODE:
 {
     self->callback_depth++;
-    cancel_pending_impl(aTHX_ self, err_skipped, 1);
+    skip_pending_impl(aTHX_ self, err_skipped);
     self->callback_depth--;
     check_destroyed(self);
 }

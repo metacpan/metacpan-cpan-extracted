@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -107,7 +107,9 @@ propagating out of a callback.
 Construct an instance. All options are optional; with none, the client
 is unconfigured and you must call C<connect> / C<connect_unix> later.
 Specifying C<host> (or C<path>) at construction time triggers an
-immediate non-blocking connect.
+immediate non-blocking connect. C<on_connect> is always delivered from
+the event loop, never synchronously from the constructor, so installing
+handlers right after C<new> is safe.
 
     my $mc = EV::Memcached->new(
         host     => '127.0.0.1',
@@ -150,8 +152,10 @@ TCP keepalive idle time. Set to 0 to disable. Ignored on Unix sockets.
 =item connect_timeout => $ms
 
 Abort an in-progress non-blocking connect after this many milliseconds.
-0 = no timeout (default). Does not apply to Unix sockets or to
-immediately-completing localhost connects.
+0 = no timeout (default). Applies to any connect that does not complete
+immediately (including unix sockets under rare kernel backlog
+conditions); immediately-completing connects finish on the next event
+loop iteration without arming this timer.
 
 =item command_timeout => $ms
 
@@ -226,7 +230,10 @@ flag if you need to terminate.
 =item on_connect => $cb->()
 
 Fires once the connection is fully established (after SASL, when
-applicable).
+applicable; on SASL auth failure it never fires). Always delivered from
+the event loop -- never synchronously from C<new> / C<connect> /
+C<connect_unix> -- so a handler installed right after the constructor
+still fires.
 
 =item on_disconnect => $cb->()
 
@@ -264,6 +271,9 @@ are queued and sent on completion.
 =head2 quit([$cb])
 
 Send a memcached C<QUIT> and let the server close the connection.
+Treated as an intentional disconnect: C<on_disconnect> fires when the
+server closes, but C<on_error> does not, and auto-reconnect is
+suppressed.
 
 =head1 STORAGE COMMANDS
 
@@ -278,12 +288,13 @@ dropped.
 
 =head2 add($key, $value, [$expiry, [$flags,]] [$cb])
 
-Store only if the key does not exist. Errors with C<NOT_STORED> if
-present.
+Store only if the key does not exist. Errors with C<EXISTS> if
+present (the server may append a message, e.g.
+C<"EXISTS: Data exists for key.">).
 
 =head2 replace($key, $value, [$expiry, [$flags,]] [$cb])
 
-Store only if the key already exists. Errors with C<NOT_STORED> if
+Store only if the key already exists. Errors with C<NOT_FOUND> if
 absent.
 
 =head2 cas($key, $value, $cas, [$expiry, [$flags,]] [$cb])
@@ -413,7 +424,9 @@ string such as C<"PLAIN">.
 =head2 skip_pending
 
 Drain the in-flight queue, firing every callback with
-C<(undef, "skipped")>. The connection itself is left intact.
+C<(undef, "skipped")>. Responses for skipped commands are consumed and
+discarded when they later arrive (strict FIFO opaque matching is
+preserved); the connection genuinely stays usable for new commands.
 
 =head2 skip_waiting
 
@@ -431,7 +444,9 @@ saturated).
 
 =head1 ACCESSORS
 
-Every option from C<new> has a getter/setter of the same name. Calling
+The following options have a getter/setter of the same name (there are
+no accessors for C<host>, C<port>, C<path>, C<username>, C<password>,
+C<reconnect_delay>, C<max_reconnect_attempts>, or C<loop>). Calling
 without arguments reads the current value; with one argument it writes
 and (where meaningful, e.g. C<keepalive>) takes effect immediately.
 
@@ -474,7 +489,12 @@ Get/set the corresponding handler. Pass C<undef> to clear.
 If C<$mc> goes out of scope while commands are in flight or queued,
 every pending and waiting callback fires once with
 C<(undef, "disconnected")>. This holds whether you call C<disconnect>
-first or simply drop the reference.
+first or simply drop the reference -- including dropping the B<last>
+reference from inside one of the object's own callbacks (deferred
+DESTROY fires the remaining callbacks before tearing down).
+
+The one exception is global destruction (interpreter shutdown): no
+Perl callbacks are invoked then; queues are freed silently.
 
 The clean shutdown idiom is:
 
@@ -507,7 +527,9 @@ sends no response at all.
 Commands that can legitimately fail (C<add>, C<replace>, C<append>,
 C<prepend>, C<delete>, C<incr>, ...) always use the non-quiet opcode so
 error responses are consumed by the client even when the user passed no
-callback. Keys are
+callback. Response matching is strict FIFO per connection: responses
+must arrive in request order, so only in-order servers are supported
+(reordering proxies are unsupported). Keys are
 validated against the 250-byte protocol limit before any bytes go on
 the wire.
 

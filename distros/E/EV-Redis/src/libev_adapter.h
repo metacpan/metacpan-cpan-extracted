@@ -19,6 +19,12 @@ typedef struct redisLibevEvents {
     ev_timer timer;
 } redisLibevEvents;
 
+/* redisAsyncHandle* assert(!REDIS_IN_CALLBACK) — a nested event loop inside
+ * a callback would abort(). Skip instead; level-triggered io and the
+ * repeating timer re-deliver once the outer callback unwinds. */
+#define REDIS_LIBEV_IN_CALLBACK(e) ((e)->context->c.flags & REDIS_IN_CALLBACK)
+
+
 static void redisLibevReadEvent(EV_P_ ev_io *watcher, int revents) {
 #if EV_MULTIPLICITY
     ((void)loop);
@@ -27,6 +33,7 @@ static void redisLibevReadEvent(EV_P_ ev_io *watcher, int revents) {
 
     redisLibevEvents *e = (redisLibevEvents*)watcher->data;
     if (e == NULL || e->context == NULL) return;
+    if (REDIS_LIBEV_IN_CALLBACK(e)) return;
     redisAsyncHandleRead(e->context);
 }
 
@@ -38,6 +45,7 @@ static void redisLibevWriteEvent(EV_P_ ev_io *watcher, int revents) {
 
     redisLibevEvents *e = (redisLibevEvents*)watcher->data;
     if (e == NULL || e->context == NULL) return;
+    if (REDIS_LIBEV_IN_CALLBACK(e)) return;
     redisAsyncHandleWrite(e->context);
 }
 
@@ -108,6 +116,7 @@ static void redisLibevCleanup(void *privdata) {
     e->wev.data = NULL;
     e->timer.data = NULL;
 
+
     if (loop != NULL) {
         ev_io_stop(loop, &e->rev);
         ev_io_stop(loop, &e->wev);
@@ -125,6 +134,7 @@ static void redisLibevTimeout(EV_P_ ev_timer *timer, int revents) {
 
     redisLibevEvents *e = (redisLibevEvents*)timer->data;
     if (e == NULL || e->context == NULL) return;
+    if (REDIS_LIBEV_IN_CALLBACK(e)) return;
     redisAsyncHandleTimeout(e->context);
 }
 
@@ -178,6 +188,28 @@ static int redisLibevAttach(EV_P_ redisAsyncContext *ac) {
     e->timer.data = (void*)e;
 
     return REDIS_OK;
+}
+
+/* Re-arm (or stop) the timeout timer from "now". hiredis's
+ * redisAsyncSetTimeout only stores the value; an already-armed timer keeps
+ * its old deadline until the next I/O event re-schedules it. */
+static void redisLibevRefreshTimeout(redisAsyncContext *ac, struct timeval tv) {
+    redisLibevEvents *e = (redisLibevEvents*)ac->ev.data;
+    struct ev_loop *loop;
+    if (e == NULL) return;
+    loop = e->loop;
+    if (loop == NULL) return;
+
+    if (tv.tv_sec || tv.tv_usec) {
+        e->timing = 1;
+        e->timer.repeat = tv.tv_sec + tv.tv_usec / 1000000.00;
+        ev_timer_again(loop, &e->timer);
+    }
+    else {
+        e->timing = 0;
+        e->timer.repeat = 0.;
+        ev_timer_stop(loop, &e->timer);
+    }
 }
 
 static void redisLibevSetPriority(redisAsyncContext *ac, int priority) {

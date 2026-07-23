@@ -5,8 +5,12 @@ MANIFEST
 README
 ppport.h
 2008.xs
+constants.txt			All constants we might export
+functions.txt			All functions we might export
+Symbols.PL			Gather constants/functions we really export
 lib/POSIX/2008.pm
 lib/POSIX/2008.pod
+lib/POSIX/2008/.exists		Dummy file to have the directory available
 t/01_use.t
 t/02_fs.t
 t/03_rw.t
@@ -14,5 +18,11 @@ t/04_at.t
 t/05_is.t
 t/06_exec.t
 t/07_poll.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/08_rand.t
+t/09_time.t
+t/10_math.t
+t/11_cmath.t
+META.yml			Module YAML meta-data (added by MakeMaker)
+META.json			Module JSON meta-data (added by MakeMaker)
+AGENTS.md			Tell the "AI" Mob to get lost
+CLAUDE.md			Tell clawd malware to get lost

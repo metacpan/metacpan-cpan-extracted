@@ -5,7 +5,7 @@ package Data::Record::Serialize::Encode::table;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Types::Standard        qw( ArrayRef Bool Str );
 use Types::Common::Numeric qw( PositiveInt );
@@ -112,7 +112,7 @@ Data::Record::Serialize::Encode::table - encode records as a formatted table and
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

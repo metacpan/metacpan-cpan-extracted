@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::ShellVar 2.165;
+package Config::Model::Backend::ShellVar 2.166;
 
 use Carp;
 use Mouse;
@@ -131,7 +131,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ version 2.165
  my $model = Config::Model->new;
  $model->create_config_class (
     name    => "MyClass",
-    element => [ 
+    element => [
         [qw/foo bar/] => {qw/type leaf value_type string/}
     ],
 
@@ -162,7 +162,7 @@ version 2.165
 File C<foo.conf> now contains:
 
  ## This file was written by Config::Model
- ## You may modify the content of this file. Configuration 
+ ## You may modify the content of this file. Configuration
  ## modifications will be preserved. Modifications in
  ## comments may be mangled.
  ##
@@ -209,9 +209,9 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::BackendMgr>, 
-L<Config::Model::Backend::Any>, 
+L<Config::Model>,
+L<Config::Model::BackendMgr>,
+L<Config::Model::Backend::Any>,
 
 =head1 AUTHOR
 

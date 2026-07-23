@@ -246,7 +246,7 @@ subtest 'Constraint validation' => sub {
 
 	throws_ok {
 		validate_strict(schema => $array_schema, args => {items => []});
-	} qr/must be at least length 1/, 'Array too small rejected';
+	} qr/must have at least 1/, 'Array too small rejected';
 
 	throws_ok {
 		validate_strict(schema => $array_schema, args => {items => [1,2,3,4]});

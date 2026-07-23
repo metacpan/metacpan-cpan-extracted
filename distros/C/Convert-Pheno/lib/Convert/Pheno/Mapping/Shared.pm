@@ -27,9 +27,6 @@ my $DEFAULT = get_defaults();
 use constant DEVEL_MODE => 0;
 use constant MAX_OMOP_INTEGER => 2_147_483_647;
 
-# Global hash (manual memoizing)
-my %SEEN = ();
-
 sub _public_ontology_entry {
     my ($entry) = @_;
     my %public_entry = %{$entry};
@@ -178,21 +175,29 @@ sub map_ontology_term {
     # 2) If already an object, assume pre‑mapped
     return $query if ref $query eq 'HASH';
 
+    # Cache lookup semantics as well as the query itself. Keeping the cache on
+    # the converter prevents results leaking between API requests.
+    my $column_key = defined $arg->{column} ? $arg->{column} : q{};
+    my $result_key = $arg->{require_concept_id} ? 'with_concept_id' : 'term';
+    my $cache =
+      ( $self->{_ontology_term_cache} ||= {} )->{$ontology}{$column_key}
+      {$result_key} ||= {};
+
     # 3) Fast return on cache hit
-    if ( exists $SEEN{$ontology}{$query} ) {
+    if ( exists $cache->{$query} ) {
         say "Skipping searching for <$query> in <$ontology> (cached)"
           if DEVEL_MODE;
         if ($profile_enabled) {
             $self->{db_profile}{mapping}{cache_hits}++;
             $self->{db_profile}{ontology}{$ontology}{cache_hits}++;
             my $resolution =
-              $SEEN{$ontology}{$query}{search_resolution} // 'fallback_na';
+              $cache->{$query}{search_resolution} // 'fallback_na';
             $self->{db_profile}{final_resolution}{$resolution}++;
             $self->{db_profile}{ontology}{$ontology}{final_resolution}
               {$resolution}++;
         }
-        _record_search_audit( $self, $query, $ontology, $SEEN{$ontology}{$query}, 'cache' );
-        return _public_ontology_entry( $SEEN{$ontology}{$query} );
+        _record_search_audit( $self, $query, $ontology, $cache->{$query}, 'cache' );
+        return _public_ontology_entry( $cache->{$query} );
     }
 
     # 4) --ohdsi-db
@@ -252,7 +257,7 @@ sub map_ontology_term {
         search_resolution => $search_resolution,
       };
 
-    $SEEN{$ontology}{$query} = $entry;
+    $cache->{$query} = $entry;
     _record_search_audit(
         $self,
         $query,
@@ -419,6 +424,9 @@ sub map2ohdsi {
         $id         = $ohdsi_dict->{$concept_id}{concept_code};
         $label      = $ohdsi_dict->{$concept_id}{concept_name};
         $vocabulary = $ohdsi_dict->{$concept_id}{vocabulary_id};
+        # OMOP has local vocabulary labels such as "Type Concept" or "Meas Type".
+        # Keep the vocabulary information but make it safe for Beacon CURIE-like ids.
+        $vocabulary =~ s/\s+/_/g;
         $data       = { id => qq($vocabulary:$id), label => $label };
     }
 
@@ -602,7 +610,7 @@ sub map_omop_visit_occurrence {
     # *** IMPORTANT ***
     # Ad hoc to avoid using --ohdsi-db while we find a solution to EUNOMIA not being self-contained
     my $ad_hoc_44818517 = {
-        id    => "Visit Type:OMOP4822465",
+        id    => "Visit_Type:OMOP4822465",
         label => "Visit derived from encounter on claim"
     };
     my $type =
@@ -618,10 +626,12 @@ sub map_omop_visit_occurrence {
       );
     my $start_date = map_iso8601_date2timestamp( $hashref->{visit_start_date} );
     my $end_date   = map_iso8601_date2timestamp( $hashref->{visit_end_date} );
-    my $info       = { VISIT_OCCURRENCE => { OMOP_columns => $hashref } };
+    my $info =
+      _source_info_enabled($self)
+      ? { VISIT_OCCURRENCE => { OMOP_columns => $hashref } }
+      : undef;
 
-    return {
-        _info         => $info,
+    my $visit = {
         id            => $visit_occurrence_id,
         concept       => $concept,
         type          => $type,
@@ -629,6 +639,8 @@ sub map_omop_visit_occurrence {
         end_date      => $end_date,
         occurrence_id => $hashref->{visit_occurrence_id}
     };
+    $visit->{_info} = $info if defined $info;
+    return $visit;
 }
 
 sub convert_date_to_iso8601 {
@@ -861,6 +873,11 @@ sub allocate_surrogate_integer {
     $self->{_surrogate_integer_counter}{$scope} = $next;
     $map->{$source_key} = $next;
     return $next;
+}
+
+sub _source_info_enabled {
+    my ($self) = @_;
+    return !exists $self->{source_info} || $self->{source_info};
 }
 
 1;

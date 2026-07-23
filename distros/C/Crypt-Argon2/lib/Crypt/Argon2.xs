@@ -98,6 +98,11 @@ static SV* S_argon2_raw(pTHX_ Argon2_type type, SV* password, SV* salt, int t_co
 }
 #define argon2_raw(...) S_argon2_raw(aTHX_ __VA_ARGS__)
 
+#undef SvPV
+#define SvPV(sv, len) SvPVbyte(sv, len)
+#undef SvPV_nolen
+#define SvPV_nolen(sv) SvPVbyte_nolen(sv)
+
 MODULE = Crypt::Argon2	PACKAGE = Crypt::Argon2
 
 SV* argon2_pass(Argon2_type type, const char* password, size_t length(password), const char* salt, size_t length(salt), int t_cost, SV* m_factor, int parallelism, size_t output_length)

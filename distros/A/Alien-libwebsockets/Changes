@@ -1,5 +1,9 @@
 Revision history for Alien::libwebsockets
 
+0.04    2026-07-22
+        - Fixed source download: use the GitHub API instead of scraping the
+          tags page, which GitHub no longer serves to anonymous clients.
+
 0.03    2026-04-04
         - Libev support now optional (auto-detected at build time).
         - Auto-detect latest libwebsockets release from GitHub.

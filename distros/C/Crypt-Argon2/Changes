@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.032     2026-07-22 16:35:05+02:00 Europe/Brussels
+          - Fix unicode bug in argon2*_pass functions
+
 0.031     2026-05-13 14:01:28+02:00 Europe/Brussels
           - CVE-2026-8463 fix OOB read in argon2_verify
           - Add argon2_implementation

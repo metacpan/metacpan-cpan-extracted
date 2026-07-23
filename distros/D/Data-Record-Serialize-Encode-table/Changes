@@ -1,5 +1,11 @@
 Revision history for Data-Record-Serialize-Encode-table
 
+0.02      2026-07-22 10:57:09 EDT
+
+  [BUILD]
+
+    * add missing prereqs
+
 0.01      2026-07-21 18:43:14 EDT
 
 * First release upon an unsuspecting world.

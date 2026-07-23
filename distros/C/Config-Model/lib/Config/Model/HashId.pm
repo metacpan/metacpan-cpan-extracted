@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::HashId 2.165;
+package Config::Model::HashId 2.166;
 
 use Mouse;
 use 5.20.0;
@@ -565,7 +565,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -632,7 +632,7 @@ Swap the order of the 2 keys. Ignored for non ordered hash.
 
 Parameters: C<< ( key1 , key2 ) >>
 
-Rename key1 in key2. 
+Rename key1 in key2.
 
 Also also optional check parameter to disable warning:
 
@@ -695,8 +695,8 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::Instance>, 
+L<Config::Model>,
+L<Config::Model::Instance>,
 L<Config::Model::AnyId>,
 L<Config::Model::ListId>,
 L<Config::Model::Value>

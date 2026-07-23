@@ -2,6 +2,11 @@
 %   my $from_statuses = $Queue->{statuses} || [];
 %   my $to_statuses   = [ grep { $_ ne '__CREATE__' } @$from_statuses ];
       <div id="<% $safe_name %>-content" class="tab-pane fade <% $Queue->{active} ? 'show active' : ''  %>" role="tabpanel" aria-labelledby="<% "category-tab-" . $safe_name %>">
+% if ( $missing ) {
+        <div class="mt-2 alert alert-warning" role="alert">
+          <% loc('The queue "[_1]" in this configuration could not be loaded. It may have been renamed or deleted. Remove this entry or correct the queue name.', $name) %>
+        </div>
+% }
 <&| /Widgets/TitleBox, title => loc("Current requirements") &>
 <br/>
 <&| /Widgets/TitleBox, title => loc("Status changes") &>
@@ -44,6 +49,7 @@
         </div>
 </&>
 
+% unless ( $missing ) {
 <&| /Widgets/TitleBox, title => loc("Add status change") &>
 <div class="row mt-2">
   <div class="boxcontainer col-md-6"><% loc('From') %></div>
@@ -234,6 +240,7 @@ while ( my $CustomField = $CFs->Next ) {
   </span>
 </div>
 </&>
+% }
       </div>
 
 <script type="text/javascript">
@@ -263,6 +270,7 @@ while ( my $CustomField = $CFs->Next ) {
 <%INIT>
 my $name     = $Queue->{name};
 my $queue_object = $Queue->{object};
+my $missing  = $Queue->{missing};
 my $safe_name  = RT::Extension::MandatoryOnTransition::HTMLSafeQueueName( $Queue->{name} );
 </%INIT>
 <%ARGS>

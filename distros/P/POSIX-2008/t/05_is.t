@@ -117,7 +117,7 @@ SKIP: {
   ok(!POSIX::2008::isalnum("$alnum$space"), '!isalnum(alnum+space)');
   ok(!POSIX::2008::isalnum(''), "!isalnum('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isalnum(undef), 'isalnum(undef)');
+  ok(!POSIX::2008::isalnum(undef), '!isalnum(undef)');
 }
 
 SKIP: {
@@ -128,7 +128,7 @@ SKIP: {
   ok(!POSIX::2008::isalpha("$alpha$space"), '!isalpha(alpha+space)');
   ok(!POSIX::2008::isalpha(''), "!isalpha('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isalpha(undef), 'isalpha(undef)');
+  ok(!POSIX::2008::isalpha(undef), '!isalpha(undef)');
 }
 
 SKIP: {
@@ -139,7 +139,7 @@ SKIP: {
   ok(!POSIX::2008::isascii("$ascii\x80"), '!isascii(ascii+0x80)');
   ok(!POSIX::2008::isascii(''), "!isascii('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isascii(undef), 'isascii(undef)');
+  ok(!POSIX::2008::isascii(undef), '!isascii(undef)');
 }
 
 SKIP: {
@@ -150,7 +150,7 @@ SKIP: {
   ok(!POSIX::2008::isblank("$blank$digit"), '!isblank(blank+digit)');
   ok(!POSIX::2008::isblank(''), "!isblank('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isblank(undef), 'isblank(undef)');
+  ok(!POSIX::2008::isblank(undef), '!isblank(undef)');
 }
 
 SKIP: {
@@ -161,7 +161,7 @@ SKIP: {
   ok(!POSIX::2008::iscntrl("$cntrl$digit"), '!iscntrl(cntrl+digit)');
   ok(!POSIX::2008::iscntrl(''), "!iscntrl('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::iscntrl(undef), 'iscntrl(undef)');
+  ok(!POSIX::2008::iscntrl(undef), '!iscntrl(undef)');
 }
 
 SKIP: {
@@ -172,7 +172,7 @@ SKIP: {
   ok(!POSIX::2008::isdigit("$digit$space"), '!isdigit(digit+space)');
   ok(!POSIX::2008::isdigit(''), "!isdigit('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isdigit(undef), 'isdigit(undef)');
+  ok(!POSIX::2008::isdigit(undef), '!isdigit(undef)');
 }
 
 SKIP: {
@@ -183,7 +183,7 @@ SKIP: {
   ok(!POSIX::2008::isgraph("$graph$space"), '!isgraph(graph+space)');
   ok(!POSIX::2008::isgraph(''), "!isgraph('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isgraph(undef), 'isgraph(undef)');
+  ok(!POSIX::2008::isgraph(undef), '!isgraph(undef)');
 }
 
 SKIP: {
@@ -194,7 +194,7 @@ SKIP: {
   ok(!POSIX::2008::islower("$lower$upper"), '!islower(lower+upper)');
   ok(!POSIX::2008::islower(''), "!islower('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::islower(undef), 'islower(undef)');
+  ok(!POSIX::2008::islower(undef), '!islower(undef)');
 }
 
 SKIP: {
@@ -205,7 +205,7 @@ SKIP: {
   ok(!POSIX::2008::isprint("$print$space"), '!isprint(print+space)');
   ok(!POSIX::2008::isprint(''), "!isprint('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isprint(undef), 'isprint(undef)');
+  ok(!POSIX::2008::isprint(undef), '!isprint(undef)');
 }
 
 SKIP: {
@@ -216,7 +216,7 @@ SKIP: {
   ok(!POSIX::2008::ispunct("$punct$space"), '!ispunct(punct+space)');
   ok(!POSIX::2008::ispunct(''), "!ispunct('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::ispunct(undef), 'ispunct(undef)');
+  ok(!POSIX::2008::ispunct(undef), '!ispunct(undef)');
 }
 
 SKIP: {
@@ -227,7 +227,7 @@ SKIP: {
   ok(!POSIX::2008::isspace("$space$cntrl"), '!isspace(space+cntrl)');
   ok(!POSIX::2008::isspace(''), "!isspace('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isspace(undef), 'isspace(undef)');
+  ok(!POSIX::2008::isspace(undef), '!isspace(undef)');
 }
 
 SKIP: {
@@ -238,7 +238,7 @@ SKIP: {
   ok(!POSIX::2008::isupper("$upper$lower"), '!isupper(upper+lower)');
   ok(!POSIX::2008::isupper(''), "!isupper('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isupper(undef), 'isupper(undef)');
+  ok(!POSIX::2008::isupper(undef), '!isupper(undef)');
 }
 
 SKIP: {
@@ -249,5 +249,5 @@ SKIP: {
   ok(!POSIX::2008::isxdigit("$xdigit$alpha"), '!isxdigit(xdigit+alpha)');
   ok(!POSIX::2008::isxdigit(''), "!isxdigit('')");
   no warnings 'uninitialized';
-  ok(!POSIX::2008::isxdigit(undef), 'isxdigit(undef)');
+  ok(!POSIX::2008::isxdigit(undef), '!isxdigit(undef)');
 }

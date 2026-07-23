@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 #
 # Copyright (c) 2016 Jeff Fearn <Jeff.Fearn@gmail.com>
+# Copyright (c) 2026 Alex Muntada <alexm@alexm.org>
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as Perl itself. See perlartistic.
@@ -20,11 +21,11 @@ my $rv = $conv->convert_file('lib/Pod/POM/View/Restructured.pm');
 ok($rv);
 
 # An array of RST strings we should get in the output
-# You will ahve to escape any quanity chars. e.g. ?, *, etc.
+# You will have to escape any quanity chars. e.g. ?, *, etc.
 my @expected = (
     '.. _Pod::POM::View::Restructured:',
     '.. _Pod::POM::View::Restructured::NAME:',
-    '`Pod::POM <http://search.cpan.org/search\?query=Pod%3a%3aPOM&mode=module>`_'
+    '`Pod::POM <https://metacpan.org/search\?q=Pod%3a%3aPOM>`_'
 );
 
 my $count = 0;

@@ -1,0 +1,28 @@
+a64l abort abs access acos acosh alarm asin asinh atan atan2 atanh atof atoi
+basename cabs cacos cacosh carg casin casinh catan catanh catclose catgets
+catopen cbrt ccos ccosh ceil cexp chdir chmod chown cimag clock
+clock_getcpuclockid clock_getres clock_gettime clock_nanosleep clock_settime
+clog close confstr conj copysign cos cosh cpow cproj creal creat csin csinh
+csqrt ctan ctanh dirname div dlclose dlerror dlopen dlsym drand48 endutxent
+erand48 erf erfc execveat exp exp2 expm1 fabs faccessat fchmodat fchownat
+fdatasync fdim fdopen fdopendir feclearexcept fegetround feraiseexcept
+fesetround fetestexcept fexecve ffs floor fma fmax fmin fmod fnmatch
+fpclassify frexp fstatat fsync futimens getdate getdate_err getegid getentropy
+geteuid getgid gethostid gethostname getitimer getpriority getresgid getresuid
+getsid getuid getutxent getutxid getutxline grantpt hypot ilogb isalnum
+isalpha isascii isatty isblank iscntrl isdigit isfinite isgraph isgreaterequal
+isinf isless islessequal islessgreater islower isnan isnormal isprint ispunct
+isspace isunordered isupper isxdigit j0 j1 jn jrand48 killpg l64a lchown ldexp
+lgamma link linkat log log10 log1p log2 logb lrand48 lrint lround lstat mkdir
+mkdirat mkdtemp mkfifo mkfifoat mknod mknodat mkostemp mkstemp mrand48
+nanosleep nearbyint nextafter nexttoward nice nrand48 open openat openat2
+pathconf pause poll posix_fadvise posix_fallocate posix_openpt pow ppoll pread
+preadv preadv2 psignal ptsname pwrite pwritev pwritev2 random raise read
+readlink readlinkat readv realpath remainder remove removeat remquo rename
+renameat renameat2 rint rmdir round scalbn seed48 setegid seteuid setgid
+setitimer setpriority setregid setresgid setresuid setreuid setsid setuid
+setutxent sighold sigignore signbit sigpause sigrelse sin sinh sqrt srand48
+srandom stat statvfs strptime strsignal symlink symlinkat sync sysconf tan
+tanh tgamma timer_create timer_delete timer_getoverrun timer_gettime
+timer_settime trunc truncate ttyname unlink unlinkat unlockpt utimensat write
+writev y0 y1 yn zaphod

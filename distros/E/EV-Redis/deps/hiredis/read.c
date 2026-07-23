@@ -47,6 +47,27 @@
 #include "sds.h"
 #include "win32.h"
 
+#ifndef HIREDIS_FLOAT_STRTOD
+/* RESP3 doubles are parsed with ffc (pure-C99 single header) by default: it is
+ * several times faster than strtod() and locale-independent (strtod honours
+ * LC_NUMERIC, which misparses the always-'.'-separated RESP3 doubles in a
+ * non-'.' locale). Define HIREDIS_FLOAT_STRTOD to fall back to strtod(). */
+#define FFC_IMPL   /* emit ffc's implementation in this (sole) translation unit */
+/* ffc.h is a vendored third-party single header. Its public entry points are
+ * `extern inline` and call file-local `static` helpers; that is well-defined for
+ * our single-TU include but trips Clang's (default-on) -Wstatic-in-inline, which
+ * hiredis's -Werror turns into a build failure on Apple Clang. Silence it just
+ * for this header. GCC has no such warning. */
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wstatic-in-inline"
+#endif
+#include "ffc.h"
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
+#endif
+
 /* Initial size of our nested reply stack and how much we grow it when needd */
 #define REDIS_READER_STACK_SIZE 9
 
@@ -288,7 +309,7 @@ static int processLineItem(redisReader *r) {
                 obj = (void*)REDIS_REPLY_INTEGER;
             }
         } else if (cur->type == REDIS_REPLY_DOUBLE) {
-            char buf[326], *eptr;
+            char buf[326];
             double d;
 
             if ((size_t)len >= sizeof(buf)) {
@@ -297,8 +318,43 @@ static int processLineItem(redisReader *r) {
                 return REDIS_ERR;
             }
 
+            /* Copy + NUL-terminate (as the strtod path does) so the string
+             * handed to createDouble keeps its terminator; some custom
+             * createDouble callbacks rely on it. ffc itself parses a
+             * [start,end) range and needs no terminator. */
             memcpy(buf,p,len);
             buf[len] = '\0';
+
+#ifndef HIREDIS_FLOAT_STRTOD
+            if (len == 3 && strcasecmp(buf,"inf") == 0) {
+                d = INFINITY; /* Positive infinite. */
+            } else if (len == 4 && strcasecmp(buf,"-inf") == 0) {
+                d = -INFINITY; /* Negative infinite. */
+            } else if ((len == 3 && strcasecmp(buf,"nan") == 0) ||
+                       (len == 4 && strcasecmp(buf, "-nan") == 0)) {
+                d = NAN; /* nan. */
+            } else {
+                /* RESP3 allows only finite values besides the inf/nan tokens
+                 * handled above, so run ffc with NO_INFNAN; the full-consume +
+                 * isfinite checks then mirror the strtod path's eptr/isfinite. */
+                ffc_parse_options o = ffc_parse_options_default();
+                o.format |= FFC_FORMAT_FLAG_NO_INFNAN;
+                ffc_result res = ffc_from_chars_double_options(buf, buf + len, &d, o);
+                if (res.outcome != FFC_OUTCOME_OK || res.ptr != buf + len ||
+                    !isfinite(d)) {
+                    __redisReaderSetError(r,REDIS_ERR_PROTOCOL,
+                            "Bad double value");
+                    return REDIS_ERR;
+                }
+            }
+
+            if (r->fn && r->fn->createDouble) {
+                obj = r->fn->createDouble(cur,d,buf,len);
+            } else {
+                obj = (void*)REDIS_REPLY_DOUBLE;
+            }
+#else
+            char *eptr;
 
             if (len == 3 && strcasecmp(buf,"inf") == 0) {
                 d = INFINITY; /* Positive infinite. */
@@ -325,6 +381,7 @@ static int processLineItem(redisReader *r) {
             } else {
                 obj = (void*)REDIS_REPLY_DOUBLE;
             }
+#endif
         } else if (cur->type == REDIS_REPLY_NIL) {
             if (len != 0) {
                 __redisReaderSetError(r,REDIS_ERR_PROTOCOL,

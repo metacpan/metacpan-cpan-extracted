@@ -101,7 +101,6 @@ Slaven
 Spiros
 Stauner
 Steffen
-Steffen_Ullrich
 Steve
 SteveHay
 Stone

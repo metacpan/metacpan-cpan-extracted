@@ -1,0 +1,17 @@
+^blib/
+^Matcher\.c$
+^Makefile$
+^Makefile\.old$
+^pm_to_blib
+^MYMETA\.
+^Cavil-Matcher-[0-9._]+\.tar\.gz$
+\.o$
+\.bs$
+\.so$
+^cover_db/
+\bcorrupt\.
+~$
+^\.git
+^\.github/
+^\.perltidyrc$
+\.bak$

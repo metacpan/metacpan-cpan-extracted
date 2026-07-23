@@ -21,7 +21,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,13 +31,12 @@ no_index:
   directory:
     - t
     - xt
+  package:
+    - LWP::Protocol::https::Socket
 provides:
   LWP::Protocol::https:
     file: lib/LWP/Protocol/https.pm
-    version: '6.15'
-  LWP::Protocol::https::Socket:
-    file: lib/LWP/Protocol/https.pm
-    version: '6.15'
+    version: '6.16'
 requires:
   IO::Socket::SSL: '1.970'
   LWP::Protocol::http: '0'
@@ -52,10 +51,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/LWP-Protocol-https/issues
   homepage: https://github.com/libwww-perl/LWP-Protocol-https
   repository: https://github.com/libwww-perl/LWP-Protocol-https.git
-version: '6.15'
+version: '6.16'
 x_Dist_Zilla:
   perl:
-    version: '5.042000'
+    version: '5.042002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -78,11 +77,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -91,7 +90,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.033'
+              version: '6.037'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -106,19 +105,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -147,7 +146,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.038'
+      version: '0.039'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -155,11 +154,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -174,7 +173,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Git::VersionManager/pluginbundle version'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -230,7 +229,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.15
+          tag: v6.16
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -255,7 +254,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Git::VersionManager/NextRelease'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -287,10 +286,10 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.033'
+          version: '6.037'
         Dist::Zilla::Role::TestRunner:
           default_jobs: '8'
-          version: '6.033'
+          version: '6.037'
       name: MakeMaker::Awesome
       version: '0.49'
     -
@@ -309,7 +308,7 @@ x_Dist_Zilla:
           skiptest:
             - has_readme
       name: Test::Kwalitee
-      version: '2.12'
+      version: '2.13'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: MojibakeTests
@@ -339,7 +338,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: Test::Compile
-      version: '2.058'
+      version: '2.059'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -370,7 +369,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: MetaTests
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
@@ -381,7 +380,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: Test::Pod::Coverage::Configurable
@@ -416,15 +415,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -440,52 +439,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.033'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.033'
+      version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.033'
+    version: '6.037'
 x_contributors:
   - 'Adam Kennedy <adamk@cpan.org>'
   - 'Adam Sjogren <asjo@koldfront.dk>'
@@ -546,7 +545,6 @@ x_contributors:
   - 'Slaven Rezic <slaven@rezic.de>'
   - 'Spiros Denaxas <s.denaxas@gmail.com>'
   - 'Steffen Ullrich <github@maulwuff.de>'
-  - 'Steffen Ullrich <Steffen_Ullrich@genua.de>'
   - 'Steve Hay <SteveHay@planit.com>'
   - 'Tim Couzins <tim.couzins@sophos.com>'
   - 'Todd Lipcon <todd@amiestreet.com>'
@@ -558,6 +556,6 @@ x_contributors:
   - 'Yuri Karaban <tech@askold.net>'
   - 'Yury Zavarin <yury.zavarin@gmail.com>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.42.0
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

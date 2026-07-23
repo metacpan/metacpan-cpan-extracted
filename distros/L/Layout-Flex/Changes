@@ -1,4 +1,7 @@
 Revision history for Layout-Flex
 
+0.03    2026-07-23
+	- Integrate with Font::Metrics
+
 0.01    2026-07-21
 	- First version

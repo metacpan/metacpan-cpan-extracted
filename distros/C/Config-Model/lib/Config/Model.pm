@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.165;
+package Config::Model 2.166;
 
 use 5.20.0;
 use strict ;
@@ -799,7 +799,7 @@ sub translate_legacy_info {
     }
 
     $legacy_logger->debug(
-        Data::Dumper->Dump( [$info], [ 'translated_' . $elt_name ] ) 
+        Data::Dumper->Dump( [$info], [ 'translated_' . $elt_name ] )
     ) if $legacy_logger->is_debug;
     return;
 }
@@ -887,8 +887,8 @@ sub translate_cargo_info {
     }
 
     $info->{cargo} = \%cargo;
-    $legacy_logger->debug( 
-        Data::Dumper->Dump( [$info], [ 'translated_' . $elt_name ] ) 
+    $legacy_logger->debug(
+        Data::Dumper->Dump( [$info], [ 'translated_' . $elt_name ] )
     ) if $legacy_logger->is_debug;
     return;
 }
@@ -1009,7 +1009,7 @@ sub translate_id_default_info {
         $self->show_legacy_issue([ $warn, "Use default_keys" ]);
     }
 
-    $legacy_logger->debug( 
+    $legacy_logger->debug(
         "translate_id_default_info $elt_name output:",
         Data::Dumper->Dump( [$info], [qw/new_info/])
     ) if $legacy_logger->is_debug;
@@ -1214,7 +1214,7 @@ sub translate_rules_arg {
                     . "'$config_class_name->$elt_name': "
                     . "rule effect must be a hash ref. Got '$rule_ref'" );
             }
-            
+
             my %new_rule = (
                 when => join( ' or ', @bool_expr ),
                 apply => $rule_ref,
@@ -1247,7 +1247,7 @@ sub translate_legacy_builtin {
     my $raw_builtin_default = delete $normalized_model->{built_in};
     return unless defined $raw_builtin_default;
 
-    $legacy_logger->debug( 
+    $legacy_logger->debug(
         Data::Dumper->Dump( [$normalized_model], ['builtin to translate'] )
     ) if $legacy_logger->is_debug;
 
@@ -1256,7 +1256,7 @@ sub translate_legacy_builtin {
 
     $model->{upstream_default} = $raw_builtin_default;
 
-    $legacy_logger->debug( Data::Dumper->Dump( [$model], ['translated_builtin'] )) 
+    $legacy_logger->debug( Data::Dumper->Dump( [$model], ['translated_builtin'] ))
         if $legacy_logger->is_debug;
     return;
 }
@@ -1267,7 +1267,7 @@ sub translate_legacy_built_in_list {
     my $raw_builtin_default = delete $normalized_model->{built_in_list};
     return unless defined $raw_builtin_default;
 
-    $legacy_logger->debug( 
+    $legacy_logger->debug(
         Data::Dumper->Dump( [$normalized_model], ['built_in_list to translate'] )
     ) if $legacy_logger->is_debug;
 
@@ -1986,7 +1986,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2024-11-28 09:47+0100\n"
+"Last-Translator: Eduardo Domínguez Vázquez <eduardo.dominguez@uib.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. ($label, $CurrentUser->loc($transition),  $CurrentUser->loc($field_label{$transition}))
+#. ($role_name, $CurrentUser->loc($transition), $CurrentUser->loc( $args{'To'} ))
+#. ($cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}))
+#: lib/RT/Extension/MandatoryOnTransition.pm:575 lib/RT/Extension/MandatoryOnTransition.pm:803 lib/RT/Extension/MandatoryOnTransition.pm:943
+msgid "%1 is required when changing %2 to %3"
+msgstr "El campo '%1' es obligatorio para cambiar '%2' a '%3'."
+
+#. ($role)
+#: lib/RT/Extension/MandatoryOnTransition.pm:650
+msgid "Failed to load role %1 for ticket"
+msgstr "Error al cargar el rol %1 del tiquet"
+
+#. ($group_name)
+#: lib/RT/Extension/MandatoryOnTransition.pm:685
+msgid "Could not load group: %1"
+msgstr "No se puede cargar el grupo: %1"
+
+#. ($value)
+#. ($value)
+#. ($value)
+#: lib/RT/Extension/MandatoryOnTransition.pm:692 lib/RT/Extension/MandatoryOnTransition.pm:739 lib/RT/Extension/MandatoryOnTransition.pm:762
+msgid "Could not load user: %1"
+msgstr "No se puede cargar el usuario: %1"
+
+#. ($roles, $role_name)
+#: lib/RT/Extension/MandatoryOnTransition.pm:796
+msgid "A member of group %1 is required for role: %2"
+msgstr "Se requiere un miembro del grupo %1 para el rol: %2"
+
+#. ($cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values)
+#: lib/RT/Extension/MandatoryOnTransition.pm:904
+msgid "%1 must be one of: %4 when changing %2 to %3"
+msgstr "%1 debe ser uno de: %4 al cambiar %2 a %3"
+
+#. ($cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values)
+#: lib/RT/Extension/MandatoryOnTransition.pm:909
+msgid "%1 must be %4 when changing %2 to %3"
+msgstr "%1 debe ser %4 al cambiar %2 a %3"
+
+#. ($cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values)
+#: lib/RT/Extension/MandatoryOnTransition.pm:923
+msgid "%1 must not be one of: %4 when changing %2 to %3"
+msgstr "%1 no debería ser uno de: %4 al cambiar %2 a %3"
+
+#. ($cf->Name, $CurrentUser->loc($transition), $CurrentUser->loc($field_label{$transition}), $valid_values)
+#: lib/RT/Extension/MandatoryOnTransition.pm:928
+msgid "%1 must not be %4 when changing %2 to %3"
+msgstr "%1 no debería ser %4 al cambiar %2 a %3"
+

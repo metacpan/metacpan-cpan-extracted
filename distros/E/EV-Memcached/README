@@ -32,8 +32,8 @@ DESCRIPTION
 
     Highlights:
 
-    *   Binary protocol with pipelining, multi-get via GETKQ + NOOP fence, and
-        fire-and-forget quiet variants (SETQ, FLUSHQ).
+    *   Binary protocol with pipelining, multi-get via GETKQ + NOOP fence,
+        and fire-and-forget quiet variants (SETQ, FLUSHQ).
 
     *   TCP and Unix socket transports, optional SASL PLAIN authentication
         (automatic re-auth on reconnect).
@@ -46,12 +46,12 @@ DESCRIPTION
         disconnect reason on teardown), DESTROY is reentrancy-safe across
         callback contexts.
 
-    AnyEvent applications can use this module unchanged, since AnyEvent runs on
-    top of EV when EV is loaded.
+    AnyEvent applications can use this module unchanged, since AnyEvent runs
+    on top of EV when EV is loaded.
 
 ENCODING
-    This module treats all keys and values as byte strings. Encode UTF-8 strings
-    before passing them in:
+    This module treats all keys and values as byte strings. Encode UTF-8
+    strings before passing them in:
 
         use Encode;
         $mc->set(foo => encode_utf8($val), sub { ... });
@@ -62,19 +62,22 @@ ENCODING
 CALLBACK CONVENTIONS
     Every command callback receives "($result, $err)". On success $err is
     "undef"; on protocol error $err holds a string like "NOT_STORED" or
-    "NOT_FOUND". On a cache miss for "get"/"gat", both arguments are "undef" (a
-    miss is not an error).
+    "NOT_FOUND". On a cache miss for "get"/"gat", both arguments are "undef"
+    (a miss is not an error).
 
-    Callback exceptions are caught with "G_EVAL" and reported via "warn" so a
-    stray "die" never unwinds the libev event loop. To abort on errors, set a
-    flag and break the loop; do not rely on "die" propagating out of a callback.
+    Callback exceptions are caught with "G_EVAL" and reported via "warn" so
+    a stray "die" never unwinds the libev event loop. To abort on errors,
+    set a flag and break the loop; do not rely on "die" propagating out of a
+    callback.
 
 CONSTRUCTOR
   new(%options)
-    Construct an instance. All options are optional; with none, the client is
-    unconfigured and you must call "connect" / "connect_unix" later. Specifying
-    "host" (or "path") at construction time triggers an immediate non-blocking
-    connect.
+    Construct an instance. All options are optional; with none, the client
+    is unconfigured and you must call "connect" / "connect_unix" later.
+    Specifying "host" (or "path") at construction time triggers an immediate
+    non-blocking connect. "on_connect" is always delivered from the event
+    loop, never synchronously from the constructor, so installing handlers
+    right after "new" is safe.
 
         my $mc = EV::Memcached->new(
             host     => '127.0.0.1',
@@ -97,26 +100,29 @@ CONSTRUCTOR
         EV watcher priority. Higher = serviced before other EV watchers.
 
     keepalive => $seconds
-        TCP keepalive idle time. Set to 0 to disable. Ignored on Unix sockets.
+        TCP keepalive idle time. Set to 0 to disable. Ignored on Unix
+        sockets.
 
    Timeouts and flow control
     connect_timeout => $ms
-        Abort an in-progress non-blocking connect after this many milliseconds.
-        0 = no timeout (default). Does not apply to Unix sockets or to
-        immediately-completing localhost connects.
+        Abort an in-progress non-blocking connect after this many
+        milliseconds. 0 = no timeout (default). Applies to any connect that
+        does not complete immediately (including unix sockets under rare
+        kernel backlog conditions); immediately-completing connects finish
+        on the next event loop iteration without arming this timer.
 
     command_timeout => $ms
-        Disconnect with "command timeout" error if no response arrives within
-        this interval. The timer resets on every response from the server. 0 =
-        no timeout (default).
+        Disconnect with "command timeout" error if no response arrives
+        within this interval. The timer resets on every response from the
+        server. 0 = no timeout (default).
 
     max_pending => $num
         Cap on concurrent in-flight commands. Excess commands are held in a
         local waiting queue. 0 = unlimited (default).
 
     waiting_timeout => $ms
-        Maximum time a command may sit in the waiting queue before its callback
-        fires with "waiting timeout". 0 = unlimited (default).
+        Maximum time a command may sit in the waiting queue before its
+        callback fires with "waiting timeout". 0 = unlimited (default).
 
     resume_waiting_on_reconnect => $bool
         If true, the waiting queue survives a disconnect and is replayed on
@@ -127,8 +133,8 @@ CONSTRUCTOR
         Enable automatic reconnection on transport errors.
 
     reconnect_delay => $ms (default 1000)
-        Delay before each reconnect attempt. The delay is always honored via a
-        timer; setting it to 0 still defers through the event loop (no
+        Delay before each reconnect attempt. The delay is always honored via
+        a timer; setting it to 0 still defers through the event loop (no
         synchronous retry recursion).
 
     max_reconnect_attempts => $num
@@ -139,24 +145,27 @@ CONSTRUCTOR
     username => $str
     password => $str
         SASL PLAIN credentials. When both are set, the client authenticates
-        after every successful connect (and reconnect). Pre-connect commands sit
-        in the waiting queue until SASL completes. Requires a memcached build
-        with SASL support and the "-S" flag.
+        after every successful connect (and reconnect). Pre-connect commands
+        sit in the waiting queue until SASL completes. Requires a memcached
+        build with SASL support and the "-S" flag.
 
    Event handlers
     on_error => $cb->($errstr)
-        Connection-level error callback. Default: write the message to "STDERR"
-        via "warn". Callbacks are run under "G_EVAL", so any "die" in a custom
-        handler is demoted to a warning -- use an explicit flag if you need to
-        terminate.
+        Connection-level error callback. Default: write the message to
+        "STDERR" via "warn". Callbacks are run under "G_EVAL", so any "die"
+        in a custom handler is demoted to a warning -- use an explicit flag
+        if you need to terminate.
 
     on_connect => $cb->()
         Fires once the connection is fully established (after SASL, when
-        applicable).
+        applicable; on SASL auth failure it never fires). Always delivered
+        from the event loop -- never synchronously from "new" / "connect" /
+        "connect_unix" -- so a handler installed right after the constructor
+        still fires.
 
     on_disconnect => $cb->()
-        Fires after a disconnect, after pending callbacks have been cancelled.
-        For server-initiated close, this fires before "on_error".
+        Fires after a disconnect, after pending callbacks have been
+        cancelled. For server-initiated close, this fires before "on_error".
 
 LIFECYCLE
   connect($host, [$port])
@@ -164,48 +173,55 @@ LIFECYCLE
     auto-reconnect timer and clears any prior "path" setting.
 
   connect_unix($path)
-    Connect via Unix domain socket. Stops any pending auto-reconnect timer and
-    clears any prior "host" setting.
+    Connect via Unix domain socket. Stops any pending auto-reconnect timer
+    and clears any prior "host" setting.
 
   disconnect
-    Disconnect cleanly. Cancels any pending reconnect, drains pending command
-    callbacks with "(undef, "disconnected")", then fires "on_disconnect". For an
-    intentional disconnect, "on_error" does not fire -- that distinction lets
-    you tell user-initiated teardown from server-side close.
+    Disconnect cleanly. Cancels any pending reconnect, drains pending
+    command callbacks with "(undef, "disconnected")", then fires
+    "on_disconnect". For an intentional disconnect, "on_error" does not fire
+    -- that distinction lets you tell user-initiated teardown from
+    server-side close.
 
   is_connected
-    Returns true while a session is established or in progress (TCP handshake /
-    SASL exchange). Commands issued in the connecting phase are queued and sent
-    on completion.
+    Returns true while a session is established or in progress (TCP
+    handshake / SASL exchange). Commands issued in the connecting phase are
+    queued and sent on completion.
 
   quit([$cb])
-    Send a memcached "QUIT" and let the server close the connection.
+    Send a memcached "QUIT" and let the server close the connection. Treated
+    as an intentional disconnect: "on_disconnect" fires when the server
+    closes, but "on_error" does not, and auto-reconnect is suppressed.
 
 STORAGE COMMANDS
-    Each command's callback receives "($result, $err)". $result is 1 on success.
+    Each command's callback receives "($result, $err)". $result is 1 on
+    success.
 
   set($key, $value, [$expiry, [$flags,]] [$cb])
-    Store unconditionally. Without $cb this becomes fire-and-forget (SETQ): no
-    response is received and any server-side failure is silently dropped.
+    Store unconditionally. Without $cb this becomes fire-and-forget (SETQ):
+    no response is received and any server-side failure is silently dropped.
 
   add($key, $value, [$expiry, [$flags,]] [$cb])
-    Store only if the key does not exist. Errors with "NOT_STORED" if present.
+    Store only if the key does not exist. Errors with "EXISTS" if present
+    (the server may append a message, e.g. "EXISTS: Data exists for key.").
 
   replace($key, $value, [$expiry, [$flags,]] [$cb])
-    Store only if the key already exists. Errors with "NOT_STORED" if absent.
+    Store only if the key already exists. Errors with "NOT_FOUND" if absent.
 
   cas($key, $value, $cas, [$expiry, [$flags,]] [$cb])
     Compare-and-swap. The $cas token comes from a prior "gets" / "gats" /
-    "mgets". Errors with "EXISTS" on token mismatch or "NOT_FOUND" if the key
-    disappeared.
+    "mgets". Errors with "EXISTS" on token mismatch or "NOT_FOUND" if the
+    key disappeared.
 
   append($key, $data, [$cb])
-    Append bytes to an existing value. Errors with "NOT_STORED" if the key does
-    not exist. Without $cb, errors are silently dropped.
+    Append bytes to an existing value. Errors with "NOT_STORED" if the key
+    does not exist. Without $cb the result is discarded, but the server
+    still sends a response (the non-quiet opcode is used); this is not
+    fire-and-forget like "set".
 
   prepend($key, $data, [$cb])
-    Prepend bytes to an existing value. Same error and fire-and-forget semantics
-    as "append".
+    Prepend bytes to an existing value. Same error and discard semantics as
+    "append".
 
   delete($key, [$cb])
     Delete a key. Errors with "NOT_FOUND" if absent.
@@ -219,8 +235,9 @@ RETRIEVAL COMMANDS
     Like "get" but returns "{ value => ..., flags => ..., cas => ... }".
 
   mget(\@keys, [$cb->(\%values, $err)])
-    Multi-get, internally pipelined as a sequence of GETKQ packets terminated by
-    a NOOP fence. Returns a hash containing only the keys that were hits:
+    Multi-get, internally pipelined as a sequence of GETKQ packets
+    terminated by a NOOP fence. Returns a hash containing only the keys that
+    were hits:
 
         $mc->mget([qw(k1 k2 k3)], sub {
             my ($values, $err) = @_;
@@ -238,8 +255,8 @@ RETRIEVAL COMMANDS
 ATOMIC COUNTERS
   incr($key, [$delta, [$initial, [$expiry,]]] [$cb->($new_value, $err)])
     Atomic increment. $delta defaults to 1. $expiry defaults to 0xFFFFFFFF,
-    which means "do not auto-create" (the call then errors with "NOT_FOUND").
-    Pass any other expiry to auto-create with $initial:
+    which means "do not auto-create" (the call then errors with
+    "NOT_FOUND"). Pass any other expiry to auto-create with $initial:
 
         $mc->incr('counter', 1, sub { ... });          # require existing
         $mc->incr('counter', 1, 100, 300, sub { ... }); # auto-create at 100, 5min TTL
@@ -247,17 +264,17 @@ ATOMIC COUNTERS
     $new_value is the post-increment counter value.
 
   decr($key, [$delta, [$initial, [$expiry,]]] [$cb->($new_value, $err)])
-    Atomic decrement. Memcached clamps the result at 0 (never negative). Same
-    auto-create semantics as "incr".
+    Atomic decrement. Memcached clamps the result at 0 (never negative).
+    Same auto-create semantics as "incr".
 
 EXPIRATION
   touch($key, $expiry, [$cb])
-    Update an existing key's expiration without fetching the value. Errors with
-    "NOT_FOUND" if absent.
+    Update an existing key's expiration without fetching the value. Errors
+    with "NOT_FOUND" if absent.
 
   gat($key, $expiry, [$cb->($value, $err)])
-    Get-and-touch: retrieve and update expiration in one round-trip. Same miss
-    semantics as "get".
+    Get-and-touch: retrieve and update expiration in one round-trip. Same
+    miss semantics as "get".
 
   gats($key, $expiry, [$cb->($info, $err)])
     Get-and-touch with metadata. Same shape as "gets".
@@ -275,23 +292,25 @@ SERVER COMMANDS
     Server version string.
 
   stats([$name,] [$cb->(\%stats, $err)])
-    Server statistics. Without $name, returns the default stats group. Common
-    groups: "settings", "items", "sizes", "slabs", "conns".
+    Server statistics. Without $name, returns the default stats group.
+    Common groups: "settings", "items", "sizes", "slabs", "conns".
 
 AUTHENTICATION
   sasl_auth($username, $password, [$cb])
-    Authenticate via SASL PLAIN. Auto-invoked on connect when both "username"
-    and "password" were passed to the constructor; call manually only when
-    authenticating after a no-auth construction.
+    Authenticate via SASL PLAIN. Auto-invoked on connect when both
+    "username" and "password" were passed to the constructor; call manually
+    only when authenticating after a no-auth construction.
 
   sasl_list_mechs([$cb->($mechs, $err)])
-    Query the server's supported mechanisms; returns a space-separated string
-    such as "PLAIN".
+    Query the server's supported mechanisms; returns a space-separated
+    string such as "PLAIN".
 
 LOCAL CONTROL
   skip_pending
-    Drain the in-flight queue, firing every callback with "(undef, "skipped")".
-    The connection itself is left intact.
+    Drain the in-flight queue, firing every callback with "(undef,
+    "skipped")". Responses for skipped commands are consumed and discarded
+    when they later arrive (strict FIFO opaque matching is preserved); the
+    connection genuinely stays usable for new commands.
 
   skip_waiting
     Same, but for the local waiting queue (commands not yet sent).
@@ -300,12 +319,15 @@ LOCAL CONTROL
     Number of commands sent and awaiting a response.
 
   waiting_count
-    Number of commands held in the local waiting queue (because the connection
-    is not ready, SASL is in progress, or "max_pending" is saturated).
+    Number of commands held in the local waiting queue (because the
+    connection is not ready, SASL is in progress, or "max_pending" is
+    saturated).
 
 ACCESSORS
-    Every option from "new" has a getter/setter of the same name. Calling
-    without arguments reads the current value; with one argument it writes and
+    The following options have a getter/setter of the same name (there are
+    no accessors for "host", "port", "path", "username", "password",
+    "reconnect_delay", "max_reconnect_attempts", or "loop"). Calling without
+    arguments reads the current value; with one argument it writes and
     (where meaningful, e.g. "keepalive") takes effect immediately.
 
     connect_timeout([$ms])
@@ -328,17 +350,23 @@ ACCESSORS
 
 DESTRUCTION
     If $mc goes out of scope while commands are in flight or queued, every
-    pending and waiting callback fires once with "(undef, "disconnected")". This
-    holds whether you call "disconnect" first or simply drop the reference.
+    pending and waiting callback fires once with "(undef, "disconnected")".
+    This holds whether you call "disconnect" first or simply drop the
+    reference -- including dropping the last reference from inside one of
+    the object's own callbacks (deferred DESTROY fires the remaining
+    callbacks before tearing down).
+
+    The one exception is global destruction (interpreter shutdown): no Perl
+    callbacks are invoked then; queues are freed silently.
 
     The clean shutdown idiom is:
 
         $mc->disconnect;   # drains queues, fires on_disconnect
         undef $mc;
 
-    If a callback closes over $mc (a common mistake -- every reference inside a
-    callback closure keeps the object alive), break the cycle before dropping
-    the outer reference:
+    If a callback closes over $mc (a common mistake -- every reference
+    inside a callback closure keeps the object alive), break the cycle
+    before dropping the outer reference:
 
         $mc->on_error(undef);
         $mc->on_connect(undef);
@@ -346,25 +374,29 @@ DESTRUCTION
         undef $mc;
 
     DESTROY is reentrant-safe: if a callback fired during teardown drops the
-    last external reference to a separate "EV::Memcached", that object's DESTROY
-    is correctly deferred and run once unwound.
+    last external reference to a separate "EV::Memcached", that object's
+    DESTROY is correctly deferred and run once unwound.
 
 BINARY PROTOCOL NOTES
-    The wire format is the memcached binary protocol -- a 24-byte header plus
-    body, with each request tagged by an opaque field used for in-flight
-    matching and pipelining. Multi-get is sent as a run of GETKQ packets ending
-    in a NOOP fence: the server emits a response only on hit, and the NOOP reply
-    terminates the batch. Fire-and-forget "set"/"flush" use the quiet SETQ /
-    FLUSHQ opcodes so the server sends no response at all.
+    The wire format is the memcached binary protocol -- a 24-byte header
+    plus body, with each request tagged by an opaque field used for
+    in-flight matching and pipelining. Multi-get is sent as a run of GETKQ
+    packets ending in a NOOP fence: the server emits a response only on hit,
+    and the NOOP reply terminates the batch. Fire-and-forget "set"/"flush"
+    use the quiet SETQ / FLUSHQ opcodes so the server sends no response at
+    all.
 
-    Commands that can legitimately fail ("add", "replace", "delete", "incr",
-    ...) always use the non-quiet opcode so error responses are consumed by the
-    client even when the user passed no callback. Keys are validated against the
+    Commands that can legitimately fail ("add", "replace", "append",
+    "prepend", "delete", "incr", ...) always use the non-quiet opcode so
+    error responses are consumed by the client even when the user passed no
+    callback. Response matching is strict FIFO per connection: responses
+    must arrive in request order, so only in-order servers are supported
+    (reordering proxies are unsupported). Keys are validated against the
     250-byte protocol limit before any bytes go on the wire.
 
 BENCHMARKS
-    Numbers from "bench/benchmark.pl" on Linux, TCP loopback, 100-byte values,
-    Perl 5.40, memcached 1.6.41:
+    Numbers from "bench/benchmark.pl" on Linux, TCP loopback, 100-byte
+    values, Perl 5.40, memcached 1.6.41:
 
                              50K cmds    200K cmds
         Pipeline SET           213K        68K ops/sec
@@ -374,11 +406,12 @@ BENCHMARKS
         Multi-get (GETKQ)      1.30M      1.17M ops/sec  (per key)
         Sequential round-trip   41K        38K ops/sec
 
-    Fire-and-forget is roughly 5x faster than callback mode because there is no
-    per-command Perl SV allocation. Multi-get is the fastest read path since
-    misses generate no traffic. Callback-mode throughput drops as batch size
-    grows because SV allocation for closures dominates; realistic workloads
-    (interleaved sends and receives) stay close to the 50K-command column.
+    Fire-and-forget is roughly 5x faster than callback mode because there is
+    no per-command Perl SV allocation. Multi-get is the fastest read path
+    since misses generate no traffic. Callback-mode throughput drops as
+    batch size grows because SV allocation for closures dominates; realistic
+    workloads (interleaved sends and receives) stay close to the 50K-command
+    column.
 
     "max_pending" overhead (200K commands):
 

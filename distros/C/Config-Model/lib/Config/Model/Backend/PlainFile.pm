@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::PlainFile 2.165;
+package Config::Model::Backend::PlainFile 2.166;
 
 use 5.10.1;
 use Carp;
@@ -222,7 +222,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -232,7 +232,7 @@ version 2.165
 
  my $inst = $model->create_config_class(
     name => "WithPlainFile",
-    element => [ 
+    element => [
         [qw/source new/] => { qw/type leaf value_type uniline/ },
     ],
     rw_config  => {
@@ -240,7 +240,7 @@ version 2.165
       config_dir => '/tmp',
     },
  );
- 
+
  my $inst = $model->instance(root_class_name => 'WithPlainFile' );
  my $root = $inst->config_root ;
 
@@ -340,9 +340,9 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 SEE ALSO
 
-L<Config::Model>, 
-L<Config::Model::BackendMgr>, 
-L<Config::Model::Backend::Any>, 
+L<Config::Model>,
+L<Config::Model::BackendMgr>,
+L<Config::Model::Backend::Any>,
 
 =head1 AUTHOR
 

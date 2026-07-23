@@ -1,0 +1,131 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Convert-Pheno API",
+    "description": "Convert-Pheno API configuration",
+    "version": "0.32"
+  },
+  "paths": {
+    "/api": {
+      "post": {
+        "x-mojo-name": "post_data",
+        "summary": "Get Body",
+        "operationId": "get_body_api_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "title": "ConversionRequest",
+                "required": [
+                  "conversion",
+                  "input"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "conversion": {
+                    "title": "Conversion",
+                    "type": "string"
+                  },
+                  "input": {
+                    "title": "Input",
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "output": {
+                    "title": "Output",
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "options": {
+                    "title": "Options",
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "data": {},
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "conversion": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["conversion"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation or conversion error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "conversion": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

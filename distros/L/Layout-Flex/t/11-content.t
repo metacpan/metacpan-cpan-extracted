@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test2::Bundle::Numerical;
 
-use lib 'blib/lib', 'blib/arch';
 use Layout::Flex;
 
 sub c { Layout::Flex->compute(@_) }

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.165;
+package Config::Model::CheckList 2.166;
 
 use Mouse;
 use 5.020;
@@ -839,7 +839,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
@@ -891,7 +891,7 @@ The available items in the check list can be :
 
 =over
 
-=item * 
+=item *
 
 A fixed list (with the C<choice> parameter)
 
@@ -940,7 +940,7 @@ List ref to specify the check list items which are "on" by default.
 
 =item ordered
 
-Specify whether the order of checked items must be preserved. 
+Specify whether the order of checked items must be preserved.
 
 =item help
 
@@ -1110,7 +1110,7 @@ Returns 'leaf'.
 
 =head2 check
 
-Set choice. Parameter is either a list of choices to set or 
+Set choice. Parameter is either a list of choices to set or
 a list ref and some optional parameter. I.e:
 
   check (\@list, check => 'skip') ;
@@ -1120,7 +1120,7 @@ choice value: either die (if yes) or discard bad value (if skip)
 
 =head2 uncheck
 
-Unset choice. Parameter is either a list of choices to unset or 
+Unset choice. Parameter is either a list of choices to unset or
 a list ref and some optional parameter. I.e:
 
   uncheck (\@list, check => 'skip') ;
@@ -1216,7 +1216,7 @@ The default list (defined by the configuration model)
 
 =item layered
 
-The list specified in layered mode. 
+The list specified in layered mode.
 
 =item upstream_default
 

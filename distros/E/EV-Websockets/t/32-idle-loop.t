@@ -66,23 +66,57 @@ if (!$pid) {
 }
 
 # Parent: not in the EV loop, so it can bound the child. Healthy ~4s; kill at 12s.
+#
+# Two very different "no result" cases must not be conflated:
+#   * the deadline passes with the pipe silent -> the loop really is stalled
+#     (this is the regression being guarded), so fail;
+#   * EOF, i.e. the child exited before reporting -> says nothing about the
+#     loop, and happens occasionally on loaded machines. Report the child's
+#     exit status and skip rather than raise a false failure.
 close $w;
-my ($established, $ticks, $err, $stalled) = (0, 0, undef, 0);
-if (IO::Select->new($r)->can_read(12) && sysread($r, my $buf, 256)) {
-    ($established, $ticks, my $e) = split ' ', $buf, 3;
-    $err = $1 if defined $e && $e =~ /^ERR:(.*)/s;
-} else {
-    $stalled = 1;
-    kill 'KILL', $pid;
+my ($established, $ticks, $err) = (0, 0, undef);
+my ($got_result, $timed_out) = (0, 0);
+{
+    # can_read() also returns empty when select() is interrupted (EINTR) -- and
+    # the child writing its result then exiting delivers SIGCHLD, which does
+    # exactly that. Treating an interrupt as a timeout reported a bogus "loop
+    # STALLED" while the result sat unread in the pipe, so retry while time
+    # remains and only call it a timeout once the deadline has really passed.
+    my $sel      = IO::Select->new($r);
+    my $deadline = time + 12;
+    while (1) {
+        my $remaining = $deadline - time;
+        if ($remaining <= 0) { $timed_out = 1; last }
+        unless ($sel->can_read($remaining)) {
+            next if time < $deadline;   # interrupted, not expired
+            $timed_out = 1;
+            last;
+        }
+        my $n = sysread($r, my $buf, 256);
+        next if !defined $n && $!{EINTR};
+        last if !defined $n || $n == 0; # EOF: child exited without reporting
+        $got_result = 1;
+        ($established, $ticks, my $e) = split ' ', $buf, 3;
+        $err = $1 if defined $e && $e =~ /^ERR:(.*)/s;
+        last;
+    }
+    kill 'KILL', $pid if $timed_out;
 }
 close $r;
 waitpid $pid, 0;
+my $child_status = $?;
 
 SKIP: {
+    skip sprintf("child exited without reporting (status 0x%04x%s); cannot judge the loop",
+                 $child_status,
+                 ($child_status & 127) ? ", signal " . ($child_status & 127) : ""), 2
+        if !$got_result && !$timed_out;
+
     skip "connection failed: $err", 2 if $err && !$established;
-    ok(!$stalled && $established,
-        $stalled ? "EV loop STALLED on idle connection (no result within deadline)"
-                 : "idle connection established");
+
+    ok($got_result && $established,
+        $timed_out ? "EV loop STALLED on idle connection (no result within deadline)"
+                   : "idle connection established");
     cmp_ok($ticks, '>=', 16,
         "user timer kept firing while connection idled ($ticks ticks; "
         . "the pre-fix loop stall capped this far lower)");

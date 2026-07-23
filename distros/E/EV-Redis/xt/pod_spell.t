@@ -46,3 +46,11 @@ homed
 unacknowledged
 psubscribe
 ssubscribe
+sharded
+Sharded
+condvar
+SPUBLISH
+smessage
+ssubscribe
+sunsubscribe
+spublish

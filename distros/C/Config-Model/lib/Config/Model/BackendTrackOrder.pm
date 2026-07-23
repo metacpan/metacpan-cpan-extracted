@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendTrackOrder 2.165;
+package Config::Model::BackendTrackOrder 2.166;
 
 # ABSTRACT: Track read order of elements from configuration
 
@@ -144,7 +144,7 @@ Config::Model::BackendTrackOrder - Track read order of elements from configurati
 
 =head1 VERSION
 
-version 2.165
+version 2.166
 
 =head1 SYNOPSIS
 
