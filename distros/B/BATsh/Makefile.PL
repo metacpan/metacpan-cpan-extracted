@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{BATsh},
-    'VERSION'   => q{0.07},
+    'VERSION'   => q{0.08},
     'ABSTRACT'  => q{Bilingual Shell for cmd.exe and bash in one script},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -57,23 +57,23 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'BATsh' => {
                 'file'    => 'lib/BATsh.pm',
-                'version' => '0.07',
+                'version' => '0.08',
             },
             'BATsh::CMD' => {
                 'file'    => 'lib/BATsh/CMD.pm',
-                'version' => '0.07',
+                'version' => '0.08',
             },
             'BATsh::Env' => {
                 'file'    => 'lib/BATsh/Env.pm',
-                'version' => '0.07',
+                'version' => '0.08',
             },
             'BATsh::MB' => {
                 'file'    => 'lib/BATsh/MB.pm',
-                'version' => '0.07',
+                'version' => '0.08',
             },
             'BATsh::SH' => {
                 'file'    => 'lib/BATsh/SH.pm',
-                'version' => '0.07',
+                'version' => '0.08',
             }
         },
     };

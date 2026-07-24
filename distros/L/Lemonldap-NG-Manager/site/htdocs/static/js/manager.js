@@ -927,23 +927,29 @@
       $scope.breadCrumb = $scope.getTrPath(scope);
       return setHelp(scope);
     };
-    $scope.keyWritable = function (scope) {
+    $scope.keyTranslatable = function (scope) {
       var node;
       node = scope.$modelValue;
-      // regexp-assemble of:
+      // Regexp::Assemble->new->add(qw(
       //  authChoice
+      //  casAppMetaDataNode
+      //  casSrvMetaDataNode
       //  cmbModule
+      //  keyNode
       //  keyText
       //  menuApp
       //  menuCat
       //  rule
       //  oidcAttribute
+      //  oidcOPMetaDataNode
+      //  oidcRPMetaDataNode
       //  samlAttribute
       //  samlIDPMetaDataNode
       //  samlSPMetaDataNode
       //  sfExtra
       //  virtualHost
-      if (node.type && node.type.match(/^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|oidcAttribute|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/)) {
+      // ))->anchor_line->as_string
+      if (node.type && node.type.match(/^(?:(?:c(?:as(?:App|Srv)MetaDataNod|mbModul)|oidc(?:[OR]PMetaDataNod|Attribut)|authChoic|rul)e|s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|key(?:Node|Text)|menu(?:App|Cat)|virtualHost)$/)) {
         return true;
       } else {
         return false;

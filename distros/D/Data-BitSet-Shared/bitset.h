@@ -115,7 +115,7 @@ static inline int bs_toggle(BsHandle *h, uint64_t bit) {
     return (old & mask) ? 0 : 1;
 }
 
-/* Population count — total set bits. */
+/* Population count -- total set bits. */
 static inline uint64_t bs_count(BsHandle *h) {
     uint64_t total = 0;
     uint32_t nw = h->hdr->num_words;
@@ -223,9 +223,11 @@ static inline int bs_validate_header(const BsHeader *hdr, uint64_t file_size) {
 static inline BsHandle *bs_setup(void *base, size_t ms, const char *path, int bfd) {
     BsHeader *hdr = (BsHeader *)base;
     BsHandle *h = (BsHandle *)calloc(1, sizeof(BsHandle));
-    if (!h) { munmap(base, ms); return NULL; }
+    if (!h) { munmap(base, ms); if (bfd >= 0) close(bfd); return NULL; }
     h->hdr = hdr;
-    h->data = (uint64_t *)((uint8_t *)base + hdr->data_off);
+    /* validation pins data_off to sizeof(BsHeader); use the constant so a
+     * racing write-peer cannot poison the base pointer after validation */
+    h->data = (uint64_t *)((uint8_t *)base + sizeof(BsHeader));
     h->mmap_size = ms;
     h->path = path ? strdup(path) : NULL;
     h->backing_fd = bfd;
@@ -274,6 +276,10 @@ static BsHandle *bs_create(const char *path, uint64_t capacity, mode_t mode, cha
         int is_new = (st.st_size == 0);
         if (!is_new && (uint64_t)st.st_size < sizeof(BsHeader)) {
             BS_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            BS_ERR("%s: refusing to initialize file not owned by us", path);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {

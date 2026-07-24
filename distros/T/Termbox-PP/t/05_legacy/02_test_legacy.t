@@ -5,6 +5,10 @@ use warnings;
 use Test::More;
 
 BEGIN {
+  $ENV{EXTENDED_TESTING} = 1;
+}
+
+BEGIN {
   require_ok 'Termbox::PP';
   use_ok 'Termbox', qw(
     :func

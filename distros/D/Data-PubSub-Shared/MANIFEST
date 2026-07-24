@@ -36,6 +36,7 @@ xt/binary_data.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
 xt/crash_recovery.t
+xt/destroy_during_call.t
 xt/detached_sub.t
 xt/die_in_callback.t
 xt/eg_runs.t
@@ -43,11 +44,14 @@ xt/fanout_1k.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/invalid_args.t
+xt/kwalitee.t
+xt/lap_aba_stale_publish.t
 xt/lifecycle.t
 xt/manifest_vs_git.t
 xt/memfd_seal.t
 xt/mmap_leak.t
 xt/overflow_vs_empty.t
+xt/poll_cb_destroy_during_call.t
 xt/poll_multi_batch.t
 xt/slow_subscriber.t
 xt/stress.t

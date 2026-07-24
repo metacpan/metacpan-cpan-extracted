@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Data::HashMap::Shared ();
+
+# Migrate Data::HashMap::Shared backing files from the previous on-disk format
+# (v9) to the current one (v10, which added the reader-slot occupancy bitmap).
+# The migration is a structural upcast done in place (atomic rename), so no old
+# version of the module is needed.  Every named file MUST be closed everywhere
+# first -- do not run this while any process has the map open.
+
+if (!@ARGV || $ARGV[0] eq '-h' || $ARGV[0] eq '--help') {
+    print <<'USAGE';
+usage: hashmap-shared-upgrade FILE...
+
+Migrate Data::HashMap::Shared backing file(s) to the current on-disk format.
+A file already in the current format is left untouched. Ensure no process has
+the file(s) mapped before running. Exits non-zero if any file failed.
+
+A sharded map (new_sharded) has one backing file per shard, named PREFIX.0,
+PREFIX.1, and so on -- pass them all, e.g. hashmap-shared-upgrade PREFIX.*
+USAGE
+    exit(@ARGV ? 0 : 1);
+}
+
+my ($upgraded, $current, $errors) = (0, 0, 0);
+for my $path (@ARGV) {
+    my $r = eval { Data::HashMap::Shared->upgrade_file($path) };
+    if (!defined $r) {
+        my $e = $@; $e =~ s/ at \S+ line \d+\.?\n?$//;
+        warn "  ERROR    $path: $e\n";
+        $errors++;
+    }
+    elsif ($r) { print "  upgraded $path\n"; $upgraded++; }
+    else       { print "  current  $path (unchanged)\n"; $current++; }
+}
+printf "%d upgraded, %d already current, %d error(s)\n", $upgraded, $current, $errors;
+exit($errors ? 1 : 0);

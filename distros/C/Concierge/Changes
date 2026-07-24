@@ -1,5 +1,47 @@
 Revision history for Concierge
 
+v0.11.0  2026-07-23
+    - BREAKING: Sessions and Users backend selection now follows the same
+      backend_class convention as Auth (introduced in v0.9.0): Desk::Setup
+      gains %SESSIONS_BACKENDS and %USERS_BACKENDS catalogs, resolving a
+      desk config's friendly sessions.backend/users.backend name
+      ('database', 'file', 'yaml') to a fully-qualified class, exactly
+      mirroring %AUTH_BACKENDS. The desk config format itself is
+      unchanged -- still friendly names under sessions.backend/
+      users.backend -- but the resolved backend_class is now what gets
+      passed down to Concierge::Sessions->new() and Concierge::Users->
+      setup(), matching Concierge::Sessions v0.11.3's and Concierge::Users
+      v0.9.4's own backend_class rename. sessions.backend and
+      users.backend also lost their implicit 'database' default and are
+      now required, matching auth.backend. Desks built before this
+      change will fail at open_desk() -- there is no migration path;
+      rebuild the desk with the same original configuration.
+    - validate_setup_config(): replaced hardcoded
+      database|file/database|yaml|file regex checks for sessions.backend/
+      users.backend with catalog-based validation (including per-backend
+      required-field checks), matching auth.backend's existing validation.
+    - Concierge.pm, Desk::Setup.pm POD: updated EXTENSIBILITY and
+      build_desk() documentation to describe backend_class propagation;
+      added a "The backend_class Pattern" subsection recommending the
+      same convention for new components with their own interchangeable
+      backend implementations.
+    - Makefile.PL: bumped PREREQ_PM minimums for Concierge::Sessions,
+      Concierge::Users, and Concierge::Auth to the first versions
+      containing their respective backend_class changes.
+    - %USERS_BACKENDS' database entry and build_quick_desk()'s hardcoded
+      Users backend_class now point to Concierge::Users::SQLite, matching
+      Concierge::Users v0.9.4's rename of Concierge::Users::Database to
+      Concierge::Users::SQLite (the module was always SQLite-specific;
+      the old name implied a generic swappable database backend that
+      never existed). The 'database' friendly name at the desk-config
+      layer is unaffected.
+    - open_desk(): Auth backend-initialization failures (including
+      the pre-v0.5 missing-auth_backend case) are fatal again, matching
+      Sessions and Users -- a desk must never open half-functional.
+      Reverts the graceful { success => 0, ... } handling added in
+      v0.9.0/0.10.0-dev; see commit 50a38bd for the change being
+      reverted.
+
 v0.10.0  2026-07-16
     - Removed Concierge::Desk::Base and Concierge::Desk::RecordsStore.
       Component.pm (pure POD contract) and UnavailableComponent.pm

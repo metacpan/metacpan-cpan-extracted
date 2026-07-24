@@ -1,4 +1,4 @@
-package Concierge::Sessions v0.11.2;
+package Concierge::Sessions v0.11.3;
 use v5.36;
 
 # ABSTRACT: Session manager with flexible session information storage
@@ -6,38 +6,19 @@ use v5.36;
 use Carp qw/croak/;
 
 use Concierge::Sessions::Session;
-use Concierge::Sessions::SQLite;
-use Concierge::Sessions::File;
 
-# Default backend
-our $DEFAULT_BACKEND 			= 'Concierge::Sessions::SQLite';
 our $DEFAULT_SESSION_TIMEOUT	= 3600;
 
 # Sessions manager
 sub new {
     my ($class, %args) = @_;
 
-    # Determine backend class (can be specified as 'database' or 'file')
-    # database (default): SQLite creates and updates session records
-    # file: File creates and overwrites session files as JSON
-    my $backend_param = $args{backend} || $DEFAULT_BACKEND;
+    my $backend_class = delete $args{backend_class}
+        or croak "Concierge::Sessions->new requires a 'backend_class' class name";
 
-    # Handle case-insensitive backend names and map to module names
-    unless ($backend_param =~ /^Concierge::Sessions::/) {
-        my $backend_lc = lc($backend_param);
-        if ($backend_lc eq 'database') {
-            $backend_param = 'Concierge::Sessions::SQLite';
-        } elsif ($backend_lc eq 'file') {
-            $backend_param = 'Concierge::Sessions::File';
-        } else {
-            # For backwards compatibility, still support module name suffixes
-            $backend_param = "Concierge::Sessions::$backend_param";
-        }
-    }
+    eval "require $backend_class; 1"
+        or croak "Cannot load Sessions backend $backend_class: $@";
 
-    my $backend_class = $backend_param;
-
-    # Create backend instance
     my $backend;
     eval {
         $backend = $backend_class->new(%args);
@@ -134,7 +115,7 @@ Concierge::Sessions - Session manager with factory pattern and multiple backend 
 
 =head1 VERSION
 
-v0.11.2
+v0.11.3
 
 =head1 SYNOPSIS
 
@@ -142,8 +123,8 @@ v0.11.2
 
     # Create session manager
     my $sessions = Concierge::Sessions->new(
-        backend     => 'database',
-        storage_dir => '/var/app/sessions',
+        backend_class => 'Concierge::Sessions::SQLite',
+        storage_dir   => '/var/app/sessions',
     );
 
     # Create a new user session
@@ -158,7 +139,7 @@ v0.11.2
     );
 
     unless ($result->{success}) {
-        die "Failed to create session: $result->{message}";
+        return $result;
     }
 
     my $session = $result->{session};
@@ -171,6 +152,14 @@ v0.11.2
         my $s = $retrieved->{session};
         # Use the session...
     }
+
+    # Or, using the inverse pattern with an early return - useful when you
+    # want to use the session unconfined by a conditional block:
+    unless ($retrieved->{success}) {
+        return $retrieved;
+    }
+    my $s = $retrieved->{session};
+    # Use the session (unconfined by the conditional block)...
 
     # Delete a session
     $sessions->delete_session($session_id);
@@ -192,27 +181,38 @@ The manager handles session lifecycle operations including creation, retrieval,
 deletion, and cleanup. Individual session data operations are handled by the
 Concierge::Sessions::Session objects returned by this manager.
 
+A backend is selected by passing its fully-qualified class name (e.g.
+C<Concierge::Sessions::SQLite>) as C<backend_class>. Concierge::Sessions
+performs no friendly-name guessing or default selection of its own -- the
+named module is C<require>d dynamically inside C<new>, so a manager
+configured for C<Concierge::Sessions::File> never loads
+C<Concierge::Sessions::SQLite> at all. When used as a component of a
+Concierge desk, resolving a friendly name (such as a config file's
+C<sessions.backend> setting) to a fully-qualified class name is a
+desk-build-time concern handled by L<Concierge::Desk::Setup> (see its
+backend catalog, C<%SESSIONS_BACKENDS>), not by this module.
+
 =head1 FEATURES
 
 =over 4
 
-=item * **Application-controlled data storage** - Store any serializable data structure in sessions
+=item * Application-controlled data storage - Store any serializable data structure in sessions
 
-=item * **In-memory performance** - Fast access to state and configuration
+=item * In-memory performance - Fast access to state and configuration
 
-=item * **Optional persistence** - Session tracks changes, saves when App tells it to
+=item * Optional persistence - Session tracks changes, saves when App tells it to
 
-=item * **Single-session enforcement** - Enforces one active session per user
+=item * Single-session enforcement - Enforces one active session per user
 
-=item * **Sliding window expiration** - Sessions auto-extend when users are active
+=item * Sliding window expiration - Sessions auto-extend when users are active
 
-=item * **Indefinite sessions** - Application-wide sessions that never expire
+=item * Indefinite sessions - Application-wide sessions that never expire
 
-=item * **Multiple backends** - Database/SQLite (production), File (testing/small user population)
+=item * Multiple backends - Database/SQLite (production), File (testing/small user population)
 
-=item * **Modern Perl** - v5.36+ with contemporary best practices
+=item * Modern Perl - v5.36+ with contemporary best practices
 
-=item * **Service layer pattern** - Non-fatal errors with descriptive messages
+=item * Service layer pattern - Non-fatal errors with descriptive messages
 
 =back
 
@@ -228,16 +228,17 @@ All methods return hashrefs with the following structure:
 Creates a new session manager instance.
 
     my $sessions = Concierge::Sessions->new(
-        backend     => 'database',     # Optional: 'database' or 'file' (default: 'database')
-        storage_dir => '/path/to/dir', # Required: directory for session storage
+        backend_class => 'Concierge::Sessions::SQLite', # Required: fully-qualified backend class
+        storage_dir   => '/path/to/dir',                # Required: directory for session storage
     );
 
 Parameters:
 
 =over 4
 
-=item * C<backend> - Backend type to use. Either 'database' (default) or 'file'.
-                   Case-insensitive.
+=item * C<backend_class> - Required. Fully-qualified class name of the backend
+                        to use, e.g. C<Concierge::Sessions::SQLite> or
+                        C<Concierge::Sessions::File>.
 
 =item * C<storage_dir> - Directory where session data will be stored. Required.
                       The directory will be created if it doesn't exist.
@@ -246,7 +247,10 @@ Parameters:
 
 Returns a blessed Concierge::Sessions object.
 
-Dies if the backend cannot be initialized.
+Dies if C<backend_class> is missing, if the named backend cannot be loaded, or
+if the backend cannot be initialized. This is the one exception to the
+C<< { success => 1|0, ... } >> hashref convention used elsewhere in this
+module.
 
 =head2 new_session
 
@@ -384,20 +388,22 @@ Returns:
 
 Returns a count of 0 if no expired sessions were found.
 
-This method should be called periodically (e.g., via cron) to clean up
+This method should be called periodically (e.g., by the app deploying
+Concierge::Sessions, via cron, etc.) to clean up
 expired sessions and reclaim storage space.
 
 =head1 BACKENDS
 
-Concierge::Sessions supports multiple storage backends:
+Concierge::Sessions supports multiple storage backends, selected via
+C<backend_class>:
 
-=head2 database
+=head2 Concierge::Sessions::SQLite
 
-The default and recommended backend for production use. Uses SQLite for storage.
+The recommended backend for production use. Uses SQLite for storage.
 
     my $sessions = Concierge::Sessions->new(
-        backend     => 'database',
-        storage_dir => '/var/app/sessions',
+        backend_class => 'Concierge::Sessions::SQLite',
+        storage_dir   => '/var/app/sessions',
     );
 
 Features:
@@ -408,7 +414,7 @@ Features:
 
 =item * ACID-compliant storage
 
-=item * Automatic cleanup of expired sessions during retrieval
+=item * Automatic filtering of expired sessions during retrieval
 
 =item * Single-session enforcement at database level
 
@@ -416,13 +422,13 @@ Features:
 
 Requires: L<DBI> and L<DBD::SQLite>
 
-=head2 file
+=head2 Concierge::Sessions::File
 
 Simple file-based backend using JSON format. Useful for testing and development.
 
     my $sessions = Concierge::Sessions->new(
-        backend     => 'file',
-        storage_dir => '/tmp/sessions',
+        backend_class => 'Concierge::Sessions::File',
+        storage_dir   => '/tmp/sessions',
     );
 
 Features:
@@ -482,8 +488,8 @@ Always check C<$result->{success}> before accessing other fields.
     use Concierge::Sessions;
 
     my $sessions = Concierge::Sessions->new(
-        backend     => 'database',
-        storage_dir => '/var/app/sessions',
+        backend_class => 'Concierge::Sessions::SQLite',
+        storage_dir   => '/var/app/sessions',
     );
 
     # Create session
@@ -571,6 +577,9 @@ L<Concierge::Sessions::Session> - Session object methods for data access
 L<Concierge::Sessions::SQLite> - SQLite backend implementation
 
 L<Concierge::Sessions::File> - File backend implementation
+
+L<Concierge::Desk::Setup> - resolves friendly backend names (e.g.
+C<'database'>) to fully-qualified classes at desk-build time
 
 L<DBI> - Database interface
 

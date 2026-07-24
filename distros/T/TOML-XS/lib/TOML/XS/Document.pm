@@ -21,11 +21,9 @@ This class is not directly instantiable.
 
 =head1 METHODS
 
-=head2 $ = I<OBJ>->parse( @POINTER )
+=head2 $what = I<OBJ>->get( @POINTER )
 
 Returns some part of the parsed TOML document as a Perl scalar.
-If the read of the TOML structure encounters a malformed data point
-an exception is thrown.
 
 If @POINTER is empty, then the return will be the entire parsed TOML
 document, represented as a hash reference.
@@ -41,6 +39,8 @@ As of now thrown exceptions are simple character strings
 that include, where relevant, a
 L<JSON pointer|https://tools.ietf.org/html/rfc6901> to the problematic
 data point.
+
+For historical reasons this may also be called C<parse>.
 
 =cut
 

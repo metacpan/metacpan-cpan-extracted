@@ -1,5 +1,23 @@
 Revision history for Concierge-Sessions
 
+v0.11.3  2026-07-23
+    - BREAKING: Concierge::Sessions->new's constructor key renamed from
+      backend to backend_class, to disambiguate it from the unrelated
+      "friendly name" sense of backend used elsewhere in the Concierge
+      suite (the sessions block of a Concierge desk's build config still
+      accepts a short friendly name like 'database'/'file' under backend;
+      Concierge::Sessions's own key now requires an already-resolved,
+      fully-qualified class name, matching Concierge::Auth's
+      backend_class). Removed the friendly-name normalization and
+      module-name-suffix fallback that previously accepted 'database',
+      'file', or a bare suffix like 'SQLite'.
+    - Removed $DEFAULT_BACKEND: callers must always supply an explicit
+      backend_class. Removed the compile-time use of
+      Concierge::Sessions::SQLite and Concierge::Sessions::File --
+      backends are now loaded dynamically inside new(), so a manager
+      configured for one backend never loads the other.
+    - Updated README, POD, and tests to use backend_class throughout.
+
 v0.11.2  2026-07-16
     - SQLite.pm: guard DESTROY against an already-undef $self->{dbh}
       during global destruction (Perl does not guarantee object

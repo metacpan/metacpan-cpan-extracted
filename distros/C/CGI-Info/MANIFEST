@@ -1,4 +1,3 @@
-.circleci/config.yml
 .codeclimate.yml
 .codecov.yml
 .tachikoma.yml
@@ -12,12 +11,10 @@ ignore.txt
 lib/CGI/Info.pm
 LICENCE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
 README
 README.md
-scripts/generate_index.pl
-scripts/generate_test_dashboard
 SECURITY.md
 t/00-load.t
 t/10-compile.t
@@ -30,6 +27,7 @@ t/as_string.t
 t/bin.t
 t/boiler.t
 t/carp.t
+t/cgi_security.t
 t/changes.t
 t/comment-spelling.t
 t/conf/as_string.yml
@@ -40,6 +38,11 @@ t/conf/cgi_host_url.yml
 t/conf/cookie.yml
 t/conf/domain_name.yml
 t/conf/host_name.yml
+t/conf/is_ai.yml
+t/conf/is_mobile.yml
+t/conf/is_robot.yml
+t/conf/is_search_engine.yml
+t/conf/is_tablet.yml
 t/conf/messages.yml
 t/conf/messages_as_string.yml
 t/conf/new.yml
@@ -64,6 +67,7 @@ t/function.t
 t/fuzz.t
 t/gv.t
 t/integration.t
+t/is_ai.t
 t/is_mobile.t
 t/is_robot.t
 t/is_search.t
@@ -71,6 +75,7 @@ t/is_tablet.t
 t/json.t
 t/kwalitee.t
 t/lib/MyLogger.pm
+t/locales.t
 t/logdir.t
 t/logger.t
 t/manifest.t

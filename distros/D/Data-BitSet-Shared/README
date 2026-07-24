@@ -93,12 +93,14 @@ SECURITY
     Backing files are created with mode 0600 (owner-only) by default, so
     only the creating user can open and attach them. To share a backing file
     across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
-    attached. Any process you grant write access to a shared mapping is
-    trusted not to corrupt its contents while other processes are using it.
+    argument to "new"; the mode is applied when the file is created; a
+    pre-existing empty file owned by the caller is adopted and also gets the
+    requested mode, while a non-empty existing file keeps its own
+    permissions. The file is opened with "O_NOFOLLOW", so a symlink planted
+    at the path is refused, and created with "O_EXCL"; the on-disk header is
+    validated when the file is attached. Any process you grant write access
+    to a shared mapping is trusted not to corrupt its contents while other
+    processes are using it.
 
 SEE ALSO
     Data::Buffer::Shared - typed shared array

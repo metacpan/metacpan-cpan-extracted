@@ -10,10 +10,14 @@ use Data::PubSub::Shared;
 my $MSGS    = $ENV{STRESS_MSGS}    || 50_000;
 my $WORKERS = $ENV{STRESS_WORKERS} || 6;
 my $CAP     = 131072;
+# Fail only when NO forward progress is made for this long -- a fixed
+# wall-clock deadline false-fails on a starved machine and is meaningless
+# on a fast one.
+my $STALL   = $ENV{STRESS_STALL}   || 20;
 
 my $total = $WORKERS * $MSGS;
 my $WMUL  = 10 ** (length($MSGS) + 1);  # multiplier > MSGS for worker ID encoding
-diag "stress: $WORKERS workers x $MSGS msgs each = $total total, cap=$CAP";
+diag "stress: $WORKERS workers x $MSGS msgs each = $total total, cap=$CAP, stall=${STALL}s";
 
 # ============================================================
 # 1. MPMC Int: N publishers, 1 subscriber after — write_pos correct
@@ -64,9 +68,14 @@ diag "stress: $WORKERS workers x $MSGS msgs each = $total total, cap=$CAP";
         if ($pid == 0) {
             my $c = Data::PubSub::Shared::Int->new($path, $CAP);
             my $sub = $c->subscribe;
+            # Progress-based completion: accounted (received + overflow)
+            # is monotonic and reaches $total once every message is
+            # either delivered or counted lost.  Fail only if it stops
+            # advancing for $STALL seconds -- never on a fixed deadline.
             my $received = 0;
-            my $t0 = time;
-            while (time - $t0 < 30) {
+            my $accounted = 0;
+            my $last_progress = time;
+            while ($accounted < $total) {
                 my $v = $sub->poll_wait(1);
                 if (defined $v) {
                     $received++;
@@ -74,10 +83,16 @@ diag "stress: $WORKERS workers x $MSGS msgs each = $total total, cap=$CAP";
                     my @more = $sub->drain;
                     $received += @more;
                 }
-                last if $received + $sub->overflow_count >= $total;
+                my $now = $received + $sub->overflow_count;
+                if ($now > $accounted) {
+                    $accounted = $now;
+                    $last_progress = time;
+                }
+                elsif (time - $last_progress > $STALL) {
+                    exit 1;   # stalled: no message accounted for $STALL seconds
+                }
             }
-            my $accounted = $received + $sub->overflow_count;
-            exit($accounted >= $total ? 0 : 1);
+            exit 0;
         }
         push @sub_pids, $pid;
     }
@@ -219,14 +234,22 @@ diag "stress: $WORKERS workers x $MSGS msgs each = $total total, cap=$CAP";
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
         $sub->eventfd_set($fd);
+        # Progress-based: fail only if no message arrives for $STALL
+        # seconds, not when a fixed deadline expires.
         my $count = 0;
-        my $t0 = time;
-        while ($count < $MSGS && time - $t0 < 30) {
+        my $last_progress = time;
+        while ($count < $MSGS) {
             my @msgs = $sub->drain_notify;
-            $count += @msgs;
-            select(undef, undef, undef, 0.001) unless @msgs;
+            if (@msgs) {
+                $count += @msgs;
+                $last_progress = time;
+            }
+            else {
+                exit 1 if time - $last_progress > $STALL;
+                select(undef, undef, undef, 0.001);
+            }
         }
-        exit($count >= $MSGS ? 0 : 1);
+        exit 0;
     }
 
     select(undef, undef, undef, 0.05);

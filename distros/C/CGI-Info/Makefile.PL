@@ -24,7 +24,7 @@ WriteMakefile(
 	VERSION_FROM	=> 'lib/CGI/Info.pm',
 	ABSTRACT_FROM	=> 'lib/CGI/Info.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
@@ -32,7 +32,37 @@ WriteMakefile(
 	PL_FILES	=> {},
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, PREREQ_PM => {
+		'boolean' => 0,
+		'Carp' => 0,
+		'File::Spec' => 3.4,
+		'Log::Abstraction' => 0.10,
+		'Net::CIDR' => 0,
+		'Object::Configure' => 0.19,
+		'Params::Get' => 0.13,
+		'Params::Validate::Strict' => 0.35,
+		'Readonly' => 0,
+		'Return::Set' => 0,
+		'Scalar::Util' => 0,
+		'Sub::Protected' => 0,
+		'Sys::Hostname' => 0,
+		'URI::Heuristic' => 0,
+		# 'Sub::Private' => 0,
+		'Cwd' => 0,
+		'Socket' => 0,
+		'HTTP::BrowserDetect' => 3.10,	# Include bingbot
+		'File::Basename' => 0,
+		'String::Clean::XSS' => 0,
+		'JSON::MaybeXS' => 0,
+		# 'String::EscapeCage' => 0.02,
+		# 'Class::Autouse' => 0,
+		'namespace::clean' => 0,
+		'Sys::Path' => 0
 	}, TEST_REQUIRES => {
+		'Data::Random' => 0,
+		'Data::Random::String' => 0,
+		'Data::Random::String::Matches' => 0,
+		'Data::Random::Structure' => 0,
 		'Errno' => 0,
 		'File::Temp' => 0,
 		'FindBin' => 0,
@@ -43,6 +73,7 @@ WriteMakefile(
 		'Test::CleanNamespaces' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0.08,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -57,35 +88,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'Taint::Runtime' => 0,
 		'Test::Returns' => 0,
-		'Test::Warn' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
-	}, PREREQ_PM => {
-		'boolean' => 0,
-		'Carp' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'File::Spec' => 3.4,
-		'Log::Abstraction' => 0.10,
-		'Net::CIDR' => 0,
-		'Object::Configure' => 0.19,
-		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.28,
-		'Return::Set' => 0,
-		'Scalar::Util' => 0,
-		'Sys::Hostname' => 0,
-		'URI::Heuristic' => 0,
-		# 'Sub::Private' => 0,
-		'Cwd' => 0,
-		'Socket' => 0,
-		'List::Util' => 1.33,
-		'HTTP::BrowserDetect' => 3.10,	# Include bingbot
-		'File::Basename' => 0,
-		'IO::Interactive' => 0,
-		'String::Clean::XSS' => 0,
-		'JSON::MaybeXS' => 0,
-		# 'String::EscapeCage' => 0.02,
-		# 'Class::Autouse' => 0,
-		'namespace::clean' => 0,
-		'Sys::Path' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'CGI-Info-*' },
 	# META_ADD => {
@@ -109,5 +112,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION	=> '5.010'
 );

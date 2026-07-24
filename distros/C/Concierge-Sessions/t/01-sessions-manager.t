@@ -26,7 +26,7 @@ note("Testing Concierge::Sessions manager functionality");
 
 subtest 'Constructor with database backend' => sub {
     my $manager = Concierge::Sessions->new(
-        backend    => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -36,7 +36,7 @@ subtest 'Constructor with database backend' => sub {
 
 subtest 'Constructor with file backend' => sub {
     my $manager = Concierge::Sessions->new(
-        backend    => 'file',
+        backend_class => 'Concierge::Sessions::File',
         storage_dir => $temp_dir,
     );
 
@@ -44,20 +44,19 @@ subtest 'Constructor with file backend' => sub {
     isa_ok($manager, ['Concierge::Sessions']);
 };
 
-subtest 'Constructor with default backend' => sub {
-    my $manager = Concierge::Sessions->new(
-        storage_dir => $temp_dir,
-    );
-
-    ok($manager, 'Manager object created');
-    isa_ok($manager, ['Concierge::Sessions']);
-};
-
-subtest 'Constructor with invalid backend' => sub {
+subtest 'Constructor without backend_class fails' => sub {
     like(
-        dies { Concierge::Sessions->new(backend => 'InvalidBackend', storage_dir => $temp_dir) },
-        qr/Failed to initialize backend/,
-        'Dies with invalid backend'
+        dies { Concierge::Sessions->new(storage_dir => $temp_dir) },
+        qr/requires a 'backend_class' class name/,
+        'Dies without backend_class'
+    );
+};
+
+subtest 'Constructor with invalid backend_class' => sub {
+    like(
+        dies { Concierge::Sessions->new(backend_class => 'Concierge::Sessions::InvalidBackend', storage_dir => $temp_dir) },
+        qr/Cannot load Sessions backend/,
+        'Dies with invalid backend_class'
     );
 };
 
@@ -67,7 +66,7 @@ subtest 'Constructor with invalid backend' => sub {
 
 subtest 'new_session() with valid user_id' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -92,7 +91,7 @@ subtest 'new_session() with valid user_id' => sub {
 
 subtest 'new_session() without user_id fails' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -105,7 +104,7 @@ subtest 'new_session() without user_id fails' => sub {
 
 subtest 'new_session() with custom timeout' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -126,7 +125,7 @@ subtest 'new_session() with custom timeout' => sub {
 
 subtest 'new_session() with default timeout' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -144,7 +143,7 @@ subtest 'new_session() with default timeout' => sub {
 
 subtest 'new_session() with initial data' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -168,7 +167,7 @@ subtest 'new_session() with initial data' => sub {
 
 subtest 'get_session() with valid session_id' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -187,7 +186,7 @@ subtest 'get_session() with valid session_id' => sub {
 
 subtest 'get_session() without session_id fails' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -199,7 +198,7 @@ subtest 'get_session() without session_id fails' => sub {
 
 subtest 'get_session() with non-existent session_id' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -211,7 +210,7 @@ subtest 'get_session() with non-existent session_id' => sub {
 
 subtest 'get_session() with expired session' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -242,7 +241,7 @@ subtest 'get_session() with expired session' => sub {
 
 subtest 'delete_session() with valid session_id' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -262,7 +261,7 @@ subtest 'delete_session() with valid session_id' => sub {
 
 subtest 'delete_session() without session_id fails' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -274,7 +273,7 @@ subtest 'delete_session() without session_id fails' => sub {
 
 subtest 'delete_session() with non-existent session_id' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -291,7 +290,7 @@ subtest 'delete_session() with non-existent session_id' => sub {
 
 subtest 'cleanup_sessions() with expired sessions' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -315,7 +314,7 @@ subtest 'cleanup_sessions() with expired sessions' => sub {
 
 subtest 'cleanup_sessions() with no expired sessions' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -337,7 +336,7 @@ subtest 'Manager with File backend - basic operations' => sub {
     my $file_dir = "$temp_dir/file_sessions";
 
     my $manager = Concierge::Sessions->new(
-        backend     => 'file',
+        backend_class => 'Concierge::Sessions::File',
         storage_dir => $file_dir,
     );
 
@@ -360,7 +359,7 @@ subtest 'File backend cleanup' => sub {
     my $file_dir = "$temp_dir/file_cleanup";
 
     my $manager = Concierge::Sessions->new(
-        backend     => 'file',
+        backend_class => 'Concierge::Sessions::File',
         storage_dir => $file_dir,
     );
 
@@ -380,7 +379,7 @@ subtest 'File backend cleanup' => sub {
 
 subtest 'delete_user_session() without user_id fails' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -392,7 +391,7 @@ subtest 'delete_user_session() without user_id fails' => sub {
 
 subtest 'delete_user_session() with valid user_id' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -406,7 +405,7 @@ subtest 'delete_user_session() with valid user_id' => sub {
 
 subtest 'delete_user_session() for user with no sessions returns deleted_count 0' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 

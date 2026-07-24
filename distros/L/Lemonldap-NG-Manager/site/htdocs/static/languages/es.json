@@ -545,6 +545,8 @@
 "ldapCAFile":"CA file path",
 "ldapCAPath":"CA directory path",
 "ldapChangePasswordAsUser":"Cambiar como usuario",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"Conexión",
 "ldapExportedVars":"Variables exportadas",
 "ldapFilters":"Filtros",

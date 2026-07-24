@@ -309,6 +309,11 @@ static void free_col_type(col_type_t *t) {
     Safefree(t);
 }
 
+/* Max nesting depth for parse_col_type recursion (hostile type strings
+ * like "Array(Array(Array(..." are bounded only by the block size). */
+#define PARSE_COL_TYPE_MAX_DEPTH 100
+
+static col_type_t* parse_col_type_depth(const char *type, size_t len, int depth);
 static col_type_t* parse_col_type(const char *type, size_t len);
 
 /*
@@ -316,7 +321,7 @@ static col_type_t* parse_col_type(const char *type, size_t len);
  * Handles nested parentheses correctly.
  * Sets t->inners and t->num_inners.
  */
-static void parse_type_list(col_type_t *t, const char *inner, size_t inner_len) {
+static void parse_type_list(col_type_t *t, const char *inner, size_t inner_len, int rec_depth) {
     int depth = 0, count = 0;
     size_t i, start = 0;
 
@@ -350,14 +355,20 @@ static void parse_type_list(col_type_t *t, const char *inner, size_t inner_len) 
                     if (inner[sp] == ' ') { s = sp + 1; break; }
                 }
             }
-            t->inners[count++] = parse_col_type(inner + s, e - s);
+            t->inners[count++] = parse_col_type_depth(inner + s, e - s, rec_depth + 1);
             start = i + 1;
         }
     }
 }
 
-static col_type_t* parse_col_type(const char *type, size_t len) {
+static col_type_t* parse_col_type_depth(const char *type, size_t len, int depth) {
     col_type_t *t;
+    if (depth > PARSE_COL_TYPE_MAX_DEPTH) {
+        /* Fail the way an unparsable type fails: CT_UNKNOWN reads as String */
+        Newxz(t, 1, col_type_t);
+        t->code = CT_UNKNOWN;
+        return t;
+    }
     Newxz(t, 1, col_type_t);
 
     if (len == 4 && memcmp(type, "Int8", 4) == 0)          t->code = CT_INT8;
@@ -378,15 +389,15 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
     }
     else if (len > 6 && memcmp(type, "Array(", 6) == 0) {
         t->code = CT_ARRAY;
-        t->inner = parse_col_type(type + 6, len - 7);
+        t->inner = parse_col_type_depth(type + 6, len - 7, depth + 1);
     }
     else if (len > 9 && memcmp(type, "Nullable(", 9) == 0) {
         t->code = CT_NULLABLE;
-        t->inner = parse_col_type(type + 9, len - 10);
+        t->inner = parse_col_type_depth(type + 9, len - 10, depth + 1);
     }
     else if (len > 15 && memcmp(type, "LowCardinality(", 15) == 0) {
         t->code = CT_LOWCARDINALITY;
-        t->inner = parse_col_type(type + 15, len - 16);
+        t->inner = parse_col_type_depth(type + 15, len - 16, depth + 1);
     }
     else if (len == 4 && memcmp(type, "Date", 4) == 0)      t->code = CT_DATE;
     else if (len == 6 && memcmp(type, "Date32", 6) == 0)    t->code = CT_DATE32;
@@ -410,6 +421,9 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
     else if (len > 11 && memcmp(type, "DateTime64(", 11) == 0) {
         t->code = CT_DATETIME64;
         t->param = atoi(type + 11);
+        /* Clamp hostile precision (drives a per-row scale loop) */
+        if (t->param < 0) t->param = 0;
+        if (t->param > 9) t->param = 9;
         /* DateTime64(N, 'timezone') — extract timezone */
         {
             const char *comma = memchr(type + 11, ',', len - 11);
@@ -445,23 +459,34 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
     else if (len > 10 && memcmp(type, "Decimal32(", 10) == 0) {
         t->code = CT_DECIMAL32;
         t->param = atoi(type + 10);
+        /* Clamp hostile scale (drives per-row pow10 loops) */
+        if (t->param < 0)  t->param = 0;
+        if (t->param > 76) t->param = 76;
     }
     else if (len > 10 && memcmp(type, "Decimal64(", 10) == 0) {
         t->code = CT_DECIMAL64;
         t->param = atoi(type + 10);
+        if (t->param < 0)  t->param = 0;
+        if (t->param > 76) t->param = 76;
     }
     else if (len > 11 && memcmp(type, "Decimal128(", 11) == 0) {
         t->code = CT_DECIMAL128;
         t->param = atoi(type + 11);
+        if (t->param < 0)  t->param = 0;
+        if (t->param > 76) t->param = 76;
     }
     else if (len > 11 && memcmp(type, "Decimal256(", 11) == 0) {
         t->code = CT_DECIMAL256;
         t->param = atoi(type + 11);
+        if (t->param < 0)  t->param = 0;
+        if (t->param > 76) t->param = 76;
     }
     else if (len > 8 && memcmp(type, "Decimal(", 8) == 0) {
         int precision = atoi(type + 8);
         const char *comma = memchr(type + 8, ',', len - 8);
         t->param = comma ? atoi(comma + 1) : 0;
+        if (t->param < 0)  t->param = 0;
+        if (t->param > 76) t->param = 76;
         if (precision <= 9)        t->code = CT_DECIMAL32;
         else if (precision <= 18)  t->code = CT_DECIMAL64;
         else if (precision <= 38)  t->code = CT_DECIMAL128;
@@ -490,18 +515,18 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
     else if (len == 7 && memcmp(type, "UInt256", 7) == 0) t->code = CT_UINT256;
     else if (len > 6 && memcmp(type, "Tuple(", 6) == 0) {
         t->code = CT_TUPLE;
-        parse_type_list(t, type + 6, len - 7);
+        parse_type_list(t, type + 6, len - 7, depth);
     }
     else if (len > 4 && memcmp(type, "Map(", 4) == 0) {
         t->code = CT_MAP;
-        parse_type_list(t, type + 4, len - 5);
+        parse_type_list(t, type + 4, len - 5, depth);
     }
     else if (len > 7 && memcmp(type, "Nested(", 7) == 0) {
         /* Nested(name1 Type1, name2 Type2) = Array(Tuple(Type1, Type2)) */
         col_type_t *tuple;
         Newxz(tuple, 1, col_type_t);
         tuple->code = CT_TUPLE;
-        parse_type_list(tuple, type + 7, len - 8);
+        parse_type_list(tuple, type + 7, len - 8, depth);
         t->code = CT_ARRAY;
         t->inner = tuple;
     }
@@ -572,8 +597,8 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
                     memcpy(t->inner_names[j],
                            body + bounds[j].name_start, bounds[j].name_len);
                     t->inner_names[j][bounds[j].name_len] = '\0';
-                    t->inners[j] = parse_col_type(
-                        body + bounds[j].type_start, bounds[j].type_len);
+                    t->inners[j] = parse_col_type_depth(
+                        body + bounds[j].type_start, bounds[j].type_len, depth + 1);
                 }
             }
         }
@@ -582,32 +607,32 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
     else if (len == 5 && memcmp(type, "Point", 5) == 0) {
         /* Point = Tuple(Float64, Float64) */
         t->code = CT_TUPLE;
-        parse_type_list(t, "Float64,Float64", 15);
+        parse_type_list(t, "Float64,Float64", 15, depth);
     }
     else if (len == 4 && memcmp(type, "Ring", 4) == 0) {
         /* Ring = Array(Point) */
         t->code = CT_ARRAY;
-        t->inner = parse_col_type("Point", 5);
+        t->inner = parse_col_type_depth("Point", 5, depth + 1);
     }
     else if (len == 10 && memcmp(type, "LineString", 10) == 0) {
         /* LineString = Array(Point) */
         t->code = CT_ARRAY;
-        t->inner = parse_col_type("Point", 5);
+        t->inner = parse_col_type_depth("Point", 5, depth + 1);
     }
     else if (len == 15 && memcmp(type, "MultiLineString", 15) == 0) {
         /* MultiLineString = Array(Array(Point)) */
         t->code = CT_ARRAY;
-        t->inner = parse_col_type("Array(Point)", 12);
+        t->inner = parse_col_type_depth("Array(Point)", 12, depth + 1);
     }
     else if (len == 7 && memcmp(type, "Polygon", 7) == 0) {
         /* Polygon = Array(Ring) */
         t->code = CT_ARRAY;
-        t->inner = parse_col_type("Ring", 4);
+        t->inner = parse_col_type_depth("Ring", 4, depth + 1);
     }
     else if (len == 12 && memcmp(type, "MultiPolygon", 12) == 0) {
         /* MultiPolygon = Array(Polygon) */
         t->code = CT_ARRAY;
-        t->inner = parse_col_type("Polygon", 7);
+        t->inner = parse_col_type_depth("Polygon", 7, depth + 1);
     }
     else if ((len > 25 && memcmp(type, "SimpleAggregateFunction(", 24) == 0)
           || (len > 19 && memcmp(type, "AggregateFunction(", 18) == 0)) {
@@ -630,7 +655,7 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
             ci++;
             while (ci < inner_len && inner[ci] == ' ') ci++;
             Safefree(t);
-            t = parse_col_type(inner + ci, inner_len - ci);
+            t = parse_col_type_depth(inner + ci, inner_len - ci, depth + 1);
         } else {
             t->code = CT_UNKNOWN;
         }
@@ -641,6 +666,10 @@ static col_type_t* parse_col_type(const char *type, size_t len) {
     }
 
     return t;
+}
+
+static col_type_t* parse_col_type(const char *type, size_t len) {
+    return parse_col_type_depth(type, len, 0);
 }
 
 /* Size in bytes for fixed-width types. Returns 0 for variable-width. */
@@ -1241,7 +1270,7 @@ static SV** decode_column_ex(const char *buf, size_t len, size_t *pos,
                 if (read_varuint(buf, len, pos, &dummy) <= 0) goto json_fail;
             }
             if (read_varuint(buf, len, pos, &ntypes) <= 0) goto json_fail;
-            if (ntypes > (uint64_t)JSON_LEX_SLOTS) goto json_fail;
+            if (ntypes >= (uint64_t)JSON_LEX_SLOTS) goto json_fail;
             int *kinds = path_kinds_buf + p * JSON_LEX_SLOTS;
             uint64_t ti;
             for (ti = 0; ti < ntypes; ti++) {
@@ -1286,13 +1315,12 @@ static SV** decode_column_ex(const char *buf, size_t len, size_t *pos,
             *pos += (size_t)nrows;
 
             int nv = path_kind_count[p];
-            int wire_slots = nv + 1;
             int slot_to_kind[JSON_LEX_SLOTS];
             unsigned mask = 0;
             int s, kk;
             int *kinds = path_kinds_buf + p * JSON_LEX_SLOTS;
             for (kk = 0; kk < nv; kk++) mask |= 1u << kinds[kk];
-            (void)json_build_lex_table(mask, slot_to_kind);
+            int wire_slots = json_build_lex_table(mask, slot_to_kind);
 
             uint64_t var_counts[JSON_LEX_SLOTS] = {0};
             uint64_t r2;

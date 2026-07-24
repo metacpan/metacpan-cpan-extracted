@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SLO_ERROR
 );
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
@@ -1752,7 +1752,7 @@ sub _handleAuthorizationCodeGrant {
                 grant_type      => "authorizationcode",
                 _oidc_sid       => $sid,
                 $self->conf->{whatToTrace} => $user,
-                _oidc_sub                  =>
+                _oidc_logout_sub           =>
                   $self->getUserIDForRP( $req, $rp, $apacheSession->data ),
             },
             0,

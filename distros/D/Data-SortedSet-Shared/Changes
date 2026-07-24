@@ -1,5 +1,23 @@
 Revision history for Data-SortedSet-Shared
 
+0.04      2026-07-23
+          - Refuse an insert when the node pool cannot satisfy the worst-case
+            split, instead of writing through an out-of-range node index if
+            the free list is exhausted or corrupt.
+          - Validate B+tree node indices on the write paths too (insert,
+            delete, merge, underflow), so a corrupt peer-written index stops
+            the operation instead of a wild read/write under the lock.
+          - Bound the member-index probe and delete scan by the table size, so
+            a corrupt all-occupied index fails cleanly instead of spinning.
+          - add_many: pin the rows array and each row's SVs across argument
+            magic, so a hostile overload cannot dangle the resolve loop.
+          - On-disk format change (v1 -> v2): an existing 0.03 file is
+            refused; recreate it.
+          - Bump Data::SortedSet::Shared::Strings to the dist version so
+            PAUSE reindexes it.
+          - Resolve argument magic before capturing the path string.
+          - Document that a writer crash can corrupt the set.
+
 0.03      2026-07-03
           - Security and robustness hardening; backing files now created mode
             0600 (pass a file-mode argument to new() for cross-user sharing).

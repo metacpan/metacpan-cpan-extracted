@@ -8,7 +8,8 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
+use Readonly;
 use Test::Mockingbird 0.08 qw(mock);
 use File::Temp qw(tempdir);
 use File::Spec;
@@ -31,7 +32,7 @@ sub reset_env {
         C_DOCUMENT_ROOT HTTP_HOST SERVER_NAME SSL_TLS_SNI SERVER_PROTOCOL
         SERVER_PORT SCRIPT_URI REMOTE_ADDR HTTP_USER_AGENT HTTP_COOKIE
         HTTP_X_WAP_PROFILE HTTP_SEC_CH_UA_MOBILE HTTP_REFERER IS_MOBILE
-        IS_SEARCH_ENGINE LOGDIR
+        IS_SEARCH_ENGINE IS_AI LOGDIR
     );
     CGI::Info->reset();
     @ARGV = ();
@@ -308,10 +309,11 @@ subtest 'robot browser: is_robot, browser_type, params blocked on SQL UA' => sub
 
     my $info = CGI::Info->new();
 
-    ok($info->is_robot(),              'is_robot() true for ClaudeBot');
-    is($info->browser_type(), 'robot', 'browser_type() is robot');
-    ok(!$info->is_mobile(),            'is_mobile() false for robot');
-    ok(!$info->is_tablet(),            'is_tablet() false for robot');
+    ok($info->is_robot(),           'is_robot() true for ClaudeBot');
+    ok($info->is_ai(),              'is_ai() true for ClaudeBot');
+    is($info->browser_type(), 'ai', 'browser_type() is ai for AI crawler');
+    ok(!$info->is_mobile(),         'is_mobile() false for robot');
+    ok(!$info->is_tablet(),         'is_tablet() false for robot');
 
     # params() should still work for a robot (it only blocks on bad content)
     my $params = $info->params();
@@ -1273,9 +1275,221 @@ subtest 'CGI::Info + Net::CIDR: Alibaba IP range handled gracefully' => sub {
     $ENV{REMOTE_ADDR}     = '47.235.1.1';
 
     my $info = CGI::Info->new();
-    # Either classified as search engine (CIDR match) or robot — both valid
+    # Either classified as search engine (CIDR match) or robot -- both valid
     my $result = $info->is_search_engine() || $info->is_robot();
     ok($result, 'Alibaba IP classified as search engine or robot via Net::CIDR');
+};
+
+# ============================================================
+# 36. is_ai() integration workflows
+#     Exercises is_ai(), is_robot(), browser_type(), params(),
+#     status(), and messages() interacting across realistic request
+#     lifecycles, including concurrency, WAF ordering, and state
+#     management between FCGI-like request cycles.
+# ============================================================
+
+# Named constants keep test data self-documenting and free of magic strings.
+Readonly my $AI_REMOTE      => '1.2.3.4';
+Readonly my $UA_CLAUDE_BOT  => 'ClaudeBot/1.0 (+http://www.anthropic.com)';
+Readonly my $UA_GPTBOT      => 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)';
+Readonly my $UA_CHATGPT_USR => 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); ChatGPT-User/1.0; +https://openai.com/bot)';
+Readonly my $UA_COHERE_AI   => 'cohere-ai/1.0';
+Readonly my $UA_CHROME      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120';
+Readonly my $UA_IPHONE_AI   => 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)';
+# GPTBot UA embedding a SQL injection payload -- used to verify WAF ordering
+Readonly my $UA_GPTBOT_SQL  => 'GPTBot/1.0 SELECT foo AND bar FROM baz';
+
+# Two objects created with different UAs in the same process must not
+# interfere.  This catches any class-level state leakage between instances.
+subtest 'is_ai(): concurrent AI and non-AI instances are independent' => sub {
+    reset_env();
+    $ENV{REMOTE_ADDR}     = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+    # Evaluate the AI-crawler instance while the AI UA is in the environment
+    $ENV{HTTP_USER_AGENT} = $UA_CLAUDE_BOT;
+    my $ai_info = CGI::Info->new();
+    ok($ai_info->is_ai(),            'ClaudeBot instance: is_ai true');
+    ok($ai_info->is_robot(),         'ClaudeBot instance: is_robot true');
+    is($ai_info->browser_type(), 'ai', 'ClaudeBot instance: browser_type is ai');
+
+    # Switch UA and create a second instance; first instance must use its cache
+    $ENV{HTTP_USER_AGENT} = $UA_CHROME;
+    my $plain_info = CGI::Info->new();
+    ok(!$plain_info->is_ai(),            'Chrome instance: is_ai false');
+    ok(!$plain_info->is_robot(),         'Chrome instance: is_robot false');
+    is($plain_info->browser_type(), 'web', 'Chrome instance: browser_type is web');
+
+    # The AI instance's cached state must survive the environment change
+    ok($ai_info->is_ai(),    'ClaudeBot instance: cached is_ai still true after env change');
+    ok($ai_info->is_robot(), 'ClaudeBot instance: cached is_robot still true after env change');
+};
+
+# An AI crawler with a clean (injection-free) query must be able to read
+# CGI params normally.  is_ai() true does not block params().
+subtest 'is_ai(): AI crawler + clean params() coexist' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = $UA_CLAUDE_BOT;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'page=1&limit=10';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(), 'ClaudeBot: is_ai true');
+
+    my $params = $info->params();
+    ok(defined $params, 'params() returns defined value for AI crawler with clean query');
+    is($params->{page},  '1',  'page param parsed correctly for AI crawler');
+    is($params->{limit}, '10', 'limit param parsed correctly for AI crawler');
+    is($info->status(), 200, 'status remains 200 for clean AI request');
+};
+
+# Critical WAF invariant: the SQL injection check in is_robot() runs BEFORE
+# the is_ai() delegation.  An AI crawler embedding a SQL payload in its UA
+# must still receive a 403, not bypass the WAF via the AI fast path.
+subtest 'is_ai(): WAF fires before AI classification on injected UA' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = $UA_GPTBOT_SQL;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'q=test';
+
+    my $info = CGI::Info->new();
+    ok($info->is_robot(), 'SQL payload in GPTBot UA: is_robot true');
+    is($info->status(), 403,
+        'SQL payload in GPTBot UA: WAF sets status 403 (not bypassed by AI classification)');
+};
+
+# IS_AI=1 env override must propagate so that is_robot() also returns true.
+# is_robot() calls is_ai() internally, so the override is observed through
+# both methods even if is_ai() has not been called directly.
+subtest 'is_ai(): IS_AI=1 override chain propagates to is_robot()' => sub {
+    reset_env();
+    local $ENV{IS_AI}       = 1;
+    $ENV{HTTP_USER_AGENT}   = $UA_CHROME;    # not an AI UA
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(),    'IS_AI=1: is_ai true for non-AI UA via override');
+    ok($info->is_robot(), 'IS_AI=1: is_robot also true (invariant via is_robot calling is_ai)');
+    is($info->browser_type(), 'ai',
+        'IS_AI=1: browser_type is ai (ai checked before robot in priority order)');
+};
+
+# Simulates FCGI-like operation: two sequential requests in the same process.
+# reset() must clear the cached is_ai state so the second request is classified
+# independently, not inheriting the first request's AI status.
+subtest 'is_ai(): reset() clears AI state between requests' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = $UA_CLAUDE_BOT;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+    my $ai_info = CGI::Info->new();
+    ok($ai_info->is_ai(),    'first request (ClaudeBot): is_ai true');
+    ok($ai_info->is_robot(), 'first request (ClaudeBot): is_robot true');
+
+    # Simulate end of request; reset class-level stdin cache
+    CGI::Info->reset();
+
+    # Second request arrives with a desktop UA
+    $ENV{HTTP_USER_AGENT} = $UA_CHROME;
+    my $plain_info = CGI::Info->new();
+    ok(!$plain_info->is_ai(),    'second request (Chrome): is_ai false after reset');
+    ok(!$plain_info->is_robot(), 'second request (Chrome): is_robot false after reset');
+};
+
+# browser_type() documents 'mobile' as the highest priority class.
+# Even with IS_AI=1 forcing is_ai() true, a mobile UA must still
+# return 'mobile', not 'ai', because the mobile check runs first.
+subtest 'is_ai(): browser_type() mobile priority beats IS_AI override' => sub {
+    reset_env();
+    local $ENV{IS_AI}       = 1;
+    $ENV{HTTP_USER_AGENT}   = $UA_IPHONE_AI;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(),    'IS_AI=1 + iPhone UA: is_ai true');
+    ok($info->is_mobile(), 'IS_AI=1 + iPhone UA: is_mobile also true');
+    is($info->browser_type(), 'mobile',
+        'IS_AI=1 + iPhone UA: browser_type is mobile (mobile wins over ai)');
+};
+
+# A correctly classified AI bot must not generate any log messages.
+# Spurious warnings here would pollute monitoring dashboards.
+subtest 'is_ai(): clean AI classification produces no messages' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = $UA_CLAUDE_BOT;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(), 'ClaudeBot: is_ai true');
+
+    my $msgs = $info->messages() // [];
+    my @warnings = grep { $_->{level} eq 'warn' || $_->{level} eq 'error' } @{$msgs};
+    is(scalar(@warnings), 0,
+        'clean AI bot classification produces no warnings or errors in messages()');
+};
+
+# AI crawlers must not be mistakenly classified as search engines.
+# is_search_engine() and is_ai() represent separate, distinct categories.
+subtest 'is_ai(): AI crawlers are not search engines' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = $UA_CLAUDE_BOT;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(),             'ClaudeBot: is_ai true');
+    ok(!$info->is_search_engine(), 'ClaudeBot: is_search_engine false (AI != search engine)');
+};
+
+# ChatGPT-User has no "bot" or "spider" token in the UA string, so
+# is_robot()'s own regex would not catch it directly.  This workflow
+# test confirms end-to-end that the invariant path works: is_robot()
+# delegates to is_ai() internally, so both return true.
+subtest 'is_ai(): ChatGPT-User full workflow -- no bot token in UA' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = $UA_CHATGPT_USR;
+    $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'q=hello';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(),     'ChatGPT-User: is_ai true');
+    ok($info->is_robot(),  'ChatGPT-User: is_robot true (invariant; no "bot" token in UA)');
+    ok(!$info->is_mobile(), 'ChatGPT-User: is_mobile false');
+    is($info->browser_type(), 'ai', 'ChatGPT-User: browser_type is ai');
+    is($info->status(), 200, 'ChatGPT-User: status remains 200 for clean request');
+};
+
+# GPTBot (OpenAI) with a clean request: confirms is_ai works beyond Anthropic bots
+# and that cohere-ai (unusual UA with no bot/spider token) is also captured.
+subtest 'is_ai(): multiple AI vendors all classified correctly' => sub {
+    my @ai_uas = (
+        [ $UA_GPTBOT,      'GPTBot'    ],
+        [ $UA_COHERE_AI,   'cohere-ai' ],
+    );
+
+    for my $case (@ai_uas) {
+        my ($ua, $label) = @{$case};
+        reset_env();
+        $ENV{HTTP_USER_AGENT}   = $ua;
+        $ENV{REMOTE_ADDR}       = $AI_REMOTE;
+        $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+
+        my $info = CGI::Info->new();
+        ok($info->is_ai(),    "$label: is_ai true");
+        ok($info->is_robot(), "$label: is_robot true (invariant)");
+        diag("$label browser_type: " . $info->browser_type())
+            if $ENV{TEST_VERBOSE};
+    }
 };
 
 done_testing();

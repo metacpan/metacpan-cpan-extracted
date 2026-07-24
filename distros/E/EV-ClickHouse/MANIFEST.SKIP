@@ -2,6 +2,7 @@
 ^\.gitignore$
 ^\.github/
 ^\.claude/
+^\.pcg/
 ^CLAUDE\.md$
 ^blib/
 ^pm_to_blib$

@@ -23,11 +23,14 @@ no_index:
     - xt
     - src
 requires:
+  Digest::SHA: '0'
   EV: '4.11'
+  JSON::PP: '0'
+  MIME::Base64: '0'
   XSLoader: '0.02'
   perl: '5.012000'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-nats/issues
   repository: https://github.com/vividsnow/perl5-ev-nats.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

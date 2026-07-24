@@ -71,7 +71,7 @@ use File::Spec ();
 use Carp qw(croak);
 use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_EXCL O_TRUNC O_APPEND);
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -116,6 +116,23 @@ use vars qw(%_SH_FUNCTIONS);
 # _alias_expand_line() at the top of _exec_line().
 use vars qw(%_SH_ALIAS);
 
+# Variable attribute registries (v0.08).  Keyed by the UPPERCASED variable
+# name (matching BATsh::Env's case-insensitive store).  %_SH_READONLY marks
+# a variable read-only ("readonly" / "declare -r"); a later assignment is
+# refused with a diagnostic and non-zero status.  %_SH_INTATTR marks the
+# integer attribute ("declare -i"); an assignment then evaluates its right
+# hand side as shell arithmetic.
+use vars qw(%_SH_READONLY %_SH_INTATTR);
+
+# Shell umask (v0.08).  Native Win32 Perl's umask() is effectively a no-op
+# (it always reports 0), so the shell keeps its OWN notion of the mask so
+# that "umask MODE; umask" round-trips on every platform.  It is seeded
+# once from the real process umask (meaningful on Unix-like systems) and,
+# on a set, is also pushed to the OS umask so it still affects file modes
+# where the OS honours it.
+use vars qw($_SH_UMASK $_SH_UMASK_INIT);
+$_SH_UMASK_INIT = 0;
+
 # Process-substitution bookkeeping (v0.07).  <(cmd) is captured eagerly
 # into a temp file during _expand(); >(cmd) defers cmd until after the
 # current simple command finishes.  Both use unique sysopen(O_CREAT|
@@ -155,6 +172,14 @@ use vars qw(%_SH_TRAP);
 use vars qw($_GETOPTS_CHARPOS $_GETOPTS_LAST_OPTIND);
 $_GETOPTS_CHARPOS     = 0;
 $_GETOPTS_LAST_OPTIND = 0;
+
+# "command NAME ..." bypass flag (v0.08).  The POSIX "command" builtin runs
+# NAME as if no shell function of that name existed.  _cmd_command() localizes
+# this to 1 around the re-dispatch of the raw remainder so that the
+# function-lookup gate in _exec_line_impl() is skipped for that one command
+# (builtins and external programs are unaffected, exactly as bash does).
+use vars qw($_CMD_NO_FUNC);
+$_CMD_NO_FUNC = 0;
 # ----------------------------------------------------------------
 my $LAST_STATUS = 0;   # $?
 
@@ -500,11 +525,13 @@ sub _exec_line_impl {
     {
         my ($pairs_ref, $remainder) = _sh_assign_prefix($line);
         if ($pairs_ref && defined $remainder && $remainder ne '') {
+            my $ro_fail = 0;
             for my $p (@{$pairs_ref}) {
                 my ($var, $rawval) = @{$p};
                 my $val = _arr_dequote(_expand($class, $rawval));
-                BATsh::Env->set($var, $val);
+                $ro_fail = 1 unless _sh_store_scalar($var, $val);
             }
+            if ($ro_fail) { $LAST_STATUS = 1; return 1 }
             return _exec_line($class, $remainder, $opts_ref);
         }
     }
@@ -578,9 +605,9 @@ sub _exec_line_impl {
         # concatenated quotes (a"b"c, x'y'z) and backslash escapes resolve
         # correctly -- not just a single outermost "..." / '...' pair.
         $val = _arr_dequote($val);
-        BATsh::Env->set($var, $val);
-        $LAST_STATUS = 0;
-        return 0;
+        my $ok = _sh_store_scalar($var, $val);
+        $LAST_STATUS = $ok ? 0 : 1;
+        return $ok ? 0 : 1;
     }
 
     if ($lc_cmd eq 'export')  { return _cmd_export($rest) }
@@ -638,9 +665,24 @@ sub _exec_line_impl {
         my @words = _parse_args($rest);
         return _exec_line($class, join(' ', @words), $opts_ref);
     }
+    if ($lc_cmd eq 'let')     { return _cmd_let($rest) }
+    if ($lc_cmd eq 'type')    { return _cmd_type($rest) }
+    if ($lc_cmd eq 'command') {
+        # The introspection forms (-v / -V) are pure lookups; the plain
+        # run form re-dispatches the RAW (pre-expansion) remainder so it is
+        # expanded exactly once and shell functions of the same name are
+        # bypassed.  Passing $_raw_pre_expand keeps expansion single-pass.
+        return _cmd_command($class, $rest, $_raw_pre_expand, $opts_ref);
+    }
+    if ($lc_cmd eq 'umask')    { return _cmd_umask($rest) }
+    if ($lc_cmd eq 'hash')     { return _cmd_hash($rest) }
+    if ($lc_cmd eq 'readonly') { return _cmd_readonly($class, $rest) }
+    if ($lc_cmd eq 'mapfile' || $lc_cmd eq 'readarray') {
+        return _cmd_mapfile($class, $rest);
+    }
 
-    # Defined SH function
-    if (exists $_SH_FUNCTIONS{$cmd}) {
+    # Defined SH function (skipped while running under "command NAME ...").
+    if (!$_CMD_NO_FUNC && exists $_SH_FUNCTIONS{$cmd}) {
         return _call_sh_function($class, $cmd, $rest, $opts_ref);
     }
 
@@ -1536,7 +1578,7 @@ sub _cmd_export {
     # export VAR=value or export VAR
     for my $item (split /\s+/, $rest) {
         if ($item =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
-            BATsh::Env->set($1, $2);
+            _sh_store_scalar($1, $2);
         }
         elsif ($item =~ /\A([A-Za-z_][A-Za-z0-9_]*)\z/) {
             # export existing variable (already in store; no-op)
@@ -1551,9 +1593,16 @@ sub _cmd_export {
 # ----------------------------------------------------------------
 sub _cmd_unset {
     my ($rest) = @_;
+    my $status = 0;
     for my $var (split /\s+/, $rest) {
         $var =~ s/\A\s+//; $var =~ s/\s+\z//;
         next if $var eq '';
+        # A readonly variable / element cannot be unset (bash: status 1).
+        if ($_SH_READONLY{ uc($var) }) {
+            print STDERR "sh: unset: $var: cannot unset: readonly variable\n";
+            $status = 1;
+            next;
+        }
         # unset NAME[SUB] -- remove a single array element
         if ($var =~ /\A([A-Za-z_][A-Za-z0-9_]*)\[([^\]]*)\]\z/) {
             my ($name, $sub) = ($1, $2);
@@ -1576,8 +1625,8 @@ sub _cmd_unset {
         }
         BATsh::Env->unset($var);
     }
-    $LAST_STATUS = 0;
-    return 0;
+    $LAST_STATUS = $status;
+    return $status;
 }
 
 # ----------------------------------------------------------------
@@ -1611,29 +1660,227 @@ sub _cmd_echo {
 # ----------------------------------------------------------------
 # printf
 # ----------------------------------------------------------------
+# A faithful pure-Perl printf: POSIX/bash format-string escapes, the full
+# conversion set (%d %i %o %u %x %X %e %E %f %g %G %c %s %b %q %%), field
+# width / precision including the dynamic "*" form, argument RECYCLING (the
+# format is reused until the arguments are exhausted), the "%b" conversion
+# (backslash escapes interpreted in the argument, with "\c" ending output),
+# the "%q" conversion (shell-reusable quoting), and the "-v VAR" option
+# (store the result in a shell variable instead of printing).  Perl 5.005_03
+# safe: no lexical filehandles, no 3-argument open, no post-5.005 sprintf
+# conversions (%a is deliberately not emitted).
 sub _cmd_printf {
     my ($rest) = @_;
-    $rest =~ s/\A\s+//;
-    # Extract format string (first quoted arg or first word)
-    my ($fmt, @args);
-    if ($rest =~ s/\A"((?:[^"\\]|\\.)*)"\s*//) {
-        $fmt = $1;
+    $rest = '' unless defined $rest;
+
+    my @tok = _arr_split_words($rest);
+
+    # Options on the still-quoted tokens: -v VAR / -vVAR, and -- terminator.
+    my $target;
+    while (@tok) {
+        my $t0 = $tok[0];
+        if ($t0 eq '--') { shift @tok; last }
+        if ($t0 eq '-v') {
+            shift @tok;
+            my $vn = @tok ? _arr_dequote(shift @tok) : '';
+            $target = $vn if $vn ne '';
+            next;
+        }
+        if ($t0 =~ /\A-v(.+)\z/s) {
+            shift @tok;
+            $target = _arr_dequote($1);
+            next;
+        }
+        last;
     }
-    elsif ($rest =~ s/\A'([^']*)'\s*//) {
-        $fmt = $1;
-    }
-    else {
-        ($fmt, $rest) = split /\s+/, $rest, 2;
-        $rest = '' unless defined $rest;
-    }
-    @args = split /\s+/, $rest;
-    $fmt =~ s/\\n/\n/g;
-    $fmt =~ s/\\t/\t/g;
+    if (!@tok) { $LAST_STATUS = 0; return 0 }
+
+    my $fmt  = _arr_dequote(shift @tok);
+    my @args = map { _arr_dequote($_) } @tok;
     $fmt  = BATsh::MB::dec($fmt);
     @args = map { BATsh::MB::dec($_) } @args;
-    eval { printf $fmt, @args };
+
+    my ($fmt_x, $fmt_stop) = _printf_unescape($fmt, 1);
+    my $out = _printf_format($fmt_x, $fmt_stop, @args);
+
+    if (defined $target) {
+        BATsh::Env->set($target, $out);
+    }
+    else {
+        print $out;
+    }
     $LAST_STATUS = 0;
     return 0;
+}
+
+# _printf_unescape(STR, ALLOW_C): interpret C/POSIX backslash escapes.
+# Returns (RESULT, STOP) where STOP is true when a "\c" (only recognised
+# when ALLOW_C is set) requested that output cease.  Unknown escapes keep
+# their backslash, matching bash.
+sub _printf_unescape {
+    my ($s, $allow_c) = @_;
+    $s = '' unless defined $s;
+    my $out  = '';
+    my $stop = 0;
+    my $i    = 0;
+    my $n    = length $s;
+    while ($i < $n) {
+        my $c = substr($s, $i, 1);
+        if ($c ne '\\') { $out .= $c; $i++; next }
+        my $d = substr($s, $i + 1, 1);
+        if    ($d eq 'n')  { $out .= "\n";     $i += 2 }
+        elsif ($d eq 't')  { $out .= "\t";     $i += 2 }
+        elsif ($d eq 'r')  { $out .= "\r";     $i += 2 }
+        elsif ($d eq '\\') { $out .= "\\";     $i += 2 }
+        elsif ($d eq 'a')  { $out .= chr(7);   $i += 2 }
+        elsif ($d eq 'b')  { $out .= chr(8);   $i += 2 }
+        elsif ($d eq 'f')  { $out .= chr(12);  $i += 2 }
+        elsif ($d eq 'v')  { $out .= chr(11);  $i += 2 }
+        elsif ($d eq 'e' || $d eq 'E') { $out .= chr(27); $i += 2 }
+        elsif ($d eq '"')  { $out .= '"';      $i += 2 }
+        elsif ($d eq "'")  { $out .= "'";      $i += 2 }
+        elsif ($d eq 'c' && $allow_c) { $stop = 1; last }
+        elsif ($d eq 'x') {
+            my $h = substr($s, $i + 2);
+            if ($h =~ /\A([0-9A-Fa-f]{1,2})/) {
+                $out .= chr(hex($1)); $i += 2 + length($1);
+            }
+            else { $out .= '\\x'; $i += 2 }
+        }
+        elsif ($d =~ /[0-7]/) {
+            my $o = substr($s, $i + 1);
+            if ($o =~ /\A(0?[0-7]{1,3})/) {
+                $out .= chr(oct($1) & 0xFF); $i += 1 + length($1);
+            }
+            else { $out .= '\\'; $i++ }
+        }
+        elsif ($d eq '') { $out .= '\\'; $i++ }
+        else             { $out .= '\\' . $d; $i += 2 }
+    }
+    return ($out, $stop);
+}
+
+# _printf_int(STR) / _printf_num(STR): coerce a printf argument to an
+# integer / a number for a numeric conversion.  A leading ' or " selects
+# the numeric value of the following character (POSIX); otherwise a leading
+# numeric prefix (decimal, 0x hex, 0 octal) is used, and a non-numeric
+# argument yields 0 (bash warns and uses 0; we stay quiet).
+sub _printf_int {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    if ($s =~ /\A['"](.)/s) { return ord($1) }
+    if ($s =~ /\A\s*([-+]?)0[xX]([0-9A-Fa-f]+)/) {
+        my $v = hex($2); return ($1 eq '-') ? -$v : $v;
+    }
+    if ($s =~ /\A\s*([-+]?)0([0-7]+)\z/) {
+        my $v = oct($2); return ($1 eq '-') ? -$v : $v;
+    }
+    if ($s =~ /\A\s*([-+]?\d+)/) { return int($1) }
+    return 0;
+}
+
+sub _printf_num {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    if ($s =~ /\A['"](.)/s) { return ord($1) }
+    if ($s =~ /\A\s*([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)/) { return $1 + 0 }
+    if ($s =~ /\A\s*([-+]?)0[xX]([0-9A-Fa-f]+)/) {
+        my $v = hex($2); return ($1 eq '-') ? -$v : $v;
+    }
+    return 0;
+}
+
+# _printf_shellquote(STR): the "%q" conversion -- quote STR so it reads back
+# as a single shell word.  Safe characters are emitted bare; anything else
+# is single-quoted with embedded single quotes rendered as '\''.
+sub _printf_shellquote {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    return "''" if $s eq '';
+    return $s if $s =~ m{\A[-A-Za-z0-9_./:=@%+,]+\z};
+    my $q = $s;
+    $q =~ s/'/'\\''/g;
+    return "'" . $q . "'";
+}
+
+# _sp(FMT, ARGS): sprintf with warnings suppressed (a non-numeric argument
+# already coerced to 0, an over-wide field, etc. must not print to STDERR).
+sub _sp {
+    my ($f, @a) = @_;
+    local $SIG{'__WARN__'} = sub { };
+    return sprintf($f, @a);
+}
+
+# _printf_format(FMT, FMT_STOP, ARGS): apply the (already escape-expanded)
+# format to the argument list, recycling the format until the arguments are
+# exhausted (bash semantics), and stopping early if a "\c" was seen.
+sub _printf_format {
+    my ($fmt, $fmt_stop, @args) = @_;
+    my $out   = '';
+    my $ai    = 0;
+    my $narg  = scalar @args;
+    my $guard = 0;
+    while (1) {
+        $guard++;
+        last if $guard > 100000;
+        my $consumed = 0;
+        my $stop     = 0;
+        my $i        = 0;
+        my $len      = length $fmt;
+        while ($i < $len) {
+            my $c = substr($fmt, $i, 1);
+            if ($c ne '%') { $out .= $c; $i++; next }
+            if (substr($fmt, $i + 1, 1) eq '%') { $out .= '%'; $i += 2; next }
+            my $tail = substr($fmt, $i);
+            if ($tail =~ /\A(%[-+ 0#]*(?:\*|\d+)?(?:\.(?:\*|\d+))?)([diouxXeEfgGcsbq])/) {
+                my $spec = $1;
+                my $conv = $2;
+                $i += length($1) + length($2);
+
+                while ($spec =~ /\*/) {
+                    my $val = ($ai < $narg) ? _printf_int($args[$ai]) : 0;
+                    if ($ai < $narg) { $ai++; $consumed++ }
+                    $val = -$val if $val < 0;   # negative field width -> abs
+                    $spec =~ s/\*/$val/;
+                }
+
+                my $have = ($ai < $narg);
+                my $raw  = $have ? $args[$ai] : '';
+
+                if ($conv eq 's') {
+                    $out .= _sp($spec . 's', $raw);
+                    if ($have) { $ai++; $consumed++ }
+                }
+                elsif ($conv eq 'b') {
+                    my ($ex, $st) = _printf_unescape($raw, 1);
+                    $out .= _sp($spec . 's', $ex);
+                    if ($have) { $ai++; $consumed++ }
+                    if ($st) { $stop = 1; last }
+                }
+                elsif ($conv eq 'q') {
+                    $out .= _sp($spec . 's', _printf_shellquote($raw));
+                    if ($have) { $ai++; $consumed++ }
+                }
+                elsif ($conv eq 'c') {
+                    my $ch = length($raw) ? substr($raw, 0, 1) : '';
+                    $out .= _sp($spec . 's', $ch);
+                    if ($have) { $ai++; $consumed++ }
+                }
+                elsif ($conv =~ /[diouxX]/) {
+                    $out .= _sp($spec . $conv, _printf_int($raw));
+                    if ($have) { $ai++; $consumed++ }
+                }
+                else {
+                    $out .= _sp($spec . $conv, _printf_num($raw));
+                    if ($have) { $ai++; $consumed++ }
+                }
+            }
+            else { $out .= '%'; $i++ }
+        }
+        last if $stop || $fmt_stop;
+        last unless ($ai < $narg && $consumed > 0);
+    }
+    return $out;
 }
 
 # ----------------------------------------------------------------
@@ -2684,6 +2931,11 @@ sub reset_sh_options {
     # getopts loop cannot leak its position into the next run.
     $_GETOPTS_CHARPOS     = 0;
     $_GETOPTS_LAST_OPTIND = 0;
+    # Variable attributes (v0.08) are script-scoped, like the options
+    # above: a fresh top-level run starts with no readonly / integer
+    # markings so one script's "readonly X" cannot leak into the next.
+    %_SH_READONLY = ();
+    %_SH_INTATTR  = ();
     return 0;
 }
 
@@ -5162,15 +5414,522 @@ sub _cmd_external {
     $full = BATsh::MB::dec($full);
     BATsh::Env->sync_to_env();
     my $rc = system($full);
-    $LAST_STATUS = ($rc == 0) ? 0 : (($rc >> 8) || 1);
+    if ($rc == -1) {
+        # system() could not launch the command (not found / exec failed).
+        # bash reports 127 for "command not found"; without this guard the
+        # old ($rc >> 8) arithmetic on -1 produced a huge garbage status.
+        $LAST_STATUS = 127;
+    }
+    else {
+        $LAST_STATUS = ($rc == 0) ? 0 : (($rc >> 8) || 1);
+    }
     return $LAST_STATUS;
+}
+
+# ----------------------------------------------------------------
+# let / type / command  (v0.08)
+# ----------------------------------------------------------------
+# Prior to v0.08 these three POSIX/bash builtins fell through to the
+# external-command path and were handed to whatever real shell (if any)
+# happened to exist -- which failed on systems without that shell, and
+# defeated BATsh's "no external shell required" design.  They are now
+# evaluated internally in pure Perl.
+
+# let EXPR [EXPR ...]
+#   Each argument is evaluated as a shell-arithmetic expression (reusing
+#   _eval_arith, so assignments and ++/-- write back to the variable store).
+#   The exit status is 0 when the LAST expression is non-zero, else 1 --
+#   the inverse-of-truth convention bash's "let" and "(( ))" both use.
+#   Arguments are quote-stripped but NOT filename-globbed, so `let "x=1*2"`
+#   and `let x=1+2` both behave as arithmetic rather than pathname patterns.
+sub _cmd_let {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    my @exprs = map { _arr_dequote($_) } _arr_split_words($rest);
+    if (!@exprs) {
+        print STDERR "sh: let: expression expected\n";
+        $LAST_STATUS = 1;
+        return 1;
+    }
+    my $last = 0;
+    for my $e (@exprs) {
+        $last = _eval_arith($e);
+    }
+    $LAST_STATUS = ($last != 0) ? 0 : 1;
+    return $LAST_STATUS;
+}
+
+# _sh_name_kind(NAME): classify NAME the way "type" / "command -v" do,
+# in bash's precedence order (alias, keyword, function, builtin, file).
+# Returns (KIND, DETAIL) where KIND is one of
+#   'alias' (DETAIL = alias body), 'keyword', 'function', 'builtin',
+#   'file'  (DETAIL = resolved path), or '' (not found; DETAIL undef).
+sub _sh_name_kind {
+    my ($name) = @_;
+    return ('', undef) unless defined $name && $name ne '';
+
+    return ('alias', $_SH_ALIAS{$name}) if exists $_SH_ALIAS{$name};
+
+    my $lc = lc($name);
+    my %kw = map { ($_ => 1) } qw(
+        if then else elif fi for while until do done
+        case esac function in select time
+    );
+    return ('keyword', undef) if $kw{$lc};
+
+    return ('function', undef) if exists $_SH_FUNCTIONS{$name};
+
+    return ('builtin', undef) if $name eq '[' || $name eq ':' || $name eq '.';
+    my %bi = map { ($_ => 1) } qw(
+        alias break cd command continue declare echo eval exec exit export
+        false getopts hash let local mapfile printf pwd read readarray
+        readonly return set shift shopt source test true trap type typeset
+        umask unalias unset
+    );
+    return ('builtin', undef) if $bi{$lc};
+
+    my $path = _sh_find_on_path($name);
+    return ('file', $path) if defined $path;
+
+    return ('', undef);
+}
+
+# _sh_find_on_path(NAME): locate an executable NAME the way a shell would.
+# A NAME containing a directory separator is tested directly; otherwise each
+# PATH element is searched (';'-separated and PATHEXT-aware on Windows-like
+# systems, ':'-separated and -x-tested elsewhere).  Returns the full path,
+# or undef when not found.  Pure-Perl and Perl 5.005_03 safe.
+sub _sh_find_on_path {
+    my ($name) = @_;
+    return undef unless defined $name && $name ne '';
+    my $is_win = ($^O =~ /MSWin32|dos|os2|cygwin/i) ? 1 : 0;
+
+    if ($name =~ m{[/\\]}) {
+        return $name if -f $name && ($is_win || -x $name);
+        return undef;
+    }
+
+    my $path = BATsh::Env->get('PATH');
+    $path = $ENV{'PATH'} unless defined $path && $path ne '';
+    return undef unless defined $path && $path ne '';
+
+    my $sep  = $is_win ? ';' : ':';
+    my @exts = ('');
+    if ($is_win) {
+        my $pe = BATsh::Env->get('PATHEXT');
+        $pe = $ENV{'PATHEXT'} unless defined $pe && $pe ne '';
+        $pe = '.COM;.EXE;.BAT;.CMD' unless defined $pe && $pe ne '';
+        push @exts, split(/;/, $pe);
+    }
+
+    my @dirs = split(/\Q$sep\E/, $path);
+    for my $dir (@dirs) {
+        $dir = '.' if $dir eq '';
+        for my $ext (@exts) {
+            my $cand = File::Spec->catfile($dir, $name . $ext);
+            if ($is_win) {
+                return $cand if -f $cand;
+            }
+            else {
+                return $cand if -f $cand && -x $cand;
+            }
+        }
+    }
+    return undef;
+}
+
+# _print_type_verbose(NAME, KIND, DETAIL): emit the "type NAME" / "command -V
+# NAME" description line.  Returns 1 when found, 0 (with a STDERR diagnostic)
+# when NAME is unknown.
+sub _print_type_verbose {
+    my ($name, $kind, $detail) = @_;
+    if ($kind eq 'alias') {
+        print "$name is aliased to `" . (defined $detail ? $detail : '') . "'\n";
+    }
+    elsif ($kind eq 'keyword')  { print "$name is a shell keyword\n" }
+    elsif ($kind eq 'function') { print "$name is a function\n" }
+    elsif ($kind eq 'builtin')  { print "$name is a shell builtin\n" }
+    elsif ($kind eq 'file')     { print "$name is $detail\n" }
+    else {
+        print STDERR "sh: type: $name: not found\n";
+        return 0;
+    }
+    return 1;
+}
+
+# type [-t|-p|-a] NAME [NAME ...]
+#   Default: describe how each NAME would be interpreted.
+#   -t: print only the one-word kind (alias/keyword/function/builtin/file).
+#   -p: print only the path when NAME is an external file (else nothing).
+#   -a: describe all matches (this interpreter reports the single primary
+#       match, so -a behaves like the default form).
+#   Exit status is non-zero when any NAME is not found.
+sub _cmd_type {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    my @w = map { _arr_dequote($_) } _arr_split_words($rest);
+
+    my $mode = '';   # '', 't', 'p', 'a'
+    while (@w && $w[0] =~ /\A-[atpP]+\z/) {
+        my $opt = shift @w;
+        $mode = 'a' if $opt =~ /a/;
+        $mode = 't' if $opt =~ /t/;
+        $mode = 'p' if $opt =~ /[pP]/;
+    }
+    if (!@w) { $LAST_STATUS = 0; return 0 }
+
+    my $status = 0;
+    for my $name (@w) {
+        my ($kind, $detail) = _sh_name_kind($name);
+        if ($mode eq 't') {
+            if ($kind eq '') { $status = 1 }
+            else { print $kind, "\n" }
+        }
+        elsif ($mode eq 'p') {
+            if    ($kind eq 'file') { print $detail, "\n" }
+            elsif ($kind eq '')     { $status = 1 }
+            # builtin/function/keyword/alias: print nothing (bash -p)
+        }
+        else {
+            _print_type_verbose($name, $kind, $detail) or $status = 1;
+        }
+    }
+    $LAST_STATUS = $status;
+    return $status;
+}
+
+# command [-p] [-v|-V] NAME [ARG ...]
+#   -v: print how NAME would be invoked (name for a builtin/function/keyword,
+#       "alias NAME='...'" for an alias, full path for an external file);
+#       exit non-zero if NAME is not found -- the ubiquitous feature-detection
+#       idiom `if command -v foo >/dev/null; then ...`.
+#   -V: verbose description, like "type NAME".
+#   plain: run NAME bypassing any shell function of that name.
+#   -p is accepted and ignored (PATH is always searched).
+sub _cmd_command {
+    my ($class, $rest, $raw_pre, $opts_ref) = @_;
+    $rest = '' unless defined $rest;
+    my @w = map { _arr_dequote($_) } _arr_split_words($rest);
+
+    my $mode = '';   # '', 'v', 'V'
+    while (@w && $w[0] =~ /\A-[pvV]+\z/) {
+        my $opt = shift @w;
+        $mode = 'v' if $opt =~ /v/;
+        $mode = 'V' if $opt =~ /V/;
+        # -p: accepted, no effect
+    }
+    # A bare "--" ends option parsing.
+    shift @w if @w && $w[0] eq '--';
+
+    if (!@w) { $LAST_STATUS = ($mode ne '') ? 1 : 0; return $LAST_STATUS }
+
+    if ($mode eq 'v' || $mode eq 'V') {
+        my $status = 0;
+        for my $name (@w) {
+            my ($kind, $detail) = _sh_name_kind($name);
+            if ($mode eq 'V') {
+                _print_type_verbose($name, $kind, $detail) or $status = 1;
+            }
+            else {   # -v
+                if    ($kind eq 'alias') { print "alias $name='" . (defined $detail ? $detail : '') . "'\n" }
+                elsif ($kind eq 'file')  { print $detail, "\n" }
+                elsif ($kind eq '')      { $status = 1 }
+                else                     { print $name, "\n" }   # keyword/function/builtin
+            }
+        }
+        $LAST_STATUS = $status;
+        return $status;
+    }
+
+    # Plain run form: re-dispatch the raw remainder with function lookup
+    # suppressed.  Recover the text after the leading "command" word (and any
+    # -p / -- options) from the pre-expansion source so _expand() runs once.
+    my $raw = defined $raw_pre ? $raw_pre : $rest;
+    $raw =~ s/\A\s*//;
+    $raw =~ s/\A[Cc][Oo][Mm][Mm][Aa][Nn][Dd]\b//;
+    $raw =~ s/\A\s+//;
+    while ($raw =~ /\A(-[pvV]+|--)\s/) {
+        my $tok = $1;
+        $raw =~ s/\A(?:-[pvV]+|--)\s+//;
+        last if $tok eq '--';
+    }
+    local $_CMD_NO_FUNC = 1;
+    return _exec_line($class, $raw, $opts_ref);
 }
 
 # ----------------------------------------------------------------
 # Background execution helpers (v1)
 # ----------------------------------------------------------------
-# _split_trailing_bg: detect an unquoted single & at the very end of a
-# line.  Returns (1, $line_without_amp) when present, else (0, $line).
+# ----------------------------------------------------------------
+# umask / hash / readonly / mapfile  (v0.08)
+# ----------------------------------------------------------------
+# _sh_is_readonly(NAME): true when NAME carries the readonly attribute.
+sub _sh_is_readonly {
+    my ($name) = @_;
+    return 0 unless defined $name;
+    return $_SH_READONLY{ uc($name) } ? 1 : 0;
+}
+
+# _sh_store_scalar(NAME, VALUE): the single choke point for a plain scalar
+# assignment.  Honours the readonly attribute (refused, status source
+# returns 0) and the integer attribute (VALUE evaluated as arithmetic).
+# Returns 1 when the value was stored, 0 when a readonly variable blocked
+# it.  All the ordinary assignment paths (VAR=val, prefix VAR=val cmd,
+# export VAR=val) funnel through here so the attributes are enforced
+# uniformly.
+sub _sh_store_scalar {
+    my ($name, $val) = @_;
+    my $ik = uc($name);
+    if ($_SH_READONLY{$ik}) {
+        print STDERR "sh: $name: readonly variable\n";
+        return 0;
+    }
+    if ($_SH_INTATTR{$ik}) {
+        $val = _eval_arith(defined $val ? $val : '');
+    }
+    BATsh::Env->set($name, $val);
+    return 1;
+}
+
+# umask [-S] [MODE]
+#   With no MODE, print the current file-creation mask (octal, or symbolic
+#   with -S).  A numeric (octal) MODE sets the mask.  Uses Perl's umask, so
+#   it is a genuine process mask on Unix-like systems (a no-op reflecting
+#   whatever the C library reports on Win32).
+sub _cmd_umask {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
+
+    # Seed the shell mask from the real process umask on first use.
+    if (!$_SH_UMASK_INIT) {
+        my $u = umask();
+        $_SH_UMASK = defined $u ? $u : 0;
+        $_SH_UMASK_INIT = 1;
+    }
+
+    my $symbolic = 0;
+    if ($rest =~ s/\A-S\b\s*//) { $symbolic = 1 }
+
+    if ($rest eq '') {
+        if ($symbolic) { print _umask_symbolic($_SH_UMASK), "\n" }
+        else           { printf "%04o\n", $_SH_UMASK }
+        $LAST_STATUS = 0;
+        return 0;
+    }
+    if ($rest =~ /\A[0-7]+\z/) {
+        $_SH_UMASK = oct($rest) & 0777;
+        umask($_SH_UMASK);   # honoured on Unix, harmless where it is not
+        $LAST_STATUS = 0;
+        return 0;
+    }
+    # Symbolic mode: "u=rwx,g=rx,o=rx" (and +/- ops).  The operand names the
+    # permissions to LEAVE enabled; the mask is their complement.
+    my $sym = _umask_apply_symbolic($_SH_UMASK, $rest);
+    if (defined $sym) {
+        $_SH_UMASK = $sym;
+        umask($_SH_UMASK);
+        $LAST_STATUS = 0;
+        return 0;
+    }
+    print STDERR "sh: umask: $rest: invalid mask\n";
+    $LAST_STATUS = 1;
+    return 1;
+}
+
+# _umask_apply_symbolic(MASK, SPEC): apply a chmod-style symbolic SPEC
+# ("[ugoa]*[-+=][rwx]*", comma-separated) to the numeric umask MASK, in
+# terms of the permissions the mask leaves ENABLED.  Returns the new
+# numeric mask, or undef when SPEC is not valid symbolic syntax.
+sub _umask_apply_symbolic {
+    my ($mask, $spec) = @_;
+    return undef unless defined $spec && $spec ne '';
+    my @allow = (
+        (~ (($mask >> 6) & 7)) & 7,
+        (~ (($mask >> 3) & 7)) & 7,
+        (~ ($mask & 7)) & 7,
+    );
+    my %idx = ('u' => 0, 'g' => 1, 'o' => 2);
+    for my $clause (split /,/, $spec) {
+        return undef unless $clause =~ /\A([ugoa]*)([-+=])([rwx]*)\z/;
+        my ($who, $op, $pstr) = ($1, $2, $3);
+        my $perm = 0;
+        $perm |= 4 if $pstr =~ /r/;
+        $perm |= 2 if $pstr =~ /w/;
+        $perm |= 1 if $pstr =~ /x/;
+        my @classes;
+        if ($who eq '' || $who =~ /a/) { @classes = (0, 1, 2) }
+        else {
+            for my $w (split //, $who) { push @classes, $idx{$w} }
+        }
+        for my $ci (@classes) {
+            if    ($op eq '=') { $allow[$ci] = $perm }
+            elsif ($op eq '+') { $allow[$ci] |= $perm }
+            else               { $allow[$ci] &= (~ $perm) & 7 }
+        }
+    }
+    my $newmask = 0;
+    $newmask |= ((~ $allow[0]) & 7) << 6;
+    $newmask |= ((~ $allow[1]) & 7) << 3;
+    $newmask |=  (~ $allow[2]) & 7;
+    return $newmask & 0777;
+}
+
+# _umask_symbolic(MASK): render a numeric umask as the bash-style symbolic
+# form "u=rwx,g=rx,o=rx" (the permissions the mask LEAVES enabled).
+sub _umask_symbolic {
+    my ($mask) = @_;
+    my @cls = ('u', 'g', 'o');
+    my @sh  = (($mask >> 6) & 7, ($mask >> 3) & 7, $mask & 7);
+    my @out;
+    for my $i (0 .. 2) {
+        my $allow = (~ $sh[$i]) & 7;
+        my $s = '';
+        $s .= 'r' if $allow & 4;
+        $s .= 'w' if $allow & 2;
+        $s .= 'x' if $allow & 1;
+        push @out, $cls[$i] . '=' . $s;
+    }
+    return join(',', @out);
+}
+
+# hash [-r] [-l] [-t] [-d name] [-p path name] [NAME ...]
+#   BATsh resolves commands through PATH on every call and keeps no
+#   location cache, so the maintenance forms (-r clear, -l/-t list, -d/-p)
+#   are accepted as successful no-ops.  "hash NAME ..." verifies each NAME
+#   is found on PATH (status 1 if any is missing), matching the observable
+#   result of bash caching a lookup.
+sub _cmd_hash {
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
+    return _sh_set_status(0) if $rest eq '';
+    return _sh_set_status(0) if $rest =~ /\A-[rlt]\b\s*\z/;
+    return _sh_set_status(0) if $rest =~ /\A-[dp]\b/;
+
+    my @tok = map { _arr_dequote($_) } _arr_split_words($rest);
+    my $status = 0;
+    for my $name (@tok) {
+        next if $name =~ /\A-/;
+        if (!defined _sh_find_on_path($name)) {
+            print STDERR "sh: hash: $name: not found\n";
+            $status = 1;
+        }
+    }
+    return _sh_set_status($status);
+}
+
+sub _sh_set_status {
+    my ($s) = @_;
+    $LAST_STATUS = $s;
+    return $s;
+}
+
+# readonly [-p] [NAME[=VALUE] ...]
+#   Mark each NAME read-only (optionally assigning VALUE first).  With no
+#   NAME, or with -p, list the current readonly variables in a form that
+#   can be re-read.
+sub _cmd_readonly {
+    my ($class, $rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
+
+    if ($rest eq '' || $rest eq '-p') {
+        for my $ik (sort keys %_SH_READONLY) {
+            my $v = BATsh::Env->get($ik);
+            $v = '' unless defined $v;
+            $v =~ s/'/'\\''/g;
+            print "readonly $ik='$v'\n";
+        }
+        return _sh_set_status(0);
+    }
+
+    my @tok = map { _arr_dequote($_) } _arr_split_words($rest);
+    my $status = 0;
+    for my $t (@tok) {
+        next if $t eq '-p' || $t eq '';
+        if ($t =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
+            my ($name, $val) = ($1, $2);
+            if (_sh_is_readonly($name)) {
+                print STDERR "sh: $name: readonly variable\n";
+                $status = 1;
+                next;
+            }
+            BATsh::Env->set($name, $val);
+            $_SH_READONLY{ uc($name) } = 1;
+        }
+        elsif ($t =~ /\A([A-Za-z_][A-Za-z0-9_]*)\z/) {
+            $_SH_READONLY{ uc($1) } = 1;
+        }
+    }
+    return _sh_set_status($status);
+}
+
+# mapfile / readarray [-t] [-d DELIM] [-n COUNT] [-O ORIGIN] [-s SKIP] [ARRAY]
+#   Read lines from standard input into the indexed array ARRAY (default
+#   MAPFILE).  -t strips the trailing delimiter from each line; -d sets the
+#   line delimiter (default newline); -n COUNT copies at most COUNT lines
+#   (0 = all); -s SKIP discards the first SKIP lines; -O ORIGIN stores the
+#   first line at index ORIGIN.  STDIN is whatever the surrounding
+#   redirection supplied (e.g. "mapfile arr < file").
+sub _cmd_mapfile {
+    my ($class, $rest) = @_;
+    $rest = '' unless defined $rest;
+    my @tok = map { _arr_dequote($_) } _arr_split_words($rest);
+
+    my $strip  = 0;
+    my $delim  = "\n";
+    my $count  = 0;    # 0 = unlimited
+    my $skip   = 0;
+    my $origin = 0;
+    while (@tok) {
+        my $t = $tok[0];
+        if    ($t eq '-t') { shift @tok; $strip = 1 }
+        elsif ($t eq '-n') { shift @tok; $count  = @tok ? int(_arr_num(shift @tok)) : 0 }
+        elsif ($t eq '-s') { shift @tok; $skip   = @tok ? int(_arr_num(shift @tok)) : 0 }
+        elsif ($t eq '-O') { shift @tok; $origin = @tok ? int(_arr_num(shift @tok)) : 0 }
+        elsif ($t eq '-d') { shift @tok; $delim  = @tok ? shift @tok : "\n" }
+        elsif ($t =~ /\A-d(.+)\z/s) { shift @tok; $delim = $1 }
+        elsif ($t eq '-u' || $t eq '-c' || $t eq '-C') { shift @tok; shift @tok if @tok }
+        elsif ($t =~ /\A-/) { shift @tok }   # unknown flag: ignore
+        else { last }
+    }
+    my $name = @tok ? shift @tok : 'MAPFILE';
+    $name = 'MAPFILE' unless defined $name && $name ne '';
+
+    my $sep = (defined $delim && length $delim) ? substr($delim, 0, 1) : "\n";
+    my @lines;
+    {
+        local $/ = $sep;
+        while (defined(my $l = <STDIN>)) { push @lines, $l }
+    }
+
+    if ($skip > 0) {
+        if ($skip >= @lines) { @lines = () }
+        else { splice(@lines, 0, $skip) }
+    }
+    if ($count > 0 && @lines > $count) { @lines = @lines[0 .. $count - 1] }
+    if ($strip) { for my $l (@lines) { $l =~ s/\Q$sep\E\z// } }
+    @lines = map { BATsh::MB::enc($_) } @lines;
+
+    my $k = _arr_name($name);
+    $_SH_ARRAY{$k}      = {};
+    $_SH_ARRAY_TYPE{$k} = 'indexed';
+    BATsh::Env->unset($name);
+    my $ix = $origin;
+    for my $l (@lines) { $_SH_ARRAY{$k}{$ix} = $l; $ix++ }
+
+    return _sh_set_status(0);
+}
+
+# _arr_num(S): integer value of a leading numeric prefix (0 otherwise).
+sub _arr_num {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    return ($s =~ /\A\s*([-+]?\d+)/) ? int($1) : 0;
+}
+
+
 # Rules:
 #   * only the last non-space character may be the background &
 #   * it must not be part of && (i.e. preceding char must not be &)
@@ -5248,6 +6007,8 @@ sub _sh_word_is_foreground {
         pwd => 1, exit => 1, 'true' => 1, 'false' => 1, read => 1,
         test => 1, source => 1, 'return' => 1, 'break' => 1,
         'continue' => 1, shift => 1, local => 1, set => 1,
+        let => 1, type => 1, command => 1,
+        umask => 1, hash => 1, readonly => 1, mapfile => 1, readarray => 1,
     );
     return 1 if $builtin{$lc};
 
@@ -5900,10 +6661,14 @@ sub _cmd_declare {
     $rest =~ s/\A\s+//;
 
     my $type;   # 'assoc' | 'indexed' | undef
+    my $intattr = 0;
+    my $roattr  = 0;
     while ($rest =~ s/\A(-[A-Za-z]+)\s+//) {
         my $flag = $1;
         if    ($flag =~ /A/) { $type = 'assoc' }
         elsif ($flag =~ /a/) { $type = 'indexed' unless defined $type }
+        $intattr = 1 if $flag =~ /i/;
+        $roattr  = 1 if $flag =~ /r/;
     }
 
     while ($rest ne '') {
@@ -5916,7 +6681,7 @@ sub _cmd_declare {
             _arr_assign_literal($class, $name, $body, 0);
             $rest = $tail;
         }
-        elsif ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(\S*)\s*(.*)\z/s) {
+        elsif ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)=((?:"[^"]*"|'[^']*'|\S)*)\s*(.*)\z/s) {
             my ($name, $val, $tail) = ($1, $2, $3);
             if (defined $type) {
                 # Typed array declared with a scalar initialiser: seed [0].
@@ -5928,23 +6693,46 @@ sub _cmd_declare {
                 $val = _expand($class, $val);
                 $val =~ s/\A"(.*)"\z/$1/s;
                 $val =~ s/\A'(.*)'\z/$1/s;
-                BATsh::Env->set($name, $val);
+                my $ik = uc($name);
+                $_SH_INTATTR{$ik} = 1 if $intattr;
+                # "declare -i x=EXPR" evaluates the right hand side as
+                # arithmetic; _sh_store_scalar re-applies this for any
+                # later plain "x=..." assignment because the attribute
+                # sticks in %_SH_INTATTR.
+                $val = _eval_arith($val) if $_SH_INTATTR{$ik};
+                if (_sh_is_readonly($name)) {
+                    print STDERR "sh: $name: readonly variable\n";
+                    $LAST_STATUS = 1;
+                }
+                else {
+                    BATsh::Env->set($name, $val);
+                }
+                $_SH_READONLY{$ik} = 1 if $roattr;
             }
             $rest = $tail;
         }
         elsif ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)\s*(.*)\z/s) {
             my ($name, $tail) = ($1, $2);
-            my $k = _arr_name($name);
-            $_SH_ARRAY{$k}      = {} unless exists $_SH_ARRAY{$k};
-            $_SH_ARRAY_TYPE{$k} = (defined $type ? $type : 'indexed');
+            if (($intattr || $roattr) && !defined $type) {
+                # Attribute-only declaration: mark the variable, do NOT
+                # turn it into an (empty) array.
+                my $ik = uc($name);
+                $_SH_INTATTR{$ik}  = 1 if $intattr;
+                $_SH_READONLY{$ik} = 1 if $roattr;
+            }
+            else {
+                my $k = _arr_name($name);
+                $_SH_ARRAY{$k}      = {} unless exists $_SH_ARRAY{$k};
+                $_SH_ARRAY_TYPE{$k} = (defined $type ? $type : 'indexed');
+            }
             $rest = $tail;
         }
         else {
             last;
         }
     }
-    $LAST_STATUS = 0;
-    return 0;
+    $LAST_STATUS = 0 unless $LAST_STATUS;
+    return $LAST_STATUS;
 }
 
 # _sh_try_array_op: detect and perform an array operation on the RAW line.
@@ -6116,7 +6904,15 @@ No external sh or bash is required.
   test / [ ... ]  (file tests, string, integer comparisons)
   cd, pwd, exit, true, false, :, read, shift, local, set, eval
   shift [N]  -- shift positional parameters left by N (default 1)
+  let EXPR [EXPR ...]  -- arithmetic evaluation builtin (v0.08)
+  type [-t|-p] NAME ...  -- report how NAME resolves (v0.08)
+  command [-v|-V] NAME [ARG ...]  -- run bypassing functions / look up NAME (v0.08)
   getopts optstring name [arg ...]  -- POSIX option parser (v0.07)
+  umask [-S] [MODE]  -- print or set the file-creation mask (v0.08)
+  hash [-r] [NAME ...]  -- PATH lookup; cache maintenance is a no-op (v0.08)
+  readonly [-p] [NAME[=VALUE] ...]  -- mark variables read-only (v0.08)
+  mapfile / readarray [-t] [-d D] [-n N] [-O O] [-s S] [ARR]
+                       -- read lines of STDIN into an indexed array (v0.08)
   set -e / -u / -x, +e/+u/+x, set -o errexit|nounset|xtrace
   trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]
   $(( arithmetic )) -- full C-style operator set (see Arithmetic
@@ -6133,6 +6929,7 @@ No external sh or bash is required.
   arr=(a b c), arr+=(d e)  -- indexed array assignment / append
   arr[i]=v, arr[i]+=v      -- indexed element assignment / append
   declare -a arr, declare -A map, typeset ...  -- array declaration
+  declare -i n=EXPR, declare -r VAR  -- integer / read-only attributes (v0.08)
   map=([k1]=v1 [k2]=v2), map[k]=v  -- associative array assignment
   ${arr[i]}, ${map[key]}, $arr (== ${arr[0]})  -- element access
   ${arr[@]}, ${arr[*]}     -- all elements
@@ -6303,6 +7100,85 @@ required argument.  If C<optstring> begins with a colon (C<:ab:c>),
 to C<?> (unknown option) or C<:> (missing argument), and C<OPTARG>
 receives the offending option letter, so the script can report the error
 itself.
+
+=head2 let / type / command
+
+C<let EXPR [EXPR ...]> evaluates each argument as a shell-arithmetic
+expression, using the same evaluator as C<$(( ))>, so assignments and the
+C<++> / C<--> operators write back to the variable store.  The exit status
+is 0 when the last expression evaluates to a non-zero value and 1 when it
+is zero -- the same "success == non-zero" convention as C<(( ))>.  Quote an
+expression that contains spaces or a C<*>: C<let "x = 1 * 2">.
+
+C<type [-t|-p] NAME ...> reports how each C<NAME> would be interpreted, in
+bash's precedence order: alias, shell keyword, function, builtin, then an
+executable found on C<PATH>.  With C<-t> only the one-word kind is printed
+(C<alias> / C<keyword> / C<function> / C<builtin> / C<file>); with C<-p>
+only the path of an external file is printed.  The status is non-zero if
+any name is unknown.
+
+C<command [-v|-V] NAME [ARG ...]> runs C<NAME> as if no shell function of
+that name existed (builtins and external programs are unaffected).  With
+C<-v> it prints how C<NAME> would be invoked -- the name for a builtin,
+function or keyword, an C<alias NAME='...'> line for an alias, or the full
+path for an external file -- which is the portable feature-detection idiom
+C<if command -v foo E<gt>/dev/null; then ...>.  With C<-V> it prints a
+verbose description, like C<type>.  C<-p> is accepted and ignored.
+
+=head2 printf
+
+C<printf FORMAT [ARG ...]> formats and prints its arguments.  The FORMAT is
+reused ("recycled") until every argument has been consumed, so
+
+  printf '%s\n' one two three
+
+prints three lines.  The conversions C<%d %i %o %u %x %X %e %E %f %g %G
+%c %s %b %q %%> are supported, with the usual flags, field width and
+precision, including the dynamic C<%*d> form that takes the width from an
+argument.  C<%b> interprets backslash escapes in its argument (and a C<\c>
+there ends all output); C<%q> quotes its argument so it reads back as a
+single shell word.  The format string itself understands the C/POSIX
+escapes C<\\ \a \b \f \n \r \t \v \e>, octal C<\NNN> and hex C<\xHH>.
+
+C<printf -v VAR FORMAT ...> stores the formatted result in the shell
+variable C<VAR> instead of printing it.  A non-numeric argument given to a
+numeric conversion is treated as C<0> (bash prints a warning; BATsh stays
+quiet).
+
+=head2 umask / hash / readonly / mapfile / declare attributes
+
+C<umask [-S] [MODE]> prints the current file-creation mask (four octal
+digits, or the symbolic C<u=rwx,g=rx,o=rx> form with C<-S>) or, given a
+MODE, sets it.  MODE may be octal (C<022>) or symbolic
+(C<u=rwx,g=rx,o=rx>, with C<+> / C<-> operations such as C<g-w>).  The
+shell keeps its own copy of the mask so C<umask MODE; umask> round-trips on
+every platform; a set value is also pushed to the OS umask, which affects
+file modes on Unix-like systems.
+
+C<hash [-r] [NAME ...]> exists for script compatibility: BATsh resolves
+commands through C<PATH> on every call and keeps no location cache, so the
+maintenance forms (C<-r>, C<-l>, C<-t>, C<-d>, C<-p>) are accepted as
+successful no-ops, while C<hash NAME> verifies that NAME is found on
+C<PATH>.
+
+C<readonly [-p] [NAME[=VALUE] ...]> marks each NAME read-only; a subsequent
+assignment or C<unset> is refused with a diagnostic and non-zero status.
+The attribute is honoured at every assignment path -- a plain C<VAR=value>,
+a prefix C<VAR=value command>, C<export>, and C<declare> -- and, like the
+shell options, is reset between top-level runs.
+
+C<mapfile> / C<readarray> C<[-t] [-d DELIM] [-n COUNT] [-O ORIGIN] [-s SKIP]
+[ARRAY]> reads lines from standard input into the indexed array ARRAY
+(default C<MAPFILE>).  C<-t> strips the trailing delimiter, C<-d> sets it
+(default newline), C<-n> limits the count (0 means all), C<-s> skips
+leading lines, and C<-O> chooses the first index.  The input is whatever
+the surrounding redirection provides, e.g. C<mapfile -t lines E<lt> file>.
+
+C<declare -i NAME[=EXPR]> gives NAME the integer attribute: the initialiser
+(and any later plain C<NAME=...> assignment) is evaluated as shell
+arithmetic, so C<declare -i n=3+4> stores C<7>.  A quoted initialiser with
+spaces is accepted too, e.g. C<declare -i s="1 + 2">.  C<declare -r> marks
+the variable read-only.
 
 =head2 Arrays and Associative Arrays
 

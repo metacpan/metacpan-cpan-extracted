@@ -10,13 +10,11 @@ use Concierge::Users;
 
 # Helper to setup test environment
 sub setup_test_env {
-    my $backend = shift;
-
     my $storage_dir = tempdir(CLEANUP => 1);
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => $backend,
+        backend_class => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ email phone /],
     };
 
@@ -45,7 +43,7 @@ sub test_user_data {
 # Test Group 1: Register User
 # ==============================================================================
 subtest 'Database: Register user' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Test 1: Register a new user
     my $user_data = test_user_data();
@@ -79,7 +77,7 @@ subtest 'Database: Register user' => sub {
 # Test Group 2: Get User
 # ==============================================================================
 subtest 'Database: Get user' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Create a user first
     my $user_data = test_user_data();
@@ -107,7 +105,7 @@ subtest 'Database: Get user' => sub {
 # Test Group 3: Update User
 # ==============================================================================
 subtest 'Database: Update user' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Create a user first
     my $user_data = test_user_data();
@@ -153,7 +151,7 @@ subtest 'Database: Update user' => sub {
 # Test Group 4: List Users
 # ==============================================================================
 subtest 'Database: List users' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Test 1: Empty list
     my $empty = $users->list_users();
@@ -190,7 +188,7 @@ subtest 'Database: List users' => sub {
 # Test Group 5: Delete User
 # ==============================================================================
 subtest 'Database: Delete user' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Create a user first
     my $user_data = test_user_data();
@@ -216,7 +214,7 @@ subtest 'Database: Delete user' => sub {
 # Test Group 6: Bulk Operations
 # ==============================================================================
 subtest 'Database: Bulk operations' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Test 1: Register multiple users
     my @bulk_users = (
@@ -252,7 +250,7 @@ subtest 'Database: Bulk operations' => sub {
 # Test Group 7: Edge Cases
 # ==============================================================================
 subtest 'Database: Edge cases' => sub {
-    my ($users, $storage_dir) = setup_test_env('database');
+    my ($users, $storage_dir) = setup_test_env();
 
     # Test 1: User with minimal data
     my $minimal = $users->register_user({

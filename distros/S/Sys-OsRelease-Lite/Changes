@@ -10,6 +10,10 @@ Change log for Sys::OsRelease
  - BUG FIXES
  - DOCS
 
+0.4.4 2026-07-23T16:57:56-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - add missing FANCY_NAME attribute from os-release in systemd 260
+
 0.4.3 2026-07-21T18:44:36-07:00 America/Los_Angeles
  [BUG FIXES]
  - move some Sys::OsRelease::Lite dependency declarations from build to

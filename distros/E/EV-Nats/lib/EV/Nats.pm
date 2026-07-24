@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -130,7 +130,9 @@ addresses for latency-sensitive applications.
 
 =head1 METHODS
 
-=head2 new(%options)
+=head2 new
+
+    new(%options)
 
 Create an EV::Nats instance. If C<host> or C<path> is supplied,
 connection is initiated immediately and the C<on_connect> callback
@@ -294,13 +296,17 @@ See L</slow_consumer>.
 
 =back
 
-=head2 connect($host, [$port])
+=head2 connect
+
+    connect($host, [$port])
 
 Initiate a TCP connection. Port defaults to 4222. Croaks if already
 connected or in the middle of connecting; otherwise returns
 immediately and signals completion via C<on_connect>.
 
-=head2 connect_unix($path)
+=head2 connect_unix
+
+    connect_unix($path)
 
 Initiate a Unix-domain-socket connection. Same async semantics as
 L</connect>.
@@ -317,20 +323,26 @@ pending writes first, see L</drain>.
 True if the CONNECT/PONG handshake has completed and no disconnect
 or reconnect is in progress.
 
-=head2 publish($subject, [$payload], [$reply_to])
+=head2 publish
+
+    publish($subject, [$payload], [$reply_to])
 
 Publish a message. Alias: C<pub>.
 
     $nats->publish('foo', 'hello');
     $nats->publish('foo', 'hello', 'reply.subject');
 
-=head2 hpublish($subject, $headers, [$payload], [$reply_to])
+=head2 hpublish
+
+    hpublish($subject, $headers, [$payload], [$reply_to])
 
 Publish with headers. Alias: C<hpub>.
 
     $nats->hpublish('foo', "NATS/1.0\r\nX-Key: val\r\n\r\n", 'body');
 
-=head2 subscribe($subject, $cb, [$queue_group])
+=head2 subscribe
+
+    subscribe($subject, $cb, [$queue_group])
 
 Subscribe to a subject. Returns subscription ID. Alias: C<sub>.
 
@@ -354,19 +366,25 @@ Callback receives:
 
 =back
 
-=head2 subscribe_max($subject, $cb, $max_msgs, [$queue_group])
+=head2 subscribe_max
+
+    subscribe_max($subject, $cb, $max_msgs, [$queue_group])
 
 Convenience: L</subscribe> followed by an auto-unsubscribe after
 C<$max_msgs> messages have been delivered.
 
-=head2 unsubscribe($sid, [$max_msgs])
+=head2 unsubscribe
+
+    unsubscribe($sid, [$max_msgs])
 
 Unsubscribe. With C<$max_msgs>, the server is told to deliver that
 many more messages and then drop the subscription. The auto-unsub
 state is restored on reconnect (so the partial count survives a
 disconnect). Alias: C<unsub>.
 
-=head2 request($subject, $payload, $cb, [$timeout_ms])
+=head2 request
+
+    request($subject, $payload, $cb, [$timeout_ms])
 
 Request/reply. Uses automatic inbox subscription. Alias: C<req>.
 
@@ -381,7 +399,9 @@ NATS message headers (HMSG), a third argument C<$headers> with the
 raw header block is also passed. Error is set on timeout
 ("request timeout") or no responders ("no responders").
 
-=head2 drain([$cb])
+=head2 drain
+
+    drain([$cb])
 
 Graceful shutdown: sends UNSUB for all subscriptions, flushes pending
 writes with a PING fence, fires C<$cb> when the server confirms with
@@ -402,7 +422,9 @@ PONG arrived.
 
 Send PING to server.
 
-=head2 flush([$cb])
+=head2 flush
+
+    flush([$cb])
 
 Send PING as a write fence; the subsequent PONG guarantees all prior
 messages were processed by the server. If C<$cb> is given, it is invoked
@@ -410,7 +432,9 @@ when the PONG arrives. The callback receives a single argument: C<undef>
 on success, or an error string (e.g. C<"disconnected">) if the connection
 dropped before the PONG arrived.
 
-=head2 creds_file($path)
+=head2 creds_file
+
+    creds_file($path)
 
 Read a NATS C<.creds> file and apply the embedded JWT and NKey seed
 via L</jwt> and L</nkey_seed>. Apply this BEFORE C<connect> so the
@@ -437,7 +461,9 @@ from the server (or C<undef> before the first INFO). Useful for
 inspecting C<server_id>, C<version>, C<cluster>, C<connect_urls>,
 etc.
 
-=head2 max_payload([$limit])
+=head2 max_payload
+
+    max_payload([$limit])
 
 Server-advertised maximum payload size in bytes. Returns the current
 value; with an argument, overrides it (publishes above this croak
@@ -455,7 +481,9 @@ Drop all queued writes without sending them. Useful before
 C<disconnect> if reconnect is enabled and you don't want stale
 publishes replayed.
 
-=head2 reconnect($enable, [$delay_ms], [$max_attempts])
+=head2 reconnect
+
+    reconnect($enable, [$delay_ms], [$max_attempts])
 
 Configure reconnection. C<$delay_ms> and C<$max_attempts> are only
 written when supplied; omitted args leave the existing value unchanged.
@@ -464,27 +492,39 @@ written when supplied; omitted args leave the existing value unchanged.
 
 Returns true if reconnect is enabled.
 
-=head2 connect_timeout([$ms])
+=head2 connect_timeout
+
+    connect_timeout([$ms])
 
 Get/set connect timeout.
 
-=head2 ping_interval([$ms])
+=head2 ping_interval
+
+    ping_interval([$ms])
 
 Get/set PING interval.
 
-=head2 max_pings_outstanding([$num])
+=head2 max_pings_outstanding
+
+    max_pings_outstanding([$num])
 
 Get/set max outstanding PINGs.
 
-=head2 priority([$num])
+=head2 priority
+
+    priority([$num])
 
 Get/set EV watcher priority.
 
-=head2 keepalive([$seconds])
+=head2 keepalive
+
+    keepalive([$seconds])
 
 Get/set TCP keepalive.
 
-=head2 batch($coderef)
+=head2 batch
+
+    batch($coderef)
 
 Batch multiple publishes into a single write. Suppresses per-publish
 write scheduling; all buffered data is flushed after the coderef returns.
@@ -493,7 +533,9 @@ write scheduling; all buffered data is flushed after the coderef returns.
         $nats->publish("foo.$_", "msg-$_") for 1..1000;
     });
 
-=head2 slow_consumer($bytes_threshold, [$cb])
+=head2 slow_consumer
+
+    slow_consumer($bytes_threshold, [$cb])
 
 Enable slow consumer detection. When the write buffer exceeds
 C<$bytes_threshold> bytes, C<$cb> is called with the current buffer size.
@@ -503,13 +545,17 @@ C<$bytes_threshold> bytes, C<$cb> is called with the current buffer size.
         warn "slow consumer: ${pending_bytes}B pending\n";
     });
 
-=head2 on_lame_duck([$cb])
+=head2 on_lame_duck
+
+    on_lame_duck([$cb])
 
 Get/set the lame-duck callback. Fires once when the server signals
 shutdown (leaf node, rolling restart) via INFO C<ldm:true>. Use this
 to migrate work to another server before the grace period elapses.
 
-=head2 nkey_seed($seed)
+=head2 nkey_seed
+
+    nkey_seed($seed)
 
 Set the NKey seed (the C<SU...> base32-encoded form) for Ed25519
 authentication. Requires the build to have OpenSSL (see
@@ -517,27 +563,35 @@ L<EV::Nats/HAS_NKEY>). The server nonce from INFO is automatically
 signed during CONNECT. May also be passed to L</new> as
 C<nkey_seed =E<gt> ...>.
 
-=head2 jwt($token)
+=head2 jwt
+
+    jwt($token)
 
 Set the user JWT. Combine with L</nkey_seed> for NATS decentralized
 auth. May also be passed to L</new>. See L</creds_file> for the
 common case of loading both from a C<.creds> file.
 
-=head2 EV::Nats->nkey_generate_user_seed
+=head2 nkey_generate_user_seed
+
+    EV::Nats->nkey_generate_user_seed
 
 Class method. Returns a fresh, valid NATS User NKey seed (the
 C<SU...> form). Useful for tests and provisioning scripts that
 don't have the C<nk> CLI available. Requires C<HAS_NKEY>; croaks
 otherwise.
 
-=head2 EV::Nats->nkey_public_from_seed($seed)
+=head2 nkey_public_from_seed
+
+    EV::Nats->nkey_public_from_seed($seed)
 
 Class method. Derives the matching public key (the C<U...> form)
 from a User NKey seed. Croaks on an invalid seed. Pair with
 L</nkey_generate_user_seed> to provision the server with the public
 key while the client keeps the seed.
 
-=head2 tls($enable, [$ca_file], [$skip_verify])
+=head2 tls
+
+    tls($enable, [$ca_file], [$skip_verify])
 
 Configure TLS. Requires OpenSSL at build time (see
 L<EV::Nats/HAS_TLS>).
@@ -562,11 +616,17 @@ Returns a hash of connection counters:
 
 Zero all counters returned by L</stats>.
 
-=head2 on_error([$cb])
+=head2 on_error
 
-=head2 on_connect([$cb])
+    on_error([$cb])
 
-=head2 on_disconnect([$cb])
+=head2 on_connect
+
+    on_connect([$cb])
+
+=head2 on_disconnect
+
+    on_disconnect([$cb])
 
 Get/set the corresponding callback at runtime. With no argument,
 returns the current value (or C<undef>). With an argument, replaces
@@ -576,11 +636,11 @@ it; pass C<undef> to clear.
 
 =over
 
-=item EV::Nats::HAS_TLS
+=item C<HAS_TLS>
 
 True if compiled with OpenSSL (TLS supported).
 
-=item EV::Nats::HAS_NKEY
+=item C<HAS_NKEY>
 
 True if NKey/JWT signing is available (also requires OpenSSL).
 

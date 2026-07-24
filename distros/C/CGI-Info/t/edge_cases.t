@@ -33,7 +33,7 @@ sub reset_env {
         C_DOCUMENT_ROOT HTTP_HOST SERVER_NAME SSL_TLS_SNI SERVER_PROTOCOL
         SERVER_PORT SCRIPT_URI REMOTE_ADDR HTTP_USER_AGENT HTTP_COOKIE
         HTTP_X_WAP_PROFILE HTTP_SEC_CH_UA_MOBILE HTTP_REFERER IS_MOBILE
-        IS_SEARCH_ENGINE LOGDIR
+        IS_SEARCH_ENGINE IS_AI LOGDIR
     );
     CGI::Info->reset();
     @ARGV = ();
@@ -1023,6 +1023,553 @@ subtest 'messages persist: multiple failures accumulate in messages()' => sub {
     my $count2 = scalar @{ $info->messages() // [] };
 
     ok($count2 >= $count1, 'messages() count does not decrease across calls');
+};
+
+# ============================================================
+# 18. is_ai() boundary and adversarial edge cases
+# ============================================================
+
+# is_ai() consults IS_AI via Perl's truth test, not a numeric 0/1 check.
+# Empty string is falsy, so IS_AI='' forces false even for an AI crawler UA.
+subtest 'is_ai: IS_AI="" empty-string override forces false' => sub {
+    reset_env();
+    local $ENV{IS_AI}       = '';
+    $ENV{HTTP_USER_AGENT}   = 'ClaudeBot/1.0 (+http://www.anthropic.com)';
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    ok(!$info->is_ai(), 'IS_AI="" (empty string, falsy) overrides ClaudeBot UA to false');
+};
+
+# '0E0' is the Perl "defined-but-zero" idiom in numeric context, but as a
+# string it is NOT '0' and is therefore truthy.  This catches callers who
+# set IS_AI='0E0' expecting it to mean "off".
+subtest 'is_ai: IS_AI="0E0" truthy string override forces true' => sub {
+    reset_env();
+    local $ENV{IS_AI}       = '0E0';
+    $ENV{HTTP_USER_AGENT}   = 'Mozilla/5.0 Firefox/120.0';
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(), 'IS_AI="0E0" is truthy as a string; forces is_ai true');
+};
+
+# Any non-'0'/non-'' string (including "no", "false") is truthy in Perl.
+# Callers who set IS_AI='false' expecting it to mean off will be surprised.
+subtest 'is_ai: IS_AI="false" truthy string override forces true' => sub {
+    reset_env();
+    local $ENV{IS_AI}       = 'false';
+    $ENV{HTTP_USER_AGENT}   = 'Mozilla/5.0 Chrome/120.0';
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(), 'IS_AI="false" is truthy as a string; forces is_ai true (not false)');
+};
+
+# When REMOTE_ADDR is absent, is_ai() returns 0 WITHOUT populating the
+# instance cache ($self->{is_ai} stays undef).  A subsequent call on the same
+# instance after REMOTE_ADDR appears must re-evaluate — not return the stale 0.
+subtest 'is_ai: result not cached when REMOTE_ADDR absent on first call' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT} = 'ClaudeBot/1.0 (+http://www.anthropic.com)';
+    # Deliberately omit REMOTE_ADDR
+
+    my $info = CGI::Info->new();
+    ok(!$info->is_ai(), 'first call with no REMOTE_ADDR returns false');
+
+    # Now the environment gains a REMOTE_ADDR (e.g. a late-set header)
+    $ENV{REMOTE_ADDR} = '1.2.3.4';
+    ok($info->is_ai(), 'second call re-evaluates and correctly detects AI crawler');
+};
+
+# Once $self->{is_ai} IS cached (positive detection), a subsequent change to
+# IS_AI in the environment must not affect the cached instance result.
+subtest 'is_ai: cached positive result survives IS_AI env change' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT}   = 'ClaudeBot/1.0 (+http://www.anthropic.com)';
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(), 'baseline: ClaudeBot detected as AI');
+
+    # Clobber IS_AI with "off" signal; instance already cached the answer
+    local $ENV{IS_AI} = 0;
+    ok($info->is_ai(), 'cached is_ai=1 unaffected by subsequent IS_AI=0 env change');
+};
+
+# is_robot() must still honour the invariant even when is_ai returns
+# true via the IS_AI env override (not UA matching).
+subtest 'is_ai: IS_AI=1 override propagates to is_robot via is_robot internals' => sub {
+    reset_env();
+    local $ENV{IS_AI}       = 1;
+    $ENV{HTTP_USER_AGENT}   = 'Mozilla/5.0 Firefox/120.0';  # non-AI UA
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    ok($info->is_ai(),    'IS_AI=1 override: is_ai true for non-AI UA');
+    ok($info->is_robot(), 'IS_AI=1 override: is_robot true via is_ai delegation inside is_robot');
+};
+
+# ============================================================
+# 19. WAF: additional attack patterns verified
+# ============================================================
+
+# The path-traversal guard checks the sanitised $value for `../`.
+# Every legitimate URL path would use encoded %2E%2E%2F or absolute refs.
+subtest 'WAF: ../ path traversal in GET value blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'file=../../etc/passwd';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on path traversal attempt');
+    is($info->status(), 403, 'path traversal (../) in GET value blocked with 403');
+};
+
+# The mustleak.com guard is a hard-coded canary domain used in SSRF probes.
+subtest 'WAF: mustleak.com/ in GET value blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'url=http://mustleak.com/probe.js';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on mustleak.com probe URL');
+    is($info->status(), 403, 'mustleak.com/ in value blocked with 403');
+};
+
+# XSS angle-bracket injection: checked on both $value (post-sanitise) and
+# $orig_value (pre-sanitise) so HTML-encoding evasion is also caught.
+subtest 'WAF: XSS <script> tag in GET value blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'search=<script>alert(1)</script>';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on XSS script injection');
+    is($info->status(), 403, 'XSS <script> tag blocked with 403');
+};
+
+# Encoded XSS: %3Cscript%3E should also be caught (orig_value is checked).
+subtest 'WAF: URL-encoded XSS %3Cscript%3E in GET value blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'q=%3Cscript%3Ealert%281%29%3C%2Fscript%3E';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on URL-encoded XSS');
+    is($info->status(), 403, 'URL-encoded XSS blocked with 403');
+};
+
+# SQL injection via exec(xp_cmdshell) pattern — a classic MSSQL shell-escape.
+# The WAF checks for exec followed by sp/xp stored procedure prefixes.
+subtest 'WAF: exec xp_cmdshell stored-procedure injection blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    # + is decoded to space: value becomes "exec xp_cmdshell"
+    $ENV{QUERY_STRING}      = 'cmd=exec+xp_cmdshell';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on exec xp_cmdshell injection');
+    is($info->status(), 403, 'exec xp_cmdshell blocked with 403');
+};
+
+# SQL injection via exec(sp_executesql) — same pattern with sp_ prefix.
+subtest 'WAF: exec sp_executesql stored-procedure injection blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'cmd=exec+sp_executesql';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on exec sp_executesql injection');
+    is($info->status(), 403, 'exec sp_executesql blocked with 403');
+};
+
+# Tautology injection AND 1=1: a minimal always-true condition.
+subtest 'WAF: AND 1=1 tautology injection blocked (403)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    # + decoded to space: "5 AND 1=1"
+    $ENV{QUERY_STRING}      = 'id=5+AND+1%3D1';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on AND 1=1 injection');
+    is($info->status(), 403, 'AND 1=1 tautology injection blocked with 403');
+};
+
+# The WAF now inspects both GET and POST.  The previous GET-only gate
+# was a security gap; it has been removed.  This test verifies that
+# known-hostile payloads in POST bodies are also blocked with 403.
+subtest 'WAF: SQL injection in POST body IS blocked (WAF now covers POST)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE}  = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}     = 'POST';
+    $ENV{CONTENT_TYPE}       = 'application/x-www-form-urlencoded';
+    my $body                 = "id=1'+OR+1%3D1--";
+    $ENV{CONTENT_LENGTH}     = length($body);
+    $CGI::Info::stdin_data   = $body;
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on SQL injection in POST body');
+    is($info->status(), 403,
+        'POST body SQL injection is now blocked with 403');
+};
+
+# ============================================================
+# 20. HTTP method boundary: OPTIONS and DELETE
+# ============================================================
+
+subtest 'HTTP OPTIONS returns 405 Method Not Allowed' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'OPTIONS';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on OPTIONS');
+    is($info->status(), 405, 'OPTIONS method returns 405');
+    ok(!defined $p, 'OPTIONS params() returns undef');
+};
+
+subtest 'HTTP DELETE returns 405 Method Not Allowed' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'DELETE';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on DELETE');
+    is($info->status(), 405, 'DELETE method returns 405');
+    ok(!defined $p, 'DELETE params() returns undef');
+};
+
+# ============================================================
+# 21. ARGV mode: --robot / --mobile / --search-engine / --tablet
+#     These flags are consumed when params() is called without GATEWAY_INTERFACE.
+# ============================================================
+
+subtest 'ARGV: --robot flag sets is_robot and consumes the flag' => sub {
+    reset_env();   # ensures no GATEWAY_INTERFACE
+    @ARGV = ('--robot', 'action=view', 'id=42');
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die with --robot in ARGV');
+    ok($info->is_robot(), '--robot ARGV flag sets is_robot true');
+    # Remaining ARGV entries are parsed as CGI params
+    ok(defined $p && defined $p->{action}, '--robot: remaining ARGV pairs parsed as params');
+};
+
+subtest 'ARGV: --mobile flag sets is_mobile' => sub {
+    reset_env();
+    @ARGV = ('--mobile', 'page=home');
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die with --mobile in ARGV');
+    ok($info->is_mobile(), '--mobile ARGV flag sets is_mobile true');
+};
+
+subtest 'ARGV: --search-engine flag sets is_search_engine' => sub {
+    reset_env();
+    @ARGV = ('--search-engine', 'q=test');
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die with --search-engine in ARGV');
+    ok($info->is_search_engine(), '--search-engine ARGV flag sets is_search_engine true');
+};
+
+subtest 'ARGV: --tablet flag sets is_tablet' => sub {
+    reset_env();
+    @ARGV = ('--tablet', 'view=gallery');
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die with --tablet in ARGV');
+    ok($info->is_tablet(), '--tablet ARGV flag sets is_tablet true');
+};
+
+# ============================================================
+# 22. POST with special content types: XML and JSON
+# ============================================================
+
+# XML bodies bypass the WAF and are stored verbatim under the "XML" key.
+# This is the documented behaviour for text/xml content-type.
+subtest 'POST text/xml: body stored under "XML" key' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE}  = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}     = 'POST';
+    $ENV{CONTENT_TYPE}       = 'text/xml';
+    my $body                 = '<root><item>value</item></root>';
+    $ENV{CONTENT_LENGTH}     = length($body);
+    $CGI::Info::stdin_data   = $body;
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@,     'does not die on XML POST');
+    ok(defined $p,            'XML POST: params() returns defined value');
+    ok(exists $p->{XML},      'XML POST: body stored under "XML" key');
+    like($p->{XML}, qr/<root>/, 'XML POST: body content preserved');
+};
+
+# Zero-byte XML body: the module reads CONTENT_LENGTH bytes, so a body of
+# exactly 0 bytes with text/xml should return a params hash with an empty XML key.
+subtest 'POST text/xml: zero-length body handled gracefully' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE}  = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}     = 'POST';
+    $ENV{CONTENT_TYPE}       = 'text/xml';
+    $ENV{CONTENT_LENGTH}     = 0;
+    $CGI::Info::stdin_data   = '';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'does not die on zero-length XML POST');
+};
+
+# application/json: the module tries to parse via JSON::MaybeXS.
+# Gracefully degrade when the module is absent.
+subtest 'POST application/json: body parsed into params (or graceful failure)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE}  = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}     = 'POST';
+    $ENV{CONTENT_TYPE}       = 'application/json';
+    my $body                 = '{"name":"alice","score":"99"}';
+    $ENV{CONTENT_LENGTH}     = length($body);
+    $CGI::Info::stdin_data   = $body;
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    if($@) {
+        # JSON::MaybeXS not installed - the module will die inside params()
+        like($@, qr/JSON|locate/i,
+            'params() dies with informative error when JSON::MaybeXS absent');
+    } else {
+        # JSON available
+        ok(!defined($p) || (ref($p) eq 'HASH'),
+            'JSON POST: returns hashref or undef (not a crash)');
+        if(defined $p) {
+            is($p->{name},  'alice', 'JSON name parsed correctly');
+            is($p->{score}, '99',    'JSON score parsed correctly');
+        }
+    }
+};
+
+# Malformed JSON should not crash the process.
+subtest 'POST application/json: malformed body dies cleanly (not silently corrupts)' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE}  = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}     = 'POST';
+    $ENV{CONTENT_TYPE}       = 'application/json';
+    my $body                 = '{broken json:::}';
+    $ENV{CONTENT_LENGTH}     = length($body);
+    $CGI::Info::stdin_data   = $body;
+
+    my $json_available = eval { require JSON::MaybeXS; 1 };
+    unless($json_available) {
+        pass('JSON::MaybeXS not installed - skipping malformed JSON test');
+        return;
+    }
+
+    my $info = CGI::Info->new();
+    eval { $info->params() };
+    # Either dies with a JSON parse error or returns undef — must not silently
+    # return a corrupted hashref
+    ok(1, 'malformed JSON POST does not segfault or silently corrupt');
+    if($@) {
+        like($@, qr/json|parse|invalid/i, 'JSON parse error propagated to caller');
+    }
+};
+
+# ============================================================
+# 23. upload_dir: hostile path validation
+# ============================================================
+
+# A relative path fails File::Spec->file_name_is_absolute() and must be
+# rejected before any filesystem access.
+subtest 'upload_dir: relative path rejected with 500' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+    $ENV{CONTENT_LENGTH}    = 100;
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params(upload_dir => 'relative/dir') };
+    ok(!$@, 'does not die on relative upload_dir');
+    is($info->status(), 500, 'relative upload_dir rejected with 500');
+};
+
+# An absolute but non-existent path must be rejected after the relativity check.
+subtest 'upload_dir: non-existent absolute path rejected with 500' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+    $ENV{CONTENT_LENGTH}    = 100;
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params(upload_dir => '/no/such/path/xyz123abc') };
+    ok(!$@, 'does not die on non-existent absolute upload_dir');
+    is($info->status(), 500, 'non-existent absolute upload_dir rejected with 500');
+};
+
+# upload_dir pointing to a plain file (not a directory) must be rejected.
+subtest 'upload_dir: file path (not a dir) rejected with 500' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'POST';
+    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+    $ENV{CONTENT_LENGTH}    = 100;
+    $ENV{REMOTE_ADDR}       = '1.2.3.4';
+
+    # Use a file known to exist on any POSIX system
+    my $file_path = $^O eq 'MSWin32' ? 'C:\\Windows\\system32\\cmd.exe'
+                                      : '/etc/hostname';
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params(upload_dir => $file_path) };
+    ok(!$@, 'does not die on upload_dir pointing to a file');
+    is($info->status(), 500, 'upload_dir pointing to a file rejected with 500');
+};
+
+# ============================================================
+# 24. Global variable integrity: $_ and $@ must not be clobbered
+# ============================================================
+
+# Perl's $_ is a commonly overused global.  The module must not destroy it.
+subtest 'global integrity: $_ not clobbered by params()' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'a=1&b=2&c=3';
+
+    local $_ = 'sentinel_value';
+    my $info = CGI::Info->new();
+    $info->params();
+    is($_, 'sentinel_value', 'params() did not clobber $_');
+};
+
+# $_ must also survive is_mobile() and is_robot() calls that use regex.
+subtest 'global integrity: $_ not clobbered by UA-detection methods' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)';
+    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+
+    local $_ = 'still_sentinel';
+    my $info = CGI::Info->new();
+    $info->is_mobile();
+    $info->is_robot();
+    $info->is_ai();
+    $info->browser_type();
+    is($_, 'still_sentinel', '$_ intact after is_mobile/is_robot/is_ai/browser_type');
+};
+
+# params() internally uses eval for require calls.  A successful eval clears
+# $@; we verify that params() does not die when the caller has a non-empty $@.
+subtest 'global integrity: params() works when caller has dirty $@' => sub {
+    reset_env();
+    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+    $ENV{REQUEST_METHOD}    = 'GET';
+    $ENV{QUERY_STRING}      = 'x=1';
+
+    eval { die "prior caller error\n" };   # set $@
+    my $pre_err = $@;
+    ok(length($pre_err), 'precondition: $@ is set before calling params()');
+
+    my $info = CGI::Info->new();
+    my $p    = eval { $info->params() };
+    ok(!$@, 'params() does not die when called with a dirty $@');
+};
+
+# ============================================================
+# 25. Referrer-based robot detection: hostile referrer values
+# ============================================================
+
+# Spam referrers with a closing parenthesis are blocked.
+# The WAF checks for ')' in the referrer string.
+subtest 'is_robot: referrer with closing parenthesis blocked as spam' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 Firefox/120.0';
+    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+    $ENV{HTTP_REFERER}    = 'http://spam-site.example.com/page(with-paren)';
+
+    my $info = CGI::Info->new();
+    ok($info->is_robot(), 'referrer with ) detected as robot/spam');
+};
+
+# A referrer that backslash-abuses the URL must be normalised before
+# matching — the is_robot() code replaces \ with _ before comparing.
+subtest 'is_robot: backslash in referrer normalised before blacklist match' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 Firefox/120.0';
+    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+    # Backslash variant of a known spam referrer — should be normalised to _ not crash
+    $ENV{HTTP_REFERER}    = 'http://semalt.com\\hack';
+
+    my $info = new_ok('CGI::Info');
+    eval { $info->is_robot() };
+    ok(!$@, 'backslash in referrer does not cause is_robot() to die');
+};
+
+# A known spam referrer from the embedded blocklist must be flagged.
+subtest 'is_robot: known spam referrer (semalt.com) blocked' => sub {
+    reset_env();
+    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 Firefox/120.0';
+    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+    $ENV{HTTP_REFERER}    = 'http://semalt.com/fake-traffic';
+
+    my $info = CGI::Info->new();
+    ok($info->is_robot(), 'semalt.com in HTTP_REFERER flagged as robot');
+};
+
+# ============================================================
+# 26. Sec-CH-UA-Mobile header boundary cases
+# ============================================================
+
+# '?1' means mobile; anything else (including '?0', '1', '') must not.
+subtest 'Sec-CH-UA-Mobile: ?1 triggers is_mobile' => sub {
+    reset_env();
+    $ENV{HTTP_SEC_CH_UA_MOBILE} = '?1';
+    my $info = CGI::Info->new();
+    ok($info->is_mobile(), 'Sec-CH-UA-Mobile: ?1 sets is_mobile true');
+};
+
+subtest 'Sec-CH-UA-Mobile: ?0 does not trigger is_mobile' => sub {
+    reset_env();
+    $ENV{HTTP_SEC_CH_UA_MOBILE} = '?0';
+    my $info = CGI::Info->new();
+    ok(!$info->is_mobile(), 'Sec-CH-UA-Mobile: ?0 does not set is_mobile');
+};
+
+subtest 'Sec-CH-UA-Mobile: bare 1 (no ?) does not trigger is_mobile' => sub {
+    reset_env();
+    $ENV{HTTP_SEC_CH_UA_MOBILE} = '1';
+    my $info = CGI::Info->new();
+    ok(!$info->is_mobile(), 'Sec-CH-UA-Mobile: bare "1" is not the spec value ?1');
+};
+
+subtest 'Sec-CH-UA-Mobile: empty string does not trigger is_mobile' => sub {
+    reset_env();
+    $ENV{HTTP_SEC_CH_UA_MOBILE} = '';
+    my $info = CGI::Info->new();
+    ok(!$info->is_mobile(), 'Sec-CH-UA-Mobile: empty string does not trigger mobile');
 };
 
 done_testing();

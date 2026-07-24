@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_FIRSTACCESS
 );
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 extends 'Lemonldap::NG::Portal::Lib::OIDCPlugin';
 
@@ -146,7 +146,8 @@ sub _run {
                 user_session_id            => $req->id,
                 grant_type                 => "password",
                 $self->conf->{whatToTrace} => $user,
-                _oidc_sub => $oidc->getUserIDForRP( $req, $rp, $req->userData ),
+                _oidc_logout_sub =>
+                  $oidc->getUserIDForRP( $req, $rp, $req->userData ),
             },
             0,
         );

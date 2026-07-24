@@ -34,5 +34,5 @@ provides:
     file: lib/Sys/OsRelease/Lite.pm
 requires:
   perl: '5.010001'
-version: v0.4.3+lite
+version: v0.4.4+lite
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

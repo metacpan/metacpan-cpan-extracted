@@ -420,6 +420,7 @@ function templates(tpl,key) {
                },
                {
                   "cnodes" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthEndpointExtraParams",
+                  "default" : [],
                   "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthEndpointExtraParams",
                   "title" : "oidcOPMetaDataOptionsAuthEndpointExtraParams",
                   "type" : "keyTextContainer"

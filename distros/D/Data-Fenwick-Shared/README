@@ -1,0 +1,215 @@
+NAME
+    Data::Fenwick::Shared - shared-memory Fenwick tree (binary indexed tree;
+    point or range update) for Linux
+
+SYNOPSIS
+        use Data::Fenwick::Shared;
+
+        # a tree over positions 1..1_000_000, anonymous mapping
+        my $fen = Data::Fenwick::Shared->new(undef, 1_000_000);
+
+        $fen->update(5, 3);        # add 3 at position 5
+        $fen->update(9, 7);        # add 7 at position 9
+
+        $fen->prefix(9);           # 10  (sum of positions 1..9)
+        $fen->range(5, 9);         # 10  (sum of positions 5..9)
+        $fen->point(5);            # 3   (value at position 5)
+        $fen->total;               # 10  (sum of all positions)
+
+        $fen->set(5, 100);         # set position 5 to 100 (returns the old value)
+
+        # rank / weighted lookup: smallest position whose prefix sum reaches a target
+        $fen->find(50);            # first position i with prefix(i) >= 50
+
+        # share across processes via a backing file
+        my $shared = Data::Fenwick::Shared->new("/tmp/counts.fen", 1_000_000);
+
+        # range-update mode: add to a whole range in O(log n), then query ranges
+        my $rng = Data::Fenwick::Shared->new_range(undef, 1_000_000);
+        $rng->range_add(10, 20, 5);   # add 5 to every position in [10, 20]
+        $rng->range(10, 20);          # 55  (sum over the range)
+
+DESCRIPTION
+    A Fenwick tree (binary indexed tree) in shared memory: a fixed-size
+    array of "n" signed 64-bit integer positions that supports point update
+    and prefix-sum query in "O(log n)" each, plus an "O(log n)" binary
+    search for the position at which a running total is reached. It is the
+    compact, update-friendly structure behind cumulative-frequency tables,
+    running rank/order statistics, and weighted random sampling.
+
+    Positions are numbered 1 to n (1-indexed). "update($i, $delta)" adds a
+    (possibly negative) delta at position $i; prefix($i) returns the sum of
+    positions "1..$i"; "range($l, $r)" the sum of "$l..$r"; point($i) the
+    current value at a single position; and "total" the sum of everything.
+    "set" overwrites a position with an absolute value. find($target)
+    returns the smallest position whose prefix sum is at least $target
+    (meaningful when all stored values are non-negative) -- the operation
+    that turns a Fenwick tree into a weighted sampler or a rank index.
+
+    The tree lives in a shared mapping, so several processes update and
+    query one structure: any process that opens the same backing file,
+    inherits the anonymous mapping across "fork", or reopens a passed memfd
+    sees the others' updates and contributes its own. A write-preferring
+    futex rwlock with dead-process recovery guards mutation, so many
+    processes may "update" and query concurrently. Two trees of equal size
+    "n" can be "merge"d by element-wise addition (a Fenwick tree is linear,
+    so the merge of tree(A) and tree(B) is tree(A+B)).
+
+    Values are signed 64-bit integers; sums that overflow 64 bits wrap, as
+    with any native integer arithmetic. Memory is "(n+1) * 8" bytes for the
+    tree plus a fixed header. Linux-only. Requires 64-bit Perl.
+
+  Range-update mode
+    A tree created with "new_range" supports range update as well as range
+    query: "range_add($l, $r, $delta)" adds a delta to every position in
+    "[$l, $r]" in "O(log n)", and "prefix"/"range"/"point"/"total" report
+    the resulting sums. It uses the classic two-BIT technique (a second
+    binary indexed tree tracking the weighted difference), so a range-mode
+    tree costs twice the memory ("2 * (n+1) * 8" bytes) but adds O(log n)
+    range updates a plain Fenwick tree cannot do. "update($i, $delta)" and
+    "set" still work (a point update is just "range_add($i, $i, $delta)").
+    "find" and "merge" are not available in range mode (the two-BIT layout
+    has no single-BIT binary lift); use a point tree for those. The mode is
+    recorded in the header, so a reopened segment stays range mode. Note
+    that the 0.02 on-disk format is incompatible with 0.01: a file created
+    by 0.01 cannot be opened and must be recreated.
+
+METHODS
+  Constructors
+        my $fen = Data::Fenwick::Shared->new($path, $n);
+        my $fen = Data::Fenwick::Shared->new(undef, $n);            # anonymous
+        my $fen = Data::Fenwick::Shared->new_memfd($name, $n);
+        my $fen = Data::Fenwick::Shared->new_from_fd($fd);
+
+        # range-update mode (two BITs) -- same arguments
+        my $fen = Data::Fenwick::Shared->new_range($path, $n);
+        my $fen = Data::Fenwick::Shared->new_range_memfd($name, $n);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $n is the number of positions (at least 1); positions are then addressed
+    as "1..$n". "new" and "new_memfd" croak if $n is less than 1 or exceeds
+    the tree cap. When reopening an existing file or memfd, the stored "n"
+    wins and the caller's $n argument is ignored -- but a positive $n
+    placeholder is still required, since the constructor validates $n before
+    the stored value wins. "new_memfd" creates a Linux memfd (transferable
+    via its "memfd" descriptor); "new_from_fd" reopens one in another
+    process. An optional file mode may be passed as the last argument to
+    "new" (e.g. 0660) to opt a newly-created backing file into cross-user
+    sharing; it defaults to 0600 (owner-only).
+
+  Updating
+        $fen->update($i, $delta);        # add $delta at position $i (1 <= $i <= n)
+        $fen->range_add($l, $r, $delta);  # add $delta to every position in [$l, $r] (range mode)
+        my $old = $fen->set($i, $value);  # set position $i to $value; returns the old value
+        $fen->clear;                      # reset every position to 0
+
+    "range_add" adds a delta to a whole inclusive range in "O(log n)" and
+    requires a range-mode tree ("new_range"); it croaks on a point-mode
+    tree. "update" adds a signed delta at a single position and returns
+    nothing. "set" overwrites a position with an absolute value and returns
+    its previous value (it is "update($i, $value - point($i))" done
+    atomically under one lock). Both croak if $i is outside "1..n". "clear"
+    zeroes the whole tree.
+
+  Querying
+        my $s = $fen->prefix($i);       # sum of positions 1..$i (0 <= $i <= n; prefix(0) == 0)
+        my $s = $fen->range($l, $r);    # sum of positions $l..$r (1 <= $l <= $r <= n)
+        my $v = $fen->point($i);        # value at position $i
+        my $t = $fen->total;            # sum of all positions (== prefix(n))
+        my $i = $fen->find($target);    # smallest position with prefix >= $target
+
+    "prefix", "range", "point", and "total" are "O(log n)" reads returning
+    signed integers. "find" binary-searches the tree for the smallest
+    position whose prefix sum is at least $target, returning that position
+    or "n+1" if no prefix reaches it. "find" is only meaningful when every
+    stored value is non-negative (a cumulative distribution): it is the core
+    of weighted sampling (draw $target uniformly in "[1, total]" and "find"
+    the bucket) and of order-statistic / rank queries. Out-of-range
+    positions croak. "find" requires a point-mode tree (it croaks in range
+    mode).
+
+  Merging, introspection, lifecycle
+        $fen->merge($other);            # element-wise add (point mode; both must have equal n)
+        $fen->size;                     # n, the number of positions
+        $fen->is_range;                 # true for a range-mode (two-BIT) tree
+        $fen->stats;                    # { size, total, ops, mmap_size, range }
+        $fen->path; $fen->memfd; $fen->sync; $fen->unlink;
+
+    "merge" adds another tree's contents into this one position by position;
+    both trees must have the same "n" or it croaks, and both must be
+    point-mode ("merge" croaks in range mode). The other tree is snapshotted
+    under its own read lock, so two processes may merge concurrently without
+    deadlock. "is_range" reports whether the tree is range mode. "size"
+    (also "capacity") is "n". "sync" flushes the mapping to its backing
+    store (a no-op for anonymous and memfd trees); "unlink" removes the
+    backing file (also callable as "Class->unlink($path)"); "path" returns
+    the backing path ("undef" for anonymous, memfd, or fd-reopened trees)
+    and "memfd" the backing descriptor -- the memfd of a "new_memfd" tree or
+    the dup'd fd of a "new_from_fd" tree, and -1 for file-backed or
+    anonymous trees.
+
+STATS
+    stats() returns a hashref: "size" (the number of positions "n"), "total"
+    (the current sum of all positions), "ops" (running count of write-path
+    calls -- "update", "range_add", "set", "merge", "clear"), "mmap_size"
+    (bytes of the shared mapping), and "range" (1 for a range-mode tree, 0
+    for a point-mode tree).
+
+SHARING ACROSS PROCESSES
+    The tree lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path, $n)"
+    on the same path with a matching $n), an anonymous mapping inherited
+    across "fork", or a memfd whose descriptor is passed to an unrelated
+    process (over a UNIX socket via "SCM_RIGHTS", or via "/proc/$pid/fd/$n")
+    and reopened with new_from_fd($fd). Because the mapping is shared, every
+    process updates and queries the same tree.
+
+        # producer and consumer share one running-sum tree with no coordination
+        my $fen = Data::Fenwick::Shared->new(undef, 1000);   # before fork
+        unless (fork) { $fen->update($_, 1) for 1 .. 500; exit }
+        wait;
+        print $fen->total, "\n";   # 500 -- the child's updates
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default. To
+    share a backing file across users, pass an explicit octal file mode such
+    as 0660 as the last argument to "new"; the mode is applied only when the
+    file is created. The file is opened with "O_NOFOLLOW" (a symlink at the
+    path is refused) and "O_EXCL"; the on-disk header is validated when the
+    file is attached. Any process you grant write access to a shared mapping
+    is trusted not to corrupt it while others are using it.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Each "update" is a short O(log n) sequence of
+    int64 stores, so a crash leaves the tree consistent up to the last
+    completed operation. Limitation: PID reuse is not detected (very
+    unlikely in practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
+
+SEE ALSO
+    Data::SortedSet::Shared (order-statistics ZSET), Data::NDArray::Shared
+    (dense numeric arrays), Data::Histogram::Shared (HdrHistogram), and the
+    rest of the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

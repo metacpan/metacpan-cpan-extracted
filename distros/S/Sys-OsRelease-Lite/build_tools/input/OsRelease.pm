@@ -28,11 +28,13 @@ my @std_search_path = qw(/etc /usr/lib /run/host);
 my $std_file_name = "os-release";
 
 # defined attributes from FreeDesktop's os-release standard - this needs to be kept up-to-date with the standard
-my @std_attrs = qw(NAME ID ID_LIKE PRETTY_NAME CPE_NAME VARIANT VARIANT_ID VERSION VERSION_ID VERSION_CODENAME
+my @std_attrs = qw(
+    NAME ID ID_LIKE PRETTY_NAME FANCY_NAME CPE_NAME VARIANT VARIANT_ID VERSION VERSION_ID VERSION_CODENAME
     BUILD_ID IMAGE_ID IMAGE_VERSION RELEASE_TYPE HOME_URL DOCUMENTATION_URL SUPPORT_URL BUG_REPORT_URL
     PRIVACY_POLICY_URL SUPPORT_END LOGO ANSI_COLOR ANSI_COLOR_REVERSE VENDOR_NAME VENDOR_URL EXPERIMENT
     EXPERIMENT_URL DEFAULT_HOSTNAME ARCHITECTURE SYSEXT_LEVEL CONFEXT_LEVEL SYSEXT_SCOPE CONFEXT_SCOPE
-    PORTABLE_PREFIXES PORTABLE_SCOPE);
+    PORTABLE_PREFIXES PORTABLE_SCOPE
+);
 
 # OS ID strings which are preferred as common if found in ID_LIKE
 my %common_id = (
@@ -461,9 +463,10 @@ That is intended to be acceptable for establishing system or container environme
 It can also be used for installing or configuring software that needs to know about the system environment.
 
 Note: due to restrictions of the Dist::Zilla build environment and its dependencies,
-Sys::OsRelease had to follow an increase in the minimum Perl version from 5.10 to 5.22.
-For systems with Perl older than 5.22, see below about I<Sys::OsRelease::Lite>
-which repackages Sys::OsRelease without the Dist::Zilla version limitation.
+L<Sys::OsRelease> 0.4.0 had to follow an increase in the minimum Perl version from 5.10 to 5.22.
+For systems with Perl older than 5.22, see below about L<Sys::OsRelease::Lite>
+which repackages Sys::OsRelease without the Dist::Zilla version limitation
+in order to retain support for legacy Perl installations.
 
 =head2 The os-release Standard
 
@@ -732,16 +735,16 @@ system information collected from multiple sources including system architecture
 
 =item L<Sys::OsRelease::Lite>
 
-A repackaging of Sys::OsRelease for older versions of Perl before 5.22.
+This is a repackaging of Sys::OsRelease for older versions of Perl before 5.22.
 This was made because dependencies of Dist::Zilla forced it to bump its minimum Perl version to 5.22,
 which in turn forced Sys::OsRelease to follow.
 Sys::OsRelease::Lite provides Sys::OsRelease with the same source code,
 implemented with a filter on the source code changing the name of the module.
-The name change is just to prevent a namespace collision in CPAN, otherwise the same module.
+The name change is just to prevent a namespace collision in CPAN, but is otherwise the same module.
 It is packaged with L<ExtUtils::MakeMaker> to maintain availability back to Perl 5.10.
-Compatibility was at time time still being maintained via CPAN testing was back to 5.10.
+Compatibility was at the time still being maintained via CPAN testing back to 5.10.
 The use case was systems with RHEL 6 on Perl 5.10.1 and RHEL 7 on Perl 5.16,
-or similar variations.
+or similar variations on enterprise or other infrastructure installations.
 
 =back
 

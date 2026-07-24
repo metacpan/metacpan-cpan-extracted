@@ -50,7 +50,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
@@ -105,7 +105,7 @@ declare -A OPTS=(
     [        alias | %            # command aliases   ]=
     [     textconv |    :         # textconv          ]=pdf,docx,docm,pptx,pptm,xlsx,xlsm,jpg,jpeg
     [        pager |    :!        # pager command     ]=
-    [     parallel | V   >up_opts # parallel view     ]=
+    [     parallel | V            # parallel view     ]=
     [     document | D   >up_opts # document mode     ]=
     [     paginate |              # paginate mode     ]=1
     [         fold | F   !        # no paginate       ]=
@@ -171,8 +171,8 @@ pager() {
 # Main
 ##############################################################################
 
-# --no-paginate or --fold/-F: disable page mode
-[[ -z ${paginate:-} ]] && up_opts+=(--no-paginate)
+# --parallel/-V: forward to ansicolumn via up.pm passthrough
+[[ ${parallel:-} ]] && up_opts+=(-V)
 
 # --page-number: show page number on border
 [[ ${page_number:-} ]] && up_opts+=(--label S=" %n ")
@@ -225,14 +225,22 @@ fi
 
 if is_command_mode "$@"; then
     # Command mode: use optex -Mup
+    [[ ${parallel:-} ]] && paginate=
     local_cmd="$1"; shift
     declare -a expanded_cmd
     read -ra expanded_cmd <<< "$(expand_alias "$local_cmd")"
-    declare -a cmd=(optex "${optex_mod[@]}" -Mup "${up_opts[@]}" -- "${expanded_cmd[@]}" "$@")
+    declare -a target=("${expanded_cmd[@]}" "$@")
 else
     # File view mode: use ansicolumn via optex -Mup
-    declare -a cmd=(optex "${optex_mod[@]}" -Mup "${up_opts[@]}" -- ansicolumn "$@")
+    [[ ${parallel:-} ]] || (( $# > 1 )) && paginate=
+    declare -a target=(ansicolumn "$@")
 fi
+
+# Disable page mode for --no-paginate/-F, or for parallel layout
+# (-V or multiple files) which has no page structure
+[[ -z ${paginate:-} ]] && up_opts+=(--no-paginate)
+
+declare -a cmd=(optex "${optex_mod[@]}" -Mup "${up_opts[@]}" -- "${target[@]}")
 
 debug "command: ${cmd[*]}"
 
@@ -419,6 +427,11 @@ Use C<--textconv=none> to disable.
 =item B<--pager>=I<COMMAND>
 
 Set the pager command. Default is C<NUP_PAGER> or C<less -F +Gg>.
+When page mode is active, C<NUP_PAGE_PAGER> takes precedence over
+C<NUP_PAGER>.
+Viewing multiple files (or C<-V> parallel view) produces parallel
+layout which has no page structure, so C<nup> disables page mode
+and C<NUP_PAGE_PAGER> is not used there.
 The C<PAGER> variable is not used to avoid an infinite loop when
 C<PAGER> is set to C<nup>.
 Use C<--pager=> (empty) or C<--no-pager> to disable pager.

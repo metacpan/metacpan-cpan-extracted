@@ -29,6 +29,7 @@ note 'tb_init_rwfd / tb_init_fd / tb_init_file';
 # ----------------------------------------------
 
 subtest 'tb_init_rwfd success path' => sub {
+SKIP: {
   plan tests => 3;
 
   local $Termbox::global->{initialized} = 0;
@@ -44,7 +45,10 @@ subtest 'tb_init_rwfd success path' => sub {
     $rfd = Win32API::File::GetOsFHandle($in);
     $wfd = Win32API::File::GetOsFHandle($out);
     $ttyfd = $wfd;
-    $rv = tb_init_rwfd(fileno($in), fileno($out)),
+    $rv = tb_init_rwfd(fileno($in), fileno($out));
+    if ($rv == TB_ERR_WIN_UNSUPPORTED()) {
+      skip "Windows VT mode unsupported on this OS", 3;
+    }
   } 
   else {
     $rfd = 10;
@@ -68,7 +72,7 @@ subtest 'tb_init_rwfd success path' => sub {
     },
     'file descriptors stored correctly'
   );
-};
+}};
 
 subtest 'tb_init_fd delegates to tb_init_rwfd' => sub {
   plan tests => 3;

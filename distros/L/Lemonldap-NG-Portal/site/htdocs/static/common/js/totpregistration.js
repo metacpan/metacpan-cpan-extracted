@@ -48,7 +48,7 @@
         }
         // Generate OTP url
         $("#divToHide").show();
-        s = "otpauth://totp/".concat(escape(data.portal), ":").concat(escape(data.user), "?secret=").concat(data.secret, "&issuer=").concat(escape(data.portal));
+        s = "otpauth://totp/".concat(escape(data.portal), ":").concat(escape(data.user), "?secret=").concat(data.secret.toUpperCase(), "&issuer=").concat(escape(data.portal));
         if (data.digits !== 6) {
           s += "&digits=".concat(data.digits);
         }

@@ -545,6 +545,8 @@
 "ldapCAFile":"CA dosya yolu",
 "ldapCAPath":"CA dizin yolu",
 "ldapChangePasswordAsUser":"Kullanıcı olarak değiştir",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"Bağlantı",
 "ldapExportedVars":"Dışa aktarılan değişkenler",
 "ldapFilters":"Filtreler",

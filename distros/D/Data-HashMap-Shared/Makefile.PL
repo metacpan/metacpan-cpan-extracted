@@ -38,6 +38,7 @@ WriteMakefile(
     AUTHOR            => 'vividsnow',
     LICENSE           => 'perl_5',
     MIN_PERL_VERSION  => '5.022',
+    EXE_FILES         => ['bin/hashmap-shared-upgrade'],
     LIBS              => [''],
     DEFINE            => '-D_GNU_SOURCE',
     INC               => '-I. ' . join(' ', @xpk_flags),

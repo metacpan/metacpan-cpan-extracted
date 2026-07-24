@@ -10,13 +10,13 @@ use File::Temp qw/tempfile tempdir/;
 use Concierge::Auth;
 use Concierge::Auth::Pwd;
 
-# --- new(backend => ..., file => $tmpfile) creates file, returns backend instance ---
+# --- new(backend_class => ..., file => $tmpfile) creates file, returns backend instance ---
 
 subtest 'new with file' => sub {
     my $dir = tempdir( CLEANUP => 1 );
     my $file = "$dir/auth.pwd";
 
-    my $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $file );
+    my $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', file => $file );
 
     ok( defined $auth, 'constructor returns defined value' );
     isa_ok( $auth, ['Concierge::Auth::Pwd'], 'object is a Concierge::Auth::Pwd' );
@@ -24,12 +24,12 @@ subtest 'new with file' => sub {
     ok( -e $file, 'password file was created' );
 };
 
-# --- new(backend => ..., no_file => 1) returns object without file (warns) ---
+# --- new(backend_class => ..., no_file => 1) returns object without file (warns) ---
 
 subtest 'new with no_file' => sub {
     my $auth;
     my $warnings = warnings {
-        $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 );
+        $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 );
     };
 
     ok( defined $auth, 'constructor returns defined value' );
@@ -38,12 +38,12 @@ subtest 'new with no_file' => sub {
     like( $warnings->[0], qr/Utilities only/, 'warning mentions utilities only' );
 };
 
-# --- new(backend => ...) with no file or no_file still returns object (warns) ---
+# --- new(backend_class => ...) with no file or no_file still returns object (warns) ---
 
 subtest 'new with no other args' => sub {
     my $auth;
     my $warnings = warnings {
-        $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd' );
+        $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd' );
     };
 
     ok( defined $auth, 'constructor returns defined value' );
@@ -52,18 +52,18 @@ subtest 'new with no other args' => sub {
     like( $warnings->[0], qr/No auth file/, 'warning mentions no auth file' );
 };
 
-# --- new(backend => ..., file => '/nonexistent/dir/file') croaks ---
+# --- new(backend_class => ..., file => '/nonexistent/dir/file') croaks ---
 
 subtest 'new with nonexistent directory croaks' => sub {
     my $died = dies {
-        Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => '/nonexistent/dir/file.pwd' );
+        Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', file => '/nonexistent/dir/file.pwd' );
     };
 
     ok( defined $died, 'constructor croaks on bad path' );
     like( $died, qr/Can't/, 'error message mentions failure' );
 };
 
-# --- new(backend => ..., file => $existing_file) opens existing file (does not truncate) ---
+# --- new(backend_class => ..., file => $existing_file) opens existing file (does not truncate) ---
 
 subtest 'new with existing file' => sub {
     my $dir  = tempdir( CLEANUP => 1 );
@@ -76,7 +76,7 @@ subtest 'new with existing file' => sub {
 
     ok( -e $file, 'file exists before new()' );
 
-    my $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $file );
+    my $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', file => $file );
 
     ok( defined $auth, 'constructor returns defined value for existing file' );
     isa_ok( $auth, ['Concierge::Auth::Pwd'], 'object is a Concierge::Auth::Pwd' );
@@ -91,18 +91,18 @@ subtest 'new with existing file' => sub {
 
 # --- factory-specific behavior ---
 
-subtest 'new without backend croaks' => sub {
+subtest 'new without backend_class croaks' => sub {
     my $died = dies {
         Concierge::Auth->new( file => '/tmp/whatever.pwd' );
     };
 
-    ok( defined $died, 'constructor croaks without a backend' );
-    like( $died, qr/requires a 'backend'/, 'error message mentions missing backend' );
+    ok( defined $died, 'constructor croaks without a backend_class' );
+    like( $died, qr/requires a 'backend_class'/, 'error message mentions missing backend_class' );
 };
 
 subtest 'new with unloadable backend croaks' => sub {
     my $died = dies {
-        Concierge::Auth->new( backend => 'Concierge::Auth::DoesNotExist' );
+        Concierge::Auth->new( backend_class => 'Concierge::Auth::DoesNotExist' );
     };
 
     ok( defined $died, 'constructor croaks on unloadable backend' );
@@ -122,7 +122,7 @@ subtest 'new with backend whose own new() dies' => sub {
     $INC{'Concierge/Auth/TestBroken.pm'} = 1;
 
     my $died = dies {
-        Concierge::Auth->new( backend => 'Concierge::Auth::TestBroken' );
+        Concierge::Auth->new( backend_class => 'Concierge::Auth::TestBroken' );
     };
 
     ok( defined $died, 'constructor croaks when backend new() dies' );

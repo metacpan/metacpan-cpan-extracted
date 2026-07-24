@@ -31,28 +31,169 @@ DESCRIPTION
 
     Linux-only. Requires 64-bit Perl.
 
+CONSTRUCTORS
+  new
+        my $heap = Data::Heap::Shared->new($path, $capacity);
+        my $heap = Data::Heap::Shared->new($path, $capacity, $mode);
+        my $heap = Data::Heap::Shared->new(undef, $capacity);
+
+    Create or attach a heap. $capacity is the maximum number of elements. If
+    $path is a defined filename, the heap is backed by that file (created if
+    absent, attached if present). If $path is "undef", an anonymous mapping
+    is used -- it has no backing file but is "MAP_SHARED", so it is
+    inherited across "fork" and shared with child processes (an unrelated
+    process simply cannot attach it).
+
+    The optional $mode is an octal permission mask applied only when the
+    backing file is created; it defaults to 0600 (owner-only). See
+    "SECURITY".
+
+    Croaks on error (bad capacity, permission denied, header mismatch,
+    etc.).
+
+  new_memfd
+        my $heap = Data::Heap::Shared->new_memfd($name, $capacity);
+
+    Create an anonymous heap backed by a Linux "memfd". $name is a label for
+    debugging (as shown in "/proc"). The underlying file descriptor can be
+    retrieved with "memfd" and passed to another process (e.g. over a unix
+    socket or by inheritance) which attaches with "new_from_fd". Croaks on
+    error.
+
+  new_from_fd
+        my $heap = Data::Heap::Shared->new_from_fd($fd);
+
+    Attach to an existing heap given an open file descriptor for its backing
+    store (typically obtained from "memfd" in another process). The header
+    is validated on attach. Croaks on error.
+
 METHODS
-        $heap->push($priority, $value);          # returns bool
-        my ($pri, $val) = $heap->pop;            # returns () if empty
-        my ($pri, $val) = $heap->pop_wait;       # blocking
-        my ($pri, $val) = $heap->pop_wait($t);   # with timeout
-        my ($pri, $val) = $heap->peek;           # without removing
+  push
+        my $ok = $heap->push($priority, $value);
 
-        $heap->size;  $heap->capacity;  $heap->is_empty;  $heap->is_full;
-        $heap->clear;  $heap->stats;  $heap->path;  $heap->memfd;
-        $heap->sync;   $heap->unlink;
+    Insert a "($priority, $value)" integer pair. Returns true on success, or
+    false if the heap is full (see "is_full"). Wakes one blocked "pop_wait"
+    waiter.
 
-        # constructors
-        $heap = Data::Heap::Shared->new_memfd($name, $capacity);
-        $heap = Data::Heap::Shared->new_from_fd($fd);
+  pop
+        my ($pri, $val) = $heap->pop;
 
-        # eventfd
-        $heap->eventfd;  $heap->eventfd_set($fd);  $heap->fileno;
-        $heap->notify;   $heap->eventfd_consume;
+    Remove and return the lowest-priority element as a "($priority, $value)"
+    pair. Returns the empty list if the heap is empty.
 
-STATS
-    stats() returns: "size", "capacity", "pushes", "pops", "waits",
-    "timeouts", "recoveries", "mmap_size".
+  pop_wait
+        my ($pri, $val) = $heap->pop_wait;         # block forever
+        my ($pri, $val) = $heap->pop_wait($secs);  # block up to $secs
+        my ($pri, $val) = $heap->pop_wait(0);      # non-blocking
+
+    Like "pop", but blocks (via futex) until an element is available. With
+    no argument (or a negative timeout) it blocks indefinitely. A timeout of
+    0 polls without blocking. A positive fractional $secs bounds the wait;
+    on timeout the empty list is returned.
+
+  peek
+        my ($pri, $val) = $heap->peek;
+
+    Return the lowest-priority element without removing it. Returns the
+    empty list if the heap is empty.
+
+  size
+        my $n = $heap->size;
+
+    Current number of elements.
+
+  capacity
+        my $cap = $heap->capacity;
+
+    Maximum number of elements (fixed at creation).
+
+  is_empty
+        my $bool = $heap->is_empty;
+
+    True if "size == 0".
+
+  is_full
+        my $bool = $heap->is_full;
+
+    True if "size >= capacity".
+
+  clear
+        $heap->clear;
+
+    Remove all elements (resets size to zero).
+
+  path
+        my $p = $heap->path;
+
+    The backing file path, or "undef" for anonymous / memfd heaps.
+
+  memfd
+        my $fd = $heap->memfd;
+
+    The backing file descriptor: the "memfd" of a "new_memfd" heap, or the
+    dup'd fd of a "new_from_fd" heap. Such an fd can be shared with another
+    process which attaches via "new_from_fd". Returns -1 for file-backed and
+    anonymous heaps, which keep no shareable descriptor.
+
+  sync
+        $heap->sync;
+
+    Flush the mapping to the backing file with "msync". Croaks on error. No
+    effect for anonymous heaps.
+
+  unlink
+        $heap->unlink;
+        Data::Heap::Shared->unlink($path);
+
+    Remove the backing file from the filesystem. Called as an instance
+    method it unlinks the heap's own path; called as a class method it
+    unlinks the given $path. Croaks for anonymous / memfd heaps (no path) or
+    on unlink failure. The mapping stays valid until all handles are
+    destroyed.
+
+  stats
+        my $stats = $heap->stats;
+
+    Return a hashref with the keys "size", "capacity", "pushes", "pops",
+    "waits", "timeouts", "recoveries", and "mmap_size". The counters are
+    cumulative across all processes sharing the heap.
+
+EVENTFD NOTIFICATION
+    An optional "eventfd" lets an event loop (e.g. EV, AnyEvent, IO::Async)
+    wake when the heap is written, instead of blocking in "pop_wait".
+
+  eventfd
+        my $fd = $heap->eventfd;
+
+    Create (or return) an eventfd associated with this handle and return its
+    file descriptor. Watch it for readability; readiness means "notify" was
+    called. Croaks on error.
+
+  eventfd_set
+        $heap->eventfd_set($fd);
+
+    Use a caller-supplied file descriptor for notification instead of one
+    created by "eventfd". Any previously-owned eventfd is closed. The heap
+    takes ownership of $fd: it is closed on the next "eventfd_set" and when
+    the heap is destroyed, so pass a dup(2) of the descriptor if you need to
+    keep using your own copy.
+
+  fileno
+        my $fd = $heap->fileno;
+
+    The current notification file descriptor, or -1 if none is set.
+
+  notify
+        $heap->notify;
+
+    Signal the notification fd (write to the eventfd), making it readable.
+    Returns true if a notification was delivered.
+
+  eventfd_consume
+        my $count = $heap->eventfd_consume;
+
+    Read and clear the eventfd counter, returning the accumulated count, or
+    "undef" if there was nothing to read.
 
 BENCHMARKS
     Single-process (500K ops, x86_64 Linux, Perl 5.40):

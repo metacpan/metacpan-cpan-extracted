@@ -16,10 +16,12 @@ requires 'Net::CIDR';
 requires 'Object::Configure', '0.19';
 requires 'Params::Get', '0.13';
 requires 'Params::Validate::Strict', '0.28';
+requires 'Readonly';
 requires 'Return::Set';
 requires 'Scalar::Util';
 requires 'Socket';
 requires 'String::Clean::XSS';
+requires 'Sub::Protected';
 requires 'Sys::Hostname';
 requires 'Sys::Path';
 requires 'URI::Heuristic';
@@ -31,6 +33,10 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
+	requires 'Data::Random';
+	requires 'Data::Random::String';
+	requires 'Data::Random::String::Matches';
+	requires 'Data::Random::Structure';
 	requires 'Errno';
 	requires 'File::Temp';
 	requires 'FindBin';
@@ -44,6 +50,7 @@ on 'test' => sub {
 	requires 'Test::CleanNamespaces';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
+	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.08';
 	requires 'Test::Most';
 	requires 'Test::Needs';

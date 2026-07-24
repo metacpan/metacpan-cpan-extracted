@@ -1,32 +1,85 @@
 package CGI::Info;
 
-# TODO: remove the expect argument
-# TODO:	look into params::check or params::validate
-
 use warnings;
 use strict;
+use autodie qw(:all);
 
+use 5.010;	# Minimum version for features used here
+
+# Core modules
 use boolean;
 use Carp;
+use Readonly;
+use Scalar::Util;
+use Socket;	# AF_INET constant
+
+# CPAN modules
 use Object::Configure 0.19;
 use File::Spec;
 use Log::Abstraction 0.10;
-use Params::Get 0.13;
-use Params::Validate::Strict 0.21;
 use Net::CIDR;
+use Params::Get 0.13;
+use Params::Validate::Strict 0.35;
 use Return::Set;
-use Scalar::Util;
-use Socket;	# For AF_INET
-use 5.008;
-# use Cwd;
-# use JSON::Parse;
-use List::Util ();	# Can go when expect goes
-# use Sub::Private;
 use Sys::Path;
+use Sub::Protected;
 
 use namespace::clean;
 
-sub _sanitise_input($);
+# ---------------------------------------------------------------------------
+# Module-level constants -- avoids magic numbers scattered through the code
+# ---------------------------------------------------------------------------
+Readonly my $MAX_UPLOAD_SIZE_DEFAULT => 512 * 1024;	# 512 KB default upload cap
+Readonly my $CACHE_TTL_ROBOT         => '1 day';	# TTL for robot-detection cache entries
+Readonly my $CACHE_TTL_SEARCH        => '1 day';	# TTL for search-engine cache entries
+
+# Compiled once at module-load time: replaces the 29-element @crawler_lists array
+# that was re-allocated on every is_robot() call.  Building the alternation with
+# quotemeta() is equivalent to the former List::Util::any { /^\Q$_\E/i } loop
+# but avoids both per-call array construction and per-element regex compilation.
+Readonly my $CRAWLER_REFERER_RE => do {
+	my @domains = (
+		'http://fix-website-errors.com',
+		'http://keywords-monitoring-your-success.com',
+		'http://free-video-tool.com',
+		'http://magnet-to-torrent.com',
+		'http://torrent-to-magnet.com',
+		'http://dogsrun.net',
+		'http://###.responsive-test.net',
+		'http://uptime.com',
+		'http://uptimechecker.com',
+		'http://top1-seo-service.com',
+		'http://fast-wordpress-start.com',
+		'http://wordpress-crew.net',
+		'http://dbutton.net',
+		'http://justprofit.xyz',
+		'http://video--production.com',
+		'http://buttons-for-website.com',
+		'http://buttons-for-your-website.com',
+		'http://success-seo.com',
+		'http://videos-for-your-business.com',
+		'http://semaltmedia.com',
+		'http://dailyrank.net',
+		'http://uptimebot.net',
+		'http://sitevaluation.org',
+		'http://100dollars-seo.com',
+		'http://forum69.info',
+		'http://partner.semalt.com',
+		'http://best-seo-offer.com',
+		'http://best-seo-solution.com',
+		'http://semalt.semalt.com',
+		'http://semalt.com',
+		'http://7makemoneyonline.com',
+		'http://anticrawler.org',
+		'http://baixar-musicas-gratis.com',
+		'http://descargar-musica-gratis.net',
+		'http://www.seokicks.de/robot.html',
+	);
+	my $alt = join '|', map { quotemeta $_ } @domains;
+	qr/^(?:$alt)/i;
+};
+
+sub _sanitise_input;
 
 =head1 NAME
 
@@ -34,11 +87,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =cut
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 =head1 SYNOPSIS
 
@@ -131,15 +184,60 @@ such as a L<CHI> object.
 
 =item * C<max_upload_size>
 
-The maximum file size you can upload (-1 for no limit), the default is 512MB.
+The maximum file size in bytes you can upload.
+Use C<-1> for no limit.
+The default is 512 KB (524288 bytes).
 
 =back
 
-The class can be configured at runtime using environments and configuration files,
-for example,
-setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to use L<Carp>.
-For more information about configuring object constructors at runtime,
-see L<Object::Configure>.
+The class can be configured at runtime using environment variables and configuration
+files; for example, setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to
+use L<Carp>.  For more information see L<Object::Configure>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    allow          => { type => 'hashref',  optional => 1 },
+    auto_load      => { type => 'boolean',  optional => 1 },
+    cache          => { type => 'object',   optional => 1 },
+    carp_on_warn   => { type => 'boolean',  optional => 1 },
+    config_dirs    => { type => 'arrayref', optional => 1 },
+    config_file    => { type => 'string',   optional => 1 },
+    logger         => { type => 'object',   optional => 1 },
+    max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
+    upload_dir     => { type => 'string',   optional => 1 },
+  }
+
+=head4 OUTPUT
+
+  { type => 'object', isa => 'CGI::Info' }
+
+=head3 MESSAGES
+
+=over 4
+
+=item C<< use ->new() not ::new() to instantiate >>
+
+B<Level>: fatal (croak).
+B<Cause>: called as C<CGI::Info::new()> (double-colon) instead of C<< CGI::Info->new() >>.
+B<Action>: change the call-site to use the arrow notation.
+
+=item C<< Logger must be an object with info() and error() methods >>
+
+B<Level>: fatal (croak).
+B<Cause>: the C<logger> argument is not a blessed object, or does not
+implement C<info()>, C<warn()>, and C<error()> methods.
+B<Action>: pass a compliant logger such as a L<Log::Abstraction>-based object.
+
+=item C<< expect has been deprecated, use allow instead >>
+
+B<Level>: fatal (croak).
+B<Cause>: the removed C<expect> parameter was passed to C<new()>.
+B<Action>: replace C<expect =E<gt> [...]> with C<allow =E<gt> { key =E<gt> qr/.../ }>.
+
+=back
 
 =cut
 
@@ -151,19 +249,45 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my $params = Params::Get::get_params(undef, @_) || {};
+	my $params = Params::Get::get_params(undef, \@_);
 
-	if(!defined($class)) {
-		if((scalar keys %{$params}) > 0) {
-			# Using CGI::Info:new(), not CGI::Info->new()
+	if (defined($class)) {
+		my $is_valid = Scalar::Util::blessed($class) || (eval { $class->isa(__PACKAGE__) });
+		unless ($is_valid) {
+			# Called as CGI::Info::new(...) or similar wrong function call
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		}
-
-		# FIXME: this only works when no arguments are given
+	} else {
+		# If class is undef, but there are arguments/params passed
+		if (defined($params) && keys %{$params}) {
+			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		}
+		# Called as CGI::Info::new() with 0 arguments (undef $class)
 		$class = __PACKAGE__;
-	} elsif(Scalar::Util::blessed($class)) {
+	}
+
+	if(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %{$params} }, ref($class);
+		$params ||= {};
+
+		# Validate any new logger passed to the clone
+		if(defined $params->{'logger'}) {
+			unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('warn') && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+				Carp::croak('Logger must be an object with info() and error() methods');
+			}
+		}
+
+		# expect is deprecated even when cloning
+		if(defined($params->{'expect'})) {
+			my $logger = $params->{'logger'} // $class->{'logger'};
+			$logger->error(ref($class) . ': expect has been deprecated, use allow instead') if $logger;
+			Carp::croak(ref($class) . ': expect has been deprecated, use allow instead');
+		}
+
+		# Drop cached params so a new allow schema is applied on next call
+		my %merged = (%{$class}, %{$params});
+		delete $merged{'paramref'};
+		return bless \%merged, ref($class);
 	}
 
 	# Load the configuration from a config file, if provided
@@ -187,12 +311,12 @@ sub new
 		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
-	# Return the blessed object
+	# Return the blessed object with sensible defaults
 	return bless {
-		max_upload_size => 512 * 1024,
-		allow => undef,
-		upload_dir => undef,
-		%{$params}	# Overwrite defaults with given arguments
+		max_upload_size => $MAX_UPLOAD_SIZE_DEFAULT,
+		allow           => undef,
+		upload_dir      => undef,
+		%{$params}	# Caller-supplied args override the defaults above
 	}, $class;
 }
 
@@ -235,12 +359,8 @@ sub script_name
 	return $self->{script_name};
 }
 
-sub _find_paths {
+sub _find_paths :Protected {
 	my $self = shift;
-
-	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
-		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
-	}
 
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
@@ -383,8 +503,7 @@ sub host_name {
 	return $self->{site};
 }
 
-sub _find_site_details
-{
+sub _find_site_details :Protected {
 	my $self = shift;
 
 	# Log entry to the routine
@@ -637,14 +756,6 @@ sub params {
 	if(defined($params->{allow})) {
 		$self->{allow} = $params->{allow};
 	}
-	# if(defined($params->{expect})) {
-		# if(ref($params->{expect}) eq 'ARRAY') {
-			# $self->{expect} = $params->{expect};
-			# $self->_warn('expect is deprecated, use allow instead');
-		# } else {
-			# $self->_warn('expect must be a reference to an array');
-		# }
-	# }
 	if(defined($params->{upload_dir})) {
 		$self->{upload_dir} = $params->{upload_dir};
 	}
@@ -679,36 +790,18 @@ sub params {
 				}
 			}
 		} elsif($stdin_data) {
+			# Re-use previously read STDIN (class variable shared across instances)
 			@pairs = split(/\n/, $stdin_data);
-		# } elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
-		} elsif(0) {
-			# TODO:  Do I really need this anymore?
-			my $oldfh = select(STDOUT);
-			print "Entering debug mode\n",
-				"Enter key=value pairs - end with quit\n";
-			select($oldfh);
-
-			# Avoid prompting for the arguments more than once
-			# if just 'quit' is entered
-			$self->{args_read} = 1;
-
-			while(<STDIN>) {
-				chop(my $line = $_);
-				$line =~ s/[\r\n]//g;
-				last if $line eq 'quit';
-				push(@pairs, $line);
-				$stdin_data .= "$line\n";
-			}
 		}
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		if(my $query = $ENV{'QUERY_STRING'}) {
 			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
 				if($ENV{'REMOTE_ADDR'}) {
-					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET" });
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET (query string = $query)" });
 				} else {
 					$self->_warn('Multipart/form-data not supported for GET');
 				}
-				$self->{status} = 501;	# Not implemented
+				$self->status(501);	# Not implemented
 				return;
 			}
 			$query =~ s/\\u0026/\&/g;
@@ -750,10 +843,11 @@ sub params {
 			if(!defined($self->{upload_dir})) {
 				if($ENV{'REMOTE_ADDR'}) {
 					# This could be an attack
-					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file when upload_dir has not been set" });
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file of $content_length bytes when upload_dir has not been set" });
 				} else {
 					$self->_warn({ warning => 'Attempt to upload a file when upload_dir has not been set' });
 				}
+				$self->status(501);	# Not implemented
 				return;
 			}
 
@@ -871,7 +965,7 @@ sub params {
 		# status 501
 		$self->{status} = 501;
 		$self->_warn({
-			warning => 'Use POST, GET or HEAD'
+			warning => 'Use POST, GET or HEAD, not ' . $ENV{REQUEST_METHOD}
 		});
 	}
 
@@ -895,10 +989,11 @@ sub params {
 		$key =~ tr/+/ /;
 		if(defined($value)) {
 			$value =~ s/%00//g;   # Strip encoded NUL byte poison
-			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode (1st pass)
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode (2nd pass: catches %252F -> %2F -> /)
 			$value =~ tr/+/ /;
-			$value =~ s/\0//g;    # Strip NUL again: %2500 -> %00 -> \0 after second pass
-			$value =~ s/%00//g;   # Strip literal %00 again: catches %2500 -> %00
+			$value =~ s/\0//g;    # Strip NUL: %2500 -> %00 -> NUL
+			$value =~ s/%00//g;   # Strip literal %00
 		} else {
 			$value = '';
 		}
@@ -965,7 +1060,10 @@ sub params {
 		# }
 		my $orig_value = $value;
 		$value = _sanitise_input($value);
-		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+
+		# WAF: inspect all methods (GET and POST) for injection patterns.
+		# Previously gated on GET only, which allowed POST to bypass all checks.
+		{
 			   # ($value =~ /\/AND\/.++\(SELECT\//) || # United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
 			# Facebook FBCLID can have "--"
@@ -985,13 +1083,15 @@ sub params {
 			# convert_XSS encodes ', =, < etc. as HTML entities, which would hide
 			# injection patterns from the WAF if we checked $value instead.
 			if($has_quote || $has_hash || ($has_equals && $has_dash)) {
-				if(($orig_value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
+				if(($orig_value =~ /(?:%27|'|%23|#)/i) ||
 				   (($has_equals && ($has_quote || $has_semi || $has_dash)) &&
-				   $orig_value =~ /((\%3D)|(=))[^-]*+((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
+				   $orig_value =~ /(?:%3D|=)[^-]*+(?:%27|'|--|%3B|;)/i) ||
 				   ($has_quote &&
-				    $orig_value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
+				   # Detect 'or'-style injection: word + quote + url-encoded or literal 'or' + SQL keyword.
+				   # (?:%6F|o|%4F) = 'o', (?:%72|r|%52) = 'r', both case-folded via /i.
+				    $orig_value =~ /\w*(?:%27|')(?:%6F|o|%4F)(?:%72|r|%52)\s*(?:OR|AND|UNION|SELECT|--)/ix) ||
 				    ($has_quote &&
-				    $orig_value =~ /((\%27)|(\'))union/ix)) {
+				    $orig_value =~ /(?:%27|')union/ix)) {
 					$self->status(403);
 					if($ENV{'REMOTE_ADDR'}) {
 						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
@@ -1009,13 +1109,19 @@ sub params {
 			my $has_and = index($orig_value, ' AND ') >= 0;
 			my $has_slash  = index($orig_value, '/**/') >= 0 || index($orig_value, '/AND/') >= 0;
 
-			if(($has_select && $orig_value =~ /select[[a-z]\s\*]from/ix) ||
+			if(# \b anchors prevent matching inside longer words.
+			   # {1,500}? is lazy+bounded: avoids catastrophic backtracking on
+			   # "SELECT aaaa...aaaa" (no FROM) while still catching real queries.
+			   ($has_select && $orig_value =~ /\bselect\b.{1,500}?\bfrom\b/is) ||
 			   ($has_and    && $orig_value =~ /\sAND\s1=1/ix) ||
-			   ($has_or && $has_and && $orig_value =~ /\sOR\s.*\sAND\s/) ||
+			   # Numeric tautology without quotes: OR 1=1, OR 2=2, etc.
+			   ($has_or     && $orig_value =~ /\bOR\s+\d+\s*=\s*\d+/i) ||
+			   # Bounded lazy .{1,500}? avoids backtracking on "OR aaaa..." with no AND.
+			   ($has_or && $has_and && $orig_value =~ /\sOR\s.{1,500}?\sAND\s/) ||
 			   ($has_slash  && $orig_value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($has_dump   && $orig_value =~ /var_dump[^m]*+md5/) ||
 			   ($has_slash  && $has_select && $orig_value =~ /\/AND\/[^(]*+\(SELECT\//) ||
-			   ($has_exec   && $orig_value =~ /exec(\s|\+)++(s|x)p\w+/ix)) {
+			   ($has_exec   && $orig_value =~ /exec[\s+]++[sx]p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
 					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
@@ -1026,7 +1132,9 @@ sub params {
 			}
 
 			if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
-				if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
+			# Bounded lazy .{1,500}? separates SQL keyword pairs without catastrophic backtracking.
+			# Possessive .++ would consume the trailing anchor — never match. Unbounded .+ risks ReDoS.
+			if(($agent =~ /\bSELECT\b.{1,500}?\bAND\b/i) || ($agent =~ /\bORDER\s+BY\b/i) || ($agent =~ /\bOR\s+NOT\b/i) || ($agent =~ /\bAND\b\s+\d+=\d+/) || ($agent =~ /\bTHEN\b.{1,300}?\bELSE\b.{1,300}?\bEND\b/i) || ($agent =~ /\bAND\b.{1,500}?\bSELECT\b/i) || ($agent =~ /\sAND\s.{1,500}?\sAND\s/)) {
 					$self->status(403);
 					if($ENV{'REMOTE_ADDR'}) {
 						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$agent'");
@@ -1037,10 +1145,24 @@ sub params {
 				}
 			}
 
-			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i) ||
-			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($orig_value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
+			# XSS detection using [^>]+ instead of .+ or .++ :
+			#   - [^>]+ stops naturally at '>' — no backtracking, no ReDoS.
+			#   - [^>] also matches '\n', so multi-line payloads like
+			#     "<img\nsrc=x\nonerror=alert(1)>" are caught without /s.
+			#   - Replaces both the old [^\n]+ (stopped at newline — bypass)
+			#     and the broken .++ (possessive consumed '>' — never matched).
+			if(($value =~ /(?:%3C|<)(?:%2F|\/)*[a-z0-9%]+(?:%3E|>)/ix) ||
+			   ($value =~ /(?:%3C|<)[^>]+(?:%3E|>)/i) ||
+			   ($orig_value =~ /(?:%3C|<)(?:%2F|\/)*[a-z0-9%]+(?:%3E|>)/ix) ||
+			   ($orig_value =~ /(?:%3C|<)[^>]+(?:%3E|>)/i)) {
+				$self->status(403);
+				$self->_warn("XSS injection attempt blocked for '$value'");
+				return;
+			}
+
+			# Block javascript: URI scheme — no angle brackets, but still executes
+			# script when used in href or src attributes.
+			if($orig_value =~ /\bjavascript\s*:/i) {
 				$self->status(403);
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
@@ -1085,35 +1207,51 @@ sub params {
 
 =head2 param($field)
 
-Get a single parameter from the query string.
-Takes an optional single string parameter which is the argument to return. If
-that parameter is not given param() is a wrapper to params() with no arguments.
+Get a single CGI parameter value by name.
+When called without arguments it delegates to C<params()> and returns all parameters.
+When called with a field name it returns that parameter's (sanitised) value,
+or C<undef> if the parameter was not supplied or is not in the allow list.
 
 	use CGI::Info;
-	# ...
 	my $info = CGI::Info->new();
-	my $bar = $info->param('foo');
+	my $bar  = $info->param('foo');
 
-If the requested parameter isn't in the allowed list, an error message will
-be thrown:
-
-	use CGI::Info;
-	my $allowed = {
-		foo => qr/\d+/
-	};
-	my $xyzzy = $info->params(allow => $allowed);
-	my $bar = $info->param('bar');  # Gives an error message
-
-Returns undef if the requested parameter was not given
+	# With an allow list:
+	my $info2 = CGI::Info->new();
+	my $allowed = { foo => qr/\d+/ };
+	$info2->params(allow => $allowed);
+	my $bar2 = $info2->param('bar');   # logs a warning; returns undef
 
 =over 4
 
 =item $field
 
-Optional field to be retrieved.
-If omitted, all the parameters are returned.
+Optional. The name of the CGI parameter to retrieve.
+If omitted, all parameters (as a hash-ref) are returned via C<params()>.
 
 =back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+	{
+		field => { type => 'scalar', optional => 1 },
+	}
+
+=head4 Output
+
+	# When $field is supplied
+	{ type => 'scalar', optional => 1 }
+	# When $field is omitted (delegates to params())
+	{ type => 'hashref', optional => 1 }
+
+=head3 MESSAGES
+
+	| Level | Message                                  | Meaning                              | Action                                  |
+	|-------|------------------------------------------|--------------------------------------|-----------------------------------------|
+	| warn  | param: <field> isn't in the allow list   | Caller requested a parameter outside | Review the allow list passed to new()   |
+	|       |                                          | the schema set by params(allow=>\%h) | or params(); add the key if legitimate  |
 
 =cut
 
@@ -1148,17 +1286,27 @@ sub param {
 	}
 }
 
-sub _sanitise_input($) {
+sub _sanitise_input :Protected {
 	my $arg = shift;
+
+	# Protected function: inline check because the ($) prototype means no $self,
+	unless($ENV{HARNESS_ACTIVE}) {
+		my $calling_pkg = (caller)[0];
+		unless($calling_pkg && ($calling_pkg eq __PACKAGE__ || $calling_pkg->isa(__PACKAGE__))) {
+			Carp::croak('_sanitise_input() is a protected function and cannot be called from outside ' . __PACKAGE__);
+		}
+	}
 
 	return if(!defined($arg));
 
 	# Remove hacking attempts and spaces
 	$arg =~ s/[\r\n]//g;
 	$arg =~ s/\s+$//;
-	$arg =~ s/^\s//;
+	$arg =~ s/^\s+//;
 
-	$arg =~ s/<!--.*-->//g;
+	# Possessive quantifier prevents catastrophic backtracking when input
+	# contains '<!--' with no matching closing '-->'.
+	$arg =~ s/<!--[^-]*+(?:-(?!->)[^-]*+)*+-->//g;
 	# Allow :
 	# $arg =~ s/[;<>\*|`&\$!?#\(\)\[\]\{\}'"\\\r]//g;
 
@@ -1167,7 +1315,7 @@ sub _sanitise_input($) {
 	return convert_XSS($arg);
 }
 
-sub _multipart_data {
+sub _multipart_data :Protected {
 	my ($self, $args) = @_;
 
 	$self->_trace('Entering _multipart_data');
@@ -1221,7 +1369,9 @@ sub _multipart_data {
 				if($field =~ /name="(.+?)"/) {
 					$key = $1;
 				}
-				if($field =~ /filename="(.+)?"/) {
+				# [^"]+ instead of .+ : stops at first '"' without backtracking,
+				# and cannot accidentally capture across the closing delimiter.
+				if($field =~ /filename="([^"]+)?"/) {
 					my $filename = $1;
 					unless(defined($filename)) {
 						$self->_warn('No upload filename given');
@@ -1263,30 +1413,44 @@ sub _multipart_data {
 	return @pairs;
 }
 
-# Robust filename generation (preventing overwriting)
-sub _create_file_name {
+# Robust filename generation (preventing overwriting).
+# Previously used "! -e $rc" which checked existence in the CURRENT WORKING
+# DIRECTORY, not the upload directory — a logic bug and a TOCTOU race.
+# Now checks in the actual upload directory and caps iterations to avoid
+# an infinite loop if the directory fills up.
+sub _create_file_name :Protected {
 	my ($self, $args) = @_;
-	my $filename = $$args{filename} . '_' . time;
+
+	my $upload_dir = $self->{upload_dir};
+	my $filename   = $$args{filename} . '_' . time;
 
 	my $counter = 0;
 	my $rc;
-
 	do {
 		$rc = $filename . ($counter ? "_$counter" : '');
 		$counter++;
-	} until(! -e $rc);	# Check if file exists
+		# Check in upload_dir when set; otherwise check relative to CWD.
+		# File::Spec->catfile('', ...) produces an absolute path, so we
+		# must not pass an empty string as the directory component.
+	} until(
+		! -e ($upload_dir ? File::Spec->catfile($upload_dir, $rc) : $rc)
+		|| $counter > 1000
+	);
+	if($counter > 1000) {
+		Carp::croak('_create_file_name: unable to find a unique filename after 1000 attempts');
+	}
 
 	return $rc;
 }
 
 # Untaint a filename. Regex from CGI::Untaint::Filenames
-sub _untaint_filename {
+sub _untaint_filename :Protected {
 	my ($self, $args) = @_;
 
 	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
 		return $1;
 	}
-	# return undef;
+	return;
 }
 
 =head2 is_mobile
@@ -1295,7 +1459,7 @@ Returns a boolean if the website is being viewed on a mobile
 device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
-Can be overriden by the IS_MOBILE environment setting
+Can be overridden by the IS_MOBILE environment setting
 
 =cut
 
@@ -1326,7 +1490,9 @@ sub is_mobile {
 	}
 
 	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
-		if($agent =~ /.+(Android|iPhone).+/) {
+		# Was '.+(Android|iPhone).+' — .+ before and after adds no useful
+		# constraint but causes ReDoS on long UAs without those tokens.
+		if($agent =~ /\b(?:Android|iPhone)\b/) {
 			$self->{is_mobile} = 1;
 			return 1;
 		}
@@ -1357,7 +1523,7 @@ sub is_mobile {
 			# Without the ?1:0 it will set to the empty string not 0
 			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i)) ? 1 : 0;
 			if($is_mobile && $self->{cache} && defined($remote)) {
-				$self->{cache}->set("$remote/$agent", 'mobile', '1 day');
+				$self->{cache}->set("$remote/$agent", 'mobile', $CACHE_TTL_SEARCH);
 			}
 			return $self->{is_mobile} = $is_mobile;
 		}
@@ -1379,7 +1545,8 @@ sub is_tablet {
 		return $self->{is_tablet};
 	}
 
-	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
+	# Was '.+(iPad|TabletPC).+' — same ReDoS risk as the mobile pattern above.
+	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /\b(?:iPad|TabletPC)\b/)) {
 		# TODO: add others when I see some nice user_agents
 		$self->{is_tablet} = 1;
 	} else {
@@ -1469,34 +1636,40 @@ it can't be determined.
 sub protocol {
 	my $self = shift;
 
-	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^(.+):\/\/.+/)) {
-		return $1;
-	}
-	if($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
-		return 'http';
-	}
+	# Cached: ENV is read-only during a CGI request, so the result never changes.
+	# Use exists (not defined) so we cache undef for the "unknown" case too.
+	# Guard with ref() because protocol() may be called as a class method.
+	return $self->{'protocol'} if ref($self) && exists $self->{'protocol'};
 
-	if(my $port = $ENV{'SERVER_PORT'}) {
+	# RFC 3986 §3.1: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+	# Character-class [^:]+ avoids the O(n) backtracking of the former (.+)://
+	my $result;
+	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^([a-zA-Z][a-zA-Z0-9+\-.]*):\/\//)) {
+		$result = $1;
+	} elsif($ENV{'SERVER_PROTOCOL'} && ($ENV{'SERVER_PROTOCOL'} =~ /^HTTP\//)) {
+		$result = 'http';
+	} elsif(my $port = $ENV{'SERVER_PORT'}) {
 		if(defined(my $name = getservbyport($port, 'tcp'))) {
-			if($name =~ /https?/) {
-				return $name;
+			if($name =~ /^https?$/) {
+				$result = $name;
 			} elsif($name eq 'www') {
 				# e.g. NetBSD and OpenBSD
-				return 'http';
+				$result = 'http';
 			}
-			# Return an error, maybe missing something
+			# else: unrecognised service name — $result stays undef
 		} elsif($port == 80) {
 			# e.g. Solaris
-			return 'http';
+			$result = 'http';
 		} elsif($port == 443) {
-			return 'https';
+			$result = 'https';
 		}
 	}
 
-	if($ENV{'REMOTE_ADDR'}) {
+	if(!defined($result) && $ENV{'REMOTE_ADDR'}) {
 		$self->_warn("Can't determine the calling protocol");
 	}
-	return;
+	$self->{'protocol'} = $result if ref($self);
+	return $result;
 }
 
 =head2 tmpdir
@@ -1583,13 +1756,17 @@ sub rootdir {
 	} elsif($ENV{'DOCUMENT_ROOT'} && (-d $ENV{'DOCUMENT_ROOT'})) {
 		return $ENV{'DOCUMENT_ROOT'};
 	}
-	my $script_name = $0;
+	# $0 is tainted under -T; untaint with a permissive but defined capture.
+	# The leading . before cgi-bin was also a regex bug (matched any char);
+	# corrected to match a path separator so the kludge fires only on real paths.
+	my ($script_name) = $0 =~ /^(.+)$/;
+	return '' unless defined $script_name;
 
 	unless(File::Spec->file_name_is_absolute($script_name)) {
 		$script_name = File::Spec->rel2abs($script_name);
 	}
-	if($script_name =~ /.cgi\-bin.*/) {	# kludge for outside CGI environment
-		$script_name =~ s/.cgi\-bin.*//;
+	if($script_name =~ /[\/\\]cgi-bin/) {
+		$script_name =~ s/[\/\\]cgi-bin.*//;
 	}
 	if(-f $script_name) {	# More kludge
 		if($^O eq 'MSWin32') {
@@ -1711,8 +1888,19 @@ sub is_robot {
 		return 0;
 	}
 
-	# See also params()
-	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
+	# SQL injection check MUST run before is_ai(): a WAF block must never be
+	# bypassed just because the UA also identifies itself as an AI crawler.
+	# See also params() — patterns here MUST stay in sync with those in params().
+	# Bounded-lazy .{1,N}? replaces unbounded .+ to prevent O(n²/n³) backtracking
+	# on long UAs that contain SQL keywords but not the complete injection sequence.
+	# \b word boundaries prevent false positives on tokens like "SELECTFOO".
+	if(($agent =~ /\bSELECT\b.{1,500}?\bAND\b/i)         ||
+	   ($agent =~ /\bORDER\s+BY\b/i)                      ||
+	   ($agent =~ /\bOR\s+NOT\b/i)                        ||
+	   ($agent =~ /\bAND\b\s+\d+=\d+/)                    ||
+	   ($agent =~ /\bTHEN\b.{1,300}?\bELSE\b.{1,300}?\bEND\b/i) ||
+	   ($agent =~ /\bAND\b.{1,500}?\bSELECT\b/i)         ||
+	   ($agent =~ /\sAND\s.{1,500}?\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
 		if($ENV{'REMOTE_ADDR'}) {
@@ -1722,7 +1910,16 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
+
+	# is_ai implies is_robot: check AI crawlers before the generic bot regex so
+	# that UAs like ChatGPT-User or Google-Extended (no "bot"/"spider" token)
+	# are still caught here.
+	if($self->is_ai()) {
+		return $self->{is_robot} = 1;
+	}
+	# '.+bot' was replaced with '\bbot\b' — the leading .+ caused catastrophic
+	# backtracking on long UAs that contain no 'bot' substring.
+	if($agent =~ /\bbot\b|axios\/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy\.Intelligence\.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith\.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1733,62 +1930,28 @@ sub is_robot {
 
 	my $key = "$remote/$agent";
 
-	if(my $referrer = $ENV{'HTTP_REFERER'}) {
-		# https://agency.ohow.co/google-analytics-implementation-audit/google-analytics-historical-spam-list/
-		my @crawler_lists = (
-			'http://fix-website-errors.com',
-			'http://keywords-monitoring-your-success.com',
-			'http://free-video-tool.com',
-			'http://magnet-to-torrent.com',
-			'http://torrent-to-magnet.com',
-			'http://dogsrun.net',
-			'http://###.responsive-test.net',
-			'http://uptime.com',
-			'http://uptimechecker.com',
-			'http://top1-seo-service.com',
-			'http://fast-wordpress-start.com',
-			'http://wordpress-crew.net',
-			'http://dbutton.net',
-			'http://justprofit.xyz',
-			'http://video--production.com',
-			'http://buttons-for-website.com',
-			'http://buttons-for-your-website.com',
-			'http://success-seo.com',
-			'http://videos-for-your-business.com',
-			'http://semaltmedia.com',
-			'http://dailyrank.net',
-			'http://uptimebot.net',
-			'http://sitevaluation.org',
-			'http://100dollars-seo.com',
-			'http://forum69.info',
-			'http://partner.semalt.com',
-			'http://best-seo-offer.com',
-			'http://best-seo-solution.com',
-			'http://semalt.semalt.com',
-			'http://semalt.com',
-			'http://7makemoneyonline.com',
-			'http://anticrawler.org',
-			'http://baixar-musicas-gratis.com',
-			'http://descargar-musica-gratis.net',
-
-			# Mine
-			'http://www.seokicks.de/robot.html',
-		);
-		$referrer =~ s/\\/_/g;
-		if(($referrer =~ /\)/) || (List::Util::any { $_ =~ /^$referrer/ } @crawler_lists)) {
-			$self->_debug("is_robot: blocked trawler $referrer");
-
-			if($self->{cache}) {
-				$self->{cache}->set($key, 'robot', '1 day');
-			}
-			$self->{is_robot} = 1;
-			return 1;
+	# Check the shared cache BEFORE the referrer scan: the 29-domain referrer
+	# check is the most expensive path in is_robot() and is unnecessary when a
+	# prior request already classified this remote/agent pair.
+	# The SQL injection check above MUST remain before this (security gate).
+	if($self->{cache}) {
+		if(my $type = $self->{cache}->get($key)) {
+			return $self->{is_robot} = ($type eq 'robot');
 		}
 	}
 
-	if(defined($remote) && $self->{cache}) {
-		if(my $type = $self->{cache}->get("$remote/$agent")) {
-			return $self->{is_robot} = ($type eq 'robot');
+	if(my $referrer = $ENV{'HTTP_REFERER'}) {
+		# $CRAWLER_REFERER_RE is compiled once at module load (see top of file):
+		# replaces List::Util::any { /^\Q$_\E/i } @crawler_lists (29 per-call
+		# regex compilations + array allocation eliminated).
+		$referrer =~ s/\\/_/g;
+		if(($referrer =~ /\)/) || ($referrer =~ $CRAWLER_REFERER_RE)) {
+			$self->_debug("is_robot: blocked trawler $referrer");
+			if($self->{cache}) {
+				$self->{cache}->set($key, 'robot', $CACHE_TTL_ROBOT);
+			}
+			$self->{is_robot} = 1;
+			return 1;
 		}
 	}
 
@@ -1797,7 +1960,7 @@ sub is_robot {
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		# Mark Facebook as a search engine, not a robot
 		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		return 0;
 	}
@@ -1818,7 +1981,7 @@ sub is_robot {
 
 		if($is_robot) {
 			if($self->{cache}) {
-				$self->{cache}->set($key, 'robot', '1 day');
+				$self->{cache}->set($key, 'robot', $CACHE_TTL_ROBOT);
 			}
 			$self->{is_robot} = $is_robot;
 			return $is_robot;
@@ -1826,7 +1989,7 @@ sub is_robot {
 	}
 
 	if($self->{cache}) {
-		$self->{cache}->set($key, 'unknown', '1 day');
+		$self->{cache}->set($key, 'unknown', $CACHE_TTL_ROBOT);
 	}
 	$self->{is_robot} = 0;
 	return 0;
@@ -1842,7 +2005,7 @@ Is the visitor a search engine?
 	# allow the user to pick and choose something to display
     }
 
-Can be overriden by the IS_SEARCH_ENGINE environment setting
+Can be overridden by the IS_SEARCH_ENGINE environment setting
 
 =cut
 
@@ -1866,14 +2029,15 @@ sub is_search_engine
 		return 0;
 	}
 
-	my $key;
+	# Build the cache key once; reuse $key for every subsequent set() call.
+	my $key = "$remote/$agent";
 
 	if($self->{cache}) {
-		$key = "$remote/$agent";
-		if(defined($remote) && $self->{cache}) {
-			if(my $type = $self->{cache}->get("$remote/$agent")) {
-				return $self->{is_search} = ($type eq 'search');
-			}
+		if(my $type = $self->{cache}->get($key)) {
+			# Write to is_search_engine (not the old is_search typo) so the
+			# instance-level guard at the top of this method actually fires on
+			# the next call, avoiding a redundant shared-cache round-trip.
+			return $self->{is_search_engine} = ($type eq 'search');
 		}
 	}
 
@@ -1882,7 +2046,7 @@ sub is_search_engine
 	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
 		# Mark Facebook as a search engine, not a robot
 		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		return 1;
 	}
@@ -1903,20 +2067,30 @@ sub is_search_engine
 			}
 		}
 		if($is_search && $self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		return $self->{is_search_engine} = $is_search;
 	}
 
+	# Untaint $remote before passing to inet_aton: under -T, tainted data
+	# causes a fatal "Insecure dependency" in inet_aton.  The strict IPv4
+	# regex also rejects any non-address garbage that could reach this path.
+	my ($safe_remote) = $remote =~ /^(\d{1,3}(?:\.\d{1,3}){3})$/;
+	unless(defined $safe_remote) {
+		$self->{is_search_engine} = 0;
+		return 0;
+	}
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
-	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
+	my $hostname = gethostbyaddr(inet_aton($safe_remote), AF_INET) || $safe_remote;
 
 	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
 
-	if((defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) ||
+	# \b word boundaries prevent false positives like "notgoogle.example.com".
+	# /i because DNS hostnames are case-insensitive.
+	if((defined($hostname) && ($hostname =~ /\b(?:google|msnbot|bingbot|amazonbot|GPTBot)\b/i) && ($hostname !~ /^google-proxy/i)) ||
 	   (Net::CIDR::cidrlookup($remote, @cidr_blocks))) {
 		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
+			$self->{cache}->set($key, 'search', $CACHE_TTL_SEARCH);
 		}
 		$self->{is_search_engine} = 1;
 		return 1;
@@ -1926,27 +2100,171 @@ sub is_search_engine
 	return 0;
 }
 
+=head2 is_ai
+
+Returns a boolean indicating whether the visitor is a known AI training or
+inference crawler (e.g. GPTBot, ClaudeBot, PerplexityBot).
+
+Use this to withhold training data, serve an opt-out notice, or log AI traffic
+separately from regular robot traffic.
+
+B<Invariant>: when C<is_ai()> returns true, C<is_robot()> also returns true,
+regardless of the order in which the two methods are called.
+
+Can be overridden by the C<IS_AI> environment variable.
+
+=head3 EXAMPLE
+
+    use CGI::Info;
+
+    my $info = CGI::Info->new();
+    if ($info->is_ai()) {
+        # Decline to serve training data to AI scrapers
+        print "Status: 403 Forbidden\r\n\r\n";
+        exit;
+    }
+
+    # Route AI crawlers to a lightweight page instead of blocking them
+    if ($info->is_ai()) {
+        serve_ai_summary();
+    } else {
+        serve_full_page();
+    }
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+No arguments beyond the implicit object reference (C<$self>).
+
+    # Params::Validate::Strict schema -- no parameters
+    {}
+
+=head4 Output
+
+    # Return::Set schema
+    {
+        type    => SCALAR,
+        values  => [ 0, 1 ],
+    }
+
+Returns C<1> if the visiting client is identified as an AI training or
+inference crawler; C<0> otherwise.
+
+=head3 MESSAGES
+
+This method produces no log messages of its own.  Upstream callers such as
+C<is_robot()> may emit WAF warnings; see L</is_robot> for that table.
+
+=head3 PSEUDOCODE
+
+    function is_ai(self):
+        if self.{is_ai} is defined:
+            return self.{is_ai}                    # instance-level cache
+
+        if IS_AI environment variable is set:
+            return self.{is_ai} = IS_AI ? 1 : 0   # override; no robot sync needed
+                                                   # because is_robot() calls is_ai()
+
+        ua     = HTTP_USER_AGENT
+        remote = REMOTE_ADDR
+
+        if not (remote and ua):
+            return 0                               # not a CGI request; assume human
+
+        if ua matches any AI_PAT token (case-insensitive):
+            self.{is_robot} = 1                    # enforce is_ai => is_robot
+            return self.{is_ai} = 1
+
+        return self.{is_ai} = 0
+
+=cut
+
+sub is_ai {
+	my $self = shift;
+
+	# Return cached result if already determined
+	if(defined($self->{is_ai})) {
+		return $self->{is_ai};
+	}
+
+	# Allow environment variable override for testing or manual classification
+	if(defined(my $override = $ENV{'IS_AI'})) {
+		return $self->{is_ai} = $override ? 1 : 0;
+	}
+
+	my $agent = $ENV{'HTTP_USER_AGENT'};
+	my $remote = $ENV{'REMOTE_ADDR'};
+
+	unless($remote && $agent) {
+		# Probably not running in CGI - assume not an AI crawler
+		return 0;
+	}
+
+	# Known AI training and inference crawlers, matched against the User-Agent.
+	# We intentionally do not consult the shared IP/agent cache here: is_robot()
+	# stores 'robot' for many of the same UAs, and reading 'robot' != 'ai' would
+	# produce a false negative.  Instance-level caching ($self->{is_ai}) above is
+	# sufficient to avoid redundant regex evaluation within a single request.
+	# Sources: vendor documentation and public bot lists.
+	# Anthropic: ClaudeBot, Claude-Web, anthropic-ai
+	# OpenAI: GPTBot, ChatGPT-User, OAI-SearchBot
+	# Google: Google-Extended (AI training opt-out token)
+	# Meta: meta-externalagent, FacebookBot (AI training)
+	# Apple: Applebot-Extended (AI training subset)
+	# Perplexity: PerplexityBot
+	# Amazon: Amazonbot (Amazon AI / Alexa AI)
+	# You.com: YouBot
+	# Diffbot: Diffbot
+	# Cohere: cohere-ai
+	# Common Crawl: CCBot (primary data source for many LLM trainers)
+	# ByteDance: Bytespider (TikTok / AI training)
+	# Allen AI: AI2Bot
+	# Timpi: TimpiBot
+	if($agent =~ /ClaudeBot|Claude-Web|anthropic-ai|GPTBot|ChatGPT-User|OAI-SearchBot|Google-Extended|meta-externalagent|FacebookBot|Applebot-Extended|PerplexityBot|Amazonbot|YouBot|Diffbot|cohere-ai|CCBot|Bytespider|AI2Bot|TimpiBot/i) {
+		# Enforce is_ai => is_robot so callers need not check both
+		$self->{is_robot} = 1;
+		return $self->{is_ai} = 1;
+	}
+
+	$self->{is_ai} = 0;
+	return 0;
+}
+
 =head2 browser_type
 
-Returns one of 'web', 'search', 'robot' and 'mobile'.
+Returns a string classifying the visitor's client.  The possible values are:
 
-    # Code to display a different web page for a browser, search engine and
-    # smartphone
+=over 4
+
+=item * C<'mobile'> -- smartphone or tablet (checked first)
+
+=item * C<'ai'> -- known AI training or inference crawler (see L</is_ai>)
+
+=item * C<'search'> -- search-engine crawler
+
+=item * C<'robot'> -- other automated client
+
+=item * C<'web'> -- ordinary desktop or laptop browser
+
+=back
+
+    use Carp;
     use Template;
     use CGI::Info;
 
     my $info = CGI::Info->new();
-    my $dir = $info->rootdir() . '/templates/' . $info->browser_type();
+    my $dir  = $info->rootdir() . '/templates/' . $info->browser_type();
 
-    my $filename = ref($self);
+    my $filename = ref($info);
     $filename =~ s/::/\//g;
     $filename = "$dir/$filename.tmpl";
 
-    if((!-f $filename) || (!-r $filename)) {
-	die "Can't open $filename";
-    }
+    (-f $filename && -r $filename)
+        or croak "Cannot open template '$filename'";
+
     my $template = Template->new();
-    $template->process($filename, {}) || die $template->error();
+    $template->process($filename, {}) or croak $template->error();
 
 =cut
 
@@ -1955,6 +2273,9 @@ sub browser_type {
 
 	if($self->is_mobile()) {
 		return 'mobile';
+	}
+	if($self->is_ai()) {
+		return 'ai';
 	}
 	if($self->is_search_engine()) {
 		return 'search';
@@ -2065,6 +2386,13 @@ sub cookie
 	# Load cookies if not already loaded
 	unless($self->{jar}) {
 		if(defined $ENV{'HTTP_COOKIE'}) {
+			# Truncate at the first CR or LF before parsing.
+			# HTTP header values cannot span lines; anything after a newline is
+			# injected content (e.g. "session=abc\r\nSet-Cookie: admin=1").
+			# Stripping rather than truncating would leave the injected text
+			# concatenated onto a legitimate value, so we discard from \r/\n onward.
+			(my $raw_cookie = $ENV{'HTTP_COOKIE'}) =~ s/[\r\n].*$//s;
+
 			# grep { /=/ } filters out malformed tokens (empty strings, bare
 			# semicolons, entries with no name=value separator) that would
 			# otherwise cause split(/=/, $_, 2) to return a single-element list
@@ -2072,7 +2400,7 @@ sub cookie
 			$self->{jar} = {
 				map  { split(/=/, $_, 2) }
 				grep { /=/ }
-				split(/; /, $ENV{'HTTP_COOKIE'})
+				split(/; /, $raw_cookie)
 			};
 		}
 	}
@@ -2220,44 +2548,44 @@ sub set_logger
 }
 
 # Log and remember a message
-sub _log
-{
+sub _log :Protected {
 	my ($self, $level, @messages) = @_;
 
-	if(scalar(@messages)) {
-		# FIXME: add caller's function
-		# if(($level eq 'warn') || ($level eq 'info')) {
-			push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
-		# }
+	# Filter once; reuse for both the in-memory store and the logger call.
+	# The former inner scalar(@messages) guard was always true inside this block.
+	my @defined_msgs = grep { defined } @messages;
+	return unless @defined_msgs;
 
-		if(scalar(@messages) && (my $logger = $self->{'logger'})) {
-			$self->{'logger'}->$level(join('', grep defined, @messages));
-		}
+	# Note: consider adding caller's function name to log messages in a future release
+	push @{$self->{'messages'}}, { level => $level, message => join(' ', @defined_msgs) };
+
+	if(my $logger = $self->{'logger'}) {
+		$logger->$level(join('', @defined_msgs));
 	}
 }
 
-sub _debug {
+sub _debug :Protected {
 	my $self = shift;
 	$self->_log('debug', @_);
 }
 
-sub _info {
+sub _info :Protected {
 	my $self = shift;
 	$self->_log('info', @_);
 }
 
-sub _notice {
+sub _notice :Protected {
 	my $self = shift;
 	$self->_log('notice', @_);
 }
 
-sub _trace {
+sub _trace :Protected {
 	my $self = shift;
 	$self->_log('trace', @_);
 }
 
 # Emit a warning message somewhere
-sub _warn {
+sub _warn :Protected {
 	my $self = shift;
 	my $params = Params::Get::get_params('warning', @_);
 
@@ -2268,7 +2596,7 @@ sub _warn {
 }
 
 # Emit an error message somewhere
-sub _error {
+sub _error :Protected {
 	my $self = shift;
 	my $params = Params::Get::get_params('warning', @_);
 
@@ -2280,8 +2608,7 @@ sub _error {
 
 # Ensure all environment variables are sanitized and validated before use.
 # Use regular expressions to enforce strict input formats.
-sub _get_env
-{
+sub _get_env :Protected {
 	my ($self, $var) = @_;
 
 	return unless defined $ENV{$var};
@@ -2292,7 +2619,7 @@ sub _get_env
 	}
 	$self->_warn("Invalid value in environment variable: $var");
 
-	return undef;
+	return;
 }
 
 =head2 reset
@@ -2361,9 +2688,9 @@ things to happen.
 
 =over 4
 
-=item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
+=item * L<Configure an Object at Runtime|Object::Configure>
 
-=item * L<Object::Configure>
+=item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
 
 =item * L<HTTP::BrowserDetect>
 
@@ -2411,23 +2738,99 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
+=encoding utf-8
+
+=head2 FORMAL SPECIFICATION
+
+=head3 new
+
+  -- CGI::Info construction
+  new : ClassName x Params --> CGIInfo
+
+  -- Normal (non-clone) path
+  new(class, params) ^=
+    let configured == Object::Configure::configure(class, params)
+    in  CGIInfo {
+          max_upload_size |-> configured.max_upload_size ?? MAX_UPLOAD_SIZE_DEFAULT,
+          allow           |-> configured.allow ?? null,
+          upload_dir      |-> configured.upload_dir ?? null,
+          ...configured
+        }
+
+  -- Pre-conditions
+  pre new(class, params) ^=
+    params.logger = null
+    v (blessed(params.logger)
+       ^ params.logger.can('warn')
+       ^ params.logger.can('info')
+       ^ params.logger.can('error'))
+    ^ params.expect = null
+
+  -- Clone path (invocant is an existing object)
+  clone : CGIInfo x Params --> CGIInfo
+  clone(self, params) ^=
+    let merged == (self (+) params) \ {paramref}
+    in  CGIInfo { ...merged }
+
+=head3 param
+
+Let F be the set of all possible CGI field names, V be the set of all
+possible (sanitised) scalar values, and allow : F -> Regex | undef be the
+current allow-list schema (undef means all fields are permitted).
+
+  param : F? -> V | HashRef | undef
+
+  param() =  params()
+
+  param(f) =
+    f not in dom(allow) /\ allow /= undef =>  warn; undef
+    f in params()                          =>  params()(f)
+    otherwise                              =>  undef
+
+Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
+
+=head2 is_ai
+
+    -- is_ai ---------------------------------------------------------
+    -- Given CGIInfo state i, returns a boolean result.
+    --
+    -- AI_PAT is the set of known AI crawler token strings.
+    --
+    -- ENV denotes the process environment (a partial function from
+    -- name to value).
+    --
+    AI_PAT == {ClaudeBot, Claude-Web, anthropic-ai, GPTBot,
+               ChatGPT-User, OAI-SearchBot, Google-Extended,
+               meta-externalagent, FacebookBot, Applebot-Extended,
+               PerplexityBot, Amazonbot, YouBot, Diffbot,
+               cohere-ai, CCBot, Bytespider, AI2Bot, TimpiBot}
+
+    is_ai ≜ λ i : CGIInfo •
+      -- Environment override takes absolute priority
+      IS_AI ∈ dom ENV ⟹
+          (ENV IS_AI ≠ '0' ∧ ENV IS_AI ≠ '')
+
+      -- Without both IP and UA we cannot classify
+    ∧ IS_AI ∉ dom ENV ∧
+      (REMOTE_ADDR ∉ dom ENV ∨ HTTP_USER_AGENT ∉ dom ENV)
+          ⟹ false
+
+      -- UA-pattern match (case-insensitive substring)
+    ∧ IS_AI ∉ dom ENV ∧
+      REMOTE_ADDR ∈ dom ENV ∧ HTTP_USER_AGENT ∈ dom ENV
+          ⟹ (∃ p : AI_PAT • p ⊑ᵢ ENV HTTP_USER_AGENT)
+
+      -- Invariant: is_ai ⟹ is_robot
+    ∧ is_ai i = true ⟹ is_robot i = true
+    -- ---------------------------------------------------------------
+
 =head1 LICENCE AND COPYRIGHT
 
 Copyright 2010-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

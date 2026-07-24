@@ -103,8 +103,8 @@
         </a>
       </span>
       <!-- Node text with/without translation -->
-      <span id="t-{{node.id}}" ng-if="keyWritable(this)" ng-click="displayForm(this)">{{node.title}}</span>
-      <span id="t-{{node.id}}" ng-if="!keyWritable(this)" ng-click="displayForm(this)" trspan="{{node.title}}"></span>
+      <span id="t-{{node.id}}" ng-if="keyTranslatable(this)" ng-click="displayForm(this)">{{node.title}}</span>
+      <span id="t-{{node.id}}" ng-if="!keyTranslatable(this)" ng-click="displayForm(this)" trspan="{{node.title}}"></span>
     </div>
     <!-- Subnodes -->
     <ol ui-tree-nodes="btn btn-sm" ng-model="node.nodes" ng-class="{hidden: collapsed}">

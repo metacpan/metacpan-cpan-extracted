@@ -1,4 +1,4 @@
-package Concierge::Users::YAML v0.9.3;
+package Concierge::Users::YAML v0.9.4;
 use v5.36;
 use Carp qw/ croak /;
 use YAML::Tiny;
@@ -333,7 +333,7 @@ v0.9.1
     # Setup with the YAML backend
     Concierge::Users->setup({
         storage_dir             => '/var/lib/myapp/users',
-        backend                 => 'yaml',
+        backend_class           => 'Concierge::Users::YAML',
         include_standard_fields => 'all',
     });
 
@@ -442,7 +442,7 @@ L<Concierge::Users> -- main API
 
 L<Concierge::Users::Meta> -- field definitions and validators
 
-L<Concierge::Users::Database>, L<Concierge::Users::File> -- alternative
+L<Concierge::Users::SQLite>, L<Concierge::Users::File> -- alternative
 backends
 
 =head1 AUTHOR

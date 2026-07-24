@@ -74,7 +74,7 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 use vars qw($ENCODING $ACTIVE $ACTIVE_ENC $LEAD $TRAIL $DANGER);
@@ -375,7 +375,7 @@ BATsh::MB - Multibyte (CP932/DBCS) script guard for BATsh
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

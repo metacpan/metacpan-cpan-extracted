@@ -1,5 +1,13 @@
 Revision history for Perl extension TOML::XS:
 
+0.06 Wed 24 Jul 2026
+- Switch to tomlc17, tomlc99’s successor. Fixes CVE-2026-16634.
+- Fix memory leaks when throwing certain errors.
+- Rename parse() and to_struct() to get(). (Old names kept for compatibility.)
+- Add microsecond/microseconds accessor.
+- Pointer-too-deep error now includes the non-container’s type.
+- Test more platforms in CI.
+
 0.05 Thu 12 Aug 2021
 - BUG FIX: Memory leak in array allocation is fixed.
 - BUG FIX: Decoded hash keys are now character-decoded.

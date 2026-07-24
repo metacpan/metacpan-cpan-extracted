@@ -89,9 +89,29 @@ typedef struct {
 
 static const struct timespec heap_lock_timeout = { 2, 0 };
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int heap_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int heap_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !heap_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 static inline void heap_mutex_lock(HeapHeader *hdr) {
@@ -176,6 +196,7 @@ static inline void heap_sift_down(HeapEntry *data, uint32_t size, uint32_t idx) 
 
 static inline void heap_make_deadline(double t, struct timespec *dl) {
     clock_gettime(CLOCK_MONOTONIC, dl);
+    if (!(t < 1e9)) t = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     dl->tv_sec += (time_t)t;
     dl->tv_nsec += (long)((t - (double)(time_t)t) * 1e9);
     if (dl->tv_nsec >= 1000000000L) { dl->tv_sec++; dl->tv_nsec -= 1000000000L; }
@@ -193,18 +214,25 @@ static inline int heap_remaining(const struct timespec *dl, struct timespec *rem
 static inline int heap_push(HeapHandle *h, int64_t priority, int64_t value) {
     HeapHeader *hdr = h->hdr;
     heap_mutex_lock(hdr);
-    if (hdr->size >= h->capacity) {
+    uint32_t cur = hdr->size;
+    if (cur >= h->capacity) {
         heap_mutex_unlock(hdr);
         return 0;
     }
-    uint32_t idx = hdr->size++;
+    uint32_t idx = cur;
+    hdr->size = cur + 1;
     h->data[idx].priority = priority;
     h->data[idx].value = value;
     heap_sift_up(h->data, idx);
     __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
     heap_mutex_unlock(hdr);
-    /* wake pop-waiters */
-    if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_RELAXED) > 0)
+    /* Wake pop-waiters.  Full barrier so our size store (under the lock) is
+     * globally ordered before this waiters_pop load; pairs with the matching
+     * fence in heap_pop_wait so a concurrent waiter either observes our push
+     * (via the futex value re-check) or we observe its waiters_pop increment
+     * -- Dekker, no lost wakeup on weakly-ordered CPUs. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->waiters_pop, __ATOMIC_SEQ_CST) > 0)
         syscall(SYS_futex, &hdr->size, FUTEX_WAKE, 1, NULL, NULL, 0);
     return 1;
 }
@@ -212,7 +240,8 @@ static inline int heap_push(HeapHandle *h, int64_t priority, int64_t value) {
 static inline int heap_pop(HeapHandle *h, int64_t *out_priority, int64_t *out_value) {
     HeapHeader *hdr = h->hdr;
     heap_mutex_lock(hdr);
-    if (hdr->size == 0) {
+    uint32_t cur = hdr->size;
+    if (cur == 0) {
         heap_mutex_unlock(hdr);
         return 0;
     }
@@ -221,17 +250,18 @@ static inline int heap_pop(HeapHandle *h, int64_t *out_priority, int64_t *out_va
      * with write access to the backing file can corrupt it past capacity,
      * which would drive an out-of-bounds read/write.  A valid heap always
      * keeps size <= capacity (push enforces it), so this never fires for
-     * good data. */
-    if (hdr->size > h->capacity) {
+     * good data.  Read it once into a local and use the local throughout. */
+    if (cur > h->capacity) {
         heap_mutex_unlock(hdr);
         return 0;
     }
     *out_priority = h->data[0].priority;
     *out_value = h->data[0].value;
-    hdr->size--;
-    if (hdr->size > 0) {
-        h->data[0] = h->data[hdr->size];
-        heap_sift_down(h->data, hdr->size, 0);
+    cur--;
+    hdr->size = cur;
+    if (cur > 0) {
+        h->data[0] = h->data[cur];
+        heap_sift_down(h->data, cur, 0);
     }
     __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
     heap_mutex_unlock(hdr);
@@ -249,8 +279,9 @@ static inline int heap_pop_wait(HeapHandle *h, int64_t *out_p, int64_t *out_v, d
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     for (;;) {
-        __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELEASE);
-        uint32_t cur = __atomic_load_n(&hdr->size, __ATOMIC_ACQUIRE);
+        __atomic_add_fetch(&hdr->waiters_pop, 1, __ATOMIC_SEQ_CST);
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);   /* StoreLoad: publish waiters_pop before reading size */
+        uint32_t cur = __atomic_load_n(&hdr->size, __ATOMIC_SEQ_CST);
         if (cur > h->capacity) {   /* corrupt size: heap_pop can never succeed, so do not busy-spin */
             __atomic_sub_fetch(&hdr->waiters_pop, 1, __ATOMIC_RELAXED);
             return 0;
@@ -383,6 +414,10 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode,
         int is_new = (st.st_size == 0);
         if (!is_new && (uint64_t)st.st_size < sizeof(HeapHeader)) {
             HEAP_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            HEAP_ERR("%s: refusing to initialize file not owned by us", path);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {

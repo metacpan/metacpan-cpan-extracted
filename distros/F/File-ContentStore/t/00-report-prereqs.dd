@@ -17,13 +17,16 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Digest' => '0',
                                       'Digest::SHA' => '0',
-                                      'Moo' => '1.006000',
+                                      'Moo' => '2.000000',
                                       'Path::Tiny' => '0.069',
                                       'Type::Params' => '0',
+                                      'Type::Tiny' => '2.000000',
                                       'Types::Path::Tiny' => '0',
                                       'Types::Standard' => '0',
+                                      'experimental' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.014'
+                                      'perl' => '5.020',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -38,8 +41,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Path::Tiny' => '0.069',
                                    'Test::More' => '0.88',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'strict' => '0'
                                  }
                  }
      };

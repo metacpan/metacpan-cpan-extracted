@@ -20,17 +20,19 @@ mock 'Log::Abstraction::_high_priority' => sub { };
 
 END { CGI::Info->reset() }
 
+use Readonly;
+
 sub reset_env {
-    delete $ENV{$_} for qw(
-        GATEWAY_INTERFACE REQUEST_METHOD QUERY_STRING CONTENT_TYPE
-        CONTENT_LENGTH SCRIPT_NAME SCRIPT_FILENAME DOCUMENT_ROOT
-        C_DOCUMENT_ROOT HTTP_HOST SERVER_NAME SSL_TLS_SNI SERVER_PROTOCOL
-        SERVER_PORT SCRIPT_URI REMOTE_ADDR HTTP_USER_AGENT HTTP_COOKIE
-        HTTP_X_WAP_PROFILE HTTP_SEC_CH_UA_MOBILE HTTP_REFERER IS_MOBILE
-        IS_SEARCH_ENGINE LOGDIR
-    );
-    CGI::Info->reset();
-    @ARGV = ();
+	delete $ENV{$_} for qw(
+		GATEWAY_INTERFACE REQUEST_METHOD QUERY_STRING CONTENT_TYPE
+		CONTENT_LENGTH SCRIPT_NAME SCRIPT_FILENAME DOCUMENT_ROOT
+		C_DOCUMENT_ROOT HTTP_HOST SERVER_NAME SSL_TLS_SNI SERVER_PROTOCOL
+		SERVER_PORT SCRIPT_URI REMOTE_ADDR HTTP_USER_AGENT HTTP_COOKIE
+		HTTP_X_WAP_PROFILE HTTP_SEC_CH_UA_MOBILE HTTP_REFERER IS_MOBILE
+		IS_SEARCH_ENGINE IS_AI LOGDIR
+	);
+	CGI::Info->reset();
+	@ARGV = ();
 }
 
 # ============================================================
@@ -1026,6 +1028,483 @@ subtest 'is_search_engine: Alibaba CIDR block IP classified as search' => sub {
     my $result = $info->is_search_engine();
     # May be classified as search engine (CIDR) or fall through to robot
     ok(defined $result, 'CIDR lookup for Alibaba IP does not die');
+};
+
+# ============================================================
+# 51. new() construction error paths
+#     Branches: invalid invocant, clone expect, clone logger
+# ============================================================
+
+# CGI::Info::new() with no args → $class = undef, no params → allowed, falls
+# back to __PACKAGE__.  This is distinct from ->new() and tests the undef-class
+# branch in the constructor.
+subtest 'new: CGI::Info::new() with no args falls back to package name' => sub {
+	reset_env();
+	my $obj = eval { CGI::Info::new() };
+	ok(!$@, 'CGI::Info::new() with no args does not croak');
+	ok(defined $obj && ref($obj) eq 'CGI::Info',
+		'CGI::Info::new() with no args returns a CGI::Info object');
+};
+
+# Calling new() with a plain non-class string as the invocant triggers the
+# "use ->new() not ::new()" croak because $class is defined but not a valid
+# CGI::Info class or subclass.
+subtest 'new: non-class string as invocant croaks with directive' => sub {
+	reset_env();
+	eval { CGI::Info::new('NotAValidClass') };
+	like($@, qr/use ->new\(\)/, 'non-class string as invocant croaks correctly');
+};
+
+# Clone path ($class is a blessed CGI::Info object): passing expect must croak
+# because expect has been deprecated even in the clone code path.
+subtest 'new: clone with deprecated expect arg croaks' => sub {
+	reset_env();
+	my $orig = CGI::Info->new();
+	eval { $orig->new(expect => ['foo']) };
+	like($@, qr/deprecated/, 'clone path: expect arg triggers deprecated croak');
+};
+
+# Clone path: a logger that is not blessed (plain hashref) must be rejected.
+subtest 'new: clone with unblessed logger croaks' => sub {
+	reset_env();
+	my $orig = CGI::Info->new();
+	eval { $orig->new(logger => { not => 'object' }) };
+	like($@, qr/Logger must be/, 'clone path: unblessed hashref as logger croaks');
+};
+
+# ============================================================
+# 52. cache() method validation
+#     Branches: non-object, missing get(), missing set(), get-without-set, store+retrieve
+# ============================================================
+
+Readonly my $CACHE_KEY => '1.2.3.4/TestUA';
+
+# Inline cache package that satisfies all requirements.
+{
+	package _TestValidCache;
+	my %store;
+	sub new  { bless {}, shift }
+	sub get  { $store{$_[1]} }
+	sub set  { $store{$_[1]} = $_[2] }
+}
+
+subtest 'cache: valid cache object stored and retrieved' => sub {
+	reset_env();
+	my $info  = CGI::Info->new();
+	my $cache = _TestValidCache->new();
+	$info->cache($cache);
+	is($info->cache(), $cache, 'cache() stores and retrieves the same object');
+};
+
+subtest 'cache: non-object (hashref) as cache croaks' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	eval { $info->cache({ not => 'object' }) };
+	like($@, qr/not an object/, 'cache() with plain hashref croaks');
+};
+
+{
+	package _TestNoGet;
+	sub new  { bless {}, shift }
+	sub set  { }
+}
+
+subtest 'cache: object without get() method croaks' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	eval { $info->cache(_TestNoGet->new()) };
+	like($@, qr/get\(\)/, 'cache() without get() method croaks with correct message');
+};
+
+{
+	package _TestNoSet;
+	sub new  { bless {}, shift }
+	sub get  { undef }
+}
+
+subtest 'cache: object without set() method croaks' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	eval { $info->cache(_TestNoSet->new()) };
+	like($@, qr/set\(\)/, 'cache() without set() method croaks with correct message');
+};
+
+subtest 'cache: called with no arg returns current cache (undef before set)' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	ok(!defined $info->cache(), 'cache() with no arg returns undef when nothing set');
+	$info->cache(_TestValidCache->new());
+	ok(defined $info->cache(), 'cache() with no arg returns stored cache after set');
+};
+
+# ============================================================
+# 53. reset() called on wrong class → carp + return (not die)
+# ============================================================
+
+# The reset() guard emits Carp::carp (a warning, not a croak) when called
+# with a class name that is not CGI::Info.  Verify: no exception, warning fired.
+subtest 'reset: called on wrong class carps and returns without dying' => sub {
+	reset_env();
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, @_ };
+	eval { CGI::Info::reset('WrongClass') };   # WrongClass ne 'CGI::Info'
+	ok(!$@, 'reset() on wrong class does not die');
+	ok(scalar @warns > 0, 'reset() on wrong class emits a warning via carp');
+};
+
+# ============================================================
+# 54. AUTOLOAD: auto_load => 0 disables delegation
+#     Branch: exists($self->{auto_load}) && boolean(0)->isFalse()
+# ============================================================
+
+subtest 'AUTOLOAD: auto_load => 0 causes croak on unknown method' => sub {
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'mykey=myval';
+
+	my $info = CGI::Info->new(auto_load => 0);
+	eval { $info->someunknownmethod() };
+	like($@, qr/Unknown method/, 'auto_load => 0: calling unknown method croaks');
+};
+
+# ============================================================
+# 55. status(): explicit status(0) sets to 0 but read-back returns 200
+#     Branch: return $self->{status} || 200  — falsy zero becomes 200
+# ============================================================
+
+# Setting status to 0 uses the assignment branch (returns 0).
+# Reading it back hits the || 200 fallback because 0 is falsy.
+# This is the documented (if surprising) behaviour.
+subtest 'status: setting 0 and reading back returns 200 due to || 200 fallback' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	my $set  = $info->status(0);
+	is($set, 0, 'status(0) assignment returns 0');
+	is($info->status(), 200, 'status() after status(0) returns 200 (0 || 200 fallback)');
+};
+
+# ============================================================
+# 56. domain_name(): www. prefix stripping and class-method path
+#     Branches: $site =~ /^www\.(.+)/ ; !ref($self)
+# ============================================================
+
+subtest 'domain_name: www. prefix stripped to bare domain' => sub {
+	reset_env();
+	$ENV{HTTP_HOST} = 'www.example.com';
+	is(CGI::Info->new()->domain_name(), 'example.com',
+		'www.example.com → example.com via domain_name()');
+};
+
+# domain_name() is documented to work as a class method — the !ref($self) guard
+# creates a fresh CGI::Info instance when invoked without an object.
+subtest 'domain_name: class method path creates new instance internally' => sub {
+	reset_env();
+	$ENV{HTTP_HOST} = 'api.example.org';
+	my $domain = CGI::Info->domain_name();
+	is($domain, 'api.example.org',
+		'domain_name() as class method returns correct value');
+};
+
+# ============================================================
+# 57. rootdir(), root_dir(), documentroot() — env-var branches and aliases
+#     Branches: C_DOCUMENT_ROOT exists; DOCUMENT_ROOT exists; class-method aliases
+# ============================================================
+
+subtest 'rootdir: C_DOCUMENT_ROOT env var used when set and is a directory' => sub {
+	reset_env();
+	my $tmp = tempdir(CLEANUP => 1);
+	$ENV{C_DOCUMENT_ROOT} = $tmp;
+	is(CGI::Info->rootdir(), $tmp,
+		'rootdir() returns C_DOCUMENT_ROOT when it exists as a directory');
+};
+
+subtest 'rootdir: DOCUMENT_ROOT env var used when C_DOCUMENT_ROOT absent' => sub {
+	reset_env();
+	my $tmp = tempdir(CLEANUP => 1);
+	$ENV{DOCUMENT_ROOT} = $tmp;
+	is(CGI::Info->rootdir(), $tmp,
+		'rootdir() returns DOCUMENT_ROOT when C_DOCUMENT_ROOT not set');
+};
+
+# root_dir() and documentroot() are documented synonyms; both work as class methods.
+subtest 'root_dir and documentroot are synonyms covering both class and object paths' => sub {
+	reset_env();
+	my $tmp = tempdir(CLEANUP => 1);
+	$ENV{DOCUMENT_ROOT} = $tmp;
+
+	my $info = CGI::Info->new();
+	is($info->root_dir(),    $tmp, 'root_dir() object method returns DOCUMENT_ROOT');
+	is($info->documentroot(), $tmp, 'documentroot() object method returns DOCUMENT_ROOT');
+	is(CGI::Info->root_dir(),    $tmp, 'root_dir() class method returns DOCUMENT_ROOT');
+	is(CGI::Info->documentroot(), $tmp, 'documentroot() class method returns DOCUMENT_ROOT');
+};
+
+# ============================================================
+# 58. params(): same key repeated → values comma-concatenated
+#     Branch: $FORM{$key} && $FORM{$key} ne $value → append ",$value"
+# ============================================================
+
+subtest 'params: same key twice in query string → values comma-concatenated' => sub {
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'color=red&color=blue';
+
+	my $p = CGI::Info->new()->params();
+	ok(defined $p,              'params returned for duplicate keys');
+	like($p->{color}, qr/red/, 'first value present in concatenated result');
+	like($p->{color}, qr/blue/, 'second value present in concatenated result');
+	like($p->{color}, qr/,/,   'values separated by comma');
+};
+
+# ============================================================
+# 59. messages_as_string() — empty case and single-message case
+#     Branches: !scalar($self->{messages}) → ''; single msg → no ; separator
+# ============================================================
+
+subtest 'messages_as_string: no messages returns empty string' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	is($info->messages_as_string(), '',
+		'messages_as_string() returns empty string when no messages recorded');
+};
+
+subtest 'messages_as_string: single message equals raw message body (no surrounding separators)' => sub {
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'x=notanumber';
+
+	my $info = CGI::Info->new();
+	$info->params(allow => { x => qr/^\d+$/ });   # triggers one info message
+	my $msgs = $info->messages() // [];
+	ok(scalar @$msgs >= 1, 'at least one message recorded after allow-list reject');
+
+	# messages_as_string() joins with '; ' — for a single message, the output
+	# must equal that message's body exactly (no leading/trailing separator).
+	my $expected_single = $msgs->[0]{message};
+	my $str = $info->messages_as_string();
+	ok(length $str, 'messages_as_string() returns non-empty string');
+	ok(index($str, $expected_single) >= 0,
+		'messages_as_string() contains the first recorded message body');
+};
+
+# ============================================================
+# 60. get_cookie() — deprecated alias for cookie()
+# ============================================================
+
+subtest 'get_cookie: deprecated alias delegates correctly to cookie()' => sub {
+	reset_env();
+	$ENV{HTTP_COOKIE} = 'session=abc123; token=xyz789';
+
+	my $info = CGI::Info->new();
+	is($info->get_cookie(cookie_name => 'session'), 'abc123',
+		'get_cookie() returns correct value for session cookie');
+	is($info->get_cookie(cookie_name => 'token'),   'xyz789',
+		'get_cookie() returns correct value for token cookie');
+};
+
+# ============================================================
+# 61. cookie(): no HTTP_COOKIE in environment → undef
+#     Branch: !$ENV{HTTP_COOKIE} → jar not built → return undef
+# ============================================================
+
+subtest 'cookie: no HTTP_COOKIE set returns undef for any cookie name' => sub {
+	reset_env();
+	# No HTTP_COOKIE set at all
+	my $info = CGI::Info->new();
+	ok(!defined $info->cookie('anycookie'),
+		'cookie() returns undef when HTTP_COOKIE env var not set');
+};
+
+# ============================================================
+# 62. protocol(): SCRIPT_URI and port-443 branches
+#     Branches: SCRIPT_URI regex match; $port == 443 fallback
+# ============================================================
+
+# SCRIPT_URI is the highest-priority protocol source — the leading token
+# before :// is returned as-is.
+subtest 'protocol: SCRIPT_URI extracts protocol prefix directly' => sub {
+	reset_env();
+	$ENV{SCRIPT_URI} = 'https://www.example.com/cgi-bin/app.cgi';
+	is(CGI::Info->new()->protocol(), 'https',
+		'protocol() extracts https from SCRIPT_URI');
+};
+
+# Port 443 falls through getservbyport() in two ways: the service is named
+# 'https' (which matches /https?/) or getservbyport returns undef (Solaris),
+# in which case the $port == 443 branch fires.  Either way the result is 'https'.
+subtest 'protocol: port 443 resolves to https via any code path' => sub {
+	reset_env();
+	local $SIG{__WARN__} = sub { };   # suppress numeric-arg warning on some platforms
+	$ENV{SERVER_PORT} = 443;
+	is(CGI::Info->new()->protocol(), 'https',
+		'port 443 resolves to https via getservbyport or == 443 fallback');
+};
+
+# ============================================================
+# 63. _find_site_details(): Sys::Hostname fallback
+#     Branch: no HTTP_HOST, SERVER_NAME, or SSL_TLS_SNI → Sys::Hostname::hostname()
+# ============================================================
+
+subtest '_find_site_details: Sys::Hostname used when no host env vars present' => sub {
+	reset_env();
+	# All three host env vars are absent
+	my $host = CGI::Info->new()->host_name();
+	ok(defined $host && length $host,
+		'host_name() falls back to Sys::Hostname::hostname() when no env vars');
+	diag("Sys::Hostname fallback returned: '$host'") if $ENV{TEST_VERBOSE};
+};
+
+# ============================================================
+# 64. is_search_engine(): IS_SEARCH_ENGINE env override and no-env-fallback
+#     Branches: $ENV{IS_SEARCH_ENGINE} truthy; !$remote → return 0
+# ============================================================
+
+subtest 'is_search_engine: IS_SEARCH_ENGINE=1 env override forces true' => sub {
+	reset_env();
+	local $ENV{IS_SEARCH_ENGINE} = 1;
+	# The override is checked before UA/IP logic, so any UA returns true
+	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (Windows NT 10.0)';
+	ok(CGI::Info->new()->is_search_engine(),
+		'IS_SEARCH_ENGINE=1 forces is_search_engine true regardless of UA');
+};
+
+subtest 'is_search_engine: no REMOTE_ADDR returns 0 without classifying' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Googlebot/2.1 (+http://www.google.com/bot.html)';
+	# No REMOTE_ADDR
+	ok(!CGI::Info->new()->is_search_engine(),
+		'is_search_engine returns 0 when REMOTE_ADDR is absent');
+};
+
+# ============================================================
+# 65. set_logger(): blessed and non-blessed input branches
+#     Branches: blessed($logger) → stored directly; else → wrapped in Log::Abstraction
+# ============================================================
+
+{
+	package _BlessedLogger65;
+	sub new   { bless {}, shift }
+	sub debug { }
+	sub info  { }
+	sub warn  { }
+	sub notice { }
+	sub error { }
+	sub trace { }
+}
+
+subtest 'set_logger: blessed logger stored directly (not rewrapped)' => sub {
+	reset_env();
+	my $info   = CGI::Info->new();
+	my $logger = _BlessedLogger65->new();
+	my $result = $info->set_logger($logger);
+
+	isa_ok($result, 'CGI::Info', 'set_logger() returns $self for method chaining');
+	is($info->{logger}, $logger, 'blessed logger stored directly without wrapping');
+};
+
+# When logger => undef is passed, the else-branch fires: Log::Abstraction->new()
+# with no args creates a default silent/console logger and stores it.
+subtest 'set_logger: logger => undef creates default Log::Abstraction logger' => sub {
+	reset_env();
+	my $info   = CGI::Info->new();
+	my $result = $info->set_logger(logger => undef);
+
+	isa_ok($result, 'CGI::Info', 'set_logger(logger=>undef) returns $self for chaining');
+	ok(defined $info->{logger}, 'default Log::Abstraction logger installed via undef path');
+	ok(ref $info->{logger},     'installed logger is a blessed reference');
+};
+
+# ============================================================
+# 66. as_string(): no-params empty-string and raw mode
+#     Branches: !$params → return ''; $args->{raw} → unescaped format
+# ============================================================
+
+# When params() returns undef (no CGI environment), as_string() must return ''
+# rather than dying or returning undef.
+subtest 'as_string: returns empty string when no params available' => sub {
+	reset_env();
+	my $info = CGI::Info->new();    # no GATEWAY_INTERFACE → params() → undef
+	is($info->as_string(), '', 'as_string() returns "" when params() returns undef');
+};
+
+# Raw mode skips the backslash/semicolon/equals escaping and returns
+# "key=value" pairs joined by "; " with no character escaping.
+subtest 'as_string: raw mode returns unescaped key=value pairs' => sub {
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'a=hello&b=world';
+
+	my $info = CGI::Info->new();
+	$info->params();
+	my $raw  = $info->as_string({ raw => 1 });
+	like($raw, qr/a=hello/, 'raw mode: a=hello present unescaped');
+	like($raw, qr/b=world/, 'raw mode: b=world present unescaped');
+	unlike($raw, qr/\\/, 'raw mode: no backslash escaping applied');
+};
+
+# ============================================================
+# 67. _warn(): without a logger, Carp::carp is emitted
+#     Branch: !defined($self->{logger}) → Carp::carp
+#     Exercises by deleting the injected logger after construction.
+# ============================================================
+
+subtest '_warn: without logger, Carp::carp emitted (not silent drop)' => sub {
+	reset_env();
+	my $info = CGI::Info->new();
+	# Object::Configure injects a logger; remove it to force the carp path.
+	delete $info->{logger};
+
+	my @carped;
+	local $SIG{__WARN__} = sub { push @carped, @_ };
+
+	# logdir() with an invalid path calls _warn() then Carp::croak().
+	# Capture the carp before the croak kills us.
+	eval { $info->logdir('/no/such/path/xyz_test_only') };
+
+	ok(scalar @carped > 0 || $@, 'without logger: _warn fired (carp emitted or croak followed)');
+	if(@carped) {
+		like($carped[0], qr/Invalid logdir|CGI::Info/,
+			'carp message is from CGI::Info logdir validation');
+	}
+};
+
+# ============================================================
+# 68. params() allow cache: second call with SAME allow returns cached paramref
+#     Branch: (defined $self->{paramref}) && ($params->{allow} eq $self->{allow})
+# ============================================================
+
+subtest 'params: second call with same allow object returns same hashref (cached)' => sub {
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'n=42';
+
+	my $allow = { n => qr/^\d+$/ };
+	my $info  = CGI::Info->new();
+	my $p1    = $info->params(allow => $allow);
+	my $p2    = $info->params(allow => $allow);   # same $allow ref → hits cache
+
+	is($p1, $p2, 'identical allow ref returns same cached hashref on second call');
+};
+
+# ============================================================
+# 69. is_search_engine(): result is instance-cached on second call
+#     Branch: defined($self->{is_search_engine}) → return immediately
+# ============================================================
+
+subtest 'is_search_engine: result is cached and returned on subsequent calls' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Googlebot/2.1 (+http://www.google.com/bot.html)';
+	$ENV{REMOTE_ADDR}     = '66.249.66.1';
+
+	my $info = CGI::Info->new();
+	my $r1   = $info->is_search_engine();
+	my $r2   = $info->is_search_engine();   # hits instance cache
+	is($r1, $r2, 'is_search_engine() returns identical value on repeated calls (cache)');
 };
 
 done_testing();

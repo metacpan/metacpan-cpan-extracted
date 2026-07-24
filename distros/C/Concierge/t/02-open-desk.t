@@ -66,7 +66,7 @@ subtest 'open_desk fails with invalid JSON config' => sub {
     like $result->{message}, qr/invalid json/i, 'error mentions invalid JSON';
 };
 
-subtest 'open_desk fails gracefully for a pre-v0.5 desk (missing auth_backend)' => sub {
+subtest 'open_desk dies for a pre-v0.5 desk (missing auth_backend)' => sub {
     use File::Spec;
     my $stale_dir = tempdir(CLEANUP => 1);
     Concierge::Desk::Setup::build_quick_desk($stale_dir);
@@ -86,17 +86,16 @@ subtest 'open_desk fails gracefully for a pre-v0.5 desk (missing auth_backend)' 
     print $wfh encode_json($config);
     close $wfh;
 
-    my $result = Concierge->open_desk($stale_dir);
-    ok !$result->{success}, 'open_desk fails for a pre-v0.5 desk';
-    like $result->{message}, qr/must be built again/i,
+    my $error = dies { Concierge->open_desk($stale_dir) };
+    like $error, qr/must be built again/i,
         'error explains the desk must be rebuilt';
-    like $result->{message}, qr/archive existing user data/i,
+    like $error, qr/archive existing user data/i,
         'error explains user data will be archived';
-    like $result->{message}, qr/delete session and any credential storage/i,
+    like $error, qr/delete session and any credential storage/i,
         'error explains session/credential storage will be deleted';
-    like $result->{message}, qr/default built-in ID-password authentication/i,
+    like $error, qr/default built-in ID-password authentication/i,
         'error explains the default backend that will be installed';
-    like $result->{message}, qr/POD/,
+    like $error, qr/POD/,
         'error points to POD for alternative auth approaches';
 };
 

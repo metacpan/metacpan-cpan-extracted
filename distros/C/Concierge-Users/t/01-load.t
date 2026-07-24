@@ -14,8 +14,8 @@ use Concierge::Users::Meta;
 pass('Concierge::Users::Meta loaded');
 
 # Test 3: Load all backend modules
-use Concierge::Users::Database;
-pass('Concierge::Users::Database loaded');
+use Concierge::Users::SQLite;
+pass('Concierge::Users::SQLite loaded');
 
 use Concierge::Users::File;
 pass('Concierge::Users::File loaded');
@@ -32,8 +32,8 @@ my @isa = @Concierge::Users::ISA;
 is(\@isa, ['Concierge::Users::Meta'], 'Concierge::Users inherits from Concierge::Users::Meta');
 
 # Test 6: Check backend inheritance
-my @db_isa = @Concierge::Users::Database::ISA;
-is(\@db_isa, ['Concierge::Users::Meta'], 'Database backend inherits from Meta');
+my @db_isa = @Concierge::Users::SQLite::ISA;
+is(\@db_isa, ['Concierge::Users::Meta'], 'SQLite backend inherits from Meta');
 
 my @file_isa = @Concierge::Users::File::ISA;
 is(\@file_isa, ['Concierge::Users::Meta'], 'File backend inherits from Meta');
@@ -64,7 +64,7 @@ my @backend_methods = qw(
     delete
     config
 );
-can_ok('Concierge::Users::Database', $_) for @backend_methods;
+can_ok('Concierge::Users::SQLite', $_) for @backend_methods;
 can_ok('Concierge::Users::File', $_) for @backend_methods;
 can_ok('Concierge::Users::YAML', $_) for @backend_methods;
 

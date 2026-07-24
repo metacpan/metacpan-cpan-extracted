@@ -1,7 +1,7 @@
 package Data::BitSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::BitSet::Shared', $VERSION);
 
@@ -130,7 +130,9 @@ C<sets>, C<clears>, C<toggles>, C<mmap_size>.
 Backing files are created with mode C<0600> (owner-only) by default, so only the
 creating user can open and attach them. To share a backing file across users,
 pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
+when the file is created; a pre-existing empty file owned by the caller is
+adopted and also gets the requested mode, while a non-empty existing file
+keeps its own permissions. The
 file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
 and created with C<O_EXCL>; the on-disk header is validated when the file is
 attached. Any process you grant write access to a shared mapping is trusted not

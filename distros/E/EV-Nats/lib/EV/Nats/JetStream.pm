@@ -148,6 +148,29 @@ sub js_publish {
     }, $self->{timeout});
 }
 
+# Like js_publish but carries NATS headers (e.g. Nats-Rollup) and still
+# waits for the PubAck. Same inbox pattern as EV::Nats::KV::create.
+sub js_publish_h {
+    my ($self, $subject, $headers, $payload, $cb) = @_;
+    my $nats  = $self->{nats};
+    my $inbox = $nats->new_inbox;
+    my ($sid, $timer);
+    $sid = $nats->subscribe_max($inbox, sub {
+        my ($s, $resp) = @_;
+        if ($timer) { $timer->stop; undef $timer; }
+        my ($ack, $derr) = decode_json_or_error($resp);
+        return $cb->(undef, $derr) if $derr;
+        return $cb->(undef, "$ack->{error}{description} (code $ack->{error}{code})")
+            if $ack->{error};
+        $cb->($ack, undef);
+    }, 1);
+    $timer = EV::timer($self->{timeout} / 1000.0, 0, sub {
+        $nats->unsubscribe($sid);
+        $cb->(undef, "publish timeout");
+    });
+    $nats->hpublish($subject, $headers, $payload, $inbox);
+}
+
 # Fetch messages (pull consumer).
 #
 # A pull-consumer NEXT request returns up to N messages on a reply inbox,
@@ -182,7 +205,9 @@ sub fetch {
 
     $sid = $nats->subscribe($inbox, sub {
         my ($subject, $payload, $reply, $headers) = @_;
-        if ($headers && $headers =~ m{^NATS/1\.0\s+(\d+)}) {
+        # Status lines are exactly "NATS/1.0 <3 digits>"; a loose \s+ would
+        # swallow a headered DATA message's first header as a status frame.
+        if ($headers && $headers =~ m{\ANATS/1\.0 (\d{3})(?:[ \r\n]|\z)}) {
             my $code = $1;
             # A NATS/1.0 status frame is a control message, never data, so it
             # must not be pushed as a result. 100 = idle heartbeat / flow
@@ -254,7 +279,9 @@ module -- see those for higher-level KV / blob APIs.
 
 All methods are async. Callbacks fire on the L<EV> loop.
 
-=head2 new(%opts)
+=head2 new
+
+    new(%opts)
 
     my $js = EV::Nats::JetStream->new(
         nats    => $nats,
@@ -264,34 +291,48 @@ All methods are async. Callbacks fire on the L<EV> loop.
 
 =head2 Stream management
 
-=head3 stream_create($config, $cb)
+=head3 stream_create
+
+    stream_create($config, $cb)
 
 Create a stream. C<$config> is passed verbatim as the
 C<StreamConfig> request body. Callback: C<($info, $err)>.
 
-=head3 stream_update($config, $cb)
+=head3 stream_update
+
+    stream_update($config, $cb)
 
 Update an existing stream. Same shape as C<stream_create>.
 
-=head3 stream_delete($name, $cb)
+=head3 stream_delete
+
+    stream_delete($name, $cb)
 
 Delete the stream by name.
 
-=head3 stream_info($name, [\%opts], $cb)
+=head3 stream_info
+
+    stream_info($name, [\%opts], $cb)
 
 Fetch stream config + state. Optional C<\%opts> may include
 C<subjects_filter> (e.g. C<E<gt>>) to populate C<state.subjects>;
 without it the server omits that field for performance.
 
-=head3 stream_list($cb)
+=head3 stream_list
+
+    stream_list($cb)
 
 List all streams' info.
 
-=head3 stream_purge($name, $cb)
+=head3 stream_purge
+
+    stream_purge($name, $cb)
 
 Purge all messages from the stream.
 
-=head3 stream_msg_get($stream, \%opts, $cb)
+=head3 stream_msg_get
+
+    stream_msg_get($stream, \%opts, $cb)
 
 Fetch a single message from C<$stream>. C<\%opts> selects the message:
 
@@ -304,26 +345,48 @@ under C<< $resp->{message}{data} >> and C<< $resp->{message}{hdrs} >>.
 
 =head2 Consumer management
 
-=head3 consumer_create($stream, $config, $cb)
+=head3 consumer_create
+
+    consumer_create($stream, $config, $cb)
 
 Create a consumer (push or pull). C<$config> is the consumer config
 hashref; C<durable_name> makes it durable, C<ack_policy> controls
 ack semantics.
 
-=head3 consumer_delete($stream, $consumer, $cb)
+=head3 consumer_delete
 
-=head3 consumer_info($stream, $consumer, $cb)
+    consumer_delete($stream, $consumer, $cb)
 
-=head3 consumer_list($stream, $cb)
+=head3 consumer_info
+
+    consumer_info($stream, $consumer, $cb)
+
+=head3 consumer_list
+
+    consumer_list($stream, $cb)
 
 =head2 Publishing and fetching
 
-=head3 js_publish($subject, $payload, $cb)
+=head3 js_publish
+
+    js_publish($subject, $payload, $cb)
 
 Publish with JetStream acknowledgment. Callback: C<($ack, $err)>
 where C<$ack> is C<{ stream, seq, duplicate }>.
 
-=head3 fetch($stream, $consumer, \%opts, $cb)
+=head3 js_publish_h
+
+    js_publish_h($subject, $headers, $payload, $cb)
+
+Like L</js_publish> but sends C<$headers> (a full C<NATS/1.0> header
+block, e.g. C<"NATS/1.0\r\nNats-Rollup: sub\r\n\r\n">) with the
+message, waiting for the PubAck on a one-shot reply inbox. Used for
+rollup publishes where the acknowledged sequence still matters
+(L<EV::Nats::ObjectStore> metadata). Callback: C<($ack, $err)>.
+
+=head3 fetch
+
+    fetch($stream, $consumer, \%opts, $cb)
 
 Pull messages from a pull-mode consumer. Options:
 
@@ -364,14 +427,18 @@ These are exposed for sibling modules (L<EV::Nats::KV>,
 L<EV::Nats::ObjectStore>) -- not part of the end-user API and subject
 to change.
 
-=head2 decode_json_or_error($json)
+=head2 decode_json_or_error
+
+    decode_json_or_error($json)
 
 Decode C<$json>. Returns C<($decoded, $error_or_undef)>; the error
 string already includes a C<"JSON decode error: "> prefix when set.
 Gates on C<$@> so falsy-but-valid JSON (C<null>, C<0>, C<false>,
 empty string) is reported as a clean decode rather than a failure.
 
-=head2 msg_is_tombstone($msg)
+=head2 msg_is_tombstone
+
+    msg_is_tombstone($msg)
 
 True if a C<STREAM.MSG.GET> response message carries a
 C<KV-Operation: DEL> or C<KV-Operation: PURGE> header. C<$msg> is the

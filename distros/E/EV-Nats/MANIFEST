@@ -52,6 +52,9 @@ t/13_misc.t
 t/14_module_load.t
 t/15_creds_file.t
 t/16_max_payload.t
+t/17_mock_protocol.t
+t/18_object_kv.t
+t/lib/MockNats.pm
 typemap
 xt/01_cluster_failover.t
 xt/02_unix_socket.t
@@ -71,6 +74,8 @@ xt/15_nkey_auth.t
 xt/16_kv_watch.t
 xt/17_flush_disconnect.t
 xt/18_js_ack_flow.t
+xt/19_connect_stress.t
+xt/20_object_interop.t
 xt/lib/EVNatsHelpers.pm
 xt/release_pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

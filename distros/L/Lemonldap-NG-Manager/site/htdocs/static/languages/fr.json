@@ -545,6 +545,8 @@
 "ldapCAFile":"Autorité de certification (fichier)",
 "ldapCAPath":"Autorité de certification (répertoire)",
 "ldapChangePasswordAsUser":"Changement en tant qu'utilisateur",
+"ldapClientCert":"Certificat client",
+"ldapClientKey":"Clef privée client",
 "ldapConnection":"Connexion",
 "ldapExportedVars":"Variables exportées",
 "ldapFilters":"Filtres",

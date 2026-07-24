@@ -1,9 +1,10 @@
 # Concierge
 
-Service layer orchestrator for authentication, session management, and user
-data operations in Perl. Concierge combines three independent component
-modules behind a single, consistent API so applications never deal with
-credential storage, session backends, or user record schemas directly.
+Extensible service layer orchestrator of operational resources for
+applications, with built-in provisions for authentication, sessions, and
+user data. Concierge combines three independent component modules behind a
+single, consistent API so applications never deal with credential storage,
+session backends, or user record schemas directly.
 
 ## Synopsis
 
@@ -40,13 +41,43 @@ say $user->moniker;         # "Alice"
 say $user->session_id;      # random hex token
 ```
 
+## Concepts
+
+Concierge is built around four ideas: it is **extensible**, it behaves as a
+**service layer**, it **orchestrates** rather than reimplements, and it
+exists to simplify an application's **operational resources**. See
+`perldoc Concierge` (CONCEPTS section) for the full discussion; summarized:
+
+- **Extensible** — Each identity-core component (Auth, Sessions, Users) is
+  itself extensible as to backend and storage configuration. Components
+  beyond the identity core may also be added to a desk, either as a plain
+  pass-through (reached through their own accessor) or with selected
+  methods `promote`d directly onto `$concierge`.
+- **Service Layer** — Setup (`build_desk()`/`build_quick_desk()`) and
+  `open_desk()` both guarantee that any failure is always clearly reported
+  — as a structured `{ success => 0, message => '...' }` response in
+  nearly every case, or as an exception in a couple of narrow structural
+  cases (missing desk directory, a non-optional component that fails to
+  load). A concierge object is only ever handed back when fully
+  functional, and once a desk is open, its API methods are never fatal to
+  the application.
+- **Orchestration** — For the identity core, Concierge directly provides
+  the capability (e.g. `login_user()` coordinates Auth, Users, and
+  Sessions in one call). For an added component, Concierge's involvement
+  can end at handoff — the component just needs to satisfy the minimal
+  contract in `Concierge::Desk::Component`.
+- **Operational Resources** — The services and data stores that support an
+  application's main purpose without being that purpose. Authentication,
+  sessions, and user records are the built-in examples; the same pattern
+  extends to anything an added component manages.
+
 ## How It Works
 
 ### Desks
 
 A *desk* is a directory containing the configuration and data files for all
 three components. You create one with `Concierge::Desk::Setup`, then open it at
-runtime with `open_desk()`. Opening a desk instantiates all components from
+runtime with `Concierge->open_desk()`. Opening a desk instantiates all components from
 the saved configuration and runs session cleanup automatically.
 
 ```perl
@@ -69,11 +100,11 @@ my $concierge = $result->{concierge};
 Concierge provides three graduated levels, each returning a
 `Concierge::Desk::User` object with methods appropriate to that level:
 
-| Level | Method | Session | User record | Auth |
-|---|---|---|---|---|
-| Visitor | `admit_visitor()` | No | No | No |
-| Guest | `checkin_guest()` | Yes | No | No |
-| Logged-in | `login_user()` | Yes | Yes | Yes |
+| Level | Method | User key | Session | User record | Auth |
+|---|---|---|---|---|---|
+| Visitor | `admit_visitor()` | Yes | No | No | No |
+| Guest | `checkin_guest()` | Yes | Yes | No | No |
+| Logged-in | `login_user()` | Yes | Yes | Yes | Yes |
 
 A guest can be promoted to a logged-in user with `login_guest()`, which
 transfers any session data (shopping cart, preferences, etc.) to the new
@@ -87,17 +118,20 @@ the right data and backend access.
 
 ### Authentication — Concierge::Auth
 
-- **Argon2id** password hashing and verification; no plaintext credentials
+- **Argon2** password hashing and verification; no plaintext credentials
   written to disk
 - Random value generators: hex IDs, alphanumeric tokens, UUIDs (v4),
   word-passphrases from a system dictionary
 - Designed for substitution: swap in any replacement that implements the
-  same method contract (`checkPwd`, `setPwd`, `resetPwd`, `deleteID`, etc.)
-  for LDAP, OAuth, or other schemes
+  same method contract (`enroll`, `authenticate`, `is_id_known`,
+  `change_credentials`, `revoke`) for LDAP, OAuth, or other schemes
 
 ### Sessions — Concierge::Sessions
 
-- **Multiple backends**: SQLite (recommended), flat-file, or in-memory text
+- **Multiple backends**: SQLite (recommended) or flat-file
+- Every session lives in memory first; data is only written to whichever
+  backend is configured when `->save()` is called. Some sessions never call
+  `save()` at all and exist purely for in-process continuity.
 - Sessions carry arbitrary key/value data (shopping carts, wizard state,
   preferences, etc.)
 - Configurable timeout per session; expired sessions cleaned up automatically
@@ -112,17 +146,8 @@ the right data and backend access.
 - **Configurable field schema**: built-in standard fields plus
   application-defined fields added at setup time
 
-Standard fields include:
-
-| Field | Notes |
-|---|---|
-| `user_id` | Required, unique identifier |
-| `moniker` | Required, display name |
-| `email`, `phone` | Contact fields |
-| `access_level` | e.g. `admin`, `staff`, `member` |
-| `user_status` | e.g. `OK`, `suspended` |
-| `term_ends` | Membership/subscription expiry |
-| `last_login_date` | Auto-updated on login |
+See the Concierge::Users README (Field Customization) for the full list of
+standard fields.
 
 Applications extend this with `app_fields` at setup time:
 
@@ -139,6 +164,9 @@ Concierge::Desk::Setup->build_desk('./desk', {
 Field definitions can also override built-in defaults (labels, null values,
 required flags, etc.) via `field_overrides`.
 
+All or selected standard fields may also be omitted entirely, except for the
+required fields and automatic date fields.
+
 ## Consistent Return Values
 
 All Concierge methods return a hashref:
@@ -152,8 +180,10 @@ All Concierge methods return a hashref:
 ```
 
 Methods never `die` or `croak` during normal operation (the one exception is
-`open_desk()`, which croaks if the desk directory does not exist). This makes
-Concierge safe to use in event-loop and persistent-process environments.
+`open_desk()`, which croaks if the desk directory does not exist, or if a
+non-optional added component -- see [Extensibility](#extensibility) below --
+fails to load). This makes Concierge safe to use in event-loop and
+persistent-process environments.
 
 ## Extensibility
 
@@ -202,7 +232,7 @@ perldoc Concierge::Users   # user records, field schema, backends
 
 ## Status
 
-Under active development (v0.10.0). API may change before 1.0.
+Under active development (v0.11.0). API may change before 1.0.
 
 ## Author
 

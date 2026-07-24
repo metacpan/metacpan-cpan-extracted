@@ -41,6 +41,9 @@ t/0023-sh-getopts.t
 t/0024-sh-redirect-quoting.t
 t/0025-sh-assign-quoting.t
 t/0026-sh-cd-and-redir-fail.t
+t/0027-let-type-command.t
+t/0028-sh-printf.t
+t/0029-sh-attrs-mapfile.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t
@@ -48,6 +51,7 @@ t/9030-distribution.t
 t/9040-style.t
 t/9050-pod.t
 t/9060-readme.t
+t/9061-readme-refs.t
 t/9070-examples.t
 t/9080-cheatsheets.t
 eg/00_hello.pl

@@ -24,6 +24,7 @@ t/pod_synopsis.t
 t/version_check.t
 xt/abi_skew.t
 xt/asan.t
+xt/class_pv_magic.t
 xt/cloexec.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
@@ -34,6 +35,7 @@ xt/fd_validation.t
 xt/fuzz_header.t
 xt/hostile_bless.t
 xt/invalid_args.t
+xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/map_shared_proof.t
 xt/memfd_seal.t

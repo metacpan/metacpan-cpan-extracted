@@ -12,28 +12,19 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
 has allowedDomains => ( is => 'rw', isa => 'ArrayRef' );
 has keytab         => ( is => 'rw' );
-has AjaxInitScript => ( is => 'rw', default => '' );
 has Name           => ( is => 'ro', default => 'Kerberos' );
-
-# Override _Ajax InitCmd
-has InitCmd => (
-    is      => 'ro',
-    default =>
-q@$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );$self->p->setHiddenFormValue( $req, ajax_auth_token => 0, '', 0 )@
-);
 
 has auth_id => ( is => 'ro', default => 'krb' );
 
 with 'Lemonldap::NG::Portal::Auth::_Ajax';
 
 # INITIALIZATION
-
 sub init {
     my $self = shift;
     my $file;
@@ -48,11 +39,42 @@ sub init {
     }
 
     $self->keytab("FILE:$file");
-    $self->AjaxInitScript( '<script type="text/javascript" src="'
-          . $self->p->staticPrefix
-          . '/common/js/kerberosChoice.min.js"></script>' )
-      if $self->conf->{krbByJs};
     return 1;
+}
+
+# Initializes display
+# When called from Choice, $from_self will not be set
+sub initDisplay {
+    my ( $self, $req, $from_self ) = @_;
+
+    $self->SUPER::initDisplay($req);
+
+    $self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );
+
+    if ( $self->conf->{krbByJs} ) {
+
+        # During session upgrade, script is already injected by extractFormInfo
+        if ( $req->data->{_krbInitAlreadyDone} ) {
+            $req->data->{customScript} =~
+              s/kerberos.min.js/kerberosChoice.min.js/g;
+        }
+        else {
+            $req->data->{customScript} .=
+                '<script type="text/javascript" src="'
+              . $self->p->staticPrefix
+              . '/common/js/'
+              . ( $from_self ? 'kerberos' : 'kerberosChoice' )
+              . '.min.js"></script>';
+        }
+
+        if ( $req->pdata->{krbDone} ) {
+            $req->data->{customScript} .=
+                '<script type="application/init">'
+              . '{ "krbDone": 1 }'
+              . '</script>';
+
+        }
+    }
 }
 
 sub auth_route {
@@ -82,6 +104,7 @@ sub extractFormInfo {
     if ($token_id) {
         my $token = $self->get_auth_token( $req, $token_id );
         if ( $token->{user} ) {
+            $req->pdata->{krbDone} = 1;
             return $self->_krbAuthFinish( $req, $token->{user} );
         }
         else {
@@ -143,14 +166,10 @@ sub _request_credential {
     else {
         $self->logger->debug( 'Append ' . $self->Name . ' init/script' );
 
-        # Call kerberos.js if Kerberos is the only Auth module
-        # kerberosChoice.js is used by Choice
-        $self->{AjaxInitScript} =~ s/kerberosChoice/kerberos/;
-
         # In some Combination scenarios, Kerberos may be called multiple
         # times but we only need to initialize the display once
         unless ( $req->data->{_krbInitAlreadyDone} ) {
-            $self->initDisplay($req);
+            $self->initDisplay( $req, 1 );
             $req->data->{_krbInitAlreadyDone} = 1;
         }
 

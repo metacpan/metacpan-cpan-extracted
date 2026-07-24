@@ -85,11 +85,15 @@ xt/asan.t
 xt/binary_data.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
+xt/fork_lock_release.t
 xt/invalid_args.t
+xt/kwalitee.t
+xt/lock_leak_on_destroy.t
 xt/longdouble_f64.t
 xt/manifest_vs_git.t
 xt/memfd_seal.t

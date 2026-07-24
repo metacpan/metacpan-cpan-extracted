@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [11.0.0] - 2026-07-23
+
 ## [10.0.0] - 2026-06-11
 ### Changed
 - [NET] - Upgraded Test project dependencies and adjusted test code due to breaking changes in MSTest v4.
@@ -240,7 +242,8 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 ### Added
 - First stable release!
 
-[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v10.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v11.0.0...HEAD
+[11.0.0]: https://github.com/cucumber/tag-expressions/compare/v10.0.0...v11.0.0
 [10.0.0]: https://github.com/cucumber/tag-expressions/compare/v9.1.0...v10.0.0
 [9.1.0]: https://github.com/cucumber/tag-expressions/compare/v9.0.0...v9.1.0
 [9.0.0]: https://github.com/cucumber/tag-expressions/compare/v8.1.0...v9.0.0
@@ -271,3 +274,4 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 [1.1.0]: https://github.com/cucumber/tag-expressions/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/cucumber/tag-expressions/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/cucumber/tag-expressions/releases/tag/v1.0.0
+ag-expressions/releases/tag/v1.0.0

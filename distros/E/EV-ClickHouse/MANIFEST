@@ -113,6 +113,9 @@ t/46_query_log_comment.t
 t/47_extra_types.t
 t/48_reentrancy.t
 t/49_external_tables.t
+t/50_review_fixes.t
+t/51_lz4_multiframe.t
+t/52_http_chunked_trickle.t
 typemap
 xs/codecs.c
 xs/io.c

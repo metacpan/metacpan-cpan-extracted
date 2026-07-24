@@ -11,7 +11,9 @@ Shared.xs
 t/01-basic.t
 t/02-oracle.t
 xt/asan.t
+xt/class_pv_magic.t
 xt/crash_recovery.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fork_cuckoo.t
 xt/kwalitee.t

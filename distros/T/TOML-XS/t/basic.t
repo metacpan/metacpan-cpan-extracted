@@ -46,8 +46,10 @@ timestamp = 1979-05-27T07:32:00-08:00
 END
 
 my $docobj = TOML::XS::from_toml($doc);
+isa_ok($docobj, 'TOML::XS::Document');
 
 my $struct = $docobj->to_struct();
+isa_ok($struct, 'HASH');
 
 my $round_floats = $Config{'uselongdouble'} || $Config{'usequadmath'};
 
@@ -63,64 +65,66 @@ my $the_timestamp_cmp = all(
         hours => 7,
         minute => 32,
         second => 0,
-        millisecond => undef,
-        milliseconds => undef,
+        millisecond => 0,
+        milliseconds => 0,
+        microsecond => 0,
+        microseconds => 0,
         timezone => '-08:00',
     ),
 );
 
 my $struct_cmp = {
-        'database' => {
-            'data' => [
-                [
-                    'delta',
-                    'phi'
-                ],
-                [ $round_floats ? num(3.14, 0.0001) : 3.14 ]
+    database => {
+        data => [
+            [
+                'delta',
+                'phi'
             ],
-            'enabled' => TOML::XS::true,
-            'ports'   => [
-                8000,
-                8001,
-                8002
-            ],
-            'temp_targets' => {
-                'case' => 72,
-                'cpu'  => 79.5,
-            }
+            [ $round_floats ? num(3.14, 0.0001) : 3.14 ]
+        ],
+        enabled => TOML::XS::true,
+        ports   => [
+            8000,
+            8001,
+            8002
+        ],
+        temp_targets => {
+            case => 72,
+            cpu  => 79.5,
+        }
+    },
+    owner => {
+        name => 'Tom Preston-Werner',
+        dob  => $the_timestamp_cmp,
+    },
+    servers => {
+        alpha => {
+            ip   => '10.0.0.1',
+            role => 'frontend'
         },
-        'owner' => {
-            'name' => 'Tom Preston-Werner',
-            'dob'  => $the_timestamp_cmp,
-        },
-        'servers' => {
-            'alpha' => {
-                'ip'   => '10.0.0.1',
-                'role' => 'frontend'
-            },
-            'beta' => {
-                'ip'   => '10.0.0.2',
-                'role' => 'backend'
-            }
-        },
-        'title' => 'TOML Example',
-   'checkextra' => {
-     'fluff' => "\x{e9}p\x{e9}e",
-     'alltypes' => [
-       'a string',
-       TOML::XS::true,
-       TOML::XS::false,
-       123,
-       '34.5',
-       $the_timestamp_cmp,
-       {},
-     ],
-     boolean => TOML::XS::false,
-     integer => 123,
-     double => 34.5,
-     timestamp => $the_timestamp_cmp,
-   },
-    };
+        beta => {
+            ip   => '10.0.0.2',
+            role => 'backend'
+        }
+    },
+    title => 'TOML Example',
+    checkextra => {
+        fluff => "\x{e9}p\x{e9}e",
+        alltypes => [
+            'a string',
+            TOML::XS::true,
+            TOML::XS::false,
+            123,
+            '34.5',
+            $the_timestamp_cmp,
+            {},
+        ],
+        boolean => TOML::XS::false,
+        integer => 123,
+        double => 34.5,
+        timestamp => $the_timestamp_cmp,
+    },
+};
 
 cmp_deeply(
     $struct,
@@ -154,35 +158,35 @@ cmp_deeply(
 }
 
 {
-    my $checkextra = $docobj->parse('checkextra');
+    my $checkextra = $docobj->get('checkextra');
     cmp_deeply(
         $checkextra,
         $struct_cmp->{'checkextra'},
-        'parse() - single pointer item',
+        'get() - single pointer item',
     );
 
     for my $ce_piece (sort keys %{ $struct_cmp->{'checkextra'} }) {
-        my $parsed = $docobj->parse('checkextra', $ce_piece);
+        my $parsed = $docobj->get('checkextra', $ce_piece);
         cmp_deeply(
             $parsed,
             $struct_cmp->{'checkextra'}{$ce_piece},
-            "parse(checkextra, $ce_piece)",
+            "get(checkextra, $ce_piece)",
         );
     }
 
     for my $i ( 0 .. $#{ $struct_cmp->{'checkextra'}{'alltypes'} } ) {
-        my $parsed = $docobj->parse('checkextra', 'alltypes', $i);
+        my $parsed = $docobj->get('checkextra', 'alltypes', $i);
         cmp_deeply(
             $parsed,
             $struct_cmp->{'checkextra'}{'alltypes'}[$i],
-            "parse(checkextra, alltypes, $i)",
+            "get(checkextra, alltypes, $i)",
         );
 
-        $parsed = $docobj->parse('checkextra', 'alltypes', "$i");
+        $parsed = $docobj->get('checkextra', 'alltypes', "$i");
         cmp_deeply(
             $parsed,
             $struct_cmp->{'checkextra'}{'alltypes'}[$i],
-            qq<parse(checkextra, alltypes, "$i")>,
+            qq<get(checkextra, alltypes, "$i")>,
         );
     }
 }

@@ -11,12 +11,16 @@ binmode( Test::More->builder->output(), ':utf8');
 BEGIN {
   require_ok 'Termbox::PP';
   use_ok 'Termbox';
-  use_ok 'Termbox::PP::WCWidth';
+  use_ok 'Terminal::WCWidth';
 }
 
 *wcwidth = Termbox::TB_OPT_LIBC_WCHAR 
          ? \&Termbox::wcwidth 
-         : \&Termbox::PP::WCWidth::wcwidth;
+         : \&Terminal::WCWidth::wcwidth;
+
+note "Using ", Termbox::TB_OPT_LIBC_WCHAR 
+            ? "Termbox::wcwidth()" 
+            : "Terminal::WCWidth::wcwidth()";
 
 sub assert_length {
   my ($str, $each, $phrase, $msg) = @_;

@@ -293,7 +293,7 @@ sub init_params { # void ()
   $custom2 = $custom;
 
   if ($color2 == TB_WHITE || !$rim) {
-    $color2 = $color | TB_BOLD;
+    $color2 = $color | TB_BRIGHT;
   }
   if (defined($custom) && length($custom) > 1 && $rim) {
     $custom2 = substr($custom, 1);
@@ -311,7 +311,7 @@ sub init_params { # void ()
 sub next_color { # $ ($)
   my ($current) = @_;
   for (my $i = 0; $i < 8; $i++) {
-    if ($current == $colors[$i] || $current == ($colors[$i] | TB_BOLD )) {
+    if ($current == $colors[$i] || $current == ($colors[$i] | TB_BRIGHT )) {
       return $colors[($i+1) % 8];
     }
   }

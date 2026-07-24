@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING.md
 lib/Map/Tube/Plugin/FuzzyFind.pm
 Makefile.PL
 LICENSE
@@ -6,7 +7,7 @@ MANIFEST
 MANIFEST.SKIP
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-README
+README.md
 t/00-load.t
 t/01-exact.t
 t/02-start.t
@@ -23,6 +24,7 @@ t/12-levenshtein.t
 t/13-levenshtein-damerau.t
 t/14-jaro-winkler.t
 t/15-ngrams.t
+t/20-list_matchers.t
 t/49-args.t
 t/50-manifest.t
 t/51-meta-json.t

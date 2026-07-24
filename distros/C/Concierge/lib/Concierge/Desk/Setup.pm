@@ -1,7 +1,7 @@
-package Concierge::Desk::Setup v0.10.0;
+package Concierge::Desk::Setup v0.11.0;
 use v5.36;
 
-our $VERSION = 'v0.10.0';
+our $VERSION = 'v0.11.0';
 
 # ABSTRACT: Setup and configuration for Concierge desk initialization
 
@@ -51,6 +51,35 @@ my %AUTH_BACKENDS = (
     # },
 );
 
+# === SESSIONS BACKEND CATALOG ===
+# Maps a friendly sessions.backend name to its fully-qualified class
+# name and the settings it requires, same shape as %AUTH_BACKENDS.
+# Concierge::Sessions itself never guesses a class from a friendly
+# name -- it requires an already-resolved backend_class (see its POD).
+my %SESSIONS_BACKENDS = (
+    database => { class => 'Concierge::Sessions::SQLite', required => [] },
+    file     => { class => 'Concierge::Sessions::File',   required => [] },
+    # redis => {
+    #     class    => 'Concierge::Sessions::Redis',
+    #     required => [qw/host port/],
+    # },
+);
+
+# === USERS BACKEND CATALOG ===
+# Maps a friendly users.backend name to its fully-qualified class name
+# and the settings it requires, same shape as %AUTH_BACKENDS.
+# Concierge::Users itself never guesses a class from a friendly name --
+# setup() requires an already-resolved backend_class (see its POD).
+my %USERS_BACKENDS = (
+    database => { class => 'Concierge::Users::SQLite', required => [] },
+    file     => { class => 'Concierge::Users::File',     required => [] },
+    yaml     => { class => 'Concierge::Users::YAML',     required => [] },
+    # postgres => {
+    #     class    => 'Concierge::Users::Postgres',
+    #     required => [qw/host dbname user password/],
+    # },
+);
+
 # Resolve a component's storage directory against base_dir: a relative
 # $dir is joined onto $base_dir (so it moves if base_dir does); an
 # absolute $dir is used as-is (letting a component's storage live
@@ -90,28 +119,31 @@ sub build_quick_desk ($storage_dir, $app_fields=[]) {
     # Create minimal Concierge object for internal operations
     my $concierge = bless {}, 'Concierge';
 
-    # Initialize Sessions component
-    $concierge->{sessions} = Concierge::Sessions->new(
-        storage_dir => $storage_dir,  # Uses database backend (SQLite) by default
-    );
-
-    # Initialize Auth component -- build_quick_desk is fully opinionated
-    # (like its fixed 'database' choice for Sessions/Users), so the
+    # Initialize Sessions component -- build_quick_desk is fully
+    # opinionated (like its fixed 'database' choice for Users), so the
     # resolved class name is hardcoded here rather than going through
     # the catalog/validation path used by build_desk().
+    my $sessions_backend = 'Concierge::Sessions::SQLite';
+    $concierge->{sessions} = Concierge::Sessions->new(
+        backend_class => $sessions_backend,
+        storage_dir   => $storage_dir,
+    );
+
+    # Initialize Auth component -- same rationale as Sessions above.
     my $auth_file    = File::Spec->catfile($storage_dir, 'auth.pwd');
     my $auth_backend = 'Concierge::Auth::Pwd';
     my $auth_args    = { file => $auth_file };
     unlink $auth_file if -f $auth_file;
     $concierge->{auth} = Concierge::Auth->new(
-        backend => $auth_backend,
+        backend_class => $auth_backend,
         %$auth_args,
     );
 
-    # Setup Users component
+    # Setup Users component -- same rationale as Sessions above.
+    my $users_backend = 'Concierge::Users::SQLite';
     my $users_setup = Concierge::Users->setup({
         storage_dir             => $storage_dir,
-        backend                 => 'database',  # Database backend (SQLite)
+        backend_class           => $users_backend,
         include_standard_fields => 'all',       # All standard fields
         field_overrides         => [],          # No overrides
         app_fields              => $app_fields,
@@ -131,8 +163,8 @@ sub build_quick_desk ($storage_dir, $app_fields=[]) {
         users_dir           => $storage_dir,
         auth_backend        => $auth_backend,
         auth_args           => $auth_args,
-        sessions_backend    => 'database',
-        users_backend       => 'database',
+        sessions_backend    => $sessions_backend,
+        users_backend       => $users_backend,
     };
     # Encode to JSON with pretty formatting and write with trailing newline
     my $json = JSON::PP->new->utf8->pretty->encode($full_config) . "\n";
@@ -222,6 +254,28 @@ sub build_desk ($config) {
             unless defined $auth_args{$key} && length $auth_args{$key};
     }
 
+    # Resolve the sessions backend: same friendly-name-to-class
+    # resolution as auth, via %SESSIONS_BACKENDS.
+    my $sessions_backend_name = $config->{sessions}{backend}
+        or return { success => 0, message => 'Missing sessions.backend' };
+    my $sessions_spec = $SESSIONS_BACKENDS{lc $sessions_backend_name}
+        or return { success => 0, message => "Unknown sessions.backend: $sessions_backend_name" };
+    for my $key (@{ $sessions_spec->{required} }) {
+        return { success => 0, message => "Missing sessions.$key required for backend '$sessions_backend_name'" }
+            unless defined $config->{sessions}{$key} && length $config->{sessions}{$key};
+    }
+
+    # Resolve the users backend: same friendly-name-to-class
+    # resolution as auth, via %USERS_BACKENDS.
+    my $users_backend_name = $config->{users}{backend}
+        or return { success => 0, message => 'Missing users.backend' };
+    my $users_spec = $USERS_BACKENDS{lc $users_backend_name}
+        or return { success => 0, message => "Unknown users.backend: $users_backend_name" };
+    for my $key (@{ $users_spec->{required} }) {
+        return { success => 0, message => "Missing users.$key required for backend '$users_backend_name'" }
+            unless defined $config->{users}{$key} && length $config->{users}{$key};
+    }
+
     # Create directories if needed
     for my $dir ($base_dir, $sessions_dir, $users_dir, $auth_dir) {
         next if -d $dir;
@@ -235,24 +289,23 @@ sub build_desk ($config) {
     # Create minimal Concierge object for internal operations
     my $concierge = bless {}, 'Concierge';
 
-    # Initialize Sessions component with specified backend
-    my $sessions_backend = $config->{sessions}{backend} || 'database'; 
+    # Initialize Sessions component with the resolved backend class
     $concierge->{sessions} = Concierge::Sessions->new(
-        backend     => $sessions_backend,
-        storage_dir => $sessions_dir,
+        backend_class => $sessions_spec->{class},
+        storage_dir   => $sessions_dir,
     );
 
     # Initialize Auth component
     unlink $auth_args{file} if $auth_args{file} && -f $auth_args{file};
     $concierge->{auth} = Concierge::Auth->new(
-        backend => $auth_spec->{class},
+        backend_class => $auth_spec->{class},
         %auth_args,
     );
 
     # Build Users setup configuration
     my $users_config = {
-        storage_dir => $users_dir,
-        backend     => $config->{users}{backend} || 'database',
+        storage_dir   => $users_dir,
+        backend_class => $users_spec->{class},
     };
 
     # Add Users-specific configuration options
@@ -409,8 +462,8 @@ sub build_desk ($config) {
         auth_dir            => $auth_dir,
         auth_backend        => $auth_spec->{class},
         auth_args           => \%auth_args,
-        sessions_backend    => $sessions_backend,
-        users_backend       => $users_config->{backend},
+        sessions_backend    => $sessions_spec->{class},
+        users_backend       => $users_config->{backend_class},
         (%components ? (components => \%components) : ()),
     };
     my $json = JSON::PP->new->utf8->pretty->encode($full_config) . "\n";
@@ -469,15 +522,27 @@ sub validate_setup_config ($config) {
     }
 
     if ($config->{sessions}{backend}) {
-        my $backend = lc $config->{sessions}{backend};
-        push @errors, "Invalid sessions.backend: must be 'database' or 'file'"
-            unless $backend =~ /^(database|file)$/;
+        my $spec = $SESSIONS_BACKENDS{lc $config->{sessions}{backend}};
+        if (!$spec) {
+            push @errors, "Invalid sessions.backend: '$config->{sessions}{backend}'";
+        } else {
+            for my $key (@{ $spec->{required} }) {
+                push @errors, "Missing sessions.$key required for backend '$config->{sessions}{backend}'"
+                    unless defined $config->{sessions}{$key} && length $config->{sessions}{$key};
+            }
+        }
     }
 
     if ($config->{users}{backend}) {
-        my $backend = lc $config->{users}{backend};
-        push @errors, "Invalid users.backend: must be 'database', 'yaml', or 'file'"
-            unless $backend =~ /^(database|yaml|file)$/;
+        my $spec = $USERS_BACKENDS{lc $config->{users}{backend}};
+        if (!$spec) {
+            push @errors, "Invalid users.backend: '$config->{users}{backend}'";
+        } else {
+            for my $key (@{ $spec->{required} }) {
+                push @errors, "Missing users.$key required for backend '$config->{users}{backend}'"
+                    unless defined $config->{users}{$key} && length $config->{users}{$key};
+            }
+        }
     }
 
     return {
@@ -496,7 +561,7 @@ Concierge::Desk::Setup - One-time desk creation and configuration for Concierge
 
 =head1 VERSION
 
-v0.10.0
+v0.11.0
 
 =head1 SYNOPSIS
 
@@ -505,7 +570,7 @@ v0.10.0
     # Simple setup -- database backends, all standard user fields
     my $result = Concierge::Desk::Setup::build_quick_desk(
         './desk',
-        ['role', 'theme'],       # application-specific user fields
+        ['position', 'rbi'],     # application-specific user fields
     );
 
     # Advanced setup -- full control over backends and field configuration
@@ -527,7 +592,7 @@ v0.10.0
             backend                 => 'database',  # 'database', 'yaml', or 'file'
             dir                     => 'users',      # optional; default: base_dir
             include_standard_fields => [qw/email phone first_name last_name/],
-            app_fields              => ['membership_tier', 'department'],
+            app_fields              => ['employee_id', 'department'],
             field_overrides         => [{ field_name => 'email', required => 1 }],
         },
     });
@@ -553,7 +618,8 @@ v0.10.0
 
 Concierge::Desk::Setup provides methods for one-time initialization of a
 Concierge desk -- the storage directory containing configuration and data
-files for the identity core components (Auth, Sessions, Users).
+files for the identity core components (Auth, Sessions, Users), and may
+be used by added components as well.
 
 Setup is separate from runtime operations.  Use this module once to
 create a desk, then use L<Concierge/open_desk> at runtime.
@@ -621,11 +687,11 @@ B<Configuration structure:>
             file    => $filename,        # default: 'auth.pwd' (backend-specific)
         },
         sessions => {
-            backend => 'database',       # 'database' or 'file'
+            backend => 'database',       # required, no default -- 'database' or 'file'
             dir     => $path,            # default: base_dir
         },
         users => {
-            backend                 => 'database',  # 'database', 'yaml', or 'file'
+            backend                 => 'database',  # required, no default -- 'database', 'yaml', or 'file'
             dir                     => $path,        # default: base_dir
             include_standard_fields => 'all',        # 'all' or \@field_names
             app_fields              => \@fields,     # custom fields
@@ -633,11 +699,19 @@ B<Configuration structure:>
         },
     }
 
-C<auth.backend> is a friendly name (currently only C<'pwd'> is built
-in) resolved via an internal backend catalog to a fully-qualified
-class -- C<'pwd'> resolves to L<Concierge::Auth::Pwd>. Unlike
-C<sessions.backend>/C<users.backend>, C<auth.backend> has no default;
-it must be specified explicitly.
+C<auth.backend>, C<sessions.backend>, and C<users.backend> are each a
+friendly name resolved via that component's own internal backend
+catalog (C<%AUTH_BACKENDS>, C<%SESSIONS_BACKENDS>, C<%USERS_BACKENDS>)
+to a fully-qualified class -- e.g. C<auth.backend =E<gt> 'pwd'>
+resolves to L<Concierge::Auth::Pwd>, C<sessions.backend =E<gt>
+'database'> resolves to L<Concierge::Sessions::SQLite>, and
+C<users.backend =E<gt> 'yaml'> resolves to L<Concierge::Users::YAML>.
+None of the three has a default; each must be specified explicitly.
+The resolved class is what actually gets passed down, as
+C<backend_class>, to L<Concierge::Sessions/new> and
+L<Concierge::Users/setup> (and, for auth, to L<Concierge::Auth/new>)
+-- none of those modules ever guesses a class from a friendly name
+themselves.
 
 Each component's C<dir> controls I<where> that component's storage
 lives (for C<auth>, e.g. C<'pwd'>'s password file) -- it defaults to
@@ -654,16 +728,20 @@ C<dir>) and backend selection/settings (C<backend>, C<file>, etc.)
 are kept as separate concerns within each component's own block.
 
 Each catalog entry also lists the settings that backend requires;
-C<'pwd'> has none, since its one setting (C<file>) always resolves via
-its computed default. Adding support for another backend (e.g.
-hypothetical C<Concierge::Auth::LDAP>, C<::OAuth>, or C<::SAML>
-entries) is a one-entry addition to this module's internal
-C<%AUTH_BACKENDS> catalog, mapping a new friendly name to its class and
-required settings (e.g. C<host>, C<bind_dn>, C<password>);
-C<build_desk()> and C<validate_setup_config()> then handle it
-automatically. C<class> is not required to live under the
+today's built-in entries (C<'pwd'> for auth; C<'database'>/C<'file'>
+for sessions; C<'database'>/C<'file'>/C<'yaml'> for users) all have
+none, since their settings always resolve via computed defaults.
+Adding support for another backend (e.g. hypothetical
+C<Concierge::Auth::LDAP>, C<Concierge::Sessions::Redis>, or
+C<Concierge::Users::Postgres>) is a one-entry addition to the relevant
+internal catalog (C<%AUTH_BACKENDS>, C<%SESSIONS_BACKENDS>, or
+C<%USERS_BACKENDS>), mapping a new friendly name to its class and
+required settings (e.g. C<host>, C<bind_dn>, C<password> for an LDAP
+auth backend); C<build_desk()> and C<validate_setup_config()> then
+handle it automatically. C<class> is not required to live under the
 C<Concierge::> namespace -- any installed module implementing the
-5-verb contract works (see L<Concierge::Auth>'s POD).
+relevant component's contract works (see L<Concierge::Auth>'s,
+L<Concierge::Sessions>'s, or L<Concierge::Users>'s POD).
 
 The C<users> block is where field configuration happens.  The sections
 below describe the available fields and show how to customize them.
@@ -676,16 +754,16 @@ B<Core fields> (always present):
 
     user_id        system   Primary authentication identifier (max 30)
     moniker        moniker  Display name, nickname, or initials (max 24)
-    user_status    enum     Eligible*, OK, Inactive (max 20)
-    access_level   enum     anon*, visitor, member, staff, admin (max 20)
+    user_status    enum     *Eligible, OK, Inactive (max 20)
+    access_level   enum     *anon, visitor, member, staff, admin (max 20)
 
-B<Standard fields> (selectable at setup):
+B<Standard fields> (selectable and configurable at setup):
 
     first_name     name     max 50
     middle_name    name     max 50
     last_name      name     max 50
-    prefix         enum     (none) Dr Mr Ms Mrs Mx Prof Hon Sir Madam
-    suffix         enum     (none) Jr Sr II III IV V PhD MD DDS Esq
+    prefix         enum     (no default) Dr Mr Ms Mrs Mx Prof Hon Sir Madam
+    suffix         enum     (no default) Jr Sr II III IV V PhD MD DDS Esq
     organization   text     max 100
     title          text     max 100
     email          email    max 255
@@ -698,6 +776,11 @@ B<System fields> (auto-managed, always present):
     last_login_date system   Updated on every successful login
     last_mod_date   system   Updated on every write
     created_date    system   Set once on creation
+
+B<Application fields> (optional, defined by the application):
+
+    Custom fields the application adds via C<app_fields>; see
+    L</Adding Application Fields> below.
 
 Core and system fields cannot be removed.  Standard fields default to
 C<< required => 0 >>.

@@ -1,5 +1,11 @@
 Revision history for Business-NAB
 
+0.08
+        - Bump version having failed to bump version last time
+
+0.07
+        - Protect against more rounding errors.
+
 0.06
         - Protect against possible rounding errors. This includes both
           changes to the way records are serialised and to internal checks

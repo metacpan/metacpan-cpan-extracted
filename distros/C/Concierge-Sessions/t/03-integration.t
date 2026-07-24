@@ -21,7 +21,7 @@ note("Testing end-to-end session workflows");
 
 subtest 'Complete session lifecycle: create, modify, save, retrieve, delete' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -69,7 +69,7 @@ subtest 'Complete session lifecycle: create, modify, save, retrieve, delete' => 
 
 subtest 'New session replaces existing session for same user' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -108,7 +108,7 @@ subtest 'New session replaces existing session for same user' => sub {
 
 subtest 'Each login gets fresh session, previous invalidated' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -141,7 +141,7 @@ subtest 'Each login gets fresh session, previous invalidated' => sub {
 
 subtest 'Data persists across save/retrieve cycle' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -173,7 +173,7 @@ subtest 'Data persists across save/retrieve cycle' => sub {
 
 subtest 'Session survives multiple save cycles' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -198,7 +198,7 @@ subtest 'Session survives multiple save cycles' => sub {
 
 subtest 'Unsaved changes are lost on retrieval' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -225,7 +225,7 @@ subtest 'Complete workflow with File backend' => sub {
     my $file_dir = "$temp_dir/file_backend_test";
 
     my $manager = Concierge::Sessions->new(
-        backend     => 'file',
+        backend_class => 'Concierge::Sessions::File',
         storage_dir => $file_dir,
     );
 
@@ -255,7 +255,7 @@ subtest 'Switching between backends for same user' => sub {
 
     # Create session with SQLite
     my $sqlite_mgr = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $sqlite_dir,
     );
 
@@ -267,7 +267,7 @@ subtest 'Switching between backends for same user' => sub {
 
     # Create different session with File backend
     my $file_mgr = Concierge::Sessions->new(
-        backend     => 'file',
+        backend_class => 'Concierge::Sessions::File',
         storage_dir => $file_dir,
     );
 
@@ -294,7 +294,7 @@ subtest 'Switching between backends for same user' => sub {
 
 subtest 'Session status updates correctly through lifecycle' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -316,7 +316,7 @@ subtest 'Session status updates correctly through lifecycle' => sub {
 
 subtest 'Application-wide session with indefinite timeout' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -367,7 +367,7 @@ subtest 'Application-wide session with indefinite timeout' => sub {
 
 subtest 'Session expiration detection' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -397,7 +397,7 @@ subtest 'Session expiration detection' => sub {
 
 subtest 'Session extends when saved (sliding window)' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -438,7 +438,7 @@ subtest 'Session extends when saved (sliding window)' => sub {
 
 subtest 'Graceful handling of invalid operations' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -462,7 +462,7 @@ subtest 'Graceful handling of invalid operations' => sub {
 
 subtest 'Session handles various data types correctly' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 
@@ -505,7 +505,7 @@ subtest 'Session handles various data types correctly' => sub {
 
 subtest 'Multiple saves of clean session are no-ops' => sub {
     my $manager = Concierge::Sessions->new(
-        backend     => 'database',
+        backend_class => 'Concierge::Sessions::SQLite',
         storage_dir => $temp_dir,
     );
 

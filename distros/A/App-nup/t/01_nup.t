@@ -72,6 +72,18 @@ subtest 'no-filename option' => sub {
 subtest 'parallel option' => sub {
     my $out = nup('-V script/nup');
     like $out, qr/-V/, '-V passed to up.pm';
+    like $out, qr/--no-paginate/, '-V disables page mode';
+};
+
+subtest 'page mode disabled for parallel layout' => sub {
+    my $out = nup('script/nup cpanfile');
+    like $out, qr/--no-paginate/, 'multiple files disable page mode';
+    $out = nup('script/nup');
+    unlike $out, qr/--no-paginate/, 'single file keeps page mode';
+    $out = nup('date');
+    unlike $out, qr/--no-paginate/, 'command mode keeps page mode';
+    $out = nup('-V date');
+    like $out, qr/--no-paginate/, '-V in command mode disables page mode';
 };
 
 subtest 'no-paginate option' => sub {

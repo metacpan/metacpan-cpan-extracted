@@ -1,16 +1,6 @@
 Changes
 CONTRIBUTING.md
-examples/01-basic-authentication.pl
-examples/02-user-management.pl
-examples/03-token-generation.pl
-examples/04-session-management.pl
-examples/05-api-keys.pl
-examples/06-file-management.pl
-examples/07-error-handling.pl
-examples/08-advanced-usage.pl
-examples/09-generators-architecture.pl
-examples/10-architecture-comparison.pl
-examples/11-custom-backend-ldap.pl
+examples/1-custom-backend-ldap.pl
 examples/README.md
 lib/Concierge/Auth.pm
 lib/Concierge/Auth/Base.pm

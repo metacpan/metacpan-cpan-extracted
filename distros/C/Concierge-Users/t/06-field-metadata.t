@@ -206,7 +206,7 @@ subtest 'Field metadata integration with setup' => sub {
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => 'database',
+        backend_class => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ email phone /],
         app_fields => [
             { field_name => 'custom', type => 'text' },
@@ -236,7 +236,7 @@ subtest 'get_field_definition' => sub {
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => 'yaml',
+        backend_class => 'Concierge::Users::YAML',
         include_standard_fields => [qw/ email /],
     };
 
@@ -280,7 +280,7 @@ subtest 'get_field_hints' => sub {
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => 'database',
+        backend_class => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ email phone /],
     };
 
@@ -404,7 +404,7 @@ subtest 'Backend config() methods' => sub {
     # Test database backend config()
     my $db_dir = tempdir(CLEANUP => 1);
     my $db_result = Concierge::Users->setup({
-        storage_dir => $db_dir, backend => 'database',
+        storage_dir => $db_dir, backend_class => 'Concierge::Users::SQLite',
         include_standard_fields => [],
     });
     my $db_users = Concierge::Users->new($db_result->{config_file});
@@ -415,7 +415,7 @@ subtest 'Backend config() methods' => sub {
     # Test file backend config()
     my $file_dir = tempdir(CLEANUP => 1);
     my $file_result = Concierge::Users->setup({
-        storage_dir => $file_dir, backend => 'file',
+        storage_dir => $file_dir, backend_class => 'Concierge::Users::File',
         include_standard_fields => [],
     });
     my $file_users = Concierge::Users->new($file_result->{config_file});
@@ -426,7 +426,7 @@ subtest 'Backend config() methods' => sub {
     # Test YAML backend config()
     my $yaml_dir = tempdir(CLEANUP => 1);
     my $yaml_result = Concierge::Users->setup({
-        storage_dir => $yaml_dir, backend => 'yaml',
+        storage_dir => $yaml_dir, backend_class => 'Concierge::Users::YAML',
         include_standard_fields => [],
     });
     my $yaml_users = Concierge::Users->new($yaml_result->{config_file});
@@ -465,7 +465,7 @@ subtest 'get_user_fields' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
         storage_dir             => $storage_dir,
-        backend                 => 'database',
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ email phone /],
     };
     my $result = Concierge::Users->setup($config);
@@ -487,7 +487,7 @@ subtest 'show_config' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
         storage_dir             => $storage_dir,
-        backend                 => 'database',
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ email /],
     };
     my $setup_result = Concierge::Users->setup($config);
@@ -630,7 +630,7 @@ subtest 'format_as in field definitions and get_field_hints' => sub {
 
     my $config = {
         storage_dir             => $storage_dir,
-        backend                 => 'database',
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ email phone text_ok term_ends prefix suffix /],
         app_fields => [
             {

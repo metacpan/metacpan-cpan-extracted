@@ -1,0 +1,301 @@
+#! /usr/bin/env perl
+#
+# file_unpack2 -- Command line front-end for File::Unpack2.
+#
+# (C) 2010-2014, jnw@cpan.org, all rights reserved.
+# Distribute under the same license as Perl itself.
+#
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Indent = 1;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use File::Unpack2;
+
+my $version = $File::Unpack2::VERSION;
+my @exclude;
+my $exclude_vcs = 1;
+my $help;
+my $mime_only;
+my $list_only;
+my $list_perlish;
+my @mime_helper_dirs;
+
+my %opt = ( verbose => 1, maxfilesize => '2.6G', one_shot => 1, no_op => 0, world_readable => 0, log_fullpath => 0, archive_name_as_dir => 0, follow_file_symlinks => 0, log_type => 'PLAIN');
+
+$opt{one_shot} = 0 if $0 =~ m{deep[^/]*$};
+
+GetOptions(
+	"verbose|v+"   	=> \$opt{verbose},
+	"version|V"    	=> sub { print "$version\n"; exit },
+	"quiet"        	=> sub { $opt{verbose} = 0; },
+	"destdir|D|C=s" => \$opt{destdir},
+	"exclude|E=s"  	=> \@exclude,
+	"exclude-vcs!" 	=> \$exclude_vcs,
+	"vcs|include-vcs!" 	=> sub { $exclude_vcs = !$_[1]; },
+	"help|?"       		=> \$help,
+	"logfile|L=s"  		=> \$opt{logfile},
+	"fullpath-log|F" 	=> \$opt{log_fullpath},
+	"one-shot|one_shot|1"   => \$opt{one_shot},
+	"deep|recursive"        => sub { $opt{one_shot} = 0; },
+	"mimetype|m+"  		=> \$mime_only,
+	"no_op|no-op|noop|n+" 	=> \$opt{no_op},
+	"list-helpers|l+" 	=> \$list_only,
+	"print-helpers|p+" 	=> \$list_perlish,
+	"params|P=s"		=> \%{$opt{log_params}},
+	"maxfilesize=s"		=> \$opt{maxfilesize},
+	"use-mime-helper-dir|I|u=s" 		=> \@mime_helper_dirs,
+	"world-readable|world_readable|R+" 	=> \$opt{world_readable},
+	"archive-dirs|archive_dirs|A"		=> \$opt{archive_name_as_dir},
+	"follow-file-symlinks|f+" 		=> \$opt{follow_file_symlinks},
+) or $help++;
+
+@mime_helper_dirs = split(/,/,join(',',@mime_helper_dirs));
+my $archive = shift or $list_perlish or $list_only or $help++;
+
+pod2usage(-verbose => 1, -msg => "file_unpack2 V$version\n") if $help;
+
+if (defined $opt{logfile})
+  {
+    $opt{log_type} = 'JSON';
+    $opt{logfile} = \*STDOUT if $opt{logfile} eq '-';
+  }
+
+$opt{logfile} ||= '/dev/null' if $list_only or $list_perlish or $mime_only or $opt{no_op};
+my $u = File::Unpack2->new(%opt);
+my $list = $u->mime_helper_dir(@mime_helper_dirs);
+
+if ($list_perlish)
+  {
+    print Dumper $list;
+    exit 0;
+  }
+
+if ($list_only)
+  {
+    printf @$_ for $u->list();
+    exit 0;
+  }
+
+if ($mime_only)
+  {
+    $u->{verbose}-- if $u->{verbose};
+    if ($u->{verbose} > 1)
+      {
+        print "using File::LibMagic $File::LibMagic::VERSION\n" if defined $File::LibMagic::VERSION;
+        print "using File::MimeInfo::Magic $File::MimeInfo::Magic::VERSION\n" if defined $File::MimeInfo::Magic::VERSION;
+        print "using File::Unpack2 $File::Unpack2::VERSION\n" if defined $File::Unpack2::VERSION;
+      }
+
+    while (defined $archive)
+      {
+	my $m = $u->mime($archive);
+	my ($h,$r) = $u->find_mime_helper($m);
+	if ($opt{verbose} > 1)
+	  {
+	    print "$archive: ", Dumper $m;
+	    print File::Unpack2::fmt_run_shellcmd($h) . "\n";
+	  }
+	elsif ($opt{verbose} == 1)
+	  {
+	    print "$archive: $m->[0]; charset=$m->[1]\n";
+	  }
+	else
+	  {
+	    print "$m->[0]\n";
+	  }
+        $archive = shift;
+      }
+    exit 0;
+  }
+
+while (defined $archive and !$u->{error})
+  {
+    $u->exclude(vcs => $exclude_vcs);
+    $u->exclude(add => \@exclude) if @exclude;
+
+    $u->unpack($archive);
+    map { print STDERR "ERROR: $_\n" } @{$u->{error}} if $u->{error};
+    $archive = shift;
+    if (defined($archive))
+      {
+        if (defined $opt{logfile} and -f $opt{logfile})
+	  {
+            warn "File::Unpack2($archive): overwriting previous logfile $opt{logfile} in 3 seconds. Press CTRL-C to abort.\n" if defined $archive;
+	    sleep(3);
+	  }
+        # reload, for the next round. (new() opens the logfile, unpack() closese it.)
+        $u = File::Unpack2->new(%opt);
+        $u->mime_helper_dir(@mime_helper_dirs);
+      }
+  }
+
+__END__
+
+=head1 NAME
+
+file_unpack2 - aggressively unpack archives, based on mime-types
+
+=head1 SYNOPSIS
+
+  file_unpack2 [options] input.tar.gz ...
+  file_unpack2 [options] input/ ...
+  file_unpack2 -l
+  file_unpack2 -p
+
+  # unpack one archive, one level deep, into the current directory
+  file_unpack2 example.tar.gz
+
+  # recursively unpack everything under src/ into /tmp/out
+  file_unpack2 --deep -D /tmp/out src/
+
+  # just report the mime-type, like 'file -i'
+  file_unpack2 -m mystery.bin
+
+=head1 DESCRIPTION
+
+C<file_unpack2> is the command line front-end for L<File::Unpack2>. It unpacks
+archive files by dispatching to mime-type specific helpers, and (with C<--deep>)
+recursively descends into anything it unpacks that looks like an archive itself.
+Its goal is to extract as much readable text as possible from an arbitrary input.
+
+Unpacking is non-recursive (one level) by default, unless the program name
+contains the substring C<deep>. See L</OPTIONS>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-v> B<--verbose>
+
+Be more verbose. Repeatable. Default: 1.
+
+=item B<-q> B<--quiet>
+
+Be quiet, not verbose.
+
+=item B<-A> B<--archive_dirs>
+
+Use exact archive names as subdirectories, modified by appending C<._*> to avoid
+collisions. Default: use truncated and/or modified archive names. E.g.
+F<example.zip> is per default unpacked into F<example/>. With C<-A>, it is
+unpacked into F<example.zip._/>. This does not apply for single file archives;
+they are always unpacked without a directory.
+
+=item B<-C> I<dir>
+
+=item B<-D> B<--destdir> I<dir>
+
+Directory where to place the output file or directory. A subdirectory is created
+if there is more than one file to unpack. Default: current dir.
+
+=item B<-E> B<--exclude> I<glob.pat>
+
+Specify files and directories that are not unpacked. Can be given multiple times.
+
+=item B<-F> B<--fullpath-log>
+
+Always use full path names in the logfile. Default: unpacked path names are
+written relative to destdir.
+
+=item B<--exclude-vcs> B<--no-exclude-vcs> B<--vcs> B<--no-vcs>
+
+Group switch for directory glob patterns of most version control systems. This
+affects at least SCCS, RCS, CVS, .svn, .git, .hg and .osc. The logfile has a
+C<{skipped}{exclude}> counter. Default: exclude-vcs on.
+
+=item B<-1> B<--one-shot>
+
+Make the unpacker non-recursive: perform one level of unpacking only. This is the
+default unless the name of the program contains the substring C<deep>.
+
+=item B<--deep> B<--recursive>
+
+Make the unpacker recursive: perform all possible levels of unpacking. This is the
+default if the name of the program contains the substring C<deep>.
+
+=item B<-h> B<--help> B<-?>
+
+Print this online help.
+
+=item B<-L> B<--logfile> I<file.log>
+
+Specify a logfile where freshly unpacked files are reported. When a logfile is
+specified, its format is JSON; the default is STDOUT with format PLAIN.
+
+=item B<-l> B<--list-helpers>
+
+Overview of mime-type patterns and their helper commands.
+
+=item B<-p> B<--print-helpers>
+
+List all builtin mime-helpers and all external mime-helpers as a nested Perl
+data structure.
+
+=item B<-P> B<--params> I<KEY=VALUE>
+
+Place additional params into the logfile.
+
+=item B<--maxfilesize> I<size>
+
+Truncate an unpacked file if it gets larger than the specified size. Size can be
+given as bytes (plain integer), or with a K, M, G or T suffix for kilo-, mega-,
+giga- or tera-bytes. Default: 2.6G.
+
+=item B<-m> B<--mimetype>
+
+Do not unpack, just report the mime-type of the archive. Output format is similar
+to C<file -i>, unless C<-q> or C<-v> are given. With C<-v>, the unpacker command
+is also printed.
+
+=item B<-R> B<--world-readable>
+
+Make the unpacked tree world readable. Default: user readable.
+
+=item B<-n> B<--no-op>
+
+Do not unpack. Print the first unpack command only.
+
+=item B<-u> B<--use-mime-helper-dir> I<dir>
+
+Include a directory of external mime helper scripts (named after the mime types
+they handle). Usable multiple times; later additions take precedence. File::Unpack2
+ships no helpers of its own, so this option, or the C<FILE_UNPACK2_HELPER_DIR>
+environment variable, is how you add a directory of them.
+
+=item B<-f> B<--follow-file-symlinks>
+
+Follow (and unpack) symlinks that point to files (or archives). Used once, we
+follow only symlinks that are present before unpacking starts. Used twice, we also
+follow symlinks that were unpacked from an archive. Symlinks to directories or
+other (dangling) symlinks are always ignored. The logfile has a
+C<{skipped}{symlink}> counter. Default: skip all symlinks.
+
+=item B<-V> B<--version>
+
+Print the File::Unpack2 version and exit.
+
+=back
+
+=head1 SEE ALSO
+
+L<File::Unpack2>
+
+=head1 AUTHOR
+
+Juergen Weigert E<lt>jnw@cpan.orgE<gt>, maintained by Sebastian Riedel
+E<lt>sriedel@suse.comE<gt> for use with L<Cavil|https://github.com/openSUSE/cavil>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2014 Juergen Weigert, (C) 2023-2026 Sebastian Riedel.
+
+This program is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself, either the GNU General Public License or the Artistic
+License.
+
+=cut

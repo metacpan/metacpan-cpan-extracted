@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 sub tree {
     return [ {
@@ -262,12 +262,13 @@ sub tree {
                                     help  => 'authldap.html#connection',
                                     form  => 'simpleInputContainer',
                                     nodes => [
-                                        'ldapServer',  'ldapPort',
-                                        'ldapVerify',  'ldapBase',
-                                        'managerDn',   'managerPassword',
-                                        'ldapTimeout', 'ldapIOTimeout',
-                                        'ldapVersion', 'ldapRaw',
-                                        'ldapCAFile',  'ldapCAPath',
+                                        'ldapServer',     'ldapPort',
+                                        'ldapVerify',     'ldapBase',
+                                        'managerDn',      'managerPassword',
+                                        'ldapClientCert', 'ldapClientKey',
+                                        'ldapTimeout',    'ldapIOTimeout',
+                                        'ldapVersion',    'ldapRaw',
+                                        'ldapCAFile',     'ldapCAPath',
                                     ]
                                 },
                                 {

@@ -1,21 +1,21 @@
 /*
- * shm_generic.h — Macro-template for shared-memory hash maps.
+ * shm_generic.h -- Macro-template for shared-memory hash maps.
  *
  * Before including, define:
- *   SHM_PREFIX         — function prefix (e.g., shm_ii)
- *   SHM_NODE_TYPE      — node struct name
- *   SHM_VARIANT_ID     — unique integer for header validation
+ *   SHM_PREFIX         -- function prefix (e.g., shm_ii)
+ *   SHM_NODE_TYPE      -- node struct name
+ *   SHM_VARIANT_ID     -- unique integer for header validation
  *
  * Key type (choose one):
- *   SHM_KEY_IS_INT + SHM_KEY_INT_TYPE  — integer key
+ *   SHM_KEY_IS_INT + SHM_KEY_INT_TYPE  -- integer key
  *   (leave undefined for string keys via arena)
  *
  * Value type (choose one):
- *   SHM_VAL_IS_STR                      — string value via arena
- *   SHM_VAL_INT_TYPE                    — integer value
+ *   SHM_VAL_IS_STR                      -- string value via arena
+ *   SHM_VAL_INT_TYPE                    -- integer value
  *
  * Optional:
- *   SHM_HAS_COUNTERS  — generate incr/decr/incr_by, max/min, and integer cas (integer values only)
+ *   SHM_HAS_COUNTERS  -- generate incr/decr/incr_by, max/min, and integer cas (integer values only)
  */
 
 /* ================================================================
@@ -39,7 +39,7 @@
 #error "shm_generic.h: inline string packing requires little-endian architecture"
 #endif
 #include <sys/file.h>
-#include <pthread.h>  /* pthread_atfork — available in libc on modern glibc; no -lpthread needed */
+#include <pthread.h>  /* pthread_atfork -- available in libc on modern glibc; no -lpthread needed */
 #include <sys/syscall.h>
 #include <limits.h>
 #include <signal.h>
@@ -56,10 +56,15 @@
 /* ---- Constants ---- */
 
 #define SHM_MAGIC       0x53484D31U  /* "SHM1" */
-#define SHM_VERSION     9U
+#define SHM_VERSION     10U  /* 10: added the occupancy bitmap region (layout change) */
 #ifndef SHM_READER_SLOTS
 #define SHM_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
 #endif
+/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
+ * cleared on clean release.  A writer scans these SHM_OCC_WORDS words to visit
+ * only OCCUPIED slots (O(words + live readers)) instead of all SHM_READER_SLOTS. */
+#define SHM_OCC_WORDS   (((SHM_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
+#define SHM_OCC_BYTES   ((uint64_t)SHM_OCC_WORDS * 8)      /* 128 bytes */
 #define SHM_INITIAL_CAP 16
 #define SHM_MAX_STR_LEN 0x3FFFFFFFU  /* ~1GB, bit 30 reserved for inline flag */
 #define SHM_LRU_NONE    UINT32_MAX
@@ -71,7 +76,7 @@
     ((h)->expires_at && (h)->expires_at[(i)] && \
      (now) >= (h)->expires_at[(i)])
 
-/* Fast monotonic seconds — avoids time() syscall overhead.
+/* Fast monotonic seconds -- avoids time() syscall overhead.
  * CLOCK_MONOTONIC_COARSE is always vDSO on Linux (~2ns). */
 static inline uint32_t shm_now(void) {
     struct timespec ts;
@@ -128,7 +133,7 @@ static inline int shm_find_next_live(const uint8_t *states, uint32_t cap, uint32
 /* SIMD probe helper: scan up to 16 state bytes from a given position
  * for tag matches or EMPTY slots. Returns via *match_mask (tag hits)
  * and *empty_mask (empty slots). Caller uses bitmasks to iterate.
- * Works on contiguous memory — caller must handle table wrap. */
+ * Works on contiguous memory -- caller must handle table wrap. */
 #ifdef __SSE2__
 static inline void shm_probe_group(const uint8_t *states, uint32_t pos,
                                     uint8_t tag, uint16_t *match_mask,
@@ -148,7 +153,7 @@ static inline void shm_probe_group(const uint8_t *states, uint32_t pos,
 /*
  * key_len / val_len layout (uint32_t):
  *   bit 31       = UTF-8 flag
- *   bit 30       = INLINE flag (string ≤ 7 bytes stored in off+len fields)
+ *   bit 30       = INLINE flag (string <= 7 bytes stored in off+len fields)
  *   bits 0-29    = length (max ~1GB)
  *
  * When INLINE is set:
@@ -165,7 +170,7 @@ static inline void shm_probe_group(const uint8_t *states, uint32_t pos,
 #define SHM_LEN_MASK     ((uint32_t)0x3FFFFFFFU)
 #define SHM_INLINE_MAX   7  /* max bytes that fit inline */
 
-/* Arena-mode packing (unchanged for ≤1GB strings) */
+/* Arena-mode packing (unchanged for <=1GB strings) */
 #define SHM_PACK_LEN(len, utf8)   ((uint32_t)(len) | ((utf8) ? SHM_UTF8_FLAG : 0))
 #define SHM_UNPACK_LEN(packed)    ((uint32_t)((packed) & SHM_LEN_MASK))
 #define SHM_UNPACK_UTF8(packed)   (((packed) & SHM_UTF8_FLAG) != 0)
@@ -246,17 +251,18 @@ typedef struct {
 
     /* ---- Cache line 1 (64-127): seqlock + read-path data ---- */
     uint32_t seq;             /* 64: seqlock counter, odd = writer active */
-    uint32_t rwlock_writers_waiting; /* 68: count of writers in FUTEX_WAIT
-                                        (reader write-preferring yield signal) */
+    uint32_t drain_seq;       /* 68: futex bumped by a reader releasing under a draining writer
+                                 (wakes it). Was rwlock_writers_waiting; same offset/size. */
     uint64_t arena_cap;       /* 72: immutable, read by seqlock string path */
     uint64_t reader_slots_off;/* 80: offset of reader-PID slot table for dead-reader recovery */
-    uint32_t slotless_readers;/* 88: live readers holding the lock with no reader-slot (was reserved) */
+    uint32_t slotless_rdepth; /* 88: read-locks held by readers with no reader-slot (documented
+                                 residual). Was slotless_readers; same offset/size. */
     uint32_t arena_large_free;/* 92: head of the >2^19 large-block free list (was reserved; 0=empty) */
     uint8_t  _reserved1[32];  /* 96-127 */
 
     /* ---- Cache line 2 (128-191): rwlock + write-hot fields ---- */
-    uint32_t rwlock;          /* 128: 0=unlocked, 1..0x7FFFFFFF=readers, 0x80000000|pid=writer */
-    uint32_t rwlock_waiters;  /* 132 */
+    uint32_t wlock;           /* 128: WRITER word ONLY: 0 (free) or 0x80000000|pid.  NOT a reader count. */
+    uint32_t rwait;           /* 132: parked-waiter hint (readers+writers blocked on wlock); over-count-safe */
     uint32_t size;            /* 136 */
     uint32_t tombstones;      /* 140 */
     uint32_t lru_head;        /* 144: MRU slot index */
@@ -275,16 +281,19 @@ typedef struct {
 
 SHM_STATIC_ASSERT(sizeof(ShmHeader) == 256, "ShmHeader must be exactly 256 bytes (4 cache lines)");
 
-/* Per-process slot for dead-process recovery.  Each shared rwlock counter
- * (the main rwlock-reader count, rwlock_waiters, rwlock_writers_waiting)
- * is mirrored here so a wrlock timeout can attribute and reverse a dead
- * process's contribution instead of waiting for the slow per-op timeout
- * drain. */
+/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
+ * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
+ * there is no separate shared reader counter to fall out of sync with it -- so a
+ * dead reader's contribution is exactly this one word, which a draining writer
+ * neutralises by clearing the slot's pid (the scan then ignores the slot).  No
+ * orphaned counter can exist, so there is no quiescent force-reset and sustained
+ * readers cannot starve a writer.  _rsv1/_rsv2 are kept only to preserve the
+ * 16-byte slot size across the already-released builds. */
 typedef struct {
-    uint32_t pid;            /* 0 = unclaimed */
-    uint32_t subcount;       /* in-flight rdlock acquisitions for this process */
-    uint32_t waiters_parked; /* contribution to hdr->rwlock_waiters         */
-    uint32_t writers_parked; /* contribution to hdr->rwlock_writers_waiting */
+    uint32_t pid;      /* 0 = unclaimed */
+    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
+    uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } ShmReaderSlot;
 
 /* ---- Process-local handle ---- */
@@ -296,13 +305,16 @@ typedef struct ShmHandle_s {
     char      *arena;
     uint32_t  *lru_prev;    /* NULL if LRU disabled */
     uint32_t  *lru_next;    /* NULL if LRU disabled */
-    uint8_t   *lru_accessed; /* NULL if LRU disabled — clock second-chance bit */
+    uint8_t   *lru_accessed; /* NULL if LRU disabled -- clock second-chance bit */
     uint32_t  *expires_at;  /* NULL if TTL disabled */
     ShmReaderSlot *reader_slots; /* SHM_READER_SLOTS entries */
+    uint64_t  *occ;          /* SHM_OCC_WORDS-word slot-occupancy bitmap (trusted layout offset) */
     uint32_t   my_slot_idx;  /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t   cached_pid;   /* getpid() cached at last slot claim */
-    uint32_t   cached_fork_gen; /* shm_fork_gen value at last slot claim — mismatch triggers reclaim */
+    uint32_t   cached_fork_gen; /* shm_fork_gen value at last slot claim -- mismatch triggers reclaim */
     uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
+    uint32_t lock_depth;    /* locks this process holds via RDLOCK_GUARD/WRSEQ_GUARD */
+    uint8_t  pending_close; /* DESTROY arrived while lock_depth > 0; free at depth 0 */
     size_t     mmap_size;
     uint32_t   max_mask;    /* max_table_cap - 1, for seqlock bounds clamping */
     uint32_t   iter_pos;
@@ -328,7 +340,7 @@ typedef struct {
     ShmHandle *current;      /* current shard handle (== handle for single maps) */
     SV        *owner;        /* ref to the map's referent SV; keeps the mmap/handle alive while the cursor lives */
     uint32_t   iter_pos;
-    uint32_t   gen;          /* table_gen snapshot — reset on mismatch */
+    uint32_t   gen;          /* table_gen snapshot -- reset on mismatch */
     uint32_t   shard_idx;    /* current shard index (0 for single maps) */
     uint32_t   shard_count;  /* total shards (1 for single maps) */
     char      *copy_buf;
@@ -385,39 +397,59 @@ static inline void shm_rwlock_spin_pause(void) {
 #endif
 }
 
-/* Extract writer PID from rwlock value (lower 31 bits when write-locked). */
+/* Writer word encoding: WRITER_BIT|pid when write-locked, 0 when free. */
 #define SHM_RWLOCK_WRITER_BIT 0x80000000U
 #define SHM_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define SHM_RWLOCK_WR(pid)    (SHM_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & SHM_RWLOCK_PID_MASK))
 
 /* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
-/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse — if a dead
+/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
  * lock-holder's PID is recycled to an unrelated live process before recovery
  * runs, this reports "alive" and that slot's orphaned contribution is not
  * reclaimed until the recycled process exits. Robust detection would require
  * a per-slot process-start-time epoch (a header-layout/SHM_VERSION change).
  * Documented under "Crash Safety" in the POD. */
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int shm_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int shm_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !shm_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Forward declaration — defined later in the LRU helpers section. */
+/* Forward declaration -- defined later in the LRU helpers section. */
 static void shm_lru_rebuild_if_corrupt(ShmHandle *h);
 
 /* Force-recover a stale write lock left by a dead process.
  * CAS to OUR pid to hold the lock while fixing seqlock, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent
  * recovering process can detect and re-recover if we crash mid-recovery. */
-static inline void shm_recover_stale_lock(ShmHandle *h, uint32_t observed_rwlock) {
+static inline void shm_recover_stale_lock(ShmHandle *h, uint32_t observed_wlock) {
     ShmHeader *hdr = h->hdr;
     uint32_t mypid = SHM_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->rwlock, &observed_rwlock,
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  Repair shared state — the
+    /* We now hold the write lock as mypid.  Repair shared state -- the
      * seqlock counter (if dead writer left it odd) and the LRU doubly-
-     * linked list (if dead writer left it one-way-broken) — while no
+     * linked list (if dead writer left it one-way-broken) -- while no
      * other process can mutate them. */
     uint32_t seq = __atomic_load_n(&hdr->seq, __ATOMIC_RELAXED);
     if (seq & 1)
@@ -425,9 +457,9 @@ static inline void shm_recover_stale_lock(ShmHandle *h, uint32_t observed_rwlock
     shm_lru_rebuild_if_corrupt(h);
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
     /* Release the lock */
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 static const struct timespec shm_lock_timeout = { SHM_LOCK_TIMEOUT_SEC, 0 };
@@ -448,11 +480,22 @@ static void shm_atfork_init(void) {
  * that fork()'d children pick up their own slot lazily instead of sharing
  * the parent's.  Hot-path is a single relaxed load + compare; only on a
  * fork-generation mismatch do we touch getpid() and scan slots. */
+/* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
+ * release.  SEQ_CST so a set bit is ordered before the slot's rdepth can go
+ * non-zero (bit set in claim, which precedes any rdlock), letting a writer's
+ * SEQ_CST bitmap scan never miss a slot a committed reader holds. */
+static inline void shm_occ_set(ShmHandle *h, uint32_t s) {
+    __atomic_fetch_or(&h->occ[s >> 6], (uint64_t)1 << (s & 63), __ATOMIC_SEQ_CST);
+}
+static inline void shm_occ_clear(ShmHandle *h, uint32_t s) {
+    __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
+}
+
 static inline void shm_claim_reader_slot(ShmHandle *h) {
     uint32_t cur_gen = __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED);
     if (__builtin_expect(cur_gen == h->cached_fork_gen && h->my_slot_idx != UINT32_MAX, 1))
         return;
-    /* Cold path — register the atfork hook once per process, then claim. */
+    /* Cold path -- register the atfork hook once per process, then claim. */
     pthread_once(&shm_atfork_once, shm_atfork_init);
     /* Re-read after pthread_once: shm_on_fork_child may have bumped it. */
     cur_gen = __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED);
@@ -462,329 +505,243 @@ static inline void shm_claim_reader_slot(ShmHandle *h) {
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % SHM_READER_SLOTS;
+    /* Pass 1: take a free slot. */
     for (uint32_t i = 0; i < SHM_READER_SLOTS; i++) {
         uint32_t s = (start + i) % SHM_READER_SLOTS;
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&h->reader_slots[s].pid,
                 &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            /* Zero all mirror fields, not just subcount: a SIGKILL'd
-             * predecessor may have left waiters_parked/writers_parked
-             * non-zero, and shm_recover_dead_readers won't drain them
-             * once we own the slot (the CAS expects the dead PID). */
-            __atomic_store_n(&h->reader_slots[s].subcount, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].waiters_parked, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].writers_parked, 0, __ATOMIC_RELAXED);
+            /* Fresh owner holds no read locks yet; clear any stale rdepth left by
+             * a dead predecessor (its contribution is dropped as we take over). */
+            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
+            shm_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
             h->my_slot_idx = s;
             return;
         }
     }
-    /* Table full — leave my_slot_idx = UINT32_MAX so we silently skip
-     * tracking for this handle (lock still works; just no recovery). */
-}
-
-/* Atomically subtract `sub` from a counter, capped at 0 (never underflows). */
-static inline void shm_atomic_sub_cap(uint32_t *p, uint32_t sub) {
-    if (!sub) return;
-    uint32_t cur = __atomic_load_n(p, __ATOMIC_RELAXED);
-    for (;;) {
-        uint32_t want = (cur > sub) ? cur - sub : 0;
-        if (__atomic_compare_exchange_n(p, &cur, want,
-                1, __ATOMIC_RELAXED, __ATOMIC_RELAXED))
-            return;
-    }
-}
-
-/* Try to claim a dead slot (CAS pid → 0) and drain its parked-waiter
- * contributions back to the global counters.  Returns 1 if the slot was
- * claimed and any drain happened, 0 otherwise (slot was stolen by another
- * recoverer, or had no waiter contribution to drain).
- *
- * Note: subcount/waiters_parked/writers_parked are NOT zeroed here.
- * Between our CAS and a follow-up store, a new process could claim the
- * slot and start populating these fields — our stores would clobber its
- * state.  shm_claim_reader_slot zeros all three on every claim, so
- * leaving stale values is harmless. */
-static inline int shm_drain_dead_slot(ShmHandle *h, uint32_t i, uint32_t pid) {
-    ShmHeader *hdr = h->hdr;
-    uint32_t expected = pid;
-    /* ACQ_REL on success: RELEASE publishes pid=0 to other observers;
-     * ACQUIRE syncs us with prior writes from the dead process to
-     * waiters_parked/writers_parked.  On weakly-ordered archs (aarch64)
-     * a plain RELAXED load before the CAS could miss those writes;
-     * loading them after the CAS keeps them inside the acquire window. */
-    if (!__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, 0,
-            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-        return 0;
-    uint32_t wp    = __atomic_load_n(&h->reader_slots[i].waiters_parked, __ATOMIC_RELAXED);
-    uint32_t writp = __atomic_load_n(&h->reader_slots[i].writers_parked, __ATOMIC_RELAXED);
-    int drained = 0;
-    if (wp)    { shm_atomic_sub_cap(&hdr->rwlock_waiters, wp); drained = 1; }
-    if (writp) { shm_atomic_sub_cap(&hdr->rwlock_writers_waiting, writp); drained = 1; }
-    return drained;
-}
-
-/* Scan reader slots for dead-process recovery.
- *
- * For each dead PID with non-zero contributions to the shared rwlock,
- * rwlock_waiters, or rwlock_writers_waiting counters, drain its share back
- * out so live processes don't have to wait for the slow per-op timeout
- * decrement to drain it for them.
- *
- * For the main rwlock counter we use the "no live reader holds → force-
- * reset to 0" trick (precise) because per-process attribution of the
- * subcount is racy across the inc-counter-then-inc-subcount window. */
-static inline void shm_recover_dead_readers(ShmHandle *h) {
-    if (!h->reader_slots) return;
-    ShmHeader *hdr = h->hdr;
-    int any_live_reader = 0;
-    int found_dead_reader = 0;
-    int any_recovery = 0;
-
-    /* Pass 1: classify slots.  Slots with dead pid and sc == 0 (no rwlock
-     * contribution to lose) are wiped immediately to free the slot for
-     * future claimants and drain any orphan parked-waiter counters.  Slots
-     * with dead pid and sc > 0 are left intact in this pass: if force-
-     * reset cannot fire (because a live reader is concurrently present),
-     * wiping the dead slot would lose the only record of its orphan
-     * rwlock contribution and strand writers permanently once the live
-     * reader releases. */
+    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
+     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
+     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
+     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
+     * old design) we need not skip dead slots that still show a read count. */
     for (uint32_t i = 0; i < SHM_READER_SLOTS; i++) {
-        uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-        if (pid == 0) continue;
-        uint32_t sc = __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED);
-        if (shm_pid_alive(pid)) {
-            if (sc > 0) any_live_reader = 1;
-            continue;
-        }
-        if (sc > 0) { found_dead_reader = 1; continue; }
-        if (shm_drain_dead_slot(h, i, pid)) any_recovery = 1;
-    }
-
-    /* Pass 2: only if force-reset will fire.  Issue the rwlock force-
-     * reset CAS FIRST, while the window since pass 1's last scan is
-     * still narrow (a handful of instructions, as in the original
-     * single-pass code).  A new reader that started rdlock between
-     * pass 1's scan and the CAS will either:
-     *   (a) have already CAS'd rwlock from cur to cur+1 — our CAS then
-     *       fails (cur mismatched), recovery yields and a future
-     *       cycle retries; or
-     *   (b) be still in the subcount-bump phase — our CAS sees the
-     *       stale cur and resets to 0; the new reader's subsequent CAS
-     *       rwlock(0 → 1) succeeds cleanly.
-     * Only after the CAS resolves do we wipe the deferred dead slots,
-     * keeping that work outside the race-sensitive window. */
-    /* A live reader with no slot (table was full) is invisible to the scan
-     * above but still holds a +1 in the lock word; never force-reset under it. */
-    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
-        any_live_reader = 1;
-    if (found_dead_reader && !any_live_reader) {
-        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
-        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
-        if (cur > 0 && cur < SHM_RWLOCK_WRITER_BIT) {
-            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
-            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
-            for (uint32_t i = 0; !live_now && i < SHM_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p && shm_pid_alive(p) &&
-                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
-                    live_now = 1;
-            }
-            if (live_now) {
-                drain_ok = 0;
-            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
-                    0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                any_recovery = 1;
-                if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-                    syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-            } else {
-                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
-            }
-        }
-        if (drain_ok) {
-            for (uint32_t i = 0; i < SHM_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p == 0 || shm_pid_alive(p)) continue;
-                if (shm_drain_dead_slot(h, i, p)) any_recovery = 1;
-            }
+        uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+        if (dpid == 0 || dpid == now_pid || shm_pid_alive(dpid)) continue;
+        uint32_t expected = dpid;
+        if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
+                __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
+            shm_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            h->my_slot_idx = i;
+            return;
         }
     }
-    if (any_recovery)
-        __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+    /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
+     * slotless path (lock still works; recovery of THIS reader's death is the
+     * documented slotless limitation). */
 }
 
-/* Inspect the lock word after a futex-wait timeout.  If a dead writer
- * holds it, force-recover the lock (which also rebuilds the LRU list
- * if it was left half-linked, all under the recovered write lock).
- * Otherwise drain dead readers' shares of the rwlock/waiter counters.
- * Called from rdlock and wrlock ETIMEDOUT branches — identical recovery
- * logic in both. */
+/* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
+ * it, force-recover the lock (which also rebuilds the LRU list if it was left
+ * half-linked, all under the recovered write lock).  Dead READERS need no action
+ * here: only a writer that owns wlock drains readers, and it clears dead readers
+ * inline in its own scan. */
 static inline void shm_recover_after_timeout(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
-    uint32_t val = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+    uint32_t val = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
     if (val >= SHM_RWLOCK_WRITER_BIT) {
         uint32_t pid = val & SHM_RWLOCK_PID_MASK;
         if (!shm_pid_alive(pid))
             shm_recover_stale_lock(h, val);
-    } else {
-        shm_recover_dead_readers(h);
     }
 }
 
-/* Park/unpark helpers: bump the global waiter counters together with this
- * process's mirrored slot counters so a wrlock-timeout recovery scan can
- * attribute and reverse a dead PID's contribution.  Kept paired to make
- * accidental drift between global and per-slot counts impossible. */
-static inline void shm_park_reader(ShmHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
+/* Bump/drop the parked-waiter hint.  Both readers (blocked at the gate) and
+ * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
+ * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
+ * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
+ * (harmless); it can never under-count, so no wakeup is lost. */
+static inline void shm_park(ShmHandle *h) {
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
-static inline void shm_unpark_reader(ShmHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-}
-static inline void shm_park_writer(ShmHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
-    }
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-}
-static inline void shm_unpark_writer(ShmHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_sub_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
-    }
+static inline void shm_unpark(ShmHandle *h) {
+    __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
 
-/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
- * recovery can see it. A slotted reader uses its slot subcount; a reader that
- * could not claim a slot (table full) uses the global hdr->slotless_readers,
- * so recovery's force-reset never fires out from under it. leave() peels
- * slotless first so a later slot claim cannot misattribute the decrement. */
-static inline void shm_reader_enter(ShmHandle *h) {
+/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
+ * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
+ * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
+ * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
+ * the writer's SEQ_CST wlock-store + rdepth-scan.  dec() peels slotless first so
+ * a slot claimed mid-hold cannot misattribute the decrement. */
+static inline void shm_rdepth_inc(ShmHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     } else {
-        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
         h->slotless_held++;
     }
 }
-static inline void shm_reader_leave(ShmHandle *h) {
+static inline void shm_rdepth_dec(ShmHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+    }
+}
+
+/* Wake a writer that may be draining readers (it waits on drain_seq).  Called
+ * after every rdepth decrement so a released read lock lets the writer re-scan
+ * promptly instead of waiting out its timeout. */
+static inline void shm_reader_wake_drain(ShmHandle *h) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+        __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
 }
 
 static inline void shm_rwlock_rdlock(ShmHandle *h) {
     shm_claim_reader_slot(h);
     ShmHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    /* Claim subcount BEFORE bumping the shared rwlock counter.  This way
-     * a concurrent writer-side recovery scan that sees our PID alive with
-     * subcount > 0 will (correctly) defer force-reset, even while we are
-     * still spinning trying to win the rwlock CAS.  Without this, a reader
-     * killed between rwlock CAS-success and subcount++ would let recovery
-     * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
-     * our eventual rdunlock dec. */
-    shm_reader_enter(h);
     for (int spin = 0; ; spin++) {
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Write-preferring: when lock is free (cur==0) and writers are
-         * waiting, yield to let the writer acquire. When readers are
-         * already active (cur>=1), new readers may join freely. */
-        if (cur > 0 && cur < SHM_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
-        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
-            if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_ACQUIRE);
+        if (cur == 0) {
+            /* Optimistically take the read: publish rdepth, then re-check wlock.
+             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST wlock CAS +
+             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
+             * two sides cannot both miss each other, so we never hold
+             * concurrently with a writer. */
+            shm_rdepth_inc(h);
+            if (__atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST) == 0)
+                return;                       /* no writer after our publish -> we hold the read lock */
+            /* A writer appeared during our publish -- yield to it (write-preferring). */
+            shm_rdepth_dec(h);
+            shm_reader_wake_drain(h);          /* let the draining writer see rdepth drop */
+            spin = 0;
+            continue;
+        }
+        /* wlock != 0: a writer holds or is acquiring.  Recover if it is dead. */
+        if (cur >= SHM_RWLOCK_WRITER_BIT &&
+            !shm_pid_alive(cur & SHM_RWLOCK_PID_MASK)) {
+            shm_recover_stale_lock(h, cur);
+            spin = 0;
+            continue;
         }
         if (__builtin_expect(spin < SHM_RWLOCK_SPIN_LIMIT, 1)) {
             shm_rwlock_spin_pause();
             continue;
         }
-        shm_park_reader(h);
-        cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Sleep when write-locked OR when yielding to waiting writers */
-        if (cur >= SHM_RWLOCK_WRITER_BIT || cur == 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+        shm_park(h);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &shm_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                shm_unpark_reader(h);
+                shm_unpark(h);
                 shm_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        shm_unpark_reader(h);
+        shm_unpark(h);
         spin = 0;
     }
 }
 
 static inline void shm_rwlock_rdunlock(ShmHandle *h) {
-    ShmHeader *hdr = h->hdr;
-    /* Release the shared counter BEFORE dropping our subcount so that
-     * "any live PID with subcount > 0" is a reliable in-flight indicator
-     * for the writer-side recovery scan.  Inverting these would create a
-     * window where we still own a unit of rwlock but our slot subcount is
-     * 0, letting recovery force-reset rwlock underneath us. */
-    uint32_t prev = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    shm_reader_leave(h);
-    if (prev == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    shm_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    shm_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
 static inline void shm_rwlock_wrlock(ShmHandle *h) {
     shm_claim_reader_slot(h);  /* refresh cached_pid across fork */
     ShmHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    /* Encode PID in the rwlock word itself (0x80000000 | pid) to eliminate
-     * any crash window between acquiring the lock and storing the owner. */
+    /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
+     * crash window between acquiring the lock and storing the owner. */
     uint32_t mypid = SHM_RWLOCK_WR(h->cached_pid);
+    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(lock, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
+        if (__atomic_compare_exchange_n(&hdr->wlock, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        /* Contended: expected now holds the current wlock value. */
+        if (expected >= SHM_RWLOCK_WRITER_BIT &&
+            !shm_pid_alive(expected & SHM_RWLOCK_PID_MASK)) {
+            shm_recover_stale_lock(h, expected);
+            spin = 0;
+            continue;
+        }
         if (__builtin_expect(spin < SHM_RWLOCK_SPIN_LIMIT, 1)) {
             shm_rwlock_spin_pause();
             continue;
         }
-        shm_park_writer(h);
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
+        shm_park(h);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
         if (cur != 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &shm_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                shm_unpark_writer(h);
+                shm_unpark(h);
                 shm_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        shm_unpark_writer(h);
+        shm_unpark(h);
         spin = 0;
+    }
+    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
+     * yield).  Drain the readers that were already holding when we won the CAS.
+     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
+     * of the Dekker handshake. */
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(SHM_OCC_WORDS + live readers)
+         * instead of O(SHM_READER_SLOTS). */
+        for (uint32_t w = 0; w < SHM_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!shm_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &shm_lock_timeout, NULL, 0);
     }
 }
 
 static inline void shm_rwlock_wrunlock(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* ---- Seqlock (lock-free readers) ---- */
@@ -800,8 +757,8 @@ static inline uint32_t shm_seqlock_read_begin(ShmHandle *h) {
             spin++;
             continue;
         }
-        /* Prolonged odd seq — check for dead writer */
-        uint32_t val = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+        /* Prolonged odd seq -- check for dead writer */
+        uint32_t val = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
         if (val >= SHM_RWLOCK_WRITER_BIT) {
             uint32_t pid = val & SHM_RWLOCK_PID_MASK;
             if (!shm_pid_alive(pid)) {
@@ -855,16 +812,26 @@ static inline uint32_t shm_arena_alloc(ShmHeader *hdr, char *arena, uint32_t len
 
     if (cls >= 0 && hdr->arena_free[cls] != 0) {
         uint32_t head = hdr->arena_free[cls];
-        uint32_t next;
-        memcpy(&next, arena + head, sizeof(uint32_t));
-        hdr->arena_free[cls] = next;
-        return head;
+        /* Free-list heads are peer-writable: a wild head would send both the
+         * pop read below and the caller's string store out of bounds.  Gate
+         * against arena_cap (read-path clamp discipline); on corruption treat
+         * the class as empty and fall back to bump allocation. */
+        if ((uint64_t)head + asize <= hdr->arena_cap) {
+            uint32_t next;
+            memcpy(&next, arena + head, sizeof(uint32_t));
+            hdr->arena_free[cls] = next;
+            return head;
+        }
     }
     if (cls < 0) {
         /* Large request: first-fit over the large free list before bumping. */
         uint32_t prev = 0, cur = hdr->arena_large_free;
         while (cur != 0) {
             uint32_t next, blk;
+            /* cur is peer-writable: never dereference a wild offset; abandon
+             * the walk and fall back to bump allocation.  Gating cur+asize
+             * also covers the 8-byte [next][size] read (asize > 2^19 here). */
+            if ((uint64_t)cur + asize > hdr->arena_cap) break;
             memcpy(&next, arena + cur, sizeof(uint32_t));
             memcpy(&blk, arena + cur + sizeof(uint32_t), sizeof(uint32_t));
             if (blk >= asize) {
@@ -888,6 +855,9 @@ static inline void shm_arena_free_block(ShmHeader *hdr, char *arena,
     uint32_t asize = shm_arena_round_up(len);
     int cls = shm_arena_class_index(asize);
     if (off == 0) return;
+    /* off comes from a peer-writable node field: a wild value would send the
+     * free-list link write below out of bounds.  Leak the block instead. */
+    if ((uint64_t)off + asize > hdr->arena_cap) return;
     if (cls < 0) {
         /* Large block (> 2^19): single first-fit free list keyed by size, so
          * churn of >512 KiB values recycles instead of leaking to bump-only.
@@ -903,7 +873,7 @@ static inline void shm_arena_free_block(ShmHeader *hdr, char *arena,
     hdr->arena_free[cls] = off;
 }
 
-/* Store a string: inline if ≤ 7 bytes, arena otherwise. Returns 1 on success, 0 on arena OOM. */
+/* Store a string: inline if <= 7 bytes, arena otherwise. Returns 1 on success, 0 on arena OOM. */
 static inline int shm_str_store(ShmHeader *hdr, char *arena,
                                  uint32_t *off, uint32_t *len_field,
                                  const char *str, uint32_t slen, bool utf8) {
@@ -964,8 +934,8 @@ static inline uint32_t shm_max_tcap_from_entries(uint32_t max_entries) {
 }
 
 /* Convert lru_skip percentage (0-99) to power-of-2 mask used by lru_promote.
- * skip=50→mask=1 (every 2nd), 75→3 (every 4th), 90→15 (every 16th),
- * 95→31 (every 32nd).  Values outside 1..99 disable skipping (mask=0). */
+ * skip=50->mask=1 (every 2nd), 75->3 (every 4th), 90->15 (every 16th),
+ * 95->31 (every 32nd).  Values outside 1..99 disable skipping (mask=0). */
 static inline uint32_t shm_lru_skip_to_mask(uint32_t lru_skip) {
     if (lru_skip == 0 || lru_skip >= 100) return 0;
     uint32_t interval = 100 / (100 - lru_skip);
@@ -1004,7 +974,7 @@ static inline void shm_lru_promote(ShmHandle *h, uint32_t idx) {
     ShmHeader *hdr = h->hdr;
     if (hdr->lru_head == idx) return;
     /* Counter-based promotion skip: promote every (mask+1)th access.
-     * Branch-predictor friendly — the skip branch is nearly always taken.
+     * Branch-predictor friendly -- the skip branch is nearly always taken.
      * Tail entry is never skipped to preserve eviction correctness. */
     if (hdr->lru_skip > 0 && idx != hdr->lru_tail) {
         static __thread uint32_t promote_ctr = 0;
@@ -1021,9 +991,9 @@ static inline void shm_lru_promote(ShmHandle *h, uint32_t idx) {
  * a one-way-broken state that could infinite-loop the next `lru_evict_one`.
  *
  * Rebuild semantics: the list is reconstructed in slot-index order (which
- * is meaningless for LRU correctness — the clock-eviction algorithm
+ * is meaningless for LRU correctness -- the clock-eviction algorithm
  * re-establishes locality on the next few promotes).  Loses ordering, not
- * correctness.  Variant-agnostic — uses only the byte-array `states` and
+ * correctness.  Variant-agnostic -- uses only the byte-array `states` and
  * the typeless lru_prev/lru_next arrays. */
 static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
     if (!h->lru_prev) return;  /* LRU disabled */
@@ -1053,7 +1023,7 @@ static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
      * size++, and shm_lru_push_front leaves a slot in an inconsistent
      * subset of {states[], chain, hdr->size}.  Counting actual LIVE
      * entries and comparing against chain_len catches every window
-     * (including the one where size is itself behind LIVE — comparing
+     * (including the one where size is itself behind LIVE -- comparing
      * chain_len to hdr->size alone misses that case). */
     uint32_t live_count = 0;
     if (!corrupt) {
@@ -1088,7 +1058,7 @@ static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
      * deciding based on stale counts. */
     hdr->size = rebuilt_count;
     hdr->tombstones = tomb_count;
-    /* No stat_recoveries bump here — caller (shm_recover_stale_lock) accounts
+    /* No stat_recoveries bump here -- caller (shm_recover_stale_lock) accounts
      * for the recovery event once, regardless of whether the LRU was rebuilt. */
 }
 
@@ -1097,7 +1067,7 @@ static void shm_lru_rebuild_if_corrupt(ShmHandle *h) {
 /* Error buffer for shm_create_map diagnostics */
 #define SHM_ERR_BUFLEN 256
 
-/* Computed layout — sizes and offsets of all variable-length regions
+/* Computed layout -- sizes and offsets of all variable-length regions
  * following the header. Filled by shm_compute_layout and used by both
  * create and reopen paths. */
 typedef struct {
@@ -1105,9 +1075,10 @@ typedef struct {
     uint64_t lru_prev_off, lru_next_off, lru_accessed_off;
     uint64_t expires_off;
     uint64_t reader_slots_off;
+    uint64_t occ_off;
     uint64_t arena_off, arena_cap;
     uint64_t total_size;
-    uint64_t end_off;  /* end of LRU/TTL region — caller verifies file is at least this large */
+    uint64_t end_off;  /* end of LRU/TTL region -- caller verifies file is at least this large */
 } ShmLayout;
 
 /* Clamp a requested arena capacity to the usable range: a 4096-byte floor so
@@ -1152,6 +1123,8 @@ static inline void shm_compute_layout(ShmLayout *lo, uint32_t max_tcap,
     off = (off + 7) & ~(uint64_t)7;
     lo->reader_slots_off = off;
     off += (uint64_t)SHM_READER_SLOTS * sizeof(ShmReaderSlot);
+    lo->occ_off = off;                 /* occupancy bitmap right after reader_slots */
+    off += SHM_OCC_BYTES;
     lo->arena_off = lo->arena_cap = 0;
     if (has_arena) {
         lo->arena_off = (off + 7) & ~(uint64_t)7;
@@ -1200,6 +1173,9 @@ static inline void shm_init_header(ShmHeader *hdr, void *base,
         memset((char *)base + lo->expires_off, 0, max_tcap * sizeof(uint32_t));
     memset((char *)base + lo->reader_slots_off, 0,
            SHM_READER_SLOTS * sizeof(ShmReaderSlot));
+    /* Zero the occupancy bitmap explicitly: create does not memset the whole
+     * mapping, so do not rely on OS zero-fill for this region. */
+    memset((char *)base + lo->occ_off, 0, SHM_OCC_BYTES);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
@@ -1269,14 +1245,19 @@ static inline int shm_validate_layout_regions(ShmLayout *lo, const ShmHeader *hd
                              "%s: file too small for LRU/TTL arrays", prefix);
         return 0;
     }
+    /* Locate reader_slots from the trusted, locally-computed layout, NOT the
+     * peer-writable hdr->reader_slots_off: a peer sharing the backing file that
+     * corrupts the stored offset must not be able to misdirect our reader_slots
+     * pointer.  We still sanity-gate the stored offset (rejects grossly corrupt
+     * files) but bounds-check the locally-computed region against the real
+     * mapping and keep lo->reader_slots_off as shm_compute_layout produced it. */
     uint64_t rs_off = hdr->reader_slots_off;
     if (!rs_off || rs_off < lo->end_off ||
-        rs_off + SHM_READER_SLOTS * sizeof(ShmReaderSlot) > mapped_size) {
+        lo->reader_slots_off + SHM_READER_SLOTS * sizeof(ShmReaderSlot) > mapped_size) {
         if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN,
                              "%s: reader_slots region missing or out of bounds", prefix);
         return 0;
     }
-    lo->reader_slots_off = rs_off;
     return 1;
 }
 
@@ -1298,13 +1279,14 @@ static ShmHandle *shm_alloc_handle(void *base, uint64_t total_size,
     h->hdr       = hdr;
     h->nodes     = (char *)hdr + hdr->nodes_off;
     h->states    = (uint8_t *)((char *)hdr + hdr->states_off);
-    h->arena     = hdr->arena_off ? (char *)hdr + hdr->arena_off : NULL;
+    h->arena     = has_arena ? (char *)hdr + lo->arena_off : NULL;   /* trusted layout offset, like reader_slots */
     h->lru_prev  = has_lru ? (uint32_t *)((char *)hdr + lo->lru_prev_off) : NULL;
     h->lru_next  = has_lru ? (uint32_t *)((char *)hdr + lo->lru_next_off) : NULL;
     h->lru_accessed = has_lru ? (uint8_t *)((char *)hdr + lo->lru_accessed_off) : NULL;
     h->expires_at = has_ttl ? (uint32_t *)((char *)hdr + lo->expires_off) : NULL;
     h->reader_slots = (ShmReaderSlot *)((char *)hdr + lo->reader_slots_off);
-    /* Slot claimed lazily on first lock — see shm_claim_reader_slot. */
+    h->occ          = (uint64_t *)((char *)hdr + lo->occ_off);   /* trusted layout offset */
+    /* Slot claimed lazily on first lock -- see shm_claim_reader_slot. */
     h->my_slot_idx = UINT32_MAX;
     h->cached_pid = 0;
     h->mmap_size = (size_t)total_size;
@@ -1312,7 +1294,7 @@ static ShmHandle *shm_alloc_handle(void *base, uint64_t total_size,
     h->iter_pos  = 0;
     h->backing_fd = backing_fd;
     /* Hash lookups are random-access: hint the kernel to skip
-     * read-ahead. Best-effort — failure (e.g., MADV_RANDOM not
+     * read-ahead. Best-effort -- failure (e.g., MADV_RANDOM not
      * supported) is harmless. */
     (void)madvise(base, (size_t)total_size, MADV_RANDOM);
     if (path) {
@@ -1401,6 +1383,10 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, file_mode) < 0)) {
+            SHM_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)lo.total_size) < 0) {
                 SHM_ERR("ftruncate(%s, %llu): %s", path, (unsigned long long)lo.total_size, strerror(errno));
@@ -1547,7 +1533,23 @@ static inline int shm_msync(ShmHandle *h) {
     return rc;
 }
 
+static void shm_close_map_now(ShmHandle *h);
+
+/* Destroying a handle while THIS process holds one of its locks would leave the
+ * save-stack lock cleanup (shm_rdunlock_cleanup / shm_wrseq_unlock_cleanup)
+ * dereferencing freed memory on unwind -- the guards capture the raw handle
+ * pointer. Argument magic can call $obj->DESTROY from inside a guarded region,
+ * so defer the free until the last lock is released.
+ * lock_depth lives in the process-local handle, not the shared segment: no
+ * on-disk format change, and no atomics (a handle is never shared between
+ * threads -- CLONE_SKIP forbids cloning it). */
 static void shm_close_map(ShmHandle *h) {
+    if (!h) return;
+    if (h->lock_depth) { h->pending_close = 1; return; }
+    shm_close_map_now(h);
+}
+
+static void shm_close_map_now(ShmHandle *h) {
     if (!h) return;
     if (h->shard_handles) {
         /* Sharded: close all sub-handles */
@@ -1558,7 +1560,7 @@ static void shm_close_map(ShmHandle *h) {
         free(h);
         return;
     }
-    /* Release our reader slot — only if we still own it AND no fork has
+    /* Release our reader slot -- only if we still own it AND no fork has
      * happened since we claimed it.  A forked child that inherits the
      * handle but never acquired the lock itself must NOT clear the
      * parent's slot via the inherited cached_pid (parent is still using
@@ -1566,13 +1568,18 @@ static void shm_close_map(ShmHandle *h) {
      * from a fork descendant that's about to exit. */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
         h->cached_fork_gen == __atomic_load_n(&shm_fork_gen, __ATOMIC_RELAXED) &&
-        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
-        /* subcount==0: a still-held lock's slot must survive for recovery */
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) == 0) {
+        /* rdepth==0: a still-held read lock's slot must survive for recovery */
+        /* Clear our occ bit BEFORE freeing the slot: we still own the pid so no
+         * claimant can take the slot mid-clear, and rdepth==0 so no writer needs
+         * to see us.  (A crash skips this -> the bit is reclaimed lazily by a
+         * writer scan / re-claim, same as the pid.) */
+        shm_occ_clear(h, h->my_slot_idx);
         uint32_t expected = h->cached_pid;
-        /* Just CAS pid → 0; do NOT clear subcount here — between the CAS
+        /* Just CAS pid -> 0; do NOT clear rdepth here -- between the CAS
          * and the store, a new process could claim the slot and start
-         * incrementing subcount, which our store would clobber.  The
-         * next claimant's shm_claim_reader_slot zeros all mirror fields. */
+         * incrementing rdepth, which our store would clobber.  The
+         * next claimant's shm_claim_reader_slot zeros it. */
         __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
                 &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
     }
@@ -1689,6 +1696,103 @@ static inline void shm_cursor_destroy(ShmCursor *c) {
     free(c->copy_buf);
     free(c);
 }
+
+/* ================================================================
+ * v9 -> v10 on-disk migration (offline structural upcast).  The v10
+ * layout inserts a 128-byte reader-slot occupancy bitmap between the
+ * reader-slot table and the arena; a v9 file is byte-identical apart
+ * from that missing region, so migration is a pure re-header + shift --
+ * no re-hashing and no old library required.  Returns 1 if the file was
+ * upgraded, 0 if it is already current (v10), -1 on error (errbuf set).
+ * The caller MUST ensure no process has the file mapped.
+ * ================================================================ */
+#define SHMUP_ERR(...) do { if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, __VA_ARGS__); } while (0)
+#define SHM_UPGRADE_SRC_VERSION 9U   /* the single previous on-disk format this transform upgrades from */
+/* Tripwire: this function implements EXACTLY the v9 -> v10 (occupancy-bitmap
+ * insertion) transform and stamps the result as SHM_VERSION.  If the on-disk
+ * format is ever bumped again, compilation fails here until the new step is
+ * added and this assertion (and SHM_UPGRADE_SRC_VERSION) are updated -- so the
+ * tool can never silently apply the wrong transform and mis-stamp a file. */
+SHM_STATIC_ASSERT(SHM_VERSION == 10U,
+    "shm_upgrade_file only knows v9 -> v10; extend it when SHM_VERSION changes");
+static int shm_upgrade_file(const char *path, char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    int fd = open(path, O_RDWR | O_NOFOLLOW | O_CLOEXEC);
+    if (fd < 0) { SHMUP_ERR("open %s: %s", path, strerror(errno)); return -1; }
+    struct stat st;
+    if (fstat(fd, &st) != 0) { SHMUP_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return -1; }
+    if ((uint64_t)st.st_size < sizeof(ShmHeader)) {
+        SHMUP_ERR("%s: too small to be a HashMap file (%lld bytes)", path, (long long)st.st_size);
+        close(fd); return -1;
+    }
+    ShmHeader hdr;
+    if (pread(fd, &hdr, sizeof hdr, 0) != (ssize_t)sizeof hdr) {
+        SHMUP_ERR("read header %s: %s", path, strerror(errno)); close(fd); return -1;
+    }
+    if (hdr.magic != SHM_MAGIC) { SHMUP_ERR("%s: bad magic (not a HashMap::Shared file)", path); close(fd); return -1; }
+    if (hdr.version == SHM_VERSION) { close(fd); return 0; }   /* already current */
+    if (hdr.version != SHM_UPGRADE_SRC_VERSION) {
+        SHMUP_ERR("%s: unsupported source version %u (migrates %u -> %u only)",
+                  path, hdr.version, SHM_UPGRADE_SRC_VERSION, (unsigned)SHM_VERSION);
+        close(fd); return -1;
+    }
+    if (hdr.wlock & 0x80000000U) {
+        SHMUP_ERR("%s: locked by a live writer (pid %u); ensure no process is using it",
+                  path, hdr.wlock & 0x7FFFFFFFU);
+        close(fd); return -1;
+    }
+    if ((uint64_t)st.st_size != hdr.total_size) {
+        SHMUP_ERR("%s: size mismatch (file=%lld, header=%llu)",
+                  path, (long long)st.st_size, (unsigned long long)hdr.total_size);
+        close(fd); return -1;
+    }
+    uint64_t rss = (uint64_t)SHM_READER_SLOTS * sizeof(ShmReaderSlot);
+    uint64_t occ_off = hdr.reader_slots_off + rss;   /* v9 arena start == new occ-region start */
+    if (hdr.reader_slots_off < sizeof(ShmHeader) || occ_off > hdr.total_size) {
+        SHMUP_ERR("%s: reader-slot region out of range (corrupt header)", path); close(fd); return -1;
+    }
+    int has_arena = (hdr.arena_off != 0);
+    if (has_arena ? (hdr.arena_off != occ_off) : (hdr.total_size != occ_off)) {
+        SHMUP_ERR("%s: unexpected v9 layout; refusing to migrate", path); close(fd); return -1;
+    }
+    uint64_t old_size = hdr.total_size, new_size = old_size + SHM_OCC_BYTES;
+    uint8_t *old = (uint8_t *)malloc((size_t)old_size);
+    uint8_t *neu = (uint8_t *)malloc((size_t)new_size);
+    if (!old || !neu) { SHMUP_ERR("out of memory"); free(old); free(neu); close(fd); return -1; }
+    if (pread(fd, old, (size_t)old_size, 0) != (ssize_t)old_size) {
+        SHMUP_ERR("read %s: %s", path, strerror(errno)); free(old); free(neu); close(fd); return -1;
+    }
+    close(fd);
+    /* header..reader_slots copied verbatim; insert a zeroed occ region; shift the arena */
+    memcpy(neu, old, (size_t)occ_off);
+    memset(neu + occ_off, 0, (size_t)SHM_OCC_BYTES);
+    memcpy(neu + occ_off + SHM_OCC_BYTES, old + occ_off, (size_t)(old_size - occ_off));
+    free(old);
+    ShmHeader *nh = (ShmHeader *)neu;
+    nh->version    = SHM_VERSION;
+    nh->total_size = new_size;
+    if (has_arena) nh->arena_off += SHM_OCC_BYTES;
+    /* reset transient lock/recovery state so the migrated file opens clean */
+    nh->wlock = 0; nh->rwait = 0; nh->seq = 0; nh->drain_seq = 0; nh->slotless_rdepth = 0;
+    memset(neu + hdr.reader_slots_off, 0, (size_t)rss);   /* drop any stale reader PIDs */
+    /* write to a sibling temp file, fsync, atomic rename; preserve mode */
+    size_t plen = strlen(path);
+    char *tmp = (char *)malloc(plen + 16);
+    if (!tmp) { SHMUP_ERR("out of memory"); free(neu); return -1; }
+    snprintf(tmp, plen + 16, "%s.upgrade-tmp", path);
+    int tfd = open(tmp, O_RDWR | O_CREAT | O_TRUNC | O_NOFOLLOW | O_CLOEXEC, st.st_mode & 07777);
+    if (tfd < 0) { SHMUP_ERR("create %s: %s", tmp, strerror(errno)); free(neu); free(tmp); return -1; }
+    (void)fchmod(tfd, st.st_mode & 07777);
+    int ok = (write(tfd, neu, (size_t)new_size) == (ssize_t)new_size) && (fsync(tfd) == 0);
+    free(neu);
+    if (!ok)                 { SHMUP_ERR("write %s: %s", tmp, strerror(errno)); close(tfd); unlink(tmp); free(tmp); return -1; }
+    if (close(tfd) != 0)     { SHMUP_ERR("close %s: %s", tmp, strerror(errno)); unlink(tmp); free(tmp); return -1; }
+    if (rename(tmp, path) != 0) { SHMUP_ERR("rename %s: %s", tmp, strerror(errno)); unlink(tmp); free(tmp); return -1; }
+    free(tmp);
+    return 1;
+}
+#undef SHMUP_ERR
+#undef SHM_UPGRADE_SRC_VERSION
 
 #endif /* SHM_DEFS_H */
 
@@ -1809,7 +1913,7 @@ static ShmHandle *SHM_FN(open_fd)(int fd, char *errbuf) {
                             (uint32_t)sizeof(SHM_NODE_TYPE), errbuf);
 }
 
-/* ---- Rehash helper (used during resize) — returns new index ---- */
+/* ---- Rehash helper (used during resize) -- returns new index ---- */
 
 static uint32_t SHM_FN(rehash_insert_raw)(ShmHandle *h, SHM_NODE_TYPE *node) {
     ShmHeader *hdr = h->hdr;
@@ -1854,7 +1958,7 @@ static void SHM_FN(tombstone_at)(ShmHandle *h, uint32_t idx) {
 }
 
 /* Standard "remove a live entry": detach from LRU, clear TTL, tombstone.
- * Used by remove/take/cas_take/pop/shift/drain — anywhere a caller-located
+ * Used by remove/take/cas_take/pop/shift/drain -- anywhere a caller-located
  * entry is being deleted. Distinct from expire_at (bumps stat_expired) and
  * lru_evict_one (picks the victim by clock-walking the LRU). */
 static inline void SHM_FN(remove_at)(ShmHandle *h, uint32_t idx) {
@@ -1867,8 +1971,8 @@ static inline void SHM_FN(remove_at)(ShmHandle *h, uint32_t idx) {
 
 static void SHM_FN(lru_evict_one)(ShmHandle *h) {
     ShmHeader *hdr = h->hdr;
-    /* Second-chance clock: walk from tail, if accessed → clear and
-     * promote (give second chance), else → evict. */
+    /* Second-chance clock: walk from tail, if accessed -> clear and
+     * promote (give second chance), else -> evict. */
     uint32_t victim = hdr->lru_tail;
     while (victim != SHM_LRU_NONE) {
         if (h->lru_accessed && __atomic_load_n(&h->lru_accessed[victim], __ATOMIC_RELAXED)) {
@@ -2131,7 +2235,7 @@ static int SHM_FN(put_inner)(ShmHandle *h,
             if (insert_pos == UINT32_MAX) insert_pos = idx;
             continue;
         }
-        /* SHM_IS_LIVE — check tag then key match */
+        /* SHM_IS_LIVE -- check tag then key match */
         if (st != tag) continue;
 #ifdef SHM_KEY_IS_INT
         if (SHM_KEY_EQ(&nodes[idx], key)) {
@@ -2287,7 +2391,7 @@ static inline int SHM_FN(put_ttl)(ShmHandle *h,
         ttl_sec);
 }
 
-/* ---- Get (seqlock — lock-free read path) ---- */
+/* ---- Get (seqlock -- lock-free read path) ---- */
 
 static int SHM_FN(get)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
@@ -2306,7 +2410,7 @@ static int SHM_FN(get)(ShmHandle *h,
 #else
     SHM_SHARD_DISPATCH(h, key_str, key_len);
 #endif
-    /* Unified seqlock path — lock-free for ALL maps including LRU/TTL.
+    /* Unified seqlock path -- lock-free for ALL maps including LRU/TTL.
      * LRU uses clock/second-chance: just set accessed bit, no wrlock.
      * TTL check is done under seqlock retry protection. */
     ShmHeader *hdr = h->hdr;
@@ -2341,8 +2445,11 @@ static int SHM_FN(get)(ShmHandle *h,
         uint32_t probe_start = 0;  /* scalar loop starts here */
 
 #ifdef __SSE2__
-        /* SIMD fast path: check first 16 states in one shot */
-        if (pos + 16 <= hdr->table_cap) {
+        /* SIMD fast path: check first 16 states in one shot.
+         * Bound by the clamped extent (mask+1), NOT a live re-read of
+         * hdr->table_cap: a peer corrupting table_cap past max_table_cap
+         * must not let this group load run off the states[] array. */
+        if (pos + 16 <= mask + 1) {
             uint16_t mmask, emask;
             shm_probe_group(states, pos, tag, &mmask, &emask);
             /* Only consider matches before first empty */
@@ -2388,7 +2495,7 @@ static int SHM_FN(get)(ShmHandle *h,
 #endif
                 relevant &= relevant - 1;
             }
-            if (emask) goto simd_done;  /* hit empty — key absent */
+            if (emask) goto simd_done;  /* hit empty -- key absent */
             probe_start = 16;           /* all 16 occupied, continue scalar from pos+16 */
         }
 simd_done:
@@ -2442,7 +2549,7 @@ simd_done:
             if (h->expires_at) {
                 uint32_t exp = h->expires_at[local_idx];
                 if (exp != 0 && shm_now() >= exp) {
-                    found = 0;  /* expired — treat as absent */
+                    found = 0;  /* expired -- treat as absent */
                 }
             }
         }
@@ -2450,14 +2557,14 @@ simd_done:
         if (found) {
 #ifdef SHM_VAL_IS_STR
             if (SHM_IS_INLINE(local_vlen_packed)) {
-                /* Inline value — data is in local_voff + local_vlen_packed, no arena access */
+                /* Inline value -- data is in local_voff + local_vlen_packed, no arena access */
                 if (local_vl > h->copy_buf_size || !h->copy_buf) {
                     if (!shm_ensure_copy_buf(h, local_vl > 0 ? local_vl : 1)) return 0;
                     continue;
                 }
                 shm_inline_read(local_voff, local_vlen_packed, h->copy_buf);
             } else {
-                /* Arena value — bounds check before copy */
+                /* Arena value -- bounds check before copy */
                 if ((uint64_t)local_voff + local_vl > arena_cap) continue;
                 if (local_vl > h->copy_buf_size || !h->copy_buf) {
                     if (!shm_ensure_copy_buf(h, local_vl > 0 ? local_vl : 1)) return 0;
@@ -2468,7 +2575,7 @@ simd_done:
 #endif
             if (shm_seqlock_read_retry(&hdr->seq, seq)) continue;
 
-            /* validated — set clock accessed bit and commit results */
+            /* validated -- set clock accessed bit and commit results */
             if (h->lru_accessed)
                 __atomic_store_n(&h->lru_accessed[local_idx], 1, __ATOMIC_RELAXED);
 #ifdef SHM_VAL_IS_STR
@@ -2538,7 +2645,7 @@ static int SHM_FN(exists_ttl)(ShmHandle *h,
     return 0;
 }
 
-/* ---- Exists (seqlock — lock-free read path) ---- */
+/* ---- Exists (seqlock -- lock-free read path) ---- */
 
 static int SHM_FN(exists)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
@@ -2604,7 +2711,7 @@ static int SHM_FN(exists)(ShmHandle *h,
 
 /* ---- Remove ---- */
 
-/* Lockless remove body — caller must hold writer lock + seqlock and have
+/* Lockless remove body -- caller must hold writer lock + seqlock and have
  * already shard-dispatched. Used by remove() and remove_multi. */
 static int SHM_FN(remove_inner)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
@@ -3089,7 +3196,7 @@ static int SHM_FN(swap)(ShmHandle *h,
         }
     }
 
-    /* Key not found — insert new */
+    /* Key not found -- insert new */
     if (insert_pos == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
@@ -3836,7 +3943,7 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
             /* TTL check */
             if (SHM_IS_EXPIRED(h, slot, now)) {
                 SHM_FN(expire_at)(h, slot);
-                /* treat as not found — will insert below */
+                /* treat as not found -- will insert below */
                 if (insert_pos == UINT32_MAX) insert_pos = slot;
                 break;
             }
@@ -3976,7 +4083,7 @@ static SHM_VAL_INT_TYPE SHM_FN(set_minmax)(ShmHandle *h,
 #endif
             if (SHM_IS_EXPIRED(h, slot, now)) {
                 SHM_FN(expire_at)(h, slot);
-                /* treat as not found — will insert below */
+                /* treat as not found -- will insert below */
                 if (insert_pos == UINT32_MAX) insert_pos = slot;
                 break;
             }
@@ -4945,7 +5052,7 @@ static int SHM_FN(get_or_set)(ShmHandle *h,
         }
     }
 
-    /* not found — insert default value */
+    /* not found -- insert default value */
     if (insert_pos == UINT32_MAX) {
         shm_seqlock_write_end(&hdr->seq);
         shm_rwlock_wrunlock(h);
@@ -5230,7 +5337,7 @@ static int SHM_FN(cursor_next)(ShmCursor *c,
 
         shm_rwlock_rdunlock(h);
 
-        /* Current shard exhausted — flush deferred work and advance */
+        /* Current shard exhausted -- flush deferred work and advance */
         if (h->iterating > 0) h->iterating--;
         SHM_FN(flush_deferred)(h);
         c->shard_idx++;

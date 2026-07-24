@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 
@@ -20,6 +20,7 @@ Data::Deque::Shared - Shared-memory double-ended queue for Linux
 =head1 SYNOPSIS
 
     use Data::Deque::Shared;
+    use feature 'say';
 
     my $dq = Data::Deque::Shared::Int->new(undef, 100);
     $dq->push_back(1);
@@ -85,12 +86,53 @@ usage is unaffected.
 
 =head1 METHODS
 
+=head2 Constructors
+
+There are two concrete subclasses; the base class C<Data::Deque::Shared>
+is not instantiated directly.
+
+C<Data::Deque::Shared::Int> stores 64-bit signed integers:
+
+    my $dq = Data::Deque::Shared::Int->new($path, $capacity, $mode);
+    my $dq = Data::Deque::Shared::Int->new_memfd($name, $capacity);
+    my $dq = Data::Deque::Shared::Int->new_from_fd($fd);
+
+C<Data::Deque::Shared::Str> stores byte/UTF-8 strings in fixed-size slots:
+
+    my $sq = Data::Deque::Shared::Str->new($path, $capacity, $max_len, $mode);
+    my $sq = Data::Deque::Shared::Str->new_memfd($name, $capacity, $max_len);
+    my $sq = Data::Deque::Shared::Str->new_from_fd($fd);
+
+For C<new>, C<$path> may be C<undef> for an anonymous (private) mapping,
+or a filesystem path for a file-backed mapping shared across processes.
+C<$capacity> is the number of slots (must be E<gt> 0 and E<lt>= 2^31); it is
+rounded up to the next power of two, and C<capacity>/C<stats> report that
+rounded value. For the Str variant, C<$max_len> is the maximum stored byte
+length per entry (must be E<gt> 0 and E<lt> 2 GiB); longer values are truncated.
+C<$mode> is an optional octal file permission mode applied only when a
+backing file is created (default C<0600>); see L</SECURITY>.
+
+C<new_memfd> creates an anonymous C<memfd> sealed mapping named C<$name>;
+retrieve its descriptor with C<memfd> and re-attach in another process
+(after passing the fd across, e.g. via C<SCM_RIGHTS>) with C<new_from_fd>.
+
+All constructors croak on failure.
+
 =head2 Push / Pop
 
     $dq->push_back($val);          $dq->push_front($val);
     $dq->push_back_wait($val, $t); $dq->push_front_wait($val, $t);
     my $v = $dq->pop_front;        my $v = $dq->pop_back;
     my $v = $dq->pop_front_wait($t); my $v = $dq->pop_back_wait($t);
+
+The non-blocking C<push_back> / C<push_front> return true on success and
+false if the deque is full. C<pop_front> / C<pop_back> return the value,
+or C<undef> if the deque is empty.
+
+The C<*_wait> variants block until the operation can proceed or the
+optional timeout C<$t> (fractional seconds; omitted or negative means
+wait forever) elapses. C<push_*_wait> return true on success, false on
+timeout; C<pop_*_wait> return the value, or C<undef> on timeout.
 
 =head2 Status
 

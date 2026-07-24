@@ -8,10 +8,11 @@ package Lemonldap::NG::Portal::CDC;
 use strict;
 use Mouse;
 use MIME::Base64;
+use Regexp::Assemble;
 use Lemonldap::NG::Common::FormEncode;
 use URI;
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
@@ -23,6 +24,7 @@ has httpOnly         => ( is => 'rw' );
 has cookieExpiration => ( is => 'rw' );
 has oldStyleUrl      => ( is => 'rw' );
 has cdc_values       => ( is => 'rw' );
+has trustedDomainsRe => ( is => 'rw' );
 
 # INITIALIZATION
 
@@ -54,7 +56,94 @@ sub init {
     foreach (qw(httpOnly cookieExpiration oldStyleUrl)) {
         $self->$_( $conf->{$_} );
     }
+
+    # Build the trusted domains regexp used to control redirection URLs
+    # (see _isTrustedRedirectUrl()). This prevents the CDC endpoint from being
+    # used as an open redirector (CWE-601).
+    $self->_buildTrustedDomainsRe($conf);
+
     return 1;
+}
+
+## @method void _buildTrustedDomainsRe($conf)
+# Build the regexp of allowed redirection hosts from the configuration.
+# @param $conf full configuration hashref
+sub _buildTrustedDomainsRe {
+    my ( $self, $conf ) = @_;
+
+    # Wildcard trustedDomains: trust any http(s) destination
+    if (    $conf->{trustedDomains}
+        and $conf->{trustedDomains} =~ /^\s*\*\s*$/ )
+    {
+        $self->trustedDomainsRe(qr#^https?://#);
+        return;
+    }
+
+    my $re    = Regexp::Assemble->new();
+    my $count = 0;
+
+    # 1. Hosts of every registered SAML federation member (SP and IdP).
+    #    We extract them from the raw metadata (entityID and endpoint
+    #    Location URLs) with a simple scan, avoiding a full XML/Lasso parse.
+    foreach my $key (qw(samlSPMetaDataXML samlIDPMetaDataXML)) {
+        my $branch = $conf->{$key};
+        next unless ref($branch) eq 'HASH';
+        foreach my $entry ( values %$branch ) {
+            my $xml =
+              ref($entry) eq 'HASH' ? ( $entry->{$key} // '' ) : ( $entry // '' );
+            next unless $xml;
+            while (
+                $xml =~ /\b(?:Location|entityID)\s*=\s*"https?:\/\/([^"\/:]+)/gi )
+            {
+                $re->add( quotemeta($1) );
+                $count++;
+            }
+        }
+    }
+
+    # 2. Explicitly trusted domains
+    if ( my $td = $conf->{trustedDomains} ) {
+        $td =~ s/^\s*(.*?)\s*$/$1/;
+        foreach ( split( /\s+/, $td ) ) {
+            next unless ($_);
+            s#^\.#([^/]+\.)?#;
+            s/\./\\./g;
+            s/\*\\\./(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9]\\.)*/g;
+            $re->add($_);
+            $count++;
+        }
+    }
+
+    # 3. The portal hosting this CDC
+    if ( my $portal = $conf->{portal} ) {
+        $portal =~ s#https?://([^/]*).*$#$1#;
+        if ($portal) {
+            $re->add( quotemeta($portal) );
+            $count++;
+        }
+    }
+
+    unless ($count) {
+
+        # Nothing is trusted: only local relative paths will be allowed
+        $self->trustedDomainsRe(undef);
+        return;
+    }
+
+    my $tmp = '^https?://' . $re->as_string . '(?::\d+)?(?:/|$)';
+    $self->trustedDomainsRe(qr/$tmp/);
+    return;
+}
+
+## @method boolean _isTrustedRedirectUrl($url)
+# @param $url decoded (and CRLF-stripped) destination URL
+# @return boolean
+sub _isTrustedRedirectUrl {
+    my ( $self, $url ) = @_;
+    return 0 unless defined $url and length $url;
+    my $re = $self->trustedDomainsRe;
+    return 0 unless $re;
+    return $url =~ $re ? 1 : 0;
 }
 
 ## @method int process()
@@ -71,13 +160,6 @@ sub handler {
     # Request parameter
     my $action = $req->param('action') || "";    # What we do
     my $idp    = $req->param('idp');             # IDP ID in write mode
-
-    # TODO: Control URL
-    #my $control_url = $self->_sub('controlUrlOrigin');
-    #unless ( $control_url == PE_OK ) {
-    #    $self->logger->error( "[CDC] Bad URL");
-    #    return $control_url;
-    #}
 
     # Get cookie
     $cdc_cookie = $req->cookies->{ $self->cdc_name };
@@ -148,6 +230,17 @@ sub handler {
             return $self->sendError( $req, "Bad URL", 400 );
         }
         my $urldc = decode_base64($url);
+
+        # Strip CR/LF to prevent HTTP response splitting in the Location header
+        $urldc =~ s/[\r\n]//g;
+
+        # Control URL origin to avoid being used as an open redirector
+        # (CWE-601). Only local paths and trusted hosts are allowed.
+        unless ( $self->_isTrustedRedirectUrl($urldc) ) {
+            $self->logger->error(
+                "[CDC] Refusing redirection to untrusted URL: $urldc");
+            return $self->sendError( $req, "Bad URL", 400 );
+        }
 
         # Add CDC IDP in return URL if needed
         # olStyleUrl can be set to 1 to use & instead of ;

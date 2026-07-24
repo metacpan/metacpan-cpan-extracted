@@ -83,4 +83,20 @@ subtest 'Conf: metadata', sub {
     );
 };
 
+# Store a second configuration to be able to test -cfgNum (#3657)
+$conf->{cfgNum} = 2;
+ok( $confAcc->store($conf) == 2, "Second conf is stored" );
+
+subtest 'Conf: metadata of last conf', sub {
+    runTest( 'common', 'info', sub { $_[0]->{num} == 2 }, '-json', 'info' );
+};
+subtest 'Conf: metadata of chosen conf', sub {
+    runTest( 'common', 'info', sub { $_[0]->{num} == 1 },
+        '-json', '-cfgNum', 1, 'info' );
+};
+subtest 'Conf: metadata of chosen conf, reversed options', sub {
+    runTest( 'common', 'info', sub { $_[0]->{num} == 1 },
+        '-cfgNum', 1, '-json', 'info' );
+};
+
 done_testing();

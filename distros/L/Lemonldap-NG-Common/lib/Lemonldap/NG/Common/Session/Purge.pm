@@ -382,6 +382,8 @@ sub _purge_for_backend {
         push @t, $id if $v + $timeout < time;
     };
 
+    my $purge_done = 0;
+
     # Real purge
     if ( $options->{backend}->can('deleteIfLowerThan') ) {
         $self->logger->debug("Found deleteIfLowerThan() in backend, using it");
@@ -414,11 +416,20 @@ sub _purge_for_backend {
                 }
             }
             $internal_stats->{end_time}->{$type} = Time::HiRes::time();
+
+            $purge_done = 1;
             return unless @t;
+        }
+        else {
+            $self->logger->notice(
+                    "deleteIfLowerThan failed during session purge"
+                  . ", falling back to slower session enumeration" );
         }
     }
 
-    else {
+    # If deleteIfLowerThan missing OR deleteIfLowerThan failed (#3656)
+    if ( !$purge_done ) {
+
         # Get all expired sessions
         Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
             $options,

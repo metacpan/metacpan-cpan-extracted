@@ -1,5 +1,22 @@
 Revision history for Termbox
 
+0.005003
+        2026-07-23
+        - Remove Win32::IPC dependency by using WaitForSingleObject (Win32::API)
+        - Fix Windows event polling timeout handling for ignored console input events
+        - Clear pending UTF-16 high surrogate state on Windows resize events
+        - Fix tb_strerror() to return a error string when tb_last_errno() is not set
+        - Fix missing last in WINDOW_BUFFER_SIZE_EVENT causing false return ()
+        - Skip WINDOW_BUFFER_SIZE_EVENT when dimensions are unchanged
+        - Fix TB_* attribute constants for TB_OPT_ATTR_W 32/64 truecolor mode
+
+0.005002
+        2026-07-21
+        - Rename Termbox::PP::WCWidth to Terminal::WCWidth
+        - Improve Unicode width calculation in Terminal::WCWidth
+        - Fix TB_OPT_EGC handling when TB_LIB_OPTS is enabled
+        - Improve POD documentation, including TB_LIB_OPTS behavior
+
 0.005001
         2026-07-20
         - Fix :colors export for TB_OPT_ATTR_W (32->16); thanks to David Cantrell
@@ -10,24 +27,24 @@ Revision history for Termbox
 0.005
         2026-07-17
         - Terminal: add Windows Virtual Terminal support (again, see v0.3)
-        - Change default wcwidth backend to builtin-based version
-        - Fix escape sequence handling in extract_event (correct TB_ERR propagation)
+        - Change default wcwidth() backend to builtin-based version
+        - Fix escape sequence handling in extract_event() (correct TB_ERR propagation)
         - Fix use :colors (as FFI) instead of :color when importing constants
         - Improve Unicode::UCD backend (long property names, emoji fallback)
         - Optimize tb_present by removing accessor overhead and inlining logic
 
 0.004007
         2026-07-13
-        - Fix missing Unicode::UCD::search_invlist on older Perl
+        - Fix missing Unicode::UCD::search_invlist() on older Perl
         - Fix Perl 5.10 syntax error with consecutive labels (DEFAULT:/case:)
 
 0.004006
         2026-07-12
-        - Terminal: keep a live filehandle so that the assigned fd stays reliable
-        - Terminal: restore tty state through the open filehandle during shutdown
-        - Fix: route tb_printf through tb_printf_inner
+        - Terminal: keep a live file handle so that the assigned fd stays reliable
+        - Terminal: restore tty state through the open file handle during shutdown
+        - Fix: route tb_printf through tb_printf_inner()
         - Fix: use global->{outbuf} consistently
-        - API: first argument for send_literal and send_num can be undefined
+        - API: first argument for send_literal() and send_num() can be undefined
 
 0.004005
         2026-07-10
@@ -39,15 +56,15 @@ Revision history for Termbox
 
 0.004004
         2026-07-07
-        - Fix on older Perl versions where Unicode::UCD::prop_invmap is not available
-        - Automatically fall back to bundled wcwidth implementation if needed
+        - Fix on older Perl versions where Unicode::UCD::prop_invmap() is not available
+        - Automatically fall back to bundled wcwidth() implementation if needed
         - Hide Termbox compatibility package from PAUSE (no_index + source annotation)
         - Avoid UNAUTHORIZED indexing warnings for Termbox namespace
 
 0.004003
         2026-07-01
         - Change: store cell contents as Perl strings instead of codepoints
-        - Change: treat tb_set_cell*/tb_extend_cell as a Perl string
+        - Change: treat tb_set_cell*/tb_extend_cell() as a Perl string
         - Add: exported constant definition documented in the POD
 
 0.004002

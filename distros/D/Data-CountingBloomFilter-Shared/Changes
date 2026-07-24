@@ -1,0 +1,8 @@
+Revision history for Data-CountingBloomFilter-Shared
+
+0.01      2026-07-22
+          - Fix a use-after-free in merge(): sv_isobject on the peer argument
+            runs get-magic, so a tied argument can destroy this object before
+            its handle is used again. Such a call now croaks.
+          - Initial release.
+

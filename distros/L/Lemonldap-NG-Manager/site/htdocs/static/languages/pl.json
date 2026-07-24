@@ -545,6 +545,8 @@
 "ldapCAFile":"Ścieżka do pliku CA.",
 "ldapCAPath":"Ścieżka katalogu urzędu certyfikacji",
 "ldapChangePasswordAsUser":"Zmień jako użytkownik",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"Połączenie",
 "ldapExportedVars":"Wyeksportowane zmienne",
 "ldapFilters":"Filtry",

@@ -8,13 +8,35 @@ use Time::HiRes qw(time);
 
 use Data::Buffer::Shared::I64;
 
-# Regression: a SIGKILL'd child holding lock_rd used to leave the rwlock's
-# reader counter permanently elevated, blocking the parent from ever
-# acquiring the write lock again.  After the dead-reader recovery patch,
-# the parent's first wrlock op should succeed within one FUTEX_WAIT
-# timeout (~2 s).
+# Regression: a SIGKILL'd child holding lock_rd used to leave the reader
+# counter permanently elevated, blocking the parent from ever acquiring the
+# write lock again.  In the reader-slots-only rwlock a reader's contribution is
+# its slot's `rdepth`; a draining writer clears a dead reader's slot inline, so
+# the parent's first wrlock op succeeds promptly.
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'buf_dead_rdr') . '.shm' }
+
+# Count reader slots with a nonzero rdepth by reading the shared header +
+# reader-slot table directly.  Header layout: reader_slots_off is a uint64 at
+# byte 40; each BufReaderSlot is 16 bytes { pid, rdepth, _rsv1, _rsv2 }.
+sub live_rdepth_slots {
+    my ($path) = @_;
+    open my $f, '<', $path or return 0;
+    binmode $f;
+    seek $f, 40, 0;
+    read $f, my $off_buf, 8;
+    my $slots_off = unpack 'Q<', $off_buf;
+    return 0 unless $slots_off;
+    my $n = 0;
+    for my $i (0 .. 1023) {
+        seek $f, $slots_off + $i * 16, 0;
+        read $f, my $slot, 8 or last;
+        my ($pid, $rdepth) = unpack 'V V', $slot;
+        $n++ if $pid && $rdepth;
+    }
+    close $f;
+    return $n;
+}
 
 # Scenario 1: dead reader holding lock_rd → writer recovers via timeout drain.
 {
@@ -34,20 +56,15 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'buf_dead_rdr') . '.shm' }
         push @pids, $pid;
     }
 
-    # Wait for children to have called lock_rd (rwlock_word > 0).
+    # Wait for children to have called lock_rd (their reader slots show rdepth>0).
     my $deadline = time + 5;
-    my $rwlock_word;
+    my $held = 0;
     while (time < $deadline) {
-        open my $f, '<', $path or last;
-        seek $f, 68, 0;  # rwlock at offset 68 (cache line 1 begins at 64, +4 for seq)
-        read $f, my $buf, 4;
-        close $f;
-        $rwlock_word = unpack 'V', $buf;
-        last if $rwlock_word > 0 && $rwlock_word < 0x80000000;
+        $held = live_rdepth_slots($path);
+        last if $held > 0;
         select(undef, undef, undef, 0.02);
     }
-    ok($rwlock_word > 0 && $rwlock_word < 0x80000000,
-       "children held rdlock (rwlock=$rwlock_word)");
+    ok($held > 0, "children held rdlock (slots with rdepth>0: $held)");
 
     kill 'KILL', @pids;
     waitpid($_, 0) for @pids;
@@ -73,10 +90,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'buf_dead_rdr') . '.shm' }
     $b->unlink;
 }
 
-# Scenario 2: dead PARKED writer leaves phantom writers_waiting > 0 with
-# rwlock == 0.  Without the val=0 recovery fix, new readers yield forever
-# to the phantom writer.  After the fix, the reader's first timeout drains
-# the phantom contribution and lock_rd succeeds.
+# Scenario 2: a dead PARKED writer leaves the parked-waiter hint (rwait)
+# over-counted.  In the reader-slots-only rwlock readers gate only on wlock, so
+# once the parent releases the write lock a new reader acquires immediately
+# regardless of the phantom rwait -- an over-counted rwait can only cause a
+# spurious wake, never a lost wakeup or a stuck reader.
 {
     my $path = tmpfile();
     my $b = Data::Buffer::Shared::I64->new($path, 16);
@@ -91,37 +109,36 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'buf_dead_rdr') . '.shm' }
         POSIX::_exit(0);
     }
 
-    # Wait for child to park (writers_waiting > 0).
+    # Wait for child to park (rwait > 0 at offset 72).
     my $deadline = time + 5;
-    my $writers_waiting;
+    my $rwait;
     while (time < $deadline) {
         open my $f, '<', $path or last;
-        seek $f, 80, 0;  # rwlock_writers_waiting at offset 80
+        seek $f, 72, 0;  # rwait at offset 72
         read $f, my $buf, 4;
         close $f;
-        $writers_waiting = unpack 'V', $buf;
-        last if $writers_waiting && $writers_waiting > 0;
+        $rwait = unpack 'V', $buf;
+        last if $rwait && $rwait > 0;
         select(undef, undef, undef, 0.02);
     }
-    ok(($writers_waiting // 0) > 0, "child parked as writer (writers_waiting=$writers_waiting)");
+    ok(($rwait // 0) > 0, "child parked as writer (rwait=$rwait)");
 
     kill 'KILL', $child;
     waitpid $child, 0;
 
-    # Release the lock; phantom writers_waiting remains from dead child.
+    # Release the lock; phantom rwait remains from the dead child.
     $b->unlock_wr;
 
-    # Re-read writers_waiting to confirm it's still phantom (>0) before recovery.
+    # Re-read rwait to confirm it's still phantom (>0) before recovery.
     open my $f, '<', $path or die;
-    seek $f, 80, 0;
+    seek $f, 72, 0;
     read $f, my $buf, 4;
     close $f;
     my $phantom = unpack 'V', $buf;
-    diag "phantom writers_waiting after kill: $phantom";
+    diag "phantom rwait after kill: $phantom";
 
-    # Now a new reader doing lock_rd should NOT yield forever — within
-    # one FUTEX_WAIT timeout, recovery drains the phantom and lock_rd
-    # acquires.
+    # A new reader doing lock_rd gates only on wlock (now 0), so it acquires
+    # immediately regardless of the phantom rwait.
     my $start = time;
     my $ok = eval {
         local $SIG{ALRM} = sub { die "alarm\n" };
@@ -134,7 +151,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'buf_dead_rdr') . '.shm' }
     my $elapsed = time - $start;
     ok($ok, sprintf('reader lock_rd returned after dead-writer (elapsed %.2fs)', $elapsed))
         or diag "stuck after ${elapsed}s: $@";
-    cmp_ok($elapsed, '<', 5, "phantom writers_waiting drained in <5s");
+    cmp_ok($elapsed, '<', 5, "reader acquires despite phantom rwait in <5s");
 
     $b->unlink;
 }

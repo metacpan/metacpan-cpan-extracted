@@ -1,0 +1,262 @@
+NAME
+    Data::CountingBloomFilter::Shared - shared-memory counting Bloom filter
+    for Linux
+
+SYNOPSIS
+        use Data::CountingBloomFilter::Shared;
+
+        # sized for 1_000_000 items at a 1% false-positive rate, anonymous mapping
+        my $cbf = Data::CountingBloomFilter::Shared->new(undef, 1_000_000, 0.01);
+
+        $cbf->add("alice");
+        $cbf->add("bob");
+
+        $cbf->contains("alice");            # 1 (probably present)
+        $cbf->contains("carol");            # 0 (definitely absent)
+
+        # unlike a plain Bloom filter, you can delete
+        $cbf->remove("alice");
+        $cbf->contains("alice");            # 0
+
+        # ...and read an occurrence count (0..15): how many times an item is stored
+        $cbf->add("x"); $cbf->add("x");
+        $cbf->count_of("x");                # 2
+
+        # bulk add in a single lock acquisition
+        my $n = $cbf->add_many([ map { "user-$_" } 1 .. 1000 ]);
+
+        # share across processes via a backing file
+        my $shared = Data::CountingBloomFilter::Shared->new("/tmp/seen.cbf", 1_000_000);
+
+DESCRIPTION
+    A counting Bloom filter in shared memory: like
+    Data::BloomFilter::Shared, a compact fixed-size structure for
+    approximate set membership, but each position is a small 4-bit counter
+    instead of a single bit. That one change buys two things a plain Bloom
+    filter cannot do: you can remove items, and you can ask how many times
+    an item was added ("count_of"). The cost is memory -- four bits per slot
+    instead of one, so about four times the size of the equivalent Bloom
+    filter.
+
+    Membership is still one-sided: "contains" returns "definitely not
+    present" or "probably present". For items you have added (and not
+    removed) it always returns true -- there are no false negatives -- with
+    a small tunable rate of false positives. It never stores the items
+    themselves, only which counters they touch.
+
+    Each item is hashed once with XXH3 (128-bit) and, by double hashing
+    (Kirsch-Mitzenmacher), drives "k" probes into an array of "m" counters.
+    "add" increments each of the item's "k" counters (saturating at 15);
+    "contains" is true when all k are greater than zero; "remove" decrements
+    them (only if the item is present); and "count_of" returns the minimum
+    of the "k" counters -- an estimate of the item's stored occurrence
+    count. From the requested capacity "n" and false-positive rate "p" the
+    filter derives "k = round(-log2 p)" and "m = next_pow2(n * k / ln2)",
+    the same geometry as a Bloom filter.
+
+    The counters saturate at 15: an item added more than 15 times (or
+    colliding with others up to that ceiling) sticks at 15 and is never
+    decremented again, which keeps membership sound (no false negatives) but
+    caps "count_of" and means a saturated item cannot be fully removed.
+    Sizing the filter for its intended load keeps saturation vanishingly
+    rare.
+
+    Because the table lives in a shared mapping, several processes share one
+    filter: any process that opens the same backing file, inherits the
+    anonymous mapping across "fork", or reopens a passed memfd sees the
+    others' additions and removals and contributes its own. A
+    write-preferring futex rwlock with dead-process recovery guards
+    mutation, so many processes may "add", "remove", and "contains"
+    concurrently.
+
+    Removal caveat. "remove" decrements the counters of an item that is
+    present. Because counters are shared between items, decrementing the
+    counters of an item that was never added -- or one whose probes collide
+    with present items -- can push a shared counter to zero and cause a
+    false negative for some other item. Only remove items you actually
+    added, and remove an item as many times as you added it to forget it
+    completely.
+
+    Items are added, tested, and removed by their byte content;
+    wide-character strings (any codepoint above 255) cause a "Wide
+    character" croak -- encode such strings to bytes first (for example with
+    "Encode::encode_utf8"). Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $cbf = Data::CountingBloomFilter::Shared->new($path, $capacity, $fp_rate);
+        my $cbf = Data::CountingBloomFilter::Shared->new(undef, 1_000_000);        # anonymous, 1% default
+        my $cbf = Data::CountingBloomFilter::Shared->new_memfd($name, $capacity, $fp_rate);
+        my $cbf = Data::CountingBloomFilter::Shared->new_from_fd($fd);
+
+    $path is the backing file ("undef" or omitted for an anonymous mapping).
+    $capacity is the number of items you expect to add (at least 1).
+    $fp_rate is the target false-positive rate at that capacity, strictly
+    between 0 and 1 (default 0.01). "new" and "new_memfd" croak on a
+    capacity below 1 or an out-of-range $fp_rate.
+
+    From $capacity and $fp_rate the filter derives "k = round(-log2
+    fp_rate)" (clamped to 1..32) probes and "m = next_pow2(capacity * k /
+    ln2)" 4-bit counters (floor 64), for a "m/2"-byte counter array. When
+    reopening an existing file or memfd the stored geometry wins and the
+    caller's $capacity/$fp_rate arguments are ignored. "new_memfd" creates a
+    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
+    reopens one in another process.
+
+    An optional file mode may be passed as the last argument to "new" (e.g.
+    0660) to opt a newly-created backing file into cross-user sharing; it
+    defaults to 0600 (owner-only) and is ignored for anonymous mappings and
+    existing files.
+
+  Adding, testing, counting, removing
+        my $new   = $cbf->add($item);           # 1 if the item was probably new, else 0
+        my $added = $cbf->add_many(\@items);     # count of adds that were probably new
+        my $in    = $cbf->contains($item);       # 1 if probably present, 0 if definitely absent
+        my $c     = $cbf->count_of($item);       # occurrence estimate 0..15
+        my $gone  = $cbf->remove($item);         # 1 if present and decremented, else 0
+        $cbf->clear;                             # reset to empty
+
+    "add" hashes $item (by its bytes; wide characters croak, encode first)
+    and increments its "k" counters, each saturating at 15. It returns 1 if
+    the item was probably new (at least one of its counters was 0
+    beforehand) or 0 if it was already present. "add_many" takes an array
+    reference and does the whole batch under a single write lock, returning
+    how many of the adds were probably new.
+
+    "contains" returns 1 if the item is probably present (all "k" counters
+    are nonzero) and 0 if it is definitely absent. A 0 means definitely
+    absent: an item you added and have not removed never returns 0 (no false
+    negatives). A 1 may be a false positive.
+
+    "count_of" returns the minimum of the item's "k" counters, an integer
+    from 0 to 15 estimating how many times the item is stored (times added
+    minus removed). Collisions can only raise a counter, so below saturation
+    "count_of" never under-counts -- it is an upper estimate. It saturates
+    at 15: a returned 15 means 15 or more, so an item added more than 15
+    times is under-reported. A 0 means definitely absent.
+
+    "remove", only if the item is present (all "k" counters are nonzero),
+    decrements each of them and returns 1; otherwise it changes nothing and
+    returns 0. Saturated (15) counters are left stuck, so "remove" of a
+    saturated item still returns 1 but cannot lower it -- a saturated item
+    cannot be fully removed. See the Removal caveat in "DESCRIPTION": only
+    remove items you added, and remove an item as many times as it was
+    added. "clear" empties the whole filter (all counters zeroed).
+
+  Merging
+        $cbf->merge($other);                     # counter-wise saturating add
+
+    "merge" adds another filter's counters into this one, counter by
+    counter, saturating each at 15. Both filters must have the same geometry
+    (same "m" and "k", i.e. created with the same capacity and
+    false-positive rate) or "merge" croaks. The other filter is snapshotted
+    under its own read lock, so two processes may safely merge concurrently.
+    After merging, "contains" is true for every item present in either
+    filter and "count_of" reflects the summed (saturated) counts.
+
+  Introspection and lifecycle
+        $cbf->count; $cbf->capacity; $cbf->counters; $cbf->hashes; $cbf->fp_rate;
+        $cbf->stats; $cbf->path; $cbf->memfd; $cbf->sync; $cbf->unlink;
+
+    "count" estimates the number of distinct items currently present (added
+    minus removed, from the fraction of nonzero counters, "-(m/k) * ln(1 -
+    X/m)" where "X" is the nonzero-counter count); it is an estimate, not an
+    exact tally. "capacity" is the configured item capacity; "counters" is
+    the counter count "m" (a power of two); "hashes" is "k"; "fp_rate" is
+    the configured target false-positive rate. "sync" flushes the mapping to
+    its backing store (a no-op for anonymous and memfd filters); "unlink"
+    removes the backing file (also callable as "Class->unlink($path)");
+    "path" returns the backing path ("undef" for anonymous, memfd, or
+    fd-reopened filters) and "memfd" the backing descriptor -- the memfd of
+    a "new_memfd" filter or the dup'd fd of a "new_from_fd" filter, and -1
+    for file-backed or anonymous filters.
+
+STATS
+    stats() returns a hashref describing the filter:
+
+    *   "capacity" -- the configured item capacity.
+
+    *   "fp_rate" -- the configured target false-positive rate.
+
+    *   "counters" -- the counter count "m" (a power of two).
+
+    *   "hashes" -- the number of probes "k" per item.
+
+    *   "counters_set" -- the number of nonzero counters.
+
+    *   "count" -- the estimated number of distinct items added.
+
+    *   "fill_ratio" -- "counters_set / counters", between 0 and 1. As this
+        approaches 1 the filter is saturating and the false-positive rate
+        degrades.
+
+    *   "ops" -- running count of write-path calls ("add", "add_many",
+        "remove", "merge", "clear"), whether or not any counter actually
+        changed.
+
+    *   "mmap_size" -- bytes of the shared mapping.
+
+SHARING ACROSS PROCESSES
+    The filter lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file (every process calls "new($path,
+    ...)" on the same path with a matching capacity), an anonymous mapping
+    inherited across "fork", or a memfd whose descriptor is passed to an
+    unrelated process (over a UNIX socket via "SCM_RIGHTS", or via
+    "/proc/$pid/fd/$n") and reopened with new_from_fd($fd). Because the
+    mapping is shared, every process adds into, tests against, and removes
+    from the same table.
+
+        # producer and consumer share one filter with no coordination
+        my $cbf = Data::CountingBloomFilter::Shared->new(undef, 100_000);   # before fork
+        unless (fork) { $cbf->add_many([ map { "ev-$_" } 1 .. 1000 ]); exit }
+        wait;
+        print $cbf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default, so
+    only the creating user can open and attach them. To share a backing file
+    across users, pass an explicit octal file mode such as 0660 as the last
+    argument to "new"; the mode is applied when the file is created; a
+    pre-existing empty file owned by the caller is adopted as new and
+    likewise gets the requested mode, while a non-empty existing file keeps
+    its own permissions. The file is opened with "O_NOFOLLOW", so a symlink
+    planted at the path is refused, and created with "O_EXCL"; the on-disk
+    header is validated when the file is attached. Any process you grant
+    write access to a shared mapping is trusted not to corrupt its contents
+    while other processes are using it.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership; if a holder dies, the next contender detects the
+    dead owner and recovers. Each "add" and "remove" is a short sequence of
+    counter updates, so a crash leaves the filter consistent up to the last
+    completed operation. Limitation: PID reuse is not detected (very
+    unlikely in practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
+
+SEE ALSO
+    Data::BloomFilter::Shared (membership without delete, one bit per slot),
+    Data::CuckooFilter::Shared (membership with delete and "count_of", no
+    saturation caveat), Data::HyperLogLog::Shared, and the rest of the
+    "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

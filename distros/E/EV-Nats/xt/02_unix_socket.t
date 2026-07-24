@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 use IO::Socket::INET;
+use POSIX ();
 use EV;
 use EV::Nats;
 
@@ -37,9 +38,8 @@ my $sock_path = "$tmp/nats.sock";
 my $socat_pid = fork;
 die "fork: $!" unless defined $socat_pid;
 if ($socat_pid == 0) {
-    exec $socat, "UNIX-LISTEN:$sock_path,fork",
-         "TCP:$host:$port";
-    POSIX::_exit(1);
+    exec($socat, "UNIX-LISTEN:$sock_path,fork",
+         "TCP:$host:$port") or POSIX::_exit(1);
 }
 
 sleep 1;

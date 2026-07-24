@@ -1,5 +1,18 @@
 Revision history for Data-Buffer-Shared
 
+0.06      2026-07-22
+          - On-disk format change (v2 -> v3): an existing 0.05 file is
+            refused; recreate it.
+          - Release a lock still held when its handle is destroyed.
+          - Keep the parent's locks when a forked child's handle is destroyed:
+            the close path now releases only locks the exiting process took
+            itself (pid + fork-generation check, same guard as the reader-slot
+            release).
+          - End the seqlock write section when destroying a handle that holds
+            lock_wr; wrunlock alone left seq odd forever and hung every bulk
+            reader (slice/get_raw/Str get).
+          - Reject Str lengths above 2^32.
+
 0.05  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "Sys-OsRelease",
-  "dist_version" => "0.4.3",
+  "dist_version" => "0.4.4",
   "license" => "artistic_2",
   "module_name" => "Sys::OsRelease",
   "recursive_test_files" => 1,

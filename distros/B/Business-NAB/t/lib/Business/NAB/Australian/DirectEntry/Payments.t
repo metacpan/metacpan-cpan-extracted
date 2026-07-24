@@ -146,6 +146,11 @@ subtest 'rounding' => sub {
 
         my $fh       = File::Temp->new;
         my $tmp_file = $fh->filename;
+
+        # reset the total_record to check we don't hit constraints
+        # when (re)building it from ->to_file
+        $Payments->{total_record} = [];
+
         ok $Payments->to_file( $tmp_file ), 'to_file succeeds';
 
         files_eq_or_diff( $tmp_file, $example_file, { style => 'Unified' } );

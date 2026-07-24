@@ -1,0 +1,31 @@
+---
+abstract: 'A utility to create password hashes'
+author:
+  - 'Mark Dootson <mdootson@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenSearch-Client-Hash
+requires:
+  Crypt::Argon2: '0.013'
+  Crypt::Bcrypt: '0.011'
+  Crypt::PBKDF2: '0.161520'
+  Crypt::URandom: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/markdootson/opensearch-client-perl/issues
+  homepage: https://metacpan.org/pod/OpenSearch::Client::Hash
+  repository: git://github.com/markdootson/opensearch-client-perl.git
+version: '3.007010'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Apache-2.0

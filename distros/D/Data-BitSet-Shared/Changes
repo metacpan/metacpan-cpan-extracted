@@ -1,5 +1,11 @@
 Revision history for Data::BitSet::Shared
 
+0.05  2026-07-23
+    - Derive the data pointer from the validated layout.
+    - Resolve argument magic before capturing the path string.
+    - Re-read the class name at the point of use in the constructors, so a
+      later argument's magic cannot dangle the INPUT-captured PV.
+
 0.04  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

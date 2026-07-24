@@ -17,3 +17,15 @@ CPAN
 CPANTS
 GPL
 MetaCPAN
+FCGI
+POSTing
+Tmpdir
+WAF
+XSS
+cgi
+documentroot
+mustleak
+param
+params
+tmpdir
+www

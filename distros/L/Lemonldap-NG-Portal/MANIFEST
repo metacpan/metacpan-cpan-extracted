@@ -679,6 +679,7 @@ t/28-AuthChoice-with-over.t
 t/28-AuthChoice-with-rules.t
 t/28-AuthChoice-with-token.t
 t/29-AuthGPG.t
+t/29-AuthKerberos-Choice.t
 t/29-AuthSSL.t
 t/29-AuthWebAuthn-Choice.t
 t/29-AuthWebAuthn.t
@@ -702,6 +703,7 @@ t/30-Auth-Oidc-Reauth.t
 t/30-Auth-ResolutionRule.t
 t/30-Auth-Saml-Reauth.t
 t/30-Auth-SAML-with-choice.t
+t/30-CDC-open-redirect.t
 t/30-CDC.t
 t/30-Lazy-Loading.t
 t/30-SAML-Federation-Config.t
@@ -716,6 +718,7 @@ t/30-SAML-POST-Logout-when-removed.t
 t/30-SAML-POST-with-2F-and-Notification.t
 t/30-SAML-POST-with-2F-UpgradeOnly.t
 t/30-SAML-POST-with-Notification.t
+t/30-SAML-ReAuth-with-Choice-Kerberos.t
 t/30-SAML-ReAuth-with-choice.t
 t/30-SAML-ReAuth-with-Cmb-Kerberos.t
 t/30-SAML-ReAuth.t
@@ -782,6 +785,7 @@ t/32-OIDC-Code-Flow-with-2F-UpgradeOnly.t
 t/32-OIDC-Code-Flow-with-2F.t
 t/32-OIDC-Double-Keys-without-kid.t
 t/32-OIDC-Double-Keys.t
+t/32-OIDC-gateway-custom-sub.t
 t/32-OIDC-Grant-Type-OAuth2-Handler-Rules.t
 t/32-OIDC-Grant-Type-Rules.t
 t/32-OIDC-Hook-GetRpConfig.t

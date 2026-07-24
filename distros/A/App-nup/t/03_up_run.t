@@ -52,4 +52,22 @@ is(run('-Mup --bs=round-box --no-pager -- true')->status, 0, '--bs option works'
 is(run('-Mup --ls=truncate --no-pager -- true')->status, 0, '--ls=truncate works');
 is(run('-Mup --ls=wrap --no-pager -- true')->status, 0, '--ls=wrap works');
 
+# Test pager selection by NUP_PAGER / NUP_PAGE_PAGER
+subtest 'pager environment' => sub {
+    local $ENV{NUP_PAGER}      = q(perl -pe s/^/NORMAL:/);
+    local $ENV{NUP_PAGE_PAGER} = q(perl -pe s/^/PAGE:/);
+    like(run('-Mup -- echo hello')->stdout, qr/^PAGE:/m,
+         'page mode uses NUP_PAGE_PAGER');
+    like(run('-Mup --no-paginate -- echo hello')->stdout, qr/^NORMAL:/m,
+         'no-paginate mode uses NUP_PAGER');
+    like(run(q(-Mup --pager='perl -pe s/^/CLI:/' -- echo hello))->stdout,
+         qr/^CLI:/m, '--pager overrides environment');
+    {
+        local %ENV = %ENV;
+        delete $ENV{NUP_PAGE_PAGER};
+        like(run('-Mup -- echo hello')->stdout, qr/^NORMAL:/m,
+             'page mode falls back to NUP_PAGER');
+    }
+};
+
 done_testing;

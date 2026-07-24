@@ -1,5 +1,12 @@
 Revision history for Perl extension App-nup
 
+1.08 2026-07-24T00:38:07Z
+
+    - Add NUP_PAGE_PAGER environment variable, used in place of
+      NUP_PAGER when the output is page-structured.  Parallel layout
+      (multiple files or -V view) has no page structure, so page mode
+      is disabled there and NUP_PAGER is used.
+
 1.07 2026-03-02T06:26:15Z
 
     - Rename --fold/-F to --no-paginate/-F for clarity

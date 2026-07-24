@@ -1,7 +1,7 @@
 package Data::Graph::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Graph::Shared', $VERSION);
 
@@ -74,6 +74,11 @@ B<Linux-only>. Requires 64-bit Perl.
     my $g = Data::Graph::Shared->new_memfd($name, $max_nodes, $max_edges);
     my $g = Data::Graph::Shared->new_from_fd($fd);                    # reopen memfd
 
+C<$max_nodes> is rounded up to the next even number for alignment, so
+C<< $g->max_nodes >> may report one more than requested; C<$max_edges> is the
+edge-slot capacity. An optional trailing octal C<$mode> (see L</SECURITY>) sets
+the backing-file permissions.
+
 =head2 Operations
 
     my $id = $g->add_node($data);            # returns node index or undef
@@ -107,6 +112,25 @@ B<Linux-only>. Requires 64-bit Perl.
     my $fd = $g->fileno;          # current eventfd fd, or -1
     $g->notify;                   # write 1 to eventfd (caller signals update)
     my $n = $g->eventfd_consume;  # read+reset eventfd counter
+
+=head1 CONCURRENCY AND CRASH SAFETY
+
+The graph lives entirely in a shared memory mapping, so multiple processes
+that attach the same backing file (or inherit the same anonymous/memfd
+mapping) operate on one shared structure. All mutating operations are
+serialized by a single process-shared exclusive mutex stored in the mapping
+header; it is implemented directly on a Linux futex, so it works across
+unrelated processes without any pthread setup.
+
+The mutex records the PID of its current owner. If a process dies while
+holding the lock, a waiter that times out detects the dead (or zombie) owner
+via C<kill(pid, 0)> plus a F</proc> liveness check, reclaims the lock, and
+proceeds. This keeps a crash from wedging the whole graph, but it cannot
+undo a mutation that was only half-applied at the moment of death, so a peer
+crashing mid-write may leave the structure in an inconsistent state.
+
+Any process you grant write access to the mapping is trusted not to corrupt
+it. This is B<Linux-only> (it relies on futex and F</proc>).
 
 =head1 BENCHMARKS
 

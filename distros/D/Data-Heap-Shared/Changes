@@ -1,5 +1,12 @@
 Revision history for Data::Heap::Shared
 
+0.07      2026-07-22
+          - Fix a use-after-free in pop_wait(): an overloaded or tied timeout
+            argument runs Perl that can destroy the heap, after which the
+            already-captured handle was still used. Such a call now croaks.
+          - Read the shared size once per push/pop, not repeatedly.
+          - Resolve argument magic before capturing the path string.
+
 0.06  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

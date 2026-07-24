@@ -1,11 +1,13 @@
 package File::ContentStore;
-$File::ContentStore::VERSION = '1.004';
-use 5.014;
+$File::ContentStore::VERSION = '1.005';
+use 5.020;
+use warnings;
+use experimental 'signatures';
 
-use Carp qw( croak );
-use Types::Standard qw( slurpy Object Bool Str ArrayRef HashRef CodeRef );
+use Carp qw( carp croak );
+use Types::Standard qw( slurpy Object Bool Int Str ArrayRef HashRef CodeRef );
 use Types::Path::Tiny qw( Dir File );
-use Type::Params qw( compile );
+use Type::Params qw( signature_for );
 use Digest;
 
 use Moo;
@@ -25,7 +27,7 @@ has digest => (
 );
 
 has parts => (
-    is => 'lazy',
+    is      => 'lazy',
     builder =>
       sub { int( length( Digest->new( shift->digest )->hexdigest ) / 32 ) },
     init_arg => undef,
@@ -41,7 +43,6 @@ has check_for_collisions => (
 has make_read_only => (
     is       => 'ro',
     isa      => Bool,
-    required => 1,
     default  => 1,
 );
 
@@ -55,8 +56,7 @@ has inode => (
     is       => 'lazy',
     isa      => HashRef,
     init_arg => undef,
-    builder  => sub {
-        my ($self) = @_;
+    builder  => sub ($self) {
         my $re = qr{
             ^
             ${ \( '[a-f0-9][a-f0-9]/' x $self->parts ) }
@@ -65,16 +65,24 @@ has inode => (
                       - 2 * $self->parts ) ) }
             $
         }x;
-        $self->path->visit(
+        my $root = $self->path;
+        $root->visit(
             sub {
                 my ( $path, $inode ) = @_;
-                my $rel = $path->relative( $self->path )->stringify;
+                my $rel = $path->relative($root)->stringify;
                 $inode->{ $path->stat->ino } = $rel
                   if -f && $rel =~ $re;
             },
             { recurse => 1 }
         );
     },
+);
+
+has dev => (
+    is       => 'lazy',
+    isa      => Int,
+    init_arg => undef,
+    builder  => sub ($self) { $self->path->stat->dev },
 );
 
 # if a single non-hashref argument is given, assume it's 'path'
@@ -97,19 +105,31 @@ sub BUILD {
 my $BUFF_SIZE = 1024 * 32;
 my $DIGEST_OPTS = { chunk_size => $BUFF_SIZE };
 
-sub link_file {
-    state $check = compile( Object, File );
-    my ( $self, $file ) = $check->(@_);
+signature_for link_file => ( positional => [ Object, File ] );
+signature_for link_dir  => ( positional => [ Object, slurpy ArrayRef [Dir] ] );
+
+sub link_file ( $self, $file ) {
 
     # skip non-files and symbolic links
     return unless -f $file && !-l $file;
 
+    my $root = $self->path;
+
+    # skip files on a different filesystem than the store
+    if ( $file->stat->dev != $self->dev ) {
+        local our @CARP_NOT = qw( Path::Tiny );
+        carp sprintf
+          "%s (%d) and %s (%d) are on different devices. Skipping",
+          $file, $file->stat->dev, $root, $self->dev;
+        return;
+    }
+
     my ( $digest, $content, $done );
 
-    # check if the file's inode is in the cache
+    # check if the file's inode is in the cache already
     if ( $content = $self->inode->{ $file->stat->ino } ) {
         $digest  = $content =~ s{/}{}gr;
-        $content = $self->path->child($content);
+        $content = $root->child($content);
         $done    = 1;
     }
 
@@ -117,7 +137,7 @@ sub link_file {
     else {
         $digest = $file->digest( $DIGEST_OPTS, $self->digest );
         $content =
-          $self->path->child(
+          $root->child(
             map( { substr $digest, 2 * $_, 2 } 0 .. $self->parts - 1 ),
             substr( $digest, 2 * $self->parts ) );
     }
@@ -156,22 +176,19 @@ sub link_file {
 
     # add the inode to the cache
     $self->inode->{ $content->stat->ino } =
-      $content->relative( $self->path )->stringify;
+      $content->relative($root)->stringify;
 
     return $content;
 }
 
-sub link_dir {
-    state $check = compile( Object, slurpy ArrayRef[Dir] );
-    my ( $self, $dirs ) = $check->(@_);
-
+sub link_dir ( $self, $dirs ) {
     $_->visit( sub { $self->link_file($_) if -f }, { recurse => 1 } )
       for @$dirs;
 }
 
-sub fsck {
-    my ($self) = @_;
-    $self->path->visit(
+sub fsck ($self) {
+    my $root = $self->path;
+    $root->visit(
         sub {
             my ( $path, $state ) = @_;
 
@@ -180,7 +197,7 @@ sub fsck {
                 # empty directory
                 push @{ $state->{empty} }, $path unless $path->children;
             }
-            elsif( -l $path ) {
+            elsif ( -l $path ) {
                 push @{ $state->{symlink} }, $path;
             }
             else {
@@ -192,7 +209,7 @@ sub fsck {
                 # content does not match name
                 my $digest = $path->digest( $DIGEST_OPTS, $self->digest );
                 push @{ $state->{corrupted} }, $path
-                  if $digest ne $path->relative( $self->path ) =~ s{/}{}gr;
+                  if $digest ne $path->relative($root) =~ s{/}{}gr;
             }
         },
         { recurse => 1 },
@@ -214,7 +231,7 @@ File::ContentStore - A store for file content built with hard links
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -232,7 +249,7 @@ digest of the content in the file.
 
 When linking a new file to the content store, a hard link is created
 to the file, named after the digest of the content. When a file which
-content is already in the store is linked in, the file is hard linked
+content already exists in the store is linked in, the file is hard linked
 to the content file in the store.
 
 =head2 Example and detailed operation
@@ -240,7 +257,7 @@ to the content file in the store.
 For a more complete definition of a hard link, see
 L<https://en.wikipedia.org/wiki/Hard_link>.
 
-Assuming we have directory containing the following files: F<file1>
+Assuming we have a directory containing the following files: F<file1>
 (inode 123456), F<file2> (inode 456789) and F<file3> (inode 789012,
 content identical to F<file1>). In the examples below, files are
 sorted by inode.
@@ -249,7 +266,7 @@ After linking F<file1> into the content store, we have the following:
 
     Directory                Content store
     ---------                -------------
-    [123456] file1           [123456] d4/1d/8cd98f00b279d1c00998ecf8427e
+    [123456] file1           [123456] d4/1d8cd98f00b279d1c00998ecf8427e
     [456789] file2
     [789012] file3
 
@@ -257,17 +274,17 @@ After linking F<file2>:
 
     Directory                Content store
     ---------                -------------
-    [123456] file1           [123456] d4/1d/8cd98f00b279d1c00998ecf8427e
-    [456789] file2           [456789] 8a/80/52e7a4f99c54b966a74144fe5761
+    [123456] file1           [123456] d4/1d8cd98f00b279d1c00998ecf8427e
+    [456789] file2           [456789] 8a/8052e7a4f99c54b966a74144fe5761
     [789012] file3
 
 And finally, after linking F<file3>, we have this:
 
     Directory                Content store
     ---------                -------------
-    [123456] file1           [123456] d4/1d/8cd98f00b279d1c00998ecf8427e
+    [123456] file1           [123456] d4/1d8cd98f00b279d1c00998ecf8427e
     [123456] file3
-    [456789] file2           [456789] 8a/80/52e7a4f99c54b966a74144fe5761
+    [456789] file2           [456789] 8a/8052e7a4f99c54b966a74144fe5761
 
 i.e. the inode that was holding the content of F<file3> is lost, and the
 name now points to the same inode as F<file1> and its content file.
@@ -281,6 +298,14 @@ If the goal is deduplication and hard-linking of identical files, once
 all the files have been linked through the content store, the content
 store is not needed any more, and can be deleted.
 
+For longer term incremental deduplication, the store can be retained as
+new files are linked into it. The only extra cost in space comes when
+files are deleted from the directories linked into the store.  To remove
+the now unneeded content files, one can run the following shell command
+from the store's root directory:
+
+    find . -type f -links 1 -delete
+
 Note that since permissions are attached to the inode (and not the
 individual files), this implies that, when linking a file with the content
 store, it will set the initial permissions of the content file if it
@@ -292,6 +317,13 @@ does not exist, and otherwise inherit the permissions of the content file.
 
 The location of the directory where the content files are stored.
 (Required.)
+
+=head2 dev
+
+The device number of the filesystem holding the L</path>.
+
+This is used internally to avoid trying to link files from a different
+device into the content store.
 
 =head2 digest
 
@@ -320,6 +352,9 @@ For example, the empty file would be linked to:
 
     # digest = SHA-256, parts = 2
     e3/b0/c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+    # digest = SHA-256, parts = 4
+    cf/83/e1/35/7eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
 
 =head2 check_for_collisions
 
@@ -436,7 +471,7 @@ Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2018-2019 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2018-2026 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

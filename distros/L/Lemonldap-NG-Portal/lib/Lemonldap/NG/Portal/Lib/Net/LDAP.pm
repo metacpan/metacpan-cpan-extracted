@@ -1,4 +1,4 @@
-##@file
+#@file
 # Extends Net::LDAP
 package Lemonldap::NG::Portal::Lib::Net::LDAP;
 
@@ -9,6 +9,7 @@ use base            qw(Net::LDAP);
 use Lemonldap::NG::Portal::Main::Constants ':all';
 use Net::LDAP::Control::PasswordPolicy;
 use Encode;
+use utf8;
 use Scalar::Util 'weaken';
 use IO::Socket::Timeout;
 use Net::LDAP qw(LDAP_PP_PASSWORD_EXPIRED LDAP_PP_ACCOUNT_LOCKED
@@ -17,9 +18,7 @@ use Net::LDAP qw(LDAP_PP_PASSWORD_EXPIRED LDAP_PP_ACCOUNT_LOCKED
   LDAP_PP_PASSWORD_TOO_SHORT LDAP_PP_PASSWORD_TOO_YOUNG
   LDAP_PP_PASSWORD_IN_HISTORY );
 
-use utf8;
-
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 # INITIALIZATION
 
@@ -47,9 +46,14 @@ sub new {
         }
         push @servers, $server;
     }
-    $tlsParams{cafile} ||= $conf->{ldapCAFile} if $conf->{ldapCAFile};
-    $tlsParams{capath} ||= $conf->{ldapCAPath} if $conf->{ldapCAPath};
-    $tlsParams{verify} ||= $conf->{ldapVerify} if $conf->{ldapVerify};
+    $tlsParams{cafile}     ||= $conf->{ldapCAFile} if $conf->{ldapCAFile};
+    $tlsParams{capath}     ||= $conf->{ldapCAPath} if $conf->{ldapCAPath};
+    $tlsParams{verify}     ||= $conf->{ldapVerify} if $conf->{ldapVerify};
+    $tlsParams{clientcert} ||= $conf->{ldapClientCert}
+      if $conf->{ldapClientCert};
+    $tlsParams{clientkey} ||= $conf->{ldapClientKey}
+      if $conf->{ldapClientKey};
+    require Authen::SASL if $conf->{ldapClientCert};
     $self = Net::LDAP->new(
         \@servers,
         onerror   => undef,
@@ -107,6 +111,7 @@ sub new {
 # Reimplementation of Net::LDAP::bind(). Connection is done :
 # - with $dn and $args->{password} as dn/password if defined,
 # - or with Lemonldap::NG account,
+# - or with mTLS,
 # - or with an anonymous bind.
 # @param $dn LDAP distinguish name
 # @param %args See Net::LDAP(3) manpage for more
@@ -159,13 +164,23 @@ sub bind {
             }
         }
     }
+    elsif ( $self->{conf}->{ldapClientCert} && $self->{conf}->{ldapClientKey} )
+    {
+        $self->{portal}->logger->debug('Call mTLS bind');
+        my $sasl = Authen::SASL->new(
+            mechanism => 'EXTERNAL',
+            callback => { user => '' }
+        );
+        $mesg = $self->SUPER::bind( undef, sasl => $sasl );
+    }
     else {
+        $self->{portal}->logger->debug('Call anonymous bind');
         $mesg = $self->SUPER::bind();
     }
     return $mesg;
 }
 
-# check_password policy error code thanks to ldap response
+# Check_password policy error code thanks to ldap response
 # input: ldap response
 # return: ( llng_code, ppolicy_error_code, ppolicy_error_msg )
 sub check_ppolicy {

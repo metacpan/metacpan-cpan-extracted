@@ -178,24 +178,24 @@ C<< ->new($path, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap) >>
 
 =over
 
-=item * B<$max_entries> — table capacity (it grows/shrinks elastically up to
+=item * B<$max_entries> -- table capacity (it grows/shrinks elastically up to
 this). Round up for your peak live-key count.
 
-=item * B<$max_size> — LRU cap (0 = no eviction). Set to bound memory; entries
+=item * B<$max_size> -- LRU cap (0 = no eviction). Set to bound memory; entries
 beyond it evict least-recently-used.
 
-=item * B<$ttl> — default per-entry TTL in seconds (0 = none). Set for caches /
+=item * B<$ttl> -- default per-entry TTL in seconds (0 = none). Set for caches /
 windows; combine with C<$max_size> for a bounded TTL cache.
 
-=item * B<$lru_skip> — LRU promotion-skip percentage (0-99, default 0). Leave at
+=item * B<$lru_skip> -- LRU promotion-skip percentage (0-99, default 0). Leave at
 0; raise only if profiling shows write-lock contention from LRU promotions on a
 Zipfian workload. See L<Data::HashMap::Shared/Constructor>.
 
-=item * B<$arena_cap> — string-storage bytes (0 = C<max(max_entries*128, 4096)>).
+=item * B<$arena_cap> -- string-storage bytes (0 = C<max(max_entries*128, 4096)>).
 Set explicitly when a few large string keys/values would otherwise exhaust the
 default; integer-only variants ignore it.
 
-=item * B<shards> (C<new_sharded($prefix, $shards, ...)>) — independent maps with
+=item * B<shards> (C<new_sharded($prefix, $shards, ...)>) -- independent maps with
 independent locks for write-heavy workloads; per-key ops route automatically,
 and the sizing args above are B<per shard>.
 

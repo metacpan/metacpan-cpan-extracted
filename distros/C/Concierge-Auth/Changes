@@ -1,5 +1,28 @@
 Revision history for Concierge-Auth
 
+v0.5.2  2026-07-23
+    - BREAKING: Concierge::Auth->new's constructor key renamed from
+      backend to backend_class, to disambiguate it from the unrelated
+      "friendly name" sense of backend used elsewhere in the Concierge
+      suite (Concierge::Sessions, Concierge::Users, and the auth/
+      sessions/users blocks of a Concierge desk's build config all
+      accept a short friendly name like 'pwd'/'database'/'file' under
+      backend; Concierge::Auth's own key has always required an
+      already-resolved, fully-qualified class name, which backend_class
+      now makes explicit). Updated the two internal call sites in the
+      core Concierge repo (Concierge.pm and Desk::Setup.pm) accordingly.
+    - Removed the 10 stale examples/*.pl scripts (01-basic-authentication.pl
+      through 10-architecture-comparison.pl) and their coverage in
+      examples/README.md: all called removed methods (checkID/checkPwd/
+      setPwd/resetPwd/deleteID) and used the pre-v0.5.0 hashref constructor.
+      Archived copies are kept outside this distribution, in the core
+      Concierge repo's ZZZ_archive/Concierge-Auth-examples/.
+    - Renamed examples/11-custom-backend-ldap.pl to
+      examples/1-custom-backend-ldap.pl, now the sole example; rewrote
+      examples/README.md to describe just this one script plus a note that
+      more examples are planned.
+    - Updated MANIFEST to match.
+
 v0.5.1  2026-07-16
     - Base.pm: gen_token/gen_crypt_token now call gen_random_token
       directly instead of going through Generators::gen_token/

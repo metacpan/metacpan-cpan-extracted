@@ -1,3 +1,7 @@
+2.0	kraih Thu Jul 23 13:50:00 CEST 2026
+  - Big module cleanup to make packaging for Linux distributions easier.
+  - Removed bundled mime helper scripts.
+
 1.5	kraih Tue Jul 22 14:30:00 CEST 2026
   - Fixed non-portable tests failing.
 

@@ -28,23 +28,26 @@ recommends:
   List::Util: '0'
   Pod::Usage: '0'
   Time::HiRes: '0'
+  Unicode::EastAsianWidth: '0'
   Unicode::EastAsianWidth::Detect: '0'
   lib: '0'
+  threads: '0'
 requires:
   Carp: '0'
   Exporter: '0'
   IO::File: '0'
   Params::Check: '0'
   Scalar::Util: '0'
+  Time::HiRes: '0'
+  Unicode::Normalize: '0'
   Win32::API: '0.75'
   Win32::Console: '0.1'
-  Win32::IPC: '1.11'
   Win32API::File: '0.1201'
   constant: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/brickpool/Termbox/issues
   repository: https://github.com/brickpool/Termbox.git
-version: v0.5.1
+version: v0.5.3
 x_homepage: http://brickpool.de
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

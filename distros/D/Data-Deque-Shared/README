@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
         use Data::Deque::Shared;
+        use feature 'say';
 
         my $dq = Data::Deque::Shared::Int->new(undef, 100);
         $dq->push_back(1);
@@ -64,11 +65,52 @@ DESCRIPTION
     unaffected.
 
 METHODS
+  Constructors
+    There are two concrete subclasses; the base class "Data::Deque::Shared"
+    is not instantiated directly.
+
+    "Data::Deque::Shared::Int" stores 64-bit signed integers:
+
+        my $dq = Data::Deque::Shared::Int->new($path, $capacity, $mode);
+        my $dq = Data::Deque::Shared::Int->new_memfd($name, $capacity);
+        my $dq = Data::Deque::Shared::Int->new_from_fd($fd);
+
+    "Data::Deque::Shared::Str" stores byte/UTF-8 strings in fixed-size
+    slots:
+
+        my $sq = Data::Deque::Shared::Str->new($path, $capacity, $max_len, $mode);
+        my $sq = Data::Deque::Shared::Str->new_memfd($name, $capacity, $max_len);
+        my $sq = Data::Deque::Shared::Str->new_from_fd($fd);
+
+    For "new", $path may be "undef" for an anonymous (private) mapping, or a
+    filesystem path for a file-backed mapping shared across processes.
+    $capacity is the number of slots (must be > 0 and <= 2^31); it is
+    rounded up to the next power of two, and "capacity"/"stats" report that
+    rounded value. For the Str variant, $max_len is the maximum stored byte
+    length per entry (must be > 0 and < 2 GiB); longer values are truncated.
+    $mode is an optional octal file permission mode applied only when a
+    backing file is created (default 0600); see "SECURITY".
+
+    "new_memfd" creates an anonymous "memfd" sealed mapping named $name;
+    retrieve its descriptor with "memfd" and re-attach in another process
+    (after passing the fd across, e.g. via "SCM_RIGHTS") with "new_from_fd".
+
+    All constructors croak on failure.
+
   Push / Pop
         $dq->push_back($val);          $dq->push_front($val);
         $dq->push_back_wait($val, $t); $dq->push_front_wait($val, $t);
         my $v = $dq->pop_front;        my $v = $dq->pop_back;
         my $v = $dq->pop_front_wait($t); my $v = $dq->pop_back_wait($t);
+
+    The non-blocking "push_back" / "push_front" return true on success and
+    false if the deque is full. "pop_front" / "pop_back" return the value,
+    or "undef" if the deque is empty.
+
+    The *_wait variants block until the operation can proceed or the
+    optional timeout $t (fractional seconds; omitted or negative means wait
+    forever) elapses. "push_*_wait" return true on success, false on
+    timeout; "pop_*_wait" return the value, or "undef" on timeout.
 
   Status
         $dq->size;  $dq->capacity;  $dq->is_empty;  $dq->is_full;

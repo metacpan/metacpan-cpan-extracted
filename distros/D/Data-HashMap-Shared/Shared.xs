@@ -20,12 +20,23 @@
 
 /* ---- Exception-safe lock guard for rdlock held across Perl API calls ---- */
 
+/* Release the lock, then drop the depth taken by the guard. If a $obj->DESTROY
+ * arrived from argument magic while we held the lock, shm_close_map deferred
+ * the free precisely so this cleanup could still run on a live handle; perform
+ * it now that the last lock is gone. */
+static void shm_guard_leave(ShmHandle *h) {
+    if (--h->lock_depth == 0 && h->pending_close) shm_close_map_now(h);
+}
+
 static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
-    shm_rwlock_rdunlock((ShmHandle *)ptr);
+    ShmHandle *h = (ShmHandle *)ptr;
+    shm_rwlock_rdunlock(h);
+    shm_guard_leave(h);
 }
 
 #define RDLOCK_GUARD(handle) \
     shm_rwlock_rdlock(handle); \
+    (handle)->lock_depth++; \
     SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
 /* ---- Exception-safe guard for a wrlock + seqlock write section ----
@@ -39,16 +50,18 @@ static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
     ShmHandle *h = (ShmHandle *)ptr;
     shm_seqlock_write_end(&h->hdr->seq);
     shm_rwlock_wrunlock(h);
+    shm_guard_leave(h);
 }
 
 #define WRSEQ_GUARD(handle) \
     shm_rwlock_wrlock(handle); \
     shm_seqlock_write_begin(&(handle)->hdr->seq); \
+    (handle)->lock_depth++; \
     SAVEDESTRUCTOR_X(shm_wrseq_unlock_cleanup, (void*)(handle))
 
 /* Exception-safe free() for malloc'd scratch buffers (e.g. drain's value
  * buffer) held across newSVpvn() in a result-build loop: an OOM croak there
- * must not leak the buffer. free() (not Safefree) — the buffer comes from the
+ * must not leak the buffer. free() (not Safefree) -- the buffer comes from the
  * C realloc() in shm_grow_buf, a different pool than the Perl allocator. */
 static void shm_free_cleanup(pTHX_ void *ptr) {
     free(ptr);
@@ -60,7 +73,18 @@ static void shm_free_cleanup(pTHX_ void *ptr) {
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed %s object", classname)
+    if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic).  That code may call $obj->DESTROY explicitly, which frees
+ * the handle and zeroes the IV; EXTRACT_MAP's mortal pins the referent only
+ * against refcount-driven destruction, not an explicit DESTROY, so the local
+ * h would dangle.  Used only where magic can actually intervene between
+ * EXTRACT_MAP and the first use of h. */
+#define REEXTRACT_MAP(classname, sv) \
+    h = INT2PTR(ShmHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("%s object destroyed during the call", classname)
 
 #define EXTRACT_STR_KEY(sv) \
     STRLEN _klen; \
@@ -94,7 +118,15 @@ static void shm_free_cleanup(pTHX_ void *ptr) {
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(sv))); \
-    if (!c) croak("Attempted to use a destroyed %s cursor", classname)
+    if (!c) croak("Attempted to use a destroyed %s cursor", classname); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))   /* pin the invocant across the method (reentrant-DESTROY UAF guard) */
+
+/* Cursor counterpart of REEXTRACT_MAP: same explicit-DESTROY hazard, applied
+ * to the cursor pointer where argument magic runs between EXTRACT_CURSOR and
+ * the first use of c. */
+#define REEXTRACT_CURSOR(classname, sv) \
+    c = INT2PTR(ShmCursor*, SvIV(SvRV(sv))); \
+    if (!c) croak("%s cursor destroyed during the call", classname)
 
 /* ---- Generic keyword build functions ---- */
 
@@ -1238,3 +1270,26 @@ INCLUDE: xs/si16.xs
 INCLUDE: xs/si32.xs
 INCLUDE: xs/si.xs
 INCLUDE: xs/ss.xs
+
+MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared
+
+# Offline migration of a backing file written by the previous release (on-disk
+# format v9) to the current format (v10).  Variant-agnostic (a byte-level
+# structural upcast).  Returns 1 if upgraded, 0 if already current; croaks on a
+# bad/locked/unsupported file.  No process may have the file mapped.
+IV
+upgrade_file(class, path_sv)
+    char *class
+    SV *path_sv
+  CODE:
+    char errbuf[SHM_ERR_BUFLEN];
+    const char *path;
+    int r;
+    PERL_UNUSED_VAR(class);
+    path = (SvGETMAGIC(path_sv), SvOK(path_sv)) ? SvPV_nolen(path_sv) : NULL;
+    if (!path) croak("Data::HashMap::Shared->upgrade_file: path is required");
+    r = shm_upgrade_file(path, errbuf);
+    if (r < 0) croak("Data::HashMap::Shared->upgrade_file: %s", errbuf);
+    RETVAL = r;
+  OUTPUT:
+    RETVAL

@@ -545,6 +545,8 @@
 "ldapCAFile":"נתיב לקובץ רשות אישורים",
 "ldapCAPath":"נתיב לתיקיית רשות אישורים",
 "ldapChangePasswordAsUser":"החלפה כמשתמש",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"חיבור",
 "ldapExportedVars":"משתנים מיוצאים",
 "ldapFilters":"מסננים",

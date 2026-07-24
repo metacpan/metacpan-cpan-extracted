@@ -1,7 +1,7 @@
 package Data::Heap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::Heap::Shared', $VERSION);
 
@@ -46,30 +46,195 @@ is triggered in a critical application.
 
 B<Linux-only>. Requires 64-bit Perl.
 
+=head1 CONSTRUCTORS
+
+=head2 new
+
+    my $heap = Data::Heap::Shared->new($path, $capacity);
+    my $heap = Data::Heap::Shared->new($path, $capacity, $mode);
+    my $heap = Data::Heap::Shared->new(undef, $capacity);
+
+Create or attach a heap. C<$capacity> is the maximum number of
+elements. If C<$path> is a defined filename, the heap is backed by
+that file (created if absent, attached if present). If C<$path> is
+C<undef>, an anonymous mapping is used -- it has no backing file but is
+C<MAP_SHARED>, so it is inherited across C<fork> and shared with child
+processes (an unrelated process simply cannot attach it).
+
+The optional C<$mode> is an octal permission mask applied only when
+the backing file is created; it defaults to C<0600> (owner-only).
+See L</SECURITY>.
+
+Croaks on error (bad capacity, permission denied, header mismatch,
+etc.).
+
+=head2 new_memfd
+
+    my $heap = Data::Heap::Shared->new_memfd($name, $capacity);
+
+Create an anonymous heap backed by a Linux C<memfd>. C<$name> is a
+label for debugging (as shown in C</proc>). The underlying file
+descriptor can be retrieved with L</memfd> and passed to another
+process (e.g. over a unix socket or by inheritance) which attaches
+with L</new_from_fd>. Croaks on error.
+
+=head2 new_from_fd
+
+    my $heap = Data::Heap::Shared->new_from_fd($fd);
+
+Attach to an existing heap given an open file descriptor for its
+backing store (typically obtained from L</memfd> in another process).
+The header is validated on attach. Croaks on error.
+
 =head1 METHODS
 
-    $heap->push($priority, $value);          # returns bool
-    my ($pri, $val) = $heap->pop;            # returns () if empty
-    my ($pri, $val) = $heap->pop_wait;       # blocking
-    my ($pri, $val) = $heap->pop_wait($t);   # with timeout
-    my ($pri, $val) = $heap->peek;           # without removing
+=head2 push
 
-    $heap->size;  $heap->capacity;  $heap->is_empty;  $heap->is_full;
-    $heap->clear;  $heap->stats;  $heap->path;  $heap->memfd;
-    $heap->sync;   $heap->unlink;
+    my $ok = $heap->push($priority, $value);
 
-    # constructors
-    $heap = Data::Heap::Shared->new_memfd($name, $capacity);
-    $heap = Data::Heap::Shared->new_from_fd($fd);
+Insert a C<($priority, $value)> integer pair. Returns true on
+success, or false if the heap is full (see L</is_full>). Wakes one
+blocked L</pop_wait> waiter.
 
-    # eventfd
-    $heap->eventfd;  $heap->eventfd_set($fd);  $heap->fileno;
-    $heap->notify;   $heap->eventfd_consume;
+=head2 pop
 
-=head1 STATS
+    my ($pri, $val) = $heap->pop;
 
-C<stats()> returns: C<size>, C<capacity>, C<pushes>, C<pops>,
-C<waits>, C<timeouts>, C<recoveries>, C<mmap_size>.
+Remove and return the lowest-priority element as a C<($priority,
+$value)> pair. Returns the empty list if the heap is empty.
+
+=head2 pop_wait
+
+    my ($pri, $val) = $heap->pop_wait;         # block forever
+    my ($pri, $val) = $heap->pop_wait($secs);  # block up to $secs
+    my ($pri, $val) = $heap->pop_wait(0);      # non-blocking
+
+Like L</pop>, but blocks (via futex) until an element is available.
+With no argument (or a negative timeout) it blocks indefinitely. A
+timeout of C<0> polls without blocking. A positive fractional
+C<$secs> bounds the wait; on timeout the empty list is returned.
+
+=head2 peek
+
+    my ($pri, $val) = $heap->peek;
+
+Return the lowest-priority element without removing it. Returns the
+empty list if the heap is empty.
+
+=head2 size
+
+    my $n = $heap->size;
+
+Current number of elements.
+
+=head2 capacity
+
+    my $cap = $heap->capacity;
+
+Maximum number of elements (fixed at creation).
+
+=head2 is_empty
+
+    my $bool = $heap->is_empty;
+
+True if C<< size == 0 >>.
+
+=head2 is_full
+
+    my $bool = $heap->is_full;
+
+True if C<< size >= capacity >>.
+
+=head2 clear
+
+    $heap->clear;
+
+Remove all elements (resets size to zero).
+
+=head2 path
+
+    my $p = $heap->path;
+
+The backing file path, or C<undef> for anonymous / memfd heaps.
+
+=head2 memfd
+
+    my $fd = $heap->memfd;
+
+The backing file descriptor: the C<memfd> of a L</new_memfd> heap, or the
+dup'd fd of a L</new_from_fd> heap. Such an fd can be shared with another
+process which attaches via L</new_from_fd>. Returns -1 for file-backed and
+anonymous heaps, which keep no shareable descriptor.
+
+=head2 sync
+
+    $heap->sync;
+
+Flush the mapping to the backing file with C<msync>. Croaks on error.
+No effect for anonymous heaps.
+
+=head2 unlink
+
+    $heap->unlink;
+    Data::Heap::Shared->unlink($path);
+
+Remove the backing file from the filesystem. Called as an instance
+method it unlinks the heap's own path; called as a class method it
+unlinks the given C<$path>. Croaks for anonymous / memfd heaps (no
+path) or on unlink failure. The mapping stays valid until all
+handles are destroyed.
+
+=head2 stats
+
+    my $stats = $heap->stats;
+
+Return a hashref with the keys C<size>, C<capacity>, C<pushes>,
+C<pops>, C<waits>, C<timeouts>, C<recoveries>, and C<mmap_size>.
+The counters are cumulative across all processes sharing the heap.
+
+=head1 EVENTFD NOTIFICATION
+
+An optional C<eventfd> lets an event loop (e.g. L<EV>, L<AnyEvent>,
+L<IO::Async>) wake when the heap is written, instead of blocking in
+L</pop_wait>.
+
+=head2 eventfd
+
+    my $fd = $heap->eventfd;
+
+Create (or return) an eventfd associated with this handle and return
+its file descriptor. Watch it for readability; readiness means
+L</notify> was called. Croaks on error.
+
+=head2 eventfd_set
+
+    $heap->eventfd_set($fd);
+
+Use a caller-supplied file descriptor for notification instead of
+one created by L</eventfd>. Any previously-owned eventfd is closed.
+B<The heap takes ownership of C<$fd>>: it is closed on the next
+C<eventfd_set> and when the heap is destroyed, so pass a C<dup(2)> of
+the descriptor if you need to keep using your own copy.
+
+=head2 fileno
+
+    my $fd = $heap->fileno;
+
+The current notification file descriptor, or -1 if none is set.
+
+=head2 notify
+
+    $heap->notify;
+
+Signal the notification fd (write to the eventfd), making it
+readable. Returns true if a notification was delivered.
+
+=head2 eventfd_consume
+
+    my $count = $heap->eventfd_consume;
+
+Read and clear the eventfd counter, returning the accumulated count,
+or C<undef> if there was nothing to read.
 
 =head1 BENCHMARKS
 

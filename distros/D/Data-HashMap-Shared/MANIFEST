@@ -83,6 +83,7 @@ xt/asan.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
 xt/crash_recovery.t
+xt/destroy_during_call.t
 xt/eacces.t
 xt/edge-cases.t
 xt/eg_runs.t
@@ -90,6 +91,7 @@ xt/fd_leak.t
 xt/fd_validation.t
 xt/fork_live.t
 xt/invalid_args.t
+xt/kwalitee.t
 xt/lru-ttl.t
 xt/manifest_vs_git.t
 xt/memfd_pass.t
@@ -110,5 +112,7 @@ xt/valgrind.t
 xt/valgrind_mp.t
 xt/writer_crash_recovery.t
 xxhash.h
+bin/hashmap-shared-upgrade
+t/24-upgrade.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

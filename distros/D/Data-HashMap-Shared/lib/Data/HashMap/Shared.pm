@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -214,8 +214,8 @@ sized for your strings instead. Clamped to C<[4096, 0xFFFFFFFF]> (arena offsets 
 it. For sharded maps it is the per-shard cap, like C<$max_entries>.
 
 Optional C<$file_mode> (octal, default C<0600>) sets the permission bits
-used when the backing file is created, with C<open(2)> semantics (masked
-by the process umask). It is ignored when attaching an existing file and
+used when the backing file is created; the exact mode is applied via
+C<fchmod>, so the process umask does not narrow it. It is ignored when attaching an existing file and
 for anonymous or memfd-backed maps. The default is owner-only; pass a
 wider mode such as C<0666> to opt in to cross-user sharing. Before
 version 0.14 the default was C<0666>.
@@ -242,8 +242,9 @@ equivalent from the map's point of view).
 =item *
 
 Non-ASCII keys with different byte encodings are B<distinct>. C<"caf\xe9">
-(latin-1, 4 bytes) and C<"café"> with C<use utf8> (5 UTF-8 bytes) are two
-different keys. If your input comes in mixed encodings, normalize with
+(latin-1, 4 bytes) and the same character sequence under C<use utf8>
+(C<"caf\xc3\xa9">, 5 UTF-8 bytes) are two different keys. If your input
+comes in mixed encodings, normalize with
 C<Encode::encode_utf8> before use.
 
 =back
@@ -478,27 +479,39 @@ specific entry being mutated may have stale or partial bytes. Calling
 C<clear> after detecting a stale lock recovery is recommended for
 safety-critical applications.
 
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
+
 =head1 BENCHMARKS
 
 Throughput versus other shared-memory / on-disk solutions, 25K entries,
 single process, Linux x86_64.  All values in M ops/s (higher is better).
 Run C<perl -Mblib bench/vs.pl 25000> to reproduce.
 
-B<Integer key E<rarr> integer value> (Shared::II):
+B<Integer key -> integer value> (Shared::II):
 
               BerkeleyDB   LMDB   Shared::II
     INSERT          31       46         184
     LOOKUP          35       40         383
     INCREMENT       16       18         165
 
-B<String key E<rarr> string value, short> (inline E<le> 7B, Shared::SS):
+B<String key -> string value, short> (inline <= 7B, Shared::SS):
 
               FastMmap   BerkeleyDB   LMDB   SharedMem   Shared::SS
     INSERT        11          26       40        62          130
     LOOKUP        10          32       34       146          213
     DELETE        14          18       --        32           68
 
-B<String key E<rarr> string value, long> (~50-100B, Shared::SS):
+B<String key -> string value, long> (~50-100B, Shared::SS):
 
               BerkeleyDB   LMDB   SharedMem   Shared::SS
     INSERT        25         37        61          133
@@ -536,7 +549,7 @@ Key takeaways:
 
 =item * Atomic C<incr> is B<9x> faster than get+put on competitors
 
-=item * Strings E<le> 7 bytes stored inline in node (zero arena overhead)
+=item * Strings <= 7 bytes stored inline in node (zero arena overhead)
 
 =back
 
@@ -578,6 +591,31 @@ file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
 and created with C<O_EXCL>; the on-disk header is validated when the file is
 attached. Any process you grant write access to a shared mapping is trusted not
 to corrupt its contents while other processes are using it.
+
+=head1 UPGRADING
+
+The on-disk format changed in this release (v9 to v10; a reader-slot occupancy
+bitmap was added). A file-backed map written by an older release is rejected with
+a version-mismatch error when attached. Migrate existing files in place -- with
+no process attached -- using the bundled tool:
+
+    hashmap-shared-upgrade FILE...
+
+or from code:
+
+    my $r = Data::HashMap::Shared->upgrade_file($path);
+    # 1 = upgraded, 0 = already current; croaks on a bad, locked or unknown file
+
+The migration is a structural upcast (no re-hashing): it is written to a sibling
+temporary file and atomically renamed over the original, preserving its mode, and
+refuses to run if a live writer holds the file.
+
+A sharded map (C<new_sharded>) keeps each shard in its own backing file named
+C<PREFIX.0>, C<PREFIX.1>, and so on; upgrade them all, for example:
+
+    hashmap-shared-upgrade PREFIX.*
+
+Anonymous and memfd maps are process-local and need no migration.
 
 =head1 AUTHOR
 

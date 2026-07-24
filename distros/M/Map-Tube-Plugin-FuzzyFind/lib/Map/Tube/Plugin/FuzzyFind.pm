@@ -10,12 +10,16 @@
 #
 package Map::Tube::Plugin::FuzzyFind;
 
-use 5.10.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
+use Carp;
+use Moo::Role;
+use namespace::clean;
+use Try::Tiny;
 
-our $VERSION = version->declare('v0.81.4');
+our $VERSION = version->declare('v0.82.1');
 
 =head1 NAME
 
@@ -23,15 +27,8 @@ Map::Tube::Plugin::FuzzyFind - Map::Tube add-on for finding stations and lines b
 
 =head1 VERSION
 
-Version 0.81.0
+Version 0.82.1
 
-=cut
-
-use 5.010;
-use Carp;
-use Moo::Role;
-use namespace::clean;
-use Try::Tiny;
 
 =head1 DESCRIPTION
 
@@ -237,6 +234,12 @@ also used here by default. This parameter allows to set other values.
 
 =back
 
+=head2 list_fuzzy_matchers( )
+
+Provide an alphabetic list of all supported fuzzy matching algorithms.
+Algorithms that are known but not installed on your machine will be
+marked appropriately.
+
 =cut
 
 # Note: The code comes on purpose in just one sub, in order to prevent
@@ -248,29 +251,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
   my( $self, @tmpargs ) = @_;
   my( %args, $pattern );
 
-  # *** This needs to be re-organised into a hash with pointers to methods.
-  my %methods = ( exact              =>  1,
-                  start              =>  2,
-                  in                 =>  3,
-                  regex              =>  4,
-                  re                 =>  4,
-                  soundex            =>  5,
-                  phonix             =>  6,
-                  daitchmokotoff     =>  7,
-                  dmsoundex          =>  7,
-                  koeln              =>  8,
-                  metaphone          =>  9,
-                  doublemetaphone    => 10,
-                  phonem             => 11,
-                  levenshtein        => 12,
-                  editdistance       => 12,
-                  fuzzy              => 12,
-                  damerau            => 13,
-                  levenshteindamerau => 13,
-                  jarowinkler        => 14,
-                  ngrams             => 15,
-                );
-  my $maxmethod = ( sort { $b <=> $a } values %methods )[0];
+  my %matchers = @{ $self->_known_matchers( ) };
 
   # unify the different ways of passing arguments:
   if ( scalar(@tmpargs) == 1 ) {
@@ -315,13 +296,15 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
   if ( $args{objects} eq 'lines' ) {
     $source = $self->get_lines();
   } elsif ( $args{objects} eq 'stations' ) {
-    $source = [ values %{ $self->nodes() } ];                                # *** replace by $self->get_stations() ***
+    # $source = [ values %{ $self->nodes() } ];                                # *** replace by $self->get_stations() ***
+    $source = $self->get_stations( );                                # *** replace by $self->get_stations() ***
   } else {
-    $source = [ @{ $self->get_lines() }, values %{ $self->nodes() } ];       # *** replace by $self->get_stations() ***
+    # $source = [ @{ $self->get_lines() }, values %{ $self->nodes() } ];       # *** replace by $self->get_stations() ***
+    $source = [ @{ $self->get_lines() }, @{ $self->get_stations( ) } ];       # *** replace by $self->get_stations() ***
   }
 
   # Find the numerical index of the method which we should use:
-  my $nmethod = $methods{ lc( $args{method} ) } // -1;
+  my( $nmethod, @modules ) = @{ $matchers{ lc( $args{method} ) } // [ -1, undef ] };
 
   my @result;
   if ( $nmethod == 1 ) {    ## no critic(ControlStructures::ProhibitCascadingIfElse)
@@ -344,19 +327,19 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
     # Match regex
     $pattern = qr/$pattern/i unless ref($pattern) eq 'Regexp';
     @result  = sort { $a->name() cmp $b->name() } grep { $_->name() =~ $pattern } @{$source};
-  } elsif ( ( $nmethod >= 5 ) && ( $nmethod <= $maxmethod ) ) {
+  # } elsif ( ( $nmethod >= 5 ) && ( $nmethod <= $maxmethod ) ) {
+  } elsif ( $nmethod >= 5 ) {
 
     # Use some well-known fuzzy matcher
     # *** This needs to be cleaned up.
-    my( $module, $loaded, $matcher );
+    my( $loaded, $matcher );
     $pattern = lc($pattern);
     $pattern =~ s/\s+//g;
     try {
       if ( $nmethod == 5 ) {
 
         # Knuth's soundex, or some variant thereof, adapted for non-ASCII codes.
-        $module = 'Text::Soundex';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $pattern_soundex = Text::Soundex::soundex_unicode($pattern);
         $matcher = sub {
@@ -366,8 +349,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 6 ) {
 
         # Phonix, (claiming to be) "an improved Soundex". This variant keeps the first letter (like original Soundex).
-        $module = 'Text::Phonetic::Phonix';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $obj = Text::Phonetic::Phonix->new( );
         my $pattern_metacode = $obj->encode($pattern);
@@ -378,8 +360,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 7 ) {
 
         # Daitch-Mokotoff Soundex, a Soundex variant geared towards Slavic and Yiddish.
-        $module = 'Text::Phonetic::DaitchMokotoff';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $obj = Text::Phonetic::DaitchMokotoff->new( );
         my @pattern_metacodes = @{ $obj->encode($pattern) };
@@ -396,8 +377,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 8 ) {
 
         # "Koeln Phonetic", a Soundex variant geared towards German. Also towards longer words.
-        $module = 'Text::Phonetic::Koeln';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $obj = Text::Phonetic::Koeln->new( );
         my $pattern_metacode = $obj->encode($pattern);
@@ -408,8 +388,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 9 ) {
 
         # Metaphone, (claiming to be) "A modern Soundex". Still with a slant towards English pronunciation.
-        $module = 'Text::Metaphone';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $maxcodelen = $args{maxcodelen};
         my $pattern_metacode = Text::Metaphone::Metaphone($pattern, $maxcodelen);
@@ -421,8 +400,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
 
         # DoubleMetaphone, an improved Metaphone, better taking into account several non-English languages.
         # Note: There may be up to two encodings for each input.
-        $module = 'Text::DoubleMetaphone';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my @pattern_metacodes = Text::DoubleMetaphone::double_metaphone($pattern);
         $matcher = sub {
@@ -437,8 +415,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 11 ) {
 
         # Phonem, a Soundex-analogue better taking into account Germanic lanuages (and their penchant for long words)
-        $module = 'Text::Phonetic::Phonem';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $obj = Text::Phonetic::Phonem->new( );
         my $pattern_metacode = $obj->encode($pattern);
@@ -449,13 +426,11 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 12 ) {
 
         # Levenshtein edit distance
-        $module = 'Text::Levenshtein::XS';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         if ($loaded) {
           $matcher = sub { Text::Levenshtein::XS::distance( $_[0], $pattern ) };
         } else {
-          $module = 'Text::Levenshtein';
-          $loaded = eval qq{ require $module; 1 };
+          $loaded = eval qq{ require $modules[1]; 1 };
           croak unless $loaded;
           $matcher = sub { Text::Levenshtein::distance( $_[0], $pattern ) };
         }
@@ -463,13 +438,11 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } elsif ( $nmethod == 13 ) {
 
         # Levenshtein-Damerau edit distance: almost the same as Levenshtein, but also counts adjacent swaps as one operation
-        $module = 'Text::Levenshtein::Damerau::XS';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         if ($loaded) {
           $matcher = sub { Text::Levenshtein::Damerau::XS::xs_edistance( $_[0], $pattern ) };
         } else {
-          $module = 'Text::Levenshtein::Damerau';
-          $loaded = eval qq{ require $module; 1 };
+          $loaded = eval qq{ require $modules[1]; 1 };
           croak unless $loaded;
           $matcher = sub { Text::Levenshtein::Damerau::edistance( $_[0], $pattern ) };
         }
@@ -479,8 +452,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
         # Jaro-Winkler string distance.
         # Originally yields a vale between 0 (very far) to 1 (identical).
         # Distances are re-normalized to better fit with Levenshtein value range.
-        $module = 'Text::JaroWinkler';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         my $stretch = 2 * length($pattern);
         $matcher = sub { $stretch * ( 1 - Text::JaroWinkler::strcmp95( $_[0], $pattern, length($_[0]) ) ) };
@@ -490,8 +462,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
         # Comparison by number of matching n-grams, by default 3-grams. (Can be changed with the windowsize argument.)
         # This needs to be re-organised so that multiple calls with the same parameters
         # (but different search strings) will re-use the string base (not the search string).
-        $module = 'String::Trigram';
-        $loaded = eval qq{ require $module; 1 };
+        $loaded = eval qq{ require $modules[0]; 1 };
         croak unless $loaded;
         $args{maxdist} ||= length($pattern) / 2;
         my %st_args;
@@ -512,7 +483,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
       } ## end elsif ( $nmethod == 15 )
     } ## end try
     catch {
-      croak "Matcher module $module not loaded or not executed: $_";
+      croak "Matcher module $modules[0] not loaded or not executed: $_";
     };
 
     # $matcher is now a coderef that takes one argument, viz., a string to match.
@@ -541,6 +512,53 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
   return $result[0];
 } ## end sub fuzzy_find
 
+
+sub list_fuzzy_matchers {
+  my($self) = @_;
+
+  my @matchers = @{ $self->_known_matchers( ) };
+  my %matchers;
+  for (my $i=0; $i<scalar(@matchers); $i+=2 ) {
+    $matchers{$matchers[$i+1][0]} //= $matchers[$i];
+  }
+  return sort values %matchers;
+} ## end sub list_matchers
+
+
+#
+# Private methods
+#
+
+
+sub _known_matchers {
+  # An array of known matching methods, some with alternate names, consecutively numbered,
+  # and the names of zero or more modules that implement them
+  my($self) = @_;
+  return [ exact              => [  1, undef ],
+           start              => [  2, undef ],
+           in                 => [  3, undef ],
+           regex              => [  4, undef ],
+           re                 => [  4, undef ],
+           soundex            => [  5, 'Text::Soundex' ],
+           phonix             => [  6, 'Text::Phonetic::Phonix' ],
+           daitchmokotoff     => [  7, 'Text::Phonetic::DaitchMokotoff' ],
+           dmsoundex          => [  7, 'Text::Phonetic::DaitchMokotoff' ],
+           koeln              => [  8, 'Text::Phonetic::Koeln' ],
+           metaphone          => [  9, 'Text::Metaphone' ],
+           doublemetaphone    => [ 10, 'Text::DoubleMetaphone' ],
+           phonem             => [ 11, 'Text::Phonetic::Phonem' ],
+           levenshtein        => [ 12, 'Text::Levenshtein::XS', 'Text::Levenshtein' ],
+           editdistance       => [ 12, 'Text::Levenshtein::XS', 'Text::Levenshtein' ],
+           fuzzy              => [ 12, 'Text::Levenshtein::XS', 'Text::Levenshtein' ],
+           damerau            => [ 13, 'Text::Levenshtein::Damerau::XS', 'Text::Levenshtein::Damerau' ],
+           levenshteindamerau => [ 13, 'Text::Levenshtein::Damerau::XS', 'Text::Levenshtein::Damerau' ],
+           jarowinkler        => [ 14, 'Text::JaroWinkler' ],
+           ngrams             => [ 15, 'String::Trigram' ],
+         ];
+
+} ## end sub _known_matchers
+
+
 =head1 AUTHOR
 
 Gisbert W. Selke, TapirSoft Selke & Selke GbR, C<< <gws at cpan.org> >>
@@ -555,22 +573,15 @@ Thanks to Mohammad S Anwar, author of L<Map::Tube>, for that module, for great f
 discussions, advice, debugging help, and willingness to refactor his code.
 Thanks to Slaven Rezic for extensive testing and valuable suggestions.
 
-=head1 SUPPORT
+=head1 CONTRIBUTING
 
-You can find documentation for this module with the perldoc command.
-
-    perldoc Map::Tube::Plugin::FuzzyFind
-
-=head1 BUGS
-
-Please report any bugs or feature requests through the web interface at
-L<https://github.com/gwselke/Map-Tube-Plugin-FuzzyFind/issues>. I will be
-notified and then you'll automatically be notified of progress on your
-bug when (and if) I make changes.
+If you find a bug or have an idea for a useful extension, your contribution via
+this module's issue tracker at L<https://github.com/gwselke/Map-Tube-Plugin-FuzzyFind/issues>
+is welcome! Pull requests are also appreciated!
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015, 2025, 2026 Gisbert W. Selke, Tapirsoft Selke & Selke GbR
+Copyright (C) 2015, 2025--2026 Gisbert W. Selke, Tapirsoft Selke & Selke GbR
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

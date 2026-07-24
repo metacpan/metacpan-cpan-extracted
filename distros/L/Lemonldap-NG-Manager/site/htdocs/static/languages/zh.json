@@ -545,6 +545,8 @@
 "ldapCAFile":"CA 檔案路徑",
 "ldapCAPath":"CA 目錄路徑",
 "ldapChangePasswordAsUser":"以使用者身份變更",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"連線",
 "ldapExportedVars":"已匯出的變數",
 "ldapFilters":"過濾器",

@@ -11,7 +11,11 @@ TOML::XS - Turbo-charged [TOML](https://toml.io) parsing!
     # NB: Don’t read_text(), or stuff may break.
     my $toml = File::Slurper::read_binary('/path/to/toml/file');
 
-    my $struct = TOML::XS::from_toml($toml)->to_struct();
+    # The top-level document is always a struct.
+    my $struct = TOML::XS::from_toml($toml)->get();
+
+    # You can also fetch individual items from the document, e.g.:
+    my $last_name = TOML::XS::from_toml($toml)->get('info', 'last_name');
 
 # DESCRIPTION
 
@@ -19,15 +23,19 @@ This module facilitates parsing of TOML documents in Perl via XS,
 which can yield dramatic performance gains relative to pure-Perl TOML
 libraries.
 
-It is currently implemented as a wrapper around the
-[tomlc99](https://github.com/cktan/tomlc99) C library.
+It is currently implemented atop the
+[tomlc17](https://github.com/cktan/tomlc17) C library. This distribution
+embeds that library, so you don’t need to install it separately.
+
+This library is solely a parser; there is no logic here to serialize a parsed
+TOML document.
 
 # FUNCTIONS
 
 ## $doc = TOML::XS::from\_toml($byte\_string)
 
 Converts a byte string (i.e., raw, undecoded bytes) that contains a
-serialized TOML document to a [TOML::XS::Document](https://metacpan.org/pod/TOML::XS::Document) instance.
+serialized TOML document to a [TOML::XS::Document](https://metacpan.org/pod/TOML%3A%3AXS%3A%3ADocument) instance.
 
 Throws a suitable exception if the TOML document is unparseable. This
 doesn’t necessarily mean that _any_ malformed TOML content triggers such
@@ -40,10 +48,10 @@ Most TOML data items map naturally to Perl. The following details
 are relevant:
 
 - Strings are character-decoded.
-- Booleans are represented as [TOML::XS::true](https://metacpan.org/pod/TOML::XS::true) and [TOML::XS::false](https://metacpan.org/pod/TOML::XS::false),
+- Booleans are represented as [TOML::XS::true](https://metacpan.org/pod/TOML%3A%3AXS%3A%3Atrue) and [TOML::XS::false](https://metacpan.org/pod/TOML%3A%3AXS%3A%3Afalse),
 which are namespace aliases for the relevant constants from
-[Types::Serialiser](https://metacpan.org/pod/Types::Serialiser).
-- Timestamps are represented as [TOML::XS::Timestamp](https://metacpan.org/pod/TOML::XS::Timestamp) instances.
+[Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser).
+- Timestamps are represented as [TOML::XS::Timestamp](https://metacpan.org/pod/TOML%3A%3AXS%3A%3ATimestamp) instances.
 
 # NOTE ON CHARACTER DECODING
 
@@ -74,5 +82,5 @@ Copyright 2021 Gasper Software Consulting. All rights reserved.
 
 This library is licensed under the same license as Perl itself.
 
-[tomlc99](https://github.com/cktan/tomlc99) is licensed under the
+[tomlc17](https://github.com/cktan/tomlc17) is licensed under the
 [MIT License](https://mit-license.org/).

@@ -476,17 +476,20 @@ static void ka_timer_cb(EV_P_ ev_timer *w, int revents) {
     if (self->magic != EV_CH_MAGIC) return;
     if (!self->connected || self->send_count > 0) return;
 
-    /* Native: append PING bytes directly; the SERVER_PONG handler tracks
-     * ka_in_flight so no callback queue entry is needed. */
+    /* Native: enqueue like the HTTP branch below rather than writing into
+     * send_buf, so a queued query can never overwrite the unsent ping and the
+     * PONG is matched to its callback by the normal response path. The send
+     * entry carries a deadline so a server that never PONGs is detected. */
     if (self->protocol == PROTO_NATIVE) {
         size_t ping_len;
         char *ping = build_native_ping(&ping_len);
-        ensure_send_cap(self, self->send_len + ping_len);
-        Copy(ping, self->send_buf + self->send_len, ping_len, char);
-        self->send_len += ping_len;
-        self->ka_in_flight++;
-        Safefree(ping);
-        start_writing(self);
+        ev_ch_send_t *s = alloc_send();
+        s->data = ping;
+        s->data_len = ping_len;
+        s->cb = SvREFCNT_inc(keepalive_noop_cb);
+        s->query_timeout = self->query_timeout > 0
+            ? self->query_timeout : self->keepalive;
+        enqueue_send(self, s);
     } else {
         /* HTTP: enqueue a real ping with a no-op callback. ClickHouse's
          * HTTP server closes idle connections after a few seconds, so

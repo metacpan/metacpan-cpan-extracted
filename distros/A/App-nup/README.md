@@ -38,7 +38,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.06
+Version 1.07
 
 # DESCRIPTION
 
@@ -194,6 +194,11 @@ force command mode when needed.
 - **--pager**=_COMMAND_
 
     Set the pager command. Default is `NUP_PAGER` or `less -F +Gg`.
+    When page mode is active, `NUP_PAGE_PAGER` takes precedence over
+    `NUP_PAGER`.
+    Viewing multiple files (or `-V` parallel view) produces parallel
+    layout which has no page structure, so `nup` disables page mode
+    and `NUP_PAGE_PAGER` is not used there.
     The `PAGER` variable is not used to avoid an infinite loop when
     `PAGER` is set to `nup`.
     Use `--pager=` (empty) or `--no-pager` to disable pager.

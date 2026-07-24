@@ -23,8 +23,10 @@ t/07-strings-oracle.t
 t/08-strings-errors.t
 xt/asan.t
 xt/concurrent_open.t
+xt/corrupt_shm.t
 xt/crash_recovery.t
 xt/dead_reader_recovery.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fd_leak.t
 xt/fork_live.t

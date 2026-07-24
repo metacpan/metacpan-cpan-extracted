@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,32 +34,35 @@
          "requires" : {
             "Carp" : "0",
             "Cwd" : "0",
-            "ExtUtils::MakeMaker" : "6.64",
             "File::Basename" : "0",
             "File::Spec" : "3.4",
             "HTTP::BrowserDetect" : "3.1",
-            "IO::Interactive" : "0",
             "JSON::MaybeXS" : "0",
-            "List::Util" : "1.33",
             "Log::Abstraction" : "0.1",
             "Net::CIDR" : "0",
             "Object::Configure" : "0.19",
             "Params::Get" : "0.13",
-            "Params::Validate::Strict" : "0.28",
+            "Params::Validate::Strict" : "0.35",
+            "Readonly" : "0",
             "Return::Set" : "0",
             "Scalar::Util" : "0",
             "Socket" : "0",
             "String::Clean::XSS" : "0",
+            "Sub::Protected" : "0",
             "Sys::Hostname" : "0",
             "Sys::Path" : "0",
             "URI::Heuristic" : "0",
             "boolean" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "Data::Random" : "0",
+            "Data::Random::String" : "0",
+            "Data::Random::String::Matches" : "0",
+            "Data::Random::Structure" : "0",
             "Errno" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
@@ -73,6 +76,7 @@
             "Test::CleanNamespaces" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.08",
             "Test::Most" : "0",
             "Test::Needs" : "0",
@@ -80,7 +84,6 @@
             "Test::RequiresInternet" : "0",
             "Test::Returns" : "0",
             "Test::Script" : "1.12",
-            "Test::Warn" : "0",
             "Test::Which" : "0",
             "Tie::Filehandle::Preempt::Stdin" : "0",
             "autodie" : "0",
@@ -103,6 +106,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

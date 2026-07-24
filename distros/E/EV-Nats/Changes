@@ -1,5 +1,20 @@
 Revision history for EV::Nats
 
+0.05  2026-07-23
+    - Fix stack overflow decoding an over-long NKey seed, and out-of-bounds
+      reads in the INFO parser
+    - Fix wrong subject/reply when a message spans reads; bound inbound
+      control lines and a hostile max_payload
+    - Fix the CONNECT flush stalling on EAGAIN, and failover to the
+      remaining resolved addresses
+    - Defer DESTROY while a callback is on the stack (use-after-free)
+    - Refuse a plaintext CONNECT to a tls_required server; treat auth
+      errors as fatal regardless of case
+    - Fix builds without OpenSSL
+    - ObjectStore wire format now matches nats.go/ADR-20 (base64url names and
+      digests, deleted markers, overwrite cleanup); older buckets still read
+    - Add a mock-server test suite; fix POD links
+
 0.04  2026-06-02
     - Fix use-after-free when a callback clears its own handler
     - Clamp control-line length to prevent a stack over-read

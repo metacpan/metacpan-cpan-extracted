@@ -1,10 +1,47 @@
 ==================================================
-Changes from 2025-07-20 00:00:00 +0000 to present.
+Changes from 2025-07-24 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.06 at 2026-07-20 11:29:46 +0000
+version 0.08 at 2026-07-24 07:32:36 +0000
 -----------------------------------------
+
+  Change: 7cba50fc080918e98068676e8277b921e1b61c9e
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-07-24 09:31:56 +0000
+
+    bump to v0.08
+
+    failed to bump VERSION at 0.07 (i blame myself as this is the first
+    time using dzil so clearly i am doing something wrong that i need to
+    fix) 
+
+  Change: d7b8deebf055e3d332bce1e8375e0a881af7bd44
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-07-23 13:25:36 +0000
+
+    bump VERSION and Change for CPAN release 
+
+  Change: 7b3d0094fcb0bfd2168b0de6fd39f324e2f2fab4
+  Author: Lee J <lee@payprop.com>
+  Date : 2026-07-23 13:24:55 +0000
+
+    Merge pull request #4 from payprop/lee/more_floating_point_fixes
+
+    use integers in call to TotalRecord->new 
+
+  Change: 0b287b4638877c588aa66825689d5c6bf308710a
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-07-23 09:56:25 +0000
+
+    use integers in call to TotalRecord->new
+
+    w/r/t 35dea513977056e6e1e6a60973cb663b00952724 - we've already
+    established that the net_total might have floating point issues, so
+    we need to truncate it when we pass into the TotalRecord->new
+    constructor to avoid type constraint failures
+
+    exercise in testing by resetting the previously built total_record 
 
   Change: 7a5bd869710d30be74913af0cd5111d650f56048
   Author: Lee Johnson <lee@payprop.com>

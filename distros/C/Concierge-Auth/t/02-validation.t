@@ -11,7 +11,7 @@ use Concierge::Auth;
 
 my $dir  = tempdir( CLEANUP => 1 );
 my $file = "$dir/auth.pwd";
-my $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $file );
+my $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', file => $file );
 
 # ========== validatePwd ==========
 # This is the one format-check kept as a shared method on
@@ -95,7 +95,7 @@ subtest 'enroll - valid ID formats accepted' => sub {
 subtest 'is_id_known - no file configured is simply "not known"' => sub {
     my $nofile_auth;
     my $w = warnings {
-        $nofile_auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 );
+        $nofile_auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 );
     };
     my $result = $nofile_auth->is_id_known('alice');
     ok( $result->{success}, 'is_id_known still succeeds (no I/O error)' );
@@ -105,7 +105,7 @@ subtest 'is_id_known - no file configured is simply "not known"' => sub {
 subtest 'change_credentials - no file configured fails' => sub {
     my $nofile_auth;
     my $w = warnings {
-        $nofile_auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 );
+        $nofile_auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 );
     };
     my $result = $nofile_auth->change_credentials('alice', 'password123');
     ok( !$result->{success}, 'change_credentials fails when no file is set' );

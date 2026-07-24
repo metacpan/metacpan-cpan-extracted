@@ -1,7 +1,7 @@
 package Data::PubSub::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::PubSub::Shared', $VERSION);
@@ -182,9 +182,14 @@ dup'd internally by C<new_from_fd>.
 
 =head2 Publishing
 
-    $ps->publish($value);                # always succeeds
+    $ps->publish($value);                # numeric: always succeeds
     my $n = $ps->publish_multi(@values); # batch (max 8192 values)
     $ps->publish_notify($value);         # publish + eventfd notify
+
+For the numeric variants (C<Int>, C<Int32>, C<Int16>) C<publish> always
+succeeds. The C<Str> variant croaks if the message is longer than the
+C<msg_size> the pub/sub was created with. C<publish_multi> croaks if
+passed more than 8192 values.
 
 Int: C<publish_multi> claims all slots in one atomic fetch-add, then
 writes values and wakes subscribers once. Str: holds mutex for the
@@ -231,7 +236,11 @@ to Perl between messages. Returns count processed.
     };
 
 Subscribers inherit the handle's eventfd at creation time.
-Use C<< $sub->eventfd_set($fd) >> to set manually after creation.
+Use C<< $sub->eventfd_set($fd) >> to set manually after creation
+(both handles and subscribers support C<eventfd_set>).
+C<< $ps->fileno >> and C<< $sub->fileno >> return the current
+notification fd (the handle's or the subscriber's), or -1 if none is
+set -- useful for registering with an event loop.
 
 =head2 Status
 
@@ -259,6 +268,8 @@ Lost messages are counted in C<overflow_count>.
     Class->unlink($path);    # class method form
     my $p = $ps->path;       # undef for anonymous/memfd
     my $s = $ps->stats;      # diagnostic hashref
+    my $c = $ps->capacity;   # ring capacity (rounded-up power of 2)
+    my $m = $sps->msg_size;  # Str only: max message size in bytes
 
 Call C<clear> only when publishers are quiescent. The C<int>/C<int32>/C<int16>
 publish path is lock-free, so C<clear> cannot exclude an in-flight publish;

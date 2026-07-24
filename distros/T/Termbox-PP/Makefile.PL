@@ -44,22 +44,24 @@ WriteMakefile1(
     prereqs => {
       runtime => {
         requires => {    # v5.10 builtin modules
-#          'bytes'           => 0,
-          'Carp'            => 0,
-          'constant'        => 0,
-#          'Config'          => 0,
-#          'Errno'           => 0,
-          'Exporter'        => 0,
-#          'Fcntl'           => 0,
-          'IO::File'        => 0,
-          'Params::Check'   => 0,
-          'Scalar::Util'    => 0,
-#          'strict'          => 0,
-#          'POSIX'           => 0,
-#          'warnings'        => 0,
-#          'Unicode::UCD'    => 0,
-#          'utf8'            => 0,
-#          'vars'            => 0,
+#          'bytes'              => 0,
+          'Carp'               => 0,
+          'constant'           => 0,
+#          'Config'             => 0,
+#          'Errno'              => 0,
+          'Exporter'           => 0,
+#          'Fcntl'              => 0,
+          'IO::File'           => 0,
+          'Params::Check'      => 0,
+          'Scalar::Util'       => 0,
+#          'strict'             => 0,
+#          'POSIX'              => 0,
+#          'warnings'           => 0,
+          'Unicode::Normalize' => 0,
+#          'Unicode::UCD'       => 0,
+#          'utf8'               => 0,
+#          'vars'               => 0,
+#          'version'            => 0,
         },
         recommends => {
           'Getopt::Long'                    => 0,
@@ -67,7 +69,9 @@ WriteMakefile1(
           'lib'                             => 0,
           'List::Util'                      => 0,
           'Pod::Usage'                      => 0,
+          'threads'                         => 0,
           'Time::HiRes'                     => 0,
+          'Unicode::EastAsianWidth'         => 0,
           'Unicode::EastAsianWidth::Detect' => 0,
         },
       },
@@ -95,10 +99,10 @@ sub WriteMakefile1 { # void (%params)
   $eumm_version = eval $eumm_version;
 
   if ($^O eq 'MSWin32') {
+    $params{PREREQ_PM}->{'Time::HiRes'}     = 0;
     $params{PREREQ_PM}->{'Win32::Console'}  = 0.10;
     $params{PREREQ_PM}->{'Win32::API'}      = 0.75;
     $params{PREREQ_PM}->{'Win32API::File'}  = 0.1201;
-    $params{PREREQ_PM}->{'Win32::IPC'}      = 1.11;
   }
 
   if ($params{TEST_REQUIRES} and $eumm_version < 6.6303) {

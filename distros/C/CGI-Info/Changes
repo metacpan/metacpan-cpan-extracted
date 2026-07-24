@@ -1,5 +1,37 @@
 Revision history for CGI-Info
 
+1.14	Thu Jul 23 21:29:19 EDT 2026
+	[ Enhancements ]
+	- Add is_ai() method: returns true for known AI training/inference crawlers (ClaudeBot, GPTBot, PerplexityBot, CCBot, etc.)
+	  browser_type() now returns 'ai' for these visitors
+	- More helpful error message on "Multipart/form-data not supported"
+	- Set status to 501 when attempting to upload to a place that doesn't take uploads
+	- Log the invalid method type
+	- Clone path now validates logger and croaks on deprecated expect argument, matching the normal construction path
+	- Clone path deletes cached paramref so a new allow schema is applied on the first params() call
+	- Upgrade t/40-more.t from Test::MockModule to Test::Mockingbird; fix three pre-existing test bugs now exposed
+	- Add use autodie qw(:all) and Readonly constants ($MAX_UPLOAD_SIZE_DEFAULT, $CACHE_TTL_ROBOT, $CACHE_TTL_SEARCH) to eliminate magic numbers
+	- Fix UNIVERSAL::isa() deprecation warning in _find_paths(): replaced with proper ->isa() call
+	- Remove dead commented-out expect and interactive debug blocks from params()
+	- Fix reversed referrer logic in is_robot(): now correctly checks if the HTTP_REFERER starts with a known crawler URL
+	- Add API SPECIFICATION, MESSAGES and FORMAL SPECIFICATION sections to param() POD
+	- Add t/locales.t: tests system-locale (POSIX LC_ALL) error-path invariance under en_US.UTF-8, de_DE.UTF-8, and zh_CN.UTF-8; geographic GeoIP subtests skipped unless IP::Country::Fast is installed
+	- Rewrite t/function.t: Test::Most, Test::Returns, Test::Memory::Cycle, Readonly constants, white-box tests for _log/_warn/_error/_get_env/_create_file_name/_untaint_filename, $_ clobbering tests
+	- Use Sub::Protected
+	- Remove subroutine prototype from _sanitise_input forward declaration and definition
+	- Replace explicit return undef with return in _get_env
+	- Rename FIXME in _log to a Note
+	- Fix spelling of overridden in POD comments
+	- Add Readonly to PREREQ_PM in Makefile.PL
+	- Refactor bin/info.pl to use cookie() instead of deprecated get_cookie() and improve cookie parsing split regex
+
+	[ Bug fixes]
+	- Fix bin/info.pl: add use autodie qw(:all); replace bare foreach(keys(%FORM)) with for my $key (sort keys %FORM)
+	- Fix _sanitise_input: change s/^\s// to s/^\s+// so all leading whitespace is stripped (was only stripping one space)
+	- Fix _untaint_filename: add explicit return at end so function returns undef (not "") when the filename regex fails to match
+	- Fix t/00-load.t bail-out: capture load error before use_ok clobbers $@, then BAIL_OUT with the actual reason on failure
+	- Fix double-colon instantiation validation to correctly croak when params are provided to CGI::Info::new
+
 1.13	Sun Apr 12 08:49:24 EDT 2026
 	Fixed test failures on Windows, e.g. https://www.cpantesters.org/cpan/report/5bf7930a-7048-1014-8eeb-cabb5837fa32
 	Bump Test::Mockingbird version, fixes https://www.cpantesters.org/cpan/report/5992cad6-3527-11f1-a62b-8d83cf1a6737

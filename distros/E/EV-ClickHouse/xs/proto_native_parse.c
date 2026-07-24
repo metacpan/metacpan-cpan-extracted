@@ -57,6 +57,7 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
     size_t pos = *outer_pos;
     int rc;
     char *decompressed = NULL;
+    int more_maybe = 0;  /* chain stopped mid-frame: short block = need-more */
     const char *bbuf;
     size_t blen, bpos;
     char errbuf[64];
@@ -74,7 +75,8 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
         int need_more = 0;
         const char *lz4_err = NULL;
         decompressed = ch_lz4_decompress_chain(buf, len, &pos, &blen,
-                                                &need_more, &lz4_err);
+                                                &need_more, &lz4_err,
+                                                &more_maybe);
         if (!decompressed) {
             if (need_more) return 0;
             if (!lz4_optional) {
@@ -131,15 +133,18 @@ static int parse_and_discard_block(ev_clickhouse_t *self,
             if (nr > 0) {
                 col_type_t *ct = parse_col_type(ctype, ctype_len);
                 int col_err = 0;
+                /* lc_self is NULL: a LowCardinality column with an inherited
+                 * dictionary hard-errors here. Real log schemas have none. */
                 SV **vals = decode_column(bbuf, blen, &bpos, nr, ct, &col_err, 0);
                 if (!vals) {
                     free_col_type(ct);
-                    if (col_err || decompressed) {
+                    if (col_err || (decompressed && !more_maybe)) {
                         if (decompressed) Safefree(decompressed);
                         snprintf(errbuf, sizeof(errbuf), "malformed %s block", kind);
                         *errmsg = safe_strdup(errbuf);
                         return -1;
                     }
+                    if (decompressed) Safefree(decompressed);
                     return 0;
                 }
                 {
@@ -180,8 +185,9 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
     if (self->compress) {
         int need_more = 0;
         const char *lz4_err = NULL;
+        /* NULL: a short block here is already treated as need-more. */
         decompressed = ch_lz4_decompress_chain(buf, len, &pos, &blen,
-                                                &need_more, &lz4_err);
+                                                &need_more, &lz4_err, NULL);
         if (!decompressed) {
             if (need_more) return 0;
             /* server log frames are not always compressed even with
@@ -242,6 +248,8 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
         if (nr > 0) {
             col_type_t *ct = parse_col_type(ctype, ctype_len);
             int col_err = 0;
+            /* lc_self is NULL: a LowCardinality column with an inherited
+             * dictionary hard-errors here. Real log schemas have none. */
             SV **vals = decode_column(bbuf, blen, &bpos, nr, ct, &col_err, 0);
             free_col_type(ct);
             if (!vals) { err_seen = col_err ? -1 : 0; break; }
@@ -421,6 +429,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         const char *dbuf;   /* data buffer (may point to decompressed data) */
         size_t dlen, dpos;
         char *decompressed = NULL;
+        int more_maybe = 0;  /* chain stopped mid-frame: short block = need-more */
 
         /* table name — outside compression */
         rc = skip_native_string(buf, len, &pos);
@@ -433,7 +442,8 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             int need_more = 0;
             const char *lz4_err = NULL;
             decompressed = ch_lz4_decompress_chain(buf, len, &pos, &dlen,
-                                                    &need_more, &lz4_err);
+                                                    &need_more, &lz4_err,
+                                                    &more_maybe);
             if (!decompressed) {
                 if (need_more) return 0;
                 *errmsg = safe_strdup(lz4_err ? lz4_err : "LZ4 decompression failed");
@@ -453,7 +463,12 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         if (self->server_revision >= DBMS_MIN_REVISION_WITH_BLOCK_INFO) {
             rc = skip_block_info(dbuf, dlen, &dpos);
             if (rc == 0) {
-                if (decompressed) { Safefree(decompressed); *errmsg = safe_strdup("truncated compressed block"); return -1; }
+                if (decompressed) {
+                    Safefree(decompressed);
+                    if (more_maybe) return 0;
+                    *errmsg = safe_strdup("truncated compressed block");
+                    return -1;
+                }
                 return 0;
             }
             if (rc < 0) { if (decompressed) Safefree(decompressed); *errmsg = safe_strdup("malformed block info"); return -1; }
@@ -461,14 +476,24 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
         rc = read_varuint(dbuf, dlen, &dpos, &num_cols);
         if (rc == 0) {
-            if (decompressed) { Safefree(decompressed); *errmsg = safe_strdup("truncated compressed block"); return -1; }
+            if (decompressed) {
+                Safefree(decompressed);
+                if (more_maybe) return 0;
+                *errmsg = safe_strdup("truncated compressed block");
+                return -1;
+            }
             return 0;
         }
         if (rc < 0) { if (decompressed) Safefree(decompressed); *errmsg = safe_strdup("malformed num_cols"); return -1; }
 
         rc = read_varuint(dbuf, dlen, &dpos, &num_rows);
         if (rc == 0) {
-            if (decompressed) { Safefree(decompressed); *errmsg = safe_strdup("truncated compressed block"); return -1; }
+            if (decompressed) {
+                Safefree(decompressed);
+                if (more_maybe) return 0;
+                *errmsg = safe_strdup("truncated compressed block");
+                return -1;
+            }
             return 0;
         }
         if (rc < 0) { if (decompressed) Safefree(decompressed); *errmsg = safe_strdup("malformed num_rows"); return -1; }
@@ -752,7 +777,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     int col_err = 0;
                     columns[c] = decode_column_ex(dbuf, dlen, &dpos, num_rows, col_types[c], &col_err, self->decode_flags, self, (int)c);
                     if (!columns[c]) {
-                        if (col_err || decompressed) {
+                        if (col_err || (decompressed && !more_maybe)) {
                             *errmsg = safe_strdup("decode_column failed");
                             goto data_error;
                         }
@@ -1131,6 +1156,7 @@ static void process_native_response(ev_clickhouse_t *self) {
             /* EndOfStream — deliver accumulated rows or deferred error */
             stop_timing(self);
             self->native_state = NATIVE_IDLE;
+            CLEAR_INSERT(self);
             if (self->send_count > 0) self->send_count--;
             lc_free_dicts(self);
 
@@ -1168,13 +1194,8 @@ static void process_native_response(ev_clickhouse_t *self) {
         }
 
         if (rc == 3) {
-            /* Pong — ack a keepalive ping, or deliver to user's ping() cb */
+            /* Pong — deliver to the queued cb (keepalive no-op or user ping) */
             self->native_state = NATIVE_IDLE;
-            if (self->ka_in_flight > 0) {
-                /* Keepalive ack: not tied to send_count or any user cb */
-                self->ka_in_flight--;
-                continue;
-            }
             stop_timing(self);
             if (self->send_count > 0) self->send_count--;
             AV *rows = newAV();

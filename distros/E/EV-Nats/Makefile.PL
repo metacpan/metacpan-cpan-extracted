@@ -20,6 +20,11 @@ my @inc = ('-Isrc', "-I$installsitearch/EV", "-I$installsitearch");
 my @libs;
 my $define = '';
 
+# Advertise $VERSION in the CONNECT command without a second literal to
+# keep in sync; the XS falls back to "0.00" if the macro is absent.
+my $nats_ver = MM->parse_version('lib/EV/Nats.pm');
+$define .= ' -DEV_NATS_VERSION=\\"' . $nats_ver . '\\"';
+
 # OpenSSL (optional TLS)
 my $ssl_cflags = `pkg-config --cflags openssl 2>/dev/null`;
 my $ssl_libs   = `pkg-config --libs openssl 2>/dev/null`;
@@ -56,8 +61,13 @@ WriteMakefile(
         'EV::MakeMaker'       => 0,
     },
     PREREQ_PM => {
-        'EV'       => '4.11',
-        'XSLoader' => '0.02',
+        'EV'           => '4.11',
+        'XSLoader'     => '0.02',
+        # Used by EV::Nats::JetStream/ObjectStore/KV; JSON::PP is core only
+        # from 5.14, so it must be declared for the 5.12 floor.
+        'JSON::PP'     => 0,
+        'MIME::Base64' => 0,
+        'Digest::SHA'  => 0,
     },
     TEST_REQUIRES => {
         'Test::More' => '0.98',

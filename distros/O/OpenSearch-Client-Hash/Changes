@@ -1,0 +1,5 @@
+Revision history for OpenSearch::Client::Hash
+
+3.007010    2026-07-24
+            * Initial release
+            * BCrypt, Argon2 and PBKDF2 password hashes.

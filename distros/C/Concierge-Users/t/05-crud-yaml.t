@@ -15,7 +15,7 @@ sub setup_test_env {
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => 'yaml',
+        backend_class => 'Concierge::Users::YAML',
         include_standard_fields => [qw/ email phone first_name last_name /],
     };
 

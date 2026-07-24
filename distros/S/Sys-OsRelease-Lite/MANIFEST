@@ -14,6 +14,9 @@ MANIFEST			This list of files
 perlcritic.rc
 Sys-OsRelease-Lite-0.4.1+lite.tar.gz
 Sys-OsRelease-Lite-0.4.2+lite.tar.gz
+Sys-OsRelease-Lite-0.4.3+lite.tar.gz
+Sys-OsRelease-Lite-0.4.4+lite/META.json
+Sys-OsRelease-Lite-0.4.4+lite/META.yml
 t/001_module_load.t
 t/002_basic.t
 t/003_samples.t

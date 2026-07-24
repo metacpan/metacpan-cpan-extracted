@@ -26,11 +26,8 @@ The limited API surface makes the module easy to learn, test, and maintain.
 =item * Pure Perl implementation
 
 The module is implemented entirely in Perl and does not require XS or any 
-external C libraries. On Unix platforms it only depends on core modules 
-available since Perl L<v5.10|https://metacpan.org/release/DAPM/perl-5.10.1>. 
-
-On Windows additional C<Win32::*> modules may be required for console and file 
-handling; these are typically available with Strawberry Perl.
+external C libraries. On Unix-like platforms it only depends on core modules. 
+Windows requires additional modules for console, file and event handling.
 
 =back
 

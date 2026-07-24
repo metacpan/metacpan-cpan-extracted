@@ -1,10 +1,10 @@
 # Concierge::Users
 
-User data management with multiple storage backends.
+Configurable user data management for applications.
 
 ## VERSION
 
-v0.9.2
+v0.9.4
 
 ## SYNOPSIS
 
@@ -14,7 +14,7 @@ use Concierge::Users;
 # One-time setup
 Concierge::Users->setup({
     storage_dir             => '/var/lib/myapp/users',
-    backend                 => 'database',   # 'database', 'file', or 'yaml'
+    backend_class           => 'Concierge::Users::SQLite',
     include_standard_fields => 'all',
     app_fields              => ['role', 'theme'],
 });
@@ -37,6 +37,10 @@ Concierge::Users manages user data records with a two-phase lifecycle:
 loads the saved config for runtime CRUD operations.  All methods return
 hashrefs with a `success` key.
 
+Concierge::Users can be used standalone, or as one of the three core
+components (alongside Concierge::Auth and Concierge::Sessions) that make
+up the Concierge service layer.
+
 ## DOCUMENTATION
 
 Comprehensive POD is available for each module:
@@ -44,18 +48,58 @@ Comprehensive POD is available for each module:
 ```bash
 perldoc Concierge::Users              # Main API and usage
 perldoc Concierge::Users::Meta        # Field catalog, validators, filter DSL, customization
-perldoc Concierge::Users::Database    # SQLite backend
+perldoc Concierge::Users::SQLite      # SQLite backend
 perldoc Concierge::Users::File        # CSV/TSV backend
 perldoc Concierge::Users::YAML        # YAML backend
 ```
 
 ## STORAGE BACKENDS
 
-- **database** -- SQLite via DBI/DBD::SQLite.  Recommended for production.
-- **file** -- CSV or TSV flat file via Text::CSV.  Set `file_format => 'csv'` or `'tsv'` (default) in `setup()`.
-- **yaml** -- One YAML file per user via YAML.  Good for individual-user access patterns.
+A backend is selected by passing its fully-qualified class name as
+`backend_class` to `setup()`.
+
+- **Concierge::Users::SQLite** -- SQLite via DBI/DBD::SQLite.  Recommended for production.
+- **Concierge::Users::File** -- CSV or TSV flat file via Text::CSV.  Set `file_format => 'csv'` or `'tsv'` (default) in `setup()`.
+- **Concierge::Users::YAML** -- One YAML file per user via YAML.  Good for individual-user access patterns.
 
 All three backends expose the same API and are selected at setup time.
+
+## FIELD CUSTOMIZATION
+
+Concierge::Users provides a standard set of fields and their metadata for
+typical user data; definitions and metadata (labels, options, validation,
+etc.) for these fields may be overridden at setup time with
+`field_overrides`, and the Users data store may be configured to use none
+or only a subset of the standard fields with `include_standard_fields`.
+
+Beyond the standard fields, applications can add their own with
+`app_fields`.
+
+Standard fields are:
+
+| Field | Notes |
+|---|---|
+| `user_id` | Required, unique identifier |
+| `moniker` | Required, display name |
+| `user_status` | Required, account status, e.g. `Eligible`, `OK`, `Inactive` |
+| `access_level` | Required, permission level, e.g. `anon`, `visitor`, `member`, `staff`, `admin` |
+| `first_name` | User's first name |
+| `middle_name` | User's middle name |
+| `last_name` | User's last name |
+| `prefix` | Name prefix or title, e.g. `Dr`, `Mr`, `Ms` |
+| `suffix` | Name suffix or professional designation, e.g. `Jr`, `PhD` |
+| `organization` | User's organization or affiliation |
+| `title` | User's position or job title |
+| `email` | Email address for notifications |
+| `phone` | Phone number with country code |
+| `text_ok` | Consent for text messages |
+| `term_ends` | Membership/subscription expiry |
+| `last_login_date` | Auto-updated on login |
+| `last_mod_date` | Auto-updated on every profile write |
+| `created_date` | Set once when the account is created |
+
+See `perldoc Concierge::Users::Meta` for the full field catalog and the
+filter DSL used by `list_users()`.
 
 ## INSTALLATION
 

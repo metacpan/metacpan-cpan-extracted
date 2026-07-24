@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 use strict;
 use ExtUtils::MakeMaker 6.64;
 

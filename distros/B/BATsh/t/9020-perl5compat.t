@@ -13,21 +13,50 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use lib "$FindBin::Bin/lib";
 use File::Spec ();
+use File::Find ();
+use File::Basename ();
 use INA_CPAN_Check;
 
 my $ROOT = File::Spec->rel2abs(
     File::Spec->catdir($FindBin::RealBin, File::Spec->updir));
 
-my @pm_files = grep { -f "$ROOT/$_" } map { "lib/$_" }
-    qw(BATsh.pm BATsh/Env.pm BATsh/CMD.pm BATsh/SH.pm);
+# Scan real source AND test/bin/example code, not only lib/*.pm. A lexical
+# dir handle or 3-arg open hiding in t/, bin/ or eg/ previously slipped past
+# this file because only lib/*.pm was walked. File::Find (core since 5.000)
+# walks lib/ t/ bin/ eg/ collecting .pm/.pl/.t files.
+#
+# The scanner cannot lint its own rule literals: this file necessarily
+# contains the very constructs it hunts for (as regex source and as
+# documentation), so it excludes itself by basename.
+my $SELF = File::Basename::basename(__FILE__);
 
-plan_skip('no .pm files found') unless @pm_files;
-plan_tests(scalar(@pm_files) * 12);
+my %seen;
+my @scan_files;
+for my $sub (qw(lib t bin eg)) {
+    my $dir = File::Spec->catdir($ROOT, $sub);
+    next unless -d $dir;
+    File::Find::find(sub {
+        return unless -f $_;
+        return unless /\.(?:pm|pl|t)$/;
+        return if File::Basename::basename($File::Find::name) eq $SELF;
+        my $abs = $File::Find::name;
+        push @scan_files, $abs unless $seen{$abs}++;
+    }, $dir);
+}
+@scan_files = sort @scan_files;
 
-for my $rel (@pm_files) {
-    my $path  = "$ROOT/$rel";
+plan_skip('no source files found') unless @scan_files;
+plan_tests(scalar(@scan_files) * 12);
+
+for my $path (@scan_files) {
+    my $rel   = $path;
+    $rel =~ s{^\Q$ROOT\E[\\/]}{};   # display path relative to dist root
     my @lines = _slurp_lines($path);
     my $code  = join('', @lines);
+    # Comment-stripped copy for the non-anchored structural checks (P2/P3/P9):
+    # a comment that merely documents a forbidden construct must not trip the
+    # detector. Anchored checks (P6/P7/P10/P11) already ignore comment lines.
+    my $code_ncmt = join "\n", grep { !/^\s*#/ } split /\n/, $code;
     my $guarded = ($code =~ /if\s*\(\s*\$\]\s*>=\s*5\./);
 
     ok($code !~ /^\s*use\s+5\.0*[6-9][0-9]*\b/m,
@@ -40,12 +69,12 @@ for my $rel (@pm_files) {
     # ('>' '<' '>>' etc.) followed by another comma. In 2-arg open the mode
     # and filename are combined in one string ("<$file") or use & for dup.
     my $has_3arg =
-        ($code =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*['"](?:>>?|<<?|\+>|\+<)['"]\s*,/);
+        ($code_ncmt =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*['"](?:>>?|<<?|\+>|\+<)['"]\s*,/);
     ok(!$has_3arg || $guarded,
        "$rel P2: 3-arg open (lexical or bareword) guarded or absent");
     # P3: lexical filehandle -- open my $fh or open(my $fh, ...)
     # Detects both: open my $fh, ... and open(my $fh, ...)
-    my $has_lex = ($code =~ /\bopen\s*[\(\s]\s*my\s+\$\w+/);
+    my $has_lex = ($code_ncmt =~ /\bopen\s*[\(\s]\s*my\s+\$\w+/);
     ok(!$has_lex || $guarded,
        "$rel P3: open(my \$fh...) guarded or absent");
     ok($code !~ /^\s*use\s+warnings\s*;/m
@@ -68,7 +97,7 @@ for my $rel (@pm_files) {
     };
 
     # P9: opendir(my $fh ...) -- Perl 5.6+ lexical dir handle
-    my $has_od_lex = ($code =~ /\bopendir\s*[\(\s]+my\s+\$/);
+    my $has_od_lex = ($code_ncmt =~ /\bopendir\s*[\(\s]+my\s+\$/);
     ok(!$has_od_lex || $guarded,
        "$rel P9: opendir(my \$dh...) guarded or absent");
 

@@ -12,7 +12,7 @@ use Concierge::Auth::Pwd;
 
 my $dir  = tempdir( CLEANUP => 1 );
 my $file = "$dir/auth.pwd";
-my $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', file => $file );
+my $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', file => $file );
 
 # ========== enroll (was setPwd) ==========
 
@@ -200,7 +200,7 @@ subtest 'encryptPwd - invalid password rejected' => sub {
 
 subtest 'is_id_known - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    my $w = warnings { $nf = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 ) };
     like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
     my $result = $nf->is_id_known('alice');
     ok( $result->{success}, 'is_id_known still succeeds when no file is set' );
@@ -209,7 +209,7 @@ subtest 'is_id_known - no file configured' => sub {
 
 subtest 'authenticate - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    my $w = warnings { $nf = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 ) };
     like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
     my $result;
     my $pw = warnings { $result = $nf->authenticate('alice', 'password123') };
@@ -218,7 +218,7 @@ subtest 'authenticate - no file configured' => sub {
 
 subtest 'revoke - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    my $w = warnings { $nf = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 ) };
     like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
     my $result = $nf->revoke('alice');
     ok( !$result->{success}, 'revoke fails when no file is set' );
@@ -226,7 +226,7 @@ subtest 'revoke - no file configured' => sub {
 
 subtest 'change_credentials - no file configured' => sub {
     my $nf;
-    my $w = warnings { $nf = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+    my $w = warnings { $nf = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 ) };
     like( $w->[0], qr/Utilities only/i, 'constructor warns when no_file' );
     my $result = $nf->change_credentials('alice', 'password123');
     ok( !$result->{success}, 'change_credentials fails when no file is set' );

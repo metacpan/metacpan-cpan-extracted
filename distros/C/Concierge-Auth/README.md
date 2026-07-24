@@ -1,29 +1,29 @@
 # Concierge::Auth
 
-Concierge authorization using Crypt::Passphrase - a production-ready authentication and authorization framework.
+Concierge authorization framework - production-ready authentication and authorization with substitutable backends.
 
 ## VERSION
 
-v0.3.2
+v0.5.2
 
 ## DESCRIPTION
 
-Concierge::Auth provides comprehensive user authentication and authorization capabilities using Crypt::Passphrase for secure password management. It supports file-based user storage, token generation, session management, and API key handling.
+Concierge::Auth provides comprehensive user authentication and authorization capabilities through a substitutable backend architecture — any backend implementing the same contract (LDAP, OAuth, etc.) can be swapped in. Token generation is available independent of the backend in use. The bundled `Concierge::Auth::Pwd` backend implements file-based password authentication using Crypt::Passphrase; see "Built-in Authentication" below.
 
 ## FEATURES
 
-- **Secure Password Management**: Argon2 encoder with Bcrypt fallback validators
-- **User Authentication**: File-based user authentication with encrypted passwords
+- **Substitutable Backends**: swap in any backend implementing the
+  `Concierge::Auth::Base` contract (LDAP, OAuth, etc.)
 - **Token Generation**: Generate cryptographically secure tokens and UUIDs
-- **Password Utilities**: Password strength validation, random string generation
-- **Session Management**: Support for session-based authentication
-- **API Key Management**: Generate and validate API keys
-- **File Management**: Secure user file operations with proper locking
 - **Generator Architecture**: Extensible generator system for tokens and identifiers
+- **Built-in Backend**: a password-file backend (`Concierge::Auth::Pwd`)
+  ships with this distribution — see "Built-in Authentication" below
 
 ## MODULE STRUCTURE
 
-- **Concierge::Auth** - Main authentication framework
+- **Concierge::Auth** - Backend factory / facade
+- **Concierge::Auth::Base** - Backend contract that all backends implement
+- **Concierge::Auth::Pwd** - Built-in password-file backend
 - **Concierge::Auth::Generators** - Token and identifier generation system
 
 ## INSTALLATION
@@ -46,92 +46,58 @@ cpanm Concierge::Auth
 ```perl
 use Concierge::Auth;
 
-# Initialize auth with a password file
-my $auth = Concierge::Auth->new({
-    file => '/path/to/users.passwd',
-});
+my $auth = Concierge::Auth->new(
+    backend_class => 'Concierge::Auth::Pwd',
+    file          => '/path/to/users.passwd',
+);
 
-# Or initialize without a file (utilities only)
-my $auth_util = Concierge::Auth->new({
-    no_file => 1,
-});
+my $result = $auth->enroll($user_id, $password);
+my $result = $auth->authenticate($user_id, $password);
+my $result = $auth->is_id_known($user_id);
+my $result = $auth->change_credentials($user_id, $new_password);
+my $result = $auth->revoke($user_id);
 
-# Authenticate a user
-my ($ok, $msg) = $auth->checkID($user_id);
-my ($ok, $msg) = $auth->checkPwd($user_id, $password);
-
-# Create a new user
-($ok, $msg) = $auth->setPwd($user_id, $password);
-
-# Change password
-($ok, $msg) = $auth->resetPwd($user_id, $new_password);
-
-# Delete a user
-($ok, $msg) = $auth->deleteID($user_id);
-
-# Generate a token
-my ($token, $msg) = $auth->gen_random_token();
-
-# Generate a random string
-my ($random, $msg) = $auth->gen_random_string(16);
-
-# Generate a UUID
-my ($uuid, $msg) = $auth->gen_uuid();
+# Generators -- work with or without a file
+# (backend_class => 'Concierge::Auth::Pwd', no_file => 1)
+my $token = $auth->gen_random_token();
+my $uuid  = $auth->gen_uuid();
 ```
 
-## DEVELOPMENT
+Each of the five core methods above returns a hashref: `{ success => 1, ... }`
+on success, or `{ success => 0, message => '...' }` on failure. See
+`Concierge::Auth::Base` for the full contract.
 
-### Repository Structure
+## Built-in Authentication (Concierge::Auth::Pwd)
 
+`Concierge::Auth::Pwd` is the password-file backend bundled with this
+distribution — the `backend_class` used in the example above.
+
+- **Password Management**: Argon2 encoder (via Crypt::Passphrase) with a
+  Bcrypt fallback validator for legacy password verification
+- **File-based Authentication**: encrypted passwords stored in a plain
+  password file, never in plaintext
+- **File Locking**: proper `flock()` support for concurrent access
+- **Password Utilities**: password strength validation, on top of the
+  random string/token generators shared with all backends
+- **Flexible**: works with or without a password file (`no_file => 1`)
+  when only the generator methods are needed
+
+Password security defaults:
+- Primary encoder: Argon2 (memory-hard, resistant to GPU/ASIC attacks)
+- Fallback validator: Bcrypt (for backward compatibility)
+- Password length: 8-72 characters (bcrypt limit)
+- User ID validation: 2-32 characters, alphanumeric plus `. _ @ -`
+
+See `perldoc Concierge::Auth::Pwd` for the full backend documentation.
+
+The generator methods (`gen_random_token`, `gen_uuid`, etc.) are different:
+they follow a `wantarray` `(value)` / `(value, message)` dual-return
+convention rather than returning a hashref, so context matters:
+
+```perl
+my ($token, $msg) = $auth->gen_random_token();  # list context
+my $token          = $auth->gen_random_token();  # scalar context: $msg discarded
 ```
-Concierge-Auth/
-├── lib/Concierge/          # Source modules
-│   ├── Auth.pm             # Main module
-│   └── Auth/               # Submodules
-│       └── Generators.pm   # Generator system
-├── examples/               # Example scripts
-│   ├── 01-basic-authentication.pl
-│   ├── 02-user-management.pl
-│   ├── 03-token-generation.pl
-│   ├── 04-session-management.pl
-│   ├── 05-api-keys.pl
-│   ├── 06-file-management.pl
-│   ├── 07-error-handling.pl
-│   ├── 08-advanced-usage.pl
-│   ├── 09-generators-architecture.pl
-│   ├── 10-architecture-comparison.pl
-│   └── README.md
-├── t/                      # Test suite
-│   ├── 00-load.t
-│   ├── 01-constructor.t
-│   ├── 02-validation.t
-│   ├── 03-auth.t
-│   └── 04-file-management.t
-├── Changes                # Revision history
-├── MANIFEST               # Distribution file list
-├── Makefile.PL            # CPAN installation script
-└── README.md              # This file
-```
-
-### Development Workflow
-
-1. **Edit** files in the Git repository
-2. **Test** using blib (doesn't affect installed version):
-   ```bash
-   perl Makefile.PL
-   make
-   prove -blib t/*.t
-   ```
-3. **Commit** changes to Git
-4. **Install** when ready for production:
-   ```bash
-   make install
-   ```
-
-This workflow lets you:
-- Develop and test without breaking your production Perl environment
-- Keep stable versions installed while working on new features
-- Install to site_perl only when changes are tested and ready
 
 ## REQUIREMENTS
 
@@ -140,32 +106,24 @@ This workflow lets you:
 - Fcntl
 - Crypt::Passphrase
 - Crypt::PRNG
-- Time::HiRes
 - parent
 - Exporter
 - Test2::V0 (for testing)
-
-## PASSWORD SECURITY
-
-Concierge::Auth uses Crypt::Passphrase with:
-- **Primary Encoder**: Argon2 (memory-hard, resistant to GPU/ASIC attacks)
-- **Fallback Validators**: Bcrypt (for backward compatibility)
-- **Password Length**: 8-72 characters (bcrypt limit)
-- **User ID Validation**: 2-32 characters, alphanumeric plus . _ @ -
 
 ## PRODUCTION USE
 
 Concierge::Auth is actively used in production environments. Key features for production:
 
-- **File Locking**: Proper flock() support for concurrent access
-- **Secure Defaults**: Argon2 encoder with reasonable defaults
 - **Error Handling**: Comprehensive error checking and reporting
 - **Token Security**: Cryptographically secure random token generation
-- **Flexible Architecture**: Works with or without password files
+
+See "Built-in Authentication" above for production-hardening details
+specific to the bundled `Concierge::Auth::Pwd` backend (file locking,
+secure password defaults).
 
 ## INTEGRATION
 
-Concierge::Auth integrates with the Concierge ecosystem:
+Concierge::Auth also integrates with the Concierge ecosystem:
 - **Concierge::Users** - User data management
 - **Concierge::Sessions** - Session management
 
@@ -176,27 +134,22 @@ These modules together form the core of the Concierge service layer, providing:
 
 ## EXAMPLES
 
-The `examples/` directory contains comprehensive examples covering:
-1. Basic authentication
-2. User management
-3. Token generation
-4. Session management
-5. API keys
-6. File management
-7. Error handling
-8. Advanced usage
-9. Generators architecture
-10. Architecture comparison
+The `examples/` directory currently contains one example:
 
-See `examples/README.md` for full details.
+- `1-custom-backend-ldap.pl` - sketch of a directory-backed (LDAP)
+  `Concierge::Auth::Base` implementation
+
+More examples covering the built-in `Concierge::Auth::Pwd` backend and
+generator usage are planned. See `examples/README.md` for details.
 
 ## ARCHITECTURE
 
 Concierge::Auth follows a service layer pattern:
-- **Constructor**: May die on fatal errors (file permissions)
-- **Methods**: Never die, always return (success, message) tuples
-- **Response Pattern**: confirm(), reject(), reply() helper methods
-- **Graceful Degradation**: Falls back to alternative methods when possible
+- **Constructor**: May die on fatal errors (missing backend, file permissions)
+- **Core contract methods**: Never die, always return a `{ success => ... }`
+  hashref (see `Concierge::Auth::Base`)
+- **Generator methods**: Never die, use a `wantarray` dual-return convention
+  (see `Concierge::Auth::Generators`)
 
 The module uses modern Perl practices:
 - v5.36+ syntax

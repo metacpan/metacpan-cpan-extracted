@@ -13,13 +13,12 @@ WriteMakefile(
     ),
     LIBS              => ['-ltoml'], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
-    INC               => '-Wall --std=c99 -I.', # e.g., '-I. -I/usr/include/other'
+    INC               => '-Wall --std=c17 -I.', # e.g., '-I. -I/usr/include/other'
     LICENSE           => "perl_5",
 
     OBJECT => [
         '$(BASEEXT)$(OBJ_EXT)',
-        'toml.o',
-        'tomlxs.o',
+        'tomlc17.o',
     ],
 
     CONFIGURE_REQUIRES => {

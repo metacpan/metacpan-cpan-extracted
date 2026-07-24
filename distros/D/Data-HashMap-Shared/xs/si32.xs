@@ -71,6 +71,7 @@ put(SV* self_sv, SV* key_sv, int32_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_put(h, _kstr, (uint32_t)_klen, _kutf8, value);
     OUTPUT:
         RETVAL
@@ -83,18 +84,24 @@ set_multi(SV* self_sv, ...)
         uint32_t count = 0;
         if (h->shard_handles) {
             for (int i = 1; i < items; i += 2) {
+                int32_t _val = (int32_t)SvIV(ST(i + 1));
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
                 STRLEN _klen; const char *_kstr = SvPV(ST(i), _klen);
                 bool _kutf8 = SvUTF8(ST(i)) ? 1 : 0;
                 if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
-                count += shm_si32_put(h, _kstr, (uint32_t)_klen, _kutf8, (int32_t)SvIV(ST(i + 1)));
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
+                count += shm_si32_put(h, _kstr, (uint32_t)_klen, _kutf8, _val);
             }
         } else {
             WRSEQ_GUARD(h);
             for (int i = 1; i < items; i += 2) {
+                int32_t _val = (int32_t)SvIV(ST(i + 1));
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
                 STRLEN _klen; const char *_kstr = SvPV(ST(i), _klen);
                 bool _kutf8 = SvUTF8(ST(i)) ? 1 : 0;
                 if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
-                count += shm_si32_put_inner(h, _kstr, (uint32_t)_klen, _kutf8, (int32_t)SvIV(ST(i + 1)), SHM_TTL_USE_DEFAULT);
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
+                count += shm_si32_put_inner(h, _kstr, (uint32_t)_klen, _kutf8, _val, SHM_TTL_USE_DEFAULT);
             }
         }
         RETVAL = count;
@@ -111,6 +118,7 @@ remove_multi(SV* self_sv, ...)
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
                 if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
                 count += shm_si32_remove(h, _ks, (uint32_t)_kl, _ku);
             }
         } else {
@@ -119,6 +127,7 @@ remove_multi(SV* self_sv, ...)
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
                 if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
                 count += shm_si32_remove_inner(h, _ks, (uint32_t)_kl, _ku);
             }
             if (count) shm_si32_maybe_shrink(h);
@@ -139,6 +148,7 @@ get_multi(SV* self_sv, ...)
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
                 bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
                 int32_t val;
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
                 if (shm_si32_get(h, _ks, (uint32_t)_kl, _ku, &val))
                     mPUSHi(val);
                 else
@@ -155,6 +165,7 @@ get_multi(SV* self_sv, ...)
             for (int i = 0; i < nkeys; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
                 bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
+                REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
                 uint32_t hash = shm_hash_string(_ks, (uint32_t)_kl);
                 uint32_t pos = hash & mask;
                 uint8_t tag = SHM_MAKE_TAG(hash);
@@ -189,6 +200,7 @@ get_with_ttl(SV* self_sv, SV* key_sv)
         EXTRACT_STR_KEY(key_sv);
         int32_t out_value;
         int64_t out_ttl;
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         if (!shm_si32_get_with_ttl(h, _kstr, (uint32_t)_klen, _kutf8, &out_value, &out_ttl)) XSRETURN_EMPTY;
         EXTEND(SP, 2);
         mPUSHi(out_value);
@@ -221,6 +233,7 @@ cas(SV* self_sv, SV* key_sv, int32_t expected, int32_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_cas(h, _kstr, (uint32_t)_klen, _kutf8, expected, desired);
     OUTPUT:
         RETVAL
@@ -231,6 +244,7 @@ cas_take(SV* self_sv, SV* key_sv, int32_t expected)
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t out_value;
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         if (!shm_si32_cas_take(h, _kstr, (uint32_t)_klen, _kutf8, expected, &out_value)) XSRETURN_UNDEF;
         RETVAL = newSViv(out_value);
     OUTPUT:
@@ -241,6 +255,7 @@ persist(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_persist(h, _kstr, (uint32_t)_klen, _kutf8);
     OUTPUT:
         RETVAL
@@ -250,6 +265,7 @@ set_ttl(SV* self_sv, SV* key_sv, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_set_ttl(h, _kstr, (uint32_t)_klen, _kutf8, (uint32_t)ttl_sec);
     OUTPUT:
         RETVAL
@@ -259,6 +275,7 @@ put_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         REQUIRE_TTL(h);
         RETVAL = shm_si32_put_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
     OUTPUT:
@@ -286,6 +303,7 @@ get(SV* self_sv, SV* key_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t value;
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         if (!shm_si32_get(h, _kstr, (uint32_t)_klen, _kutf8, &value)) XSRETURN_UNDEF;
         RETVAL = newSViv(value);
     OUTPUT:
@@ -296,6 +314,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_remove(h, _kstr, (uint32_t)_klen, _kutf8);
     OUTPUT:
         RETVAL
@@ -305,6 +324,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_exists(h, _kstr, (uint32_t)_klen, _kutf8);
     OUTPUT:
         RETVAL
@@ -314,6 +334,7 @@ incr(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int ok;
         int32_t val = shm_si32_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, 1, &ok);
         if (!ok) croak("Data::HashMap::Shared::SI32: increment failed");
@@ -326,6 +347,7 @@ decr(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int ok;
         int32_t val = shm_si32_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, -1, &ok);
         if (!ok) croak("Data::HashMap::Shared::SI32: decrement failed");
@@ -338,6 +360,7 @@ incr_by(SV* self_sv, SV* key_sv, int32_t delta)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int ok;
         int32_t val = shm_si32_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, delta, &ok);
         if (!ok) croak("Data::HashMap::Shared::SI32: incr_by failed");
@@ -350,6 +373,7 @@ max(SV* self_sv, SV* key_sv, int32_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int ok;
         int32_t val = shm_si32_set_minmax(h, _kstr, (uint32_t)_klen, _kutf8, desired, 1, &ok);
         if (!ok) croak("Data::HashMap::Shared::SI32: max failed");
@@ -362,6 +386,7 @@ min(SV* self_sv, SV* key_sv, int32_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int ok;
         int32_t val = shm_si32_set_minmax(h, _kstr, (uint32_t)_klen, _kutf8, desired, 0, &ok);
         if (!ok) croak("Data::HashMap::Shared::SI32: min failed");
@@ -515,6 +540,7 @@ get_or_set(SV* self_sv, SV* key_sv, int32_t default_value)
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t out;
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int rc = shm_si32_get_or_set(h, _kstr, (uint32_t)_klen, _kutf8, default_value, &out);
         if (!rc) XSRETURN_UNDEF;
         RETVAL = newSViv(out);
@@ -527,6 +553,7 @@ take(SV* self_sv, SV* key_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t out_value;
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         if (!shm_si32_take(h, _kstr, (uint32_t)_klen, _kutf8, &out_value)) XSRETURN_UNDEF;
         RETVAL = newSViv(out_value);
     OUTPUT:
@@ -611,6 +638,7 @@ touch(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_touch(h, _kstr, (uint32_t)_klen, _kutf8);
     OUTPUT:
         RETVAL
@@ -668,6 +696,7 @@ add(SV* self_sv, SV* key_sv, int32_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_add(h, _kstr, (uint32_t)_klen, _kutf8, value);
     OUTPUT:
         RETVAL
@@ -677,6 +706,7 @@ add_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         REQUIRE_TTL(h);
         RETVAL = shm_si32_add_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
     OUTPUT:
@@ -687,6 +717,7 @@ update(SV* self_sv, SV* key_sv, int32_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         RETVAL = shm_si32_update(h, _kstr, (uint32_t)_klen, _kutf8, value);
     OUTPUT:
         RETVAL
@@ -696,6 +727,7 @@ update_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl_sec)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         REQUIRE_TTL(h);
         RETVAL = shm_si32_update_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
     OUTPUT:
@@ -707,6 +739,7 @@ swap(SV* self_sv, SV* key_sv, int32_t value)
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t out_value;
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int rc = shm_si32_swap(h, _kstr, (uint32_t)_klen, _kutf8, value, &out_value);
         if (rc != 1) XSRETURN_UNDEF;
         RETVAL = newSViv(out_value);
@@ -740,6 +773,7 @@ ttl_remaining(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
         int64_t remaining = shm_si32_ttl_remaining(h, _kstr, (uint32_t)_klen, _kutf8);
         if (remaining < 0) XSRETURN_UNDEF;
         RETVAL = newSViv(remaining);
@@ -816,6 +850,7 @@ seek(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_CURSOR("Data::HashMap::Shared::SI32::Cursor", self_sv);
         EXTRACT_STR_KEY(key_sv);
+        REEXTRACT_CURSOR("Data::HashMap::Shared::SI32::Cursor", self_sv);
         RETVAL = shm_si32_cursor_seek(c, _kstr, (uint32_t)_klen, _kutf8);
     OUTPUT:
         RETVAL

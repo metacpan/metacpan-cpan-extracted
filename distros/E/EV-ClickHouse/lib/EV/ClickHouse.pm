@@ -11,7 +11,7 @@ my $RE_IDENT = qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 my $RE_TABLE = qr/\A[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?\z/;
 
 BEGIN {
-    our $VERSION = '0.05';
+    our $VERSION = '0.06';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -1030,7 +1030,14 @@ sub _flush {
         }
     };
     my @opt = $self->{settings} ? ($self->{settings}) : ();
-    $self->{ch}->insert($self->{table}, $batch, @opt, $cb);
+    # insert() croaks synchronously when the connection is definitively down,
+    # and via XS _streamer_push_row that croak is swallowed by G_EVAL — so
+    # without this in_flight would stay 1 forever and finish() never fire.
+    # Route the failure through $cb to keep the bookkeeping in one place.
+    unless (eval { $self->{ch}->insert($self->{table}, $batch, @opt, $cb); 1 }) {
+        my $err = $@ || "insert failed";
+        $cb->(undef, $err);
+    }
 }
 
 sub finish {
@@ -1385,11 +1392,10 @@ sub with_session {
 sub drain {
     my ($self, $cb) = @_;
     my $left = scalar @{ $self->{conns} };
-    my $err;
     for my $c (@{ $self->{conns} }) {
         $c->drain(sub {
-            $err //= $_[0] if $_[0];
-            $cb->($err) unless --$left;
+            # Per-connection drain callback takes no arguments.
+            $cb->(undef) unless --$left;
         });
     }
 }
@@ -1426,7 +1432,7 @@ sub shutdown {
     };
     for my $c (@{ $self->{conns} }) {
         $c->drain(sub {
-            $err //= $_[0] if $_[0];
+            # Per-connection drain callback takes no arguments.
             $finalize->() if --$left == 0;
         });
     }

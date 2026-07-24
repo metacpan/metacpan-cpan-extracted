@@ -40,7 +40,7 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 require BATsh::Env;

@@ -7,7 +7,8 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
+use Readonly;
 use Test::Mockingbird 0.08 qw(mock mock_scoped);
 use File::Temp qw(tempdir);
 use File::Spec;
@@ -28,7 +29,7 @@ sub reset_env {
 		C_DOCUMENT_ROOT HTTP_HOST SERVER_NAME SSL_TLS_SNI SERVER_PROTOCOL
 		SERVER_PORT SCRIPT_URI REMOTE_ADDR HTTP_USER_AGENT HTTP_COOKIE
 		HTTP_X_WAP_PROFILE HTTP_SEC_CH_UA_MOBILE HTTP_REFERER IS_MOBILE
-		IS_SEARCH_ENGINE LOGDIR
+		IS_SEARCH_ENGINE IS_AI LOGDIR
 	);
 	CGI::Info->reset();
 	@ARGV = ();
@@ -774,8 +775,163 @@ subtest 'is_search_engine() - overridden by IS_SEARCH_ENGINE=1' => sub {
 };
 
 # ============================================================
+# is_ai()
+# POD: returns boolean; true when visitor is a known AI training or
+#      inference crawler; is_robot() is also true when is_ai() is true
+#      (documented invariant); overridden by the IS_AI env variable.
+# ============================================================
+
+# Readonly constants used throughout the is_ai() tests.
+Readonly my $AI_REMOTE => '1.2.3.4';
+Readonly my $UA_CLAUDE_BOT  => 'ClaudeBot/1.0 (+http://www.anthropic.com)';
+Readonly my $UA_GPTBOT      => 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)';
+Readonly my $UA_CHATGPT     => 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); ChatGPT-User/1.0; +https://openai.com/bot)';
+Readonly my $UA_COHERE      => 'cohere-ai/1.0';
+Readonly my $UA_DESKTOP_WIN => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120';
+
+# Exhaustive API ledger: every documented return state, invariant, and
+# override.  Each key is deleted when a subtest exercises that state.
+# The empty-ledger assertion at the end of this section catches any
+# POD-documented behaviour that was accidentally left untested.
+my %is_ai_ledger = (
+	'returns 0 outside CGI environment'        => 1,
+	'returns 1 for AI crawler UA'              => 1,
+	'returns 0 for non-AI UA'                  => 1,
+	'returns 0 when REMOTE_ADDR absent'        => 1,
+	'IS_AI=1 env override forces true'         => 1,
+	'IS_AI=0 env override forces false'        => 1,
+	'is_robot() true when is_ai() true'        => 1,
+	'invariant holds with is_robot() first'    => 1,
+	'browser_type returns ai when is_ai true'  => 1,
+);
+
+# No CGI environment at all: both REMOTE_ADDR and HTTP_USER_AGENT absent.
+subtest 'is_ai() - false when no CGI environment' => sub {
+	reset_env();
+	is(CGI::Info->new()->is_ai(), 0,
+		'is_ai() returns 0 outside CGI environment');
+	delete $is_ai_ledger{'returns 0 outside CGI environment'};
+};
+
+# ClaudeBot is a canonical Anthropic training crawler.
+subtest 'is_ai() - true for ClaudeBot UA' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_CLAUDE_BOT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(CGI::Info->new()->is_ai(), 'ClaudeBot UA => is_ai true');
+	delete $is_ai_ledger{'returns 1 for AI crawler UA'};
+};
+
+# GPTBot (OpenAI training crawler) confirms coverage beyond ClaudeBot.
+subtest 'is_ai() - true for GPTBot UA' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_GPTBOT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(CGI::Info->new()->is_ai(), 'GPTBot UA => is_ai true');
+};
+
+# ChatGPT-User contains no "bot" or "spider" token; this exercises the
+# regex branches for unusual UA formats and also proves is_robot() is
+# reached via the is_ai() delegation path in is_robot().
+subtest 'is_ai() - true for ChatGPT-User (no bot/spider token in UA)' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_CHATGPT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(CGI::Info->new()->is_ai(), 'ChatGPT-User UA => is_ai true');
+};
+
+# cohere-ai is another non-standard UA with no "bot" or "spider" component.
+subtest 'is_ai() - true for cohere-ai UA' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_COHERE;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(CGI::Info->new()->is_ai(), 'cohere-ai UA => is_ai true');
+};
+
+# An ordinary desktop browser must not trigger is_ai().
+subtest 'is_ai() - false for desktop browser UA' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_DESKTOP_WIN;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(!CGI::Info->new()->is_ai(), 'desktop UA => is_ai false');
+	delete $is_ai_ledger{'returns 0 for non-AI UA'};
+};
+
+# REMOTE_ADDR absent: the CGI environment is incomplete; method returns 0.
+# This is consistent with is_robot() and is_search_engine() behaviour.
+subtest 'is_ai() - false when REMOTE_ADDR absent' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_CLAUDE_BOT;
+	# No REMOTE_ADDR
+	ok(!CGI::Info->new()->is_ai(), 'absent REMOTE_ADDR => is_ai false');
+	delete $is_ai_ledger{'returns 0 when REMOTE_ADDR absent'};
+};
+
+# IS_AI=1 must force true even for a non-AI UA (env override is authoritative).
+# Use local so the override does not leak into subsequent tests.
+subtest 'is_ai() - IS_AI=1 env override forces true' => sub {
+	reset_env();
+	local $ENV{IS_AI}	 = 1;
+	$ENV{HTTP_USER_AGENT} = $UA_DESKTOP_WIN;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(CGI::Info->new()->is_ai(), 'IS_AI=1 forces true for non-AI UA');
+	delete $is_ai_ledger{'IS_AI=1 env override forces true'};
+};
+
+# IS_AI=0 must force false even for a known AI crawler UA.
+subtest 'is_ai() - IS_AI=0 env override forces false' => sub {
+	reset_env();
+	local $ENV{IS_AI}	 = 0;
+	$ENV{HTTP_USER_AGENT} = $UA_CLAUDE_BOT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	ok(!CGI::Info->new()->is_ai(), 'IS_AI=0 forces false for AI UA');
+	delete $is_ai_ledger{'IS_AI=0 env override forces false'};
+};
+
+# Invariant (documented in POD): is_ai() true implies is_robot() true,
+# regardless of which method is called first.
+subtest 'is_ai() - is_robot() also true when is_ai() is true' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_CLAUDE_BOT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	my $info = CGI::Info->new();
+	ok($info->is_ai(),    'ClaudeBot => is_ai true');
+	ok($info->is_robot(), 'ClaudeBot => is_robot also true (invariant)');
+	delete $is_ai_ledger{'is_robot() true when is_ai() true'};
+};
+
+# Call-order variant: is_robot() called FIRST.  ChatGPT-User has no
+# "bot"/"spider" token so is_robot()'s own regex would miss it; the
+# invariant is enforced by is_robot() delegating to is_ai() internally.
+subtest 'is_ai() - invariant holds when is_robot() called before is_ai()' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_CHATGPT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	my $info = CGI::Info->new();
+	ok($info->is_robot(), 'ChatGPT-User: is_robot() true when called first');
+	ok($info->is_ai(),    'ChatGPT-User: is_ai()   true after is_robot()');
+	delete $is_ai_ledger{'invariant holds with is_robot() first'};
+};
+
+# browser_type() must return 'ai' for AI crawlers (POD documents this as
+# the second priority after 'mobile', before 'search', 'robot', 'web').
+subtest 'is_ai() - browser_type() returns ai' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = $UA_CLAUDE_BOT;
+	$ENV{REMOTE_ADDR}	 = $AI_REMOTE;
+	is(CGI::Info->new()->browser_type(), 'ai',
+		'ClaudeBot => browser_type returns ai');
+	delete $is_ai_ledger{'browser_type returns ai when is_ai true'};
+};
+
+# Ledger must be empty -- every documented state was exercised above.
+ok(!%is_ai_ledger, 'is_ai() ledger empty: all documented states covered')
+	or diag('Untested is_ai() states: ' . join(', ', sort keys %is_ai_ledger));
+
+# ============================================================
 # browser_type()
-# POD: returns one of 'web', 'search', 'robot', 'mobile'
+# POD: returns one of 'mobile', 'ai', 'search', 'robot', 'web'
+#      in that priority order
 # ============================================================
 
 subtest 'browser_type() - returns mobile for smartphone UA' => sub {
@@ -792,20 +948,27 @@ subtest 'browser_type() - returns web for desktop browser' => sub {
 	is(CGI::Info->new()->browser_type(), 'web', 'desktop => web');
 };
 
-subtest 'browser_type() - returns robot for known bot' => sub {
+subtest 'browser_type() - returns ai for known AI crawler' => sub {
 	reset_env();
 	$ENV{HTTP_USER_AGENT} = 'ClaudeBot/1.0';
 	$ENV{REMOTE_ADDR}	 = '1.2.3.4';
-	is(CGI::Info->new()->browser_type(), 'robot', 'bot => robot');
+	is(CGI::Info->new()->browser_type(), 'ai', 'bot => ai');
 };
 
-subtest 'browser_type() - return value is one of the four valid strings' => sub {
+subtest 'browser_type() - returns robot for non-AI bot' => sub {
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'SomeGenericSpider/1.0';
+	$ENV{REMOTE_ADDR}	 = '1.2.3.4';
+	is(CGI::Info->new()->browser_type(), 'robot', 'generic spider => robot');
+};
+
+subtest 'browser_type() - return value is one of the five valid strings' => sub {
 	reset_env();
 	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (Windows NT 10.0)';
 	$ENV{REMOTE_ADDR}	 = '1.2.3.4';
 	my $type = CGI::Info->new()->browser_type();
-	ok((grep { $type eq $_ } qw(web search robot mobile)),
-		"browser_type() returns one of the four valid values (got '$type')");
+	ok((grep { $type eq $_ } qw(web search robot mobile ai)),
+		"browser_type() returns one of the five valid values (got '$type')");
 };
 
 # ============================================================

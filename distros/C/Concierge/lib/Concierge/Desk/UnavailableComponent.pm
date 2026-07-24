@@ -1,7 +1,7 @@
-package Concierge::Desk::UnavailableComponent v0.10.0;
+package Concierge::Desk::UnavailableComponent v0.11.0;
 use v5.36;
 
-our $VERSION = 'v0.10.0';
+our $VERSION = 'v0.11.0';
 
 # ABSTRACT: Stand-in substituted for a failed optional Concierge desk component
 
@@ -48,7 +48,7 @@ Concierge::Desk::UnavailableComponent - Stand-in substituted for a failed option
 
 =head1 VERSION
 
-v0.10.0
+v0.11.0
 
 =head1 SYNOPSIS
 
@@ -68,6 +68,26 @@ C<new()> died at desk-open time. It accepts any method call and returns
 a uniform failure hashref, so application code that always checks
 C<< $result->{success} >> continues to work without special-casing a
 missing component.
+
+This substitution can only happen at C<open_desk()> time, and only for
+a component that was configured C<< optional => 1 >> in the desk's
+C<components> block at build time. It presupposes the component
+already succeeded once: a C<setup()> failure always fails the entire
+desk build, regardless of C<optional> (see
+L<Concierge::Desk::Setup/build_desk>), so the desk could not have been
+built -- and Concierge could not have been instantiated -- unless this
+component's C<setup()> succeeded. C<UnavailableComponent> stands in
+only for a later C<new()> failure, typically in some subsequent process
+opening the same already-built desk, where something in that runtime
+environment (a missing library, an unreachable resource) causes
+construction to fail even though the persisted C<payload> itself is
+fine.
+
+There is no supported way to swap in a working component after this
+substitution occurs. Desk configuration is fixed at C<open_desk()>
+time, and patching C<< $concierge->{name} >> directly with a live
+replacement, while technically possible today, is not a sanctioned
+pattern.
 
 =head1 METHODS
 

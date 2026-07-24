@@ -20,9 +20,12 @@
 #include "XSParseKeyword.h"
 
 /* ---- as_scalar magic: prevent use-after-free by preventing buffer DESTROY
- * while the returned scalar ref is alive. We attach magic to the inner SV
- * that holds a reference to the buffer object. When the inner SV is freed,
- * the magic destructor releases the reference. ---- */
+ * while the returned scalar ref is alive. We attach magic to the inner SV that
+ * holds a reference to the buffer's underlying handle -- the REFERENT (SvRV),
+ * not the caller's RV container: `undef $buf` clears the container in place and
+ * releases the handle, which would free the mapping while the inner SV still
+ * aliases it. When the inner SV is freed, the magic destructor releases the
+ * reference (deferring DESTROY until both the caller and the scalar are gone). ---- */
 
 static int buf_scalar_magic_free(pTHX_ SV *sv, MAGIC *mg) {
     PERL_UNUSED_ARG(sv);
@@ -40,7 +43,19 @@ static const MGVTBL buf_scalar_magic_vtbl = {
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed %s object", classname)
+    if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, e.g. SvPV on an SV argument or SvIV/SvUV/SvNV on a ST()
+ * slot).  That code may call $obj->DESTROY explicitly, which frees the handle
+ * and zeroes the IV; EXTRACT_BUF's mortal pins the referent only against
+ * refcount-driven destruction, not an explicit DESTROY, so the local `h`
+ * would dangle.  Used only where magic can actually intervene between
+ * EXTRACT_BUF and the next use of h. */
+#define REEXTRACT_BUF(classname, sv) \
+    h = INT2PTR(BufHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("%s object destroyed during the call", classname)
 
 /* ---- Generic keyword build functions ---- */
 

@@ -11,7 +11,6 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/diag.t',
-    't/example.t',
     't/https_proxy.t'
 );
 

@@ -1,5 +1,14 @@
 Revision history for Data-CountMinSketch-Shared
 
+0.03      2026-07-22
+          - On-disk format change (v1 -> v2): an existing 0.02 file is
+            refused; recreate it.
+          - Fix a use-after-free in merge(): sv_isobject on the peer argument
+            runs get-magic, so a tied argument can destroy this object before
+            its handle is used again. Such a call now croaks.
+          - Resolve argument magic before capturing the path string.
+          - Document that counters wrap at 2^64.
+
 0.02      2026-07-03
           - Security and robustness hardening; backing files now created mode
             0600 (pass a file-mode argument to new() for cross-user sharing).

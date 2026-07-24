@@ -9,7 +9,21 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::CountMinSketch::Shared")) \
         croak("Expected a Data::CountMinSketch::Shared object"); \
     CmsHandle *h = INT2PTR(CmsHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::CountMinSketch::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::CountMinSketch::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal pins
+ * the referent only against refcount-driven destruction, not an explicit
+ * DESTROY, so the local `h` would dangle.  Used only where magic can actually
+ * intervene between EXTRACT and the first use of h -- a load and a branch,
+ * immediately before a lock that costs orders of magnitude more. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::CountMinSketch::Shared object was replaced during the call"); \
+    h = INT2PTR(CmsHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::CountMinSketch::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -30,10 +44,12 @@ new(class, path = &PL_sv_undef, epsilon = 0.001, delta = 0.001, ...)
   PREINIT:
     char errbuf[CMS_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Resolve the optional mode arg FIRST: its SvGETMAGIC can realloc/free the
+     * path PV, so capture the path pointer LAST, right before cms_create(). */
     /* Optional 4th arg: file mode for a newly-created backing file (default 0600,
      * owner-only). Pass a wider mode (e.g. 0660) to opt in to cross-user sharing. */
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     CmsHandle *h = cms_create(p, epsilon, delta, mode, errbuf);   /* validates epsilon/delta into errbuf */
     if (!h) croak("Data::CountMinSketch::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -90,6 +106,7 @@ add(self, item, n = 1)
     UV total;
   CODE:
     s = SvPVbyte(item, len);               /* may croak (wide char) -- BEFORE the lock */
+    REEXTRACT(self);
     cms_rwlock_wrlock(h);
     cms_add_locked(h, s, len, (uint64_t)n);
     total = (UV)h->hdr->total;
@@ -108,6 +125,7 @@ add_many(self, items)
     AV *av;
     IV  top;
   CODE:
+    SvGETMAGIC(items);
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::CountMinSketch::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
@@ -120,10 +138,18 @@ add_many(self, items)
             Newx(ls, cnt, STRLEN);       SAVEFREEPV(ls);
             for (i = 0; i < cnt; i++) {                  /* a croak here holds NO lock; SAVEFREEPV cleans up */
                 SV **el = av_fetch(av, (SSize_t)i, 0);
-                if (el && *el) ps[i] = SvPVbyte(*el, ls[i]);
-                else { ps[i] = ""; ls[i] = 0; }
+                if (el && *el) {
+                    STRLEN len;
+                    const char *src = SvPVbyte(*el, len); /* may run overload/tie/get-magic = arbitrary Perl */
+                    /* Copy bytes into a private mortal SV NOW: a LATER element SvPVbyte can
+                     * grow/free THIS element PV, dangling src before the locked loop uses it. */
+                    SV *copy = sv_2mortal(newSVpvn(src, len));
+                    ps[i] = SvPVX_const(copy);
+                    ls[i] = len;
+                } else { ps[i] = ""; ls[i] = 0; }
             }
         }
+        REEXTRACT(self);
         cms_rwlock_wrlock(h);                            /* locked region: NO croak-capable calls */
         for (i = 0; i < cnt; i++) cms_add_locked(h, ps[i], ls[i], 1);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
@@ -144,6 +170,7 @@ estimate(self, item)
     UV est;
   CODE:
     s = SvPVbyte(item, len);               /* may croak (wide char) -- BEFORE the lock */
+    REEXTRACT(self);
     cms_rwlock_rdlock(h);
     est = (UV)cms_estimate_locked(h, s, len);
     cms_rwlock_rdunlock(h);
@@ -162,6 +189,10 @@ merge(self, other)
         croak("Data::CountMinSketch::Shared->merge: expected a Data::CountMinSketch::Shared object");
     CmsHandle *o = INT2PTR(CmsHandle*, SvIV(SvRV(other)));
     if (!o) croak("Attempted to use a destroyed Data::CountMinSketch::Shared object");
+    /* sv_isobject/sv_derived_from above begin with SvGETMAGIC(other), so a
+     * tied `other` can have destroyed self before h is used below. `o` was
+     * read after that magic and needs no re-read. */
+    REEXTRACT(self);
 
     /* w and d are immutable after creation -- compare lock-free, croak BEFORE
      * allocating, so a mismatch holds no lock and leaks no buffer. */

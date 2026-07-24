@@ -1,0 +1,67 @@
+#!perl -w
+
+use strict;
+use Test::More;
+use Test::RequiresInternet 'httpbin.org' => 443;
+
+use LWP::UserAgent ();
+
+my $ua = LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
+
+my $url = 'https://httpbin.org';
+
+# httpbin.org is a shared public service that intermittently returns 5xx or
+# times out. Test::RequiresInternet only proves the TCP port is reachable, so
+# an up-but-unhealthy service would otherwise fail this test even though there
+# is nothing wrong with the module. Probe once and skip if it is unhealthy.
+{
+    my $probe = $ua->simple_request( HTTP::Request->new( GET => $url ) );
+    plan skip_all => "$url unavailable: " . $probe->status_line
+        unless $probe->is_success;
+}
+
+plan tests => 2;
+
+subtest "Request GET $url" => sub {
+    plan tests => 6;
+
+    my $res = $ua->simple_request(HTTP::Request->new(GET => $url));
+    ok($res->is_success, "success status");
+
+    my $h;
+
+    $h = 'X-Died';
+    my $x_died = $res->header($h);
+    is($x_died, undef, "no $h header");
+
+    $h = 'Client-SSL-Socket-Class';
+    my $socket_class = $res->header($h) || '';
+    ok($socket_class =~ /\S/, "have header $h");
+
+    SKIP: {
+        $h = 'Client-SSL-Version';
+        my $ssl_version = $res->header($h) || '';
+        my $h_test = $ssl_version =~ /^(SSL|TLS)v\d/i;
+        my $want_class = 'IO::Socket::SSL';
+        $h_test
+            or $socket_class eq $want_class
+            or skip "header $h only guaranteed when using $want_class", 1;
+        ok($h_test, "have header $h");
+    }
+
+    $h = 'Client-SSL-Cipher';
+    my $ssl_cipher = $res->header($h) || '';
+    ok($ssl_cipher =~ /\S/, "have header $h");
+
+    like($res->content, qr/\Qhttpbin.org/, "found expected document content");
+};
+
+subtest "Check for warnings from GET $url (RT #81948)" => sub {
+    plan tests => 2;
+    my $warn = '';
+    $SIG{__WARN__} = sub { $warn = shift };
+    my $res = $ua->simple_request(HTTP::Request->new(GET => $url));
+    ok($res->is_success, "success status");
+    is($warn, '', "no warning seen");
+    $res->dump(prefix => "# ");
+};

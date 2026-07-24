@@ -1,0 +1,155 @@
+NAME
+    Data::IntervalTree::Shared - shared-memory interval tree (overlap /
+    stabbing queries)
+
+SYNOPSIS
+        use Data::IntervalTree::Shared;
+
+        # up to 100_000 intervals
+        my $it = Data::IntervalTree::Shared->new(undef, 100_000);
+
+        $it->add($start, $end, $booking_id) for @bookings;   # each interval carries an id
+
+        # which intervals contain a point?
+        my @at = $it->stab($t);              # e.g. "what's booked at time $t"
+
+        # which intervals overlap a range?
+        my @ov = $it->overlaps($lo, $hi);    # e.g. "any booking touching [$lo,$hi]"
+        printf "id %d: [%d, %d]\n", $_->{id}, $_->{lo}, $_->{hi} for @ov;
+
+        # share the index across processes via a backing file
+        my $shared = Data::IntervalTree::Shared->new("/tmp/bookings.it", 100_000);
+
+DESCRIPTION
+    An interval tree in shared memory: a set of integer intervals "[lo, hi]"
+    that answers overlap and stabbing queries far faster than scanning every
+    interval -- "which stored intervals contain point "p"?" and "which
+    overlap the range "[lo, hi]"?". It complements Data::SegmentTree::Shared
+    (range-aggregate over indexed positions) and Data::KDTree::Shared
+    (multi-dimensional points): this one indexes a set of intervals for
+    containment/overlap. Classic uses: scheduling and calendar conflict
+    detection, IP-range to owner lookup, genomic feature overlap, and "what
+    is active at time "t"".
+
+    Endpoints are signed 64-bit integers (timestamps, IP addresses, genomic
+    coordinates -- exact, with no floating-point edge cases). Each interval
+    carries a user-supplied 64-bit id (defaulting to its insertion index),
+    returned with every match. Internally it is an augmented balanced binary
+    search tree keyed by the low endpoint, each node caching the maximum
+    high endpoint of its subtree so a query prunes whole subtrees that end
+    before it.
+
+    Intervals are appended in O(1) and the balanced tree is bulk-built on
+    the first query after any insert, so query recursion is O(log n + k)
+    deep (k = matches) regardless of insertion order -- no risk of a
+    degenerate, deep tree. Because the intervals live in a shared mapping,
+    several processes build and query one index: any process that opens the
+    same backing file, inherits the anonymous mapping across "fork", or
+    reopens a passed memfd sees the same intervals. A write-preferring futex
+    rwlock with dead-process recovery guards mutation; once the tree is
+    built, queries take only the read lock. Linux-only. Requires 64-bit
+    Perl.
+
+    The index has a fixed capacity; adding beyond it croaks. Memory is
+    "capacity * 40" bytes for the intervals plus a build scratch of
+    "capacity * 4" bytes and a fixed header.
+
+METHODS
+  Constructors
+        my $it = Data::IntervalTree::Shared->new($path, $capacity, $mode);
+        my $it = Data::IntervalTree::Shared->new(undef, $capacity);
+        my $it = Data::IntervalTree::Shared->new_memfd($name, $capacity);
+        my $it = Data::IntervalTree::Shared->new_from_fd($fd);
+
+    $capacity is the maximum number of intervals (1..2^24). "new" and
+    "new_memfd" croak on an out-of-range $capacity. When reopening an
+    existing file or memfd the stored geometry wins and the caller's
+    argument is ignored. An optional file mode may be passed as the last
+    argument to "new" (e.g. 0660) for cross-user sharing; it defaults to
+    0600 (owner-only).
+
+  Adding intervals
+        my $i = $it->add($lo, $hi);          # id defaults to the insertion index
+        my $i = $it->add($lo, $hi, $id);     # attach an explicit 64-bit id
+        $it->build;                          # (optional) force a rebuild now
+
+    "add" appends one interval with integer endpoints "$lo <= $hi" (croaks
+    otherwise) and an optional integer $id, returning its insertion index;
+    it croaks if the tree is full. Intervals are treated as closed (both
+    endpoints inclusive). "build" forces the balanced tree to be (re)built
+    immediately; you rarely need it, since queries build automatically after
+    inserts.
+
+  Queries
+        my @at = $it->stab($point);          # intervals containing $point (lo <= p <= hi)
+        my @ov = $it->overlaps($lo, $hi);    # intervals overlapping [$lo, $hi]
+
+    "stab" returns every stored interval that contains the point $point.
+    "overlaps" returns every stored interval that intersects the closed
+    range "[$lo, $hi]" (i.e. "interval.lo <= $hi" and "interval.hi >= $lo");
+    "$lo > $hi" croaks. Both return a list of hash references "{ id => ...,
+    lo => ..., hi => ... }", sorted by "lo" ascending. A point stab is
+    exactly "overlaps($p, $p)".
+
+  Introspection and lifecycle
+        $it->count;         # number of intervals added
+        $it->capacity;      # maximum number of intervals
+        $it->clear;         # remove all intervals
+        $it->stats;         # { count, capacity, dirty, ops, mmap_size }
+        $it->path; $it->memfd; $it->sync; $it->unlink;
+
+    "clear" empties the index. "sync" flushes the mapping to its backing
+    store (a no-op for anonymous and memfd trees); "unlink" removes the
+    backing file (also callable as "Class->unlink($path)"); "path" returns
+    the backing path ("undef" for anonymous, memfd, or fd-reopened trees)
+    and "memfd" the backing descriptor.
+
+SHARING ACROSS PROCESSES
+    The index lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file, an anonymous mapping inherited
+    across "fork", or a memfd passed to an unrelated process and reopened
+    with new_from_fd($fd). Any process can add intervals; the first query
+    after an add rebuilds the shared tree once (under the write lock), and
+    subsequent queries run concurrently under the read lock.
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default; pass
+    an explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
+    and the header is validated on attach. Any process granted write access
+    is trusted not to corrupt the mapping.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership and dead-owner recovery. Adds are short bounded
+    appends and the bulk build runs entirely under the write lock, so a
+    crash leaves the index consistent up to the last completed operation (a
+    crash mid-build simply leaves it marked for rebuild). Limitation: PID
+    reuse is not detected (very unlikely in practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
+
+SEE ALSO
+    Data::SegmentTree::Shared (range-aggregate over indexed positions),
+    Data::KDTree::Shared (multi-dimensional point index), and the rest of
+    the "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

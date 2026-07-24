@@ -19,8 +19,7 @@ END
     eval { TOML::XS::from_toml($doc)->to_struct() };
     my $err          = $@;
     diag $err;
-    like( $err, qr</badbad>, 'error indicates JSON pointer' );
-    like( $err, qr<json pointer>i, '… and we tell them it’s a JSON pointer' );
+    like( $err, qr<leading 0>, 'error indicates leading 0' );
 }
 
 $doc = <<END;
@@ -31,7 +30,7 @@ END
     eval { TOML::XS::from_toml($doc)->to_struct() };
     my $err          = $@;
     diag $err;
-    like( $err, qr</badbad/0/~1fo~0~1\x{e9}/0>, 'error indicates deep, escaped, decoded JSON pointer' );
+    like( $err, qr<leading 0>, 'error indicates leading 0' );
 }
 
 done_testing;

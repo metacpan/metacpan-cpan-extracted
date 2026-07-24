@@ -215,21 +215,29 @@ static char* ch_lz4_compress(const char *data, size_t data_len, size_t *out_len)
 /* Decompress one or more consecutive LZ4 sub-blocks starting at buf[*pos].
  * Advances *pos past every consumed sub-block; *out_len is total decompressed
  * size. Returns malloc'd buffer (caller Safefrees) on success, NULL on
- * not-enough-data (sets *need_more=1) or on hard error (sets *err). */
+ * not-enough-data (sets *need_more=1) or on hard error (sets *err) — both for
+ * the first frame, the only one known to belong to this packet. *more_maybe
+ * (may be NULL) is set when the chain stopped on a not-yet-complete following
+ * frame, so the caller reads a short block as need-more, not as malformed. */
 static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
                                       size_t *out_len, int *need_more,
-                                      const char **err) {
+                                      const char **err, int *more_maybe) {
     size_t comp_consumed;
     char *out;
 
     *need_more = 0;
     *err = NULL;
+    if (more_maybe) *more_maybe = 0;
 
     out = ch_lz4_decompress(buf + *pos, len - *pos, out_len,
                             &comp_consumed, need_more, err);
     if (!out) return NULL;
     *pos += comp_consumed;
 
+    /* A packet's compressed region is not length-delimited, so past the block's
+     * last frame *pos may sit on the next coalesced packet, whose bytes are
+     * arbitrary. A speculative frame must therefore never stall or fail the
+     * chain — it just ends it, consuming nothing. */
     while (len - *pos >= CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE
            && (uint8_t)buf[*pos + CH_CHECKSUM_SIZE] == CH_LZ4_METHOD) {
         size_t extra_len, extra_consumed;
@@ -239,10 +247,10 @@ static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
                                          &extra_consumed,
                                          &extra_need_more, &extra_err);
         if (!extra) {
-            Safefree(out);
-            if (extra_need_more) { *need_more = 1; return NULL; }
-            *err = extra_err;
-            return NULL;
+            /* Not a validated continuation frame (truncated, or the checksum
+             * says these bytes are not ours). Keep what we have. */
+            if (extra_need_more && more_maybe) *more_maybe = 1;
+            break;
         }
         if (extra_len > CH_MAX_DECOMPRESS_SIZE - *out_len) {
             Safefree(extra);

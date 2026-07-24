@@ -1,5 +1,13 @@
 Revision history for File-ContentStore
 
+1.005 2026-07-24 BOOK
+    - start using the Type::Params MODERN API (v2),
+      and requiring Moo 2.000000 or later
+    - skip files that are on a different filesystem than the store,
+      instead of dying
+    - minor documentation improvements
+    - add some test diagnostics to try to figure out failures on Win32
+
 1.004 2019-11-26 BOOK
     - Update the minimum version required for Path::Tiny
     - Minor documentation fixes

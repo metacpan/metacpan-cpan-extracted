@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Font::Metrics ();
 
@@ -23,7 +23,7 @@ Layout::Flex - CSS flexbox layout engine with wrap, gap, margin, and content dri
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

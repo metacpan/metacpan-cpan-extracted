@@ -222,47 +222,6 @@ package main;
         CUU      => "\e[A", # Cursor Up
         UI_OFFSET=> 11,     # Alignment offset for "  Syntax: "
         };
-
-# --- ENCAPSULATED DEBUG ALIAS ---
-    BEGIN
-        {
-        if ($INC{'perl5db.pl'})
-            {
-            require Data::Dumper;
-            require Term::ANSIColor;
-            no strict 'refs';
-            no warnings 'once';
-
-            my $debug_sub = sub
-                {
-                my @args = @_;
-
-                # Automatically detect flattened hashes:
-                # If even number of arguments and the first one isn't a reference
-                if (scalar @args > 1 && scalar @args % 2 == 0 && !ref($args[0]))
-                    {
-                    # Wrap the flattened list into a temporary hashref
-                    my %tmp_hash = @args;
-                    @args = (\%tmp_hash);
-                    }
-
-                print "\n", Term::ANSIColor::BOLD(), Term::ANSIColor::BLUE(),
-                      'DEBUG (tstregex): ', Term::ANSIColor::RESET(),
-                      Data::Dumper::Dumper(@args);
-                };
-
-            # Force injection into all relevant namespaces
-            foreach my $pkg ('main', 'Tstregex', 'DB')
-                {
-                *{"${pkg}::d"} = $debug_sub;
-                }
-
-            my $cuu = defined &main::CUU ? main::CUU() : "\e[A";
-            print $cuu, Term::ANSIColor::BOLD(), Term::ANSIColor::CYAN(),
-                  'INFO: ', Term::ANSIColor::RESET(),
-                  "Alias 'd' ready (Auto-hash detection enabled)\n\n";
-            }
-        }
         
     exit(main(scalar(@ARGV), \@ARGV)) if(!caller);
 
@@ -433,7 +392,7 @@ package main;
 
 package Tstregex;
     {
-    our $VERSION = '1.14';
+    our $VERSION = '1.15';
     use Exporter qw(import);
 
     our @EXPORT  = qw(

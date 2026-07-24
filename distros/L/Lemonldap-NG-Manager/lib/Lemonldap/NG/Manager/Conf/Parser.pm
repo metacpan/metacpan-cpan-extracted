@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -502,6 +502,39 @@ sub _scanNodes {
                         else {
                             hdebug("  $target: scanning subnodes");
                             $self->_scanNodes($subNodes);
+                        }
+                    }
+                    elsif ( $target eq
+                        'oidcOPMetaDataOptionsAuthEndpointExtraParams' )
+                    {
+                        if ( $leaf->{cnodes} ) {
+                            hdebug('    unopened');
+                            $self->newConf->{$optKey}->{$key}->{$target} =
+                              $self->refConf->{$optKey}->{$oldName}->{$target}
+                              // {};
+                        }
+                        elsif ($h) {
+                            hdebug('    opened');
+                            $self->set( $optKey, [ $oldName, $key ],
+                                $target, $leaf->{title}, $leaf->{data} );
+                        }
+                        elsif ( !@$subNodes ) {
+                            hdebug("  $target: no subnodes");
+                            $self->confChanged(1);
+                        }
+                        else {
+                            hdebug("  $target: scanning subnodes");
+                            my @oldKeys =
+                              keys %{ $self->refConf->{$optKey}->{$oldName}
+                                  ->{$target} };
+                            $self->_scanNodes($subNodes);
+                            my @newKeys = keys
+                              %{ $self->newConf->{$optKey}->{$key}->{$target} };
+
+                            # Detect deleted nodes
+                            my %seen    = map  { $_ => 1 } @newKeys;
+                            my @deleted = grep { !$seen{$_} } @oldKeys;
+                            $self->confChanged(1) if @deleted;
                         }
                     }
                     elsif ( $target =~

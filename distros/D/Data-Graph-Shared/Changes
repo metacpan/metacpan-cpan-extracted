@@ -1,5 +1,12 @@
 Revision history for Data::Graph::Shared
 
+0.05      2026-07-22
+          - Fix a use-after-free in add_edge(): an overloaded or tied weight
+            argument runs Perl that can destroy the graph, after which the
+            already-captured handle was still used. Such a call now croaks.
+          - Cache mapping geometry from one validated snapshot at attach.
+          - Reject node indexes >= 2^32 instead of truncating them.
+
 0.04  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

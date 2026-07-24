@@ -49,7 +49,7 @@ getKey = function() {
       }
       // Generate OTP url
       $("#divToHide").show();
-      s = `otpauth://totp/${escape(data.portal)}:${escape(data.user)}?secret=${data.secret}&issuer=${escape(data.portal)}`;
+      s = `otpauth://totp/${escape(data.portal)}:${escape(data.user)}?secret=${data.secret.toUpperCase()}&issuer=${escape(data.portal)}`;
       if (data.digits !== 6) {
         s += `&digits=${data.digits}`;
       }

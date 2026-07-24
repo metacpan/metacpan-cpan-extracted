@@ -2,7 +2,7 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.07
+    Version 0.08
 
 SYNOPSIS
       use BATsh;
@@ -188,6 +188,17 @@ SH MODE
       test / [ ... ]  (file, string, and integer comparisons)
       cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
       eval  (quote removal + re-execution with a second expansion)
+      let EXPR [EXPR ...]  (arithmetic evaluation; status 1 if last is zero)
+      type [-t|-p] NAME ...  (report how NAME resolves)
+      command [-v|-V] NAME [ARG ...]  (run bypassing functions; look up NAME)
+      umask [-S] [MODE]  (print/set the file-creation mask; octal or
+        symbolic u=rwx,g=rx,o=rx)
+      hash [-r] [NAME ...]  (PATH lookup; no-op cache maintenance)
+      readonly [-p] [NAME[=VALUE] ...]  (mark a variable read-only)
+      mapfile / readarray [-t] [-d D] [-n N] [-O O] [-s S] [ARRAY]
+        (read stdin lines into an indexed array)
+      declare -i NAME[=EXPR]  (integer attribute: assignments evaluate as
+        arithmetic); declare -r NAME  (readonly attribute)
       set -e / -u / -x, set +e/+u/+x, set -o errexit|nounset|xtrace
       trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG)
       $(( arithmetic )) -- full C-style operator set:
@@ -319,12 +330,8 @@ BUGS AND LIMITATIONS
     pattern matching ("shopt -s extglob"; "?()", "*()", "+()", "@()",
     "!()" in case patterns and in "${VAR%pat}"-family patterns),
     here-strings ("<<< word"), process substitution ("<(cmd)", ">(cmd)"),
-    and the "select", "alias"/"unalias", and "exec" builtins are now
-    supported as of version 0.07 (see BATsh::SH).
-
-    The built-in SH interpreter does not implement:
-
-    *   The builtin "getopts".
+    and the "getopts", "select", "alias"/"unalias", and "exec" builtins are
+    now supported as of version 0.07 (see BATsh::SH).
 
     The shell options "set -e" (errexit), "set -u" (nounset) and "set -x"
     (xtrace) are supported as of version 0.07, including the long forms "set
@@ -340,6 +347,17 @@ BUGS AND LIMITATIONS
     The builtin "eval" is supported as of version 0.07: one level of quote
     removal, concatenation, and re-execution with a second round of
     expansion (POSIX semantics).
+
+    The builtins "let", "type" and "command" are supported as of version
+    0.08, evaluated internally in pure Perl (previously they fell through to
+    an external shell and failed where none existed). "let EXPR ..."
+    evaluates each argument as shell arithmetic, reusing the "$(( ))"
+    evaluator, with exit status 0 when the last expression is non-zero and 1
+    when it is zero. "type [-t|-p] NAME ..." reports how each NAME resolves
+    (alias, keyword, function, builtin, or a file on PATH). "command [-v|-V]
+    NAME [ARG ...]" runs NAME bypassing a same-named shell function; "-v"
+    prints how NAME would be invoked (the portable "command -v foo" feature
+    test) and "-V" prints a verbose, "type"-style description.
 
     "trap" is supported in SH mode: "trap 'cmd' SIGSPEC..." registers a
     handler, "trap - SIGSPEC" resets to default, "trap '' SIGSPEC" ignores,

@@ -6,7 +6,7 @@ CGI-Info
 [![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/cgi-info/test.yml?branch=master)
-![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
+![Perl Version](https://img.shields.io/badge/perl-5.10+-blue)
 [![Security Policy](https://img.shields.io/badge/security-policy-blue.svg)](SECURITY.md)
 <!-- [![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info) -->
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.12
+Version 1.14
 
 # SYNOPSIS
 
@@ -108,13 +108,54 @@ It takes other optional parameters:
 
 - `max_upload_size`
 
-    The maximum file size you can upload (-1 for no limit), the default is 512MB.
+    The maximum file size in bytes you can upload.
+    Use `-1` for no limit.
+    The default is 512 KB (524288 bytes).
 
-The class can be configured at runtime using environments and configuration files,
-for example,
-setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
-For more information about configuring object constructors at runtime,
-see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+The class can be configured at runtime using environment variables and configuration
+files; for example, setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to
+use [Carp](https://metacpan.org/pod/Carp).  For more information see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      allow          => { type => 'hashref',  optional => 1 },
+      auto_load      => { type => 'boolean',  optional => 1 },
+      cache          => { type => 'object',   optional => 1 },
+      carp_on_warn   => { type => 'boolean',  optional => 1 },
+      config_dirs    => { type => 'arrayref', optional => 1 },
+      config_file    => { type => 'string',   optional => 1 },
+      logger         => { type => 'object',   optional => 1 },
+      max_upload_size=> { type => 'integer',  optional => 1, min => -1 },
+      upload_dir     => { type => 'string',   optional => 1 },
+    }
+
+#### OUTPUT
+
+    { type => 'object', isa => 'CGI::Info' }
+
+### MESSAGES
+
+- `use ->new() not ::new() to instantiate`
+
+    **Level**: fatal (croak).
+    **Cause**: called as `CGI::Info::new()` (double-colon) instead of `CGI::Info->new()`.
+    **Action**: change the call-site to use the arrow notation.
+
+- `Logger must be an object with info() and error() methods`
+
+    **Level**: fatal (croak).
+    **Cause**: the `logger` argument is not a blessed object, or does not
+    implement `info()`, `warn()`, and `error()` methods.
+    **Action**: pass a compliant logger such as a [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction)-based object.
+
+- `expect has been deprecated, use allow instead`
+
+    **Level**: fatal (croak).
+    **Cause**: the removed `expect` parameter was passed to `new()`.
+    **Action**: replace `expect => [...]` with `allow => { key => qr/.../ }`.
 
 ## script\_name
 
@@ -357,31 +398,47 @@ Advanced features:
 
 ## param($field)
 
-Get a single parameter from the query string.
-Takes an optional single string parameter which is the argument to return. If
-that parameter is not given param() is a wrapper to params() with no arguments.
+Get a single CGI parameter value by name.
+When called without arguments it delegates to `params()` and returns all parameters.
+When called with a field name it returns that parameter's (sanitised) value,
+or `undef` if the parameter was not supplied or is not in the allow list.
 
         use CGI::Info;
-        # ...
         my $info = CGI::Info->new();
-        my $bar = $info->param('foo');
+        my $bar  = $info->param('foo');
 
-If the requested parameter isn't in the allowed list, an error message will
-be thrown:
-
-        use CGI::Info;
-        my $allowed = {
-                foo => qr/\d+/
-        };
-        my $xyzzy = $info->params(allow => $allowed);
-        my $bar = $info->param('bar');  # Gives an error message
-
-Returns undef if the requested parameter was not given
+        # With an allow list:
+        my $info2 = CGI::Info->new();
+        my $allowed = { foo => qr/\d+/ };
+        $info2->params(allow => $allowed);
+        my $bar2 = $info2->param('bar');   # logs a warning; returns undef
 
 - $field
 
-    Optional field to be retrieved.
-    If omitted, all the parameters are returned.
+    Optional. The name of the CGI parameter to retrieve.
+    If omitted, all parameters (as a hash-ref) are returned via `params()`.
+
+### API SPECIFICATION
+
+#### Input
+
+        {
+                field => { type => 'scalar', optional => 1 },
+        }
+
+#### Output
+
+        # When $field is supplied
+        { type => 'scalar', optional => 1 }
+        # When $field is omitted (delegates to params())
+        { type => 'hashref', optional => 1 }
+
+### MESSAGES
+
+        | Level | Message                                  | Meaning                              | Action                                  |
+        |-------|------------------------------------------|--------------------------------------|-----------------------------------------|
+        | warn  | param: <field> isn't in the allow list   | Caller requested a parameter outside | Review the allow list passed to new()   |
+        |       |                                          | the schema set by params(allow=>\%h) | or params(); add the key if legitimate  |
 
 ## is\_mobile
 
@@ -389,7 +446,7 @@ Returns a boolean if the website is being viewed on a mobile
 device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
-Can be overriden by the IS\_MOBILE environment setting
+Can be overridden by the IS\_MOBILE environment setting
 
 ## is\_tablet
 
@@ -505,29 +562,112 @@ Is the visitor a search engine?
         # allow the user to pick and choose something to display
     }
 
-Can be overriden by the IS\_SEARCH\_ENGINE environment setting
+Can be overridden by the IS\_SEARCH\_ENGINE environment setting
+
+## is\_ai
+
+Returns a boolean indicating whether the visitor is a known AI training or
+inference crawler (e.g. GPTBot, ClaudeBot, PerplexityBot).
+
+Use this to withhold training data, serve an opt-out notice, or log AI traffic
+separately from regular robot traffic.
+
+**Invariant**: when `is_ai()` returns true, `is_robot()` also returns true,
+regardless of the order in which the two methods are called.
+
+Can be overridden by the `IS_AI` environment variable.
+
+### EXAMPLE
+
+    use CGI::Info;
+
+    my $info = CGI::Info->new();
+    if ($info->is_ai()) {
+        # Decline to serve training data to AI scrapers
+        print "Status: 403 Forbidden\r\n\r\n";
+        exit;
+    }
+
+    # Route AI crawlers to a lightweight page instead of blocking them
+    if ($info->is_ai()) {
+        serve_ai_summary();
+    } else {
+        serve_full_page();
+    }
+
+### API SPECIFICATION
+
+#### Input
+
+No arguments beyond the implicit object reference (`$self`).
+
+    # Params::Validate::Strict schema -- no parameters
+    {}
+
+#### Output
+
+    # Return::Set schema
+    {
+        type    => SCALAR,
+        values  => [ 0, 1 ],
+    }
+
+Returns `1` if the visiting client is identified as an AI training or
+inference crawler; `0` otherwise.
+
+### MESSAGES
+
+This method produces no log messages of its own.  Upstream callers such as
+`is_robot()` may emit WAF warnings; see ["is\_robot"](#is_robot) for that table.
+
+### PSEUDOCODE
+
+    function is_ai(self):
+        if self.{is_ai} is defined:
+            return self.{is_ai}                    # instance-level cache
+
+        if IS_AI environment variable is set:
+            return self.{is_ai} = IS_AI ? 1 : 0   # override; no robot sync needed
+                                                   # because is_robot() calls is_ai()
+
+        ua     = HTTP_USER_AGENT
+        remote = REMOTE_ADDR
+
+        if not (remote and ua):
+            return 0                               # not a CGI request; assume human
+
+        if ua matches any AI_PAT token (case-insensitive):
+            self.{is_robot} = 1                    # enforce is_ai => is_robot
+            return self.{is_ai} = 1
+
+        return self.{is_ai} = 0
 
 ## browser\_type
 
-Returns one of 'web', 'search', 'robot' and 'mobile'.
+Returns a string classifying the visitor's client.  The possible values are:
 
-    # Code to display a different web page for a browser, search engine and
-    # smartphone
+- `'mobile'` -- smartphone or tablet (checked first)
+- `'ai'` -- known AI training or inference crawler (see ["is\_ai"](#is_ai))
+- `'search'` -- search-engine crawler
+- `'robot'` -- other automated client
+- `'web'` -- ordinary desktop or laptop browser
+
+    use Carp;
     use Template;
     use CGI::Info;
 
     my $info = CGI::Info->new();
-    my $dir = $info->rootdir() . '/templates/' . $info->browser_type();
+    my $dir  = $info->rootdir() . '/templates/' . $info->browser_type();
 
-    my $filename = ref($self);
+    my $filename = ref($info);
     $filename =~ s/::/\//g;
     $filename = "$dir/$filename.tmpl";
 
-    if((!-f $filename) || (!-r $filename)) {
-        die "Can't open $filename";
-    }
+    (-f $filename && -r $filename)
+        or croak "Cannot open template '$filename'";
+
     my $template = Template->new();
-    $template->process($filename, {}) || die $template->error();
+    $template->process($filename, {}) or croak $template->error();
 
 ## get\_cookie
 
@@ -658,8 +798,8 @@ things to happen.
 
 # SEE ALSO
 
+- [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/CGI-Info/coverage/)
-- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
 
@@ -699,15 +839,94 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=CGI::Info](http://deps.cpantesters.org/?module=CGI::Info)
 
+## FORMAL SPECIFICATION
+
+### new
+
+    -- CGI::Info construction
+    new : ClassName x Params --> CGIInfo
+
+    -- Normal (non-clone) path
+    new(class, params) ^=
+      let configured == Object::Configure::configure(class, params)
+      in  CGIInfo {
+            max_upload_size |-> configured.max_upload_size ?? MAX_UPLOAD_SIZE_DEFAULT,
+            allow           |-> configured.allow ?? null,
+            upload_dir      |-> configured.upload_dir ?? null,
+            ...configured
+          }
+
+    -- Pre-conditions
+    pre new(class, params) ^=
+      params.logger = null
+      v (blessed(params.logger)
+         ^ params.logger.can('warn')
+         ^ params.logger.can('info')
+         ^ params.logger.can('error'))
+      ^ params.expect = null
+
+    -- Clone path (invocant is an existing object)
+    clone : CGIInfo x Params --> CGIInfo
+    clone(self, params) ^=
+      let merged == (self (+) params) \ {paramref}
+      in  CGIInfo { ...merged }
+
+### param
+
+Let F be the set of all possible CGI field names, V be the set of all
+possible (sanitised) scalar values, and allow : F -> Regex | undef be the
+current allow-list schema (undef means all fields are permitted).
+
+    param : F? -> V | HashRef | undef
+
+    param() =  params()
+
+    param(f) =
+      f not in dom(allow) /\ allow /= undef =>  warn; undef
+      f in params()                          =>  params()(f)
+      otherwise                              =>  undef
+
+Safety invariant: for all f, param(f) /= undef => f in dom(allow) \\/ allow = undef.
+
+## is\_ai
+
+    -- is_ai ---------------------------------------------------------
+    -- Given CGIInfo state i, returns a boolean result.
+    --
+    -- AI_PAT is the set of known AI crawler token strings.
+    --
+    -- ENV denotes the process environment (a partial function from
+    -- name to value).
+    --
+    AI_PAT == {ClaudeBot, Claude-Web, anthropic-ai, GPTBot,
+               ChatGPT-User, OAI-SearchBot, Google-Extended,
+               meta-externalagent, FacebookBot, Applebot-Extended,
+               PerplexityBot, Amazonbot, YouBot, Diffbot,
+               cohere-ai, CCBot, Bytespider, AI2Bot, TimpiBot}
+
+    is_ai ≜ λ i : CGIInfo •
+      -- Environment override takes absolute priority
+      IS_AI ∈ dom ENV ⟹
+          (ENV IS_AI ≠ '0' ∧ ENV IS_AI ≠ '')
+
+      -- Without both IP and UA we cannot classify
+    ∧ IS_AI ∉ dom ENV ∧
+      (REMOTE_ADDR ∉ dom ENV ∨ HTTP_USER_AGENT ∉ dom ENV)
+          ⟹ false
+
+      -- UA-pattern match (case-insensitive substring)
+    ∧ IS_AI ∉ dom ENV ∧
+      REMOTE_ADDR ∈ dom ENV ∧ HTTP_USER_AGENT ∈ dom ENV
+          ⟹ (∃ p : AI_PAT • p ⊑ᵢ ENV HTTP_USER_AGENT)
+
+      -- Invariant: is_ai ⟹ is_robot
+    ∧ is_ai i = true ⟹ is_robot i = true
+    -- ---------------------------------------------------------------
+
 # LICENCE AND COPYRIGHT
 
 Copyright 2010-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

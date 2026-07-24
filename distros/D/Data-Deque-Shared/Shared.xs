@@ -9,7 +9,18 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Deque::Shared")) \
         croak("Expected a Data::Deque::Shared object"); \
     DeqHandle *h = INT2PTR(DeqHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::Deque::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::Deque::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic).  That code may call $obj->DESTROY explicitly, which frees
+ * the handle and zeroes the IV; EXTRACT_DEQ's mortal pins the referent only
+ * against refcount-driven destruction, not an explicit DESTROY, so the local
+ * `h` would dangle.  Used only where magic can actually intervene between
+ * EXTRACT_DEQ and the first use of h. */
+#define REEXTRACT_DEQ(sv) \
+    h = INT2PTR(DeqHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Deque::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -174,7 +185,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Deque::Shared")) {
         DeqHandle *h = INT2PTR(DeqHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -285,8 +296,9 @@ push_back_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     int64_t v = (int64_t)val;
+    REEXTRACT_DEQ(self);
     RETVAL = deq_push_wait(h, &v, sizeof(v), 0, timeout);
   OUTPUT:
     RETVAL
@@ -299,8 +311,9 @@ push_front_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     int64_t v = (int64_t)val;
+    REEXTRACT_DEQ(self);
     RETVAL = deq_push_wait(h, &v, sizeof(v), 1, timeout);
   OUTPUT:
     RETVAL
@@ -334,8 +347,9 @@ pop_front_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     int64_t v;
+    REEXTRACT_DEQ(self);
     RETVAL = deq_pop_wait(h, &v, 0, timeout) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -347,8 +361,9 @@ pop_back_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     int64_t v;
+    REEXTRACT_DEQ(self);
     RETVAL = deq_pop_wait(h, &v, 1, timeout) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -419,6 +434,7 @@ push_back(self, val)
   CODE:
     STRLEN slen;
     const char *s = SvPV(val, slen);
+    REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
@@ -440,6 +456,7 @@ push_front(self, val)
   CODE:
     STRLEN slen;
     const char *s = SvPV(val, slen);
+    REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
@@ -460,9 +477,10 @@ push_back_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     STRLEN slen;
     const char *s = SvPV(val, slen);
+    REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
@@ -483,9 +501,10 @@ push_front_wait(self, val, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     STRLEN slen;
     const char *s = SvPV(val, slen);
+    REEXTRACT_DEQ(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;  /* fixed-size slot: truncate (documented + tested) */
     uint8_t *buf;
@@ -553,8 +572,9 @@ pop_front_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     uint8_t *buf;
+    REEXTRACT_DEQ(self);
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (deq_pop_wait(h, buf, 0, timeout)) {
@@ -579,8 +599,9 @@ pop_back_wait(self, ...)
     EXTRACT_DEQ(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     uint8_t *buf;
+    REEXTRACT_DEQ(self);
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (deq_pop_wait(h, buf, 1, timeout)) {

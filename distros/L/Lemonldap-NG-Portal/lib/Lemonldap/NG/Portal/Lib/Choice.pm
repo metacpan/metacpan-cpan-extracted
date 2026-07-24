@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 has modules    => ( is => 'rw', default => sub { {} } );
 has rules      => ( is => 'rw', default => sub { {} } );
@@ -126,8 +126,10 @@ sub checkChoice {
 sub _getChoiceFromReq {
     my ( $self, $req ) = @_;
 
-    # Check Choice from pdata
-    if ( defined $req->pdata->{_choice} ) {
+    # Check Choice from pdata, unless the request carries an explicit choice.
+    if ( defined $req->pdata->{_choice}
+        and !$req->parameters->get( $self->conf->{authChoiceParam} ) )
+    {
         return ( $req->pdata->{_choice}, "pdata" );
     }
     elsif (( defined $req->data->{_authChoice} )

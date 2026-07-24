@@ -545,6 +545,8 @@
 "ldapCAFile":"Đường dẫn tệp CA",
 "ldapCAPath":"Đường dẫn thư mục CA",
 "ldapChangePasswordAsUser":"Thay đổi như người dùng",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"Kết nối",
 "ldapExportedVars":"Biến đã được xuất",
 "ldapFilters":"Bộ lọc",

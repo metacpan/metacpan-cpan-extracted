@@ -13,3 +13,4 @@
 *.bak
 *.tar.gz
 *~
+/Data-HashMap-Shared-*/

@@ -55,6 +55,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-hashmap-shared"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

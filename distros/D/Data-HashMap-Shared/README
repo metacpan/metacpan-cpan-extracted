@@ -156,11 +156,11 @@ DESCRIPTION
     the per-shard cap, like $max_entries.
 
     Optional $file_mode (octal, default 0600) sets the permission bits used
-    when the backing file is created, with open(2) semantics (masked by the
-    process umask). It is ignored when attaching an existing file and for
-    anonymous or memfd-backed maps. The default is owner-only; pass a wider
-    mode such as 0666 to opt in to cross-user sharing. Before version 0.14
-    the default was 0666.
+    when the backing file is created; the exact mode is applied via
+    "fchmod", so the process umask does not narrow it. It is ignored when
+    attaching an existing file and for anonymous or memfd-backed maps. The
+    default is owner-only; pass a wider mode such as 0666 to opt in to
+    cross-user sharing. Before version 0.14 the default was 0666.
 
     Zero-cost when disabled: with both "$max_size=0" and "$ttl=0", the fast
     lock-free read path is used. The only overhead is a branch (predicted
@@ -178,9 +178,10 @@ DESCRIPTION
         equivalent from the map's point of view).
 
     *   Non-ASCII keys with different byte encodings are distinct. "caf\xe9"
-        (latin-1, 4 bytes) and "café" with "use utf8" (5 UTF-8 bytes) are
-        two different keys. If your input comes in mixed encodings,
-        normalize with "Encode::encode_utf8" before use.
+        (latin-1, 4 bytes) and the same character sequence under "use utf8"
+        ("caf\xc3\xa9", 5 UTF-8 bytes) are two different keys. If your input
+        comes in mixed encodings, normalize with "Encode::encode_utf8"
+        before use.
 
     String-value variants ("SS", "IS", "I16S", "I32S") store the SV UTF-8
     flag alongside each value and round-trip it on retrieval. The "cas"
@@ -414,26 +415,40 @@ DESCRIPTION
     "clear" after detecting a stale lock recovery is recommended for
     safety-critical applications.
 
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
+
 BENCHMARKS
     Throughput versus other shared-memory / on-disk solutions, 25K entries,
     single process, Linux x86_64. All values in M ops/s (higher is better).
     Run "perl -Mblib bench/vs.pl 25000" to reproduce.
 
-    Integer key → integer value (Shared::II):
+    Integer key - integer value> (Shared::II):
 
                   BerkeleyDB   LMDB   Shared::II
         INSERT          31       46         184
         LOOKUP          35       40         383
         INCREMENT       16       18         165
 
-    String key → string value, short (inline ≤ 7B, Shared::SS):
+    String key - string value, short> (inline <= 7B, Shared::SS):
 
                   FastMmap   BerkeleyDB   LMDB   SharedMem   Shared::SS
         INSERT        11          26       40        62          130
         LOOKUP        10          32       34       146          213
         DELETE        14          18       --        32           68
 
-    String key → string value, long (~50-100B, Shared::SS):
+    String key - string value, long> (~50-100B, Shared::SS):
 
                   BerkeleyDB   LMDB   SharedMem   Shared::SS
         INSERT        25         37        61          133
@@ -474,7 +489,7 @@ BENCHMARKS
 
     *   Atomic "incr" is 9x faster than get+put on competitors
 
-    *   Strings ≤ 7 bytes stored inline in node (zero arena overhead)
+    *   Strings <= 7 bytes stored inline in node (zero arena overhead)
 
 SEE ALSO
     Data::Buffer::Shared - typed shared array
@@ -513,6 +528,31 @@ SECURITY
     with "O_EXCL"; the on-disk header is validated when the file is
     attached. Any process you grant write access to a shared mapping is
     trusted not to corrupt its contents while other processes are using it.
+
+UPGRADING
+    The on-disk format changed in this release (v9 to v10; a reader-slot
+    occupancy bitmap was added). A file-backed map written by an older
+    release is rejected with a version-mismatch error when attached. Migrate
+    existing files in place -- with no process attached -- using the bundled
+    tool:
+
+        hashmap-shared-upgrade FILE...
+
+    or from code:
+
+        my $r = Data::HashMap::Shared->upgrade_file($path);
+        # 1 = upgraded, 0 = already current; croaks on a bad, locked or unknown file
+
+    The migration is a structural upcast (no re-hashing): it is written to a
+    sibling temporary file and atomically renamed over the original,
+    preserving its mode, and refuses to run if a live writer holds the file.
+
+    A sharded map ("new_sharded") keeps each shard in its own backing file
+    named "PREFIX.0", "PREFIX.1", and so on; upgrade them all, for example:
+
+        hashmap-shared-upgrade PREFIX.*
+
+    Anonymous and memfd maps are process-local and need no migration.
 
 AUTHOR
     vividsnow

@@ -11,6 +11,8 @@ CREATE INDEX i_s__httpSessionType ON sessions ((a_session ->> '_httpSessionType'
 CREATE INDEX i_s_user             ON sessions ((a_session ->> 'user'));
 CREATE INDEX i_s_mail             ON sessions ((a_session ->> 'mail'));
 CREATE INDEX i_s__session_uid     ON sessions ((a_session ->> '_session_uid'));
+CREATE INDEX i_s__oidc_sub        ON sessions ((a_session ->> '_oidc_sub'));
+CREATE INDEX i_s__oidc_sid        ON sessions ((a_session ->> '_oidc_sid'));
 
 
 CREATE TABLE psessions (
@@ -44,8 +46,6 @@ CREATE TABLE oidcsessions (
 CREATE INDEX i_o__session_kind   ON oidcsessions ((a_session ->> '_session_kind'));
 CREATE INDEX i_o__utime          ON oidcsessions ((cast(a_session ->> '_utime' as bigint )));
 CREATE INDEX i_o_user_session_id ON oidcsessions ((a_session ->> 'user_session_id'));
-CREATE INDEX i_o__oidc_sid       ON oidcsessions ((a_session ->> '_oidc_sid'));
-CREATE INDEX i_o__oidc_sub       ON oidcsessions ((a_session ->> '_oidc_sub'));
 
 CREATE TABLE cassessions (
     id varchar(64) not null primary key,

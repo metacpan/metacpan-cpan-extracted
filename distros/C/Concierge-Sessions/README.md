@@ -1,14 +1,11 @@
 # Concierge::Sessions - Session Management System
 
-**Version:** 0.9.0
+**Version:** 0.11.2
 
-Concierge::Sessions is a comprehensive session management system for Perl applications,
-providing flexible storage backends, sliding window expiration, and application-controlled data storage.
-
-Sessions enable applications to track user actions and maintain state across multiple operations.
-Keep session data in memory for fast access, persist to storage when needed, and maintain continuity
-between user interactions whether in online services, CLI tools, games, time-billing systems, or any
-application that needs to track state over time.
+Concierge::Sessions is a comprehensive session management system for Perl
+applications, maintaining state across multiple operations — in online
+services, CLI tools, games, time-billing systems, or any application that
+needs to track state over time.
 
 ## Features
 
@@ -40,9 +37,10 @@ make install
 - Perl 5.36 or later
 - DBI (for SQLite backend)
 - DBD::SQLite (for SQLite backend)
-- JSON::PP or JSON
+- JSON::PP
 - Time::HiRes
 - File::Spec
+- Crypt::PRNG
 - Test2::V0 (for testing)
 
 ## Quick Start
@@ -52,7 +50,7 @@ use Concierge::Sessions;
 
 # Create session manager
 my $sessions = Concierge::Sessions->new(
-    backend => 'database',
+    backend_class => 'Concierge::Sessions::SQLite',
     storage_dir => '/var/app/sessions',
 );
 
@@ -65,21 +63,22 @@ my $result = $sessions->new_session(
     },
 );
 
-if ($result->{success}) {
-    my $session = $result->{session};
-    my $session_id = $session->session_id();
-
-    # Read session data
-    my $data_result = $session->get_data();
-    my $data = $data_result->{value};
-
-    # Update session data
-    $data->{cart} = ['item1', 'item2'];
-    $session->set_data($data);
-
-    # Save changes (extends session timeout)
-    $session->save();
+unless ($result->{success}) {
+	return $result; # { success => 0, message => '...' }
 }
+my $session = $result->{session};
+my $session_id = $session->session_id();
+
+# Read session data
+my $data_result = $session->get_data();
+my $data = $data_result->{value};
+
+# Update session data
+$data->{cart} = ['item1', 'item2'];
+$session->set_data($data);
+
+# Save changes (extends session timeout)
+$session->save();
 
 # Retrieve session later
 my $retrieved = $sessions->get_session($session_id);
@@ -89,7 +88,8 @@ my $retrieved = $sessions->get_session($session_id);
 
 ### Sliding Window Expiration
 
-Sessions automatically extend when `save()` is called:
+`save()` is the method used to persist session data to the backend (see
+"Data Access" below); calling it also extends the session automatically:
 
 ```perl
 my $session = $sessions->new_session(
@@ -123,7 +123,11 @@ $app_session->is_expired();  # Always returns false
 
 ### Data Access
 
-All data operations work with the entire data field:
+A session object has its own simple data field in the form of a hashref
+that may store any serializable Perl construct. Data storage operations by
+the session object are strictly limited to inserting and retrieving the
+whole hashref; any modifications to the hashref must be done by the app,
+with the updated hashref then replacing the previous one.
 
 ```perl
 # Get entire data structure
@@ -139,7 +143,7 @@ $data->{cart} = [@items];
 $session->set_data($data);
 
 # Persist to backend (also extends session timeout)
-$session->save();
+$session->save();  # Session is clean again (is_dirty() now false)
 ```
 
 ### Session Lifecycle
@@ -164,16 +168,16 @@ $sessions->delete_session($session->session_id());
 ### Backend Selection
 
 ```perl
-# Database backend (production, high performance)
+# SQLite backend (production, high performance)
 my $sessions = Concierge::Sessions->new(
-    backend     => 'database',
-    storage_dir => '/var/app/sessions',
+    backend_class => 'Concierge::Sessions::SQLite',
+    storage_dir   => '/var/app/sessions',
 );
 
 # File backend (testing, human-readable)
 my $sessions = Concierge::Sessions->new(
-    backend     => 'file',
-    storage_dir => '/tmp/sessions',
+    backend_class => 'Concierge::Sessions::File',
+    storage_dir   => '/tmp/sessions',
 );
 ```
 
@@ -295,7 +299,7 @@ prove -lv t/
 prove -lv t/01-sessions-manager.t
 ```
 
-Test coverage: 75 tests across 4 test files, all passing.
+Test coverage: 104 tests across 4 test files, all passing.
 
 ## Examples
 
@@ -325,55 +329,4 @@ Bruce Van Allen <bva@cruzio.com>
 - [DBI](https://metacpan.org/pod/DBI) - Database interface
 - [JSON::PP](https://metacpan.org/pod/JSON::PP) - JSON handling
 - [Time::HiRes](https://metacpan.org/pod/Time::HiRes) - High resolution time
-
-## Version History
-### Version 0.9.0 2026-02-13
-    - Added META provides (resolves CPANTS meta_yml_has_provides)
-    - Added SECURITY.md with vulnerability reporting policy
-      (resolves CPANTS has_security_doc, security_doc_contains_contact)
-    - Added CONTRIBUTING.md with contribution guidelines
-      (resolves CPANTS has_contributing_doc)
-    - Added xt/pod-no-nonascii.t author test to guard against non-ASCII in POD
-    - Fixed stale POD versions in Base.pm, Session.pm, SQLite.pm, File.pm
-    - Bumped all module versions to v0.9.0
-### Version 0.8.9 2026-02-13
-    - Removed non-ASCII characters from POD in Files.pm
-### Version 0.8.8 2026-02-13
-    - Switched session ID generation from Crypt::URandom to Crypt::PRNG
-      (random_bytes), aligning with Concierge::Auth::Generators and reducing
-      overall Concierge suite dependencies
-    - CVE-2026-2439: Insecure session ID generation via uuidgen/rand fallback
-      was fixed in v0.8.5; this entry documents the assigned CVE
-### Version 0.8.7 2026-02-13
-    - Fixed CPAN tester timeout failures: session expiry in installation
-      tests now mocked via direct SQLite update (no sleep). Real-time
-      timeout tests moved to xt/ (author tests only, skipped under
-      AUTOMATED_TESTING).
-### Version 0.8.6 2026-02-12
-    - Rebuilt tarball with GNU tar (fixes PaxHeader issue on CPAN)
-### Version 0.8.5 2026-02-12
-    - Security: replaced insecure session ID generation (uuidgen/rand fallback)
-      with cryptographically secure random IDs via Crypt::URandom (160-bit entropy)
-    - Added Crypt::URandom as a dependency
-    - Further widened sliding window test timing margins for slow platforms
-### Version 0.8.4 2026-02-12
-    - Fixed integration test timing margins for slow platforms (Windows/Strawberry Perl)
-### Version 0.8.3 2026-02-11
-    - Fixed session expiration tests that were timing out too fast
-### Version 0.8.2 2026-02-11
-    - Improved documentation
-
-### Version 0.8.1 (Current)
-
-- Backend parameter names: 'database' and 'file' (case-insensitive)
-- Method name updates: delete_user_session, cleanup_sessions
-- Version alignment across all modules
-
-### Version 0.7.0
-
-- Initial release as Concierge::Sessions
-- Sliding window session expiration
-- Indefinite session support
-- Multiple backend support (database, file)
-- 75 tests, all passing
-- Production-ready
+- [Crypt::PRNG](https://metacpan.org/pod/Crypt::PRNG) - Session ID generation

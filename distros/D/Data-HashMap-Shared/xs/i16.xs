@@ -542,6 +542,7 @@ get_multi(SV* self_sv, ...)
             for (int i = 0; i < nkeys; i++) {
                 int16_t key = (int16_t)SvIV(ST(i + 1));
                 int16_t val;
+                REEXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
                 if (shm_i16_get(h, key, &val))
                     mPUSHi(val);
                 else
@@ -566,6 +567,7 @@ get_multi(SV* self_sv, ...)
             /* Phase 2: probe each key */
             for (int i = 0; i < nkeys; i++) {
                 int16_t key = (int16_t)SvIV(ST(i + 1));
+                REEXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
                 uint32_t hash = hashes[i];
                 uint32_t pos = hash & mask;
                 uint8_t tag = SHM_MAKE_TAG(hash);
@@ -634,12 +636,20 @@ set_multi(SV* self_sv, ...)
         if ((items - 1) % 2 != 0) croak("set_multi requires even number of arguments (key, value pairs)");
         uint32_t count = 0;
         if (h->shard_handles) {
-            for (int i = 1; i < items; i += 2)
-                count += shm_i16_put(h, (int16_t)SvIV(ST(i)), (int16_t)SvIV(ST(i + 1)));
+            for (int i = 1; i < items; i += 2) {
+                int16_t _k = (int16_t)SvIV(ST(i));
+                int16_t _v = (int16_t)SvIV(ST(i + 1));
+                REEXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+                count += shm_i16_put(h, _k, _v);
+            }
         } else {
             WRSEQ_GUARD(h);
-            for (int i = 1; i < items; i += 2)
-                count += shm_i16_put_inner(h, (int16_t)SvIV(ST(i)), (int16_t)SvIV(ST(i + 1)), SHM_TTL_USE_DEFAULT);
+            for (int i = 1; i < items; i += 2) {
+                int16_t _k = (int16_t)SvIV(ST(i));
+                int16_t _v = (int16_t)SvIV(ST(i + 1));
+                REEXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+                count += shm_i16_put_inner(h, _k, _v, SHM_TTL_USE_DEFAULT);
+            }
         }
         RETVAL = count;
     OUTPUT:
@@ -651,12 +661,18 @@ remove_multi(SV* self_sv, ...)
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
         uint32_t count = 0;
         if (h->shard_handles) {
-            for (int i = 1; i < items; i++)
-                count += shm_i16_remove(h, (int16_t)SvIV(ST(i)));
+            for (int i = 1; i < items; i++) {
+                int16_t _k = (int16_t)SvIV(ST(i));
+                REEXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+                count += shm_i16_remove(h, _k);
+            }
         } else {
             WRSEQ_GUARD(h);
-            for (int i = 1; i < items; i++)
-                count += shm_i16_remove_inner(h, (int16_t)SvIV(ST(i)));
+            for (int i = 1; i < items; i++) {
+                int16_t _k = (int16_t)SvIV(ST(i));
+                REEXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+                count += shm_i16_remove_inner(h, _k);
+            }
             if (count) shm_i16_maybe_shrink(h);
         }
         RETVAL = count;

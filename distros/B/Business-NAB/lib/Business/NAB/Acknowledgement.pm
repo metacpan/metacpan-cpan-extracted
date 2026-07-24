@@ -1,5 +1,5 @@
 package Business::NAB::Acknowledgement;
-$Business::NAB::Acknowledgement::VERSION = '0.06';
+$Business::NAB::Acknowledgement::VERSION = '0.08';
 =head1 NAME
 
 Business::NAB::Acknowledgement

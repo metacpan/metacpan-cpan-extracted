@@ -545,6 +545,8 @@
 "ldapCAFile":"Путь к файлу ЦС",
 "ldapCAPath":"Путь к каталогу ЦС",
 "ldapChangePasswordAsUser":"Изменить как пользователя",
+"ldapClientCert":"Client certificate",
+"ldapClientKey":"Client private key",
 "ldapConnection":"Соединение",
 "ldapExportedVars":"Экспортированные переменные",
 "ldapFilters":"Фильтры",

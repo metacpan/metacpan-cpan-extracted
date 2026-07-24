@@ -17,6 +17,7 @@
 # Avoid editor/tool config
 ^\.claude/
 ^CLAUDE\.md$
+^\.pcg/
 
 # Avoid OS-specific files
 \.DS_Store$

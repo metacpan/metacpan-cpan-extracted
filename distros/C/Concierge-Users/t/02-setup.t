@@ -13,13 +13,21 @@ use Concierge::Users;
 # Helper function to create a temporary directory
 my $temp_base = tempdir(CLEANUP => 1);
 
+# Maps friendly backend names (as used throughout this test file) to
+# fully-qualified backend_class values
+my %BACKEND_CLASS_FOR = (
+    database => 'Concierge::Users::SQLite',
+    file     => 'Concierge::Users::File',
+    yaml     => 'Concierge::Users::YAML',
+);
+
 # Helper function to create test config
 sub make_config {
     my ($storage_dir, $backend, $extra) = @_;
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => $backend,
+        backend_class => $BACKEND_CLASS_FOR{$backend} // $backend,
         include_standard_fields => 'all',
         %{$extra || {}},
     };
@@ -48,7 +56,7 @@ subtest 'Database backend setup' => sub {
     close $fh;
     my $saved_config = decode_json($json);
 
-    is($saved_config->{backend_module}, 'Concierge::Users::Database', 'Correct backend module saved');
+    is($saved_config->{backend_module}, 'Concierge::Users::SQLite', 'Correct backend module saved');
     ok($saved_config->{fields}, 'Fields array saved');
     is(ref $saved_config->{fields}, 'ARRAY', 'Fields is an array');
     ok($saved_config->{field_definitions}, 'Field definitions saved');
@@ -204,35 +212,31 @@ subtest 'Custom app fields' => sub {
 subtest 'Setup error handling' => sub {
     # Test 1: Missing storage_dir - fatal error, should croak
     like(
-        dies { Concierge::Users->setup({ backend => 'database' }) },
+        dies { Concierge::Users->setup({ backend_class => 'Concierge::Users::SQLite' }) },
         qr/storage_dir/,
         'Croaks with storage_dir error when storage_dir missing'
     );
 
-    # Test 2: Missing backend - fatal error, should croak
+    # Test 2: Missing backend_class - fatal error, should croak
     like(
         dies { Concierge::Users->setup({ storage_dir => '/tmp/test' }) },
-        qr/backend/,
-        'Croaks with backend error when backend missing'
+        qr/backend_class/,
+        'Croaks with backend_class error when backend_class missing'
     );
 
-    # Test 3: Invalid backend - fatal error, should croak
-    like(
-        dies {
-            Concierge::Users->setup({
-                storage_dir => '/tmp/test',
-                backend => 'invalid'
-            })
-        },
-        qr/Invalid backend|backend/,
-        'Croaks with error for invalid backend'
-    );
+    # Test 3: Invalid backend_class - unloadable class, returns error hashref
+    my $result3 = Concierge::Users->setup({
+        storage_dir => '/tmp/test',
+        backend_class => 'Concierge::Users::InvalidBackend',
+    });
+    ok(!$result3->{success}, 'Fails with invalid backend_class');
+    like($result3->{message}, qr/not available/, 'Error mentions backend not available');
 
     # Test 4: Invalid file format - backend returns error hashref
     my $storage_dir = tempdir(CLEANUP => 1);
     my $result4 = Concierge::Users->setup({
         storage_dir => $storage_dir,
-        backend => 'file',
+        backend_class => 'Concierge::Users::File',
         file_format => 'xml'
     });
     ok(!$result4->{success}, 'Fails with invalid file format');

@@ -28,7 +28,7 @@ use warnings;
 # version '...'
 use version;
 our $version = version->declare('v2.7.0_0');
-our $VERSION = version->declare('v0.5.1');
+our $VERSION = version->declare('v0.5.3');
 
 # authority '...'
 our $authority = 'github:adsr';
@@ -68,18 +68,16 @@ use constant STRICT => !!grep { exists $ENV{$_} && $ENV{$_} } qw(
   RELEASE_TESTING
 );
 
-# The following compile-time options are available for conditional code. 
-# They are set to the default values used in the C implementation, but can be 
-# overridden by setting the corresponding environment variables before loading 
-# this module.
+# The following compile-time options are available for conditional code.
+# Their defaults are derived from the original C implementation and the
+# current Perl configuration, but may be overridden through environment
+# variables before loading this module.
 
 # Ensure consistent compile-time options
-use constant TB_LIB_OPTS => 
-  exists $ENV{TB_LIB_OPTS} && $ENV{TB_LIB_OPTS} ? 1 : 0;
+use constant TB_LIB_OPTS => $ENV{TB_LIB_OPTS} ? 1 : 0;
 
 # Deprecated. Sets TB_OPT_ATTR_W to 32 if not already set.
-use constant TB_OPT_TRUECOLOR => 
-  exists $ENV{TB_OPT_TRUECOLOR} && $ENV{TB_OPT_TRUECOLOR} ? 1 : 0;
+use constant TB_OPT_TRUECOLOR => $ENV{TB_OPT_TRUECOLOR} ? 1 : 0;
 
 # Integer width of fg and bg attributes. Valid values (assuming system support) 
 # are 16, 32, and 64. 32 or 64 enables output mode TB_OUTPUT_TRUECOLOR. 
@@ -94,8 +92,7 @@ use constant TB_OPT_ATTR_W =>
 
 # If set, enable extended grapheme cluster support (tb_extend_cell, 
 # tb_set_cell_ex). Consumes more memory. Defaults off.
-use constant TB_OPT_EGC => !TB_LIB_OPTS 
-  && exists $ENV{TB_OPT_EGC} && $ENV{TB_OPT_EGC} ? 1 : 0;
+use constant TB_OPT_EGC => TB_LIB_OPTS || ($ENV{TB_OPT_EGC} ? 1 : 0);
 
 # Write buffer size for printf operations. Represents the largest string that 
 # can be sent in one call to tb_print and tb_send functions. Defaults to 4096.
@@ -110,7 +107,7 @@ use constant TB_OPT_READ_BUF => !TB_LIB_OPTS
 # Unicode-aware versions. Note, Unicode::UCD are version-dependent and must 
 # support prop_invmap and search_invlist. Defaults to built-in.
 use constant TB_OPT_LIBC_WCHAR => !TB_LIB_OPTS 
-  && exists $ENV{TB_OPT_LIBC_WCHAR} && $ENV{TB_OPT_LIBC_WCHAR} 
+  && $ENV{TB_OPT_LIBC_WCHAR} 
   && Unicode::UCD->can('prop_invmap') 
   && Unicode::UCD->can('search_invlist') ? 1 : 0;
 
@@ -597,14 +594,14 @@ BEGIN { if (TB_OPT_ATTR_W == 16) {
 }
 else { # TB_OPT_ATTR_W is 32 or 64
   no warnings 'once';
-  *TB_BOLD                = sub () { 0x00010000 };
-  *TB_UNDERLINE           = sub () { 0x00020000 };
-  *TB_REVERSE             = sub () { 0x00040000 };
-  *TB_ITALIC              = sub () { 0x00080000 };
-  *TB_BLINK               = sub () { 0x00100000 };
-  *TB_HI_BLACK            = sub () { 0x00200000 };
-  *TB_BRIGHT              = sub () { 0x00400000 };
-  *TB_DIM                 = sub () { 0x00800000 };
+  *TB_BOLD                = sub () { 0x01000000 };
+  *TB_UNDERLINE           = sub () { 0x02000000 };
+  *TB_REVERSE             = sub () { 0x04000000 };
+  *TB_ITALIC              = sub () { 0x08000000 };
+  *TB_BLINK               = sub () { 0x10000000 };
+  *TB_HI_BLACK            = sub () { 0x20000000 };
+  *TB_BRIGHT              = sub () { 0x40000000 };
+  *TB_DIM                 = sub () { 0x80000000 };
   *TB_TRUECOLOR_BOLD      = &TB_BOLD;    # TB_TRUECOLOR_BOLD is deprecated
   *TB_TRUECOLOR_UNDERLINE = &TB_UNDERLINE;
   *TB_TRUECOLOR_REVERSE   = &TB_REVERSE;
@@ -719,7 +716,7 @@ use vars qw( $global );
 # Utility functions ------------------------------------------------------
 # ------------------------------------------------------------------------
 
-BEGIN { require Termbox::PP::WCWidth unless TB_OPT_LIBC_WCHAR }
+BEGIN { require Terminal::WCWidth unless TB_OPT_LIBC_WCHAR }
 
 # Determine if the current locale is CJK, which affects the width of 
 # 'A' (Ambiguous) characters.
@@ -923,13 +920,13 @@ use constant {
 # WinVT ------------------------------------------------------------------
 # ------------------------------------------------------------------------
 
+use if _WIN32, 'Time::HiRes';
 use if _WIN32, 'Win32::Console';
 use if _WIN32, 'Win32API::File', qw(
   :Misc
   :Func
   :FILE_TYPE_
 );
-use if _WIN32, 'Win32::IPC';
 
 # Standard error codes (POSIX errors)
 use if _WIN32, constant => {
@@ -981,7 +978,7 @@ use if _WIN32, constant => {
   CP_UTF8 => 65001,
 };
 
-# Windows PeekConsoleInput/ReadConsoleInput
+# Windows PeekConsoleInput/ReadConsoleInput constants
 use if _WIN32, constant => {
   # INPUT_RECORD
   wEventType        => 0,
@@ -1005,9 +1002,23 @@ use if _WIN32, constant => {
   VK_SCROLL  => 0x91,    # SCROLL LOCK key
 };
 
-# ReadConsoleInputW
+# Windows wait event constants
+use if _WIN32, constant => {
+  INFINITE       => 0xffffffff,
+  WAIT_OBJECT_0  => 0x00000000,
+  WAIT_TIMEOUT   => 0x00000102,
+};
+
+# Windows ReadConsoleInputW/WaitForSingleObject imports
 BEGIN { if (_WIN32) {
   require Win32::API;
+
+  Win32::API::More->Import('kernel32',
+    'DWORD WINAPI WaitForSingleObject(
+      HANDLE hHandle,
+      DWORD  dwMilliseconds
+    )'
+  ) or die "Import WaitForSingleObject: $^E";
 
   my $ReadConsoleInputW = Win32::API::More->new('kernel32',
     'BOOL WINAPI ReadConsoleInputW(
@@ -1018,6 +1029,7 @@ BEGIN { if (_WIN32) {
     )'
   ) or die "Import ReadConsoleInputW: $^E";
 
+  # Win32::Console::_ReadConsoleInput like wrapper for ReadConsoleInputW
   *ReadConsoleInputW = sub {    # @events ($hConsoleInput)
     state $sig = compile(
       _Int,
@@ -1042,8 +1054,9 @@ BEGIN { if (_WIN32) {
       };
       case: WINDOW_BUFFER_SIZE_EVENT() == $_ and do {
         @ir = ( @ir, unpack('x4 s2', $lpBuffer) );
+        last;
       };
-      case: MENU_EVENT() == $_  || 
+      case: MENU_EVENT()  == $_ || 
             FOCUS_EVENT() == $_ 
       and do {
         @ir = ( @ir, unpack('x4 L', $lpBuffer) );
@@ -2319,7 +2332,7 @@ sub tb_set_func {    # $int ($fn_type, $fn)
 
   state $warned = 0;
   warn "tb_set_func() is deprecated and may be removed in a future release\n" 
-    unless $warned++;
+    if STRICT && !$warned++;
 
   switch: for ($fn_type) {
     case: TB_FUNC_EXTRACT_PRE == $_ and do {
@@ -2491,12 +2504,12 @@ if (_WIN32) {
       TB_ERR_RESIZE_POLL      == $_ ||
       TB_ERR_RESIZE_READ      == $_ 
     and do {
-      $! = $global->{last_errno};
-      return "$!";
+      $! = $global->{last_errno} if $global->{last_errno};
+      return $! ? "$!" : "Error: $_";
     };
     default: {
-      $! = $global->{last_errno};
-      return "$!";
+      $! = $global->{last_errno} if $global->{last_errno};
+      return $! ? "$!" : "Unknown Error";
     }
   }
 }
@@ -2508,7 +2521,7 @@ sub tb_cell_buffer {    # \@ ()
   state $warned = 0;
   warn "tb_cell_buffer() is deprecated; ".
        "use tb_get_cell() and related APIs instead\n"
-    unless $warned++;
+    if STRICT && !$warned++;
 
   my $back = $global->{back};
   return [] unless ref($back) eq 'cellbuf' && ref($back->{cells}) eq 'ARRAY';
@@ -2555,7 +2568,7 @@ sub tb_wcwidth {    # $int ($codepoint)
 if (TB_OPT_LIBC_WCHAR) {
   return wcwidth($codepoint);
 } else {
-  return Termbox::PP::WCWidth::wcwidth($codepoint);
+  return Terminal::WCWidth::wcwidth($codepoint);
 } #endif
 }
 
@@ -2760,7 +2773,7 @@ if (TB_OPT_LIBC_WCHAR) {
     return 0;
   }
 
-  my $w = Termbox::PP::WCWidth::wcwidth($ch);
+  my $w = Terminal::WCWidth::wcwidth($ch);
   $$width = $w if defined $width;
   return $w >= 0 ? 1 : 0;
 } #endif
@@ -3451,29 +3464,55 @@ sub wait_event {    # $int ($event, $timeout)
   return TB_OK if $rv == TB_OK;
 
 if (_WIN32) {
+  # Get console input handle for WaitForSingleObject() and ReadConsoleInputW()
   my $hInput = $global->{rfd} // INVALID_HANDLE_VALUE;
   if ($hInput == INVALID_HANDLE_VALUE) {
     $^E = ERROR_INVALID_HANDLE;
     $global->{last_errno} = $! = EBADF;
     return TB_ERR_POLL;
   }
-  my $ipc = bless(\$hInput, 'Win32::IPC');
 
-  do {
-    # WaitForSingleObject is used to wait for input events. The timeout is 
-    # specified in ms. If the timeout is negative, it will wait indefinitely.
-    $rv = $ipc->wait($timeout < 0 ? undef : $timeout);
-    if (!defined $rv) {
+  # Poll timeout tracking
+  my $start = Time::HiRes::time();
+
+  # Undefined on the first iteration, defined after the first wait attempt
+  my $wait_time;
+
+  # Preserve a pending UTF-16 high surrogate across poll calls
+  state $pending_high_surrogate;
+
+  while (1) {
+    # Compute remaining wait time for WaitForSingleObject()
+    if ($timeout < 0) {
+      $wait_time = INFINITE;
+    } elsif ($timeout == 0) {
+      # Allow only a single non-blocking poll attempt
+      return TB_ERR_NO_EVENT if defined $wait_time;
+      $wait_time = 0;
+    } else {
+      my $elapsed = int((Time::HiRes::time() - $start) * 1000);
+      # Allow at least one wait attempt for positive timeouts
+      return TB_ERR_NO_EVENT if defined $wait_time && $elapsed >= $timeout;
+      $wait_time = $timeout - $elapsed;
+    }
+
+    # Use WaitForSingleObject() to wait for console input events
+    $rv = WaitForSingleObject($hInput, $wait_time);
+    if ($rv == WAIT_TIMEOUT) {
+      $global->{last_errno} = $! = 0;
+      return TB_ERR_NO_EVENT;
+    }
+    elsif ($rv != WAIT_OBJECT_0) {
       my $err = 0+ $^E;
       if    ($err == ERROR_INVALID_HANDLE) { $! = EBADF  }
       elsif ($err == ERROR_ACCESS_DENIED)  { $! = EACCES }
       else                                 { $! = EINVAL }
       $global->{last_errno} = 0+ $!;
       return TB_ERR_POLL;
-    } elsif ($rv == 0) {
-      $global->{last_errno} = $! = 0;
-      return TB_ERR_NO_EVENT;
     }
+
+    # Indicates whether at least one relevant input record was processed
+    my $dispatched = 0;
 
     # Read wide input records from the console because higher-level console
     # I/O is still not reliable for full Unicode input handling.
@@ -3498,7 +3537,7 @@ if (_WIN32) {
 
         # Discard pure modifier/lock key events only if they do not carry text
         next if !$ir[UnicodeChar] && (
-              $ir[wVirtualKeyCode] == VK_SHIFT
+             $ir[wVirtualKeyCode] == VK_SHIFT
           || $ir[wVirtualKeyCode] == VK_CONTROL
           || $ir[wVirtualKeyCode] == VK_MENU
           || $ir[wVirtualKeyCode] == VK_CAPITAL
@@ -3506,7 +3545,6 @@ if (_WIN32) {
           || $ir[wVirtualKeyCode] == VK_SCROLL
           );
 
-        state $pending_high_surrogate;
         while ($ir[wRepeatCount]--) {
           my $wc = $ir[UnicodeChar];
 
@@ -3530,6 +3568,7 @@ if (_WIN32) {
               my $ch = chr($codepoint);
               utf8::encode($ch);
               bytebuf_nputs(\$global->{inbuf}, $ch, length($ch));
+              $dispatched = 1;
               next;
             }
 
@@ -3545,17 +3584,29 @@ if (_WIN32) {
           my $ch = chr($wc);
           utf8::encode($ch);
           bytebuf_nputs(\$global->{inbuf}, $ch, length($ch));
+          $dispatched = 1;
         }
       }
       elsif ($ir[wEventType] == WINDOW_BUFFER_SIZE_EVENT) {
+        my $w = $global->{width};
+        my $h = $global->{height};
+
         $rv = update_term_size();
         return $rv if $rv != TB_OK;
+
+        # Only dispatch a resize event if the size actually changed
+        next if $w == $global->{width} && $h == $global->{height};
+
         $rv = resize_cellbufs();
         return $rv if $rv != TB_OK;
 
         $event->{type} = TB_EVENT_RESIZE;
         $event->{w}    = $global->{width};
         $event->{h}    = $global->{height};
+
+        # Reset any pending high surrogate since the resize event is dispatched
+        $pending_high_surrogate = undef;
+        $dispatched = 1;
         return TB_OK;
       }
       else {
@@ -3564,11 +3615,14 @@ if (_WIN32) {
       }
     }
 
+    # No relevant input was dispatched, continue polling
+    next unless $dispatched;
+  
     %$event = %$empty_event;
     $rv = extract_event($event);
     return TB_OK if $rv == TB_OK;
 
-  } while ($timeout < 0);
+  } #/ while (1);
 
   return $rv;
 } #endif

@@ -1,7 +1,7 @@
 package Data::CountMinSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::CountMinSketch::Shared', $VERSION);
 
@@ -54,7 +54,10 @@ count, and overestimates by at most C<epsilon * total> with probability at least
 C<1 - delta>, where C<total> is the sum of all increments. (An item never added
 estimates as 0 unless hash collisions with other items inflate every one of its
 cells.) This makes the sketch ideal for finding heavy hitters and approximate
-counts in a stream that is too large to count exactly.
+counts in a stream that is too large to count exactly. One caveat: C<add> does
+not saturate, so a single key's counter and the grand total wrap at 2^64 if a
+true count ever reaches that (C<merge> saturates instead); the
+never-underestimate guarantee holds for all realistic counts.
 
 Each item is hashed once with XXH3 (128-bit); the two 64-bit halves drive one
 column per row (C<d>-row double hashing) into a C<d> x C<w> matrix of 64-bit
@@ -233,6 +236,18 @@ ownership; if a holder dies, the next contender detects the dead owner and
 recovers. Each cell increment is a single word store, so a crash leaves the
 sketch consistent up to the last completed C<add>.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

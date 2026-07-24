@@ -4,12 +4,16 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Needs 'Test::MockModule';
+use Test::Needs;
+use Test::Mockingbird 0.08 qw(mock mock_scoped);
 use File::Temp qw(tempdir);
 use JSON::MaybeXS qw(encode_json);
 use Test::Returns;
 
 BEGIN { use_ok('CGI::Info') }
+
+# Silence Log::Abstraction stderr noise from expected WAF/validation log calls.
+mock 'Log::Abstraction::_high_priority' => sub { };
 
 # Mock environment for testing
 my %mock_env;
@@ -207,8 +211,7 @@ subtest 'Custom validation subroutines' => sub {
 subtest 'Strict validation rules' => sub {
 	test_needs 'Params::Validate::Strict';
 
-	my @messages;
-	my $info = CGI::Info->new(logger => \@messages);
+	my $info = CGI::Info->new();
 
 	local @ARGV = ('age=25', 'invalid_age=200');
 
@@ -229,7 +232,7 @@ subtest 'Strict validation rules' => sub {
 
 	is($params->{age}, 25, 'Strict validation passed for valid age');
 	ok(!exists($params->{invalid_age}), 'Strict validation failed for invalid age');
-	ok(scalar(@messages));
+	ok(scalar(grep { $_->{message} =~ /invalid_age/ } @{$info->messages() // []}), 'Message logged for invalid parameter');
 };
 
 # Test security features - SQL injection detection
@@ -377,12 +380,10 @@ subtest 'param() with allow list' => sub {
 
 	is($info->param('allowed'), 'yes', 'Allowed parameter accessible via param()');
 
-	# Test accessing forbidden parameter
-	my $warnings = '';
-	local $SIG{__WARN__} = sub { $warnings .= $_[0] };
-
 	is($info->param('forbidden'), undef, 'Forbidden parameter returns undef');
-	like($warnings, qr/forbidden.*isn't in the allow list/, 'Warning generated for forbidden access');
+	my @warn_msgs = map { $_->{message} }
+		grep { $_->{level} eq 'warn' } @{$info->messages() // []};
+	like(join("\n", @warn_msgs), qr/forbidden.*isn't in the allow list/, 'Warning recorded for forbidden access');
 };
 
 # Test edge cases and error conditions
@@ -575,21 +576,13 @@ subtest 'Performance considerations' => sub {
 
 # Test logger integration
 subtest 'Logger integration' => sub {
-	my @log_messages;
-
-	# Mock logger that captures messages
-	my $mock_logger = sub {
-		push @log_messages, @_;
-	};
-
 	my $info = CGI::Info->new();
 
 	local @ARGV = ('test=value');
 
-	my $params = $info->params(logger => $mock_logger);
+	my $params = $info->params();
 
-	# Should have debug messages about parameters
-	ok(@log_messages > 0, 'Logger received messages');
+	ok(scalar(@{$info->messages() // []}), 'Messages recorded during parameter parsing');
 };
 
 # Test Return::Set integration

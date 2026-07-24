@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 =encoding utf-8
 
@@ -30,11 +30,13 @@ Both stdout and stderr are merged and passed through the filter, so
 error messages are also displayed in the multi-column paged output.
 
 The pager command is taken from the C<NUP_PAGER> environment variable
-if set, otherwise defaults to C<less -F +Gg>.  The environment
-variable is named after the L<nup> command, a wrapper for this
-module.  The C<PAGER> variable is not used to avoid an infinite loop
-when C<PAGER> is set to C<nup>.  Use the C<--pager> option to specify
-a different pager on the command line.
+if set, otherwise defaults to C<less -F +Gg>.  When page mode is
+active, the C<NUP_PAGE_PAGER> environment variable is consulted
+first.
+The environment variables are named after the L<nup> command, a
+wrapper for this module.  The C<PAGER> variable is not used to avoid
+an infinite loop when C<PAGER> is set to C<nup>.  Use the C<--pager>
+option to specify a different pager on the command line.
 
 The C<-F> option causes C<less> to exit immediately if the output
 fits on one screen.  C<+Gg> causes C<less> to read all input before
@@ -78,6 +80,11 @@ See L<App::ansicolumn> for available styles.
 Disable page mode.  Without pagination, the entire content is
 split evenly across columns.  Page mode is the default.
 
+Note that L<App::ansicolumn> uses parallel layout when multiple
+files are given, which has no page structure.  Specify this option
+in such cases so that C<NUP_PAGE_PAGER> is not used (the L<nup>
+command does this automatically).
+
 =item B<-A>, B<--auto-paginate>
 
 Automatically disable page mode when only one column fits the
@@ -85,7 +92,9 @@ terminal.
 
 =item B<--pager>=I<COMMAND>
 
-Set the pager command.  Default is C<NUP_PAGER> or C<less -F +Gg>.
+Set the pager command, overriding the environment variables.
+Default is C<NUP_PAGE_PAGER> (page mode only), C<NUP_PAGER>, or
+C<less -F +Gg>.
 
 =item B<--no-pager>
 
@@ -204,7 +213,7 @@ my $config = Getopt::EX::Config->new(
     'border-style' => 'heavy-box',
     'paginate'     => 1,
     'auto-paginate' => undef,
-    'pager'        => $ENV{NUP_PAGER} || 'less -F +Gg',
+    'pager'        => undef,
     'no-pager'     => undef,
 );
 
@@ -233,13 +242,14 @@ sub finalize {
     my $rows         = $config->{row};
     my $height       = defined $rows ? int(($term_height - 1) / $rows) : undef;
     my $border_style = $config->{'border-style'};
-    my $pager        = $config->{pager};
+    my $no_page      = !$config->{paginate}
+        || ($config->{'auto-paginate'} && $cols <= 1);
+    my $pager        = $config->{pager} //
+        ((!$no_page && $ENV{NUP_PAGE_PAGER}) || $ENV{NUP_PAGER} || 'less -F +Gg');
 
     # Build default ansicolumn options
     my @ac_opts = ("-w$term_width", "--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");
     push @ac_opts, "--height=$height" if defined $height;
-    my $no_page = !$config->{paginate}
-        || ($config->{'auto-paginate'} && $cols <= 1);
     push @ac_opts, "--no-page"        if $no_page;
     push @ac_opts, @passthru;
 

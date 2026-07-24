@@ -1,0 +1,8 @@
+Revision history for Data-HierTimingWheel-Shared
+
+0.01      2026-07-22
+          - Fix a use-after-free in advance(): an overloaded or tied tick
+            count runs Perl that can destroy the wheel, after which the
+            already-captured handle was still used. Such a call now croaks.
+          - Initial release.
+

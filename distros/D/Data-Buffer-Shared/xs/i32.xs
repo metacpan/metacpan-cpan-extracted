@@ -2,10 +2,13 @@ MODULE = Data::Buffer::Shared    PACKAGE = Data::Buffer::Shared::I32
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, char* path, UV capacity, UV file_mode = 0600)
+new(char* class, SV* path, UV capacity, UV file_mode = 0600)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
-        BufHandle* buf = buf_i32_create(path, (uint64_t)capacity, (mode_t)file_mode, errbuf);
+        /* Capture the PV here, after every INPUT conversion has run its get-magic:
+           a typemap-captured char* would dangle if a later arg's magic realloced it. */
+        const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+        BufHandle* buf = buf_i32_create(p, (uint64_t)capacity, (mode_t)file_mode, errbuf);
         if (!buf) croak("Data::Buffer::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
@@ -63,6 +66,7 @@ set_slice(SV* self_sv, UV from, ...)
         SAVEFREEPV(tmp);
         for (UV i = 0; i < count; i++)
             tmp[i] = (int32_t)SvIV(ST(i + 2));
+        REEXTRACT_BUF("Data::Buffer::Shared::I32", self_sv);
         RETVAL = buf_i32_set_slice(h, (uint64_t)from, (uint64_t)count, tmp);
     OUTPUT:
         RETVAL
@@ -216,6 +220,8 @@ SV*
 get_raw(SV* self_sv, UV byte_off, UV nbytes)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::I32", self_sv);
+        if (!buf_i32_raw_in_bounds(h, (uint64_t)byte_off, (uint64_t)nbytes))
+            croak("Data::Buffer::Shared::I32: get_raw out of bounds");
         RETVAL = newSV(nbytes ? nbytes : 1);
         SvPOK_on(RETVAL);
         SvCUR_set(RETVAL, nbytes);
@@ -233,6 +239,7 @@ set_raw(SV* self_sv, UV byte_off, SV* data_sv)
         EXTRACT_BUF("Data::Buffer::Shared::I32", self_sv);
         STRLEN dlen;
         const char *dptr = SvPV(data_sv, dlen);
+        REEXTRACT_BUF("Data::Buffer::Shared::I32", self_sv);
         RETVAL = buf_i32_set_raw(h, (uint64_t)byte_off, (uint64_t)dlen, dptr);
     OUTPUT:
         RETVAL
@@ -274,10 +281,13 @@ atomic_xor(SV* self_sv, UV idx, IV mask)
         RETVAL
 
 SV*
-new_memfd(char* class, char* name, UV capacity)
+new_memfd(char* class, SV* name, UV capacity)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
-        BufHandle* buf = buf_i32_create_memfd(name, (uint64_t)capacity, errbuf);
+        /* Capture the PV here, after every INPUT conversion has run its get-magic:
+           a typemap-captured char* would dangle if a later arg's magic realloced it. */
+        const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
+        BufHandle* buf = buf_i32_create_memfd(nm, (uint64_t)capacity, errbuf);
         if (!buf) croak("Data::Buffer::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
@@ -306,7 +316,7 @@ SV*
 as_scalar(SV* self_sv)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::I32", self_sv);
-        size_t len = (size_t)(h->hdr->capacity * h->hdr->elem_size);
+        size_t len = (size_t)((uint64_t)h->capacity * h->elem_size);
         SV *inner = newSV_type(SVt_PV);
         SvPV_set(inner, (char *)h->data);
         SvCUR_set(inner, len);
@@ -314,7 +324,7 @@ as_scalar(SV* self_sv)
         SvPOK_on(inner);
         SvREADONLY_on(inner);
         MAGIC *mg = sv_magicext(inner, NULL, PERL_MAGIC_ext, &buf_scalar_magic_vtbl, NULL, 0);
-        mg->mg_obj = SvREFCNT_inc_simple_NN(self_sv);
+        mg->mg_obj = SvREFCNT_inc_simple_NN(SvRV(self_sv));  /* pin the REFERENT (handle), not the RV container: undef $buf clears the container in place and would otherwise free the mapping while inner aliases it */
         RETVAL = newRV_noinc(inner);
     OUTPUT:
         RETVAL
@@ -330,6 +340,7 @@ add_slice(SV* self_sv, UV from, ...)
         SAVEFREEPV(tmp);
         for (UV i = 0; i < count; i++)
             tmp[i] = (int32_t)SvIV(ST(i + 2));
+        REEXTRACT_BUF("Data::Buffer::Shared::I32", self_sv);
         RETVAL = buf_i32_add_slice(h, (uint64_t)from, (uint64_t)count, tmp);
     OUTPUT:
         RETVAL

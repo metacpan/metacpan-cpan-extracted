@@ -1,5 +1,20 @@
 Revision history for Data-PubSub-Shared
 
+0.08      2026-07-23
+          - Int/Int32/Int16 publish now commits (value, sequence) atomically
+            and drops an already-superseded store, so a publisher preempted a
+            full lap can no longer revert a slot and stall a subscriber. Uses a
+            lock-free slot-wide CAS where available, else the header mutex; the
+            on-disk format is unchanged.
+          - poll_cb: re-extract the subscriber after each callback, so one that
+            destroys or replaces it croaks instead of using a freed pointer.
+          - REEXTRACT guards re-check SvROK first (a replaced invocant croaks).
+          - poll: compute the sequence displacement wraparound-safe, avoiding
+            signed-overflow UB (previously masked by Perl's -fwrapv).
+          - xt/stress.t: use a progress-based stall check, not a 30s deadline.
+          - Reject headers whose data offset and arena size overflow.
+          - Fetch get-magic on optional arguments before testing them.
+
 0.07  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

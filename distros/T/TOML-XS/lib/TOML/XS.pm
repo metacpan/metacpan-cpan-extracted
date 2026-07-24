@@ -10,7 +10,7 @@ use Types::Serialiser ();
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.05';
+    $VERSION = '0.06';
     XSLoader::load( __PACKAGE__, $VERSION );
 }
 
@@ -31,7 +31,11 @@ TOML::XS - Turbo-charged L<TOML|https://toml.io> parsing!
     # NB: Don’t read_text(), or stuff may break.
     my $toml = File::Slurper::read_binary('/path/to/toml/file');
 
-    my $struct = TOML::XS::from_toml($toml)->to_struct();
+    # The top-level document is always a struct.
+    my $struct = TOML::XS::from_toml($toml)->get();
+
+    # You can also fetch individual items from the document, e.g.:
+    my $last_name = TOML::XS::from_toml($toml)->get('info', 'last_name');
 
 =head1 DESCRIPTION
 
@@ -39,8 +43,12 @@ This module facilitates parsing of TOML documents in Perl via XS,
 which can yield dramatic performance gains relative to pure-Perl TOML
 libraries.
 
-It is currently implemented as a wrapper around the
-L<tomlc99|https://github.com/cktan/tomlc99> C library.
+It is currently implemented atop the
+L<tomlc17|https://github.com/cktan/tomlc17> C library. This distribution
+embeds that library, so you don’t need to install it separately.
+
+This library is solely a parser; there is no logic here to serialize a parsed
+TOML document.
 
 =head1 FUNCTIONS
 
@@ -101,24 +109,6 @@ On my system the included (I<very> simple!) benchmark outputs:
 *true = *Types::Serialiser::true;
 *false = *Types::Serialiser::false;
 
-sub _croak_malformed_toml {
-    my $path_ar = shift;
-
-    return _croak_with_pointer('Malformed TOML value found!', $path_ar);
-}
-
-sub _croak_pointer_beyond_datum {
-    my $path_ar = shift;
-
-    return _croak_with_pointer('Can’t descend into non-container!', $path_ar);
-}
-
-sub _croak_with_pointer {
-    my ($msg, $path_ar) = @_;
-
-    die sprintf( "%s (JSON pointer: %s)", $msg, _BUILD_JSON_POINTER($path_ar) );
-}
-
 sub _BUILD_JSON_POINTER {
     my $pieces_ar = shift;
 
@@ -138,7 +128,7 @@ Copyright 2021 Gasper Software Consulting. All rights reserved.
 
 This library is licensed under the same license as Perl itself.
 
-L<tomlc99|https://github.com/cktan/tomlc99> is licensed under the
+L<tomlc17|https://github.com/cktan/tomlc17> is licensed under the
 L<MIT License|https://mit-license.org/>.
 
 =cut

@@ -37,5 +37,5 @@ pm_to_blib
 
 # Project-specific exclusions
 ^examples/
-^docs/
 ^ZZZ_archive/
+^paad/

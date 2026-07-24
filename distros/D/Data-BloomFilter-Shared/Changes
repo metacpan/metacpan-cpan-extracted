@@ -1,5 +1,10 @@
 Revision history for Data-BloomFilter-Shared
 
+0.04      2026-07-21
+          - On-disk format change (v1 -> v2): an existing 0.03 file is
+            refused; recreate it.
+          - Resolve argument magic before capturing the path string.
+
 0.03      2026-07-11
           - Fix fp_rate test on long-double perls.
 

@@ -1,5 +1,112 @@
 Revision history for BATsh
 
+0.08  2026-07-23 JST (Japan Standard Time)
+
+    - NEW SH BUILTINS: let, type and command are now evaluated internally
+      in pure Perl.  Previously all three fell through to the external
+      command path and were handed to whatever real shell happened to
+      exist -- which failed on systems without that shell and defeated
+      BATsh's "no external shell required" design.
+
+      * let EXPR [EXPR ...] -- arithmetic evaluation, reusing the same
+        evaluator as $(( )), so assignments and ++/-- write back to the
+        variable store.  Exit status is 0 when the last expression is
+        non-zero and 1 when it is zero (the (( )) convention).
+
+      * type [-t|-p] NAME ... -- report how each NAME resolves, in bash's
+        precedence order: alias, keyword, function, builtin, then an
+        executable on PATH.  -t prints the one-word kind; -p prints the
+        path of an external file.
+
+      * command [-v|-V] NAME [ARG ...] -- run NAME bypassing any shell
+        function of that name; -v prints how NAME would be invoked (the
+        portable  `command -v foo >/dev/null`  feature-detection idiom)
+        and -V prints a verbose, type-style description.
+
+      New regression test t/0027-let-type-command.t (22 checks).
+
+    - MORE SH BUILTINS / ATTRIBUTES (pure Perl):
+
+      * umask [-S] [MODE] -- print or set the file-creation mask; -S prints
+        the symbolic form.  MODE may be octal (022) or symbolic
+        (u=rwx,g=rx,o=rx, with +/- operations).  The shell keeps its own
+        copy of the mask so "umask MODE; umask" round-trips on every
+        platform (native Win32 Perl's umask() always reports 0), and pushes
+        a set value to the OS umask so it still affects file modes where
+        the OS honours it.
+      * hash [-r] [NAME ...] -- BATsh keeps no location cache, so the
+        maintenance forms are successful no-ops; "hash NAME" verifies NAME
+        is on PATH.  (Previously umask and hash fell through to an external
+        shell and produced "Can't exec" errors.)
+      * readonly [-p] [NAME[=VALUE] ...] -- mark a variable read-only; a
+        later assignment or unset is refused with a non-zero status.  The
+        readonly attribute is enforced at every assignment path (VAR=val,
+        prefix VAR=val cmd, export, declare) and is script-scoped (reset
+        between top-level runs).
+      * mapfile / readarray [-t] [-d DELIM] [-n COUNT] [-O ORIGIN]
+        [-s SKIP] [ARRAY] -- read lines of standard input into an indexed
+        array (default MAPFILE).
+
+    - declare -i / -r: the integer attribute now evaluates a variable's
+      right-hand side as arithmetic ("declare -i n=3+4" stores 7, and the
+      attribute sticks so a later "n=2*5" stores 10); -r marks the variable
+      read-only.  Previously "declare -i" stored its initialiser literally.
+      A quoted initialiser containing spaces now works too, e.g.
+      declare -i s="1 + 2" (the scalar value is parsed quote-aware).
+
+      New regression test t/0029-sh-attrs-mapfile.t (22 checks).
+
+    - printf REWRITTEN (SH mode): the builtin is now a faithful pure-Perl
+      implementation.  Previously it understood only \n and \t, split
+      quoted arguments on whitespace (losing "a b" style operands), did not
+      recycle the format, and leaked Perl "Redundant argument" / "isn't
+      numeric" warnings to STDERR.  It now supports:
+
+        * format recycling -- the format is reused until the arguments are
+          exhausted, so  printf '%s\n' a b c  prints three lines;
+        * the full conversion set  %d %i %o %u %x %X %e %E %f %g %G
+          %c %s %b %q %%,  with flags, field width and precision, and the
+          dynamic  %*d  width/precision form;
+        * %b (backslash escapes interpreted in the argument, with \c ending
+          output) and %q (shell-reusable quoting);
+        * the complete C/POSIX escape set in the format string
+          (\\ \a \b \f \n \r \t \v \e \NNN octal \xHH hex);
+        * -v VAR to store the result in a shell variable instead of
+          printing;
+        * quiet, bash-like handling of a non-numeric numeric argument
+          (treated as 0, no STDERR noise).
+
+      New regression test t/0028-sh-printf.t (21 checks).
+
+    - FIX (SH external commands): a command that could not be launched
+      (system() returned -1) now reports exit status 127 ("command not
+      found"), as bash does.  The previous  ($rc >> 8)  arithmetic on -1
+      produced a nonsensical huge status.
+
+    - DOC FIX (README): "getopts" was still listed under "does not
+      implement" although it has been a supported builtin since 0.07.  The
+      stale entry is removed and getopts is listed with the other 0.07
+      builtins.
+
+    - QA / TESTS: this release also hardens the distribution's own
+      self-checks against two blind spots.
+
+    - t/9020-perl5compat.t now scans the whole distribution rather than
+      only lib/*.pm.  It walks lib/, t/, bin/ and eg/ with File::Find
+      (core since Perl 5.000) and applies the Perl 5.005_03 compatibility
+      checks (3-argument open, lexical file and directory handles,
+      our/say/state, defined-or, and so on) to every .pm, .pl and .t
+      file.  Previously only four lib modules were examined, so a
+      Perl 5.6+ construct in a test, script or example could slip past.
+      The scanner excludes itself -- it necessarily contains the very
+      constructs it detects -- and ignores matches that occur only in
+      comments.
+
+    - t/9061-readme-refs.t (new): checks that every in-distribution file
+      the README refers to (eg/, doc/, bin/, lib/ and t/ paths) actually
+      exists on disk.  This is the reverse of the existing MANIFEST-driven
+      README check and guards against a documented-but-absent example.
+
 0.07  2026-07-21 JST (Japan Standard Time)
 
     - SECURITY / SH REDIRECTIONS: fixed two defects in the pure-Perl SH

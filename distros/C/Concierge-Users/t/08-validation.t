@@ -7,6 +7,14 @@ use Test2::Tools::Exception qw/ dies lives /;
 use File::Temp qw/ tempdir /;
 use Concierge::Users;
 
+# Maps friendly backend names (as used throughout this test file) to
+# fully-qualified backend_class values
+my %BACKEND_CLASS_FOR = (
+    database => 'Concierge::Users::SQLite',
+    file     => 'Concierge::Users::File',
+    yaml     => 'Concierge::Users::YAML',
+);
+
 # Helper to setup test environment
 sub setup_test_env {
     my $backend = shift;
@@ -15,7 +23,7 @@ sub setup_test_env {
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => $backend,
+        backend_class => $BACKEND_CLASS_FOR{$backend} // $backend,
         include_standard_fields => [qw/ email phone first_name last_name organization /],
     };
 
@@ -336,7 +344,7 @@ subtest 'Date validator (term_ends)' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
         storage_dir             => $storage_dir,
-        backend                 => 'database',
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ term_ends /],
     };
     my $setup_result = Concierge::Users->setup($config);
@@ -372,7 +380,7 @@ subtest 'Timestamp validator (last_login_date)' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
         storage_dir => $storage_dir,
-        backend     => 'database',
+        backend_class => 'Concierge::Users::SQLite',
     };
     my $setup_result = Concierge::Users->setup($config);
     my $users = Concierge::Users->new($setup_result->{config_file});
@@ -415,7 +423,7 @@ subtest 'Boolean validator (text_ok)' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
         storage_dir             => $storage_dir,
-        backend                 => 'database',
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => [qw/ text_ok /],
     };
     my $setup_result = Concierge::Users->setup($config);
@@ -459,7 +467,7 @@ subtest 'Integer validator (app field)' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
         storage_dir             => $storage_dir,
-        backend                 => 'database',
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => [],
         app_fields              => [
             { field_name => 'score', type => 'integer', required => 0, label => 'Score' },

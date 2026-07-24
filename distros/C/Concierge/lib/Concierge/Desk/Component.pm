@@ -1,7 +1,7 @@
-package Concierge::Desk::Component v0.10.0;
+package Concierge::Desk::Component v0.11.0;
 use v5.36;
 
-our $VERSION = 'v0.10.0';
+our $VERSION = 'v0.11.0';
 
 # ABSTRACT: Contract documentation for additional Concierge desk components
 
@@ -15,7 +15,7 @@ Concierge::Desk::Component - Contract documentation for additional Concierge des
 
 =head1 VERSION
 
-v0.10.0
+v0.11.0
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,12 @@ This module is B<pure documentation>. It has no functional subs, and
 nothing inherits from it. Concierge's component mechanism is duck-typed:
 any class satisfying the contract below works, regardless of what (if
 anything) it subclasses. There is no C<isa> check anywhere in the loading
-path.
+path -- and just as importantly, neither C<Concierge> nor
+C<Concierge::Desk::Setup> ever inherits from an added component. The
+relationship is compositional, not hierarchical: the application's
+concierge obtains component objects and hands them to the application,
+which composes its own capabilities from them, rather than a
+component's behavior becoming part of Concierge's own class hierarchy.
 
 =head1 THE CONTRACT
 
@@ -87,17 +92,30 @@ exceptions.
 
 A component's full API is always reachable through the bare accessor
 installed by C<open_desk()> -- C<< $concierge->{name}->method(...) >> or
-C<< $concierge->name->method(...) >>. This is the permanent escape
-hatch and requires no configuration; it works for every component,
-promoted or not.
+C<< $concierge->name->method(...) >>. This is the standard access
+Concierge provides the application for using the component and
+requires no configuration; it works for every component, promoted or
+not.
 
-C<promote> is an additional, optional, purely-cosmetic layer on top of
+The bare accessor can also be used just once, to capture the component
+object itself, after which the application can call its methods
+directly, with Concierge no longer part of the call:
+
+    my $componentObj = $c->{component_name}; # or $c->component_name();
+    $componentObj->method();
+
+It's the same object either way -- Concierge is not a god object that
+mediates every operation; it is how the application obtains component
+objects that it then composes into its own logic, independent of
+Concierge from that point on.
+
+C<promote> is an additional, optional, convenience layer on top of
 that: a curated allowlist of a component's methods forwarded directly
 onto C<$concierge> itself, so C<< $concierge->get_signal_report(...) >>
 works as sugar for C<< $concierge->{reports}->get_signal_report(...) >>.
 It is a convenience/clarity mechanism only, B<not> access control --
-every component method stays reachable via the escape hatch above
-regardless of whether it is promoted.
+every component method stays reachable via direct access to the
+component regardless of whether it is promoted.
 
 =head2 Config shape
 
@@ -109,17 +127,20 @@ C<optional>, passed to C<< Concierge::Desk::Setup::build_desk() >>:
             class   => 'Concierge::Reports',
             promote => ['get_signal_report'],
             # or, to expose it under a different top-level name:
-            promote => { get_signal_report => 'fetch_signal_report' },
+            promote => { fetch_signal_report => 'get_signal_report' },
         },
     },
 
 An arrayref promotes each listed method under its own name. A hashref
 promotes C<< top_name => component_method >> pairs, letting the
-top-level name differ from the component's own method name.
+top-level name differ from the component's own method name. In other
+words, the concierge may use its own alias to call the component's real
+method -- e.g. C<< $concierge->fetch_signal_report(...) >> calls the
+component's C<get_signal_report()>.
 
     my $c = Concierge->open_desk($desk_dir)->{concierge};
-    $c->get_signal_report(...);                  # promoted sugar
-    $c->{reports}->get_signal_report(...);        # escape hatch, always works
+    $c->fetch_signal_report(...);                 # promoted sugar, using alias
+    $c->{reports}->get_signal_report(...);        # direct component access
 
 =head2 Validation happens entirely at build time
 
@@ -168,9 +189,9 @@ identically to promoted names.
 
 A component-advertised "suggested methods" discovery convention (e.g.
 an C<api_methods()> method a component could implement to suggest its
-own promotion candidates) is a plausible future extension, but is out
-of scope today -- C<promote> is entirely author-specified in the
-C<components> config block.
+own promotion candidates) is a plausible future extension, but for now
+C<promote> is entirely author-specified in the C<components> config
+block.
 
 =head1 UNAVAILABLE COMPONENT SUBSTITUTION
 

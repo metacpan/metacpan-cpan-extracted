@@ -221,4 +221,26 @@ subtest "Multiple backends" => sub {
 
 };
 
+subtest "Broken deleteIfLowerThan still falls back to GKFAS" => sub {
+    _cleanSessions;
+    _storeSession( "global", "SSO", "a", 10000 );
+    _storeSession( "global", "SSO", "b", 12000 );
+
+    my $dILT_called = 0;
+    no warnings 'once';
+    local *Apache::Session::File::deleteIfLowerThan = sub {
+        $dILT_called = 1;
+        return 0;
+    };
+
+    _test_purge(16000);
+
+    is( $dILT_called, 1, "deleteIfLowerThan was called but failed" );
+    is_deeply( _getSessionsNames("global"),
+        ["b"], "Session b is recent enough to survive" );
+
+    _test_purge(20000);
+    is_deeply( _getSessionsNames("global"), [], "No sessions remaining" );
+};
+
 done_testing();

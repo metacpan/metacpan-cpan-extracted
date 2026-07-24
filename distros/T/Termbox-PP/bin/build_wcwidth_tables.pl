@@ -22,7 +22,7 @@ use FindBin qw( $Bin );
 use LWP;
 use POSIX;
 
-use constant TARGET => "$Bin/../lib/Termbox/PP/WCWidth/Tables.pm";
+use constant TARGET => "$Bin/../lib/Terminal/WCWidth/Tables.pm";
 
 BEGIN {
   $ENV{PERL_LWP_ENV_PROXY} = 1;
@@ -122,7 +122,7 @@ sub main { # $ ()
   my $content = '';
   open(my $fh, ">", \$content);
   $fh->say(<<HEADER
-package Termbox::PP::WCWidth::Tables;
+package Terminal::WCWidth::Tables;
 use strict;
 use warnings;
 

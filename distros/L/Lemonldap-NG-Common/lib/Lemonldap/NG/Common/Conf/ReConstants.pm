@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 our %EXPORT_TAGS = ( 'all' => [qw($simpleHashKeys $doubleHashKeys $specialNodeKeys $casAppMetaDataNodeKeys $casSrvMetaDataNodeKeys $keyNodeKeys $oidcOPMetaDataNodeKeys $oidcRPMetaDataNodeKeys $samlIDPMetaDataNodeKeys $samlSPMetaDataNodeKeys $virtualHostKeys $specialNodeHash $authParameters $issuerParameters $samlServiceParameters $oidcServiceParameters $casServiceParameters)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -47,7 +47,7 @@ our $authParameters = {
   githubParams => [qw(githubAuthnLevel githubClientID githubClientSecret githubUserField githubScope)],
   gpgParams => [qw(gpgAuthnLevel gpgDb)],
   kerberosParams => [qw(krbAuthnLevel krbKeytab krbByJs krbRemoveDomain krbAllowedDomains)],
-  ldapParams => [qw(ldapAuthnLevel ldapExportedVars ldapServer ldapPort ldapVerify ldapBase managerDn managerPassword ldapTimeout ldapIOTimeout ldapVersion ldapRaw ldapCAFile ldapCAPath LDAPFilter AuthLDAPFilter mailLDAPFilter ldapSearchDeref ldapGroupBase groupLDAPFilter ldapGroupObjectClass ldapGroupAttributeName ldapGroupAttributeNameUser ldapGroupAttributeNameSearch ldapGroupDecodeSearchedValue ldapGroupRecursive ldapGroupAttributeNameGroup ldapPpolicyControl ldapSetPassword ldapChangePasswordAsUser ldapPwdEnc ldapUsePasswordResetAttribute ldapPasswordResetAttribute ldapPasswordResetAttributeValue ldapAllowResetExpiredPassword ldapGetUserBeforePasswordChange ldapForcePasswordChangeExpirationWarning ldapITDS)],
+  ldapParams => [qw(ldapAuthnLevel ldapExportedVars ldapServer ldapPort ldapVerify ldapBase managerDn managerPassword ldapClientCert ldapClientKey ldapTimeout ldapIOTimeout ldapVersion ldapRaw ldapCAFile ldapCAPath LDAPFilter AuthLDAPFilter mailLDAPFilter ldapSearchDeref ldapGroupBase groupLDAPFilter ldapGroupObjectClass ldapGroupAttributeName ldapGroupAttributeNameUser ldapGroupAttributeNameSearch ldapGroupDecodeSearchedValue ldapGroupRecursive ldapGroupAttributeNameGroup ldapPpolicyControl ldapSetPassword ldapChangePasswordAsUser ldapPwdEnc ldapUsePasswordResetAttribute ldapPasswordResetAttribute ldapPasswordResetAttributeValue ldapAllowResetExpiredPassword ldapGetUserBeforePasswordChange ldapForcePasswordChangeExpirationWarning ldapITDS)],
   linkedinParams => [qw(linkedInAuthnLevel linkedInClientID linkedInClientSecret linkedInFields linkedInUserField linkedInScope)],
   nullParams => [qw(nullAuthnLevel)],
   oidcParams => [qw(oidcAuthnLevel oidcRPCallbackGetParam oidcRPStateTimeout)],

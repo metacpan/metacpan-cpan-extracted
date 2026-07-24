@@ -1,7 +1,7 @@
 package Data::CuckooFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::CuckooFilter::Shared', $VERSION);
 
@@ -229,7 +229,9 @@ the combined effect of what all of them have done.
 Backing files are created with mode C<0600> (owner-only) by default, so only the
 creating user can open and attach them. To share a backing file across users,
 pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
-only when the file is created (an existing file keeps its own permissions). The
+only when the file is created, with one exception: a pre-existing empty file
+owned by you is initialized as new and set to that mode. Any other existing
+file keeps its own permissions. The
 file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
 and created with C<O_EXCL>; the on-disk header is validated when the file is
 attached. Any process you grant write access to a shared mapping is trusted not
@@ -242,7 +244,24 @@ ownership; if a holder dies, the next contender detects the dead owner and
 recovers. Each C<add> commits with a single fingerprint store (or, on the
 eviction path, an all-or-nothing sequence that rolls back on failure), so a
 crash leaves the filter consistent up to the last completed operation.
+B<Crash caveat>: dead-writer recovery repairs only the lock word, not the
+table. A writer killed in the middle of an eviction run never gets to roll it
+back and strands the fingerprint it was carrying, so a previously added item
+can afterward read as absent -- the "no false negatives" guarantee holds only
+when no writer has died mid-operation. Recreate the filter if that matters.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

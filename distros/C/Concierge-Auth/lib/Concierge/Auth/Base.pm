@@ -1,4 +1,4 @@
-package Concierge::Auth::Base v0.5.1;
+package Concierge::Auth::Base v0.5.2;
 use v5.36;
 
 # ABSTRACT: Base class / contract for Concierge::Auth backends
@@ -52,7 +52,7 @@ Concierge::Auth::Base - Base class / contract for Concierge::Auth backends
 
 =head1 VERSION
 
-v0.5.1
+v0.5.2
 
 =head1 SYNOPSIS
 
@@ -82,9 +82,9 @@ operations Concierge itself needs to perform -- "add a user," "change
 credentials," "is this ID known," "authenticate" -- rather than at the
 level of any one backend's natural storage primitives. The built-in
 password-file backend, for example, satisfies this contract internally
-using its own C<checkID>/C<setPwd>/C<resetPwd>/C<deleteID>/C<checkPwd>
-methods, but those are private implementation detail of that backend and
-are not part of this contract. A backend with a fundamentally different
+using its own file-locking, hashing, and response-formatting helpers, but
+those are private implementation detail of that backend and are not part
+of this contract. A backend with a fundamentally different
 storage/verification model (e.g. an LDAP directory) satisfies the same
 five methods however fits its model, without needing anything resembling
 those primitives at all.
@@ -103,15 +103,15 @@ object internally.
 
 =head2 The Generators Guarantee
 
-Concierge also relies on whatever object ends up as C<$concierge-E<gt>{auth}>
-for identifier generation that has nothing to do with authentication:
-visitors and guests (see C<admit_visitor>/C<checkin_guest> in
-L<Concierge>) are never authenticated -- they are simply assigned a
-generated identifier for cookie/session purposes, with no credential
-involved at all. That capability (C<gen_uuid>, C<gen_random_id>,
-C<gen_random_token>, C<gen_random_string>, C<gen_word_phrase>, and the
-deprecated aliases C<gen_token>/C<gen_crypt_token>) is therefore
-independent of the five-method contract above.
+Concierge also relies on its configured authentication class's object
+to generate identifiers for other uses not connected to
+authentication. For example, applications might not authenticate
+visitors or guests (see C<admit_visitor>/C<checkin_guest> in
+L<Concierge>) -- they are simply assigned a generated identifier for
+cookie/session purposes, with no credential involved at all. That
+capability (C<gen_uuid>, C<gen_random_id>, C<gen_random_token>,
+C<gen_random_string>, C<gen_word_phrase>) is therefore independent of
+the five-method contract above.
 
 Unlike the five required methods, this guarantee is satisfied with a
 working I<default> rather than a die-stub: C<Concierge::Auth::Base>

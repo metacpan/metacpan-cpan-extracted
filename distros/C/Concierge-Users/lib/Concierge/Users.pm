@@ -1,4 +1,4 @@
-package Concierge::Users v0.9.3;
+package Concierge::Users v0.9.4;
 use v5.36;
 
 use Carp		qw/ croak carp /;
@@ -26,24 +26,14 @@ sub setup {
     }
 
     # Explicit backend selection is required
-    my $backend_type = $config->{backend} 
-    	or croak "Configuration must include 'backend' parameter 'database', 'file', or 'yaml'";
-
-    # Normalize backend name and determine module name
-    my $backend = do {
-        my $back = lc $backend_type;
-        $back eq 'database' ? 'Database' :
-        $back eq 'file'     ? 'File' :
-        $back eq 'yaml'     ? 'YAML' :
-        croak "Invalid backend type: $backend_type (must be 'database', 'file', or 'yaml')";
-    };
+    my $backend_class = $config->{backend_class}
+    	or croak "Configuration must include 'backend_class' parameter";
 
     # Load backend module
-    my $backend_class = "Concierge::Users::${backend}";
     eval "require $backend_class";
     return {
         success => 0,
-        message => "Backend '$backend_type' not available: $@"
+        message => "Backend '$backend_class' not available: $@"
     } if $@;
 
 	my $field_meta	= Concierge::Users::Meta::init_field_meta($config);
@@ -66,7 +56,7 @@ sub setup {
     my $config_to_save = {
         version => "$Concierge::Users::VERSION",
         generated => Concierge::Users::Meta->current_timestamp(),
-        backend_module => "Concierge::Users::${backend}",
+        backend_module => $backend_class,
         backend_config => $configure_result->{config},
         fields => $field_meta->{fields},
         field_definitions => $field_meta->{field_definitions},
@@ -374,7 +364,7 @@ Concierge::Users - User data management with multiple storage backends
 
 =head1 VERSION
 
-v0.9.3
+v0.9.4
 
 =head1 SYNOPSIS
 
@@ -383,7 +373,7 @@ v0.9.3
     # One-time setup -- creates storage and config file
     my $result = Concierge::Users->setup({
         storage_dir             => './data/users',
-        backend                 => 'database',    # 'database', 'file', or 'yaml'
+        backend_class           => 'Concierge::Users::SQLite',
         include_standard_fields => 'all',
         app_fields              => ['role', 'theme'],
     });
@@ -440,21 +430,30 @@ standalone.
 
 =head2 Storage Backends
 
+A backend is selected by passing its fully-qualified class name as
+C<backend_class> to C<setup()>. Concierge::Users performs no
+friendly-name guessing or default selection of its own -- the named
+module is C<require>d dynamically inside C<setup()>. When used as a
+component of a Concierge desk, resolving a friendly name (such as a
+config file's C<users.backend> setting) to a fully-qualified class name
+is a desk-build-time concern handled by L<Concierge::Desk::Setup> (see
+its backend catalog, C<%USERS_BACKENDS>), not by this module.
+
 =over 4
 
-=item B<database> -- SQLite via L<DBI>/L<DBD::SQLite>. Recommended for
-production and larger datasets.
+=item B<Concierge::Users::SQLite> -- SQLite via L<DBI>/L<DBD::SQLite>.
+Recommended for production and larger datasets.
 
-=item B<file> -- CSV/TSV flat file. Simple, human-readable, no database
-dependency.
+=item B<Concierge::Users::File> -- CSV/TSV flat file. Simple,
+human-readable, no database dependency.
 
-=item B<yaml> -- One YAML file per user via L<YAML::Tiny>. Good for
-individual user access patterns.
+=item B<Concierge::Users::YAML> -- One YAML file per user via
+L<YAML::Tiny>. Good for individual user access patterns.
 
 =back
 
 All backends provide the same CRUD API. The backend is selected at setup
-time and recorded in the config file.
+time and its class name is recorded verbatim in the config file.
 
 =head2 Field System
 
@@ -523,7 +522,9 @@ B<Configuration keys:>
 =item C<storage_dir> (required) -- directory for data files; created if
 absent.
 
-=item C<backend> (required) -- C<'database'>, C<'file'>, or C<'yaml'>.
+=item C<backend_class> (required) -- fully-qualified backend class name,
+e.g. C<Concierge::Users::SQLite>, C<Concierge::Users::File>, or
+C<Concierge::Users::YAML>.
 
 =item C<include_standard_fields> -- Optional.  When omitted or set to
 C<'all'>, all 12 standard fields are included (the default).  Pass an
@@ -546,8 +547,8 @@ See L<Concierge::Users::Meta/Field Overrides>.
 
 Returns C<< { success => 1, config_file => $path } >> on success.
 
-Croaks if C<storage_dir> or C<backend> is missing, or if the directory
-cannot be created.
+Croaks if C<storage_dir> or C<backend_class> is missing, or if the
+directory cannot be created.
 
 =head2 new
 
@@ -653,8 +654,11 @@ Inherited from L<Concierge::Users::Meta>.
 L<Concierge::Users::Meta> -- field definitions, validators, and
 configuration utilities
 
-L<Concierge::Users::Database>, L<Concierge::Users::File>,
+L<Concierge::Users::SQLite>, L<Concierge::Users::File>,
 L<Concierge::Users::YAML> -- storage backend implementations
+
+L<Concierge::Desk::Setup> -- resolves friendly backend names (e.g.
+C<'database'>) to fully-qualified classes at desk-build time
 
 L<Concierge::Auth>, L<Concierge::Sessions> -- companion Concierge
 components

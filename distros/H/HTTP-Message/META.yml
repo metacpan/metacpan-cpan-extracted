@@ -63,7 +63,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Message/issues
   homepage: https://github.com/libwww-perl/HTTP-Message
   repository: https://github.com/libwww-perl/HTTP-Message.git
-version: '7.03'
+version: '7.04'
 x_Dist_Zilla:
   perl:
     version: '5.042002'
@@ -452,7 +452,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v7.03
+          tag: v7.04
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -605,6 +605,7 @@ x_contributors:
   - 'chromatic <chromatic@wgz.org>'
   - 'copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>'
   - 'Dan Book <grinnz@grinnz.com>'
+  - 'Daniel Böhmer <post@daniel-boehmer.de>'
   - 'Daniel Hedlund <Daniel.Hedlund@eprize.com>'
   - 'Daniel Trizen <trizen@protonmail.com>'
   - 'David E. Wheeler <david@justatheory.com>'

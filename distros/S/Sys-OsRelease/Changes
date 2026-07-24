@@ -1,6 +1,6 @@
 Change log for Sys::OsRelease
 
-0.4.3 2026-07-21T18:44:36-07:00 America/Los_Angeles
+0.4.4 2026-07-23T16:57:56-07:00 America/Los_Angeles
  [MAJOR]
  [API CHANGE]
  [MINOR]
@@ -8,10 +8,14 @@ Change log for Sys::OsRelease
  [SECURITY]
  [REVISION]
  [BUG FIXES]
- - move some Sys::OsRelease::Lite dependency declarations from build to
-   configure stage (found by CPAN Testers)
+ - add missing FANCY_NAME attribute from os-release in systemd 260
 
  [DOCS]
+
+0.4.3 2026-07-21T18:44:36-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - move some Sys::OsRelease::Lite dependency declarations from build to
+   configure stage (found by CPAN Testers)
 
 0.4.2 2026-07-19T23:34:29-07:00 America/Los_Angeles
  [REVISION]

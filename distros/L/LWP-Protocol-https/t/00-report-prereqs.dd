@@ -31,6 +31,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::Spelling::CommonMistakes' => '1.000',
                                       'Test::Portability::Files' => '0',
+                                      'Test::RequiresInternet' => '0',
                                       'Test::Spelling' => '0.17',
                                       'Test::Version' => '1'
                                     }
@@ -62,7 +63,6 @@ do { my $x = {
                                    'Socket' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0.002010',
-                                   'Test::RequiresInternet' => '0',
                                    'perl' => '5.008001',
                                    'warnings' => '0'
                                  }

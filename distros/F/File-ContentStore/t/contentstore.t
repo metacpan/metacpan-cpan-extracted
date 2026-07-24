@@ -35,6 +35,15 @@ IMG_0025.JPG
 git-fusion.png
 TREE
 
+# check if the filesystem supports hard links
+# (continue testing, to get an actual FAIL)
+{
+    my $tmp = Path::Tiny->tempdir( DIR => $dir{obj}, CLEANUP => 1 );
+    my $old = $tmp->child('OLDFILE')->spew('CONTENT');
+    link( $old, $tmp->child('NEWFILE') )
+      or diag "Failed to create a hard link in $tmp: $!.";
+}
+
 # create the ContentRepo
 my $store = File::ContentStore->new( $dir{obj} );
 isa_ok( $store, 'File::ContentStore' );

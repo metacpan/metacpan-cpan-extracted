@@ -53,8 +53,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Convert::PEM'           => 0,
         'Crypt::OpenSSL::RSA'    => 0,
-        'Lemonldap::NG::Common'  => '2.23.0',
-        'Lemonldap::NG::Handler' => '2.23.0',
+        'Lemonldap::NG::Common'  => '2.23.1',
+        'Lemonldap::NG::Handler' => '2.23.1',
         'LWP::UserAgent'         => 0,
     },    # e.g., Module::Name => 1.1
     (

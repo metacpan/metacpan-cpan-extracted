@@ -28,7 +28,7 @@ use URI::QueryParam;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 use constant oidcErrorLevel => {
     server_error     => 'error',
@@ -2972,8 +2972,12 @@ sub getAudiences {
 sub getUserIDForRP {
     my ( $self, $req, $rp, $data ) = @_;
 
-    # Use pre-computed sub if available (stored in online refresh tokens)
-    return $data->{_oidc_sub} if $data->{_oidc_sub};
+    # Use pre-computed sub if available (stored in online refresh tokens for
+    # back-channel logout). This must use a dedicated key (_oidc_logout_sub)
+    # and not _oidc_sub, because _oidc_sub may be set by the Auth/OpenIDConnect
+    # module with the sub returned by an upstream OP when LL::NG acts as a
+    # gateway (see #3627).
+    return $data->{_oidc_logout_sub} if $data->{_oidc_logout_sub};
 
     my $user_id_attribute =
          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsUserIDAttr}

@@ -1,4 +1,4 @@
-package Concierge::Auth v0.5.1;
+package Concierge::Auth v0.5.2;
 use v5.36;
 
 # ABSTRACT: Factory/dispatcher for Concierge::Auth backends
@@ -7,8 +7,8 @@ use Carp qw/croak/;
 
 sub new {
     my ($class, %args) = @_;
-    my $backend_class = delete $args{backend}
-        or croak "Concierge::Auth->new requires a 'backend' class name";
+    my $backend_class = delete $args{backend_class}
+        or croak "Concierge::Auth->new requires a 'backend_class' class name";
 
     eval "require $backend_class; 1"
         or croak "Cannot load Auth backend $backend_class: $@";
@@ -30,15 +30,15 @@ Concierge::Auth - Factory/dispatcher for Concierge::Auth backends
 
 =head1 VERSION
 
-v0.5.1
+v0.5.2
 
 =head1 SYNOPSIS
 
     use Concierge::Auth;
 
     my $auth = Concierge::Auth->new(
-        backend => 'Concierge::Auth::Pwd',
-        file    => '/path/to/auth.pwd',
+        backend_class => 'Concierge::Auth::Pwd',
+        file          => '/path/to/auth.pwd',
     );
 
     # $auth is a Concierge::Auth::Pwd instance -- use it directly:
@@ -51,44 +51,45 @@ v0.5.1
 
 =head1 DESCRIPTION
 
-C<Concierge::Auth> is a thin factory that resolves a backend class name
-to a live backend instance. It performs I<no> guessing: C<backend> must
-be a fully-qualified, already-resolved class name (e.g.
-C<Concierge::Auth::Pwd>), not a friendly short name like C<'pwd'>.
-There is no default backend and no C<lc()>/string-mapping performed
-here.
-
-Resolving a friendly name (such as a C<backend> value read from a
-config file) to a fully-qualified class name, and validating that every
-setting the chosen backend needs is present, is a desk-build-time
-concern handled by L<Concierge::Desk::Setup> (see its backend catalog,
-C<%AUTH_BACKENDS>), not by this module. By the time C<Concierge::Auth-E<gt>new>
-is called, that resolution has already happened once, not on every call.
+C<Concierge::Auth> is a thin factory that turns a backend class name
+into a live, ready-to-use backend instance. Given a fully-qualified
+class name (e.g. C<Concierge::Auth::Pwd>) and whatever arguments that
+backend needs, C<new> C<require>s the named module, constructs it, and
+hands back the instance directly -- there is no wrapper object or
+delegation layer. A conforming backend already fully implements the
+L<Concierge::Auth::Base> contract, so the returned object responds
+directly to C<authenticate>/C<is_id_known>/C<enroll>/
+C<change_credentials>/C<revoke>, and to the
+L<Concierge::Auth::Generators> methods, with no extra indirection.
 
 The named backend module is C<require>d dynamically inside C<new> --
 this module does not C<use> any concrete backend at compile time. A
 desk configured for C<Concierge::Auth::LDAP>, for example, never loads
 C<Concierge::Auth::Pwd> at all.
 
-Unlike L<Concierge::Sessions>, which wraps its backend inside a
-C<{ storage => $backend }> container, this factory returns the backend
-instance directly. A conforming backend (e.g. C<Concierge::Auth::Pwd>)
-already fully implements the L<Concierge::Auth::Base> contract, so no
-wrapper object or delegation layer is needed -- C<$concierge-E<gt>{auth}>
-responds directly to C<authenticate>/C<is_id_known>/C<enroll>/
-C<change_credentials>/C<revoke>, and to the
-L<Concierge::Auth::Generators> methods, with no extra indirection.
-
 All remaining arguments passed to C<new> (e.g. C<file> for C<::Pwd>;
 C<host>/C<bind_dn>/C<password> for a hypothetical C<::LDAP>) are passed
 straight through to the backend's own C<new> unexamined --
 C<Concierge::Auth> has no opinion about what any given backend needs.
 
+C<Concierge::Auth> performs I<no> guessing about C<backend_class>: it
+must already be a fully-qualified, resolved class name, not a friendly
+short name like C<'pwd'>. There is no default backend and no
+C<lc()>/string-mapping performed here. When used as a component of a
+Concierge desk, resolving a friendly name (such as a config file's
+C<auth.backend> setting) to a fully-qualified class name, and
+validating that every setting the chosen backend needs is present, is
+a desk-build-time concern handled by L<Concierge::Desk::Setup> (see its
+backend catalog, C<%AUTH_BACKENDS>), not by this module -- by the time
+C<Concierge::Auth-E<gt>new> is called, that resolution has already
+happened once, not on every call. Used standalone, outside a Concierge
+desk, callers simply supply the fully-qualified class name themselves.
+
 =head1 CONSTRUCTOR
 
 =head2 new
 
-    my $auth = Concierge::Auth->new( backend => $class_name, %backend_args );
+    my $auth = Concierge::Auth->new( backend_class => $class_name, %backend_args );
 
 Loads C<$class_name> (via C<require>) and calls C<< $class_name->new(%backend_args) >>,
 returning the resulting backend instance.
@@ -97,7 +98,7 @@ Croaks if:
 
 =over 4
 
-=item * C<backend> is missing.
+=item * C<backend_class> is missing.
 
 =item * The named class cannot be loaded (nonexistent module, syntax
 error, missing dependency, etc).

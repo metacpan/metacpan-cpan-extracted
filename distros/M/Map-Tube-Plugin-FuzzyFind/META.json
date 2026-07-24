@@ -77,7 +77,7 @@
    "provides" : {
       "Map::Tube::Plugin::FuzzyFind" : {
          "file" : "lib/Map/Tube/Plugin/FuzzyFind.pm",
-         "version" : "v0.81.4"
+         "version" : "v0.82.1"
       }
    },
    "release_status" : "stable",
@@ -91,6 +91,6 @@
          "web" : "https://github.com/gwselke/Map-Tube-Plugin-FuzzyFind"
       }
    },
-   "version" : "v0.81.4",
+   "version" : "v0.82.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

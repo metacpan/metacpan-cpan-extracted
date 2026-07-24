@@ -4,9 +4,9 @@ examples/db-app/db-app.pl
 examples/file-app/file-app.pl
 examples/yaml-app/yaml-app.pl
 lib/Concierge/Users.pm
-lib/Concierge/Users/Database.pm
 lib/Concierge/Users/File.pm
 lib/Concierge/Users/Meta.pm
+lib/Concierge/Users/SQLite.pm
 lib/Concierge/Users/YAML.pm
 LICENSE
 Makefile.PL

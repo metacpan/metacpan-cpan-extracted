@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -452,6 +452,7 @@ sub _oidcMetaDataNodes {
         my $value =
           eval { $self->getConfKey( $req, $query )->{$partner}; } // undef;
         return $self->sendError( $req, undef, 400 ) if ( $req->error );
+
         return $self->sendJSONresponse( $req, { value => $value } );
     }
 
@@ -467,7 +468,22 @@ sub _oidcMetaDataNodes {
             $self->getConfKey( $req, "oidc${type}MetaDataOptions" )->{$partner}
               ->{$query};
         } // undef;
-        return $self->sendJSONresponse( $req, { value => $value } );
+
+        if ( ref($value) eq "HASH" ) {
+            foreach my $h ( sort keys %$value ) {
+                push @$resp,
+                  {
+                    id => "oidc${type}MetaDataNodes/$partner/$query/" . $id++,
+                    title => $h,
+                    data  => $value->{$h},
+                    type  => 'keyText',
+                  };
+            }
+            return $self->sendJSONresponse( $req, $resp );
+        }
+        else {
+            return $self->sendJSONresponse( $req, { value => $value } );
+        }
     }
     else {
         return $self->sendError( $req,

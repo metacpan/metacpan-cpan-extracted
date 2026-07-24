@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 1;
 =encoding utf-8
@@ -44,7 +44,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 =head1 DESCRIPTION
@@ -224,6 +224,11 @@ Use C<--textconv=none> to disable.
 =item B<--pager>=I<COMMAND>
 
 Set the pager command. Default is C<NUP_PAGER> or C<less -F +Gg>.
+When page mode is active, C<NUP_PAGE_PAGER> takes precedence over
+C<NUP_PAGER>.
+Viewing multiple files (or C<-V> parallel view) produces parallel
+layout which has no page structure, so C<nup> disables page mode
+and C<NUP_PAGE_PAGER> is not used there.
 The C<PAGER> variable is not used to avoid an infinite loop when
 C<PAGER> is set to C<nup>.
 Use C<--pager=> (empty) or C<--no-pager> to disable pager.

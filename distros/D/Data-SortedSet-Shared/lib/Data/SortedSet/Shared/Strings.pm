@@ -5,7 +5,7 @@ use Carp ();
 use Data::Intern::Shared ();
 use Data::SortedSet::Shared ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # ---- construction ----
 
@@ -37,6 +37,7 @@ sub key_table  { $_[0]{keys} }    # the underlying Data::Intern::Shared
 
 sub add {
     my ($self, $str, $score) = @_;
+    Carp::croak("add: NaN score") if $score != $score;   # reject before interning (else a ghost key leaks)
     my $id = $self->{keys}->intern($str);
     return undef unless defined $id;          # key table full
     return $self->{set}->add($id, $score);
@@ -44,6 +45,7 @@ sub add {
 
 sub incr {
     my ($self, $str, $delta) = @_;
+    Carp::croak("incr: NaN delta") if $delta != $delta;  # reject before interning (else a ghost key leaks)
     my $id = $self->{keys}->intern($str);
     Carp::croak("incr: key table full") unless defined $id;
     return $self->{set}->incr($id, $delta);
@@ -194,7 +196,7 @@ stay interned until C<clear> (see L<Data::Intern::Shared/LIMITS>). B<Linux-only>
 
 C<new> creates (or reopens) both backing stores; for cross-process file-backed use,
 every process passes the same C<set>/C<keys> paths. C<mode> sets the file mode for
-both backing files (default 0600, subject to umask); it is used only when a file is
+both backing files (default 0600, applied exactly -- not narrowed by umask); it is used only when a file is
 created and ignored when attaching an existing one. C<wrap> wraps two
 already-constructed objects (e.g. memfd-backed ones shared by fd). C<set> and
 C<key_table> return the underlying L<Data::SortedSet::Shared> and

@@ -2,7 +2,8 @@
  * pubsub.h -- Shared-memory broadcast pub/sub for Linux
  *
  * Two variants:
- *   Int -- lock-free MPMC publish, lock-free subscribe (int64 values)
+ *   Int -- MPMC publish (lock-free where a slot-wide CAS is available, else
+ *          serialized on the header mutex), lock-free subscribe (int64 values)
  *   Str -- mutex-protected publish, lock-free subscribe (variable-length
  *          byte strings up to msg_size, one fixed arena region per slot)
  *
@@ -200,9 +201,29 @@ static inline int pubsub_ensure_copy_buf(PubSubSub *sub, uint32_t needed) {
 #define PUBSUB_MUTEX_PID_MASK   0x7FFFFFFFU
 #define PUBSUB_MUTEX_VAL(pid)   (PUBSUB_MUTEX_WRITER_BIT | ((uint32_t)(pid) & PUBSUB_MUTEX_PID_MASK))
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int pubsub_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int pubsub_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !pubsub_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 static const struct timespec pubsub_lock_timeout = { PUBSUB_LOCK_TIMEOUT_SEC, 0 };
@@ -283,6 +304,7 @@ static inline int pubsub_remaining_time(const struct timespec *deadline,
 
 static inline void pubsub_make_deadline(double timeout, struct timespec *deadline) {
     clock_gettime(CLOCK_MONOTONIC, deadline);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     deadline->tv_sec += (time_t)timeout;
     deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
     if (deadline->tv_nsec >= 1000000000L) {
@@ -317,7 +339,8 @@ static inline int pubsub_validate_header(PubSubHeader *hdr, uint32_t mode,
             return 0;
         uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
         if (hdr->data_off < slots_end ||
-            hdr->data_off + hdr->arena_cap > hdr->total_size)
+            hdr->data_off > hdr->total_size ||
+            hdr->arena_cap > hdr->total_size - hdr->data_off)   /* overflow-safe: no data_off+arena_cap wrap */
             return 0;
     }
     return 1;
@@ -478,6 +501,10 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, fmode) < 0)) {
+            PUBSUB_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)total_size) < 0) {
                 PUBSUB_ERR("ftruncate(%s): %s", path, strerror(errno));
@@ -651,19 +678,137 @@ static inline uint64_t pubsub_lag(PubSubSub *sub) {
 /* ================================================================
  * Int publish/poll macro template
  *
- * DEFINE_INT_PUBSUB(prefix, SlotType, ValType, SeqType, DiffType)
- *   generates: pubsub_<prefix>_publish, _publish_multi, _poll, _poll_wait
+ * DEFINE_INT_PUBSUB(prefix, SlotType, ValType, SeqType, DiffType, COMMIT)
+ *   generates: pubsub_<prefix>_commit_at, _publish, _publish_multi, _poll,
+ *   _poll_wait.  COMMIT is the slot-commit primitive (see below).
  * ================================================================ */
 
-#define DEFINE_INT_PUBSUB(PFX, SLOT, VTYPE, STYPE, DTYPE)                      \
+/* ---- slot commit: write (value, sequence) so a publisher preempted for a
+ * full lap between its write_pos claim and here can never revert the slot to
+ * stale contents (which would permanently stall a subscriber sitting on it) or
+ * clobber a fresher value.  Two implementations, chosen per slot width. ---- */
+
+/* Drop iff a lap at or past ours already owns the slot.  Sequence 0 is
+ * ambiguous: it is both "never written" and the truncated sequence of the
+ * publisher at pos == 2^bits-1 (Int32/Int16 store (uint32_t)(pos+1)).  Only the
+ * genuinely-uncomparable case -- our own sequence is also 0 -- bypasses the
+ * comparison (write the boundary/empty publish); an occupant sitting at a
+ * truncated 0 is still compared, so a stale writer one lap behind it is
+ * correctly dropped instead of reverting the slot.  Without the both-zero
+ * guard, a lone `curseq != 0` bypass would re-open the lap-ABA revert once per
+ * 2^32 publishes on Int32/Int16. */
+#define PUBSUB_LAP_SUPERSEDED(STYPE, DTYPE, NEWSEQ, CURSEQ)                    \
+    ((DTYPE)((STYPE)(NEWSEQ) - (STYPE)(CURSEQ)) <= 0 &&                        \
+     !((STYPE)(CURSEQ) == 0 && (STYPE)(NEWSEQ) == 0))
+
+/* Lock-free: commit (value, sequence) as one indivisible slot update via a
+ * slot-wide CAS, and DROP the store if a later lap already owns the slot (its
+ * sequence is at or past the one we would write).  Keeps value and sequence
+ * mutually consistent for the reader's seqlock, and makes the lapped-writer
+ * test-and-drop atomic against other publishers.  Used for the 8-byte
+ * Int32/Int16 slots everywhere, and the 16-byte Int slot where a lock-free
+ * 16-byte CAS is available.
+ *
+ * The slot is punned to a same-width unsigned integer (WORDT) and driven with
+ * __sync_bool_compare_and_swap: gcc inlines that to cmpxchg16b (with -mcx16)
+ * for the 16-byte case, whereas the __atomic builtins route 16-byte ops through
+ * libatomic -- which we must avoid, since a lock-based libatomic fallback is
+ * not shared-memory safe across processes.  sequence and value are read with
+ * their own narrow inline atomic loads to form the CAS expectation; a torn or
+ * stale expectation just fails the CAS and the loop re-reads.  memset zeroes
+ * any padding (Int16's _pad) so the punned expectation matches the slot, whose
+ * padding is invariantly zero (mmap zero-fill; no path writes it nonzero). */
+#define PUBSUB_COMMIT_ATOMIC(SLOTT, WORDT, STYPE, DTYPE, HDR, SLOTP, NEWSEQ, VAL) \
+    do {                                                                       \
+        _Static_assert(sizeof(WORDT) == sizeof(SLOTT),                         \
+                       "PubSub: CAS word type must match slot size");          \
+        WORDT *_wp = (WORDT *)(SLOTP);                                         \
+        for (;;) {                                                             \
+            STYPE _cseq = __atomic_load_n(&(SLOTP)->sequence, __ATOMIC_RELAXED);\
+            if (PUBSUB_LAP_SUPERSEDED(STYPE, DTYPE, NEWSEQ, _cseq))            \
+                break;                 /* a >= lap owns the slot -> drop */     \
+            SLOTT _cur, _des; WORDT _ecur, _edes;                             \
+            memset(&_cur, 0, sizeof _cur);                                     \
+            _cur.sequence = _cseq;                                             \
+            _cur.value = __atomic_load_n(&(SLOTP)->value, __ATOMIC_RELAXED);   \
+            _des = _cur; _des.sequence = (NEWSEQ); _des.value = (VAL);         \
+            memcpy(&_ecur, &_cur, sizeof _ecur);                              \
+            memcpy(&_edes, &_des, sizeof _edes);                              \
+            if (__sync_bool_compare_and_swap(_wp, _ecur, _edes))              \
+                break;                 /* committed */                         \
+            /* CAS failed (stale/torn expectation or a racing publisher): retry*/\
+        }                                                                      \
+        (void)(HDR);                                                           \
+    } while (0)
+
+/* Fallback for a platform without a lock-free CAS as wide as the slot:
+ * serialize publishers on the header mutex (the one the Str variant uses).
+ * Same test-and-drop; readers stay lock-free.  Only ever selected for the
+ * 16-byte Int slot where PUBSUB_INT_ATOMIC16 is 0. WORDT is unused here. */
+#define PUBSUB_COMMIT_MUTEX(SLOTT, WORDT, STYPE, DTYPE, HDR, SLOTP, NEWSEQ, VAL) \
+    do {                                                                       \
+        pubsub_mutex_lock(HDR);                                                \
+        SLOTT *_s = (SLOTP);                                                   \
+        if (!PUBSUB_LAP_SUPERSEDED(STYPE, DTYPE, NEWSEQ, _s->sequence)) {      \
+            _s->value = (VAL);                                                 \
+            __atomic_store_n(&_s->sequence, (NEWSEQ), __ATOMIC_RELEASE);       \
+        }                                                                      \
+        pubsub_mutex_unlock(HDR);                                              \
+        (void)sizeof(WORDT);                                                   \
+    } while (0)
+
+/* Is a lock-free CAS as wide as the 16-byte Int slot available?  Needs a
+ * 128-bit integer (__int128) and, on x86-64, -mcx16 (added by Makefile.PL) so
+ * gcc inlines cmpxchg16b; arm64 has it natively.  Build with
+ * -DPUBSUB_INT_FORCE_MUTEX to force the fallback (used to test it). */
+#if defined(PUBSUB_INT_FORCE_MUTEX) || !defined(__SIZEOF_INT128__)
+#  define PUBSUB_INT_ATOMIC16 0
+#elif defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16) || defined(__aarch64__) || defined(__ARM_FEATURE_ATOMICS)
+#  define PUBSUB_INT_ATOMIC16 1
+#else
+#  define PUBSUB_INT_ATOMIC16 0
+#endif
+
+#if PUBSUB_INT_ATOMIC16
+typedef unsigned __int128 PubSubIntWord;
+#  define PUBSUB_COMMIT_INT PUBSUB_COMMIT_ATOMIC
+#else
+typedef uint64_t PubSubIntWord;   /* mutex fallback: WORDT is only sizeof'd */
+#  define PUBSUB_COMMIT_INT PUBSUB_COMMIT_MUTEX
+#endif
+
+/* The 8-byte Int32/Int16 slots need a lock-free 8-byte CAS -- inline on
+ * x86-64/aarch64/armv7+ but a libatomic (locked, not shared-memory safe) call
+ * on ancient 32-bit targets without one (armv6, i486/i586, mips/riscv32).
+ * Fall back to the header mutex there too.  -DPUBSUB_INT8_FORCE_MUTEX forces
+ * it for testing. */
+#if defined(PUBSUB_INT8_FORCE_MUTEX) || defined(PUBSUB_INT_FORCE_MUTEX)
+#  define PUBSUB_INT_ATOMIC8 0
+#elif defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8) || defined(__x86_64__) || defined(__aarch64__)
+#  define PUBSUB_INT_ATOMIC8 1
+#else
+#  define PUBSUB_INT_ATOMIC8 0
+#endif
+
+#if PUBSUB_INT_ATOMIC8
+#  define PUBSUB_COMMIT_INT8 PUBSUB_COMMIT_ATOMIC
+#else
+#  define PUBSUB_COMMIT_INT8 PUBSUB_COMMIT_MUTEX
+#endif
+
+#define DEFINE_INT_PUBSUB(PFX, SLOT, WORDT, VTYPE, STYPE, DTYPE, COMMIT)       \
+                                                                                \
+static inline void pubsub_##PFX##_commit_at(PubSubHandle *h, uint64_t pos,     \
+                                             VTYPE value) {                    \
+    SLOT *slots = (SLOT *)h->slots;                                            \
+    uint32_t idx = pos & h->cap_mask;                                          \
+    COMMIT(SLOT, WORDT, STYPE, DTYPE, h->hdr, &slots[idx], (STYPE)(pos + 1), value);\
+}                                                                              \
                                                                                 \
 static inline int pubsub_##PFX##_publish(PubSubHandle *h, VTYPE value) {       \
     PubSubHeader *hdr = h->hdr;                                                \
-    SLOT *slots = (SLOT *)h->slots;                                            \
     uint64_t pos = __atomic_fetch_add(&hdr->write_pos, 1, __ATOMIC_RELAXED);   \
-    uint32_t idx = pos & h->cap_mask;                                          \
-    slots[idx].value = value;                                                  \
-    __atomic_store_n(&slots[idx].sequence, (STYPE)(pos + 1), __ATOMIC_RELEASE);\
+    pubsub_##PFX##_commit_at(h, pos, value);                                   \
     __atomic_add_fetch(&hdr->stat_publish_ok, 1, __ATOMIC_RELAXED);            \
     pubsub_wake_subscribers(hdr);                                              \
     return 1;                                                                  \
@@ -672,15 +817,9 @@ static inline int pubsub_##PFX##_publish(PubSubHandle *h, VTYPE value) {       \
 static inline uint32_t pubsub_##PFX##_publish_multi(PubSubHandle *h,           \
         const VTYPE *values, uint32_t count) {                                 \
     PubSubHeader *hdr = h->hdr;                                                \
-    SLOT *slots = (SLOT *)h->slots;                                            \
-    uint32_t mask = h->cap_mask;                                               \
     uint64_t pos = __atomic_fetch_add(&hdr->write_pos, count, __ATOMIC_RELAXED);\
-    for (uint32_t i = 0; i < count; i++) {                                     \
-        uint32_t idx = (pos + i) & mask;                                       \
-        slots[idx].value = values[i];                                          \
-        __atomic_store_n(&slots[idx].sequence,                                 \
-            (STYPE)(pos + i + 1), __ATOMIC_RELEASE);                           \
-    }                                                                          \
+    for (uint32_t i = 0; i < count; i++)                                       \
+        pubsub_##PFX##_commit_at(h, pos + i, values[i]);                       \
     __atomic_add_fetch(&hdr->stat_publish_ok, count, __ATOMIC_RELAXED);        \
     pubsub_wake_subscribers(hdr);                                              \
     return count;                                                              \
@@ -701,7 +840,10 @@ static inline int pubsub_##PFX##_poll(PubSubSub *sub, VTYPE *value) {          \
         uint32_t idx = cursor & sub->cap_mask;                                 \
         SLOT *slot = &slots[idx];                                              \
         STYPE seq1 = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);       \
-        DTYPE diff = (DTYPE)seq1 - (DTYPE)(STYPE)(cursor + 1);                 \
+        /* Subtract as UNSIGNED STYPE, then cast to DTYPE (wraparound-safe, \
+         * same idiom as PUBSUB_LAP_SUPERSEDED); the signed subtraction of \
+         * two DTYPEs here would be UB on displacement > 2^31 without -fwrapv. */ \
+        DTYPE diff = (DTYPE)((STYPE)seq1 - (STYPE)(cursor + 1));             \
         if (diff != 0) {                                                       \
             if (diff > 0) {                                                    \
                 uint64_t nc = wp > sub->capacity ? wp - sub->capacity : 0;     \
@@ -761,14 +903,15 @@ static int pubsub_##PFX##_poll_wait(PubSubSub *sub, VTYPE *value,              \
     }                                                                          \
 }
 
-/* Instantiate for Int (64-bit seq + 64-bit value = 16 bytes/slot) */
-DEFINE_INT_PUBSUB(int, PubSubIntSlot, int64_t, uint64_t, int64_t)
+/* Instantiate for Int (64-bit seq + 64-bit value = 16 bytes/slot).  The 16-byte
+ * slot uses a lock-free CAS where available, else the header-mutex fallback. */
+DEFINE_INT_PUBSUB(int, PubSubIntSlot, PubSubIntWord, int64_t, uint64_t, int64_t, PUBSUB_COMMIT_INT)
 
 /* Instantiate for Int32 (32-bit seq + 32-bit value = 8 bytes/slot) */
-DEFINE_INT_PUBSUB(int32, PubSubInt32Slot, int32_t, uint32_t, int32_t)
+DEFINE_INT_PUBSUB(int32, PubSubInt32Slot, uint64_t, int32_t, uint32_t, int32_t, PUBSUB_COMMIT_INT8)
 
 /* Instantiate for Int16 (32-bit seq + 16-bit value = 8 bytes/slot) */
-DEFINE_INT_PUBSUB(int16, PubSubInt16Slot, int16_t, uint32_t, int32_t)
+DEFINE_INT_PUBSUB(int16, PubSubInt16Slot, uint64_t, int16_t, uint32_t, int32_t, PUBSUB_COMMIT_INT8)
 
 /* ================================================================
  * Str: mutex-protected publish, lock-free subscribe
@@ -949,6 +1092,13 @@ static int pubsub_str_poll_wait(PubSubSub *sub, const char **out_str,
 
 static void pubsub_clear(PubSubHandle *h) {
     PubSubHeader *hdr = h->hdr;
+    /* Str-only mutex is intentional, not an omission: the int/int32/int16
+     * publish path is lock-free and never acquires hdr->mutex, so locking it
+     * here would serialize nothing. Callers must invoke clear() only while
+     * publishers are quiescent -- see the clear() contract in
+     * Data::PubSub::Shared POD ("Call clear only when publishers are
+     * quiescent"). Str publish takes the ring mutex, so only that mode can
+     * (and does) exclude an in-flight publish here. */
     if (h->mode == PUBSUB_MODE_STR)
         pubsub_mutex_lock(hdr);
 

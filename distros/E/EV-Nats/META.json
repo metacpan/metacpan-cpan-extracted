@@ -36,7 +36,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Digest::SHA" : "0",
             "EV" : "4.11",
+            "JSON::PP" : "0",
+            "MIME::Base64" : "0",
             "XSLoader" : "0.02",
             "perl" : "5.012000"
          }
@@ -58,6 +61,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-nats"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

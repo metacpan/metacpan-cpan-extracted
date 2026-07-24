@@ -40,8 +40,7 @@ CONF
     my $pid = fork;
     die "fork: $!" unless defined $pid;
     if ($pid == 0) {
-        exec $nats_bin, '-c', $conf, '--pid', "$tmp/nats$i.pid";
-        _exit(1);
+        exec($nats_bin, '-c', $conf, '--pid', "$tmp/nats$i.pid") or _exit(1);
     }
     push @pids, $pid;
 }

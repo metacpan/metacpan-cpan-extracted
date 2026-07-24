@@ -1,7 +1,8 @@
-Changes
+CHANGELOG.md
 lib/Net/SNMP/QueryEngine/AnyEvent.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00-load.t
 t/manifest.t
@@ -20,6 +21,13 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 META.yml
-MYMETA.json
-MYMETA.yml
 t/boilerplate.t
+t/10-live-get.t
+t/11-live-gettable.t
+t/12-live-info.t
+t/13-live-whendone.t
+t/14-live-error.t
+t/15-live-reconnect.t
+t/data/meow.snmprec
+t/data/public.snmprec
+t/lib/SQETest.pm

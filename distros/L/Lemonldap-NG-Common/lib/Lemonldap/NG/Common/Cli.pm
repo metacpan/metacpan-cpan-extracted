@@ -95,7 +95,7 @@ sub run {
         if ( $_[$i] =~ s/^--?(\w)/$1/ ) {
             my $k    = $_[$i];
             my $bool = ( $k =~ booleanOptions );
-            my $v    = $bool ? 1 : $_[ $i++ ];
+            my $v    = $bool ? 1 : $_[ ++$i ];
             if ( ref $self ) {
                 eval { $self->$k($v) };
                 if ($@) {

@@ -19,6 +19,7 @@ typedef struct ev_loop* EV__Loop;
 struct ev_pg_s {
     unsigned int magic;
     struct ev_loop *loop;
+    SV *loop_sv;   /* ref to the EV::Loop object; keeps the ev_loop alive for our lifetime */
     PGconn *conn;
 
     ev_io    rio, wio;
@@ -85,7 +86,7 @@ static void emit_error(ev_pg_t *self, const char *msg);
 static int  cleanup_connection(ev_pg_t *self);
 static HV*  build_error_fields(PGresult *res);
 static HV*  build_result_meta(PGresult *res);
-static void cancel_pending(ev_pg_t *self, const char *errmsg);
+static int  cancel_pending(ev_pg_t *self, const char *errmsg);
 static int  check_destroyed(ev_pg_t *self);
 static int  handle_conn_loss(ev_pg_t *self);
 
@@ -454,6 +455,8 @@ static int deliver_result(ev_pg_t *self, PGresult *res) {
             }
 
             PUSHs(sv_2mortal(newRV_noinc((SV*)meta)));
+            /* describe is a successful result — let result_meta() refresh from it */
+            RELEASE_LAST_HV(self->last_result_meta);
         }
         else if (st == PGRES_TUPLES_OK || st == PGRES_SINGLE_TUPLE
 #ifdef LIBPQ_HAS_CHUNK_MODE
@@ -687,11 +690,17 @@ static void process_results(ev_pg_t *self) {
                         int rc;
                         while ((rc = PQgetCopyData(self->conn, &buf, 1)) > 0)
                             PQfreemem(buf);
-                        /* rc == -1: COPY done, rc == 0: would block */
+                        /* rc == -1: COPY done, rc == 0: would block, rc == -2: error */
                         if (rc == 0) {
                             self->draining_copy = (st == PGRES_COPY_BOTH) ? 3 : 1;
                             update_idle_ref(self);
-                            continue;
+                            self->pending_result = last_res;   /* resume via top-of-function draining_copy handler on next read */
+                            return;
+                        }
+                        if (rc == -2) {   /* fatal COPY error — report like the top handler */
+                            if (last_res) PQclear(last_res);
+                            handle_conn_loss(self);
+                            return;
                         }
                     }
                     if (st == PGRES_COPY_IN || st == PGRES_COPY_BOTH) {
@@ -784,6 +793,8 @@ static void process_results(ev_pg_t *self) {
                         /* PQisBusy interrupted drain; residual results
                          * remain in libpq buffer — flag for later. */
                         self->draining_single_row = 1;
+                        self->skip_results++;   /* balance the decrement this stream's NULL will take:
+                                                 * the delivering query was excluded from skip_pending's count */
                         update_idle_ref(self);
                     }
                     if (last_res != NULL) {
@@ -1097,10 +1108,11 @@ static int cleanup_connection(ev_pg_t *self) {
     return 0;
 }
 
-static void cancel_pending(ev_pg_t *self, const char *errmsg) {
+static int cancel_pending(ev_pg_t *self, const char *errmsg) {
     ev_pg_cb_t *cbt;
     unsigned int entry_magic = self->magic;
     int remaining = self->pending_count;
+    int skipped = 0;
 
     self->meta_fresh = 0;
 
@@ -1137,6 +1149,7 @@ static void cancel_pending(ev_pg_t *self, const char *errmsg) {
 
             SvREFCNT_dec(cbt->cb);
         }
+        skipped++;
         release_cbt(cbt);
 
         if (self->magic != entry_magic) {
@@ -1147,6 +1160,7 @@ static void cancel_pending(ev_pg_t *self, const char *errmsg) {
                 if (!self->cb_head) self->cb_tail = NULL;
                 self->pending_count--;
                 if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);
+                skipped++;
                 release_cbt(cbt);
             }
             break;
@@ -1155,6 +1169,7 @@ static void cancel_pending(ev_pg_t *self, const char *errmsg) {
 
     self->callback_depth--;
     update_idle_ref(self);
+    return skipped;
 }
 
 static ev_pg_cb_t* push_cb(ev_pg_t *self, SV *cb, int is_sync) {
@@ -1403,6 +1418,7 @@ CODE:
     Newxz(RETVAL, 1, ev_pg_t);
     RETVAL->magic = EV_PG_MAGIC;
     RETVAL->loop = loop;
+    RETVAL->loop_sv = newSVsv(ST(1));   /* keep the loop object alive for our lifetime */
     RETVAL->fd = -1;
 #ifdef LIBPQ_HAS_ASYNC_CANCEL
     RETVAL->cancel_fd = -1;
@@ -1419,6 +1435,8 @@ CODE:
 
     self->magic = EV_PG_FREED;
 
+    /* loop_sv keeps the loop alive for these stops in the normal case;
+     * during global destruction (PL_dirty) loop teardown order isn't guaranteed. */
     stop_reading(self);
     stop_writing(self);
 
@@ -1452,6 +1470,7 @@ CODE:
             Safefree(cbt);
         }
         self->cb_tail = NULL;
+        if (self->loop_sv) SvREFCNT_dec(self->loop_sv);
         Safefree(self);
         return;
     }
@@ -1488,6 +1507,7 @@ CODE:
     RELEASE_HANDLER(self->on_drain);
     RELEASE_LAST_HV(self->last_error_fields);
     RELEASE_LAST_HV(self->last_result_meta);
+    if (self->loop_sv) { SvREFCNT_dec(self->loop_sv); self->loop_sv = NULL; }
     if (self->trace_fp) fclose(self->trace_fp);
     Safefree(self->conninfo);
 
@@ -2154,15 +2174,17 @@ void
 skip_pending(EV::Pg self)
 CODE:
 {
-    int to_skip = self->pending_count;
-    if (self->delivering_cbt) to_skip--;  /* already consumed */
-    cancel_pending(self, "skipped");
+    PGconn *entry_conn = self->conn;
+    int skipped = cancel_pending(self, "skipped");
     if (self->magic != EV_PG_MAGIC) {
         check_destroyed(self);
         return;
     }
-    if (to_skip > 0)
-        self->skip_results += to_skip;
+    /* Only credit if the same connection is still in place: a "skipped"
+     * callback may have torn it down (finish/reset/connect), taking its
+     * in-flight sequences — and skip_results — with it. */
+    if (skipped > 0 && self->conn == entry_conn)
+        self->skip_results += skipped;
     check_destroyed(self);
 }
 

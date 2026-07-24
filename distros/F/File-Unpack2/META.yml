@@ -1,17 +1,13 @@
 ---
-abstract: 'A strong bz2/gz/zip/tar/cpio/rpm/deb/cab/lzma/7z/rar/... archive unpacker, based on mime-types'
+abstract: 'Aggressively unpack any archive, recursively, by mime type'
 author:
-  - 'Sebastian Riedel <sri@cpan.org>'
+  - 'Sebastian Riedel <sriedel@suse.com>'
 build_requires:
-  FindBin: '0'
-  Pod::Coverage: '0.18'
-  Test::CheckManifest: '0.9'
-  Test::More: '0'
-  Test::Pod: '1.22'
-  Test::Pod::Coverage: '1.08'
-configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -22,12 +18,15 @@ no_index:
   directory:
     - t
     - inc
-requires:
+    - t
+recommends:
   BSD::Resource: '0'
-  Carp: '0'
   Compress::Raw::Bzip2: '0'
   Compress::Raw::Lzma: '0'
   Compress::Raw::Zlib: '2.024'
+  Filesys::Statvfs: '0'
+requires:
+  Carp: '0'
   Cwd: '0'
   File::Compare: '0'
   File::Copy: '0'
@@ -35,12 +34,17 @@ requires:
   File::MimeInfo::Magic: '0'
   File::Path: '0'
   File::Temp: '0'
-  Filesys::Statvfs: '0'
   Getopt::Long: '0'
   IPC::Run: '0'
   JSON: '0'
   Pod::Usage: '0'
   String::ShellQuote: '0'
   Text::Sprintf::Named: '0'
-version: '1.5'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/openSUSE/perl-File-Unpack2/issues
+  homepage: https://github.com/openSUSE/cavil
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/openSUSE/perl-File-Unpack2.git
+version: '2.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

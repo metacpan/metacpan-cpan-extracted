@@ -1,5 +1,27 @@
 Revision history for Concierge-Users
 
+v0.9.4  2026-07-23
+    - BREAKING: Concierge::Users->setup's configuration key renamed from
+      backend to backend_class, to disambiguate it from the unrelated
+      "friendly name" sense of backend used elsewhere in the Concierge
+      suite (a desk's build config still accepts a short friendly name
+      like 'database'/'file'/'yaml' under backend; Concierge::Users's own
+      key now requires an already-resolved, fully-qualified class name,
+      matching Concierge::Auth's and Concierge::Sessions's backend_class).
+      Removed the friendly-name-to-class ternary and its
+      database|file|yaml validation.
+    - Updated README, POD, and tests to use backend_class throughout.
+    - BREAKING: Renamed Concierge::Users::Database to
+      Concierge::Users::SQLite. The old name implied a generic,
+      swappable database backend, but the implementation is (and
+      always was) SQLite-specific via DBI/DBD::SQLite -- there is no
+      abstraction over other RDBMSes. The new name matches
+      Concierge::Sessions::SQLite's existing convention and is honest
+      about what the class does. The 'database' friendly name at the
+      desk-config layer (Concierge::Desk::Setup's %USERS_BACKENDS
+      catalog) is unaffected and still resolves to this module, just
+      under its new class name.
+
 v0.9.3  2026-07-16
     - Meta.pm: remove 'required' flag from the created_date system field.
       It is set internally by the service layer, not collected from

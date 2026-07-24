@@ -167,7 +167,7 @@ subtest 'gen_crypt_token deprecated alias - functional' => sub {
 ## OO interface tests (Auth.pm wrappers)
 
 my $auth;
-my $w = warnings { $auth = Concierge::Auth->new( backend => 'Concierge::Auth::Pwd', no_file => 1 ) };
+my $w = warnings { $auth = Concierge::Auth->new( backend_class => 'Concierge::Auth::Pwd', no_file => 1 ) };
 
 subtest 'gen_uuid - OO' => sub {
     my ($ok, $msg) = $auth->gen_uuid();

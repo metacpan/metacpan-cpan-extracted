@@ -19,6 +19,11 @@
 #include <time.h>
 #include <arpa/inet.h>
 
+/* Makefile.PL defines this from $EV::Nats::VERSION so the two cannot drift */
+#ifndef EV_NATS_VERSION
+#define EV_NATS_VERSION "0.00"
+#endif
+
 #ifdef HAVE_OPENSSL
   #include <openssl/ssl.h>
   #include <openssl/err.h>
@@ -92,9 +97,11 @@ struct nats_sub_s {
     ngx_queue_t queue;
 };
 
-/* PONG callback entry (for flush) */
+/* PONG callback queue entry, one per client-sent PING (FIFO stays 1:1).
+   kind: 0 = user flush cb, 1 = drain marker, 2 = internal PING placeholder. */
 typedef struct nats_pong_cb_s {
     SV *cb;
+    int kind;
     ngx_queue_t queue;
 } nats_pong_cb_t;
 
@@ -117,6 +124,7 @@ struct nats_s {
     int fd;
     int connected;
     int connecting;
+    int connect_pending;    /* nonblocking connect(2) still in flight */
 
     ev_io rio, wio;
     int reading, writing;
@@ -146,6 +154,10 @@ struct nats_s {
     char *host;
     int port;
     char *path; /* Unix socket path */
+
+    /* getaddrinfo candidates kept across async connect failures for failover */
+    struct addrinfo *ai_res;    /* the list to freeaddrinfo */
+    struct addrinfo *ai_next;   /* next candidate to try */
 
     int reconnect_enabled;
     int reconnect_delay_ms;
@@ -230,6 +242,11 @@ struct nats_s {
     int ldm;
     SV *on_ldm;
 
+    /* Deferred destroy: DESTROY inside an event-loop callback only sets
+       destroy_pending; the outermost nats_on_* wrapper frees (cb_depth) */
+    int cb_depth;
+    int destroy_pending;
+
     /* TLS */
 #ifdef HAVE_OPENSSL
     SSL_CTX *ssl_ctx;
@@ -255,6 +272,7 @@ typedef struct nats_req_s {
 
 static void nats_connect_tcp(nats_t *self);
 static void nats_connect_unix(nats_t *self);
+static void nats_free_addrinfo(nats_t *self);
 static void nats_do_connect(nats_t *self);
 static void nats_schedule_reconnect(nats_t *self);
 static void nats_next_server(nats_t *self);
@@ -272,6 +290,7 @@ static void nats_process_line(nats_t *self, char *line, size_t len);
 static void nats_process_msg(nats_t *self, char *payload, size_t len);
 static void nats_emit_error(nats_t *self, const char *err);
 static void nats_cleanup(nats_t *self);
+static void nats_destroy_now(nats_t *self);
 static void nats_start_ping_timer(nats_t *self);
 static void nats_drain_waiting(nats_t *self);
 static void nats_setup_inbox(nats_t *self);
@@ -299,8 +318,10 @@ static void nats_set_str(char **dst, const char *src)
 static void nats_set_str_sv(char **dst, SV *val)
 {
     STRLEN l;
-    const char *s = SvPV(val, l);
+    const char *s;
     if (*dst) { Safefree(*dst); *dst = NULL; }
+    if (!SvOK(val)) return; /* undef means "unset": NULL, not an empty string */
+    s = SvPV(val, l);
     Newx(*dst, l + 1, char);
     memcpy(*dst, s, l);
     (*dst)[l] = '\0';
@@ -335,6 +356,26 @@ static void wbuf_append(nats_t *self, const char *data, size_t len)
     self->wbuf_len += len;
 }
 
+/* Bounded substring search for counted buffers: rbuf slices are not
+   NUL-terminated, so strstr() is unsafe (memmem() is not portable). */
+static const char *nats_memfind(const char *hay, size_t hay_len,
+                                const char *needle, size_t needle_len)
+{
+    const char *last;
+    const char *p;
+    if (needle_len == 0) return hay;
+    if (hay_len < needle_len) return NULL;
+    last = hay + (hay_len - needle_len);
+    p = hay;
+    while (p <= last) {
+        p = (const char *)memchr(p, needle[0], (size_t)(last - p) + 1);
+        if (!p) return NULL;
+        if (memcmp(p, needle, needle_len) == 0) return p;
+        p++;
+    }
+    return NULL;
+}
+
 /* ================================================================
  * NKey helpers (base32 + Ed25519)
  * ================================================================ */
@@ -342,8 +383,11 @@ static void wbuf_append(nats_t *self, const char *data, size_t len)
 #ifdef HAVE_OPENSSL
 #include <openssl/evp.h>
 
-/* NATS base32 decode (RFC 4648, no padding) */
-static int nats_base32_decode(const char *src, size_t src_len, unsigned char *dst, size_t *dst_len)
+/* NATS base32 decode (RFC 4648, no padding). dst_cap bounds the output:
+   an over-long input (e.g. a hostile .creds seed) must not smash dst. */
+static int nats_base32_decode(const char *src, size_t src_len,
+                              unsigned char *dst, size_t dst_cap,
+                              size_t *dst_len)
 {
     static const int8_t b32_tab[128] = {
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
@@ -368,6 +412,7 @@ static int nats_base32_decode(const char *src, size_t src_len, unsigned char *ds
         bits += 5;
         if (bits >= 8) {
             bits -= 8;
+            if (di >= dst_cap) return -1;
             dst[di++] = (unsigned char)(buf >> bits);
         }
     }
@@ -451,9 +496,9 @@ static int nats_nkey_sign(const char *seed_encoded, const char *nonce, size_t no
     unsigned char raw[64];
     size_t raw_len = 0;
 
-    if (nats_base32_decode(seed_encoded, strlen(seed_encoded), raw, &raw_len) != 0)
+    if (nats_base32_decode(seed_encoded, strlen(seed_encoded), raw, sizeof(raw), &raw_len) != 0)
         return -1;
-    if (raw_len < 36) return -1; /* prefix(2) + seed(32) + CRC(2) */
+    if (raw_len != 36) return -1; /* prefix(2) + seed(32) + CRC(2), exactly */
 
     /* Validate CRC16 */
     uint16_t expected_crc = (uint16_t)raw[raw_len - 2] | ((uint16_t)raw[raw_len - 1] << 8);
@@ -487,9 +532,9 @@ static int nats_nkey_public(const char *seed_encoded, char *pub_out, size_t pub_
     unsigned char raw[64];
     size_t raw_len = 0;
 
-    if (nats_base32_decode(seed_encoded, strlen(seed_encoded), raw, &raw_len) != 0)
+    if (nats_base32_decode(seed_encoded, strlen(seed_encoded), raw, sizeof(raw), &raw_len) != 0)
         return -1;
-    if (raw_len < 36) return -1;
+    if (raw_len != 36) return -1;
 
     uint16_t expected_crc = (uint16_t)raw[raw_len - 2] | ((uint16_t)raw[raw_len - 1] << 8);
     if (nats_crc16(raw, raw_len - 2) != expected_crc) return -1;
@@ -588,7 +633,7 @@ static int nats_ssl_setup(nats_t *self)
         self->ssl_ctx = SSL_CTX_new(TLS_client_method());
         if (!self->ssl_ctx) return -1;
 
-        if (self->tls_ca_file) {
+        if (self->tls_ca_file && *self->tls_ca_file) {
             if (!SSL_CTX_load_verify_locations(self->ssl_ctx, self->tls_ca_file, NULL))
                 return -1;
         } else {
@@ -913,9 +958,12 @@ static void nats_cleanup(nats_t *self)
 
     self->connected = 0;
     self->connecting = 0;
+    self->connect_pending = 0;
     self->pings_outstanding = 0;
     self->parse_state = PARSE_OP;
     self->ldm = 0;  /* lame-duck flag is per-connection */
+
+    nats_free_addrinfo(self);
 
 #ifdef HAVE_OPENSSL
     nats_ssl_cleanup(self);
@@ -932,14 +980,13 @@ static void nats_cleanup(nats_t *self)
 
     nats_cancel_all_requests(self, "disconnected");
 
-    /* Drain pending PONG callbacks (flush + drain markers). Fire each
-       cb with a single error arg so callers learn the flush failed
-       rather than hang forever waiting for a PONG that won't arrive. */
+    /* Drain pending PONG callbacks: fire kind-0 flush cbs with an error so
+       callers don't hang; drain markers and placeholders are freed silently. */
     while (!ngx_queue_empty(&self->pong_cbs)) {
         ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
         nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
         ngx_queue_remove(pq);
-        if (pcb->cb) {
+        if (pcb->kind == 0 && pcb->cb) {
             dSP;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
@@ -995,6 +1042,15 @@ static void nats_emit_error(nats_t *self, const char *err)
     }
 }
 
+/* Kind-2 placeholder for an internal PING, keeping the pong_cbs FIFO 1:1 with PINGs sent */
+static void nats_push_pong_marker(nats_t *self)
+{
+    nats_pong_cb_t *pcb;
+    Newxz(pcb, 1, nats_pong_cb_t);
+    pcb->kind = 2;
+    ngx_queue_insert_tail(&self->pong_cbs, &pcb->queue);
+}
+
 /* ================================================================
  * CONNECT command builder
  * ================================================================ */
@@ -1024,7 +1080,7 @@ static void nats_send_connect(nats_t *self)
     if (self->no_responders)
         CONNECT_APPEND(",\"no_responders\":true");
     CONNECT_APPEND(",\"headers\":true");
-    CONNECT_APPEND(",\"lang\":\"perl-xs\",\"version\":\"0.03\""); /* keep in sync with $VERSION */
+    CONNECT_APPEND(",\"lang\":\"perl-xs\",\"version\":\"" EV_NATS_VERSION "\"");
 
     if (self->user) {
         int elen = json_escape_string(escaped, sizeof(escaped), self->user);
@@ -1046,7 +1102,7 @@ static void nats_send_connect(nats_t *self)
         int elen = json_escape_string(escaped, sizeof(escaped), self->jwt);
         CONNECT_APPEND(",\"jwt\":%.*s", elen, escaped);
     }
-  #ifdef HAVE_OPENSSL
+#ifdef HAVE_OPENSSL
     if (self->nkey_seed && self->server_nonce) {
         /* Sign nonce with NKey */
         char sig[128];
@@ -1057,7 +1113,7 @@ static void nats_send_connect(nats_t *self)
             CONNECT_APPEND(",\"nkey\":\"%s\",\"sig\":\"%s\"", pub, sig);
         }
     }
-  #endif
+#endif
 
     CONNECT_APPEND("}\r\n");
 
@@ -1072,6 +1128,7 @@ static void nats_send_connect(nats_t *self)
     nats_resub_all(self);
 
     wbuf_append(self, "PING\r\n", 6);
+    nats_push_pong_marker(self);
 }
 
 /* ================================================================
@@ -1348,21 +1405,30 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
             char *e = line + len;
             char *found;
 
-            found = strstr(p, "\"max_payload\":");
-            if (found && found < e) {
+            /* max_payload accumulates into a signed int: parse wide and
+               clamp to INT_MAX so a hostile INFO cannot poison it negative */
+            found = (char *)nats_memfind(p, (size_t)(e - p), "\"max_payload\":", 14);
+            if (found) {
                 found += 14;
-                self->max_payload = 0;
+                uint64_t mp = 0;
+                char *digits = found;
                 while (found < e && *found >= '0' && *found <= '9') {
-                    self->max_payload = self->max_payload * 10 + (*found - '0');
+                    uint64_t d = (uint64_t)(*found - '0');
+                    if (mp <= (UINT64_MAX - d) / 10)
+                        mp = mp * 10 + d;
+                    else
+                        mp = UINT64_MAX;
                     found++;
                 }
+                if (found > digits && mp > 0)
+                    self->max_payload = mp > (uint64_t)INT_MAX ? INT_MAX : (int)mp;
             }
 
             nats_parse_connect_urls(self, p, e - p);
 
             /* Parse nonce for NKey auth */
-            found = strstr(p, "\"nonce\":\"");
-            if (found && found < e) {
+            found = (char *)nats_memfind(p, (size_t)(e - p), "\"nonce\":\"", 9);
+            if (found) {
                 found += 9;
                 const char *nend = memchr(found, '"', e - found);
                 if (nend) {
@@ -1375,8 +1441,8 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
             }
 
             /* Parse ldm (lame duck mode) */
-            found = strstr(p, "\"ldm\":");
-            if (found && found < e) {
+            found = (char *)nats_memfind(p, (size_t)(e - p), "\"ldm\":", 6);
+            if (found) {
                 found += 6;
                 while (found < e && (*found == ' ' || *found == '\t')) found++;
                 if (found < e && *found == 't') {
@@ -1396,6 +1462,26 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
         }
 
         if (self->connecting) {
+            /* tls_required: CONNECT would leak credentials over plaintext
+               before the server could reject it; refuse instead */
+            {
+                const char *tr = nats_memfind(line + 5, len - 5, "\"tls_required\":", 15);
+                if (tr) {
+                    const char *tre = line + len;
+                    int tls_active = 0;
+                    tr += 15;
+                    while (tr < tre && (*tr == ' ' || *tr == '\t')) tr++;
+#ifdef HAVE_OPENSSL
+                    tls_active = self->tls;
+#endif
+                    if ((size_t)(tre - tr) >= 4 && memcmp(tr, "true", 4) == 0 && !tls_active) {
+                        self->intentional_disconnect = 1;
+                        nats_emit_error(self, "server requires TLS but TLS is not enabled");
+                        nats_cleanup(self);
+                        return;
+                    }
+                }
+            }
 #ifdef HAVE_OPENSSL
             if (self->tls && !self->ssl) {
                 if (nats_ssl_setup(self) != 0) {
@@ -1426,7 +1512,11 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
     /* MSG */
     if (len >= 4 && line[0] == 'M' && line[1] == 'S' && line[2] == 'G' && line[3] == ' ') {
         if (nats_parse_msg_args(self, line, len) == 0) {
-            if (self->msg_total_len > (size_t)self->max_payload) {
+            /* max_payload is a signed int a hostile INFO could poison;
+               the +2 check rejects lengths whose trailing CRLF would wrap */
+            size_t limit = self->max_payload > 0 ? (size_t)self->max_payload
+                                                 : (size_t)DEFAULT_MAX_PAYLOAD;
+            if (self->msg_total_len > limit || self->msg_total_len > SIZE_MAX - 2) {
                 nats_emit_error(self, "server sent message exceeding max_payload");
                 nats_cleanup(self);
                 return;
@@ -1439,7 +1529,9 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
     /* HMSG */
     if (len >= 5 && line[0] == 'H' && line[1] == 'M' && line[2] == 'S' && line[3] == 'G' && line[4] == ' ') {
         if (nats_parse_hmsg_args(self, line, len) == 0) {
-            if (self->msg_total_len > (size_t)self->max_payload) {
+            size_t limit = self->max_payload > 0 ? (size_t)self->max_payload
+                                                 : (size_t)DEFAULT_MAX_PAYLOAD;
+            if (self->msg_total_len > limit || self->msg_total_len > SIZE_MAX - 2) {
                 nats_emit_error(self, "server sent message exceeding max_payload");
                 nats_cleanup(self);
                 return;
@@ -1465,6 +1557,8 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
             self->connecting = 0;
             self->connected = 1;
             self->reconnect_attempts = 0;
+            /* connect succeeded: drop the saved list; reconnect re-resolves */
+            nats_free_addrinfo(self);
 
             if (self->connect_timer_active) {
                 ev_timer_stop(self->loop, &self->connect_timer);
@@ -1485,22 +1579,14 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
             nats_drain_waiting(self);
         }
 
-        /* Fire flush/PONG callback (one per PONG, FIFO) */
+        /* One PONG consumes exactly one queue entry (one per PING sent) */
         if (!ngx_queue_empty(&self->pong_cbs)) {
             ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
             nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
             ngx_queue_remove(pq);
-            if (pcb->cb) {
-                dSP;
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                EXTEND(SP, 1);
-                PUSHs(&PL_sv_undef);  /* success: no error */
-                PUTBACK;
-                call_sv(pcb->cb, G_DISCARD);
-                FREETMPS; LEAVE;
-                SvREFCNT_dec(pcb->cb);
-            } else if (self->draining) {
+            if (pcb->kind == 2) {
+                Safefree(pcb);
+            } else if (pcb->kind == 1) {
                 /* Drain marker: fire drain callback and disconnect */
                 self->draining = 0;
                 if (self->drain_cb) {
@@ -1518,8 +1604,20 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                 self->intentional_disconnect = 1;
                 nats_cleanup(self);
                 return;
+            } else {
+                if (pcb->cb) {
+                    dSP;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    EXTEND(SP, 1);
+                    PUSHs(&PL_sv_undef);  /* success: no error */
+                    PUTBACK;
+                    call_sv(pcb->cb, G_DISCARD);
+                    FREETMPS; LEAVE;
+                    SvREFCNT_dec(pcb->cb);
+                }
+                Safefree(pcb);
             }
-            Safefree(pcb);
         }
 
         return;
@@ -1540,8 +1638,17 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
         char errbuf[512];
         snprintf(errbuf, sizeof(errbuf), "%.*s", (int)mlen, msg);
 
-        if (strstr(errbuf, "authorization") || strstr(errbuf, "authentication")) {
-            self->intentional_disconnect = 1;
+        /* nats-server capitalizes these; strcasestr is not portable, so
+           lowercase a bounded copy. Auth errors are fatal: no reconnect. */
+        {
+            char lc[512];
+            size_t i, n = strlen(errbuf);
+            for (i = 0; i < n; i++)
+                lc[i] = (errbuf[i] >= 'A' && errbuf[i] <= 'Z')
+                      ? errbuf[i] + ('a' - 'A') : errbuf[i];
+            lc[n] = '\0';
+            if (strstr(lc, "authorization") || strstr(lc, "authentication"))
+                self->intentional_disconnect = 1;
         }
         nats_emit_error(self, errbuf);
         nats_cleanup(self);
@@ -1553,10 +1660,19 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
  * IO callbacks
  * ================================================================ */
 
-static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
+/* Fail over to the next getaddrinfo candidate after an async connect failure. */
+static int nats_failover_next_addr(nats_t *self)
 {
-    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, rio));
-    (void)revents;
+    if (!self->ai_next) return 0;
+    nats_stop_watchers(self);
+    close(self->fd);
+    self->fd = -1;
+    nats_connect_tcp(self);
+    return 1;
+}
+
+static void nats_on_read_inner(nats_t *self)
+{
 
 #ifdef HAVE_OPENSSL
     if (self->ssl_handshaking) {
@@ -1589,6 +1705,10 @@ static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
         if (n == 0) {
             nats_cleanup(self);
         } else if (errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR) {
+            /* a refused nonblocking connect can surface here as a read
+               error, before nats_on_write's SO_ERROR check — fail over too */
+            if (self->connect_pending && nats_failover_next_addr(self))
+                return;
             nats_emit_error(self, strerror(errno));
             nats_cleanup(self);
         }
@@ -1610,11 +1730,30 @@ static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
         if (self->parse_state == PARSE_OP) {
             char *start = self->rbuf + consumed;
             char *nl = (char *)memchr(start, '\n', self->rbuf_len - consumed);
-            if (!nl) break;
+            if (!nl) {
+                /* a peer that never sends '\n' would otherwise grow rbuf
+                   without bound (MAX_CONTROL_LINE was outbound-only) */
+                if (self->rbuf_len - consumed > MAX_CONTROL_LINE) {
+                    nats_emit_error(self, "maximum control line exceeded");
+                    nats_cleanup(self);
+                    return;
+                }
+                break;
+            }
 
+            size_t line_off = consumed;
             size_t line_len = nl - start;
             nats_process_line(self, start, line_len);
             consumed += line_len + 1;
+
+            /* body not fully arrived: subject/reply are offsets into this
+               line, so roll back and re-parse the header once it has */
+            if (self->fd >= 0 && self->parse_state == PARSE_MSG_BODY &&
+                self->rbuf_len - consumed < self->msg_total_len + 2) {
+                consumed = line_off;
+                self->parse_state = PARSE_OP;
+                break;
+            }
 
         } else if (self->parse_state == PARSE_MSG_BODY) {
             size_t need = self->msg_total_len + 2;
@@ -1658,6 +1797,18 @@ static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
     }
 }
 
+/* cb_depth bracket: DESTROY during the dispatch only sets destroy_pending
+   and the free runs here. nats_destroy_now frees self - touch nothing after. */
+static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
+{
+    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, rio));
+    (void)loop; (void)revents;
+    self->cb_depth++;
+    nats_on_read_inner(self);
+    if (--self->cb_depth == 0 && self->destroy_pending)
+        nats_destroy_now(self);
+}
+
 static void nats_try_write(nats_t *self)
 {
     if (self->fd < 0) return;
@@ -1691,60 +1842,91 @@ static void nats_try_write(nats_t *self)
     }
 }
 
-static void nats_on_write(struct ev_loop *loop, ev_io *w, int revents)
+static void nats_on_write_inner(nats_t *self)
 {
-    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, wio));
-    (void)loop; (void)revents;
-
-    if (self->connecting && !self->connected) {
+    if (self->connect_pending) {
         int err = 0;
         socklen_t errlen = sizeof(err);
         getsockopt(self->fd, SOL_SOCKET, SO_ERROR, &err, &errlen);
         if (err) {
+            if (nats_failover_next_addr(self))
+                return;
             nats_emit_error(self, strerror(err));
             nats_cleanup(self);
             return;
         }
-        /* TCP connect complete. NATS speaks plain text until INFO arrives;
-           if TLS is configured, we upgrade once we've parsed INFO. So just
-           switch to reading and wait for the server's INFO greeting. */
-        if (self->writing) {
-            ev_io_stop(self->loop, &self->wio);
-            self->writing = 0;
-        }
-        if (!self->reading) {
-            ev_io_start(self->loop, &self->rio);
-            self->reading = 1;
-        }
-        return;
+        /* TCP connect complete. Fall through: wbuf may already hold part
+           of the CONNECT flush; nats_try_write disarms wio once empty. */
+        self->connect_pending = 0;
     }
 
+#ifdef HAVE_OPENSSL
+    /* resume a TLS handshake stalled on SSL_ERROR_WANT_WRITE */
+    if (self->ssl_handshaking) {
+        int hret = nats_ssl_handshake(self);
+        if (hret < 0) {
+            nats_ssl_fail(self, "SSL handshake failed");
+            return;
+        }
+        if (hret == 0) return;
+        self->ssl_handshaking = 0;
+        if (self->connecting)
+            nats_send_connect(self);
+    }
+#endif
+
     nats_try_write(self);
+}
+
+static void nats_on_write(struct ev_loop *loop, ev_io *w, int revents)
+{
+    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, wio));
+    (void)loop; (void)revents;
+    self->cb_depth++;
+    nats_on_write_inner(self);
+    if (--self->cb_depth == 0 && self->destroy_pending)
+        nats_destroy_now(self);
 }
 
 /* ================================================================
  * Timer callbacks
  * ================================================================ */
 
-static void nats_on_connect_timeout(struct ev_loop *loop, ev_timer *w, int revents)
+static void nats_on_connect_timeout_inner(nats_t *self)
 {
-    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, connect_timer));
-    (void)loop; (void)revents;
     self->connect_timer_active = 0;
     nats_emit_error(self, "connect timeout");
     nats_cleanup(self);
 }
 
-static void nats_on_reconnect_timer(struct ev_loop *loop, ev_timer *w, int revents)
+static void nats_on_connect_timeout(struct ev_loop *loop, ev_timer *w, int revents)
 {
-    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, reconnect_timer));
+    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, connect_timer));
     (void)loop; (void)revents;
+    self->cb_depth++;
+    nats_on_connect_timeout_inner(self);
+    if (--self->cb_depth == 0 && self->destroy_pending)
+        nats_destroy_now(self);
+}
+
+static void nats_on_reconnect_timer_inner(nats_t *self)
+{
     self->reconnect_timer_active = 0;
     self->reconnect_attempts++;
     self->intentional_disconnect = 0;
     if (self->server_pool_count > 0)
         nats_next_server(self);
     nats_do_connect(self);
+}
+
+static void nats_on_reconnect_timer(struct ev_loop *loop, ev_timer *w, int revents)
+{
+    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, reconnect_timer));
+    (void)loop; (void)revents;
+    self->cb_depth++;
+    nats_on_reconnect_timer_inner(self);
+    if (--self->cb_depth == 0 && self->destroy_pending)
+        nats_destroy_now(self);
 }
 
 static void nats_start_ping_timer(nats_t *self)
@@ -1756,11 +1938,8 @@ static void nats_start_ping_timer(nats_t *self)
     self->ping_timer_active = 1;
 }
 
-static void nats_on_ping_timer(struct ev_loop *loop, ev_timer *w, int revents)
+static void nats_on_ping_timer_inner(nats_t *self)
 {
-    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, ping_timer));
-    (void)loop; (void)revents;
-
     self->pings_outstanding++;
     if (self->max_pings_outstanding > 0 &&
         self->pings_outstanding > self->max_pings_outstanding) {
@@ -1770,22 +1949,40 @@ static void nats_on_ping_timer(struct ev_loop *loop, ev_timer *w, int revents)
     }
 
     wbuf_append(self, "PING\r\n", 6);
+    nats_push_pong_marker(self);
     nats_try_write(self);
+}
+
+static void nats_on_ping_timer(struct ev_loop *loop, ev_timer *w, int revents)
+{
+    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, ping_timer));
+    (void)loop; (void)revents;
+    self->cb_depth++;
+    nats_on_ping_timer_inner(self);
+    if (--self->cb_depth == 0 && self->destroy_pending)
+        nats_destroy_now(self);
 }
 
 /* ================================================================
  * Write coalescing via ev_prepare
  * ================================================================ */
 
-static void nats_on_prepare(struct ev_loop *loop, ev_prepare *w, int revents)
+static void nats_on_prepare_inner(nats_t *self)
 {
-    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, prepare_watcher));
-    (void)loop; (void)revents;
-
     if (self->wbuf_dirty && self->fd >= 0) {
         self->wbuf_dirty = 0;
         nats_try_write(self);
     }
+}
+
+static void nats_on_prepare(struct ev_loop *loop, ev_prepare *w, int revents)
+{
+    nats_t *self = (nats_t *)((char *)w - offsetof(nats_t, prepare_watcher));
+    (void)loop; (void)revents;
+    self->cb_depth++;
+    nats_on_prepare_inner(self);
+    if (--self->cb_depth == 0 && self->destroy_pending)
+        nats_destroy_now(self);
 }
 
 static void nats_schedule_write(nats_t *self)
@@ -1818,6 +2015,8 @@ static void nats_schedule_write(nats_t *self)
  * Request timeout
  * ================================================================ */
 
+/* Deliberately not cb_depth-guarded: it never dereferences nats_t - the
+   req is already unlinked, so a connection-destroying callback is harmless. */
 static void nats_on_request_timeout(struct ev_loop *loop, ev_timer *w, int revents)
 {
     nats_req_t *req = (nats_req_t *)((char *)w - offsetof(nats_req_t, timer));
@@ -1928,8 +2127,8 @@ static void nats_free_server_pool(nats_t *self)
 static void nats_parse_connect_urls(nats_t *self, const char *json, size_t len)
 {
     const char *key = "\"connect_urls\":[";
-    const char *p = strstr(json, key);
-    if (!p || p >= json + len) return;
+    const char *p = nats_memfind(json, len, key, strlen(key));
+    if (!p) return;
 
     p += strlen(key);
     const char *end = json + len;
@@ -1989,6 +2188,8 @@ static void nats_next_server(nats_t *self)
 
     nats_set_str(&self->host, srv->host);
     self->port = srv->port;
+    /* host changed: any saved getaddrinfo candidates are stale */
+    nats_free_addrinfo(self);
 
     /* Rotate this server to end of pool */
     ngx_queue_remove(q);
@@ -2003,6 +2204,8 @@ static void nats_after_connect(nats_t *self, int fd, int rv)
     self->fd = fd;
     self->connecting = 1;
     self->connected = 0;
+    /* rv != 0: EINPROGRESS — first EV_WRITE must SO_ERROR-check the connect */
+    self->connect_pending = (rv != 0);
 
     ev_io_init(&self->rio, nats_on_read, fd, EV_READ);
     ev_io_init(&self->wio, nats_on_write, fd, EV_WRITE);
@@ -2021,32 +2224,128 @@ static void nats_after_connect(nats_t *self, int fd, int rv)
     }
 
     if (self->connect_timeout_ms > 0) {
+        /* failover re-enters here with the timer still running: ev_timer_set
+           on an active watcher corrupts libev's heap key, so stop it first */
+        if (self->connect_timer_active) {
+            ev_timer_stop(self->loop, &self->connect_timer);
+            self->connect_timer_active = 0;
+        }
         ev_timer_set(&self->connect_timer, self->connect_timeout_ms / 1000.0, 0.0);
         ev_timer_start(self->loop, &self->connect_timer);
         self->connect_timer_active = 1;
     }
 }
 
-static void nats_connect_tcp(nats_t *self)
+/* Drop the saved getaddrinfo list; NULLs both fields, never frees twice. */
+static void nats_free_addrinfo(nats_t *self)
 {
-    struct addrinfo hints, *res, *rp;
-    char port_str[8];
-    int fd = -1;
+    if (self->ai_res)
+        freeaddrinfo(self->ai_res);
+    self->ai_res = NULL;
+    self->ai_next = NULL;
+}
 
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
+/* Actual teardown behind DESTROY. With cb_depth > 0 DESTROY only sets
+   destroy_pending and the outermost nats_on_* wrapper runs this once the
+   callback returns. Callers must not touch self after this. */
+static void nats_destroy_now(nats_t *self)
+{
+    CLEAR_HANDLER(self->on_error);
+    CLEAR_HANDLER(self->on_connect);
+    CLEAR_HANDLER(self->on_disconnect);
 
-    snprintf(port_str, sizeof(port_str), "%d", self->port);
+    nats_stop_watchers(self);
+    nats_stop_timers(self);
 
-    int rv = getaddrinfo(self->host, port_str, &hints, &res);
-    if (rv != 0) {
-        nats_emit_error(self, gai_strerror(rv));
-        nats_schedule_reconnect(self);
-        return;
+    while (!ngx_queue_empty(&self->req_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->req_queue);
+        nats_req_t *req = ngx_queue_data(q, nats_req_t, queue);
+        ngx_queue_remove(q);
+        if (req->timer_active)
+            ev_timer_stop(self->loop, &req->timer);
+        CLEAR_HANDLER(req->cb);
+        Safefree(req);
+    }
+    nats_skip_waiting(self);
+
+    while (!ngx_queue_empty(&self->pong_cbs)) {
+        ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
+        nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
+        ngx_queue_remove(pq);
+        CLEAR_HANDLER(pcb->cb);
+        Safefree(pcb);
     }
 
-    for (rp = res; rp != NULL; rp = rp->ai_next) {
+    while (!ngx_queue_empty(&self->subs)) {
+        ngx_queue_t *q = ngx_queue_head(&self->subs);
+        nats_sub_t *sub = ngx_queue_data(q, nats_sub_t, queue);
+        nats_remove_sub(self, sub);
+    }
+
+    if (self->fd >= 0) {
+        close(self->fd);
+        self->fd = -1;
+    }
+    nats_free_addrinfo(self);
+
+    CLEAR_HANDLER(self->server_info_json);
+    CLEAR_HANDLER(self->drain_cb);
+
+    nats_free_server_pool(self);
+    if (self->sub_map) {
+        SvREFCNT_dec((SV *)self->sub_map);
+        self->sub_map = NULL;
+    }
+#ifdef HAVE_OPENSSL
+    nats_ssl_cleanup(self);
+    if (self->ssl_ctx) { SSL_CTX_free(self->ssl_ctx); self->ssl_ctx = NULL; }
+    Safefree(self->tls_ca_file);
+#endif
+
+    Safefree(self->rbuf);
+    Safefree(self->wbuf);
+    Safefree(self->host);
+    Safefree(self->path);
+    Safefree(self->user);
+    Safefree(self->pass);
+    Safefree(self->token);
+    Safefree(self->name);
+    Safefree(self->nkey_seed);
+    Safefree(self->jwt);
+    Safefree(self->server_nonce);
+    CLEAR_HANDLER(self->on_slow_consumer);
+    CLEAR_HANDLER(self->on_ldm);
+
+    Safefree(self);
+}
+
+static void nats_connect_tcp(nats_t *self)
+{
+    struct addrinfo hints, *rp;
+    char port_str[8];
+    int fd = -1;
+    int rv = 0;
+
+    /* Resolve once per host and keep the list: a connect that later fails
+       via SO_ERROR fails over to the remaining candidates. */
+    if (!self->ai_res) {
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+
+        snprintf(port_str, sizeof(port_str), "%d", self->port);
+
+        rv = getaddrinfo(self->host, port_str, &hints, &self->ai_res);
+        if (rv != 0) {
+            self->ai_res = NULL;
+            nats_emit_error(self, gai_strerror(rv));
+            nats_schedule_reconnect(self);
+            return;
+        }
+        self->ai_next = self->ai_res;
+    }
+
+    for (rp = self->ai_next; rp != NULL; rp = rp->ai_next) {
         fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (fd < 0) continue;
 
@@ -2057,27 +2356,27 @@ static void nats_connect_tcp(nats_t *self)
 
         if (self->keepalive > 0) {
             setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag));
-            #ifdef TCP_KEEPIDLE
+#ifdef TCP_KEEPIDLE
             setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &self->keepalive, sizeof(self->keepalive));
-            #endif
+#endif
         }
 
         rv = connect(fd, rp->ai_addr, rp->ai_addrlen);
-        if (rv == 0 || errno == EINPROGRESS) break;
+        if (rv == 0 || errno == EINPROGRESS) {
+            self->ai_next = rp->ai_next;
+            nats_after_connect(self, fd, rv);
+            return;
+        }
 
         close(fd);
         fd = -1;
     }
 
-    freeaddrinfo(res);
+    /* Address list exhausted: drop it so the next attempt re-resolves. */
+    nats_free_addrinfo(self);
 
-    if (fd < 0) {
-        nats_emit_error(self, "connection failed");
-        nats_schedule_reconnect(self);
-        return;
-    }
-
-    nats_after_connect(self, fd, rv);
+    nats_emit_error(self, "connection failed");
+    nats_schedule_reconnect(self);
 }
 
 static void nats_connect_unix(nats_t *self)
@@ -2228,7 +2527,7 @@ new(class, ...)
                 self->priority = SvIV(val);
             else if (strcmp(key, "keepalive") == 0)
                 self->keepalive = SvIV(val);
-  #ifdef HAVE_OPENSSL
+#ifdef HAVE_OPENSSL
             else if (strcmp(key, "tls") == 0)
                 self->tls = SvTRUE(val) ? 1 : 0;
             else if (strcmp(key, "tls_ca_file") == 0)
@@ -2237,7 +2536,7 @@ new(class, ...)
                 self->tls_skip_verify = SvTRUE(val) ? 1 : 0;
             else if (strcmp(key, "nkey_seed") == 0)
                 nats_set_str_sv(&self->nkey_seed, val);
-  #endif
+#endif
             else if (strcmp(key, "jwt") == 0)
                 nats_set_str_sv(&self->jwt, val);
             else if (strcmp(key, "slow_consumer_bytes") == 0)
@@ -2590,6 +2889,7 @@ ping(self)
   CODE:
     NATS_CROAK_UNLESS_CONNECTED(self);
     wbuf_append(self, "PING\r\n", 6);
+    nats_push_pong_marker(self);
     nats_try_write(self);
 
 void
@@ -2623,8 +2923,11 @@ int
 max_payload(self, ...)
     EV::Nats self
   CODE:
-    if (items > 1)
-        self->max_payload = SvIV(ST(1));
+    if (items > 1) {
+        IV v = SvIV(ST(1));
+        /* clamp: a negative limit would wrap to SIZE_MAX in the size_t guards */
+        self->max_payload = v < 0 ? 0 : (v > INT_MAX ? INT_MAX : (int)v);
+    }
     RETVAL = self->max_payload;
   OUTPUT:
     RETVAL
@@ -2815,7 +3118,9 @@ batch(self, code)
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         PUTBACK;
-        call_sv(code, G_DISCARD);
+        /* G_EVAL: a die() must not longjmp past the batch_mode reset below;
+           that would wedge the write path for the connection's lifetime */
+        call_sv(code, G_DISCARD | G_EVAL);
         FREETMPS; LEAVE;
     }
     self->batch_mode = 0;
@@ -2839,6 +3144,9 @@ batch(self, code)
             FREETMPS; LEAVE;
         }
     }
+    /* state restored; rethrow so the caller still sees the exception */
+    if (SvTRUE(ERRSV))
+        croak_sv(ERRSV);
 
 void
 slow_consumer(self, bytes_threshold, cb = NULL)
@@ -2863,7 +3171,7 @@ on_lame_duck(self, ...)
     if (GIMME_V != G_VOID && self->on_ldm)
         PUSHs(sv_2mortal(newSVsv(self->on_ldm)));
 
-  #ifdef HAVE_OPENSSL
+#ifdef HAVE_OPENSSL
 
 void
 nkey_seed(self, seed)
@@ -2912,7 +3220,7 @@ nkey_generate_user_seed(class)
   OUTPUT:
     RETVAL
 
-  #endif
+#endif
 
 void
 jwt(self, jwt_token)
@@ -2945,13 +3253,13 @@ drain(self, cb = NULL)
     }
 
     /* Enqueue PING fence via pong_cbs — naturally ordered after any pending flush cbs.
-       Use NULL cb; the PONG handler checks draining after firing pong_cb. */
+       kind 1 marks drain completion; the PONG handler fires drain_cb on it. */
     wbuf_append(self, "PING\r\n", 6);
     nats_try_write(self);
     {
         nats_pong_cb_t *pcb;
         Newxz(pcb, 1, nats_pong_cb_t);
-        pcb->cb = NULL; /* drain completion marker */
+        pcb->kind = 1; /* drain completion marker */
         ngx_queue_insert_tail(&self->pong_cbs, &pcb->queue);
     }
 
@@ -2971,70 +3279,11 @@ DESTROY(self)
         return;
     }
 
-    CLEAR_HANDLER(self->on_error);
-    CLEAR_HANDLER(self->on_connect);
-    CLEAR_HANDLER(self->on_disconnect);
-
-    nats_stop_watchers(self);
-    nats_stop_timers(self);
-
-    while (!ngx_queue_empty(&self->req_queue)) {
-        ngx_queue_t *q = ngx_queue_head(&self->req_queue);
-        nats_req_t *req = ngx_queue_data(q, nats_req_t, queue);
-        ngx_queue_remove(q);
-        if (req->timer_active)
-            ev_timer_stop(self->loop, &req->timer);
-        CLEAR_HANDLER(req->cb);
-        Safefree(req);
-    }
-    nats_skip_waiting(self);
-
-    while (!ngx_queue_empty(&self->pong_cbs)) {
-        ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
-        nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
-        ngx_queue_remove(pq);
-        CLEAR_HANDLER(pcb->cb);
-        Safefree(pcb);
+    /* DESTROY from inside an event-loop callback: defer the free until the
+       outermost wrapper returns; its C frames still use self */
+    if (self->cb_depth > 0) {
+        self->destroy_pending = 1;
+        return;
     }
 
-    while (!ngx_queue_empty(&self->subs)) {
-        ngx_queue_t *q = ngx_queue_head(&self->subs);
-        nats_sub_t *sub = ngx_queue_data(q, nats_sub_t, queue);
-        nats_remove_sub(self, sub);
-    }
-
-    if (self->fd >= 0) {
-        close(self->fd);
-        self->fd = -1;
-    }
-
-    CLEAR_HANDLER(self->server_info_json);
-    CLEAR_HANDLER(self->drain_cb);
-
-    nats_free_server_pool(self);
-    if (self->sub_map) {
-        SvREFCNT_dec((SV *)self->sub_map);
-        self->sub_map = NULL;
-    }
-
-  #ifdef HAVE_OPENSSL
-    nats_ssl_cleanup(self);
-    if (self->ssl_ctx) { SSL_CTX_free(self->ssl_ctx); self->ssl_ctx = NULL; }
-    Safefree(self->tls_ca_file);
-  #endif
-
-    Safefree(self->rbuf);
-    Safefree(self->wbuf);
-    Safefree(self->host);
-    Safefree(self->path);
-    Safefree(self->user);
-    Safefree(self->pass);
-    Safefree(self->token);
-    Safefree(self->name);
-    Safefree(self->nkey_seed);
-    Safefree(self->jwt);
-    Safefree(self->server_nonce);
-    CLEAR_HANDLER(self->on_slow_consumer);
-    CLEAR_HANDLER(self->on_ldm);
-
-    Safefree(self);
+    nats_destroy_now(self);

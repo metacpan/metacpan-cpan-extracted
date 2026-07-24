@@ -39,6 +39,11 @@ METHODS
         my $g = Data::Graph::Shared->new_memfd($name, $max_nodes, $max_edges);
         my $g = Data::Graph::Shared->new_from_fd($fd);                    # reopen memfd
 
+    $max_nodes is rounded up to the next even number for alignment, so
+    "$g->max_nodes" may report one more than requested; $max_edges is the
+    edge-slot capacity. An optional trailing octal $mode (see "SECURITY")
+    sets the backing-file permissions.
+
   Operations
         my $id = $g->add_node($data);            # returns node index or undef
         $g->add_edge($src, $dst);                # weight defaults to 1
@@ -69,6 +74,25 @@ METHODS
         my $fd = $g->fileno;          # current eventfd fd, or -1
         $g->notify;                   # write 1 to eventfd (caller signals update)
         my $n = $g->eventfd_consume;  # read+reset eventfd counter
+
+CONCURRENCY AND CRASH SAFETY
+    The graph lives entirely in a shared memory mapping, so multiple
+    processes that attach the same backing file (or inherit the same
+    anonymous/memfd mapping) operate on one shared structure. All mutating
+    operations are serialized by a single process-shared exclusive mutex
+    stored in the mapping header; it is implemented directly on a Linux
+    futex, so it works across unrelated processes without any pthread setup.
+
+    The mutex records the PID of its current owner. If a process dies while
+    holding the lock, a waiter that times out detects the dead (or zombie)
+    owner via "kill(pid, 0)" plus a /proc liveness check, reclaims the lock,
+    and proceeds. This keeps a crash from wedging the whole graph, but it
+    cannot undo a mutation that was only half-applied at the moment of
+    death, so a peer crashing mid-write may leave the structure in an
+    inconsistent state.
+
+    Any process you grant write access to the mapping is trusted not to
+    corrupt it. This is Linux-only (it relies on futex and /proc).
 
 BENCHMARKS
     Single-process (10K ops, x86_64 Linux, Perl 5.40):

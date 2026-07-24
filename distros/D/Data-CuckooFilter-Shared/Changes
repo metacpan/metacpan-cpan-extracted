@@ -1,5 +1,13 @@
 Revision history for Data-CuckooFilter-Shared
 
+0.03      2026-07-23
+          - On-disk format change (v1 -> v2): an existing 0.02 file is
+            refused; recreate it.
+          - Resolve argument magic before capturing the path string.
+          - Re-read the class name at the point of use in the constructors, so
+            a later argument's magic cannot dangle the INPUT-captured PV.
+          - Document that a crash mid-eviction can drop a fingerprint.
+
 0.02      2026-07-09
           - Security and robustness hardening; backing files now created mode
             0600 (pass a file-mode argument to new() for cross-user sharing).

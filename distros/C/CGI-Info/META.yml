@@ -3,6 +3,10 @@ abstract: 'Information about the CGI environment'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Data::Random: '0'
+  Data::Random::String: '0'
+  Data::Random::String::Matches: '0'
+  Data::Random::Structure: '0'
   Errno: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
@@ -17,6 +21,7 @@ build_requires:
   Test::CleanNamespaces: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.08'
   Test::Most: '0'
   Test::Needs: '0'
@@ -24,7 +29,6 @@ build_requires:
   Test::RequiresInternet: '0'
   Test::Returns: '0'
   Test::Script: '1.12'
-  Test::Warn: '0'
   Test::Which: '0'
   Tie::Filehandle::Preempt::Stdin: '0'
   autodie: '0'
@@ -34,7 +38,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
-license: open_source
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -46,31 +50,30 @@ no_index:
 requires:
   Carp: '0'
   Cwd: '0'
-  ExtUtils::MakeMaker: '6.64'
   File::Basename: '0'
   File::Spec: '3.4'
   HTTP::BrowserDetect: '3.1'
-  IO::Interactive: '0'
   JSON::MaybeXS: '0'
-  List::Util: '1.33'
   Log::Abstraction: '0.1'
   Net::CIDR: '0'
   Object::Configure: '0.19'
   Params::Get: '0.13'
-  Params::Validate::Strict: '0.28'
+  Params::Validate::Strict: '0.35'
+  Readonly: '0'
   Return::Set: '0'
   Scalar::Util: '0'
   Socket: '0'
   String::Clean::XSS: '0'
+  Sub::Protected: '0'
   Sys::Hostname: '0'
   Sys::Path: '0'
   URI::Heuristic: '0'
   boolean: '0'
   namespace::clean: '0'
-  perl: '5.008'
+  perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info
   homepage: https://metacpan.org/pod/CGI::Info
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '1.13'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

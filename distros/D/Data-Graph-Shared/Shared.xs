@@ -9,7 +9,29 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Graph::Shared")) \
         croak("Expected a Data::Graph::Shared object"); \
     GraphHandle *h = INT2PTR(GraphHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::Graph::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::Graph::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic).  EXTRACT_GRAPH's sv_2mortal(SvREFCNT_inc(...)) pin only
+ * blocks REFCOUNT-driven destruction; an explicit $obj->DESTROY frees the
+ * handle regardless and zeroes the IV, so the local `h` would dangle.
+ * That same Perl can also REPLACE the invocant (`$obj = 42` from an overload
+ * handler mutates ST(0), because Perl passes aliases), which is why SvROK is
+ * re-checked before SvRV -- otherwise SvRV would run on a non-reference. */
+#define REEXTRACT_GRAPH(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Graph::Shared object was replaced during the call"); \
+    h = INT2PTR(GraphHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Graph::Shared object destroyed during the call")
+
+/* Node ids are UV in the XS signature but uint32_t in the core. Reject an
+ * out-of-range id instead of silently truncating it into a different, valid
+ * node (the core only bounds the TRUNCATED value). Must be used before any
+ * lock is taken: croaking under the process-shared mutex would leak it. */
+#define GRAPH_CHECK_NODE(x, meth) \
+    do { if ((x) > 0xFFFFFFFFU) \
+        croak("Data::Graph::Shared->" meth ": node index exceeds 2^32"); } while (0)
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -18,7 +40,7 @@
     RETVAL = ref
 
 #define REQUIRE_NODE(h, node) do { \
-    if ((uint32_t)(node) >= (h)->hdr->max_nodes || !graph_bit_set((h)->node_bitmap, (uint32_t)(node))) { \
+    if ((uint32_t)(node) >= (h)->max_nodes || !graph_bit_set((h)->node_bitmap, (uint32_t)(node))) { \
         graph_mutex_unlock((h)->hdr); \
         croak("node %u does not exist", (unsigned)(node)); \
     } \
@@ -37,12 +59,15 @@ new(class, path, max_nodes, max_edges, ...)
   PREINIT:
     char errbuf[GRAPH_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
-    if (p && strlen(p) != (size_t)SvCUR(path))
-        croak("Data::Graph::Shared->new: path contains an embedded NUL");
+    /* Resolve the optional mode arg FIRST: its get-magic runs arbitrary Perl that
+     * can realloc/free the path PV, so capture the path LAST, immediately before
+     * use (the embedded-NUL check then validates the bytes actually opened). */
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     if (max_nodes > UINT32_MAX || max_edges > UINT32_MAX)
         croak("Data::Graph::Shared->new: max_nodes/max_edges exceed 2^32");
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    if (p && strlen(p) != (size_t)SvCUR(path))
+        croak("Data::Graph::Shared->new: path contains an embedded NUL");
     GraphHandle *h = graph_create(p, (uint32_t)max_nodes, (uint32_t)max_edges, mode, errbuf);
     if (!h) croak("Data::Graph::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -102,7 +127,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p = NULL;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Graph::Shared")) {
         GraphHandle *h = INT2PTR(GraphHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -195,7 +220,10 @@ add_edge(self, src, dst, ...)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
-    int64_t weight = (items > 3) ? (int64_t)SvIV(ST(3)) : 1;
+    GRAPH_CHECK_NODE(src, "add_edge");
+    GRAPH_CHECK_NODE(dst, "add_edge");
+    int64_t weight = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (int64_t)SvIV(ST(3)) : 1;
+    REEXTRACT_GRAPH(self);   /* the weight's get-magic may have destroyed self */
     RETVAL = graph_add_edge(h, (uint32_t)src, (uint32_t)dst, weight);
   OUTPUT:
     RETVAL
@@ -207,6 +235,7 @@ remove_node(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    GRAPH_CHECK_NODE(node, "remove_node");
     RETVAL = graph_remove_node(h, (uint32_t)node);
   OUTPUT:
     RETVAL
@@ -218,6 +247,7 @@ remove_node_full(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    GRAPH_CHECK_NODE(node, "remove_node_full");
     RETVAL = graph_remove_node_full(h, (uint32_t)node);
   OUTPUT:
     RETVAL
@@ -229,6 +259,7 @@ has_node(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    GRAPH_CHECK_NODE(node, "has_node");
     RETVAL = graph_has_node(h, (uint32_t)node);
   OUTPUT:
     RETVAL
@@ -240,6 +271,7 @@ node_data(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    GRAPH_CHECK_NODE(node, "node_data");
     graph_mutex_lock(h->hdr);
     REQUIRE_NODE(h, node);
     RETVAL = (IV)h->node_data[(uint32_t)node];
@@ -255,6 +287,7 @@ set_node_data(self, node, data)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    GRAPH_CHECK_NODE(node, "set_node_data");
     graph_mutex_lock(h->hdr);
     REQUIRE_NODE(h, node);
     h->node_data[(uint32_t)node] = (int64_t)data;
@@ -268,6 +301,7 @@ neighbors(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   PPCODE:
+    GRAPH_CHECK_NODE(node, "neighbors");
     /* Collect edges under lock, then build Perl SVs outside it:
      * newAV/newSVuv/newSViv can longjmp on OOM, which would leak the
      * process-shared mutex to peers (no automatic cleanup for futex). */
@@ -284,7 +318,7 @@ neighbors(self, node)
     }
     uint32_t i = 0;
     while (eidx != GRAPH_NONE && i < deg) {
-        if (eidx >= h->hdr->max_edges) break;   /* corrupt/attacker edge index: stop */
+        if (eidx >= h->max_edges) break;   /* corrupt/attacker edge index: stop */
         dsts[i] = h->edges[eidx].dst;
         wts[i]  = h->edges[eidx].weight;
         eidx = h->edges[eidx].next;
@@ -307,6 +341,7 @@ degree(self, node)
   PREINIT:
     EXTRACT_GRAPH(self);
   CODE:
+    GRAPH_CHECK_NODE(node, "degree");
     graph_mutex_lock(h->hdr);
     REQUIRE_NODE(h, node);
     RETVAL = graph_degree(h, (uint32_t)node);

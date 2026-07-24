@@ -23,7 +23,7 @@ sub main { # $ ()
   for (my $y = 0; $y < min(25, $h); $y++) {
     for (my $x = 0; $x < min(40, $w); $x++) {
       Termbox::tb_set_cell($x, $y, chr(9585.5+rand), Termbox::TB_WHITE, 
-        Termbox::TB_BLUE | Termbox::TB_BOLD);
+        Termbox::TB_BLUE | Termbox::TB_BRIGHT);
       Termbox::tb_present();
     }
   }

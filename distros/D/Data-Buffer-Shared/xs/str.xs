@@ -2,10 +2,14 @@ MODULE = Data::Buffer::Shared    PACKAGE = Data::Buffer::Shared::Str
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, char* path, UV capacity, UV str_len, UV file_mode = 0600)
+new(char* class, SV* path, UV capacity, UV str_len, UV file_mode = 0600)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
-        BufHandle* buf = buf_str_create(path, (uint64_t)capacity, (uint32_t)str_len, (mode_t)file_mode, errbuf);
+        /* Capture the PV here, after every INPUT conversion has run its get-magic:
+           a typemap-captured char* would dangle if a later arg's magic realloced it. */
+        const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+        if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new: max length exceeds 2^32");
+        BufHandle* buf = buf_str_create(p, (uint64_t)capacity, (uint32_t)str_len, (mode_t)file_mode, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
@@ -24,7 +28,7 @@ SV*
 get(SV* self_sv, UV idx)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
-        uint32_t esz = h->hdr->elem_size;
+        uint32_t esz = h->elem_size;
         char *tmp;
         Newx(tmp, esz + 1, char);
         SAVEFREEPV(tmp);
@@ -40,6 +44,7 @@ set(SV* self_sv, UV idx, SV* val_sv)
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         STRLEN vlen;
         const char *vstr = SvPV(val_sv, vlen);
+        REEXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         RETVAL = buf_str_set(h, (uint64_t)idx, vstr, (uint32_t)vlen);
     OUTPUT:
         RETVAL
@@ -49,7 +54,7 @@ slice(SV* self_sv, UV from, UV count)
     PPCODE:
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         if (count == 0) XSRETURN_EMPTY;
-        uint32_t esz = h->hdr->elem_size;
+        uint32_t esz = h->elem_size;
         char *tmp;
         Newx(tmp, count * esz, char);
         SAVEFREEPV(tmp);
@@ -69,7 +74,7 @@ set_slice(SV* self_sv, UV from, ...)
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         UV count = items - 2;
         if (count == 0) XSRETURN(1);
-        uint32_t esz = h->hdr->elem_size;
+        uint32_t esz = h->elem_size;
         char *tmp;
         Newxz(tmp, count * esz, char);
         SAVEFREEPV(tmp);
@@ -79,6 +84,7 @@ set_slice(SV* self_sv, UV from, ...)
             uint32_t copy_len = (uint32_t)(vlen < esz ? vlen : esz);
             memcpy(tmp + i * esz, vstr, copy_len);
         }
+        REEXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         RETVAL = buf_str_set_slice(h, (uint64_t)from, (uint64_t)count, tmp);
     OUTPUT:
         RETVAL
@@ -89,6 +95,7 @@ fill(SV* self_sv, SV* val_sv)
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         STRLEN vlen;
         const char *vstr = SvPV(val_sv, vlen);
+        REEXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         buf_str_fill(h, vstr, (uint32_t)vlen);
 
 UV
@@ -183,6 +190,7 @@ SV*
 new_anon(char* class, UV capacity, UV str_len)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
+        if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new_anon: max length exceeds 2^32");
         BufHandle* buf = buf_str_create_anon((uint64_t)capacity, (uint32_t)str_len, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
@@ -199,6 +207,8 @@ SV*
 get_raw(SV* self_sv, UV byte_off, UV nbytes)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
+        if (!buf_str_raw_in_bounds(h, (uint64_t)byte_off, (uint64_t)nbytes))
+            croak("Data::Buffer::Shared::Str: get_raw out of bounds");
         RETVAL = newSV(nbytes ? nbytes : 1);
         SvPOK_on(RETVAL);
         SvCUR_set(RETVAL, nbytes);
@@ -216,15 +226,20 @@ set_raw(SV* self_sv, UV byte_off, SV* data_sv)
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         STRLEN dlen;
         const char *dptr = SvPV(data_sv, dlen);
+        REEXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
         RETVAL = buf_str_set_raw(h, (uint64_t)byte_off, (uint64_t)dlen, dptr);
     OUTPUT:
         RETVAL
 
 SV*
-new_memfd(char* class, char* name, UV capacity, UV str_len)
+new_memfd(char* class, SV* name, UV capacity, UV str_len)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
-        BufHandle* buf = buf_str_create_memfd(name, (uint64_t)capacity, (uint32_t)str_len, errbuf);
+        /* Capture the PV here, after every INPUT conversion has run its get-magic:
+           a typemap-captured char* would dangle if a later arg's magic realloced it. */
+        const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
+        if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new_memfd: max length exceeds 2^32");
+        BufHandle* buf = buf_str_create_memfd(nm, (uint64_t)capacity, (uint32_t)str_len, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
     OUTPUT:
@@ -234,6 +249,7 @@ SV*
 new_from_fd(char* class, int fd, UV str_len)
     CODE:
         char errbuf[BUF_ERR_BUFLEN];
+        if (str_len > 0xFFFFFFFFU) croak("Data::Buffer::Shared::Str->new_from_fd: max length exceeds 2^32");
         BufHandle* buf = buf_str_open_fd(fd, (uint32_t)str_len, errbuf);
         if (!buf) croak("Data::Buffer::Shared::Str: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)buf);
@@ -253,7 +269,7 @@ SV*
 as_scalar(SV* self_sv)
     CODE:
         EXTRACT_BUF("Data::Buffer::Shared::Str", self_sv);
-        size_t len = (size_t)(h->hdr->capacity * h->hdr->elem_size);
+        size_t len = (size_t)((uint64_t)h->capacity * h->elem_size);
         SV *inner = newSV_type(SVt_PV);
         SvPV_set(inner, (char *)h->data);
         SvCUR_set(inner, len);
@@ -261,7 +277,7 @@ as_scalar(SV* self_sv)
         SvPOK_on(inner);
         SvREADONLY_on(inner);
         MAGIC *mg = sv_magicext(inner, NULL, PERL_MAGIC_ext, &buf_scalar_magic_vtbl, NULL, 0);
-        mg->mg_obj = SvREFCNT_inc_simple_NN(self_sv);
+        mg->mg_obj = SvREFCNT_inc_simple_NN(SvRV(self_sv));  /* pin the REFERENT (handle), not the RV container: undef $buf clears the container in place and would otherwise free the mapping while inner aliases it */
         RETVAL = newRV_noinc(inner);
     OUTPUT:
         RETVAL

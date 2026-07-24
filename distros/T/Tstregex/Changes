@@ -1,5 +1,9 @@
 Revision history for tstregex
 
+1.15  2026/07/23
+      - removed the debuger "d()" subroutine, a goodies to debug.. tstregex itself (!)
+        the command will be transfered in a module Devel::perlXdb as a debuger extention (among other goodies..)
+
 1.14  2026/06/12
       - Minor fixes of 1.13 for consistency across CPAN indexing tools.
 

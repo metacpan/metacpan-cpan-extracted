@@ -1,5 +1,10 @@
 Revision history for Data-HashMap-Shared
 
+0.16      2026-07-21
+          - On-disk format change (v9 -> v10): migrate existing files with
+            bin/hashmap-shared-upgrade or Data::HashMap::Shared->upgrade_file.
+          - Bound arena free-list offsets before use.
+
 0.15  2026-07-11
     - Fix flaky dead-reader-recovery precondition test.
 
@@ -34,7 +39,7 @@ Revision history for Data-HashMap-Shared
     - LRU rebuild on writer recovery if a dead writer left the chain inconsistent
     - Cursor fixes: iter_pos/gen reset on cursor_seek shard switch;
       double-decrement of iterating on exhausted cursor destroy/reset/seek
-    - SHM_VERSION 7 → 9 (header layout); existing 0.08 maps must be recreated
+    - SHM_VERSION 7 -> 9 (header layout); existing 0.08 maps must be recreated
 
 0.08  2026-05-18
     - New ops: cas (string values), add_ttl, update_ttl, cas_take,
@@ -73,7 +78,7 @@ Revision history for Data-HashMap-Shared
     - Hash-tag probe filtering, prefetch, lru_skip optimization
     - SSE2-accelerated state scanning for iteration
     - SSE2-accelerated tag matching in probe loops
-    - Inline small strings (≤7 bytes) stored in node structs, no arena overhead
+    - Inline small strings (<=7 bytes) stored in node structs, no arena overhead
     - Batch get_multi with prefetch pipeline under single lock
     - Fast monotonic clock (CLOCK_MONOTONIC_COARSE) for TTL paths
     - Pre-sized copy_buf to avoid realloc on first access

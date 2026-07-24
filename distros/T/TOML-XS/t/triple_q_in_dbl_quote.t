@@ -11,17 +11,19 @@ use Config;
 
 use TOML::XS;
 
-my $doc = <<END;
+my $toml = <<END;
 # This is a TOML document
 
-bad = "Triple-single quote like this ''' is forbidden."
+wasbad = "Triple-single quote like this ''' is not forbidden."
 END
 
-{
-    eval { TOML::XS::from_toml($doc) };
-    my $err          = $@;
-    diag $err;
-    like( $err, qr<quote>,           'reject triple-quote in the TOML string' );
-}
+my $doc = TOML::XS::from_toml($toml);
+
+cmp_deeply(
+    $doc->to_struct(),
+    {
+        wasbad => "Triple-single quote like this ''' is not forbidden.",
+    },
+);
 
 done_testing;

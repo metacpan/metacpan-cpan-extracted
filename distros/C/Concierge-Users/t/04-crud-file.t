@@ -17,7 +17,7 @@ sub setup_test_env {
 
     my $config = {
         storage_dir => $storage_dir,
-        backend => $backend,
+        backend_class => "Concierge::Users::" . ucfirst($backend),
         file_format => $format,
         include_standard_fields => [qw/ email phone /],
     };

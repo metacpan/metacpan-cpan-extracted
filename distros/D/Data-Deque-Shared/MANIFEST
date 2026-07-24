@@ -29,6 +29,8 @@ xt/asan.t
 xt/capacity_boundary.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
+xt/dead_peer_recovery.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fd_leak.t
 xt/fd_validation.t
@@ -36,6 +38,7 @@ xt/file_format_v1.t
 xt/fork_live.t
 xt/fuzz_ops.t
 xt/invalid_args.t
+xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/memfd_seal.t
 xt/mmap_leak.t

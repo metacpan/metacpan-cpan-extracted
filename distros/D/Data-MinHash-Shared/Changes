@@ -1,0 +1,11 @@
+Revision history for Data-MinHash-Shared
+
+0.02      2026-07-23
+          - Add b-bit MinHash (bbit_similarity / bbit_signature / bbit_similarity_of).
+          - Copy the first signature before reading the second in bbit.
+          - Resolve argument magic before capturing the path string.
+          - Re-read the class name at the point of use in the constructors, so
+            a later argument's magic cannot dangle the INPUT-captured PV.
+
+0.01      2026-07-10
+          - Initial release.

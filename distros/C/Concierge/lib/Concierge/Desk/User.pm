@@ -1,7 +1,7 @@
-package Concierge::Desk::User v0.10.0;
+package Concierge::Desk::User v0.11.0;
 use v5.36;
 
-our $VERSION = 'v0.10.0';
+our $VERSION = 'v0.11.0';
 
 # ABSTRACT: User object enabled by Concierge
 
@@ -178,7 +178,7 @@ Concierge::Desk::User - User object enabled by Concierge
 
 =head1 VERSION
 
-v0.10.0
+v0.11.0
 
 =head1 SYNOPSIS
 
@@ -314,6 +314,15 @@ Returns the L<Concierge::Sessions::Session> object, or C<undef> for
 visitors. The session object provides C<get_data>, C<set_data>, C<save>,
 and status methods.
 
+For ordinary session-data reads and writes, prefer
+C<get_session_data>/C<update_session_data> below rather than calling
+C<get_data>/C<set_data> directly: those are all-or-nothing (C<set_data>
+replaces the entire data hashref), while the user object's methods merge
+individual keys and call C<save> for you -- which, as a side effect,
+extends the session's expiration via its sliding-window renewal. Reach
+for the raw session object only when its status methods, or a deliberate
+full replace, are actually needed.
+
 =head3 get_session_data
 
     my $data = $user->get_session_data;
@@ -326,8 +335,10 @@ no data has been stored. Returns C<undef> for visitors (no session).
     $user->update_session_data({ cart => \@items, last_page => '/shop' });
 
 Merges C<%updates> into the existing session data and saves to persistent
-storage. Existing keys not present in C<%updates> are preserved. Returns
-1 on success, C<undef> if the user has no session (visitors).
+storage, which as a side effect also extends the session's expiration
+(sliding-window renewal). Existing keys not present in C<%updates> are
+preserved. Returns 1 on success, C<undef> if the user has no session
+(visitors).
 
 =head2 User Data -- Memory Snapshot
 

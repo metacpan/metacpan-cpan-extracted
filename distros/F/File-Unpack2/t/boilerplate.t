@@ -36,7 +36,7 @@ sub module_boilerplate_ok {
     );
 }
 
-  not_in_file_ok(README =>
+  not_in_file_ok('README.md' =>
     "The README is used..."       => qr/The README is used/,
     "'version information here'"  => qr/to provide version information/,
   );
@@ -45,7 +45,7 @@ sub module_boilerplate_ok {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('Unpack2.pm');
+  module_boilerplate_ok('lib/File/Unpack2.pm');
 
 TODO: {
   local $TODO = "Need to replace the boilerplate text";

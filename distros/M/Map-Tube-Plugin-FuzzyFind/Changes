@@ -1,5 +1,14 @@
 Revision history for Map::Tube::Plugin::FuzzyFind
 
+0.82.1 2026-07-24
+  - Fixed typos in README.md and CONTRIBUTING.md. Thanks @manwar!
+
+0.82.0 2026-07-23
+  - Added method list_fuzzy_matchers( ).
+  - Switched README to markdown.
+  - Added CONTRIBUTING.md
+  - Bumped Perl version to 5.14, in keeping with Map::Tube
+
 0.81.4 2026-06-26
   - Improvements to Makefile.PL
   - Added another test.

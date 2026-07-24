@@ -299,6 +299,7 @@ static void process_http_response(ev_clickhouse_t *self) {
     char *decoded = NULL;
     size_t decoded_len = 0;
     size_t decoded_cap = 0;
+    const char *cp = NULL;      /* chunk parse cursor; read at chunk_need_more */
 
     if (self->recv_len == 0 || self->send_count == 0) return;
 
@@ -352,31 +353,45 @@ static void process_http_response(ev_clickhouse_t *self) {
     size_t consumed;
     if (chunked) {
         /* decode chunked transfer encoding */
-        const char *cp = self->recv_buf + hdr_end;
         const char *cp_end = self->recv_buf + self->recv_len;
+
+        if (self->http_chunk_active) {
+            /* resume partial decode; offset survives recv_buf realloc */
+            decoded = self->http_decoded;
+            decoded_len = self->http_decoded_len;
+            decoded_cap = self->http_decoded_cap;
+            cp = self->recv_buf + self->http_chunk_off;
+        } else {
+            cp = self->recv_buf + hdr_end;
+        }
 
         {
             int chunked_complete = 0;
             while (cp < cp_end) {
+                const char *chunk_start = cp;
                 /* read chunk size */
                 const char *nl = cp;
                 unsigned long chunk_size;
                 while (nl < cp_end && *nl != '\r') nl++;
-                if (nl + 2 > cp_end) goto need_more; /* need more data */
+                /* resume at the header of the chunk not yet copied */
+                if (nl + 2 > cp_end) { cp = chunk_start; goto chunk_need_more; }
 
                 chunk_size = strtoul(cp, NULL, 16);
                 cp = nl + 2; /* skip \r\n */
 
                 if (chunk_size == 0) {
                     /* terminal chunk; skip trailing \r\n */
-                    if (cp + 2 > cp_end) goto need_more;
+                    if (cp + 2 > cp_end) { cp = chunk_start; goto chunk_need_more; }
                     cp += 2;
                     chunked_complete = 1;
                     break;
                 }
 
                 if ((size_t)(cp_end - cp) < 2
-                    || chunk_size > (size_t)(cp_end - cp) - 2) goto need_more;
+                    || chunk_size > (size_t)(cp_end - cp) - 2) {
+                    cp = chunk_start;
+                    goto chunk_need_more;
+                }
 
                 /* guard against overflow and unbounded growth —
                  * close connection since remaining chunks would
@@ -391,6 +406,11 @@ static void process_http_response(ev_clickhouse_t *self) {
                 if (decoded_len + chunk_size < decoded_len
                     || decoded_len + chunk_size > cap) {
                     if (decoded) Safefree(decoded);
+                    self->http_decoded = NULL;
+                    self->http_decoded_len = 0;
+                    self->http_decoded_cap = 0;
+                    self->http_chunk_off = 0;
+                    self->http_chunk_active = 0;
                     self->send_count--;
                     teardown_after_deliver(self,
                         "chunked response too large", "connection closed");
@@ -408,12 +428,20 @@ static void process_http_response(ev_clickhouse_t *self) {
                 cp += chunk_size + 2; /* skip chunk data + \r\n */
             }
 
-            if (!chunked_complete) goto need_more;
+            /* loop exited at cp_end, so all present chunks were copied;
+             * resume at cp — chunk_start would duplicate the last chunk */
+            if (!chunked_complete) goto chunk_need_more;
         }
 
         body = decoded;
         body_len = decoded_len;
         consumed = cp - self->recv_buf;
+        /* ownership moved to local decoded; drop saved state, no free */
+        self->http_decoded = NULL;
+        self->http_decoded_len = 0;
+        self->http_decoded_cap = 0;
+        self->http_chunk_off = 0;
+        self->http_chunk_active = 0;
     } else {
         /* Content-Length based — bound content_length before any pointer
          * arithmetic so a malicious huge value cannot overflow
@@ -444,6 +472,11 @@ static void process_http_response(ev_clickhouse_t *self) {
             char *dec = gzip_decompress(body, body_len, &dec_len);
             if (!dec) {
                 if (decoded) Safefree(decoded);
+                self->http_decoded = NULL;
+                self->http_decoded_len = 0;
+                self->http_decoded_cap = 0;
+                self->http_chunk_off = 0;
+                self->http_chunk_active = 0;
                 recv_consume(self, consumed);
                 int destroyed = deliver_error(self, "gzip decompression failed");
                 if (destroyed) return;
@@ -502,9 +535,14 @@ done:
     pipeline_advance(self);
     return;
 
-need_more:
-    /* incomplete response — keep reading */
-    if (decoded) Safefree(decoded);
+chunk_need_more:
+    /* incomplete chunked body — persist the decode across read events;
+     * cp carries the resume offset, so recv_buf may be realloc'd */
+    self->http_decoded = decoded;
+    self->http_decoded_len = decoded_len;
+    self->http_decoded_cap = decoded_cap;
+    self->http_chunk_off = (size_t)(cp - self->recv_buf);
+    self->http_chunk_active = 1;
     return;
 }
 

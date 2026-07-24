@@ -1,15 +1,10 @@
 #define PERL_NO_GET_CONTEXT
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
-#include "ppport.h"
+#include "easyxs/easyxs.h"
 
 #include <stdbool.h>
 #include <string.h>
 
-#include "toml.h"
-#include "tomlxs.h"
+#include "tomlc17.h"
 
 /* Disabled for production because adding subprocess detection
    would entail having a separate struct for the objects, which
@@ -21,9 +16,6 @@
 #define TIMESTAMP_CLASS "TOML::XS::Timestamp"
 #define BOOLEAN_CLASS "TOML::XS"
 
-#define CROAK_MALFORMED_TOML_FN "TOML::XS::_croak_malformed_toml"
-#define CROAK_POINTER_BEYOND_DATUM_FN "TOML::XS::_croak_pointer_beyond_datum"
-
 #define PERL_TRUE get_sv(BOOLEAN_CLASS "::true", 0)
 #define PERL_FALSE get_sv(BOOLEAN_CLASS "::false", 0)
 
@@ -34,12 +26,6 @@
 #else
 #define _IS_GLOBAL_DESTRUCT PL_dirty
 #endif
-
-#define ERR_PATH_UNSHIFT(err_path_ptr, sv) STMT_START {   \
-    if (NULL == *err_path_ptr) *err_path_ptr = newAV(); \
-    av_unshift(*err_path_ptr, 1); \
-    av_store(*err_path_ptr, 0, sv); \
-} STMT_END
 
 #define _verify_no_null(tomlstr, tomllen)               \
     if (strchr(tomlstr, 0) != (tomlstr + tomllen)) {    \
@@ -60,52 +46,26 @@
         );                                                      \
     }
 
-static inline SV* _datum_string_to_sv( pTHX_ toml_datum_t d ) {
-#if TOMLXS_SV_CAN_USE_EXTERNAL_STRING
-    /* More efficient: make the SV use the existing string.
-       (Would sv_usepvn() work just as well??)
-    */
-    SV* ret = newSV(0);
-    SvUPGRADE(ret, SVt_PV);
-    SvPV_set(ret, d.u.s);
-    SvPOK_on(ret);
-    SvCUR_set(ret, strlen(d.u.s));
-    SvLEN_set(ret, SvCUR(ret));
-    SvUTF8_on(ret);
-#else
-    /* Slow but safe: copy the string into the PV. */
-    SV* ret = newSVpvn_utf8(d.u.s, strlen(d.u.s), TRUE);
-    tomlxs_free_string(d.u.s);
-#endif
+const char* type_name[] = {
+    [TOML_STRING] = "string",
+    [TOML_INT64] = "integer",
+    [TOML_FP64] = "float",
+    [TOML_BOOLEAN] = "boolean",
+    [TOML_DATE] = "date",
+    [TOML_TIME] = "time",
+    [TOML_DATETIME] = "datetime",
+    [TOML_DATETIMETZ] = "datetime",
+};
 
-    return ret;
+void append_tz_to_sv(pTHX_ int16_t minutes, SV* sv) {
+    char sign = (minutes < 0) ? '-' : '+';
+    int abs_minutes = abs(minutes);
+
+    int hours = abs_minutes / 60;
+    int mins = abs_minutes % 60;
+
+    sv_catpvf(sv, "%c%02d:%02d", sign, hours, mins);
 }
-
-#define _datum_boolean_to_sv(d) \
-    SvREFCNT_inc(d.u.b ? PERL_TRUE : PERL_FALSE);
-
-#define _datum_integer_to_sv(d) \
-    newSViv((IV)d.u.i);
-
-#define _datum_double_to_sv(datum) \
-    newSVnv((NV)datum.u.d);
-
-#define RETURN_IF_DATUM_IS_STRING(d) \
-    if (d.ok) return _datum_string_to_sv(aTHX_ d);
-
-#define RETURN_IF_DATUM_IS_BOOLEAN(d) \
-    if (d.ok) return _datum_boolean_to_sv(d);
-
-#define RETURN_IF_DATUM_IS_INTEGER(d)   \
-    if (d.ok) return _datum_integer_to_sv(d);
-
-#define RETURN_IF_DATUM_IS_DOUBLE(d)    \
-    if (d.ok) return _datum_double_to_sv(d);
-
-#define RETURN_IF_DATUM_IS_TIMESTAMP(d) \
-    if (d.ok) return _datum_timestamp_to_sv(aTHX_ d);
-
-/* ---------------------------------------------------------------------- */
 
 /* perlclib describes grok_atoUV(), but it’s not public. :( */
 bool my_grok_atoUV(pTHX_ const char *pv, UV *valuep) {
@@ -118,42 +78,8 @@ bool my_grok_atoUV(pTHX_ const char *pv, UV *valuep) {
     return false;
 }
 
-SV* _ptr_to_svrv(pTHX_ void* ptr, HV* stash) {
-    SV* referent = newSVuv( PTR2UV(ptr) );
-    SV* retval = newRV_noinc(referent);
-    sv_bless(retval, stash);
-
-    return retval;
-}
-
-static inline SV* _datum_timestamp_to_sv( pTHX_ toml_datum_t datum ) {
-    return _ptr_to_svrv(aTHX_ datum.u.ts, gv_stashpv(TIMESTAMP_CLASS, FALSE));
-}
-
-static inline void _call_croaker_pv (pTHX_ const char* fn, AV* err_path) {
-    dSP;
-
-    ENTER;
-    SAVETMPS;
-
-    PUSHMARK(SP);
-    EXTEND(SP, 1);
-
-    /* When this mortal reference is reaped it’ll decrement
-        the referent AV’s refcount. */
-    mPUSHs(newRV_noinc( (SV*)err_path ));
-
-    PUTBACK;
-
-    call_pv(fn, G_DISCARD);
-
-    // Unneeded:
-    // FREETMPS;
-    // LEAVE;
-}
-
 static inline SV* _call_pv_scalar_1_1 (pTHX_ const char* fn, SV* arg) {
-    dSP;
+     dSP;
 
     ENTER;
     SAVETMPS;
@@ -185,7 +111,7 @@ static inline SV* _call_pv_scalar_1_1 (pTHX_ const char* fn, SV* arg) {
     return ret;
 }
 
-static inline SV* _get_json_pointer_sv (pTHX_ SV** stack, unsigned stack_idx) {
+static inline SV* _make_json_pointer_sv (pTHX_ SV** stack, unsigned stack_idx) {
     AV* pointer = newAV();
 
     for (unsigned i=0; i<=stack_idx; i++) {
@@ -197,21 +123,16 @@ static inline SV* _get_json_pointer_sv (pTHX_ SV** stack, unsigned stack_idx) {
     return _call_pv_scalar_1_1(aTHX_ "TOML::XS::_BUILD_JSON_POINTER", pointer_ar);
 }
 
-toml_table_t* _get_toml_table_from_sv(pTHX_ SV *self_sv) {
-    SV *referent = SvRV(self_sv);
-    return INT2PTR(toml_table_t*, SvUV(referent));
+toml_datum_t _get_toml_timestamp_from_sv(pTHX_ SV *self_sv) {
+    toml_datum_t* datum = exs_structref_ptr(self_sv);
+
+    return *datum;
 }
 
-toml_timestamp_t* _get_toml_timestamp_from_sv(pTHX_ SV *self_sv) {
-    SV *referent = SvRV(self_sv);
-    return INT2PTR(toml_timestamp_t*, SvUV(referent));
-}
+SV* _toml_datum_to_sv(pTHX_ toml_datum_t datum);
 
-SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key, AV** err_path_ptr);
-SV* _toml_array_value_to_sv(pTHX_ toml_array_t* arr, int i, AV** err_path_ptr);
-
-SV* _toml_table_to_sv(pTHX_ toml_table_t* tab, AV** err_path_ptr) {
-    int i;
+SV* _toml_table_to_sv(pTHX_ toml_datum_t datum) {
+    ASSUME(datum.type == TOML_TABLE);
 
     /* Doesn’t need to be mortal since this should not throw.
         Should that ever change this will need to be mortal then
@@ -219,28 +140,21 @@ SV* _toml_table_to_sv(pTHX_ toml_table_t* tab, AV** err_path_ptr) {
     */
     HV* hv = newHV();
 
-    for (i = 0; ; i++) {
-        const char* key = toml_key_in(tab, i);
-        if (!key) break;
+    for (int i = 0; i < datum.u.tab.size; i++) {
+        SV* sv = _toml_datum_to_sv(aTHX_ datum.u.tab.value[i]);
+        ASSUME(sv != NULL);
 
-        SV* sv = _toml_table_value_to_sv(aTHX_ tab, key, err_path_ptr);
+        const char* key = datum.u.tab.key[i];
+        int keylen = datum.u.tab.len[i];
 
-        if (NULL == sv) {
-            SvREFCNT_dec((SV*)hv);
-            SV* piece = newSVpv(key, 0);
-            sv_utf8_decode(piece);
-            ERR_PATH_UNSHIFT(err_path_ptr, piece);
-            return NULL;
-        }
-
-        hv_store(hv, key, -strlen(key), sv, 0);
+        hv_store(hv, key, -keylen, sv, 0);
     }
 
     return newRV_noinc( (SV *) hv );
 }
 
-SV* _toml_array_to_sv(pTHX_ toml_array_t* arr, AV** err_path_ptr) {
-    int i;
+SV* _toml_array_to_sv(pTHX_ toml_datum_t datum) {
+    ASSUME(datum.type == TOML_ARRAY);
 
     /* Doesn’t need to be mortal since this should not throw.
         Should that ever change this will need to be mortal then
@@ -248,18 +162,14 @@ SV* _toml_array_to_sv(pTHX_ toml_array_t* arr, AV** err_path_ptr) {
     */
     AV* av = newAV();
 
-    int size = toml_array_nelem(arr);
+    //int size = toml_array_nelem(arr);
+    int size = datum.u.arr.size;
 
     av_extend(av, size - 1);
 
-    for (i = 0; i<size; i++) {
-        SV* sv = _toml_array_value_to_sv(aTHX_ arr, i, err_path_ptr);
-
-        if (NULL == sv) {
-            SvREFCNT_dec((SV*)av);
-            ERR_PATH_UNSHIFT(err_path_ptr, newSViv(i));
-            return NULL;
-        }
+    for (int i = 0; i<size; i++) {
+        SV* sv = _toml_datum_to_sv(aTHX_ datum.u.arr.elem[i]);
+        ASSUME(sv != NULL);
 
         av_store(av, i, sv);
     }
@@ -267,137 +177,52 @@ SV* _toml_array_to_sv(pTHX_ toml_array_t* arr, AV** err_path_ptr) {
     return newRV_noinc( (SV *) av );
 }
 
-SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key, AV** err_path_ptr) {
-    toml_array_t* arr;
-    toml_table_t* tab;
 
-    if (0 != (arr = toml_array_in(curtab, key))) {
-        return _toml_array_to_sv(aTHX_ arr, err_path_ptr);
+SV* _toml_datum_to_sv(pTHX_ toml_datum_t datum) {
+    SV* ret;
+
+    switch (datum.type) {
+    case TOML_UNKNOWN:
+        ASSUME(FALSE);
+    case TOML_STRING:
+        return newSVpvn_utf8(datum.u.str.ptr, datum.u.str.len, TRUE);
+    case TOML_INT64:
+        return newSViv(datum.u.int64);
+    case TOML_FP64:
+        return newSVnv(datum.u.fp64);
+    case TOML_BOOLEAN:
+        return SvREFCNT_inc(datum.u.boolean ? PERL_TRUE : PERL_FALSE);
+    case TOML_DATE:
+    case TOML_TIME:
+    case TOML_DATETIME:
+    case TOML_DATETIMETZ:
+        ret = exs_new_structref(toml_datum_t, TIMESTAMP_CLASS);
+        memcpy(exs_structref_ptr(ret), &datum, sizeof(toml_datum_t));
+        return ret;
+    case TOML_ARRAY:
+        return _toml_array_to_sv(aTHX_ datum);
+    case TOML_TABLE:
+        return _toml_table_to_sv(aTHX_ datum);
+    default:
+        break;
     }
 
-    if (0 != (tab = toml_table_in(curtab, key))) {
-        return _toml_table_to_sv(aTHX_ tab, err_path_ptr);
-    }
-
-    toml_datum_t d;
-
-    d = toml_string_in(curtab, key);
-    RETURN_IF_DATUM_IS_STRING(d);
-
-    d = toml_bool_in(curtab, key);
-    RETURN_IF_DATUM_IS_BOOLEAN(d);
-
-    d = toml_int_in(curtab, key);
-    RETURN_IF_DATUM_IS_INTEGER(d);
-
-    d = toml_double_in(curtab, key);
-    RETURN_IF_DATUM_IS_DOUBLE(d);
-
-    d = toml_timestamp_in(curtab, key);
-    RETURN_IF_DATUM_IS_TIMESTAMP(d);
-
-    /* This indicates some unspecified parse error that the initial
-       parse didn’t catch.
-    */
-    return NULL;
+    ASSUME(FALSE);
 }
 
-SV* _toml_array_value_to_sv(pTHX_ toml_array_t* curarr, int i, AV** err_path_ptr) {
-    toml_array_t* arr;
-    toml_table_t* tab;
+toml_datum_t _drill_into_array(pTHX_ toml_datum_t datum, SV** stack, unsigned stack_idx, unsigned drill_len);
 
-    if (0 != (arr = toml_array_at(curarr, i))) {
-        return _toml_array_to_sv(aTHX_ arr, err_path_ptr);
-    }
+static inline void _croak_on_nonfinal_drill( pTHX_ toml_type_t type, SV** stack, unsigned stack_idx, unsigned drill_len) {
+    SV* jsonpointer = _make_json_pointer_sv(aTHX_ stack, stack_idx);
+    sv_2mortal(jsonpointer);
 
-    if (0 != (tab = toml_table_at(curarr, i))) {
-        return _toml_table_to_sv(aTHX_ tab, err_path_ptr);
-    }
+    croak("Cannot descend into non-container (%s)! (JSON pointer: %" SVf ")", type_name[type], jsonpointer);
 
-    toml_datum_t d;
-
-    d = toml_string_at(curarr, i);
-    RETURN_IF_DATUM_IS_STRING(d);
-
-    d = toml_bool_at(curarr, i);
-    RETURN_IF_DATUM_IS_BOOLEAN(d);
-
-    d = toml_int_at(curarr, i);
-    RETURN_IF_DATUM_IS_INTEGER(d);
-
-    d = toml_double_at(curarr, i);
-    RETURN_IF_DATUM_IS_DOUBLE(d);
-
-    d = toml_timestamp_at(curarr, i);
-    RETURN_IF_DATUM_IS_TIMESTAMP(d);
-
-    /* This indicates some unspecified parse error that the initial
-       parse didn’t catch.
-    */
-    return NULL;
+    assert(0);
 }
 
-#if DETECT_LEAKS
-static inline void _warn_if_global_destruct_destroy( pTHX_ SV* obj ) {
-    if (_IS_GLOBAL_DESTRUCT) {
-        warn( "%" SVf " destroyed at global destruction; memory leak likely!\n", obj);
-    }
-}
-#endif
-
-/* for profiling: */
-/*
-#include <sys/time.h>
-
-void _print_timeofday(char* label) {
-    struct timeval tp;
-
-    gettimeofday(&tp, NULL);
-    fprintf(stderr, "%s: %ld.%06d\n", label, tp.tv_sec, tp.tv_usec);
-}
-*/
-
-typedef union {
-    toml_table_t*       table_p;
-    toml_array_t*       array_p;
-    toml_datum_t        datum;
-} entity_t;
-
-typedef struct {
-    entity_t entity;
-
-    enum toml_xs_type   type;
-} toml_entity_t;
-
-toml_entity_t _drill_into_array(pTHX_ toml_array_t* arrin, SV** stack, unsigned stack_idx, unsigned drill_len, AV** err_path_ptr);
-
-static inline void _croak_if_datum_is_nonfinal_drill( pTHX_ SV** stack, unsigned stack_idx, unsigned drill_len) {
-    if (stack_idx != drill_len-1) {
-
-        SV* jsonpointer = _get_json_pointer_sv(aTHX_ stack, stack_idx);
-
-        SV* errsv = newSVpvf("Cannot descend into non-container! (JSON pointer: %" SVf ")", jsonpointer);
-        croak_sv(errsv);
-
-        assert(0);
-    }
-}
-
-static inline bool _table_has_key_sv(toml_table_t* tabin, const char* keystr) {
-    const char* key;
-
-    for (unsigned i = 0; ; i++) {
-        key = toml_key_in(tabin, i);
-        if (!key) break;
-
-        if (strEQ(key, keystr)) return true;
-    }
-
-    return false;
-}
-
-toml_entity_t _drill_into_table(pTHX_ toml_table_t* tabin, SV** stack, unsigned stack_idx, unsigned drill_len, AV** err_path_ptr) {
-    toml_entity_t newent;
+toml_datum_t _drill_into_table(pTHX_ toml_datum_t tabin, SV** stack, unsigned stack_idx, unsigned drill_len) {
+    ASSUME(tabin.type == TOML_TABLE);
 
     SV* key_sv = stack[stack_idx];
 
@@ -407,81 +232,37 @@ toml_entity_t _drill_into_table(pTHX_ toml_table_t* tabin, SV** stack, unsigned 
 
     char* key = SvPVutf8_nolen(key_sv);
 
-    toml_table_t* tab = toml_table_in(tabin, key);
+    toml_datum_t next = toml_get(tabin, key);
 
-    if (tab) {
-        if (stack_idx == drill_len-1) {
-            newent.type = TOML_XS_TYPE_TABLE;
-            newent.entity.table_p = tab;
-            return newent;
-        }
-        else {
-            return _drill_into_table(aTHX_ tab, stack, 1 + stack_idx, drill_len, err_path_ptr);
-        }
+    if (next.type == TOML_UNKNOWN) {
+        SV* json_pointer = _make_json_pointer_sv(aTHX_ stack, stack_idx);
+        sv_2mortal(json_pointer);
+        croak("element not found (JSON pointer: %" SVf ")", json_pointer);
     }
 
-    toml_array_t* arr = toml_array_in(tabin, key);
-
-    if (arr) {
-        if (stack_idx == drill_len-1) {
-            newent.type = TOML_XS_TYPE_ARRAY;
-            newent.entity.array_p = arr;
-            return newent;
-        }
-        else {
-            return _drill_into_array(aTHX_ arr, stack, 1 + stack_idx, drill_len, err_path_ptr);
-        }
+    if (stack_idx == drill_len-1) {
+        return next;
     }
 
-    _croak_if_datum_is_nonfinal_drill(aTHX_ stack, stack_idx, drill_len);
-
-    newent.entity.datum = toml_string_in(tabin, key);
-
-    if (newent.entity.datum.ok) {
-        newent.type = TOML_XS_TYPE_STRING;
-    }
-    else {
-        newent.entity.datum = toml_bool_in(tabin, key);
-
-        if (newent.entity.datum.ok) {
-            newent.type = TOML_XS_TYPE_BOOLEAN;
-        }
-        else {
-            newent.entity.datum = toml_int_in(tabin, key);
-
-            if (newent.entity.datum.ok) {
-                newent.type = TOML_XS_TYPE_INTEGER;
-            }
-            else {
-                newent.entity.datum = toml_double_in(tabin, key);
-
-                if (newent.entity.datum.ok) {
-                    newent.type = TOML_XS_TYPE_DOUBLE;
-                }
-                else {
-                    newent.entity.datum = toml_timestamp_in(tabin, key);
-
-                    if (newent.entity.datum.ok) {
-                        newent.type = TOML_XS_TYPE_TIMESTAMP;
-                    }
-                    else {
-                        SV* json_pointer = _get_json_pointer_sv(aTHX_ stack, stack_idx);
-                        if (_table_has_key_sv(tabin, key)) {
-                            croak("Invalid table element: %" SVf, json_pointer);
-                        }
-
-                        croak("Missing table element: %" SVf, json_pointer);
-                    }
-                }
-            }
-        }
+    switch (next.type) {
+    case TOML_UNKNOWN:
+        assert(0);
+    case TOML_TABLE:
+        return _drill_into_table(aTHX_ next, stack, 1 + stack_idx, drill_len);
+    case TOML_ARRAY:
+        return _drill_into_array(aTHX_ next, stack, 1 + stack_idx, drill_len);
+    default:
+        break;
     }
 
-    return newent;
+    _croak_on_nonfinal_drill(aTHX_ next.type, stack, stack_idx, drill_len);
+
+    ASSUME(FALSE);
+    return next; // silence compiler warning
 }
 
-toml_entity_t _drill_into_array(pTHX_ toml_array_t* arrin, SV** stack, unsigned stack_idx, unsigned drill_len, AV** err_path_ptr) {
-    toml_entity_t newent;
+toml_datum_t _drill_into_array(pTHX_ toml_datum_t datum, SV** stack, unsigned stack_idx, unsigned drill_len) {
+    ASSUME(datum.type == TOML_ARRAY);
 
     int i;
 
@@ -500,85 +281,39 @@ toml_entity_t _drill_into_array(pTHX_ toml_array_t* arrin, SV** stack, unsigned 
             i = idx_uv;
         }
         else {
-            SV* json_pointer = _get_json_pointer_sv(aTHX_ stack, stack_idx - 1);
+            SV* json_pointer = _make_json_pointer_sv(aTHX_ stack, stack_idx - 1);
             sv_2mortal(json_pointer);
-            croak("Non-number (%" SVf ") given as index to array (JSON pointer: %" SVf ")!", key_sv, json_pointer);
+            croak("Invalid array index (%" SVf ") given to array (JSON pointer: %" SVf ")!", key_sv, json_pointer);
         }
     }
 
-    toml_table_t* tab = toml_table_at(arrin, i);
-
-    if (tab) {
-        if (stack_idx == drill_len-1) {
-            newent.type = TOML_XS_TYPE_TABLE;
-            newent.entity.table_p = tab;
-            return newent;
-        }
-        else {
-            return _drill_into_table( aTHX_ tab, stack, 1 + stack_idx, drill_len, err_path_ptr);
-        }
+    if (i >= datum.u.arr.size) {
+        SV* json_pointer = _make_json_pointer_sv(aTHX_ stack, stack_idx);
+        sv_2mortal(json_pointer);
+        croak("Index exceeds max array index (%d; JSON pointer: %" SVf ")", datum.u.arr.size - 1, json_pointer);
     }
 
-    toml_array_t* arr = toml_array_at(arrin, i);
+    toml_datum_t next = datum.u.arr.elem[i];
 
-    if (arr) {
-        if (stack_idx == drill_len-1) {
-            newent.type = TOML_XS_TYPE_ARRAY;
-            newent.entity.array_p = arr;
-            return newent;
-        }
-        else {
-            return _drill_into_array( aTHX_ arr, stack, 1 + stack_idx, drill_len, err_path_ptr);
-        }
+    if (stack_idx == drill_len-1) {
+        return next;
     }
 
-    _croak_if_datum_is_nonfinal_drill(aTHX_ stack, stack_idx, drill_len);
-
-    newent.entity.datum = toml_string_at(arrin, i);
-
-    if (newent.entity.datum.ok) {
-        newent.type = TOML_XS_TYPE_STRING;
-    }
-    else {
-        newent.entity.datum = toml_bool_at(arrin, i);
-
-        if (newent.entity.datum.ok) {
-            newent.type = TOML_XS_TYPE_BOOLEAN;
-        }
-        else {
-            newent.entity.datum = toml_int_at(arrin, i);
-
-            if (newent.entity.datum.ok) {
-                newent.type = TOML_XS_TYPE_INTEGER;
-            }
-            else {
-                newent.entity.datum = toml_double_at(arrin, i);
-
-                if (newent.entity.datum.ok) {
-                    newent.type = TOML_XS_TYPE_DOUBLE;
-                }
-                else {
-                    newent.entity.datum = toml_timestamp_at(arrin, i);
-
-                    if (newent.entity.datum.ok) {
-                        newent.type = TOML_XS_TYPE_TIMESTAMP;
-                    }
-                    else {
-                        SV* json_pointer = _get_json_pointer_sv(aTHX_ stack, stack_idx);
-                        unsigned arraylen = toml_array_nelem(arrin);
-
-                        if (i >= arraylen) {
-                            croak("Index exceeds max array index (%d; JSON pointer: %" SVf ")", arraylen - 1, json_pointer);
-                        }
-
-                        croak("Invalid array member (JSON pointer: %" SVf ")", json_pointer);
-                    }
-                }
-            }
-        }
+    switch (next.type) {
+    case TOML_UNKNOWN:
+        assert(0);
+    case TOML_TABLE:
+        return _drill_into_table(aTHX_ next, stack, 1 + stack_idx, drill_len);
+    case TOML_ARRAY:
+        return _drill_into_array(aTHX_ next, stack, 1 + stack_idx, drill_len);
+    default:
+        break;
     }
 
-    return newent;
+    _croak_on_nonfinal_drill(aTHX_ next.type, stack, stack_idx, drill_len);
+
+    assert(0);
+    return next; // silence compiler warning
 }
 
 /* ---------------------------------------------------------------------- */
@@ -591,234 +326,27 @@ SV*
 from_toml (SV* tomlsv)
     CODE:
         STRLEN tomllen;
-        char errbuf[200];
         char* tomlstr = SvPVbyte(tomlsv, tomllen);
 
         _verify_no_null(tomlstr, tomllen);
 
         _verify_valid_utf8(tomlstr, tomllen);
 
-        toml_table_t* tab = toml_parse(tomlstr, errbuf, sizeof(errbuf));
+        toml_result_t res = toml_parse(tomlstr, tomllen);
 
-        if (tab == NULL) croak("%s", errbuf);
+        if (!res.ok) {
+            toml_free(res);
+            croak("failed to parse TOML: %s", res.errmsg);
+        }
 
-        RETVAL = _ptr_to_svrv( aTHX_ tab, gv_stashpv(DOCUMENT_CLASS, FALSE) );
+        SV* retsv = exs_new_structref(toml_result_t, DOCUMENT_CLASS);
+        memcpy(exs_structref_ptr(retsv), &res, sizeof(toml_result_t));
+
+        RETVAL = retsv;
     OUTPUT:
         RETVAL
 
 # ----------------------------------------------------------------------
 
-MODULE = TOML::XS     PACKAGE = TOML::XS::Document
-
-PROTOTYPES: DISABLE
-
-SV*
-parse (SV* docsv, ...)
-    ALIAS:
-        to_struct = 1
-    CODE:
-        UNUSED(ix);
-        toml_table_t* tab = _get_toml_table_from_sv(aTHX_ docsv);
-
-        AV* err_path = NULL;
-
-        if (items > 1) {
-            toml_entity_t root_entity = _drill_into_table(aTHX_ tab, &ST(1), 0, items-1, &err_path);
-
-            switch (root_entity.type) {
-                case TOML_XS_TYPE_INVALID:
-                    RETVAL = NULL;
-                    break;
-                case TOML_XS_TYPE_TABLE:
-                    RETVAL = _toml_table_to_sv(aTHX_ root_entity.entity.table_p, &err_path);
-                    break;
-
-                case TOML_XS_TYPE_ARRAY:
-                    RETVAL = _toml_array_to_sv(aTHX_ root_entity.entity.array_p, &err_path);
-                    break;
-
-                case TOML_XS_TYPE_STRING:
-                    RETVAL = _datum_string_to_sv(aTHX_ root_entity.entity.datum);
-                    break;
-
-                case TOML_XS_TYPE_BOOLEAN:
-                    RETVAL = _datum_boolean_to_sv(root_entity.entity.datum);
-                    break;
-
-                case TOML_XS_TYPE_INTEGER:
-                    RETVAL = _datum_integer_to_sv(root_entity.entity.datum);
-                    break;
-
-                case TOML_XS_TYPE_DOUBLE:
-                    RETVAL = _datum_double_to_sv(root_entity.entity.datum);
-                    break;
-
-                case TOML_XS_TYPE_TIMESTAMP:
-                    RETVAL = _datum_timestamp_to_sv(aTHX_ root_entity.entity.datum);
-                    break;
-
-                default:
-                    assert(0);
-            }
-        }
-        else {
-            RETVAL = _toml_table_to_sv(aTHX_ tab, &err_path);
-        }
-
-        if (NULL == RETVAL) {
-            _call_croaker_pv(aTHX_ CROAK_MALFORMED_TOML_FN, err_path);
-
-            assert(0);
-        }
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY (SV* docsv)
-    CODE:
-#if DETECT_LEAKS
-        _warn_if_global_destruct_destroy(aTHX_ docsv);
-#endif
-
-        toml_table_t* tab = _get_toml_table_from_sv(aTHX_ docsv);
-        toml_free(tab);
-
-# ----------------------------------------------------------------------
-
-MODULE = TOML::XS     PACKAGE = TOML::XS::Timestamp
-
-PROTOTYPES: DISABLE
-
-SV*
-to_string (SV* selfsv)
-    CODE:
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = newSVpvs("");
-
-        if (NULL != ts->year) {
-            sv_catpvf(
-                RETVAL,
-                "%02d-%02d-%02d",
-                *ts->year, *ts->month, *ts->day
-            );
-        }
-
-        if (NULL != ts->hour) {
-            sv_catpvf(
-                RETVAL,
-                "T%02d:%02d:%02d",
-                *ts->hour, *ts->minute, *ts->second
-            );
-
-            if (NULL != ts->millisec) {
-                sv_catpvf(
-                    RETVAL,
-                    ".%03d",
-                    *ts->millisec
-                );
-            }
-        }
-
-        if (NULL != ts->z) {
-            sv_catpv(RETVAL, ts->z);
-        }
-    OUTPUT:
-        RETVAL
-
-SV*
-year (SV* selfsv)
-    CODE:
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->year ? newSViv(*ts->year) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-month (SV* selfsv)
-    CODE:
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->month ? newSViv(*ts->month) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-day (SV* selfsv)
-    ALIAS:
-        date = 1
-    CODE:
-        UNUSED(ix);
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->day ? newSViv(*ts->day) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-hour (SV* selfsv)
-    ALIAS:
-        hours = 1
-    CODE:
-        UNUSED(ix);
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->hour ? newSViv(*ts->hour) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-minute (SV* selfsv)
-    ALIAS:
-        minutes = 1
-    CODE:
-        UNUSED(ix);
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->minute ? newSViv(*ts->minute) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-second (SV* selfsv)
-    ALIAS:
-        seconds = 1
-    CODE:
-        UNUSED(ix);
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->second ? newSViv(*ts->second) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-millisecond (SV* selfsv)
-    ALIAS:
-        milliseconds = 1
-    CODE:
-        UNUSED(ix);
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->millisec ? newSViv(*ts->millisec) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-SV*
-timezone (SV* selfsv)
-    CODE:
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-
-        RETVAL = ts->z ? newSVpv(ts->z, 0) : &PL_sv_undef;
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY (SV* selfsv)
-    CODE:
-#if DETECT_LEAKS
-        _warn_if_global_destruct_destroy(aTHX_ selfsv);
-#endif
-
-        toml_timestamp_t* ts = _get_toml_timestamp_from_sv(aTHX_ selfsv);
-        tomlxs_free_timestamp(ts);
+INCLUDE: Document.xs
+INCLUDE: Timestamp.xs

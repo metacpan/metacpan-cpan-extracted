@@ -40,11 +40,11 @@
  * Layout
  *
  * Header (128 bytes)
- * Node data:  max_nodes * sizeof(int64_t)    — node values
- * Node heads: max_nodes * sizeof(uint32_t)   — first-edge index per node
- * Node bitmap: ceil(max_nodes/64) * 8        — allocation bitmap
- * Edges:      max_edges * sizeof(GraphEdge)  — edge pool
- * Edge bitmap: ceil(max_edges/64) * 8        — edge allocation bitmap
+ * Node data:  max_nodes * sizeof(int64_t)    -- node values
+ * Node heads: max_nodes * sizeof(uint32_t)   -- first-edge index per node
+ * Node bitmap: ceil(max_nodes/64) * 8        -- allocation bitmap
+ * Edges:      max_edges * sizeof(GraphEdge)  -- edge pool
+ * Edge bitmap: ceil(max_edges/64) * 8        -- edge allocation bitmap
  * ================================================================ */
 
 typedef struct {
@@ -86,6 +86,8 @@ typedef struct {
     uint64_t    *edge_bitmap;
     uint32_t     node_bwords;
     uint32_t     edge_bwords;
+    uint32_t     max_nodes;    /* cached at attach: peer-writable hdr field, fixed geometry */
+    uint32_t     max_edges;    /* cached at attach: peer-writable hdr field, fixed geometry */
     size_t       mmap_size;
     char        *path;
     int          notify_fd;
@@ -98,9 +100,29 @@ typedef struct {
 
 static const struct timespec graph_lock_timeout = { 2, 0 };
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int graph_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int graph_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !graph_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 static inline void graph_mutex_lock(GraphHeader *hdr) {
@@ -128,7 +150,7 @@ static inline void graph_mutex_lock(GraphHeader *hdr) {
                 if (!graph_pid_alive(pid) &&
                     __atomic_compare_exchange_n(&hdr->mutex, &cur, 0,
                             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-                    /* Recovered — wake one waiter so it can proceed. */
+                    /* Recovered -- wake one waiter so it can proceed. */
                     syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
                 }
             }
@@ -175,7 +197,7 @@ static inline void graph_bit_free(uint64_t *bm, uint32_t idx) {
  * ================================================================ */
 
 static inline int64_t graph_add_node_locked(GraphHandle *h, int64_t data) {
-    int64_t idx = graph_bit_alloc(h->node_bitmap, h->node_bwords, h->hdr->max_nodes);
+    int64_t idx = graph_bit_alloc(h->node_bitmap, h->node_bwords, h->max_nodes);
     if (idx < 0) return -1;
     h->node_data[idx] = data;
     h->node_heads[idx] = GRAPH_NONE;
@@ -184,10 +206,10 @@ static inline int64_t graph_add_node_locked(GraphHandle *h, int64_t data) {
 }
 
 static inline int graph_add_edge_locked(GraphHandle *h, uint32_t src, uint32_t dst, int64_t weight) {
-    if (src >= h->hdr->max_nodes || dst >= h->hdr->max_nodes) return 0;
+    if (src >= h->max_nodes || dst >= h->max_nodes) return 0;
     if (!graph_bit_set(h->node_bitmap, src) || !graph_bit_set(h->node_bitmap, dst))
         return 0;
-    int64_t eidx = graph_bit_alloc(h->edge_bitmap, h->edge_bwords, h->hdr->max_edges);
+    int64_t eidx = graph_bit_alloc(h->edge_bitmap, h->edge_bwords, h->max_edges);
     if (eidx < 0) return 0;
     h->edges[eidx].dst = dst;
     h->edges[eidx].weight = weight;
@@ -198,12 +220,12 @@ static inline int graph_add_edge_locked(GraphHandle *h, uint32_t src, uint32_t d
 }
 
 static inline int graph_remove_node_locked(GraphHandle *h, uint32_t node) {
-    if (node >= h->hdr->max_nodes) return 0;
+    if (node >= h->max_nodes) return 0;
     if (!graph_bit_set(h->node_bitmap, node)) return 0;
     /* free all outgoing edges */
     uint32_t eidx = h->node_heads[node];
     while (eidx != GRAPH_NONE) {
-        if (eidx >= h->hdr->max_edges) break;   /* corrupt/attacker edge index: stop */
+        if (eidx >= h->max_edges) break;   /* corrupt/attacker edge index: stop */
         uint32_t next = h->edges[eidx].next;
         graph_bit_free(h->edge_bitmap, eidx);
         __atomic_fetch_sub(&h->hdr->edge_count, 1, __ATOMIC_RELAXED);
@@ -218,16 +240,16 @@ static inline int graph_remove_node_locked(GraphHandle *h, uint32_t node) {
 /* Like remove_node_locked, but also splices every other node's adjacency
  * list to drop edges pointing TO `node` (incoming edges). O(N+E). */
 static inline int graph_remove_node_full_locked(GraphHandle *h, uint32_t node) {
-    if (node >= h->hdr->max_nodes) return 0;
+    if (node >= h->max_nodes) return 0;
     if (!graph_bit_set(h->node_bitmap, node)) return 0;
-    uint32_t max_n = h->hdr->max_nodes;
+    uint32_t max_n = h->max_nodes;
     for (uint32_t src = 0; src < max_n; src++) {
         if (src == node) continue;
         if (!graph_bit_set(h->node_bitmap, src)) continue;
         uint32_t *slot = &h->node_heads[src];
         uint32_t eidx = *slot;
         while (eidx != GRAPH_NONE) {
-            if (eidx >= h->hdr->max_edges) break;
+            if (eidx >= h->max_edges) break;
             uint32_t next = h->edges[eidx].next;
             if (h->edges[eidx].dst == node) {
                 *slot = next;
@@ -279,17 +301,17 @@ static inline int graph_remove_node_full(GraphHandle *h, uint32_t node) {
 }
 
 static inline int graph_has_node(GraphHandle *h, uint32_t node) {
-    if (node >= h->hdr->max_nodes) return 0;
+    if (node >= h->max_nodes) return 0;
     return graph_bit_set(h->node_bitmap, node);
 }
 
 /* Caller must hold graph_mutex and have verified node is live via bitmap. */
 static inline uint32_t graph_degree(GraphHandle *h, uint32_t node) {
-    if (node >= h->hdr->max_nodes) return 0;
+    if (node >= h->max_nodes) return 0;
     uint32_t count = 0;
     uint32_t eidx = h->node_heads[node];
     while (eidx != GRAPH_NONE) {
-        if (eidx >= h->hdr->max_edges) break;
+        if (eidx >= h->max_edges) break;
         count++;
         eidx = h->edges[eidx].next;
     }
@@ -349,13 +371,38 @@ static inline GraphHandle *graph_setup(void *base, size_t map_size,
         return NULL;
     }
     h->hdr          = hdr;
-    h->node_data    = (int64_t *)((uint8_t *)base + hdr->node_data_off);
-    h->node_heads   = (uint32_t *)((uint8_t *)base + hdr->node_heads_off);
-    h->node_bitmap  = (uint64_t *)((uint8_t *)base + hdr->node_bitmap_off);
-    h->edges        = (GraphEdge *)((uint8_t *)base + hdr->edge_data_off);
-    h->edge_bitmap  = (uint64_t *)((uint8_t *)base + hdr->edge_bitmap_off);
-    h->node_bwords  = (hdr->max_nodes + 63) / 64;
-    h->edge_bwords  = (hdr->max_edges + 63) / 64;
+    /* Snapshot the geometry ONCE and re-verify it against the mapping before
+     * caching anything: a write-peer can flip max_nodes/max_edges/*_off in the
+     * window between graph_validate_header and here (graph_open_fd holds no
+     * lock at all), so the earlier validation does not pin what we cache.
+     * Offsets are then RECOMPUTED from the trusted layout rather than read from
+     * the peer-writable header fields. */
+    {
+        uint32_t mn = __atomic_load_n(&hdr->max_nodes, __ATOMIC_ACQUIRE);
+        uint32_t me = __atomic_load_n(&hdr->max_edges, __ATOMIC_ACQUIRE);
+        if (mn == 0 || me == 0 || mn > 0x7FFFFFFFu || me > 0x7FFFFFFFu ||
+            graph_total_size(mn, me) != (uint64_t)map_size) {
+            munmap(base, map_size);
+            if (backing_fd >= 0) close(backing_fd);
+            free(h);
+            return NULL;
+        }
+        uint32_t nb = (mn + 63) / 64;
+        uint64_t node_data_off   = sizeof(GraphHeader);
+        uint64_t node_heads_off  = node_data_off + (uint64_t)mn * sizeof(int64_t);
+        uint64_t node_bitmap_off = node_heads_off + (uint64_t)mn * sizeof(uint32_t);
+        uint64_t edge_data_off   = node_bitmap_off + (uint64_t)nb * 8;
+        uint64_t edge_bitmap_off = edge_data_off + (uint64_t)me * sizeof(GraphEdge);
+        h->node_data    = (int64_t *)((uint8_t *)base + node_data_off);
+        h->node_heads   = (uint32_t *)((uint8_t *)base + node_heads_off);
+        h->node_bitmap  = (uint64_t *)((uint8_t *)base + node_bitmap_off);
+        h->edges        = (GraphEdge *)((uint8_t *)base + edge_data_off);
+        h->edge_bitmap  = (uint64_t *)((uint8_t *)base + edge_bitmap_off);
+        h->node_bwords  = nb;
+        h->edge_bwords  = (me + 63) / 64;
+        h->max_nodes    = mn;   /* verified snapshot; never the live hdr copy */
+        h->max_edges    = me;
+    }
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->notify_fd    = -1;
@@ -437,6 +484,10 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
         int is_new = (st.st_size == 0);
         if (!is_new && (uint64_t)st.st_size < sizeof(GraphHeader)) {
             GRAPH_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            GRAPH_ERR("%s: refusing to initialize file not owned by us", path);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {

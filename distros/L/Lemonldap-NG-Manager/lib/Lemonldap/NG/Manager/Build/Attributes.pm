@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.1';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -2615,6 +2615,7 @@ sub attributes {
             test          => sub { return perlExpr(@_) },
             msgFail       => '__badValue__',
             documentation => 'Args for REST 2F init',
+            help          => 'rest2f.html#arguments',
         },
         rest2fVerifyUrl => {
             type          => 'url',
@@ -2622,11 +2623,10 @@ sub attributes {
         },
         rest2fVerifyArgs => {
             type          => 'keyTextContainer',
-            keyTest       => qr/^\w+$/,
-            keyMsgFail    => '__badKeyName__',
-            test          => qr/^\w+$/,
+            test          => sub { return perlExpr(@_) },
             msgFail       => '__badValue__',
             documentation => 'Args for REST 2F verify',
+            help          => 'rest2f.html#arguments',
         },
         rest2fResendInterval => {
             type          => 'text',
@@ -4295,6 +4295,16 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation =>
               'Location of the CA directory for LDAP connections',
         },
+        ldapClientCert => {
+            type          => 'text',
+            documentation =>
+              'Location of the client certificate file for LDAP connections',
+        },
+        ldapClientKey => {
+            type          => 'text',
+            documentation =>
+              'Location of the client private key for LDAP connections',
+        },
 
         # SSL
         SSLAuthnLevel => {
@@ -5282,6 +5292,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcOPMetaDataOptionsAcrValues => { type => 'text', },
         oidcOPMetaDataOptionsAuthEndpointExtraParams => {
             type          => 'keyTextContainer',
+            default       => {},
             documentation =>
               'Additional parameters for OpenID Connect Authorization endpoint',
         },

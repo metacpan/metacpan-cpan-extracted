@@ -22,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -866,7 +866,7 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

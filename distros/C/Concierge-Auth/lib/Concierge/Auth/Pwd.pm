@@ -1,4 +1,4 @@
-package Concierge::Auth::Pwd v0.5.1;
+package Concierge::Auth::Pwd v0.5.2;
 use v5.36;
 
 # ABSTRACT: Password-file Concierge::Auth backend using Crypt::Passphrase
@@ -438,7 +438,7 @@ Concierge::Auth::Pwd - Password-file Concierge::Auth backend using Crypt::Passph
 
 =head1 VERSION
 
-v0.5.1
+v0.5.2
 
 =head1 SYNOPSIS
 
@@ -488,42 +488,45 @@ L<Concierge::Auth::Generators> (using L<Crypt::PRNG> for
 cryptographically secure random output). See
 L<Concierge::Auth::Base/The Generators Guarantee>.
 
-Concierge::Auth::Pwd is one backend of L<Concierge::Auth>, 
-the authentication component of the Concierge suite, alongside 
-L<Concierge::Sessions> (session management) and L<Concierge::Users> 
-(user data storage). It can also be used standalone.
+Concierge::Auth::Pwd is the default fully functional backend class
+provided with Concierge::Auth.
 
-=head2 Two Method Layers
+=head2 Three Method Layers
 
-This module itself defines two layers of methods:
+This module itself defines three layers of methods:
 
 =over 4
 
-=item * B<Contract methods> (C<authenticate>, C<is_id_known>, C<enroll>,
-C<change_credentials>, C<revoke>) -- the interface defined by
-L<Concierge::Auth::Base>. These are what C<Concierge> calls, and every
-Concierge::Auth backend (this one, or an alternative such as an
-LDAP-backed backend) implements them. Password-file I/O and validation
-are written directly inline in these methods -- there are no
-intermediate backend-primitive methods to hop through. They return the
-C<{ success => 1|0, ... }> hashref convention used throughout the rest
-of the Concierge suite. C<validatePwd> is kept as a small shared helper
-since both C<enroll> and C<change_credentials> need it; it also returns
-the hashref convention.
+=item * Contract methods that provide the interface defined by
+L<Concierge::Auth::Base>:
 
-=item * B<Backend-specific methods> (file-management and encryption) --
-specific to how B<this> backend manages its password file, independent
-of the contract logic above. Other backends are not expected to
-implement these, and application code that wants to remain
-backend-agnostic should prefer the contract methods. These retain the
-original wantarray-sensitive C<(bool, message)> dual-return convention:
-C<$value> in scalar context, C<($value, $message)> in list context.
+=over 4
+
+=item * C<authenticate>
+
+=item * C<is_id_known>
+
+=item * C<enroll>
+
+=item * C<change_credentials>
+
+=item * C<revoke>
 
 =back
 
-A third set of methods -- token/random value generation -- is
-available on every instance but is not defined in this module at all;
-see L</DESCRIPTION> above.
+Each of these methods must return its results in the form of a hashref
+with C<{ success => 1|0, message => '...' }>, allowing the calling
+application to keep control even if the method fails.
+
+=item * Methods specific to how this backend class manages its password
+file, independent of, but in service to, the contract methods above.
+
+=item * Generator methods for creating secure tokens and random values.
+Generator methods are automatically provided from
+L<Concierge::Auth::Generators>, but may be overridden; Concierge::Auth::Pwd
+does not override any of them.
+
+=back
 
 =head1 CONSTRUCTOR
 

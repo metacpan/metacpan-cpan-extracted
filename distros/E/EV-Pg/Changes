@@ -1,3 +1,9 @@
+0.08  2026-07-23
+    - fix skip_pending accounting: stale-result misdelivery, COPY-OUT skip
+      livelock, re-entrant double-count, and phantom credit across reconnect
+    - fix segfault when a custom EV loop is freed before the EV::Pg object
+    - refresh result_meta after describe results
+
 0.07  2026-06-02
     - return undef result_meta for non-data results (first COPY/error/sync)
     - fix connect_params undef handling and dedup conninfo building

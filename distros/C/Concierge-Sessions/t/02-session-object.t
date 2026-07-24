@@ -17,10 +17,10 @@ note("Testing Concierge::Sessions::Session object functionality");
 
 # Helper to create a session manager
 sub create_manager {
-    my $backend = shift || 'SQLite';
+    my $backend_class = shift || 'Concierge::Sessions::SQLite';
     return Concierge::Sessions->new(
-        backend     => $backend,
-        storage_dir => $temp_dir,
+        backend_class => $backend_class,
+        storage_dir   => $temp_dir,
     );
 }
 

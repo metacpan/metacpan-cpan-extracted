@@ -1,4 +1,4 @@
-package Concierge::Users::Meta v0.9.3;
+package Concierge::Users::Meta v0.9.4;
 use v5.36;
 use Carp qw/ croak carp /;
 use YAML::Tiny;
@@ -1148,7 +1148,7 @@ utilities for Concierge::Users
 
 =head1 VERSION
 
-v0.9.3
+v0.9.4
 
 =head1 SYNOPSIS
 
@@ -1742,7 +1742,7 @@ warning header.  Used internally during C<setup()>.
 
 L<Concierge::Users> -- main API and CRUD operations
 
-L<Concierge::Users::Database>, L<Concierge::Users::File>,
+L<Concierge::Users::SQLite>, L<Concierge::Users::File>,
 L<Concierge::Users::YAML> -- storage backend implementations
 
 =head1 AUTHOR
@@ -1772,8 +1772,8 @@ __DATA__
 ################################################################################
 
 Configuration:
-  Version: v0.9.3
-  Backend: Concierge::Users::Database  # Default; can be 'database', 'file', or 'yaml'
+  Version: v0.9.4
+  Backend: Concierge::Users::SQLite  # Or Concierge::Users::File / ::YAML
   Storage Directory: /path/to/storage  # Set during setup
   Generated: 2026-01-06 19:10:18
 

@@ -30,7 +30,7 @@ WriteMakefile(
     PM => {
         'lib/Concierge/Users.pm'          => '$(INST_LIB)/Concierge/Users.pm',
         'lib/Concierge/Users/Meta.pm'     => '$(INST_LIB)/Concierge/Users/Meta.pm',
-        'lib/Concierge/Users/Database.pm' => '$(INST_LIB)/Concierge/Users/Database.pm',
+        'lib/Concierge/Users/SQLite.pm'   => '$(INST_LIB)/Concierge/Users/SQLite.pm',
         'lib/Concierge/Users/File.pm'     => '$(INST_LIB)/Concierge/Users/File.pm',
         'lib/Concierge/Users/YAML.pm'     => '$(INST_LIB)/Concierge/Users/YAML.pm',
     },
@@ -50,23 +50,23 @@ WriteMakefile(
         provides => {
             'Concierge::Users' => {
                 file    => 'lib/Concierge/Users.pm',
-                version => 'v0.9.3',
+                version => 'v0.9.4',
             },
             'Concierge::Users::Meta' => {
                 file    => 'lib/Concierge/Users/Meta.pm',
-                version => 'v0.9.3',
+                version => 'v0.9.4',
             },
-            'Concierge::Users::Database' => {
-                file    => 'lib/Concierge/Users/Database.pm',
-                version => 'v0.9.3',
+            'Concierge::Users::SQLite' => {
+                file    => 'lib/Concierge/Users/SQLite.pm',
+                version => 'v0.9.4',
             },
             'Concierge::Users::File' => {
                 file    => 'lib/Concierge/Users/File.pm',
-                version => 'v0.9.3',
+                version => 'v0.9.4',
             },
             'Concierge::Users::YAML' => {
                 file    => 'lib/Concierge/Users/YAML.pm',
-                version => 'v0.9.3',
+                version => 'v0.9.4',
             },
         },
     },

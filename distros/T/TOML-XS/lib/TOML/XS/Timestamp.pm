@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-TOML::XS::Document - Object representation of a L<TOML|https://toml.io>
+TOML::XS::Timestamp - Object representation of a L<TOML|https://toml.io>
 timestamp
 
 =head1 SYNOPSIS
@@ -22,7 +22,7 @@ This class is not directly instantiable.
 
 =head1 ACCESSOR METHODS
 
-Any of the following may be undef:
+Any of the following may be undef, depending on the original TOML.
 
 =over
 
@@ -40,7 +40,9 @@ Any of the following may be undef:
 
 =item * C<millisecond()> (alias: C<milliseconds()>)
 
-=item * C<timezone()>
+=item * C<microsecond()> (alias: C<microseconds()>)
+
+=item * C<timezone()> (string)
 
 =back
 

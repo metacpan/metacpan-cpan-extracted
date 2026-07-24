@@ -11,6 +11,7 @@
 ^Pg\.c$
 ^EV-Pg-
 ^\.claude/
+^\.pcg/
 ^CLAUDE\.md$
 ^_Inline/
 ~$

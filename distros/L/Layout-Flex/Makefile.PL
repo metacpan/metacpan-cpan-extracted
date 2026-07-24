@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
+use File::Path qw(make_path);
+
+make_path('lib/Font/Metrics/Install');
 
 my $dep  = ExtUtils::Depends->new('Layout::Flex', 'Font::Metrics');
 my %deps = $dep->get_makefile_vars;
@@ -20,6 +23,7 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0',
+        'Font::Metrics' => '0.02',
     },
     PREREQ_PM => {
         'Font::Metrics' => '0.02',

@@ -2,7 +2,7 @@ package Data::Buffer::Shared::I8;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub import {
     $^H{"Data::Buffer::Shared::I8/buf_i8_get"} = 1;
