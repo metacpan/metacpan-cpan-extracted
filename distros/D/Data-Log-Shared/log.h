@@ -24,7 +24,7 @@
  * it. Callers must reset/recreate the log. This is extremely rare in
  * practice given the small instruction window.
  *
- * Padding ensures the next slot header is 4-byte aligned — required
+ * Padding ensures the next slot header is 4-byte aligned -- required
  * for atomic load/store on strict-alignment ISAs (ARM64 LDAR/STLR
  * trap on unaligned addresses with SIGBUS).
  */
@@ -48,7 +48,7 @@
 #include <linux/futex.h>
 #include <sys/eventfd.h>
 
-#define LOG_MAGIC       0x4C4F4732U  /* "LOG2" — v2 entry format with reserve_size */
+#define LOG_MAGIC       0x4C4F4732U  /* "LOG2" -- v2 entry format with reserve_size */
 #define LOG_VERSION     2
 #define LOG_ERR_BUFLEN  256
 /* Slot header: reserve_size (u32) + len (u32) = 8 bytes. */
@@ -62,9 +62,9 @@
 
 /* log_read / log_read_ex return codes */
 #define LOG_READ_EMPTY     0  /* no entry at offset (end / uncommitted in flight) */
-#define LOG_READ_OK        1  /* valid entry — out_data, out_len, next_off set */
-#define LOG_READ_ABANDONED 2  /* slot abandoned — next_off set, no data */
-#define LOG_READ_TRUNCATED 3  /* offset below truncation — next_off = truncation, no data */
+#define LOG_READ_OK        1  /* valid entry -- out_data, out_len, next_off set */
+#define LOG_READ_ABANDONED 2  /* slot abandoned -- next_off set, no data */
+#define LOG_READ_TRUNCATED 3  /* offset below truncation -- next_off = truncation, no data */
 
 /* ================================================================
  * Header (128 bytes)
@@ -118,6 +118,7 @@ static inline uint64_t log_region_size(const LogHandle *h) {
 
 static inline void log_make_deadline(double t, struct timespec *dl) {
     clock_gettime(CLOCK_MONOTONIC, dl);
+    if (!(t < 1e9)) t = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     dl->tv_sec += (time_t)t;
     dl->tv_nsec += (long)((t - (double)(time_t)t) * 1e9);
     if (dl->tv_nsec >= 1000000000L) { dl->tv_sec++; dl->tv_nsec -= 1000000000L; }
@@ -133,7 +134,7 @@ static inline int log_remaining(const struct timespec *dl, struct timespec *rem)
 }
 
 /* ================================================================
- * Append — CAS reserve space, publish reserve_size, write data,
+ * Append -- CAS reserve space, publish reserve_size, write data,
  * commit (len). reserve_size is published BEFORE data so a crashed
  * writer leaves a recoverable slot boundary for readers.
  * ================================================================ */
@@ -198,19 +199,19 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len, i
 }
 
 /* ================================================================
- * Read — read entry at offset.
+ * Read -- read entry at offset.
  *
  * Returns:
- *   LOG_READ_OK        — entry found; out_data/out_len/next_off set.
- *   LOG_READ_ABANDONED — slot was reserved but never committed (writer
+ *   LOG_READ_OK        -- entry found; out_data/out_len/next_off set.
+ *   LOG_READ_ABANDONED -- slot was reserved but never committed (writer
  *                       crashed mid-append); next_off advanced past it,
  *                       no out_data. abandon_wait_us caps the wait for
  *                       an in-flight writer before declaring abandonment.
- *   LOG_READ_TRUNCATED — offset lies below the current truncation point
+ *   LOG_READ_TRUNCATED -- offset lies below the current truncation point
  *                       (a concurrent truncate advanced past it);
  *                       next_off is set to the truncation offset so the
  *                       caller skips forward instead of stopping. No data.
- *   LOG_READ_EMPTY     — no entry (past tail or in-flight writer not yet
+ *   LOG_READ_EMPTY     -- no entry (past tail or in-flight writer not yet
  *                       timed out).
  * ================================================================ */
 
@@ -246,7 +247,7 @@ static inline int log_read_ex(LogHandle *h, uint64_t offset,
     /* Load reserve_size FIRST. ACQUIRE pairs with the writer's RELEASE-
      * store of reserve_size, which happens-after the RELAXED store of
      * len=0. So observing reserve_size > 0 guarantees the writer's
-     * len=0 is also visible — we can then trust the subsequent len-load.
+     * len=0 is also visible -- we can then trust the subsequent len-load.
      *
      * This is the "happens-before chain": reserve_size release -> reader
      * acquire -> len load. Without it, a freshly-CAS-reserved slot could
@@ -288,7 +289,7 @@ static inline int log_read_ex(LogHandle *h, uint64_t offset,
      *   reserve_size == 0: writer either hasn't published it yet (very
      *     narrow window between CAS and the reserve_size store) or
      *     crashed before publishing. We can't determine slot length so
-     *     signal EMPTY — caller must retry or give up.
+     *     signal EMPTY -- caller must retry or give up.
      *   reserve_size > 0, len == 0: writer crashed after publishing the
      *     boundary but before committing data. Skip via reserve_size. */
     if (reserve_size == 0) return LOG_READ_EMPTY;
@@ -431,7 +432,7 @@ static inline int log_validate_header(const LogHeader *hdr, uint64_t file_size,
 static inline LogHandle *log_setup(void *base, size_t ms, const char *path, int bfd) {
     LogHeader *hdr = (LogHeader *)base;
     LogHandle *h = (LogHandle *)calloc(1, sizeof(LogHandle));
-    if (!h) { munmap(base, ms); return NULL; }
+    if (!h) { munmap(base, ms); if (bfd >= 0) close(bfd); return NULL; }
     h->hdr = hdr;
     /* Layer B: data_off is validated to equal sizeof(LogHeader) on every path
      * that reaches here (log_init_header sets it; log_validate_header rejects
@@ -499,6 +500,10 @@ static LogHandle *log_create(const char *path, uint64_t data_size, mode_t mode, 
             LOG_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            LOG_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             LOG_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -558,7 +563,7 @@ static void log_destroy(LogHandle *h) {
     free(h);
 }
 
-/* NOT concurrency-safe — caller must ensure no concurrent access.
+/* NOT concurrency-safe -- caller must ensure no concurrent access.
  *
  * Zeros the data region before rewinding tail. This is required for
  * correctness: a stale slot at offset 0 could otherwise leak old
@@ -583,9 +588,12 @@ static void log_reset(LogHandle *h) {
 }
 
 /* Concurrency-safe truncate: mark entries before offset as invalid.
- * Does NOT reclaim space — the log is append-only. Readers skip
+ * Does NOT reclaim space -- the log is append-only. Readers skip
  * entries below the truncation offset. */
 static inline void log_truncate(LogHandle *h, uint64_t offset) {
+    /* keep the validated invariant truncation <= data_size (log_validate_header);
+     * an unbounded offset would otherwise be published to every reader. */
+    if (offset > h->hdr->data_size) offset = h->hdr->data_size;
     for (;;) {
         uint64_t cur = __atomic_load_n(&h->hdr->truncation, __ATOMIC_RELAXED);
         if (offset <= cur) return;  /* can only advance, not retreat */

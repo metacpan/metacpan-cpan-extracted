@@ -4096,7 +4096,7 @@ erf(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = erfq(x);
-# elif defined(PSX2008_HAS_SQRTL)
+# elif defined(PSX2008_HAS_ERFL)
     RETVAL = erfl(x);
 # else
     RETVAL = erf(x);
@@ -4112,7 +4112,7 @@ erfc(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = erfcq(x);
-# elif defined(PSX2008_HAS_SQRTL)
+# elif defined(PSX2008_HAS_ERFCL)
     RETVAL = erfcl(x);
 # else
     RETVAL = erfc(x);
@@ -4430,7 +4430,7 @@ j0(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = j0q(x);
-# elif defined(PSX2008_HAS_SQRTL) && !defined(__MINGW32__)
+# elif defined(PSX2008_HAS_J0L) && !defined(__MINGW32__)
     RETVAL = j0l(x);
 # else
     RETVAL = j0(x);
@@ -4446,7 +4446,7 @@ j1(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = j1q(x);
-# elif defined(PSX2008_HAS_SQRTL) && !defined(__MINGW32__)
+# elif defined(PSX2008_HAS_J1L) && !defined(__MINGW32__)
     RETVAL = j1l(x);
 # else
     RETVAL = j1(x);
@@ -4462,7 +4462,7 @@ jn(int n, NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = jnq(n, x);
-# elif defined(PSX2008_HAS_SQRTL) && !defined(__MINGW32__)
+# elif defined(PSX2008_HAS_JNL) && !defined(__MINGW32__)
     RETVAL = jnl(n, x);
 # else
     RETVAL = jn(n, x);
@@ -4494,7 +4494,7 @@ lgamma(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = lgammaq(x);
-# elif defined(PSX2008_HAS_SQRTL)
+# elif defined(PSX2008_HAS_LGAMMAL)
     RETVAL = lgammal(x);
 # else
     RETVAL = lgamma(x);
@@ -4890,7 +4890,7 @@ tgamma(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = tgammaq(x);
-# elif defined(PSX2008_HAS_SQRTL)
+# elif defined(PSX2008_HAS_TGAMMAL)
     RETVAL = tgammal(x);
 # else
     RETVAL = tgamma(x);
@@ -4922,7 +4922,7 @@ y0(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = y0q(x);
-# elif defined(PSX2008_HAS_SQRTL) && !defined(__MINGW32__)
+# elif defined(PSX2008_HAS_Y0L) && !defined(__MINGW32__)
     RETVAL = y0l(x);
 # else
     RETVAL = y0(x);
@@ -4938,7 +4938,7 @@ y1(NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = y1q(x);
-# elif defined(PSX2008_HAS_SQRTL) && !defined(__MINGW32__)
+# elif defined(PSX2008_HAS_Y1L) && !defined(__MINGW32__)
     RETVAL = y1l(x);
 # else
     RETVAL = y1(x);
@@ -4954,7 +4954,7 @@ yn(int n, NV x);
   CODE:
 # if defined(PSX2008_HAS_SQRTQ)
     RETVAL = ynq(n, x);
-# elif defined(PSX2008_HAS_SQRTL) && !defined(__MINGW32__)
+# elif defined(PSX2008_HAS_YNL) && !defined(__MINGW32__)
     RETVAL = ynl(n, x);
 # else
     RETVAL = yn(n, x);
@@ -5072,7 +5072,7 @@ cexp(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = cexpq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CEXPL)
     result = cexpl(z);
 # else
     result = cexp(z);
@@ -5091,7 +5091,7 @@ clog(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = clogq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CLOGL)
     result = clogl(z);
 # else
     result = clog(z);
@@ -5282,7 +5282,7 @@ ccos(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = ccosq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CCOSL)
     result = ccosl(z);
 # else
     result = ccos(z);
@@ -5301,7 +5301,7 @@ ccosh(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = ccoshq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CCOSHL)
     result = ccoshl(z);
 # else
     result = ccosh(z);
@@ -5320,7 +5320,7 @@ csin(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = csinq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CSINL)
     result = csinl(z);
 # else
     result = csin(z);
@@ -5339,7 +5339,7 @@ csinh(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = csinhq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CSINHL)
     result = csinhl(z);
 # else
     result = csinh(z);
@@ -5358,7 +5358,7 @@ ctan(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = ctanq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CTANL)
     result = ctanl(z);
 # else
     result = ctan(z);
@@ -5377,7 +5377,7 @@ ctanh(NV re, NV im);
   PPCODE:
 # if defined(PSX2008_HAS_CSQRTQ)
     result = ctanhq(z);
-# elif defined(PSX2008_HAS_CSQRTL)
+# elif defined(PSX2008_HAS_CTANHL)
     result = ctanhl(z);
 # else
     result = ctanh(z);

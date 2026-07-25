@@ -698,8 +698,21 @@ sub _traverse {
         for my $item (@stack) {
             next if !defined $item;
 
+            # array slice access: [start:end]
+            if ($step =~ /^\[(.*):(.*)\]$/s) {
+                my @args = _parse_bracket_slice_arguments($1, $2);
+                push @next_stack, _apply_bracket_slice($item, @args);
+            }
+            # array slice access: key[start:end]
+            elsif ($step =~ /^(.*?)\[(.*):(.*)\]$/s) {
+                my ($key, $raw_start, $raw_end) = ($1, $2, $3);
+                if (ref $item eq 'HASH' && exists $item->{$key}) {
+                    my @args = _parse_bracket_slice_arguments($raw_start, $raw_end);
+                    push @next_stack, _apply_bracket_slice($item->{$key}, @args);
+                }
+            }
             # direct index access: [index]
-            if ($step =~ /^\[(\d+)\]$/) {
+            elsif ($step =~ /^\[(\d+)\]$/) {
                 my $index = $1;
                 if (ref $item eq 'ARRAY' && defined $item->[$index]) {
                     push @next_stack, $item->[$index];
@@ -1731,12 +1744,11 @@ sub _apply_slice {
         my $array = $value;
         my $size  = @$array;
 
-        return [] if $size == 0;
-
         my $raw_start = @args ? $args[0] : 0;
         my $start     = 0;
 
-        if (defined $raw_start && !looks_like_number($raw_start)) {
+        if (defined $raw_start
+            && (_is_string_scalar($raw_start) || !looks_like_number($raw_start))) {
             die 'slice(): start must be numeric';
         }
 
@@ -1749,13 +1761,16 @@ sub _apply_slice {
         return []        if $start >= $size;
 
         my $length;
-        if (@args > 1 && defined $args[1] && !looks_like_number($args[1])) {
+        if (@args > 1 && defined $args[1]
+            && (_is_string_scalar($args[1]) || !looks_like_number($args[1]))) {
             die 'slice(): length must be numeric';
         }
 
         if (@args > 1 && defined $args[1] && looks_like_number($args[1])) {
             $length = int($args[1]);
         }
+
+        return [] if $size == 0;
 
         my $end;
         if (defined $length) {
@@ -1774,6 +1789,34 @@ sub _apply_slice {
     }
 
     return $value;
+}
+
+sub _apply_bracket_slice {
+    my ($value, $raw_start, $raw_end) = @_;
+
+    return _apply_slice($value, $raw_start, $raw_end)
+        if ref $value ne 'ARRAY';
+
+    if (defined $raw_start
+        && (_is_string_scalar($raw_start) || !looks_like_number($raw_start))) {
+        die 'slice(): start must be numeric';
+    }
+    if (defined $raw_end
+        && (_is_string_scalar($raw_end) || !looks_like_number($raw_end))) {
+        die 'slice(): length must be numeric';
+    }
+
+    my $size  = scalar @$value;
+    my $start = defined $raw_start ? int($raw_start) : 0;
+    $start += $size if $start < 0;
+    $start = 0       if $start < 0;
+
+    return _apply_slice($value, $start) unless defined $raw_end;
+
+    my $end = int($raw_end);
+    $end += $size if $end < 0;
+
+    return _apply_slice($value, $start, $end - $start);
 }
 
 sub _apply_replace {
@@ -1836,6 +1879,36 @@ sub _parse_arguments {
         $part =~ s/^\s+|\s+$//g;
         $part;
     } @parts;
+}
+
+sub _parse_slice_arguments {
+    my ($raw) = @_;
+
+    return () unless defined $raw;
+
+    my @parts = _split_semicolon_arguments($raw);
+    return _parse_arguments($raw) if @parts == 1;
+
+    return map { _parse_slice_argument($_) } @parts;
+}
+
+sub _parse_bracket_slice_arguments {
+    my ($raw_start, $raw_length) = @_;
+
+    return map { _parse_slice_argument($_) } ($raw_start, $raw_length);
+}
+
+sub _parse_slice_argument {
+    my ($raw) = @_;
+
+    return undef unless defined $raw;
+    $raw =~ s/^\s+|\s+$//g;
+    return undef if $raw eq '';
+
+    my $decoded = eval { _decode_json($raw) };
+    return $decoded unless $@;
+
+    return $raw;
 }
 
 sub _split_semicolon_arguments {

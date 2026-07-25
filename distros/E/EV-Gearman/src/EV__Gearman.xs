@@ -1,6 +1,8 @@
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_mg_findext   /* ppport fallback for perls < 5.13.8 */
 #include "ppport.h"
 
 #include "EVAPI.h"
@@ -87,6 +89,11 @@
 
 #define BUF_INIT_SIZE 16384
 #define GM_MAX_PACKET (256u * 1024u * 1024u)  /* 256 MB sanity bound */
+/* Admin (text-protocol) replies carry no length field, only a line
+   terminator, so GM_MAX_PACKET cannot bound them. A peer that never
+   sends the terminator would otherwise grow the read buffer without
+   limit; cap the buffered reply and drop the connection past this. */
+#define GM_MAX_ADMIN_RESPONSE (16u * 1024u * 1024u)
 /* Once a buffer has fully drained, release it back to BUF_INIT_SIZE if
    it grew past this — a single large packet otherwise pins its
    high-water-mark allocation for the life of the connection. */
@@ -124,7 +131,6 @@ typedef struct ev_gm_func_s ev_gm_func_t;
 typedef struct ev_gm_active_s ev_gm_active_t;
 
 typedef ev_gm_t* EV__Gearman;
-typedef struct ev_loop* EV__Loop;
 
 /* Request awaiting a response (FIFO). For SUBMIT_JOB, holds the
  * callback bundle that gets transferred to active_jobs once the
@@ -138,6 +144,8 @@ struct ev_gm_req_s {
     SV *on_status;
     SV *on_exception;
     int admin_terminator; /* 0 = single-line; 1 = ".\n" terminator (status/workers) */
+    ev_tstamp sent_at;    /* ev_now() when queued on cb_queue; per-request
+                             command_timeout budget starts here */
 };
 
 /* Pending packet awaiting connect / drain */
@@ -168,11 +176,13 @@ struct ev_gm_func_s {
     SV *cb;
     int async;     /* if 1, callback returns nothing; user calls $job->complete */
     int timeout;   /* seconds; 0 = no timeout */
+    int no_cb_warned; /* warned once about dispatching to a cb-less can_do entry */
 };
 
 struct ev_gm_s {
     unsigned int magic;
     struct ev_loop *loop;
+    SV *loop_sv;   /* strong ref on a user-supplied loop => EV::Loop object */
     int fd;
     int connected;
     int connecting;
@@ -219,6 +229,11 @@ struct ev_gm_s {
     int port;
     char *path;
 
+    /* getaddrinfo fallback list (TCP): live only while a connect
+       sequence walks it; freed on success, exhaustion or disconnect. */
+    struct addrinfo *ai_list;
+    struct addrinfo *ai_cur;
+
     /* Reconnect */
     int reconnect;
     int reconnect_delay_ms;
@@ -241,6 +256,12 @@ struct ev_gm_s {
     int in_cb_cleanup;
     int in_wait_cleanup;
     int in_active_cleanup;
+    /* Live EV::Gearman::Job objects holding a tombstone reference on
+       this struct (via sv_magicext on the job HV). While > 0 the
+       struct is never Safefreed — a DESTROYed connection becomes an
+       inert tombstone until the last job releases it, so job_resolve's
+       magic-word check never reads freed memory. */
+    U32 job_refs;
 
     /* Options */
     int priority;
@@ -249,12 +270,6 @@ struct ev_gm_s {
     /* Options sent on connect */
     int opt_exceptions;
 };
-
-/* ================================================================
- * Shared error strings
- * ================================================================ */
-
-static SV *err_disconnected = NULL;
 
 /* ================================================================
  * Forward declarations
@@ -279,9 +294,11 @@ static void finish_connect_success(pTHX_ ev_gm_t *self);
 static void stop_connect_timer(ev_gm_t *self);
 static void stop_reconnect_timer(ev_gm_t *self);
 static int  check_destroyed(ev_gm_t *self);
-static void cancel_pending(pTHX_ ev_gm_t *self, SV *err_sv);
-static void cancel_waiting(pTHX_ ev_gm_t *self, SV *err_sv);
-static void cancel_active(pTHX_ ev_gm_t *self, SV *err_sv);
+static void clear_addrinfo(ev_gm_t *self);
+static void connect_try_from(pTHX_ ev_gm_t *self, const char *prev_err);
+static void cancel_pending(pTHX_ ev_gm_t *self, const char *reason);
+static void cancel_waiting(pTHX_ ev_gm_t *self, const char *reason);
+static void cancel_active(pTHX_ ev_gm_t *self, const char *reason);
 static void send_pending_waits(pTHX_ ev_gm_t *self);
 static void arm_cmd_timer(ev_gm_t *self);
 static void disarm_cmd_timer(ev_gm_t *self);
@@ -396,12 +413,17 @@ static void stop_writing(ev_gm_t *self) {
     }
 }
 
+/* "Is dead" predicate with the free as a side effect. Callers use the
+   return value as "the object is dead, STOP TOUCHING IT" — which must
+   not be conflated with "it was freed": with jobs stashed, a destroyed
+   client has magic == FREED but job_refs > 0, and falls through to
+   nothing. The struct is Safefreed exactly once: when it is dead AND
+   the callback depth has unwound AND no job tombstone refs remain. */
 static int check_destroyed(ev_gm_t *self) {
-    if (self->magic == GM_MAGIC_FREED && self->callback_depth == 0) {
+    if (self->magic != GM_MAGIC_FREED) return 0;
+    if (self->callback_depth == 0 && self->job_refs == 0)
         Safefree(self);
-        return 1;
-    }
-    return 0;
+    return 1;                /* dead either way — caller must stop */
 }
 
 /* ================================================================
@@ -488,6 +510,12 @@ static int gm_set_socket_flags(int fd) {
     fl = fcntl(fd, F_GETFD);
     if (fl >= 0) (void)fcntl(fd, F_SETFD, fl | FD_CLOEXEC);
 #endif
+#ifdef SO_NOSIGPIPE
+    /* macOS/BSD lack MSG_NOSIGNAL; this is their per-socket way to
+       keep a write to a closed peer from raising SIGPIPE. A library
+       must never be able to kill its embedder with a signal. */
+    { int one = 1; (void)setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one)); }
+#endif
     return 0;
 }
 
@@ -508,6 +536,7 @@ static SV* handler_accessor(pTHX_ SV **slot, int items, SV *new_cb) {
 /* Allocate a request entry with kind set; if cb_sv is a valid coderef,
    bumps its refcount into r->cb. Pass NULL (or a non-coderef) for no cb. */
 static ev_gm_req_t* alloc_req(int kind, SV *cb_sv) {
+    dTHX;
     ev_gm_req_t *r;
     Newxz(r, 1, ev_gm_req_t);
     r->kind = kind;
@@ -551,7 +580,7 @@ static void cleanup_func(pTHX_ ev_gm_func_t *f) {
  * Cancel queues
  * ================================================================ */
 
-/* Drain a queue, firing each entry's user callback with err_sv before
+/* Drain a queue, firing each entry's user callback with reason before
    freeing it. Bails if a callback triggers DESTROY (magic flips to
    FREED). The flag prevents reentrancy if a callback also calls
    disconnect() while we are mid-loop. */
@@ -564,7 +593,7 @@ static void cleanup_func(pTHX_ ev_gm_func_t *f) {
         ngx_queue_remove(_q);                                           \
         self->counter--;                                                \
         if (cb_expr)                                                    \
-            invoke_cb2(aTHX_ self, cb_expr, NULL, newSVsv(err_sv));     \
+            invoke_cb2(aTHX_ self, cb_expr, NULL, newSVpv(reason, 0));  \
         if (self->magic == GM_MAGIC_FREED) {                            \
             cleanup(aTHX_ _e);                                          \
             self->flag = 0;                                             \
@@ -575,20 +604,20 @@ static void cleanup_func(pTHX_ ev_gm_func_t *f) {
     self->flag = 0;                                                     \
 } while (0)
 
-static void cancel_pending(pTHX_ ev_gm_t *self, SV *err_sv) {
+static void cancel_pending(pTHX_ ev_gm_t *self, const char *reason) {
     CANCEL_QUEUE(&self->cb_queue, ev_gm_req_t, cleanup_req,
                  pending_count, in_cb_cleanup, _e->cb);
     self->pending_count = 0;
 }
 
-static void cancel_waiting(pTHX_ ev_gm_t *self, SV *err_sv) {
+static void cancel_waiting(pTHX_ ev_gm_t *self, const char *reason) {
     CANCEL_QUEUE(&self->wait_queue, ev_gm_wait_t, cleanup_wait,
                  waiting_count, in_wait_cleanup,
                  (_e->req ? _e->req->cb : NULL));
     self->waiting_count = 0;
 }
 
-static void cancel_active(pTHX_ ev_gm_t *self, SV *err_sv) {
+static void cancel_active(pTHX_ ev_gm_t *self, const char *reason) {
     CANCEL_QUEUE(&self->active_jobs, ev_gm_active_t, cleanup_active,
                  active_count_cached, in_active_cleanup, _e->on_complete);
     self->active_count_cached = 0;
@@ -618,20 +647,41 @@ static void cleanup_connection(pTHX_ ev_gm_t *self) {
        the GRAB loop from scratch. Registered functions are kept. */
     self->worker_sleeping = 0;
     self->worker_grab_inflight = 0;
+
+    clear_addrinfo(self);
+}
+
+/* Drop the resolved-address list, if any. It is only live while a
+   connect sequence is walking it. */
+static void clear_addrinfo(ev_gm_t *self) {
+    if (self->ai_list) {
+        freeaddrinfo(self->ai_list);
+        self->ai_list = NULL;
+        self->ai_cur = NULL;
+    }
 }
 
 static void handle_disconnect(pTHX_ ev_gm_t *self, const char *reason) {
     int was_connected = self->connected;
     cleanup_connection(aTHX_ self);
 
-    cancel_pending(aTHX_ self, err_disconnected);
+    cancel_pending(aTHX_ self, "disconnected");
     if (self->magic == GM_MAGIC_FREED) return;
 
-    cancel_active(aTHX_ self, err_disconnected);
+    cancel_active(aTHX_ self, "disconnected");
     if (self->magic == GM_MAGIC_FREED) return;
 
-    cancel_waiting(aTHX_ self, err_disconnected);
+    cancel_waiting(aTHX_ self, "disconnected");
     if (self->magic == GM_MAGIC_FREED) return;
+
+    /* Arm the reconnect BEFORE firing user callbacks: re-queueing work
+       from on_disconnect/on_error is the documented purpose of the
+       wait queue, and GM_CROAK_UNLESS_ALIVE keys off the reconnect
+       timer being active. schedule_reconnect may itself emit_error
+       ("max reconnect attempts reached"), so re-check for DESTROY. */
+    if (!self->intentional_disconnect && self->reconnect)
+        schedule_reconnect(aTHX_ self);
+    if (check_destroyed(self)) return;
 
     if (was_connected) {
         emit_disconnect(aTHX_ self);
@@ -642,12 +692,13 @@ static void handle_disconnect(pTHX_ ev_gm_t *self, const char *reason) {
         emit_error(aTHX_ self, reason);
         if (check_destroyed(self)) return;
     }
-
-    if (!self->intentional_disconnect && self->reconnect)
-        schedule_reconnect(aTHX_ self);
 }
 
 static void schedule_reconnect(pTHX_ ev_gm_t *self) {
+    /* DESTROY during a callback leaves a zombie (magic FREED, struct
+       kept alive by callback_depth); arming a timer on it would point
+       libev at freed memory once the depth unwinds. */
+    if (self->magic != GM_MAGIC_ALIVE) return;
     if (self->reconnect_timer_active) return;
     if (self->max_reconnect_attempts > 0 &&
         self->reconnect_attempts >= self->max_reconnect_attempts) {
@@ -677,19 +728,29 @@ static void stop_reconnect_timer(ev_gm_t *self) {
     }
 }
 
+/* The command timeout is per-request: the request at the head of
+   cb_queue must be answered within command_timeout_ms of its sent_at
+   stamp, regardless of how much unrelated traffic flows meanwhile.
+   Arm a one-shot timer for the current head's remaining budget;
+   callers re-arm whenever the head changes (pop) or the queue empties
+   (disarm via the empty-check here). */
 static void arm_cmd_timer(ev_gm_t *self) {
+    if (self->cmd_timer_active) {
+        ev_timer_stop(self->loop, &self->cmd_timer);
+        self->cmd_timer_active = 0;
+    }
     if (self->command_timeout_ms <= 0) return;
     if (!self->connected) return;
-    ev_tstamp timeout = (ev_tstamp)self->command_timeout_ms / 1000.0;
-    if (self->cmd_timer_active) {
-        self->cmd_timer.repeat = timeout;
-        ev_timer_again(self->loop, &self->cmd_timer);
-    } else {
-        ev_timer_init(&self->cmd_timer, cmd_timeout_cb, timeout, timeout);
-        self->cmd_timer.data = (void *)self;
-        ev_timer_start(self->loop, &self->cmd_timer);
-        self->cmd_timer_active = 1;
-    }
+    if (ngx_queue_empty(&self->cb_queue)) return;
+    ev_gm_req_t *head = ngx_queue_data(ngx_queue_head(&self->cb_queue),
+                                       ev_gm_req_t, queue);
+    ev_tstamp budget = (ev_tstamp)self->command_timeout_ms / 1000.0;
+    ev_tstamp remaining = head->sent_at + budget - ev_now(self->loop);
+    if (remaining < 0) remaining = 0;
+    ev_timer_init(&self->cmd_timer, cmd_timeout_cb, remaining, 0.0);
+    self->cmd_timer.data = (void *)self;
+    ev_timer_start(self->loop, &self->cmd_timer);
+    self->cmd_timer_active = 1;
 }
 
 static void disarm_cmd_timer(ev_gm_t *self) {
@@ -700,14 +761,22 @@ static void disarm_cmd_timer(ev_gm_t *self) {
 }
 
 static void cmd_timeout_cb(EV_P_ ev_timer *w, int revents) {
+    dTHX;
     ev_gm_t *self = (ev_gm_t *)w->data;
     (void)loop; (void)revents;
     if (self->magic != GM_MAGIC_ALIVE) return;
-    if (ngx_queue_empty(&self->cb_queue)) {
-        disarm_cmd_timer(self);
+    self->cmd_timer_active = 0;   /* one-shot: already fired */
+    if (ngx_queue_empty(&self->cb_queue)) return;
+    /* The head may have changed since this timer was armed (every arm
+       is for the then-head's budget); a current head still within
+       budget gets a re-arm for its remainder, not a disconnect. */
+    ev_gm_req_t *head = ngx_queue_data(ngx_queue_head(&self->cb_queue),
+                                       ev_gm_req_t, queue);
+    ev_tstamp budget = (ev_tstamp)self->command_timeout_ms / 1000.0;
+    if (ev_now(self->loop) - head->sent_at < budget) {
+        arm_cmd_timer(self);
         return;
     }
-    disarm_cmd_timer(self);
     self->callback_depth++;
     handle_disconnect(aTHX_ self, "command timeout");
     self->callback_depth--;
@@ -715,6 +784,7 @@ static void cmd_timeout_cb(EV_P_ ev_timer *w, int revents) {
 }
 
 static void connect_timeout_cb(EV_P_ ev_timer *w, int revents) {
+    dTHX;
     ev_gm_t *self = (ev_gm_t *)w->data;
     (void)loop; (void)revents;
     if (self->magic != GM_MAGIC_ALIVE) return;
@@ -726,6 +796,7 @@ static void connect_timeout_cb(EV_P_ ev_timer *w, int revents) {
 }
 
 static void reconnect_timer_cb(EV_P_ ev_timer *w, int revents) {
+    dTHX;
     ev_gm_t *self = (ev_gm_t *)w->data;
     (void)loop; (void)revents;
     if (self->magic != GM_MAGIC_ALIVE) return;
@@ -765,6 +836,7 @@ static void submit_bytes(pTHX_ ev_gm_t *self,
         buf_append_write(self, pkt, plen);
         Safefree(pkt);
         if (req) {
+            req->sent_at = ev_now(self->loop);
             ngx_queue_insert_tail(&self->cb_queue, &req->queue);
             self->pending_count++;
             arm_cmd_timer(self);
@@ -809,6 +881,7 @@ static void send_pending_waits(pTHX_ ev_gm_t *self) {
         buf_append_write(self, w->packet, w->packet_len);
 
         if (w->req) {
+            w->req->sent_at = ev_now(self->loop);
             ngx_queue_insert_tail(&self->cb_queue, &w->req->queue);
             self->pending_count++;
             w->req = NULL;
@@ -1012,35 +1085,146 @@ static ev_gm_active_t* find_active_by_handle(ev_gm_t *self,
     return NULL;
 }
 
-/* Pop the head request entry; returns NULL if queue empty. */
+/* Pop the head request entry; returns NULL if queue empty. Popping
+   advances the head, so the per-request command timer is re-armed for
+   the new head's budget (or disarmed when nothing remains). */
 static ev_gm_req_t* pop_req(ev_gm_t *self) {
     if (ngx_queue_empty(&self->cb_queue)) return NULL;
     ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
     ev_gm_req_t *r = ngx_queue_data(q, ev_gm_req_t, queue);
     ngx_queue_remove(q);
     self->pending_count--;
+    if (ngx_queue_empty(&self->cb_queue)) disarm_cmd_timer(self);
+    else                                arm_cmd_timer(self);
     return r;
+}
+
+/* ---- Response/request pairing -------------------------------------
+ * gearmand answers the request/response commands synchronously in
+ * wire order, so a reply whose command cannot answer the head request
+ * means a broken or hostile peer — or a FIFO already desynced. With no
+ * request-ids in the protocol there is no resynchronization primitive;
+ * continuing would deliver (possibly attacker-chosen) data to the
+ * wrong callback, so a mismatch tears the connection down. NOOP and
+ * ERROR are excepted: a correct gearmand may emit both asynchronously.
+ */
+
+static const char* gm_cmd_name(uint32_t cmd) {
+    switch (cmd) {
+    case GM_CMD_JOB_CREATED:        return "JOB_CREATED";
+    case GM_CMD_NO_JOB:             return "NO_JOB";
+    case GM_CMD_JOB_ASSIGN:         return "JOB_ASSIGN";
+    case GM_CMD_WORK_STATUS:        return "WORK_STATUS";
+    case GM_CMD_WORK_COMPLETE:      return "WORK_COMPLETE";
+    case GM_CMD_WORK_FAIL:          return "WORK_FAIL";
+    case GM_CMD_ECHO_RES:           return "ECHO_RES";
+    case GM_CMD_ERROR:              return "ERROR";
+    case GM_CMD_STATUS_RES:         return "STATUS_RES";
+    case GM_CMD_ALL_YOURS:          return "ALL_YOURS";
+    case GM_CMD_WORK_EXCEPTION:     return "WORK_EXCEPTION";
+    case GM_CMD_OPTION_RES:         return "OPTION_RES";
+    case GM_CMD_WORK_DATA:          return "WORK_DATA";
+    case GM_CMD_WORK_WARNING:       return "WORK_WARNING";
+    case GM_CMD_JOB_ASSIGN_UNIQ:    return "JOB_ASSIGN_UNIQ";
+    case GM_CMD_STATUS_RES_UNIQUE:  return "STATUS_RES_UNIQUE";
+    case GM_CMD_NOOP:               return "NOOP";
+    default:                        return "UNKNOWN_CMD";
+    }
+}
+
+static const char* gm_kind_name(int kind) {
+    switch (kind) {
+    case CB_ECHO:            return "ECHO";
+    case CB_SUBMIT:          return "SUBMIT";
+    case CB_SUBMIT_BG:       return "SUBMIT_BG";
+    case CB_GET_STATUS:      return "GET_STATUS";
+    case CB_GET_STATUS_UNIQ: return "GET_STATUS_UNIQUE";
+    case CB_OPTION:          return "OPTION";
+    case CB_GRAB_JOB:        return "GRAB_JOB";
+    case CB_ADMIN:           return "ADMIN";
+    default:                 return "UNKNOWN_KIND";
+    }
+}
+
+#define GM_KIND_MASK(k) (1u << ((k) - 1))   /* CB_* are 1..8 */
+
+/* Pop the head request iff its kind can legitimately be answered by
+   `cmd`. Empty queue: return NULL (caller decides tolerance). Kind
+   mismatch: the FIFO is desynced — tear the connection down with a
+   protocol error and return NULL. Callers must then touch nothing
+   further on self; process_responses re-checks magic/connected after
+   every arm. */
+static ev_gm_req_t* pop_req_expect(pTHX_ ev_gm_t *self, uint32_t cmd,
+                                   unsigned kind_mask)
+{
+    if (ngx_queue_empty(&self->cb_queue)) return NULL;
+    ev_gm_req_t *head = ngx_queue_data(ngx_queue_head(&self->cb_queue),
+                                       ev_gm_req_t, queue);
+    if (!(kind_mask & GM_KIND_MASK(head->kind))) {
+        char msg[128];
+        snprintf(msg, sizeof(msg),
+                 "protocol desync: %s cannot answer %s request",
+                 gm_cmd_name(cmd), gm_kind_name(head->kind));
+        handle_disconnect(aTHX_ self, msg);
+        return NULL;
+    }
+    return pop_req(self);
 }
 
 /* Forward declare so handle_response_packet can call into worker job dispatch */
 static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
     int with_unique, const char *body, size_t body_len);
 
+/* Release the tombstone reference a job holds on its client. Runs
+   exactly once when the job HV is freed (magic lives on the referent,
+   not the RV, so re-blessing cannot shake it and Perl code cannot
+   remove it). The struct is still allocated here by the job_refs
+   invariant: freed only when refs hit 0. */
+static int ev_gm_job_magic_free(pTHX_ SV *sv, MAGIC *mg) {
+    ev_gm_t *self = (ev_gm_t *)mg->mg_ptr;
+    (void)sv;
+    mg->mg_ptr = NULL;
+    if (self) {
+        if (self->job_refs > 0)
+            self->job_refs--;
+        (void)check_destroyed(self);
+    }
+    return 0;
+}
+
+static const MGVTBL ev_gm_job_magic_vtbl = {
+    NULL, NULL, NULL, NULL, ev_gm_job_magic_free   /* svt_free only */
+};
+
 /* Validate a job hashref and return its (live) client + handle bytes.
- * Croaks with op-prefixed messages on any inconsistency. */
+ * Croaks with op-prefixed messages on any inconsistency. The client
+ * pointer arrives as PERL_MAGIC_ext on the job HV (attached by
+ * worker_dispatch_job), not as a hash key: unforgeable and
+ * un-clobberable from Perl, and the job_refs tombstone count keeps the
+ * struct allocated so the magic-word check below never reads freed
+ * memory. */
 static ev_gm_t* job_resolve(pTHX_ SV *job_sv, const char **h, STRLEN *hl,
                             const char *op)
 {
     if (!SvROK(job_sv)) croak("%s: invalid job", op);
-    HV *job = (HV *)SvRV(job_sv);
-    SV **ptr_sv = hv_fetchs(job, "_client_ptr", 0);
-    if (!ptr_sv || !SvIOK(*ptr_sv))
+    SV *ref = SvRV(job_sv);
+    if (SvTYPE(ref) != SVt_PVHV)
+        croak("%s: stale job (not a job hash)", op);
+    MAGIC *mg = mg_findext(ref, PERL_MAGIC_ext, &ev_gm_job_magic_vtbl);
+    if (!mg || !mg->mg_ptr)
         croak("%s: stale job (no client pointer)", op);
-    SV **handle_sv = hv_fetchs(job, "handle", 0);
+    SV **handle_sv = hv_fetchs((HV *)ref, "handle", 0);
     if (!handle_sv) croak("%s: missing handle", op);
-    ev_gm_t *self = INT2PTR(ev_gm_t *, SvIV(*ptr_sv));
-    if (!self || self->magic != GM_MAGIC_ALIVE)
+    ev_gm_t *self = (ev_gm_t *)mg->mg_ptr;
+    if (self->magic != GM_MAGIC_ALIVE)
         croak("%s: client destroyed", op);
+    /* A live-but-disconnected client would silently queue this WORK_*
+       packet into the pre-connect wait queue and flush it after a
+       reconnect — where gearmand, which forgot the job at the drop,
+       answers JOB_NOT_FOUND. Croak instead: the job is already dead
+       server-side, so queuing can only produce that error. */
+    if (!self->connected)
+        croak("%s: not connected", op);
     *h = SvPV(*handle_sv, *hl);
     return self;
 }
@@ -1051,7 +1235,8 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     switch (cmd) {
 
     case GM_CMD_ECHO_RES: {
-        ev_gm_req_t *r = pop_req(self);
+        ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
+                                        GM_KIND_MASK(CB_ECHO));
         if (!r) return;
         if (r->cb)
             invoke_cb2(aTHX_ self, r->cb, newSVpvn(body, body_len), NULL);
@@ -1060,8 +1245,13 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     }
 
     case GM_CMD_JOB_CREATED: {
-        /* Match against next request that expects JOB_CREATED */
-        ev_gm_req_t *r = pop_req(self);
+        /* Only a SUBMIT request may sit at the head; anything else is
+           a desync (pop_req_expect disconnects). The old silent-free
+           else branch is gone: it dropped the user's callback without
+           an error, and with pending_count at 0 not even the command
+           timer could fire — a permanent silent hang. */
+        ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
+            GM_KIND_MASK(CB_SUBMIT) | GM_KIND_MASK(CB_SUBMIT_BG));
         if (!r) return;
         SV *handle_sv = newSVpvn(body, body_len);
         if (r->kind == CB_SUBMIT_BG) {
@@ -1070,7 +1260,7 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
             else
                 SvREFCNT_dec(handle_sv);
             cleanup_req(aTHX_ r);
-        } else if (r->kind == CB_SUBMIT) {
+        } else {
             /* Foreground: register active job, transfer callback bundle */
             ev_gm_active_t *a;
             Newxz(a, 1, ev_gm_active_t);
@@ -1086,9 +1276,6 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
             self->active_count_cached++;
             cleanup_req(aTHX_ r);
             SvREFCNT_dec(handle_sv);
-        } else {
-            SvREFCNT_dec(handle_sv);
-            cleanup_req(aTHX_ r);
         }
         break;
     }
@@ -1180,7 +1367,9 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     case GM_CMD_STATUS_RES_UNIQUE: {
         /* Both arms decode HANDLE-or-UNIQUE then KNOWN, RUNNING, NUM,
            DENOM, with STATUS_RES_UNIQUE adding a final CLIENT_COUNT. */
-        ev_gm_req_t *r = pop_req(self);
+        ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
+            cmd == GM_CMD_STATUS_RES ? GM_KIND_MASK(CB_GET_STATUS)
+                                     : GM_KIND_MASK(CB_GET_STATUS_UNIQ));
         if (!r) return;
         if (r->cb) {
             int with_count = (cmd == GM_CMD_STATUS_RES_UNIQUE);
@@ -1208,7 +1397,8 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     }
 
     case GM_CMD_OPTION_RES: {
-        ev_gm_req_t *r = pop_req(self);
+        ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
+                                        GM_KIND_MASK(CB_OPTION));
         if (!r) return;
         if (r->cb)
             invoke_cb2(aTHX_ self, r->cb, newSViv(1), NULL);
@@ -1217,15 +1407,26 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     }
 
     case GM_CMD_NO_JOB: {
-        ev_gm_req_t *r = pop_req(self);
-        if (!r) return;
+        /* The grab round is over no matter what the queue looks like —
+           clearing this FIRST is load-bearing: an early return with the
+           flag stuck wedges the worker permanently (worker_continue
+           gates on it). */
         self->worker_grab_inflight = 0;
-        /* grab_job's caller registered a cb; fire it with "no job" so
-           it knows to back off. The high-level work() loop never sets
-           r->cb for its internal grabs, so this is a no-op there. */
-        if (r->cb)
-            invoke_cb2(aTHX_ self, r->cb, NULL, newSVpvs("no job"));
-        cleanup_req(aTHX_ r);
+        ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
+                                        GM_KIND_MASK(CB_GRAB_JOB));
+        if (!self->connected) return;   /* desync disconnect in progress */
+        if (r) {
+            /* grab_job's caller registered a cb; fire it with "no job"
+               so it knows to back off. The high-level work() loop never
+               sets r->cb for its internal grabs, so this is a no-op
+               there. */
+            if (r->cb)
+                invoke_cb2(aTHX_ self, r->cb, NULL, newSVpvs("no job"));
+            cleanup_req(aTHX_ r);
+            if (self->magic == GM_MAGIC_FREED) return;
+        }
+        /* else: empty queue — tolerate. NO_JOB carries no information,
+           nothing remains to misroute, and the flag is already clear. */
         if (self->worker_active) {
             worker_send_pre_sleep(aTHX_ self);
             if (self->worker_on_idle)
@@ -1236,9 +1437,19 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
 
     case GM_CMD_JOB_ASSIGN:
     case GM_CMD_JOB_ASSIGN_UNIQ: {
-        ev_gm_req_t *r = pop_req(self);
-        if (!r) return;
+        /* First statement, same load-bearing reason as NO_JOB. */
         self->worker_grab_inflight = 0;
+        if (ngx_queue_empty(&self->cb_queue)) {
+            /* A correct server only assigns in reply to a queued GRAB;
+               an unsolicited assign carries real work we cannot
+               attribute (and would strand server-side). Desync. */
+            handle_disconnect(aTHX_ self,
+                "protocol desync: unsolicited JOB_ASSIGN");
+            return;
+        }
+        ev_gm_req_t *r = pop_req_expect(aTHX_ self, cmd,
+                                        GM_KIND_MASK(CB_GRAB_JOB));
+        if (!r) return;
         worker_dispatch_job(aTHX_ self, r,
             cmd == GM_CMD_JOB_ASSIGN_UNIQ ? 1 : 0, body, body_len);
         cleanup_req(aTHX_ r);
@@ -1252,7 +1463,16 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
     }
 
     case GM_CMD_ERROR: {
-        /* ERRCODE\0ERR_TEXT — fail head request */
+        /* ERRCODE\0ERR_TEXT. ERROR carries no handle, so attribution is
+           impossible in general — and "pop whatever is at the head" is
+           actively destructive: gearmand emits JOB_NOT_FOUND
+           asynchronously for a WORK_* we sent (e.g. a double
+           complete()), which on a worker arrives while the head is the
+           in-flight GRAB_JOB; popping it wedges the worker for good.
+           So: pop only a head kind that can actually fail this way
+           (in-order rejection of that request — GRAB_JOB is never
+           answered with ERROR, ADMIN expects text); anything else is
+           surfaced at connection level with the FIFO left intact. */
         size_t cl, tl;
         const char *c = gm_arg(body, body_len, 0, 2, &cl);
         const char *t = gm_arg(body, body_len, 1, 2, &tl);
@@ -1261,14 +1481,22 @@ static void handle_response_packet(pTHX_ ev_gm_t *self,
             err = newSVpvf("%.*s: %.*s", (int)cl, c, (int)tl, t);
         else
             err = newSVpvn(body, body_len);
-        ev_gm_req_t *r = pop_req(self);
-        if (r && r->cb) {
-            invoke_cb2(aTHX_ self, r->cb, NULL, err);
+        ev_gm_req_t *head = ngx_queue_empty(&self->cb_queue) ? NULL
+            : ngx_queue_data(ngx_queue_head(&self->cb_queue),
+                             ev_gm_req_t, queue);
+        if (head && head->kind != CB_GRAB_JOB && head->kind != CB_ADMIN) {
+            pop_req(self);
+            if (head->cb) {
+                invoke_cb2(aTHX_ self, head->cb, NULL, err);
+            } else {
+                emit_error(aTHX_ self, SvPV_nolen(err));
+                SvREFCNT_dec(err);
+            }
+            cleanup_req(aTHX_ head);
         } else {
             emit_error(aTHX_ self, SvPV_nolen(err));
             SvREFCNT_dec(err);
         }
-        if (r) cleanup_req(aTHX_ r);
         break;
     }
 
@@ -1298,26 +1526,57 @@ static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
     hv_stores(job, "function", newSVpvn(f, fl));
     hv_stores(job, "unique",   u ? newSVpvn(u, ul) : newSVpvn("", 0));
     hv_stores(job, "workload", w ? newSVpvn(w, wl) : newSVpvn("", 0));
-    /* Raw client pointer; we deliberately do NOT bump the client's
-       refcount because $g is the unique T_PTROBJ owner — creating a
-       second blessed RV would let DESTROY fire twice. Job methods
-       check self->magic to detect a destroyed connection. */
-    hv_stores(job, "_client_ptr", newSViv(PTR2IV(self)));
+    /* Tombstone reference on the client, carried as PERL_MAGIC_ext on
+       the job HV — not a hash key, so user code, hash walkers and
+       serializers can neither see nor clobber it, and a forged job
+       hash has no magic to pass job_resolve's check. svt_free
+       (ev_gm_job_magic_free) releases the reference; while any job
+       lives, job_refs > 0 keeps this struct allocated (as an inert
+       tombstone once DESTROY has run), so job_resolve's magic-word
+       check never reads freed memory.
+       Do NOT "simplify" this into storing the client's blessed SV with
+       a bumped refcount: the old comment's double-DESTROY fear was
+       unfounded (DESTROY fires once when the one blessed RV's refcount
+       hits zero, no matter how many references a job holds), but a
+       strong ref would invert ownership — the connection would stay
+       connected and grabbing jobs, invisibly, for as long as any job
+       is stashed, with no handle left to stop it. The RV is the sole
+       owner; jobs are observers. */
+    self->job_refs++;
+    sv_magicext((SV *)job, NULL, PERL_MAGIC_ext,
+                &ev_gm_job_magic_vtbl, (const char *)self, 0);
 
-    SV *jobref = sv_2mortal(newRV_noinc((SV*)job));
+    /* Owned reference, NOT a mortal: io_cb is a raw libev callback and
+       never runs inside a per-callback Perl scope, so no FREETMPS would
+       ever pop a mortal off the tmps stack — every dispatched job would
+       stay pinned until EV::run returns (i.e. never, for a worker
+       daemon). We release this reference on each exit path below. */
+    SV *jobref = newRV_noinc((SV*)job);
     sv_bless(jobref, gv_stashpv("EV::Gearman::Job", GV_ADD));
 
     /* grab_job mode: caller supplied an explicit cb on the request,
-       deliver the job to it instead of the registered-function path. */
+       deliver the job to it instead of the registered-function path.
+       invoke_cb2 mortalizes its arg, taking ownership of jobref. */
     if (r->cb) {
-        SvREFCNT_inc(jobref);   /* invoke_cb2 mortalizes its arg */
         invoke_cb2(aTHX_ self, r->cb, jobref, NULL);
         worker_continue(aTHX_ self);
         return;
     }
 
     ev_gm_func_t *fn = find_function(self, f, fl);
-    if (!fn) {
+    if (!fn || !fn->cb) {
+        /* A plain can_do() entry records the ability (so reconnect
+           re-sends CAN_DO and grab_job can pull such jobs) but carries
+           no handler; calling it would eat "Not a CODE reference"
+           under G_EVAL and answer every job with a silent WORK_FAIL.
+           Fail loudly (once per function) instead. */
+        if (fn && !fn->no_cb_warned) {
+            fn->no_cb_warned = 1;
+            warn("EV::Gearman: no handler for function '%.*s' "
+                 "(registered via can_do without a callback); "
+                 "use register_function or grab_job", (int)fl, f);
+        }
+        SvREFCNT_dec(jobref);
         send_work_event(aTHX_ self, GM_CMD_WORK_FAIL, h, hl, NULL, 0);
         worker_continue(aTHX_ self);
         return;
@@ -1352,6 +1611,9 @@ static void worker_dispatch_job(pTHX_ ev_gm_t *self, ev_gm_req_t *r,
     PUTBACK;
     FREETMPS; LEAVE;
     self->callback_depth--;
+    /* Release our owned jobref; if the callback stashed the job (async
+       mode) its own reference keeps the job alive. */
+    SvREFCNT_dec(jobref);
 
     if (self->magic == GM_MAGIC_FREED) {
         if (retval) SvREFCNT_dec(retval);
@@ -1453,9 +1715,19 @@ static int parse_admin_response(pTHX_ ev_gm_t *self) {
 
     ngx_queue_remove(&r->queue);
     self->pending_count--;
+    if (ngx_queue_empty(&self->cb_queue)) disarm_cmd_timer(self);
+    else                                arm_cmd_timer(self);
+    /* gearmand's text-protocol error replies are single-line
+       "ERR ..." — deliver them as the error argument, not as a
+       successful result (mirrors the binary ERROR convention). The
+       raw text is kept intact. */
+    int is_err = (!r->admin_terminator && result_len >= 4 &&
+                  memcmp(self->rbuf, "ERR ", 4) == 0);
     /* invoke_cb2 dec's the SV when r->cb is NULL, so build it
        unconditionally and let the helper handle the no-cb case. */
-    invoke_cb2(aTHX_ self, r->cb, newSVpvn(self->rbuf, result_len), NULL);
+    invoke_cb2(aTHX_ self, r->cb,
+               is_err ? NULL : newSVpvn(self->rbuf, result_len),
+               is_err ? newSVpvn(self->rbuf, result_len) : NULL);
     cleanup_req(aTHX_ r);
 
     if (self->magic == GM_MAGIC_FREED) return 1;
@@ -1471,7 +1743,6 @@ static int parse_admin_response(pTHX_ ev_gm_t *self) {
 }
 
 static void process_responses(pTHX_ ev_gm_t *self) {
-    int processed = 0;
     while (self->rbuf_len > 0) {
         /* Binary response packets start with "\0RES"; the text/admin
            protocol never emits a leading NUL, so the first byte is
@@ -1480,7 +1751,17 @@ static void process_responses(pTHX_ ev_gm_t *self) {
 
         if (is_admin) {
             int rv = parse_admin_response(aTHX_ self);
-            if (rv == 0) break;                 /* need more bytes */
+            if (rv == 0) {                      /* need more bytes */
+                /* A broken/hostile peer can stream an unterminated
+                   admin reply forever; without a length prefix there is
+                   no other bound on the accumulation. (rv == 0 implies
+                   the head request is CB_ADMIN.) */
+                if (self->rbuf_len > GM_MAX_ADMIN_RESPONSE) {
+                    handle_disconnect(aTHX_ self, "admin response too large");
+                    return;
+                }
+                break;
+            }
             if (rv < 0) {                       /* protocol error */
                 handle_disconnect(aTHX_ self,
                     "unexpected admin response (queue head is not admin)");
@@ -1488,7 +1769,6 @@ static void process_responses(pTHX_ ev_gm_t *self) {
             }
             if (self->magic == GM_MAGIC_FREED) return;
             if (!self->connected) return;
-            processed++;
             continue;
         }
 
@@ -1516,14 +1796,6 @@ static void process_responses(pTHX_ ev_gm_t *self) {
         self->rbuf_len -= total;
         if (self->rbuf_len > 0)
             memmove(self->rbuf, self->rbuf + total, self->rbuf_len);
-        processed++;
-    }
-
-    if (processed > 0 && self->cmd_timer_active) {
-        if (ngx_queue_empty(&self->cb_queue))
-            disarm_cmd_timer(self);
-        else
-            arm_cmd_timer(self);
     }
 
     /* Fully consumed: release an oversized read buffer (e.g. after a
@@ -1557,8 +1829,18 @@ static void on_readable(pTHX_ ev_gm_t *self) {
 
 static int try_write(ev_gm_t *self) {
     while (self->wbuf_off < self->wbuf_len) {
+        /* MSG_NOSIGNAL where it exists (Linux, NetBSD); elsewhere
+           SO_NOSIGPIPE was set at socket creation. Both are defensive
+           hygiene — the first write to a dead peer normally just
+           returns ECONNRESET — since installing a SIGPIPE handler is
+           the embedder's business, not a library's. */
+#ifdef MSG_NOSIGNAL
+        ssize_t n = send(self->fd, self->wbuf + self->wbuf_off,
+                         self->wbuf_len - self->wbuf_off, MSG_NOSIGNAL);
+#else
         ssize_t n = write(self->fd, self->wbuf + self->wbuf_off,
                           self->wbuf_len - self->wbuf_off);
+#endif
         if (n > 0) self->wbuf_off += n;
         else if (n < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
@@ -1573,6 +1855,92 @@ static int try_write(ev_gm_t *self) {
     return 1;
 }
 
+/* Attempt one non-blocking connect to the candidate at self->ai_cur.
+   Returns 1 when the sequence stops here: the connect either completed
+   synchronously (finish_connect_success already ran) or is in flight
+   (EINPROGRESS; on_connect_complete finishes it). Returns 0 on
+   immediate failure with errbuf filled; the caller advances. */
+static int connect_attempt(pTHX_ ev_gm_t *self, char *errbuf, size_t errbuf_size) {
+    struct addrinfo *ai = self->ai_cur;
+    int fd, ret;
+
+#ifdef SOCK_CLOEXEC
+    fd = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol);
+    if (fd < 0 && errno == EINVAL)  /* old kernels: fall back */
+        fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+#else
+    fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+#endif
+    if (fd < 0) {
+        snprintf(errbuf, errbuf_size, "socket: %s", strerror(errno));
+        return 0;
+    }
+    if (gm_set_socket_flags(fd) < 0) {
+        close(fd);
+        snprintf(errbuf, errbuf_size, "fcntl set socket flags failed");
+        return 0;
+    }
+    int one = 1;
+    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+    self->fd = fd;
+    ret = connect(fd, ai->ai_addr, ai->ai_addrlen);
+
+    /* Watcher init is the same for the immediate-success, EINPROGRESS
+       and immediate-failure branches; only ev_io_start (via start_*)
+       differs. Init'd-but-not-started watchers are inert, so it is
+       safe to run this even in the failure branch which closes the fd. */
+    ev_io_init(&self->rio, io_cb, self->fd, EV_READ);
+    self->rio.data = (void *)self;
+    ev_io_init(&self->wio, io_cb, self->fd, EV_WRITE);
+    self->wio.data = (void *)self;
+    ev_set_priority(&self->rio, self->priority);
+    ev_set_priority(&self->wio, self->priority);
+
+    if (ret == 0) {
+        clear_addrinfo(self);
+        stop_connect_timer(self);
+        self->connected = 1;
+        finish_connect_success(aTHX_ self);
+        return 1;
+    }
+    if (errno != EINPROGRESS) {
+        snprintf(errbuf, errbuf_size, "connect: %s", strerror(errno));
+        close(self->fd);
+        self->fd = -1;
+        return 0;
+    }
+    self->connecting = 1;
+    start_writing(self);
+
+    /* Armed only on the first async candidate: the timeout bounds the
+       whole candidate sequence, not each individual attempt. */
+    if (!self->connect_timer_active && self->connect_timeout_ms > 0) {
+        ev_tstamp delay = (ev_tstamp)self->connect_timeout_ms / 1000.0;
+        ev_timer_init(&self->connect_timer, connect_timeout_cb, delay, 0.0);
+        self->connect_timer.data = (void *)self;
+        ev_timer_start(self->loop, &self->connect_timer);
+        self->connect_timer_active = 1;
+    }
+    return 1;
+}
+
+/* Walk candidates from self->ai_cur onward until one connects (or is
+   in flight). prev_err is the failure text of the candidate that just
+   failed; when the list runs out, report the most recent error and
+   let the reconnect logic run. */
+static void connect_try_from(pTHX_ ev_gm_t *self, const char *prev_err) {
+    char errbuf[160];
+    snprintf(errbuf, sizeof(errbuf), "%s", prev_err);
+    while (self->ai_cur) {
+        if (connect_attempt(aTHX_ self, errbuf, sizeof(errbuf)))
+            return;
+        self->ai_cur = self->ai_cur->ai_next;
+    }
+    stop_connect_timer(self);
+    clear_addrinfo(self);
+    report_connect_error(aTHX_ self, errbuf);
+}
+
 static void on_connect_complete(pTHX_ ev_gm_t *self) {
     int err = 0;
     socklen_t len = sizeof(err);
@@ -1584,18 +1952,25 @@ static void on_connect_complete(pTHX_ ev_gm_t *self) {
         self->fd = -1;
         self->connecting = 0;
         stop_writing(self);
-        stop_connect_timer(self);
-        report_connect_error(aTHX_ self, errbuf);
+        /* Fall through to the next resolved address, if any (e.g. a
+           dual-stack 'localhost' refusing ::1 while 127.0.0.1 would
+           answer). The connect timer keeps running; on exhaustion
+           connect_try_from stops it and reports the last error. */
+        if (self->ai_cur)
+            self->ai_cur = self->ai_cur->ai_next;
+        connect_try_from(aTHX_ self, errbuf);
         return;
     }
     self->connecting = 0;
     self->connected = 1;
     stop_writing(self);
     stop_connect_timer(self);
+    clear_addrinfo(self);
     finish_connect_success(aTHX_ self);
 }
 
 static void io_cb(EV_P_ ev_io *w, int revents) {
+    dTHX;
     ev_gm_t *self = (ev_gm_t *)w->data;
     (void)loop;
     if (self->magic != GM_MAGIC_ALIVE) return;
@@ -1637,37 +2012,7 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
 static void start_connect(pTHX_ ev_gm_t *self) {
     int fd, ret;
 
-    if (self->path) {
-        struct sockaddr_un addr;
-        memset(&addr, 0, sizeof(addr));
-        addr.sun_family = AF_UNIX;
-        if (strlen(self->path) >= sizeof(addr.sun_path)) {
-            emit_error(aTHX_ self, "unix socket path too long");
-            return;
-        }
-        strncpy(addr.sun_path, self->path, sizeof(addr.sun_path) - 1);
-
-#ifdef SOCK_CLOEXEC
-        fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-        if (fd < 0 && errno == EINVAL)  /* old kernels: fall back */
-            fd = socket(AF_UNIX, SOCK_STREAM, 0);
-#else
-        fd = socket(AF_UNIX, SOCK_STREAM, 0);
-#endif
-        if (fd < 0) {
-            char errbuf[128];
-            snprintf(errbuf, sizeof(errbuf), "socket: %s", strerror(errno));
-            emit_error(aTHX_ self, errbuf);
-            return;
-        }
-        if (gm_set_socket_flags(fd) < 0) {
-            close(fd);
-            emit_error(aTHX_ self, "fcntl set socket flags failed");
-            return;
-        }
-        self->fd = fd;
-        ret = connect(fd, (struct sockaddr *)&addr, sizeof(addr));
-    } else {
+    if (!self->path) {
         struct addrinfo hints, *res = NULL;
         char port_str[16];
         snprintf(port_str, sizeof(port_str), "%d", self->port);
@@ -1682,31 +2027,48 @@ static void start_connect(pTHX_ ev_gm_t *self) {
             report_connect_error(aTHX_ self, errbuf);
             return;
         }
+        /* Try every resolved address in turn: a dual-stack 'localhost'
+           typically resolves to ::1 first, which a gearmand bound to
+           127.0.0.1 will refuse — the fallback list is the only way
+           such a host stays reachable by name. */
+        clear_addrinfo(self);
+        self->ai_list = res;
+        self->ai_cur = res;
+        connect_try_from(aTHX_ self, "connect: no resolved addresses");
+        return;
+    }
+
+    /* Unix-domain socket: a single fixed address, no fallback list. */
+    {
+        struct sockaddr_un addr;
+        memset(&addr, 0, sizeof(addr));
+        addr.sun_family = AF_UNIX;
+        if (strlen(self->path) >= sizeof(addr.sun_path)) {
+            report_connect_error(aTHX_ self, "unix socket path too long");
+            return;
+        }
+        strncpy(addr.sun_path, self->path, sizeof(addr.sun_path) - 1);
+
 #ifdef SOCK_CLOEXEC
-        fd = socket(res->ai_family, res->ai_socktype | SOCK_CLOEXEC, res->ai_protocol);
-        if (fd < 0 && errno == EINVAL)
-            fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+        if (fd < 0 && errno == EINVAL)  /* old kernels: fall back */
+            fd = socket(AF_UNIX, SOCK_STREAM, 0);
 #else
-        fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        fd = socket(AF_UNIX, SOCK_STREAM, 0);
 #endif
         if (fd < 0) {
-            freeaddrinfo(res);
             char errbuf[128];
             snprintf(errbuf, sizeof(errbuf), "socket: %s", strerror(errno));
             report_connect_error(aTHX_ self, errbuf);
             return;
         }
         if (gm_set_socket_flags(fd) < 0) {
-            freeaddrinfo(res);
             close(fd);
-            emit_error(aTHX_ self, "fcntl set socket flags failed");
+            report_connect_error(aTHX_ self, "fcntl set socket flags failed");
             return;
         }
-        int one = 1;
-        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
         self->fd = fd;
-        ret = connect(fd, res->ai_addr, res->ai_addrlen);
-        freeaddrinfo(res);
+        ret = connect(fd, (struct sockaddr *)&addr, sizeof(addr));
     }
 
     /* Watcher init is the same for the immediate-success and
@@ -1780,8 +2142,6 @@ MODULE = EV::Gearman  PACKAGE = EV::Gearman
 BOOT:
 {
     I_EV_API("EV::Gearman");
-    err_disconnected = newSVpvs("disconnected");
-    SvREADONLY_on(err_disconnected);
 }
 
 EV::Gearman
@@ -1846,7 +2206,40 @@ CODE:
         }
         else if (strEQ(k, "grab_unique"))               RETVAL->worker_grab_uniq = SvTRUE(v) ? 1 : 0;
         else if (strEQ(k, "loop")) {
-            RETVAL->loop = (struct ev_loop *)SvPVX(SvRV(v));
+            if (!SvROK(v) || !sv_derived_from(v, "EV::Loop")) {
+                Safefree(RETVAL->rbuf);
+                Safefree(RETVAL->wbuf);
+                CLEAR_HANDLER(RETVAL->on_error);
+                CLEAR_HANDLER(RETVAL->on_connect);
+                CLEAR_HANDLER(RETVAL->on_disconnect);
+                CLEAR_HANDLER(RETVAL->loop_sv);
+                if (RETVAL->client_id) Safefree(RETVAL->client_id);
+                Safefree(RETVAL);
+                croak("loop => must be an EV::Loop object");
+            }
+            /* An EV::Loop object is a blessed scalar holding the
+               struct ev_loop pointer in its IV slot (T_PTROBJ style);
+               the PV slot is NULL, so SvPVX would read garbage. */
+            RETVAL->loop = INT2PTR(struct ev_loop *, SvIV(SvRV(v)));
+            /* Hold a strong ref so the loop outlives the client even
+               when the caller drops their own reference to it. */
+            CLEAR_HANDLER(RETVAL->loop_sv);
+            RETVAL->loop_sv = newSVsv(v);
+        }
+        else {
+            /* An unknown key is almost always a typo ("reconect") that
+               would silently leave the intended option unset — fail
+               loudly. Tear the partial object down exactly like the
+               loop-validation branch above. */
+            Safefree(RETVAL->rbuf);
+            Safefree(RETVAL->wbuf);
+            CLEAR_HANDLER(RETVAL->on_error);
+            CLEAR_HANDLER(RETVAL->on_connect);
+            CLEAR_HANDLER(RETVAL->on_disconnect);
+            CLEAR_HANDLER(RETVAL->loop_sv);
+            if (RETVAL->client_id) Safefree(RETVAL->client_id);
+            Safefree(RETVAL);
+            croak("EV::Gearman: unknown constructor option '%s'", k);
         }
     }
 
@@ -1856,6 +2249,7 @@ CODE:
         CLEAR_HANDLER(RETVAL->on_error);
         CLEAR_HANDLER(RETVAL->on_connect);
         CLEAR_HANDLER(RETVAL->on_disconnect);
+        CLEAR_HANDLER(RETVAL->loop_sv);
         if (RETVAL->client_id) Safefree(RETVAL->client_id);
         Safefree(RETVAL);
         croak("cannot specify both 'host' and 'path'");
@@ -1906,7 +2300,7 @@ CODE:
             ev_gm_req_t *r = ngx_queue_data(q, ev_gm_req_t, queue);
             ngx_queue_remove(q);
             if (r->cb)
-                invoke_cb2(aTHX_ self, r->cb, NULL, newSVsv(err_disconnected));
+                invoke_cb2(aTHX_ self, r->cb, NULL, newSVpvs("disconnected"));
             cleanup_req(aTHX_ r);
         }
         while (!ngx_queue_empty(&self->active_jobs)) {
@@ -1915,7 +2309,7 @@ CODE:
             ngx_queue_remove(q);
             self->active_count_cached--;
             if (a->on_complete)
-                invoke_cb2(aTHX_ self, a->on_complete, NULL, newSVsv(err_disconnected));
+                invoke_cb2(aTHX_ self, a->on_complete, NULL, newSVpvs("disconnected"));
             cleanup_active(aTHX_ a);
         }
         while (!ngx_queue_empty(&self->wait_queue)) {
@@ -1923,13 +2317,15 @@ CODE:
             ev_gm_wait_t *w = ngx_queue_data(q, ev_gm_wait_t, queue);
             ngx_queue_remove(q);
             if (w->req && w->req->cb)
-                invoke_cb2(aTHX_ self, w->req->cb, NULL, newSVsv(err_disconnected));
+                invoke_cb2(aTHX_ self, w->req->cb, NULL, newSVpvs("disconnected"));
             cleanup_wait(aTHX_ w);
         }
         DRAIN_QUEUE_SILENT(&self->functions, ev_gm_func_t, cleanup_func);
         self->pending_count = 0;
         self->waiting_count = 0;
         self->active_count_cached = 0;
+        clear_addrinfo(self);
+        CLEAR_HANDLER(self->loop_sv);
         CLEAR_HANDLER(self->on_error);
         CLEAR_HANDLER(self->on_connect);
         CLEAR_HANDLER(self->on_disconnect);
@@ -1949,9 +2345,9 @@ CODE:
 
     if (!PL_dirty) {
         self->callback_depth++;
-        cancel_pending(aTHX_ self, err_disconnected);
-        cancel_active(aTHX_ self, err_disconnected);
-        cancel_waiting(aTHX_ self, err_disconnected);
+        cancel_pending(aTHX_ self, "disconnected");
+        cancel_active(aTHX_ self, "disconnected");
+        cancel_waiting(aTHX_ self, "disconnected");
         self->callback_depth--;
     } else {
         DRAIN_QUEUE_SILENT(&self->cb_queue,    ev_gm_req_t,    cleanup_req);
@@ -1962,16 +2358,22 @@ CODE:
     DRAIN_QUEUE_SILENT(&self->functions, ev_gm_func_t, cleanup_func);
 
     self->magic = GM_MAGIC_FREED;
+    CLEAR_HANDLER(self->loop_sv);
     CLEAR_HANDLER(self->on_error);
     CLEAR_HANDLER(self->on_connect);
     CLEAR_HANDLER(self->on_disconnect);
     CLEAR_HANDLER(self->worker_on_idle);
-    Safefree(self->host);
-    Safefree(self->path);
-    Safefree(self->client_id);
-    Safefree(self->rbuf);
-    Safefree(self->wbuf);
-    Safefree(self);
+    /* NULL after free: with jobs outstanding the struct survives as an
+       inert tombstone (freed by the last job's svt_free via
+       check_destroyed), so no dangling bytes may linger in it. */
+    Safefree(self->host);      self->host = NULL;
+    Safefree(self->path);      self->path = NULL;
+    Safefree(self->client_id); self->client_id = NULL;
+    Safefree(self->rbuf);      self->rbuf = NULL;
+    Safefree(self->wbuf);      self->wbuf = NULL;
+    /* Depth is 0 in this branch, so this frees iff no job holds a
+       tombstone reference; otherwise the last job release does. */
+    (void)check_destroyed(self);
 }
 
 void
@@ -2010,7 +2412,7 @@ CODE:
     if (self->connected || self->connecting) {
         handle_disconnect(aTHX_ self, NULL);
     } else {
-        cancel_waiting(aTHX_ self, err_disconnected);
+        cancel_waiting(aTHX_ self, "disconnected");
     }
     self->callback_depth--;
     check_destroyed(self);
@@ -2056,6 +2458,16 @@ PPCODE:
     mPUSHu(self->wbuf_cap);
 }
 
+# Internal: number of live EV::Gearman::Job objects holding a tombstone
+# reference on this connection. Used by the test suite to assert that
+# dispatched-then-dropped jobs accumulate nothing. Not public API.
+int
+_job_refs(EV::Gearman self)
+CODE:
+    RETVAL = self->job_refs;
+OUTPUT:
+    RETVAL
+
 SV *
 on_error(EV::Gearman self, ...)
 CODE:
@@ -2087,6 +2499,7 @@ CODE:
     GM_CROAK_UNLESS_ALIVE(self);
     STRLEN dlen;
     const char *data = SvPV(data_sv, dlen);
+    gm_check_size(aTHX_ dlen);   /* parity with submit/epoch */
     ev_gm_req_t *r = alloc_req(CB_ECHO, cb_sv);
     enqueue_packet(aTHX_ self, GM_CMD_ECHO_REQ, data, dlen, r);
 }
@@ -2234,6 +2647,15 @@ CODE:
         existing->timeout = timeout;
     }
     send_can_do(aTHX_ self, fname, flen, timeout);
+
+    /* If the worker is idle (asleep after NO_JOB), gearmand won't wake us
+       for jobs already queued under this new ability — it only NOOPs on
+       fresh submissions. Poll once so that backlog isn't stranded; a
+       spurious poll is harmless (NO_JOB just re-sleeps). */
+    if (self->worker_active && self->worker_sleeping) {
+        self->worker_sleeping = 0;
+        worker_continue(aTHX_ self);
+    }
 }
 
 void
@@ -2281,6 +2703,7 @@ CODE:
         existing->cb = newSVsv(cb_sv);
         existing->async = async ? 1 : 0;
         existing->timeout = timeout;
+        existing->no_cb_warned = 0;
     } else {
         ev_gm_func_t *f;
         Newxz(f, 1, ev_gm_func_t);
@@ -2292,6 +2715,12 @@ CODE:
     }
 
     send_can_do(aTHX_ self, name, nlen, timeout);
+
+    /* Wake an idle worker to grab the new ability's backlog (see can_do). */
+    if (self->worker_active && self->worker_sleeping) {
+        self->worker_sleeping = 0;
+        worker_continue(aTHX_ self);
+    }
 }
 
 void
@@ -2363,19 +2792,34 @@ CODE:
     if (items > 2 && SvOK(ST(items-1)) && SvROK(ST(items-1)) && SvTYPE(SvRV(ST(items-1))) == SVt_PVCV)
         cb = ST(items-1);
 
-    /* Multi-line admin commands terminate with ".\n"; single-line ones don't. */
+    /* Multi-line admin commands terminate with ".\n"; single-line ones
+       don't (gearmand 1.1.21):
+         multi-line: status, workers, prioritystatus — arguments are
+                     ignored by the server and the reply stays
+                     multi-line, so these match on the leading word;
+                     "show jobs", "show unique jobs" — no-argument
+                     forms only (with extra arguments the server
+                     answers a single-line ERR UNKNOWN_SHOW_ARGUMENTS,
+                     so they must only match exactly);
+         single-line: version, getpid, verbose, maxqueue F N,
+                     cancel job H, create function, drop function, and
+                     anything unrecognized (a one-line ERR). */
     int multi = 0;
     /* Strip trailing whitespace for matching */
     size_t cl = clen;
     while (cl > 0 && (cmd[cl-1] == '\n' || cmd[cl-1] == ' ' || cmd[cl-1] == '\t' || cmd[cl-1] == '\r'))
         cl--;
-    if ((cl ==  6 && memcmp(cmd, "status",         6) == 0) ||
-        (cl ==  7 && memcmp(cmd, "workers",        7) == 0) ||
-        (cl == 14 && memcmp(cmd, "prioritystatus", 14) == 0))
-        multi = 1;
-    /* "shutdown" / "shutdown graceful" => single line ("OK\n" then disconnect) */
-    /* "version" => single line */
-    /* "maxqueue X N" => "OK\n" */
+    /* leading-word match with a word boundary, so "status quo" counts
+       but "statusquo" does not */
+#define GM_ADMIN_WORD(c, l, w) \
+    (l >= sizeof(w) - 1 && memcmp(c, w, sizeof(w) - 1) == 0 && \
+     (l == sizeof(w) - 1 || c[sizeof(w) - 1] == ' ' || c[sizeof(w) - 1] == '\t'))
+    multi = GM_ADMIN_WORD(cmd, cl, "status")
+         || GM_ADMIN_WORD(cmd, cl, "workers")
+         || GM_ADMIN_WORD(cmd, cl, "prioritystatus")
+         || (cl ==  9 && memcmp(cmd, "show jobs",        9) == 0)
+         || (cl == 16 && memcmp(cmd, "show unique jobs", 16) == 0);
+#undef GM_ADMIN_WORD
 
     /* Build full text command (must end in \n) */
     char *txt;

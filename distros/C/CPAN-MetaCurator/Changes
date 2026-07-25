@@ -1,5 +1,17 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.27  2026-07-14
+	- Add scripts/parse.metacpan.recent.pl & some input in html/*.html, saved from MetaCPAN Recent.
+		This is part of catching up with 2 weeks of new releases starting on 2026-07-14 which I missed.
+	- Use the following to generate a new LICENSE file
+	- software-license --type license --holder "Ron Savage" --license Perl_5 --year 2026 > LICENSE
+	- Replace Moo with Mew.
+	- Remove page_name=html/cpan.metacurator.tree.html from data/cpan.metacurator.constants.csv
+		because it is also specified in scripts/export.tree.pl.
+	- In export.pl & Export.pm rename output_path to jstree_html_path.
+	- Allow the DAG_Node::Tree to be written to disk via the param dag_nodetree_path.
+	- Start processing notes per module after the 3 basic lines per module.
+
 1.26  2026-07-07
 	- Start walking the tree. Node ids will be used to generate forward & backward references
 		from a topic in a See also to the actual node, which can then be made the current node

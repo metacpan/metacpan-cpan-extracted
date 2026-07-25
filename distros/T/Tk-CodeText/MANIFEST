@@ -17,6 +17,8 @@ t/5-Tk-CodeText-Theme.t
 t/6-Bench
 t/color_history
 t/lib/BenchCodeText.pm
+t/patchtst.diff
+t/patchtst.txt
 t/ref_file.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

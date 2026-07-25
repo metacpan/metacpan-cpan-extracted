@@ -2,11 +2,10 @@ package Mail::DMARC::Report::Receive;
 use strict;
 use warnings;
 use feature 'signatures';
-no warnings 'experimental::signatures';    ## no critic (ProhibitNoWarnings)
 use feature 'try';
 no warnings 'experimental::try';    ## no critic (ProhibitNoWarnings)
 
-our $VERSION = '2.20260621';
+our $VERSION = '2.20260724';
 
 use Carp;
 use Data::Dumper;
@@ -483,7 +482,7 @@ Mail::DMARC::Report::Receive - process incoming DMARC reports
 
 =head1 VERSION
 
-version 2.20260621
+version 2.20260724
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,8 @@
+2.49  2026-07-24
+
+  - Validate slice function and bracket-slice arguments consistently.
+  - Bump module version to 2.49.
+
 2.48  2026-07-19
 
   - Fix comparisons evaluated against values produced by pipe filters.

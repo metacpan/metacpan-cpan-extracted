@@ -16,7 +16,7 @@ ok(EV::Gearman->can($_), "method $_") for qw(
     can_do cant_do reset_abilities
     register_function unregister_function
     work work_one work_stop grab_job all_yours
-    admin server_status server_workers server_version maxqueue shutdown_server
+    admin server_status server_workers server_version maxqueue
     on_error on_connect on_disconnect
     pending_count waiting_count active_count
     connect_timeout command_timeout reconnect priority keepalive

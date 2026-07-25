@@ -1,12 +1,58 @@
 Revision history for Perl extension Catalyst::View::Wkhtmltopdf.
 
-0.5.2
+v0.6.1    2026-07-25 09:14:21+01:00 Europe/London
+  [Security]
+    - Improved validation and sanitization of arguments, as the fix for CVE-2026-16766 was incomplete.
+
+  [Documentation]
+    - Recorganised sections, and include the STATUS section in the README.
+
+    - Updated SECURITY CONSIDERATIONS.
+
+    - Updated the documentation for Pod::Weaver.
+
+    - Fixed typos.
+
+  [Tests]
+    - Tests are skipped when wkhtmltopdf is not in the path.
+
+v0.6.0    2026-07-24 14:58:58+01:00 Europe/London
+  [Security]
+    - Fix potential shell command injection from arguments (CVE-2026-16766).
+
+  [Enhancements]
+    - Return a filehandle instead of the PDF contents
+
+    - The command attribute was changed to use File::Which to guess the patch of wkhtmltopdf.
+
+    - Added support for additional options. (See documentation)
+
+    - Internal code improvements.
+
+    - The HTML is read as raw bytes.
+
+  [Documentation]
+    - Updated AUTHOR with maintainer.
+
+    - Added STATUS and SECURITY CONSIDERATIONS sections about wkhtmltopdf no longer being maintained.
+
+    - Updated the link to the wkhtmltopdf project.
+
+    - Documented release dates in Changes.
+
+  [Tests]
+    - Added simple test.
+
+  [Toolchain]
+    - Revised Dist::Zilla configuration.
+
+0.5.2 2012-07-25
     - Fixed error in documentation (default stash key was wrong)
 
-0.5.1
+0.5.1 2012-02-22
     - Typos
 
-0.5.0
+0.5.0 2012-02-22
     - Factored out rendering to render(), which can also be called
       directly to get PDF in a variable instead of outputting it
     - Default tmpdir is now guessed through File::Spec instead
@@ -16,16 +62,16 @@ Revision history for Perl extension Catalyst::View::Wkhtmltopdf.
     - Switch to semantic versioning
     - Fixed bugs here and there
 
-0.0004
+0.0004 2011-05-06
     - Fixed bug if passing a TT template (jegade)
     - Add "orientation" option (jegade)
 
-0.0003
+0.0003 2011-04-02
     - Changed a // to || so now the lib works on perl 5.8.x as well
 
-0.0002
+0.0002 2011-03-15
     - remove a 0 from version number ;-)
     - fix doc
 
-0.00001  Mon Mar 14 2011
+0.00001 2011-03-14
     - original version

@@ -16,11 +16,11 @@ OSLV::Monitor::Backends::FreeBSD - backend for FreeBSD jails
 
 =head1 VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 =cut
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 =head1 SYNOPSIS
 
@@ -155,8 +155,11 @@ sub run {
 				'reading proc cache "' . $self->{proc_cache} . '" failed... using a empty one...' . $@
 			);
 			$data->{cache_failure} = 1;
-			$proc_cache = {};
-			return $data;
+			# treat a corrupt/truncated cache as a fresh one so this run
+			# regenerates and overwrites it with valid data instead of getting
+			# permanently stuck on the bad file
+			$proc_cache   = {};
+			$cache_is_new = 1;
 		} ## end if ($@)
 	} else {
 		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
@@ -243,6 +246,14 @@ sub run {
 
 					if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
 						warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run done clone($base_stats) done' );
+					}
+
+					# record the jail's root path as reported by jls
+					if (   defined( $jls_jail->{path} )
+						&& ref( $jls_jail->{path} ) eq ''
+						&& $jls_jail->{path} ne '' )
+					{
+						push( @{ $data->{oslvms}{$jname}{path} }, $jls_jail->{path} );
 					}
 
 					# finds each ip ifconfig shows in a jail
@@ -436,6 +447,13 @@ sub run {
 						. '' );
 			}
 			foreach my $proc ( @{ $ps->{'process-information'}{process} } ) {
+				# skip the kernel idle process... on a multi-core system its
+				# per-CPU idle threads make ps report roughly ncpu*100% for
+				# percent-cpu, which would otherwise be summed in and wildly
+				# inflate the reported jail/total CPU usage
+				if ( defined( $proc->{command} ) && $proc->{command} eq '[idle]' ) {
+					next;
+				}
 				if ( $proc->{'elapsed-times'} ne '-' ) {
 					my $cache_name
 						= $proc->{pid} . '-' . $proc->{uid} . '-' . $proc->{gid} . '-' . $jail . '-' . $proc->{command};
@@ -459,7 +477,7 @@ sub run {
 								$seconds
 									= $seconds + ( 3600 * $time_split[0] ) + ( 60 * $time_split[1] ) + $time_split[2];
 							} else {
-								$seconds = $seconds + ( 60 * $time_split[1] ) + $time_split[1];
+								$seconds = $seconds + ( 60 * $time_split[0] ) + $time_split[1];
 							}
 							$stat_value = $seconds;
 							$proc->{$stat} = $stat_value;
@@ -468,11 +486,27 @@ sub run {
 						if ( looks_like_number($stat_value) ) {
 							if ( $counters->{$stat} ) {
 								if (   defined( $proc_cache->{$cache_name} )
-									&& defined( $proc_cache->{$cache_name}{$stat} ) )
+									&& defined( $proc_cache->{$cache_name}{$stat} )
+									&& $stat_value >= $proc_cache->{$cache_name}{$stat} )
 								{
 									$stat_value = ( $stat_value - $proc_cache->{$cache_name}{$stat} ) / 300;
-								} else {
+								} elsif ( defined( $proc_cache->{$cache_name} )
+									&& defined( $proc_cache->{$cache_name}{$stat} ) )
+								{
+									# the counter went backwards (reset/PID reuse), so the raw
+									# value is what has accrued since then
 									$stat_value = $stat_value / 300;
+								} elsif ( looks_like_number( $proc->{'elapsed-times'} )
+									&& $proc->{'elapsed-times'} <= 300 )
+								{
+									# no cached previous value, but the proc is younger than the
+									# polling interval, so the total accrued is from this interval
+									$stat_value = $stat_value / 300;
+								} else {
+									# a old proc with no cached previous value, so zero it to
+									# avoid a spike from the accumulated total... the raw values
+									# cached below provide the delta for the next run
+									$stat_value = 0;
 								}
 								$data->{oslvms}{$jail}{$stat}
 									= $data->{oslvms}{$jail}{$stat} + $stat_value;
@@ -504,7 +538,9 @@ sub run {
 				. $self->{proc_cache}
 				. '"' );
 	}
-	eval { write_file( $self->{proc_cache}, encode_json($new_proc_cache) ); };
+	# written atomically so an interrupted write cannot leave behind a
+	# truncated/empty cache file
+	eval { write_file( $self->{proc_cache}, { atomic => 1 }, encode_json($new_proc_cache) ); };
 	if ($@) {
 		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
 			warn(     'DEBUG, '

@@ -33,7 +33,22 @@ static void nda_boot_pdl(pTHX) {
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::NDArray::Shared")) \
         croak("Expected a Data::NDArray::Shared object"); \
     NdaHandle *h = INT2PTR(NdaHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::NDArray::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::NDArray::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h.
+ * The same Perl can also REPLACE the invocant ($obj = 42 mutates ST(0),
+ * because Perl passes aliases), hence the SvROK re-check before SvRV. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::NDArray::Shared object was replaced during the call"); \
+    h = INT2PTR(NdaHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::NDArray::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -45,21 +60,43 @@ static void nda_boot_pdl(pTHX) {
  * Typed element get: read element e of dtype dt, return the dtype-correct SV
  * (float -> newSVnv, signed -> newSViv, unsigned -> newSVuv).
  * ---------------------------------------------------------------- */
-static SV *nda_get_sv(pTHX_ NdaHandle *h, uint64_t e) {
-    char *base = nda_data(h);
-    switch (h->hdr->dtype) {
-        case NDA_F64: { double   v; memcpy(&v, base + e*8, 8); return newSVnv(v); }
-        case NDA_F32: { float    v; memcpy(&v, base + e*4, 4); return newSVnv((double)v); }
-        case NDA_I64: { int64_t  v; memcpy(&v, base + e*8, 8); return newSViv((IV)v); }
-        case NDA_I32: { int32_t  v; memcpy(&v, base + e*4, 4); return newSViv((IV)v); }
-        case NDA_I16: { int16_t  v; memcpy(&v, base + e*2, 2); return newSViv((IV)v); }
-        case NDA_I8:  { int8_t   v = (int8_t)base[e];          return newSViv((IV)v); }
-        case NDA_U64: { uint64_t v; memcpy(&v, base + e*8, 8); return newSVuv((UV)v); }
-        case NDA_U32: { uint32_t v; memcpy(&v, base + e*4, 4); return newSVuv((UV)v); }
-        case NDA_U16: { uint16_t v; memcpy(&v, base + e*2, 2); return newSVuv((UV)v); }
-        case NDA_U8:  { uint8_t  v = (uint8_t)base[e];         return newSVuv((UV)v); }
+static uint32_t nda_dtype_bytes(int dt) {
+    switch (dt) {
+        case NDA_F64: case NDA_I64: case NDA_U64: return 8;
+        case NDA_F32: case NDA_I32: case NDA_U32: return 4;
+        case NDA_I16: case NDA_U16:               return 2;
+        default:                                  return 1;   /* I8 / U8 */
+    }
+}
+
+/* Copy element e's raw bytes into buf (caller holds a lock).  Building the SV is
+   deferred to nda_sv_from_raw so a croak-capable alloc never runs under the lock
+   (an OOM longjmp there would strand this process's read lock -> writers hang). */
+static void nda_read_raw(NdaHandle *h, uint64_t e, char buf[8]) {
+    uint32_t nb = nda_dtype_bytes(h->dtype);   /* cached: peer hdr->dtype must not resize the element */
+    memcpy(buf, nda_data(h) + e * nb, nb);
+}
+
+/* Build an SV from raw element bytes (NO lock needed). */
+static SV *nda_sv_from_raw(pTHX_ int dtype, const char *buf) {
+    switch (dtype) {
+        case NDA_F64: { double   v; memcpy(&v, buf, 8); return newSVnv(v); }
+        case NDA_F32: { float    v; memcpy(&v, buf, 4); return newSVnv((double)v); }
+        case NDA_I64: { int64_t  v; memcpy(&v, buf, 8); return newSViv((IV)v); }
+        case NDA_I32: { int32_t  v; memcpy(&v, buf, 4); return newSViv((IV)v); }
+        case NDA_I16: { int16_t  v; memcpy(&v, buf, 2); return newSViv((IV)v); }
+        case NDA_I8:  { int8_t   v = (int8_t)buf[0];    return newSViv((IV)v); }
+        case NDA_U64: { uint64_t v; memcpy(&v, buf, 8); return newSVuv((UV)v); }
+        case NDA_U32: { uint32_t v; memcpy(&v, buf, 4); return newSVuv((UV)v); }
+        case NDA_U16: { uint16_t v; memcpy(&v, buf, 2); return newSVuv((UV)v); }
+        case NDA_U8:  { uint8_t  v = (uint8_t)buf[0];   return newSVuv((UV)v); }
     }
     return newSViv(0);
+}
+
+/* Read + build in one step (only for callers that already build after unlock). */
+static SV *nda_get_sv(pTHX_ NdaHandle *h, uint64_t e) {
+    char buf[8]; nda_read_raw(h, e, buf); return nda_sv_from_raw(aTHX_ h->dtype, buf);
 }
 
 /* ----------------------------------------------------------------
@@ -95,7 +132,7 @@ static void nda_store_bytes(NdaHandle *h, uint64_t e, const char *enc, uint32_t 
 /* Splat pre-encoded bytes across every element (call under the write lock).
  * The croak-prone numeric conversion is done by nda_encode BEFORE locking. */
 static void nda_fill_bytes(NdaHandle *h, const char *enc, uint32_t nb) {
-    uint64_t size = h->hdr->size, e;
+    uint64_t size = h->size, e;   /* cached immutable count, not peer hdr->size */
     char *base = nda_data(h);
     if (nb == 1) { memset(base, (unsigned char)enc[0], (size_t)size); return; }
     for (e = 0; e < size; e++) memcpy(base + e * nb, enc, nb);
@@ -131,25 +168,26 @@ static void nda_read_scalar(pTHX_ uint8_t dt, SV *sv, double *s, int64_t *siv, u
     else *suv = SvUV(sv);
 }
 static void nda_scalar_op_locked(NdaHandle *h, double s, int64_t siv, uint64_t suv, int op) {
-    uint64_t size = h->hdr->size, e;
+    uint64_t size = h->size, e;   /* cached immutable count, not peer hdr->size */
     char *base = nda_data(h);
-    if (nda_is_float(h->hdr->dtype)) {
-        if (h->hdr->dtype == NDA_F64) {
+    uint32_t dt = h->dtype;   /* cached: peer hdr->dtype must not resize the element */
+    if (nda_is_float(dt)) {
+        if (dt == NDA_F64) {
             double *p = (double *)base;
             if (op == '+') for (e=0;e<size;e++) p[e] += s; else for (e=0;e<size;e++) p[e] *= s;
         } else { /* F32 */
             float *p = (float *)base; float fs = (float)s;
             if (op == '+') for (e=0;e<size;e++) p[e] += fs; else for (e=0;e<size;e++) p[e] *= fs;
         }
-    } else if (nda_is_signed(h->hdr->dtype)) {
-        switch (h->hdr->dtype) {
+    } else if (nda_is_signed(dt)) {
+        switch (dt) {
             case NDA_I64: NDA_SCALAR_INT(int64_t, uint64_t); break;
             case NDA_I32: NDA_SCALAR_INT(int32_t, uint32_t); break;
             case NDA_I16: NDA_SCALAR_INT(int16_t, uint32_t); break;
             case NDA_I8:  NDA_SCALAR_INT(int8_t,  uint32_t); break;
         }
     } else {
-        switch (h->hdr->dtype) {
+        switch (dt) {
             case NDA_U64: NDA_SCALAR_UINT(uint64_t, uint64_t); break;
             case NDA_U32: NDA_SCALAR_UINT(uint32_t, uint32_t); break;
             case NDA_U16: NDA_SCALAR_UINT(uint16_t, uint32_t); break;
@@ -179,10 +217,10 @@ static void nda_scalar_op_locked(NdaHandle *h, double s, int64_t siv, uint64_t s
 } while (0)
 
 static void nda_elementwise_op_locked(NdaHandle *a, NdaHandle *b, int op) {
-    uint64_t size = a->hdr->size, e;
+    uint64_t size = a->size, e;   /* cached immutable count (== b->size, checked), not peer hdr->size */
     char *da = nda_data(a);
     const char *db = nda_data(b);
-    switch (a->hdr->dtype) {
+    switch (a->dtype) {   /* cached: peer hdr->dtype must not resize the element */
         case NDA_F64: NDA_EW_FLT(double);   break;
         case NDA_F32: NDA_EW_FLT(float);    break;
         case NDA_I64: NDA_EW_INT(int64_t,  uint64_t); break;
@@ -224,16 +262,21 @@ static void nda_unlock_pair(NdaHandle *a, NdaHandle *b) {
  * deadlock-free id order (or a single wrlock for self/same-id), apply the
  * element-wise op, bump stat_ops, and unlock.  `op` is '+', '-' or '*'; `who`
  * is the fully-qualified method name used in croak messages. */
-static void nda_do_elementwise(pTHX_ NdaHandle *h, SV *other, int op, const char *who) {
+static void nda_do_elementwise(pTHX_ SV *self_sv, NdaHandle *h, SV *other, int op, const char *who) {
     if (!sv_isobject(other) || !sv_derived_from(other, "Data::NDArray::Shared"))
         croak("%s: expected a Data::NDArray::Shared object", who);
     NdaHandle *o = INT2PTR(NdaHandle*, SvIV(SvRV(other)));
     if (!o) croak("Attempted to use a destroyed Data::NDArray::Shared object");
-    if (o->hdr->dtype != h->hdr->dtype)
+    /* sv_isobject/sv_derived_from above begin with SvGETMAGIC(other), so a tied
+     * `other` can have run Perl that destroyed self before h is used below.
+     * `h` is this function's own parameter, so re-reading it here is enough;
+     * `o` was read after the magic and needs no re-read. */
+    REEXTRACT(self_sv);
+    if (o->dtype != h->dtype)   /* cached: the kernel interprets both in the cached dtype */
         croak("%s: dtype mismatch", who);
-    if (o->hdr->size != h->hdr->size)
+    if (o->size != h->size)   /* cached immutable counts, not peer hdr->size */
         croak("%s: size mismatch (%" UVuf " vs %" UVuf ")",
-              who, (UV)h->hdr->size, (UV)o->hdr->size);
+              who, (UV)h->size, (UV)o->size);
     if (o == h || o->hdr->array_id == h->hdr->array_id) {
         nda_rwlock_wrlock(h);
         nda_elementwise_op_locked(h, h, op);   /* self: +=->double, -=->zero, *=->square */
@@ -298,6 +341,7 @@ new(class, ...)
            for every existing ($path,$dtype,@shape) call. */
         mode_t mode = 0600;
         I32 eff_items = items;
+        if (items > 3) SvGETMAGIC(ST(items - 1));   /* a tied/overloaded scalar may FETCH to the opts hashref */
         if (items > 3 && SvROK(ST(items - 1))
                       && SvTYPE(SvRV(ST(items - 1))) == SVt_PVHV) {
             HV *opts = (HV *)SvRV(ST(items - 1));
@@ -372,6 +416,7 @@ get(self, ...)
         /* Validate shape + compute the flat offset UNDER the read lock: a concurrent
            reshape() mutates ndim/shape/strides under the write lock, so doing this
            lock-free could bound-check one shape yet offset with another -> OOB. */
+        REEXTRACT(self);
         nda_rwlock_rdlock(h);
         uint32_t ndim = h->hdr->ndim;
         if (nix != ndim) { nda_rwlock_rdunlock(h);
@@ -386,10 +431,13 @@ get(self, ...)
            multi-index still yields a flat offset past the element count -> OOB
            read.  Canonical row-major strides always keep off < size, so this
            never fires for good data. */
-        if (off >= h->hdr->size) { nda_rwlock_rdunlock(h);
+        if (off >= h->size) { nda_rwlock_rdunlock(h);   /* cached immutable count, not peer hdr->size */
             croak("Data::NDArray::Shared->get: computed offset out of range"); }
-        RETVAL = nda_get_sv(aTHX_ h, off);
-        nda_rwlock_rdunlock(h);
+        {
+            char _raw[8]; nda_read_raw(h, off, _raw);   /* copy element under the lock */
+            nda_rwlock_rdunlock(h);
+            RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
+        }
     }
   OUTPUT:
     RETVAL
@@ -409,9 +457,11 @@ set(self, ...)
         SV *val = ST(items - 1);
         for (uint32_t d = 0; d < nix; d++)          /* read the args before locking */
             idx[d] = (uint64_t)SvUV(ST(1 + d));
-        char enc[8]; uint32_t nb = nda_encode(aTHX_ h->hdr->dtype, val, enc);  /* encode val lock-free */
+        REEXTRACT(self);
+        char enc[8]; uint32_t nb = nda_encode(aTHX_ h->dtype, val, enc);  /* encode val lock-free */
         /* Validate + compute the offset UNDER the write lock (see get: serializes the
            shape read + offset against a concurrent reshape to prevent an OOB index). */
+        REEXTRACT(self);
         nda_rwlock_wrlock(h);
         uint32_t ndim = h->hdr->ndim;
         if (nix != ndim) { nda_rwlock_wrunlock(h);
@@ -424,7 +474,7 @@ set(self, ...)
         /* Layer B: bound the strides-derived flat offset against the element
            count before writing -- corrupted strides in the shared segment must
            not drive an OOB write (see get; never fires for canonical data). */
-        if (off >= h->hdr->size) { nda_rwlock_wrunlock(h);
+        if (off >= h->size) { nda_rwlock_wrunlock(h);   /* cached immutable count, not peer hdr->size */
             croak("Data::NDArray::Shared->set: computed offset out of range"); }
         nda_store_bytes(h, off, enc, nb);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -438,12 +488,16 @@ get_flat(self, e)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (e >= h->hdr->size)
+    if (e >= h->size)   /* cached immutable count, not peer hdr->size */
         croak("Data::NDArray::Shared->get_flat: index %" UVuf " out of range (size %" UVuf ")",
-              e, (UV)h->hdr->size);
-    nda_rwlock_rdlock(h);
-    RETVAL = nda_get_sv(aTHX_ h, (uint64_t)e);
-    nda_rwlock_rdunlock(h);
+              e, (UV)h->size);
+    {
+        char _raw[8];
+        nda_rwlock_rdlock(h);
+        nda_read_raw(h, (uint64_t)e, _raw);
+        nda_rwlock_rdunlock(h);
+        RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);
+    }
   OUTPUT:
     RETVAL
 
@@ -455,10 +509,11 @@ set_flat(self, e, val)
   PREINIT:
     EXTRACT(self);
   CODE:
-    if (e >= h->hdr->size)
+    if (e >= h->size)   /* cached immutable count, not peer hdr->size */
         croak("Data::NDArray::Shared->set_flat: index %" UVuf " out of range (size %" UVuf ")",
-              e, (UV)h->hdr->size);
-    char enc[8]; uint32_t nb = nda_encode(aTHX_ h->hdr->dtype, val, enc);  /* encode before locking */
+              e, (UV)h->size);
+    char enc[8]; uint32_t nb = nda_encode(aTHX_ h->dtype, val, enc);  /* encode before locking */
+    REEXTRACT(self);
     nda_rwlock_wrlock(h);
     nda_store_bytes(h, (uint64_t)e, enc, nb);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -471,7 +526,8 @@ fill(self, val)
   PREINIT:
     EXTRACT(self);
   CODE:
-    char enc[8]; uint32_t nb = nda_encode(aTHX_ h->hdr->dtype, val, enc);  /* encode before locking */
+    char enc[8]; uint32_t nb = nda_encode(aTHX_ h->dtype, val, enc);  /* encode before locking */
+    REEXTRACT(self);
     nda_rwlock_wrlock(h);
     nda_fill_bytes(h, enc, nb);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -488,7 +544,7 @@ zero(self)
     EXTRACT(self);
   CODE:
     nda_rwlock_wrlock(h);
-    memset(nda_data(h), 0, (size_t)(h->hdr->size * h->hdr->itemsize));
+    memset(nda_data(h), 0, (size_t)(h->size * h->itemsize));   /* cached immutable geometry, not peer hdr fields */
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     nda_rwlock_wrunlock(h);
     SvREFCNT_inc(self);
@@ -516,9 +572,10 @@ reshape(self, ...)
             if (dims[i] > UINT64_MAX / newsize) croak("Data::NDArray::Shared->reshape: shape too large");
             newsize *= dims[i];
         }
-        if (newsize != h->hdr->size)
+        REEXTRACT(self);
+        if (newsize != h->size)   /* cached immutable count: reshape must preserve element count */
             croak("Data::NDArray::Shared->reshape: total size %" UVuf " does not match current size %" UVuf,
-                  (UV)newsize, (UV)h->hdr->size);
+                  (UV)newsize, (UV)h->size);
         /* row-major strides for the new shape */
         strides[nd - 1] = 1;
         for (int d = nd - 2; d >= 0; d--) strides[d] = strides[d + 1] * dims[d + 1];
@@ -556,7 +613,7 @@ mean(self)
         nda_rwlock_rdlock(h);
         acc = nda_sum_locked(h);
         nda_rwlock_rdunlock(h);
-        RETVAL = acc / (double)h->hdr->size;   /* size >= 1 always */
+        RETVAL = acc / (double)h->size;   /* cached immutable count (>= 1); matches the summed span */
     }
   OUTPUT:
     RETVAL
@@ -568,11 +625,12 @@ min(self)
     EXTRACT(self);
   CODE:
     {
-        uint64_t best;
+        uint64_t best; char _raw[8];
         nda_rwlock_rdlock(h);
         best = nda_argextreme_locked(h, 0);   /* compare in native dtype */
-        RETVAL = nda_get_sv(aTHX_ h, best);   /* dtype-correct value of the min element */
+        nda_read_raw(h, best, _raw);          /* copy the min element under the lock */
         nda_rwlock_rdunlock(h);
+        RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
     }
   OUTPUT:
     RETVAL
@@ -584,11 +642,12 @@ max(self)
     EXTRACT(self);
   CODE:
     {
-        uint64_t best;
+        uint64_t best; char _raw[8];
         nda_rwlock_rdlock(h);
         best = nda_argextreme_locked(h, 1);   /* compare in native dtype */
-        RETVAL = nda_get_sv(aTHX_ h, best);
+        nda_read_raw(h, best, _raw);          /* copy the max element under the lock */
         nda_rwlock_rdunlock(h);
+        RETVAL = nda_sv_from_raw(aTHX_ h->dtype, _raw);   /* build SV after unlock */
     }
   OUTPUT:
     RETVAL
@@ -601,7 +660,8 @@ add_scalar(self, s)
     EXTRACT(self);
   CODE:
     double sd=0; int64_t si=0; uint64_t su=0;
-    nda_read_scalar(aTHX_ h->hdr->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
+    nda_read_scalar(aTHX_ h->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
+    REEXTRACT(self);
     nda_rwlock_wrlock(h);
     nda_scalar_op_locked(h, sd, si, su, '+');
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -619,7 +679,8 @@ mul_scalar(self, s)
     EXTRACT(self);
   CODE:
     double sd=0; int64_t si=0; uint64_t su=0;
-    nda_read_scalar(aTHX_ h->hdr->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
+    nda_read_scalar(aTHX_ h->dtype, s, &sd, &si, &su);  /* pre-read lock-free */
+    REEXTRACT(self);
     nda_rwlock_wrlock(h);
     nda_scalar_op_locked(h, sd, si, su, '*');
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -636,7 +697,7 @@ add(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
-    nda_do_elementwise(aTHX_ h, other, '+', "Data::NDArray::Shared->add");
+    nda_do_elementwise(aTHX_ self, h, other, '+', "Data::NDArray::Shared->add");
     SvREFCNT_inc(self);
     RETVAL = self;
   OUTPUT:
@@ -649,7 +710,7 @@ subtract(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
-    nda_do_elementwise(aTHX_ h, other, '-', "Data::NDArray::Shared->subtract");
+    nda_do_elementwise(aTHX_ self, h, other, '-', "Data::NDArray::Shared->subtract");
     SvREFCNT_inc(self);
     RETVAL = self;
   OUTPUT:
@@ -662,7 +723,7 @@ multiply(self, other)
   PREINIT:
     EXTRACT(self);
   CODE:
-    nda_do_elementwise(aTHX_ h, other, '*', "Data::NDArray::Shared->multiply");
+    nda_do_elementwise(aTHX_ self, h, other, '*', "Data::NDArray::Shared->multiply");
     SvREFCNT_inc(self);
     RETVAL = self;
   OUTPUT:
@@ -675,13 +736,21 @@ to_list(self)
     EXTRACT(self);
   CODE:
     {
-        uint64_t size = h->hdr->size, e;
+        uint64_t size = h->size, e;   /* cached immutable count, not peer hdr->size */
+        int dt = h->dtype;
+        uint32_t nb = nda_dtype_bytes(dt);
+        char *snap = NULL;
         AV *av = newAV();
-        av_extend(av, (SSize_t)(size - 1));   /* pre-extend BEFORE the lock; no croak under lock */
+        if (size) {
+            av_extend(av, (SSize_t)(size - 1));   /* pre-extend BEFORE the lock */
+            Newx(snap, size * (STRLEN)nb, char);
+            SAVEFREEPV(snap);                     /* freed on scope exit / croak */
+        }
         nda_rwlock_rdlock(h);
-        for (e = 0; e < size; e++)
-            av_store(av, (SSize_t)e, nda_get_sv(aTHX_ h, e));
+        if (size) memcpy(snap, nda_data(h), (size_t)(size * nb));   /* snapshot raw bytes under the lock */
         nda_rwlock_rdunlock(h);
+        for (e = 0; e < size; e++)                /* build the SVs AFTER unlocking */
+            av_store(av, (SSize_t)e, nda_sv_from_raw(aTHX_ dt, snap + e * nb));
         RETVAL = newRV_noinc((SV *)av);
     }
   OUTPUT:
@@ -767,7 +836,7 @@ buffer(self)
     EXTRACT(self);
   CODE:
     {
-        uint64_t bytes = h->hdr->size * h->hdr->itemsize;
+        uint64_t bytes = h->size * h->itemsize;   /* cached immutable geometry, not peer hdr fields */
         char *base = nda_data(h);
         RETVAL = newSVpvn("", 0);
         (void)SvGROW(RETVAL, (STRLEN)(bytes + 1));   /* size the buffer BEFORE the lock */
@@ -792,7 +861,8 @@ update_from_bytes(self, src)
     {
         STRLEN slen;
         const char *sbytes = SvPVbyte(src, slen);   /* resolve + any croak BEFORE the lock */
-        uint64_t bytes = h->hdr->size * h->hdr->itemsize;
+        REEXTRACT(self);
+        uint64_t bytes = h->size * h->itemsize;   /* cached immutable geometry, not peer hdr fields */
         char *base;
         if ((uint64_t)slen != bytes)
             croak("Data::NDArray::Shared->update_from_bytes: got %" UVuf
@@ -835,6 +905,7 @@ _alias_pdl_create(self, datatype, dims_av)
         p->datatype = (pdl_datatypes)datatype;   /* set type before setdims so nbytes is right */
         err = PDL->setdims(p, dims, (PDL_Indx)nd);
         if (err.error) { PDL->destroy(p); croak("Data::NDArray::Shared: PDL->setdims failed"); }
+        REEXTRACT(self);
         p->data = nda_data(h);                    /* alias the shared mmap */
         p->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
         PDL->add_deletedata_magic(p, nda_pdl_nofree, 0);
@@ -857,7 +928,7 @@ dtype(self)
   PREINIT:
     EXTRACT(self);
   CODE:
-    RETVAL = newSVpv(nda_name_tab[h->hdr->dtype], 0);   /* immutable */
+    RETVAL = newSVpv(nda_name_tab[h->dtype], 0);   /* immutable */
   OUTPUT:
     RETVAL
 
@@ -873,7 +944,7 @@ stats(self)
         /* Snapshot under the lock; build the HV after releasing it so an OOM
            in newHV/newSV* can never strand the lock. */
         nda_rwlock_rdlock(h);
-        dtype    = h->hdr->dtype;
+        dtype    = h->dtype;   /* cached + in-range: safe to index nda_name_tab */
         ndim     = h->hdr->ndim;
         if (ndim > NDA_MAX_DIMS) ndim = NDA_MAX_DIMS;   /* clamp a peer-corrupted ndim */
         itemsize = h->hdr->itemsize;
@@ -883,7 +954,10 @@ stats(self)
         nda_rwlock_rdunlock(h);
 
         AV *shape_av = newAV();
-        av_extend(shape_av, (SSize_t)(ndim - 1));
+        /* Guard the low side: a peer-corrupted ndim==0 would wrap ndim-1 to
+           UINT32_MAX -> a ~34GB av_extend -> uncatchable OOM abort.  ndim==0 is
+           handled gracefully (empty shape), matching shape()/strides(). */
+        if (ndim > 0) av_extend(shape_av, (SSize_t)(ndim - 1));
         for (d = 0; d < ndim; d++) av_store(shape_av, (SSize_t)d, newSVuv((UV)shp[d]));
 
         HV *hv = newHV();

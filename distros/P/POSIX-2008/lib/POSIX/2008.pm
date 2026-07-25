@@ -12,7 +12,7 @@ require 'POSIX/2008/symbols.pl'; # Defines @_constants and @_functions.
 our @_constants;
 our @_functions;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION; # so "use Module 0.002" won't warn on underscore
 

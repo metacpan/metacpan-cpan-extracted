@@ -1,0 +1,12 @@
+# Avoid shipping monorepo / build helpers in the CPAN tarball.
+# Patterns are regexes matched against the whole path — keep them anchored.
+^build\.sh$
+^shell\.sh$
+^bin/wildling$
+^\.git
+^Wildling-
+^MYMETA\..*
+^Makefile$
+^MANIFEST\.bak$
+^blib/
+^pm_to_blib$

@@ -11,21 +11,14 @@ use DateTime::Tiny;
 use File::Spec;
 use File::Slurper 'read_lines';
 
-use Moo;
+use Mew;
 use Mojo::JSON 'from_json';
 
 use Text::CSV::Encoded;
-use Types::Standard qw/ArrayRef Int Str/;
 
-has constants_csv_path =>
-(
-	default		=> sub{return 'data/cpan.metacurator.constants.csv'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -constants_csv_path => (Str, default => sub{return 'data/cpan.metacurator.constants.csv'}, chained => 1);
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 # -----------------------------------------------
 
@@ -176,8 +169,7 @@ sub populate_topics_table
 		$temp_title	= $title	|| '';
 
 		$self -> logger -> debug("Skipping paragraph: temp_text: =>$temp_text<=. temp_title: =>$temp_title<=") if (! ($temp_text && $temp_title) );
-		$self -> logger -> info("populate_topics_table(). Missing title @ line: $index. name: $title"),	next if (! defined $title);
-		$self -> logger -> info("populate_topics_table(). Missing text @ line: $index. text: $text"),	next if ($text !~ m/^\"\"\"\no (.+)$/s);
+		$self -> logger -> info("populate_topics_table(). Missing text @ line: $index. title: $title. text: $text"),	next if ($text !~ m/^\"\"\"\no (.+)$/s);
 
 		$$record{parent_id}	= $root_id;
 		$text				= $1 if ($text =~ m/^\"\"\"\n(.+)$/s);
@@ -187,7 +179,7 @@ sub populate_topics_table
 	}
 
 	$$pad{$table_name}	= $self -> read_table($table_name);
-	my($record_count)	= $#{$$pad{$table_name} };
+	my($record_count)	= $#{$$pad{$table_name} } + 1;
 
 	$self -> logger -> info("Populated '$table_name'. Record count: $record_count");
 

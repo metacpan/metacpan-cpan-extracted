@@ -1,9 +1,9 @@
 package Mail::DMARC::Report::Aggregate::Record::Auth_Results::SPF;
-our $VERSION = '2.20260621';
+our $VERSION = '2.20260724';
 use strict;
 use warnings;
 use feature 'signatures';
-no warnings 'experimental::signatures';    ## no critic (ProhibitNoWarnings)
+no warnings 'experimental::args_array_with_signatures';    ## no critic (ProhibitNoWarnings)
 
 use Carp;
 use parent 'Mail::DMARC::Base';
@@ -93,7 +93,7 @@ Mail::DMARC::Report::Aggregate::Record::Auth_Results::SPF - auth_results/spf sec
 
 =head1 VERSION
 
-version 2.20260621
+version 2.20260724
 
 =head1 AUTHORS
 

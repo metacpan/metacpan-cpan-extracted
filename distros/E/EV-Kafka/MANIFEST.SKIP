@@ -16,4 +16,5 @@
 ^EV-Kafka-
 ^MANIFEST\.bak$
 ^\.claude/
+^\.pcg/
 ^_Inline/

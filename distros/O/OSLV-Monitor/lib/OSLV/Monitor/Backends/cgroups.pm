@@ -16,11 +16,11 @@ OSLV::Monitor::Backends::cgroups - Backend for Linux cgroups.
 
 =head1 VERSION
 
-Version 1.0.3
+Version 1.0.4
 
 =cut
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 =head1 SYNOPSIS
 
@@ -140,6 +140,9 @@ sub new {
 			'major-faults'                 => 1,
 			'involuntary-context-switches' => 1,
 			'minor-faults'                 => 1,
+			'nr_bursts'                    => 1,
+			'nr_periods'                   => 1,
+			'nr_throttled'                 => 1,
 			'received-messages'            => 1,
 			'sent-messages'                => 1,
 			'swaps'                        => 1,
@@ -170,9 +173,6 @@ sub new {
 			'thp_collapse_alloc'           => 1,
 			'thp_swpout'                   => 1,
 			'thp_swpout_fallback'          => 1,
-			'system_usec'                  => 1,
-			'usage_usec'                   => 1,
-			'user_usec'                    => 1,
 			'zswpin'                       => 1,
 			'zswpout'                      => 1,
 			'zswpwb'                       => 1,
@@ -227,17 +227,21 @@ sub run {
 			dbytes                         => 0,
 			dios                           => 0,
 			'core_sched.force_idle_usec'   => 0,
+			'core_sched.force_idle-time'   => 0,
 			nr_periods                     => 0,
 			nr_throttled                   => 0,
 			throttled_usec                 => 0,
+			'throttled-time'               => 0,
 			nr_bursts                      => 0,
 			burst_usec                     => 0,
+			'burst-time'                   => 0,
 			anon                           => 0,
 			file                           => 0,
 			kernel                         => 0,
 			kernel_stack                   => 0,
 			pagetables                     => 0,
 			sec_pagetables                 => 0,
+			percpu                         => 0,
 			sock                           => 0,
 			vmalloc                        => 0,
 			shmem                          => 0,
@@ -282,8 +286,11 @@ sub run {
 			pglazyfreed                    => 0,
 			zswpin                         => 0,
 			zswpout                        => 0,
+			zswpwb                         => 0,
 			thp_fault_alloc                => 0,
 			thp_collapse_alloc             => 0,
+			thp_swpout                     => 0,
+			thp_swpout_fallback            => 0,
 			rss                            => 0,
 			'data-size'                    => 0,
 			'text-size'                    => 0,
@@ -309,7 +316,11 @@ sub run {
 				'reading proc cache "' . $self->{cache_file} . '" failed... using a empty one...' . $@
 			);
 			$data->{cache_failure} = 1;
-			return $data;
+			# treat a corrupt/truncated cache as a fresh one so this run
+			# regenerates and overwrites it with valid data instead of getting
+			# permanently stuck on the bad file
+			$self->{cache} = {};
+			$cache_is_new  = 1;
 		}
 	} else {
 		$cache_is_new = 1;
@@ -329,17 +340,21 @@ sub run {
 		dbytes                         => 0,
 		dios                           => 0,
 		'core_sched.force_idle_usec'   => 0,
+		'core_sched.force_idle-time'   => 0,
 		nr_periods                     => 0,
 		nr_throttled                   => 0,
 		throttled_usec                 => 0,
+		'throttled-time'               => 0,
 		nr_bursts                      => 0,
 		burst_usec                     => 0,
+		'burst-time'                   => 0,
 		anon                           => 0,
 		file                           => 0,
 		kernel                         => 0,
 		kernel_stack                   => 0,
 		pagetables                     => 0,
 		sec_pagetables                 => 0,
+		percpu                         => 0,
 		sock                           => 0,
 		vmalloc                        => 0,
 		shmem                          => 0,
@@ -384,8 +399,11 @@ sub run {
 		pglazyfreed                    => 0,
 		zswpin                         => 0,
 		zswpout                        => 0,
+		zswpwb                         => 0,
 		thp_fault_alloc                => 0,
 		thp_collapse_alloc             => 0,
+		thp_swpout                     => 0,
+		thp_swpout_fallback            => 0,
 		rss                            => 0,
 		'data-size'                    => 0,
 		'text-size'                    => 0,
@@ -462,8 +480,24 @@ sub run {
 						};
 						my $inspect_output = `$cgroup_jank_type inspect $pod_id 2> /dev/null`;
 						my $inspect_parsed;
-						$self->{ $cgroup_jank_type . '_info' }{$pod_id} = { ip => [] };
+						$self->{ $cgroup_jank_type . '_info' }{$pod_name} = { ip => [], path => undef };
 						eval { $inspect_parsed = decode_json($inspect_output) };
+						# record the container's root filesystem path when available
+						if (   defined($inspect_parsed)
+							&& ref($inspect_parsed) eq 'ARRAY'
+							&& defined( $inspect_parsed->[0] )
+							&& ref( $inspect_parsed->[0] ) eq 'HASH'
+							&& defined( $inspect_parsed->[0]{GraphDriver} )
+							&& ref( $inspect_parsed->[0]{GraphDriver} ) eq 'HASH'
+							&& defined( $inspect_parsed->[0]{GraphDriver}{Data} )
+							&& ref( $inspect_parsed->[0]{GraphDriver}{Data} ) eq 'HASH'
+							&& defined( $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir} )
+							&& ref( $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir} ) eq ''
+							&& $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir} ne '' )
+						{
+							$self->{ $cgroup_jank_type . '_info' }{$pod_name}{path}
+								= $inspect_parsed->[0]{GraphDriver}{Data}{MergedDir};
+						}
 						if (   defined($inspect_parsed)
 							&& ref($inspect_parsed) eq 'ARRAY'
 							&& defined( $inspect_parsed->[0] )
@@ -545,7 +579,7 @@ sub run {
 	#	my $ps_output = `ps -haxo pid,uid,gid,cgroupns,%cpu,%mem,rss,vsize,trs,drs,size,cgroup 2> /dev/null`;
 	#	if ( $? != 0 ) {
 	#		$self->{cgroupns_usable} = 0;
-	my $ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,cgroup 2> /dev/null`;
+	my $ps_output = `ps -haxo pid,uid,gid,%cpu,%mem,rss,vsize,trs,drs,size,etimes,cgroup,comm 2> /dev/null`;
 	#	}
 	my @ps_output_split = split( /\n/, $ps_output );
 	my %found_cgroups;
@@ -560,24 +594,42 @@ sub run {
 	my %cgroups_etimes;
 	my %cgroups_invvol_ctxt_switches;
 	my %cgroups_vol_ctxt_switches;
+	my %cgroups_root_paths;
 
 	foreach my $line (@ps_output_split) {
 		$line =~ s/^\s+//;
 		my $vol_ctxt_switches   = 0;
 		my $invol_ctxt_switches = 0;
-		my ( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup );
+		my ( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup, $comm );
 		#		if ( $self->{cgroupns_usable} ) {
 		#			( $pid, $uid, $gid, $cgroupns, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )#
 		#				= split( /\s+/, $line );
 		#		} else {
-		( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup )
-			= split( /\s+/, $line );
+		# comm is captured last, with a split limit, so a command name containing
+		# whitespace does not shift the earlier fields
+		( $pid, $uid, $gid, $percpu, $permem, $rss, $vsize, $trs, $drs, $size, $etimes, $cgroup, $comm )
+			= split( /\s+/, $line, 13 );
 		#		}
+		# skip the idle/swapper task... the Linux equivalent of FreeBSD's
+		# [idle]... the true idle is PID 0 (swapper), which ps normally does
+		# not list, but guard against it defensively so it can never be
+		# counted as CPU usage
+		if ( defined($comm) && ( $comm eq 'swapper' || $comm =~ m{^swapper/} ) ) {
+			next;
+		}
 		if ( $cgroup =~ /^0\:\:\// ) {
 
 			my $cache_name = 'proc-' . $pid . '-' . $uid . '-' . $gid . '-' . $cgroup;
 
 			$found_cgroups{$cgroup}           = $cgroup;
+
+			# save the root fs path as seen by this process, resolving chroots
+			# and the like... for the usual case this is just /
+			my $proc_root_path = readlink( '/proc/' . $pid . '/root' );
+			if ( defined($proc_root_path) ) {
+				$cgroups_root_paths{$cgroup}{$proc_root_path} = 1;
+			}
+
 			$data->{totals}{'percent-cpu'}    = $data->{totals}{'percent-cpu'} + $percpu;
 			$data->{totals}{'percent-memory'} = $data->{totals}{'percent-memory'} + $permem;
 			$data->{totals}{rss}              = $data->{totals}{rss} + $rss;
@@ -604,11 +656,12 @@ sub run {
 					} ## end foreach my $found_switch (@switches_find)
 				} ## end if ( -f '/proc/' . $pid . '/status' )
 			};
-			$vol_ctxt_switches = $self->cache_process( $cache_name, 'voluntary-context-switches', $vol_ctxt_switches );
+			$vol_ctxt_switches
+				= $self->cache_process( $cache_name, 'voluntary-context-switches', $vol_ctxt_switches, $etimes );
 			$data->{totals}{'voluntary-context-switches'}
 				= $data->{totals}{'voluntary-context-switches'} + $vol_ctxt_switches;
 			$invol_ctxt_switches
-				= $self->cache_process( $cache_name, 'involuntary-context-switches', $invol_ctxt_switches );
+				= $self->cache_process( $cache_name, 'involuntary-context-switches', $invol_ctxt_switches, $etimes );
 			$data->{totals}{'involuntary-context-switches'}
 				= $data->{totals}{'involuntary-context-switches'} + $invol_ctxt_switches;
 
@@ -689,6 +742,29 @@ sub run {
 			$base_dir =~ s/^0\:\://;
 			$base_dir = '/sys/fs/cgroup' . $base_dir;
 
+			# record the root fs path for this oslvm, akin to the path for a FreeBSD
+			# jail... for containers prefer the rootfs reported by "inspect" as the
+			# procs there are in their own mount namespace and will see it as just /,
+			# otherwise use the roots the procs see, which handles chroots and the like
+			my @root_paths;
+			if ( $name =~ /^[pd]\_/ ) {
+				my $container_name = $name;
+				$container_name =~ s/^[pd]\_//;
+				my $info_key = ( $name =~ /^p\_/ ) ? 'podman_info' : 'docker_info';
+				if ( defined( $self->{$info_key}{$container_name}{path} )
+					&& $self->{$info_key}{$container_name}{path} ne '' )
+				{
+					push( @root_paths, $self->{$info_key}{$container_name}{path} );
+				}
+			}
+			if ( !@root_paths && defined( $cgroups_root_paths{$cgroup} ) ) {
+				@root_paths = sort( keys( %{ $cgroups_root_paths{$cgroup} } ) );
+			}
+			if ( !@root_paths ) {
+				push( @root_paths, '/' );
+			}
+			push( @{ $data->{oslvms}{$name}{path} }, @root_paths );
+
 			my $cpu_stats_raw;
 			if ( -f $base_dir . '/cpu.stat' && -r $base_dir . '/cpu.stat' ) {
 				eval { $cpu_stats_raw = read_file( $base_dir . '/cpu.stat' ); };
@@ -750,7 +826,7 @@ sub run {
 						my @line_split = split( /\s/, $line );
 						shift(@line_split);
 						foreach my $item (@line_split) {
-							my ( $stat, $value ) = split( /\=/, $line, 2 );
+							my ( $stat, $value ) = split( /\=/, $item, 2 );
 							if ( defined( $stat_mapping->{$stat} ) ) {
 								$stat = $stat_mapping->{$stat};
 							}
@@ -768,10 +844,11 @@ sub run {
 
 	$data->{uid_mapping} = $self->{uid_mapping};
 
-	# save the proc cache for next run
-	eval { write_file( $self->{cache_file}, encode_json( $self->{new_cache} ) ); };
+	# save the proc cache for next run... written atomically so an interrupted
+	# write cannot leave behind a truncated/empty cache file
+	eval { write_file( $self->{cache_file}, { atomic => 1 }, encode_json( $self->{new_cache} ) ); };
 	if ($@) {
-		push( @{ $data->{errors} }, 'saving proc cache failed, "' . $self->{proc_cache} . '"... ' . $@ );
+		push( @{ $data->{errors} }, 'saving proc cache failed, "' . $self->{cache_file} . '"... ' . $@ );
 		$data->{cache_failure} = 1;
 	}
 
@@ -897,6 +974,7 @@ sub cache_process {
 	my $name      = $_[1];
 	my $var       = $_[2];
 	my $new_value = $_[3];
+	my $age       = $_[4];
 
 	if ( !defined($name) || !defined($var) || !defined($new_value) ) {
 		warn('name, var, or new_value is undef');
@@ -914,43 +992,20 @@ sub cache_process {
 	}
 	$self->{new_cache}{$name}{$var} = $new_value;
 
-	# not seen it yet
+	# first time seeing this counter, so there is no previous value to compute
+	# a delta against... if what it is for is older than the polling interval,
+	# or of unknown age, return 0 to avoid a spike from the accumulated total,
+	# but for young ones the total accrued is from this interval, so usable...
+	# either way the raw value saved to new_cache above provides the delta next run
 	if ( !defined( $self->{cache}{$name}{$var} ) ) {
-		if ( $new_value != 0 ) {
-			if (   $var eq 'cpu-time'
-				|| $var eq 'system-time'
-				|| $var eq 'user-time'
-				|| $var eq 'throttled-time'
-				|| $var eq 'burst-time'
-				|| $var eq 'core_sched.force_idle-time' )
-			{
-				$new_value = $new_value / $self->{time_divider};
-			}
-			$new_value = $new_value / 300;
-		} ## end if ( $new_value != 0 )
-		return $new_value;
-	} ## end if ( !defined( $self->{cache}{$name}{$var}...))
-
-	if ( $new_value >= $self->{cache}{$name}{$var} ) {
-		$new_value = $new_value - $self->{cache}{$name}{$var};
-		if ( $new_value != 0 ) {
-			if (   $var eq 'cpu-time'
-				|| $var eq 'system-time'
-				|| $var eq 'user-time'
-				|| $var eq 'throttled-time'
-				|| $var eq 'burst-time'
-				|| $var eq 'core_sched.force_idle-time' )
-			{
-				$new_value = $new_value / $self->{time_divider};
-			}
-			$new_value = $new_value / 300;
-		} ## end if ( $new_value != 0 )
-		if ( $new_value > 10000000000 ) {
-			$self->{new_cache}{$name}{$var} = 0;
+		if ( !defined($age) || !looks_like_number($age) || $age > 300 ) {
 			return 0;
 		}
-		return $new_value;
-	} ## end if ( $new_value >= $self->{cache}{$name}{$var...})
+	} elsif ( $new_value >= $self->{cache}{$name}{$var} ) {
+		# if the counter instead went backwards it was reset, such as the cgroup
+		# being recreated, in which case the raw value is what has accrued since then
+		$new_value = $new_value - $self->{cache}{$name}{$var};
+	}
 
 	if ( $new_value != 0 ) {
 		if (   $var eq 'cpu-time'
@@ -964,6 +1019,12 @@ sub cache_process {
 		}
 		$new_value = $new_value / 300;
 	} ## end if ( $new_value != 0 )
+
+	# discard garbage values... new_cache keeps the raw value saved above so
+	# the delta for the next run is still sane
+	if ( $new_value > 10000000000 ) {
+		return 0;
+	}
 
 	return $new_value;
 } ## end sub cache_process

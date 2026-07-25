@@ -1,6 +1,7 @@
 use 5.008003;
 use strict;
 use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 use File::Path qw(make_path);
@@ -10,6 +11,16 @@ make_path('lib/Font/Metrics/Install');
 my $dep  = ExtUtils::Depends->new('Layout::Flex', 'Font::Metrics');
 my %deps = $dep->get_makefile_vars;
 
+# Find Font::Metrics' static archive so Linux's ld can resolve fm_* symbols
+# at link time (macOS uses -undefined dynamic_lookup; Linux does not).
+my $fm_lib;
+for my $inc (@INC) {
+    my $p = "$inc/auto/Font/Metrics/libfm$Config{_a}";
+    if (-f $p) { $fm_lib = $p; last; }
+}
+die "Cannot find Font::Metrics static library (libfm$Config{_a})\n"
+  . "Install Font::Metrics >= 0.03 first.\n" unless $fm_lib;
+
 my %WriteMakefileArgs = (
     NAME             => 'Layout::Flex',
     AUTHOR           => ['LNATION <email@lnation.org>'],
@@ -18,15 +29,16 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
     INC              => join(' ', '-I. -Iinclude', $deps{INC} // ()),
+    LDFROM           => "Flex\$(OBJ_EXT) $fm_lib",
     XS               => { 'Flex.xs' => 'Flex.c' },
     macro            => { TARFLAGS => '--format=ustar -c -v -f' },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0',
-        'Font::Metrics' => '0.02',
+        'Font::Metrics' => '0.03',
     },
     PREREQ_PM => {
-        'Font::Metrics' => '0.02',
+        'Font::Metrics' => '0.03',
     },
     TEST_REQUIRES => {
         'Test::More'               => '0',

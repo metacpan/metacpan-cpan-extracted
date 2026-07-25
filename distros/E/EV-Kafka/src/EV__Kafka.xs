@@ -31,6 +31,7 @@
 
 #ifdef HAVE_LZ4
   #include <lz4.h>
+  #include <lz4frame.h>   /* Kafka's wire format is LZ4 FRAME (KIP-57) */
 #endif
 
 #ifdef HAVE_ZLIB
@@ -104,6 +105,11 @@
 
 #define CLEAR_HANDLER(field) \
     do { if (NULL != (field)) { SvREFCNT_dec(field); (field) = NULL; } } while(0)
+
+/* DESTROY nulls the IV in the blessed ref, so every copy of the ref
+ * yields a NULL self; guard every XSUB entry against stale use. */
+#define KF_REQUIRE_CONN(s) \
+    do { if (!(s)) croak("EV::Kafka::Conn: method called on destroyed connection"); } while (0)
 
 /* call_sv a stored handler SV, pinned across the call so the callback may
  * clear its own handler (e.g. $obj->on_error(undef)) without freeing the CV
@@ -322,6 +328,8 @@ static int kf_read_compact_string(const char *buf, const char *end, const char *
         *slen = 0;
         return n;
     }
+    /* reject lengths that would wrap negative in the int32_t cast below */
+    if (raw - 1 > (uint64_t)INT32_MAX) return -1;
     int32_t len = (int32_t)(raw - 1);
     if (end - buf - n < len) return -1;
     *out = buf + n;
@@ -402,6 +410,8 @@ struct ev_kafka_conn_cb_s {
 struct ev_kafka_conn_s {
     unsigned int magic;
     struct ev_loop *loop;
+    SV *loop_sv;    /* held so a custom EV::Loop cannot be ev_loop_destroy'd
+                     * under live watchers; NULL for EV_DEFAULT */
     int fd;
     int state;
 
@@ -469,6 +479,13 @@ struct ev_kafka_conn_s {
     ev_timer reconnect_timer;
     int reconnect_timing;
     int intentional_disconnect;
+    /* Backoff state: attempts since the last successful connect;
+     * delay = reconnect_delay_ms * 2^attempts, capped and jittered. */
+    int reconnect_attempts;
+
+    /* Connect/handshake timeout (seconds); the single self->timer covers
+     * TCP connect AND all handshake phases until CONN_READY. */
+    double connect_timeout;
 
     /* Safety: callback_depth is bumped by the outermost event-loop watcher
      * frames; DESTROY defers Safefree while depth>0 (free_pending) so a
@@ -609,7 +626,13 @@ static ssize_t kf_io_write(ev_kafka_conn_t *self, const void *buf, size_t len) {
         return ret;
     }
 #endif
+#ifdef MSG_NOSIGNAL
+    /* MSG_NOSIGNAL: a write to an RST socket must fail with EPIPE, not kill
+     * the process with SIGPIPE (BSD/macOS use SO_NOSIGPIPE instead). */
+    return send(self->fd, buf, len, MSG_NOSIGNAL);
+#else
     return write(self->fd, buf, len);
+#endif
 }
 
 /* ================================================================
@@ -664,13 +687,37 @@ static void conn_stop_writing(ev_kafka_conn_t *self) {
     }
 }
 
+/* Arm (or re-arm) the single connect/handshake timer; it stays armed
+ * until CONN_READY so a silent peer fails the conn instead of wedging it. */
+static void conn_arm_timer(ev_kafka_conn_t *self) {
+    if (self->connect_timeout <= 0) return;
+    if (self->timing)
+        ev_timer_stop(self->loop, &self->timer);
+    ev_timer_init(&self->timer, conn_timer_cb, self->connect_timeout, 0.0);
+    self->timer.data = (void *)self;
+    ev_timer_start(self->loop, &self->timer);
+    self->timing = 1;
+}
+
+static void conn_disarm_timer(ev_kafka_conn_t *self) {
+    if (self->timing) {
+        ev_timer_stop(self->loop, &self->timer);
+        self->timing = 0;
+    }
+}
+
 /* ================================================================
  * Callback invocation helpers
  * ================================================================ */
 
 static void conn_emit_error(pTHX_ ev_kafka_conn_t *self, const char *msg) {
-    if (!self->on_error)
-        croak("EV::Kafka::Conn: %s", msg);
+    if (!self->on_error) {
+        /* Never croak in watcher context: a longjmp would skip the
+         * enclosing frame's --callback_depth, stranding the deferred
+         * conn_do_free forever.  Warn instead. */
+        warn("EV::Kafka::Conn: %s", msg);
+        return;
+    }
 
     self->callback_depth++;
     {
@@ -759,9 +806,8 @@ static void conn_invoke_cb(pTHX_ ev_kafka_conn_t *self, SV *cb, SV *result, SV *
 }
 
 static int conn_check_destroyed(ev_kafka_conn_t *self) {
-    /* free_pending: DESTROY ran inside a callback and deferred the actual
-     * Safefree to the outermost watcher frame; treat the conn as gone so
-     * callers stop touching it, but the memory is still valid until then. */
+    /* free_pending: DESTROY deferred the Safefree to the outermost watcher
+     * frame; treat the conn as gone, but the memory is valid until then. */
     return self->magic != KF_MAGIC_ALIVE || self->free_pending;
 }
 
@@ -770,6 +816,16 @@ static int conn_check_destroyed(ev_kafka_conn_t *self) {
  * callback, or by the outermost event-loop watcher frame once it unwinds to
  * callback_depth 0 with free_pending set.  conn_cleanup() must have run first. */
 static void conn_do_free(pTHX_ ev_kafka_conn_t *self) {
+    /* Defensive: if a future early-return ever strands queue entries,
+     * free them here (callbacks are NOT invoked). */
+    while (!ngx_queue_empty(&self->cb_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+        ngx_queue_remove(q);
+        ev_kafka_conn_cb_t *cbt = ngx_queue_data(q, ev_kafka_conn_cb_t, queue);
+        if (cbt->cb) SvREFCNT_dec(cbt->cb);
+        Safefree(cbt);
+    }
+
     if (self->reconnect_timing) {
         ev_timer_stop(self->loop, &self->reconnect_timer);
         self->reconnect_timing = 0;
@@ -778,6 +834,8 @@ static void conn_do_free(pTHX_ ev_kafka_conn_t *self) {
     CLEAR_HANDLER(self->on_error);
     CLEAR_HANDLER(self->on_connect);
     CLEAR_HANDLER(self->on_disconnect);
+
+    if (self->loop_sv) SvREFCNT_dec(self->loop_sv);
 
     if (self->host) Safefree(self->host);
     if (self->client_id) Safefree(self->client_id);
@@ -807,10 +865,7 @@ static void conn_do_free(pTHX_ ev_kafka_conn_t *self) {
 static void conn_cleanup(pTHX_ ev_kafka_conn_t *self) {
     conn_stop_reading(self);
     conn_stop_writing(self);
-    if (self->timing) {
-        ev_timer_stop(self->loop, &self->timer);
-        self->timing = 0;
-    }
+    conn_disarm_timer(self);
 #ifdef HAVE_OPENSSL
     if (self->ssl) {
         SSL_free(self->ssl);
@@ -825,6 +880,11 @@ static void conn_cleanup(pTHX_ ev_kafka_conn_t *self) {
         close(self->fd);
         self->fd = -1;
     }
+    /* Stale bytes must not leak onto the next connection: a reconnect
+     * must not resume behind leftover output or a partial old response. */
+    self->wbuf_len = 0;
+    self->wbuf_off = 0;
+    self->rbuf_len = 0;
     self->state = CONN_DISCONNECTED;
 }
 
@@ -833,20 +893,17 @@ static void conn_cancel_pending(pTHX_ ev_kafka_conn_t *self, const char *err) {
     SV *err_sv = in_destruct ? NULL : newSVpv(err, 0);
     ngx_queue_t *q;
 
+    /* Drain the WHOLE queue even when a callback destroys the conn
+     * mid-loop.  Safe: each cbt is unlinked BEFORE its callback runs, so
+     * a re-entrant drain cannot invoke it twice, and callback_depth > 0
+     * defers conn_do_free, keeping self valid for the rest of the drain. */
     while (!ngx_queue_empty(&self->cb_queue)) {
         q = ngx_queue_head(&self->cb_queue);
         ngx_queue_remove(q);
         ev_kafka_conn_cb_t *cbt = ngx_queue_data(q, ev_kafka_conn_cb_t, queue);
         self->pending_count--;
-        if (cbt->cb && !cbt->internal && !in_destruct) {
+        if (cbt->cb && !cbt->internal && !in_destruct)
             conn_invoke_cb(aTHX_ self, cbt->cb, NULL, sv_2mortal(newSVsv(err_sv)));
-            if (conn_check_destroyed(self)) {
-                SvREFCNT_dec(cbt->cb);
-                Safefree(cbt);
-                SvREFCNT_dec(err_sv);
-                return;
-            }
-        }
         if (cbt->cb) SvREFCNT_dec(cbt->cb);
         Safefree(cbt);
     }
@@ -854,12 +911,20 @@ static void conn_cancel_pending(pTHX_ ev_kafka_conn_t *self, const char *err) {
 }
 
 static void conn_handle_disconnect(pTHX_ ev_kafka_conn_t *self, const char *reason) {
+    /* Idempotent: conn_cleanup() below leaves state == CONN_DISCONNECTED,
+     * so a re-entrant disconnect() stops at this guard.  Callers already
+     * DISCONNECTED must schedule their own conn_schedule_reconnect. */
+    if (self->state == CONN_DISCONNECTED) return;
+
     conn_cleanup(aTHX_ self);
 
-    conn_emit_disconnect(aTHX_ self);
+    /* Fail pending requests BEFORE emitting disconnect: requests enqueued
+     * from on_disconnect (e.g. a re-entrant connect()) belong to the NEW
+     * connection and must not be cancelled by the old one's drain. */
+    conn_cancel_pending(aTHX_ self, reason);
     if (conn_check_destroyed(self)) return;
 
-    conn_cancel_pending(aTHX_ self, reason);
+    conn_emit_disconnect(aTHX_ self);
     if (conn_check_destroyed(self)) return;
 
     if (!self->intentional_disconnect && self->auto_reconnect) {
@@ -879,7 +944,14 @@ static void conn_reconnect_timer_cb(EV_P_ ev_timer *w, int revents) {
     (void)loop;
     if (self->magic != KF_MAGIC_ALIVE) return;
     self->callback_depth++;
-    conn_reconnect_timer_cb_inner(loop, w, revents);
+    {
+        /* Per-event tmps frame: see conn_io_cb. */
+        ENTER;
+        SAVETMPS;
+        conn_reconnect_timer_cb_inner(loop, w, revents);
+        FREETMPS;
+        LEAVE;
+    }
     if (--self->callback_depth == 0 && self->free_pending)
         conn_do_free(aTHX_ self);
 }
@@ -895,13 +967,23 @@ static void conn_reconnect_timer_cb_inner(EV_P_ ev_timer *w, int revents) {
     if (self->state != CONN_DISCONNECTED) return;
     if (!self->host) return;
 
-    conn_start_connect(aTHX_ self, self->host, self->port, 10.0);
+    conn_start_connect(aTHX_ self, self->host, self->port, self->connect_timeout);
 }
 
 static void conn_schedule_reconnect(pTHX_ ev_kafka_conn_t *self) {
     if (self->reconnect_timing) return;
+    /* Capped exponential backoff with jitter: retry N>1 waits
+     * reconnect_delay_ms * 2^(N-1), capped at 30s, jittered +/-25%. */
+    int attempt = self->reconnect_attempts;
     double delay = self->reconnect_delay_ms / 1000.0;
     if (delay < 0.01) delay = 1.0;
+    if (attempt > 0) {
+        int shift = attempt > 5 ? 5 : attempt;
+        delay *= (double)(1 << shift);
+        if (delay > 30.0) delay = 30.0;
+        delay *= 0.75 + 0.5 * ((double)rand() / (double)RAND_MAX);
+    }
+    self->reconnect_attempts = attempt + 1;
     ev_timer_init(&self->reconnect_timer, conn_reconnect_timer_cb, delay, 0.0);
     ev_timer_start(self->loop, &self->reconnect_timer);
     self->reconnect_timing = 1;
@@ -989,6 +1071,14 @@ static int32_t conn_send_request(pTHX_ ev_kafka_conn_t *self,
 
     conn_start_writing(self);
 
+    if (no_response && cb) {
+        /* acks=0: the broker never answers, so fire the callback now with
+         * an empty success result: it means "handed to the socket", not
+         * "broker acknowledged". */
+        conn_invoke_cb(aTHX_ self, cb,
+            sv_2mortal(newRV_noinc((SV*)newHV())), NULL);
+    }
+
     return corr_id;
 }
 
@@ -1047,9 +1137,11 @@ static void conn_parse_api_versions_response(pTHX_ ev_kafka_conn_t *self,
     /* Handshake complete (or continue to SASL) */
     if (self->sasl_mechanism) {
         self->state = CONN_SASL_HANDSHAKE;
+        conn_arm_timer(self);   /* re-arm for the SASL phase */
         conn_send_sasl_handshake(aTHX_ self);
     } else {
         self->state = CONN_READY;
+        conn_disarm_timer(self);   /* handshake done */
         conn_emit_connect(aTHX_ self);
     }
     return;
@@ -1105,6 +1197,7 @@ static void conn_parse_sasl_handshake_response(pTHX_ ev_kafka_conn_t *self,
     }
 
     /* Proceed to authenticate */
+    conn_arm_timer(self);
     conn_send_sasl_authenticate(aTHX_ self);
     return;
 
@@ -1158,6 +1251,8 @@ static void conn_send_sasl_authenticate(pTHX_ ev_kafka_conn_t *self) {
         if (!self->sasl_username) {
             conn_emit_error(aTHX_ self, "SCRAM: username required");
             kf_buf_free(&body);
+            if (conn_check_destroyed(self)) return;
+            conn_handle_disconnect(aTHX_ self, "SCRAM: username required");
             return;
         }
         kf_buf_t msg;
@@ -1181,6 +1276,8 @@ static void conn_send_sasl_authenticate(pTHX_ ev_kafka_conn_t *self) {
     else {
         conn_emit_error(aTHX_ self, "unsupported SASL mechanism");
         kf_buf_free(&body);
+        if (conn_check_destroyed(self)) return;
+        conn_handle_disconnect(aTHX_ self, "unsupported SASL mechanism");
         return;
     }
 
@@ -1266,7 +1363,7 @@ static void conn_parse_sasl_authenticate_response(pTHX_ ev_kafka_conn_t *self,
             }
         }
 
-        if (!server_nonce || !salt_b64 || iterations <= 0) {
+        if (!server_nonce || !salt_b64 || iterations <= 0 || iterations > 1048576) {
             conn_emit_error(aTHX_ self, "SCRAM: malformed server-first-message");
             if (conn_check_destroyed(self)) return;
             conn_handle_disconnect(aTHX_ self, "SCRAM auth failed");
@@ -1475,8 +1572,22 @@ static void conn_parse_sasl_authenticate_response(pTHX_ ev_kafka_conn_t *self,
     }
 #endif
 
+#ifdef HAVE_OPENSSL
+    /* SCRAM configured but the exchange never completed: no server
+     * signature was verified — refuse. */
+    if (self->sasl_mechanism
+        && strncmp(self->sasl_mechanism, "SCRAM-", 6) == 0
+        && self->scram_step != SCRAM_STEP_DONE) {
+        conn_emit_error(aTHX_ self, "SASL: incomplete SCRAM exchange");
+        if (conn_check_destroyed(self)) return;
+        conn_handle_disconnect(aTHX_ self, "SASL auth failed");
+        return;
+    }
+#endif
+
     /* Auth success — connection is ready */
     self->state = CONN_READY;
+    conn_disarm_timer(self);   /* handshake done */
     conn_emit_connect(aTHX_ self);
     return;
 
@@ -1722,11 +1833,30 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
 
 #ifdef HAVE_LZ4
     if (compression == COMPRESS_LZ4) {
-        int max_compressed = LZ4_compressBound((int)records.len);
+        /* Kafka's wire format is LZ4 FRAME (KIP-57), not the raw block API. */
+        LZ4F_compressionContext_t cctx;
+        size_t bound = LZ4F_compressFrameBound(records.len, NULL);
         char *compressed;
-        Newx(compressed, max_compressed, char);
-        int clen = LZ4_compress_default(records.data, compressed,
-            (int)records.len, max_compressed);
+        Newx(compressed, bound, char);
+        size_t clen = 0;
+        if (!LZ4F_isError(LZ4F_createCompressionContext(&cctx, LZ4F_VERSION))) {
+            size_t n = LZ4F_compressBegin(cctx, compressed, bound, NULL);
+            if (!LZ4F_isError(n)) {
+                clen += n;
+                n = LZ4F_compressUpdate(cctx, compressed + clen, bound - clen,
+                                        records.data, records.len, NULL);
+                if (!LZ4F_isError(n)) {
+                    clen += n;
+                    n = LZ4F_compressEnd(cctx, compressed + clen, bound - clen,
+                                         NULL);
+                    if (!LZ4F_isError(n))
+                        clen += n;
+                    else
+                        clen = 0;
+                } else clen = 0;
+            }
+            LZ4F_freeCompressionContext(cctx);
+        }
         if (clen > 0) {
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, compressed, clen);
@@ -1816,7 +1946,10 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
     } else
 #endif
     {
-        (void)compression;
+        /* Requested codec not built in (or COMPRESS_NONE): emit uncompressed
+         * and clear the compression bits so the batch is not mislabeled. */
+        if (compression != COMPRESS_NONE)
+            inner.data[1] &= (char)~0x07;
         kf_buf_append_i32(&inner, (int32_t)count);
         kf_buf_append(&inner, records.data, records.len);
     }
@@ -1838,6 +1971,11 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
 
 /* ================================================================
  * Response parsers
+ *
+ * Ownership: every HV/AV is mortalized at birth and adopted by its
+ * parent with newRV_inc; the root is sv_2mortal(newRV_noinc(root)).
+ * The per-event SAVETMPS frame in the watcher wrappers reclaims all of
+ * it, including nodes abandoned at "goto done" on malformed input.
  * ================================================================ */
 
 /* Metadata response parser (API 3) */
@@ -1847,8 +1985,8 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *brokers_av = newAV();
-    AV *topics_av = newAV();
+    AV *brokers_av = (AV*)sv_2mortal((SV*)newAV());
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
 
     (void)self;
@@ -1870,7 +2008,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
         int32_t i;
 
         for (i = 0; i < broker_count; i++) {
-            HV *bh = newHV();
+            HV *bh = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 4) goto done;
             int32_t nid = kf_read_i32(p); p += 4;
             hv_store(bh, "node_id", 7, newSViv(nid), 0);
@@ -1896,7 +2034,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
             if (n < 0) goto done;
             p += n;
 
-            av_push(brokers_av, newRV_noinc((SV*)bh));
+            av_push(brokers_av, newRV_inc((SV*)bh));
         }
 
         /* cluster_id */
@@ -1917,7 +2055,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
         int32_t topic_count = (int32_t)(raw - 1);
 
         for (i = 0; i < topic_count; i++) {
-            HV *th = newHV();
+            HV *th = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 2) goto done;
             int16_t terr = kf_read_i16(p); p += 2;
             hv_store(th, "error_code", 10, newSViv(terr), 0);
@@ -1943,11 +2081,11 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
             if (n < 0) goto done;
             p += n;
             int32_t part_count = (int32_t)(raw - 1);
-            AV *parts_av = newAV();
+            AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
             int32_t j;
 
             for (j = 0; j < part_count; j++) {
-                HV *ph = newHV();
+                HV *ph = (HV*)sv_2mortal((SV*)newHV());
                 if (end - p < 2) goto done;
                 int16_t perr = kf_read_i16(p); p += 2;
                 hv_store(ph, "error_code", 10, newSViv(perr), 0);
@@ -2000,9 +2138,9 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                 if (n < 0) goto done;
                 p += n;
 
-                av_push(parts_av, newRV_noinc((SV*)ph));
+                av_push(parts_av, newRV_inc((SV*)ph));
             }
-            hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
+            hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
 
             /* topic authorized operations — v8+ */
             if (version >= 8) {
@@ -2015,7 +2153,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
             if (n < 0) goto done;
             p += n;
 
-            av_push(topics_av, newRV_noinc((SV*)th));
+            av_push(topics_av, newRV_inc((SV*)th));
         }
     } else {
         /* Non-flexible (v0-v8) — use classic STRING/ARRAY encoding */
@@ -2031,7 +2169,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
         if (broker_count < 0 || broker_count > 65536) goto done;
         int32_t i;
         for (i = 0; i < broker_count; i++) {
-            HV *bh = newHV();
+            HV *bh = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 4) goto done;
             int32_t nid = kf_read_i32(p); p += 4;
             hv_store(bh, "node_id", 7, newSViv(nid), 0);
@@ -2054,7 +2192,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                 p += n;
             }
 
-            av_push(brokers_av, newRV_noinc((SV*)bh));
+            av_push(brokers_av, newRV_inc((SV*)bh));
         }
 
         /* cluster_id (v2+) */
@@ -2077,7 +2215,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
         int32_t topic_count = kf_read_i32(p); p += 4;
         if (topic_count < 0 || topic_count > 1000000) goto done;
         for (i = 0; i < topic_count; i++) {
-            HV *th = newHV();
+            HV *th = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 2) goto done;
             int16_t terr = kf_read_i16(p); p += 2;
             hv_store(th, "error_code", 10, newSViv(terr), 0);
@@ -2098,10 +2236,10 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
             if (end - p < 4) goto done;
             int32_t part_count = kf_read_i32(p); p += 4;
             if (part_count < 0 || part_count > 1000000) goto done;
-            AV *parts_av = newAV();
+            AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
             int32_t j;
             for (j = 0; j < part_count; j++) {
-                HV *ph = newHV();
+                HV *ph = (HV*)sv_2mortal((SV*)newHV());
                 if (end - p < 2) goto done;
                 int16_t perr = kf_read_i16(p); p += 2;
                 hv_store(ph, "error_code", 10, newSViv(perr), 0);
@@ -2143,17 +2281,17 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                     p += (int64_t)rcount * 4;
                 }
 
-                av_push(parts_av, newRV_noinc((SV*)ph));
+                av_push(parts_av, newRV_inc((SV*)ph));
             }
-            hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
+            hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
 
-            av_push(topics_av, newRV_noinc((SV*)th));
+            av_push(topics_av, newRV_inc((SV*)th));
         }
     }
 
 done:
-    hv_store(result, "brokers", 7, newRV_noinc((SV*)brokers_av), 0);
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "brokers", 7, newRV_inc((SV*)brokers_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -2164,7 +2302,7 @@ static SV* conn_parse_produce_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
 
     (void)self;
@@ -2175,7 +2313,7 @@ static SV* conn_parse_produce_response(pTHX_ ev_kafka_conn_t *self,
     int32_t i;
 
     for (i = 0; i < topic_count; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -2185,11 +2323,11 @@ static SV* conn_parse_produce_response(pTHX_ ev_kafka_conn_t *self,
         /* partitions: ARRAY */
         if (end - p < 4) goto done;
         int32_t part_count = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
 
         for (j = 0; j < part_count; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 4) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
             hv_store(ph, "partition", 9, newSViv(pid), 0);
@@ -2214,10 +2352,10 @@ static SV* conn_parse_produce_response(pTHX_ ev_kafka_conn_t *self,
                 p += 8;
             }
 
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
     /* throttle_time_ms (v1+) */
@@ -2227,7 +2365,7 @@ static SV* conn_parse_produce_response(pTHX_ ev_kafka_conn_t *self,
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -2249,7 +2387,8 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
     if (out_base_offset) *out_base_offset = base_offset;
     int32_t batch_length = kf_read_i32(p); p += 4;
 
-    if (end - p < batch_length) return -1;
+    /* compare in 64-bit so a huge batch_length cannot wrap the check */
+    if (batch_length < 0 || (int64_t)(end - p) < (int64_t)batch_length) return -1;
     const char *batch_end = p + batch_length;
 
     if (batch_end - p < 9) return -1;
@@ -2282,6 +2421,8 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
         size_t compressed_len = batch_end - p;
         size_t decomp_cap = compressed_len * 4;
         if (decomp_cap < 4096) decomp_cap = 4096;
+        /* set only by a codec branch that fully succeeded (see below) */
+        int decompressed_ok = 0;
 
 #ifdef HAVE_ZLIB
         if (compression_type == COMPRESS_GZIP) {
@@ -2307,6 +2448,7 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
                     rec_data = decompressed;
                     rec_end = decompressed + dest_len;
                     zok = 1;
+                    decompressed_ok = 1;
                 } else if (zret == Z_BUF_ERROR || zret == Z_OK) {
                     Safefree(decompressed);
                     decompressed = NULL;
@@ -2321,29 +2463,42 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
 #endif
 #ifdef HAVE_LZ4
         if (compression_type == COMPRESS_LZ4) {
-            int dlen = -1;
+            /* LZ4 FRAME format (KIP-57); the context holds frame state,
+             * so create a fresh one per attempt. */
             while (decomp_cap < 64 * 1024 * 1024) {
+                LZ4F_decompressionContext_t dctx;
+                if (LZ4F_isError(LZ4F_createDecompressionContext(&dctx, LZ4F_VERSION)))
+                    break;
                 Newx(decompressed, decomp_cap, char);
-                dlen = LZ4_decompress_safe(p, decompressed,
-                    (int)compressed_len, (int)decomp_cap);
-                if (dlen >= 0) break;
-                /* Negative return can mean either malformed input or
-                 * insufficient output buffer — LZ4 doesn't distinguish.
-                 * Grow and retry; if it's malformed we'll bail at the cap. */
+                size_t produced = 0, consumed = 0;
+                int err = 0, done = 0;
+                while (consumed < compressed_len) {
+                    size_t dst_size = decomp_cap - produced;
+                    size_t src_size = compressed_len - consumed;
+                    size_t r = LZ4F_decompress(dctx,
+                        decompressed + produced, &dst_size,
+                        p + consumed, &src_size, NULL);
+                    produced += dst_size;
+                    consumed += src_size;
+                    if (LZ4F_isError(r)) { err = 1; break; }
+                    if (r == 0) { done = 1; break; }   /* frame complete */
+                    if (dst_size == 0 && src_size == 0)
+                        break;   /* no progress: output cap hit */
+                }
+                LZ4F_freeDecompressionContext(dctx);
+                if (done) {
+                    /* produced==0 is a validly-empty batch: the record
+                     * loop sees zero records. */
+                    rec_data = decompressed;
+                    rec_end = decompressed + produced;
+                    decompressed_ok = 1;
+                    break;
+                }
                 Safefree(decompressed);
                 decompressed = NULL;
-                decomp_cap *= 2;
-            }
-            if (dlen >= 0) {
-                /* dlen==0 is a validly-empty batch: point rec_data at the
-                 * (empty) decompressed buffer so the record loop sees zero
-                 * records, instead of falling through to parse the still-
-                 * compressed bytes.  decompressed is freed after the loop. */
-                rec_data = decompressed;
-                rec_end = decompressed + dlen;
-            } else if (decompressed) {
-                Safefree(decompressed);
-                decompressed = NULL;
+                if (err || produced < decomp_cap)
+                    break;               /* malformed or truncated frame */
+                decomp_cap *= 2;         /* output cap hit: grow, retry */
             }
         }
 #endif
@@ -2361,6 +2516,7 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
                 if (!ZSTD_isError(dlen)) {
                     rec_data = decompressed;
                     rec_end = decompressed + dlen;
+                    decompressed_ok = 1;
                 } else {
                     Safefree(decompressed);
                     decompressed = NULL;
@@ -2379,6 +2535,7 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
                         decompressed, &dlen) == SNAPPY_OK) {
                     rec_data = decompressed;
                     rec_end = decompressed + dlen;
+                    decompressed_ok = 1;
                 } else {
                     Safefree(decompressed);
                     decompressed = NULL;
@@ -2386,6 +2543,13 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
             }
         }
 #endif
+
+        if (!decompressed_ok) {
+            /* unknown type, codec missing, or decompression failed: do
+             * NOT parse the compressed bytes as records. */
+            if (decompressed) Safefree(decompressed);
+            return -1;
+        }
     }
 
     const char *rp = rec_data;
@@ -2494,7 +2658,7 @@ static SV* conn_parse_fetch_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
 
     (void)self;
@@ -2524,7 +2688,7 @@ static SV* conn_parse_fetch_response(pTHX_ ev_kafka_conn_t *self,
     int32_t i;
 
     for (i = 0; i < topic_count; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
 
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
@@ -2535,11 +2699,11 @@ static SV* conn_parse_fetch_response(pTHX_ ev_kafka_conn_t *self,
         /* partitions: ARRAY */
         if (end - p < 4) goto done;
         int32_t part_count = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
 
         for (j = 0; j < part_count; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
 
             if (end - p < 4) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
@@ -2581,7 +2745,7 @@ static SV* conn_parse_fetch_response(pTHX_ ev_kafka_conn_t *self,
             if (end - p < 4) goto done;
             int32_t records_size = kf_read_i32(p); p += 4;
 
-            AV *records_av = newAV();
+            AV *records_av = (AV*)sv_2mortal((SV*)newAV());
             if (records_size > 0 && end - p >= records_size) {
                 const char *rp = p;
                 const char *rend = p + records_size;
@@ -2590,9 +2754,10 @@ static SV* conn_parse_fetch_response(pTHX_ ev_kafka_conn_t *self,
                 while (rp < rend && rend - rp >= 12) {
                     int64_t bo;
                     int32_t bl = kf_read_i32(rp + 8);
-                    if (bl < 0 || rend - rp < 12 + bl) break;
-                    kf_decode_record_batch(aTHX_ rp, 12 + (size_t)bl, records_av, &bo);
-                    rp += 12 + bl;
+                    /* 12 + bl in 64-bit: a bl near INT32_MAX would wrap */
+                    if (bl < 0 || (int64_t)bl > (int64_t)(rend - rp) - 12) break;
+                    kf_decode_record_batch(aTHX_ rp, (size_t)12 + (size_t)bl, records_av, &bo);
+                    rp += (ptrdiff_t)12 + (ptrdiff_t)bl;
                 }
 
                 p += records_size;
@@ -2600,16 +2765,16 @@ static SV* conn_parse_fetch_response(pTHX_ ev_kafka_conn_t *self,
                 p = end; /* truncated */
             }
 
-            hv_store(ph, "records", 7, newRV_noinc((SV*)records_av), 0);
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            hv_store(ph, "records", 7, newRV_inc((SV*)records_av), 0);
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
 
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -2620,7 +2785,7 @@ static SV* conn_parse_list_offsets_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
 
     (void)self;
@@ -2637,7 +2802,7 @@ static SV* conn_parse_list_offsets_response(pTHX_ ev_kafka_conn_t *self,
     int32_t i;
 
     for (i = 0; i < topic_count; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -2646,11 +2811,11 @@ static SV* conn_parse_list_offsets_response(pTHX_ ev_kafka_conn_t *self,
 
         if (end - p < 4) goto done;
         int32_t part_count = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
 
         for (j = 0; j < part_count; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 4) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
             hv_store(ph, "partition", 9, newSViv(pid), 0);
@@ -2675,14 +2840,14 @@ static SV* conn_parse_list_offsets_response(pTHX_ ev_kafka_conn_t *self,
                 p += 4;
             }
 
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -2786,10 +2951,10 @@ static SV* conn_parse_join_group_response(pTHX_ ev_kafka_conn_t *self,
     /* members array */
     if (end - p < 4) goto done;
     int32_t mcount = kf_read_i32(p); p += 4;
-    AV *members_av = newAV();
+    AV *members_av = (AV*)sv_2mortal((SV*)newAV());
     int32_t i;
     for (i = 0; i < mcount; i++) {
-        HV *mh = newHV();
+        HV *mh = (HV*)sv_2mortal((SV*)newHV());
 
         const char *mid; int16_t midlen;
         n = kf_read_string(p, end, &mid, &midlen);
@@ -2815,9 +2980,9 @@ static SV* conn_parse_join_group_response(pTHX_ ev_kafka_conn_t *self,
             p += mdlen;
         }
 
-        av_push(members_av, newRV_noinc((SV*)mh));
+        av_push(members_av, newRV_inc((SV*)mh));
     }
-    hv_store(result, "members", 7, newRV_noinc((SV*)members_av), 0);
+    hv_store(result, "members", 7, newRV_inc((SV*)members_av), 0);
 
 done:
     return sv_2mortal(newRV_noinc((SV*)result));
@@ -2879,7 +3044,7 @@ static SV* conn_parse_offset_commit_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
     (void)self;
 
@@ -2889,7 +3054,7 @@ static SV* conn_parse_offset_commit_response(pTHX_ ev_kafka_conn_t *self,
     int32_t tc = kf_read_i32(p); p += 4;
     int32_t i;
     for (i = 0; i < tc; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -2898,23 +3063,23 @@ static SV* conn_parse_offset_commit_response(pTHX_ ev_kafka_conn_t *self,
 
         if (end - p < 4) goto done;
         int32_t pc = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
         for (j = 0; j < pc; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 6) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
             int16_t err = kf_read_i16(p); p += 2;
             hv_store(ph, "partition", 9, newSViv(pid), 0);
             hv_store(ph, "error_code", 10, newSViv(err), 0);
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -2925,7 +3090,7 @@ static SV* conn_parse_offset_fetch_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
     (void)self;
 
@@ -2935,7 +3100,7 @@ static SV* conn_parse_offset_fetch_response(pTHX_ ev_kafka_conn_t *self,
     int32_t tc = kf_read_i32(p); p += 4;
     int32_t i;
     for (i = 0; i < tc; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -2944,10 +3109,10 @@ static SV* conn_parse_offset_fetch_response(pTHX_ ev_kafka_conn_t *self,
 
         if (end - p < 4) goto done;
         int32_t pc = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
         for (j = 0; j < pc; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 4) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
             hv_store(ph, "partition", 9, newSViv(pid), 0);
@@ -2968,10 +3133,10 @@ static SV* conn_parse_offset_fetch_response(pTHX_ ev_kafka_conn_t *self,
             int16_t err = kf_read_i16(p); p += 2;
             hv_store(ph, "error_code", 10, newSViv(err), 0);
 
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
     /* error_code (v2+) */
@@ -2981,7 +3146,7 @@ static SV* conn_parse_offset_fetch_response(pTHX_ ev_kafka_conn_t *self,
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -3010,7 +3175,7 @@ static SV* conn_parse_create_topics_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
     (void)self;
 
@@ -3020,7 +3185,7 @@ static SV* conn_parse_create_topics_response(pTHX_ ev_kafka_conn_t *self,
     int32_t tc = kf_read_i32(p); p += 4;
     int32_t i;
     for (i = 0; i < tc; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -3041,11 +3206,11 @@ static SV* conn_parse_create_topics_response(pTHX_ ev_kafka_conn_t *self,
                 hv_store(th, "error_message", 13, newSVpvn(emsg, elen), 0);
         }
 
-        av_push(topics_av, newRV_noinc((SV*)th));
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -3056,7 +3221,7 @@ static SV* conn_parse_delete_topics_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
     (void)self;
 
@@ -3066,7 +3231,7 @@ static SV* conn_parse_delete_topics_response(pTHX_ ev_kafka_conn_t *self,
     int32_t tc = kf_read_i32(p); p += 4;
     int32_t i;
     for (i = 0; i < tc; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -3077,11 +3242,11 @@ static SV* conn_parse_delete_topics_response(pTHX_ ev_kafka_conn_t *self,
         int16_t err = kf_read_i16(p); p += 2;
         hv_store(th, "error_code", 10, newSViv(err), 0);
 
-        av_push(topics_av, newRV_noinc((SV*)th));
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -3119,7 +3284,7 @@ static SV* conn_parse_add_partitions_to_txn_response(pTHX_ ev_kafka_conn_t *self
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
     (void)self; (void)version;
 
@@ -3130,7 +3295,7 @@ static SV* conn_parse_add_partitions_to_txn_response(pTHX_ ev_kafka_conn_t *self
     int32_t tc = kf_read_i32(p); p += 4;
     int32_t i;
     for (i = 0; i < tc; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -3139,23 +3304,23 @@ static SV* conn_parse_add_partitions_to_txn_response(pTHX_ ev_kafka_conn_t *self
 
         if (end - p < 4) goto done;
         int32_t pc = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
         for (j = 0; j < pc; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 6) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
             int16_t err = kf_read_i16(p); p += 2;
             hv_store(ph, "partition", 9, newSViv(pid), 0);
             hv_store(ph, "error_code", 10, newSViv(err), 0);
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -3184,7 +3349,7 @@ static SV* conn_parse_txn_offset_commit_response(pTHX_ ev_kafka_conn_t *self,
     const char *p = data;
     const char *end = data + len;
     HV *result = newHV();
-    AV *topics_av = newAV();
+    AV *topics_av = (AV*)sv_2mortal((SV*)newAV());
     int n;
     (void)self;
 
@@ -3194,7 +3359,7 @@ static SV* conn_parse_txn_offset_commit_response(pTHX_ ev_kafka_conn_t *self,
     int32_t tc = kf_read_i32(p); p += 4;
     int32_t i;
     for (i = 0; i < tc; i++) {
-        HV *th = newHV();
+        HV *th = (HV*)sv_2mortal((SV*)newHV());
         const char *tname; int16_t tnlen;
         n = kf_read_string(p, end, &tname, &tnlen);
         if (n < 0) goto done;
@@ -3203,23 +3368,23 @@ static SV* conn_parse_txn_offset_commit_response(pTHX_ ev_kafka_conn_t *self,
 
         if (end - p < 4) goto done;
         int32_t pc = kf_read_i32(p); p += 4;
-        AV *parts_av = newAV();
+        AV *parts_av = (AV*)sv_2mortal((SV*)newAV());
         int32_t j;
         for (j = 0; j < pc; j++) {
-            HV *ph = newHV();
+            HV *ph = (HV*)sv_2mortal((SV*)newHV());
             if (end - p < 6) goto done;
             int32_t pid = kf_read_i32(p); p += 4;
             int16_t err = kf_read_i16(p); p += 2;
             hv_store(ph, "partition", 9, newSViv(pid), 0);
             hv_store(ph, "error_code", 10, newSViv(err), 0);
-            av_push(parts_av, newRV_noinc((SV*)ph));
+            av_push(parts_av, newRV_inc((SV*)ph));
         }
-        hv_store(th, "partitions", 10, newRV_noinc((SV*)parts_av), 0);
-        av_push(topics_av, newRV_noinc((SV*)th));
+        hv_store(th, "partitions", 10, newRV_inc((SV*)parts_av), 0);
+        av_push(topics_av, newRV_inc((SV*)th));
     }
 
 done:
-    hv_store(result, "topics", 6, newRV_noinc((SV*)topics_av), 0);
+    hv_store(result, "topics", 6, newRV_inc((SV*)topics_av), 0);
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
@@ -3283,7 +3448,10 @@ static void conn_process_responses(pTHX_ ev_kafka_conn_t *self) {
             if (conn_check_destroyed(self)) return;
         }
 
-        /* Compact rbuf after dispatch */
+        /* Compact rbuf after dispatch — unless dispatch tore down the
+         * conn (conn_cleanup zeroed rbuf_len; subtracting would underflow). */
+        if (self->rbuf_len < consumed)
+            return;
         self->rbuf_len -= consumed;
         if (self->rbuf_len > 0)
             memmove(self->rbuf, self->rbuf + consumed, self->rbuf_len);
@@ -3300,7 +3468,16 @@ static void conn_io_cb(EV_P_ ev_io *w, int revents) {
     (void)loop;
     if (!self || self->magic != KF_MAGIC_ALIVE) return;
     self->callback_depth++;
-    conn_io_cb_inner(loop, w, revents);
+    {
+        /* Per-event tmps frame: without it, mortals created below would
+         * pile up in EV::run's frame.  FREETMPS runs while callback_depth
+         * >= 1, so a triggered destructor still defers conn_do_free. */
+        ENTER;
+        SAVETMPS;
+        conn_io_cb_inner(loop, w, revents);
+        FREETMPS;
+        LEAVE;
+    }
     if (--self->callback_depth == 0 && self->free_pending)
         conn_do_free(aTHX_ self);
 }
@@ -3317,10 +3494,6 @@ static void conn_io_cb_inner(EV_P_ ev_io *w, int revents) {
         int err = 0;
         socklen_t errlen = sizeof(err);
 
-        if (self->timing) {
-            ev_timer_stop(self->loop, &self->timer);
-            self->timing = 0;
-        }
         conn_stop_writing(self);
 
         if (getsockopt(self->fd, SOL_SOCKET, SO_ERROR, &err, &errlen) < 0)
@@ -3334,6 +3507,8 @@ static void conn_io_cb_inner(EV_P_ ev_io *w, int revents) {
             return;
         }
 
+        /* TCP connected — keep the timer armed for the handshake phases. */
+        conn_arm_timer(self);
         conn_on_connect_done(aTHX_ self);
         return;
     }
@@ -3348,6 +3523,7 @@ static void conn_io_cb_inner(EV_P_ ev_io *w, int revents) {
             conn_stop_writing(self);
 
             /* TLS done — proceed to ApiVersions (or SASL if needed) */
+            conn_arm_timer(self);
             conn_send_api_versions(aTHX_ self);
             conn_start_reading(self);
             return;
@@ -3383,6 +3559,7 @@ static void conn_io_cb_inner(EV_P_ ev_io *w, int revents) {
             ssize_t n = kf_io_write(self, self->wbuf + self->wbuf_off,
                                      self->wbuf_len - self->wbuf_off);
             if (n < 0) {
+                if (errno == EINTR) continue;
                 if (errno == EAGAIN || errno == EWOULDBLOCK) break;
                 conn_emit_error(aTHX_ self, strerror(errno));
                 if (conn_check_destroyed(self)) return;
@@ -3409,6 +3586,7 @@ static void conn_io_cb_inner(EV_P_ ev_io *w, int revents) {
         ssize_t n = kf_io_read(self, self->rbuf + self->rbuf_len,
                                 self->rbuf_cap - self->rbuf_len);
         if (n < 0) {
+            if (errno == EINTR) return;   /* level-triggered watcher re-fires */
             if (errno == EAGAIN || errno == EWOULDBLOCK) return;
             conn_emit_error(aTHX_ self, strerror(errno));
             if (conn_check_destroyed(self)) return;
@@ -3436,7 +3614,14 @@ static void conn_timer_cb(EV_P_ ev_timer *w, int revents) {
     self->timing = 0;
     if (self->magic != KF_MAGIC_ALIVE) return;
     self->callback_depth++;
-    conn_timer_cb_inner(loop, w, revents);
+    {
+        /* Per-event tmps frame: see conn_io_cb. */
+        ENTER;
+        SAVETMPS;
+        conn_timer_cb_inner(loop, w, revents);
+        FREETMPS;
+        LEAVE;
+    }
     if (--self->callback_depth == 0 && self->free_pending)
         conn_do_free(aTHX_ self);
 }
@@ -3450,9 +3635,11 @@ static void conn_timer_cb_inner(EV_P_ ev_timer *w, int revents) {
     self->timing = 0;
     if (self->magic != KF_MAGIC_ALIVE) return;
 
-    conn_emit_error(aTHX_ self, "connect timeout");
+    const char *msg = self->state == CONN_CONNECTING
+        ? "connect timeout" : "handshake timeout";
+    conn_emit_error(aTHX_ self, msg);
     if (conn_check_destroyed(self)) return;
-    conn_handle_disconnect(aTHX_ self, "connect timeout");
+    conn_handle_disconnect(aTHX_ self, msg);
 }
 
 /* ================================================================
@@ -3470,6 +3657,8 @@ static int is_ip_literal(const char *host) {
 
 static void conn_on_connect_done(pTHX_ ev_kafka_conn_t *self) {
     /* TCP connected — set up I/O watchers if not already */
+
+    self->reconnect_attempts = 0;
 
 #ifdef HAVE_OPENSSL
     if (self->tls_enabled) {
@@ -3562,6 +3751,9 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
 
     if (self->state != CONN_DISCONNECTED) {
         conn_cleanup(aTHX_ self);
+        /* fail old-conn callbacks: their correlation IDs must not match the new wire */
+        conn_cancel_pending(aTHX_ self, "reconnecting");
+        if (conn_check_destroyed(self)) return;
     }
 
     /* Save host/port (skip if already pointing to same string, e.g. reconnect) */
@@ -3571,6 +3763,8 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
     }
     self->port = port;
     self->intentional_disconnect = 0;
+    /* default timeout so a silent peer cannot wedge the conn forever */
+    self->connect_timeout = (timeout > 0) ? timeout : 10.0;
 
     snprintf(port_str, sizeof(port_str), "%d", port);
 
@@ -3592,12 +3786,25 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
         char errbuf[256];
         snprintf(errbuf, sizeof(errbuf), "resolve: %s", gai_strerror(gai_err));
         conn_emit_error(aTHX_ self, errbuf);
+        if (conn_check_destroyed(self)) return;
+        /* already DISCONNECTED: conn_handle_disconnect would no-op, so
+         * schedule the retry directly. */
+        if (!self->intentional_disconnect && self->auto_reconnect)
+            conn_schedule_reconnect(aTHX_ self);
         return;
     }
 
     for (rp = res; rp; rp = rp->ai_next) {
         fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (fd < 0) continue;
+
+#ifdef SO_NOSIGPIPE
+        /* BSD/macOS: no SIGPIPE from writes on this socket */
+        {
+            int one = 1;
+            setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
+        }
+#endif
 
         /* Non-blocking */
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
@@ -3620,6 +3827,7 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
             ev_io_init(&self->wio, conn_io_cb, fd, EV_WRITE);
             self->wio.data = (void *)self;
 
+            conn_arm_timer(self);   /* cover the handshake phases */
             conn_on_connect_done(aTHX_ self);
             return;
         }
@@ -3636,12 +3844,7 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
 
             conn_start_writing(self); /* wait for connect to complete */
 
-            if (timeout > 0) {
-                ev_timer_init(&self->timer, conn_timer_cb, timeout, 0.0);
-                self->timer.data = (void *)self;
-                ev_timer_start(self->loop, &self->timer);
-                self->timing = 1;
-            }
+            conn_arm_timer(self);
             return;
         }
 
@@ -3650,6 +3853,42 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
 
     freeaddrinfo(res);
     conn_emit_error(aTHX_ self, "connect: all addresses failed");
+    if (conn_check_destroyed(self)) return;
+    /* See the resolve-failure branch above: schedule the retry directly. */
+    if (!self->intentional_disconnect && self->auto_reconnect)
+        conn_schedule_reconnect(aTHX_ self);
+}
+
+/* Pre-validate the topics ARRAY so croak() doesn't longjmp over
+ * kf_buf_free in the caller; check_part_records also requires
+ * {partition, offset} hashrefs per partition. */
+static void kf_validate_txn_topics(const char *who, SV *topics_sv,
+    int check_part_records)
+{
+    if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVAV)
+        croak("%s: expected arrayref", who);
+    AV *topics = (AV*)SvRV(topics_sv);
+    SSize_t i, tc = av_len(topics) + 1;
+    for (i = 0; i < tc; i++) {
+        SV **elem = av_fetch(topics, i, 0);
+        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
+            croak("%s: bad element", who);
+        HV *th = (HV*)SvRV(*elem);
+        if (!hv_fetch(th, "topic", 5, 0))
+            croak("%s: missing topic", who);
+        SV **parts_sv = hv_fetch(th, "partitions", 10, 0);
+        if (!parts_sv || !SvROK(*parts_sv) || SvTYPE(SvRV(*parts_sv)) != SVt_PVAV)
+            croak("%s: missing partitions", who);
+        if (check_part_records) {
+            AV *parts = (AV*)SvRV(*parts_sv);
+            SSize_t j, pc = av_len(parts) + 1;
+            for (j = 0; j < pc; j++) {
+                SV **pelem = av_fetch(parts, j, 0);
+                if (!pelem || !SvROK(*pelem) || SvTYPE(SvRV(*pelem)) != SVt_PVHV)
+                    croak("%s: bad partition", who);
+            }
+        }
+    }
 }
 
 /* ================================================================
@@ -3667,14 +3906,17 @@ _new(char *cls, SV *loop_sv)
         struct ev_loop *loop;
         ev_kafka_conn_t *self;
 
-        if (SvOK(loop_sv) && sv_derived_from(loop_sv, "EV::Loop"))
+        if (SvOK(loop_sv) && sv_derived_from(loop_sv, "EV::Loop")) {
             loop = (struct ev_loop *)SvIV(SvRV(loop_sv));
+        }
         else
             loop = EV_DEFAULT;
 
         Newxz(self, 1, ev_kafka_conn_t);
         self->magic = KF_MAGIC_ALIVE;
         self->loop = loop;
+        if (loop != EV_DEFAULT)
+            self->loop_sv = newSVsv(loop_sv);   /* freed in conn_do_free */
         self->fd = -1;
         self->state = CONN_DISCONNECTED;
         self->next_correlation_id = 1;
@@ -3711,6 +3953,7 @@ void
 DESTROY(EV::Kafka::Conn self)
     CODE:
     {
+        if (!self) return;   /* IV already nulled by an earlier DESTROY */
         if (self->magic != KF_MAGIC_ALIVE) return;
         if (self->free_pending) return;   /* already scheduled for deferred free */
 
@@ -3722,6 +3965,11 @@ DESTROY(EV::Kafka::Conn self)
          * free_pending guard, and conn_check_destroyed reports the conn gone. */
         self->magic = KF_MAGIC_FREED;
         self->free_pending = 1;
+
+        /* Null the IV in the blessed ref BEFORE the drain: every copy of
+         * the ref shares it, so teardown callbacks calling methods on the
+         * dying conn get a clean croak (KF_REQUIRE_CONN). */
+        sv_setiv(SvRV(ST(0)), 0);
 
         conn_cancel_pending(aTHX_ self, "destroyed");
 
@@ -3737,6 +3985,7 @@ void
 connect(EV::Kafka::Conn self, const char *host, int port, double timeout = 0)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         conn_start_connect(aTHX_ self, host, port, timeout);
     }
 
@@ -3744,6 +3993,7 @@ void
 disconnect(EV::Kafka::Conn self)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         self->intentional_disconnect = 1;
         if (self->reconnect_timing) {
             ev_timer_stop(self->loop, &self->reconnect_timer);
@@ -3755,21 +4005,30 @@ disconnect(EV::Kafka::Conn self)
 int
 connected(EV::Kafka::Conn self)
     CODE:
+    {
+        KF_REQUIRE_CONN(self);
         RETVAL = (self->state == CONN_READY) ? 1 : 0;
+    }
     OUTPUT:
         RETVAL
 
 int
 state(EV::Kafka::Conn self)
     CODE:
+    {
+        KF_REQUIRE_CONN(self);
         RETVAL = self->state;
+    }
     OUTPUT:
         RETVAL
 
 int
 pending(EV::Kafka::Conn self)
     CODE:
+    {
+        KF_REQUIRE_CONN(self);
         RETVAL = self->pending_count;
+    }
     OUTPUT:
         RETVAL
 
@@ -3777,6 +4036,7 @@ void
 on_error(EV::Kafka::Conn self, SV *cb = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         CLEAR_HANDLER(self->on_error);
         if (cb && SvOK(cb)) {
             self->on_error = newSVsv(cb);
@@ -3787,6 +4047,7 @@ void
 on_connect(EV::Kafka::Conn self, SV *cb = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         CLEAR_HANDLER(self->on_connect);
         if (cb && SvOK(cb)) {
             self->on_connect = newSVsv(cb);
@@ -3797,6 +4058,7 @@ void
 on_disconnect(EV::Kafka::Conn self, SV *cb = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         CLEAR_HANDLER(self->on_disconnect);
         if (cb && SvOK(cb)) {
             self->on_disconnect = newSVsv(cb);
@@ -3807,6 +4069,7 @@ void
 client_id(EV::Kafka::Conn self, const char *id = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (id) {
             if (self->client_id) Safefree(self->client_id);
             self->client_id = savepv(id);
@@ -3818,9 +4081,10 @@ void
 tls(EV::Kafka::Conn self, int enable, const char *ca_file = NULL, int skip_verify = 0)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         self->tls_enabled = enable;
         if (self->tls_ca_file) { Safefree(self->tls_ca_file); self->tls_ca_file = NULL; }
-        if (ca_file) self->tls_ca_file = savepv(ca_file);
+        if (ca_file && *ca_file) self->tls_ca_file = savepv(ca_file);
         self->tls_skip_verify = skip_verify;
     }
 
@@ -3828,13 +4092,15 @@ void
 sasl(EV::Kafka::Conn self, const char *mechanism, const char *username = NULL, const char *password = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->sasl_mechanism) { Safefree(self->sasl_mechanism); self->sasl_mechanism = NULL; }
         if (self->sasl_username) { Safefree(self->sasl_username); self->sasl_username = NULL; }
         if (self->sasl_password) { Safefree(self->sasl_password); self->sasl_password = NULL; }
         if (SvOK(ST(1))) {
             self->sasl_mechanism = savepv(mechanism);
-            if (username) self->sasl_username = savepv(username);
-            if (password) self->sasl_password = savepv(password);
+            /* undef arrives as "" through the typemap — store NULL instead. */
+            if (username && *username) self->sasl_username = savepv(username);
+            if (password && *password) self->sasl_password = savepv(password);
         }
     }
 
@@ -3842,6 +4108,7 @@ void
 auto_reconnect(EV::Kafka::Conn self, int enable, int delay_ms = 1000)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         self->auto_reconnect = enable;
         self->reconnect_delay_ms = delay_ms;
     }
@@ -3850,6 +4117,7 @@ void
 metadata(EV::Kafka::Conn self, SV *topics_sv, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -3887,6 +4155,7 @@ void
 api_versions(EV::Kafka::Conn self)
     PPCODE:
     {
+        KF_REQUIRE_CONN(self);
         if (!self->api_versions_known)
             XSRETURN_UNDEF;
 
@@ -3908,6 +4177,7 @@ void
 fetch(EV::Kafka::Conn self, const char *topic, int partition, SV *offset_sv, SV *arg1 = NULL, SV *arg2 = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -3993,6 +4263,7 @@ void
 fetch_multi(EV::Kafka::Conn self, SV *topics_sv, SV *arg1 = NULL, SV *arg2 = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4028,6 +4299,24 @@ fetch_multi(EV::Kafka::Conn self, SV *topics_sv, SV *arg1 = NULL, SV *arg2 = NUL
         if (ver < 0) ver = 4;
         if (ver > 7) ver = 7;
 
+        /* Validate up front so croak() doesn't longjmp over kf_buf_free. */
+        {
+            hv_iterinit(topics_hv);
+            HE *entry;
+            while ((entry = hv_iternext(topics_hv))) {
+                SV *parts_sv = hv_iterval(topics_hv, entry);
+                if (!SvROK(parts_sv) || SvTYPE(SvRV(parts_sv)) != SVt_PVAV)
+                    croak("fetch_multi: value must be an arrayref");
+                AV *parts_av = (AV*)SvRV(parts_sv);
+                SSize_t i, pc = av_len(parts_av) + 1;
+                for (i = 0; i < pc; i++) {
+                    SV **elem = av_fetch(parts_av, i, 0);
+                    if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
+                        croak("fetch_multi: partition entry must be a hashref");
+                }
+            }
+        }
+
         kf_buf_t body;
         kf_buf_init(&body);
 
@@ -4054,17 +4343,13 @@ fetch_multi(EV::Kafka::Conn self, SV *topics_sv, SV *arg1 = NULL, SV *arg2 = NUL
             kf_buf_append_string(&body, tname, (int16_t)tlen);
 
             SV *parts_sv = hv_iterval(topics_hv, entry);
-            if (!SvROK(parts_sv) || SvTYPE(SvRV(parts_sv)) != SVt_PVAV)
-                croak("fetch_multi: value must be an arrayref");
-            AV *parts_av = (AV*)SvRV(parts_sv);
+            AV *parts_av = (AV*)SvRV(parts_sv);   /* validated above */
             SSize_t i, pc = av_len(parts_av) + 1;
             kf_buf_append_i32(&body, (int32_t)pc);
 
             for (i = 0; i < pc; i++) {
                 SV **elem = av_fetch(parts_av, i, 0);
-                if (!elem || !SvROK(*elem))
-                    croak("fetch_multi: partition entry must be a hashref");
-                HV *ph = (HV*)SvRV(*elem);
+                HV *ph = (HV*)SvRV(*elem);        /* validated above */
 
                 SV **pid_sv = hv_fetch(ph, "partition", 9, 0);
                 int32_t pid = pid_sv ? (int32_t)SvIV(*pid_sv) : 0;
@@ -4092,6 +4377,7 @@ void
 produce_batch(EV::Kafka::Conn self, const char *topic, int partition, SV *records_sv, SV *opts_sv = NULL, SV *cb = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4185,6 +4471,7 @@ void
 list_offsets(EV::Kafka::Conn self, const char *topic, int partition, SV *timestamp_sv, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4227,6 +4514,7 @@ void
 produce(EV::Kafka::Conn self, const char *topic, int partition, SV *key_sv, SV *value_sv, SV *opts_sv = NULL, SV *cb = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4348,6 +4636,7 @@ void
 find_coordinator(EV::Kafka::Conn self, const char *group_id, SV *cb, int key_type = 0)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4373,8 +4662,12 @@ void
 join_group(EV::Kafka::Conn self, const char *group_id, const char *member_id, SV *topics_sv, SV *cb, int session_timeout_ms = 30000, int rebalance_timeout_ms = 60000, SV *group_instance_id_sv = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
+
+        if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVAV)
+            croak("join_group: expected arrayref");
 
         int16_t ver = self->api_versions[API_JOIN_GROUP];
         if (ver < 0) ver = 1;
@@ -4442,6 +4735,7 @@ void
 sync_group(EV::Kafka::Conn self, const char *group_id, int generation_id, const char *member_id, SV *assignments_sv, SV *cb, SV *group_instance_id_sv = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4506,6 +4800,7 @@ void
 heartbeat(EV::Kafka::Conn self, const char *group_id, int generation_id, const char *member_id, SV *cb, SV *group_instance_id_sv = NULL)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4542,8 +4837,12 @@ void
 offset_commit(EV::Kafka::Conn self, const char *group_id, int generation_id, const char *member_id, SV *offsets_sv, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
+
+        if (!SvROK(offsets_sv) || SvTYPE(SvRV(offsets_sv)) != SVt_PVAV)
+            croak("offset_commit: expected arrayref");
 
         int16_t ver = self->api_versions[API_OFFSET_COMMIT];
         if (ver < 0) ver = 2;
@@ -4618,8 +4917,12 @@ void
 offset_fetch(EV::Kafka::Conn self, const char *group_id, SV *topics_sv, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
+
+        if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVAV)
+            croak("offset_fetch: expected arrayref");
 
         int16_t ver = self->api_versions[API_OFFSET_FETCH];
         if (ver < 0) ver = 1;
@@ -4666,6 +4969,7 @@ void
 leave_group(EV::Kafka::Conn self, const char *group_id, const char *member_id, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4690,8 +4994,12 @@ void
 create_topics(EV::Kafka::Conn self, SV *topics_sv, int timeout_ms, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
+
+        if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVAV)
+            croak("create_topics: expected arrayref");
 
         int16_t ver = self->api_versions[API_CREATE_TOPICS];
         if (ver < 0) ver = 0;
@@ -4744,8 +5052,12 @@ void
 delete_topics(EV::Kafka::Conn self, SV *topics_sv, int timeout_ms, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
+
+        if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVAV)
+            croak("delete_topics: expected arrayref");
 
         int16_t ver = self->api_versions[API_DELETE_TOPICS];
         if (ver < 0) ver = 0;
@@ -4776,6 +5088,7 @@ void
 init_producer_id(EV::Kafka::Conn self, SV *transactional_id_sv, int txn_timeout_ms, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4810,6 +5123,7 @@ void
 add_partitions_to_txn(EV::Kafka::Conn self, const char *transactional_id, SV *producer_id_sv, int producer_epoch, SV *topics_sv, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4818,6 +5132,8 @@ add_partitions_to_txn(EV::Kafka::Conn self, const char *transactional_id, SV *pr
         if (ver > 1) ver = 1;
 
         int64_t pid = SvIV(producer_id_sv);
+
+        kf_validate_txn_topics("add_partitions_to_txn", topics_sv, 0);
 
         kf_buf_t body;
         kf_buf_init(&body);
@@ -4828,25 +5144,20 @@ add_partitions_to_txn(EV::Kafka::Conn self, const char *transactional_id, SV *pr
         kf_buf_append_i16(&body, (int16_t)producer_epoch);
 
         /* topics: ARRAY of {topic, partitions: ARRAY(i32)} */
-        if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVAV)
-            croak("add_partitions_to_txn: expected arrayref");
-        AV *topics = (AV*)SvRV(topics_sv);
+        AV *topics = (AV*)SvRV(topics_sv);   /* validated above */
         SSize_t i, tc = av_len(topics) + 1;
         kf_buf_append_i32(&body, (int32_t)tc);
 
         for (i = 0; i < tc; i++) {
             SV **elem = av_fetch(topics, i, 0);
-            if (!elem || !SvROK(*elem)) croak("add_partitions_to_txn: bad element");
             HV *th = (HV*)SvRV(*elem);
             SV **tname_sv = hv_fetch(th, "topic", 5, 0);
-            if (!tname_sv) croak("add_partitions_to_txn: missing topic");
             STRLEN tnlen;
             const char *tname = SvPV(*tname_sv, tnlen);
             kf_buf_append_string(&body, tname, (int16_t)tnlen);
 
             SV **parts_sv = hv_fetch(th, "partitions", 10, 0);
-            if (!parts_sv || !SvROK(*parts_sv)) croak("add_partitions_to_txn: missing partitions");
-            AV *parts = (AV*)SvRV(*parts_sv);
+            AV *parts = (AV*)SvRV(*parts_sv);   /* validated above */
             SSize_t j, pc = av_len(parts) + 1;
             kf_buf_append_i32(&body, (int32_t)pc);
             for (j = 0; j < pc; j++) {
@@ -4863,6 +5174,7 @@ void
 end_txn(EV::Kafka::Conn self, const char *transactional_id, SV *producer_id_sv, int producer_epoch, int committed, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4889,6 +5201,7 @@ void
 txn_offset_commit(EV::Kafka::Conn self, const char *transactional_id, const char *group_id, SV *producer_id_sv, int producer_epoch, int generation_id, const char *member_id, SV *offsets_sv, SV *cb)
     CODE:
     {
+        KF_REQUIRE_CONN(self);
         if (self->state != CONN_READY)
             croak("not connected");
 
@@ -4897,6 +5210,8 @@ txn_offset_commit(EV::Kafka::Conn self, const char *transactional_id, const char
         if (ver > 3) ver = 3;
 
         int64_t pid = SvIV(producer_id_sv);
+
+        kf_validate_txn_topics("txn_offset_commit", offsets_sv, 1);
 
         kf_buf_t body;
         kf_buf_init(&body);
@@ -4919,33 +5234,27 @@ txn_offset_commit(EV::Kafka::Conn self, const char *transactional_id, const char
         }
 
         /* offsets: ARRAY of {topic, partitions: [{partition, offset}]} */
-        if (!SvROK(offsets_sv) || SvTYPE(SvRV(offsets_sv)) != SVt_PVAV)
-            croak("txn_offset_commit: expected arrayref");
-        AV *topics = (AV*)SvRV(offsets_sv);
+        AV *topics = (AV*)SvRV(offsets_sv);   /* validated above */
         SSize_t i, tc = av_len(topics) + 1;
         kf_buf_append_i32(&body, (int32_t)tc);
 
         for (i = 0; i < tc; i++) {
             SV **elem = av_fetch(topics, i, 0);
-            if (!elem || !SvROK(*elem)) croak("txn_offset_commit: bad element");
             HV *th = (HV*)SvRV(*elem);
 
             SV **tname_sv = hv_fetch(th, "topic", 5, 0);
-            if (!tname_sv) croak("txn_offset_commit: missing topic");
             STRLEN tnlen;
             const char *tname = SvPV(*tname_sv, tnlen);
             kf_buf_append_string(&body, tname, (int16_t)tnlen);
 
             SV **parts_sv = hv_fetch(th, "partitions", 10, 0);
-            if (!parts_sv || !SvROK(*parts_sv)) croak("txn_offset_commit: missing partitions");
-            AV *parts = (AV*)SvRV(*parts_sv);
+            AV *parts = (AV*)SvRV(*parts_sv);   /* validated above */
             SSize_t j, pc = av_len(parts) + 1;
             kf_buf_append_i32(&body, (int32_t)pc);
 
             for (j = 0; j < pc; j++) {
                 SV **pelem = av_fetch(parts, j, 0);
-                if (!pelem || !SvROK(*pelem)) croak("txn_offset_commit: bad partition");
-                HV *ph = (HV*)SvRV(*pelem);
+                HV *ph = (HV*)SvRV(*pelem);     /* validated above */
 
                 SV **ppid_sv = hv_fetch(ph, "partition", 9, 0);
                 kf_buf_append_i32(&body, ppid_sv ? (int32_t)SvIV(*ppid_sv) : 0);

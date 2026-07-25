@@ -14,6 +14,7 @@ t/02-oracle.t
 t/03-pdl.t
 xt/asan.t
 xt/crash_recovery.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fork_ndarray.t
 xt/kwalitee.t

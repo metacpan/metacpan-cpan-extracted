@@ -1,5 +1,10 @@
 Tk::CodeText module changes log
 
+0.69 25 Jul 2026
+	- Popping the search box no longer depends on the ststus bar being visible.
+	- Modified auto complete. The list will adjust when it is popped an you keep on typing.
+	- Added method patchdiff to XText. Modified the codetext executable to support that.
+
 0.68 04 Apr 2025
 	- Fixed updating line numbers and fold indicators when drag scrolling.
 

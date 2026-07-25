@@ -1,9 +1,8 @@
 package Mail::DMARC::Report::Store::SQL::Grammars::SQLite;
-our $VERSION = '2.20260621';
+our $VERSION = '2.20260724';
 use strict;
 use warnings;
 use feature 'signatures';
-no warnings 'experimental::signatures';    ## no critic (ProhibitNoWarnings)
 
 sub new($class) {
     my $self = {};
@@ -292,7 +291,7 @@ Mail::DMARC::Report::Store::SQL::Grammars::SQLite - Grammar for working with sql
 
 =head1 VERSION
 
-version 2.20260621
+version 2.20260724
 
 =head1 SYPNOSIS
 

@@ -1,7 +1,12 @@
-# submit_job_epoch schedules a background job for a future wall-clock
-# time. We schedule far enough out that it won't run during the test,
-# then confirm the server accepted it (a handle came back) and reports
-# it as a known, not-yet-running job.
+# SUBMIT_JOB_EPOCH wire encoding. Whether gearmand executes an epoch
+# job is the server's business (its default builtin queue accepts but
+# never runs them); what THIS module guarantees is the packet it emits.
+# A fake server decodes the request and asserts the body is exactly
+# FUNC\0UNIQUE\0EPOCH\0WORKLOAD, with the EPOCH field rendered as the
+# decimal integer passed in — including a value past 2^31, to catch
+# signed/32-bit truncation. The old test hardcoded nothing but also
+# asserted nothing about the wire, so an epoch hardcoded to "0" in the
+# XS left it green; this one goes red. No gearmand needed.
 use strict;
 use warnings;
 use Test::More;
@@ -9,44 +14,104 @@ use IO::Socket::INET;
 use EV;
 use EV::Gearman;
 
-my $host = $ENV{TEST_GEARMAN_HOST} || '127.0.0.1';
-my $port = $ENV{TEST_GEARMAN_PORT} || 4730;
-my $probe = IO::Socket::INET->new(
-    PeerAddr => $host, PeerPort => $port, Proto => 'tcp', Timeout => 1,
-);
-plan skip_all => "no gearmand at $host:$port" unless $probe;
-close $probe;
+use constant {
+    GM_CMD_SUBMIT_JOB_EPOCH => 36,
+    GM_CMD_JOB_CREATED      => 8,
+};
 
-my $cli  = EV::Gearman->new(host => $host, port => $port);
-my $func = "epoch_$$";
+# Spin a one-shot capture server, connect a client, run $submit->($cli,
+# $cb) once connected, and return ([captured packets], @cb_args).
+# Each captured packet is [magic, cmd, declared_len, body].
+sub submit_and_capture {
+    my ($submit) = @_;
 
-# 1) Schedule for an hour out; expect a JOB_CREATED handle back.
-my ($handle, $err);
-$cli->submit_job_epoch($func, 'later', time() + 3600, sub {
-    ($handle, $err) = @_; EV::break;
-});
-my $g = EV::timer 5, 0, sub { fail 'epoch submit timeout'; EV::break };
-EV::run;
-is $err, undef, 'no error scheduling an epoch job';
-like $handle, qr/\S/, "got a job handle ($handle)";
+    my $srv = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1', LocalPort => 0, Listen => 1, ReuseAddr => 1,
+    ) or plan skip_all => "cannot bind listener: $!";
+    $srv->blocking(0);
+    my $port = $srv->sockport;
 
-# 2) The scheduled job should be known to the server but not running
-#    (no worker, and its time hasn't come).
-my $info;
-$cli->get_status($handle, sub { $info = $_[0]; EV::break });
-$g = EV::timer 5, 0, sub { fail 'get_status timeout'; EV::break };
-EV::run;
-is ref($info), 'HASH', 'status hashref returned';
-is $info->{known},   1, 'scheduled job is known to the server';
-is $info->{running}, 0, 'scheduled job is not running yet';
+    my @pkts;
+    my @cb_args;
+    my ($conn, $read_w);
+    my $rbuf = '';
+    my $accept_w = EV::io fileno($srv), EV::READ, sub {
+        $conn = $srv->accept or return;
+        $conn->blocking(0);
+        $read_w = EV::io fileno($conn), EV::READ, sub {
+            my $n = sysread($conn, my $chunk, 65536);
+            if (!$n) { undef $read_w; return; }
+            $rbuf .= $chunk;
+            while (length($rbuf) >= 12) {
+                my ($magic, $cmd, $len) = unpack "a4 N N", $rbuf;
+                last if length($rbuf) < 12 + $len;
+                my $body = substr($rbuf, 12, $len);
+                substr($rbuf, 0, 12 + $len) = '';
+                push @pkts, [$magic, $cmd, $len, $body];
+                if ($cmd == GM_CMD_SUBMIT_JOB_EPOCH) {
+                    my $handle = "H:fake:$$";
+                    syswrite $conn, "\0RES"
+                        . pack("N N", GM_CMD_JOB_CREATED, length $handle)
+                        . $handle;
+                }
+            }
+        };
+    };
 
-# 3) The unique opt is accepted on the epoch path too.
-my ($h2, $e2);
-$cli->submit_job_epoch($func, 'keyed', time() + 3600,
-    { unique => "epoch-$$" }, sub { ($h2, $e2) = @_; EV::break });
-$g = EV::timer 5, 0, sub { fail 'epoch+unique submit timeout'; EV::break };
-EV::run;
-is $e2, undef, 'epoch job with unique key accepted';
-like $h2, qr/\S/, 'epoch job with unique key returned a handle';
+    my $cli;
+    $cli = EV::Gearman->new(
+        host => '127.0.0.1', port => $port,
+        on_connect => sub {
+            $submit->($cli, sub { @cb_args = @_; EV::break });
+        },
+    );
+    my $guard = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+
+    undef $cli; undef $read_w; undef $accept_w;
+    close $conn if $conn;
+    close $srv;
+    return (\@pkts, \@cb_args);
+}
+
+my $func = "epoch_wire_$$";
+
+# --- 1. epoch with explicit unique -----------------------------------
+{
+    my $epoch = 1735689600;   # 2025-01-01T00:00:00Z
+    my ($pkts, $cb) = submit_and_capture(sub {
+        my ($cli, $cb) = @_;
+        $cli->submit_job_epoch($func, 'payload', $epoch,
+            { unique => 'u-key' }, $cb);
+    });
+
+    is scalar(@$pkts), 1, 'client sent exactly one packet';
+    my ($magic, $cmd, $len, $body) = @{ $pkts->[0] };
+    is $magic, "\0REQ", 'request magic is \0REQ';
+    is $cmd, GM_CMD_SUBMIT_JOB_EPOCH, 'command is SUBMIT_JOB_EPOCH (36)';
+    is $len, length($body), 'declared length matches body length';
+    is $body, "$func\0u-key\0$epoch\0payload",
+        'body is exactly FUNC\0UNIQUE\0EPOCH\0WORKLOAD';
+    is_deeply $cb, ["H:fake:$$", undef],
+        'JOB_CREATED handle reached the submit callback';
+}
+
+# --- 2. epoch past 2^31, no unique ------------------------------------
+{
+    my $epoch = 4102444800;   # 2100-01-01T00:00:00Z, > 2**31
+    my ($pkts, $cb) = submit_and_capture(sub {
+        my ($cli, $cb) = @_;
+        $cli->submit_job_epoch($func, 'wl2', $epoch, $cb);
+    });
+
+    is scalar(@$pkts), 1, 'client sent exactly one packet';
+    my ($magic, $cmd, $len, $body) = @{ $pkts->[0] };
+    is $cmd, GM_CMD_SUBMIT_JOB_EPOCH, 'command is SUBMIT_JOB_EPOCH (36)';
+    is $len, length($body), 'declared length matches body length';
+    is $body, "$func\0\0$epoch\0wl2",
+        'large epoch survives untruncated; unique field empty when omitted';
+    like $cb->[0], qr/\S/, 'JOB_CREATED handle reached the submit callback';
+    is $cb->[1], undef, 'no error';
+}
 
 done_testing;

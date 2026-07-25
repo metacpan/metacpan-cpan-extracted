@@ -79,12 +79,12 @@ METHODS
     "new_memfd" croak if any argument is out of range.
 
     $mode sets the permission bits used when "new" creates the backing file
-    (still subject to the process umask); the default is 0600, owner-only.
-    Pass e.g. 0660 to opt in to sharing the file with other users in the
-    group. It applies only at creation: reopening an existing file does not
-    change its permissions, and the argument is ignored for anonymous
-    histograms ($path undef or omitted). "new_memfd" and "new_from_fd" do
-    not take a mode.
+    (applied exactly via "fchmod", so umask does not narrow it); the default
+    is 0600, owner-only. Pass e.g. 0660 to opt in to sharing the file with
+    other users in the group. It applies only at creation: reopening an
+    existing file does not change its permissions, and the argument is
+    ignored for anonymous histograms ($path undef or omitted). "new_memfd"
+    and "new_from_fd" do not take a mode.
 
     $lowest additionally must satisfy "floor(log2($lowest)) + ceil(log2(2 *
     10**$sig_figs)) - 1 <= 61" (a histogram-geometry limit); in practice
@@ -239,6 +239,20 @@ CRASH SAFETY
     a crash leaves the histogram consistent up to the last completed
     "record". Limitation: PID reuse is not detected (very unlikely in
     practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
 
 SEE ALSO
     Data::CountMinSketch::Shared, Data::HyperLogLog::Shared,

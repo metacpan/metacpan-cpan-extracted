@@ -2,164 +2,71 @@ package CPAN::MetaCurator::Config;
 
 use boolean;
 use feature 'say';
-use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Config::Tiny;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use File::Spec;
 
+use Mew;
 use Mojo::Log;
-use Moo;
-
-use Types::Standard qw/ArrayRef HashRef Object Str/;
 
 use utf8;
 
-has config =>
-(
-	default		=> sub{return {} },
-	is			=> 'rw',
-	isa			=> HashRef,
-	required	=> 1,
-);
+has config => (HashRef, default => sub {return {} }, chained => 1);
 
-has config_path =>
-(
-	default		=> sub{return 'data/cpan.metacurator.conf'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -config_path => (Str, default => 'data/cpan.metacurator.conf');
 
-has database_path =>
-(
-	default		=> sub{return 'data/cpan.metacurator.sqlite'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has database_path => (Str, default => 'data/cpan.metacurator.sqlite');
 
-has error =>
-(
-	default		=> sub{return ''},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -error => (Str, default => '', chained => 1);
 
-has home_path =>
-(
-	default		=> '',
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has home_path => (Str, default => '', chained => 1);
 
 # Available log levels are trace, debug, info, warn, error and fatal, in that order.
 
-has log_level =>
-(
-	default		=> sub{return 'info'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -log_level => (Str, default => 'info', chained => 1);
 
-has logger =>
-(
-	is			=> 'rw',
-	isa			=> Object,
-	required	=> 0,
-);
+has -logger => (Object, chained => 1);
 
-has logo_path =>
-(
-	default		=> '',
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 1,
-);
+has metapackager_config => (HashRef, default => sub {return {} }, chained => 1);
 
-has metapackager_config =>
-(
-	default		=> sub{return {} },
-	is			=> 'rw',
-	isa			=> HashRef,
-	required	=> 1,
-);
+has -metapackager_config_path => (Str, default => 'data/cpan.metapackager.conf');
 
-has metapackager_config_path =>
-(
-	default		=> sub{return 'data/cpan.metapackager.conf'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -metapackager_database_path => (Str, default => '/tmp/cpan.metapackager.sqlite');
 
-
-has metapackager_database_path =>
-(
-	default		=> sub{return '/tmp/cpan.metapackager.sqlite'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
-
-has node_types =>
-(
-	default		=> sub{return [qw/acronym known leaf see_also topic unknown/]},
-	is			=> 'rw',
-	isa			=> ArrayRef,
-	required	=> 0,
-);
+has -node_types => (ArrayRef, default => sub {return [qw/acronym known leaf see_also topic unknown/]});
 
 # Warning. Order is important because of foreign key constraints.
 # The tables are created in this order, and dropped in reverse order.
 # Lastly, we process the topics table to extract the module names.
 # See also Database.build_pad().
 
-has table_names =>
-(
-	default		=> sub{return [qw/constants log modules topics/]},
-	is			=> 'rw',
-	isa			=> ArrayRef,
-	required	=> 0,
-);
+has -table_names => (ArrayRef, default => sub{return [qw/constants log modules topics/]});
 
-has tiddlers_path =>
-(
-	default		=> sub{return 'data/tiddlers.json'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -tiddlers_path => (Str, default => 'data/tiddlers.json');
 
-has visual_break =>
-(
-	default		=> sub{return '-' x 50},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has -visual_break => (Str, default => sub{return '-' x 50});
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 # -----------------------------------------------
 
 sub init_config
 {
-	my($self)				= @_;
-	my($path)				= File::Spec -> catfile($self -> home_path, $self -> config_path);
-	my($config)				= $self -> config($self -> _init_config($path) );
-	$$config{config_path}	= $path;
-	$$config{log_path}		= File::Spec -> catfile($self -> home_path, $$config{log_path});
+	my($self)			= @_;
+	my($path)			= File::Spec -> catfile($self -> home_path, $self -> config_path);
+	my($conf)			= Config::Tiny -> read($path);
+	$conf				= $conf -> {_};
+	$$conf{config_path}	= $path;
+	$$conf{log_path}	= File::Spec -> catfile($self -> home_path, $$conf{log_path});
 
-	$self -> config($config);
-	$self -> logger(Mojo::Log -> new(level => $self -> log_level, path => $$config{log_path}) );
+	$self -> config($conf);
+	$self -> logger(Mojo::Log -> new(level => $self -> log_level, path => $$conf{log_path}) );
 
 	# Fix me. Test UTF8 char handling.
 
-	$self -> logger -> debug("Entered Config.init_config()");
 	$self -> logger -> info("Testing write of utf8 chars to logger. I ♥ Mojolicious");
 	$self -> logger -> debug("Leaving Config.init_config()");
 
@@ -167,44 +74,15 @@ sub init_config
 
 # -----------------------------------------------
 
-sub _init_config
-{
-	my($self, $path) = @_;
-
-	# Section: [global].
-
-	my($config) = Config::Tiny -> read($path);
-
-	die 'Error: ' . Config::Tiny -> errstr . "\n" if (Config::Tiny -> errstr);
-
-	# Sections: [localhost] and [webhost].
-
-	my($section);
-
-	for my $i (1 .. 2)
-	{
-		$section = $i == 1 ? 'global' : $$config{$section}{host};
-
-		$self -> error("Error: Config file '$path' does not contain the section [$section]") if (! $$config{$section});
-	}
-
-	return $$config{$section};
-
-}	# End of _init_config.
-
-# -----------------------------------------------
-
 sub init_metapackager_config
 {
-	my($self) = @_;
+	my($self)			= @_;
+	my($path)			= File::Spec -> catfile($self -> home_path, $self -> metapackager_config_path);
+	my($conf)			= Config::Tiny -> read($path);
+	$conf				= $conf -> {_};
+	$$conf{config_path}	= $path;
 
-	$self -> logger -> debug("Entered Config.init_metapackager_config()");
-
-	my($path)				= File::Spec -> catfile($self -> home_path, $self -> metapackager_config_path);
-	my($config)				= $self -> config($self -> _init_config($path) );
-	$$config{config_path}	= $path;
-
-	$self -> metapackager_config($config);
+	$self -> metapackager_config($conf);
 	$self -> logger -> debug("Leaving Config.init_metapackager_config()");
 
 } # End of init_metapackager_config.

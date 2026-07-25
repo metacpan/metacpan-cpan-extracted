@@ -16,5 +16,6 @@
 ^EV-Gearman-
 ^MANIFEST\.bak$
 ^\.claude/
+^\.pcg/
 ^_Inline/
 ^src/ppport\.h$

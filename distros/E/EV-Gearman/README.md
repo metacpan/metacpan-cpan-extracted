@@ -76,7 +76,7 @@ batched write and lets the server stream replies back at full
 throughput.
 
 The text/admin protocol (`status`, `workers`, `version`,
-`maxqueue`, `shutdown`) shares the connection too; multi-line
+`maxqueue`) shares the connection too; multi-line
 replies are buffered to the `".\n"` terminator and delivered as a
 single string.
 
@@ -197,6 +197,13 @@ truthy value.
 
     Unix-domain socket path. Mutually exclusive with `host`.
 
+    Note that a `connect(2)` to a unix socket completes inline, so the
+    connection is fully established (and `on_connect` has already fired)
+    before `new` returns — a `$g->on_connect(...)` assigned after
+    construction will never fire for it. Pass `on_connect` to the
+    constructor instead (the same can theoretically happen for a TCP
+    connect that completes immediately).
+
 - `loop => $ev_loop`
 
     EV loop to attach to. Default: `EV::default_loop`.
@@ -219,9 +226,16 @@ truthy value.
 
 - `command_timeout => $ms`
 
-    Disconnect with `"command timeout"` if no response arrives within
-    this interval. The timer resets on every byte received. `0` = no
-    timeout (default).
+    Per-request timeout. The request at the head of the pending queue is
+    given this many ms from the moment it is written to the socket; if it
+    is still unanswered when its budget expires, the connection is torn
+    down with `"command timeout"`. The budget is independent of
+    unrelated traffic: other packets arriving meanwhile neither extend
+    the head request's budget nor shorten it, and once the head is
+    answered the next request's own budget applies. A slow reply that
+    keeps dribbling in is therefore safe as long as the request completes
+    within its budget — and a genuinely stuck request dies on schedule
+    even on an otherwise busy connection. `0` = no timeout (default).
 
 ### Reconnect
 
@@ -251,7 +265,8 @@ automatically.
     If true, the `exceptions` option is sent on every connect, so
     foreground clients receive `WORK_EXCEPTION` packets. For workers,
     this also enables forwarding `die` messages from sync callbacks
-    as exceptions before the `WORK_FAIL`.
+    as exceptions instead of the `WORK_FAIL` (`WORK_EXCEPTION` is
+    terminal at the server; sending both would earn a `JOB_NOT_FOUND`).
 
 - `client_id => $str`
 
@@ -277,6 +292,10 @@ automatically.
     Those packets sit ahead of any user submissions made from inside
     the callback — so submitting a job here is safe even though the
     ability registrations haven't yet hit the socket.
+
+    For unix sockets (`path`) the connect completes inline inside
+    `new`, so this callback fires before `new` returns — assign it via
+    the constructor, not after (see `path`).
 
 - `on_disconnect => $cb->()`
 
@@ -364,8 +383,13 @@ Schedule a background job for absolute epoch time `$epoch`
 `%opts`, only `unique` is meaningful — the per-event handlers
 (`on_data`, `on_warning`, etc.) are silently ignored because the
 server delivers no work events to the submitting client for
-scheduled / background jobs. Server must be built with persistent
-queue support for scheduled jobs to survive a restart.
+scheduled / background jobs.
+
+**Server note:** with gearmand 1.1.21's default `builtin` queue we
+observed that the server accepts an epoch job and returns a handle
+but never executes it; a persistent queue type is required for
+scheduled delivery. Other gearmand versions or queue types may
+behave differently — verify against your deployment.
 
 ## get\_status($handle, $cb->($info, $err))
 
@@ -504,8 +528,26 @@ or printable (admin). Multi-line replies are accumulated to the
 
 Send a raw text command (newline appended automatically). Replies
 are accumulated until the `".\n"` terminator for the multi-line
-commands `status`, `workers`, and `prioritystatus`; everything
-else is treated as single-line.
+commands `status`, `workers`, `prioritystatus` (matched on the
+leading word, so arguments are tolerated), `show jobs`, and
+`show unique jobs` (exact forms only — with extra arguments
+gearmand answers a single-line `ERR` instead); everything else is
+treated as single-line.
+
+A single-line reply beginning with `ERR ` (gearmand's text-protocol
+error prefix, e.g. for an unrecognized command) is delivered as the
+error argument: `$cb->(undef, "ERR UNKNOWN_COMMAND ...")` — not
+as a successful result. The connection stays up.
+
+If a command not in the multi-line set above nevertheless gets a
+`".\n"`-terminated multi-line reply from the server, only the first
+line is delivered; the leftover lines cannot be attributed to any
+request and the connection is torn down with a protocol error.
+
+Because the text protocol has no length prefix, a buffered reply is
+capped at 16 MiB: a peer that keeps streaming without ever sending
+the terminator is dropped with an `"admin response too large"`
+error (and the normal reconnect logic applies).
 
 ## server\_status(\[$cb\])
 
@@ -523,16 +565,13 @@ Single-line reply (e.g. `"OK 1.1.21+ds"`).
 
 Set the per-function queue size cap. Reply is `"OK\n"`.
 
-## shutdown\_server(graceful => $bool, cb => $cb)
-
-Send `shutdown` or `shutdown graceful`. The server replies with
-`"OK\n"` and then closes the connection.
-
 # INTROSPECTION
 
 ## pending\_count
 
-Number of binary requests sent and awaiting a response.
+Number of requests sent and awaiting a response — binary client
+requests, admin (text-protocol) commands, and the worker's in-flight
+`GRAB_JOB` all count.
 
 ## waiting\_count
 

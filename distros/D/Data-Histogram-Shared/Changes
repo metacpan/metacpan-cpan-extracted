@@ -1,5 +1,14 @@
 Revision history for Data-Histogram-Shared
 
+0.03      2026-07-22
+          - Fix use-after-free in merge() and record_many(): a tied argument,
+            a tied array, or overloaded elements run Perl that can destroy
+            the histogram, after which the already-captured handle was still
+            used. Such a call now croaks.
+          - On-disk format change (v1 -> v2): an existing 0.02 file is
+            refused; recreate it.
+          - Fetch get-magic on optional arguments before testing them.
+
 0.02      2026-07-03
           - Security and robustness hardening; backing files now created mode
             0600 (pass a file-mode argument to new() for cross-user sharing).

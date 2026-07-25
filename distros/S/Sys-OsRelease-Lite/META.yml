@@ -16,7 +16,6 @@ build_requires:
 configure_requires:
   CPAN::Changes: '0'
   ExtUtils::MakeMaker: '0'
-  Readonly: '0'
   Versioning::Scheme::Semantic: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
@@ -34,5 +33,5 @@ provides:
     file: lib/Sys/OsRelease/Lite.pm
 requires:
   perl: '5.010001'
-version: v0.4.4+lite
+version: v0.4.5+lite
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,7 +1,7 @@
 package Data::Intern::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::Intern::Shared', $VERSION);
 
@@ -68,10 +68,10 @@ per-string removal (see L</LIMITS>). B<Linux-only>. Requires 64-bit Perl.
 
 C<$path> is the backing file (C<undef> for an anonymous mapping); C<$max_strings>
 is the id/string capacity; C<$arena_bytes> is the total string-bytes capacity and
-is optional (defaults to C<$max_strings * 32>, capped at 4 GB). When reopening an
+is optional (defaults to C<$max_strings * 32>, with a 64-byte floor, capped at 4 GB). When reopening an
 existing file or memfd, the stored header wins and the caller's sizes are ignored.
 Backing files are created with mode 0600 (owner-only) by default; pass an octal
-C<$mode> (e.g. C<0666>, subject to umask) to allow cross-user sharing. C<$mode>
+C<$mode> (e.g. C<0666>, applied exactly via C<fchmod> -- not narrowed by umask) to allow cross-user sharing. C<$mode>
 applies only when the file is created -- it is ignored when attaching to an
 existing file, and for anonymous and memfd tables.
 C<new_memfd> creates a Linux memfd (transferable via its C<memfd> descriptor);
@@ -166,6 +166,18 @@ ownership; if a holder dies, the next contender detects the dead owner and
 recovers. The arena and tables are append-only and never rewritten in place, so a
 crash leaves the table consistent up to the last completed C<intern>.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

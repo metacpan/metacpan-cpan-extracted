@@ -1,7 +1,7 @@
 package Data::Histogram::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::Histogram::Shared', $VERSION);
 
@@ -99,7 +99,7 @@ and must be in the range 1..5 (default 3). C<new> and C<new_memfd> croak if any
 argument is out of range.
 
 C<$mode> sets the permission bits used when C<new> B<creates> the backing file
-(still subject to the process umask); the default is C<0600>, owner-only. Pass
+(applied exactly via C<fchmod>, so umask does not narrow it); the default is C<0600>, owner-only. Pass
 e.g. C<0660> to opt in to sharing the file with other users in the group. It
 applies only at creation: reopening an existing file does not change its
 permissions, and the argument is ignored for anonymous histograms (C<$path>
@@ -266,6 +266,18 @@ ownership; if a holder dies, the next contender detects the dead owner and
 recovers. Each count increment is a single word store, so a crash leaves the
 histogram consistent up to the last completed C<record>.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

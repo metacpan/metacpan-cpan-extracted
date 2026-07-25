@@ -1,0 +1,16 @@
+bin/wildling.pl
+lib/Wildling.pm
+lib/Wildling/Cli.pm
+lib/Wildling/Generator.pm
+lib/Wildling/help.txt
+lib/Wildling/Json.pm
+lib/Wildling/ParsePattern.pm
+lib/Wildling/Token.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+post-release-smoke.sh
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

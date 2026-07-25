@@ -11,7 +11,7 @@
  * mutation; immutable header fields (dtype/ndim/shape/strides/size/itemsize)
  * are read lock-free.
  *
- * Layout: Header -> reader_slots[1024] -> data[size * itemsize]
+ * Layout: Header -> reader_slots[1024] -> occ bitmap -> data[size * itemsize]
  */
 
 #ifndef NDARRAY_H
@@ -45,9 +45,15 @@
  * ================================================================ */
 
 #define NDA_MAGIC        0x4144444EU  /* "NDDA" (little-endian) */
-#define NDA_VERSION      1
+#define NDA_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
 #define NDA_ERR_BUFLEN   256
 #define NDA_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
+
+/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
+ * cleared on clean release.  A writer scans these NDA_OCC_WORDS words to visit
+ * only OCCUPIED slots (O(words + live readers)) instead of all NDA_READER_SLOTS. */
+#define NDA_OCC_WORDS   (((NDA_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
+#define NDA_OCC_BYTES   ((uint64_t)NDA_OCC_WORDS * 8)      /* 128 bytes */
 #define NDA_MAX_DIMS     8
 #define NDA_MAX_BYTES    ((uint64_t)1 << 40)   /* 1 TiB cap on the data buffer */
 
@@ -83,15 +89,19 @@ static inline int nda_dtype_from_name(const char *s, size_t len) {
  * Structs
  * ================================================================ */
 
-/* Per-process slot for dead-process recovery.  Each shared rwlock counter
- * is mirrored here so a wrlock timeout can attribute and reverse a dead
- * process's contribution instead of waiting for the slow per-op timeout
- * drain. */
+/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
+ * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
+ * there is no separate shared reader counter to fall out of sync with it -- so a
+ * dead reader's contribution is exactly this one word, which a draining writer
+ * neutralises by clearing the slot's pid (the scan then ignores the slot).  No
+ * orphaned counter can exist, so there is no quiescent force-reset and sustained
+ * readers cannot starve a writer.  _rsv1/_rsv2 are kept only to preserve the
+ * 16-byte slot size across the already-released builds. */
 typedef struct {
-    uint32_t pid;            /* 0 = unclaimed */
-    uint32_t subcount;       /* in-flight rdlock acquisitions for this process */
-    uint32_t waiters_parked; /* contribution to hdr->rwlock_waiters         */
-    uint32_t writers_parked; /* contribution to hdr->rwlock_writers_waiting */
+    uint32_t pid;      /* 0 = unclaimed */
+    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
+    uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } NdaReaderSlot;
 
 struct NdaHeader {
@@ -113,10 +123,10 @@ struct NdaHeader {
     uint64_t array_id;                /* 184 stable identity for set-op lock ordering */
 
     /* ---- lock + stats ---- */
-    uint32_t rwlock;                  /* 192 */
-    uint32_t rwlock_waiters;          /* 196 */
-    uint32_t rwlock_writers_waiting;  /* 200 */
-    uint32_t _pad1;                   /* 204 */
+    uint32_t wlock;                   /* 192  WRITER word ONLY: 0 (free) or WRITER_BIT|pid.  NOT a reader count. */
+    uint32_t rwait;                   /* 196  parked-waiter hint (readers+writers blocked on wlock); over-count-safe */
+    uint32_t drain_seq;               /* 200  futex bumped by a reader releasing under a draining writer (wakes it) */
+    uint32_t slotless_rdepth;         /* 204  readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 208 */
     uint8_t  _pad[40];                /* 216..255 */
 };
@@ -129,22 +139,48 @@ _Static_assert(sizeof(struct NdaHeader) == 256, "NdaHeader must be 256 bytes");
 typedef struct NdaHandle {
     NdaHeader     *hdr;
     NdaReaderSlot *reader_slots;  /* NDA_READER_SLOTS entries */
+    uint64_t      *occ;           /* NDA_OCC_WORDS-word slot-occupancy bitmap (trusted layout offset) */
     void          *base;          /* mmap base */
+    /* ---- immutable geometry cached at attach (Layer B: never re-read the
+     * peer-writable header for a loop bound / byte extent / data base; a
+     * lock-violating peer that corrupts hdr->{size,itemsize,data_off} after we
+     * attached must not drive an OOB access) ---- */
+    char          *data;          /* data base = trusted layout, NOT peer hdr->data_off */
+    uint64_t       size;          /* total element count (immutable after create) */
+    uint32_t       dtype;         /* enum NdaDtype (immutable after create); every element-width / element-type decision uses THIS, never peer hdr->dtype */
+    uint32_t       itemsize;      /* bytes per element (immutable after create) */
     size_t         mmap_size;
     char          *path;          /* backing file path (strdup'd) */
     int            backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
     uint32_t       my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t       cached_pid;    /* getpid() cached at last slot claim */
     uint32_t       cached_fork_gen; /* nda_fork_gen value at last slot claim */
+    uint32_t       slotless_held; /* read-locks this process holds with no reader-slot */
 } NdaHandle;
 
 /* ================================================================
- * Futex-based write-preferring read-write lock
- * with reader-slot dead-process recovery
+ * Futex-based write-preferring read-write lock (reader-slots-only)
+ * with dead-process recovery
+ *
+ * The reader count is NOT stored in a shared counter.  It is DISTRIBUTED across
+ * per-process reader slots: each slot's `rdepth` is that process's entire
+ * contribution to the lock.  A reader publishes its presence in its own slot and
+ * then re-checks the writer word; a writer publishes the writer word and then
+ * scans every slot until all live readers' rdepth reach 0.  Sequentially-
+ * consistent store+load on each side (a Dekker handshake) gives mutual exclusion.
+ *
+ * Because a reader's whole contribution is ONE atomic word owned by ONE process,
+ * a crashed reader is recovered by clearing that one slot (CAS its pid to 0) --
+ * there is no second counter to strand, no orphaned +1, and therefore no
+ * quiescent force-reset.  A reader killed anywhere in rdlock/rdunlock leaves at
+ * most `rdepth>0` in its dead slot, which the draining writer clears directly, so
+ * sustained read traffic can never starve a writer.  Write-preference is inherent
+ * in the gate (new readers see wlock!=0 and yield), so there is no reader-count
+ * yield hack.
  * ================================================================ */
 
 #define NDA_RWLOCK_SPIN_LIMIT 32
-#define NDA_LOCK_TIMEOUT_SEC  2  /* FUTEX_WAIT timeout for stale lock detection */
+#define NDA_LOCK_TIMEOUT_SEC  2  /* FUTEX_WAIT timeout for stale-lock detection / drain re-scan */
 
 static inline void nda_rwlock_spin_pause(void) {
 #if defined(__x86_64__) || defined(__i386__)
@@ -156,7 +192,7 @@ static inline void nda_rwlock_spin_pause(void) {
 #endif
 }
 
-/* Extract writer PID from rwlock value (lower 31 bits when write-locked). */
+/* Writer word encoding: WRITER_BIT|pid when write-locked, 0 when free. */
 #define NDA_RWLOCK_WRITER_BIT 0x80000000U
 #define NDA_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define NDA_RWLOCK_WR(pid)    (NDA_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & NDA_RWLOCK_PID_MASK))
@@ -167,24 +203,46 @@ static inline void nda_rwlock_spin_pause(void) {
  * runs, this reports "alive" and that slot's orphaned contribution is not
  * reclaimed until the recycled process exits. Documented under "Crash Safety"
  * in the POD. */
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int nda_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int nda_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !nda_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale write lock left by a dead process.
- * CAS to OUR pid to hold the lock while fixing shared state, then release. */
-static inline void nda_recover_stale_lock(NdaHandle *h, uint32_t observed_rwlock) {
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while fixing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void nda_recover_stale_lock(NdaHandle *h, uint32_t observed_wlock) {
     NdaHeader *hdr = h->hdr;
     uint32_t mypid = NDA_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->rwlock, &observed_rwlock,
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 static const struct timespec nda_lock_timeout = { NDA_LOCK_TIMEOUT_SEC, 0 };
@@ -201,260 +259,287 @@ static void nda_atfork_init(void) {
     pthread_atfork(NULL, NULL, nda_on_fork_child);
 }
 
-/* Ensure this process owns a reader slot.  Called from the lock helpers so
- * that fork()'d children pick up their own slot lazily instead of sharing
- * the parent's. */
+/* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
+ * release.  SEQ_CST so a set bit is ordered before the slot's rdepth can go
+ * non-zero (bit set in claim, which precedes any rdlock), letting a writer's
+ * SEQ_CST bitmap scan never miss a slot a committed reader holds. */
+static inline void nda_occ_set(NdaHandle *h, uint32_t s) {
+    __atomic_fetch_or(&h->occ[s >> 6], (uint64_t)1 << (s & 63), __ATOMIC_SEQ_CST);
+}
+static inline void nda_occ_clear(NdaHandle *h, uint32_t s) {
+    __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
+}
+
+/* Ensure this process owns a reader slot.  Called from the lock helpers so that
+ * fork()'d children pick up their own slot lazily instead of sharing the
+ * parent's.  Hot-path is a single relaxed load + compare; only on a
+ * fork-generation mismatch do we touch getpid() and scan slots. */
 static inline void nda_claim_reader_slot(NdaHandle *h) {
     uint32_t cur_gen = __atomic_load_n(&nda_fork_gen, __ATOMIC_RELAXED);
     if (__builtin_expect(cur_gen == h->cached_fork_gen && h->my_slot_idx != UINT32_MAX, 1))
         return;
     /* Cold path -- register the atfork hook once per process, then claim. */
     pthread_once(&nda_atfork_once, nda_atfork_init);
+    /* Re-read after pthread_once: nda_on_fork_child may have bumped it. */
     cur_gen = __atomic_load_n(&nda_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % NDA_READER_SLOTS;
+    /* Pass 1: take a free slot. */
     for (uint32_t i = 0; i < NDA_READER_SLOTS; i++) {
         uint32_t s = (start + i) % NDA_READER_SLOTS;
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&h->reader_slots[s].pid,
                 &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            __atomic_store_n(&h->reader_slots[s].subcount, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].waiters_parked, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].writers_parked, 0, __ATOMIC_RELAXED);
+            /* Fresh owner holds no read locks yet; clear any stale rdepth left by
+             * a dead predecessor (its contribution is dropped as we take over). */
+            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
+            nda_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
             h->my_slot_idx = s;
             return;
         }
     }
-    /* Table full -- leave my_slot_idx = UINT32_MAX so we silently skip
-     * tracking for this handle (lock still works; just no recovery). */
-}
-
-/* Atomically subtract `sub` from a counter, capped at 0 (never underflows). */
-static inline void nda_atomic_sub_cap(uint32_t *p, uint32_t sub) {
-    if (!sub) return;
-    uint32_t cur = __atomic_load_n(p, __ATOMIC_RELAXED);
-    for (;;) {
-        uint32_t want = (cur > sub) ? cur - sub : 0;
-        if (__atomic_compare_exchange_n(p, &cur, want,
-                1, __ATOMIC_RELAXED, __ATOMIC_RELAXED))
-            return;
-    }
-}
-
-/* Try to claim a dead slot (CAS pid -> 0) and drain its parked-waiter
- * contributions back to the global counters. */
-static inline void nda_drain_dead_slot(NdaHandle *h, uint32_t i, uint32_t pid) {
-    NdaHeader *hdr = h->hdr;
-    uint32_t expected = pid;
-    if (!__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, 0,
-            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-        return;
-    uint32_t wp    = __atomic_load_n(&h->reader_slots[i].waiters_parked, __ATOMIC_RELAXED);
-    uint32_t writp = __atomic_load_n(&h->reader_slots[i].writers_parked, __ATOMIC_RELAXED);
-    if (wp)    nda_atomic_sub_cap(&hdr->rwlock_waiters, wp);
-    if (writp) nda_atomic_sub_cap(&hdr->rwlock_writers_waiting, writp);
-}
-
-/* Scan reader slots for dead-process recovery. */
-static inline void nda_recover_dead_readers(NdaHandle *h) {
-    if (!h->reader_slots) return;
-    NdaHeader *hdr = h->hdr;
-    int any_live_reader = 0;
-    int found_dead_reader = 0;
-
+    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
+     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
+     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
+     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
+     * old design) we need not skip dead slots that still show a read count. */
     for (uint32_t i = 0; i < NDA_READER_SLOTS; i++) {
-        uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-        if (pid == 0) continue;
-        uint32_t sc = __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED);
-        if (nda_pid_alive(pid)) {
-            if (sc > 0) any_live_reader = 1;
-            continue;
-        }
-        if (sc > 0) { found_dead_reader = 1; continue; }
-        nda_drain_dead_slot(h, i, pid);
-    }
-
-    if (found_dead_reader && !any_live_reader) {
-        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
-        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
-        if (cur > 0 && cur < NDA_RWLOCK_WRITER_BIT) {
-            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
-            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
-            for (uint32_t i = 0; !live_now && i < NDA_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p && nda_pid_alive(p) &&
-                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
-                    live_now = 1;
-            }
-            if (live_now) {
-                drain_ok = 0;
-            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
-                    0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-                    syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-            } else {
-                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
-            }
-        }
-        if (drain_ok) {
-            for (uint32_t i = 0; i < NDA_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p == 0 || nda_pid_alive(p)) continue;
-                nda_drain_dead_slot(h, i, p);
-            }
+        uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+        if (dpid == 0 || dpid == now_pid || nda_pid_alive(dpid)) continue;
+        uint32_t expected = dpid;
+        if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
+                __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
+            nda_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            h->my_slot_idx = i;
+            return;
         }
     }
+    /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
+     * slotless path (lock still works; recovery of THIS reader's death is the
+     * documented slotless limitation). */
 }
 
-/* Inspect the lock word after a futex-wait timeout. */
+/* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
+ * it, force-recover.  Dead READERS need no action here: only a writer that owns
+ * wlock drains readers, and it clears dead readers inline in its own scan. */
 static inline void nda_recover_after_timeout(NdaHandle *h) {
-    NdaHeader *hdr = h->hdr;
-    uint32_t val = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+    uint32_t val = __atomic_load_n(&h->hdr->wlock, __ATOMIC_RELAXED);
     if (val >= NDA_RWLOCK_WRITER_BIT) {
         uint32_t pid = val & NDA_RWLOCK_PID_MASK;
         if (!nda_pid_alive(pid))
             nda_recover_stale_lock(h, val);
-    } else {
-        nda_recover_dead_readers(h);
     }
 }
 
-/* Park/unpark helpers. */
-static inline void nda_park_reader(NdaHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
+/* Bump/drop the parked-waiter hint.  Both readers (blocked at the gate) and
+ * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
+ * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
+ * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
+ * (harmless); it can never under-count, so no wakeup is lost. */
+static inline void nda_park(NdaHandle *h) {
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
-static inline void nda_unpark_reader(NdaHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
+static inline void nda_unpark(NdaHandle *h) {
+    __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
-static inline void nda_park_writer(NdaHandle *h) {
+
+/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
+ * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
+ * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
+ * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
+ * the writer's SEQ_CST wlock-store + rdepth-scan.  leave() peels slotless first
+ * so a slot claimed mid-hold cannot misattribute the decrement. */
+static inline void nda_rdepth_inc(NdaHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
+        h->slotless_held++;
     }
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
 }
-static inline void nda_unpark_writer(NdaHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_sub_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
+static inline void nda_rdepth_dec(NdaHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+    }
+}
+
+/* Wake a writer that may be draining readers (it waits on drain_seq).  Called
+ * after every rdepth decrement so a released read lock lets the writer re-scan
+ * promptly instead of waiting out its timeout. */
+static inline void nda_reader_wake_drain(NdaHandle *h) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+        __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
 }
 
 static inline void nda_rwlock_rdlock(NdaHandle *h) {
     nda_claim_reader_slot(h);
     NdaHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
     for (int spin = 0; ; spin++) {
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur > 0 && cur < NDA_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
-        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
-            if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_ACQUIRE);
+        if (cur == 0) {
+            /* Optimistically take the read: publish rdepth, then re-check wlock.
+             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST wlock CAS +
+             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
+             * two sides cannot both miss each other, so we never hold
+             * concurrently with a writer. */
+            nda_rdepth_inc(h);
+            if (__atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST) == 0)
+                return;                       /* no writer after our publish -> we hold the read lock */
+            /* A writer appeared during our publish -- yield to it (write-preferring). */
+            nda_rdepth_dec(h);
+            nda_reader_wake_drain(h);          /* let the draining writer see rdepth drop */
+            spin = 0;
+            continue;
+        }
+        /* wlock != 0: a writer holds or is acquiring.  Recover if it is dead. */
+        if (cur >= NDA_RWLOCK_WRITER_BIT &&
+            !nda_pid_alive(cur & NDA_RWLOCK_PID_MASK)) {
+            nda_recover_stale_lock(h, cur);
+            spin = 0;
+            continue;
         }
         if (__builtin_expect(spin < NDA_RWLOCK_SPIN_LIMIT, 1)) {
             nda_rwlock_spin_pause();
             continue;
         }
-        nda_park_reader(h);
-        cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur >= NDA_RWLOCK_WRITER_BIT ||
-            (cur == 0 && __atomic_load_n(writers_waiting, __ATOMIC_RELAXED))) {
-            /* park on a free lock only to yield to a waiting writer; with no
-             * writer, re-loop and acquire -- else nobody would ever wake us. */
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+        nda_park(h);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &nda_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                nda_unpark_reader(h);
+                nda_unpark(h);
                 nda_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        nda_unpark_reader(h);
+        nda_unpark(h);
         spin = 0;
     }
 }
 
 static inline void nda_rwlock_rdunlock(NdaHandle *h) {
-    NdaHeader *hdr = h->hdr;
-    uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
-    if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    nda_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    nda_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
 static inline void nda_rwlock_wrlock(NdaHandle *h) {
     nda_claim_reader_slot(h);  /* refresh cached_pid across fork */
     NdaHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
+    /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
+     * crash window between acquiring the lock and storing the owner. */
     uint32_t mypid = NDA_RWLOCK_WR(h->cached_pid);
+    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(lock, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
+        if (__atomic_compare_exchange_n(&hdr->wlock, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        /* Contended: expected now holds the current wlock value. */
+        if (expected >= NDA_RWLOCK_WRITER_BIT &&
+            !nda_pid_alive(expected & NDA_RWLOCK_PID_MASK)) {
+            nda_recover_stale_lock(h, expected);
+            spin = 0;
+            continue;
+        }
         if (__builtin_expect(spin < NDA_RWLOCK_SPIN_LIMIT, 1)) {
             nda_rwlock_spin_pause();
             continue;
         }
-        nda_park_writer(h);
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
+        nda_park(h);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
         if (cur != 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &nda_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                nda_unpark_writer(h);
+                nda_unpark(h);
                 nda_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        nda_unpark_writer(h);
+        nda_unpark(h);
         spin = 0;
+    }
+    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
+     * yield).  Drain the readers that were already holding when we won the CAS.
+     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
+     * of the Dekker handshake. */
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(NDA_OCC_WORDS + live readers)
+         * instead of O(NDA_READER_SLOTS). */
+        for (uint32_t w = 0; w < NDA_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!nda_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &nda_lock_timeout, NULL, 0);
     }
 }
 
 static inline void nda_rwlock_wrunlock(NdaHandle *h) {
     NdaHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* ================================================================
  * Layout math + data access
  *
- * Layout: Header -> reader_slots[1024] -> data[size * itemsize]
- * The reader-slot region is a multiple of 16 bytes, and the header is 256
- * bytes, so data_off is 16-byte aligned (good for any element width).
+ * Layout: Header -> reader_slots[1024] -> occ bitmap -> data[size * itemsize]
+ * The reader-slot region is a multiple of 16 bytes, the occ bitmap is 128
+ * bytes, and the header is 256 bytes, so data_off is 16-byte aligned (good for
+ * any element width).
  * ================================================================ */
 
-typedef struct { uint64_t reader_slots, data; } NdaLayout;
+typedef struct { uint64_t reader_slots, occ, data; } NdaLayout;
 
 static inline NdaLayout nda_layout(void) {
     NdaLayout L;
     L.reader_slots = sizeof(struct NdaHeader);
-    L.data         = L.reader_slots + (uint64_t)NDA_READER_SLOTS * sizeof(NdaReaderSlot);
+    L.occ          = L.reader_slots + (uint64_t)NDA_READER_SLOTS * sizeof(NdaReaderSlot);
+    L.data         = L.occ + NDA_OCC_BYTES;
     return L;
 }
 
@@ -464,7 +549,7 @@ static inline uint64_t nda_total_size(uint64_t data_bytes) {
 }
 
 static inline char *nda_data(NdaHandle *h) {
-    return (char *)h->base + h->hdr->data_off;
+    return h->data;   /* cached trusted layout base; never re-read peer hdr->data_off */
 }
 
 /* Flat element index for a multi-index (caller has bounds-checked each dim). */
@@ -481,7 +566,7 @@ static inline uint64_t nda_flat_offset(NdaHandle *h, const uint64_t *idx, uint32
 
 static inline double nda_load_nv(NdaHandle *h, uint64_t e) {
     char *base = nda_data(h);
-    switch (h->hdr->dtype) {
+    switch (h->dtype) {   /* cached: peer hdr->dtype must not resize the element */
         case NDA_F64: { double   v; memcpy(&v, base + e*8, 8); return v; }
         case NDA_F32: { float    v; memcpy(&v, base + e*4, 4); return (double)v; }
         case NDA_I64: { int64_t  v; memcpy(&v, base + e*8, 8); return (double)v; }
@@ -500,7 +585,7 @@ static inline double nda_load_nv(NdaHandle *h, uint64_t e) {
  * lock; dtype must be one of I64/I32/I16/I8). */
 static inline int64_t nda_load_i64(NdaHandle *h, uint64_t e) {
     char *base = nda_data(h);
-    switch (h->hdr->dtype) {
+    switch (h->dtype) {   /* cached: peer hdr->dtype must not resize the element */
         case NDA_I64: { int64_t v; memcpy(&v, base + e*8, 8); return v; }
         case NDA_I32: { int32_t v; memcpy(&v, base + e*4, 4); return (int64_t)v; }
         case NDA_I16: { int16_t v; memcpy(&v, base + e*2, 2); return (int64_t)v; }
@@ -513,7 +598,7 @@ static inline int64_t nda_load_i64(NdaHandle *h, uint64_t e) {
  * lock; dtype must be one of U64/U32/U16/U8). */
 static inline uint64_t nda_load_u64(NdaHandle *h, uint64_t e) {
     char *base = nda_data(h);
-    switch (h->hdr->dtype) {
+    switch (h->dtype) {   /* cached: peer hdr->dtype must not resize the element */
         case NDA_U64: { uint64_t v; memcpy(&v, base + e*8, 8); return v; }
         case NDA_U32: { uint32_t v; memcpy(&v, base + e*4, 4); return (uint64_t)v; }
         case NDA_U16: { uint16_t v; memcpy(&v, base + e*2, 2); return (uint64_t)v; }
@@ -524,7 +609,7 @@ static inline uint64_t nda_load_u64(NdaHandle *h, uint64_t e) {
 
 /* Sum every element as a double (caller holds the read lock). */
 static inline double nda_sum_locked(NdaHandle *h) {
-    uint64_t size = h->hdr->size, e;
+    uint64_t size = h->size, e;   /* cached immutable count, not peer hdr->size */
     double acc = 0.0;
     for (e = 0; e < size; e++) acc += nda_load_nv(h, e);
     return acc;
@@ -535,8 +620,8 @@ static inline double nda_sum_locked(NdaHandle *h) {
  * (which collapse/mis-order as doubles) are ranked exactly.  Float dtypes
  * compare as double.  Caller holds the read lock; size >= 1 always. */
 static inline uint64_t nda_argextreme_locked(NdaHandle *h, int want_max) {
-    uint64_t size = h->hdr->size, e, best = 0;
-    uint32_t dt = h->hdr->dtype;
+    uint64_t size = h->size, e, best = 0;   /* cached immutable count, not peer hdr->size */
+    uint32_t dt = h->dtype;   /* cached: peer hdr->dtype must not resize the element */
     if (nda_is_float(dt)) {
         double bestv = nda_load_nv(h, 0);
         for (e = 1; e < size; e++) {
@@ -642,9 +727,20 @@ static inline NdaHandle *nda_setup(void *base, size_t map_size,
         if (backing_fd >= 0) close(backing_fd);
         return NULL;
     }
+    NdaLayout L     = nda_layout();
     h->hdr          = hdr;
     h->base         = base;
-    h->reader_slots = (NdaReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    h->reader_slots = (NdaReaderSlot *)((uint8_t *)base + sizeof(NdaHeader));  /* trusted layout, not the peer-writable header offset */
+    h->occ          = (uint64_t *)((uint8_t *)base + L.occ);   /* trusted layout offset */
+    h->data         = (char *)base + L.data;   /* trusted layout, not the peer-writable hdr->data_off */
+    h->size         = hdr->size;               /* cache immutable geometry (validated at attach) */
+    /* Cache dtype too: a lock-violating peer that corrupts hdr->dtype after we
+       attached must not change the per-element WIDTH (nb) while size/data stay
+       fixed -> OOB.  Validate it in range exactly like the other cached
+       geometry (every create/attach path has already validated it; clamp
+       defensively so an out-of-range value can never index a typed table). */
+    h->dtype        = (hdr->dtype < NDA_NTYPES) ? hdr->dtype : NDA_F64;
+    h->itemsize     = hdr->itemsize;
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -728,6 +824,10 @@ static NdaHandle *nda_create(const char *path, int dtype,
             NDA_ERR("%s: file too small (%lld)", path, (long long)stt.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && (stt.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            NDA_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             NDA_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -785,10 +885,15 @@ static NdaHandle *nda_open_fd(int fd, char *errbuf) {
 static void nda_destroy(NdaHandle *h) {
     if (!h) return;
     /* Release our reader slot on clean teardown (else short-lived-reader churn
-     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+     * exhausts the slot table); skip if a read lock is still held (rdepth>0). */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
         h->cached_fork_gen == __atomic_load_n(&nda_fork_gen, __ATOMIC_RELAXED) &&
-        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) == 0) {
+        /* Clear our occ bit BEFORE freeing the slot: we still own the pid so no
+         * claimant can take the slot mid-clear, and rdepth==0 so no writer needs
+         * to see us.  (A crash skips this -> the bit is reclaimed lazily by a
+         * writer scan / re-claim, same as the pid.) */
+        nda_occ_clear(h, h->my_slot_idx);
         uint32_t expected = h->cached_pid;
         __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
                 &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);

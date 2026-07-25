@@ -41,7 +41,7 @@
          "requires" : {
             "EV" : "4.11",
             "XSLoader" : "0.02",
-            "perl" : "5.012000"
+            "perl" : "5.020000"
          }
       },
       "test" : {
@@ -61,6 +61,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-gearman"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,5 +1,11 @@
 Revision history for Font-Metrics
 
+0.03    2026-07-24
+	- Build and install libfm$(LIB_EXT) static archive alongside the shared
+	  object so downstream XS modules (e.g. Layout::Flex) can link fm_*
+	  symbols at static-link time; fixes undefined symbol errors on Linux
+	  where -undefined dynamic_lookup is unavailable.
+
 0.02    2026-07-23
 	- Export fm_* C symbols with dl_load_flags (RTLD_GLOBAL) so downstream
 	  XS modules can link against them at load time.

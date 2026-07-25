@@ -79,6 +79,56 @@ DESCRIPTION
     *   Automatic reconnection at the connection layer; bootstrap-broker
         failover; periodic metadata refresh
 
+CLIENT LIFETIME
+    An "EV::Kafka::Client" is a handle, like an EV watcher: the application
+    must keep a reference to it for as long as it is in use. When the last
+    reference is dropped the client tears itself down immediately and
+    silently, exactly as if close() had been called. This means
+
+        EV::Kafka->new(brokers => ...)->connect(sub { ... });
+        EV::run;
+
+    does NOT work -- the client is destroyed at the end of the statement and
+    the connect callback never fires. Keep the object:
+
+        my $kafka = EV::Kafka->new(brokers => ...);
+        $kafka->connect(sub { ... });
+        EV::run;
+
+    The callback contract, both for explicit close() and for teardown by
+    garbage collection:
+
+    *   No operation callback is ever silently dropped. Once an operation
+        accepts a callback it is invoked exactly once. If the client is
+        closed first, pending callbacks are invoked with an error in their
+        documented error position: produce callbacks get "(undef, $err)",
+        "flush"/"poll" callbacks get "($err)", "connect" and "seek"
+        callbacks get "(undef, $err)". Requests already sent to a broker are
+        failed by the connection layer; queued, unsent work is failed by
+        close() itself.
+
+    *   Event handlers are not operation callbacks. "on_message",
+        "on_assign", "on_revoke" and "on_connect" simply stop firing at
+        close; they are not invoked with an error.
+
+    *   Public methods croak after close. Calling any operation method on a
+        closed client dies with "EV::Kafka: client is closed". close()
+        itself is idempotent.
+
+    *   close() does not send LeaveGroup; call unsubscribe() first for a
+        clean consumer-group leave.
+
+RECONNECTION
+    Client-managed broker connections reconnect automatically after a loss
+    (bootstrap-broker failover at connect() time; "auto_reconnect" with a 1s
+    delay on every pooled connection afterwards). Operations queued while a
+    broker is down complete when it returns. A lost connection is reported
+    once via the "on_error" handler ("connection to broker lost;
+    reconnecting"); the reconnect attempts themselves are not reported --
+    with the default die-on-error handler, a broker outage is survivable.
+    Retries use capped exponential backoff with jitter. flush() bounds the
+    wait: see "flush_timeout".
+
 ANYEVENT INTEGRATION
     AnyEvent has EV as one of its backends, so EV::Kafka can be used in
     AnyEvent applications seamlessly.
@@ -94,7 +144,8 @@ NO UTF-8 SUPPORT
 CLUSTER CLIENT METHODS
   new(%options)
     Create a new EV::Kafka client. Returns a blessed "EV::Kafka::Client"
-    object.
+    object. Unknown option names croak ("EV::Kafka: unknown option(s):
+    ..."), so typos fail at construction instead of being silently ignored.
 
         my $kafka = EV::Kafka->new(
             brokers  => '10.0.0.1:9092,10.0.0.2:9092',
@@ -147,12 +198,23 @@ CLUSTER CLIENT METHODS
         sets producer_id/epoch/sequence in each RecordBatch for exactly-once
         delivery (broker-side deduplication). Only one batch per (topic,
         partition) is in-flight at a time when this is enabled, to prevent
-        sequence-number aliasing on retry.
+        sequence-number aliasing on retry. Produce calls made before
+        "InitProducerId" completes are queued, never sent non-idempotent. If
+        "InitProducerId" fails after bounded retries, the failure is sticky:
+        queued and later produce callbacks receive an error and
+        "begin_transaction" dies -- the client never silently degrades to
+        non-idempotent production. "DUPLICATE_SEQUENCE" (46) responses are
+        treated as acks (the broker already has the batch), while
+        "OUT_OF_ORDER_SEQUENCE_NUMBER" (45) and "INVALID_PRODUCER_EPOCH"
+        (47) trigger a single epoch-bump re-initialization shared by all
+        affected partitions, then the batch is retried.
 
     transactional_id => 'Str'
         Enable transactional producer. Implies idempotent. Required for
         "begin_transaction"/"commit_transaction"/"abort_transaction" and
-        "send_offsets_to_transaction" (full EOS).
+        "send_offsets_to_transaction" (full EOS). The transactional
+        "InitProducerId" request is sent only to the transaction coordinator
+        (discovered via FindCoordinator), never to an arbitrary broker.
 
     partitioner => $cb->($topic, $key, $num_partitions)
         Custom partition selection function. Default: murmur2 hash of key,
@@ -182,14 +244,27 @@ CLUSTER CLIENT METHODS
         Refreshes happen in the background, so consumers and producers pick
         up leader changes without waiting for a request to fail first.
 
+    flush_timeout => N (default 30)
+        Seconds flush() waits for outstanding work before giving up and
+        calling its callback with an error. Set to 0 to wait forever.
+
     loop => $ev_loop
         EV loop object to use. Default: "EV::default_loop".
 
   connect([$cb])
     Connect to the cluster. Connects to the first available bootstrap
     broker, fetches cluster metadata, then fires $cb->($metadata). On
-    bootstrap-broker failure the next address is tried; if all fail, the
-    "on_error" handler fires.
+    bootstrap-broker failure the next address is tried; if all fail, $cb is
+    invoked as "$cb->(undef, $err)" (without a callback, the "on_error"
+    handler fires instead). If the client is closed before the connection
+    completes, $cb is invoked as "$cb->(undef, $err)".
+
+    Calling connect() more than once is defined: callbacks registered while
+    a connection is in progress are queued and each fires exactly once;
+    calling connect() on an already-connected client fires the callback
+    immediately with the cached metadata. If idempotent producer
+    initialization was requested but fails, queued connect callbacks are
+    invoked as "$cb->(undef, $err)" instead of with metadata.
 
         $kafka->connect(sub {
             my $meta = shift;
@@ -198,6 +273,9 @@ CLUSTER CLIENT METHODS
 
   produce($topic, $key, $value, [\%opts,] [$cb])
     Produce a message. Routes to the correct partition leader automatically.
+    %opts accepts only "partition" and "headers"; any other key croaks
+    ("EV::Kafka: produce: unknown option ..."), catching typos like
+    "partiton".
 
         # with callback (acks=1 or acks=-1)
         $kafka->produce('topic', 'key', 'value', sub {
@@ -231,7 +309,9 @@ CLUSTER CLIENT METHODS
   flush([$cb])
     Flush all accumulated produce batches and wait for all in-flight
     requests to complete. $cb fires when all pending responses have been
-    received.
+    received, as $cb->($err) on failure: "flush timed out" after
+    "flush_timeout" seconds (default 30, 0 waits forever), or "client
+    closed" if the client is closed while a flush is outstanding.
 
   assign(\@partitions)
     Manually assign partitions for consuming.
@@ -243,12 +323,23 @@ CLUSTER CLIENT METHODS
 
   seek($topic, $partition, $offset, [$cb])
     Seek a partition to a specific offset. Use -2 for earliest, -1 for
-    latest. Updates the assignment in-place.
+    latest. Updates the assignment in-place. Errors are delivered as the
+    callback's second argument: "$cb->(undef, $err)" fires when the
+    partition is not assigned, when the partition leader is unreachable, or
+    when the underlying ListOffsets request fails.
 
-        $kafka->seek('my-topic', 0, -1, sub { print "at latest\n" });
+        $kafka->seek('my-topic', 0, -1, sub {
+            my ($res, $err) = @_;
+            warn "seek failed: $err" if $err;
+        });
+
+    A seek that lands while a fetch for the same partition is in flight is
+    not clobbered by the in-flight fetch response.
 
   offsets_for($topic, $cb)
-    Get earliest and latest offsets for all partitions of a topic.
+    Get earliest and latest offsets for all partitions of a topic. The
+    callback is "$cb->($offsets, $err)"; $err is the first ListOffsets
+    failure encountered, if any.
 
         $kafka->offsets_for('my-topic', sub {
             my $offsets = shift;
@@ -256,7 +347,9 @@ CLUSTER CLIENT METHODS
         });
 
   lag($cb)
-    Get consumer lag for all assigned partitions.
+    Get consumer lag for all assigned partitions. The callback is
+    "$cb->($lag, $err)"; $err is the first ListOffsets failure encountered,
+    if any.
 
         $kafka->lag(sub {
             my $lag = shift;
@@ -272,7 +365,24 @@ CLUSTER CLIENT METHODS
 
   poll([$cb])
     Fetch messages from assigned partitions. Calls "on_message" for each
-    received record. $cb fires when all fetch responses have arrived.
+    received record. $cb fires as $cb->($err) when all fetch responses have
+    arrived; $err is undef on success.
+
+    Per-partition fetch errors are surfaced and, where possible, recovered:
+
+    *   "OFFSET_OUT_OF_RANGE" (1): the position is re-resolved via
+        ListOffsets according to "auto_offset_reset" ('earliest' for
+        manually assigned consumers), and the poll callback receives the
+        error. An out-of-range partition therefore recovers instead of
+        failing every subsequent poll with the same stale offset.
+
+    *   Other error codes: reported to the "on_error" handler once per
+        partition per rebalance (a new assign() or group rejoin resets the
+        budget); the poll callback is not invoked with these.
+
+    An errored partition's position is never advanced by its error response.
+    A die inside "on_message" is caught, reported via "warn", and does not
+    prevent delivery of the remaining records in the batch.
 
         my $timer = EV::timer 0, 0.1, sub { $kafka->poll };
 
@@ -280,6 +390,20 @@ CLUSTER CLIENT METHODS
     Join a consumer group and subscribe to one or more topics. The list of
     topic names comes first, followed by option key/value pairs. The group
     protocol handles partition assignment automatically.
+
+    Topic names must match the Kafka charset ("[A-Za-z0-9._-]"); anything
+    else croaks. Option names are reserved words: "group_id",
+    "group_instance_id", "on_assign", "on_revoke", "session_timeout",
+    "rebalance_timeout", "heartbeat_interval", "auto_commit",
+    "auto_offset_reset". Because the API is positional, a misspelled option
+    name cannot be detected (it would be a legal topic name), so avoid these
+    strings as topic names. A reserved name given without a value croaks.
+    "group_id" only needs to be defined, so "group_id => '0'" is accepted.
+
+    If the coordinator connection fails during JoinGroup/SyncGroup, the
+    client retries with full coordinator re-discovery (5 attempts, 1s
+    apart). On exhaustion the group enters the "stopped" state and the
+    failure is reported via "on_error" instead of retrying forever.
 
         $kafka->subscribe('topic-a', 'topic-b',
             group_id           => 'my-group',
@@ -332,7 +456,11 @@ CLUSTER CLIENT METHODS
     offset commits are rolled back.
 
   close([$cb])
-    Graceful shutdown: stop timers, disconnect all broker connections.
+    Graceful shutdown: stop all timers, fail every pending operation
+    callback with an error (see "CLIENT LIFETIME"), disconnect all broker
+    connections. Idempotent. After close, calling any operation method
+    croaks with "EV::Kafka: client is closed". Does not send LeaveGroup --
+    call unsubscribe() first for a clean consumer-group leave.
 
         $kafka->close(sub { EV::break });
 
@@ -347,7 +475,10 @@ LOW-LEVEL CONNECTION METHODS
         $conn->connect('127.0.0.1', 9092, 5.0);
 
   connect($host, $port, [$timeout])
-    Connect to a broker. Timeout in seconds (0 = no timeout).
+    Connect to a broker. Timeout in seconds; 0 selects a 10-second default.
+    The timeout covers the TCP connect AND every handshake phase (TLS,
+    ApiVersions, SASL): a peer that accepts but then stays silent fails the
+    connection with a "handshake timeout" error instead of hanging forever.
 
   disconnect
     Disconnect from broker.
@@ -373,7 +504,10 @@ LOW-LEVEL CONNECTION METHODS
 
     Options: "acks" (default 1), "headers" (hashref), "timestamp" (epoch ms,
     default now), "compression" ('none', 'lz4', 'gzip', 'zstd', 'snappy';
-    each requires its respective library at build time).
+    each requires its respective library at build time). With "acks => 0"
+    the broker sends no response, so the callback fires immediately with an
+    empty success result: it means "handed to the socket", not "broker
+    acknowledged".
 
   produce_batch($topic, $partition, \@records, [\%opts,] [$cb])
     Produce multiple records in a single RecordBatch. Each record is "{key,
@@ -447,6 +581,14 @@ LOW-LEVEL CONNECTION METHODS
     Set connection-level handler callbacks. Call with no argument or "undef"
     to clear.
 
+    If no "on_error" handler is installed, connection errors are reported
+    via warn() rather than by throwing an exception from inside the event
+    loop. "on_disconnect" fires exactly once per actual disconnection, so
+    calling disconnect() from inside "on_error" or "on_disconnect" is safe
+    and does not retrigger it. When a connection drops with requests still
+    in flight, their callbacks fire with an error string BEFORE
+    "on_disconnect" fires.
+
   client_id($id)
     Set the client identifier.
 
@@ -457,7 +599,11 @@ LOW-LEVEL CONNECTION METHODS
     Configure SASL authentication.
 
   auto_reconnect($enable, [$delay_ms])
-    Enable automatic reconnection with delay in milliseconds (default 1000).
+    Enable automatic reconnection. $delay_ms (default 1000) is the base
+    delay: the first retry happens after exactly $delay_ms, later retries
+    use capped exponential backoff (doubling each attempt, up to 30s, with
+    +/-25% jitter), resetting once a connection succeeds. Reconnects reuse
+    the timeout from the original connect() call.
 
   leave_group($group_id, $member_id, $cb)
     Send LeaveGroup to coordinator for fast partition rebalance.
@@ -492,6 +638,18 @@ LOW-LEVEL CONNECTION METHODS
 
   state
     Connection state as integer (0=disconnected, 6=ready).
+
+  Object lifetime
+    The connection is torn down when its last reference drops, or when
+    "DESTROY" is called explicitly; explicit destruction is idempotent.
+    Pending request callbacks are invoked with a 'destroyed' error during
+    teardown. Once destroyed, the object is inert: every subsequent method
+    call on it (from any copy of the reference) croaks with
+    "EV::Kafka::Conn: method called on destroyed connection" -- including
+    calls made from callbacks running during the teardown itself (those
+    exceptions are caught by the callback dispatcher and reported via
+    warn()). A conn passed a custom "EV::Loop" holds a reference on it, so
+    the loop cannot be destroyed while the conn is alive.
 
 UTILITY FUNCTIONS
   EV::Kafka::_murmur2($key)
@@ -560,6 +718,16 @@ ERROR HANDLING
     callback: "$cb->($result, $error)". If $error is defined, $result may be
     undef.
 
+    An error that belongs to a specific operation is reported to that
+    operation's callback *or* to the "on_error" handler, never both -- this
+    matters because the default "on_error" handler dies. Errors with no
+    owning operation (connection loss, metadata failures, group protocol
+    failures, per-partition fetch errors) go to "on_error".
+
+    A die inside a user callback ("on_message", a produce callback) does not
+    propagate out of the event loop: it is caught, reported via "warn", and
+    the remaining callbacks in the same batch still run.
+
     Within result structures, per-partition "error_code" fields use Kafka
     numeric codes:
 
@@ -574,7 +742,8 @@ ERROR HANDLING
         27  REBALANCE_IN_PROGRESS        (group rejoin)
         36  TOPIC_ALREADY_EXISTS
         45  OUT_OF_ORDER_SEQUENCE_NUMBER (idempotent: epoch bump)
-        46  DUPLICATE_SEQUENCE_NUMBER    (idempotent: epoch bump)
+        46  DUPLICATE_SEQUENCE_NUMBER    (idempotent: treated as an ack)
+        47  INVALID_PRODUCER_EPOCH       (idempotent: epoch bump)
         79  MEMBER_ID_REQUIRED           (group rejoin with assigned id)
 
     Use EV::Kafka::Client::error_name($code) for the full list.
@@ -788,10 +957,22 @@ LIMITATIONS
 
     *   Producer retry policy -- transient errors (NOT_LEADER,
         COORDINATOR_NOT_AVAILABLE) trigger metadata refresh and up to 3
-        retries with backoff. Hard idempotent errors (OUT_OF_ORDER_SEQUENCE,
-        DUPLICATE_SEQUENCE) trigger one InitProducerId-with-fresh-epoch
-        recovery attempt. Other broker errors are surfaced to the callback
-        immediately.
+        retries with backoff. DUPLICATE_SEQUENCE is treated as an ack;
+        OUT_OF_ORDER_SEQUENCE and INVALID_PRODUCER_EPOCH trigger one
+        InitProducerId-with-fresh-epoch recovery attempt. Other broker
+        errors are surfaced to the callback immediately.
+
+CAVEATS
+    *   SIGPIPE on Linux with TLS -- writes on plain connections are
+        protected ("MSG_NOSIGNAL" on Linux, "SO_NOSIGPIPE" on BSD/macOS),
+        but TLS writes on Linux are not: "SSL_write" takes no per-call flags
+        and Linux has no "SO_NOSIGPIPE", so a broker RST racing a write can
+        deliver SIGPIPE and terminate the process. Applications using "tls
+        => 1" on Linux should set "$SIG{PIPE} = 'IGNORE';" at startup.
+        Ignoring it is harmless: failed writes surface as EPIPE through the
+        normal connection error path. The module deliberately does not set
+        this itself -- a library must not change a process-global signal
+        disposition its embedding application may rely on.
 
 AUTHOR
     vividsnow

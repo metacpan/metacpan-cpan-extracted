@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Catalyst-View-Wkhtmltopdf</name>
+  <shortdesc>Catalyst view to convert HTML (or TT) content to PDF using wkhtmltopdf</shortdesc>
+  <category rdfs:label="WebKit" />
+  <category rdfs:label="HTML" />
+  <category rdfs:label="PDF" />
+  <category rdfs:label="QtWebKit" />
+  <category rdfs:label="wkhtmltopdf" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Michele Beltrame</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mb@italpro.net" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Jens Gassmann</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jens.gassmann@atomix.de" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <bug-database rdf:resource="https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-View-Wkhtmltopdf" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/Catalyst-View-Wkhtmltopdf" />
+      <location rdf:resource="git://github.com/robrwo/Catalyst-View-Wkhtmltopdf.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

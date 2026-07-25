@@ -3,6 +3,11 @@ Revision history for Perl extension Socket::MsgHdr.
 LY - Lincoln Yeoh
 TLB - Troels Liebe Bentsen
 PE - Paul Evans
+FG - Felipe Gasper
+EW - Eric Wong
+
+0.06 Fri Jul 24 2026
+    - Make recvmsg set .msg_flags. (EW)
 
 0.05 Fri Nov 30 2018
     - No changes.

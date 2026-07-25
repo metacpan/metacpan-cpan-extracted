@@ -1,0 +1,53 @@
+{
+   "abstract" : "Pattern based string generator library and CLI",
+   "author" : [
+      "Magnus Weinberg <magnus.weinberg@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Wildling",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dotmonk/wildling/issues"
+      },
+      "homepage" : "https://github.com/dotmonk/wildling",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dotmonk/wildling.git",
+         "web" : "https://github.com/dotmonk/wildling/tree/main/perl"
+      }
+   },
+   "version" : "v2.0.7",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

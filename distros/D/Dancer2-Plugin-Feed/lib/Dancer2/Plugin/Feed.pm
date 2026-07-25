@@ -1,13 +1,18 @@
 #
 # This file is part of Dancer2-Plugin-Feed
 #
-# This software is copyright (c) 2016 by Natal Ngétal.
+# This software is copyright (c) 2026 by Natal Ngétal.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 package Dancer2::Plugin::Feed;
-$Dancer2::Plugin::Feed::VERSION = '1.160550';
+$Dancer2::Plugin::Feed::VERSION = '1.262050';
+use strict;
+use warnings;
+
+use v5.20;
+
 use Dancer2::Plugin;
 use XML::Feed;
 
@@ -41,13 +46,13 @@ register create_feed => sub {
 };
 
 register create_atom_feed => sub {
-    my ($dsl, %params) = plugin_args(@_);
+    my ($dsl, %params) = @_;
 
     _create_atom_feed($dsl, \%params);
 };
 
 register create_rss_feed => sub {
-    my ($dsl, %params) = plugin_args(@_);
+    my ($dsl, %params) = @_;
 
     _create_rss_feed($dsl, \%params);
 };
@@ -87,7 +92,19 @@ sub _create_feed {
 
         foreach (@entries_properties) {
             my $val = $entry->{$_};
-            $e->$_($val) if $val
+            if ($_ eq 'category' || $_ eq 'tags') {
+                if ($val && !ref $val) {
+                    $val = [$val];
+                }
+                if (ref $val eq 'ARRAY' && $val->@*) {
+                    foreach my $val_item ($val->@*) {
+                        $e->$_($val_item) if $val_item;
+                    }
+                }
+            }
+            else {
+                $e->$_($val) if $val
+            }
         }
 
         $feed->add_entry($e);
@@ -126,7 +143,7 @@ Dancer2::Plugin::Feed - Easy to generate feed rss or atom for Dancer2 applicatio
 
 =head1 VERSION
 
-version 1.160550
+version 1.262050
 
 =head1 SYNOPSIS
 
@@ -189,7 +206,7 @@ The B<Content-Type> header will be set to the appropriate value
 
 =item entries
 
-An arrayref containing a list of entries. Each item will be transformed to an L<XML::Feed::Entry> object. Each entry is an hashref. Some common attributes for these hashrefs are C<title>, C<link>, C<summary>, C<content>, C<author>, C<issued> and C<modified>. Check L<XML::Feed::Entry> for more details.
+An arrayref containing a list of entries. Each item will be transformed to an L<XML::Feed::Entry> object. Each entry is an hashref. Some common attributes for these hashrefs are C<title>, C<link>, C<summary>, C<category>, C<content>, C<author>, C<issued> and C<modified>. Check L<XML::Feed::Entry> for more details.
 
 =item title
 
@@ -250,13 +267,23 @@ L<XML::Feed>
 L<XML::Feed::Entry>
 L<Dancer::Plugin::Feed>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Natal Ngétal
 
+=item *
+
+Stefan Härter
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Natal Ngétal.
+This software is copyright (c) 2026 by Natal Ngétal.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

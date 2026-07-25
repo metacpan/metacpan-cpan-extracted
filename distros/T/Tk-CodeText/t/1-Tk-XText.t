@@ -1,7 +1,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 142;
+use Test::More tests => 146;
 use Test::Tk;
 
 use Data::Dumper;
@@ -11,6 +11,19 @@ require Tk::ROText;
 BEGIN { use_ok('Tk::XText') };
 
 createapp;
+
+my $patchtext = '
+This is just for patch testing.
+
+and nothing else.
+';
+
+my $patchdiff = '@@ -0,0 +1,4 @@
++
++This is just for patch testing.
++
++and nothing else.
+';
 
 my $text;
 my $utext;
@@ -82,15 +95,15 @@ if (defined $app) {
 		}
 		$app->after(500, $call);
 	};
-	
+
 	my $sb = $app->Frame->pack(-fill => 'x');
 
 	$sb->Label(
 		-text => " Pos:"
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Label(
-		-textvariable => \$pos, 
-		-width => 8, 
+		-textvariable => \$pos,
+		-width => 8,
 		-relief => 'groove'
 	)->pack(-side => 'left', -pady => 2);
 
@@ -98,8 +111,8 @@ if (defined $app) {
 		-text => " Lines:"
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Label(
-		-textvariable => \$lines, 
-		-width => 5, 
+		-textvariable => \$lines,
+		-width => 5,
 		-relief => 'groove'
 	)->pack(-side => 'left', -pady => 2);
 
@@ -107,24 +120,24 @@ if (defined $app) {
 		-text => " Size:"
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Label(
-		-textvariable => \$size, 
+		-textvariable => \$size,
 		-width => 8, -relief => 'groove')->pack(-side => 'left', -pady => 2);
 	$sb->Label(
 		-textvariable => \$ovr,
-		-width => 11, 
+		-width => 11,
 		-relief => 'groove'
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Label(
-		-textvariable => \$mod, 
-		-width => 9, 
+		-textvariable => \$mod,
+		-width => 9,
 		-relief => 'groove'
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Button(
-		-text=> 'Reset', 
-		-command => ['clear', $text], 
+		-text=> 'Reset',
+		-command => ['clear', $text],
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Button(
-		-text=> 'Clear modified', 
+		-text=> 'Clear modified',
 		-command => sub {
 			$text->clearModified(0);
 			&tmodified;
@@ -132,7 +145,7 @@ if (defined $app) {
 	)->pack(-side => 'left', -pady => 2);
 	$sb->Button(
 		-text=> 'Load Ref file',
-		-command => ['load', $text, 'lib/Tk/CodeTextOld.pm'], 
+		-command => ['load', $text, 'lib/Tk/CodeTextOld.pm'],
 	)->pack(-side => 'left');
 	&$call;
 }
@@ -169,8 +182,8 @@ my $commentline2 = "<<-one->>\ntwo\n";
 my $commentsel2 = "<<-one\ntwo\n->>";
 
 #some predifined tests and routines
-my $init = [ sub { 
-	$text->clear; 
+my $init = [ sub {
+	$text->clear;
 	$text->insert('1.0', $original);
 	$text->clearModified(0);
 	return $text->get('1.0', 'end - 1c');
@@ -198,7 +211,7 @@ sub del {
 		$text->Delete;
 		$len --;
 	}
-	
+
 }
 
 sub gettext {
@@ -243,22 +256,22 @@ push @tests, (
 	#testing inserting and undo redo
 	[ sub {
 		$text->insert('1.0', $original);
-		return gettext; 
+		return gettext;
 	}, $original, 'Inserted text' ],
-	
+
 	$ismodified,
 
 	[ sub {
 		$text->undo;
 		my $t = gettext;
-		return gettext; 
+		return gettext;
 	}, '', 'Undo Inserted text' ],
-	
+
 	$isnotmodified,
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo Inserted text' ],
 
 	$ismodified,
@@ -266,14 +279,14 @@ push @tests, (
 	[ sub {
 		$text->undo;
 		my $t = gettext;
-		return gettext; 
+		return gettext;
 	}, '', 'Undo Inserted text' ],
-	
+
 	$isnotmodified,
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo Inserted text' ],
 
 	$ismodified,
@@ -283,21 +296,21 @@ push @tests, (
 	[ sub {
 		$text->markSet('insert', '1.0 lineend');
 		$text->indent;
-		return gettext; 
+		return gettext;
 	}, $indentedline, 'Indented line' ],
 
 	$ismodified,
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Undo Iindented line' ],
 
 	$isnotmodified,
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $indentedline, 'Redo Idented line' ],
 
 
@@ -306,59 +319,59 @@ push @tests, (
 	#testing unindent line and undo redo
 	[ sub {
 		$text->unindent;
-		return gettext; 
+		return gettext;
 	}, $original, 'Unindented line' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $indentedline, 'Undo Unindented line' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo Unidented line' ],
 
 	#testing indent selection and undo redo
 	$init,
-	
+
 	[ sub {
 		$text->selectAll;
 		$text->indent;
-		return gettext; 
+		return gettext;
 	}, $indentedsel, 'Indented selection' ],
 
 	$ismodified,
-	
+
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Undo Indented selection' ],
 
 	$isnotmodified,
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $indentedsel, 'Redo Idented selection' ],
 
 	$ismodified,
-	
+
 	#testing unindent selection and undo redo
 	[ sub {
 		$text->selectAll;
 		$text->unindent;
-		return gettext; 
+		return gettext;
 	}, $original, 'Unindented selection' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $indentedsel, 'Undo Unindented selection' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo Unidented selection' ],
 
 	#testing comment line 1 with # and undo redo
@@ -368,21 +381,21 @@ push @tests, (
 		$text->configure(-slcomment => '#');
 		$text->SetCursor('1.0 lineend');
 		$text->comment;
-		return gettext; 
+		return gettext;
 	}, $commentline1, 'Comment line 1' ],
 
 	$ismodified,
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Undo Comment line 1' ],
 
 	$isnotmodified,
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $commentline1, 'Redo Comment line 1' ],
 
 	$ismodified,
@@ -392,17 +405,17 @@ push @tests, (
 		$text->unselectAll;
 		$text->SetCursor('0.0 lineend');
 		$text->uncomment;
-		return gettext; 
+		return gettext;
 	}, $original, 'UnComment line 1' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $commentline1, 'Undo UnComment line 1' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo UnComment line 1' ],
 
 	#testing comment selection 1 and undo redo
@@ -411,21 +424,21 @@ push @tests, (
 	[ sub {
 		$text->selectAll;
 		$text->comment;
-		return gettext; 
+		return gettext;
 	}, $commentsel1, 'Comment selection 1' ],
 
 	$ismodified,
-	
+
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Undo Comment selection 1' ],
 
 	$isnotmodified,
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $commentsel1, 'Redo Comment selection 1' ],
 
 	$ismodified,
@@ -434,17 +447,17 @@ push @tests, (
 	[ sub {
 		$text->selectAll;
 		$text->uncomment;
-		return gettext; 
+		return gettext;
 	}, $original, 'UnComment selection 1' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $commentsel1, 'Undo UnComment selection 1' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo UnComment selection 1' ],
 
 	#testing comment line 2 with '<<-', '->>' and undo/redo
@@ -455,17 +468,17 @@ push @tests, (
 		$text->unselectAll;
 		$text->SetCursor('1.0 lineend');
 		$text->comment;
-		return gettext; 
+		return gettext;
 	}, $commentline2, 'Comment line 2' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Undo Comment line 2' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $commentline2, 'Redo Comment line 2' ],
 
 	#testing uncomment line 2 and undo redo
@@ -473,51 +486,51 @@ push @tests, (
 		$text->unselectAll;
 		$text->SetCursor('0.0 lineend');
 		$text->uncomment;
-		return gettext; 
+		return gettext;
 	}, $original, 'UnComment line 2' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $commentline2, 'Undo UnComment line 2' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo UnComment line 2' ],
 
 	#testing comment selection 2 and undo redo
 	[ sub {
 		$text->selectAll;
 		$text->comment;
-		return gettext; 
+		return gettext;
 	}, $commentsel2, 'Comment selection 2' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Undo Comment selection 2' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $commentsel2, 'Redo Comment selection 2' ],
 
 	#testing comment selection 2 and undo redo
 	[ sub {
 		$text->selectAll;
 		$text->uncomment;
-		return gettext; 
+		return gettext;
 	}, $original, 'UnComment selection 2' ],
 
 	[ sub {
 		$text->undo;
-		return gettext; 
+		return gettext;
 	}, $commentsel2, 'Undo UnComment selection 2' ],
 
 	[ sub {
 		$text->redo;
-		return gettext; 
+		return gettext;
 	}, $original, 'Redo UnComment selection 2' ],
 
 	#emptying document
@@ -526,7 +539,7 @@ push @tests, (
 	#undo/redo buffer testing
 	[ sub {
 		enter($original);
-		return gettext; 
+		return gettext;
 	}, $original, 'Enter some original' ],
 
 	$ismodified,
@@ -616,7 +629,7 @@ push @tests, (
 
 	#delete buffer testing
 	$init,
-	
+
 	[ sub {
 		$text->goTo('1.3');
 		del(5);
@@ -681,7 +694,7 @@ push @tests, (
 
 	#selection replace testing
 	$init,
-	
+
 	[ sub {
 		$text->selectAll;
 		$text->ReplaceSelectionsWith("three\n");
@@ -703,7 +716,7 @@ push @tests, (
 	}, "three\n", 'Redo, Replace selection' ],
 
 	$ismodified,
-	
+
 	#delete selection
 	$init,
 
@@ -728,7 +741,7 @@ push @tests, (
 	}, "", 'Redo, Delete selection' ],
 
 	$ismodified,
-	
+
 	#backspace selection
 	$init,
 
@@ -753,7 +766,7 @@ push @tests, (
 	}, "", 'Redo, Backspace selection' ],
 
 	$ismodified,
-	
+
 	#key a selection
 	$init,
 
@@ -778,7 +791,22 @@ push @tests, (
 	}, "a", 'Redo, Key a selection' ],
 
 	$ismodified,
-	
+
+	$reset,
+
+	[ sub {
+		$text->patchdiff(\$patchdiff);
+		return gettext;
+	}, $patchtext, 'Patch diff string' ],
+
+	$reset,
+
+	[ sub {
+		$text->patchdiff('t/patchtst.diff');
+		return gettext;
+	}, $patchtext, 'Patch diff file' ],
+
+
 	#emptying document
 	$reset,
 );

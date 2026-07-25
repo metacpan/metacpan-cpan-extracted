@@ -1,5 +1,9 @@
 Revision history for Dancer-Plugin-Feed
 
+1.262050  2026-07-24 16:36:16+02:00 Europe/Berlin
+
+    * Allow multiple categories per feed entry (#8).
+
 1.160550  2016-02-24 23:01:28+01:00 Europe/Paris
 
     * Fix typo feed properties by Peter Mottram (#6).

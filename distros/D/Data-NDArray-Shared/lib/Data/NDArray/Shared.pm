@@ -2,7 +2,7 @@ package Data::NDArray::Shared;
 use strict;
 use warnings;
 use Carp ();
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::NDArray::Shared', $VERSION);
 
@@ -26,7 +26,10 @@ my %PDL_TYPE = (   # dtype => PDL type-constructor name
 my %DTYPE_OF = reverse %PDL_TYPE;   # PDL type name => dtype
 
 sub _require_pdl {
-    eval { require PDL; 1 }
+    # require PDL alone does NOT define the type-constructor subs (&PDL::double,
+    # &PDL::long, ...) nor new_from_specification -- those live in PDL::Core, which
+    # `use PDL` loads but `require PDL` does not.  Load it explicitly so to_pdl works.
+    eval { require PDL; require PDL::Core; 1 }
         or Carp::croak("Data::NDArray::Shared: PDL interop needs PDL installed (cpanm PDL)");
 }
 sub _pdl_ctor {
@@ -206,7 +209,7 @@ float dtypes accumulate reductions in C<double>.
 
 A write-preferring futex rwlock with dead-process recovery guards every
 mutation, so writes from many processes serialize cleanly. The immutable header
-fields C<dtype>, C<size>, and C<itemsize> are immutable; C<ndim>, C<shape>, and
+fields C<dtype>, C<size>, and C<itemsize> never change; C<ndim>, C<shape>, and
 C<strides> can change under C<reshape> (which holds the write lock), so element
 access reads them under the read lock. B<Linux-only>. Requires 64-bit Perl.
 
@@ -464,7 +467,8 @@ they interleave.
 
 Backing files are created with mode C<0600> (owner-only) by default, so only the
 creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> via a C<< mode => 0660 >> option to C<new>; the mode is applied
+pass an explicit octal file mode such as C<0660> via a trailing options hashref,
+C<< Data::NDArray::Shared->new($path, $dtype, @dims, { mode => 0660 }) >>; the mode is applied
 only when the file is created (an existing file keeps its own permissions). The
 file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
 and created with C<O_EXCL>; the on-disk header is validated when the file is
@@ -479,6 +483,18 @@ recovers. Because each mutation updates the data buffer (and, for C<reshape>, a
 few header words) while holding the lock, a crash leaves the array consistent up
 to the last completed operation. B<Limitation>: PID reuse is not detected (very
 unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

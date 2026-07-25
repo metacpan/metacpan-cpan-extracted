@@ -1,5 +1,14 @@
 Revision history for Layout-Flex
 
+0.05    2026-07-24
+	- Link Font::Metrics libfm.a static archive into Flex.so via LDFROM;
+	  should hopefully fix undefined symbol fm_* errors on Linux at load time.
+	- Require Font::Metrics >= 0.03.
+
+0.04    2026-07-23
+	- UTF-8 support in Font::Metrics measure path (is_utf8 branching in
+	  lf_measure_fm and lf_measure_fm_wrapped).
+
 0.03    2026-07-23
 	- Integrate with Font::Metrics
 

@@ -207,7 +207,13 @@ SKIP: {
   cmp_ok(join('', @buf2), 'eq', '777', 'preadv(fh) strings read');
 
   my $rv = POSIX::2008::preadv($fd, @buf2, [1, 0, 0, 2], -1);
-  ok(!defined($rv) && $! == EINVAL, 'preadv() with negative offset sets errno EINVAL');
+  if (! defined $rv) {
+    cmp_ok($!, '==', EINVAL, 'preadv() with negative offset sets errno EINVAL');
+  }
+  else {
+    # omnios-r151054 returns 0 with a negative offset.
+    cmp_ok($rv, '==', 0, 'preadv() with negative offset returns 0');
+  }
 }
 
 close $fh;

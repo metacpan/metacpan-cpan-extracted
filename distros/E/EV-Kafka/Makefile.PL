@@ -40,24 +40,28 @@ if ($ssl_libs) {
     }
 }
 
-# LZ4 (optional, for record batch compression)
+# LZ4 (optional, for record batch compression).  HAVE_LZ4 now implies the
+# frame API, so lz4frame.h must be present, not just lz4.h.
 my $lz4_cflags = `pkg-config --cflags liblz4 2>/dev/null`;
 my $lz4_libs   = `pkg-config --libs liblz4 2>/dev/null`;
 chomp $lz4_cflags;
 chomp $lz4_libs;
 
-if ($lz4_libs) {
+my $lz4frame_probe = sub {
+    my $cc = shift;
+    my $test = `printf '#include <lz4.h>\n#include <lz4frame.h>\n' | $Config{cc} $cc -xc -fsyntax-only - 2>/dev/null; echo \$?`;
+    chomp $test;
+    return $test eq '0';
+};
+
+if ($lz4_libs && $lz4frame_probe->($lz4_cflags)) {
     $extra_inc .= " $lz4_cflags -DHAVE_LZ4";
     push @libs, $lz4_libs;
+} elsif (!$lz4_libs && $lz4frame_probe->('')) {
+    push @libs, '-llz4';
+    $extra_inc .= ' -DHAVE_LZ4';
 } else {
-    my $test = `echo '#include <lz4.h>' | $Config{cc} -xc -fsyntax-only - 2>/dev/null; echo \$?`;
-    chomp $test;
-    if ($test eq '0') {
-        push @libs, '-llz4';
-        $extra_inc .= ' -DHAVE_LZ4';
-    } else {
-        warn "liblz4 not found, building without LZ4 compression\n";
-    }
+    warn "liblz4 with lz4frame.h not found, building without LZ4 compression\n";
 }
 
 # zlib (for gzip compression)

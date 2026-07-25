@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.68';
+$VERSION = '0.69';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -916,9 +916,11 @@ sub FindAndOrReplace {
 			-fill => 'x',
 		);
 	}
-	$sandr->pack(
+	my $sb = $self->Subwidget('Statusbar');
+	my @op;
+	push @op, -before => $sb if $sb->ismapped;
+	$sandr->pack(@op,
 		-fill => 'x',
-		-before => $self->Subwidget('Statusbar'),
 	);
 	$self->Subwidget('FindEntry')->focus;
 	$self->toplevel->geometry($geosave);
@@ -1508,6 +1510,17 @@ sub OnModify {
 	$self->spacesCheck($index);
 	$self->Callback('-modifiedcall', $index);
 }
+
+=item B<patchdiff>I($patch, ?$style?)
+
+Applies a patch to the text. I<$patch> can either be
+a refrence to a string or a filen name. 
+
+I<$style> is optional. By default it is set to 'Unified'.
+
+The operation registers as a single undo event. See also L<Text::Patch>.
+
+=cut
 
 sub position {
 	my ($self, $pos) = @_;

@@ -1795,11 +1795,13 @@ Omitted arguments are treated as undef. In case of an array reference the array
 is updated according to the fields affected by the format string. If an error
 occurred the array is not udpated.
 
-In list context returns the broken-down time or the empty list on error.
-Fields not affected by the format string are returned as initialized (but see
-glibc notes below).
+In list context it returns the broken-down time or the empty list on error.
 
-In scalar context returns the index of the first byte in I<s> that was not
+Fields not affected by the format string may be returned as initialized, set to
+default values, or recomputed depending on your OS (e.g. glibc "recomputes"
+I<wday> and I<yday> if any of the year, month, or day elements changed).
+
+In scalar context it returns the index of the first byte in I<s> that was not
 processed or the byte length of I<s> if the whole string was consumed or undef
 on error.
 
@@ -1808,10 +1810,6 @@ will only be processed up to the first NUL byte.
 
 I<gmtoff> and I<zone> were standardized with POSIX.1-2024. They might not be
 supported by your system, and I<zone> might be ignored entirely.
-
-glibc "recomputes" I<wday> and I<yday> if any of the year, month, or day
-elements changed, so they might be meaningless unless you specified a complete
-date.
 
 I<New in version 0.02.>
 
@@ -2045,7 +2043,7 @@ available:
  :rw        read(), readv(), write(), writev()
  :prw       pread(), preadv(), preadv2(), pwrite(), pwritev(), pwritev2()
  :clock     All clock* functions and CLOCK_ constants and TIMER_ABSTIME
- :errno     errno constants
+ :errno_h   errno constants
  :fcntl     All F_, FD_, O_, POSIX_FADV_, SEEK_, _OK constants (for AT_ use :at)
  :fenv_h    All FE_ constants and fe* functions
  :fnm       fnmatch() and all FNM_ constants
@@ -2068,6 +2066,8 @@ I<New in version 0.22:> :confstr, :pathconf, :sysconf export tags.
 I<New in version 0.25:> :poll export tag.
 
 I<New in version 0.24:> :socket_h export tag.
+
+I<New in version 0.27:> :errno_h export tag.
 
 =head1 CONSTANTS
 

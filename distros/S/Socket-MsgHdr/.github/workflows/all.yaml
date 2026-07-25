@@ -1,0 +1,138 @@
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+    PERL_USE_UNSAFE_INC: 0
+    AUTHOR_TESTING: 1
+    AUTOMATED_TESTING: 1
+    RELEASE_TESTING: 1
+    PERL_CARTON_PATH: $GITHUB_WORKSPACE/local
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.42'
+          - '5.40'
+          - '5.38'
+          - '5.36'
+          - '5.34'
+          - '5.32'
+          - '5.30'
+          - '5.28'
+          - '5.26'
+          - '5.24'
+          - '5.22'
+          - '5.20'
+          - '5.18'
+          - '5.16'
+          - '5.14'
+          - '5.12'
+          - '5.10'
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        run: cpanm --notest --installdeps .
+      - name: perl Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run Tests
+        run: prove -wlvmb t
+
+  macOS:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: Set up Perl
+        run: brew install perl
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        run: curl -L https://cpanmin.us | perl - --notest --installdeps .
+      - name: perl Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run Tests
+        run: make test
+
+  alpine:
+    runs-on: ubuntu-latest
+
+    name: Alpine ${{ matrix.docker_arch }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_arch:
+        - i386
+        - s390x
+        - riscv64
+        - ppc64le
+        - amd64
+        - armhf
+        - arm/v7
+        - aarch64
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: Get the qemu container
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Run tests
+        run: docker run --rm --interactive --platform linux/${{ matrix.docker_arch }} --mount type=bind,source=$(pwd),target=/host alpine:latest sh -c "apk update && apk add bash curl wget perl perl-dev make git gcc musl-dev && perl -V && cd /host && curl -L https://cpanmin.us | perl - --notest --installdeps . && perl Makefile.PL && (make || make || make || make || make) && prove -wlvmb t"
+
+  qemu:
+    runs-on: ubuntu-latest
+
+    name: ${{ matrix.docker_arch }}, ${{ matrix.image }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - docker_arch: s390x
+            image: ubuntu:22.04
+          - docker_arch: riscv64
+            image: ubuntu:22.04
+          - docker_arch: ppc64le
+            image: ubuntu:22.04
+          - docker_arch: aarch64
+            image: ubuntu:22.04
+          - docker_arch: arm/v7
+            image: ubuntu:22.04
+          - docker_arch: amd64
+            image: ubuntu:22.04
+          - docker_arch: 386
+            image: debian:bookworm
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - name: Get the qemu container
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Run tests on ${{ matrix.platform }}
+        run: docker run --rm --interactive --platform linux/${{ matrix.docker_arch }} --mount type=bind,source=$(pwd),target=/host ${{ matrix.image }} bash -c "apt update && apt install -y curl perl make git gcc && perl -V && cd /host && curl -L https://cpanmin.us | perl - --notest --installdeps . && perl Makefile.PL && (make || make || make || make || make) && prove -wlvmb t"

@@ -1,4 +1,7 @@
 Revision history for EV::Gearman
 
+0.02    2026-07-24
+        - Memory safety hardening
+
 0.01    2026-06-02
         - Initial release

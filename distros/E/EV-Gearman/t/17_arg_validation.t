@@ -12,13 +12,49 @@ like $@, qr/odd number of arguments/, 'new: odd args croak';
 eval { EV::Gearman->new(host => '127.0.0.1', path => '/tmp/x') };
 like $@, qr/cannot specify both 'host' and 'path'/, 'new: host+path conflict croak';
 
+# new() croaks on unknown keys — a typo must not silently disable the
+# intended option
+{
+    eval { EV::Gearman->new(reconect => 1) };
+    like $@, qr/unknown constructor option 'reconect'/,
+        'new: typo key croaks, naming the key';
+    eval { EV::Gearman->new(command_timeout => 100, bogus_key => 1) };
+    like $@, qr/unknown constructor option 'bogus_key'/,
+        'new: unknown key croaks even among valid keys';
+
+    # every documented key is still accepted — the croak must not be
+    # over-eager
+    my $g = EV::Gearman->new(
+        on_error              => sub {},
+        on_connect            => sub {},
+        on_disconnect         => sub {},
+        connect_timeout       => 100,
+        command_timeout       => 100,
+        priority              => 1,
+        keepalive             => 0,
+        reconnect             => 1,
+        reconnect_delay       => 100,
+        max_reconnect_attempts => 2,
+        exceptions            => 1,
+        client_id             => 't17',
+        grab_unique           => 1,
+        loop                  => EV::default_loop,
+    );
+    ok $g, 'all non-connect documented keys accepted';
+    my $g2 = EV::Gearman->new(host => '127.0.0.1', port => 4730, on_error => sub {});
+    ok $g2, 'host/port accepted';
+    my $g3 = EV::Gearman->new(path => '/tmp/nonexistent-ev-gearman.sock',
+                              on_error => sub {});
+    ok $g3, 'path accepted';
+}
+
 # register_function requires a coderef
 {
     my $g = EV::Gearman->new;
     eval { $g->register_function('f') };
     like $@, qr/callback required/, 'register_function: missing cb croak';
     eval { $g->register_function('f', 'not-a-coderef') };
-    like $@, qr/coderef|callback required/, 'register_function: non-coderef croak';
+    like $@, qr/unexpected argument/, 'register_function: non-coderef croak';
 }
 
 # grab_job() with no args is an XS-level usage error. (Its coderef
@@ -73,6 +109,17 @@ like $@, qr/cannot specify both 'host' and 'path'/, 'new: host+path conflict cro
     like $@, qr/payload too large/, 'submit_job: oversized payload croaks';
     undef $huge;
     $g->reconnect(0);   # stop any reconnect attempts before teardown
+}
+
+# echo() takes the same arbitrary user payload and must have the same
+# guard — parity with submit/epoch.
+{
+    my $g = EV::Gearman->new(host => '127.0.0.1', port => 4730);
+    my $huge = 'x' x (256 * 1024 * 1024 + 1);
+    eval { $g->echo($huge, sub {}) };
+    like $@, qr/payload too large/, 'echo: oversized payload croaks';
+    undef $huge;
+    $g->reconnect(0);
 }
 
 done_testing;

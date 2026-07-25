@@ -158,6 +158,10 @@ smh_recvmsg(s, msg_hdr, flags = 0)
             SvCUR_set(*svp, RETVAL);
         if ((svp = hv_fetch(hsh, "control", 7, FALSE)))
             SvCUR_set(*svp, mh.m.msg_controllen);
+        if ((svp = hv_fetch(hsh, "flags", 5, FALSE))) {
+            SvUPGRADE(*svp, SVt_IV);
+            SvIV_set(*svp, mh.m.msg_flags);
+        }
     }
     OUTPUT:
     RETVAL

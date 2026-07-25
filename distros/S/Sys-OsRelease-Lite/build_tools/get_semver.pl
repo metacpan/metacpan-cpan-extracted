@@ -11,17 +11,15 @@ use warnings;
 use utf8;
 use feature qw(say);
 use Carp    qw(carp croak);
-use Readonly;
 use CPAN::Changes;
 use Versioning::Scheme::Semantic;
 
-# constants
-Readonly::Scalar my $Debug        => ( $ENV{SORL_DEBUG} // 0 ? 1 : 0 );
-Readonly::Scalar my $ChangesFile  => 'Changes';
-Readonly::Scalar my $VersionRE  => qr/\%VERSION\%/x;
-Readonly::Scalar my $NextTokenRE  => qr/\{\{\$NEXT\}\}/x;
-Readonly::Scalar my $NextTokenStr => '{{$NEXT}}';
-Readonly::Hash my %GroupOrder => (
+my $Debug        = ( $ENV{SORL_DEBUG} // 0 ? 1 : 0 );
+my $ChangesFile  = 'Changes';
+my $VersionRE    = qr/\%VERSION\%/x;
+my $NextTokenRE  = qr/\{\{\$NEXT\}\}/x;
+my $NextTokenStr = '{{$NEXT}}';
+my %GroupOrder = (
     MAJOR        => 0,
     "API CHANGE" => 1,
     MINOR        => 2,
@@ -31,7 +29,7 @@ Readonly::Hash my %GroupOrder => (
     "BUG FIXES"  => 6,
     DOCS         => 7,
 );
-Readonly::Hash my %GroupLevel => (
+my %GroupLevel = (
     MAJOR        => 0,
     "API CHANGE" => 0,
     MINOR        => 1,

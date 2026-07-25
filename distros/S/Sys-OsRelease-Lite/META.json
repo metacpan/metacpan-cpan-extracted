@@ -36,7 +36,6 @@
          "requires" : {
             "CPAN::Changes" : "0",
             "ExtUtils::MakeMaker" : "0",
-            "Readonly" : "0",
             "Versioning::Scheme::Semantic" : "0"
          }
       },
@@ -60,6 +59,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.4+lite",
+   "version" : "v0.4.5+lite",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

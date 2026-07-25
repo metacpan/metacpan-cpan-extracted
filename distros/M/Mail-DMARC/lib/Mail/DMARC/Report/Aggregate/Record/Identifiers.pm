@@ -1,9 +1,9 @@
 package Mail::DMARC::Report::Aggregate::Record::Identifiers;
-our $VERSION = '2.20260621';
+our $VERSION = '2.20260724';
 use strict;
 use warnings;
 use feature 'signatures';
-no warnings 'experimental::signatures';    ## no critic (ProhibitNoWarnings)
+no warnings 'experimental::args_array_with_signatures';    ## no critic (ProhibitNoWarnings)
 
 use Carp;
 
@@ -44,7 +44,7 @@ Mail::DMARC::Report::Aggregate::Record::Identifiers - identifiers section of a D
 
 =head1 VERSION
 
-version 2.20260621
+version 2.20260724
 
 =head1 AUTHORS
 

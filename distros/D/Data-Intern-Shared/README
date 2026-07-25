@@ -53,14 +53,15 @@ METHODS
     $path is the backing file ("undef" for an anonymous mapping);
     $max_strings is the id/string capacity; $arena_bytes is the total
     string-bytes capacity and is optional (defaults to "$max_strings * 32",
-    capped at 4 GB). When reopening an existing file or memfd, the stored
-    header wins and the caller's sizes are ignored. Backing files are
-    created with mode 0600 (owner-only) by default; pass an octal $mode
-    (e.g. 0666, subject to umask) to allow cross-user sharing. $mode applies
-    only when the file is created -- it is ignored when attaching to an
-    existing file, and for anonymous and memfd tables. "new_memfd" creates a
-    Linux memfd (transferable via its "memfd" descriptor); "new_from_fd"
-    reopens one in another process.
+    with a 64-byte floor, capped at 4 GB). When reopening an existing file
+    or memfd, the stored header wins and the caller's sizes are ignored.
+    Backing files are created with mode 0600 (owner-only) by default; pass
+    an octal $mode (e.g. 0666, applied exactly via "fchmod" -- not narrowed
+    by umask) to allow cross-user sharing. $mode applies only when the file
+    is created -- it is ignored when attaching to an existing file, and for
+    anonymous and memfd tables. "new_memfd" creates a Linux memfd
+    (transferable via its "memfd" descriptor); "new_from_fd" reopens one in
+    another process.
 
   Interning
         my $id = $in->intern($str);   # id (>=0); undef if the id space or arena is full
@@ -141,6 +142,20 @@ CRASH SAFETY
     rewritten in place, so a crash leaves the table consistent up to the
     last completed "intern". Limitation: PID reuse is not detected (very
     unlikely in practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
 
 SEE ALSO
     Data::SortedSet::Shared (the int64-keyed sorted set this interns keys

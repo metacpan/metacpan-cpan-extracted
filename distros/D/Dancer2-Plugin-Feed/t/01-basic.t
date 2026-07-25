@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 72;
 
 use lib 't/lib';
 use XML::Feed;
@@ -15,25 +15,32 @@ my $psgi = Plack::Test->create( Dancer2->runner->psgi_app );
 my ($res, $feed);
 
 $res = $psgi->request( GET '/feed' );
-is $res->code, 500, "response for GET /feed is 500";
+is ($res->code, 500, "response for GET /feed is 500");
 
 for my $format (qw/atom rss/) {
     for my $route ("/feed/$format", "/other/feed/$format") {
         ok ($res = $psgi->request( GET $route ) );
-        is $res->code, 200, "$format - $route";
+        is ($res->code, 200, "$format - $route");
         is ($res->header('Content-Type'), "application/$format+xml");
         ok ( $feed = XML::Feed->parse( \$res->decoded_content ) );
         is ( $feed->title, 'TestApp with ' . $format );
         my @entries = $feed->entries;
         is (scalar @entries, 10);
-        is ($entries[0]->title, 'entry 1');
+        is ($entries[0]->title, 'entry 0');
+
+        # test categories
+        for my $idx (0 .. $#entries) {
+            my $entry = $entries[$idx];
+            my @categories = $entry->category;
+            is (scalar @categories, $idx);
+        }
     }
 }
 
 #eval { $res = dancer_response(GET => '/feed/foo')};
 #like $@, qr/unknown format/;
 $res = $psgi->request( GET '/feed/foo' );
-is $res->code, 500, "response for GET /feed/foo is 500";
+is ($res->code, 500, "response for GET /feed/foo is 500");
 
 { 
     package TestApp; 

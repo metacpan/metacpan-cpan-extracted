@@ -111,7 +111,7 @@ without requiring jq.
 ### Download (latest)
 
 ```bash
-curl -sSfL https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-PP-4.16.tar.gz -o JSON-PP.tar.gz
+curl -sSfL https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-PP-4.xx.tar.gz -o JSON-PP.tar.gz
 tar xzf JSON-PP.tar.gz
 
 JSONPP_LIB=$(echo JSON-PP-*/lib)

@@ -7,7 +7,7 @@ use EV::Gearman::Job ();
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -21,35 +21,54 @@ BEGIN {
 #   $g->submit_job_high_bg(...)
 #   $g->submit_job_low_bg(...)
 
-# Strip an optional trailing \%opts and \&cb in either order.
+# Parse the optional trailing ([\%opts], [\&cb]) pair shared by the
+# submit_job* family, submit_job_epoch and register_function. An
+# explicit undef in either slot is accepted as "absent"; any other
+# unrecognised argument croaks — silently dropping it would submit the
+# job without the caller's callback and leave their code hanging.
 sub _opts_cb {
-    my $opts = (@_ && ref $_[0] eq 'HASH') ? shift : undef;
-    my $cb   = (@_ && ref $_[0] eq 'CODE') ? shift : undef;
+    my $who = shift;
+    my ($opts, $cb);
+    if (@_ && !defined $_[0])        { shift }   # explicit undef = no opts
+    elsif (@_ && ref $_[0] eq 'HASH') { $opts = shift }
+    if (@_ && !defined $_[0])        { shift }   # explicit undef = no cb
+    elsif (@_ && ref $_[0] eq 'CODE') { $cb = shift }
+    if (@_) {
+        my $bad  = shift;
+        my $desc = ref $bad ? ref($bad) . ' reference' : "'$bad'";
+        Carp::croak("$who: unexpected argument $desc (expected [\\%opts] [, \\&cb])");
+    }
     ($opts, $cb);
 }
 
 sub _build_submitter {
-    my ($cmd_idx) = @_;
+    my ($cmd_idx, $name) = @_;
     return sub {
         my $self     = shift;
         my $func     = shift;
         my $workload = shift;
-        my ($opts, $cb) = _opts_cb(@_);
+        my ($opts, $cb) = _opts_cb($name, @_);
+        # undef would warn in SvPV and submit an empty string — croak
+        # instead of sending a job nobody asked for.
+        Carp::croak("$name: function name required") unless defined $func;
+        Carp::croak("$name: workload must be defined") unless defined $workload;
         my $unique = $opts ? $opts->{unique} : undef;
         $self->_submit_internal($cmd_idx, $func, $workload, $unique, $opts, $cb);
     };
 }
 
-*submit_job         = _build_submitter(0);
-*submit_job_high    = _build_submitter(1);
-*submit_job_low     = _build_submitter(2);
-*submit_job_bg      = _build_submitter(3);
-*submit_job_high_bg = _build_submitter(4);
-*submit_job_low_bg  = _build_submitter(5);
+*submit_job         = _build_submitter(0, 'submit_job');
+*submit_job_high    = _build_submitter(1, 'submit_job_high');
+*submit_job_low     = _build_submitter(2, 'submit_job_low');
+*submit_job_bg      = _build_submitter(3, 'submit_job_bg');
+*submit_job_high_bg = _build_submitter(4, 'submit_job_high_bg');
+*submit_job_low_bg  = _build_submitter(5, 'submit_job_low_bg');
 
 sub submit_job_epoch {
     my ($self, $func, $workload, $epoch) = (shift, shift, shift, shift);
-    my ($opts, $cb) = _opts_cb(@_);
+    my ($opts, $cb) = _opts_cb('submit_job_epoch', @_);
+    Carp::croak("submit_job_epoch: function name required") unless defined $func;
+    Carp::croak("submit_job_epoch: workload must be defined") unless defined $workload;
     my $unique = $opts ? $opts->{unique} : undef;
     $self->_submit_epoch($func, $workload, $unique, $epoch, $cb);
 }
@@ -57,8 +76,7 @@ sub submit_job_epoch {
 sub register_function {
     my $self = shift;
     my $name = shift;
-    my $opts = (@_ && ref $_[0] eq 'HASH') ? shift : undef;
-    my $cb   = shift;
+    my ($opts, $cb) = _opts_cb('register_function', @_);
     Carp::croak("register_function: callback required") unless ref $cb eq 'CODE';
     my $timeout = $opts && $opts->{timeout} ? int $opts->{timeout} : 0;
     my $async   = $opts && $opts->{async}   ? 1 : 0;
@@ -84,12 +102,6 @@ sub maxqueue {
     Carp::croak("maxqueue: size must be a non-negative integer")
         unless defined($size) && $size =~ /\A[0-9]+\z/;
     $self->admin("maxqueue $func $size", $cb);
-}
-
-sub shutdown_server {
-    my ($self, %opts) = @_;
-    my $graceful = $opts{graceful} ? ' graceful' : '';
-    $self->admin("shutdown$graceful", $opts{cb});
 }
 
 1;
@@ -172,7 +184,7 @@ batched write and lets the server stream replies back at full
 throughput.
 
 The text/admin protocol (C<status>, C<workers>, C<version>,
-C<maxqueue>, C<shutdown>) shares the connection too; multi-line
+C<maxqueue>) shares the connection too; multi-line
 replies are buffered to the C<".\n"> terminator and delivered as a
 single string.
 
@@ -296,6 +308,13 @@ once) to keep reconnect cycles fully non-blocking.
 
 Unix-domain socket path. Mutually exclusive with C<host>.
 
+Note that a C<connect(2)> to a unix socket completes inline, so the
+connection is fully established (and C<on_connect> has already fired)
+before C<new> returns — a C<< $g->on_connect(...) >> assigned after
+construction will never fire for it. Pass C<on_connect> to the
+constructor instead (the same can theoretically happen for a TCP
+connect that completes immediately).
+
 =item C<loop =E<gt> $ev_loop>
 
 EV loop to attach to. Default: C<EV::default_loop>.
@@ -322,9 +341,16 @@ Abort an in-progress non-blocking connect after this many ms. C<0>
 
 =item C<command_timeout =E<gt> $ms>
 
-Disconnect with C<"command timeout"> if no response arrives within
-this interval. The timer resets on every byte received. C<0> = no
-timeout (default).
+Per-request timeout. The request at the head of the pending queue is
+given this many ms from the moment it is written to the socket; if it
+is still unanswered when its budget expires, the connection is torn
+down with C<"command timeout">. The budget is independent of
+unrelated traffic: other packets arriving meanwhile neither extend
+the head request's budget nor shorten it, and once the head is
+answered the next request's own budget applies. A slow reply that
+keeps dribbling in is therefore safe as long as the request completes
+within its budget — and a genuinely stuck request dies on schedule
+even on an otherwise busy connection. C<0> = no timeout (default).
 
 =back
 
@@ -362,7 +388,8 @@ automatically.
 If true, the C<exceptions> option is sent on every connect, so
 foreground clients receive C<WORK_EXCEPTION> packets. For workers,
 this also enables forwarding C<die> messages from sync callbacks
-as exceptions before the C<WORK_FAIL>.
+as exceptions instead of the C<WORK_FAIL> (C<WORK_EXCEPTION> is
+terminal at the server; sending both would earn a C<JOB_NOT_FOUND>).
 
 =item C<client_id =E<gt> $str>
 
@@ -392,6 +419,10 @@ client has enqueued its options and worker-function CAN_DOs.
 Those packets sit ahead of any user submissions made from inside
 the callback — so submitting a job here is safe even though the
 ability registrations haven't yet hit the socket.
+
+For unix sockets (C<path>) the connect completes inline inside
+C<new>, so this callback fires before C<new> returns — assign it via
+the constructor, not after (see C<path>).
 
 =item C<on_disconnect =E<gt> $cb-E<gt>()>
 
@@ -481,8 +512,13 @@ C<submit_job_bg>: C<($handle, $err)> on C<JOB_CREATED>. Of
 C<%opts>, only C<unique> is meaningful — the per-event handlers
 (C<on_data>, C<on_warning>, etc.) are silently ignored because the
 server delivers no work events to the submitting client for
-scheduled / background jobs. Server must be built with persistent
-queue support for scheduled jobs to survive a restart.
+scheduled / background jobs.
+
+B<Server note:> with gearmand 1.1.21's default C<builtin> queue we
+observed that the server accepts an epoch job and returns a handle
+but never executes it; a persistent queue type is required for
+scheduled delivery. Other gearmand versions or queue types may
+behave differently — verify against your deployment.
 
 =head2 get_status($handle, $cb-E<gt>($info, $err))
 
@@ -621,8 +657,26 @@ C<".\n"> terminator and delivered as a single string.
 
 Send a raw text command (newline appended automatically). Replies
 are accumulated until the C<".\n"> terminator for the multi-line
-commands C<status>, C<workers>, and C<prioritystatus>; everything
-else is treated as single-line.
+commands C<status>, C<workers>, C<prioritystatus> (matched on the
+leading word, so arguments are tolerated), C<show jobs>, and
+C<show unique jobs> (exact forms only — with extra arguments
+gearmand answers a single-line C<ERR> instead); everything else is
+treated as single-line.
+
+A single-line reply beginning with C<ERR > (gearmand's text-protocol
+error prefix, e.g. for an unrecognized command) is delivered as the
+error argument: C<$cb-E<gt>(undef, "ERR UNKNOWN_COMMAND ...")> — not
+as a successful result. The connection stays up.
+
+If a command not in the multi-line set above nevertheless gets a
+C<".\n">-terminated multi-line reply from the server, only the first
+line is delivered; the leftover lines cannot be attributed to any
+request and the connection is torn down with a protocol error.
+
+Because the text protocol has no length prefix, a buffered reply is
+capped at 16 MiB: a peer that keeps streaming without ever sending
+the terminator is dropped with an C<"admin response too large">
+error (and the normal reconnect logic applies).
 
 =head2 server_status([$cb])
 
@@ -640,16 +694,13 @@ Single-line reply (e.g. C<"OK 1.1.21+ds">).
 
 Set the per-function queue size cap. Reply is C<"OK\n">.
 
-=head2 shutdown_server(graceful => $bool, cb => $cb)
-
-Send C<shutdown> or C<shutdown graceful>. The server replies with
-C<"OK\n"> and then closes the connection.
-
 =head1 INTROSPECTION
 
 =head2 pending_count
 
-Number of binary requests sent and awaiting a response.
+Number of requests sent and awaiting a response — binary client
+requests, admin (text-protocol) commands, and the worker's in-flight
+C<GRAB_JOB> all count.
 
 =head2 waiting_count
 

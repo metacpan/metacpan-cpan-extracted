@@ -5,7 +5,6 @@ data/cpan.metacurator.conf
 data/cpan.metacurator.constants.csv
 data/cpan.metacurator.sqlite
 data/cpan.metapackager.conf
-data/names.txt
 data/one.png
 data/special.topics.txt
 data/tiddlers.json
@@ -20,8 +19,6 @@ lib/CPAN/MetaCurator/Import.pm
 lib/CPAN/MetaCurator/Search.pm
 lib/CPAN/MetaCurator/Validate.pm
 LICENSE
-LICENSE-Artistic-2.0
-LICENSE-GPL-3
 log/development.log
 Makefile.PL
 MANIFEST			This list of files
@@ -34,6 +31,7 @@ scripts/export.modules2csv.pl
 scripts/export.tree.pl
 scripts/export.tree.sh
 scripts/flowchart.pl
+scripts/parse.metacpan.recent.pl
 scripts/populate.sqlite.tables.pl
 scripts/read.tiddlers.pl
 scripts/text.balanced.pl
@@ -49,6 +47,7 @@ templates/body.html
 templates/footer.html
 templates/header.html
 templates/note.html
+TODO.txt
 xt/author/cpan.changes.strict.t
 xt/author/cpan.changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -9,7 +9,18 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Intern::Shared")) \
         croak("Expected a Data::Intern::Shared object"); \
     SiHandle *h = INT2PTR(SiHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::Intern::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::Intern::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+#define REEXTRACT(sv) \
+    h = INT2PTR(SiHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Intern::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -30,9 +41,12 @@ new(class, path, max_strings, arena_bytes = 0, ...)
   PREINIT:
     char errbuf[SI_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
+    /* Resolve the optional trailing mode arg BEFORE capturing the path PV:
+       its get-magic can run Perl code that reallocs/frees path's PV, so the
+       PV must be captured last, immediately before si_create() uses it. */
     /* Opt-in file mode for cross-user sharing; default 0600 (owner-only). */
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     if (max_strings > SI_MAX_STRINGS) croak("Data::Intern::Shared->new: max_strings exceeds 2^30");
     if (arena_bytes > UINT32_MAX) croak("Data::Intern::Shared->new: arena_bytes exceeds 2^32");
     SiHandle *h = si_create(p, (uint32_t)max_strings, (uint32_t)arena_bytes, mode, errbuf);
@@ -146,6 +160,7 @@ intern(self, str)
     int64_t id;
   CODE:
     s = SvPVbyte(str, n);
+    REEXTRACT(self);
     si_rwlock_wrlock(h);
     id = si_intern_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -165,6 +180,7 @@ id_of(self, str)
     uint32_t id;
   CODE:
     s = SvPVbyte(str, n);
+    REEXTRACT(self);
     si_rwlock_rdlock(h);
     int found = si_id_of_locked(h, s, n, &id);
     si_rwlock_rdunlock(h);
@@ -187,9 +203,15 @@ string(self, id)
          * segment yields undef instead of an out-of-bounds read/trap. Valid
          * data always satisfies off+4+len <= arena_used, so behavior is
          * unchanged in normal use. */
-        if (id < h->hdr->count) {
+        /* count/arena_used are mutable peer-writable header words; clamp each to
+         * the cached physical array size before using it as the id / offset
+         * bound, so a corrupted over-large counter cannot admit an OOB index. */
+        uint32_t count = h->hdr->count;
+        if (count > h->max_strings) count = h->max_strings;
+        if (id < count) {
             uint32_t off = h->reverse[id];
             uint32_t used = h->hdr->arena_used;
+            if (used > h->arena_bytes) used = h->arena_bytes;
             if (off <= used && used - off >= sizeof(uint32_t)) {
                 uint32_t l;
                 const char *str = si_arena_str(h, off, &l);
@@ -223,6 +245,7 @@ exists(self, str)
     uint32_t id;
   CODE:
     s = SvPVbyte(str, n);
+    REEXTRACT(self);
     si_rwlock_rdlock(h);
     RETVAL = si_id_of_locked(h, s, n, &id);
     si_rwlock_rdunlock(h);
@@ -236,19 +259,31 @@ stats(self)
     EXTRACT(self);
   CODE:
     {
-        HV *hv = newHV();
+        uint32_t count, max_strings, hash_slots, arena_used, arena_bytes;
+        uint64_t ops;
+        /* Snapshot the header fields under the lock; do all (croak-capable) Perl
+           allocation after releasing it -- an OOM in newHV/newSVuv must never
+           strand the read lock. */
         si_rwlock_rdlock(h);
         SiHeader *hd = h->hdr;
-        hv_stores(hv, "count",       newSVuv(hd->count));
-        hv_stores(hv, "max_strings", newSVuv(hd->max_strings));
-        hv_stores(hv, "hash_slots",  newSVuv(hd->hash_slots));
-        hv_stores(hv, "hash_load",   newSVnv((double)hd->count / (double)hd->hash_slots));
-        hv_stores(hv, "arena_used",  newSVuv(hd->arena_used));
-        hv_stores(hv, "arena_bytes", newSVuv(hd->arena_bytes));
-        hv_stores(hv, "arena_load",  newSVnv((double)hd->arena_used / (double)hd->arena_bytes));
-        hv_stores(hv, "ops",         newSVuv(hd->stat_ops));
-        hv_stores(hv, "mmap_size",   newSVuv((UV)h->mmap_size));
+        count       = hd->count;
+        max_strings = hd->max_strings;
+        hash_slots  = hd->hash_slots;
+        arena_used  = hd->arena_used;
+        arena_bytes = hd->arena_bytes;
+        ops         = hd->stat_ops;
         si_rwlock_rdunlock(h);
+
+        HV *hv = newHV();
+        hv_stores(hv, "count",       newSVuv(count));
+        hv_stores(hv, "max_strings", newSVuv(max_strings));
+        hv_stores(hv, "hash_slots",  newSVuv(hash_slots));
+        hv_stores(hv, "hash_load",   newSVnv((double)count / (double)hash_slots));
+        hv_stores(hv, "arena_used",  newSVuv(arena_used));
+        hv_stores(hv, "arena_bytes", newSVuv(arena_bytes));
+        hv_stores(hv, "arena_load",  newSVnv((double)arena_used / (double)arena_bytes));
+        hv_stores(hv, "ops",         newSVuv(ops));
+        hv_stores(hv, "mmap_size",   newSVuv((UV)h->mmap_size));
         RETVAL = newRV_noinc((SV *)hv);
     }
   OUTPUT:

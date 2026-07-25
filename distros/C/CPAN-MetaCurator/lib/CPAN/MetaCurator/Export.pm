@@ -9,32 +9,166 @@ use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 use Data::Dumper::Concise; # For Dumper().
 use DateTime::Tiny;
 
-use File::Slurper 'read_lines';
+use File::Slurper qw/read_lines write_text/;
+
 use File::Spec;
 
 use HTML::Escape 'escape_html';
 
-use Moo;
+use Mew;
 
-use Switch::Declare;
-use Syntax::Keyword::Match;
+use Switch::Declare;		# For switch.
+use Syntax::Keyword::Match;	# For match.
 
 use Tree::DAG_Node;
 
-use Types::Standard qw/Str/;
+has -dag_nodetree_path => (Str, default => sub{return ''}, chained => 1);
 
-has test_topics_path =>
-(
-	default		=> sub{return '/tmp/test.topics.txt'},
-	is			=> 'rw',
-	isa			=> Str,
-	required	=> 0,
-);
+has jstree_html_path => (Str, default => sub{return ''}, chained => 1);
 
 our $leaf_id;
 our %seen;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
+
+# --------------------------------------------------
+
+sub build_dag_tree
+{
+	my($self, $daughter, $pad, $topic) = @_;
+	my(@lines)		= split(/\n/, $$topic{text});
+	@lines			= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
+	my($index)		= -1;
+
+	my(@components);
+	my($entry);
+	my(%inside, $item);
+	my($leaf, $line, $line_count);
+	my($module);
+	my(%node_type, $note, $note_count);
+	my(@pre_pre);
+	my($see_also_root);
+	my($text, $token, $type);
+
+	$inside{pre_pre}	= false;
+	$inside{see_also}	= false;
+	$item				= {description => '', href => '', id => 0, text => '', uri => ''};
+
+	while ($index < $#lines)
+	{
+		$index++;
+
+		$line	= $lines[$index];
+		$token	= ($line =~ /^o (.+)/) ? $1 : '';
+
+		$self -> logger -> debug("Processing line $index: <$line>. token: $token");
+
+		# $token ne '':
+		# a. See also
+		# b. An acronym
+		# Otherwise:
+		# c. A description
+		# d. A href
+		# e. <pre>
+		# f. </pre>
+
+		if ($token eq 'See also')
+		{
+			$inside{see_also}	= true;
+			$see_also_root		= Tree::DAG_Node -> new({name => 'See also', attributes => {id => ++$leaf_id, description => '', uri => ''} });
+
+			$daughter -> add_daughter($see_also_root);
+		}
+		elsif ($token)
+		{
+			$inside{see_also}	= false;
+			$line_count			= 0;
+			$module				= $token;
+			$note_count			= 0;
+
+			if (! $seen{$module})
+			{
+				$seen{$module} = $self -> insert_hashref('modules', {name => $module});
+
+				$self -> gather_statistics(\%node_type, $pad, $module, $topic);
+			}
+		}
+		elsif ($line =~ /<pre>/)
+		{
+			# Fix me. What happens if there are 2 sets of <pre>...</pre> within 1 topic?
+
+			$inside{pre_pre} = true;
+		}
+		elsif ($line =~ m|</pre>|)
+		{
+			$inside{pre_pre} = false;
+		}
+		elsif ($inside{pre_pre})
+		{
+		}
+		else
+		{
+			$line_count++;
+
+			$token = ($line =~ /^- (.+)/) ? $1 : '';
+
+			if ($inside{see_also})
+			{
+				# Fix me. References to topics can be forward references.
+
+				@components	= split(' - ', $token);
+				$text		= ($#components < 1) ? $components[0] : $components[1];
+				$type		= switch ($components[0])
+				{
+					case /^\[?\[?[A-Za-z]+\d?\d?\]?\]?$/	{'topic'}
+					case /^http/							{'uri'}
+					default									{'text'}
+				};
+
+				match ($type : eq)
+				{
+					case('topic')	{
+										$$item{text} = ($components[0] =~ /^\[?\[?([A-Za-z]+\d?\d?)\]?\]?$/) ? $1 : $components[0];
+										$$item{text} = "[Topic] <button class='btn btn-info'>$$item{text}</button>"
+									}
+					case('uri')		{$$item{text} = "<a href = '" . escape_html($components[0]) . "' target = '_blank'>$text</a>"}
+					case('text')	{$$item{text} = $token}
+				}
+
+				$leaf = Tree::DAG_Node -> new({name => $$item{text}, attributes => {id => ++$leaf_id, description => '', uri => $$item{text}} });
+
+				$see_also_root -> add_daughter($leaf);
+			}
+			elsif ($line_count == 1)
+			{
+				$$item{description} = $token;
+			}
+			elsif ($line_count == 2)
+			{
+				$$item{text}	= $token;
+				$leaf			= Tree::DAG_Node -> new({name => $module, attributes => {id => ++$leaf_id, description => $$item{description}, uri => $$item{text}} });
+
+				$daughter -> add_daughter($leaf);
+			}
+			else
+			{
+				$note_count++;
+
+				if ($note_count == 1)
+				{
+					$note = Tree::DAG_Node -> new({name => "Notes for: $module", attributes => {id => ++$leaf_id, description => '', uri => ''} });
+
+					$daughter -> add_daughter($note);
+				}
+
+				$entry = Tree::DAG_Node -> new({name => $token, attributes => {id => ++$leaf_id, description => '', uri => ''} });
+
+				$note -> add_daughter($entry);
+			}
+		}
+	}
+
+} # End of build_dag_tree.
 
 # -----------------------------------------------
 
@@ -46,87 +180,122 @@ sub export_tree
 	$self -> init_db;
 
 	my($pad)					= $self -> build_pad;
+	$$pad{jstree_html_path}		= $self -> jstree_html_path;
 	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
-	my(@list)					= '<ul>';
 	my($origin)					= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
-	my($not_used)				= $$pad{topic_html_ids}{$$origin{title} };
 	$leaf_id					= 0;
-	my($root)					= Tree::DAG_Node -> new({name => $$origin{title}, attributes => {id => $leaf_id} });
+	my($root)					= Tree::DAG_Node -> new({name => $$origin{title}, attributes => {id => $leaf_id, description => 'Root'} });
 
 	$self -> logger -> info($self -> visual_break);
 	$self -> logger -> info("Topic: id: $leaf_id. title: $$origin{title}");
 
-	push @list, qq|<li data-jstree='{"opened": true}' id = '$leaf_id'><a href = '#'>$$origin{title}</a>|;
-	push @list, '<ul>';
-
-	my(%wanted);
-
-	# Read data/testing.topics.txt for topic names to process. This just limits the output.
-	# See also data/special.topic.txt.
-
-	if (-e $self -> test_topics_path)
-	{
-		my($test_topics)	= $self -> read_csv_file($self -> test_topics_path);
-		$wanted{$_}			= true for (@$test_topics);
-	}
-
-	# If the file is absent or empty, activate all topics.
-
-	my(@keys) = keys %wanted;
-
-	for ($#keys == 0)
-	{
-		$wanted{$$_{title} } = true for (@{$$pad{topics} });
-	}
+	# Phase 1: Build the DAG_Node tree.
 
 	my($daughter);
-	my($item, $items_ref);
-	my($see_also_ref);
 
 	for my $topic (@{$$pad{topics} })
 	{
-		next if (! $wanted{$$topic{title} });
-
-		$self -> logger -> info("Topic: id: $$topic{id}. html_id: $$pad{topic_names}{$$topic{title}}. title: $$topic{title}");
-
-		$daughter = Tree::DAG_Node -> new({name => $$topic{title}, attributes => {id => ++$leaf_id} });
+		$daughter = Tree::DAG_Node -> new({name => $$topic{title}, attributes => {id => ++$leaf_id, description => 'Topic'} });
 
 		$root -> add_daughter($daughter);
 
-		($items_ref, $see_also_ref) = $self -> parse_topic($daughter, $pad, $topic);
-
-		$self -> logger -> info("parse_topic() returned: $#$items_ref, $#$see_also_ref");
-
-		++$leaf_id;
-
-		push @list, qq|\t<li data-jstree='{"opened": false}' id = '$leaf_id'>$$topic{title}|;
-		push @list, '<ul>';
-
-		for $item (@$items_ref)
-		{
-			++$leaf_id;
-			$$pad{count}{leaf}++;
-
-			if ($$item{text} eq 'See also')
-			{
-				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$leaf_id'>See also|;
-				push @list, "\t<ul>";
-				push @list, qq|\t\t<li>$$_{text}</li>| for (@$see_also_ref);
-				push @list, "\t</ul>";
-				push @list, "\t</li>";
-			}
-			else
-			{
-				push @list, $$item{html} ? "<li>$$item{html}</li>" : "<li id = '$$item{id}'>$$item{text}</li>";
-			}
-		}
-
-		push @list, '</ul>', '</li>';
-
-		$self -> logger -> info($self -> visual_break);
+		$self -> build_dag_tree($daughter, $pad, $topic);
 	}
 
-	push @list, '</ul>', '</li>', '</ul>';
+	# Phase 2: Save the DAG_Node tree to disk.
+
+	if ($self -> dag_nodetree_path)
+	{
+		write_text($self -> dag_nodetree_path, join("\n", @{$root -> tree2string}) . "\n");
+	}
+
+	# Phase 3: Scan the DAG_Node tree to get the topic ids.
+	# These will be used to resolve forward references of topics.
+
+	my($attributes);
+	my($id);
+	my($name);
+	my(%topic_id_map);
+
+	$root -> walk_down
+	({
+		callbackback => sub
+		{
+			my($node, $options)	= @_;
+			$attributes			= $node -> attributes;
+			$name       		= $node -> name;
+
+			if ($$options{_depth} == 1) # Topics.
+			{
+				$topic_id_map{$name} = $$attributes{id};
+			}
+
+		}, # End of callbackback.
+		_depth => 0,
+	});
+
+	# Phase 4; Build the JS Tree.
+	# New style.
+
+	my($description);
+	my(@list);
+	my($previous_depth);
+	my($uri);
+
+	$root -> walk_down
+	({
+		callback => sub
+		{
+			my($node, $options)	= @_;
+			$attributes			= $node -> attributes;
+			$name       		= $node -> name;
+
+			if ($$options{_depth} == 0) # Root.
+			{
+				push @list, '<ul>'; # Open global li.
+				push @list, qq|<li data-jstree='{"opened": true}' id = '$$attributes{id}'>$name|;
+				push @list, '<ul>'; # Open ul for subtree below root.
+			}
+			elsif ($$options{_depth} == 1) # Topics.
+			{
+				push @list, '</li>'				if ($previous_depth == 1); # Close li opened at this depth.
+				push @list, '</ul></li>'		if ($previous_depth == 2); # Close ul & li opened in subtree below.
+				push @list, '</ul></li></ul>'	if ($previous_depth == 3); # Close ul & li opened in subtree below. Eg: CssStuff with no entries below See also.
+				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$$attributes{id}'>$name|;
+			}
+			elsif ($$options{_depth} == 2) # Module name || 'Notes for ...' || 'See also'.
+			{
+				$$pad{count}{leaf}++;
+
+				$description	= $$attributes{description};
+				$uri			= $$attributes{uri} || '#';
+				$uri			= ($name =~ qr/Notes for|See also/) ? "&#8853; $name" : "<a href = '" . escape_html($uri) . "' target = '_blank'>$name - $description</a>";
+
+				push @list, '<ul>'			if ($previous_depth == 1); # Open ul for subtree at this level.
+				push @list, '</li>'			if ($previous_depth == 2); # Close li opened at this depth.
+				push @list, '</ul></li>'	if ($previous_depth == 3); # Close ul & li opened in subtree below.
+				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$$attributes{id}'>$uri|;
+			}
+			elsif ($$options{_depth} == 3) # 'Notes for ...' || 'See also' entries.
+			{
+				push @list, '<ul>'			if ($previous_depth == 2); # Open ul for subtree at this level.
+				push @list, qq|\t<li data-jstree='{"opened": false}' id = '$$attributes{id}'>$name</li>|;
+			}
+
+			$previous_depth = $$options{_depth};
+
+			return 1;
+
+		}, # End of callback.
+		_depth => 0,
+	});
+
+	push @list, '</ul>'; # Close ul for subtree opened at root.
+	push @list, '</li>'; # CLose li opened at root.
+	push @list, '</ul>'; # Close global li.
+
+	# Phase 5: Build the web page which uses JSTree.
+	# And save it to html/cpan.metacurator.tree.html
 
 	my($list)	= join("\n", @list);
 	$body		=~ s/!list!/$list/;
@@ -138,38 +307,6 @@ sub export_tree
 
 	$self -> write_file($header, $body, $footer, $pad);
 	$self -> logger -> info("$_ count: $$pad{count}{$_}") for (sort keys %{$$pad{count} });
-
-	# This works. It's very plain.
-	#say $root -> name;
-	#say map{"\t" . $_ -> name . "\n"} $root -> daughters;
-	#
-	# This works. It's nicer.
-	#say map("$_\n", @{$root->tree2string});
-
-	# Scan the tree looking for topics. We stockpile each along with its id.
-
-	my($attributes);
-	my($id);
-	my($name);
-	my($topic, %topic_id_map);
-
-	$root -> walk_down
-	({
-		callbackback => sub
-		{
-			my($node, $options)	= @_;
-			$attributes			= $node -> attributes;
-			$name       		= $node -> name;
-
-			if ($name =~ /^\[Topic/)
-			{
-				$id		= $$attributes{id};
-				$topic	= $1 if ($name =~ />(.+)</);
-
-				say "$topic => $id";
-			}
-		} # End of callbackback.
-	});
 
 	return 0;
 
@@ -215,177 +352,18 @@ sub gather_statistics
 
 	$$pad{count}{acronym}++	if ($$node_type{acronym});
 	$$pad{count}{known}++	if ($$node_type{known});
-
-	if ($$node_type{unknown} && ($token ne 'See also') )
-	{
-		$$pad{count}{unknown}++;
-
-		$self -> logger -> debug("Unknown: $token");
-	}
+	$$pad{count}{unknown}++	if ($$node_type{unknown} && ($token ne 'See also') );
 
 } # End of gather_statistics;
-
-# --------------------------------------------------
-
-sub parse_topic
-{
-	my($self, $daughter, $pad, $topic) = @_;
-	my(@lines)	= split(/\n/, $$topic{text});
-	@lines		= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
-	my($index)	= -1;
-
-	$self -> logger -> debug("Topic: $$topic{title}. Line count: $#lines");
-
-	my(@components);
-	my($description);
-	my(@extras);
-	my($href);
-	my(%inside, $is_topic, $item, @items);
-	my($line, $line_count);
-	my($module, $module_leaf);
-	my(%node_type);
-	my(@pre_pre);
-	my($see_also_root, $see_also_1, @see_also);
-	my($text, $token, $type);
-
-	$inside{pre_pre}	= false;
-	$inside{see_also}	= false;
-
-	while ($index < $#lines)
-	{
-		$index++;
-
-		$item	= {href => '', id => ++$leaf_id, text => ''};
-		$line	= $lines[$index];
-		$token	= ($line =~ /^o (.+)/) ? $1 : '';
-
-		$self -> logger -> debug("Processing line $index: <$line>. token: $token");
-
-		# $token ne '':
-		# a. See also
-		# b. An acronym
-		# Otherwise:
-		# c. A description
-		# d. A href
-		# e. <pre>
-		# f. </pre>
-
-		if ($token eq 'See also')
-		{
-			$inside{see_also}	= true;
-			$$item{text}		= 'See also';
-
-			push @items, $item;
-
-			$see_also_root = Tree::DAG_Node -> new({name => 'See also', attributes => {id => ++$leaf_id} });
-
-			$daughter -> add_daughter($see_also_root);
-		}
-		elsif ($token)
-		{
-			$description		= '';
-			$inside{see_also}	= false;
-			$line_count			= 0;
-			$module				= $token;
-
-			# Fix me. Should be checking known modules.
-
-#			if ($$pad{module_names}{$token} && ! $seen{$token})
-			if (! $seen{$module})
-			{
-				$seen{$module} = $self -> insert_hashref('modules', {name => $module});
-
-				$self -> gather_statistics(\%node_type, $pad, $module, $topic);
-#				$self -> logger -> debug("Topic: $$topic{title}. Module: $token");
-			}
-		}
-		elsif ($line =~ /<pre>/)
-		{
-			# Fix me. What happens if there are 2 sets of <pre>...</pre> within 1 topic?
-
-			$inside{pre_pre} = true;
-		}
-		elsif ($line =~ m|</pre>|)
-		{
-			$inside{pre_pre} = false;
-		}
-		elsif ($inside{pre_pre})
-		{
-			$$item{html}	= '';
-			$$item{text}	= $line;
-
-			push @pre_pre, $item;
-		}
-		else
-		{
-			$line_count++;
-
-			$token = ($line =~ /^- (.+)/) ? $1 : '';
-
-			if ($inside{see_also})
-			{
-				# Fix me. References to topics can be forward references.
-
-				@components	= split(' - ', $token);
-				$text		= ($#components < 1) ? $components[0] : $components[1];
-				$type		= switch ($components[0])
-				{
-					case /^\[?\[?[A-Za-z]+\d?\d?\]?\]?$/	{'topic'}
-					case /^http/							{'uri'}
-					default									{'text'}
-				};
-
-				match ($type : eq)
-				{
-					case('topic')	{
-										$$item{text} = ($components[0] =~ /^\[?\[?([A-Za-z]+\d?\d?)\]?\]?$/) ? $1 : $components[0];
-										$$item{text} = "[Topic] <button class='btn btn-info'>$$item{text}</button>"
-									}
-					case('uri')		{$$item{text} = "<a href = '" . escape_html($components[0]) . "' target = '_blank'>$text</a>"}
-					case('text')	{$$item{text} = $token}
-				}
-
-				push@see_also, $item;
-
-				$see_also_1	= Tree::DAG_Node -> new({name => $$item{text}, attributes => {id => ++$leaf_id} });
-
-				$see_also_root -> add_daughter($see_also_1);
-			}
-			elsif ($line_count == 1)
-			{
-				$description = $token;
-			}
-			elsif ($line_count == 2)
-			{
-				$href			= $token;
-				$$item{html}	= "<a href = '" . escape_html($href) . "' target = '_blank'>$module - $description</a>";
-				$$item{text}	= '';
-
-				push @items, $item;
-
-				$module_leaf = Tree::DAG_Node -> new({name => $module, attributes => {id => ++$leaf_id} });
-
-				$daughter -> add_daughter($module_leaf);
-			}
-			else
-			{
-				push @extras, $token,
-			}
-		}
-	}
-
-	return ([@items], [@see_also]);
-
-} # End of parse_topic.
 
 # --------------------------------------------------
 
 sub write_file
 {
 	my($self, $header, $body, $footer, $pad) = @_;
-	my($output_path) = File::Spec -> catfile($self -> home_path, $self -> output_path);
+	my($output_path) = File::Spec -> catfile($self -> home_path, $self -> jstree_html_path);
 
-	# $$pad{encoding} has a : prefix, & the value is from the constants table, which is from
+	# $$pad{encoding} has a ':' prefix, & the value is from the constants table, which is from
 	# /home/ron/perl.modules/CPAN-MetaCurator/data/cpan.metacurator.constants.csv.
 
 	open(my $fh, ">$$pad{encoding}", $output_path);

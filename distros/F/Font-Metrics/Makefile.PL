@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
         'fm_truetype.c'                     => '$(INST_LIB)/Font/Metrics/src/fm_truetype.c',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-    clean => { FILES => 'Font-Metrics-* Metrics.c Metrics.o Metrics.bs *.o lib/Font/Metrics/Install/Files.pm' },
+    clean => { FILES => 'Font-Metrics-* Metrics.c Metrics.o Metrics.bs *.o lib/Font/Metrics/Install/Files.pm libfm$(LIB_EXT)' },
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
@@ -73,3 +73,20 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+sub MY::postamble {
+    my $c_objs = join(' ',
+        map { (my $o = $_) =~ s/\.c$/\$(OBJ_EXT)/; $o } @c_src);
+    return <<"MAKE";
+libfm\$(LIB_EXT) : $c_objs
+\t\$(AR) \$(AR_STATIC_ARGS) libfm\$(LIB_EXT) $c_objs
+\t\$(RANLIB) libfm\$(LIB_EXT)
+
+pure_all :: \$(INST_ARCHAUTODIR)/libfm\$(LIB_EXT)
+
+\$(INST_ARCHAUTODIR)/libfm\$(LIB_EXT) : libfm\$(LIB_EXT) \$(INST_ARCHAUTODIR)\$(DFSEP).exists
+\t\$(NOECHO) \$(RM_F) \$@
+\t\$(CP) libfm\$(LIB_EXT) \$@
+\t\$(CHMOD) \$(PERM_RWX) \$@
+MAKE
+}

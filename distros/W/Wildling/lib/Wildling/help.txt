@@ -1,0 +1,43 @@
+wildling - pattern based string generator
+
+USAGE
+    wildling [options] [pattern ...]
+
+OPTIONS
+    --select #                  Print only combination number # (repeatable)
+    --range #-#                 Print combinations from # to # inclusive (repeatable)
+    --check                     Print generation info instead of results
+    --dictionary <name>:<path>  Load a dictionary file as <name> (repeatable)
+    --template <path>           Load options from a JSON template file
+    --help, -h                  Show this help message
+    --version, -v               Show version
+
+PATTERNS
+    # #{N} #{N-M}               digits 0-9; optional fixed or ranged length
+    @ @{N} @{N-M}               lowercase a-z
+    * *{N} *{N-M}               lowercase a-z and digits 0-9
+    & &{N} &{N-M}               lowercase and uppercase letters
+    ! !{N} !{N-M}               uppercase A-Z
+    ? ?{N} ?{N-M}               uppercase A-Z and digits 0-9
+    - -{N} -{N-M}               letters and digits
+    ${'a,b',N-M}               combinations from a comma-separated word list
+    %{'name'} %{'name',N-M}     words from a named dictionary
+    \# \@ \$ ...                escape a wildcard character
+
+TEMPLATE JSON
+    {
+      "patterns": ["Year 19##", "%{'colors'}"],
+      "dictionaries": {
+        "colors": "path/to/colors.txt",
+        "inline": ["red", "blue"]
+      },
+      "select": [0, 2],
+      "range": ["5-7"],
+      "check": false
+    }
+
+EXAMPLES
+    wildling --dictionary colors:./colors.txt "%{'colors'}#"
+    wildling --template ./config.json
+    wildling --select 0 --range 8-9 "##"
+    wildling "${'blue,red',1-2}"

@@ -79,4 +79,48 @@ is provoke("garbage line\n"),
         'server EOF reports "connection closed by server"';
 }
 
+# 5) Admin replies have no length prefix: a peer streaming bytes
+#    without ever sending the terminator must not grow the read buffer
+#    without limit. Past 16 MiB the client must drop the connection
+#    with "admin response too large".
+{
+    my $srv = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1', LocalPort => 0, Listen => 1, ReuseAddr => 1,
+    ) or plan skip_all => "cannot bind listener: $!";
+    my $port = $srv->sockport;
+    $srv->blocking(0);
+
+    local $SIG{PIPE} = 'IGNORE';
+    my $chunk  = 'A' x (64 * 1024);      # no newline, ever
+    my $stream = 64 * 1024 * 1024;       # stop after 64 MiB and just hold
+    my $ww;
+    my $accept_w = EV::io fileno($srv), EV::READ, sub {
+        my $c = $srv->accept or return;
+        $c->blocking(0);
+        $ww = EV::io fileno($c), EV::WRITE, sub {
+            my $n = syswrite $c, $chunk;
+            unless ($n) { undef $ww; close $c; return; }   # client gave up
+            $stream -= $n;
+            if ($stream <= 0) { undef $ww; }               # keep socket open
+        };
+    };
+
+    my $err;
+    my $g = EV::Gearman->new(
+        host => '127.0.0.1', port => $port,
+        on_error => sub { $err //= $_[0]; EV::break },
+    );
+    $g->admin('version', sub { });
+    my $guard = EV::timer 10, 0, sub { fail 'admin cap timeout'; EV::break };
+    EV::run;
+
+    is $err, 'admin response too large',
+        'unterminated admin stream disconnects with "admin response too large"';
+    ok !$g->is_connected, 'client disconnected';
+    my ($rcap) = $g->_buf_caps;
+    cmp_ok $rcap, '<=', 32 * 1024 * 1024,
+        'read buffer stayed bounded (cap overshoots at most one doubling)';
+    undef $g; undef $ww; close $srv;
+}
+
 done_testing;

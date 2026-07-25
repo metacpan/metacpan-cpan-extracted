@@ -965,7 +965,8 @@ sub _evaluate_value_expression {
         my $path = $1;
         $path =~ s/^\s+|\s+$//g;
 
-        if ($path !~ /\s/ && $path !~ /[+\-*\/]/) {
+        my $is_bracket_slice = $path =~ /\[[^\]]*:[^\]]*\]/;
+        if (($path !~ /\s/ || $is_bracket_slice) && $path !~ /[+\-*\/]/) {
             return ([], 1) unless defined $context;
             return ([], 1) if $path eq '';
 

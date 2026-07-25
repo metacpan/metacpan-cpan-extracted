@@ -52,6 +52,16 @@ t/16_epoch.t
 t/17_arg_validation.t
 t/18_admin_disconnect.t
 t/19_protocol_errors.t
+t/20_worker_no_leak.t
+t/21_custom_loop.t
+t/22_addrinfo_fallback.t
+t/23_reconnect_edge.t
+t/24_protocol_desync.t
+t/25_job_lifetime.t
+t/26_submit_args.t
+t/27_admin_text.t
+t/28_cmd_timeout.t
+t/29_register_while_sleeping.t
 tools/gen-readme.pl
 typemap
 xt/01_stress.t

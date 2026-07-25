@@ -9,7 +9,20 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::HyperLogLog::Shared")) \
         croak("Expected a Data::HyperLogLog::Shared object"); \
     HllHandle *h = INT2PTR(HllHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::HyperLogLog::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::HyperLogLog::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::HyperLogLog::Shared object was replaced during the call"); \
+    h = INT2PTR(HllHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::HyperLogLog::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -29,7 +42,6 @@ new(class, path = &PL_sv_undef, precision = 14, ...)
   PREINIT:
     char errbuf[HLL_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* optional 4th arg = file mode for the exclusive create of a NEW backing
        file (opt-in cross-user sharing); default 0600 (owner-only).  Ignored
        for anonymous/undef path and when attaching an existing file. */
@@ -37,6 +49,9 @@ new(class, path = &PL_sv_undef, precision = 14, ...)
     if (precision < HLL_MIN_PRECISION || precision > HLL_MAX_PRECISION)
         croak("Data::HyperLogLog::Shared->new: precision must be between %d and %d",
               HLL_MIN_PRECISION, HLL_MAX_PRECISION);
+    /* capture the path PV LAST: the get-magic on ST(3) above can run
+       arbitrary Perl code that reallocs/frees path's PV, dangling p */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     HllHandle *h = hll_create(p, (uint32_t)precision, mode, errbuf);
     if (!h) croak("Data::HyperLogLog::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -93,6 +108,7 @@ add(self, item)
     const char *s;
   CODE:
     s = SvPVbyte(item, n);
+    REEXTRACT(self);
     hll_rwlock_wrlock(h);
     RETVAL = hll_add_locked(h, s, n);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -110,6 +126,7 @@ add_many(self, items)
     IV  top;
     UV  added = 0;
   CODE:
+    SvGETMAGIC(items);
     if (!SvROK(items) || SvTYPE(SvRV(items)) != SVt_PVAV)
         croak("Data::HyperLogLog::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(items);
@@ -122,10 +139,18 @@ add_many(self, items)
             Newx(ls, cnt, STRLEN);       SAVEFREEPV(ls);
             for (i = 0; i < cnt; i++) {                  /* a croak here holds NO lock; SAVEFREEPV cleans up */
                 SV **el = av_fetch(av, (SSize_t)i, 0);
-                if (el && *el) ps[i] = SvPVbyte(*el, ls[i]);
-                else { ps[i] = ""; ls[i] = 0; }
+                if (el && *el) {
+                    STRLEN len;
+                    const char *src = SvPVbyte(*el, len); /* may run overload/tie/get-magic = arbitrary Perl */
+                    /* Copy bytes into a private mortal SV NOW: a LATER element SvPVbyte can
+                     * grow/free THIS element PV, dangling src before the locked loop uses it. */
+                    SV *copy = sv_2mortal(newSVpvn(src, len));
+                    ps[i] = SvPVX_const(copy);
+                    ls[i] = len;
+                } else { ps[i] = ""; ls[i] = 0; }
             }
         }
+        REEXTRACT(self);
         hll_rwlock_wrlock(h);                            /* locked region: NO croak-capable calls */
         for (i = 0; i < cnt; i++) added += (UV)hll_add_locked(h, ps[i], ls[i]);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
@@ -160,6 +185,10 @@ merge(self, other)
         croak("Data::HyperLogLog::Shared->merge: expected a Data::HyperLogLog::Shared object");
     HllHandle *o = INT2PTR(HllHandle*, SvIV(SvRV(other)));
     if (!o) croak("Attempted to use a destroyed Data::HyperLogLog::Shared object");
+    /* sv_isobject/sv_derived_from above begin with SvGETMAGIC(other), so a
+     * tied `other` can have destroyed self before h is used below. `o` was
+     * read after that magic and needs no re-read. */
+    REEXTRACT(self);
 
     /* Snapshot the other's registers under its read lock into a temp
      * buffer, then release before taking self's write lock.  Copying to

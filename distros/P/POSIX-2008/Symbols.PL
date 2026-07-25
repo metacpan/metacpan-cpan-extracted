@@ -8,7 +8,7 @@
 use File::Spec;
 
 require XSLoader;
-XSLoader::load('POSIX::2008', '0.27');
+XSLoader::load('POSIX::2008', '0.28');
 
 my %names;
 

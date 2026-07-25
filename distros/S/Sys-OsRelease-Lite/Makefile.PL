@@ -11,8 +11,9 @@ use utf8;
 use Carp qw(croak);
 use ExtUtils::MakeMaker;
 
+my $perl = $^X;
 my $semver;
-open( my $fh, "-|", "perl", "build_tools/get_semver.pl" )
+open( my $fh, "-|", $perl, "build_tools/get_semver.pl" )
     or croak "failed to run build/get_semver.pl to get version number: $!";
 while (<$fh>) {
     $semver .= $_;
@@ -37,7 +38,6 @@ WriteMakefile(
     PM => { 'lib/Sys/OsRelease/Lite.pm' => '$(INST_LIB)/Sys/OsRelease/Lite.pm' },
     CONFIGURE_REQUIRES => {
         "ExtUtils::MakeMaker" => 0,
-        "Readonly" => 0,
         "CPAN::Changes" => 0,
         "Versioning::Scheme::Semantic" => 0,
     },

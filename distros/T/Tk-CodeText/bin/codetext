@@ -4,10 +4,11 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.64';
+$VERSION = '0.69';
 
 use Tk;
 require Tk::CodeText;
+require Tk::YADialog;
 require Tk::YAMessage;
 use Getopt::Long;
 use File::Path qw(make_path);
@@ -220,6 +221,9 @@ $menu = $app->Menu(
 					-accelerator => 'CTRL+R',
 					-command => ['FindAndReplacePopUp', $txt],
 				],
+				['command' => '~Patch',
+					-command => \&Patch,
+				],
 				['separator' => '-'],
 				['command' => '~Collapse all folds',
 					-command => ['foldCollapseAll', $txt],
@@ -343,6 +347,64 @@ sub loadSettings {
 		close OFILE;
 		return 1
 	}
+}
+
+sub Patch {
+	my @padding = (-padx => 2, -pady => 2);
+	my $dialog = $app->YADialog(
+		-buttons => ['Ok', 'Cancel'],
+	);
+
+	my $f = $dialog->Frame->pack(-fill => 'x');
+	$f->Label(
+		-text => 'File:',
+		-width => 6,
+		-anchor => 'e',
+	)->pack(-side => 'left');
+	my $e = $f->Entry(
+		-width => 40,
+	)->pack(@padding, -side => 'left');
+	$f->Button(
+		-text => 'Select',
+		-command => sub {
+			my $file = $app->getOpenFile;
+			if (defined $file) {
+				$e->delete('0', 'end');
+				$e->insert('end', $file)
+			}
+		},
+	)->pack(@padding, -side => 'left');
+
+	my $m = $dialog->Frame->pack(-fill => 'x');
+	$m->Label(
+		-text => 'Style:',
+		-width => 6,
+		-anchor => 'e',
+	)->pack(-side => 'left');
+	my $style = 'Unified';
+	my $mb = $m->Menubutton(
+		-anchor => 'w',
+		-textvariable => \$style,
+	)->pack(@padding, -side => 'left', -fill => 'x');
+	my @menu = ();
+	for ('Unified', 'Context', 'OldStyle') {
+		my $operation = $_;
+		push @menu, [command => $operation,
+			-command => sub { $style = $operation },
+		];
+	}
+	$mb->configure(-menu => $mb->Menu(
+		-menuitems => \@menu,
+	));
+	
+	my $result = $dialog->show(
+		-popover => $app,
+	);
+	if ($result eq 'Ok') {
+		my $file = $e->get;
+		$txt->patchdiff($file, $style) if -e $file;
+	}
+	$dialog->destroy
 }
 
 sub saveDoc {

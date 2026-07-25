@@ -24,6 +24,7 @@ requires:
   Math::Round: '0.08'
   Syntax::Kamelon: '0.24'
   Test::Tk: '3.03'
+  Text::Patch: '1.8'
   Tk: '804.030'
   Tk::ColorEntry: '0.11'
   Tk::PopList: '0.14'
@@ -31,5 +32,5 @@ requires:
 resources:
   bugtracker: https://github.com/haje61/Tk-CodeText/issues
   repository: git://github.com/haje61/Tk-CodeText.git
-version: '0.68'
+version: '0.69'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

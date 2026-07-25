@@ -111,4 +111,35 @@ close $probe;
     pass 'admin intermix cleanup';
 }
 
+# 6. Async worker DESTROYed with stashed jobs outstanding (T-D1-4):
+#    the client struct must become an inert tombstone kept alive by the
+#    jobs' magic references, job methods must croak "client destroyed",
+#    and releasing the jobs must free the tombstone — no definite leak,
+#    no use-after-free. (This is the scenario xt/90 and xt/91 drive.)
+{
+    my $w = EV::Gearman->new(host => $host, port => $port);
+    my $c = EV::Gearman->new(host => $host, port => $port);
+    my @stash;
+    $w->register_function('xt_leak_tomb_'.$$ => { async => 1 }, sub {
+        push @stash, $_[0];
+        EV::break if @stash == 2;
+    });
+    $w->work;
+    $c->on_connect(sub {
+        $c->submit_job_bg('xt_leak_tomb_'.$$, 'one');
+        $c->submit_job_bg('xt_leak_tomb_'.$$, 'two');
+    });
+    my $t = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    is scalar(@stash), 2, 'two async jobs dispatched and stashed';
+
+    undef $w;            # DESTROY with jobs outstanding -> tombstone
+    my $err = do { local $@; eval { $stash[0]->complete('x'); 1 } ? '' : $@ };
+    like $err, qr/client destroyed/,
+        'stashed job croaks "client destroyed" after worker DESTROY';
+    undef @stash;        # tombstone freed here, via the jobs' svt_free
+    undef $c;
+    pass 'tombstone released with jobs';
+}
+
 done_testing;

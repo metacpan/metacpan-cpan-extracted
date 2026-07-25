@@ -1,5 +1,11 @@
 Revision history for POSIX::2008.
 
+0.28  2026-07-24
+  - Handle some non-constant C macros (e.g. on Solaris).
+  - Check for math functions not available on older FreeBSD releases.
+  - t/09_time.t: Check only strptime() values set in the format string.
+  - Small POD fixes.
+
 0.27  2026-07-22
   - This module now also covers POSIX.1 editions after 2008.
   - Math functions use quadmath or long doubles if enabled and available.

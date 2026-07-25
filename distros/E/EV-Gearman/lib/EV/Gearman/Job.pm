@@ -2,10 +2,14 @@ package EV::Gearman::Job;
 use strict;
 use warnings;
 
-# A job is a blessed hashref { handle, function, unique, workload,
-# _client_ptr => raw ev_gm_t* (IV) }, built by EV::Gearman XS when a
-# JOB_ASSIGN[_UNIQ] arrives. Job methods read the pointer back and
-# guard against use-after-free via the C struct's magic word.
+# A job is a blessed hashref { handle, function, unique, workload },
+# built by EV::Gearman XS when a JOB_ASSIGN[_UNIQ] arrives. The
+# connection back-pointer is carried as perl magic (PERL_MAGIC_ext) on
+# the hash — not a key — together with a tombstone reference that keeps
+# the connection's control block allocated until every job referencing
+# it is released. Job methods validate the struct's magic word, so a
+# destroyed connection croaks instead of dereferencing freed memory,
+# and a forged hash has no magic to pass the check.
 
 sub handle   { $_[0]{handle}   }
 sub function { $_[0]{function} }
@@ -68,12 +72,24 @@ below are still available for sending intermediate events.
 In B<async> mode, the callback returns immediately; you must
 explicitly call C<complete>, C<fail>, or C<exception> later. The
 job object can be stashed in a closure or any other long-lived
-container — it carries the connection pointer plus a magic word
-that's checked on every send.
+container — it outlives the connection safely.
 
 If the underlying L<EV::Gearman> connection has been destroyed by
 the time you call a job method, the call C<croak>s with
-C<"client destroyed">; this prevents use-after-free.
+C<"client destroyed">. If the client is alive but currently
+disconnected (even with reconnect armed), the call C<croak>s with
+C<"not connected">: gearmand forgets the job when the connection
+drops, so a packet queued for the next session would only earn a
+C<JOB_NOT_FOUND> error there. The job holds an internal tombstone
+reference that keeps the connection's control block allocated
+(but torn down) until every job referencing it is released, so
+this check is sound — it never reads freed memory. The
+back-pointer is stored as perl magic, not a hash key: user code,
+hash walkers, and serializers cannot see or clobber it, and a
+job hash that did not come from a C<JOB_ASSIGN> croaks with
+C<"stale job"> instead of dereferencing a forged pointer. Note
+that job objects are not serializable; a L<Storable> round-trip
+produces a job that croaks C<"stale job">.
 
 =head1 ACCESSORS
 

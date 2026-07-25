@@ -1,5 +1,30 @@
 Revision history for OSLV-Monitor
 
+1.0.5   2026-07-24/20:00
+        - cgroups: fix io.stat parsing so IO stats are recorded
+        - cgroups: emit throttled/burst/force_idle-time, percpu, thp_swpout, and zswpwb stats
+        - cgroups: fix container IP mapping key and cache-save error message
+        - cgroups: populate path with container rootfs, falling back to the roots
+          seen by the procs in the cgroup, matching jail path semantics
+        - cgroups: treat nr_periods, nr_throttled, and nr_bursts as counters so
+          they are rates like throttled-time and burst-time, matching what the
+          LibreNMS graphs expect
+        - both: when a counter is seen for the first time, return 0 instead of the
+          accumulated total over 300 if what it is for is older than the polling
+          interval, preventing spikes when something old is first seen... procs
+          younger than the polling interval are still processed as fresh counters
+          so short lived procs don't go uncounted
+        - cgroups: don't zero the cached raw counter value when discarding a
+          garbage value, preventing a inflated delta on the following run
+        - cgroups: remove unused raw usec names from the counters list
+        - FreeBSD: fix MM:SS CPU time parsing
+        - FreeBSD: guard against counter rollback
+        - FreeBSD: populate jail path
+        - both: self-heal a corrupt/truncated cache instead of erroring every run
+        - both: write the cache atomically to avoid truncated cache files
+        - fix leaked $@ that turned a handled cache error into "Failed to run backend"
+        - do not include idle
+
 1.0.4   2026-05-09/14:30
         - fix handling of include/exclude stuff for FreeBSD
         - add OSLV_MONITOR_DEBUG env

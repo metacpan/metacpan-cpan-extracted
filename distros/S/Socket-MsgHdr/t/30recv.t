@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More;
-BEGIN { plan tests => 9 };
+BEGIN { plan tests => 11 };
 use bytes;
 use strict;
 use Socket;
@@ -124,4 +124,42 @@ SKIP: {
 
   cmp_ok($dev1, '==', $dev2, "scm_rights fds on same device");
   cmp_ok($ino1, '==', $ino2, "scm_rights fds are same inode");
+
+  eval { &MSG_CTRUNC; }; # autoloaded, may not be defined yet
+  skip "msg_ctrunc not defined", 1 if $@;
+
+  socketpair(Rd, Wr, AF_UNIX, SOCK_DGRAM, 0)
+    or die "socketpair: $!\n";
+
+  $hdr = new Socket::MsgHdr(buf => "hello!");
+  $hdr->cmsghdr(SOL_SOCKET, SCM_RIGHTS, pack('i', fileno STDIN));
+  sendmsg(\*Wr, $hdr, 0)
+    or die "sendmsg: $!\n";
+
+  $m = new Socket::MsgHdr(buflen => 256, controllen => 1);
+  recvmsg(\*Rd, $m, 0)
+    or die "recvmsg: $!\n";
+
+  ok($m->flags & MSG_CTRUNC, 'MSG_CTRUNC set when controllen is too short');
+
+  close Rd; close Wr;
+};
+
+# 11
+SKIP: {
+  local (*Rd, *Wr);
+  socketpair(Rd, Wr, AF_UNIX, SOCK_DGRAM, 0)
+    or die "socketpair: $!\n";
+
+  my $hdr = new Socket::MsgHdr(buf => 'ab');
+  sendmsg(\*Wr, $hdr, 0)
+    or die "sendmsg: $!\n";
+
+  my $m = new Socket::MsgHdr(buflen => 1);
+  recvmsg(\*Rd, $m, 0)
+    or die "recvmsg: $!\n";
+
+  ok($m->flags & MSG_TRUNC, 'MSG_TRUNC set when buflen is too short');
+
+  close Rd; close Wr;
 };

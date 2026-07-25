@@ -1,4 +1,4 @@
-use 5.012;
+use 5.020;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -23,7 +23,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/EV/Gearman.pm',
     AUTHOR           => 'vividsnow',
     LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.012000',
+    MIN_PERL_VERSION => '5.020000',
 
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.64',

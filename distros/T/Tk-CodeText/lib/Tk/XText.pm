@@ -6,14 +6,15 @@ Tk::XText - Extended Text widget
 
 =cut
 
-use vars qw($VERSION);
-$VERSION = '0.68';
 use strict;
 use warnings;
 use Carp;
+use vars qw($VERSION);
+$VERSION = '0.69';
 
 use Tk;
 use Math::Round;
+use Text::Patch;
 require Tk::DialogBox;
 require Tk::LabFrame;
 require Tk::Spinbox;
@@ -23,9 +24,9 @@ use base qw(Tk::Derived Tk::Text);
 Construct Tk::Widget 'XText';
 
 #boilerplating for auto complete facilities
-my %delimhash = (	'.',	1, '(', 1, ')',	1, ':',	1, '!',	1, '+',	1, ',',	1, '-',	1, '<',	1, '=',
-	1, '>',	1, '%',	1, '&',	1, '*', 1, '"', 1, '\'', 1,	'/',	1, ';',	1, '?',	1, '[',	1, ']',	1,
-	'^',	1, '{',	1, '|',	1, '}',	1, '~',	1, '\\', 1, '$', 1, '@', 1, '#', 1, '`', 1, ' ', 1, "\t", 1
+my %delimhash = ( '.', 1, '(', 1, ')', 1, ':', 1, '!', 1, '+', 1, ',', 1, '-', 1, '<', 1, '=',
+	1, '>', 1, '%', 1, '&', 1, '*', 1, '"', 1, '\'', 1, '/', 1, ';', 1, '?', 1, '[', 1, ']', 1,
+	'^', 1, '{', 1, '|', 1, '}', 1, '~', 1, '\\', 1, '$', 1, '@', 1, '#', 1, '`', 1, ' ', 1, "\t", 1
 );
 
 =head1 SYNOPSIS
@@ -257,12 +258,12 @@ sub Populate {
 		-contextmenu => ['PASSIVE'],
 		-escapepressed => ['CALLBACK', undef, undef, sub {}],
 		-findandreplacecall => ['PASSIVE'],
-		-findoptions	=> ['METHOD', undef, undef, [-background => '#C0FFC0', -foreground => '#000000']],
+		-findoptions => ['METHOD', undef, undef, [-background => '#C0FFC0', -foreground => '#000000']],
 		-indentstyle => ['PASSIVE', 'indentStyle', 'IndentStyle', "tab"],
 		-keyreleasecall => ['CALLBACK', undef, undef, sub {}],
 		-logcall => ['CALLBACK', undef, undef, sub {}],
 		-match => ['PASSIVE', 'match', 'Match', '[]{}()'],
-		-matchoptions	=> ['METHOD', undef, undef, [-background => '#0000FF', -foreground => '#FFFF00']],
+		-matchoptions => ['METHOD', undef, undef, [-background => '#0000FF', -foreground => '#FFFF00']],
 		-menuitems => ['PASSIVE'],
 		-mlcommentend => ['PASSIVE'],
 		-mlcommentstart => ['PASSIVE'],
@@ -291,6 +292,27 @@ sub Populate {
 	$self->bind('<ButtonRelease-2>', [ $self, 'Button2Release', Ev('x'), Ev('y') ]);
 	$self->markSet('match', '0.0');
 	$self->after(10, ['DoPostConfig', $self]);
+}
+
+sub acFillList {
+	my $self = shift;
+
+	#first some show stoppers
+	my $word = $self->acGetWord;
+	return unless defined $word;
+	my @choices = $self->acGetChoices($word);
+	return unless @choices;
+
+	
+	#fill the list
+	my $lb = $self->acListbox;
+	$lb->deleteAll;
+	for (@choices) {
+		$lb->add($_, -text => $_);
+	}
+	$lb->selectionSet($choices[0]);
+	$self->acGeometry;
+	return @choices;
 }
 
 sub acGeometry {
@@ -402,17 +424,9 @@ sub acPostChoices {
 		$self->acPopDown;
 		return
 	}
-	my @choices = $self->acGetChoices($word);
+	my @choices = $self->acFillList;
 	return unless @choices;
 	
-	#fill the list
-	my $lb = $self->acListbox;
-	$lb->deleteAll;
-	for (@choices) {
-		$lb->add($_, -text => $_);
-	}
-	$lb->selectionSet($choices[0]);
-
 	#pop this thing
 	my $pop = $self->acPop ;
 	unless ($pop->ismapped) {
@@ -484,7 +498,7 @@ sub acScanEnd {
 	my $data = $self->acPool;
 	if (defined $data) {
 		for (keys %$data) {
-			delete $data->{$_} if $data->{$_} eq 0;
+			delete $data->{$_} if $data->{$_} == 0;
 		}
 	}
 	$self->acRunning(0);
@@ -567,34 +581,44 @@ sub acSettings {
 
 sub activate {
 	my ($self, $key) = @_;
+	return unless $self->cget('-autocomplete');
 
-	#pop down choice list if no word or choices to the word is found
 	my $word = $self->acGetWord;
-	$self->acPopDown unless defined $word;
-	if (defined $word) {
-		my @choices = $self->acGetChoices($word);
-		$self->acPopDown unless @choices
-	}
 
 	#all kinds of conditions for not proceeding
 	if ($key eq '') {
 		$self->activateCancel;
 		return
 	}
-	return unless $self->cget('-autocomplete');
 
 	unless (defined $word) {
 		$self->acTriggerWord('');
 		return;
 	}
 
+	my $pop = $self->acPop;
+	if ($pop->ismapped) {
+		#pop down choice list if no word or choices to the word is found
+		if (defined $word) {
+			my @choices = $self->acGetChoices($word);
+			if (@choices) {
+				$self->acFillList;
+			} else {
+				$self->acPopDown unless @choices
+			}
+		} else {
+			$self->acPopDown
+		}
+		return
+	}
+
 	my $tword = $self->acTriggerWord;
 	$tword = quotemeta($tword);
-	return @_ if ($tword ne '') and ($word =~ /^$tword/);
+	return if ($tword ne '') and ($word =~ /^$tword/);
 	$self->acTriggerWord($word);
+	$self->acFillList;
 
 	$self->{'active_id'} = $self->after($self->cget('-activedelay'), ['acPostChoices', $self]);
-	return @_;
 }
 
 sub activateCancel {
@@ -1066,7 +1090,7 @@ sub FindAll {
 	$self->FindClear;
 	my $search = $self->FindExpression($mode, $case, $pattern);
 	return unless defined $search;
-	my @all = ();
+	my @all;
 	for (1 .. $self->linenumber('end - 1c')) {
 		my @hits = $self->FindInLine($_, $search);
 		for (@hits) {
@@ -1077,6 +1101,8 @@ sub FindAll {
 			$self->tagRaise('sel');
 		}
 	}
+	my $hits = @all;
+	$self->log("$hits hits");
 	return @all
 }
 
@@ -1631,6 +1657,39 @@ sub OverstrikeMode {
 	return $self->{'OVERSTRIKE_MODE'};
 }
 
+=item B<patchdiff>I($patch, ?$style?)
+
+=cut
+
+sub patchdiff {
+	my ($self, $patch, $style) = @_;
+	$style = 'Unified' unless defined $style;
+	my $type = ref $patch;
+	if ($type eq 'SCALAR') {
+		$patch = $$patch
+	} else {
+		my $file = $patch;
+		$patch = '';
+		if (open my $fh, "<$file") {
+			while (my $line = <$fh>) {
+				$patch = $patch . $line
+			}
+			close $fh
+		} else {
+			$self->log("Cannot open patch file $file", 'error');
+			return
+		}
+	}
+	my $old = $self->get('0.0', 'end - 1c');
+	my $new  = patch( $old, $patch, { STYLE => $style } );
+	my $modified = $self->editModified;
+	$self->SUPER::delete('0.0', 'end');
+	$self->SUPER::insert('0.0', $new, $old);
+	$self->RecordUndo('replace', $modified, '0.0', $old, $new);
+	$self->modifiedCall('0.0');
+	$self->log("Patch applied");
+}
+
 sub PostPopupMenu {
 	my ($self, $x, $y) = @_;
 	my $menu = $self->cget('-contextmenu');
@@ -2182,19 +2241,4 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

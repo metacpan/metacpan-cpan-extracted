@@ -10,6 +10,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Socket/MsgHdr.pm', # finds $VERSION
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Socket/MsgHdr.pm',
+    LICENSE           => 'perl_5',
     AUTHOR            => [ 'Mike Pomraning <mjp@cpan.org>', 'Felipe Gasper <felipe@cpan.org>' ],
 	($mm_ver >= 6.31 ? (LICENSE => 'perl') : ()),
     LIBS              => [''], # e.g., '-lm'

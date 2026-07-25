@@ -13,6 +13,7 @@ WriteMakefile(
 		'Math::Round' => '0.08',
 		'Syntax::Kamelon' => '0.24',
 		'Test::Tk' => '3.03',
+		'Text::Patch' => '1.8',
 		'Tk' => '804.030',
 		'Tk::ColorEntry' => '0.11',
 		'Tk::PopList' => '0.14',

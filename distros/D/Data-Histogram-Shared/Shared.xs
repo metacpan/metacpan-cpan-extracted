@@ -9,7 +9,24 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Histogram::Shared")) \
         croak("Expected a Data::Histogram::Shared object"); \
     HistHandle *h = INT2PTR(HistHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::Histogram::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::Histogram::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+/* The same Perl that can destroy the handle can also REPLACE the invocant
+ * ($obj = 42 from an overload handler mutates ST(0), because Perl passes
+ * aliases), so SvROK must be re-checked before SvRV -- otherwise SvRV would
+ * run on a non-reference. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Histogram::Shared object was replaced during the call"); \
+    h = INT2PTR(HistHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Histogram::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -83,22 +100,30 @@ DESTROY(self)
     }
 
 IV
-record(self, value, count = 1)
+record(self, value, ...)
     SV *self
     IV value
-    UV count
   PREINIT:
     EXTRACT(self);
     int64_t idx;
     IV total;
   CODE:
+    /* optional count (default 1); read here so an explicit undef falls through to
+     * the default instead of warning "uninitialized value". */
+    int has_count = (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2))));
+    UV count = has_count ? SvUV(ST(2)) : 1;
     /* Range-check + index-compute BEFORE locking so a croak holds no lock. */
     if (value < 0)
         croak("Data::Histogram::Shared->record: negative value (%lld)", (long long)value);
     /* count is a UV: a negative arg wraps to a huge unsigned and would silently
      * inflate the bucket.  Reject it via a signed check on the raw SV. */
-    if (items > 2 && SvNV(ST(2)) < 0)
+    if (has_count && SvNV(ST(2)) < 0)
         croak("Data::Histogram::Shared->record: negative count (%lld)", (long long)SvIV(ST(2)));
+    /* A huge positive count (>= 2^63) passes the signed check above but wraps to a
+     * negative int64_t below, corrupting the bucket/total.  Reject it too. */
+    if (count > (UV)INT64_MAX)
+        croak("Data::Histogram::Shared->record: count too large (%llu)", (unsigned long long)count);
+    REEXTRACT(self);
     idx = hist_index_for(h, (int64_t)value);
     if (idx < 0)
         croak("Data::Histogram::Shared->record: value %lld exceeds highest_trackable_value (%lld)",
@@ -121,10 +146,14 @@ record_many(self, values)
     AV *av;
     IV  top;
   CODE:
+    SvGETMAGIC(values);   /* a tied/overloaded scalar may FETCH to an arrayref */
     if (!SvROK(values) || SvTYPE(SvRV(values)) != SVt_PVAV)
         croak("Data::Histogram::Shared->record_many: expected an array reference");
     av = (AV *)SvRV(values);
     top = av_len(av);                     /* last index, -1 if empty */
+    /* SvGETMAGIC(values) above, and av_len on a tied array (AvFILL -> mg_size
+     * -> FETCHSIZE), both run Perl that can have destroyed self. */
+    REEXTRACT(self);
     {
         STRLEN cnt = (top >= 0) ? (STRLEN)(top + 1) : 0, i;
         int64_t *vals = NULL;
@@ -135,12 +164,17 @@ record_many(self, values)
                 IV v = (el && *el) ? SvIV(*el) : 0;
                 if (v < 0)
                     croak("Data::Histogram::Shared->record_many: negative value (%lld)", (long long)v);
+                REEXTRACT(self);
                 if (hist_index_for(h, (int64_t)v) < 0)
                     croak("Data::Histogram::Shared->record_many: value %lld exceeds highest_trackable_value (%lld)",
                           (long long)v, (long long)h->hdr->highest);
                 vals[i] = (int64_t)v;
             }
         }
+        /* The REEXTRACT inside the loop above only runs when cnt > 0; a tied
+         * FETCHSIZE reporting 0 skips the loop entirely and lands straight
+         * here, so re-check outside the `if (cnt)` block as well. */
+        REEXTRACT(self);
         hist_rwlock_wrlock(h);                            /* locked region: NO croak-capable calls */
         for (i = 0; i < cnt; i++) hist_record_locked(h, vals[i], 1);
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);  /* a call always counts, even an empty batch */
@@ -255,6 +289,10 @@ merge(self, other)
         croak("Data::Histogram::Shared->merge: expected a Data::Histogram::Shared object");
     HistHandle *o = INT2PTR(HistHandle*, SvIV(SvRV(other)));
     if (!o) croak("Attempted to use a destroyed Data::Histogram::Shared object");
+    /* sv_isobject/sv_derived_from above begin with SvGETMAGIC(other), so a tied
+     * `other` can have run Perl that destroyed self before h is used below.
+     * `o` was read after that magic and needs no re-read. */
+    REEXTRACT(self);
 
     /* Geometry is immutable after creation -- compare lock-free, croak BEFORE
      * allocating, so a mismatch holds no lock and leaks no buffer. */

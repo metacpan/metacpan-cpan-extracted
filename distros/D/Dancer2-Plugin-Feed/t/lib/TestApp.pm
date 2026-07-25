@@ -1,7 +1,7 @@
 #
 # This file is part of Dancer2-Plugin-Feed
 #
-# This software is copyright (c) 2016 by Natal Ngétal.
+# This software is copyright (c) 2026 by Natal Ngétal.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -41,7 +41,7 @@ get '/other/feed/atom' => sub {
 };
 
 sub _get_entries {
-    [map { { title => "entry $_" } } ( 1 .. 10 )];
+    [map { { title => "entry $_", category => [('a') x $_] } } ( 0 .. 9 )];
 }
 
 1;

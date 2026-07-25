@@ -1090,7 +1090,7 @@ sub apply {
         # support for slice(start[, length])
         if ($part =~ /^slice(?:\((.*)\))?$/) {
             my $args_raw = defined $1 ? $1 : '';
-            my @args     = JQ::Lite::Util::_parse_arguments($args_raw);
+            my @args     = JQ::Lite::Util::_parse_slice_arguments($args_raw);
 
             @next_results = map { JQ::Lite::Util::_apply_slice($_, @args) } @results;
             @$out_ref = @next_results;

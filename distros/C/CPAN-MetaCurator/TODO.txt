@@ -1,0 +1,8 @@
+TODO for CPAN::MetaCurator
+--------------------------
+o Rewrite Validate.pm so it does not makes less assumptions about the format of the entries
+o Does Validate.pm need to be re-designed now I'm using Tree::DAG_Node in Export.pm?
+o Implement links within the JSTree tree when 'See also' entries refer to other topics
+o What exactly are the Unclassified entries noted in the header of the JSTree?
+o Update 02packages.details.txt.gz, which means re-run CPAN::MetaPackager
+o Should release date or version be added to the output?

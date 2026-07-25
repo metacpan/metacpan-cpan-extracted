@@ -31,6 +31,7 @@ xt/cloexec_exec.t
 xt/concurrent_open.t
 xt/cross_module_fd.t
 xt/daemon_detach.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fd_leak.t
 xt/fd_validation.t
@@ -39,6 +40,7 @@ xt/fuzz_header.t
 xt/hostile_bless.t
 xt/invalid_args.t
 xt/kill_midop.t
+xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/map_shared_proof.t
 xt/max_entry.t
