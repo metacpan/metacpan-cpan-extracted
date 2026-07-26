@@ -36,7 +36,7 @@ while ( time - $start_time < $timeout ) {
     }
 
     # Query next batch
-    my @to_query = sort { ( $a->{id} ^.$info_hash ) cmp( $b->{id} ^.$info_hash ) } grep { !$_->{visited} && $_->{ip} } values %candidates;
+    my @to_query = sort { ( $a->{id} ^.$info_hash ) cmp ( $b->{id} ^.$info_hash ) } grep { !$_->{visited} && $_->{ip} } values %candidates;
     if (@to_query) {
         my $count = 0;
         for my $c (@to_query) {

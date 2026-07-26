@@ -43,6 +43,8 @@
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
 [ 9. UTF-8 conservé tel quel (pas d'échappement \uXXXX) ]
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
 
 [ 10. Exemples ]
   my $h = mb::JSON::decode('{"nom":"Alice","age":30}');

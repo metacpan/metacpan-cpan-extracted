@@ -1,3 +1,4 @@
+.claude/settings.local.json
 bin/sass2css.pl
 Build.PL
 Changes
@@ -12,6 +13,8 @@ LICENSE
 Makefile
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 README
 t/00-critic.t
 t/00-distribution.t
@@ -43,10 +46,12 @@ t/91-keep-order.t
 t/92-no-whitespace.t
 t/93-parentref-comma.t
 t/94-scss-linebreaks.t
+t/bug-test-comma-selectors.t
+t/bug-test-comprehensive.t
+t/bug-test-mixin-nested-include.t
+t/bug-test-mixin-with-arguments.t
 t/lib/special.pm
 t/RT-62474-accept-spaces.t
 t/RT-80831-commasep-selectors.t
 t/RT-80927-nested-includes.t
 t/RT-80978-nested-ampersand-includes.t
-META.yml
-META.json

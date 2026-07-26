@@ -1,19 +1,18 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{mb::JSON},
-    'VERSION'   => q{0.06},
+    'VERSION'   => q{0.07},
     'ABSTRACT'  => q{JSON encode/decode for multibyte (UTF-8) strings},
     'PREREQ_PM' => {
         'Carp' => '0',
+        'ExtUtils::MakeMaker' => '5.4302',
         'perl' => '5.00503',
-        'strict' => '1.01',
-        'vars' => '0',
-        'warnings' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -44,11 +43,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'mb::JSON' => {
                 'file'    => 'lib/mb/JSON.pm',
-                'version' => '0.06',
+                'version' => '0.07',
             },
             'mb::JSON::Boolean' => {
                 'file'    => 'lib/mb/JSON.pm',
-                'version' => '0.06',
+                'version' => '0.07',
             }
         },
     };

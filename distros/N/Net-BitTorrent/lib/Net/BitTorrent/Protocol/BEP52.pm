@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
-class Net::BitTorrent::Protocol::BEP52 v2.0.0 : isa(Net::BitTorrent::Protocol::BEP03) {
+class Net::BitTorrent::Protocol::BEP52 v2.1.1 : isa(Net::BitTorrent::Protocol::BEP03) {
 
     # BEP 52 Hash Request
     # infohash (v2 only), pieces root, proof layer, base layer, index, length

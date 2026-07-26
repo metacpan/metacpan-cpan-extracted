@@ -2,7 +2,7 @@
 X_No_Archive: Yes
 abstract: 'A Foreign Function Interface eXtension'
 author:
-  - 'Sanko Robinson <sanko@cpan.org>'
+  - 'Sanko Robinson'
 build_requires:
   Capture::Tiny: '0'
   Data::Dump: '0'
@@ -15,7 +15,7 @@ build_requires:
   TAP::Harness::Env: '0'
   Test2::Plugin::UTF8: '0'
   Test2::Tools::Compare: '0'
-  Test2::V0: '0'
+  Test2::V1: '0'
 configure_requires:
   CPAN::Meta: '2.150012'
   Exporter: '5.57'
@@ -31,7 +31,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: v5.40.0
 dynamic_config: 0
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
 keywords:
   - ffi
   - dll
@@ -63,13 +63,13 @@ optional_features:
 provides:
   Affix:
     file: lib/Affix.pm
-    version: v1.0.9
+    version: v1.1.0
   Affix::Build:
     file: lib/Affix/Build.pm
-    version: v1.0.9
+    version: v1.1.0
   Affix::Wrap:
     file: lib/Affix/Wrap.pm
-    version: v1.0.9
+    version: v1.1.0
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -82,7 +82,7 @@ resources:
   homepage: https://github.com/sanko/Affix.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Affix.pm.git
-version: v1.0.9
+version: v1.1.0
 x_help_wanted:
   - Tester
   - Documenter

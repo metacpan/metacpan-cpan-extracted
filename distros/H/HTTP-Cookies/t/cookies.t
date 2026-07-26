@@ -1,9 +1,9 @@
 #!perl -w
 
-use HTTP::Cookies ();
-use HTTP::Request ();
+use HTTP::Cookies  ();
+use HTTP::Request  ();
 use HTTP::Response ();
-use URI ();
+use URI            ();
 
 use Test::More tests => 79;
 
@@ -47,55 +47,56 @@ my $year_plus_one = (localtime)[5] + 1900 + 1;
 
 $c = HTTP::Cookies->new;
 
-$req = HTTP::Request->new(GET => "http://1.1.1.1/");
-$req->header("Host", "www.acme.com:80");
+$req = HTTP::Request->new( GET => "http://1.1.1.1/" );
+$req->header( "Host", "www.acme.com:80" );
 
-$res = HTTP::Response->new(200, "OK");
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie" => "CUSTOMER=WILE_E_COYOTE; path=/ ; expires=Wednesday, 09-Nov-$year_plus_one 23:12:40 GMT");
+$res->header( "Set-Cookie" =>
+        "CUSTOMER=WILE_E_COYOTE; path=/ ; expires=Wednesday, 09-Nov-$year_plus_one 23:12:40 GMT"
+);
+
 #print $res->as_string;
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/");
+$req = HTTP::Request->new( GET => "http://www.acme.com/" );
 $c->add_cookie_header($req);
 
-is($req->header("Cookie"), "CUSTOMER=WILE_E_COYOTE");
-is($req->header("Cookie2"), "\$Version=\"1\"");
+is( $req->header("Cookie"),  "CUSTOMER=WILE_E_COYOTE" );
+is( $req->header("Cookie2"), "\$Version=\"1\"" );
 
 $res->request($req);
-$res->header("Set-Cookie" => "PART_NUMBER=ROCKET_LAUNCHER_0001; path=/");
+$res->header( "Set-Cookie" => "PART_NUMBER=ROCKET_LAUNCHER_0001; path=/" );
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/foo/bar");
+$req = HTTP::Request->new( GET => "http://www.acme.com/foo/bar" );
 $c->add_cookie_header($req);
 
 $h = $req->header("Cookie");
-like($h, qr/PART_NUMBER=ROCKET_LAUNCHER_0001/);
-like($h, qr/CUSTOMER=WILE_E_COYOTE/);
+like( $h, qr/PART_NUMBER=ROCKET_LAUNCHER_0001/ );
+like( $h, qr/CUSTOMER=WILE_E_COYOTE/ );
 
 $res->request($req);
-$res->header("Set-Cookie", "SHIPPING=FEDEX; path=/foo");
+$res->header( "Set-Cookie", "SHIPPING=FEDEX; path=/foo" );
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/");
+$req = HTTP::Request->new( GET => "http://www.acme.com/" );
 $c->add_cookie_header($req);
 
 $h = $req->header("Cookie");
-like($h, qr/PART_NUMBER=ROCKET_LAUNCHER_0001/);
-like($h, qr/CUSTOMER=WILE_E_COYOTE/);
-unlike($h, qr/SHIPPING=FEDEX/);
+like( $h, qr/PART_NUMBER=ROCKET_LAUNCHER_0001/ );
+like( $h, qr/CUSTOMER=WILE_E_COYOTE/ );
+unlike( $h, qr/SHIPPING=FEDEX/ );
 
-
-$req = HTTP::Request->new(GET => "http://www.acme.com/foo/");
+$req = HTTP::Request->new( GET => "http://www.acme.com/foo/" );
 $c->add_cookie_header($req);
 
 $h = $req->header("Cookie");
-like($h, qr/PART_NUMBER=ROCKET_LAUNCHER_0001/);
-like($h, qr/CUSTOMER=WILE_E_COYOTE/);
-like($h, qr/^SHIPPING=FEDEX;/);
+like( $h, qr/PART_NUMBER=ROCKET_LAUNCHER_0001/ );
+like( $h, qr/CUSTOMER=WILE_E_COYOTE/ );
+like( $h, qr/^SHIPPING=FEDEX;/ );
 
 print $c->as_string;
-
 
 # Second Example transaction sequence:
 #
@@ -120,42 +121,42 @@ print $c->as_string;
 #       NOTE: There are two name/value pairs named "PART_NUMBER" due to
 #       the inheritance of the "/" mapping in addition to the "/ammo" mapping.
 
-$c = HTTP::Cookies->new;  # clear it
+$c = HTTP::Cookies->new;    # clear it
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/");
-$res = HTTP::Response->new(200, "OK");
+$req = HTTP::Request->new( GET => "http://www.acme.com/" );
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie", "PART_NUMBER=ROCKET_LAUNCHER_0001; path=/");
+$res->header( "Set-Cookie", "PART_NUMBER=ROCKET_LAUNCHER_0001; path=/" );
 
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/");
+$req = HTTP::Request->new( GET => "http://www.acme.com/" );
 $c->add_cookie_header($req);
 
-is($req->header("Cookie"), "PART_NUMBER=ROCKET_LAUNCHER_0001");
+is( $req->header("Cookie"), "PART_NUMBER=ROCKET_LAUNCHER_0001" );
 
 $res->request($req);
-$res->header("Set-Cookie", "PART_NUMBER=RIDING_ROCKET_0023; path=/ammo");
+$res->header( "Set-Cookie", "PART_NUMBER=RIDING_ROCKET_0023; path=/ammo" );
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/ammo");
+$req = HTTP::Request->new( GET => "http://www.acme.com/ammo" );
 $c->add_cookie_header($req);
 
-like($req->header("Cookie"),
-    qr/^PART_NUMBER=RIDING_ROCKET_0023;\s*PART_NUMBER=ROCKET_LAUNCHER_0001/);
+like(
+    $req->header("Cookie"),
+    qr/^PART_NUMBER=RIDING_ROCKET_0023;\s*PART_NUMBER=ROCKET_LAUNCHER_0001/
+);
 
 print $c->as_string;
 undef($c);
-
 
 #-------------------------------------------------------------------
 # When there are no "Set-Cookie" header, then even responses
 # without any request URLs connected should be allowed.
 
 $c = HTTP::Cookies->new;
-$c->extract_cookies(HTTP::Response->new("200", "OK"));
-is(count_cookies($c), 0);
-
+$c->extract_cookies( HTTP::Response->new( "200", "OK" ) );
+is( count_cookies($c), 0 );
 
 #-------------------------------------------------------------------
 # Then we test with the examples from RFC 2965.
@@ -184,9 +185,11 @@ $c = HTTP::Cookies->new;
 #
 #       Cookie reflects user's identity.
 
-$cookie = interact($c, 'http://www.acme.com/acme/login',
-                       'Customer="WILE_E_COYOTE"; Version="1"; Path="/acme"');
-ok(!$cookie);
+$cookie = interact(
+    $c, 'http://www.acme.com/acme/login',
+    'Customer="WILE_E_COYOTE"; Version="1"; Path="/acme"'
+);
+ok( !$cookie );
 
 #
 #   3.  User Agent -> Server
@@ -205,9 +208,14 @@ ok(!$cookie);
 #
 #       Shopping basket contains an item.
 
-$cookie = interact($c, 'http://www.acme.com/acme/pickitem',
-		       'Part_Number="Rocket_Launcher_0001"; Version="1"; Path="/acme"');
-like($cookie, qr(^\$Version="?1"?; Customer="?WILE_E_COYOTE"?; \$Path="/acme"$));
+$cookie = interact(
+    $c, 'http://www.acme.com/acme/pickitem',
+    'Part_Number="Rocket_Launcher_0001"; Version="1"; Path="/acme"'
+);
+like(
+    $cookie,
+    qr(^\$Version="?1"?; Customer="?WILE_E_COYOTE"?; \$Path="/acme"$)
+);
 
 #
 #   5.  User Agent -> Server
@@ -227,12 +235,14 @@ like($cookie, qr(^\$Version="?1"?; Customer="?WILE_E_COYOTE"?; \$Path="/acme"$))
 #
 #       New cookie reflects shipping method.
 
-$cookie = interact($c, "http://www.acme.com/acme/shipping",
-		   'Shipping="FedEx"; Version="1"; Path="/acme"');
+$cookie = interact(
+    $c, "http://www.acme.com/acme/shipping",
+    'Shipping="FedEx"; Version="1"; Path="/acme"'
+);
 
-like($cookie, qr/^\$Version="?1"?;/);
-like($cookie, qr/Part_Number="?Rocket_Launcher_0001"?;\s*\$Path="\/acme"/);
-like($cookie, qr/Customer="?WILE_E_COYOTE"?;\s*\$Path="\/acme"/);
+like( $cookie, qr/^\$Version="?1"?;/ );
+like( $cookie, qr/Part_Number="?Rocket_Launcher_0001"?;\s*\$Path="\/acme"/ );
+like( $cookie, qr/Customer="?WILE_E_COYOTE"?;\s*\$Path="\/acme"/ );
 
 #
 #   7.  User Agent -> Server
@@ -252,10 +262,10 @@ like($cookie, qr/Customer="?WILE_E_COYOTE"?;\s*\$Path="\/acme"/);
 #
 #       Transaction is complete.
 
-$cookie = interact($c, "http://www.acme.com/acme/process");
+$cookie = interact( $c, "http://www.acme.com/acme/process" );
 print "FINAL COOKIE: $cookie\n";
-like($cookie, qr/Shipping="?FedEx"?;\s*\$Path="\/acme"/);
-like($cookie, qr/WILE_E_COYOTE/);
+like( $cookie, qr/Shipping="?FedEx"?;\s*\$Path="\/acme"/ );
+like( $cookie, qr/WILE_E_COYOTE/ );
 
 #
 # The user agent makes a series of requests on the origin server, after
@@ -265,7 +275,6 @@ like($cookie, qr/WILE_E_COYOTE/);
 # contains all the cookies received so far.
 
 print $c->as_string;
-
 
 # 5.2  Example 2
 #
@@ -286,9 +295,11 @@ $c = HTTP::Cookies->new;
 # Set-Cookie2: Part_Number="Riding_Rocket_0023"; Version="1";
 #         Path="/acme/ammo"
 
-interact($c, "http://www.acme.com/acme/ammo/specific",
-             'Part_Number="Rocket_Launcher_0001"; Version="1"; Path="/acme"',
-             'Part_Number="Riding_Rocket_0023"; Version="1"; Path="/acme/ammo"');
+interact(
+    $c, "http://www.acme.com/acme/ammo/specific",
+    'Part_Number="Rocket_Launcher_0001"; Version="1"; Path="/acme"',
+    'Part_Number="Riding_Rocket_0023"; Version="1"; Path="/acme/ammo"'
+);
 
 # A subsequent request by the user agent to the (same) server for URLs of
 # the form /acme/ammo/...  would include the following request header:
@@ -302,8 +313,8 @@ interact($c, "http://www.acme.com/acme/ammo/specific",
 # attribute, /acme.  Further note that the same cookie name appears more
 # than once.
 
-$cookie = interact($c, "http://www.acme.com/acme/ammo/...");
-like($cookie, qr/Riding_Rocket_0023.*Rocket_Launcher_0001/);
+$cookie = interact( $c, "http://www.acme.com/acme/ammo/..." );
+like( $cookie, qr/Riding_Rocket_0023.*Rocket_Launcher_0001/ );
 
 # A subsequent request by the user agent to the (same) server for a URL of
 # the form /acme/parts/ would include the following request header:
@@ -314,9 +325,9 @@ like($cookie, qr/Riding_Rocket_0023.*Rocket_Launcher_0001/);
 # the request URL, /acme/parts/, so the cookie does not get forwarded to
 # the server.
 
-$cookie = interact($c, "http://www.acme.com/acme/parts/");
-like($cookie, qr/Rocket_Launcher_0001/);
-unlike($cookie, qr/Riding_Rocket_0023/);
+$cookie = interact( $c, "http://www.acme.com/acme/parts/" );
+like( $cookie, qr/Rocket_Launcher_0001/ );
+unlike( $cookie, qr/Riding_Rocket_0023/ );
 
 print $c->as_string;
 
@@ -327,48 +338,70 @@ print $c->as_string;
 $c = HTTP::Cookies->new;
 
 # illegal domain (no embedded dots)
-$cookie = interact($c, "http://www.acme.com", 'foo=bar; domain=".com"');
-is(count_cookies($c), 0);
+$cookie = interact( $c, "http://www.acme.com", 'foo=bar; domain=".com"' );
+is( count_cookies($c), 0 );
 
 # legal domain
-$cookie = interact($c, "http://www.acme.com", 'foo=bar; domain="acme.com"');
-is(count_cookies($c), 1);
+$cookie = interact( $c, "http://www.acme.com", 'foo=bar; domain="acme.com"' );
+is( count_cookies($c), 1 );
 
 # illegal domain (host prefix "www.a" contains a dot)
-$cookie = interact($c, "http://www.a.acme.com", 'foo=bar; domain="acme.com"');
-is(count_cookies($c), 1);
+$cookie
+    = interact( $c, "http://www.a.acme.com", 'foo=bar; domain="acme.com"' );
+is( count_cookies($c), 1 );
 
 # legal domain
-$cookie = interact($c, "http://www.a.acme.com", 'foo=bar; domain=".a.acme.com"');
-is(count_cookies($c), 2);
+$cookie = interact(
+    $c, "http://www.a.acme.com",
+    'foo=bar; domain=".a.acme.com"'
+);
+is( count_cookies($c), 2 );
 
 # can't use a IP-address as domain
-$cookie = interact($c, "http://125.125.125.125", 'foo=bar; domain="125.125.125"');
-is(count_cookies($c), 2);
+$cookie = interact(
+    $c, "http://125.125.125.125",
+    'foo=bar; domain="125.125.125"'
+);
+is( count_cookies($c), 2 );
 
 # illegal path (must be prefix of request path)
-$cookie = interact($c, "http://www.sol.no", 'foo=bar; domain=".sol.no"; path="/foo"');
-is(count_cookies($c), 2);
+$cookie = interact(
+    $c, "http://www.sol.no",
+    'foo=bar; domain=".sol.no"; path="/foo"'
+);
+is( count_cookies($c), 2 );
 
 # legal path
-$cookie = interact($c, "http://www.sol.no/foo/bar", 'foo=bar; domain=".sol.no"; path="/foo"');
-is(count_cookies($c), 3);
+$cookie = interact(
+    $c, "http://www.sol.no/foo/bar",
+    'foo=bar; domain=".sol.no"; path="/foo"'
+);
+is( count_cookies($c), 3 );
 
 # illegal port (request-port not in list)
-$cookie = interact($c, "http://www.sol.no", 'foo=bar; domain=".sol.no"; port="90,100"');
-is(count_cookies($c), 3);
+$cookie = interact(
+    $c, "http://www.sol.no",
+    'foo=bar; domain=".sol.no"; port="90,100"'
+);
+is( count_cookies($c), 3 );
 
 # legal port
-$cookie = interact($c, "http://www.sol.no", 'foo=bar; domain=".sol.no"; port="90,100, 80,8080"; max-age=100; Comment = "Just kidding! (\"|\\\\) "');
-is(count_cookies($c), 4);
+$cookie = interact(
+    $c, "http://www.sol.no",
+    'foo=bar; domain=".sol.no"; port="90,100, 80,8080"; max-age=100; Comment = "Just kidding! (\"|\\\\) "'
+);
+is( count_cookies($c), 4 );
 
 # port attribute without any value (current port)
-$cookie = interact($c, "http://www.sol.no", 'foo9=bar; domain=".sol.no"; port; max-age=100;');
-is(count_cookies($c), 5);
+$cookie = interact(
+    $c, "http://www.sol.no",
+    'foo9=bar; domain=".sol.no"; port; max-age=100;'
+);
+is( count_cookies($c), 5 );
 
 # encoded path
-$cookie = interact($c, "http://www.sol.no/foo/", 'foo8=bar; path="/%66oo"');
-is(count_cookies($c), 6);
+$cookie = interact( $c, "http://www.sol.no/foo/", 'foo8=bar; path="/%66oo"' );
+is( count_cookies($c), 6 );
 
 my $file = "lwp-cookies-$$.txt";
 $c->save($file);
@@ -379,7 +412,7 @@ $c = HTTP::Cookies->new;
 $c->load($file);
 unlink($file) || warn "Can't unlink $file: $!";
 
-is($old, $c->as_string);
+is( $old, $c->as_string );
 
 undef($c);
 
@@ -387,15 +420,21 @@ undef($c);
 # Try some URL encodings of the PATHs
 #
 $c = HTTP::Cookies->new;
-interact($c, "http://www.acme.com/foo%2f%25/%40%40%0Anew%E5/%E5", 'foo  =   bar; version    =   1');
+interact(
+    $c, "http://www.acme.com/foo%2f%25/%40%40%0Anew%E5/%E5",
+    'foo  =   bar; version    =   1'
+);
 print $c->as_string;
 
-$cookie = interact($c, "http://www.acme.com/foo%2f%25/@@%0anewå/æøå", "bar=baz; path=\"/foo/\"; version=1");
-like($cookie, qr/foo=bar/);
-like($cookie, qr/^\$version=\"?1\"?/i);
+$cookie = interact(
+    $c, "http://www.acme.com/foo%2f%25/@@%0anewå/æøå",
+    "bar=baz; path=\"/foo/\"; version=1"
+);
+like( $cookie, qr/foo=bar/ );
+like( $cookie, qr/^\$version=\"?1\"?/i );
 
-$cookie = interact($c, "http://www.acme.com/foo/%25/@@%0anewå/æøå");
-ok(!$cookie);
+$cookie = interact( $c, "http://www.acme.com/foo/%25/@@%0anewå/æøå" );
+ok( !$cookie );
 
 undef($c);
 
@@ -403,67 +442,70 @@ undef($c);
 # Try to use the Netscape cookie file format for saving
 #
 $file = "cookies-$$.txt";
-$c = HTTP::Cookies::Netscape->new(file => $file);
-interact($c, "http://www.acme.com/", "foo1=bar; max-age=100");
-interact($c, "http://www.acme.com/", "foo2=bar; port=\"80\"; max-age=100; Discard; Version=1");
-interact($c, "http://www.acme.com/", "foo3=bar; secure; Version=1");
+$c    = HTTP::Cookies::Netscape->new( file => $file );
+interact( $c, "http://www.acme.com/", "foo1=bar; max-age=100" );
+interact(
+    $c, "http://www.acme.com/",
+    "foo2=bar; port=\"80\"; max-age=100; Discard; Version=1"
+);
+interact( $c, "http://www.acme.com/", "foo3=bar; secure; Version=1" );
 $c->save;
 undef($c);
 
-$c = HTTP::Cookies::Netscape->new(file => $file);
-is(count_cookies($c), 1);     # 2 of them discarded on save
+$c = HTTP::Cookies::Netscape->new( file => $file );
+is( count_cookies($c), 1 );    # 2 of them discarded on save
 
-like($c->as_string, qr/foo1=bar/);
+like( $c->as_string, qr/foo1=bar/ );
 undef($c);
 unlink($file);
 
 # Expect a HttpOnly cookie to be loaded, rather than treated as a comment
-$c = HTTP::Cookies::Netscape->new(file => 't/data/netscape-httponly.txt');
-is(count_cookies($c), 4);
+$c = HTTP::Cookies::Netscape->new( file => 't/data/netscape-httponly.txt' );
+is( count_cookies($c), 4 );
 undef($c);
 
 #
 # Some additional Netscape cookies test
 #
-$c = HTTP::Cookies->new;
-$req = HTTP::Request->new(POST => "http://foo.bar.acme.com/foo");
+$c   = HTTP::Cookies->new;
+$req = HTTP::Request->new( POST => "http://foo.bar.acme.com/foo" );
 
 # Netscape allows a host part that contains dots
-$res = HTTP::Response->new(200, "OK");
-$res->header(set_cookie => 'Customer=WILE_E_COYOTE; domain=.acme.com');
+$res = HTTP::Response->new( 200, "OK" );
+$res->header( set_cookie => 'Customer=WILE_E_COYOTE; domain=.acme.com' );
 $res->request($req);
 $c->extract_cookies($res);
 
 # and that the domain is the same as the host without adding a leading
 # dot to the domain.  Should not quote even if strange chars are used
 # in the cookie value.
-$res = HTTP::Response->new(200, "OK");
-$res->header(set_cookie => 'PART_NUMBER=3,4; domain=foo.bar.acme.com');
+$res = HTTP::Response->new( 200, "OK" );
+$res->header( set_cookie => 'PART_NUMBER=3,4; domain=foo.bar.acme.com' );
 $res->request($req);
 $c->extract_cookies($res);
 
 print $c->as_string;
 
-$req = HTTP::Request->new(POST => URI->new("http://foo.bar.acme.com/foo"));
+$req = HTTP::Request->new( POST => URI->new("http://foo.bar.acme.com/foo") );
 $c->add_cookie_header($req);
-#print $req->as_string;
-like($req->header("Cookie"), qr/PART_NUMBER=3,4/);
-like($req->header("Cookie"), qr/Customer=WILE_E_COYOTE/);
 
+#print $req->as_string;
+like( $req->header("Cookie"), qr/PART_NUMBER=3,4/ );
+like( $req->header("Cookie"), qr/Customer=WILE_E_COYOTE/ );
 
 # Test handling of local intranet hostnames without a dot
 $c->clear;
 print "---\n";
 
-interact($c, "http://example/", "foo1=bar; PORT; Discard;");
-$_=interact($c, "http://example/", 'foo2=bar; domain=".local"');
-like($_, qr/foo1=bar/);
+interact( $c, "http://example/", "foo1=bar; PORT; Discard;" );
+$_ = interact( $c, "http://example/", 'foo2=bar; domain=".local"' );
+like( $_, qr/foo1=bar/ );
 
-$_=interact($c, "http://example/", 'foo3=bar');
-$_=interact($c, "http://example/");
+$_ = interact( $c, "http://example/", 'foo3=bar' );
+$_ = interact( $c, "http://example/" );
 print "Cookie: $_\n";
-like($_, qr/foo2=bar/);
-is(count_cookies($c), 3);
+like( $_, qr/foo2=bar/ );
+is( count_cookies($c), 3 );
 print $c->as_string;
 
 # Test for empty path
@@ -475,32 +517,34 @@ print $c->as_string;
 # In this case routine extract_cookies() must set cookie to / (root)
 print "---\n";
 print "Test for empty path...\n";
-$c = HTTP::Cookies->new;  # clear it
+$c = HTTP::Cookies->new;    # clear it
 
-$req = HTTP::Request->new(GET => "http://www.ants.com/");
+$req = HTTP::Request->new( GET => "http://www.ants.com/" );
 
-$res = HTTP::Response->new(200, "OK");
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie" => "JSESSIONID=ABCDERANDOM123; Path=");
+$res->header( "Set-Cookie" => "JSESSIONID=ABCDERANDOM123; Path=" );
 print $res->as_string;
 $c->extract_cookies($res);
+
 #print $c->as_string;
 
-$req = HTTP::Request->new(GET => "http://www.ants.com/");
+$req = HTTP::Request->new( GET => "http://www.ants.com/" );
 $c->add_cookie_header($req);
+
 #print $req->as_string;
 
-is($req->header("Cookie"), "JSESSIONID=ABCDERANDOM123");
-is($req->header("Cookie2"), "\$Version=\"1\"");
-
+is( $req->header("Cookie"),  "JSESSIONID=ABCDERANDOM123" );
+is( $req->header("Cookie2"), "\$Version=\"1\"" );
 
 # missing path in the request URI
-$req = HTTP::Request->new(GET => URI->new("http://www.ants.com:8080"));
+$req = HTTP::Request->new( GET => URI->new("http://www.ants.com:8080") );
 $c->add_cookie_header($req);
+
 #print $req->as_string;
 
-is($req->header("Cookie"), "JSESSIONID=ABCDERANDOM123");
-is($req->header("Cookie2"), "\$Version=\"1\"");
+is( $req->header("Cookie"),  "JSESSIONID=ABCDERANDOM123" );
+is( $req->header("Cookie2"), "\$Version=\"1\"" );
 
 # test mixing of Set-Cookie and Set-Cookie2 headers.
 # Example from http://www.trip.com/trs/trip/flighttracker/flight_tracker_home.xsl
@@ -521,18 +565,24 @@ is($req->header("Cookie2"), "\$Version=\"1\"");
 # X-Meta-Description: Trip.com privacy policy
 # X-Meta-Keywords: privacy policy
 
-$req = HTTP::Request->new('GET', 'http://www.trip.com/trs/trip/flighttracker/flight_tracker_home.xsl');
-$res = HTTP::Response->new(200, "OK");
+$req = HTTP::Request->new(
+    'GET',
+    'http://www.trip.com/trs/trip/flighttracker/flight_tracker_home.xsl'
+);
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->push_header("Set-Cookie"  => qq(trip.appServer=1111-0000-x-024;Domain=.trip.com;Path=/));
-$res->push_header("Set-Cookie"  => qq(JSESSIONID=fkumjm7nt1.JS24;Path=/trs));
-$res->push_header("Set-Cookie2" => qq(JSESSIONID=fkumjm7nt1.JS24;Version=1;Discard;Path="/trs"));
+$res->push_header( "Set-Cookie" =>
+        qq(trip.appServer=1111-0000-x-024;Domain=.trip.com;Path=/) );
+$res->push_header( "Set-Cookie" => qq(JSESSIONID=fkumjm7nt1.JS24;Path=/trs) );
+$res->push_header( "Set-Cookie2" =>
+        qq(JSESSIONID=fkumjm7nt1.JS24;Version=1;Discard;Path="/trs") );
+
 #print $res->as_string;
 
-$c = HTTP::Cookies->new;  # clear it
+$c = HTTP::Cookies->new;    # clear it
 $c->extract_cookies($res);
 print $c->as_string;
-is($c->as_string, <<'EOT');
+is( $c->as_string, <<'EOT' );
 Set-Cookie3: trip.appServer=1111-0000-x-024; path="/"; domain=.trip.com; path_spec; discard; version=0
 Set-Cookie3: JSESSIONID=fkumjm7nt1.JS24; path="/trs"; domain=www.trip.com; path_spec; discard; version=1
 EOT
@@ -541,167 +591,212 @@ EOT
 # Test if temporary cookies are deleted properly with
 # $jar->clear_temporary_cookies()
 
-$req = HTTP::Request->new('GET', 'http://www.perlmeister.com/scripts');
-$res = HTTP::Response->new(200, "OK");
+$req = HTTP::Request->new( 'GET', 'http://www.perlmeister.com/scripts' );
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-   # Set session/perm cookies and mark their values as "session" vs. "perm"
-   # to recognize them later
-$res->push_header("Set-Cookie"  => qq(s1=session;Path=/scripts));
-$res->push_header("Set-Cookie"  => qq(p1=perm; Domain=.perlmeister.com;Path=/;expires=Fri, 02-Feb-$year_plus_one 23:24:20 GMT));
-$res->push_header("Set-Cookie"  => qq(p2=perm;Path=/;expires=Fri, 02-Feb-$year_plus_one 23:24:20 GMT));
-$res->push_header("Set-Cookie"  => qq(s2=session;Path=/scripts;Domain=.perlmeister.com));
-$res->push_header("Set-Cookie2" => qq(s3=session;Version=1;Discard;Path="/"));
 
-$c = HTTP::Cookies->new;  # clear jar
+# Set session/perm cookies and mark their values as "session" vs. "perm"
+# to recognize them later
+$res->push_header( "Set-Cookie" => qq(s1=session;Path=/scripts) );
+$res->push_header( "Set-Cookie" =>
+        qq(p1=perm; Domain=.perlmeister.com;Path=/;expires=Fri, 02-Feb-$year_plus_one 23:24:20 GMT)
+);
+$res->push_header( "Set-Cookie" =>
+        qq(p2=perm;Path=/;expires=Fri, 02-Feb-$year_plus_one 23:24:20 GMT) );
+$res->push_header(
+    "Set-Cookie" => qq(s2=session;Path=/scripts;Domain=.perlmeister.com) );
+$res->push_header(
+    "Set-Cookie2" => qq(s3=session;Version=1;Discard;Path="/") );
+
+$c = HTTP::Cookies->new;    # clear jar
 $c->extract_cookies($res);
+
 # How many session/permanent cookies do we have?
-my %counter = ("session_after" => 0);
+my %counter = ( "session_after" => 0 );
 $c->scan( sub { $counter{"${_[2]}_before"}++ } );
 $c->clear_temporary_cookies();
+
 # How many now?
 $c->scan( sub { $counter{"${_[2]}_after"}++ } );
-is($counter{"perm_after"}, $counter{"perm_before"}); # a permanent cookie got lost accidently
-is($counter{"session_after"}, 0); # a session cookie hasn't been cleared
-is($counter{"session_before"}, 3);  # we didn't have session cookies in the first place
+is( $counter{"perm_after"}, $counter{"perm_before"} )
+    ;                       # a permanent cookie got lost accidently
+is( $counter{"session_after"},  0 );    # a session cookie hasn't been cleared
+is( $counter{"session_before"}, 3 )
+    ;    # we didn't have session cookies in the first place
+
 #print $c->as_string;
 
-
 # Test handling of 'secure ' attribute for classic cookies
-$c = HTTP::Cookies->new;
-$req = HTTP::Request->new(GET => "https://1.1.1.1/");
-$req->header("Host", "www.acme.com:80");
+$c   = HTTP::Cookies->new;
+$req = HTTP::Request->new( GET => "https://1.1.1.1/" );
+$req->header( "Host", "www.acme.com:80" );
 
-$res = HTTP::Response->new(200, "OK");
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie" => "CUSTOMER=WILE_E_COYOTE ; secure ; path=/");
+$res->header( "Set-Cookie" => "CUSTOMER=WILE_E_COYOTE ; secure ; path=/" );
+
 #print $res->as_string;
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.acme.com/");
+$req = HTTP::Request->new( GET => "http://www.acme.com/" );
 $c->add_cookie_header($req);
 
-ok(!$req->header("Cookie"));
+ok( !$req->header("Cookie") );
 
 $req->uri->scheme("https");
 $c->add_cookie_header($req);
 
-is($req->header("Cookie"), "CUSTOMER=WILE_E_COYOTE");
+is( $req->header("Cookie"), "CUSTOMER=WILE_E_COYOTE" );
 
 #print $req->as_string;
 #print $c->as_string;
 
-
-$req = HTTP::Request->new(GET => "ftp://ftp.activestate.com/");
+$req = HTTP::Request->new( GET => "ftp://ftp.activestate.com/" );
 $c->add_cookie_header($req);
-ok(!$req->header("Cookie"));
+ok( !$req->header("Cookie") );
 
-$req = HTTP::Request->new(GET => "file:/etc/motd");
+$req = HTTP::Request->new( GET => "file:/etc/motd" );
 $c->add_cookie_header($req);
-ok(!$req->header("Cookie"));
+ok( !$req->header("Cookie") );
 
-$req = HTTP::Request->new(GET => "mailto:gisle\@aas.no");
+$req = HTTP::Request->new( GET => "mailto:gisle\@aas.no" );
 $c->add_cookie_header($req);
-ok(!$req->header("Cookie"));
-
+ok( !$req->header("Cookie") );
 
 # Test cookie called 'expires' <https://rt.cpan.org/Ticket/Display.html?id=8108>
-$c = HTTP::Cookies->new;
-$req = HTTP::Request->new("GET" => "http://example.com");
-$res = HTTP::Response->new(200, "OK");
+$c   = HTTP::Cookies->new;
+$req = HTTP::Request->new( "GET" => "http://example.com" );
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie" => "Expires=10101");
+$res->header( "Set-Cookie" => "Expires=10101" );
 $c->extract_cookies($res);
+
 #print $c->as_string;
-is($c->as_string, <<'EOT');
+is( $c->as_string, <<'EOT' );
 Set-Cookie3: Expires=10101; path="/"; domain=example.com; discard; version=0
 EOT
 
 # Test empty cookie header [RT#29401]
 $c = HTTP::Cookies->new;
-$res->header("Set-Cookie" => ["CUSTOMER=WILE_E_COYOTE; path=/;", ""]);
+$res->header( "Set-Cookie" => [ "CUSTOMER=WILE_E_COYOTE; path=/;", "" ] );
+
 #print $res->as_string;
 $c->extract_cookies($res);
+
 #print $c->as_string;
-is($c->as_string, <<'EOT');
+is( $c->as_string, <<'EOT' );
 Set-Cookie3: CUSTOMER=WILE_E_COYOTE; path="/"; domain=example.com; path_spec; discard; version=0
 EOT
 
 # Test empty cookie part [RT#38480]
 $c = HTTP::Cookies->new;
-$res->header("Set-Cookie" => "CUSTOMER=WILE_E_COYOTE;;path=/;");
+$res->header( "Set-Cookie" => "CUSTOMER=WILE_E_COYOTE;;path=/;" );
+
 #print $res->as_string;
 $c->extract_cookies($res);
+
 #print $c->as_string;
-is($c->as_string, <<'EOT');
+is( $c->as_string, <<'EOT' );
 Set-Cookie3: CUSTOMER=WILE_E_COYOTE; path="/"; domain=example.com; path_spec; discard; version=0
 EOT
 
 # Test Set-Cookie with version set
 $c = HTTP::Cookies->new;
-$res->header("Set-Cookie" => "foo=\"bar\";version=1");
+$res->header( "Set-Cookie" => "foo=\"bar\";version=1" );
+
 #print $res->as_string;
 $c->extract_cookies($res);
+
 #print $c->as_string;
-$req = HTTP::Request->new(GET => "http://www.example.com/foo");
+$req = HTTP::Request->new( GET => "http://www.example.com/foo" );
 $c->add_cookie_header($req);
+
 #print $req->as_string;
-is($req->header("Cookie"), "foo=bar");
+is( $req->header("Cookie"), "foo=bar" );
 
 # Test cookies that expire far into the future [RT#50147]
 $c = HTTP::Cookies->new;
-$res->header("Set-Cookie", "PREF=ID=cee18f7c4e977184:TM=1254583090:LM=1254583090:S=Pdb0-hy9PxrNj4LL; expires=Mon, 03-Oct-2211 15:18:10 GMT; path=/; domain=.example.com");
-$res->push_header("Set-Cookie", "expired1=1; expires=Mon, 03-Oct-2001 15:18:10 GMT; path=/; domain=.example.com");
-$res->push_header("Set-Cookie", "expired2=1; expires=Fri Jan  1 00:00:00 GMT 1970; path=/; domain=.example.com");
-$res->push_header("Set-Cookie", "expired3=1; expires=Fri Jan  1 00:00:01 GMT 1970; path=/; domain=.example.com");
-$res->push_header("Set-Cookie", "expired4=1; expires=Thu Dec 31 23:59:59 GMT 1969; path=/; domain=.example.com");
-$res->push_header("Set-Cookie", "expired5=1; expires=Fri Feb  2 00:00:00 GMT 1950; path=/; domain=.example.com");
+$res->header(
+    "Set-Cookie",
+    "PREF=ID=cee18f7c4e977184:TM=1254583090:LM=1254583090:S=Pdb0-hy9PxrNj4LL; expires=Mon, 03-Oct-2211 15:18:10 GMT; path=/; domain=.example.com"
+);
+$res->push_header(
+    "Set-Cookie",
+    "expired1=1; expires=Mon, 03-Oct-2001 15:18:10 GMT; path=/; domain=.example.com"
+);
+$res->push_header(
+    "Set-Cookie",
+    "expired2=1; expires=Fri Jan  1 00:00:00 GMT 1970; path=/; domain=.example.com"
+);
+$res->push_header(
+    "Set-Cookie",
+    "expired3=1; expires=Fri Jan  1 00:00:01 GMT 1970; path=/; domain=.example.com"
+);
+$res->push_header(
+    "Set-Cookie",
+    "expired4=1; expires=Thu Dec 31 23:59:59 GMT 1969; path=/; domain=.example.com"
+);
+$res->push_header(
+    "Set-Cookie",
+    "expired5=1; expires=Fri Feb  2 00:00:00 GMT 1950; path=/; domain=.example.com"
+);
 $c->extract_cookies($res);
+
 #print $res->as_string;
 #print "---\n";
 #print $c->as_string;
-$req = HTTP::Request->new(GET => "http://www.example.com/foo");
+$req = HTTP::Request->new( GET => "http://www.example.com/foo" );
 $c->add_cookie_header($req);
+
 #print $req->as_string;
-is($req->header("Cookie"), "PREF=ID=cee18f7c4e977184:TM=1254583090:LM=1254583090:S=Pdb0-hy9PxrNj4LL");
+is(
+    $req->header("Cookie"),
+    "PREF=ID=cee18f7c4e977184:TM=1254583090:LM=1254583090:S=Pdb0-hy9PxrNj4LL"
+);
 
 $c->clear_temporary_cookies;
-$req = HTTP::Request->new(GET => "http://www.example.com/foo");
+$req = HTTP::Request->new( GET => "http://www.example.com/foo" );
 $c->add_cookie_header($req);
+
 #print $req->as_string;
-is($req->header("Cookie"), "PREF=ID=cee18f7c4e977184:TM=1254583090:LM=1254583090:S=Pdb0-hy9PxrNj4LL");
+is(
+    $req->header("Cookie"),
+    "PREF=ID=cee18f7c4e977184:TM=1254583090:LM=1254583090:S=Pdb0-hy9PxrNj4LL"
+);
 
 # Test merging of cookies
 $c = HTTP::Cookies->new;
-$res->header("Set-Cookie", "foo=1; path=/");
+$res->header( "Set-Cookie", "foo=1; path=/" );
 $c->extract_cookies($res);
 
-$req = HTTP::Request->new(GET => "http://www.example.com/foo");
-$req->header("Cookie", "x=bcd");
+$req = HTTP::Request->new( GET => "http://www.example.com/foo" );
+$req->header( "Cookie", "x=bcd" );
 $c->add_cookie_header($req);
-is($req->header("Cookie"), "x=bcd; foo=1");
+is( $req->header("Cookie"), "x=bcd; foo=1" );
 $c->add_cookie_header($req);
-is($req->header("Cookie"), "x=bcd; foo=1; foo=1");
+is( $req->header("Cookie"), "x=bcd; foo=1; foo=1" );
+
 #print $req->as_string;
 
 # Test get_cookies
 $c = HTTP::Cookies->new;
-$res->header("Set-Cookie", "foo=42");
+$res->header( "Set-Cookie", "foo=42" );
 $c->extract_cookies($res);
-is($c->get_cookies("example.com")->{foo}, 42);
-is($c->get_cookies("example.com", "foo"), 42);
-is($c->get_cookies("example.com", "bar"), undef);
-is($c->get_cookies("http://example.com", "foo"), 42);
-is($c->get_cookies("https://example.com", "foo"), 42);
-is($c->get_cookies(URI->new("https://example.com"), "foo"), 42);
-is($c->get_cookies("foo.example.com", "foo"), 42);
-is($c->get_cookies("example.org", "foo"), undef);
+is( $c->get_cookies("example.com")->{foo}, 42 );
+is( $c->get_cookies( "example.com",                   "foo" ), 42 );
+is( $c->get_cookies( "example.com",                   "bar" ), undef );
+is( $c->get_cookies( "http://example.com",            "foo" ), 42 );
+is( $c->get_cookies( "https://example.com",           "foo" ), 42 );
+is( $c->get_cookies( URI->new("https://example.com"), "foo" ), 42 );
+is( $c->get_cookies( "foo.example.com",               "foo" ), 42 );
+is( $c->get_cookies( "example.org",                   "foo" ), undef );
 
-my @a = $c->get_cookies("example.com", "bar", "foo");
-is_deeply(\@a, [undef, 42]);
+my @a = $c->get_cookies( "example.com", "bar", "foo" );
+is_deeply( \@a, [ undef, 42 ] );
 
 # Test ignore_discard argument of save()
 $c = HTTP::Cookies->new( ignore_discard => 0 );
-interact($c, 'http://example.com/', 'foo=bar; Discard;');
+interact( $c, 'http://example.com/', 'foo=bar; Discard;' );
 $old = $c->as_string;
 $c->save( file => $file, ignore_discard => 1 );
 undef $c;
@@ -710,14 +805,16 @@ $c = HTTP::Cookies->new( ignore_discard => 0 );
 $c->load($file);
 unlink($file) || warn "Can't unlink $file: $!";
 
-is($c->as_string, $old);
+is( $c->as_string, $old );
 
-$c = HTTP::Cookies::Netscape->new( ignore_discard => 0 );
-$req = HTTP::Request->new(GET => "http://1.1.1.1/");
-$req->header("Host", "www.acme.com:80");
-$res = HTTP::Response->new(200, "OK");
+$c   = HTTP::Cookies::Netscape->new( ignore_discard => 0 );
+$req = HTTP::Request->new( GET => "http://1.1.1.1/" );
+$req->header( "Host", "www.acme.com:80" );
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie" => "foo=bar; path=/; discard; expires=Wednesday, 09-Nov-$year_plus_one 23:12:40 GMT");
+$res->header( "Set-Cookie" =>
+        "foo=bar; path=/; discard; expires=Wednesday, 09-Nov-$year_plus_one 23:12:40 GMT"
+);
 $c->extract_cookies($res);
 $old = $c->as_string;
 $c->save( file => $file, ignore_discard => 1 );
@@ -725,46 +822,47 @@ undef $c;
 
 $c = HTTP::Cookies::Netscape->new( ignore_discard => 0 );
 $c->load($file);
-$req = HTTP::Request->new(GET => "http://www.acme.com/foo/bar");
+$req = HTTP::Request->new( GET => "http://www.acme.com/foo/bar" );
 $c->add_cookie_header($req);
 $h = $req->header("Cookie");
-like($h, qr/foo=bar/);
+like( $h, qr/foo=bar/ );
 unlink($file) || warn "Can't unlink $file: $!";
 
-# Test discard isn't set when max-age is set
-$c = HTTP::Cookies->new;
-$req = HTTP::Request->new("GET" => "http://example.com");
-$res = HTTP::Response->new(200, "OK");
+# max-age must produce an expiry (GH #69); the cookie should be kept rather
+# than discarded. Match the expires value with a pattern, not a literal
+# timestamp, so the test does not depend on the current date.
+$c   = HTTP::Cookies->new;
+$req = HTTP::Request->new( "GET" => "http://example.com" );
+$res = HTTP::Response->new( 200, "OK" );
 $res->request($req);
-$res->header("Set-Cookie" => "foo=bar; max-age=1337");
+$res->header( "Set-Cookie" => "foo=bar; max-age=1337" );
 $c->extract_cookies($res);
+
 #print $c->as_string;
-is($c->as_string, <<'EOT');
-Set-Cookie3: foo=bar; path="/"; domain=example.com; version=0
-EOT
-
-
+like(
+    $c->as_string,
+    qr{^Set-Cookie3: foo=bar; path="/"; domain=example\.com; expires="[^"]+"; version=0\n\z},
+    "max-age sets an expiry and keeps the cookie"
+);
 
 #-------------------------------------------------------------------
 
-sub interact
-{
-    my $c = shift;
+sub interact {
+    my $c   = shift;
     my $url = shift;
-    my $req = HTTP::Request->new(POST => $url);
+    my $req = HTTP::Request->new( POST => $url );
     $c->add_cookie_header($req);
     my $cookie = $req->header("Cookie");
-    my $res = HTTP::Response->new(200, "OK");
+    my $res    = HTTP::Response->new( 200, "OK" );
     $res->request($req);
-    for (@_) { $res->push_header("Set-Cookie2" => $_) }
+    for (@_) { $res->push_header( "Set-Cookie2" => $_ ) }
     $c->extract_cookies($res);
     return $cookie;
 }
 
-sub count_cookies
-{
-    my $c = shift;
+sub count_cookies {
+    my $c  = shift;
     my $no = 0;
-    $c->scan(sub { $no++ });
+    $c->scan( sub { $no++ } );
     $no;
 }

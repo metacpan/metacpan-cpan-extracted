@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use Readonly;
 
-our $VERSION = q[1.0.4];
+our $VERSION = q[1.1.0];
 
 # TODO: Use token patterns from original sass and use them consistently
 

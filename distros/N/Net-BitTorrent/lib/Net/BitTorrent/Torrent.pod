@@ -111,6 +111,79 @@ The code reference to execute when the event is emitted.
 
 =back
 
+=head2 C<magnet_uri( )>
+
+Returns the magnet URI for this torrent.
+
+    my $magnet = $torrent->magnet_uri;
+
+This method constructs and returns a B<magnet:> URI string encoding the torrent's infohash(es), name, and initial
+trackers. This is useful for sharing torrent references or for re-adding the same torrent later.
+
+=head2 C<speed_down( )>
+
+Returns the current download speed.
+
+    my $bps = $torrent->speed_down;
+
+This method returns the current download rate in bytes per second, averaged over recent ticks.
+
+=head2 C<speed_up( )>
+
+Returns the current upload speed.
+
+    my $bps = $torrent->speed_up;
+
+This method returns the current upload rate in bytes per second, averaged over recent ticks.
+
+=head2 C<num_peers( )>
+
+Returns the number of connected peers.
+
+    my $count = $torrent->num_peers;
+
+This method returns the current number of active peer connections for this swarm.
+
+=head2 C<num_seeds( )>
+
+Returns the number of connected seeders.
+
+    my $count = $torrent->num_seeds;
+
+This method returns the current number of connected peers that have all pieces (seeders).
+
+=head2 C<total_size( )>
+
+Returns the total size of the torrent data.
+
+    my $bytes = $torrent->total_size;
+
+This method returns the combined size in bytes of all files in the torrent.
+
+=head2 C<bytes_downloaded( )>
+
+Returns the total bytes downloaded so far.
+
+    my $dl = $torrent->bytes_downloaded;
+
+This method returns the total number of payload bytes received from all peers for this torrent.
+
+=head2 C<bytes_uploaded( )>
+
+Returns the total bytes uploaded so far.
+
+    my $ul = $torrent->bytes_uploaded;
+
+This method returns the total number of payload bytes sent to all peers for this torrent.
+
+=head2 C<bytes_left( )>
+
+Returns the remaining bytes to download.
+
+    my $remaining = $torrent->bytes_left;
+
+This method returns the number of bytes still needed to complete the download.
+
 =head2 C<name( )>
 
 Returns a human-readable name for the torrent.

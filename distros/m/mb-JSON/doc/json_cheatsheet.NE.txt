@@ -36,9 +36,15 @@
 [ 7. null / undef ]
   undef -> null  /  null -> undef
 
-[ 8. Hash keys sorted, UTF-8 kept as-is ]
+[ 8. ह्यास कुञ्जीहरू वर्णानुक्रममा क्रमबद्ध ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 9. उदाहरण ]
+[ 9. UTF-8 जस्ताको तस्तै ]
+  encode({"name"=>"田中"}) -> '{"name":"田中"}'
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
+
+[ 10. उदाहरण ]
   my $h = mb::JSON::decode('{"name":"Alice","ok":true}');
   my $j = mb::JSON::encode({name=>'Alice',ok=>mb::JSON::true});
   my $j = mb::JSON::stringify({name=>'Alice',ok=>mb::JSON::true});

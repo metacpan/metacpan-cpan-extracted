@@ -1,5 +1,6 @@
 package Terse::Plugin::Config;
-
+use strict;
+use warnings;
 use base 'Terse::Plugin';
 use Data::LNPath qw/lnpath/;
 
@@ -41,7 +42,7 @@ Terse::Plugin::Config - JSON configs
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

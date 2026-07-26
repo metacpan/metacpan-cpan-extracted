@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Affix::Wrap - Frictionless C/C++ Binding Generator for Affix
+Affix::Wrap - Automatic Generation of FFI Wrappers for Shared Libraries Written in C or C++
 
 =head1 SYNOPSIS
 
@@ -28,9 +28,8 @@ Affix::Wrap - Frictionless C/C++ Binding Generator for Affix
 
 =head1 DESCRIPTION
 
-C<Affix::Wrap> is a frictionless binding generator that bridges C/C++ header files and L<Affix>. It parses headers to
-extract functions, structs, enums, typedefs, macros, and global variables, automatically converting this information
-into L<Affix> definitions.
+Automatically generate Affix bindings from C/C++ header files. C<Affix::Wrap> parses headers to extract functions,
+structs, enums, typedefs, macros, and global variables, converting them into L<Affix> definitions.
 
 It is designed to facilitate two primary developer workflows:
 
@@ -51,7 +50,7 @@ end users.
 
 =head2 Parsing Drivers
 
-C<Affix::Wrap> employs a dual-driver strategy:
+Choose between Clang (recommended, compiler-grade accuracy) or a pure-Perl regex fallback:
 
 =over
 
@@ -69,7 +68,7 @@ C++ constructs), it requires no external dependencies and is sufficient for many
 
 =head1 Supported Features
 
-C<Affix::Wrap> extracts and bridges:
+What C<Affix::Wrap> extracts and bridges from your headers:
 
 =over
 
@@ -90,6 +89,8 @@ C<Affix::Wrap> extracts and bridges:
 =back
 
 =head1 CONSTRUCTOR
+
+Create a new binder instance with the header files and settings you need:
 
 =head2 C<new( ... )>
 
@@ -127,6 +128,8 @@ to find the C<clang> executable and falls back to Regex if unavailable.
 =back
 
 =head1 METHODS
+
+Parse headers, inject bindings at runtime, or generate standalone .pm files:
 
 =head2 wrap( $lib, [$target_package] )
 
@@ -173,6 +176,8 @@ Optional. The specific file to start parsing from. Defaults to the first file in
 =back
 
 =head1 Data Model
+
+The internal object hierarchy returned by C<parse()>. Each node represents a parsed C entity.
 
 The C<parse()> method returns a list of objects inheriting from C<Affix::Wrap::Entity>.
 
@@ -303,6 +308,8 @@ A preprocessor C<#define>. Only simple value macros are captured.
 
 =head1 Tutorials
 
+Two workflows: use headers at runtime or generate distributable Perl modules.
+
 =head2 Runtime Library Wrappers
 
 If you want to use a C library immediately without creating a separate Perl module file, use the C<wrap> method.
@@ -350,7 +357,7 @@ described in L<parse()>.
 
 =head1 AUTHOR
 
-Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Sanko Robinson - L<https://github.com/sanko>
 
 =head1 COPYRIGHT
 

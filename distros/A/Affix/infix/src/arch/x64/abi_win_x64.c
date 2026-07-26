@@ -678,6 +678,8 @@ static infix_status generate_reverse_prologue_win_x64(code_buffer * buf, infix_r
     // Save callee-saved registers that we might use as scratch registers.
     emit_push_reg(buf, RSI_REG);
     emit_push_reg(buf, RDI_REG);
+    // Save RAX to ensure it can be preserved across the call for void functions.
+    emit_push_reg(buf, RAX_REG);
     emit_mov_reg_reg(buf, RBP_REG, RSP_REG);
 
     layout->prologue_size = (uint32_t)buf->size;
@@ -821,14 +823,15 @@ static infix_status generate_reverse_argument_marshalling_win_x64(code_buffer * 
         }
         else {
             // Argument was passed on the caller's stack.
-            // RBP points to saved RDI.
-            // [RBP] -> Saved RDI
-            // [RBP+8] -> Saved RSI
-            // [RBP+16] -> Saved RBP
-            // [RBP+24] -> Return Address
-            // [RBP+32..63] -> Shadow Space (32 bytes)
-            // [RBP+64..] -> Stack arguments
-            int32_t caller_stack_offset = 32 + SHADOW_SPACE + (int32_t)(stack_slot_offset * 8);
+            // RBP points to saved RAX.
+            // [RBP] -> Saved RAX
+            // [RBP+8] -> Saved RDI
+            // [RBP+16] -> Saved RSI
+            // [RBP+24] -> Saved RBP
+            // [RBP+32] -> Return Address
+            // [RBP+40..71] -> Shadow Space (32 bytes)
+            // [RBP+72..] -> Stack arguments
+            int32_t caller_stack_offset = 40 + SHADOW_SPACE + (int32_t)(stack_slot_offset * 8);
             if (passed_by_ref)
                 emit_mov_reg_mem(buf, RAX_REG, RBP_REG, caller_stack_offset);
             else
@@ -958,6 +961,14 @@ static infix_status generate_reverse_epilogue_win_x64(code_buffer * buf,
     // RBP was set to RSP after all pushes.
     // mov rsp, rbp
     emit_mov_reg_reg(buf, RSP_REG, RBP_REG);
+
+    if (context->return_type->category == INFIX_TYPE_VOID) {
+        emit_pop_reg(buf, RAX_REG);
+    }
+    else {
+        // Skip the saved RAX to preserve the return value already in RAX.
+        emit_add_reg_imm8(buf, RSP_REG, 8);
+    }
 
     emit_pop_reg(buf, RDI_REG);
     emit_pop_reg(buf, RSI_REG);

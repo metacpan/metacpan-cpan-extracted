@@ -1,5 +1,9 @@
 Revision history for Terse-Headers
 
+0.03	2026-07-26
+	- Remove pax headers
+	- use strict/warnings in all PMs
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

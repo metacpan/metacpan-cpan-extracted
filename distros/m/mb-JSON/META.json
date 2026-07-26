@@ -1,12 +1,12 @@
 {
     "name" : "mb-JSON",
-    "version" : "0.06",
+    "version" : "0.07",
     "abstract" : "JSON encode/decode for multibyte (UTF-8) strings",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version 0.41",
     "license" : [
         "perl_5"
     ],
@@ -32,48 +32,40 @@
         "build" : {
             "requires" : {
                 "Carp" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
                 "Carp" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "runtime" : {
             "requires" : {
                 "Carp" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "test" : {
             "requires" : {
                 "Carp" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         }
     },
     "provides" : {
         "mb::JSON" : {
             "file" : "lib/mb/JSON.pm",
-            "version" : "0.06"
+            "version" : "0.07"
         },
         "mb::JSON::Boolean" : {
             "file" : "lib/mb/JSON.pm",
-            "version" : "0.06"
+            "version" : "0.07"
         }
     }
 }

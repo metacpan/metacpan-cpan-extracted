@@ -1,5 +1,8 @@
 package Terse::Controller::DelayedStatic;
 
+use strict;
+use warnings;
+
 use base 'Terse::Controller';
 
 sub static :get :view(static) :delayed :path(static/(.*\.js)) :captured(1) :content_type(application/javascript) { }
@@ -43,7 +46,7 @@ Terse::Controller::DelayedStatic - Serve delayed static resources controller
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

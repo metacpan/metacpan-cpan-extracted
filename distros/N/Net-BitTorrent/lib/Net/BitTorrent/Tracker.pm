@@ -3,7 +3,7 @@ use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
 #
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Tracker v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Tracker v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Net::BitTorrent::Tracker::HTTP;
     use Net::BitTorrent::Tracker::UDP;
     use List::Util qw[shuffle];

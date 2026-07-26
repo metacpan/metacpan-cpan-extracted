@@ -2,8 +2,9 @@ use v5.40;
 use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
-use File::Temp          qw[tempfile];
+use Path::Tiny          qw[path tempfile tempdir];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 $|++;
 #
 subtest simple => sub {
@@ -57,7 +58,8 @@ END_C
         affix $lib, 'c_is_null_file',   [ Pointer [File] ]         => Int;
         #
         subtest 'Writing to a Perl filehandle from C' => sub {
-            my ( $fh, $filename ) = tempfile();
+            my $file = tempfile( { realpath => 1 } );
+            my $fh   = $file->filehandle('>');
 
             # Note: We use a real file because PerlIO_findFILE (used internally)
             # requires a valid C-level FILE* which scalar handles (\$) might not provide.
@@ -70,22 +72,21 @@ END_C
             close $fh;
 
             # Verify content
-            open my $check, '<', $filename or die $!;
+            my $check   = $file->filehandle('<');
             my $content = <$check>;
             is $content, 'Hello from C', 'Data written by C appears in file';
-            unlink $filename;
         };
         subtest 'Reading from a Perl filehandle in C' => sub {
-            my ( $fh, $filename ) = tempfile();
+            my $file = tempfile( { realpath => 1 } );
+            my $fh   = $file->filehandle('>');
             syswrite $fh, 'ABC';
             close $fh;
-            open my $read_fh, '<', $filename or die $!;
+            my $read_fh   = $file->filehandle('<');
             my $char_code = c_read_char($read_fh);
             is chr($char_code), 'A', 'C function read first character correctly';
             $char_code = c_read_char($read_fh);
             is chr($char_code), 'B', 'C function read second character correctly';
             close $read_fh;
-            unlink $filename;
         };
         subtest 'Returning a FILE* from C to Perl' => sub {
             my $fh = c_create_tmpfile();
@@ -113,11 +114,11 @@ END_C
         # Test Roundtrip
         # Note: PerlIO* handles are generally strictly tied to the Perl layer.
         # When passed to C, we extract the PerlIO*, pass it, and wrap it in a new Glob on return.
-        my ( $fh, $filename ) = tempfile();
+        my $file = tempfile( { realpath => 1 } );
+        my $fh   = $file->filehandle('+>');
         syswrite $fh, 'Test Data';
-        seek( $fh, 0, 0 );
-        my $new_fh = c_perlio_identity($fh);
-        ok $new_fh, 'Received handle back from C';
+        sysseek $fh, 0, 0;
+        ok my $new_fh = c_perlio_identity($fh), 'Received handle back from C';
         is ref($new_fh), 'GLOB', 'Returned handle is a Glob reference';
 
         # Since it's the same underlying stream, reading from one should advance the other
@@ -126,7 +127,6 @@ END_C
         is $line, 'Test Data', 'Round-tripped PerlIO handle is readable';
         close $fh;
         close $new_fh;    # Should be safe to close the wrapper
-        unlink $filename;
     }
 };
 #
@@ -146,7 +146,7 @@ subtest complex => sub {
 
         // Initialize logger with a file
         DLLEXPORT void init_logger(Logger* logger, FILE* fp) {
-            if (!fp) fprintf(stderr, "C-side Warning: fp is NULL\n");
+            if (!fp) fprintf(stderr, "C-side Warning: fp is NULL");
             logger->log_file = fp;
             logger->counter = 0;
         }
@@ -177,8 +177,10 @@ subtest complex => sub {
     affix $lib, 'log_message',   [ Pointer [ Logger() ], String ]         => Void;
     affix $lib, 'create_logger', [ Pointer [File] ] => Logger();
     subtest 'File inside Struct (Pointer)' => sub {
-        my ( $fh, $filename ) = tempfile();
-        my $old_fh = select($fh);
+        my $file     = tempfile( { realpath => 1 } );
+        my $filename = $file->stringify;
+        my $fh       = $file->filehandle('+>');
+        my $old_fh   = select($fh);
         $| = 1;
         select($old_fh);
 
@@ -201,7 +203,7 @@ subtest complex => sub {
         is ref($retrieved_fh), 'GLOB', 'It is a glob';
 
         # Write from Perl using retrieved handle
-        # print {$retrieved_fh} "From Perl\n"; # Careful, might double-close if not careful
+        # print {$retrieved_fh} "From Perl"; # Careful, might double-close if not careful
         # Check file content
         open my $check, '<', $filename;
         my @lines = <$check>;
@@ -209,14 +211,15 @@ subtest complex => sub {
         is scalar(@lines), 2, 'File has 2 lines';
         like $lines[0], qr/\[1\] First message/,  'Line 1 matches';
         like $lines[1], qr/\[2\] Second message/, 'Line 2 matches';
-        free($logger);
 
         # Keep $fh alive until test end to avoid closing underneath C
         close $fh;
     };
     subtest 'File inside Struct (Value Return)' => sub {
-        my ( $fh, $filename ) = tempfile();
-        my $old_fh = select($fh);
+        my $file     = tempfile( { realpath => 1 } );
+        my $filename = $file->stringify;
+        my $fh       = $file->filehandle('+>');
+        my $old_fh   = select($fh);
         $| = 1;
         select($old_fh);
 
@@ -228,7 +231,7 @@ subtest complex => sub {
 
         # Write using the returned handle to verify it works
         # Note: $logger_hash->{log_file} wraps the same FILE* as $fh.
-        ok syswrite( $logger_hash->{log_file}, "Direct write from Perl\n" ), 'syswrite to the handle from Perl';
+        ok syswrite( $logger_hash->{log_file}, "Direct write from Perl" ), 'syswrite to the handle from Perl';
 
         # To avoid double-close warnings, we let Perl handle cleanup of the glob
         # but be careful about explicit closes.
@@ -238,7 +241,7 @@ subtest complex => sub {
         open my $check, '<', $filename;
         my $content = <$check>;
         close $check;
-        is $content, "Direct write from Perl\n", 'Handle returned in struct is usable';
+        is $content, "Direct write from Perl", 'Handle returned in struct is usable';
         close $fh;
     };
     subtest 'File in Array' => sub {
@@ -257,9 +260,15 @@ subtest complex => sub {
 
         # Array of Pointers to Files (FILE* files[3])
         affix $lib2, 'write_all', [ Array [ Pointer [File], 3 ], String ] => Void;
-        my ( $fh1, $f1 ) = tempfile();
-        my ( $fh2, $f2 ) = tempfile();
-        my ( $fh3, $f3 ) = tempfile();
+        my $file1 = tempfile( { realpath => 1 } );
+        my $f1    = $file1->stringify;
+        my $fh1   = $file1->filehandle('+>');
+        my $file2 = tempfile( { realpath => 1 } );
+        my $f2    = $file2->stringify;
+        my $fh2   = $file2->filehandle('+>');
+        my $file3 = tempfile( { realpath => 1 } );
+        my $f3    = $file3->stringify;
+        my $fh3   = $file3->filehandle('+>');
 
         # Flush buffers
         for my $h ( $fh1, $fh2, $fh3 ) { my $o = select($h); $| = 1; select($o); }
@@ -314,7 +323,9 @@ END_C
         affix $lib, 'init_logger2',   [ Pointer [ Logger2() ], Pointer [PerlIO] ] => Void;
         affix $lib, 'create_logger2', [ Pointer [PerlIO] ]                        => Logger2();
         subtest 'PerlIO inside Struct (Pointer)' => sub {
-            my ( $fh, $filename ) = tempfile();
+            my $file     = tempfile( { realpath => 1 } );
+            my $filename = $file->stringify;
+            my $fh       = $file->filehandle('+>');
             syswrite $fh, "Original Content\n";
 
             # Allocate struct memory
@@ -340,10 +351,11 @@ END_C
             is scalar(@lines), 2, 'File has 2 lines';
             like $lines[0], qr/Original Content/,    'Line 1 matches';
             like $lines[1], qr/Appended via Struct/, 'Line 2 matches';
-            free($logger);
         };
         subtest 'PerlIO inside Struct (Value Return)' => sub {
-            my ( $fh, $filename ) = tempfile();
+            my $file     = tempfile( { realpath => 1 } );
+            my $filename = $file->stringify;
+            my $fh       = $file->filehandle('+>');
 
             # Call C function returning a struct by value
             my $logger_hash = create_logger2($fh);
@@ -352,14 +364,14 @@ END_C
             is ref( $logger_hash->{handle} ), 'GLOB', 'It is a glob';
 
             # Write using the returned handle
-            syswrite $logger_hash->{handle}, "Write via Value Return\n";
+            syswrite $logger_hash->{handle}, "Write via Value Return";
             close $fh;
 
             # Verify content
             open my $check, '<', $filename;
             my $content = <$check>;
             close $check;
-            is $content, "Write via Value Return\n", 'Handle returned in struct is usable';
+            is $content, "Write via Value Return", 'Handle returned in struct is usable';
         };
         subtest 'PerlIO in Array' => sub {
 
@@ -379,9 +391,15 @@ END_C2
 
             # Array of PerlIO*
             affix $lib2, 'swap_handles', [ Array [ Pointer [PerlIO], 3 ] ] => Void;
-            my ( $fh1, $f1 ) = tempfile();
-            my ( $fh2, $f2 ) = tempfile();
-            my ( $fh3, $f3 ) = tempfile();
+            my $file1 = tempfile( { realpath => 1 } );
+            my $f1    = $file1->stringify;
+            my $fh1   = $file1->filehandle('+>');
+            my $file2 = tempfile( { realpath => 1 } );
+            my $f2    = $file2->stringify;
+            my $fh2   = $file2->filehandle('+>');
+            my $file3 = tempfile( { realpath => 1 } );
+            my $f3    = $file3->stringify;
+            my $fh3   = $file3->filehandle('+>');
 
             # Write distinct markers
             syswrite $fh1, 'File 1';

@@ -1,6 +1,9 @@
 package Terse::Headers;
 
-our $VERSION = '0.02';
+use strict;
+use warnings;
+
+our $VERSION = '0.03';
 
 1;
 
@@ -14,7 +17,7 @@ Terse::Headers - Terse headers
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

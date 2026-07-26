@@ -41,8 +41,8 @@ sub SDL_AppQuit { }
 This module provides a Perl wrapper for SDL3, a cross-platform development library designed to provide low level access
 to audio, keyboard, mouse, joystick, and graphics hardware.
 
-This is very much still under construction. There are a few examples in this distribution's `eg/` directory but a few
-games and other demos I've written may be found on github: [https://github.com/sanko/SDL3.pm-demos](https://github.com/sanko/SDL3.pm-demos).
+There are a few examples in this distribution's `eg/` directory but games and other demos I've written may be found on
+github: [https://github.com/sanko/SDL3.pm-demos](https://github.com/sanko/SDL3.pm-demos).
 
 ## Features
 
@@ -480,9 +480,11 @@ The project's repo: [https://github.com/Perl-SDL3/SDL3.pm](https://github.com/Pe
 
 The SDL3 Wiki: [https://wiki.libsdl.org/SDL3/FrontPage](https://wiki.libsdl.org/SDL3/FrontPage)
 
+[Affix](https://metacpan.org/pod/Affix)
+
 # LICENSE
 
-This software is Copyright (c) 2025 by Sanko Robinson <sanko@cpan.org>.
+This software is Copyright (c) 2025 by Sanko Robinson.
 
 This is free software, licensed under:
 
@@ -494,4 +496,4 @@ See the `LICENSE` file for full text.
 
 # AUTHOR
 
-Sanko Robinson <sanko@cpan.org>
+Sanko Robinson [https://github.com/sanko](https://github.com/sanko)

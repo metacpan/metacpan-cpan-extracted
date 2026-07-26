@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
-class Net::BitTorrent::Tracker::UDP v2.1.0 : isa(Net::BitTorrent::Tracker::Base) {
+class Net::BitTorrent::Tracker::UDP v2.1.1 : isa(Net::BitTorrent::Tracker::Base) {
     use Net::BitTorrent::Protocol::BEP23;
     use Net::BitTorrent::SSRF qw[is_safe_ip resolve_and_pin];
     use IO::Socket::IP;

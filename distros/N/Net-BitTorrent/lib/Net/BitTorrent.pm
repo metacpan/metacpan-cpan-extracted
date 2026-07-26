@@ -3,7 +3,7 @@ use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::builtin', 'experimental::try';
 use Net::BitTorrent::Emitter;
 #
-class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Net::BitTorrent::Torrent;
     use Net::BitTorrent::DHT;
     use Net::uTP::Manager;    # Standalone spin-off
@@ -12,7 +12,7 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use Crypt::URandom qw[urandom];
     use version;
     use Time::HiRes            qw[time];
-    use Net::BitTorrent::Types qw[:encryption];
+    use Net::BitTorrent::Types qw[:encryption :state];
     use Algorithm::RateLimiter::TokenBucket;
     use Net::Multicast::PeerDiscovery;
     use Net::BitTorrent::SSRF qw[is_safe_ip];
@@ -655,10 +655,8 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
         $self->_emit( 'torrent_added', $t );
         return $t;
     }
-
-    method torrents () {
-        return [ values %torrents ];
-    }
+    method torrents ()      { [ values %torrents ] }
+    method torrents_hash () { \%torrents }
 
     method dht () {
         return undef unless $bep05;
@@ -696,13 +694,13 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
         $tick_debt = 5.0 if $tick_debt > 5.0;    # Max debt to avoid huge bursts
         my $real_start = time();
         while ( $tick_debt >= 0.01 ) {
-            my $slice = 0.1;
+            my $slice = 0.025;
             $slice = $tick_debt if $tick_debt < $slice;
             $self->_run_one_tick($slice);
             $tick_debt -= $slice;
 
-            # Don't block the caller's main loop for more than 200ms
-            last if ( time() - $real_start ) > 0.2;
+            # Don't block the caller's main loop for more than 50ms
+            last if ( time() - $real_start ) > 0.05;
         }
     }
 
@@ -847,6 +845,7 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
             # Net::BitTorrent::DHT::handle_incoming returns (nodes, peers, data)
             # The 'data' (result) hash contains 'queried_target' which is the infohash
             # we were looking for when these peers were returned.
+            my %dispatched_to;
             for my $d (@all_data) {
                 my $ih = $d->{queried_target};
                 if ( $ih && ( my $t = $torrents{$ih} ) ) {
@@ -856,9 +855,24 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
                     for my $peer (@all_peers) {
                         $t->add_peer($peer);
                     }
+                    $dispatched_to{$ih} = 1;
                 }
                 elsif ( $debug && $ih ) {
                     $self->_emit_log( 'debug', "DHT result for unknown infohash " . unpack( "H*", $ih ) );
+                }
+            }
+
+            # Fallback: if peers arrived but no data entry matched, dispatch to torrents in METADATA state that are actively searching (get_peers
+            # responses from bootstrap nodes may not carry queried_target if the response lacks a token field).
+            if ( @all_peers && !%dispatched_to ) {
+                for my $t ( grep { $_->state == STATE_METADATA } values %torrents ) {
+                    my $ih = $t->infohash_v2 || $t->infohash_v1;
+                    next unless $ih;
+                    for my $peer (@all_peers) {
+                        $t->add_peer($peer);
+                    }
+                    $self->_emit_log( 'debug', "DHT peer fallback: dispatching " . scalar(@all_peers) . " peers to " . unpack( "H*", $ih ) )
+                        if $debug;
                 }
             }
 
@@ -896,12 +910,8 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
             }
         }
 
-        # Update all torrents (evaluates choking, etc.)
+        # BEP 14: Periodically announce on local network
         for my $t ( values %torrents ) {
-            $t->tick($timeout);
-
-            # BEP 14: Periodically announce on local network
-            # (Simplified: every ~60s if we tracked a timer, here we just do it occasionally)
             if ( rand() < 0.01 ) {    # Hack for now
                 if ($lpd) {
                     $lpd->announce( $t->infohash_v2, 6881 ) if $t->infohash_v2;
@@ -912,29 +922,42 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method save_state ($path) {
-        use JSON::PP   qw[encode_json];
+        use JSON::PP;
         use Path::Tiny qw[path];
+        my $json = JSON::PP->new->utf8->canonical;
         my %data = ( node_id => $node_id, torrents => {}, );
         my %seen;
         for my $ih ( keys %torrents ) {
             my $t = $torrents{$ih};
+
+            # prefer v1 key (20 bytes / 40 hex) over v2 (32 bytes / 64 hex)
+            next if length($ih) > 20 && $t->infohash_v1;
             next if $seen{ builtin::refaddr($t) }++;
-            $data{torrents}{ unpack( 'H*', $ih ) } = $t->dump_state();
+            my $state;
+            eval { $state = $t->dump_state() };
+            if ($@) {
+                $self->_emit_log( 'warn', "Failed to dump state for torrent: $@" );
+                next;
+            }
+            $data{torrents}{ unpack( 'H*', $ih ) } = $state;
         }
 
         # Add integrity checksum to detect tampering
-        my $payload = encode_json( \%data );
-        $data{_checksum} = unpack( 'H*', sha1($payload) );
-        path($path)->spew_utf8( encode_json( \%data ) );
+        my $payload = $json->encode( \%data );
+        my $sha     = Digest::SHA->new(1);
+        $sha->add($payload);
+        $data{_checksum} = $sha->hexdigest;
+        path($path)->spew_utf8( $json->encode( \%data ) );
     }
 
     method load_state ($path) {
-        use JSON::PP   qw[decode_json];
+        use JSON::PP;
         use Path::Tiny qw[path];
+        my $json = JSON::PP->new->utf8->canonical;
         return unless path($path)->exists;
         my $raw = path($path)->slurp_utf8;
         my $data;
-        try { $data = decode_json($raw) }
+        try { $data = $json->decode($raw) }
         catch ($e) {
             $self->_emit_log( 'error', "Failed to parse state file: $e" );
             return;
@@ -943,8 +966,10 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
 
         # Verify integrity checksum
         if ( defined $data->{_checksum} ) {
-            my $stored   = delete $data->{_checksum};
-            my $expected = unpack( 'H*', sha1( encode_json($data) ) );
+            my $stored = delete $data->{_checksum};
+            my $sha    = Digest::SHA->new(1);
+            $sha->add( $json->encode($data) );
+            my $expected = $sha->hexdigest;
             if ( $expected ne $stored ) {
                 $self->_emit_log( 'warn', 'State file integrity check failed, keeping current state' );
                 return;
@@ -958,7 +983,7 @@ class Net::BitTorrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
         }
         if ( ref $data->{torrents} eq 'HASH' ) {
             for my $ih_hex ( keys %{ $data->{torrents} } ) {
-                next unless $ih_hex =~ /^[0-9a-f]{40}$/i;
+                next unless $ih_hex =~ /^[0-9a-f]{40,64}$/i;
                 next unless ref $data->{torrents}{$ih_hex} eq 'HASH';
                 my $ih = pack( 'H*', $ih_hex );
                 if ( my $t = $torrents{$ih} ) {

@@ -2,16 +2,14 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Transport::TCP v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Transport::TCP v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use IO::Select;
     use Errno;
     field $socket : param : reader;
-    field $write_buffer     = '';
-    field $read_buffer_size = 0;                    # Track inbound buffer growth
+    field $write_buffer = '';
     field $connecting : param  = 1;
     field $filter     : reader = undef;
     my $MAX_WRITE_BUFFER_SIZE = 4 * 1024 * 1024;    # 4 MB
-    my $MAX_READ_BUFFER_SIZE  = 4 * 1024 * 1024;    # 4 MB post-handshake inbound limit
     ADJUST {
         if ( $socket && $socket->opened ) {
             $socket->blocking(0);
@@ -114,13 +112,6 @@ class Net::BitTorrent::Transport::TCP v2.1.0 : isa(Net::BitTorrent::Emitter) {
         $self->_flush_write_buffer();
         my $len = $socket->sysread( my $buffer, 65535 );
         if ( defined $len && $len > 0 ) {
-            $read_buffer_size += $len;
-            if ( $read_buffer_size > $MAX_READ_BUFFER_SIZE ) {
-                $self->_emit_log( 'error', 'Inbound buffer exceeded maximum size, disconnecting' );
-                $read_buffer_size = 0;
-                $self->_emit('disconnected');
-                return;
-            }
 
             # warn "    [DEBUG] TCP::tick received $len bytes\n";
             if ($filter) {
@@ -156,7 +147,6 @@ class Net::BitTorrent::Transport::TCP v2.1.0 : isa(Net::BitTorrent::Emitter) {
             else {
                 $self->receive_data($buffer);
             }
-            $read_buffer_size = 0 if defined $len;    # Reset after successful processing
         }
         elsif ( defined $len && $len == 0 ) {
             $self->_emit_log( 'debug', 'TCP remote closed connection' );

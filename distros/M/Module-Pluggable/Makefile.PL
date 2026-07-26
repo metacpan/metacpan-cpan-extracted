@@ -61,6 +61,7 @@ my %WriteMakefileArgs = (
         'File::Spec::Functions' => '0',
         'File::Temp'            => '0',
         'base'                  => '0',
+        'parent'                => '0',
         'FindBin'               => '0',
         'strict'                => '0',
         'warnings'              => '0',
@@ -92,18 +93,6 @@ my %WriteMakefileArgs = (
                 },
             },
         },
-        optional_features => {
-            module_runtime => {
-                description => "Optionally use Module::Runtime for requiring plugins rather than homegrown system",
-                prereqs => {
-                    runtime => {
-                        requires => {
-                            'Module::Runtime' => '0.012',
-                        }
-                    }
-                }
-            }
-        }
     },
 );
 
@@ -119,6 +108,21 @@ if (!eval { ExtUtils::MakeMaker->VERSION('6.5501') }) {
         @{$WriteMakefileArgs{BUILD_REQUIRES}}{ keys %{$WriteMakefileArgs{BUILD_REQUIRES}} };
 
     delete $WriteMakefileArgs{BUILD_REQUIRES};
+}
+
+
+# On `make install`, delete any copy of this module left behind in a core
+# Perl library directory by an old release that used INSTALLDIRS => 'perl'.
+# Such a copy would otherwise shadow the new 'site' install (#39). Only
+# needed when we're actually installing to 'site' this time around.
+my $installing_to_site = $WriteMakefileArgs{INSTALLDIRS} eq 'site';
+
+sub MY::postamble {
+    return '' unless $installing_to_site;
+    return <<'MAKE_FRAG';
+install ::
+	$(NOECHO) $(PERL) installscripts/remove_stale_core_copies.pl
+MAKE_FRAG
 }
 
 WriteMakefile(%WriteMakefileArgs);

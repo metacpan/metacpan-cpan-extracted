@@ -136,6 +136,18 @@ abstract の型解決前 null チェック、リスト内 null 項目など)は*
     -fsanitize=address`、実行時に `DYLD_INSERT_LIBRARIES=<libclang_rt.
     asan_osx_dynamic.dylib>`。**prove 経由は SIP が DYLD 変数を子に
     渡さないので、テストを単体実行するか Linux コンテナを使う。**
+  - macOS: **`DYLD_INSERT_LIBRARIES` に指定する ASan ランタイムは、
+    ビルドに使った `cc`/`clang` と同じツールチェイン由来のものを使う**
+    (例: `/usr/bin/cc` が Xcode Command Line Tools の Apple clang なら、
+    `/Library/Developer/CommandLineTools/usr/lib/clang/<ver>/lib/darwin/
+    libclang_rt.asan_osx_dynamic.dylib` を使う)。バージョンの異なる
+    ASan ランタイム(例: nix 経由の compiler-rt)を注入すると、OS の
+    dyld 実装との組み合わせによっては `perl` の起動自体が
+    `__asan::AsanInitFromRtl()` の初期化中に自己デッドロックし、
+    単純な `perl -e 'print 1'` すら何分待っても終わらない(`sample`
+    で見ると `StaticSpinMutex::LockSlow()` で spin している)。無関係な
+    コード変更のバグと誤認しやすいので、ASan 実行が異常に遅い/終わらない
+    ときはまずランタイムのバージョン不一致を疑う。
 - **ASan は `PERL_HASH_SEED` を複数固定して回す**(例: 1〜20)。HV の
   反復順がプールの並びを変え、未初期化読みの発火がシード依存になる。
   CI が「同一コミットで pass と SEGV」を出したら、まずシード起因を疑い

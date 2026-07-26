@@ -645,6 +645,31 @@ _canvas_gen_html(pTHX_ HV *self)
         sv_catpvf(html, " class=\"%s\"", SvPV_nolen(*class_svp));
 
     sv_catpvs(html, "></canvas>");
+
+    {
+        SV **hclick_svp = hv_fetchs(self, "_has_click", 0);
+        if (hclick_svp && SvTRUE(*hclick_svp)) {
+            sv_catpvf(html,
+                "<script>(function(){"
+                "var cv=document.getElementById('%s');"
+                "function pos(e,ev){"
+                "var r=e.getBoundingClientRect();"
+                "return[Math.floor((ev.clientX-r.left)*e.width/r.width),"
+                       "Math.floor((ev.clientY-r.top)*e.height/r.height)];"
+                "}"
+                "cv.addEventListener('click',function(ev){"
+                "var p=pos(cv,ev);"
+                "window.chandra.invoke('__canvas_click_%s',p);});"
+                "cv.addEventListener('contextmenu',function(ev){"
+                "ev.preventDefault();"
+                "var p=pos(cv,ev);"
+                "window.chandra.invoke('__canvas_rclick_%s',p);});"
+                "})();</script>",
+                id, id, id
+            );
+        }
+    }
+
     return html;
 }
 

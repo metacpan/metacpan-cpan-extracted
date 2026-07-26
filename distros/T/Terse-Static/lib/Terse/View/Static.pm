@@ -1,5 +1,8 @@
 package Terse::View::Static;
 
+use strict;
+use warnings;
+
 use base 'Terse::View';
 
 sub build_view {
@@ -60,7 +63,7 @@ Terse::View::Static - Serve static resources view
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

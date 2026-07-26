@@ -1,0 +1,77 @@
+---
+X_No_Archive: Yes
+abstract: 'Perl Wrapper for the Simple DirectMedia Layer 3.0'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Affix: v1.1.0
+  Alien::SDL3: v2.24.0
+  IPC::Cmd: '0'
+  TAP::Harness::Env: '0'
+  Test2::Plugin::UTF8: '0'
+  Test2::Tools::Compare: '0'
+  Test2::V0: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Requirements::Dynamic: '0'
+  Config: '0'
+  ExtUtils::Helpers: '0.028'
+  ExtUtils::Install: '0'
+  ExtUtils::InstallPaths: '0.002'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '2.36'
+  JSON::PP: '2'
+  Path::Tiny: '0.144'
+dynamic_config: 0
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+keywords:
+  - ffi
+  - library
+  - wrapper
+  - sdl3
+  - gamedev
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SDL3
+no_index:
+  directory:
+    - t
+    - xt
+    - share
+    - eg
+optional_features:
+  DD:
+    description: 'Dump structures'
+    requires:
+      Data::Printer: '0'
+provides:
+  SDL3:
+    file: lib/SDL3.pm
+    version: v0.0.4
+requires:
+  Affix: v1.1.0
+  Alien::SDL3: v2.24.0
+  Carp: '0'
+  Data::Dump: '0'
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/Perl-SDL3/SDL3.pm/issues
+  homepage: https://github.com/Perl-SDL3/SDL3.pm
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/Perl-SDL3/SDL3.pm.git
+version: v0.0.4
+x_help_wanted:
+  - Tester
+  - Documenter
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+  - eg/dev.pl
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

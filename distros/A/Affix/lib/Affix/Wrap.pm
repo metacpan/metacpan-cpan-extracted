@@ -1,4 +1,4 @@
-package Affix::Wrap v1.0.9 {
+package Affix::Wrap v1.1.0 {
     use v5.40;
     use feature 'class';
     no warnings 'experimental::class';
@@ -7,50 +7,59 @@ package Affix::Wrap v1.0.9 {
     use Capture::Tiny qw[capture];
     use JSON::PP;
     use File::Basename qw[basename];
+    use Carp           qw[];
     use Affix          qw[];
     #
     class    #
         Affix::Wrap::Type {
         use Affix qw[Void];
-        field $name : reader : param //= 'void';
-        method to_string { $self->name }
+        field $name     : reader : param //= 'void';
+        field $is_const : reader : param //= 0;
+        method to_string { ( $is_const ? 'const ' : '' ) . $self->name }
         use overload '""' => 'to_string', fallback => 1;
 
         # Factory method to parse a C type string into objects
         sub parse ( $class, $t ) {
             return $class->new( name => 'void' ) unless defined $t;
 
-            # Cleanup attributes and whitespace
+            # Cleanup
             $t =~ s/__attribute__\s*\(\(.*\)\)//g;
+            $t =~ s/\b(restrict|volatile)\b//g;
             $t =~ s/^\s+|\s+$//g;
 
-            # Function Pointer: Ret (*)(Args)
+            # Function Pointers: Ret (*)(Args)
             if ( $t =~ /^(.+?)\s*\(\*\)\s*\((.*)\)$/ ) {
-                my $ret_str  = $1;
-                my $args_str = $2;
-                my $ret      = $class->parse($ret_str);
+                my ( $ret_str, $args_str ) = ( $1, $2 );
                 my @args;
                 if ( $args_str ne '' && $args_str ne 'void' ) {
+
+                    # Simple split; for complex nested pointers, Clang driver is preferred
                     @args = map { $class->parse($_) } split( /\s*,\s*/, $args_str );
                 }
-                return Affix::Wrap::Type::CodeRef->new( ret => $ret, params => \@args );
+                return Affix::Wrap::Type::CodeRef->new( ret => $class->parse($ret_str), params => \@args );
             }
+
+            # Arrays: Type[N]
             if ( $t =~ /^(.*)\s*\[(\d+)\]$/ ) {
                 return Affix::Wrap::Type::Array->new( of => $class->parse($1), count => $2 );
             }
-            $t =~ s/(\*)\s*(?:const|restrict)\s*$/$1/;
-            $t =~ /^(.+)\s*\*$/ ? Affix::Wrap::Type::Pointer->new( of => $class->parse($1) ) : $class->new( name => $t );
+
+            # Pointers: Type * [const]
+            # We match the outermost pointer and its trailing const qualifier
+            if ( $t =~ /^(.*)\s*\*\s*(const)?$/ ) {
+                my ( $inner, $is_ptr_const ) = ( $1, $2 );
+                return Affix::Wrap::Type::Pointer->new( of => $class->parse($inner), is_const => ( $is_ptr_const ? 1 : 0 ) );
+            }
+
+            # Base Types: [const] Name
+            # Only strip the const if it's at this level
+            my $const = ( $t =~ s/\bconst\b//g ) ? 1 : 0;
+            $t =~ s/^\s+|\s+$//g;
+            return $class->new( name => $t, is_const => $const );
         }
 
-        method affix_type {
-            my $t = $self->name;
-            $t =~ s/^(?:struct|union|enum)\s+//;
-            $t =~ s/consts?\s+//g;
-            $t =~ s/(\s+\**)const$/$1/g;
-            $t =~ s/(\s+\**)restrict$/$1/g;
-            $t =~ s/\s+$//;
-            #
-            state $type_map //= {
+        sub _type_map ( $self //= () ) {
+            state $type_map = {
                 void                 => 'Void',
                 bool                 => 'Bool',
                 short                => 'Short',
@@ -67,83 +76,131 @@ package Affix::Wrap v1.0.9 {
                 float                => 'Float',
                 double               => 'Double',
                 'long double'        => 'LongDouble',
-                int8_t               => 'Int8',
-                sint8_t              => 'SInt8',
-                uint8_t              => 'UInt8',
-                int16_t              => 'Int16',
-                sint16_t             => 'SInt16',
-                uint16_t             => 'UInt16',
-                int32_t              => 'Int32',
-                sint32_t             => 'SInt32',
-                uint32_t             => 'UInt32',
-                int64_t              => 'Int64',
-                sint64_t             => 'SInt64',
-                uint64_t             => 'UInt64',
-                int128_t             => 'Int128',
-                sint128_t            => 'SInt128',
-                uint128_t            => 'UInt128',
-                size_t               => 'Size_t',
-                ssize_t              => 'SSize_t',
-                ptrdiff_t            => 'SSize_t',
-                wchar_t              => 'WChar',
-                time_t               => 'Int64',
-                '...'                => 'VarArgs',
-                'va_list'            => 'VarArgs',
-                '__builtin_va_list'  => 'VarArgs',      # Clang
 
-                #
-                'char[]'  => 'String',
-                'file*'   => 'File',
-                file      => 'Void',                    # Fixes FILE* -> Pointer[Void]
-                'time_t'  => 'Int64',                   # Standard timestamp
-                'jmp_buf' => 'Void',                    # Opaque handle for setjmp
-                '_jbtype' => 'Void',                    # Internal jmp_buf typedef
+                # Extended stdint.h
+                int8_t    => 'Int8',
+                sint8_t   => 'SInt8',
+                uint8_t   => 'UInt8',
+                int16_t   => 'Int16',
+                sint16_t  => 'SInt16',
+                uint16_t  => 'UInt16',
+                int32_t   => 'Int32',
+                sint32_t  => 'SInt32',
+                uint32_t  => 'UInt32',
+                int64_t   => 'Int64',
+                sint64_t  => 'SInt64',
+                uint64_t  => 'UInt64',
+                int128_t  => 'Int128',
+                sint128_t => 'SInt128',
+                uint128_t => 'UInt128',
 
-                # 'tm' (struct tm) is undefined because we skip system headers.
-                # Mapping to Void ensures 'struct tm *' becomes 'Pointer[Void]'
-                'tm'        => Affix::Pointer( [Void] ),
-                'struct tm' => Affix::Pointer( [Void] )
+                # Fast & Least stdint.h types
+                uint_fast8_t   => 'UInt8',
+                int_fast8_t    => 'Int8',
+                uint_fast16_t  => 'UInt16',
+                int_fast16_t   => 'Int16',
+                uint_fast32_t  => 'UInt32',
+                int_fast32_t   => 'Int32',
+                uint_fast64_t  => 'UInt64',
+                int_fast64_t   => 'Int64',
+                uint_least8_t  => 'UInt8',
+                int_least8_t   => 'Int8',
+                uint_least16_t => 'UInt16',
+                int_least16_t  => 'Int16',
+                uint_least32_t => 'UInt32',
+                int_least32_t  => 'Int32',
+                uint_least64_t => 'UInt64',
+                int_least64_t  => 'Int64',
+
+                # Architecture specific
+                size_t    => 'Size_t',
+                ssize_t   => 'SSize_t',
+                ptrdiff_t => 'SSize_t',
+                intptr_t  => 'SSize_t',
+                uintptr_t => 'Size_t',
+                off_t     => 'SSize_t',
+                pid_t     => 'Int',
+                wchar_t   => 'WChar',
+                time_t    => 'Int64',
+
+                # Variadic
+                '...'               => 'VarArgs',
+                va_list             => 'VarArgs',
+                '__builtin_va_list' => 'VarArgs',
+
+                # Standard library structures mapped to pointers
+                'char[]'    => 'String',
+                'file*'     => 'File',
+                file        => 'Void',
+                jmp_buf     => 'Void',
+                _jbtype     => 'Void',
+                tm          => 'Void',
+                'struct tm' => 'Void'
             };
+            return $type_map;
+        }
 
-            # Case-insensitive lookup (handled by existing code)
-            return $type_map->{ lc $t } if defined $type_map->{ lc $t };
-            return "'$t'"               if $t =~ /^[a-z_]\w*$/i;
-            warn "WARNING: Unknown C type '$t' mapped to Void\n";
-            'Void';
+        method _clean_name {
+            my $t = $self->name;
+            $t =~ s/^(?:struct|union|enum)\s+//;
+            $t =~ s/\s*\*+$//;
+            $t =~ s/^\s+|\s+$//g;
+            return $t;
+        }
+
+        method affix_type {
+            my $clean = $self->_clean_name;
+            my $map   = $self->_type_map;
+            my $key   = lc $clean;
+
+            # Get the CamelCase Perl sub name (e.g. 'Int', 'Double', or the cleaned Custom Name with parens)
+            my $out = exists $map->{$key} ? $map->{$key} : ( $clean =~ /^[a-zA-Z_]\w*$/ ? "$clean()" : 'Void' );
+
+            # Apply Const wrapper if this level is qualified
+            return $is_const ? "Const[$out]" : $out;
         }
 
         method affix {
-            use Affix qw[Void];
-            my $type_str = $self->affix_type;
-
-            # Case 1: Simple named type (e.g. "Int", "UChar")
-            if ( $type_str =~ /^(\w+)$/ ) {
+            use Affix qw[Void Const];
+            my $clean = lc $self->_clean_name;
+            my $map   = $self->_type_map;
+            my $res;
+            if ( exists $map->{$clean} ) {
+                my $mapped = $map->{$clean};
                 no strict 'refs';
-                my $fn = "Affix::$type_str";
-                return $fn->() if defined &{$fn};    # Return Affix::Int() object
-                return '@' . $type_str;              # Return string "@png_byte"
+                my $fn = "Affix::$mapped";
+                $res = defined &{$fn} ? $fn->() : "\@$mapped";
             }
-
-            # Case 2: Complex string (e.g. "Pointer[Void]")
-            # We return the string directly so Affix::affix() can parse it
-            return $type_str;
+            else {
+                my $raw_name = $self->_clean_name;
+                $res = ( $raw_name =~ /^[a-z_]\w*$/i ) ? "\@$raw_name" : Void();
+            }
+            return $is_const ? Const [$res] : $res;
         }
     }
     class    #
         Affix::Wrap::Type::Pointer : isa(Affix::Wrap::Type) {
-        use Affix qw[Pointer];
+        use Affix qw[Pointer Const];
         field $of : reader : param;
-        method name       { $of->name . '*' }
-        method affix_type { 'Pointer[' . $of->affix_type . ']' }
-        method affix      { Pointer [ $of->affix ] }
+        method name { $of->name . '*' }
+
+        method affix_type {
+            my $res = 'Pointer[' . $of->affix_type . ']';
+            return $self->is_const ? "Const[$res]" : $res;
+        }
+
+        method affix {
+            my $res = Pointer [ $of->affix ];
+            return $self->is_const ? Const [$res] : $res;
+        }
         };
     class    #
         Affix::Wrap::Type::Array : isa(Affix::Wrap::Type) {
         use Affix qw[Array];
         field $of    : reader : param;
         field $count : reader : param;
-        method name       { $of->name . "[" . $count . "]" }
-        method affix_type { sprintf( 'Array[%s, %d]', $of->affix_type, $count ) }
+        method name       { $of->name . '[' . $count . ']' }
+        method affix_type { 'Array[' . $of->affix_type . ', ' . $count . ']' }
         method affix      { Array [ $of->affix, $count ] }
         };
     class    #
@@ -285,13 +342,16 @@ package Affix::Wrap v1.0.9 {
 
         method affix_type {
             return $definition->affix_type if defined $definition;
-            return $type->affix_type       if builtin::blessed($type);
-            return 'Void';
+            return $type->affix_type;
         }
 
         method affix {
             return $definition->affix if defined $definition;
-            builtin::blessed($type) ? $type->affix : Void;
+            return $type->affix       if builtin::blessed($type);
+
+            # Fallback: if it's just a string, wrap it in a Reference object
+            return Affix::Type::Reference->new( name => $type =~ s/^@//r ) if defined $type;
+            return Affix::Void();
         }
     }
     class    #
@@ -300,71 +360,89 @@ package Affix::Wrap v1.0.9 {
         method set_value ($v) { $value = $v }
 
         method affix_type {
-            $value // return '';
-            my $v = $value // '';
-            $v =~ s/^\s+|\s+$//g;
-            return '' unless length $v;
+            my $v = $self->value // return '';
+
+            # Sanitize C string concatenations in macros (e.g. "a" "b" -> "ab")
+            $v =~ s/"\s+"//g;
+
+            # Strip outer quotes from C string literals
+            if    ( $v =~ /^"(.*)"$/ ) { $v = $1; $v =~ s/\\(.)/$1/g; }
+            elsif ( $v =~ /^'(.*)'$/ ) { $v = $1; }
+
+            # Protect against Perl-internal reserved names (starting with __)
+            # and macros containing unresolved C calls or backslashes
+            if ( $self->name =~ /^__/ || $v =~ /[\\()]/ ) {
+                return '# use constant ' . $self->name . " => $v";
+            }
             if ( $v =~ /^-?(?:0x[\da-fA-F]+|\d+(?:\.\d+)?)$/ ) {
                 return sprintf 'use constant %s => %s', $self->name, $v;
             }
-            if ( $v =~ /^".*"$/ || $v =~ /^'.*'$/ ) {
-                return sprintf 'use constant %s => %s', $self->name, $v;
-            }
             $v =~ s/'/\\'/g;
-            sprintf 'use constant %s => \'%s\'', $self->name, $v;
+            return "use constant " . $self->name . " => '$v'";
         }
 
         method affix ( $lib //= (), $pkg //= () ) {
             if ( $pkg && defined $value && length $value ) {
                 my $val = $value;
                 if ( $val =~ /^"(.*)"$/ || $val =~ /^'(.*)'$/ ) { $val = $1; }
-                no strict 'refs';
-                no warnings 'redefine';
-                *{ "${pkg}::" . $self->name } = sub () {$val};
+                if ( $pkg =~ /^[a-zA-Z_]\w*(::\w+)*$/ && $self->name =~ /^[a-zA-Z_]\w*$/ ) {
+                    no strict 'refs';
+                    no warnings 'redefine';
+                    *{ "${pkg}::" . $self->name } = sub () {$val};
+                }
             }
             sub () {$value};
         }
-        } class Affix::Wrap::Variable : isa(Affix::Wrap::Entity) {
+        };
+    class    #
+        Affix::Wrap::Variable : isa(Affix::Wrap::Entity) {
         field $type : reader : param;
-        method affix_type { sprintf 'pin my $%s, $lib, \'%s\' => %s', $self->name, $self->name, $type->affix_type }
+
+        method affix_type {
+
+            # Safely declare the package var, then attempt to pin it
+            sprintf "our \$%s;\n    try { Affix::pin(\$%s, \$lib, '%s', %s) } catch(\$e) { }", $self->name, $self->name, $self->name,
+                $type->affix_type;
+        }
 
         method affix ( $lib, $pkg //= () ) {
-            if ($lib) {
-                my $t = $type->affix;
-                if ($pkg) {
-                    no strict 'refs';
-
-                    # Vivify package variable and bind it
-                    Affix::pin( ${ "${pkg}::" . $self->name }, $lib, $self->name, $t );
-                }
-                else {
-                    my $var;
-                    Affix::pin( $var, $lib, $self->name, $t );
-                    return $var;
-                }
+            my $var;
+            try {
+                Affix::pin( $var, $lib, $self->name, $type->affix );
             }
-            $type->affix;
+            catch ($e) {
+
+                # Symbol missing; that's fine
+            }
+            return $var;
         }
-        } class    #
+        };
+    class    #
         Affix::Wrap::Typedef : isa(Affix::Wrap::Entity) {
         field $underlying : reader : param;
-        method affix_type { 'typedef \'' . $self->name . '\' => ' . $underlying->affix_type }
+
+        method affix_type {
+
+            # Return ONLY the underlying expression (e.g. 'Int' or 'Struct[...]')
+            # This prevents the "typedef 'name' => typedef 'name' => ..." recursion.
+            return $underlying->affix_type;
+        }
 
         method affix ( $lib //= (), $pkg //= () ) {
-            my $t = $underlying->affix;
-            Affix::typedef $self->name, $t;
 
-            # If the underlying type is an Enum, we must manually export the constants to the target package.
-            # Affix::typedef only installs them into the *caller* (which is this class).
-            if ( $pkg && builtin::blessed($t) && $t->isa('Affix::Type::Enum') ) {
-                my ( $const_map, $val_map ) = $t->resolve();
-                no strict 'refs';
-                while ( my ( $const_name, $val ) = each %$const_map ) {
-                    *{"${pkg}::${const_name}"} = sub () {$val};
-                }
+            # If the underlying is a complex type (Struct/Enum), we want to return
+            # that object so the batch gets "@Name = {body}"
+            # If it's another Typedef, we return a Reference to prevent infinite recursion.
+            my $t = $underlying->affix;
+            if ( $underlying isa Affix::Wrap::Typedef ) {
+                return Affix::Type::Reference->new( name => $underlying->name ) . '()';
             }
+            return $t . '( )';
         }
-        } class Affix::Wrap::Struct : isa(Affix::Wrap::Entity) {
+        }
+        #
+        class    #
+        Affix::Wrap::Struct : isa(Affix::Wrap::Entity) {
         field $tag     : reader : param //= 'struct';
         field $members : reader : param //= [];
 
@@ -375,43 +453,50 @@ package Affix::Wrap v1.0.9 {
 
         method affix ( $lib //= (), $pkg //= () ) {
             use Affix qw[Struct Union];
-            if ( $tag eq 'union' ) {
-                return Union [ map { $_->name, $_->affix } @$members ];
-            }
-            Struct [ map { $_->name, $_->affix } @$members ];
+            return ( $tag eq 'union' ) ? Union [ map { $_->name, $_->affix } @$members ] : Struct [ map { $_->name, $_->affix } @$members ];
         }
-        } class    #
+        };
+    class    #
         Affix::Wrap::Enum : isa(Affix::Wrap::Entity) {
         field $constants : reader : param //= [];
 
         method affix_type {
             my @defs;
             for my $c (@$constants) {
-                if ( !defined $c->{value} ) {
-                    push @defs, $c->{name};
-                    next;
-                }
-                my $v = $c->{value} // 0;
+                my $v = $c->{value};
+                if ( !defined $v ) { push @defs, "'$c->{name}'"; next; }
                 $v = "'$v'" if $v !~ /^-?\d+$/;
-                push @defs, sprintf( '[%s => %s]', $c->{name}, $v );
+                push @defs, sprintf( "[ %s => %s ]", $c->{name}, $v );
             }
+
+            # Return only the expression
             return sprintf 'Enum[ %s ]', join( ', ', @defs );
+        }
+
+        method perl_constants {
+            my @out;
+            for my $c (@$constants) {
+                my $v = $c->{value};
+                $v = "'$v'" if defined $v && $v !~ /^-?\d+$/;
+                $v //= 0;
+                push @out, "sub $c->{name} () { $v }";
+            }
+            return join( "\n    ", @out );
         }
 
         method affix ( $lib //= (), $pkg //= () ) {
             use Affix qw[Enum];
             my @defs;
             for my $c (@$constants) {
-                if ( !defined $c->{value} ) { push @defs, $c->{name}; next }
+                if ( !defined $c->{value} ) { push @defs, $c->{name}; next; }
                 push @defs, [ $c->{name}, $c->{value} ];
             }
             my $type = Enum [@defs];
-
-            # Manual export if this is a bare enum (not typedef'd)
-            if ($pkg) {
+            if ( $pkg && $self->name && $self->name ne '(anonymous)' ) {
                 my ( $const_map, $val_map ) = $type->resolve();
                 no strict 'refs';
                 while ( my ( $const_name, $val ) = each %$const_map ) {
+                    next unless $const_name =~ /^[a-zA-Z_]\w*$/;
                     *{"${pkg}::${const_name}"} = sub () {$val};
                 }
             }
@@ -427,9 +512,17 @@ package Affix::Wrap v1.0.9 {
         field $mangled_name : reader : param //= ();
 
         method affix_type {
-            sprintf 'affix $lib, %s => [%s], %s',
-                ( $self->mangled_name ne $self->name ? ( sprintf q[[%s => '%s']], $self->mangled_name, $self->name ) :
-                    ( sprintf q['%s'], $self->name ) ), join( ', ', @{ $self->affix_args } ), $self->affix_ret;
+            my $sym = $self->name;
+            if ( defined $self->mangled_name && $self->mangled_name ne $self->name ) {
+                $sym = $self->mangled_name;
+
+                # Mach-O prepends a leading underscore to C symbols (e.g., _return_six)
+                # but dlsym expects the source-level name without it.
+                $sym = $self->name if $sym eq '_' . $self->name;
+            }
+            sprintf "affix \$lib, %s => [%s], %s",
+                ( $sym ne $self->name ? ( sprintf q[[%s => '%s']], $sym, $self->name ) : ( sprintf q['%s'], $self->name ) ),
+                join( ', ', map { $_->affix_type } @$args ), $ret->affix_type;
         }
 
         method affix ( $lib, $pkg //= () ) {
@@ -585,7 +678,9 @@ package Affix::Wrap v1.0.9 {
             return 0 if $f =~ m{^/usr/(include|lib|share|local/include)};
             return 0 if $f =~ m{^/System/Library};
             return 1 if $allowed_files->{$f};
-            for my $dir (@$project_dirs) { return 1 if index( $f, $dir ) == 0; }
+            for my $dir (@$project_dirs) {
+                return 1 if index( $f, $dir ) == 0 && ( length($f) == length($dir) || substr( $f, length($dir), 1 ) eq '/' );
+            }
             return 0;
         }
 
@@ -1391,8 +1486,13 @@ package Affix::Wrap v1.0.9 {
                 else                         { die "Unknown driver '$driver'"; }
             }
             elsif ( !defined $driver ) {
-                my ( $out, $err, $exit ) = Capture::Tiny::capture { system( 'clang', '--version' ); };
-                my $use_clang = $exit == 0;
+
+                # Wrap in a localized warn-handler to suppress the internal "Can't spawn" error
+                my $exit = do {
+                    local $SIG{__WARN__} = sub { };
+                    system( 'clang', '--version', '>', File::Spec->devnull, '2>&1' );
+                };
+                my $use_clang = ( $exit == 0 );
                 $driver = $use_clang ? Affix::Wrap::Driver::Clang->new( project_files => $project_files ) :
                     Affix::Wrap::Driver::Regex->new( project_files => $project_files );
             }
@@ -1400,7 +1500,9 @@ package Affix::Wrap v1.0.9 {
 
         method parse( $entry_point //= () ) {
             $entry_point //= $project_files->[0];
-            $driver->parse( $entry_point, $include_dirs );
+            my @nodes = $driver->parse( $entry_point, $include_dirs );
+            $self->_resolve_macros( \@nodes );
+            return @nodes;
         }
 
         method _resolve_macros ($nodes) {
@@ -1408,7 +1510,7 @@ package Affix::Wrap v1.0.9 {
             for my $node (@$nodes) {
                 if ( $node isa Affix::Wrap::Macro ) {
                     my $val = $node->value // '';
-                    $val =~ s/(?<=\d)[Uu][Ll]{0,2}//g;
+                    $val =~ s/(?<=\d)[Uu][Ll]{0,2}//g;    # Strip C suffixes like 100ULL
                     $macros{ $node->name } = $val;
                 }
             }
@@ -1417,33 +1519,32 @@ package Affix::Wrap v1.0.9 {
             $resolve = sub {
                 my ($token) = @_;
                 return undef unless defined $token;
-                $token =~ s/^\s+|\s+$//g;    # Trim whitespace
-
-                # Is it a literal number?
-                return oct($token) if $token =~ /^0x[\da-fA-F]+$/i;    # Hex -> Int
-                return int($token) if $token =~ /^-?\d+$/;             # Dec -> Int
-
-                # Check cache (recursion guard)
+                $token =~ s/^\s+|\s+$//g;
+                return oct($token)    if $token =~ /^0x[\da-fA-F]+$/i;
+                return $token + 0     if $token =~ /^-?\d+(?:\.\d+)?$/;
                 return $cache{$token} if exists $cache{$token};
                 local $cache{$token} = undef;
-
-                # Look up definition
                 my $expr = $macros{$token};
-                return undef unless defined $expr;                     # Not found (maybe a string or unknown)
+                return undef unless defined $expr;
+                1 while $expr =~ s/^\((.*)\)$/$1/;    # Strip outer parens
 
-                # Parse expression
-                # Strip outer parentheses recursively: ((A|B)) -> A|B
-                1 while $expr =~ s/^\((.*)\)$/$1/;
+                # Resolve bitwise and arithmetic expressions
+                if ( $expr =~ /[|&<>+\-*\/]/ ) {
+                    my $evaluable = $expr;
 
-                # Handle bitwise OR chains (e.g. "FLAG_A | FLAG_B")
-                if ( $expr =~ /\|/ ) {
-                    my $accum = 0;
-                    for my $part ( split /\|/, $expr ) {
-                        my $val = $resolve->($part);
-                        return undef unless defined $val;    # Abort if any part is non-numeric
-                        $accum |= $val;
+                    # Using {} delimiters so the // operator doesn't break the regex parser
+                    $evaluable =~ s{\b([a-zA-Z_]\w*)\b}{ $resolve->($1) // $1 }ge;
+
+                    # Clean up any C-style suffixes that might have survived
+                    $evaluable =~ s/\b(\d+)L+\b/$1/g;
+
+                    # If everything is now numeric/operators/whitespace, we can safely eval
+                    if ( $evaluable =~ /^[0-9\s|&<>\+\-\*\/\(\).xXa-fA-F]+$/ ) {
+
+                        # Using a string eval here to let Perl's engine handle C-like precedence
+                        my $res = eval $evaluable;
+                        return $cache{$token} = $res if defined $res;
                     }
-                    return $cache{$token} = $accum;
                 }
 
                 # Fallback: Treat as simple alias (A -> B)
@@ -1452,70 +1553,139 @@ package Affix::Wrap v1.0.9 {
             for my $node (@$nodes) {
                 if ( $node isa Affix::Wrap::Macro ) {
                     my $val = $resolve->( $node->name );
-                    if ( defined $val ) {
-                        $node->set_value($val);
+                    $node->set_value($val) if defined $val;
+                }
+            }
+        }
+
+        method _generate_code( $lib, $pkg ) {
+            Carp::croak("Affix::Wrap::generate/wrap requires a valid package name") unless defined $pkg && $pkg =~ /^[a-zA-Z_]\w*(::\w+)*$/;
+            my @nodes = $self->parse;
+            my %unique_types;
+            my %referenced_names;
+            for my $node (@nodes) {
+                if ( $node->can('name') && $node->name && $node->name ne '(anonymous)' ) {
+                    next if $node isa Affix::Wrap::Macro || $node isa Affix::Wrap::Function || $node isa Affix::Wrap::Variable;
+                    $unique_types{ $node->name } = $node;
+                }
+
+                # Collect dependencies from affix_type strings (e.g. '@sockaddr')
+                my $sig = eval { $node->affix . "" } // '';
+                while ( $sig =~ /@([a-zA-Z_]\w*)/g ) { $referenced_names{$1} = 1; }
+            }
+
+            # Atomic Engine Batch
+            my @fwd = sort keys %{ { map { $_ => 1 } ( keys %unique_types, keys %referenced_names ) } };
+            my @batch_lines;
+            for my $name ( sort keys %unique_types ) {
+                my $sig = $unique_types{$name}->affix_type;
+                push @batch_lines, "    typedef $name => $sig;" if $sig && $sig ne "$name()";
+            }
+            my $batch_str = @batch_lines ? join( "\n", @batch_lines ) . "\n" : "";
+
+            # Perl Module Construction
+            # Safely quote $lib: escape \ and ] within q[...] delimiters
+            my $_lib = '';
+            if ( defined $lib ) {
+                my $safe_lib = $lib;
+                $safe_lib =~ s/\\/\\\\/g;
+                $safe_lib =~ s/\]/\\]/g;
+                $_lib = "my \$lib = q[$safe_lib];";
+            }
+            my $out = <<~"PERL";
+            package $pkg {
+                use v5.40;
+                use Affix qw[:all];
+                #
+                $_lib
+            PERL
+            for my $name (@fwd) {
+                $out .= "    typedef '$name';\n";
+            }
+            $out .= $batch_str;
+            $out .= "\n    #\n";
+            for my $node (@nodes) {
+                $out .= "    " . $node->perl_constants . "\n" if $node isa Affix::Wrap::Enum;
+            }
+            $out .= "\n    #\n";
+            for my $node (@nodes) {
+                my $code = $node->affix_type;
+                if ( $code && ( $node isa Affix::Wrap::Function || $node isa Affix::Wrap::Variable || $node isa Affix::Wrap::Macro ) ) {
+                    $out .= "    $code;\n";
+                }
+            }
+            $out .= "};\n1;\n";
+        }
+
+        method generate( $lib, $pkg, $file ) {
+            my ( $code, $nodes ) = $self->_generate_code( $lib, $pkg );
+            Path::Tiny::path($file)->spew_utf8($code);
+        }
+
+        method wrap ( $lib, $pkg //= [caller]->[0] ) {
+            my ( $code, $nodes ) = $self->_generate_code( $lib, $pkg );
+            eval $code;
+            if ($@) {
+                Carp::croak("Affix::Wrap wrap() compilation failed: $@\n\nCode:\n$code");
+            }
+            return grep { $_ isa Affix::Wrap::Function || $_ isa Affix::Wrap::Variable || $_ isa Affix::Wrap::Macro } @$nodes;
+        }
+
+        method list_symbols ($lib_path) {
+            my $abs = path($lib_path)->absolute->stringify;
+            return [] unless -e $abs;
+            my @symbols;
+            my ( $out, $err, $exit );
+
+            # llvm-nm
+            # We use --extern-only to find the public API
+            ( $out, $err, $exit ) = capture { system( 'llvm-nm', '--extern-only', '--defined-only', $abs ) };
+            if ( $exit == 0 && $out ) {
+                for ( split /\n/, $out ) {
+                    if (/ [TRG] (?:_)?(\w+)$/) { push @symbols, $1; }
+                }
+            }
+
+            # objdump for Strawberry Perl
+            if ( !@symbols ) {
+                ( $out, $err, $exit ) = capture { system( 'objdump', '-p', $abs ) };
+                if ( $exit == 0 && $out ) {
+
+                    # objdump -p displays the "Export Address Table"
+                    # We look for the lines following the table header
+                    my $in_exports = 0;
+                    for ( split /\n/, $out ) {
+                        if (/^\[Ordinal\/Name Pointer\] Table$/) { $in_exports = 1; next; }
+                        if ($in_exports) {
+                            last if /^\s*$/;    # End of table
+
+                            # Format:[   0] lsquic_engine_new
+                            if (/\[\s*\d+\]\s+(\w+)/) { push @symbols, $1; }
+                        }
                     }
                 }
             }
-        }
 
-        method generate ( $lib, $pkg, $file ) {
-            my @nodes = $self->parse;
-            $self->_resolve_macros( \@nodes );
-            my $out =<<~"";
-            package $pkg {
-                use v5.36;
-                use Affix;
-                #
-                my \$lib = '$lib';
+            # dumpbin for MSVC
+            if ( !@symbols ) {
+                ( $out, $err, $exit ) = capture { system( 'dumpbin', '/EXPORTS', $abs ) };
+                if ( $exit == 0 && $out ) {
+                    my $in_exports = 0;
+                    for ( split /\n/, $out ) {
+                        if (/ordinal\s+hint\s+RVA\s+name/) { $in_exports = 1; next; }
+                        if ($in_exports) {
 
-            for my $name ( keys %$types ) {
-                my $type     = $types->{$name};
-                my $type_str = builtin::blessed($type) ? $type : "'$type'";    # Quote user types
-                $out .= "typedef '$name' => $type_str;\n";
-            }
-            for my $node (@nodes) {
-                if ( ( $node isa Affix::Wrap::Typedef || $node isa Affix::Wrap::Struct || $node isa Affix::Wrap::Enum ) &&
-                    exists $types->{ $node->name } ) {
-                    next;
-                }
-                my $code = $node->affix_type;
-                if ($code) { $out .= "$code;\n"; }
-            }
-            $out .= "\n};\n1;\n";
-            Path::Tiny::path($file)->spew_utf8($out);
-        }
-
-        method wrap ( $lib, $target //= [caller]->[0] ) {
-
-            # Pre-register User Types
-            # This ensures they are available in the Affix registry before signatures are parsed,
-            # and allows using them in recursive definitions or opaque handles.
-            for my $name ( keys %$types ) {
-                my $type     = $types->{$name};
-                my $type_str = builtin::blessed($type) ? $type : "$type";
-                Affix::typedef( $name, $type_str );
-            }
-            my @nodes = $self->parse;
-
-            #  Macro resolution pass
-            $self->_resolve_macros( \@nodes );
-
-            # Generation pass
-            my @installed;
-            for my $node (@nodes) {
-
-                # Skip definitions if the user provided a manual type override
-                if ( ( $node isa Affix::Wrap::Typedef || $node isa Affix::Wrap::Struct || $node isa Affix::Wrap::Enum ) &&
-                    exists $types->{ $node->name } ) {
-                    next;
-                }
-                if ( $node->can('affix') ) {
-                    $node->affix( $lib, $target );
-                    push @installed, $node;
+                            # Format: 1    0 00001234 lsquic_engine_new
+                            if (/^\s+\d+\s+[A-F0-9]+\s+[A-F0-9]+\s+(\w+)/) { push @symbols, $1; }
+                        }
+                    }
                 }
             }
-            @installed;
+            @symbols = sort @symbols;
+            if ( !@symbols ) {
+                warn "[!] list_symbols: No symbols found in $abs using llvm-nm, objdump, or dumpbin.\n";
+            }
+            return \@symbols;
         }
     }
 }

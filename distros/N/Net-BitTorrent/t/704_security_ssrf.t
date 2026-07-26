@@ -130,10 +130,15 @@ subtest resolve_and_pin => sub {
         is $ip,   '8.8.8.8', 'safe IPv4 passed through';
         is $port, 80,        'port preserved';
     };
-    is Net::BitTorrent::SSRF::resolve_and_pin( '127.0.0.1',                                  80 ), U(), 'loopback IP returns empty list';
-    is Net::BitTorrent::SSRF::resolve_and_pin( '192.168.1.1',                                80 ), U(), 'RFC 1918 IP returns empty list';
-    is Net::BitTorrent::SSRF::resolve_and_pin( '169.254.169.254',                            80 ), U(), 'cloud metadata IP returns empty list';
-    is Net::BitTorrent::SSRF::resolve_and_pin( 'fe80::1',                                    80 ), U(), 'IPv6 link-local returns empty list';
+    is Net::BitTorrent::SSRF::resolve_and_pin( '127.0.0.1',       80 ), U(), 'loopback IP returns empty list';
+    is Net::BitTorrent::SSRF::resolve_and_pin( '192.168.1.1',     80 ), U(), 'RFC 1918 IP returns empty list';
+    is Net::BitTorrent::SSRF::resolve_and_pin( '169.254.169.254', 80 ), U(), 'cloud metadata IP returns empty list';
+    is Net::BitTorrent::SSRF::resolve_and_pin( 'fe80::1',         80 ), U(), 'IPv6 link-local returns empty list';
+    my ( $dns_err, @dns_results )
+        = Socket::getaddrinfo( 'this-host-does-not-exist-12345.example.com', 80, { family => Socket::AF_UNSPEC, socktype => Socket::SOCK_STREAM } );
+    if (@dns_results) {
+        skip_all 'DNS resolved the test hostname; cannot test unresolvable case';
+    }
     is Net::BitTorrent::SSRF::resolve_and_pin( 'this-host-does-not-exist-12345.example.com', 80 ), U(), 'unresolvable hostname returns empty list';
 };
 #

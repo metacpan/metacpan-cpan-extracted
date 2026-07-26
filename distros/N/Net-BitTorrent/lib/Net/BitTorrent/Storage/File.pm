@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Storage::File v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Storage::File v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Digest::Merkle::SHA256;
     use Path::Tiny  qw();
     use Digest::SHA qw[sha256];

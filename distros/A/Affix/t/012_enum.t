@@ -1,7 +1,8 @@
 use v5.40;
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 #
 $|++;
 #
@@ -149,7 +150,7 @@ END_RAW
 
     package Other::Scope;
     use Affix;
-    use Test2::Tools::Affix qw[ok is];
+    use Test2::V0 qw[ok is];
 
     sub run_test {
         Affix::typedef( ScopedEnum => Affix::Enum( [ [ SCOPED_A => 99 ] ] ) );

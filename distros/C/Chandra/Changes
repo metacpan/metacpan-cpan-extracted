@@ -1,5 +1,11 @@
 Revision history for Chandra
 
+0.30 2026-07-25
+  - Chandra::App: document on_tick - a per-frame callback for games and
+    animations that switches run() to a non-blocking event loop
+  - Chandra::App: document on_close (window-close handler, e.g. for flushing
+    save state on exit) and on_reload (hot-reload callback).
+
 0.29 2026-07-08
   - xs/shortcut.xs: fix keyboard shortcuts broken by double injection after document.open().
 

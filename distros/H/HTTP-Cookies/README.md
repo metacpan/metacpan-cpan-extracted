@@ -4,7 +4,7 @@ HTTP::Cookies - HTTP cookie jars
 
 # VERSION
 
-version 6.11
+version 6.12
 
 # SYNOPSIS
 
@@ -84,7 +84,7 @@ The following methods are provided:
 - $cookie\_jar->get\_cookies( $url\_or\_domain )
 - $cookie\_jar->get\_cookies( $url\_or\_domain, $cookie\_key,... )
 
-    Returns a hash of the cookies that applies to the given URL. If a
+    Returns a reference to a hash of the cookies that apply to the given URL. If a
     domainname is given as argument, then a prefix of "https://" is assumed.
 
     If one or more $cookie\_key parameters are provided return the given values,

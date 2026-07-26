@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Scalar::Util qw(refaddr);
 
 BEGIN {
   eval { require Promise::XS; 1 }
@@ -160,6 +161,27 @@ subtest 'per-request cache dedupes and prime seeds it' => sub {
   is scalar @user_batches, 0, 'no batch needed when everything was primed';
 };
 
+subtest 'load preserves custom cache keys and disabled caching' => sub {
+  my $empty_key = GraphQL::Houtou::DataLoader->new(
+    cache_key => sub { '' },
+    batch => sub { return [ map { $_ } @{ $_[0] } ] },
+  );
+  my $first = $empty_key->load('first');
+  my $second = $empty_key->load('second');
+  is refaddr($second), refaddr($first), 'an empty custom cache key dedupes';
+  is $empty_key->pending_count, 1, 'deduped key is queued once';
+
+  my $uncached = GraphQL::Houtou::DataLoader->new(
+    cache => 0,
+    batch => sub { return [ map { $_ } @{ $_[0] } ] },
+  );
+  my $uncached_first = $uncached->load('same');
+  my $uncached_second = $uncached->load('same');
+  isnt refaddr($uncached_second), refaddr($uncached_first),
+    'disabled caching creates distinct tickets';
+  is $uncached->pending_count, 2, 'disabled caching queues both loads';
+};
+
 subtest 'per-key errors fail only that field' => sub {
   my $flaky = GraphQL::Houtou::DataLoader->new(batch => sub {
     my ($ids) = @_;
@@ -259,6 +281,125 @@ subtest 'load_many per-key failures land in the result array' => sub {
     'failed slot holds an Error object';
   like $got->[1]->message, qr/no such key: bad/, 'error carries the reason';
   is $got->[2], 'B', 'value after the failure';
+};
+
+subtest 'native ticket exposes a safe await contract' => sub {
+  my $ticket = GraphQL::Houtou::DataLoader::Ticket->new;
+  ok !$ticket->AWAIT_IS_READY, 'new ticket is pending';
+  eval { $ticket->AWAIT_GET };
+  like $@, qr/not ready/, 'pending value cannot be read';
+
+  my @notifications;
+  $ticket->_subscribe_native(
+    sub { push @notifications, [ resolved => $_[0] ] },
+    sub { push @notifications, [ rejected => $_[0] ] },
+  );
+  $ticket->_resolve('ready');
+  ok $ticket->AWAIT_IS_READY, 'resolved ticket is ready';
+  is $ticket->AWAIT_GET, 'ready', 'resolved value is available';
+  is_deeply \@notifications, [ [ resolved => 'ready' ] ],
+    'pending subscriber is notified once';
+  $ticket->_resolve('ignored');
+  is $ticket->AWAIT_GET, 'ready', 'settlement is idempotent';
+
+  my $rejected = GraphQL::Houtou::DataLoader::Ticket->new;
+  $rejected->_reject("ticket failed\n");
+  ok $rejected->AWAIT_IS_READY, 'rejected ticket is ready';
+  eval { $rejected->AWAIT_GET };
+  like $@, qr/ticket failed/, 'rejection is raised by AWAIT_GET';
+
+  my $then_value;
+  my $compatible = GraphQL::Houtou::DataLoader::Ticket->resolved('compatible');
+  ok $compatible->can('then'), 'ticket provides then';
+  ok $compatible->can('catch'), 'ticket provides catch';
+  ok $compatible->can('finally'), 'ticket provides finally';
+  ok $compatible->can('all'), 'ticket provides all';
+  ok $compatible->can('race'), 'ticket provides race';
+  $compatible->then(sub { $then_value = $_[0] });
+  is $then_value, 'compatible', 'public then compatibility remains usable';
+
+  my ($all_value, $race_value);
+  $compatible->all($compatible)->then(sub { $all_value = $_[0] });
+  $compatible->race($compatible)->then(sub { $race_value = $_[0] });
+  is_deeply $all_value, ['compatible'],
+    'public instance-style all compatibility remains usable';
+  is $race_value, 'compatible',
+    'public instance-style race compatibility remains usable';
+
+  my $caught;
+  my $public_rejected = GraphQL::Houtou::DataLoader::Ticket->new;
+  $public_rejected->catch(sub { $caught = $_[0] });
+  $public_rejected->_reject('public failure');
+  is $caught, 'public failure', 'public catch compatibility remains usable';
+
+  my $finalized = 0;
+  my $public_pending = GraphQL::Houtou::DataLoader::Ticket->new;
+  $public_pending->finally(sub { $finalized++ });
+  $public_pending->_resolve('public value');
+  is $finalized, 1, 'public finally compatibility remains usable';
+
+  my $flattened = GraphQL::Houtou::DataLoader::Ticket->new;
+  my $derived = $flattened->_subscribe(sub {
+    return GraphQL::Houtou::DataLoader::Ticket->resolved($_[0] . '-child');
+  }, undef);
+  $flattened->_resolve('parent');
+  is $derived->AWAIT_GET, 'parent-child', 'XS chain flattens a returned ticket';
+
+  my $promise_source = GraphQL::Houtou::DataLoader::Ticket->new;
+  my $promise_derived = $promise_source->_subscribe(sub {
+    return Promise::XS::resolved($_[0] . '-promise');
+  }, undef);
+  $promise_source->_resolve('parent');
+  is $promise_derived->AWAIT_GET, 'parent-promise',
+    'XS chain flattens a returned Promise::XS promise';
+
+  my $promise_rejection_source = GraphQL::Houtou::DataLoader::Ticket->new;
+  my $promise_rejection = $promise_rejection_source->_subscribe(sub {
+    return Promise::XS::rejected("nested promise failed\n");
+  }, undef);
+  $promise_rejection_source->_resolve('parent');
+  eval { $promise_rejection->AWAIT_GET };
+  like $@, qr/nested promise failed/,
+    'rejection from a returned Promise::XS promise propagates';
+
+  my $failed = GraphQL::Houtou::DataLoader::Ticket->new;
+  my $failed_chain = $failed->_subscribe(sub { die "callback failed\n" }, undef);
+  $failed->_resolve('value');
+  ok $failed_chain->AWAIT_IS_READY, 'callback failure settles the derived ticket';
+  eval { $failed_chain->AWAIT_GET };
+  like $@, qr/callback failed/, 'callback exception becomes a rejection';
+
+  my $recovered = GraphQL::Houtou::DataLoader::Ticket->new;
+  my $recovered_chain = $recovered->_subscribe(
+    undef, sub { return "recovered: $_[0]" },
+  );
+  $recovered->_reject('reason');
+  is $recovered_chain->AWAIT_GET, 'recovered: reason',
+    'reject callback can recover the chain';
+
+  my $self_source = GraphQL::Houtou::DataLoader::Ticket->new;
+  my $self_chain;
+  $self_chain = $self_source->_subscribe(sub { return $self_chain }, undef);
+  $self_source->_resolve('value');
+  ok $self_chain->AWAIT_IS_READY, 'self-resolution settles the derived ticket';
+  eval { $self_chain->AWAIT_GET };
+  like $@, qr/cannot resolve to itself/, 'self-resolution is rejected';
+};
+
+subtest 'cache hits and primed values return ready tickets' => sub {
+  my ($users) = make_loaders();
+  $users->prime('1', $USERS{1});
+  my $primed = $users->load('1');
+  ok $primed->AWAIT_IS_READY, 'prime creates a ready ticket';
+  is $primed->AWAIT_GET->{name}, 'alice', 'primed value is readable';
+
+  my $pending = $users->load('2');
+  ok !$pending->AWAIT_IS_READY, 'first uncached load is pending';
+  $users->dispatch;
+  ok $pending->AWAIT_IS_READY, 'dispatch settles the ticket';
+  is $users->load('2'), $pending, 'cache returns the same ticket';
+  is $users->load('2')->AWAIT_GET->{name}, 'bob',
+    'cache hit is immediately readable';
 };
 
 subtest 'load_many list form is deprecated but keeps working' => sub {

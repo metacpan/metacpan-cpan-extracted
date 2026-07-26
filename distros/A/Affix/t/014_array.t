@@ -2,7 +2,8 @@ use v5.40;
 use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0;
+use Affix qw[:all];
 #
 $|++;
 #
@@ -50,13 +51,12 @@ isa_ok my $sum_arr = wrap( $lib_path, 'sum_array_static', [ Array [ Int, 5 ] ] =
 is $sum_arr->( [ 1, 2, 3, 4, 5 ] ), 15, 'Fixed size array passed by value';
 #
 subtest 'Fixed Array Binary Safety' => sub {
-    my $ptr = calloc( 5, Int8 );                   # Allocate 5 bytes
-    my $mem = cast( $ptr, Array [ Int8, 5 ] );     # Write: "A \0 B \0 C"
-    $$mem = [ 65, 0, 66, 0, 67 ];                  # We can write using an array ref (slow path, verify write works)
-    my $view = cast( $ptr, Array [ Char, 5 ] );    # Now read it back as a char array (fast path)
+    my $ptr = calloc( 5, sizeof UInt8 );            # Allocate 5 bytes (binary safe)
+    my $mem = cast( $ptr, Array [ UInt8, 5 ] );     # vtbl_buffer
+    $$mem = pack "C*", 65, 0, 66, 0, 67;            # Assign binary string
+    my $view = cast( $ptr, Array [ UInt8, 5 ] );    # Read back (binary safe)
     my $data = $$view;
     is length($data), 5,         'Binary string has correct length (5)';
     is $data,         "A\0B\0C", 'Binary content preserved (nulls included)';
-    free($ptr);
 };
 done_testing;

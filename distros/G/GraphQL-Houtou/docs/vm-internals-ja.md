@@ -56,7 +56,7 @@ schema compile は、GraphQL 型定義を実行用の slot catalog に変換す�
 | `return_type_kind_code` | scalar/object/list/interface 等の種別 |
 | `item_non_null` | list item が non-null か |
 | `resolver_shape` | `DEFAULT` または `EXPLICIT` |
-| `resolver_mode` | `DEFAULT` または native resolver 契約の `NATIVE` |
+| `resolver_mode` | `DEFAULT`、`NATIVE`、`NATIVE_NO_ARGS`、または `NATIVE_ONE_ARG` |
 | `callback_abi_code` | resolver 呼び出し ABI |
 | `completion_family` | `GENERIC`、`OBJECT`、`LIST`、`ABSTRACT` |
 | `dispatch_family` | abstract type の dispatch 方法 |
@@ -137,7 +137,7 @@ compact block は5要素である。
 | 3 | block-local slot table |
 | 4 | op array |
 
-compact slot は14要素である。
+compact slot は15要素である。
 
 | index | 内容 |
 |---:|---|
@@ -155,6 +155,7 @@ compact slot は14要素である。
 | 11 | compact argument definitions |
 | 12 | callback ABI code |
 | 13 | `item_non_null` |
+| 14 | zero-argument accessor method name |
 
 compact op は21要素である。
 
@@ -308,9 +309,19 @@ schema と operation を分離する理由は、schema metadata と callback は
 |---:|---|---|
 | 1 | default | default resolver |
 | 2 | explicit generic | 通常の明示 resolver。lazy `info` 等を利用可能 |
-| 3 | explicit native | `resolver_mode => 'native'` の高速契約 |
+| 3 | explicit fast resolver | `resolver_mode => 'fast_resolve'` のHashRef契約 |
+| 4 | explicit fast no-args | `resolver_mode => 'fast_resolve_no_args'` の引数なし契約 |
+| 5 | explicit fast one-arg | `resolver_mode => 'fast_resolve_one_arg'` の1引数契約 |
 
 generic callback boundary は Perl API 互換のため source、args、context、lazy info を用意する。native mode は hot path 向けで、generic lazy-info ABI を要求しない resolver に限定される。
+公開APIではcode 3を`fast_resolve`、code 4を`fast_resolve_no_args`、code 5を
+`fast_resolve_one_arg`として指定する。`native*`表記は互換aliasとして残る。
+`fast_resolve_no_args` は argument を宣言しない field に限り、resolver を
+`($source, $context, $return_type)` で呼ぶ。空の args HashRef を request ごとに
+materialize しないため、狭い scalar field が多数ある query ほど効果が大きい。
+`fast_resolve_one_arg` は argument を1個だけ宣言する field に限り、resolver を
+`($source, $value, $context, $return_type)` で呼ぶ。特にdynamic argumentでは
+requestごとのargs HashRefを作らず、coerce済みvariable slotを直接渡す。
 
 ## 6. request-time 実行
 

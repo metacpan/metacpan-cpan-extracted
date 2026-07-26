@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
 	'URI' => 0,
 	'Scalar::Util' => 0
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Terse-Plugin-UA-*' },
 );

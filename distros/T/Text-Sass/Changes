@@ -1,5 +1,7 @@
 Changelog for Text-Sass
 
+1.1.0 - RT#80978 / RT#80927 fix: & includes don't work in nested blocks
+
 1.0.4 - support single-line comments from Konstantin Tokarev
 
 1.0.1 - support custom functions.

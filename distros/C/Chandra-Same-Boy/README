@@ -1,0 +1,34 @@
+Chandra-Same-Boy
+
+Play Game Boy and Game Boy Color games in a native Chandra window.
+
+Chandra::Same::Boy is a Chandra widget that renders a Same::Boy emulator to a
+canvas in a webview, with keyboard input, save states and battery-backed saves.
+Chandra::Same::Boy::App is a one-line wrapper around it.
+
+This is the 0.01 structural release: construction, ROM/cartridge handling and
+the non-visual controls are functional; the canvas, input and game loop
+(mount) are implemented in subsequent phases. See plan/chandra-same-boy/.
+
+SYNOPSIS
+
+    use Chandra::Same::Boy::App;
+    Chandra::Same::Boy::App->new(rom => 'game.gbc', scale => 3)->run;
+
+    # or from the shell
+    chandra-same-boy game.gbc --scale 3
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Requires Chandra (>= 0.29) and Same::Boy (>= 0.02). Cartridge ROMs are supplied
+by you and are not included.
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION and is free software, licensed
+under the Artistic License 2.0.

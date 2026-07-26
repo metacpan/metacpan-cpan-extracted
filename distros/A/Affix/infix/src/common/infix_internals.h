@@ -271,6 +271,8 @@ typedef enum {
     ARG_LOCATION_INTEGER_SSE_PAIR,
     /** @brief (SysV x64) A struct split between an SSE and a GPR register. */
     ARG_LOCATION_SSE_INTEGER_PAIR,
+    /** @brief (x64) A large aggregate (> 16 bytes) passed by reference; the pointer is in a GPR. */
+    ARG_LOCATION_GPR_REFERENCE,
 #endif
     /** @brief Argument is passed on the stack. */
     ARG_LOCATION_STACK

@@ -5,7 +5,7 @@ use warnings;
 use Object::Proto;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Chandra;
 

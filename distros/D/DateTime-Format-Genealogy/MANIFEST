@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/DateTime/Format/Genealogy.pm
 LICENSE
 Makefile.PL
@@ -14,10 +15,15 @@ t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/date.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
 t/error.t
+t/extended_tests.t
+t/function.t
+t/integration.t
 t/links.t
+t/locales.t
 t/no404s.t
 t/noopentickets.t
 t/pod-cm.t
@@ -26,6 +32,7 @@ t/pod-synopsis.t
 t/pod.t
 t/prereq.t
 t/snippets.t
+t/unit.t
 t/unused.t
 t/vars.t
 t/version.t

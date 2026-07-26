@@ -268,6 +268,15 @@ Returns a list of all active torrents.
 
 This method returns an array reference containing all currently managed L<Net::BitTorrent::Torrent> objects.
 
+=head2 C<torrents_hash( )>
+
+Returns the internal torrents hash.
+
+    my $hash = $client->torrents_hash;
+
+This method returns a hash reference where keys are hex infohashes (SHA-1 for v1, SHA-256 for v2) and values are the
+corresponding L<Net::BitTorrent::Torrent> objects. This is useful for fast lookups by infohash.
+
 =head2 C<finished( )>
 
 Returns a list of completed torrents.

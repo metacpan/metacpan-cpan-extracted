@@ -250,6 +250,17 @@ my $list = $client->torrents( );
 
 This method returns an array reference containing all currently managed [Net::BitTorrent::Torrent](https://metacpan.org/pod/Net%3A%3ABitTorrent%3A%3ATorrent) objects.
 
+## `torrents_hash( )`
+
+Returns the internal torrents hash.
+
+```perl
+my $hash = $client->torrents_hash;
+```
+
+This method returns a hash reference where keys are hex infohashes (SHA-1 for v1, SHA-256 for v2) and values are the
+corresponding [Net::BitTorrent::Torrent](https://metacpan.org/pod/Net%3A%3ABitTorrent%3A%3ATorrent) objects. This is useful for fast lookups by infohash.
+
 ## `finished( )`
 
 Returns a list of completed torrents.

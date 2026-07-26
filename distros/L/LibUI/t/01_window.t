@@ -1,30 +1,17 @@
 use strict;
 use Test::More 0.98;
-use lib './t/lib', './lib';
+use lib './t/lib', './lib', '../lib';
 use t::Display;
-use lib '../lib';
 use LibUI ':all';
-use LibUI::Window;
+#
 t::Display::needs_display();
-Init() && die;
-my $window = LibUI::Window->new( 'Hi', 320, 100, 0 );
-isa_ok $window, 'LibUI::Window';
-$window->onClosing(
-    sub {
-        diag 'Window cloased manually';
-        Quit();
-        return 1;
-    },
-    undef
-);
-ok !$window->show, '->show';
-Timer(
-    100,
-    sub {
-        pass 'Timer triggered! Quitting...';
-        Quit;
-    },
-    undef
-);
-Main();
-done_testing
+uiInit( { Size => 0 } ) && die;
+#
+pass 'post Init()';
+ok my $window = uiNewWindow( 'Hi', 320, 100, 0 ), q[uiNewWindow( 'Hi', 320, 100, 0 )];
+ok !uiControlShow($window),                       'uiControlShow($window)';
+uiTimer( 100, sub { uiQuit(); }, undef );
+uiMain();
+pass 'uiMain() returned cleanly';
+#
+done_testing;

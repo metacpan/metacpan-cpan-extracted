@@ -407,6 +407,7 @@ sub _inflate_slot {
     schema_slot_index => $struct->{schema_slot_index},
     field_name => $struct->{field_name},
     result_name => $struct->{result_name},
+    accessor => $struct->{accessor},
     return_type_name => $struct->{return_type_name},
     resolver_shape => $struct->{resolver_shape},
     resolver_mode => $struct->{resolver_mode},
@@ -447,19 +448,69 @@ sub _build_slots_for_object {
   for my $field_name (sort keys %$fields) {
     my $field = $fields->{$field_name} || {};
     my $return_type = $field->{type};
+    my $resolver_mode = $field->{resolver_mode} || q();
     my $wrapped = slot_needs_runtime_wrapper(
       schema => $schema,
       field => $field,
     );
+    if ($resolver_mode ne q()
+        && !grep { $resolver_mode eq $_ } qw(
+          native native_args native_no_args native_one_arg
+          fast_resolve fast_resolve_no_args fast_resolve_one_arg
+        )) {
+      die "unknown resolver_mode '$resolver_mode'"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    if (($resolver_mode eq 'native_no_args'
+          || $resolver_mode eq 'fast_resolve_no_args')
+        && $field->{args}
+        && keys %{ $field->{args} }) {
+      die "resolver_mode '" . $field->{resolver_mode}
+        . "' requires a field without arguments"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    if (($resolver_mode eq 'native_one_arg'
+          || $resolver_mode eq 'fast_resolve_one_arg')
+        && (!$field->{args} || keys(%{ $field->{args} }) != 1)) {
+      die "resolver_mode '" . $field->{resolver_mode}
+        . "' requires exactly one argument"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    if (defined $field->{accessor}
+        && (ref($field->{accessor}) || $field->{accessor} eq q())) {
+      die "accessor requires a non-empty method name"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    if (defined $field->{accessor} && $field->{resolve}) {
+      die "accessor and resolve cannot both be specified"
+        . " (" . $type->name . ".$field_name)\n";
+    }
+    if (defined $field->{accessor}
+        && $field->{args}
+        && keys %{ $field->{args} }) {
+      die "accessor requires a field without arguments"
+        . " (" . $type->name . ".$field_name)\n";
+    }
     push @slots, GraphQL::Houtou::Runtime::Slot->new(
       schema_slot_key => join(q(.), $type->name, $field_name),
       field_name => $field_name,
       result_name => $field_name,
+      accessor => $field->{accessor},
       return_type_name => _type_name($return_type),
       resolver_shape => ($field->{resolve} || $wrapped) ? 'EXPLICIT' : 'DEFAULT',
       resolver_mode => $wrapped
         ? 'DEFAULT'
-        : (($field->{resolver_mode} || q()) eq 'native' ? 'NATIVE' : 'DEFAULT'),
+        : (($resolver_mode eq 'native_one_arg'
+            || $resolver_mode eq 'fast_resolve_one_arg')
+          ? 'NATIVE_ONE_ARG'
+          : (($resolver_mode eq 'native_no_args'
+              || $resolver_mode eq 'fast_resolve_no_args')
+            ? 'NATIVE_NO_ARGS'
+            : (($resolver_mode eq 'native'
+                || $resolver_mode eq 'native_args'
+                || $resolver_mode eq 'fast_resolve')
+              ? 'NATIVE'
+              : 'DEFAULT'))),
       completion_family => _completion_family_for_type($return_type),
       dispatch_family => _dispatch_family_for_type($return_type),
       arg_defs_compact => _build_input_defs_compact($field->{args} || {}),

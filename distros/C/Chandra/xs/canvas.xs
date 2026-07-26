@@ -788,9 +788,70 @@ CODE:
 OUTPUT:
     RETVAL
 
-void
-flush(self)
+ # ---- on_click($app, $callback) — left-click → callback($x_px, $y_px) ----
+
+SV *
+on_click(self, app, callback)
     SV *self
+    SV *app
+    SV *callback
+CODE:
+{
+    HV *self_hv = (HV *)SvRV(self);
+    SV **id_svp = hv_fetchs(self_hv, "id", 0);
+    const char *id = (id_svp && SvPOK(*id_svp)) ? SvPV_nolen(*id_svp) : "_canvas_1";
+    SV *bname = newSVpvf("__canvas_click_%s", id);
+
+    (void)hv_stores(self_hv, "_has_click", newSViv(1));
+
+    {
+        dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+        XPUSHs(app);
+        XPUSHs(sv_2mortal(bname));
+        XPUSHs(callback);
+        PUTBACK;
+        call_method("bind", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+ # ---- on_rclick($app, $callback) — right-click → callback($x_px, $y_px) ----
+
+SV *
+on_rclick(self, app, callback)
+    SV *self
+    SV *app
+    SV *callback
+CODE:
+{
+    HV *self_hv = (HV *)SvRV(self);
+    SV **id_svp = hv_fetchs(self_hv, "id", 0);
+    const char *id = (id_svp && SvPOK(*id_svp)) ? SvPV_nolen(*id_svp) : "_canvas_1";
+    SV *bname = newSVpvf("__canvas_rclick_%s", id);
+
+    (void)hv_stores(self_hv, "_has_click", newSViv(1));
+
+    {
+        dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+        XPUSHs(app);
+        XPUSHs(sv_2mortal(bname));
+        XPUSHs(callback);
+        PUTBACK;
+        call_method("bind", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+void
+flush(self, app)
+    SV *self
+    SV *app
 PPCODE:
 {
     HV *self_hv = (HV *)SvRV(self);
@@ -801,10 +862,10 @@ PPCODE:
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpvs("Chandra")));
+    XPUSHs(app);
     XPUSHs(sv_2mortal(js));
     PUTBACK;
-    call_method("eval_js", G_DISCARD);
+    call_method("eval", G_DISCARD);
     FREETMPS;
     LEAVE;
 

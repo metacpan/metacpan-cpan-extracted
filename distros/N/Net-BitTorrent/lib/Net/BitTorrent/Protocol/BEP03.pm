@@ -3,7 +3,7 @@ use feature 'class';
 no warnings 'experimental::class';
 #
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Protocol::BEP03 v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Protocol::BEP03 v2.1.1 : isa(Net::BitTorrent::Emitter) {
     #
     field $infohash : param = undef;
     field $peer_id  : param : reader;
@@ -68,7 +68,13 @@ class Net::BitTorrent::Protocol::BEP03 v2.1.0 : isa(Net::BitTorrent::Emitter) {
     field $processing = 0;
 
     method receive_data ($data) {
+        return if $state eq 'CLOSED';
         $buffer_in .= $data;
+        if ( length($buffer_in) > MAX_MESSAGE_SIZE + 65536 ) {
+            $state = 'CLOSED';
+            $self->_emit_log( 'fatal', 'Inbound buffer exceeded hard limit, disconnecting' );
+            return;
+        }
         return if $processing;
         $processing = 1;
         try { $self->_process_buffer(); }

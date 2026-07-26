@@ -1,5 +1,8 @@
 package Terse::Plugin::Headers;
 
+use strict;
+use warnings;
+
 use base 'Terse::Plugin';
 
 sub build_plugin {
@@ -36,7 +39,7 @@ Terse::Plugin::Headers - Terse headers
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

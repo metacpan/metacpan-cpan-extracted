@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.1] - 2026-07-25
+
+Minor release that's just a pinch of sugar for client authoring.
+
+### Added
+
+- `torrents_hash()` method for fast lookups by infohash
+- `magnet_uri()` method to construct magnet URIs from infohash, name, and tracker list (returns `undef` for private torrents)
+- `speed_down()`, `speed_up()`, `num_peers()`, `num_seeds()`, `total_size()`, `bytes_downloaded()`, `bytes_uploaded()`, `bytes_left()` methods on Torrent
+- `connected()` method on Peer to check if the connection is still alive
+- `metadata_received` event emitted after metadata is fully received and before transitioning to `STATE_RUNNING`
+- Fallback DHT peer dispatch to torrents in `METADATA` state when no explicit `queried_target` match is found
+- V2 infohash support in state persistence (accepts 40 or 64 hex chars)
+- Smoothed value for `speed_down()` and `speed_up()` (α=0.3)
+- `tick()` now processes 15 peers per cycle instead of all peers at once, reducing CPU spikes and improving UI responsiveness
+
+### Changed
+
+- Tick slice reduced from 0.1s to 0.025s and maximum blocking time reduced from 200ms to 50ms for snappier UI
+- Immediately checks all connected peers for interest after transitioning from `METADATA` to `RUNNING` (catches peers that sent `HAVE_ALL` before we had a bitfield)
+- DHT `tick()` now uses non-blocking `can_read(0)` since `_run_one_tick` already reads the socket
+- State persistence uses `JSON::PP` canonical mode (`->canonical`) and `Digest::SHA` for the integrity checksum instead of raw `encode_json` + `sha1`
+- Torrent `dump_state` validates metadata structure before saving (requires `piece length` > 0, `name`, and either `pieces` or `file tree`)
+- Torrent `load_state` validates metadata structure before applying (requires non-empty hash with `piece length` > 0 and `name`)
+- BEP10 `send_ext_handshake` now guards against undefined `metadata_size` before sending
+- `_request_metadata` refactored to block-style conditionals for clarity
+- Removed broken `$read_buffer_size` counter in TCP transport (was unreachable; BEP03 buffer cap provides the real defense)
+- [Some](https://www.cpantesters.org/cpan/report/4fed0e74-83bf-11f1-a5f3-44496e8775ea) [smokers](https://www.cpantesters.org/cpan/report/c1290b22-8407-11f1-b2a2-34ec6d8775ea) [were](https://www.cpantesters.org/cpan/report/88ad0b56-83bf-11f1-a5f3-44496e8775ea) [resolving](https://www.cpantesters.org/cpan/report/5d1456b6-83bf-11f1-a5f3-44496e8775ea) `this-host-does-not-exist-12345.example.com` as valid in our SSRF unit tests. My best guess is wildcard-resolving DNS servers?
+
+### Fixed
+
+- Hard cap on BEP03 inbound buffer (`MAX_MESSAGE_SIZE + 65536`) to prevent accumulation from peers sending slow-arriving large messages
+- `receive_data()` now returns immediately when state is `CLOSED` so we aren't dealing with data left in the pipe
+- PEX peers now validated against SSRF policy (`is_safe_ip()`) before being added to the peer list
+- Metadata piece data size validation: non-final pieces must be exactly 16384 bytes, final piece must not exceed expected remainder
+- `SUGGEST_PIECE` and `ALLOWED_FAST` now validate piece index is within range before accepting
+- `ut_holepunch` messages with empty payloads are rejected
+- `HASH_REQUEST` and `HASHES` handlers now validate root length, base layer, and length before writing to Merkle tree
+- `HASHES` handler validates hash count against claimed `$length` field
+- `BITFIELD` message now validates payload length matches `ceil(num_pieces / 8)`
+- `PIECE` message now validates `$begin + data_length <= piece_length` before processing
+- BEP09 `ut_metadata` now validates `piece` and `total_size` are non-negative integers before emitting events
+
 ## [v2.1.0] - 2026-07-19
 
 ### Fixed
@@ -56,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Net::BitTorrent::Torrent::DESTROY` disconnects peers and clears all data structures on garbage collection
 
 ### Changed
-- Peer reputation blacklist threshold lowered from 50 to 20; `adjust_reputation` now caps at 0–100 and is a no-op after disconnect
+- Peer reputation blacklist threshold lowered from 50 to 20; `adjust_reputation` now caps at 0-100 and is a no-op after disconnect
 - `Net::BitTorrent::Emitter` weakens `$parent_emitter` via `builtin::weaken` to break `Torrent->Peer->Emitter->Torrent` reference cycles causing memory leaks (I hope)
 - Endgame mode now enters on a 60-second stall (no piece verification) in addition to the existing piece-count triggers
 - Endgame duplicate request cancellation: when a block arrives, all other peers' inflight requests for that same block are immediately cancelled
@@ -391,7 +434,8 @@ This is a documentation update.  100% coverage.
 - It actually exists
 - See above
 
-[Unreleased]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.1.1...HEAD
+[v2.1.1]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.1.0...v2.1.1
 [v2.1.0]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.0.1...v2.1.0
 [v2.0.1]: https://github.com/sanko/Net-BitTorrent.pm/compare/v2.0.0...v2.0.1
 [v2.0.0]: https://github.com/sanko/Net-BitTorrent.pm/compare/0.052...v2.0.0

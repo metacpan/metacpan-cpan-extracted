@@ -38,6 +38,8 @@ reference.
 - [`module-map.md`](module-map.md) — ownership and responsibility by module.
 - [`vm-internals-ja.md`](vm-internals-ja.md) — VM opcodes, frames, values, and
   execution lanes.
+- [`sync-first-execution-design-ja.md`](sync-first-execution-design-ja.md) —
+  active design for running the sync VM until an actual suspension boundary.
 - [`parser-internals.md`](parser-internals.md) — tokenizer/parser ownership and
   AST construction.
 - [`evolution-and-performance.md`](evolution-and-performance.md) — rationale

@@ -71,7 +71,7 @@ my $timer = IO::Async::Timer::Periodic->new(
         add_to_frontier( $dht->routing_table->find_closest( $info_hash, 50 ) );
 
         # Prioritize closest unvisited candidates
-        my @unvisited = sort { ( $a->{id} ^.$info_hash ) cmp( $b->{id} ^.$info_hash ) } grep { $_->{visited} == 0 && $_->{ip} } values %candidates;
+        my @unvisited = sort { ( $a->{id} ^.$info_hash ) cmp ( $b->{id} ^.$info_hash ) } grep { $_->{visited} == 0 && $_->{ip} } values %candidates;
         if (@unvisited) {
             my $batch_size = 12;
             my @batch      = splice( @unvisited, 0, $batch_size );

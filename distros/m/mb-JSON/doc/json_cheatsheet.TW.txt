@@ -44,6 +44,8 @@
 
 [ 9. UTF-8 字元原樣輸出（不轉義為 \uXXXX）]
   encode({"name"=>"田中"}) -> '{"name":"田中"}'
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
 
 [ 10. 範例 ]
   my $h = mb::JSON::decode('{"name":"田中","age":30}');

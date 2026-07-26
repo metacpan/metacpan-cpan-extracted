@@ -15,7 +15,7 @@ sub _init_table {
 #
 _init_table();
 #
-class Net::BitTorrent::DHT::Security v2.1.0 {
+class Net::BitTorrent::DHT::Security v2.1.1 {
     use Socket qw[inet_aton inet_pton AF_INET AF_INET6];
     use Crypt::URandom qw[urandom];
 

@@ -3,7 +3,7 @@ use feature 'class';
 no warnings 'experimental::class';
 #
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Torrent::PiecePicker v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Torrent::PiecePicker v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Acme::Selection::RarestFirst;
     use Net::BitTorrent::Types qw[:pick];
     field $bitfield : param;

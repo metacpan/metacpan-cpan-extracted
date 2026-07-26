@@ -1,0 +1,15 @@
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+\bblib/
+^pm_to_blib$
+\.o$
+\.bs$
+\.bundle$
+^Boy\.c$
+^Same-Boy-
+\.tar\.gz$
+^\.git
+^tools/.*\.tmp$
+# Never ship ROMs: commercial ROMs are copyrighted. Tests build their own.
+^test_roms/

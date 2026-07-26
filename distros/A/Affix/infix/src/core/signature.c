@@ -449,6 +449,30 @@ static infix_type * parse_packed_struct(parser_state * state) {
         return nullptr;
     return packed_type;
 }
+/**
+ * @internal
+ * @brief Helper to preserve the semantic name of C-style primitive aliases.
+ * @param state The parser's state.
+ * @param id The primitive type id.
+ * @param name The string the user used to describe this type.
+ */
+static infix_type * _create_named_primitive(parser_state * state, infix_primitive_type_id id, const char * name) {
+    infix_type * t = infix_arena_calloc(state->arena, 1, sizeof(infix_type), _Alignof(infix_type));
+    if (!t)
+        return nullptr;
+
+    *t = *infix_type_create_primitive(id);
+    t->is_arena_allocated = true;
+    t->arena = state->arena;
+
+    size_t len = strlen(name) + 1;
+    char * arena_name = infix_arena_alloc(state->arena, len, 1);
+    if (arena_name) {
+        infix_memcpy(arena_name, name, len);
+        t->name = arena_name;
+    }
+    return t;
+}
 // Main Parser Logic
 /**
  * @internal
@@ -524,13 +548,16 @@ INFIX_INTERNAL infix_type * parse_primitive(parser_state * state) {
         return infix_type_create_primitive(sizeof(size_t) == 8 ? INFIX_PRIMITIVE_UINT64 : INFIX_PRIMITIVE_UINT32);
     if (consume_keyword(state, "ssize_t"))
         return infix_type_create_primitive(sizeof(ssize_t) == 8 ? INFIX_PRIMITIVE_SINT64 : INFIX_PRIMITIVE_SINT32);
-    // uchar.h types
+    // Explicit Character Types
     if (consume_keyword(state, "char8_t"))
-        return infix_type_create_primitive(INFIX_PRIMITIVE_UINT8);
+        return _create_named_primitive(state, INFIX_PRIMITIVE_UINT8, "char8_t");
     if (consume_keyword(state, "char16_t"))
-        return infix_type_create_primitive(INFIX_PRIMITIVE_UINT16);
+        return _create_named_primitive(state, INFIX_PRIMITIVE_UINT16, "char16_t");
     if (consume_keyword(state, "char32_t"))
-        return infix_type_create_primitive(INFIX_PRIMITIVE_UINT32);
+        return _create_named_primitive(state, INFIX_PRIMITIVE_UINT32, "char32_t");
+    if (consume_keyword(state, "wchar_t"))
+        return _create_named_primitive(
+            state, sizeof(wchar_t) == 2 ? INFIX_PRIMITIVE_UINT16 : INFIX_PRIMITIVE_SINT32, "wchar_t");
     // AVX convenience aliases
     if (consume_keyword(state, "m256d")) {
         infix_type * type = nullptr;
@@ -1262,7 +1289,12 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
     }
     // If the type has a semantic name, always prefer printing it.
     if (type->name) {
-        _print(state, "@%s", type->name);
+        // Only prepend '@' if it is an aggregate or named reference.
+        // Primitives like WChar or aliases like size_t should not get '@'.
+        if (type->category == INFIX_TYPE_PRIMITIVE || type->category == INFIX_TYPE_VOID)
+            _print(state, "%s", type->name);
+        else
+            _print(state, "@%s", type->name);
         return;
     }
     switch (type->category) {
@@ -1458,6 +1490,63 @@ static void _infix_type_print_itanium_recursive(printer_state * state, const inf
         return;
     }
 
+    // These built-in types must ALWAYS use ABI codes, ignoring any name aliases.
+    if (type->category == INFIX_TYPE_VOID) {
+        _print(state, "v");
+        return;
+    }
+
+    if (type->category == INFIX_TYPE_PRIMITIVE) {
+        switch (type->meta.primitive_id) {
+        case INFIX_PRIMITIVE_BOOL:
+            _print(state, "b");
+            return;
+        case INFIX_PRIMITIVE_SINT8:  // signed char
+            _print(state, "a");
+            return;
+        case INFIX_PRIMITIVE_UINT8:  // unsigned char
+            _print(state, "h");
+            return;
+        case INFIX_PRIMITIVE_SINT16:  // short
+            _print(state, "s");
+            return;
+        case INFIX_PRIMITIVE_UINT16:  // unsigned short
+            _print(state, "t");
+            return;
+        case INFIX_PRIMITIVE_SINT32:  // int
+            _print(state, "i");
+            return;
+        case INFIX_PRIMITIVE_UINT32:  // unsigned int
+            _print(state, "j");
+            return;
+        case INFIX_PRIMITIVE_SINT64:  // long long
+            _print(state, "x");
+            return;
+        case INFIX_PRIMITIVE_UINT64:  // unsigned long long
+            _print(state, "y");
+            return;
+        case INFIX_PRIMITIVE_SINT128:  // __int128
+            _print(state, "n");
+            return;
+        case INFIX_PRIMITIVE_UINT128:  // unsigned __int128
+            _print(state, "o");
+            return;
+        case INFIX_PRIMITIVE_FLOAT16:  // half-precision float (IEEE 754)
+            _print(state, "Dh");
+            return;
+        case INFIX_PRIMITIVE_FLOAT:
+            _print(state, "f");
+            return;
+        case INFIX_PRIMITIVE_DOUBLE:
+            _print(state, "d");
+            return;
+        case INFIX_PRIMITIVE_LONG_DOUBLE:
+            _print(state, "e");
+            return;
+        }
+    }
+
+    // Substitutions. Check if this complex type (Pointer/Struct) was already seen.
     size_t sub_index;
     bool is_builtin = (type->category == INFIX_TYPE_VOID || type->category == INFIX_TYPE_PRIMITIVE);
 
@@ -1466,63 +1555,12 @@ static void _infix_type_print_itanium_recursive(printer_state * state, const inf
         return;
     }
 
+    // Complex types
     switch (type->category) {
-    case INFIX_TYPE_VOID:
-        _print(state, "v");
-        break;
     case INFIX_TYPE_POINTER:
         _print(state, "P");
         _infix_type_print_itanium_recursive(state, type->meta.pointer_info.pointee_type);
         _add_itanium_sub(state, type);
-        break;
-    case INFIX_TYPE_PRIMITIVE:
-        switch (type->meta.primitive_id) {
-        case INFIX_PRIMITIVE_BOOL:
-            _print(state, "b");
-            break;
-        case INFIX_PRIMITIVE_SINT8:
-            _print(state, "a");
-            break;  // signed char
-        case INFIX_PRIMITIVE_UINT8:
-            _print(state, "h");
-            break;  // unsigned char
-        case INFIX_PRIMITIVE_SINT16:
-            _print(state, "s");
-            break;  // short
-        case INFIX_PRIMITIVE_UINT16:
-            _print(state, "t");
-            break;  // unsigned short
-        case INFIX_PRIMITIVE_SINT32:
-            _print(state, "i");
-            break;  // int
-        case INFIX_PRIMITIVE_UINT32:
-            _print(state, "j");
-            break;  // unsigned int
-        case INFIX_PRIMITIVE_SINT64:
-            _print(state, "x");
-            break;  // long long
-        case INFIX_PRIMITIVE_UINT64:
-            _print(state, "y");
-            break;  // unsigned long long
-        case INFIX_PRIMITIVE_SINT128:
-            _print(state, "n");
-            break;  // __int128
-        case INFIX_PRIMITIVE_UINT128:
-            _print(state, "o");
-            break;  // unsigned __int128
-        case INFIX_PRIMITIVE_FLOAT16:
-            _print(state, "Dh");
-            break;  // half-precision float (IEEE 754)
-        case INFIX_PRIMITIVE_FLOAT:
-            _print(state, "f");
-            break;
-        case INFIX_PRIMITIVE_DOUBLE:
-            _print(state, "d");
-            break;
-        case INFIX_PRIMITIVE_LONG_DOUBLE:
-            _print(state, "e");
-            break;
-        }
         break;
     case INFIX_TYPE_NAMED_REFERENCE:
         {
@@ -1610,11 +1648,66 @@ static void _infix_type_print_msvc_recursive(printer_state * state, const infix_
         return;
     }
 
+    // Built-in types: Use MSVC ABI codes immediately.
+    if (type->category == INFIX_TYPE_VOID) {
+        _print(state, "X");
+        return;
+    }
+
+    if (type->category == INFIX_TYPE_PRIMITIVE) {
+        switch (type->meta.primitive_id) {
+        case INFIX_PRIMITIVE_BOOL:
+            _print(state, "_N");
+            return;
+        case INFIX_PRIMITIVE_SINT8:
+            _print(state, "C");
+            return;
+        case INFIX_PRIMITIVE_UINT8:
+            _print(state, "E");
+            return;
+        case INFIX_PRIMITIVE_SINT16:
+            _print(state, "F");
+            return;
+        case INFIX_PRIMITIVE_UINT16:
+            _print(state, "G");
+            return;
+        case INFIX_PRIMITIVE_SINT32:
+            _print(state, "H");
+            return;
+        case INFIX_PRIMITIVE_UINT32:
+            _print(state, "I");
+            return;
+        case INFIX_PRIMITIVE_SINT64:
+            _print(state, "_J");
+            return;
+        case INFIX_PRIMITIVE_UINT64:
+            _print(state, "_K");
+            return;
+        case INFIX_PRIMITIVE_SINT128:
+            _print(state, "_L");
+            return;
+        case INFIX_PRIMITIVE_UINT128:
+            _print(state, "_M");
+            return;
+        case INFIX_PRIMITIVE_FLOAT16:
+            _print(state, "_T");
+            return;
+        case INFIX_PRIMITIVE_FLOAT:
+            _print(state, "M");
+            return;
+        case INFIX_PRIMITIVE_DOUBLE:
+            _print(state, "N");
+            return;
+        case INFIX_PRIMITIVE_LONG_DOUBLE:
+            _print(state, "O");
+            return;
+        }
+    }
+
     // Check for type back-references (0-9)
     // MSVC only back-references complex types or pointers to them.
-    bool can_backref =
-        (type->category == INFIX_TYPE_POINTER || type->category == INFIX_TYPE_STRUCT ||
-         type->category == INFIX_TYPE_UNION || type->category == INFIX_TYPE_ENUM || type->name != nullptr);
+    bool can_backref = (type->category == INFIX_TYPE_POINTER || type->category == INFIX_TYPE_STRUCT ||
+                        type->category == INFIX_TYPE_UNION || type->category == INFIX_TYPE_ENUM);
 
     if (can_backref) {
         for (size_t i = 0; i < state->msvc_type_count; i++) {
@@ -1683,9 +1776,6 @@ static void _infix_type_print_msvc_recursive(printer_state * state, const infix_
     }
 
     switch (type->category) {
-    case INFIX_TYPE_VOID:
-        _print(state, "X");
-        break;
     case INFIX_TYPE_POINTER:
         // Standard MSVC pointer encoding for x64:
         // P = Pointer
@@ -1712,55 +1802,6 @@ static void _infix_type_print_msvc_recursive(printer_state * state, const infix_
         _print(state, "@Z");
         if (can_backref && state->msvc_type_count < 10)
             state->msvc_types[state->msvc_type_count++] = type;
-        break;
-    case INFIX_TYPE_PRIMITIVE:
-        switch (type->meta.primitive_id) {
-        case INFIX_PRIMITIVE_BOOL:
-            _print(state, "_N");
-            break;
-        case INFIX_PRIMITIVE_SINT8:
-            _print(state, "C");
-            break;
-        case INFIX_PRIMITIVE_UINT8:
-            _print(state, "E");
-            break;
-        case INFIX_PRIMITIVE_SINT16:
-            _print(state, "F");
-            break;
-        case INFIX_PRIMITIVE_UINT16:
-            _print(state, "G");
-            break;
-        case INFIX_PRIMITIVE_SINT32:
-            _print(state, "H");
-            break;
-        case INFIX_PRIMITIVE_UINT32:
-            _print(state, "I");
-            break;
-        case INFIX_PRIMITIVE_SINT64:
-            _print(state, "_J");
-            break;
-        case INFIX_PRIMITIVE_UINT64:
-            _print(state, "_K");
-            break;
-        case INFIX_PRIMITIVE_SINT128:
-            _print(state, "_L");
-            break;
-        case INFIX_PRIMITIVE_UINT128:
-            _print(state, "_M");
-            break;
-        case INFIX_PRIMITIVE_FLOAT16:
-            _print(state, "_T");
-            break;
-        case INFIX_PRIMITIVE_FLOAT:
-            _print(state, "M");
-            break;
-        case INFIX_PRIMITIVE_DOUBLE:
-            _print(state, "N");
-            break;
-        case INFIX_PRIMITIVE_LONG_DOUBLE:
-            _print(state, "O");
-            break;
-        }
         break;
     case INFIX_TYPE_COMPLEX:
         // MSVC doesn't have a built-in complex type, it uses structs.

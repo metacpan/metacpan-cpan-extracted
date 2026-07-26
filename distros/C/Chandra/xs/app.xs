@@ -153,6 +153,23 @@ CODE:
 OUTPUT:
     RETVAL
 
+ # ---- on_tick($coderef) - register a game/animation tick callback ----
+
+SV *
+on_tick(self, callback)
+    SV *self
+    SV *callback
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **old = hv_fetchs(hv, "_tick_cb", 0);
+    if (old && SvOK(*old)) SvREFCNT_dec(*old);
+    (void)hv_stores(hv, "_tick_cb", SvREFCNT_inc(callback));
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
  # ---- route($path, $handler, %opts) ----
 
 SV *
@@ -1321,7 +1338,7 @@ CODE:
         sv_catsv(nav_js, body_escaped);
         sv_catpvs(nav_js, "';Array.prototype.slice.call(_c.getElementsByTagName('script')).forEach(function(_s){");
         sv_catpvs(nav_js, "var _n=document.createElement('script');_n.text=_s.text;_s.parentNode.replaceChild(_n,_s);");
-        sv_catpvs(nav_js, "});}else{document.open();document.write('");
+        sv_catpvs(nav_js, "});}else{document.open();document.write('<meta charset=\"utf-8\">");
         sv_catsv(nav_js, full_escaped);
         sv_catpvs(nav_js, "');document.close();}try{history.pushState({},'','");
         sv_catpv(nav_js, path);
@@ -1927,7 +1944,7 @@ CODE:
         escaped = chandra_escape_js(aTHX_ html_sv);
         SvREFCNT_dec(html_sv);
 
-        js = newSVpvs("document.open();document.write('");
+        js = newSVpvs("document.open();document.write('<meta charset=\"utf-8\">");
         sv_catsv(js, escaped);
         sv_catpvs(js, "');document.close();");
         SvREFCNT_dec(escaped);
@@ -1952,7 +1969,7 @@ CODE:
 
     } else if (html_svp && SvOK(*html_svp)) {
         SV *escaped = chandra_escape_js(aTHX_ *html_svp);
-        SV *js = newSVpvs("document.open();document.write('");
+        SV *js = newSVpvs("document.open();document.write('<meta charset=\"utf-8\">");
         sv_catsv(js, escaped);
         sv_catpvs(js, "');document.close();");
         SvREFCNT_dec(escaped);
@@ -2290,7 +2307,7 @@ CODE:
             escaped = chandra_escape_js(aTHX_ html_sv);
             SvREFCNT_dec(html_sv);
 
-            js = newSVpvs("document.open();document.write('");
+            js = newSVpvs("document.open();document.write('<meta charset=\"utf-8\">");
             sv_catsv(js, escaped);
             sv_catpvs(js, "');document.close();");
             SvREFCNT_dec(escaped);
@@ -2310,7 +2327,7 @@ CODE:
             SV **html_svp = hv_fetchs(hv, "_html", 0);
             if (html_svp && SvOK(*html_svp)) {
                 SV *escaped = chandra_escape_js(aTHX_ *html_svp);
-                SV *js = newSVpvs("document.open();document.write('");
+                SV *js = newSVpvs("document.open();document.write('<meta charset=\"utf-8\">");
                 sv_catsv(js, escaped);
                 sv_catpvs(js, "');document.close();");
                 SvREFCNT_dec(escaped);
@@ -2340,13 +2357,15 @@ CODE:
 
     /* Determine blocking mode */
     {
-        SV **hr_svp = hv_fetchs(hv, "_hot_reload", 0);
+        SV **hr_svp  = hv_fetchs(hv, "_hot_reload", 0);
         SV **hub_svp = hv_fetchs(hv, "_hub", 0);
-        SV **cl_svp = hv_fetchs(hv, "_client", 0);
+        SV **cl_svp  = hv_fetchs(hv, "_client", 0);
+        SV **tk_svp  = hv_fetchs(hv, "_tick_cb", 0);
         blocking = 1;
-        if ((hr_svp && SvOK(*hr_svp)) ||
+        if ((hr_svp  && SvOK(*hr_svp))  ||
             (hub_svp && SvOK(*hub_svp)) ||
-            (cl_svp && SvOK(*cl_svp))) {
+            (cl_svp  && SvOK(*cl_svp))  ||
+            (tk_svp  && SvOK(*tk_svp))) {
             blocking = 0;
         }
     }
@@ -2404,6 +2423,19 @@ CODE:
                 XPUSHs(*cl_svp);
                 PUTBACK;
                 call_method("poll", G_DISCARD);
+                FREETMPS; LEAVE;
+            }
+        }
+
+        /* Tick callback (game loop etc.) */
+        {
+            SV **tk_svp = hv_fetchs(hv, "_tick_cb", 0);
+            if (tk_svp && SvOK(*tk_svp)) {
+                dSP;
+                ENTER; SAVETMPS;
+                PUSHMARK(SP);
+                PUTBACK;
+                call_sv(*tk_svp, G_DISCARD | G_EVAL);
                 FREETMPS; LEAVE;
             }
         }

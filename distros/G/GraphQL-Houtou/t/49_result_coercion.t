@@ -147,6 +147,29 @@ subtest 'promise-settled leaves coerce at settle time' => sub {
   ok $by_path{'pBad'} && $by_path{'pNums.1'}, 'errors carry field and item paths';
 };
 
+subtest 'promise-settled string leaves keep their UTF-8 flag' => sub {
+  eval { require Promise::XS; 1 } or plan skip_all => 'Promise::XS not available';
+  # gql_runtime_vm_native_value_t (the tree pending fields settle through
+  # in the async lane) had no UTF8 tracking on its scalar_pv, so a
+  # resolver's wide-character string lost the UTF8 flag on the round trip
+  # through native_value_from_sv/materialize_sv - regardless of whether
+  # the value arrived via Promise::XS or a DataLoader Ticket.
+  my $wide = "unicode: \x{65e5}\x{672c}\x{8a9e} \x{1F600}";
+  my $async_schema = GraphQL::Houtou::Schema->new(
+    query => GraphQL::Houtou::Type::Object->new(
+      name => 'Query',
+      fields => {
+        v => { type => $String, resolve => sub { Promise::XS::resolved($wide) } },
+        w => { type => $String, resolve => sub { 'sync-sibling' } },
+      },
+    ),
+  );
+  my $runtime = build_native_runtime($async_schema, async => 1);
+  my $result = $runtime->execute_document('{ v w }', on_stall => sub { 0 });
+  is $result->{data}{v}, $wide, 'wide-character content is unchanged';
+  ok utf8::is_utf8($result->{data}{v}), 'UTF8 flag survives the async settle path';
+};
+
 subtest 'custom scalar serialize failure is a field error' => sub {
   my $dies_schema = GraphQL::Houtou::Schema->new(
     query => GraphQL::Houtou::Type::Object->new(

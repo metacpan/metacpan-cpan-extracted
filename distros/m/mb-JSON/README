@@ -66,6 +66,8 @@ FUNCTIONS
       Converts a Perl data structure to a JSON text string.
       Hash keys are sorted alphabetically for deterministic output.
       UTF-8 multibyte bytes are output as-is (not \uXXXX-escaped).
+      If called with no argument at all, $_ is used; encode(undef)
+      still returns null.
 
   mb::JSON::stringify($data)
       Alias for encode().  Both names are interchangeable.
@@ -95,9 +97,40 @@ DECODING RULES
   true    -> mb::JSON::Boolean (numifies to 1)
   false   -> mb::JSON::Boolean (numifies to 0)
   number  -> Perl number
-  string  -> Perl string (\uXXXX converted to UTF-8)
-  object  -> hash reference
+  string  -> Perl string (\uXXXX converted to UTF-8; UTF-16 surrogate
+             pairs combined into 4-byte UTF-8 for code points > U+FFFF)
+  object  -> hash reference (a repeated key keeps the last value)
   array   -> array reference
+
+  A leading UTF-8 byte order mark (EF BB BF) is skipped before parsing.
+
+  Whitespace between tokens is space, tab, LF and CR -- exactly the set
+  RFC 8259 defines. Form feed and vertical tab are not whitespace. The
+  set is spelled out rather than written as perl's \s so that it is the
+  same on every supported perl.
+
+CONFIGURATION
+
+  $mb::JSON::MAX_DEPTH   (default 512)
+      Maximum nesting depth accepted by decode() and produced by
+      encode(). Deeper input or data is rejected with an error rather
+      than exhausting the Perl stack. A false value disables the check.
+      The limit counts objects and arrays, not values, and both
+      directions stop at the same count, so anything decode() accepts
+      can be handed straight back to encode().
+
+  $mb::JSON::STRICT      (default 0)
+      When false, decode() copies string bytes through unchanged: raw
+      control characters are accepted and UTF-8 is not validated.
+      When true, decode() rejects a raw control character U+0000-U+001F
+      inside a string and rejects a string whose bytes are not
+      well-formed UTF-8.
+
+  Both are ordinary package variables, so local() works:
+
+    local $mb::JSON::MAX_DEPTH = 64;
+    local $mb::JSON::STRICT    = 1;
+    my $data = mb::JSON::decode($untrusted);
 
 BOOLEAN VALUES
 
@@ -171,16 +204,39 @@ TARGET USE CASES
 
 LIMITATIONS
 
-  - Surrogate pairs (\uD800-\uDFFF) in \uXXXX sequences are not supported
-  - Circular references in encode() are not detected (infinite recursion)
   - Numbers are not distinguished from strings if the value matches the
-    number pattern
+    number pattern, so the string "30" is encoded as the number 30.
+    Leading-zero strings such as "007" stay strings.
+  - Numbers pass through Perl's own numeric conversion, so 1.0 and 1e2
+    are re-encoded as 1 and 100, and an integer wider than the
+    platform's floating point mantissa loses precision.
+  - A number literal outside the range of this perl's floating point
+    type is rejected by decode()/parse() rather than silently converted:
+    it would otherwise become Inf at one end, or 0 after losing every
+    significant digit it carried at the other. Where the range ends
+    depends on how perl was built -- an ordinary double runs out around
+    1e308, so 1e400 and 1e-400 are rejected there, while a perl built
+    -Duselongdouble or -Dusequadmath accepts both. A literal that is
+    genuinely zero, including 0e-400, is unaffected on every build.
+  - References other than ARRAY and HASH are stringified rather than
+    raising an error. A blessed hash or array reference is stringified
+    too, because ref() returns the class name.
+  - Inf and NaN have no JSON representation and are rejected by
+    encode()/stringify(). They are recognized by how perl prints them,
+    so a string spelling exactly "Inf", "-Inf", "Infinity", "NaN" or one
+    of the "1.#INF" forms is rejected too. Longer words such as "Info"
+    and "nano" are unaffected.
+  - By default the decoder does not validate UTF-8 and accepts raw
+    control characters inside strings. Set $mb::JSON::STRICT to enable
+    those checks.
 
 AUTHOR
 
-  INABA Hitoshi <ina@cpan.org>
+  INABA Hitoshi <ina.cpan@gmail.com>
 
 COPYRIGHT AND LICENSE
+
+  Copyright (c) 2021, 2022, 2026 INABA Hitoshi <ina.cpan@gmail.com>
 
   This software is free software; you can redistribute it and/or modify
   it under the same terms as Perl itself.

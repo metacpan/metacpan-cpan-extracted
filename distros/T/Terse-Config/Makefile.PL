@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
         'Data::LNPath' => '1.02',
 	'YAML::XS' => 0
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Terse-Config-*' },
 );

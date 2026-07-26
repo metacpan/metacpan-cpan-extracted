@@ -5,6 +5,42 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0] - 2026-07-25
+
+### Added
+
+- V2 Pin System: Replaced the old `Affix_Pin` struct with `Affix_Pin_2_Point_Oh` backed by Perl Magic VTables, eliminating tied-variable overhead for all memory access.
+- Reworked `Affix::Wrap` type parser to handle `const`, `restrict`, and `volatile` qualifiers, improved function pointer matching, and refactored the type map for cleaner code generation.
+- Generated `Affix::Wrap` bindings now emit `Const[...]` for C `const`-qualified types, enabling compile-time safety in wrapper output.
+- Added `Const[...]` type wrapper that prevents Perl-side mutation of C memory marked `const`. Replaces the old `Live` helper.
+- Added struct bitfield array syntax so members can be declared as `[$name, $type, $width]`.
+- Enum definitions now accept explicit integer values and arithmetic expressions (`FOO => BAR | 0x8`) in addition to sequential auto-increment.
+- [infix] Added support for preserving character-specific primitive names (`wchar_t`, `char16_t`, `char32_t`, `char8_t`), enabling correct identification of string buffers via `infix_type_get_name()`.
+
+### Changed
+
+- WChar now maps to the platform-correct `wchar_t` type (uint16 on Windows, uint32 elsewhere) instead of hardcoded `uint16`.
+- WString now platform-dependent (`*uint16` on Windows, `*uint32` elsewhere).
+- StringList redefined as `Pointer[Pointer[Char]]` instead of the `@StringList` alias.
+- Extended `_is_signature_string` to recognize `+`, `c[...]`, `v[...]`, and `e:` prefixed type strings.
+- Do not rewind `args_arena` so pointers survive XSUB return (hopefully callee stored them).
+
+### Fixed
+
+- Fixed struct member callback assignment where `$pin->{fn} = sub { ... }` silently created a trampoline with 0 arguments, causing "Too few arguments" errors or crashes when C called through the function pointer. `Pointer[Callback[...]]` creates a double-pointer type chain; `set_ptr` and `push_reverse_trampoline` now walk through all Pointer levels to reach `REVERSE_TRAMPOLINE`.
+- `set_ptr` now croaks when a coderef is assigned to a non-callback pointer type instead of silently creating a broken 0-argument trampoline.
+- Fixed fuzzer `struct_callback` variant's verify function to truncate expected values to the callback return type's width.
+- Fixed packed struct layout where `Packed(Struct[...])` returned sizeof values matching unpacked structs.
+- Replaced silent fallbacks with proper errors: unknown primitive type IDs in opcode dispatch and enum size handling now croak instead of silently misinterpreting memory.
+- Added warning when callback type signature serialization fails instead of silently returning a raw pointer value.
+- Fixed a sign-extension bug in 128-bit integer parsing.
+- Fixed bitfield write-back logic to use proper bitmasking, preventing neighboring bit corruption.
+- Corrected `wstring` (UTF-16/32) conversion to handle null-terminators properly in fixed-size arrays.
+- Fixed `Affix::Wrap` eval-generated bindings on macOS where Clang emits Mach-O underscore-prefixed `mangledName` (`_return_six`), but `dlsym` expects the source-level name (`return_six`).
+- [infix] Fixed RAX register preservation in Windows x64 reverse trampoline epilogue for void functions, preventing clobber of the return value register.
+- [infix] Fixed SysV x64 reverse trampoline handling of `ARG_LOCATION_GPR_REFERENCE` for aggregates >16 bytes passed by reference.
+- [infix] Corrected handling of aggregates classified as `MEMORY` during reverse trampoline calls in SysV.
+
 ## [v1.0.9] - 2026-03-05
 
 This release focuses on refining the "Live" zero-copy system (ugh) and fixing bitfield write-back support (yay).
@@ -129,8 +165,8 @@ Most of this version's work went into threading stability, ABI correctness, and 
 ### Changed
 
   - [[infix]] The JIT memory allocator on Linux now uses `memfd_create` (on kernels 3.17+) to create anonymous file descriptors for dual-mapped W^X memory. This avoids creating visible temporary files in `/dev/shm` and improves hygiene and security. On FreeBSD, `SHM_ANON` is now used.
-  - \[infix] On dual-mapped platforms (Linux/BSD), the Read-Write view of the JIT memory is now **unmapped immediately** after code generation. This closes a security window where an attacker with a heap read/write primitive could potentially modify executable code by finding the stale RW pointer.
-  - \[infix] `infix_library_open` now uses `RTLD_LOCAL` instead of `RTLD_GLOBAL` on POSIX systems. This prevents symbols from loaded libraries from polluting the global namespace and causing conflicts with other plugins or the host application.
+  - [infix] On dual-mapped platforms (Linux/BSD), the Read-Write view of the JIT memory is now **unmapped immediately** after code generation. This closes a security window where an attacker with a heap read/write primitive could potentially modify executable code by finding the stale RW pointer.
+  - [infix] `infix_library_open` now uses `RTLD_LOCAL` instead of `RTLD_GLOBAL` on POSIX systems. This prevents symbols from loaded libraries from polluting the global namespace and causing conflicts with other plugins or the host application.
 
 ### Fixed
 
@@ -140,19 +176,19 @@ Most of this version's work went into threading stability, ABI correctness, and 
   - Type resolution: Fixed a logic bug where `Pointer[SV]` types were incorrectly treated as generic pointers if `typedef`'d. They are now correctly unwrapped into Perl CODE refs or blessed objects.
   - Process exit: Disabled explicit library unloading (`dlclose`/`FreeLibrary`) during global destruction. This prevents segmentation faults when background threads from loaded libraries try to execute code that has been unmapped from memory during shutdown.
     I tried to just limit it to Go lang libs but it's just more trouble than it's worth until I resolve a few more things.
-  - \[infix] Fixed stack corruption on macOS ARM64 (Apple Silicon). `long double` on this platform is 8 bytes (an alias for `double`), unlike standard AAPCS64 where it is 16 bytes. The JIT previously emitted 16-byte stores (`STR Qn`) for these types, overwriting adjacent stack memory.
-  - \[infix] Fixed `long double` handling on macOS Intel (Darwin). Verified that Apple adheres to the System V ABI for this type: it requires 16-byte stack alignment and returns values on the x87 FPU stack (`ST(0)`).
-  - \[infix] Fixed a generic System V ABI bug where 128-bit types (vectors, `__int128`) were not correctly aligned to 16 bytes on the stack relative to the return address, causing data corruption when mixed with odd numbers of 8-byte arguments.
-  - \[infix] Enforced natural alignment for stack arguments in the AAPCS64 implementation. Previously, arguments were packed to 8-byte boundaries, which violated alignment requirements for 128-bit types.
-  - \[infix] Fixed a critical deployment issue where the public `infix.h` header included an internal file (`common/compat_c23.h`). The header is now fully self-contained and defines `INFIX_NODISCARD` for attribute compatibility.
-  - \[infix] Fixed 128-bit vector truncation on System V x64 (Linux/macOS). Reverse trampolines previously used 64-bit moves (`MOVSD`) for all SSE arguments, corrupting the upper half of vector arguments. They now correctly use `MOVUPS`.
-  - \[infix] Fixed vector argument corruption on AArch64. The reverse trampoline generator now correctly identifies vector types and uses 128-bit stores (`STR Qn`) instead of falling back to 64-bit/32-bit stores or GPRs.
-  - \[infix] Fixed floating-point corruption on Windows on ARM64. Reverse trampolines now force full 128-bit register saves for all floating-point arguments to ensure robust handling of volatile register states.
-  - \[infix] Fixed a logic error in the System V reverse argument classifier where vectors were defaulting to `INTEGER` class, causing the trampoline to look in `RDI`/`RSI` instead of `XMM` registers.
-  - \[infix] Fixed potential cache coherency issues on Windows x64. The library now unconditionally calls `FlushInstructionCache` after JIT compilation.
-  - \[infix] Capped the maximum alignment in `infix_type_create_packed_struct` to 1MB to prevent integer wrap-around bugs in layout calculation.
-  - \[infix] Fixed a buffer overread on macOS ARM64 where small signed integers were loaded using 32-bit `LDRSW`. Implemented `LDRSH` and `LDRSB`.
-  - \[infix] Added native support for Apple's Hardened Runtime security policy.
+  - [infix] Fixed stack corruption on macOS ARM64 (Apple Silicon). `long double` on this platform is 8 bytes (an alias for `double`), unlike standard AAPCS64 where it is 16 bytes. The JIT previously emitted 16-byte stores (`STR Qn`) for these types, overwriting adjacent stack memory.
+  - [infix] Fixed `long double` handling on macOS Intel (Darwin). Verified that Apple adheres to the System V ABI for this type: it requires 16-byte stack alignment and returns values on the x87 FPU stack (`ST(0)`).
+  - [infix] Fixed a generic System V ABI bug where 128-bit types (vectors, `__int128`) were not correctly aligned to 16 bytes on the stack relative to the return address, causing data corruption when mixed with odd numbers of 8-byte arguments.
+  - [infix] Enforced natural alignment for stack arguments in the AAPCS64 implementation. Previously, arguments were packed to 8-byte boundaries, which violated alignment requirements for 128-bit types.
+  - [infix] Fixed a critical deployment issue where the public `infix.h` header included an internal file (`common/compat_c23.h`). The header is now fully self-contained and defines `INFIX_NODISCARD` for attribute compatibility.
+  - [infix] Fixed 128-bit vector truncation on System V x64 (Linux/macOS). Reverse trampolines previously used 64-bit moves (`MOVSD`) for all SSE arguments, corrupting the upper half of vector arguments. They now correctly use `MOVUPS`.
+  - [infix] Fixed vector argument corruption on AArch64. The reverse trampoline generator now correctly identifies vector types and uses 128-bit stores (`STR Qn`) instead of falling back to 64-bit/32-bit stores or GPRs.
+  - [infix] Fixed floating-point corruption on Windows on ARM64. Reverse trampolines now force full 128-bit register saves for all floating-point arguments to ensure robust handling of volatile register states.
+  - [infix] Fixed a logic error in the System V reverse argument classifier where vectors were defaulting to `INTEGER` class, causing the trampoline to look in `RDI`/`RSI` instead of `XMM` registers.
+  - [infix] Fixed potential cache coherency issues on Windows x64. The library now unconditionally calls `FlushInstructionCache` after JIT compilation.
+  - [infix] Capped the maximum alignment in `infix_type_create_packed_struct` to 1MB to prevent integer wrap-around bugs in layout calculation.
+  - [infix] Fixed a buffer overread on macOS ARM64 where small signed integers were loaded using 32-bit `LDRSW`. Implemented `LDRSH` and `LDRSB`.
+  - [infix] Added native support for Apple's Hardened Runtime security policy.
     - The JIT engine now utilizes `MAP_JIT` when the `com.apple.security.cs.allow-jit` entitlement is detected.
     - Implemented thread-local permission toggling via `pthread_jit_write_protect_np` to maintain W^X compliance.
 
@@ -191,7 +227,6 @@ Based on infix v0.1.3
     - Dual-Driver Architecture:
       - `Affix::Wrap::Driver::Clang`: Uses the system `clang` executable to parse the AST for high-fidelity extraction of types, macros, and comments.
       - `Affix::Wrap::Driver::Regex`: A zero-dependency fallback driver that parses headers using heuristics.
-
 
 ### Changed
 
@@ -309,7 +344,8 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.9...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/sanko/Affix.pm/compare/v1.0.9...v1.1.0
 [v1.0.9]: https://github.com/sanko/Affix.pm/compare/v1.0.8...v1.0.9
 [v1.0.8]: https://github.com/sanko/Affix.pm/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/sanko/Affix.pm/compare/v1.0.6...v1.0.7

@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
-class Net::BitTorrent::Emitter v2.1.0 {
+class Net::BitTorrent::Emitter v2.1.1 {
     field %on;                            # event_name => [ sub { ... }, ... ]
     field $parent_emitter : reader;
     use constant MAX_LISTENERS => 100;    # Max callbacks per event

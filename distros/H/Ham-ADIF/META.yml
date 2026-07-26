@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,13 +17,13 @@ name: Ham-ADIF
 provides:
   Ham::ADIF:
     file: lib/Ham/ADIF.pm
-    version: v2018.3.31
+    version: v2026.7.25
   Ham::ADIF::ADI:
     file: lib/Ham/ADIF/ADI.pm
-    version: v2018.3.31
+    version: v2026.7.25
   Ham::ADIF::ADX:
     file: lib/Ham/ADIF/ADX.pm
-    version: v2018.3.31
+    version: v2026.7.25
 requires:
   Carp: '1.04'
   English: '1.02'
@@ -33,6 +33,6 @@ requires:
   strict: '1.03'
   warnings: '1.05'
 resources:
-  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
-version: v2018.3.31
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+version: v2026.7.25
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

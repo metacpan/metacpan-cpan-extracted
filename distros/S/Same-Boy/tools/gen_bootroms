@@ -1,0 +1,72 @@
+#!/bin/sh
+# Regenerate src/bootroms.h from SameBoy's MIT open-source boot ROMs.
+#
+# The Game Boy needs a boot ROM to start. Nintendo's original boot ROMs are
+# copyrighted and cannot be redistributed, so Same::Boy embeds SameBoy's own
+# open-source replacements (BootROMs/*.asm, Expat/MIT). Those must be
+# assembled with the RGBDS toolchain; the assembled bytes are then baked into
+# src/bootroms.h so end users need no toolchain at build time.
+#
+# Requirements: git, a C compiler, and RGBDS (rgbasm/rgblink/rgbgfx).
+#   macOS:  brew install rgbds
+#   Debian: apt-get install rgbds
+#
+# Usage:  tools/gen_bootroms [SAMEBOY_GIT_TAG]
+#
+set -eu
+
+TAG="${1:-master}"
+HERE=$(cd "$(dirname "$0")/.." && pwd)
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+
+echo "Cloning SameBoy ($TAG) ..."
+git clone --depth 1 --branch "$TAG" https://github.com/LIJI32/SameBoy.git "$WORK/SameBoy" \
+    2>/dev/null || git clone --depth 1 https://github.com/LIJI32/SameBoy.git "$WORK/SameBoy"
+
+echo "Assembling boot ROMs ..."
+( cd "$WORK/SameBoy" && make bootroms )
+
+BIN="$WORK/SameBoy/build/bin/BootROMs"
+OUT="$HERE/src/bootroms.h"
+
+echo "Writing $OUT ..."
+perl - "$BIN" "$OUT" <<'PERL'
+my ($bin, $out) = @ARGV;
+my @roms = qw(dmg mgb sgb sgb2 cgb agb);
+open my $o, '>', $out or die $!;
+print $o "/* Generated from SameBoy MIT open-source boot ROMs (BootROMs/*.asm).\n";
+print $o "   Do not edit by hand; regenerate with tools/gen_bootroms.\n";
+print $o "   Emulation boot ROMs (c) Lior Halphon, Expat/MIT license. */\n";
+print $o "#ifndef SB_BOOTROMS_H\n#define SB_BOOTROMS_H\n#include <stddef.h>\n\n";
+for my $r (@roms) {
+    open my $fh, '<:raw', "$bin/${r}_boot.bin" or die "read ${r}_boot.bin: $!";
+    local $/; my @by = unpack 'C*', <$fh>; close $fh;
+    printf $o "static const unsigned char sb_bootrom_%s[%d] = {\n", $r, scalar @by;
+    for (my $i = 0; $i < @by; $i += 12) {
+        my $j = $i + 11 < $#by ? $i + 11 : $#by;
+        print $o "    ", join(',', map { sprintf '0x%02x', $_ } @by[$i .. $j]), ",\n";
+    }
+    print $o "};\n\n";
+}
+print $o <<'C';
+/* Pick the default boot ROM for a GB_model_t value (see Core/model.h). */
+static inline const unsigned char *sb_default_bootrom(int model, size_t *len)
+{
+    switch (model) {
+        case 0x002: *len = sizeof(sb_bootrom_dmg);  return sb_bootrom_dmg;
+        case 0x100: *len = sizeof(sb_bootrom_mgb);  return sb_bootrom_mgb;
+        case 0x004: *len = sizeof(sb_bootrom_sgb);  return sb_bootrom_sgb;
+        case 0x101: *len = sizeof(sb_bootrom_sgb2); return sb_bootrom_sgb2;
+        default:
+            if ((model & 0xF00) == 0x200) { *len = sizeof(sb_bootrom_cgb); return sb_bootrom_cgb; }
+            *len = sizeof(sb_bootrom_dmg); return sb_bootrom_dmg;
+    }
+}
+
+#endif /* SB_BOOTROMS_H */
+C
+close $o;
+PERL
+
+echo "Done."

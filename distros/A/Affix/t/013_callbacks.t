@@ -1,8 +1,8 @@
 use v5.40;
-use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 #
 $|++;
 #
@@ -105,16 +105,9 @@ subtest simple => sub {
     $inspect->(
         $r,
         sub {
-            my $ptr = shift;
-
-            # $$ptr reads the struct (HashRef)
-            # $ptr is now a Pin (scalar ref), so we must dereference it to get the hash.
-            my $struct = $$ptr;
+            my $struct = shift;                    # Arrives as the magical HashRef directly
             $seen_label = $struct->{label};
-
-            # Modify and write back
-            $struct->{label} = "Checked";
-            $$ptr = $struct;
+            $struct->{label} = "Checked";          # Magical write-back
         }
     );
     is $seen_label, "Check", 'Callback received struct pointer correctly';
@@ -130,10 +123,7 @@ subtest simple => sub {
 subtest 'unions passed to callbacks' => sub {
     ok typedef( MyUnion => Union [ i => SInt32, f => Float32, c => Array [ Char, 8 ] ] ), 'typedef @MyUnion';
     isa_ok my $invoke = wrap( $lib_path, 'invoke_union_cb', [ Callback [ [ Pointer [ MyUnion() ] ] => Void ] ] => Int ), ['Affix'];
-    my $cb = sub($pin) {
-
-        # Dereference the pin
-        my $u = $$pin;
+    my $cb = sub($u) {
         is $u->{i}, 42, 'Read integer member from union pointer directly';    # magical
 
         # IEEE 754 2.0f is 0x40000000 (1073741824 decimal)
@@ -141,7 +131,7 @@ subtest 'unions passed to callbacks' => sub {
     };
     my $ret = $invoke->($cb);
 
-    # Verify the write inside the callback persisted to the C caller
+    # 0x40000000 is 1073741824. Overwriting the union proves the callback write persisted.
     is $ret, 1073741824, 'Callback modifications persisted to C (Union write-back)';
 };
 subtest 'ThisCall Sugar' => sub {

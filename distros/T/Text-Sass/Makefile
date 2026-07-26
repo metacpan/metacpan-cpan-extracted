@@ -1,6 +1,6 @@
 MAJOR    ?= 1
-MINOR    ?= 0
-SUB      ?= 4
+MINOR    ?= 1
+SUB      ?= 0
 PATCH    ?= 1
 CODENAME ?= $(shell lsb_release -cs)
 MD5SUM    = md5sum

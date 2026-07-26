@@ -4,7 +4,7 @@
       "Roger Pettett <rmp@psyphi.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "Sass",
       "SCSS",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Sass",
    "prereqs" : {
@@ -48,19 +48,19 @@
    "provides" : {
       "Text::Sass" : {
          "file" : "lib/Text/Sass.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.1.0"
       },
       "Text::Sass::Expr" : {
          "file" : "lib/Text/Sass/Expr.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.1.0"
       },
       "Text::Sass::Functions" : {
          "file" : "lib/Text/Sass/Functions.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.1.0"
       },
       "Text::Sass::Token" : {
          "file" : "lib/Text/Sass/Token.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "url" : "https://github.com/rmp/libtext-sass-perl"
       }
    },
-   "version" : "v1.0.4",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v1.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

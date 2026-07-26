@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings qw[experimental::class experimental::builtin];
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Protocol::MSE::KeyExchange v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Protocol::MSE::KeyExchange v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Digest::SHA qw[sha1];
     use Crypt::URandom qw[urandom];
     use Math::BigInt try => 'GMP';
@@ -160,7 +160,7 @@ class Net::BitTorrent::Protocol::MSE::KeyExchange v2.1.0 : isa(Net::BitTorrent::
     }
 
     # Pure Perl RC4 Implementation
-    class Net::BitTorrent::Protocol::MSE::RC4 v2.0.0 : isa(Net::BitTorrent::Emitter) {
+    class Net::BitTorrent::Protocol::MSE::RC4 v2.1.1 : isa(Net::BitTorrent::Emitter) {
     field @S;
     field $x = 0;
     field $y = 0;

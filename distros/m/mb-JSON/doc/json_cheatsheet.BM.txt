@@ -44,6 +44,10 @@
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
 [ 9. UTF-8 maanw tɛ sɛgɛsɛgɛ (\uXXXX ma kɛ) ]
+  decode: "\uXXXX"             -> UTF-8
+  decode: "\uD83D\uDE00"       -> 4-byte UTF-8 (emoji)
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
 
 [ 10. Kunnafoni ]
   my $h = mb::JSON::decode('{"togo":"Moussa","san":30}');

@@ -1,4 +1,4 @@
-package SDL3 v0.0.3 {
+package SDL3 v0.0.4 {
     use v5.40;
     use base 'Exporter';
     use Affix qw[:all];
@@ -49,8 +49,8 @@ SDL3 - Perl Wrapper for the Simple DirectMedia Layer 3.0
 This module provides a Perl wrapper for SDL3, a cross-platform development library designed to provide low level access
 to audio, keyboard, mouse, joystick, and graphics hardware.
 
-This is very much still under construction. There are a few examples in this distribution's C<eg/> directory but a few
-games and other demos I've written may be found on github: L<https://github.com/sanko/SDL3.pm-demos>.
+There are a few examples in this distribution's C<eg/> directory but games and other demos I've written may be found on
+github: L<https://github.com/sanko/SDL3.pm-demos>.
 
 =head2 Features
 
@@ -59,8 +59,8 @@ Each feature listed below is a tag you may use.
 =cut
 
     my ( $lib, @etc ) = Alien::SDL3->dynamic_libs;
-    croak "Could not find library" unless $lib;
-    Affix::load_library($_) or die "Could not find $_" for $lib, @etc;
+    croak 'Could not find library' unless $lib;
+    Affix::load_library($_) or die 'Could not find ' . $_ for $lib, @etc;
     our ( %EXPORT_TAGS, @EXPORT_OK );
     my $main_hook;
 
@@ -3310,32 +3310,24 @@ See L<SDL3: CategoryLog|https://wiki.libsdl.org/SDL3/CategoryLog>
             'SDL_LOG_PRIORITY_INFO',    'SDL_LOG_PRIORITY_WARN',  'SDL_LOG_PRIORITY_ERROR',   'SDL_LOG_PRIORITY_CRITICAL',
             'SDL_LOG_PRIORITY_COUNT'
         ];
+        #
+        _typedef_and_export SDL_LogOutputFunction => Callback [ [ Pointer [Void], Int, SDL_LogPriority(), String ] => Void ];
+        #
         _affix_and_export SDL_SetLogPriorities     => [ SDL_LogPriority() ], Void;
         _affix_and_export SDL_SetLogPriority       => [ Int, SDL_LogPriority() ], Void;
         _affix_and_export SDL_GetLogPriority       => [Int], SDL_LogPriority();
         _affix_and_export SDL_ResetLogPriorities   => [], Void;
         _affix_and_export SDL_SetLogPriorityPrefix => [ SDL_LogPriority(), String ], Bool;
-
-        #~ ...oy.
-        #~ _affix_and_export SDL_Log                  => [ String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogTrace             => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogVerbose           => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogDebug             => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogInfo              => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogWarn              => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogError             => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogCritical          => [ Int, String, VarArgs ], Void;
-        #~ _affix_and_export SDL_LogMessage           => [ Int, SDL_LogPriority(), String, VarArgs ], Void;
-        _affix_and_export SDL_Log         => [String], Void;
-        _affix_and_export SDL_LogTrace    => [ Int, String ], Void;
-        _affix_and_export SDL_LogVerbose  => [ Int, String ], Void;
-        _affix_and_export SDL_LogDebug    => [ Int, String ], Void;
-        _affix_and_export SDL_LogInfo     => [ Int, String ], Void;
-        _affix_and_export SDL_LogWarn     => [ Int, String ], Void;
-        _affix_and_export SDL_LogError    => [ Int, String ], Void;
-        _affix_and_export SDL_LogCritical => [ Int, String ], Void;
-        _affix_and_export SDL_LogMessage  => [ Int, SDL_LogPriority(), String ], Void;
-        _typedef_and_export SDL_LogOutputFunction => Callback [ [ Pointer [Void], Int, SDL_LogPriority(), String ] => Void ];
+        #
+        _affix_and_export SDL_Log                         => [ String, VarArgs ], Void;
+        _affix_and_export SDL_LogTrace                    => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogVerbose                  => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogDebug                    => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogInfo                     => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogWarn                     => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogError                    => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogCritical                 => [ Int, String, VarArgs ], Void;
+        _affix_and_export SDL_LogMessage                  => [ Int, SDL_LogPriority(), String, VarArgs ], Void;
         _affix_and_export SDL_GetDefaultLogOutputFunction => [], SDL_LogOutputFunction();
         _affix_and_export SDL_GetLogOutputFunction        => [ Pointer [ SDL_LogOutputFunction() ], Pointer [ Pointer [Void] ] ], Void;
         _affix_and_export SDL_SetLogOutputFunction        => [ SDL_LogOutputFunction(), Pointer [Void] ], Void;
@@ -3369,9 +3361,13 @@ See F<eg/hello_world.pl> for an example and L<SDL3: CategoryMain|https://wiki.li
             SDL_EnterAppMainCallbacks =>
             [ Int, Pointer [String], SDL_AppInit_func(), SDL_AppIterate_func(), SDL_AppEvent_func(), SDL_AppQuit_func() ],
             Int;
-        _affix_and_export SDL_RegisterApp        => [ String, UInt32, Pointer [Void] ], Bool;
-        _affix_and_export SDL_UnregisterApp      => [], Void;
-        _affix_and_export SDL_GDKSuspendComplete => [], Void;
+        if ( $^O eq 'MSWin32' ) {
+            _affix_and_export SDL_RegisterApp        => [ String, UInt32, Pointer [Void] ], Bool;
+            _affix_and_export SDL_UnregisterApp      => [], Void;
+            _affix_and_export SDL_GDKRunApp          => [], Void;
+            _affix_and_export SDL_GDKRunApp          => [ SDL_main_func(), Pointer [Void] ], Int;
+            _affix_and_export SDL_GDKSuspendComplete => [], Void;
+        }
     }
 
 =head3 C<:messagebox> - Message Boxes
@@ -5967,9 +5963,11 @@ The project's repo: L<https://github.com/Perl-SDL3/SDL3.pm>
 
 The SDL3 Wiki: L<https://wiki.libsdl.org/SDL3/FrontPage>
 
+L<Affix>
+
 =head1 LICENSE
 
-This software is Copyright (c) 2025 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>.
+This software is Copyright (c) 2025 by Sanko Robinson.
 
 This is free software, licensed under:
 
@@ -5979,7 +5977,7 @@ See the F<LICENSE> file for full text.
 
 =head1 AUTHOR
 
-Sanko Robinson <sanko@cpan.org>
+Sanko Robinson L<https://github.com/sanko>
 
 =begin stopwords
 

@@ -40,13 +40,17 @@ I do my best to avoid breaking functionality when I do release updates to Plerd,
 
 ## Setup
 
+### Before you begin
+
+To install and run Plerd, you need the following installed on your machine:
+
+- Perl version 5.26 or later. [Perlbrew](https://perlbrew.pl) is an excellent tool to install and manage a more recent perl alongside your machine's system Perl, if needed.
+- The `cpanm` program for managing third-party Perl libraries. You can likely find it as `cpanminus` in your favorite package manager. Or, install it from
+source, through the instructions at [http://cpanmin.us](http://cpanmin.us).
+
 ### Installation
 
-**First, make sure you have the `cpanm` program on your machine.** It is likely
-available as "cpanminus" in your favorite package manager. (Or install it from
-source, through the instructions at [http://cpanmin.us](http://cpanmin.us).)
-
-Then, to install the latest release of Plerd, run this command:
+To install the latest release of Plerd, run this command:
 
     cpanm Plerd
 
@@ -221,9 +225,13 @@ Once you've configured your blog as described above, you can add these attribute
 
 - **image\_alt**: A textual description of the image referenced by the `image` attribute. (Equivalent in usage to the "alt" attribute in an HTML `<img>` tag.) Plerd will just leave this blank, if you don't define it yourself.
 
-### MultiMarkdown
+### GitHub-Flavored Markdown
 
-Plerd supports [MultiMarkdown](https://fletcherpenney.net/multimarkdown/) syntax out of the box! Go ahead and put MultiMarkdown tables and stuff into your posts. It'll just work.
+Plerd processes your posts with [Markdown::Perl](https://metacpan.org/pod/Markdown::Perl)
+in its GitHub-Flavored Markdown (GFM) mode. This means you get the full CommonMark spec, including fenced code blocks, plus GFM extensions such as tables, strikethrough, and task lists. For a full syntax
+reference, see [pmarkdown supported syntax](https://github.com/mkende/pmarkdown/blob/main/Syntax.md).
+
+Plerd departs from GFM in one respect: it passes all HTML markup found in a post's source file to its published output, unfiltered. Because Plerd is intended as a single-user blogging platform, it trusts that all HTML tags included in a post are present with the author's intent, and should be rendered as such.
 
 ### Webmention
 
@@ -244,6 +252,12 @@ To keep up to date on Plerd news, follow [the Plerd blog](https://plerd.jmac.org
 You can also [email me, Jason McIntosh](mailto:jmac@jmac.org), directly. I am always interested to hear about other folks making use of Plerd, and I will do whatever I can to help them with it. All such feedback does tend to make the software that much better, after all!
 
 [Plerd has a homepage at its creator's website.](http://jmac.org/plerd)
+
+### Support for Plerd 1.x
+
+Plerd version 2.000 was released in July, 2026, after a significant change in dependencies required a more recent Perl version. If you still need to run Plerd version 1, you can find a maintenance branch called `maint/1.x` in the Plerd GitHub repository. You can also [find the most recent version 1 release on CPAN](https://metacpan.org/release/JMAC/Plerd-1.903), and install it directly with the following command:
+
+    cpanm Plerd@1.903
 
 ## See Plerd at work
 

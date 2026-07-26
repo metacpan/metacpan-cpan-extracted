@@ -1,0 +1,9 @@
+FROM ubuntu:24.04
+
+RUN apt-get update \
+    && apt-get install -y gcc make fakeroot lsb-release
+
+COPY Makefile /tmp/Makefile
+COPY DEBIAN/control DEBIAN/control
+
+RUN make -f /tmp/Makefile deps && rm -f /tmp/Makefile DEBIAN/control

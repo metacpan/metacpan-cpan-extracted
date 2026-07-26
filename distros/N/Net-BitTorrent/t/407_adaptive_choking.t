@@ -12,7 +12,7 @@ subtest 'Adaptive Choking (Leecher Mode)' => sub {
     my $temp         = Path::Tiny->tempdir;
     my $client       = Net::BitTorrent->new();
     my $torrent_file = $temp->child('test.torrent');
-    $torrent_file->spew_raw( bencode( { info => { name => 'test', 'piece length' => 16384, pieces => pack( 'H*', '1' x 40 ), } } ) );
+    $torrent_file->spew_raw( bencode( { info => { name => 'test', 'piece length' => 1048576, pieces => pack( 'H*', '1' x 40 ), } } ) );
     my $t = $client->add_torrent( $torrent_file, $temp );
     $t->start();
     $t->bitfield->clear(0);    # Leecher mode

@@ -53,6 +53,23 @@ my $schema = GraphQL::Houtou::Schema->new(
           Promise::XS::resolved({ id => '41', name => 'async:41' });
         },
       },
+      later_users => {
+        type => $User->list,
+        resolve => sub {
+          require Promise::XS;
+          Promise::XS::resolved([
+            { id => '43', name => 'async:43' },
+            { id => '44', name => 'async:44' },
+          ]);
+        },
+      },
+      broken_users => {
+        type => $User->list,
+        resolve => sub {
+          require Promise::XS;
+          Promise::XS::resolved([{ id => '45' }]);
+        },
+      },
       later_list => {
         type => $String->non_null->list->non_null,
         resolve => sub {
@@ -98,7 +115,7 @@ subtest 'runtime rejects legacy promise_code' => sub {
 
 subtest 'runtime auto-detects Promise::XS values' => sub {
   my $result = $schema->execute(
-    '{ later later_user { id name } later_list later_search { ... on RuntimePromiseUser { id name } } }',
+    '{ later later_user { id name } later_users { key: id name } later_list later_search { ... on RuntimePromiseUser { id name } } }',
   );
 
   my $resolved = maybe_get_promise_xs($result);
@@ -114,6 +131,10 @@ subtest 'runtime auto-detects Promise::XS values' => sub {
         id => '41',
         name => 'async:41',
       },
+      later_users => [
+        { key => '43', name => 'async:43' },
+        { key => '44', name => 'async:44' },
+      ],
       later_list => [ 'alpha', 'beta' ],
       later_search => {
         id => '42',
@@ -121,6 +142,22 @@ subtest 'runtime auto-detects Promise::XS values' => sub {
       },
     },
   }, 'runtime program resolves Promise::XS-backed scalar/object/list/abstract fields';
+};
+
+subtest 'resolved plain-hash lists preserve non-null errors' => sub {
+  my $resolved = maybe_get_promise_xs(
+    $schema->execute('{ broken_users { id name } }')
+  );
+
+  is_deeply $resolved->{data}, {
+    broken_users => [ undef ],
+  }, 'a non-null child violation nulls its object item';
+  is_deeply $resolved->{errors}[0]{path}, [
+    'broken_users', 0, 'name',
+  ], 'the optimized child path includes the list index and field';
+  like $resolved->{errors}[0]{message},
+    qr/Cannot return null for non-nullable field RuntimePromiseUser\.name/,
+    'the optimized child reports the standard non-null error';
 };
 
 done_testing;

@@ -721,3 +721,22 @@ INFIX_INTERNAL void emit_arm64_svc_imm(code_buffer * buf, uint16_t imm) {
     instr |= (uint32_t)(imm & 0xFFFF) << 5;
     emit_int32(buf, instr);
 }
+/**
+ * @internal
+ * @brief Emits `LSR <Xd>, <Xn>, #<imm>` (Logical Shift Right by Immediate).
+ * @details This is implemented as `UBFM <Xd>, <Xn>, #imm, #63`.
+ *          LSR Xd, Xn, #imm is an alias for UBFM Xd, Xn, #imm, #63.
+ *
+ * Encoding: sf=1, opc=01, 100110, N=1, immr, imms=111111, Rn, Rd
+ *           1_01_100110_1_immr[5:0]_111111_Rn[4:0]_Rd[4:0]
+ */
+INFIX_INTERNAL void emit_arm64_lsr_imm(code_buffer * buf, arm64_gpr src, arm64_gpr dest, uint8_t shift) {
+    if (buf->error)
+        return;
+    uint32_t instr = 0xB3400000;                // UBFM base: sf=1, opc=01, 100110, N=1, imms=111111
+    instr |= 0x0000FC00;                        // imms = 63 (bits 15:10)
+    instr |= ((uint32_t)(shift & 0x3F)) << 16;  // immr (bits 21:16)
+    instr |= ((uint32_t)(src & 0x1F)) << 5;     // Rn (bits 9:5)
+    instr |= (uint32_t)(dest & 0x1F);           // Rd (bits 4:0)
+    emit_int32(buf, instr);
+}

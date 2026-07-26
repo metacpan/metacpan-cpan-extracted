@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Peer v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Net::BitTorrent::Types qw[:encryption :state];
     use Net::BitTorrent::SSRF qw[is_safe_ip];
     field $protocol : param;
@@ -37,6 +37,7 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use constant REQUEST_TIMEOUT => 30;                           # Seconds without response before disconnect
     use constant IDLE_TIMEOUT    => 120;                          # Seconds without any data before disconnect
     method protocol ()     {$protocol}
+    method connected ()    { !$_disconnected }
     method is_encrypted () { defined $mse             && $mse->state eq 'PAYLOAD' }
     method is_seeder ()    { defined $bitfield_status && $bitfield_status eq 'all' }
 
@@ -199,6 +200,15 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method handle_hash_request ( $root, $proof_layer, $base_layer, $index, $length ) {
+        if ( !defined $root || length($root) != 32 ) {
+            $self->_emit_log( 'debug', 'HASH_REQUEST with invalid root' ) if $debug;
+            return;
+        }
+        if ( $base_layer > 63 || $length == 0 || $length > 65536 ) {
+            $self->_emit_log( 'debug', "HASH_REQUEST with invalid params: layer=$base_layer index=$index length=$length" ) if $debug;
+            $self->adjust_reputation(-5);
+            return;
+        }
         my $file = $torrent->storage->get_file_by_root($root);
         if ( !$file || !$file->merkle ) {
             $protocol->send_hash_reject( $root, $proof_layer, $base_layer, $index, $length ) if $protocol->can('send_hash_reject');
@@ -211,6 +221,15 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method handle_hashes ( $root, $proof_layer, $base_layer, $index, $length, $hashes ) {
+        if ( !defined $root || length($root) != 32 ) {
+            $self->_emit_log( 'debug', 'HASHES with invalid root' ) if $debug;
+            return;
+        }
+        if ( $base_layer > 63 || $length == 0 || $length > 65536 ) {
+            $self->_emit_log( 'debug', "HASHES with invalid params: layer=$base_layer index=$index length=$length" ) if $debug;
+            $self->adjust_reputation(-5);
+            return;
+        }
         my $file = $torrent->storage->get_file_by_root($root);
         return unless $file && $file->merkle;
         my $node_size = 32;
@@ -220,6 +239,10 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
             return;
         }
         my $num_hashes = length($hashes) / $node_size;
+        if ( $num_hashes > $length ) {
+            $self->_emit_log( 'debug', "HASHES contains $num_hashes hashes but claimed length is $length, truncating" ) if $debug;
+            $num_hashes = $length;
+        }
 
         # BEP 52: index and length refer to the range of nodes at base_layer.
         # The hashes string contains these nodes concatenated.
@@ -260,6 +283,7 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
         for my $p ( @$added, @$added6 ) {
             next unless ref $p eq 'HASH' && defined $p->{ip} && defined $p->{port};
             next if $p->{port} < 1 || $p->{port} > 65535;
+            next unless is_safe_ip( $p->{ip} );
             $torrent->add_peer($p);
         }
     }
@@ -390,6 +414,13 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
             $self->_check_interest();
         }
         elsif ( $id == 5 ) {    # BITFIELD
+            my $num_pieces = $torrent->bitfield ? $torrent->bitfield->size       : 0;
+            my $expected   = $num_pieces        ? int( ( $num_pieces + 7 ) / 8 ) : 0;
+            if ( $expected == 0 || $plen != $expected ) {
+                $self->_emit_log( 'debug', "Peer BITFIELD with invalid length $plen (expected $expected)" ) if $debug;
+                $self->adjust_reputation(-5);
+                return;
+            }
             $bitfield_status = $payload;
             $torrent->set_peer_bitfield( $self, $payload );
             $self->_emit( bitfield => $torrent->peer_bitfields->{$self} );
@@ -418,10 +449,29 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
         }
         elsif ( $id == 7 ) {    # PIECE
             my ( $index, $begin ) = unpack( 'N N', substr( $payload, 0, 8, '' ) );
+            my $num_pieces = $torrent->bitfield ? $torrent->bitfield->size : 0;
+            my $piece_len  = $torrent->metadata->{info}{'piece length'} // 16384;
+            if ( $num_pieces == 0 || $index >= $num_pieces ) {
+                $self->_emit_log( 'debug', "Peer PIECE with out-of-range index $index" ) if $debug;
+                $self->adjust_reputation(-5);
+                return;
+            }
+            if ( $begin + length($payload) > $piece_len ) {
+                $self->_emit_log( 'debug', "Peer PIECE block extends beyond piece boundary: $index:$begin+" . length($payload) . " > $piece_len" )
+                    if $debug;
+                $self->adjust_reputation(-5);
+                return;
+            }
             $self->_handle_piece_data( $index, $begin, $payload );
         }
         elsif ( $id == 13 ) {    # SUGGEST_PIECE
-            my $index = unpack( 'N', $payload );
+            my $index      = unpack( 'N', $payload );
+            my $num_pieces = $torrent->bitfield ? $torrent->bitfield->size : 0;
+            if ( $num_pieces == 0 || $index >= $num_pieces ) {
+                $self->_emit_log( 'debug', "Peer SUGGEST_PIECE with out-of-range index $index" ) if $debug;
+                $self->adjust_reputation(-2);
+                return;
+            }
             push @suggested_pieces, $index if scalar @suggested_pieces < 100 && !grep { $_ == $index } @suggested_pieces;
             $self->_check_interest();
         }
@@ -441,8 +491,14 @@ class Net::BitTorrent::Peer v2.1.0 : isa(Net::BitTorrent::Emitter) {
             $self->_handle_reject( $index, $begin, $len );
         }
         elsif ( $id == 17 ) {    # ALLOWED_FAST
-            my $index       = unpack( 'N', $payload );
-            my $max_allowed = $torrent->bitfield ? ( $torrent->bitfield->size < 10 ? $torrent->bitfield->size : 10 ) : 10;
+            my $index      = unpack( 'N', $payload );
+            my $num_pieces = $torrent->bitfield ? $torrent->bitfield->size : 0;
+            if ( $num_pieces == 0 || $index >= $num_pieces ) {
+                $self->_emit_log( 'debug', "Peer ALLOWED_FAST with out-of-range index $index" ) if $debug;
+                $self->adjust_reputation(-2);
+                return;
+            }
+            my $max_allowed = $num_pieces < 10 ? $num_pieces : 10;
             push @allowed_fast_set, $index if scalar @allowed_fast_set < $max_allowed && !grep { $_ == $index } @allowed_fast_set;
             $self->_check_interest();
         }

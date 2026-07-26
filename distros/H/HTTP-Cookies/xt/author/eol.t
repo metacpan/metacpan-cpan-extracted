@@ -18,6 +18,7 @@ my @files = (
     't/data/netscape-httponly.txt',
     't/issue26.t',
     't/issue32.t',
+    't/issue69.t',
     't/publicsuffix.t'
 );
 

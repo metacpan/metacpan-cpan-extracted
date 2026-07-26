@@ -2,7 +2,8 @@ use v5.40;
 use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 $|++;
 my $C_CODE = <<'END_C';
 #include "std.h"
@@ -56,6 +57,6 @@ subtest 'Return Value' => sub {
 };
 subtest 'Edge Cases' => sub {
     is count_args(undef), -1, 'Undef passed as NULL';
-    is count_args( [] ),   0, 'Empty array passed as empty list (only NULL terminator)';
+    is count_args( [] ),   0, 'Empty array passed as empty list (contains only NULL terminator)';
 };
 done_testing;

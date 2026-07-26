@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
-class Net::BitTorrent::Protocol::BEP09 v2.0.0 : isa(Net::BitTorrent::Protocol::BEP10) {
+class Net::BitTorrent::Protocol::BEP09 v2.1.1 : isa(Net::BitTorrent::Protocol::BEP10) {
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
 
     # BEP 09 Message Types
@@ -34,15 +34,25 @@ class Net::BitTorrent::Protocol::BEP09 v2.0.0 : isa(Net::BitTorrent::Protocol::B
                     $self->_emit_log( 'error', 'ut_metadata message missing msg_type' );
                     return;
                 }
+                my $piece = $dict->{piece};
+                if ( !defined $piece || $piece !~ /^\d+$/ || $piece < 0 ) {
+                    $self->_emit_log( 'error', "ut_metadata message with invalid piece: $piece" );
+                    return;
+                }
                 if ( $type == METADATA_REQUEST ) {
-                    $self->_emit( metadata_request => $dict->{piece} );
+                    $self->_emit( metadata_request => $piece );
                 }
                 elsif ( $type == METADATA_DATA ) {
-                    $self->_emit_log( 'debug', "Received metadata data for piece $dict->{piece} (len " . length($remaining) . ')' ) if $self->debug;
-                    $self->_emit( metadata_data => $dict->{piece}, $dict->{total_size}, $remaining );
+                    my $total_size = $dict->{total_size};
+                    if ( !defined $total_size || $total_size !~ /^\d+$/ || $total_size <= 0 ) {
+                        $self->_emit_log( 'error', "ut_metadata DATA with invalid total_size: $total_size" );
+                        return;
+                    }
+                    $self->_emit_log( 'debug', "Received metadata data for piece $piece (len " . length($remaining) . ')' ) if $self->debug;
+                    $self->_emit( metadata_data => $piece, $total_size, $remaining );
                 }
                 elsif ( $type == METADATA_REJECT ) {
-                    $self->_emit( metadata_reject => $dict->{piece} );
+                    $self->_emit( metadata_reject => $piece );
                 }
                 else {
                     $self->_emit_log( 'debug', "Unknown ut_metadata msg_type: $type" ) if $self->debug;

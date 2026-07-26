@@ -285,10 +285,14 @@ static infix_status prepare_forward_call_frame_arm64(infix_arena_t * arena,
     layout->num_args = num_args;
     layout->num_stack_args = 0;
     // Determine if the return value is passed by reference (via hidden pointer in X8).
-    // This is true for aggregates larger than 16 bytes.
+    // HFAs/HVAs are always returned in V0-V3 registers regardless of size, so they
+    // are never indirect. Composites <= 16 bytes are returned in X0/X1; larger ones
+    // use the Memory strategy (X8 points to caller-allocated buffer).
     bool ret_is_aggregate = (ret_type->category == INFIX_TYPE_STRUCT || ret_type->category == INFIX_TYPE_UNION ||
                              ret_type->category == INFIX_TYPE_ARRAY || ret_type->category == INFIX_TYPE_COMPLEX);
-    layout->return_value_in_memory = (ret_is_aggregate && ret_type->size > 16);
+    const infix_type * hfa_base = nullptr;
+    bool is_hfa_type = is_hfa(ret_type, &hfa_base);
+    layout->return_value_in_memory = (ret_is_aggregate && !is_hfa_type && ret_type->size > 16);
     // Main Argument Classification Loop
     for (size_t i = 0; i < num_args; ++i) {
         infix_type * type = arg_types[i];
@@ -716,7 +720,58 @@ static infix_status generate_forward_epilogue_arm64(code_buffer * buf,
                 emit_arm64_str_imm(buf, true, X1_REG, X20_REG, 8);
                 break;
             default:
-                break;
+                {
+                    // Generic fallback for non-power-of-2 return sizes (3,5, 6, 7, 9-15).
+                    // AAPCS64: structs <= 16 bytes are returned in X0 (first 8) and X1 (bytes 8-15).
+                    // Sub-register stores (STRH W, STRB W) only read the LOW bits of the register,
+                    // so we must LSR to shift the desired bytes into position before each store.
+                    size_t size = ret_type->size;
+                    if (size <= 8) {
+                        // All bytes from X0.
+                        size_t off = 0;
+                        if (size >= 4) {
+                            emit_arm64_str_imm(buf, false, X0_REG, X20_REG, (int32_t)off);
+                            off += 4;
+                        }
+                        if (size - off >= 2) {
+                            if (off > 0)
+                                emit_arm64_lsr_imm(buf, X0_REG, X9_REG, (uint8_t)(off * 8));
+                            emit_arm64_strh_imm(buf, off > 0 ? X9_REG : X0_REG, X20_REG, (int32_t)off);
+                            off += 2;
+                        }
+                        if (size - off >= 1) {
+                            if (off > 0)
+                                emit_arm64_lsr_imm(buf, X0_REG, X9_REG, (uint8_t)(off * 8));
+                            emit_arm64_strb_imm(buf, off > 0 ? X9_REG : X0_REG, X20_REG, (int32_t)off);
+                        }
+                    }
+                    else {
+                        // Bytes 0-7 from X0 (full 8-byte store), bytes 8+ from X1.
+                        emit_arm64_str_imm(buf, true, X0_REG, X20_REG, 0);
+                        size_t rem = size - 8;
+                        size_t off = 8;
+                        if (rem >= 4) {
+                            emit_arm64_str_imm(buf, false, X1_REG, X20_REG, (int32_t)off);
+                            off += 4;
+                            rem -= 4;
+                        }
+                        if (rem >= 2) {
+                            size_t shift = (off - 8) * 8;
+                            if (shift > 0)
+                                emit_arm64_lsr_imm(buf, X1_REG, X9_REG, (uint8_t)shift);
+                            emit_arm64_strh_imm(buf, shift > 0 ? X9_REG : X1_REG, X20_REG, (int32_t)off);
+                            off += 2;
+                            rem -= 2;
+                        }
+                        if (rem >= 1) {
+                            size_t shift = (off - 8) * 8;
+                            if (shift > 0)
+                                emit_arm64_lsr_imm(buf, X1_REG, X9_REG, (uint8_t)shift);
+                            emit_arm64_strb_imm(buf, shift > 0 ? X9_REG : X1_REG, X20_REG, (int32_t)off);
+                        }
+                    }
+                    break;
+                }
             }
         }
     }
@@ -1564,7 +1619,55 @@ static infix_status generate_direct_forward_epilogue_arm64(code_buffer * buf,
                 emit_arm64_str_imm(buf, true, X1_REG, X20_REG, 8);
                 break;
             default:
-                break;
+                {
+                    // Generic fallback for non-power-of-2 return sizes (3,5, 6, 7, 9-15).
+                    // Sub-register stores (STRH W, STRB W) only read the LOW bits of the register,
+                    // so we must LSR to shift the desired bytes into position before each store.
+                    size_t size = ret_type->size;
+                    if (size <= 8) {
+                        size_t off = 0;
+                        if (size >= 4) {
+                            emit_arm64_str_imm(buf, false, X0_REG, X20_REG, (int32_t)off);
+                            off += 4;
+                        }
+                        if (size - off >= 2) {
+                            if (off > 0)
+                                emit_arm64_lsr_imm(buf, X0_REG, X9_REG, (uint8_t)(off * 8));
+                            emit_arm64_strh_imm(buf, off > 0 ? X9_REG : X0_REG, X20_REG, (int32_t)off);
+                            off += 2;
+                        }
+                        if (size - off >= 1) {
+                            if (off > 0)
+                                emit_arm64_lsr_imm(buf, X0_REG, X9_REG, (uint8_t)(off * 8));
+                            emit_arm64_strb_imm(buf, off > 0 ? X9_REG : X0_REG, X20_REG, (int32_t)off);
+                        }
+                    }
+                    else {
+                        emit_arm64_str_imm(buf, true, X0_REG, X20_REG, 0);
+                        size_t rem = size - 8;
+                        size_t off = 8;
+                        if (rem >= 4) {
+                            emit_arm64_str_imm(buf, false, X1_REG, X20_REG, (int32_t)off);
+                            off += 4;
+                            rem -= 4;
+                        }
+                        if (rem >= 2) {
+                            size_t shift = (off - 8) * 8;
+                            if (shift > 0)
+                                emit_arm64_lsr_imm(buf, X1_REG, X9_REG, (uint8_t)shift);
+                            emit_arm64_strh_imm(buf, shift > 0 ? X9_REG : X1_REG, X20_REG, (int32_t)off);
+                            off += 2;
+                            rem -= 2;
+                        }
+                        if (rem >= 1) {
+                            size_t shift = (off - 8) * 8;
+                            if (shift > 0)
+                                emit_arm64_lsr_imm(buf, X1_REG, X9_REG, (uint8_t)shift);
+                            emit_arm64_strb_imm(buf, shift > 0 ? X9_REG : X1_REG, X20_REG, (int32_t)off);
+                        }
+                    }
+                    break;
+                }
             }
         }
     }

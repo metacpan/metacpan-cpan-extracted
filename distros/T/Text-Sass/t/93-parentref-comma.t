@@ -45,10 +45,6 @@ EOT
       text-decoration: underline
 EOT
 
-  SKIP: {
-      skip $TODO, 1;
-
-      my $ts = Text::Sass->new();
-      is($ts->sass2css($sass), $css, "sass to css conversion ok");
-    }
+  my $ts = Text::Sass->new();
+  is($ts->sass2css($sass), $css, "sass to css conversion ok");
 }

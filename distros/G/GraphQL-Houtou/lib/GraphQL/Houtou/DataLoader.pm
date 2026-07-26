@@ -5,19 +5,21 @@ use strict;
 use warnings;
 
 use Promise::XS ();
+use GraphQL::Houtou ();
 # The Houtou XS runtime resolves promise continuations through helpers in
 # this module; settling loader promises requires it to be loaded.
 use GraphQL::Houtou::Promise::PromiseXS ();
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+GraphQL::Houtou::_bootstrap_xs();
 
 # Reference batching loader for GraphQL::Houtou, following the semantics of
 # Facebook's dataloader. It is written strictly against the public batching
-# contract (execute's on_stall hook): loads queue a key and return a
-# Promise::XS promise; dispatch() sends every queued key to the batch
-# function in one call and settles the promises. It never touches executor
-# internals, so alternative loader implementations are equally supported.
+# contract (execute's on_stall hook): loads queue a key and return an
+# XS-backed await ticket; dispatch() sends every queued key to the batch
+# function in one call and settles the tickets.
 
 sub new {
   my ($class, %args) = @_;
@@ -28,7 +30,7 @@ sub new {
     batch => $batch,
     max_batch_size => $args{max_batch_size} || 0,
     cache => exists $args{cache} ? ($args{cache} ? 1 : 0) : 1,
-    cache_key => ref($args{cache_key}) eq 'CODE' ? $args{cache_key} : sub { $_[0] },
+    cache_key => ref($args{cache_key}) eq 'CODE' ? $args{cache_key} : undef,
     _promises => {},
     _queue => [],
   }, $class;
@@ -37,15 +39,13 @@ sub new {
 sub load {
   my ($self, $key) = @_;
   die "GraphQL::Houtou::DataLoader::load requires a defined key\n" if !defined $key;
-  my $cache_key = $self->{cache_key}->($key);
+  my $cache_key = $self->{cache}
+    ? ($self->{cache_key} ? $self->{cache_key}->($key) : $key)
+    : undef;
   if ($self->{cache} && exists $self->{_promises}{$cache_key}) {
     return $self->{_promises}{$cache_key};
   }
-  my $deferred = Promise::XS::deferred();
-  push @{ $self->{_queue} }, [ $key, $deferred ];
-  my $promise = $deferred->promise;
-  $self->{_promises}{$cache_key} = $promise if $self->{cache};
-  return $promise;
+  return $self->_enqueue_load_miss($key, $cache_key, $self->{cache});
 }
 
 # dataloader-js semantics: takes an arrayref of keys, returns one promise
@@ -61,17 +61,17 @@ sub load_many {
     return map { $self->load($_) } @args;
   }
   my $keys = $args[0];
-  return Promise::XS::resolved([]) if !@$keys;
+  return GraphQL::Houtou::DataLoader::Ticket->resolved([]) if !@$keys;
 
   my @results;
   my $remaining = @$keys;
-  my $deferred = Promise::XS::deferred();
+  my $ticket = GraphQL::Houtou::DataLoader::Ticket->new;
   for my $i (0 .. $#$keys) {
     my $slot = $i;
-    $self->load($keys->[$slot])->then(
+    $self->load($keys->[$slot])->_subscribe(
       sub {
         $results[$slot] = $_[0];
-        $deferred->resolve(\@results) if !--$remaining;
+        $ticket->_resolve(\@results) if !--$remaining;
         return;
       },
       sub {
@@ -80,25 +80,27 @@ sub load_many {
           blessed($reason) && $reason->isa('GraphQL::Houtou::DataLoader::Error')
           ? $reason
           : GraphQL::Houtou::DataLoader::Error->new($reason);
-        $deferred->resolve(\@results) if !--$remaining;
+        $ticket->_resolve(\@results) if !--$remaining;
         return;
       },
     );
   }
-  return $deferred->promise;
+  return $ticket;
 }
 
 sub prime {
   my ($self, $key, $value) = @_;
-  my $cache_key = $self->{cache_key}->($key);
+  my $cache_key = $self->{cache_key} ? $self->{cache_key}->($key) : $key;
   return $self if !$self->{cache} || exists $self->{_promises}{$cache_key};
-  $self->{_promises}{$cache_key} = Promise::XS::resolved($value);
+  $self->{_promises}{$cache_key} =
+    GraphQL::Houtou::DataLoader::Ticket->resolved($value);
   return $self;
 }
 
 sub clear {
   my ($self, $key) = @_;
-  delete $self->{_promises}{ $self->{cache_key}->($key) };
+  my $cache_key = $self->{cache_key} ? $self->{cache_key}->($key) : $key;
+  delete $self->{_promises}{$cache_key};
   return $self;
 }
 
@@ -119,36 +121,7 @@ sub dispatch {
   my $queue = $self->{_queue};
   return 0 if !@$queue;
   $self->{_queue} = [];
-
-  my $dispatched = 0;
-  my $max = $self->{max_batch_size};
-  while (@$queue) {
-    my @chunk = splice(@$queue, 0, ($max > 0 && $max < @$queue) ? $max : scalar @$queue);
-    my @keys = map { $_->[0] } @chunk;
-    my $values = eval { $self->{batch}->(\@keys) };
-    my $batch_error = $@;
-
-    if ($batch_error || ref($values) ne 'ARRAY' || @$values != @keys) {
-      my $reason = $batch_error
-        || "DataLoader batch function must return an arrayref with one entry per key\n";
-      for my $entry (@chunk) {
-        $entry->[1]->reject($reason);
-        $dispatched++;
-      }
-      next;
-    }
-
-    for my $i (0 .. $#chunk) {
-      my $value = $values->[$i];
-      if (blessed($value) && $value->isa('GraphQL::Houtou::DataLoader::Error')) {
-        $chunk[$i][1]->reject($value->message);
-      } else {
-        $chunk[$i][1]->resolve($value);
-      }
-      $dispatched++;
-    }
-  }
-  return $dispatched;
+  return $self->_dispatch_queue($queue);
 }
 
 # Build an on_stall callback that keeps dispatching a set of loaders until
@@ -176,6 +149,24 @@ sub new {
 }
 
 sub message { return $_[0]{message} }
+
+package GraphQL::Houtou::DataLoader::Ticket;
+
+sub _as_promise {
+  my ($self) = @_;
+  my $deferred = Promise::XS::deferred();
+  $self->_subscribe_native(
+    sub { $deferred->resolve($_[0]) },
+    sub { $deferred->reject($_[0]) },
+  );
+  return $deferred->promise;
+}
+
+sub then    { return shift->_as_promise->then(@_) }
+sub catch   { return shift->_as_promise->catch(@_) }
+sub finally { return shift->_as_promise->finally(@_) }
+sub all     { shift; return Promise::XS::Promise->all(@_) }
+sub race    { shift; return Promise::XS::Promise->race(@_) }
 
 package GraphQL::Houtou::DataLoader;
 
@@ -260,12 +251,20 @@ C<load($key)>, C<load_many(\@keys)>, C<prime($key, $value)>, C<clear($key)>,
 C<clear_all>, C<pending_count>, C<dispatch>.
 
 C<load_many> follows dataloader-js C<loadMany>: it takes an arrayref of
-keys and returns a single promise that resolves with an arrayref of values
+keys and returns a single thenable that resolves with an arrayref of values
 in key order. It never rejects on per-key failures - failed slots hold
 C<GraphQL::Houtou::DataLoader::Error> objects (check with C<blessed> +
 C<isa>, read the reason with C<< ->message >>). Calling it with a flat key
 list is deprecated (it returns one promise per key and warns in the
 C<deprecated> category).
+
+C<load> and C<load_many> return XS-backed tickets. They retain the
+Promise::XS chaining methods C<then>, C<catch>, C<finally>, C<all>, and
+C<race> for application code. The executor uses C<AWAIT_IS_READY> and
+C<AWAIT_GET> to consume already-settled cache entries without creating a
+Promise::XS continuation; pending tickets notify the executor directly
+from XS. Calling C<AWAIT_GET> before readiness throws, and calling it on a
+rejected ticket throws the rejection reason.
 
 Instances cache per key (create one loader per request unless you want
 cross-request caching). Pass C<< cache => 0 >> to disable, C<cache_key>

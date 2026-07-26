@@ -1,4 +1,4 @@
-package Affix v1.0.9 {    # 'FFI' is my middle name!
+package Affix v1.1.0 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
@@ -19,8 +19,8 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
 
     BEGIN {
         use XSLoader;
-        $DynaLoad::dl_debug = $DynaLoad::dl_debug = 1;
-        $okay               = XSLoader::load();
+        $DynaLoader::dl_debug = 0;
+        $okay                 = XSLoader::load();
         my $platform
             = 'Affix::Platform::' .
             ( ( $^O eq 'MSWin32' ) ? 'Windows' :
@@ -30,7 +30,7 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
 
         #~ warn $platform;
         #~ use base $platform;
-        eval 'use ' . $platform . ' qw[:all];';
+        eval "use $platform qw[:all]";
         $@ && die $@;
         our @ISA = ($platform);
     }
@@ -48,9 +48,9 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
             Float32 Float64
             Size_t SSize_t
             String WString
-            Pointer Array Live Struct Union Enum Callback CodeRef Complex Vector Live
+            Pointer Array Struct Union Enum Callback CodeRef Complex Vector
             ThisCall attach_destructor
-            Packed VarArgs
+            Const Packed VarArgs
             SV
             File PerlIO
             StringList
@@ -182,25 +182,20 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
 
     sub _is_type ($thing) {
         return 1 if builtin::blessed($thing) && $thing->isa('Affix::Type');
-        return 0 if !defined $thing || ref $thing;
-
-        # Strictly check for signature characters
-        return 1 if $thing =~ /^[\*\[\{\!<@]/;
-
-        # Primitive types must match exactly or be followed by a delimiter
-        return 1
-            if $thing
-            =~ /^(?:void|bool|[usw]?char|u?short|u?int|u?long(?:long)?|float|double|longdouble|s?size_t|s?int\d+|uint\d+|float\d+|m\d+[a-z]*)$/;
+        return 1 if !ref($thing) && defined $thing && index( '*@({;<', substr( $thing, 0, 1 ) ) >= 0;
         return 0;
     }
 
     # Abstract
-    sub Void ()       { Affix::Type::Primitive->new( name => 'void' ) }
-    sub Bool ()       { Affix::Type::Primitive->new( name => 'bool' ) }
-    sub Char ()       { Affix::Type::Primitive->new( name => 'char' ) }
-    sub UChar()       { Affix::Type::Primitive->new( name => 'uchar' ) }
-    sub SChar()       { Affix::Type::Primitive->new( name => 'char' ) }
-    sub WChar()       { Affix::Type::Primitive->new( name => 'uint16' ) }
+    CORE::state $wchar_size = $Config{wcharsize} // ( $^O eq 'MSWin32' ? 2 : 4 );
+    sub Void () { Affix::Type::Primitive->new( name => 'void' ) }
+    sub Bool () { Affix::Type::Primitive->new( name => 'bool' ) }
+    sub Char () { Affix::Type::Primitive->new( name => 'char' ) }
+    sub UChar() { Affix::Type::Primitive->new( name => 'uchar' ) }
+    sub SChar() { Affix::Type::Primitive->new( name => 'char' ) }
+
+    #~ sub WChar()       { Affix::Type::Primitive->new( name => ( $wchar_size == 2 ? 'uint16' : 'uint32' ) ) }
+    sub WChar()       { Affix::Type::Primitive->new( name => 'wchar_t' ) }
     sub Short ()      { Affix::Type::Primitive->new( name => 'short' ) }
     sub UShort ()     { Affix::Type::Primitive->new( name => 'ushort' ) }
     sub Int ()        { Affix::Type::Primitive->new( name => 'int' ) }
@@ -252,23 +247,14 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
     }
     sub Struct : prototype($) { Affix::Type::Struct->new( members => $_[0] ) }
 
-    sub Live : prototype($) {
+    sub Const : prototype($) {
         my $t = $_[0];
         $t = $t->() if ref($t) eq 'CODE';
         if ( ref($t) eq 'ARRAY' ) {
             if   ( @$t == 1 ) { $t = $t->[0]; }
             else              { $t = ( @$t == 2 && !ref( $t->[1] ) && $t->[1] =~ /^\d+$/ ) ? Array($t) : Struct($t); }
         }
-        if ( builtin::blessed($t) ) {
-            return '+' . $t->signature if $t->isa('Affix::Type::Struct') || $t->isa('Affix::Type::Union');
-            return Pointer [$t]        if $t->isa('Affix::Type::Array');
-            return Pointer [$t];
-        }
-        if ( !ref $t ) {
-            return '+' . $t if $t =~ /^[\{\<@]/;
-            return '*' . $t if $t =~ /^\[/;
-        }
-        return $t;
+        return Affix::Type::Const->new( inner => $t );
     }
 
     # Union[ i => Int, f => Float ] -> <i:int,f:float>
@@ -337,15 +323,15 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
     }
 
     # Packed[ Struct[...] ]        -> !{...}
-    # Packed( 4, [ Struct[...] ] ) -> !4:{...}
+    # Packed[ N, Struct[...] ]     -> !N:{...}
     sub Packed : prototype($) {
-        if ( @_ == 2 && !ref( $_[0] ) ) {
-            my ( $align, $content ) = @_;
-            my $agg = ref($content) eq 'ARRAY' ? _build_aggregate( $content, '{%s}' ) : $content;
+        my $content = $_[0];
+        if ( ref($content) eq 'ARRAY' && @$content == 2 && !ref( $content->[0] ) ) {
+            my ( $align, $struct ) = @$content;
+            my $agg = ref($struct) eq 'ARRAY' ? _build_aggregate( $struct, '{%s}' ) : $struct;
             return "!$align:$agg";
         }
-        my $content = $_[0];
-        my $agg     = ref($content) eq 'ARRAY' ? _build_aggregate( $content, '{%s}' ) : $content;
+        my $agg = ref($content) eq 'ARRAY' ? _build_aggregate( $content, '{%s}' ) : $content;
         return "!$agg";
     }
 
@@ -354,11 +340,11 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
 
     # Semantic aliases and convienient types
     sub String ()     {'*char'}
-    sub WString ()    {'*ushort'}
+    sub WString ()    { $wchar_size == 2 ? '*uint16' : '*uint32' }
     sub SV()          {'@SV'}
     sub File ()       {'@File'}
     sub PerlIO ()     {'@PerlIO'}
-    sub StringList () {'@StringList'}
+    sub StringList () { Pointer [ Pointer [Char] ] }
     sub Buffer ()     {'@Buffer'}
     sub SockAddr ()   {'@SockAddr'}
 
@@ -368,11 +354,12 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
         my @parts;
         for ( my $i = 0; $i < @$args; $i++ ) {
             my $curr = $args->[$i];
+            if ( ref($curr) eq 'ARRAY' ) {
+                push @parts, $curr->[0] . ':' . $curr->[1];
+                next;
+            }
             my $next = $args->[ $i + 1 ];
-            if ( defined $next &&
-                ( !ref($curr) || !builtin::blessed($curr) || !$curr->isa('Affix::Type') ) &&
-                builtin::blessed($next) &&
-                $next->isa('Affix::Type') ) {
+            if ( defined $next && _is_type($next) && !ref($curr) ) {
                 push @parts, "$curr:$next";
                 $i++;
             }
@@ -422,11 +409,23 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
         }
         return 1;
     }
+
+    # Update @EXPORT_OK or %EXPORT_TAGS to include 'cast' if not already there
     package    #
         Affix::Type {
         use overload '""' => sub { shift->signature() }, fallback => 1;
         sub new       { my ( $class, %args ) = @_; bless \%args, $class }
-        sub signature { die "Abstract method" }
+        sub signature {...}
+    }
+    package    #
+        Affix::Type::Const {
+        our @ISA = qw[Affix::Type];
+        sub new { my ( $class, %args ) = @_; bless \%args, $class }
+
+        sub signature {
+            my $self = shift;
+            return builtin::blessed( $self->{inner} ) ? $self->{inner}->signature : $self->{inner};
+        }
     }
     package    #
         Affix::Type::Reference {
@@ -459,11 +458,37 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
             $self->{const_map}  = {};
             $self->{values_map} = {};
             my $counter = 0;
-            for my $item ( @{ $self->{elements} } ) {
+            my @elems   = @{ $self->{elements} };
+            for ( my $i = 0; $i < @elems; $i++ ) {
+                my $item = $elems[$i];
                 my ( $name, $final_val );
                 if ( !ref $item ) {
-                    $name      = $item;
-                    $final_val = $counter;
+                    $name = $item;
+                    my $next     = $elems[ $i + 1 ];
+                    my $is_value = 0;
+                    if ( defined $next && !ref $next ) {
+                        if ( $next =~ /^-?\d+$/ || $next =~ /^0x[0-9a-fA-F]+$/ || $next =~ /[\+\|\-\*\/\<\>\~\!\^\(\)]/ ) {
+                            $is_value = 1;
+                        }
+                        elsif ( exists $self->{const_map}->{$next} ) {
+                            $is_value = 1;
+                        }
+                    }
+                    if ($is_value) {
+                        if ( $next =~ /^-?\d+$/ ) {
+                            $final_val = $next;
+                        }
+                        elsif ( $next =~ /^0x[0-9a-fA-F]+$/ ) {
+                            $final_val = hex($next);
+                        }
+                        else {
+                            $final_val = $self->_calculate_expr( $next, $self->{const_map} );
+                        }
+                        $i++;
+                    }
+                    else {
+                        $final_val = $counter;
+                    }
                 }
                 elsif ( ref $item eq 'ARRAY' ) {
                     my $raw_val;
@@ -531,7 +556,7 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
                 'unary_minus' => [ 14, 0 ],
                 '!'           => [ 14, 0 ],
                 '~'           => [ 14, 0 ],
-                '('           => [ -1, 0 ],
+                '('           => [ -1, 0 ]
             );
             my $expect_unary = 1;
             for my $token (@tokens) {
@@ -584,8 +609,8 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
                     if    ( $token eq '+' )  { push @stack, $a + $b; }
                     elsif ( $token eq '-' )  { push @stack, $a - $b; }
                     elsif ( $token eq '*' )  { push @stack, $a * $b; }
-                    elsif ( $token eq '/' )  { push @stack, int( $a / $b ); }
-                    elsif ( $token eq '%' )  { push @stack, $a % $b; }
+                    elsif ( $token eq '/' )  { push @stack, $b ? int( $a / $b ) : 0; }
+                    elsif ( $token eq '%' )  { push @stack, $b ? $a % $b        : 0; }
                     elsif ( $token eq '<<' ) { push @stack, $a << $b; }
                     elsif ( $token eq '>>' ) { push @stack, $a >> $b; }
                     elsif ( $token eq '|' )  { push @stack, $a | $b; }
@@ -615,11 +640,18 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
             my @parts;
             for ( my $i = 0; $i < @$members; $i++ ) {
                 my $curr = $members->[$i];
+                if ( ref($curr) eq 'ARRAY' ) {
+                    my ( $name, $type, $width ) = @$curr;
+                    if ( defined $width && !ref($width) && $width =~ /^\d+$/ ) {
+                        push @parts, "$name:$type:$width";
+                    }
+                    else {
+                        push @parts, "$name:$type";
+                    }
+                    next;
+                }
                 my $next = $members->[ $i + 1 ];
-                if ( defined $next &&
-                    builtin::blessed($next)   &&
-                    $next->isa('Affix::Type') &&
-                    ( !builtin::blessed($curr) || !$curr->isa('Affix::Type') ) ) {
+                if ( defined $next && Affix::_is_type($next) && !Affix::_is_type($curr) ) {
                     my $name = $curr;
                     my $type = $next;
                     $i++;
@@ -666,53 +698,6 @@ package Affix v1.0.9 {    # 'FFI' is my middle name!
             my $r = builtin::blessed( $self->{ret} ) ? $self->{ret}->signature : $self->{ret};
             return "*(($args)->$r)";
         }
-    }
-    package    #
-        Affix::Pointer {
-        use v5.40;
-        use overload '""' => \&address, '@{}' => \&_as_array, '%{}' => \&_as_hash, fallback => 1;
-        sub address           { Affix::address(shift) }
-        sub type              { Affix::_pin_type(shift) }
-        sub element_type      { Affix::_pin_element_type(shift) }
-        sub size              { Affix::_pin_size(shift) }
-        sub count             { Affix::_pin_count(shift) }
-        sub cast              { Affix::cast( shift, shift ) }
-        sub _as_array         { my $self = shift; my @proxy; tie @proxy, 'Affix::Pointer::TiedArray', $self; return \@proxy; }
-        sub _as_hash          { my $self = shift; my %proxy; tie %proxy, 'Affix::Pointer::TiedHash',  $self; return \%proxy; }
-        sub attach_destructor { my ( $self, $destructor, $lib ) = @_; Affix::attach_destructor( $self, $destructor, $lib ); }
-    }
-    package    #
-        Affix::Pointer::TiedHash {
-        use v5.40;
-        sub TIEHASH  { my ( $class, $ptr ) = @_; my $obj = $ptr->cast( "+" . $ptr->element_type ); return $obj; }
-        sub FETCH    { my ( $self, $key ) = @_; return $self->{$key}; }
-        sub STORE    { my ( $self, $key, $val ) = @_; $self->{$key} = $val; }
-        sub EXISTS   { my ( $self, $key ) = @_; return exists $self->{$key}; }
-        sub FIRSTKEY { my ($self) = @_; keys %$self; return each %$self; }
-        sub NEXTKEY  { my ( $self, $last ) = @_; return each %$self; }
-        sub SCALAR   { my ($self) = @_; return scalar %$self; }
-        };
-    package    #
-        Affix::Pointer::TiedArray {
-        use v5.40;
-        sub TIEARRAY  { bless { pin => $_[1] }, $_[0] }
-        sub FETCH     { my ( $self, $index ) = @_; Affix::_pin_get_at( $self->{pin}, $index ); }
-        sub STORE     { my ( $self, $index, $value ) = @_; Affix::_pin_set_at( $self->{pin}, $index, $value ); }
-        sub FETCHSIZE { my $self = shift; Affix::_pin_count( $self->{pin} ) // 0x7FFFFFFF; }
-        sub EXISTS    { my ( $self, $index ) = @_; my $count = Affix::_pin_count( $self->{pin} ); return defined($count) ? ( $index < $count ) : 1; }
-        sub DELETE    { die "Cannot delete elements from a C array" }
-        sub CLEAR     { die "Cannot clear a C array" }
-        };
-    package    #
-        Affix::Live {
-        use v5.40;
-        sub new      { my ( $class, $ref ) = @_; return bless $ref // {}, $class; }
-        sub FETCH    { my ( $self, $key ) = @_; return $self->{$key}; }
-        sub STORE    { my ( $self, $key, $val ) = @_; $self->{$key} = $val; }
-        sub EXISTS   { my ( $self, $key ) = @_; return exists $self->{$key}; }
-        sub FIRSTKEY { my ($self) = @_; keys %$self; return each %$self; }
-        sub NEXTKEY  { my ( $self, $last ) = @_; return each %$self; }
-        sub SCALAR   { my ($self) = @_; return scalar %$self; }
     }
 };
 1;

@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Torrent v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
     use Net::BitTorrent::Storage;
     use Net::BitTorrent::Tracker;
@@ -15,6 +15,7 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use IO::Socket::IP;
     use Net::BitTorrent::Types qw[:state :pick];
     use Algorithm::RateLimiter::TokenBucket;
+    use URI::Escape qw[uri_escape];
 
     # Security limits
     use constant MAX_METADATA_SIZE     => 10 * 1024 * 1024;    # 10 MB which would be... massive
@@ -23,6 +24,7 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     use constant MAX_PEERS             => 10_000;              # Max discovered peers per torrent
     use constant MAX_ATTEMPTED         => 5000;                # Max attempted connection entries
     use constant ENDGAME_STALL_TIMEOUT => 60;                  # Seconds without piece verification before endgame fallback
+    use constant METADATA_PIECE_SIZE   => 16384;               # BEP 09: metadata pieces are always 16KB
 
     #
     field $path             : param = undef;
@@ -56,14 +58,27 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     field $last_piece_verified_at = 0;    # Timestamp of last successful piece verification (for endgame stall detection)
     field %test_data;                     # For simulation
     field %block_cache;                   # piece_index => { offset => data }
-    field $bytes_downloaded = 0;
-    field $bytes_uploaded   = 0;
-    field $bytes_left       = 0;
+    field $bytes_downloaded : reader = 0;
+    field $bytes_uploaded   : reader = 0;
+    field $bytes_left       : reader = 0;
+    field $_prev_downloaded = 0;
+    field $_prev_uploaded   = 0;
+    field $_speed_down      = 0;
+    field $_speed_up        = 0;
+    field $_ema_speed_down  = 0;
+    field $_ema_speed_up    = 0;
+    field $_tick_counter    = 0;
+    field $_num_peers       = 0;
+    field $_num_seeds       = 0;
+    method speed_down () {$_speed_down}
+    method speed_up ()   {$_speed_up}
+    method num_peers ()  {$_num_peers}
+    method num_seeds ()  {$_num_seeds}
     field @piece_priorities;
     field $picking_strategy = PICK_RAREST_FIRST;
     field $is_partial_seed : reader : writer(set_partial_seed) = 0;
     field $is_superseed    : reader : writer(set_superseed)    = 0;
-    field %superseed_offers;              # Peer object => piece_index
+    field %superseed_offers;    # Peer object => piece_index
     field $debug : param = 0;
     field $max_peers : param : reader : writer = 100;
     #
@@ -462,29 +477,53 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
         # Attempt to connect to discovered peers if we need more
         $self->_attempt_connections() if keys %peer_objects < 50;
 
-        # Snapshot peer list to avoid hash mutation during iteration
-        # (tick may trigger disconnect which modifies %peer_objects)
+        # Batch peer iteration to avoid blocking the UI for too long.
+        # With many peers (up to 50), processing them all in one tick can
+        # take >100ms. Instead, rotate through them in batches of 15.
         my @peers_snapshot = values %peer_objects;
-        for my $peer (@peers_snapshot) {
-            $peer->tick();
-            if ( $state == STATE_METADATA ) {
-                $self->_request_metadata($peer);
-            }
-            elsif ( $state == STATE_RUNNING ) {
-
-                # Update interest
-                my $is_interesting = $picker->is_interesting($peer);
-                if ( $is_interesting && !$peer->am_interested ) {
-                    $peer->interested();
+        my $peer_count     = scalar @peers_snapshot;
+        if ( $peer_count > 0 ) {
+            my $batch_size = 15;
+            my $offset     = $_tick_counter % $batch_size;
+            for ( my $i = $offset; $i < $peer_count && $i < $offset + $batch_size; $i++ ) {
+                my $peer = $peers_snapshot[$i];
+                next unless $peer;    # Skip if peer was disconnected mid-iteration
+                $peer->tick();
+                if ( $state == STATE_METADATA ) {
+                    $self->_request_metadata($peer);
                 }
-                elsif ( !$is_interesting && $peer->am_interested ) {
-                    $peer->not_interested();
-                }
+                elsif ( $state == STATE_RUNNING && $picker ) {
 
-                # Request pieces if not choked
-                $self->_request_pieces($peer) if !$peer->peer_choking && $peer->am_interested;
+                    # Update interest
+                    my $is_interesting = $picker->is_interesting($peer);
+                    if ( $is_interesting && !$peer->am_interested ) {
+                        $peer->interested();
+                    }
+                    elsif ( !$is_interesting && $peer->am_interested ) {
+                        $peer->not_interested();
+                    }
+
+                    # Request pieces if not choked
+                    $self->_request_pieces($peer) if !$peer->peer_choking && $peer->am_interested;
+                }
             }
         }
+
+        # Smooth speed with exponential moving average (alpha=0.3)
+        # to avoid bouncing between real values and zero on idle ticks.
+        if ( $delta > 0 ) {
+            my $raw_down = ( $bytes_downloaded - $_prev_downloaded ) / $delta;
+            my $raw_up   = ( $bytes_uploaded - $_prev_uploaded ) / $delta;
+            $_ema_speed_down = $_ema_speed_down == 0 ? $raw_down : ( 0.3 * $raw_down + 0.7 * $_ema_speed_down );
+            $_ema_speed_up   = $_ema_speed_up == 0   ? $raw_up   : ( 0.3 * $raw_up + 0.7 * $_ema_speed_up );
+            $_speed_down     = int( $_ema_speed_down + 0.5 );
+            $_speed_up       = int( $_ema_speed_up + 0.5 );
+        }
+        $_prev_downloaded = $bytes_downloaded;
+        $_prev_uploaded   = $bytes_uploaded;
+        my @alive = grep { $_->connected } @peers_snapshot;
+        $_num_peers = scalar @alive;
+        $_num_seeds = scalar grep { $_->is_seeder } @alive;
         $choke_timer += $delta;
         if ( $choke_timer >= 10 ) {
             $self->_evaluate_choking();
@@ -511,6 +550,7 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
             $self->_update_dht_search();
             $dht_lookup_timer = 0;
         }
+        $_tick_counter++;
     }
     field %attempted_connections;    # ip:port => timestamp
 
@@ -573,20 +613,26 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     field %metadata_pending;    # peer => piece_index
 
     method _request_metadata ($peer) {
-        return unless $peer->protocol->isa('Net::BitTorrent::Protocol::BEP10');
+        unless ( $peer->protocol->isa('Net::BitTorrent::Protocol::BEP10') ) {
+            return;
+        }
         my $remote_ext = $peer->protocol->remote_extensions;
-        return unless exists $remote_ext->{ut_metadata};
+        unless ( exists $remote_ext->{ut_metadata} ) {
+            return;
+        }
 
         # We need metadata_size from the peer (from extended handshake)
         my $m_size = $peer->protocol->metadata_size;
-        return unless $m_size > 0;
+        unless ( $m_size > 0 ) {
+            return;
+        }
         if ( $metadata_size == 0 ) {
             $metadata_size = $m_size;
             $self->_emit_log( 'debug', "Metadata size identified: $metadata_size bytes" ) if $debug;
         }
 
         # How many pieces? (BEP 09 uses 16KiB pieces)
-        my $num_pieces = int( ( $metadata_size + 16383 ) / 16384 );
+        my $num_pieces = int( ( $metadata_size + METADATA_PIECE_SIZE - 1 ) / METADATA_PIECE_SIZE );
 
         # Check if we already have a request pending for this peer
         return if exists $metadata_pending{$peer};
@@ -633,9 +679,9 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     method handle_metadata_request ( $peer, $piece ) {
         return unless $metadata;
         my $info_encoded = bencode( $metadata->{info} );
-        my $num_pieces   = int( ( length($info_encoded) + 16383 ) / 16384 );
+        my $num_pieces   = int( ( length($info_encoded) + METADATA_PIECE_SIZE - 1 ) / METADATA_PIECE_SIZE );
         return if $piece < 0 || $piece >= $num_pieces;
-        my $piece_data = substr( $info_encoded, $piece * 16384, 16384 );
+        my $piece_data = substr( $info_encoded, $piece * METADATA_PIECE_SIZE, METADATA_PIECE_SIZE );
         $peer->protocol->send_metadata_data( $piece, length($info_encoded), $piece_data );
     }
 
@@ -648,9 +694,15 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
             }
             $metadata_size = $total_size;
         }
-        my $num_pieces = int( ( $metadata_size + 16383 ) / 16384 );
+        my $num_pieces = int( ( $metadata_size + METADATA_PIECE_SIZE - 1 ) / METADATA_PIECE_SIZE );
         if ( $piece < 0 || $piece >= $num_pieces ) {
             $self->_emit_log( 'warning', "Received out-of-range metadata piece index $piece (max " . ( $num_pieces - 1 ) . ')' );
+            return;
+        }
+        my $expected_size = ( $piece < $num_pieces - 1 ) ? METADATA_PIECE_SIZE : ( $metadata_size - $piece * METADATA_PIECE_SIZE );
+        my $actual_len    = length($data);
+        if ( $actual_len > $expected_size || ( $piece < $num_pieces - 1 && $actual_len != METADATA_PIECE_SIZE ) ) {
+            $self->_emit_log( 'warning', "Metadata piece $piece invalid size: $actual_len bytes (expected $expected_size)" );
             return;
         }
         $self->_emit_log( 'debug', "Received metadata piece $piece (len " . length($data) . ') from ' . ( $peer ? $peer->ip : 'unknown' ) ) if $debug;
@@ -747,10 +799,20 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
         $picker     = Net::BitTorrent::Torrent::PiecePicker->new( bitfield => $bitfield, );
         $bytes_left = $self->_calculate_total_size();
         $state      = STATE_RUNNING;
+        $self->_emit('metadata_received');
         $self->_emit('started');
 
         # Re-initialize peer bitfields now that we have the size
         $self->init_peer_bitfield($_) for values %peer_objects;
+
+        # Immediately evaluate interest for all connected peers
+        # (HAVE_ALL may have arrived before we had a bitfield, so _check_interest was a no-op)
+        for my $peer ( values %peer_objects ) {
+            next if $peer->am_interested;
+            if ( $picker->is_interesting($peer) ) {
+                $peer->interested();
+            }
+        }
 
         # Announce to trackers now that we have full infohash info
         $self->announce();
@@ -1097,6 +1159,11 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
         return $total;
     }
 
+    method total_size () {
+        return $_cached_total_size if defined $_cached_total_size;
+        return $self->_calculate_total_size();
+    }
+
     method _sum_file_tree ($tree) {
         my $total = 0;
         for my $node ( values %$tree ) {
@@ -1341,6 +1408,16 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     method peer_id ()     {$peer_id}
     method trackers ()    { return $tracker_manager->trackers() }
 
+    method magnet_uri () {
+        return if $is_private;
+        my @pairs;
+        push @pairs, 'xt=urn:btih:' . unpack( 'H*', $infohash_v1 )     if $infohash_v1;
+        push @pairs, 'xt=urn:btmh:1220' . unpack( 'H*', $infohash_v2 ) if $infohash_v2;
+        push @pairs, 'dn=' . uri_escape( $metadata->{info}{name} )     if $metadata && $metadata->{info} && $metadata->{info}{name};
+        push @pairs, 'tr=' . uri_escape($_) for @$initial_trackers;
+        return 'magnet:?' . join( '&', @pairs );
+    }
+
     method DESTROY () {
         return unless $state != STATE_STOPPED;
         for my $peer ( grep {defined} values %peer_objects ) {
@@ -1354,29 +1431,41 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
     }
 
     method dump_state () {
+        my $saved_meta = undef;
+        if ( $metadata && ref $metadata eq 'HASH' && ref $metadata->{info} eq 'HASH' ) {
+            my $info = $metadata->{info};
+            if ( ( $info->{'piece length'} // 0 ) > 0 && defined $info->{name} && ( $info->{pieces} || $info->{'file tree'} ) ) {
+                $saved_meta = $metadata;
+            }
+        }
         return {
-            metadata   => $metadata,
-            bitfield   => $bitfield->data,
-            storage    => $storage->dump_state(),
+            state      => $state,
+            metadata   => $saved_meta,
+            bitfield   => $bitfield ? $bitfield->data        : undef,
+            storage    => $storage  ? $storage->dump_state() : undef,
             downloaded => $bytes_downloaded,
             uploaded   => $bytes_uploaded
         };
     }
 
-    method load_state ($state) {
-        return unless ref $state eq 'HASH';
-        if ( exists $state->{metadata} ) {
-            if ( ref $state->{metadata} eq 'HASH' && ref $state->{metadata}{info} eq 'HASH' ) {
-                $metadata = $state->{metadata};
+    method load_state ($data) {
+        return unless ref $data eq 'HASH';
+        if ( exists $data->{metadata} ) {
+            if ( ref $data->{metadata} eq 'HASH' &&
+                keys $data->{metadata}->%*                           &&
+                ref $data->{metadata}{info} eq 'HASH'                &&
+                ( $data->{metadata}{info}{'piece length'} // 0 ) > 0 &&
+                defined $data->{metadata}{info}{name} ) {
+                $metadata = $data->{metadata};
                 $self->_init_from_metadata();
             }
             else {
                 $self->_emit_log( 'warn', 'load_state: invalid metadata structure, skipping' );
             }
         }
-        if ( exists $state->{bitfield} && defined $state->{bitfield} && $bitfield ) {
-            if ( length( $state->{bitfield} ) == int( ( $bitfield->size + 7 ) / 8 ) ) {
-                $bitfield->set_data( $state->{bitfield} );
+        if ( exists $data->{bitfield} && defined $data->{bitfield} && $bitfield ) {
+            if ( length( $data->{bitfield} ) == int( ( $bitfield->size + 7 ) / 8 ) ) {
+                $bitfield->set_data( $data->{bitfield} );
                 my $piece_len = $metadata->{info}{'piece length'} // 16384;
                 $bytes_left = ( $bitfield->size - $bitfield->count ) * $piece_len;
             }
@@ -1384,9 +1473,20 @@ class Net::BitTorrent::Torrent v2.1.0 : isa(Net::BitTorrent::Emitter) {
                 $self->_emit_log( 'warn', 'load_state: bitfield size mismatch, skipping' );
             }
         }
-        $storage->load_state( $state->{storage} ) if exists $state->{storage} && $storage;
-        $bytes_downloaded = $state->{downloaded} // 0;
-        $bytes_uploaded   = $state->{uploaded}   // 0;
+        $storage->load_state( $data->{storage} ) if exists $data->{storage} && $storage;
+        $bytes_downloaded = $data->{downloaded} // 0;
+        $bytes_uploaded   = $data->{uploaded}   // 0;
+        if ( exists $data->{state} && defined $data->{state} ) {
+            if ( $metadata && $picker ) {
+                $state = $data->{state};
+            }
+            elsif ( $data->{state} == STATE_RUNNING || $data->{state} == STATE_STARTING ) {
+                $state = STATE_STOPPED;
+            }
+            else {
+                $state = $data->{state};
+            }
+        }
     }
 
     method file_tree () {

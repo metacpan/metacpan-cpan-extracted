@@ -10,7 +10,7 @@ use if $] > 5.017, 'deprecate';
 # Peter Gibbons: I wouldn't say I've been missing it, Bob!
 
 
-our $VERSION = '6.3';
+our $VERSION = '6.4';
 our $FORCE_SEARCH_ALL_PATHS = 0;
 
 sub import {
@@ -185,6 +185,8 @@ or directory
 
     use Module::Pluggable search_dirs => ['mylibs/Foo'];
 
+If you I<only> want to search those C<search_dirs>, provide a true value for
+C<search_dirs_strict>.
 
 Or if you want to instantiate each plugin rather than just return the name
 
@@ -279,6 +281,31 @@ By default this is 'plugins'
 
 An array ref of namespaces to look in.
 
+    search_path => ['MyApp::Plugin', 'MyApp::Extension']
+
+Alternatively, you can pass a hash ref where each key is a namespace prefix and
+each value is a hash ref of option overrides for that path. The per-path
+options are merged on top of the global options, so you only need to
+specify what differs.
+
+    search_path => {
+        'MyApp::Plugin'    => { max_depth => 2 },
+        'MyApp::Extension' => { max_depth => 3, instantiate => 'new' },
+    }
+
+If you want plugins to be in a particular order, use an array ref of mixed
+plain strings and single-key hash refs instead. Order is preserved; only the
+hash ref entries carry per-path option overrides.
+
+    search_path => [
+        'MyApp::Plugin',
+        { 'MyApp::Extension' => { max_depth => 3, instantiate => 'new' } },
+    ]
+
+Results from all paths are combined and returned in a single list. Class
+names are deduplicated across paths; if any path uses C<instantiate> its
+objects are included as-is alongside any class names from other paths.
+
 =head2 search_dirs
 
 An array ref of directories to look in before @INC.
@@ -356,6 +383,24 @@ and to only get the latter (i.e C<MyClass::Plugin::Foo::Bar>)
         package MyClass;
         use Module::Pluggable min_depth => 4;
 
+=head2 sort_results
+
+Controls the order plugin names (or objects) are returned in. One of:
+
+=over 4
+
+=item * C<'alpha'> (the default) - sorted alphabetically by package name.
+
+=item * C<'path'> - returned in search-path discovery order: all plugins
+under the first C<search_path> entry, then the second, and so on.
+
+=item * C<0> - no sort is applied at all. Fastest option, for callers that
+will sort or otherwise order the results themselves.
+
+=back
+
+        package MyClass;
+        use Module::Pluggable sort_results => 'path';
 
 =head1 TRIGGERS
 

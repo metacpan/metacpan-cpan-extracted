@@ -1,5 +1,9 @@
 Revision history for Terse-Static
 
+0.13	2026-07-26
+	- Remove PAX headers
+	- Use strict/warnings in all PMs
+
 0.04    [2022-12-14]
 	- The psuedo coded Terse::Controller::Static now actually works :).
 

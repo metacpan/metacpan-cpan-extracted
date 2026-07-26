@@ -1,8 +1,8 @@
 use v5.40;
-use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 #
 $|++;
 my $C_CODE = <<'END_C';
@@ -53,7 +53,8 @@ is $pinned_buf, "Initial", 'Read C string from pinned array';
 #
 my $sym = find_symbol( load_library($lib_path), 'global_buffer' );
 #
-my $sym_arr = Affix::cast( $sym, Array [ Char, 64 ] );
-$$sym_arr = "Perl was here";
-is $pinned_buf, "Perl was here", 'Writing string to pinned array persisted in C memory';
+my $sym_arr = cast( $sym, Array [ Char, 64 ] );
+$$sym_arr = 'Perl was here';
+is $pinned_buf, 'Perl was here', 'Writing string to pinned array persisted in C memory';
+#
 done_testing;

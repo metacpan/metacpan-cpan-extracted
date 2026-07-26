@@ -52,7 +52,7 @@ while (1) {
         }
 
         # Pick the top N closest unvisited candidates
-        my @to_query = sort { ( $a->{id} ^.$infohash ) cmp( $b->{id} ^.$infohash ) } grep { !$_->{visited} && $_->{ip} } values %candidates;
+        my @to_query = sort { ( $a->{id} ^.$infohash ) cmp ( $b->{id} ^.$infohash ) } grep { !$_->{visited} && $_->{ip} } values %candidates;
         if (@to_query) {
             my $best_dist = unpack( 'H*', $to_query[0]{id} ^.$infohash );
             say sprintf( '[DEMO] Frontier: %d nodes. Best dist: %s', scalar( keys %candidates ), $best_dist );

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:rt.cpan.org)",
+      "WebSearch",
+      "Bash(perl *)",
+      "Bash(git checkout *)",
+      "Bash(grep -n 'if\\(ref $val\\)' /Users/rmp/dev/libtext-sass-perl/lib/Text/Sass.pm)",
+      "Bash(grep -v \"^$\")"
+    ]
+  }
+}

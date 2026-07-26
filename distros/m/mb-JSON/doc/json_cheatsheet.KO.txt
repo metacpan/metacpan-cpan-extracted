@@ -43,6 +43,8 @@
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
 [ 9. UTF-8 멀티바이트 문자 그대로 출력 (\uXXXX 변환 없음) ]
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
 
 [ 10. 예제 ]
   my $h = mb::JSON::decode('{"name":"홍길동","age":30}');

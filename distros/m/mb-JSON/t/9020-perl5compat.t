@@ -48,11 +48,6 @@ my @all_files = (@pm_files, @t_files, @eg_files);
 
 plan_skip('no files found') unless @all_files;
 
-# Counts: P1-P9 for all files, P10-P14 for .pm only
-my $total = scalar(@all_files) * 9
-          + scalar(@pm_files)  * 5;
-plan_tests($total);
-
 ######################################################################
 # Helpers
 ######################################################################
@@ -64,30 +59,38 @@ sub _code {
     return $text;
 }
 
+my @tests;
+
 ######################################################################
 # P1-P9: All files
 ######################################################################
 for my $f (@all_files) {
-    my $code = _code($f);
 
     # P1: no `our`
-    my @p1 = _scan_code("$ROOT/$f", qr/\bour\b/);
-    ok(!@p1, "P1 - no 'our' keyword: $f");
-    diag("  line $_->{line}: $_->{text}") for @p1;
+    push @tests, sub {
+        my @p1 = _scan_code("$ROOT/$f", qr/\bour\b/);
+        ok(!@p1, "P1 - no 'our' keyword: $f");
+        diag("  line $_->{line}: $_->{text}") for @p1;
+    };
 
     # P2: no say/given/state/when
-    my @p2 = _scan_code("$ROOT/$f", qr/\b(?:say|given|state|when)\s*[\(\{]/);
-    ok(!@p2, "P2 - no say/given/state/when: $f");
-    diag("  line $_->{line}: $_->{text}") for @p2;
+    push @tests, sub {
+        my @p2 = _scan_code("$ROOT/$f", qr/\b(?:say|given|state|when)\s*[\(\{]/);
+        ok(!@p2, "P2 - no say/given/state/when: $f");
+        diag("  line $_->{line}: $_->{text}") for @p2;
+    };
 
     # P3: no my(undef,...)
-    my @p3 = _scan_code("$ROOT/$f", qr/\bmy\s*\(\s*undef/);
-    ok(!@p3, "P3 - no my(undef,...): $f");
-    diag("  line $_->{line}: $_->{text}") for @p3;
+    push @tests, sub {
+        my @p3 = _scan_code("$ROOT/$f", qr/\bmy\s*\(\s*undef/);
+        ok(!@p3, "P3 - no my(undef,...): $f");
+        diag("  line $_->{line}: $_->{text}") for @p3;
+    };
 
     # P4: no defined-or // (split// exempt)
-    my @p4;
-    {
+    push @tests, sub {
+        my $code = _code($f);
+        my @p4;
         my $lineno = 0;
         for my $raw (split /\n/, $code) {
             $lineno++;
@@ -104,34 +107,44 @@ for my $f (@all_files) {
                 push @p4, { line => $lineno, text => $raw };
             }
         }
-    }
-    ok(!@p4, "P4 - no defined-or // operator: $f");
-    diag("  line $_->{line}: $_->{text}") for @p4;
+        ok(!@p4, "P4 - no defined-or // operator: $f");
+        diag("  line $_->{line}: $_->{text}") for @p4;
+    };
 
     # P5: no //=
-    my @p5 = _scan_code("$ROOT/$f", qr/\/\/=/);
-    ok(!@p5, "P5 - no //= operator: $f");
-    diag("  line $_->{line}: $_->{text}") for @p5;
+    push @tests, sub {
+        my @p5 = _scan_code("$ROOT/$f", qr/\/\/=/);
+        ok(!@p5, "P5 - no //= operator: $f");
+        diag("  line $_->{line}: $_->{text}") for @p5;
+    };
 
     # P6: no yada-yada
-    my @p6 = _scan_code("$ROOT/$f", qr/(?<![\.])\.\.\.(?![\.])/ );
-    ok(!@p6, "P6 - no yada-yada (...): $f");
-    diag("  line $_->{line}: $_->{text}") for @p6;
+    push @tests, sub {
+        my @p6 = _scan_code("$ROOT/$f", qr/(?<![\.])\.\.\.(?![\.])/ );
+        ok(!@p6, "P6 - no yada-yada (...): $f");
+        diag("  line $_->{line}: $_->{text}") for @p6;
+    };
 
     # P7: no \o{...}
-    my @p7 = _scan_code("$ROOT/$f", qr/\\o\{/);
-    ok(!@p7, "P7 - no \\o{} octal escape: $f");
-    diag("  line $_->{line}: $_->{text}") for @p7;
+    push @tests, sub {
+        my @p7 = _scan_code("$ROOT/$f", qr/\\o\{/);
+        ok(!@p7, "P7 - no \\o{} octal escape: $f");
+        diag("  line $_->{line}: $_->{text}") for @p7;
+    };
 
     # P8: no \x{NNN} wide
-    my @p8 = _scan_code("$ROOT/$f", qr/\\x\{[0-9a-fA-F]{3,}\}/);
-    ok(!@p8, "P8 - no wide \\x{} hex escape: $f");
-    diag("  line $_->{line}: $_->{text}") for @p8;
+    push @tests, sub {
+        my @p8 = _scan_code("$ROOT/$f", qr/\\x\{[0-9a-fA-F]{3,}\}/);
+        ok(!@p8, "P8 - no wide \\x{} hex escape: $f");
+        diag("  line $_->{line}: $_->{text}") for @p8;
+    };
 
     # P9: no @- / @+ / $-[N] / $+[N]
-    my @p9 = _scan_code("$ROOT/$f", qr/(?:\@-|\@\+|\$-\[|\$\+\[)/);
-    ok(!@p9, "P9 - no \@-/\@+/\$-[N]/\$+[N] (5.6+ special vars): $f");
-    diag("  line $_->{line}: $_->{text}") for @p9;
+    push @tests, sub {
+        my @p9 = _scan_code("$ROOT/$f", qr/(?:\@-|\@\+|\$-\[|\$\+\[)/);
+        ok(!@p9, "P9 - no \@-/\@+/\$-[N]/\$+[N] (5.6+ special vars): $f");
+        diag("  line $_->{line}: $_->{text}") for @p9;
+    };
 }
 
 ######################################################################
@@ -141,49 +154,62 @@ for my $pm (@pm_files) {
     my $text = _slurp("$ROOT/$pm");
 
     # P10: $VERSION self-assignment
-    ok($text =~ /\$VERSION\s*=\s*\$VERSION/,
-       "P10 - \$VERSION self-assignment present: $pm");
+    push @tests, sub {
+        ok($text =~ /\$VERSION\s*=\s*\$VERSION/,
+           "P10 - \$VERSION self-assignment present: $pm");
+    };
 
     # P11: warnings stub
-    ok($text =~ /\$INC\{'warnings\.pm'\}\s*=.*?eval\s*['"]package warnings;\s*sub import/s,
-       "P11 - warnings compat stub present: $pm");
+    push @tests, sub {
+        ok($text =~ /\$INC\{'warnings\.pm'\}\s*=.*?eval\s*['"]package warnings;\s*sub import/s,
+           "P11 - warnings compat stub present: $pm");
+    };
 
     # P12: CVE-2016-1238
-    my $code = $text;
-    $code =~ s/\n__END__\b.*\z//s;
-    $code =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
-    ok($code =~ /BEGIN\s*\{[^}]*pop\s+\@INC[^}]*\}/s
-    || $code =~ /pop \@INC if \$INC\[-1\] eq '\.'/ ,
-       "P12 - CVE-2016-1238 pop \@INC in BEGIN: $pm");
+    push @tests, sub {
+        my $code = $text;
+        $code =~ s/\n__END__\b.*\z//s;
+        $code =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
+        ok($code =~ /BEGIN\s*\{[^}]*pop\s+\@INC[^}]*\}/s
+        || $code =~ /pop \@INC if \$INC\[-1\] eq '\.'/ ,
+           "P12 - CVE-2016-1238 pop \@INC in BEGIN: $pm");
+    };
 
     # P13: use 5.00503
-    ok($text =~ /^use 5\.00503;/m,
-       "P13 - use 5.00503 present: $pm");
+    push @tests, sub {
+        ok($text =~ /^use 5\.00503;/m,
+           "P13 - use 5.00503 present: $pm");
+    };
 
     # P14: header order: use5 -> strict -> warnings_stub -> use warnings
     #                    -> pop @INC -> use vars -> $VERSION
-    my %pos;
-    for my $pair (
-        [ 'use5',     qr/^use 5\.00503;/m                     ],
-        [ 'strict',   qr/^use strict;/m                       ],
-        [ 'wstub',    qr/\$INC\{'warnings\.pm'\}/             ],
-        [ 'warnings', qr/^use warnings;/m                     ],
-        [ 'popinc',   qr/pop\s+\@INC/                         ],
-        [ 'usevars',  qr/^use vars\b/m                        ],
-        [ 'version',  qr/^\$VERSION\s*=\s*'\d/m               ],
-    ) {
-        my ($name, $re) = @$pair;
-        if ($text =~ $re) { $pos{$name} = length($`) }
-        else              { $pos{$name} = 999999 }
-    }
-    my $p14 = $pos{use5}     < $pos{strict}
-           && $pos{strict}   < $pos{wstub}
-           && $pos{wstub}    < $pos{warnings}
-           && $pos{warnings} < $pos{popinc}
-           && $pos{popinc}   < $pos{usevars}
-           && $pos{usevars}  < $pos{version};
-    ok($p14, "P14 - header order "
-           . "(use5..strict..warnings..pop\@INC..vars..\$VERSION): $pm");
+    push @tests, sub {
+        my %pos;
+        for my $pair (
+            [ 'use5',     qr/^use 5\.00503;/m                     ],
+            [ 'strict',   qr/^use strict;/m                       ],
+            [ 'wstub',    qr/\$INC\{'warnings\.pm'\}/             ],
+            [ 'warnings', qr/^use warnings;/m                     ],
+            [ 'popinc',   qr/pop\s+\@INC/                         ],
+            [ 'usevars',  qr/^use vars\b/m                        ],
+            [ 'version',  qr/^\$VERSION\s*=\s*'\d/m               ],
+        ) {
+            my ($name, $re) = @$pair;
+            if ($text =~ $re) { $pos{$name} = length($`) }
+            else              { $pos{$name} = 999999 }
+        }
+        my $p14 = $pos{use5}     < $pos{strict}
+               && $pos{strict}   < $pos{wstub}
+               && $pos{wstub}    < $pos{warnings}
+               && $pos{warnings} < $pos{popinc}
+               && $pos{popinc}   < $pos{usevars}
+               && $pos{usevars}  < $pos{version};
+        ok($p14, "P14 - header order "
+               . "(use5..strict..warnings..pop\@INC..vars..\$VERSION): $pm");
+    };
 }
+
+plan_tests(scalar(@tests));
+$_->() for @tests;
 
 END { end_testing() }

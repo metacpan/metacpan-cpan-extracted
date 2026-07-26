@@ -28,14 +28,14 @@ subtest ':clipboard' => sub {    # This must come after SDL_Init...
     # clipboard internal operations might fail or return empty strings.
     # We check if the call didn't crash, but getting the value back depends on OS support.
     my $txt = SDL_GetClipboardText();
-    diag "Clipboard contains: " . ( $txt // '<undef>' );
+    diag 'Clipboard contains: ' . ( $txt // '<undef>' );
 };
 subtest ':error' => sub {
     imported_ok qw[SDL_SetError SDL_GetError SDL_ClearError];
     is SDL_SetError('Test Error'), F(),          'SDL_SetError(...)';
     is SDL_GetError(),             'Test Error', 'SDL_SetError set the message correctly';
     SDL_ClearError();
-    is SDL_GetError(), "", 'SDL_ClearError cleared message';
+    is SDL_GetError(), '', 'SDL_ClearError cleared message';
 };
 subtest ':stdinc' => sub {
     imported_ok qw[SDL_malloc SDL_free SDL_strcmp SDL_strlen SDL_memcpy];
@@ -129,6 +129,68 @@ subtest ':video' => sub {    # This might not work on a headless system...
     my $flags = SDL_GetWindowFlags($win);
     ok( ( $flags & SDL_WINDOW_HIDDEN ), 'Window has HIDDEN flag' );
     SDL_DestroyWindow($win);
+};
+subtest ':log' => sub {
+    imported_ok qw[
+        SDL_Log SDL_LogInfo SDL_LogWarn SDL_LogError SDL_LogTrace
+        SDL_SetLogPriority SDL_GetLogPriority SDL_GetLogOutputFunction SDL_SetLogOutputFunction
+        SDL_LOG_CATEGORY_APPLICATION SDL_LOG_PRIORITY_INFO SDL_LOG_PRIORITY_WARN SDL_LOG_PRIORITY_CRITICAL
+    ];
+    my ( $log_message_store, $log_priority_store, $log_category_store );
+
+    # 1. Get and store the original log output function
+    my ( $original_log_function, $original_userdata ) = ( undef, undef );
+    SDL_GetLogOutputFunction( \$original_log_function, \$original_userdata );
+    ok $original_log_function, 'Got original log function';
+
+    # 2. Define and set a custom log output function
+    my $custom_log_output = sub( $userdata, $category, $priority, $message ) {
+        $log_message_store  = $message;
+        $log_priority_store = $priority;
+        $log_category_store = $category;
+        diag $message;
+        pass 'Custom log function called';
+    };
+    SDL_SetLogOutputFunction( $custom_log_output, undef );
+    pass 'Set custom log output function';
+
+    # Test logging functions
+    subtest 'logging functions' => sub {
+        $log_message_store = undef;    # Reset
+        SDL_Log( 'Test log message: %s works', 'placeholder' );
+        is $log_message_store,      'Test log message: placeholder works', 'SDL_Log sent correct message';
+        is int $log_priority_store, SDL_LOG_PRIORITY_INFO(),               'SDL_Log used default INFO priority';
+        is int $log_category_store, SDL_LOG_CATEGORY_APPLICATION(),        'SDL_Log used default APPLICATION category';
+        $log_message_store = undef;
+        #
+        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, 'Information message' );
+        is $log_message_store,      'Information message',   'SDL_LogInfo sent correct message';
+        is int $log_priority_store, SDL_LOG_PRIORITY_INFO(), 'SDL_LogInfo used INFO priority';
+        $log_message_store = undef;
+        SDL_LogWarn( SDL_LOG_CATEGORY_APPLICATION, 'Warning message' );
+        is $log_message_store,      'Warning message',       'SDL_LogWarn sent correct message';
+        is int $log_priority_store, SDL_LOG_PRIORITY_WARN(), 'SDL_LogWarn used WARN priority';
+    };
+    subtest priority => sub {
+        my $original_priority = SDL_GetLogPriority(SDL_LOG_CATEGORY_APPLICATION);
+        SDL_SetLogPriority( SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR );
+        is int SDL_GetLogPriority(SDL_LOG_CATEGORY_APPLICATION), SDL_LOG_PRIORITY_ERROR(), 'SDL_SetLogPriority worked';
+
+        # With higher priority, INFO messages should be ignored
+        $log_message_store = undef;
+        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, 'This should not be logged' );
+        is $log_message_store, undef, 'Log message below priority was correctly ignored';
+        $log_message_store = undef;
+        SDL_LogError( SDL_LOG_CATEGORY_APPLICATION, 'This error should be logged' );
+        is $log_message_store, 'This error should be logged', 'Log message at priority was correctly logged';
+
+        # Restore priority
+        SDL_SetLogPriority( SDL_LOG_CATEGORY_APPLICATION, $original_priority );
+    };
+
+    # Restore the original log output function
+    SDL_SetLogOutputFunction( $original_log_function, $original_userdata );
+    pass 'Restored original log output function';
 };
 #
 SDL_Quit();

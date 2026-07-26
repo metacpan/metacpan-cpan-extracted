@@ -46,6 +46,8 @@
 [ 9. UTF-8 マルチバイト文字はそのまま出力 ]
   encode({"name"=>"田中"}) -> '{"name":"田中"}'
   \uXXXX にはエスケープしない
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
 
 [ 10. 使用例 ]
   # デコード

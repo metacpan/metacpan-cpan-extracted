@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use 5.008003;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Chandra::Same::Boy::App;
+
+# chandra-same-boy - play a Game Boy / Game Boy Color ROM in a Chandra window.
+#
+#   chandra-same-boy ROM.gbc [--model cgb|dmg|sgb|sgb2|mgb]
+#                            [--scale N] [--no-audio] [--title STR]
+
+my %opt = (model => 'cgb', scale => 3, audio => 1);
+GetOptions(
+    'model=s' => \$opt{model},
+    'scale=i' => \$opt{scale},
+    'title=s' => \$opt{title},
+    'audio!'  => \$opt{audio},
+    'help'    => \$opt{help},
+) or usage();
+
+usage() if $opt{help};
+my $rom = shift @ARGV;
+usage("a ROM path is required") unless defined $rom && -f $rom;
+
+Chandra::Same::Boy::App->new(
+    rom         => $rom,
+    model       => $opt{model},
+    scale       => $opt{scale},
+    (defined $opt{title} ? (title => $opt{title}) : ()),
+    sample_rate => $opt{audio} ? 44100 : 0,
+)->run;
+
+sub usage {
+    my ($msg) = @_;
+    print STDERR "error: $msg\n\n" if $msg;
+    print STDERR <<'USAGE';
+usage: chandra-same-boy ROM.gbc [options]
+
+  --model cgb|dmg|sgb|sgb2|mgb   hardware model (default cgb)
+  --scale N                      integer display scale (default 3)
+  --no-audio                     disable sound
+  --title STR                    window title
+  --help                         this message
+USAGE
+    exit($msg ? 2 : 0);
+}

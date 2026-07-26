@@ -203,6 +203,15 @@ Returns the protocol handler.
 
 This method returns the L<Net::BitTorrent::Protocol> object currently managing the connection.
 
+=head2 C<connected( )>
+
+Checks if the peer is still connected.
+
+    say 'Peer is alive' if $peer->connected;
+
+This method returns true if the connection to this peer has not been closed. Once disconnected, this method returns
+false.
+
 =head2 C<is_encrypted( )>
 
 Checks if the connection is encrypted.

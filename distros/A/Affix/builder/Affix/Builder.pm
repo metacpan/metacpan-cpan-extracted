@@ -22,7 +22,7 @@ class    #
     # infix and Affix stuff
     use Config qw[%Config];
     field $force : param //= 0;
-    field $debug : param = 0;
+    field $debug : param //= 0;
     field $libver;
     field $cflags;
     field $ldflags;
@@ -60,13 +60,13 @@ class    #
                 ' -g3 -gdwarf-4 ' .
                 ' -Wno-deprecated -pipe ' .
                 ' -Wall -Wextra -Wpedantic -Wvla -Wnull-dereference ' .
-                ' -Wswitch-enum  -Wduplicated-cond ' .
+                ' -Wswitch-enum -Wduplicated-cond ' .
                 ' -Wduplicated-branches';
             $cflags .= ' -fvar-tracking-assignments' unless $Config{osname} eq 'darwin';
         }
         elsif ( !$is_win ) {
             $cflags
-                .= ' -DNDEBUG -DBOOST_DISABLE_ASSERTS -Ofast -ftree-vectorize -ffast-math -fno-align-functions -fno-align-loops -fno-omit-frame-pointer -flto=auto';
+                .= ' -DNDEBUG -DBOOST_DISABLE_ASSERTS -O3 -ftree-vectorize -ffast-math -fno-align-functions -fno-align-loops -fno-omit-frame-pointer -flto';
         }
 
         # Threading support (Critical for shm_open/librt on Linux)
@@ -88,7 +88,7 @@ class    #
         my %module_shared = map { $_ => catfile( qw[blib lib auto share module], abs2rel( $_, 'module-share' ) ) } find( qr/(?:)/, 'module-share' );
         pm_to_blib( { %modules, %docs, %scripts, %dist_shared, %module_shared }, catdir(qw[blib lib auto]) );
         make_executable($_) for values %scripts;
-        make_path( catdir(qw[blib arch]), { chmod => 0777, verbose => $verbose } );
+        make_path( catdir(qw[blib arch]), { chmod => 0755, verbose => $verbose } );
         0;
     }
     method step_clean() { remove_tree( $_, { verbose => $verbose } ) for qw[blib temp]; 0 }
@@ -123,6 +123,113 @@ class    #
         TAP::Harness::Env->create( \%test_args )->runtests( sort map { $_->stringify } find( qr/\.t$/, 't' ) )->has_errors;
     }
 
+    method step_fuzz(@args) {
+        my %args = @args;
+        $self->step_build() unless -d 'blib';
+
+        # Fuzz config via env vars (or caller can pass %args)
+        my $max_iter     = $ENV{FUZZ_MAX_ITER} // $args{iter}    // 10000;
+        my $timeout      = $ENV{FUZZ_TIMEOUT}  // $args{timeout} // 5;
+        my $verbose_fuzz = $ENV{FUZZ_VERBOSE}  // $args{verbose} // 0;
+
+        # Determine which Perl targets to run
+        my @targets;
+        if ( $args{all} ) {
+            @targets = qw[wrap grammar register cross compile];
+        }
+        elsif ( $args{smoke} ) {
+            @targets = qw[wrap grammar register cross];
+        }
+        elsif ( $args{target} ) {
+            @targets = ref $args{target} ? @{ $args{target} } : ( $args{target} );
+        }
+        else {
+            @targets = qw[wrap grammar register cross];
+        }
+
+        # Perl fuzz target metadata
+        my %perl_targets = (
+            wrap     => { script => 'fuzz_wrap_type_sig.pl',  desc => 'Affix::Wrap::Type->parse()',          needs_lib => 1 },
+            grammar  => { script => 'fuzz_grammar_mutate.pl', desc => 'Grammar-aware C sig mutations',       needs_lib => 1, extra_inc => 1 },
+            register => { script => 'fuzz_register_types.pl', desc => 'Affix::_typedef() — C parser direct', needs_lib => 1 },
+            cross    => { script => 'fuzz_cross_boundary.pl', desc => 'Cross-boundary Perl->C->JIT',         needs_lib => 1 },
+            compile  => { script => 'fuzz_compile_ok.pl',     desc => 'compile_ok() C compilation',          needs_lib => 1 },
+            shared   => { script => 'fuzz_shared_lib.pl',     desc => 'Compile→load→affix→call→verify ABI',  needs_lib => 1 },
+        );
+
+        # C fuzz targets (delegate to infix/build.pl)
+        my %c_targets = (
+            signature  => 'Parser crashes + arena stress',
+            abi        => 'ABI classification',
+            types      => 'Type generator bugs',
+            roundtrip  => 'Type->String->Type consistency',
+            trampoline => 'JIT trampoline creation',
+            direct     => 'Direct marshalling JIT',
+        );
+        my $fuzz_dir = path('fuzz');
+        die "fuzz/ directory not found\n" unless -d $fuzz_dir;
+        my $failures = 0;
+        my $iters    = $args{smoke} ? 100 : $max_iter;
+        my $to       = $args{smoke} ? 3   : $timeout;
+
+        # Run Perl fuzz targets via TAP::Harness for proper TAP output
+        require TAP::Harness::Env;
+        my @fuzz_scripts;
+        for my $name (@targets) {
+            my $target = $perl_targets{$name} // do { warn "Unknown Perl fuzz target: $name\n"; $failures++; next };
+            my $script = $fuzz_dir->child( $target->{script} );
+            unless ( -f $script ) {
+                warn "Fuzz script not found: $script\n";
+                $failures++;
+                next;
+            }
+            say "=" x 60;
+            say "Fuzzing: $target->{desc}";
+            say "  Script: $target->{script}";
+            say "  Iterations: $iters, Timeout: ${to}s";
+            say "=" x 60;
+            push @fuzz_scripts, $script->stringify;
+        }
+        if (@fuzz_scripts) {
+            local $ENV{FUZZ_MAX_ITER} = $iters;
+            local $ENV{FUZZ_TIMEOUT}  = $to;
+            local $ENV{FUZZ_VERBOSE}  = $verbose_fuzz;
+            my %harness_args
+                = ( ( verbosity => $verbose ), ( color => -t STDOUT ), lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ], );
+            my $harness = TAP::Harness::Env->create( \%harness_args );
+            my $aggr    = $harness->runtests( sort @fuzz_scripts );
+            $failures++ if $aggr->has_errors;
+            say "";
+        }
+
+        # Smoke test: also quick-build C targets if available
+        if ( $args{smoke} || $args{all} ) {
+            my $build_pl = path('infix/build.pl');
+            if ( -f $build_pl ) {
+                for my $name ( sort keys %c_targets ) {
+                    say "=" x 60;
+                    say "Building C fuzz target: fuzz:$name";
+                    say "  $c_targets{$name}";
+                    say "=" x 60;
+                    my $exit = system( $^X, $build_pl->stringify, "fuzz:$name" );
+                    $failures++ if $exit != 0;
+                    say "";
+                }
+            }
+            else {
+                say "Skipping C fuzz targets (infix/build.pl not found)";
+            }
+        }
+        say "=" x 60;
+        if ($failures) {
+            say "FAILED: $failures target(s) reported crashes or build errors";
+        }
+        else {
+            say "All fuzz targets clean.";
+        }
+        return $failures > 0 ? 1 : 0;
+    }
+
     method get_arguments (@sources) {
         $_ = detildefy($_) for grep {defined} $install_base, $destdir, $prefix, values %{$install_paths};
         $install_paths = ExtUtils::InstallPaths->new( dist_name => $meta->name );
@@ -132,7 +239,7 @@ class    #
     method Build(@args) {
         my $method = $self->can( 'step_' . $action );
         $method // die "No such action '$action'\n";
-        exit $method->($self);
+        exit $method->( $self, @args );
     }
 
     method Build_PL() {
@@ -142,8 +249,14 @@ class    #
 #!%s
 use lib 'builder';
 use %s;
-%s->new( @ARGV && $ARGV[0] =~ /\A\w+\z/ ? ( action => shift @ARGV ) : (),
-    map { /^--/ ? ( shift(@ARGV) =~ s[^--][]r => 1 ) : /^-/ ? ( shift(@ARGV) =~ s[^-][]r => shift @ARGV ) : () } @ARGV )->Build();
+my $action = @ARGV && $ARGV[0] =~ /\A\w+\z/ ? shift @ARGV : 'build';
+my $opts = {};
+while ( @ARGV ) {
+    my $a = shift @ARGV;
+    if ( $a =~ /^-(\w+)$/ ) { $opts->{$1} = shift @ARGV // 1; }
+    elsif ( $a =~ /^-(\w+)=(.+)$/ ) { $opts->{$1} = $2; }
+}
+%s->new( action => $action )->Build( %%$opts );
 
         make_executable('Build');
         my @env = defined $ENV{PERL_MB_OPT} ? split_like_shell( $ENV{PERL_MB_OPT} ) : ();
@@ -173,8 +286,9 @@ use %s;
 
     # infix builder
     method step_clone_infix() {
-        return                      if cwd->absolute->child('infix')->exists;
-        die 'Failed to clone infix' if system 'git clone --verbose https://github.com/sanko/infix.git';
+        return if cwd->absolute->child('infix')->exists;
+        my $clone_dir = cwd->absolute->child('infix');
+        die 'Failed to clone infix' if system( 'git', 'clone', '--depth', '1', 'https://github.com/sanko/infix.git', $clone_dir->stringify );
     }
 
     method step_infix () {
@@ -281,21 +395,33 @@ END_C
         close $fh;
         my ( $ofh, $out ) = tempfile( UNLINK => 1 );
         close $ofh;
-        my $null = '/dev/null';
 
-        # Try without -lrt
-        system("$cc -o $out $src >$null 2>&1") == 0 and return '';
+        # Try without -lrt (list-form system to avoid shell injection)
+        open( my $devnull, '>', '/dev/null' ) if $^O ne 'MSWin32';
+        my $old_stdout = select $devnull      if $devnull;
+        system( $cc, '-o', $out, $src );
+        select $old_stdout if $old_stdout;
+        close $devnull     if $devnull;
+        return ''          if $? == 0;
 
         # Try with -lrt
-        system("$cc -o $out $src -lrt >$null 2>&1") == 0 and return '-lrt';
+        open( $devnull, '>', '/dev/null' ) if $^O ne 'MSWin32';
+        $old_stdout = select $devnull      if $devnull;
+        system( $cc, '-o', $out, $src, '-lrt' );
+        select $old_stdout if $old_stdout;
+        close $devnull     if $devnull;
+        return '-lrt'      if $? == 0;
         return '';
     }
 
     sub command_exists {
-        my ($cmd)       = @_;
-        my $null_device = $Config{osname} eq 'MSWin32' ? 'NUL'                            : '/dev/null';
-        my $search_cmd  = $Config{osname} eq 'MSWin32' ? "where $cmd > $null_device 2>&1" : "command -v $cmd > $null_device 2>&1";
-        return system($search_cmd) == 0;
+        my ($cmd) = @_;
+        if ( $Config{osname} eq 'MSWin32' ) {
+            return system( 'where', $cmd ) == 0;
+        }
+        else {
+            return system( 'command', '-v', $cmd ) == 0;
+        }
     }
 
     method step_affix {
@@ -303,7 +429,14 @@ END_C
         my $cwd = cwd->absolute;
         my @objs;
         require ExtUtils::CBuilder;
-        my $builder = ExtUtils::CBuilder->new( quiet => !$verbose, config => {} );
+        my %config = %Config;
+        if ($debug) {
+            $config{ldflags}   =~ s/-s //g;
+            $config{ldflags}   =~ s/ -s//g;
+            $config{lddlflags} =~ s/-s //g;
+            $config{lddlflags} =~ s/ -s//g;
+        }
+        my $builder = ExtUtils::CBuilder->new( quiet => !$verbose, config => \%config );
         my $pre     = $cwd->child(qw[blib arch auto])->absolute;
         require DynaLoader;
         my $mod2fname = defined &DynaLoader::mod2fname ? \&DynaLoader::mod2fname : sub { return $_[0][-1] };
@@ -314,8 +447,9 @@ END_C
         my $lib_file = catfile( $archdir, $mod2fname->( \@parts ) . '.' . $Config{dlext} );
         my @dirs;
         push @dirs, '../';
-        my $has_cxx = !1;
-        my @sources = $cwd->child('lib/Affix.c');
+        my $has_cxx    = !1;
+        my $recompiled = 0;
+        my @sources    = $cwd->child('lib/Affix.c');
 
         #~ warn "Sources to process: @sources\n";
         for my $source (@sources) {
@@ -329,13 +463,29 @@ END_C
             my $obj     = $builder->object_file($source);
 
             #~ warn "Checking obj: $obj\n";
+            # Check mtimes of all .c and .h files under lib/ (includes Affix.c, marshal.c, Affix.h)
+            my $newest_dep = $source->stat->mtime;
+            my $iter       = path('lib')->iterator;
+            while ( my $entry = $iter->() ) {
+                next unless $entry->is_file;
+                next unless $entry =~ /\.[ch]$/;
+                my $dep_mtime = $entry->stat->mtime;
+                $newest_dep = $dep_mtime if $dep_mtime > $newest_dep;
+            }
             my $should_compile
                 = ( $force ||
                     ( !-f $obj ) ||
-                    ( $source->stat->mtime >= path($obj)->stat->mtime ) ||
+                    ( $newest_dep >= path($obj)->stat->mtime ) ||
                     ( path(__FILE__)->stat->mtime > path($obj)->stat->mtime ) );
-
-            #~ warn "Should compile: $should_compile\n";
+            if ($should_compile) {
+                my $reason
+                    = !-f $obj                                            ? 'object file missing' :
+                    $newest_dep >= path($obj)->stat->mtime                ? 'source newer than object' :
+                    path(__FILE__)->stat->mtime > path($obj)->stat->mtime ? 'builder changed' :
+                    'forced';
+                warn "Compiling $source ($reason)\n";
+                $recompiled = 1;
+            }
             push @dirs, $source->dirname();
             $has_cxx = 1 if $cxx;
             push @objs,
@@ -365,12 +515,14 @@ END_C
 
             # Removed incorrect -lstdc++ logic. Added -lm for math.
             # -pthread is already in $ldflags via ADJUST
-            extra_linker_flags => ( $ldflags . ' -L' . $infix_build_lib . ' -linfix ' . $lrt_flag . ' -lm' ),
-            objects            => [@objs],
-            lib_file           => $lib_file,
-            module_name        => join '::',
+            extra_linker_flags =>
+                [ split( ' ', $ldflags ), "-L$infix_build_lib", '-linfix', ( $lrt_flag ? ( split( ' ', $lrt_flag ) ) : () ), '-lm' ],
+            objects     => [@objs],
+            lib_file    => $lib_file,
+            module_name => join '::',
             @parts
         };
+        warn "Linking $lib_file\n" if $recompiled;
         return $builder->link(%$data);
     }
     };

@@ -27,7 +27,7 @@ $User = GraphQL::Houtou::Type::Object->new(
   runtime_tag => 'user',
   fields => {
     id => { type => $String->non_null },
-    name => { type => $String },
+    name => { type => $String, accessor => 'display_name' },
   },
 );
 
@@ -45,6 +45,17 @@ my $schema = GraphQL::Houtou::Schema->new(
         type => $User,
         resolver_mode => 'native',
         resolve => sub { +{ kind => 'user', id => 'u1', name => 'Ana' } },
+      },
+      ping => {
+        type => $String,
+        resolver_mode => 'fast_resolve_no_args',
+        resolve => sub { 'pong' },
+      },
+      echo => {
+        type => $String,
+        resolver_mode => 'fast_resolve_one_arg',
+        args => { value => { type => $String } },
+        resolve => sub { $_[1] },
       },
       search => {
         type => $SearchResult->list->non_null,
@@ -76,6 +87,14 @@ subtest 'runtime graph records field families and dispatch shapes' => sub {
   is $slots{viewer}->completion_family, 'OBJECT', 'viewer compiles to object family';
   is $slots{viewer}->resolver_shape, 'EXPLICIT', 'viewer keeps explicit resolver shape';
   is $slots{viewer}->resolver_mode, 'NATIVE', 'viewer keeps native resolver mode';
+  is $slots{ping}->resolver_mode, 'NATIVE_NO_ARGS',
+    'ping keeps native_no_args resolver mode';
+  is $slots{ping}->callback_abi_code, 4,
+    'ping uses the native no-args callback ABI';
+  is $slots{echo}->resolver_mode, 'NATIVE_ONE_ARG',
+    'echo keeps native_one_arg resolver mode';
+  is $slots{echo}->callback_abi_code, 5,
+    'echo uses the native one-argument callback ABI';
   is $slots{search}->completion_family, 'LIST', 'search compiles to list family';
   is $compiled->type_index->{Node}{completion_family}, 'ABSTRACT', 'interface recorded as abstract family';
   is $compiled->dispatch_index->{SearchResult}{dispatch_family}, 'TAG', 'union tag dispatch is compiled';
@@ -96,6 +115,15 @@ subtest 'runtime graph can emit native descriptor' => sub {
   my ($search_slot) = grep {
     (($_->{schema_slot_key} || q()) eq 'Query.search')
   } @{ $descriptor->{slot_catalog} || [] };
+  my ($ping_slot) = grep {
+    (($_->{schema_slot_key} || q()) eq 'Query.ping')
+  } @{ $descriptor->{slot_catalog} || [] };
+  my ($echo_slot) = grep {
+    (($_->{schema_slot_key} || q()) eq 'Query.echo')
+  } @{ $descriptor->{slot_catalog} || [] };
+  my ($name_slot) = grep {
+    (($_->{schema_slot_key} || q()) eq 'User.name')
+  } @{ $descriptor->{slot_catalog} || [] };
   ok ref($descriptor->{slot_catalog}) eq 'ARRAY' && @{$descriptor->{slot_catalog}} >= 2,
     'native runtime descriptor exports slot catalog';
   ok defined $search_slot->{schema_slot_index},
@@ -106,6 +134,16 @@ subtest 'runtime graph can emit native descriptor' => sub {
     'native runtime slot keeps numeric resolver mode code';
   is $search_slot->{schema_slot_key}, 'Query.search',
     'native runtime slot keeps stable schema slot key';
+  is $ping_slot->{resolver_mode_code}, 3,
+    'native descriptor records the no-args resolver mode';
+  is $ping_slot->{callback_abi_code}, 4,
+    'native descriptor records the no-args callback ABI';
+  is $echo_slot->{resolver_mode_code}, 4,
+    'native descriptor records the one-argument resolver mode';
+  is $echo_slot->{callback_abi_code}, 5,
+    'native descriptor records the one-argument callback ABI';
+  is $name_slot->{accessor}, 'display_name',
+    'native descriptor records the accessor method name';
 };
 
 subtest 'runtime descriptor can round-trip through JSON file helpers' => sub {

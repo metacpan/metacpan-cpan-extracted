@@ -104,3 +104,6 @@ INFIX_INTERNAL void emit_arm64_b_reg(code_buffer * buf, arm64_gpr reg);
  * @param imm A 16-bit immediate value passed to the kernel. For syscalls, this is typically 0.
  */
 INFIX_INTERNAL void emit_arm64_svc_imm(code_buffer * buf, uint16_t imm);
+// Shift Emitters
+/** @internal @brief Emits `LSR <Xd>, <Xn>, #<shift>` (logical shift right by immediate) via UBFM. */
+INFIX_INTERNAL void emit_arm64_lsr_imm(code_buffer * buf, arm64_gpr src, arm64_gpr dest, uint8_t shift);

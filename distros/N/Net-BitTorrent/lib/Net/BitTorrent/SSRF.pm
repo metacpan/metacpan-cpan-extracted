@@ -1,4 +1,4 @@
-package Net::BitTorrent::SSRF v2.1.0 {
+package Net::BitTorrent::SSRF v2.1.1 {
     use v5.40;
     use Exporter qw[import];
     use Socket   qw[inet_pton inet_ntop AF_INET AF_INET6 AF_UNSPEC SOCK_STREAM getaddrinfo getnameinfo NI_NUMERICHOST];

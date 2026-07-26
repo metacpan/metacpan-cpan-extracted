@@ -21,8 +21,7 @@ use FindBin ();
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/lib";
 
-my ($T_PLAN, $T_RUN, $T_FAIL) = (0, 0, 0);
-sub plan_tests { $T_PLAN = $_[0]; print "1..$T_PLAN\n" }
+my ($T_RUN, $T_FAIL) = (0, 0);
 sub ok {
     my ($ok, $name) = @_;
     $T_RUN++;
@@ -31,37 +30,50 @@ sub ok {
     return $ok;
 }
 sub diag { print "# $_[0]\n" }
-END { exit 1 if $T_PLAN && $T_FAIL }
+# Assigning to $? sets the exit status; calling exit() from an END block
+# aborts perl 5.6 and earlier with "Callback called exit."
+END { $? = 1 if $T_FAIL }
 
-plan_tests(14);
+my @tests;
 
-# ok 1: module loads
-eval { require mb::JSON };
-ok(!$@, 'mb::JSON loads without error');
-diag("load error: $@") if $@;
+# module loads
+push @tests, sub {
+    eval { require mb::JSON };
+    ok(!$@, 'mb::JSON loads without error');
+    diag("load error: $@") if $@;
+};
 
-# ok 2-3: VERSION
-ok(defined $mb::JSON::VERSION,         'mb::JSON: $VERSION defined');
-ok($mb::JSON::VERSION =~ /^\d+\.\d+/, 'mb::JSON: $VERSION looks like a version number');
+# VERSION
+push @tests, sub { ok(defined $mb::JSON::VERSION,        'mb::JSON: $VERSION defined') };
+push @tests, sub { ok($mb::JSON::VERSION =~ /^\d+\.\d+/, 'mb::JSON: $VERSION looks like a version number') };
 
-# ok 4: mb::JSON::Boolean present
-ok(defined $mb::JSON::Boolean::{new} || 1,
-   'mb::JSON::Boolean package present');
+# mb::JSON::Boolean present
+push @tests, sub {
+    ok(defined $mb::JSON::Boolean::{new} || 1,
+       'mb::JSON::Boolean package present');
+};
 
-# ok 5-10: functions exist (decode/parse pair, encode/stringify pair, true/false)
+# functions exist (decode/parse pair, encode/stringify pair, true/false)
 for my $fn (qw(decode parse encode stringify true false)) {
-    ok(mb::JSON->can($fn), "mb::JSON->can('$fn')");
+    push @tests, sub { ok(mb::JSON->can($fn), "mb::JSON->can('$fn')") };
 }
 
-# ok 11-12: true / false are Boolean objects
-ok(ref(mb::JSON::true())  eq 'mb::JSON::Boolean', 'mb::JSON::true  is a Boolean object');
-ok(ref(mb::JSON::false()) eq 'mb::JSON::Boolean', 'mb::JSON::false is a Boolean object');
+# true / false are Boolean objects
+push @tests, sub { ok(ref(mb::JSON::true())  eq 'mb::JSON::Boolean', 'mb::JSON::true  is a Boolean object') };
+push @tests, sub { ok(ref(mb::JSON::false()) eq 'mb::JSON::Boolean', 'mb::JSON::false is a Boolean object') };
 
-# ok 13: INA_CPAN_Check loads
-eval { require INA_CPAN_Check };
-ok(!$@, 'INA_CPAN_Check loads without error');
+# INA_CPAN_Check loads
+push @tests, sub {
+    eval { require INA_CPAN_Check };
+    ok(!$@, 'INA_CPAN_Check loads without error');
+};
 
-# ok 14: key helpers defined
-ok( defined &INA_CPAN_Check::check_A
- && defined &INA_CPAN_Check::check_K,
-   'INA_CPAN_Check: check_A through check_K defined');
+# key helpers defined
+push @tests, sub {
+    ok( defined &INA_CPAN_Check::check_A
+     && defined &INA_CPAN_Check::check_K,
+       'INA_CPAN_Check: check_A through check_K defined');
+};
+
+print "1.." . scalar(@tests) . "\n";
+$_->() for @tests;

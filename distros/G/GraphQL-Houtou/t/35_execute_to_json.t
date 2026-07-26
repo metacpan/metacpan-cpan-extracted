@@ -12,6 +12,12 @@ use GraphQL::Houtou::Type::Scalar qw($String $Int $Float $Boolean $ID);
 
 my $json = JSON::MaybeXS->new->utf8;
 
+{
+  package Local::AsyncAccessorValue;
+  sub new { return bless {}, $_[0] }
+  sub later { return Promise::XS::resolved('accessor-x') }
+}
+
 my $User = GraphQL::Houtou::Type::Object->new(
   name => 'User',
   runtime_tag => 'user',
@@ -159,6 +165,109 @@ subtest 'async resolvers need an async runtime' => sub {
   my $bytes = $rt_async->execute_document_to_json('{ later }');
   is_deeply $json->decode($bytes), { data => { later => 'x' } },
     'async runtime settles pre-resolved promises to JSON';
+};
+
+subtest 'fast_resolve_no_args ABI is preserved on the async lane' => sub {
+  my $has_promise_xs = eval { require Promise::XS; 1 };
+  plan skip_all => 'Promise::XS not available' if !$has_promise_xs;
+  my @seen;
+  my $async_schema = GraphQL::Houtou::Schema->new(
+    query => GraphQL::Houtou::Type::Object->new(
+      name => 'AsyncNativeNoArgsQuery',
+      fields => {
+        later => {
+          type => $String,
+          resolver_mode => 'fast_resolve_no_args',
+          resolve => sub {
+            @seen = @_;
+            return Promise::XS::resolved('x');
+          },
+        },
+      },
+    ),
+  );
+
+  my $bytes = build_native_runtime($async_schema, async => 1)
+    ->execute_document_to_json('{ later }', context => { request_id => 7 });
+  is_deeply $json->decode($bytes), { data => { later => 'x' } },
+    'async runtime settles a fast no-args resolver';
+  is scalar(@seen), 3, 'async resolver receives the three-argument ABI';
+  is_deeply $seen[1], { request_id => 7 }, 'async resolver receives context';
+  is $seen[2]->name, 'String', 'async resolver receives return type';
+};
+
+subtest 'fast_resolve_one_arg ABI is preserved on the async lane' => sub {
+  my $has_promise_xs = eval { require Promise::XS; 1 };
+  plan skip_all => 'Promise::XS not available' if !$has_promise_xs;
+  my @seen;
+  my $async_schema = GraphQL::Houtou::Schema->new(
+    query => GraphQL::Houtou::Type::Object->new(
+      name => 'AsyncNativeOneArgQuery',
+      fields => {
+        later => {
+          type => $String,
+          resolver_mode => 'fast_resolve_one_arg',
+          args => { value => { type => $String, default_value => 'fallback' } },
+          resolve => sub {
+            @seen = @_;
+            return Promise::XS::resolved($_[1]);
+          },
+        },
+      },
+    ),
+  );
+
+  my $bytes = build_native_runtime($async_schema, async => 1)
+    ->execute_document_to_json(
+      'query Q($value: String) { later(value: $value) }',
+      variables => { value => 'x' },
+      context => { request_id => 8 },
+    );
+  is_deeply $json->decode($bytes), { data => { later => 'x' } },
+    'async runtime settles a fast one-argument resolver';
+  is scalar(@seen), 4, 'async resolver receives the four-argument ABI';
+  is $seen[1], 'x', 'async resolver receives the direct argument value';
+  is_deeply $seen[2], { request_id => 8 }, 'async resolver receives context';
+  is $seen[3]->name, 'String', 'async resolver receives return type';
+
+  my $default_bytes = build_native_runtime($async_schema, async => 1)
+    ->execute_document_to_json(
+      'query Q($value: String) { later(value: $value) }',
+    );
+  is_deeply $json->decode($default_bytes), { data => { later => 'fallback' } },
+    'async JSON lane applies an argument default for an omitted variable';
+};
+
+subtest 'accessor methods can return promises on the async lane' => sub {
+  my $has_promise_xs = eval { require Promise::XS; 1 };
+  plan skip_all => 'Promise::XS not available' if !$has_promise_xs;
+  my $Value = GraphQL::Houtou::Type::Object->new(
+    name => 'AsyncAccessorValue',
+    fields => {
+      later => {
+        type => $String,
+        accessor => 'later',
+      },
+    },
+  );
+  my $accessor_schema = GraphQL::Houtou::Schema->new(
+    query => GraphQL::Houtou::Type::Object->new(
+      name => 'AsyncAccessorQuery',
+      fields => {
+        value => {
+          type => $Value,
+          resolve => sub { return Local::AsyncAccessorValue->new },
+        },
+      },
+    ),
+    types => [ $Value ],
+  );
+
+  my $bytes = build_native_runtime($accessor_schema, async => 1)
+    ->execute_document_to_json('{ value { later } }');
+  is_deeply $json->decode($bytes), {
+    data => { value => { later => 'accessor-x' } },
+  }, 'async runtime settles a promise returned by an accessor';
 };
 
 subtest 'sequential responses are stable' => sub {

@@ -2,6 +2,7 @@ use v5.40;
 use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix;
+use Test2::V0 -no_srand => 1;
 use Affix qw[:all];
 
 # We need a function that is guaranteed to fail and set errno/GetLastError.

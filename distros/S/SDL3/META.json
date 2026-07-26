@@ -45,7 +45,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Affix" : "v1.0.2",
+            "Affix" : "v1.1.0",
             "Alien::SDL3" : "v2.24.0"
          }
       },
@@ -91,7 +91,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Affix" : "v1.0.2",
+            "Affix" : "v1.1.0",
             "Alien::SDL3" : "v2.24.0",
             "Carp" : "0",
             "Data::Dump" : "0",
@@ -107,18 +107,12 @@
             "Test2::Tools::Compare" : "0",
             "Test2::V0" : "0"
          }
-      },
-      "x_build" : {
-         "requires" : {
-            "Affix" : "v1.0.2",
-            "Alien::SDL3" : "v2.24.0"
-         }
       }
    },
    "provides" : {
       "SDL3" : {
          "file" : "lib/SDL3.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -136,7 +130,7 @@
          "web" : "https://github.com/Perl-SDL3/SDL3.pm"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_help_wanted" : [
       "Tester",
       "Documenter"
@@ -145,7 +139,7 @@
       ".tidyallrc",
       ".gitignore",
       ".clang-format",
-      ".github/",
+      ".github/**",
       "eg/dev.pl"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",

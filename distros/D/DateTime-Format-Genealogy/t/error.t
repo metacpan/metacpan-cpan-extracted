@@ -17,7 +17,7 @@ ERROR: {
 	does_carp_that_matches(sub { $f->parse_datetime(date =>, '29 Se 1939', strict => 1) }, qr/^Unparseable date/);
 	does_carp_that_matches(sub { $f->parse_datetime(date =>, '29 Sep. 1939', strict => 1) }, qr/^Unparseable date/);
 	does_carp_that_matches(sub { $f->parse_datetime('31 Nov 1939') }, qr/^31 Nov 1939/);
-	does_croak_that_matches(sub { $f->parse_datetime({ datex => '30 Sep 1939' }) }, qr/^Usage:/);
+	does_croak_that_matches(sub { $f->parse_datetime({ datex => '30 Sep 1939' }) }, qr/Invalid parse_datetime parameters.*datex/);
 	cmp_ok($f->parse_datetime(['29 Sep 1939'])->dmy(), 'eq', '29-09-1939', 'Handles array with just one element');
 	does_carp_that_matches(sub { $f->parse_datetime('Bef 29 Sep 1939') }, qr/invalid/);
 	does_carp_that_matches(sub { $f->parse_datetime(date => 'bef 29 Sep 1939', strict => 1) }, qr/need an exact date/);

@@ -14,12 +14,13 @@ build_requires:
   FindBin: '0'
   Test::More: '0'
   base: '0'
+  parent: '0'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,11 +30,6 @@ no_index:
   directory:
     - t
     - inc
-optional_features:
-  module_runtime:
-    description: 'Optionally use Module::Runtime for requiring plugins rather than homegrown system'
-    requires:
-      Module::Runtime: '0.012'
 recommends:
   Module::Runtime: '0.012'
 requires:
@@ -49,5 +45,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Pluggable
   repository: https://github.com/simonwistow/Module-Pluggable.git
-version: '6.3'
+version: '6.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

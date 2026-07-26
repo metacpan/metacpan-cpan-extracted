@@ -10,7 +10,7 @@ use XML::LibXML;
 use Carp;
 use base qw(Ham::ADIF);
 
-our $VERSION = q[2018.03.31];
+our $VERSION = q[2026.07.25];
 
 sub parse_file {
   my ($self, $filename, $schema) = @_;

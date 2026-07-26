@@ -1,0 +1,3670 @@
+=encoding utf-8
+
+=head1 NAME
+
+LibUI - Simple, Portable, Native GUI Library
+
+=head1 SYNOPSIS
+
+    use LibUI;
+
+    sub onClosing ( $window, $data ) {
+        uiQuit();
+        return 1;
+    }
+
+    my $err = uiInit( { Size => 0 } );
+    if ( defined $err ) {
+        printf "Error initializing libui-ng: %s\n", $err;
+        uiFreeInitError($err);
+        return 1;
+    }
+
+    # Create a new window
+    my $w = uiNewWindow( "Hello, World!", 320, 120, 0 );
+    uiWindowOnClosing( $w, \&onClosing, undef );
+    uiWindowSetMargined( $w, 1 );
+
+    #
+    my $l = uiNewLabel("Hello, World!");
+    uiWindowSetChild( $w, $l );
+
+    #
+    uiControlShow($w);
+    uiMain();
+    uiUninit();
+
+=begin html
+
+<h2>Screenshots</h2> <div style="text-align: center"> <h3>Linux</h3><img alt="Linux"
+src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/linux.png" /> <h3>MacOS</h3><img alt="MacOS"
+src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/macos.png" /> <h3>Windows</h3><img alt="Windows"
+src="https://sankorobinson.com/LibUI.pm/screenshots/synopsis/windows.png" /> </div>
+
+=end html
+
+=head1 DESCRIPTION
+
+LibUI is a simple and portable (but not inflexible) GUI library in C that uses the native GUI technologies of each
+platform it supports.
+
+=head1 Functions
+
+LibUI, keeping with the ethos of simplicity, is functional.
+
+You may import any of them by name or with their given import tags.
+
+=head2 Default Functions
+
+These are basic functions to get the UI started and may be imported with the C<:default> tag.
+
+=head3 C<uiInit( ... )>
+
+    my $err = uiInit({ Size => 0 });
+
+Ask LibUI to do all the platform specific work to get up and running. If LibUI fails to initialize itself, this will
+return a string.
+
+You B<must> call this before creating widgets.
+
+=head3 C<uiUninit( )>
+
+    uiUninit( );
+
+Ask LibUI to break everything down before quitting.
+
+=begin private
+
+=head3 C<uiFreeInitError( ... )>
+
+    uiFreeInitError( $err );
+
+Frees the string returned when C<uiInit( ... )> fails.
+
+=end private
+
+=head3 C<uiMain( )>
+
+    uiMain( );
+
+Let LibUI's event loop run until interrupted.
+
+=head3 C<uiMainSteps( )>
+
+    uiMainSteps( );
+
+You may call this instead of C<uiMain( )> if you want to run the main loop yourself.
+
+=head3 C<uiMainStep( ... )>
+
+    my $ok = uiMainStep( 1 );
+
+Runs one iteration of the main loop.
+
+It takes a single boolean argument indicating whether to wait for an even to occur or not.
+
+It returns true if an event was processed (or if no even is available if you don't wish to wait) and false if the event
+loop was told to stop (for instance, C<uiQuit()> was called).
+
+=head3 C<uiQuit( )>
+
+    uiQuit( );
+
+Signals LibUI that you are ready to quit.
+
+=head3 C<uiQueueMain( )>
+
+    uiQueueMain( sub { }, $values );
+
+Trigger a callback on the main thread from any other thread. This is likely unstable. It's for sure untested as long as
+perl threads are garbage.
+
+=head3 C<uiTimer( ... )>
+
+    uiTimer( 1000, sub { die 'do not do this here' }, undef);
+
+    uiTime(
+        1000,
+        sub {
+            my $data = shift;
+            return 1 unless ++$data->{ticks} == 5;
+            0;
+        },
+        { ticks => 0 }
+    );
+
+Expected parameters include:
+
+=over
+
+=item C<$time>
+
+Time in milliseconds.
+
+=item C<$func>
+
+Callback that will be triggered when C<$time> runs out.
+
+Return a true value from your C<$func> to make your timer repeating.
+
+=item C<$data>
+
+Any userdata you feel like passing. It'll be handed off to your function.
+
+=back
+
+=head3 C<uiOnShouldQuit( ... )>
+
+    uiOnShouldQuit( sub {}, undef );
+
+Callback triggered when the GUI is prepared to quit.
+
+Expected parameters include:
+
+=over
+
+=item C<$func>
+
+Callback that will be triggered.
+
+=item C<$user_data>
+
+User data passed to the callback.
+
+=back
+
+=head3 C<uiFreeText( ... )>
+
+    uiFreeText( $title );
+
+Free a string with LibUI.
+
+=head2 Control Functions
+
+These functions may be used by all subclasses of the base control.
+
+Import them with the C<:control> tag.
+
+=head3 C<uiControlDestroy( ... )>
+
+    uiControlDestroy( $button );
+
+Dispose and free all allocated resources related to a control.
+
+=head3 C<uiControlHandle( ... )>
+
+    my $ptr = uiControlHandle( $button );
+
+Returns the control's OS-level handle.
+
+=head3 C<uiControlParent( ... )>
+
+    my $window = uiControlParent( $button );
+
+Returns the parent control.
+
+=head3 C<uiControlSetParent( ... )>
+
+    my $ptr = uiControlSetParent( $button, $window );
+
+Sets the control's parent.
+
+=head3 C<uiControlToplevel( ... )>
+
+    my $top = uiControlToplevel( $window );
+
+Returns whether or not the control is a top level control.
+
+=head3 C<uiControlVisible( ... )>
+
+    my $visible = uiControlVisible( $label );
+
+Returns whether or not the control is visible.
+
+=head3 C<uiControlShow( ... )>
+
+    uiControlShow( $window );
+
+Shows the control.
+
+=head3 C<uiControlHide( ... )>
+
+    uiControlHide( $label );
+
+Hides the control.
+
+Hidden controls do not take up space within the layout.
+
+=head3 C<uiControlEnabled( ... )>
+
+    my $enabled = uiControlEnabled( $label );
+
+Returns whether or not the control is enabled.
+
+=head3 C<uiControlEnable( ... )>
+
+    uiControlEnable( $label );
+
+Enables the control.
+
+=head3 C<uiControlDisable( ... )>
+
+    uiControlDisable( $label );
+
+Disables the control.
+
+=head3 C<uiAllocControl( ... )>
+
+    uiAllocControl( $label );
+
+Allocates a new custom C<uiControl>.
+
+Expected parameters include:
+
+=over
+
+=item C<$n>
+
+Size of the control (in bytes).
+
+=item C<$OSsig>
+
+=item C<$typesig>
+
+=item C<$typename>
+
+Name of the type as a string.
+
+=back
+
+This function is undocumented upstream.
+
+=head3 C<uiFreeControl( ... )>
+
+    uiFreeControl( $button );
+
+Frees a control.
+
+=head3 C<uiControlVerifySetParent( ... )>
+
+    uiControlVerifySetParent( $button, $window );
+
+Makes sure the control's parent can be set to parent.
+
+=head3 C<uiControlEnabledToUser( ... )>
+
+    my $enabled = uiControlEnabledToUser( $label );
+
+Returns whether or not the control can be interacted with by the user.
+
+Checks if the control and all its parents are enabled to make sure it can be interacted with by the user.
+
+=begin private
+
+=head3 C<uiControlEnabledToUser( ... )>
+
+    my $enabled = uiControlEnabledToUser( $label );
+
+Returns whether or not the control can be interacted with by the user.
+
+Checks if the control and all its parents are enabled to make sure it can be interacted with by the user.
+
+=end private
+
+=head2 Window Functions
+
+A window control that represents a top-level window.
+
+A window contains exactly one child control that occupies the entire window and cannot be a child of another control.
+
+These functions may be imported with the C<:window> tag.
+
+=head3 C<uiWindowTitle( ... )>
+
+    my $title = uiWindowTitle( $window );
+
+Returns the window title.
+
+=head3 C<uiWindowSetTitle( ... )>
+
+    uiWindowSetTitle( $window, 'Petris 1.0' );
+
+Sets the window title.
+
+=head3 C<uiWindowPosition( ... )>
+
+    uiWindowPosition( $window, my $x, my $y );
+
+Gets the window position.
+
+Coordinates are measured from the top left corner of the screen. This method may return inaccurate or dummy values on
+X11.
+
+
+=head3 C<uiWindowSetPosition( ... )>
+
+    uiWindowSetPosition( $window, 300, 50 );
+
+Moves the window to the specified position.
+
+Coordinates are measured from the top left corner of the screen. This method is merely a hint and may be ignored on
+X11.
+
+=head3 C<uiWindowOnPositionChanged( ... )>
+
+    uiWindowOnPositionChanged(
+        $window,
+        sub {
+            my ($w, $data) = @_;
+            uiWindowPosition( $w, my $x, my $y );
+            warn sprintf 'x: %d, y: %d', $x, $y;
+        },
+        undef
+    );
+
+Registers a callback for when the window moved.
+
+Expected parameters include:
+
+=over
+
+=item C<$window>
+
+The window to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+The callback is not triggered when calling C<uiWindowSetPosition( ... )>.
+
+=head3 C<uiWindowContentSize( ... )>
+
+    uiWindowContentSize( $window, my $w, my $h );
+
+Gets the window content size.
+
+The content size does NOT include window decorations like menus or title bars.
+
+=head3 C<uiWindowSetContentSize( ... )>
+
+    uiWindowSetContentSize( $window, 500, 100 );
+
+Sets the window content size.
+
+The content size does NOT include window decorations like menus or title bars.
+
+This method is merely a hint and may be ignored by the system.
+
+=head3 C<uiWindowFullscreen( ... )>
+
+    my $full = uiWindowFullscreen( $window );
+
+Returns whether or not the window is full screen.
+
+=head3 C<uiWindowSetFullscreen( ... )>
+
+    uiWindowSetFullscreen( $window, 1 );
+
+Sets whether or not the window is full screen.
+
+This method is merely a hint and may be ignored by the system.
+
+=head3 C<uiWindowOnContentSizeChanged( ... )>
+
+    uiWindowOnContentSizeChanged(
+        $w,
+        sub {
+            uiWindowContentSize( $w, my $w, my $h );
+            say "w: $w, h: $h";
+        },
+        undef
+    );
+
+Registers a callback for when the window content size is changed.
+
+Expected parameters include:
+
+=over
+
+=item C<$window>
+
+The window to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+The callback is not triggered when calling C<uiWindowSetContentSize( ... )>.
+
+=head3 C<uiWindowOnClosing( ... )>
+
+    uiWindowOnClosing(
+        $w,
+        sub {
+            say 'Goodbye...';
+            return 1;
+        },
+        undef
+    );
+
+Registers a callback for when the window is to be closed.
+
+Expected parameters include:
+
+=over
+
+=item C<$window>
+
+The window to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+Return a true value to destroy the window. Return an untrue value to abort closing and keep the window alive and
+visible.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+The callback is not triggered when calling C<uiWindowSetContentSize( ... )>.
+
+=head3 C<uiWindowOnFocusChanged( ... )>
+
+    uiWindowOnFocusChanged(
+        $w,
+        sub {
+            say LibUI::uiWindowFocused($w) ? 'in focus' : 'lost focus';
+        },
+        undef
+    );
+
+Registers a callback for when the window focus changes.
+
+Expected parameters include:
+
+=over
+
+=item C<$window>
+
+The window to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head3 C<uiWindowFocused( ... )>
+
+    my $in_focus = uiWindowFocused( $w );
+
+Returns whether or not the window is focused.
+
+=head3 C<uiWindowBorderless( ... )>
+
+    my $no_border = uiWindowBorderless( $w );
+
+Returns whether or not the window is borderless.
+
+=head3 C<uiWindowSetBorderless( ... )>
+
+    uiWindowSetBorderless( $w, 1 );
+
+Sets whether or not the window is borderless.
+
+This method is merely a hint and may be ignored by the system.
+
+=head3 C<uiWindowSetChild( ... )>
+
+    uiWindowSetChild( $w, $box );
+
+Sets the window's child.
+
+=head3 C<uiWindowMargined( ... )>
+
+    my $comfortable = uiWindowMargined( $w );
+
+Returns whether or not the window has a margin.
+
+=head3 C<uiWindowSetMargined( ... )>
+
+    uiWindowSetMargined( $w, 1 );
+
+Sets whether or not the window has a margin.
+
+The margin size is determined by the OS defaults.
+
+=head3 C<uiWindowResizeable( ... )>
+
+    my $resizable = uiWindowResizeable( $w );
+
+Returns whether or not the window is user resizable.
+
+=head3 C<uiWindowSetResizeable( ... )>
+
+    uiWindowSetResizeable( $w, 1 );
+
+Sets whether or not the window is user resizable.
+
+The margin size is determined by the OS defaults.
+
+=head3 C<uiNewWindow( ... )>
+
+Creates a new uiWindow.
+
+Expected parameters include:
+
+=over
+
+=item C<$title>
+
+Window title.
+
+=item C<$width>
+
+Window width in pixels.
+
+=item C<$height>
+
+Window height in pixels.
+
+=item C<$hasMenubar>
+
+Whether or not the window should display a menu bar.
+
+=back
+
+=head2 Button Functions
+
+These functions create and wrap a control that visually represents a button to be clicked by the user to trigger an
+action.
+
+Import these functions with the C<:button> tag.
+
+=head3 C<uiButtonText( ... )>
+
+    my $label = uiButtonText( $button );
+
+Returns the button label text.
+
+=head3 C<uiButtonSetText( ... )>
+
+    uiButtonSetText( $button, 'Click again' );
+
+Sets the button label text.
+
+=head3 C<uiButtonOnClicked( ... )>
+
+    uiButtonOnClicked( $button, sub { my ($btn, data) = @_; }, undef );
+
+Registers a callback for when the button is clicked.
+
+=head3 C<uiNewButton( ... )>
+
+    my $button = uiNewButton( 'Click me' );
+
+Creates a new button.
+
+Expected parameters include:
+
+=over
+
+=item C<$label>
+
+=back
+
+=head2 Box Functions
+
+These functions wrap a boxlike container that holds a group of controls.
+
+The contained controls are arranged to be displayed either horizontally or vertically next to each other.
+
+You may import these functions with the C<:box> tag.
+
+=head3 C<uiBoxAppend( ... )>
+
+    uiBoxAppend( $box, $child, 1 );
+
+Appends a control to the box.
+
+Stretchy items expand to use the remaining space within the box. In the case of multiple stretchy items the space is
+shared equally.
+
+Expected parameters include:
+
+=over
+
+=item C<$box>
+
+=item C<$child>
+
+=item C<$stretchy>
+
+True value to stretch the child, otherwise false.
+
+=back
+
+=head3 C<uiBoxNumChildren( ... )>
+
+    my $kids = uiBoxNumChildren( $box );
+
+Returns the number of controls contained within the box.
+
+=head3 C<uiBoxDelete( ... )>
+
+    uiBoxDelete( $box, 3 );
+
+Removes the control at a given index from the box.
+
+=head3 C<uiBoxPadded( ... )>
+
+    my $comfortable = uiBoxPadded( $box );
+
+Returns whether or not controls within the box are padded.
+
+Padding is defined as space between individual controls.
+
+=head3 C<uiBoxSetPadded( ... )>
+
+    uiBoxSetPadded( $box, 1 );
+
+Sets whether or not controls within the box are padded.
+
+Padding is defined as space between individual controls. The padding size is determined by the OS defaults.
+
+=head3 C<uiNewHorizontalBox( )>
+
+    uiNewHorizontalBox( );
+
+Creates a new horizontal box.
+
+Controls within the box are placed next to each other horizontally.
+
+=head3 C<uiNewVerticalBox( )>
+
+    my $vbox = uiNewVerticalBox( );
+
+Creates a new vertical box.
+
+Controls within the box are placed next to each other vertically.
+
+=head2 Checkbox Functions
+
+The functions wrap a control with a user checkable box accompanied by a text label.
+
+You may import them with the C<:checkbox> tag.
+
+=head3 C<uiCheckboxText( ... )>
+
+    my $label = uiCheckboxText( $chk );
+
+Returns the checkbox label text.
+
+=head3 C<uiCheckboxSetText( ... )>
+
+    uiCheckboxSetText( $chk, 'Show Small Files' );
+
+Sets the checkbox label text.
+
+=head3 C<uiCheckboxOnToggled( ... )>
+
+    uiCheckboxOnToggled( $chk, sub { my ($check, $data) = @_; }, undef );
+
+Registers a callback for when the checkbox is toggled by the user.
+
+The callback is not triggered when calling C<uiCheckboxSetChecked( ... )>.
+
+=head3 C<uiCheckboxChecked( ... )>
+
+    my $on = uiCheckboxChecked( $chk );
+
+Returns whether or the checkbox is checked.
+
+=head3 C<uiCheckboxSetChecked( ... )>
+
+    uiCheckboxSetChecked( $chk, 1 );
+
+Sets whether or not the checkbox is checked.
+
+=head3 C<uiNewCheckbox( ... )>
+
+    my $chk = uiNewCheckbox( 'Save automatically' );
+
+Creates a new checkbox.
+
+=head2 Entry Functions
+
+An entry is a control with a single line text entry field.
+
+You may import these functions with the C<:entry> tag.
+
+=head3 C<uiEntryText( ... )>
+
+    my $text = uiEntryText( $field );
+
+Returns the entry's text.
+
+=head3 C<uiEntrySetText( ... )>
+
+    uiEntrySetText( $field, 'Once upon a time ' );
+
+Sets the entry's text.
+
+=head3 C<uiEntryOnChanged( ... )>
+
+    uiEntryOnChanged( $field, sub { my ($txt, $data) = @_; }, undef );
+
+Registers a callback for when the user changes the entry's text.
+
+The callback is not triggered when calling C<uiEntrySetText( ... )>.
+
+=head3 C<uiEntryReadOnly( ... )>
+
+    my $ro = uiEntryReadOnly( $field );
+
+Returns whether or not the entry's text can be changed. A true value if readonly, otherwise false.
+
+=head3 C<uiEntrySetReadOnly( ... )>
+
+    uiEntrySetReadOnly( $field, 1 );
+
+Sets whether or not the entry's text is read only.
+
+=head3 C<uiNewEntry( )>
+
+    my $field = uiNewEntry( );
+
+Creates a new entry.
+
+=head3 C<uiNewPasswordEntry( ... )>
+
+    my $pass = uiNewPasswordEntry( );
+
+Creates a new entry suitable for sensitive inputs like passwords.
+
+The entered text is NOT readable by the user but masked as C<*******>.
+
+=head3 C<uiNewSearchEntry( ... )>
+
+    my $search = uiNewSearchEntry();
+
+Creates a new entry suitable for search.
+
+Some systems will deliberately delay the C<uiEntryOnChanged( ... )> callback for a more natural feel.
+
+=head2 Label Functions
+
+A label is a control that displays non-interactive text.
+
+You may import these functions with the C<:label> tag.
+
+=head3 C<uiLabelText( ... )>
+
+    my $text = uiLabelText( $label );
+
+Returns the label text.
+
+=head3 C<uiLabelSetText( ... )>
+
+    uiLabelSetText( $label, 'Status: Okay' );
+
+Sets the label text.
+
+=head3 C<uiNewLabel( ... )>
+
+    my $label = uiNewLabel( 'Status: Init' );
+
+Creates a new label.
+
+=head2 Tab Functions
+
+A tab represents a multi-page control interface that displays one page at a time.
+
+Each page/tab has an associated label that can be selected to switch between pages/tabs.
+
+=head3 C<uiTabAppend( ... )>
+
+    uiTabAppend( $container, 'Home', $box_1 );
+
+Appends a control in form of a page/tab with label.
+
+=head3 C<uiTabInsertAt( ... )>
+
+    uiTabInsertAt( $container, 'Advanced', 5, $box_2 );
+
+Inserts a control in as a page/tab with label at C<$index>.
+
+=head3 C<uiTabDelete( ... )>
+
+    uiTabDelete( $container, 5 );
+
+Removes the control at C<$index>.
+
+=head3 C<uiTabNumPages( ... )>
+
+    my $tabs = uiTabNumPages( $container );
+
+Returns the number of pages contained.
+
+=head3 C<uiTabMargined( ... )>
+
+    my $comfortable = uiTabMargined( $container, 3 );
+
+Returns whether or not the page/tab at C<$index> has a margin.
+
+=head3 C<uiTabSetMargined( ... )>
+
+    uiTabSetMargined( $container, 3, 0 ); # where 3 is the inded and 0 is false
+
+Sets whether or not the page/tab at C<$index> has a margin.
+
+The margin size is determined by the OS defaults.
+
+=head3 C<uiNewTab( )>
+
+    my $container = uiNewTab( );
+
+Creates a new tab container.
+
+=head2 Group Functions
+
+A group is a control container that adds a label to the contained child control.
+
+This control is a great way of grouping related controls in combination with uiBox. A visual box will or will not be
+drawn around the child control dependent on the underlying OS implementation.
+
+You may import these functions with the C<:group> tag.
+
+=head3 C<uiGroupTitle( ... )>
+
+    my $title = uiGroupTitle( $group );
+
+Returns the group title.
+
+=head3 C<uiGroupSetTitle( ... )>
+
+    uiGroupSetTitle( $group, 'Subscriptions' );
+
+Sets the group title.
+
+=head3 C<uiGroupSetChild( ... )>
+
+    uiGroupSetChild( $group $box );
+
+Sets the group's child.
+
+=head3 C<uiGroupMargined( ... )>
+
+    my $comfortable = uiGroupMargined( $group );
+
+Returns whether or not the group has a margin.
+
+=head3 C<uiGroupSetMargined( ... )>
+
+    uiGroupSetMargined( $group, 1 );
+
+Sets whether or not the group has a margin.
+
+The margin size is determined by the OS defaults.
+
+=head3 C<uiNewGroup( ... )>
+
+    my $group = uiNewGroup( 'Introduction' );
+
+Creates a new group.
+
+=head2 Spinbox Functions
+
+A spinbox is a control to display and modify integer values via a text field or C<+/-> buttons.
+
+This is a convenient control for having the user enter integer values. Values are guaranteed to be within the specified
+range.
+
+The C<+> button increases the held value by 1.
+
+The C<-> button decreased the held value by 1.
+
+Entering a value out of range will clamp to the nearest value in range.
+
+You may import these functions with the C<:spinbox> tag.
+
+=head3 C<uiSpinboxValue( ... )>
+
+    my $value = uiSpinboxValue( $spinner );
+
+Returns the spinbox value.
+
+=head3 C<uiSpinboxSetValue( ... )>
+
+    uiSpinboxSetValue( $spinner, 30 );
+
+Sets the spinbox value.
+
+Setting a value out of range will clamp to the nearest value in range.
+
+=head3 C<uiSpinboxOnChanged( ... )>
+
+    uiSpinboxOnChanged( $spinner, sub { my ($spin, $user_data) = @_; }, undef );
+
+Registers a callback for when the spinbox value is changed by the user.
+
+The callback is not triggered when calling C<uiSpinboxSetValue( ... )>.
+
+=head3 C<uiNewSpinbox( ... )>
+
+    my $spinner = uiNewSpinbox( 1, 100 );
+
+Creates a new spinbox.
+
+The initial spinbox value equals the minimum value.
+
+In the current implementation upstream, C<$min> and C<$max> are swapped if C<$min> is greater than C<$max>. This may
+change in the future though.
+
+=head2 Slider Functions
+
+A slider is a control to display and modify integer values via a user draggable slider.
+
+Values are guaranteed to be within the specified range.
+
+Sliders by default display a tool tip showing the current value when being dragged.
+
+Sliders are horizontal only.
+
+You may import these functions with the C<:slider> tag.
+
+=head3 C<uiSliderValue( ... )>
+
+    my $value = uiSliderValue( $slider );
+
+Returns the slider value.
+
+=head3 C<uiSliderSetValue( ... )>
+
+    uiSliderSetValue( $slider, 59 );
+
+Sets the slider value.
+
+=head3 C<uiSliderHasToolTip( ... )>
+
+    my $enabled = uiSliderHasToolTip( $slider );
+
+Returns whether or not the slider has a tool tip.
+
+=head3 C<uiSliderSetHasToolTip( ... )>
+
+    uiSliderSetHasToolTip( $slider, 1 );
+
+Sets whether or not the slider has a tool tip.
+
+=head3 C<uiSliderOnChanged( ... )>
+
+    uiSliderOnChanged( $slider, sub { my ($sl, $user_data) = @_; }, undef );
+
+Registers a callback for when the slider value is changed by the user.
+
+The callback is not triggered when calling C<uiSliderSetValue( ... )>.
+
+=head3 C<uiSliderOnReleased( ... )>
+
+    uiSliderOnReleased( $slider, sub { my ($sl, $user_data) = @_; }, undef );
+
+Registers a callback for when the slider is released from dragging.
+
+=head3 C<uiSliderSetRange( ... )>
+
+    uiSliderSetRange( $slider, 1, 500 );
+
+Sets the slider range.
+
+Make sure to clamp the slider value to the nearest value in range - should it be out of range. Manually call
+C<uiSliderOnChanged( ... )>'s callback in such a case.
+
+=head3 C<uiNewSlider( ... )>
+
+    my $slider = uiNewSlider( 1, 100 );
+
+Creates a new slider.
+
+The initial slider value equals the minimum value.
+
+In the current implementation upstream, C<$min> and C<$max> are swapped if C<$min> is greater than C<$max>. This may
+change in the future though.
+
+=head2 ProgressBar Functions
+
+A ProgressBar is a control that visualizes the progress of a task via the fill level of a horizontal bar.
+
+Indeterminate values are supported via an animated bar.
+
+=head3 C<uiProgressBarValue( ... )>
+
+    my $value = uiProgressBarValue( $bar );
+
+Returns the progress bar value.
+
+=head3 C<uiProgressBarSetValue( ... )>
+
+    uiProgressBarSetValue( $bar, 100 );
+
+Sets the progress bar value.
+
+Valid values are C<[0 .. 100]> for displaying a solid bar imitating a percent value.
+
+Use a value of C<-1> to render an animated bar to convey an indeterminate value.
+
+=head3 C<uiNewProgressBar( )>
+
+Creates a new progress bar.
+
+=head2 Separator Functions
+
+A separator is a control to visually separate controls, horizontally or vertically.
+
+Import these functions with the C<:separator> tag.
+
+=head3 C<uiNewHorizontalSeparator( )>
+
+    my $hsplit = uiNewHorizontalSeparator( );
+
+Creates a new horizontal separator.
+
+=head3 C<uiNewVerticalSeparator( )>
+
+    my $hsplit = uiNewVerticalSeparator( );
+
+Creates a new vertical separator.
+
+=head2 Combobox Functions
+
+A combobox is a control to select one item from a predefined list of items via a drop down menu.
+
+You may import these functions with the C<:combobox> tag.
+
+=head3 C<uiComboboxAppend( ... )>
+
+    uiComboboxAppend( $combo, 'Candy' );
+
+Appends an item to the combo box.
+
+=head3 C<uiComboboxInsertAt( ... )>
+
+    uiComboboxInsertAt( $combo, 4, 'Salty snacks' );
+
+Inserts an item at C<$index> to the combo box.
+
+=head3 C<uiComboboxDelete( ... )>
+
+    uiComboboxDelete( $combo, 4 );
+
+Deletes an item at C<$index> from the combo box.
+
+Deleting the index of the item currently selected will move the selection to the next item in the combo box or C<-1> if
+no such item exists.
+
+=head3 C<uiComboboxClear( ... )>
+
+    uiComboboxClear( $combo );
+
+Deletes all items from the combo box.
+
+=head3 C<uiComboboxNumItems( ... )>
+
+    my $options = uiComboboxNumItems( $combo );
+
+Returns the number of items contained within the combo box.
+
+=head3 C<uiComboboxSelected( ... )>
+
+    my $current = uiComboboxSelected( $combo );
+
+Returns the index of the item selected or C<-1> on empty selection.
+
+=head3 C<uiComboboxSetSelected( ... )>
+
+    uiComboboxSetSelected( $combo, 2 );
+
+Sets the item selected. C<-1> to clear selection.
+
+=head3 C<uiComboboxOnSelected( ... )>
+
+    uiComboboxOnSelected( $combo, sub { my ($c, $user_data) = @_; }, undef );
+
+Registers a callback for when a combo box item is selected.
+
+The callback is not triggered when calling C<uiComboboxSetSelected( ... )>, C<uiComboboxInsertAt( ... )>,
+C<uiComboboxDelete( ... )>, or C<uiComboboxClear( ... )>.
+
+=head3 C<uiNewCombobox( )>
+
+    my $combo = uiNewCombobox( );
+
+Creates a new combo box.
+
+=head2 Editable Combobox Functions
+
+An editable combobox is a control to select one item from a predefined list of items or enter ones own.
+
+Predefined items can be selected from a drop down menu.
+
+A customary item can be entered by the user via an editable text field.
+
+You may import these functions with the C<:editablecombobox> tag.
+
+=head3 C<uiEditableComboboxAppend( ... )>
+
+    uiEditableComboboxAppend( $combo, 'Fire' );
+
+Appends an item to the editable combo box.
+
+=head3 C<uiEditableComboboxText( ... )>
+
+    my $text = uiEditableComboboxText( $combo );
+
+Returns the text of the editable combo box.
+
+This text is either the text of one of the predefined list items or the text manually entered by the user.
+
+=head3 C<uiEditableComboboxSetText( ... )>
+
+    uiEditableComboboxSetText( $combo, "Floating" );
+
+Sets the editable combo box text.
+
+=head3 C<uiEditableComboboxOnChanged( )>
+
+    uiEditableComboboxOnChanged( $combo, sub { my ($cb, user_data) = @_; }, undef );
+
+Registers a callback for when an editable combo box item is selected or user text changed.
+
+The callback is not triggered when calling C<uiEditableComboboxSetText( ... )>.
+
+=head3 C<uiNewEditableCombobox( )>
+
+    my $combo = uiNewEditableCombobox( );
+
+Creates a new editable combo box.
+
+=head2 Menu Functions
+
+Menus provide the standard menu functionality found at the top of application windows.
+
+Each menu has a name and can contain items, check items, quit, preferences, about, and separators.
+
+You may import these functions with the C<:menu> tag.
+
+=head3 C<uiNewMenu( ... )>
+
+    my $menu = uiNewMenu( 'File' );
+
+Creates a new menu with the given name.
+
+=head3 C<uiMenuAppendItem( ... )>
+
+    my $item = uiMenuAppendItem( $menu, 'Open' );
+
+Appends a new item to the menu with the given name.
+
+=head3 C<uiMenuAppendCheckItem( ... )>
+
+    my $item = uiMenuAppendCheckItem( $menu, 'Show Toolbar' );
+
+Appends a new item with a checkbox to the menu with the given name.
+
+=head3 C<uiMenuAppendQuitItem( ... )>
+
+    my $item = uiMenuAppendQuitItem( $menu );
+
+Appends a quit item to the menu.
+
+On platforms where there is a standard quit item, this is it. On other platforms, this is just a normal item.
+
+=head3 C<uiMenuAppendPreferencesItem( ... )>
+
+    my $item = uiMenuAppendPreferencesItem( $menu );
+
+Appends a preferences item to the menu.
+
+On platforms where there is a standard preferences item, this is it. On other platforms, this is just a normal item.
+
+=head3 C<uiMenuAppendAboutItem( ... )>
+
+    my $item = uiMenuAppendAboutItem( $menu );
+
+Appends an about item to the menu.
+
+On platforms where there is a standard about item, this is it. On other platforms, this is just a normal item.
+
+=head3 C<uiMenuAppendSeparator( ... )>
+
+    uiMenuAppendSeparator( $menu );
+
+Appends a separator to the menu.
+
+=head3 C<uiMenuItemEnable( ... )>
+
+    uiMenuItemEnable( $item );
+
+Enables the menu item.
+
+=head3 C<uiMenuItemDisable( ... )>
+
+    uiMenuItemDisable( $item );
+
+Disables the menu item.
+
+=head3 C<uiMenuItemOnClicked( ... )>
+
+    uiMenuItemOnClicked(
+        $item,
+        $window,
+        sub {
+            my ($item, $window, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when the menu item is clicked.
+
+Expected parameters include:
+
+=over
+
+=item C<$item>
+
+The menu item to bind.
+
+=item C<$window>
+
+The window this menu item is associated with.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the menu item that triggered the callback, the window associated
+with the menu item, and user data registered with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head3 C<uiMenuItemChecked( ... )>
+
+    my $checked = uiMenuItemChecked( $item );
+
+Returns whether or not the menu item is checked.
+
+=head3 C<uiMenuItemSetChecked( ... )>
+
+    uiMenuItemSetChecked( $item, 1 );
+
+Sets whether or not the menu item is checked.
+
+=head2 DateTime Picker Functions
+
+A date time picker is a control to select a date, time, or both.
+
+You may import these functions with the C<:datetimepicker> tag.
+
+=head3 C<uiNewDatePicker( )>
+
+    my $picker = uiNewDatePicker( );
+
+Creates a new date picker.
+
+=head3 C<uiNewTimePicker( )>
+
+    my $picker = uiNewTimePicker( );
+
+Creates a new time picker.
+
+=head3 C<uiNewDateTimePicker( )>
+
+    my $picker = uiNewDateTimePicker( );
+
+Creates a new date and time picker.
+
+=head3 C<uiDateTimePickerOnChanged( ... )>
+
+    uiDateTimePickerOnChanged(
+        $picker,
+        sub {
+            my ($picker, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when the date time picker value is changed.
+
+Expected parameters include:
+
+=over
+
+=item C<$picker>
+
+The date time picker to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head3 C<uiDateTimePickerTime( ... )>
+
+    uiDateTimePickerTime( $picker, $time );
+
+Gets the time value of the date time picker.
+
+Expected parameters include:
+
+=over
+
+=item C<$picker>
+
+The date time picker to query.
+
+=item C<$time>
+
+A pointer to a C<LibUI::TM> struct that will receive the time value.
+
+=back
+
+=head3 C<uiDateTimePickerSetTime( ... )>
+
+    uiDateTimePickerSetTime( $picker, $time );
+
+Sets the time value of the date time picker.
+
+Expected parameters include:
+
+=over
+
+=item C<$picker>
+
+The date time picker to modify.
+
+=item C<$time>
+
+A pointer to a C<LibUI::TM> struct containing the new time value.
+
+=back
+
+=head2 Color Button Functions
+
+A color button is a control that allows the user to select a color.
+
+You may import these functions with the C<:colorbutton> tag.
+
+=head3 C<uiNewColorButton( )>
+
+    my $button = uiNewColorButton( );
+
+Creates a new color button.
+
+=head3 C<uiColorButtonColor( ... )>
+
+    uiColorButtonColor( $button, my $r, my $g, my $b, my $a );
+
+Gets the color of the color button.
+
+Expected parameters include:
+
+=over
+
+=item C<$button>
+
+The color button to query.
+
+=item C<$r>
+
+A pointer to a double that will receive the red component.
+
+=item C<$g>
+
+A pointer to a double that will receive the green component.
+
+=item C<$b>
+
+A pointer to a double that will receive the blue component.
+
+=item C<$a>
+
+A pointer to a double that will receive the alpha component.
+
+=back
+
+=head3 C<uiColorButtonSetColor( ... )>
+
+    uiColorButtonSetColor( $button, 0.5, 0.5, 0.5, 1.0 );
+
+Sets the color of the color button.
+
+Expected parameters include:
+
+=over
+
+=item C<$button>
+
+The color button to modify.
+
+=item C<$r>
+
+The red component.
+
+=item C<$g>
+
+The green component.
+
+=item C<$b>
+
+The blue component.
+
+=item C<$a>
+
+The alpha component.
+
+=back
+
+=head3 C<uiColorButtonOnChanged( ... )>
+
+    uiColorButtonOnChanged(
+        $button,
+        sub {
+            my ($button, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when the color button color is changed.
+
+Expected parameters include:
+
+=over
+
+=item C<$button>
+
+The color button to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head2 Font Button Functions
+
+A font button is a control that allows the user to select a font.
+
+You may import these functions with the C<:fontbutton> tag.
+
+=head3 C<uiNewFontButton( )>
+
+    my $button = uiNewFontButton( );
+
+Creates a new font button.
+
+=head3 C<uiFontButtonFont( ... )>
+
+    uiFontButtonFont( $button, $font );
+
+Gets the font selected by the font button.
+
+Expected parameters include:
+
+=over
+
+=item C<$button>
+
+The font button to query.
+
+=item C<$font>
+
+A pointer that will receive the font descriptor.
+
+=back
+
+=head3 C<uiFreeFontButtonFont( ... )>
+
+    uiFreeFontButtonFont( $font );
+
+Frees a font descriptor obtained from C<uiFontButtonFont( ... )>.
+
+=head3 C<uiLoadControlFont( )>
+
+    my $font = uiLoadControlFont( );
+
+Loads the default font used for controls.
+
+=head3 C<uiFontButtonOnChanged( ... )>
+
+    uiFontButtonOnChanged(
+        $button,
+        sub {
+            my ($button, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when the font button font is changed.
+
+Expected parameters include:
+
+=over
+
+=item C<$button>
+
+The font button to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head2 Multiline Entry Functions
+
+A multiline entry is a control to display and allow editing of a multi-line text field.
+
+You may import these functions with the C<:multilineentry> tag.
+
+=head3 C<uiNewMultilineEntry( )>
+
+    my $entry = uiNewMultilineEntry( );
+
+Creates a new multiline entry with wrapping enabled.
+
+=head3 C<uiNewNonWrappingMultilineEntry( )>
+
+    my $entry = uiNewNonWrappingMultilineEntry( );
+
+Creates a new multiline entry with wrapping disabled.
+
+=head3 C<uiMultilineEntryText( ... )>
+
+    my $text = uiMultilineEntryText( $entry );
+
+Returns the text of the multiline entry.
+
+=head3 C<uiMultilineEntrySetText( ... )>
+
+    uiMultilineEntrySetText( $entry, 'Hello, World!' );
+
+Sets the multiline entry text.
+
+=head3 C<uiMultilineEntryAppend( ... )>
+
+    uiMultilineEntryAppend( $entry, 'More text' );
+
+Appends text to the multiline entry.
+
+=head3 C<uiMultilineEntryOnChanged( ... )>
+
+    uiMultilineEntryOnChanged(
+        $entry,
+        sub {
+            my ($entry, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when the multiline entry text is changed by the user.
+
+The callback is not triggered when calling C<uiMultilineEntrySetText( ... )> or C<uiMultilineEntryAppend( ... )>.
+
+=head3 C<uiMultilineEntryReadOnly( ... )>
+
+    my $ro = uiMultilineEntryReadOnly( $entry );
+
+Returns whether or not the multiline entry text can be changed.
+
+=head3 C<uiMultilineEntrySetReadOnly( ... )>
+
+    uiMultilineEntrySetReadOnly( $entry, 1 );
+
+Sets whether or not the multiline entry text is read only.
+
+=head2 Radio Buttons Functions
+
+Radio buttons are a control to select one option from a set of options.
+
+They are displayed as a list of labeled radio buttons.
+
+You may import these functions with the C<:radiobuttons> tag.
+
+=head3 C<uiNewRadioButtons( )>
+
+    my $radio = uiNewRadioButtons( );
+
+Creates a new radio buttons control.
+
+=head3 C<uiRadioButtonsAppend( ... )>
+
+    uiRadioButtonsAppend( $radio, 'Option 1' );
+
+Appends a new radio button with the given label to the radio buttons control.
+
+=head3 C<uiRadioButtonsSelected( ... )>
+
+    my $index = uiRadioButtonsSelected( $radio );
+
+Returns the index of the selected radio button or C<-1> on empty selection.
+
+=head3 C<uiRadioButtonsSetSelected( ... )>
+
+    uiRadioButtonsSetSelected( $radio, 2 );
+
+Sets the selected radio button. Use C<-1> to clear selection.
+
+=head3 C<uiRadioButtonsOnSelected( ... )>
+
+    uiRadioButtonsOnSelected(
+        $radio,
+        sub {
+            my ($radio, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when a radio button is selected.
+
+Expected parameters include:
+
+=over
+
+=item C<$radio>
+
+The radio buttons control to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head2 Tab Extra Functions
+
+These functions provide additional functionality for tab controls.
+
+You may import these functions with the C<:tab_extra> tag.
+
+=head3 C<uiTabSelected( ... )>
+
+    my $index = uiTabSelected( $tab );
+
+Returns the index of the currently selected page.
+
+=head3 C<uiTabSetSelected( ... )>
+
+    uiTabSetSelected( $tab, 2 );
+
+Sets the selected page by index.
+
+=head3 C<uiTabOnSelected( ... )>
+
+    uiTabOnSelected(
+        $tab,
+        sub {
+            my ($tab, $data) = @_;
+        },
+        undef
+    );
+
+Registers a callback for when a tab page is selected.
+
+Expected parameters include:
+
+=over
+
+=item C<$tab>
+
+The tab control to bind.
+
+=item C<$code_ref>
+
+Code reference that should expect a reference back to the instance that triggered the callback and user data registered
+with the sender instance.
+
+=item C<$user_data>
+
+Whatever you feel like passing along.
+
+=back
+
+=head2 Grid Functions
+
+A grid is a container control that arranges its children in a grid layout.
+
+You may import these functions with the C<:grid> tag.
+
+=head3 C<uiNewGrid( )>
+
+    my $grid = uiNewGrid( );
+
+Creates a new grid.
+
+=head3 C<uiGridAppend( ... )>
+
+    uiGridAppend( $grid, $child, 0, 0, 1, 1, 1, 1, 1, 1 );
+
+Appends a control to the grid.
+
+Expected parameters include:
+
+=over
+
+=item C<$grid>
+
+The grid to append to.
+
+=item C<$child>
+
+The control to append.
+
+=item C<$left>
+
+Column position.
+
+=item C<$top>
+
+Row position.
+
+=item C<$xspan>
+
+Number of columns spanned.
+
+=item C<$yspan>
+
+Number of rows spanned.
+
+=item C<$halign>
+
+Horizontal alignment.
+
+=item C<$valign>
+
+Vertical alignment.
+
+=item C<$hstretch>
+
+Whether or not the control will be stretched horizontally to fill available space.
+
+=item C<$vstretch>
+
+Whether or not the control will be stretched vertically to fill available space.
+
+=back
+
+=head3 C<uiGridInsertAt( ... )>
+
+    uiGridInsertAt( $grid, $child, $existing, 0, 0, 0, 1, 1, 1, 1, 1, 1 );
+
+Inserts a control to the grid relative to an existing control.
+
+Expected parameters include:
+
+=over
+
+=item C<$grid>
+
+The grid to insert into.
+
+=item C<$child>
+
+The control to insert.
+
+=item C<$existing>
+
+The existing control relative to which the new control is inserted.
+
+=item C<$at>
+
+Position relative to the existing control.
+
+=item C<$left>
+
+Column position.
+
+=item C<$top>
+
+Row position.
+
+=item C<$xspan>
+
+Number of columns spanned.
+
+=item C<$yspan>
+
+Number of rows spanned.
+
+=item C<$halign>
+
+Horizontal alignment.
+
+=item C<$valign>
+
+Vertical alignment.
+
+=item C<$hstretch>
+
+Whether or not the control will be stretched horizontally to fill available space.
+
+=item C<$vstretch>
+
+Whether or not the control will be stretched vertically to fill available space.
+
+=back
+
+=head3 C<uiGridPadded( ... )>
+
+    my $comfortable = uiGridPadded( $grid );
+
+Returns whether or not controls within the grid are padded.
+
+Padding is defined as space between individual controls.
+
+=head3 C<uiGridSetPadded( ... )>
+
+    uiGridSetPadded( $grid, 1 );
+
+Sets whether or not controls within the grid are padded.
+
+Padding is defined as space between individual controls. The padding size is determined by the OS defaults.
+
+=head2 Form Functions
+
+A form is a container control that arranges its children in a form layout with labels.
+
+You may import these functions with the C<:form> tag.
+
+=head3 C<uiNewForm( )>
+
+    my $form = uiNewForm( );
+
+Creates a new form.
+
+=head3 C<uiFormAppend( ... )>
+
+    uiFormAppend( $form, 'Name:', $entry, 0 );
+
+Appends a control to the form.
+
+Expected parameters include:
+
+=over
+
+=item C<$form>
+
+The form to append to.
+
+=item C<$label>
+
+The label for the control.
+
+=item C<$child>
+
+The control to append.
+
+=item C<$stretchy>
+
+Whether or not the control is stretchy.
+
+=back
+
+=head3 C<uiFormNumChildren( ... )>
+
+    my $kids = uiFormNumChildren( $form );
+
+Returns the number of controls contained within the form.
+
+=head3 C<uiFormDelete( ... )>
+
+    uiFormDelete( $form, 0 );
+
+Removes the control at the given index from the form.
+
+=head3 C<uiFormPadded( ... )>
+
+    my $comfortable = uiFormPadded( $form );
+
+Returns whether or not controls within the form are padded.
+
+Padding is defined as space between individual controls.
+
+=head3 C<uiFormSetPadded( ... )>
+
+    uiFormSetPadded( $form, 1 );
+
+Sets whether or not controls within the form are padded.
+
+Padding is defined as space between individual controls. The padding size is determined by the OS defaults.
+
+=head2 File Dialog Functions
+
+These functions display file open, file save, and folder open dialogs.
+
+You may import these functions with the C<:filedialog> tag.
+
+=head3 C<uiOpenFile( ... )>
+
+    my $file = uiOpenFile( $window );
+
+Shows an open file dialog.
+
+Returns the selected file path or C<undef> if the dialog was cancelled.
+
+=head3 C<uiOpenFolder( ... )>
+
+    my $folder = uiOpenFolder( $window );
+
+Shows an open folder dialog.
+
+Returns the selected folder path or C<undef> if the dialog was cancelled.
+
+=head3 C<uiSaveFile( ... )>
+
+    my $file = uiSaveFile( $window );
+
+Shows a save file dialog.
+
+Returns the selected file path or C<undef> if the dialog was cancelled.
+
+=head2 Message Box Functions
+
+These functions display message boxes with information or error messages.
+
+You may import these functions with the C<:msgbox> tag.
+
+=head3 C<uiMsgBox( ... )>
+
+    uiMsgBox( $window, 'Information', 'Operation completed successfully.' );
+
+Shows an informational message box.
+
+Expected parameters include:
+
+=over
+
+=item C<$window>
+
+The parent window.
+
+=item C<$title>
+
+The message box title.
+
+=item C<$description>
+
+The message body.
+
+=back
+
+=head3 C<uiMsgBoxError( ... )>
+
+    uiMsgBoxError( $window, 'Error', 'Something went wrong.' );
+
+Shows an error message box.
+
+Expected parameters include:
+
+=over
+
+=item C<$window>
+
+The parent window.
+
+=item C<$title>
+
+The message box title.
+
+=item C<$description>
+
+The message body.
+
+=back
+
+=head2 Area Functions
+
+An area is a control that provides a canvas for custom drawing and user input.
+
+You may import area operation functions with the C<:area_extra> tag.
+
+=head3 C<uiNewArea( ... )>
+
+    my $area = uiNewArea( $handler );
+
+Creates a new area with the given area handler.
+
+=head3 C<uiNewScrollingArea( ... )>
+
+    my $area = uiNewScrollingArea( $handler, $width, $height );
+
+Creates a new scrolling area with the given dimensions and area handler.
+
+=head3 C<uiAreaSetSize( ... )>
+
+    uiAreaSetSize( $area, 800, 600 );
+
+Sets the size of the area.
+
+=head3 C<uiAreaQueueRedrawAll( ... )>
+
+    uiAreaQueueRedrawAll( $area );
+
+Queues a full redraw of the area.
+
+=head3 C<uiAreaScrollTo( ... )>
+
+    uiAreaScrollTo( $area, $x, $y, $width, $height );
+
+Scrolls the area to the given rectangle.
+
+Expected parameters include:
+
+=over
+
+=item C<$area>
+
+The area to scroll.
+
+=item C<$x>
+
+The horizontal position to scroll to.
+
+=item C<$y>
+
+The vertical position to scroll to.
+
+=item C<$width>
+
+The width of the scroll rectangle.
+
+=item C<$height>
+
+The height of the scroll rectangle.
+
+=back
+
+=head3 C<uiAreaBeginUserWindowMove( ... )>
+
+    uiAreaBeginUserWindowMove( $area );
+
+Begins moving the window that contains the area based on user input.
+
+This is used for implementing custom window dragging.
+
+=head3 C<uiAreaBeginUserWindowResize( ... )>
+
+    uiAreaBeginUserWindowResize( $area, $edge );
+
+Begins resizing the window that contains the area based on user input.
+
+Expected parameters include:
+
+=over
+
+=item C<$area>
+
+The area to use for resize detection.
+
+=item C<$edge>
+
+The window edge to resize from.
+
+=back
+
+=head2 Draw Path Functions
+
+Draw paths represent shapes that can be stroked or filled.
+
+You may import these functions with the C<:drawpath> tag.
+
+=head3 C<uiDrawNewPath( ... )>
+
+    my $path = uiDrawNewPath( $fillMode );
+
+Creates a new draw path.
+
+Expected parameters include:
+
+=over
+
+=item C<$fillMode>
+
+The fill mode to use for the path.
+
+=back
+
+=head3 C<uiDrawFreePath( ... )>
+
+    uiDrawFreePath( $path );
+
+Frees a draw path.
+
+=head3 C<uiDrawPathNewFigure( ... )>
+
+    uiDrawPathNewFigure( $path, $x, $y );
+
+Starts a new figure at the given point.
+
+=head3 C<uiDrawPathNewFigureWithArc( ... )>
+
+    uiDrawPathNewFigureWithArc(
+        $path, $xCenter, $yCenter, $radius,
+        $startAngle, $sweep, $negative
+    );
+
+Starts a new figure with an arc.
+
+Expected parameters include:
+
+=over
+
+=item C<$path>
+
+The draw path.
+
+=item C<$xCenter>
+
+The X coordinate of the arc center.
+
+=item C<$yCenter>
+
+The Y coordinate of the arc center.
+
+=item C<$radius>
+
+The arc radius.
+
+=item C<$startAngle>
+
+The start angle in radians.
+
+=item C<$sweep>
+
+The sweep angle in radians.
+
+=item C<$negative>
+
+Whether or not the arc is counter-clockwise.
+
+=back
+
+=head3 C<uiDrawPathLineTo( ... )>
+
+    uiDrawPathLineTo( $path, $x, $y );
+
+Draws a line to the given point.
+
+=head3 C<uiDrawPathArcTo( ... )>
+
+    uiDrawPathArcTo(
+        $path, $xCenter, $yCenter, $radius,
+        $startAngle, $sweep, $negative
+    );
+
+Draws an arc to the path.
+
+Expected parameters include:
+
+=over
+
+=item C<$path>
+
+The draw path.
+
+=item C<$xCenter>
+
+The X coordinate of the arc center.
+
+=item C<$yCenter>
+
+The Y coordinate of the arc center.
+
+=item C<$radius>
+
+The arc radius.
+
+=item C<$startAngle>
+
+The start angle in radians.
+
+=item C<$sweep>
+
+The sweep angle in radians.
+
+=item C<$negative>
+
+Whether or not the arc is counter-clockwise.
+
+=back
+
+=head3 C<uiDrawPathBezierTo( ... )>
+
+    uiDrawPathBezierTo( $path, $x0, $y0, $x1, $y1, $x2, $y2 );
+
+Draws a Bézier curve to the path.
+
+Expected parameters include:
+
+=over
+
+=item C<$path>
+
+The draw path.
+
+=item C<$x0>
+
+First control point X.
+
+=item C<$y0>
+
+First control point Y.
+
+=item C<$x1>
+
+Second control point X.
+
+=item C<$y1>
+
+Second control point Y.
+
+=item C<$x2>
+
+End point X.
+
+=item C<$y2>
+
+End point Y.
+
+=back
+
+=head3 C<uiDrawPathCloseFigure( ... )>
+
+    uiDrawPathCloseFigure( $path );
+
+Closes the current figure by drawing a line from the current point to the starting point of the figure.
+
+=head3 C<uiDrawPathAddRectangle( ... )>
+
+    uiDrawPathAddRectangle( $path, $x, $y, $width, $height );
+
+Adds a rectangle to the path.
+
+=head3 C<uiDrawPathEnded( ... )>
+
+    my $ended = uiDrawPathEnded( $path );
+
+Returns whether or not the path has been ended.
+
+=head3 C<uiDrawPathEnd( ... )>
+
+    uiDrawPathEnd( $path );
+
+Ends the path. The path cannot be modified after this.
+
+=head2 Draw Stroke and Fill Functions
+
+These functions stroke and fill draw paths on a draw context.
+
+You may import these functions with the C<:drawstroke> tag.
+
+=head3 C<uiDrawStroke( ... )>
+
+    uiDrawStroke( $context, $path, $brush, $params );
+
+Strokes a draw path on the draw context.
+
+Expected parameters include:
+
+=over
+
+=item C<$context>
+
+The draw context.
+
+=item C<$path>
+
+The draw path to stroke.
+
+=item C<$brush>
+
+A C<LibUI::DrawBrush> describing the stroke appearance.
+
+=item C<$params>
+
+A C<LibUI::DrawStrokeParams> describing the stroke parameters.
+
+=back
+
+=head3 C<uiDrawFill( ... )>
+
+    uiDrawFill( $context, $fillMode, $brush, $matrix );
+
+Fills a draw path on the draw context.
+
+Expected parameters include:
+
+=over
+
+=item C<$context>
+
+The draw context.
+
+=item C<$fillMode>
+
+The fill mode.
+
+=item C<$brush>
+
+A C<LibUI::DrawBrush> describing the fill appearance.
+
+=item C<$matrix>
+
+A C<LibUI::DrawMatrix> transform applied to the brush, or C<undef> for no transform.
+
+=back
+
+=head2 Draw Matrix Functions
+
+Draw matrices are used to transform coordinates and sizes during drawing operations.
+
+You may import these functions with the C<:drawmatrix> tag.
+
+=head3 C<uiDrawMatrixSetIdentity( ... )>
+
+    uiDrawMatrixSetIdentity( $matrix );
+
+Sets the matrix to the identity matrix.
+
+=head3 C<uiDrawMatrixTranslate( ... )>
+
+    uiDrawMatrixTranslate( $matrix, $x, $y );
+
+Translates the matrix.
+
+=head3 C<uiDrawMatrixScale( ... )>
+
+    uiDrawMatrixScale( $matrix, $xCenter, $yCenter, $x, $y );
+
+Scales the matrix around the given center point.
+
+=head3 C<uiDrawMatrixRotate( ... )>
+
+    uiDrawMatrixRotate( $matrix, $x, $y, $radians );
+
+Rotates the matrix around the given point.
+
+=head3 C<uiDrawMatrixSkew( ... )>
+
+    uiDrawMatrixSkew( $matrix, $x, $y, $xAmount, $yAmount );
+
+Skews the matrix.
+
+=head3 C<uiDrawMatrixMultiply( ... )>
+
+    uiDrawMatrixMultiply( $dest, $src );
+
+Multiplies the destination matrix by the source matrix.
+
+=head3 C<uiDrawMatrixInvertible( ... )>
+
+    my $ok = uiDrawMatrixInvertible( $matrix );
+
+Returns whether or not the matrix is invertible.
+
+=head3 C<uiDrawMatrixInvert( ... )>
+
+    my $ok = uiDrawMatrixInvert( $matrix );
+
+Inverts the matrix.
+
+Returns true on success, false if the matrix is not invertible.
+
+=head3 C<uiDrawMatrixTransformPoint( ... )>
+
+    uiDrawMatrixTransformPoint( $matrix, $x, $y );
+
+Transforms a point using the matrix.
+
+=head3 C<uiDrawMatrixTransformSize( ... )>
+
+    uiDrawMatrixTransformSize( $matrix, $width, $height );
+
+Transforms a size using the matrix.
+
+=head2 Draw Context Functions
+
+These functions perform operations on the draw context beyond basic path drawing.
+
+You may import these functions with the C<:drawcontext> tag.
+
+=head3 C<uiDrawTransform( ... )>
+
+    uiDrawTransform( $context, $matrix );
+
+Transforms the coordinate space of the draw context.
+
+=head3 C<uiDrawClip( ... )>
+
+    uiDrawClip( $context, $path );
+
+Clips drawing to the given path.
+
+=head3 C<uiDrawSave( ... )>
+
+    uiDrawSave( $context );
+
+Saves the current draw context state.
+
+=head3 C<uiDrawRestore( ... )>
+
+    uiDrawRestore( $context );
+
+Restores a previously saved draw context state.
+
+=head2 Image Functions
+
+These functions manage images used in the UI.
+
+You may import these functions with the C<:image> tag.
+
+=head3 C<uiNewImage( ... )>
+
+    my $image = uiNewImage( $width, $height );
+
+Creates a new image with the given dimensions.
+
+=head3 C<uiFreeImage( ... )>
+
+    uiFreeImage( $image );
+
+Frees an image.
+
+=head3 C<uiImageAppend( ... )>
+
+    uiImageAppend( $image, $pixels, $width, $height, $stride );
+
+Appends pixel data to the image.
+
+Expected parameters include:
+
+=over
+
+=item C<$image>
+
+The image to append to.
+
+=item C<$pixels>
+
+Pointer to the pixel data.
+
+=item C<$width>
+
+Width of the pixel data in pixels.
+
+=item C<$height>
+
+Height of the pixel data in pixels.
+
+=item C<$stride>
+
+Stride of the pixel data in bytes.
+
+=back
+
+=head2 Text Attribute Functions
+
+Text attributes modify the appearance of text in an attributed string.
+
+You may import these functions with the C<:attr> tag.
+
+=head3 C<uiFreeAttribute( ... )>
+
+    uiFreeAttribute( $attr );
+
+Frees a text attribute.
+
+=head3 C<uiAttributeGetType( ... )>
+
+    my $type = uiAttributeGetType( $attr );
+
+Returns the type of a text attribute.
+
+=head3 C<uiNewFamilyAttribute( ... )>
+
+    my $attr = uiNewFamilyAttribute( 'Helvetica' );
+
+Creates a new font family attribute.
+
+=head3 C<uiAttributeFamily( ... )>
+
+    my $family = uiAttributeFamily( $attr );
+
+Returns the font family from a font family attribute.
+
+=head3 C<uiNewSizeAttribute( ... )>
+
+    my $attr = uiNewSizeAttribute( 14.0 );
+
+Creates a new font size attribute.
+
+=head3 C<uiAttributeSize( ... )>
+
+    my $size = uiAttributeSize( $attr );
+
+Returns the font size from a font size attribute.
+
+=head3 C<uiNewWeightAttribute( ... )>
+
+    my $attr = uiNewWeightAttribute( $weight );
+
+Creates a new font weight attribute.
+
+=head3 C<uiAttributeWeight( ... )>
+
+    my $weight = uiAttributeWeight( $attr );
+
+Returns the font weight from a font weight attribute.
+
+=head3 C<uiNewItalicAttribute( ... )>
+
+    my $attr = uiNewItalicAttribute( $italic );
+
+Creates a new font italic attribute.
+
+=head3 C<uiAttributeItalic( ... )>
+
+    my $italic = uiAttributeItalic( $attr );
+
+Returns the font italic style from a font italic attribute.
+
+=head3 C<uiNewStretchAttribute( ... )>
+
+    my $attr = uiNewStretchAttribute( $stretch );
+
+Creates a new font stretch attribute.
+
+=head3 C<uiAttributeStretch( ... )>
+
+    my $stretch = uiAttributeStretch( $attr );
+
+Returns the font stretch from a font stretch attribute.
+
+=head3 C<uiNewColorAttribute( ... )>
+
+    my $attr = uiNewColorAttribute( $r, $g, $b, $a );
+
+Creates a new text color attribute.
+
+=head3 C<uiAttributeColor( ... )>
+
+    uiAttributeColor( $attr, my $r, my $g, my $b, my $a );
+
+Returns the color from a text color attribute.
+
+=head3 C<uiNewBackgroundAttribute( ... )>
+
+    my $attr = uiNewBackgroundAttribute( $r, $g, $b, $a );
+
+Creates a new text background color attribute.
+
+=head3 C<uiNewUnderlineAttribute( ... )>
+
+    my $attr = uiNewUnderlineAttribute( $underline );
+
+Creates a new underline attribute.
+
+=head3 C<uiAttributeUnderline( ... )>
+
+    my $underline = uiAttributeUnderline( $attr );
+
+Returns the underline style from an underline attribute.
+
+=head3 C<uiNewUnderlineColorAttribute( ... )>
+
+    my $attr = uiNewUnderlineColorAttribute( $color, $r, $g, $b, $a );
+
+Creates a new underline color attribute.
+
+=head3 C<uiAttributeUnderlineColor( ... )>
+
+    uiAttributeUnderlineColor( $attr, my $color, my $r, my $g, my $b, my $a );
+
+Returns the underline color from an underline color attribute.
+
+=head2 OpenType Features Functions
+
+OpenType features provide fine-grained control over text rendering.
+
+You may import these functions with the C<:opentype> tag.
+
+=head3 C<uiNewOpenTypeFeatures( )>
+
+    my $features = uiNewOpenTypeFeatures( );
+
+Creates a new OpenType features map.
+
+=head3 C<uiFreeOpenTypeFeatures( ... )>
+
+    uiFreeOpenTypeFeatures( $features );
+
+Frees an OpenType features map.
+
+=head3 C<uiOpenTypeFeaturesClone( ... )>
+
+    my $clone = uiOpenTypeFeaturesClone( $features );
+
+Clones an OpenType features map.
+
+=head3 C<uiOpenTypeFeaturesAdd( ... )>
+
+    uiOpenTypeFeaturesAdd( $features, $a, $b, $c, $d, $value );
+
+Adds a feature to the OpenType features map.
+
+The four character tags identify the feature.
+
+=head3 C<uiOpenTypeFeaturesRemove( ... )>
+
+    uiOpenTypeFeaturesRemove( $features, $a, $b, $c, $d );
+
+Removes a feature from the OpenType features map.
+
+=head3 C<uiOpenTypeFeaturesGet( ... )>
+
+    my $ok = uiOpenTypeFeaturesGet( $features, $a, $b, $c, $d, $value );
+
+Gets a feature from the OpenType features map.
+
+Returns true if the feature was found, false otherwise.
+
+=head3 C<uiOpenTypeFeaturesForEach( ... )>
+
+    uiOpenTypeFeaturesForEach(
+        $features,
+        sub {
+            my ($features, $a, $b, $c, $d, $value, $data) = @_;
+        },
+        $user_data
+    );
+
+Iterates over all features in the OpenType features map.
+
+=head3 C<uiNewFeaturesAttribute( ... )>
+
+    my $attr = uiNewFeaturesAttribute( $features );
+
+Creates a new OpenType features attribute.
+
+=head3 C<uiAttributeFeatures( ... )>
+
+    my $features = uiAttributeFeatures( $attr );
+
+Returns the OpenType features map from a features attribute.
+
+=head2 Attributed String Functions
+
+An attributed string is a string with associated text attributes that modify its appearance.
+
+You may import these functions with the C<:attrstr> tag.
+
+=head3 C<uiNewAttributedString( ... )>
+
+    my $str = uiNewAttributedString( 'Hello' );
+
+Creates a new attributed string with the given initial text.
+
+=head3 C<uiFreeAttributedString( ... )>
+
+    uiFreeAttributedString( $str );
+
+Frees an attributed string.
+
+=head3 C<uiAttributedStringString( ... )>
+
+    my $text = uiAttributedStringString( $str );
+
+Returns the plain text of an attributed string.
+
+=head3 C<uiAttributedStringLen( ... )>
+
+    my $len = uiAttributedStringLen( $str );
+
+Returns the length in bytes of an attributed string.
+
+=head3 C<uiAttributedStringAppendUnattributed( ... )>
+
+    uiAttributedStringAppendUnattributed( $str, ' more text' );
+
+Appends unattributed text to the attributed string.
+
+=head3 C<uiAttributedStringInsertAtUnattributed( ... )>
+
+    uiAttributedStringInsertAtUnattributed( $str, 'inserted ', 6 );
+
+Inserts unattributed text at the given byte index.
+
+=head3 C<uiAttributedStringDelete( ... )>
+
+    uiAttributedStringDelete( $str, 0, 5 );
+
+Deletes a range of text from the attributed string.
+
+=head3 C<uiAttributedStringSetAttribute( ... )>
+
+    uiAttributedStringSetAttribute( $str, $attr, 0, 5 );
+
+Sets an attribute on a range of the attributed string.
+
+Expected parameters include:
+
+=over
+
+=item C<$str>
+
+The attributed string to modify.
+
+=item C<$attr>
+
+The text attribute to apply.
+
+=item C<$start>
+
+The start byte index (inclusive).
+
+=item C<$end>
+
+The end byte index (exclusive).
+
+=back
+
+=head3 C<uiAttributedStringForEachAttribute( ... )>
+
+    uiAttributedStringForEachAttribute(
+        $str,
+        sub {
+            my ($str, $attr, $start, $end, $data) = @_;
+        },
+        $user_data
+    );
+
+Iterates over all attributes in the attributed string.
+
+=head3 C<uiAttributedStringNumGraphemes( ... )>
+
+    my $count = uiAttributedStringNumGraphemes( $str );
+
+Returns the number of graphemes in the attributed string.
+
+=head3 C<uiAttributedStringByteIndexToGrapheme( ... )>
+
+    my $grapheme = uiAttributedStringByteIndexToGrapheme( $str, $index );
+
+Converts a byte index to a grapheme index.
+
+=head3 C<uiAttributedStringGraphemeToByteIndex( ... )>
+
+    my $byte = uiAttributedStringGraphemeToByteIndex( $str, $index );
+
+Converts a grapheme index to a byte index.
+
+=head2 Text Layout Functions
+
+Text layout functions handle the rendering of attributed strings.
+
+You may import these functions with the C<:textlayout> tag.
+
+=head3 C<uiDrawNewTextLayout( ... )>
+
+    my $layout = uiDrawNewTextLayout( $params );
+
+Creates a new text layout with the given parameters.
+
+The params struct contains the attributed string, default font, width, and alignment.
+
+=head3 C<uiDrawFreeTextLayout( ... )>
+
+    uiDrawFreeTextLayout( $layout );
+
+Frees a text layout.
+
+=head3 C<uiDrawText( ... )>
+
+    uiDrawText( $layout, $text, $x, $y );
+
+Draws text on the draw context at the given position.
+
+=head3 C<uiDrawTextLayoutExtents( ... )>
+
+    uiDrawTextLayoutExtents( $layout, my $width, my $height );
+
+Returns the extents (width and height) of the text layout.
+
+=head2 Table Functions
+
+Tables display data in rows and columns with support for various column types including text, images, checkboxes,
+progress bars, and buttons.
+
+You may import these functions with the C<:table> tag.
+
+=head3 C<uiFreeTableValue( ... )>
+
+    uiFreeTableValue( $value );
+
+Frees a table value.
+
+=head3 C<uiTableValueGetType( ... )>
+
+    my $type = uiTableValueGetType( $value );
+
+Returns the type of a table value.
+
+=head3 C<uiNewTableValueString( ... )>
+
+    my $value = uiNewTableValueString( 'Hello' );
+
+Creates a new table value from a string.
+
+=head3 C<uiTableValueString( ... )>
+
+    my $str = uiTableValueString( $value );
+
+Returns the string from a table value.
+
+=head3 C<uiNewTableValueImage( ... )>
+
+    my $value = uiNewTableValueImage( $image );
+
+Creates a new table value from an image.
+
+=head3 C<uiTableValueImage( ... )>
+
+    my $image = uiTableValueImage( $value );
+
+Returns the image from a table value.
+
+=head3 C<uiNewTableValueInt( ... )>
+
+    my $value = uiNewTableValueInt( 42 );
+
+Creates a new table value from an integer.
+
+=head3 C<uiTableValueInt( ... )>
+
+    my $int = uiTableValueInt( $value );
+
+Returns the integer from a table value.
+
+=head3 C<uiNewTableValueColor( ... )>
+
+    my $value = uiNewTableValueColor( $r, $g, $b, $a );
+
+Creates a new table value from a color.
+
+=head3 C<uiTableValueColor( ... )>
+
+    uiTableValueColor( $value, my $r, my $g, my $b, my $a );
+
+Returns the color from a table value.
+
+=head3 C<uiNewTableModel( ... )>
+
+    my $model = uiNewTableModel( $handler );
+
+Creates a new table model with the given handler.
+
+=head3 C<uiFreeTableModel( ... )>
+
+    uiFreeTableModel( $model );
+
+Frees a table model.
+
+=head3 C<uiTableModelRowInserted( ... )>
+
+    uiTableModelRowInserted( $model, $index );
+
+Notifies the table that a row was inserted at the given index.
+
+=head3 C<uiTableModelRowChanged( ... )>
+
+    uiTableModelRowChanged( $model, $index );
+
+Notifies the table that a row at the given index has changed.
+
+=head3 C<uiTableModelRowDeleted( ... )>
+
+    uiTableModelRowDeleted( $model, $index );
+
+Notifies the table that a row at the given index was deleted.
+
+=head3 C<uiTableAppendTextColumn( ... )>
+
+    uiTableAppendTextColumn( $table, 'Name', 0, 1, 2 );
+
+Appends a text column to the table.
+
+Expected parameters include:
+
+=over
+
+=item C<$table>
+
+The table to append to.
+
+=item C<$title>
+
+The column title.
+
+=item C<$textModelColumn>
+
+The model column for the text.
+
+=item C<$textParamsModelColumn>
+
+The model column for text parameters, or C<-1>.
+
+=item C<$editableModelColumn>
+
+The model column that indicates editability, or C<-1>.
+
+=back
+
+=head3 C<uiTableAppendImageColumn( ... )>
+
+    uiTableAppendImageColumn( $table, 'Icon', 0 );
+
+Appends an image column to the table.
+
+=head3 C<uiTableAppendImageTextColumn( ... )>
+
+    uiTableAppendImageTextColumn( $table, 'Item', 0, 1, -1, -1 );
+
+Appends an image and text column to the table.
+
+=head3 C<uiTableAppendCheckboxColumn( ... )>
+
+    uiTableAppendCheckboxColumn( $table, 'Done', 0, 1 );
+
+Appends a checkbox column to the table.
+
+=head3 C<uiTableAppendCheckboxTextColumn( ... )>
+
+    uiTableAppendCheckboxTextColumn( $table, 'Task', 0, 1, -1, -1 );
+
+Appends a checkbox with text column to the table.
+
+=head3 C<uiTableAppendProgressBarColumn( ... )>
+
+    uiTableAppendProgressBarColumn( $table, 'Progress', 0 );
+
+Appends a progress bar column to the table.
+
+=head3 C<uiTableAppendButtonColumn( ... )>
+
+    uiTableAppendButtonColumn( $table, 'Action', 0, 1 );
+
+Appends a button column to the table.
+
+=head3 C<uiNewTable( ... )>
+
+    my $table = uiNewTable( { Model => $model, RowBackgroundColorModelColumn => -1 } );
+
+Creates a new table with the given parameters. The C<Model> field is a L<uiTableModel>, and
+C<RowBackgroundColorModelColumn> specifies a column index whose color value will be used as the row background color
+(use C<-1> for none).
+
+=head3 C<uiTableHeaderVisible( ... )>
+
+    my $visible = uiTableHeaderVisible( $table );
+
+Returns whether or not the table header is visible.
+
+=head3 C<uiTableHeaderSetVisible( ... )>
+
+    uiTableHeaderSetVisible( $table, 1 );
+
+Sets whether or not the table header is visible.
+
+=head3 C<uiTableHeaderOnClicked( ... )>
+
+    uiTableHeaderOnClicked(
+        $table,
+        sub {
+            my ($table, $columnIndex, $data) = @_;
+        },
+        $user_data
+    );
+
+Registers a callback for when a table header column is clicked.
+
+=head3 C<uiTableOnRowClicked( ... )>
+
+    uiTableOnRowClicked(
+        $table,
+        sub {
+            my ($table, $rowIndex, $data) = @_;
+        },
+        $user_data
+    );
+
+Registers a callback for when a table row is clicked.
+
+=head3 C<uiTableOnRowDoubleClicked( ... )>
+
+    uiTableOnRowDoubleClicked(
+        $table,
+        sub {
+            my ($table, $rowIndex, $data) = @_;
+        },
+        $user_data
+    );
+
+Registers a callback for when a table row is double-clicked.
+
+=head3 C<uiTableHeaderSetSortIndicator( ... )>
+
+    uiTableHeaderSetSortIndicator( $table, $column, $indicator );
+
+Sets the sort indicator for a table column.
+
+=head3 C<uiTableHeaderSortIndicator( ... )>
+
+    my $indicator = uiTableHeaderSortIndicator( $table, $column );
+
+Returns the sort indicator for a table column.
+
+=head3 C<uiTableColumnWidth( ... )>
+
+    my $width = uiTableColumnWidth( $table, $column );
+
+Returns the width of the given column.
+
+=head3 C<uiTableColumnSetWidth( ... )>
+
+    uiTableColumnSetWidth( $table, $column, $width );
+
+Sets the width of the given column.
+
+=head3 C<uiTableGetSelectionMode( ... )>
+
+    my $mode = uiTableGetSelectionMode( $table );
+
+Returns the selection mode of the table.
+
+=head3 C<uiTableSetSelectionMode( ... )>
+
+    uiTableSetSelectionMode( $table, $mode );
+
+Sets the selection mode of the table.
+
+=head3 C<uiTableOnSelectionChanged( ... )>
+
+    uiTableOnSelectionChanged(
+        $table,
+        sub {
+            my ($table, $data) = @_;
+        },
+        $user_data
+    );
+
+Registers a callback for when the table selection changes.
+
+=head3 C<uiTableGetSelection( ... )>
+
+    my $selection = uiTableGetSelection( $table );
+
+Returns the current table selection.
+
+=head3 C<uiTableSetSelection( ... )>
+
+    uiTableSetSelection( $table, $selection );
+
+Sets the table selection.
+
+=head3 C<uiFreeTableSelection( ... )>
+
+    uiFreeTableSelection( $selection );
+
+Frees a table selection.
+
+=head1 CONSTANTS
+
+Named constants replace magic numbers throughout the API. Import them with the C<:constants> tag or all at once with
+C<:all>.
+
+=head2 Fill Mode
+
+    uiDrawNewPath( UI_FILL_WINDING );
+
+=over
+
+=item C<UI_FILL_WINDING> (0)
+
+=item C<UI_FILL_ALTERNATE> (1)
+
+=back
+
+=head2 Draw Brush Type
+
+    my $brush = solid_brush(1, 0, 0);   # Type is UI_BRUSH_SOLID
+
+=over
+
+=item C<UI_BRUSH_SOLID> (0)
+
+=item C<UI_BRUSH_LINEAR_GRADIENT> (1)
+
+=item C<UI_BRUSH_RADIAL_GRADIENT> (2)
+
+=back
+
+=head2 Line Cap and Join
+
+    my $s = draw_stroke( thickness => 2, cap => UI_LINE_CAP_ROUND, join => UI_LINE_JOIN_BEVEL );
+
+=over
+
+=item C<UI_LINE_CAP_FLAT> (0)
+
+=item C<UI_LINE_CAP_ROUND> (1)
+
+=item C<UI_LINE_JOIN_MITER> (0)
+
+=item C<UI_LINE_JOIN_ROUND> (1)
+
+=item C<UI_LINE_JOIN_BEVEL> (2)
+
+=back
+
+=head2 Text Alignment
+
+=over
+
+=item C<UI_TEXT_ALIGN_LEFT> (0)
+
+=item C<UI_TEXT_ALIGN_CENTER> (1)
+
+=item C<UI_TEXT_ALIGN_RIGHT> (2)
+
+=back
+
+=head2 Text Weight
+
+Standard CSS/OpenType weight scale.
+
+=over
+
+=item C<UI_WEIGHT_THIN> (100)
+
+=item C<UI_WEIGHT_EXTRA_LIGHT> (200)
+
+=item C<UI_WEIGHT_LIGHT> (300)
+
+=item C<UI_WEIGHT_BOOK> (350)
+
+=item C<UI_WEIGHT_NORMAL> (400)
+
+=item C<UI_WEIGHT_MEDIUM> (500)
+
+=item C<UI_WEIGHT_SEMI_BOLD> (600)
+
+=item C<UI_WEIGHT_BOLD> (700)
+
+=item C<UI_WEIGHT_EXTRA_BOLD> (800)
+
+=item C<UI_WEIGHT_HEAVY> (900)
+
+=back
+
+=head2 Text Italic
+
+=over
+
+=item C<UI_ITALIC_NORMAL> (0)
+
+=item C<UI_ITALIC_OBLIQUE> (1)
+
+=item C<UI_ITALIC_ITALIC> (2)
+
+=back
+
+=head2 Text Stretch
+
+=over
+
+=item C<UI_STRETCH_ULTRA_CONDENSED> (0)
+
+=item C<UI_STRETCH_EXTRA_CONDENSED> (1)
+
+=item C<UI_STRETCH_CONDENSED> (2)
+
+=item C<UI_STRETCH_SEMI_CONDENSED> (3)
+
+=item C<UI_STRETCH_NORMAL> (4)
+
+=item C<UI_STRETCH_SEMI_EXPANDED> (5)
+
+=item C<UI_STRETCH_EXPANDED> (6)
+
+=item C<UI_STRETCH_EXTRA_EXPANDED> (7)
+
+=item C<UI_STRETCH_ULTRA_EXPANDED> (8)
+
+=back
+
+=head2 Underline
+
+=over
+
+=item C<UI_UNDERLINE_NONE> (0)
+
+=item C<UI_UNDERLINE_SINGLE> (1)
+
+=item C<UI_UNDERLINE_DOUBLE> (2)
+
+=item C<UI_UNDERLINE_SQUIGGLE> (3)
+
+=back
+
+=head2 Table Column Types
+
+Used in C<ColumnType> callbacks.
+
+=over
+
+=item C<UI_TABLE_COLUMN_STRING> (0)
+
+=item C<UI_TABLE_COLUMN_IMAGE> (1)
+
+=item C<UI_TABLE_COLUMN_INT> (2)
+
+=item C<UI_TABLE_COLUMN_COLOR> (3)
+
+=back
+
+=head2 Table Selection Mode
+
+=over
+
+=item C<UI_SELECTION_NONE> (0)
+
+=item C<UI_SELECTION_SINGLE> (1)
+
+=item C<UI_SELECTION_MULTIPLE> (2)
+
+=back
+
+=head2 Sort Indicator
+
+=over
+
+=item C<UI_SORT_NONE> (0)
+
+=item C<UI_SORT_ASCENDING> (1)
+
+=item C<UI_SORT_DESCENDING> (2)
+
+=back
+
+=head2 Grid Alignment
+
+Used with C<uiGridAppend>.
+
+=over
+
+=item C<UI_ALIGN_FILL> (0)
+
+=item C<UI_ALIGN_START> (1)
+
+=item C<UI_ALIGN_CENTER> (2)
+
+=item C<UI_ALIGN_END> (3)
+
+=back
+
+=head1 HELPERS
+
+Convenience functions that reduce boilerplate. Import with the C<:helpers> tag or C<:all>.
+
+=head2 C<solid_brush( ... )>
+
+    my $brush = solid_brush( $r, $g, $b, $a );
+
+Returns a C<DrawBrush> hashref configured as a solid-color brush. C<$a> (alpha) defaults to C<1.0>.
+
+This replaces the verbose 11-field hashref:
+
+    # Before:
+    { Type => 0, R => $r, G => $g, B => $b, A => 1.0,
+      X0 => 0, Y0 => 0, X1 => 0, Y1 => 0, OuterRadius => 0,
+      Stops => undef, NumStops => 0 }
+
+    # After:
+    solid_brush($r, $g, $b)
+
+=head2 C<draw_stroke( ... )>
+
+    my $stroke = draw_stroke( thickness => 2.0, cap => UI_LINE_CAP_ROUND );
+
+Returns a C<DrawStrokeParams> hashref. All parameters are named and optional:
+
+=over
+
+=item C<cap> - Line cap style (default: C<UI_LINE_CAP_FLAT>)
+
+=item C<join> - Line join style (default: C<UI_LINE_JOIN_MITER>)
+
+=item C<thickness> - Stroke width (default: C<1.0>)
+
+=item C<miter_limit> - Miter limit (default: C<10.0>)
+
+=item C<dashes> - Array ref of dash lengths (default: C<undef>)
+
+=item C<num_dashes> - Number of dashes (default: C<0>)
+
+=item C<dash_phase> - Dash phase offset (default: C<0.0>)
+
+=back
+
+=head2 C<format_tm( ... )>
+
+    my $str = format_tm( $tm_hashref );
+
+Formats a C<struct tm> hashref (as returned by C<uiDateTimePickerTime>) into a human-readable string like C<"Sun Jul  6
+14:30:05 2026">.
+
+=head1 LibUI::Matrix
+
+Object-oriented wrapper around C<uiDrawMatrix>. Encapsulates the 6-field matrix struct and provides chainable methods.
+
+    use LibUI qw[:all];
+
+    my $m = LibUI::Matrix->identity();
+    $m->translate(100, 50)->rotate(100, 50, $angle);
+    $m->apply($dc);
+
+=head2 Methods
+
+=head3 C<LibUI::Matrix-E<gt>new( ... )>
+
+    my $m = LibUI::Matrix->new(
+        m11 => 1, m12 => 0, m21 => 0, m22 => 1, m31 => 0, m32 => 0
+    );
+
+Creates a new matrix. All fields default to the identity matrix.
+
+=head3 C<LibUI::Matrix-E<gt>identity()>
+
+    my $m = LibUI::Matrix->identity();
+
+Shorthand for C<< LibUI::Matrix->new() >>.
+
+=head3 C<$m-E<gt>set_identity()>
+
+Resets the matrix to the identity matrix.
+
+=head3 C<$m-E<gt>translate( $x, $y )>
+
+    $m->translate(100, 50);
+
+Applies a translation. Returns C<$self> for chaining.
+
+=head3 C<$m-E<gt>scale( $x, $y, $w, $h )>
+
+    $m->scale(200, 150, 1.5, 1.5);
+
+Applies a scale around point C<($x, $y)>. Returns C<$self> for chaining.
+
+=head3 C<$m-E<gt>rotate( $x, $y, $angle )>
+
+    $m->rotate(200, 150, 3.14);
+
+Applies a rotation (in radians) around point C<($x, $y)>. Returns C<$self> for chaining.
+
+=head3 C<$m-E<gt>skew( $x, $y, $xamount, $yamount )>
+
+    $m->skew(200, 150, 0.3, 0);
+
+Applies a skew around point C<($x, $y)>. Returns C<$self> for chaining.
+
+=head3 C<$m-E<gt>multiply( $other )>
+
+    $m->multiply($other_matrix);
+
+Multiplies C<$m> by C<$other>. Returns C<$self> for chaining.
+
+=head3 C<$m-E<gt>invertible()>
+
+    if ($m->invertible()) { ... }
+
+Returns true if the matrix is invertible.
+
+=head3 C<$m-E<gt>invert()>
+
+    $m->invert() or die "singular matrix";
+
+Inverts the matrix. Returns true on success.
+
+=head3 C<$m-E<gt>transform_point( $x, $y )>
+
+    my ($rx, $ry) = $m->transform_point(10, 20);
+
+Transforms a point through the matrix. Returns C<($rx, $ry)>.
+
+=head3 C<$m-E<gt>transform_size( $w, $h )>
+
+    my ($rw, $rh) = $m->transform_size(100, 50);
+
+Transforms a size through the matrix. Returns C<($rw, $rh)>.
+
+=head3 C<$m-E<gt>apply( $dc )>
+
+    $m->apply($draw_context);
+
+Applies the matrix to a draw context via C<uiDrawTransform>. Returns C<$self> for chaining.
+
+=head1 DATETIME PICKER WRAPPERS
+
+The C<uiDateTimePickerTime> and C<uiDateTimePickerSetTime> functions are wrapped to work with Perl-friendly data
+structures instead of raw C<struct tm> buffers.
+
+=head2 C<uiDateTimePickerTime( ... )>
+
+    my $tm = uiDateTimePickerTime( $picker );
+
+Returns a hashref representing C<struct tm>:
+
+    {
+        tm_sec   => 30,      # seconds (0-59)
+        tm_min   => 5,       # minutes (0-59)
+        tm_hour  => 14,      # hours (0-23)
+        tm_mday  => 6,       # day of month (1-31)
+        tm_mon   => 6,       # month (0-11, January = 0)
+        tm_year  => 126,     # years since 1900
+        tm_wday  => 0,       # day of week (0-6, Sunday = 0)
+        tm_yday  => 186,     # day of year (0-365)
+        tm_isdst => 0        # daylight saving time flag
+    }
+
+=head2 C<uiDateTimePickerSetTime( ... )>
+
+Accepts three calling styles:
+
+    # Hashref (full control)
+    uiDateTimePickerSetTime( $picker, {
+        tm_sec  => 0, tm_min => 0, tm_hour => 0,
+        tm_mday => 1, tm_mon => 0, tm_year => 70
+    });
+
+    # Epoch timestamp (convenience)
+    uiDateTimePickerSetTime( $picker, time() );
+
+    # Positional list (sec, min, hour, mday, mon, year, ...)
+    uiDateTimePickerSetTime( $picker, 0, 30, 14, 6, 6, 126 );
+
+When using the epoch form, C<localtime()> is used internally and C<tm_isdst> is set to C<-1> (let the system decide).
+
+=head1 FONT BUTTON WRAPPERS
+
+=head2 C<uiFontButtonFont( ... )>
+
+    my $desc = uiFontButtonFont( $button );
+
+Returns a hashref describing the selected font. Automatically handles memory allocation and cleanup (no need for
+C<calloc>, C<sizeof>, C<cast>, or C<uiFreeFontButtonFont>).
+
+    my $desc = uiFontButtonFont($btn);
+    printf "Family: %s, Size: %.1f\n", $desc->{Family}, $desc->{Size};
+    # Fields: Family, Size, Weight, Italic, Stretch
+
+=head2 C<uiLoadControlFont( ... )>
+
+    my $desc = uiLoadControlFont();
+
+Loads the system default control font and returns a font descriptor hashref. Same structure as C<uiFontButtonFont>.
+
+=head1 OUT-PARAMETER WRAPPERS
+
+Functions that previously required passing scalar references for output values now return Perl lists directly.
+
+=head2 C<uiColorButtonColor( ... )>
+
+    my ($r, $g, $b, $a) = uiColorButtonColor( $button );
+
+=head2 C<uiAttributeColor( ... )>
+
+    my ($r, $g, $b, $a) = uiAttributeColor( $attribute );
+
+=head2 C<uiAttributeUnderlineColor( ... )>
+
+    my ($underline, $r, $g, $b, $a) = uiAttributeUnderlineColor( $attribute );
+
+=head2 C<uiWindowPosition( ... )>
+
+    my ($x, $y) = uiWindowPosition( $window );
+
+=head2 C<uiWindowContentSize( ... )>
+
+    my ($w, $h) = uiWindowContentSize( $window );
+
+=head2 C<uiDrawTextLayoutExtents( ... )>
+
+    my ($w, $h) = uiDrawTextLayoutExtents( $layout );
+
+=head2 C<uiDrawMatrixTransformPoint( ... )>
+
+    my ($rx, $ry) = uiDrawMatrixTransformPoint( $matrix, $x, $y );
+
+=head2 C<uiDrawMatrixTransformSize( ... )>
+
+    my ($rw, $rh) = uiDrawMatrixTransformSize( $matrix, $w, $h );
+
+=head1 TABLE SIMPLIFICATION
+
+=head2 C<uiNewTable( ... )>
+
+    # Just pass the model directly (RowBackgroundColorModelColumn defaults to -1)
+    my $table = uiNewTable( $model );
+
+    # Or pass a full hashref if you need control
+    my $table = uiNewTable({ Model => $model, RowBackgroundColorModelColumn => 2 });
+
+When passed a model pointer directly, C<RowBackgroundColorModelColumn> defaults to C<-1> (disabled).
+
+=head1 AREA HANDLER ALIASES
+
+C<uiNewArea> and C<uiNewScrollingArea> accept callbacks that trigger your coderef. Missing callbacks default to no-ops.
+
+    my $area = uiNewArea({
+        Draw        => sub { ... },
+        MouseEvent  => sub { ... }
+    });
+
+=over
+
+=item C<Draw>
+
+=item C<MouseEvent>
+
+=item C<MouseCrossed>
+
+=item C<DragBroken>
+
+=item C<KeyEvent>
+
+=back
+
+The C<Draw>, C<MouseEvent>, and C<KeyEvent> callbacks receive typed hashrefs instead of raw pointers.
+
+=head1 Requirements
+
+L<Affix> and L<Alien::libui>. LibUI builds and works on Linux, Windows, macOS, etc.
+
+=head1 See Also
+
+From simple 'Hello, World!' scripts to a full blown threaded L<Net::BitTorrent> wrapper may be found in F<eg/>.
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=begin stopwords
+
+draggable gotta userdata borderless uiWindow uiBox resizable checkbox readonly spinbox combobox
+
+=end stopwords
+
+=cut

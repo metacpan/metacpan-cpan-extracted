@@ -39,32 +39,38 @@ my @recommended_sections = (
 # Add distribution-specific phantom names here
 my @phantom_names = ();
 
-my $total = scalar(@required_sections)
-          + scalar(@recommended_sections)
-          + 1;   # R2 phantom check
-plan_tests($total);
-
 my $text = _slurp("$ROOT/README");
+
+my @tests;
 
 # R1a: Required sections
 for my $sec (@required_sections) {
-    ok(index($text, $sec) >= 0,
-       "R1 - README required section present: $sec");
+    push @tests, sub {
+        ok(index($text, $sec) >= 0,
+           "R1 - README required section present: $sec");
+    };
 }
 
 # R1b: Recommended sections
 for my $sec (@recommended_sections) {
-    ok(index($text, $sec) >= 0,
-       "R1 - README recommended section present: $sec");
+    push @tests, sub {
+        ok(index($text, $sec) >= 0,
+           "R1 - README recommended section present: $sec");
+    };
 }
 
 # R2: No phantom method/API names
-my @found_phantom;
-for my $name (@phantom_names) {
-    push @found_phantom, $name if index($text, $name) >= 0;
-}
-ok(!@found_phantom,
-   'R2 - README contains no phantom API names'
-   . (@found_phantom ? " (found: @found_phantom)" : ''));
+push @tests, sub {
+    my @found_phantom;
+    for my $name (@phantom_names) {
+        push @found_phantom, $name if index($text, $name) >= 0;
+    }
+    ok(!@found_phantom,
+       'R2 - README contains no phantom API names'
+       . (@found_phantom ? " (found: @found_phantom)" : ''));
+};
+
+plan_tests(scalar(@tests));
+$_->() for @tests;
 
 END { end_testing() }

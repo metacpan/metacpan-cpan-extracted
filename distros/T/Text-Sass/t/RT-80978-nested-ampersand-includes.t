@@ -26,11 +26,8 @@ a b.this {
 }
 EOT
 
- SKIP: {
-    skip q[SCSS nested ampersand includes not working], 1;
-    my $ts = Text::Sass->new();
+  my $ts = Text::Sass->new();
 
-    is($ts->scss2css($sass), $css, "RT#80978 scss to css for nested ampersand includes");
-  }
+  is($ts->scss2css($sass), $css, "RT#80978 scss to css for nested ampersand includes");
 }
 

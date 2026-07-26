@@ -1,4 +1,4 @@
-package Affix::Platform::Unix v0.12.0 {
+package Affix::Platform::Unix v1.1.0 {
     use v5.40;
     use Path::Tiny qw[path];
     use Config     qw[%Config];
@@ -55,29 +55,44 @@ package Affix::Platform::Unix v0.12.0 {
     }
 
     sub _findLib_ld($name) {
-        `export LC_ALL 'C'; export LANG 'C'; ld -t -o /dev/null -l$name 2>&1`;
+        local $ENV{LC_ALL} = 'C';
+        local $ENV{LANG}   = 'C';
+        open( my $fh, '-|', 'ld', '-t', '-o', '/dev/null', "-l$name" ) or return;
+        my $output = do { local $/; <$fh> };
+        close $fh;
+        return $output;
     }
 
     sub _findLib_gcc($name) {
         $name =~ s[^lib][];
         CORE::state $compiler;
         $compiler //= sub {
-            my $ret = `which gcc 2>&1`;
-            chomp($ret);
-            $ret = `which cc 2>&1` unless -x $ret;
-            chomp($ret);
-            return undef unless -x $ret;
-            chomp($ret);
-            $ret;
+            for my $cc (qw[gcc cc]) {
+                if ( open( my $fh, '-|', $cc, '--version' ) ) {
+                    my $line = <$fh>;
+                    close $fh;
+                    return $cc if defined $line;
+                }
+            }
+            return 'gcc';
             }
             ->();
         my $trace;
         {
             use File::Temp qw[tempfile];
-            my ( $fh, $temp_file ) = tempfile();
-            $trace = `$compiler -Wl,-t -o $temp_file -l$name 2>&1`;    # Redirect stderr to stdout
+            my ( undef, $temp_file ) = tempfile();
+            if ( open( my $fh, '-|', $compiler, '-Wl,-t', '-o', $temp_file, "-l$name" ) ) {
+                $trace = do { local $/; <$fh> };
+                close $fh;
+            }
+            if ( !defined $trace || !length $trace ) {
+                if ( open( my $fh2, '-|', $compiler, '--print-file-name', "lib$name.$so" ) ) {
+                    $trace = do { local $/; <$fh2> };
+                    close $fh2;
+                }
+            }
         };
-        grep {/^.*?\/lib$name\.[^\s]+$/} split /\n/, $trace;
+        grep {/^.*?\/lib\Q$name\E\.[^\s]+$/} split /\n/, $trace;
     }
 
     sub find_library ( $name, $version //= '' ) {    # TODO: actually feed version to diff methods
@@ -103,10 +118,10 @@ package Affix::Platform::Unix v0.12.0 {
 
     sub _get_soname ($file) {    # assuming GNU binutils / ELF
         return undef unless $file && -f $file;
-        my $objdump = `which objdump`;
-        return undef unless $objdump;    # objdump is not available, give up
-        chomp $objdump;
-        my $dump = `$objdump -p -j .dynamic $file 2>/dev/null`;
+        open( my $fh, '-|', 'objdump', '-p', '-j', '.dynamic', $file ) or return;
+        my $dump = do { local $/; <$fh> };
+        close $fh;
+        return unless defined $dump;
         $dump =~ /\sSONAME\s+([^\s]+)/ ? $1 : ();
     }
 }

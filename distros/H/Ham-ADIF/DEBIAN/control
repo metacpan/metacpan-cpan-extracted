@@ -1,0 +1,10 @@
+Package: libham-adif-perl
+Version: MAJOR.MINOR.SUB-PATCH
+Section: base
+Priority: optional
+Architecture: all
+Source: libham-adif-perl
+Build-Depends: lsb-release, libmodule-build-perl, libmodule-build-perl, libtest-perl-critic-perl, libtest-kwalitee-perl, libwww-perl, libtap-harness-junit-perl, libtest-compile-perl, libtest-pod-perl, libtest-distribution-perl, libtest-pod-coverage-perl, fakeroot, dpkg
+Depends: perl, libxml-libxml-perl
+Maintainer: Roger Pettett <rmp@psyphi.net>
+Description: Ham Radio ADIF file format parser

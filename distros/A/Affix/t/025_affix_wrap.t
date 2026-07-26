@@ -1,8 +1,11 @@
 use v5.40;
+use blib;
 use Affix::Wrap;
 use Test2::Tools::Affix qw[:all];
+use Test2::V0 -no_srand => 1;
 use Path::Tiny;
 use Capture::Tiny qw[capture];
+$|++;
 
 # Determine if Clang is available
 my $CLANG_AVAIL = do {
@@ -208,7 +211,7 @@ EOF
             }
             my ($dp) = grep { $_->name eq 'double_ptr' } @objs;
             ok( $dp, 'Found double_ptr' );
-            is( $dp->underlying->affix_type, 'Pointer[Pointer[Char]]', 'double_ptr affix_type' );
+            is( $dp->underlying->affix_type, 'Pointer[Const[Pointer[Const[Char]]]]', 'double_ptr affix_type' );
             my ($ap) = grep { $_->name eq 'array_of_pointers' } @objs;
             ok( $ap, 'Found array_of_pointers' );
             is( $ap->underlying->affix_type, 'Array[Pointer[Int], 5]', 'array_of_pointers affix_type' );
@@ -255,15 +258,130 @@ EOF
             my $content = $pm_file->slurp_utf8;
             like $content, qr/package\s+StaticLib\s*{/,                                                         'Package decl';
             like $content, qr/use constant STATIC_VAL => 42;/,                                                  'Constant generated';
-            like $content, qr/typedef 'StaticStruct' => Struct\[ x => Int \];/,                                 'Struct typedef generated';
+            like $content, qr/typedef StaticStruct => Struct\[ x => Int \];/,                                   'Struct typedef generated';
             like $content, qr/affix \$lib, ('static_func'|\[_static_func => 'static_func'\]) => \[Int\], Int;/, 'Function affix generated';
 
             # Syntax check
             my ( undef, undef, $exit ) = capture { system $^X, '-Ilib', '-c', $pm_file->stringify };
             is $exit >> 8, 0, 'Generated code syntax check OK';
         };
+        subtest 'Security: _generate_code injection prevention (C1)' => sub {
+            my $dir = Path::Tiny->tempdir;
+            spew_files(
+                $dir,
+                'simple.h' => <<'EOF',
+int simple_func(int x);
+EOF
+                'main.c' => '#include "simple.h"'
+            );
+            my $parser = $driver_class->new( project_files => [ $dir->child('simple.h')->stringify ] );
+            my $binder = Affix::Wrap->new( driver => $parser );
+
+            # Malicious $lib containing ] must not break q[...] quoting
+            subtest 'Malicious lib with ]' => sub {
+                my $evil_lib = 'lib]; system("echo PWNED"); #';
+                my $pm_file  = $dir->child('evil_lib.pm');
+                lives { $binder->generate( $evil_lib, 'Safe::Lib', $pm_file->stringify ) }
+                    or bail_out 'generate() died on malicious lib';
+                ok -e $pm_file, 'Generated .pm file despite malicious lib';
+                my $content = $pm_file->slurp_utf8;
+
+                # Package declaration must be clean
+                like $content, qr/package\s+Safe::Lib\s*\{/, 'Package declaration is safe';
+
+                # The ] in the payload must be escaped inside q[...] so it doesn't break out
+                like $content, qr/q\[.*\\\].*\]/, 'Closing bracket escaped inside q[...]';
+
+                # The entire file must compile — proves the payload is inert
+                my ( undef, undef, $exit ) = capture { system $^X, '-Ilib', '-c', $pm_file->stringify };
+                is $exit >> 8, 0, 'Generated code compiles despite malicious lib';
+            };
+
+            # Malicious $pkg names must be rejected with a croak
+            subtest 'Malicious pkg names rejected' => sub {
+                my @bad_pkgs = (
+                    [ 'Evil::pkg; system("echo PWNED")',    'semicolon injection' ],
+                    [ 'Evil::pkg { system("echo PWNED") }', 'block injection' ],
+                    [ '123bad',                             'starts with digit' ],
+                    [ 'Evil::pkg::',                        'trailing ::' ],
+                    [ '::Evil',                             'leading ::' ],
+                    [ 'Evil pkg',                           'space in name' ],
+                    [ "Evil\tpkg",                          'tab in name' ],
+                    [ 'Evil::pkg#',                         'comment char in name' ],
+                    [ "Evil::pkg\nsystem('echo PWNED')",    'newline injection' ],
+                );
+                for my $t (@bad_pkgs) {
+                    my ( $bad_pkg, $desc ) = @$t;
+                    ok dies { $binder->generate( 'good_lib', $bad_pkg, '/dev/null' ) }, "rejects $desc: $bad_pkg";
+                }
+            };
+
+            # Valid $pkg names must be accepted
+            subtest 'Valid pkg names accepted' => sub {
+                my @good_pkgs = (
+                    [ 'Good',     'simple name' ],
+                    [ 'GoodName', 'single word' ],
+                    [ 'Test123',  'alphanumeric' ],
+                    [ '_private', 'leading underscore' ],
+                );
+                for my $t (@good_pkgs) {
+                    my ( $good_pkg, $desc ) = @$t;
+                    my $pm_file = $dir->child("good_$good_pkg.pm");
+                    lives { $binder->generate( 'good_lib', $good_pkg, $pm_file->stringify ) }
+                        or fail "Should accept $desc: $good_pkg";
+                    like $pm_file->slurp_utf8, qr/package\s+\Q$good_pkg\E\s*\{/, "Package decl for $desc";
+                }
+
+                # Names with :: are valid Perl packages but can't be tested via
+                # file I/O on Windows (colon is forbidden in filenames). Verify
+                # they pass validation without writing to disk.
+                my @ns_pkgs = ( 'Good::Name', 'A::B::C::D' );
+                for my $good_pkg (@ns_pkgs) {
+                    my $code = eval {
+                        my ( $c, $n ) = $binder->_generate_code( 'good_lib', $good_pkg );
+                        $c;
+                    };
+                    ok defined $code, "accepts namespace $good_pkg";
+                    like $code, qr/package\s+\Q$good_pkg\E\s*\{/, "Package decl for $good_pkg";
+                }
+            };
+
+            # Malicious $pkg that looks valid but isn't must be rejected
+            subtest 'Borderline pkg names rejected' => sub {
+                my @borderline = (
+                    [ 'Evil; system("echo PWNED")', 'semicolon, no ::' ],
+                    [ 'Evil pkg',                   'space, no ::' ],
+                    [ 'Evil::system("echo PWNED")', 'parens in name' ],
+                    [ 'Evil->pkg',                  'arrow instead of ::' ],
+                );
+                for my $t (@borderline) {
+                    my ( $bad, $desc ) = @$t;
+                    ok dies { $binder->generate( 'lib', $bad, '/dev/null' ) }, "rejects $desc: $bad";
+                }
+            };
+
+            # $lib with backslashes (Windows paths) must be handled
+            subtest 'Windows-style lib paths' => sub {
+                my $win_lib = 'C:\Users\Test\lib.dll';
+                my $pm_file = $dir->child('winpath.pm');
+                lives { $binder->generate( $win_lib, 'WinPathTest', $pm_file->stringify ) }
+                    or bail_out 'generate() died on Windows path';
+                my $content = $pm_file->slurp_utf8;
+
+                # Backslashes are doubled when escaped for q[...] (\\ -> \\\\)
+                like $content, qr/q\[.*C:\\\\Users\\\\Test\\\\lib\.dll\]/, 'Windows path safely quoted';
+                my ( undef, undef, $exit ) = capture { system $^X, '-Ilib', '-c', $pm_file->stringify };
+                is $exit >> 8, 0, 'Generated code compiles with Windows path';
+            };
+
+            # wrap() must also reject bad $pkg
+            subtest 'wrap() rejects malicious pkg' => sub {
+                ok dies { $binder->wrap( 'good_lib', 'Evil; system("echo PWNED")' ) }, 'wrap() rejects malicious pkg name';
+            };
+        };
     };
 }
 run_tests_for_driver( 'Affix::Wrap::Driver::Clang', 'Clang System' ) if $CLANG_AVAIL;
 run_tests_for_driver( 'Affix::Wrap::Driver::Regex', 'Regex System (Fallback)' );
+#
 done_testing();

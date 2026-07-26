@@ -244,6 +244,8 @@ static bool _layout_struct(infix_type * type) {
             size_t align = mtype->alignment;
             if (align == 0)
                 align = 1;
+            if (type->meta.aggregate_info.is_packed)
+                align = 1;
             if (align > max_alignment && !type->meta.aggregate_info.is_packed)
                 max_alignment = align;
 
@@ -281,6 +283,8 @@ static bool _layout_struct(infix_type * type) {
                 size_t align = mtype->alignment;
                 if (align == 0)
                     align = 1;
+                if (type->meta.aggregate_info.is_packed)
+                    align = 1;
 
                 if (align > max_alignment && !type->meta.aggregate_info.is_packed)
                     max_alignment = align;
@@ -300,6 +304,8 @@ static bool _layout_struct(infix_type * type) {
             in_bitfield = false;
             size_t align = mtype->alignment;
             if (align == 0)
+                align = 1;
+            if (type->meta.aggregate_info.is_packed)
                 align = 1;
 
             if (align > max_alignment && !type->meta.aggregate_info.is_packed)
@@ -760,6 +766,11 @@ INFIX_API c23_nodiscard infix_status infix_type_create_packed_struct(infix_arena
     type->meta.aggregate_info.members = arena_members;
     type->meta.aggregate_info.num_members = num_members;
     type->meta.aggregate_info.is_packed = true;  // Marked as packed
+    // Calculate member offsets (with alignment=1 for all members).
+    if (!_layout_struct(type)) {
+        *out_type = nullptr;
+        return INFIX_ERROR_INVALID_ARGUMENT;
+    }
     *out_type = type;
     return INFIX_SUCCESS;
 }
@@ -1230,7 +1241,12 @@ size_t _infix_estimate_graph_size(infix_arena_t * temp_arena, const infix_type *
 INFIX_API c23_nodiscard const char * infix_type_get_name(const infix_type * type) {
     if (type == nullptr)
         return nullptr;
-    return type->name;
+    if (type->name)
+        return type->name;
+    // Add this check so Affix can inspect unresolved types!
+    if (type->category == INFIX_TYPE_NAMED_REFERENCE)
+        return type->meta.named_reference.name;
+    return nullptr;
 }
 /**
  * @brief Gets the fundamental category of a type.

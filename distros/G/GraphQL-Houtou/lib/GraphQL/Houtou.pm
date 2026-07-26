@@ -7,7 +7,7 @@ use Exporter 'import';
 use XSLoader ();
 use GraphQL::Houtou::Runtime::LazyInfo ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $XS_BUNDLE_LOADED = 0;
 our @EXPORT_OK = qw(
   parse
@@ -296,6 +296,129 @@ C<< GraphQL::Houtou::Schema->from_doc($sdl, %opts) >> and
 C<< ->from_ast($ast, %opts) >>. Type-system extensions in the same SDL
 document are merged before the executable schema is constructed.
 
+=head3 Fast resolver modes
+
+Resolvers remain ordinary Perl coderefs. A C<fast_resolve*> mode asks the XS
+VM to call the coderef through a smaller callback signature, without
+constructing the generic lazy C<$info> object. The zero- and one-argument
+forms also avoid constructing an arguments HashRef.
+
+In short:
+
+=over 4
+
+=item * execution and argument preparation stay inside the XS VM
+
+=item * the application callback is still Perl
+
+=item * C<$info> is unavailable
+
+=item * the callback signature is part of the selected fast-resolver contract
+
+=item * return-value completion, errors, null propagation, and Promise
+handling remain the runtime's responsibility
+
+=back
+
+C<resolver_mode> selects one of these callback ABIs; it is not inferred from
+the number of field arguments. Use the regular resolver contract when the
+resolver needs C<$info>, or unless profiling shows that a fast mode matters:
+
+=over 4
+
+=item * any count, regular API
+
+Omit C<resolver_mode>. The resolver receives
+C<($source, $args, $context, $info, $return_type)>.
+
+=item * zero arguments, fast path
+
+Use C<fast_resolve_no_args>. The resolver receives
+C<($source, $context, $return_type)>.
+
+=item * exactly one argument, fast path
+
+Use C<fast_resolve_one_arg>. The resolver receives
+C<($source, $value, $context, $return_type)>.
+
+=item * two or more arguments, fast path
+
+Use C<fast_resolve>. The resolver receives
+C<($source, $args, $context, $return_type)>.
+
+=back
+
+Use the mode matching the field's declared argument count.
+C<fast_resolve> accepts any argument count and always passes a HashRef as
+C<$args>, but the count-specific names make the callback signature explicit.
+The specialized modes change the callback signature and are therefore
+never selected automatically. Schema compilation rejects
+C<fast_resolve_no_args> on a field with arguments and
+C<fast_resolve_one_arg> unless the field has exactly one. The older
+C<native>, C<native_args>, C<native_no_args>, and C<native_one_arg>
+spellings remain compatibility aliases.
+
+    fields => {
+      health => {
+        type => $String,
+        resolver_mode => 'fast_resolve_no_args',
+        resolve => sub {
+          my ($source, $context, $return_type) = @_;
+          return 'ok';
+        },
+      },
+      user => {
+        type => $User,
+        args => { id => { type => $ID->non_null } },
+        resolver_mode => 'fast_resolve_one_arg',
+        resolve => sub {
+          my ($source, $id, $context, $return_type) = @_;
+          return load_user($id);
+        },
+      },
+      search => {
+        type => $User->list,
+        args => {
+          term => { type => $String },
+          limit => { type => $Int },
+        },
+        resolver_mode => 'fast_resolve',
+        resolve => sub {
+          my ($source, $args, $context, $return_type) = @_;
+          return search_users($args->{term}, $args->{limit});
+        },
+      },
+    }
+
+=head3 Zero-argument object accessors
+
+For fields backed by a zero-argument method on the source object, use
+C<accessor> instead of wrapping the method in a resolver:
+
+    my $User = GraphQL::Houtou::Type::Object->new(
+      name => 'User',
+      fields => {
+        id => {
+          type => $ID,
+          accessor => 'id',
+        },
+        displayName => {
+          type => $String,
+          accessor => 'display_name',
+        },
+      },
+    );
+
+The first field calls C<< $user->id() >> and the second calls
+C<< $user->display_name() >>. The VM does not construct C<$args> or C<$info>,
+and does not call a separate resolver coderef. Accessor methods may return
+normal values or promises.
+
+C<accessor> is deliberately limited to fields without GraphQL arguments.
+Use a regular resolver when the method needs field arguments, context, info,
+authorization logic, or DataLoader access. C<accessor> and C<resolve> cannot
+be specified together.
+
 The inverse direction is C<print_schema()> (also available as
 C<< $schema->to_doc >>), which renders any schema back to SDL — including
 schemas assembled from Perl type objects:
@@ -342,6 +465,23 @@ bundled reference implementation, following the dataloader-js semantics:
 C<load($key)> returns one promise per key, C<load_many(\@keys)> returns a
 single promise of the values in key order, and instances cache per key
 (create one loader per request).
+
+An argument-free DataLoader field that only needs its source and context can
+use the reduced resolver contract:
+
+    author => {
+      type => $User,
+      resolver_mode => 'fast_resolve_no_args',
+      resolve => sub {
+        my ($entry, $context) = @_;
+        return $context->{users}->load($entry->{author_id});
+      },
+    }
+
+This avoids constructing the generic args and info objects for every list
+item. The bundled DataLoader benchmark measures roughly 4--7% higher
+end-to-end throughput for this shape. Use the regular resolver contract when
+the field needs GraphQL arguments or C<$info>.
 
 =head3 Declaring an async schema (async => 1)
 

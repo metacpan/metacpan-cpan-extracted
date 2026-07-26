@@ -15,8 +15,7 @@ use lib "$FindBin::Bin/../lib";
 
 use mb::JSON;
 
-my ($T_PLAN, $T_RUN, $T_FAIL) = (0, 0, 0);
-sub plan_tests { $T_PLAN = $_[0]; print "1..$T_PLAN\n" }
+my ($T_RUN, $T_FAIL) = (0, 0);
 sub ok   {
     my ($ok,$n) = @_;
     $T_RUN++; $T_FAIL++ unless $ok;
@@ -27,121 +26,151 @@ sub is   {
     my $ok = defined $got && defined $exp && "$got" eq "$exp";
     ok($ok, $n) or print "# got:      '$got'\n# expected: '$exp'\n";
 }
-END { exit 1 if $T_PLAN && $T_FAIL }
+# Assigning to $? sets the exit status; calling exit() from an END block
+# aborts perl 5.6 and earlier with "Callback called exit."
+END { $? = 1 if $T_FAIL }
 
-plan_tests(39);
+my @tests;
 
-# ok 1: stringify is defined (alias for encode)
-ok(defined &mb::JSON::stringify, 'stringify: function exists (alias for encode)');
+# stringify is defined (alias for encode)
+push @tests, sub { ok(defined &mb::JSON::stringify, 'stringify: function exists (alias for encode)') };
 
-# ok 2: undef -> null
+# undef -> null
+push @tests, sub { is( mb::JSON::encode(undef), 'null', 'encode: undef -> null' ) };
 
-is( mb::JSON::encode(undef), 'null', 'encode: undef -> null' );
+# boolean objects
+push @tests, sub { is( mb::JSON::encode(mb::JSON::true),  'true',  'encode: true'  ) };
+push @tests, sub { is( mb::JSON::encode(mb::JSON::false), 'false', 'encode: false' ) };
 
-# ok 3-4: boolean objects
-is( mb::JSON::encode(mb::JSON::true),  'true',  'encode: true'  );
-is( mb::JSON::encode(mb::JSON::false), 'false', 'encode: false' );
+# plain 1 is a number, NOT true
+push @tests, sub { is( mb::JSON::encode(1), '1', 'encode: 1 -> number 1 (not true)' ) };
 
-# ok 5: plain 1 is a number, NOT true
-is( mb::JSON::encode(1), '1', 'encode: 1 -> number 1 (not true)' );
+# plain 0 is a number, NOT false
+push @tests, sub { is( mb::JSON::encode(0), '0', 'encode: 0 -> number 0 (not false)' ) };
 
-# ok 6: plain 0 is a number, NOT false
-is( mb::JSON::encode(0), '0', 'encode: 0 -> number 0 (not false)' );
+# numbers
+push @tests, sub { is( mb::JSON::encode(42),   '42',   'encode: integer'  ) };
+push @tests, sub { is( mb::JSON::encode(-7),   '-7',   'encode: negative' ) };
+push @tests, sub { is( mb::JSON::encode(3.14), '3.14', 'encode: float'    ) };
 
-# ok 7-9: numbers
-is( mb::JSON::encode(42),    '42',    'encode: integer'  );
-is( mb::JSON::encode(-7),    '-7',    'encode: negative' );
-is( mb::JSON::encode(3.14),  '3.14',  'encode: float'    );
+# string
+push @tests, sub { is( mb::JSON::encode('hello'), '"hello"', 'encode: string' ) };
 
-# ok 10: string
-is( mb::JSON::encode('hello'), '"hello"', 'encode: string' );
+# string escapes
+push @tests, sub { is( mb::JSON::encode("a\nb"), '"a\\nb"', 'encode: newline escape' ) };
+push @tests, sub { is( mb::JSON::encode("a\tb"), '"a\\tb"', 'encode: tab escape'     ) };
+push @tests, sub { is( mb::JSON::encode("a\rb"), '"a\\rb"', 'encode: CR escape'      ) };
+push @tests, sub { is( mb::JSON::encode('a"b'),  '"a\\"b"', 'encode: quote escape'   ) };
+push @tests, sub { is( mb::JSON::encode('a\\b'), '"a\\\\b"','encode: backslash escape') };
 
-# ok 11-15: string escapes
-is( mb::JSON::encode("a\nb"),  '"a\\nb"', 'encode: newline escape' );
-is( mb::JSON::encode("a\tb"),  '"a\\tb"', 'encode: tab escape'     );
-is( mb::JSON::encode("a\rb"),  '"a\\rb"', 'encode: CR escape'      );
-is( mb::JSON::encode('a"b'),   '"a\\"b"', 'encode: quote escape'   );
-is( mb::JSON::encode('a\\b'),  '"a\\\\b"','encode: backslash escape');
+# control character escape
+push @tests, sub { is( mb::JSON::encode("a\x01b"), '"a\\u0001b"', 'encode: control char \\u0001' ) };
 
-# ok 16: 6: control character escape
-is( mb::JSON::encode("a\x01b"), '"a\\u0001b"', 'encode: control char \\u0001' );
+# UTF-8 kept as-is (not \uXXXX)
+push @tests, sub {
+    my $ja = chr(0xE7).chr(0x94).chr(0xB0).chr(0xE4).chr(0xB8).chr(0xAD); # U+7530 U+4E2D
+    is( mb::JSON::encode($ja), '"' . $ja . '"', 'encode: UTF-8 bytes kept as-is' );
+};
+push @tests, sub {
+    my $hi = chr(0xE3).chr(0x81).chr(0x82).chr(0xE3).chr(0x81).chr(0x84).chr(0xE3).chr(0x81).chr(0x86); # U+3042 U+3044 U+3046
+    is( mb::JSON::encode($hi), '"' . $hi . '"', 'encode: UTF-8 hiragana kept as-is' );
+};
 
-# ok 17-18: UTF-8 kept as-is (not \uXXXX)
-my $ja = chr(0xE7).chr(0x94).chr(0xB0).chr(0xE4).chr(0xB8).chr(0xAD); # U+7530 U+4E2D
-is( mb::JSON::encode($ja), '"' . $ja . '"', 'encode: UTF-8 bytes kept as-is' );
+# empty string
+push @tests, sub { is( mb::JSON::encode(''), '""', 'encode: empty string' ) };
 
-my $hi = chr(0xE3).chr(0x81).chr(0x82).chr(0xE3).chr(0x81).chr(0x84).chr(0xE3).chr(0x81).chr(0x86); # U+3042 U+3044 U+3046
-is( mb::JSON::encode($hi), '"' . $hi . '"', 'encode: UTF-8 hiragana kept as-is' );
+# empty array
+push @tests, sub { is( mb::JSON::encode([]), '[]', 'encode: empty array' ) };
 
-# ok 19: 9: empty string
-is( mb::JSON::encode(''), '""', 'encode: empty string' );
+# empty hash
+push @tests, sub { is( mb::JSON::encode({}), '{}', 'encode: empty hash' ) };
 
-# ok 20: 0: empty array
-is( mb::JSON::encode([]), '[]', 'encode: empty array' );
+# array
+push @tests, sub { is( mb::JSON::encode([1,2,3]),   '[1,2,3]',   'encode: integer array' ) };
+push @tests, sub { is( mb::JSON::encode(['a','b']), '["a","b"]', 'encode: string array'  ) };
 
-# ok 21: 1: empty hash
-is( mb::JSON::encode({}), '{}', 'encode: empty hash' );
+# array with mixed types
+push @tests, sub {
+    is( mb::JSON::encode([1,'two',undef,mb::JSON::true]),
+        '[1,"two",null,true]', 'encode: mixed array' );
+};
 
-# ok 22-23: array
-is( mb::JSON::encode([1,2,3]),     '[1,2,3]',     'encode: integer array'  );
-is( mb::JSON::encode(['a','b']),   '["a","b"]',   'encode: string array'   );
+# hash - keys sorted alphabetically
+push @tests, sub {
+    is( mb::JSON::encode({b=>2,a=>1}),
+        '{"a":1,"b":2}', 'encode: hash keys sorted' );
+};
+push @tests, sub {
+    is( mb::JSON::encode({name=>'Alice',age=>30}),
+        '{"age":30,"name":"Alice"}', 'encode: hash age/name sorted' );
+};
 
-# ok 24: 4: array with mixed types
-is( mb::JSON::encode([1,'two',undef,mb::JSON::true]),
-    '[1,"two",null,true]', 'encode: mixed array' );
+# hash with undef value
+push @tests, sub { is( mb::JSON::encode({k=>undef}), '{"k":null}', 'encode: hash undef -> null' ) };
 
-# ok 25-26: hash - keys sorted alphabetically
-is( mb::JSON::encode({b=>2,a=>1}),
-    '{"a":1,"b":2}', 'encode: hash keys sorted' );
+# hash with boolean
+push @tests, sub {
+    is( mb::JSON::encode({f=>mb::JSON::false,t=>mb::JSON::true}),
+        '{"f":false,"t":true}', 'encode: hash with booleans' );
+};
 
-is( mb::JSON::encode({name=>'Alice',age=>30}),
-    '{"age":30,"name":"Alice"}', 'encode: hash age/name sorted' );
+# nested
+push @tests, sub {
+    is( mb::JSON::encode({list=>[1,2,3]}),
+        '{"list":[1,2,3]}', 'encode: nested array in hash' );
+};
 
-# ok 27: 7: hash with undef value
-is( mb::JSON::encode({k=>undef}), '{"k":null}', 'encode: hash undef -> null' );
+# deeply nested
+push @tests, sub {
+    is( mb::JSON::encode([[1,2],[3,4]]),
+        '[[1,2],[3,4]]', 'encode: nested arrays' );
+};
 
-# ok 28: 8: hash with boolean
-is( mb::JSON::encode({f=>mb::JSON::false,t=>mb::JSON::true}),
-    '{"f":false,"t":true}', 'encode: hash with booleans' );
+# UTF-8 key
+push @tests, sub {
+    my $key = chr(0xE5).chr(0x90).chr(0x8D).chr(0xE5).chr(0x89).chr(0x8D); # U+540D U+524D
+    is( mb::JSON::encode({$key => 'test'}),
+        '{"' . $key . '":"test"}', 'encode: UTF-8 key in hash' );
+};
 
-# ok 29: 9: nested
-is( mb::JSON::encode({list=>[1,2,3]}),
-    '{"list":[1,2,3]}', 'encode: nested array in hash' );
+# roundtrip decode -> encode
+push @tests, sub {
+    my $orig = '{"active":true,"count":3,"name":"test","ok":false}';
+    my $rt   = mb::JSON::encode(mb::JSON::decode($orig));
+    is($rt, $orig, 'roundtrip: decode then encode');
+};
+push @tests, sub {
+    my $arr_orig = '[1,"two",null,true,false]';
+    my $arr_rt   = mb::JSON::encode(mb::JSON::decode($arr_orig));
+    is($arr_rt, $arr_orig, 'roundtrip: array decode then encode');
+};
 
-# ok 30: 0: deeply nested
-is( mb::JSON::encode([[1,2],[3,4]]),
-    '[[1,2],[3,4]]', 'encode: nested arrays' );
+# roundtrip encode -> decode
+push @tests, sub {
+    my $data = { name => 'Bob', score => 99, active => mb::JSON::true };
+    my $back = mb::JSON::decode(mb::JSON::encode($data));
+    is($back->{name}, 'Bob', 'roundtrip: encode then decode name');
+};
+push @tests, sub {
+    my $data = { name => 'Bob', score => 99, active => mb::JSON::true };
+    my $back = mb::JSON::decode(mb::JSON::encode($data));
+    is($back->{score}, 99, 'roundtrip: encode then decode score');
+};
+push @tests, sub {
+    my $data = { name => 'Bob', score => 99, active => mb::JSON::true };
+    my $back = mb::JSON::decode(mb::JSON::encode($data));
+    ok(ref($back->{active}) eq 'mb::JSON::Boolean' && $back->{active},
+       'roundtrip: boolean preserved');
+};
 
-# ok 31: 1: UTF-8 key
-my $key = chr(0xE5).chr(0x90).chr(0x8D).chr(0xE5).chr(0x89).chr(0x8D); # U+540D U+524D
-is( mb::JSON::encode({$key => 'test'}),
-    '{"' . $key . '":"test"}', 'encode: UTF-8 key in hash' );
+# encode integer zero in array
+push @tests, sub { is( mb::JSON::encode([0, 1, -1]), '[0,1,-1]', 'encode: zero in array' ) };
 
-# ok 32-33: roundtrip decode -> encode
-my $orig = '{"active":true,"count":3,"name":"test","ok":false}';
-my $rt   = mb::JSON::encode(mb::JSON::decode($orig));
-is($rt, $orig, 'roundtrip: decode then encode');
+# string that looks like a number
+push @tests, sub { is( mb::JSON::encode('007'), '"007"', 'encode: leading-zero string stays string' ) };
 
-my $arr_orig = '[1,"two",null,true,false]';
-my $arr_rt   = mb::JSON::encode(mb::JSON::decode($arr_orig));
-is($arr_rt, $arr_orig, 'roundtrip: array decode then encode');
+# scientific notation
+push @tests, sub { is( mb::JSON::encode(1e2), '100', 'encode: scientific notation -> number' ) };
 
-# ok 34-35: roundtrip encode -> decode
-my $data = { name => 'Bob', score => 99, active => mb::JSON::true };
-my $json = mb::JSON::encode($data);
-my $back = mb::JSON::decode($json);
-is($back->{name},  'Bob', 'roundtrip: encode then decode name');
-is($back->{score}, 99,    'roundtrip: encode then decode score');
-
-# ok 36: 6: roundtrip boolean
-ok(ref($back->{active}) eq 'mb::JSON::Boolean' && $back->{active},
-   'roundtrip: boolean preserved');
-
-# ok 37: 7: encode integer zero in array
-is( mb::JSON::encode([0, 1, -1]), '[0,1,-1]', 'encode: zero in array' );
-
-# ok 38: 8: string that looks like a number
-is( mb::JSON::encode('007'), '"007"', 'encode: leading-zero string stays string' );
-
-# ok 39: 9: scientific notation
-is( mb::JSON::encode(1e2), '100', 'encode: scientific notation -> number' );
+print "1.." . scalar(@tests) . "\n";
+$_->() for @tests;

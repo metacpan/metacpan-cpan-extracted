@@ -104,7 +104,7 @@
  * - `__declspec(deprecated)` on Microsoft Visual C++.
  * - Nothing on other compilers.
  */
-#if COMPAT_HAS_C_ATTRIBUTE(deprecated)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L && COMPAT_HAS_C_ATTRIBUTE(deprecated)
 #define c23_deprecated [[deprecated]]
 #elif defined(INFIX_COMPILER_GCC) || defined(INFIX_COMPILER_CLANG)
 #define c23_deprecated __attribute__((deprecated))
@@ -127,7 +127,7 @@
  * - `__attribute__((fallthrough))` on GCC and Clang.
  * - Nothing on other compilers (including MSVC, which uses a different mechanism or lacks the warning).
  */
-#if COMPAT_HAS_C_ATTRIBUTE(fallthrough)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L && COMPAT_HAS_C_ATTRIBUTE(fallthrough)
 #define c23_fallthrough [[fallthrough]]
 #elif defined(INFIX_COMPILER_GCC) || defined(INFIX_COMPILER_CLANG)
 #define c23_fallthrough __attribute__((fallthrough))
@@ -148,7 +148,7 @@
  * - `__attribute__((unused))` on GCC and Clang.
  * - Nothing on other compilers.
  */
-#if COMPAT_HAS_C_ATTRIBUTE(maybe_unused)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L && COMPAT_HAS_C_ATTRIBUTE(maybe_unused)
 #define c23_maybe_unused [[maybe_unused]]
 #elif defined(INFIX_COMPILER_GCC) || defined(INFIX_COMPILER_CLANG)
 #define c23_maybe_unused __attribute__((unused))

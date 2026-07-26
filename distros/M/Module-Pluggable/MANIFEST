@@ -9,6 +9,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+installscripts/remove_stale_core_copies.pl
 t/01use.t
 t/02alsoworks.t
 t/02works.t
@@ -54,6 +55,13 @@ t/26inc_hook.t
 t/27app_fatpacker.t
 t/28appledouble.t
 t/29unreadable.t
+<<<<<<< HEAD
+t/30search_dirs_strict.t
+t/31per_path_opts.t
+=======
+t/30per_path_opts.t
+t/31sort_results.t
+>>>>>>> 14fe60b (Add opt-in sort_results option.)
 t/acme/Acme/MyTest/Plugin/Foo.pm
 t/fp/app.pl
 t/fp/lib/App/TestMPFP/Plugin/A.pm
@@ -70,6 +78,7 @@ t/lib/ExtTest/Plugin/Bar.plugin
 t/lib/ExtTest/Plugin/Foo.plugin
 t/lib/ExtTest/Plugin/Quux/Foo.plugin
 t/lib/InnerTest/Plugin/Foo.pm
+t/lib/LocalIncTest/Plugin/Abbrev.pm
 t/lib/M/X.pm
 t/lib/MyOtherTest/Plugin/Bar.pm
 t/lib/MyOtherTest/Plugin/Foo.pm
@@ -82,10 +91,10 @@ t/lib/MyTest/Plugin/Quux/Foo.pm
 t/lib/No/Middle.pm
 t/lib/OddTest/Plugin/Foo.pm
 t/lib/TA/C/A/I.pm
-t/lib/Text/Abbrev.pm
 t/lib/TriggerTest/Plugin/After.pm
 t/lib/TriggerTest/Plugin/CallbackAllow.pm
 t/lib/TriggerTest/Plugin/CallbackDeny.pm
 t/lib/TriggerTest/Plugin/Deny.pm
 t/lib/TriggerTest/Plugin/Error.pm
 t/lib/Zot/.Zork.pm
+t/search_dirs_strict.t

@@ -1,8 +1,8 @@
 use v5.40;
-use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 #
 my $c_source = <<'END_C';
 #include "std.h"
@@ -200,24 +200,23 @@ subtest 'Pinning / Dereferencing Deep Structures' => sub {
     # Get a pointer to the static C struct
     my $ptr = $get_static_rect->();
 
-    # Verify we got a pointer-like SV (unblessed ref with magic, per new implementation)
+    # Verify we got a pointer-like SV (magical HashRef)
     ok $ptr, 'Got a pointer';
 
-    # Dereference to read (Deep copy from C -> Perl)
-    my $val = $$ptr;
-    is $val, { top_left => { x => 0, y => 0 }, bottom_right => { x => 10, y => 20 } }, 'Dereferenced nested struct pointer correctly';
+    # No dereference needed. $ptr is the HashRef representing the C struct.
+    is $ptr, { top_left => { x => 0, y => 0 }, bottom_right => { x => 10, y => 20 } }, 'Struct pointer correctly mapped to HashRef';
 
-    # Modify via pointer using pinning syntax logic (write to C)
-    # Since $ptr is magic, assigning to $$ptr should marshal data back to C memory
-    $$ptr = { top_left => { x => 99, y => 99 }, bottom_right => { x => 100, y => 100 } };
+    # Modify via pointer (deep write back to C memory)
+    # Assigning to the magical HashRef triggers deep synchronization via VTables
+    $ptr->{top_left}     = { x => 99,  y => 99 };
+    $ptr->{bottom_right} = { x => 100, y => 100 };
 
     # Read again to verify round-trip
-    my $val_new = $$ptr;
-    is $val_new->{top_left}{x}, 99, 'Write-back to static C struct via magic successful';
+    is $ptr->{top_left}{x}, 99, 'Write-back to static C struct via magic successful';
 
     # Verify it persists (call the C accessor again)
     my $ptr2 = $get_static_rect->();
-    is $$ptr2->{top_left}{x}, 99, 'Changes persisted in C memory';
+    is $ptr2->{top_left}{x}, 99, 'Changes persisted in C memory';
 };
 #
 done_testing;

@@ -1,0 +1,54 @@
+image: ubuntu:24.04
+
+variables:
+  DEBIAN_FRONTEND: "noninteractive"
+  PATCH:           $CI_PIPELINE_ID
+
+stages:
+ - build
+ - upload
+
+build:
+  stage: build
+  script:
+    - apt-get update
+    - apt-get install -y make
+    - make deb
+  artifacts:
+    paths:
+      - ./*.tar.gz
+      - ./*.deb
+  only:
+    - dev
+    - master
+
+.upload-common: &upload-common |
+  apt-get update
+  apt-get install -y openssh-client
+  echo "$SSH_PRIVATE_KEY" > .privkey
+  chmod 600 .privkey
+  scp -o StrictHostKeyChecking=no -i .privkey *.deb uploader@deb-repo.lan:/repo/apt/incoming/$REPO/
+
+upload-staging:
+  stage: upload
+  script:
+    - *upload-common
+  variables:
+    REPO: noble-testing
+  only:
+    - master
+  artifacts:
+    paths:
+      - ./*.deb
+
+upload-dev:
+  stage: upload
+  script:
+    - *upload-common
+  variables:
+    REPO: noble-unstable
+  only:
+    - dev
+  artifacts:
+    paths:
+      - ./*.deb

@@ -1,7 +1,5 @@
 ^MYMETA.json$
 ^MYMETA.yml$
-^META.json$
-^META.yml$
 .git
 .svn
 _build

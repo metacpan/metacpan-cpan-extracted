@@ -10,6 +10,7 @@ docs/architecture-overview.md
 docs/evolution-and-performance.md
 docs/execution-benchmark.md
 docs/federation.md
+docs/future-performance-investigation-ja.md
 docs/memory-leak-check.md
 docs/migrating-from-graphql-perl.md
 docs/module-map.md
@@ -18,6 +19,7 @@ docs/persisted-queries.md
 docs/production-deployment.md
 docs/production-release-audit-2026-07-18.md
 docs/spec-conformance-september-2025.md
+docs/sync-first-execution-design-ja.md
 docs/validation-conformance.md
 docs/vm-internals-ja.md
 docs/xs-coding-rules.md
@@ -143,9 +145,13 @@ t/55_subscription_unsupported.t
 t/56_federation_subgraph.t
 t/57_default_resolver_compat.t
 t/58_introspection_policy.t
+t/59_on_stall_native_drive.t
+t/60_utf8_multibyte.t
 t/kitchen-sink.graphql
 t/schema-kitchen-sink.graphql
 t/swapi-schema.graphql
+util/accessor-benchmark.pl
+util/dataloader-benchmark.pl
 util/execution-benchmark-checkpoint.pl
 util/execution-benchmark.pl
 util/generate-nytprof-snapshot.pl
@@ -157,6 +163,7 @@ util/parser-benchmark.pl
 util/parser-fuzz.pl
 util/profile-execution-target.pl
 util/profile-parser.pl
+util/resolver-abi-benchmark.pl
 util/soak-test.pl
 util/valgrind-perl.supp
 META.yml

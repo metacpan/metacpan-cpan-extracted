@@ -3,7 +3,7 @@ package Chandra::Bridge::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Chandra ();
 

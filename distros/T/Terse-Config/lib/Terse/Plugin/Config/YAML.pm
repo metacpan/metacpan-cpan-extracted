@@ -1,5 +1,8 @@
 package Terse::Plugin::Config::YAML;
 
+use strict;
+use warnings;
+
 use base 'Terse::Plugin::Config';
 
 use YAML::XS qw/LoadFile/;
@@ -24,7 +27,7 @@ Terse::Plugin::Config::YAML - YAML configs
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

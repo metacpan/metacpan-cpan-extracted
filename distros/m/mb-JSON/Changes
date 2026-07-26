@@ -1,5 +1,261 @@
 Revision history for mb-JSON
 
+0.07  2026-07-26 JST (Japan Standard Time)
+  - decode()/parse(): whitespace between tokens is now matched with an
+    explicit [\x20\x09\x0A\x0D] instead of \s. RFC 8259 allows exactly
+    space, tab, LF and CR, but perl's \s also matches form feed on every
+    perl and, since perl 5.18, vertical tab as well. The same document
+    therefore decoded on perl 5.18 and later and failed to decode on
+    perl 5.16 and earlier -- the one kind of divergence a distribution
+    targeting 5.005_03 through the latest perl must not have. Form feed
+    and vertical tab between tokens are now reported as an unexpected
+    token on every perl. String contents are unaffected: they were never
+    matched with \s.
+  - encode()/stringify(): $MAX_DEPTH is now applied on entering an
+    object or array, with >=, which is where and how _parse_object() and
+    _parse_array() apply it. Testing every value with > instead counted
+    a leaf scalar as a nesting level of its own, which the decoder never
+    does, and allowed one container more than decode() would read back:
+    a 513-container structure encoded but could not be decoded again.
+    Both directions now stop at the same $MAX_DEPTH containers, so
+    anything decode() accepts can be handed straight to encode().
+  - decode()/parse(): a number literal that underflows to zero (e.g.
+    1e-400 on a perl with ordinary doubles) is now rejected with
+    "number out of range", the same as one that overflows to Inf. 0.07
+    already rejected the overflow case; leaving the underflow case
+    silent meant a literal could lose every significant digit it carried
+    and still decode successfully. Only the mantissa is examined, so a
+    literal that is genuinely zero -- "0", "0.000", and also "0e-400" --
+    still decodes to 0. Where the range ends is a property of the perl,
+    not of this module: a perl built -Duselongdouble or -Dusequadmath
+    accepts 1e400 and 1e-400 as ordinary finite numbers, and rejects
+    only far more extreme literals.
+  - parse(), stringify(): both now hand their argument straight to
+    decode()/encode() instead of copying it into a lexical first.
+    decode() already resolves an omitted or undefined argument to $_ and
+    already takes the one copy it needs, so the extra copy duplicated
+    the whole document for nothing -- a wasted megabyte on a megabyte of
+    JSON. Behaviour, including the $_ fallback, is unchanged.
+  - t/1005-limits.t, eg/05_limits.pl: the out-of-range number tests no
+    longer hardcode 1e400 and 1e-400. Those literals are out of range
+    only on a perl whose NV is an ordinary double; on a perl built
+    -Duselongdouble or -Dusequadmath they are ordinary finite numbers
+    that decode() correctly accepts, so the tests would have reported a
+    FAIL for correct behaviour on those smokers. Both now search at run
+    time for an exponent this perl actually cannot represent, and print
+    the pair they settled on. 1e300 and 1e-300 are still hardcoded as
+    the in-range cases, being comfortably inside the range of a double
+    and of every wider NV.
+  - t/1005-limits.t: added coverage for the four items above -- the
+    accepted and rejected whitespace bytes, decode/encode agreeing on
+    the container count at both a local $MAX_DEPTH and the shipped
+    default, underflowing and genuinely-zero number literals, and the
+    aliases resolving $_ and leaving the caller's string alone.
+  - decode()/parse()/encode()/stringify(): the recursive descent
+    parser and encoder no longer trigger perl's core "Deep recursion
+    on subroutine" warning on input nested deeper than perl's fixed
+    100-call threshold. That threshold is well below the default
+    $MAX_DEPTH of 512, so correctly-decoded/encoded input in that
+    range previously still printed a warning to STDERR on every call,
+    and the warning could not be silenced from the caller's side
+    because it comes from a lexical `use warnings` in this module, not
+    the caller's. From perl 5.006 the 'recursion' category is switched
+    off lexically inside each recursive sub. Perl 5.005_03 has no
+    lexical warnings and therefore no such category, so on that perl
+    $^W is instead localized to 0 for the extent of the parse in
+    decode() and encode(); on 5.006 and later the same statement
+    localizes $^W to the value it already held, which changes nothing.
+    The warnings-compat stub near the top of the file now also ensures
+    warnings::unimport, under its own guard. The distribution-wide stub
+    block is skipped whenever something else installed a warnings stub
+    first, and every t/*.t and eg/*.pl installs an import-only one
+    before loading this module, so folding unimport into that block
+    would not have defined it in the case that matters; on perl
+    5.005_03 `no warnings` then died with "Can't locate object method
+    unimport via package warnings". The canonical block itself is
+    unchanged and still byte-identical to the other ina@CPAN
+    distributions.
+  - t/1001-decode.t, t/1002-encode.t, t/1003-boolean.t,
+    t/1004-stringify.t, t/1005-limits.t, t/9001-load.t: the END block
+    sets $? instead of calling exit(). Calling exit() from an END
+    block aborts perl 5.6 and earlier with "Callback called exit." and
+    "END failed--cleanup aborted", which replaced the real failure
+    report with a confusing one on exactly the oldest perls this
+    distribution targets. Only a failing run reached that code, so it
+    stayed invisible while the suite passed. This matches what
+    t/lib/INA_CPAN_Check.pm already did for the tests that delegate
+    to it.
+  - decode()/parse(): a JSON number literal that is valid JSON syntax
+    but too large for perl's floating point range (e.g. 1e400) is now
+    rejected with "number out of range" instead of silently returning
+    Inf. Previously such a value decoded successfully but could not be
+    re-encoded, since encode() already rejects Inf/NaN.
+  - decode()/parse(): the scanner no longer consumes its input by
+    deleting the front of the buffer with s/\A...//. That copied the
+    remainder of the text on every token and made decoding quadratic in
+    the input length. It now advances pos() with the \G anchor and the
+    /gc modifiers and never modifies the buffer, so decoding is linear.
+    Measured on one reference machine, an 800 KB document went from
+    over 12 seconds to about 0.2 seconds. \G, pos() and /gc are all
+    available in perl 5.005_03, so the compatibility target is
+    unchanged.
+  - _parse_string(): ordinary characters are now taken a run at a time
+    with /\G([^"\\]+)/gcs instead of one character per regex match.
+    The elaborate $utf8_pat alternation it replaced could not reject
+    anything (its first and last branches matched every byte), so
+    removing it changes no behaviour; a well-formed-UTF-8 pattern is
+    now kept only for the new $STRICT validation.
+  - decode()/parse(): now combine UTF-16 surrogate pairs in \uXXXX
+    escapes (\uD800-\uDBFF followed by \uDC00-\uDFFF) into the single
+    code point they represent and emit it as 4-byte UTF-8. Characters
+    above U+FFFF (e.g. emoji) written as surrogate pairs by JavaScript
+    JSON.stringify(), Python json.dumps() (default), and similar
+    encoders now decode correctly. Previously each half was emitted as
+    an invalid 3-byte sequence.
+  - _cp_to_utf8(): extended to emit 4-byte UTF-8 for U+10000..U+10FFFF
+    (byte-decomposed, so every chr() argument stays <= 0xFF and the
+    code remains perl 5.005_03 safe).
+  - decode()/parse(): an unrecognized backslash escape inside a string
+    is now an error instead of being passed through literally.
+  - decode()/parse(): a leading UTF-8 byte order mark (EF BB BF) is now
+    skipped instead of raising "unexpected token".
+  - Added $mb::JSON::MAX_DEPTH (default 512). decode() rejects input
+    nested deeper than this, and encode() rejects a data structure
+    nested deeper than this, instead of exhausting the perl stack on
+    hostile input. A false value disables the check.
+  - Added $mb::JSON::STRICT (default 0). When set, decode() rejects a
+    raw control character U+0000-U+001F inside a string and rejects a
+    string whose bytes are not well-formed UTF-8. The default remains
+    byte-transparent, as before.
+  - encode()/stringify(): circular references are now detected and
+    reported instead of recursing forever. Detection is per path, so a
+    structure that merely shares a subtree more than once still encodes
+    normally. Tracking that path makes encode() roughly 20% slower.
+  - encode()/stringify(): Inf, -Inf and NaN are now rejected. They
+    previously became the JSON strings "Inf", "-Inf" and "NaN", which
+    is valid JSON but silently wrong. They are recognized by how perl
+    prints them, because no portable way exists to tell a numeric Inf
+    from a string spelling it: a numeric test alone is wrong from perl
+    5.22, where even the string "Info" numifies to Inf, and asking the
+    scalar directly needs B, whose constants are AUTOLOADed on perl
+    5.005 and cannot be called as functions there. The cost is that a
+    string spelling exactly "Inf", "-Inf", "Infinity", "NaN" or one of
+    the "1.#INF" forms is rejected too; longer words such as "Info" and
+    "nano" are unaffected. The rule behaves identically on every
+    supported perl.
+  - encode()/stringify(): called with no argument at all, they now
+    encode $_, mirroring decode()/parse(). encode(undef) still returns
+    null, so the undef -> null rule is unaffected.
+  - New decode diagnostics: "lone high surrogate", "lone low
+    surrogate", and "invalid low surrogate" in \u sequences.
+  - New decode diagnostics: "invalid escape sequence", "nesting too
+    deep (max N)", and, under $STRICT, "raw control character in
+    string" and "malformed UTF-8 in string".
+  - New encode diagnostics: "nesting too deep (max N)", "circular
+    reference detected", and "cannot encode Inf or NaN".
+  - lib/mb/JSON.pm: removed a duplicated "decode -- JSON text -> Perl
+    data / parse -- alias for decode()" banner comment that had been
+    left behind above the encode section.
+  - lib/mb/JSON.pm POD: merged the two overlapping sections LIMITATIONS
+    and BUGS AND LIMITATIONS. LIMITATIONS now holds the list and BUGS
+    holds the reporting address; the TABLE OF CONTENTS was updated to
+    match.
+  - lib/mb/JSON.pm POD: added INCOMPATIBLE CHANGES, CONFIGURATION
+    ($MAX_DEPTH, $STRICT), and PERFORMANCE.
+  - lib/mb/JSON.pm POD: moved the per-version prose out of DESCRIPTION,
+    which duplicated this file and grew on every release.
+  - lib/mb/JSON.pm POD SYNOPSIS: each example now declares its own
+    variable, so copying the block no longer produces "my $data masked
+    earlier declaration" warnings.
+  - lib/mb/JSON.pm POD: removed the "surrogate pairs not supported"
+    LIMITATIONS entry; documented the new behaviour under DECODING
+    RULES and DIAGNOSTICS.
+  - lib/mb/JSON.pm POD: documented that object keys are last-wins, that
+    numbers pass through perl's own numeric conversion (so 1.0
+    re-encodes as 1 and very wide integers lose precision), and that a
+    blessed HASH or ARRAY reference is stringified because ref()
+    returns the class name.
+  - README: added the missing limitations (blessed and other
+    references, number precision, no UTF-8 validation by default), the
+    CONFIGURATION section, and the copyright line that the POD already
+    carried.
+  - doc/json_cheatsheet.*.txt: added \uXXXX and surrogate pair examples
+    to the UTF-8 section of all 21 languages.
+  - doc/json_cheatsheet.*.txt: BN, HI, KM, MN, MY, NE, SI, TH, TR, UR
+    and VI merged "hash keys are sorted" and "UTF-8 kept as-is" into a
+    single section, and nine of them left that heading untranslated.
+    All 21 languages now carry the same sections in the same order.
+  - Added eg/05_limits.pl: worked examples of $MAX_DEPTH, $STRICT,
+    circular reference detection, Inf/NaN rejection and byte order mark
+    handling, showing both the accepted and the rejected case for each.
+  - Added t/1005-limits.t: MAX_DEPTH, STRICT, circular references,
+    Inf/NaN, and byte order mark handling. The Inf/NaN tests report the
+    spelling the running platform uses for a non-finite value, so an
+    unrecognized one is visible in the output.
+  - t/1001-decode.t: added tests for surrogate pairs and the three
+    surrogate error cases.
+  - t/9080-cheatsheets.t: added S4, which checks that every doc/*.txt
+    carries the same section count, so a language falling out of step
+    with the others is caught.
+  - t/*.t: converted every test file to the closure-array plan pattern
+    so the plan self-derives from the number of tests. Self-contained
+    tests (1001-1005, 9001, 9020, 9050, 9060, 9070, 9080) print
+    "1.." . scalar(@tests) before running them; tests that delegate to
+    t/lib/INA_CPAN_Check check_* helpers (9010, 9030, 9040) call
+    plan_tests(count_*()) first, because the harness reads the plan
+    line at the head of the output and would otherwise see no tests at
+    all. Removed stale "# ok N" numbering comments. Behaviour and
+    emitted TAP messages are unchanged.
+  - t/lib/INA_CPAN_Check.pm: replaced with the shared 0.41 library used
+    across ina@CPAN distributions.  0.41 merges what the mb-JSON copy did
+    better into the shared one: the richer per-module version check (B),
+    the six-point perl 5.005_03 check (D), the '} else' layout rule (E2),
+    the K1 comma and K2 \@array rules alongside K3, the prerequisite
+    version clash check (J2), the Changes format check (as the new
+    category L), and encoding coverage over every text file in MANIFEST
+    rather than only lib/*.pm and t/*.t.  From the shared side it brings
+    the duplicate-plan and plan-count guards, plan_skip(), an END block
+    that sets the exit status without calling exit() (which aborts perl
+    5.6 and earlier with "Callback called exit."), the utf8_ok option on
+    category C, and selfcheck_suite().
+  - t/lib/INA_CPAN_Check.pm: _scan_code() now takes ($path, $pattern) and
+    returns the matching lines with POD, __END__, comments, string
+    literals and regex literals removed.  The shared 0.37 version took
+    ($root) and returned every line of every file, so the nine
+    _scan_code() calls in t/9020-perl5compat.t silently matched nothing:
+    90 assertions were passing without testing anything.
+  - t/lib/INA_CPAN_Check.pm: fixed the META provides parsers.  The YAML
+    one returned an empty set because a package name containing "::"
+    defeated its regex, and the JSON one reported a package literally
+    named "provides" because the outer key paired up with the first
+    package's version.  Both are now parsed structurally.
+  - t/lib/INA_CPAN_Check.pm: fixed two list-context defects, both of
+    which under-counted a plan.  "sort grep { ... } LIST" parses as
+    "sort SUBNAME LIST" and called grep as the comparator; and
+    scalar(f()) on a sub ending in a qw() list yields the last element
+    rather than the count.
+  - t/9030-distribution.t: now calls A, B, F, I, J and L.  H (README
+    sections) was dropped because t/9060-readme.t checks the same file in
+    more depth; D and G are likewise left to t/9020 and t/9050, so no
+    assertion is made twice.
+  - pmake.bat: replaced with the shared 0.41 version.  It adds the
+    'pmake selfcheck' target (--check1 perl 5.005_03 compatibility,
+    --check2 coding style) and runs selfcheck_suite() at 'pmake dist'
+    time, which executes every t/*.t in a child perl and rejects a
+    duplicate plan line or a plan count that does not match the number
+    of assertions actually run.
+  - LICENSE: removed trailing whitespace from five lines of the Artistic
+    License text.  No wording changed; pmake 0.41 generates the file this
+    way already, and category C now covers every text file in MANIFEST
+    rather than only Perl sources, so the old copy was flagged.
+  - Updated author contact e-mail from ina@cpan.org to
+    ina.cpan@gmail.com throughout the distribution (lib/mb/JSON.pm POD
+    and copyright, README, SECURITY.md, META.yml/META.json author,
+    Makefile.PL AUTHOR, pmake.bat, and the t/lib/INA_CPAN_Check.pm
+    author checks).
+  - Verified on perl 5.005_03 and perl 5.42.
+  - created by INABA Hitoshi
+
 0.06  2026-04-18 JST (Japan Standard Time)
   - Added mb::JSON::stringify(): alias for encode(), symmetric with
     mb::JSON::parse() which is an alias for decode().
@@ -24,6 +280,7 @@ Revision history for mb-JSON
   - Fixed lib/mb/JSON.pm POD: LIMITATIONS now mentions stringify() alongside
     encode() for circular reference warning; ENCODING RULES and DECODING RULES
     sections note their aliases; BOOLEAN VALUES mentions stringify() parity.
+  - created by INABA Hitoshi
 
 0.05  2026-04-04 JST (Japan Standard Time)
   - fix t/9050-pod.t: replace G11 implementation with Pod::Checker OO
@@ -41,42 +298,42 @@ Revision history for mb-JSON
     t/9060-readme.t, t/9070-examples.t, t/9080-cheatsheets.t:
     warnings stub guard updated to !defined(&warnings::import) form
     (consistent with mb 0.61, UTF8-R2 0.30, and other distributions).
+  - created by INABA Hitoshi
 
 0.04  2026-03-26 JST (Japan Standard Time)
-
-    New features:
-    - Added mb::JSON::encode(): Perl data structure -> JSON text.
-      Hash keys are sorted alphabetically for deterministic output.
-      UTF-8 multibyte strings are output as-is (not \uXXXX-escaped).
-      undef encodes as null.
-    - Added mb::JSON::Boolean type (mb::JSON::true / mb::JSON::false).
-      Plain 1/0 encode as JSON numbers; use mb::JSON::true/false for
-      JSON booleans.
-    - decode() now returns mb::JSON::Boolean objects for JSON true/false
-      (previously returned !!1 / !!0).
-    - Added mb::JSON::decode() as the canonical name; parse() retained
-      as a backward-compatible alias.
-    - Added eg/01_decode.pl, eg/02_encode.pl sample scripts.
-    - Added t/1001-decode.t, t/1002-encode.t, t/1003-boolean.t.
-    - Added t/9001-load.t through t/9080-cheatsheets.t: distribution
-      quality checks aligned with DB-Handy 1.07, HTTP-Handy 1.03,
-      and LTSV-LINQ 1.07 (INA_CPAN_Check-based test suite).
-    - Added doc/json_cheatsheet.*.txt: JSON quick reference in 21
-      languages.
-    - Fixed: warnings stub now guards with !defined(&warnings::import)
-      to suppress "import redefined" warnings.
+  New features:
+  - Added mb::JSON::encode(): Perl data structure -> JSON text.
+    Hash keys are sorted alphabetically for deterministic output.
+    UTF-8 multibyte strings are output as-is (not \uXXXX-escaped).
+    undef encodes as null.
+  - Added mb::JSON::Boolean type (mb::JSON::true / mb::JSON::false).
+    Plain 1/0 encode as JSON numbers; use mb::JSON::true/false for
+    JSON booleans.
+  - decode() now returns mb::JSON::Boolean objects for JSON true/false
+    (previously returned !!1 / !!0).
+  - Added mb::JSON::decode() as the canonical name; parse() retained
+    as a backward-compatible alias.
+  - Added eg/01_decode.pl, eg/02_encode.pl sample scripts.
+  - Added t/1001-decode.t, t/1002-encode.t, t/1003-boolean.t.
+  - Added t/9001-load.t through t/9080-cheatsheets.t: distribution
+    quality checks aligned with DB-Handy 1.07, HTTP-Handy 1.03,
+    and LTSV-LINQ 1.07 (INA_CPAN_Check-based test suite).
+  - Added doc/json_cheatsheet.*.txt: JSON quick reference in 21
+    languages.
+  - Fixed: warnings stub now guards with !defined(&warnings::import)
+    to suppress "import redefined" warnings.
+  - created by INABA Hitoshi
 
 0.03  2022-01-23 JST (Japan Standard Time)
-
-    - parse(): JSON null   -> undef
-    - parse(): JSON true   -> !!1
-    - parse(): JSON false  -> !!0
-    - Supports UTF-8 multibyte strings
+  - parse(): JSON null   -> undef
+  - parse(): JSON true   -> !!1
+  - parse(): JSON false  -> !!0
+  - Supports UTF-8 multibyte strings
+  - created by INABA Hitoshi
 
 0.02  2022-01-01 JST (Japan Standard Time)
-
-    - Bug fixes in string parsing
+  - Bug fixes in string parsing
+  - created by INABA Hitoshi
 
 0.01  2021-12-01 JST (Japan Standard Time)
-
-    - Initial release
+  - Initial release

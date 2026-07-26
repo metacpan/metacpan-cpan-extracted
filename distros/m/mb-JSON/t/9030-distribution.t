@@ -1,6 +1,8 @@
 ######################################################################
 # 9030-distribution.t  Distribution integrity.
-# Corresponds to: cpan_precheck categories A, B, F, H, I, J
+# INA_CPAN_Check categories A, B, F, I, J, L.
+# H (README sections) is left out on purpose: t/9060-readme.t checks the
+# same file in more depth, and D/G are covered by t/9020 and t/9050.
 ######################################################################
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
@@ -19,13 +21,13 @@ my $ROOT = File::Spec->rel2abs(
 plan_skip('MANIFEST not found') unless -f "$ROOT/MANIFEST";
 
 plan_tests(count_A($ROOT) + count_B($ROOT) + count_F()
-         + count_H()      + count_I()      + count_J($ROOT));
+         + count_I()      + count_J($ROOT) + count_L());
 
 check_A($ROOT);
 check_B($ROOT);
 check_F($ROOT);
-check_H($ROOT);
 check_I($ROOT);
 check_J($ROOT);
+check_L($ROOT);
 
 END { end_testing() }

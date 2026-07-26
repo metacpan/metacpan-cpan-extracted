@@ -1,5 +1,8 @@
 Revision history for Terse-Plugin-DBI
 
+0.05	2026-07-26
+	- Remove PAX headers
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

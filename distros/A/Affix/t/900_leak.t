@@ -1,6 +1,7 @@
 use lib './lib', '../lib', '../blib/arch/', 'blib/arch', '../', '.';
 use Affix               qw[:all];
 use Test2::Tools::Affix qw[:all];
+use Test2::V0 -no_srand => 1;
 use Test2::Require::AuthorTesting;
 $|++;
 skip_all 'I have no idea why *BSD is leaking here' if $^O =~ /BSD/i;

@@ -1,5 +1,8 @@
 package Terse::View::Static::Memory;
 
+use strict;
+use warnings;
+
 use base 'Terse::View::Static';
 
 sub build_view {
@@ -55,7 +58,7 @@ Terse::View::Static::Memory - Serve static resources in memory view
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

@@ -3,14 +3,14 @@ use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
 #
-class Net::BitTorrent::DHT::Peer v2.0.6 {
+class Net::BitTorrent::DHT::Peer v2.1.1 {
     field $ip     : param : reader;
     field $port   : param : reader;
     field $family : param : reader;
     method to_string () {"$ip:$port"}
 };
 #
-class Net::BitTorrent::DHT v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::DHT v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Algorithm::Kademlia;
     use Net::BitTorrent::DHT::Security;
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
@@ -334,7 +334,7 @@ class Net::BitTorrent::DHT v2.1.0 : isa(Net::BitTorrent::Emitter) {
     method tick ( $timeout //= 0 ) {
         $self->_rotate_tokens();
         $self->_rotate_node_id()        if time - $last_node_id_rotation >= $node_id_rotation_interval;
-        return $self->handle_incoming() if $select->can_read($timeout);
+        return $self->handle_incoming() if $select->can_read(0);    # Non-blocking: _run_one_tick already reads this socket
         return ( [], [], undef );
     }
 

@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
-class Net::BitTorrent::Protocol::BEP06 v2.0.0 : isa(Net::BitTorrent::Protocol::BEP55) {
+class Net::BitTorrent::Protocol::BEP06 v2.1.1 : isa(Net::BitTorrent::Protocol::BEP55) {
 
     # BEP 06 Message IDs
     use constant {

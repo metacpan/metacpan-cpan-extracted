@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 
-package Net::BitTorrent::Types v2.0.0 {
+package Net::BitTorrent::Types v2.1.1 {
     use Exporter qw[import];
     our @EXPORT = qw[
         ENCRYPTION_NONE

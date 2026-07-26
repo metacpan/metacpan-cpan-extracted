@@ -24,17 +24,17 @@ ok !$t->bitfield->get(1), 'Piece 1 not yet verified (throttled)';
 # 16KB per second. Our piece is 16KB.
 $client->set_hashing_rate_limit(16384);
 
-# Tick 0.5s -> should process 8KB -> nothing finished
-$client->tick(0.1) for 1 .. 5;
+# Process 0.5s -> 8KB allowance -> nothing finished
+$client->_process_hashing_queue(0.5);
 ok !$t->bitfield->get(0), 'Piece 0 still not finished after 0.5s';
 
-# Tick another 0.6s -> total 1.1s -> should have finished piece 0
-$client->tick(0.1) for 1 .. 6;
+# Process another 0.6s -> total 1.1s -> should have finished piece 0
+$client->_process_hashing_queue(0.6);
 ok $t->bitfield->get(0),  'Piece 0 verified after 1.1s';
 ok !$t->bitfield->get(1), 'Piece 1 still pending';
 
-# Tick another 1.0s -> should finish piece 1
-$client->tick(0.1) for 1 .. 10;
+# Process another 1.0s -> should finish piece 1
+$client->_process_hashing_queue(1.0);
 ok $t->bitfield->get(1), 'Piece 1 verified after 2.1s';
 #
 subtest 'Hashing queue drains before accepting when full' => sub {

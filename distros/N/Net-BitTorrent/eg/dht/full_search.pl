@@ -60,7 +60,7 @@ while ( time - $start_time < 60 ) {    # Run for 60 seconds max
         }
 
         # Sort frontier by distance to target
-        my @sorted = sort { ( $a->{id} ^.$target_bin ) cmp( $b->{id} ^.$target_bin ) } values %frontier;
+        my @sorted = sort { ( $a->{id} ^.$target_bin ) cmp ( $b->{id} ^.$target_bin ) } values %frontier;
 
         # Query top 8 closest unvisited nodes
         my $count = 0;

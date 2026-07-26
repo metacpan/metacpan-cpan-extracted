@@ -1,14 +1,9 @@
-.github/FUNDING.yml
-.github/workflows/affix-cross.yml
-.github/workflows/affix-unix.yml
-.github/workflows/affix-win32.yml
-.github/workflows/ci.yml
-.github/workflows/delete_logs.yml
 Build.PL
 Changes.md
 LICENSE
 MANIFEST
 META.json
+META.yml
 README.md
 builder/SDL3/Builder.pm
 cpanfile

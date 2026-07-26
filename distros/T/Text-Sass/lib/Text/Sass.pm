@@ -21,7 +21,7 @@ use Text::Sass::Token;
 use Data::Dumper;
 use Readonly;
 
-our $VERSION = q[1.0.4];
+our $VERSION = q[1.1.0];
 our $DEBUG     = 0;
 our $FUNCTIONS = [qw(Text::Sass::Functions)];
 
@@ -445,7 +445,8 @@ sub _css_kvs {
 }
 
 sub _parse_css {
-  my ($self, $str, $substash, $symbols) = @_;
+  my ($self, $str, $substash, $symbols, $chain) = @_;
+  $chain ||= [];
 
   #########
   # /* comment */
@@ -498,7 +499,9 @@ sub _parse_css {
       }
 
       if ($kv =~ /[{].*[}]/smx) {
-        $self->_parse_css( $kv, $ssubstash, $symbols );
+        # Nested group - process recursively with parent chain
+        my $newchain = [@{$chain}, $tokens];
+        $self->_parse_css( $kv, $ssubstash, $symbols, $newchain );
         next;
       }
 
@@ -518,7 +521,7 @@ sub _parse_css {
         }
 
         my $result    = [];
-        $self->_parse_css($mixin_str, $result, $subsymbols);
+        $self->_parse_css($mixin_str, $result, $subsymbols, $chain);
         push @{$ssubstash}, @{$result->[0]->{$proto}};
 
         $DEBUG and carp qq[DYNAMIC MIXIN $func];
@@ -549,7 +552,9 @@ sub _parse_css {
       my ($k) = keys %{$child};
       my ($v) = $child->{$k};
 #carp qq[post-process k=$k v=$v tokens=$tokens];
-      $k      =~ s{(.*)&}{&$1$tokens}smx;
+      # Prepend parent chain + tokens to selectors with &
+      my $parent_selector = join q[ ], @{$chain}, $tokens;
+      $k =~ s{(.*)&}{&$1$parent_selector}smx;
 #carp qq[post-process kafter=$k];
       push @{$parent_processed}, { $k => $v };
 #carp Dumper($substash);

@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef DEBUG
 #define DEBUG 0
+#endif
 
 // Disables the implicit 'pTHX_' context pointer argument, which is good practice for
 // modern Perl XS code that uses the 'aTHX_' macro explicitly.
@@ -21,8 +23,14 @@
 
 #include "common/infix_internals.h"
 #include <infix/infix.h>
-// This structure defines the thread-local storage for our module. Under ithreads,
-// each Perl thread will get its own private instance of this struct.
+
+/**
+ * @defgroup ThreadContext Thread-Safe Globals
+ *
+ * This structure defines the thread-local storage for our module. Under ithreads,
+ * each Perl thread will get its own private instance of this struct.
+ * @{
+ */
 typedef struct {
     /// A per-thread hash table to store loaded libraries.
     /// Maps library path -> LibRegistryEntry*.
@@ -40,6 +48,8 @@ typedef struct {
     HV * stash_pointer;  // Cache for Affix::Pointer stash
 } my_cxt_t;
 START_MY_CXT;
+/** @} */
+
 // Helper macro to fetch a value from a hash if it exists, otherwise return a default.
 #define hv_existsor(hv, key, _or) hv_exists(hv, key, strlen(key)) ? *hv_fetch(hv, key, strlen(key), 0) : _or
 // Macros to handle passing the Perl interpreter context ('THX') explicitly,
@@ -73,7 +83,8 @@ typedef void (*Affix_Step_Executor)(pTHX_ Affix * affix,
                                     void ** c_args,
                                     void * ret_buffer);
 /// Function pointer type for a "pull" operation: marshalling from C (void*) to Perl (SV).
-typedef void (*Affix_Pull)(pTHX_ Affix * affix, SV *, const infix_type *, void *);
+typedef void (*Affix_Pull)(pTHX_ Affix *, SV *, const infix_type *, void *, bool);
+
 /// Function pointer type for a "push" operation: marshalling from Perl (SV) to C (void*).
 typedef void (*Affix_Push_Handler)(pTHX_ Affix * affix, SV *, void *);
 /**
@@ -178,6 +189,7 @@ struct Affix {
     const infix_type * unwrapped_ret_type;  // Pre-unwrapped for OP_RET_PTR
     Affix_Pull ret_pull_handler;            ///< Cached handler for marshalling the return value.
     Affix_Opcode ret_opcode;                ///< Optimized return opcode.
+    bool ret_readonly;                      ///< Should the returned aggregate prevent perl-side mutations?
     void ** c_args;
 
     // Reconstruction info for threading/cloning
@@ -191,20 +203,25 @@ struct Affix {
         HV * variadic_cache;
     size_t num_fixed_args;
 };
-/// Represents an Affix::Pin object, a blessed Perl scalar that wraps a raw C pointer.
+
+/**
+ * @struct Affix_Pin_2_Point_Oh
+ * @brief The internal payload attached to Perl Scalars via Perl Magic (PERL_MAGIC_ext).
+ * @details This struct holds the raw C pointer, type metadata, and bitfield offsets.
+ * When Perl attempts to read or write a scalar, the VTable fetches this struct to
+ * map the scalar value directly to native C memory.
+ */
 typedef struct {
-    void * pointer;              ///< The raw C memory address.
-    const infix_type * type;     ///< Infix's description of the data type at 'pointer'. Used for dereferencing.
-    infix_arena_t * type_arena;  ///< Memory arena that owns the 'type' structure.
-    bool managed;                ///< If true, Perl owns the 'pointer' and will safefree() it on DESTROY.
-    UV ref_count;                ///< Refcount to prevent premature freeing when SVs are copied.
-    size_t size;                 ///< Size of malloc'd void pointers.
-    void (*destructor)(void *);  ///< Custom destructor function (e.g. SDL_DestroyWindow).
-    SV * destructor_lib_sv;      ///< Perl object (Affix::Lib) to keep alive for the destructor.
-    SV * owner_sv;               ///< Perl object that owns the memory, kept alive by this pin.
-    size_t bit_offset;           ///< Bit offset (for bitfields)
-    size_t bit_width;            ///< Bit width (for bitfields, 0 = not a bitfield)
-} Affix_Pin;
+    void * ptr;              /**< Pointer to the actual C memory backing this variable. */
+    const infix_type * type; /**< Pointer to the parsed AST type node. */
+    infix_arena_t * arena;   /**< Local arena for anonymous types. */
+    uint8_t bit_offset;      /**< Bitfield offset (0 for standard types). */
+    uint8_t bit_width;       /**< Bitfield width in bits (0 for standard types). */
+    bool readonly;           /**< True if the pin is marked const/readonly. */
+    bool absolute;           /**< True if ptr is the target address, false if it's the address of a variable */
+    void (*destructor)(void *);
+    SV * destructor_lib_sv;
+} Affix_Pin_2_Point_Oh;
 /// Holds the necessary data for a callback, specifically the Perl subroutine to call.
 typedef struct {
     SV * coderef_rv;  ///< A reference (RV) to the Perl coderef. We hold this to keep it alive.
@@ -230,6 +247,7 @@ struct Affix_Backend {
     const infix_type * ret_type;   ///< Cached return type info.
     Affix_Pull pull_handler;       ///< Pre-resolved handler for marshalling the return value.
     Affix_Opcode ret_opcode;       ///< Optimized return opcode.
+    bool ret_readonly;             ///< Should the returned aggregate prevent perl-side mutations?
     size_t num_args;               ///< Cached number of arguments.
 
     char * sig_str;
@@ -254,9 +272,9 @@ void push_array(pTHX_ Affix * affix, const infix_type * type, SV * sv, void * p)
 void push_reverse_trampoline(pTHX_ Affix * affix, const infix_type * type, SV * sv, void * p);
 
 // Marshalling (Perl <- C)
-void ptr2sv(pTHX_ Affix * affix, void * c_ptr, SV * perl_sv, const infix_type * type);
+void ptr2sv(pTHX_ Affix *, void *, SV *, const infix_type *, bool);
 void _populate_hv_from_c_struct(
-    pTHX_ Affix * affix, HV * hv, const infix_type * type, void * p, bool live, SV * owner_sv);
+    pTHX_ Affix * affix, HV * hv, const infix_type * type, void * p, bool live, SV * owner_sv, bool);
 
 // Handler resolution
 Affix_Step_Executor get_plan_step_executor(const infix_type * type);
@@ -264,16 +282,6 @@ Affix_Pull get_pull_handler(pTHX_ const infix_type * type);
 Affix_Out_Param_Writer get_out_param_writer(const infix_type * type);
 
 // Pin management
-void _pin_sv(pTHX_ SV * sv,
-             const infix_type * type,
-             void * pointer,
-             bool managed,
-             SV * owner_sv,
-             size_t bit_offset,
-             size_t bit_width);
-bool is_pin(pTHX_ SV * sv);
-Affix_Pin * _get_pin_from_sv(pTHX_ SV * sv);
-SV * _new_pointer_obj(pTHX_ Affix_Pin * pin);
 
 // Reverse trampolines
 void _affix_callback_handler_entry(infix_context_t *, void *, void **);
@@ -308,3 +316,31 @@ void _DD(pTHX_ SV *, const char *, int);
 
 #include <string.h>
 #include <wchar.h>
+
+void * _extract_pointer_value(pTHX_ SV * sv, MAGIC * ignore_mg);
+void * get_address_v2(pTHX_ SV * sv);
+bool is_pin_v2(pTHX_ SV * sv);
+const infix_type * resolve_type(pTHX_ const infix_type * type);
+SV * wrap_callable_pointer(pTHX_ void * addr, const infix_type * type);
+void pull_pointer_as_callable(pTHX_ Affix *, SV *, const infix_type *, void *, bool);
+const infix_type * _unwrap_pin_type(const infix_type * type);
+void bind_placeholder(
+    pTHX_ SV *, void *, const infix_type *, uint8_t, uint8_t, bool, SV *, infix_arena_t *, bool, bool);
+void pull_pointer_as_pin(pTHX_ Affix *, SV *, const infix_type *, void *, bool);
+IV sizeof_type(pTHX_ const char * name);
+SV * cast(pTHX_ SV * in, const char * name);
+SV * alloc_owned(pTHX_ UV size);
+void free_owned(pTHX_ SV * rv);
+int is_v2_vtable(MGVTBL * v);
+int is_string_list_type(pTHX_ const infix_type * type);
+
+extern MGVTBL vtbl_lazy_aggregate;
+extern MGVTBL vtbl_array;
+
+extern MGVTBL vtbl_sint8, vtbl_uint8, vtbl_sint16, vtbl_uint16, vtbl_sint32, vtbl_uint32, vtbl_sint64, vtbl_uint64,
+    vtbl_float, vtbl_double, vtbl_float16, vtbl_bool, vtbl_sint128, vtbl_uint128, vtbl_void, vtbl_bitfield,
+    vtbl_pointer, vtbl_array, string_vtable, wstring_vtable, vtbl_lazy_aggregate, vtbl_enum;
+Affix_Pin_2_Point_Oh * get_pin_v2(pTHX_ SV * sv);
+SV * bind_aggregate(pTHX_ void *, const infix_type *, SV *, bool);
+SV * bind_aggregate_anon(pTHX_ void *, const infix_type *, SV * owner, infix_arena_t * a, bool);
+void * get_address_v2(pTHX_ SV * sv);

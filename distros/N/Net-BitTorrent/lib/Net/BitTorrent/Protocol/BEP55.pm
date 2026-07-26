@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
-class Net::BitTorrent::Protocol::BEP55 v2.0.0 : isa(Net::BitTorrent::Protocol::BEP11) {
+class Net::BitTorrent::Protocol::BEP55 v2.1.1 : isa(Net::BitTorrent::Protocol::BEP11) {
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
     use Net::BitTorrent::Protocol::BEP23;
 
@@ -11,6 +11,7 @@ class Net::BitTorrent::Protocol::BEP55 v2.0.0 : isa(Net::BitTorrent::Protocol::B
         $self->on(
             extended_message => sub ( $self, $name, $payload ) {
                 return unless $name eq 'ut_holepunch';
+                return if length($payload) < 1;
                 my $type = unpack( 'C', substr( $payload, 0, 1, '' ) );
                 my $dict;
                 try {

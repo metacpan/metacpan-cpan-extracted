@@ -10,7 +10,7 @@ use Carp;
 use Ham::ADIF::ADX;
 use Ham::ADIF::ADI;
 
-our $VERSION = q[2018.03.31];
+our $VERSION = q[2026.07.25];
 
 sub new {
   my ($class, $ref) = @_;

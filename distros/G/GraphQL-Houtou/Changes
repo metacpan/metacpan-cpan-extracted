@@ -1,5 +1,25 @@
 Revision history for Perl extension GraphQL-Houtou
 
+0.04 2026-07-26T09:01:54Z
+
+    - Extend fast root continuation to single root object/abstract fields (#103)
+    - Drive on_stall from C, skip the response Promise::XS entirely (#104)
+    - Fix DataLoader Ticket cancellation leak, drive fallback on_stall from C too (#105)
+    - Pool LazyInfo ($info) structs to cut per-call allocator churn (#106)
+    - Extend Phase 7's raw frame linkage to suspending list items (#107)
+    - Fix two UTF8 flag loss bugs found while adding multibyte robustness tests (#108)
+    - Add regression tests for unverified multibyte/persistence paths (#109)
+
+0.03_01 2026-07-25T10:45:54Z
+    - Apply argument defaults when referenced variables are omitted.
+    - Reject unknown resolver modes during schema compilation.
+    - Preserve DataLoader ticket all/race Promise compatibility.
+    - Speed up variable preparation and direct variable argument lookup.
+    - Add fast resolver ABIs for zero-, one-, and multiple-argument fields.
+    - Add explicit fast_resolve modes for reduced resolver callback signatures.
+    - Add zero-argument object accessors that bypass the generic resolver adapter.
+    - Cache accessor method lookup with subclass and redefinition invalidation.
+
 0.03 2026-07-22T10:49:34Z
     - Preflight oversized parser inputs and add heaptrack gate (#86)
     - Acknowledge graphql-perl influence (#87)

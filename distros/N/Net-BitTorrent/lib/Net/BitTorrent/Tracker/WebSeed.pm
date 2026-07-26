@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Tracker::WebSeed v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Tracker::WebSeed v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use HTTP::Tiny;
     use Net::BitTorrent::SSRF qw[is_safe_url];
     field $url : param : reader;                                  # Base URL

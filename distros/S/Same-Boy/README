@@ -1,0 +1,44 @@
+Same-Boy
+
+Same::Boy is a Game Boy and Game Boy Color emulator for Perl. It is an XS
+binding over the Core of SameBoy (https://github.com/LIJI32/SameBoy), a
+highly accurate emulator by Lior Halphon. The Core is vendored and compiled
+into the extension, so there are no external library dependencies.
+
+SameBoy's own MIT-licensed open-source boot ROMs are embedded, so the
+emulator boots out of the box -- no copyrighted Nintendo boot ROMs and no
+build-time assembler toolchain are required. (Cartridge ROMs are supplied by
+you at runtime and are not included.)
+
+SYNOPSIS
+
+    use Same::Boy;
+
+    my $gb = Same::Boy->new(model => 'cgb', rom => 'game.gbc');
+
+    $gb->run_frame for 1 .. 60;
+
+    my ($w, $h) = $gb->dimensions;   # 160, 144
+    my $frame   = $gb->pixels;       # packed 0x00RRGGBB words, $w*$h of them
+
+    $gb->press('a');
+    $gb->run_frame;
+    $gb->release('a');
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+A C compiler is required. RGBDS is NOT required to build or install; it is
+only needed to regenerate the embedded boot ROMs (see tools/gen_bootroms).
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION and is free software,
+licensed under the Artistic License 2.0.
+
+The vendored SameBoy Core and boot ROMs are Copyright (c) Lior Halphon,
+used under the Expat (MIT) license; see LICENSE.SameBoy.

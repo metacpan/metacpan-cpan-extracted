@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
-class Net::BitTorrent::Protocol::Simulation v2.0.0 : isa(Net::BitTorrent::Protocol::BEP11) {
+class Net::BitTorrent::Protocol::Simulation v2.1.1 : isa(Net::BitTorrent::Protocol::BEP11) {
     field $peer : reader : writer;
 
     method _handle_message ( $id, $payload ) {

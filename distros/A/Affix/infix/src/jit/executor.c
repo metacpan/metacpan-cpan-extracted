@@ -524,7 +524,7 @@ static void _infix_register_seh_windows_x64(infix_executable_t * exec,
             "Registered SEH PDATA at %p (XDATA at %p, Stub at %p) for JIT code at %p", rf, ui, stub, exec->rx_ptr);
     }
     else {
-        fprintf(stderr, "infix: RtlAddFunctionTable failed! GetLastError=%lu\n", GetLastError());
+        INFIX_DEBUG_PRINTF("infix: RtlAddFunctionTable failed! GetLastError=%lu\n", GetLastError());
     }
 }
 #elif defined(INFIX_ARCH_AARCH64)
@@ -620,7 +620,7 @@ static void _infix_register_seh_windows_arm64(infix_executable_t * exec,
             "Registered SEH PDATA at %p (XDATA at %p, Stub at %p) for JIT code at %p", rf, ui, stub, exec->rx_ptr);
     }
     else {
-        fprintf(stderr, "infix: RtlAddFunctionTable failed! GetLastError=%lu\n", GetLastError());
+        INFIX_DEBUG_PRINTF("infix: RtlAddFunctionTable failed! GetLastError=%lu\n", GetLastError());
     }
 }
 #endif
@@ -1136,6 +1136,19 @@ c23_nodiscard bool infix_protected_make_readonly(infix_protected_t prot) {
  * @param args_array A pointer to the `void**` array of argument pointers.
  */
 void infix_internal_dispatch_callback_fn_impl(infix_reverse_t * context, void * return_value_ptr, void ** args_array) {
+    INFIX_DEBUG_PRINTF("REVERSE_DISPATCH: context=%p ret=%p args=%p num_args=%zu\n",
+                       (void *)context,
+                       return_value_ptr,
+                       (void *)args_array,
+                       context->num_args);
+    if (args_array) {
+        for (size_t i = 0; i < context->num_args; i++) {
+            INFIX_DEBUG_PRINTF("  args[%zu] = %p", i, args_array[i]);
+            if (args_array[i])
+                INFIX_DEBUG_PRINTF(" (val32: %d %d)", ((int *)args_array[i])[0], ((int *)args_array[i])[1]);
+            INFIX_DEBUG_PRINTF("\n");
+        }
+    }
     INFIX_DEBUG_PRINTF("Dispatching reverse call. Context: %p, User Fn: %p, ret=%p, args=%p",
                        (void *)context,
                        context->user_callback_fn,

@@ -1,4 +1,4 @@
-package Net::BitTorrent::Protocol::BEP03::Bencode v2.1.0 {
+package Net::BitTorrent::Protocol::BEP03::Bencode v2.1.1 {
     use v5.40;
     use Exporter qw[import];
     our %EXPORT_TAGS = ( all => [ our @EXPORT_OK = qw[bencode bdecode] ], bencode => [] );
@@ -13,7 +13,7 @@ package Net::BitTorrent::Protocol::BEP03::Bencode v2.1.0 {
         return '';
     }
 
-    sub bdecode( $string //= return, $k //= 0, $depth = 0 ) {
+    sub bdecode( $string //= return, $k //= 0, $depth //= 0 ) {
         no warnings 'recursion';    # Let me deal with it.
         die 'bencode nesting depth limit exceeded (max ' . MAX_BDECODE_DEPTH . ' levels)' if $depth > MAX_BDECODE_DEPTH;
         my $return;

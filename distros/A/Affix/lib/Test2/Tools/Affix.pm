@@ -4,31 +4,20 @@ package    #
     use blib;
     use Affix;
     use Affix::Build;
-    use Test2::API qw[context run_subtest];
-    use Test2::V0 -no_srand => 1, '!subtest';
-    use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
+    use Test2::API              qw[context run_subtest];
+    use Test2::Tools::Basic     qw[ok plan skip_all done_testing diag note pass fail];
+    use Test2::Tools::Class     qw[isa_ok];
+    use Test2::Tools::Compare   qw[is isnt like float];
+    use Test2::Tools::Exception qw[lives dies];
+    use Test2::Tools::Warnings  qw[warns];
     use Test2::Plugin::UTF8;
     use Test2::IPC;
     use Path::Tiny qw[path tempfile];
     use Exporter 'import';
     use Capture::Tiny ':all';
     our @CARP_NOT;
-    our %EXPORT_TAGS = (
-        all => [
-            our @EXPORT
-                = qw[
-                compile_ok affix_ok leaks
-                plan todo skip skip_all done_testing diag note
-                subtest ok isa_ok skip_all is isnt like
-                pass fail
-                lives dies try_ok warns warning
-                U D T F DNE array string float number bool hash etc end
-                refcount
-                can_ok isa_ok
-                capture imported_ok warns
-                path tempfile tempdir]
-        ]
-    );
+    our @EXPORT      = qw[compile_ok affix_ok leaks];
+    our %EXPORT_TAGS = ( all => \@EXPORT );
     #
     my $OS  = $^O;
     my $Inc = path($0)->absolute;

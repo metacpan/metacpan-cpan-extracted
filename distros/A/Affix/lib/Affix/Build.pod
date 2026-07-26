@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Affix::Build - Robust, Polyglot Build System for FFI Extensions
+Affix::Build - Polyglot Compiler Frontend for Building FFI Extensions in Everything from Assembly to Zig
 
 =head1 SYNOPSIS
 
@@ -37,20 +37,20 @@ Affix::Build - Robust, Polyglot Build System for FFI Extensions
 
 =head1 DESCRIPTION
 
-C<Affix::Build> is a cross-platform compilation utility designed to generate shared libraries (C<.dll>, C<.so>,
-C<.dylib>) from source code in over 20 different programming languages.
+Compile source code from 20+ languages into shared libraries ready for Affix binding. C<Affix::Build> is a
+cross-platform compilation utility designed to generate shared libraries (C<.dll>, C<.so>, C<.dylib>) from source code
+in over 20 different programming languages.
 
-While originally developed to compile test fixtures for the Affix suite, it has evolved into a robust tool for creating
-polyglot extensions. It abstracts away the complexity of invoking various compilers, normalizing object file
-extensions, handling platform-specific linker flags (such as MinGW vs. MSVC on Windows), and ensuring that language
-runtimes (like the Go GC or .NET Runtime) are correctly initialized.
+It abstracts away the complexity of invoking various compilers, normalizing object file extensions, handling
+platform-specific linker flags (such as MinGW vs. MSVC on Windows), and ensuring that language runtimes (like the Go
+GC or .NET Runtime) are correctly initialized.
 
-It serves as a powerful, polyglot alternative to C<Inline::*> modules—allowing you to write native code in your
+It serves as a powerful, polyglot alternative to C<Inline::*> modules. This allows you to write native code in your
 language of choice and instantly bind to it from Perl using L<Affix>.
 
 =head2 Build Strategies
 
-The builder automatically selects the optimal strategy based on the input sources:
+The builder automatically picks the right approach based on your sources:
 
 =over
 
@@ -80,9 +80,9 @@ to an aggregation strategy:
 
 =head1 CONSTRUCTOR
 
-    my $builder = Affix::Build->new( %params );
+Create a new compiler instance:
 
-Creates a new compiler instance.
+    my $builder = Affix::Build->new( %params );
 
 =over
 
@@ -103,6 +103,8 @@ Creates a new compiler instance.
 =back
 
 =head1 METHODS
+
+Add source files, then compile and link into a shared library:
 
 =head2 C<add( $input, %args )>
 
@@ -146,7 +148,7 @@ has already completed.
 
 =head1 SUPPORTED LANGUAGES
 
-C<Affix::Build> attempts to locate the necessary binaries in your system C<PATH>.
+20+ languages supported. The builder looks for compilers in your system C<PATH>.
 
 =head3 C / C++
 
@@ -274,6 +276,8 @@ Support is also included for:
 
 =head1 PLATFORM NOTES
 
+Platform-specific quirks and workarounds. The Windows/MinGW environment deserves special attention:
+
 =head2 Windows (MinGW / Strawberry Perl)
 
 This environment is notoriously considered "Polyglot Hard Mode." C<Affix::Build> performs several behind-the-scenes
@@ -291,7 +295,7 @@ tricks to make it work:
 
 =head1 AUTHOR
 
-Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Sanko Robinson - L<https://github.com/sanko>
 
 =head1 COPYRIGHT
 

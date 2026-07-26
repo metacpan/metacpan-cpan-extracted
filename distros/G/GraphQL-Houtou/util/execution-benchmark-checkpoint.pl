@@ -24,7 +24,7 @@ GetOptions(
 
 @cases = $include_async
   ? qw(async_scalar async_list async_object async_abstract async_preresolved)
-  : qw(nested_variable_object list_of_objects abstract_with_fragment varying_variables list_of_objects_json)
+  : qw(nested_variable_object list_of_objects abstract_with_fragment varying_variables dynamic_directive_guards list_of_objects_json)
   if !@cases;
 if ($include_async && $promise_backend eq 'promise_xs') {
   # The plain async cases only report the program runtime; async_preresolved

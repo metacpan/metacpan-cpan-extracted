@@ -1,6 +1,6 @@
 package Terse::Plugin::DBI;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.04'; 
+our $VERSION = '0.05'; 
 use base 'Terse::Plugin';
 
 use DBI;
@@ -32,7 +32,7 @@ Terse::Plugin::DBI - DBI in Terse
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

@@ -1,4 +1,4 @@
-package Affix::Platform::Windows v0.12.0 {
+package Affix::Platform::Windows v1.1.0 {
     use v5.40;
     use DynaLoader;
     use Win32;    # Core on Windows
@@ -46,11 +46,18 @@ package Affix::Platform::Windows v0.12.0 {
     }
 
     sub get_msvcrt_version() {
-        open( my $pipe, '-|', 'dumpbin /headers msvcrt.dll', 'r' ) or return;
-        my $dumpbin_output;
-        $dumpbin_output .= $_ while <$pipe>;
-        close $pipe;
-        return $1 if $dumpbin_output && $dumpbin_output =~ /FileVersion\s+(\d+\.\d+\.\d+\.\d+)/;
+        my $dumpbin = 'dumpbin';
+        for my $dir ( split ';', $ENV{PATH} ) {
+            my $file = File::Spec->catfile( $dir, $dumpbin );
+            $file .= '.exe' if $file !~ /\.exe$/i;
+            if ( -f $file ) {
+                open( my $pipe, '-|', $file, '/headers', 'msvcrt.dll' ) or return;
+                my $dumpbin_output;
+                $dumpbin_output .= $_ while <$pipe>;
+                close $pipe;
+                return $1 if $dumpbin_output && $dumpbin_output =~ /FileVersion\s+(\d+\.\d+\.\d+\.\d+)/;
+            }
+        }
     }
 
     sub find_library($name) {

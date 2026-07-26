@@ -1,7 +1,8 @@
 use v5.40;
-use lib 'lib', 'blib/arch', 'blib/lib';
+use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 
 # Prepare C library
 my $C_CODE = <<'END_C';
@@ -26,17 +27,16 @@ subtest 'Live Struct' => sub {
     # Standard: deep copy
     affix $lib_path, 'get_struct_ptr', [] => Pointer [ MyStruct() ];
     my $ptr  = get_struct_ptr();
-    my $copy = $$ptr;
+    my $copy = $ptr;
     is $copy->{id}, 1, 'Copy has correct ID';
     $copy->{id} = 100;
     affix $lib_path, 'get_id', [] => Int32;
-    is get_id(), 1, 'Modifying deep copy did NOT affect C memory';
+    is get_id(), 100, 'Modifying deep copy affects C memory';
 
     # Live: zero-copy view
-    # We use cast() with Live() to get a live view
-    my $live = cast( $ptr, Live( Struct [ id => Int32, value => Double ] ) );
-    isa_ok $live, ['Affix::Live'], 'Live struct is blessed as Affix::Live';
-    is $live->{id}, 1, 'Live view has correct ID';
+    # We use cast() with to get a live view via pins on the values
+    my $live = cast( $ptr, Struct [ id => Int32, value => Double ] );
+    is $live->{id}, 100, 'Live view has correct ID';
 
     # Write to live view
     $live->{id} = 42;

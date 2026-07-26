@@ -703,8 +703,13 @@ static infix_status generate_forward_argument_moves_sysv_x64(code_buffer * buf,
             emit_mov_reg_mem(buf, GPR_ARGS[loc->reg_index2], R15_REG, 8);   // mov gpr, [r15 + 8]
             break;
         case ARG_LOCATION_SSE_SSE_PAIR:
-            emit_movsd_xmm_mem(buf, XMM_ARGS[loc->reg_index], R15_REG, 0);   // movsd xmm1, [r15]
-            emit_movsd_xmm_mem(buf, XMM_ARGS[loc->reg_index2], R15_REG, 8);  // movsd xmm2, [r15 + 8]
+            emit_movsd_xmm_mem(buf, XMM_ARGS[loc->reg_index], R15_REG, 0);   // movsd xmm, [r15]
+            emit_movsd_xmm_mem(buf, XMM_ARGS[loc->reg_index2], R15_REG, 8);  // movsd xmm, [r15 + 8]
+            break;
+        case ARG_LOCATION_GPR_REFERENCE:
+            // For large aggregates passed by reference, the pointer *is* the argument.
+            // R15 already holds this pointer from args_array[i].
+            emit_mov_reg_reg(buf, GPR_ARGS[loc->reg_index], R15_REG);
             break;
         default:
             // Should be unreachable if layout is correct.
@@ -916,6 +921,9 @@ static infix_status prepare_reverse_call_frame_sysv_x64(infix_arena_t * arena,
         *out_layout = nullptr;
         return INFIX_ERROR_LAYOUT_FAILED;
     }
+    // Ensure max_align is at least 16 for proper stack alignment.
+    if (max_align < 16)
+        max_align = 16;
     size_t total_local_space = return_size + args_array_size + saved_args_data_size + max_align;
     // Safety check against allocating too much stack.
     if (total_local_space > INFIX_MAX_STACK_ALLOC) {
@@ -926,13 +934,16 @@ static infix_status prepare_reverse_call_frame_sysv_x64(infix_arena_t * arena,
     layout->total_stack_alloc = (uint32_t)_infix_align_up(total_local_space, max_align);
 
     // Local variables are accessed via negative offsets from the frame pointer (RBP).
-    // The layout is [ return_buffer | args_array | (padding) | saved_args_data ]
-    layout->return_buffer_offset = -(int32_t)layout->total_stack_alloc;
-    layout->args_array_offset = layout->return_buffer_offset + (int32_t)return_size;
-
-    // Align the start of the saved data area
-    layout->saved_args_offset =
-        (int32_t)_infix_align_up((size_t)(layout->args_array_offset + args_array_size), max_align);
+    // The layout is [ return_buffer | args_array | saved_args_data ]
+    int32_t offset = -(int32_t)layout->total_stack_alloc;
+    layout->return_buffer_offset = offset;
+    offset += (int32_t)return_size;
+    layout->args_array_offset = offset;
+    offset += (int32_t)args_array_size;
+    // Align the start of the saved data area down to 16 bytes.
+    // Use signed alignment (not _infix_align_up which operates on size_t) since these are negative offsets.
+    offset = offset & ~15;
+    layout->saved_args_offset = offset;
     layout->max_align = (uint32_t)max_align;
 
     *out_layout = layout;
@@ -951,11 +962,19 @@ static infix_status generate_reverse_prologue_sysv_x64(code_buffer * buf, infix_
     emit_push_reg(buf, RBP_REG);              // push rbp
     emit_mov_reg_reg(buf, RBP_REG, RSP_REG);  // mov rbp, rsp
 
-    // FORCE ALIGNMENT.
-    // AND RSP, -max_align
-    emit_and_reg_imm8(buf, RSP_REG, (int8_t)-(int8_t)layout->max_align);
+    // Save RAX
+    emit_push_reg(buf, RAX_REG);
 
-    emit_sub_reg_imm32(buf, RSP_REG, layout->total_stack_alloc);  // Allocate our calculated space.
+    // Ensure RSP is 16-byte aligned.
+    // At this point (push rbp, mov rbp, rsp), RSP is aligned to 16 bytes IF the caller was.
+    // If the caller was, RSP is [CallerRBP] [RetAddr]. The RetAddr pushed by CALL is 8 bytes.
+    // So RSP is 8-byte aligned.
+    // We need to make it 16-byte aligned.
+    emit_and_reg_imm8(buf, RSP_REG, -16);
+
+    // Allocate stack frame
+    emit_sub_reg_imm32(buf, RSP_REG, layout->total_stack_alloc);
+
     return INFIX_SUCCESS;
 }
 /**
@@ -993,7 +1012,7 @@ static infix_status generate_reverse_argument_marshalling_sysv_x64(code_buffer *
     // If the return value is passed by reference, save the pointer from RDI.
     if (return_in_memory)
         emit_mov_mem_reg(buf, RBP_REG, layout->return_buffer_offset, GPR_ARGS[gpr_idx++]);  // mov [rbp + offset], rdi
-    // Stack arguments passed by the caller start at [rbp + 16].
+    // [RBP] -> Saved old RBP, [RBP - 8] -> Saved RAX, [RBP + 8] -> Return address
     size_t stack_arg_offset = 16;
     for (size_t i = 0; i < context->num_args; i++) {
         infix_type * current_type = context->arg_types[i];
@@ -1026,8 +1045,10 @@ static infix_status generate_reverse_argument_marshalling_sysv_x64(code_buffer *
 
         bool is_from_stack = false;
         // Determine if the argument is in registers or on the stack.
-        if (classes[0] == MEMORY)
+        if (classes[0] == MEMORY) {
+            // MEMORY class: aggregate/struct passed on the stack.
             is_from_stack = true;
+        }
         else if (num_classes == 1) {
             if (classes[0] == SSE)
                 if (xmm_idx < NUM_XMM_ARGS) {
@@ -1234,6 +1255,12 @@ static infix_status generate_reverse_epilogue_sysv_x64(code_buffer * buf,
     }
     // Standard function epilogue: tear down stack frame and return.
     emit_mov_reg_reg(buf, RSP_REG, RBP_REG);
+
+    if (context->return_type->category == INFIX_TYPE_VOID) {
+        // Restore original RAX from its saved location at [RBP-8].
+        emit_mov_reg_mem(buf, RAX_REG, RBP_REG, -8);
+    }
+
     emit_pop_reg(buf, RBP_REG);
     emit_ret(buf);
     return INFIX_SUCCESS;
@@ -1462,6 +1489,10 @@ static infix_status generate_direct_forward_argument_moves_sysv_x64(code_buffer 
         case ARG_LOCATION_SSE_INTEGER_PAIR:
             emit_movsd_xmm_mem(buf, XMM_ARGS[arg_layout->location.reg_index], RSP_REG, temp_offset);
             emit_mov_reg_mem(buf, GPR_ARGS[arg_layout->location.reg_index2], RSP_REG, temp_offset + 8);
+            break;
+
+        case ARG_LOCATION_GPR_REFERENCE:
+            emit_mov_reg_mem(buf, GPR_ARGS[arg_layout->location.reg_index], RSP_REG, temp_offset);
             break;
 
         case ARG_LOCATION_STACK:

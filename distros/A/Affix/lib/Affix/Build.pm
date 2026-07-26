@@ -1,4 +1,4 @@
-package Affix::Build v1.0.9 {
+package Affix::Build v1.1.0 {
     use v5.40;
     use experimental qw[class try];
     use Config;
@@ -39,9 +39,11 @@ package Affix::Build v1.0.9 {
             $build_dir = Path::Tiny->new($build_dir) unless builtin::blessed $build_dir;
 
             # Standard convention: Windows DLLs don't need 'lib' prefix, Unix SOs do.
-            my $prefix = ( $os eq 'MSWin32' || $name =~ /^lib/ ) ? ''          : 'lib';
-            my $suffix = defined $version                        ? ".$version" : '';
-            $libname = $build_dir->child("$prefix$name.$so_ext$suffix")->absolute;
+            my $prefix    = ( $os eq 'MSWin32' || $name =~ /^lib/ ) ? ''          : 'lib';
+            my $suffix    = defined $version                        ? ".$version" : '';
+            my $safe_name = $name;
+            $safe_name =~ s/[^\w.-]/_/g;
+            $libname = $build_dir->child("$prefix$safe_name.$so_ext$suffix")->absolute;
 
             # We prefer C++ drivers (g++, clang++) to handle standard libraries for mixed code (C+Rust, C+C++)
             $linker = $self->_can_run(qw[g++ clang++ c++ icpx]) || $self->_can_run(qw[cc gcc clang icx cl]) || 'c++';
@@ -607,8 +609,9 @@ XML
             }
         }
 
-        method _build_cobol ( $file, $out, $mode ) {
+        method _build_cobol ( $src, $out, $mode ) {
             my $cobc = $self->_can_run('cobc') // croak "GnuCOBOL not found";
+            my $file = ref $src ? $src->{path} : $src;
             if ( $mode eq 'dynamic' ) {
 
                 # -b = build dynamic module
@@ -624,8 +627,9 @@ XML
             }
         }
 
-        method _build_ocaml ( $file, $out, $mode ) {
-            my $ml = $self->_can_run('ocamlopt') // croak "OCaml not found";
+        method _build_ocaml ( $src, $out, $mode ) {
+            my $ml   = $self->_can_run('ocamlopt') // croak "OCaml not found";
+            my $file = ref $src ? $src->{path} : $src;
             if ( $mode eq 'dynamic' ) {
 
                 # ocamlopt -shared -o lib.so file.ml
@@ -639,8 +643,9 @@ XML
 
         #~ https://wiki.liberty-eiffel.org/index.php/Compile
         #~ https://svn.eiffel.com/eiffelstudio-public/branches/Eiffel_54/Delivery/docs/papers/dll.html
-        method _build_eiffel ( $file, $out, $mode ) {
-            my $se = $self->_can_run('se') // croak "SmartEiffel not found";
+        method _build_eiffel ( $src, $out, $mode ) {
+            my $se   = $self->_can_run('se') // croak "SmartEiffel not found";
+            my $file = ref $src ? $src->{path} : $src;
 
             # Transpile to C
             my $c_file = $build_dir->child( $self->_base($file) . '.c' );

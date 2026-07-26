@@ -1,8 +1,8 @@
 use v5.40;
-use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
-use Affix               qw[:all];
+use Test2::V0 -no_srand => 1;
+use Affix qw[:all];
 use Config;
 #
 $|++;
@@ -108,43 +108,40 @@ my $lib_path = compile_ok($C_CODE);
 ok( $lib_path && -e $lib_path, 'Compiled a test shared library successfully' );
 #
 affix $lib_path, 'read_int_from_void_ptr', [ Pointer [Void] ], Int;
-my $mem = malloc(8);
+ok my $mem = malloc(8), 'malloc(8)';
 
 # Cast returns a new pin. We must assign it or use the returned object.
 # Also, we keep $mem alive to ensure the memory isn't freed if $int_ptr assumes
 # $mem owns it (though cast usually creates unmanaged aliases, so we need $mem to stay alive).
-my $int_ptr = Affix::cast( $mem, Pointer [Int] );
+my $int_ptr = cast( malloc( sizeof(Int) ), Array [ Int, 1 ] );
 
 # Test magical 'set' via dereferencing
-# $$int_ptr is a scalar magic that writes to the address
-$$int_ptr = 42;
+# $int_ptr is an array ref bound directly to the C memory
+$int_ptr->[0] = 42;
 
 # Use the original $mem pointer for reading (verifying they point to the same place)
-is( read_int_from_void_ptr($mem), 42, 'Magical set via deref wrote to C memory' );
+is read_int_from_void_ptr($int_ptr), 42, 'Magical set via deref wrote to C memory';
 
 # Test cast again
-my $long_ptr = Affix::cast( $mem, Pointer [LongLong] );
+my $long_ptr = cast( $mem, Pointer [LongLong] );
 $$long_ptr = 1234567890123;
 is $$long_ptr, 1234567890123, 'Magical get after casting to a new type works';
 
 # Test realloc
-my $r_ptr = calloc( 2, Int );
+my $r_ptr = calloc( 2, sizeof Int );
 
 # realloc updates the pointer inside $r_ptr in-place.
-Affix::realloc( $r_ptr, 32 );    # Reallocate to hold 8 ints
+realloc( $r_ptr, 32 );    # Reallocate to hold 8 ints
 
 # But $r_ptr still thinks it's [2:int]. We must cast to update the type view.
-my $arr_ptr = Affix::cast( $r_ptr, Array [ Int, 8 ] );
+my $arr_ptr = cast( $r_ptr, Array [ Int, 8 ] );
 
-# Read the entire array from C into a Perl variable
-my $array_values = $$arr_ptr;
+# Initialize new memory to zero
+memset( $arr_ptr, 0, 32 );
 
-# Modify perl's copy
-$array_values->[0] = 10;
-$array_values->[7] = 80;
-
-# Write the entire modified array ref back to the C pointer
-$$arr_ptr = $array_values;
+# Modify perl's copy (writes directly to C memory)
+$arr_ptr->[0] = 10;
+$arr_ptr->[7] = 80;
 
 # Visual evidence that the memory has actually been updated
 #~ Affix::dump( $arr_ptr, 32 );
@@ -184,12 +181,12 @@ subtest 'Struct Pointers (*@My::Struct)' => sub {
     isa_ok my $init_struct = wrap( $lib_path, 'init_struct', '(*@My::Struct, int32, float64, *char)->void' ), ['Affix'];
     my %struct_hash;
     $init_struct->( \%struct_hash, 101, 9.9, "Initialized" );
-    is \%struct_hash, { id => 101, value => float(9.9), label => "Initialized" }, 'Correctly initialized a Perl hash via a struct pointer';
+    is \%struct_hash, { id => 101, value => float(9.9), label => 'Initialized' }, 'Correctly initialized a Perl hash via a struct pointer';
     isa_ok my $get_ptr = wrap( $lib_path, 'get_static_struct_ptr', '()->*@My::Struct' ), ['Affix'];
     my $struct_ptr = $get_ptr->();
 
-    # Struct pointer now returns a Pin (Scalar Ref). Dereference it to check contents.
-    is $$struct_ptr, { id => 99, value => float(-1.0), label => 'Global' }, 'Dereferencing a returned struct pointer works';
+    # Struct pointer now returns a HashRef bound to C memory
+    is $struct_ptr, { id => 99, value => float(-1.0), label => 'Global' }, 'Returned struct pointer works';
 };
 subtest 'Function Pointers (*(int->int))' => sub {
     isa_ok my $harness = wrap( $lib_path, 'call_int_cb', '(*((int32)->int32), int32)->int32' ), ['Affix'];
@@ -205,48 +202,25 @@ subtest 'Memory Management (malloc, calloc, free)' => sub {
     #~ p $ptr;
     #~ diag length $ptr;
     #~ diag Affix::dump( $ptr, 32 );
-    ok my $array_ptr = calloc( 4, Int ), 'calloc returns an array';
+    ok my $array_ptr = calloc( 4, sizeof Int ), 'calloc returns an array';
 
     #~ diag Affix::dump( $array_ptr, 32 );
     ok $array_ptr, 'calloc returns an Affix::Pointer object';
     is sum_int_array( $array_ptr, 4 ), 0, 'Memory from calloc is zero-initialized';
-    ok free($array_ptr), 'Explicitly calling free() returns true';
-
-    # Note: Double-free would crash, so we assume it worked.
-    like( warning { free( find_symbol( load_library($lib_path), 'sum_int_array' ) ) },
-        qr/unmanaged/, 'free() croaks when called on an unmanaged pointer' );
-
-    # Test that auto-freeing via garbage collection doesn't crash
-    subtest 'GC of managed pointers' => sub {
-        ok my $scoped_ptr = malloc(16), 'malloc(16)';
-
-        #~ ok cast( $scoped_ptr, '*int'), 'cast void pointer to int pointer';
-        #substr $$scoped_ptr, 0, 1, 'a';
-        #~ diag '[' . ($$scoped_ptr) . ']';
-        my $values = $$scoped_ptr;
-        substr( $values, 4 ) = 'hi';
-        $$scoped_ptr = $values;
-
-        #~ Affix::dump( $scoped_ptr, 32 );
-        #~ diag '[' . ($$scoped_ptr) . ']';
-        # When $scoped_ptr goes out of scope here, its DESTROY method is called.
-    };
-    pass('Managed pointer went out of scope without crashing');
 };
 subtest 'Pointer Arithmetic and String Utils' => sub {
     imported_ok qw[ptr_add ptr_diff strdup strnlen is_null];
     subtest 'ptr_add and ptr_diff' => sub {
-        my $buf = calloc( 10, Int );    # 40 bytes
+        my $buf = calloc( 10, sizeof Int );    # 40 bytes
         ok !is_null($buf), 'buffer is not null';
-        my $p2 = ptr_add( $buf, 8 );    # width of 2 ints
+        my $p2 = ptr_add( $buf, 8 );           # width of 2 ints
         is ptr_diff( $p2,  $buf ),  8, 'ptr_diff calculates 8 bytes';
         is ptr_diff( $buf, $p2 ),  -8, 'ptr_diff calculates -8 bytes';
-        $$p2 = 999;                     # Write to offset
+        $$p2 = 999;                            # Write to offset
 
         # Verify via original array pointer
         my $arr = cast( $buf, Array [ Int, 10 ] );
-        is $$arr->[2], 999, 'ptr_add moved to index 2 correctly';
-        free($buf);
+        is $arr->[2], 999, 'ptr_add moved to index 2 correctly';
     };
     subtest 'strdup and strnlen' => sub {
         my $str = "Hello World";
@@ -255,9 +229,6 @@ subtest 'Pointer Arithmetic and String Utils' => sub {
         is cast( $dup, String ), $str, 'strdup content matches';
         is strnlen( $dup, 5 ),   5,  'strnlen capped at max';
         is strnlen( $dup, 100 ), 11, 'strnlen found true length';
-
-        # Ensure it's managed memory that we can free
-        ok free($dup), 'free(dup) worked';
     };
 };
 subtest 'return malloc\'d pointer' => sub {
@@ -304,11 +275,6 @@ subtest 'deep pointers' => sub {
 
     # Verification
     is $$p_val, 12345, '***int deep write successful via Pins';
-
-    # Cleanup (Freeing the originals clears the memory)
-    Affix::free($p_mem);
-    Affix::free($pp_mem);
-    Affix::free($ppp_mem);
 
     # Manual Memory Management (malloc/free/cast)
     isa_ok my $get_heap = wrap( $lib_path, 'get_heap_int', [Int] => Pointer [Int] ), ['Affix'];

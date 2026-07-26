@@ -1,6 +1,6 @@
 package Terse::Plugin::Glitch;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use Glitch;
 use YAML::XS;
 use JSON;
@@ -53,7 +53,7 @@ Terse::Plugin::Glitch - The great new Terse::Plugin::Glitch!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

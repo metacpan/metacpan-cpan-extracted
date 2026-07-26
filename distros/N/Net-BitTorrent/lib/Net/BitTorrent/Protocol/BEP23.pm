@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
-class Net::BitTorrent::Protocol::BEP23 v2.0.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Protocol::BEP23 v2.1.1 : isa(Net::BitTorrent::Emitter) {
     use Socket qw[inet_pton inet_ntop AF_INET];
 
     sub pack_peers_ipv4 (@peers) {

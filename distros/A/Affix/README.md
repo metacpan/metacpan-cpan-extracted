@@ -20,6 +20,9 @@ say pow( 2.0, 10.0 ); # 1024
 typedef Point => Struct[ x => Int, y => Int ];
 affix $lib, 'draw_point', [ Point() ] => Void;
 draw_point( { x => 10, y => 20 } );
+affix $lib, 'get_pos', [] => Point();
+my $pt = get_pos();
+say sprintf 'x: %d, y: %d', $pt->{x}, $pt->{y};
 
 # We can also allocate and manage raw memory and write data to it
 my $ptr = Affix::malloc(1024);
@@ -39,41 +42,33 @@ Affix::free($ptr);
 
 # DESCRIPTION
 
-Affix is a high-performance, developer friendly Foreign Function Interface (FFI) extension for Perl. It serves as a
-universal bridge to the vast ecosystem of native software including those written in C, Rust, Zig, C++, Go, Fortran,
-and more without writing XS code, managing a compiler, or compromising on execution speed. Affix also comes with an
-extensive type system including native support for primitives (including half-width floats and 128bit integers), nested
-C style structs, union, fixed size arrays, smart handling of enums, SIMD vector types, and, of course, pointers.
+Call native code from Perl without XS, compilers, or runtime overhead.
 
-At its core, Affix is powered by [infix](https://github.com/sanko/infix/), a lightweight JIT (Just-In-Time) compilation
-engine designed with speed and portability as its primary objectives. Unlike traditional FFI solutions that rely on
-generic, per-call dispatch loops, Affix generates optimized machine code trampolines at runtime. These trampolines
-handle argument marshalling and return value processing directly, significantly reducing the overhead of crossing the
-boundary between Perl and native code. The underlying infix engine is [rigorously tested across a diverse range of
-environments](https://github.com/sanko/infix/actions/workflows/ci.yml), ensuring reliable performance on Linux, Windows,
-macOS, Solaris, and various BSD flavors. It supports multiple CPU architectures including `x86_64` and `AArch64`
-(ARM64).
+Affix is a high-performance Foreign Function Interface (FFI) for Perl. It bridges Perl to C, Rust, Zig, C++, Go,
+Fortran, and more via JIT-compiled trampolines that handle argument marshalling at runtime—no generic dispatch loops.
+The result is near-native call speed with a rich type system covering primitives, structs, unions, enums, SIMD vectors, and pointers.
 
-Affix serves as a universal bridge to the vast ecosystem of native software. Whether you're tapping into a legacy
-Fortran math routine, a modern Rust crate, or a system-level C library, Affix makes the integration safe, idiomatic,
-and exceptionally fast.
+Powered by [infix](https://github.com/sanko/infix/), which has been tested on Linux, Windows, macOS, Solaris, BSD, and across
+`x86_64` and `AArch64` (ARM64).
 
 # EXPORTS
 
-Affix exports standard types (`Int`, `Double`, etc.) and core functions (`affix`, `wrap`, `load_library`) by
-default. You can control imports using tags:
+Import types and functions with built-in tags. By default, Affix exports standard types (`Int`, `Double`, etc.) and
+core functions (`affix`, `wrap`, `load_library`).
+
+Control what gets imported:
 
 ```perl
 use Affix qw[:all];    # Import everything
 use Affix qw[:lib];    # Library helpers (libc, libm, load_library...)
-use Affix qw[:memory]; # malloc, free, memcpy, cast, dump...
-use Affix qw[:pin];    # Variable binding (pin, unpin)
+use Affix qw[:memory]; # malloc, free, memcpy, cast, dump, raw, snapshot, pin, unpin...
 use Affix qw[:types];  # Types only (Int, Struct, Pointer...)
 ```
 
 # CORE API
 
-These functions are the primary entry points for interacting with foreign libraries.
+Bind functions to Perl subroutines and define custom types. These are the primary entry points for interacting with
+foreign libraries.
 
 ## `affix( $lib, $symbol, $params, $return )`
 
@@ -107,11 +102,6 @@ my $pow = wrap $lib, 'pow', [ Double, Double ] => Double;
 my $result = $pow->( 2, 5 );
 ```
 
-## `direct_affix( ... )` / `direct_wrap( ... )`
-
-**Experimental:** Bypasses standard safety checks and intermediate processing for maximum performance with simple
-primitives. Generates highly specialized trampolines that read Perl SVs directly from the stack.
-
 ## `typedef( $name => $type )`
 
 Registers a named type alias. This makes signatures more readable and is required for recursive types and smart Enums.
@@ -140,19 +130,41 @@ coerce( Float, 1.5 );
 
 # VARIABLES & PINNING
 
-Affix allows you to link Perl scalars directly to global or external variables exported by C libraries.
+Bind Perl scalars directly to C global variables for real-time, two-way access to C memory.
 
-## `pin( $var, $lib, $symbol, $type )`
+## `pin( ... )`
 
-Binds a scalar to a C variable. Reading the scalar reads C memory; writing to it updates C memory immediately.
+Binds a scalar to a C variable. Reading the scalar reads C memory; writing to it updates C memory immediately. Three
+calling conventions are supported:
 
-```perl
-# C: extern int errno;
-my $errno;
-pin $errno, libc(), 'errno', Int;
+- **pin( $var, $lib, $symbol, $type )**
 
-$errno = 0;   # Writes directly to C memory
-```
+    Binds to an exported symbol. This is the most common form.
+
+    ```perl
+    # C: extern int errno;
+    my $errno;
+    pin $errno, libc(), 'errno', Int;
+
+    $errno = 0;   # Writes directly to C memory
+    ```
+
+- **pin( $var, $address, $type )**
+
+    Binds to a raw memory address (e.g., from `find_symbol` or pointer arithmetic).
+
+    ```perl
+    my $addr = address($some_ptr);
+    pin my $val, $addr, Int;
+    ```
+
+- **pin( $var, $existing\_pin )**
+
+    Clones the binding from an existing pin (copies the address and type).
+
+    ```perl
+    pin my $copy, $original_pin;
+    ```
 
 ## `unpin( $var )`
 
@@ -160,8 +172,8 @@ Removes the magic applied by `pin`. The variable retains its last value but is n
 
 # TYPE SYSTEM
 
-Affix signatures are built using helper functions that map precisely to C types. These are exported by default, or can
-be imported explicitly using the `:types` tag.
+Map C types to Perl with a rich, built-in vocabulary. Affix signatures are built using helper functions that map
+precisely to C types. These are exported by default, or can be imported explicitly using the `:types` tag.
 
 ## Primitive Types
 
@@ -220,16 +232,75 @@ Use these when a C library explicitly requests a `stdint.h` type.
 
 ### `Pointer[ $type ]`
 
-A pointer to another type. When used as an argument, you can pass a **reference to a scalar** for automatic temporary
-allocation and write-back.
+A pointer to another type. Affix wraps pointers in magical Perl scalar references that read and write C memory directly
+via the `$$` dereference operator.
+
+#### Reading
+
+Dereferencing reads the value from C memory:
 
 ```perl
-# C: void get_val(int *val);
-affix $lib, 'get_val', [ Pointer[Int] ] => Void;
-my $val = 0;
-get_val(\$val);
-say $val; # Updated by C
+affix $lib, 'get_ptr', [] => Pointer[Int];
+my $ptr = get_ptr();
+say $$ptr;  # Reads the int value from C memory
 ```
+
+#### Writing
+
+Assigning through the dereference writes directly to C memory:
+
+```
+$$ptr = 42;  # Writes 42 to the C memory address
+```
+
+This works for deep pointer chains as well:
+
+```perl
+# int*** ptr; ***ptr = 5;
+my $ppp = cast( $mem, Pointer[ Pointer[ Pointer[Int] ] ] );
+$$ppp = $pp_val;  # Writes the pointer address through the chain
+```
+
+#### Passing Scalars as Pointers
+
+When a function expects a `Pointer[$type]` argument, pass a **scalar reference** (`\$var`) to send the address of a
+Perl scalar. Affix automatically handles the marshalling:
+
+```perl
+# C: int deref_and_add(int* p);
+affix $lib, 'deref_and_add', [ Pointer[Int] ] => Int;
+
+my $val = 50;
+is deref_and_add( \$val ), 60;  # Passes address of $val as int*
+
+# C: void modify_int_ptr(int* p, int new_val);
+affix $lib, 'modify_int_ptr', [ Pointer[Int], Int ] => Void;
+modify_int_ptr( \$val, 999 );
+say $val;  # 1000; C function wrote through the pointer
+```
+
+#### Array Indexing
+
+Pointers to arrays support direct element access via array subscript syntax. Reads and writes go directly to C memory:
+
+```perl
+affix $lib, 'get_array_ptr', [] => Pointer[ Array[ Int, 4 ] ];
+my $arr = get_array_ptr();
+say $arr->[0];   # Read first element from C memory
+$arr->[2] = 99;  # Write third element in C memory
+```
+
+To take a deep copy (snapshot), dereference into an anonymous array ref:
+
+```perl
+my $snapshot = [@$arr];
+$snapshot->[0] = 100;  # Modifying snapshot does NOT affect C memory
+```
+
+#### Void Pointers
+
+If `$type` is `Void`, the pointer is "terminal." Dereferencing it will return `undef`. In this case, use `cast()`
+or `address()` to work with the raw memory address.
 
 ### Specialized Pointers
 
@@ -257,13 +328,16 @@ A C union, mapped to a Perl `HashRef` with exactly one key.
 typedef Event => Union[ key_code => Int, pressure => Float ];
 ```
 
-### `Packed[ $align, $aggregate ]`
+### `Packed[ $aggregate ]` / `Packed[ $align, $aggregate ]`
 
 Forces specific byte alignment on a Struct or Union (e.g., `#pragma pack(1)`).
 
 ```perl
-# C: #pragma pack(push, 1) ...
-Packed[ 1, Struct[ flag => Char, data => Int ] ];
+# Without explicit alignment (default):
+Packed[ Struct[ flag => Char, data => Int ] ];
+
+# With explicit alignment (e.g., #pragma pack(push, 1)):
+Packed( 1, Struct[ flag => Char, data => Int ] );
 ```
 
 ### `Array[ $type, $count ]`
@@ -286,26 +360,24 @@ typedef Config => Struct[ a => UInt32 | 1, b => UInt32 | 3 ];
 
 ## Live Views (Zero-Copy Aggregates)
 
-Standard structs and arrays copy data between Perl and C. Live views allow you to directly manipulate C memory through
-Perl references.
+In Affix, memory structures are live by design. When C returns a pointer to an aggregate (Struct, Union, or Array), or
+when you use `cast()` to overlay a type onto a memory address, Affix does not copy the data.
 
-`Live[ $type ]` Returns a live, zero-copy view of the memory as defined by `$type`.
+Instead, it returns a magical Perl reference (blessed into `Affix::Pointer`) mapped directly to the C memory via Perl
+VTables. This means zero-copy performance without the overhead of `tie`.
 
-If `$type` is a `Struct` or `Union`, it returns an `Affix::Live` tied hash. Modifying keys in this hash updates C
-memory immediately.
-
-If `$type` is an `Array`, it returns an `Affix::Pointer` object. Modifying elements (e.g. `$arr->[0] = 5`)
-writes directly to memory.
+Modifying keys or elements in these structures updates C memory immediately, and reading them reads directly from the C
+heap.
 
 ```perl
 # Example: Live view of a struct
-my $live = cast( $ptr, Live[ Struct[ x => Int, y => Int ] ] );
+my $live = cast( $ptr, Struct[ x => Int, y => Int ] );
 $live->{x} = 42; # Updates C memory
 ```
 
 ### Unified Access
 
-`Affix::Pointer` objects for aggregates allow direct field access (`$p->{field}`) without explicit casting.
+Magical `Affix::Pointer` references allow direct field access (`$p->{field}`) without explicit casting.
 
 ```perl
 affix $lib, 'get_ptr', [] => Pointer[Point];
@@ -400,11 +472,18 @@ my $packed_res = add_vecs( $v1, $v2 );
 
 # MEMORY MANAGEMENT
 
-When bridging Perl and C, handling raw memory safely is critical. Affix uses **Pins** to manage this boundary.
+Allocate, cast, and manage C memory safely from Perl using zero-copy VTable magic. When bridging Perl and C, handling
+raw memory safely is critical. Affix uses **Pins** to manage this boundary.
 
-A Pin (an `Affix::Pointer` object) is a magical scalar reference that holds a C memory address, its associated type
-information, and an ownership flag. If a Pin is "managed", Perl will automatically free the underlying memory when the
-variable goes out of scope.
+Affix now features a completely reimagined memory access system using Perl's internal magic to map Perl variables
+directly to native C memory. This provides zero-copy performance with the ergonomics of native Perl Hashes and Arrays.
+
+## Managed vs. Unmanaged Memory
+
+Memory in Affix is handled by life lines.
+
+- **Affix::Memory:** Created via `malloc()` or `calloc()`. These are root objects. When the Perl variable is destroyed, `safefree()` is called automatically.
+- **Pins:** Created via `cast()` or pointer dereferencing. These variables do not own the memory, but they hold a reference to a life line to prevent the parent memory from being freed prematurely.
 
 ## Allocation & Deallocation
 
@@ -412,21 +491,19 @@ These functions allocate memory on the C heap. Memory allocated via these functi
 
 ### `malloc( $size )`
 
-Allocates `$size` bytes of uninitialized memory. Returns a managed `Pointer[Void]` pin.
+Allocates `$size` bytes of uninitialized memory. Returns a `Pointer[Void]` pin.
 
 ```perl
 my $ptr = malloc(1024); # Allocates 1KB
-# $ptr is automatically freed when it goes out of scope
 ```
 
-### `calloc( $count, $type )`
+### `calloc( $count, $size )`
 
-Allocates memory for an array of `$count` elements of the given `$type`, and zero-initializes the memory. Returns a
-managed pin typed as an Array.
+Allocates zero-initialized memory for `$count` elements of `$size`. Returns a `Pointer[Void]` pin.
 
 ```perl
-my $arr = calloc( 10, Int );
-$arr->[0] = 42; # Write directly to the first element
+my $ptr = calloc( 10, sizeof(Int) );
+my $arr = cast( $ptr, Array[Int, 10] );
 ```
 
 ### `realloc( $ptr, $new_size )`
@@ -459,20 +536,31 @@ a segmentation fault.
 free($ptr);
 ```
 
-## Lifecycle & Ownership
+### `own( $pin )`
 
-### `own( $ptr, [$bool] )`
+Returns true if the given pin is an owned `Affix::Memory` object (i.e., memory allocated via `malloc` or `calloc`
+that Perl manages directly). Returns false for unmanaged pins or raw scalars.
 
-Gets or sets the lifecycle management status of a pointer.
+```
+if (own($ptr)) {
+    say "Perl owns this memory; it will be freed automatically.";
+}
+```
 
-- `own($ptr, 1)`: Perl takes ownership. `free()` will be called automatically when `$ptr` is garbage collected.
-- `own($ptr, 0)`: Perl releases ownership. You (or the C library) are now responsible for freeing the memory.
+### `is_pin( $var )`
+
+Returns true if the variable is currently bound to C memory via `pin`, `cast`, or pointer dereferencing. Returns
+false for ordinary Perl scalars.
 
 ```perl
-# Take ownership of a pointer returned from C
-my $c_string = get_string_from_c();
-own($c_string, 1);
+my $x = 42;
+say is_pin($x); # false
+
+pin $x, libc(), 'errno', Int;
+say is_pin($x); # true
 ```
+
+## Lifecycle & Ownership
 
 ### `attach_destructor( $pin, $func_ptr, [$lib] )`
 
@@ -487,27 +575,31 @@ my $free_func = find_symbol($my_lib, 'custom_free');
 attach_destructor($ptr, $free_func, $my_lib);
 ```
 
+### `readonly( $pin, [$bool] )`
+
+Gets or sets the "const" status of a memory pin. If set to true, any attempt to write to that memory from Perl will
+throw an exception.
+
+```
+readonly($point, 1);
+$point->{x} = 20; # CRASH: Modification of a read-only C value
+```
+
 ## Type Casting
 
 ### `cast( $ptr, $type )`
 
-Reinterprets a memory address as a new type. The behavior depends on the requested `$type`:
-
-- **Casting to a Value (Primitives/Strings):** Reads the memory immediately and returns a Perl scalar copy.
-- **Casting to a Reference (Pointers/Live Views):** Returns a **new unmanaged Pin** that aliases the same memory address, allowing you to interact with it using the new type's rules.
+The most powerful tool in the memory kit. It "overlays" a C type definition onto a raw memory address.
 
 ```perl
-my $void_ptr = malloc(4);
-
-# 1. Alias the memory as an Integer pointer
-my $int_ptr = cast($void_ptr, Pointer[Int]);
-$int_ptr->[0] = 99;
-
-# 2. Read the memory immediately as an integer value
-my $val = cast($void_ptr, Int); # Returns 99
+my $mem = malloc(16);
+my $point = cast($mem, Struct[ x => Int, y => Int ]);
+$point->{x} = 10;
 ```
 
 # POINTER UTILITIES
+
+Navigate and inspect raw pointers with helper functions for address arithmetic, null checks, and more.
 
 ### `address( $ptr )`
 
@@ -541,10 +633,21 @@ Returns true if the address is `NULL` (`0x0`).
 
 Safe string length calculation. Checks the pointer for a `NULL` terminator, scanning at most `$max` bytes.
 
-# RAW MEMORY OPERATIONS
+### `raw( $ptr, $length_in_bytes )`
 
-Affix exposes standard C memory operations for high-performance, raw byte manipulation. These functions accept either
-Pins or raw integer addresses.
+Returns a Perl string containing the raw, un-decoded binary data extracted directly from the memory address. This is
+the programmatic, binary equivalent of `dump()`.
+
+### `snapshot( $pin )`
+
+Deeply reads the C memory backing a Pin and returns a pure, non-magical native Perl data structure (ArrayRef, HashRef,
+or Scalar). Because it does not apply VTable magic to the returned values, reading elements from the returned structure
+in a bulk operation (like summing a 10,000 element array) is exceptionally fast.
+
+# Raw Memory Operations
+
+Classic C memory functions (memcpy, memset, etc.) available directly from Perl for high-performance byte manipulation.
+These functions accept either Pins or raw integer addresses.
 
 - `memcpy( $dest, $src, $bytes )`: Copies exactly `$bytes` from `$src` to `$dest`.
 - `memmove( $dest, $src, $bytes )`: Copies `$bytes` from `$src` to `$dest`. Safe to use if the memory regions overlap.
@@ -552,10 +655,82 @@ Pins or raw integer addresses.
 - `memcmp( $ptr1, $ptr2, $bytes )`: Compares the first `$bytes` of two memory blocks. Returns an integer less than, equal to, or greater than zero.
 - `memchr( $ptr, $byte_val, $bytes )`: Locates the first occurrence of `$byte_val` within the first `$bytes` of the memory block. Returns a new Pin pointing to the match, or `undef`.
 
+# `Const` & Readonly Memory
+
+Enforce C's const contract at the Perl level. Affix intercepts writes to read-only memory and throws a fatal exception:
+`Modification of a read-only C value attempted`.
+
+## Declarative Const: `Const[ $type ]`
+
+You can wrap any type in `Const[ ... ]` within a signature.
+
+```perl
+# C: void process(const char* name, const int* values);
+affix $lib, 'process', [ Const[String], Pointer[ Const[Int] ] ] => Void;
+```
+
+## Imperative Const: `readonly( $pin, [$bool] )`
+
+The `readonly()` function allows you to inspect or toggle the const status of a Pin or Aggregate at runtime. This acts
+as an _FFI Escape Hatch_ (similar to `const_cast` in C++).
+
+```perl
+my $point = cast($addr, 'struct { x: int, y: int }');
+
+readonly($point, 1); # Lock the entire struct
+$point->{x} = 10;    # FATAL ERROR
+```
+
+## Recursive Protection
+
+When an aggregate (Struct or Array) is marked as read-only, Affix automatically propagates that protection to all of
+its members.
+
+```perl
+my $rect = cast($addr, '+struct { top: {x:int, y:int}, bottom: {x:int, y:int} }');
+
+# Even though 'x' wasn't explicitly marked Const, it inherited protection
+# from the parent struct.
+$rect->{top}{x} = 5; # FATAL ERROR
+```
+
+## Casting with Const
+
+When using `cast( ... )`, you can prepend a `+` to the type signature to create an immutable view of a raw memory
+address.
+
+```perl
+my $view = cast($raw_addr, "+MyStruct");
+# $view is now a read-only HashRef mapping to C memory.
+```
+
+# Zero-copy Aggregates
+
+Structs, unions, and arrays map directly to C memory—no deep copies required. When C returns a pointer to an aggregate,
+Affix wraps it in a magical Perl reference that reads and writes C memory in real time.
+
+### Native Array Indexing
+
+C Arrays are traversed using standard Perl array syntax.
+
+```perl
+typedef Task => Struct[ id => Int, name => String ];
+affix $lib, 'get_tasks', [] => Pointer[ Array[ Task(), 10 ] ];
+
+my $tasks = get_tasks();
+$tasks->[5]{id} = 404; # Writes directly to C memory!
+```
+
+### Deep Null Safety
+
+Traversing a \`NULL\` pointer in C causes a segfault. Affix wraps C memory in Perl safety rails. If you try to traverse a
+\`NULL\` pointer inside a struct, Affix intercepts it and throws a standard Perl exception (`Can't use an undefined
+value as a HASH reference`).
+
 # LIBRARIES & SYMBOLS
 
-Loading dynamic libraries across different operating systems (Windows, macOS, Linux, BSD) can be a nightmare of varying
-extensions, prefixes, and search paths. Affix abstracts this complexity away with a smart library discovery engine.
+Load and inspect dynamic libraries across platforms. Affix's smart discovery engine handles varying extensions,
+prefixes, and search paths automatically.
 
 ## Library Discovery
 
@@ -642,8 +817,8 @@ if (!$lib) {
 
 # INTROSPECTION
 
-When working with C APIs, you often need to know exactly how much memory a structure consumes or where a specific field
-is located within a block of memory. Affix provides compiler-grade type introspection.
+Query type sizes, alignments, and field offsets like a compiler would. When working with C APIs, you often need to know
+exactly how much memory a structure consumes or where a specific field is located within a block of memory.
 
 ### `sizeof( $type )`
 
@@ -693,9 +868,9 @@ say "Registered types: " . join(', ', @known_types);
 
 # INTERFACING WITH OTHER LANGUAGES
 
-Because Affix dynamically loads symbols according to the C Application Binary Interface (C ABI), it can interact with
-libraries written in almost any language, provided they expose their functions correctly. Companion modules like
-[Affix::Build](https://metacpan.org/pod/Affix%3A%3ABuild) make compiling these languages seamless.
+Guidelines for calling into C++, Rust, Fortran, Go, and Assembly from Affix. Because Affix dynamically loads symbols
+according to the C ABI, it can interact with libraries written in almost any language, provided they expose their
+functions correctly. Companion modules like [Affix::Build](https://metacpan.org/pod/Affix%3A%3ABuild) make compiling these languages seamless.
 
 Here are the requirements and quirks for interfacing with non-C languages.
 
@@ -752,8 +927,8 @@ internal metadata (length/capacity) and do not map directly to C arrays or `char
 
 # ERROR HANDLING & DEBUGGING
 
-Bridging two entirely different runtimes can lead to spectacular crashes if types or memory boundaries are mismatched.
-Affix provides built-in tools to help you identify what went wrong.
+Diagnose FFI issues with built-in error reporting, memory inspection, and hex dumps. Bridging two entirely different
+runtimes can lead to spectacular crashes if types or memory boundaries are mismatched.
 
 ## Error Handling
 
@@ -828,15 +1003,16 @@ set_destruct_level(2);
 
 # COMPANION MODULES
 
-Affix ships with two powerful companion modules to streamline your FFI development:
+Auto-generate bindings from C/C++ headers and compile polyglot source with two companion modules:
 
 - [**Affix::Wrap**](https://metacpan.org/pod/Affix%3A%3AWrap): Parses C/C++ headers using the Clang AST to automatically generate Affix bindings for entire libraries.
 - [**Affix::Build**](https://metacpan.org/pod/Affix%3A%3ABuild): A polyglot builder that compiles inline C, C++, Rust, Zig, Go, and 15+ other languages into dynamic libraries you can bind instantly.
 
 # THREAD SAFETY & CONCURRENCY
 
-Affix bridges Perl (a single-threaded interpreter, generally) with libraries that may be multi-threaded. This creates
-potential hazards that you must manage.
+Understand the threading model: what's safe to do from callbacks, and what must happen in the main thread before
+spawning any threads. Affix bridges Perl (a single-threaded interpreter, generally) with libraries that may be
+multi-threaded. This creates potential hazards that you must manage.
 
 ## 1. Initialization Phase vs. Execution Phase
 
@@ -859,7 +1035,8 @@ to attach a temporary Perl context to that thread. This should be sufficient but
 
 # RECIPES & EXAMPLES
 
-See [The Affix Cookbook](https://github.com/sanko/Affix.pm/discussions/categories/recipes) for comprehensive guides to
+Real-world patterns including linked lists and C++ vtable calls. See
+[The Affix Cookbook](https://github.com/sanko/Affix.pm/discussions/categories/recipes) for comprehensive guides to
 using Affix.
 
 ## Linked List Implementation
@@ -917,7 +1094,7 @@ engine.
 
 # AUTHOR
 
-Sanko Robinson <sanko@cpan.org>
+Sanko Robinson - [https://github.com/sanko](https://github.com/sanko)
 
 # COPYRIGHT
 

@@ -44,6 +44,8 @@
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
 [ 9. Ang mga UTF-8 na string ay nananatiling buo (hindi \uXXXX) ]
+  decode: "\uXXXX"           -> UTF-8
+  decode: "\uD83D\uDE00"     -> 4-byte UTF-8 (emoji)
 
 [ 10. Mga Halimbawa ]
   my $h = mb::JSON::decode('{"pangalan":"Juan","edad":30}');

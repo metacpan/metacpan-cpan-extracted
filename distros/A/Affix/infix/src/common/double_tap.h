@@ -525,12 +525,22 @@ int tap_done(void) {
 }
 
 // The main test runner that gets compiled into the test executable.
+#if defined(DBLTAP_USE_GCOV_FLUSH)
+#ifdef __cplusplus
+extern "C" void __gcov_dump(void);
+#else
+extern void __gcov_dump(void);
+#endif
+#endif
 int main(void) {
     tap_init();
     test_body();
     int result = tap_done();
-#if defined(_WIN32) && !defined(__clang__)
-    return result;
+#if defined(DBLTAP_USE_GCOV_FLUSH)
+    __gcov_dump();
+    _exit(result);
+#elif defined(_WIN32) && !defined(__clang__)
+    _exit(result);
 #else
     // Use _exit() to bypass standard atexit() cleanup which can segfault on some
     // platforms when TLS or coverage profiling is involved.

@@ -3,7 +3,7 @@ use feature 'class';
 no warnings 'experimental::class';
 use Net::BitTorrent::Emitter;
 #
-class Net::BitTorrent::Tracker::Base v2.1.0 : isa(Net::BitTorrent::Emitter) {
+class Net::BitTorrent::Tracker::Base v2.1.1 : isa(Net::BitTorrent::Emitter) {
     field $url : param : reader;
     field $ssrf_bypass : param : reader = 0;
 

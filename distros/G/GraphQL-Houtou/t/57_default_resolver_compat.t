@@ -233,4 +233,29 @@ subtest 'default resolver coderefs support Promise::XS' => sub {
     'promise result follows the async completion lane';
 };
 
+subtest 'pending root leaf resumes without invoking its resolver twice' => sub {
+  plan skip_all => 'Promise::XS is not available'
+    if !eval { require Promise::XS; 1 };
+  require GraphQL::Houtou::Promise::PromiseXS;
+  my $deferred = Promise::XS::deferred();
+  my $calls = 0;
+  my $result = build_native_runtime($schema, async => 1)->execute_document(
+    '{ promised }',
+    root_value => {
+      promised => sub {
+        $calls++;
+        return $deferred->promise;
+      },
+    },
+  );
+  isa_ok $result, 'Promise::XS::Promise';
+  is $calls, 1, 'resolver ran once before suspension';
+  $deferred->resolve('later');
+  my $settled =
+    GraphQL::Houtou::Promise::PromiseXS::maybe_get_promise_xs($result);
+  is_deeply $settled, { data => { promised => 'later' } },
+    'settled value resumes at completion';
+  is $calls, 1, 'resume did not rerun resolver';
+};
+
 done_testing;

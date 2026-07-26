@@ -1,5 +1,69 @@
 Revision history for DateTime::Format::Genealogy
 
+0.13	Sat Jul 25 17:27:13 EDT 2026
+	[ Bug Fixes ]
+	- Fix t/error.t failures when Params::Get >= 0.13 croaks before our own usage check
+		See https://github.com/nigelhorne/DateTime-Format-Genealogy/issues/11
+	- Fix 'return inside eval' bug in _convert_calendar that silently discarded
+		Hebrew and French Republican calendar conversions
+	- Fix bare clone (->new() on an object) returning the original reference
+		instead of a copy
+	- Fix ISO date month 00 silently mapping to December via Perl's negative
+		array-index wrap; month 13-99 no longer produces undef month name
+	- Fix $@ race condition: three eval blocks (validate_strict, Hebrew calendar,
+		French Republican calendar) now capture $@ into a lexical immediately so
+		a DESTROY firing between the eval and the check cannot silently clear it
+	- Fix greedy first-group quantifier in 'bet X and Y' / 'from X to Y' range
+		patterns; was picking the last keyword occurrence rather than the first
+	- Fix unanchored =~ /FRENCH R/ calendar-type test replaced with string
+		equality, preventing false matches on future escape variants
+	- Fix 3-digit and oversized years returning today's date instead of undef
+		(DateTime::Format::Natural success() was not checked in the GGD-cached path)
+	- Fix missing optional calendar module returning a Gregorian DateTime instead
+		of undef when DateTime::Calendar::Hebrew or ::FrenchRevolutionary is absent
+	- Fix undef canonical field in GGD result crashing DateTime::Format::Natural
+
+	[ Security ]
+	- Sanitise user-supplied date strings in all Carp messages via new _safe_str()
+		helper: control characters (including CR/LF for log injection, ANSI escapes)
+		are replaced with '?' and messages are truncated at 120 characters
+	- Add MAX_CACHE_SIZE guard (10,000 entries) in _date_parser_cached to prevent
+		memory exhaustion when an adversarial caller feeds unbounded unique strings
+
+	[ Performance ]
+	- Cache failed GGD parses as undef in _date_parser_cached; previously only
+		successes were memoised, causing repeated O(n) GGD calls for the same
+		invalid string and duplicate carp emissions
+	- _date_parser_cached now accepts a plain positional arg instead of routing
+		through Params::Get, removing measurable dispatch overhead from the hot path
+	- _julian_to_gregorian_offset uses a for-loop with early exit instead of grep,
+		avoiding temporary list allocation on each Julian date conversion
+
+	[ Enhancements ]
+	- Support Object::Configure
+	- Use Params::Get in new()
+	- Use Params::Validate::Strict to reject unknown parameter keys
+	- Use Sub::Private (enforce mode) for _convert_calendar and
+		_julian_to_gregorian_offset; use Sub::Protected for _date_parser_cached
+	- Use Readonly constants for month alias table, Julian offset tiers, and
+		new MAX_CACHE_SIZE limit
+	- Consolidate French/German month aliases (Janv, Juli, Mai) into the main
+		%MONTH_ALIAS lookup table; remove separate special-case branches
+	- quiet and strict flags now fall back to object-level attributes when
+		not supplied per-call to parse_datetime
+	- Full POD added: EXAMPLE, API SPECIFICATION, MESSAGES, FORMAL SPECIFICATION,
+		PSEUDOCODE, and LIMITATIONS sections
+	- New t/locales.t covering POSIX locale behaviour
+	- New t/unit.t, t/integration.t, t/edge_cases.t, t/extended_tests.t,
+		t/function.t — comprehensive black-box, integration, hostile-input,
+		coverage-gap, and white-box test suites
+	- Eliminate duplicate =head1 SEE ALSO section
+	- Minimum Perl version corrected from 5.006_001 to 5.010 (// and //= require it)
+	- use Carp () and use Scalar::Util () — explicit non-import; all calls use
+		fully-qualified names throughout
+	- t/edge_cases.t: timing ceiling raised to 30 s and alarm() subtest skips
+		on Windows where alarm() is not implemented
+
 0.12	Wed Aug 13 08:23:37 EDT 2025
 	Use Params::Get
 	Use Readonly::Values::Months

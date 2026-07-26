@@ -1,29 +1,35 @@
 ---
-abstract: 'Create a DateTime object from a Genealogy Date'
+abstract: 'Create a DateTime object from a genealogy date string'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   Data::Dumper: '0'
   English: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IPC::System::Simple: '0'
   Test::Carp: '0'
   Test::CleanNamespaces: '0'
   Test::Compile: '0'
   Test::Deep: '0'
   Test::DescribeMe: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
+  Test::Returns: '0'
   Test::Warn: '0'
+  Test::Without::Module: '0'
+  Time::HiRes: '0'
   WWW::RT::CPAN: '0'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -36,12 +42,18 @@ requires:
   Carp: '0'
   DateTime::Format::Natural: '0'
   Genealogy::Gedcom::Date: '2.01'
-  Params::Get: '0.08'
+  Object::Configure: '0.23'
+  Params::Get: '0.15'
+  Params::Validate::Strict: '0'
+  Readonly: '0'
   Readonly::Values::Months: '0.02'
   Scalar::Util: '0'
-  perl: '5.006002'
+  Sub::Private: '0'
+  Sub::Protected: '0'
+  namespace::clean: '0'
+  perl: '5.010000'
 resources:
   bugtracker: https://github.com/nigelhorne/DateTime-Format-Genealogy/issues
-  repository: git://github.com/nigelhorne/DateTime-Format-Genealogy.git
-version: '0.12'
+  repository: https://github.com/nigelhorne/DateTime-Format-Genealogy.git
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Bridge;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 1;
 
@@ -160,6 +160,37 @@ toggled in the browser with B<F12> or B<Ctrl+Shift+I>.
 Register a callback invoked when an error is captured by
 L<Chandra::Error>.  The callback receives a hashref with C<message>,
 C<context>, C<trace>, and C<time>.
+
+=head2 on_tick($coderef)
+
+Register a per-frame callback for games and animations.  Once a tick
+callback is set, C<run()> switches to a non-blocking event loop and invokes
+C<$coderef> on every iteration, so it is the driver for real-time apps.
+Returns C<$self> for chaining.  Pace the work yourself (e.g. with
+L<Time::HiRes>) for a fixed frame rate:
+
+    my $next = Time::HiRes::time();
+    $app->on_tick(sub {
+        my $now = Time::HiRes::time();
+        return if $now < $next;      # ~60fps
+        $next += 1/60;
+        # ... advance and redraw one frame ...
+    });
+
+Update the page from within the callback with C<dispatch_eval>, which is safe
+to call from Perl callbacks.
+
+=head2 on_close($coderef)
+
+Register a handler invoked when the main window is closed.  Useful for
+flushing state (save files, preferences) on exit.  Returns C<$self>.
+
+    $app->on_close(sub { $game->save });
+
+=head2 on_reload($coderef)
+
+Register a callback invoked when a hot reload occurs (see C<watch>).  Returns
+C<$self>.
 
 =head2 watch($path, $coderef)
 

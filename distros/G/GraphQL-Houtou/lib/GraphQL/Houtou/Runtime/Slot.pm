@@ -15,6 +15,7 @@ sub new {
     schema_slot_index => $args{schema_slot_index},
     field_name => $args{field_name},
     result_name => $args{result_name},
+    accessor => $args{accessor},
     return_type_name => $args{return_type_name},
     return_type_kind_code => defined $args{return_type_kind_code} ? $args{return_type_kind_code} : 0,
     item_non_null => $args{item_non_null} ? 1 : 0,
@@ -32,6 +33,7 @@ sub schema_slot_key { return $_[0]{schema_slot_key} }
 sub schema_slot_index { return $_[0]{schema_slot_index} }
 sub field_name { return $_[0]{field_name} }
 sub result_name { return $_[0]{result_name} }
+sub accessor { return $_[0]{accessor} }
 sub return_type_name { return $_[0]{return_type_name} }
 sub return_type_kind_code { return $_[0]{return_type_kind_code} }
 sub item_non_null { return $_[0]{item_non_null} }
@@ -51,6 +53,7 @@ sub to_struct {
     schema_slot_index => $self->{schema_slot_index},
     field_name => $self->{field_name},
     result_name => $self->{result_name},
+    accessor => $self->{accessor},
     return_type_name => $self->{return_type_name},
     resolver_shape => $self->{resolver_shape},
     resolver_mode => $self->{resolver_mode},
@@ -72,6 +75,7 @@ sub to_native_struct {
     schema_slot_index => $self->{schema_slot_index},
     field_name => $self->{field_name},
     result_name => $self->{result_name},
+    accessor => $self->{accessor},
     return_type_name => $self->{return_type_name},
     return_type_kind_code => $self->{return_type_kind_code},
     item_non_null => $self->{item_non_null},
@@ -109,6 +113,7 @@ sub to_native_compact_struct {
     ($include_arg_defs ? _clone_compact($self->{arg_defs_compact}) : undef),
     $native->{callback_abi_code},
     $native->{item_non_null} ? 1 : 0,
+    $native->{accessor},
   ];
 }
 
@@ -125,12 +130,16 @@ sub _resolver_shape_code {
 
 sub _resolver_mode_code {
   my ($mode) = @_;
+  return 4 if ($mode || q()) eq 'NATIVE_ONE_ARG';
+  return 3 if ($mode || q()) eq 'NATIVE_NO_ARGS';
   return 2 if ($mode || q()) eq 'NATIVE';
   return 1;
 }
 
 sub _callback_abi_code {
   my ($shape, $mode) = @_;
+  return 5 if ($mode || q()) eq 'NATIVE_ONE_ARG';
+  return 4 if ($mode || q()) eq 'NATIVE_NO_ARGS';
   return 3 if ($mode || q()) eq 'NATIVE';
   return 2 if ($shape || q()) eq 'EXPLICIT';
   return 1;

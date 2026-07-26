@@ -1,7 +1,7 @@
 use v5.40;
 use feature 'class', 'try';
 no warnings 'experimental::class', 'experimental::try';
-class Net::BitTorrent::Protocol::BEP10 v2.0.0 : isa(Net::BitTorrent::Protocol::BEP52) {
+class Net::BitTorrent::Protocol::BEP10 v2.1.1 : isa(Net::BitTorrent::Protocol::BEP52) {
     use Net::BitTorrent::Protocol::BEP03::Bencode qw[bencode bdecode];
     field $local_extensions  : param : reader = {};
     field $remote_extensions : reader = {};
@@ -15,7 +15,7 @@ class Net::BitTorrent::Protocol::BEP10 v2.0.0 : isa(Net::BitTorrent::Protocol::B
 
     method send_ext_handshake () {
         my $data = { m => $local_extensions, v => 'Net::BitTorrent ' . ( $Net::BitTorrent::VERSION // $Net::BitTorrent::Protocol::BEP10::VERSION ) };
-        $data->{metadata_size} = $metadata_size if $metadata_size > 0;
+        $data->{metadata_size} = $metadata_size if defined $metadata_size && $metadata_size > 0;
         my $payload = bencode($data);
         $self->send_message( EXTENDED, pack( 'C a*', 0, $payload ) );
     }
