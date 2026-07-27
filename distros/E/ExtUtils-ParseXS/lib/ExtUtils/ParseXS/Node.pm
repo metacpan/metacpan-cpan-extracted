@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '3.63';
+our $VERSION = '3.64';
 
 =head1 NAME
 
@@ -1726,11 +1726,15 @@ EOF
     # in particular, when emitting one of:
     #      XSANY.any_i32 = $value;
     #      XSINTERFACE_FUNC_SET(cv, $value);
+    #
+    # It may be that all of the uses are guarded by false conditionals,
+    # so make sure we don't get an unused variable warning.
 
     if ($pxs->{need_boot_cv}) {
         print $self->Q(<<"EOF");
             |    $open_brace
             |        CV * cv;
+            |        PERL_UNUSED_VAR(cv);
             |
 EOF
     }
@@ -4152,10 +4156,13 @@ sub C_func_signature {
                  or $param->{is_length};
 
         my $a = $param->{var};
-        $a = "&$a" if $param->{is_addr} or $io =~ /OUT/;
+        my $t = defined $param->{type} ? $param->{type} : 'void*';
+        if ($param->{is_addr} or $io =~ /OUT/) {
+            $a = "&$a";
+            $t = "$t*";
+        }
         push @args, $a;
-        my $t = $param->{type};
-        push @types, defined $t ? $t : 'void*';
+        push @types, $t;
     }
 
     return \@args, \@types;
@@ -4947,8 +4954,11 @@ sub parse {
             $var =~ s/\s+$//;
             my $param = $ioparams->{names}{$var};
             # 'void*' is a desperate guess if no such parameter
-            push @$types, ($param && defined $param->{type})
+            my $type = $param && defined $param->{type}
                             ? $param->{type} : 'void*';
+            $type .= '*' if $param && $param->{is_addr}
+                || (defined $param->{in_out} && $param->{in_out} =~ /OUT/);
+            push @$types, $type;
         }
         $self->{args}  = $args;
     }

@@ -10,7 +10,7 @@ use parent 'Types::Standard';
 our @EXPORT_OK = ( Types::Standard->type_names );
 
 our $meta = __PACKAGE__->meta;
-our $VERSION = '0.000009';
+our $VERSION = '0.000010';
 
 our (%entity, %recurse, %compare, $esc, $unesc, $path);
 BEGIN {
@@ -450,7 +450,7 @@ Coerce::Types::Standard - Coercing
 
 =head1 VERSION
 
-Version 0.000009
+Version 0.000010
 
 =cut
 

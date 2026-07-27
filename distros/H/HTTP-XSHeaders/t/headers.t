@@ -5,12 +5,14 @@ use Test qw(plan ok skip);
 eval { require URI; 1; }
 or do { print "1..0 # SKIP URI is required for this test\n"; exit 0; };
 
-plan tests => 154;
+plan tests => 156;
 
 my($h, $h2);
 sub j { join("|", @_) }
 
+use lib 't/lib';
 use HTTP::XSHeaders;
+use MyTestUtils;
 $h = HTTP::XSHeaders->new;
 ok($h);
 ok(ref($h), "HTTP::XSHeaders");
@@ -415,3 +417,12 @@ $h = HTTP::XSHeaders->new(
     if_modified_since => "Sat, 29 Oct 1994 19:43:31 GMT; length=34343"
 );
 ok(gmtime($h->if_modified_since), "Sat Oct 29 19:43:31 1994");
+
+{
+  my $e = MyTestUtils::_try(sub { $h->header('foo:' => 'bar') });
+  ok($e =~ qr/Illegal field name 'foo:'/);
+}
+{
+  my $e = MyTestUtils::_try(sub { $h->header("foo\0bar" => 'baz') });
+  ok($e =~ qr/Illegal field name/);
+}

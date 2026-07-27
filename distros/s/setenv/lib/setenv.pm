@@ -1,7 +1,7 @@
 package setenv;
 
 # where are we?
-$VERSION= '0.07';
+$VERSION= '0.08';
 
 # be as strict and verbose as possible
 use strict;
@@ -79,7 +79,7 @@ additives.
 
 =head1 VERSION
 
-This documentation describes version 0.07.
+This documentation describes version 0.08.
 
 =head1 METHODS
 

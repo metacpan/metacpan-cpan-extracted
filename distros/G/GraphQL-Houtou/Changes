@@ -1,5 +1,9 @@
 Revision history for Perl extension GraphQL-Houtou
 
+0.05 2026-07-26T22:07:03Z
+
+    - Fix boolean literal crash under JSON::MaybeXS 1.003009 / JSON::PP fallback (#110)
+
 0.04 2026-07-26T09:01:54Z
 
     - Extend fast root continuation to single root object/abstract fields (#103)

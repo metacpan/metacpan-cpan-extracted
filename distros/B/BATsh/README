@@ -2,7 +2,7 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.08
+    Version 0.09
 
 SYNOPSIS
       use BATsh;
@@ -200,6 +200,7 @@ SH MODE
       declare -i NAME[=EXPR]  (integer attribute: assignments evaluate as
         arithmetic); declare -r NAME  (readonly attribute)
       set -e / -u / -x, set +e/+u/+x, set -o errexit|nounset|xtrace
+      set -- [ARG ...] / set ARG ...  (replace $1..$9 / $@ / $#)
       trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]  (EXIT + %SIG)
       $(( arithmetic )) -- full C-style operator set:
         + - * / % **  (** right-assoc; / % truncate toward zero)
@@ -326,6 +327,15 @@ BUGS AND LIMITATIONS
     "VAR=value" or prefix "VAR=value command" assignment. "~user" resolves
     via getpwnam and is therefore Unix-like only (a no-op on Win32).
 
+    The result of an expansion is literal data as of version 0.09: a
+    backslash arriving from a variable, from a command substitution or
+    from a tilde expansion is no longer re-read as a shell escape by the
+    quote-removal stage, so a Windows pathname held in a variable stays
+    intact ("d=\"C:\\Users\\x\"; cd $d"), while a backslash written in
+    the script itself still quotes the character after it. A tilde
+    expansion is also protected against field splitting, so a home
+    directory whose name contains a space stays one word.
+
     Brace expansion "{a,b,c}" and "{1..5}"/"{a..e}[..step]", extended
     pattern matching ("shopt -s extglob"; "?()", "*()", "+()", "@()",
     "!()" in case patterns and in "${VAR%pat}"-family patterns),
@@ -343,6 +353,44 @@ BUGS AND LIMITATIONS
     status 1. The options are reset at the start of each top-level
     "run"/"run_string"/"run_lines", so "set -e" does not leak into a later
     run in the same process.
+
+    "set" also takes operands as of version 0.09: "set -- ARG ..."
+    replaces the positional parameters (and "set --" clears them), and so
+    does a first operand that is not an option, as in "set a b c". The
+    parameters are the ones a function call and "shift" use, so $1..$9,
+    "$@", "$*", $# , shift and getopts all see them, which makes the usual
+
+        set -- -f value extra
+        while getopts f: opt; do ... done
+        shift $((OPTIND - 1))
+
+    idiom work; before 0.09 every operand was ignored and that loop never
+    ran. "set" leaves OPTIND alone, as bash does. At most nine positional
+    parameters are addressable.
+
+    Filename patterns ("*", "?", "[abc]", "[a-z]", "[!abc]") are matched
+    by BATsh itself as of version 0.09, not by Perl's "glob()", which
+    reads a backslash as an escape character and so destroyed an ordinary
+    Windows pattern ("C:\dir\*.txt" was searched for as "C:dir*.txt" and
+    came back with its backslashes deleted). The separator is "/"
+    everywhere and "\" as well on Windows, where a path is written that
+    way; on Unix a backslash stays an ordinary filename character. A
+    leading "." is matched only by a pattern that starts with ".", every
+    segment but the last has to be a directory, "[!abc]" negates, matches
+    are sorted, case is ignored on Windows, and a pattern that matches
+    nothing is left exactly as written. CMD-mode wildcards ("FOR %f IN
+    (...)", "DEL") use the same matcher.
+
+    How a Windows pattern is written differs between the two modes. A
+    CMD-mode line has no escape character, so it is written as it looks
+    ("FOR %f IN (C:\dir\*.txt)", "DEL C:\dir\*.tmp"). An SH-mode line
+    follows bash, where a backslash quotes the next character, so a bare
+    "echo C:\dir\*.txt" means "C:dir*.txt" there (in bash as well); keep
+    the path in a variable, as a script does anyway, and the backslashes
+    are data and stay separators:
+
+        d='C:\dir\'
+        for f in $d*.txt; do echo "$f"; done
 
     The builtin "eval" is supported as of version 0.07: one level of quote
     removal, concatenation, and re-execution with a second round of

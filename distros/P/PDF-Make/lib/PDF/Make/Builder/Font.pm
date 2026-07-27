@@ -4,6 +4,7 @@ use warnings;
 use Object::Proto;
 use PDF::Make::Page qw(:fonts);
 use PDF::Make::Font ();
+use Font::Metrics ();
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder::Font',
@@ -60,19 +61,19 @@ my %BASEFONT = (
     'ZapfDingbats_normal'    => 'ZapfDingbats',
 );
 
-# Cache for PDF::Make::Font XS objects (exact per-glyph metrics)
-my %_xs_font_cache;
+# Cache for Font::Metrics objects (exact per-glyph metrics via Font::Metrics XS)
+my %_fm_cache;
 
 sub _xs_font {
     my ($self, $variant) = @_;
     $variant //= $self->_default_variant;
     my $fam = family $self;
     my $key = "${fam}_${variant}";
-    return $_xs_font_cache{$key} if $_xs_font_cache{$key};
+    return $_fm_cache{$key} if $_fm_cache{$key};
     my $basefont = $BASEFONT{$key};
     return undef unless $basefont;
-    $_xs_font_cache{$key} = PDF::Make::Font->standard14($basefont);
-    return $_xs_font_cache{$key};
+    $_fm_cache{$key} = Font::Metrics->new(name => $basefont);
+    return $_fm_cache{$key};
 }
 
 sub _default_variant {

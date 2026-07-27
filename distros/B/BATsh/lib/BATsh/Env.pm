@@ -23,7 +23,7 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 require BATsh::MB;
 
@@ -53,10 +53,10 @@ sub init {
 
 sub _key { return uc($_[0]) }
 
-sub get        { my ($c,$n)=@_; return $STORE{_key($n)} }
-sub set        { my ($c,$n,$v)=@_; $STORE{_key($n)} = defined $v ? $v : '' }
-sub unset      { my ($c,$n)=@_; delete $STORE{_key($n)} }
-sub exists_var { my ($c,$n)=@_; return exists $STORE{_key($n)} ? 1 : 0 }
+sub get        { my ($c, $n) = @_; return $STORE{_key($n)} }
+sub set        { my ($c, $n, $v) = @_; $STORE{_key($n)} = defined $v ? $v : '' }
+sub unset      { my ($c, $n) = @_; delete $STORE{_key($n)} }
+sub exists_var { my ($c, $n) = @_; return exists $STORE{_key($n)} ? 1 : 0 }
 sub sync_to_env {
     %ENV = ();
     for my $k (keys %STORE) {
@@ -65,7 +65,7 @@ sub sync_to_env {
     }
 }
 sub snapshot   { my %s = %STORE; return { %s } }
-sub restore    { my ($c,$s)=@_; %STORE = %{$s} }
+sub restore    { my ($c, $s) = @_; %STORE = %{$s} }
 sub delayed_expansion { return $DELAYED_EXPANSION }
 
 sub setlocal {
@@ -348,6 +348,10 @@ __END__
 =head1 NAME
 
 BATsh::Env - Shared variable store for BATsh
+
+=head1 VERSION
+
+Version 0.09
 
 =head1 SYNOPSIS
 

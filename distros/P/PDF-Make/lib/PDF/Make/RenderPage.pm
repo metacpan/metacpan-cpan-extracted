@@ -5,7 +5,7 @@ use warnings;
 use Carp qw(croak);
 use PDF::Make ();  # load XS so SCALE_*/ROTATE_* constants are defined
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 =head1 NAME
 

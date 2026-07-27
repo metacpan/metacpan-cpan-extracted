@@ -61,11 +61,11 @@
    "provides" : {
       "GraphQL::Houtou" : {
          "file" : "lib/GraphQL/Houtou.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "GraphQL::Houtou::DataLoader" : {
          "file" : "lib/GraphQL/Houtou/DataLoader.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "GraphQL::Houtou::DataLoader::Error" : {
          "file" : "lib/GraphQL/Houtou/DataLoader.pm"
@@ -78,7 +78,7 @@
       },
       "GraphQL::Houtou::Error" : {
          "file" : "lib/GraphQL/Houtou/Error.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "GraphQL::Houtou::Federation" : {
          "file" : "lib/GraphQL/Houtou/Federation.pm",
@@ -231,7 +231,7 @@
       },
       "GraphQL::Houtou::XS::Parser" : {
          "file" : "lib/GraphQL/Houtou/XS/Parser.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -246,7 +246,7 @@
          "web" : "https://github.com/AnaTofuZ/GraphQL-Houtou"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

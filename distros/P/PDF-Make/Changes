@@ -1,5 +1,9 @@
 Revision history for PDF::Make
 
+0.09  2026-07-26
+      - Builder::Text: add a "preformatted" option that renders text verbatim,
+        preserving hard newlines and all in line whitespace
+
 0.08  2026-07-21
       - Builder::Layout::Row::render now uses Layout::Flex for both width
         distribution and height computation. 

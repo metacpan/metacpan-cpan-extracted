@@ -6,6 +6,33 @@ package INA_CPAN_Check;
 #
 # COMPATIBILITY: Perl 5.005_03 and later
 #
+# Check catalogue.  Each letter is one category, exported as a pair:
+# count_X($root) returns how many assertions check_X($root) will make, so
+# a test file can emit its plan before running anything.
+#
+#   A  MANIFEST completeness
+#   B  version consistency across .pm / META.yml / META.json /
+#      Makefile.PL / Changes, including the provides blocks
+#   C  encoding hygiene: US-ASCII, trailing whitespace, final newline
+#   D  Perl 5.005_03 compatibility of lib/*.pm
+#   E  code layout style: no shebang, no '} else' on one line
+#   F  eg/ examples exist
+#   G  POD structure of lib/*.pm
+#   H  README required sections
+#   I  generated metadata is well-formed
+#   J  test suite and prerequisite conventions
+#   K  reference and punctuation style of lib/*.pm
+#   L  Changes file format
+#
+# A distribution calls only the letters it does not already cover in more
+# depth itself.  D, G and H in particular are baseline checks: a dist that
+# ships its own perl5compat / pod / readme test file should leave them out
+# rather than assert the same things twice.
+#
+# selfcheck_suite() is separate from the letters.  It runs the whole test
+# suite in a child Perl at 'pmake dist' time and verifies the TAP each file
+# emits, which is the only way to catch a plan line in the wrong place.
+#
 ######################################################################
 
 use strict;
@@ -19,12 +46,15 @@ use Exporter ();
 use vars qw(@ISA);
 @ISA = qw(Exporter);
 
-$VERSION = '0.37';
+$VERSION = '0.41';
 $VERSION = $VERSION;
 
 @EXPORT_OK = qw(
     ok plan_tests diag plan_skip end_testing
-    _slurp _slurp_lines _scan_code _manifest_files _find_pm_t
+    _slurp _slurp_lines _scan_code _code_only
+    _manifest_files _manifest_pm_and_t _text_files _find_pm_t
+    _primary_pm _lib_pm_files _pm_version
+    _yaml_str _json_str
     check_A count_A
     check_B count_B
     check_C count_C
@@ -36,6 +66,7 @@ $VERSION = $VERSION;
     check_I count_I
     check_J count_J
     check_K count_K
+    check_L count_L
 );
 
 use vars qw($T_PLAN $T_RUN $T_FAIL
@@ -159,33 +190,23 @@ END {
 sub _slurp {
     my ($path) = @_;
     local *_INA_FH;
-    open(_INA_FH, $path) or die "cannot open '$path': $!";
+    open(_INA_FH, $path) or return '';
     my $content = do { local $/; <_INA_FH> };
     close _INA_FH;
-    return $content;
+    return defined $content ? $content : '';
 }
 
 sub _slurp_lines {
     my ($path) = @_;
     local *_INA_FH;
-    open(_INA_FH, $path) or die "cannot open '$path': $!";
+    open(_INA_FH, $path) or return ();
     my @lines = <_INA_FH>;
     close _INA_FH;
     return @lines;
 }
 
-sub _scan_code {
-    # returns lines of all .pm and .t files under $root
-    my ($root) = @_;
-    my @files = _find_pm_t($root);
-    my @lines;
-    for my $f (@files) {
-        my @l = _slurp_lines($f);
-        push @lines, map { "$f: $_" } @l;
-    }
-    return @lines;
-}
-
+# Every .pm and .t under $dir, recursively, as paths relative to nothing
+# (they keep the $dir prefix they were found with).
 sub _find_pm_t {
     my ($dir) = @_;
     local *_INA_DIR;
@@ -210,310 +231,739 @@ sub _manifest_files {
     my @lines = _slurp_lines("$root/MANIFEST");
     my @files;
     for my $line (@lines) {
-        chomp $line;
+        $line =~ s/\r?\n$//;
         $line =~ s/\s*#.*$//;
         $line =~ s/^\s+|\s+$//g;
-        next unless $line ne '';
-        push @files, $line;
+        push @files, $line if length $line;
     }
     return @files;
 }
 
-######################################################################
-# check_A -- MANIFEST completeness
-# Every file listed in MANIFEST must exist on disk.
-######################################################################
-sub count_A {
+# The files that carry ina@CPAN hand-written code: lib/*.pm, every *.t,
+# and eg/*.pl.  Driven by MANIFEST so that generated or vendored files
+# outside it are never scanned.
+sub _manifest_pm_and_t {
     my ($root) = @_;
-    return 0 unless defined($root) && -f "$root/MANIFEST";
-    return scalar(_manifest_files($root));
-}
-sub check_A {
-    my ($root) = @_;
-    return unless -f "$root/MANIFEST";
-    my @files = _manifest_files($root);
-    for my $f (@files) {
-        ok(-e "$root/$f", "A1: MANIFEST entry exists: $f");
+    my @all   = _manifest_files($root);
+    my @found = grep {
+        ((/\.pm$/ && m{^lib/}) || /\.t$/ || m{^eg/.*\.pl$}) && -f "$root/$_"
+    } @all;
+    return @found if @found;
+    # Fallback for a dist with no usable MANIFEST.
+    my @fb;
+    for my $dir ('lib', 't') {
+        push @fb, _find_pm_t("$root/$dir") if -d "$root/$dir";
     }
-}
-
-######################################################################
-# check_B -- version consistency
-# $VERSION in .pm matches META.yml, META.json, Makefile.PL, Changes
-######################################################################
-sub count_B { return 5 }
-sub check_B {
-    my ($root) = @_;
-
-    # extract $VERSION from primary .pm
-    my $ver = _extract_version($root);
-    ok(defined $ver, "B1: \$VERSION found in primary .pm");
-    $ver = '(unknown)' unless defined $ver;
-
-    # META.yml
-    my $meta_yml = '';
-    if (-f "$root/META.yml") {
-        $meta_yml = _slurp("$root/META.yml");
+    for my $p (@fb) {
+        $p =~ s{^\Q$root\E/}{};
     }
-    ok($meta_yml =~ /version\s*:\s*['"']?\Q$ver\E['"']?/,
-        "B2: META.yml version matches $ver");
-
-    # META.json
-    my $meta_json = '';
-    if (-f "$root/META.json") {
-        $meta_json = _slurp("$root/META.json");
-    }
-    ok($meta_json =~ /["']version["']\s*:\s*["']\Q$ver\E["']/,
-        "B3: META.json version matches $ver");
-
-    # Makefile.PL
-    my $mkpl = '';
-    if (-f "$root/Makefile.PL") {
-        $mkpl = _slurp("$root/Makefile.PL");
-    }
-    ok($mkpl =~ /VERSION['"]\s*=>\s*(?:['"]|\bq\{)\Q$ver\E(?:['"]|\})/
-    || $mkpl =~ /VERSION\s*=>\s*(?:['"]|\bq\{)\Q$ver\E(?:['"]|\})/,
-        "B4: Makefile.PL VERSION matches $ver");
-
-    # Changes
-    my $changes = '';
-    if (-f "$root/Changes") {
-        $changes = _slurp("$root/Changes");
-    }
-    ok($changes =~ /^\Q$ver\E\b/m,
-        "B5: Changes has entry for $ver");
+    return @fb;
 }
 
-sub _extract_version {
+# MANIFEST entries that are text and therefore subject to the encoding
+# checks.  Anything with a known binary extension is excluded.
+sub _text_files {
     my ($root) = @_;
-    my $pm = _primary_pm($root);
-    return undef unless -f $pm;
-    my $src = _slurp($pm);
-    if ($src =~ /\$VERSION\s*=\s*['"]([^'"]+)['"]/) {
-        return $1;
-    }
-    return undef;
+    return grep { !/\.(?:gz|tgz|zip|tar|bz2|png|jpe?g|gif|ico|pdf)$/i }
+           _manifest_files($root);
 }
+
+# Find $pattern in $path, ignoring POD, __END__, comments, string literals
+# and regex literals, so that a match is real code and not prose or data.
+# Returns a list of { line => N, text => "..." }.
+sub _scan_code {
+    my ($path, $pattern) = @_;
+    my $text = _slurp($path);
+    return () unless $text ne '';
+    $text =~ s/\n__END__\b.*\z//s;
+    $text =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
+    my @hits;
+    my $lineno = 0;
+    for my $line (split /\n/, $text) {
+        $lineno++;
+        next if $line =~ /^\s*#/;
+        my $clean = $line;
+        $clean =~ s/'(?:[^'\\]|\\.)*'/''/g;
+        $clean =~ s/"(?:[^"\\]|\\.)*"/""/g;
+        $clean =~ s{(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
+        $clean =~ s{/[^/]+/[gimsex]*}{}g;
+        $clean =~ s/#.*$//;
+        if ($clean =~ $pattern) {
+            push @hits, { line => $lineno, text => $line };
+        }
+    }
+    return @hits;
+}
+
+# Code with POD and __END__ removed, for whole-file pattern matching.
+sub _code_only {
+    my ($path) = @_;
+    my $text = _slurp($path);
+    $text =~ s/\n__END__\b.*\z//s;
+    $text =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
+    return $text;
+}
+
+######################################################################
+# Distribution and metadata utilities
+######################################################################
 
 sub _dist_name {
     my ($root) = @_;
     my $base = $root;
-    $base =~ s{.*[/\\]}{};  # basename
-    $base =~ s{-[\d.]+$}{};  # strip version
+    $base =~ s{.*[/\\]}{};
+    $base =~ s{-[\d.]+$}{};
     return $base;
 }
 
-######################################################################
-# check_C -- encoding: US-ASCII, trailing whitespace, final newline
-######################################################################
-sub count_C {
-    my ($root) = @_;
-    plan_skip('MANIFEST not found') unless -f "$root/MANIFEST";
-    my @files = _ascii_check_files($root);
-    return scalar(@files) * 3;
-}
-sub check_C {
-    my ($root, %opt) = @_;
-    return unless -f "$root/MANIFEST";
-    my $utf8_ok = exists $opt{utf8_ok} ? $opt{utf8_ok} : undef;
-    my @files = _ascii_check_files($root);
-    for my $rel (@files) {
-        my $path = "$root/$rel";
-        my $src  = -f $path ? _slurp($path) : '';
-        # US-ASCII is required for Perl source and metadata (5.005_03
-        # portability).  Files that are intentionally non-US-ASCII -- the
-        # 21-language cheatsheets under doc/, the multibyte transpiler core
-        # lib/mb.pm, and the t/[1-8]xxx MBCS fixtures -- are named by the
-        # caller via the utf8_ok regex (doc/*.txt is always exempt).
-        # C2/C3 still apply to them.
-        my $ascii_exempt = ($rel =~ m{^doc/.*\.txt$}i)
-                        || (defined $utf8_ok && $rel =~ /$utf8_ok/);
-        ok($ascii_exempt || $src !~ /[^\x00-\x7F]/, "C1: US-ASCII only: $rel");
-        ok($src !~ /[ \t]+\n/,     "C2: no trailing whitespace: $rel");
-        ok($src eq '' || $src =~ /\n\z/, "C3: ends with newline: $rel");
-    }
-}
-
-sub _ascii_check_files {
-    my ($root) = @_;
-    my @all = _manifest_files($root);
-    return grep {
-        /\.(?:pm|pl|t|PL|bat|txt|md|yml|json)$/i
-        && !/(?:^|\/)(lib\/Perl500503\/OrDie\.pm)$/
-    } @all;
-}
-
-######################################################################
-# check_D -- Perl 5.005_03 compatibility (warnings stub pattern)
-######################################################################
-sub count_D { return 2 }
-sub check_D {
-    my ($root) = @_;
-    my @pm_files = (_find_pm_t("$root/lib"), _find_pm_t("$root/t"));
-
-    my $all_pass = 1;
-    my $stub_ok  = 1;
-    for my $f (@pm_files) {
-        my $src = _slurp($f);
-        # Check: if 'use warnings' present, must have !defined guard
-        if ($src =~ /^use warnings\b/m) {
-            unless ($src =~ /!defined\(&warnings::import\)/) {
-                $stub_ok = 0;
-                diag("D1: missing warnings stub guard in $f");
-            }
-        }
-        # Check: no 'our ' at top level (rough check)
-        if ($src =~ /^our\s+[\$\@\%]/m) {
-            $all_pass = 0;
-            diag("D2: 'our' found in $f");
-        }
-    }
-    ok($stub_ok,  'D1: warnings stub guards present where needed');
-    ok($all_pass, "D2: no bare 'our' at line start in .pm/.t files");
-}
-
-######################################################################
-# check_E -- style: no shebang in lib/*.pm
-######################################################################
-sub count_E { return 1 }
-sub check_E {
-    my ($root) = @_;
-    my @pm_files = _find_pm_t("$root/lib");
-    my $ok = 1;
-    for my $f (@pm_files) {
-        my $src = _slurp($f);
-        if ($src =~ /^#!/) {
-            $ok = 0;
-            diag("E1: shebang found in $f");
-        }
-    }
-    ok($ok, 'E1: no shebang in lib/*.pm');
-}
-
-######################################################################
-# check_F -- eg/ example files exist and are executable-ish
-######################################################################
-sub count_F { return 1 }
-sub check_F {
-    my ($root) = @_;
-    my @eg;
-    if (-d "$root/eg") {
-        local *_EG_DIR;
-        opendir(_EG_DIR, "$root/eg") or die;
-        @eg = grep { /\.pl$/ } readdir(_EG_DIR);
-        closedir _EG_DIR;
-    }
-    ok(scalar(@eg) > 0, 'F1: at least one eg/*.pl example file exists');
-}
-
-######################################################################
-# check_G -- POD structure
-######################################################################
-sub count_G { return 6 }
-sub check_G {
-    my ($root) = @_;
-    my $pm = _primary_pm($root);
-    my $src = -f $pm ? _slurp($pm) : '';
-
-    ok($src =~ /^=head1\s+NAME\b/m,        'G1: POD has NAME section');
-    ok($src =~ /^=head1\s+VERSION\b/m,     'G2: POD has VERSION section');
-    ok($src =~ /^=head1\s+SYNOPSIS\b/m,    'G3: POD has SYNOPSIS section');
-    ok($src =~ /^=head1\s+DESCRIPTION\b/m, 'G4: POD has DESCRIPTION section');
-    ok($src =~ /^=head1\s+AUTHOR\b/m,      'G5: POD has AUTHOR section');
-    ok($src =~ /^=head1\s+LICENSE\b/m,     'G6: POD has LICENSE section');
-}
-
+# The primary module is the first MANIFEST entry (ina convention, as used
+# by pmake.bat).  Deriving it from MANIFEST is robust regardless of the
+# directory name or a trailing "/.." that rel2abs leaves in $root.
 sub _primary_pm {
     my ($root) = @_;
-    # The primary module is the first MANIFEST entry (ina convention, as
-    # used by pmake.bat). Deriving it from MANIFEST is robust regardless of
-    # the directory name or a trailing "/.." that rel2abs leaves in $root.
     if (-f "$root/MANIFEST") {
         my @manifest = _manifest_files($root);
         if (@manifest && $manifest[0] =~ /\.pm$/ && -f "$root/$manifest[0]") {
             return "$root/$manifest[0]";
         }
     }
-    # Fallback: derive from the distribution directory name.
     my $dist = _dist_name($root);
     (my $rel = $dist) =~ s{-}{/}g;
     return "$root/lib/$rel.pm";
 }
 
-######################################################################
-# check_H -- README required sections
-######################################################################
-sub count_H { return 4 }
-sub check_H {
+sub _lib_pm_files {
     my ($root) = @_;
-    my $readme = '';
-    if (-f "$root/README") {
-        $readme = _slurp("$root/README");
+    # The grep must not be written directly after sort: "sort grep {...} LIST"
+    # parses as "sort SUBNAME LIST" and calls grep as the comparator.
+    my @pm = grep { m{^lib/.*\.pm$} && -f "$root/$_" } _manifest_files($root);
+    return sort @pm;
+}
+
+sub _pm_version {
+    my ($path) = @_;
+    my $text = _slurp($path);
+    return undef unless $text ne '';
+    if ($text =~ /\$VERSION\s*=\s*['"]([^'"]+)['"]/) {
+        return $1;
     }
-    ok($readme =~ /\bNAME\b/,        'H1: README has NAME');
-    ok($readme =~ /\bSYNOPSIS\b/,    'H2: README has SYNOPSIS');
-    ok($readme =~ /\bDESCRIPTION\b/, 'H3: README has DESCRIPTION');
-    ok($readme =~ /\bINSTALL/i,      'H4: README has INSTALL');
-}
-
-######################################################################
-# check_I -- META files well-formed
-######################################################################
-sub count_I { return 4 }
-sub check_I {
-    my ($root) = @_;
-
-    my $yml = -f "$root/META.yml"  ? _slurp("$root/META.yml")  : '';
-    my $jsn = -f "$root/META.json" ? _slurp("$root/META.json") : '';
-
-    ok($yml =~ /^name\s*:/m,    'I1: META.yml has name field');
-    ok($yml =~ /^version\s*:/m, 'I2: META.yml has version field');
-    ok($jsn =~ /"name"\s*:/,    'I3: META.json has name field');
-    ok($jsn =~ /"version"\s*:/, 'I4: META.json has version field');
-}
-
-######################################################################
-# check_J -- test file naming (9NNN-name.t convention)
-######################################################################
-sub count_J { return 1 }
-sub check_J {
-    my ($root) = @_;
-    my @t_files;
-    local *_TMP_DIR;
-    if (opendir(_TMP_DIR, "$root/t")) {
-        @t_files = grep { /\.t$/ } readdir(_TMP_DIR);
-        closedir _TMP_DIR;
+    if ($text =~ /\$VERSION\s*=\s*([\d._]+)/) {
+        return $1;
     }
-    my @bad = grep { /^9\d{3}/ && !/^9\d{3}[-_][a-z]/ } @t_files;
-    ok(!@bad, "J1: 9NNN test files follow 9NNN-name.t naming convention(@bad)");
+    return undef;
 }
 
-######################################################################
-# check_K -- K3 style: { %hash } form for hash references
-######################################################################
-sub count_K { return 1 }
-sub check_K {
-    my ($root, %opt) = @_;
-    # k3_exempt is a regular expression (as a string) matched against the
-    # *name* of the returned hash. Hash names that match are allowed to use
-    # the "return \%name" form (e.g. accessor-style %env / %opts / %args).
-    # When omitted, no name is exempt and every "return \%..." is flagged.
-    my $exempt = defined($opt{k3_exempt}) ? $opt{k3_exempt} : '';
-    my @pm_files = _find_pm_t("$root/lib");
-    my $ok = 1;
-    for my $f (@pm_files) {
-        my $src = _slurp($f);
-        # detect "return \%hash;" (should be "return { %hash };").
-        # \w* also captures the empty name of forms such as "return \%{...}",
-        # which is never exempt and is therefore always flagged.
-        while ($src =~ /\breturn\s+\\\%(\w*)/g) {
-            my $name = $1;
-            next if $name ne '' && $exempt ne '' && $name =~ /$exempt/;
-            $ok = 0;
-            diag("K3: 'return \\%$name' should be 'return { %$name }' in $f");
+sub _yaml_str {
+    my ($text, $key) = @_;
+    return undef unless defined $text && $text ne '';
+    if ($text =~ /^${key}:\s*['"]?([^'"\n]+)['"]?\s*$/m) {
+        return $1;
+    }
+    return undef;
+}
+
+sub _json_str {
+    my ($text, $key) = @_;
+    return undef unless defined $text && $text ne '';
+    if ($text =~ /"${key}"\s*:\s*"([^"]+)"/) {
+        return $1;
+    }
+    return undef;
+}
+
+# The provides block of META.yml, as { package => version }.  Parsed line
+# by line: a package key is indented and ends at the colon, its version is
+# indented further.  A regex over the whole block is not reliable because
+# package names contain colons themselves.
+sub _provides_versions_yml {
+    my ($text) = @_;
+    my %h;
+    return { %h } unless defined $text && $text ne '';
+    my $in  = 0;
+    my $pkg = undef;
+    for my $line (split /\n/, $text) {
+        $line =~ s/\r$//;
+        if ($line =~ /^provides:\s*$/) { $in = 1; next }
+        next unless $in;
+        last if $line =~ /^\S/;
+        if ($line =~ /^\s+([\w:]+):\s*$/) { $pkg = $1; next }
+        if (defined $pkg && $line =~ /^\s+version:\s*['"]?([\d._]+)/) {
+            $h{$pkg} = $1;
         }
     }
-    ok($ok, 'K3: hash references use { %hash } form');
+    return { %h };
+}
+
+# The provides block of META.json, as { package => version }.  The block is
+# isolated by counting braces first; matching "name": { ... "version" }
+# against the whole document instead would let the outer "provides" key pair
+# up with the first package's version.
+sub _provides_versions_json {
+    my ($text) = @_;
+    my %h;
+    return { %h } unless defined $text && $text ne '';
+    return { %h } unless $text =~ /"provides"\s*:\s*\{/g;
+
+    my $start = pos($text);
+    my $len   = length($text);
+    my $depth = 1;
+    my $i     = $start;
+    while ($i < $len && $depth > 0) {
+        my $c = substr($text, $i, 1);
+        if    ($c eq '{') { $depth++ }
+        elsif ($c eq '}') { $depth-- }
+        $i++;
+    }
+    my $block = substr($text, $start, $i - $start - 1);
+
+    while ($block =~ /"([\w:]+)"\s*:\s*\{(.*?)\}/gs) {
+        my $pkg  = $1;
+        my $body = $2;
+        if ($body =~ /"version"\s*:\s*"([^"]+)"/) {
+            $h{$pkg} = $1;
+        }
+    }
+    return { %h };
+}
+
+######################################################################
+# check_A -- MANIFEST completeness
+#
+#   A1  every MANIFEST entry exists on disk
+#   A2  the files every ina@CPAN dist must ship are listed
+#   A3  at least one .pm is listed
+#
+# Options:
+#   required => [ list ]   override the required-file list
+######################################################################
+
+sub _required_files {
+    my (%opt) = @_;
+    return @{ $opt{required} } if exists $opt{required};
+    return qw(Changes Makefile.PL MANIFEST META.yml META.json README LICENSE);
+}
+
+sub count_A {
+    my ($root, %opt) = @_;
+    return 0 unless defined($root) && -f "$root/MANIFEST";
+    my @manifest = _manifest_files($root);
+    my @required = _required_files(%opt);
+    return scalar(@manifest) + scalar(@required) + 1;
+}
+
+sub check_A {
+    my ($root, %opt) = @_;
+    plan_skip('MANIFEST not found') unless -f "$root/MANIFEST";
+    my @manifest = _manifest_files($root);
+    plan_skip('MANIFEST is empty') unless @manifest;
+
+    for my $f (@manifest) {
+        ok(-e "$root/$f", "A1 - MANIFEST entry exists: $f");
+    }
+    for my $req (_required_files(%opt)) {
+        ok(scalar(grep { $_ eq $req } @manifest),
+           "A2 - required file listed in MANIFEST: $req");
+    }
+    ok(scalar(grep { /\.pm$/ } @manifest) > 0,
+       'A3 - at least one .pm listed in MANIFEST');
+}
+
+######################################################################
+# check_B -- version consistency
+#
+# Per lib/*.pm:
+#   B1  $VERSION is defined
+#   B2  META.yml version matches it
+#   B3  META.json version matches it
+#   B4  Makefile.PL VERSION matches it
+#   B5  the top Changes entry matches it
+#   B6  every META.yml provides version matches it
+# Once per dist:
+#   B7  every META.json provides version matches the primary $VERSION
+######################################################################
+
+sub count_B {
+    my ($root) = @_;
+    my @pm = _lib_pm_files($root);
+    return scalar(@pm) * 6 + 1;
+}
+
+sub check_B {
+    my ($root) = @_;
+    my @pm_files  = _lib_pm_files($root);
+    my $meta_yml  = _slurp("$root/META.yml");
+    my $meta_json = _slurp("$root/META.json");
+    my $mkf_text  = _slurp("$root/Makefile.PL");
+    my $chg_text  = _slurp("$root/Changes");
+
+    for my $pm (@pm_files) {
+        my $ver = _pm_version("$root/$pm");
+        ok(defined $ver, "B1 - \$VERSION defined in $pm");
+        $ver = '(undef)' unless defined $ver;
+
+        my $yml_ver = _yaml_str($meta_yml, 'version');
+        ok(defined $yml_ver && $yml_ver eq $ver,
+           "B2 - META.yml version (" . (defined $yml_ver ? $yml_ver : 'undef')
+           . ") eq \$VERSION ($ver)");
+
+        my $json_ver = _json_str($meta_json, 'version');
+        ok(defined $json_ver && $json_ver eq $ver,
+           "B3 - META.json version (" . (defined $json_ver ? $json_ver : 'undef')
+           . ") eq \$VERSION ($ver)");
+
+        my $mk_ver;
+        $mk_ver = $1 if $mkf_text =~ /'VERSION'\s*=>\s*q\{([^}]+)\}/;
+        $mk_ver = $1 if !defined $mk_ver
+                     && $mkf_text =~ /'VERSION'\s*=>\s*['"]([^'"]+)['"]/;
+        ok(defined $mk_ver && $mk_ver eq $ver,
+           "B4 - Makefile.PL VERSION (" . (defined $mk_ver ? $mk_ver : 'undef')
+           . ") eq \$VERSION ($ver)");
+
+        my $chg_ver;
+        for my $line (split /\n/, $chg_text) {
+            if ($line =~ /^(\d+\.\d+[\w.]*)/) { $chg_ver = $1; last }
+        }
+        ok(defined $chg_ver && $chg_ver eq $ver,
+           "B5 - Changes top version (" . (defined $chg_ver ? $chg_ver : 'undef')
+           . ") eq \$VERSION ($ver)");
+
+        my $prov_yml = _provides_versions_yml($meta_yml);
+        my @yml_mm;
+        for my $pkg (sort keys %$prov_yml) {
+            push @yml_mm, "$pkg=$prov_yml->{$pkg}" if $prov_yml->{$pkg} ne $ver;
+        }
+        ok(!@yml_mm && %$prov_yml,
+           "B6 - META.yml provides versions all eq \$VERSION ($ver): $pm"
+           . (@yml_mm ? " (@yml_mm)" : ''));
+    }
+
+    my $primary_ver = @pm_files ? _pm_version("$root/$pm_files[0]") : undef;
+    my $prov_json   = _provides_versions_json($meta_json);
+    my @json_mm;
+    for my $pkg (sort keys %$prov_json) {
+        push @json_mm, "$pkg=$prov_json->{$pkg}"
+            if defined $primary_ver && $prov_json->{$pkg} ne $primary_ver;
+    }
+    ok(!@json_mm && %$prov_json,
+       "B7 - META.json provides versions all eq \$VERSION ("
+       . (defined $primary_ver ? $primary_ver : 'undef') . ")"
+       . (@json_mm ? " (@json_mm)" : ''));
+}
+
+######################################################################
+# check_C -- encoding hygiene, over every text file in MANIFEST
+#
+#   C1  US-ASCII only
+#   C2  no trailing whitespace
+#   C3  file ends with a newline
+#
+# Perl source and metadata must be US-ASCII for 5.005_03 portability.
+# Files that are intentionally not US-ASCII -- the multi-language cheat
+# sheets under doc/, a multibyte transpiler core, MBCS test fixtures --
+# are exempt from C1 only.  doc/*.txt is always exempt; anything else is
+# named by the caller through the utf8_ok regex.
+#
+# Options:
+#   utf8_ok => 'regex'     extra paths exempt from C1
+######################################################################
+
+sub count_C {
+    my ($root) = @_;
+    plan_skip('MANIFEST not found') unless -f "$root/MANIFEST";
+    my @files = _text_files($root);
+    return scalar(@files) * 3;
+}
+
+sub check_C {
+    my ($root, %opt) = @_;
+    return unless -f "$root/MANIFEST";
+    my $utf8_ok = exists $opt{utf8_ok} ? $opt{utf8_ok} : undef;
+
+    for my $rel (_text_files($root)) {
+        my $path = "$root/$rel";
+        unless (-f $path) {
+            ok(0, "C1 - US-ASCII only: $rel (file missing)");
+            ok(0, "C2 - no trailing whitespace: $rel (file missing)");
+            ok(0, "C3 - ends with newline: $rel (file missing)");
+            next;
+        }
+        my $src = _slurp($path);
+        my $ascii_exempt = ($rel =~ m{^doc/.*\.txt$}i)
+                        || (defined $utf8_ok && $rel =~ /$utf8_ok/);
+        ok($ascii_exempt || $src !~ /[^\x00-\x7F]/,
+           "C1 - US-ASCII only: $rel"
+           . ($ascii_exempt ? ' (exempt)' : ''));
+        ok($src !~ /[ \t]+\r?\n/,      "C2 - no trailing whitespace: $rel");
+        ok($src eq '' || $src =~ /\n\z/, "C3 - ends with newline: $rel");
+    }
+}
+
+######################################################################
+# check_D -- Perl 5.005_03 compatibility, per lib/*.pm
+#
+#   D1  the warnings stub defines import()
+#   D2  no 'our'                        (5.6+)
+#   D3  no say / given / state          (5.10+)
+#   D4  no my (undef, ...)              (5.10+)
+#   D5  $VERSION self-assignment present
+#   D6  CVE-2016-1238 mitigation: pop @INC
+#
+# A dist whose own test suite checks these in more depth (a t/9020 style
+# perl5compat file) should not also call check_D.
+######################################################################
+
+sub count_D {
+    my ($root) = @_;
+    my @pm = _lib_pm_files($root);
+    return scalar(@pm) * 6;
+}
+
+sub check_D {
+    my ($root) = @_;
+    for my $pm (_lib_pm_files($root)) {
+        my $text = _slurp("$root/$pm");
+        my $code = _code_only("$root/$pm");
+
+        ok($code =~ /\$INC\{'warnings\.pm'\}\s*=.*?eval\s*['"]package warnings;\s*sub import/s,
+           "D1 - warnings stub defines import(): $pm");
+
+        my @our_hits = _scan_code("$root/$pm", qr/\bour\b/);
+        ok(!@our_hits, "D2 - no 'our' keyword: $pm");
+
+        my @syn = _scan_code("$root/$pm", qr/\b(?:say|given|state)\s*[\(\{]/);
+        ok(!@syn, "D3 - no say/given/state: $pm");
+
+        my @und = _scan_code("$root/$pm", qr/\bmy\s*\(\s*undef/);
+        ok(!@und, "D4 - no 'my (undef, ...)': $pm");
+
+        ok($text =~ /\$VERSION\s*=\s*\$VERSION/,
+           "D5 - \$VERSION self-assignment present: $pm");
+
+        ok($code =~ /BEGIN\s*\{[^}]*pop\s+\@INC[^}]*\}/s
+        || $code =~ /pop \@INC if \$INC\[-1\] eq '\.'/,
+           "D6 - CVE-2016-1238 pop \@INC: $pm");
+    }
+}
+
+######################################################################
+# check_E -- code layout style
+#
+#   E1  no shebang in lib/*.pm                          (once)
+#   E2  no '} else' / '} elsif' on one line             (per file)
+######################################################################
+
+sub count_E {
+    my ($root) = @_;
+    my @files = _manifest_pm_and_t($root);
+    return 1 + scalar(@files);
+}
+
+sub check_E {
+    my ($root) = @_;
+
+    my $no_shebang = 1;
+    for my $f (_find_pm_t("$root/lib")) {
+        if (_slurp($f) =~ /^#!/) {
+            $no_shebang = 0;
+            diag("E1: shebang found in $f");
+        }
+    }
+    ok($no_shebang, 'E1 - no shebang in lib/*.pm');
+
+    for my $f (_manifest_pm_and_t($root)) {
+        next unless -f "$root/$f";
+        my @hits = _scan_code("$root/$f", qr/^\s*\}\s*els(?:e|if)\b/);
+        ok(!@hits, "E2 - no '} else/elsif' on same line: $f");
+        for my $h (@hits) { diag("  line $h->{line}: $h->{text}") }
+    }
+}
+
+######################################################################
+# check_F -- eg/ examples exist
+#
+#   F1  at least one eg/*.pl is shipped
+######################################################################
+
+sub count_F { return 1 }
+
+sub check_F {
+    my ($root) = @_;
+    my @eg;
+    if (-d "$root/eg") {
+        local *_INA_EG;
+        if (opendir(_INA_EG, "$root/eg")) {
+            @eg = grep { /\.pl$/ } readdir(_INA_EG);
+            closedir _INA_EG;
+        }
+    }
+    ok(scalar(@eg) > 0, 'F1 - at least one eg/*.pl example exists');
+}
+
+######################################################################
+# check_G -- POD structure, per lib/*.pm
+#
+#   G1  =head1 NAME          G4  =head1 DESCRIPTION
+#   G2  =head1 VERSION       G5  =head1 AUTHOR
+#   G3  =head1 SYNOPSIS      G6  a =head1 naming LICENSE
+#   G7  every POD block is closed by =cut
+#
+# G6 accepts any heading that contains the word LICENSE, so both
+# "=head1 LICENSE" and "=head1 COPYRIGHT AND LICENSE" pass.
+#
+# A dist whose own test suite checks POD in more depth (a t/9050 style
+# pod file) should not also call check_G.
+######################################################################
+
+sub count_G {
+    my ($root) = @_;
+    my @pm = _lib_pm_files($root);
+    return scalar(@pm) * 7;
+}
+
+sub check_G {
+    my ($root) = @_;
+    for my $pm (_lib_pm_files($root)) {
+        my $text = _slurp("$root/$pm");
+        ok($text =~ /^=head1\s+NAME\b/m,        "G1 - =head1 NAME: $pm");
+        ok($text =~ /^=head1\s+VERSION\b/m,     "G2 - =head1 VERSION: $pm");
+        ok($text =~ /^=head1\s+SYNOPSIS\b/m,    "G3 - =head1 SYNOPSIS: $pm");
+        ok($text =~ /^=head1\s+DESCRIPTION\b/m, "G4 - =head1 DESCRIPTION: $pm");
+        ok($text =~ /^=head1\s+AUTHOR\b/m,      "G5 - =head1 AUTHOR: $pm");
+        ok($text =~ /^=head1\s+.*\bLICENSE\b/m, "G6 - =head1 ... LICENSE: $pm");
+        my $opens = () = $text =~ /^=[a-zA-Z]/mg;
+        my $cuts  = () = $text =~ /^=cut\b/mg;
+        ok($cuts >= 1 && $cuts <= $opens, "G7 - POD blocks closed by =cut: $pm");
+    }
+}
+
+######################################################################
+# check_H -- README required sections
+#
+#   H1 NAME   H2 SYNOPSIS   H3 DESCRIPTION   H4 INSTALL
+#
+# A dist whose own test suite checks README in more depth (a t/9060 style
+# readme file) should not also call check_H.
+######################################################################
+
+sub count_H { return 4 }
+
+sub check_H {
+    my ($root) = @_;
+    my $readme = _slurp("$root/README");
+    ok($readme =~ /\bNAME\b/,        'H1 - README has NAME');
+    ok($readme =~ /\bSYNOPSIS\b/,    'H2 - README has SYNOPSIS');
+    ok($readme =~ /\bDESCRIPTION\b/, 'H3 - README has DESCRIPTION');
+    ok($readme =~ /\bINSTALL/i,      'H4 - README has INSTALL');
+}
+
+######################################################################
+# check_I -- generated metadata is well-formed
+#
+# META.yml:   I1 name  I2 version  I3 license
+#             I4 minimum_perl_version  I5 author  I6 provides non-empty
+# META.json:  I7 name  I8 version  I9 parses as an object
+# Makefile.PL I10 WriteMakefile()  I11 NAME and VERSION  I12 AUTHOR
+#
+# Options:
+#   min_perl  => '5.00503'                 expected minimum_perl_version
+#   author_re => 'ina\.cpan\@gmail\.com'   expected author / AUTHOR
+######################################################################
+
+sub count_I { return 12 }
+
+sub check_I {
+    my ($root, %opt) = @_;
+    my $min_perl  = exists $opt{min_perl}  ? $opt{min_perl}  : '5.00503';
+    my $author_re = exists $opt{author_re} ? $opt{author_re}
+                                           : 'ina\.cpan\@gmail\.com';
+
+    my $yml  = _slurp("$root/META.yml");
+    my $jsn  = _slurp("$root/META.json");
+    my $mkpl = _slurp("$root/Makefile.PL");
+
+    ok($yml =~ /^name\s*:/m,    'I1 - META.yml has name');
+    ok($yml =~ /^version\s*:/m, 'I2 - META.yml has version');
+    ok($yml =~ /^license\s*:/m, 'I3 - META.yml has license');
+
+    my $got_perl = _yaml_str($yml, 'minimum_perl_version');
+    ok(defined $got_perl && $got_perl eq $min_perl,
+       "I4 - META.yml minimum_perl_version is $min_perl (got: "
+       . (defined $got_perl ? $got_perl : 'undef') . ")");
+
+    my $author = _yaml_str($yml, 'author');
+    $author = '' unless defined $author;
+    if ($yml =~ /^author:\s*\n(\s+-[^\n]+)/m) { $author = $1 }
+    ok($author =~ /$author_re/i, 'I5 - META.yml author matches expected address');
+
+    my $prov = _provides_versions_yml($yml);
+    ok(scalar(keys %$prov) > 0, 'I6 - META.yml provides is non-empty');
+
+    ok($jsn =~ /"name"\s*:/,    'I7 - META.json has name');
+    ok($jsn =~ /"version"\s*:/, 'I8 - META.json has version');
+    ok($jsn =~ /^\s*\{/,        'I9 - META.json is a JSON object');
+
+    ok($mkpl =~ /WriteMakefile\s*\(/, 'I10 - Makefile.PL calls WriteMakefile()');
+    ok($mkpl =~ /'NAME'/ && $mkpl =~ /'VERSION'/,
+       'I11 - Makefile.PL has NAME and VERSION');
+    ok($mkpl =~ /$author_re/i, 'I12 - Makefile.PL AUTHOR matches expected address');
+}
+
+######################################################################
+# check_J -- test suite and prerequisite conventions
+#
+#   J1  9NNN test files are named 9NNN-name.t
+#   J2  no declared prerequisite carries the module's own $VERSION
+#
+# J2 catches the copy-paste slip of pasting the dist version into a core
+# module's minimum version in META.yml requires.
+######################################################################
+
+sub count_J { return 2 }
+
+sub check_J {
+    my ($root) = @_;
+
+    my @t_files;
+    local *_INA_T;
+    if (opendir(_INA_T, "$root/t")) {
+        @t_files = grep { /\.t$/ } readdir(_INA_T);
+        closedir _INA_T;
+    }
+    my @bad = sort grep { /^9\d{3}/ && !/^9\d{3}[-_][a-z]/ } @t_files;
+    ok(!@bad, 'J1 - 9NNN test files follow 9NNN-name.t'
+            . (@bad ? " (@bad)" : ''));
+
+    my @pm_files = _lib_pm_files($root);
+    my $pm_ver   = @pm_files ? _pm_version("$root/$pm_files[0]") : undef;
+    my $meta_yml = _slurp("$root/META.yml");
+    my $clash    = 0;
+    if (defined $pm_ver && $meta_yml =~ /^requires:(.*?)(?=^\S)/ms) {
+        my $block = $1;
+        while ($block =~ /:\s*([\d._]+)/g) {
+            if ($1 eq $pm_ver) { $clash = 1; last }
+        }
+    }
+    ok(!$clash, 'J2 - no prerequisite version equals the module $VERSION');
+}
+
+######################################################################
+# check_K -- reference and punctuation style, per lib/*.pm
+#
+#   K1  a comma is followed by whitespace
+#   K2  [ @array ] rather than \@array
+#   K3  { %hash }  rather than \%hash
+#
+# Options:
+#   k3_exempt => 'regex'   hash names allowed to keep the \%name form
+#                          (default: env, opts, args)
+######################################################################
+
+sub count_K {
+    my ($root) = @_;
+    my @pm = _lib_pm_files($root);
+    return scalar(@pm) * 3;
+}
+
+sub check_K {
+    my ($root, %opt) = @_;
+    my $k3_exempt = exists $opt{k3_exempt} ? $opt{k3_exempt}
+                                           : 'env\b|opts\b|args\b';
+
+    for my $pm (_lib_pm_files($root)) {
+        my $text  = _code_only("$root/$pm");
+        my @lines = split /\n/, $text;
+
+        my @k1_bad;
+        my $n = 0;
+        for my $line (@lines) {
+            $n++;
+            my $s = $line;
+            $s =~ s/^\s*#.*$//;
+            next unless $s =~ /\S/;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s{(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
+            $s =~ s{/[^/]+/[gimsex]*}{}g;
+            $s =~ s/#.*$//;
+            push @k1_bad, $n if $s =~ /,(?=[^\s\n\)\]\}\/])/;
+        }
+        ok(!@k1_bad, "K1 - comma followed by whitespace: $pm"
+                   . _first_lines(\@k1_bad));
+
+        my @k2_bad;
+        $n = 0;
+        for my $line (@lines) {
+            $n++;
+            next if $line =~ /^\s*#/;
+            my $cl = $line;
+            $cl =~ s/'[^']*'//g;
+            $cl =~ s/"[^"]*"//g;
+            $cl =~ s/#.*$//;
+            push @k2_bad, $n if $cl =~ /(?:push|unshift|return|=)\s*\\\@\w/;
+        }
+        ok(!@k2_bad, "K2 - use [ \@array ] instead of \\\@array: $pm"
+                   . _first_lines(\@k2_bad));
+
+        my @k3_bad;
+        $n = 0;
+        for my $line (@lines) {
+            $n++;
+            next if $line =~ /^\s*#/;
+            my $cl = $line;
+            $cl =~ s/'[^']*'//g;
+            $cl =~ s/"[^"]*"//g;
+            $cl =~ s/#.*$//;
+            push @k3_bad, $n if $cl =~ /\\\%(?!$k3_exempt)\w+/;
+        }
+        ok(!@k3_bad, "K3 - use { \%hash } instead of \\\%hash: $pm"
+                   . _first_lines(\@k3_bad));
+    }
+}
+
+sub _first_lines {
+    my ($bad) = @_;
+    return '' unless @$bad;
+    my $last = @$bad > 3 ? 2 : $#$bad;
+    return ' (lines: ' . join(', ', @{$bad}[0 .. $last]) . ')';
+}
+
+######################################################################
+# check_L -- Changes file format
+#
+#   L1  Changes is non-empty
+#   L2  the newest entry starts with VERSION and a date
+#   L3  the newest entry has an indented description body
+######################################################################
+
+sub count_L { return 3 }
+
+sub check_L {
+    my ($root) = @_;
+    my @lines = _slurp_lines("$root/Changes");
+    ok(scalar(@lines) > 0, 'L1 - Changes is non-empty');
+
+    my $top = '';
+    for my $line (@lines) {
+        $line =~ s/\r?\n$//;
+        next unless $line =~ /^\d/;
+        $top = $line;
+        last;
+    }
+    ok($top =~ /^\d+\.\d+\S*\s+\S+/,
+       "L2 - newest Changes entry has VERSION and date: '$top'");
+
+    my $has_body = 0;
+    my $in_entry = 0;
+    for my $line (@lines) {
+        $line =~ s/\r?\n$//;
+        if ($line =~ /^\d+\.\d+/) {
+            last if $in_entry;
+            $in_entry = 1;
+            next;
+        }
+        if ($in_entry && $line =~ /^\s+\S/) { $has_body = 1; last }
+    }
+    ok($has_body, 'L3 - newest Changes entry has an indented body');
 }
 
 ######################################################################

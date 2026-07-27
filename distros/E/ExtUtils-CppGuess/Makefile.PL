@@ -36,5 +36,12 @@ WriteMakefile(
           web => 'https://github.com/tsee/extutils-cppguess',
         },
       },
+      prereqs => {
+        develop => {
+          requires => {
+            'CPAN::Changes' => 0,
+          },
+        },
+      },
     },
 );

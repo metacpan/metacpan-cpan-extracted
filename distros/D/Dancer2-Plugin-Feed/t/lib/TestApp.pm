@@ -41,7 +41,7 @@ get '/other/feed/atom' => sub {
 };
 
 sub _get_entries {
-    [map { { title => "entry $_", category => [('a') x $_] } } ( 0 .. 9 )];
+    [ map { { title => "entry $_", category => [ ('a') x $_ ] } } ( 0 .. 9 ) ];
 }
 
 1;

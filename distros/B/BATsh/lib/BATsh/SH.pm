@@ -71,7 +71,7 @@ use File::Spec ();
 use Carp qw(croak);
 use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_EXCL O_TRUNC O_APPEND);
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -84,6 +84,11 @@ use vars qw(*_SH_REDIR_SRC *_SH_REDIR_DST *_SH_REDIR_SAVOUT *_SH_REDIR_SAVERR *_
 
 # Bareword filehandle glob for here-document temp file (Perl 5.005_03 compatible)
 use vars qw(*_HD_TMP);
+
+# Bareword directory handle for pathname expansion (_glob_paths).  One
+# directory level is read and closed at a time, so a single handle is
+# enough and is never nested.
+use vars qw(*_GLOB_DH);
 
 # Bareword filehandle globs for background-job PID temp file (Perl 5.005_03 compatible)
 use vars qw(*_BG_TMP *_BG_PIDFH);
@@ -628,10 +633,11 @@ sub _exec_line_impl {
         # happened to match.  Checking the raw text instead means only
         # a glob metacharacter that was actually written in the source
         # (e.g. "echo *.txt") triggers globbing.
-        my (undef, $raw_rest) = _split_sh($_raw_pre_expand);
+        my @raw_parts = _split_sh($_raw_pre_expand);
+        my $raw_rest  = $raw_parts[1];
         $raw_rest = '' unless defined $raw_rest;
         if (_raw_has_glob($raw_rest)) {
-            my @words = _parse_args($rest);
+            my @words = _parse_args($rest, 1);
             $rest = join(' ', @words);
         }
         return _cmd_echo($rest);
@@ -693,8 +699,41 @@ sub _exec_line_impl {
 # ----------------------------------------------------------------
 # Variable / arithmetic expansion
 # ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# Expansion-result protection
+# ----------------------------------------------------------------
+# BATsh expands a line first and removes quotes from it afterwards, so
+# a backslash arriving as the RESULT of an expansion (a variable value,
+# command-substitution output, or a tilde expansion) used to be re-read
+# as a shell escape by the later quote-removal stage and silently
+# deleted.  On Windows that ate every path: with HOME set to
+# C:\home\flower the line `cd ~` tried to enter C:homeflower, and
+# `d="C:\Users\x"; cd $d` failed in the same way.
+# POSIX quote removal applies to the source word only, never to what an
+# expansion produced, so a backslash coming out of an expansion is
+# stashed here behind a NUL-delimited sentinel (a NUL can never occur
+# in shell source) and becomes a literal backslash again in
+# _arr_dequote() -- or in _unprotect_lit(), for the few consumers that
+# never dequote (external command lines, here-document bodies, the
+# variable store).
+# ----------------------------------------------------------------
+sub _protect_lit {
+    my ($v) = @_;
+    return '' unless defined $v;
+    $v =~ s/\\/\x00BATSH_LB\x00/g;
+    return $v;
+}
+
+sub _unprotect_lit {
+    my ($v) = @_;
+    return '' unless defined $v;
+    $v =~ s/\x00BATSH_LB\x00/\\/g;
+    return $v;
+}
+
 sub _expand {
     my ($class, $str) = @_;
+
     return '' unless defined $str;
 
     # Tilde expansion (v0.07) MUST run before variable / command
@@ -734,7 +773,7 @@ sub _expand {
     $str = _replace_cmd_subst($class, $str);
 
     # backtick command substitution: `cmd`
-    $str =~ s/`([^`]*)`/_cmd_subst($class, $1)/ge;
+    $str =~ s/`([^`]*)`/_protect_lit(_cmd_subst($class, $1))/ge;
 
     # ---- Array expansions (v0.06) ----------------------------------
     # These MUST precede the scalar ${#VAR} / ${VAR} rules below so that a
@@ -755,19 +794,19 @@ sub _expand {
 
     # ${!NAME[@]} / ${!NAME[*]} -- list of indices / keys
     $str =~ s/\$\{!([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}/
-        join(' ', _arr_ordered_keys($1))
+        _protect_lit(join(' ', _arr_ordered_keys($1)))
     /ge;
 
     # ${NAME[@]} / ${NAME[*]} -- all elements (space-joined word-split model)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\[[\@*]\]\}/
-        join(' ', _arr_values($1))
+        _protect_lit(join(' ', _arr_values($1)))
     /ge;
 
     # ${NAME[SUB]} -- single element
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\[([^\]]*)\]\}/
         do {
             my $v = _arr_get_element($1, _arr_expand_sub($class, $2));
-            defined $v ? $v : ''
+            defined $v ? _protect_lit($v) : ''
         }
     /ge;
     # ----------------------------------------------------------------
@@ -780,76 +819,77 @@ sub _expand {
 
     # ${VAR%%pattern} -- remove longest suffix   (MUST be before single %)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)%%([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v, $2, 1) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(_sh_remove_suffix($v, $2, 1)) }
     /ge;
 
     # ${VAR%pattern}  -- remove shortest suffix  (single %, not %%)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)%(?!%)([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v, $2, 0) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(_sh_remove_suffix($v, $2, 0)) }
     /ge;
 
     # ${VAR##pattern} -- remove longest prefix   (MUST be before single #)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)##([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v, $2, 1) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(_sh_remove_prefix($v, $2, 1)) }
     /ge;
 
     # ${VAR#pattern}  -- remove shortest prefix  (single #, not ##)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)#(?!#)([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v, $2, 0) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(_sh_remove_prefix($v, $2, 0)) }
     /ge;
 
     # ${VAR//pat/rep} -- replace all occurrences  (MUST be before single /)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\/\/([^\/}]*)\/([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v, $2, $3, 1) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(_sh_replace($v, $2, $3, 1)) }
     /ge;
 
     # ${VAR/pat/rep} -- replace first occurrence  (single /, not //)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\/(?!\/)([^\/}]*)\/([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v, $2, $3, 0) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(_sh_replace($v, $2, $3, 0)) }
     /ge;
 
     # ${VAR^^} -- uppercase all
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\^\^\}/
-        do { my $v = BATsh::Env->get($1); defined $v ? uc($v) : '' }
+        do { my $v = BATsh::Env->get($1); defined $v ? _protect_lit(uc($v)) : '' }
     /ge;
 
     # ${VAR^} -- uppercase first char
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\^\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; ucfirst($v) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(ucfirst($v)) }
     /ge;
 
     # ${VAR,,} -- lowercase all
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*),,\}/
-        do { my $v = BATsh::Env->get($1); defined $v ? lc($v) : '' }
+        do { my $v = BATsh::Env->get($1); defined $v ? _protect_lit(lc($v)) : '' }
     /ge;
 
     # ${VAR,} -- lowercase first char
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*),\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; lcfirst($v) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _protect_lit(lcfirst($v)) }
     /ge;
 
     # ${VAR:offset:length} and ${VAR:offset}
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):(-?\d+):(\d+)\}/
         do {
             my $v = BATsh::Env->get($1); $v = defined $v ? $v : '';
-            BATsh::MB::mb_substr($v, int($2), int($3))
+            _protect_lit(BATsh::MB::mb_substr($v, int($2), int($3)))
         }
     /ge;
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):(-?\d+)\}/
         do {
             my $v = BATsh::Env->get($1); $v = defined $v ? $v : '';
-            BATsh::MB::mb_substr($v, int($2))
+            _protect_lit(BATsh::MB::mb_substr($v, int($2)))
         }
     /ge;
 
     # ${VAR:-default} ${VAR:=default} ${VAR:+alt}
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):-(.*?)\}/
-        do { my $v = BATsh::Env->get($1); (defined $v && $v ne '') ? $v : $2 }
+        do { my $v = BATsh::Env->get($1); (defined $v && $v ne '') ? _protect_lit($v) : $2 }
     /ge;
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):=(.*?)\}/
         do {
             my $v = BATsh::Env->get($1);
-            if (!defined $v || $v eq '') { BATsh::Env->set($1,$2); $v = $2 }
+            if (!defined $v || $v eq '') { BATsh::Env->set($1, $2); $v = $2 }
+            else { $v = _protect_lit($v) }
             $v
         }
     /ge;
@@ -862,12 +902,12 @@ sub _expand {
         do {
             my $n = $1;
             if (_arr_exists($n)) {
-                my $v = _arr_get_element($n, 0); defined $v ? $v : ''
+                my $v = _arr_get_element($n, 0); defined $v ? _protect_lit($v) : ''
             }
             else {
                 my $v = BATsh::Env->get($n);
                 _nounset_hit($n) if !defined $v;
-                defined $v ? $v : ''
+                defined $v ? _protect_lit($v) : ''
             }
         }
     /ge;
@@ -883,7 +923,7 @@ sub _expand {
 
 
     # $0 script name
-    $str =~ s/\$0/do { my $v=BATsh::Env->get('%0'); defined $v ? $v : '' }/ge;
+    $str =~ s/\$0/do { my $v=BATsh::Env->get('%0'); defined $v ? _protect_lit($v) : '' }/ge;
 
     # $1..$9 positional parameters
     $str =~ s/\$([1-9])/
@@ -891,7 +931,7 @@ sub _expand {
             my $n = $1;
             my $v = BATsh::Env->get("%$n");
             $v = BATsh::Env->get("BATSH_ARG$n") unless defined $v && $v ne '';
-            defined $v ? $v : ''
+            defined $v ? _protect_lit($v) : ''
         }
     /ge;
 
@@ -899,8 +939,8 @@ sub _expand {
     # Historically only $@ was substituted; $* fell through unexpanded and
     # printed literally.  Both now expand to the space-joined parameter
     # list held in %*.
-    $str =~ s/\$\@/do { my $v=BATsh::Env->get('%*'); defined $v ? $v : '' }/ge;
-    $str =~ s/\$\*/do { my $v=BATsh::Env->get('%*'); defined $v ? $v : '' }/ge;
+    $str =~ s/\$\@/do { my $v=BATsh::Env->get('%*'); defined $v ? _protect_lit($v) : '' }/ge;
+    $str =~ s/\$\*/do { my $v=BATsh::Env->get('%*'); defined $v ? _protect_lit($v) : '' }/ge;
 
     # $# number of positional parameters
     $str =~ s/\$#/
@@ -921,12 +961,12 @@ sub _expand {
         do {
             my $n = $1;
             if (_arr_exists($n)) {
-                my $v = _arr_get_element($n, 0); defined $v ? $v : ''
+                my $v = _arr_get_element($n, 0); defined $v ? _protect_lit($v) : ''
             }
             else {
                 my $v = BATsh::Env->get($n);
                 _nounset_hit($n) if !defined $v;
-                defined $v ? $v : ''
+                defined $v ? _protect_lit($v) : ''
             }
         }
     /ge;
@@ -1338,7 +1378,7 @@ sub _replace_cmd_subst {
                 $body .= $c; $i++;
             }
 
-            $result .= _cmd_subst($class, $body);
+            $result .= _protect_lit(_cmd_subst($class, $body));
             next;
         }
 
@@ -1575,10 +1615,13 @@ sub _cmd_export {
         }
         return 0;
     }
-    # export VAR=value or export VAR
-    for my $item (split /\s+/, $rest) {
+    # export VAR=value or export VAR.  The value is split on UNQUOTED
+    # whitespace and dequoted exactly like an ordinary assignment, so
+    # `export V='C:\x'` exports C:\x rather than the quote characters
+    # themselves, and `export V="a b"` keeps its embedded space.
+    for my $item (_arr_split_words($rest)) {
         if ($item =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
-            _sh_store_scalar($1, $2);
+            _sh_store_scalar($1, _arr_dequote($2));
         }
         elsif ($item =~ /\A([A-Za-z_][A-Za-z0-9_]*)\z/) {
             # export existing variable (already in store; no-op)
@@ -1645,6 +1688,15 @@ sub _cmd_echo {
         $rest =~ s/\\t/\t/g;
         $rest =~ s/\\r/\r/g;
         $rest =~ s/\\\\/\\/g;
+        # The same sequences arriving from an expansion (v='a\tb';
+        # echo -e $v) still carry the protection sentinel in place of
+        # their backslash, and are interpreted here as well; a protected
+        # backslash that does not start a known escape stays protected,
+        # so a Windows path keeps its separators.
+        $rest =~ s/\x00BATSH_LB\x00n/\n/g;
+        $rest =~ s/\x00BATSH_LB\x00t/\t/g;
+        $rest =~ s/\x00BATSH_LB\x00r/\r/g;
+        $rest =~ s/\x00BATSH_LB\x00\x00BATSH_LB\x00/\x00BATSH_LB\x00/g;
     }
     # Remove shell quoting structurally so that quotes anywhere in the
     # argument list are dropped (e.g. echo "${arr[@]}" tail), not only when
@@ -1931,8 +1983,29 @@ sub _tilde_expand {
 # purposes.  Everything else in the string (variables, command
 # substitution, arithmetic, ...) is left as-is for the rest of
 # _expand() to process afterwards.
+# _tilde_protect: let an expanded tilde-prefix survive the rest of the
+# expansion pipeline unharmed.  The replacement text is DATA, not shell
+# source: a Windows home directory such as C:\home\flower must not have
+# its backslashes eaten by quote removal, a "$" or "`" in it must not
+# start an expansion, and a home directory containing spaces must stay
+# a single word (POSIX: a tilde-expansion result is not field-split).
+# An unresolved ~name is returned untouched, exactly as bash leaves it.
+sub _tilde_protect {
+    my ($expanded, $orig) = @_;
+    return $orig unless defined $expanded;
+    return $expanded if $expanded eq $orig;
+    my $v = _protect_lit($expanded);
+    $v =~ s/\$/\x00BATSH_DL\x00/g;
+    $v =~ s/`/\x00BATSH_BT\x00/g;
+    # Only a home directory containing whitespace needs the quotes;
+    # quoting the usual case too would suppress globbing of ~/* words.
+    return $v unless $v =~ /\s/;
+    return '"' . $v . '"';
+}
+
 sub _tilde_prepass {
     my ($str) = @_;
+
     return $str unless defined $str && $str =~ /~/;
 
     my @chars = split //, $str;
@@ -1962,7 +2035,7 @@ sub _tilde_prepass {
             my $j = $i + 1;
             my $tag = '';
             while ($j < $n && $chars[$j] !~ /[\s\/'"]/) { $tag .= $chars[$j]; $j++ }
-            $out .= _tilde_expand('~' . $tag);
+            $out .= _tilde_protect(_tilde_expand('~' . $tag), '~' . $tag);
             $i = $j;
             $at_word_start = 0;
             next;
@@ -2752,16 +2825,54 @@ sub _cmd_local {
 # ----------------------------------------------------------------
 # set (sh set options -- minimal implementation)
 # ----------------------------------------------------------------
+# _sh_set_positional: replace $1..$9 / $@ / $* with a new argument list.
+# The interpreter keeps the positional parameters in %1..%9 (mirrored in
+# BATSH_ARG1..9 for the legacy CMD-side view) and their space-joined form
+# in %*, exactly as a function call and "shift" do, so "set --" reuses
+# that representation instead of inventing a second one.  OPTIND is
+# deliberately NOT reset: bash leaves it alone too, and a script that
+# re-parses a fresh list resets it itself.
+sub _sh_set_positional {
+    my ($args_ref) = @_;
+    my @args = @{$args_ref};
+    for my $n (1 .. 9) {
+        my $v = defined $args[$n-1] ? $args[$n-1] : '';
+        BATsh::Env->set("%$n", $v);
+        BATsh::Env->set("BATSH_ARG$n", $v);
+    }
+    BATsh::Env->set('%*', join(' ', @args));
+    return 1;
+}
+
 sub _cmd_set_sh {
     my ($rest) = @_;
     $rest =~ s/\A\s+//;
     $rest =~ s/\s+\z//;
     # set -e/+e -u/+u -x/+x, combinable (-eux), and set -o/+o NAME
-    # (errexit / nounset / xtrace).  Unknown letters and other forms are
-    # accepted silently (set is also a noop for positional-parameter use).
-    my @words = split /\s+/, $rest;
+    # (errexit / nounset / xtrace).  Unknown option letters are accepted
+    # silently.
+    #
+    # POSIX operand handling (v0.09): "set -- [ARG ...]" replaces the
+    # positional parameters with ARG ... (and clears them when no ARG is
+    # given), and so does a first word that is not an option, as in
+    # "set a b c".  Until v0.09 every operand form was silently ignored,
+    # so the common
+    #     set -- -f value ; while getopts f: opt ; do ... done
+    # idiom saw an empty argument list.  Words are split on unquoted
+    # whitespace and dequoted, so "set -- 'a b' c" sets exactly two
+    # parameters.
+    my @words = map { _arr_dequote($_) } _arr_split_words($rest);
+    my @pos     = ();
+    my $set_pos = 0;
     while (@words) {
         my $w = shift @words;
+        if ($w eq '--') {
+            $set_pos = 1;
+            @pos     = @words;
+            @words   = ();
+            last;
+        }
+
         if ($w =~ /\A([-+])o\z/ && @words) {
             my $on = ($1 eq '-') ? 1 : 0;
             my $name = lc(shift @words);
@@ -2779,7 +2890,14 @@ sub _cmd_set_sh {
             }
             next;
         }
+        # Not an option: this word and every word after it are the new
+        # positional parameters.
+        $set_pos = 1;
+        @pos     = ($w, @words);
+        @words   = ();
+        last;
     }
+    _sh_set_positional(\@pos) if $set_pos;
     $LAST_STATUS = 0;
     return 0;
 }
@@ -3018,7 +3136,12 @@ sub _eval_test {
     # File tests
     if ($expr =~ /\A(-[a-z])\s+(.+)\z/) {
         my ($op, $path) = ($1, $2);
-        $path =~ s/\A"//; $path =~ s/"\z//;
+        # Quote removal (which is also what turns a backslash that came
+        # out of an expansion back into a literal one) follows the same
+        # rules as for command words: test compares its operands
+        # literally, so a half-stripped "C:\dir"/sub would never name
+        # an existing file.
+        $path = _arr_dequote($path);
         $path = BATsh::MB::dec($path);
         if ($op eq '-e') { return -e $path ? 1 : 0 }
         if ($op eq '-f') { return -f $path ? 1 : 0 }
@@ -3035,8 +3158,8 @@ sub _eval_test {
     # String comparisons: = == != < >
     if ($expr =~ /\A(.+?)\s+(=|==|!=|<|>)\s+(.+)\z/) {
         my ($a, $op, $b) = ($1, $2, $3);
-        $a =~ s/\A"//; $a =~ s/"\z//;
-        $b =~ s/\A"//; $b =~ s/"\z//;
+        $a = _arr_dequote($a);
+        $b = _arr_dequote($b);
         if ($op eq '='  || $op eq '==') { return ($a eq $b) ? 1 : 0 }
         if ($op eq '!=') { return ($a ne $b) ? 1 : 0 }
         if ($op eq '<')  { return ($a lt $b) ? 1 : 0 }
@@ -3046,8 +3169,8 @@ sub _eval_test {
     # Integer comparisons: -eq -ne -lt -le -gt -ge
     if ($expr =~ /\A(.+?)\s+(-eq|-ne|-lt|-le|-gt|-ge)\s+(.+)\z/) {
         my ($a, $op, $b) = ($1, $2, $3);
-        $a =~ s/\A"//; $a =~ s/"\z//;
-        $b =~ s/\A"//; $b =~ s/"\z//;
+        $a = _arr_dequote($a);
+        $b = _arr_dequote($b);
         $a = int($a) if $a =~ /\A-?\d+\z/;
         $b = int($b) if $b =~ /\A-?\d+\z/;
         if ($op eq '-eq') { return ($a == $b) ? 1 : 0 }
@@ -3060,17 +3183,17 @@ sub _eval_test {
 
     # -n string (non-empty)
     if ($expr =~ /\A-n\s+(.+)\z/) {
-        my $s = $1; $s =~ s/\A"//; $s =~ s/"\z//;
+        my $s = _arr_dequote($1);
         return length($s) > 0 ? 1 : 0;
     }
     # -z string (empty)
     if ($expr =~ /\A-z\s+(.+)\z/) {
-        my $s = $1; $s =~ s/\A"//; $s =~ s/"\z//;
+        my $s = _arr_dequote($1);
         return length($s) == 0 ? 1 : 0;
     }
 
     # bare string: true if non-empty
-    $expr =~ s/\A"//; $expr =~ s/"\z//;
+    $expr = _arr_dequote($expr);
     return (length($expr) > 0 && $expr ne '0') ? 1 : 0;
 }
 
@@ -3672,7 +3795,8 @@ sub _parse_subshell {
         my $texp = _expand($class, $trailer);
         # Reuse the main redirection parser so a quoted target ("a b",
         # ">name", "cmd|") is read and dequoted exactly as elsewhere.
-        my (undef, $tr_redirs) = _sh_strip_redirects($texp);
+        my @tr_parts  = _sh_strip_redirects($texp);
+        my $tr_redirs = $tr_parts[1];
         for my $r (@{$tr_redirs}) {
             my ($fd, $app, $file) = @{$r};
             next if $file =~ /\A&[12]\z/;   # dup forms handled in body
@@ -5017,9 +5141,161 @@ sub _glob_expand {
     my ($word) = @_;
     # Fast path: no metacharacters
     return ($word) unless $word =~ /[*?\[]/;
-    my @matches = map { BATsh::MB::enc($_) } glob(BATsh::MB::dec($word));
+    # The matcher has to see the real pathname, so a backslash still held
+    # behind its expansion-result sentinel (a Windows path that came out
+    # of a variable) is restored first.  What comes back is data again and
+    # is re-protected, so the quote-removal stage downstream cannot eat
+    # the separators of the very names it just matched.
+    my $pat = _unprotect_lit($word);
+    my @matches = map { _protect_lit(BATsh::MB::enc($_)) }
+                      _glob_paths(BATsh::MB::dec($pat));
     return @matches ? @matches : ($word);
 }
+
+# ----------------------------------------------------------------
+# _glob_paths: pathname expansion in pure Perl (v0.09)
+# ----------------------------------------------------------------
+# Perl's built-in glob() cannot serve a shell that has to run on Windows:
+# it reads a backslash as an ESCAPE character, so the perfectly ordinary
+# pattern  C:\dir\*.txt  is understood as  C:dir*.txt  and matches
+# nothing, and when a pattern matches nothing glob() hands it back with
+# those backslashes already deleted.  File::Glob's GLOB_NOESCAPE would
+# avoid that, but File::Glob arrived in Perl 5.6 and BATsh supports
+# 5.005_03.  glob() also offers no extglob support and no say over
+# dot-files.  The pattern is therefore matched here, one path segment at
+# a time, with this module's own _glob_to_re() translator:
+#
+#   * the pathname separator is "/" everywhere, and "\" as well on
+#     Windows, where that is simply how a path is written.  On Unix a
+#     backslash is an ordinary character in a filename and stays one, so
+#     a directory really named "a\b" keeps working;
+#   * a segment holding no metacharacter is appended literally;
+#   * a leading "." is matched only by a pattern that starts with "."  --
+#     the shell rule, which glob() follows too;
+#   * every segment but the last has to name a directory;
+#   * the separators the caller wrote come back unchanged, so a Windows
+#     pattern yields Windows pathnames;
+#   * a negated class "[!abc]" negates, and only names that exist are
+#     returned, sorted, with case ignored on Windows.
+#
+# Returns the (possibly empty) list of matching pathnames.  The caller
+# decides what an empty list means; POSIX leaves the word untouched.
+# Perl 5.005_03 safe: bareword directory handle, no File::Glob, no
+# File::Spec, and one directory level is read and closed at a time so the
+# single global handle is never nested.
+# ----------------------------------------------------------------
+sub _glob_paths {
+    my ($pat) = @_;
+    return () unless defined $pat && $pat ne '';
+    my $win      = ($^O =~ /MSWin32|dos|os2|cygwin/i) ? 1 : 0;
+    my $sepclass = $win ? '[\\\\/]'  : '[/]';
+    my $nonsep   = $win ? '[^\\\\/]' : '[^/]';
+
+    # The leading root -- a Windows drive letter and/or separators -- is
+    # never a pattern and is copied through as written.
+    my $rest   = $pat;
+    my $prefix = '';
+    if ($win && $rest =~ s/\A([A-Za-z]:)//) { $prefix = $1 }
+    if ($rest =~ s/\A($sepclass+)//)        { $prefix .= $1 }
+
+    # Split the remainder into [segment, following separators] pairs.
+    my @parts = ();
+    while ($rest ne '') {
+        if    ($rest =~ s/\A($nonsep+)($sepclass+)//) { push @parts, [$1, $2] }
+        elsif ($rest =~ s/\A($nonsep+)\z//)           { push @parts, [$1, ''] }
+        elsif ($rest =~ s/\A($sepclass+)//)           { next }
+        else                                          { last }
+    }
+    return () unless @parts;
+
+    my @cur   = ($prefix);
+    my $done  = 0;
+    my $total = scalar(@parts);
+    for my $p (@parts) {
+        my ($seg, $sep) = @{$p};
+        $done++;
+        my $last = ($done == $total) ? 1 : 0;
+
+        # Is this segment a pattern at all?  An unbalanced "[" is not:
+        # treating it as a character class would let a stray bracket in
+        # "echo [$dir]" match a one-character filename.
+        my $is_pat = 0;
+        $is_pat = 1 if $seg =~ /[*?]/;
+        $is_pat = 1 if $seg =~ /\[[^\]]+\]/;
+        $is_pat = 1 if $_OPT_EXTGLOB && $seg =~ /[?*+\@!]\(/;
+
+        if (!$is_pat) {
+            my @next = ();
+            for my $c (@cur) { push @next, $c . $seg . $sep }
+            @cur = @next;
+            next;
+        }
+
+        my $re = _glob_to_re($seg, 1);
+        $re = $win ? "(?i)\\A(?:$re)\\z" : "\\A(?:$re)\\z";
+        # A pattern that cannot be compiled (an empty or reversed
+        # character class, say) is taken literally, as the shell does.
+        # The warning handler keeps such a pattern from printing a Perl
+        # diagnostic on the script's STDERR.
+        my $re_bad = 0;
+        {
+            local $SIG{'__WARN__'} = sub { 1 };
+            eval { my $probe = 'x'; $probe =~ /$re/ };
+            $re_bad = 1 if $@;
+        }
+        if ($re_bad) {
+            my @lit = ();
+            for my $c (@cur) { push @lit, $c . $seg . $sep }
+            @cur = @lit;
+            next;
+        }
+        my $want_dot = (index($seg, '.') == 0) ? 1 : 0;
+        my @next = ();
+        for my $c (@cur) {
+            # opendir() gets the directory without its trailing separator:
+            # Win32 turns "dir\\" into a "dir\\\\*" search pattern.
+            my $dir = $c;
+            if ($dir eq '') { $dir = '.' }
+            else {
+                my $trim = $dir;
+                $trim =~ s/$sepclass+\z//;
+                $dir = $trim unless $trim eq ''
+                                    || ($win && $trim =~ /\A[A-Za-z]:\z/);
+            }
+            my @names = ();
+            if (opendir(_GLOB_DH, $dir)) {
+                @names = readdir(_GLOB_DH);
+                closedir(_GLOB_DH);
+            }
+            local $SIG{'__WARN__'} = sub { 1 };
+            for my $nm (sort @names) {
+                next if !$want_dot && index($nm, '.') == 0;
+                my $hit = 0;
+                eval { $hit = ($nm =~ /$re/) ? 1 : 0 };
+                next unless $hit;
+                my $full = $c . $nm;
+                next if !$last && !-d $full;
+                push @next, $full . $sep;
+            }
+        }
+        @cur = @next;
+        return () unless @cur;
+    }
+
+    # Only existing names are matches.  A trailing separator is dropped
+    # for the probe, since Win32 dislikes "C:\dir\" in a file test.
+    my @out = ();
+    for my $c (@cur) {
+        my $probe = $c;
+        $probe =~ s/$sepclass+\z//;
+        $probe = $c if $probe eq '';
+        $probe = $c if $win && $probe =~ /\A[A-Za-z]:\z/;
+        next unless -e $probe || -l $probe;
+        push @out, $c;
+    }
+    return sort @out;
+}
+
 
 # ----------------------------------------------------------------
 # _raw_has_glob: true when the RAW (pre-expansion) argument text contains
@@ -5105,10 +5381,20 @@ sub _glob_to_re {
         }
         elsif ($c eq '?') { $re .= '.' }
         elsif ($c eq '[') {
+            # POSIX character class.  A leading ! (or ^) negates it -- the
+            # shell spells the negation "[!abc]", which Perl would read as
+            # the class of "!", "a", "b" and "c" -- and a leading ] and an
+            # embedded backslash are literal members of the class.
             my $cls = '[';
             $i++;
+            if ($i < $n && ($chars[$i] eq '!' || $chars[$i] eq '^')) {
+                $cls .= '^';
+                $i++;
+            }
+            if ($i < $n && $chars[$i] eq ']') { $cls .= '\\]'; $i++ }
             while ($i < $n && $chars[$i] ne ']') {
-                $cls .= $chars[$i]; $i++;
+                $cls .= ($chars[$i] eq '\\') ? '\\\\' : $chars[$i];
+                $i++;
             }
             $cls .= ']';
             $re .= $cls;
@@ -5364,7 +5650,14 @@ sub _call_sh_function {
 # _parse_args: split a string into arguments respecting quotes
 # ----------------------------------------------------------------
 sub _parse_args {
-    my ($str) = @_;
+    # $protect_quoted is set by a caller that joins the words back into a
+    # string and hands that string to a builtin which dequotes it again.
+    # The quotes are gone by then, so a backslash that was INSIDE them
+    # would be read as an escape by that second pass and disappear:
+    # echo "C:\dir"/*.txt printed C:dir/*.txt.  Protecting it marks it as
+    # data, exactly as an expansion result is marked, while a backslash
+    # written outside quotes stays an escape, as in bash.
+    my ($str, $protect_quoted) = @_;
     $str = '' unless defined $str;
     $str =~ s/\A\s+//; $str =~ s/\s+\z//;
     return () unless $str =~ /\S/;
@@ -5376,7 +5669,11 @@ sub _parse_args {
     my $in_dq = 0;
     for my $ch (split //, $str) {
         if ($in_sq) {
-            if ($ch eq "'") { $in_sq = 0 } else { $cur .= $ch; $word_quoted = 1 }
+            if ($ch eq "'") { $in_sq = 0 }
+            else {
+                $cur .= $protect_quoted ? _protect_lit($ch) : $ch;
+                $word_quoted = 1;
+            }
             next;
         }
         if ($ch eq "'" && !$in_dq) { $in_sq = 1; $word_quoted = 1; next }
@@ -5387,7 +5684,7 @@ sub _parse_args {
             $cur = ''; $word_quoted = 0;
             next;
         }
-        $cur .= $ch;
+        $cur .= ($protect_quoted && $in_dq) ? _protect_lit($ch) : $ch;
     }
     push @args,   $cur          if $cur ne '' || @args;
     push @quoted, $word_quoted  if $cur ne '' || @quoted;
@@ -5411,6 +5708,9 @@ sub _cmd_external {
     $rest = '' unless defined $rest;
     $rest =~ s/\A\s+//;
     my $full = $rest ne '' ? "$cmd $rest" : $cmd;
+    # The command line goes to the OS verbatim, so a protected backslash
+    # has to be a real backslash again here.
+    $full = _unprotect_lit($full);
     $full = BATsh::MB::dec($full);
     BATsh::Env->sync_to_env();
     my $rc = system($full);
@@ -5679,6 +5979,7 @@ sub _sh_is_readonly {
 # uniformly.
 sub _sh_store_scalar {
     my ($name, $val) = @_;
+    $val = _unprotect_lit($val) if defined $val;
     my $ik = uc($name);
     if ($_SH_READONLY{$ik}) {
         print STDERR "sh: $name: readonly variable\n";
@@ -6341,7 +6642,7 @@ sub _hd_run {
 
     my @body = @{$body_ref};
     if (!$quoted) {
-        for my $b (@body) { $b = _expand($class, $b) }
+        for my $b (@body) { $b = _unprotect_lit(_expand($class, $b)) }
     }
     my $text = '';
     for my $b (@body) { $text .= BATsh::MB::dec($b) . "\n" }
@@ -6499,7 +6800,9 @@ sub _arr_dequote {
         if ($c eq '"' && !$in_sq) { $in_dq = !$in_dq; $i++; next }
         $out .= $c; $i++;
     }
-    return $out;
+    # A backslash that came out of an expansion is literal data, never a
+    # shell escape: restore it now that quote removal has finished.
+    return _unprotect_lit($out);
 }
 
 # Split a string on unquoted whitespace, KEEPING the quote characters in
@@ -6837,6 +7140,10 @@ __END__
 
 BATsh::SH - Pure Perl bash/sh interpreter for BATsh
 
+=head1 VERSION
+
+Version 0.09
+
 =head1 SYNOPSIS
 
   # Used internally by BATsh; not normally called directly.
@@ -6914,6 +7221,7 @@ No external sh or bash is required.
   mapfile / readarray [-t] [-d D] [-n N] [-O O] [-s S] [ARR]
                        -- read lines of STDIN into an indexed array (v0.08)
   set -e / -u / -x, +e/+u/+x, set -o errexit|nounset|xtrace
+  set -- [ARG ...], set ARG ...  -- replace $1..$9 / $@ / $# (v0.09)
   trap 'cmd' SIG... / trap - SIG / trap '' SIG / trap [-p]
   $(( arithmetic )) -- full C-style operator set (see Arithmetic
    Expansion below); supports $1..$9 positional params
@@ -6950,7 +7258,7 @@ No external sh or bash is required.
   cmd <<-DELIM             (here-document, strip leading tabs)
   cmd <<'DELIM'            (here-document, no expansion)
   cmd &                    (background execution; external commands)
-  echo *.txt               (filename glob expansion: *, ?, [abc])
+  echo *.txt               (filename glob expansion: *, ?, [abc], [!abc])
   for f in *.pl; do ...    (glob expansion in for-loop word list)
   {a,b,c}, {1..5}, {a..e}[..step]  -- brace expansion (v0.07)
   shopt -s/-u extglob; ?(),*(),+(),@(),!()  -- extended pattern matching
@@ -6993,7 +7301,32 @@ The following parameter expansion forms are supported:
 Patterns use shell glob syntax: C<*> matches any string, C<?>
 matches any single character, C<[abc]> matches a character class.
 
+=head2 Expansion Results Are Literal (v0.09)
+
+A line is expanded first and has its quotes removed afterwards, so the
+two stages have to agree on what counts as shell source.  Quote removal
+applies to the word as it was written in the script -- never to what an
+expansion has just produced.  A backslash arriving from a variable, from
+a command substitution or from a tilde expansion is therefore literal
+data and survives untouched, while a backslash written in the script
+still quotes the character after it:
+
+  d="C:\Users\x"     # the value is  C:\Users\x
+  echo $d            # prints        C:\Users\x
+  echo C:\Users\x    # prints        C:Usersx   (source-level escapes)
+
+Before v0.09 the second line printed C<C:Usersx> as well, which made
+every Windows pathname held in a variable unusable, C<cd ~> included
+(with C<HOME> set to C<C:\home\flower> it tried to enter
+C<C:homeflower>).  A tilde expansion is additionally protected against
+field splitting, so a home directory whose name contains a space stays a
+single word, exactly as POSIX requires.
+
+Filename globbing likewise leaves a pattern that matches nothing exactly
+as it was written, instead of returning it with its backslashes removed.
+
 =head2 Arithmetic Expansion
+
 
 C<$(( expression ))> is evaluated by a recursive-descent parser with the
 full C-style operator set, in decreasing precedence:
@@ -7047,6 +7380,92 @@ command substitutions twice).
 All three options are reset at the start of each top-level
 C<BATsh-E<gt>run> / C<run_string> / C<run_lines>, so C<set -e> in one
 script does not leak into a later run in the same process.
+
+=head2 Positional Parameters via set (v0.09)
+
+C<set> also takes operands, as POSIX requires:
+
+  set -- ARG ...    replace $1..$9 / $@ / $* / $# with ARG ...
+  set --            clear them
+  set ARG ...       same, when the first operand is not an option
+  set -e -- ARG     options and operands may be combined
+
+The parameters are the ones a shell function call and C<shift> use, so
+C<$1>..C<$9>, C<$@>, C<$*>, C<$#>, C<shift> and C<getopts> all see them,
+and words are split on unquoted whitespace and dequoted, so
+C<set -- "a b" c> sets exactly two parameters.  This makes the usual
+option-parsing idiom work:
+
+  set -- -f value extra
+  while getopts f: opt; do
+      case $opt in
+          f) echo "$OPTARG" ;;
+      esac
+  done
+  shift $((OPTIND - 1))       # "extra" is now $1
+
+Before v0.09 every operand of C<set> was ignored, so the argument list
+stayed empty and the loop above never ran.  C<OPTIND> is deliberately
+left alone by C<set>, exactly as in bash: a script that parses a second
+list resets C<OPTIND=1> itself.  As elsewhere in BATsh, at most nine
+positional parameters are addressable.
+
+=head2 Pathname Expansion (v0.09)
+
+Filename patterns (C<*>, C<?>, C<[abc]>, C<[a-z]>, C<[!abc]>) are matched
+by BATsh itself rather than by Perl's C<glob()>, which reads a backslash
+as an escape character and would therefore destroy an ordinary Windows
+pattern: C<C:\dir\*.txt> was searched for as C<C:dir*.txt>, matched
+nothing, and came back with the backslashes deleted.  (File::Glob's
+C<GLOB_NOESCAPE> would avoid that, but File::Glob needs Perl 5.6 and
+BATsh supports 5.005_03.)  The matcher walks the pattern one path
+segment at a time:
+
+=over 4
+
+=item *
+
+The separator is C</> everywhere, and C<\> as well on Windows.  On Unix a
+backslash is an ordinary character in a filename and keeps that meaning,
+so a directory really named C<a\b> still works.
+
+=item *
+
+A leading C<.> is matched only by a pattern that itself starts with
+C<.>, and every segment but the last has to name a directory.
+
+=item *
+
+C<[!abc]> negates the class, the separators written in the pattern are
+the separators returned, matches are sorted, case is ignored on Windows,
+and only names that exist are returned -- a pattern matching nothing is
+left exactly as written, as POSIX requires.
+
+=back
+
+CMD-mode wildcards (C<FOR %f IN (...)>, C<DEL>) use the same matcher.
+
+How a Windows pattern is written differs between the two modes, and the
+difference is not the matcher's doing but the syntax each mode obeys.  In
+a CMD-mode line C<cmd.exe> has no escape character at all, so a pattern
+is written exactly as it looks:
+
+  FOR %%f IN (C:\dir\*.txt) DO ECHO %%f
+  DEL C:\dir\*.tmp
+
+In an SH-mode line a backslash quotes the character after it, as in bash,
+so a pathname typed bare would lose its separators before any matching
+happens (C<echo C:\dir\*.txt> means C<C:dir*.txt>, in bash too).  Quote
+the path, or -- as a script would anyway -- keep it in a variable:
+
+  d='C:\dir'
+  for f in $d\*.txt ; do echo "$f" ; done   # no: \* quotes the *
+  for f in $d/*.txt ; do echo "$f" ; done   # yes: mixed separators
+  d='C:\dir\'
+  for f in $d*.txt  ; do echo "$f" ; done   # yes: separator from $d
+
+A backslash that arrives from a variable is data, so it stays a
+separator; only the one typed in the line is an escape.
 
 =head2 eval
 
@@ -7543,10 +7962,10 @@ C<set -e> / C<-u> / C<-x>.
 =item *
 
 Extglob operators are recognised in case patterns and in the
-C<${VAR#pat}>-family parameter-expansion patterns only; pathname
-(filename) globbing (C<echo *.@(jpg|png)>) does not expand them, since
-filename globbing is delegated to Perl's built-in C<glob()>, which has
-no extglob support of its own.
+C<${VAR#pat}>-family parameter-expansion patterns only.  Pathname
+(filename) globbing (C<echo *.@(jpg|png)>) does not expand them: an
+unquoted C<(> C<)> is read by the line parser as a subshell command
+group long before the word reaches the pathname matcher.
 
 =item *
 

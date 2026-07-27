@@ -22,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 require BATsh::MB;
@@ -479,11 +479,12 @@ sub call_sub {
     # %0..%9 / %* (and the SH-side BATSH_ARG* mirror), and the caller's
     # parameters are restored on return.  An undef snapshot means the key
     # was absent and must be removed again on restore.
-    my @frame_keys = ('%0','%1','%2','%3','%4','%5','%6','%7','%8','%9','%*',
+    my @frame_keys = ('%0', '%1', '%2', '%3', '%4', '%5',
+                      '%6', '%7', '%8', '%9', '%*',
                       'BATSH_ARGC',
-                      'BATSH_ARG1','BATSH_ARG2','BATSH_ARG3','BATSH_ARG4',
-                      'BATSH_ARG5','BATSH_ARG6','BATSH_ARG7','BATSH_ARG8',
-                      'BATSH_ARG9');
+                      'BATSH_ARG1', 'BATSH_ARG2', 'BATSH_ARG3',
+                      'BATSH_ARG4', 'BATSH_ARG5', 'BATSH_ARG6',
+                      'BATSH_ARG7', 'BATSH_ARG8', 'BATSH_ARG9');
     my %saved;
     for my $k (@frame_keys) {
         $saved{$k} = exists $BATsh::Env::STORE{$k} ? $BATsh::Env::STORE{$k}
@@ -778,7 +779,10 @@ sub repl {
         if ($line =~ /\A\s*(?:EXIT|exit)\s*\z/) { print "Bye.\n"; last }
         next if $depth == 0 && $line =~ /\A\s*\z/;
         push @buf, $line;
-        my (undef, undef, $first) = _parse_line($line);
+        # (undef, ...) in a my list is a Perl 5.10 spelling; the list is
+        # taken as a whole and indexed instead, for 5.005_03.
+        my @parsed = _parse_line($line);
+        my $first  = $parsed[2];
         $cur_mode = classify_token($first) if $depth == 0 && $cur_mode eq '';
         # Detect here-document opener (SH only); defer activation one line
         if ($cur_mode eq 'SH') {
@@ -866,7 +870,7 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 This archive contains the distribution Dancer2-Plugin-Feed,
-version 1.262050:
+version 1.262070:
 
-  Easy to generate feed rss or atom for Dancer2 applications.
+  Easy to generate feed (RSS or atom) for Dancer2 applications.
 
 This software is copyright (c) 2026 by Natal Ngétal.
 

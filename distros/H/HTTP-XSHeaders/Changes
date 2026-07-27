@@ -1,3 +1,7 @@
+1.001000    2026-07-26
+            * Validate header field names against RFC 9110 token grammar.
+            (Christian Hansen)
+
 1.000002    2026-07-22
             * Add official dependency on HTTP::Headers.
             * Fix old-style package declration so old Perls stop complaining.

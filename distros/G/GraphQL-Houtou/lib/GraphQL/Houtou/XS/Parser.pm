@@ -7,7 +7,7 @@ use GraphQL::Houtou ();
 use GraphQL::Houtou::Error ();
 use JSON::MaybeXS ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 BEGIN {
   GraphQL::Houtou::_bootstrap_xs();
@@ -19,10 +19,16 @@ use 5.014;
 use strict;
 use warnings;
 use GraphQL::Houtou::Error ();
-use JSON::MaybeXS ();
+use JSON::MaybeXS qw(JSON);
 
 sub _make_bool {
-  return $_[0] ? JSON::MaybeXS::true() : JSON::MaybeXS::false();
+  # JSON::MaybeXS::true()/false() as bare package-qualified calls only work
+  # when the chosen backend happens to install them into the JSON::MaybeXS
+  # namespace itself - not guaranteed across JSON::MaybeXS versions/backends
+  # (observed failing under JSON::MaybeXS 1.003009 falling back to JSON::PP:
+  # "Undefined subroutine &JSON::MaybeXS::true called"). JSON()->true/false
+  # is the documented, backend-agnostic form already used in Type::Scalar.
+  return $_[0] ? JSON->true : JSON->false;
 }
 
 sub _string_value {

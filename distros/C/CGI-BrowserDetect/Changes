@@ -5,3 +5,6 @@ Revision history for CGI-BrowserDetect
 
 0.03    2018-08-11
         Improve test coverage
+
+1.02	2026-07-26
+	Remove PAX headers

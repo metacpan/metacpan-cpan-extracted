@@ -1,12 +1,12 @@
 {
     "name" : "BATsh",
-    "version" : "0.08",
+    "version" : "0.09",
     "abstract" : "Bilingual Shell for cmd.exe and bash in one script",
     "author" : [
         "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat version 0.40",
+    "generated_by" : "pmake.bat version 0.42",
     "license" : [
         "perl_5"
     ],
@@ -77,23 +77,23 @@
     "provides" : {
         "BATsh" : {
             "file" : "lib/BATsh.pm",
-            "version" : "0.08"
+            "version" : "0.09"
         },
         "BATsh::CMD" : {
             "file" : "lib/BATsh/CMD.pm",
-            "version" : "0.08"
+            "version" : "0.09"
         },
         "BATsh::Env" : {
             "file" : "lib/BATsh/Env.pm",
-            "version" : "0.08"
+            "version" : "0.09"
         },
         "BATsh::MB" : {
             "file" : "lib/BATsh/MB.pm",
-            "version" : "0.08"
+            "version" : "0.09"
         },
         "BATsh::SH" : {
             "file" : "lib/BATsh/SH.pm",
-            "version" : "0.08"
+            "version" : "0.09"
         }
     }
 }

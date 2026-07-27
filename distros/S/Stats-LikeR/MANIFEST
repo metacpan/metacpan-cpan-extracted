@@ -15,6 +15,7 @@ t/01.t
 t/HepatitisCdata.csv
 t/_parse_csv.t
 t/add_data.t
+t/age_standardize.t
 t/agg.t
 t/anova.t
 t/aoh2hoa.t
@@ -22,6 +23,7 @@ t/aoh2hoh.t
 t/aov.t
 t/assign.HoH.t
 t/assign.t
+t/bedroc.t
 t/better.coverage.t
 t/binom_test.t
 t/bodyfat.csv
@@ -39,13 +41,19 @@ t/csort.rowname.t
 t/csort.t
 t/drop_duplicates.t
 t/dropna.t
+t/dunn_test.t
+t/effect_sizes.t
+t/epi_2x2.t
 t/fillna.t
 t/filter.rowid.t
 t/filter.t
 t/filter_match.t
 t/fisher_test.t
+t/friedman_test.t
 t/glm.t
+t/glm_families.t
 t/group_by.HoH.filter.t
+t/help.t
 t/hoa2aoh.t
 t/hoa2hoh.t
 t/hoh2hoa.t
@@ -55,6 +63,7 @@ t/intersection.t
 t/is_equivalent.t
 t/ks_test.t
 t/lm.bugs.t
+t/mcnemar_test.t
 t/mean.t
 t/melt.t
 t/merge.t
@@ -68,6 +77,7 @@ t/pnorm.t
 t/prcomp.t
 t/predict.t
 t/predict2.t
+t/prop_test.t
 t/qcut.t
 t/rank.t
 t/read_filter.20260706.t
@@ -75,9 +85,12 @@ t/read_table.2.t
 t/read_table.comments.t
 t/read_table.t
 t/read_table.xlsx.t
+t/roc.t
 t/select_drop_rename_cols.t
 t/set_ops.t
 t/summary.t
+t/survival.t
+t/table_one.t
 t/transpose.t
 t/tukey.t
 t/uniq.t
@@ -89,6 +102,7 @@ t/view.aoa.t
 t/view.t
 t/view2.t
 t/view_aoa.t
+t/vif_hoslem.t
 t/wilcox_test.t
 t/write_table.longtable.t
 t/write_table.t

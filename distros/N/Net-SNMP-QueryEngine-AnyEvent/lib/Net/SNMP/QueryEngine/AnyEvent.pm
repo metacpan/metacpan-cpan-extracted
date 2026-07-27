@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.1.0';
+our $VERSION = 'v1.2.0';
 
 use AnyEvent;
 use AnyEvent::Handle;
@@ -254,7 +254,7 @@ Net::SNMP::QueryEngine::AnyEvent - multiplexing SNMP query engine client using A
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.2.0
 
 =head1 SYNOPSIS
 
@@ -361,15 +361,32 @@ Performs info request.
 
 Performs dest_info request.
 
+=head1 USING WITH YOUR OWN EVENT LOOP
+
+The wait() method is an optional convenience.  All callbacks are
+driven by the event loop itself, so a program which manages its own
+events never needs to call it: block on a condvar of your own and
+send it from a callback:
+
+    my $cv = AnyEvent->condvar;
+    my $sqe = Net::SNMP::QueryEngine::AnyEvent->new;
+
+    $sqe->gettable("127.0.0.1", 161, "1.3.6.1.2.1.2.2", sub {
+      my ($h, $ok, $r) = @_;
+      ...
+    });
+    $sqe->when_done("127.0.0.1", 161, sub { $cv->send });
+
+    $cv->recv;
+
 =head1 AUTHOR
 
 Anton Berezin, C<< <tobez at tobez.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-snmp-queryengine-anyevent at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-SNMP-QueryEngine-AnyEvent>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests via the GitHub issue tracker
+at L<https://github.com/tobez/Net-SNMP-QueryEngine-AnyEvent/issues>.
 
 
 =head1 SEE ALSO
@@ -389,21 +406,13 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub: source code and issue tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SNMP-QueryEngine-AnyEvent>
+L<https://github.com/tobez/Net-SNMP-QueryEngine-AnyEvent>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Net-SNMP-QueryEngine-AnyEvent>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Net-SNMP-QueryEngine-AnyEvent>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Net-SNMP-QueryEngine-AnyEvent/>
+L<https://metacpan.org/dist/Net-SNMP-QueryEngine-AnyEvent>
 
 =back
 
@@ -414,7 +423,7 @@ This work is in part sponsored by Telia Denmark.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2012-2015, Anton Berezin "<tobez@tobez.org>". All rights
+Copyright (c) 2012-2026, Anton Berezin "<tobez@tobez.org>". All rights
 reserved.
 
 Redistribution and use in source and binary forms, with or without

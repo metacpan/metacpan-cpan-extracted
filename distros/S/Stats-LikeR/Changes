@@ -1,6 +1,32 @@
 Revision history for Stats-LikeR
 
-   # Changes
+
+0.27 2026-07-26 CDT
+
+ - New `h` function: `h('agg')`, `h(*agg)` or `h(\&agg)` prints that function's section of this document and returns, in the spirit of R's `?function`. `h()` lists every documented function. It covers the XS functions as well as the Perl ones, because it looks the name up in the module's POD instead of reading an argument list — see [Getting help](#getting-help).
+ - The pure Perl functions also accept `'?'` or `'h'` in place of their arguments, which prints the same text and then dies. `$Stats::LikeR::HELP = 0` switches that off for code that has to pass a column or file really named `'h'`.
+ - `qcut`'s hand-written usage message was replaced by its section of this document; `qcut('h')` and `qcut('?')` still die, but `qcut('H')` no longer means help.
+
+ - speed improvements in calculation of Kendall tau and p-value.  Improvement of writing xlsx files that won't show in time, but pure waste was removed.
+
+ - Addition of `auc`, `auroc`, `cmh_test`, `epi_2x2`, `roc` functions
+
+ - `prcomp` now accepts AoH input
+
+ - glm extended (LikeR.xs)
+ - family => 'poisson' (log link) and family => 'negbin' — negative-binomial θ estimated by ML via a MASS::glm.nb-style outer loop, or fixed with theta =>. Matched R to ~1e-8 (coefs, deviance, null-dev, AIC, SE, θ); exact Poisson limit when data aren't over-dispersed.
+ - Every non-gaussian family now returns exp (odds/rate/incidence-rate ratios + conf.low/conf.high), link-scale conf.int, conf.level, and theta (negbin). Count families report z-statistics. OR/CI matched R's confint.default exactly.
+
+ - New XS tests (all matched R exactly)
+ - prop_test — 1/2/k-sample proportions (Yates, Wilson & Wald-diff CIs)
+ - mcnemar_test — matrix or paired vectors; continuity correction; exact => 1 binomial
+ - friedman_test — repeated-measures rank test, tie-corrected
+ - dunn_test — post-Kruskal pairwise, 7 adjustment methods
+
+ - New Perl functions (lib/Stats/LikeR.pm, matched base-R references)
+ - Effect sizes: cohen_d (+Hedges g, CI), smd, cramers_v (+Bergsma bias-corrected), eta_squared (η²/partial/ω²)
+ - vif, hosmer_lemeshow (matches hoslem.test)
+ - age_standardize — direct standardization + Fay–Feuer gamma CI (matches epitools::ageadjust.direct)
 
 0.26 2026-07-20 CDT
 
@@ -124,19 +150,19 @@ Revision history for Stats-LikeR
      commented-header column resolves whether it is referenced as `# PDB` or by
      its clean name `PDB`:
 
-     read_table(
-     'regression_rank.tabular.tsv',
-     filter => { '# PDB' => sub { $_ == 2 } },
-     );
+         read_table(
+             'regression_rank.tabular.tsv',
+             filter => { '# PDB' => sub { $_ == 2 } },
+         );
 
  - **Clearer "column not found" error.** The failure now names the file and
      lists the actual header instead of printing it to STDOUT (a library
      shouldn't print):
 
-     read_table: Filter column 'nope' not found in the header of FILE;
-     header is: 'PDB', 'score'
+         read_table: Filter column 'nope' not found in the header of FILE;
+         header is: 'PDB', 'score'
 
- - ## 0.20
+0.20 2026-07-05 CDT
 
  - addition of `ncol`, `nrow`, and `pnorm` functions
 
@@ -163,8 +189,8 @@ Revision history for Stats-LikeR
  - Clearer usage message. The signature is now `csort(...)`, so xsubpp no longer emits the misleading auto-generated `Usage: Stats::LikeR::csort(data, by, output=&PL_sv_undef)`. Argument count is checked by hand, and the croak now shows both real calling forms:
 
      Usage: csort($df, 'column.name', 'HoA')
-     or  csort($df, sub { $b->{'No.'} <=> $a->{'No.'} }, 'hoa')
-     (optional 4th arg names the row-name column when sorting a HoH; default 'row.name')
+        or  csort($df, sub { $b->{'No.'} <=> $a->{'No.'} }, 'hoa')
+       (optional 4th arg names the row-name column when sorting a HoH; default 'row.name')
 
  - `data`/`by`/`output` are read as `ST(0..2)`; `output` still defaults to matching the input shape.
 
@@ -256,7 +282,7 @@ Revision history for Stats-LikeR
 
  - new option to output to LaTeX table
 
- - ## 0.19
+0.19 2026-07-01 CDT
 
  - numerous `SSize_t var1 = av_len(var) + 1` are changed to `size_t var1 = av_len(var) + 1` as `size_t`; as the result cannot be negative, in order to expand numerical range
 
@@ -266,7 +292,7 @@ Revision history for Stats-LikeR
 
  - `view` now breaks columns into chunks for very wide data sets, more closely matching R's behavior
 
- - ## 0.18
+0.18 2026-06-28 CDT
 
  - `restrict` keyword added to numerous places within `intersection` to decrease CPU time
 
@@ -274,7 +300,7 @@ Revision history for Stats-LikeR
 
  - fixed POD rendering
 
- - ## 0.17
+0.17 2026-06-23 CDT (approx)
 
  - addition of `assign`, which adds new columns based on calculations from other columns
 
@@ -462,7 +488,7 @@ Revision history for Stats-LikeR
 
  - now accepts array of hashes
 
- - ## 0.16
+0.16 2026-06-17 CDT
 
  - changes to dist.ini, the minimum Perl version disappeared when I fixed other problems
 
@@ -661,13 +687,13 @@ Revision history for Stats-LikeR
 
  - Added `t/wilcox_test.t` (flat, no subtests): R-agreement cases, option handling (`paired`, `correct`, `exact`, `mu`, named/positional `x`/`y`, NA dropping), regressions for all four bug fixes, argument-error and `alternative`-validation checks, output shape, and `no_leaks_ok` coverage of the two-sample, exact, and paired allocation paths.
 
- - ## 0.15
+0.15 2026-06-11 CDT
 
  - `view` function added, similar to R's `head`
 
  - `read_table`:
      filter => {
-     'Testosterone, total (nmol/L)' => sub { defined $_ },
+         'Testosterone, total (nmol/L)' => sub { defined $_ },
      }
 
  - was broken by the change in undefined variables in 0.14, but is back to being `undef`
@@ -861,7 +887,7 @@ Revision history for Stats-LikeR
      empty input writing no file, and UTF-8 column names and row keys. Two leak
      assertions cover the exception paths above.
 
- - ## 0.14
+0.14 2026-06-08 CDT
 
  - `filter` function added for rows
 
@@ -881,22 +907,22 @@ Revision history for Stats-LikeR
 
  - `fisher_test` now should be complete, errors with confidence intervals fixed
 
- - ## 0.13
+0.13 2026-06-07 CDT
 
  - `read_table`: speed improvements; commented headers are now allowed
 
  - `write_table`: fix for 
 
      Attempt to free temp prematurely: SV 0x56417a2ae610 at t/write_table.t line 182.
-     main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+     	main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
      Attempt to free unreferenced scalar: SV 0x56417a2ae610 at t/write_table.t line 183.
-     main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+     	main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
 
  - `write_table` gives better warnings for incorrect types of data given
 
  - Numerous changes to dist.ini to improve CPAN testing, especially for Win32
 
- - ## 0.12
+0.12 2026-06-08 CDT
 
  - `add_data` can also take hash of arrays, and various mixes of data types
 
@@ -924,7 +950,7 @@ Revision history for Stats-LikeR
 
  - Added `__EXTENSIONS__` to source XS file for better CPAN testing
 
- - ## 0.11
+0.11 2026-06-03 CDT
 
  - better POD formatting for tables
 
@@ -936,7 +962,7 @@ Revision history for Stats-LikeR
 
  - Better documentation for t-test
 
- - ## 0.10
+0.10 2026-06-01 CDT (approx)
 
  - changes to compilation for CPAN, trying to get this work on Windows
 
@@ -944,13 +970,13 @@ Revision history for Stats-LikeR
 
  - `matrix` will work without key names, just like in R.  Testing for `matrix` has improved.
 
- - ## 0.09
+0.09 2026-06-01 CDT (approx)
 
  - context changes in XS `dTHX`, `pTHX_`, and `aTHX_` to get better CPAN testing results
 
  - `restrict` keywords added to `lm` to increase speed
 
- - ## 0.08
+0.08 2026-05-26 CDT
 
  - Speed improvement in `summary` of hashes.
 
@@ -962,7 +988,7 @@ Revision history for Stats-LikeR
 
  - `read_table` now returns hash-of-hash in {row}{column}
 
- - ## 0.07
+0.07 2026-05-24 CDT
 
  - Addition of `summary` function.
 
@@ -972,7 +998,7 @@ Revision history for Stats-LikeR
 
  - `read_table` and `write_table` now automatically set separators for `.csv` files as `,` and `.tsv` files as `"\t"`, respectively, so these values no longer need to be specified separately from the file name.
 
- - ## 0.06
+0.06 2026-05-19 CDT
 
  - Changed compiler options so that Solaris will work
 
@@ -980,7 +1006,7 @@ Revision history for Stats-LikeR
 
  - Added restrict keywords to `power_t_test`, and made `int` to `unsigned int`
 
- - ## 0.05
+0.05 2026-05-08 CDT
 
  - Leak testing for `sample`
 

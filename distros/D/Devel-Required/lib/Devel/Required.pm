@@ -1,7 +1,7 @@
 package Devel::Required;
 
 # set version information
-$VERSION= '0.17';
+$VERSION= '0.18';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -302,7 +302,7 @@ distributions that have a C<maint> and C<blead> version internally.
 
 This module should B<only> be installed on the system of the developer.
 
-Note that as 0.17 the module should be used in an eval BEFORE loading
+Note that the module should be used in an eval BEFORE loading
 +L<ExtUtils::MakeMaker>, not afterwards as in previous versions. This version
 +should work on any version of perl.
 

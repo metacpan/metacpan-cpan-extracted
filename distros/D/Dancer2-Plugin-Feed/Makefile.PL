@@ -15,7 +15,7 @@ use 5.020000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Easy to generate feed rss or atom for Dancer2 applications.",
+  "ABSTRACT" => "Easy to generate feed (RSS or atom) for Dancer2 applications.",
   "AUTHOR" => "Natal Ng\x{e9}tal, Stefan H\x{e4}rter",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.262050",
+  "VERSION" => "1.262070",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -83,5 +83,6 @@ CppGuessTest\.obj
 ^t/makemaker/
 
 ^\.github/
+^xt/
 
 \.swp$

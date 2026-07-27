@@ -22,13 +22,13 @@ my %module_build_args = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Easy to generate feed rss or atom for Dancer2 applications.",
+  "dist_abstract" => "Easy to generate feed (RSS or atom) for Dancer2 applications.",
   "dist_author" => [
     "Natal Ng\x{e9}tal",
     "Stefan H\x{e4}rter"
   ],
   "dist_name" => "Dancer2-Plugin-Feed",
-  "dist_version" => "1.262050",
+  "dist_version" => "1.262070",
   "license" => "perl",
   "module_name" => "Dancer2::Plugin::Feed",
   "recursive_test_files" => 1,

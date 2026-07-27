@@ -1,0 +1,11 @@
+Revision history for Litavis
+
+0.03    2026-07-11
+        - litavis_parser.h: undef Perl's fopen/fclose/fread/fwrite macros on
+          Windows+MULTIPLICITY before plain-C static functions (PerlSIO
+          redirect requires my_perl in scope).
+        - litavis_parser.h: define _XOPEN_SOURCE 700 on MinGW before
+          <dirent.h> so opendir/readdir/closedir are visible under -std=c99.
+
+0.01    2026-03-28
+        - Initial release.

@@ -196,7 +196,7 @@ done
 echo "[17] return (demonstrated in mixed mode in eg/07)"
 # In pure SH sections, subroutines are invoked via CMD-section CALL.
 # See eg/07_mixed_comprehensive.batsh for CALL :sub / return examples.
-echo "  (skipped: use eg/07 for subroutine demos)" 
+echo "  (skipped: use eg/07 for subroutine demos)"
 
 # ---------------------------------------------------------------
 # 18. $? last exit status
@@ -211,13 +211,13 @@ echo "  after false: status=$?"
 # 19. shift (demonstrated in mixed mode)
 # ---------------------------------------------------------------
 echo "[19] shift -- see eg/07 for full demo via CALL :sub"
-echo "  (shift is effective inside subroutines invoked by CMD CALL)" 
+echo "  (shift is effective inside subroutines invoked by CMD CALL)"
 
 # ---------------------------------------------------------------
 # 20. local variable (demonstrated in mixed mode)
 # ---------------------------------------------------------------
 echo "[20] local -- see eg/07 for full demo via CALL :sub"
-echo "  (local is effective inside subroutines invoked by CMD CALL)" 
+echo "  (local is effective inside subroutines invoked by CMD CALL)"
 
 # ---------------------------------------------------------------
 echo "[SH comprehensive] Done."

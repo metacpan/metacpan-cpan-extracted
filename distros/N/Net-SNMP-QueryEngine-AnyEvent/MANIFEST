@@ -8,7 +8,6 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-ignore.txt
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -28,6 +27,7 @@ t/12-live-info.t
 t/13-live-whendone.t
 t/14-live-error.t
 t/15-live-reconnect.t
+t/16-connect-failure.t
 t/data/meow.snmprec
 t/data/public.snmprec
 t/lib/SQETest.pm

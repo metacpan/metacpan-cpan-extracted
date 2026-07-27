@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use JSON::MaybeXS ();
+use JSON::MaybeXS qw(JSON);
 use Test::More 0.98;
 
 use GraphQL::Houtou ();
@@ -859,7 +859,7 @@ subtest 'dynamic include directives execute through lowered runtime guards' => s
   # spec's AllowedVariableUsage, and request validation now enforces it.
   my $result = $schema->execute(
     'query Q($show: Boolean!) { viewer { id name @include(if: $show) } }',
-    variables => { show => JSON::MaybeXS::true() },
+    variables => { show => JSON->true },
   );
 
   is_deeply $result, {

@@ -1,6 +1,9 @@
 ######################################################################
 #
-# 9040-style.t  Code style checks (US-ASCII, no trailing whitespace)
+# 9040-style.t  Code style checks
+#
+#   check_C  US-ASCII only, no trailing whitespace, ends with newline
+#   check_K  comma spacing and reference idioms in lib/*.pm
 #
 # COMPATIBILITY: Perl 5.005_03 and later
 #
@@ -18,7 +21,8 @@ use INA_CPAN_Check;
 my $ROOT = File::Spec->rel2abs(
     File::Spec->catdir($FindBin::RealBin, File::Spec->updir));
 
-plan_tests(count_C($ROOT));
+plan_tests(count_C($ROOT) + count_K($ROOT));
 check_C($ROOT);
+check_K($ROOT);
 
 END { end_testing() }

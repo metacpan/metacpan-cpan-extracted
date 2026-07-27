@@ -9,7 +9,7 @@ WriteMakefile (
  AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT	=> 'add dump methods to all classes and objects',
  VERSION_FROM	=> 'lib/UNIVERSAL/dump.pm',
-
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> {qw(
                     Data::Dumper      0
                    )},

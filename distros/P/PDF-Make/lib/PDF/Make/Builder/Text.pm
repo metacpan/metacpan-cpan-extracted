@@ -14,6 +14,7 @@ BEGIN {
         'pad_end:Str',
         'margin:Num:default(5)',
         'overflow:Bool:default(0)',
+        'preformatted:Bool:default(0)',
         'font:HashRef',
         'x:Num', 'y:Num', 'w:Num', 'h:Num',
         'end_w:Num:default(0)',
@@ -38,6 +39,56 @@ sub _resolve_font {
         return $f;
     }
     return $base;
+}
+
+# Soft-wrap one physical line of preformatted text to $max_w, preserving all
+# whitespace. Breaks at whitespace boundaries where possible; a single token
+# wider than the line is broken between characters. Returns the wrapped
+# segments (continuation segments start at the left margin, not re-indented).
+sub _wrap_pre_line {
+    my ($font, $line, $max_w) = @_;
+    return ($line) if $font->measure_text($line) <= $max_w;
+
+    # Words and whitespace runs, everything preserved. Any atom that is itself
+    # wider than the line is pre-split into character-sized chunks.
+    my @atoms;
+    for my $a (grep { length } split /(\s+)/, $line) {
+        if ($font->measure_text($a) <= $max_w) {
+            push @atoms, $a;
+        } else {
+            push @atoms, _char_chunks($font, $a, $max_w);
+        }
+    }
+
+    my @out;
+    my $cur = '';
+    for my $a (@atoms) {
+        if ($cur eq '' || $font->measure_text($cur . $a) <= $max_w) {
+            $cur .= $a;
+        } else {
+            push @out, $cur;
+            $cur = $a;
+        }
+    }
+    push @out, $cur if length $cur;
+    return @out;
+}
+
+# Break a string into the longest character prefixes that each fit in $max_w.
+sub _char_chunks {
+    my ($font, $s, $max_w) = @_;
+    my @chunks;
+    my $cur = '';
+    for my $ch (split //, $s) {
+        if ($cur eq '' || $font->measure_text($cur . $ch) <= $max_w) {
+            $cur .= $ch;
+        } else {
+            push @chunks, $cur;
+            $cur = $ch;
+        }
+    }
+    push @chunks, $cur if length $cur;
+    return @chunks;
 }
 
 sub add {
@@ -74,36 +125,65 @@ sub add {
         $indent_w = $font->space_width * $ind;
     }
 
-    # Word-wrap
+    # Build the list of physical lines to render.  Each entry is
+    # [ line_text, line_width, is_first ].
     my $raw = text $self;
-    my @words = split /\s+/, $raw;
-    return $self unless @words;
+    my $preformatted = preformatted $self;
 
     my @lines;
-    my $line = '';
-    my $line_w = $indent_w;
-    my $first_line = 1;
 
-    for my $word (@words) {
-        my $candidate = $line eq '' ? $word : ($line . ' ' . $word);
-        my $candidate_w = $font->measure_text($candidate);
-        my $test_w = $candidate_w + ($first_line ? $indent_w : 0);
-        my $max_w = $text_w;
-
-        if ($test_w > $max_w && $line ne '') {
-            push @lines, [$line, $line_w, $first_line];
-            $first_line = 0;
-            $line = $word;
-            $line_w = $font->measure_text($line);
-        } else {
-            $line = $candidate;
-            $line_w = $test_w;
+    if ($preformatted) {
+        # Verbatim: preserve hard newlines and all in-line whitespace (leading
+        # spaces indent via the space glyph's advance), expand tabs to four
+        # spaces, and never collapse runs of whitespace. Physical lines wider
+        # than the content width are soft-wrapped (at whitespace where
+        # possible, mid-token otherwise) so nothing runs off the page.
+        return $self unless length $raw;
+        for my $phys (split /\n/, $raw, -1) {
+            $phys =~ s/\t/    /g;
+            if ($phys eq '') {
+                push @lines, ['', 0, 0];   # blank line -> vertical space
+                next;
+            }
+            for my $seg (_wrap_pre_line($font, $phys, $text_w)) {
+                push @lines, [$seg, $font->measure_text($seg), 0];
+            }
         }
+        # A trailing newline yields one empty line; drop it so a block that
+        # merely ends in "\n" doesn't gain a spurious blank line.
+        pop @lines if @lines > 1 && $lines[-1][0] eq '';
     }
-    push @lines, [$line, $line_w, $first_line] if $line ne '';
+    else {
+        # Word-wrap: collapse whitespace and reflow to the content width.
+        my @words = split /\s+/, $raw;
+        return $self unless @words;
 
-    # Render lines
-    my $al = align $self;
+        my $line = '';
+        my $line_w = $indent_w;
+        my $first_line = 1;
+
+        for my $word (@words) {
+            my $candidate = $line eq '' ? $word : ($line . ' ' . $word);
+            my $candidate_w = $font->measure_text($candidate);
+            my $test_w = $candidate_w + ($first_line ? $indent_w : 0);
+            my $max_w = $text_w;
+
+            if ($test_w > $max_w && $line ne '') {
+                push @lines, [$line, $line_w, $first_line];
+                $first_line = 0;
+                $line = $word;
+                $line_w = $font->measure_text($line);
+            } else {
+                $line = $candidate;
+                $line_w = $test_w;
+            }
+        }
+        push @lines, [$line, $line_w, $first_line] if $line ne '';
+    }
+
+    # Render lines. Preformatted text is always left-aligned; reflow-only
+    # features (alignment, dot-leader padding) don't apply to it.
+    my $al = $preformatted ? 'left' : align $self;
     my $can_overflow = overflow $self;
 
     for my $idx (0 .. $#lines) {
@@ -260,6 +340,18 @@ Vertical margin in points added after the text block.
 
 When true, automatically creates new pages if the text exceeds the remaining
 space on the current page.
+
+=item B<preformatted> (Bool, default 0)
+
+When true, the text is rendered verbatim: hard newlines and all in-line
+whitespace are preserved (leading spaces indent), and tabs are expanded to
+four spaces. Whitespace is never collapsed, but physical lines longer than
+the content width are soft-wrapped (at whitespace where possible, mid-token
+otherwise) so nothing runs off the page. Preformatted text is always
+left-aligned, and C<align>, C<indent>, and C<pad> are ignored; page
+C<overflow> still applies. Use this for code blocks and other pre-formatted
+content where the default whitespace-collapsing word-wrap would destroy the
+layout.
 
 =item B<font> (HashRef)
 

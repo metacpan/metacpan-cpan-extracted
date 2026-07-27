@@ -15,33 +15,53 @@ my @DATA = (
       linker_flags => 'msvcprt.lib',
     },
   ],
-  [
-    { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => ''} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '-lstdc++',
-    },
-  ],
-  [
-    { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => 'static-libstdc++'} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '',
-    },
-  ],
-  [
-    { os => 'freebsd', cc => 'gcc', config => {ccflags => ''}, osvers => 9 },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '-lstdc++',
-    },
-  ],
+  $^O eq 'darwin' ? () : ( # "gcc" on macOS can be clang
+    [
+      { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => ''} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++',
+      },
+    ],
+    [
+      { os => 'MSWin32', cc => 'gcc', config => {ccflags => '', ldflags => 'static-libstdc++'} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '',
+      },
+    ],
+    [
+      { os => 'freebsd', cc => 'gcc', config => {ccflags => ''}, osvers => 9 },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++',
+      },
+    ],
+    [
+      { os => 'netbsd', cc => 'gcc', config => {ccflags => ''} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++ -lgcc_s',
+      },
+    ],
+    [
+      { os => 'linux', cc => 'gcc', config => {ccflags => ''} },
+      {
+        is_sunstudio => 0,
+        is_msvc => undef, is_gcc => 1, is_clang => 0,
+        compiler_command => 'g++ -xc++',
+        linker_flags => '-lstdc++',
+      },
+    ],
+  ),
   [
     { os => 'freebsd', cc => 'gcc', config => {gccversion => 'Clang', ccflags => ''}, osvers => 10 },
     {
@@ -52,29 +72,11 @@ my @DATA = (
     },
   ],
   [
-    { os => 'netbsd', cc => 'gcc', config => {ccflags => ''} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
-      linker_flags => '-lstdc++ -lgcc_s',
-    },
-  ],
-  [
     { os => 'linux', cc => 'clang', config => {gccversion => 'Clang', ccflags => ''} },
     {
       is_sunstudio => 0,
       is_msvc => undef, is_gcc => undef, is_clang => 1,
       compiler_command => 'clang++ -xc++ -Wno-reserved-user-defined-literal',
-      linker_flags => '-lstdc++',
-    },
-  ],
-  [
-    { os => 'linux', cc => 'gcc', config => {ccflags => ''} },
-    {
-      is_sunstudio => 0,
-      is_msvc => undef, is_gcc => 1, is_clang => 0,
-      compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++',
     },
   ],
@@ -101,6 +103,7 @@ our $CAPTURES;
 {
   no warnings "redefine";
   *ExtUtils::CppGuess::_capture =
+  *ExtUtils::CppGuess::_capture_empty_stdin =
     sub {
       my @cmd = @_;
       if (my $result = $CAPTURES->{"@cmd"}) {
@@ -140,21 +143,26 @@ my @CAPS =
          compiler_command => 'g++ -xc++',
          linker_flags => '-lstdc++',
        },
-       { "cc --version" => "cc (Debian 12.2.0-14) 12.2.0" },
+       {
+         "cc --version" => "cc (Debian 12.2.0-14) 12.2.0",
+         "cc -dM -E -" => "#define __GNUC__ 4",
+       },
      ],
     );
 
 for my $test (@CAPS) {
     my ($args, $expect, $cap) = @$test;
     local $CAPTURES = $cap;
-    run_test($args, $expect);
+    run_test($args, $expect, 1);
 }
 
 done_testing;
 
 sub run_test {
-  my ($args, $expect) = @_;
+  my ($args, $expect, $mocked) = @_;
   my $guess = ExtUtils::CppGuess->new(%$args);
   my %got = map {$_ => $guess->$_} @METHODS;
-  is_deeply \%got, $expect or diag explain [ $args, \%got, $expect ];
+  my $label = join(' ', grep $_, map $args->{$_}, qw(os cc));
+  $label .= $mocked ? " (MOCKED)" : " (not mocked)";
+  is_deeply \%got, $expect, $label or diag explain [ $args, \%got, $expect ];
 }

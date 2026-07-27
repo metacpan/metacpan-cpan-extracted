@@ -1,5 +1,5 @@
 package Hash::Typed;
-use strict; use warnings; our $VERSION = '0.06';
+use strict; use warnings; our $VERSION = '0.07';
 use Carp qw/croak/; use Tie::Hash; our (@ISA);
 
 BEGIN { 
@@ -152,7 +152,7 @@ Hash::Typed - Ordered typed tied hashes.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 

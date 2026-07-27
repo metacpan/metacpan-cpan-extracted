@@ -72,6 +72,8 @@ EOF
             [  0, qr{"Foo::biz",.*\n.*= 3;},
                    "has Foo::biz" ],
             [  0, qr{\QCV * cv;}, "has cv declaration" ],
+            [  0, qr{\QCV * cv;\E\s*\QPERL_UNUSED_VAR(cv)},
+                   "has a PERL_UNUSED_VAR for the cv declaration" ],
         ],
 
         [
@@ -1021,6 +1023,15 @@ EOF
             [ERR,
             qr{\QError: duplicate INTERFACE name: 'f1'},
                    "got expected err" ],
+        ],
+        [
+            'INTERFACE with OUT arguments',
+            Q(<<'EOF'),
+                |void
+                |foo(OUT int value)
+                |    INTERFACE: abc
+EOF
+            [  0, qr{\(int\*\)}, "OUT argument" ],
         ],
     );
 

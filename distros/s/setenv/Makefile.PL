@@ -7,6 +7,7 @@ WriteMakefile (
  AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
  ABSTRACT	=> 'set %ENV variables at compile time',
  VERSION_FROM	=> 'lib/setenv.pm',
+ macro => { TARFLAGS   => "--format=ustar -c -v -f" },
  PREREQ_PM	=> { qw(
                    ) },
 );

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Litavis', $VERSION);
@@ -398,17 +398,17 @@ the original colour.
 
 =head2 Cascade-Aware Deduplication
 
-    # Conservative mode (default) — safe merging only
+    # Conservative mode (default) - safe merging only
     my $css = Litavis->new->parse('
         .reset  { color: black; margin: 0; }
         .theme  { color: red; }
         .footer { color: black; margin: 0; }
     ')->compile;
     # .reset and .footer are NOT merged because .theme
-    # defines "color" which conflicts — merging would
+    # defines "color" which conflicts - merging would
     # reorder the cascade.
 
-    # Aggressive mode — merge all identical, ignore cascade
+    # Aggressive mode - merge all identical, ignore cascade
     my $css = Litavis->new(dedupe => 2)->parse('
         .a { padding: 8px; }
         .b { color: red; }

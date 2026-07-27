@@ -16,6 +16,37 @@
 # define PERL_UNUSED_ARG(x) ((void)x)
 #endif
 
+static inline bool http_is_token_char(char c) {
+  // RFC 9110 §5.6.2 ABNF tchar:
+  // "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /
+  // "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
+  static const uint64_t T[4] = {
+    UINT64_C(0x03FF6CFA00000000),
+    UINT64_C(0x57FFFFFFC7FFFFFE),
+    UINT64_C(0x0000000000000000),
+    UINT64_C(0x0000000000000000),
+  };
+  unsigned char u = (unsigned char)c;
+  return (T[u >> 6] & (UINT64_C(1) << (u & 0x3F))) != 0;
+}
+
+static inline bool http_is_token(const char *str, size_t len) {
+  // RFC 9110 §5.6.2 ABNF token = 1*tchar
+  if (!len)
+    return false;
+  // Full scan, no early exit: keeps the loop shape branchless and
+  // data-independent so GCC/Clang can auto-vectorize it.
+  size_t count = 0;
+  for (size_t i = 0; i < len; i++)
+    count += http_is_token_char(str[i]);
+  return count == len;
+}
+
+// Destructor wrapper for SAVEDESTRUCTOR_X
+static void THX_hlist_destroy(pTHX_ void *p) {
+    hlist_destroy((HList *)p);
+}
+
 static MAGIC* THX_mg_find(pTHX_ SV* sv, const MGVTBL* const vtbl) {
     MAGIC* mg;
 
@@ -348,6 +379,7 @@ header(HList* hl, ...)
       }
 
       seen = hlist_create();
+      SAVEDESTRUCTOR_X(THX_hlist_destroy, seen);
       for (j = 1; j <= argc; ) {
           if (j > argc) {
             break;
@@ -360,6 +392,8 @@ header(HList* hl, ...)
           pval = ST(j++);
 
           ckey = SvPV(pkey, len);
+          if (!http_is_token(ckey, len))
+            croak("Illegal field name '%.*s'", (int)len, ckey);
           int clear = 0;
           if (! hlist_get(seen, ckey)) {
             clear = 1;
@@ -381,7 +415,6 @@ header(HList* hl, ...)
 
           set_value(aTHX_ hl, ckey, pval);
       }
-      hlist_destroy(seen);
       break;
     } while (0);
 

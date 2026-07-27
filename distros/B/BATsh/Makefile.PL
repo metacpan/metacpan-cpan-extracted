@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{BATsh},
-    'VERSION'   => q{0.08},
+    'VERSION'   => q{0.09},
     'ABSTRACT'  => q{Bilingual Shell for cmd.exe and bash in one script},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -20,6 +20,7 @@ my %args = (
 );
 
 # Install bin/*.pl as executables (EUMM creates .bat wrappers on Win32).
+# A dist without a bin/ directory is unaffected.
 if (-d 'bin') {
     local *BINDIR;
     if (opendir(BINDIR, 'bin')) {
@@ -57,23 +58,23 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'BATsh' => {
                 'file'    => 'lib/BATsh.pm',
-                'version' => '0.08',
+                'version' => '0.09',
             },
             'BATsh::CMD' => {
                 'file'    => 'lib/BATsh/CMD.pm',
-                'version' => '0.08',
+                'version' => '0.09',
             },
             'BATsh::Env' => {
                 'file'    => 'lib/BATsh/Env.pm',
-                'version' => '0.08',
+                'version' => '0.09',
             },
             'BATsh::MB' => {
                 'file'    => 'lib/BATsh/MB.pm',
-                'version' => '0.08',
+                'version' => '0.09',
             },
             'BATsh::SH' => {
                 'file'    => 'lib/BATsh/SH.pm',
-                'version' => '0.08',
+                'version' => '0.09',
             }
         },
     };

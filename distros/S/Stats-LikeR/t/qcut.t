@@ -88,12 +88,25 @@ sub is_approx {
 	ok(scalar @edges < 5, 'dropping merges duplicate edges');
 }
 
-# --- help: qcut('h') / qcut('H') dies with a help string --------------------
+# --- help: qcut('h') / qcut('?') prints the documentation and dies ----------
+# The text comes from the module's own POD now (see t/help.t), so this only
+# checks that qcut takes part in it, in either argument slot.
 {
-	for my $arg (qw/h H/) {
-		my $err = !eval { qcut($arg); 1 };
-		ok($err, "qcut('$arg') dies");
-		like($@, qr/equal-frequency binning/, "qcut('$arg') emits help text");
+	for my $arg ('h', '?') {
+		for my $call ( [ $arg ], [ [1 .. 9], $arg ] ) {
+			my ($out, $err) = ('');
+			{
+				local *STDOUT;
+				open STDOUT, '>', \$out or die "cannot redirect STDOUT: $!";
+				$err = !eval { qcut(@$call); 1 };
+			}
+			my $slot = @$call == 1 ? 'first' : 'second';
+			ok($err, "qcut('$arg') in the $slot slot dies");
+			like($@, qr/help requested/,
+				"qcut('$arg') in the $slot slot dies with the help notice");
+			like($out, qr/Equal-frequency binning/,
+				"qcut('$arg') in the $slot slot prints its documentation");
+		}
 	}
 }
 
@@ -113,7 +126,13 @@ if ($INC{'Devel/Cover.pm'}) { done_testing(); exit 0 }
 	no_leaks_ok { eval { my $x = qcut(\@data, 4, labels => [qw/a b c d/]) } } 'qcut: no leaks (labels)';
 	no_leaks_ok { eval { my @x = qcut(\@tied, 4, duplicates => 'drop') } } 'qcut: no leaks (drop dups)';
 	no_leaks_ok { eval { my @x = qcut(\@tied, 4) } } 'qcut: no leaks (croak path)';
-	no_leaks_ok { eval { qcut('h') } } 'qcut: no leaks (help/die path)';
+	# the help path prints the documentation, so keep it off the TAP stream
+	no_leaks_ok {
+		my $sink = '';
+		local *STDOUT;
+		open STDOUT, '>', \$sink or die "cannot redirect STDOUT: $!";
+		eval { qcut('h') };
+	} 'qcut: no leaks (help/die path)';
 }
 
 done_testing();

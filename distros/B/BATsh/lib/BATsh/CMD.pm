@@ -40,11 +40,16 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 require BATsh::Env;
 require BATsh::MB;
+# For BATsh::SH::_glob_paths(): CMD-mode wildcards (FOR sets, DEL) are
+# expanded by the same pure-Perl matcher the SH side uses, because Perl's
+# built-in glob() reads a backslash as an escape and would destroy an
+# ordinary Windows pattern such as C:\dir\*.txt.
+require BATsh::SH;
 
 # ----------------------------------------------------------------
 # Module-level state
@@ -403,7 +408,7 @@ sub _exec_pipe {
             open(_PIPE_SAVIN, '<&STDIN')
                 or do { close(_PIPE_RFH); last };
             open(STDIN, '<&_PIPE_RFH')
-                or do { close(_PIPE_RFH); open(STDIN,'<&_PIPE_SAVIN'); close(_PIPE_SAVIN); last };
+                or do { close(_PIPE_RFH); open(STDIN, '<&_PIPE_SAVIN'); close(_PIPE_SAVIN); last };
             close(_PIPE_RFH);
             $saved_in = 1;
         }
@@ -413,21 +418,21 @@ sub _exec_pipe {
         if (defined $output_f) {
             open(_PIPE_WFH, ">$output_f")
                 or do {
-                    if ($saved_in) { open(STDIN,'<&_PIPE_SAVIN'); close(_PIPE_SAVIN) }
+                    if ($saved_in) { open(STDIN, '<&_PIPE_SAVIN'); close(_PIPE_SAVIN) }
                     _warn("pipe: open $output_f: $!");
                     last;
                 };
             open(_PIPE_SAVOUT, '>&STDOUT')
                 or do {
                     close(_PIPE_WFH);
-                    if ($saved_in) { open(STDIN,'<&_PIPE_SAVIN'); close(_PIPE_SAVIN) }
+                    if ($saved_in) { open(STDIN, '<&_PIPE_SAVIN'); close(_PIPE_SAVIN) }
                     last;
                 };
             open(STDOUT, '>&_PIPE_WFH')
                 or do {
                     close(_PIPE_WFH);
-                    open(STDOUT,'>&_PIPE_SAVOUT'); close(_PIPE_SAVOUT);
-                    if ($saved_in) { open(STDIN,'<&_PIPE_SAVIN'); close(_PIPE_SAVIN) }
+                    open(STDOUT, '>&_PIPE_SAVOUT'); close(_PIPE_SAVOUT);
+                    if ($saved_in) { open(STDIN, '<&_PIPE_SAVIN'); close(_PIPE_SAVIN) }
                     last;
                 };
             close(_PIPE_WFH);
@@ -1062,7 +1067,8 @@ sub _cmd_for {
             $item =~ s/\A\s+//; $item =~ s/\s+\z//;
             next if $item eq '';
             if ($item =~ /[*?]/) {
-                my @g = map { BATsh::MB::enc($_) } glob(BATsh::MB::dec($item));
+                my @g = map { BATsh::MB::enc($_) }
+                            BATsh::SH::_glob_paths(BATsh::MB::dec($item));
                 push @expanded, @g ? @g : ($item);
             }
             else { push @expanded, $item }
@@ -1450,14 +1456,36 @@ sub _cmd_cd {
 }
 
 # ----------------------------------------------------------------
+# _cmd_strip_switches: remove a command's own /X switches from its
+# argument string.  The pattern used before v0.09 -- s{\s*/[A-Za-z:]+}{}g
+# -- deleted every "/word" run, so it also ate the directory components
+# of a forward-slash pathname: DEL /tmp/log/*.tmp lost "/tmp" and "/log"
+# and then complained about a file called "\*.tmp".  A switch is now only
+# removed when its letter is one this command actually has (optionally
+# followed by :attributes) and it stands as a word of its own.
+# ----------------------------------------------------------------
+sub _cmd_strip_switches {
+    my ($str, $letters) = @_;
+    return '' unless defined $str;
+    my $again = 1;
+    while ($again) {
+        $again = 0;
+        $again = 1 if $str =~ s{\A/([$letters])(?::[-A-Za-z]*)?(?=\s|\z)\s*}{}i;
+    }
+    $str =~ s{\s+/([$letters])(?::[-A-Za-z]*)?(?=\s|\z)}{}ig;
+    return $str;
+}
+
+# ----------------------------------------------------------------
 # DIR
 # ----------------------------------------------------------------
 sub _cmd_dir {
+
     my ($rest) = @_;
     $rest = BATsh::MB::dec($rest);
     $rest =~ s/\A\s+//; $rest =~ s/\s+\z//;
     my $target = $rest eq '' ? '.' : $rest;
-    $target =~ s/\s*\/[A-Za-z:]+//g;
+    $target = _cmd_strip_switches($target, 'ABSPWOQTLNXCR');
     $target =~ s/\s+\z//;
     $target = '.' if $target eq '';
     $target =~ s/\A"//; $target =~ s/"\z//;
@@ -1500,9 +1528,11 @@ sub _cmd_copy {
 sub _cmd_del {
     my ($rest) = @_;
     $rest = BATsh::MB::dec($rest);
-    $rest =~ s/\A\s+//; $rest =~ s/\s*\/[A-Za-z:]+//g; $rest =~ s/\s+\z//;
+    $rest =~ s/\A\s+//;
+    $rest = _cmd_strip_switches($rest, 'PFSQA');
+    $rest =~ s/\s+\z//;
     $rest =~ s/\A"//; $rest =~ s/"\z//;
-    my @files = glob($rest);
+    my @files = BATsh::SH::_glob_paths($rest);
     @files = ($rest) unless @files;
     for my $f (@files) {
         unlink($f) or print "Could not find $f\n";
@@ -1622,6 +1652,10 @@ __END__
 =head1 NAME
 
 BATsh::CMD - Pure Perl cmd.exe interpreter for BATsh
+
+=head1 VERSION
+
+Version 0.09
 
 =head1 SYNOPSIS
 

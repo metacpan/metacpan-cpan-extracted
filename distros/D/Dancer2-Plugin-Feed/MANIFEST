@@ -4,6 +4,7 @@ Changes
 INSTALL
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -11,3 +12,4 @@ dist.ini
 lib/Dancer2/Plugin/Feed.pm
 t/01-basic.t
 t/lib/TestApp.pm
+xt/author/critic.t

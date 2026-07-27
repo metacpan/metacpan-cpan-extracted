@@ -76,7 +76,18 @@ subtest 'scalar kinds serialize with correct JSON types' => sub {
   # str is asserted on raw bytes below instead of via the round-trip
   # comparison: the SV-lane reference copy does not always preserve the
   # UTF8 flag, which makes eq-deep comparisons encoding-form sensitive.
-  json_matches_execute('{ int float bool nothing numeric_string }');
+  #
+  # bool is likewise excluded from the round-trip is_deeply: the JSON lane
+  # decodes a JSON boolean to a blessed JSON::PP::Boolean object, while the
+  # plain execute_document lane returns an unblessed 1/0
+  # (gql_runtime_vm_serialize_leaf_sv's GQL_VM_LEAF_BOOLEAN case always
+  # returns a plain IV). Whether is_deeply treats those as equal depends on
+  # which JSON backend is active - true under Cpanel::JSON::XS/JSON::XS,
+  # false under a pure JSON::PP fallback - so truthiness is asserted
+  # directly below instead of via structural equality.
+  json_matches_execute('{ int float nothing numeric_string }');
+  ok !!$json->decode($runtime->execute_document_to_json('{ bool }'))->{data}{bool},
+    'decoded bool is true regardless of the active JSON backend\'s boolean representation';
   my $bytes = $runtime->execute_document_to_json('{ str int float bool nothing numeric_string }');
   like $bytes, qr/"int":42[,}]/, 'Int is a bare JSON number';
   like $bytes, qr/"float":2\.5[,}]/, 'Float is a bare JSON number';

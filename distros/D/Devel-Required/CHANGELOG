@@ -1,3 +1,6 @@
+0.18	26 July 2026
+	Remove PAX headers
+
 0.17	28 August 2024
 	Fix module so it should work on any version of perl.
 	Note the order it is used in a Makefile.PL has changed,

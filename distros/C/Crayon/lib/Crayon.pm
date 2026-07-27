@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use 5.006;
 use strict;
 use warnings;
@@ -341,7 +341,7 @@ Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 1.05 
+Version 1.06 
 
 =cut
 
@@ -375,6 +375,9 @@ Version 1.05
 	#	color: #7f7f7f;
 	# }
 
+=head1 DESCRIPTION
+
+Crayon is a CSS preprocessor and compiler. The author has since L<Litavis> which succeeds Crayon with a focus on speed, correctness and performance.
 
 =head1 SUBROUTINES/METHODS
 

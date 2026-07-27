@@ -1,15 +1,21 @@
 Revision history for Dancer-Plugin-Feed
 
+1.262070  2026-07-26 18:23:56+02:00 Europe/Berlin
+
+    * Resolved test failures due to postfix dereferencing being experimental before perl v5.24 (https://codeberg.org/demiguise/Dancer2-Plugin-Feed/issues/1).
+    * Improved and corrected dist.ini configuration, e.g. with regard to meta information.
+    * Added some small POD corrections.
+
 1.262050  2026-07-24 16:36:16+02:00 Europe/Berlin
 
-    * Allow multiple categories per feed entry (#8).
+    * Allow multiple categories per feed entry (https://github.com/hobbestigrou/Dancer2-Plugin-Feed/issues/8).
 
 1.160550  2016-02-24 23:01:28+01:00 Europe/Paris
 
-    * Fix typo feed properties by Peter Mottram (#6).
+    * Fix typo feed properties by Peter Mottram (https://github.com/hobbestigrou/Dancer2-Plugin-Feed/pull/6).
 
 1.160190  2016-01-19 23:54:36+01:00 Europe/Paris
 
     * Initial version developed.
-    * Code improvement by Dave Cross (#4).
-    * New Dancer2::Plugin support by Peter Mottram (#5)
+    * Code improvement by Dave Cross (https://github.com/hobbestigrou/Dancer2-Plugin-Feed/pull/4).
+    * New Dancer2::Plugin support by Peter Mottram (https://github.com/hobbestigrou/Dancer2-Plugin-Feed/pull/5)
