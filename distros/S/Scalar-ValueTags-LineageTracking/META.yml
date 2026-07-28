@@ -1,0 +1,28 @@
+---
+abstract: 'track data lineages using ValueTags'
+author:
+  - 'Noel Maddy <ZHTWN@cpan.org'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scalar-ValueTags-LineageTracking
+provides:
+  Scalar::ValueTags::LineageTracking:
+    file: lib/Scalar/ValueTags/LineageTracking.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Ref::Util: '0'
+  Scalar::ValueTags: '0.004'
+  perl: '5.044'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

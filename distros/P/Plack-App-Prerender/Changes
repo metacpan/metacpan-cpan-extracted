@@ -1,5 +1,32 @@
 Revision history for Plack-App-Prerender:
 
+v0.3.0    2026-07-27 18:09:12+01:00 Europe/London
+  [Security]
+  - Requests with no forward slash are now blocked, as these may allow the host to be changed (CVE-2026-17552).
+
+  [Documentation]
+  - Updated AUTHOR email address.
+
+  - Update copyright year.
+
+  - Added a SECURITY CONSIDERATIONS section.
+
+  - Fixed typos.
+
+  - Updated README with the UsefulReadme plugin.
+
+  [Tests]
+  - Tests changed to use example.com as httpbin.org is not responding.
+
+  - Tests will adapt when the external server is responding with HTTP 5xx errors.
+
+  - Add more author tests.
+
+  [Toolchain]
+  - Update the Dist::Zilla configuration.
+
+  - Releases are signed with SigStore.
+
 v0.2.0    2020-10-18 12:13:43+01:00 Europe/London
   [Enhancements]
   - The request and response attributes can take a hash reference

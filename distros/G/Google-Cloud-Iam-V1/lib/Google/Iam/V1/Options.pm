@@ -1,0 +1,104 @@
+package Google::Iam::V1::Options;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Chtnb29nbGUvaWFtL3YxL29wdGlvbnMucHJvdG8SDWdvb2dsZS5pYW0udjEiTAoQR2V0UG9s
+aWN5T3B0aW9ucxI4ChhyZXF1ZXN0ZWRfcG9saWN5X3ZlcnNpb24YASABKAVSFnJlcXVlc3Rl
+ZFBvbGljeVZlcnNpb25CfQoRY29tLmdvb2dsZS5pYW0udjFCDE9wdGlvbnNQcm90b1ABWilj
+bG91ZC5nb29nbGUuY29tL2dvL2lhbS9hcGl2MS9pYW1wYjtpYW1wYvgBAaoCE0dvb2dsZS5D
+bG91ZC5JYW0uVjHKAhNHb29nbGVcQ2xvdWRcSWFtXFYxStkMCgYSBA4ALwEKvAQKAQwSAw4A
+EjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFw
+YWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5v
+dCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2Uu
+CiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDov
+L3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVk
+IGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQog
+ZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFT
+IElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBL
+SU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0
+aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRh
+dGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQABYKCAoBCBIDEgAfCgkKAggfEgMS
+AB8KCAoBCBIDEwAwCgkKAgglEgMTADAKCAoBCBIDFABACgkKAggLEgMUAEAKCAoBCBIDFQAi
+CgkKAggKEgMVACIKCAoBCBIDFgAtCgkKAggIEgMWAC0KCAoBCBIDFwAqCgkKAggBEgMXACoK
+CAoBCBIDGAAwCgkKAggpEgMYADAKPQoCBAASBBsALwEaMSBFbmNhcHN1bGF0ZXMgc2V0dGlu
+Z3MgcHJvdmlkZWQgdG8gR2V0SWFtUG9saWN5LgoKCgoDBAABEgMbCBgK/QUKBAQAAgASAy4C
+JRrvBSBPcHRpb25hbC4gVGhlIG1heGltdW0gcG9saWN5IHZlcnNpb24gdGhhdCB3aWxsIGJl
+IHVzZWQgdG8gZm9ybWF0IHRoZQogcG9saWN5LgoKIFZhbGlkIHZhbHVlcyBhcmUgMCwgMSwg
+YW5kIDMuIFJlcXVlc3RzIHNwZWNpZnlpbmcgYW4gaW52YWxpZCB2YWx1ZSB3aWxsIGJlCiBy
+ZWplY3RlZC4KCiBSZXF1ZXN0cyBmb3IgcG9saWNpZXMgd2l0aCBhbnkgY29uZGl0aW9uYWwg
+cm9sZSBiaW5kaW5ncyBtdXN0IHNwZWNpZnkKIHZlcnNpb24gMy4gUG9saWNpZXMgd2l0aCBu
+byBjb25kaXRpb25hbCByb2xlIGJpbmRpbmdzIG1heSBzcGVjaWZ5IGFueSB2YWxpZAogdmFs
+dWUgb3IgbGVhdmUgdGhlIGZpZWxkIHVuc2V0LgoKIFRoZSBwb2xpY3kgaW4gdGhlIHJlc3Bv
+bnNlIG1pZ2h0IHVzZSB0aGUgcG9saWN5IHZlcnNpb24gdGhhdCB5b3Ugc3BlY2lmaWVkLAog
+b3IgaXQgbWlnaHQgdXNlIGEgbG93ZXIgcG9saWN5IHZlcnNpb24uIEZvciBleGFtcGxlLCBp
+ZiB5b3Ugc3BlY2lmeSB2ZXJzaW9uCiAzLCBidXQgdGhlIHBvbGljeSBoYXMgbm8gY29uZGl0
+aW9uYWwgcm9sZSBiaW5kaW5ncywgdGhlIHJlc3BvbnNlIHVzZXMKIHZlcnNpb24gMS4KCiBU
+byBsZWFybiB3aGljaCByZXNvdXJjZXMgc3VwcG9ydCBjb25kaXRpb25zIGluIHRoZWlyIElB
+TSBwb2xpY2llcywgc2VlIHRoZQogW0lBTQogZG9jdW1lbnRhdGlvbl0oaHR0cHM6Ly9jbG91
+ZC5nb29nbGUuY29tL2lhbS9oZWxwL2NvbmRpdGlvbnMvcmVzb3VyY2UtcG9saWNpZXMpLgoK
+DAoFBAACAAUSAy4CBwoMCgUEAAIAARIDLgggCgwKBQQAAgADEgMuIyRiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Iam::V1::Options::GetPolicyOptions ===
+    # Fields for GetPolicyOptions
+    # Field: requested_policy_version Type: 5 ()
+
+=pod
+
+=head1 NAME
+
+Google::Iam::V1::Options::GetPolicyOptions - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Iam::V1::Options;
+
+    my $msg = Google::Iam::V1::Options::GetPolicyOptions->new(
+        requested_policy_version => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<requested_policy_version>
+
+Type: Int32
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Iam::V1::Options - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

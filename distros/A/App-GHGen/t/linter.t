@@ -23,7 +23,8 @@ subtest 'lint step absent when enable_linter => 0' => sub {
     my $yaml = generate_custom_perl_workflow({ enable_linter => 0 });
 
     unlike($yaml, qr/Lint and syntax check/, 'lint step is absent');
-    unlike($yaml, qr/shell: perl \{0\}/,     'perl {0} shell not used');
+    # shell: perl {0} is also used by the Perl-version detection step, so we
+    # cannot assert its global absence — just verify the lint step itself is gone.
 };
 
 # ── Lint step runs before tests ────────────────────────────────────────────

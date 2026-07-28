@@ -9,6 +9,7 @@
 typedef struct {
     upb_DefPool* pool;
     bool frozen;
+    bool poisoned;
 } PerlUpb_DescriptorPool;
 
 static upb_DefPool *generated_pool_ptr = NULL;
@@ -17,6 +18,7 @@ void* PerlUpb_DescriptorPool_CreateRaw(pTHX) {
     PerlUpb_DescriptorPool* p = (PerlUpb_DescriptorPool*)safemalloc(sizeof(PerlUpb_DescriptorPool));
     p->pool = upb_DefPool_New();
     p->frozen = false;
+    p->poisoned = false;
     if (!p->pool) {
         safefree(p);
         croak("Failed to create upb_DefPool");
@@ -83,6 +85,7 @@ SV* PerlUpb_DescriptorPool_GetWrapper(pTHX_ const upb_DefPool* pool) {
     PerlUpb_DescriptorPool* p = (PerlUpb_DescriptorPool*)safemalloc(sizeof(PerlUpb_DescriptorPool));
     p->pool = (upb_DefPool*)pool;
     p->frozen = false;
+    p->poisoned = false;
     hv_store(hv, "_pool_ptr", 9, newSViv(PTR2IV(p)), 0);
 
     SV* obj = newRV_noinc((SV*)hv);
@@ -92,19 +95,35 @@ SV* PerlUpb_DescriptorPool_GetWrapper(pTHX_ const upb_DefPool* pool) {
     return obj;
 }
 
-const upb_DefPool* PerlUpb_DescriptorPool_GetPool(pTHX_ SV* sv) {
+static inline PerlUpb_DescriptorPool* _get_wrapper_raw(pTHX_ SV* pool_sv) {
+    if (!pool_sv || !SvROK(pool_sv)) return NULL;
+    SV* rv = SvRV(pool_sv);
+    if (SvTYPE(rv) != SVt_PVHV) return NULL;
+    SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
+    if (!svp || !SvIOK(*svp)) return NULL;
+    return INT2PTR(PerlUpb_DescriptorPool*, SvIV(*svp));
+}
+
+void PerlUpb_DescriptorPool_Poison(pTHX_ SV* pool_sv) {
+    PerlUpb_DescriptorPool* p = _get_wrapper_raw(aTHX_ pool_sv);
+    if (p) {
+        p->poisoned = true;
+    } else {
+        croak("Failed to poison DescriptorPool: invalid wrapper object");
+    }
+}
+
+upb_DefPool* PerlUpb_DescriptorPool_GetPool(pTHX_ SV* sv) {
     if (!sv || !SvROK(sv) || !sv_isa(sv, "Protobuf::DescriptorPool")) {
         croak("Argument is not a Protobuf::DescriptorPool object");
     }
 
-    SV* rv = SvRV(sv);
-    if (SvTYPE(rv) != SVt_PVHV) return NULL;
-
-    SV** svp = hv_fetch((HV*)rv, "_pool_ptr", 9, 0);
-    if (!svp || !SvIOK(*svp)) return NULL;
-
-    PerlUpb_DescriptorPool* p = INT2PTR(PerlUpb_DescriptorPool*, SvIV(*svp));
-    return p ? p->pool : NULL;
+    PerlUpb_DescriptorPool* p = _get_wrapper_raw(aTHX_ sv);
+    if (!p) return NULL;
+    if (p->poisoned) {
+        croak("Integrity compromise: Pool used after failure");
+    }
+    return p->pool;
 }
 
 void PerlUpb_DescriptorPool_Free(pTHX_ SV* sv) {

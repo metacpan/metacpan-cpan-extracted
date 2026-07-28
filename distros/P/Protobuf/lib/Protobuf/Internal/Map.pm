@@ -6,7 +6,7 @@ Protobuf::Internal::Map - Internal XS implementation for map fields
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 use Protobuf::Internal::MapIterator;

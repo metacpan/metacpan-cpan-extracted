@@ -1,156 +1,123 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::QueryParameter;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Auditing };
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
-    eval { require Google::Api::Migration };
     eval { require Google::Protobuf::Struct };
     eval { require Google::Protobuf::Wrappers };
-    eval { require Datapol::SemanticAnnotations };
     my $descriptor_b64 = <<'EOF';
 Ci5nb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcXVlcnlfcGFyYW1ldGVyLnByb3RvEhhnb29n
-bGUuY2xvdWQuYmlncXVlcnkudjIaGWdvb2dsZS9hcGkvYXVkaXRpbmcucHJvdG8aH2dvb2ds
-ZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnByb3Rv
-Ghpnb29nbGUvYXBpL21pZ3JhdGlvbi5wcm90bxocZ29vZ2xlL3Byb3RvYnVmL3N0cnVjdC5w
-cm90bxoeZ29vZ2xlL3Byb3RvYnVmL3dyYXBwZXJzLnByb3RvGjxzdG9yYWdlL2RhdGFwb2wv
-YW5ub3RhdGlvbnMvcHJvdG8vc2VtYW50aWNfYW5ub3RhdGlvbnMucHJvdG8iwgEKGFF1ZXJ5
-UGFyYW1ldGVyU3RydWN0VHlwZRIkCgRuYW1lGAEgASgJQhDgQQHq6oCsAwcSBUFVRElUUgRu
-YW1lElIKBHR5cGUYAiABKAsyLC5nb29nbGUuY2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJh
-bWV0ZXJUeXBlQhDgQQLq6oCsAwcSBUFVRElUUgR0eXBlEiwKC2Rlc2NyaXB0aW9uGAMgASgJ
-QgrgQQGgoPCYAewOUgtkZXNjcmlwdGlvbiLKAwoSUXVlcnlQYXJhbWV0ZXJUeXBlEiQKBHR5
-cGUYASABKAlCEOBBAurqgKwDBxIFQVVESVRSBHR5cGUSQAoTdGltZXN0YW1wX3ByZWNpc2lv
-bhgFIAEoA0IK4EEBoKDwmAHnB0gAUhJ0aW1lc3RhbXBQcmVjaXNpb26IAQESXQoKYXJyYXlf
-dHlwZRgCIAEoCzIsLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5RdWVyeVBhcmFtZXRlclR5
-cGVCEOBBAerqgKwDBxIFQVVESVRSCWFycmF5VHlwZRJnCgxzdHJ1Y3RfdHlwZXMYAyADKAsy
-Mi5nb29nbGUuY2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJhbWV0ZXJTdHJ1Y3RUeXBlQhDg
-QQHq6oCsAwcSBUFVRElUUgtzdHJ1Y3RUeXBlcxJsChJyYW5nZV9lbGVtZW50X3R5cGUYBCAB
-KAsyLC5nb29nbGUuY2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJhbWV0ZXJUeXBlQhDgQQHq
-6oCsAwcSBUFVRElUUhByYW5nZUVsZW1lbnRUeXBlQhYKFF90aW1lc3RhbXBfcHJlY2lzaW9u
-IrYBCgpSYW5nZVZhbHVlElUKBXN0YXJ0GAEgASgLMi0uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5
-LnYyLlF1ZXJ5UGFyYW1ldGVyVmFsdWVCEOBBAerqgKwDBxIFQVVESVRSBXN0YXJ0ElEKA2Vu
-ZBgCIAEoCzItLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5RdWVyeVBhcmFtZXRlclZhbHVl
-QhDgQQHq6oCsAwcSBUFVRElUUgNlbmQitQUKE1F1ZXJ5UGFyYW1ldGVyVmFsdWUSXQoFdmFs
-dWUYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWVCKeBBAerqgKwDBxIFQVVE
-SVSav+TaBBM6EXZhbHVlX2FsdGVybmF0aXZlUgV2YWx1ZRJiCgxhcnJheV92YWx1ZXMYAiAD
-KAsyLS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJhbWV0ZXJWYWx1ZUIQ4EEB
-6uqArAMHEgVBVURJVFILYXJyYXlWYWx1ZXMSjAEKDXN0cnVjdF92YWx1ZXMYAyADKAsyPy5n
-b29nbGUuY2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJhbWV0ZXJWYWx1ZS5TdHJ1Y3RWYWx1
-ZXNFbnRyeUIm6uqArAMHEgVBVURJVJq/5NoEEzoRYWx0X3N0cnVjdF92YWx1ZXNSDHN0cnVj
-dFZhbHVlcxJXCgtyYW5nZV92YWx1ZRgGIAEoCzIkLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52
-Mi5SYW5nZVZhbHVlQhDgQQHq6oCsAwcSBUFVRElUUgpyYW5nZVZhbHVlEjUKEXZhbHVlX2Fs
-dGVybmF0aXZlGAQgAygJQgiav+TaBAIYAVIQdmFsdWVBbHRlcm5hdGl2ZRJMChFhbHRfc3Ry
-dWN0X3ZhbHVlcxgFIAMoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZUIImr/k2gQCGAFSD2Fs
-dFN0cnVjdFZhbHVlcxpuChFTdHJ1Y3RWYWx1ZXNFbnRyeRIQCgNrZXkYASABKAlSA2tleRJD
-CgV2YWx1ZRgCIAEoCzItLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5RdWVyeVBhcmFtZXRl
-clZhbHVlUgV2YWx1ZToCOAEihwIKDlF1ZXJ5UGFyYW1ldGVyEiQKBG5hbWUYASABKAlCEOBB
-AerqgKwDBxIFQVVESVRSBG5hbWUSZQoOcGFyYW1ldGVyX3R5cGUYAiABKAsyLC5nb29nbGUu
-Y2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJhbWV0ZXJUeXBlQhDgQQLq6oCsAwcSBUFVRElU
-Ug1wYXJhbWV0ZXJUeXBlEmgKD3BhcmFtZXRlcl92YWx1ZRgDIAEoCzItLmdvb2dsZS5jbG91
-ZC5iaWdxdWVyeS52Mi5RdWVyeVBhcmFtZXRlclZhbHVlQhDgQQLq6oCsAwcSBUFVRElUUg5w
-YXJhbWV0ZXJWYWx1ZUK6AQocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkITUXVlcnlQ
-YXJhbWV0ZXJQcm90b1o7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92Mi9hcGl2Mi9i
-aWdxdWVyeXBiO2JpZ3F1ZXJ5cGKK1dvSD0QKQnBhY2thZ2U6dGhpcmRfcGFydHkvamF2YS9j
-ZWwvdG9vbHMvc3JjL3Rlc3QvamF2YS9kZXYvY2VsL3Rvb2xzL21jcErcIAoHEgUAAJoBAQoI
-CgEMEgMAABIKCAoBAhIDAgAhCgkKAgMAEgMEACMKCQoCAwESAwUAKQoJCgIDAhIDBgAkCgkK
-AgMDEgMHACQKCQoCAwQSAwgAJgoJCgIDBRIDCQAoCgkKAgMGEgMKAEYKCAoBCBIDDABSCgkK
-AggLEgMMAFIKCAoBCBIDDQA1CgkKAggBEgMNADUKCAoBCBIDDgA0CgkKAggIEgMOADQKCQoB
-CBIEDwARAgoOCgYI0bqr+gESBA8AEQIKTQoCBAASBBUAJQEaQSBUaGUgdHlwZSBvZiBhIHN0
-cnVjdCBwYXJhbWV0ZXIuCiAoPT0gc2hhbGxvd19pbmxpbmVfbWVzc2FnZSA9PSkKCgoKAwQA
-ARIDFQggCicKBAQAAgASBBcCGgQaGSBUaGUgbmFtZSBvZiB0aGlzIGZpZWxkLgoKDAoFBAAC
-AAUSAxcCCAoMCgUEAAIAARIDFwkNCgwKBQQAAgADEgMXEBEKDQoFBAACAAgSBBcSGgMKEQoK
-BAACAAitjcA1AhIDGAQzCg8KCAQAAgAInAgAEgMZBCoKJwoEBAACARIEHAIfBBoZIFRoZSB0
-eXBlIG9mIHRoaXMgZmllbGQuCgoMCgUEAAIBBhIDHAIUCgwKBQQAAgEBEgMcFRkKDAoFBAAC
-AQMSAxwcHQoNCgUEAAIBCBIEHB4fAwoRCgoEAAIBCK2NwDUCEgMdBDMKDwoIBAACAQicCAAS
-Ax4EKgo4CgQEAAICEgQhAiQEGiogSHVtYW4tb3JpZW50ZWQgZGVzY3JpcHRpb24gb2YgdGhl
-IGZpZWxkLgoKDAoFBAACAgUSAyECCAoMCgUEAAICARIDIQkUCgwKBQQAAgIDEgMhFxgKDQoF
-BAACAggSBCEZJAMKDwoIBAACAgicCAASAyIEKgoQCgkEAAICCISEjhMSAyMELQosCgIEARIE
-KABKARogIFRoZSB0eXBlIG9mIGEgcXVlcnkgcGFyYW1ldGVyLgoKCgoDBAEBEgMoCBoKMQoE
-BAECABIEKgItBBojIFRoZSB0b3AgbGV2ZWwgdHlwZSBvZiB0aGlzIGZpZWxkLgoKDAoFBAEC
-AAUSAyoCCAoMCgUEAQIAARIDKgkNCgwKBQQBAgADEgMqEBEKDQoFBAECAAgSBCoSLQMKEQoK
-BAECAAitjcA1AhIDKwQzCg8KCAQBAgAInAgAEgMsBCoKigIKBAQBAgESBDUCOAQa+wEgT3B0
-aW9uYWwuIFByZWNpc2lvbiAobWF4aW11bSBudW1iZXIgb2YgdG90YWwgZGlnaXRzIGluIGJh
-c2UgMTApIGZvciBzZWNvbmRzCiBvZiBUSU1FU1RBTVAgdHlwZS4KIEBkZWZhdWx0IDYKCiBQ
-b3NzaWJsZSB2YWx1ZXMgaW5jbHVkZToKICogNiAoRGVmYXVsdCwgZm9yIFRJTUVTVEFNUCB0
-eXBlIHdpdGggbWljcm9zZWNvbmQgcHJlY2lzaW9uKQogKiAxMiAoRm9yIFRJTUVTVEFNUCB0
-eXBlIHdpdGggcGljb3NlY29uZCBwcmVjaXNpb24pCgoMCgUEAQIBBBIDNQIKCgwKBQQBAgEF
-EgM1CxAKDAoFBAECAQESAzURJAoMCgUEAQIBAxIDNScoCg0KBQQBAgEIEgQ1KTgDCg8KCAQB
-AgEInAgAEgM2BCoKEAoJBAECAQiEhI4TEgM3BC0KRgoEBAECAhIEOwI+BBo4IFRoZSB0eXBl
-IG9mIHRoZSBhcnJheSdzIGVsZW1lbnRzLCBpZiB0aGlzIGlzIGFuIGFycmF5LgoKDAoFBAEC
-AgYSAzsCFAoMCgUEAQICARIDOxUfCgwKBQQBAgIDEgM7IiMKDQoFBAECAggSBDskPgMKEQoK
-BAECAgitjcA1AhIDPAQzCg8KCAQBAgIInAgAEgM9BCoKVwoEBAECAxIEQQJEBBpJIFRoZSB0
-eXBlcyBvZiB0aGUgZmllbGRzIG9mIHRoaXMgc3RydWN0LCBpbiBvcmRlciwgaWYgdGhpcyBp
-cyBhCiBzdHJ1Y3QuCgoMCgUEAQIDBBIDQQIKCgwKBQQBAgMGEgNBCyMKDAoFBAECAwESA0Ek
-MAoMCgUEAQIDAxIDQTM0Cg0KBQQBAgMIEgRBNUQDChEKCgQBAgMIrY3ANQISA0IEMwoPCggE
-AQIDCJwIABIDQwQqCkIKBAQBAgQSBEYCSQQaNCBUaGUgZWxlbWVudCB0eXBlIG9mIHRoZSBy
-YW5nZSwgaWYgdGhpcyBpcyBhIHJhbmdlLgoKDAoFBAECBAYSA0YCFAoMCgUEAQIEARIDRhUn
-CgwKBQQBAgQDEgNGKisKDQoFBAECBAgSBEYsSQMKEQoKBAECBAitjcA1AhIDRwQzCg8KCAQB
-AgQInAgAEgNIBCoKLgoCBAISBE0AWgEaIiBSZXByZXNlbnRzIHRoZSB2YWx1ZSBvZiBhIHJh
-bmdlLgoKCgoDBAIBEgNNCBIKXQoEBAICABIEUAJTBBpPIFRoZSBzdGFydCB2YWx1ZSBvZiB0
-aGUgcmFuZ2UuIEEgbWlzc2luZyB2YWx1ZSByZXByZXNlbnRzIGFuIHVuYm91bmRlZAogc3Rh
-cnQuCgoMCgUEAgIABhIDUAIVCgwKBQQCAgABEgNQFhsKDAoFBAICAAMSA1AeHwoNCgUEAgIA
-CBIEUCBTAwoRCgoEAgIACK2NwDUCEgNRBDMKDwoIBAICAAicCAASA1IEKgpZCgQEAgIBEgRW
-AlkEGksgVGhlIGVuZCB2YWx1ZSBvZiB0aGUgcmFuZ2UuIEEgbWlzc2luZyB2YWx1ZSByZXBy
-ZXNlbnRzIGFuIHVuYm91bmRlZAogZW5kLgoKDAoFBAICAQYSA1YCFQoMCgUEAgIBARIDVhYZ
-CgwKBQQCAgEDEgNWHB0KDQoFBAICAQgSBFYeWQMKEQoKBAICAQitjcA1AhIDVwQzCg8KCAQC
-AgEInAgAEgNYBCoKLgoCBAMSBV0AhAEBGiEgVGhlIHZhbHVlIG9mIGEgcXVlcnkgcGFyYW1l
-dGVyLgoKCgoDBAMBEgNdCBsKQQoEBAMCABIEXwJjBBozIFRoZSB2YWx1ZSBvZiB0aGlzIHZh
-bHVlLCBpZiBhIHNpbXBsZSBzY2FsYXIgdHlwZS4KCgwKBQQDAgAGEgNfAh0KDAoFBAMCAAES
-A18eIwoMCgUEAwIAAxIDXyYnCg0KBQQDAgAIEgRfKGMDChEKCgQDAgAIrY3ANQISA2AEMwoP
-CggEAwIACJwIABIDYQQqChEKCgQDAgAI88esSwcSA2IETQo7CgQEAwIBEgRlAmgEGi0gVGhl
-IGFycmF5IHZhbHVlcywgaWYgdGhpcyBpcyBhbiBhcnJheSB0eXBlLgoKDAoFBAMCAQQSA2UC
-CgoMCgUEAwIBBhIDZQseCgwKBQQDAgEBEgNlHysKDAoFBAMCAQMSA2UuLwoNCgUEAwIBCBIE
-ZTBoAwoRCgoEAwIBCK2NwDUCEgNmBDMKDwoIBAMCAQicCAASA2cEKgooCgQEAwICEgRqAm0E
-GhogVGhlIHN0cnVjdCBmaWVsZCB2YWx1ZXMuCgoMCgUEAwICBhIDagIiCgwKBQQDAgIBEgNq
-IzAKDAoFBAMCAgMSA2ozNAoNCgUEAwICCBIEajVtAwoRCgoEAwICCK2NwDUCEgNrBDMKEQoK
-BAMCAgjzx6xLBxIDbARNCjkKBAQDAgMSBG8CcgQaKyBUaGUgcmFuZ2UgdmFsdWUsIGlmIHRo
-aXMgaXMgYSByYW5nZSB0eXBlLgoKDAoFBAMCAwYSA28CDAoMCgUEAwIDARIDbw0YCgwKBQQD
-AgMDEgNvGxwKDQoFBAMCAwgSBG8dcgMKEQoKBAMCAwitjcA1AhIDcAQzCg8KCAQDAgMInAgA
-EgNxBCoK5QEKBAQDAgQSBHkCekAa1gEgKC0tCiBUaGUgYWx0ZXJuYXRpdmUgZmllbGQgdGhh
-dCB3aWxsIGJlIHVzZWQgd2hlbiBFU0YgaXMgbm90IGFibGUgdG8gdHJhbnNsYXRlCiB0aGUg
-cmVjZWl2ZWQgZGF0YSB0byB0aGUgdmFsdWUgZmllbGQuIFNlZSBkZXRhaWxzIGF0CiBnby9k
-ZWFsaW5nX3dpdGhfYXBpYXJ5X2xheF9hcnJheV9wYXJzaW5nLgogLS0pCiBUaGlzIGZpZWxk
-IHNob3VsZCBub3QgYmUgdXNlZC4KCgwKBQQDAgQEEgN5AgoKDAoFBAMCBAUSA3kLEQoMCgUE
-AwIEARIDeRIjCgwKBQQDAgQDEgN5JicKDAoFBAMCBAgSA3oGPwoRCgoEAwIECPPHrEsDEgN6
-Bz4KlAIKBAQDAgUSBoIBAoMBQBqDAiAoLS0KIFRoZSBhbHRlcm5hdGl2ZSBmaWVsZCB0aGF0
-IHdpbGwgYmUgdXNlZCB3aGVuIGEgdXNlciBwcm92aWRlcyBhIGxpc3QgYW5kCiB0aHVzIHRo
-ZSBFU0YgaXMgbm90IGFibGUgdG8gdHJhbnNsYXRlIHRoZSByZWNlaXZlZCBkYXRhIHRvIHRo
-ZQogc3RydWN0X3ZhbHVlcyBmaWVsZC4gU2VlIGRldGFpbHMgYXQKIGdvL2RlYWxpbmdfd2l0
-aF9hcGlhcnlfbGF4X2FycmF5X3BhcnNpbmcuCiAtLSkKIFRoaXMgZmllbGQgc2hvdWxkIG5v
-dCBiZSB1c2VkLgoKDQoFBAMCBQQSBIIBAgoKDQoFBAMCBQYSBIIBCyAKDQoFBAMCBQESBIIB
-ITIKDQoFBAMCBQMSBIIBNTYKDQoFBAMCBQgSBIMBBj8KEgoKBAMCBQjzx6xLAxIEgwEHPgot
-CgIEBBIGhwEAmgEBGh8gQSBwYXJhbWV0ZXIgZ2l2ZW4gdG8gYSBxdWVyeS4KCgsKAwQEARIE
-hwEIFgpoCgQEBAIAEgaKAQKNAQQaWCBJZiB1bnNldCwgdGhpcyBpcyBhIHBvc2l0aW9uYWwg
-cGFyYW1ldGVyLiBPdGhlcndpc2UsIHNob3VsZCBiZQogdW5pcXVlIHdpdGhpbiBhIHF1ZXJ5
-LgoKDQoFBAQCAAUSBIoBAggKDQoFBAQCAAESBIoBCQ0KDQoFBAQCAAMSBIoBEBEKDwoFBAQC
-AAgSBooBEo0BAwoSCgoEBAIACK2NwDUCEgSLAQQzChAKCAQEAgAInAgAEgSMAQQqCi0KBAQE
-AgESBpABApMBBBodIFRoZSB0eXBlIG9mIHRoaXMgcGFyYW1ldGVyLgoKDQoFBAQCAQYSBJAB
-AhQKDQoFBAQCAQESBJABFSMKDQoFBAQCAQMSBJABJicKDwoFBAQCAQgSBpABKJMBAwoSCgoE
-BAIBCK2NwDUCEgSRAQQzChAKCAQEAgEInAgAEgSSAQQqCi4KBAQEAgISBpYBApkBBBoeIFRo
-ZSB2YWx1ZSBvZiB0aGlzIHBhcmFtZXRlci4KCg0KBQQEAgIGEgSWAQIVCg0KBQQEAgIBEgSW
-ARYlCg0KBQQEAgIDEgSWASgpCg8KBQQEAgIIEgaWASqZAQMKEgoKBAQCAgitjcA1AhIElwEE
-MwoQCggEBAICCJwIABIEmAEEKmIGcHJvdG8z
+bGUuY2xvdWQuYmlncXVlcnkudjIaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8a
+HGdvb2dsZS9wcm90b2J1Zi9zdHJ1Y3QucHJvdG8aHmdvb2dsZS9wcm90b2J1Zi93cmFwcGVy
+cy5wcm90byKhAQoYUXVlcnlQYXJhbWV0ZXJTdHJ1Y3RUeXBlEhcKBG5hbWUYASABKAlCA+BB
+AVIEbmFtZRJFCgR0eXBlGAIgASgLMiwuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyLlF1ZXJ5
+UGFyYW1ldGVyVHlwZUID4EECUgR0eXBlEiUKC2Rlc2NyaXB0aW9uGAMgASgJQgPgQQFSC2Rl
+c2NyaXB0aW9uIo8DChJRdWVyeVBhcmFtZXRlclR5cGUSFwoEdHlwZRgBIAEoCUID4EECUgR0
+eXBlEjkKE3RpbWVzdGFtcF9wcmVjaXNpb24YBSABKANCA+BBAUgAUhJ0aW1lc3RhbXBQcmVj
+aXNpb26IAQESUAoKYXJyYXlfdHlwZRgCIAEoCzIsLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52
+Mi5RdWVyeVBhcmFtZXRlclR5cGVCA+BBAVIJYXJyYXlUeXBlEloKDHN0cnVjdF90eXBlcxgD
+IAMoCzIyLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5RdWVyeVBhcmFtZXRlclN0cnVjdFR5
+cGVCA+BBAVILc3RydWN0VHlwZXMSXwoScmFuZ2VfZWxlbWVudF90eXBlGAQgASgLMiwuZ29v
+Z2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyLlF1ZXJ5UGFyYW1ldGVyVHlwZUID4EEBUhByYW5nZUVs
+ZW1lbnRUeXBlQhYKFF90aW1lc3RhbXBfcHJlY2lzaW9uIpwBCgpSYW5nZVZhbHVlEkgKBXN0
+YXJ0GAEgASgLMi0uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyLlF1ZXJ5UGFyYW1ldGVyVmFs
+dWVCA+BBAVIFc3RhcnQSRAoDZW5kGAIgASgLMi0uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYy
+LlF1ZXJ5UGFyYW1ldGVyVmFsdWVCA+BBAVIDZW5kIosEChNRdWVyeVBhcmFtZXRlclZhbHVl
+EjcKBXZhbHVlGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlQgPgQQFSBXZh
+bHVlElUKDGFycmF5X3ZhbHVlcxgCIAMoCzItLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5R
+dWVyeVBhcmFtZXRlclZhbHVlQgPgQQFSC2FycmF5VmFsdWVzEmQKDXN0cnVjdF92YWx1ZXMY
+AyADKAsyPy5nb29nbGUuY2xvdWQuYmlncXVlcnkudjIuUXVlcnlQYXJhbWV0ZXJWYWx1ZS5T
+dHJ1Y3RWYWx1ZXNFbnRyeVIMc3RydWN0VmFsdWVzEkoKC3JhbmdlX3ZhbHVlGAYgASgLMiQu
+Z29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyLlJhbmdlVmFsdWVCA+BBAVIKcmFuZ2VWYWx1ZRJC
+ChFhbHRfc3RydWN0X3ZhbHVlcxgFIAMoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZVIPYWx0
+U3RydWN0VmFsdWVzGm4KEVN0cnVjdFZhbHVlc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EkMK
+BXZhbHVlGAIgASgLMi0uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyLlF1ZXJ5UGFyYW1ldGVy
+VmFsdWVSBXZhbHVlOgI4ASLgAQoOUXVlcnlQYXJhbWV0ZXISFwoEbmFtZRgBIAEoCUID4EEB
+UgRuYW1lElgKDnBhcmFtZXRlcl90eXBlGAIgASgLMiwuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5
+LnYyLlF1ZXJ5UGFyYW1ldGVyVHlwZUID4EECUg1wYXJhbWV0ZXJUeXBlElsKD3BhcmFtZXRl
+cl92YWx1ZRgDIAEoCzItLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5RdWVyeVBhcmFtZXRl
+clZhbHVlQgPgQQJSDnBhcmFtZXRlclZhbHVlQnAKHGNvbS5nb29nbGUuY2xvdWQuYmlncXVl
+cnkudjJCE1F1ZXJ5UGFyYW1ldGVyUHJvdG9aO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVl
+cnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdxdWVyeXBiSrQdCgYSBA4AbQEKvAQKAQwSAw4A
+EjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFw
+YWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5v
+dCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2Uu
+CiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDov
+L3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVk
+IGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQog
+ZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFT
+IElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBL
+SU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0
+aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRh
+dGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACEKCQoCAwASAxIAKQoJCgIDARID
+EwAmCgkKAgMCEgMUACgKCAoBCBIDFgBSCgkKAggLEgMWAFIKCAoBCBIDFwA0CgkKAggIEgMX
+ADQKCAoBCBIDGAA1CgkKAggBEgMYADUKLQoCBAASBBsAJAEaISBUaGUgdHlwZSBvZiBhIHN0
+cnVjdCBwYXJhbWV0ZXIuCgoKCgMEAAESAxsIIAowCgQEAAIAEgMdAjsaIyBPcHRpb25hbC4g
+VGhlIG5hbWUgb2YgdGhpcyBmaWVsZC4KCgwKBQQAAgAFEgMdAggKDAoFBAACAAESAx0JDQoM
+CgUEAAIAAxIDHRARCgwKBQQAAgAIEgMdEjoKDwoIBAACAAicCAASAx0TOQowCgQEAAIBEgMg
+AkcaIyBSZXF1aXJlZC4gVGhlIHR5cGUgb2YgdGhpcyBmaWVsZC4KCgwKBQQAAgEGEgMgAhQK
+DAoFBAACAQESAyAVGQoMCgUEAAIBAxIDIBwdCgwKBQQAAgEIEgMgHkYKDwoIBAACAQicCAAS
+AyAfRQpBCgQEAAICEgMjAkIaNCBPcHRpb25hbC4gSHVtYW4tb3JpZW50ZWQgZGVzY3JpcHRp
+b24gb2YgdGhlIGZpZWxkLgoKDAoFBAACAgUSAyMCCAoMCgUEAAICARIDIwkUCgwKBQQAAgID
+EgMjFxgKDAoFBAACAggSAyMZQQoPCggEAAICCJwIABIDIxpACiwKAgQBEgQnAD8BGiAgVGhl
+IHR5cGUgb2YgYSBxdWVyeSBwYXJhbWV0ZXIuCgoKCgMEAQESAycIGgo6CgQEAQIAEgMpAjsa
+LSBSZXF1aXJlZC4gVGhlIHRvcCBsZXZlbCB0eXBlIG9mIHRoaXMgZmllbGQuCgoMCgUEAQIA
+BRIDKQIICgwKBQQBAgABEgMpCQ0KDAoFBAECAAMSAykQEQoMCgUEAQIACBIDKRI6Cg8KCAQB
+AgAInAgAEgMpEzkK/gEKBAQBAgESBDECMi8a7wEgT3B0aW9uYWwuIFByZWNpc2lvbiAobWF4
+aW11bSBudW1iZXIgb2YgdG90YWwgZGlnaXRzIGluIGJhc2UgMTApIGZvciBzZWNvbmRzCiBv
+ZiBUSU1FU1RBTVAgdHlwZS4KCiBQb3NzaWJsZSB2YWx1ZXMgaW5jbHVkZToKICogNiAoRGVm
+YXVsdCwgZm9yIFRJTUVTVEFNUCB0eXBlIHdpdGggbWljcm9zZWNvbmQgcHJlY2lzaW9uKQog
+KiAxMiAoRm9yIFRJTUVTVEFNUCB0eXBlIHdpdGggcGljb3NlY29uZCBwcmVjaXNpb24pCgoM
+CgUEAQIBBBIDMQIKCgwKBQQBAgEFEgMxCxAKDAoFBAECAQESAzERJAoMCgUEAQIBAxIDMSco
+CgwKBQQBAgEIEgMyBi4KDwoIBAECAQicCAASAzIHLQpPCgQEAQICEgM1Ak0aQiBPcHRpb25h
+bC4gVGhlIHR5cGUgb2YgdGhlIGFycmF5J3MgZWxlbWVudHMsIGlmIHRoaXMgaXMgYW4gYXJy
+YXkuCgoMCgUEAQICBhIDNQIUCgwKBQQBAgIBEgM1FR8KDAoFBAECAgMSAzUiIwoMCgUEAQIC
+CBIDNSRMCg8KCAQBAgIInAgAEgM1JUsKYQoEBAECAxIEOQI6LxpTIE9wdGlvbmFsLiBUaGUg
+dHlwZXMgb2YgdGhlIGZpZWxkcyBvZiB0aGlzIHN0cnVjdCwgaW4gb3JkZXIsIGlmIHRoaXMg
+aXMgYQogc3RydWN0LgoKDAoFBAECAwQSAzkCCgoMCgUEAQIDBhIDOQsjCgwKBQQBAgMBEgM5
+JDAKDAoFBAECAwMSAzkzNAoMCgUEAQIDCBIDOgYuCg8KCAQBAgMInAgAEgM6By0KTAoEBAEC
+BBIEPQI+Lxo+IE9wdGlvbmFsLiBUaGUgZWxlbWVudCB0eXBlIG9mIHRoZSByYW5nZSwgaWYg
+dGhpcyBpcyBhIHJhbmdlLgoKDAoFBAECBAYSAz0CFAoMCgUEAQIEARIDPRUnCgwKBQQBAgQD
+EgM9KisKDAoFBAECBAgSAz4GLgoPCggEAQIECJwIABIDPgctCi4KAgQCEgRCAEoBGiIgUmVw
+cmVzZW50cyB0aGUgdmFsdWUgb2YgYSByYW5nZS4KCgoKAwQCARIDQggSCmYKBAQCAgASA0UC
+SRpZIE9wdGlvbmFsLiBUaGUgc3RhcnQgdmFsdWUgb2YgdGhlIHJhbmdlLiBBIG1pc3Npbmcg
+dmFsdWUgcmVwcmVzZW50cyBhbgogdW5ib3VuZGVkIHN0YXJ0LgoKDAoFBAICAAYSA0UCFQoM
+CgUEAgIAARIDRRYbCgwKBQQCAgADEgNFHh8KDAoFBAICAAgSA0UgSAoPCggEAgIACJwIABID
+RSFHCmIKBAQCAgESA0kCRxpVIE9wdGlvbmFsLiBUaGUgZW5kIHZhbHVlIG9mIHRoZSByYW5n
+ZS4gQSBtaXNzaW5nIHZhbHVlIHJlcHJlc2VudHMgYW4KIHVuYm91bmRlZCBlbmQuCgoMCgUE
+AgIBBhIDSQIVCgwKBQQCAgEBEgNJFhkKDAoFBAICAQMSA0kcHQoMCgUEAgIBCBIDSR5GCg8K
+CAQCAgEInAgAEgNJH0UKLQoCBAMSBE0AXgEaISBUaGUgdmFsdWUgb2YgYSBxdWVyeSBwYXJh
+bWV0ZXIuCgoKCgMEAwESA00IGwpLCgQEAwIAEgRPAlAvGj0gT3B0aW9uYWwuIFRoZSB2YWx1
+ZSBvZiB0aGlzIHZhbHVlLCBpZiBhIHNpbXBsZSBzY2FsYXIgdHlwZS4KCgwKBQQDAgAGEgNP
+Ah0KDAoFBAMCAAESA08eIwoMCgUEAwIAAxIDTyYnCgwKBQQDAgAIEgNQBi4KDwoIBAMCAAic
+CAASA1AHLQpFCgQEAwIBEgRTAlQvGjcgT3B0aW9uYWwuIFRoZSBhcnJheSB2YWx1ZXMsIGlm
+IHRoaXMgaXMgYW4gYXJyYXkgdHlwZS4KCgwKBQQDAgEEEgNTAgoKDAoFBAMCAQYSA1MLHgoM
+CgUEAwIBARIDUx8rCgwKBQQDAgEDEgNTLi8KDAoFBAMCAQgSA1QGLgoPCggEAwIBCJwIABID
+VActCicKBAQDAgISA1cCNRoaIFRoZSBzdHJ1Y3QgZmllbGQgdmFsdWVzLgoKDAoFBAMCAgYS
+A1cCIgoMCgUEAwICARIDVyMwCgwKBQQDAgIDEgNXMzQKQgoEBAMCAxIDWgJGGjUgT3B0aW9u
+YWwuIFRoZSByYW5nZSB2YWx1ZSwgaWYgdGhpcyBpcyBhIHJhbmdlIHR5cGUuCgoMCgUEAwID
+BhIDWgIMCgwKBQQDAgMBEgNaDRgKDAoFBAMCAwMSA1obHAoMCgUEAwIDCBIDWh1FCg8KCAQD
+AgMInAgAEgNaHkQKLQoEBAMCBBIDXQI3GiAgVGhpcyBmaWVsZCBzaG91bGQgbm90IGJlIHVz
+ZWQuCgoMCgUEAwIEBBIDXQIKCgwKBQQDAgQGEgNdCyAKDAoFBAMCBAESA10hMgoMCgUEAwIE
+AxIDXTU2CisKAgQEEgRhAG0BGh8gQSBwYXJhbWV0ZXIgZ2l2ZW4gdG8gYSBxdWVyeS4KCgoK
+AwQEARIDYQgWCm8KBAQEAgASA2QCOxpiIE9wdGlvbmFsLiBJZiB1bnNldCwgdGhpcyBpcyBh
+IHBvc2l0aW9uYWwgcGFyYW1ldGVyLiBPdGhlcndpc2UsIHNob3VsZCBiZQogdW5pcXVlIHdp
+dGhpbiBhIHF1ZXJ5LgoKDAoFBAQCAAUSA2QCCAoMCgUEBAIAARIDZAkNCgwKBQQEAgADEgNk
+EBEKDAoFBAQCAAgSA2QSOgoPCggEBAIACJwIABIDZBM5CjUKBAQEAgESBGcCaC8aJyBSZXF1
+aXJlZC4gVGhlIHR5cGUgb2YgdGhpcyBwYXJhbWV0ZXIuCgoMCgUEBAIBBhIDZwIUCgwKBQQE
+AgEBEgNnFSMKDAoFBAQCAQMSA2cmJwoMCgUEBAIBCBIDaAYuCg8KCAQEAgEInAgAEgNoBy0K
+NgoEBAQCAhIEawJsLxooIFJlcXVpcmVkLiBUaGUgdmFsdWUgb2YgdGhpcyBwYXJhbWV0ZXIu
+CgoMCgUEBAICBhIDawIVCgwKBQQEAgIBEgNrFiUKDAoFBAQCAgMSA2soKQoMCgUEBAICCBID
+bAYuCg8KCAQEAgIInAgAEgNsBy1iBnByb3RvMw==
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -163,6 +130,40 @@ EOF
     # Field: type Type: 11 (.google.cloud.bigquery.v2.QueryParameterType)
     # Field: description Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::QueryParameter;
+
+    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<type>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
+
+=item * B<description>
+
+Type: String
+
+=back
+
+=cut
+
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType ===
     # Fields for QueryParameterType
     # Field: type Type: 9 ()
@@ -171,10 +172,82 @@ EOF
     # Field: struct_types Type: 11 (.google.cloud.bigquery.v2.QueryParameterStructType)
     # Field: range_element_type Type: 11 (.google.cloud.bigquery.v2.QueryParameterType)
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::QueryParameter;
+
+    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType->new(
+        type => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<type>
+
+Type: String
+
+=item * B<timestamp_precision>
+
+Type: Int64
+
+=item * B<array_type>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
+
+=item * B<struct_types>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterStructType)
+
+=item * B<range_element_type>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
+
+=back
+
+=cut
+
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::RangeValue ===
     # Fields for RangeValue
     # Field: start Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
     # Field: end Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::QueryParameter::RangeValue - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::QueryParameter;
+
+    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::RangeValue->new(
+        start => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<start>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
+
+=item * B<end>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
+
+=back
+
+=cut
 
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue ===
     # Fields for QueryParameterValue
@@ -182,8 +255,49 @@ EOF
     # Field: array_values Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
     # Field: struct_values Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue.StructValuesEntry)
     # Field: range_value Type: 11 (.google.cloud.bigquery.v2.RangeValue)
-    # Field: value_alternative Type: 9 ()
     # Field: alt_struct_values Type: 11 (.google.protobuf.Value)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::QueryParameter;
+
+    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue->new(
+        value => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<value>
+
+Type: Message (.google.protobuf.StringValue)
+
+=item * B<array_values>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
+
+=item * B<struct_values>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterValue.StructValuesEntry)
+
+=item * B<range_value>
+
+Type: Message (.google.cloud.bigquery.v2.RangeValue)
+
+=item * B<alt_struct_values>
+
+Type: Message (.google.protobuf.Value)
+
+=back
+
+=cut
 
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter ===
     # Fields for QueryParameter
@@ -191,4 +305,56 @@ EOF
     # Field: parameter_type Type: 11 (.google.cloud.bigquery.v2.QueryParameterType)
     # Field: parameter_value Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::QueryParameter;
+
+    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<parameter_type>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
+
+=item * B<parameter_value>
+
+Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::QueryParameter - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -1,0 +1,9 @@
+Revision history for Data-SegmentTree-Shared
+
+0.02      2026-07-21
+          - Add range_assign and gcd/product range monoids.
+          - On-disk format change: 0.01 files cannot be opened by 0.02.
+          - Resolve argument magic before capturing the path string.
+
+0.01      2026-07-10
+          - Initial release.

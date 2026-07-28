@@ -4,7 +4,7 @@
       "Zeus Panchenko <zeus@gnu.org.ua>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://github.com/z-eos/regather.git"
       }
    },
-   "version" : "v0.85.00",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v0.87.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

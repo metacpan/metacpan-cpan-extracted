@@ -36,6 +36,7 @@ eval {
     diag "";
     diag "Client:   " . ref($es);
     diag "Cxn:      " . $es->transport->cxn_pool->cxn_factory->cxn_class;
+    diag "Perl:     " . $^X;
     diag "";
     pass "OS Version";
 } or fail "OS Version";

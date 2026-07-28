@@ -24,11 +24,11 @@ Google::Auth::Exceptions - Exceptions used in the Google::Auth package
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 # Base class for all google.auth errors
 
@@ -72,43 +72,29 @@ extends 'Google::Auth::Error';
 
 =head1 AUTHOR
 
-C.J. Collier, C<< <cjcollier at cpan.org> >>
+C.J. Collier, C<< <cjac at google.com> >>
 
-=head1 BUGS
+=head1 BUGS AND SUPPORT
 
-Please report any bugs or feature requests to C<bug-google-auth-library-perl at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Google-Auth-Library-Perl>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Google::Auth::Exceptions
-
+Please report any bugs or feature requests to the GitHub issue tracker at
+L<https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues> or via RT at
+L<https://rt.cpan.org/Dist/Display.html?Name=Google-Auth>.
 
 You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub Issue Tracker
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Google-Auth-Library-Perl>
+L<https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * RT: CPAN's Request Tracker
 
-L<http://annocpan.org/dist/Google-Auth-Library-Perl>
+L<https://rt.cpan.org/Dist/Display.html?Name=Google-Auth>
 
-=item * CPAN Ratings
+=item * MetaCPAN
 
-L<https://cpanratings.perl.org/d/Google-Auth-Library-Perl>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/Google-Auth-Library-Perl>
+L<https://metacpan.org/release/Google-Auth>
 
 =back
 

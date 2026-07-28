@@ -9,7 +9,20 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::RoaringBitmap::Shared")) \
         croak("Expected a Data::RoaringBitmap::Shared object"); \
     RbHandle *h = INT2PTR(RbHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::RoaringBitmap::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::RoaringBitmap::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::RoaringBitmap::Shared object was replaced during the call"); \
+    h = INT2PTR(RbHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::RoaringBitmap::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -142,6 +155,7 @@ add_many(self, ints)
     UV *vals;
     IV total_added;
   CODE:
+    SvGETMAGIC(ints);
     if (!SvROK(ints) || SvTYPE(SvRV(ints)) != SVt_PVAV)
         croak("Data::RoaringBitmap::Shared->add_many: expected an array reference");
     av = (AV *)SvRV(ints);
@@ -151,6 +165,7 @@ add_many(self, ints)
     SAVEFREEPV(vals);
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(av, i, 0);
+        if (e && *e) SvGETMAGIC(*e);   /* a tied-array element is a deferred-magic PVLV */
         UV v = (e && SvOK(*e)) ? SvUV(*e) : 0;
         if (v > RB_UINT32_MAX_UV) {
             croak("Data::RoaringBitmap::Shared->add_many: value %" UVuf
@@ -159,6 +174,7 @@ add_many(self, ints)
         vals[i] = v;
     }
     total_added = 0;
+    REEXTRACT(self);
     rb_rwlock_wrlock(h);
     for (i = 0; i < n; i++) {
         uint32_t hi = (uint32_t)(vals[i] >> 16);
@@ -273,20 +289,22 @@ to_array(self)
     AV *av;
     UV card;
   CODE:
-    /* Pre-size the AV to the cardinality BEFORE the lock (av_extend can croak
-       on OOM; av_store afterward cannot).  The cardinality may grow between
-       this read and the fill, but to_array is a best-effort snapshot; we cap
-       the fill at the pre-sized length so we never store past the extent. */
+    /* Read the cardinality under a short read lock to size a C snapshot buffer.
+       Allocate it with Newx OUTSIDE any lock (Newx can OOM-longjmp, which under
+       the read lock would strand it), snapshot the set bits under a second read
+       lock, then build the AV AFTER unlocking -- newSVuv/av_store must never run
+       while the lock is held.  The cardinality may grow between the read and the
+       fill, but to_array is a best-effort snapshot; we cap the fill at the buffer
+       length so we never write past it. */
     rb_rwlock_rdlock(h);
     card = (UV)h->hdr->cardinality;
     rb_rwlock_rdunlock(h);
 
-    av = newAV();
-    if (card) av_extend(av, (SSize_t)card - 1);   /* room for indices 0..card-1 */
-
     {
+        uint32_t *buf = NULL;
         RbBucket *bt;
         UV idx = 0;
+        if (card) { Newx(buf, card, uint32_t); SAVEFREEPV(buf); }
         rb_rwlock_rdlock(h);
         bt = rb_buckets(h);
         for (uint32_t hi = 0; hi < RB_NUM_BUCKETS && idx < card; hi++) {
@@ -295,20 +313,27 @@ to_array(self)
                 uint16_t *vals = rb_array(h, bt[hi].container_off);
                 uint32_t ac = rb_array_card(&bt[hi]);
                 for (uint32_t i = 0; i < ac && idx < card; i++)
-                    av_store(av, (SSize_t)idx++, newSVuv(((UV)hi << 16) | vals[i]));
+                    buf[idx++] = ((uint32_t)hi << 16) | vals[i];
             } else {
                 uint64_t *bits = rb_bitmap(h, bt[hi].container_off);
                 for (uint32_t w = 0; w < 1024 && idx < card; w++) {
                     uint64_t word = bits[w];
                     while (word && idx < card) {
                         uint32_t lo = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                        av_store(av, (SSize_t)idx++, newSVuv(((UV)hi << 16) | lo));
+                        buf[idx++] = ((uint32_t)hi << 16) | lo;
                         word &= word - 1;   /* clear lowest set bit */
                     }
                 }
             }
         }
         rb_rwlock_rdunlock(h);
+
+        av = newAV();
+        if (idx) {
+            av_extend(av, (SSize_t)idx - 1);
+            for (UV i = 0; i < idx; i++)
+                av_store(av, (SSize_t)i, newSVuv((UV)buf[i]));
+        }
     }
     RETVAL = newRV_noinc((SV *)av);
   OUTPUT:
@@ -326,6 +351,10 @@ union(self, other)
     {
         RbHandle *o = INT2PTR(RbHandle*, SvIV(SvRV(other)));
         if (!o) croak("Attempted to use a destroyed Data::RoaringBitmap::Shared object");
+        /* sv_isobject/sv_derived_from above begin with SvGETMAGIC(other), so a
+         * tied `other` can have destroyed self before h is used below. `o` was
+         * read after that magic and needs no re-read. */
+        REEXTRACT(self);
         /* Same underlying bitmap (same handle, or two handles to one mapping
          * sharing a bitmap_id) -> a |= a is a no-op.  Must short-circuit before
          * locking: taking the write lock and the read lock on the SAME rwlock
@@ -366,6 +395,10 @@ intersect(self, other)
     {
         RbHandle *o = INT2PTR(RbHandle*, SvIV(SvRV(other)));
         if (!o) croak("Attempted to use a destroyed Data::RoaringBitmap::Shared object");
+        /* sv_isobject/sv_derived_from above begin with SvGETMAGIC(other), so a
+         * tied `other` can have destroyed self before h is used below. `o` was
+         * read after that magic and needs no re-read. */
+        REEXTRACT(self);
         /* Same underlying bitmap (same handle, or two handles to one mapping
          * sharing a bitmap_id) -> a &= a is a no-op.  Short-circuit before
          * locking to avoid self-deadlocking on the one shared rwlock. */

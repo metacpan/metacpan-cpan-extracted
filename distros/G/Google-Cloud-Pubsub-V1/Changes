@@ -1,0 +1,17 @@
+Revision history for Google-Cloud-Pubsub-V1-PublisherClient
+
+0.03  Fri Jul 24 05:23:59 2026
+    - Initial release. Auto-generated from Protocol Buffers schema.
+    - Regenerated clients with separate service classes and regex fixes.
+    - Improved generated POD documentation with dual-transport examples.
+    - Encoded source .proto paths into generated POD.
+    - Excluded BUILD from pod coverage in generated tests.
+
+0.02    Fri Jul 17 2026
+        [CI & Code Generation]
+        - Upgraded package version to 0.02.
+        - Corrected copyright assignment to Google LLC in generated module headers.
+        - Pruned redundant sub-module $VERSION declarations.
+
+0.01  Mon Jul 13 22:30:27 2026
+        - Initial distribution release.

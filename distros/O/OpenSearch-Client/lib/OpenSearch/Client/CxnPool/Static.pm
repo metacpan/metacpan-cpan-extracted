@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::CxnPool::Static;
-$OpenSearch::Client::CxnPool::Static::VERSION = '3.007009';
+$OpenSearch::Client::CxnPool::Static::VERSION = '3.007010';
 use Moo;
 with 'OpenSearch::Client::Role::CxnPool::Static',
     'OpenSearch::Client::Role::Is_Sync';
@@ -74,7 +74,7 @@ OpenSearch::Client::CxnPool::Static - A CxnPool for connecting to a remote clust
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 SYNOPSIS
 

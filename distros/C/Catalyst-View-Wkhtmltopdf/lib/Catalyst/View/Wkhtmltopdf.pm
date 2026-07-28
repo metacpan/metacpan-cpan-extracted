@@ -6,7 +6,7 @@ use Moose;
 extends 'Catalyst::View';
 
 use version 0.77;
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.3';
 
 use B;
 use File::Temp;
@@ -118,6 +118,8 @@ sub render {
 
     print $htmlf $html;
 
+    my $send_filehandle = delete $args->{send_filehandle};
+
     my @args;
 
     if ( defined $args->{page_width} && defined $args->{page_height} ) {
@@ -163,8 +165,15 @@ sub render {
 
     $c->log->debug($err) if $err;
 
-    # Read the output and return it
-    return IO::File::WithPath->new( $pdffn, '<:raw' );
+    if ( $send_filehandle ) {
+        return IO::File::WithPath->new( $pdffn, '<:raw' );
+    }
+    else {
+        my $pdffc      = Path::Class::File->new($pdffn);
+        my $pdfcontent = $pdffc->slurp();
+        $pdffc->remove();
+        return $pdfcontent;
+    }
 }
 
 __PACKAGE__->meta->make_immutable();
@@ -177,7 +186,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords QtWebKit epr greyscale lowquality pdf tmpdir TT wkhtmltopdf
+=for stopwords QtWebKit epr greyscale lowquality pdf tmpdir TT wkhtmltopdf Sendfile
 
 =head1 NAME
 
@@ -185,7 +194,7 @@ Catalyst::View::Wkhtmltopdf - Catalyst view to convert HTML (or TT) content to P
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -257,8 +266,7 @@ to pass to the view. Default is C<wk>.
 
 Default: guessed via C<File::Spec::tmpdir()>.
 
-Name of URI parameter to specify JSON callback function name. Defaults
-to C<callback>. Only effective when C<allow_callback> is turned on.
+This is the temporary directory that HTML and PDF files are saved in.
 
 =head2 command
 
@@ -313,6 +321,17 @@ Parameters are passed via the stash:
 You can pass the following configuration options here, which will
 override the global configuration: I<disposition>, I<filename>,
 I<page_size>.
+
+=head2 send_filehandle
+
+When true, this will return a result by filehandle.
+
+This is preferable when the PDF files are larger or when X-Sendfile extensions are enabled for the webserver.
+However, the PDF files will not be removed automatically after they are sent.
+
+It defaults to false. In versions v0.6.0 through v0.6.2 this was the default behavior.
+
+Added in v0.6.3.
 
 =head2 page_width
 
@@ -384,7 +403,17 @@ hashref, which will be passed to L<Catalyst::View::TT>'s
 C<render> method. If not supplied, undef will be passed,
 so the TT view method will behave as per its documentation.
 
+=head1 KNOWN ISSUES
+
+Temporary files may not be purged in L</tmpdir>.
+See L</SECURITY CONSIDERATIONS>.
+
+The POD for L<Catalyst::Helper::View::Wkhtmltopdf> will include the helper template,
+due to POD processors including the C<DATA> section.
+
 =head1 SECURITY CONSIDERATIONS
+
+=head2 Status of the Wkhtmltopdf Project
 
 B<Do not use wkhtmltopdf with untrusted HTML.>
 
@@ -395,10 +424,21 @@ The L<git repository|https://github.com/wkhtmltopdf/wkhtmltopdf> was archived as
 
 You should consider migrating to alternative solutions.
 
+=head2 Options
+
 It is assumed that the L</command> attribute is configured by a trusted source (developer or operator).
 
 The options are sent to wkhtmltopdf via stdin, using the C<--read-args-from-stdin> option.
 However, any options configured through the web application should be considered untrusted and validated.
+
+=head2 Temporary Files
+
+Temporary HTML and PDF files are saved in L</tmpdir>.
+They may be left in the directory on failure.
+
+When returning a filehandle instead of the PDF content, the PDF files are not removed when L</send_filehandle> is true.
+
+A separate process will need to purge files, to prevent them from filling the disk, as well as to remove sensitive information.
 
 =begin :readme
 

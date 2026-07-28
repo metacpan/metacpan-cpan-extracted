@@ -4,12 +4,12 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.36
+Version 0.37
 
 # DESCRIPTION
 
 `Database::Abstraction` is a read-only ORM for Perl that gives a uniform
-interface over CSV, PSV, XML, SQLite, and BerkeleyDB files — without writing
+interface over CSV, PSV, XML, SQLite, DBM::Deep, and BerkeleyDB files - without writing
 any SQL.
 
 Key features:
@@ -24,12 +24,12 @@ operators (`-like`, `-not_like`), set operators (`-in`, `-not_in`,
 combine tables with INNER, LEFT, RIGHT, FULL, or CROSS joins.
 - **Chained query builder.**  The `query()` method returns a
 [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) object for fluent, composable queries:
-`$db->query->where(…)->order_by(…)->limit(…)->all()`.
+`$db->query->where(...)->order_by(...)->limit(...)->all()`.
 - **Schema introspection.**  `columns()` lists column names; `schema()`
 returns full type/nullability metadata, using native driver introspection
 (`PRAGMA table_info` for SQLite, `column_info` for others).
 - **DSN portability.**  Pass a `dsn` (plus optional `username`/`password`)
-to connect to any DBI-supported database (SQLite, PostgreSQL, MySQL, …)
+to connect to any DBI-supported database (SQLite, PostgreSQL, MySQL, ...)
 instead of pointing at a local file.
 - **Performance.**  Small files are slurped into a RAM hash for sub-millisecond
 lookups.  All DBI statement handles are cached with `prepare_cached()`.
@@ -41,7 +41,7 @@ A CHI-compatible cache layer is also supported.
     package Database::Foo;
     use parent 'Database::Abstraction';
 
-    # 2. Open the database — file is auto-detected from the class name
+    # 2. Open the database - file is auto-detected from the class name
     #    (looks for foo.sql / foo.psv / foo.csv / foo.xml / foo.db)
     my $db = Database::Foo->new(directory => '/path/to/data');
 
@@ -97,7 +97,7 @@ A CHI-compatible cache layer is also supported.
     my $first = $db->query->where(name => 'Alice')->first();
     my $count = $db->query->where(status => 'active')->count();
 
-    # 7. Connect via DSN (PostgreSQL, MySQL, SQLite, …) ---------------
+    # 7. Connect via DSN (PostgreSQL, MySQL, SQLite, ...) ---------------
 
     my $db2 = Database::Foo->new(
         dsn      => 'dbi:Pg:dbname=mydb;host=db.example.com',
@@ -107,8 +107,8 @@ A CHI-compatible cache layer is also supported.
 
     # 8. Schema introspection -----------------------------------------
 
-    my $cols   = $db->columns();  # ['entry', 'name', 'score', …]
-    my $schema = $db->schema();   # { name => { type=>'TEXT', nullable=>1, … }, … }
+    my $cols   = $db->columns();  # ['entry', 'name', 'score', ...]
+    my $schema = $db->schema();   # { name => { type=>'TEXT', nullable=>1, ... }, ... }
 
 # QUICK START EXAMPLE
 
@@ -147,21 +147,27 @@ The module probes the `directory` for files in this priority order:
 
     File ending `.sql`
 
-- 2. `PSV`
+- 2. `Deep`
+
+    DBM::Deep file ending `.dbm` or `.deep`.  The entire file is slurped
+    into a plain Perl hash on open; all in-memory fast-paths apply.
+    Requires [DBM::Deep](https://metacpan.org/pod/DBM%3A%3ADeep) (loaded lazily).
+
+- 3. `PSV`
 
     Pipe-separated file, ending `.psv`
 
-- 3. `CSV`
+- 4. `CSV`
 
     Comma (or custom) separated file, ending `.csv` or `.db`; can be
     gzipped.  **Note:** the default separator is `!` not `,` for historical
-    reasons — pass `sep_char => ','` for standard CSVs.
+    reasons - pass `sep_char => ','` for standard CSVs.
 
-- 4. `XML`
+- 5. `XML`
 
     File ending `.xml`
 
-- 5. `BerkeleyDB`
+- 6. `BerkeleyDB`
 
     Binary key-value file ending `.db`
 
@@ -200,8 +206,8 @@ Multiple operators on one column are ANDed:
 
 ## Set membership
 
-    name => { -in     => ['Alice', 'Bob'] }   # name IN (…)
-    name => { -not_in => ['Alice', 'Bob'] }   # name NOT IN (…)
+    name => { -in     => ['Alice', 'Bob'] }   # name IN (...)
+    name => { -not_in => ['Alice', 'Bob'] }   # name NOT IN (...)
 
 ## Range
 
@@ -242,14 +248,12 @@ hashrefs) describing the join:
 
 ## init
 
-Initializes the abstraction class and its subclasses with optional arguments for configuration.
+Set class-level defaults shared by all instances.
 
     Database::Abstraction::init(directory => '../data');
 
-See the documentation for new to see what variables can be set.
-
-Returns a reference to a hash of the current values.
-Therefore when given with no arguments you can get the current default values:
+Accepts the same parameters as ["new"](#new).  Returns a reference to the
+current defaults hash, so you can read them back:
 
     my $defaults = Database::Abstraction::init();
     print $defaults->{'directory'}, "\n";
@@ -268,7 +272,7 @@ or
 
 Create an object pointing to a read-only database.
 
-Accepts arguments as a hash, a hashref, or — as a shortcut — a single bare
+Accepts arguments as a hash, a hashref, or - as a shortcut - a single bare
 string which is taken to be `directory`.
 
 ### Connection parameters
@@ -304,6 +308,17 @@ string which is taken to be `directory`.
     Override the full filename (relative to `directory`).  Takes precedence
     over `dbname`.
 
+- `host`
+
+    Remote hostname (or `user@host`) from which to fetch the data file(s) via
+    SSH/SCP.  When present, each candidate filename is fetched with
+    [File::Slurp::Remote](https://metacpan.org/pod/File%3A%3ASlurp%3A%3ARemote) into a local temporary directory; the existing
+    extension-based file-type detection then runs against that directory.
+    `directory` is treated as the remote path (no local canonicalization is
+    applied).  Using `filename` together with `host` avoids probing multiple
+    extensions and is therefore more efficient.  [File::Slurp::Remote](https://metacpan.org/pod/File%3A%3ASlurp%3A%3ARemote) must be
+    installed; it is loaded lazily (only when `host` is given).
+
 ### Behaviour parameters
 
 - `no_entry`
@@ -317,7 +332,8 @@ string which is taken to be `directory`.
 
 - `sep_char`
 
-    Field separator for CSV/PSV files.  Default is `!` — pass `sep_char => ','`
+    Field separator for CSV/PSV files.
+    Default is `!` - pass `sep_char => ','`
     for standard comma-separated files.
 
 - `max_slurp_size`
@@ -362,7 +378,7 @@ string which is taken to be `directory`.
 - If no arguments are set, class-level defaults set via `init()` or `use`
 are used.
 - Slurp mode assumes the key column (`entry`) is unique.  If it is not,
-searches will be incomplete — disable slurp mode by setting
+searches will be incomplete - disable slurp mode by setting
 `max_slurp_size => 0`.
 - Passing an existing object as `$class` clones it, merging any new
 arguments.
@@ -392,17 +408,16 @@ Pass a `join` key to combine with another table:
 Results are returned in the cache (if configured) and the returned array
 reference is made read-only unless `no_fixate` was set.
 
-**Note:** because this returns an array reference, no `LIMIT` is applied.
-Use ["selectall\_array"](#selectall_array) in scalar context, or ["query"](#query) with `->limit()`,
-when you want `LIMIT 1`.
+**Note:** this always returns all matching rows.  Use ["selectall\_array"](#selectall_array)
+in scalar context, or `$db->query->limit(1)->all()`, to fetch just one row.
 
 ### PSEUDOCODE
 
     1. Parse criteria; extract and build any JOIN clause.
     2. If data is slurped AND no joins AND criteria are simple:
-       a. No criteria → return all rows as arrayref.
-       b. entry-only lookup → return [$data{entry}].
-       c. Otherwise → scan rows in-memory with _match_criterion.
+       a. No criteria -> return all rows as arrayref.
+       b. entry-only lookup -> return [$data{entry}].
+       c. Otherwise -> scan rows in-memory with _match_criterion.
     3. Otherwise build SQL: SELECT * FROM table [JOIN] [WHERE] ORDER BY id.
     4. Check cache; return cached arrayref on HIT.
     5. prepare_cached + execute; fetch all rows.
@@ -421,7 +436,7 @@ rather than a reference to an array.
     my @rows = $db->selectall_array(status => 'active');
 
 In **scalar context** it applies `LIMIT 1` and returns just the first
-matching hash reference — making it more efficient than `selectall_arrayref`
+matching hash reference - making it more efficient than `selectall_arrayref`
 when you only need one row.  In **list context** all matching rows are returned.
 
 Accepts the same criteria and `join` parameter as ["selectall\_arrayref"](#selectall_arrayref).
@@ -500,10 +515,10 @@ Returns an array reference of column names for the current table.
 
 The column list is determined by the backend:
 
-- **Slurp mode** — sorted keys of the first row in memory.
-- **SQLite / other DBI** — a zero-row `SELECT *` exposes the driver's
+- **Slurp mode** - sorted keys of the first row in memory.
+- **SQLite / other DBI** - a zero-row `SELECT *` exposes the driver's
 `NAME` attribute.
-- **BerkeleyDB** — always returns `['entry', 'value']`.
+- **BerkeleyDB** - always returns `['entry', 'value']`.
 
 The result is cached inside the object after the first call.
 
@@ -512,10 +527,10 @@ The result is cached inside the object after the first call.
 Returns a hash reference describing the schema of the current table.
 Each key is a column name; each value is a hash reference with these keys:
 
-- `type` — data type string (e.g. `TEXT`, `INTEGER`, `REAL`)
-- `nullable` — `1` if the column may be NULL, `0` if NOT NULL
-- `default` — default value string, or `undef`
-- `pk` — `1` if this column is (part of) the primary key, `0` otherwise
+- `type` - data type string (e.g. `TEXT`, `INTEGER`, `REAL`)
+- `nullable` - `1` if the column may be NULL, `0` if NOT NULL
+- `default` - default value string, or `undef`
+- `pk` - `1` if this column is (part of) the primary key, `0` otherwise
 
     my $schema = $db->schema();
 
@@ -529,10 +544,10 @@ Each key is a column name; each value is a hash reference with these keys:
 
 The schema is determined by the backend:
 
-- **SQLite** — `PRAGMA table_info(table)`
-- **Other DBI drivers** — `$dbh->column_info(...)`
-- **Slurp mode** — inferred from the first row (all columns typed as `TEXT`)
-- **BerkeleyDB** — always returns `entry` (pk) and `value`
+- **SQLite** - `PRAGMA table_info(table)`
+- **Other DBI drivers** - `$dbh->column_info(...)`
+- **Slurp mode** - inferred from the first row (all columns typed as `TEXT`)
+- **BerkeleyDB** - always returns `entry` (pk) and `value`
 
 The result is cached inside the object after the first call.
 
@@ -557,7 +572,7 @@ database instance, for fluent method-chaining queries.
 
 See [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) for the full API.
 
-## AUTOLOAD — column shortcut
+## AUTOLOAD - column shortcut
 
 Calling an unknown method whose name matches a column name performs a column
 lookup.  The method name is the column you want; the arguments are criteria.
@@ -589,11 +604,11 @@ has been disabled with `auto_load => 0`.
     2. Croak if auto_load => 0.
     3. Validate $column against /^[a-zA-Z_][a-zA-Z0-9_]*$/.
     4. If data is slurped:
-       a. List context, no params → map column over all rows (exists guard).
-       b. entry-only param → direct hash lookup (exists guard).
-       c. No params, scalar → first value in hash.
-       d. no_entry set → scan array for matching key/value pair.
-       e. Other params → scan keyed hash for matching column.
+       a. List context, no params -> map column over all rows (exists guard).
+       b. entry-only param -> direct hash lookup (exists guard).
+       c. No params, scalar -> first value in hash.
+       d. no_entry set -> scan array for matching key/value pair.
+       e. Other params -> scan keyed hash for matching column.
     5. If not slurped, build SQL:
        - List:   SELECT column FROM table [WHERE ...] ORDER BY column
        - Scalar: SELECT DISTINCT column FROM table [WHERE ...] LIMIT 1
@@ -708,7 +723,7 @@ same criteria has already populated it.
 
 # SEE ALSO
 
-- [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) — chained query builder
+- [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) - chained query builder
 - [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/Database-Abstraction/coverage/)
 

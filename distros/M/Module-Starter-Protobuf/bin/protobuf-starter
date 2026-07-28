@@ -22,6 +22,7 @@ GetOptions(
     'author=s@'    => \$config{author},
     'email=s'      => \$config{email},
     'license=s'    => \$config{license},
+    'version=s'    => \$config{version},
     'force'        => \$config{force},
     'verbose'      => \$config{verbose},
     'help'         => sub { pod2usage(1) },

@@ -9,7 +9,18 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::RadixTree::Shared")) \
         croak("Expected a Data::RadixTree::Shared object"); \
     RdxHandle *h = INT2PTR(RdxHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::RadixTree::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::RadixTree::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+#define REEXTRACT(sv) \
+    h = INT2PTR(RdxHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::RadixTree::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -30,11 +41,14 @@ new(class, path = &PL_sv_undef, node_capacity = 4096, arena_capacity = 65536, ..
   PREINIT:
     char errbuf[RDX_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* Optional 5th arg: file mode for a newly-created file-backed segment
      * (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
      * sharing. Ignored for anonymous/existing segments. */
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    /* Capture the path PV only AFTER get-magic on the later optional args
+     * above has run: SvGETMAGIC(ST(4)) may realloc/free the PV that
+     * SvPV_nolen(path) returns, so the capture must stay last. */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     RdxHandle *h = rdx_create(p, (uint64_t)node_capacity, (uint64_t)arena_capacity, mode, errbuf);   /* validates args into errbuf */
     if (!h) croak("Data::RadixTree::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -93,6 +107,7 @@ insert(self, key, value = 1)
     /* Resolve key bytes BEFORE locking: SvPVbyte croaks on wide chars, and a
        croak must never happen while holding the lock. */
     kp = SvPVbyte(key, klen);
+    REEXTRACT(self);
     rdx_rwlock_wrlock(h);
     if (!rdx_insert_has_room(h, (uint32_t)klen)) {
         rdx_rwlock_wrunlock(h);   /* release BEFORE croak */
@@ -118,6 +133,7 @@ lookup(self, key)
     int found;
   CODE:
     kp = SvPVbyte(key, klen);   /* before the lock */
+    REEXTRACT(self);
     rdx_rwlock_rdlock(h);
     found = rdx_lookup_locked(h, (const uint8_t *)kp, (uint32_t)klen, &val);
     rdx_rwlock_rdunlock(h);
@@ -135,6 +151,7 @@ exists(self, key)
     const char *kp;
   CODE:
     kp = SvPVbyte(key, klen);   /* before the lock */
+    REEXTRACT(self);
     rdx_rwlock_rdlock(h);
     RETVAL = rdx_lookup_locked(h, (const uint8_t *)kp, (uint32_t)klen, NULL) ? 1 : 0;
     rdx_rwlock_rdunlock(h);
@@ -153,6 +170,7 @@ longest_prefix(self, key)
     int found;
   CODE:
     kp = SvPVbyte(key, klen);   /* before the lock */
+    REEXTRACT(self);
     rdx_rwlock_rdlock(h);
     found = rdx_longest_prefix_locked(h, (const uint8_t *)kp, (uint32_t)klen, &val);
     rdx_rwlock_rdunlock(h);
@@ -171,6 +189,7 @@ delete(self, key)
     int removed;
   CODE:
     kp = SvPVbyte(key, klen);   /* before the lock */
+    REEXTRACT(self);
     rdx_rwlock_wrlock(h);
     removed = rdx_delete_locked(h, (const uint8_t *)kp, (uint32_t)klen);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);

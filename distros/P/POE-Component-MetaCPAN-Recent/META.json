@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150012",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Digest::SHA" : "0",
             "HTTP::Request" : "0",
             "HTTP::Response" : "0",
             "JSON::PP" : "0",
@@ -62,9 +63,9 @@
          "web" : "https://github.com/bingos/poe-component-metacpan-recent"
       }
    },
-   "version" : "1.04",
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "1.06",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

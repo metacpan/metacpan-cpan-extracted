@@ -1,0 +1,32 @@
+# Testing Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient 0.03, Perl 5.040001, /usr/bin/perl
+t/00-load.t .................................... ok
+t/01-service-BusinessGlossaryService.t ......... ok
+t/01-service-CatalogService.t .................. ok
+t/01-service-CmekService.t ..................... ok
+t/01-service-DataProductService.t .............. ok
+t/01-service-DataScanService.t ................. ok
+t/01-service-DataTaxonomyService.t ............. ok
+t/01-service-DataplexService.t ................. ok
+t/01-service-MetadataService.t ................. ok
+t/02-rest-transport-BusinessGlossaryService.t .. ok
+t/02-rest-transport-CatalogService.t ........... ok
+t/02-rest-transport-CmekService.t .............. ok
+t/02-rest-transport-DataProductService.t ....... ok
+PRE-CONDITION VIOLATION: mainpos_e (0x563b9b9a4480) is NOT reachable from its head (0x563b9b9a4468) at bucket 454
+perl: vendor/upb/hash/common.c:246: insert: Assertion `0' failed.
+t/02-rest-transport-DataScanService.t .......... 
+No subtests run 
+t/02-rest-transport-DataTaxonomyService.t ...... ok
+t/02-rest-transport-DataplexService.t .......... ok
+t/02-rest-transport-MetadataService.t .......... ok
+t/manifest.t ................................... skipped: Author tests not required for installation
+t/pod-coverage.t ............................... skipped: Author/Release tests not required for installation
+t/pod.t ........................................ skipped: Author tests not required for installation
+
+Test Summary Report
+-------------------
+t/02-rest-transport-DataScanService.t        (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+Files=20, Tests=47, 61 wallclock secs ( 0.13 usr  0.04 sys + 47.22 cusr  7.90 csys = 55.29 CPU)
+Result: FAIL

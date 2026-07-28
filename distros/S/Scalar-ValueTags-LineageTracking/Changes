@@ -1,0 +1,10 @@
+Revision history for Scalar::ValueTags::LineageTracking
+
+NOTE: Odd versions are trial versions; even versions are release versions
+
+0.001 2026-07-27
+ - First trial version
+
+0.002 2026-07-27
+ - First release version
+ - bump Scalar::ValueTags to 0.004

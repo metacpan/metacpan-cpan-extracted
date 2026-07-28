@@ -1,0 +1,61 @@
+package Google::Cloud::Bigquery::Storage::V1::Annotations;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Protobuf::Descriptor };
+    my $descriptor_b64 = <<'EOF';
+CjJnb29nbGUvY2xvdWQvYmlncXVlcnkvc3RvcmFnZS92MS9hbm5vdGF0aW9ucy5wcm90bxIg
+Z29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0b3JhZ2UudjEaIGdvb2dsZS9wcm90b2J1Zi9kZXNj
+cmlwdG9yLnByb3RvOkUKC2NvbHVtbl9uYW1lEh0uZ29vZ2xlLnByb3RvYnVmLkZpZWxkT3B0
+aW9ucxi1w/fYASABKAlSCmNvbHVtbk5hbWWIAQFCwAEKJGNvbS5nb29nbGUuY2xvdWQuYmln
+cXVlcnkuc3RvcmFnZS52MUIQQW5ub3RhdGlvbnNQcm90b1ABWj5jbG91ZC5nb29nbGUuY29t
+L2dvL2JpZ3F1ZXJ5L3N0b3JhZ2UvYXBpdjEvc3RvcmFnZXBiO3N0b3JhZ2VwYqoCIEdvb2ds
+ZS5DbG91ZC5CaWdRdWVyeS5TdG9yYWdlLlYxygIgR29vZ2xlXENsb3VkXEJpZ1F1ZXJ5XFN0
+b3JhZ2VcVjFK2wUKBhIEAAAbAQoICgEMEgMAABIKCAoBAhIDAgApCgkKAgMAEgMEACoKCAoB
+CBIDBgA9CgkKAgglEgMGAD0KCAoBCBIDBwBVCgkKAggLEgMHAFUKCAoBCBIDCAA9CgkKAggB
+EgMIAD0KCAoBCBIDCQAiCgkKAggKEgMJACIKCAoBCBIDCgAxCgkKAggIEgMKADEKCAoBCBID
+CwA+CgkKAggpEgMLAD4KCQoBBxIEDQAbAQrsAwoCBwASAxoCKhrgAyBTZXR0aW5nIHRoZSBj
+b2x1bW5fbmFtZSBleHRlbnNpb24gYWxsb3dzIHVzZXJzIHRvIHJlZmVyZW5jZQogYmlncXVl
+cnkgY29sdW1uIGluZGVwZW5kZW50bHkgb2YgdGhlIGZpZWxkIG5hbWUgaW4gdGhlIHByb3Rv
+Y29sIGJ1ZmZlcgogbWVzc2FnZS4KCiBUaGUgaW50ZW5kZWQgdXNlIG9mIHRoaXMgYW5ub3Rh
+dGlvbiBpcyB0byByZWZlcmVuY2UgYSBkZXN0aW5hdGlvbiBjb2x1bW4KIG5hbWVkIHVzaW5n
+IGNoYXJhY3RlcnMgdW5hdmFpbGFibGUgZm9yIHByb3RvYnVmIGZpZWxkIG5hbWVzIChlLmcu
+IHVuaWNvZGUKIGNoYXJhY3RlcnMpLgoKIE1vcmUgZGV0YWlscyBhYm91dCBCaWdRdWVyeSBu
+YW1pbmcgbGltaXRhdGlvbnMgY2FuIGJlIGZvdW5kIGhlcmU6CiBodHRwczovL2Nsb3VkLmdv
+b2dsZS5jb20vYmlncXVlcnkvZG9jcy9zY2hlbWFzI2NvbHVtbl9uYW1lcwoKIFRoaXMgZXh0
+ZW5zaW9uIGlzIGN1cnJlbnRseSBleHBlcmltZW50YWwuCgoKCgMHAAISAw0HIwoKCgMHAAQS
+AxoCCgoKCgMHAAUSAxoLEQoKCgMHAAESAxoSHQoKCgMHAAMSAxogKWIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::Storage::V1::Annotations - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -1,0 +1,30 @@
+---
+abstract: 'Perl DBI Driver for Google Cloud BigQuery with Async Support'
+author:
+  - 'C.J. Collier <cjac@google.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-BigQuery
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '1.651'
+  Google::Auth: '0.03'
+  Google::Cloud::BigQuery::Storage::V1: '0.02'
+  Google::Cloud::Bigquery::V2: '0.02'
+  Google::gRPC::Client: '0.03'
+  Protobuf: '0.06'
+  perl: '5.008003'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

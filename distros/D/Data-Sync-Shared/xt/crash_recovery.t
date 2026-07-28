@@ -42,7 +42,9 @@ use Data::Sync::Shared;
     my $s = $rw->stats;
     diag sprintf "dt=%.2fs recoveries=%d", $dt, $s->{recoveries};
 
-    ok $dt >= 1.5 && $dt < 5, sprintf('rwlock writer recovery in %.2fs', $dt);
+    # Reader-slots-only rwlock: a dead writer is detected inline on the
+    # contended CAS and recovered immediately (no 2s futex-timeout drain).
+    ok $dt < 5, sprintf('rwlock writer recovery in %.2fs', $dt);
     ok $s->{recoveries} >= 1, 'rwlock recovery counter incremented';
 }
 

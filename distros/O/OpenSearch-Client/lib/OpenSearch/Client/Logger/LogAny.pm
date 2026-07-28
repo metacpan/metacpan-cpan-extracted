@@ -21,13 +21,13 @@
 # limitations under the License.
 
 package OpenSearch::Client::Logger::LogAny;
-$OpenSearch::Client::Logger::LogAny::VERSION = '3.007009';
+$OpenSearch::Client::Logger::LogAny::VERSION = '3.007010';
 use Moo;
 with 'OpenSearch::Client::Role::Logger';
 use OpenSearch::Client::Util qw(parse_params to_list);
 use namespace::clean;
 
-use Log::Any 1.02 ();
+use Log::Any 1.708 ();
 use Log::Any::Adapter();
 
 #===================================
@@ -77,7 +77,7 @@ OpenSearch::Client::Logger::LogAny - A Log::Any-based Logger implementation
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 DESCRIPTION
 

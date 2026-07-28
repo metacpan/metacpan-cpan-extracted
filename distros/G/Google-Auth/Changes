@@ -1,5 +1,12 @@
 Revision history for Google-Auth
 
+0.05    Wed Jul 22 2026
+        - Fixed POD test failures.
+        - Resolved author testing failures (Kwalitee, PerlTidy).
+        [Version Alignment & Submodule Synchronization]
+        - Synchronized $VERSION = '0.05' across all Google::Auth submodules.
+        - Hardened release_lint.pl distcheck verification.
+
 0.04    Mon Jul 20 2026
         [CPAN RT #180157 Fix]
         - Replaced system free() with Perl's Safefree() for memory allocated via Newx() in XS.xs generate_self_signed_cert() and verify_signature().

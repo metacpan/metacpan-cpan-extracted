@@ -37,7 +37,6 @@
             "Google::gRPC::Client" : "0.01",
             "Log::Any" : "0",
             "Moo" : "0",
-            "Net::Curl" : "0",
             "Protobuf" : "0.01",
             "perl" : "5.008003"
          }
@@ -62,6 +61,6 @@
          "web" : "https://github.com/c9h/google-auth-library-perl"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

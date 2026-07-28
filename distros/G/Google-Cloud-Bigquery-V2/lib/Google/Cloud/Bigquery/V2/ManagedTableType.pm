@@ -1,45 +1,42 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::ManagedTableType;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Inclusion };
     my $descriptor_b64 = <<'EOF';
 CjFnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvbWFuYWdlZF90YWJsZV90eXBlLnByb3RvEhhn
-b29nbGUuY2xvdWQuYmlncXVlcnkudjIaGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnByb3RvKk8K
-EE1hbmFnZWRUYWJsZVR5cGUSIgoeTUFOQUdFRF9UQUJMRV9UWVBFX1VOU1BFQ0lGSUVEEAAS
-CgoGTkFUSVZFEAESCwoHQklHTEFLRRACQn8KHGNvbS5nb29nbGUuY2xvdWQuYmlncXVlcnku
-djJCFU1hbmFnZWRUYWJsZVR5cGVQcm90b1ABWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1
-ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5cGI7YmlncXVlcnlwYorV29IPBQoDYWxsSogECgYSBAAA
-FAEKCAoBDBIDAAASCggKAQISAwIAIQoJCgIDABIDBAAkCggKAQgSAwYAUgoJCgIICxIDBgBS
-CggKAQgSAwcAIgoJCgIIChIDBwAiCggKAQgSAwgANQoJCgIIARIDCAA1CggKAQgSAwkANgoJ
-CgIICBIDCQA2CggKAQgSAwoALQoPCggI0bqr+gEBABIDCgAtCkwKAgUAEgQNABQBGkAgVGhl
-IGNsYXNzaWZpY2F0aW9uIG9mIG1hbmFnZWQgdGFibGUgdHlwZXMgdGhhdCBjYW4gYmUgY3Jl
-YXRlZC4KCgoKAwUAARIDDQUVCi8KBAUAAgASAw8CJRoiIE5vIG1hbmFnZWQgdGFibGUgdHlw
-ZSBzcGVjaWZpZWQuCgoMCgUFAAIAARIDDwIgCgwKBQUAAgACEgMPIyQKPAoEBQACARIDEQIN
-Gi8gVGhlIG1hbmFnZWQgdGFibGUgaXMgYSBuYXRpdmUgQmlnUXVlcnkgdGFibGUuCgoMCgUF
-AAIBARIDEQIICgwKBQUAAgECEgMRCwwKUwoEBQACAhIDEwIOGkYgVGhlIG1hbmFnZWQgdGFi
-bGUgaXMgYSBCaWdMYWtlIHRhYmxlIGZvciBBcGFjaGUgSWNlYmVyZyBpbiBCaWdRdWVyeS4K
-CgwKBQUAAgIBEgMTAgkKDAoFBQACAgISAxMMDWIGcHJvdG8z
+b29nbGUuY2xvdWQuYmlncXVlcnkudjIqTwoQTWFuYWdlZFRhYmxlVHlwZRIiCh5NQU5BR0VE
+X1RBQkxFX1RZUEVfVU5TUEVDSUZJRUQQABIKCgZOQVRJVkUQARILCgdCSUdMQUtFEAJCdAoc
+Y29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIVTWFuYWdlZFRhYmxlVHlwZVByb3RvUAFa
+O2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdx
+dWVyeXBiSpcICgYSBA4AIQEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUg
+TExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAo
+dGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBj
+b21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2Yg
+dGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJ
+Q0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVl
+ZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vu
+c2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFO
+VElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBs
+aWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJu
+aW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoI
+CgECEgMQACEKCAoBCBIDEgBSCgkKAggLEgMSAFIKCAoBCBIDEwAiCgkKAggKEgMTACIKCAoB
+CBIDFAA2CgkKAggIEgMUADYKCAoBCBIDFQA1CgkKAggBEgMVADUKTAoCBQASBBgAIQEaQCBU
+aGUgY2xhc3NpZmljYXRpb24gb2YgbWFuYWdlZCB0YWJsZSB0eXBlcyB0aGF0IGNhbiBiZSBj
+cmVhdGVkLgoKCgoDBQABEgMYBRUKLwoEBQACABIDGgIlGiIgTm8gbWFuYWdlZCB0YWJsZSB0
+eXBlIHNwZWNpZmllZC4KCgwKBQUAAgABEgMaAiAKDAoFBQACAAISAxojJAo8CgQFAAIBEgMd
+Ag0aLyBUaGUgbWFuYWdlZCB0YWJsZSBpcyBhIG5hdGl2ZSBCaWdRdWVyeSB0YWJsZS4KCgwK
+BQUAAgEBEgMdAggKDAoFBQACAQISAx0LDApTCgQFAAICEgMgAg4aRiBUaGUgbWFuYWdlZCB0
+YWJsZSBpcyBhIEJpZ0xha2UgdGFibGUgZm9yIEFwYWNoZSBJY2ViZXJnIGluIEJpZ1F1ZXJ5
+LgoKDAoFBQACAgESAyACCQoMCgUFAAICAhIDIAwNYgZwcm90bzM=
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -47,3 +44,21 @@ EOF
 # Message definitions
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::ManagedTableType - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

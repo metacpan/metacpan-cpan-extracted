@@ -1,55 +1,44 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::Error;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Auditing };
-    eval { require Google::Api::Inclusion };
     my $descriptor_b64 = <<'EOF';
 CiRnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvZXJyb3IucHJvdG8SGGdvb2dsZS5jbG91ZC5i
-aWdxdWVyeS52MhoZZ29vZ2xlL2FwaS9hdWRpdGluZy5wcm90bxoaZ29vZ2xlL2FwaS9pbmNs
-dXNpb24ucHJvdG8itQEKCkVycm9yUHJvdG8SJQoGcmVhc29uGAEgASgJQg3q6oCsAwcSBUFV
-RElUUgZyZWFzb24SKQoIbG9jYXRpb24YAiABKAlCDerqgKwDBxIFQVVESVRSCGxvY2F0aW9u
-EiwKCmRlYnVnX2luZm8YAyABKAlCDerqgKwDBxIFQVVESVRSCWRlYnVnSW5mbxInCgdtZXNz
-YWdlGAQgASgJQg3q6oCsAwcSBUFVRElUUgdtZXNzYWdlQmYKHGNvbS5nb29nbGUuY2xvdWQu
-YmlncXVlcnkudjJaO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmln
-cXVlcnlwYjtiaWdxdWVyeXBiitXb0g8FCgNhbGxKiQcKBhIEAAAfAQoICgEMEgMAABIKCAoB
-AhIDAgAhCgkKAgMAEgMEACMKCQoCAwESAwUAJAoICgEIEgMHAFIKCQoCCAsSAwcAUgoICgEI
-EgMIADUKCQoCCAESAwgANQoICgEIEgMJAC0KDwoICNG6q/oBAQASAwkALQq6AQoCBAASBBIA
-HwEarQEgRXJyb3IgZGV0YWlscy4KCiAoLS0KIE1pcnJvcnMgQXBpYXJ5IGRlZmluaXRpb24g
-YXQKIGdvb2dsZWRhdGEvYXBpc2VydmluZy9jb25maWcvY2xvdWQvaGVsaXgvdjIvdGVtcGxh
-dGVzL2Vycm9yUHJvdG8uanNvbnQKIEl0IGNhbiBiZSBzaGFyZWQgYW1vbmcgZGlmZmVyZW50
-IHNlcnZpY2VzLgogLS0pCgoKCgMEAAESAxIIEgo8CgQEAAIAEgMUAkYaLyBBIHNob3J0IGVy
-cm9yIGNvZGUgdGhhdCBzdW1tYXJpemVzIHRoZSBlcnJvci4KCgwKBQQAAgAFEgMUAggKDAoF
-BAACAAESAxQJDwoMCgUEAAIAAxIDFBITCgwKBQQAAgAIEgMUFEUKEQoKBAACAAitjcA1AhID
-FBVECj4KBAQAAgESAxcCSBoxIFNwZWNpZmllcyB3aGVyZSB0aGUgZXJyb3Igb2NjdXJyZWQs
-IGlmIHByZXNlbnQuCgoMCgUEAAIBBRIDFwIICgwKBQQAAgEBEgMXCREKDAoFBAACAQMSAxcU
-FQoMCgUEAAIBCBIDFxZHChEKCgQAAgEIrY3ANQISAxcXRgpiCgQEAAICEgMbAkoaVSBEZWJ1
-Z2dpbmcgaW5mb3JtYXRpb24uIFRoaXMgcHJvcGVydHkgaXMgaW50ZXJuYWwgdG8gR29vZ2xl
-IGFuZCBzaG91bGQgbm90CiBiZSB1c2VkLgoKDAoFBAACAgUSAxsCCAoMCgUEAAICARIDGwkT
-CgwKBQQAAgIDEgMbFhcKDAoFBAACAggSAxsYSQoRCgoEAAICCK2NwDUCEgMbGUgKOQoEBAAC
-AxIDHgJHGiwgQSBodW1hbi1yZWFkYWJsZSBkZXNjcmlwdGlvbiBvZiB0aGUgZXJyb3IuCgoM
-CgUEAAIDBRIDHgIICgwKBQQAAgMBEgMeCRAKDAoFBAACAwMSAx4TFAoMCgUEAAIDCBIDHhVG
-ChEKCgQAAgMIrY3ANQISAx4WRWIGcHJvdG8z
+aWdxdWVyeS52MiJ5CgpFcnJvclByb3RvEhYKBnJlYXNvbhgBIAEoCVIGcmVhc29uEhoKCGxv
+Y2F0aW9uGAIgASgJUghsb2NhdGlvbhIdCgpkZWJ1Z19pbmZvGAMgASgJUglkZWJ1Z0luZm8S
+GAoHbWVzc2FnZRgEIAEoCVIHbWVzc2FnZUJbChxjb20uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5
+LnYyWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5cGI7
+YmlncXVlcnlwYkrqCAoGEgQOACMBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29v
+Z2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAy
+LjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQg
+aW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5
+IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNl
+cy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBh
+Z3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBM
+aWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdB
+UlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3Ig
+aW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdv
+dmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNl
+LgoKCAoBAhIDEAAhCggKAQgSAxIAUgoJCgIICxIDEgBSCggKAQgSAxMANQoJCgIIARIDEwA1
+ChwKAgQAEgQWACMBGhAgRXJyb3IgZGV0YWlscy4KCgoKAwQAARIDFggSCjwKBAQAAgASAxgC
+FBovIEEgc2hvcnQgZXJyb3IgY29kZSB0aGF0IHN1bW1hcml6ZXMgdGhlIGVycm9yLgoKDAoF
+BAACAAUSAxgCCAoMCgUEAAIAARIDGAkPCgwKBQQAAgADEgMYEhMKPgoEBAACARIDGwIWGjEg
+U3BlY2lmaWVzIHdoZXJlIHRoZSBlcnJvciBvY2N1cnJlZCwgaWYgcHJlc2VudC4KCgwKBQQA
+AgEFEgMbAggKDAoFBAACAQESAxsJEQoMCgUEAAIBAxIDGxQVCmIKBAQAAgISAx8CGBpVIERl
+YnVnZ2luZyBpbmZvcm1hdGlvbi4gVGhpcyBwcm9wZXJ0eSBpcyBpbnRlcm5hbCB0byBHb29n
+bGUgYW5kIHNob3VsZCBub3QKIGJlIHVzZWQuCgoMCgUEAAICBRIDHwIICgwKBQQAAgIBEgMf
+CRMKDAoFBAACAgMSAx8WFwo5CgQEAAIDEgMiAhUaLCBBIGh1bWFuLXJlYWRhYmxlIGRlc2Ny
+aXB0aW9uIG9mIHRoZSBlcnJvci4KCgwKBQQAAgMFEgMiAggKDAoFBAACAwESAyIJEAoMCgUE
+AAIDAxIDIhMUYgZwcm90bzM=
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -63,4 +52,60 @@ EOF
     # Field: debug_info Type: 9 ()
     # Field: message Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::Error::ErrorProto - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Error;
+
+    my $msg = Google::Cloud::Bigquery::V2::Error::ErrorProto->new(
+        reason => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<reason>
+
+Type: String
+
+=item * B<location>
+
+Type: String
+
+=item * B<debug_info>
+
+Type: String
+
+=item * B<message>
+
+Type: String
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::Error - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -70,7 +70,11 @@ lib/Google/Api/Usage.pm
 lib/Google/Api/Usage/Types.pm
 lib/Google/Api/Visibility.pm
 lib/Google/Api/Visibility/Types.pm
+lib/Google/Cloud/ExtendedOperations.pm
+lib/Google/Cloud/ExtendedOperations/Types.pm
 lib/Google/Cloud/REST/Client.pm
+lib/Google/Longrunning/Operations.pm
+lib/Google/Longrunning/Operations/Types.pm
 lib/Google/Rpc/Status.pm
 lib/Google/Type/CalendarPeriod.pm
 lib/Google/Type/CalendarPeriod/Types.pm
@@ -108,12 +112,16 @@ lib/Google/Type/Timeofday.pm
 lib/Google/Type/Timeofday/Types.pm
 Makefile.PL
 MANIFEST			This list of files
+META.yml
 README
 t/00-load.t
 t/03-rest-client.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/00_changes.t
+xt/00_kwalitee.t
+xt/00_perl-critic.t
+xt/00_perltidy.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

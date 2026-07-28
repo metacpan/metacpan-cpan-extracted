@@ -1,0 +1,177 @@
+NAME
+    Data::Reservoir::Shared - shared-memory reservoir sampler (uniform
+    stream sample)
+
+SYNOPSIS
+        use Data::Reservoir::Shared;
+
+        # keep a uniform random sample of 100 items from an unbounded stream
+        my $rsv = Data::Reservoir::Shared->new(undef, 100);
+
+        $rsv->add($_) for @stream;      # feed items; each is kept or discarded
+
+        my @sample = $rsv->sample;      # up to 100 items, uniformly sampled
+        $rsv->count;                    # how many are held (min of seen, 100)
+        $rsv->seen;                     # total items observed
+
+        # share the reservoir across processes via a backing file
+        my $shared = Data::Reservoir::Shared->new("/tmp/sample.rsv", 100);
+
+        # weighted sampling: keep items with probability proportional to weight
+        my $wrsv = Data::Reservoir::Shared->new_weighted(undef, 100);
+        $wrsv->add($event, $weight) for @stream;   # heavier items kept more often
+
+DESCRIPTION
+    A reservoir sampler in shared memory: it keeps a uniform random sample
+    of "k" items drawn from a stream of unknown or unbounded length, in
+    fixed memory, using Algorithm R. Feed it items one at a time with "add";
+    while fewer than "k" items have been seen every item is kept, and after
+    that the i-th item replaces a uniformly random slot with probability
+    "k/i". At any point the "k" retained items are a uniform random sample
+    of everything seen so far -- the standard way to sample a log stream,
+    sample events for telemetry, or take a fair sample of a data set too
+    large to hold.
+
+    Because the reservoir lives in a shared mapping, several processes feed
+    and read one sample: any process that opens the same backing file,
+    inherits the anonymous mapping across "fork", or reopens a passed memfd
+    contributes to and reads the same reservoir. The sampling RNG (a
+    xorshift64) lives in the shared header and is advanced under the write
+    lock, so concurrent producers sample one consistent reservoir. A
+    write-preferring futex rwlock with dead-process recovery guards
+    mutation.
+
+    Items are stored inline, truncated to "item_size" bytes (default 256):
+    an item longer than "item_size" keeps only its first "item_size" bytes.
+    Memory is about "k * S" bytes for the slots, where the per-slot stride
+    "S" rounds "8 + item_size" up to a multiple of 8, plus a fixed header.
+    Items are handled by their byte content; wide-character strings (any
+    codepoint above 255) cause a "Wide character" croak -- encode to bytes
+    first. Linux-only. Requires 64-bit Perl.
+
+  Weighted sampling (A-Res)
+    A reservoir created with "new_weighted" keeps a weighted random sample:
+    each item carries a positive weight and is retained with probability
+    proportional to its weight rather than uniformly. This is the
+    Efraimidis-Spirakis A-Res algorithm -- each observed item is assigned a
+    key "u ** (1/weight)" (with "u" uniform in "(0,1]") and the "k" items
+    with the largest keys are kept, tracked in a shared min-heap so a
+    heavier arrival can evict the current lightest member. With a single
+    slot the probability of keeping item "i" is exactly "w_i / sum(w)". Feed
+    weighted items with "$rsv->add($item, $weight)" (the weight must be a
+    finite number greater than zero); everything else -- "sample", "count",
+    "get", "clear", and cross-process sharing -- works identically. A
+    weighted reservoir stores an extra "k * 16" bytes for the heap and
+    records its mode in the header, so a reopened segment stays weighted.
+
+METHODS
+  Constructors
+        my $rsv = Data::Reservoir::Shared->new($path, $k, $item_size);
+        my $rsv = Data::Reservoir::Shared->new(undef, $k);              # anonymous, item_size 256
+        my $rsv = Data::Reservoir::Shared->new_memfd($name, $k, $item_size);
+        my $rsv = Data::Reservoir::Shared->new_from_fd($fd);
+
+        # weighted (A-Res) reservoir -- same arguments, weighted sampling
+        my $rsv = Data::Reservoir::Shared->new_weighted($path, $k, $item_size);
+        my $rsv = Data::Reservoir::Shared->new_weighted_memfd($name, $k, $item_size);
+
+    $k is the reservoir size (the number of items to retain, at least 1).
+    $item_size is the maximum bytes stored per item (default 256; items are
+    truncated to it). "new" and "new_memfd" croak on a size below 1 or an
+    out-of-range $item_size. When reopening an existing file or memfd the
+    stored geometry wins and the caller's arguments are ignored. An optional
+    file mode may be passed as the last argument to "new" (e.g. 0660) for
+    cross-user sharing; it defaults to 0600 (owner-only).
+
+  Sampling
+        my $kept  = $rsv->add($item);            # uniform: 1 if now stored, 0 if discarded
+        my $kept  = $rsv->add($item, $weight);    # weighted reservoir: weight must be > 0
+        my $n     = $rsv->add_many(\@items);              # uniform: array ref of items
+        my $n     = $rsv->add_many([[$item,$w], ...]);     # weighted: [item, weight] pairs
+        my @items = $rsv->sample;            # current sample (a list, up to k items)
+        my $it    = $rsv->get($i);           # the i-th retained item (0-based), or undef
+        $rsv->clear;                         # empty the reservoir (seen resets to 0)
+
+    "add" feeds one item and returns 1 if it is now stored in the reservoir
+    or 0 if it was discarded. On a weighted reservoir "add" takes a second
+    argument, the item's weight (a finite number greater than zero -- a
+    missing, zero, negative, infinite, or NaN weight croaks). "add_many"
+    feeds an array reference under a single write lock, returning how many
+    of the batch were stored (an item that replaces an earlier sample counts
+    as stored; use "count" for the number currently retained); for a
+    weighted reservoir each element must be an "[$item, $weight]" pair.
+    "sample" returns the retained items as a list (order is not meaningful);
+    "get" returns a single retained item by index. "clear" empties the
+    reservoir and resets the seen counter.
+
+  Introspection and RNG
+        $rsv->count;        # number of items currently held: min(seen, k)
+        $rsv->seen;         # total items observed
+        $rsv->capacity;     # k
+        $rsv->item_size;    # max bytes per item
+        $rsv->is_weighted;  # true for a weighted (A-Res) reservoir
+        $rsv->seed($n);     # set the RNG state (for reproducible sampling in tests)
+        $rsv->stats;        # { size, item_size, count, seen, ops, mmap_size, weighted }
+
+    "seed" sets the shared RNG state to a fixed value, making subsequent
+    sampling deterministic -- useful for reproducible tests. By default the
+    RNG is seeded from process and clock entropy at creation, so different
+    runs draw different samples.
+
+  Lifecycle
+        $rsv->path; $rsv->memfd; $rsv->sync; $rsv->unlink;
+
+    "sync" flushes the mapping to its backing store (a no-op for anonymous
+    and memfd reservoirs); "unlink" removes the backing file (also callable
+    as "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened reservoirs) and "memfd" the backing
+    descriptor.
+
+SHARING ACROSS PROCESSES
+    The reservoir lives in a shared mapping, shared the same three ways as
+    the rest of the family: a backing file, an anonymous mapping inherited
+    across "fork", or a memfd passed to an unrelated process and reopened
+    with new_from_fd($fd). Every process's "add" feeds the one shared
+    reservoir, and the shared RNG keeps the sampling probabilities
+    consistent across producers.
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default; pass
+    an explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
+    and the header is validated on attach. Any process granted write access
+    is trusted not to corrupt the mapping.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership and dead-owner recovery. Each "add" is a short
+    bounded update, so a crash leaves the reservoir consistent up to the
+    last completed operation. Limitation: PID reuse is not detected (very
+    unlikely in practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
+
+SEE ALSO
+    Data::HyperLogLog::Shared (cardinality estimation),
+    Data::CountMinSketch::Shared (frequency estimation), and the rest of the
+    "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

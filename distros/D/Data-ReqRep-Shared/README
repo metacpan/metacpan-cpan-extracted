@@ -88,7 +88,9 @@ DESCRIPTION
         ->new_from_fd($fd)
 
     Constructor arguments for Str: "$path, $req_cap, $resp_slots, $resp_size
-    [, $arena]". For Int: "$path, $req_cap, $resp_slots".
+    [, $arena [, $mode]]". For Int: "$path, $req_cap, $resp_slots [,
+    $mode]". $mode is the octal backing-file permission (default 0600); see
+    "SECURITY".
 
   Server API
         my ($data, $id) = $srv->recv;              # non-blocking
@@ -285,13 +287,16 @@ SEE ALSO
 SECURITY
     Backing files are created with mode 0600 (owner-only) by default, so
     only the creating user can open and attach them. To share a backing file
-    across users, pass an explicit octal file mode such as 0660 as the last
-    argument to "new"; the mode is applied only when the file is created (an
-    existing file keeps its own permissions). The file is opened with
-    "O_NOFOLLOW", so a symlink planted at the path is refused, and created
-    with "O_EXCL"; the on-disk header is validated when the file is
-    attached. Any process you grant write access to a shared mapping is
-    trusted not to corrupt its contents while other processes are using it.
+    across users, pass an explicit octal file mode such as 0660 as the final
+    $mode argument to "new" -- for Str after the optional $arena
+    ("new($path, $req_cap, $resp_slots, $resp_size, $arena, 0660)"), for Int
+    as the fourth argument ("new($path, $req_cap, $resp_slots, 0660)"); the
+    mode is applied only when the file is created (an existing file keeps
+    its own permissions). The file is opened with "O_NOFOLLOW", so a symlink
+    planted at the path is refused, and created with "O_EXCL"; the on-disk
+    header is validated when the file is attached. Any process you grant
+    write access to a shared mapping is trusted not to corrupt its contents
+    while other processes are using it.
 
 AUTHOR
     vividsnow

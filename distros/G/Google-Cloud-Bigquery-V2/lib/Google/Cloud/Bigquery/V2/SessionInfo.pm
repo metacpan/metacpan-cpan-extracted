@@ -1,45 +1,40 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::SessionInfo;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Auditing };
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
     my $descriptor_b64 = <<'EOF';
 Citnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvc2Vzc2lvbl9pbmZvLnByb3RvEhhnb29nbGUu
-Y2xvdWQuYmlncXVlcnkudjIaGWdvb2dsZS9hcGkvYXVkaXRpbmcucHJvdG8aH2dvb2dsZS9h
-cGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnByb3RvIj4K
-C1Nlc3Npb25JbmZvEi8KCnNlc3Npb25faWQYASABKAlCEOBBA+rqgKwDBxIFQVVESVRSCXNl
-c3Npb25JZEJ6Chxjb20uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyQhBTZXNzaW9uSW5mb1By
-b3RvUAFaO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlw
-YjtiaWdxdWVyeXBiitXb0g8FCgNhbGxK9wIKBhIEAAAVAQoICgEMEgMAABIKCAoBAhIDAgAh
-CgkKAgMAEgMEACMKCQoCAwESAwUAKQoJCgIDAhIDBgAkCggKAQgSAwgAUgoJCgIICxIDCABS
-CggKAQgSAwkANQoJCgIIARIDCQA1CggKAQgSAwoAIgoJCgIIChIDCgAiCggKAQgSAwsAMQoJ
-CgIICBIDCwAxCggKAQgSAwwALQoPCggI0bqr+gEBABIDDAAtCjgKAgQAEgQPABUBGiwgW1By
-ZXZpZXddIEluZm9ybWF0aW9uIHJlbGF0ZWQgdG8gc2Vzc2lvbnMuCgoKCgMEAAESAw8IEwom
-CgQEAAIAEgQRAhQEGhggVGhlIGlkIG9mIHRoZSBzZXNzaW9uLgoKDAoFBAACAAUSAxECCAoM
-CgUEAAIAARIDEQkTCgwKBQQAAgADEgMRFhcKDQoFBAACAAgSBBEYFAMKDwoIBAACAAicCAAS
-AxIELQoRCgoEAAIACK2NwDUCEgMTBDNiBnByb3RvMw==
+Y2xvdWQuYmlncXVlcnkudjIaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8iMQoL
+U2Vzc2lvbkluZm8SIgoKc2Vzc2lvbl9pZBgBIAEoCUID4EEDUglzZXNzaW9uSWRCbwocY29t
+Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIQU2Vzc2lvbkluZm9Qcm90b1ABWjtjbG91ZC5n
+b29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5cGI7YmlncXVlcnlwYkrz
+BgoGEgQOAB0BCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExp
+Y2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGlj
+ZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5j
+ZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNl
+bnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIu
+MAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4g
+d3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRp
+c3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1Ig
+Q09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNl
+ZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJt
+aXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAh
+CgkKAgMAEgMSACkKCAoBCBIDFABSCgkKAggLEgMUAFIKCAoBCBIDFQAiCgkKAggKEgMVACIK
+CAoBCBIDFgAxCgkKAggIEgMWADEKCAoBCBIDFwA1CgkKAggBEgMXADUKOAoCBAASBBoAHQEa
+LCBbUHJldmlld10gSW5mb3JtYXRpb24gcmVsYXRlZCB0byBzZXNzaW9ucy4KCgoKAwQAARID
+GggTCjIKBAQAAgASAxwCRBolIE91dHB1dCBvbmx5LiBUaGUgaWQgb2YgdGhlIHNlc3Npb24u
+CgoMCgUEAAIABRIDHAIICgwKBQQAAgABEgMcCRMKDAoFBAACAAMSAxwWFwoMCgUEAAIACBID
+HBhDCg8KCAQAAgAInAgAEgMcGUJiBnByb3RvMw==
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -50,4 +45,48 @@ EOF
     # Fields for SessionInfo
     # Field: session_id Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::SessionInfo::SessionInfo - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::SessionInfo;
+
+    my $msg = Google::Cloud::Bigquery::V2::SessionInfo::SessionInfo->new(
+        session_id => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<session_id>
+
+Type: String
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::SessionInfo - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -28,7 +28,7 @@ use Google::Auth::Exceptions;
 use Google::Auth::RetryHelper;
 use Log::Any qw($log);
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 has json_key => (
     is       => 'ro',

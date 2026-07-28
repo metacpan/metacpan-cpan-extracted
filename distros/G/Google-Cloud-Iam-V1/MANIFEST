@@ -1,0 +1,27 @@
+Changes
+ignore.txt
+lib/Google/Cloud/Iam/V1.pm
+lib/Google/Cloud/Iam/V1/IamPolicyClient.pm
+lib/Google/Iam/V1/IamPolicy.pm
+lib/Google/Iam/V1/IamPolicy/Types.pm
+lib/Google/Iam/V1/Logging/AuditData.pm
+lib/Google/Iam/V1/Logging/AuditData/Types.pm
+lib/Google/Iam/V1/Options.pm
+lib/Google/Iam/V1/Options/Types.pm
+lib/Google/Iam/V1/Policy.pm
+lib/Google/Iam/V1/Policy/Types.pm
+lib/Google/Iam/V1/ResourcePolicyMember.pm
+lib/Google/Iam/V1/ResourcePolicyMember/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-service-IamPolicy.t
+t/02-rest-transport-IamPolicy.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

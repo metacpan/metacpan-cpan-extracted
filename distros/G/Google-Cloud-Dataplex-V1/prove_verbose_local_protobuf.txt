@@ -1,0 +1,15 @@
+t/02-rest-transport-DataplexService.t .. 
+# Subtest: Client REST Transport Initialization
+    ok 1 - Created client with REST transport
+    ok 2 - An object of class 'Google::Cloud::REST::Client' isa 'Google::Cloud::REST::Client'
+    1..2
+ok 1 - Client REST Transport Initialization
+# Subtest: Client REST API Request
+    ok 1 - Received response from mock REST client
+    1..1
+ok 2 - Client REST API Request
+1..2
+ok
+All tests successful.
+Files=1, Tests=2,  5 wallclock secs ( 0.04 usr  0.01 sys +  2.93 cusr  0.64 csys =  3.62 CPU)
+Result: PASS

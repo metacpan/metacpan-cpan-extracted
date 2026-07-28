@@ -28,6 +28,7 @@ t/08-unix-socket.t
 t/09-env-redis-server.t
 t/10-tie-list.t
 t/11-timeout.t
+t/12-no-io-socket-ssl.t
 t/20-tie-hash.t
 t/30-scripts.t
 t/42-client_cmds.t
@@ -98,8 +99,8 @@ deps/hiredis/examples/example-qt.h
 deps/hiredis/examples/example-redismoduleapi.c
 deps/hiredis/examples/example-ssl.c
 deps/hiredis/examples/example.c
+deps/hiredis/ffc.h
 deps/hiredis/fmacros.h
-deps/hiredis/fuzzing/format_command_fuzzer.c
 deps/hiredis/hiredis-config.cmake.in
 deps/hiredis/hiredis.c
 deps/hiredis/hiredis.h

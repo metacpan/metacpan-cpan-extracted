@@ -1,57 +1,49 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::RestrictionConfig;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Auditing };
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
-    eval { require Datapol::SemanticAnnotations };
     my $descriptor_b64 = <<'EOF';
 CjFnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcmVzdHJpY3Rpb25fY29uZmlnLnByb3RvEhhn
-b29nbGUuY2xvdWQuYmlncXVlcnkudjIaGWdvb2dsZS9hcGkvYXVkaXRpbmcucHJvdG8aH2dv
-b2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnBy
-b3RvGjxzdG9yYWdlL2RhdGFwb2wvYW5ub3RhdGlvbnMvcHJvdG8vc2VtYW50aWNfYW5ub3Rh
-dGlvbnMucHJvdG8izgEKEVJlc3RyaWN0aW9uQ29uZmlnEmgKBHR5cGUYASABKA4yOy5nb29n
-bGUuY2xvdWQuYmlncXVlcnkudjIuUmVzdHJpY3Rpb25Db25maWcuUmVzdHJpY3Rpb25UeXBl
-QhfgQQOgoPCYAecH6uqArAMHEgVBVURJVFIEdHlwZSJPCg9SZXN0cmljdGlvblR5cGUSIAoc
-UkVTVFJJQ1RJT05fVFlQRV9VTlNQRUNJRklFRBAAEhoKFlJFU1RSSUNURURfREFUQV9FR1JF
-U1MQAUKAAQocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkIWUmVzdHJpY3Rpb25Db25m
-aWdQcm90b1ABWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1
-ZXJ5cGI7YmlncXVlcnlwYorV29IPBQoDYWxsSv0FCgYSBAAAIgEKCAoBDBIDAAASCggKAQIS
-AwIAIQoJCgIDABIDBAAjCgkKAgMBEgMFACkKCQoCAwISAwYAJAoJCgIDAxIDBwBGCggKAQgS
-AwkAUgoJCgIICxIDCQBSCggKAQgSAwoANQoJCgIIARIDCgA1CggKAQgSAwsAIgoJCgIIChID
-CwAiCggKAQgSAwwANwoJCgIICBIDDAA3CggKAQgSAw0ALQoPCggI0bqr+gEBABIDDQAtCiAK
-AgQAEgQQACIBGhQgKC0tIE5leHQgaWQ6IDIgLS0pCgoKCgMEAAESAxAIGQpQCgQEAAQAEgQS
-AhoDGkIgUmVzdHJpY3Rpb25UeXBlIHNwZWNpZmllcyB0aGUgdHlwZSBvZiBkYXRhc2V0L3Rh
-YmxlIHJlc3RyaWN0aW9uLgoKDAoFBAAEAAESAxIHFgomCgYEAAQAAgASAxQEJRoXIFNob3Vs
-ZCBuZXZlciBiZSB1c2VkLgoKDgoHBAAEAAIAARIDFAQgCg4KBwQABAACAAISAxQjJAqcAQoG
-BAAEAAIBEgMZBB8ajAEgUmVzdHJpY3QgZGF0YSBlZ3Jlc3MuIFNlZSBbRGF0YQogZWdyZXNz
-XShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlncXVlcnkvZG9jcy9hbmFseXRpY3MtaHVi
-LWludHJvZHVjdGlvbiNkYXRhX2VncmVzcykKIGZvciBtb3JlIGRldGFpbHMuCgoOCgcEAAQA
-AgEBEgMZBBoKDgoHBAAEAAIBAhIDGR0eCkAKBAQAAgASBB0CIQQaMiBTcGVjaWZpZXMgdGhl
-IHR5cGUgb2YgZGF0YXNldC90YWJsZSByZXN0cmljdGlvbi4KCgwKBQQAAgAGEgMdAhEKDAoF
-BAACAAESAx0SFgoMCgUEAAIAAxIDHRkaCg0KBQQAAgAIEgQdGyEDChEKCgQAAgAIrY3ANQIS
-Ax4EMwoPCggEAAIACJwIABIDHwQtChAKCQQAAgAIhISOExIDIAQtYgZwcm90bzM=
+b29nbGUuY2xvdWQuYmlncXVlcnkudjIaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJv
+dG8iugEKEVJlc3RyaWN0aW9uQ29uZmlnElQKBHR5cGUYASABKA4yOy5nb29nbGUuY2xvdWQu
+YmlncXVlcnkudjIuUmVzdHJpY3Rpb25Db25maWcuUmVzdHJpY3Rpb25UeXBlQgPgQQNSBHR5
+cGUiTwoPUmVzdHJpY3Rpb25UeXBlEiAKHFJFU1RSSUNUSU9OX1RZUEVfVU5TUEVDSUZJRUQQ
+ABIaChZSRVNUUklDVEVEX0RBVEFfRUdSRVNTEAFCdQocY29tLmdvb2dsZS5jbG91ZC5iaWdx
+dWVyeS52MkIWUmVzdHJpY3Rpb25Db25maWdQcm90b1ABWjtjbG91ZC5nb29nbGUuY29tL2dv
+L2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5cGI7YmlncXVlcnlwYkrGCQoGEgQOACcBCrwE
+CgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVy
+IHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91
+IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBM
+aWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAg
+IGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyBy
+ZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29m
+dHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9u
+IGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBP
+RiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5z
+ZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQK
+IGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAhCgkKAgMAEgMSACkK
+CAoBCBIDFABSCgkKAggLEgMUAFIKCAoBCBIDFQAiCgkKAggKEgMVACIKCAoBCBIDFgA3CgkK
+AggIEgMWADcKCAoBCBIDFwA1CgkKAggBEgMXADUKCgoCBAASBBkAJwEKCgoDBAABEgMZCBkK
+UAoEBAAEABIEGwIjAxpCIFJlc3RyaWN0aW9uVHlwZSBzcGVjaWZpZXMgdGhlIHR5cGUgb2Yg
+ZGF0YXNldC90YWJsZSByZXN0cmljdGlvbi4KCgwKBQQABAABEgMbBxYKJgoGBAAEAAIAEgMd
+BCUaFyBTaG91bGQgbmV2ZXIgYmUgdXNlZC4KCg4KBwQABAACAAESAx0EIAoOCgcEAAQAAgAC
+EgMdIyQKnAEKBgQABAACARIDIgQfGowBIFJlc3RyaWN0IGRhdGEgZWdyZXNzLiBTZWUgW0Rh
+dGEKIGVncmVzc10oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2JpZ3F1ZXJ5L2RvY3MvYW5h
+bHl0aWNzLWh1Yi1pbnRyb2R1Y3Rpb24jZGF0YV9lZ3Jlc3MpCiBmb3IgbW9yZSBkZXRhaWxz
+LgoKDgoHBAAEAAIBARIDIgQaCg4KBwQABAACAQISAyIdHgpMCgQEAAIAEgMmAkcaPyBPdXRw
+dXQgb25seS4gU3BlY2lmaWVzIHRoZSB0eXBlIG9mIGRhdGFzZXQvdGFibGUgcmVzdHJpY3Rp
+b24uCgoMCgUEAAIABhIDJgIRCgwKBQQAAgABEgMmEhYKDAoFBAACAAMSAyYZGgoMCgUEAAIA
+CBIDJhtGCg8KCAQAAgAInAgAEgMmHEViBnByb3RvMw==
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -62,8 +54,68 @@ EOF
     # Fields for RestrictionConfig
     # Field: type Type: 14 (.google.cloud.bigquery.v2.RestrictionConfig.RestrictionType)
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::RestrictionConfig;
+
+    my $msg = Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig->new(
+        type => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<type>
+
+Type: Enum (.google.cloud.bigquery.v2.RestrictionConfig.RestrictionType)
+
+=back
+
+=cut
+
 # Enum: RestrictionConfig::RestrictionType
 our $RestrictionConfig_RESTRICTION_TYPE_UNSPECIFIED = 0;
 our $RestrictionConfig_RESTRICTED_DATA_EGRESS = 1;
 
+=pod
+
+=head2 Enum: RestrictionConfig::RestrictionType
+
+Values:
+
+=over 4
+
+=item * C<RESTRICTION_TYPE_UNSPECIFIED> => 0
+
+=item * C<RESTRICTED_DATA_EGRESS> => 1
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::RestrictionConfig - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

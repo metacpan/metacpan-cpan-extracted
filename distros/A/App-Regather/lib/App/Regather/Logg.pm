@@ -1,4 +1,4 @@
-# -*- mode: cperl; mode: follow; -*-
+# -*- mode: cperl; eval: (follow-mode) -*-
 #
 
 package App::Regather::Logg;
@@ -8,16 +8,15 @@ use warnings;
 use diagnostics;
 use Sys::Syslog qw(:standard :macros);
 use Mail::Send;
+use POSIX qw(strftime);
 use Sys::Hostname;
 use Data::Printer caller_info => 1, class => { expand => 2 };
 
 # https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
-use constant dpc => { info    => 'ansi113',
-		      err     => 'bold ansi255 on_ansi196',
-		      debug   => 'ansi195', #grey18', #bright_yellow',
-#		      warning => 'bold ansi237 on_ansi214', #bright_yellow',
-		      warning => 'ansi214', #bright_yellow',
-		    };
+use constant DPC => { info    => 'green',
+		      err     => 'red',
+		      debug   => 'magenta',
+		      warning => 'yellow', };
 
 =pod
 
@@ -31,8 +30,8 @@ App::Regather::Logg - logging class
 
     use App::Regather::Logg;
     my $log = new App::Regather::Logg( prognam    => 'MyAppName',
-			          foreground => $foreground_or_syslog,
-			          colors     => $wheather_to_use_term_colors );
+				  foreground => $foreground_or_syslog,
+				  colors     => $wheather_to_use_term_colors );
     $log->cc( pr => 'info', fm => "App::Regather::Logg initialized ... (write to syslog)" );
     $log->cc( fg => 1, fm => "App::Regather::Logg initialized ... (write to STDOUT)" );
     ...
@@ -163,11 +162,14 @@ sub conclude {
 
   $arg{msg} = sprintf $arg{pr_f} . $arg{fm}, @{$arg{ls}};
   if ( $arg{fg} ) {
-    p($arg{msg},
-      colored     => $self->{colors} && $self->{foreground},
-      caller_info => 0,
-      color       => { string => dpc->{$arg{pr}}},
-      output      => 'stdout' );
+    my $msg = sprintf("%s %s",
+		      strftime("%b %e %H:%M:%S", localtime),
+		      $arg{msg});
+    p( $msg,
+       colored     => $self->{colors} && $self->{foreground},
+       caller_info => 0,
+       colors      => { string => DPC->{$arg{pr}} },
+       output      => 'stdout' );
   } else {
     syslog( $arg{pr_s}, $arg{pr_f} . $arg{fm}, @{$arg{ls}} );
   }
@@ -327,4 +329,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =cut
 
 1;
-

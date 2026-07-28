@@ -192,7 +192,7 @@ sub _add_enum_data {
 
 sub _normalize_name {
     my ($name) = @_;
-    return undef unless defined $name;
+    return unless defined $name;
     $name =~ s/^\.//;
     return $name;
 }

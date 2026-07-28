@@ -1,5 +1,14 @@
 Revision history for perl module App::Tarotplane
 
+2.02 Mon 27 Jul 2026
+  - Card files can now be read from standard input "-" is given as an input
+    file for tarotplane.
+  - Clean up error messages.
+  - Remove dependency on Croak.
+  - Add demo.gif back to distribution.
+  - No longer maintaining META files manually.
+  - Fixed some minor documentation errors.
+
 2.01 Thu 12 Dec 2024
   Fixes:
     - Grammar issues in documentation.

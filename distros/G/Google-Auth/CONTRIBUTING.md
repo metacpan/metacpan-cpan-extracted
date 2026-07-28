@@ -56,17 +56,17 @@ Here are a few examples:
 
 ```
 * makes the scope parameter's optional in all APIs. (@tbetbetbe[])
-* [#14](https://github.com/google/google-auth-library-perl/issues/14): ADC Support for JWT Service Tokens. ([@tbetbetbe][])
+* [#14](https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues/14): ADC Support for JWT Service Tokens. ([@tbetbetbe][])
 ```
 
 * Mark it up in [Markdown syntax][6].
 * The entry line should start with `* ` (an asterisk and a space).
-* If the change has a related GitHub issue (e.g. a bug fix for a reported issue), put a link to the issue as `[#123](https://github.com/google/google-auth-library-perl/issues/11): `.
+* If the change has a related GitHub issue (e.g. a bug fix for a reported issue), put a link to the issue as `[#123](https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues/11): `.
 * Describe the brief of the change. The sentence should end with a punctuation.
 * At the end of the entry, add an implicit link to your GitHub user page as `([@username][])`.
 * If this is your first contribution to google-auth-library-perl project, add a link definition for the implicit link to the bottom of the changelog as `[@username]: https://github.com/username`.
 
-[1]: https://github.com/google/google-auth-perl-library/issues
+[1]: https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
 [2]: http://gun.io/blog/how-to-github-fork-branch-and-pull-request
 [3]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [4]: https://help.github.com/articles/using-pull-requests

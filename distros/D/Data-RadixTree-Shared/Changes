@@ -1,5 +1,18 @@
 Revision history for Data-RadixTree-Shared
 
+0.03      2026-07-23
+          - On-disk format change (v1 -> v2): an existing 0.02 file is
+            refused; recreate it.
+          - Reset the node recycle list in clear(): a stale free list handed the
+            same node out twice after a clear, silently losing keys while
+            count still counted them.
+          - Make the edge split crash-safe and recycle freed nodes.
+          - Fail insert on node-pool exhaustion instead of corrupting NIL.
+          - Fix the insert capacity pre-check: it must cover the copy-on-write
+            split's 3 transient node allocations (mid + ch2 + leaf) and count
+            recycled free-list nodes. At 2 free nodes a split ran out of nodes
+            mid-way and insert silently reported the dropped key as updated.
+
 0.02      2026-07-03
           - Security and robustness hardening; backing files now created mode
             0600 (pass a file-mode argument to new() for cross-user sharing).

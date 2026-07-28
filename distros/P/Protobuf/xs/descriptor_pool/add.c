@@ -19,7 +19,7 @@ SV* PerlUpb_DescriptorPool_AddSerializedFile(pTHX_ SV* self, SV* serialized) {
     if (PerlUpb_DescriptorPool_IsFrozen(aTHX_ self)) {
         croak("Cannot add file to a frozen DescriptorPool");
     }
-    const upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ self);
+    upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ self);
     if (!pool) return &PL_sv_undef;
 
     STRLEN len;
@@ -34,12 +34,13 @@ SV* PerlUpb_DescriptorPool_AddSerializedFile(pTHX_ SV* self, SV* serialized) {
 
     upb_Status status;
     upb_Status_Clear(&status);
-    const upb_FileDef* file = upb_DefPool_AddFile((upb_DefPool*)pool, (const void*)proto, &status);
+    const upb_FileDef* file = upb_DefPool_AddFile(pool, (const void*)proto, &status);
 
     // The pool keeps its own internal state, so the proto is no longer needed.
     PerlUpb_Arena_Release(aTHX_ arena, PERL_UPB_LIFECYCLE_TRANSIENT);
 
     if (!file) {
+        PerlUpb_DescriptorPool_Poison(aTHX_ self);
         const char* msg = upb_Status_ErrorMessage(&status);
         if (strstr(msg, "duplicate symbol")) {
             // Try to find WHICH symbol and WHERE it is
@@ -82,7 +83,7 @@ SV* PerlUpb_DescriptorPool_AddSerializedFileDescriptorSet(pTHX_ SV* self, SV* se
     if (PerlUpb_DescriptorPool_IsFrozen(aTHX_ self)) {
         croak("Cannot add file to a frozen DescriptorPool");
     }
-    const upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ self);
+    upb_DefPool* pool = PerlUpb_DescriptorPool_GetPool(aTHX_ self);
     if (!pool) return &PL_sv_undef;
 
     STRLEN len;
@@ -103,8 +104,9 @@ SV* PerlUpb_DescriptorPool_AddSerializedFileDescriptorSet(pTHX_ SV* self, SV* se
 
     for (size_t i = 0; i < n; i++) {
         upb_Status_Clear(&status);
-        const upb_FileDef* file = upb_DefPool_AddFile((upb_DefPool*)pool, (const void*)files[i], &status);
+        const upb_FileDef* file = upb_DefPool_AddFile(pool, (const void*)files[i], &status);
         if (!file) {
+            PerlUpb_DescriptorPool_Poison(aTHX_ self);
             const char* msg = upb_Status_ErrorMessage(&status);
             PerlUpb_Arena_Release(aTHX_ arena, PERL_UPB_LIFECYCLE_TRANSIENT);
             SvREFCNT_dec(av);

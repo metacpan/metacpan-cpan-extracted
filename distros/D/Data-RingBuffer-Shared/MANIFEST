@@ -34,6 +34,8 @@ xt/cloexec.t
 xt/cloexec_exec.t
 xt/concurrent_open.t
 xt/cross_module_fd.t
+xt/destroy_during_call.t
+xt/displaced_writer.t
 xt/eg_runs.t
 xt/epoch_boundary.t
 xt/fd_leak.t
@@ -42,6 +44,7 @@ xt/fork_bomb.t
 xt/fuzz_header.t
 xt/hostile_bless.t
 xt/invalid_args.t
+xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/map_shared_proof.t
 xt/memfd_seal.t

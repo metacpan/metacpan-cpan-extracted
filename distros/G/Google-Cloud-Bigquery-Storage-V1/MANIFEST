@@ -1,0 +1,32 @@
+Changes
+ignore.txt
+lib/Google/Cloud/Bigquery/Storage/V1.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Annotations.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Annotations/Types.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Arrow.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Arrow/Types.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Avro.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Avro/Types.pm
+lib/Google/Cloud/Bigquery/Storage/V1/BigqueryReadClient.pm
+lib/Google/Cloud/Bigquery/Storage/V1/BigqueryWriteClient.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Protobuf.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Protobuf/Types.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Storage.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Storage/Types.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Stream.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Stream/Types.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Table.pm
+lib/Google/Cloud/Bigquery/Storage/V1/Table/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-service-BigqueryRead.t
+t/02-rest-transport-BigqueryRead.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

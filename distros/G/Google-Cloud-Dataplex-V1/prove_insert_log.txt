@@ -1,0 +1,23 @@
+[INSERT_LOG] Key: à°ÓU©U, Hash: 1940975974, Bucket: 6, Table: 0x7ffc1e7d5888
+[INSERT_LOG] Key: à°ÓU©U, Hash: 1940975974, Bucket: 6, Table: 0x7ffc1e7d5888
+[INSERT_LOG] Key: google/protobuf/descriptor.proto, Hash: 3725503154, Bucket: 2, Table: 0x55a955d369e8
+[INSERT_LOG] Key: à°ÓU©U, Hash: 1940975974, Bucket: 6, Table: 0x7ffc1e7d5888
+[INSERT_LOG] Key: google.api.enum_visibility, Hash: 2991517052, Bucket: 60, Table: 0x55a955d369d8
+[INSERT_LOG] Key: google.api.value_visibility, Hash: 2088847233, Bucket: 1, Table: 0x55a955d369d8
+[INSERT_LOG] Key: google.api.field_visibility, Hash: 2242431973, Bucket: 37, Table: 0x55a955d369d8
+[INSERT_LOG] Key: google.api.message_visibility, Hash: 518511822, Bucket: 14, Table: 0x55a955d369d8
+[INSERT_LOG] Key: google.api.method_visibility, Hash: 698949496, Bucket: 56, Table: 0x55a955d369d8
+[INSERT_LOG] Key: google.api.api_visibility, Hash: 376631044, Bucket: 4, Table: 0x55a955d369d8
+[INSERT_LOG] Key: google.api.Visibility, Hash: 3319162836, Bucket: 20, Table: 0x55a955d369d8
+[INSERT_LOG] Key: rules, Hash: 928431406, Bucket: 0, Table: 0x55a955d44d58
+[INSERT_LOG] Key: rules, Hash: 928431406, Bucket: 0, Table: 0x55a955d44d68
+t/01-service-CatalogService.t .. 
+No subtests run 
+
+Test Summary Report
+-------------------
+t/01-service-CatalogService.t (Wstat: 139 (Signal: SEGV, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 139
+  Parse errors: No plan found in TAP output
+Files=1, Tests=0,  1 wallclock secs ( 0.03 usr  0.02 sys +  0.38 cusr  0.17 csys =  0.60 CPU)
+Result: FAIL

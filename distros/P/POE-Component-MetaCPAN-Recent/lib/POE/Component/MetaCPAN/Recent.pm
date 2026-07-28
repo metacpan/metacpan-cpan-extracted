@@ -1,5 +1,5 @@
 package POE::Component::MetaCPAN::Recent;
-$POE::Component::MetaCPAN::Recent::VERSION = '1.04';
+$POE::Component::MetaCPAN::Recent::VERSION = '1.06';
 #ABSTRACT: Obtain uploaded CPAN dists via MetaCPAN.
 
 use strict;
@@ -11,6 +11,7 @@ use HTTP::Request;
 use HTTP::Response;
 use JSON::PP;
 use Time::Piece;
+use Digest::SHA qw[sha256_hex];
 
 sub spawn {
   my $package = shift;
@@ -20,6 +21,7 @@ sub spawn {
   $opts{delay} = 180 unless $opts{delay};
   my $options = delete $opts{options};
   my $self = bless \%opts, $package;
+  $self->{cache} = {};
   $self->{session_id} = POE::Session->create(
     object_states => [
       $self => {
@@ -98,6 +100,10 @@ sub _get_recent {
   POE::Component::SmokeBox::Recent::HTTP->spawn(
      uri => URI->new( 'http://fastapi.metacpan.org/release/recent?type=l&page=1&page_size=100' ),
   );
+  my $cachetime = time() - ( 60 * 60 * 2 );
+  foreach my $digest ( keys %{ $self->{cache} } ) {
+    delete $self->{cache}->{$digest} if $self->{cache}->{$digest} < $cachetime;
+  }
   $self->{_http_requests}++;
   return;
 }
@@ -117,7 +123,9 @@ sub _handle_recent {
         $self->{timestamp} = $ts unless $self->{timestamp};
         last RELEASES if $ts <= $self->{timestamp};
         $recent->{ts} = $ts;
-        push @uploads, $recent;
+        my $digest = sha256_hex( join '/', $recent->{author}, $recent->{name} );
+        push @uploads, $recent unless $self->{cache}->{$digest};
+        $self->{cache}->{$digest} = $ts;
       }
       foreach my $upload ( reverse @uploads ) {
         $self->{timestamp} = delete $upload->{ts};
@@ -151,7 +159,7 @@ POE::Component::MetaCPAN::Recent - Obtain uploaded CPAN dists via MetaCPAN.
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -248,7 +256,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams.
+This software is copyright (c) 2026 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

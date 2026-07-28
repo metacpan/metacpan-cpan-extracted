@@ -1,7 +1,7 @@
 package Data::RoaringBitmap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::RoaringBitmap::Shared', $VERSION);
 
@@ -92,9 +92,10 @@ intersect only> (no C<xor> / C<andnot> yet); a bitmap container is B<not>
 down-converted back to an array when removals make it sparse again.
 
 B<Capacity is fixed at creation.> The container pool holds C<container_capacity>
-slots; C<add>, C<add_many> and C<union> croak (after releasing the lock) when
-the pool is exhausted. A bitmap that touches every bucket as a dense bitmap
-needs all 65536 slots (512 MiB of pool); a sparse set needs far fewer.
+slots; slot 0 is a reserved sentinel, so C<container_capacity - 1> buckets are
+usable. C<add>, C<add_many> and C<union> croak (after releasing the lock) when
+the pool is exhausted. A bitmap that touches all 65536 buckets as dense bitmaps
+needs a C<container_capacity> of 65537 (512 MiB of pool); a sparse set needs far fewer.
 B<Linux-only.> Requires 64-bit Perl.
 
 =head1 METHODS
@@ -103,6 +104,7 @@ B<Linux-only.> Requires 64-bit Perl.
 
     my $a = Data::RoaringBitmap::Shared->new($path, $container_capacity);
     my $a = Data::RoaringBitmap::Shared->new(undef, $container_capacity); # anonymous
+    my $a = Data::RoaringBitmap::Shared->new($path, $capacity, $file_mode);
     my $a = Data::RoaringBitmap::Shared->new_memfd($name, $container_capacity);
     my $a = Data::RoaringBitmap::Shared->new_from_fd($fd);
 
@@ -117,7 +119,9 @@ capacity is out of range. A freshly created bitmap is empty
 
 When reopening an existing file or memfd, the B<stored geometry wins> and the
 existing elements are preserved; the capacity you pass to C<new> on a reopen is
-used only when the file is brand new. C<new_memfd> creates a Linux memfd
+used only when the file is brand new. An optional third argument to C<new>,
+C<$file_mode> (default C<0600>, owner-only), sets the permission bits of a
+newly created backing file; see L</SECURITY>. C<new_memfd> creates a Linux memfd
 (transferable via its C<memfd> descriptor); C<new_from_fd> reopens one in
 another process.
 
@@ -136,7 +140,8 @@ container pool is exhausted (only adding to a brand-new bucket can need a slot);
 the croak happens B<after> the write lock is released and the bitmap is left
 consistent.
 
-C<add_many> adds every value of the array reference (each range-checked up front;
+C<add_many> adds every value of the array reference (an undef element is treated
+as 0; each value is range-checked up front;
 an out-of-range value croaks before any lock). It returns the number of elements
 that were B<newly added>. B<It is not atomic on pool exhaustion:> values are
 added in order, and if the pool runs out partway, C<add_many> croaks with the
@@ -197,7 +202,10 @@ memory (so both processes compute the same order regardless of how the handles
 happen to be laid out in each process), and the receiver always takes the write
 lock. Calling a set op with two handles to the same underlying bitmap (the same
 object, or a second handle that reopened the same backing file or memfd) is
-detected and is a no-op.
+detected and is a no-op. B<Caveat>: this identity check compares an internal
+bitmap id, so a byte copy of a backing file (e.g. C<cp>) carries the same id;
+a set op between an original and such a copy is wrongly treated as "the same
+bitmap" and is a no-op. Do not seed a second bitmap by copying another's file.
 
 =head2 Lifecycle
 
@@ -270,6 +278,18 @@ recovers. Because every mutation performs its container allocations under the
 lock after a capacity pre-check, a crash leaves the bitmap consistent up to the
 last completed operation. B<Limitation>: PID reuse is not detected (very
 unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

@@ -6,7 +6,7 @@ Protobuf::WKT::Struct - Mixin for google.protobuf.Struct, Value, and ListValue
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

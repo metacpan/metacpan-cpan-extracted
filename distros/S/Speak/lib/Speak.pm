@@ -15,7 +15,7 @@ Andrew DeFaria <Andrew@DeFaria.com>
 
 =item Revision
 
-$Revision: 1.01 $
+$Revision: 1.02 $
 
 =item Created
 
@@ -43,12 +43,14 @@ package Speak;
 
 use strict;
 use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use base 'Exporter';
 
 use Clipboard;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 {
 
@@ -62,8 +64,7 @@ our $VERSION = '1.01';
   use IO::Handle;
   use Carp;
 
-  sub new {
-    my ($class, %args) = @_;
+sub new ($class, %args) {
     my $self = {
       path        => $args{path} || '.',
       name        => $args{name} || 'speak',
@@ -89,32 +90,40 @@ our $VERSION = '1.01';
     return $self;
   } ## end sub new
 
-  sub msg {
-    my ($self, $msg) = @_;
+  sub log ($self, $msg, $nolinefeed = undef) {
     return unless defined $msg;
 
-    print "$msg\n";
+    if (defined $nolinefeed) {
+      print $msg;
+    } else {
+      print "$msg\n";
+    }
 
     if ($self->{handle}) {
       my $timestamp =
         $self->{timestamped}
         ? strftime ("%Y-%m-%d %H:%M:%S", localtime) . ": "
         : "";
-      my $fh = $self->{handle};
-      print $fh "$timestamp$msg\n";
-    } ## end if ($self->{handle})
-    return;
-  } ## end sub msg
 
-  sub DESTROY {
-    my $self = shift;
+      my $fh = $self->{handle};
+
+      if (defined $nolinefeed) {
+        print $fh $timestamp, $msg;
+      } else {
+        print $fh $timestamp, $msg, "\n";
+      }
+    }
+
+    return;
+  } ## end sub log
+
+  sub DESTROY ($self) {
     close $self->{handle} if $self->{handle};
     return;
   }
 }
 
-sub _get_config {
-  my ($file) = @_;
+sub _get_config ($file) {
   my %config;
   return %config unless -f $file;
 
@@ -146,34 +155,23 @@ use Carp;
 
 our @EXPORT_OK = qw(speak);
 
-sub _split_text ($) {
-  my ($text) = @_;
+sub _split_text ($text) {
   return unless defined $text;
 
-  # Split into sentences max 100 chars
   my @sentences;
-
-  # If text is long and has no punctuation, force split
-  if (length ($text) > 100 && $text !~ /[.!?;]/) {
-    return unpack ("(A100)*", $text);
-  }
-
-  # Basic splitting on punctuation, keeping punctuation
-  # This is a simplified version of speak.pl logic
-  while ($text =~ /(.{1,100}?(?:[.!?;]|$))/g) {
-    push @sentences, $1;
-  }
-
-  # Fallback if regex missed: chunk into 100-char segments
-  if (!@sentences) {
-    @sentences = unpack ("(A100)*", $text);
+  while (length $text) {
+    if ($text =~ s/^(.{1,100}?(?:[.!?;]|$))//) {
+      push @sentences, $1;
+    } else {
+      # Fallback: force-slice the first 100 characters if no punctuation is found within 100 chars
+      push @sentences, substr($text, 0, 100, "");
+    }
   }
 
   return @sentences;
-} ## end sub _split_text ($)
+} ## end sub _split_text ($text)
 
-sub _fetch_mp3 ($$$) {
-  my ($ua, $text, $lang) = @_;
+sub _fetch_mp3 ($ua, $text, $lang) {
 
   my $url =
       "https://translate.google.com/translate_tts?ie=UTF-8&tl=$lang&q="
@@ -203,8 +201,7 @@ sub _fetch_mp3 ($$$) {
   }
 } ## end sub _fetch_mp3 ($$$)
 
-sub _convert_mp3_to_wav ($$) {
-  my ($mp3, $wav) = @_;
+sub _convert_mp3_to_wav ($mp3, $wav) {
 
   # Try ffmpeg
   if (system ("which ffmpeg >/dev/null 2>&1") == 0) {
@@ -226,8 +223,7 @@ sub _convert_mp3_to_wav ($$) {
 } ## end sub _convert_mp3_to_wav ($$)
 
 ## no critic (Subroutines::ProhibitExcessComplexity)
-sub speak (;$$$) {
-  my ($msg, $log, $lang) = @_;
+sub speak ($msg, $log = undef, $lang = undef) {
 
 =pod
 
@@ -306,12 +302,12 @@ Returns:
   foreach my $path (@mute_paths) {
     if ($path && -f $path) {
       $msg .= ' [silent shh]';
-      $log->msg ($msg);
+      $log->log ($msg);
       return;
     }
   } ## end foreach my $path (@mute_paths)
 
-  $log->msg ($msg);
+  $log->log ($msg);
 
   # New Implementation
   my $ua = LWP::UserAgent->new;
@@ -482,7 +478,7 @@ Returns:
 =head1 CONFIGURATION AND ENVIRONMENT
 
 SPEAK_LANG: Language code (e.g. 'en', 'en-gb', 'en-au'). 
-            See eg/speak.conf for available languages.
+            See etc/speak.conf for available languages.
             Defaults to $ENV{SPEAK_LANG} or 'en'.
 
 SPEAK_MUTE: If set to a true value, speech output is muted.

@@ -22,7 +22,23 @@ static const MGVTBL pool_scalar_magic_vtbl = {
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Pool::Shared")) \
         croak("Expected a Data::Pool::Shared object"); \
     PoolHandle *h = INT2PTR(PoolHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::Pool::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::Pool::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+/* The same Perl can also REPLACE the invocant ($obj = 42 from an overload
+ * handler mutates ST(0), because Perl passes aliases), so SvROK is re-checked
+ * before SvRV -- otherwise SvRV would run on a non-reference. */
+#define REEXTRACT_POOL(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Pool::Shared object was replaced during the call"); \
+    h = INT2PTR(PoolHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Pool::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -31,9 +47,9 @@ static const MGVTBL pool_scalar_magic_vtbl = {
     RETVAL = ref
 
 #define CHECK_SLOT(h, slot) \
-    if ((UV)(slot) >= (h)->hdr->capacity) \
+    if ((UV)(slot) >= (h)->capacity) \
         croak("slot %" UVuf " out of range (capacity %" UVuf ")", \
-              (UV)(slot), (UV)(h)->hdr->capacity)
+              (UV)(slot), (UV)(h)->capacity)
 
 #define CHECK_ALLOCATED(h, slot) \
     if (!pool_is_allocated(h, slot)) \
@@ -106,7 +122,8 @@ alloc(self, ...)
     EXTRACT_POOL(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_POOL(self);
     int64_t slot = pool_alloc(h, timeout);
     RETVAL = (slot >= 0) ? newSViv((IV)slot) : &PL_sv_undef;
   OUTPUT:
@@ -144,7 +161,7 @@ get(self, slot)
   CODE:
     CHECK_SLOT(h, slot);
     CHECK_ALLOCATED(h, slot);
-    RETVAL = newSVpvn((const char *)pool_slot_ptr(h, slot), h->hdr->elem_size);
+    RETVAL = newSVpvn((const char *)pool_slot_ptr(h, slot), h->elem_size);
   OUTPUT:
     RETVAL
 
@@ -160,11 +177,17 @@ set(self, slot, data)
     CHECK_ALLOCATED(h, slot);
     STRLEN len;
     const char *bytes = SvPV(data, len);
-    if (len > h->hdr->elem_size)
-        len = h->hdr->elem_size;
+    /* SvPV on a bare SV arg runs overload/tie magic = arbitrary Perl, which can
+     * have destroyed self before h is used below. (CHECK_SLOT/CHECK_ALLOCATED
+     * above ran on the pre-magic handle; re-validate against the current one.) */
+    REEXTRACT_POOL(self);
+    CHECK_SLOT(h, slot);
+    CHECK_ALLOCATED(h, slot);
+    if (len > h->elem_size)
+        len = h->elem_size;
     memcpy(pool_slot_ptr(h, slot), bytes, len);
-    if (len < h->hdr->elem_size)
-        memset(pool_slot_ptr(h, slot) + len, 0, h->hdr->elem_size - len);
+    if (len < h->elem_size)
+        memset(pool_slot_ptr(h, slot) + len, 0, h->elem_size - len);
 
 bool
 is_allocated(self, slot)
@@ -342,7 +365,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Pool::Shared")) {
         PoolHandle *h = INT2PTR(PoolHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -387,13 +410,16 @@ alloc_n(self, count, ...)
     EXTRACT_POOL(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     if (count == 0) {
         RETVAL = newRV_noinc((SV *)newAV());
+    } else if (count > 0xFFFFFFFFU) {
+        croak("Data::Pool::Shared->alloc_n: count exceeds 2^32");   /* would truncate to uint32 for pool_alloc_n */
     } else {
         uint64_t *buf;
         Newx(buf, count, uint64_t);
         SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from newSViv/av_push */
+        REEXTRACT_POOL(self);
         if (pool_alloc_n(h, buf, (uint32_t)count, timeout)) {
             AV *av = newAV();
             av_extend(av, count - 1);
@@ -414,6 +440,7 @@ free_n(self, slots_av)
   PREINIT:
     EXTRACT_POOL(self);
   CODE:
+    SvGETMAGIC(slots_av);   /* a tied/overloaded scalar may FETCH to an arrayref */
     if (!SvROK(slots_av) || SvTYPE(SvRV(slots_av)) != SVt_PVAV)
         croak("free_n: expected arrayref");
     AV *av = (AV *)SvRV(slots_av);
@@ -426,10 +453,12 @@ free_n(self, slots_av)
         SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from SvUV magic */
         for (SSize_t i = 0; i < len; i++) {
             SV **svp = av_fetch(av, i, 0);
+            if (svp && *svp) SvGETMAGIC(*svp);   /* a tied-array element is a deferred-magic PVLV */
             if (!svp || !SvOK(*svp))
                 croak("free_n: undef slot at index %ld", (long)i);
             buf[i] = (uint64_t)SvUV(*svp);
         }
+        REEXTRACT_POOL(self);
         RETVAL = pool_free_n(h, buf, (uint32_t)len);
     }
   OUTPUT:
@@ -442,7 +471,7 @@ allocated_slots(self)
     EXTRACT_POOL(self);
   CODE:
     AV *av = newAV();
-    uint64_t cap = h->hdr->capacity;
+    uint64_t cap = h->capacity;
     uint32_t nwords = h->bitmap_words;
     for (uint32_t widx = 0; widx < nwords; widx++) {
         uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
@@ -494,9 +523,9 @@ slot_sv(self, slot)
     sv_upgrade(RETVAL, SVt_PV);
     SvPV_set(RETVAL, (char *)pool_slot_ptr(h, slot));
     SvLEN_set(RETVAL, 0);
-    SvCUR_set(RETVAL, h->hdr->elem_size);
+    SvCUR_set(RETVAL, h->elem_size);
     SvPOK_on(RETVAL);
-    /* Pin pool alive while this SV is referenced — magic before READONLY */
+    /* Pin pool alive while this SV is referenced -- magic before READONLY */
     MAGIC *mg = sv_magicext(RETVAL, NULL, PERL_MAGIC_ext, &pool_scalar_magic_vtbl, NULL, 0);
     /* Pin the REFERENT (the blessed handle), not the container RV: pinning self
      * lets `$pool = undef` still drop the referent -> DESTROY munmaps -> the
@@ -977,6 +1006,12 @@ set(self, slot, val)
     CHECK_ALLOCATED(h, slot);
     STRLEN len;
     const char *str = SvPV(val, len);
+    /* SvPV on a bare SV arg runs overload/tie magic = arbitrary Perl, which can
+     * have destroyed self before h is used below. (CHECK_SLOT/CHECK_ALLOCATED
+     * above ran on the pre-magic handle; re-validate against the current one.) */
+    REEXTRACT_POOL(self);
+    CHECK_SLOT(h, slot);
+    CHECK_ALLOCATED(h, slot);
     pool_set_str(h, slot, str, (uint32_t)len);
 
 UV

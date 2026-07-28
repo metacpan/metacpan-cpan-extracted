@@ -6,7 +6,7 @@ Protobuf::ClassGenerator - Generates Perl classes from Protocol Buffer descripto
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,8 @@ the terms of the BSD 3-Clause License.
 =cut
 
 package Protobuf::ClassGenerator;
+
+## no critic (TestingAndDebugging::ProhibitNoStrict, BuiltinFunctions::ProhibitStringyEval)
 
 use strict;
 use warnings;

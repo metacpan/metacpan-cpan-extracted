@@ -30,7 +30,7 @@ inputs:
   perl-version:
     description: 'Perl version to use'
     required: false
-    default: '5.40'
+    default: '5.42'
 
 outputs:
   issues-found:
@@ -125,7 +125,7 @@ runs:
         Run `ghgen analyze --fix` locally to automatically apply these fixes, or enable auto-fix mode in this action:
         
         ```yaml
-        - uses: nigelhorne/App-GHGen@v6
+        - uses: nigelhorne/App-GHGen@v7
           with:
             auto-fix: true
         ```
@@ -138,7 +138,7 @@ runs:
     - name: Comment on PR
       if: github.event_name == 'pull_request' && inputs.mode == 'comment' && steps.analyze.outputs.issues > 0
       id: comment
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         github-token: ${{ inputs.github-token }}
         script: |

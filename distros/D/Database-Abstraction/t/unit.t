@@ -37,6 +37,31 @@ my $have_sqlite = eval { require DBI; require DBD::SQLite; 1 };
 my $have_chi    = eval { require CHI; 1 };
 
 # ---------------------------------------------------------------------------
+# API Message Ledger — documented error states not yet covered by sections 1-16.
+# Each state is deleted when a corresponding subtest successfully triggers it.
+# A ledger assertion at the end of the file fails if any state is untested.
+# ---------------------------------------------------------------------------
+my %LEDGER = (
+	'unsafe id in new'       => 'new(): id injection guard — semicolon in id',
+	'unsafe id in clone'     => 'new(): clone path id injection guard',
+	'unsafe host in new'     => 'new(): host injection guard — space/metachar in host',
+	'BerkeleyDB no JOINs'    => 'selectall_arrayref: _scan_berkeley join croak',
+	'BerkeleyDB no or-and'   => 'selectall_arrayref: _scan_berkeley -or/-and croak',
+	'fetchrow_hashref NoSQL' => 'fetchrow_hashref: BerkeleyDB non-entry column croak',
+	'query all join BDB'     => 'Query->all():   join on BerkeleyDB croak',
+	'query first join BDB'   => 'Query->first(): join on BerkeleyDB croak',
+	'query count join BDB'   => 'Query->count(): join on BerkeleyDB croak',
+	'query all join Deep'    => 'Query->all():   join on Deep croak',
+	'query first join Deep'  => 'Query->first(): join on Deep croak',
+	'query count join Deep'  => 'Query->count(): join on Deep croak',
+	'Unknown SQL operator'   => '_build_where_conditions: unknown operator croak',
+	'selectall -in'          => 'selectall_arrayref: -in operator via DBI',
+	'selectall -between'     => 'selectall_arrayref: -between operator via DBI',
+	'selectall -like'        => 'selectall_arrayref: -like operator via DBI',
+	'selectall -or direct'   => 'selectall_arrayref: -or grouping direct call',
+);
+
+# ---------------------------------------------------------------------------
 # Test library subclasses — thin wrappers that satisfy the abstract contract
 # ---------------------------------------------------------------------------
 use lib 't/lib';
@@ -566,6 +591,19 @@ note '=== 12. columns() ===';
 		is_deeply($bdb_cols, ['entry', 'value'],
 			'12.5 columns(): BerkeleyDB returns [entry, value]');
 	}
+
+	# 12.6  no_entry CSV slurp (ARRAY data) returns correct column list
+	#       Regression guard for bug where ref($data) eq 'ARRAY' left @cols empty.
+	#       Uses Database::test4ne (id=>'cardinal') so the slurp produces ARRAY data.
+	{
+		use_ok('Database::test4ne');
+		my $ne = Database::test4ne->new(directory => $DATA_DIR);
+		$ne->count();    # trigger lazy _open and slurp into ARRAY ref
+		my $ne_cols = $ne->columns();
+		isa_ok($ne_cols, 'ARRAY', '12.6 columns(): no_entry CSV ARRAY slurp returns arrayref');
+		ok(scalar(@{$ne_cols}) > 0,
+			'12.6 columns(): no_entry CSV ARRAY slurp returns non-empty list');
+	}
 }
 
 # ---------------------------------------------------------------------------
@@ -611,6 +649,18 @@ note '=== 13. schema() ===';
 			'13.6 schema(): BerkeleyDB entry column is pk');
 		is($bdb_schema->{'value'}{'pk'}, 0,
 			'13.6 schema(): BerkeleyDB value column is not pk');
+	}
+
+	# 13.7  no_entry CSV slurp (ARRAY data) returns correct schema
+	#       Regression guard for bug where ref($data) eq 'ARRAY' left %schema empty.
+	#       Uses Database::test4ne (id=>'cardinal') so the slurp produces ARRAY data.
+	{
+		my $ne = Database::test4ne->new(directory => $DATA_DIR);
+		$ne->count();    # trigger lazy _open and slurp into ARRAY ref
+		my $ne_schema = $ne->schema();
+		isa_ok($ne_schema, 'HASH', '13.7 schema(): no_entry CSV ARRAY slurp returns hashref');
+		ok(scalar(keys %{$ne_schema}) > 0,
+			'13.7 schema(): no_entry CSV ARRAY slurp schema is non-empty');
 	}
 }
 
@@ -864,6 +914,309 @@ note '=== 16. PSV and XML backends ===';
 	my $xall = $xml->selectall_arrayref();
 	ok(defined($xall) && scalar @{$xall} >= 1,
 		'16.2 XML backend: selectall_arrayref returns rows');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 17 — Operator criteria via selectall_arrayref() (SQLite required)
+#
+# Tests every documented operator hashref type directly via a public method,
+# NOT via the query builder.  Uses no_entry => 1 to force Params::Get to
+# parse named pairs correctly (avoids positional-arg pitfall; see CLAUDE.md).
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 17. Operator criteria via selectall_arrayref() ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for operator tests', 18
+		unless $have_sqlite;
+
+	my $op_dir  = tempdir(CLEANUP => 1);
+	my $op_file = File::Spec->catfile($op_dir, 'op_unit.sql');
+	my $op_dsn  = "dbi:SQLite:dbname=$op_file";
+
+	do {
+		my $s = DBI->connect($op_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE op_unit (entry TEXT PRIMARY KEY, name TEXT, score INTEGER, status TEXT)');
+		$s->do("INSERT INTO op_unit VALUES ('a','Alice',90,'active')");
+		$s->do("INSERT INTO op_unit VALUES ('b','Bob',60,'active')");
+		$s->do("INSERT INTO op_unit VALUES ('c','Carol',80,'inactive')");
+		$s->do("INSERT INTO op_unit VALUES ('d','Dave',50,'inactive')");
+		$s->do("INSERT INTO op_unit VALUES ('e','Eve',100,'active')");
+		$s->disconnect();
+	};
+
+	{
+		package Database::op_unit;
+		use parent 'Database::Abstraction';
+	}
+
+	# no_entry => 1 is required so Params::Get parses 'col => hashref' as
+	# {col => hashref} rather than mapping the first scalar to 'entry'.
+	my $op = Database::op_unit->new(dsn => $op_dsn, no_entry => 1);
+
+	# 17.1  Greater-than
+	my $gt = $op->selectall_arrayref(score => { '>' => 80 });
+	is(scalar @{$gt}, 2,   '17.1 >: exactly 2 rows with score > 80');
+	ok(!(grep { $_->{'score'} <= 80 } @{$gt}),
+		'17.1 >: all returned rows satisfy the criterion');
+
+	# 17.2  Less-than
+	my $lt = $op->selectall_arrayref(score => { '<' => 70 });
+	is(scalar @{$lt}, 2, '17.2 <: 2 rows with score < 70');
+
+	# 17.3  Greater-than-or-equal
+	my $gte = $op->selectall_arrayref(score => { '>=' => 80 });
+	is(scalar @{$gte}, 3, '17.3 >=: 3 rows with score >= 80');
+
+	# 17.4  Less-than-or-equal
+	my $lte = $op->selectall_arrayref(score => { '<=' => 60 });
+	is(scalar @{$lte}, 2, '17.4 <=: 2 rows with score <= 60');
+
+	# 17.5  Not-equal
+	my $ne = $op->selectall_arrayref(status => { '!=' => 'active' });
+	is(scalar @{$ne}, 2, '17.5 !=: 2 inactive rows');
+
+	# 17.6  -in operator: match a set of values
+	my $in = $op->selectall_arrayref(name => { -in => ['Alice', 'Eve'] });
+	is(scalar @{$in}, 2, '17.6 -in: 2 rows in set [Alice, Eve]');
+	delete $LEDGER{'selectall -in'};
+
+	# 17.7  -not_in operator
+	my $nin = $op->selectall_arrayref(name => { -not_in => ['Alice', 'Bob'] });
+	is(scalar @{$nin}, 3, '17.7 -not_in: 3 rows not in [Alice, Bob]');
+
+	# 17.8  -between operator (inclusive both ends)
+	my $btwn = $op->selectall_arrayref(score => { -between => [60, 90] });
+	is(scalar @{$btwn}, 3, '17.8 -between [60,90]: 3 rows in range');
+	ok(!(grep { $_->{'score'} < 60 || $_->{'score'} > 90 } @{$btwn}),
+		'17.8 -between: all rows within [60, 90] inclusive');
+	delete $LEDGER{'selectall -between'};
+
+	# 17.9  -like operator (SQL LIKE with % wildcard)
+	my $like = $op->selectall_arrayref(name => { -like => 'A%' });
+	is(scalar @{$like},       1,       '17.9 -like A%: 1 matching row');
+	is($like->[0]{'name'}, 'Alice', '17.9 -like A%: correct row returned');
+	delete $LEDGER{'selectall -like'};
+
+	# 17.10 -not_like operator
+	my $nlike = $op->selectall_arrayref(name => { -not_like => 'A%' });
+	is(scalar @{$nlike}, 4, '17.10 -not_like A%: 4 non-matching rows');
+
+	# 17.11 -or grouping applied directly to selectall_arrayref
+	my $or_rows = $op->selectall_arrayref(
+		-or => [
+			{ name => 'Alice' },
+			{ name => 'Dave'  },
+		],
+	);
+	is(scalar @{$or_rows}, 2, '17.11 -or grouping: 2 matching rows');
+	delete $LEDGER{'selectall -or direct'};
+
+	# 17.12 -and grouping (intersection of two conditions)
+	my $and_rows = $op->selectall_arrayref(
+		-and => [
+			{ status => 'active'      },
+			{ score  => { '>=' => 90} },
+		],
+	);
+	ok(scalar @{$and_rows} >= 2, '17.12 -and grouping: >= 2 rows satisfying both conditions');
+
+	# 17.13 Unknown operator → croak with operator name in message
+	#        _build_where_conditions has an exhaustive elsif chain; any value
+	#        not in it triggers the documented "Unknown operator" croak.
+	throws_ok { $op->selectall_arrayref(score => { 'BADOP' => 5 }) }
+		qr/Unknown operator 'BADOP'/,
+		'17.13 unknown operator causes croak naming the bad operator';
+	delete $LEDGER{'Unknown SQL operator'};
+
+	# 17.14 count() with operator criterion
+	my $cnt = $op->count(score => { '>' => 80 });
+	is($cnt, 2, '17.14 count() with > operator: 2 matching rows');
+
+	# 17.15 fetchrow_hashref with operator criterion
+	my $frh = $op->fetchrow_hashref(score => { '>=' => 100 });
+	ok(defined($frh) && $frh->{'name'} eq 'Eve',
+		'17.15 fetchrow_hashref with >= 100 returns the Eve row');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 18 — BerkeleyDB backend guard croaks
+#
+# BerkeleyDB is a key-value store; the module must croak with clear messages
+# when callers attempt SQL-style operations (JOINs, -or groups, column queries).
+# The 'berkeley' hash is injected directly because instantiating a real BerkeleyDB
+# file is not needed to drive these code paths.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 18. BerkeleyDB guard croaks ===';
+{
+	# 18.1  selectall_arrayref with join parameter → _scan_berkeley join guard
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { sentinel => 1 };	# non-empty ref → truthy
+		throws_ok {
+			$bdb->selectall_arrayref(join => { table => 'dept', on => 'a.id = b.id' })
+		} qr/BerkeleyDB does not support JOINs/i,
+		'18.1 selectall_arrayref: join on BerkeleyDB causes croak';
+		delete $LEDGER{'BerkeleyDB no JOINs'};
+	}
+
+	# 18.2  selectall_arrayref with -or grouping → _scan_berkeley -or/-and guard
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { sentinel => 1 };
+		throws_ok {
+			$bdb->selectall_arrayref(-or => [{ entry => 'a' }, { entry => 'b' }])
+		} qr/BerkeleyDB does not support -or\/-and/i,
+		'18.2 selectall_arrayref: -or on BerkeleyDB causes croak';
+		delete $LEDGER{'BerkeleyDB no or-and'};
+	}
+
+	# 18.3  fetchrow_hashref with non-entry column on BerkeleyDB
+	#        BerkeleyDB is a k/v store; arbitrary column queries are not
+	#        supported — the module must croak with the documented message.
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { sentinel => 1 };
+		throws_ok {
+			$bdb->fetchrow_hashref(name => 'Alice')
+		} qr/fetchrow_hashref is meaningless on a NoSQL database/i,
+		'18.3 fetchrow_hashref: non-entry column on BerkeleyDB causes croak';
+		delete $LEDGER{'fetchrow_hashref NoSQL'};
+	}
+
+	# 18.4-18.6  query() terminal methods with JOINs on BerkeleyDB
+	#             The query builder delegates to selectall_arrayref / count for
+	#             BerkeleyDB, but must refuse JOINs before any DBI access.
+	{
+		my $join_spec = { table => 'dept', on => 'a.id = b.id' };
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { sentinel => 1 };
+
+		throws_ok { $bdb->query()->join($join_spec)->all() }
+			qr/JOINs is not supported on BerkeleyDB/i,
+			'18.4 query->join->all(): JOINs on BerkeleyDB causes croak';
+		delete $LEDGER{'query all join BDB'};
+
+		throws_ok { $bdb->query()->join($join_spec)->first() }
+			qr/JOINs is not supported on BerkeleyDB/i,
+			'18.5 query->join->first(): JOINs on BerkeleyDB causes croak';
+		delete $LEDGER{'query first join BDB'};
+
+		throws_ok { $bdb->query()->join($join_spec)->count() }
+			qr/JOINs is not supported on BerkeleyDB/i,
+			'18.6 query->join->count(): JOINs on BerkeleyDB causes croak';
+		delete $LEDGER{'query count join BDB'};
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 19 — DBM::Deep backend query builder guard croaks
+#
+# The Deep backend (type = 'Deep') follows the same non-SQL code path as
+# BerkeleyDB in the query builder.  JOINs are not supported and must croak
+# with a distinct message ("not supported on Deep") before any SQL is built.
+# 'data' is injected so _open_table() does not call _open() again.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 19. DBM::Deep query builder guard croaks ===';
+{
+	my $join_spec = { table => 'dept', on => 'a.id = b.id' };
+
+	{
+		my $deep = Database::test1->new($DATA_DIR);
+		$deep->{'type'} = 'Deep';
+		$deep->{'data'} = {};	# prevents _open_table() from calling _open()
+		throws_ok { $deep->query()->join($join_spec)->all() }
+			qr/JOINs is not supported on Deep/i,
+			'19.1 query->join->all(): JOINs on Deep causes croak';
+		delete $LEDGER{'query all join Deep'};
+	}
+
+	{
+		my $deep = Database::test1->new($DATA_DIR);
+		$deep->{'type'} = 'Deep';
+		$deep->{'data'} = {};
+		throws_ok { $deep->query()->join($join_spec)->first() }
+			qr/JOINs is not supported on Deep/i,
+			'19.2 query->join->first(): JOINs on Deep causes croak';
+		delete $LEDGER{'query first join Deep'};
+	}
+
+	{
+		my $deep = Database::test1->new($DATA_DIR);
+		$deep->{'type'} = 'Deep';
+		$deep->{'data'} = {};
+		throws_ok { $deep->query()->join($join_spec)->count() }
+			qr/JOINs is not supported on Deep/i,
+			'19.3 query->join->count(): JOINs on Deep causes croak';
+		delete $LEDGER{'query count join Deep'};
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 20 — new() safety guards: id and host injection prevention
+#
+# The POD documents that new() validates 'id' and 'host' strictly against
+# identifier regexes.  Hostile values must croak before any object is created.
+# Tests cover both the direct construction path and the clone path (which
+# previously bypassed the id guard — now fixed per Changes 0.37).
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 20. new() safety guards ===';
+{
+	# 20.1  Unsafe id (semicolons and SQL keywords must be rejected immediately)
+	throws_ok {
+		Database::test1->new(directory => $DATA_DIR, id => 'bad;id')
+	} qr/unsafe id column name/i,
+	'20.1 new(): semicolon in id field causes croak before any object is returned';
+	delete $LEDGER{'unsafe id in new'};
+
+	# 20.2  Unsafe id in the clone path (obj->new(id => ...) branch)
+	#        Prior to 0.37 the early return in the clone branch bypassed the
+	#        id validation block — this asserts the fix is in place.
+	{
+		my $original = Database::test1->new($DATA_DIR);
+		throws_ok { $original->new(id => 'bad;id') }
+			qr/unsafe id column name/i,
+			'20.2 new(): clone path: hostile id causes croak';
+		delete $LEDGER{'unsafe id in clone'};
+	}
+
+	# 20.3  Unsafe host (spaces / shell metacharacters must be rejected)
+	throws_ok {
+		Database::test1->new(directory => $DATA_DIR, host => 'bad host; rm -rf /')
+	} qr/unsafe host/i,
+	'20.3 new(): shell metacharacters in host cause croak at construction time';
+	delete $LEDGER{'unsafe host in new'};
+}
+
+# ---------------------------------------------------------------------------
+# LEDGER ASSERTION
+# If SQLite was unavailable, the SQLite-only states were never reachable;
+# remove them before checking so the ledger still passes on minimal installs.
+# ---------------------------------------------------------------------------
+unless($have_sqlite) {
+	delete @LEDGER{qw(
+		Unknown SQL operator
+		selectall -in
+		selectall -between
+		selectall -like
+		selectall -or direct
+	)};
+}
+
+note '';
+note '=== LEDGER: asserting all documented API states were exercised ===';
+if(%LEDGER) {
+	for my $state (sort keys %LEDGER) {
+		fail("Untested documented API state: $state ($LEDGER{$state})");
+	}
+} else {
+	pass('API ledger: all documented error states exercised');
 }
 
 done_testing();

@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Ai::Generativelanguage::V1::GenerativeService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );

@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 2;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth = $dbh->prepare('SELECT CAST(1 AS INT64), "abc"');
+$sth->execute();
+my $row = $sth->fetchrow_arrayref();
+is($row->[0], '1', 'INT64 type');
+is($row->[1], 'mock_value', 'STRING type');

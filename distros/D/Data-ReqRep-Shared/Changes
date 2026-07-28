@@ -1,5 +1,9 @@
 Revision history for Data-ReqRep-Shared
 
+0.06      2026-07-21
+          - Bound a shared slot's response length before copying it.
+          - Fetch get-magic on optional arguments before testing them.
+
 0.05  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

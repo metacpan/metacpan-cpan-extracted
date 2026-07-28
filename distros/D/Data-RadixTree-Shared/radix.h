@@ -17,7 +17,7 @@
  * delete is LAZY in v1: it unmarks the key's value but does not free node-pool
  * or arena space. Size the capacities for the working set, or clear() to reset.
  *
- * Layout: Header -> reader_slots[1024] -> node_pool[node_cap] -> label_arena[arena_cap]
+ * Layout: Header -> reader_slots[1024] -> occ_bitmap -> node_pool[node_cap] -> label_arena[arena_cap]
  */
 
 #ifndef RADIX_H
@@ -50,11 +50,16 @@
  * ================================================================ */
 
 #define RDX_MAGIC        0x58444152U  /* "RADX" (little-endian) */
-#define RDX_VERSION      1
+#define RDX_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
 #define RDX_ERR_BUFLEN   256
 #ifndef RDX_READER_SLOTS
 #define RDX_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
+/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
+ * cleared on clean release.  A writer scans these RDX_OCC_WORDS words to visit
+ * only OCCUPIED slots (O(words + live readers)) instead of all RDX_READER_SLOTS. */
+#define RDX_OCC_WORDS   (((RDX_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
+#define RDX_OCC_BYTES   ((uint64_t)RDX_OCC_WORDS * 8)      /* 128 bytes */
 #define RDX_MAX_NODES    (1u << 24)   /* 16.7M nodes: node index 0 is the reserved NIL sentinel */
 #define RDX_MAX_ARENA    0xF0000000u  /* ~3.75 GiB label arena; offsets/lengths are uint32 */
 
@@ -80,16 +85,19 @@ typedef struct {
 _Static_assert(sizeof(RdxNode) == 256u * 4u + 4u + 4u + 8u + 8u, "RdxNode layout");
 _Static_assert(sizeof(RdxNode) % 8 == 0, "RdxNode must be 8-byte aligned");
 
-/* Per-process slot for dead-process recovery.  Each shared rwlock counter
- * (the main rwlock-reader count, rwlock_waiters, rwlock_writers_waiting)
- * is mirrored here so a wrlock timeout can attribute and reverse a dead
- * process's contribution instead of waiting for the slow per-op timeout
- * drain. */
+/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
+ * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
+ * there is no separate shared reader counter to fall out of sync with it -- so a
+ * dead reader's contribution is exactly this one word, which a draining writer
+ * neutralises by clearing the slot's pid (the scan then ignores the slot).  No
+ * orphaned counter can exist, so there is no quiescent force-reset and sustained
+ * readers cannot starve a writer.  _rsv1/_rsv2 are kept only to preserve the
+ * 16-byte slot size across the already-released builds. */
 typedef struct {
-    uint32_t pid;            /* 0 = unclaimed */
-    uint32_t subcount;       /* in-flight rdlock acquisitions for this process */
-    uint32_t waiters_parked; /* contribution to hdr->rwlock_waiters         */
-    uint32_t writers_parked; /* contribution to hdr->rwlock_writers_waiting */
+    uint32_t pid;      /* 0 = unclaimed */
+    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
+    uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } RdxReaderSlot;
 
 struct RdxHeader {
@@ -99,16 +107,20 @@ struct RdxHeader {
     uint32_t root;                    /* 16  root node index (allocated at create) */
     uint32_t arena_cap;               /* 20  label-arena capacity in bytes */
     uint32_t arena_used;              /* 24  bytes used in the arena */
-    uint32_t _pad1;                   /* 28  (was free_head; lazy delete never freed nodes) */
+    uint32_t free_head;               /* 28  head of the free-node list, 0 == empty (node 0 is
+                                       *     NIL so it can never be on the list).  Reuses the
+                                       *     slot this field originally had, so the on-disk
+                                       *     format is unchanged: existing files carry 0 here,
+                                       *     which reads correctly as "no free nodes". */
     uint64_t keys;                    /* 32  count of stored keys */
     uint64_t total_size;              /* 40 */
     uint64_t reader_slots_off;        /* 48 */
     uint64_t node_pool_off;           /* 56 */
     uint64_t arena_off;               /* 64 */
-    uint32_t rwlock;                  /* 72 */
-    uint32_t rwlock_waiters;          /* 76 */
-    uint32_t rwlock_writers_waiting;  /* 80 */
-    uint32_t slotless_readers;  /* live readers holding the lock with no reader-slot (was padding) */
+    uint32_t wlock;                   /* 72  WRITER word ONLY: 0 (free) or WRITER_BIT|pid.  NOT a reader count. */
+    uint32_t rwait;                   /* 76  parked-waiter hint (readers+writers blocked on wlock); over-count-safe */
+    uint32_t drain_seq;               /* 80  futex bumped by a reader releasing under a draining writer (wakes it) */
+    uint32_t slotless_rdepth;         /* readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 88 */
     uint8_t  _pad[160];               /* 96..255 */
 };
@@ -121,23 +133,48 @@ _Static_assert(sizeof(RdxHeader) == 256, "RdxHeader must be 256 bytes");
 typedef struct RdxHandle {
     RdxHeader     *hdr;
     RdxReaderSlot *reader_slots;  /* RDX_READER_SLOTS entries */
+    uint64_t      *occ;           /* RDX_OCC_WORDS-word slot-occupancy bitmap (trusted layout offset) */
     void          *base;          /* mmap base */
+    /* Fixed geometry cached at attach from validated header.  These bound every
+     * node-pool / arena access so a lock-violating peer that later corrupts the
+     * peer-writable header (node_cap/arena_cap/node_pool_off/arena_off) cannot
+     * turn a live index or offset into an out-of-bounds reference. */
+    uint32_t       node_cap;      /* node-pool capacity (array size, incl. NIL) */
+    uint32_t       arena_cap;     /* label-arena capacity in bytes */
+    uint64_t       node_pool_off; /* node-pool offset from trusted layout */
+    uint64_t       arena_off;     /* arena offset from trusted layout */
     size_t         mmap_size;
     char          *path;          /* backing file path (strdup'd) */
     int            backing_fd;    /* memfd or reopened-fd to close on destroy, -1 for file/anon */
     uint32_t       my_slot_idx;   /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t       cached_pid;    /* getpid() cached at last slot claim */
     uint32_t       cached_fork_gen; /* rdx_fork_gen value at last slot claim */
-    uint32_t slotless_held; /* rwlock read-locks held with no reader-slot */
+    uint32_t slotless_held; /* read-locks this process holds with no reader-slot */
 } RdxHandle;
 
 /* ================================================================
- * Futex-based write-preferring read-write lock
- * with reader-slot dead-process recovery
+ * Futex-based write-preferring read-write lock (reader-slots-only)
+ * with dead-process recovery
+ *
+ * The reader count is NOT stored in a shared counter.  It is DISTRIBUTED across
+ * per-process reader slots: each slot's `rdepth` is that process's entire
+ * contribution to the lock.  A reader publishes its presence in its own slot and
+ * then re-checks the writer word; a writer publishes the writer word and then
+ * scans every slot until all live readers' rdepth reach 0.  Sequentially-
+ * consistent store+load on each side (a Dekker handshake) gives mutual exclusion.
+ *
+ * Because a reader's whole contribution is ONE atomic word owned by ONE process,
+ * a crashed reader is recovered by clearing that one slot (CAS its pid to 0) --
+ * there is no second counter to strand, no orphaned +1, and therefore no
+ * quiescent force-reset.  A reader killed anywhere in rdlock/rdunlock leaves at
+ * most `rdepth>0` in its dead slot, which the draining writer clears directly, so
+ * sustained read traffic can never starve a writer.  Write-preference is inherent
+ * in the gate (new readers see wlock!=0 and yield), so there is no reader-count
+ * yield hack.
  * ================================================================ */
 
 #define RDX_RWLOCK_SPIN_LIMIT 32
-#define RDX_LOCK_TIMEOUT_SEC  2  /* FUTEX_WAIT timeout for stale lock detection */
+#define RDX_LOCK_TIMEOUT_SEC  2  /* FUTEX_WAIT timeout for stale-lock detection / drain re-scan */
 
 static inline void rdx_rwlock_spin_pause(void) {
 #if defined(__x86_64__) || defined(__i386__)
@@ -149,7 +186,7 @@ static inline void rdx_rwlock_spin_pause(void) {
 #endif
 }
 
-/* Extract writer PID from rwlock value (lower 31 bits when write-locked). */
+/* Writer word encoding: WRITER_BIT|pid when write-locked, 0 when free. */
 #define RDX_RWLOCK_WRITER_BIT 0x80000000U
 #define RDX_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define RDX_RWLOCK_WR(pid)    (RDX_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & RDX_RWLOCK_PID_MASK))
@@ -157,30 +194,50 @@ static inline void rdx_rwlock_spin_pause(void) {
 /* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
 /* Liveness via kill(pid,0). NOTE: cannot detect PID reuse -- if a dead
  * lock-holder's PID is recycled to an unrelated live process before recovery
- * runs, this reports "alive" and that slot's orphaned contribution is not
- * reclaimed until the recycled process exits. Robust detection would require
- * a per-slot process-start-time epoch (a header-layout/version change).
+ * runs, this reports "alive" and that slot's rdepth is not reclaimed until the
+ * recycled process exits. Robust detection would require a per-slot
+ * process-start-time epoch (a header-layout/version change).
  * Documented under "Crash Safety" in the POD. */
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int rdx_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int rdx_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !rdx_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale write lock left by a dead process.
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent
- * recovering process can detect and re-recover if we crash mid-recovery. */
-static inline void rdx_recover_stale_lock(RdxHandle *h, uint32_t observed_rwlock) {
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void rdx_recover_stale_lock(RdxHandle *h, uint32_t observed_wlock) {
     RdxHeader *hdr = h->hdr;
     uint32_t mypid = RDX_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->rwlock, &observed_rwlock,
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 static const struct timespec rdx_lock_timeout = { RDX_LOCK_TIMEOUT_SEC, 0 };
@@ -195,6 +252,17 @@ static void rdx_on_fork_child(void) {
 }
 static void rdx_atfork_init(void) {
     pthread_atfork(NULL, NULL, rdx_on_fork_child);
+}
+
+/* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
+ * release.  SEQ_CST so a set bit is ordered before the slot's rdepth can go
+ * non-zero (bit set in claim, which precedes any rdlock), letting a writer's
+ * SEQ_CST bitmap scan never miss a slot a committed reader holds. */
+static inline void rdx_occ_set(RdxHandle *h, uint32_t s) {
+    __atomic_fetch_or(&h->occ[s >> 6], (uint64_t)1 << (s & 63), __ATOMIC_SEQ_CST);
+}
+static inline void rdx_occ_clear(RdxHandle *h, uint32_t s) {
+    __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
 }
 
 /* Ensure this process owns a reader slot.  Called from the lock helpers so
@@ -215,337 +283,258 @@ static inline void rdx_claim_reader_slot(RdxHandle *h) {
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % RDX_READER_SLOTS;
+    /* Pass 1: take a free slot. */
     for (uint32_t i = 0; i < RDX_READER_SLOTS; i++) {
         uint32_t s = (start + i) % RDX_READER_SLOTS;
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&h->reader_slots[s].pid,
                 &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            /* Zero all mirror fields, not just subcount: a SIGKILL'd
-             * predecessor may have left waiters_parked/writers_parked
-             * non-zero, and rdx_recover_dead_readers won't drain them
-             * once we own the slot (the CAS expects the dead PID). */
-            __atomic_store_n(&h->reader_slots[s].subcount, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].waiters_parked, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].writers_parked, 0, __ATOMIC_RELAXED);
+            /* Fresh owner holds no read locks yet; clear any stale rdepth left by
+             * a dead predecessor (its contribution is dropped as we take over). */
+            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
+            rdx_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
             h->my_slot_idx = s;
             return;
         }
     }
-    /* Table full -- leave my_slot_idx = UINT32_MAX so we silently skip
-     * tracking for this handle (lock still works; just no recovery). */
-}
-
-/* Atomically subtract `sub` from a counter, capped at 0 (never underflows). */
-static inline void rdx_atomic_sub_cap(uint32_t *p, uint32_t sub) {
-    if (!sub) return;
-    uint32_t cur = __atomic_load_n(p, __ATOMIC_RELAXED);
-    for (;;) {
-        uint32_t want = (cur > sub) ? cur - sub : 0;
-        if (__atomic_compare_exchange_n(p, &cur, want,
-                1, __ATOMIC_RELAXED, __ATOMIC_RELAXED))
-            return;
-    }
-}
-
-/* Try to claim a dead slot (CAS pid -> 0) and drain its parked-waiter
- * contributions back to the global counters.  A no-op if the slot was stolen
- * by another recoverer or had no waiter contribution to drain.
- *
- * Note: subcount/waiters_parked/writers_parked are NOT zeroed here.
- * Between our CAS and a follow-up store, a new process could claim the
- * slot and start populating these fields -- our stores would clobber its
- * state.  rdx_claim_reader_slot zeros all three on every claim, so
- * leaving stale values is harmless. */
-static inline void rdx_drain_dead_slot(RdxHandle *h, uint32_t i, uint32_t pid) {
-    RdxHeader *hdr = h->hdr;
-    uint32_t expected = pid;
-    /* ACQ_REL on success: RELEASE publishes pid=0 to other observers;
-     * ACQUIRE syncs us with prior writes from the dead process to
-     * waiters_parked/writers_parked.  On weakly-ordered archs (aarch64)
-     * a plain RELAXED load before the CAS could miss those writes;
-     * loading them after the CAS keeps them inside the acquire window. */
-    if (!__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, 0,
-            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-        return;
-    uint32_t wp    = __atomic_load_n(&h->reader_slots[i].waiters_parked, __ATOMIC_RELAXED);
-    uint32_t writp = __atomic_load_n(&h->reader_slots[i].writers_parked, __ATOMIC_RELAXED);
-    if (wp)    rdx_atomic_sub_cap(&hdr->rwlock_waiters, wp);
-    if (writp) rdx_atomic_sub_cap(&hdr->rwlock_writers_waiting, writp);
-}
-
-/* Scan reader slots for dead-process recovery.
- *
- * For each dead PID with non-zero contributions to the shared rwlock,
- * rwlock_waiters, or rwlock_writers_waiting counters, drain its share back
- * out so live processes don't have to wait for the slow per-op timeout
- * decrement to drain it for them.
- *
- * For the main rwlock counter we use the "no live reader holds -> force-
- * reset to 0" trick (precise) because per-process attribution of the
- * subcount is racy across the inc-counter-then-inc-subcount window. */
-static inline void rdx_recover_dead_readers(RdxHandle *h) {
-    if (!h->reader_slots) return;
-    RdxHeader *hdr = h->hdr;
-    int any_live_reader = 0;
-    int found_dead_reader = 0;
-
-    /* Pass 1: classify slots.  Slots with dead pid and sc == 0 (no rwlock
-     * contribution to lose) are wiped immediately to free the slot for
-     * future claimants and drain any orphan parked-waiter counters.  Slots
-     * with dead pid and sc > 0 are left intact in this pass: if force-
-     * reset cannot fire (because a live reader is concurrently present),
-     * wiping the dead slot would lose the only record of its orphan
-     * rwlock contribution and strand writers permanently once the live
-     * reader releases. */
+    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
+     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
+     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
+     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
+     * old design) we need not skip dead slots that still show a read count. */
     for (uint32_t i = 0; i < RDX_READER_SLOTS; i++) {
-        uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-        if (pid == 0) continue;
-        uint32_t sc = __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED);
-        if (rdx_pid_alive(pid)) {
-            if (sc > 0) any_live_reader = 1;
-            continue;
-        }
-        if (sc > 0) { found_dead_reader = 1; continue; }
-        rdx_drain_dead_slot(h, i, pid);
-    }
-
-    /* Pass 2: only if force-reset will fire.  Issue the rwlock force-
-     * reset CAS FIRST, while the window since pass 1's last scan is
-     * still narrow (a handful of instructions, as in the original
-     * single-pass code).  A new reader that started rdlock between
-     * pass 1's scan and the CAS will either:
-     *   (a) have already CAS'd rwlock from cur to cur+1 -- our CAS then
-     *       fails (cur mismatched), recovery yields and a future
-     *       cycle retries; or
-     *   (b) be still in the subcount-bump phase -- our CAS sees the
-     *       stale cur and resets to 0; the new reader's subsequent CAS
-     *       rwlock(0 -> 1) succeeds cleanly.
-     * Only after the CAS resolves do we wipe the deferred dead slots,
-     * keeping that work outside the race-sensitive window. */
-    /* A live reader with no slot (table was full) is invisible to the scan
-     * above but still holds a +1 in the lock word; never force-reset under it. */
-    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
-        any_live_reader = 1;
-    if (found_dead_reader && !any_live_reader) {
-        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
-        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
-        if (cur > 0 && cur < RDX_RWLOCK_WRITER_BIT) {
-            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
-            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
-            for (uint32_t i = 0; !live_now && i < RDX_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p && rdx_pid_alive(p) &&
-                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
-                    live_now = 1;
-            }
-            if (live_now) {
-                drain_ok = 0;
-            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
-                    0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-                    syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-            } else {
-                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
-            }
-        }
-        if (drain_ok) {
-            for (uint32_t i = 0; i < RDX_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p == 0 || rdx_pid_alive(p)) continue;
-                rdx_drain_dead_slot(h, i, p);
-            }
+        uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+        if (dpid == 0 || dpid == now_pid || rdx_pid_alive(dpid)) continue;
+        uint32_t expected = dpid;
+        if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
+                __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
+            rdx_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            h->my_slot_idx = i;
+            return;
         }
     }
+    /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
+     * slotless path (lock still works; recovery of THIS reader's death is the
+     * documented slotless limitation). */
 }
 
-/* Inspect the lock word after a futex-wait timeout.  If a dead writer
- * holds it, force-recover the lock.  Otherwise drain dead readers' shares
- * of the rwlock/waiter counters.  Called from rdlock and wrlock ETIMEDOUT
- * branches -- identical recovery logic in both. */
+/* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
+ * it, force-recover.  Dead READERS need no action here: only a writer that owns
+ * wlock drains readers, and it clears dead readers inline in its own scan. */
 static inline void rdx_recover_after_timeout(RdxHandle *h) {
-    RdxHeader *hdr = h->hdr;
-    uint32_t val = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+    uint32_t val = __atomic_load_n(&h->hdr->wlock, __ATOMIC_RELAXED);
     if (val >= RDX_RWLOCK_WRITER_BIT) {
         uint32_t pid = val & RDX_RWLOCK_PID_MASK;
         if (!rdx_pid_alive(pid))
             rdx_recover_stale_lock(h, val);
-    } else {
-        rdx_recover_dead_readers(h);
     }
 }
 
-/* Park/unpark helpers: bump the global waiter counters together with this
- * process's mirrored slot counters so a wrlock-timeout recovery scan can
- * attribute and reverse a dead PID's contribution.  Kept paired to make
- * accidental drift between global and per-slot counts impossible. */
-static inline void rdx_park_reader(RdxHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
+/* Bump/drop the parked-waiter hint.  Both readers (blocked at the gate) and
+ * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
+ * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
+ * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
+ * (harmless); it can never under-count, so no wakeup is lost. */
+static inline void rdx_park(RdxHandle *h) {
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
-static inline void rdx_unpark_reader(RdxHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-}
-static inline void rdx_park_writer(RdxHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
-    }
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-}
-static inline void rdx_unpark_writer(RdxHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_sub_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
-    }
+static inline void rdx_unpark(RdxHandle *h) {
+    __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
 
-/* Reader accounting: a reader mirrors its +1 in the lock word so dead-reader
- * recovery can see it. A slotted reader uses its slot subcount; a reader that
- * could not claim a slot (table full) uses the global hdr->slotless_readers,
- * so recovery's force-reset never fires out from under it. leave() peels
- * slotless first so a later slot claim cannot misattribute the decrement. */
-static inline void rdx_reader_enter(RdxHandle *h) {
+/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
+ * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
+ * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
+ * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
+ * the writer's SEQ_CST wlock-store + rdepth-scan.  leave() peels slotless first
+ * so a slot claimed mid-hold cannot misattribute the decrement. */
+static inline void rdx_rdepth_inc(RdxHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     } else {
-        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
         h->slotless_held++;
     }
 }
-static inline void rdx_reader_leave(RdxHandle *h) {
+static inline void rdx_rdepth_dec(RdxHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+    }
+}
+
+/* Wake a writer that may be draining readers (it waits on drain_seq).  Called
+ * after every rdepth decrement so a released read lock lets the writer re-scan
+ * promptly instead of waiting out its timeout. */
+static inline void rdx_reader_wake_drain(RdxHandle *h) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+        __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
 }
 
 static inline void rdx_rwlock_rdlock(RdxHandle *h) {
     rdx_claim_reader_slot(h);
     RdxHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    /* Claim subcount BEFORE bumping the shared rwlock counter.  This way
-     * a concurrent writer-side recovery scan that sees our PID alive with
-     * subcount > 0 will (correctly) defer force-reset, even while we are
-     * still spinning trying to win the rwlock CAS.  Without this, a reader
-     * killed between rwlock CAS-success and subcount++ would let recovery
-     * force-reset rwlock to 0 underneath us, causing a UINT32_MAX wrap on
-     * our eventual rdunlock dec. */
-    rdx_reader_enter(h);
     for (int spin = 0; ; spin++) {
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Write-preferring: when lock is free (cur==0) and writers are
-         * waiting, yield to let the writer acquire. When readers are
-         * already active (cur>=1), new readers may join freely. */
-        if (cur > 0 && cur < RDX_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
-        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
-            if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_ACQUIRE);
+        if (cur == 0) {
+            /* Optimistically take the read: publish rdepth, then re-check wlock.
+             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST wlock CAS +
+             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
+             * two sides cannot both miss each other, so we never hold
+             * concurrently with a writer. */
+            rdx_rdepth_inc(h);
+            if (__atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST) == 0)
+                return;                       /* no writer after our publish -> we hold the read lock */
+            /* A writer appeared during our publish -- yield to it (write-preferring). */
+            rdx_rdepth_dec(h);
+            rdx_reader_wake_drain(h);          /* let the draining writer see rdepth drop */
+            spin = 0;
+            continue;
+        }
+        /* wlock != 0: a writer holds or is acquiring.  Recover if it is dead. */
+        if (cur >= RDX_RWLOCK_WRITER_BIT &&
+            !rdx_pid_alive(cur & RDX_RWLOCK_PID_MASK)) {
+            rdx_recover_stale_lock(h, cur);
+            spin = 0;
+            continue;
         }
         if (__builtin_expect(spin < RDX_RWLOCK_SPIN_LIMIT, 1)) {
             rdx_rwlock_spin_pause();
             continue;
         }
-        rdx_park_reader(h);
-        cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Sleep when write-locked OR when yielding to waiting writers */
-        if (cur >= RDX_RWLOCK_WRITER_BIT || cur == 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+        rdx_park(h);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &rdx_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                rdx_unpark_reader(h);
+                rdx_unpark(h);
                 rdx_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        rdx_unpark_reader(h);
+        rdx_unpark(h);
         spin = 0;
     }
 }
 
 static inline void rdx_rwlock_rdunlock(RdxHandle *h) {
-    RdxHeader *hdr = h->hdr;
-    /* Release the shared counter BEFORE dropping our subcount so that
-     * "any live PID with subcount > 0" is a reliable in-flight indicator
-     * for the writer-side recovery scan.  Inverting these would create a
-     * window where we still own a unit of rwlock but our slot subcount is
-     * 0, letting recovery force-reset rwlock underneath us. */
-    uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    rdx_reader_leave(h);
-    if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    rdx_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    rdx_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
 static inline void rdx_rwlock_wrlock(RdxHandle *h) {
     rdx_claim_reader_slot(h);  /* refresh cached_pid across fork */
     RdxHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    /* Encode PID in the rwlock word itself (0x80000000 | pid) to eliminate
-     * any crash window between acquiring the lock and storing the owner. */
+    /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
+     * crash window between acquiring the lock and storing the owner. */
     uint32_t mypid = RDX_RWLOCK_WR(h->cached_pid);
+    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(lock, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
+        if (__atomic_compare_exchange_n(&hdr->wlock, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        /* Contended: expected now holds the current wlock value. */
+        if (expected >= RDX_RWLOCK_WRITER_BIT &&
+            !rdx_pid_alive(expected & RDX_RWLOCK_PID_MASK)) {
+            rdx_recover_stale_lock(h, expected);
+            spin = 0;
+            continue;
+        }
         if (__builtin_expect(spin < RDX_RWLOCK_SPIN_LIMIT, 1)) {
             rdx_rwlock_spin_pause();
             continue;
         }
-        rdx_park_writer(h);
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
+        rdx_park(h);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
         if (cur != 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &rdx_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                rdx_unpark_writer(h);
+                rdx_unpark(h);
                 rdx_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        rdx_unpark_writer(h);
+        rdx_unpark(h);
         spin = 0;
+    }
+    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
+     * yield).  Drain the readers that were already holding when we won the CAS.
+     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
+     * of the Dekker handshake. */
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(RDX_OCC_WORDS + live readers)
+         * instead of O(RDX_READER_SLOTS). */
+        for (uint32_t w = 0; w < RDX_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!rdx_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &rdx_lock_timeout, NULL, 0);
     }
 }
 
 static inline void rdx_rwlock_wrunlock(RdxHandle *h) {
     RdxHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* ================================================================
  * Layout math + node-pool / arena accessors
  *
- * Layout: Header -> reader_slots[1024] -> node_pool[node_cap] -> arena[arena_cap]
- * RdxNode is 8-byte aligned (sizeof %8 == 0) and RdxReaderSlot is 16 bytes,
- * so node_pool_off is 8-byte aligned.  The arena is raw bytes (no alignment
- * requirement) and follows the node pool.
+ * Layout: Header -> reader_slots[1024] -> occ_bitmap -> node_pool[node_cap] -> arena[arena_cap]
+ * RdxNode is 8-byte aligned (sizeof %8 == 0), RdxReaderSlot is 16 bytes, and the
+ * occ bitmap is RDX_OCC_BYTES (a multiple of 8), so node_pool_off stays 8-byte
+ * aligned.  The arena is raw bytes (no alignment requirement) after the pool.
  * ================================================================ */
 
-typedef struct { uint64_t reader_slots, node_pool, arena; } RdxLayout;
+typedef struct { uint64_t reader_slots, occ, node_pool, arena; } RdxLayout;
 
 static inline RdxLayout rdx_layout(uint32_t node_cap) {
     RdxLayout L;
     L.reader_slots = sizeof(RdxHeader);
-    L.node_pool    = L.reader_slots + (uint64_t)RDX_READER_SLOTS * sizeof(RdxReaderSlot);
+    L.occ          = L.reader_slots + (uint64_t)RDX_READER_SLOTS * sizeof(RdxReaderSlot);
+    L.node_pool    = L.occ + RDX_OCC_BYTES;
     L.arena        = L.node_pool + (uint64_t)node_cap * sizeof(RdxNode);
     return L;
 }
@@ -556,10 +545,10 @@ static inline uint64_t rdx_total_size(uint32_t node_cap, uint32_t arena_cap) {
 }
 
 static inline RdxNode *rdx_nodes(RdxHandle *h) {
-    return (RdxNode *)((char *)h->base + h->hdr->node_pool_off);
+    return (RdxNode *)((char *)h->base + h->node_pool_off);   /* cached trusted offset, not peer-writable header */
 }
 static inline uint8_t *rdx_arena(RdxHandle *h) {
-    return (uint8_t *)((char *)h->base + h->hdr->arena_off);
+    return (uint8_t *)((char *)h->base + h->arena_off);       /* cached trusted offset, not peer-writable header */
 }
 
 /* ================================================================
@@ -570,11 +559,34 @@ static inline uint8_t *rdx_arena(RdxHandle *h) {
  * node index.  v1 has no freelist (delete is lazy and never frees nodes), so a
  * node always comes off the high-water mark.  The caller pre-checks capacity
  * before any mutation, so a 0 return must not happen mid-insert. */
+/* Push a node onto the free list.  Callers must hold the write lock and must
+ * have already made the node unreachable from the tree.  Node 0 is NIL and is
+ * never freed.  The free-list link lives in the dead node's label_off. */
+static inline void rdx_free_node(RdxHandle *h, uint32_t idx) {
+    if (idx == 0 || idx >= h->node_cap) return;   /* never recycle NIL or an out-of-pool index */
+    RdxHeader *hdr = h->hdr;
+    RdxNode *nodes = rdx_nodes(h);
+    memset(&nodes[idx], 0, sizeof(RdxNode));
+    nodes[idx].label_off = hdr->free_head;        /* next-free link (0 terminates) */
+    hdr->free_head = idx;
+}
+
 static inline uint32_t rdx_alloc_node(RdxHandle *h) {
     RdxHeader *hdr = h->hdr;
     RdxNode *nodes = rdx_nodes(h);
-    if (hdr->node_used < hdr->node_cap) {
-        uint32_t idx = hdr->node_used++;
+    /* Recycle first.  free_head is peer-writable, so bound it against the cached
+     * pool capacity before dereferencing: a corrupt value must never index out of
+     * the node pool (an in-range corrupt value can only confuse the tree, which is
+     * the same trust level as any other header field). */
+    uint32_t idx = hdr->free_head;
+    if (idx != 0 && idx < h->node_cap) {
+        uint32_t next = nodes[idx].label_off;
+        hdr->free_head = (next < h->node_cap) ? next : 0;
+        memset(&nodes[idx], 0, sizeof(RdxNode));
+        return idx;
+    }
+    if (hdr->node_used < h->node_cap) {   /* cached cap: the write index must stay in the real pool */
+        idx = hdr->node_used++;
         memset(&nodes[idx], 0, sizeof(RdxNode));
         return idx;
     }
@@ -587,19 +599,59 @@ static inline uint32_t rdx_alloc_node(RdxHandle *h) {
 static inline uint32_t rdx_arena_append(RdxHandle *h, const uint8_t *bytes, uint32_t len) {
     RdxHeader *hdr = h->hdr;
     uint32_t off = hdr->arena_used;
-    if (len) memcpy(rdx_arena(h) + off, bytes, len);
+    /* off is the peer-writable arena_used; the caller pre-checked room against
+     * the cached cap, but re-verify here so a concurrent lock-violating peer
+     * that inflated arena_used cannot drive this memcpy past the arena. */
+    if (len) {
+        if ((uint64_t)off + len > h->arena_cap) return off;   /* refuse OOB write */
+        memcpy(rdx_arena(h) + off, bytes, len);
+    }
     hdr->arena_used += len;
     return off;
 }
 
-/* Worst case any single insert consumes: up to 2 new nodes (a split makes a
- * mid node + a leaf node) and up to klen arena bytes (the leaf's label).
- * v1 has no freelist, so the 2 nodes must come fresh from the high-water mark.
- * Returns 1 if both fit, 0 otherwise.  Caller holds the write lock. */
+/* Worst case any single insert consumes: the copy-on-write edge split
+ * transiently allocates THREE nodes (mid + ch2 + the new leaf) before the
+ * displaced child is recycled post-commit (net consumption is 2), plus up to
+ * klen arena bytes (the leaf's label).  Returns 1 if both fit, 0 otherwise.
+ * Caller holds the write lock. */
+#define RDX_INSERT_MAX_ALLOC 3
+
+/* Count the nodes a single insert can draw on: fresh high-water slots plus
+ * free-list entries.  rdx_alloc_node recycles before bumping the high-water
+ * mark, so both sources must count -- checking the high-water mark alone
+ * would refuse inserts that recycled nodes could satisfy, and (pre-fix)
+ * checking it against 2 instead of 3 let a split run out of nodes mid-way
+ * and return 0, which insert reported as "key already existed, updated"
+ * while the key was never stored.
+ * The free-list head and links live in peer-writable shared memory, threaded
+ * through label_off: walking at most the remaining need keeps a corrupt list
+ * containing a cycle bounded here, and every link is checked against the
+ * cached pool capacity before it is dereferenced -- the same bounds
+ * rdx_alloc_node applies when it pops.  The walk runs under the caller's
+ * write lock, so a well-formed list cannot change under it. */
+static inline int rdx_nodes_available(RdxHandle *h, uint32_t need) {
+    RdxHeader *hdr = h->hdr;
+    /* Cached cap: the used counter is peer-writable, so compute headroom
+     * against the fixed geometry (and clamp an inflated used-mark to "no
+     * high-water room", so the unsigned subtraction can never wrap to a huge
+     * "room available"). */
+    uint32_t avail = (hdr->node_used < h->node_cap) ? h->node_cap - hdr->node_used : 0;
+    RdxNode *nodes = rdx_nodes(h);
+    uint32_t idx = hdr->free_head;
+    while (avail < need && idx != 0 && idx < h->node_cap) {
+        avail++;
+        idx = nodes[idx].label_off;
+    }
+    return avail >= need;
+}
+
 static inline int rdx_insert_has_room(RdxHandle *h, uint32_t klen) {
     RdxHeader *hdr = h->hdr;
-    if (hdr->node_cap - hdr->node_used < 2) return 0;
-    if (hdr->arena_cap - hdr->arena_used < klen) return 0;
+    if (!rdx_nodes_available(h, RDX_INSERT_MAX_ALLOC)) return 0;
+    /* Cached cap, same anti-wrap guard as above for the peer-writable
+     * arena_used. */
+    if (hdr->arena_used > h->arena_cap || h->arena_cap - hdr->arena_used < klen) return 0;
     return 1;
 }
 
@@ -627,6 +679,7 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
     RdxNode *nodes = rdx_nodes(h);
     uint8_t *arena = rdx_arena(h);
     uint32_t cur = hdr->root, kpos = 0;
+    if (cur == 0 || cur >= h->node_cap) return 0; /* root read from peer-writable header; keep the index in-pool */
     for (;;) {
         if (kpos == klen) {                       /* key ends here -> mark this node */
             int isnew = !nodes[cur].has_value;
@@ -637,9 +690,18 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
         }
         uint8_t b = key[kpos];
         uint32_t ch = nodes[cur].children[b];
-        if (ch == 0) {                            /* no child on b -> new leaf with the rest as its label */
+        /* child index is read from the peer-writable mmap; an out-of-pool value
+         * (like the read paths' `ch >= node_used` reject) is treated as absent so
+         * the corrupt link is overwritten by a fresh in-pool leaf below, never
+         * followed into an out-of-bounds node dereference / OOB child write. */
+        if (ch == 0 || ch >= h->node_cap) {       /* no child on b -> new leaf with the rest as its label */
             uint32_t leaf = rdx_alloc_node(h);
             nodes = rdx_nodes(h);                 /* base is stable, but re-fetch defensively after alloc */
+            /* Pool exhausted: rdx_alloc_node returns 0, which is the NIL
+             * sentinel. Writing through it corrupts NIL (every read path
+             * treats 0 as "not found") and linking children[b]=0 silently
+             * drops the key while insert still reports success. Fail instead. */
+            if (!leaf) return 0;
             nodes[leaf].label_off = rdx_arena_append(h, key + kpos, klen - kpos);
             nodes[leaf].label_len = klen - kpos;
             nodes[leaf].has_value = 1;
@@ -655,9 +717,15 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
             hdr->keys++;
             return 1;
         }
-        /* match the child's label against key[kpos..] */
-        const uint8_t *L = arena + nodes[ch].label_off;
-        uint32_t llen = nodes[ch].label_len;
+        /* match the child's label against key[kpos..].  label_off/label_len also
+         * come from the peer-writable mmap; clamp the extent against the cached
+         * arena capacity (as the read paths do with `loff + llen > arena_used`)
+         * before forming arena + label_off or reading/adjusting the label, so a
+         * corrupted offset can never drive an out-of-bounds arena read or an OOB
+         * label_off/label_len write on the split path below. */
+        uint32_t loff = nodes[ch].label_off, llen = nodes[ch].label_len;
+        if ((uint64_t)loff + llen > h->arena_cap) return 0;
+        const uint8_t *L = arena + loff;
         uint32_t m = rdx_cpl(L, key + kpos, RDX_MIN(llen, klen - kpos));
         if (m == llen) {                          /* whole label matched -> descend */
             cur = ch;
@@ -669,27 +737,51 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
          * Capture mid_first = L[m] BEFORE mutating ch's label_off (L is a pointer
          * into the arena and is unaffected by the label_off change, but be explicit). */
         uint8_t mid_first = L[m];
+        /* Copy-on-write split.  Build a NEW child (ch2) that carries the
+         * remainder label and inherits ch's children/value, plus the new middle
+         * node, and leave the live tree COMPLETELY untouched until one final
+         * store publishes mid.
+         *
+         * The previous in-place version truncated ch's label (label_off += m)
+         * before publishing mid, so a crash in that window left `cur` pointing
+         * at a child whose label had lost its first m bytes -- silently losing
+         * every key beneath it.  Publishing first instead would leave the prefix
+         * counted twice, so NEITHER in-place ordering is crash-safe; only
+         * copy-on-write is.  The displaced ch is recycled AFTER the commit, so a
+         * crash between the two only leaks one node (reclaimed by the free list)
+         * rather than corrupting the tree.  Node accounting is unchanged versus
+         * the old code: the extra allocation is paid for by recycling ch. */
         uint32_t mid = rdx_alloc_node(h);
+        /* Pool exhausted -> 0 == NIL; bail before touching anything, so the tree
+         * is left exactly as it was rather than writing through NIL. */
+        if (!mid) return 0;
+        uint32_t ch2 = rdx_alloc_node(h);
+        if (!ch2) { rdx_free_node(h, mid); return 0; }
+        uint32_t leaf = 0;
+        if (kpos + m != klen) {                            /* key continues past the split */
+            leaf = rdx_alloc_node(h);
+            if (!leaf) { rdx_free_node(h, ch2); rdx_free_node(h, mid); return 0; }
+        }
         nodes = rdx_nodes(h);
-        nodes[mid].label_off = nodes[ch].label_off;       /* first m bytes */
+        nodes[ch2] = nodes[ch];                            /* inherit children/value */
+        nodes[ch2].label_off = nodes[ch].label_off + m;    /* remainder, same arena region */
+        nodes[ch2].label_len = nodes[ch].label_len - m;
+        nodes[mid].label_off = nodes[ch].label_off;        /* first m bytes */
         nodes[mid].label_len = m;
-        nodes[ch].label_off += m;                         /* child keeps the remainder, same region */
-        nodes[ch].label_len -= m;
-        nodes[mid].children[mid_first] = ch;
-        nodes[cur].children[b] = mid;
-        if (kpos + m == klen) {                            /* the key ends exactly at the split point */
+        nodes[mid].children[mid_first] = ch2;
+        if (leaf) {
+            nodes[leaf].label_off = rdx_arena_append(h, key + kpos + m, klen - kpos - m);
+            nodes[leaf].label_len = klen - kpos - m;
+            nodes[leaf].has_value = 1;
+            nodes[leaf].value = value;
+            nodes[mid].children[key[kpos + m]] = leaf;
+        } else {                                           /* key ends exactly at the split point */
             nodes[mid].has_value = 1;
             nodes[mid].value = value;
-            hdr->keys++;
-            return 1;
         }
-        uint32_t leaf = rdx_alloc_node(h);
-        nodes = rdx_nodes(h);
-        nodes[leaf].label_off = rdx_arena_append(h, key + kpos + m, klen - kpos - m);
-        nodes[leaf].label_len = klen - kpos - m;
-        nodes[leaf].has_value = 1;
-        nodes[leaf].value = value;
-        nodes[mid].children[key[kpos + m]] = leaf;
+        /* Single-word commit: everything above is unreachable until this store. */
+        __atomic_store_n(&nodes[cur].children[b], mid, __ATOMIC_RELEASE);
+        rdx_free_node(h, ch);                              /* displaced: recycle post-commit */
         hdr->keys++;
         return 1;
     }
@@ -702,8 +794,14 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
 static inline uint32_t rdx_find_locked(RdxHandle *h, const uint8_t *key, uint32_t klen) {
     RdxNode *nodes = rdx_nodes(h);
     uint8_t *arena = rdx_arena(h);
+    /* Bounds come from the peer-writable header; clamp the mutable used-marks to
+     * the cached fixed capacities so an inflated node_used/arena_used can never
+     * admit an out-of-pool child index or out-of-arena label extent. */
     uint32_t node_used = h->hdr->node_used, arena_used = h->hdr->arena_used;
+    if (node_used > h->node_cap)  node_used  = h->node_cap;
+    if (arena_used > h->arena_cap) arena_used = h->arena_cap;
     uint32_t cur = h->hdr->root, kpos = 0;
+    if (cur == 0 || cur >= node_used) return 0;   /* root read from peer-writable header */
     for (;;) {
         if (kpos == klen) return cur;
         uint32_t ch = nodes[cur].children[key[kpos]];
@@ -735,9 +833,14 @@ static inline int rdx_lookup_locked(RdxHandle *h, const uint8_t *key, uint32_t k
 static inline int rdx_longest_prefix_locked(RdxHandle *h, const uint8_t *key, uint32_t klen, uint64_t *out) {
     RdxNode *nodes = rdx_nodes(h);
     uint8_t *arena = rdx_arena(h);
+    /* Same clamp as rdx_find_locked: the used-marks are peer-writable, so cap
+     * them at the cached fixed geometry before they bound any array access. */
     uint32_t node_used = h->hdr->node_used, arena_used = h->hdr->arena_used;
+    if (node_used > h->node_cap)  node_used  = h->node_cap;
+    if (arena_used > h->arena_cap) arena_used = h->arena_cap;
     uint32_t cur = h->hdr->root, kpos = 0;
     int found = 0;
+    if (cur == 0 || cur >= node_used) return 0;   /* root read from peer-writable header */
     if (nodes[cur].has_value) { if (out) *out = nodes[cur].value; found = 1; }  /* empty key stored */
     for (;;) {
         if (kpos == klen) break;
@@ -777,7 +880,13 @@ static inline void rdx_clear_locked(RdxHandle *h) {
     hdr->node_used = 2;
     hdr->arena_used = 0;
     hdr->keys = 0;
-    memset(&nodes[hdr->root], 0, sizeof(RdxNode));   /* zero children + has_value + label */
+    /* Drop the recycle list too. It names nodes above the reset high-water
+     * mark, so leaving it would hand the same node out twice -- once popped
+     * from the stale list and once from the bump path -- silently losing the
+     * keys stored under whichever insert lost the race. */
+    hdr->free_head = 0;
+    if (hdr->root && hdr->root < h->node_cap)        /* root is peer-writable; keep the memset in-pool */
+        memset(&nodes[hdr->root], 0, sizeof(RdxNode));   /* zero children + has_value + label */
 }
 
 /* ================================================================
@@ -840,7 +949,18 @@ static inline RdxHandle *rdx_setup(void *base, size_t map_size,
     }
     h->hdr          = hdr;
     h->base         = base;
-    h->reader_slots = (RdxReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    h->reader_slots = (RdxReaderSlot *)((uint8_t *)base + sizeof(RdxHeader));  /* trusted layout, not the peer-writable header offset */
+    /* Cache fixed geometry from the (already-validated) header and derive the
+     * pool/arena offsets from the canonical layout -- never re-read the
+     * peer-writable node_pool_off/arena_off/node_cap/arena_cap on the hot path. */
+    {
+        RdxLayout L = rdx_layout(hdr->node_cap);
+        h->occ           = (uint64_t *)((uint8_t *)base + L.occ);   /* trusted layout offset */
+        h->node_cap      = hdr->node_cap;
+        h->arena_cap     = hdr->arena_cap;
+        h->node_pool_off = L.node_pool;
+        h->arena_off     = L.arena;
+    }
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -866,6 +986,7 @@ static inline int rdx_validate_header(const RdxHeader *hdr, uint64_t file_size) 
     if (hdr->root == 0 || hdr->root >= hdr->node_cap) return 0;
     if (hdr->node_used < 2 || hdr->node_used > hdr->node_cap) return 0;
     if (hdr->arena_used > hdr->arena_cap) return 0;
+    if (hdr->free_head >= hdr->node_cap) return 0;   /* 0 == empty; any real entry must be in-pool */
     return 1;
 }
 
@@ -915,6 +1036,10 @@ static RdxHandle *rdx_create(const char *path, uint64_t node_cap_in, uint64_t ar
         int is_new = (st.st_size == 0);
         if (!is_new && (uint64_t)st.st_size < sizeof(RdxHeader)) {
             RDX_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            RDX_ERR("%s: refusing to initialize file not owned by us", path);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
@@ -973,10 +1098,15 @@ static RdxHandle *rdx_open_fd(int fd, char *errbuf) {
 static void rdx_destroy(RdxHandle *h) {
     if (!h) return;
     /* Release our reader slot on clean teardown (else short-lived-reader churn
-     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+     * exhausts the slot table); skip if a read lock is still held (rdepth>0). */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
         h->cached_fork_gen == __atomic_load_n(&rdx_fork_gen, __ATOMIC_RELAXED) &&
-        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) == 0) {
+        /* Clear our occ bit BEFORE freeing the slot: we still own the pid so no
+         * claimant can take the slot mid-clear, and rdepth==0 so no writer needs
+         * to see us.  (A crash skips this -> the bit is reclaimed lazily by a
+         * writer scan / re-claim, same as the pid.) */
+        rdx_occ_clear(h, h->my_slot_idx);
         uint32_t expected = h->cached_pid;
         __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
                 &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);

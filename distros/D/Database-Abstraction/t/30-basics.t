@@ -80,9 +80,13 @@ use_ok('Database::test1');
 }
 
 subtest 'Test loading configuration from a file' => sub {
-	my $config_file = File::Spec->catfile($Bin, File::Spec->updir(), 'config.yaml');
+	my $tmpdir = File::Spec->tmpdir();
+	my $tmp_config = File::Temp->new(SUFFIX => '.yaml', UNLINK => 1);
+	print $tmp_config "---\ndirectory: $tmpdir\nmax_slurp_size: 8192\n";
+	$tmp_config->flush();
 
-	my $obj = Database::test1->new(config_file => $config_file);
+	my $obj = Database::test1->new(config_file => $tmp_config->filename());
 
-	cmp_ok($obj->{'directory'}, 'eq', '/tmp', 'Can read configuration in from a file');
+	cmp_ok($obj->{'directory'}, 'eq', $tmpdir, 'Can read configuration in from a file');
+	is($obj->{'max_slurp_size'}, 8192, 'Numeric config value loaded correctly');
 };

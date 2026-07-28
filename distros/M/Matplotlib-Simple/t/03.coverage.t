@@ -30,9 +30,17 @@ if ($python_available) {
 		( $mpl_version = $raw ) =~ s/^\s+|\s+$//g;
 	}
 }
+# matplotlib_venn is an optional dependency, needed only by venn_proportional_area
+my $venn_available = 0;
+if ($python_available) {
+	qx/python3 -c "import matplotlib_venn" 2>&1/;
+	$venn_available = ( $? == 0 ) ? 1 : 0;
+}
 diag( $python_available ? "python3: $python_version_raw" : 'python3 not found' );
 diag( $mpl_available ? "matplotlib: $mpl_version (render layer ON)"
 	: 'matplotlib >= 3.10 not found (render layer SKIPPED)' );
+diag( $venn_available ? 'matplotlib_venn: found'
+	: 'matplotlib_venn not found (venn_proportional_area render SKIPPED)' );
 
 # ----------------------------------------------------------------------------
 # SVG validation (structural regexes + python well-formedness parse).

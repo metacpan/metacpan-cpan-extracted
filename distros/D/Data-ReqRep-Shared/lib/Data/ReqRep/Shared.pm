@@ -1,7 +1,7 @@
 package Data::ReqRep::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::ReqRep::Shared', $VERSION);
@@ -127,7 +127,9 @@ B<Client> (opens existing channel):
     ->new_from_fd($fd)
 
 Constructor arguments for Str: C<$path, $req_cap, $resp_slots,
-$resp_size [, $arena]>. For Int: C<$path, $req_cap, $resp_slots>.
+$resp_size [, $arena [, $mode]]>. For Int: C<$path, $req_cap,
+$resp_slots [, $mode]>. C<$mode> is the octal backing-file permission
+(default C<0600>); see L</SECURITY>.
 
 =head2 Server API
 
@@ -345,7 +347,10 @@ L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 Backing files are created with mode C<0600> (owner-only) by default, so only the
 creating user can open and attach them. To share a backing file across users,
-pass an explicit octal file mode such as C<0660> as the last argument to C<new>; the mode is applied
+pass an explicit octal file mode such as C<0660> as the final C<$mode> argument
+to C<new> -- for Str after the optional C<$arena>
+(C<< new($path, $req_cap, $resp_slots, $resp_size, $arena, 0660) >>), for Int as
+the fourth argument (C<< new($path, $req_cap, $resp_slots, 0660) >>); the mode is applied
 only when the file is created (an existing file keeps its own permissions). The
 file is opened with C<O_NOFOLLOW>, so a symlink planted at the path is refused,
 and created with C<O_EXCL>; the on-disk header is validated when the file is

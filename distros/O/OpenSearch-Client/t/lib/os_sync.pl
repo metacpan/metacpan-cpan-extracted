@@ -50,7 +50,15 @@ our %Auth;
 
 if ( $userinfo && $use_https ) {
     %Auth = ( use_https => 1, userinfo => $userinfo );
+    if ( $ENV{OS_NO_SSL_VERIFY} ) {
+        $Auth{ssl_options} = {
+            SSL_verify_mode     => 0x00,
+            SSL_verifycn_scheme => 'none',
+            verify_hostname => 0,
+        };
+    }
 }
+
 
 my $es;
 if ( $ENV{OS} ) {

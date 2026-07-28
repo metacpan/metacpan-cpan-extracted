@@ -1,0 +1,68 @@
+# Testing Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient 0.03, Perl 5.040001, /usr/bin/perl
+t/00-load.t .................................... ok
+t/01-service-BusinessGlossaryService.t ......... ok
+t/01-service-CatalogService.t .................. ok
+PRE-CONDITION VIOLATION: mainpos_e (0x5560707597e0) is NOT reachable from its head (0x5560707597b0) at bucket 957
+  Collider Key: google.type.Date
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/01-service-CmekService.t ..................... 
+No subtests run 
+t/01-service-DataProductService.t .............. ok
+PRE-CONDITION VIOLATION: mainpos_e (0x564f1557dae8) is NOT reachable from its head (0x564f1557dad0) at bucket 669
+  Collider Key: google.cloud.dataplex.v1.Asset.ResourceSpec.AccessMode
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/01-service-DataScanService.t ................. 
+No subtests run 
+PRE-CONDITION VIOLATION: mainpos_e (0x55cce7aa06a8) is NOT reachable from its head (0x55cce7aa0690) at bucket 977
+  Collider Key: google.api.TLS_CIPHER_RESTRICTION_VIOLATED
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/01-service-DataTaxonomyService.t ............. 
+No subtests run 
+t/01-service-DataplexService.t ................. ok
+PRE-CONDITION VIOLATION: mainpos_e (0x563c90ce5d50) is NOT reachable from its head (0x563c90ce5d38) at bucket 1018
+  Collider Key: google.cloud.dataplex.v1.Asset.DiscoveryStatus.SCHEDULED
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/01-service-MetadataService.t ................. 
+No subtests run 
+t/02-rest-transport-BusinessGlossaryService.t .. ok
+t/02-rest-transport-CatalogService.t ........... ok
+t/02-rest-transport-CmekService.t .............. ok
+t/02-rest-transport-DataProductService.t ....... ok
+t/02-rest-transport-DataScanService.t .......... ok
+t/02-rest-transport-DataTaxonomyService.t ...... ok
+PRE-CONDITION VIOLATION: mainpos_e (0x56244c3cb710) is NOT reachable from its head (0x56244c3cb5f0) at bucket 975
+  Collider Key: google.api.ORG_RESTRICTION_HEADER_INVALID
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/02-rest-transport-DataplexService.t .......... 
+No subtests run 
+PRE-CONDITION VIOLATION: mainpos_e (0x559720afb858) is NOT reachable from its head (0x559720afb840) at bucket 507
+  Collider Key: google.cloud.dataplex.v1.DataQualityRule.RuleSource.RulePathElement.EntryLinkSource
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/02-rest-transport-MetadataService.t .......... 
+No subtests run 
+t/manifest.t ................................... skipped: Author tests not required for installation
+t/pod-coverage.t ............................... skipped: Author/Release tests not required for installation
+t/pod.t ........................................ skipped: Author tests not required for installation
+
+Test Summary Report
+-------------------
+t/01-service-CmekService.t                   (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/01-service-DataScanService.t               (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/01-service-DataTaxonomyService.t           (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/01-service-MetadataService.t               (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/02-rest-transport-DataplexService.t        (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/02-rest-transport-MetadataService.t        (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+Files=20, Tests=33, 65 wallclock secs ( 0.11 usr  0.06 sys + 43.73 cusr  7.59 csys = 51.49 CPU)
+Result: FAIL

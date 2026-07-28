@@ -37,7 +37,7 @@ my $cache = CHI->new( driver => 'Memory', global => 1 );
 
 my $handler = Plack::App::Prerender->new(
     mech    => $mech,
-    rewrite => 'https://httpbin.org',
+    rewrite => 'https://example.com',
     cache   => $cache,
     wait    => 5,
 );
@@ -50,9 +50,14 @@ test_psgi
         my $req = GET '/';
         my $res = $cb->($req);
 
-        is $res->code, HTTP_OK, join( " ", $req->method, $req->uri );
+        {
+            my $todo = todo 'testing an external website';
+            $todo = undef unless $res->code >= HTTP_INTERNAL_SERVER_ERROR;
 
-        like $res->content, qr/react-text/, 'has dynamic text';
+            is $res->code, HTTP_OK, join( " ", $req->method, $req->uri );
+
+            like $res->content, qr/This domain is for use in documentation examples/, 'has text';
+        }
 
 };
 

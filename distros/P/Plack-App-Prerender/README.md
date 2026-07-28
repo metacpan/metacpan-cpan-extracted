@@ -2,10 +2,6 @@
 
 Plack::App::Prerender - a simple prerendering proxy for Plack
 
-# VERSION
-
-version v0.2.0
-
 # SYNOPSIS
 
 ```perl
@@ -30,131 +26,101 @@ my $app = Plack::App::Prerender->new(
 # DESCRIPTION
 
 This is a PSGI application that acts as a simple prerendering proxy
-for websites using Chrone.
+for websites using Chrome.
 
 This only supports GET requests, as this is intended as a proxy for
 search engines that do not support AJAX-generated content.
 
-# ATTRIBUTES
+# RECENT CHANGES
 
-## mech
+Changes for version v0.3.0 (2026-07-27)
 
-A [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW::Mechanize::Chrome) object. If omitted, a headless instance of
-Chrome will be launched.
+- Security
+    - Requests with no forward slash are now blocked, as these may allow the host to be changed (CVE-2026-17552).
+- Documentation
+    - Updated AUTHOR email address.
+    - Update copyright year.
+    - Added a SECURITY CONSIDERATIONS section.
+    - Fixed typos.
+    - Updated README with the UsefulReadme plugin.
+- Tests
+    - Tests changed to use example.com as httpbin.org is not responding.
+    - Tests will adapt when the external server is responding with HTTP 5xx errors.
+    - Add more author tests.
+- Toolchain
+    - Update the Dist::Zilla configuration.
+    - Releases are signed with SigStore.
 
-If you want to specify alternative options, you chould create your own
-instance of WWW::Mechanize::Chrome and pass it to the constructor.
+See the `Changes` file for more details.
 
-## rewrite
+# REQUIREMENTS
 
-This can either be a base URL prefix string, or a code reference that
-takes the PSGI `REQUEST_URI` and environment hash as arguments, and
-returns a full URL to pass to ["mech"](#mech).
+This module lists the following modules as runtime dependencies:
 
-If the code reference returns `undef`, then the request will abort
-with an HTTP 400.
+- [Encode](https://metacpan.org/pod/Encode)
+- [HTTP::Headers](https://metacpan.org/pod/HTTP%3A%3AHeaders)
+- [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest)
+- [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus)
+- [Plack::Component](https://metacpan.org/pod/Plack%3A%3AComponent)
+- [Plack::Request](https://metacpan.org/pod/Plack%3A%3ARequest)
+- [Plack::Util](https://metacpan.org/pod/Plack%3A%3AUtil)
+- [Plack::Util::Accessor](https://metacpan.org/pod/Plack%3A%3AUtil%3A%3AAccessor)
+- [Ref::Util](https://metacpan.org/pod/Ref%3A%3AUtil)
+- [Time::Seconds](https://metacpan.org/pod/Time%3A%3ASeconds)
+- [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)
+- [parent](https://metacpan.org/pod/parent)
+- [perl](https://metacpan.org/pod/perl) version v5.10.1 or later
+- [strict](https://metacpan.org/pod/strict)
+- [warnings](https://metacpan.org/pod/warnings)
 
-If the code reference returns an array reference, then it assumes the
-request is a Plack response and simply returns it.
+See the `cpanfile` file for the full list of prerequisites.
 
-This can be used for simple request validation.  For example,
+# INSTALLATION
 
-```perl
-use Robots::Validate v0.2.0;
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
-sub validator {
-  my ($path, $env) = @_;
-
-  state $rv = Robots::Validate->new();
-
-  unless ( $rv->validate( $env ) ) {
-      if (my $logger = $env->{'psgix.logger'}) {
-         $logger->( { level => 'warn', message => 'not a bot!' } );
-      }
-      return [ 403, [], [] ];
-  }
-
-  ...
-}
+```
+cpan Plack::App::Prerender
 ```
 
-## cache
+You can also extract the distribution archive and install this module (along with any dependencies):
 
-This is the cache handling interface. See [CHI](https://metacpan.org/pod/CHI).
+```
+cpan .
+```
 
-If no cache is specified (v0.2.0), then the result will not be cached.
+You can also install this module manually using the following commands:
 
-## max\_age
+```
+perl Makefile.PL
+make
+make test
+make install
+```
 
-This is the maximum time (in seconds) to cache content.  If the page
-returns a `Cache-Control` header with a `max-age`, then that will be
-used instead.
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
 
-## request
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
+```
 
-This is a hash reference (since v0.2.0) of request headers to pass
-through the proxy.  The keys are the request header fieldss, and the
-values are the headers that will be passed to the ["rewrite"](#rewrite) URL.
+For more information, see the `INSTALL` file included with this distribution.
 
-Values of `1` will be a synonym for the same header, and false values
-will mean that the header is skipped.
+# SECURITY CONSIDERATIONS
 
-An array reference can be used to simply pass through a list of
-headers unchanged.
+By default, Chrome can access local files using the `file:` protocol.
 
-It will default to the following headers:
+By default, Chrome will run scripts.
 
-- `X-Forwarded-For`
-- `X-Forwarded-Host`
-- `X-Forwarded-Port`
-- `X-Forwarded-Proto`
+This should only be used for trusted websites, e.g. adding a prerendering proxy for your own website.
 
-The `User-Agent` is forwarded as `X-Forwarded-User-Agent`.
+# SUPPORT
 
-## response
+Only the latest version of this module will be supported.
 
-This is a hash reference (since v0.2.0) of request headers to return
-from the proxy.  The keys are the response header fields, and the
-values are the headers that will be returned from the proxy.
-
-Values of `1` will be a synonym for the same header, and false values
-will mean that the header is skipped.
-
-An array reference can be used to simply pass through a list of
-headers unchanged.
-
-It will default to the following headers:
-
-- `Content-Type`
-- `Expires`
-- `Last-Modified`
-
-## wait
-
-The number of seconds to wait for new content to be loaded.
-
-# LIMITATIONS
-
-This does not support cache invalidation or screenshot rendering.
-
-This only does the bare minimum necessary for proxying requests. You
-may need additional middleware for reverse proxies, logging, or
-security filtering.
-
-# SEE ALSO
-
-[Plack](https://metacpan.org/pod/Plack)
-
-[WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW::Mechanize::Chrome)
-
-Rendertron [https://github.com/GoogleChrome/rendertron](https://github.com/GoogleChrome/rendertron)
-
-# SOURCE
-
-The development version is on github at [https://github.com/robrwo/perl-Plack-App-Prerender](https://github.com/robrwo/perl-Plack-App-Prerender)
-and may be cloned from [git://github.com/robrwo/perl-Plack-App-Prerender.git](git://github.com/robrwo/perl-Plack-App-Prerender.git)
-
-# BUGS
+Future releases may only support Perl versions released in the last ten (10) years.
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/perl-Plack-App-Prerender/issues](https://github.com/robrwo/perl-Plack-App-Prerender/issues)
@@ -163,16 +129,34 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see `SECURITY.md` for instructions how to report security vulnerabilities.
+
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/perl-Plack-App-Prerender](https://github.com/robrwo/perl-Plack-App-Prerender)
+and may be cloned from [https://github.com/robrwo/perl-Plack-App-Prerender.git](https://github.com/robrwo/perl-Plack-App-Prerender.git)
+
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020, 2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+[Plack](https://metacpan.org/pod/Plack)
+
+[WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)
+
+Rendertron [https://github.com/GoogleChrome/rendertron](https://github.com/GoogleChrome/rendertron)

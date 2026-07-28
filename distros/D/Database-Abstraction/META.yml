@@ -57,6 +57,8 @@ requires:
   Params::Get: '0.13'
   Return::Set: '0'
   Scalar::Util: '0'
+  Sub::Private: '0'
+  Sub::Protected: '0'
   autodie: '0'
   boolean: '0'
   perl: '5.010'
@@ -65,5 +67,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.36'
+version: '0.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -39,14 +39,12 @@ perldoc Google::Auth
 
 You can also look for information at:
 
-- **RT, CPAN's request tracker (report bugs here):**  
-  https://rt.cpan.org/NoAuth/Bugs.html?Dist=google-auth-library-perl
-- **AnnoCPAN, Annotated CPAN documentation:**  
-  http://annocpan.org/dist/google-auth-library-perl
-- **CPAN Ratings:**  
-  https://cpanratings.perl.org/d/google-auth-library-perl
-- **Search CPAN:**  
-  https://metacpan.org/release/google-auth-library-perl
+- **GitHub Issue Tracker:**  
+  https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
+- **RT, CPAN's request tracker:**  
+  https://rt.cpan.org/Dist/Display.html?Name=Google-Auth
+- **MetaCPAN:**  
+  https://metacpan.org/release/Google-Auth
 
 ## License and Copyright
 

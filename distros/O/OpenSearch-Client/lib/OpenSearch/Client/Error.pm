@@ -20,7 +20,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Error;
-$OpenSearch::Client::Error::VERSION = '3.007009';
+$OpenSearch::Client::Error::VERSION = '3.007010';
 our $DEBUG = 0;
 
 @OpenSearch::Client::Error::Internal::ISA     = __PACKAGE__;
@@ -198,7 +198,7 @@ OpenSearch::Client::Error - Errors thrown by OpenSearch::Client
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 DESCRIPTION
 
@@ -240,7 +240,7 @@ has the following sub-classes:
 
 =item * C<OpenSearch::Client::Error::Unauthorized>
 
-Invalid (or no) username/password provided as C<userinfo> for a password
+Invalid (or no) username/password provided as C<username> and C<password> ( or C<userinfo> ) for a password
 protected service. These errors are triggered by the C<401> HTTP status code.
 
 =item * C<OpenSearch::Client::Error::Missing>

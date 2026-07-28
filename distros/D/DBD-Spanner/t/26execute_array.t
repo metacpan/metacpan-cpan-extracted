@@ -1,0 +1,14 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth = $dbh->prepare('INSERT INTO users (id, val) VALUES (?, ?)');
+my @col1 = (10, 20, 30);
+my @col2 = ('a', 'b', 'c');
+$sth->bind_param_array(1, \@col1);
+$sth->bind_param_array(2, \@col2);
+my $tuples = $sth->execute_array({ ArrayTupleStatus => [] });
+is($tuples, 3, 'execute_array processed 3 tuples');
+ok($sth, 'Statement handle active after batch execution');
+ok($dbh->ping(), 'Connection alive after batch execution');

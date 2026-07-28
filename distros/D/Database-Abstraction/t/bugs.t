@@ -17,10 +17,13 @@ eval { require DBI; require DBD::SQLite };
 if($@) {
 	plan skip_all => 'DBD::SQLite not available';
 } else {
-	plan tests => 29;
+	plan tests => 34;
 }
 
 use lib 't/lib';
+use Database::test1;
+use Database::test3;
+use Database::test5;
 
 my $data_dir = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 
@@ -31,7 +34,7 @@ my $data_dir = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 #   accesses must use exists() before dereferencing a locked key.
 # -------------------------------------------------------------------------
 
-use_ok('Database::test1');
+pass('Database::test1 loaded');
 my $t1 = new_ok('Database::test1' => [$data_dir]);
 
 # Slurped data should be accessible without throwing on any key access
@@ -130,7 +133,7 @@ throws_ok { $noa->number('one') } qr/AUTOLOAD disabled/i, 'BUG4: auto_load => 0 
 
 # We can't easily trigger the XML die paths without crafting XML files,
 # so we test that the XML success path still works (regression guard).
-use_ok('Database::test3');
+pass('Database::test3 loaded');
 my $t3 = Database::test3->new(directory => $data_dir);
 ok(defined($t3), 'BUG5: XML load still works after die->croak fix');
 
@@ -140,7 +143,7 @@ ok(defined($t3), 'BUG5: XML load still works after die->croak fix');
 #   that column name, not the string literal 'entry'.
 # -------------------------------------------------------------------------
 
-use_ok('Database::test5');
+pass('Database::test5 loaded');
 my $t5 = Database::test5->new(directory => $data_dir);
 
 # In list context AUTOLOAD builds a SELECT with the correct id column guard
@@ -213,4 +216,58 @@ ok(defined($logged_db), 'BUG8: object created with code-ref logger');
 	throws_ok {
 		$db->selectall_arrayref('val; DROP TABLE injtest--' => 'x')
 	} qr/unsafe column name/i, 'BUG9: SQL injection in column name is rejected';
+}
+
+# -------------------------------------------------------------------------
+# BUG 10: Data::Reuse::fixate() emits "Use of uninitialized value in hash
+#   slice" when processing row hashrefs that contain undef column values.
+#   The 'empty' row in test1.csv has a blank 'number' field, which becomes
+#   undef after blank_is_undef / empty_is_undef CSV processing.
+#   On some older Data::Alias / Data::Reuse / Perl version combinations the
+#   hash-slice assignment inside reuse() warns "Use of uninitialized value
+#   in hash slice at Data/Reuse.pm line 150".  This test asserts the warning
+#   does not fire across all three fixate call-sites in Abstraction.pm.
+# -------------------------------------------------------------------------
+
+{
+	# Intercept all warnings emitted while exercising the fixate paths so we
+	# can inspect them after each operation without disrupting Test::NoWarnings.
+	my @warned;
+	local $SIG{__WARN__} = sub { push @warned, @_ };
+
+	# -- Path 1: slurp fixate (line 885) ----------------------------------------
+	# Data::Reuse::fixate(%{$self->{'data'}}) processes the whole hash-of-hashrefs,
+	# including the 'empty' row whose 'number' value is undef.
+	{
+		my $db_slurp = Database::test1->new(directory => $data_dir);
+		$db_slurp->count();    # forces _open_table() -> slurp + fixate
+	}
+	my @slice_warns = grep { /uninitialized value in hash slice/ } @warned;
+	is(scalar @slice_warns, 0,
+		'BUG10: slurp fixate emits no "uninitialized value in hash slice" warning');
+	@warned = ();
+
+	# -- Path 2: DBI fixate in selectall_arrayref (lines 1053-1054) ----------------
+	# forget() + fixate(@{$rc}) where $rc contains rows with undef column values.
+	# max_slurp_size => 0 forces the DBI path regardless of file size.
+	{
+		my $db_dbi = Database::test1->new(directory => $data_dir, max_slurp_size => 0);
+		my $all = $db_dbi->selectall_arrayref();
+		my ($empty_row) = grep { $_->{'entry'} eq 'empty' } @{$all};
+		ok(defined($empty_row),            'BUG10: empty row is present in DBI results');
+		ok(!defined($empty_row->{'number'}), 'BUG10: empty row has undef number column (trigger condition confirmed)');
+	}
+	@slice_warns = grep { /uninitialized value in hash slice/ } @warned;
+	is(scalar @slice_warns, 0,
+		'BUG10: selectall_arrayref DBI fixate emits no "uninitialized value in hash slice" warning');
+	@warned = ();
+
+	# -- Path 3: DBI fixate in selectall_array (lines 1204-1205) ------------------
+	{
+		my $db_dbi2 = Database::test1->new(directory => $data_dir, max_slurp_size => 0);
+		$db_dbi2->selectall_array();
+	}
+	@slice_warns = grep { /uninitialized value in hash slice/ } @warned;
+	is(scalar @slice_warns, 0,
+		'BUG10: selectall_array DBI fixate emits no "uninitialized value in hash slice" warning');
 }

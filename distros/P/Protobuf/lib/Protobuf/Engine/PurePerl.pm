@@ -22,7 +22,7 @@ sub _init_iv_limits {
 sub _mdef {
     my ($self, $msg) = @_;
     return $msg->{_mdef} if defined $msg->{_mdef};
-    my $class = ref($msg) or return undef;
+    my $class = ref($msg) or return;
     return eval { $class->descriptor } || Protobuf::DescriptorPool->generated_pool->find_message_by_name($class);
 }
 
@@ -83,9 +83,9 @@ sub _default_value {
     } elsif ($type == 14) { # ENUM
         return 0;
     } elsif ($type == 11) { # MESSAGE
-        return undef;
+        return;
     }
-    return undef;
+    return;
 }
 
 sub set {
@@ -547,12 +547,12 @@ sub _decode_field {
         return unpack('V', $bytes);
     }
 
-    return undef;
+    return;
 }
 
 sub _get_perl_class_for_mdef {
     my ($self, $mdef) = @_;
-    return undef unless $mdef;
+    return unless $mdef;
 
     # XS mdef
     return $mdef->perl_class_name() if $mdef->can('perl_class_name');

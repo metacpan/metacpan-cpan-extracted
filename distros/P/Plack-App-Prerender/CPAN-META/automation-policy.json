@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "code_request",
+   "automated_contributions" : "code_request",
+   "code_generation" : "machine_generated",
+   "distribution" : "Plack-App-Prerender-v0.3.0",
+   "version" : 1
+}

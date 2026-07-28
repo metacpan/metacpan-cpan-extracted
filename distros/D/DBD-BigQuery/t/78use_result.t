@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 2;
+use DBI;
+my $dbh = DBI->connect('dbi:BigQuery:project=p;dataset=d', '', '');
+my $sth = $dbh->prepare('SELECT id FROM t');
+$sth->execute();
+my $r = $sth->fetchrow_arrayref();
+ok($r, 'Fetched result row');
+ok(!$sth->fetchrow_arrayref(), 'Stream finished');

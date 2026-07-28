@@ -1,0 +1,443 @@
+#!/usr/bin/env perl
+# ======================================================================
+# ABSTRACT: CLI tool to query the World Register of Marine Species
+# ======================================================================
+# (C) 2012 by A. Weidauer
+# Contact: alex.weidauer@huckfinn.de
+# ======================================================================
+# TODO: Investigate the fuzzy mode
+# ======================================================================
+use v5.20;
+use strict;
+use warnings;
+use utf8;
+
+# Packages -------------------------------------------------------------
+use Pod::Usage qw(pod2usage);
+use Getopt::Long qw(:config no_ignore_case bundling);
+use Data::Dumper;
+use Net::WoRMS;
+use Getopt::Long;
+
+# Modern Perl ----------------------------------------------------------
+use Syntax::Keyword::Match;
+use feature qw(signatures);
+no warnings 'once';
+no warnings 'experimental';
+no warnings 'experimental::signatures';
+
+# GLOBALS ==============================================================
+my $DEBUG = 0;
+my $VERSION = $Net::WoRMS::VERSION;
+my $HELP_INFO = "Use $0 --help for further info.";
+
+# SOAP Client Preparation ----------------------------------------------
+# Defaults are provided by Net::WoRMS
+my $END_POINT;
+my $APHIA_NS;
+my $APHIA_URI;
+
+# Data/pattern for command line parameter ------------------------------
+my $FORMAT = "TEXT";
+my @PARAMS;
+my $TASK;
+
+# Usage sugar: help, man and version for the CLI -----------------------
+my $IS_MANUAL;   # Flag show man page
+my $IS_HELP;     # Flag show help page
+my $IS_VERSION;  # Flag show version
+
+# Parse CLI ============================================================
+my ($FIND_ID, $FIND_REC, $FIND_FUZ, $GET_REC, $GET_CHILDS) = (1,2,3,4,5);
+my %TASKS = (
+    'find-id'       => [$FIND_ID,   'STR', '' ],
+    'find-record'   => [$FIND_REC,  'STR', '' ],
+     # 'find-fuzzy' => [$FIND_FUZ,  'STR', '' ],
+    'get-record'    => [$GET_REC,   'INT', 0  ],
+    'get-children'  => [$GET_CHILDS,'INT', 0  ],
+);
+
+# Parse CLI ============================================================
+GetOptions(
+    "aphia-ns=s"       => \$APHIA_NS,
+    "aphia-uri=s"      => \$APHIA_URI,
+    "D|debug"          => \$DEBUG,
+    "endpoint"         => \$END_POINT,
+    "f|format=s"       => \$FORMAT,
+    "h|help"           => \$IS_HELP,
+    "m|man"            => \$IS_MANUAL,
+    "v|version"        => \$IS_VERSION,
+    "<>"               => sub { my $arg = shift; push @PARAMS, $arg; }
+) or die("ERROR: Invalid command line parameter!\n $HELP_INFO\n");
+;
+# Program Info =========================================================
+# Show help if needed
+pod2usage( -verbose => 1, -exitval => 0 ) if $IS_HELP;
+
+# Show man page
+pod2usage( -verbose => 2 ) if $IS_MANUAL;
+
+# Print program version
+&showVersion if $IS_VERSION;
+
+# Parameter Check ======================================================
+my $WORMS = Net::WoRMS->new();
+$TASK    = getTask(\@PARAMS);
+$FORMAT  = getFormat($WORMS, $FORMAT);
+
+# Change the aphia-namespace, aphia-uri or the endpoint not tested
+# because never needed before (for completeness).
+$WORMS->changeAphiaURI($APHIA_URI) if $APHIA_URI;
+$WORMS->changeAphiaNS($APHIA_NS)   if $APHIA_NS;
+$WORMS->changeEndPoint($END_POINT) if $END_POINT;
+$WORMS->changeFormat($FORMAT);
+$WORMS->changeDebug(1) if $DEBUG;
+$WORMS->init();
+
+# Main =================================================================
+my ($do, $type, $param) = @$TASK;
+match($do : == ) {
+
+    # find-id
+    case($FIND_ID) {  $WORMS->searchSpeciesID($param,1); }
+
+    # find-record
+    case($FIND_REC) {
+      my $id  = $WORMS->searchSpeciesID($param,0);
+      my $rec = $WORMS->getRecordByID($id);
+      $WORMS->printRecord($rec,1,1,"");
+    }
+
+    # find-fuzzy experimental
+    #   offset funktioniert nicht!
+    # case($FIND_FUZ) {
+    #  $WORMS->searchFuzzy($param, 0, $FUZZY);
+    # }
+    
+    # get-record
+    case($GET_REC) {
+      my $rec = $WORMS->getRecordByID($param);
+      $WORMS->printRecord($rec,1,1,"");
+    }
+    # get-children
+    case($GET_CHILDS) {
+      $WORMS->getChildrenByID($param);
+    }
+
+}
+
+# Service Routines =====================================================
+
+sub getTask($params) {
+
+    # Get task and parameter
+    &errorMissingTask unless scalar(@$params) == 2;
+    my $task  = $params->[0];
+    my $param = $params->[1];
+
+    # Find task and config in the tas dictionary
+    my $result = $TASKS{lc($task)};
+    &errorWrongTask($task) unless $result;
+
+    # Match the parameter ageinst the task
+    die &errorMissingParam($task) unless $param;
+    my $type = $result->[1];
+    if ($type eq 'INT') {
+        die &errorInvalidParam($task, $param) unless ( $param =~ /^\d+/ );
+    }
+
+    # Prepare the result
+    $result->[2] = $param;
+    return $result;
+}
+
+sub getFormat($worms, $format) {
+    my $formats = $worms->getFormats();
+    my $result  = $formats->{uc($format)};
+    errorInvalidFormat($format, $formats) unless $result;
+    return uc($format);
+}
+
+# Error messages -------------------------------------------------------
+sub errorInvalidFormat($format, $formats) {
+    my $flist = join('|',sort(keys(%$formats)));
+    die "ERROR: Invalid output FORMAT: '$format'!\n".
+        "Valid formats are '$flist'!\n$HELP_INFO\n";
+}
+
+sub errorInvalidParam($task, $param) {
+    die "ERROR: Invalid number FORMAT: '$param' for TASK: '$task'!\n";
+}
+
+sub errorMissingTask {
+    die "ERROR: Missing task and/or parameter! $HELP_INFO\n";
+}
+
+sub errorMissingParam($task) {
+    die "ERROR: Missing PARAMETER: 'ID|NAME' for TASK: '$task'! ".
+        "$HELP_INFO\n";
+}
+
+sub errWrongTask($task) {
+    die "ERROR: Unknown TASK: '$task'! $HELP_INFO\n";
+}
+
+# Usage suger ----------------------------------------------------------
+sub showVersion() {
+    print $VERSION,"\n";
+    exit 0;
+}
+
+__END__
+
+# Help text ============================================================
+
+=pod
+
+=head1 NAME
+
+query-worms - CLI tool to query the World Register of Marine Species
+
+=head1 SYNOPSIS
+
+    query-worms --help
+    query-worms --man
+    query-worms TASK PARAM [--format TEXT|CSV|SQL] [--debug]
+    query-worms find-id     'Abra truncata'
+    query-worms find-record 'Abra alba'
+    query-worms get-record   507245
+    query-worms get-children 138474
+
+=head1 DESCRIPTION
+
+ The tool is Q&D solution to read and search datasets from the
+ taxonomic database WoRMS.  WoRMS is a register for marine
+ species. The aim of a World Register of Marine Species (WoRMS) is to
+ provide an authoritative and comprehensive list of names of marine
+ organisms, including information on synonymy. While highest priority
+ goes to valid names, other names in use are included so that this
+ register can serve as a guide to interpret taxonomic literature.
+
+ http://www.marinespecies.org/
+
+=head1 TASKS
+
+=over 4
+
+=item find-id NAME
+
+Find a WoRMS taxon ID (called AphiaID) by an name.
+
+=item find-record NAME
+
+Find WoRMS taxon record by name.
+
+=item get-children ID
+
+Get sub sequent taxa of a certain level for a specific AphiaID.
+Please be careful, lists for some taxa could be be large.
+
+=item get-record ID
+
+Get the data record for a specific AphiaID.
+
+=back
+
+=head1 PARAMETER
+
+=over 4
+
+=item NAME
+
+A NAME addresses a scientific name for a taxon. You can use taxa
+expression of different ranks like 'Animalia', 'Annelida', 'Abra' or
+'Abra alba'.
+
+
+=item ID
+
+An ID is a numeric key in WoRMS called AphiaID. You can start an
+investigation on the top level using:
+
+     query-worms get-children 1 | grep ' NAME'
+
+=back
+
+=head1 OPTIONEN
+
+=over 4
+
+=item -h, --help
+
+Show help advise.
+
+=item -m, --man
+
+Show manpage
+
+=item -v, --version
+
+Show version
+
+=item -D, --debug
+
+Debug queries.
+
+=item -f --format TEXT|CSV|SQL
+
+Output format
+
+=back
+
+=head1 Output formats
+
+The tool gives you different output structures for each
+operation mode (get-record, find-record, etc...).
+
+=over 4
+
+=item find-id NAME
+
+You will get the key (AphiaID) for the addressed taxon.
+
+=back
+
+=over 8
+
+=item FORMAT TEXT
+
+INT APHIA.ID 550560
+
+=item FORMAT SQL
+
+APHIA_ID = 550560
+
+=item FORMAT CSV
+
+550560
+
+=back
+
+=over 4
+
+=item find-record, get-record NAME
+
+  Record for species datasets
+
+=back
+
+=over 8
+
+=item FORMAT TEXT
+
+    WORMS ID 138474
+         INT         APHIA.ID 138474
+         STR             NAME 'Abra'
+         STR           AUTHOR 'Lamarck, 1818'
+         STR             RANK 'Genus'
+         STR           STATUS 'accepted'
+         INT   VALID.APHIA.ID 138474
+         STR       VALID.NAME 'Abra'
+         STR     VALID.AUTHOR 'Lamarck, 1818'
+         STR          KINGDOM 'Animalia'
+         STR           PHYLUM 'Mollusca'
+         STR            CLASS 'Bivalvia'
+         STR            ORDER 'Cardiida'
+         STR           FAMILY 'Semelidae'
+         STR            GENUS 'Abra'
+         STR         CITATION 'MolluscaBase eds. (2026). MolluscaBase. Abra Lamarck, 1818. Accessed through: World Register of Marine Species at: https://www.marinespecies.org/aphia.php?p=taxdetails&id=138474 on 2026-07-28'
+    EOF
+
+=item FORMAT SQL
+
+    INSERT INTO WORMS_TABLE \
+    (APHIA_ID,NAME,AUTHOR,RANK,STATUS,VALID_APHIA_ID,VALID_NAME,\
+     VALID_AUTHOR,RNK_KINGDOM,RNK_PHYLUM,RNK_CLASS,RNK_ORDER,
+     RNK_FAMILY,RNK_GENUS,CITATION) VALUES \
+
+    (138474,'Abra','Lamarck, 1818','Genus','accepted',138474,'Abra',\
+    'Lamarck, 1818','Animalia','Mollusca','Bivalvia','Cardiida', \
+    'Semelidae','Abra',\
+    'MolluscaBase eds. (2026). MolluscaBase. Abra Lamarck, 1818. Accessed through: World Register of Marine Species at: https://www.marinespecies.org/aphia.php?p=taxdetails&id=138474 on 2026-07-28');
+
+=item FORMAT CSV
+
+    APHIA_ID,NAME,AUTHOR,RANK,STATUS,VALID_APHIA_ID,VALID_NAME,\
+    VALID_AUTHOR,RNK_KINGDOM,RNK_PHYLUM,RNK_CLASS,RNK_ORDER,\
+    RNK_FAMILY,RNK_GENUS,CITATION
+    138474,'Abra','Lamarck, 1818','Genus','accepted',138474,'Abra',\
+    'Lamarck, 1818','Animalia','Mollusca','Bivalvia','Cardiida',\
+    'Semelidae','Abra','MolluscaBase eds. (2026). MolluscaBase. Abra Lamarck, 1818. Accessed through: World Register of Marine Species at: https://www.marinespecies.org/aphia.php?p=taxdetails&id=138474 on 2026-07-28'
+
+=back
+
+=over 4
+
+=item get-children ID
+
+A list of secord for pattern search or species groups
+
+=back
+
+=over 8
+
+=item FORMAT TEXT (Default config)
+
+WORMS.CHILDREN ID XXXXX
+
+ WORMS ID 550560
+    STRING  VALID.NAME     'Pontoporeia affinis'
+    STRING  STATUS         'unaccepted'
+  ...
+  EOF
+  ...
+EOF
+
+=item FORMAT SQL
+
+ INSERT INTO WORMS_TABLE
+
+  (APHIA_ID, NAME, AUTHOR, STATUS, CITE, RANK,
+   VALID_APHIA_ID, VALID_NAME, VALID_AUTHOR,
+   RNK_KINGDOM, RNK_PHYLUM, RNK_CLASS,
+   RNK_ORDER,  RNK_FAMILY,  RNK_GENUS)
+
+ VALUES
+
+  (550560,'Pontoporeia affinis','Ekman, 1913',
+   'unaccepted','Lowry, J. (2012). Pontoporeia ..',
+   'Species',103078,'Pontoporeia affinis',
+   'Lindstroem, 1855',
+   'Animalia','Arthropoda','Amphipoda',
+   'Malacostraca','Pontoporeiidae','Pontoporeia')
+
+  (550561,'Pontoporeia ...'...),
+  ...;
+
+=item FORMAT CSV
+
+    LINE1: APHIA_ID,NAME,AUTHOR, ...
+    LINE2: 50560,'Pontoporeia affinis','Ekman, 1913',...
+    LINE3: 550560,'Pontoporeia ...',...,...
+    LINE4: ...
+
+=back
+
+=head1 LICENSE
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or any later
+version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
+
+# EOF ==================================================================

@@ -5,10 +5,10 @@ requires 'perl', '5.010';
 requires 'Carp';
 requires 'Class::Abstract';
 requires 'Cwd';
-requires 'DBI', '1.6';
 requires 'DBD::SQLite::Constants';
-requires 'Data::Reuse';
-requires 'ExtUtils::MakeMaker', '6.64';
+requires 'DBI', '1.6';
+requires 'Data::Reuse';   # Required for result-set memory deduplication; see also RT#100461
+requires 'ExtUtils::MakeMaker', '6.64';   # 6.64 for TEST_REQUIRES
 requires 'File::Spec';
 requires 'File::Temp';
 requires 'List::Util', '1.33';
@@ -17,13 +17,15 @@ requires 'Object::Configure', '0.16';
 requires 'Params::Get', '0.13';
 requires 'Return::Set';
 requires 'Scalar::Util';
+requires 'Sub::Private';
+requires 'Sub::Protected';
 requires 'autodie';
 requires 'boolean';
 requires 'strict';
 requires 'warnings';
 
 on 'configure' => sub {
-	requires 'ExtUtils::MakeMaker', '6.64';
+	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 };
 
 on 'test' => sub {

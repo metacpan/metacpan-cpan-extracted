@@ -31,7 +31,7 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Starter-Protobuf
+        https://rt.cpan.org/Dist/Display.html?Name=Module-Starter-Protobuf
 
     Search CPAN
         https://metacpan.org/release/Module-Starter-Protobuf

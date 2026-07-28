@@ -1,5 +1,38 @@
 Revision history for App-GHGen
 
+0.07	Mon Jul 27 15:32:43 EDT 2026
+	[ Bug Fixes ]
+	- Added matrix exclusion for windows-latest + perl 5.40.  The
+	  shogo82148/build-perl perl-5.40.4-thr-win32-x64.zip ships a perl.exe
+	  and a libperl540.a from two different builds: any XS module compiled
+	  against that libperl540.a (handshake key 0x12c00080) mismatches the
+	  running perl.exe (needs 0x12d00080).  Even Win32::Process — a core
+	  Windows XS module bundled in the zip and loaded by IPC::System::Simple
+	  — fails to load, so no XS-using test can pass on this combination.
+	  The previous workaround (cpanm --reinstall YAML::XS) cannot help
+	  because the compilation itself uses the broken libperl540.a.
+	  Exclusion is emitted only when both 'windows-latest' and '5.40' are
+	  in the matrix; custom OS or Perl lists that omit either are unaffected.
+	  See https://github.com/shogo82148/actions-setup-perl/issues/2310 for further information.
+	- Added defensive Windows step "Reinstall YAML::XS against current Perl"
+	  (`cpanm --notest --reinstall YAML::XS`) to ensure a freshly compiled
+	  YAML::XS.dll lands in site/lib (which precedes the bundled lib in @INC)
+	  for cases where the shogo82148 Perl zip bundles a stale XS DLL and the
+	  toolchain (perl.exe + libperl.a) is internally consistent.
+	- Removed .github/workflows/perl-ci.yml from the cache key. Including the workflow file
+	  hash caused unnecessary full cache invalidation on every comment or whitespace edit to
+	  the workflow; it provided no meaningful safety guarantee beyond the cpanfile hash.
+	- Strengthened the cache key further: a dedicated cross-platform step (shell: perl {0})
+	  fingerprints the actual Perl binary files using unpack('%32C*',...) + read() so no
+	  extra CPAN modules are needed. On Windows the Perl runtime DLL (e.g. perl540.dll) is
+	  also read alongside perl.exe. The checksum combined with $Config{archname} is appended
+	  to $Config{version} to form the final cache key.
+	  Rationale: Strawberry Perl occasionally re-releases the same Perl version (e.g. 5.40.0)
+	  with a recompiled DLL that changes the XS handshake key but leaves $Config{version}
+	  unchanged. Reading the binary detects any such change without requiring Digest::MD5.
+	  (An earlier Digest::MD5->addfile approach failed on some runners with "Can't use an
+	  undefined value as filehandle reference"; read + unpack avoids that entirely.)
+
 0.06	Fri Jul 17 11:39:03 EDT 2026
 	[ Bug Fixes ]
 	- Approved https://github.com/nigelhorne/App-GHGen/pull/6

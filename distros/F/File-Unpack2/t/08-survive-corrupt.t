@@ -10,6 +10,11 @@ $SIG{ALRM} = sub { die "TIMEOUT: possible unpacker hang in ".__FILE__."\n" }; al
 use JSON;
 use Data::Dumper;
 
+# This test is entirely about PDF handling, which is dispatched to pdftotext
+# (poppler-tools). Distro build chroots often lack it, so skip cleanly rather
+# than fail - the same way t/04 skips when unzip is missing.
+plan skip_all => 'pdftotext (poppler-tools) not installed' unless -x '/usr/bin/pdftotext';
+
 my $bad = 't/data/bad34.pdf';
 my $good = 't/data/good10.pdf';
 my $destdir = File::Temp::tempdir("FU_06_XXXXX", TMPDIR => 1, CLEANUP => 1);

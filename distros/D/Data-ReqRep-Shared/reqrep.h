@@ -211,9 +211,29 @@ static inline RespSlotHeader *reqrep_resp_slot(ReqRepHandle *h, uint32_t idx) {
 #define REQREP_MUTEX_PID_MASK   0x7FFFFFFFU
 #define REQREP_MUTEX_VAL(pid)   (REQREP_MUTEX_WRITER_BIT | ((uint32_t)(pid) & REQREP_MUTEX_PID_MASK))
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int reqrep_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int reqrep_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !reqrep_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 static const struct timespec reqrep_lock_timeout = { REQREP_LOCK_TIMEOUT_SEC, 0 };
@@ -316,6 +336,7 @@ static inline int reqrep_remaining_time(const struct timespec *deadline,
 
 static inline void reqrep_make_deadline(double timeout, struct timespec *deadline) {
     clock_gettime(CLOCK_MONOTONIC, deadline);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     deadline->tv_sec += (time_t)timeout;
     deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
     if (deadline->tv_nsec >= 1000000000L) {
@@ -348,11 +369,11 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
 
     /* Recover stale slots from dead processes (both ACQUIRED and READY).
      *
-     * ABA-safe pattern (mirrors Pool's recover_stale): CAS owner_pid dead→0
+     * ABA-safe pattern (mirrors Pool's recover_stale): CAS owner_pid dead->0
      * FIRST to claim exclusive recovery rights. Without this, two recoverers
      * (or a recoverer racing a free+fresh-acquire cycle) can both see
      * state==ACQUIRED and the same dead PID, both race their state CAS, and
-     * the loser silently clobbers a live owner — the constant RESP_ACQUIRED
+     * the loser silently clobbers a live owner -- the constant RESP_ACQUIRED
      * value is identical across acquisitions, so the state CAS alone cannot
      * detect the recycle.
      *
@@ -367,7 +388,7 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
         if (!pid || reqrep_pid_alive(pid)) continue;
 
         /* Claim exclusive recovery rights by CASing the dead owner to 0.
-         * Loser of this race exits — winner of state CAS would have already
+         * Loser of this race exits -- winner of state CAS would have already
          * progressed; we can't safely race the state transition. */
         uint32_t expected_pid = pid;
         if (!__atomic_compare_exchange_n(&slot->owner_pid, &expected_pid, 0,
@@ -375,7 +396,7 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
             continue;
 
         /* We own the recovery now. Drive state to FREE; retry on transient
-         * ACQUIRED→READY (reply arrived after death) until state is FREE.
+         * ACQUIRED->READY (reply arrived after death) until state is FREE.
          * If clear() or another path beat us, state==FREE already.
          * State can only be 0/1/2; CAS-on-fail sets cur_state to current. */
         uint32_t cur_state = state;
@@ -386,7 +407,7 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
         }
         __atomic_add_fetch(&h->hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
 
-        /* Now claim FREE→ACQUIRED for ourselves. */
+        /* Now claim FREE->ACQUIRED for ourselves. */
         uint32_t expected = RESP_FREE;
         if (__atomic_compare_exchange_n(&slot->state, &expected, RESP_ACQUIRED,
                 0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
@@ -410,7 +431,7 @@ static int32_t reqrep_slot_acquire(ReqRepHandle *h) {
  *      either way, the slot is no longer ours and the release is a no-op.
  *   2. Single-shot CAS state from_state -> FREE. If state is unexpected
  *      (already FREE from clear, or ACQUIRED again from a fresh acquirer
- *      after clear), CAS-on-fail is a no-op — fresh acquirer's claim is
+ *      after clear), CAS-on-fail is a no-op -- fresh acquirer's claim is
  *      preserved.
  *
  * Without step 1, a blind state CAS from RESP_ACQUIRED -> FREE would
@@ -640,6 +661,10 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            REQREP_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)total_size) < 0) {
                 REQREP_ERR("ftruncate(%s): %s", path, strerror(errno));
@@ -1057,17 +1082,17 @@ static int reqrep_recv_wait(ReqRepHandle *h, const char **out_str,
  *
  * Stale-detection race: the gen check at top + CAS at bottom is TOCTOU on
  * the generation counter. Between them, the original owner may cancel
- * (state→FREE, gen++) and a new owner may re-acquire (state→ACQUIRED,
- * gen++) — leaving state==ACQUIRED (same numeric value) but gen advanced.
+ * (state->FREE, gen++) and a new owner may re-acquire (state->ACQUIRED,
+ * gen++) -- leaving state==ACQUIRED (same numeric value) but gen advanced.
  * The CAS, which only compares state, would silently publish our data
  * into the new owner's slot, who'd then read it as their reply.
  *
  * Fix: re-verify gen immediately before the publishing CAS, and re-verify
  * once more AFTER the CAS. If the post-CAS gen check fails, we've already
- * published READY against a wrong-owner slot — issue a corrective generation
+ * published READY against a wrong-owner slot -- issue a corrective generation
  * bump + state reset to invalidate the wrong owner's id. They will see
  * -4 (stale) from get_wait, which is the same outcome as if they had been
- * cancelled — preferable to data corruption. */
+ * cancelled -- preferable to data corruption. */
 static int reqrep_reply(ReqRepHandle *h, uint64_t id,
                          const char *str, uint32_t len, bool utf8) {
     uint32_t slot_idx = REQREP_ID_SLOT(id);
@@ -1090,7 +1115,7 @@ static int reqrep_reply(ReqRepHandle *h, uint64_t id,
     if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen)
         return -2;
 
-    /* CAS ACQUIRED→READY (with RELEASE to publish data writes). */
+    /* CAS ACQUIRED->READY (with RELEASE to publish data writes). */
     uint32_t expected_state = RESP_ACQUIRED;
     if (!__atomic_compare_exchange_n(&slot->state, &expected_state, RESP_READY,
             0, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
@@ -1133,6 +1158,10 @@ static int reqrep_try_get(ReqRepHandle *h, uint64_t id,
     if (state != RESP_READY) return 0;
 
     uint32_t len = slot->resp_len;
+    /* resp_len is peer/file-writable shared state; bound it against the slot's
+     * data capacity before the copy, exactly as the request path clamps
+     * arena_off+len (reqrep_recv_locked). A corrupt slot delivers empty. */
+    if (len > h->resp_data_max) len = 0;
     *out_utf8 = (slot->resp_flags & 1) != 0;
 
     if (!reqrep_ensure_copy_buf(h, len + 1)) return -2;
@@ -1143,7 +1172,7 @@ static int reqrep_try_get(ReqRepHandle *h, uint64_t id,
     *out_str = h->copy_buf;
     *out_len = len;
 
-    /* CAS READY→FREE so a fresh acquirer (after clear/recovery raced our
+    /* CAS READY->FREE so a fresh acquirer (after clear/recovery raced our
      * read) keeps their slot. */
     reqrep_slot_release_from(h, slot_idx, RESP_READY);
     return 1;
@@ -1203,8 +1232,8 @@ static int reqrep_get_wait(ReqRepHandle *h, uint64_t id,
     }
 }
 
-/* Cancel a pending request — CAS ACQUIRED→FREE only if generation matches.
- * If the reply already arrived (READY), cancel is a no-op — call get() to drain. */
+/* Cancel a pending request -- CAS ACQUIRED->FREE only if generation matches.
+ * If the reply already arrived (READY), cancel is a no-op -- call get() to drain. */
 static void reqrep_cancel(ReqRepHandle *h, uint64_t id) {
     uint32_t slot_idx = REQREP_ID_SLOT(id);
     uint32_t expected_gen = REQREP_ID_GEN(id);
@@ -1299,7 +1328,7 @@ static void reqrep_clear(ReqRepHandle *h) {
     reqrep_mutex_unlock(hdr);
 
     /* Release all in-flight response slots so get_wait callers unblock.
-     * Retry CAS if reply races us (ACQUIRED→READY between load and CAS). */
+     * Retry CAS if reply races us (ACQUIRED->READY between load and CAS). */
     for (uint32_t i = 0; i < h->resp_slots; i++) {
         RespSlotHeader *slot = reqrep_resp_slot(h, i);
         uint32_t state = __atomic_load_n(&slot->state, __ATOMIC_ACQUIRE);
@@ -1313,7 +1342,7 @@ static void reqrep_clear(ReqRepHandle *h) {
                     syscall(SYS_futex, &slot->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
                 break;
             }
-            /* CAS failed — state updated with actual value; retry if still valid */
+            /* CAS failed -- state updated with actual value; retry if still valid */
         }
     }
 
@@ -1327,11 +1356,11 @@ static inline int reqrep_sync(ReqRepHandle *h) {
 }
 
 /* ================================================================
- * eventfd — event-loop integration
+ * eventfd -- event-loop integration
  *
  * Two separate eventfds:
- *   notify_fd — request notification (client -> server: "new request")
- *   reply_fd  — reply notification (server -> client: "response ready")
+ *   notify_fd -- request notification (client -> server: "new request")
+ *   reply_fd  -- reply notification (server -> client: "response ready")
  * ================================================================ */
 
 static inline int reqrep_eventfd_create(ReqRepHandle *h) {
@@ -1470,6 +1499,10 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
         if (!is_new && (uint64_t)st.st_size < sizeof(ReqRepHeader)) {
             REQREP_ERR("%s: file too small", path); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            REQREP_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total_size) < 0) {
             REQREP_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -1541,7 +1574,10 @@ static inline int reqrep_int_try_send(ReqRepHandle *h, int64_t value, uint64_t *
     uint32_t gen = __atomic_load_n(&rs->generation, __ATOMIC_ACQUIRE);
 
     ReqRepHeader *hdr = h->hdr;
-    ReqIntSlot *slots = (ReqIntSlot *)((char *)h->hdr + hdr->req_slots_off);
+    /* Use the attach-cached, validated slot base -- never re-derive from the
+     * peer-writable hdr->req_slots_off, which a lock-violating peer could
+     * corrupt to relocate the array under us. */
+    ReqIntSlot *slots = (ReqIntSlot *)h->req_slots;
     uint32_t mask = h->req_cap_mask;
     uint64_t pos = __atomic_load_n(&hdr->req_tail, __ATOMIC_RELAXED);
 
@@ -1614,7 +1650,8 @@ static int reqrep_int_send_wait(ReqRepHandle *h, int64_t value,
 
 static inline int reqrep_int_try_recv(ReqRepHandle *h, int64_t *out_value, uint64_t *out_id) {
     ReqRepHeader *hdr = h->hdr;
-    ReqIntSlot *slots = (ReqIntSlot *)((char *)hdr + hdr->req_slots_off);
+    /* Attach-cached, validated slot base (see reqrep_int_try_send). */
+    ReqIntSlot *slots = (ReqIntSlot *)h->req_slots;
     uint32_t mask = h->req_cap_mask;
     uint64_t pos = __atomic_load_n(&hdr->req_head, __ATOMIC_RELAXED);
     for (;;) {
@@ -1699,7 +1736,7 @@ static int reqrep_int_reply(ReqRepHandle *h, uint64_t id, int64_t value) {
             0, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
         return -2;
 
-    /* Post-CAS verification — invalidate the wrong owner if we raced. */
+    /* Post-CAS verification -- invalidate the wrong owner if we raced. */
     if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != expected_gen) {
         __atomic_add_fetch(&slot->generation, 1, __ATOMIC_RELEASE);
         __atomic_store_n(&slot->owner_pid, 0, __ATOMIC_RELAXED);
@@ -1729,7 +1766,7 @@ static int reqrep_int_try_get(ReqRepHandle *h, uint64_t id, int64_t *out_value) 
     if (state != RESP_READY) return 0;
 
     *out_value = *(int64_t *)((uint8_t *)slot + sizeof(RespSlotHeader));
-    /* CAS READY→FREE — see reqrep_try_get release comment. */
+    /* CAS READY->FREE -- see reqrep_try_get release comment. */
     reqrep_slot_release_from(h, slot_idx, RESP_READY);
     return 1;
 }
@@ -1749,7 +1786,7 @@ static int reqrep_int_get_wait(ReqRepHandle *h, uint64_t id, int64_t *out_value,
         if (state == RESP_READY)
             return reqrep_int_try_get(h, id, out_value);
         __atomic_add_fetch(&slot->waiters, 1, __ATOMIC_RELEASE);
-        /* StoreLoad barrier: see reqrep_recv_wait's slot path — publish
+        /* StoreLoad barrier: see reqrep_recv_wait's slot path -- publish
          * slot->waiters++ before re-reading generation/state. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         if (__atomic_load_n(&slot->generation, __ATOMIC_ACQUIRE) != REQREP_ID_GEN(id)) {
@@ -1813,10 +1850,11 @@ static void reqrep_int_clear(ReqRepHandle *h) {
     ReqRepHeader *hdr = h->hdr;
 
     /* Reset Vyukov queue: head/tail to 0, reinit sequence numbers.
-     * Use atomic stores — concurrent readers use atomic loads on these. */
+     * Use atomic stores -- concurrent readers use atomic loads on these. */
     __atomic_store_n(&hdr->req_head, 0, __ATOMIC_RELAXED);
     __atomic_store_n(&hdr->req_tail, 0, __ATOMIC_RELAXED);
-    ReqIntSlot *slots = (ReqIntSlot *)((char *)hdr + hdr->req_slots_off);
+    /* Attach-cached, validated slot base (see reqrep_int_try_send). */
+    ReqIntSlot *slots = (ReqIntSlot *)h->req_slots;
     for (uint32_t i = 0; i < h->req_cap; i++)
         __atomic_store_n(&slots[i].sequence, (uint64_t)i, __ATOMIC_RELAXED);
     __atomic_thread_fence(__ATOMIC_SEQ_CST);

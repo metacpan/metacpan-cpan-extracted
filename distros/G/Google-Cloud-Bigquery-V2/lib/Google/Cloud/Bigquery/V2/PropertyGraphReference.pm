@@ -1,21 +1,10 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::PropertyGraphReference;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
@@ -23,35 +12,39 @@ use MIME::Base64;
 
 BEGIN {
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
-    eval { require Datapol::SemanticAnnotations };
     my $descriptor_b64 = <<'EOF';
 Cjdnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcHJvcGVydHlfZ3JhcGhfcmVmZXJlbmNlLnBy
 b3RvEhhnb29nbGUuY2xvdWQuYmlncXVlcnkudjIaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZp
-b3IucHJvdG8aGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnByb3RvGjxzdG9yYWdlL2RhdGFwb2wv
-YW5ub3RhdGlvbnMvcHJvdG8vc2VtYW50aWNfYW5ub3RhdGlvbnMucHJvdG8ipgEKFlByb3Bl
-cnR5R3JhcGhSZWZlcmVuY2USKQoKcHJvamVjdF9pZBgBIAEoCUIK4EECoKDwmAHXCFIJcHJv
-amVjdElkEikKCmRhdGFzZXRfaWQYAiABKAlCCuBBAqCg8JgBzAhSCWRhdGFzZXRJZBI2ChFw
-cm9wZXJ0eV9ncmFwaF9pZBgDIAEoCUIK4EECoKDwmAHMCFIPcHJvcGVydHlHcmFwaElkQsQB
-Chxjb20uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnYyQhtQcm9wZXJ0eUdyYXBoUmVmZXJlbmNl
-UHJvdG9QAVo7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92Mi9hcGl2Mi9iaWdxdWVy
-eXBiO2JpZ3F1ZXJ5cGKK1dvSD0QKQnBhY2thZ2U6dGhpcmRfcGFydHkvamF2YS9jZWwvdG9v
-bHMvc3JjL3Rlc3QvamF2YS9kZXYvY2VsL3Rvb2xzL21jcEqvBgoGEgQAACUBCggKAQwSAwAA
-EgoICgECEgMCACEKCQoCAwASAwQAKQoJCgIDARIDBQAkCgkKAgMCEgMGAEYKCAoBCBIDCABS
-CgkKAggLEgMIAFIKCAoBCBIDCQAiCgkKAggKEgMJACIKCAoBCBIDCgA1CgkKAggBEgMKADUK
-CAoBCBIDCwA8CgkKAggIEgMLADwKCQoBCBIEDAAOAgoOCgYI0bqr+gESBAwADgIKKgoCBAAS
-BBEAJQEaHiBJZCBwYXRoIG9mIGEgcHJvcGVydHkgZ3JhcGguCgoKCgMEAAESAxEIHgpFCgQE
-AAIAEgQTAhYEGjcgVGhlIElEIG9mIHRoZSBwcm9qZWN0IGNvbnRhaW5pbmcgdGhpcyBwcm9w
-ZXJ0eSBncmFwaC4KCgwKBQQAAgAFEgMTAggKDAoFBAACAAESAxMJEwoMCgUEAAIAAxIDExYX
-Cg0KBQQAAgAIEgQTGBYDChAKCQQAAgAIhISOExIDFAQxCg8KCAQAAgAInAgAEgMVBCoKRQoE
-BAACARIEGQIcBBo3IFRoZSBJRCBvZiB0aGUgZGF0YXNldCBjb250YWluaW5nIHRoaXMgcHJv
-cGVydHkgZ3JhcGguCgoMCgUEAAIBBRIDGQIICgwKBQQAAgEBEgMZCRMKDAoFBAACAQMSAxkW
-FwoNCgUEAAIBCBIEGRgcAwoQCgkEAAIBCISEjhMSAxoELwoPCggEAAIBCJwIABIDGwQqCqYB
-CgQEAAICEgQhAiQEGpcBIFRoZSBJRCBvZiB0aGUgcHJvcGVydHkgZ3JhcGguIFRoZSBJRCBt
-dXN0IGNvbnRhaW4gb25seQogbGV0dGVycyAoYS16LCBBLVopLCBudW1iZXJzICgwLTkpLCBv
-ciB1bmRlcnNjb3JlcyAoXykuIFRoZSBtYXhpbXVtCiBsZW5ndGggaXMgMjU2IGNoYXJhY3Rl
-cnMuCgoMCgUEAAICBRIDIQIICgwKBQQAAgIBEgMhCRoKDAoFBAACAgMSAyEdHgoNCgUEAAIC
-CBIEIR8kAwoQCgkEAAICCISEjhMSAyIELwoPCggEAAICCJwIABIDIwQqYgZwcm90bzM=
+b3IucHJvdG8ikQEKFlByb3BlcnR5R3JhcGhSZWZlcmVuY2USIgoKcHJvamVjdF9pZBgBIAEo
+CUID4EECUglwcm9qZWN0SWQSIgoKZGF0YXNldF9pZBgCIAEoCUID4EECUglkYXRhc2V0SWQS
+LwoRcHJvcGVydHlfZ3JhcGhfaWQYAyABKAlCA+BBAlIPcHJvcGVydHlHcmFwaElkQnoKHGNv
+bS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJCG1Byb3BlcnR5R3JhcGhSZWZlcmVuY2VQcm90
+b1ABWjtjbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L3YyL2FwaXYyL2JpZ3F1ZXJ5cGI7
+YmlncXVlcnlwYkqVCgoGEgQOACUBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29v
+Z2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAy
+LjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQg
+aW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5
+IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNl
+cy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBh
+Z3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBM
+aWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdB
+UlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3Ig
+aW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdv
+dmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNl
+LgoKCAoBAhIDEAAhCgkKAgMAEgMSACkKCAoBCBIDFABSCgkKAggLEgMUAFIKCAoBCBIDFQAi
+CgkKAggKEgMVACIKCAoBCBIDFgA8CgkKAggIEgMWADwKCAoBCBIDFwA1CgkKAggBEgMXADUK
+KgoCBAASBBoAJQEaHiBJZCBwYXRoIG9mIGEgcHJvcGVydHkgZ3JhcGguCgoKCgMEAAESAxoI
+HgpOCgQEAAIAEgMcAkEaQSBSZXF1aXJlZC4gVGhlIElEIG9mIHRoZSBwcm9qZWN0IGNvbnRh
+aW5pbmcgdGhpcyBwcm9wZXJ0eSBncmFwaC4KCgwKBQQAAgAFEgMcAggKDAoFBAACAAESAxwJ
+EwoMCgUEAAIAAxIDHBYXCgwKBQQAAgAIEgMcGEAKDwoIBAACAAicCAASAxwZPwpOCgQEAAIB
+EgMfAkEaQSBSZXF1aXJlZC4gVGhlIElEIG9mIHRoZSBkYXRhc2V0IGNvbnRhaW5pbmcgdGhp
+cyBwcm9wZXJ0eSBncmFwaC4KCgwKBQQAAgEFEgMfAggKDAoFBAACAQESAx8JEwoMCgUEAAIB
+AxIDHxYXCgwKBQQAAgEIEgMfGEAKDwoIBAACAQicCAASAx8ZPwqvAQoEBAACAhIDJAJIGqEB
+IFJlcXVpcmVkLiBUaGUgSUQgb2YgdGhlIHByb3BlcnR5IGdyYXBoLiBUaGUgSUQgbXVzdCBj
+b250YWluIG9ubHkKIGxldHRlcnMgKGEteiwgQS1aKSwgbnVtYmVycyAoMC05KSwgb3IgdW5k
+ZXJzY29yZXMgKF8pLiBUaGUgbWF4aW11bQogbGVuZ3RoIGlzIDI1NiBjaGFyYWN0ZXJzLgoK
+DAoFBAACAgUSAyQCCAoMCgUEAAICARIDJAkaCgwKBQQAAgIDEgMkHR4KDAoFBAACAggSAyQf
+RwoPCggEAAICCJwIABIDJCBGYgZwcm90bzM=
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -64,4 +57,56 @@ EOF
     # Field: dataset_id Type: 9 ()
     # Field: property_graph_id Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::PropertyGraphReference::PropertyGraphReference - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::PropertyGraphReference;
+
+    my $msg = Google::Cloud::Bigquery::V2::PropertyGraphReference::PropertyGraphReference->new(
+        project_id => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<project_id>
+
+Type: String
+
+=item * B<dataset_id>
+
+Type: String
+
+=item * B<property_graph_id>
+
+Type: String
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::PropertyGraphReference - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

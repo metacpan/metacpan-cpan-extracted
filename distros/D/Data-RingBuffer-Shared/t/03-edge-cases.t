@@ -41,6 +41,7 @@ use Data::RingBuffer::Shared;
 
 # Signed extremes
 {
+    no warnings 'portable';   # 64-bit hex literals below; this module requires 64-bit Perl
     my $r = Data::RingBuffer::Shared::Int->new_memfd("e5", 4);
     $r->write(0x7FFFFFFFFFFFFFFF);
     $r->write(-0x8000000000000000);

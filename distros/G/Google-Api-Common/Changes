@@ -1,6 +1,13 @@
 Revision history for Google-Api-Common
 
-0.02    Fri Jul 17 2026
+0.03    2026-07-26
+        [Ecosystem Hardening & Parity]
+        - Merged Google-Longrunning into Google-Api-Common distribution.
+        - Removed legacy stubs (Inclusion.pm, Auditing.pm, Migration.pm).
+        - Bundled Longrunning operations directly in lib/Google/Longrunning/.
+
+
+0.02    2026-07-17
         [REST Transport & Response Handling]
         - Consolidated REST HTTP client transport in Google::Cloud::REST::Client with unified OAuth2 token injection.
         - Fixed $VERSION evaluation and stringification in Google::Cloud::REST::Client.
@@ -11,6 +18,6 @@ Revision history for Google-Api-Common
         - Upgraded package version to 0.02 (lib/Google/Api/Common.pm).
         - Streamlined $VERSION declarations across sub-modules.
 
-0.01    Date/time
+0.01    2026-01-01
         First version, released on an unsuspecting world.
 

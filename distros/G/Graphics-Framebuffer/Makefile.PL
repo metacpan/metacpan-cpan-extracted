@@ -20,7 +20,7 @@ use Term::ANSIColor;
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 
-my $VERSION = '2.02';
+my $VERSION = '2.03';
 my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
 $COLS = 80 if ($COLS < 80);
 $ROWS = 25 if ($ROWS < 25);
@@ -187,6 +187,7 @@ primitives.pl          - This script will pretty much demonstrate all of
 slideshow.pl           - This script shows all of the images in a specific
                          path (full screen, if asked).
 viewpic.pl             - This script shows one specific image (or animation).
+vector.pl              - A simple language to draw and display images.
 dump.pl                - This script does a diagnostic variable dump to the
                          file 'dump.log', for the author to help you with
                          troubleshooting.
@@ -215,6 +216,7 @@ get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate
 primitives.pl          - This script will pretty much demonstrate all of the capabilities of this module.
 slideshow.pl           - This script shows all of the images in a specific path (full screen, if asked).
 viewpic.pl             - This script shows one specific image (or animation).
+vector.pl              - A simple language to draw and display images.
 dump.pl                - This script does a diagnostic variable dump to the file 'dump.log', for the author to help you with troubleshooting.
 fonts.pl               - This script prints installed font names.
 text_mode.pl           - A rescue script to force the tty into text mode.
@@ -239,17 +241,11 @@ foreach my $l (split(/\n/,$message)) {
 }
 print colored(['black on_blue'],'-' x $COLS),"\n";
 
-unless (defined($ENV{'DISPLAY'})) {
-    print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'      make'),"\n";
-    print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'      make')," test\n";
-    print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],' sudo '),colored(['bright_green'],'make')," install\n";
-    print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'      make')," veryclean\n";
-} else {
-    print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'               make'),"\n";
-    print colored(['bright_white on_magenta'],' Testing     -> '),colored(['red'],'GFB_IGNORE_X=1 '),colored(['bright_green'],'make')," test\n";
-    print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'          sudo '),colored(['bright_green'],'make')," install\n";
-    print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'               make')," veryclean\n";
-}
+print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'      make'),"\n";
+print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'      make')," test\n";
+print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],' sudo '),colored(['bright_green'],'make')," install\n";
+print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'      make')," veryclean\n";
+
 print colored(['black on_blue'],'-' x $COLS),"\n";
 print $blink, colored(['yellow on_blue'],sprintf('%-67s',' PLEASE PAY ATTENTION TO THE MESSAGE BELOW FOR ANY MISSING MODULES BEFORE CONTINUING ')), "\n";
 
@@ -260,7 +256,9 @@ my $mm = WriteMakefile(
     ABSTRACT_FROM      => 'lib/Graphics/Framebuffer.pm',
     PL_FILES           => {},
     MIN_PERL_VERSION   => '5.20.0', # 5.6 (5.006) is considered slow and unstable.  Upgrade
-    CONFIGURE_REQUIRES => {
+    CONFIGURE_REQUIRES => { # Added all Inline variants to this stage
+        'Inline'              => '0.53',
+        'Inline::C'           => '0.53',
         'Inline::MakeMaker'   => '0.45',
         'ExtUtils::MakeMaker' => '6.52',
         'Term::ANSIColor'     => '4.00',

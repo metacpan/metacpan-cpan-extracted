@@ -1,0 +1,8 @@
+*.sw?
+*.bak
+Build
+MYMETA.*
+_build/
+blib/
+lib/*/*.c
+lib/*/*.o

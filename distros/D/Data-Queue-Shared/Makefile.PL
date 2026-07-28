@@ -27,13 +27,14 @@ if ($@) {
 WriteMakefile(
     NAME              => 'Data::Queue::Shared',
     VERSION_FROM      => 'lib/Data/Queue/Shared.pm',
-    PREREQ_PM         => {},
+    PREREQ_PM         => { 'XS::Parse::Keyword' => '0.40' },
     TEST_REQUIRES     => {
         'Test::More' => 0,
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
         'Devel::PPPort' => 0,
+        'XS::Parse::Keyword' => '0.40',
     },
     ABSTRACT_FROM     => 'lib/Data/Queue/Shared.pm',
     AUTHOR            => 'vividsnow',

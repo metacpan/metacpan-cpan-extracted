@@ -1,5 +1,23 @@
 Revision history for Perl extension Catalyst::View::Wkhtmltopdf.
 
+v0.6.3    2026-07-27 15:21:38+01:00 Europe/London
+  [Enhancements]
+    - Added the send_filehandle option, which enables returning a filehandle rather than the PDF.
+      It defaults to false, which reverts the behavior back to pre-v0.6.0.
+
+  [Documentation]
+    - Fixed incorrect description for tmpdir.
+
+    - Added KNOWN ISSUES.
+
+v0.6.2    2026-07-27 14:45:05+01:00 Europe/London
+  [Documentation]
+    - Fixed POD for Catalyst::Helper::View::Wkhtmltopdf RT#180300
+
+    - Added subsections to the SECURITY CONSIDERATIONS.
+
+    - Documented temporary files not being cleaned up RT#180344.
+
 v0.6.1    2026-07-25 09:14:21+01:00 Europe/London
   [Security]
     - Improved validation and sanitization of arguments, as the fix for CVE-2026-16766 was incomplete.

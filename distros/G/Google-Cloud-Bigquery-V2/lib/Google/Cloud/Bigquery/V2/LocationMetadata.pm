@@ -1,21 +1,10 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::LocationMetadata;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
@@ -27,16 +16,27 @@ CjBnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvbG9jYXRpb25fbWV0YWRhdGEucHJvdG8SGGdv
 b2dsZS5jbG91ZC5iaWdxdWVyeS52MiJAChBMb2NhdGlvbk1ldGFkYXRhEiwKEmxlZ2FjeV9s
 b2NhdGlvbl9pZBgBIAEoCVIQbGVnYWN5TG9jYXRpb25JZEJyChxjb20uZ29vZ2xlLmNsb3Vk
 LmJpZ3F1ZXJ5LnYyQhVMb2NhdGlvbk1ldGFkYXRhUHJvdG9aO2Nsb3VkLmdvb2dsZS5jb20v
-Z28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdxdWVyeXBiSuMDCgYSBAAADwEK
-CAoBDBIDAAASCggKAQISAwIAIQoICgEIEgMEAFIKCQoCCAsSAwQAUgoICgEIEgMFADUKCQoC
-CAESAwUANQoICgEIEgMGADYKCQoCCAgSAwYANgqaAQoCBAASBAsADwEajQEgQmlnUXVlcnkt
-c3BlY2lmaWMgbWV0YWRhdGEgYWJvdXQgYSBsb2NhdGlvbi4gVGhpcyB3aWxsIGJlIHNldCBv
-bgogZ29vZ2xlLmNsb3VkLmxvY2F0aW9uLkxvY2F0aW9uLm1ldGFkYXRhIGluIENsb3VkIExv
-Y2F0aW9uIEFQSQogcmVzcG9uc2VzLgoKCgoDBAABEgMLCBgKsgEKBAQAAgASAw4CIBqkASBU
-aGUgbGVnYWN5IEJpZ1F1ZXJ5IGxvY2F0aW9uIElELCBlLmcuIOKAnEVV4oCdIGZvciB0aGUg
-4oCcZXVyb3Bl4oCdIGxvY2F0aW9uLgogVGhpcyBpcyBmb3IgYW55IEFQSSBjb25zdW1lcnMg
-dGhhdCBuZWVkIHRoZSBsZWdhY3kg4oCcVVPigJ0gYW5kIOKAnEVV4oCdIGxvY2F0aW9ucy4K
-CgwKBQQAAgAFEgMOAggKDAoFBAACAAESAw4JGwoMCgUEAAIAAxIDDh4fYgZwcm90bzM=
+Z28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdxdWVyeXBiSpgICgYSBA4AHQEK
+vAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5k
+ZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5
+b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhl
+IExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAg
+ICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNz
+IHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBz
+b2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQg
+b24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05T
+IE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNl
+bnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFu
+ZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACEKCAoBCBIDEgBS
+CgkKAggLEgMSAFIKCAoBCBIDEwA2CgkKAggIEgMTADYKCAoBCBIDFAA1CgkKAggBEgMUADUK
+mgEKAgQAEgQZAB0BGo0BIEJpZ1F1ZXJ5LXNwZWNpZmljIG1ldGFkYXRhIGFib3V0IGEgbG9j
+YXRpb24uIFRoaXMgd2lsbCBiZSBzZXQgb24KIGdvb2dsZS5jbG91ZC5sb2NhdGlvbi5Mb2Nh
+dGlvbi5tZXRhZGF0YSBpbiBDbG91ZCBMb2NhdGlvbiBBUEkKIHJlc3BvbnNlcy4KCgoKAwQA
+ARIDGQgYCrIBCgQEAAIAEgMcAiAapAEgVGhlIGxlZ2FjeSBCaWdRdWVyeSBsb2NhdGlvbiBJ
+RCwgZS5nLiDigJxFVeKAnSBmb3IgdGhlIOKAnGV1cm9wZeKAnSBsb2NhdGlvbi4KIFRoaXMg
+aXMgZm9yIGFueSBBUEkgY29uc3VtZXJzIHRoYXQgbmVlZCB0aGUgbGVnYWN5IOKAnFVT4oCd
+IGFuZCDigJxFVeKAnSBsb2NhdGlvbnMuCgoMCgUEAAIABRIDHAIICgwKBQQAAgABEgMcCRsK
+DAoFBAACAAMSAxweH2IGcHJvdG8z
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -47,4 +47,48 @@ EOF
     # Fields for LocationMetadata
     # Field: legacy_location_id Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::LocationMetadata;
+
+    my $msg = Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata->new(
+        legacy_location_id => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<legacy_location_id>
+
+Type: String
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::LocationMetadata - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

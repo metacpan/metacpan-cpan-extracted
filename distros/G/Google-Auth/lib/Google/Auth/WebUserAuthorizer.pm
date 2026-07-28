@@ -17,7 +17,7 @@ package Google::Auth::WebUserAuthorizer;
 use JSON::MaybeXS;
 use strict;
 
-our $VERSION = 0.02;
+our $VERSION = '0.05';
 
 my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 
@@ -27,7 +27,7 @@ my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 #use Google::Auth::Signet::UserAuthorizer;
 #use Google::Auth::Signet::UserRefreshCredentials;
 
-=pod
+=begin comment
 
     # Varation on {Google::Auth::UserAuthorizer} adapted for Plack based
     # web applications.
@@ -99,7 +99,7 @@ sub handle_auth_callback_deferred
         $coder->encode($callback_state);
     $redirect_uri;
 
-=pod
+=begin comment
       def self.handle_auth_callback_deferred request
         callback_state, redirect_uri = extract_callback_state request
         request.session[CALLBACK_STATE_KEY] = MultiJson.dump callback_state
@@ -125,7 +125,7 @@ sub handle_auth_callback_deferred
 sub initialize
 {
 
-=pod
+=begin comment
       def initialize client_id, scope, token_store, callback_uri = nil
         super client_id, scope, token_store, callback_uri
       end
@@ -147,7 +147,7 @@ sub initialize
 sub handle_auth_callback
 {
 
-=pod
+=begin comment
       def handle_auth_callback user_id, request
         callback_state, redirect_uri = WebUserAuthorizer.extract_callback_state(
           request
@@ -187,7 +187,7 @@ sub handle_auth_callback
 sub get_authorization_url
 {
 
-=pod
+=begin comment
 
       def get_authorization_url options = {}
         options = options.dup
@@ -230,7 +230,7 @@ sub get_authorization_url
 sub get_credentials
 {
 
-=pod
+=begin comment
 
       def get_credentials user_id, request = nil, scope = nil
         if request&.session&.key? CALLBACK_STATE_KEY
@@ -257,7 +257,7 @@ sub get_credentials
 sub extract_callback_state
 {
 
-=pod
+=begin comment
 
       def self.extract_callback_state request
         state = MultiJson.load(request[STATE_PARAM] || "{}")
@@ -289,7 +289,7 @@ sub extract_callback_state
 sub validate_callback_state
 {
 
-=pod
+=begin comment
 
       def self.validate_callback_state state, request
         raise Signet::AuthorizationError, MISSING_AUTH_CODE_ERROR if state[AUTH_CODE_KEY].nil?
@@ -307,7 +307,7 @@ sub validate_callback_state
 
 package Google::Auth::WebUserAuthorizer::CallbackApp;
 
-=pod
+=begin comment
 
       # Small Plack app which acts as the default callback handler for the app.
       #

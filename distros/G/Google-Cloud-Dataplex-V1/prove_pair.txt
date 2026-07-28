@@ -1,0 +1,5 @@
+t/02-rest-transport-DataScanService.t ..... ok
+t/02-rest-transport-DataProductService.t .. ok
+All tests successful.
+Files=2, Tests=4,  8 wallclock secs ( 0.04 usr  0.02 sys +  5.83 cusr  0.96 csys =  6.85 CPU)
+Result: PASS

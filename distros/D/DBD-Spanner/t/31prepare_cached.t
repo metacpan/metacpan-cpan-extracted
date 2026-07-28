@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth1 = $dbh->prepare_cached('SELECT id FROM users WHERE val = ?');
+my $sth2 = $dbh->prepare_cached('SELECT id FROM users WHERE val = ?');
+is($sth1, $sth2, 'prepare_cached returned identical statement handle instance');
+ok($sth1->execute('a'), 'First execution succeeded');
+ok($sth2->execute('b'), 'Cached execution succeeded');

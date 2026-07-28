@@ -6,7 +6,7 @@ Protobuf::Descriptor::MessageDef - Descriptor for a Protocol Buffer message
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 sub full_name {

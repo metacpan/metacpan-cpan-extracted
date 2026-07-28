@@ -1,4 +1,8 @@
 Revision history for Google-Ai-Generativelanguage-V1
 
+0.02    2026-07-26
+        - Fixed POD test failures and updated pod-coverage.t to skip undocumented type packages.
+
+
 0.01  Sat Jul 18 18:48:59 2026
     - Initial release. Auto-generated from Protocol Buffers schema.

@@ -10,7 +10,24 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed %s object", classname)
+    if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT_HANDLE's
+ * mortal pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local h would dangle.  Used only where magic
+ * can actually intervene between EXTRACT_HANDLE and the first use of h. */
+/* The same Perl that can destroy the handle can also REPLACE the invocant
+ * ($obj = 42 from an overload handler mutates ST(0), because Perl passes
+ * aliases), so SvROK must be re-checked before SvRV -- otherwise SvRV would
+ * run on a non-reference. */
+#define REEXTRACT(sv) \
+    if (!SvROK(sv)) \
+        croak("Data::Sync::Shared object was replaced during the call"); \
+    h = INT2PTR(SyncHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Sync::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -30,7 +47,7 @@ new(class, path, max, ...)
   PREINIT:
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
-    uint32_t initial = (items > 3) ? (uint32_t)SvUV(ST(3)) : (uint32_t)max;
+    uint32_t initial = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (uint32_t)SvUV(ST(3)) : (uint32_t)max;
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     SyncHandle *h = sync_create(p, SYNC_TYPE_SEMAPHORE, (uint32_t)max, initial, mode, errbuf);
@@ -47,7 +64,7 @@ new_memfd(class, name, max, ...)
   PREINIT:
     char errbuf[SYNC_ERR_BUFLEN];
   CODE:
-    uint32_t initial = (items > 3) ? (uint32_t)SvUV(ST(3)) : (uint32_t)max;
+    uint32_t initial = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? (uint32_t)SvUV(ST(3)) : (uint32_t)max;
     SyncHandle *h = sync_create_memfd(name, SYNC_TYPE_SEMAPHORE, (uint32_t)max, initial, errbuf);
     if (!h) croak("Data::Sync::Shared::Semaphore->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -84,7 +101,8 @@ acquire(self, ...)
     EXTRACT_HANDLE("Data::Sync::Shared::Semaphore", self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT(self);
     RETVAL = sync_sem_acquire(h, timeout);
   OUTPUT:
     RETVAL
@@ -107,7 +125,14 @@ acquire_n(self, n, ...)
     EXTRACT_HANDLE("Data::Sync::Shared::Semaphore", self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT(self);
+    /* n is a UV: reject n > max up front. Otherwise a huge n truncates to uint32,
+     * and any n above the semaphore max makes the wait condition (cur >= n)
+     * unsatisfiable -> a blocking acquire_n hangs forever. */
+    if (n > (UV)h->hdr->param)
+        croak("Data::Sync::Shared::Semaphore->acquire_n: n (%" UVuf ") exceeds max (%u)",
+              n, (unsigned)h->hdr->param);
     RETVAL = sync_sem_acquire_n(h, (uint32_t)n, timeout);
   OUTPUT:
     RETVAL
@@ -131,6 +156,7 @@ release(self, ...)
   CODE:
     if (items > 1) {
         uint32_t n = (uint32_t)SvUV(ST(1));
+        REEXTRACT(self);
         sync_sem_release_n(h, n);
     } else {
         sync_sem_release(h);
@@ -251,7 +277,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Sync::Shared::Semaphore")) {
         SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -348,7 +374,8 @@ wait(self, ...)
     EXTRACT_HANDLE("Data::Sync::Shared::Barrier", self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT(self);
     RETVAL = sync_barrier_wait(h, timeout);
   OUTPUT:
     RETVAL
@@ -486,7 +513,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Sync::Shared::Barrier")) {
         SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -581,6 +608,7 @@ rdlock(self, ...)
   CODE:
     if (items > 1) {
         double timeout = SvNV(ST(1));
+        REEXTRACT(self);
         if (!sync_rwlock_rdlock_timed(h, timeout))
             croak("rdlock: timeout");
     } else {
@@ -630,6 +658,7 @@ wrlock(self, ...)
   CODE:
     if (items > 1) {
         double timeout = SvNV(ST(1));
+        REEXTRACT(self);
         if (!sync_rwlock_wrlock_timed(h, timeout))
             croak("wrlock: timeout");
     } else {
@@ -766,7 +795,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Sync::Shared::RWLock")) {
         SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -788,12 +817,27 @@ stats(self)
     SyncHeader *hdr = h->hdr;
     uint32_t val = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
     const char *state;
-    if (val == 0) state = "unlocked";
-    else if (val < SYNC_RWLOCK_WRITER_BIT) state = "read_locked";
-    else state = "write_locked";
+    UV readers = 0;
+    if (val >= SYNC_RWLOCK_WRITER_BIT) {
+        state = "write_locked";
+    } else {
+        /* Reader-slots-only rwlock: the reader count is NOT stored in `value`
+         * (which is now the writer word only). Derive it by summing each
+         * process's rdepth across the shared reader-slot table, plus the
+         * slotless residual. Best-effort snapshot (taken without the lock);
+         * a not-yet-reclaimed dead reader may transiently inflate it. */
+        if (h->reader_slots) {
+            for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
+                if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == 0)
+                    continue;
+                readers += __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_RELAXED);
+            }
+        }
+        readers += (UV)__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_RELAXED);
+        state = readers > 0 ? "read_locked" : "unlocked";
+    }
     hv_store(hv, "state", 5, newSVpv(state, 0), 0);
-    hv_store(hv, "readers", 7,
-        newSVuv(val < SYNC_RWLOCK_WRITER_BIT ? val : 0), 0);
+    hv_store(hv, "readers", 7, newSVuv(readers), 0);
     hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     hv_store(hv, "acquires", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_acquires, __ATOMIC_RELAXED)), 0);
@@ -891,7 +935,8 @@ wait(self, ...)
     EXTRACT_HANDLE("Data::Sync::Shared::Condvar", self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT(self);
     RETVAL = sync_condvar_wait(h, timeout);
   OUTPUT:
     RETVAL
@@ -997,7 +1042,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Sync::Shared::Condvar")) {
         SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -1091,7 +1136,8 @@ enter(self, ...)
     EXTRACT_HANDLE("Data::Sync::Shared::Once", self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT(self);
     RETVAL = sync_once_enter(h, timeout);
   OUTPUT:
     RETVAL
@@ -1207,7 +1253,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Sync::Shared::Once")) {
         SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;

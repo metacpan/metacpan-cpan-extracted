@@ -1,8 +1,24 @@
 Changes
+ignore.txt
 lib/Google/Cloud/Metastore/V1.pm
+lib/Google/Cloud/Metastore/V1/DataprocMetastoreClient.pm
+lib/Google/Cloud/Metastore/V1/DataprocMetastoreFederationClient.pm
+lib/Google/Cloud/Metastore/V1/Metastore.pm
+lib/Google/Cloud/Metastore/V1/Metastore/Types.pm
+lib/Google/Cloud/Metastore/V1/MetastoreFederation.pm
+lib/Google/Cloud/Metastore/V1/MetastoreFederation/Types.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/01-service-DataprocMetastore.t
+t/01-service-DataprocMetastoreFederation.t
+t/02-rest-transport-DataprocMetastore.t
+t/02-rest-transport-DataprocMetastoreFederation.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

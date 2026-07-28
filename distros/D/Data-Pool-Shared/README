@@ -119,7 +119,7 @@ METHODS
         my $idx = $pool->alloc;             # block until available
         my $idx = $pool->alloc($timeout);   # with timeout (seconds)
         my $idx = $pool->alloc(0);          # non-blocking
-        my $idx = $pool->try_alloc;         # non-blocking (alias)
+        my $idx = $pool->try_alloc;         # non-blocking (same as alloc(0))
 
     Returns slot index on success, "undef" on failure/timeout.
 

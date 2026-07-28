@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp qw(tmpnam);
 use POSIX qw(_exit);
 use Data::Sync::Shared;
@@ -41,10 +42,10 @@ $cv->unlock;
 {
     my $c = Data::Sync::Shared::Condvar->new(undef);
     $c->lock;
-    my $t0 = time;
+    my $t0 = Time::HiRes::time();
     my $r = $c->wait(0);
     ok !$r, 'wait(0) returns false immediately';
-    ok time - $t0 < 1, 'wait(0) did not block';
+    ok Time::HiRes::time() - $t0 < 1, 'wait(0) did not block';
     $c->unlock;
 }
 

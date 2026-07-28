@@ -1,17 +1,3 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::JobStats::Types;
 
 use strict;
@@ -72,36 +58,6 @@ coerce 'RepeatedQueryTimelineSample',
 declare 'MapStringQueryTimelineSample',
     as HashRef[QueryTimelineSample()];
 
-declare 'ReservationResourceUsage',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::ReservationResourceUsage'];
-
-coerce 'ReservationResourceUsage',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::ReservationResourceUsage'->new($_) };
-
-declare 'RepeatedReservationResourceUsage',
-    as ArrayRef[ReservationResourceUsage()];
-
-coerce 'RepeatedReservationResourceUsage',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::ReservationResourceUsage'->new($_) } @$_ ] };
-
-declare 'MapStringReservationResourceUsage',
-    as HashRef[ReservationResourceUsage()];
-
-declare 'BigQueryModelTraining',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::BigQueryModelTraining'];
-
-coerce 'BigQueryModelTraining',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::BigQueryModelTraining'->new($_) };
-
-declare 'RepeatedBigQueryModelTraining',
-    as ArrayRef[BigQueryModelTraining()];
-
-coerce 'RepeatedBigQueryModelTraining',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::BigQueryModelTraining'->new($_) } @$_ ] };
-
-declare 'MapStringBigQueryModelTraining',
-    as HashRef[BigQueryModelTraining()];
-
 declare 'ExternalServiceCost',
     as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::ExternalServiceCost'];
 
@@ -116,36 +72,6 @@ coerce 'RepeatedExternalServiceCost',
 
 declare 'MapStringExternalServiceCost',
     as HashRef[ExternalServiceCost()];
-
-declare 'BigtableUpdateStatistics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::BigtableUpdateStatistics'];
-
-coerce 'BigtableUpdateStatistics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::BigtableUpdateStatistics'->new($_) };
-
-declare 'RepeatedBigtableUpdateStatistics',
-    as ArrayRef[BigtableUpdateStatistics()];
-
-coerce 'RepeatedBigtableUpdateStatistics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::BigtableUpdateStatistics'->new($_) } @$_ ] };
-
-declare 'MapStringBigtableUpdateStatistics',
-    as HashRef[BigtableUpdateStatistics()];
-
-declare 'SpannerUpdateStatistics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::SpannerUpdateStatistics'];
-
-coerce 'SpannerUpdateStatistics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::SpannerUpdateStatistics'->new($_) };
-
-declare 'RepeatedSpannerUpdateStatistics',
-    as ArrayRef[SpannerUpdateStatistics()];
-
-coerce 'RepeatedSpannerUpdateStatistics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::SpannerUpdateStatistics'->new($_) } @$_ ] };
-
-declare 'MapStringSpannerUpdateStatistics',
-    as HashRef[SpannerUpdateStatistics()];
 
 declare 'ExportDataStatistics',
     as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::ExportDataStatistics'];
@@ -302,36 +228,6 @@ declare 'MapStringVectorSearchStatistics',
 
 declare 'IndexUsageMode',
     as (Int | Str);
-
-declare 'SearchIndexingStats',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::SearchIndexingStats'];
-
-coerce 'SearchIndexingStats',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::SearchIndexingStats'->new($_) };
-
-declare 'RepeatedSearchIndexingStats',
-    as ArrayRef[SearchIndexingStats()];
-
-coerce 'RepeatedSearchIndexingStats',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::SearchIndexingStats'->new($_) } @$_ ] };
-
-declare 'MapStringSearchIndexingStats',
-    as HashRef[SearchIndexingStats()];
-
-declare 'VectorSearchIndexingStats',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::VectorSearchIndexingStats'];
-
-coerce 'VectorSearchIndexingStats',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::VectorSearchIndexingStats'->new($_) };
-
-declare 'RepeatedVectorSearchIndexingStats',
-    as ArrayRef[VectorSearchIndexingStats()];
-
-coerce 'RepeatedVectorSearchIndexingStats',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::VectorSearchIndexingStats'->new($_) } @$_ ] };
-
-declare 'MapStringVectorSearchIndexingStats',
-    as HashRef[VectorSearchIndexingStats()];
 
 declare 'QueryInfo',
     as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::QueryInfo'];
@@ -723,21 +619,6 @@ coerce 'RepeatedSparkStatistics',
 declare 'MapStringSparkStatistics',
     as HashRef[SparkStatistics()];
 
-declare 'EndpointsEntry',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry'];
-
-coerce 'EndpointsEntry',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry'->new($_) };
-
-declare 'RepeatedEndpointsEntry',
-    as ArrayRef[EndpointsEntry()];
-
-coerce 'RepeatedEndpointsEntry',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry'->new($_) } @$_ ] };
-
-declare 'MapStringEndpointsEntry',
-    as HashRef[EndpointsEntry()];
-
 declare 'LoggingInfo',
     as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::LoggingInfo'];
 
@@ -752,6 +633,21 @@ coerce 'RepeatedLoggingInfo',
 
 declare 'MapStringLoggingInfo',
     as HashRef[LoggingInfo()];
+
+declare 'EndpointsEntry',
+    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry'];
+
+coerce 'EndpointsEntry',
+    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry'->new($_) };
+
+declare 'RepeatedEndpointsEntry',
+    as ArrayRef[EndpointsEntry()];
+
+coerce 'RepeatedEndpointsEntry',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry'->new($_) } @$_ ] };
+
+declare 'MapStringEndpointsEntry',
+    as HashRef[EndpointsEntry()];
 
 declare 'MaterializedViewStatistics',
     as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::MaterializedViewStatistics'];
@@ -834,49 +730,22 @@ coerce 'RepeatedMetadataCacheStatistics',
 declare 'MapStringMetadataCacheStatistics',
     as HashRef[MetadataCacheStatistics()];
 
-declare 'PrivacyPolicyStats',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::PrivacyPolicyStats'];
-
-coerce 'PrivacyPolicyStats',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::PrivacyPolicyStats'->new($_) };
-
-declare 'RepeatedPrivacyPolicyStats',
-    as ArrayRef[PrivacyPolicyStats()];
-
-coerce 'RepeatedPrivacyPolicyStats',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::PrivacyPolicyStats'->new($_) } @$_ ] };
-
-declare 'MapStringPrivacyPolicyStats',
-    as HashRef[PrivacyPolicyStats()];
-
-declare 'ContinuousQueryStatistics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::ContinuousQueryStatistics'];
-
-coerce 'ContinuousQueryStatistics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::ContinuousQueryStatistics'->new($_) };
-
-declare 'RepeatedContinuousQueryStatistics',
-    as ArrayRef[ContinuousQueryStatistics()];
-
-coerce 'RepeatedContinuousQueryStatistics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::ContinuousQueryStatistics'->new($_) } @$_ ] };
-
-declare 'MapStringContinuousQueryStatistics',
-    as HashRef[ContinuousQueryStatistics()];
-
-declare 'DefaultConnectionStats',
-    as InstanceOf['Google::Cloud::Bigquery::V2::JobStats::DefaultConnectionStats'];
-
-coerce 'DefaultConnectionStats',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::JobStats::DefaultConnectionStats'->new($_) };
-
-declare 'RepeatedDefaultConnectionStats',
-    as ArrayRef[DefaultConnectionStats()];
-
-coerce 'RepeatedDefaultConnectionStats',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::JobStats::DefaultConnectionStats'->new($_) } @$_ ] };
-
-declare 'MapStringDefaultConnectionStats',
-    as HashRef[DefaultConnectionStats()];
-
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::JobStats::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

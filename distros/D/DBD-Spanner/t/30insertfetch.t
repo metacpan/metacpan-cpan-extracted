@@ -1,0 +1,12 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth = $dbh->prepare('SELECT id, val FROM users');
+$sth->execute();
+my $row = $sth->fetchrow_arrayref();
+is_deeply($row, ['1', 'mock_value'], 'Fetched row');
+my $next = $sth->fetchrow_arrayref();
+is($next, undef, 'EOF undef');
+ok(!$sth->FETCH('Active'), 'Inactive after EOF');

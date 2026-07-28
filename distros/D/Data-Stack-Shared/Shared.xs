@@ -9,7 +9,18 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Stack::Shared")) \
         croak("Expected a Data::Stack::Shared object"); \
     StkHandle *h = INT2PTR(StkHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::Stack::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::Stack::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic).  That code may call $obj->DESTROY explicitly, which frees
+ * the handle and zeroes the IV; EXTRACT_STK's mortal pins the referent only
+ * against refcount-driven destruction, not an explicit DESTROY, so the local
+ * `h` would dangle.  Used only where magic can actually intervene between
+ * EXTRACT_STK and the first use of h. */
+#define REEXTRACT_STK(sv) \
+    h = INT2PTR(StkHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::Stack::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -176,7 +187,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Stack::Shared")) {
         StkHandle *h = INT2PTR(StkHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -275,8 +286,9 @@ push_wait(self, val, ...)
     EXTRACT_STK(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     int64_t v = (int64_t)val;
+    REEXTRACT_STK(self);
     RETVAL = stk_push(h, &v, sizeof(v), timeout);
   OUTPUT:
     RETVAL
@@ -299,8 +311,9 @@ pop_wait(self, ...)
     EXTRACT_STK(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
     int64_t v;
+    REEXTRACT_STK(self);
     RETVAL = stk_pop(h, &v, timeout) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -332,7 +345,7 @@ new(class, path, capacity, max_len, ...)
     char errbuf[STK_ERR_BUFLEN];
   CODE:
     if (max_len == 0) croak("max_len must be > 0");
-    if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
+    if (max_len > 0x7FFFFFFFu)   /* bit 31 of the stored length prefix is the UTF8 flag */
         croak("max_len too large");
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
@@ -353,7 +366,7 @@ new_memfd(class, name, capacity, max_len)
     char errbuf[STK_ERR_BUFLEN];
   CODE:
     if (max_len == 0) croak("max_len must be > 0");
-    if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
+    if (max_len > 0x7FFFFFFFu)   /* bit 31 of the stored length prefix is the UTF8 flag */
         croak("max_len too large");
     uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
     StkHandle *h = stk_create_memfd(name, capacity, elem_size, STK_VAR_STR, errbuf);
@@ -384,11 +397,12 @@ push(self, val)
   CODE:
     STRLEN slen;
     const char *s = SvPV(val, slen);
+    REEXTRACT_STK(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen;
+    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
     RETVAL = stk_try_push(h, buf, h->elem_size);
@@ -404,14 +418,15 @@ push_wait(self, val, ...)
     EXTRACT_STK(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     STRLEN slen;
     const char *s = SvPV(val, slen);
+    REEXTRACT_STK(self);
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;
     uint8_t *buf;
     Newxz(buf, h->elem_size, uint8_t);
-    uint32_t l32 = (uint32_t)slen;
+    uint32_t l32 = (uint32_t)slen | (SvUTF8(val) ? 0x80000000u : 0u);  /* bit 31 = SvUTF8 */
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
     RETVAL = stk_push(h, buf, h->elem_size, timeout);
@@ -431,9 +446,12 @@ pop(self)
     if (stk_try_pop(h, buf)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
+        int is_utf8 = (len & 0x80000000u) != 0;   /* bit 31 = SvUTF8 */
+        len &= 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }
@@ -447,16 +465,20 @@ pop_wait(self, ...)
     EXTRACT_STK(self);
     double timeout = -1;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_STK(self);
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
     SAVEFREEPV(buf);
     if (stk_pop(h, buf, timeout)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
+        int is_utf8 = (len & 0x80000000u) != 0;   /* bit 31 = SvUTF8 */
+        len &= 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }
@@ -475,9 +497,12 @@ peek(self)
     if (stk_peek(h, buf)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
+        int is_utf8 = (len & 0x80000000u) != 0;   /* bit 31 = SvUTF8 */
+        len &= 0x7FFFFFFFu;
         uint32_t max_len = h->elem_size - sizeof(uint32_t);
         if (len > max_len) len = max_len;
         RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+        if (is_utf8) SvUTF8_on(RETVAL);
     } else {
         RETVAL = &PL_sv_undef;
     }

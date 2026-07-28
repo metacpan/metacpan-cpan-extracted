@@ -6,7 +6,7 @@ use v5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
 use parent qw/ Plack::Component /;
 
@@ -97,6 +97,10 @@ sub call {
         ? $base->($path_query, $env)
         : $base . $path_query;
 
+    unless ( is_coderef($base) || substr($path_query, 0, 1) eq '/' ) {
+        $url = undef;
+    }
+
     $url //= [ HTTP_BAD_REQUEST, [], [] ];
     return $url if (is_plain_arrayref($url));
 
@@ -177,13 +181,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords Rendertron mech prerendering proxying
+
 =head1 NAME
 
 Plack::App::Prerender - a simple prerendering proxy for Plack
 
 =head1 VERSION
 
-version v0.2.0
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -207,7 +213,7 @@ version v0.2.0
 =head1 DESCRIPTION
 
 This is a PSGI application that acts as a simple prerendering proxy
-for websites using Chrone.
+for websites using Chrome.
 
 This only supports GET requests, as this is intended as a proxy for
 search engines that do not support AJAX-generated content.
@@ -219,7 +225,7 @@ search engines that do not support AJAX-generated content.
 A L<WWW::Mechanize::Chrome> object. If omitted, a headless instance of
 Chrome will be launched.
 
-If you want to specify alternative options, you chould create your own
+If you want to specify alternative options, you could create your own
 instance of WWW::Mechanize::Chrome and pass it to the constructor.
 
 =head2 rewrite
@@ -253,6 +259,12 @@ This can be used for simple request validation.  For example,
     ...
   }
 
+If L</rewrite> is a URL prefix string, then the path must start with a forward slash, otherwise it will return an HTTP 400.
+This is to prevent security issues where the hostname is changed and the prerendering proxy is abused
+
+If L</rewrite> is a code reference, then any path will be accepted,
+but it is assumed that the  the developer will check for  requests without a forward slash and handle them appropriately.
+
 =head2 cache
 
 This is the cache handling interface. See L<CHI>.
@@ -268,7 +280,7 @@ used instead.
 =head2 request
 
 This is a hash reference (since v0.2.0) of request headers to pass
-through the proxy.  The keys are the request header fieldss, and the
+through the proxy.  The keys are the request header fields, and the
 values are the headers that will be passed to the L</rewrite> URL.
 
 Values of C<1> will be a synonym for the same header, and false values
@@ -329,6 +341,14 @@ This only does the bare minimum necessary for proxying requests. You
 may need additional middleware for reverse proxies, logging, or
 security filtering.
 
+=head1 SECURITY CONSIDERATIONS
+
+By default, Chrome can access local files using the C<file:> protocol.
+
+By default, Chrome will run scripts.
+
+This should only be used for trusted websites, e.g. adding a prerendering proxy for your own website.
+
 =head1 SEE ALSO
 
 L<Plack>
@@ -340,9 +360,13 @@ Rendertron L<https://github.com/GoogleChrome/rendertron>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Plack-App-Prerender>
-and may be cloned from L<git://github.com/robrwo/perl-Plack-App-Prerender.git>
+and may be cloned from L<https://github.com/robrwo/perl-Plack-App-Prerender.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+Future releases may only support Perl versions released in the last ten (10) years.
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/perl-Plack-App-Prerender/issues>
@@ -351,13 +375,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020, 2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

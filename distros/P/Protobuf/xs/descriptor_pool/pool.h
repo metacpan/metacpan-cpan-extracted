@@ -14,11 +14,14 @@ SV* PerlUpb_DescriptorPool_New(pTHX);
 SV* PerlUpb_DescriptorPool_GetWrapper(pTHX_ const upb_DefPool* pool);
 
 // Returns the underlying upb_DefPool from a Perl wrapper.
-const upb_DefPool* PerlUpb_DescriptorPool_GetPool(pTHX_ SV* sv);
+upb_DefPool* PerlUpb_DescriptorPool_GetPool(pTHX_ SV* sv);
 
 // Freezing
 void PerlUpb_DescriptorPool_Freeze(pTHX_ SV* sv);
 bool PerlUpb_DescriptorPool_IsFrozen(pTHX_ SV* sv);
+
+// Poisoning
+void PerlUpb_DescriptorPool_Poison(pTHX_ SV* sv);
 
 // Frees the descriptor pool wrapper.
 void PerlUpb_DescriptorPool_Free(pTHX_ SV* sv);

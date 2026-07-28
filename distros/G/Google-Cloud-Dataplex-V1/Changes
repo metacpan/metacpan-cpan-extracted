@@ -1,3 +1,12 @@
+Revision history for Google-Cloud-Dataplex-V1-BusinessGlossaryServiceClient
+
+0.03  Sat Jul 25 21:26:59 2026
+    - Initial release. Auto-generated from Protocol Buffers schema.
+    - Regenerated clients with separate service classes and regex fixes.
+    - Improved generated POD documentation with dual-transport examples.
+    - Encoded source .proto paths into generated POD.
+    - Excluded BUILD from pod coverage in generated tests.
+
 0.02    Fri Jul 17 2026
         [CI & Code Generation]
         - Upgraded package version to 0.02.

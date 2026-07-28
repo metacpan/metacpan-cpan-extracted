@@ -39,16 +39,16 @@
 #include <sys/time.h> /* for struct timeval */
 #else
 struct timeval; /* forward declaration */
-typedef long long ssize_t;
+typedef intptr_t ssize_t;
 #endif
 #include <stdint.h> /* uintXX_t, etc */
 #include "sds.h" /* for sds */
 #include "alloc.h" /* for allocation wrappers */
 
 #define HIREDIS_MAJOR 1
-#define HIREDIS_MINOR 2
+#define HIREDIS_MINOR 4
 #define HIREDIS_PATCH 0
-#define HIREDIS_SONAME 1.1.0
+#define HIREDIS_SONAME 1.4.0
 
 /* Connection type can be blocking or non-blocking and is set in the
  * least significant bit of the flags field in redisContext. */
@@ -165,6 +165,7 @@ struct redisSsl;
 #define REDIS_OPT_PREFER_IPV4 0x20       /* Prefer IPv4 in DNS lookups. */
 #define REDIS_OPT_PREFER_IPV6 0x40       /* Prefer IPv6 in DNS lookups. */
 #define REDIS_OPT_PREFER_IP_UNSPEC (REDIS_OPT_PREFER_IPV4 | REDIS_OPT_PREFER_IPV6)
+#define REDIS_OPT_SET_SOCK_CLOEXEC 0x80  /* Set SOCK_CLOEXEC on socket file descriptor. */
 
 /* In Unix systems a file descriptor is a regular signed int, with -1
  * representing an invalid descriptor. In Windows it is a SOCKET

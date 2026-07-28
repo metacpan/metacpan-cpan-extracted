@@ -1,21 +1,10 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::PartitioningDefinition;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
@@ -23,52 +12,48 @@ use MIME::Base64;
 
 BEGIN {
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
-    eval { require Datapol::SemanticAnnotations };
     my $descriptor_b64 = <<'EOF';
 CjZnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcGFydGl0aW9uaW5nX2RlZmluaXRpb24ucHJv
 dG8SGGdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MhofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlv
-ci5wcm90bxoaZ29vZ2xlL2FwaS9pbmNsdXNpb24ucHJvdG8aPHN0b3JhZ2UvZGF0YXBvbC9h
-bm5vdGF0aW9ucy9wcm90by9zZW1hbnRpY19hbm5vdGF0aW9ucy5wcm90byKAAQoWUGFydGl0
-aW9uaW5nRGVmaW5pdGlvbhJmChJwYXJ0aXRpb25lZF9jb2x1bW4YASADKAsyKy5nb29nbGUu
-Y2xvdWQuYmlncXVlcnkudjIuUGFydGl0aW9uZWRDb2x1bW5CCuBBAaCg8JgB7A5SEXBhcnRp
-dGlvbmVkQ29sdW1uIkQKEVBhcnRpdGlvbmVkQ29sdW1uEiUKBWZpZWxkGAEgASgJQgrgQQKg
-oPCYAewOSABSBWZpZWxkiAEBQggKBl9maWVsZELEAQocY29tLmdvb2dsZS5jbG91ZC5iaWdx
-dWVyeS52MkIbUGFydGl0aW9uaW5nRGVmaW5pdGlvblByb3RvUAFaO2Nsb3VkLmdvb2dsZS5j
-b20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmlncXVlcnlwYjtiaWdxdWVyeXBiitXb0g9ECkJw
-YWNrYWdlOnRoaXJkX3BhcnR5L2phdmEvY2VsL3Rvb2xzL3NyYy90ZXN0L2phdmEvZGV2L2Nl
-bC90b29scy9tY3BKkQ0KBhIEAAA0AQoICgEMEgMAABIKCAoBAhIDAgAhCgkKAgMAEgMEACkK
-CQoCAwESAwUAJAoJCgIDAhIDBgBGCggKAQgSAwgAUgoJCgIICxIDCABSCggKAQgSAwkAIgoJ
-CgIIChIDCQAiCggKAQgSAwoANQoJCgIIARIDCgA1CggKAQgSAwsAPAoJCgIICBIDCwA8CgkK
-AQgSBAwADgIKDgoGCNG6q/oBEgQMAA4CCq8ECgIEABIEGgArARqiBCBUaGUgcGFydGl0aW9u
-aW5nIGluZm9ybWF0aW9uLCB3aGljaCBpbmNsdWRlcyBtYW5hZ2VkIHRhYmxlLCBleHRlcm5h
-bCB0YWJsZQogYW5kIG1ldGFzdG9yZSBwYXJ0aXRpb25lZCB0YWJsZSBwYXJ0aXRpb24gaW5m
-b3JtYXRpb24uCiAoLS0KIFRoZSBwYXJ0aXRpb25pbmcgaW5mb3JtYXRpb24sIHdoaWNoIGlu
-Y2x1ZGVzIG1hbmFnZWQgdGFibGUsIGV4dGVybmFsIHRhYmxlCiBhbmQgbWV0YXN0b3JlIHBh
-cnRpdGlvbmVkIHRhYmxlIHBhcnRpdGlvbiBpbmZvcm1hdGlvbi4gRXhpc3RpbmcgcGFydGl0
-aW9uCiB0eXBlcyBsaWtlIGBUaW1lUGFydGl0aW9uaW5nYCwgb3IgYEhpdmVQYXJ0aXRpb25p
-bmdPcHRpb25zYCB3aWxsIGNvbnRpbnVlIHRvCiByZXR1cm4gdGhpcyBpbmZvcm1hdGlvbiBh
-cyB3ZWxsIGFzIGFsbG93IGZvciBtb2RpZmljYXRpb24gd2hlbiBhcHByb3ByaWF0ZS4KIFRo
-aXMgZmllbGQgaXMgaW50ZW5kZWQgdG8gYmUgYSB1bml2ZXJzYWwgdmlldyBhY3Jvc3MgdGFi
-bGUgdHlwZXMgYWJvdXQgdGhlaXIKIHBhcnRpdGlvbmluZyBkYXRhLgogLS0pCgoKCgMEAAES
-AxoIHgrdBAoEBAACABIEJwIqBBrOBCBEZXRhaWxzIGFib3V0IGVhY2ggcGFydGl0aW9uaW5n
-IGNvbHVtbi4gVGhpcyBmaWVsZCBpcyBvdXRwdXQgb25seSBmb3IgYWxsCiBwYXJ0aXRpb25p
-bmcgdHlwZXMgb3RoZXIgdGhhbiBtZXRhc3RvcmUgcGFydGl0aW9uZWQgdGFibGVzLgogQmln
-UXVlcnkgbmF0aXZlIHRhYmxlcyBvbmx5IHN1cHBvcnQgMSBwYXJ0aXRpb25pbmcgY29sdW1u
-LiBPdGhlciB0YWJsZQogdHlwZXMgbWF5IHN1cHBvcnQgMCwgMSBvciBtb3JlIHBhcnRpdGlv
-bmluZyBjb2x1bW5zLgogRm9yIG1ldGFzdG9yZSBwYXJ0aXRpb25lZCB0YWJsZXMsIHRoZSBv
-cmRlciBtdXN0IG1hdGNoIHRoZSBkZWZpbml0aW9uIG9yZGVyCiBpbiB0aGUgSGl2ZSBNZXRh
-c3RvcmUsIHdoZXJlIGl0IG11c3QgbWF0Y2ggdGhlIHBoeXNpY2FsIGxheW91dCBvZiB0aGUK
-IHRhYmxlLiBGb3IgZXhhbXBsZSwKCiBDUkVBVEUgVEFCTEUgYV90YWJsZShpZCBCSUdJTlQs
-IG5hbWUgU1RSSU5HKQogUEFSVElUSU9ORUQgQlkgKGNpdHkgU1RSSU5HLCBzdGF0ZSBTVFJJ
-TkcpLgoKIEluIHRoaXMgY2FzZSB0aGUgdmFsdWVzIG11c3QgYmUgWydjaXR5JywgJ3N0YXRl
-J10gaW4gdGhhdCBvcmRlci4KCgwKBQQAAgAEEgMnAgoKDAoFBAACAAYSAycLHAoMCgUEAAIA
-ARIDJx0vCgwKBQQAAgADEgMnMjMKDQoFBAACAAgSBCc0KgMKDwoIBAACAAicCAASAygEKgoQ
-CgkEAAIACISEjhMSAykELQoyCgIEARIELgA0ARomIFRoZSBwYXJ0aXRpb25pbmcgY29sdW1u
-IGluZm9ybWF0aW9uLgoKCgoDBAEBEgMuCBkKMQoEBAECABIEMAIzBBojIFRoZSBuYW1lIG9m
-IHRoZSBwYXJ0aXRpb24gY29sdW1uLgoKDAoFBAECAAQSAzACCgoMCgUEAQIABRIDMAsRCgwK
-BQQBAgABEgMwEhcKDAoFBAECAAMSAzAaGwoNCgUEAQIACBIEMBwzAwoPCggEAQIACJwIABID
-MQQqChAKCQQBAgAIhISOExIDMgQtYgZwcm90bzM=
+ci5wcm90byJ5ChZQYXJ0aXRpb25pbmdEZWZpbml0aW9uEl8KEnBhcnRpdGlvbmVkX2NvbHVt
+bhgBIAMoCzIrLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52Mi5QYXJ0aXRpb25lZENvbHVtbkID
+4EEBUhFwYXJ0aXRpb25lZENvbHVtbiI9ChFQYXJ0aXRpb25lZENvbHVtbhIeCgVmaWVsZBgB
+IAEoCUID4EECSABSBWZpZWxkiAEBQggKBl9maWVsZEJ6Chxjb20uZ29vZ2xlLmNsb3VkLmJp
+Z3F1ZXJ5LnYyQhtQYXJ0aXRpb25pbmdEZWZpbml0aW9uUHJvdG9QAVo7Y2xvdWQuZ29vZ2xl
+LmNvbS9nby9iaWdxdWVyeS92Mi9hcGl2Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGJK5A0KBhIE
+DgAwAQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNl
+ZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2Ui
+KTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0
+aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBh
+dAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBV
+bmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRp
+bmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmli
+dXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJ
+VElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhl
+IExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lv
+bnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIQoJCgID
+ABIDEgApCggKAQgSAxQAUgoJCgIICxIDFABSCggKAQgSAxUAIgoJCgIIChIDFQAiCggKAQgS
+AxYAPAoJCgIICBIDFgA8CggKAQgSAxcANQoJCgIIARIDFwA1CpEBCgIEABIEGwAqARqEASBU
+aGUgcGFydGl0aW9uaW5nIGluZm9ybWF0aW9uLCB3aGljaCBpbmNsdWRlcyBtYW5hZ2VkIHRh
+YmxlLCBleHRlcm5hbCB0YWJsZQogYW5kIG1ldGFzdG9yZSBwYXJ0aXRpb25lZCB0YWJsZSBw
+YXJ0aXRpb24gaW5mb3JtYXRpb24uCgoKCgMEAAESAxsIHgrnBAoEBAACABIEKAIpLxrYBCBP
+cHRpb25hbC4gRGV0YWlscyBhYm91dCBlYWNoIHBhcnRpdGlvbmluZyBjb2x1bW4uIFRoaXMg
+ZmllbGQgaXMgb3V0cHV0IG9ubHkKIGZvciBhbGwgcGFydGl0aW9uaW5nIHR5cGVzIG90aGVy
+IHRoYW4gbWV0YXN0b3JlIHBhcnRpdGlvbmVkIHRhYmxlcy4KIEJpZ1F1ZXJ5IG5hdGl2ZSB0
+YWJsZXMgb25seSBzdXBwb3J0IDEgcGFydGl0aW9uaW5nIGNvbHVtbi4gT3RoZXIgdGFibGUK
+IHR5cGVzIG1heSBzdXBwb3J0IDAsIDEgb3IgbW9yZSBwYXJ0aXRpb25pbmcgY29sdW1ucy4K
+IEZvciBtZXRhc3RvcmUgcGFydGl0aW9uZWQgdGFibGVzLCB0aGUgb3JkZXIgbXVzdCBtYXRj
+aCB0aGUgZGVmaW5pdGlvbiBvcmRlcgogaW4gdGhlIEhpdmUgTWV0YXN0b3JlLCB3aGVyZSBp
+dCBtdXN0IG1hdGNoIHRoZSBwaHlzaWNhbCBsYXlvdXQgb2YgdGhlCiB0YWJsZS4gRm9yIGV4
+YW1wbGUsCgogQ1JFQVRFIFRBQkxFIGFfdGFibGUoaWQgQklHSU5ULCBuYW1lIFNUUklORykK
+IFBBUlRJVElPTkVEIEJZIChjaXR5IFNUUklORywgc3RhdGUgU1RSSU5HKS4KCiBJbiB0aGlz
+IGNhc2UgdGhlIHZhbHVlcyBtdXN0IGJlIFsnY2l0eScsICdzdGF0ZSddIGluIHRoYXQgb3Jk
+ZXIuCgoMCgUEAAIABBIDKAIKCgwKBQQAAgAGEgMoCxwKDAoFBAACAAESAygdLwoMCgUEAAIA
+AxIDKDIzCgwKBQQAAgAIEgMpBi4KDwoIBAACAAicCAASAykHLQoyCgIEARIELQAwARomIFRo
+ZSBwYXJ0aXRpb25pbmcgY29sdW1uIGluZm9ybWF0aW9uLgoKCgoDBAEBEgMtCBkKOgoEBAEC
+ABIDLwJFGi0gUmVxdWlyZWQuIFRoZSBuYW1lIG9mIHRoZSBwYXJ0aXRpb24gY29sdW1uLgoK
+DAoFBAECAAQSAy8CCgoMCgUEAQIABRIDLwsRCgwKBQQBAgABEgMvEhcKDAoFBAECAAMSAy8a
+GwoMCgUEAQIACBIDLxxECg8KCAQBAgAInAgAEgMvHUNiBnByb3RvMw==
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -79,8 +64,78 @@ EOF
     # Fields for PartitioningDefinition
     # Field: partitioned_column Type: 11 (.google.cloud.bigquery.v2.PartitionedColumn)
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+
+    my $msg = Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition->new(
+        partitioned_column => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<partitioned_column>
+
+Type: Message (.google.cloud.bigquery.v2.PartitionedColumn)
+
+=back
+
+=cut
+
 # === Message: Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn ===
     # Fields for PartitionedColumn
     # Field: field Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+
+    my $msg = Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn->new(
+        field => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<field>
+
+Type: String
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::PartitioningDefinition - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

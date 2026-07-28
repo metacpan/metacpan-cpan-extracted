@@ -1,0 +1,25 @@
+Changes
+ignore.txt
+lib/Google/Cloud/Pubsub/V1.pm
+lib/Google/Cloud/Pubsub/V1/PublisherClient.pm
+lib/Google/Cloud/Pubsub/V1/SchemaServiceClient.pm
+lib/Google/Cloud/Pubsub/V1/SubscriberClient.pm
+lib/Google/Pubsub/V1/Pubsub.pm
+lib/Google/Pubsub/V1/Pubsub/Types.pm
+lib/Google/Pubsub/V1/Schema.pm
+lib/Google/Pubsub/V1/Schema/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-service-Publisher.t
+t/01-service-SchemaService.t
+t/02-rest-transport-Publisher.t
+t/02-rest-transport-SchemaService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

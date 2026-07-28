@@ -38,4 +38,4 @@
 
 ## I cannot get it to work.  Will you help me?
 
-   Yes, to a point.  Please make sure you have tried all of the troubleshooting steps described in ```installing/TROUBLESHOOTING.md```.  Send me an email to my address indicated on the documentation or [metacpan.org](https://metacpan.org/author/RKELSCH).  Attach, as a plain text file, the output of ```examples/dump.pl```.  Have "GFB HELP" in the subject line.
+   Yes, to a point.  Please make sure you have tried all of the troubleshooting steps described in [installing/TROUBLESHOOTING.md](TROUBLESHOOTING.md).  Send me an email to my address indicated on the documentation or [metacpan.org](https://metacpan.org/author/RKELSCH).  Attach, as a plain text file, the output of ```examples/dump.pl```.  Have "GFB HELP" in the subject line.

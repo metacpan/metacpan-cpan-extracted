@@ -1,0 +1,182 @@
+package Google::Spanner::V1::CommitResponse;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Protobuf::Timestamp };
+    eval { require Google::Spanner::V1::Location };
+    eval { require Google::Spanner::V1::Transaction };
+    my $descriptor_b64 = <<'EOF';
+Cidnb29nbGUvc3Bhbm5lci92MS9jb21taXRfcmVzcG9uc2UucHJvdG8SEWdvb2dsZS5zcGFu
+bmVyLnYxGh9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGh9nb29nbGUvcHJvdG9i
+dWYvdGltZXN0YW1wLnByb3RvGiBnb29nbGUvc3Bhbm5lci92MS9sb2NhdGlvbi5wcm90bxoj
+Z29vZ2xlL3NwYW5uZXIvdjEvdHJhbnNhY3Rpb24ucHJvdG8isAUKDkNvbW1pdFJlc3BvbnNl
+EkUKEGNvbW1pdF90aW1lc3RhbXAYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1w
+Ug9jb21taXRUaW1lc3RhbXASUAoMY29tbWl0X3N0YXRzGAIgASgLMi0uZ29vZ2xlLnNwYW5u
+ZXIudjEuQ29tbWl0UmVzcG9uc2UuQ29tbWl0U3RhdHNSC2NvbW1pdFN0YXRzEl4KD3ByZWNv
+bW1pdF90b2tlbhgEIAEoCzIzLmdvb2dsZS5zcGFubmVyLnYxLk11bHRpcGxleGVkU2Vzc2lv
+blByZWNvbW1pdFRva2VuSABSDnByZWNvbW1pdFRva2VuEkkKEnNuYXBzaG90X3RpbWVzdGFt
+cBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSEXNuYXBzaG90VGltZXN0YW1w
+EkYKDGNhY2hlX3VwZGF0ZRgGIAEoCzIeLmdvb2dsZS5zcGFubmVyLnYxLkNhY2hlVXBkYXRl
+QgPgQQFSC2NhY2hlVXBkYXRlEl0KD2lzb2xhdGlvbl9sZXZlbBgHIAEoDjI0Lmdvb2dsZS5z
+cGFubmVyLnYxLlRyYW5zYWN0aW9uT3B0aW9ucy5Jc29sYXRpb25MZXZlbFIOaXNvbGF0aW9u
+TGV2ZWwSYgoOcmVhZF9sb2NrX21vZGUYCCABKA4yPC5nb29nbGUuc3Bhbm5lci52MS5UcmFu
+c2FjdGlvbk9wdGlvbnMuUmVhZFdyaXRlLlJlYWRMb2NrTW9kZVIMcmVhZExvY2tNb2RlGjQK
+C0NvbW1pdFN0YXRzEiUKDm11dGF0aW9uX2NvdW50GAEgASgDUg1tdXRhdGlvbkNvdW50QhkK
+F011bHRpcGxleGVkU2Vzc2lvblJldHJ5QrYBChVjb20uZ29vZ2xlLnNwYW5uZXIudjFCE0Nv
+bW1pdFJlc3BvbnNlUHJvdG9QAVo1Y2xvdWQuZ29vZ2xlLmNvbS9nby9zcGFubmVyL2FwaXYx
+L3NwYW5uZXJwYjtzcGFubmVycGKqAhdHb29nbGUuQ2xvdWQuU3Bhbm5lci5WMcoCF0dvb2ds
+ZVxDbG91ZFxTcGFubmVyXFYx6gIaR29vZ2xlOjpDbG91ZDo6U3Bhbm5lcjo6VjFK3BgKBhIE
+DgBPAQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNl
+ZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2Ui
+KTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0
+aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBh
+dAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBV
+bmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRp
+bmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmli
+dXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJ
+VElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhl
+IExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lv
+bnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAGgoJCgID
+ABIDEgApCgkKAgMBEgMTACkKCQoCAwISAxQAKgoJCgIDAxIDFQAtCggKAQgSAxcANAoJCgII
+JRIDFwA0CggKAQgSAxgATAoJCgIICxIDGABMCggKAQgSAxkAIgoJCgIIChIDGQAiCggKAQgS
+AxoANAoJCgIICBIDGgA0CggKAQgSAxsALgoJCgIIARIDGwAuCggKAQgSAxwANAoJCgIIKRID
+HAA0CggKAQgSAx0AMwoJCgIILRIDHQAzCkoKAgQAEgQgAE8BGj4gVGhlIHJlc3BvbnNlIGZv
+ciBbQ29tbWl0XVtnb29nbGUuc3Bhbm5lci52MS5TcGFubmVyLkNvbW1pdF0uCgoKCgMEAAES
+AyAIFgo1CgQEAAMAEgQiAisDGicgQWRkaXRpb25hbCBzdGF0aXN0aWNzIGFib3V0IGEgY29t
+bWl0LgoKDAoFBAADAAESAyIKFQrDBAoGBAADAAIAEgMqBB0aswQgVGhlIHRvdGFsIG51bWJl
+ciBvZiBtdXRhdGlvbnMgZm9yIHRoZSB0cmFuc2FjdGlvbi4gS25vd2luZyB0aGUKIGBtdXRh
+dGlvbl9jb3VudGAgdmFsdWUgY2FuIGhlbHAgeW91IG1heGltaXplIHRoZSBudW1iZXIgb2Yg
+bXV0YXRpb25zCiBpbiBhIHRyYW5zYWN0aW9uIGFuZCBtaW5pbWl6ZSB0aGUgbnVtYmVyIG9m
+IEFQSSByb3VuZCB0cmlwcy4gWW91IGNhbgogYWxzbyBtb25pdG9yIHRoaXMgdmFsdWUgdG8g
+cHJldmVudCB0cmFuc2FjdGlvbnMgZnJvbSBleGNlZWRpbmcgdGhlIHN5c3RlbQogW2xpbWl0
+XShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vc3Bhbm5lci9xdW90YXMjbGltaXRzX2Zvcl9j
+cmVhdGluZ19yZWFkaW5nX3VwZGF0aW5nX2FuZF9kZWxldGluZ19kYXRhKS4KIElmIHRoZSBu
+dW1iZXIgb2YgbXV0YXRpb25zIGV4Y2VlZHMgdGhlIGxpbWl0LCB0aGUgc2VydmVyIHJldHVy
+bnMKIFtJTlZBTElEX0FSR1VNRU5UXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vc3Bhbm5l
+ci9kb2NzL3JlZmVyZW5jZS9yZXN0L3YxL0NvZGUjRU5VTV9WQUxVRVMuSU5WQUxJRF9BUkdV
+TUVOVCkuCgoOCgcEAAMAAgAFEgMqBAkKDgoHBAADAAIAARIDKgoYCg4KBwQAAwACAAMSAyob
+HApOCgQEAAIAEgMuAjEaQSBUaGUgQ2xvdWQgU3Bhbm5lciB0aW1lc3RhbXAgYXQgd2hpY2gg
+dGhlIHRyYW5zYWN0aW9uIGNvbW1pdHRlZC4KCgwKBQQAAgAGEgMuAhsKDAoFBAACAAESAy4c
+LAoMCgUEAAIAAxIDLi8wCsIBCgQEAAIBEgMzAh8atAEgVGhlIHN0YXRpc3RpY3MgYWJvdXQg
+dGhpcyBgQ29tbWl0YC4gTm90IHJldHVybmVkIGJ5IGRlZmF1bHQuCiBGb3IgbW9yZSBpbmZv
+cm1hdGlvbiwgc2VlCiBbQ29tbWl0UmVxdWVzdC5yZXR1cm5fY29tbWl0X3N0YXRzXVtnb29n
+bGUuc3Bhbm5lci52MS5Db21taXRSZXF1ZXN0LnJldHVybl9jb21taXRfc3RhdHNdLgoKDAoF
+BAACAQYSAzMCDQoMCgUEAAIBARIDMw4aCgwKBQQAAgEDEgMzHR4KVAoEBAAIABIENgI6AxpG
+IFlvdSBtdXN0IGV4YW1pbmUgYW5kIHJldHJ5IHRoZSBjb21taXQgaWYgdGhlIGZvbGxvd2lu
+ZyBpcyBwb3B1bGF0ZWQuCgoMCgUEAAgAARIDNggfCngKBAQAAgISAzkEORprIElmIHNwZWNp
+ZmllZCwgdHJhbnNhY3Rpb24gaGFzIG5vdCBjb21taXR0ZWQgeWV0LgogWW91IG11c3QgcmV0
+cnkgdGhlIGNvbW1pdCB3aXRoIHRoZSBuZXcgcHJlY29tbWl0IHRva2VuLgoKDAoFBAACAgYS
+AzkEJAoMCgUEAAICARIDOSU0CgwKBQQAAgIDEgM5NzgK4AEKBAQAAgMSA0ACMxrSASBJZiBg
+VHJhbnNhY3Rpb25PcHRpb25zLmlzb2xhdGlvbl9sZXZlbGAgaXMgc2V0IHRvCiBgSXNvbGF0
+aW9uTGV2ZWwuUkVQRUFUQUJMRV9SRUFEYCwgdGhlbiB0aGUgc25hcHNob3QgdGltZXN0YW1w
+IGlzIHRoZQogdGltZXN0YW1wIGF0IHdoaWNoIGFsbCByZWFkcyBpbiB0aGUgdHJhbnNhY3Rp
+b24gcmFuLiBUaGlzIHRpbWVzdGFtcCBpcwogbmV2ZXIgcmV0dXJuZWQuCgoMCgUEAAIDBhID
+QAIbCgwKBQQAAgMBEgNAHC4KDAoFBAACAwMSA0AxMgqKAwoEBAACBBIDSAJIGvwCIE9wdGlv
+bmFsLiBBIGNhY2hlIHVwZGF0ZSBleHByZXNzZXMgYSBzZXQgb2YgY2hhbmdlcyB0aGUgY2xp
+ZW50IHNob3VsZAogaW5jb3Jwb3JhdGUgaW50byBpdHMgbG9jYXRpb24gY2FjaGUuIFRoZSBj
+bGllbnQgc2hvdWxkIGRpc2NhcmQgdGhlIGNoYW5nZXMKIGlmIHRoZXkgYXJlIG9sZGVyIHRo
+YW4gdGhlIGRhdGEgaXQgYWxyZWFkeSBoYXMuIFRoaXMgZGF0YSBjYW4gYmUgb2J0YWluZWQK
+IGluIHJlc3BvbnNlIHRvIHJlcXVlc3RzIHRoYXQgaW5jbHVkZWQgYSBgUm91dGluZ0hpbnRg
+IGZpZWxkLCBidXQgbWF5IGFsc28KIGJlIG9idGFpbmVkIGJ5IGV4cGxpY2l0IGxvY2F0aW9u
+LWZldGNoaW5nIFJQQ3Mgd2hpY2ggbWF5IGJlIGFkZGVkIGluIHRoZQogZnV0dXJlLgoKDAoF
+BAACBAYSA0gCDQoMCgUEAAIEARIDSA4aCgwKBQQAAgQDEgNIHR4KDAoFBAACBAgSA0gfRwoP
+CggEAAIECJwIABIDSCBGCkcKBAQAAgUSA0sCOBo6IFRoZSBpc29sYXRpb24gbGV2ZWwgdXNl
+ZCBmb3IgdGhlIHJlYWQtd3JpdGUgdHJhbnNhY3Rpb24uCgoMCgUEAAIFBhIDSwIjCgwKBQQA
+AgUBEgNLJDMKDAoFBAACBQMSA0s2NwpGCgQEAAIGEgNOAj8aOSBUaGUgcmVhZCBsb2NrIG1v
+ZGUgdXNlZCBmb3IgdGhlIHJlYWQtd3JpdGUgdHJhbnNhY3Rpb24uCgoMCgUEAAIGBhIDTgIr
+CgwKBQQAAgYBEgNOLDoKDAoFBAACBgMSA049PmIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Spanner::V1::CommitResponse::CommitResponse ===
+    # Fields for CommitResponse
+    # Field: commit_timestamp Type: 11 (.google.protobuf.Timestamp)
+    # Field: commit_stats Type: 11 (.google.spanner.v1.CommitResponse.CommitStats)
+    # Field: precommit_token Type: 11 (.google.spanner.v1.MultiplexedSessionPrecommitToken)
+    # Field: snapshot_timestamp Type: 11 (.google.protobuf.Timestamp)
+    # Field: cache_update Type: 11 (.google.spanner.v1.CacheUpdate)
+    # Field: isolation_level Type: 14 (.google.spanner.v1.TransactionOptions.IsolationLevel)
+    # Field: read_lock_mode Type: 14 (.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode)
+
+=pod
+
+=head1 NAME
+
+Google::Spanner::V1::CommitResponse::CommitResponse - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Spanner::V1::CommitResponse;
+
+    my $msg = Google::Spanner::V1::CommitResponse::CommitResponse->new(
+        commit_timestamp => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<commit_timestamp>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<commit_stats>
+
+Type: Message (.google.spanner.v1.CommitResponse.CommitStats)
+
+=item * B<precommit_token>
+
+Type: Message (.google.spanner.v1.MultiplexedSessionPrecommitToken)
+
+=item * B<snapshot_timestamp>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<cache_update>
+
+Type: Message (.google.spanner.v1.CacheUpdate)
+
+=item * B<isolation_level>
+
+Type: Enum (.google.spanner.v1.TransactionOptions.IsolationLevel)
+
+=item * B<read_lock_mode>
+
+Type: Enum (.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode)
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Spanner::V1::CommitResponse - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

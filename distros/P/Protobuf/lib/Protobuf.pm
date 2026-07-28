@@ -51,7 +51,7 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our $HAS_XS;
 {
@@ -108,7 +108,7 @@ sub get_engine {
 
     my $class = "Protobuf::Engine::" . ($engine_key eq 'xs' ? 'XS' : 'PurePerl');
     (my $file = $class) =~ s/::/\//g;
-    require "$file.pm";
+    require "$file.pm"; ## no critic (Modules::RequireBarewordIncludes)
 
     return $engines{$engine_key} = $class->new();
 }

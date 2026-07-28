@@ -6,11 +6,27 @@
 #include "ppport.h"
 #include "reqrep.h"
 
+/* Narrow a Perl string length to the uint32 wire width WITHOUT silent truncation:
+ * a length that doesn't fit maps to UINT32_MAX so the downstream < 2 GiB size
+ * check croaks, instead of the value wrapping to a small, wrongly-accepted length. */
+#define LEN32(len) ((len) > (STRLEN)0xFFFFFFFFU ? 0xFFFFFFFFU : (uint32_t)(len))
+
 #define EXTRACT_HANDLE(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed %s object", classname)
+    if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic).  That code may call $obj->DESTROY explicitly, which frees
+ * the handle and zeroes the IV; EXTRACT_HANDLE's mortal pins the referent
+ * only against refcount-driven destruction, not an explicit DESTROY, so the
+ * local `h` would dangle.  Used only where magic can actually intervene
+ * between EXTRACT_HANDLE and the first use of h. */
+#define REEXTRACT_HANDLE(classname, sv) \
+    h = INT2PTR(ReqRepHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("%s object destroyed during the call", classname)
 
 #define MAKE_OBJ(class, ptr) \
     SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
@@ -32,12 +48,13 @@ new(class, path, req_cap, resp_slots, resp_size, ...)
     char errbuf[REQREP_ERR_BUFLEN];
     uint64_t arena_cap;
   CODE:
-    arena_cap = (items > 5) ? (uint64_t)SvUV(ST(5)) : 0;
+    arena_cap = (items > 5 && (SvGETMAGIC(ST(5)), SvOK(ST(5)))) ? (uint64_t)SvUV(ST(5)) : 0;
     const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* Optional 7th arg (index 6, after arena_cap): file mode for a newly-created
      * file-backed segment (default 0600, owner-only). Pass e.g. 0660 to opt into
      * cross-user sharing. Ignored for anonymous/existing segments. */
     mode_t mode = (items > 6 && (SvGETMAGIC(ST(6)), SvOK(ST(6)))) ? (mode_t)SvUV(ST(6)) : 0600;
+    if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU || resp_size > 0xFFFFFFFFU) croak("Data::ReqRep::Shared->new: a capacity/size argument exceeds 2^32");
     ReqRepHandle *h = reqrep_create(p, (uint32_t)req_cap, (uint32_t)resp_slots,
                                      (uint32_t)resp_size, arena_cap, mode, errbuf);
     if (!h) croak("Data::ReqRep::Shared->new: %s", errbuf);
@@ -56,7 +73,8 @@ new_memfd(class, name, req_cap, resp_slots, resp_size, ...)
     char errbuf[REQREP_ERR_BUFLEN];
     uint64_t arena_cap;
   CODE:
-    arena_cap = (items > 5) ? (uint64_t)SvUV(ST(5)) : 0;
+    arena_cap = (items > 5 && (SvGETMAGIC(ST(5)), SvOK(ST(5)))) ? (uint64_t)SvUV(ST(5)) : 0;
+    if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU || resp_size > 0xFFFFFFFFU) croak("Data::ReqRep::Shared->new: a capacity/size argument exceeds 2^32");
     ReqRepHandle *h = reqrep_create_memfd(name, (uint32_t)req_cap, (uint32_t)resp_slots,
                                            (uint32_t)resp_size, arena_cap, errbuf);
     if (!h) croak("Data::ReqRep::Shared->new_memfd: %s", errbuf);
@@ -127,7 +145,8 @@ recv_wait(self, ...)
     uint64_t id;
     bool utf8;
   PPCODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
     int r = reqrep_recv_wait(h, &str, &len, &utf8, &id, timeout);
     if (r == -1) croak("Data::ReqRep::Shared: out of memory");
     if (r == 1) {
@@ -153,6 +172,12 @@ recv_multi(self, count)
     UV n = 0;
     int last_r = 0;
     int oom = 0;
+    /* Cap count at the request-queue capacity: the queue can't hold more than
+     * req_cap items, so a single recv_multi can't return more than that. This
+     * also prevents an unvalidated huge count from overflowing the malloc size
+     * ((size_t)count * sizeof wraps -> tiny alloc -> heap overflow in the locked
+     * drain below). */
+    if (count > (UV)h->req_cap) count = (UV)h->req_cap;
     if (count > 0) {
         items_buf = (void *)malloc((size_t)count * sizeof(*items_buf));
         if (!items_buf) croak("Data::ReqRep::Shared: out of memory");
@@ -195,7 +220,8 @@ recv_wait_multi(self, count, ...)
     uint64_t id;
     bool utf8;
   PPCODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
     /* Block until at least 1 */
     int r = reqrep_recv_wait(h, &str, &len, &utf8, &id, timeout);
     if (r == -1) croak("Data::ReqRep::Shared: out of memory");
@@ -206,11 +232,17 @@ recv_wait_multi(self, count, ...)
         mXPUSHs(sv);
         mXPUSHu((UV)id);
     }
-    /* Grab up to count-1 more non-blocking — hoist SV construction out of lock. */
+    /* Grab up to count-1 more non-blocking -- hoist SV construction out of lock. */
     struct { char *buf; uint32_t len; uint64_t id; bool utf8; } *items_buf = NULL;
     UV n = 0;
     int last_r2 = 0;
     int oom = 0;
+    /* Cap count at req_cap + 1: after the initial blocking recv, the locked loop
+     * can drain at most req_cap more items (the queue holds at most req_cap while
+     * we hold the mutex). Capping BEFORE the malloc stops an unvalidated huge
+     * count from overflowing (count-1)*sizeof (size_t wrap -> tiny alloc -> heap
+     * overflow in the locked drain below). */
+    if (count > (UV)h->req_cap + 1) count = (UV)h->req_cap + 1;
     if (count > 1) {
         items_buf = (void *)malloc((size_t)(count - 1) * sizeof(*items_buf));
         if (!items_buf) croak("Data::ReqRep::Shared: out of memory");
@@ -252,12 +284,13 @@ drain(self, ...)
     bool utf8;
     uint32_t max_count;
   PPCODE:
-    max_count = (items > 1) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
     /* Hoist SV construction out of the mutex (see recv_multi). */
     struct drain_item { char *buf; uint32_t len; uint64_t id; bool utf8; struct drain_item *next; } *drained_head = NULL, *drained_tail = NULL;
     UV drained_n = 0;
     int last_r = 0;
     int oom = 0;
+    REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
     reqrep_mutex_lock(h->hdr);
     while (max_count-- > 0) {
         last_r = reqrep_recv_locked(h, &str, &len, &utf8, &id);
@@ -296,7 +329,8 @@ reply(self, id, value)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_reply(h, (uint64_t)id, str, (uint32_t)len, utf8);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
+    int r = reqrep_reply(h, (uint64_t)id, str, LEN32(len), utf8);
     if (r == -1) croak("Data::ReqRep::Shared: invalid slot index");
     if (r == -3) croak("Data::ReqRep::Shared: response too long (max %u bytes)", h->resp_data_max);
     RETVAL = (r == 1);
@@ -366,7 +400,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *path;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::ReqRep::Shared")) {
         ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         path = h->path;
@@ -583,7 +617,8 @@ send(self, value)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_try_send(h, str, (uint32_t)len, utf8, &id);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
+    int r = reqrep_try_send(h, str, LEN32(len), utf8, &id);
     if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     RETVAL = (r == 1) ? newSVuv((UV)id) : &PL_sv_undef;
   OUTPUT:
@@ -599,10 +634,11 @@ send_wait(self, value, ...)
     STRLEN len;
     uint64_t id;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_send_wait(h, str, (uint32_t)len, utf8, &id, timeout);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
+    int r = reqrep_send_wait(h, str, LEN32(len), utf8, &id, timeout);
     if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     RETVAL = (r == 1) ? newSVuv((UV)id) : &PL_sv_undef;
   OUTPUT:
@@ -619,7 +655,8 @@ send_notify(self, value)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_try_send(h, str, (uint32_t)len, utf8, &id);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
+    int r = reqrep_try_send(h, str, LEN32(len), utf8, &id);
     if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         reqrep_notify(h);
@@ -640,10 +677,11 @@ send_wait_notify(self, value, ...)
     STRLEN len;
     uint64_t id;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_send_wait(h, str, (uint32_t)len, utf8, &id, timeout);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
+    int r = reqrep_send_wait(h, str, LEN32(len), utf8, &id, timeout);
     if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         reqrep_notify(h);
@@ -687,7 +725,8 @@ get_wait(self, id, ...)
     uint32_t len;
     bool utf8;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
     int r = reqrep_get_wait(h, (uint64_t)id, &str, &len, &utf8, timeout);
     if (r == -1) croak("Data::ReqRep::Shared::Client: invalid slot index");
     if (r == -2) croak("Data::ReqRep::Shared::Client: out of memory");
@@ -713,7 +752,8 @@ req(self, value)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_request(h, str, (uint32_t)len, utf8, &out_str, &out_len, &out_utf8, -1);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
+    int r = reqrep_request(h, str, LEN32(len), utf8, &out_str, &out_len, &out_utf8, -1);
     if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         RETVAL = newSVpvn(out_str, out_len);
@@ -738,7 +778,8 @@ req_wait(self, value, timeout)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = reqrep_request(h, str, (uint32_t)len, utf8, &out_str, &out_len, &out_utf8, timeout);
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
+    int r = reqrep_request(h, str, LEN32(len), utf8, &out_str, &out_len, &out_utf8, timeout);
     if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         RETVAL = newSVpvn(out_str, out_len);
@@ -940,6 +981,7 @@ new(class, path, req_cap, resp_slots, ...)
      * segment (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
      * sharing. Ignored for anonymous/existing segments. */
     mode_t mode = (items > 4 && (SvGETMAGIC(ST(4)), SvOK(ST(4)))) ? (mode_t)SvUV(ST(4)) : 0600;
+    if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU) croak("Data::ReqRep::Shared::Int->new: req_cap/resp_slots exceeds 2^32");
     ReqRepHandle *h = reqrep_create_int(p, (uint32_t)req_cap, (uint32_t)resp_slots, mode, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -955,6 +997,7 @@ new_memfd(class, name, req_cap, resp_slots)
   PREINIT:
     char errbuf[REQREP_ERR_BUFLEN];
   CODE:
+    if (req_cap > 0xFFFFFFFFU || resp_slots > 0xFFFFFFFFU) croak("Data::ReqRep::Shared::Int->new_memfd: req_cap/resp_slots exceeds 2^32");
     ReqRepHandle *h = reqrep_create_int_memfd(name, (uint32_t)req_cap, (uint32_t)resp_slots, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -1016,7 +1059,8 @@ recv_wait(self, ...)
     int64_t value;
     uint64_t id;
   PPCODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
     if (reqrep_int_recv_wait(h, &value, &id, timeout)) {
         mXPUSHi((IV)value);
         mXPUSHu((UV)id);
@@ -1239,7 +1283,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *path;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::ReqRep::Shared::Int")) {
         ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         path = h->path;
@@ -1322,7 +1366,8 @@ send_wait(self, value, ...)
     double timeout = -1;
     uint64_t id;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Int::Client", self);
     int r = reqrep_int_send_wait(h, (int64_t)value, &id, timeout);
     RETVAL = (r == 1) ? newSVuv((UV)id) : &PL_sv_undef;
   OUTPUT:
@@ -1351,7 +1396,8 @@ get_wait(self, id, ...)
     double timeout = -1;
     int64_t value;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::ReqRep::Shared::Int::Client", self);
     int r = reqrep_int_get_wait(h, (uint64_t)id, &value, timeout);
     if (r == -1) croak("Data::ReqRep::Shared::Int::Client: invalid slot index");
     RETVAL = (r == 1) ? newSViv((IV)value) : &PL_sv_undef;

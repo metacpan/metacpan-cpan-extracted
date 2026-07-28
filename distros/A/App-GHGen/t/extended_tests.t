@@ -10,7 +10,6 @@ use File::Temp qw(tempdir);
 use Path::Tiny;
 use Cwd qw(getcwd);
 use Readonly;
-use lib "$ENV{HOME}/src/njh/Test-Returns/lib";
 use Test::Returns;
 
 use App::GHGen::Analyzer       qw(analyze_workflow find_workflows get_cache_suggestion);

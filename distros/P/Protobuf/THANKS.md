@@ -55,8 +55,13 @@ We would like to especially thank:
     `App::EvalServerAdvanced` and `Google::ProtocolBuffers::Dynamic`.
 
 *   **Lukas Mai** ([@mauke](https://github.com/mauke)) - For
-    spotting stale repository links and missing bugtracker URLs in the CPAN
-    `META.json` metadata.
+    spotting stale repository links and missing bugtracker URLs in CPAN
+    metadata, catching compilation issues under `-flto=auto` and ithreads,
+    and sharing the `make distcheck` release linting pattern to prevent
+    releases with missing `Changes` entries.
+
+*   **Dan Book** ([@Grinnz](https://github.com/Grinnz)) - For authoring
+    guidance, CPAN toolchain insights, and release management recommendations.
 
 *   **Slaven Rezić** ([@srezic](https://github.com/srezic) / Slaven_Rezic) - For
     reporting CPAN RT tickets #180139 and #178734, helping improve build system stability across diverse Perl environments and platform architectures.

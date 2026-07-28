@@ -34,6 +34,7 @@ use_ok('Database::test1');	# keyed CSV (! sep, 'entry' key)
 use_ok('Database::test2');	# PSV (| sep, 'entry' key)
 use_ok('Database::test3');	# XML complex — must use max_slurp_size => 1
 use_ok('Database::test4');	# no_entry CSV (, sep)
+use_ok('Database::test4ne');	# no_entry CSV with custom id=>'cardinal' (produces ARRAY slurp)
 use_ok('Database::test5');	# CSV with custom ID column
 
 Readonly my $DATA_DIR       => File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
@@ -610,6 +611,20 @@ note '=== H. columns() / schema() caching and consistency ===';
 	my $db2  = Database::test1->new($DATA_DIR);
 	my $cols3 = $db2->columns();
 	isnt($cols1, $cols3, 'H6: separate objects have separate cached column refs');
+
+	# H7 — no_entry CSV slurp (ARRAY-ref data) columns() and schema() return
+	#       correct results (regression guard for ARRAY-branch fix in columns/schema)
+	#       Database::test4ne uses id=>'cardinal' so rows survive the slurp filter.
+	{
+		my $ne_db = Database::test4ne->new(directory => $DATA_DIR);
+		$ne_db->count();    # trigger slurp into ARRAY ref
+		my $ne_cols = $ne_db->columns();
+		ok(ref($ne_cols) eq 'ARRAY' && scalar(@{$ne_cols}) > 0,
+			'H7a: no_entry CSV columns() returns non-empty arrayref (ARRAY path)');
+		my $ne_sch = $ne_db->schema();
+		ok(ref($ne_sch) eq 'HASH' && scalar(keys %{$ne_sch}) > 0,
+			'H7b: no_entry CSV schema() returns non-empty hashref (ARRAY path)');
+	}
 }
 
 # ---------------------------------------------------------------------------
@@ -803,6 +818,325 @@ note '=== L. Optional-dep graceful degradation ===';
 	# L4 — Attempting to use BerkeleyDB-specific methods on CSV backend croaks clearly
 	my $db_csv = Database::test1->new(directory => $DATA_DIR);
 	ok(!$db_csv->{'berkeley'}, 'L4: CSV backend has no berkeley flag');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION M — DBM::Deep backend end-to-end workflow
+# Creates a real .deep fixture in a tempdir, then exercises every core public
+# method (selectall_arrayref, selectall_array, fetchrow_hashref, count,
+# AUTOLOAD, columns, schema) plus the query builder through the in-memory
+# delegation path.  Verifies that the 'type' field is set to 'Deep'.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== M. DBM::Deep backend end-to-end ===';
+
+my $have_deep = do { local $@; eval { require DBM::Deep; 1 } };
+
+SKIP: {
+	skip 'DBM::Deep not available', 20 unless $have_deep;
+
+	# Declare the test subclass at runtime (avoid BEGIN because we are inside SKIP).
+	do {
+		package Database::integ_deep;
+		use parent -norequire, 'Database::Abstraction';
+	};
+
+	my $deep_dir = tempdir(CLEANUP => 1);
+
+	# Build a .deep fixture with three rows, each having entry + two columns.
+	{
+		require DBM::Deep;
+		my $file = File::Spec->catfile($deep_dir, 'integ_deep.deep');
+		my $ddb  = DBM::Deep->new({ file => $file });
+		$ddb->{'alpha'}  = { name => 'Alice', score => 10 };
+		$ddb->{'beta'}   = { name => 'Bob',   score => 20 };
+		$ddb->{'gamma'}  = { name => 'Carol', score => 30 };
+		undef $ddb;    # flush and close before Database::Abstraction opens it
+	}
+
+	my $ddb_obj = new_ok('Database::integ_deep' => [ directory => $deep_dir ]);
+
+	# M1 — type is set to 'Deep' after first data access
+	my $m_all = $ddb_obj->selectall_arrayref();
+	is($ddb_obj->{'type'}, 'Deep', 'M1: backend type is "Deep" after open');
+
+	# M2 — selectall_arrayref returns all 3 rows
+	is(ref($m_all), 'ARRAY',        'M2a: selectall_arrayref returns arrayref');
+	is(scalar @{$m_all}, 3,         'M2b: 3 rows total');
+	ok(ref($m_all->[0]) eq 'HASH',  'M2c: each element is a hashref');
+
+	# M3 — filtered selectall_arrayref by entry key
+	my $m_one = $ddb_obj->selectall_arrayref(entry => 'alpha');
+	is(scalar @{$m_one}, 1,               'M3a: filtered by entry returns 1 row');
+	is($m_one->[0]{'name'}, 'Alice',       'M3b: filtered row has correct name');
+
+	# M4 — filtered selectall_arrayref by non-key column
+	my $m_score = $ddb_obj->selectall_arrayref(score => 20);
+	is(scalar @{$m_score}, 1,             'M4a: filtered by score column returns 1 row');
+	is($m_score->[0]{'name'}, 'Bob',       'M4b: correct name for score==20');
+
+	# M5 — selectall_array (flat list variant)
+	my @m_arr = $ddb_obj->selectall_array();
+	is(scalar @m_arr, 3, 'M5: selectall_array returns 3 rows');
+
+	# M6 — fetchrow_hashref by entry
+	my $m_row = $ddb_obj->fetchrow_hashref(entry => 'gamma');
+	ok(defined($m_row),             'M6a: fetchrow_hashref(entry=>gamma) defined');
+	is($m_row->{'name'}, 'Carol',   'M6b: correct name');
+	ok(!defined($ddb_obj->fetchrow_hashref(entry => '__missing__')),
+		'M6c: fetchrow_hashref miss returns undef');
+
+	# M7 — count() total and filtered
+	is($ddb_obj->count(), 3, 'M7a: count() == 3');
+	is($ddb_obj->count(score => 10), 1, 'M7b: count(score=>10) == 1');
+
+	# M8 — AUTOLOAD column lookup
+	my $m_name = $ddb_obj->name(entry => 'beta');
+	is($m_name, 'Bob', 'M8: AUTOLOAD name(entry=>beta) == Bob');
+
+	# M9 — columns() includes 'entry', 'name', 'score'
+	my $m_cols = $ddb_obj->columns();
+	ok(scalar(grep { $_ eq 'name'  } @{$m_cols}), 'M9a: columns includes "name"');
+	ok(scalar(grep { $_ eq 'score' } @{$m_cols}), 'M9b: columns includes "score"');
+
+	# M10 — query builder delegation: all() returns all rows; where() filters
+	my $qb_all = $ddb_obj->query()->all();
+	is(scalar @{$qb_all}, 3, 'M10a: query()->all() returns 3 rows');
+	my $qb_one = $ddb_obj->query()->where(entry => 'alpha')->first();
+	is($qb_one->{'name'}, 'Alice', 'M10b: query()->where(entry)->first() returns correct row');
+	is($ddb_obj->query()->count(), 3, 'M10c: query()->count() == 3');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION N — Remote file backend with mocked File::Slurp::Remote
+# Overrides read_remote_file to serve in-memory CSV data so no real SSH is
+# needed.  Verifies that selectall_arrayref, fetchrow_hashref, count, AUTOLOAD,
+# and the query builder all work transparently on remote-fetched data.
+# Also verifies that _remote_tmpdir is populated and cleaned up in DESTROY.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== N. Remote file backend (mocked SSH) ===';
+
+my $have_remote = do { local $@; eval { require File::Slurp::Remote; 1 } };
+
+SKIP: {
+	skip 'File::Slurp::Remote not available', 13 unless $have_remote;
+
+	do {
+		package Database::integ_remote;
+		use parent -norequire, 'Database::Abstraction';
+	};
+
+	# Fixture data served by the mock; keyed by "host:path".
+	my %N_FIXTURE = (
+		'remhost:/rdata/integ_remote.csv' =>
+			"entry!name!score\nalpha!Alice!10\nbeta!Bob!20\ngamma!Carol!30\n",
+	);
+
+	{
+		no warnings 'redefine';
+		*File::Slurp::Remote::read_remote_file = sub {
+			my ($host, $file) = @_;
+			my $key = "$host:$file";
+			die "N-mock: no fixture for $key\n" unless exists $N_FIXTURE{$key};
+			return $N_FIXTURE{$key};
+		};
+	}
+
+	my $rdb = new_ok('Database::integ_remote' => [
+		host      => 'remhost',
+		directory => '/rdata',
+	]);
+
+	# N2 — selectall_arrayref returns all rows from remote CSV
+	# (triggers _open_table -> _open -> File::Slurp::Remote fetch)
+	my $n_all = $rdb->selectall_arrayref();
+	is(ref($n_all), 'ARRAY', 'N2a: selectall_arrayref returns arrayref');
+	is(scalar @{$n_all}, 3,  'N2b: 3 rows from remote CSV');
+
+	# N1 — _remote_tmpdir is created by _open() (checked after first access)
+	ok(defined($rdb->{'_remote_tmpdir'}),
+		'N1: _remote_tmpdir is defined for a remote host after data access');
+
+	# N3 — fetchrow_hashref by entry
+	my $n_row = $rdb->fetchrow_hashref(entry => 'beta');
+	is(ref($n_row),       'HASH', 'N3a: fetchrow_hashref returns hashref');
+	is($n_row->{'name'}, 'Bob',   'N3b: correct name from remote data');
+
+	# N4 — count()
+	is($rdb->count(), 3, 'N4: count() == 3 from remote CSV');
+
+	# N5 — AUTOLOAD column lookup on remote data
+	is($rdb->name(entry => 'alpha'), 'Alice', 'N5: AUTOLOAD name(alpha) == Alice');
+
+	# N6 — query builder all() on remote data
+	my $n_qb = $rdb->query()->where(score => 20)->first();
+	is($n_qb->{'name'}, 'Bob', 'N6: query()->where(score=>20)->first() correct');
+
+	# N7 — DESTROY removes _remote_tmpdir
+	my $rdb2 = Database::integ_remote->new(
+		host      => 'remhost',
+		directory => '/rdata',
+	);
+	my $tmpdir_path = ref($rdb2->{'_remote_tmpdir'}) ? "$rdb2->{'_remote_tmpdir'}" : undef;
+	$rdb2->DESTROY();
+	ok(!exists($rdb2->{'_remote_tmpdir'}),
+		'N7: DESTROY() removes _remote_tmpdir key');
+
+	# N8 — host injection guard: space in host is rejected
+	throws_ok {
+		Database::integ_remote->new(
+			host      => 'bad host',
+			directory => '/rdata',
+		)
+	} qr/unsafe host/i, 'N8: host with space is rejected at new()';
+
+	# N9 — host injection guard: shell metachar in host is rejected
+	throws_ok {
+		Database::integ_remote->new(
+			host      => 'host;rm -rf /',
+			directory => '/rdata',
+		)
+	} qr/unsafe host/i, 'N9: host with semicolon is rejected at new()';
+}
+
+# ---------------------------------------------------------------------------
+# SECTION O — Local-host short-circuit integration
+# When host => 'localhost' (or '127.0.0.1', '::1') is supplied, _open() must
+# read the local directory directly without invoking File::Slurp::Remote.
+# Uses a real local tempdir with a CSV fixture to verify data is returned
+# correctly, and checks that _remote_tmpdir is NOT created.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== O. Local-host short-circuit ===';
+
+{
+	do {
+		package Database::integ_local;
+		use parent -norequire, 'Database::Abstraction';
+	};
+
+	# Write a minimal CSV fixture into a local tempdir.
+	my $local_dir = tempdir(CLEANUP => 1);
+	{
+		my $csv_path = File::Spec->catfile($local_dir, 'integ_local.csv');
+		open my $fh, '>', $csv_path;
+		print {$fh} "entry!name!score\none!Alice!10\ntwo!Bob!20\n";
+		close $fh;
+	}
+
+	# Install a sentinel if File::Slurp::Remote is loaded so we detect misuse.
+	if(exists $INC{'File/Slurp/Remote.pm'}) {
+		no warnings 'redefine';
+		*File::Slurp::Remote::read_remote_file = sub {
+			fail('O: read_remote_file called for a local host — must not use SSH');
+			die 'sentinel: should not be reached';
+		};
+	}
+
+	# O1 — host=>localhost reads local files without SSH
+	my $lo = Database::integ_local->new(
+		host      => 'localhost',
+		directory => $local_dir,
+	);
+	my $o_all = $lo->selectall_arrayref();
+	is(ref($o_all), 'ARRAY',    'O1a: host=>localhost returns arrayref');
+	is(scalar @{$o_all}, 2,     'O1b: correct row count from local CSV');
+	ok(defined($o_all->[0]{'entry'}), 'O1c: entry column present in returned rows');
+
+	# O2 — _remote_tmpdir is NOT created for a local host
+	ok(!defined($lo->{'_remote_tmpdir'}),
+		'O2: _remote_tmpdir is undef for localhost shortcircuit');
+
+	# O3 — host=>127.0.0.1 also reads locally
+	my $lo2 = Database::integ_local->new(
+		host      => '127.0.0.1',
+		directory => $local_dir,
+	);
+	my $o2_cnt = $lo2->count();
+	is($o2_cnt, 2, 'O3: host=>127.0.0.1 shortcircuit returns correct count');
+
+	# O4 — host=>::1 also reads locally
+	my $lo3 = Database::integ_local->new(
+		host      => '::1',
+		directory => $local_dir,
+	);
+	is($lo3->count(), 2, 'O4: host=>::1 shortcircuit returns correct count');
+
+	# O5 — fetchrow_hashref on local shortcircuit returns correct row
+	my $o_row = $lo->fetchrow_hashref(entry => 'two');
+	ok(defined($o_row),          'O5a: fetchrow_hashref defined on local shortcircuit');
+	is($o_row->{'name'}, 'Bob',  'O5b: correct name from local CSV via shortcircuit');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION P — Query builder + BerkeleyDB cross-module workflow
+# Injects berkeley state into a CSV-backed object to activate the BerkeleyDB
+# in-memory delegation path inside Query.pm, testing the cross-module
+# interaction between Database::Abstraction::Query's all/first/count and
+# Database::Abstraction's _scan_berkeley / selectall_arrayref.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== P. Query builder + BerkeleyDB cross-module workflow ===';
+
+{
+	# Build a normal CSV object and inject a BerkeleyDB-like in-memory hash.
+	# BerkeleyDB stores key => scalar.  _scan_berkeley() maps this into rows of
+	# the form { entry => $key, value => $scalar }.  The injected hash must use
+	# scalar values — not hashrefs — to match the real BDB row structure.
+	my $bdb_obj = Database::test1->new($DATA_DIR);
+
+	$bdb_obj->{'berkeley'} = {
+		darwin   => 'biologist',
+		einstein => 'physicist',
+		feynman  => 'physicist',
+	};
+
+	# P1 — query()->all() returns all 3 injected rows via BerkeleyDB delegation
+	my $p_all = $bdb_obj->query()->all();
+	is(ref($p_all), 'ARRAY', 'P1a: query()->all() on BDB returns arrayref');
+	is(scalar @{$p_all}, 3,  'P1b: all 3 rows returned via BDB delegation');
+	ok(scalar(grep { $_->{'entry'} } @{$p_all}), 'P1c: rows have "entry" key');
+
+	# P2 — query()->where(entry => ...)->all() filters via BerkeleyDB scan
+	my $p_filt = $bdb_obj->query()->where(entry => 'einstein')->all();
+	is(scalar @{$p_filt}, 1,                'P2a: where(entry)->all() returns 1 row');
+	is($p_filt->[0]{'entry'}, 'einstein',    'P2b: correct entry key returned');
+	is($p_filt->[0]{'value'}, 'physicist',   'P2c: correct value returned');
+
+	# P3 — query()->where()->first() returns first matched row
+	my $p_first = $bdb_obj->query()->where(entry => 'feynman')->first();
+	is($p_first->{'value'}, 'physicist', 'P3: query()->where()->first() returns correct row');
+
+	# P4 — query()->count() returns total row count via BDB delegation
+	is($bdb_obj->query()->count(), 3, 'P4: query()->count() == 3 via BDB delegation');
+
+	# P5 — query()->where()->count() returns filtered count (2 physicists)
+	is($bdb_obj->query()->where(value => 'physicist')->count(), 2,
+		'P5: query()->where(value)->count() == 2');
+
+	# P6 — query()->order_by()->limit() paginates correctly via Perl-side sort
+	# Sorting by entry ASC: darwin, einstein, feynman — limit(2) = darwin, einstein
+	my $p_sorted = $bdb_obj->query()->order_by('entry ASC')->limit(2)->all();
+	is(scalar @{$p_sorted}, 2, 'P6a: limit(2) returns exactly 2 rows');
+	is($p_sorted->[0]{'entry'}, 'darwin',   'P6b: first row ASC by entry is darwin');
+	is($p_sorted->[1]{'entry'}, 'einstein', 'P6c: second row ASC by entry is einstein');
+
+	# P7 — query()->join() on BerkeleyDB croaks with a clear message
+	throws_ok {
+		$bdb_obj->query()->join({ table => 'other', on => 'k1 = k2' })->all()
+	} qr/JOINs? is not supported on BerkeleyDB/i,
+		'P7: query()->join()->all() on BDB croaks';
+
+	# P8 — Two independent query objects on the same BDB object do not interfere
+	my $qa = $bdb_obj->query()->where(entry => 'darwin');
+	my $qb = $bdb_obj->query()->where(entry => 'einstein');
+	is($qa->first()->{'value'}, 'biologist', 'P8a: first query returns correct value');
+	is($qb->first()->{'value'}, 'physicist', 'P8b: second query returns correct value');
 }
 
 done_testing();

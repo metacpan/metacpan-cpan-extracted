@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp qw(tmpnam);
 use POSIX qw(_exit);
 use Data::Sync::Shared;
@@ -208,10 +209,10 @@ use Data::Sync::Shared;
 {
     my $cv = Data::Sync::Shared::Condvar->new(undef);
     $cv->lock;
-    my $t0 = time;
+    my $t0 = Time::HiRes::time();
     my $ok = $cv->wait_while(sub { 1 }, 0);
     ok !$ok, 'wait_while(pred, 0) returns false immediately';
-    ok time - $t0 < 1, 'wait_while(pred, 0) did not block';
+    ok Time::HiRes::time() - $t0 < 1, 'wait_while(pred, 0) did not block';
     $cv->unlock;
 
     # predicate already false with timeout=0

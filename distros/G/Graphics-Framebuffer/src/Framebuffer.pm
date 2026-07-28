@@ -174,7 +174,7 @@ The current background color encoded as a string.
 
 * B<ACCELERATED>
 
-Indicates if C code or hardware acceleration is being used.
+Indicates if Perl or C code is being used.
 
 =back
 
@@ -184,7 +184,6 @@ Indicates if C code or hardware acceleration is being used.
 
  0 = Perl code only
  1 = Some functions accelerated by compiled C code (Default)
- 2 = All of #1 plus additional functions accelerated by hardware (currently not supported, and likely never will)
 
 =back
 
@@ -314,8 +313,6 @@ Acceleration method constants
 
 * B<SOFTWARE> ( 1 )
 
-* B<HARDWARE> ( 2 )
-
 =back
 
 =cut
@@ -360,7 +357,6 @@ use constant {
 
     PERL     => 0,
     SOFTWARE => 1,
-    HARDWARE => 2,         # I seriously doubt hardware will ever be implemented since most framebuffers have no hardware acceleration capability
 
     ## Set up the Framebuffer driver "constants" defaults
     # Commands
@@ -493,7 +489,6 @@ BEGIN {
       CENTRE_XY
       PERL
       SOFTWARE
-      HARDWARE
       @HATCHES
       @COLORORDER
     );
@@ -540,8 +535,6 @@ The following are names you can search to get to the desired method (sorted alph
 =item * B<fill>, B<filled_pie>
 
 =item * B<get_face_name>, B<get_font_list>, B<getpixel>, B<get_pixel>, B<graphics_mode>
-
-=item * B<hardware>
 
 =item * B<last_plot>, B<line>, B<load_image>
 
@@ -902,7 +895,6 @@ sub new {
         'ACCELERATED'         => SOFTWARE,    # Use accelerated graphics
                                               #   0 = PERL     = Pure Perl
                                               #   1 = SOFTWARE = C Accelerated (but still software)
-                                              #   2 = HARDWARE = C & Hardware accelerated.
         'FBIO_WAITFORVSYNC'   => 0x4620,
         'VT_GETSTATE'         => 0x5603,
         'KDSETMODE'           => 0x4B3A,
@@ -3926,9 +3918,11 @@ sub _fill_polygon {
     my $top    = 0;
     my $bottom = 0;
     my $fill;
+	my $x_clip = $self->{'X_CLIP'};
+	my $y_clip = $self->{'Y_CLIP'};
     while (scalar(@{ $params->{'coordinates'} })) {
-        my $x = int(shift(@{ $params->{'coordinates'} })) - $self->{'X_CLIP'};    # Compensate for the smaller area in Imager
-        my $y = int(shift(@{ $params->{'coordinates'} })) - $self->{'Y_CLIP'};
+        my $x = int(shift(@{ $params->{'coordinates'} })) - $x_clip;    # Compensate for the smaller area in Imager
+        my $y = int(shift(@{ $params->{'coordinates'} })) - $y_clip;
         $left   = min($left, $x);
         $right  = max($right, $x);
         $top    = min($top, $y);
@@ -4929,18 +4923,15 @@ When called without parameters, it returns the current setting.
 
 =over 4
 
- $fb->acceleration(HARDWARE); # Turn hardware acceleration ON, along with some C acceleration (HARDWARE IS NOT YET IMPLEMENTED!)
-
  $fb->acceleration(SOFTWARE); # Turn C (software) acceleration ON
 
  $fb->acceleration(PERL);     # Turn acceleration OFF, using Perl
 
- my $accel = $fb->acceleration(); # Get current acceleration state.  0 = PERL, 1 = SOFTWARE, 2 = HARDWARE (not yet implemented)
+ my $accel = $fb->acceleration(); # Get current acceleration state.  0 = PERL or 1 = SOFTWARE
 
  my $accel = $fb->acceleration('english'); # Get current acceleration state in an english string.
                                            # "PERL"     = PERL     = 0
                                            # "SOFTWARE" = SOFTWARE = 1
-                                           # "HARDWARE" = HARDWARE = 2
 
 =back
 
@@ -4952,16 +4943,17 @@ sub acceleration {
     my $self = shift;
     if (scalar(@_)) {
         my $set = shift;
-        if ($set =~ /^\d+$/ && $set >= PERL && $set <= HARDWARE) {
-            $set = SOFTWARE if ($set > SOFTWARE);                      # HARDWARE is not implemented and setting defaults to SOFTWARE
+        if ($set =~ /^\d+$/ && $set >= PERL && $set <= SOFTWARE) {
             $self->{'ACCELERATED'} = $set;
         } elsif ($set =~ /english|string/i) {
-            foreach my $name (qw( PERL SOFTWARE HARDWARE )) {
+            foreach my $name (qw( PERL SOFTWARE )) {
                 if ($self->{'ACCELERATED'} == $self->{$name}) {
                     return ($name);
                 }
             }
-        } ## end elsif ($set =~ /english|string/i)
+        } else {
+		    $set = PERL;
+		}
     } ## end if (scalar(@_))
     return ($self->{'ACCELERATED'});
 } ## end sub acceleration
@@ -4986,17 +4978,6 @@ This is an alias to "acceleration(SOFTWARE)"
 sub software {
     my $self = shift;
     $self->acceleration(SOFTWARE);
-}
-
-=head2 hardware
-
-This is an alias to "acceleration(HARDWARE)"
-
-=cut
-
-sub hardware {
-    my $self = shift;
-    $self->acceleration(HARDWARE);
 }
 
 =head2 blit_read
@@ -5723,10 +5704,12 @@ sub clip_set {
     $self->{'XX_CLIP'} = abs(int($params->{'xx'}));
     $self->{'YY_CLIP'} = abs(int($params->{'yy'}));
 
+	# Sanity checks
     $self->{'X_CLIP'}  = ($self->{'XRES'} - 2) if ($self->{'X_CLIP'} > ($self->{'XRES'} - 1));
     $self->{'Y_CLIP'}  = ($self->{'YRES'} - 2) if ($self->{'Y_CLIP'} > ($self->{'YRES'} - 1));
     $self->{'XX_CLIP'} = ($self->{'XRES'} - 1) if ($self->{'XX_CLIP'} >= $self->{'XRES'});
     $self->{'YY_CLIP'} = ($self->{'YRES'} - 1) if ($self->{'YY_CLIP'} >= $self->{'YRES'});
+
     $self->{'W_CLIP'}  = $self->{'XX_CLIP'} - $self->{'X_CLIP'};
     $self->{'H_CLIP'}  = $self->{'YY_CLIP'} - $self->{'Y_CLIP'};
     $self->{'CLIPPED'} = TRUE;
@@ -6432,6 +6415,9 @@ sub load_image {
     my $bytes          = $self->{'BYTES'};
     my $min_bytes      = $self->{'MIN_BYTES'};
     my $hold;
+	# Make hash values temporary scalars for speed
+	my ($x_clip, $y_clip, $xx_clip, $yy_clip, $w_clip, $h_clip) = ($self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}, $self->{'W_CLIP'}, $self->{'H_CLIP'});
+	my $diagnostics = $self->{'DIAGNOSTICS'};
 
     if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) {    # This uses ffmpeg to convert a movie to a temporary GIF and then plays it
         my $quiet  = ($self->{'SHOW_ERRORS'})       ? 'verbose'           : 'quiet';
@@ -6599,23 +6585,23 @@ sub load_image {
 
             if (exists($params->{'center'})) {    # Only accepted values are processed
                 if ($params->{'center'} == CENTER_X) {
-                    $x = ($w < $self->{'W_CLIP'}) ? int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'} : $self->{'X_CLIP'};
+                    $x = ($w < $w_clip) ? int(($w_clip - $w) / 2) + $x_clip : $x_clip;
                 } elsif ($params->{'center'} == CENTER_Y) {
-                    $y = ($h < $self->{'H_CLIP'}) ? int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'} : $self->{'Y_CLIP'};
+                    $y = ($h < $h_clip) ? int(($h_clip - $h) / 2) + $y_clip : $y_clip;
                 } elsif ($params->{'center'} == CENTER_XY) {
-                    $x = ($w < $self->{'W_CLIP'}) ? int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'} : $self->{'X_CLIP'};
-                    $y = ($h < $self->{'H_CLIP'}) ? int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'} : $self->{'Y_CLIP'};
+                    $x = ($w < $w_clip) ? int(($w_clip - $w) / 2) + $x_clip : $x_clip;
+                    $y = ($h < $h_clip) ? int(($h_clip - $h) / 2) + $y_clip : $y_clip;
                 }
             } elsif (defined($params->{'x'}) && defined($params->{'y'})) {
                 $x = int($params->{'x'});
                 $y = int($params->{'y'});
             } else {
-                if ($w < $self->{'W_CLIP'}) {
-                    $x = int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'};
+                if ($w < $w_clip) {
+                    $x = int(($w_clip - $w) / 2) + $x_clip;
                     $y = 0;
-                } elsif ($h < $self->{'H_CLIP'}) {
+                } elsif ($h < $h_clip) {
                     $x = 0;
-                    $y = int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'};
+                    $y = int(($h_clip - $h) / 2) + $y_clip;
                 } else {
                     $x = 0;
                     $y = 0;
@@ -6642,7 +6628,7 @@ sub load_image {
                 }
             };
             push(@odata, $temp_image);
-            if ($self->{'DIAGNOSTICS'}) {
+            if ($diagnostics) {
                 my $saved = $self->{'DRAW_MODE'};
                 $self->mask_mode() if ($self->{'ACCELERATED'});
                 $self->blit_write($odata[-1]);

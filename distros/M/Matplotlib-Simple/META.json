@@ -1,0 +1,56 @@
+{
+   "abstract" : "Access Matplotlib from Perl; providing consistent user interface between different plot types",
+   "author" : [
+      "David E. Condon <dec986@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Matplotlib-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.58"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Printer" : "0",
+            "Devel::Confess" : "0",
+            "Devel::Size" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON::MaybeXS" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "1.22",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hhg7/MatPlotLib-Simple/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Matplotlib-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hhg7/MatPlotLib-Simple",
+         "web" : "https://github.com/hhg7/MatPlotLib-Simple"
+      }
+   },
+   "version" : "0.311",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -8,8 +8,9 @@ use Test::Most tests => 12;
 use Test::NoWarnings;
 
 use lib 't/lib';
-use_ok('Database::test5');
+use Database::test5;
 
+pass('Database::test5 loaded');
 my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 my $test5 = new_ok('Database::test5' => [directory => $directory]);
 

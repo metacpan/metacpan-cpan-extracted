@@ -40,11 +40,13 @@ xt/cloexec_exec.t
 xt/concurrent_cancel.t
 xt/concurrent_open.t
 xt/crash_recovery.t
+xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/graceful_shutdown.t
 xt/invalid_args.t
+xt/kwalitee.t
 xt/large_messages.t
 xt/latency_p99.t
 xt/leaktest.t

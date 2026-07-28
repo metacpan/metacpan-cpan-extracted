@@ -4,7 +4,7 @@
 
 ## OPERATING SYSTEM REQUIREMENT
 
-   Graphics::Framebuffer only works (for the moment) on Linux.  FreeBSD is planned for the future, but is not yet implemented.
+   **Graphics::Framebuffer** only works (for the moment) on Linux.  FreeBSD is planned for the future, but is not yet implemented.
 
 ![Divider](../pics/pink.jpg?raw=true "Divider")
 
@@ -88,7 +88,7 @@
 
    Next it will ask you if you are using the packaged version of Perl, the one included in your distribution.  If you are, then you need to answer "yes" to the question and allow it to install the Perl prerequisites.
 
-### INSTALLING LINUX ON VIRTUAL BOX WITH EFI
+### INSTALLING LINUX ON VIRTUALBOX WITH EFI
 
    If your distribution of Linux has EFI install capability, then I encourage you install that version and set up the virtual machine accordingly.
 
@@ -274,7 +274,7 @@ rm -f *~ */*~ *.orig */*.orig *.bak */*.bak *.old */*.old
    wget -O - https://install.perlbrew.pl | bash
    ```
 
-   Append the following line to your " ~/.bash_profile " then log out and log in again:
+   Append the following line to your ```~/.bash_profile``` then log out and log in again:
 
    ```bash
    source ~/perl5/perlbrew/etc/bashrc

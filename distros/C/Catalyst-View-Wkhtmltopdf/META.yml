@@ -36,10 +36,10 @@ name: Catalyst-View-Wkhtmltopdf
 provides:
   Catalyst::Helper::View::Wkhtmltopdf:
     file: lib/Catalyst/Helper/View/Wkhtmltopdf.pm
-    version: v0.6.1
+    version: v0.6.3
   Catalyst::View::Wkhtmltopdf:
     file: lib/Catalyst/View/Wkhtmltopdf.pm
-    version: v0.6.1
+    version: v0.6.3
 requires:
   B: '0'
   Catalyst::View: '0'
@@ -59,7 +59,7 @@ resources:
   Authority: cpan:RRWO
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-View-Wkhtmltopdf
   repository: git://github.com/robrwo/Catalyst-View-Wkhtmltopdf.git
-version: v0.6.1
+version: v0.6.3
 x_contributors:
   - 'Jens Gassmann <jens.gassmann@atomix.de>'
   - 'Robert Rothenberg <perl@rhizomnic.com>'

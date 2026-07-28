@@ -1,6 +1,7 @@
 TYPEMAP
 kqueue_t       KQUEUE_OBJECT
 uintptr_t      T_U_INT
+u_int          T_U_INT
 u_short        T_U_SHORT
 intptr_t       T_INT
 

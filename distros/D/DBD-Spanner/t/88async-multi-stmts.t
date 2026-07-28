@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth1 = $dbh->prepare('SELECT 1', { Async => 1 });
+my $sth2 = $dbh->prepare('SELECT 2', { Async => 1 });
+is($sth1->execute(), '0E0', 'sth1 0E0');
+is($sth2->execute(), '0E0', 'sth2 0E0');
+ok($sth1->fetch_async_row() && $sth2->fetch_async_row(), 'Both async handles fetched');

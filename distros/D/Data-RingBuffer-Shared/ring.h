@@ -3,7 +3,7 @@
  *
  * Lock-free circular buffer: writes overwrite oldest when full.
  * Readers access by relative position (0=latest) or absolute sequence.
- * No consumer tracking — data persists until overwritten.
+ * No consumer tracking -- data persists until overwritten.
  *
  * v2 layout adds per-slot publication sequence (seqlock-per-slot), so
  * readers never observe a partially-written or cross-epoch torn slot:
@@ -33,7 +33,7 @@
 #include <time.h>
 #include <limits.h>
 
-#define RING_MAGIC       0x524E4732U  /* "RNG2" — v2 layout: per-slot publication seq */
+#define RING_MAGIC       0x524E4732U  /* "RNG2" -- v2 layout: per-slot publication seq */
 #define RING_VERSION     2
 #define RING_ERR_BUFLEN  256
 
@@ -82,6 +82,7 @@ typedef struct {
     uint64_t   *seq;           /* per-slot publication sequence (cap entries) */
     size_t      mmap_size;
     uint32_t    elem_size;
+    uint64_t    capacity;      /* cached at attach; header is peer-writable */
     char       *path;
     int         notify_fd;
     int         backing_fd;
@@ -92,11 +93,11 @@ typedef struct {
  * ================================================================ */
 
 static inline uint8_t *ring_slot(RingHandle *h, uint64_t seq) {
-    return h->data + (seq % h->hdr->capacity) * h->elem_size;
+    return h->data + (seq % h->capacity) * h->elem_size;
 }
 
 /* ================================================================
- * Write — overwrites oldest when full, always succeeds
+ * Write -- overwrites oldest when full, always succeeds
  *
  * Per-slot seq encoding (uint64_t, initial 0):
  *   bit 0 = 1 (odd): writer in progress for pos = (seq >> 1) - 1
@@ -108,19 +109,19 @@ static inline uint8_t *ring_slot(RingHandle *h, uint64_t seq) {
 
 static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen) {
     RingHeader *hdr = h->hdr;
-    /* Claim a unique position via fetch_add — ring overwrites, no capacity check. */
+    /* Claim a unique position via fetch_add -- ring overwrites, no capacity check. */
     uint64_t pos = __atomic_fetch_add(&hdr->head, 1, __ATOMIC_ACQ_REL);
-    uint64_t slot_idx = pos % hdr->capacity;
+    uint64_t slot_idx = pos % h->capacity;
     uint64_t my_writing = ((pos + 1) << 1) | 1;   /* odd: writing for pos */
     uint64_t my_done    = (pos + 1) << 1;         /* even: pos is committed */
 
     /* CAS per-slot seq from a committed (even) mark to our writing-mark.
-     * If another writer is in progress (odd), spin until they commit —
+     * If another writer is in progress (odd), spin until they commit --
      * otherwise we'd race data writes to the same slot. If a newer writer
      * has already committed (seq >> 1 > pos+1), skip: their data wins.
      *
      * Bounded WRITING-wait for abandoned slots: a writer that CAS'd seq
-     * even→odd but died before publishing would otherwise strand this
+     * even->odd but died before publishing would otherwise strand this
      * slot forever (every capacity-th write thereafter would spin). We
      * track wall-clock seconds via CLOCK_MONOTONIC_COARSE; if the slot
      * stays odd past RING_WRITER_RECOVERY_SEC the prior writer is treated
@@ -132,7 +133,7 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
     for (;;) {
         if (cur & 1) {
             /* In-progress writer's pos = (cur >> 1) - 1. If that pos is
-             * past ours, their data supersedes ours — skip entirely. */
+             * past ours, their data supersedes ours -- skip entirely. */
             if ((cur >> 1) > pos + 1) break;
             /* Another writer owns the slot. Wait briefly; if it stays
              * odd past the deadline, take over (assume abandoned). */
@@ -147,7 +148,7 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
                     /* CAS over the odd mark. If it succeeds, we own the
                      * slot and proceed to write. If it fails, someone
                      * else (the original writer or another recoverer)
-                     * raced us — reload and continue normally. */
+                     * raced us -- reload and continue normally. */
                     if (__atomic_compare_exchange_n(&h->seq[slot_idx], &cur, my_writing,
                             0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
                         wrote = 1; break;
@@ -170,11 +171,29 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
         }
     }
     if (wrote) {
-        uint32_t sz = h->elem_size;
-        uint32_t cp = vlen < sz ? vlen : sz;
-        memcpy(ring_slot(h, pos), val, cp);
-        if (cp < sz) memset(ring_slot(h, pos) + cp, 0, sz - cp);
-        __atomic_store_n(&h->seq[slot_idx], my_done, __ATOMIC_RELEASE);
+        /* Re-check ownership before touching the slot. If we stalled past
+         * RING_WRITER_RECOVERY_SEC a recoverer took the slot over, wrote its
+         * own value and committed it; our data is superseded. Writing here
+         * would clobber a committed value, and the publish below would roll
+         * the slot's epoch BACKWARDS to our stale mark -- which both loses the
+         * newer write and leaves readers unable to match the slot at all. */
+        if (__atomic_load_n(&h->seq[slot_idx], __ATOMIC_ACQUIRE) == my_writing) {
+            uint32_t sz = h->elem_size;
+            uint32_t cp = vlen < sz ? vlen : sz;
+            memcpy(ring_slot(h, pos), val, cp);
+            if (cp < sz) memset(ring_slot(h, pos) + cp, 0, sz - cp);
+            /* Publish with a CAS, never a blind store: if ownership was lost
+             * between the check above and here, the CAS simply fails and our
+             * superseded write is dropped, instead of regressing seq. */
+            uint64_t expect = my_writing;
+            (void)__atomic_compare_exchange_n(&h->seq[slot_idx], &expect, my_done,
+                    0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+        }
+        /* Residual (unavoidable for a seqlock): a writer descheduled between
+         * the ownership check and the memcpy can still overwrite the bytes of
+         * a slot recovered in that gap. Recovery needs a >= 2s stall while the
+         * check-to-memcpy gap is sub-microsecond, so the epoch corruption above
+         * is eliminated and only a vanishingly narrow data race remains. */
     }
 
     uint64_t cnt = __atomic_add_fetch(&hdr->count, 1, __ATOMIC_RELEASE);
@@ -194,7 +213,7 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
 }
 
 /* ================================================================
- * Read — by relative position (0=latest) or absolute sequence
+ * Read -- by relative position (0=latest) or absolute sequence
  * ================================================================ */
 
 /* Read by absolute sequence number. Returns 1 if data for that seq was
@@ -202,10 +221,10 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
 static inline int ring_read_seq(RingHandle *h, uint64_t seq, void *out) {
     uint64_t head = __atomic_load_n(&h->hdr->head, __ATOMIC_ACQUIRE);
     if (seq >= head) return 0;  /* not yet written */
-    uint64_t oldest = (head > h->hdr->capacity) ? head - h->hdr->capacity : 0;
+    uint64_t oldest = (head > h->capacity) ? head - h->capacity : 0;
     if (seq < oldest) return 0;  /* already overwritten */
 
-    uint64_t slot_idx = seq % h->hdr->capacity;
+    uint64_t slot_idx = seq % h->capacity;
     uint64_t expected = (seq + 1) << 1;  /* even mark: pos=seq committed */
 
     for (int retry = 0; retry < 8; retry++) {
@@ -224,7 +243,7 @@ static inline int ring_read_seq(RingHandle *h, uint64_t seq, void *out) {
 static inline int ring_read_latest(RingHandle *h, uint32_t n, void *out) {
     uint64_t head = __atomic_load_n(&h->hdr->head, __ATOMIC_ACQUIRE);
     if (head == 0) return 0;
-    uint64_t avail = head < h->hdr->capacity ? head : h->hdr->capacity;
+    uint64_t avail = head < h->capacity ? head : h->capacity;
     if (n >= avail) return 0;
     return ring_read_seq(h, head - 1 - n, out);
 }
@@ -243,11 +262,12 @@ static inline uint64_t ring_size(RingHandle *h) {
 }
 
 /* ================================================================
- * Wait — block until new data arrives
+ * Wait -- block until new data arrives
  * ================================================================ */
 
 static inline void ring_make_deadline(double t, struct timespec *dl) {
     clock_gettime(CLOCK_MONOTONIC, dl);
+    if (!(t < 1e9)) t = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     dl->tv_sec += (time_t)t;
     dl->tv_nsec += (long)((t - (double)(time_t)t) * 1e9);
     if (dl->tv_nsec >= 1000000000L) { dl->tv_sec++; dl->tv_nsec -= 1000000000L; }
@@ -364,12 +384,13 @@ static inline int ring_validate_header(const RingHeader *hdr, uint64_t file_size
 static inline RingHandle *ring_setup(void *base, size_t ms, const char *path, int bfd) {
     RingHeader *hdr = (RingHeader *)base;
     RingHandle *h = (RingHandle *)calloc(1, sizeof(RingHandle));
-    if (!h) { munmap(base, ms); return NULL; }
+    if (!h) { munmap(base, ms); if (bfd >= 0) close(bfd); return NULL; }
     h->hdr = hdr;
     h->seq = (uint64_t *)((uint8_t *)base + hdr->seq_off);
     h->data = (uint8_t *)base + hdr->data_off;
     h->mmap_size = ms;
     h->elem_size = hdr->elem_size;
+    h->capacity = hdr->capacity;
     h->path = path ? strdup(path) : NULL;
     h->notify_fd = -1;
     h->backing_fd = bfd;
@@ -497,9 +518,9 @@ static void ring_destroy(RingHandle *h) {
     free(h);
 }
 
-/* NOT concurrency-safe — caller must ensure no concurrent writers/readers. */
+/* NOT concurrency-safe -- caller must ensure no concurrent writers/readers. */
 static void ring_clear(RingHandle *h) {
-    uint64_t cap = h->hdr->capacity;
+    uint64_t cap = h->capacity;
     /* Reset per-slot seq: otherwise new writes at pos=0 look stale against
      * old high seq marks. */
     for (uint64_t i = 0; i < cap; i++)

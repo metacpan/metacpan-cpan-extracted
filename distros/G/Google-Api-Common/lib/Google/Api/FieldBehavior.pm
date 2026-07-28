@@ -3,7 +3,7 @@ package Google::Api::FieldBehavior;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.11';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -11,7 +11,7 @@ use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Protobuf };
+    eval { require Google::Protobuf::Descriptor };
     my $descriptor_b64 = <<'EOF';
 Ch9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvEgpnb29nbGUuYXBpGiBnb29nbGUv
 cHJvdG9idWYvZGVzY3JpcHRvci5wcm90byq2AQoNRmllbGRCZWhhdmlvchIeChpGSUVMRF9C
@@ -105,3 +105,21 @@ EOF
 # Message definitions
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Api::FieldBehavior - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

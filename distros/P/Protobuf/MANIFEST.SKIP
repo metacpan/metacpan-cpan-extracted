@@ -28,3 +28,6 @@
 ^Makefile\.old$
 ^local/
 ^notes$
+
+# Avoid compiled C test executables under t/c/
+^t/c/(?:.*/)?[^/.]+$

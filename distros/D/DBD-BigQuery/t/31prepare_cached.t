@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:BigQuery:project=p;dataset=d', '', '');
+my $sth1 = $dbh->prepare_cached('SELECT id FROM t WHERE data = ?');
+my $sth2 = $dbh->prepare_cached('SELECT id FROM t WHERE data = ?');
+is($sth1, $sth2, 'prepare_cached returned identical statement handle instance');
+ok($sth1->execute('x'), 'First execution succeeded');
+ok($sth2->execute('y'), 'Cached execution succeeded');

@@ -6,11 +6,11 @@
  * PID-based stale slot recovery.
  *
  * Variants:
- *   Raw — opaque byte slots of arbitrary elem_size
- *   I64 — int64_t slots with atomic CAS/add
- *   F64 — double slots
- *   I32 — int32_t slots with atomic CAS/add
- *   Str — fixed-length string slots (4-byte length prefix + data)
+ *   Raw -- opaque byte slots of arbitrary elem_size
+ *   I64 -- int64_t slots with atomic CAS/add
+ *   F64 -- double slots
+ *   I32 -- int32_t slots with atomic CAS/add
+ *   Str -- fixed-length string slots (4-byte length prefix + data)
  */
 
 #ifndef POOL_H
@@ -93,6 +93,8 @@ typedef struct {
     uint8_t    *data;
     size_t      mmap_size;
     uint32_t    bitmap_words;
+    uint64_t    capacity;    /* cached-at-attach geometry (peer may corrupt hdr->capacity) */
+    uint32_t    elem_size;   /* cached-at-attach geometry (peer may corrupt hdr->elem_size) */
     char       *path;
     int         notify_fd;
     int         backing_fd;
@@ -103,13 +105,34 @@ typedef struct {
  * Utility
  * ================================================================ */
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int pool_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int pool_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !pool_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 static inline void pool_make_deadline(double timeout, struct timespec *deadline) {
     clock_gettime(CLOCK_MONOTONIC, deadline);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     deadline->tv_sec += (time_t)timeout;
     deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
     if (deadline->tv_nsec >= 1000000000L) {
@@ -136,7 +159,7 @@ static inline int pool_remaining_time(const struct timespec *deadline,
  * ================================================================ */
 
 static inline uint8_t *pool_slot_ptr(PoolHandle *h, uint64_t slot) {
-    return h->data + slot * h->hdr->elem_size;
+    return h->data + slot * h->elem_size;
 }
 
 static inline int pool_is_allocated(PoolHandle *h, uint64_t slot) {
@@ -152,7 +175,7 @@ static inline int pool_is_allocated(PoolHandle *h, uint64_t slot) {
 
 static inline int64_t pool_try_alloc(PoolHandle *h) {
     uint32_t nwords = h->bitmap_words;
-    uint64_t cap = h->hdr->capacity;
+    uint64_t cap = h->capacity;
     uint32_t start = h->scan_hint;
     uint32_t mypid = (uint32_t)getpid();
 
@@ -169,7 +192,7 @@ static inline int64_t pool_try_alloc(PoolHandle *h) {
             if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
                     1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
                 __atomic_store_n(&h->owners[slot], mypid, __ATOMIC_RELAXED);
-                memset(pool_slot_ptr(h, slot), 0, h->hdr->elem_size);
+                memset(pool_slot_ptr(h, slot), 0, h->elem_size);
                 __atomic_add_fetch(&h->hdr->used, 1, __ATOMIC_RELEASE);
                 __atomic_add_fetch(&h->hdr->stat_allocs, 1, __ATOMIC_RELAXED);
                 /* Advance hint past full word to reduce next scan */
@@ -177,7 +200,7 @@ static inline int64_t pool_try_alloc(PoolHandle *h) {
                     ? (widx + 1) % nwords : widx;
                 return (int64_t)slot;
             }
-            /* CAS failed — word now holds current value, retry */
+            /* CAS failed -- word now holds current value, retry */
         }
     }
     return -1;
@@ -255,7 +278,7 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
 
 static inline int pool_free_slot(PoolHandle *h, uint64_t slot) {
     PoolHeader *hdr = h->hdr;
-    if (slot >= hdr->capacity) return 0;
+    if (slot >= h->capacity) return 0;
 
     uint32_t widx = (uint32_t)(slot / 64);
     int bit = (int)(slot % 64);
@@ -289,7 +312,7 @@ static inline int pool_free_slot(PoolHandle *h, uint64_t slot) {
 }
 
 /* ================================================================
- * Batch free — single used decrement + single futex wake
+ * Batch free -- single used decrement + single futex wake
  * ================================================================ */
 
 static inline uint32_t pool_free_n(PoolHandle *h, uint64_t *slots, uint32_t count) {
@@ -298,7 +321,7 @@ static inline uint32_t pool_free_n(PoolHandle *h, uint64_t *slots, uint32_t coun
 
     for (uint32_t i = 0; i < count; i++) {
         uint64_t slot = slots[i];
-        if (slot >= hdr->capacity) continue;
+        if (slot >= h->capacity) continue;
 
         uint32_t widx = (uint32_t)(slot / 64);
         int bit = (int)(slot % 64);
@@ -331,7 +354,7 @@ static inline uint32_t pool_free_n(PoolHandle *h, uint64_t *slots, uint32_t coun
 }
 
 /* ================================================================
- * Batch alloc — all-or-nothing, shared deadline
+ * Batch alloc -- all-or-nothing, shared deadline
  * ================================================================ */
 
 static inline int pool_alloc_n(PoolHandle *h, uint64_t *out, uint32_t count,
@@ -388,19 +411,19 @@ static inline int pool_alloc_n(PoolHandle *h, uint64_t *out, uint32_t count,
 }
 
 /* ================================================================
- * Stale recovery — CAS owner to narrow race window
+ * Stale recovery -- CAS owner to narrow race window
  * ================================================================ */
 
 static inline uint32_t pool_recover_stale(PoolHandle *h) {
     uint32_t recovered = 0;
-    uint64_t cap = h->hdr->capacity;
+    uint64_t cap = h->capacity;
 
     for (uint64_t slot = 0; slot < cap; slot++) {
         if (!pool_is_allocated(h, slot)) continue;
         uint32_t owner = __atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE);
         if (owner == 0 || pool_pid_alive(owner)) continue;
 
-        /* CAS owner from dead PID to 0 — if it fails, slot was
+        /* CAS owner from dead PID to 0 -- if it fails, slot was
          * re-allocated or already recovered by another process */
         if (!__atomic_compare_exchange_n(&h->owners[slot], &owner, 0,
                 0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
@@ -416,7 +439,7 @@ static inline uint32_t pool_recover_stale(PoolHandle *h) {
          *
          * Mitigation: pre-CAS owner check (narrows window) + post-CAS
          * recovery accounting (always decrement used, since our CAS
-         * succeeded against an "expected = bit set" state — that bit is
+         * succeeded against an "expected = bit set" state -- that bit is
          * gone from popcount). If post-CAS observes an owner already
          * stored, an allocator's CAS landed inside our window; we restore
          * the bit so their slot stays claimed. Their own used++ pairs
@@ -537,7 +560,18 @@ static inline int pool_validate_header(const PoolHeader *hdr, uint64_t file_size
       if (w && hdr->elem_size != w) return 0; }   /* typed variant: elem_size must match its fixed width */
     if (hdr->capacity == 0 || hdr->capacity > POOL_MAX_CAPACITY) return 0;
     if (hdr->elem_size == 0) return 0;
-    if (hdr->capacity > (UINT64_MAX - sizeof(PoolHeader)) / hdr->elem_size) return 0;
+    /* Full-layout overflow check, identical to the one the create paths apply:
+     * total = header + bitmap + owners + data. Counting only sizeof(PoolHeader)
+     * here was weaker than at creation, so a crafted header could wrap
+     * total_size mod 2^64, satisfy the equality checks below, and leave the
+     * derived slot pointers far outside the mapping.
+     * capacity <= POOL_MAX_CAPACITY (checked above) bounds the bitmap/owners
+     * products, so computing the overhead cannot itself overflow. */
+    {   uint64_t overhead = sizeof(PoolHeader)
+                          + ((hdr->capacity + 63) / 64) * 8
+                          + POOL_ALIGN8(hdr->capacity * 4);
+        if (hdr->capacity > (UINT64_MAX - overhead) / hdr->elem_size) return 0;
+    }
     if (hdr->total_size != file_size) return 0;
 
     uint64_t bm_off, own_off, dat_off, total;
@@ -554,7 +588,7 @@ static inline PoolHandle *pool_setup_handle(void *base, size_t map_size,
                                              const char *path, int backing_fd) {
     PoolHeader *hdr = (PoolHeader *)base;
     PoolHandle *h = (PoolHandle *)calloc(1, sizeof(PoolHandle));
-    if (!h) { munmap(base, map_size); return NULL; }
+    if (!h) { munmap(base, map_size); if (backing_fd >= 0) close(backing_fd); return NULL; }
 
     h->hdr         = hdr;
     h->bitmap      = (uint64_t *)((uint8_t *)base + hdr->bitmap_off);
@@ -562,6 +596,8 @@ static inline PoolHandle *pool_setup_handle(void *base, size_t map_size,
     h->data        = (uint8_t *)base + hdr->data_off;
     h->mmap_size   = map_size;
     h->bitmap_words = (uint32_t)((hdr->capacity + 63) / 64);
+    h->capacity    = hdr->capacity;   /* validated at attach; use cached copy for all indexing/bounds */
+    h->elem_size   = hdr->elem_size;  /* validated at attach; use cached copy for all slot addressing */
     h->path        = path ? strdup(path) : NULL;
     h->notify_fd   = -1;
     h->backing_fd  = backing_fd;
@@ -595,8 +631,12 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
     if (capacity == 0) { POOL_ERR("capacity must be > 0"); return NULL; }
     if (elem_size == 0) { POOL_ERR("elem_size must be > 0"); return NULL; }
     if (capacity > POOL_MAX_CAPACITY) { POOL_ERR("capacity too large"); return NULL; }
-    if (capacity > (UINT64_MAX - sizeof(PoolHeader)) / elem_size) {
-        POOL_ERR("capacity * elem_size overflow"); return NULL;
+    {   /* full-layout overflow check: total = header + bitmap + owners + data.
+           capacity <= POOL_MAX_CAPACITY bounds the bitmap/owners products. */
+        uint64_t overhead = sizeof(PoolHeader) + ((capacity + 63) / 64) * 8 + POOL_ALIGN8(capacity * 4);
+        if (capacity > (UINT64_MAX - overhead) / elem_size) {
+            POOL_ERR("capacity * elem_size overflow"); return NULL;
+        }
     }
 
     uint64_t bm_off, own_off, dat_off, total;
@@ -637,6 +677,10 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            POOL_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)total) < 0) {
                 POOL_ERR("ftruncate(%s): %s", path, strerror(errno));
@@ -672,7 +716,7 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
         }
     }
 
-    /* Initialize header — flock still held for file-backed new files */
+    /* Initialize header -- flock still held for file-backed new files */
     pool_init_header(base, total, elem_size, variant_id, capacity,
                      bm_off, own_off, dat_off);
 
@@ -692,8 +736,12 @@ static PoolHandle *pool_create_memfd(const char *name, uint64_t capacity,
     if (capacity == 0) { POOL_ERR("capacity must be > 0"); return NULL; }
     if (elem_size == 0) { POOL_ERR("elem_size must be > 0"); return NULL; }
     if (capacity > POOL_MAX_CAPACITY) { POOL_ERR("capacity too large"); return NULL; }
-    if (capacity > (UINT64_MAX - sizeof(PoolHeader)) / elem_size) {
-        POOL_ERR("capacity * elem_size overflow"); return NULL;
+    {   /* full-layout overflow check: total = header + bitmap + owners + data.
+           capacity <= POOL_MAX_CAPACITY bounds the bitmap/owners products. */
+        uint64_t overhead = sizeof(PoolHeader) + ((capacity + 63) / 64) * 8 + POOL_ALIGN8(capacity * 4);
+        if (capacity > (UINT64_MAX - overhead) / elem_size) {
+            POOL_ERR("capacity * elem_size overflow"); return NULL;
+        }
     }
 
     uint64_t bm_off, own_off, dat_off, total;
@@ -799,7 +847,7 @@ static int pool_msync(PoolHandle *h) {
 }
 
 /* ================================================================
- * Typed accessors — integers (atomic)
+ * Typed accessors -- integers (atomic)
  * ================================================================ */
 
 static inline int64_t pool_get_i64(PoolHandle *h, uint64_t slot) {
@@ -861,7 +909,7 @@ static inline int32_t pool_add_i32(PoolHandle *h, uint64_t slot, int32_t delta) 
 }
 
 /* ================================================================
- * Typed accessors — float (non-atomic)
+ * Typed accessors -- float (non-atomic)
  * ================================================================ */
 
 static inline double pool_get_f64(PoolHandle *h, uint64_t slot) {
@@ -875,7 +923,7 @@ static inline void pool_set_f64(PoolHandle *h, uint64_t slot, double val) {
 }
 
 /* ================================================================
- * Typed accessors — string (4-byte length prefix + data)
+ * Typed accessors -- string (4-byte length prefix + data)
  * ================================================================ */
 
 static inline uint32_t pool_get_str_len(PoolHandle *h, uint64_t slot) {
@@ -885,7 +933,7 @@ static inline uint32_t pool_get_str_len(PoolHandle *h, uint64_t slot) {
      * max_len underflow and defeat the clamp below (which would otherwise return a
      * ~4 GiB length -> OOB read). Legit Str pools have elem_size >= 5, so this is a
      * never-taken branch for valid data. */
-    uint32_t elem = h->hdr->elem_size;
+    uint32_t elem = h->elem_size;
     if (elem <= sizeof(uint32_t)) return 0;
     uint32_t len;
     memcpy(&len, pool_slot_ptr(h, slot), sizeof(uint32_t));
@@ -903,7 +951,7 @@ static inline void pool_set_str(PoolHandle *h, uint64_t slot,
     /* See pool_get_str_len: reject slots too small to hold the length prefix so
      * the max_len computation cannot underflow (which would defeat the clamp and
      * let the data memcpy run off the end of the data region -> OOB write). */
-    uint32_t elem = h->hdr->elem_size;
+    uint32_t elem = h->elem_size;
     if (elem <= sizeof(uint32_t)) return;
     uint32_t max_len = elem - (uint32_t)sizeof(uint32_t);
     if (len > max_len) len = max_len;
@@ -912,14 +960,14 @@ static inline void pool_set_str(PoolHandle *h, uint64_t slot,
 }
 
 /* ================================================================
- * Reset — free all slots (NOT concurrency-safe, caller must
+ * Reset -- free all slots (NOT concurrency-safe, caller must
  * ensure no other process is accessing the pool)
  * ================================================================ */
 
 static inline void pool_reset(PoolHandle *h) {
     PoolHeader *hdr = h->hdr;
     memset(h->bitmap, 0, (size_t)h->bitmap_words * 8);
-    memset(h->owners, 0, (size_t)hdr->capacity * 4);
+    memset(h->owners, 0, (size_t)h->capacity * 4);
     __atomic_store_n(&hdr->used, 0, __ATOMIC_RELEASE);
     /* StoreLoad barrier: see pool_free_slot (reset is documented single-writer,
      * but keep the handshake correct if a waiter is nonetheless parked). */

@@ -1,11 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
-
-OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
-OPTION(ENABLE_SSL "Build hiredis_ssl for SSL support" OFF)
-OPTION(DISABLE_TESTS "If tests should be compiled or not" OFF)
-OPTION(ENABLE_SSL_TESTS "Should we test SSL connections" OFF)
-OPTION(ENABLE_EXAMPLES "Enable building hiredis examples" OFF)
-OPTION(ENABLE_ASYNC_TESTS "Should we run all asynchronous API tests" OFF)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.15.0)
 
 MACRO(getVersionBit name)
   SET(VERSION_REGEX "^#define ${name} (.+)$")
@@ -22,7 +15,24 @@ SET(VERSION "${HIREDIS_MAJOR}.${HIREDIS_MINOR}.${HIREDIS_PATCH}")
 MESSAGE("Detected version: ${VERSION}")
 
 PROJECT(hiredis LANGUAGES "C" VERSION "${VERSION}")
+
+#Built as a subproject or if it is the main project
+set(MAIN_PROJECT OFF)
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(MAIN_PROJECT ON)
+endif()
+
 INCLUDE(GNUInstallDirs)
+
+OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
+OPTION(ENABLE_SSL "Build hiredis_ssl for SSL support" OFF)
+OPTION(DISABLE_TESTS "If tests should be compiled or not" OFF)
+OPTION(ENABLE_SSL_TESTS "Should we test SSL connections" OFF)
+OPTION(ENABLE_EXAMPLES "Enable building hiredis examples" OFF)
+OPTION(ENABLE_ASYNC_TESTS "Should we run all asynchronous API tests" OFF)
+# Historically, the NuGet file was always install; default
+# to ON for those who rely on that historical behaviour.
+OPTION(ENABLE_NUGET "Install NuGET packaging details" ON)
 
 # Hiredis requires C99
 SET(CMAKE_C_STANDARD 99)
@@ -50,7 +60,8 @@ set_target_properties(hiredis PROPERTIES EXPORT_NAME ${hiredis_export_name})
 
 SET_TARGET_PROPERTIES(hiredis
     PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE
-    VERSION "${HIREDIS_SONAME}")
+    VERSION "${VERSION}"
+    SOVERSION "${HIREDIS_MAJOR}")
 IF(MSVC)
     SET_TARGET_PROPERTIES(hiredis
         PROPERTIES COMPILE_FLAGS /Z7)
@@ -67,31 +78,35 @@ TARGET_INCLUDE_DIRECTORIES(hiredis PUBLIC $<INSTALL_INTERFACE:include> $<BUILD_I
 
 CONFIGURE_FILE(hiredis.pc.in hiredis.pc @ONLY)
 
-set(CPACK_PACKAGE_VENDOR "Redis")
-set(CPACK_PACKAGE_DESCRIPTION "\
-Hiredis is a minimalistic C client library for the Redis database.
+if (MAIN_PROJECT)
+  set(CPACK_PACKAGE_VENDOR "Redis")
+  set(CPACK_PACKAGE_DESCRIPTION "\
+  Hiredis is a minimalistic C client library for the Redis database.
+  
+  It is minimalistic because it just adds minimal support for the protocol, \
+  but at the same time it uses a high level printf-alike API in order to make \
+  it much higher level than otherwise suggested by its minimal code base and the \
+  lack of explicit bindings for every Redis command.
+  
+  Apart from supporting sending commands and receiving replies, it comes with a \
+  reply parser that is decoupled from the I/O layer. It is a stream parser designed \
+  for easy reusability, which can for instance be used in higher level language bindings \
+  for efficient reply parsing.
+  
+  Hiredis only supports the binary-safe Redis protocol, so you can use it with any Redis \
+  version >= 1.2.0.
+  
+  The library comes with multiple APIs. There is the synchronous API, the asynchronous API \
+  and the reply parsing API.")
+  set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/redis/hiredis")
+  set(CPACK_PACKAGE_CONTACT "michael dot grunder at gmail dot com")
+  set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+  set(CPACK_RPM_PACKAGE_AUTOREQPROV ON)
 
-It is minimalistic because it just adds minimal support for the protocol, \
-but at the same time it uses a high level printf-alike API in order to make \
-it much higher level than otherwise suggested by its minimal code base and the \
-lack of explicit bindings for every Redis command.
-
-Apart from supporting sending commands and receiving replies, it comes with a \
-reply parser that is decoupled from the I/O layer. It is a stream parser designed \
-for easy reusability, which can for instance be used in higher level language bindings \
-for efficient reply parsing.
-
-Hiredis only supports the binary-safe Redis protocol, so you can use it with any Redis \
-version >= 1.2.0.
-
-The library comes with multiple APIs. There is the synchronous API, the asynchronous API \
-and the reply parsing API.")
-set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/redis/hiredis")
-set(CPACK_PACKAGE_CONTACT "michael dot grunder at gmail dot com")
-set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-set(CPACK_RPM_PACKAGE_AUTOREQPROV ON)
-
-include(CPack)
+  if (NOT CPack_CMake_INCLUDED)  
+    include(CPack)
+  endif()
+endif()
 
 INSTALL(TARGETS hiredis
     EXPORT hiredis-targets
@@ -105,9 +120,11 @@ if (MSVC AND BUILD_SHARED_LIBS)
         CONFIGURATIONS Debug RelWithDebInfo)
 endif()
 
-# For NuGet packages
-INSTALL(FILES hiredis.targets
-    DESTINATION build/native)
+if (ENABLE_NUGET)
+    # For NuGet packages
+    INSTALL(FILES hiredis.targets
+        DESTINATION build/native)
+endif()
 
 INSTALL(FILES hiredis.h read.h sds.h async.h alloc.h sockcompat.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hiredis)
@@ -164,7 +181,8 @@ IF(ENABLE_SSL)
     SET_TARGET_PROPERTIES(hiredis_ssl
         PROPERTIES
         WINDOWS_EXPORT_ALL_SYMBOLS TRUE
-        VERSION "${HIREDIS_SONAME}")
+        VERSION "${VERSION}"
+        SOVERSION "${HIREDIS_MAJOR}")
     IF(MSVC)
         SET_TARGET_PROPERTIES(hiredis_ssl
             PROPERTIES COMPILE_FLAGS /Z7)

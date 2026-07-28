@@ -1,0 +1,160 @@
+package Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+Cjlnb29nbGUvY2xvdWQvZGF0YXBsZXgvdjEvZGF0YV9xdWFsaXR5X3J1bGVfdGVtcGxhdGUu
+cHJvdG8SGGdvb2dsZS5jbG91ZC5kYXRhcGxleC52MRofZ29vZ2xlL2FwaS9maWVsZF9iZWhh
+dmlvci5wcm90byLxBAoXRGF0YVF1YWxpdHlSdWxlVGVtcGxhdGUSFwoEbmFtZRgBIAEoCUID
+4EEDUgRuYW1lEiEKCWRpbWVuc2lvbhgCIAEoCUID4EEDUglkaW1lbnNpb24SYQoOc3FsX2Nv
+bGxlY3Rpb24YAyADKAsyNS5nb29nbGUuY2xvdWQuZGF0YXBsZXgudjEuRGF0YVF1YWxpdHlS
+dWxlVGVtcGxhdGUuU3FsQgPgQQNSDXNxbENvbGxlY3Rpb24SdgoQaW5wdXRfcGFyYW1ldGVy
+cxgEIAMoCzJGLmdvb2dsZS5jbG91ZC5kYXRhcGxleC52MS5EYXRhUXVhbGl0eVJ1bGVUZW1w
+bGF0ZS5JbnB1dFBhcmFtZXRlcnNFbnRyeUID4EEDUg9pbnB1dFBhcmFtZXRlcnMSJwoMY2Fw
+YWJpbGl0aWVzGAUgAygJQgPgQQNSDGNhcGFiaWxpdGllcxogCgNTcWwSGQoFcXVlcnkYASAB
+KAlCA+BBA1IFcXVlcnkaZwoUUGFyYW1ldGVyRGVzY3JpcHRpb24SJQoLZGVzY3JpcHRpb24Y
+ASABKAlCA+BBA1ILZGVzY3JpcHRpb24SKAoNZGVmYXVsdF92YWx1ZRgCIAEoCUID4EEDUgxk
+ZWZhdWx0VmFsdWUaigEKFElucHV0UGFyYW1ldGVyc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5
+ElwKBXZhbHVlGAIgASgLMkYuZ29vZ2xlLmNsb3VkLmRhdGFwbGV4LnYxLkRhdGFRdWFsaXR5
+UnVsZVRlbXBsYXRlLlBhcmFtZXRlckRlc2NyaXB0aW9uUgV2YWx1ZToCOAFCeAocY29tLmdv
+b2dsZS5jbG91ZC5kYXRhcGxleC52MUIcRGF0YVF1YWxpdHlSdWxlVGVtcGxhdGVQcm90b1AB
+WjhjbG91ZC5nb29nbGUuY29tL2dvL2RhdGFwbGV4L2FwaXYxL2RhdGFwbGV4cGI7ZGF0YXBs
+ZXhwYkq5FgoGEgQOAEQBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExM
+QwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRo
+ZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29t
+cGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRo
+ZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNF
+TlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQg
+dG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNl
+IGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJ
+RVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGll
+ZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmlu
+ZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoB
+AhIDEAAhCgkKAgMAEgMSACkKCAoBCBIDFABPCgkKAggLEgMUAE8KCAoBCBIDFQAiCgkKAggK
+EgMVACIKCAoBCBIDFgA9CgkKAggIEgMWAD0KCAoBCBIDFwA1CgkKAggBEgMXADUKdAoCBAAS
+BBsARAEaaCBEYXRhUXVhbGl0eVJ1bGVUZW1wbGF0ZSByZXByZXNlbnRzIGEgdGVtcGxhdGUg
+d2hpY2ggY2FuIGJlIHJldXNlZCBhY3Jvc3MKIG11bHRpcGxlIGRhdGEgcXVhbGl0eSBydWxl
+cy4KCgoKAwQAARIDGwgfCqYBCgQEAAMAEgQeAiEDGpcBIFRlbXBsYXRpemVkIFNRTCBxdWVy
+eSBmb3IgZGF0YSBxdWFsaXR5IHJ1bGVzLiBJdCBjYW4gaGF2ZSBwYXJhbWV0ZXJzIHRoYXQK
+IGNhbiBiZSBzdWJzdGl0dXRlZCB3aXRoIHZhbHVlcyB3aGVuIGEgcnVsZSBpcyBjcmVhdGVk
+IHVzaW5nIHRoaXMgdGVtcGxhdGUuCgoMCgUEAAMAARIDHgoNCksKBgQAAwACABIDIARBGjwg
+T3V0cHV0IG9ubHkuIFRlbXBsYXRpemVkIFNRTCBxdWVyeSBmb3IgZGF0YSBxdWFsaXR5IHJ1
+bGVzLgoKDgoHBAADAAIABRIDIAQKCg4KBwQAAwACAAESAyALEAoOCgcEAAMAAgADEgMgExQK
+DgoHBAADAAIACBIDIBVAChEKCgQAAwACAAicCAASAyAWPwrbAQoEBAADARIEJgIvAxrMASBE
+ZXNjcmlwdGlvbiBvZiB0aGUgaW5wdXQgcGFyYW1ldGVyLiBJdCBjYW4gaW5jbHVkZSB0aGUg
+dHlwZShzKSBzdXBwb3J0ZWQKIGJ5IHRoZSBwYXJhbWV0ZXIgYW5kIGludGVuZGVkIHVzYWdl
+LiBJdCBpcyBmb3IgaW5mb3JtYXRpb24gcHVycG9zZXMgb25seQogYW5kIGRvZXMgbm90IGFm
+ZmVjdCB0aGUgYmVoYXZpb3Igb2YgdGhlIHJ1bGUgdGVtcGxhdGUuCgoMCgUEAAMBARIDJgoe
+CuoBCgYEAAMBAgASAysERxraASBPdXRwdXQgb25seS4gRGVzY3JpcHRpb24gb2YgdGhlIGlu
+cHV0IHBhcmFtZXRlci4gSXQgY2FuIGluY2x1ZGUgdGhlCiB0eXBlKHMpIHN1cHBvcnRlZCBi
+eSB0aGUgcGFyYW1ldGVyIGFuZCBpbnRlbmRlZCB1c2FnZS4gSXQgaXMgZm9yCiBpbmZvcm1h
+dGlvbiBwdXJwb3NlcyBvbmx5IGFuZCBkb2VzIG5vdCBhZmZlY3QgdGhlIGJlaGF2aW9yIG9m
+IHRoZSBydWxlCiB0ZW1wbGF0ZS4KCg4KBwQAAwECAAUSAysECgoOCgcEAAMBAgABEgMrCxYK
+DgoHBAADAQIAAxIDKxkaCg4KBwQAAwECAAgSAysbRgoRCgoEAAMBAgAInAgAEgMrHEUKWgoG
+BAADAQIBEgMuBEkaSyBPdXRwdXQgb25seS4gVGhlIGRlZmF1bHQgdmFsdWUgZm9yIHRoZSBw
+YXJhbWV0ZXIgaWYgbm8gdmFsdWUgaXMgcHJvdmlkZWQuCgoOCgcEAAMBAgEFEgMuBAoKDgoH
+BAADAQIBARIDLgsYCg4KBwQAAwECAQMSAy4bHAoOCgcEAAMBAgEIEgMuHUgKEQoKBAADAQIB
+CJwIABIDLh5HCrQBCgQEAAIAEgMzAj4apgEgT3V0cHV0IG9ubHkuIFRoZSBuYW1lIG9mIHRo
+ZSBydWxlIHRlbXBsYXRlIGluIHRoZSBmb3JtYXQ6CiBgcHJvamVjdHMve3Byb2plY3RfaWRf
+b3JfbnVtYmVyfS9sb2NhdGlvbnMve2xvY2F0aW9uX2lkfS9lbnRyeUdyb3Vwcy97ZW50cnlf
+Z3JvdXBfaWR9L2VudHJpZXMve2VudHJ5X2lkfWAKCgwKBQQAAgAFEgMzAggKDAoFBAACAAES
+AzMJDQoMCgUEAAIAAxIDMxARCgwKBQQAAgAIEgMzEj0KDwoIBAACAAicCAASAzMTPAqFAQoE
+BAACARIDNwJDGnggT3V0cHV0IG9ubHkuIFRoZSBkaW1lbnNpb24gYSBydWxlIHRlbXBsYXRl
+IGJlbG9uZ3MgdG8uIFJ1bGUgbGV2ZWwgcmVzdWx0cwogYXJlIGFsc28gYWdncmVnYXRlZCBh
+dCB0aGUgZGltZW5zaW9uIGxldmVsLgoKDAoFBAACAQUSAzcCCAoMCgUEAAIBARIDNwkSCgwK
+BQQAAgEDEgM3FRYKDAoFBAACAQgSAzcXQgoPCggEAAIBCJwIABIDNxhBCmwKBAQAAgISAzsC
+ThpfIE91dHB1dCBvbmx5LiBDb2xsZWN0aW9uIG9mIFNRTHMgZm9yIGRhdGEgcXVhbGl0eSBy
+dWxlcy4gQ3VycmVudGx5IG9ubHkgb25lCiBTUUwgaXMgc3VwcG9ydGVkLgoKDAoFBAACAgQS
+AzsCCgoMCgUEAAICBhIDOwsOCgwKBQQAAgIBEgM7Dx0KDAoFBAACAgMSAzsgIQoMCgUEAAIC
+CBIDOyJNCg8KCAQAAgIInAgAEgM7I0wKPQoEBAACAxIEPgI/MhovIE91dHB1dCBvbmx5LiBE
+ZXNjcmlwdGlvbiBmb3IgaW5wdXQgcGFyYW1ldGVycwoKDAoFBAACAwYSAz4CIwoMCgUEAAID
+ARIDPiQ0CgwKBQQAAgMDEgM+NzgKDAoFBAACAwgSAz8GMQoPCggEAAIDCJwIABIDPwcwCl4K
+BAQAAgQSA0MCTxpRIE91dHB1dCBvbmx5LiBBIGxpc3Qgb2YgZmVhdHVyZXMgb3IgcHJvcGVy
+dGllcyBzdXBwb3J0ZWQgYnkgdGhpcyBydWxlCiB0ZW1wbGF0ZS4KCgwKBQQAAgQEEgNDAgoK
+DAoFBAACBAUSA0MLEQoMCgUEAAIEARIDQxIeCgwKBQQAAgQDEgNDISIKDAoFBAACBAgSA0Mj
+TgoPCggEAAIECJwIABIDQyRNYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate ===
+    # Fields for DataQualityRuleTemplate
+    # Field: name Type: 9 ()
+    # Field: dimension Type: 9 ()
+    # Field: sql_collection Type: 11 (.google.cloud.dataplex.v1.DataQualityRuleTemplate.Sql)
+    # Field: input_parameters Type: 11 (.google.cloud.dataplex.v1.DataQualityRuleTemplate.InputParametersEntry)
+    # Field: capabilities Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
+
+    my $msg = Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<dimension>
+
+Type: String
+
+=item * B<sql_collection>
+
+Type: Message (.google.cloud.dataplex.v1.DataQualityRuleTemplate.Sql)
+
+=item * B<input_parameters>
+
+Type: Message (.google.cloud.dataplex.v1.DataQualityRuleTemplate.InputParametersEntry)
+
+=item * B<capabilities>
+
+Type: String
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Dataplex::V1::DataQualityRuleTemplate - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

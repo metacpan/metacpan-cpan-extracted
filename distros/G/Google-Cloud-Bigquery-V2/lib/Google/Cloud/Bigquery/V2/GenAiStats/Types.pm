@@ -1,17 +1,3 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::GenAiStats::Types;
 
 use strict;
@@ -20,42 +6,6 @@ use warnings;
 use Type::Library -base;
 use Type::Utils -all;
 use Types::Standard -types;
-
-declare 'ModalityTokenCount',
-    as InstanceOf['Google::Cloud::Bigquery::V2::GenAiStats::ModalityTokenCount'];
-
-coerce 'ModalityTokenCount',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::GenAiStats::ModalityTokenCount'->new($_) };
-
-declare 'RepeatedModalityTokenCount',
-    as ArrayRef[ModalityTokenCount()];
-
-coerce 'RepeatedModalityTokenCount',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::GenAiStats::ModalityTokenCount'->new($_) } @$_ ] };
-
-declare 'MapStringModalityTokenCount',
-    as HashRef[ModalityTokenCount()];
-
-declare 'Modality',
-    as (Int | Str);
-
-declare 'EndpointGenAiStats',
-    as InstanceOf['Google::Cloud::Bigquery::V2::GenAiStats::EndpointGenAiStats'];
-
-coerce 'EndpointGenAiStats',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::GenAiStats::EndpointGenAiStats'->new($_) };
-
-declare 'RepeatedEndpointGenAiStats',
-    as ArrayRef[EndpointGenAiStats()];
-
-coerce 'RepeatedEndpointGenAiStats',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::GenAiStats::EndpointGenAiStats'->new($_) } @$_ ] };
-
-declare 'MapStringEndpointGenAiStats',
-    as HashRef[EndpointGenAiStats()];
-
-declare 'TrafficType',
-    as (Int | Str);
 
 declare 'GenAiFunctionErrorStats',
     as InstanceOf['Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats'];
@@ -148,3 +98,21 @@ declare 'MapStringGenAiStats',
     as HashRef[GenAiStats()];
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::GenAiStats::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

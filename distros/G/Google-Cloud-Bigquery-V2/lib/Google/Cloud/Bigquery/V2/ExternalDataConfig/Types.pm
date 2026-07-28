@@ -1,17 +1,3 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::ExternalDataConfig::Types;
 
 use strict;
@@ -156,24 +142,6 @@ coerce 'RepeatedGoogleSheetsOptions',
 declare 'MapStringGoogleSheetsOptions',
     as HashRef[GoogleSheetsOptions()];
 
-declare 'CloudPubSubOptions',
-    as InstanceOf['Google::Cloud::Bigquery::V2::ExternalDataConfig::CloudPubSubOptions'];
-
-coerce 'CloudPubSubOptions',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::ExternalDataConfig::CloudPubSubOptions'->new($_) };
-
-declare 'RepeatedCloudPubSubOptions',
-    as ArrayRef[CloudPubSubOptions()];
-
-coerce 'RepeatedCloudPubSubOptions',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::ExternalDataConfig::CloudPubSubOptions'->new($_) } @$_ ] };
-
-declare 'MapStringCloudPubSubOptions',
-    as HashRef[CloudPubSubOptions()];
-
-declare 'PubSubDataFormat',
-    as (Int | Str);
-
 declare 'ExternalDataConfiguration',
     as InstanceOf['Google::Cloud::Bigquery::V2::ExternalDataConfig::ExternalDataConfiguration'];
 
@@ -189,9 +157,6 @@ coerce 'RepeatedExternalDataConfiguration',
 declare 'MapStringExternalDataConfiguration',
     as HashRef[ExternalDataConfiguration()];
 
-declare 'AuthorizationMode',
-    as (Int | Str);
-
 declare 'ObjectMetadata',
     as (Int | Str);
 
@@ -199,3 +164,21 @@ declare 'MetadataCacheMode',
     as (Int | Str);
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::ExternalDataConfig::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

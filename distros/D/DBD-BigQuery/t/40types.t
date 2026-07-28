@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 2;
+use DBI;
+my $dbh = DBI->connect('dbi:BigQuery:project=p;dataset=d', '', '');
+my $sth = $dbh->prepare('SELECT CAST(1 AS INT64), "abc"');
+$sth->execute();
+my $row = $sth->fetchrow_arrayref();
+is($row->[0], '1', 'INT64 type');
+is($row->[1], 'bq_mock_data', 'STRING type');

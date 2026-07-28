@@ -4,7 +4,7 @@ use parent 'Protobuf::Descriptor::Base::PurePerl';
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub name {
     my ($self) = @_;
@@ -44,7 +44,7 @@ sub find_field_by_name {
     foreach my $field (@{$self->{_data}{fields} || []}) {
         return $field if $field->name eq $name;
     }
-    return undef;
+    return;
 }
 
 sub find_field_by_number {
@@ -52,7 +52,7 @@ sub find_field_by_number {
     foreach my $field (@{$self->{_data}{fields} || []}) {
         return $field if $field->number == $number;
     }
-    return undef;
+    return;
 }
 
 sub oneof_count {
@@ -70,7 +70,7 @@ sub find_oneof_by_name {
     foreach my $oneof (@{$self->{_data}{oneofs} || []}) {
         return $oneof if $oneof->name eq $name;
     }
-    return undef;
+    return;
 }
 
 sub nested_type_count {

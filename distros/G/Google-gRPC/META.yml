@@ -1,7 +1,7 @@
 ---
 abstract: 'Generic, high-performance gRPC client transport over HTTP/2'
 author:
-  - 'C.J. Collier <CJCOLLIER@CPAN.ORG>'
+  - 'C.J. Collier <cjac@google.com>'
 build_requires:
   Test::More: '0'
 configure_requires:
@@ -23,5 +23,5 @@ requires:
   Protobuf: '0.01'
   Protocol::HTTP2: '0.13'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

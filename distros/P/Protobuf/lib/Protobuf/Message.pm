@@ -6,7 +6,7 @@ Protobuf::Message - Base class for Protocol Buffer messages
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -245,7 +245,7 @@ require Protobuf;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Protobuf::Internal::Repeated;
 use Protobuf::Internal::Map;
@@ -391,7 +391,7 @@ sub which_oneof {
                 return $f->name;
             }
         }
-        return undef;
+        return;
     }
 }
 

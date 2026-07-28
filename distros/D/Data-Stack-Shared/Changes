@@ -1,5 +1,12 @@
 Revision history for Data::Stack::Shared
 
+0.07  2026-07-22
+    - Fix push/pop hanging on a slot abandoned by a killed peer.
+    - Fix the reclaim path in pop() skipping the push_wait wake: a pusher
+      blocked on a full stack stayed asleep forever after a pop reclaimed
+      the abandoned slot instead of producing a value.
+    - Fetch get-magic on optional arguments before testing them.
+
 0.06  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

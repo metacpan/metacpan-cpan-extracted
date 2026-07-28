@@ -1,21 +1,10 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::RoutineReference;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
@@ -23,32 +12,37 @@ use MIME::Base64;
 
 BEGIN {
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
-    eval { require Google::Api::Policy };
     my $descriptor_b64 = <<'EOF';
 CjBnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvcm91dGluZV9yZWZlcmVuY2UucHJvdG8SGGdv
 b2dsZS5jbG91ZC5iaWdxdWVyeS52MhofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90
-bxoaZ29vZ2xlL2FwaS9pbmNsdXNpb24ucHJvdG8aF2dvb2dsZS9hcGkvcG9saWN5LnByb3Rv
-IpkBChBSb3V0aW5lUmVmZXJlbmNlEisKCnByb2plY3RfaWQYASABKAlCDOBBAsL2jNwEA4AB
-AVIJcHJvamVjdElkEisKCmRhdGFzZXRfaWQYAiABKAlCDOBBAsL2jNwEA4ABAVIJZGF0YXNl
-dElkEisKCnJvdXRpbmVfaWQYAyABKAlCDOBBAsL2jNwEA4ABAVIJcm91dGluZUlkQn0KHGNv
-bS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJCFVJvdXRpbmVSZWZlcmVuY2VQcm90b1o7Y2xv
-dWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92Mi9hcGl2Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5
-cGKK1dvSDwUKA2FsbEqBBgoGEgQAACABCggKAQwSAwAAEgoICgECEgMCACEKCQoCAwASAwQA
-KQoJCgIDARIDBQAkCgkKAgMCEgMGACEKCAoBCBIDCABSCgkKAggLEgMIAFIKCAoBCBIDCQA1
-CgkKAggBEgMJADUKCAoBCBIDCgA2CgkKAggIEgMKADYKCAoBCBIDCwAtCg8KCAjRuqv6AQEA
-EgMLAC0KIwoCBAASBA4AIAEaFyBJZCBwYXRoIG9mIGEgcm91dGluZS4KCgoKAwQAARIDDggY
-Cj4KBAQAAgASBBACEwQaMCBUaGUgSUQgb2YgdGhlIHByb2plY3QgY29udGFpbmluZyB0aGlz
-IHJvdXRpbmUuCgoMCgUEAAIABRIDEAIICgwKBQQAAgABEgMQCRMKDAoFBAACAAMSAxAWFwoN
-CgUEAAIACBIEEBgTAwoPCggEAAIACJwIABIDEQQqChEKCgQAAgAI6M7BSxASAxIERgo+CgQE
-AAIBEgQVAhgEGjAgVGhlIElEIG9mIHRoZSBkYXRhc2V0IGNvbnRhaW5pbmcgdGhpcyByb3V0
-aW5lLgoKDAoFBAACAQUSAxUCCAoMCgUEAAIBARIDFQkTCgwKBQQAAgEDEgMVFhcKDQoFBAAC
-AQgSBBUYGAMKDwoIBAACAQicCAASAxYEKgoRCgoEAAIBCOjOwUsQEgMXBEYKnwEKBAQAAgIS
-BBwCHwQakAEgVGhlIElEIG9mIHRoZSByb3V0aW5lLiBUaGUgSUQgbXVzdCBjb250YWluIG9u
-bHkKIGxldHRlcnMgKGEteiwgQS1aKSwgbnVtYmVycyAoMC05KSwgb3IgdW5kZXJzY29yZXMg
-KF8pLiBUaGUgbWF4aW11bQogbGVuZ3RoIGlzIDI1NiBjaGFyYWN0ZXJzLgoKDAoFBAACAgUS
-AxwCCAoMCgUEAAICARIDHAkTCgwKBQQAAgIDEgMcFhcKDQoFBAACAggSBBwYHwMKDwoIBAAC
-AgicCAASAx0EKgoRCgoEAAICCOjOwUsQEgMeBEZiBnByb3RvMw==
+byJ+ChBSb3V0aW5lUmVmZXJlbmNlEiIKCnByb2plY3RfaWQYASABKAlCA+BBAlIJcHJvamVj
+dElkEiIKCmRhdGFzZXRfaWQYAiABKAlCA+BBAlIJZGF0YXNldElkEiIKCnJvdXRpbmVfaWQY
+AyABKAlCA+BBAlIJcm91dGluZUlkQnIKHGNvbS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJC
+FVJvdXRpbmVSZWZlcmVuY2VQcm90b1o7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92
+Mi9hcGl2Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGJK5AkKBhIEDgAkAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIQoJCgIDABIDEgApCggKAQgSAxQAUgoJ
+CgIICxIDFABSCggKAQgSAxUANgoJCgIICBIDFQA2CggKAQgSAxYANQoJCgIIARIDFgA1CiMK
+AgQAEgQZACQBGhcgSWQgcGF0aCBvZiBhIHJvdXRpbmUuCgoKCgMEAAESAxkIGApHCgQEAAIA
+EgMbAkEaOiBSZXF1aXJlZC4gVGhlIElEIG9mIHRoZSBwcm9qZWN0IGNvbnRhaW5pbmcgdGhp
+cyByb3V0aW5lLgoKDAoFBAACAAUSAxsCCAoMCgUEAAIAARIDGwkTCgwKBQQAAgADEgMbFhcK
+DAoFBAACAAgSAxsYQAoPCggEAAIACJwIABIDGxk/CkcKBAQAAgESAx4CQRo6IFJlcXVpcmVk
+LiBUaGUgSUQgb2YgdGhlIGRhdGFzZXQgY29udGFpbmluZyB0aGlzIHJvdXRpbmUuCgoMCgUE
+AAIBBRIDHgIICgwKBQQAAgEBEgMeCRMKDAoFBAACAQMSAx4WFwoMCgUEAAIBCBIDHhhACg8K
+CAQAAgEInAgAEgMeGT8KqAEKBAQAAgISAyMCQRqaASBSZXF1aXJlZC4gVGhlIElEIG9mIHRo
+ZSByb3V0aW5lLiBUaGUgSUQgbXVzdCBjb250YWluIG9ubHkKIGxldHRlcnMgKGEteiwgQS1a
+KSwgbnVtYmVycyAoMC05KSwgb3IgdW5kZXJzY29yZXMgKF8pLiBUaGUgbWF4aW11bQogbGVu
+Z3RoIGlzIDI1NiBjaGFyYWN0ZXJzLgoKDAoFBAACAgUSAyMCCAoMCgUEAAICARIDIwkTCgwK
+BQQAAgIDEgMjFhcKDAoFBAACAggSAyMYQAoPCggEAAICCJwIABIDIxk/YgZwcm90bzM=
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -61,4 +55,56 @@ EOF
     # Field: dataset_id Type: 9 ()
     # Field: routine_id Type: 9 ()
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::RoutineReference::RoutineReference - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::RoutineReference;
+
+    my $msg = Google::Cloud::Bigquery::V2::RoutineReference::RoutineReference->new(
+        project_id => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<project_id>
+
+Type: String
+
+=item * B<dataset_id>
+
+Type: String
+
+=item * B<routine_id>
+
+Type: String
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::RoutineReference - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

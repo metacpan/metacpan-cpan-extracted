@@ -1,0 +1,252 @@
+package Google::Cloud::Dataplex::V1::Processing;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::Duration };
+    my $descriptor_b64 = <<'EOF';
+Cilnb29nbGUvY2xvdWQvZGF0YXBsZXgvdjEvcHJvY2Vzc2luZy5wcm90bxIYZ29vZ2xlLmNs
+b3VkLmRhdGFwbGV4LnYxGh9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGhlnb29n
+bGUvYXBpL3Jlc291cmNlLnByb3RvGh5nb29nbGUvcHJvdG9idWYvZHVyYXRpb24ucHJvdG8i
+hQMKB1RyaWdnZXISSQoJb25fZGVtYW5kGGQgASgLMiouZ29vZ2xlLmNsb3VkLmRhdGFwbGV4
+LnYxLlRyaWdnZXIuT25EZW1hbmRIAFIIb25EZW1hbmQSSAoIc2NoZWR1bGUYZSABKAsyKi5n
+b29nbGUuY2xvdWQuZGF0YXBsZXgudjEuVHJpZ2dlci5TY2hlZHVsZUgAUghzY2hlZHVsZRJG
+CghvbmVfdGltZRhmIAEoCzIpLmdvb2dsZS5jbG91ZC5kYXRhcGxleC52MS5UcmlnZ2VyLk9u
+ZVRpbWVIAFIHb25lVGltZRoKCghPbkRlbWFuZBojCghTY2hlZHVsZRIXCgRjcm9uGAEgASgJ
+QgPgQQJSBGNyb24aZAoHT25lVGltZRJZChl0dGxfYWZ0ZXJfc2Nhbl9jb21wbGV0aW9uGAEg
+ASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQgPgQQFSFnR0bEFmdGVyU2NhbkNvbXBs
+ZXRpb25CBgoEbW9kZSJ7CgpEYXRhU291cmNlEkAKBmVudGl0eRhkIAEoCUIm4EEF+kEgCh5k
+YXRhcGxleC5nb29nbGVhcGlzLmNvbS9FbnRpdHlIAFIGZW50aXR5EiEKCHJlc291cmNlGGUg
+ASgJQgPgQQVIAFIIcmVzb3VyY2VCCAoGc291cmNlIuMBCgtTY2FubmVkRGF0YRJlChFpbmNy
+ZW1lbnRhbF9maWVsZBgBIAEoCzI2Lmdvb2dsZS5jbG91ZC5kYXRhcGxleC52MS5TY2FubmVk
+RGF0YS5JbmNyZW1lbnRhbEZpZWxkSABSEGluY3JlbWVudGFsRmllbGQaXwoQSW5jcmVtZW50
+YWxGaWVsZBIZCgVmaWVsZBgBIAEoCUID4EEDUgVmaWVsZBIZCgVzdGFydBgCIAEoCUID4EED
+UgVzdGFydBIVCgNlbmQYAyABKAlCA+BBA1IDZW5kQgwKCmRhdGFfcmFuZ2VCawocY29tLmdv
+b2dsZS5jbG91ZC5kYXRhcGxleC52MUIPUHJvY2Vzc2luZ1Byb3RvUAFaOGNsb3VkLmdvb2ds
+ZS5jb20vZ28vZGF0YXBsZXgvYXBpdjEvZGF0YXBsZXhwYjtkYXRhcGxleHBiSvEjCgcSBQ4A
+gAEBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2Vk
+IHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIp
+OwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRo
+IHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0
+CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVu
+bGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGlu
+Zywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1
+dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElU
+SU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUg
+TGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9u
+cyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAhCgkKAgMA
+EgMSACkKCQoCAwESAxMAIwoJCgIDAhIDFAAoCggKAQgSAxYATwoJCgIICxIDFgBPCggKAQgS
+AxcAIgoJCgIIChIDFwAiCggKAQgSAxgAMAoJCgIICBIDGAAwCggKAQgSAxkANQoJCgIIARID
+GQA1CjcKAgQAEgQcAEoBGisgRGF0YVNjYW4gc2NoZWR1bGluZyBhbmQgdHJpZ2dlciBzZXR0
+aW5ncy4KCgoKAwQAARIDHAgPCjgKBAQAAwASAx4CFRorIFRoZSBzY2FuIHJ1bnMgb25jZSB2
+aWEgYFJ1bkRhdGFTY2FuYCBBUEkuCgoMCgUEAAMAARIDHgoSCjoKBAQAAwESBCECLwMaLCBU
+aGUgc2NhbiBpcyBzY2hlZHVsZWQgdG8gcnVuIHBlcmlvZGljYWxseS4KCgwKBQQAAwEBEgMh
+ChIKrQQKBgQAAwECABIDLgQ9Gp0EIFJlcXVpcmVkLiBbQ3Jvbl0oaHR0cHM6Ly9lbi53aWtp
+cGVkaWEub3JnL3dpa2kvQ3Jvbikgc2NoZWR1bGUgZm9yIHJ1bm5pbmcKIHNjYW5zIHBlcmlv
+ZGljYWxseS4KCiBUbyBleHBsaWNpdGx5IHNldCBhIHRpbWV6b25lIGluIHRoZSBjcm9uIHRh
+YiwgYXBwbHkgYSBwcmVmaXggaW4gdGhlCiBjcm9uIHRhYjogKioiQ1JPTl9UWj0ke0lBTkFf
+VElNRV9aT05FfSIqKiBvciAqKiJUWj0ke0lBTkFfVElNRV9aT05FfSIqKi4KIFRoZSAqKiR7
+SUFOQV9USU1FX1pPTkV9KiogbWF5IG9ubHkgYmUgYSB2YWxpZCBzdHJpbmcgZnJvbSBJQU5B
+IHRpbWUgem9uZQogZGF0YWJhc2UKIChbd2lraXBlZGlhXShodHRwczovL2VuLndpa2lwZWRp
+YS5vcmcvd2lraS9MaXN0X29mX3R6X2RhdGFiYXNlX3RpbWVfem9uZXMjTGlzdCkpLgogRm9y
+IGV4YW1wbGUsIGBDUk9OX1RaPUFtZXJpY2EvTmV3X1lvcmsgMSAqICogKiAqYCwgb3IKIGBU
+Wj1BbWVyaWNhL05ld19Zb3JrIDEgKiAqICogKmAuCgogVGhpcyBmaWVsZCBpcyByZXF1aXJl
+ZCBmb3IgU2NoZWR1bGUgc2NhbnMuCgoOCgcEAAMBAgAFEgMuBAoKDgoHBAADAQIAARIDLgsP
+Cg4KBwQAAwECAAMSAy4SEwoOCgcEAAMBAgAIEgMuFDwKEQoKBAADAQIACJwIABIDLhU7CjQK
+BAQAAwISBDICOgMaJiBUaGUgc2NhbiBydW5zIG9uY2UgdXNpbmcgY3JlYXRlIEFQSS4KCgwK
+BQQAAwIBEgMyChEK4AIKBgQAAwICABIEOAQ5MRrPAiBPcHRpb25hbC4gVGltZSB0byBsaXZl
+IGZvciBPbmVUaW1lIHNjYW5zLgogZGVmYXVsdCB2YWx1ZSBpcyAyNCBob3VycywgbWluaW11
+bSB2YWx1ZSBpcyAwIHNlY29uZHMsIGFuZCBtYXhpbXVtIHZhbHVlCiBpcyAzNjUgZGF5cy4g
+VGhlIHRpbWUgaXMgY2FsY3VsYXRlZCBmcm9tIHRoZSBkYXRhIHNjYW4gam9iIGNvbXBsZXRp
+b24KIHRpbWUuIElmIHZhbHVlIGlzIHNldCBhcyAwIHNlY29uZHMsIHRoZSBzY2FuIHdpbGwg
+YmUgaW1tZWRpYXRlbHkgZGVsZXRlZAogdXBvbiBqb2IgY29tcGxldGlvbiwgcmVnYXJkbGVz
+cyBvZiB3aGV0aGVyIHRoZSBqb2Igc3VjY2VlZGVkIG9yIGZhaWxlZC4KCg4KBwQAAwICAAYS
+AzgEHAoOCgcEAAMCAgABEgM4HTYKDgoHBAADAgIAAxIDODk6Cg4KBwQAAwICAAgSAzkIMAoR
+CgoEAAMCAgAInAgAEgM5CS8KaAoEBAAIABIEPwJJAxpaIERhdGFTY2FuIHNjaGVkdWxpbmcg
+YW5kIHRyaWdnZXIgc2V0dGluZ3MuCgogSWYgbm90IHNwZWNpZmllZCwgdGhlIGRlZmF1bHQg
+aXMgYG9uRGVtYW5kYC4KCgwKBQQACAABEgM/CAwKOAoEBAACABIDQQQdGisgVGhlIHNjYW4g
+cnVucyBvbmNlIHZpYSBgUnVuRGF0YVNjYW5gIEFQSS4KCgwKBQQAAgAGEgNBBAwKDAoFBAAC
+AAESA0ENFgoMCgUEAAIAAxIDQRkcCjkKBAQAAgESA0QEHBosIFRoZSBzY2FuIGlzIHNjaGVk
+dWxlZCB0byBydW4gcGVyaW9kaWNhbGx5LgoKDAoFBAACAQYSA0QEDAoMCgUEAAIBARIDRA0V
+CgwKBQQAAgEDEgNEGBsKXQoEBAACAhIDSAQbGlAgVGhlIHNjYW4gcnVucyBvbmNlLCBhbmQg
+ZG9lcyBub3QgY3JlYXRlIGFuIGFzc29jaWF0ZWQgU2NhbkpvYiBjaGlsZAogcmVzb3VyY2Uu
+CgoMCgUEAAICBhIDSAQLCgwKBQQAAgIBEgNIDBQKDAoFBAACAgMSA0gXGgorCgIEARIETQBq
+ARofIFRoZSBkYXRhIHNvdXJjZSBmb3IgRGF0YVNjYW4uCgoKCgMEAQESA00IEgplCgQEAQgA
+EgRQAmkDGlcgVGhlIHNvdXJjZSBpcyByZXF1aXJlZCBhbmQgaW1tdXRhYmxlLiBPbmNlIGl0
+IGlzIHNldCwgaXQgY2Fubm90IGJlIGNoYW5nZQogdG8gb3RoZXJzLgoKDAoFBAEIAAESA1AI
+Dgr+AQoEBAECABIEVARZBhrvASBJbW11dGFibGUuIFRoZSBEYXRhcGxleCBVbml2ZXJzYWwg
+Q2F0YWxvZyBlbnRpdHkgdGhhdCByZXByZXNlbnRzIHRoZSBkYXRhCiBzb3VyY2UgKGUuZy4g
+QmlnUXVlcnkgdGFibGUpIGZvciBEYXRhU2Nhbiwgb2YgdGhlIGZvcm06CiBgcHJvamVjdHMv
+e3Byb2plY3RfbnVtYmVyfS9sb2NhdGlvbnMve2xvY2F0aW9uX2lkfS9sYWtlcy97bGFrZV9p
+ZH0vem9uZXMve3pvbmVfaWR9L2VudGl0aWVzL3tlbnRpdHlfaWR9YC4KCgwKBQQBAgAFEgNU
+BAoKDAoFBAECAAESA1QLEQoMCgUEAQIAAxIDVBQXCg0KBQQBAgAIEgRUGFkFCg8KCAQBAgAI
+nAgAEgNVBi0KDwoHBAECAAifCBIEVgZYBwrJBAoEBAECARIDaAREGrsEIEltbXV0YWJsZS4g
+VGhlIHNlcnZpY2UtcXVhbGlmaWVkIGZ1bGwgcmVzb3VyY2UgbmFtZSBvZiB0aGUgY2xvdWQg
+cmVzb3VyY2UKIGZvciBhIERhdGFTY2FuIGpvYiB0byBzY2FuIGFnYWluc3QuIFRoZSBmaWVs
+ZCBjb3VsZCBlaXRoZXIgYmU6IENsb3VkCiBTdG9yYWdlIGJ1Y2tldCBmb3IgRGF0YURpc2Nv
+dmVyeVNjYW4gRm9ybWF0OgogLy9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL3Byb2plY3RzL1BS
+T0pFQ1RfSUQvYnVja2V0cy9CVUNLRVRfSUQKIG9yCiBCaWdRdWVyeSB0YWJsZSBvZiB0eXBl
+ICJUQUJMRSIgZm9yCiBEYXRhUHJvZmlsZVNjYW4vRGF0YVF1YWxpdHlTY2FuL0RhdGFEb2N1
+bWVudGF0aW9uU2NhbgogRm9ybWF0OgogLy9iaWdxdWVyeS5nb29nbGVhcGlzLmNvbS9wcm9q
+ZWN0cy9QUk9KRUNUX0lEL2RhdGFzZXRzL0RBVEFTRVRfSUQvdGFibGVzL1RBQkxFX0lECiBv
+cgogQmlnUXVlcnkgZGF0YXNldCBmb3IgRGF0YURvY3VtZW50YXRpb25TY2FuIG9ubHkKIEZv
+cm1hdDoKIC8vYmlncXVlcnkuZ29vZ2xlYXBpcy5jb20vcHJvamVjdHMvUFJPSkVDVF9JRC9k
+YXRhc2V0cy9EQVRBU0VUX0lECgoMCgUEAQIBBRIDaAQKCgwKBQQBAgEBEgNoCxMKDAoFBAEC
+AQMSA2gWGQoMCgUEAQIBCBIDaBpDCg8KCAQBAgEInAgAEgNoG0IKUAoCBAISBW0AgAEBGkMg
+VGhlIGRhdGEgc2Nhbm5lZCBkdXJpbmcgcHJvY2Vzc2luZyAoZS5nLiBpbiBpbmNyZW1lbnRh
+bCBEYXRhU2NhbikKCgoKAwQCARIDbQgTCk4KBAQCAwASBG8CeQMaQCBBIGRhdGEgcmFuZ2Ug
+ZGVub3RlZCBieSBhIHBhaXIgb2Ygc3RhcnQvZW5kIHZhbHVlcyBvZiBhIGZpZWxkLgoKDAoF
+BAIDAAESA28KGgqAAQoGBAIDAAIAEgNyBEEacSBPdXRwdXQgb25seS4gVGhlIGZpZWxkIHRo
+YXQgY29udGFpbnMgdmFsdWVzIHdoaWNoIG1vbm90b25pY2FsbHkgaW5jcmVhc2VzCiBvdmVy
+IHRpbWUgKGUuZy4gYSB0aW1lc3RhbXAgY29sdW1uKS4KCg4KBwQCAwACAAUSA3IECgoOCgcE
+AgMAAgABEgNyCxAKDgoHBAIDAAIAAxIDchMUCg4KBwQCAwACAAgSA3IVQAoRCgoEAgMAAgAI
+nAgAEgNyFj8KRgoGBAIDAAIBEgN1BEEaNyBPdXRwdXQgb25seS4gVmFsdWUgdGhhdCBtYXJr
+cyB0aGUgc3RhcnQgb2YgdGhlIHJhbmdlLgoKDgoHBAIDAAIBBRIDdQQKCg4KBwQCAwACAQES
+A3ULEAoOCgcEAgMAAgEDEgN1ExQKDgoHBAIDAAIBCBIDdRVAChEKCgQCAwACAQicCAASA3UW
+PwpECgYEAgMAAgISA3gEPxo1IE91dHB1dCBvbmx5LiBWYWx1ZSB0aGF0IG1hcmtzIHRoZSBl
+bmQgb2YgdGhlIHJhbmdlLgoKDgoHBAIDAAICBRIDeAQKCg4KBwQCAwACAgESA3gLDgoOCgcE
+AgMAAgIDEgN4ERIKDgoHBAIDAAICCBIDeBM+ChEKCgQCAwACAgicCAASA3gUPQopCgQEAggA
+EgR8An8DGhsgVGhlIHJhbmdlIG9mIHNjYW5uZWQgZGF0YQoKDAoFBAIIAAESA3wIEgpCCgQE
+AgIAEgN+BCsaNSBUaGUgcmFuZ2UgZGVub3RlZCBieSB2YWx1ZXMgb2YgYW4gaW5jcmVtZW50
+YWwgZmllbGQKCgwKBQQCAgAGEgN+BBQKDAoFBAICAAESA34VJgoMCgUEAgIAAxIDfikqYgZw
+cm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Dataplex::V1::Processing::Trigger ===
+    # Fields for Trigger
+    # Field: on_demand Type: 11 (.google.cloud.dataplex.v1.Trigger.OnDemand)
+    # Field: schedule Type: 11 (.google.cloud.dataplex.v1.Trigger.Schedule)
+    # Field: one_time Type: 11 (.google.cloud.dataplex.v1.Trigger.OneTime)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Dataplex::V1::Processing::Trigger - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Processing;
+
+    my $msg = Google::Cloud::Dataplex::V1::Processing::Trigger->new(
+        on_demand => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<on_demand>
+
+Type: Message (.google.cloud.dataplex.v1.Trigger.OnDemand)
+
+=item * B<schedule>
+
+Type: Message (.google.cloud.dataplex.v1.Trigger.Schedule)
+
+=item * B<one_time>
+
+Type: Message (.google.cloud.dataplex.v1.Trigger.OneTime)
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Dataplex::V1::Processing::DataSource ===
+    # Fields for DataSource
+    # Field: entity Type: 9 ()
+    # Field: resource Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Dataplex::V1::Processing::DataSource - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Processing;
+
+    my $msg = Google::Cloud::Dataplex::V1::Processing::DataSource->new(
+        entity => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<entity>
+
+Type: String
+
+=item * B<resource>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Dataplex::V1::Processing::ScannedData ===
+    # Fields for ScannedData
+    # Field: incremental_field Type: 11 (.google.cloud.dataplex.v1.ScannedData.IncrementalField)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Dataplex::V1::Processing::ScannedData - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Processing;
+
+    my $msg = Google::Cloud::Dataplex::V1::Processing::ScannedData->new(
+        incremental_field => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<incremental_field>
+
+Type: Message (.google.cloud.dataplex.v1.ScannedData.IncrementalField)
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Dataplex::V1::Processing - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

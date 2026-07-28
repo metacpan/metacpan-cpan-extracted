@@ -24,7 +24,7 @@ use Test::More;
 use Test::Exception;
 use OpenSearch::Client;
 
-do './t/lib/LogCallback.pl' or die( $@ || $! );
+do './t/lib/LogCapture.pl' or die( $@ || $! );
 
 ok my $e
     = OpenSearch::Client->new( nodes => 'https://foo.bar:444/some/path' ),
@@ -47,7 +47,7 @@ ok $l->trace_error(
     ),
     'No body';
 
-is $format, <<"RESPONSE", 'No body - format';
+is $messagetext, <<"RESPONSE", 'No body - format';
 # ERROR: OpenSearch::Client::Error::Missing Foo missing
 #\x20
 RESPONSE
@@ -62,7 +62,7 @@ ok $l->trace_error(
     ),
     'Body';
 
-is $format, <<"RESPONSE", 'Body - format';
+is $messagetext, <<"RESPONSE", 'Body - format';
 # ERROR: OpenSearch::Client::Error::Missing Foo missing
 # {
 #    "foo" : "bar"

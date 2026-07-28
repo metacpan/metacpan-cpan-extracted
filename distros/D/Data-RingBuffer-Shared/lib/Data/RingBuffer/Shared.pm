@@ -1,7 +1,7 @@
 package Data::RingBuffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::RingBuffer::Shared', $VERSION);
 
@@ -143,6 +143,30 @@ Single-process (1M ops, x86_64 Linux, Perl 5.40, cap=1000):
 
 C<stats()> returns a hashref: C<size>, C<capacity>, C<head>, C<count>,
 C<writes>, C<overwrites>, C<mmap_size>.
+
+=head1 CONCURRENCY AND CRASH SAFETY
+
+The ring is B<lock-free>: there are no mutexes or rwlocks. A writer claims a
+unique, monotonically increasing position with a single atomic increment of the
+head counter, so multiple writer and reader processes may share one buffer
+concurrently. Writes always succeed and never block; when the buffer is full the
+oldest slot is overwritten.
+
+Each slot carries a publication sequence used as a seqlock. A reader loads the
+sequence, copies the value, then re-checks the sequence; if a write was in
+progress or the slot has since been overwritten, the read is retried and
+ultimately reports "no value" (C<latest> and C<read_seq> return C<undef>). A
+reader therefore never observes a torn or half-written value.
+
+If a writer crashes mid-write, its slot is left marked in-progress. Readers skip
+that slot (returning C<undef>) rather than block, and after a short recovery
+timeout a later writer reclaims the slot and overwrites the partial data. Because
+there are no locks, a crash can never orphan one and wedge other processes; the
+buffer as a whole stays usable. C<wait_for> blocks on a futex over an internal
+wake counter, so a crashed waiter cannot stall writers either.
+
+C<clear> is B<not> concurrency-safe: call it only when no other process is
+writing to the buffer.
 
 =head1 SECURITY
 

@@ -13,6 +13,7 @@ t/acceptance/protobuf-starter.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/protos/service.proto
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

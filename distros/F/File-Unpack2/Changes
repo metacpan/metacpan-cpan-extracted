@@ -1,3 +1,10 @@
+2.01	kraih Mon Jul 27 15:48:00 CEST 2026
+  - Require BSD::Resource and Filesys::Statvfs again, so the maxfilesize and
+    free-space safeguards are always enforced (they were silently disabled when
+    the modules were only recommended and thus absent from build environments).
+  - Skip the PDF tests when pdftotext (poppler-tools) is not installed, so the
+    test suite passes in minimal build environments.
+
 2.0	kraih Thu Jul 23 13:50:00 CEST 2026
   - Big module cleanup to make packaging for Linux distributions easier.
   - Removed bundled mime helper scripts.

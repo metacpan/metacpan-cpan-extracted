@@ -8,6 +8,8 @@ use CHI;
 use Log::Log4perl qw/ :easy /;
 use Plack::App::Prerender;
 
+use Plack::Builder;
+
 my $cache = CHI->new(
     driver => 'File',
     root_dir => '/tmp/test-chi',
@@ -24,12 +26,15 @@ sub validator {
     #     return [ 403, [], [] ];
     # }
 
-    return "https://www.sciencephoto.com" . $path;
+    return "http://robert.sciencephoto.local:3000" . $path;
+    #    return "https://www.sciencephoto.com" . $path;
+    #    return "https://staging.sciencephoto.co.uk" . $path;
 }
 
 Log::Log4perl->easy_init($ERROR);
 
 my $app = Plack::App::Prerender->new(
+    wait    => 1,
     rewrite => \&validator,
-    cache   => $cache,
+    #    cache   => $cache,
 )->to_app;

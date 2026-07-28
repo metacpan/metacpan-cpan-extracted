@@ -15,11 +15,15 @@ WriteMakefile(
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => '7.12'},
 
   # Lzma, Bzip2, Zlib are not strictly required; they are only used for
-  # multi-level mime-type recognition. BSD::Resource and Filesys::Statvfs are
-  # likewise optional safeguards. They are listed as recommends, not requires.
+  # multi-level mime-type recognition; they are only recommended. BSD::Resource
+  # (enforces the maxfilesize disk-exhaustion safeguard) and Filesys::Statvfs
+  # (free-space monitoring) are required: they back safety features that are on by
+  # default, so a build without them silently loses those protections.
   PREREQ_PM => {
     'File::LibMagic'        => 0,
     'File::MimeInfo::Magic' => 0,
+    'BSD::Resource'         => 0,
+    'Filesys::Statvfs'      => 0,
     'Cwd'                   => 0,
     'Carp'                  => 0,
     'File::Path'            => 0,
@@ -46,8 +50,6 @@ WriteMakefile(
           'Compress::Raw::Lzma'  => 0,
           'Compress::Raw::Bzip2' => 0,
           'Compress::Raw::Zlib'  => '2.024',
-          'BSD::Resource'        => 0,
-          'Filesys::Statvfs'     => 0,
         },
       },
     },

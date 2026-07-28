@@ -1,0 +1,200 @@
+NAME
+
+    Net::WoRMS bundles functionalities for the tool query-worms.
+
+VERSION
+
+    version 1.3
+
+SYNOPSIS
+
+    Net::WoRMS bundles WEB access, parsing and fomatting capabilities for
+    the tool query-worms. The the modul was built around the the module
+    SOAP::Lite and is implemented as a Moo object.
+
+MODULE DEPENDENCIES
+
+    The module uses the packages:
+
+    Data::Dumper
+
+      Debugging purposes
+
+    Moo
+
+      Object oriented extension for the module
+
+    MooX::Types::MooseLike::Base
+
+      Minimal type system for Moo
+
+    SOAP::Lite
+
+      is used for the WEB access and parsing capabilities to retrieve data
+      from www.marinespecies.org.
+
+    Syntax::Keyword::Match -- to end the switch case madness
+
+GLOBAL VARIABLES and CONSTANTS
+
+    $END_POINT = 'http://www.marinespecies.org/aphia.php?p=soap'
+
+      The access point to retrieve data via the Simple Object Access
+      Protocol.
+
+    $APHIA_NS = 'http://aphia/v1.0'
+
+      Namespace and Namespace URI. In the development context these
+      variables are considered as a constants. There are methods to change
+      these values but never tested.
+
+    $FORMAT ='TEXT'
+
+      FORMAT defines the default output format.
+
+    @ORDER_SCORE = qw/APHIA_ID ... /
+
+      The array holds field names for SQL related output.
+
+    @ORDER_DOT = qw/APHIA.ID ... /
+
+      The array holds field names for TEXT and CSV related output.
+
+    %FORMATS = ( TEXT => 1, SQL => 2, CSV => 3);
+
+      The format hash mostly for validation.
+
+    %ORDER_HASH
+
+      Dictionary to sort and translate the retieved field names from the
+      WoRMS database and bring them into a consistent form.
+
+    @TYPE
+
+      Type array corresponding to @ORDER_SCORE/@ORDER_DOT and the
+      %ORDER_HASH to handle quotes and NULL values.
+
+FIELDS
+
+    Debug: BOOL
+
+      Flag to switch to the debugging mode.
+
+    Format: STR
+
+      Field holds the current output format TEXT|SQL|CSV.
+
+    EndPoint: STR (URI)
+
+      The current SOAP endpoint defaults to $END_POINT.
+
+    AphiaNS and AphiaURI: STR (URI)
+
+      The current namespace and namespace URI, defaulting to $APHIA_NS.
+
+    Soap
+
+      The SOAP access client instance generate by SOAP::Lite.
+
+METHODS
+
+    init()
+
+      Initializes the SOAP client.
+
+    NOTE1:
+
+      The function changeEndPoint($uli), changeAphiaURI($uri) and
+      changeAphiaNS($uri) as well as changeDebug($flag),
+      changeFormat($format) must be used before the initialization phase.
+
+ CHANGE METHODS
+
+    changeEndPoint($uri)
+
+      Change the end point for the soap client (don't change).
+
+    changeAphiaURI($uri)
+
+      Change the namespace URI for the soap client (don't change).
+
+    changeAphiaNS($uri)
+
+      Change the namespace soap soap client (don't change).
+
+    changeDebug($flag)
+
+      Demand debugging capabilities.
+
+    changeFormat($format)
+
+      Changes the output format. Valid formats are TEXT|CSV|SQL.
+
+    getFormats()
+
+      Get the format dictionary for validation.
+
+ QUERY METHODS
+
+    checkSoap()
+
+      Check if the soap client is running. The function stops the program
+      (die ...) in case of an error.
+
+    checkError($soapResponse)
+
+      Checks the the SOAP query result. The function stops the program in
+      case of an communication error.
+
+    checkDebug($queryResult)
+
+      Prints the query result (dictionary) via Data::Dumper to STDERR if
+      the debugging flag is set.
+
+    searchSpeciesID($name, $print)
+
+      Function to find a species by a certain name. The if the flag $print
+      is set. The result will be written to STDOUT on the given format.
+
+    getRecordByID($aphiaID)
+
+      Retrieves a record for a given AphiaID and returns a dictionary or
+      'dies' with an error.
+
+    getBlockChildrenByID($AphiaID, $offs)
+
+      Retrieve a set of taxon records under an given AphiaID for a devine
+      offset in the query ensemble .The offset addresses a paging pattern.
+
+    getChildrenByID($aphiaID)
+
+      Retrieves all children under a given AphiaID using the method
+      getBlockChildrenID(...) and prints the result to STDOUT using the
+      method printRecord(...).
+
+    printRecord($record, $first, $last, $spc)
+
+      Prints a record to SDTOUT and handles inentation by $spc as well as
+      header and trailing aspects by using the $first and $last flags.
+
+AUTHOR
+
+    Alexander Weidauer <alex.weidauer@huckfinn.de>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2012 by Alexander Weidauer
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or any later
+    version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

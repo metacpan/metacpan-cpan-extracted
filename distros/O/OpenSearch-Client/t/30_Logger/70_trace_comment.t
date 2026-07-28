@@ -24,8 +24,8 @@ use Test::More;
 use Test::Exception;
 use OpenSearch::Client;
 
-do './t/lib/LogCallback.pl' or die( $@ || $! );
-our $format;
+do './t/lib/LogCapture.pl' or die( $@ || $! );
+our $messagetext;
 
 ok my $e
     = OpenSearch::Client->new( nodes => 'https://foo.bar:444/some/path' ),
@@ -38,7 +38,7 @@ ok $c->does('OpenSearch::Client::Role::Cxn'),
 
 ok $l->trace_comment("The quick fox\njumped"), 'Comment';
 
-is $format, <<"COMMENT", 'Comment - format';
+is $messagetext, <<"COMMENT", 'Comment - format';
 # *** The quick fox
 # *** jumped
 COMMENT

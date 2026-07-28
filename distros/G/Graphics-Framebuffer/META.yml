@@ -8,6 +8,8 @@ build_requires:
   Test::More: '1.00'
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
+  Inline: '0.53'
+  Inline::C: '0.53'
   Inline::MakeMaker: '0.45'
   Term::ANSIColor: '4.00'
   Term::ReadKey: '2.04'
@@ -33,5 +35,5 @@ requires:
   Math::Gradient: '0.03'
   Term::ReadKey: '2.04'
   perl: '5.020000'
-version: '7.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+version: '7.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

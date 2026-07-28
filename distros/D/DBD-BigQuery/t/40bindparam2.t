@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 2;
+use DBI;
+my $dbh = DBI->connect('dbi:BigQuery:project=p;dataset=d', '', '');
+my $sth = $dbh->prepare('SELECT id FROM t WHERE a = ? AND b = ?');
+$sth->bind_param(1, 10);
+$sth->bind_param(2, 20);
+ok($sth->execute(), 'Bound positional parameters');
+ok($sth->fetchrow_arrayref(), 'Fetched row');

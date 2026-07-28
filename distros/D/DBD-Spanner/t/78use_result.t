@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 2;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth = $dbh->prepare('SELECT id FROM users');
+$sth->execute();
+my $r = $sth->fetchrow_arrayref();
+ok($r, 'Fetched result row');
+ok(!$sth->fetchrow_arrayref(), 'Stream finished');

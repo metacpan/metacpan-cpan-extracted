@@ -1,17 +1,37 @@
 Changes
 ignore.txt
 lib/Google/Cloud/Spanner/V1.pm
-lib/Google/Spanner/V1/descriptors.pb
+lib/Google/Cloud/Spanner/V1/SpannerClient.pm
+lib/Google/Spanner/V1/ChangeStream.pm
+lib/Google/Spanner/V1/ChangeStream/Types.pm
+lib/Google/Spanner/V1/CommitResponse.pm
+lib/Google/Spanner/V1/CommitResponse/Types.pm
+lib/Google/Spanner/V1/Keys.pm
+lib/Google/Spanner/V1/Keys/Types.pm
+lib/Google/Spanner/V1/Location.pm
+lib/Google/Spanner/V1/Location/Types.pm
+lib/Google/Spanner/V1/Mutation.pm
+lib/Google/Spanner/V1/Mutation/Types.pm
+lib/Google/Spanner/V1/QueryPlan.pm
+lib/Google/Spanner/V1/QueryPlan/Types.pm
+lib/Google/Spanner/V1/ResultSet.pm
+lib/Google/Spanner/V1/ResultSet/Types.pm
 lib/Google/Spanner/V1/Spanner.pm
+lib/Google/Spanner/V1/Spanner/Types.pm
+lib/Google/Spanner/V1/Transaction.pm
+lib/Google/Spanner/V1/Transaction/Types.pm
+lib/Google/Spanner/V1/Type.pm
+lib/Google/Spanner/V1/Type/Types.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
-t/01-service.t
-t/02-spanner-codec.t
+t/01-service-Spanner.t
+t/02-rest-transport-Spanner.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/00_perl-critic.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

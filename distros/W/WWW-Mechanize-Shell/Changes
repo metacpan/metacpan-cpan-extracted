@@ -13,6 +13,9 @@ Todo:
     * Add set-cookie and delete-cookie commands
     * Add (optional) HTTP::Cookies::Find support
 
+0.63 2026-07-27
+    * Support LWP four argument auth() method (code by Alexander Bluhm, thanks)
+
 0.62 2023-07-21
     * Test stability fix
 

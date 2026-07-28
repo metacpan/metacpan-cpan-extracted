@@ -29,7 +29,7 @@
 #include <linux/futex.h>
 #include <sys/eventfd.h>
 
-#define STK_MAGIC       0x53544B32U  /* "STK2" — v2 layout (per-slot ctl) */
+#define STK_MAGIC       0x53544B32U  /* "STK2" -- v2 layout (per-slot ctl) */
 #define STK_VERSION     2
 #define STK_ERR_BUFLEN  256
 
@@ -83,7 +83,7 @@ typedef struct {
     uint64_t  *ctl;            /* per-slot state+generation word */
     size_t     mmap_size;
     uint32_t   elem_size;      /* cached from header at open time */
-    uint64_t   capacity;       /* cached from header at open time — trusted bound */
+    uint64_t   capacity;       /* cached from header at open time -- trusted bound */
     char      *path;
     int        notify_fd;
     int        backing_fd;
@@ -95,6 +95,7 @@ typedef struct {
 
 static inline void stk_make_deadline(double timeout, struct timespec *dl) {
     clock_gettime(CLOCK_MONOTONIC, dl);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     dl->tv_sec += (time_t)timeout;
     dl->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
     if (dl->tv_nsec >= 1000000000L) { dl->tv_sec++; dl->tv_nsec -= 1000000000L; }
@@ -121,28 +122,80 @@ static inline void stk_spin_pause(void) {
 #endif
 }
 
-/* Slot state machine — same pattern as Data::Deque::Shared. */
-static inline uint64_t stk_slot_claim_write(uint64_t *ctl_word) {
+/* Slot state machine -- same pattern as Data::Deque::Shared.
+ *
+ * Bounded wait for `want`, with abandoned-slot recovery.
+ *
+ * A peer that died between claiming a slot and publishing/releasing it leaves
+ * the slot stuck in WRITING (crashed pusher) or READING (crashed popper). An
+ * unbounded spin here wedges EVERY process using the stack, forever, at 100%
+ * CPU -- stk_drain already bounds its own wait for exactly this reason (see the
+ * comment there); push/pop must do the same or a single SIGKILL is a permanent
+ * cluster-wide DoS. We hot-spin briefly, then sleep, and on a ~2s deadline force
+ * the slot back to EMPTY with the generation bumped.
+ *
+ * Returns 1 with *out_gen set when the slot was claimed in state `want`.
+ * Returns 0 when the slot was abandoned and force-reclaimed.
+ *
+ * Same false-positive caveat as stk_drain: ctl encodes no PID, so a live peer
+ * stalled >2s is indistinguishable from a dead one. Its later publish/release is
+ * a CAS against the old generation (stk_slot_publish), so it no-ops instead of
+ * resurrecting a phantom slot; the value is dropped exactly as for a real crash.
+ * The claim->publish window is a sub-microsecond memcpy, so the threshold is
+ * many orders of magnitude above normal latency. */
+static inline int stk_slot_wait_state(uint64_t *ctl_word, uint32_t want,
+                                      uint64_t *out_gen) {
+    struct timespec dl;
+    int dl_set = 0;
+    uint32_t spins = 0;
     for (;;) {
         uint64_t c = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
-        if (STK_SLOT_STATE(c) == STK_SLOT_EMPTY) {
-            uint64_t nc = (STK_SLOT_GEN(c) << 2) | STK_SLOT_WRITING;
+        if (STK_SLOT_STATE(c) == want) {
+            uint32_t next = (want == STK_SLOT_EMPTY) ? STK_SLOT_WRITING : STK_SLOT_READING;
+            uint64_t nc = (STK_SLOT_GEN(c) << 2) | next;
             if (__atomic_compare_exchange_n(ctl_word, &c, nc,
-                    0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-                return STK_SLOT_GEN(c);
+                    0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+                *out_gen = STK_SLOT_GEN(c);
+                return 1;
+            }
+            continue;
         }
         stk_spin_pause();
+        if ((++spins & 0x3F) == 0) {
+            if (!dl_set) { stk_make_deadline(2.0, &dl); dl_set = 1; }
+            struct timespec rem;
+            if (!stk_remaining(&dl, &rem)) {
+                /* Abandoned by a dead peer: force EMPTY with gen bumped. If the
+                 * CAS loses, the peer just completed (or another recoverer won)
+                 * -- re-observe rather than clobber. */
+                uint64_t nc = ((STK_SLOT_GEN(c) + 1) << 2) | STK_SLOT_EMPTY;
+                if (__atomic_compare_exchange_n(ctl_word, &c, nc,
+                        0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+                    return 0;
+                continue;
+            }
+            /* Short sleep to keep CPU usage low during the long wait. */
+            struct timespec ts = { 0, 100000L }; /* 100us */
+            nanosleep(&ts, NULL);
+        }
     }
 }
 
+static inline uint64_t stk_slot_claim_write(uint64_t *ctl_word) {
+    uint64_t gen;
+    /* On recovery the slot is EMPTY at the bumped gen: retry and take it. */
+    while (!stk_slot_wait_state(ctl_word, STK_SLOT_EMPTY, &gen)) { }
+    return gen;
+}
+
 /* Publish WRITING@gen -> FILLED@gen. Implemented as CAS (not a plain store)
- * so that if stk_drain force-recovered the slot mid-write — bumping it to
- * EMPTY@(gen+1) — this publish is a no-op rather than clobbering the
+ * so that if stk_drain force-recovered the slot mid-write -- bumping it to
+ * EMPTY@(gen+1) -- this publish is a no-op rather than clobbering the
  * recovered state back to FILLED@gen. That would leave a phantom FILLED at
  * a stale gen which the next pusher's stk_slot_claim_write (waits on EMPTY)
  * could never advance past, deadlocking that slot forever. The caller's
  * top CAS was already committed, so on lost-race the value is silently
- * dropped — matching the documented drain-recovery semantics. */
+ * dropped -- matching the documented drain-recovery semantics. */
 static inline void stk_slot_publish(uint64_t *ctl_word, uint64_t gen) {
     uint64_t expected = (gen << 2) | STK_SLOT_WRITING;
     uint64_t desired  = (gen << 2) | STK_SLOT_FILLED;
@@ -150,17 +203,10 @@ static inline void stk_slot_publish(uint64_t *ctl_word, uint64_t gen) {
             0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
 }
 
-static inline uint64_t stk_slot_claim_read(uint64_t *ctl_word) {
-    for (;;) {
-        uint64_t c = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
-        if (STK_SLOT_STATE(c) == STK_SLOT_FILLED) {
-            uint64_t nc = (STK_SLOT_GEN(c) << 2) | STK_SLOT_READING;
-            if (__atomic_compare_exchange_n(ctl_word, &c, nc,
-                    0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-                return STK_SLOT_GEN(c);
-        }
-        stk_spin_pause();
-    }
+/* Returns 1 and sets *out_gen on success; 0 if the slot was abandoned by a
+ * crashed pusher and has been force-reclaimed (no value to read). */
+static inline int stk_slot_claim_read(uint64_t *ctl_word, uint64_t *out_gen) {
+    return stk_slot_wait_state(ctl_word, STK_SLOT_FILLED, out_gen);
 }
 
 static inline void stk_slot_release(uint64_t *ctl_word, uint64_t gen) {
@@ -243,6 +289,21 @@ static inline int stk_push(StkHandle *h, const void *val, uint32_t vlen, double 
  * Pop (LIFO top--)
  * ================================================================ */
 
+/* Wake one blocked pusher, if any. Must run after EVERY committed top--,
+ * whether the pop produced a value or reclaimed an abandoned slot: either
+ * way a slot's worth of room was freed, and pushers parked in stk_push()'s
+ * FUTEX_WAIT have no other waker on this path (only a successful pop,
+ * drain(), or clear() bumps push_wake_seq). The StoreLoad barrier pairs
+ * with the one in the push-wait loop: publish top-- before reading
+ * waiters_push. */
+static inline void stk_wake_pushers(StkHeader *hdr) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
+        __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
+    }
+}
+
 static inline int stk_try_pop(StkHandle *h, void *out) {
     StkHeader *hdr = h->hdr;
     for (;;) {
@@ -251,16 +312,24 @@ static inline int stk_try_pop(StkHandle *h, void *out) {
         if (t > h->capacity) return 0;  /* corrupted top: reject rather than OOB h->ctl[t-1]/slot */
         if (__atomic_compare_exchange_n(&hdr->top, &t, t - 1,
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-            uint64_t gen = stk_slot_claim_read(&h->ctl[t - 1]);
+            uint64_t gen;
+            if (!stk_slot_claim_read(&h->ctl[t - 1], &gen)) {
+                /* Slot was abandoned by a crashed pusher and has been
+                 * reclaimed: that value never existed. top is already
+                 * decremented, so retry at the next position down rather than
+                 * reporting the stack empty while entries remain below. The
+                 * loop terminates because every iteration lowers top. The
+                 * committed top-- freed room, so wake a blocked pusher just
+                 * as a successful pop would -- otherwise a push_wait() that
+                 * parked while the stack read full sleeps forever now that
+                 * no successful pop can ever follow on an empty stack. */
+                stk_wake_pushers(hdr);
+                continue;
+            }
             memcpy(out, stk_slot(h, t - 1), h->elem_size);
             stk_slot_release(&h->ctl[t - 1], gen);
             __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
-            /* StoreLoad barrier: publish top-- before reading waiters_push. */
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
-                __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
-                syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
-            }
+            stk_wake_pushers(hdr);
             return 1;
         }
     }
@@ -351,7 +420,7 @@ static inline void stk_init_header(void *base, uint64_t total,
                                     uint32_t elem_size, uint32_t variant_id,
                                     uint64_t capacity) {
     StkHeader *hdr = (StkHeader *)base;
-    memset(base, 0, (size_t)total);  /* zeroes ctl array → all slots EMPTY, gen=0 */
+    memset(base, 0, (size_t)total);  /* zeroes ctl array -> all slots EMPTY, gen=0 */
     hdr->magic      = STK_MAGIC;
     hdr->version    = STK_VERSION;
     hdr->elem_size  = elem_size;
@@ -363,8 +432,8 @@ static inline void stk_init_header(void *base, uint64_t total,
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
-/* Layout fields are passed in by the caller — either from a validated
- * header snapshot or locally computed — never re-read from the live
+/* Layout fields are passed in by the caller -- either from a validated
+ * header snapshot or locally computed -- never re-read from the live
  * mapping, which a hostile peer could rewrite between validation and
  * here (double-fetch TOCTOU). */
 static inline StkHandle *stk_setup(void *base, size_t msize,
@@ -372,13 +441,13 @@ static inline StkHandle *stk_setup(void *base, size_t msize,
                                     uint64_t data_off, uint64_t ctl_off,
                                     uint32_t elem_size, uint64_t capacity) {
     StkHandle *h = (StkHandle *)calloc(1, sizeof(StkHandle));
-    if (!h) { munmap(base, msize); return NULL; }
+    if (!h) { munmap(base, msize); if (bfd >= 0) close(bfd); return NULL; }
     h->hdr        = (StkHeader *)base;
     h->data       = (uint8_t *)base + data_off;
     h->ctl        = (uint64_t *)((uint8_t *)base + ctl_off);
     h->mmap_size  = msize;
-    h->elem_size  = elem_size;  /* cached — safe from shared-mem tampering */
-    h->capacity   = capacity;   /* cached — trusted index/length bound */
+    h->elem_size  = elem_size;  /* cached -- safe from shared-mem tampering */
+    h->capacity   = capacity;   /* cached -- trusted index/length bound */
     h->path       = path ? strdup(path) : NULL;
     h->notify_fd  = -1;
     h->backing_fd = bfd;
@@ -392,6 +461,10 @@ static inline int stk_validate_header(const StkHeader *hdr, uint64_t file_size,
     if (hdr->version != STK_VERSION) return 0;
     if (hdr->variant_id != expected_variant) return 0;
     if (hdr->elem_size == 0 || hdr->capacity == 0) return 0;
+    /* Pin elem_size to the variant so a crafted header can't drive an over-read/write
+       in push/pop: Int reads a fixed 8-byte slot; Str needs a 4-byte length prefix + data. */
+    if (expected_variant == STK_VAR_INT && hdr->elem_size != 8) return 0;
+    if (expected_variant == STK_VAR_STR && hdr->elem_size < 5) return 0;
     if (hdr->capacity > 0x7FFFFFFFu) return 0;
     if (hdr->total_size != file_size) return 0;
     if (hdr->data_off != sizeof(StkHeader)) return 0;
@@ -456,6 +529,10 @@ static StkHandle *stk_create(const char *path, uint64_t capacity,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            STK_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)total) < 0) {
                 STK_ERR("ftruncate: %s", strerror(errno));
@@ -539,11 +616,11 @@ static void stk_destroy(StkHandle *h) {
     free(h);
 }
 
-/* NOT concurrency-safe — use drain() for concurrent scenarios */
+/* NOT concurrency-safe -- use drain() for concurrent scenarios */
 static void stk_clear(StkHandle *h) {
     __atomic_store_n(&h->hdr->top, 0, __ATOMIC_RELEASE);
     memset(h->ctl, 0, (size_t)h->capacity * sizeof(uint64_t));  /* trusted cached length */
-    /* clear() frees the entire stack at once — wake all waiters.
+    /* clear() frees the entire stack at once -- wake all waiters.
      * StoreLoad barrier: publish top=0 before reading the waiter counts. */
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&h->hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
@@ -565,12 +642,12 @@ static void stk_clear(StkHandle *h) {
  * wait at ~2s per slot; on timeout we CAS WRITING -> EMPTY (gen bumped) so
  * the slot is reclaimed.
  *
- * Limitation: slot ctl encodes only (gen << 2) | state — no PID — so we
+ * Limitation: slot ctl encodes only (gen << 2) | state -- no PID -- so we
  * cannot distinguish a crashed pusher from a merely slow one. A live pusher
  * stalled > 2s would be falsely reclaimed; its subsequent publish is a CAS
  * (see stk_slot_publish) so it observes the gen bump and silently no-ops
  * rather than resurrecting a phantom FILLED slot. The pusher's value is
- * dropped — equivalent to a crashed pusher. In practice the gap between
+ * dropped -- equivalent to a crashed pusher. In practice the gap between
  * claim_write and publish is sub-microsecond memcpy time, so the false-
  * positive threshold is many orders of magnitude away from normal latency. */
 static inline uint32_t stk_drain(StkHandle *h) {
@@ -606,7 +683,7 @@ static inline uint32_t stk_drain(StkHandle *h) {
                     /* Treat as abandoned (crashed writer/reader): force the
                      * slot back to EMPTY with gen bumped. If CAS succeeds we
                      * skipped the slot; if it fails, the writer just published
-                     * (or another recoverer fixed it) — loop and re-observe so
+                     * (or another recoverer fixed it) -- loop and re-observe so
                      * a FILLED value is not leaked. */
                     uint64_t nc = ((STK_SLOT_GEN(c) + 1) << 2) | STK_SLOT_EMPTY;
                     if (__atomic_compare_exchange_n(&h->ctl[i], &c, nc,
@@ -620,7 +697,7 @@ static inline uint32_t stk_drain(StkHandle *h) {
             }
         }
     }
-    /* drain freed `t` slots at once — wake up to that many.
+    /* drain freed `t` slots at once -- wake up to that many.
      * StoreLoad barrier: publish the freed slots before reading waiters_push. */
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {

@@ -5,7 +5,6 @@ author:
 build_requires:
   File::Temp: '0'
   IO::Socket::SSL: '0'
-  Log::Any::Adapter::Callback: '0.09'
   POSIX: '0'
   TAP::Harness::JUnit: '0'
   Test::Deep: '0'
@@ -48,7 +47,7 @@ requires:
   JSON::PP: '0'
   LWP::UserAgent: '0'
   List::Util: '0'
-  Log::Any: '1.02'
+  Log::Any: '1.708'
   Log::Any::Adapter: '0'
   MIME::Base64: '0'
   Module::Runtime: '0'
@@ -68,7 +67,7 @@ resources:
   bugtracker: https://github.com/markdootson/opensearch-client-perl/issues
   homepage: https://metacpan.org/pod/OpenSearch::Client
   repository: git://github.com/markdootson/opensearch-client-perl.git
-version: '3.007009'
+version: '3.007010'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Apache-2.0

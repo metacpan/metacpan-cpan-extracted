@@ -42,6 +42,7 @@ xt/cloexec.t
 xt/cloexec_exec.t
 xt/crash_recovery.t
 xt/cross_module_fd.t
+xt/destroy_during_call.t
 xt/double_init_race.t
 xt/eg_runs.t
 xt/endurance_leak.t
@@ -54,6 +55,7 @@ xt/hostile_bless.t
 xt/integration_pipeline.t
 xt/invalid_args.t
 xt/kernel_downgrade.t
+xt/kwalitee.t
 xt/large_capacity.t
 xt/lto_o3.t
 xt/malloc_fail.t

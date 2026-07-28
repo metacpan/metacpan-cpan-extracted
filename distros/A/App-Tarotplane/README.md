@@ -71,14 +71,18 @@ maintainability.
 As for the origin of the name **tarotplane**:
 ```
 curses cards
+   ↓
 occult cards
+   ↓
 tarot cards
+   ↓
 tarot.pl
+   ↓
 tarotplane (the Beefheart one)
 ```
 
 ## Copyright
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2026 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

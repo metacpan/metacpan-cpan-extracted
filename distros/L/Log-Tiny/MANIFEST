@@ -1,4 +1,5 @@
 Changes
+cpanfile
 example.pl
 lib/Log/Tiny.pm
 Makefile.PL
@@ -8,6 +9,17 @@ t/00-load.t
 t/01-log.t
 t/02-wrapper.t
 t/03-exclude.t
+t/05-open.t
+t/06-filehandle.t
+t/07-caller-depth.t
+t/08-formats.t
+t/09-levels.t
+t/10-literal.t
+t/11-easy.t
+t/12-lazy.t
+t/13-would-log.t
+t/14-logdie.t
+t/15-strftime.t
 t/pod-coverage.t
 t/pod.t
 wrapper.pl

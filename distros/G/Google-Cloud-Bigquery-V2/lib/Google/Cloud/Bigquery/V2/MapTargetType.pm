@@ -1,46 +1,43 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::MapTargetType;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Inclusion };
     my $descriptor_b64 = <<'EOF';
 Ci5nb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvbWFwX3RhcmdldF90eXBlLnByb3RvEhhnb29n
-bGUuY2xvdWQuYmlncXVlcnkudjIaGmdvb2dsZS9hcGkvaW5jbHVzaW9uLnByb3RvKkUKDU1h
-cFRhcmdldFR5cGUSHwobTUFQX1RBUkdFVF9UWVBFX1VOU1BFQ0lGSUVEEAASEwoPQVJSQVlf
-T0ZfU1RSVUNUEAFCfAocY29tLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS52MkISTWFwVGFyZ2V0
-VHlwZVByb3RvUAFaO2Nsb3VkLmdvb2dsZS5jb20vZ28vYmlncXVlcnkvdjIvYXBpdjIvYmln
-cXVlcnlwYjtiaWdxdWVyeXBiitXb0g8FCgNhbGxKrAQKBhIEAAAUAQoICgEMEgMAABIKCAoB
-AhIDAgAhCgkKAgMAEgMEACQKCAoBCBIDBgBSCgkKAggLEgMGAFIKCAoBCBIDBwAiCgkKAggK
-EgMHACIKCAoBCBIDCAA1CgkKAggBEgMIADUKCAoBCBIDCQAzCgkKAggIEgMJADMKCAoBCBID
-CgAtCg8KCAjRuqv6AQEAEgMKAC0KSgoCBQASBA0AFAEaPiBJbmRpY2F0ZXMgdGhlIG1hcCB0
-YXJnZXQgdHlwZS4gT25seSBhcHBsaWVzIHRvIHBhcnF1ZXQgbWFwcy4KCgoKAwUAARIDDQUS
-CowBCgQFAAIAEgMQAiIafyBJbiB0aGlzIG1vZGUsIHRoZSBtYXAgd2lsbCBoYXZlIHRoZSBm
-b2xsb3dpbmcgc2NoZW1hOgogc3RydWN0IG1hcF9maWVsZF9uYW1lIHsgIHJlcGVhdGVkIHN0
-cnVjdCBrZXlfdmFsdWUgeyAga2V5ICB2YWx1ZSAgfSB9LgoKDAoFBQACAAESAxACHQoMCgUF
-AAIAAhIDECAhCnUKBAUAAgESAxMCFhpoIEluIHRoaXMgbW9kZSwgdGhlIG1hcCB3aWxsIGhh
-dmUgdGhlIGZvbGxvd2luZyBzY2hlbWE6CiByZXBlYXRlZCBzdHJ1Y3QgbWFwX2ZpZWxkX25h
-bWUgeyAga2V5ICB2YWx1ZSB9LgoKDAoFBQACAQESAxMCEQoMCgUFAAIBAhIDExQVYgZwcm90
-bzM=
+bGUuY2xvdWQuYmlncXVlcnkudjIqRQoNTWFwVGFyZ2V0VHlwZRIfChtNQVBfVEFSR0VUX1RZ
+UEVfVU5TUEVDSUZJRUQQABITCg9BUlJBWV9PRl9TVFJVQ1QQAUJxChxjb20uZ29vZ2xlLmNs
+b3VkLmJpZ3F1ZXJ5LnYyQhJNYXBUYXJnZXRUeXBlUHJvdG9QAVo7Y2xvdWQuZ29vZ2xlLmNv
+bS9nby9iaWdxdWVyeS92Mi9hcGl2Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGJKuwgKBhIEDgAg
+AQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1
+bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsK
+IHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0
+aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoK
+ICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxl
+c3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcs
+IHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRl
+ZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElP
+TlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExp
+Y2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMg
+YW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIQoICgEIEgMS
+AFIKCQoCCAsSAxIAUgoICgEIEgMTACIKCQoCCAoSAxMAIgoICgEIEgMUADMKCQoCCAgSAxQA
+MwoICgEIEgMVADUKCQoCCAESAxUANQpKCgIFABIEGAAgARo+IEluZGljYXRlcyB0aGUgbWFw
+IHRhcmdldCB0eXBlLiBPbmx5IGFwcGxpZXMgdG8gcGFycXVldCBtYXBzLgoKCgoDBQABEgMY
+BRIKjAEKBAUAAgASAxsCIhp/IEluIHRoaXMgbW9kZSwgdGhlIG1hcCB3aWxsIGhhdmUgdGhl
+IGZvbGxvd2luZyBzY2hlbWE6CiBzdHJ1Y3QgbWFwX2ZpZWxkX25hbWUgeyAgcmVwZWF0ZWQg
+c3RydWN0IGtleV92YWx1ZSB7ICBrZXkgIHZhbHVlICB9IH0uCgoMCgUFAAIAARIDGwIdCgwK
+BQUAAgACEgMbICEKdQoEBQACARIDHwIWGmggSW4gdGhpcyBtb2RlLCB0aGUgbWFwIHdpbGwg
+aGF2ZSB0aGUgZm9sbG93aW5nIHNjaGVtYToKIHJlcGVhdGVkIHN0cnVjdCBtYXBfZmllbGRf
+bmFtZSB7ICBrZXkgIHZhbHVlIH0uCgoMCgUFAAIBARIDHwIRCgwKBQUAAgECEgMfFBViBnBy
+b3RvMw==
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -48,3 +45,21 @@ EOF
 # Message definitions
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::MapTargetType - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

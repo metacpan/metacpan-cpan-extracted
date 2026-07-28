@@ -26,7 +26,7 @@ use Moo 2.001000 ();
 use OpenSearch::Client::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '3.007009';
+our $VERSION = '3.007010';
 
 my %Default_Plugins = (
     client      => [ 'OpenSearch::Client::Core',         '3_0::Direct' ],
@@ -54,7 +54,15 @@ sub new {
     $params->{cxn} ||= 'HTTPTiny';
     my $plugins = delete $params->{plugins} || [];
     $plugins = [$plugins] unless ref $plugins eq 'ARRAY';
-
+    
+    {
+        my $username = delete $params->{username};
+        my $password = delete $params->{password};
+        if (!$params->{userinfo} && $username && $password) {
+            $params->{userinfo} = sprintf('%s:%s', $username , $password );
+        }
+    }
+    
     for my $name (@Load_Order) {
         my ( $base, $default ) = @{ $Default_Plugins{$name} };
         my $sub_class = $params->{$name} || $default;
@@ -85,7 +93,7 @@ OpenSearch::Client - An unofficial Perl client for OpenSearch
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 SYNOPSIS
 
@@ -108,6 +116,11 @@ L<Search::Elasticsearch> is no longer maintained as Elasticsearch no longer incl
 =head1 MANUAL
 
 For documentation index see L<OpenSearch::Client::Manual>
+
+=head1 UTILITIES
+
+L<OpenSearch::Client::Hash> provided in a seperate distribution allows creation of C<BCrypt>, C<Argon2>
+and C<PBKDF2> password hashes that can be stored for later use in user creation.
 
 =head1 HISTORY
 

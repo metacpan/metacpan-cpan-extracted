@@ -24,7 +24,7 @@
  * only (no xor / andnot yet); bitmap containers are NOT down-converted to arrays
  * on removal.
  *
- * Layout: Header -> reader_slots[1024] -> bucket_table[65536] -> container_pool[container_cap]
+ * Layout: Header -> reader_slots[1024] -> occ_bitmap -> bucket_table[65536] -> container_pool[container_cap]
  */
 
 #ifndef ROARING_H
@@ -58,9 +58,15 @@
  * ================================================================ */
 
 #define RB_MAGIC          0x474E5252U  /* "RRNG" (little-endian) */
-#define RB_VERSION        1
+#define RB_VERSION        2   /* 2: added the occupancy bitmap region (layout change) */
 #define RB_ERR_BUFLEN     256
 #define RB_READER_SLOTS   1024         /* max concurrent reader processes for dead-process recovery */
+
+/* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
+ * cleared on clean release.  A writer scans these RB_OCC_WORDS words to visit only
+ * OCCUPIED slots (O(words + live readers)) instead of all RB_READER_SLOTS. */
+#define RB_OCC_WORDS      (((RB_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
+#define RB_OCC_BYTES      ((uint64_t)RB_OCC_WORDS * 8)      /* 128 bytes */
 #define RB_NUM_BUCKETS    65536u       /* one bucket per high-16 value */
 #define RB_CONTAINER_BYTES 8192u       /* 4096*2 == 1024*8: array and bitmap share this size */
 #define RB_ARRAY_MAX      4096u        /* convert array -> bitmap when an array would exceed this */
@@ -90,15 +96,19 @@ typedef struct {
 
 _Static_assert(sizeof(RbBucket) == 16, "RbBucket must be 16 bytes");
 
-/* Per-process slot for dead-process recovery.  Mirrors this process's
- * contribution to each shared rwlock counter so a wrlock timeout can attribute
- * and reverse a dead process's share instead of waiting for the slow per-op
- * timeout drain. */
+/* Per-process slot for dead-process recovery.  In the reader-slots-only rwlock a
+ * reader's ENTIRE contribution to the shared lock is `rdepth` in its OWN slot --
+ * there is no separate shared reader counter to fall out of sync with it -- so a
+ * dead reader's contribution is exactly this one word, which a draining writer
+ * neutralises by clearing the slot's pid (the scan then ignores the slot).  No
+ * orphaned counter can exist, so there is no quiescent force-reset and sustained
+ * readers cannot starve a writer.  _rsv1/_rsv2 are kept only to preserve the
+ * 16-byte slot size across the already-released builds. */
 typedef struct {
-    uint32_t pid;            /* 0 = unclaimed */
-    uint32_t subcount;       /* in-flight rdlock acquisitions for this process */
-    uint32_t waiters_parked; /* contribution to hdr->rwlock_waiters         */
-    uint32_t writers_parked; /* contribution to hdr->rwlock_writers_waiting */
+    uint32_t pid;      /* 0 = unclaimed */
+    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
+    uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } RbReaderSlot;
 
 struct RbHeader {
@@ -114,10 +124,10 @@ struct RbHeader {
     uint64_t reader_slots_off;        /* 48 */
     uint64_t bucket_table_off;        /* 56 */
     uint64_t container_pool_off;      /* 64 */
-    uint32_t rwlock;                  /* 72 */
-    uint32_t rwlock_waiters;          /* 76 */
-    uint32_t rwlock_writers_waiting;  /* 80 */
-    uint32_t _pad0;                   /* 84  align stat_ops to 8 */
+    uint32_t wlock;                   /* 72  WRITER word ONLY: 0 (free) or WRITER_BIT|pid.  NOT a reader count. */
+    uint32_t rwait;                   /* 76  parked-waiter hint (readers+writers blocked on wlock); over-count-safe */
+    uint32_t drain_seq;               /* 80  futex bumped by a reader releasing under a draining writer (wakes it) */
+    uint32_t slotless_rdepth;         /* 84  readers holding with no reader-slot (documented residual); also aligns stat_ops */
     uint64_t stat_ops;                /* 88 */
     uint8_t  _pad1[160];              /* 96..255 */
 };
@@ -130,22 +140,43 @@ _Static_assert(sizeof(RbHeader) == 256, "RbHeader must be 256 bytes");
 typedef struct RbHandle {
     RbHeader     *hdr;
     RbReaderSlot *reader_slots;   /* RB_READER_SLOTS entries */
+    uint64_t     *occ;            /* RB_OCC_WORDS-word slot-occupancy bitmap (trusted layout offset) */
+    RbBucket     *bucket_table;   /* cached from trusted layout, not the peer-writable header offset */
+    uint8_t      *pool;           /* cached container-pool base (trusted layout) */
     void         *base;           /* mmap base */
     size_t        mmap_size;
     char         *path;           /* backing file path (strdup'd) */
     int           backing_fd;     /* memfd or reopened-fd to close on destroy, -1 for file/anon */
+    uint32_t      container_cap;  /* cached fixed geometry, validated in range at attach */
     uint32_t      my_slot_idx;    /* UINT32_MAX if all slots taken (no recovery for this handle) */
     uint32_t      cached_pid;     /* getpid() cached at last slot claim */
     uint32_t      cached_fork_gen;/* rb_fork_gen value at last slot claim */
+    uint32_t      slotless_held;  /* read-locks this process holds with no reader-slot */
 } RbHandle;
 
 /* ================================================================
- * Futex-based write-preferring read-write lock
- * with reader-slot dead-process recovery
+ * Futex-based write-preferring read-write lock (reader-slots-only)
+ * with dead-process recovery
+ *
+ * The reader count is NOT stored in a shared counter.  It is DISTRIBUTED across
+ * per-process reader slots: each slot's `rdepth` is that process's entire
+ * contribution to the lock.  A reader publishes its presence in its own slot and
+ * then re-checks the writer word; a writer publishes the writer word and then
+ * scans every slot until all live readers' rdepth reach 0.  Sequentially-
+ * consistent store+load on each side (a Dekker handshake) gives mutual exclusion.
+ *
+ * Because a reader's whole contribution is ONE atomic word owned by ONE process,
+ * a crashed reader is recovered by clearing that one slot (CAS its pid to 0) --
+ * there is no second counter to strand, no orphaned +1, and therefore no
+ * quiescent force-reset.  A reader killed anywhere in rdlock/rdunlock leaves at
+ * most `rdepth>0` in its dead slot, which the draining writer clears directly, so
+ * sustained read traffic can never starve a writer.  Write-preference is inherent
+ * in the gate (new readers see wlock!=0 and yield), so there is no reader-count
+ * yield hack.
  * ================================================================ */
 
 #define RB_RWLOCK_SPIN_LIMIT 32
-#define RB_LOCK_TIMEOUT_SEC  2  /* FUTEX_WAIT timeout for stale lock detection */
+#define RB_LOCK_TIMEOUT_SEC  2  /* FUTEX_WAIT timeout for stale-lock detection / drain re-scan */
 
 static inline void rb_rwlock_spin_pause(void) {
 #if defined(__x86_64__) || defined(__i386__)
@@ -157,7 +188,7 @@ static inline void rb_rwlock_spin_pause(void) {
 #endif
 }
 
-/* Extract writer PID from rwlock value (lower 31 bits when write-locked). */
+/* Writer word encoding: WRITER_BIT|pid when write-locked, 0 when free. */
 #define RB_RWLOCK_WRITER_BIT 0x80000000U
 #define RB_RWLOCK_PID_MASK   0x7FFFFFFFU
 #define RB_RWLOCK_WR(pid)    (RB_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & RB_RWLOCK_PID_MASK))
@@ -167,26 +198,46 @@ static inline void rb_rwlock_spin_pause(void) {
  * lock-holder's PID is recycled to an unrelated live process before recovery
  * runs, this reports "alive" and that slot's orphaned contribution is not
  * reclaimed until the recycled process exits. Documented under "Crash Safety". */
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int rb_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int rb_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !rb_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale write lock left by a dead process.
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent
- * recovering process can detect and re-recover if we crash mid-recovery. */
-static inline void rb_recover_stale_lock(RbHandle *h, uint32_t observed_rwlock) {
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void rb_recover_stale_lock(RbHandle *h, uint32_t observed_wlock) {
     RbHeader *hdr = h->hdr;
     uint32_t mypid = RB_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->rwlock, &observed_rwlock,
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
     /* We now hold the write lock as mypid.  No additional shared state needs
      * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 static const struct timespec rb_lock_timeout = { RB_LOCK_TIMEOUT_SEC, 0 };
@@ -203,9 +254,24 @@ static void rb_atfork_init(void) {
     pthread_atfork(NULL, NULL, rb_on_fork_child);
 }
 
+/* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
+ * release.  SEQ_CST so a set bit is ordered before the slot's rdepth can go
+ * non-zero (bit set in claim, which precedes any rdlock), letting a writer's
+ * SEQ_CST bitmap scan never miss a slot a committed reader holds. */
+static inline void rb_occ_set(RbHandle *h, uint32_t s) {
+    __atomic_fetch_or(&h->occ[s >> 6], (uint64_t)1 << (s & 63), __ATOMIC_SEQ_CST);
+}
+static inline void rb_occ_clear(RbHandle *h, uint32_t s) {
+    __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
+}
+
 /* Ensure this process owns a reader slot.  Called from the lock helpers so
  * that fork()'d children pick up their own slot lazily instead of sharing
  * the parent's.  Hot-path is a single relaxed load + compare; only on a
+ * fork-generation mismatch do we touch getpid() and scan slots. */
+/* Ensure this process owns a reader slot.  Called from the lock helpers so that
+ * fork()'d children pick up their own slot lazily instead of sharing the
+ * parent's.  Hot-path is a single relaxed load + compare; only on a
  * fork-generation mismatch do we touch getpid() and scan slots. */
 static inline void rb_claim_reader_slot(RbHandle *h) {
     uint32_t cur_gen = __atomic_load_n(&rb_fork_gen, __ATOMIC_RELAXED);
@@ -217,283 +283,262 @@ static inline void rb_claim_reader_slot(RbHandle *h) {
     cur_gen = __atomic_load_n(&rb_fork_gen, __ATOMIC_RELAXED);
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
+    if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
     h->cached_fork_gen = cur_gen;
     h->my_slot_idx = UINT32_MAX;
     uint32_t start = now_pid % RB_READER_SLOTS;
+    /* Pass 1: take a free slot. */
     for (uint32_t i = 0; i < RB_READER_SLOTS; i++) {
         uint32_t s = (start + i) % RB_READER_SLOTS;
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&h->reader_slots[s].pid,
                 &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            /* Zero all mirror fields, not just subcount: a SIGKILL'd
-             * predecessor may have left waiters_parked/writers_parked
-             * non-zero, and rb_recover_dead_readers won't drain them
-             * once we own the slot (the CAS expects the dead PID). */
-            __atomic_store_n(&h->reader_slots[s].subcount, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].waiters_parked, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].writers_parked, 0, __ATOMIC_RELAXED);
+            /* Fresh owner holds no read locks yet; clear any stale rdepth left by
+             * a dead predecessor (its contribution is dropped as we take over). */
+            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
+            rb_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
             h->my_slot_idx = s;
             return;
         }
     }
-    /* Table full -- leave my_slot_idx = UINT32_MAX so we silently skip
-     * tracking for this handle (lock still works; just no recovery). */
-}
-
-/* Atomically subtract `sub` from a counter, capped at 0 (never underflows). */
-static inline void rb_atomic_sub_cap(uint32_t *p, uint32_t sub) {
-    if (!sub) return;
-    uint32_t cur = __atomic_load_n(p, __ATOMIC_RELAXED);
-    for (;;) {
-        uint32_t want = (cur > sub) ? cur - sub : 0;
-        if (__atomic_compare_exchange_n(p, &cur, want,
-                1, __ATOMIC_RELAXED, __ATOMIC_RELAXED))
-            return;
-    }
-}
-
-/* Try to claim a dead slot (CAS pid -> 0) and drain its parked-waiter
- * contributions back to the global counters.  A no-op if the slot was stolen
- * by another recoverer or had no waiter contribution to drain.
- *
- * Note: subcount/waiters_parked/writers_parked are NOT zeroed here.
- * rb_claim_reader_slot zeros all three on every claim, so leaving stale
- * values is harmless. */
-static inline void rb_drain_dead_slot(RbHandle *h, uint32_t i, uint32_t pid) {
-    RbHeader *hdr = h->hdr;
-    uint32_t expected = pid;
-    /* ACQ_REL on success: RELEASE publishes pid=0; ACQUIRE syncs us with the
-     * dead process's prior writes to waiters_parked/writers_parked. */
-    if (!__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, 0,
-            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-        return;
-    uint32_t wp    = __atomic_load_n(&h->reader_slots[i].waiters_parked, __ATOMIC_RELAXED);
-    uint32_t writp = __atomic_load_n(&h->reader_slots[i].writers_parked, __ATOMIC_RELAXED);
-    if (wp)    rb_atomic_sub_cap(&hdr->rwlock_waiters, wp);
-    if (writp) rb_atomic_sub_cap(&hdr->rwlock_writers_waiting, writp);
-}
-
-/* Scan reader slots for dead-process recovery.
- *
- * For each dead PID with non-zero contributions to the shared rwlock,
- * rwlock_waiters, or rwlock_writers_waiting counters, drain its share back
- * out so live processes don't have to wait for the slow per-op timeout
- * decrement to drain it for them. */
-static inline void rb_recover_dead_readers(RbHandle *h) {
-    if (!h->reader_slots) return;
-    RbHeader *hdr = h->hdr;
-    int any_live_reader = 0;
-    int found_dead_reader = 0;
-
-    /* Pass 1: classify slots.  Dead pid with sc == 0 is wiped immediately to
-     * free the slot and drain orphan parked-waiter counters.  Dead pid with
-     * sc > 0 is left intact: if force-reset cannot fire (a live reader is
-     * concurrently present), wiping it would lose the only record of its
-     * orphan rwlock contribution and strand writers. */
+    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
+     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
+     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
+     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
+     * old design) we need not skip dead slots that still show a read count. */
     for (uint32_t i = 0; i < RB_READER_SLOTS; i++) {
-        uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-        if (pid == 0) continue;
-        uint32_t sc = __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED);
-        if (rb_pid_alive(pid)) {
-            if (sc > 0) any_live_reader = 1;
-            continue;
-        }
-        if (sc > 0) { found_dead_reader = 1; continue; }
-        rb_drain_dead_slot(h, i, pid);
-    }
-
-    /* Pass 2: only if force-reset will fire.  Issue the rwlock force-reset
-     * CAS FIRST (narrow window since pass 1), then wipe the deferred dead
-     * slots outside the race-sensitive window. */
-    if (found_dead_reader && !any_live_reader) {
-        /* ACQUIRE: a late reader's subcount++ (before its rwlock CAS) is then visible below. */
-        uint32_t cur = __atomic_load_n(&hdr->rwlock, __ATOMIC_ACQUIRE);
-        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
-        if (cur > 0 && cur < RB_RWLOCK_WRITER_BIT) {
-            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
-            int live_now = 0;   /* no slotless readers here: scanning slots is complete */
-            for (uint32_t i = 0; !live_now && i < RB_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p && rb_pid_alive(p) &&
-                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
-                    live_now = 1;
-            }
-            if (live_now) {
-                drain_ok = 0;
-            } else if (__atomic_compare_exchange_n(&hdr->rwlock, &cur, 0,
-                    0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-                    syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-            } else {
-                drain_ok = 0;   /* rwlock changed under us -- shares may still be live */
-            }
-        }
-        if (drain_ok) {
-            for (uint32_t i = 0; i < RB_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p == 0 || rb_pid_alive(p)) continue;
-                rb_drain_dead_slot(h, i, p);
-            }
+        uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+        if (dpid == 0 || dpid == now_pid || rb_pid_alive(dpid)) continue;
+        uint32_t expected = dpid;
+        if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
+                __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
+            rb_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            h->my_slot_idx = i;
+            return;
         }
     }
+    /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
+     * slotless path (lock still works; recovery of THIS reader's death is the
+     * documented slotless limitation). */
 }
 
-/* Inspect the lock word after a futex-wait timeout.  If a dead writer
- * holds it, force-recover the lock.  Otherwise drain dead readers' shares
- * of the rwlock/waiter counters. */
+/* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
+ * it, force-recover.  Dead READERS need no action here: only a writer that owns
+ * wlock drains readers, and it clears dead readers inline in its own scan. */
 static inline void rb_recover_after_timeout(RbHandle *h) {
-    RbHeader *hdr = h->hdr;
-    uint32_t val = __atomic_load_n(&hdr->rwlock, __ATOMIC_RELAXED);
+    uint32_t val = __atomic_load_n(&h->hdr->wlock, __ATOMIC_RELAXED);
     if (val >= RB_RWLOCK_WRITER_BIT) {
         uint32_t pid = val & RB_RWLOCK_PID_MASK;
         if (!rb_pid_alive(pid))
             rb_recover_stale_lock(h, val);
-    } else {
-        rb_recover_dead_readers(h);
     }
 }
 
-/* Park/unpark helpers: bump the global waiter counters together with this
- * process's mirrored slot counters so a wrlock-timeout recovery scan can
- * attribute and reverse a dead PID's contribution. */
-static inline void rb_park_reader(RbHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
+/* Bump/drop the parked-waiter hint.  Both readers (blocked at the gate) and
+ * writers (blocked acquiring wlock) wait on the wlock futex and use this, so
+ * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
+ * SIGKILLed while parked leaves rwait over-counted -> at most a spurious wake
+ * (harmless); it can never under-count, so no wakeup is lost. */
+static inline void rb_park(RbHandle *h) {
+    __atomic_add_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
-static inline void rb_unpark_reader(RbHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
+static inline void rb_unpark(RbHandle *h) {
+    __atomic_sub_fetch(&h->hdr->rwait, 1, __ATOMIC_RELAXED);
 }
-static inline void rb_park_writer(RbHandle *h) {
+
+/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
+ * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
+ * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
+ * so the wlock re-check that follows it in rdlock forms a Dekker handshake with
+ * the writer's SEQ_CST wlock-store + rdepth-scan.  leave() peels slotless first
+ * so a slot claimed mid-hold cannot misattribute the decrement. */
+static inline void rb_rdepth_inc(RbHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
+    } else {
+        __atomic_add_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
+        h->slotless_held++;
     }
-    __atomic_add_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
 }
-static inline void rb_unpark_writer(RbHandle *h) {
-    __atomic_sub_fetch(&h->hdr->rwlock_waiters, 1, __ATOMIC_RELAXED);
-    __atomic_sub_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
+static inline void rb_rdepth_dec(RbHandle *h) {
+    if (h->slotless_held > 0) {
+        h->slotless_held--;
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
+    } else if (h->my_slot_idx != UINT32_MAX) {
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
+    }
+}
+
+/* Wake a writer that may be draining readers (it waits on drain_seq).  Called
+ * after every rdepth decrement so a released read lock lets the writer re-scan
+ * promptly instead of waiting out its timeout. */
+static inline void rb_reader_wake_drain(RbHandle *h) {
+    if (__atomic_load_n(&h->hdr->wlock, __ATOMIC_ACQUIRE) != 0) {
+        __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
     }
 }
 
 static inline void rb_rwlock_rdlock(RbHandle *h) {
     rb_claim_reader_slot(h);
     RbHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    /* Claim subcount BEFORE bumping the shared rwlock counter so a concurrent
-     * writer-side recovery scan that sees our PID alive with subcount > 0 will
-     * (correctly) defer force-reset even while we are still spinning. */
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
     for (int spin = 0; ; spin++) {
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Write-preferring: when free (cur==0) and writers wait, yield. When
-         * readers are already active (cur>=1), new readers may join freely. */
-        if (cur > 0 && cur < RB_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
-        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
-            if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_ACQUIRE);
+        if (cur == 0) {
+            /* Optimistically take the read: publish rdepth, then re-check wlock.
+             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST wlock CAS +
+             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
+             * two sides cannot both miss each other, so we never hold
+             * concurrently with a writer. */
+            rb_rdepth_inc(h);
+            if (__atomic_load_n(&hdr->wlock, __ATOMIC_SEQ_CST) == 0)
+                return;                       /* no writer after our publish -> we hold the read lock */
+            /* A writer appeared during our publish -- yield to it (write-preferring). */
+            rb_rdepth_dec(h);
+            rb_reader_wake_drain(h);          /* let the draining writer see rdepth drop */
+            spin = 0;
+            continue;
+        }
+        /* wlock != 0: a writer holds or is acquiring.  Recover if it is dead. */
+        if (cur >= RB_RWLOCK_WRITER_BIT &&
+            !rb_pid_alive(cur & RB_RWLOCK_PID_MASK)) {
+            rb_recover_stale_lock(h, cur);
+            spin = 0;
+            continue;
         }
         if (__builtin_expect(spin < RB_RWLOCK_SPIN_LIMIT, 1)) {
             rb_rwlock_spin_pause();
             continue;
         }
-        rb_park_reader(h);
-        cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur >= RB_RWLOCK_WRITER_BIT || cur == 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+        rb_park(h);
+        cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &rb_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                rb_unpark_reader(h);
+                rb_unpark(h);
                 rb_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        rb_unpark_reader(h);
+        rb_unpark(h);
         spin = 0;
     }
 }
 
 static inline void rb_rwlock_rdunlock(RbHandle *h) {
-    RbHeader *hdr = h->hdr;
-    /* Release the shared counter BEFORE dropping our subcount so "any live PID
-     * with subcount > 0" stays a reliable in-flight indicator for recovery. */
-    uint32_t after = __atomic_sub_fetch(&hdr->rwlock, 1, __ATOMIC_RELEASE);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
-    if (after == 0 && __atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    rb_rdepth_dec(h);                 /* RELEASE: drop our entire contribution */
+    rb_reader_wake_drain(h);          /* if a writer is draining, wake it to re-scan */
 }
 
 static inline void rb_rwlock_wrlock(RbHandle *h) {
     rb_claim_reader_slot(h);  /* refresh cached_pid across fork */
     RbHeader *hdr = h->hdr;
-    uint32_t *lock = &hdr->rwlock;
-    /* Encode PID in the rwlock word itself (0x80000000 | pid) to eliminate any
+    /* Encode PID in the wlock word itself (0x80000000 | pid) to eliminate any
      * crash window between acquiring the lock and storing the owner. */
     uint32_t mypid = RB_RWLOCK_WR(h->cached_pid);
+    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(lock, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
+        if (__atomic_compare_exchange_n(&hdr->wlock, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        /* Contended: expected now holds the current wlock value. */
+        if (expected >= RB_RWLOCK_WRITER_BIT &&
+            !rb_pid_alive(expected & RB_RWLOCK_PID_MASK)) {
+            rb_recover_stale_lock(h, expected);
+            spin = 0;
+            continue;
+        }
         if (__builtin_expect(spin < RB_RWLOCK_SPIN_LIMIT, 1)) {
             rb_rwlock_spin_pause();
             continue;
         }
-        rb_park_writer(h);
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
+        rb_park(h);
+        uint32_t cur = __atomic_load_n(&hdr->wlock, __ATOMIC_RELAXED);
         if (cur != 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+            long rc = syscall(SYS_futex, &hdr->wlock, FUTEX_WAIT, cur,
                               &rb_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                rb_unpark_writer(h);
+                rb_unpark(h);
                 rb_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        rb_unpark_writer(h);
+        rb_unpark(h);
         spin = 0;
+    }
+    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
+     * yield).  Drain the readers that were already holding when we won the CAS.
+     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
+     * of the Dekker handshake. */
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(RB_OCC_WORDS + live readers)
+         * instead of O(RB_READER_SLOTS). */
+        for (uint32_t w = 0; w < RB_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!rb_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &rb_lock_timeout, NULL, 0);
     }
 }
 
 static inline void rb_rwlock_wrunlock(RbHandle *h) {
     RbHeader *hdr = h->hdr;
-    __atomic_store_n(&hdr->rwlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwlock_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->rwlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* ================================================================
  * Layout math + bucket-table / container-pool accessors
  *
- * Layout: Header -> reader_slots[1024] -> bucket_table[65536] -> container_pool
- * RbReaderSlot is 16 bytes and RbBucket is 16 bytes, so every region begins on
- * a 16-byte boundary; container slots are 8192 bytes (8-byte aligned for the
- * uint64 bitmap interpretation).
+ * Layout: Header -> reader_slots[1024] -> occ bitmap -> bucket_table[65536] -> container_pool
+ * RbReaderSlot is 16 bytes and RbBucket is 16 bytes, and the occ bitmap is 128
+ * bytes (16 * uint64), so every region begins on a 16-byte boundary; container
+ * slots are 8192 bytes (8-byte aligned for the uint64 bitmap interpretation).
  * ================================================================ */
 
-typedef struct { uint64_t reader_slots, bucket_table, container_pool; } RbLayout;
+typedef struct { uint64_t reader_slots, occ, bucket_table, container_pool; } RbLayout;
 
 static inline RbLayout rb_layout(void) {
     RbLayout L;
     L.reader_slots   = sizeof(RbHeader);
-    L.bucket_table   = L.reader_slots + (uint64_t)RB_READER_SLOTS * sizeof(RbReaderSlot);
+    L.occ            = L.reader_slots + (uint64_t)RB_READER_SLOTS * sizeof(RbReaderSlot);
+    L.bucket_table   = L.occ + RB_OCC_BYTES;
     L.container_pool = L.bucket_table + (uint64_t)RB_NUM_BUCKETS * sizeof(RbBucket);
     return L;
 }
@@ -503,18 +548,24 @@ static inline uint64_t rb_total_size(uint32_t container_cap) {
     return L.container_pool + (uint64_t)container_cap * RB_CONTAINER_BYTES;
 }
 
+/* bucket_table / container-pool base pointers come from the cached trusted
+ * layout, NOT the peer-writable header offsets: a lock-violating peer that
+ * corrupts hdr->bucket_table_off / hdr->container_pool_off after we attached
+ * would otherwise redirect every bucket/slot access to a wild pointer. */
 static inline RbBucket *rb_buckets(RbHandle *h) {
-    return (RbBucket *)((char *)h->base + h->hdr->bucket_table_off);
+    return h->bucket_table;
 }
 static inline uint8_t *rb_pool(RbHandle *h) {
-    return (uint8_t *)((char *)h->base + h->hdr->container_pool_off);
+    return h->pool;
 }
 /* Base pointer of container slot `i` (1-based; i==0 is the NULL sentinel).
  * `i` originates from a bucket's file-stored container_off, which a local peer
  * can corrupt to an out-of-range slot; clamp to the reserved sentinel (0) so the
- * returned pointer always lands inside the container pool. */
+ * returned pointer always lands inside the container pool.  The clamp bound is
+ * the cached container_cap (fixed geometry validated at attach and sizing the
+ * mmap), never the live peer-writable hdr->container_cap. */
 static inline void *rb_slot(RbHandle *h, uint32_t i) {
-    if (i >= h->hdr->container_cap) i = 0;
+    if (i >= h->container_cap) i = 0;
     return (void *)(rb_pool(h) + (size_t)i * RB_CONTAINER_BYTES);
 }
 /* An array container holds at most RB_ARRAY_MAX entries in its fixed-size slot;
@@ -742,6 +793,7 @@ static inline int rb_min_locked(RbHandle *h, uint32_t *out) {
     for (uint32_t hi = 0; hi < RB_NUM_BUCKETS; hi++) {
         if (bt[hi].type == RB_TYPE_NONE) continue;
         if (bt[hi].type == RB_TYPE_ARRAY) {
+            if (rb_array_card(&bt[hi]) == 0) continue;   /* corrupt: an array container with 0 entries */
             *out = (hi << 16) | rb_array(h, bt[hi].container_off)[0];
             return 1;
         }
@@ -1025,7 +1077,8 @@ static inline uint64_t rb_gen_bitmap_id(const void *hdr_addr) {
 static inline void rb_init_header(void *base, uint32_t container_cap, uint64_t total_size) {
     RbLayout L = rb_layout();
     RbHeader *hdr = (RbHeader *)base;
-    /* Zero the header + reader-slot + bucket-table region.  A fresh mapping is
+    /* Zero the header + reader-slot + occ-bitmap + bucket-table region (up to the
+     * container pool, so the occ bitmap starts all-clear).  A fresh mapping is
      * OS-zeroed, but zero explicitly for the reopen-of-anon path. */
     memset(base, 0, (size_t)L.container_pool);
     hdr->magic              = RB_MAGIC;
@@ -1052,9 +1105,17 @@ static inline RbHandle *rb_setup(void *base, size_t map_size,
         if (backing_fd >= 0) close(backing_fd);
         return NULL;
     }
+    RbLayout L      = rb_layout();
     h->hdr          = hdr;
     h->base         = base;
-    h->reader_slots = (RbReaderSlot *)((uint8_t *)base + hdr->reader_slots_off);
+    /* All region bases derive from the trusted compile-time layout, not the
+     * peer-writable header offsets; container_cap is the validated fixed
+     * geometry (rb_validate_header / rb_validate_create_args ran before this). */
+    h->reader_slots = (RbReaderSlot *)((uint8_t *)base + L.reader_slots);
+    h->occ          = (uint64_t *)((uint8_t *)base + L.occ);   /* trusted layout offset */
+    h->bucket_table = (RbBucket *)((uint8_t *)base + L.bucket_table);
+    h->pool         = (uint8_t *)base + L.container_pool;
+    h->container_cap = hdr->container_cap;
     h->mmap_size    = map_size;
     h->path         = path ? strdup(path) : NULL;
     h->backing_fd   = backing_fd;
@@ -1125,6 +1186,10 @@ static RbHandle *rb_create(const char *path, uint64_t container_cap_in, mode_t f
             RB_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, file_mode) < 0)) {
+            RB_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             RB_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -1180,10 +1245,15 @@ static RbHandle *rb_open_fd(int fd, char *errbuf) {
 static void rb_destroy(RbHandle *h) {
     if (!h) return;
     /* Release our reader slot on clean teardown (else short-lived-reader churn
-     * exhausts the slot table); skip if a lock is still held (subcount>0). */
+     * exhausts the slot table); skip if a read lock is still held (rdepth>0). */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
         h->cached_fork_gen == __atomic_load_n(&rb_fork_gen, __ATOMIC_RELAXED) &&
-        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) == 0) {
+        /* Clear our occ bit BEFORE freeing the slot: we still own the pid so no
+         * claimant can take the slot mid-clear, and rdepth==0 so no writer needs
+         * to see us.  (A crash skips this -> the bit is reclaimed lazily by a
+         * writer scan / re-claim, same as the pid.) */
+        rb_occ_clear(h, h->my_slot_idx);
         uint32_t expected = h->cached_pid;
         __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
                 &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);

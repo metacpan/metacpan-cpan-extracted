@@ -14,5 +14,5 @@ inc/
 nytprof.out
 pod2htm*.tmp
 pm_to_blib
-Google-Cloud-Spanner-V1-*
-Google-Cloud-Spanner-V1-*.tar.gz
+Google-Cloud-Spanner-V1-SpannerClient-*
+Google-Cloud-Spanner-V1-SpannerClient-*.tar.gz

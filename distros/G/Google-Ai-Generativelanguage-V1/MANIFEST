@@ -1,15 +1,33 @@
 Changes
+ignore.txt
 lib/Google/Ai/Generativelanguage/V1.pm
+lib/Google/Ai/Generativelanguage/V1/Citation.pm
+lib/Google/Ai/Generativelanguage/V1/Citation/Types.pm
+lib/Google/Ai/Generativelanguage/V1/Content.pm
+lib/Google/Ai/Generativelanguage/V1/Content/Types.pm
 lib/Google/Ai/Generativelanguage/V1/GenerativeService.pm
 lib/Google/Ai/Generativelanguage/V1/GenerativeService/Types.pm
+lib/Google/Ai/Generativelanguage/V1/GenerativeServiceClient.pm
+lib/Google/Ai/Generativelanguage/V1/Model.pm
+lib/Google/Ai/Generativelanguage/V1/Model/Types.pm
+lib/Google/Ai/Generativelanguage/V1/ModelService.pm
+lib/Google/Ai/Generativelanguage/V1/ModelService/Types.pm
+lib/Google/Ai/Generativelanguage/V1/ModelServiceClient.pm
+lib/Google/Ai/Generativelanguage/V1/Safety.pm
+lib/Google/Ai/Generativelanguage/V1/Safety/Types.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/01-service-GenerativeService.t
+t/01-service-ModelService.t
 t/01-service.t
+t/02-rest-transport-GenerativeService.t
+t/02-rest-transport-ModelService.t
 t/02-rest-transport.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

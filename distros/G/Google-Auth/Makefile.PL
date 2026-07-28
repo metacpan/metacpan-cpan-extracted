@@ -38,7 +38,7 @@ for my $dir (@ssl_search_dirs) {
 
 WriteMakefile(
     NAME             => 'Google::Auth',
-    AUTHOR           => q{C.J. Collier <CJCOLLIER@CPAN.ORG>},
+    AUTHOR           => q{C.J. Collier <cjac@google.com>},
     VERSION_FROM     => 'lib/Google/Auth.pm',
     ABSTRACT_FROM    => 'lib/Google/Auth.pm',
     LICENSE          => 'Apache 2.0',
@@ -66,3 +66,16 @@ WriteMakefile(
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Google-Auth-Library-Perl-*' },
 );
+
+package MY;
+
+sub dist_basics {
+    my $self = shift;
+    my $inherited = $self->SUPER::dist_basics(@_);
+    my $check_code = "\t\$(PERL) -Ilib maint/release_lint.pl\n";
+    $inherited =~ s/(distcheck\s*:)/$1 release_lint\n\nrelease_lint :\n$check_code\n/;
+    return $inherited;
+}
+
+package main;
+1;

@@ -6,6 +6,13 @@
 #include "ppport.h"
 #include "queue.h"
 
+/* Narrow a Perl string length to the uint32 wire width WITHOUT silent truncation:
+ * a length that doesn't fit maps to UINT32_MAX so the downstream < 2 GiB size
+ * check croaks, instead of the value wrapping to a small, wrongly-accepted length.
+ * Defined unconditionally (NOT inside the XS::Parse::Keyword guard) so it exists
+ * even where that optional dependency is absent. */
+#define LEN32(len) ((len) > (STRLEN)0xFFFFFFFFU ? 0xFFFFFFFFU : (uint32_t)(len))
+
 #ifdef HAVE_XS_PARSE_KEYWORD
 #include "XSParseKeyword.h"
 
@@ -84,7 +91,18 @@ DEFINE_Q_KW(str, "Str", size, 1, build_kw_1arg)
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
     QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed %s object", classname)
+    if (!h) croak("Attempted to use a destroyed %s object", classname); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT_HANDLE's
+ * mortal pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local h would dangle.  Used only where magic
+ * can actually intervene between EXTRACT_HANDLE and the first use of h. */
+#define REEXTRACT_HANDLE(classname, sv) \
+    h = INT2PTR(QueueHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("%s object destroyed during the call", classname)
 
 #define MAKE_OBJ(class, ptr) \
     SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
@@ -116,7 +134,7 @@ BOOT:
     REGISTER_Q_KW(str, peek, "Data::Queue::Shared::Str::peek");
     REGISTER_Q_KW(str, size, "Data::Queue::Shared::Str::size");
 #endif
-/* XSMARKER: end of BOOT — INCLUDE_COMMAND regex must strip BOOT from generated sections */
+/* XSMARKER: end of BOOT -- INCLUDE_COMMAND regex must strip BOOT from generated sections */
 
 SV *
 new(class, path, capacity, ...)
@@ -216,7 +234,8 @@ push_wait(self, value, ...)
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     RETVAL = queue_int_push_wait(h, (int64_t)value, timeout);
   OUTPUT:
     RETVAL
@@ -229,7 +248,8 @@ pop_wait(self, ...)
     double timeout = -1;
     int64_t value;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     if (queue_int_pop_wait(h, &value, timeout))
         RETVAL = newSViv((IV)value);
     else
@@ -246,7 +266,9 @@ push_multi(self, ...)
     uint32_t count = items - 1;
     uint32_t pushed = 0;
     for (uint32_t i = 0; i < count; i++) {
-        if (!queue_int_try_push(h, (int64_t)SvIV(ST(i + 1)))) break;
+        int64_t v = (int64_t)SvIV(ST(i + 1));
+        REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
+        if (!queue_int_try_push(h, v)) break;
         pushed++;
     }
 
@@ -320,7 +342,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *path;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Queue::Shared::Int")) {
         QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         path = h->path;
@@ -386,7 +408,8 @@ drain(self, ...)
     int64_t value;
     uint32_t max_count;
   PPCODE:
-    max_count = (items > 1) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     while (max_count-- > 0 && queue_int_try_pop(h, &value))
         mXPUSHi((IV)value);
 
@@ -399,7 +422,8 @@ pop_wait_multi(self, count, ...)
     double timeout = -1;
     int64_t value;
   PPCODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     /* Block until at least 1 */
     if (!queue_int_pop_wait(h, &value, timeout)) XSRETURN(0);
     mXPUSHi((IV)value);
@@ -419,7 +443,9 @@ push_wait_multi(self, timeout, ...)
     uint32_t nvalues = items - 2;
     RETVAL = 0;
     for (uint32_t i = 0; i < nvalues; i++) {
-        if (!queue_int_push_wait(h, (int64_t)SvIV(ST(i + 2)), timeout)) break;
+        int64_t v = (int64_t)SvIV(ST(i + 2));
+        REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
+        if (!queue_int_push_wait(h, v, timeout)) break;
         RETVAL++;
     }
   OUTPUT:
@@ -569,8 +595,9 @@ push(self, value)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = queue_str_try_push(h, str, (uint32_t)len, utf8);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+    int r = queue_str_try_push(h, str, LEN32(len), utf8);
+    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
     RETVAL = (r == 1);
   OUTPUT:
     RETVAL
@@ -605,11 +632,12 @@ push_wait(self, value, ...)
     double timeout = -1;
     STRLEN len;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = queue_str_push_wait(h, str, (uint32_t)len, utf8, timeout);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+    int r = queue_str_push_wait(h, str, LEN32(len), utf8, timeout);
+    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
     RETVAL = (r == 1);
   OUTPUT:
     RETVAL
@@ -624,7 +652,8 @@ pop_wait(self, ...)
     uint32_t len;
     bool utf8;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_pop_wait(h, &str, &len, &utf8, timeout);
     if (r == 1) {
         RETVAL = newSVpvn(str, len);
@@ -656,14 +685,23 @@ push_multi(self, ...)
         SAVEFREEPV(args);
         for (uint32_t i = 0; i < count; i++) {
             SV *sv = ST(i + 1);
-            args[i].str = SvPV(sv, args[i].len);
-            args[i].utf8 = SvUTF8(sv) ? true : false;
+            STRLEN len;
+            const char *src = SvPV(sv, len); /* may run overload/tie/get-magic = arbitrary Perl */
+            bool utf8 = SvUTF8(sv) ? true : false;
+            /* Copy bytes into a private mortal SV NOW: a LATER element's SvPV
+             * can grow/free THIS element's PV (or reassign this scalar),
+             * dangling src before the locked loop memcpy's from it. */
+            SV *copy = sv_2mortal(newSVpvn(src, len));
+            args[i].str = SvPVX_const(copy);
+            args[i].len = len;
+            args[i].utf8 = utf8;
         }
     }
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     queue_mutex_lock(h->hdr);
     for (uint32_t i = 0; i < count; i++) {
-        int r = queue_str_push_locked(h, args[i].str, (uint32_t)args[i].len, args[i].utf8);
-        if (r == -2) { queue_mutex_unlock(h->hdr); croak("Data::Queue::Shared::Str: string too long (max 2GB)"); }
+        int r = queue_str_push_locked(h, args[i].str, LEN32(args[i].len), args[i].utf8);
+        if (r == -2) { queue_mutex_unlock(h->hdr); croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)"); }
         if (r != 1) break;
         pushed++;
     }
@@ -774,7 +812,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *path;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::Queue::Shared::Str")) {
         QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         path = h->path;
@@ -851,8 +889,9 @@ push_front(self, value)
   CODE:
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = queue_str_push_front(h, str, (uint32_t)len, utf8);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+    int r = queue_str_push_front(h, str, LEN32(len), utf8);
+    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
     RETVAL = (r == 1);
   OUTPUT:
     RETVAL
@@ -866,11 +905,12 @@ push_front_wait(self, value, ...)
     double timeout = -1;
     STRLEN len;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
-    int r = queue_str_push_front_wait(h, str, (uint32_t)len, utf8, timeout);
-    if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+    int r = queue_str_push_front_wait(h, str, LEN32(len), utf8, timeout);
+    if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
     RETVAL = (r == 1);
   OUTPUT:
     RETVAL
@@ -885,12 +925,13 @@ drain(self, ...)
     bool utf8;
     uint32_t max_count;
   PPCODE:
-    max_count = (items > 1) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    max_count = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
     /* Hoist SV construction out of the mutex (see pop_multi). */
     struct drain_item { char *buf; uint32_t len; bool utf8; struct drain_item *next; } *drained_head = NULL, *drained_tail = NULL;
     UV drained_n = 0;
     int last_r = 0;
     int oom = 0;
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     queue_mutex_lock(h->hdr);
     while (max_count-- > 0) {
         last_r = queue_str_pop_locked(h, &str, &len, &utf8);
@@ -928,7 +969,8 @@ pop_wait_multi(self, count, ...)
     uint32_t len;
     bool utf8;
   PPCODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     /* Block until at least 1 */
     {
         int r = queue_str_pop_wait(h, &str, &len, &utf8, timeout);
@@ -961,8 +1003,9 @@ push_wait_multi(self, timeout, ...)
         STRLEN len;
         const char *str = SvPV(sv, len);
         bool utf8 = SvUTF8(sv) ? true : false;
-        int r = queue_str_push_wait(h, str, (uint32_t)len, utf8, timeout);
-        if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
+        REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+        int r = queue_str_push_wait(h, str, LEN32(len), utf8, timeout);
+        if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
         if (r != 1) break;
         RETVAL++;
     }
@@ -1000,7 +1043,8 @@ pop_back_wait(self, ...)
     uint32_t len;
     bool utf8;
   CODE:
-    if (items > 1) timeout = SvNV(ST(1));
+    if (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) timeout = SvNV(ST(1));
+    REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
     int r = queue_str_pop_back_wait(h, &str, &len, &utf8, timeout);
     if (r == 1) {
         RETVAL = newSVpvn(str, len);

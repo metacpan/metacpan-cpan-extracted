@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp qw(tmpnam);
 use POSIX qw(_exit);
 use Data::Sync::Shared;
@@ -97,9 +98,9 @@ is $bar->arrived, 0, 'arrived starts at 0';
 # wait(0) is non-blocking
 {
     my $b = Data::Sync::Shared::Barrier->new(undef, 2);
-    my $t0 = time;
+    my $t0 = Time::HiRes::time();
     is $b->wait(0), -1, 'wait(0) returns -1 immediately';
-    ok time - $t0 < 1, 'wait(0) did not block';
+    ok Time::HiRes::time() - $t0 < 1, 'wait(0) did not block';
 }
 
 # Reset

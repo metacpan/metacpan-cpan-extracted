@@ -46,6 +46,8 @@ WriteMakefile(
 		'Params::Get' => 0.13,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
+		'Sub::Private' => 0,
+		'Sub::Protected' => 0,
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'DBD::XMLSimple' => 0.07,

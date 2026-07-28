@@ -1,0 +1,191 @@
+NAME
+    Data::SegmentTree::Shared - shared-memory segment tree (range
+    add/assign, range sum/min/max/gcd/product)
+
+SYNOPSIS
+        use Data::SegmentTree::Shared;
+
+        # an array of 1000 signed-integer positions, all 0
+        my $st = Data::SegmentTree::Shared->new(undef, 1000);
+
+        $st->set(10, 42);              # position 10 := 42
+        $st->add(10, 5);               # position 10 += 5  (now 47)
+        $st->range_add(0, 99, 3);      # add 3 to every position in [0, 99]
+        $st->range_assign(0, 99, 7);   # set every position in [0, 99] to 7
+
+        my $s = $st->sum(0, 99);       # sum over a range
+        my $lo = $st->min(0, 99);      # minimum over a range
+        my $hi = $st->max(0, 99);      # maximum over a range
+        my $q = $st->query(0, 99);     # { sum, min, max, count } in one call
+        my $g = $st->gcd(0, 99);       # gcd over a range   (assign/set-only trees)
+        my $p = $st->product(0, 99);   # product over a range (assign/set-only trees)
+
+        # share the array across processes via a backing file
+        my $shared = Data::SegmentTree::Shared->new("/tmp/array.st", 1000);
+
+DESCRIPTION
+    A segment tree in shared memory: a fixed array of "n" signed 64-bit
+    integer positions that supports range updates and range queries in O(log
+    n) each -- add a delta to every element of a range, and ask for the sum,
+    minimum, or maximum of any range. It complements Data::Fenwick::Shared
+    (which does prefix sums and point updates): a segment tree adds range
+    minimum and maximum queries and range add (via lazy propagation),
+    neither of which a Fenwick tree can do.
+
+    The tree is a perfect binary tree over next_pow2(n) leaves; each node
+    caches its subtree's sum, min, and max, plus a pending "range add" delta
+    that is pushed down lazily. Range updates and queries therefore touch
+    only O(log n) nodes. Positions start at 0 and are addressed by a 0-based
+    index; out-of-range indices croak.
+
+    Because the tree lives in a shared mapping, several processes update and
+    query one array: any process that opens the same backing file, inherits
+    the anonymous mapping across "fork", or reopens a passed memfd sees the
+    same array. A write-preferring futex rwlock with dead-process recovery
+    guards mutation; queries never mutate the tree, so they take only the
+    read lock and many can run at once. Linux-only. Requires 64-bit Perl.
+
+    Values and range sums are signed 64-bit integers; feeding values large
+    enough that a range sum exceeds the 64-bit range overflows (wraps), as
+    with any native integer accumulator.
+
+  Range assign and the gcd/product monoids
+    Alongside "range_add", the tree supports range_assign -- set every
+    position of a range to a constant in O(log n) (a second lazy tag,
+    composed correctly with "range_add"). It also offers two extra range
+    monoids, gcd and product.
+
+    These monoids come with a hard rule dictated by the math: gcd and
+    product cannot be maintained under "range_add" (there is no way to
+    recover the gcd or product of "{a+d, b+d, ...}" from the gcd/product of
+    "{a, b, ...}"). So "gcd" and "product" are exact only while the tree has
+    been built with assign/set updates only; the first "range_add" or "add"
+    permanently gates them off ("gcd"/ "product" then croak until "clear").
+    Use "$st->monoids_valid" to check. Point updates via "set" use assign
+    internally, so they keep the monoids valid. "product" additionally
+    croaks if the product of the queried range overflows a signed 64-bit
+    integer.
+
+    On-disk format: version 0.02 widened the node to carry the assign tag
+    and the gcd/product aggregates, so a segment-tree file written by 0.01
+    cannot be opened by 0.02 (it is rejected on attach); rebuild it. These
+    trees are normally ephemeral compute structures, so this only matters if
+    you persisted one.
+
+METHODS
+  Constructors
+        my $st = Data::SegmentTree::Shared->new($path, $n, $mode);
+        my $st = Data::SegmentTree::Shared->new(undef, $n);            # anonymous
+        my $st = Data::SegmentTree::Shared->new_memfd($name, $n);
+        my $st = Data::SegmentTree::Shared->new_from_fd($fd);
+
+    $n is the number of positions (at least 1, up to 2^24); every position
+    starts at 0. Memory is "2 * next_pow2(n) * 64" bytes plus a fixed
+    header. "new" and "new_memfd" croak on a $n below 1 or above 2^24. When
+    reopening an existing file or memfd the stored $n wins and the caller's
+    argument is ignored. An optional file mode may be passed as the last
+    argument to "new" (e.g. 0660) for cross-user sharing; it defaults to
+    0600 (owner-only).
+
+  Updates
+        $st->set($i, $value);              # position $i := $value
+        my $new = $st->add($i, $delta);     # position $i += $delta; returns the new value
+        $st->range_add($l, $r, $delta);     # add $delta to every position in [$l, $r]
+        $st->range_assign($l, $r, $value);  # set every position in [$l, $r] to $value
+
+    "set" assigns a single position; "add" adds a delta to a single position
+    and returns its new value; "range_add" adds a delta to every position in
+    the inclusive range "[$l, $r]", and "range_assign" sets every position
+    in the range to a constant -- each in O(log n) via lazy propagation. All
+    indices are 0-based and croak if out of range; the range forms croak if
+    $l $r>. Note that "range_add"/"add" gate off the gcd/product monoids
+    (see below), while "set"/ "range_assign" do not.
+
+  Queries
+        my $v = $st->get($i);          # value at position $i
+        my $s = $st->sum($l, $r);      # sum over [$l, $r]
+        my $lo = $st->min($l, $r);     # minimum over [$l, $r]
+        my $hi = $st->max($l, $r);     # maximum over [$l, $r]
+        my $q = $st->query($l, $r);    # { sum, min, max, count } in one locked call
+        my $g = $st->gcd($l, $r);      # gcd over [$l, $r]     (assign/set-only trees)
+        my $p = $st->product($l, $r);  # product over [$l, $r] (assign/set-only trees)
+
+    "get" returns a single position's value. "sum", "min", and "max" return
+    one aggregate over the inclusive range "[$l, $r]". "query" returns all
+    of them at once as a hash reference "{ sum, min, max, count }" ("count"
+    is "$r - $l + 1"), computed under a single read lock so the four values
+    are mutually consistent. "gcd" returns the greatest common divisor of
+    "|values|" over the range (0 for an all-zero range), and "product" their
+    product; both require an assign/set-only tree and croak once any
+    "range_add"/"add" has run (see "Range assign and the gcd/product
+    monoids"), and "product" also croaks on 64-bit overflow. Ranges croak if
+    an index is out of range or $l $r>.
+
+  Introspection and lifecycle
+        $st->size;          # n, the number of positions
+        $st->monoids_valid; # true if gcd/product are still usable (no range_add yet)
+        $st->clear;         # reset every position to 0
+        $st->stats;         # { n, size, tree_size, ops, mmap_size }
+        $st->path; $st->memfd; $st->sync; $st->unlink;
+
+    "monoids_valid" reports whether "gcd"/"product" are currently usable
+    (false once a "range_add"/"add" has gated them off). "clear" resets
+    every position to 0 and re-enables the monoids. "sync" flushes the
+    mapping to its backing store (a no-op for anonymous and memfd trees);
+    "unlink" removes the backing file (also callable as
+    "Class->unlink($path)"); "path" returns the backing path ("undef" for
+    anonymous, memfd, or fd-reopened trees) and "memfd" the backing
+    descriptor.
+
+SHARING ACROSS PROCESSES
+    The tree lives in a shared mapping, shared the same three ways as the
+    rest of the family: a backing file, an anonymous mapping inherited
+    across "fork", or a memfd passed to an unrelated process and reopened
+    with new_from_fd($fd). Every process's updates land in the one shared
+    array, and queries take only the read lock so many readers proceed
+    concurrently.
+
+SECURITY
+    Backing files are created with mode 0600 (owner-only) by default; pass
+    an explicit octal mode (e.g. 0660) as the last argument to "new" for
+    cross-user sharing. The file is opened with "O_NOFOLLOW" and "O_EXCL",
+    and the header is validated on attach. Any process granted write access
+    is trusted not to corrupt the mapping.
+
+CRASH SAFETY
+    Mutation is guarded by a futex-based write-preferring rwlock with
+    PID-encoded ownership and dead-owner recovery. Dead-owner recovery
+    restores lock availability only. Each mutation is a multi-store O(log n)
+    tree walk with no commit protocol, so a writer killed mid-update leaves
+    that update partially applied: the tree can be left internally
+    inconsistent (a later "query" may disagree with the individual "get"
+    values), and recovery neither detects nor repairs the torn update. Treat
+    a crash during a mutation as leaving the tree in an undefined state, and
+    rebuild from a trusted source if you need consistency across crashes.
+    Limitation: PID reuse is not detected (very unlikely in practice).
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
+
+SEE ALSO
+    Data::Fenwick::Shared (prefix sums / point updates), and the rest of the
+    "Data::*::Shared" family.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

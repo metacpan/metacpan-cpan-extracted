@@ -30,6 +30,8 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.52",
+            "Inline" : "0.53",
+            "Inline::C" : "0.53",
             "Inline::MakeMaker" : "0.45",
             "Term::ANSIColor" : "4.00",
             "Term::ReadKey" : "2.04"
@@ -51,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "7.04",
+   "version" : "7.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -25,6 +25,10 @@ B<tarotplane> is a TUI flashcard program written in Perl using the Curses
 module. It reads cards from specially formatted text files consisting of terms
 and definitions, then displays them in a TUI.
 
+I<file> is the path to the card files to read cards from. Multiple card files
+can be given as input. If I<file> is a single dash (C<->), B<tarotplane> will
+read from standard input.
+
 =head2 Card Files
 
 A B<tarotplane> card file is a text file that contains cards. Each card must
@@ -185,7 +189,7 @@ Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright 2024, Samuel Young.
+Copyright 2024-2026, Samuel Young.
 
 This program is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.

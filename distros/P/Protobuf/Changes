@@ -1,5 +1,23 @@
 Revision history for Protobuf
 
+0.12    2026-07-26
+        [Ecosystem Hardening & Parity]
+        - Merged Google-Protobuf-WKT into core Protobuf distribution.
+        - Bundled standard Well-Known Types (Timestamp, Any, Descriptor, etc.) directly in lib/Google/Protobuf/.
+
+
+0.11    Wed Jul 22 2026
+        [Documentation]
+        - Added missing 0.10 release entry to Changes file (reported by Lukas Mai / @mauke).
+
+0.10    Wed Jul 22 2026
+        [Core Runtime & Multi-Platform Alignment]
+        - Synchronized $VERSION = '0.11' across all 45 sub-module .pm files to resolve DynaLoader version mismatch errors during XS bootstrapping.
+        - Process ID Tracking: Added getpid() check in xs/descriptor_pool/pool.c to reinitialize generated_pool_ptr across fork() calls, eliminating segfaults and use-after-free conditions in multi-process/forking servers.
+        - RPATH Linker Fix: Single-quoted \$$ORIGIN in Makefile.PL extra_ldflags so make/ld passes literal $ORIGIN to ld.so.
+        - Template Toolkit Integration: Refactored blib_libprotobufperl_copy Makefile rule out of Makefile.PL and into makefile.tt template block.
+        - Test Proto Automation: Added generate_test_protos rule in makefile.tt and untracked static pre-generated t/generated/*.pm files from Git tracking.
+
 0.09    Sat Jul 18 2026
         [Compatibility & API Layer]
         - Added Google::ProtocolBuffers::Dynamic compatibility API shim (Google::ProtocolBuffers::Dynamic) backed by the high-performance upb C engine.

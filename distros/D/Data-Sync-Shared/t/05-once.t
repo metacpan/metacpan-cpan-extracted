@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Time::HiRes ();
 use File::Temp qw(tmpnam);
 use POSIX qw(_exit);
 use Data::Sync::Shared;
@@ -34,9 +35,9 @@ ok !$once->enter, 'enter returns false when already done';
         _exit(0);
     }
     select(undef, undef, undef, 0.05);
-    my $t0 = time;
+    my $t0 = Time::HiRes::time();
     my $r = $o->enter(0);
-    ok time - $t0 < 1, 'enter(0) did not block';
+    ok Time::HiRes::time() - $t0 < 1, 'enter(0) did not block';
     ok !$r, 'enter(0) returns false when running';
     waitpid($pid, 0);
 }

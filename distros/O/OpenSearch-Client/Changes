@@ -1,5 +1,15 @@
 Revision history for OpenSearch::Client
 
+3.007010    2026-07-27
+            * Added OpenSearch::Client::Transport::TryCatch to remove
+              the need for additional user try { }catch { }; or eval
+              constructs for error capture. Amends the internal
+              try{}catch{} to return rather than throwing errors.
+            * Allow 'username' and 'password' params as an alternative
+              to 'userinfo'.
+            * Tests - replaced Log::Any::Adapter::Callback with Capture
+            * Use 'application_id' - to populate header 'X-Opaque-Id'
+
 3.007009    2026-07-14
             * Cleaned up 'method_supported_in_version' code.
 

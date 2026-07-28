@@ -3,7 +3,7 @@ package Catalyst::Helper::View::Wkhtmltopdf;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.3';
 
 
 sub mk_compclass {
@@ -25,7 +25,7 @@ Catalyst::Helper::View::Wkhtmltopdf
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -35,27 +35,14 @@ version v0.6.1
 
 Helper for Wkhtmltopdf Views.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 mk_compclass
-
-=head1 NAME
-
-Catalyst::Helper::View::Wkhtmltopdf - Helper for Wkhtmltopdf Views
+=head2 mk_compclass
 
 =head1 SEE ALSO
 
 L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,
 L<Catalyst::Response>, L<Catalyst::Helper>
-
-=head1 AUTHOR
-
-Michele Beltrame, C<mb@cattlegrid.info>
-
-=head1 LICENSE
-
-This library is free software . You can redistribute it and/or modify
-it under the same terms as perl itself.
 
 =head1 SOURCE
 

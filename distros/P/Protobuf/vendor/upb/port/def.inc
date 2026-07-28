@@ -514,10 +514,10 @@ Error, UINTPTR_MAX is undefined
 
 #if defined(UPB_IS_GOOGLE3) && \
     (!defined(UPB_BOOTSTRAP_STAGE) || UPB_BOOTSTRAP_STAGE != 0)
-#define UPB_DESC_MINITABLE(sym) &proto2__##sym##_msg_init
+#define UPB_DESC_MINITABLE(sym) &google__protobuf__##sym##_msg_init
 #elif defined(UPB_IS_GOOGLE3) && defined(UPB_BOOTSTRAP_STAGE) && \
     UPB_BOOTSTRAP_STAGE == 0
-#define UPB_DESC_MINITABLE(sym) proto2__##sym##_msg_init()
+#define UPB_DESC_MINITABLE(sym) google__protobuf__##sym##_msg_init()
 #elif defined(UPB_BOOTSTRAP_STAGE) && UPB_BOOTSTRAP_STAGE == 0
 #define UPB_DESC_MINITABLE(sym) google__protobuf__##sym##_msg_init()
 #else
@@ -562,7 +562,15 @@ Error, UINTPTR_MAX is undefined
 //     }
 //   }
 
+#if defined(__GNUC__) && !defined(__clang__)
+// GCC can't handle mismatched retain attributes in the same section:
+//   https://github.com/protocolbuffers/protobuf/issues/26385
+// To work around this, we retain all linker array elements, even though this
+// effectively disables tree-shaking of unused extensions when using GCC.
+#define UPB_LINKARR_ATTR UPB_RETAIN
+#else
 #define UPB_LINKARR_ATTR
+#endif
 
 #define UPB_LINKARR_SENTINEL UPB_RETAIN __attribute__((weak, used))
 
@@ -660,10 +668,10 @@ Error, UINTPTR_MAX is undefined
  * to prevent optimizers from removing the constructor. Our solution is to
  * create a dummy exported weak symbol that prevent this stripping.
  */
-#pragma section(".CRT$XCU", long, read)
+#pragma section(".CRT$XCT", read)
 #define UPB_CONSTRUCTOR(name, unique_name)                                   \
   static void __cdecl UPB_PRIVATE(name)(void);                               \
-  __declspec(allocate(".CRT$XCU"), selectany) void(                          \
+  __declspec(allocate(".CRT$XCT"), selectany) void(                          \
       __cdecl * UPB_PRIVATE(name##_))(void) = UPB_PRIVATE(name);             \
   __declspec(selectany, dllexport) void* UPB_PRIVATE(name##_force_linkage) = \
       &UPB_PRIVATE(name##_);                                                 \

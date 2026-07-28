@@ -20,12 +20,11 @@ no_index:
     - inc
     - t
 recommends:
-  BSD::Resource: '0'
   Compress::Raw::Bzip2: '0'
   Compress::Raw::Lzma: '0'
   Compress::Raw::Zlib: '2.024'
-  Filesys::Statvfs: '0'
 requires:
+  BSD::Resource: '0'
   Carp: '0'
   Cwd: '0'
   File::Compare: '0'
@@ -34,6 +33,7 @@ requires:
   File::MimeInfo::Magic: '0'
   File::Path: '0'
   File::Temp: '0'
+  Filesys::Statvfs: '0'
   Getopt::Long: '0'
   IPC::Run: '0'
   JSON: '0'
@@ -46,5 +46,5 @@ resources:
   homepage: https://github.com/openSUSE/cavil
   license: https://dev.perl.org/licenses/
   repository: https://github.com/openSUSE/perl-File-Unpack2.git
-version: '2.0'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

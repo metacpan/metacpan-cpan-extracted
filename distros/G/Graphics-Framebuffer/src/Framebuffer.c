@@ -115,6 +115,43 @@ void c_fill(char *framebuffer,
             short xoffset,
             short yoffset);
 
+/* Fast & safe unaligned access helpers.
+   By default we use efficient direct loads/stores on architectures that
+   are known to allow unaligned accesses (x86/x86_64). On other targets we
+   use memcpy-based helpers to avoid undefined behaviour or bus faults.
+*/
+#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+static inline uint32_t read_u32(const void *p) {
+    return *((const uint32_t *)p);
+}
+static inline void write_u32(void *p, uint32_t v) {
+    *((uint32_t *)p) = v;
+}
+static inline uint16_t read_u16(const void *p) {
+    return *((const uint16_t *)p);
+}
+static inline void write_u16(void *p, uint16_t v) {
+    *((uint16_t *)p) = v;
+}
+#else
+static inline uint32_t read_u32(const void *p) {
+    uint32_t v;
+    memcpy(&v, p, sizeof v);
+    return v;
+}
+static inline void write_u32(void *p, uint32_t v) {
+    memcpy(p, &v, sizeof v);
+}
+static inline uint16_t read_u16(const void *p) {
+    uint16_t v;
+    memcpy(&v, p, sizeof v);
+    return v;
+}
+static inline void write_u16(void *p, uint16_t v) {
+    memcpy(p, &v, sizeof v);
+}
+#endif
+
 /* Helper to plot one antialiased pixel. */
 static void plot_aa_pixel(char *framebuffer,
             unsigned int color,
@@ -328,14 +365,14 @@ void c_fill(char *framebuffer,
 
         switch (bits_per_pixel) {
             case 32:
-                target32 = *((uint32_t *)p);
+                target32 = read_u32(p);
                 break;
             case 24:
                 /* pack 3 bytes into 24-bit value (low 24 bits) */
                 target32 = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
                 break;
             case 16:
-                target16 = *((uint16_t *)p);
+                target16 = read_u16(p);
                 break;
             case 8:
                 target8 = *p;
@@ -402,7 +439,7 @@ void c_fill(char *framebuffer,
             bool equal = false;
             switch (bits_per_pixel) {
                 case 32: {
-                    uint32_t v = *((uint32_t *)p);
+                    uint32_t v = read_u32(p);
                     equal = (v == target32);
                     break;
                 }
@@ -414,7 +451,7 @@ void c_fill(char *framebuffer,
                     break;
                }
                case 16: {
-                    uint16_t v = *((uint16_t *)p);
+                    uint16_t v = read_u16(p);
                     equal = (v == target16);
                     break;
                }
@@ -452,7 +489,7 @@ void c_fill(char *framebuffer,
             bool equalr = false;
             switch (bits_per_pixel) {
                 case 32: {
-                    uint32_t v = *((uint32_t *)pr);
+                    uint32_t v = read_u32(pr);
                     equalr = (v == target32);
                     break;
                 }
@@ -464,7 +501,7 @@ void c_fill(char *framebuffer,
                     break;
                 }
                 case 16: {
-                    uint16_t v = *((uint16_t *)pr);
+                    uint16_t v = read_u16(pr);
                     equalr = (v == target16);
                     break;
                 }
@@ -524,7 +561,7 @@ void c_fill(char *framebuffer,
                     bool equalu = false;
                     switch (bits_per_pixel) {
                         case 32: {
-                            uint32_t v = *((uint32_t *)ps);
+                            uint32_t v = read_u32(ps);
                             equalu = (v == target32);
                             break;
                         }
@@ -536,7 +573,7 @@ void c_fill(char *framebuffer,
                             break;
                         }
                         case 16: {
-                            uint16_t v = *((uint16_t *)ps);
+                            uint16_t v = read_u16(ps);
                             equalu = (v == target16);
                             break;
                         }
@@ -566,7 +603,7 @@ void c_fill(char *framebuffer,
                         bool equald = false;
                         switch (bits_per_pixel) {
                             case 32: {
-                                uint32_t v = *((uint32_t *)ps2);
+                                uint32_t v = read_u32(ps2);
                                 equald = (v == target32);
                                 break;
                             }
@@ -578,7 +615,7 @@ void c_fill(char *framebuffer,
                                 break;
                             }
                             case 16: {
-                                uint16_t v = *((uint16_t *)ps2);
+                                uint16_t v = read_u16(ps2);
                                 equald = (v == target16);
                                 break;
                             }
@@ -626,7 +663,7 @@ void c_fill(char *framebuffer,
                     bool equalu = false;
                     switch (bits_per_pixel) {
                         case 32: {
-                            uint32_t v = *((uint32_t *)ps);
+                            uint32_t v = read_u32(ps);
                             equalu = (v == target32);
                             break;
                         }
@@ -638,7 +675,7 @@ void c_fill(char *framebuffer,
                             break;
                         }
                         case 16: {
-                            uint16_t v = *((uint16_t *)ps);
+                            uint16_t v = read_u16(ps);
                             equalu = (v == target16);
                             break;
                         }
@@ -668,7 +705,7 @@ void c_fill(char *framebuffer,
                         bool equald = false;
                         switch (bits_per_pixel) {
                             case 32: {
-                                uint32_t v = *((uint32_t *)ps2);
+                                uint32_t v = read_u32(ps2);
                                 equald = (v == target32);
                                 break;
                             }
@@ -680,7 +717,7 @@ void c_fill(char *framebuffer,
                                 break;
                             }
                             case 16: {
-                                uint16_t v = *((uint16_t *)ps2);
+                                uint16_t v = read_u16(ps2);
                                 equald = (v == target16);
                                 break;
                             }
@@ -753,7 +790,7 @@ void c_plot(char *framebuffer,
 
     switch (bits_per_pixel) {
         case 32: {
-            uint32_t fb = *((uint32_t *)p);
+            uint32_t fb = read_u32(p);
             uint32_t col = (uint32_t)color;
             uint32_t bcol = (uint32_t)bcolor;
             uint32_t res = fb;
@@ -805,7 +842,7 @@ void c_plot(char *framebuffer,
                 default:
                     break;
             }
-            *((uint32_t *)p) = res;
+            write_u32(p, res);
         } break;
 
         case 24: {
@@ -878,7 +915,7 @@ void c_plot(char *framebuffer,
         } break;
 
         case 16: {
-            uint16_t fb = *((uint16_t *)p);
+            uint16_t fb = read_u16(p);
             uint16_t col16 = (uint16_t)color;
             uint16_t res16 = fb;
             switch (draw_mode) {
@@ -929,7 +966,7 @@ void c_plot(char *framebuffer,
                 default:
                     break;
             }
-            *((uint16_t *)p) = res16;
+            write_u16(p, res16);
         } break;
 
         case 8: { /* Not supported yet, but here is the code if it ever is */
@@ -1366,30 +1403,36 @@ void c_blit_write(char *framebuffer,
 
             switch (bits_per_pixel) {
                 case 32: {
-                    uint32_t s = *((uint32_t *)src);
+                    uint32_t s = read_u32(src);
                     switch (draw_mode) {
                         case NORMAL_MODE:
-                            *((uint32_t *)dst) = s;
+                            write_u32(dst, s);
                             break;
-                        case XOR_MODE:
-                            *((uint32_t *)dst) ^= s;
-                            break;
-                        case OR_MODE:
-                            *((uint32_t *)dst) |= s;
-                            break;
-                        case AND_MODE:
-                            *((uint32_t *)dst) &= s;
-                            break;
+                        case XOR_MODE: {
+                            uint32_t tmp = read_u32(dst);
+                            tmp ^= s;
+                            write_u32(dst, tmp);
+                        } break;
+                        case OR_MODE: {
+                            uint32_t tmp = read_u32(dst);
+                            tmp |= s;
+                            write_u32(dst, tmp);
+                        } break;
+                        case AND_MODE: {
+                            uint32_t tmp = read_u32(dst);
+                            tmp &= s;
+                            write_u32(dst, tmp);
+                        } break;
                         case MASK_MODE: {
-                            uint32_t fbv = *((uint32_t *)dst);
-                            if ((s & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) *((uint32_t *)dst) = s;
+                            uint32_t fbv = read_u32(dst);
+                            if ((s & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) write_u32(dst, s);
                         } break;
                         case UNMASK_MODE: {
-                            uint32_t fbv = *((uint32_t *)dst);
-                            if ((fbv & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) *((uint32_t *)dst) = s;
+                            uint32_t fbv = read_u32(dst);
+                            if ((fbv & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) write_u32(dst, s);
                         } break;
                         case ALPHA_MODE: {
-                            uint32_t fbv = *((uint32_t *)dst);
+                            uint32_t fbv = read_u32(dst);
                             unsigned char fb_r = fbv & 0xFF;
                             unsigned char fb_g = (fbv >> 8) & 0xFF;
                             unsigned char fb_b = (fbv >> 16) & 0xFF;
@@ -1401,19 +1444,29 @@ void c_blit_write(char *framebuffer,
                             fb_r = ((R * A) + (fb_r * invA)) >> 8;
                             fb_g = ((G * A) + (fb_g * invA)) >> 8;
                             fb_b = ((B * A) + (fb_b * invA)) >> 8;
-                            *((uint32_t *)dst) = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
+                            write_u32(dst, fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24));
                         } break;
-                        case ADD_MODE:
-                            *((uint32_t *)dst) += s;
-                            break;
-                        case SUBTRACT_MODE:
-                            *((uint32_t *)dst) -= s;
-                            break;
-                        case MULTIPLY_MODE:
-                            *((uint32_t *)dst) *= s;
-                            break;
+                        case ADD_MODE: {
+                            uint32_t tmp = read_u32(dst);
+                            tmp += s;
+                            write_u32(dst, tmp);
+                        } break;
+                        case SUBTRACT_MODE: {
+                            uint32_t tmp = read_u32(dst);
+                            tmp -= s;
+                            write_u32(dst, tmp);
+                        } break;
+                        case MULTIPLY_MODE: {
+                            uint32_t tmp = read_u32(dst);
+                            tmp *= s;
+                            write_u32(dst, tmp);
+                        } break;
                         case DIVIDE_MODE:
-                            if (s != 0) *((uint32_t *)dst) /= s;
+                            if (s != 0) {
+                                uint32_t tmp = read_u32(dst);
+                                tmp /= s;
+                                write_u32(dst, tmp);
+                            }
                             break;
                     }
                 } break;
@@ -1490,8 +1543,8 @@ void c_blit_write(char *framebuffer,
                 } break;
 
                 case 16: {
-                    uint16_t s = *((uint16_t *)src);
-                    uint16_t fbv = *((uint16_t *)dst);
+                    uint16_t s = read_u16(src);
+                    uint16_t fbv = read_u16(dst);
                     uint16_t res = fbv;
                     switch (draw_mode) {
                         case NORMAL_MODE:
@@ -1539,7 +1592,7 @@ void c_blit_write(char *framebuffer,
                             if (s != 0) res = fbv / s;
                             break;
                     }
-                    *((uint16_t *)dst) = res;
+                    write_u16(dst, res);
                 } break;
 
                 case 8: {
@@ -1637,7 +1690,7 @@ void c_rotate(char *image,
 
                 switch (bits_per_pixel) {
                     case 32:
-                        *((unsigned int *)dst) = *((unsigned int *)src);
+                        write_u32(dst, read_u32(src));
                         break;
                     case 24:
                         dst[0] = src[0];
@@ -1645,7 +1698,7 @@ void c_rotate(char *image,
                         dst[2] = src[2];
                         break;
                     case 16:
-                        *((unsigned short *)dst) = *((unsigned short *)src);
+                        write_u16(dst, read_u16(src));
                         break;
                     case 8:
                         *dst = *src;
@@ -1744,7 +1797,7 @@ void c_convert_16_24(char *buf16,
     unsigned char b5;
 
     while (loc16 < size16) {
-        unsigned short rgb565 = *((unsigned short *)(buf16 + loc16));
+        unsigned short rgb565 = read_u16(buf16 + loc16);
         loc16 += 2;
         if (color_order == RGB) {
             b5 = (rgb565 & 0xf800) >> 11;
@@ -1775,7 +1828,7 @@ void c_convert_16_32(char *buf16,
     unsigned char b5;
 
     while (loc16 < size16) {
-        unsigned short rgb565 = *((unsigned short *)(buf16 + loc16));
+        unsigned short rgb565 = read_u16(buf16 + loc16);
         loc16 += 2;
         if (color_order == 0) {
             b5 = (rgb565 & 0xf800) >> 11;
@@ -1788,7 +1841,7 @@ void c_convert_16_32(char *buf16,
         unsigned char r8 = (r5 * 527 + 23) >> 6;
         unsigned char g8 = (g6 * 259 + 33) >> 6;
         unsigned char b8 = (b5 * 527 + 23) >> 6;
-        *((unsigned int *)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
+        write_u32(buf32 + loc32, r8 | (g8 << 8) | (b8 << 16));
         loc32 += 3;
         if (r8 == 0 && g8 == 0 && b8 == 0) {
             /* Black is always treated as a clear mask */
@@ -1821,7 +1874,7 @@ void c_convert_24_16(char *buf24,
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
         }
         /* write 16-bit value at loc16 and advance by 2 bytes */
-        *((unsigned short *)(buf16 + loc16)) = rgb565;
+        write_u16(buf16 + loc16, rgb565);
         loc16 += 2;
     }
 }
@@ -1835,7 +1888,7 @@ void c_convert_32_16(char *buf32,
     unsigned int loc32 = 0;
     unsigned short rgb565 = 0;
     while (loc32 < size32) {
-        unsigned int crgb = *((unsigned int *)(buf32 + loc32));
+        unsigned int crgb = read_u32(buf32 + loc32);
         unsigned char r8 = crgb & 255;
         unsigned char g8 = (crgb >> 8) & 255;
         unsigned char b8 = (crgb >> 16) & 255;
@@ -1849,7 +1902,7 @@ void c_convert_32_16(char *buf32,
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
         }
         /* write 16-bit value and advance */
-        *((unsigned short *)(buf16 + loc16)) = rgb565;
+        write_u16(buf16 + loc16, rgb565);
         loc16 += 2;
     }
 }
@@ -1880,7 +1933,7 @@ void c_convert_24_32(char *buf24,
         unsigned char r = *(buf24 + loc24++);
         unsigned char g = *(buf24 + loc24++);
         unsigned char b = *(buf24 + loc24++);
-        *((unsigned int *)(buf32 + loc32)) = r | (g << 8) | (b << 16);
+        write_u32(buf32 + loc32, r | (g << 8) | (b << 16));
         loc32 += 3;
         if (r == 0 && g == 0 && b == 0) {
             *(buf32 + loc32++) = 0; /* The background is transparent */
@@ -1899,7 +1952,7 @@ void c_convert_32_8(char *buf32,
     unsigned int loc8 = 0;
     unsigned char m = 0;
     while (loc32 < size32) {
-        unsigned int crgb = *((unsigned int *)(buf32 + loc32));
+        unsigned int crgb = read_u32(buf32 + loc32);
         loc32 += 4;
         unsigned char r = crgb & 255;
         unsigned char g = (crgb >> 8) & 255;
@@ -1917,7 +1970,9 @@ void c_convert_24_8(char *buf24,
     unsigned int loc24 = 0;
     unsigned char m = 0;
     while (loc24 < size24) {
-        unsigned int crgb = *((unsigned int *)(buf24 + loc24));
+        unsigned int crgb = (uint32_t)*(unsigned char *)(buf24 + loc24) |
+                            ((uint32_t)*(unsigned char *)(buf24 + loc24 + 1) << 8) |
+                            ((uint32_t)*(unsigned char *)(buf24 + loc24 + 2) << 16);
         loc24 += 3;
         unsigned char r = crgb & 255;
         unsigned char g = (crgb >> 8) & 255;
@@ -1938,7 +1993,7 @@ void c_convert_16_8(char *buf16,
     unsigned char b5;
 
     while (loc16 < size16) {
-        unsigned short rgb565 = *((unsigned short *)(buf16 + loc16));
+        unsigned short rgb565 = read_u16(buf16 + loc16);
         loc16 += 2;
         if (color_order == 0) {
             b5 = (rgb565 & 0xf800) >> 11;
@@ -1965,7 +2020,7 @@ void c_convert_8_32(char *buf8,
 
     while (loc8 < size8) {
         unsigned char m = *((unsigned char *)(buf8 + loc8++));
-        *((unsigned int *)(buf32 + loc32)) = m | (m << 8) | (m << 16);
+        write_u32(buf32 + loc32, m | (m << 8) | (m << 16));
         loc32 += 3;
         if (m == 0) {
             /* Black is always treated as a clear mask */
@@ -1990,28 +2045,6 @@ void c_convert_8_24(char *buf8,
         *(buf24 + loc24++) = m;
         *(buf24 + loc24++) = m;
         *(buf24 + loc24++) = m;
-    }
-}
-
-void c_convert_8_16(char *buf8,
-                    unsigned int size8,
-                    char *buf16,
-                    unsigned char color_order) {
-    unsigned int loc8 = 0;
-    unsigned int loc16 = 0;
-    unsigned short rgb565 = 0;
-    while (loc8 < size8) {
-        unsigned char m = *(buf8 + loc8++);
-        unsigned char r5 = (m * 249 + 1014) >> 11;
-        unsigned char g6 = (m * 253 + 505) >> 10;
-        unsigned char b5 = (m * 249 + 1014) >> 11;
-        if (color_order == RGB) {
-            rgb565 = (b5 << 11) | (g6 << 5) | r5;
-        } else {
-            rgb565 = (r5 << 11) | (g6 << 5) | b5;
-        }
-        *((unsigned short *)(buf16 + loc16)) = rgb565;
-        loc16 += 2;
     }
 }
 
@@ -2104,7 +2137,7 @@ void c_monochrome(char *pixels,
                 break;
 
             case 16: {
-                rgb565 = *((unsigned short *)(pixels + idx));
+                rgb565 = read_u16(pixels + idx);
                 /* extract components consistent with other conversion routines */
                 unsigned char r5;
                 unsigned char g6;
@@ -2148,10 +2181,9 @@ void c_monochrome(char *pixels,
         switch (bits_per_pixel) {
             case 32:
                 if (m == 0) {
-                    *((unsigned int *)(pixels + idx)) = m | (m << 8) | (m << 16);
+                    write_u32(pixels + idx, m | (m << 8) | (m << 16));
                 } else {
-                    *((unsigned int *)(pixels + idx)) =
-                        m | (m << 8) | (m << 16) | 0xFF000000;
+                    write_u32(pixels + idx, m | (m << 8) | (m << 16) | 0xFF000000);
                 }
                 break;
             case 24: {
@@ -2161,7 +2193,7 @@ void c_monochrome(char *pixels,
             } break;
             case 16: {
                 /* for 16-bit we've prepared rgb565 above */
-                *((unsigned short *)(pixels + idx)) = rgb565;
+                write_u16(pixels + idx, rgb565);
             } break;
             case 8: {
                 *(pixels + idx) = rgb8;

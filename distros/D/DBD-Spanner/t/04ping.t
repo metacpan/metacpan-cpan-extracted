@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+ok($dbh->ping(), 'Active handle ping returned true');
+$dbh->disconnect();
+ok(!$dbh->ping(), 'Disconnected handle ping returned false');
+my $dbh2 = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+ok($dbh2->ping(), 'Reconnected handle ping returned true');

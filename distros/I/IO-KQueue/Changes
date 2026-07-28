@@ -1,6 +1,11 @@
 IO::KQueue Changes
 ==================
 
+0.40 2026-07-27
+    - Fix fflags type: u_short -> u_int
+    - Apply patch to prevent NULL pushed to AV (Jun Kuriyama(KURIYAMA), Anton Berezin (GRUBER))
+    - Now maintained by John Barrett, for better or worse
+
 0.39 2020-07-10
     - Fix no-lib packaging error (arc)
 

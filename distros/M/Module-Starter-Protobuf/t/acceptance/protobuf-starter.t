@@ -96,8 +96,8 @@ subtest 'Successful dry run generation' => sub {
         remove_tree($tmp_out);
     }
     
-    my $proto_file = File::Spec->catfile('..', 'protobuf', 'perl', 't', 'protos', 'service.proto');
-    my $import_path = File::Spec->catdir('..', 'protobuf', 'perl', 't', 'protos');
+    my $proto_file = File::Spec->catfile('t', 'protos', 'service.proto');
+    my $import_path = File::Spec->catdir('t', 'protos');
     
     my ($exit_code, $stdout, $stderr) = run_script(
         '--module=Google::Cloud::Test',

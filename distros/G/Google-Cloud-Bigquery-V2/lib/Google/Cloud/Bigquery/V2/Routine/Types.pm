@@ -1,17 +1,3 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::Routine::Types;
 
 use strict;
@@ -102,24 +88,6 @@ coerce 'RepeatedUserDefinedContextEntry',
 declare 'MapStringUserDefinedContextEntry',
     as HashRef[UserDefinedContextEntry()];
 
-declare 'JavascriptOptions',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Routine::Routine::JavascriptOptions'];
-
-coerce 'JavascriptOptions',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Routine::Routine::JavascriptOptions'->new($_) };
-
-declare 'RepeatedJavascriptOptions',
-    as ArrayRef[JavascriptOptions()];
-
-coerce 'RepeatedJavascriptOptions',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Routine::Routine::JavascriptOptions'->new($_) } @$_ ] };
-
-declare 'MapStringJavascriptOptions',
-    as HashRef[JavascriptOptions()];
-
-declare 'ParameterEncodingMode',
-    as (Int | Str);
-
 declare 'PythonOptions',
     as InstanceOf['Google::Cloud::Bigquery::V2::Routine::PythonOptions'];
 
@@ -149,21 +117,6 @@ coerce 'RepeatedExternalRuntimeOptions',
 
 declare 'MapStringExternalRuntimeOptions',
     as HashRef[ExternalRuntimeOptions()];
-
-declare 'ExternalVolumeMount',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Routine::ExternalVolumeMount'];
-
-coerce 'ExternalVolumeMount',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Routine::ExternalVolumeMount'->new($_) };
-
-declare 'RepeatedExternalVolumeMount',
-    as ArrayRef[ExternalVolumeMount()];
-
-coerce 'RepeatedExternalVolumeMount',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Routine::ExternalVolumeMount'->new($_) } @$_ ] };
-
-declare 'MapStringExternalVolumeMount',
-    as HashRef[ExternalVolumeMount()];
 
 declare 'SparkOptions',
     as InstanceOf['Google::Cloud::Bigquery::V2::Routine::SparkOptions'];
@@ -258,21 +211,6 @@ coerce 'RepeatedUpdateRoutineRequest',
 declare 'MapStringUpdateRoutineRequest',
     as HashRef[UpdateRoutineRequest()];
 
-declare 'PatchRoutineRequest',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Routine::PatchRoutineRequest'];
-
-coerce 'PatchRoutineRequest',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Routine::PatchRoutineRequest'->new($_) };
-
-declare 'RepeatedPatchRoutineRequest',
-    as ArrayRef[PatchRoutineRequest()];
-
-coerce 'RepeatedPatchRoutineRequest',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Routine::PatchRoutineRequest'->new($_) } @$_ ] };
-
-declare 'MapStringPatchRoutineRequest',
-    as HashRef[PatchRoutineRequest()];
-
 declare 'DeleteRoutineRequest',
     as InstanceOf['Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest'];
 
@@ -319,3 +257,21 @@ declare 'MapStringListRoutinesResponse',
     as HashRef[ListRoutinesResponse()];
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::Routine::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

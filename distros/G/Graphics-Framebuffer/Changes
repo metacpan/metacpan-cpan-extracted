@@ -1,9 +1,24 @@
 Change log for Graphics::Framebuffer
 
+7.06   Jul 27, 2026
+
+       Minor clipping optimizations
+	   Optimized the C code for byte alignment
+
+7.05   Jul 27, 2026
+
+       Removed the HARDWARE acceleration placeholder.  Hardware acceleration is not possible for the
+       framebuffer driver.  No need to keep this useless setting.
+
+       *  "HARDWARE" constant removed
+       *  Method "acceleration" clamps acceleration to C mode only allowing PERL and SOFTWARE as a
+          setting
+       *  Method "hardware" completely removed.
+
 7.04   May 29, 2026
 
        C code optimized and refactored
-	   examples/vector.pl improved
+       examples/vector.pl improved
 
 7.03   May 14, 2026
 

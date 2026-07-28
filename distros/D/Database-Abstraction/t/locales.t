@@ -21,8 +21,9 @@ use Test::Most tests => 10;
 use Test::NoWarnings;
 
 use lib 't/lib';
-use_ok('Database::test1');
+use Database::test1;
 
+pass('Database::test1 loaded');
 my $data_dir = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 
 # Strip the Carp-appended "at FILE line N.\n" so messages compare cleanly

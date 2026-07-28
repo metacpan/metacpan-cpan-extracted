@@ -1,0 +1,46 @@
+Changes
+ignore.txt
+lib/Google/Cloud/Dataflow/V1beta3.pm
+lib/Google/Cloud/Dataflow/V1beta3/FlexTemplatesServiceClient.pm
+lib/Google/Cloud/Dataflow/V1beta3/JobsV1beta3Client.pm
+lib/Google/Cloud/Dataflow/V1beta3/MessagesV1beta3Client.pm
+lib/Google/Cloud/Dataflow/V1beta3/MetricsV1beta3Client.pm
+lib/Google/Cloud/Dataflow/V1beta3/SnapshotsV1beta3Client.pm
+lib/Google/Cloud/Dataflow/V1beta3/TemplatesServiceClient.pm
+lib/Google/Dataflow/V1beta3/Environment.pm
+lib/Google/Dataflow/V1beta3/Environment/Types.pm
+lib/Google/Dataflow/V1beta3/Jobs.pm
+lib/Google/Dataflow/V1beta3/Jobs/Types.pm
+lib/Google/Dataflow/V1beta3/Messages.pm
+lib/Google/Dataflow/V1beta3/Messages/Types.pm
+lib/Google/Dataflow/V1beta3/Metrics.pm
+lib/Google/Dataflow/V1beta3/Metrics/Types.pm
+lib/Google/Dataflow/V1beta3/Snapshots.pm
+lib/Google/Dataflow/V1beta3/Snapshots/Types.pm
+lib/Google/Dataflow/V1beta3/Streaming.pm
+lib/Google/Dataflow/V1beta3/Streaming/Types.pm
+lib/Google/Dataflow/V1beta3/Templates.pm
+lib/Google/Dataflow/V1beta3/Templates/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-service-FlexTemplatesService.t
+t/01-service-JobsV1beta3.t
+t/01-service-MessagesV1beta3.t
+t/01-service-MetricsV1beta3.t
+t/01-service-SnapshotsV1beta3.t
+t/01-service-TemplatesService.t
+t/02-rest-transport-FlexTemplatesService.t
+t/02-rest-transport-JobsV1beta3.t
+t/02-rest-transport-MessagesV1beta3.t
+t/02-rest-transport-MetricsV1beta3.t
+t/02-rest-transport-SnapshotsV1beta3.t
+t/02-rest-transport-TemplatesService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

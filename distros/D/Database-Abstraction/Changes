@@ -1,5 +1,85 @@
 Revision history for Database-Abstraction
 
+0.37	Mon Jul 27 16:58:13 EDT 2026
+	[ Enhancements ]
+	- Remote file support: new host => 'server' (or 'user@host') constructor
+	  parameter; when present, all candidate file extensions are fetched from
+	  the remote machine via File::Slurp::Remote (SSH/SCP) into a local
+	  File::Temp directory before the existing extension-based probe runs;
+	  all backends (CSV, PSV, XML, SQLite, DBM::Deep) work transparently;
+	  File::Temp::Dir object stored in _remote_tmpdir is auto-cleaned in
+	  DESTROY; host name validated in new() against a strict identifier regex
+	  (prevents shell injection); the local -d directory check is skipped
+	  when host is given (directory is a remote path); File::Slurp::Remote
+	  is loaded lazily (only when host is given)
+	- Local-host short-circuit: when host => 'localhost', '127.0.0.1', '::1',
+	  or the current machine's hostname (short or FQDN) is given, _open()
+	  reads the directory directly without loading or calling File::Slurp::Remote;
+	  implemented by _is_local_host() which strips optional user@ prefix then
+	  matches loopback literals and Sys::Hostname::hostname() (both short and
+	  FQDN forms); new() restores the local -d directory check for local hosts;
+	  host validation regex extended to allow ':' so IPv6 addresses (::1, etc.)
+	  are accepted
+	- DBM::Deep backend: files with .dbm or .deep extension are detected
+	  (after SQLite, before BerkeleyDB) and slurped into the in-memory hash
+	  at open time via DBM::Deep->new(read_only=>1); all existing slurp
+	  fast-paths (selectall_arrayref, selectall_array, fetchrow_hashref,
+	  AUTOLOAD, columns, schema) work unchanged; type is set to 'Deep'
+	- DBM::Deep magic-byte detection: _is_deep_db() checks the first 4 bytes
+	  for 'DPDB' (0x44 0x50 0x44 0x42, the standard DBM::Deep signature) or
+	  'DPDP' (0x44 0x50 0x44 0x50); in _open() the .db candidate is probed
+	  for Deep magic before the BerkeleyDB check, so .db files that are
+	  actually DBM::Deep are correctly identified without requiring a .dbm
+	  or .deep extension
+	- count() general in-memory scan: added a third fast-path branch that
+	  fires when $self->{'data'} is set AND there is no DBI handle (i.e.
+	  Deep backend); allows count(col => $val) without DBI; SQL-backed
+	  backends (CSV/XML/SQLite) still fall through to SQL so column-name
+	  validation continues to fire
+	- Query builder (Query.pm) all()/first()/count(): added Deep alongside
+	  BerkeleyDB in the in-memory delegate path so that query()->where()->all()
+	  etc. work on Deep files without a DBI handle
+
+	[ Security ]
+	- new() clone path: validate 'id' argument before bless in the clone
+	  branch; previously the early return at line 540 bypassed the id
+	  validation block at lines 558-562, allowing $obj->new(id => "x); DROP
+	  TABLE t--") to produce an object whose $self->{'id'} was directly
+	  interpolated (unbound) into ORDER BY, COUNT(), and CSV-comment-filter
+	  SQL clauses; fix adds the same /^[a-zA-Z_][a-zA-Z0-9_]*$/ guard
+	  inside the clone branch before bless
+
+	[ Bug fixes ]
+	- t/{csv,csv_id,schema,locales,no_entry,bugs}.t: replaced use_ok() with
+	  compile-time use + pass() to prevent "Too late to run CHECK block"
+	  warnings from Sub::Private (used by Log::Abstraction); use_ok() wraps
+	  its argument in a runtime string eval, past the CHECK phase, which
+	  caused Test::NoWarnings failures in those six test files
+	- Don't attempt to fixate empty data
+	- _fixate(): new private wrapper around Data::Reuse::fixate() that
+	  suppresses the spurious "Use of uninitialized value in hash slice"
+	  warning emitted by Data::Alias's XS hash-aliasing code on older Perl
+	  versions when a source hashref contains undef column values (NULL
+	  database fields); Data::Reuse still fixates correctly — the warning
+	  is a false positive from Data::Alias not fully initialising key SVs
+	  in the older internal Perl hash representation; all four fixate
+	  call-sites in Abstraction.pm now go through _fixate(); confirmed
+	  reproducible with Data::Alias 1.30 on Perl < 5.34
+	- t/bugs.t BUG10: regression guard for the above warning across all
+	  three fixate code-paths (slurp, selectall_arrayref DBI,
+	  selectall_array DBI)
+	- _fixate(): move Data::Reuse::forget() inside the wrapper so it covers
+	  all four fixate call-sites including the slurp path; the slurp fixate
+	  was previously exempt on the grounds that slurped hashrefs are long-lived
+	  and don't create stale entries themselves, but it was still vulnerable to
+	  stale entries left by earlier objects whose hashrefs were freed after going
+	  out of scope — the memory allocator can reuse those addresses for new slurp
+	  hashrefs, causing fixate() to alias them to wrong canonicals (root cause of
+	  an intermittent t/unit.t failure where $db->number('one') occasionally
+	  returned 2 instead of 1); the explicit Data::Reuse::forget() calls that
+	  previously preceded _fixate() in selectall_arrayref and selectall_array
+	  are now redundant and have been removed
+
 0.36	Thu Jul  9 21:38:49 EDT 2026
 	[ Bug fixes ]
 	- Data::Reuse stale-address hazard: selectall_arrayref() and

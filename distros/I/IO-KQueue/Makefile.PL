@@ -24,12 +24,12 @@ my %make = (
         resources => {
             license  => [ 'perl_5' ],
             repository => {
-                url => 'git://github.com/arc/p5-io-kqueue.git',
-                web => 'https://github.com/arc/p5-io-kqueue',
+                url => 'git://github.com/jbarrett/p5-io-kqueue.git',
+                web => 'https://github.com/jbarrett/p5-io-kqueue',
                 type => 'git',
             },
             bugtracker => {
-                web => 'https://github.com/arc/p5-io-kqueue/issues',
+                web => 'https://github.com/jbarrett/p5-io-kqueue/issues',
             },
         },
     },

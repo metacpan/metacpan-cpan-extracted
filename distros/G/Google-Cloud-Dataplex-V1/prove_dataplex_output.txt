@@ -1,0 +1,51 @@
+# Testing Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient 0.03, Perl 5.040001, /usr/bin/perl
+t/00-load.t .................................... ok
+t/01-service-BusinessGlossaryService.t ......... ok
+t/01-service-CatalogService.t .................. ok
+t/01-service-CmekService.t ..................... ok
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/01-service-DataProductService.t .............. 
+No subtests run 
+t/01-service-DataScanService.t ................. ok
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/01-service-DataTaxonomyService.t ............. 
+No subtests run 
+t/01-service-DataplexService.t ................. ok
+t/01-service-MetadataService.t ................. ok
+t/02-rest-transport-BusinessGlossaryService.t .. ok
+t/02-rest-transport-CatalogService.t ........... ok
+t/02-rest-transport-CmekService.t .............. ok
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/02-rest-transport-DataProductService.t ....... 
+No subtests run 
+t/02-rest-transport-DataScanService.t .......... ok
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/02-rest-transport-DataTaxonomyService.t ...... 
+No subtests run 
+t/02-rest-transport-DataplexService.t .......... ok
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/02-rest-transport-MetadataService.t .......... 
+No subtests run 
+t/manifest.t ................................... skipped: Author tests not required for installation
+t/pod-coverage.t ............................... skipped: Author/Release tests not required for installation
+t/pod.t ........................................ skipped: Author tests not required for installation
+
+Test Summary Report
+-------------------
+t/01-service-DataProductService.t            (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/01-service-DataTaxonomyService.t           (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/02-rest-transport-DataProductService.t     (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/02-rest-transport-DataTaxonomyService.t    (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/02-rest-transport-MetadataService.t        (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+Files=20, Tests=37, 61 wallclock secs ( 0.11 usr  0.06 sys + 43.31 cusr  7.21 csys = 50.69 CPU)
+Result: FAIL

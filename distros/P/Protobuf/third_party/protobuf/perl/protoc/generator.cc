@@ -477,7 +477,11 @@ std::string PerlCodeGenerator::GenerateModule(
     }
   }
 
-  ss << "1;\n";
+  ss << "1;\n\n__END__\n\n=head1 NAME\n\n"
+     << package_name_ << " - Protocol Buffers schema definition\n\n=head1 DESCRIPTION\n\n"
+     << "Auto-generated Protocol Buffers schema definition class.\n\n"
+     << "=head1 LICENSE AND COPYRIGHT\n\nCopyright (C) 2026 Google LLC\n\n"
+     << "This program is released under the Apache 2.0 license.\n\n=cut\n";
   return ss.str();
 }
 
@@ -505,7 +509,11 @@ std::string PerlCodeGenerator::GenerateTypes(
     PrintTypesRecursively(messages[j], package_name_, ss);
   }
 
-  ss << "1;\n";
+  ss << "1;\n\n__END__\n\n=head1 NAME\n\n"
+     << package_name_ << "::Types - Type definitions and coercions\n\n=head1 DESCRIPTION\n\n"
+     << "Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.\n\n"
+     << "=head1 LICENSE AND COPYRIGHT\n\nCopyright (C) 2026 Google LLC\n\n"
+     << "This program is released under the Apache 2.0 license.\n\n=cut\n";
   return ss.str();
 }
 

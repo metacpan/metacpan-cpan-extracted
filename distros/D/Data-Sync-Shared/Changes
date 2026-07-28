@@ -1,5 +1,15 @@
 Revision history for Data-Sync-Shared
 
+0.07      2026-07-22
+          - Fix guards releasing a lock from the wrong process: a forked child
+            inheriting an RWLock, Condvar or Semaphore guard released the
+            PARENT lock at exit, breaking mutual exclusion. Each guard now
+            records the acquiring PID and releases only from it.
+          - On-disk format change (v2 -> v3): an existing 0.06 file is
+            refused; recreate it.
+          - Give the Guard packages a $VERSION so PAUSE indexes them.
+          - Reject acquire_n above the maximum instead of blocking forever.
+
 0.06  2026-07-03
     - Security and robustness hardening; backing files now created mode
       0600 (pass a file-mode argument to new() for cross-user sharing).

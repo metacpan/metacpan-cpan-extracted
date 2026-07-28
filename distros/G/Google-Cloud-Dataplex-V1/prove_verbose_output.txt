@@ -1,0 +1,15 @@
+t/02-rest-transport-MetadataService.t .. 
+# Subtest: Client REST Transport Initialization
+    ok 1 - Created client with REST transport
+    ok 2 - An object of class 'Google::Cloud::REST::Client' isa 'Google::Cloud::REST::Client'
+    1..2
+ok 1 - Client REST Transport Initialization
+# Subtest: Client REST API Request
+    ok 1 - Received response from mock REST client
+    1..1
+ok 2 - Client REST API Request
+1..2
+ok
+All tests successful.
+Files=1, Tests=2,  4 wallclock secs ( 0.03 usr  0.02 sys +  2.90 cusr  0.48 csys =  3.43 CPU)
+Result: PASS

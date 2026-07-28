@@ -4,7 +4,7 @@
       "Ichinose Shogo <shogo82148@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
    "provides" : {
       "Redis::Fast" : {
          "file" : "lib/Redis/Fast.pm",
-         "version" : "0.37"
+         "version" : "0.39"
       },
       "Redis::Fast::Hash" : {
          "file" : "lib/Redis/Fast/Hash.pm"
@@ -94,7 +94,7 @@
          "web" : "https://github.com/shogo82148/Redis-Fast"
       }
    },
-   "version" : "0.37",
+   "version" : "0.39",
    "x_contributors" : [
       "Aaron Crane <arc@aaroncrane.co.uk>",
       "Aaron Crane <arc@cpan.org>",
@@ -134,6 +134,7 @@
       "Xavier Guimard <x.guimard@free.fr>",
       "Zugschlus <mh+github201409@zugschlus.de>",
       "bj5004 <bartosz.jakubski@hurra.com>",
+      "copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>",
       "dams <dams@zarb.org>",
       "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
       "hisaichi5518 <hisada.kazuki@gmail.com>",

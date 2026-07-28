@@ -1,5 +1,13 @@
 Changes file for Speak
 
+1.02    2026-07-27
+        - Fixed speak() signature to make $log and $lang parameters optional
+          (Perl feature 'signatures' enforces strict arity; previously calling
+          speak($msg) with one argument caused a fatal error).
+        - Fixed Speak::Logger::log() signature to make $nolinefeed optional.
+        - Fixed stale $log->msg() call in mute-path logic (method was renamed
+          to log() in a prior refactor, causing a fatal method-not-found error).
+
 1.01    2026-02-06
         - Fixed issue where 'speak' script only read the first line of an input file.
         - Fixed pronunciation of escape sequences (literal \n, \t etc) by replacing them with spaces.

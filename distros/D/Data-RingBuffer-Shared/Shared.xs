@@ -9,7 +9,18 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::RingBuffer::Shared")) \
         croak("Expected a Data::RingBuffer::Shared object"); \
     RingHandle *h = INT2PTR(RingHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::RingBuffer::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::RingBuffer::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT_RING's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT_RING and the first use of h. */
+#define REEXTRACT(sv) \
+    h = INT2PTR(RingHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::RingBuffer::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -79,7 +90,8 @@ wait_for(self, expected_count, ...)
     EXTRACT_RING(self);
     double timeout = -1;
   CODE:
-    if (items > 2) timeout = SvNV(ST(2));
+    if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
+    REEXTRACT(self);
     RETVAL = ring_wait(h, expected_count, timeout);
   OUTPUT:
     RETVAL
@@ -177,7 +189,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::RingBuffer::Shared")) {
         RingHandle *h = INT2PTR(RingHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -220,13 +232,15 @@ new(class, path, capacity, ...)
   PREINIT:
     char errbuf[RING_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* Optional 4th arg: file mode for a newly-created file-backed segment
      * (default 0600, owner-only). Pass e.g. 0660 to opt into cross-user
      * sharing. Ignored for anonymous/existing segments. */
     UV mv = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? SvUV(ST(3)) : 0600;
     if (mv & ~(UV)0777) croak("file mode 0%o out of range (max 0777; did you pass the mode as a string?)", (unsigned)mv);
     mode_t mode = (mode_t)mv;
+    /* Capture the path PV only after all trailing-arg get-magic above has
+     * run: magic on ST(3) could realloc or free the PV, so grab it last. */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     RingHandle *h = ring_create(p, capacity, sizeof(int64_t), RING_VAR_INT, mode, errbuf);
     if (!h) croak("Data::RingBuffer::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -236,12 +250,15 @@ new(class, path, capacity, ...)
 SV *
 new_memfd(class, name, capacity)
     const char *class
-    const char *name
+    SV *name
     UV capacity
   PREINIT:
     char errbuf[RING_ERR_BUFLEN];
   CODE:
-    RingHandle *h = ring_create_memfd(name, capacity, sizeof(int64_t), RING_VAR_INT, errbuf);
+    /* Capture the name PV here in CODE, after all INPUT conversions (incl.
+     * capacity get-magic) have run; INPUT order would capture it too early. */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
+    RingHandle *h = ring_create_memfd(nm, capacity, sizeof(int64_t), RING_VAR_INT, errbuf);
     if (!h) croak("Data::RingBuffer::Shared::Int->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -278,8 +295,10 @@ latest(self, ...)
   PREINIT:
     EXTRACT_RING(self);
   CODE:
-    uint32_t n = (items > 1) ? (uint32_t)SvUV(ST(1)) : 0;
+    UV nn = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? SvUV(ST(1)) : 0;
+    uint32_t n = nn > 0xFFFFFFFFU ? 0xFFFFFFFFU : (uint32_t)nn;  /* no wrap: absurd n -> out of range -> undef */
     int64_t v;
+    REEXTRACT(self);
     RETVAL = ring_read_latest(h, n, &v) ? newSViv((IV)v) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -309,12 +328,14 @@ new(class, path, capacity, ...)
   PREINIT:
     char errbuf[RING_ERR_BUFLEN];
   CODE:
-    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     /* Optional 4th arg: file mode for a new file-backed segment (default 0600);
      * pass e.g. 0660 to opt into cross-user sharing. */
     UV mv = (items > 3 && (SvGETMAGIC(ST(3)), SvOK(ST(3)))) ? SvUV(ST(3)) : 0600;
     if (mv & ~(UV)0777) croak("file mode 0%o out of range (max 0777; did you pass the mode as a string?)", (unsigned)mv);
     mode_t mode = (mode_t)mv;
+    /* Capture the path PV only after all trailing-arg get-magic above has
+     * run: magic on ST(3) could realloc or free the PV, so grab it last. */
+    const char *p = (SvGETMAGIC(path), SvOK(path)) ? SvPV_nolen(path) : NULL;
     RingHandle *h = ring_create(p, capacity, sizeof(double), RING_VAR_F64, mode, errbuf);
     if (!h) croak("Data::RingBuffer::Shared::F64->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -324,12 +345,15 @@ new(class, path, capacity, ...)
 SV *
 new_memfd(class, name, capacity)
     const char *class
-    const char *name
+    SV *name
     UV capacity
   PREINIT:
     char errbuf[RING_ERR_BUFLEN];
   CODE:
-    RingHandle *h = ring_create_memfd(name, capacity, sizeof(double), RING_VAR_F64, errbuf);
+    /* Capture the name PV here in CODE, after all INPUT conversions (incl.
+     * capacity get-magic) have run; INPUT order would capture it too early. */
+    const char *nm = (SvGETMAGIC(name), SvOK(name)) ? SvPV_nolen(name) : NULL;
+    RingHandle *h = ring_create_memfd(nm, capacity, sizeof(double), RING_VAR_F64, errbuf);
     if (!h) croak("Data::RingBuffer::Shared::F64->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
   OUTPUT:
@@ -366,8 +390,10 @@ latest(self, ...)
   PREINIT:
     EXTRACT_RING(self);
   CODE:
-    uint32_t n = (items > 1) ? (uint32_t)SvUV(ST(1)) : 0;
+    UV nn = (items > 1 && (SvGETMAGIC(ST(1)), SvOK(ST(1)))) ? SvUV(ST(1)) : 0;
+    uint32_t n = nn > 0xFFFFFFFFU ? 0xFFFFFFFFU : (uint32_t)nn;  /* no wrap: absurd n -> out of range -> undef */
     double v;
+    REEXTRACT(self);
     RETVAL = ring_read_latest(h, n, &v) ? newSVnv(v) : &PL_sv_undef;
   OUTPUT:
     RETVAL

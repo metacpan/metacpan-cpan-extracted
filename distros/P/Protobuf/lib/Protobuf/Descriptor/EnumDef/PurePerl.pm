@@ -4,7 +4,7 @@ use parent 'Protobuf::Descriptor::Base::PurePerl';
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub name {
     my ($self) = @_;
@@ -36,7 +36,7 @@ sub find_value_by_name {
     foreach my $value (@{$self->{_data}{values} || []}) {
         return $value if $value->name eq $name;
     }
-    return undef;
+    return;
 }
 
 sub find_value_by_number {
@@ -44,7 +44,7 @@ sub find_value_by_number {
     foreach my $value (@{$self->{_data}{values} || []}) {
         return $value if $value->number == $number;
     }
-    return undef;
+    return;
 }
 
 1;

@@ -2,11 +2,11 @@
  * sync.h -- Shared-memory synchronization primitives for Linux
  *
  * Five primitives:
- *   Semaphore — bounded counter (CAS-based, cross-process resource limiting)
- *   Barrier   — N processes rendezvous at a point before proceeding
- *   RWLock    — reader-writer lock for external resources
- *   Condvar   — condition variable with futex wait/signal/broadcast
- *   Once      — one-time initialization gate (like pthread_once)
+ *   Semaphore -- bounded counter (CAS-based, cross-process resource limiting)
+ *   Barrier   -- N processes rendezvous at a point before proceeding
+ *   RWLock    -- reader-writer lock for external resources
+ *   Condvar   -- condition variable with futex wait/signal/broadcast
+ *   Once      -- one-time initialization gate (like pthread_once)
  *
  * All use file-backed mmap(MAP_SHARED) for cross-process sharing,
  * futex for blocking wait, and PID-based stale lock recovery.
@@ -38,7 +38,7 @@
  * ================================================================ */
 
 #define SYNC_MAGIC        0x53594E31U  /* "SYN1" */
-#define SYNC_VERSION      2  /* v2: per-process reader-slot table for RWLock dead-reader recovery */
+#define SYNC_VERSION      3  /* v3: on-disk format adds the RWLock reader-slot occupancy bitmap (layout change) */
 
 /* Primitive type IDs */
 #define SYNC_TYPE_SEMAPHORE  0
@@ -54,20 +54,33 @@
 #define SYNC_READER_SLOTS    1024  /* per-process reader-counter mirror for RWLock */
 #endif
 
+/* Occupancy bitmap (RWLock only): one bit per reader slot, set when a process
+ * claims its slot and cleared on clean release.  A draining writer scans these
+ * SYNC_OCC_WORDS words to visit only OCCUPIED slots (O(words + live readers))
+ * instead of all SYNC_READER_SLOTS.  Stored right after the reader-slot table. */
+#define SYNC_OCC_WORDS   (((SYNC_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
+#define SYNC_OCC_BYTES   ((uint64_t)SYNC_OCC_WORDS * 8)      /* 128 bytes */
+
 /* ================================================================
  * Per-process reader-slot table (for RWLock dead-reader recovery)
  *
  * Allocated only when type == SYNC_TYPE_RWLOCK (Option A).
- * Mirrors each process's contribution to the global rwlock counters so a
- * SIGKILL'd reader's stuck reader-count contribution can be reclaimed.
  * ~16KB per RWLock (1024 slots * 16 bytes); zero overhead for other types.
+ *
+ * In the reader-slots-only rwlock a reader's ENTIRE contribution to the shared
+ * lock is `rdepth` in its OWN slot -- there is no separate shared reader counter
+ * to fall out of sync with it -- so a dead reader's contribution is exactly this
+ * one word, which a draining writer neutralises by clearing the slot's pid (the
+ * scan then ignores the slot).  No orphaned counter can exist, so there is no
+ * quiescent force-reset and sustained readers cannot starve a writer.  _rsv1/
+ * _rsv2 are kept only to preserve the 16-byte slot size across released builds.
  * ================================================================ */
 
 typedef struct {
-    uint32_t pid;             /* owning PID, 0 = free */
-    uint32_t subcount;        /* this process's rwlock reader contribution */
-    uint32_t waiters_parked;  /* this process's contribution to hdr->waiters */
-    uint32_t writers_parked;  /* this process's contribution to rwlock_writers_waiting */
+    uint32_t pid;      /* owning PID, 0 = free */
+    uint32_t rdepth;   /* read-locks THIS process currently holds (recursion-safe) */
+    uint32_t _rsv1;    /* reserved (was waiters_parked); unused, kept for layout size */
+    uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } SyncReaderSlot;
 
 /* ================================================================
@@ -82,10 +95,11 @@ typedef struct {
     uint32_t param;          /* 12: type-specific (sem max, barrier count, etc.) */
     uint64_t total_size;     /* 16: mmap size */
     uint64_t reader_slots_off;/* 24: offset of SyncReaderSlot[SYNC_READER_SLOTS], 0 if not allocated (non-RWLock primitives) */
-    uint32_t slotless_readers;/* 32: RWLock live readers holding the lock with NO reader-slot
-                                     (claimed when the slot table was full). Keeps dead-reader
-                                     recovery from force-resetting the lock word out from under
-                                     them. Defaults to 0, so images from before this field (was padding) stay compatible. */
+    uint32_t slotless_rdepth; /* 32: RWLock live readers holding the lock with NO reader-slot
+                                     (claimed when the slot table was full). A draining writer
+                                     cannot attribute these to a pid, so it waits them out (the
+                                     documented slotless residual). Defaults to 0, so images from
+                                     before this field (was padding) stay compatible. */
     uint8_t  _pad0[28];      /* 36-63 */
 
     /* ---- Cache line 1 (64-127): mutable state ---- */
@@ -93,8 +107,9 @@ typedef struct {
     /* Semaphore: value = current count, waiters = blocked acquirers */
     /* Barrier: value = arrived count, waiters = blocked at barrier,
                 generation = increments each time barrier trips */
-    /* RWLock: value = rwlock word (0=free, N=N readers, 0x80000000|pid=writer),
-               waiters = blocked lockers */
+    /* RWLock: value = WRITER word only (0=free, 0x80000000|pid=writer; readers
+               are NOT counted here -- each holds rdepth in its own reader-slot),
+               waiters = parked lockers (readers+writers) hint on the value futex */
     /* Condvar: value = signal counter (futex word), waiters = blocked waiters,
                 mutex = associated mutex for predicate protection */
     /* Once: value = state (0=INIT, 1=RUNNING|pid, 2=DONE),
@@ -111,8 +126,8 @@ typedef struct {
     uint64_t stat_waits;     /* 104 */
     uint64_t stat_timeouts;  /* 112 */
     uint32_t stat_signals;   /* 120 */
-    uint32_t rwlock_writers_waiting; /* 124: RWLock write-preferring yield signal
-                                             (writers only, not readers) */
+    uint32_t drain_seq;      /* 124: RWLock futex a releasing reader bumps to wake a
+                                     writer draining readers in wrlock Phase 2 */
 } SyncHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -130,6 +145,7 @@ typedef struct {
     int         notify_fd;   /* eventfd, -1 if disabled */
     int         backing_fd;  /* memfd fd, -1 for file-backed/anonymous */
     SyncReaderSlot *reader_slots; /* in mmap, SYNC_READER_SLOTS entries; NULL if not RWLock */
+    uint64_t   *occ;         /* in mmap, SYNC_OCC_WORDS-word reader-slot occupancy bitmap; NULL if not RWLock (set alongside reader_slots) */
     uint32_t    my_slot_idx; /* UINT32_MAX = unclaimed; per-process slot index */
     uint32_t    cached_pid;  /* getpid() at claim time */
     uint32_t    cached_fork_gen; /* fork-generation at claim time */
@@ -150,14 +166,35 @@ static inline void sync_spin_pause(void) {
 #endif
 }
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int sync_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int sync_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !sync_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 /* Convert timeout in seconds (double) to absolute deadline */
 static inline void sync_make_deadline(double timeout, struct timespec *deadline) {
     clock_gettime(CLOCK_MONOTONIC, deadline);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     deadline->tv_sec += (time_t)timeout;
     deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
     if (deadline->tv_nsec >= 1000000000L) {
@@ -246,11 +283,26 @@ static inline void sync_mutex_unlock(SyncHeader *hdr) {
 }
 
 /* ================================================================
- * RWLock helpers (for SYNC_TYPE_RWLOCK)
+ * Futex-based write-preferring read-write lock (reader-slots-only)
+ * for SYNC_TYPE_RWLOCK, with dead-process recovery
  *
- * value == 0:                  unlocked
- * value  1..0x7FFFFFFF:        N active readers
- * value  0x80000000 | pid:     write-locked by pid
+ * value == 0:                 unlocked (no writer)
+ * value == 0x80000000 | pid:  write-locked by pid
+ *
+ * The reader count is NOT stored in `value`.  It is DISTRIBUTED across
+ * per-process reader slots: each slot's `rdepth` is that process's entire
+ * contribution to the lock.  A reader publishes its presence in its own slot and
+ * then re-checks `value`; a writer publishes `value` and then scans every slot
+ * until all live readers' rdepth reach 0.  Sequentially-consistent store+load on
+ * each side (a Dekker handshake) gives mutual exclusion.
+ *
+ * Because a reader's whole contribution is ONE atomic word owned by ONE process,
+ * a crashed reader is recovered by clearing that one slot (CAS its pid to 0) --
+ * no second counter to strand, no orphaned +1, no quiescent force-reset.  A
+ * reader killed anywhere in rdlock/rdunlock leaves at most `rdepth>0` in its dead
+ * slot, which the draining writer clears directly, so sustained read traffic can
+ * never starve a writer.  Write-preference is inherent in the gate (new readers
+ * see value!=0 and yield).
  * ================================================================ */
 
 #define SYNC_RWLOCK_WRITER_BIT 0x80000000U
@@ -260,6 +312,10 @@ static inline void sync_mutex_unlock(SyncHeader *hdr) {
 static inline int sync_rwlock_try_rdlock(SyncHandle *h);
 static inline int sync_rwlock_try_wrlock(SyncHandle *h);
 
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * A single CAS observed->0 wins the recovery race (a loser's CAS just fails);
+ * this module has no extra shared lock state to repair.  Bumps stat_recoveries
+ * and wakes any lockers parked on the value futex. */
 static inline void sync_recover_stale_rwlock(SyncHeader *hdr, uint32_t observed) {
     if (!__atomic_compare_exchange_n(&hdr->value, &observed, 0,
             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
@@ -272,11 +328,10 @@ static inline void sync_recover_stale_rwlock(SyncHeader *hdr, uint32_t observed)
 }
 
 /* ---- Per-process reader-slot lifecycle (dead-reader recovery) ----
- * Each process claims one SyncReaderSlot lazily on first rwlock op so that
- * its contribution to the shared reader-count can be reclaimed by other
- * processes if it dies (SIGKILL'd reader no longer pins the counter).
- * Only relevant for SYNC_TYPE_RWLOCK; non-RWLock primitives leave
- * h->reader_slots == NULL and these helpers become no-ops. */
+ * Each process claims one SyncReaderSlot lazily on first rwlock op so that a
+ * SIGKILL'd reader's rdepth contribution can be neutralised by a draining
+ * writer.  Only relevant for SYNC_TYPE_RWLOCK; non-RWLock primitives leave
+ * h->reader_slots == NULL and this helper is a no-op. */
 static uint32_t sync_fork_gen = 0;
 static pthread_once_t sync_atfork_once = PTHREAD_ONCE_INIT;
 static void sync_on_fork_child(void) {
@@ -286,12 +341,25 @@ static void sync_atfork_init(void) {
     pthread_atfork(NULL, NULL, sync_on_fork_child);
 }
 
+/* Occupancy bitmap: set a slot's bit when it is claimed, clear it on clean
+ * release.  SEQ_CST so a set bit is ordered before that slot's rdepth can go
+ * non-zero (the bit is set in claim, which precedes any rdlock's rdepth++),
+ * letting a writer's SEQ_CST bitmap scan never miss a slot a committed reader
+ * holds.  Callers guarantee h->occ != NULL (it is set alongside h->reader_slots,
+ * and every call site is under an `if (h->reader_slots)` guard). */
+static inline void sync_occ_set(SyncHandle *h, uint32_t s) {
+    __atomic_fetch_or(&h->occ[s >> 6], (uint64_t)1 << (s & 63), __ATOMIC_SEQ_CST);
+}
+static inline void sync_occ_clear(SyncHandle *h, uint32_t s) {
+    __atomic_fetch_and(&h->occ[s >> 6], ~((uint64_t)1 << (s & 63)), __ATOMIC_SEQ_CST);
+}
+
 static inline void sync_claim_reader_slot(SyncHandle *h) {
     if (!h->reader_slots) return;
     pthread_once(&sync_atfork_once, sync_atfork_init);
     uint32_t cur_gen = __atomic_load_n(&sync_fork_gen, __ATOMIC_RELAXED);
     if (h->cached_fork_gen != cur_gen) {
-        if (cur_gen != h->cached_fork_gen) h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
+        h->slotless_held = 0;  /* fork: child holds none of the parent's slotless read locks */
         h->cached_fork_gen = cur_gen;
         h->my_slot_idx = UINT32_MAX;
     }
@@ -299,165 +367,46 @@ static inline void sync_claim_reader_slot(SyncHandle *h) {
     uint32_t now_pid = (uint32_t)getpid();
     h->cached_pid = now_pid;
     uint32_t start = now_pid % SYNC_READER_SLOTS;
+    /* Pass 1: take a free slot. */
     for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
         uint32_t s = (start + i) % SYNC_READER_SLOTS;
         uint32_t expected = 0;
         if (__atomic_compare_exchange_n(&h->reader_slots[s].pid,
                 &expected, now_pid, 0,
                 __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            __atomic_store_n(&h->reader_slots[s].subcount, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].waiters_parked, 0, __ATOMIC_RELAXED);
-            __atomic_store_n(&h->reader_slots[s].writers_parked, 0, __ATOMIC_RELAXED);
+            /* Fresh owner holds no read locks yet; clear any stale rdepth left by
+             * a dead predecessor (its contribution is dropped as we take over). */
+            __atomic_store_n(&h->reader_slots[s].rdepth, 0, __ATOMIC_RELAXED);
+            sync_occ_set(h, s);   /* mark occupied BEFORE any rdlock can bump rdepth */
             h->my_slot_idx = s;
             return;
         }
     }
-    /* Slot table full — silently skip tracking; recovery falls back to
-     * the slow per-op timeout drain. */
-}
-
-/* Atomically subtract `sub` from a counter, capped at 0 (never underflows). */
-static inline void sync_atomic_sub_cap(uint32_t *p, uint32_t sub) {
-    if (!sub) return;
-    uint32_t cur = __atomic_load_n(p, __ATOMIC_RELAXED);
-    for (;;) {
-        uint32_t want = (cur > sub) ? cur - sub : 0;
-        if (__atomic_compare_exchange_n(p, &cur, want,
-                1, __ATOMIC_RELAXED, __ATOMIC_RELAXED))
-            return;
-    }
-}
-
-/* Try to claim a dead slot (CAS pid → 0) and drain its parked-waiter
- * contributions to the global counters. Returns 1 if drained, 0 if lost
- * the CAS race or had no contributions. ACQ_REL syncs us with the dead
- * process's RELAXED stores to mirror fields on weakly-ordered archs. */
-static inline int sync_drain_dead_slot(SyncHandle *h, uint32_t i, uint32_t pid) {
-    SyncHeader *hdr = h->hdr;
-    uint32_t expected = pid;
-    if (!__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, 0,
-            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-        return 0;
-    uint32_t wp    = __atomic_load_n(&h->reader_slots[i].waiters_parked, __ATOMIC_RELAXED);
-    uint32_t writp = __atomic_load_n(&h->reader_slots[i].writers_parked, __ATOMIC_RELAXED);
-    int drained = 0;
-    if (wp)    { sync_atomic_sub_cap(&hdr->waiters, wp); drained = 1; }
-    if (writp) { sync_atomic_sub_cap(&hdr->rwlock_writers_waiting, writp); drained = 1; }
-    /* Don't zero slot fields — sync_claim_reader_slot zeros them on the
-     * next claim; zeroing here can race a new claimant's increments. */
-    return drained;
-}
-
-static inline void sync_recover_dead_readers(SyncHandle *h) {
-    if (!h->reader_slots) return;
-    SyncHeader *hdr = h->hdr;
-    int any_live_reader = 0;
-    int found_dead_reader = 0;
-    int any_recovery = 0;
-
-    /* Pass 1: scan; classify; immediate-wipe dead slots with sc==0 (no
-     * rwlock contribution to lose). Defer wiping dead-with-sc>0 slots
-     * until force-reset can fire — otherwise we'd lose the only record
-     * of the orphan rwlock contribution while a live reader is present. */
+    /* Pass 2: no free slot -- reclaim one whose owner is dead.  Safe to take even
+     * if its rdepth>0: clearing pid drops the dead reader's entire contribution
+     * (a writer scan ignores rdepth when pid==0) and we reset rdepth to 0 as we
+     * claim it.  No orphaned shared counter exists to preserve, so (unlike the
+     * old design) we need not skip dead slots that still show a read count. */
     for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
-        uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-        if (pid == 0) continue;
-        uint32_t sc = __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED);
-        if (sync_pid_alive(pid)) {
-            if (sc > 0) any_live_reader = 1;
-            continue;
-        }
-        if (sc > 0) { found_dead_reader = 1; continue; }
-        if (sync_drain_dead_slot(h, i, pid)) any_recovery = 1;
-    }
-
-    /* A live reader that could not claim a slot (table was full) is invisible
-     * to the scan above, yet still holds a +1 in the lock word. Treat any
-     * such slotless reader as a live reader so force-reset never zeroes the
-     * lock out from under it (which would let a writer in -> writer-exclusion
-     * violation). It is mirrored in hdr->slotless_readers exactly as slotted
-     * readers are mirrored via their slot subcount. */
-    if (__atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0)
-        any_live_reader = 1;
-
-    /* Pass 2: only if force-reset will fire.  Issue the rwlock CAS first
-     * to keep the race window with new readers narrow, then wipe the
-     * deferred dead slots. */
-    if (found_dead_reader && !any_live_reader) {
-        /* ACQUIRE: a late reader's subcount++ (before its value CAS) is then visible below. */
-        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_ACQUIRE);
-        int drain_ok = 1;   /* keep dead slots if the reset doesn't fire */
-        if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
-            /* Re-scan for a live reader (fail-safe: only suppresses a reset). */
-            int live_now = __atomic_load_n(&hdr->slotless_readers, __ATOMIC_RELAXED) > 0;
-            for (uint32_t i = 0; !live_now && i < SYNC_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p && sync_pid_alive(p) &&
-                    __atomic_load_n(&h->reader_slots[i].subcount, __ATOMIC_RELAXED) > 0)
-                    live_now = 1;
-            }
-            if (live_now) {
-                drain_ok = 0;
-            } else if (__atomic_compare_exchange_n(&hdr->value, &cur, 0,
-                    0, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                any_recovery = 1;
-                /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
-                __atomic_thread_fence(__ATOMIC_SEQ_CST);
-                if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
-                    syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-            } else {
-                drain_ok = 0;   /* value changed under us -- shares may still be live */
-            }
-        }
-        if (drain_ok) {
-            for (uint32_t i = 0; i < SYNC_READER_SLOTS; i++) {
-                uint32_t p = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (p == 0 || sync_pid_alive(p)) continue;
-                if (sync_drain_dead_slot(h, i, p)) any_recovery = 1;
-            }
+        uint32_t dpid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+        if (dpid == 0 || dpid == now_pid || sync_pid_alive(dpid)) continue;
+        uint32_t expected = dpid;
+        if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &expected, now_pid, 0,
+                __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+            __atomic_store_n(&h->reader_slots[i].rdepth, 0, __ATOMIC_RELAXED);
+            sync_occ_set(h, i);   /* mark occupied BEFORE any rdlock can bump rdepth */
+            h->my_slot_idx = i;
+            return;
         }
     }
-    if (any_recovery)
-        __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+    /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
+     * slotless path (lock still works; recovery of THIS reader's death is the
+     * documented slotless limitation). */
 }
 
-/* Park/unpark helpers — keep global hdr->waiters/rwlock_writers_waiting
- * and per-slot mirror counters in sync so recovery can drain them. */
-static inline void sync_park_reader(SyncHandle *h) {
-    __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-}
-static inline void sync_unpark_reader(SyncHandle *h) {
-    __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX)
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-}
-static inline void sync_park_writer(SyncHandle *h) {
-    __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
-    __atomic_add_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
-    }
-}
-static inline void sync_unpark_writer(SyncHandle *h) {
-    __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
-    __atomic_sub_fetch(&h->hdr->rwlock_writers_waiting, 1, __ATOMIC_RELAXED);
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].waiters_parked, 1, __ATOMIC_RELAXED);
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].writers_parked, 1, __ATOMIC_RELAXED);
-    }
-}
-
-/* Recovery dispatcher: if a writer is dead, force-reset the lock word;
- * otherwise scan reader slots for dead readers and drain their stuck
- * contributions to the rwlock and waiter counters.  Reload the lock
- * value here (rather than trusting a stale snapshot from the futex
- * caller) so that (a) a writer that died after our futex_wait started
- * is detected on the same timeout, and (b) phantom waiter/writers_waiting
- * contributions left by a dead parked writer are drained even when the
- * lock word itself is now 0. */
+/* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
+ * it, force-recover.  Dead READERS need no action here: only a writer that owns
+ * `value` drains readers, and it clears dead readers inline in its own scan. */
 static inline void sync_recover_after_timeout(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     uint32_t val = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
@@ -465,331 +414,299 @@ static inline void sync_recover_after_timeout(SyncHandle *h) {
         uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
         if (!sync_pid_alive(pid))
             sync_recover_stale_rwlock(hdr, val);
-    } else {
-        sync_recover_dead_readers(h);
     }
 }
 
-/* ---- Reader accounting (slot subcount, or global slotless count) ----
- * A reader mirrors its +1 in the lock word so dead-reader recovery can see
- * it. A slotted reader uses its reader-slot subcount; a reader that could not
- * claim a slot (table full) uses the global hdr->slotless_readers instead, so
- * recovery's force-reset never fires out from under it. enter() is called
- * BEFORE the lock CAS (in-flight visibility); abort() undoes it when the
- * acquire fails; leave() undoes it on unlock, peeling slotless first so a
- * later slot claim cannot misattribute the decrement. */
-static inline void sync_reader_enter(SyncHandle *h) {
+/* Bump/drop the parked-waiter hint.  Both readers (blocked at the gate) and
+ * writers (blocked acquiring `value`) wait on the value futex and use this, so
+ * wrunlock/recover know whether a FUTEX_WAKE is worth a syscall.  A waiter
+ * SIGKILLed while parked leaves waiters over-counted -> at most a spurious wake
+ * (harmless); it can never under-count, so no wakeup is lost. */
+static inline void sync_park(SyncHandle *h) {
+    __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
+}
+static inline void sync_unpark(SyncHandle *h) {
+    __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
+}
+
+/* Publish (inc) / retract (dec) this reader's presence -- its ENTIRE
+ * contribution to the lock.  A slotted reader uses its slot's rdepth; a reader
+ * that could not claim a slot uses the global slotless_rdepth.  inc() is SEQ_CST
+ * so the value re-check that follows it in rdlock forms a Dekker handshake with
+ * the writer's SEQ_CST value-store + rdepth-scan.  dec() peels slotless first so
+ * a slot claimed mid-hold cannot misattribute the decrement. */
+static inline void sync_rdepth_inc(SyncHandle *h) {
     if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_SEQ_CST);
     } else {
-        __atomic_add_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_SEQ_CST);
         h->slotless_held++;
     }
 }
-static inline void sync_reader_abort(SyncHandle *h) {
-    if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
-    } else {
-        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
-        h->slotless_held--;
-    }
-}
-static inline void sync_reader_leave(SyncHandle *h) {
+static inline void sync_rdepth_dec(SyncHandle *h) {
     if (h->slotless_held > 0) {
         h->slotless_held--;
-        __atomic_sub_fetch(&h->hdr->slotless_readers, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(&h->hdr->slotless_rdepth, 1, __ATOMIC_RELEASE);
     } else if (h->my_slot_idx != UINT32_MAX) {
-        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].subcount, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(&h->reader_slots[h->my_slot_idx].rdepth, 1, __ATOMIC_RELEASE);
     }
+}
+
+/* Wake a writer that may be draining readers (it waits on drain_seq).  Called
+ * after every rdepth decrement so a released read lock lets the writer re-scan
+ * promptly instead of waiting out its timeout. */
+static inline void sync_reader_wake_drain(SyncHandle *h) {
+    if (__atomic_load_n(&h->hdr->value, __ATOMIC_ACQUIRE) != 0) {
+        __atomic_add_fetch(&h->hdr->drain_seq, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &h->hdr->drain_seq, FUTEX_WAKE, 1, NULL, NULL, 0);
+    }
+}
+
+/* Give-up path for the timed/try readers: retract our published rdepth and wake
+ * a draining writer so it re-scans without our contribution. */
+static inline void sync_reader_abort(SyncHandle *h) {
+    sync_rdepth_dec(h);
+    sync_reader_wake_drain(h);
+}
+
+/* Writer-side scan of all reader slots: reclaim any dead reader (CAS its pid to
+ * 0) and report whether a LIVE reader still holds (rdepth>0), including the
+ * slotless residual.  Shared by wrlock Phase 2, try_wrlock, and wrlock_timed. */
+static inline int sync_rwlock_readers_busy(SyncHandle *h) {
+    int busy = 0;
+    if (h->reader_slots) {
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(SYNC_OCC_WORDS + live readers)
+         * instead of O(SYNC_READER_SLOTS). */
+        for (uint32_t w = 0; w < SYNC_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                      /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                 /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                /* no live owner -- stale rdepth, ignore */
+                if (!sync_pid_alive(pid)) {
+                    /* Dead reader: clear its pid so the slot no longer counts (its
+                     * whole contribution WAS this slot).  Leave the occ bit SET
+                     * (harmless -- a later scan hits pid==0 and skips, a re-claim
+                     * re-sets it) to avoid racing a concurrent claimant.  rdepth is
+                     * left stale but is now ignored (pid==0) and zeroed by the next
+                     * claimant.  Count it as a recovery (gated on the CAS so it is
+                     * tallied exactly once). */
+                    uint32_t ep = pid;
+                    if (__atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+                        __atomic_add_fetch(&h->hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                              /* live reader still holding */
+            }
+        }
+    }
+    /* A live slotless reader keeps us waiting; a crashed slotless reader that
+     * cannot be attributed to a pid is the documented slotless limitation. */
+    if (__atomic_load_n(&h->hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+        busy = 1;
+    return busy;
 }
 
 static inline void sync_rwlock_rdlock(SyncHandle *h) {
-    SyncHeader *hdr = h->hdr;
     sync_claim_reader_slot(h);
-    uint32_t *lock = &hdr->value;
-    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    /* Mirror our reader contribution BEFORE the rwlock CAS so a concurrent
-     * recovery scan sees us as a live in-flight reader (slotted or slotless). */
-    sync_reader_enter(h);
+    SyncHeader *hdr = h->hdr;
     for (int spin = 0; ; spin++) {
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Write-preferring: yield to parked writers when lock is free. */
-        if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
-        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
-            if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return;
+        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_ACQUIRE);
+        if (cur == 0) {
+            /* Optimistically take the read: publish rdepth, then re-check value.
+             * SEQ_CST inc + SEQ_CST load vs the writer's SEQ_CST value CAS +
+             * SEQ_CST rdepth scan: by the single total order of SEQ_CST ops the
+             * two sides cannot both miss each other, so we never hold
+             * concurrently with a writer. */
+            sync_rdepth_inc(h);
+            if (__atomic_load_n(&hdr->value, __ATOMIC_SEQ_CST) == 0)
+                return;                       /* no writer after our publish -> we hold */
+            /* A writer appeared during our publish -- yield to it (write-preferring). */
+            sync_reader_abort(h);             /* retract rdepth + wake the draining writer */
+            spin = 0;
+            continue;
+        }
+        /* value != 0: a writer holds or is acquiring.  Recover if it is dead. */
+        if (cur >= SYNC_RWLOCK_WRITER_BIT &&
+            !sync_pid_alive(cur & SYNC_RWLOCK_PID_MASK)) {
+            sync_recover_stale_rwlock(hdr, cur);
+            spin = 0;
+            continue;
         }
         if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
             sync_spin_pause();
             continue;
         }
-        sync_park_reader(h);
-        /* StoreLoad: publish our parked-waiter registration before re-reading
-         * the lock word (weak-memory lost-wakeup guard). */
+        sync_park(h);
+        /* StoreLoad: publish our parked registration before re-reading value
+         * (weak-memory lost-wakeup guard). */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
-        cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        /* Sleep when write-locked OR yielding to parked writers (cur==0) */
-        if (cur >= SYNC_RWLOCK_WRITER_BIT || cur == 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
+        cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->value, FUTEX_WAIT, cur,
                               &sync_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                sync_unpark_reader(h);
-                if (cur >= SYNC_RWLOCK_WRITER_BIT) {
-                    sync_recover_after_timeout(h);
-                } else {
-                    /* Yielding to writers timed out — optimistically drop one
-                     * writers_waiting to recover from potentially-crashed
-                     * parked writer. A live writer just re-increments. */
-                    uint32_t wc = __atomic_load_n(writers_waiting, __ATOMIC_RELAXED);
-                    while (wc > 0 && !__atomic_compare_exchange_n(
-                            writers_waiting, &wc, wc - 1,
-                            1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
-                    /* Also opportunistically reap dead-reader slot mirrors
-                     * (some other reader holds the lock but may be dead). */
-                    sync_recover_dead_readers(h);
-                }
+                sync_unpark(h);
+                sync_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        sync_unpark_reader(h);
+        sync_unpark(h);
         spin = 0;
     }
-}
-
-/* Timed rdlock: returns 1 on success, 0 on timeout. timeout<0 = infinite.
- * No try-lock fast-path: would bypass write-preference when cur==0 &&
- * writers_waiting > 0. Main loop's first iteration handles the uncontended
- * case at ~same cost.
- *
- * Uses the same slot-claim + park-reader pattern as the regular rdlock,
- * with user-timeout ETIMEDOUT short-circuiting to return 0 (after we drop
- * any claimed subcount). Per-iteration futex waits are capped at
- * SYNC_LOCK_TIMEOUT_SEC so the global recovery scan runs periodically. */
-static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
-    if (timeout == 0) {
-        return sync_rwlock_try_rdlock(h);
-    }
-
-    SyncHeader *hdr = h->hdr;
-    sync_claim_reader_slot(h);
-    uint32_t *lock = &hdr->value;
-    struct timespec deadline, remaining;
-    int has_deadline = (timeout > 0);
-    if (has_deadline) sync_make_deadline(timeout, &deadline);
-
-    /* Register as an in-flight reader (slotted subcount or slotless) BEFORE the
-     * rwlock CAS so a concurrent recovery scan sees us as live. */
-    sync_reader_enter(h);
-
-    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
-    for (int spin = 0; ; spin++) {
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
-            if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return 1;
-        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
-            if (__atomic_compare_exchange_n(lock, &cur, 1,
-                    1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
-                return 1;
-        }
-        if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
-            sync_spin_pause();
-            continue;
-        }
-        sync_park_reader(h);
-        /* StoreLoad: publish our parked-waiter registration before re-reading
-         * the lock word (weak-memory lost-wakeup guard). */
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);
-        cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur >= SYNC_RWLOCK_WRITER_BIT || cur == 0) {
-            struct timespec *pts = NULL;
-            int capped = 0;
-            /* Cap wait at SYNC_LOCK_TIMEOUT_SEC so stale-holder recovery
-             * runs periodically even with a user-supplied deadline. */
-            if (has_deadline) {
-                if (!sync_remaining_time(&deadline, &remaining)) {
-                    sync_unpark_reader(h);
-                    sync_reader_abort(h);
-                    return 0;
-                }
-                if (remaining.tv_sec >= SYNC_LOCK_TIMEOUT_SEC) {
-                    pts = (struct timespec *)&sync_lock_timeout;
-                    capped = 1;
-                } else {
-                    pts = &remaining;
-                }
-            } else {
-                pts = (struct timespec *)&sync_lock_timeout;
-                capped = 1;
-            }
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur, pts, NULL, 0);
-            if (rc == -1 && errno == ETIMEDOUT) {
-                sync_unpark_reader(h);
-                /* If timeout matches the global lock-timeout cap (not the
-                 * user's deadline), run the recovery scan; otherwise it's
-                 * the user's deadline expiring and we should return 0. */
-                if (!capped) {
-                    sync_reader_abort(h);
-                    return 0;
-                }
-                if (cur >= SYNC_RWLOCK_WRITER_BIT) {
-                    sync_recover_after_timeout(h);
-                } else {
-                    /* Yielding to writer timed out — drop one writers_waiting
-                     * to recover from a potentially-crashed parked writer. */
-                    uint32_t wc = __atomic_load_n(writers_waiting, __ATOMIC_RELAXED);
-                    while (wc > 0 && !__atomic_compare_exchange_n(
-                            writers_waiting, &wc, wc - 1,
-                            1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
-                    sync_recover_dead_readers(h);
-                }
-                spin = 0;
-                continue;
-            }
-        }
-        sync_unpark_reader(h);
-        spin = 0;
-    }
-}
-
-/* try_rdlock: bump subcount up-front so concurrent recovery scans see us
- * as live in-flight; revert on CAS failure. Cheap and keeps recovery
- * accounting consistent. */
-static inline int sync_rwlock_try_rdlock(SyncHandle *h) {
-    SyncHeader *hdr = h->hdr;
-    sync_claim_reader_slot(h);
-    sync_reader_enter(h);
-    uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
-    if (cur >= SYNC_RWLOCK_WRITER_BIT) {
-        sync_reader_abort(h);
-        return 0;
-    }
-    if (__atomic_compare_exchange_n(&hdr->value, &cur, cur + 1,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return 1;
-    sync_reader_abort(h);
-    return 0;
 }
 
 static inline void sync_rwlock_rdunlock(SyncHandle *h) {
-    SyncHeader *hdr = h->hdr;
-    /* Decrement rwlock BEFORE subcount: a concurrent recovery scan that
-     * sees subcount > 0 with our (live) PID will (correctly) treat us as
-     * an in-flight reader and skip force-reset. */
-    uint32_t prev = __atomic_sub_fetch(&hdr->value, 1, __ATOMIC_RELEASE);
-    sync_reader_leave(h);
-    /* StoreLoad: publish the reader-count decrement before reading waiters
-     * (weak-memory lost-wakeup guard). */
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
-    if (prev == 0 && __atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    sync_rdepth_dec(h);                /* RELEASE: drop our entire contribution */
+    sync_reader_wake_drain(h);         /* if a writer is draining, wake it to re-scan */
 }
 
-static inline void sync_rwlock_wrlock(SyncHandle *h) {
-    SyncHeader *hdr = h->hdr;
+/* try_rdlock: one-shot, non-blocking.  Returns 1 on success, 0 on failure. */
+static inline int sync_rwlock_try_rdlock(SyncHandle *h) {
     sync_claim_reader_slot(h);
-    uint32_t *lock = &hdr->value;
-    uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
-    for (int spin = 0; ; spin++) {
-        uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(lock, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return;
-        if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
-            sync_spin_pause();
-            continue;
+    SyncHeader *hdr = h->hdr;
+    uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_ACQUIRE);
+    if (cur != 0) {
+        /* A writer holds or is acquiring.  Recover once if it is dead, re-read. */
+        if (cur >= SYNC_RWLOCK_WRITER_BIT &&
+            !sync_pid_alive(cur & SYNC_RWLOCK_PID_MASK)) {
+            sync_recover_stale_rwlock(hdr, cur);
+            cur = __atomic_load_n(&hdr->value, __ATOMIC_ACQUIRE);
         }
-        sync_park_writer(h);
-        /* StoreLoad: see the rdlock park path (weak-memory lost-wakeup guard). */
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur != 0) {
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
-                              &sync_lock_timeout, NULL, 0);
-            if (rc == -1 && errno == ETIMEDOUT) {
-                sync_unpark_writer(h);
-                sync_recover_after_timeout(h);
-                spin = 0;
-                continue;
-            }
-        }
-        sync_unpark_writer(h);
-        spin = 0;
+        if (cur != 0) return 0;
     }
+    sync_rdepth_inc(h);
+    if (__atomic_load_n(&hdr->value, __ATOMIC_SEQ_CST) != 0) {
+        /* A writer appeared during our publish -- yield (write-preferring). */
+        sync_reader_abort(h);
+        return 0;
+    }
+    return 1;
 }
 
-/* Timed wrlock: returns 1 on success, 0 on timeout. timeout<0 = infinite. */
-static inline int sync_rwlock_wrlock_timed(SyncHandle *h, double timeout) {
-    if (sync_rwlock_try_wrlock(h)) return 1;
-    if (timeout == 0) return 0;
-
-    SyncHeader *hdr = h->hdr;
+/* Timed rdlock: returns 1 on success, 0 on timeout.  timeout<0 = infinite,
+ * timeout==0 = one-shot try.  Same optimistic gate as sync_rwlock_rdlock; the
+ * gate FUTEX_WAIT is bounded by an absolute deadline computed from `timeout`.
+ * On give-up we hold NOTHING (every 0-return has already retracted rdepth). */
+static inline int sync_rwlock_rdlock_timed(SyncHandle *h, double timeout) {
+    if (timeout == 0) return sync_rwlock_try_rdlock(h);
     sync_claim_reader_slot(h);
-    uint32_t *lock = &hdr->value;
-    uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
+    SyncHeader *hdr = h->hdr;
     struct timespec deadline, remaining;
     int has_deadline = (timeout > 0);
     if (has_deadline) sync_make_deadline(timeout, &deadline);
-
     for (int spin = 0; ; spin++) {
-        uint32_t expected = 0;
-        if (__atomic_compare_exchange_n(lock, &expected, mypid,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-            return 1;
+        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_ACQUIRE);
+        if (cur == 0) {
+            /* Optimistic publish + Dekker re-check (see sync_rwlock_rdlock). */
+            sync_rdepth_inc(h);
+            if (__atomic_load_n(&hdr->value, __ATOMIC_SEQ_CST) == 0)
+                return 1;
+            sync_reader_abort(h);      /* retract rdepth + wake the draining writer */
+            if (has_deadline && !sync_remaining_time(&deadline, &remaining))
+                return 0;              /* deadline passed; we hold nothing */
+            spin = 0;
+            continue;
+        }
+        if (cur >= SYNC_RWLOCK_WRITER_BIT &&
+            !sync_pid_alive(cur & SYNC_RWLOCK_PID_MASK)) {
+            sync_recover_stale_rwlock(hdr, cur);
+            spin = 0;
+            continue;
+        }
         if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
             sync_spin_pause();
             continue;
         }
-        sync_park_writer(h);
-        /* StoreLoad: see the rdlock park path (weak-memory lost-wakeup guard). */
+        sync_park(h);
+        /* StoreLoad: publish our parked registration before re-reading value. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
-        uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
+        cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
         if (cur != 0) {
-            struct timespec *pts = NULL;
-            int capped = 0;
-            /* Cap wait at SYNC_LOCK_TIMEOUT_SEC so stale-holder recovery
-             * runs periodically even with a user-supplied deadline. */
+            /* Cap the wait at SYNC_LOCK_TIMEOUT_SEC so stale-holder recovery runs
+             * periodically even with a longer user deadline. */
+            struct timespec *pts = (struct timespec *)&sync_lock_timeout;
+            int capped = 1;
             if (has_deadline) {
                 if (!sync_remaining_time(&deadline, &remaining)) {
-                    sync_unpark_writer(h);
-                    return 0;
+                    sync_unpark(h);
+                    return 0;          /* deadline passed; nothing held */
                 }
-                if (remaining.tv_sec >= SYNC_LOCK_TIMEOUT_SEC) {
-                    pts = (struct timespec *)&sync_lock_timeout;
-                    capped = 1;
-                } else {
-                    pts = &remaining;
-                }
-            } else {
-                pts = (struct timespec *)&sync_lock_timeout;
-                capped = 1;
+                if (remaining.tv_sec < SYNC_LOCK_TIMEOUT_SEC) { pts = &remaining; capped = 0; }
             }
-            long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur, pts, NULL, 0);
+            long rc = syscall(SYS_futex, &hdr->value, FUTEX_WAIT, cur, pts, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
-                sync_unpark_writer(h);
-                if (!capped) return 0;  /* user deadline expired */
+                sync_unpark(h);
+                if (!capped) return 0; /* user deadline expired; nothing held */
                 sync_recover_after_timeout(h);
                 spin = 0;
                 continue;
             }
         }
-        sync_unpark_writer(h);
+        sync_unpark(h);
         spin = 0;
     }
 }
 
-static inline int sync_rwlock_try_wrlock(SyncHandle *h) {
+static inline void sync_rwlock_wrlock(SyncHandle *h) {
+    sync_claim_reader_slot(h);   /* refresh cached_pid + own a slot across fork */
     SyncHeader *hdr = h->hdr;
-    uint32_t expected = 0;
+    /* Encode PID in the value word itself (0x80000000 | pid) to eliminate any
+     * crash window between acquiring the lock and storing the owner. */
     uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
-    return __atomic_compare_exchange_n(&hdr->value, &expected, mypid,
-                0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED);
+    /* Phase 1: acquire the writer word (mutual exclusion among writers). */
+    for (int spin = 0; ; spin++) {
+        uint32_t expected = 0;
+        if (__atomic_compare_exchange_n(&hdr->value, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        /* Contended: expected now holds the current value.  Recover a dead writer. */
+        if (expected >= SYNC_RWLOCK_WRITER_BIT &&
+            !sync_pid_alive(expected & SYNC_RWLOCK_PID_MASK)) {
+            sync_recover_stale_rwlock(hdr, expected);
+            spin = 0;
+            continue;
+        }
+        if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
+            sync_spin_pause();
+            continue;
+        }
+        sync_park(h);
+        /* StoreLoad: see the rdlock park path (weak-memory lost-wakeup guard). */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            long rc = syscall(SYS_futex, &hdr->value, FUTEX_WAIT, cur,
+                              &sync_lock_timeout, NULL, 0);
+            if (rc == -1 && errno == ETIMEDOUT) {
+                sync_unpark(h);
+                sync_recover_after_timeout(h);
+                spin = 0;
+                continue;
+            }
+        }
+        sync_unpark(h);
+        spin = 0;
+    }
+    /* Phase 2: we own `value`, so no NEW reader can join (they see value!=0 and
+     * yield).  Drain the readers that were already holding when we won the CAS.
+     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
+     * of the Dekker handshake. */
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        if (!sync_rwlock_readers_busy(h))
+            return;                                    /* exclusive: value held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &sync_lock_timeout, NULL, 0);
+    }
 }
 
 static inline void sync_rwlock_wrunlock(SyncHandle *h) {
@@ -801,15 +718,125 @@ static inline void sync_rwlock_wrunlock(SyncHandle *h) {
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
-/* Downgrade: atomically convert wrlock to rdlock (writer -> 1 reader).
- * Also accounts the post-downgrade reader contribution on our slot so a
- * subsequent SIGKILL leaves a recoverable subcount, not an orphan. */
-static inline void sync_rwlock_downgrade(SyncHandle *h) {
-    SyncHeader *hdr = h->hdr;
+/* try_wrlock: one-shot.  Returns 1 iff we obtain exclusive ownership, 0
+ * otherwise.  A try must NOT wait for readers to drain. */
+static inline int sync_rwlock_try_wrlock(SyncHandle *h) {
     sync_claim_reader_slot(h);
-    sync_reader_enter(h);
-    __atomic_store_n(&hdr->value, 1, __ATOMIC_RELEASE);
-    /* StoreLoad: publish the state change before reading the waiter count (weak-memory lost-wakeup guard). */
+    SyncHeader *hdr = h->hdr;
+    uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
+    uint32_t expected = 0;
+    if (!__atomic_compare_exchange_n(&hdr->value, &expected, mypid,
+            0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
+        /* Contended.  Recover a dead writer and retry once; else fail. */
+        if (expected >= SYNC_RWLOCK_WRITER_BIT &&
+            !sync_pid_alive(expected & SYNC_RWLOCK_PID_MASK)) {
+            sync_recover_stale_rwlock(hdr, expected);
+            expected = 0;
+            if (!__atomic_compare_exchange_n(&hdr->value, &expected, mypid,
+                    0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+                return 0;
+        } else {
+            return 0;
+        }
+    }
+    /* We hold `value`.  Dekker: our SEQ_CST CAS + the SEQ_CST rdepth loads in the
+     * scan cannot both miss a reader whose SEQ_CST publish + value re-check ran. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    if (sync_rwlock_readers_busy(h)) {
+        /* Readers still hold -- release the writer word and fail (no waiting). */
+        __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
+            syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        return 0;
+    }
+    return 1;   /* exclusive: value held + every rdepth 0 */
+}
+
+/* Timed wrlock: returns 1 on success, 0 on timeout.  timeout<0 = infinite,
+ * timeout==0 = one-shot try.  BOTH the Phase-1 value acquire and the Phase-2
+ * drain wait are bounded by an absolute deadline; on a Phase-2 give-up we own
+ * `value` and MUST release it before returning 0. */
+static inline int sync_rwlock_wrlock_timed(SyncHandle *h, double timeout) {
+    if (timeout == 0) return sync_rwlock_try_wrlock(h);
+    sync_claim_reader_slot(h);
+    SyncHeader *hdr = h->hdr;
+    uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
+    struct timespec deadline, remaining;
+    int has_deadline = (timeout > 0);
+    if (has_deadline) sync_make_deadline(timeout, &deadline);
+    /* Phase 1: acquire the writer word, bounded by the deadline. */
+    for (int spin = 0; ; spin++) {
+        uint32_t expected = 0;
+        if (__atomic_compare_exchange_n(&hdr->value, &expected, mypid,
+                0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+            break;
+        if (expected >= SYNC_RWLOCK_WRITER_BIT &&
+            !sync_pid_alive(expected & SYNC_RWLOCK_PID_MASK)) {
+            sync_recover_stale_rwlock(hdr, expected);
+            spin = 0;
+            continue;
+        }
+        if (__builtin_expect(spin < SYNC_SPIN_LIMIT, 1)) {
+            sync_spin_pause();
+            continue;
+        }
+        sync_park(h);
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
+        if (cur != 0) {
+            struct timespec *pts = (struct timespec *)&sync_lock_timeout;
+            int capped = 1;
+            if (has_deadline) {
+                if (!sync_remaining_time(&deadline, &remaining)) {
+                    sync_unpark(h);
+                    return 0;          /* deadline passed; no lock held */
+                }
+                if (remaining.tv_sec < SYNC_LOCK_TIMEOUT_SEC) { pts = &remaining; capped = 0; }
+            }
+            long rc = syscall(SYS_futex, &hdr->value, FUTEX_WAIT, cur, pts, NULL, 0);
+            if (rc == -1 && errno == ETIMEDOUT) {
+                sync_unpark(h);
+                if (!capped) return 0; /* user deadline expired; no lock held */
+                sync_recover_after_timeout(h);
+                spin = 0;
+                continue;
+            }
+        }
+        sync_unpark(h);
+        spin = 0;
+    }
+    /* Phase 2: we own `value`; drain existing readers, bounded by the deadline.
+     * On a deadline give-up we must release the writer word we hold. */
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);
+        if (!sync_rwlock_readers_busy(h))
+            return 1;                                  /* exclusive */
+        struct timespec *pts = (struct timespec *)&sync_lock_timeout;
+        if (has_deadline) {
+            if (!sync_remaining_time(&deadline, &remaining)) {
+                /* Deadline hit while draining -- release the value word we own. */
+                __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
+                __atomic_thread_fence(__ATOMIC_SEQ_CST);
+                if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
+                    syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+                return 0;
+            }
+            if (remaining.tv_sec < SYNC_LOCK_TIMEOUT_SEC) pts = &remaining;
+        }
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, pts, NULL, 0);
+    }
+}
+
+/* Downgrade: convert a held write lock (value == WRITER|pid) to a read lock.
+ * Publish our reader rdepth FIRST (SEQ_CST) so a writer that later CASes `value`
+ * sees our rdepth in its drain scan, THEN release the writer word. */
+static inline void sync_rwlock_downgrade(SyncHandle *h) {
+    sync_claim_reader_slot(h);
+    SyncHeader *hdr = h->hdr;
+    sync_rdepth_inc(h);                            /* publish as a reader before releasing */
+    __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
+    /* StoreLoad: publish the release before reading the waiter count (weak-memory lost-wakeup guard). */
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->value, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -1029,7 +1056,7 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
     uint32_t arrived = __atomic_add_fetch(&hdr->value, 1, __ATOMIC_ACQ_REL);
 
     if (arrived == parties) {
-        /* Last to arrive — trip the barrier. CAS preserves broken bit invariant. */
+        /* Last to arrive -- trip the barrier. CAS preserves broken bit invariant. */
         __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
         for (;;) {
             uint32_t old_g = __atomic_load_n(&hdr->generation, __ATOMIC_RELAXED);
@@ -1054,7 +1081,7 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
         return 1;  /* leader */
     }
 
-    /* Not last — wait for generation to change or broken bit to appear */
+    /* Not last -- wait for generation to change or broken bit to appear */
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     struct timespec deadline, remaining;
@@ -1073,10 +1100,10 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
             if (!sync_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
                 /* Try to break the barrier. If CAS fails with BROKEN_BIT
-                 * clear, only gen changed — our cohort tripped → return 0.
+                 * clear, only gen changed -- our cohort tripped -> return 0.
                  * If CAS fails with BROKEN_BIT set, current state is
                  * broken (whether by us, another waiter, or trip+re-break)
-                 * → return -1, matching the non-timeout path. */
+                 * -> return -1, matching the non-timeout path. */
                 uint32_t g = gen_raw;
                 if (!__atomic_compare_exchange_n(&hdr->generation, &g,
                         gen_raw | SYNC_BARRIER_BROKEN_BIT,
@@ -1345,8 +1372,9 @@ static inline void sync_once_reset(SyncHandle *h) {
  * Create / Open / Close
  *
  * Layout:
- *   [0..127]                : SyncHeader
- *   [128..128+SLOTS_SIZE-1] : SyncReaderSlot[SYNC_READER_SLOTS]  (RWLock only)
+ *   [0..127]                          : SyncHeader
+ *   [128 .. 128+SLOTS_SIZE-1]         : SyncReaderSlot[SYNC_READER_SLOTS]  (RWLock only)
+ *   [128+SLOTS_SIZE .. +OCC_BYTES-1]  : occupancy bitmap, SYNC_OCC_WORDS words (RWLock only)
  *
  * Non-RWLock primitives keep total_size = sizeof(SyncHeader) (Option A:
  * pay-for-what-you-use, ~16KB only when needed).
@@ -1357,7 +1385,7 @@ static inline void sync_once_reset(SyncHandle *h) {
 static inline uint64_t sync_layout_total_size(uint32_t type) {
     uint64_t sz = sizeof(SyncHeader);
     if (type == SYNC_TYPE_RWLOCK)
-        sz += (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
+        sz += (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot) + SYNC_OCC_BYTES;
     return sz;
 }
 
@@ -1415,7 +1443,7 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
         hdr->reader_slots_off = slots_off;
         if (type == SYNC_TYPE_SEMAPHORE)
             hdr->value = initial;
-        /* MAP_ANONYMOUS already zero-fills reader_slots region. */
+        /* MAP_ANONYMOUS already zero-fills the reader_slots + occ region. */
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         goto setup_handle;
     } else {
@@ -1440,6 +1468,10 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, mode) < 0)) {
+            SYNC_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)total_size) < 0) {
                 SYNC_ERR("ftruncate(%s): %s", path, strerror(errno));
@@ -1462,9 +1494,11 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
                          hdr->type == type &&
                          hdr->total_size == (uint64_t)st.st_size);
             if (valid && type == SYNC_TYPE_RWLOCK) {
-                /* reader_slots_off must point to a valid region inside the file. */
+                /* reader_slots_off must point to a valid region, and the file must
+                 * hold the slot table AND the occupancy bitmap that follows it. */
                 uint64_t need = sizeof(SyncHeader) +
-                                (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
+                                (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot) +
+                                SYNC_OCC_BYTES;
                 if (hdr->reader_slots_off != sizeof(SyncHeader) ||
                     (uint64_t)st.st_size < need)
                     valid = 0;
@@ -1479,7 +1513,7 @@ static SyncHandle *sync_create(const char *path, uint32_t type, uint32_t param,
         }
 
         /* Initialize while holding the flock */
-        memset(base, 0, (size_t)total_size);  /* zero header + reader_slots region */
+        memset(base, 0, (size_t)total_size);  /* zero header + reader_slots + occ region */
         hdr->magic            = SYNC_MAGIC;
         hdr->version          = SYNC_VERSION;
         hdr->type             = type;
@@ -1512,11 +1546,25 @@ setup_handle:;
     {
     uint64_t rso = hdr->reader_slots_off;
     uint64_t need_slots = (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
-    h->reader_slots = (rso > 0 && rso <= (uint64_t)map_size &&
-                       (uint64_t)map_size - rso >= need_slots &&
-                       (rso & (uint64_t)(_Alignof(SyncReaderSlot) - 1)) == 0)
-        ? (SyncReaderSlot *)((char *)base + rso)
-        : NULL;
+    if (rso > 0 && rso <= (uint64_t)map_size &&
+        (uint64_t)map_size - rso >= need_slots &&
+        (rso & (uint64_t)(_Alignof(SyncReaderSlot) - 1)) == 0) {
+        h->reader_slots = (SyncReaderSlot *)((char *)base + rso);
+        /* Occupancy bitmap follows the slot table; bound it within the mapping
+         * too.  On a poisoned or short map NULL BOTH -- occ is used only under an
+         * `if (h->reader_slots)` guard, so the two must be non-NULL together. */
+        uint64_t occ_off = rso + need_slots;
+        if (occ_off <= (uint64_t)map_size &&
+            (uint64_t)map_size - occ_off >= SYNC_OCC_BYTES) {
+            h->occ = (uint64_t *)((char *)base + occ_off);
+        } else {
+            h->reader_slots = NULL;
+            h->occ = NULL;
+        }
+    } else {
+        h->reader_slots = NULL;
+        h->occ = NULL;
+    }
     }
     h->my_slot_idx  = UINT32_MAX;
 
@@ -1553,7 +1601,7 @@ static SyncHandle *sync_create_memfd(const char *name, uint32_t type,
     }
 
     SyncHeader *hdr = (SyncHeader *)base;
-    memset(hdr, 0, (size_t)total_size);  /* zero header + reader_slots region */
+    memset(hdr, 0, (size_t)total_size);  /* zero header + reader_slots + occ region */
     hdr->magic            = SYNC_MAGIC;
     hdr->version          = SYNC_VERSION;
     hdr->type             = type;
@@ -1574,9 +1622,16 @@ static SyncHandle *sync_create_memfd(const char *name, uint32_t type,
     h->path         = NULL;
     h->notify_fd    = -1;
     h->backing_fd   = fd;
-    h->reader_slots = (slots_off > 0)
-        ? (SyncReaderSlot *)((char *)base + slots_off)
-        : NULL;
+    if (slots_off > 0) {
+        h->reader_slots = (SyncReaderSlot *)((char *)base + slots_off);
+        /* Occupancy bitmap follows the slot table (total_size, and the sealed
+         * memfd mapping, both cover it -- trusted create, so no bound check). */
+        h->occ = (uint64_t *)((char *)base + slots_off +
+                              (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot));
+    } else {
+        h->reader_slots = NULL;
+        h->occ = NULL;
+    }
     h->my_slot_idx  = UINT32_MAX;
 
     return h;
@@ -1610,7 +1665,8 @@ static SyncHandle *sync_open_fd(int fd, uint32_t type, char *errbuf) {
                  hdr->total_size == (uint64_t)st.st_size);
     if (valid && type == SYNC_TYPE_RWLOCK) {
         uint64_t need = sizeof(SyncHeader) +
-                        (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
+                        (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot) +
+                        SYNC_OCC_BYTES;
         if (hdr->reader_slots_off != sizeof(SyncHeader) ||
             (uint64_t)st.st_size < need)
             valid = 0;
@@ -1641,11 +1697,25 @@ static SyncHandle *sync_open_fd(int fd, uint32_t type, char *errbuf) {
     {
     uint64_t rso = hdr->reader_slots_off;
     uint64_t need_slots = (uint64_t)SYNC_READER_SLOTS * sizeof(SyncReaderSlot);
-    h->reader_slots = (rso > 0 && rso <= (uint64_t)map_size &&
-                       (uint64_t)map_size - rso >= need_slots &&
-                       (rso & (uint64_t)(_Alignof(SyncReaderSlot) - 1)) == 0)
-        ? (SyncReaderSlot *)((char *)base + rso)
-        : NULL;
+    if (rso > 0 && rso <= (uint64_t)map_size &&
+        (uint64_t)map_size - rso >= need_slots &&
+        (rso & (uint64_t)(_Alignof(SyncReaderSlot) - 1)) == 0) {
+        h->reader_slots = (SyncReaderSlot *)((char *)base + rso);
+        /* Occupancy bitmap follows the slot table; bound it within the mapping
+         * too.  On a poisoned or short map NULL BOTH -- occ is used only under an
+         * `if (h->reader_slots)` guard, so the two must be non-NULL together. */
+        uint64_t occ_off = rso + need_slots;
+        if (occ_off <= (uint64_t)map_size &&
+            (uint64_t)map_size - occ_off >= SYNC_OCC_BYTES) {
+            h->occ = (uint64_t *)((char *)base + occ_off);
+        } else {
+            h->reader_slots = NULL;
+            h->occ = NULL;
+        }
+    } else {
+        h->reader_slots = NULL;
+        h->occ = NULL;
+    }
     }
     h->my_slot_idx  = UINT32_MAX;
 
@@ -1654,18 +1724,23 @@ static SyncHandle *sync_open_fd(int fd, uint32_t type, char *errbuf) {
 
 static void sync_destroy(SyncHandle *h) {
     if (!h) return;
-    /* Release reader slot — only if we still own it AND no fork has happened
+    /* Release reader slot -- only if we still own it AND no fork has happened
      * since we claimed it. A forked child that inherits the handle but never
      * acquired the lock itself must NOT clear the parent's slot. */
     if (h->reader_slots && h->my_slot_idx != UINT32_MAX && h->cached_pid &&
         h->cached_fork_gen == __atomic_load_n(&sync_fork_gen, __ATOMIC_RELAXED) &&
-        __atomic_load_n(&h->reader_slots[h->my_slot_idx].subcount, __ATOMIC_ACQUIRE) == 0) {
-        /* subcount==0: a still-held lock's slot must survive for recovery */
+        __atomic_load_n(&h->reader_slots[h->my_slot_idx].rdepth, __ATOMIC_ACQUIRE) == 0) {
+        /* rdepth==0: a still-held read lock's slot must survive for recovery */
+        /* Clear our occ bit BEFORE releasing the slot: we still own the pid so no
+         * claimant can take the slot mid-clear, and rdepth==0 so no writer needs
+         * to see us.  (A crash skips this -> the bit is reclaimed lazily by a
+         * writer scan / re-claim, same as the pid.) */
+        sync_occ_clear(h, h->my_slot_idx);
         uint32_t expected = h->cached_pid;
-        /* CAS pid -> 0; do NOT clear subcount/wp/writp — between the CAS and
-         * a follow-up store, a new process could claim the slot, and our
-         * store would clobber its state. sync_claim_reader_slot zeros all
-         * mirror fields on every claim, so leaving stale values is safe. */
+        /* CAS pid -> 0; do NOT clear rdepth -- between the CAS and a follow-up
+         * store, a new process could claim the slot, and our store would clobber
+         * its state. sync_claim_reader_slot zeros rdepth on every claim, so
+         * leaving a stale value is safe. */
         __atomic_compare_exchange_n(&h->reader_slots[h->my_slot_idx].pid,
                 &expected, 0, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
     }

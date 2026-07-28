@@ -1,0 +1,12 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:BigQuery:project=p;dataset=d', '', '');
+my $sth = $dbh->prepare('SELECT id, data FROM t');
+$sth->execute();
+my $row = $sth->fetchrow_arrayref();
+is_deeply($row, ['1', 'bq_mock_data'], 'Fetched row');
+my $next = $sth->fetchrow_arrayref();
+is($next, undef, 'EOF undef');
+ok(!$sth->FETCH('Active'), 'Inactive after EOF');

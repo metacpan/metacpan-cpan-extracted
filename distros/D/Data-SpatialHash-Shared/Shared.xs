@@ -9,7 +9,18 @@
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::SpatialHash::Shared")) \
         croak("Expected a Data::SpatialHash::Shared object"); \
     SpatialHandle *h = INT2PTR(SpatialHandle*, SvIV(SvRV(sv))); \
-    if (!h) croak("Attempted to use a destroyed Data::SpatialHash::Shared object")
+    if (!h) croak("Attempted to use a destroyed Data::SpatialHash::Shared object"); \
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
+
+/* Re-read the handle after a call that can run Perl code (tied/overloaded
+ * argument magic, tied-array fetches).  That code may call $obj->DESTROY
+ * explicitly, which frees the handle and zeroes the IV; EXTRACT's mortal
+ * pins the referent only against refcount-driven destruction, not an
+ * explicit DESTROY, so the local `h` would dangle.  Used only where magic
+ * can actually intervene between EXTRACT and the first use of h. */
+#define REEXTRACT(sv) \
+    h = INT2PTR(SpatialHandle*, SvIV(SvRV(sv))); \
+    if (!h) croak("Data::SpatialHash::Shared object destroyed during the call")
 
 #define MAKE_OBJ(class, handle) \
     SV *obj = newSViv(PTR2IV(handle)); \
@@ -77,6 +88,7 @@ static const double *sph_parse_opts(pTHX_ SV **sp, int first, int items, double 
         const char *key = SvPV_nolen(sp[ai]);
         if (strcmp(key, "wrap") == 0) {
             SV *wv = sp[ai + 1];
+            SvGETMAGIC(wv);   /* a tied/overloaded scalar may FETCH to an arrayref */
             if (!SvROK(wv) || SvTYPE(SvRV(wv)) != SVt_PVAV)
                 croak("%s: wrap must be an arrayref [Wx, Wy] or [Wx, Wy, Wz]", who);
             AV *av = (AV *)SvRV(wv);
@@ -187,7 +199,7 @@ unlink(self_or_class, ...)
     SV *self_or_class
   CODE:
     const char *p = NULL;
-    if (sv_isobject(self_or_class)) {
+    if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::SpatialHash::Shared")) {
         SpatialHandle *h = INT2PTR(SpatialHandle*, SvIV(SvRV(self_or_class)));
         if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
@@ -350,6 +362,7 @@ insert(self, x, y, ...)
     else if (items == 6) { z = (double)SvNV(ST(3)); val = (int64_t)SvIV(ST(4)); radius = (double)SvNV(ST(5)); }
     else croak("insert: expected (x,y,value), (x,y,z,value), or (x,y,z,value,radius)");
     if (radius < 0 || !isfinite(radius)) croak("insert: radius must be a finite number >= 0");
+    REEXTRACT(self);
     sph_rwlock_wrlock(h);
     idx = sph_insert_locked(h, x, y, z, val, radius);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
@@ -371,8 +384,9 @@ move(self, handle, x, y, ...)
     z = 0;
     if (items == 5) z = (double)SvNV(ST(4));
     else if (items != 4) croak("move: expected (handle,x,y) or (handle,x,y,z)");
+    REEXTRACT(self);
     sph_rwlock_wrlock(h);
-    RETVAL = sph_move_locked(h, (uint32_t)handle, x, y, z);
+    RETVAL = sph_move_locked(h, sph_idx(handle), x, y, z);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
   OUTPUT:
@@ -386,7 +400,7 @@ remove(self, handle)
     EXTRACT(self);
   CODE:
     sph_rwlock_wrlock(h);
-    RETVAL = sph_remove_locked(h, (uint32_t)handle);
+    RETVAL = sph_remove_locked(h, sph_idx(handle));
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
   OUTPUT:
@@ -400,7 +414,7 @@ has(self, handle)
     EXTRACT(self);
   CODE:
     sph_rwlock_rdlock(h);
-    RETVAL = sph_is_live(h, (uint32_t)handle);
+    RETVAL = sph_is_live(h, sph_idx(handle));
     sph_rwlock_rdunlock(h);
   OUTPUT:
     RETVAL
@@ -413,8 +427,8 @@ value(self, handle)
     EXTRACT(self);
   CODE:
     sph_rwlock_rdlock(h);
-    REQUIRE_LIVE_RD(h, (uint32_t)handle);
-    RETVAL = (IV)h->entries[(uint32_t)handle].value;
+    REQUIRE_LIVE_RD(h, sph_idx(handle));
+    RETVAL = (IV)h->entries[sph_idx(handle)].value;
     sph_rwlock_rdunlock(h);
   OUTPUT:
     RETVAL
@@ -428,8 +442,8 @@ set_value(self, handle, v)
     EXTRACT(self);
   CODE:
     sph_rwlock_wrlock(h);
-    REQUIRE_LIVE(h, (uint32_t)handle);
-    h->entries[(uint32_t)handle].value = (int64_t)v;
+    REQUIRE_LIVE(h, sph_idx(handle));
+    h->entries[sph_idx(handle)].value = (int64_t)v;
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
 
@@ -443,8 +457,8 @@ set_radius(self, handle, radius)
   CODE:
     if (radius < 0 || !isfinite(radius)) croak("set_radius: radius must be a finite number >= 0");
     sph_rwlock_wrlock(h);
-    REQUIRE_LIVE(h, (uint32_t)handle);
-    h->entries[(uint32_t)handle].radius = (double)radius;
+    REQUIRE_LIVE(h, sph_idx(handle));
+    h->entries[sph_idx(handle)].radius = (double)radius;
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
 
@@ -456,8 +470,8 @@ get_radius(self, handle)
     EXTRACT(self);
   CODE:
     sph_rwlock_rdlock(h);
-    REQUIRE_LIVE_RD(h, (uint32_t)handle);
-    RETVAL = h->entries[(uint32_t)handle].radius;
+    REQUIRE_LIVE_RD(h, sph_idx(handle));
+    RETVAL = h->entries[sph_idx(handle)].radius;
     sph_rwlock_rdunlock(h);
   OUTPUT:
     RETVAL
@@ -470,15 +484,21 @@ move_many(self, rows)
     EXTRACT(self);
     IV moved;
   CODE:
+    SvGETMAGIC(rows);
     if (!SvROK(rows) || SvTYPE(SvRV(rows)) != SVt_PVAV)
         croak("move_many: expected an arrayref of [handle,x,y] or [handle,x,y,z]");
     {
     AV *av = (AV *)SvRV(rows);
     SSize_t nr = av_len(av) + 1;
+    struct mm_row { uint32_t handle; double x, y, z; int valid; } *R = NULL;
     moved = 0;
-    sph_rwlock_wrlock(h);
+    if (nr > 0) { Newxz(R, nr, struct mm_row); SAVEFREEPV(R); }
+    /* Phase 1: resolve all user-controlled conversions with NO lock held.
+       SvUV/SvNV run get-magic/overload = arbitrary Perl that may die; doing it
+       here (lock-free) means a longjmp can't strand the write lock. */
     for (SSize_t i = 0; i < nr; i++) {
         SV **rv = av_fetch(av, i, 0);
+        if (rv) SvGETMAGIC(*rv);   /* a tied-array element is a deferred-magic PVLV */
         if (!rv || !SvROK(*rv) || SvTYPE(SvRV(*rv)) != SVt_PVAV) continue;
         AV *row = (AV *)SvRV(*rv);
         SSize_t rl = av_len(row) + 1;
@@ -486,7 +506,18 @@ move_many(self, rows)
         SV **hp = av_fetch(row, 0, 0), **xp = av_fetch(row, 1, 0), **yp = av_fetch(row, 2, 0);
         SV **zp = (rl == 4) ? av_fetch(row, 3, 0) : NULL;
         if (!hp || !xp || !yp) continue;
-        if (sph_move_locked(h, (uint32_t)SvUV(*hp), SvNV(*xp), SvNV(*yp), zp ? SvNV(*zp) : 0.0)) moved++;
+        R[i].handle = sph_idx(SvUV(*hp));
+        R[i].x = SvNV(*xp);
+        R[i].y = SvNV(*yp);
+        R[i].z = zp ? SvNV(*zp) : 0.0;
+        R[i].valid = 1;
+    }
+    /* Phase 2: pure C under the write lock, using pre-resolved values only. */
+    REEXTRACT(self);
+    sph_rwlock_wrlock(h);
+    for (SSize_t i = 0; i < nr; i++) {
+        if (!R[i].valid) continue;
+        if (sph_move_locked(h, R[i].handle, R[i].x, R[i].y, R[i].z)) moved++;
     }
     if (nr > 0) __atomic_fetch_add(&h->hdr->stat_ops, (uint64_t)nr, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
@@ -502,16 +533,25 @@ insert_many(self, rows)
   PREINIT:
     EXTRACT(self);
   PPCODE:
+    SvGETMAGIC(rows);
     if (!SvROK(rows) || SvTYPE(SvRV(rows)) != SVt_PVAV)
         croak("insert_many: expected an arrayref of [x,y,value] or [x,y,value,radius]");
     {
     AV *av = (AV *)SvRV(rows);
     SSize_t nr = av_len(av) + 1;
+    struct im_row { double x, y, rad; int64_t val; int valid; } *R = NULL;
+    uint32_t *ids = NULL;
     EXTEND(SP, nr);
-    sph_rwlock_wrlock(h);
+    if (nr > 0) {
+        Newxz(R, nr, struct im_row);   SAVEFREEPV(R);
+        Newx(ids, nr, uint32_t);       SAVEFREEPV(ids);
+    }
+    /* Phase 1: resolve all user-controlled conversions with NO lock held.
+       SvNV/SvIV run get-magic/overload = arbitrary Perl that may die; doing it
+       here (lock-free) means a longjmp can't strand the write lock. */
     for (SSize_t i = 0; i < nr; i++) {
-        uint32_t idx = SPH_NONE;
         SV **rv = av_fetch(av, i, 0);
+        if (rv) SvGETMAGIC(*rv);   /* a tied-array element is a deferred-magic PVLV */
         if (rv && SvROK(*rv) && SvTYPE(SvRV(*rv)) == SVt_PVAV) {
             AV *row = (AV *)SvRV(*rv);
             SSize_t rl = av_len(row) + 1;
@@ -520,18 +560,31 @@ insert_many(self, rows)
                 SV **rp = (rl == 4) ? av_fetch(row, 3, 0) : NULL;
                 if (xp && yp && vp) {
                     double rad = rp ? SvNV(*rp) : 0.0;
-                    /* skip a row with a bad radius (-> undef handle), like other
-                       malformed rows; can't croak here -- we hold the write lock */
-                    if (rad >= 0 && isfinite(rad))
-                        idx = sph_insert_locked(h, SvNV(*xp), SvNV(*yp), 0.0,
-                                                (int64_t)SvIV(*vp), rad);
+                    /* a row with a bad radius yields an undef handle, like other
+                       malformed rows */
+                    if (rad >= 0 && isfinite(rad)) {
+                        R[i].x = SvNV(*xp);
+                        R[i].y = SvNV(*yp);
+                        R[i].val = (int64_t)SvIV(*vp);
+                        R[i].rad = rad;
+                        R[i].valid = 1;
+                    }
                 }
             }
         }
-        PUSHs(idx == SPH_NONE ? &PL_sv_undef : sv_2mortal(newSVuv(idx)));
     }
+    /* Phase 2: pure C under the write lock into a C result buffer. */
+    REEXTRACT(self);
+    sph_rwlock_wrlock(h);
+    for (SSize_t i = 0; i < nr; i++)
+        ids[i] = R[i].valid
+            ? sph_insert_locked(h, R[i].x, R[i].y, 0.0, R[i].val, R[i].rad)
+            : SPH_NONE;
     if (nr > 0) __atomic_fetch_add(&h->hdr->stat_ops, (uint64_t)nr, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
+    /* Phase 3: build result SVs after the lock is released. */
+    for (SSize_t i = 0; i < nr; i++)
+        PUSHs(ids[i] == SPH_NONE ? &PL_sv_undef : sv_2mortal(newSVuv(ids[i])));
     }
 
 void
@@ -543,10 +596,10 @@ position(self, handle)
     double px, py, pz;
   PPCODE:
     sph_rwlock_rdlock(h);
-    REQUIRE_LIVE_RD(h, (uint32_t)handle);
-    px = h->entries[(uint32_t)handle].pos[0];
-    py = h->entries[(uint32_t)handle].pos[1];
-    pz = h->entries[(uint32_t)handle].pos[2];
+    REQUIRE_LIVE_RD(h, sph_idx(handle));
+    px = h->entries[sph_idx(handle)].pos[0];
+    py = h->entries[sph_idx(handle)].pos[1];
+    pz = h->entries[sph_idx(handle)].pos[2];
     sph_rwlock_rdunlock(h);
     EXTEND(SP, 3);
     PUSHs(sv_2mortal(newSVnv(px)));
@@ -564,6 +617,7 @@ query_cell(self, x, y, ...)
     if (items != 3 && items != 4) croak("query_cell: (x,y) or (x,y,z)");
     int dims = (items == 4) ? 3 : 2;
     double p[3] = { x, y, dims==3 ? (double)SvNV(ST(3)) : 0 };
+    REEXTRACT(self);
     EMIT_QUERY(sph_query_cell(h, p, dims, &col));
 
 void
@@ -579,6 +633,7 @@ query_aabb(self, ...)
         lo[0]=SvNV(ST(1)); lo[1]=SvNV(ST(2)); lo[2]=SvNV(ST(3));
         hi[0]=SvNV(ST(4)); hi[1]=SvNV(ST(5)); hi[2]=SvNV(ST(6));
     } else croak("query_aabb: (x0,y0,x1,y1) or (x0,y0,z0,x1,y1,z1)");
+    REEXTRACT(self);
     EMIT_QUERY(sph_query_aabb(h, lo, hi, dims, &col));
 
 void
@@ -592,6 +647,7 @@ query_radius(self, ...)
     else if (items == 5) { dims = 3; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); c[2]=SvNV(ST(3)); r=SvNV(ST(4)); }
     else croak("query_radius: (x,y,r) or (x,y,z,r)");
     if (r < 0 || !isfinite(r)) croak("query_radius: r must be a finite number >= 0");
+    REEXTRACT(self);
     EMIT_QUERY(sph_query_radius(h, c, r, dims, &col));
 
 # Batched broad-phase: N radius queries under ONE read lock. Returns an arrayref of
@@ -606,6 +662,7 @@ query_radius_many(self, queries)
   PREINIT:
     EXTRACT(self);
   CODE:
+    SvGETMAGIC(queries);
     if (!SvROK(queries) || SvTYPE(SvRV(queries)) != SVt_PVAV)
         croak("query_radius_many: expected an arrayref of [x,y,r] or [x,y,z,r]");
     {
@@ -614,10 +671,15 @@ query_radius_many(self, queries)
     AV *out = newAV();
     if (nq > 0) av_extend(out, nq - 1);
     int err = 0;                                  /* 0 ok, 1 OOM, 2 TOOBIG */
-    sph_rwlock_rdlock(h);                          /* one lock for the whole batch */
-    for (SSize_t i = 0; i < nq && !err; i++) {
-        AV *res = newAV();
+    struct qr_row { double c[3]; double r; int dims; } *Q = NULL;
+    if (nq > 0) { Newxz(Q, nq, struct qr_row); SAVEFREEPV(Q); }
+    /* Phase 1: resolve all user-controlled conversions with NO lock held.
+       SvNV runs get-magic/overload = arbitrary Perl that may die; doing it here
+       (lock-free) means a longjmp can't strand the read lock. dims stays 0 for a
+       malformed query -> an empty result slot. */
+    for (SSize_t i = 0; i < nq; i++) {
         SV **qp = av_fetch(qav, i, 0);
+        if (qp) SvGETMAGIC(*qp);   /* a tied-array element is a deferred-magic PVLV */
         if (qp && SvROK(*qp) && SvTYPE(SvRV(*qp)) == SVt_PVAV) {
             AV *q = (AV *)SvRV(*qp);
             SSize_t ql = av_len(q) + 1;
@@ -630,25 +692,45 @@ query_radius_many(self, queries)
                 if (x && y && z && rr) { dims=3; c[0]=SvNV(*x); c[1]=SvNV(*y); c[2]=SvNV(*z); r=SvNV(*rr); }
             }
             if (dims && r >= 0 && isfinite(r)) {
-                sph_collect_t col = { NULL, 0, 0 };
-                int rc = sph_query_radius(h, c, r, dims, &col);
-                if (rc == SPH_Q_OOM)         { free(col.vals); err = 1; }
-                else if (rc == SPH_Q_TOOBIG) { free(col.vals); err = 2; }
-                else {
-                    if (col.n) av_extend(res, (SSize_t)col.n - 1);
-                    for (size_t k = 0; k < col.n; k++) av_push(res, newSViv((IV)col.vals[k]));
-                    free(col.vals);
-                }
+                Q[i].c[0]=c[0]; Q[i].c[1]=c[1]; Q[i].c[2]=c[2]; Q[i].r=r; Q[i].dims=dims;
             }
-            /* else: malformed query -> empty res (cannot croak under the lock) */
         }
-        av_push(out, newRV_noinc((SV *)res));      /* out owns res, even on the error path */
+    }
+    /* Phase 2: run the queries under one read lock, collecting raw ids into C
+       buffers only.  Building the Perl result tree here (newAV/newSViv/av_push)
+       could hit an allocation failure -> Perl longjmps out with the read lock
+       still held, permanently stranding this process's rdepth (a later writer
+       then hangs forever draining it).  So we defer ALL SV building to Phase 3,
+       after rdunlock -- matching EMIT_QUERY and every sibling query method. */
+    sph_collect_t *R = NULL;
+    if (nq > 0) { Newxz(R, nq, sph_collect_t); SAVEFREEPV(R); }
+    REEXTRACT(self);
+    sph_rwlock_rdlock(h);                          /* one lock for the whole batch */
+    for (SSize_t i = 0; i < nq && !err; i++) {
+        if (Q[i].dims) {
+            sph_collect_t col = { NULL, 0, 0 };
+            int rc = sph_query_radius(h, Q[i].c, Q[i].r, Q[i].dims, &col);
+            if (rc == SPH_Q_OOM)         { free(col.vals); err = 1; }
+            else if (rc == SPH_Q_TOOBIG) { free(col.vals); err = 2; }
+            else R[i] = col;                       /* transfer ownership of col.vals */
+        }
     }
     sph_rwlock_rdunlock(h);
     if (err) {
-        SvREFCNT_dec((SV *)out);                   /* frees out + every res pushed so far */
+        for (SSize_t i = 0; i < nq; i++) free(R[i].vals);   /* free what Phase 2 collected */
+        SvREFCNT_dec((SV *)out);
         if (err == 1) croak("query_radius_many: out of memory");
         croak(SPH_TOOBIG_MSG, (unsigned)SPH_MAX_QUERY_CELLS);
+    }
+    /* Phase 3: build the Perl result tree with NO lock held. */
+    for (SSize_t i = 0; i < nq; i++) {
+        AV *res = newAV();
+        if (R[i].n) {
+            av_extend(res, (SSize_t)R[i].n - 1);
+            for (size_t k = 0; k < R[i].n; k++) av_push(res, newSViv((IV)R[i].vals[k]));
+        }
+        free(R[i].vals);                           /* malloc'd by sph_query_radius */
+        av_push(out, newRV_noinc((SV *)res));      /* out owns res */
     }
     RETVAL = newRV_noinc((SV *)out);
     }
@@ -691,7 +773,7 @@ move_geo(self, handle, lat, lon, alt)
     if (!(h->hdr->sphere_radius > 0.0)) croak("move_geo: map was not created with sphere => R");
     sph_geo_to_xyz(h->hdr->sphere_radius, lat, lon, alt, xyz);
     sph_rwlock_wrlock(h);
-    RETVAL = sph_move_locked(h, (uint32_t)handle, xyz[0], xyz[1], xyz[2]);
+    RETVAL = sph_move_locked(h, sph_idx(handle), xyz[0], xyz[1], xyz[2]);
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     sph_rwlock_wrunlock(h);
   OUTPUT:
@@ -707,10 +789,10 @@ position_geo(self, handle)
   PPCODE:
     if (!(h->hdr->sphere_radius > 0.0)) croak("position_geo: map was not created with sphere => R");
     sph_rwlock_rdlock(h);
-    REQUIRE_LIVE_RD(h, (uint32_t)handle);
-    p[0] = h->entries[(uint32_t)handle].pos[0];
-    p[1] = h->entries[(uint32_t)handle].pos[1];
-    p[2] = h->entries[(uint32_t)handle].pos[2];
+    REQUIRE_LIVE_RD(h, sph_idx(handle));
+    p[0] = h->entries[sph_idx(handle)].pos[0];
+    p[1] = h->entries[sph_idx(handle)].pos[1];
+    p[2] = h->entries[sph_idx(handle)].pos[2];
     sph_rwlock_rdunlock(h);
     sph_geo_of_xyz(h->hdr->sphere_radius, p, &lat, &lon, &alt);
     EXTEND(SP, 3);
@@ -862,11 +944,13 @@ void query_knn(self, ...)
   PREINIT:
     EXTRACT(self);
   PPCODE:
-    double c[3] = {0,0,0}; uint32_t k; int dims;
-    if (items == 4) { dims = 2; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); k=(uint32_t)SvUV(ST(3)); }
-    else if (items == 5) { dims = 3; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); c[2]=SvNV(ST(3)); k=(uint32_t)SvUV(ST(4)); }
+    double c[3] = {0,0,0}; uint32_t k; int dims; IV kiv;
+    if (items == 4) { dims = 2; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); kiv=SvIV(ST(3)); }
+    else if (items == 5) { dims = 3; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); c[2]=SvNV(ST(3)); kiv=SvIV(ST(4)); }
     else croak("query_knn: (x,y,k) or (x,y,z,k)");
-    if (k == 0) croak("query_knn: k must be >= 1");
+    if (kiv < 1) croak("query_knn: k must be >= 1");   /* SvIV so a negative k is caught (SvUV would wrap it to a huge k) */
+    k = kiv > (IV)UINT32_MAX ? UINT32_MAX : (uint32_t)kiv;   /* clamp an absurd k; knn caps at count anyway */
+    REEXTRACT(self);
     EMIT_QUERY(sph_query_knn(h, c, k, dims, &col));
 
 void each_in_radius(self, ...)
@@ -879,10 +963,12 @@ void each_in_radius(self, ...)
     if (items == 5) { dims=2; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); r=SvNV(ST(3)); cb=ST(4); }
     else if (items == 6) { dims=3; c[0]=SvNV(ST(1)); c[1]=SvNV(ST(2)); c[2]=SvNV(ST(3)); r=SvNV(ST(4)); cb=ST(5); }
     else croak("each_in_radius: (x,y,r,cb) or (x,y,z,r,cb)");
+    SvGETMAGIC(cb);   /* a tied/overloaded scalar may FETCH to a coderef */
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV) croak("each_in_radius: last arg must be a coderef");
     if (r < 0 || !isfinite(r)) croak("each_in_radius: r must be a finite number >= 0");
     /* snapshot under lock */
     sph_collect_t col = { NULL, 0, 0 };
+    REEXTRACT(self);
     sph_rwlock_rdlock(h);
     int rc = sph_query_radius(h, c, r, dims, &col);
     sph_rwlock_rdunlock(h);
@@ -908,8 +994,10 @@ each_pair_within(self, max_r, cb)
   PREINIT:
     EXTRACT(self);
   PPCODE:
+    SvGETMAGIC(cb);   /* a tied/overloaded scalar may FETCH to a coderef */
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV) croak("each_pair_within: last arg must be a coderef");
     if (max_r < 0 || !isfinite(max_r)) croak("each_pair_within: max_r must be a finite number >= 0");
+    REEXTRACT(self);
     EMIT_PAIRS(sph_pairs(h, (double)max_r, sph_pair_to_collect, &col));
 
 void
@@ -919,7 +1007,9 @@ each_colliding_pair(self, cb)
   PREINIT:
     EXTRACT(self);
   PPCODE:
+    SvGETMAGIC(cb);   /* a tied/overloaded scalar may FETCH to a coderef */
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV) croak("each_colliding_pair: arg must be a coderef");
+    REEXTRACT(self);
     EMIT_PAIRS(sph_pairs(h, -1.0, sph_pair_to_collect, &col));
 
 void clear(self)

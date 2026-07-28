@@ -102,6 +102,31 @@ STATS
     stats() returns a hashref: "size", "capacity", "head", "count",
     "writes", "overwrites", "mmap_size".
 
+CONCURRENCY AND CRASH SAFETY
+    The ring is lock-free: there are no mutexes or rwlocks. A writer claims
+    a unique, monotonically increasing position with a single atomic
+    increment of the head counter, so multiple writer and reader processes
+    may share one buffer concurrently. Writes always succeed and never
+    block; when the buffer is full the oldest slot is overwritten.
+
+    Each slot carries a publication sequence used as a seqlock. A reader
+    loads the sequence, copies the value, then re-checks the sequence; if a
+    write was in progress or the slot has since been overwritten, the read
+    is retried and ultimately reports "no value" ("latest" and "read_seq"
+    return "undef"). A reader therefore never observes a torn or
+    half-written value.
+
+    If a writer crashes mid-write, its slot is left marked in-progress.
+    Readers skip that slot (returning "undef") rather than block, and after
+    a short recovery timeout a later writer reclaims the slot and overwrites
+    the partial data. Because there are no locks, a crash can never orphan
+    one and wedge other processes; the buffer as a whole stays usable.
+    "wait_for" blocks on a futex over an internal wake counter, so a crashed
+    waiter cannot stall writers either.
+
+    "clear" is not concurrency-safe: call it only when no other process is
+    writing to the buffer.
+
 SECURITY
     Backing files are created with mode 0600 (owner-only) by default, so
     only the creating user can open and attach them. To share a backing file

@@ -13,3 +13,10 @@
 # limitations under the License.
 
 package Google::Auth::IDTokens;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+1;

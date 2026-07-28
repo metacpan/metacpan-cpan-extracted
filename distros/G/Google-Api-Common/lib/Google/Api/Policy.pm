@@ -3,7 +3,7 @@ package Google::Api::Policy;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.11';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -11,7 +11,7 @@ use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Protobuf };
+    eval { require Google::Protobuf::Descriptor };
     my $descriptor_b64 = <<'EOF';
 Chdnb29nbGUvYXBpL3BvbGljeS5wcm90bxIKZ29vZ2xlLmFwaRogZ29vZ2xlL3Byb3RvYnVm
 L2Rlc2NyaXB0b3IucHJvdG8ifwoLRmllbGRQb2xpY3kSGgoIc2VsZWN0b3IYASABKAlSCHNl
@@ -161,3 +161,21 @@ Type: Message (.google.api.FieldPolicy)
 =cut
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Api::Policy - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

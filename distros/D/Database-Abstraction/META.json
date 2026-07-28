@@ -47,6 +47,8 @@
             "Params::Get" : "0.13",
             "Return::Set" : "0",
             "Scalar::Util" : "0",
+            "Sub::Private" : "0",
+            "Sub::Protected" : "0",
             "autodie" : "0",
             "boolean" : "0",
             "perl" : "5.010",
@@ -96,6 +98,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

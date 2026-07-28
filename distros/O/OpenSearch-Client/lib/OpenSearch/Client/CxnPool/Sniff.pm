@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::CxnPool::Sniff;
-$OpenSearch::Client::CxnPool::Sniff::VERSION = '3.007009';
+$OpenSearch::Client::CxnPool::Sniff::VERSION = '3.007010';
 use Moo;
 with 'OpenSearch::Client::Role::CxnPool::Sniff',
     'OpenSearch::Client::Role::Is_Sync';
@@ -101,11 +101,11 @@ OpenSearch::Client::CxnPool::Sniff - A CxnPool for connecting to a local cluster
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 SYNOPSIS
 
-    $e = OpenSearch::Client->new(
+    $os = OpenSearch::Client->new(
         cxn_pool => 'Sniff',
         nodes    => [
             'search1:9200',
@@ -136,6 +136,7 @@ in the cluster will accept.
 This class does L<OpenSearch::Client::Role::CxnPool::Sniff> and
 L<OpenSearch::Client::Role::Is_Sync>.
 
+
 =head1 CONFIGURATION
 
 =head2 C<nodes>
@@ -144,6 +145,24 @@ The list of nodes to use to discover the cluster.  Can accept a single node,
 multiple nodes, and defaults to C<localhost:9200> if no C<nodes> are
 specified. See L<OpenSearch::Client::Role::Cxn/node> for details of the node
 specification.
+
+=head2 C<use_https>
+
+The nodes specified for the L<Sniff|OpenSearch::Client::CxnPool::Sniff> connection pool are used to I<discover> the cluster.
+If your cluster is served by nodes over HTTPS you must specify C<use_https> when creating your client.
+It is not enough ( or necessary ) to indicate the scheme for the discovery nodes alone.
+
+    $os = OpenSearch::Client->new(
+        cxn_pool => 'Sniff',
+        nodes    => [
+            'search1:9200',
+            'search2:9200'
+        ],
+        use_https  => 1,             # required for an HTTPS cluster
+        ...
+        ...
+    );
+
 
 =head2 See also
 

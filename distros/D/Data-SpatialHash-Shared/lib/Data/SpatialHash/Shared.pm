@@ -1,7 +1,7 @@
 package Data::SpatialHash::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::SpatialHash::Shared', $VERSION);
 
@@ -74,7 +74,9 @@ more bucket lookups.
 =head2 2D vs 3D
 
 All methods that accept coordinates accept either (x, y) or (x, y, z).
-When z is omitted it is treated as 0.  A handle created with a 2D
+When z is omitted it is treated as 0, so a 2D query matches the z=0 cell layer
+(points within one C<cell_size> of the z=0 plane), not an infinite z-column, and
+z does not enter the distance for a 2D call.  A handle created with a 2D
 insert can be queried with either 2D or 3D calls.
 
 =head2 Toroidal space
@@ -115,7 +117,9 @@ unbounded Euclidean space.
 
 When reopening an existing backing file or memfd, the stored header wins: the
 caller's C<$max>, C<$buckets>, C<$cell>, C<wrap>, and C<sphere> arguments are
-ignored and the file's original values are used.
+ignored and the file's original values are used. They are still validated for
+well-formedness first (for example a non-positive C<$cell> croaks), so pass
+plausible values even on a reopen; only the stored geometry is authoritative.
 
 C<new_memfd> creates a Linux memfd (anonymous but transferable via C<memfd>
 file descriptor).  C<new_from_fd> reopens an existing memfd in another
@@ -427,6 +431,18 @@ the same PID as a dead lock holder before recovery runs, the stale lock
 may not be released automatically.  This edge case requires the kernel
 to reassign PIDs faster than lock-recovery attempts, which is very
 unlikely in practice but cannot be ruled out.
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

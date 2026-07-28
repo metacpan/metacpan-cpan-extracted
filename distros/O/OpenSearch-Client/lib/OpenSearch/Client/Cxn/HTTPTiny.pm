@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Cxn::HTTPTiny;
-$OpenSearch::Client::Cxn::HTTPTiny::VERSION = '3.007009';
+$OpenSearch::Client::Cxn::HTTPTiny::VERSION = '3.007010';
 use Moo;
 with 'OpenSearch::Client::Role::Cxn', 'OpenSearch::Client::Role::Is_Sync';
 
@@ -110,7 +110,7 @@ OpenSearch::Client::Cxn::HTTPTiny - A Cxn implementation which uses HTTP::Tiny
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 DESCRIPTION
 
@@ -133,9 +133,11 @@ From L<OpenSearch::Client::Role::Cxn>
 
 =item * L<max_content_length|OpenSearch::Client::Role::Cxn/"max_content_length">
 
-=item * L<deflate|OpenSearch::Client::Role::Cxn/"gzip">
+=item * L<gzip|OpenSearch::Client::Role::Cxn/"gzip">
 
 =item * L<deflate|OpenSearch::Client::Role::Cxn/"deflate">
+
+=item * L<application_id|OpenSearch::Client::Role::Cxn/"application_id">
 
 =item * L<request_timeout|OpenSearch::Client::Role::Cxn/"request_timeout">
 
@@ -151,7 +153,7 @@ From L<OpenSearch::Client::Role::Cxn>
 
 =item * L<handle_args|OpenSearch::Client::Role::Cxn/"handle_args">
 
-=item * L<handle_args|OpenSearch::Client::Role::Cxn/"default_qs_params">
+=item * L<default_qs_params|OpenSearch::Client::Role::Cxn/"default_qs_params">
 
 =back
 

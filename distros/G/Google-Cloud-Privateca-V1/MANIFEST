@@ -1,0 +1,21 @@
+Changes
+ignore.txt
+lib/Google/Cloud/Privateca/V1.pm
+lib/Google/Cloud/Privateca/V1/CertificateAuthorityServiceClient.pm
+lib/Google/Cloud/Security/Privateca/V1/Resources.pm
+lib/Google/Cloud/Security/Privateca/V1/Resources/Types.pm
+lib/Google/Cloud/Security/Privateca/V1/Service.pm
+lib/Google/Cloud/Security/Privateca/V1/Service/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-service-CertificateAuthorityService.t
+t/02-rest-transport-CertificateAuthorityService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,14 @@
 Revision history for Redis
 
+0.39 2026-07-27T13:49:06Z
+    - Avoid constructor failures when IO::Socket::SSL is unavailable #162
+
+0.38 2026-07-27T12:41:46Z
+    - bump hiredis v1.4.0 #149
+    - drop support of Perl 5.22 #159
+
 0.37 2024-03-08T16:30:20Z
-    -  Add SSL/TLS support #150 (thanks @thomas-netcraft)
+    - Add SSL/TLS support #150 (thanks @thomas-netcraft)
     - drop support of Perl 5.12 #151
     - bump hiredis v1.2.0 #152
 

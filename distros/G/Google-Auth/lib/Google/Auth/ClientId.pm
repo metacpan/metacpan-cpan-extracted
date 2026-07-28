@@ -19,6 +19,6 @@ use strict;
 
 #my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 
-our $VERSION = 0.02;
+our $VERSION = '0.05';
 
 1;

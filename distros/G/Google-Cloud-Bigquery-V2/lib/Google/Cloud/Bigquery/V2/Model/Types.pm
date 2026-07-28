@@ -1,17 +1,3 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::Model::Types;
 
 use strict;
@@ -81,9 +67,6 @@ declare 'DistanceType',
 declare 'DataSplitMethod',
     as (Int | Str);
 
-declare 'LabelImputationMethod',
-    as (Int | Str);
-
 declare 'DataFrequency',
     as (Int | Str);
 
@@ -101,27 +84,6 @@ declare 'OptimizationStrategy',
 
 declare 'FeedbackType',
     as (Int | Str);
-
-declare 'OptimizationObjectiveType',
-    as (Int | Str);
-
-declare 'TextEmbeddingMethod',
-    as (Int | Str);
-
-declare 'LabelsEntry',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry'];
-
-coerce 'LabelsEntry',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry'->new($_) };
-
-declare 'RepeatedLabelsEntry',
-    as ArrayRef[LabelsEntry()];
-
-coerce 'RepeatedLabelsEntry',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry'->new($_) } @$_ ] };
-
-declare 'MapStringLabelsEntry',
-    as HashRef[LabelsEntry()];
 
 declare 'SeasonalPeriod',
     as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::SeasonalPeriod'];
@@ -200,21 +162,6 @@ declare 'MapStringHparamTuningEnums',
 
 declare 'HparamTuningObjective',
     as (Int | Str);
-
-declare 'OptimizationObjectiveStruct',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::OptimizationObjectiveStruct'];
-
-coerce 'OptimizationObjectiveStruct',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::OptimizationObjectiveStruct'->new($_) };
-
-declare 'RepeatedOptimizationObjectiveStruct',
-    as ArrayRef[OptimizationObjectiveStruct()];
-
-coerce 'RepeatedOptimizationObjectiveStruct',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::OptimizationObjectiveStruct'->new($_) } @$_ ] };
-
-declare 'MapStringOptimizationObjectiveStruct',
-    as HashRef[OptimizationObjectiveStruct()];
 
 declare 'RegressionMetrics',
     as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::RegressionMetrics'];
@@ -471,81 +418,6 @@ coerce 'RepeatedDimensionalityReductionMetrics',
 declare 'MapStringDimensionalityReductionMetrics',
     as HashRef[DimensionalityReductionMetrics()];
 
-declare 'TextGenerationMetrics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::TextGenerationMetrics'];
-
-coerce 'TextGenerationMetrics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::TextGenerationMetrics'->new($_) };
-
-declare 'RepeatedTextGenerationMetrics',
-    as ArrayRef[TextGenerationMetrics()];
-
-coerce 'RepeatedTextGenerationMetrics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::TextGenerationMetrics'->new($_) } @$_ ] };
-
-declare 'MapStringTextGenerationMetrics',
-    as HashRef[TextGenerationMetrics()];
-
-declare 'SummarizationMetrics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::SummarizationMetrics'];
-
-coerce 'SummarizationMetrics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::SummarizationMetrics'->new($_) };
-
-declare 'RepeatedSummarizationMetrics',
-    as ArrayRef[SummarizationMetrics()];
-
-coerce 'RepeatedSummarizationMetrics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::SummarizationMetrics'->new($_) } @$_ ] };
-
-declare 'MapStringSummarizationMetrics',
-    as HashRef[SummarizationMetrics()];
-
-declare 'QuestionAnsweringMetrics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::QuestionAnsweringMetrics'];
-
-coerce 'QuestionAnsweringMetrics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::QuestionAnsweringMetrics'->new($_) };
-
-declare 'RepeatedQuestionAnsweringMetrics',
-    as ArrayRef[QuestionAnsweringMetrics()];
-
-coerce 'RepeatedQuestionAnsweringMetrics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::QuestionAnsweringMetrics'->new($_) } @$_ ] };
-
-declare 'MapStringQuestionAnsweringMetrics',
-    as HashRef[QuestionAnsweringMetrics()];
-
-declare 'ClassificationMetrics',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::ClassificationMetrics'];
-
-coerce 'ClassificationMetrics',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::ClassificationMetrics'->new($_) };
-
-declare 'RepeatedClassificationMetrics',
-    as ArrayRef[ClassificationMetrics()];
-
-coerce 'RepeatedClassificationMetrics',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::ClassificationMetrics'->new($_) } @$_ ] };
-
-declare 'MapStringClassificationMetrics',
-    as HashRef[ClassificationMetrics()];
-
-declare 'PerClassMetricsEntry',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::ClassificationMetrics::PerClassMetricsEntry'];
-
-coerce 'PerClassMetricsEntry',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::ClassificationMetrics::PerClassMetricsEntry'->new($_) };
-
-declare 'RepeatedPerClassMetricsEntry',
-    as ArrayRef[PerClassMetricsEntry()];
-
-coerce 'RepeatedPerClassMetricsEntry',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::ClassificationMetrics::PerClassMetricsEntry'->new($_) } @$_ ] };
-
-declare 'MapStringPerClassMetricsEntry',
-    as HashRef[PerClassMetricsEntry()];
-
 declare 'EvaluationMetrics',
     as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::EvaluationMetrics'];
 
@@ -654,42 +526,6 @@ declare 'MapStringCategoryEncodingMethod',
 declare 'EncodingMethod',
     as (Int | Str);
 
-declare 'PreprocessMethod',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::PreprocessMethod'];
-
-coerce 'PreprocessMethod',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::PreprocessMethod'->new($_) };
-
-declare 'RepeatedPreprocessMethod',
-    as ArrayRef[PreprocessMethod()];
-
-coerce 'RepeatedPreprocessMethod',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::PreprocessMethod'->new($_) } @$_ ] };
-
-declare 'MapStringPreprocessMethod',
-    as HashRef[PreprocessMethod()];
-
-declare 'NumericalPreprocessMethod',
-    as (Int | Str);
-
-declare 'Seasonality',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::Seasonality'];
-
-coerce 'Seasonality',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::Seasonality'->new($_) };
-
-declare 'RepeatedSeasonality',
-    as ArrayRef[Seasonality()];
-
-coerce 'RepeatedSeasonality',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::Seasonality'->new($_) } @$_ ] };
-
-declare 'MapStringSeasonality',
-    as HashRef[Seasonality()];
-
-declare 'SeasonalityType',
-    as (Int | Str);
-
 declare 'PcaSolverOptionEnums',
     as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::PcaSolverOptionEnums'];
 
@@ -755,9 +591,6 @@ coerce 'RepeatedTrainingOptions',
 
 declare 'MapStringTrainingOptions',
     as HashRef[TrainingOptions()];
-
-declare 'PruningMethod',
-    as (Int | Str);
 
 declare 'ReservationAffinityType',
     as (Int | Str);
@@ -1035,20 +868,20 @@ declare 'MapStringHparamTuningTrial',
 declare 'TrialStatus',
     as (Int | Str);
 
-declare 'ServingConfig',
-    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::ServingConfig'];
+declare 'LabelsEntry',
+    as InstanceOf['Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry'];
 
-coerce 'ServingConfig',
-    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::ServingConfig'->new($_) };
+coerce 'LabelsEntry',
+    from HashRef, via { 'Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry'->new($_) };
 
-declare 'RepeatedServingConfig',
-    as ArrayRef[ServingConfig()];
+declare 'RepeatedLabelsEntry',
+    as ArrayRef[LabelsEntry()];
 
-coerce 'RepeatedServingConfig',
-    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::ServingConfig'->new($_) } @$_ ] };
+coerce 'RepeatedLabelsEntry',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry'->new($_) } @$_ ] };
 
-declare 'MapStringServingConfig',
-    as HashRef[ServingConfig()];
+declare 'MapStringLabelsEntry',
+    as HashRef[LabelsEntry()];
 
 declare 'GetModelRequest',
     as InstanceOf['Google::Cloud::Bigquery::V2::Model::GetModelRequest'];
@@ -1126,3 +959,21 @@ declare 'MapStringListModelsResponse',
     as HashRef[ListModelsResponse()];
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::Model::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

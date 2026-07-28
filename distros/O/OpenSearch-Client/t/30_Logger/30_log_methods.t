@@ -24,7 +24,7 @@ use Test::More;
 use Test::Exception;
 use OpenSearch::Client;
 
-do './t/lib/LogCallback.pl' or die( $@ || $! );
+do './t/lib/LogCapture.pl' or die( $@ || $! );
 
 isa_ok my $l = OpenSearch::Client->new->logger,
     'OpenSearch::Client::Logger::LogAny',
@@ -43,22 +43,23 @@ sub test_level {
     my $is_level = 'is_' . $level;
 
     # ->debug
-    ( $method, $format ) = ();
+    ( $method, $messagetext ) = ();
     ok $l->$level("foo"), "$level";
     is $method, $level, "$level - method";
-    is $format, "foo", "$level - format";
+    is $messagetext, "foo", "$level - format";
 
     # ->debugf
-    ( $method, $format ) = ();
+    ( $method, $messagetext ) = ();
     ok $l->$levelf( "foo %s", "bar" ), "$levelf";
     is $method, $level, "$levelf - method";
-    is $format, "foo bar", "$levelf - format";
-
-    # ->is_debug
-    ( $method, $format ) = ();
-    ok $l->$is_level(), "$is_level";
-    is $method, $is_level, "$is_level - method";
-    is $format, undef, "$is_level - format";
+    is $messagetext, "foo bar", "$levelf - format";
+    
+    ## ->is_debug - method is not reset here
+    ## now using Capture
+    ( $messagetext ) = ();
+    ok $l->$is_level(), "$is_level";    
+    is $method, $level, "$is_level - method";
+    is $messagetext, undef, "$is_level - format";
 }
 
 #===================================
@@ -67,12 +68,12 @@ sub test_throw {
     my $level = shift;
     my $throw = 'throw_' . $level;
     my $re    = qr/\[Request\] \*\* Foo/;
-    ( $method, $format ) = ();
+    ( $method, $messagetext ) = ();
 
     throws_ok { $l->$throw( 'Request', 'Foo', 42 ) } $re, $throw;
 
     is $@->{vars}, 42, "$throw - vars";
     is $method,   $level, "$throw - method";
-    like $format, $re,    "$throw - format";
+    like $messagetext, $re,    "$throw - format";
 
 }

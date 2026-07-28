@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 3;
+plan tests => 9;
 
 sub not_in_file_ok {
     my ($filename, %regex) = @_;
@@ -50,7 +50,13 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/DatasetServiceClient.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/JobServiceClient.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/ModelServiceClient.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/ProjectServiceClient.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/RoutineServiceClient.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/RowAccessPolicyServiceClient.pm');
+  module_boilerplate_ok('lib/Google/Cloud/Bigquery/V2/TableServiceClient.pm');
 
 
 }

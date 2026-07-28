@@ -6,7 +6,7 @@ Protobuf::Internal - Internal XS functions and utilities
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ require Protobuf;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our @EXPORT_OK = qw(
     class_name_to_full_name

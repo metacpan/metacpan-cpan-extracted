@@ -375,12 +375,23 @@ Set basic authentication credentials.
 
 Syntax:
 
-    auth user password
+    auth [authority realm] user password
+
+If you get back a 401, you can simply supply the matching
+user and password, as the authority and the realm are taken
+from the last response:
+
+        >get http://www.example.com
+        Retrieving http://www.example.com(401)
+        http://www.example.com>auth corion secret
+        http://www.example.com>get http://www.example.com
+        Retrieving http://www.example.com(200)
+        http://www.example.com>
 
 If you know the authority and the realm in advance, you can
 presupply the credentials, for example at the start of the script :
 
-        >auth corion secret
+        >auth www.example.com:80 secure_realm corion secret
         >get http://www.example.com
         Retrieving http://www.example.com(200)
         http://www.example.com>
@@ -741,7 +752,7 @@ The public support forum of this module is
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002-2023 Max Maischein
+Copyright (C) 2002-2026 Max Maischein
 
 # AUTHOR
 

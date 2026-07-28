@@ -54,6 +54,11 @@ our %Auth = ( use_https => 1, userinfo => $ENV{OS_USERINFO} );
 $ENV{OS_CXN_POOL} = 'Static';
 $Auth{ssl_options} = ssl_options();
 
+# Clear environment
+$ENV{OS_NO_SSL_VERIFY} = undef;
+$ENV{OS_USERINFO} = undef;
+$ENV{OS_ALWAYS_SSL} = undef;
+
 my $es = do "os_sync.pl" or die( $@ || $! );
 
 ok $es->cluster->health,

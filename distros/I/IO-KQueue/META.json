@@ -4,7 +4,7 @@
       "Matt Sergeant <matt@sergeant.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -39,14 +39,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/arc/p5-io-kqueue/issues"
+         "web" : "https://github.com/jbarrett/p5-io-kqueue/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/arc/p5-io-kqueue.git",
-         "web" : "https://github.com/arc/p5-io-kqueue"
+         "url" : "git://github.com/jbarrett/p5-io-kqueue.git",
+         "web" : "https://github.com/jbarrett/p5-io-kqueue"
       }
    },
-   "version" : "0.39",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

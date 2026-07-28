@@ -24,7 +24,7 @@ use Test::More;
 use Test::Exception;
 use OpenSearch::Client;
 
-do './t/lib/LogCallback.pl' or die( $@ || $! );
+do './t/lib/LogCapture.pl' or die( $@ || $! );
 
 ok my $e
     = OpenSearch::Client->new( nodes => 'https://foo.bar:444/some/path' ),
@@ -39,7 +39,7 @@ ok $c->does('OpenSearch::Client::Role::Cxn'),
 
 ok $l->trace_response( $c, 200, undef, 0.123 ), 'No body';
 
-is $format, <<"RESPONSE", 'No body - format';
+is $messagetext, <<"RESPONSE", 'No body - format';
 # Response: 200, Took: 123 ms
 #\x20
 RESPONSE
@@ -47,7 +47,7 @@ RESPONSE
 # Body
 
 ok $l->trace_response( $c, 200, { foo => 'bar' }, 0.123 ), 'Body';
-is $format, <<'RESPONSE', 'Body - format';
+is $messagetext, <<'RESPONSE', 'Body - format';
 # Response: 200, Took: 123 ms
 # {
 #    "foo" : "bar"

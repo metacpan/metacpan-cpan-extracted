@@ -1,4 +1,4 @@
-# -*- mode: cperl; mode: follow; -*-
+# -*- mode: cperl; eval: (follow-mode) -*-
 #
 
 package App::Regather::Plugin::configfile;

@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use Test::More tests => 4;
+use DBI;
+my $dbh = DBI->connect('dbi:Spanner:projects/p/instances/i/databases/d', '', '');
+my $sth = $dbh->prepare('SELECT id FROM users', { Async => 1 });
+is($sth->execute(), '0E0', 'Async execute returns 0E0');
+ok($sth->FETCH('AsyncWantRead'), 'AsyncWantRead active');
+ok($sth->async_read_ready(), 'async_read_ready');
+ok($sth->fetch_async_row(), 'fetch_async_row');

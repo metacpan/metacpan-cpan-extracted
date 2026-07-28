@@ -150,7 +150,7 @@ sub call {
 
     # Parse response
     my $content = $res->content;
-    return undef unless defined $content && length $content;
+    return unless defined $content && length $content;
 
     my $decoded_json = eval { decode_json($content) };
     if ($@) {

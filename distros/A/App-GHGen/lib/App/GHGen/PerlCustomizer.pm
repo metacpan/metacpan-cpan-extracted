@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 	generate_custom_perl_workflow
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf-8
 
@@ -188,20 +188,22 @@ errors are caught across the full version range being tested.
 
 The step uses C<shell: perl {0}>, which works identically on Linux, macOS,
 and Windows without any OS-specific branching.  It searches C<lib/> and
-C<bin/> (falling back to C<.> when neither exists), spawns
-C<perl -Mstrict -Mwarnings -c> for each C<.pm> file found, and exits
-non-zero if any file fails.  B<No additional CPAN modules are required.>
+C<bin/> (falling back to C<.> when neither exists), loads each C<.pm> file
+via C<do $file> with a stub C<@INC> handler that silently satisfies any
+missing C<use> statements, and exits non-zero if any file fails.  Using
+C<do $file> avoids spawning C<perl -c> subprocesses (which have
+Windows command-line quoting issues) and avoids false failures caused by
+missing CPAN dependencies.  B<No additional CPAN modules are required.>
 
 =item C<enable_linter_unused> (boolean, default C<1>)
 
-When true, inserts a B<"Check for unused variables"> step immediately after
-the test run and before Perl::Critic.  The step installs L<warnings::unused>
-from CPAN and runs C<perl -Mwarnings::unused -c> on every C<.pm> file under
-C<lib/>.
-
-This step is conditioned on the latest matrix Perl version and
-C<ubuntu-latest>, matching the Perl::Critic and coverage steps.  It is also
-marked C<continue-on-error: true> because unused-variable warnings can be
+When true, appends an unused-variable check to the B<end of the lint step>
+(i.e. it runs before the test run, not after).  The check installs
+L<warnings::unused> from CPAN, then runs
+C<PERL5OPT=-Mwarnings::unused prove -lr t/> so that variable lifetimes are
+exercised at runtime (C<perl -c> is compile-only and cannot detect unused
+variables).  It is gated on C<RUNNER_OS == Linux> and marked
+C<continue-on-error: true> because unused-variable warnings can be
 legitimately noisy on some codebases.
 
 =item C<enable_critic> (boolean, default C<1>)
@@ -352,6 +354,17 @@ sub generate_custom_perl_workflow($opts = {}) {
 	for my $version (@perl_versions) {
 		$yaml .= "          - '$version'\n";
 	}
+	# shogo82148/build-perl perl-5.40.4-thr-win32-x64.zip ships a perl.exe and a
+	# libperl540.a from two different builds.  Any XS module compiled against that
+	# libperl540.a (key 0x12c00080) mismatches the running perl.exe (needs
+	# 0x12d00080).  Even Win32::Process (a core Windows XS module bundled in the
+	# zip) fails to load, so no XS-using test can pass on this combination.
+	# Exclude until the upstream distribution is fixed.
+	if ((grep { $_ eq '5.40' } @perl_versions) && (grep { $_ eq 'windows-latest' } @os)) {
+		$yaml .= "        exclude:\n";
+		$yaml .= "          - os: windows-latest\n";
+		$yaml .= "            perl: '5.40'\n";
+	}
 	$yaml .= "    name: Perl \${{ matrix.perl }} on \${{ matrix.os }}\n";
 	$yaml .= "    env:\n";
 	$yaml .= "      AUTOMATED_TESTING: 1\n";
@@ -361,17 +374,46 @@ sub generate_custom_perl_workflow($opts = {}) {
 	$yaml .= "      - uses: actions/checkout\@v7\n\n";
 
 	$yaml .= "      - name: Setup Perl\n";
+	$yaml .= "        id: setup-perl\n";
 	$yaml .= "        uses: shogo82148/actions-setup-perl\@v1\n";
 	$yaml .= "        with:\n";
 	$yaml .= "          perl-version: \${{ matrix.perl }}\n\n";
+
+	# Hash the actual Perl binary files so the cache key changes whenever the
+	# binary changes, even across silent Strawberry Perl re-releases that keep the
+	# same $Config{version} string but change the DLL ABI and handshake key.
+	# On Windows we hash both perl.exe and the Perl runtime DLL (e.g. perl540.dll)
+	# because perl.exe is a thin stub — only the DLL contains the real runtime.
+	# shell: perl {0} runs identically on Linux, macOS, and Windows.
+	$yaml .= "      - name: Get exact Perl binary version for cache key\n";
+	$yaml .= "        id: perl-version\n";
+	$yaml .= "        shell: perl {0}\n";
+	$yaml .= "        run: |\n";
+	$yaml .= <<'VERSION_STEP';
+          use Config;
+          my @paths = ($^X);
+          if ($^O eq 'MSWin32' && $Config{libperl}) {
+              (my $dir = $^X) =~ s{[\\/][^\\/]+$}{};
+              my $dll = "$dir/$Config{libperl}";
+              push @paths, $dll if -f $dll;
+          }
+          my $sum = 0;
+          for my $path (@paths) {
+              open(my $fh, '<:raw', $path) or next;
+              $sum += unpack('%32C*', $_) while read $fh, $_, 65536;
+          }
+          open(my $out, '>>', $ENV{GITHUB_OUTPUT}) or die $!;
+          print $out "version=$Config{version}-$Config{archname}-$sum\n";
+
+VERSION_STEP
 
 	$yaml .= "      - name: Cache CPAN modules\n";
 	$yaml .= "        uses: actions/cache\@v6\n";
 	$yaml .= "        with:\n";
 	$yaml .= "          path: ~/perl5\n";
-	$yaml .= "          key: \${{ runner.os }}-\${{ matrix.perl }}-\${{ hashFiles('cpanfile') }}\n";
+	$yaml .= "          key: \${{ runner.os }}-perl-\${{ steps.perl-version.outputs.version }}-\${{ hashFiles('cpanfile') }}\n";
 	$yaml .= "          restore-keys: |\n";
-	$yaml .= "            \${{ runner.os }}-\${{ matrix.perl }}-\n\n";
+	$yaml .= "            \${{ runner.os }}-perl-\${{ steps.perl-version.outputs.version }}-\n\n";
 
 	$yaml .= "      - name: Install cpanm and local::lib\n";
 	$yaml .= "        if: runner.os != 'Windows'\n";
@@ -396,6 +438,20 @@ sub generate_custom_perl_workflow($opts = {}) {
 	$yaml .= "          set \"PATH=%USERPROFILE%\\perl5\\bin;%PATH%\"\n";
 	$yaml .= "          set \"PERL5LIB=%USERPROFILE%\\perl5\\lib\\perl5\"\n";
 	$yaml .= "          cpanm --notest --installdeps .\n\n";
+
+	# The shogo82148 Perl distributions bundle pre-compiled XS modules (e.g.
+	# YAML::XS) in the Perl zip.  cpanm sees them as "already installed" and
+	# skips recompilation, leaving a DLL that may have the wrong handshake key.
+	# Force-reinstall YAML::XS into site/lib (which precedes the bundled lib in
+	# @INC) to ensure a freshly compiled copy is always used.
+	# NOTE: this step cannot rescue a fundamentally broken distribution where
+	# libperl540.a and perl.exe themselves are from different builds (as in the
+	# shogo82148 perl-5.40.4-thr-win32-x64.zip build) — that case is handled
+	# by the matrix exclusion above.
+	$yaml .= "      - name: Reinstall YAML::XS against current Perl (Windows)\n";
+	$yaml .= "        if: runner.os == 'Windows'\n";
+	$yaml .= "        shell: cmd\n";
+	$yaml .= "        run: cpanm --notest --reinstall YAML::XS\n\n";
 
 	if ($enable_linter) {
 		$yaml .= "      - name: Lint and syntax check\n";
@@ -528,8 +584,35 @@ sub _normalize_version($version) {
 	# Convert "5.036" or "5.36" to comparable number
 	$version =~ s/^v?//;
 	my @parts = split /\./, $version;
-	return sprintf("%d.%03d", $parts[0] // 5, $parts[1] // 0);
+	return sprintf('%d.%03d', $parts[0] // 5, $parts[1] // 0);
 }
+
+=head1 LIMITATIONS
+
+=head2 Windows + Perl 5.40 excluded from the generated matrix
+
+The shogo82148 C<perl-5.40.4-thr-win32-x64.zip> distribution ships a
+C<perl.exe> and a C<libperl540.a> from two different builds.  Any XS module
+compiled against that C<libperl540.a> receives handshake key
+C<0x12c00080>, but C<perl.exe> needs C<0x12d00080>.  Even
+C<Win32::Process> — a core Windows XS module bundled in the zip and loaded
+transitively by C<IPC::System::Simple> — fails to load with this mismatch,
+so no XS-using test can pass on this combination.
+
+Recompiling XS modules (e.g. via C<cpanm --reinstall YAML::XS>) does not
+help: the compilation itself links against the broken C<libperl540.a> and
+inherits the wrong key.
+
+The generated workflow therefore includes a C<matrix.exclude> entry for
+C<{os: windows-latest, perl: '5.40'}>.  This entry is only emitted when
+both C<windows-latest> and C<5.40> are present in the matrix, so workflows
+that restrict their OS or Perl lists are unaffected.
+
+Remove the exclusion once the upstream shogo82148/build-perl distribution
+is fixed and the C<perl.exe> and C<libperl540.a> in the 5.40.x zip are
+built from the same source tree.
+
+See L<https://github.com/shogo82148/actions-setup-perl/issues/2310> for further information.
 
 =head1 AUTHOR
 

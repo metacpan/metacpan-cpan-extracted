@@ -43,7 +43,9 @@ use Data::Sync::Shared;
     my $s = $rw->stats;
     diag sprintf "dt=%.2fs recoveries=%d", $dt, $s->{recoveries};
 
-    ok $dt >= 1.5 && $dt < 6,
+    # Reader-slots-only rwlock: the draining writer clears the dead reader's
+    # slot inline during wrlock, so recovery is immediate (no 2s timeout drain).
+    ok $dt < 6,
         sprintf('rwlock dead-reader recovery in %.2fs', $dt);
     ok $s->{recoveries} >= 1, 'dead-reader: recoveries counter incremented';
 }

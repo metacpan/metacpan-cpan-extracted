@@ -1,60 +1,46 @@
-# Copyright (C) 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 package Google::Cloud::Bigquery::V2::EncryptionConfig;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.11';
+
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
 use Protobuf::Internal qw(:all);
 use MIME::Base64;
 
 BEGIN {
-    eval { require Google::Api::Auditing };
     eval { require Google::Api::FieldBehavior };
-    eval { require Google::Api::Inclusion };
-    eval { require Google::Api::Policy };
     eval { require Google::Protobuf::Wrappers };
     my $descriptor_b64 = <<'EOF';
 CjBnb29nbGUvY2xvdWQvYmlncXVlcnkvdjIvZW5jcnlwdGlvbl9jb25maWcucHJvdG8SGGdv
-b2dsZS5jbG91ZC5iaWdxdWVyeS52MhoZZ29vZ2xlL2FwaS9hdWRpdGluZy5wcm90bxofZ29v
-Z2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90bxoaZ29vZ2xlL2FwaS9pbmNsdXNpb24ucHJv
-dG8aF2dvb2dsZS9hcGkvcG9saWN5LnByb3RvGh5nb29nbGUvcHJvdG9idWYvd3JhcHBlcnMu
-cHJvdG8idAoXRW5jcnlwdGlvbkNvbmZpZ3VyYXRpb24SWQoMa21zX2tleV9uYW1lGAEgASgL
-MhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlQhngQQHq6oCsAwcSBUFVRElUwvaM3AQD
-gAEBUgprbXNLZXlOYW1lQn0KHGNvbS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJCFUVuY3J5
-cHRpb25Db25maWdQcm90b1o7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92Mi9hcGl2
-Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGKK1dvSDwUKA2FsbEqvBwoGEgQAACABCggKAQwSAwAA
-EgoICgECEgMCACEKCQoCAwASAwQAIwoJCgIDARIDBQApCgkKAgMCEgMGACQKCQoCAwMSAwcA
-IQoJCgIDBBIDCAAoCggKAQgSAwoAUgoJCgIICxIDCgBSCggKAQgSAwsANQoJCgIIARIDCwA1
-CggKAQgSAwwANgoJCgIICBIDDAA2CggKAQgSAw0ALQoPCggI0bqr+gEBABIDDQAtCsQCCgIE
-ABIEFQAgARq3AiAoLS0gRW5jcnlwdGlvbiBpbmZvIHRoYXQgY2FuIGJlIGFzc29jaWF0ZWQg
-d2l0aCBtdWx0aXBsZSBBUEkgbWV0aG9kcy4gU2VlOgogZ29vZ2xlZGF0YS9hcGlzZXJ2aW5n
-L2NvbmZpZy9jbG91ZC9oZWxpeC92Mi90ZW1wbGF0ZXMvZW5jcnlwdGlvbmNvbmZpZ3VyYXRp
-b24uanNvbnQKIC0tKQogKC0tIGFwaS1saW50ZXI6IGFiYnJldmlhdGlvbnM9ZGlzYWJsZWQg
-LS0pCiAoPT0gc3VwcHJlc3Nfd2FybmluZyBuYW1pbmctbmFtZS1hYmJyZXZpYXRpb24gPT0p
-CiBDb25maWd1cmF0aW9uIGZvciBDbG91ZCBLTVMgZW5jcnlwdGlvbiBzZXR0aW5ncy4KCgoK
-AwQAARIDFQgfCrwCCgQEAAIAEgQbAh8EGq0CIERlc2NyaWJlcyB0aGUgQ2xvdWQgS01TIGVu
-Y3J5cHRpb24ga2V5IHRoYXQgd2lsbCBiZSB1c2VkIHRvCiBwcm90ZWN0IGRlc3RpbmF0aW9u
-IEJpZ1F1ZXJ5IHRhYmxlLiBUaGUgQmlnUXVlcnkgU2VydmljZSBBY2NvdW50IGFzc29jaWF0
-ZWQKIHdpdGggeW91ciBwcm9qZWN0IHJlcXVpcmVzIGFjY2VzcyB0byB0aGlzIGVuY3J5cHRp
-b24ga2V5LgogKC0tIEEgd3JhcHBlciBpcyB1c2VkIGJlY2F1c2UgaW4gQXBpYXJ5IGl0IGlz
-IHBvc3NpYmxlIHRvIHNldCB0aGlzIGZpZWxkIHRvCiAgICAgdGhlIGVtcHR5IHN0cmluZy4g
-LS0pCgoMCgUEAAIABhIDGwIdCgwKBQQAAgABEgMbHioKDAoFBAACAAMSAxstLgoNCgUEAAIA
-CBIEGy8fAwoRCgoEAAIACK2NwDUCEgMcBDMKDwoIBAACAAicCAASAx0EKgoRCgoEAAIACOjO
-wUsQEgMeBEZiBnByb3RvMw==
+b2dsZS5jbG91ZC5iaWdxdWVyeS52MhofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90
+bxoeZ29vZ2xlL3Byb3RvYnVmL3dyYXBwZXJzLnByb3RvIl4KF0VuY3J5cHRpb25Db25maWd1
+cmF0aW9uEkMKDGttc19rZXlfbmFtZRgBIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdW
+YWx1ZUID4EEBUgprbXNLZXlOYW1lQnIKHGNvbS5nb29nbGUuY2xvdWQuYmlncXVlcnkudjJC
+FUVuY3J5cHRpb25Db25maWdQcm90b1o7Y2xvdWQuZ29vZ2xlLmNvbS9nby9iaWdxdWVyeS92
+Mi9hcGl2Mi9iaWdxdWVyeXBiO2JpZ3F1ZXJ5cGJKnAgKBhIEDgAgAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIQoJCgIDABIDEgApCgkKAgMBEgMTACgK
+CAoBCBIDFQBSCgkKAggLEgMVAFIKCAoBCBIDFgA2CgkKAggIEgMWADYKCAoBCBIDFwA1CgkK
+AggBEgMXADUKPgoCBAASBBoAIAEaMiBDb25maWd1cmF0aW9uIGZvciBDbG91ZCBLTVMgZW5j
+cnlwdGlvbiBzZXR0aW5ncy4KCgoKAwQAARIDGggfCt4BCgQEAAIAEgQeAh8vGs8BIE9wdGlv
+bmFsLiBEZXNjcmliZXMgdGhlIENsb3VkIEtNUyBlbmNyeXB0aW9uIGtleSB0aGF0IHdpbGwg
+YmUgdXNlZCB0bwogcHJvdGVjdCBkZXN0aW5hdGlvbiBCaWdRdWVyeSB0YWJsZS4gVGhlIEJp
+Z1F1ZXJ5IFNlcnZpY2UgQWNjb3VudCBhc3NvY2lhdGVkCiB3aXRoIHlvdXIgcHJvamVjdCBy
+ZXF1aXJlcyBhY2Nlc3MgdG8gdGhpcyBlbmNyeXB0aW9uIGtleS4KCgwKBQQAAgAGEgMeAh0K
+DAoFBAACAAESAx4eKgoMCgUEAAIAAxIDHi0uCgwKBQQAAgAIEgMfBi4KDwoIBAACAAicCAAS
+Ax8HLWIGcHJvdG8z
 EOF
     Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
 }
@@ -65,4 +51,48 @@ EOF
     # Fields for EncryptionConfiguration
     # Field: kms_key_name Type: 11 (.google.protobuf.StringValue)
 
+=pod
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::EncryptionConfig;
+
+    my $msg = Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration->new(
+        kms_key_name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<kms_key_name>
+
+Type: Message (.google.protobuf.StringValue)
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Bigquery::V2::EncryptionConfig - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

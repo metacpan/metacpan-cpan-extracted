@@ -104,6 +104,13 @@ static long long usec(void) {
 #define assert(e) (void)(e)
 #endif
 
+#define redisTestPanic(msg) \
+    do { \
+        fprintf(stderr, "PANIC: %s (In function \"%s\", file \"%s\", line %d)\n", \
+                msg, __func__, __FILE__, __LINE__); \
+        exit(1); \
+    } while (1)
+
 /* Helper to extract Redis version information.  Aborts on any failure. */
 #define REDIS_VERSION_FIELD "redis_version:"
 void get_redis_version(redisContext *c, int *majorptr, int *minorptr) {
@@ -149,7 +156,7 @@ static redisContext *select_database(redisContext *c) {
     assert(reply != NULL);
     freeReplyObject(reply);
 
-    /* Make sure the DB is emtpy */
+    /* Make sure the DB is empty */
     reply = redisCommand(c,"DBSIZE");
     assert(reply != NULL);
     if (reply->type == REDIS_REPLY_INTEGER && reply->integer == 0) {
@@ -232,7 +239,7 @@ static redisContext *do_connect(struct config config) {
             c = redisConnectFd(fd);
         }
     } else {
-        assert(NULL);
+        redisTestPanic("Unknown connection type!");
     }
 
     if (c == NULL) {
@@ -420,6 +427,24 @@ static void test_tcp_options(struct config cfg) {
     test("Setting TCP_USER_TIMEOUT errors when unsupported: ");
     test_cond(redisSetTcpUserTimeout(c, 100) == REDIS_ERR && c->err == REDIS_ERR_IO);
 #endif
+
+    redisFree(c);
+}
+
+static void test_unix_keepalive(struct config cfg) {
+    redisContext *c;
+    redisReply *r;
+
+    c = do_connect(cfg);
+
+    test("Setting TCP_KEEPALIVE on a unix socket returns an error: ");
+    test_cond(redisEnableKeepAlive(c) == REDIS_ERR && c->err == 0);
+
+    test("Setting TCP_KEEPALIVE on a unix socket doesn't break the connection: ");
+    r = redisCommand(c, "PING");
+    test_cond(r != NULL && r->type == REDIS_REPLY_STATUS && r->len == 4 &&
+              !memcmp(r->str, "PONG", 4));
+    freeReplyObject(r);
 
     redisFree(c);
 }
@@ -703,6 +728,47 @@ static void test_reply_reader(void) {
     freeReplyObject(reply);
     redisReaderFree(reader);
 
+    test("Parses RESP3 double edge magnitudes bit-exactly: ");
+    {
+        static const struct { const char *resp; double val; } dcases[] = {
+            {",0\r\n", 0.0}, {",-0\r\n", -0.0}, {",1.5\r\n", 1.5},
+            {",-2.25\r\n", -2.25}, {",1e308\r\n", 1e308}, {",5e-324\r\n", 5e-324},
+            {",2.2250738585072014e-308\r\n", 2.2250738585072014e-308},
+            {",1.7976931348623157e308\r\n", 1.7976931348623157e308},
+        };
+        size_t i; int ok = 1;
+        for (i = 0; i < sizeof(dcases)/sizeof(dcases[0]); i++) {
+            reader = redisReaderCreate();
+            redisReaderFeed(reader, dcases[i].resp, strlen(dcases[i].resp));
+            if (redisReaderGetReply(reader,&reply) != REDIS_OK || reply == NULL ||
+                ((redisReply*)reply)->type != REDIS_REPLY_DOUBLE ||
+                ((redisReply*)reply)->dval != dcases[i].val ||
+                /* also compare the sign bit, so "-0" must parse to -0.0 and not
+                 * +0.0 (which == would otherwise accept) */
+                signbit(((redisReply*)reply)->dval) != signbit(dcases[i].val)) ok = 0;
+            freeReplyObject(reply);
+            redisReaderFree(reader);
+        }
+        test_cond(ok);
+    }
+
+    test("Rejects malformed RESP3 doubles: ");
+    {
+        static const char *bad[] = {
+            ",\r\n", ",1.2.3\r\n", ",1e\r\n", ",+\r\n", ",.\r\n",
+            ",1,5\r\n", ",abc\r\n", ",3.14x\r\n",
+        };
+        size_t i; int ok = 1;
+        for (i = 0; i < sizeof(bad)/sizeof(bad[0]); i++) {
+            reader = redisReaderCreate();
+            redisReaderFeed(reader, bad[i], strlen(bad[i]));
+            if (redisReaderGetReply(reader,&reply) != REDIS_ERR) ok = 0;
+            freeReplyObject(reply);
+            redisReaderFree(reader);
+        }
+        test_cond(ok);
+    }
+
     test("Can parse RESP3 nil: ");
     reader = redisReaderCreate();
     redisReaderFeed(reader, "_\r\n",3);
@@ -770,6 +836,26 @@ static void test_reply_reader(void) {
     freeReplyObject(reply);
     redisReaderFree(reader);
 
+    test("Can parse RESP3 attribute: ");
+    reader = redisReaderCreate();
+    redisReaderFeed(reader, "|2\r\n+foo\r\n:123\r\n+bar\r\n#t\r\n",26);
+    ret = redisReaderGetReply(reader,&reply);
+    test_cond(ret == REDIS_OK &&
+        ((redisReply*)reply)->type == REDIS_REPLY_ATTR &&
+        ((redisReply*)reply)->elements == 4 &&
+        ((redisReply*)reply)->element[0]->type == REDIS_REPLY_STATUS &&
+        ((redisReply*)reply)->element[0]->len == 3 &&
+        !strcmp(((redisReply*)reply)->element[0]->str,"foo") &&
+        ((redisReply*)reply)->element[1]->type == REDIS_REPLY_INTEGER &&
+        ((redisReply*)reply)->element[1]->integer == 123 &&
+        ((redisReply*)reply)->element[2]->type == REDIS_REPLY_STATUS &&
+        ((redisReply*)reply)->element[2]->len == 3 &&
+        !strcmp(((redisReply*)reply)->element[2]->str,"bar") &&
+        ((redisReply*)reply)->element[3]->type == REDIS_REPLY_BOOL &&
+        ((redisReply*)reply)->element[3]->integer);
+    freeReplyObject(reply);
+    redisReaderFree(reader);
+
     test("Can parse RESP3 set: ");
     reader = redisReaderCreate();
     redisReaderFeed(reader, "~5\r\n+orange\r\n$5\r\napple\r\n#f\r\n:100\r\n:999\r\n",40);
@@ -805,7 +891,7 @@ static void test_reply_reader(void) {
 
     test("Can parse RESP3 doubles in an array: ");
     reader = redisReaderCreate();
-    redisReaderFeed(reader, "*1\r\n,3.14159265358979323846\r\n",31);
+    redisReaderFeed(reader, "*1\r\n,3.14159265358979323846\r\n",29);
     ret = redisReaderGetReply(reader,&reply);
     test_cond(ret == REDIS_OK &&
         ((redisReply*)reply)->type == REDIS_REPLY_ARRAY &&
@@ -1231,15 +1317,13 @@ static void test_blocking_connection_timeouts(struct config config) {
     redisContext *c;
     redisReply *reply;
     ssize_t s;
-    const char *sleep_cmd = "DEBUG SLEEP 3\r\n";
-    struct timeval tv;
+    const char *sleep_cmd = "DEBUG SLEEP 1\r\n";
+    struct timeval tv = {.tv_sec = 0, .tv_usec = 10000};
 
     c = do_connect(config);
     test("Successfully completes a command when the timeout is not exceeded: ");
     reply = redisCommand(c,"SET foo fast");
     freeReplyObject(reply);
-    tv.tv_sec = 0;
-    tv.tv_usec = 10000;
     redisSetTimeout(c, tv);
     reply = redisCommand(c, "GET foo");
     test_cond(reply != NULL && reply->type == REDIS_REPLY_STRING && memcmp(reply->str, "fast", 4) == 0);
@@ -1257,8 +1341,6 @@ static void test_blocking_connection_timeouts(struct config config) {
         sdsfree(c->obuf);
         c->obuf = sdsempty();
 
-        tv.tv_sec = 0;
-        tv.tv_usec = 10000;
         redisSetTimeout(c, tv);
         reply = redisCommand(c, "GET foo");
 #ifndef _WIN32
@@ -1271,7 +1353,7 @@ static void test_blocking_connection_timeouts(struct config config) {
         freeReplyObject(reply);
 
         // wait for the DEBUG SLEEP to complete so that Redis server is unblocked for the following tests
-        millisleep(3000);
+        millisleep(1100);
     } else {
         test_skipped();
     }
@@ -1340,7 +1422,7 @@ static void test_blocking_io_errors(struct config config) {
 }
 
 static void test_invalid_timeout_errors(struct config config) {
-    redisContext *c;
+    redisContext *c = NULL;
 
     test("Set error when an invalid timeout usec value is used during connect: ");
 
@@ -1352,10 +1434,10 @@ static void test_invalid_timeout_errors(struct config config) {
     } else if(config.type == CONN_UNIX) {
         c = redisConnectUnixWithTimeout(config.unix_sock.path, config.connect_timeout);
     } else {
-        assert(NULL);
+        redisTestPanic("Unknown connection type!");
     }
 
-    test_cond(c->err == REDIS_ERR_IO && strcmp(c->errstr, "Invalid timeout specified") == 0);
+    test_cond(c != NULL && c->err == REDIS_ERR_IO && strcmp(c->errstr, "Invalid timeout specified") == 0);
     redisFree(c);
 
     test("Set error when an invalid timeout sec value is used during connect: ");
@@ -1368,10 +1450,10 @@ static void test_invalid_timeout_errors(struct config config) {
     } else if(config.type == CONN_UNIX) {
         c = redisConnectUnixWithTimeout(config.unix_sock.path, config.connect_timeout);
     } else {
-        assert(NULL);
+        redisTestPanic("Unknown connection type!");
     }
 
-    test_cond(c->err == REDIS_ERR_IO && strcmp(c->errstr, "Invalid timeout specified") == 0);
+    test_cond(c != NULL && c->err == REDIS_ERR_IO && strcmp(c->errstr, "Invalid timeout specified") == 0);
     redisFree(c);
 }
 
@@ -2253,7 +2335,7 @@ static void test_async_polling(struct config config) {
      */
     test("Ping/Pong from onConnected callback (Issue #931): ");
     c = do_aconnect(config, ASTEST_ISSUE_931_PING);
-    /* connect callback issues ping, reponse callback destroys context */
+    /* connect callback issues ping, response callback destroys context */
     while(astest.ac)
         redisPollTick(c, 0.1);
     assert(astest.connected == 0);
@@ -2356,6 +2438,7 @@ int main(int argc, char **argv) {
         test_blocking_connection_timeouts(cfg);
         test_blocking_io_errors(cfg);
         test_invalid_timeout_errors(cfg);
+        test_unix_keepalive(cfg);
         if (throughput) test_throughput(cfg);
     } else {
         test_skipped();

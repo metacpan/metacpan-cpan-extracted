@@ -40,6 +40,8 @@ This script speaks the contents of the passed in message, clipboard or file
 
 use strict;
 use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use Getopt::Long;
 use Pod::Usage;
@@ -47,10 +49,9 @@ use Pod::Usage;
 use Speak qw(speak);
 use Clipboard;
 
-sub error {
-  my ($msg, $exit_code) = @_;
-  print STDERR "ERROR: $msg\n";
-  exit ($exit_code || 1);
+sub error ($msg, $exit_code = 1) {
+    print STDERR "ERROR: $msg\n";
+    exit $exit_code;
 }
 
 my $verbose = 0;

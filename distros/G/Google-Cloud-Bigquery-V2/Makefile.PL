@@ -34,7 +34,6 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Moo'                     => '0',
-        'Net::Curl'               => '0',
         'Log::Any'                => '0',
         'Google::Auth'            => '0.01',
         'Google::gRPC::Client'    => '0.01',

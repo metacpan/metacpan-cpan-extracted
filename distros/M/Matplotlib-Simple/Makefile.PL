@@ -4,13 +4,13 @@ use warnings;
 
 use 5.010;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.58;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Access Matplotlib from Perl; providing consistent user interface between different plot types",
   "AUTHOR" => "David E. Condon <dec986\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => "6.58"
   },
   "DISTNAME" => "Matplotlib-Simple",
   "LICENSE" => "perl",
@@ -21,16 +21,15 @@ my %WriteMakefileArgs = (
     "Data::Printer" => 0,
     "Devel::Confess" => 0,
     "Devel::Size" => 0,
-    "File::Path" => 0,
     "IPC::System::Simple" => 0,
     "JSON::MaybeXS" => 0,
     "MIME::Base64" => 0,
-    "Term::ANSIColor" => 0,
+    "Scalar::Util" => "1.22",
     "Test::Exception" => 0,
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.301",
+  "VERSION" => "0.311",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,11 +41,10 @@ my %FallbackPrereqs = (
   "Data::Printer" => 0,
   "Devel::Confess" => 0,
   "Devel::Size" => 0,
-  "File::Path" => 0,
   "IPC::System::Simple" => 0,
   "JSON::MaybeXS" => 0,
   "MIME::Base64" => 0,
-  "Term::ANSIColor" => 0,
+  "Scalar::Util" => "1.22",
   "Test::Exception" => 0,
   "Test::More" => 0,
   "autodie" => 0

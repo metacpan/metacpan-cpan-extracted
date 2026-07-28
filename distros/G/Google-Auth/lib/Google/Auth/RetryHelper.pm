@@ -21,7 +21,7 @@ use Google::Auth::Exceptions;
 use Time::HiRes;
 use Log::Any qw($log);
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 sub execute_with_retry {
     my ( $class, $code, %options ) = @_;

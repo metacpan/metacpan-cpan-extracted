@@ -83,6 +83,7 @@ lib/OpenSearch/Client/Serializer/JSON/Cpanel.pm
 lib/OpenSearch/Client/Serializer/JSON/PP.pm
 lib/OpenSearch/Client/Serializer/JSON/XS.pm
 lib/OpenSearch/Client/Transport.pm
+lib/OpenSearch/Client/Transport/TryCatch.pm
 lib/OpenSearch/Client/Util.pm
 t/10_Basic/10_load.t
 t/20_Serializer/10_load_cpanel.t
@@ -158,7 +159,7 @@ t/Core_3_0/40_scroll.t
 t/Core_3_0/50_version_can_do.t
 t/Core_3_0/60_auth_httptiny.t
 t/Core_3_0/61_auth_lwp.t
-t/lib/LogCallback.pl
+t/lib/LogCapture.pl
 t/lib/MockCxn.pm
 t/lib/bad_cacert.pem
 t/lib/default_cxn.pl

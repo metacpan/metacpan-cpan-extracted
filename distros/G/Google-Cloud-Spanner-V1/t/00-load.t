@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'Google::Cloud::Spanner::V1' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Spanner::V1::SpannerClient' ) || print "Bail out!\n";
 }
 
-diag( "Testing Google::Cloud::Spanner::V1 $Google::Cloud::Spanner::V1::VERSION, Perl $], $^X" );
+diag( "Testing Google::Cloud::Spanner::V1::SpannerClient $Google::Cloud::Spanner::V1::SpannerClient::VERSION, Perl $], $^X" );

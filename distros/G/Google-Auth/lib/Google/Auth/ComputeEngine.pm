@@ -19,7 +19,7 @@ use warnings;
 
 use Moo;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 sub on_gce {
     my ( $class, %options ) = @_;

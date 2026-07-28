@@ -1,5 +1,29 @@
 Revision history for Log-Tiny
 
+1.3     Mon Jul 20 2026 05:30 UTC
+        * Easy mode: 'use Log::Tiny qw(:easy)' exports TRACE/DEBUG/INFO/
+          WARN/ERROR/FATAL (and the LOG* helpers) that log through one
+          process-wide logger; defaults to STDERR. Configure with
+          Log::Tiny->easy_init().
+        * Lazy messages: a code-ref message is only evaluated if it will
+          actually be logged (passes the min_level threshold).
+        * would_log($category) predicate to guard expensive logging.
+        * LOGWARN/LOGDIE/LOGCARP/LOGCLUCK/LOGCROAK/LOGCONFESS: log then
+          warn/die/carp (Log4perl-style).
+        * %D{...} strftime timestamp format code (default ISO-ish).
+
+1.2     Sun Jul 19 2026 22:45 UTC
+        * Log to a filehandle, STDOUT or STDERR (not just a file path).
+        * Use 3-arg open() so the log path is honoured literally.
+        * Enable 'use warnings'; switch 'use vars' to 'our'.
+        * Configurable caller depth ($Log::Tiny::caller_depth) for wrapped calls.
+        * Per-instance %formats snapshot with optional override hashref.
+        * Optional severity-level threshold filtering.
+        * Add cpanfile and GitHub Actions CI (perl 5.16 - latest).
+        * Fix POD typos and remove dead code in the %formats 'S' entry.
+        * Emit unrecognised %-codes literally (e.g. %d), as documented,
+          instead of letting the internal sprintf consume them.
+
 1.1     Tue Jan  4 2022 23:44 UTC
         * Fix bug with buffering output to file.
 

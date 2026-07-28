@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -54,23 +54,24 @@ Data::Queue::Shared - High-performance shared-memory MPMC queues for Linux
     # Integer queue (lock-free Vyukov MPMC)
     my $q = Data::Queue::Shared::Int->new('/tmp/myq.shm', 1024);
 
-    # Anonymous queue (fork-inherited, no filesystem)
-    my $q = Data::Queue::Shared::Int->new(undef, 1024);
-
-    # memfd-backed queue (shareable via fd passing)
-    my $q = Data::Queue::Shared::Str->new_memfd("my_queue", 1024);
-    my $fd = $q->memfd;  # pass via SCM_RIGHTS or fork
-    my $q2 = Data::Queue::Shared::Str->new_from_fd($fd);
-    $q->push(42);
-    my $val = $q->pop;              # non-blocking, undef if empty
+    $q->push(42);                    # non-blocking, false if full
+    my $val = $q->pop;               # non-blocking, undef if empty
 
     # Blocking pop (waits for data)
-    my $val = $q->pop_wait;         # infinite wait
-    my $val = $q->pop_wait(1.5);    # 1.5 second timeout
+    $val = $q->pop_wait;             # infinite wait
+    $val = $q->pop_wait(1.5);        # 1.5 second timeout
 
     # Batch operations
     my $pushed = $q->push_multi(1, 2, 3, 4, 5);
-    my @vals = $q->pop_multi(10);   # pop up to 10
+    my @vals   = $q->pop_multi(10);  # pop up to 10
+
+    # Anonymous queue (fork-inherited, no filesystem)
+    my $aq = Data::Queue::Shared::Int->new(undef, 1024);
+
+    # memfd-backed queue (shareable via fd passing)
+    my $mq = Data::Queue::Shared::Int->new_memfd("my_queue", 1024);
+    my $fd = $mq->memfd;             # pass via SCM_RIGHTS or fork
+    my $mq2 = Data::Queue::Shared::Int->new_from_fd($fd);
 
     # String queue (mutex-protected, circular arena)
     my $sq = Data::Queue::Shared::Str->new('/tmp/strq.shm', 1024);
@@ -78,7 +79,7 @@ Data::Queue::Shared - High-performance shared-memory MPMC queues for Linux
     my $msg = $sq->pop;
 
     # With explicit arena size (default: capacity * 256)
-    my $sq = Data::Queue::Shared::Str->new('/tmp/strq.shm', 1024, 1048576);
+    $sq = Data::Queue::Shared::Str->new('/tmp/strq.shm', 1024, 1048576);
 
     # Multiprocess
     if (fork() == 0) {
@@ -87,7 +88,7 @@ Data::Queue::Shared - High-performance shared-memory MPMC queues for Linux
         exit;
     }
     wait;
-    print $q->pop;  # 99
+    print $q->pop;                   # 99
 
 =head1 DESCRIPTION
 
@@ -194,7 +195,8 @@ Opens a queue from a received memfd. The fd is dup'd internally.
 For Str queues, C<$arena_bytes> sets the string storage arena size
 (default: C<$capacity * 256>, minimum 4096, maximum 4GB). Strings are
 stored in a circular arena; total stored string bytes cannot exceed the
-arena capacity. Individual strings are limited to ~2GB.
+arena capacity. Any single string is likewise bounded by the arena capacity
+(and by a ~2GB hard limit); pushing one that does not fit croaks.
 
 =head2 API
 

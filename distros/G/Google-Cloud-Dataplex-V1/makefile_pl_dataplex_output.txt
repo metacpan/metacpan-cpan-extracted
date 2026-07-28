@@ -1,0 +1,5 @@
+Invalid LICENSE value 'apache_2' ignored
+Invalid LICENSE value 'apache_2' ignored
+Generating a Unix-style Makefile
+Writing Makefile for Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient
+Writing MYMETA.yml and MYMETA.json

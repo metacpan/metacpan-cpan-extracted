@@ -1,7 +1,7 @@
 ---
 abstract: 'Implements application default credentials and project ID detection.'
 author:
-  - 'C.J. Collier <CJCOLLIER@CPAN.ORG>'
+  - 'C.J. Collier <cjac@google.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Exception: '0'
@@ -28,5 +28,5 @@ requires:
   Moo: '0'
   URI: '0'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

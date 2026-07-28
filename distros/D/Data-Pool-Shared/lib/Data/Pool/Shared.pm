@@ -1,7 +1,7 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
@@ -18,9 +18,12 @@ sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (dou
 # Guard -- auto-free on scope exit
 
 package Data::Pool::Shared::Guard {
+    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         my $self = shift;
-        eval { $self->[0]->free($self->[1]) } if $self->[0];
+        # only the creating process frees the slot: after fork the child inherits
+        # the guard object and must not free the parent's still-owned slot.
+        eval { $self->[0]->free($self->[1]) } if $self->[0] && $self->[2] == $$;
     }
 }
 
@@ -28,7 +31,7 @@ sub alloc_guard {
     my ($self, $timeout) = @_;
     my $idx = $self->alloc($timeout // -1);
     return unless defined $idx;
-    my $guard = bless [$self, $idx], 'Data::Pool::Shared::Guard';
+    my $guard = bless [$self, $idx, $$], 'Data::Pool::Shared::Guard';
     return wantarray ? ($idx, $guard) : $guard;
 }
 
@@ -36,7 +39,7 @@ sub try_alloc_guard {
     my ($self) = @_;
     my $idx = $self->try_alloc;
     return unless defined $idx;
-    my $guard = bless [$self, $idx], 'Data::Pool::Shared::Guard';
+    my $guard = bless [$self, $idx, $$], 'Data::Pool::Shared::Guard';
     return wantarray ? ($idx, $guard) : $guard;
 }
 
@@ -209,7 +212,7 @@ startup for crash recovery.
     my $idx = $pool->alloc;             # block until available
     my $idx = $pool->alloc($timeout);   # with timeout (seconds)
     my $idx = $pool->alloc(0);          # non-blocking
-    my $idx = $pool->try_alloc;         # non-blocking (alias)
+    my $idx = $pool->try_alloc;         # non-blocking (same as alloc(0))
 
 Returns slot index on success, C<undef> on failure/timeout.
 

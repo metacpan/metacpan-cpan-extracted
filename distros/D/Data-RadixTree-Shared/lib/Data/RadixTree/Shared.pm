@@ -1,7 +1,7 @@
 package Data::RadixTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::RadixTree::Shared', $VERSION);
 
@@ -115,8 +115,9 @@ only used when the file is brand new. C<new_memfd> creates a Linux memfd
 another process.
 
 C<$mode> (default C<0600>, owner-only) is the permission mode for a B<newly
-created> backing file; pass e.g. C<0660> to opt into cross-user sharing (it is
-applied via C<open()>, so subject to the process umask). It is ignored for
+created> backing file; pass e.g. C<0660> to opt into cross-user sharing. The
+exact mode is applied (via C<fchmod> after the C<O_EXCL> create, so the process
+umask does not narrow it). It is ignored for
 anonymous mappings and when attaching to an existing file or memfd -- on attach
 the existing file's permissions apply, so a file created with the C<0600>
 default is not openable by other users unless a wider mode was passed at
@@ -247,6 +248,18 @@ recovers. Because an C<insert> performs all of its node/arena allocations under
 the lock after a capacity pre-check, a crash leaves the tree consistent up to
 the last completed C<insert> or C<delete>. B<Limitation>: PID reuse is not
 detected (very unlikely in practice).
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head1 SEE ALSO
 

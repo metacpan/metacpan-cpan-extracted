@@ -1,0 +1,27 @@
+t/01-service-DataProductService.t .. ok
+All tests successful.
+Files=1, Tests=3,  7 wallclock secs ( 0.06 usr  0.02 sys +  4.44 cusr  0.90 csys =  5.42 CPU)
+Result: PASS
+t/01-service-DataTaxonomyService.t .. ok
+All tests successful.
+Files=1, Tests=3,  6 wallclock secs ( 0.05 usr  0.03 sys +  4.27 cusr  0.90 csys =  5.25 CPU)
+Result: PASS
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/02-rest-transport-DataProductService.t .. 
+No subtests run 
+
+Test Summary Report
+-------------------
+t/02-rest-transport-DataProductService.t (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+Files=1, Tests=0,  6 wallclock secs ( 0.04 usr  0.02 sys +  2.84 cusr  0.69 csys =  3.59 CPU)
+Result: FAIL
+t/02-rest-transport-DataTaxonomyService.t .. ok
+All tests successful.
+Files=1, Tests=2,  7 wallclock secs ( 0.05 usr  0.03 sys +  4.68 cusr  0.89 csys =  5.65 CPU)
+Result: PASS
+t/02-rest-transport-MetadataService.t .. ok
+All tests successful.
+Files=1, Tests=2,  6 wallclock secs ( 0.05 usr  0.03 sys +  4.61 cusr  0.87 csys =  5.56 CPU)
+Result: PASS

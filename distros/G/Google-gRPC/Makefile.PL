@@ -54,7 +54,7 @@ else {
 
 WriteMakefile(
     NAME             => 'Google::gRPC',
-    AUTHOR           => q{C.J. Collier <CJCOLLIER@CPAN.ORG>},
+    AUTHOR           => q{C.J. Collier <cjac@google.com>},
     VERSION_FROM     => 'lib/Google/gRPC/Client.pm',
     ABSTRACT         => 'Generic, high-performance gRPC client transport over HTTP/2',
     LICENSE          => 'Apache 2.0',
@@ -76,3 +76,16 @@ WriteMakefile(
     clean => { FILES => 'Google-gRPC-* xs/*.o xs/*.c *.o NGHTTP2.c' },
     %extra_params,
 );
+
+package MY;
+
+sub dist_basics {
+    my $self = shift;
+    my $inherited = $self->SUPER::dist_basics(@_);
+    my $check_code = "\t\$(PERL) -Ilib maint/release_lint.pl\n";
+    $inherited =~ s/(distcheck\s*:)/$1 release_lint\n\nrelease_lint :\n$check_code\n/;
+    return $inherited;
+}
+
+package main;
+1;

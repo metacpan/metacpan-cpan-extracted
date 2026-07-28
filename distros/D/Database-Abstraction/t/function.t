@@ -46,6 +46,7 @@ my $have_sqlite = eval { require DBI; require DBD::SQLite; 1 };
 
 use lib 't/lib';
 use_ok('Database::test1');		# CSV slurp fixture
+use_ok('Database::test4ne');		# no_entry CSV, id=>'cardinal' — produces ARRAY slurp
 use_ok('Database::test5');		# CSV with custom id ('ID'), sep ','
 
 # ---------------------------------------------------------------------------
@@ -378,7 +379,7 @@ note '--- A11: _quote_identifier()';
 	is($q, '"my_col"', '_quote_identifier(): fallback uses ANSI double-quotes');
 }
 
-# ---- A12: _is_berkeley_db / _is_berkeley_db_0 / _is_berkeley_db_12 ------
+# ---- A12: _is_berkeley_db / _has_bdb_magic --------------------------------
 note '--- A12: BerkeleyDB magic-number probes';
 {
 	my $db = Database::test1->new($DATA_DIR);
@@ -394,25 +395,25 @@ note '--- A12: BerkeleyDB magic-number probes';
 	ok(!$db->_is_berkeley_db($tmpfile->filename()),
 		'_is_berkeley_db(): text file → 0');
 
-	# _is_berkeley_db_0: handles a file handle with < 4 bytes → returns 0
+	# _has_bdb_magic: file with < 4 bytes → offset-0 read guard fires → 0
 	{
 		my $tiny = File::Temp->new();
 		print {$tiny} 'XY';
 		$tiny->flush();
 		open my $fh, '<', $tiny->filename();	## no critic
 		binmode $fh;
-		ok(!$db->_is_berkeley_db_0($fh), '_is_berkeley_db_0(): <4 bytes → 0');
+		ok(!$db->_has_bdb_magic($fh), '_has_bdb_magic(): <4 bytes → 0');
 		close $fh;
 	}
 
-	# _is_berkeley_db_12: handles a file too short for seek → returns 0
+	# _has_bdb_magic: 4 non-magic bytes at offset 0, file too short for offset 12 → 0
 	{
 		my $tiny2 = File::Temp->new();
-		print {$tiny2} 'X';
+		print {$tiny2} 'XYZW';	# 4 bytes, no BDB magic
 		$tiny2->flush();
 		open my $fh, '<', $tiny2->filename();	## no critic
 		binmode $fh;
-		ok(!$db->_is_berkeley_db_12($fh), '_is_berkeley_db_12(): too short → 0');
+		ok(!$db->_has_bdb_magic($fh), '_has_bdb_magic(): non-magic 4 bytes, offset-12 empty → 0');
 		close $fh;
 	}
 }
@@ -594,6 +595,33 @@ note '--- A19: columns() and schema()';
 	is($schema, $schema2, 'schema(): cached ref returned on second call');
 }
 
+# ---- A19b: columns() and schema() — no_entry CSV ARRAY slurp path -------
+# Bug fix: when $self->{'data'} is an ARRAY ref (no_entry CSV slurp), the
+# ref($data) eq 'HASH' branch was skipped, returning empty results.
+# The fix adds an elsif for ARRAY ref.
+# Database::test4ne has id=>'cardinal' so test4.csv rows survive the slurp
+# filter and are stored as an ARRAY ref.
+note '--- A19b: columns() and schema() — ARRAY-ref slurp path';
+{
+	my $ne = Database::test4ne->new(directory => $DATA_DIR);
+	$ne->count();    # trigger lazy _open and slurp into ARRAY ref
+
+	is(ref($ne->{'data'}), 'ARRAY',
+		'A19b pre-cond: data is ARRAY ref for test4ne');
+
+	my $ne_cols = $ne->columns();
+	isa_ok($ne_cols, 'ARRAY',
+		'columns() ARRAY slurp: returns arrayref (not empty)');
+	ok(scalar(@{$ne_cols}) > 0,
+		'columns() ARRAY slurp: list is non-empty');
+
+	my $ne_schema = $ne->schema();
+	isa_ok($ne_schema, 'HASH',
+		'schema() ARRAY slurp: returns hashref (not empty)');
+	ok(scalar(keys %{$ne_schema}) > 0,
+		'schema() ARRAY slurp: schema is non-empty');
+}
+
 # ---- A20: query() — returns Query object ---------------------------------
 note '--- A20: query()';
 {
@@ -728,6 +756,559 @@ SKIP: {
 
 	my $names = $db->query->select('name')->where(status => 'active')->all();
 	ok(exists $names->[0]{'name'}, 'select(): name key present');
+
+	# ---- B8: _apply_perl_sort_limit() --------------------------------
+	note '--- B8: _apply_perl_sort_limit()';
+
+	# Sort ASC: names must be in ascending alphabetical order after sort
+	{
+		my @rows = (
+			{ name => 'Carol', score => 8 },
+			{ name => 'Alice', score => 9 },
+			{ name => 'Bob',   score => 7 },
+		);
+		Database::Abstraction::Query::_apply_perl_sort_limit(\@rows, 'name ASC', undef, undef);
+		is($rows[0]{'name'}, 'Alice', '_apply_perl_sort_limit(): ASC → first is Alice');
+		is($rows[2]{'name'}, 'Carol', '_apply_perl_sort_limit(): ASC → last is Carol');
+	}
+
+	# Sort DESC: scores in descending order
+	{
+		my @rows = (
+			{ name => 'Carol', score => 8 },
+			{ name => 'Alice', score => 9 },
+			{ name => 'Bob',   score => 7 },
+		);
+		Database::Abstraction::Query::_apply_perl_sort_limit(\@rows, 'name DESC', undef, undef);
+		is($rows[0]{'name'}, 'Carol', '_apply_perl_sort_limit(): DESC → first is Carol');
+		is($rows[2]{'name'}, 'Alice', '_apply_perl_sort_limit(): DESC → last is Alice');
+	}
+
+	# Offset: skip the first N rows
+	{
+		my @rows = map { { n => $_ } } (1..5);
+		Database::Abstraction::Query::_apply_perl_sort_limit(\@rows, undef, 2, undef);
+		is(scalar @rows, 3, '_apply_perl_sort_limit(): offset 2 leaves 3 rows');
+		is($rows[0]{'n'}, 3, '_apply_perl_sort_limit(): offset 2 → first row is n=3');
+	}
+
+	# Limit: keep only the first N rows
+	{
+		my @rows = map { { n => $_ } } (1..5);
+		Database::Abstraction::Query::_apply_perl_sort_limit(\@rows, undef, undef, 3);
+		is(scalar @rows, 3, '_apply_perl_sort_limit(): limit 3 → exactly 3 rows');
+		is($rows[-1]{'n'}, 3, '_apply_perl_sort_limit(): limit 3 → last row is n=3');
+	}
+
+	# Sort + offset + limit combined: verify the complete pipeline
+	{
+		my @rows = map { { n => $_, name => chr(ord('e') - $_) } } (1..5);
+		Database::Abstraction::Query::_apply_perl_sort_limit(\@rows, 'name ASC', 1, 2);
+		is(scalar @rows, 2, '_apply_perl_sort_limit(): combined: 2 rows after offset+limit');
+	}
+
+	# ---- B9: _build_sql() internal SQL assembly ----------------------
+	note '--- B9: _build_sql()';
+
+	# SELECT * with no WHERE — CSV comment-row guard is added for CSV type,
+	# but since the backend is SQLite here, no_entry matters.
+	{
+		my $q_bare = $db->query();
+		my ($sql, $args, $tbl) = $q_bare->_build_sql(0);
+		like($sql, qr/SELECT \* FROM qtest/i, '_build_sql(): SELECT * from correct table');
+		is(scalar @{$args}, 0, '_build_sql(): no WHERE → no bind args');
+		is($tbl, 'qtest', '_build_sql(): returns correct table name');
+	}
+
+	# SELECT * with WHERE clause
+	{
+		my $q_where = $db->query()->where(status => 'active');
+		my ($sql, $args) = $q_where->_build_sql(0);
+		like($sql, qr/WHERE/i, '_build_sql(): WHERE clause present when criteria set');
+		is(scalar @{$args}, 1, '_build_sql(): one bind arg for equality criterion');
+		is($args->[0], 'active', '_build_sql(): bind arg value correct');
+	}
+
+	# COUNT(*) mode (count_only = 1)
+	{
+		my $q_cnt = $db->query()->where(status => 'active');
+		my ($sql) = $q_cnt->_build_sql(1);
+		like($sql, qr/SELECT COUNT\(\*\)/i, '_build_sql(): count_only=1 → SELECT COUNT(*)');
+		unlike($sql, qr/ORDER BY/i, '_build_sql(): count_only=1 → no ORDER BY');
+	}
+
+	# ORDER BY and LIMIT in non-count mode
+	{
+		my $q_paged = $db->query()->order_by('name ASC')->limit(3)->offset(1);
+		my ($sql) = $q_paged->_build_sql(0);
+		like($sql, qr/ORDER BY name ASC/i, '_build_sql(): ORDER BY clause included');
+		like($sql, qr/LIMIT 3/,            '_build_sql(): LIMIT clause included');
+		like($sql, qr/OFFSET 1/,           '_build_sql(): OFFSET clause included');
+	}
+
+	# ---- B10: BerkeleyDB delegation in terminal methods --------------
+	note '--- B10: Query BerkeleyDB delegation';
+
+	# Inject a BerkeleyDB-like state directly — the query builder must
+	# delegate to selectall_arrayref / count instead of building SQL.
+	{
+		my $bdb = Database::qtest->new(dsn => $dsn);
+		$bdb->{'berkeley'} = { k1 => 'v1', k2 => 'v2', k3 => 'v3' };
+
+		# all() with no joins must return all injected rows
+		my $bdb_all = $bdb->query()->all();
+		is(scalar @{$bdb_all}, 3, 'Query BDB all(): returns all 3 rows from berkeley hash');
+		isa_ok($bdb_all->[0], 'HASH', 'Query BDB all(): each row is a hashref');
+
+		# first() must return the first element of the berkeley scan
+		my $bdb_first = $bdb->query()->first();
+		isa_ok($bdb_first, 'HASH', 'Query BDB first(): returns a hashref');
+
+		# count() must return the total count without SQL
+		my $bdb_count = $bdb->query()->count();
+		is($bdb_count, 3, 'Query BDB count(): returns 3');
+
+		# all() with where() filter applied to BerkeleyDB scan
+		my $bdb_filtered = $bdb->query()->where(entry => 'k1')->all();
+		is(scalar @{$bdb_filtered}, 1, 'Query BDB all(): where() filter applied in-memory');
+		is($bdb_filtered->[0]{'value'}, 'v1', 'Query BDB all(): filtered row correct');
+	}
+
+	# ---- B11: where() hashref form -----------------------------------
+	note '--- B11: where() hashref form';
+
+	# where() must accept a single hashref as well as named pairs
+	{
+		my $by_hashref  = $db->query()->where({ status => 'active' })->count();
+		my $by_namedpair = $db->query()->where(status => 'active')->count();
+		is($by_hashref, $by_namedpair,
+			'where(): hashref form yields same count as named-pair form');
+	}
+
+	# Multiple where() calls merge with AND semantics
+	{
+		my $n_combined = $db->query()
+			->where(status => 'active')
+			->where(score  => { '>=' => 8 })
+			->count();
+		ok($n_combined > 0 && $n_combined < 5,
+			'where(): multiple calls merge with AND, narrowing result set');
+	}
+
+	# ---- B12: join() arrayref form -----------------------------------
+	note '--- B12: join() arrayref form';
+
+	{
+		my $q_j = $db->query();
+		# Single hashref form: one spec pushed
+		$q_j->join({ table => 't1', on => 'a.id=t1.id' });
+		is(scalar @{$q_j->{'_joins'}}, 1, 'join(): single hashref pushes one spec');
+
+		# Arrayref form: multiple specs pushed in one call
+		$q_j->join([
+			{ table => 't2', on => 'a.id=t2.id' },
+			{ table => 't3', on => 'a.id=t3.id', type => 'LEFT' },
+		]);
+		is(scalar @{$q_j->{'_joins'}}, 3, 'join(): arrayref form pushes two more specs');
+		is($q_j->{'_joins'}[1]{'table'}, 't2', 'join(): arrayref first spec table correct');
+		is($q_j->{'_joins'}[2]{'type'},  'LEFT', 'join(): arrayref second spec type correct');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# PART A — new sections (A22 onward) for functions not yet covered above
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== Part A (continued) ===';
+
+# ---- A22: import() ----------------------------------------------------------
+note '--- A22: import()';
+{
+	my %saved = %Database::Abstraction::defaults;
+
+	# Even-count args: calls init() via hashref derived from paired args.
+	# We cannot easily assert what init() does because Object::Configure may
+	# read config files; just verify it doesn't croak.
+	lives_ok {
+		Database::Abstraction::import('Database::test1', cache_duration => '2 hours');
+	} 'import(): even-count key=value args do not croak';
+
+	# Hashref arg: the single-hashref branch forwards to init()
+	lives_ok {
+		Database::Abstraction::import('Database::test1', { cache_duration => '3 hours' });
+	} 'import(): single hashref arg does not croak';
+
+	# No args: even-count (0) branch, effectively a no-op
+	lives_ok {
+		Database::Abstraction::import('Database::test1');
+	} 'import(): no-arg call does not croak';
+
+	%Database::Abstraction::defaults = %saved;
+}
+
+# ---- A23: _is_deep_db() comprehensive positive tests -----------------------
+note '--- A23: _is_deep_db() comprehensive';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Non-existent file → 0 without raising an exception
+	ok(!$db->_is_deep_db('/no/such/deep.db'),
+		'_is_deep_db(): non-existent file → 0 (silent)');
+
+	# Text file → 0
+	{
+		my $txt = File::Temp->new(SUFFIX => '.db');
+		print {$txt} "not a deep db\n";
+		$txt->flush();
+		ok(!$db->_is_deep_db($txt->filename()),
+			'_is_deep_db(): text content → 0');
+	}
+
+	# 3 bytes (too short to hold a 4-byte magic) → 0
+	{
+		my $tiny = File::Temp->new(SUFFIX => '.db');
+		print {$tiny} 'XYZ';
+		$tiny->flush();
+		ok(!$db->_is_deep_db($tiny->filename()),
+			'_is_deep_db(): 3-byte file (too short) → 0');
+	}
+
+	# 4 non-magic bytes → 0
+	{
+		my $nonmagic = File::Temp->new(SUFFIX => '.db');
+		print {$nonmagic} 'ABCD';
+		$nonmagic->flush();
+		ok(!$db->_is_deep_db($nonmagic->filename()),
+			'_is_deep_db(): 4 non-magic bytes → 0');
+	}
+
+	# DPDB — standard DBM::Deep file header → 1
+	{
+		my $f = File::Temp->new(SUFFIX => '.db');
+		binmode $f;
+		print {$f} 'DPDBextraignored';
+		$f->flush();
+		ok($db->_is_deep_db($f->filename()),
+			'_is_deep_db(): DPDB magic → 1');
+	}
+
+	# DPDP — alternative DBM::Deep file header → 1
+	{
+		my $f = File::Temp->new(SUFFIX => '.db');
+		binmode $f;
+		print {$f} 'DPDPextraignored';
+		$f->flush();
+		ok($db->_is_deep_db($f->filename()),
+			'_is_deep_db(): DPDP magic → 1');
+	}
+}
+
+# ---- A24: _is_local_host() white-box tests ---------------------------------
+note '--- A24: _is_local_host()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Documented loopback literals always return true regardless of hostname
+	ok($db->_is_local_host('localhost'),   '_is_local_host(): localhost → true');
+	ok($db->_is_local_host('127.0.0.1'),   '_is_local_host(): 127.0.0.1 → true');
+	ok($db->_is_local_host('::1'),         '_is_local_host(): ::1 (IPv6 loopback) → true');
+
+	# user@host forms strip the prefix before comparison
+	ok($db->_is_local_host('user@localhost'),   '_is_local_host(): user@localhost → true');
+	ok($db->_is_local_host('njh@127.0.0.1'),    '_is_local_host(): user@127.0.0.1 → true');
+
+	# Unambiguously remote names must return false
+	ok(!$db->_is_local_host('remoteserver'),   '_is_local_host(): remote name → false');
+	ok(!$db->_is_local_host('db.example.com'), '_is_local_host(): remote FQDN → false');
+	ok(!$db->_is_local_host('192.168.1.1'),    '_is_local_host(): non-loopback IP → false');
+}
+
+# ---- A25: _scan_berkeley() comprehensive ------------------------------------
+note '--- A25: _scan_berkeley()';
+{
+	# join parameter must croak before scanning begins
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { x => 'y' };
+		throws_ok {
+			$bdb->_scan_berkeley({ join => { table => 't', on => 'x=y' } })
+		} qr/BerkeleyDB does not support JOINs/i,
+		'_scan_berkeley(): join param causes croak';
+	}
+
+	# -or must croak (BerkeleyDB cannot handle logical groupings)
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { x => 'y' };
+		throws_ok {
+			$bdb->_scan_berkeley({ '-or' => [{ entry => 'x' }] })
+		} qr/BerkeleyDB does not support -or\/-and/i,
+		'_scan_berkeley(): -or param causes croak';
+	}
+
+	# -and must also croak
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { x => 'y' };
+		throws_ok {
+			$bdb->_scan_berkeley({ '-and' => [{ entry => 'x' }] })
+		} qr/BerkeleyDB does not support -or\/-and/i,
+		'_scan_berkeley(): -and param causes croak';
+	}
+
+	# No criteria → all rows; each row has entry+value keys
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { alice => 'Alice', bob => 'Bob', carol => 'Carol' };
+		my $all = $bdb->_scan_berkeley({});
+		is(scalar @{$all}, 3, '_scan_berkeley(): no criteria → 3 rows');
+		isa_ok($all, 'ARRAY', '_scan_berkeley(): returns arrayref');
+		ok(exists $all->[0]{'entry'}, '_scan_berkeley(): each row has entry key');
+		ok(exists $all->[0]{'value'}, '_scan_berkeley(): each row has value key');
+		returns_ok($all, { type => 'arrayref' }, '_scan_berkeley(): return type is arrayref');
+	}
+
+	# entry criterion selects exactly one row
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { alice => 'Alice', bob => 'Bob' };
+		my $filtered = $bdb->_scan_berkeley({ entry => 'alice' });
+		is(scalar @{$filtered}, 1,       '_scan_berkeley(): entry criterion → 1 row');
+		is($filtered->[0]{'value'}, 'Alice', '_scan_berkeley(): correct value returned');
+	}
+
+	# value criterion works on the non-key column
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { alice => 'Alice', bob => 'Bob' };
+		my $by_val = $bdb->_scan_berkeley({ value => 'Bob' });
+		is(scalar @{$by_val}, 1,     '_scan_berkeley(): value criterion → 1 row');
+		is($by_val->[0]{'entry'}, 'bob', '_scan_berkeley(): correct entry returned');
+	}
+
+	# Empty berkeley hash → empty arrayref (not undef)
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = {};
+		my $empty = $bdb->_scan_berkeley({});
+		is(scalar @{$empty}, 0, '_scan_berkeley(): empty hash → empty arrayref');
+	}
+}
+
+# ---- A26: _like_match() DP matcher ------------------------------------------
+note '--- A26: _like_match()';
+{
+	# _like_match() is a package-level function with no $self argument
+
+	# Exact-match semantics
+	ok(Database::Abstraction::_like_match('alice', 'alice'),
+		'_like_match(): exact match → 1');
+	ok(!Database::Abstraction::_like_match('alice', 'bob'),
+		'_like_match(): exact non-match → 0');
+
+	# % wildcard at end: prefix match
+	ok(Database::Abstraction::_like_match('alice', 'al%'),
+		'_like_match(): % end, prefix matches → 1');
+	ok(!Database::Abstraction::_like_match('bob', 'al%'),
+		'_like_match(): % end, prefix does not match → 0');
+
+	# % wildcard at start: suffix match
+	ok(Database::Abstraction::_like_match('alice', '%ce'),
+		'_like_match(): % start, suffix matches → 1');
+	ok(!Database::Abstraction::_like_match('alice', '%zz'),
+		'_like_match(): % start, suffix does not match → 0');
+
+	# % wildcard in middle
+	ok(Database::Abstraction::_like_match('alice', 'al%ce'),
+		'_like_match(): % middle, both parts match → 1');
+	ok(!Database::Abstraction::_like_match('alice', 'al%zz'),
+		'_like_match(): % middle, trailing part does not match → 0');
+
+	# % matches empty sequence
+	ok(Database::Abstraction::_like_match('',  '%'),
+		'_like_match(): empty string matches bare % → 1');
+	ok(Database::Abstraction::_like_match('x', '%'),
+		'_like_match(): any string matches bare % → 1');
+	ok(!Database::Abstraction::_like_match('', 'a%'),
+		'_like_match(): empty string does not match non-empty prefix → 0');
+
+	# _ single-character wildcard
+	ok(Database::Abstraction::_like_match('alice', 'a_ice'),
+		'_like_match(): _ matches one char → 1');
+	ok(!Database::Abstraction::_like_match('ace', 'a_ice'),
+		'_like_match(): _ requires exactly one char, not zero → 0');
+
+	# Multiple % wildcards (exercises the row-vs-column DP traversal)
+	ok(Database::Abstraction::_like_match('abcabc', '%a%b%'),
+		'_like_match(): multiple % wildcards → 1');
+	ok(!Database::Abstraction::_like_match('xyz', '%a%b%'),
+		'_like_match(): multiple % wildcards, no match → 0');
+
+	# Case insensitivity: SQL LIKE is case-insensitive
+	ok(Database::Abstraction::_like_match('ALICE', 'al%'),
+		'_like_match(): case-insensitive: ALICE matches al% → 1');
+	ok(Database::Abstraction::_like_match('Alice', 'ALICE'),
+		'_like_match(): case-insensitive: Alice matches ALICE → 1');
+
+	# ReDoS guard: a pattern that would catastrophically backtrack with a
+	# naive regex (%a%a%a%b on a long 'aaa...a' string) must complete promptly
+	# because the DP algorithm is O(m*n), not exponential.
+	my $long_a = 'a' x 20;
+	ok(!Database::Abstraction::_like_match($long_a, '%a%a%a%a%a%b'),
+		'_like_match(): ReDoS-inducing pattern completes quickly and returns correct 0');
+}
+
+# ---- A27: _has_bdb_magic() positive tests -----------------------------------
+note '--- A27: _has_bdb_magic() positive cases';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# BDB Btree big-endian magic: pack('N', 0x00061561) = "\x00\x06\x15\x61"
+	{
+		my $f = File::Temp->new(); binmode $f;
+		print {$f} "\x00\x06\x15\x61EXTRA"; $f->flush();
+		open my $fh, '<', $f->filename(); binmode $fh;
+		ok($db->_has_bdb_magic($fh), '_has_bdb_magic(): BDB Btree big-endian magic → 1');
+		close $fh;
+	}
+
+	# BDB Hash big-endian magic: pack('N', 0x00053162) = "\x00\x05\x31\x62"
+	{
+		my $f = File::Temp->new(); binmode $f;
+		print {$f} "\x00\x05\x31\x62EXTRA"; $f->flush();
+		open my $fh, '<', $f->filename(); binmode $fh;
+		ok($db->_has_bdb_magic($fh), '_has_bdb_magic(): BDB Hash big-endian magic → 1');
+		close $fh;
+	}
+
+	# BDB Btree little-endian magic: pack('V', 0x00061561) = "\x61\x15\x06\x00"
+	{
+		my $f = File::Temp->new(); binmode $f;
+		print {$f} "\x61\x15\x06\x00EXTRA"; $f->flush();
+		open my $fh, '<', $f->filename(); binmode $fh;
+		ok($db->_has_bdb_magic($fh), '_has_bdb_magic(): BDB Btree little-endian magic → 1');
+		close $fh;
+	}
+
+	# Btree fallback at offset 12: 4 non-magic bytes + 8 filler + "\x61\x15\x00\x00"
+	# unpack('H*', "\x61\x15\x00\x00") = '61150000'; substr(…, 0, 4) = '6115' → match
+	{
+		my $f = File::Temp->new(); binmode $f;
+		print {$f} 'xxxx';               # offset 0: non-magic
+		print {$f} 'y' x 8;              # offset 4-11: filler
+		print {$f} "\x61\x15\x00\x00";  # offset 12: Btree '6115' prefix
+		$f->flush();
+		open my $fh, '<', $f->filename(); binmode $fh;
+		ok($db->_has_bdb_magic($fh), '_has_bdb_magic(): Btree fallback at offset 12 → 1');
+		close $fh;
+	}
+}
+
+# ---- A28: new() injection guards -------------------------------------------
+note '--- A28: new() injection guards';
+{
+	# Semicolons and SQL keywords make the id column name dangerous
+	throws_ok {
+		Database::test1->new(directory => $DATA_DIR, id => 'bad;id')
+	} qr/unsafe id column name/i,
+	'new(): id with semicolon → croak before object returned';
+
+	# SQL injection attempt in the clone path (fixed in 0.37)
+	{
+		my $original = Database::test1->new($DATA_DIR);
+		throws_ok { $original->new(id => "x); DROP TABLE t--") }
+			qr/unsafe id column name/i,
+			'new(): clone path: SQL in id → croak';
+	}
+
+	# host validation: spaces and shell metacharacters must be rejected
+	throws_ok {
+		Database::test1->new(directory => $DATA_DIR, host => 'bad host; rm -rf /')
+	} qr/unsafe host/i,
+	'new(): host with shell metacharacters → croak at construction time';
+
+	# A safe underscore-containing id must pass
+	lives_ok {
+		Database::test1->new(directory => $DATA_DIR, id => 'my_entry_col')
+	} 'new(): underscored id does not croak';
+}
+
+# ---- A29: columns() and schema() — SQLite DBI path -------------------------
+note '--- A29: columns() and schema() — SQLite path';
+SKIP: {
+	skip 'DBD::SQLite not available for schema tests', 10 unless $have_sqlite;
+
+	my $sch_dir  = tempdir(CLEANUP => 1);
+	my $sch_file = File::Spec->catfile($sch_dir, 'colschema.sql');
+	my $sch_dsn  = "dbi:SQLite:dbname=$sch_file";
+
+	do {
+		my $s = DBI->connect($sch_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE colschema (entry TEXT PRIMARY KEY NOT NULL, name TEXT, score INTEGER DEFAULT 0)');
+		$s->do("INSERT INTO colschema VALUES ('a','Alpha',10)");
+		$s->disconnect();
+	};
+
+	{
+		package Database::colschema;
+		use parent 'Database::Abstraction';
+	}
+
+	my $db = Database::colschema->new(dsn => $sch_dsn);
+
+	# columns() — SQLite uses SELECT * WHERE 1=0 then $sth->{NAME}
+	my $cols = $db->columns();
+	isa_ok($cols, 'ARRAY', 'columns() SQLite: returns arrayref');
+	is(scalar @{$cols}, 3,  'columns() SQLite: exactly 3 columns');
+	ok((grep { $_ eq 'entry' } @{$cols}), 'columns() SQLite: entry present');
+	ok((grep { $_ eq 'name'  } @{$cols}), 'columns() SQLite: name present');
+	ok((grep { $_ eq 'score' } @{$cols}), 'columns() SQLite: score present');
+
+	# schema() — SQLite uses PRAGMA table_info
+	my $schema = $db->schema();
+	isa_ok($schema, 'HASH', 'schema() SQLite: returns hashref');
+	ok(exists $schema->{'entry'}, 'schema() SQLite: entry key present');
+	is($schema->{'entry'}{'pk'}, 1, 'schema() SQLite: entry is primary key');
+	# PRAGMA table_info sets notnull=1 for NOT NULL; nullable = !notnull, which
+	# is a Perl boolean false ('' or 0 depending on Perl version) — assert falsy
+	ok(!$schema->{'entry'}{'nullable'}, 'schema() SQLite: NOT NULL column → nullable is false');
+	ok(exists $schema->{'score'}{'default'}, 'schema() SQLite: score has default sub-key');
+}
+
+# ---- A30: DESTROY() — cleanup verification ----------------------------------
+note '--- A30: DESTROY()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# Inject sentinel refs so we can check they are removed by DESTROY
+	$db->{'_temp_fh'}      = \(my $dummy1);
+	$db->{'_remote_tmpdir'} = \(my $dummy2);
+
+	lives_ok { $db->DESTROY() } 'DESTROY(): does not croak on normal object';
+
+	# After DESTROY all keys are cleared (the general cleanup loop runs)
+	ok(!exists($db->{'_temp_fh'}),       'DESTROY(): _temp_fh key removed');
+	ok(!exists($db->{'_remote_tmpdir'}), 'DESTROY(): _remote_tmpdir key removed');
+}
+
+# ---- A31: selectall_hashref() and selectall_hash() aliases -----------------
+note '--- A31: selectall_hashref / selectall_hash aliases';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# selectall_hashref is a documented backward-compat alias for selectall_arrayref
+	my $ref1 = $db->selectall_hashref();
+	my $ref2 = $db->selectall_arrayref();
+	is(scalar @{$ref1}, scalar @{$ref2},
+		'selectall_hashref(): returns same count as selectall_arrayref()');
+	isa_ok($ref1, 'ARRAY', 'selectall_hashref(): returns arrayref');
+
+	# selectall_hash is a documented backward-compat alias for selectall_array
+	my @arr1 = $db->selectall_hash();
+	my @arr2 = $db->selectall_array();
+	is(scalar @arr1, scalar @arr2,
+		'selectall_hash(): returns same count as selectall_array()');
 }
 
 done_testing();

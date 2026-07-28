@@ -4,11 +4,6 @@ package Database::Abstraction;
 # Copyright (C) 2015-2026, Nigel Horne
 
 # Usage is subject to licence terms.
-# The licence terms of this software are as follows:
-# Personal single user, single computer use: GPL2
-# All other users (for example, Commercial, Charity, Educational, Government)
-#	must apply in writing for a licence for use from Nigel Horne at the
-#	above e-mail.
 
 # TODO:	Switch "entry" to off by default, and enable by passing 'entry'
 #	though that wouldn't be so nice for AUTOLOAD
@@ -23,7 +18,6 @@ package Database::Abstraction;
 # TODO:	It would be better for the default sep_char to be ',' rather than '!'
 # TODO:	Other databases e.g., Redis, noSQL, remote databases such as MySQL, PostgreSQL
 # TODO: The no_entry/entry terminology is confusing.  Replace with no_id/id_column
-# TODO: Add support for DBM::Deep
 # TODO: Log queries and the time that they took to execute per database
 
 use warnings;
@@ -45,9 +39,20 @@ use Object::Configure 0.16;
 use Params::Get 0.13;
 use Return::Set qw(set_return);
 use Scalar::Util;
+use Sub::Private;
+use Sub::Protected;
+
+# File::Slurp::Remote is loaded lazily in _open() when host => '...' is given.
 
 our %defaults;
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
+
+# Compiled once at module load; reused in every identifier-safety check.
+# Using \A/\z (true string anchors) rather than ^/$ which match around \n.
+# SAFE_IDENTIFIER: bare SQL identifier — letters, digits, underscore.
+# SAFE_QUALIFIED:  allows a single dot for table.column notation in JOINs.
+my $SAFE_IDENTIFIER = qr/\A[a-zA-Z_][a-zA-Z0-9_]*\z/;
+my $SAFE_QUALIFIED  = qr/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/;
 
 =head1 NAME
 
@@ -55,16 +60,16 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 DESCRIPTION
 
 C<Database::Abstraction> is a read-only ORM for Perl that gives a uniform
-interface over CSV, PSV, XML, SQLite, and BerkeleyDB files - without writing
+interface over CSV, PSV, XML, SQLite, DBM::Deep, and BerkeleyDB files - without writing
 any SQL.
 
 Key features:
@@ -228,21 +233,27 @@ The module probes the C<directory> for files in this priority order:
 
 File ending C<.sql>
 
-=item 2. C<PSV>
+=item 2. C<Deep>
+
+DBM::Deep file ending C<.dbm> or C<.deep>.  The entire file is slurped
+into a plain Perl hash on open; all in-memory fast-paths apply.
+Requires L<DBM::Deep> (loaded lazily).
+
+=item 3. C<PSV>
 
 Pipe-separated file, ending C<.psv>
 
-=item 3. C<CSV>
+=item 4. C<CSV>
 
 Comma (or custom) separated file, ending C<.csv> or C<.db>; can be
 gzipped.  B<Note:> the default separator is C<!> not C<,> for historical
 reasons - pass C<< sep_char => ',' >> for standard CSVs.
 
-=item 4. C<XML>
+=item 5. C<XML>
 
 File ending C<.xml>
 
-=item 5. C<BerkeleyDB>
+=item 6. C<BerkeleyDB>
 
 Binary key-value file ending C<.db>
 
@@ -421,6 +432,17 @@ name derived from the class name).
 Override the full filename (relative to C<directory>).  Takes precedence
 over C<dbname>.
 
+=item * C<host>
+
+Remote hostname (or C<user@host>) from which to fetch the data file(s) via
+SSH/SCP.  When present, each candidate filename is fetched with
+L<File::Slurp::Remote> into a local temporary directory; the existing
+extension-based file-type detection then runs against that directory.
+C<directory> is treated as the remote path (no local canonicalization is
+applied).  Using C<filename> together with C<host> avoids probing multiple
+extensions and is therefore more efficient.  L<File::Slurp::Remote> must be
+installed; it is loaded lazily (only when C<host> is given).
+
 =back
 
 =head3 Behaviour parameters
@@ -533,7 +555,15 @@ sub new {
 	} elsif($class eq __PACKAGE__) {
 		croak("$class: abstract class");
 	} elsif(Scalar::Util::blessed($class)) {
-		# If $class is an object, clone it with new arguments
+		# If $class is an object, clone it with new arguments.
+		# Validate 'id' before merging — the id validation block below is
+		# skipped by this early return, so a hostile clone arg like
+		# id => "entry); DROP TABLE t--" would otherwise bypass all guards
+		# and be interpolated directly into ORDER BY / COUNT() SQL.
+		if(defined $args{'id'}) {
+			croak(ref($class), ": unsafe id column name '$args{id}'")
+				unless $args{'id'} =~ $SAFE_IDENTIFIER;
+		}
 		return bless { %{$class}, %args }, ref($class);
 	}
 
@@ -549,14 +579,24 @@ sub new {
 	unless($args{'dsn'} || $defaults{'dsn'}) {
 		croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
 
-		croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
+		# Skip the local -d check only for genuinely remote hosts.
+		# localhost / 127.0.0.1 / current hostname are treated as local.
+		my $given_host = $args{'host'} // $defaults{'host'};
+		unless($given_host && !$class->_is_local_host($given_host)) {
+			croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
+		}
 	}
 
 	# Validate the primary-key column name to prevent SQL injection via ORDER BY / WHERE
 	for my $src (\%defaults, \%args) {
 		if(defined $src->{'id'}) {
 			croak("$class: unsafe id column name '$src->{id}'")
-				unless $src->{'id'} =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+				unless $src->{'id'} =~ $SAFE_IDENTIFIER;
+		}
+		if(defined $src->{'host'}) {
+			croak("$class: unsafe host '$src->{host}'")
+				# \z (not $) so a trailing newline cannot sneak past the anchor.
+				unless $src->{'host'} =~ /\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9:][a-zA-Z0-9._:-]*\z/;
 		}
 	}
 
@@ -598,7 +638,7 @@ sub set_logger
 # Read the data into memory or establish a connection to the database file.
 # column_names allows the column names to be overridden on CSV files
 
-sub _open
+sub _open :Protected
 {
 	# Enforce that _open is only reachable from within this class hierarchy;
 	# caller() returns the calling package name as a plain string.
@@ -611,7 +651,7 @@ sub _open
 	my $max_slurp_size = $params->{'max_slurp_size'} || $self->{'max_slurp_size'};
 
 	my $table = $self->{'table'} || ref($self);
-	$table =~ s/.*:://;
+	$table =~ s/\A.*:://;
 
 	$self->_trace(ref($self), ": _open $table");
 
@@ -622,8 +662,6 @@ sub _open
 
 	# DSN-based connection bypasses file detection entirely
 	if(my $dsn = $self->{'dsn'} || $defaults{'dsn'}) {
-		require DBI && DBI->import() unless DBI->can('connect');
-
 		my $dialect = 'generic';
 		if    ($dsn =~ /^dbi:SQLite:/i) { $dialect = 'sqlite'   }
 		elsif ($dsn =~ /^dbi:Pg:/i)     { $dialect = 'postgres' }
@@ -652,19 +690,60 @@ sub _open
 		return $self;
 	}
 
-	my $dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
 	my $dbname = $self->{'dbname'} || $defaults{'dbname'} || $table;
 	Carp::croak(ref($self), ": unsafe dbname '$dbname'")
 		unless $dbname =~ /^[a-zA-Z0-9_.-]+$/ && $dbname !~ /\.\./;
+
+	# When a remote host is given, fetch all candidate files into a local temp
+	# directory via File::Slurp::Remote (SSH/SCP).  localhost / 127.0.0.1 / the
+	# current machine's hostname are treated as local (no SSH, no temp dir).
+	my $dir;
+	if(my $host = $self->{'host'} || $defaults{'host'}) {
+		if($self->_is_local_host($host)) {
+			$self->_debug("host '$host' is local; reading directory directly");
+			$dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
+		} else {
+			require File::Slurp::Remote;
+			my $remote_dir = $self->{'directory'} || $defaults{'directory'};
+			my $tmpdir_obj = File::Temp->newdir(CLEANUP => 1);
+			$self->{'_remote_tmpdir'} = $tmpdir_obj;	# auto-cleans on DESTROY
+			my $tmpdir = $tmpdir_obj->dirname();
+			for my $ext (qw(sql dbm deep db csv.gz db.gz psv csv xml)) {
+				my $remote_file = "$remote_dir/$dbname.$ext";
+				my $content = eval { scalar File::Slurp::Remote::read_remote_file($host, $remote_file) };
+				next unless defined($content) && length($content);
+				my $local = File::Spec->catfile($tmpdir, "$dbname.$ext");
+				open(my $fh, '>', $local);
+				binmode $fh;
+				print $fh $content;
+				close $fh;
+				$self->_debug("fetched remote $host:$remote_file");
+			}
+			$dir = $tmpdir;
+		}
+	} else {
+		$dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
+	}
 	my $slurp_file = File::Spec->catfile($dir, "$dbname.sql");
 
 	$self->_debug("_open: try to open $slurp_file");
 
+	# Probe for DBM::Deep files (.dbm or .deep) before the CSV/BerkeleyDB fallback.
+	# Loaded lazily so the DBM::Deep module is not required for other backends.
+	my $deep_file;
+	for my $ext (qw(dbm deep)) {
+		my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
+		if(-r $candidate) { $deep_file = $candidate; last }
+	}
+	# Also detect DBM::Deep files by magic bytes (covers .db files and arbitrary extensions).
+	if(!$deep_file) {
+		my $db_candidate = File::Spec->catfile($dir, "$dbname.db");
+		$deep_file = $db_candidate if -r $db_candidate && $self->_is_deep_db($db_candidate);
+	}
+
 	# Look at various places to find the file and derive the file type from the file's name
 	if(-r $slurp_file) {
 		# SQLite file
-		require DBI && DBI->import() unless DBI->can('connect');
-
 		require DBD::SQLite::Constants;
 		$dbh = DBI->connect("dbi:SQLite:dbname=$slurp_file", undef, undef, {
 			sqlite_open_flags => DBD::SQLite::Constants::SQLITE_OPEN_READONLY(),
@@ -679,6 +758,40 @@ sub _open
 		$dbh->sqlite_busy_timeout(100000);	# 10s
 		$self->_debug("read in $table from SQLite $slurp_file");
 		$self->{'type'} = 'DBI';
+	} elsif($deep_file) {
+		# DBM::Deep file (.dbm or .deep) — slurp the entire tied hash into a plain
+		# Perl hash so all existing in-memory fast-paths work without modification.
+		require DBM::Deep;
+		my $deep = DBM::Deep->new({ file => $deep_file, read_only => 1 });
+		my $id = $self->{'id'};
+		if($self->{'no_entry'}) {
+			# Not keyed — produce an ordered arrayref of row hashrefs, same as CSV no_entry.
+			my @data;
+			for my $k (sort keys %{$deep}) {
+				my $row = $deep->{$k};
+				# Use reftype (not ref) so blessed DBM::Deep::Hash objects are recognised.
+				# Inject the outer key as the id column so criteria on that column work.
+				push @data, (Scalar::Util::reftype($row) // '') eq 'HASH'
+					? { $id => $k, %{$row} }
+					: { $id => $k, value => $row };
+			}
+			$self->{'data'} = @data ? \@data : undef;
+		} else {
+			# Keyed on the primary-key column (default: 'entry') for O(1) lookups.
+			# Each row hash must contain the id column (like CSV rows), so that
+			# selectall_arrayref and AUTOLOAD can access it by name.
+			my %data;
+			for my $k (keys %{$deep}) {
+				my $row = $deep->{$k};
+				$data{$k} = (Scalar::Util::reftype($row) // '') eq 'HASH'
+					? { $id => $k, %{$row} }
+					: { $id => $k, value => $row };
+			}
+			$self->{'data'} = %data ? \%data : undef;
+		}
+		$slurp_file = $deep_file;
+		$self->_debug("read in $table from DBM::Deep $deep_file");
+		$self->{'type'} = 'Deep';
 	} elsif($self->_is_berkeley_db(File::Spec->catfile($dir, "$dbname.db"))) {
 		$self->_debug("$table is a BerkeleyDB file");
 		$self->{'type'} = 'BerkeleyDB';
@@ -687,26 +800,27 @@ sub _open
 		# File::pfopen splits $path on ':' which breaks Windows drive letters
 		# (C:\foo becomes ['C', '\foo']).  Since we always have a single directory
 		# we use File::Spec->catfile directly — same behaviour, portable.
+		my $gz_file;
 		for my $ext (qw(csv.gz db.gz)) {
 			my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
 			next unless -r $candidate;
-			open($fin, '<', $candidate) or next;
-			$slurp_file = $candidate;
+			open($fin, '<', $candidate);
+			$gz_file = $candidate;
 			last;
 		}
-		if(defined($slurp_file) && (-r $slurp_file)) {
+		if($gz_file) {
 			require Gzip::Faster;
-			Gzip::Faster->import();
 
 			close($fin);
 			$fin = File::Temp->new(SUFFIX => '.csv', UNLINK => 1);
-			print $fin gunzip_file($slurp_file);
+			print $fin Gzip::Faster::gunzip_file($gz_file);
 			$fin->flush();
 			$slurp_file = $fin->filename();
 			$self->{'_temp_fh'} = $fin;	# Keep object alive; auto-unlinks at DESTROY
 		} else {
 			my $psv = File::Spec->catfile($dir, "$dbname.psv");
-			if(-r $psv && open($fin, '<', $psv)) {
+			if(-r $psv) {
+				open($fin, '<', $psv);
 				# Pipe separated file
 				$slurp_file = $psv;
 				$params->{'sep_char'} = '|';
@@ -715,7 +829,7 @@ sub _open
 				for my $ext (qw(csv db)) {
 					my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
 					next unless -r $candidate;
-					open($fin, '<', $candidate) or next;
+					open($fin, '<', $candidate);
 					$slurp_file = $candidate;
 					last;
 				}
@@ -790,11 +904,10 @@ sub _open
 					$self->{'data'} = ();
 				} else {
 					require Text::xSV::Slurp;
-					Text::xSV::Slurp->import();
 
 					$self->_debug('slurp in');
 
-					my $dataref = xsv_slurp(
+					my $dataref = Text::xSV::Slurp::xsv_slurp(
 						shape => 'aoh',
 						text_csv => {
 							sep_char => $sep_char,
@@ -809,7 +922,10 @@ sub _open
 					);
 
 					# Filter out blank lines and comment rows (lines starting with #)
-					my @data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @{$dataref};
+					# Two passes replaced with one: pre-compute id column to avoid N hash
+				# lookups per element, and combine both conditions into one grep.
+				my $id_col = $self->{'id'};
+				my @data = grep { defined($_->{$id_col}) && $_->{$id_col} !~ /\A\s*#/ } @{$dataref};
 
 					if($self->{'no_entry'}) {
 						# Not keyed on a primary column — keep as ordered list.
@@ -829,9 +945,8 @@ sub _open
 			if(-r $slurp_file) {
 				if((-s $slurp_file) <= $max_slurp_size) {
 					require XML::Simple;
-					XML::Simple->import();
 
-					my $xml = XMLin($slurp_file);
+					my $xml = XML::Simple::XMLin($slurp_file);
 					my @keys = keys %{$xml};
 					my $key = $keys[0];
 					my @data;
@@ -880,7 +995,7 @@ sub _open
 	}
 
 	# ref() must be called on the variable, not on the result of 'eq'
-	Data::Reuse::fixate(%{$self->{'data'}}) if($self->{'data'} && (ref($self->{'data'}) eq 'HASH'));
+	$self->_fixate($self->{'data'}) if($self->{'data'} && (ref($self->{'data'}) eq 'HASH'));
 
 	$self->{$table} = $dbh;
 	my @statb = stat($slurp_file);
@@ -980,9 +1095,12 @@ sub selectall_arrayref {
 			# Scan in-memory hash for simple column criteria without touching DBI.
 			# fixate() locks hash keys, so use exists() to avoid throwing on unknown columns.
 			$self->_debug("$table: selectall_arrayref in-memory scan with criteria");
+			# Pre-compute param keys once — avoids re-running keys() inside the inner
+			# closure on every row iteration (N hash-key extractions → 1).
+			my @param_keys = keys %{$params};
 			my @rc = grep {
 				my $row = $_;
-				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } keys %{$params}
+				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } @param_keys
 			} values %{$self->{'data'}};
 			return set_return(\@rc, { type => 'arrayref' });
 		}
@@ -1039,17 +1157,12 @@ sub selectall_arrayref {
 
 		my $rc;
 		while(my $href = $sth->fetchrow_hashref()) {
-			push @{$rc}, $href if(scalar keys %{$href});
+			push @{$rc}, $href if %{$href};
 		}
 		$c->set($key, $rc, $self->{'cache_duration'}) if $c;
 
-		if(!$self->{'no_fixate'}) {
-			# forget() clears stale address→canonical mappings from prior calls;
-			# fixate() then deduplicates values within this result set only.
-			# Without forget(), freed hashref addresses from previous fixate calls
-			# can collide with new DBI hashrefs and return wrong canonical rows.
-			Data::Reuse::forget();
-			Data::Reuse::fixate(@{$rc});
+		if($rc && !$self->{'no_fixate'}) {
+			$self->_fixate($rc);
 		}
 
 		return $rc;
@@ -1199,8 +1312,7 @@ sub selectall_array
 
 		if($rc) {
 			if(!$self->{'no_fixate'}) {
-				Data::Reuse::forget();
-				Data::Reuse::fixate(@{$rc});
+				$self->_fixate($rc);
 			}
 			return @{$rc};
 		}
@@ -1259,6 +1371,19 @@ sub count
 		} elsif((scalar(keys %{$params}) == 1) && defined($params->{'entry'}) && !$self->{'no_entry'}) {
 			# exists() guard: fixate() locks all keys in the slurp hash
 			return (exists($self->{'data'}->{$params->{'entry'}}) && $self->{'data'}->{$params->{'entry'}}) ? 1 : 0;
+		} elsif(!$self->_has_complex_criteria($params) && !$self->{$table}) {
+			# General in-memory scan for simple column criteria.
+			# Only taken when there is no DBI handle ($self->{$table} is undef),
+			# i.e. slurp-only backends like Deep.  CSV/XML/SQLite have a DBI handle
+			# and must fall through to the SQL path so that column-name validation
+			# fires in _build_where_conditions.
+			$self->_debug("$table: count in-memory scan");
+			my @param_keys = keys %{$params};
+			my @rows = ref($self->{'data'}) eq 'HASH' ? values %{$self->{'data'}} : @{$self->{'data'}};
+			return scalar grep {
+				my $row = $_;
+				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } @param_keys
+			} @rows;
 		}
 	}
 
@@ -1291,7 +1416,10 @@ sub count
 		# in cache, derive the count from that array rather than hitting the DB.
 		# The key is built to match what selectall_arrayref would store.
 		$key = ref($self) . '::' . $query;
-		$key =~ s/COUNT\((.+?)\)/$1/;
+		# [^)]+ is a negated character class: O(n) with zero backtracking.
+		# The former lazy .+? could scan past the first ) in pathological SQL;
+		# [^)]+ is also semantically correct (COUNT(expr) never contains ) ).
+		$key =~ s/COUNT\(([^)]+)\)/$1/;
 		$key .= ' array';
 		if(defined($query_args[0])) {
 			$key .= ' ' . join(', ', @query_args);
@@ -1361,7 +1489,7 @@ sub fetchrow_hashref {
 	# ::diag($self->{'type'});
 	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'}) && !$self->_has_complex_criteria($params)) {
 		$self->_debug('Fast return from slurped data');
-		# Use exists() — fixate() locks the outer hash; accessing a missing key throws
+		# Use exists(), fixate() locks the outer hash; accessing a missing key throws
 		return exists($self->{'data'}->{$params->{'entry'}}) ? $self->{'data'}->{$params->{'entry'}} : undef;
 	}
 
@@ -1487,7 +1615,9 @@ sub execute
 	my $query = $args->{'query'};
 
 	# Append "FROM <table>" if missing
-	$query .= " FROM $table" unless $query =~ /\sFROM\s/i;
+	# \bFROM\b catches the keyword at any word boundary (space, tab, newline),
+	# unlike the former \sFROM\s which missed forms like "col\tFROM" or leading FROM.
+	$query .= " FROM $table" unless $query =~ /\bFROM\b/i;
 
 	# Log the query if a logger is available
 	$self->_debug("execute $query");
@@ -1571,6 +1701,8 @@ sub columns {
 		if(ref($data) eq 'HASH') {
 			my ($first) = values %{$data};
 			@cols = sort keys %{$first} if $first;
+		} elsif(ref($data) eq 'ARRAY' && @{$data}) {
+			@cols = sort keys %{$data->[0]};
 		}
 	} else {
 		my $sth = $self->{$table}->prepare_cached("SELECT * FROM $table WHERE 1=0");
@@ -1643,18 +1775,21 @@ sub schema {
 	}
 
 	if(my $data = $self->{'data'}) {
+		my $first;
 		if(ref($data) eq 'HASH') {
-			my ($first) = values %{$data};
-			if($first) {
-				my $id = $self->{'id'};
-				for my $col (keys %{$first}) {
-					$schema{$col} = {
-						type     => 'TEXT',
-						nullable => ($col eq $id ? 0 : 1),
-						default  => undef,
-						pk       => ($col eq $id ? 1 : 0),
-					};
-				}
+			($first) = values %{$data};
+		} elsif(ref($data) eq 'ARRAY' && @{$data}) {
+			$first = $data->[0];
+		}
+		if($first) {
+			my $id = $self->{'id'};
+			for my $col (keys %{$first}) {
+				$schema{$col} = {
+					type     => 'TEXT',
+					nullable => ($col eq $id ? 0 : 1),
+					default  => undef,
+					pk       => ($col eq $id ? 1 : 0),
+				};
 			}
 		}
 	} else {
@@ -1771,6 +1906,7 @@ sub AUTOLOAD {
 	my ($column) = $AUTOLOAD =~ /::(\w+)$/;
 
 	return if($column eq 'DESTROY');
+	return if($column =~ /^_/);	# never treat private method names as column lookups
 
 	my $self = shift or return;
 
@@ -1780,7 +1916,7 @@ sub AUTOLOAD {
 	Carp::croak(__PACKAGE__, ": AUTOLOAD disabled (auto_load => 0)") if(exists($self->{'auto_load'}) && !$self->{'auto_load'});
 
 	# Validate column name - only allow safe column name
-	Carp::croak(__PACKAGE__, ": Invalid column name: $column") unless $column =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+	Carp::croak(__PACKAGE__, ": Invalid column name: $column") unless $column =~ $SAFE_IDENTIFIER;
 
 	my $table = $self->_open_table();
 
@@ -1864,7 +2000,13 @@ sub AUTOLOAD {
 			} elsif((scalar keys %params) == 0) {
 				if(wantarray) {
 					if($distinct) {
-						my %h = map { $_ => 1 } grep { defined } map { exists($_->{$column}) ? $_->{$column} : undef } values %{$data};
+						# Single pass instead of three (map→grep→map): avoids three
+						# intermediate lists of size N on the stack.
+						my %h;
+						for my $r (values %{$data}) {
+							my $v = exists($r->{$column}) ? $r->{$column} : undef;
+							$h{$v} = 1 if defined $v;
+						}
 						return keys %h;
 					}
 					# DEAD CODE: unreachable because the outer `if(wantarray && !$distinct)`
@@ -1904,7 +2046,7 @@ sub AUTOLOAD {
 	for my $k (sort keys %params) {
 		# Guard against SQL injection via column names — same rule as _build_where_conditions
 		Carp::croak(__PACKAGE__, ": unsafe column name '$k'")
-			unless $k =~ /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
+			unless $k =~ $SAFE_QUALIFIED;
 		my $value = $params{$k};
 		$self->_debug(__PACKAGE__, ": AUTOLOAD adding key/value pair $k=>", defined($value) ? $value : 'NULL');
 		if(defined($value)) {
@@ -1953,7 +2095,7 @@ sub AUTOLOAD {
 		if($cache) {
 			$cache->set($key, \@rc, $self->{'cache_duration'});	# Store a ref to the array
 		}
-		Data::Reuse::fixate(@rc) if(!$self->{'no_fixate'});
+		Database::Abstraction::_fixate($self, \@rc) if(scalar(@rc) && !$self->{'no_fixate'});
 		return @rc;
 	}
 	my $rc = $sth->fetchrow_array();	# Return the first match only
@@ -1972,12 +2114,13 @@ sub DESTROY
 	}
 	my $self = shift;
 
-	# Clean up temporary file — deleting the File::Temp object triggers auto-unlink
+	# Clean up temporary files — deleting File::Temp objects triggers auto-unlink/rmdir
 	delete $self->{'_temp_fh'};
+	delete $self->{'_remote_tmpdir'};
 
 	# Clean up database handles
 	my $table_name = $self->{'table'} || ref($self);
-	$table_name =~ s/.*:://;
+	$table_name =~ s/\A.*:://;
 
 	if(my $dbh = delete $self->{$table_name}) {
 		$dbh->disconnect() if $dbh->can('disconnect');
@@ -2012,7 +2155,7 @@ sub _build_joins
 		my $type  = uc($j->{'type'}  // 'INNER');
 		my $jtable = $j->{'table'} or Carp::croak('join: missing "table"');
 		Carp::croak("join: unsafe table name '$jtable'")
-			unless $jtable =~ /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
+			unless $jtable =~ $SAFE_QUALIFIED;
 		my $on     = $j->{'on'}    or Carp::croak('join: missing "on" condition');
 		Carp::croak("Invalid JOIN type: $type") unless $valid_types{$type};
 		push @clauses, "$type JOIN $jtable ON ($on)";
@@ -2037,6 +2180,36 @@ sub _has_complex_criteria
 # Build the WHERE clause body (everything after "WHERE") from a criteria hash.
 # Handles -or / -and groupings then delegates per-column work to _build_where_conditions.
 # Returns ($sql_fragment, \@bind_values).
+# Wrapper around Data::Reuse::fixate() that suppresses the spurious
+# "Use of uninitialized value in hash slice" warning.  Data::Alias's XS
+# hash-aliasing code does not fully initialise key SVs on older Perl
+# versions when the source hash contains undef values (NULL columns).
+# Data::Reuse still fixates correctly; the warning is a false positive.
+# $struct must be the hashref or arrayref to fixate.
+sub _fixate :Private
+{
+	my (undef, $struct) = @_;
+	return unless defined $struct;
+	# Clear stale address→canonical mappings from prior fixate calls before
+	# fixating $struct.  Without this, freed hashref addresses from a previous
+	# object's slurp or DBI result can be reused by the allocator for new
+	# hashrefs; fixate() would then find the stale entry and alias the new
+	# hashref to the wrong canonical, silently substituting one row's data for
+	# another.  This is the same stale-address hazard that affects DBI paths
+	# (see selectall_arrayref / selectall_array) but also affects the slurp
+	# fixate when earlier objects go out of scope before a new slurp runs.
+	Data::Reuse::forget();
+	local $SIG{__WARN__} = sub {
+		# Two index() calls replace the former /.*\b/ — no backtracking at all.
+		# The prefix check is constant-time; the suffix scan is O(n) but stops
+		# at the first match rather than first matching greedily then retreating.
+		warn @_ unless
+			index($_[0], 'Use of uninitialized value') == 0
+			&& index($_[0], 'in hash slice') >= 0;
+	};
+	&Data::Reuse::fixate($struct);
+}
+
 sub _build_where
 {
 	my ($self, $params) = @_;
@@ -2099,7 +2272,7 @@ sub _build_where_conditions
 
 		# Guard against SQL injection via column names; allow table.column notation for JOINs
 		Carp::croak("_build_where_conditions: unsafe column name '$col'")
-			unless $col =~ /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
+			unless $col =~ $SAFE_QUALIFIED;
 
 		if(ref($val) eq 'HASH') {
 			for my $op (sort keys %{$val}) {
@@ -2125,7 +2298,9 @@ sub _build_where_conditions
 						push @clauses, "$col != ?";
 						push @args, $operand;
 					}
-				} elsif($op =~ /^(?:>|<|>=|<=)$/) {
+				# [<>]=? matches >, <, >=, <= as a single character class — no alternation
+				# overhead, no backtracking, and self-documenting.
+				} elsif($op =~ /\A[<>]=?\z/) {
 					push @clauses, "$col $op ?";
 					push @args, $operand;
 				} else {
@@ -2186,33 +2361,93 @@ sub _scan_berkeley
 	return \@rows;
 }
 
-# SQL LIKE match using dynamic programming (O(m*n), no catastrophic backtracking).
-# % matches any sequence of chars; _ matches exactly one char.  Case-insensitive.
+# SQL LIKE match — case-insensitive, ReDoS-safe, no catastrophic backtracking.
+# % matches any sequence of chars; _ matches exactly one char.
+#
+# Fast paths cover the four most common LIKE shapes using O(1) string ops:
+#   '%'        → always true
+#   no wildcard → lc eq comparison
+#   '%suffix'  → ends-with check via substr
+#   'prefix%'  → starts-with check via index
+#   '%mid%'    → contains check via index  (single inner literal, no _ wildcards)
+#
+# Full DP uses O(m) memory (two 1-D rolling arrays) instead of the O(m*n) 2-D
+# table the naive approach allocates.  Character access uses substr() instead of
+# split(//) so no per-character scalar objects are created.
 sub _like_match
 {
 	my ($str, $pattern) = @_;
-	my @s = split //, lc($str);
-	my @p = split //, lc($pattern);
-	my $m = scalar @s;
-	my $n = scalar @p;
 
-	my @dp = map { [ (0) x ($m + 1) ] } 0 .. $n;
-	$dp[0][0] = 1;
+	# Fast path 1: bare '%' — matches any string regardless of content.
+	return 1 if $pattern eq '%';
 
-	for my $i (1 .. $n) {
-		if($p[$i - 1] eq '%') {
-			$dp[$i][0] = $dp[$i - 1][0];
-			for my $j (1 .. $m) {
-				$dp[$i][$j] = ($dp[$i - 1][$j] || $dp[$i][$j - 1]) ? 1 : 0;
-			}
-		} else {
-			for my $j (1 .. $m) {
-				$dp[$i][$j] = ($dp[$i - 1][$j - 1]
-					&& ($p[$i - 1] eq '_' || $p[$i - 1] eq $s[$j - 1])) ? 1 : 0;
+	my $lc_str = lc($str);
+	my $lc_pat = lc($pattern);
+	my $pat_len = length($lc_pat);
+	my $str_len = length($lc_str);
+
+	# Fast path 2: no wildcard characters — plain case-insensitive equality.
+	return ($lc_str eq $lc_pat)
+		if index($lc_pat, '%') == -1 && index($lc_pat, '_') == -1;
+
+	# Fast paths 3-5 apply only when the pattern has no '_' wildcards.
+	# (Patterns with '_' need per-character DP to enforce the single-char rule.)
+	if(index($lc_pat, '_') == -1) {
+		my $first_pct = index($lc_pat, '%');
+		my $last_pct  = rindex($lc_pat, '%');
+
+		# Fast path 3: '%suffix' — exactly one '%', at the start.
+		if($first_pct == 0 && $last_pct == 0) {
+			my $sfx = substr($lc_pat, 1);
+			my $sfx_len = length($sfx);
+			return $str_len >= $sfx_len
+				&& substr($lc_str, $str_len - $sfx_len) eq $sfx;
+		}
+
+		# Fast path 4: 'prefix%' — exactly one '%', at the end.
+		if($last_pct == $pat_len - 1 && $first_pct == $pat_len - 1) {
+			my $pfx = substr($lc_pat, 0, $pat_len - 1);
+			return index($lc_str, $pfx) == 0;
+		}
+
+		# Fast path 5: '%literal%' — '%' at both ends, no inner '%'.
+		# pat_len >= 3 ensures there are two distinct '%' characters.
+		# Only return here when the middle segment is free of further wildcards;
+		# if it contains '%' (e.g. '%a%b%'), fall through to the full DP.
+		if($first_pct == 0 && $last_pct == $pat_len - 1 && $pat_len >= 3) {
+			my $needle = substr($lc_pat, 1, $pat_len - 2);
+			if(index($needle, '%') == -1) {
+				return index($lc_str, $needle) >= 0;
 			}
 		}
 	}
-	return $dp[$n][$m];
+
+	# Full DP — O(m*n) time, O(m) memory.
+	# Two 1-D arrays (@prev, @curr) replace the O(m*n) 2-D table.
+	# substr() replaces split(//) — no per-char scalar allocation.
+	my $m = $str_len;
+	my $n = $pat_len;
+
+	# @prev[j] = true iff pattern[0..i-1] matches string[0..j-1]
+	my @prev = (1, (0) x $m);
+
+	for my $i (1 .. $n) {
+		my @curr = (0) x ($m + 1);
+		my $pc = substr($lc_pat, $i - 1, 1);
+		if($pc eq '%') {
+			$curr[0] = $prev[0];
+			for my $j (1 .. $m) {
+				$curr[$j] = ($prev[$j] || $curr[$j - 1]) ? 1 : 0;
+			}
+		} else {
+			for my $j (1 .. $m) {
+				$curr[$j] = ($prev[$j - 1]
+					&& ($pc eq '_' || $pc eq substr($lc_str, $j - 1, 1))) ? 1 : 0;
+			}
+		}
+		@prev = @curr;
+	}
+	return $prev[$m];
 }
 
 sub _match_criterion
@@ -2263,14 +2498,24 @@ sub _open_table
 {
 	my($self, $params) = @_;
 
-	# Get table name (remove package name prefix if present)
-	my $table = $params->{'table'} || $self->{'table'} || ref($self);
-	$table =~ s/.*:://;
+	# Derive the table name, caching the result in '_table_name' for the common
+	# case of no caller-supplied 'table' override.  Avoids repeating ref()+regex
+	# on every query when the same object makes many calls.
+	my $table;
+	if($params->{'table'}) {
+		($table = $params->{'table'}) =~ s/\A.*:://;
+	} else {
+		$table = $self->{'_table_name'} //= do {
+			my $t = $self->{'table'} || ref($self);
+			$t =~ s/\A.*:://;
+			$t;
+		};
+	}
 
 	# Open a connection if it's not already open.
 	# BerkeleyDB never sets $self->{$table} (no DBI handle) or $self->{'data'},
 	# so we also guard on $self->{'berkeley'} to avoid re-tying on every call.
-	$self->_open() if((!$self->{$table}) && (!$self->{'data'}) && (!$self->{'berkeley'}));
+	$self->_open() if(!$self->{$table} && !$self->{'data'} && !$self->{'berkeley'});
 
 	return $table;
 }
@@ -2282,7 +2527,7 @@ sub _quote_identifier
 	my ($self, $name) = @_;
 
 	my $table = $self->{'table'} || ref($self);
-	$table =~ s/.*:://;
+	$table =~ s/\A.*:://;
 	if(my $dbh = $self->{$table}) {
 		return $dbh->quote_identifier($name);
 	}
@@ -2291,8 +2536,7 @@ sub _quote_identifier
 
 # Determine whether a given file is a valid Berkeley DB file.
 # It combines a fast preliminary check with a more thorough validation step for accuracy.
-# It looks for the magic number at both byte 0 and byte 12
-# TODO: Combine _db_0 and _db_12 as they are very similar routines
+# It looks for the magic number at both byte 0 and byte 12.
 sub _is_berkeley_db {
 	my ($self, $file) = @_;
 
@@ -2302,13 +2546,13 @@ sub _is_berkeley_db {
 	do { no autodie qw(open); open $fh, '<', $file } or return 0;
 	binmode $fh;
 
-	my $is_db = (($self->_is_berkeley_db_0($fh)) || ($self->_is_berkeley_db_12($fh)));
+	my $is_db = $self->_has_bdb_magic($fh);
 	close $fh;
 
 	if($is_db) {
 		# Step 2: Attempt to open as Berkeley DB
 
-		require DB_File && DB_File->import();
+		require DB_File;
 
 		my %bdb;
 		if(tie %bdb, 'DB_File', $file, O_RDONLY, 0644, $DB_File::DB_HASH) {
@@ -2320,42 +2564,62 @@ sub _is_berkeley_db {
 	return 0;
 }
 
-# Determine whether a given file is a valid Berkeley DB file.
-# It combines a fast preliminary check with a more thorough validation step for accuracy.
-sub _is_berkeley_db_0
-{
+# Check for Berkeley DB magic bytes at offsets 0 and 12.
+# Returns true if either location contains a recognised BDB magic number.
+sub _has_bdb_magic {
 	my ($self, $fh) = @_;
 
-	# Read the first 4 bytes (magic number)
-	read($fh, my $magic_bytes, 4) == 4 or return 0;
+	# Offset 0: 32-bit magic number in both endian forms
+	read($fh, my $buf, 4) == 4 or return 0;
+	my %magic = map { $_ => 1 } (0x00061561, 0x00053162, 0x00042253, 0x00052444);
+	return 1 if $magic{unpack('N', $buf)} || $magic{unpack('V', $buf)};
 
-	# Unpack both big-endian and little-endian values
-	my $magic_be = unpack('N', $magic_bytes);	# Big-endian
-	my $magic_le = unpack('V', $magic_bytes);	# Little-endian
-
-	# Known Berkeley DB magic numbers (in both endian formats)
-	my %known_magic = map { $_ => 1 } (
-		0x00061561,	# Btree
-		0x00053162,	# Hash
-		0x00042253,	# Queue
-		0x00052444,	# Recno
-	);
-
-	return($known_magic{$magic_be} || $known_magic{$magic_le});
+	# Offset 12: Btree magic prefix (fallback for some BDB file variants)
+	seek $fh, 12, 0 or return 0;
+	read($fh, $buf, 4) or return 0;
+	my $hex12 = substr(unpack('H*', $buf), 0, 4);
+	return($hex12 eq '6115' || $hex12 eq '1561');
 }
 
-sub _is_berkeley_db_12
-{
-	my ($self, $fh) = @_;
-	my $header;
+# Return true if $host refers to the current machine (localhost, loopback, or
+# the machine's own hostname).  Strips an optional user@ prefix first.
+# Used by new() and _open() to decide whether to use local file access instead
+# of File::Slurp::Remote, so the caller never loads that module unnecessarily.
+sub _is_local_host {
+	my ($self, $host) = @_;
 
-	seek $fh, 12, 0 or return 0;
-	read($fh, $header, 4) or return 0;
+	# Strip optional user@ prefix
+	(my $bare = $host) =~ s/^[^@]*\@//;
 
-	$header = substr(unpack('H*', $header), 0, 4);
+	# \z anchors at true end-of-string; $ would match before a trailing newline.
+	return 1 if $bare =~ /\A(?:localhost|127\.0\.0\.1|::1)\z/i;
 
-	# Berkeley DB magic numbers
-	return($header eq '6115' || $header eq '1561');	# Btree
+	require Sys::Hostname;
+	my $me = lc(Sys::Hostname::hostname());
+	my $lc_bare = lc($bare);
+	return 1 if $lc_bare eq $me;
+
+	# Match on short hostname: 'mybox' matches 'mybox.example.com' and vice-versa
+	(my $me_short   = $me)      =~ s/\..*//;
+	(my $bare_short = $lc_bare) =~ s/\..*//;
+	return($bare_short eq $me_short);
+}
+
+# Determine whether a given file is a DBM::Deep file by checking its magic bytes.
+# The standard DBM::Deep magic is 'DPDB' (0x44 0x50 0x44 0x42); 'DPDP' (0x44 0x50 0x44 0x50)
+# is also accepted for compatibility with files created by alternative tooling.
+# Returns 1 if the first 4 bytes match a known DBM::Deep signature, 0 otherwise.
+sub _is_deep_db {
+	my ($self, $file) = @_;
+
+	my $fh;
+	do { no autodie qw(open); open $fh, '<', $file } or return 0;
+	binmode $fh;
+	my $n = read($fh, my $magic, 4);
+	close $fh;
+	return 0 unless defined($n) && $n == 4;
+
+	return($magic eq 'DPDB' || $magic eq 'DPDP');
 }
 
 # Log and remember a message

@@ -9,7 +9,7 @@ B<OpenSearch::Client::Manual>
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 Basics
 
@@ -45,6 +45,11 @@ L<OpenSearch::Client::Manual::Helpers>
 =head1 Running the tests
 
 L<OpenSearch::Client::Manual::Tests>
+
+=head1 UTILITIES
+
+L<OpenSearch::Client::Hash> provided in a seperate distribution allows creation of C<BCrypt>, C<Argon2>
+and C<PBKDF2> password hashes that can be stored for later use in user creation.
 
 =head1 MANUAL
 

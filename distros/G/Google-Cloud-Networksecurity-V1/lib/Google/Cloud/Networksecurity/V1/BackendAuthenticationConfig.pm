@@ -1,0 +1,567 @@
+package Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::FieldMask };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CkNnb29nbGUvY2xvdWQvbmV0d29ya3NlY3VyaXR5L3YxL2JhY2tlbmRfYXV0aGVudGljYXRp
+b25fY29uZmlnLnByb3RvEh9nb29nbGUuY2xvdWQubmV0d29ya3NlY3VyaXR5LnYxGh9nb29n
+bGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGhlnb29nbGUvYXBpL3Jlc291cmNlLnByb3Rv
+GiBnb29nbGUvcHJvdG9idWYvZmllbGRfbWFzay5wcm90bxofZ29vZ2xlL3Byb3RvYnVmL3Rp
+bWVzdGFtcC5wcm90byLHBwobQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnEhcKBG5hbWUY
+ASABKAlCA+BBAlIEbmFtZRIlCgtkZXNjcmlwdGlvbhgCIAEoCUID4EEBUgtkZXNjcmlwdGlv
+bhJACgtjcmVhdGVfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BB
+A1IKY3JlYXRlVGltZRJACgt1cGRhdGVfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5U
+aW1lc3RhbXBCA+BBA1IKdXBkYXRlVGltZRJgCgZsYWJlbHMYBSADKAsySC5nb29nbGUuY2xv
+dWQubmV0d29ya3NlY3VyaXR5LnYxLkJhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZy5MYWJl
+bHNFbnRyeVIGbGFiZWxzEmQKEmNsaWVudF9jZXJ0aWZpY2F0ZRgGIAEoCUI14EEB+kEvCi1j
+ZXJ0aWZpY2F0ZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vQ2VydGlmaWNhdGVSEWNsaWVudENl
+cnRpZmljYXRlElgKDHRydXN0X2NvbmZpZxgHIAEoCUI14EEB+kEvCi1jZXJ0aWZpY2F0ZW1h
+bmFnZXIuZ29vZ2xlYXBpcy5jb20vVHJ1c3RDb25maWdSC3RydXN0Q29uZmlnEnUKEHdlbGxf
+a25vd25fcm9vdHMYCCABKA4ySy5nb29nbGUuY2xvdWQubmV0d29ya3NlY3VyaXR5LnYxLkJh
+Y2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZy5XZWxsS25vd25Sb290c1IOd2VsbEtub3duUm9v
+dHMSFwoEZXRhZxgJIAEoCUID4EEDUgRldGFnGjkKC0xhYmVsc0VudHJ5EhAKA2tleRgBIAEo
+CVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAEiTgoOV2VsbEtub3duUm9vdHMSIAoc
+V0VMTF9LTk9XTl9ST09UU19VTlNQRUNJRklFRBAAEggKBE5PTkUQARIQCgxQVUJMSUNfUk9P
+VFMQAjqmAepBogEKOm5ldHdvcmtzZWN1cml0eS5nb29nbGVhcGlzLmNvbS9CYWNrZW5kQXV0
+aGVudGljYXRpb25Db25maWcSZHByb2plY3RzL3twcm9qZWN0fS9sb2NhdGlvbnMve2xvY2F0
+aW9ufS9iYWNrZW5kQXV0aGVudGljYXRpb25Db25maWdzL3tiYWNrZW5kX2F1dGhlbnRpY2F0
+aW9uX2NvbmZpZ30iqAEKJ0xpc3RCYWNrZW5kQXV0aGVudGljYXRpb25Db25maWdzUmVxdWVz
+dBJBCgZwYXJlbnQYASABKAlCKeBBAvpBIwohbG9jYXRpb25zLmdvb2dsZWFwaXMuY29tL0xv
+Y2F0aW9uUgZwYXJlbnQSGwoJcGFnZV9zaXplGAIgASgFUghwYWdlU2l6ZRIdCgpwYWdlX3Rv
+a2VuGAMgASgJUglwYWdlVG9rZW4i+QEKKExpc3RCYWNrZW5kQXV0aGVudGljYXRpb25Db25m
+aWdzUmVzcG9uc2USggEKHmJhY2tlbmRfYXV0aGVudGljYXRpb25fY29uZmlncxgBIAMoCzI8
+Lmdvb2dsZS5jbG91ZC5uZXR3b3Jrc2VjdXJpdHkudjEuQmFja2VuZEF1dGhlbnRpY2F0aW9u
+Q29uZmlnUhxiYWNrZW5kQXV0aGVudGljYXRpb25Db25maWdzEiYKD25leHRfcGFnZV90b2tl
+bhgCIAEoCVINbmV4dFBhZ2VUb2tlbhIgCgt1bnJlYWNoYWJsZRgDIAMoCVILdW5yZWFjaGFi
+bGUifwolR2V0QmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnUmVxdWVzdBJWCgRuYW1lGAEg
+ASgJQkLgQQL6QTwKOm5ldHdvcmtzZWN1cml0eS5nb29nbGVhcGlzLmNvbS9CYWNrZW5kQXV0
+aGVudGljYXRpb25Db25maWdSBG5hbWUi3AIKKENyZWF0ZUJhY2tlbmRBdXRoZW50aWNhdGlv
+bkNvbmZpZ1JlcXVlc3QSWgoGcGFyZW50GAEgASgJQkLgQQL6QTwSOm5ldHdvcmtzZWN1cml0
+eS5nb29nbGVhcGlzLmNvbS9CYWNrZW5kQXV0aGVudGljYXRpb25Db25maWdSBnBhcmVudBJM
+CiBiYWNrZW5kX2F1dGhlbnRpY2F0aW9uX2NvbmZpZ19pZBgCIAEoCUID4EECUh1iYWNrZW5k
+QXV0aGVudGljYXRpb25Db25maWdJZBKFAQodYmFja2VuZF9hdXRoZW50aWNhdGlvbl9jb25m
+aWcYAyABKAsyPC5nb29nbGUuY2xvdWQubmV0d29ya3NlY3VyaXR5LnYxLkJhY2tlbmRBdXRo
+ZW50aWNhdGlvbkNvbmZpZ0ID4EECUhtiYWNrZW5kQXV0aGVudGljYXRpb25Db25maWci9AEK
+KFVwZGF0ZUJhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZ1JlcXVlc3QSQAoLdXBkYXRlX21h
+c2sYASABKAsyGi5nb29nbGUucHJvdG9idWYuRmllbGRNYXNrQgPgQQFSCnVwZGF0ZU1hc2sS
+hQEKHWJhY2tlbmRfYXV0aGVudGljYXRpb25fY29uZmlnGAIgASgLMjwuZ29vZ2xlLmNsb3Vk
+Lm5ldHdvcmtzZWN1cml0eS52MS5CYWNrZW5kQXV0aGVudGljYXRpb25Db25maWdCA+BBAlIb
+YmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIpsBCihEZWxldGVCYWNrZW5kQXV0aGVudGlj
+YXRpb25Db25maWdSZXF1ZXN0ElYKBG5hbWUYASABKAlCQuBBAvpBPAo6bmV0d29ya3NlY3Vy
+aXR5Lmdvb2dsZWFwaXMuY29tL0JhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZ1IEbmFtZRIX
+CgRldGFnGAIgASgJQgPgQQFSBGV0YWdC7gMKI2NvbS5nb29nbGUuY2xvdWQubmV0d29ya3Nl
+Y3VyaXR5LnYxQiBCYWNrZW5kQXV0aGVudGljYXRpb25Db25maWdQcm90b1ABWk1jbG91ZC5n
+b29nbGUuY29tL2dvL25ldHdvcmtzZWN1cml0eS9hcGl2MS9uZXR3b3Jrc2VjdXJpdHlwYjtu
+ZXR3b3Jrc2VjdXJpdHlwYqoCH0dvb2dsZS5DbG91ZC5OZXR3b3JrU2VjdXJpdHkuVjHKAh9H
+b29nbGVcQ2xvdWRcTmV0d29ya1NlY3VyaXR5XFYx6gIiR29vZ2xlOjpDbG91ZDo6TmV0d29y
+a1NlY3VyaXR5OjpWMepBcwotY2VydGlmaWNhdGVtYW5hZ2VyLmdvb2dsZWFwaXMuY29tL0Nl
+cnRpZmljYXRlEkJwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vY2Vy
+dGlmaWNhdGVzL3tjZXJ0aWZpY2F0ZX3qQXQKLWNlcnRpZmljYXRlbWFuYWdlci5nb29nbGVh
+cGlzLmNvbS9UcnVzdENvbmZpZxJDcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97bG9j
+YXRpb259L3RydXN0Q29uZmlncy97dHJ1c3RfY29uZmlnfUqxQQoHEgUOAO8BAQq8BAoBDBID
+DgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUg
+QXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkg
+bm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5z
+ZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRw
+Oi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWly
+ZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJl
+CiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAi
+QVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5Z
+IEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9y
+IHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1p
+dGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAKAoJCgIDABIDEgApCgkKAgMB
+EgMTACMKCQoCAwISAxQAKgoJCgIDAxIDFQApCggKAQgSAxcAPAoJCgIIJRIDFwA8CggKAQgS
+AxgAZAoJCgIICxIDGABkCggKAQgSAxkAIgoJCgIIChIDGQAiCggKAQgSAxoAQQoJCgIICBID
+GgBBCggKAQgSAxsAPAoJCgIIARIDGwA8CggKAQgSAxwAPAoJCgIIKRIDHAA8CggKAQgSAx0A
+OwoJCgIILRIDHQA7CgkKAQgSBB4AIQIKDAoECJ0IABIEHgAhAgoJCgEIEgQiACUCCgwKBAid
+CAESBCIAJQIK+wUKAgQAEgU3AIcBARrtBSBCYWNrZW5kQXV0aGVudGljYXRpb25Db25maWcg
+bWVzc2FnZSBncm91cHMgdGhlIFRydXN0Q29uZmlnIHRvZ2V0aGVyIHdpdGgKIG90aGVyIHNl
+dHRpbmdzIHRoYXQgY29udHJvbCBob3cgdGhlIGxvYWQgYmFsYW5jZXIgYXV0aGVudGljYXRl
+cywgYW5kCiBleHByZXNzZXMgaXRzIGlkZW50aXR5IHRvLCB0aGUgYmFja2VuZDoKCiAqIGB0
+cnVzdENvbmZpZ2AgaXMgdGhlIGF0dGFjaGVkIFRydXN0Q29uZmlnLgoKICogYHdlbGxLbm93
+blJvb3RzYCBpbmRpY2F0ZXMgd2hldGhlciB0aGUgbG9hZCBiYWxhbmNlIHNob3VsZCB0cnVz
+dCBiYWNrZW5kCiBzZXJ2ZXIgY2VydGlmaWNhdGVzIHRoYXQgYXJlIGlzc3VlZCBieSBwdWJs
+aWMgY2VydGlmaWNhdGUgYXV0aG9yaXRpZXMsIGluCiBhZGRpdGlvbiB0byBjZXJ0aWZpY2F0
+ZXMgdHJ1c3RlZCBieSB0aGUgVHJ1c3RDb25maWcuCgogKiBgY2xpZW50Q2VydGlmaWNhdGVg
+IGlzIGEgY2xpZW50IGNlcnRpZmljYXRlIHRoYXQgdGhlIGxvYWQgYmFsYW5jZXIgdXNlcyB0
+bwogZXhwcmVzcyBpdHMgaWRlbnRpdHkgdG8gdGhlIGJhY2tlbmQsIGlmIHRoZSBjb25uZWN0
+aW9uIHRvIHRoZSBiYWNrZW5kIHVzZXMKIG1UTFMuCgogWW91IGNhbiBhdHRhY2ggdGhlIEJh
+Y2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZyB0byB0aGUgbG9hZCBiYWxhbmNlcidzCiBCYWNr
+ZW5kU2VydmljZSBkaXJlY3RseSBkZXRlcm1pbmluZyBob3cgdGhhdCBCYWNrZW5kU2Vydmlj
+ZSBuZWdvdGlhdGVzIFRMUy4KCgoKAwQAARIDNwgjCgsKAwQABxIEOAI7BAoNCgUEAAedCBIE
+OAI7BApfCgQEAAQAEgQ/AlADGlEgRW51bSB0byBzcGVjaWZ5IHRoZSB3ZWxsIGtub3duIHJv
+b3RzIHRvIHVzZSBmb3Igc2VydmVyIGNlcnRpZmljYXRlCiB2YWxpZGF0aW9uLgoKDAoFBAAE
+AAESAz8HFQokCgYEAAQAAgASA0EEJRoVIEVxdWl2YWxlbnQgdG8gTk9ORS4KCg4KBwQABAAC
+AAESA0EEIAoOCgcEAAQAAgACEgNBIyQKcwoGBAAEAAIBEgNFBA0aZCBUaGUgQmFja2VuZFNl
+cnZpY2Ugd2lsbCBvbmx5IHZhbGlkYXRlIHNlcnZlciBjZXJ0aWZpY2F0ZXMgYWdhaW5zdCBy
+b290cwogc3BlY2lmaWVkIGluIFRydXN0Q29uZmlnLgoKDgoHBAAEAAIBARIDRQQICg4KBwQA
+BAACAQISA0ULDAqzAwoGBAAEAAICEgNPBBUaowMgVGhlIEJhY2tlbmRTZXJ2aWNlIHVzZXMg
+YSBzZXQgb2Ygd2VsbC1rbm93biBwdWJsaWMgcm9vdHMsIGluIGFkZGl0aW9uIHRvCiBhbnkg
+cm9vdHMgc3BlY2lmaWVkIGluIHRoZSB0cnVzdENvbmZpZyBmaWVsZCwgd2hlbiB2YWxpZGF0
+aW5nIHRoZSBzZXJ2ZXIKIGNlcnRpZmljYXRlcyBwcmVzZW50ZWQgYnkgdGhlIGJhY2tlbmQu
+IFZhbGlkYXRpb24gd2l0aCB0aGVzZSByb290cyBpcwogb25seSBjb25zaWRlcmVkIHdoZW4g
+dGhlIFRsc1NldHRpbmdzLnNuaSBmaWVsZCBpbiB0aGUgQmFja2VuZFNlcnZpY2UgaXMKIHNl
+dC4KCiBUaGUgd2VsbC1rbm93biByb290cyBhcmUgYSBzZXQgb2Ygcm9vdCBDQXMgbWFuYWdl
+ZCBieSBHb29nbGUuIENBcyBpbiB0aGlzCiBzZXQgY2FuIGJlIGFkZGVkIG9yIHJlbW92ZWQg
+d2l0aG91dCBub3RpY2UuCgoOCgcEAAQAAgIBEgNPBBAKDgoHBAAEAAICAhIDTxMUCsMBCgQE
+AAIAEgNVAjsatQEgUmVxdWlyZWQuIE5hbWUgb2YgdGhlIEJhY2tlbmRBdXRoZW50aWNhdGlv
+bkNvbmZpZyByZXNvdXJjZS4gSXQgbWF0Y2hlcyB0aGUKIHBhdHRlcm4KIGBwcm9qZWN0cy8q
+L2xvY2F0aW9ucy97bG9jYXRpb259L2JhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZ3Mve2Jh
+Y2tlbmRfYXV0aGVudGljYXRpb25fY29uZmlnfWAKCgwKBQQAAgAFEgNVAggKDAoFBAACAAES
+A1UJDQoMCgUEAAIAAxIDVRARCgwKBQQAAgAIEgNVEjoKDwoIBAACAAicCAASA1UTOQo/CgQE
+AAIBEgNYAkIaMiBPcHRpb25hbC4gRnJlZS10ZXh0IGRlc2NyaXB0aW9uIG9mIHRoZSByZXNv
+dXJjZS4KCgwKBQQAAgEFEgNYAggKDAoFBAACAQESA1gJFAoMCgUEAAIBAxIDWBcYCgwKBQQA
+AgEIEgNYGUEKDwoIBAACAQicCAASA1gaQApJCgQEAAICEgRbAlwyGjsgT3V0cHV0IG9ubHku
+IFRoZSB0aW1lc3RhbXAgd2hlbiB0aGUgcmVzb3VyY2Ugd2FzIGNyZWF0ZWQuCgoMCgUEAAIC
+BhIDWwIbCgwKBQQAAgIBEgNbHCcKDAoFBAACAgMSA1sqKwoMCgUEAAICCBIDXAYxCg8KCAQA
+AgIInAgAEgNcBzAKSQoEBAACAxIEXwJgMho7IE91dHB1dCBvbmx5LiBUaGUgdGltZXN0YW1w
+IHdoZW4gdGhlIHJlc291cmNlIHdhcyB1cGRhdGVkLgoKDAoFBAACAwYSA18CGwoMCgUEAAID
+ARIDXxwnCgwKBQQAAgMDEgNfKisKDAoFBAACAwgSA2AGMQoPCggEAAIDCJwIABIDYAcwCj4K
+BAQAAgQSA2MCIRoxIFNldCBvZiBsYWJlbCB0YWdzIGFzc29jaWF0ZWQgd2l0aCB0aGUgcmVz
+b3VyY2UuCgoMCgUEAAIEBhIDYwIVCgwKBQQAAgQBEgNjFhwKDAoFBAACBAMSA2MfIAqBAwoE
+BAACBRIEbAJxBBryAiBPcHRpb25hbC4gQSByZWZlcmVuY2UgdG8gYSBjZXJ0aWZpY2F0ZW1h
+bmFnZXIuZ29vZ2xlYXBpcy5jb20uQ2VydGlmaWNhdGUKIHJlc291cmNlLiBUaGlzIGlzIGEg
+cmVsYXRpdmUgcmVzb3VyY2UgcGF0aCBmb2xsb3dpbmcgdGhlIGZvcm0KICJwcm9qZWN0cy97
+cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vY2VydGlmaWNhdGVzL3tjZXJ0aWZpY2F0
+ZX0iLgoKIFVzZWQgYnkgYSBCYWNrZW5kU2VydmljZSB0byBuZWdvdGlhdGUgbVRMUyB3aGVu
+IHRoZSBiYWNrZW5kIGNvbm5lY3Rpb24gdXNlcwogVExTIGFuZCB0aGUgYmFja2VuZCByZXF1
+ZXN0cyBhIGNsaWVudCBjZXJ0aWZpY2F0ZS4gTXVzdCBoYXZlIGEgQ0xJRU5UX0FVVEgKIHNj
+b3BlLgoKDAoFBAACBQUSA2wCCAoMCgUEAAIFARIDbAkbCgwKBQQAAgUDEgNsHh8KDQoFBAAC
+BQgSBGwgcQMKDwoIBAACBQicCAASA20EKgoPCgcEAAIFCJ8IEgRuBHAFCsYDCgQEAAIGEgV7
+AoABBBq2AyBPcHRpb25hbC4gQSByZWZlcmVuY2UgdG8gYSBUcnVzdENvbmZpZyByZXNvdXJj
+ZSBmcm9tIHRoZQogY2VydGlmaWNhdGVtYW5hZ2VyLmdvb2dsZWFwaXMuY29tIG5hbWVzcGFj
+ZS4gVGhpcyBpcyBhIHJlbGF0aXZlIHJlc291cmNlCiBwYXRoIGZvbGxvd2luZyB0aGUgZm9y
+bQogInByb2plY3RzL3twcm9qZWN0fS9sb2NhdGlvbnMve2xvY2F0aW9ufS90cnVzdENvbmZp
+Z3Mve3RydXN0X2NvbmZpZ30iLgoKIEEgQmFja2VuZFNlcnZpY2UgdXNlcyB0aGUgY2hhaW4g
+b2YgdHJ1c3QgcmVwcmVzZW50ZWQgYnkgdGhpcyBUcnVzdENvbmZpZywKIGlmIHNwZWNpZmll
+ZCwgdG8gdmFsaWRhdGUgdGhlIHNlcnZlciBjZXJ0aWZpY2F0ZXMgcHJlc2VudGVkIGJ5IHRo
+ZSBiYWNrZW5kLgogUmVxdWlyZWQgdW5sZXNzIHdlbGxLbm93blJvb3RzIGlzIHNldCB0byBQ
+VUJMSUNfUk9PVFMuCgoMCgUEAAIGBRIDewIICgwKBQQAAgYBEgN7CRUKDAoFBAACBgMSA3sY
+GQoOCgUEAAIGCBIFexqAAQMKDwoIBAACBgicCAASA3wEKgoPCgcEAAIGCJ8IEgR9BH8FCkoK
+BAQAAgcSBIMBAiYaPCBXZWxsIGtub3duIHJvb3RzIHRvIHVzZSBmb3Igc2VydmVyIGNlcnRp
+ZmljYXRlIHZhbGlkYXRpb24uCgoNCgUEAAIHBhIEgwECEAoNCgUEAAIHARIEgwERIQoNCgUE
+AAIHAxIEgwEkJQoyCgQEAAIIEgSGAQI+GiQgT3V0cHV0IG9ubHkuIEV0YWcgb2YgdGhlIHJl
+c291cmNlLgoKDQoFBAACCAUSBIYBAggKDQoFBAACCAESBIYBCQ0KDQoFBAACCAMSBIYBEBEK
+DQoFBAACCAgSBIYBEj0KEAoIBAACCAicCAASBIYBEzwKTAoCBAESBooBAJ0BARo+IFJlcXVl
+c3QgdXNlZCBieSB0aGUgTGlzdEJhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZ3MgbWV0aG9k
+LgoKCwoDBAEBEgSKAQgvCrABCgQEAQIAEgaOAQKTAQQanwEgUmVxdWlyZWQuIFRoZSBwcm9q
+ZWN0IGFuZCBsb2NhdGlvbiBmcm9tIHdoaWNoIHRoZQogQmFja2VuZEF1dGhlbnRpY2F0aW9u
+Q29uZmlncyBzaG91bGQgYmUgbGlzdGVkLCBzcGVjaWZpZWQgaW4gdGhlIGZvcm1hdAogYHBy
+b2plY3RzLyovbG9jYXRpb25zL3tsb2NhdGlvbn1gLgoKDQoFBAECAAUSBI4BAggKDQoFBAEC
+AAESBI4BCQ8KDQoFBAECAAMSBI4BEhMKDwoFBAECAAgSBo4BFJMBAwoQCggEAQIACJwIABIE
+jwEEKgoRCgcEAQIACJ8IEgaQAQSSAQUKUgoEBAECARIElgECFhpEIE1heGltdW0gbnVtYmVy
+IG9mIEJhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZ3MgdG8gcmV0dXJuIHBlciBjYWxsLgoK
+DQoFBAECAQUSBJYBAgcKDQoFBAECAQESBJYBCBEKDQoFBAECAQMSBJYBFBUK8AEKBAQBAgIS
+BJwBAhga4QEgVGhlIHZhbHVlIHJldHVybmVkIGJ5IHRoZSBsYXN0IGBMaXN0QmFja2VuZEF1
+dGhlbnRpY2F0aW9uQ29uZmlnc1Jlc3BvbnNlYAogSW5kaWNhdGVzIHRoYXQgdGhpcyBpcyBh
+IGNvbnRpbnVhdGlvbiBvZiBhIHByaW9yCiBgTGlzdEJhY2tlbmRBdXRoZW50aWNhdGlvbkNv
+bmZpZ3NgIGNhbGwsIGFuZCB0aGF0IHRoZSBzeXN0ZW0KIHNob3VsZCByZXR1cm4gdGhlIG5l
+eHQgcGFnZSBvZiBkYXRhLgoKDQoFBAECAgUSBJwBAggKDQoFBAECAgESBJwBCRMKDQoFBAEC
+AgMSBJwBFhcKUQoCBAISBqABAKsBARpDIFJlc3BvbnNlIHJldHVybmVkIGJ5IHRoZSBMaXN0
+QmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlncyBtZXRob2QuCgoLCgMEAgESBKABCDAKPgoE
+BAICABIEogECShowIExpc3Qgb2YgQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIHJlc291
+cmNlcy4KCg0KBQQCAgAEEgSiAQIKCg0KBQQCAgAGEgSiAQsmCg0KBQQCAgABEgSiASdFCg0K
+BQQCAgADEgSiAUhJCukBCgQEAgIBEgSnAQIdGtoBIElmIHRoZXJlIG1pZ2h0IGJlIG1vcmUg
+cmVzdWx0cyB0aGFuIHRob3NlIGFwcGVhcmluZyBpbiB0aGlzIHJlc3BvbnNlLCB0aGVuCiBg
+bmV4dF9wYWdlX3Rva2VuYCBpcyBpbmNsdWRlZC4gVG8gZ2V0IHRoZSBuZXh0IHNldCBvZiBy
+ZXN1bHRzLCBjYWxsIHRoaXMKIG1ldGhvZCBhZ2FpbiB1c2luZyB0aGUgdmFsdWUgb2YgYG5l
+eHRfcGFnZV90b2tlbmAgYXMgYHBhZ2VfdG9rZW5gLgoKDQoFBAICAQUSBKcBAggKDQoFBAIC
+AQESBKcBCRgKDQoFBAICAQMSBKcBGxwKNAoEBAICAhIEqgECIhomIExvY2F0aW9ucyB0aGF0
+IGNvdWxkIG5vdCBiZSByZWFjaGVkLgoKDQoFBAICAgQSBKoBAgoKDQoFBAICAgUSBKoBCxEK
+DQoFBAICAgESBKoBEh0KDQoFBAICAgMSBKoBICEKSgoCBAMSBq4BALcBARo8IFJlcXVlc3Qg
+dXNlZCBieSB0aGUgR2V0QmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIG1ldGhvZC4KCgsK
+AwQDARIErgEILQqnAQoEBAMCABIGsQECtgEEGpYBIFJlcXVpcmVkLiBBIG5hbWUgb2YgdGhl
+IEJhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZyB0byBnZXQuIE11c3QgYmUgaW4gdGhlCiBm
+b3JtYXQgYHByb2plY3RzLyovbG9jYXRpb25zL3tsb2NhdGlvbn0vYmFja2VuZEF1dGhlbnRp
+Y2F0aW9uQ29uZmlncy8qYC4KCg0KBQQDAgAFEgSxAQIICg0KBQQDAgABEgSxAQkNCg0KBQQD
+AgADEgSxARARCg8KBQQDAgAIEgaxARK2AQMKEAoIBAMCAAicCAASBLIBBCoKEQoHBAMCAAif
+CBIGswEEtQEFCk0KAgQEEga6AQDOAQEaPyBSZXF1ZXN0IHVzZWQgYnkgdGhlIENyZWF0ZUJh
+Y2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZyBtZXRob2QuCgoLCgMEBAESBLoBCDAKjQEKBAQE
+AgASBr0BAsIBBBp9IFJlcXVpcmVkLiBUaGUgcGFyZW50IHJlc291cmNlIG9mIHRoZSBCYWNr
+ZW5kQXV0aGVudGljYXRpb25Db25maWcuIE11c3QgYmUKIGluIHRoZSBmb3JtYXQgYHByb2pl
+Y3RzLyovbG9jYXRpb25zL3tsb2NhdGlvbn1gLgoKDQoFBAQCAAUSBL0BAggKDQoFBAQCAAES
+BL0BCQ8KDQoFBAQCAAMSBL0BEhMKDwoFBAQCAAgSBr0BFMIBAwoQCggEBAIACJwIABIEvgEE
+KgoRCgcEBAIACJ8IEga/AQTBAQUKjAIKBAQEAgESBsgBAskBLxr7ASBSZXF1aXJlZC4gU2hv
+cnQgbmFtZSBvZiB0aGUgQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIHJlc291cmNlIHRv
+IGJlCiBjcmVhdGVkLiBUaGlzIHZhbHVlIHNob3VsZCBiZSAxLTYzIGNoYXJhY3RlcnMgbG9u
+ZywgY29udGFpbmluZyBvbmx5CiBsZXR0ZXJzLCBudW1iZXJzLCBoeXBoZW5zLCBhbmQgdW5k
+ZXJzY29yZXMsIGFuZCBzaG91bGQgbm90IHN0YXJ0IHdpdGggYQogbnVtYmVyLiBFLmcuICJi
+YWNrZW5kLWF1dGgtY29uZmlnIi4KCg0KBQQEAgEFEgTIAQIICg0KBQQEAgEBEgTIAQkpCg0K
+BQQEAgEDEgTIASwtCg0KBQQEAgEIEgTJAQYuChAKCAQEAgEInAgAEgTJAQctCk8KBAQEAgIS
+BswBAs0BLxo/IFJlcXVpcmVkLiBCYWNrZW5kQXV0aGVudGljYXRpb25Db25maWcgcmVzb3Vy
+Y2UgdG8gYmUgY3JlYXRlZC4KCg0KBQQEAgIGEgTMAQIdCg0KBQQEAgIBEgTMAR47Cg0KBQQE
+AgIDEgTMAT4/Cg0KBQQEAgIIEgTNAQYuChAKCAQEAgIInAgAEgTNAQctCkkKAgQFEgbRAQDe
+AQEaOyBSZXF1ZXN0IHVzZWQgYnkgVXBkYXRlQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmln
+IG1ldGhvZC4KCgsKAwQFARIE0QEIMArvAgoEBAUCABIG2AEC2QEvGt4CIE9wdGlvbmFsLiBG
+aWVsZCBtYXNrIGlzIHVzZWQgdG8gc3BlY2lmeSB0aGUgZmllbGRzIHRvIGJlIG92ZXJ3cml0
+dGVuIGluIHRoZQogQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIHJlc291cmNlIGJ5IHRo
+ZSB1cGRhdGUuICBUaGUgZmllbGRzCiBzcGVjaWZpZWQgaW4gdGhlIHVwZGF0ZV9tYXNrIGFy
+ZSByZWxhdGl2ZSB0byB0aGUgcmVzb3VyY2UsIG5vdAogdGhlIGZ1bGwgcmVxdWVzdC4gQSBm
+aWVsZCB3aWxsIGJlIG92ZXJ3cml0dGVuIGlmIGl0IGlzIGluIHRoZQogbWFzay4gSWYgdGhl
+IHVzZXIgZG9lcyBub3QgcHJvdmlkZSBhIG1hc2sgdGhlbiBhbGwgZmllbGRzIHdpbGwgYmUK
+IG92ZXJ3cml0dGVuLgoKDQoFBAUCAAYSBNgBAhsKDQoFBAUCAAESBNgBHCcKDQoFBAUCAAMS
+BNgBKisKDQoFBAUCAAgSBNkBBi4KEAoIBAUCAAicCAASBNkBBy0KSQoEBAUCARIG3AEC3QEv
+GjkgUmVxdWlyZWQuIFVwZGF0ZWQgQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIHJlc291
+cmNlLgoKDQoFBAUCAQYSBNwBAh0KDQoFBAUCAQESBNwBHjsKDQoFBAUCAQMSBNwBPj8KDQoF
+BAUCAQgSBN0BBi4KEAoIBAUCAQicCAASBN0BBy0KTQoCBAYSBuEBAO8BARo/IFJlcXVlc3Qg
+dXNlZCBieSB0aGUgRGVsZXRlQmFja2VuZEF1dGhlbnRpY2F0aW9uQ29uZmlnIG1ldGhvZC4K
+CgsKAwQGARIE4QEIMAqrAQoEBAYCABIG5QEC6gEEGpoBIFJlcXVpcmVkLiBBIG5hbWUgb2Yg
+dGhlIEJhY2tlbmRBdXRoZW50aWNhdGlvbkNvbmZpZyB0byBkZWxldGUuIE11c3QgYmUgaW4K
+IHRoZSBmb3JtYXQKIGBwcm9qZWN0cy8qL2xvY2F0aW9ucy97bG9jYXRpb259L2JhY2tlbmRB
+dXRoZW50aWNhdGlvbkNvbmZpZ3MvKmAuCgoNCgUEBgIABRIE5QECCAoNCgUEBgIAARIE5QEJ
+DQoNCgUEBgIAAxIE5QEQEQoPCgUEBgIACBIG5QES6gEDChAKCAQGAgAInAgAEgTmAQQqChEK
+BwQGAgAInwgSBucBBOkBBQpmCgQEBgIBEgTuAQI7GlggT3B0aW9uYWwuIEV0YWcgb2YgdGhl
+IHJlc291cmNlLgogSWYgdGhpcyBpcyBwcm92aWRlZCwgaXQgbXVzdCBtYXRjaCB0aGUgc2Vy
+dmVyJ3MgZXRhZy4KCg0KBQQGAgEFEgTuAQIICg0KBQQGAgEBEgTuAQkNCg0KBQQGAgEDEgTu
+ARARCg0KBQQGAgEIEgTuARI6ChAKCAQGAgEInAgAEgTuARM5YgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig ===
+    # Fields for BackendAuthenticationConfig
+    # Field: name Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: labels Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.LabelsEntry)
+    # Field: client_certificate Type: 9 ()
+    # Field: trust_config Type: 9 ()
+    # Field: well_known_roots Type: 14 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.WellKnownRoots)
+    # Field: etag Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<description>
+
+Type: String
+
+=item * B<create_time>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<update_time>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<labels>
+
+Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.LabelsEntry)
+
+=item * B<client_certificate>
+
+Type: String
+
+=item * B<trust_config>
+
+Type: String
+
+=item * B<well_known_roots>
+
+Type: Enum (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.WellKnownRoots)
+
+=item * B<etag>
+
+Type: String
+
+=back
+
+=cut
+
+# Enum: BackendAuthenticationConfig::WellKnownRoots
+our $BackendAuthenticationConfig_WELL_KNOWN_ROOTS_UNSPECIFIED = 0;
+our $BackendAuthenticationConfig_NONE = 1;
+our $BackendAuthenticationConfig_PUBLIC_ROOTS = 2;
+
+=pod
+
+=head2 Enum: BackendAuthenticationConfig::WellKnownRoots
+
+Values:
+
+=over 4
+
+=item * C<WELL_KNOWN_ROOTS_UNSPECIFIED> => 0
+
+=item * C<NONE> => 1
+
+=item * C<PUBLIC_ROOTS> => 2
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest ===
+    # Fields for ListBackendAuthenticationConfigsRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest->new(
+        parent => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<parent>
+
+Type: String
+
+=item * B<page_size>
+
+Type: Int32
+
+=item * B<page_token>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse ===
+    # Fields for ListBackendAuthenticationConfigsResponse
+    # Field: backend_authentication_configs Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
+    # Field: next_page_token Type: 9 ()
+    # Field: unreachable Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse->new(
+        backend_authentication_configs => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<backend_authentication_configs>
+
+Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
+
+=item * B<next_page_token>
+
+Type: String
+
+=item * B<unreachable>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest ===
+    # Fields for GetBackendAuthenticationConfigRequest
+    # Field: name Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest ===
+    # Fields for CreateBackendAuthenticationConfigRequest
+    # Field: parent Type: 9 ()
+    # Field: backend_authentication_config_id Type: 9 ()
+    # Field: backend_authentication_config Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest->new(
+        parent => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<parent>
+
+Type: String
+
+=item * B<backend_authentication_config_id>
+
+Type: String
+
+=item * B<backend_authentication_config>
+
+Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest ===
+    # Fields for UpdateBackendAuthenticationConfigRequest
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+    # Field: backend_authentication_config Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest->new(
+        update_mask => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<update_mask>
+
+Type: Message (.google.protobuf.FieldMask)
+
+=item * B<backend_authentication_config>
+
+Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest ===
+    # Fields for DeleteBackendAuthenticationConfigRequest
+    # Field: name Type: 9 ()
+    # Field: etag Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<etag>
+
+Type: String
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

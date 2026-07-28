@@ -2,8 +2,8 @@
  * queue.h -- Shared-memory MPMC queue for Linux
  *
  * Two variants:
- *   Int  — lock-free Vyukov bounded MPMC queue (int64 values)
- *   Str  — futex-mutex protected queue with circular arena (byte strings)
+ *   Int  -- lock-free Vyukov bounded MPMC queue (int64 values)
+ *   Str  -- futex-mutex protected queue with circular arena (byte strings)
  *
  * Both use file-backed mmap(MAP_SHARED) for cross-process sharing,
  * futex for blocking wait, and PID-based stale lock recovery.
@@ -182,9 +182,29 @@ static inline int queue_ensure_copy_buf(QueueHandle *h, uint32_t needed) {
 #define QUEUE_MUTEX_PID_MASK   0x7FFFFFFFU
 #define QUEUE_MUTEX_VAL(pid)   (QUEUE_MUTEX_WRITER_BIT | ((uint32_t)(pid) & QUEUE_MUTEX_PID_MASK))
 
+/* A zombie (dead but not yet reaped) still answers kill(pid,0) as alive, so a
+ * process that crashed while holding the lock and lingers unreaped would never
+ * be recovered.  Treat /proc/<pid>/stat state 'Z' as dead.  Linux-only (as is
+ * this module); if /proc is unreadable we fall back to "alive" (safe: we never
+ * force-recover a possibly-live holder). */
+static inline int queue_pid_is_zombie(uint32_t pid) {
+    char path[32], buf[256];
+    snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return 0;
+    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    close(fd);
+    if (n <= 0) return 0;
+    buf[n] = '\0';
+    /* "pid (comm) state ..."; comm may contain ')', so scan to the last one. */
+    char *rp = strrchr(buf, ')');
+    if (!rp || rp + 2 >= buf + n) return 0;   /* need ") X" within the bytes read */
+    return rp[1] == ' ' && rp[2] == 'Z';
+}
 static inline int queue_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1;
-    return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
+    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
+    return !queue_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
 static const struct timespec queue_lock_timeout = { QUEUE_LOCK_TIMEOUT_SEC, 0 };
@@ -288,6 +308,7 @@ static inline int queue_remaining_time(const struct timespec *deadline,
 /* Convert timeout in seconds (double) to absolute deadline */
 static inline void queue_make_deadline(double timeout, struct timespec *deadline) {
     clock_gettime(CLOCK_MONOTONIC, deadline);
+    if (!(timeout < 1e9)) timeout = 1e9; /* clamp Inf/NaN/huge: avoid UB (time_t) cast -> instant spurious timeout */
     deadline->tv_sec += (time_t)timeout;
     deadline->tv_nsec += (long)((timeout - (double)(time_t)timeout) * 1e9);
     if (deadline->tv_nsec >= 1000000000L) {
@@ -378,7 +399,7 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
     void *base;
 
     if (anonymous) {
-        /* Anonymous shared mmap — fork-inherited, no filesystem */
+        /* Anonymous shared mmap -- fork-inherited, no filesystem */
         map_size = (size_t)total_size;
         base = mmap(NULL, map_size, PROT_READ | PROT_WRITE,
                      MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -410,6 +431,10 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (is_new && (st.st_uid != geteuid() || fchmod(fd, file_mode) < 0)) {
+            QUEUE_ERR("%s: refusing to initialize file not owned by us", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new) {
             if (ftruncate(fd, (off_t)total_size) < 0) {
                 QUEUE_ERR("ftruncate(%s): %s", path, strerror(errno));
@@ -478,7 +503,7 @@ setup_handle:;
     }
 }
 
-/* Create queue backed by memfd — shareable via fd passing (SCM_RIGHTS) */
+/* Create queue backed by memfd -- shareable via fd passing (SCM_RIGHTS) */
 static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
                                         uint32_t mode, uint64_t arena_cap_hint,
                                         char *errbuf) {
@@ -1000,7 +1025,7 @@ static void queue_str_clear(QueueHandle *h) {
     hdr->arena_wpos = 0;
     hdr->arena_used = 0;
     queue_mutex_unlock(hdr);
-    /* clear is a bulk transition — wake every blocked producer and
+    /* clear is a bulk transition -- wake every blocked producer and
      * consumer so they re-evaluate state, not just one of each. */
     if (__atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->push_futex, 1, __ATOMIC_RELEASE);
@@ -1039,7 +1064,7 @@ static inline int queue_str_peek(QueueHandle *h, const char **out_str,
     return 1;
 }
 
-/* Push to front of queue (requeue). Str only — Int is strictly FIFO. */
+/* Push to front of queue (requeue). Str only -- Int is strictly FIFO. */
 static inline int queue_str_push_front(QueueHandle *h, const char *str,
                                         uint32_t len, bool utf8) {
     QueueHeader *hdr = h->hdr;
@@ -1156,7 +1181,7 @@ static int queue_str_push_front_wait(QueueHandle *h, const char *str,
     }
 }
 
-/* Pop from back (tail). Str only — undoes the most recent push. */
+/* Pop from back (tail). Str only -- undoes the most recent push. */
 static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
                                       uint32_t *out_len, bool *out_utf8) {
     QueueHeader *hdr = h->hdr;
@@ -1244,13 +1269,13 @@ static int queue_str_pop_back_wait(QueueHandle *h, const char **out_str,
     }
 }
 
-/* msync — flush mmap to disk for crash durability */
+/* msync -- flush mmap to disk for crash durability */
 static inline int queue_sync(QueueHandle *h) {
     return msync(h->hdr, h->mmap_size, MS_SYNC);
 }
 
 /* ================================================================
- * eventfd — event-loop integration
+ * eventfd -- event-loop integration
  * ================================================================ */
 
 static inline int queue_eventfd_create(QueueHandle *h) {
@@ -1261,7 +1286,7 @@ static inline int queue_eventfd_create(QueueHandle *h) {
 }
 
 /* Replace the current notify fd. Closes the old fd ONLY if we created
- * it ourselves via queue_eventfd_create — caller-supplied fds remain
+ * it ourselves via queue_eventfd_create -- caller-supplied fds remain
  * the caller's property. */
 static inline void queue_eventfd_set(QueueHandle *h, int fd) {
     if (h->notify_fd >= 0 && h->notify_fd != fd && h->notify_fd_owned)

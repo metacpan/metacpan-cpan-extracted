@@ -6,6 +6,7 @@ package Database::Abstraction::Query;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use Carp;
 use Scalar::Util qw(blessed);
@@ -16,11 +17,11 @@ Database::Abstraction::Query - Fluent, chainable query builder for Database::Abs
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 SYNOPSIS
 
@@ -233,6 +234,14 @@ Returns C<$self>.
 sub order_by
 {
 	my ($self, $col) = @_;
+	# Guard the three primary SQL injection vectors before the value is
+	# interpolated verbatim into ORDER BY $col (see _build_sql).  The check
+	# is deliberately permissive so it does not break legitimate multi-column
+	# expressions ("score DESC, name ASC") or SQL functions ("ABS(score) DESC").
+	if(defined $col) {
+		croak("order_by: unsafe ORDER BY expression '$col'")
+			if $col =~ /;|--|\/\*/;
+	}
 	$self->{'_order_by'} = $col;
 	return $self;
 }
@@ -248,7 +257,12 @@ Set the maximum number of rows to return.  Returns C<$self>.
 sub limit
 {
 	my ($self, $n) = @_;
-	$self->{'_limit'} = $n;
+	# Validate at the setter: LIMIT must be a non-negative integer.
+	# Direct interpolation into SQL (line: LIMIT $n) makes any non-integer a
+	# potential injection vector (e.g. "10; DROP TABLE users").
+	croak("limit: value must be a non-negative integer")
+		if !defined($n) || $n !~ /\A\d+\z/;
+	$self->{'_limit'} = int($n);
 	return $self;
 }
 
@@ -263,7 +277,10 @@ Skip the first N rows (for pagination with L</limit>).  Returns C<$self>.
 sub offset
 {
 	my ($self, $n) = @_;
-	$self->{'_offset'} = $n;
+	# Same guard as limit(): OFFSET is interpolated directly into SQL.
+	croak("offset: value must be a non-negative integer")
+		if !defined($n) || $n !~ /\A\d+\z/;
+	$self->{'_offset'} = int($n);
 	return $self;
 }
 
@@ -275,10 +292,15 @@ sub _apply_perl_sort_limit
 	my ($rows, $order_by, $offset, $limit) = @_;
 
 	if(defined $order_by) {
-		my ($col, $dir) = ($order_by =~ /^(\S+)(?:\s+(ASC|DESC))?$/i);
+		# Use \z (true end-of-string) not $ (matches before a trailing newline).
+		# (ASC|DESC) is already a non-regex check after capture; $dir is either
+		# 'ASC', 'DESC', or undef — hoist the direction decision out of the sort
+		# comparator so it is not evaluated O(N log N) times for an N-row result.
+		my ($col, $dir) = ($order_by =~ /\A(\S+)(?:\s+(ASC|DESC))?\z/i);
 		$dir //= 'ASC';
+		my $desc = ($dir eq 'DESC');	# evaluated once, not on every comparison
 		@{$rows} = sort {
-			$dir =~ /DESC/i
+			$desc
 				? (($b->{$col} // '') cmp ($a->{$col} // ''))
 				: (($a->{$col} // '') cmp ($b->{$col} // ''))
 		} @{$rows};
@@ -292,12 +314,12 @@ sub _build_sql
 {
 	my ($self, $count_only) = @_;
 
-	my $db    = $self->{'_db'};
-	my $table = $db->{'table'} || ref($db);
-	$table =~ s/.*:://;
+	my $db = $self->{'_db'};
 
-	# Ensure the underlying table connection is open
+	# _open_table populates $db->{'_table_name'} as a side-effect, so call it
+	# first and then read the cache directly — avoids a second ref()+regex.
 	$db->_open_table({});
+	my $table = $db->{'_table_name'};
 
 	my $select = $count_only ? 'COUNT(*)' : $self->{'_select'};
 	my $query  = "SELECT $select FROM $table";
@@ -346,8 +368,9 @@ sub all
 	# Ensure _open() fires before checking the backend type.
 	$db->_open_table({});
 
-	if($db->{'berkeley'}) {
-		croak(ref($db), ': query->all() with JOINs is not supported on BerkeleyDB')
+	if($db->{'berkeley'} || ($db->{'type'} // '') eq 'Deep') {
+		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : 'Deep';
+		croak(ref($db), ": query->all() with JOINs is not supported on $backend")
 			if @{$self->{'_joins'}};
 		my $rows = $db->selectall_arrayref({%{$self->{'_where'}}});
 		_apply_perl_sort_limit($rows, $self->{'_order_by'}, $self->{'_offset'}, $self->{'_limit'});
@@ -385,8 +408,9 @@ sub first
 
 	$db->_open_table({});
 
-	if($db->{'berkeley'}) {
-		croak(ref($db), ': query->first() with JOINs is not supported on BerkeleyDB')
+	if($db->{'berkeley'} || ($db->{'type'} // '') eq 'Deep') {
+		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : 'Deep';
+		croak(ref($db), ": query->first() with JOINs is not supported on $backend")
 			if @{$self->{'_joins'}};
 		my $rows = $db->selectall_arrayref({%{$self->{'_where'}}});
 		_apply_perl_sort_limit($rows, $self->{'_order_by'}, $self->{'_offset'}, undef);
@@ -425,8 +449,9 @@ sub count
 
 	$db->_open_table({});
 
-	if($db->{'berkeley'}) {
-		croak(ref($db), ': query->count() with JOINs is not supported on BerkeleyDB')
+	if($db->{'berkeley'} || ($db->{'type'} // '') eq 'Deep') {
+		my $backend = $db->{'berkeley'} ? 'BerkeleyDB' : 'Deep';
+		croak(ref($db), ": query->count() with JOINs is not supported on $backend")
 			if @{$self->{'_joins'}};
 		return $db->count({%{$self->{'_where'}}});
 	}

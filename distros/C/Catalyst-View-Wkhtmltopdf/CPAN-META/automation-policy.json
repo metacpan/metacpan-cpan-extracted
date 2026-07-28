@@ -2,6 +2,6 @@
    "automated_actions" : "code_request",
    "automated_contributions" : "code_request",
    "code_generation" : "machine_generated",
-   "distribution" : "Catalyst-View-Wkhtmltopdf-v0.6.1",
+   "distribution" : "Catalyst-View-Wkhtmltopdf-v0.6.3",
    "version" : 1
 }

@@ -1,0 +1,15 @@
+.gitignore
+Build.PL
+Changes
+lib/Scalar/ValueTags/LineageTracking.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00basic.t
+xt/01changes.t
+xt/02checkmanifest.t
+xt/03pod.t
+xt/99kwalitee.t

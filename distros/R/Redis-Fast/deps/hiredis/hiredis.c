@@ -102,6 +102,7 @@ void freeReplyObject(void *reply) {
         break; /* Nothing to free */
     case REDIS_REPLY_ARRAY:
     case REDIS_REPLY_MAP:
+    case REDIS_REPLY_ATTR:
     case REDIS_REPLY_SET:
     case REDIS_REPLY_PUSH:
         if (r->element != NULL) {
@@ -160,6 +161,7 @@ static void *createStringObject(const redisReadTask *task, char *str, size_t len
         parent = task->parent->obj;
         assert(parent->type == REDIS_REPLY_ARRAY ||
                parent->type == REDIS_REPLY_MAP ||
+               parent->type == REDIS_REPLY_ATTR ||
                parent->type == REDIS_REPLY_SET ||
                parent->type == REDIS_REPLY_PUSH);
         parent->element[task->idx] = r;
@@ -192,6 +194,7 @@ static void *createArrayObject(const redisReadTask *task, size_t elements) {
         parent = task->parent->obj;
         assert(parent->type == REDIS_REPLY_ARRAY ||
                parent->type == REDIS_REPLY_MAP ||
+               parent->type == REDIS_REPLY_ATTR ||
                parent->type == REDIS_REPLY_SET ||
                parent->type == REDIS_REPLY_PUSH);
         parent->element[task->idx] = r;
@@ -212,6 +215,7 @@ static void *createIntegerObject(const redisReadTask *task, long long value) {
         parent = task->parent->obj;
         assert(parent->type == REDIS_REPLY_ARRAY ||
                parent->type == REDIS_REPLY_MAP ||
+               parent->type == REDIS_REPLY_ATTR ||
                parent->type == REDIS_REPLY_SET ||
                parent->type == REDIS_REPLY_PUSH);
         parent->element[task->idx] = r;
@@ -249,6 +253,7 @@ static void *createDoubleObject(const redisReadTask *task, double value, char *s
         parent = task->parent->obj;
         assert(parent->type == REDIS_REPLY_ARRAY ||
                parent->type == REDIS_REPLY_MAP ||
+               parent->type == REDIS_REPLY_ATTR ||
                parent->type == REDIS_REPLY_SET ||
                parent->type == REDIS_REPLY_PUSH);
         parent->element[task->idx] = r;
@@ -267,6 +272,7 @@ static void *createNilObject(const redisReadTask *task) {
         parent = task->parent->obj;
         assert(parent->type == REDIS_REPLY_ARRAY ||
                parent->type == REDIS_REPLY_MAP ||
+               parent->type == REDIS_REPLY_ATTR ||
                parent->type == REDIS_REPLY_SET ||
                parent->type == REDIS_REPLY_PUSH);
         parent->element[task->idx] = r;
@@ -287,6 +293,7 @@ static void *createBoolObject(const redisReadTask *task, int bval) {
         parent = task->parent->obj;
         assert(parent->type == REDIS_REPLY_ARRAY ||
                parent->type == REDIS_REPLY_MAP ||
+               parent->type == REDIS_REPLY_ATTR ||
                parent->type == REDIS_REPLY_SET ||
                parent->type == REDIS_REPLY_PUSH);
         parent->element[task->idx] = r;
@@ -765,7 +772,7 @@ int redisReconnect(redisContext *c) {
     c->err = 0;
     memset(c->errstr, '\0', strlen(c->errstr));
 
-    if (c->privctx && c->funcs->free_privctx) {
+    if (c->privctx && c->funcs && c->funcs->free_privctx) {
         c->funcs->free_privctx(c->privctx);
         c->privctx = NULL;
     }
@@ -827,6 +834,9 @@ redisContext *redisConnectWithOptions(const redisOptions *options) {
     }
     if (options->options & REDIS_OPT_PREFER_IPV6) {
         c->flags |= REDIS_PREFER_IPV6;
+    }
+    if (options->options & REDIS_OPT_SET_SOCK_CLOEXEC) {
+        c->flags |= REDIS_OPT_SET_SOCK_CLOEXEC;
     }
 
     /* Set any user supplied RESP3 PUSH handler or use freeReplyObject

@@ -22,7 +22,7 @@
 
 
 package OpenSearch::Client::Role::API;
-$OpenSearch::Client::Role::API::VERSION = '3.007009';
+$OpenSearch::Client::Role::API::VERSION = '3.007010';
 use Moo::Role;
 requires 'api_version';
 requires 'api';
@@ -143,7 +143,7 @@ OpenSearch::Client::Role::API - Provides common functionality for API implementa
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 MANUAL
 

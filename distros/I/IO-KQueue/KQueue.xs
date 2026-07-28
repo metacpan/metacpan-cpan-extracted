@@ -48,7 +48,7 @@ EV_SET(kq, ident, filter, flags, fflags = 0, data = 0, udata = NULL)
     uintptr_t   ident
     short       filter
     u_short     flags
-    u_short     fflags
+    u_int       fflags
     intptr_t    data
     SV        * udata
   PREINIT:
@@ -107,7 +107,8 @@ kevent(kq, timeout=&PL_sv_undef)
         av_push(array, newSViv(ke[i].flags));
         av_push(array, newSViv(ke[i].fflags));
         av_push(array, newSViv(ke[i].data));
-        av_push(array, SvREFCNT_inc(ke[i].udata));
+        if (ke[i].udata)
+            av_push(array, SvREFCNT_inc(ke[i].udata));
         PUSHs(sv_2mortal(newRV_noinc((SV*)array)));
     }
     
@@ -152,7 +153,10 @@ get_kev(kq, i)
     sv_setiv(AvARRAY(ke2av)[2], ke2[i-1].flags);
     sv_setiv(AvARRAY(ke2av)[3], ke2[i-1].fflags);
     sv_setiv(AvARRAY(ke2av)[4], ke2[i-1].data);
-    av_store(ke2av, 5, SvREFCNT_inc(ke2[i-1].udata));
+    if (ke2[i-1].udata)
+        av_store(ke2av, 5, SvREFCNT_inc(ke2[i-1].udata));
+    else
+        av_store(ke2av, 5, &PL_sv_undef);
     
     RETVAL = newRV_inc((SV*) ke2av);
     

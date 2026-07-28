@@ -1,7 +1,7 @@
 package Data::Sync::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::Sync::Shared', $VERSION);
@@ -22,35 +22,43 @@ XSLoader::load('Data::Sync::Shared', $VERSION);
 # Guard objects -- auto-release on scope exit
 
 package Data::Sync::Shared::RWLock::Guard {
+    our $VERSION = '0.07';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
+        # Only the process that took the lock may release it: after fork the
+        # child inherits the guard object, and its global destruction would
+        # otherwise release a lock the PARENT still holds -- breaking mutual
+        # exclusion for every other process.
         my $self = shift;
-        $self->[0]->${\$self->[1]} if $self->[0];
+        $self->[0]->${\$self->[1]} if $self->[0] && $self->[2] == $$;
     }
 }
 
 sub Data::Sync::Shared::RWLock::rdlock_guard {
     my $self = shift;
     $self->rdlock(@_);
-    bless [$self, 'rdunlock'], 'Data::Sync::Shared::RWLock::Guard';
+    bless [$self, 'rdunlock', $$], 'Data::Sync::Shared::RWLock::Guard';
 }
 
 sub Data::Sync::Shared::RWLock::wrlock_guard {
     my $self = shift;
     $self->wrlock(@_);
-    bless [$self, 'wrunlock'], 'Data::Sync::Shared::RWLock::Guard';
+    bless [$self, 'wrunlock', $$], 'Data::Sync::Shared::RWLock::Guard';
 }
 
 package Data::Sync::Shared::Condvar::Guard {
+    our $VERSION = '0.07';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
+        # Only the process that took the mutex may release it -- see the note
+        # on RWLock::Guard::DESTROY.
         my $self = shift;
-        $self->[0]->unlock if $self->[0];
+        $self->[0]->unlock if $self->[0] && $self->[1] == $$;
     }
 }
 
 sub Data::Sync::Shared::Condvar::lock_guard {
     my $self = shift;
     $self->lock;
-    bless [$self], 'Data::Sync::Shared::Condvar::Guard';
+    bless [$self, $$], 'Data::Sync::Shared::Condvar::Guard';
 }
 
 # Condvar wait_while -- loop until predicate returns false
@@ -88,13 +96,17 @@ sub Data::Sync::Shared::Semaphore::acquire_guard {
     } else {
         $self->acquire_n($n, $timeout // -1) or return undef;
     }
-    bless [$self, $n], 'Data::Sync::Shared::Semaphore::Guard';
+    bless [$self, $n, $$], 'Data::Sync::Shared::Semaphore::Guard';
 }
 
 package Data::Sync::Shared::Semaphore::Guard {
+    our $VERSION = '0.07';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
+        # Only the process that took the permits may release them: a forked
+        # child's global destruction would otherwise release permits it never
+        # acquired, pushing the semaphore count above what is actually free.
         my $self = shift;
-        $self->[0]->release($self->[1]);
+        $self->[0]->release($self->[1]) if $self->[0] && $self->[2] == $$;
     }
 }
 
@@ -221,7 +233,8 @@ detect the stale PID and a new initializer is elected.
 
 =item * Anonymous and memfd modes
 
-=item * Timeouts on all blocking operations
+=item * Timeouts on all blocking operations (except Condvar C<lock>, which
+provides only a non-blocking C<try_lock>)
 
 =item * eventfd integration for event-loop wakeup
 
@@ -232,6 +245,18 @@ detect the stale PID and a new initializer is elected.
 All primitives encode the holder's PID in the lock word. If a process
 dies while holding a lock, other processes detect the stale lock within
 2 seconds via C<kill(pid, 0)> and automatically recover.
+
+Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
+crashed lock holder's contribution through its reader-slot. The slot table holds
+1024 entries (one per concurrent reader process). If more than that many reader
+processes share one mapping at once, a reader that cannot claim a slot proceeds
+"slotless" -- it still takes the read lock but leaves no per-process record. If
+such a slotless reader is then killed while holding the read lock, its share of
+the lock cannot be attributed to a dead process, so writer recovery cannot
+reclaim it and writers may block until the mapping is recreated. Reaching this
+needs more than 1024 concurrent reader processes on one mapping plus a crash in
+the brief read-lock window; the dead-process slot reclaim keeps the table from
+filling with stale entries, so in practice it is very unlikely.
 
 =head2 Security
 
@@ -246,7 +271,8 @@ last argument to new():
     my $sem = Data::Sync::Shared::Semaphore->new($path, $max, $initial, 0660);
     my $rw  = Data::Sync::Shared::RWLock->new($path, 0660);
 
-The mode is still subject to the caller's umask, exactly like open().
+The mode is applied exactly via C<fchmod> after an C<O_EXCL> create, so
+the caller's umask does not narrow it.
 Offsets read back from an attached segment are bounds-checked before
 use, so a poisoned reader-slot offset cannot steer a pointer outside
 the mapping.
@@ -324,9 +350,11 @@ C<$parties> must be >= 2.
     my $r = $bar->wait($timeout); # with timeout
 
 Returns: 1 = leader (last to arrive), 0 = non-leader, -1 = timeout.
-On timeout the barrier is permanently broken: C<wait> returns C<-1> for
-the timing-out party and all other waiters, and every subsequent C<wait>
-also returns C<-1> until C<reset> is called. This matches POSIX
+A zero timeout (C<< wait(0) >>) is a non-blocking probe: it returns C<-1> if the
+party would have to block, B<without> breaking the barrier. On a positive
+timeout that actually elapses the barrier is permanently broken: C<wait> returns
+C<-1> for the timing-out party and all other waiters, and every subsequent
+C<wait> also returns C<-1> until C<reset> is called. This matches POSIX
 C<pthread_barrier_t> broken semantics.
 
     my $gen = $bar->generation;    # how many times barrier has tripped
@@ -416,8 +444,11 @@ returns false. Returns 1 if predicate became false, 0 on timeout.
     my $ok  = $once->is_done;            # check without blocking
     $once->reset;                        # reset to uninitialized state
 
-C<enter> returns true for exactly one process (the initializer).
-All others block until C<done> is called, then return false.
+C<enter> returns true for exactly one process (the initializer).  All others
+block until C<done> is called, then return false.  With a C<$timeout>, a waiter
+that times out before initialization completes B<also> returns false: a false
+return means "not the initializer", not necessarily "initialization complete",
+so use C<is_done> to tell a finished gate from a timed-out wait.
 If the initializer dies, stale PID detection elects a new one.
 
 =head2 Common Methods

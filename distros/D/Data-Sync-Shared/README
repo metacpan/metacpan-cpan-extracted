@@ -100,7 +100,8 @@ DESCRIPTION
 
     *   Anonymous and memfd modes
 
-    *   Timeouts on all blocking operations
+    *   Timeouts on all blocking operations (except Condvar "lock", which
+        provides only a non-blocking "try_lock")
 
     *   eventfd integration for event-loop wakeup
 
@@ -108,6 +109,20 @@ DESCRIPTION
     All primitives encode the holder's PID in the lock word. If a process
     dies while holding a lock, other processes detect the stale lock within
     2 seconds via "kill(pid, 0)" and automatically recover.
+
+    Reader-slot exhaustion (slotless readers): dead-process recovery
+    attributes a crashed lock holder's contribution through its reader-slot.
+    The slot table holds 1024 entries (one per concurrent reader process).
+    If more than that many reader processes share one mapping at once, a
+    reader that cannot claim a slot proceeds "slotless" -- it still takes
+    the read lock but leaves no per-process record. If such a slotless
+    reader is then killed while holding the read lock, its share of the lock
+    cannot be attributed to a dead process, so writer recovery cannot
+    reclaim it and writers may block until the mapping is recreated.
+    Reaching this needs more than 1024 concurrent reader processes on one
+    mapping plus a crash in the brief read-lock window; the dead-process
+    slot reclaim keeps the table from filling with stale entries, so in
+    practice it is very unlikely.
 
   Security
     Backing files are created securely: the path is opened with
@@ -121,10 +136,10 @@ DESCRIPTION
         my $sem = Data::Sync::Shared::Semaphore->new($path, $max, $initial, 0660);
         my $rw  = Data::Sync::Shared::RWLock->new($path, 0660);
 
-    The mode is still subject to the caller's umask, exactly like open().
-    Offsets read back from an attached segment are bounds-checked before
-    use, so a poisoned reader-slot offset cannot steer a pointer outside the
-    mapping.
+    The mode is applied exactly via "fchmod" after an "O_EXCL" create, so
+    the caller's umask does not narrow it. Offsets read back from an
+    attached segment are bounds-checked before use, so a poisoned
+    reader-slot offset cannot steer a pointer outside the mapping.
 
   Guard Objects
     All locking primitives provide scope-based guards that auto-release on
@@ -189,11 +204,13 @@ PRIMITIVES
         my $r = $bar->wait;           # block until all parties arrive
         my $r = $bar->wait($timeout); # with timeout
 
-    Returns: 1 = leader (last to arrive), 0 = non-leader, -1 = timeout. On
-    timeout the barrier is permanently broken: "wait" returns -1 for the
-    timing-out party and all other waiters, and every subsequent "wait" also
-    returns -1 until "reset" is called. This matches POSIX
-    "pthread_barrier_t" broken semantics.
+    Returns: 1 = leader (last to arrive), 0 = non-leader, -1 = timeout. A
+    zero timeout (wait(0)) is a non-blocking probe: it returns -1 if the
+    party would have to block, without breaking the barrier. On a positive
+    timeout that actually elapses the barrier is permanently broken: "wait"
+    returns -1 for the timing-out party and all other waiters, and every
+    subsequent "wait" also returns -1 until "reset" is called. This matches
+    POSIX "pthread_barrier_t" broken semantics.
 
         my $gen = $bar->generation;    # how many times barrier has tripped
         my $n   = $bar->arrived;       # currently arrived count
@@ -272,8 +289,12 @@ PRIMITIVES
         $once->reset;                        # reset to uninitialized state
 
     "enter" returns true for exactly one process (the initializer). All
-    others block until "done" is called, then return false. If the
-    initializer dies, stale PID detection elects a new one.
+    others block until "done" is called, then return false. With a $timeout,
+    a waiter that times out before initialization completes also returns
+    false: a false return means "not the initializer", not necessarily
+    "initialization complete", so use "is_done" to tell a finished gate from
+    a timed-out wait. If the initializer dies, stale PID detection elects a
+    new one.
 
   Common Methods
     All primitives support:

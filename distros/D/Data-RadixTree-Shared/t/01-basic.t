@@ -212,7 +212,10 @@ like $@, qr/arena_capacity/i, 'oversized arena_cap croak mentions arena capacity
 {
     # tiny node pool: NIL + root + a couple. Distinct single-byte keys each need
     # a fresh leaf node, so inserting enough distinct keys must eventually croak.
-    my $t = Data::RadixTree::Shared->new(undef, 4, 65536);
+    # The pre-check prices every insert at the copy-on-write split's worst case
+    # of 3 transient node allocations, so the pool must leave at least 3 free
+    # nodes for an insert to be attempted.
+    my $t = Data::RadixTree::Shared->new(undef, 6, 65536);
     my @ok;
     my $croaked = 0;
     for my $c ('a' .. 'z') {

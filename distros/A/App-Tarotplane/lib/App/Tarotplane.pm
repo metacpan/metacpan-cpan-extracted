@@ -1,5 +1,5 @@
 package App::Tarotplane;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 use 5.016;
 use strict;
 use warnings;
@@ -21,163 +21,166 @@ $PRGNAM - $PRGVER
 Usage: $0 [options] file ...
 
 Options:
- -o <by>  --order=<by>   Order cards alphabetically by terms or definitions
- -r       --random       Randomize order cards appear in
- -t       --terms-first  Show terms first rather than definitions
- -h       --help         Print help message and exit
- -v       --version      Print version and copyright info, then exit
+ -o [<by>] --order=[<by>] Order cards alphabetically by terms or definitions
+ -r        --random       Randomize order cards appear in
+ -t        --terms-first  Show terms first rather than definitions
+ -h        --help         Print help message and exit
+ -v        --version      Print version and copyright info, then exit
 END
 
 my $VER_MSG = <<END;
 $PRGNAM - $PRGVER
 
-Copyright 2024, Samuel Young
+Copyright 2024-2026, Samuel Young
 
 This program is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.
 END
 
+my $TTY_PATH = $^O eq 'MSWin32' ? 'CONIN$' : '/dev/tty';
+
 our %CARD_SORT = (
-	None   => 0,
-	Random => 1,
-	Order  => 2,
+    None   => 0,
+    Random => 1,
+    Order  => 2,
 );
 
 sub init {
 
-	my $class = shift;
-	my $self = {
-		Files   => [],
-		Sort    => $CARD_SORT{None},
-		OrderBy => '',
-		First   => 'Definition',
-	};
+    my $class = shift;
+    my $self = {
+        Files   => [],
+        Sort    => $CARD_SORT{None},
+        OrderBy => '',
+        First   => 'Definition',
+    };
 
-	my $order = undef;
+    my $order = undef;
 
-	Getopt::Long::config('bundling');
-	GetOptions(
-		'order|o:s'     => \$order,
-		'random|r'      => sub { $self->{Sort} = $CARD_SORT{Random} },
-		'terms-first|t' => sub { $self->{First} = 'Term' },
-		'help|h'        => sub { print $HELP_MSG; exit 0 },
-		'version|v'     => sub { print $VER_MSG;  exit 0 },
-	) or die "Error in command line arguments\n";
+    Getopt::Long::config('bundling');
+    GetOptions(
+        'order|o:s'     => \$order,
+        'random|r'      => sub { $self->{Sort} = $CARD_SORT{Random} },
+        'terms-first|t' => sub { $self->{First} = 'Term' },
+        'help|h'        => sub { print $HELP_MSG; exit 0 },
+        'version|v'     => sub { print $VER_MSG;  exit 0 },
+    ) or die "Error in command line arguments\n";
 
-	die $HELP_MSG unless @ARGV;
+    die $HELP_MSG unless @ARGV;
 
-	$self->{Files} = \@ARGV;
+    $self->{Files} = [ @ARGV ];
+    if (scalar(grep { $_ eq '-' } @{$self->{Files}}) > 1) {
+        die "Standard input ('-') can only be passed once to the command-line\n";
+    }
 
-	foreach my $f (@{$self->{Files}}) {
-		unless (-r $f) {
-			die "$f does not exist or is not readable\n";
-		}
-	}
+    if (defined $order) {
 
-	if (defined $order) {
+        $order = fc $order;
 
-		$order = fc $order;
+        if ($order eq fc 'term' or $order eq '') {
+            $self->{OrderBy} = 'Term';
+        } elsif ($order eq fc 'definition') {
+            $self->{OrderBy} = 'Definition';
+        } else {
+            die "Cards must be sorted by either 'Term' or 'Definition'\n";
+        }
 
-		if ($order eq fc 'term' or $order eq '') {
-			$self->{OrderBy} = 'Term';
-		} elsif ($order eq fc 'definition') {
-			$self->{OrderBy} = 'Definition';
-		} else {
-			die "Cards must be sorted by either 'Term' or 'Definition'\n";
-		}
+        $self->{Sort} = $CARD_SORT{Order};
 
-		$self->{Sort} = $CARD_SORT{Order};
+    }
 
-	}
-
-	bless $self, $class;
-	return $self;
+    bless $self, $class;
+    return $self;
 
 }
 
 sub run {
 
-	my $self = shift;
+    my $self = shift;
 
-	my $deck = App::Tarotplane::Cards->new(@{$self->{Files}});
+    my $deck = App::Tarotplane::Cards->new(@{$self->{Files}});
 
-	if ($self->{Sort} == $CARD_SORT{Random}) {
-		$deck->shuffle_deck();
-	} elsif ($self->{Sort} == $CARD_SORT{Order}) {
-		$deck->order_deck($self->{OrderBy});
-	}
+    if (not -t STDIN) {
+        open STDIN, '<', $TTY_PATH or die "Failed to open $TTY_PATH: $!\n";
+    }
 
-	my $filestr = join(" ", @{$self->{Files}});
+    if ($self->{Sort} == $CARD_SORT{Random}) {
+        $deck->shuffle_deck();
+    } elsif ($self->{Sort} == $CARD_SORT{Order}) {
+        $deck->order_deck($self->{OrderBy});
+    }
 
-	my $card = 0;
-	my $side = $self->{First};
+    my $filestr = join(" ", @{$self->{Files}});
 
-	my $ui = App::Tarotplane::UI->init();
+    my $card = 0;
+    my $side = $self->{First};
 
-	$ui->wipe();
+    my $ui = App::Tarotplane::UI->init();
 
-	$ui->draw_card(
-		$deck->card_side($card, $side),
-		$side eq 'Term' ? 1 : 0
-	);
-	$ui->draw_info(
-		sprintf("[%d/%d] %s", $card + 1, $deck->get('CardNum'), $filestr)
-	);
+    $ui->wipe();
 
-	$ui->update();
+    $ui->draw_card(
+        $deck->card_side($card, $side),
+        $side eq 'Term' ? 1 : 0
+    );
+    $ui->draw_info(
+        sprintf("[%d/%d] %s", $card + 1, $deck->get('CardNum'), $filestr)
+    );
 
-	while (1) {
+    $ui->update();
 
-		my $cmd = $ui->poll();
+    while (1) {
 
-		# Do nothing if we can't recognize the command
-		next unless defined $cmd;
+        my $cmd = $ui->poll();
 
-		if ($cmd eq 'Next') {
-			$card++ if $card < $deck->get('CardNum') - 1;
-			$side = $self->{First};
-		} elsif ($cmd eq 'Prev') {
-			$card-- if $card > 0;
-			$side = $self->{First};
-		} elsif ($cmd eq 'Flip') {
-			$side = $side eq 'Term' ? 'Definition' : 'Term';
-		} elsif ($cmd eq 'First') {
-			$card = 0;
-			$side = $self->{First};
-		} elsif ($cmd eq 'Last') {
-			$card = $deck->get('CardNum') - 1;
-			$side = $self->{First};
-		} elsif ($cmd eq 'Quit') {
-			last;
-		} elsif ($cmd eq 'Help') {
-			$ui->wipe();
-			$ui->draw_help();
-			$ui->update();
-			$ui->poll();
-		}
+        # Do nothing if we can't recognize the command
+        next unless defined $cmd;
 
-		$ui->wipe();
-		$ui->draw_card(
-			$deck->card_side($card, $side),
-			$side eq 'Term' ? 1 : 0
-		);
-		$ui->draw_info(
-			sprintf("[%d/%d] %s", $card + 1, $deck->get('CardNum'), $filestr)
-		);
-		$ui->update();
+        if ($cmd eq 'Next') {
+            $card++ if $card < $deck->get('CardNum') - 1;
+            $side = $self->{First};
+        } elsif ($cmd eq 'Prev') {
+            $card-- if $card > 0;
+            $side = $self->{First};
+        } elsif ($cmd eq 'Flip') {
+            $side = $side eq 'Term' ? 'Definition' : 'Term';
+        } elsif ($cmd eq 'First') {
+            $card = 0;
+            $side = $self->{First};
+        } elsif ($cmd eq 'Last') {
+            $card = $deck->get('CardNum') - 1;
+            $side = $self->{First};
+        } elsif ($cmd eq 'Quit') {
+            last;
+        } elsif ($cmd eq 'Help') {
+            $ui->wipe();
+            $ui->draw_help();
+            $ui->update();
+            $ui->poll();
+        }
 
-	}
+        $ui->wipe();
+        $ui->draw_card(
+            $deck->card_side($card, $side),
+            $side eq 'Term' ? 1 : 0
+        );
+        $ui->draw_info(
+            sprintf("[%d/%d] %s", $card + 1, $deck->get('CardNum'), $filestr)
+        );
+        $ui->update();
 
-	$ui->end();
+    }
+
+    $ui->end();
 
 }
 
 sub get {
 
-	my $self = shift;
-	my $get  = shift;
+    my $self = shift;
+    my $get  = shift;
 
-	return $self->{$get};
+    return $self->{$get};
 
 }
 
@@ -278,7 +281,7 @@ Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright 2024, Samuel Young
+Copyright 2024-2026, Samuel Young
 
 This library is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.

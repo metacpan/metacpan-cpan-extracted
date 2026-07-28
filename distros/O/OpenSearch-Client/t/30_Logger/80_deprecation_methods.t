@@ -24,15 +24,15 @@ use Test::More;
 use Test::Exception;
 use OpenSearch::Client;
 
-do './t/lib/LogCallback.pl' or die( $@ || $! );
+do './t/lib/LogCapture.pl' or die( $@ || $! );
 
 isa_ok my $l = OpenSearch::Client->new->logger,
     'OpenSearch::Client::Logger::LogAny',
     'Logger';
 
-( $method, $format ) = ();
+( $method, $messagetext ) = ();
 ok $l->deprecation( "foo", { foo => 1 } ), "deprecation";
 is $method, "warning", "deprecation - method";
-is $format, "[DEPRECATION] foo - In request: {foo => 1}", "deprecation - format";
+is $messagetext, "[DEPRECATION] foo - In request: {foo => 1}", "deprecation - format";
 
 done_testing;

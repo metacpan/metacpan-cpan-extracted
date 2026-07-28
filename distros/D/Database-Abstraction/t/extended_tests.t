@@ -523,4 +523,209 @@ SKIP: {
 	};
 }
 
+# ---------------------------------------------------------------------------
+# EX16 — .db.gz gzip path (line 800: for my $ext (qw(csv.gz db.gz)))
+# The module probes both 'csv.gz' and 'db.gz' but EX15 only creates a .csv.gz.
+# This test creates a .db.gz file to exercise the second iteration of the loop.
+# ---------------------------------------------------------------------------
+
+SKIP: {
+	skip('Gzip::Faster not available', 3) unless $HAS_GZIP;
+
+	subtest 'EX16: .db.gz gzip path is detected and decompressed' => sub {
+		plan tests => 3;
+
+		my $csv_content = "entry!number\n\"eins\"!1\n\"zwei\"!2\n\"drei\"!3\n";
+		my $gzipped     = Gzip::Faster::gzip($csv_content);
+
+		my $tmpdir = tempdir(CLEANUP => 1);
+		my $gzfile = File::Spec->catfile($tmpdir, 'testdbgz.db.gz');
+		open(my $fh, '>', $gzfile) or die "cannot write $gzfile: $!";
+		binmode $fh;
+		print $fh $gzipped;
+		close $fh;
+
+		{
+			package Database::testdbgz;
+			use parent 'Database::Abstraction';
+		}
+
+		my $db;
+		lives_ok { $db = Database::testdbgz->new(directory => $tmpdir) }
+			'EX16: .db.gz instantiation lives';
+		cmp_ok($db->count(), '==', 3,
+			'EX16: .db.gz returns correct row count (3 rows)');
+		is($db->fetchrow_hashref(entry => 'eins')->{'number'}, 1,
+			'EX16: correct value accessible from .db.gz-backed table');
+	};
+}
+
+# ---------------------------------------------------------------------------
+# EX17 — DBM::Deep scalar values: { $id => $k, value => $scalar } branch
+# Lines 772 and 784 in _open(): when reftype($row) is not 'HASH' (i.e. the
+# DBM::Deep value is a plain scalar), the row must be stored as
+# { entry => $key, value => $scalar } to match the BerkeleyDB convention.
+# deep.t always uses hashref values; this test exercises the scalar branch.
+# ---------------------------------------------------------------------------
+
+my $HAS_DEEP = eval { require DBM::Deep; 1 };
+
+SKIP: {
+	skip('DBM::Deep not available', 8) unless $HAS_DEEP;
+
+	subtest 'EX17: DBM::Deep scalar values stored as {entry,value} (lines 772,784)' => sub {
+		plan tests => 8;
+
+		require DBM::Deep;
+
+		my $deep_dir = tempdir(CLEANUP => 1);
+
+		# Create a .deep file with plain scalar (string) values, not hashrefs.
+		# This exercises the scalar branch at lines 772 and 784.
+		my $deep_file = File::Spec->catfile($deep_dir, 'scalards.deep');
+		{
+			my $ddb = DBM::Deep->new({ file => $deep_file });
+			$ddb->{'k1'} = 'alpha_value';
+			$ddb->{'k2'} = 'beta_value';
+			undef $ddb;
+		}
+
+		{
+			package Database::scalards;
+			use parent 'Database::Abstraction';
+		}
+
+		my $db = new_ok('Database::scalards' => [ directory => $deep_dir ]);
+
+		# Trigger _open() via count() and inspect the stored row structure.
+		my $cnt = $db->count();
+		is($cnt, 2, 'EX17: scalar-value Deep file: 2 rows');
+		is($db->{'type'}, 'Deep', 'EX17: type is Deep for scalar-value file');
+
+		# The slurped data hash must store each row as { entry => key, value => scalar }.
+		ok(exists $db->{'data'}->{'k1'}, 'EX17: key k1 exists in slurped data');
+		is($db->{'data'}->{'k1'}{'entry'}, 'k1',          'EX17: entry column holds the key');
+		is($db->{'data'}->{'k1'}{'value'}, 'alpha_value',  'EX17: value column holds the scalar');
+
+		# AUTOLOAD should be able to retrieve the value column
+		my $v = $db->value(entry => 'k2');
+		is($v, 'beta_value', 'EX17: AUTOLOAD value(entry=>k2) returns scalar value');
+
+		# selectall_arrayref must return rows with {entry, value} structure
+		my $all = $db->selectall_arrayref();
+		my %by_key = map { $_->{'entry'} => $_->{'value'} } @{$all};
+		is($by_key{'k1'}, 'alpha_value', 'EX17: selectall_arrayref preserves scalar value');
+	};
+}
+
+# ---------------------------------------------------------------------------
+# EX18 — columns() / schema() for no_entry CSV slurp (ARRAY-ref data)
+# When $self->{'data'} is an ARRAY ref (no_entry CSV slurp), the
+# if(ref($data) eq 'HASH') branch in both columns() and schema() is FALSE.
+# Both methods must fall through to the DBI path and still return correct data.
+# ---------------------------------------------------------------------------
+
+subtest 'EX18: columns() / schema() for no_entry CSV ARRAY slurp (DBI fallthrough)' => sub {
+	plan tests => 7;
+
+	# Database::exttest_ne uses test4.csv with no_entry => 1, sep_char => ','.
+	# After slurp, $db->{'data'} is an arrayref — the HASH branch is skipped.
+	my $db = Database::exttest_ne->new(directory => $DATA_DIR);
+	$db->count();    # trigger lazy _open and slurp
+	is(ref($db->{'data'}), 'ARRAY', 'EX18 pre-cond: data is arrayref for no_entry CSV');
+
+	# columns() must fall through to DBI and return correct column names
+	my $cols = $db->columns();
+	isa_ok($cols, 'ARRAY', 'EX18: columns() returns arrayref even for ARRAY-slurp data');
+	ok(scalar(grep { $_ eq 'cardinal' } @{$cols}),
+		'EX18: columns() includes "cardinal" via DBI fallthrough');
+	ok(scalar(grep { $_ eq 'ordinal' }  @{$cols}),
+		'EX18: columns() includes "ordinal" via DBI fallthrough');
+
+	# schema() must fall through to DBI and return correct schema
+	my $schema = $db->schema();
+	isa_ok($schema, 'HASH', 'EX18: schema() returns hashref even for ARRAY-slurp data');
+	ok(exists $schema->{'cardinal'}, 'EX18: schema() has "cardinal" column');
+	ok(exists $schema->{'ordinal'},  'EX18: schema() has "ordinal" column');
+};
+
+# ---------------------------------------------------------------------------
+# EX19 — selectall_array() in scalar context on BerkeleyDB (line 1201)
+# The scalar-context branch returns $rows->[0] (the first matched row).
+# db.t only calls selectall_array() in list context; this test targets the
+# scalar-context path by calling it in a scalar assignment.
+# ---------------------------------------------------------------------------
+
+subtest 'EX19: selectall_array() BerkeleyDB scalar context returns first row (line 1201)' => sub {
+	plan tests => 4;
+
+	my $bdb_obj = Database::test1->new(directory => $DATA_DIR);
+
+	# Inject a BerkeleyDB-style hash (scalar values, same format as _scan_berkeley produces).
+	# All three keys are present; in scalar context only the first row is returned.
+	$bdb_obj->{'berkeley'} = {
+		x => 'xval',
+		y => 'yval',
+	};
+
+	# List context: get all rows (should be 2)
+	my @all_rows = $bdb_obj->selectall_array();
+	is(scalar @all_rows, 2, 'EX19: list context returns all 2 rows');
+	ok(ref($all_rows[0]) eq 'HASH', 'EX19: each element is a hashref');
+
+	# Scalar context: should return first row only (the $rows->[0] branch)
+	my $first_row = $bdb_obj->selectall_array();
+	ok(defined($first_row), 'EX19: scalar context returns a defined value (not undef)');
+	ok(ref($first_row) eq 'HASH', 'EX19: scalar context returns a hashref (line 1201)');
+};
+
+# ---------------------------------------------------------------------------
+# EX20 — DBM::Deep no_entry scalar values: { $id => $k, value => $scalar }
+# Exercises the no_entry branch at line 772 when reftype($row) is not 'HASH'.
+# EX17 covers the keyed case; this covers the no_entry case (arrayref storage).
+# ---------------------------------------------------------------------------
+
+SKIP: {
+	skip('DBM::Deep not available', 5) unless $HAS_DEEP;
+
+	subtest 'EX20: DBM::Deep no_entry + scalar values stored as arrayref (line 772)' => sub {
+		plan tests => 5;
+
+		require DBM::Deep;
+
+		my $ne_dir = tempdir(CLEANUP => 1);
+
+		# Scalar-valued .deep file, no_entry mode: arrayref of {id=>k, value=>v}.
+		my $ne_file = File::Spec->catfile($ne_dir, 'scalarne.deep');
+		{
+			my $ddb = DBM::Deep->new({ file => $ne_file });
+			$ddb->{'p'} = 'piano';
+			$ddb->{'q'} = 'quitar';
+			undef $ddb;
+		}
+
+		{
+			package Database::scalarne;
+			use parent 'Database::Abstraction';
+			sub new {
+				my $class = shift;
+				return $class->SUPER::new(no_entry => 1, @_);
+			}
+		}
+
+		my $ne = new_ok('Database::scalarne' => [ directory => $ne_dir ]);
+		$ne->count();    # trigger _open
+		is(ref($ne->{'data'}), 'ARRAY', 'EX20: no_entry scalar Deep stores ARRAY data');
+
+		# Each arrayref element should be { 'entry' => key, value => scalar }
+		# (id defaults to 'entry' since we passed no custom id).
+		my ($p_row) = grep { defined $_->{'entry'} && $_->{'entry'} eq 'p' } @{$ne->{'data'}};
+		ok(defined($p_row), 'EX20: row with entry=p found');
+		is($p_row->{'value'}, 'piano',   'EX20: value column holds scalar from DBM::Deep');
+
+		is($ne->count(), 2, 'EX20: count() returns 2 for no_entry scalar Deep file');
+	};
+}
+
 done_testing();
+

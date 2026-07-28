@@ -33,7 +33,8 @@ our %tests = (
                                             'submit' ], location => qr'^%s/formsubmit$',
                                             values => { query2 => 'bar', query => 'foo' }
                 },
-    auth => { requests => 1, lines => [ 'auth user password', 'get %s' ], location => qr'^%s/$' },
+    auth => { requests => 1, lines => [ 'auth localhost:80 realm user password', 'get %s' ], location => qr'^%s/$' },
+    auth_guess => { requests => 1, lines => [ 'get %s', 'auth user password' ], location => qr'^%s/$' },
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => qr'^%s/$' },
     content_save => { requests => 1, lines => [ 'get %s','content tmp.content','eval unlink "tmp.content"'], location => qr'^%s/$' },
     comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => qr'^%s/$' },

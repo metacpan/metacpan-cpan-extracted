@@ -1,0 +1,17 @@
+Revision history for Data-Reservoir-Shared
+
+0.02      2026-07-22
+          - Fix a use-after-free in add_many(): a tied array, or overloaded
+            or tied elements, run Perl that can destroy the reservoir, after
+            which the already-captured handle was still used. Such a call
+            now croaks.
+          - Add weighted (A-Res) sampling: new_weighted / add(item, weight).
+          - Pin both elements of a weighted pair before reading either.
+
+0.01      2026-07-10
+          - Initial release. Shared-memory reservoir sampler: a uniform random
+            sample of k items from an unbounded stream (Algorithm R) in fixed
+            memory, with a shared xorshift64 RNG so concurrent producers sample
+            one consistent reservoir. Items stored inline (truncated to
+            item_size). Backed by a file, anonymous mapping, or memfd;
+            write-preferring rwlock with dead-process recovery. Linux, 64-bit.

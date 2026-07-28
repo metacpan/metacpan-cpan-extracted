@@ -21,7 +21,7 @@
 # limitations under the License.
 
 package OpenSearch::Client::Role::Cxn;
-$OpenSearch::Client::Role::Cxn::VERSION = '3.007009';
+$OpenSearch::Client::Role::Cxn::VERSION = '3.007010';
 use Moo::Role;
 use OpenSearch::Client::Util qw(parse_params throw to_list);
 use List::Util qw(min);
@@ -114,6 +114,13 @@ sub BUILDARGS {
             userinfo => $uri->userinfo
         };
     }
+    {
+        my $n_username = delete $node->{username};
+        my $n_password = delete $node->{password};
+        if (!$node->{userinfo} && $n_username && $n_password) {
+            $node->{userinfo} = sprintf('%s:%s', $n_username , $n_password );
+        }
+    }
 
     my $host = $node->{host} || 'localhost';
     my $userinfo = $node->{userinfo} || $params->{userinfo} || '';
@@ -135,7 +142,11 @@ sub BUILDARGS {
         chomp $auth;
         $default_headers{Authorization} = "Basic $auth";
     }
-
+    
+    if ( $params->{application_id} ) {
+        $default_headers{'X-Opaque-Id'} = $params->{application_id};
+    }
+    
     if ( $params->{gzip} ) {
         $default_headers{'Accept-Encoding'} = "gzip";
     }
@@ -452,7 +463,7 @@ OpenSearch::Client::Role::Cxn - Provides common functionality to HTTP Cxn implem
 
 =head1 VERSION
 
-version 3.007009
+version 3.007010
 
 =head1 DESCRIPTION
 
@@ -512,6 +523,10 @@ or to configure the client to present its own certificate.
 The values accepted by C<ssl_options> depend on the C<Cxn> class.  See the
 documentation for the C<Cxn> class that you are using.
 
+L<HTTPTiny|OpenSearch::Client::Cxn::HTTPTiny>
+
+L<LWP|OpenSearch::Client::Cxn::LWP>
+
 =head2 C<proxy options>
 
 Options for C<http_proxy>, C<https_proxy> and C<no_proxy> can be configured.
@@ -521,6 +536,34 @@ Options for C<http_proxy>, C<https_proxy> and C<no_proxy> can be configured.
         https_proxy => 'http://192.168.200.250:8888',
         no_proxy    => [ '192.168.200.81', '192.168.200.82', '192.168.200.83' ]  
     );
+
+=head2 C<application_id>
+
+You can specify an 'application_id' which will be sent to the server as a 'X-Opaque-Id' header.
+This identifier is used to track tasks and deduplicate deprecation warnings in server-side logs.
+It is used to differentiate between callers sending requests to your OpenSearch cluster.
+Do not specify a unique value per request.
+
+    $os = OpenSearch::Client->new(
+        application_id => 'Basic Client Testing Application',
+        ....
+    );
+
+Deprecation warnings in server side JSON logs include the application_id header value.
+
+    {
+      "type": "deprecation", 
+      "timestamp": "2026-07-21T21:39:25,142+0100",
+      "level": "DEPRECATION", 
+      "component": "o.o.d.r.RestController", 
+      "cluster.name": "single-node-cluster", 
+      "node.name": "single-node", 
+      "message": "[GET /_cat/master] is deprecated! Use [GET /_cat/cluster_manager] instead.", 
+      "x-opaque-id": "Basic Client Testing Application", 
+      "cluster.uuid": "kF-YD2EmQ4S6YAsAtk3Q3g", 
+      "node.id": "u2Uq86tzR_KIFYYyhQO33A"  
+    }
+
 
 =head2 C<max_content_length>
 
@@ -683,7 +726,7 @@ the class which handles the network transport, eg L<HTTP::Tiny>.
     );
 
 Any values passed to C<default_qs_params> will be added to the query string
-of every request. Also see L<OpenSearch::Client::Role::Cxn::HTTP/default_headers()>.
+of every request. Also see L<OpenSearch::Client::Role::Cxn#default_headers()>.
 
 =head1 METHODS
 
@@ -710,6 +753,8 @@ or not.
 Returns the username and password of the cxn, if any, eg C<"user:pass">.
 If C<userinfo> is provided, then a Basic Authorization header is added
 to each request.
+
+C<username> and C<password> can be provided as an alternative to C<userinfo> to create the C<userinfo> value.
 
 =head2 C<default_headers()>
 

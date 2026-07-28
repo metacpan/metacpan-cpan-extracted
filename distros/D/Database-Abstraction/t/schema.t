@@ -9,12 +9,12 @@ use Test::Most tests => 21;
 use Test::NoWarnings;
 
 use lib 't/lib';
+use Database::test1;
 use FindBin qw($Bin);
 
 # ---- CSV slurp path ----
 
-use_ok('Database::test1');
-
+pass('Database::test1 loaded');
 my $data_dir = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 my $t1 = new_ok('Database::test1' => [$data_dir]);
 

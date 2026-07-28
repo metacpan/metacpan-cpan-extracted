@@ -1,0 +1,14 @@
+use strict;
+use warnings;
+use Test::More tests => 3;
+use DBI;
+my $dbh = DBI->connect('dbi:BigQuery:project=p;dataset=d', '', '');
+my $sth = $dbh->prepare('INSERT INTO t (id, data) VALUES (?, ?)');
+my @col1 = (100, 200, 300);
+my @col2 = ('x', 'y', 'z');
+$sth->bind_param_array(1, \@col1);
+$sth->bind_param_array(2, \@col2);
+my $tuples = $sth->execute_array({ ArrayTupleStatus => [] });
+is($tuples, 3, 'execute_array processed 3 tuples');
+ok($sth, 'Statement handle active after batch execution');
+ok($dbh->ping(), 'Connection alive after batch execution');

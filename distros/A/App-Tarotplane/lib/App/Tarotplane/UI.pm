@@ -1,5 +1,5 @@
 package App::Tarotplane::UI;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 use 5.016;
 use strict;
 use warnings;
@@ -8,7 +8,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(%KEY_BINDINGS);
 
-use Carp;
 use Text::Wrap qw(wrap $columns);
 
 use Curses;
@@ -18,13 +17,13 @@ use Curses;
 my $Cursed = 0;
 
 our %KEY_BINDINGS = (
-	Next  => [ 'l', KEY_RIGHT, ],
-	Prev  => [ 'h', KEY_LEFT, ],
-	Flip  => [ 'j', 'k', ' ', KEY_UP, KEY_DOWN, ],
-	First => [ KEY_NPAGE, KEY_END, ],
-	Last  => [ KEY_PPAGE, KEY_HOME, ],
-	Quit  => [ 'q', ],
-	Help  => [ '?', ],
+    Next  => [ 'l', KEY_RIGHT, ],
+    Prev  => [ 'h', KEY_LEFT, ],
+    Flip  => [ 'j', 'k', ' ', KEY_UP, KEY_DOWN, ],
+    First => [ KEY_NPAGE, KEY_END, ],
+    Last  => [ KEY_PPAGE, KEY_HOME, ],
+    Quit  => [ 'q', ],
+    Help  => [ '?', ],
 );
 
 my $CONTROLS_HELP = <<END;
@@ -39,176 +38,176 @@ END
 
 sub init {
 
-	my $class = shift;
-	my $self = {
-		MainWin => undef,
-		CardWin => undef,
-		InfoWin => undef,
-		CardStr => '',
-		InfoStr => '',
-	};
+    my $class = shift;
+    my $self = {
+        MainWin => undef,
+        CardWin => undef,
+        InfoWin => undef,
+        CardStr => '',
+        InfoStr => '',
+    };
 
-	if ($Cursed) {
-		croak "Curses is already running";
-	}
+    if ($Cursed) {
+        die "Curses is already running";
+    }
 
-	bless $self, $class;
+    bless $self, $class;
 
-	initscr();
+    initscr();
 
-	curs_set(0);
-	cbreak();
-	noecho();
-	keypad(1);
+    curs_set(0);
+    cbreak();
+    noecho();
+    keypad(1);
 
-	$self->{MainWin} = $stdscr;
+    $self->{MainWin} = $stdscr;
 
-	$self->{InfoWin} = newwin(1, $COLS, $LINES - 1, 0);
-	$self->{CardWin} = newwin($LINES - 3, $COLS - 2, 1, 1);
+    $self->{InfoWin} = newwin(1, $COLS, $LINES - 1, 0);
+    $self->{CardWin} = newwin($LINES - 3, $COLS - 2, 1, 1);
 
-	$Cursed = 1;
+    $Cursed = 1;
 
-	return $self;
+    return $self;
 
 }
 
 sub wipe {
 
-	my $self = shift;
+    my $self = shift;
 
-	erase($self->{MainWin});
-	noutrefresh($self->{MainWin});
+    erase($self->{MainWin});
+    noutrefresh($self->{MainWin});
 
 }
 
 sub update {
 
-	my $self = shift;
+    my $self = shift;
 
-	doupdate();
+    doupdate();
 
 }
 
 sub draw_card {
 
-	my $self = shift;
-	my $str  = shift;
-	my $bold = shift;
+    my $self = shift;
+    my $str  = shift;
+    my $bold = shift;
 
-	# Make room for the box borders and a single whitespace on each side.
-	my $linemax = getmaxx($self->{CardWin}) - 4;
+    # Make room for the box borders and a single whitespace on each side.
+    my $linemax = getmaxx($self->{CardWin}) - 4;
 
-	$self->{CardStr} = $str if defined $str;
+    $self->{CardStr} = $str if defined $str;
 
-	$columns = $linemax;
-	my $text = wrap('', '', $self->{CardStr});
+    $columns = $linemax;
+    my $text = wrap('', '', $self->{CardStr});
 
-	if (defined $bold) {
-		attrset($self->{CardWin}, $bold ? A_BOLD : A_NORMAL);
-	}
+    if (defined $bold) {
+        attrset($self->{CardWin}, $bold ? A_BOLD : A_NORMAL);
+    }
 
-	erase($self->{CardWin});
-	box($self->{CardWin}, 0, 0);
+    erase($self->{CardWin});
+    box($self->{CardWin}, 0, 0);
 
-	my $ypos = (getmaxy($self->{CardWin}) / 2) - (($text =~ tr/\n//) / 2);
+    my $ypos = (getmaxy($self->{CardWin}) / 2) - (($text =~ tr/\n//) / 2);
 
-	foreach my $l (split /\n/, $text) {
-		$l =~ s/^\s+|\s+$//; # Trim leading/trailing whitespace.
-		$l =~ s/\s+/ /g;     # Truncate space.
-		addstr($self->{CardWin}, $ypos++, (($linemax + 4) - length($l)) / 2, $l);
-	}
+    foreach my $l (split /\n/, $text) {
+        $l =~ s/^\s+|\s+$//; # Trim leading/trailing whitespace.
+        $l =~ s/\s+/ /g;     # Truncate space.
+        addstr($self->{CardWin}, $ypos++, (($linemax + 4) - length($l)) / 2, $l);
+    }
 
-	noutrefresh($self->{CardWin});
+    noutrefresh($self->{CardWin});
 
 }
 
 sub draw_info {
 
-	my $self = shift;
-	my $info = shift;
+    my $self = shift;
+    my $info = shift;
 
-	$self->{InfoStr} = $info if defined $info;
+    $self->{InfoStr} = $info if defined $info;
 
-	erase($self->{InfoWin});
+    erase($self->{InfoWin});
 
-	addstr($self->{InfoWin}, $self->{InfoStr});
+    addstr($self->{InfoWin}, $self->{InfoStr});
 
-	noutrefresh($self->{InfoWin});
+    noutrefresh($self->{InfoWin});
 
 }
 
 sub draw_help {
 
-	my $self = shift;
+    my $self = shift;
 
-	my $y = 0;
-	foreach my $l (split /\n/, $CONTROLS_HELP) {
-		addstr($self->{MainWin}, $y++, 0, $l);
-	}
+    my $y = 0;
+    foreach my $l (split /\n/, $CONTROLS_HELP) {
+        addstr($self->{MainWin}, $y++, 0, $l);
+    }
 
-	noutrefresh($self->{MainWin});
+    noutrefresh($self->{MainWin});
 
 }
 
 sub update_size {
 
-	my $self = shift;
+    my $self = shift;
 
-	$self->wipe();
+    $self->wipe();
 
-	resize($self->{InfoWin}, 1, $COLS);
-	mvwin($self->{InfoWin}, $LINES - 1, 0);
+    resize($self->{InfoWin}, 1, $COLS);
+    mvwin($self->{InfoWin}, $LINES - 1, 0);
 
-	resize($self->{CardWin}, $LINES - 3, $COLS - 2);
-	mvwin($self->{CardWin}, 1, 1);
+    resize($self->{CardWin}, $LINES - 3, $COLS - 2);
+    mvwin($self->{CardWin}, 1, 1);
 
-	$self->draw_card();
-	$self->draw_info();
+    $self->draw_card();
+    $self->draw_info();
 
-	$self->update();
+    $self->update();
 
 }
 
 sub poll {
 
-	my $self = shift;
+    my $self = shift;
 
-	while (my $in = getch()) {
+    while (my $in = getch()) {
 
-		if ($in eq KEY_RESIZE) {
-			$self->update_size();
-			next;
-		}
+        if ($in eq KEY_RESIZE) {
+            $self->update_size();
+            next;
+        }
 
-		foreach my $k (keys %KEY_BINDINGS) {
-			return $k if grep { $in eq $_ } @{$KEY_BINDINGS{$k}};
-		}
+        foreach my $k (keys %KEY_BINDINGS) {
+            return $k if grep { $in eq $_ } @{$KEY_BINDINGS{$k}};
+        }
 
-		return undef;
+        return undef;
 
-	}
+    }
 
 }
 
 sub end {
 
-	my $self = shift;
+    my $self = shift;
 
-	endwin();
+    endwin();
 
-	foreach my $win (grep { /Win$/ } keys %{$self}) {
-		$self->{$win} = undef;
-	}
+    foreach my $win (grep { /Win$/ } keys %{$self}) {
+        $self->{$win} = undef;
+    }
 
-	$Cursed = 0;
+    $Cursed = 0;
 
 }
 
 DESTROY {
 
-	my $self = shift;
+    my $self = shift;
 
-	$self->end();
+    $self->end();
 
 }
 
@@ -315,7 +314,7 @@ Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright 2024, Samuel Young
+Copyright 2024-2026, Samuel Young
 
 This library is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.

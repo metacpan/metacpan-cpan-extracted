@@ -39,7 +39,11 @@ export REDIS_TEST_CONFIG
 CC:=$(shell sh -c 'type $${CC%% *} >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
 CXX:=$(shell sh -c 'type $${CXX%% *} >/dev/null 2>/dev/null && echo $(CXX) || echo g++')
 OPTIMIZATION?=-O3
-WARNINGS=-Wall -Wextra -Werror -Wstrict-prototypes -Wwrite-strings -Wno-missing-field-initializers
+WARNINGS=-Wall -Wextra -Wstrict-prototypes -Wwrite-strings -Wno-missing-field-initializers
+USE_WERROR?=1
+ifeq ($(USE_WERROR),1)
+  WARNINGS+=-Werror
+endif
 DEBUG_FLAGS?= -g -ggdb
 REAL_CFLAGS=$(OPTIMIZATION) -fPIC $(CPPFLAGS) $(CFLAGS) $(WARNINGS) $(DEBUG_FLAGS) $(PLATFORM_FLAGS)
 REAL_LDFLAGS=$(LDFLAGS)
@@ -137,7 +141,10 @@ endif
 ifeq ($(uname_S),Darwin)
   DYLIBSUFFIX=dylib
   DYLIB_MINOR_NAME=$(LIBNAME).$(HIREDIS_SONAME).$(DYLIBSUFFIX)
+  DYLIB_MAJOR_NAME=$(LIBNAME).$(HIREDIS_MAJOR).$(DYLIBSUFFIX)
   DYLIB_MAKE_CMD=$(CC) -dynamiclib -Wl,-install_name,$(PREFIX)/$(LIBRARY_PATH)/$(DYLIB_MINOR_NAME) -o $(DYLIBNAME) $(LDFLAGS)
+  SSL_DYLIB_MINOR_NAME=$(SSL_LIBNAME).$(HIREDIS_SONAME).$(DYLIBSUFFIX)
+  SSL_DYLIB_MAJOR_NAME=$(SSL_LIBNAME).$(HIREDIS_MAJOR).$(DYLIBSUFFIX)
   SSL_DYLIB_MAKE_CMD=$(CC) -dynamiclib -Wl,-install_name,$(PREFIX)/$(LIBRARY_PATH)/$(SSL_DYLIB_MINOR_NAME) -o $(SSL_DYLIBNAME) $(LDFLAGS) $(SSL_LDFLAGS)
   DYLIB_PLUGIN=-Wl,-undefined -Wl,dynamic_lookup
 endif

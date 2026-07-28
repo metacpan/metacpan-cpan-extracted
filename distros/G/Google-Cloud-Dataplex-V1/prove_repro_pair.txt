@@ -1,0 +1,14 @@
+PRE-CONDITION VIOLATION: mainpos_e (0x55cd8f302028) is NOT reachable from its head (0x55cd8f302010) at bucket 497
+  Collider Key: google.api.LOCATION_TAX_POLICY_VIOLATED
+perl: vendor/upb/hash/common.c:251: insert: Assertion `0' failed.
+t/01-service-CatalogService.t .. 
+No subtests run 
+t/01-service-CmekService.t ..... ok
+
+Test Summary Report
+-------------------
+t/01-service-CatalogService.t (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+Files=2, Tests=3,  7 wallclock secs ( 0.04 usr  0.00 sys +  4.31 cusr  0.82 csys =  5.17 CPU)
+Result: FAIL

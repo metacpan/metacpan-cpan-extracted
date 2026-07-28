@@ -1,5 +1,10 @@
 Revision history for Data-SpatialHash-Shared
 
+0.03      2026-07-17
+          - On-disk format change (v1 -> v2): an existing 0.02 file is
+            refused; recreate it.
+          - Security and robustness hardening.
+
 0.02      2026-07-03
           - Security and robustness hardening; backing files now created mode
             0600 (pass a file-mode argument to new() for cross-user sharing).

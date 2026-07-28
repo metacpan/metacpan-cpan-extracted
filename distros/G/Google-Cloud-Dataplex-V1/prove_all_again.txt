@@ -1,0 +1,36 @@
+# Testing Google::Cloud::Dataplex::V1::BusinessGlossaryServiceClient 0.03, Perl 5.040001, /usr/bin/perl
+t/00-load.t .................................... ok
+t/01-service-BusinessGlossaryService.t ......... ok
+t/01-service-CatalogService.t .................. ok
+t/01-service-CmekService.t ..................... ok
+t/01-service-DataProductService.t .............. ok
+t/01-service-DataScanService.t ................. ok
+t/01-service-DataTaxonomyService.t ............. ok
+t/01-service-DataplexService.t ................. ok
+t/01-service-MetadataService.t ................. ok
+t/02-rest-transport-BusinessGlossaryService.t .. ok
+t/02-rest-transport-CatalogService.t ........... ok
+t/02-rest-transport-CmekService.t .............. ok
+t/02-rest-transport-DataProductService.t ....... ok
+t/02-rest-transport-DataScanService.t .......... ok
+t/02-rest-transport-DataTaxonomyService.t ...... ok
+perl: vendor/upb/hash/common.c:188: insert: Assertion `findentry(t, key, hash, eql) == ((void *)0)' failed.
+t/02-rest-transport-DataplexService.t .......... 
+No subtests run 
+perl: vendor/upb/hash/common.c:216: insert: Assertion `chain' failed.
+t/02-rest-transport-MetadataService.t .......... 
+No subtests run 
+t/manifest.t ................................... skipped: Author tests not required for installation
+t/pod-coverage.t ............................... skipped: Author/Release tests not required for installation
+t/pod.t ........................................ skipped: Author tests not required for installation
+
+Test Summary Report
+-------------------
+t/02-rest-transport-DataplexService.t        (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+t/02-rest-transport-MetadataService.t        (Wstat: 134 (Signal: ABRT, dumped core) Tests: 0 Failed: 0)
+  Non-zero wait status: 134
+  Parse errors: No plan found in TAP output
+Files=20, Tests=45, 105 wallclock secs ( 0.19 usr  0.10 sys + 73.34 cusr 14.35 csys = 87.98 CPU)
+Result: FAIL

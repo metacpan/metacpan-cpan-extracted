@@ -1,0 +1,287 @@
+package Google::Ai::Generativelanguage::V1::Safety;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.11';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+Cixnb29nbGUvYWkvZ2VuZXJhdGl2ZWxhbmd1YWdlL3YxL3NhZmV0eS5wcm90bxIfZ29vZ2xl
+LmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MRofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5w
+cm90byLCAgoMU2FmZXR5UmF0aW5nEk4KCGNhdGVnb3J5GAMgASgOMi0uZ29vZ2xlLmFpLmdl
+bmVyYXRpdmVsYW5ndWFnZS52MS5IYXJtQ2F0ZWdvcnlCA+BBAlIIY2F0ZWdvcnkSZAoLcHJv
+YmFiaWxpdHkYBCABKA4yPS5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxLlNhZmV0
+eVJhdGluZy5IYXJtUHJvYmFiaWxpdHlCA+BBAlILcHJvYmFiaWxpdHkSGAoHYmxvY2tlZBgF
+IAEoCFIHYmxvY2tlZCJiCg9IYXJtUHJvYmFiaWxpdHkSIAocSEFSTV9QUk9CQUJJTElUWV9V
+TlNQRUNJRklFRBAAEg4KCk5FR0xJR0lCTEUQARIHCgNMT1cQAhIKCgZNRURJVU0QAxIICgRI
+SUdIEAQi5QIKDVNhZmV0eVNldHRpbmcSTgoIY2F0ZWdvcnkYAyABKA4yLS5nb29nbGUuYWku
+Z2VuZXJhdGl2ZWxhbmd1YWdlLnYxLkhhcm1DYXRlZ29yeUID4EECUghjYXRlZ29yeRJkCgl0
+aHJlc2hvbGQYBCABKA4yQS5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxLlNhZmV0
+eVNldHRpbmcuSGFybUJsb2NrVGhyZXNob2xkQgPgQQJSCXRocmVzaG9sZCKdAQoSSGFybUJs
+b2NrVGhyZXNob2xkEiQKIEhBUk1fQkxPQ0tfVEhSRVNIT0xEX1VOU1BFQ0lGSUVEEAASFwoT
+QkxPQ0tfTE9XX0FORF9BQk9WRRABEhoKFkJMT0NLX01FRElVTV9BTkRfQUJPVkUQAhITCg9C
+TE9DS19PTkxZX0hJR0gQAxIOCgpCTE9DS19OT05FEAQSBwoDT0ZGEAUqgwMKDEhhcm1DYXRl
+Z29yeRIdChlIQVJNX0NBVEVHT1JZX1VOU1BFQ0lGSUVEEAASHAoYSEFSTV9DQVRFR09SWV9E
+RVJPR0FUT1JZEAESGgoWSEFSTV9DQVRFR09SWV9UT1hJQ0lUWRACEhoKFkhBUk1fQ0FURUdP
+UllfVklPTEVOQ0UQAxIYChRIQVJNX0NBVEVHT1JZX1NFWFVBTBAEEhkKFUhBUk1fQ0FURUdP
+UllfTUVESUNBTBAFEhsKF0hBUk1fQ0FURUdPUllfREFOR0VST1VTEAYSHAoYSEFSTV9DQVRF
+R09SWV9IQVJBU1NNRU5UEAcSHQoZSEFSTV9DQVRFR09SWV9IQVRFX1NQRUVDSBAIEiMKH0hB
+Uk1fQ0FURUdPUllfU0VYVUFMTFlfRVhQTElDSVQQCRIjCh9IQVJNX0NBVEVHT1JZX0RBTkdF
+Uk9VU19DT05URU5UEAoSJQodSEFSTV9DQVRFR09SWV9DSVZJQ19JTlRFR1JJVFkQCxoCCAFC
+jwEKI2NvbS5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxQgtTYWZldHlQcm90b1AB
+WlljbG91ZC5nb29nbGUuY29tL2dvL2FpL2dlbmVyYXRpdmVsYW5ndWFnZS9hcGl2MS9nZW5l
+cmF0aXZlbGFuZ3VhZ2VwYjtnZW5lcmF0aXZlbGFuZ3VhZ2VwYkqeJAoHEgUOAI0BAQq8BAoB
+DBIDDgASMrEEIENvcHlyaWdodCAyMDI1IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0
+aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBt
+YXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGlj
+ZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBo
+dHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVx
+dWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3
+YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBh
+biAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0Yg
+QU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2Ug
+Zm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBs
+aW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAKAoJCgIDABIDEgApCggK
+AQgSAxQAcAoJCgIICxIDFABwCggKAQgSAxUAIgoJCgIIChIDFQAiCggKAQgSAxYALAoJCgII
+CBIDFgAsCggKAQgSAxcAPAoJCgIIARIDFwA8CnwKAgUAEgQdAEUBGnAgVGhlIGNhdGVnb3J5
+IG9mIGEgcmF0aW5nLgoKIFRoZXNlIGNhdGVnb3JpZXMgY292ZXIgdmFyaW91cyBraW5kcyBv
+ZiBoYXJtcyB0aGF0IGRldmVsb3BlcnMKIG1heSB3aXNoIHRvIGFkanVzdC4KCgoKAwUAARID
+HQURCicKBAUAAgASAx8CIBoaIENhdGVnb3J5IGlzIHVuc3BlY2lmaWVkLgoKDAoFBQACAAES
+Ax8CGwoMCgUFAAIAAhIDHx4fCmYKBAUAAgESAyMCHxpZICoqUGFMTSoqIC0gTmVnYXRpdmUg
+b3IgaGFybWZ1bCBjb21tZW50cyB0YXJnZXRpbmcgaWRlbnRpdHkgYW5kL29yIHByb3RlY3Rl
+ZAogYXR0cmlidXRlLgoKDAoFBQACAQESAyMCGgoMCgUFAAIBAhIDIx0eCkoKBAUAAgISAyYC
+HRo9ICoqUGFMTSoqIC0gQ29udGVudCB0aGF0IGlzIHJ1ZGUsIGRpc3Jlc3BlY3RmdWwsIG9y
+IHByb2ZhbmUuCgoMCgUFAAICARIDJgIYCgwKBQUAAgICEgMmGxwKggEKBAUAAgMSAyoCHRp1
+ICoqUGFMTSoqIC0gRGVzY3JpYmVzIHNjZW5hcmlvcyBkZXBpY3RpbmcgdmlvbGVuY2UgYWdh
+aW5zdCBhbiBpbmRpdmlkdWFsIG9yCiBncm91cCwgb3IgZ2VuZXJhbCBkZXNjcmlwdGlvbnMg
+b2YgZ29yZS4KCgwKBQUAAgMBEgMqAhgKDAoFBQACAwISAyobHApTCgQFAAIEEgMtAhsaRiAq
+KlBhTE0qKiAtIENvbnRhaW5zIHJlZmVyZW5jZXMgdG8gc2V4dWFsIGFjdHMgb3Igb3RoZXIg
+bGV3ZCBjb250ZW50LgoKDAoFBQACBAESAy0CFgoMCgUFAAIEAhIDLRkaCjwKBAUAAgUSAzAC
+HBovICoqUGFMTSoqIC0gUHJvbW90ZXMgdW5jaGVja2VkIG1lZGljYWwgYWR2aWNlLgoKDAoF
+BQACBQESAzACFwoMCgUFAAIFAhIDMBobCmQKBAUAAgYSAzQCHhpXICoqUGFMTSoqIC0gRGFu
+Z2Vyb3VzIGNvbnRlbnQgdGhhdCBwcm9tb3RlcywgZmFjaWxpdGF0ZXMsIG9yIGVuY291cmFn
+ZXMKIGhhcm1mdWwgYWN0cy4KCgwKBQUAAgYBEgM0AhkKDAoFBQACBgISAzQcHQovCgQFAAIH
+EgM3Ah8aIiAqKkdlbWluaSoqIC0gSGFyYXNzbWVudCBjb250ZW50LgoKDAoFBQACBwESAzcC
+GgoMCgUFAAIHAhIDNx0eCjQKBAUAAggSAzoCIBonICoqR2VtaW5pKiogLSBIYXRlIHNwZWVj
+aCBhbmQgY29udGVudC4KCgwKBQUAAggBEgM6AhsKDAoFBQACCAISAzoeHwo2CgQFAAIJEgM9
+AiYaKSAqKkdlbWluaSoqIC0gU2V4dWFsbHkgZXhwbGljaXQgY29udGVudC4KCgwKBQUAAgkB
+EgM9AiEKDAoFBQACCQISAz0kJQouCgQFAAIKEgNAAicaISAqKkdlbWluaSoqIC0gRGFuZ2Vy
+b3VzIGNvbnRlbnQuCgoMCgUFAAIKARIDQAIhCgwKBQUAAgoCEgNAJCYKhQEKBAUAAgsSA0QC
+ORp4ICoqR2VtaW5pKiogLSBDb250ZW50IHRoYXQgbWF5IGJlIHVzZWQgdG8gaGFybSBjaXZp
+YyBpbnRlZ3JpdHkuCiBERVBSRUNBVEVEOiB1c2UgZW5hYmxlX2VuaGFuY2VkX2NpdmljX2Fu
+c3dlcnMgaW5zdGVhZC4KCgwKBQUAAgsBEgNEAh8KDAoFBQACCwISA0QiJAoMCgUFAAILAxID
+RCU4Cg0KBgUAAgsDARIDRCY3CrcCCgIEABIETgBsARqqAiBTYWZldHkgcmF0aW5nIGZvciBh
+IHBpZWNlIG9mIGNvbnRlbnQuCgogVGhlIHNhZmV0eSByYXRpbmcgY29udGFpbnMgdGhlIGNh
+dGVnb3J5IG9mIGhhcm0gYW5kIHRoZQogaGFybSBwcm9iYWJpbGl0eSBsZXZlbCBpbiB0aGF0
+IGNhdGVnb3J5IGZvciBhIHBpZWNlIG9mIGNvbnRlbnQuCiBDb250ZW50IGlzIGNsYXNzaWZp
+ZWQgZm9yIHNhZmV0eSBhY3Jvc3MgYSBudW1iZXIgb2YKIGhhcm0gY2F0ZWdvcmllcyBhbmQg
+dGhlIHByb2JhYmlsaXR5IG9mIHRoZSBoYXJtIGNsYXNzaWZpY2F0aW9uIGlzIGluY2x1ZGVk
+CiBoZXJlLgoKCgoDBAABEgNOCBQK2AEKBAQABAASBFMCYgMayQEgVGhlIHByb2JhYmlsaXR5
+IHRoYXQgYSBwaWVjZSBvZiBjb250ZW50IGlzIGhhcm1mdWwuCgogVGhlIGNsYXNzaWZpY2F0
+aW9uIHN5c3RlbSBnaXZlcyB0aGUgcHJvYmFiaWxpdHkgb2YgdGhlIGNvbnRlbnQgYmVpbmcK
+IHVuc2FmZS4gVGhpcyBkb2VzIG5vdCBpbmRpY2F0ZSB0aGUgc2V2ZXJpdHkgb2YgaGFybSBm
+b3IgYSBwaWVjZSBvZiBjb250ZW50LgoKDAoFBAAEAAESA1MHFgosCgYEAAQAAgASA1UEJRod
+IFByb2JhYmlsaXR5IGlzIHVuc3BlY2lmaWVkLgoKDgoHBAAEAAIAARIDVQQgCg4KBwQABAAC
+AAISA1UjJApBCgYEAAQAAgESA1gEExoyIENvbnRlbnQgaGFzIGEgbmVnbGlnaWJsZSBjaGFu
+Y2Ugb2YgYmVpbmcgdW5zYWZlLgoKDgoHBAAEAAIBARIDWAQOCg4KBwQABAACAQISA1gREgo6
+CgYEAAQAAgISA1sEDBorIENvbnRlbnQgaGFzIGEgbG93IGNoYW5jZSBvZiBiZWluZyB1bnNh
+ZmUuCgoOCgcEAAQAAgIBEgNbBAcKDgoHBAAEAAICAhIDWwoLCj0KBgQABAACAxIDXgQPGi4g
+Q29udGVudCBoYXMgYSBtZWRpdW0gY2hhbmNlIG9mIGJlaW5nIHVuc2FmZS4KCg4KBwQABAAC
+AwESA14ECgoOCgcEAAQAAgMCEgNeDQ4KOwoGBAAEAAIEEgNhBA0aLCBDb250ZW50IGhhcyBh
+IGhpZ2ggY2hhbmNlIG9mIGJlaW5nIHVuc2FmZS4KCg4KBwQABAACBAESA2EECAoOCgcEAAQA
+AgQCEgNhCwwKNgoEBAACABIDZQJFGikgUmVxdWlyZWQuIFRoZSBjYXRlZ29yeSBmb3IgdGhp
+cyByYXRpbmcuCgoMCgUEAAIABhIDZQIOCgwKBQQAAgABEgNlDxcKDAoFBAACAAMSA2UaGwoM
+CgUEAAIACBIDZRxECg8KCAQAAgAInAgAEgNlHUMKQgoEBAACARIDaAJLGjUgUmVxdWlyZWQu
+IFRoZSBwcm9iYWJpbGl0eSBvZiBoYXJtIGZvciB0aGlzIGNvbnRlbnQuCgoMCgUEAAIBBhID
+aAIRCgwKBQQAAgEBEgNoEh0KDAoFBAACAQMSA2ggIQoMCgUEAAIBCBIDaCJKCg8KCAQAAgEI
+nAgAEgNoI0kKPwoEBAACAhIDawITGjIgV2FzIHRoaXMgY29udGVudCBibG9ja2VkIGJlY2F1
+c2Ugb2YgdGhpcyByYXRpbmc/CgoMCgUEAAICBRIDawIGCgwKBQQAAgIBEgNrBw4KDAoFBAAC
+AgMSA2sREgqrAQoCBAESBXIAjQEBGp0BIFNhZmV0eSBzZXR0aW5nLCBhZmZlY3RpbmcgdGhl
+IHNhZmV0eS1ibG9ja2luZyBiZWhhdmlvci4KCiBQYXNzaW5nIGEgc2FmZXR5IHNldHRpbmcg
+Zm9yIGEgY2F0ZWdvcnkgY2hhbmdlcyB0aGUgYWxsb3dlZCBwcm9iYWJpbGl0eSB0aGF0CiBj
+b250ZW50IGlzIGJsb2NrZWQuCgoKCgMEAQESA3IIFQpCCgQEAQQAEgV0AoYBAxozIEJsb2Nr
+IGF0IGFuZCBiZXlvbmQgYSBzcGVjaWZpZWQgaGFybSBwcm9iYWJpbGl0eS4KCgwKBQQBBAAB
+EgN0BxkKKgoGBAEEAAIAEgN2BCkaGyBUaHJlc2hvbGQgaXMgdW5zcGVjaWZpZWQuCgoOCgcE
+AQQAAgABEgN2BCQKDgoHBAEEAAIAAhIDdicoCjkKBgQBBAACARIDeQQcGiogQ29udGVudCB3
+aXRoIE5FR0xJR0lCTEUgd2lsbCBiZSBhbGxvd2VkLgoKDgoHBAEEAAIBARIDeQQXCg4KBwQB
+BAACAQISA3kaGwpBCgYEAQQAAgISA3wEHxoyIENvbnRlbnQgd2l0aCBORUdMSUdJQkxFIGFu
+ZCBMT1cgd2lsbCBiZSBhbGxvd2VkLgoKDgoHBAEEAAICARIDfAQaCg4KBwQBBAACAgISA3wd
+HgpKCgYEAQQAAgMSA38EGBo7IENvbnRlbnQgd2l0aCBORUdMSUdJQkxFLCBMT1csIGFuZCBN
+RURJVU0gd2lsbCBiZSBhbGxvd2VkLgoKDgoHBAEEAAIDARIDfwQTCg4KBwQBBAACAwISA38W
+FwouCgYEAQQAAgQSBIIBBBMaHiBBbGwgY29udGVudCB3aWxsIGJlIGFsbG93ZWQuCgoPCgcE
+AQQAAgQBEgSCAQQOCg8KBwQBBAACBAISBIIBERIKLQoGBAEEAAIFEgSFAQQMGh0gVHVybiBv
+ZmYgdGhlIHNhZmV0eSBmaWx0ZXIuCgoPCgcEAQQAAgUBEgSFAQQHCg8KBwQBBAACBQISBIUB
+CgsKOAoEBAECABIEiQECRRoqIFJlcXVpcmVkLiBUaGUgY2F0ZWdvcnkgZm9yIHRoaXMgc2V0
+dGluZy4KCg0KBQQBAgAGEgSJAQIOCg0KBQQBAgABEgSJAQ8XCg0KBQQBAgADEgSJARobCg0K
+BQQBAgAIEgSJARxEChAKCAQBAgAInAgAEgSJAR1DClYKBAQBAgESBIwBAkwaSCBSZXF1aXJl
+ZC4gQ29udHJvbHMgdGhlIHByb2JhYmlsaXR5IHRocmVzaG9sZCBhdCB3aGljaCBoYXJtIGlz
+IGJsb2NrZWQuCgoNCgUEAQIBBhIEjAECFAoNCgUEAQIBARIEjAEVHgoNCgUEAQIBAxIEjAEh
+IgoNCgUEAQIBCBIEjAEjSwoQCggEAQIBCJwIABIEjAEkSmIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Ai::Generativelanguage::V1::Safety::SafetyRating ===
+    # Fields for SafetyRating
+    # Field: category Type: 14 (.google.ai.generativelanguage.v1.HarmCategory)
+    # Field: probability Type: 14 (.google.ai.generativelanguage.v1.SafetyRating.HarmProbability)
+    # Field: blocked Type: 8 ()
+
+=pod
+
+=head1 NAME
+
+Google::Ai::Generativelanguage::V1::Safety::SafetyRating - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1::Safety;
+
+    my $msg = Google::Ai::Generativelanguage::V1::Safety::SafetyRating->new(
+        category => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<category>
+
+Type: Enum (.google.ai.generativelanguage.v1.HarmCategory)
+
+=item * B<probability>
+
+Type: Enum (.google.ai.generativelanguage.v1.SafetyRating.HarmProbability)
+
+=item * B<blocked>
+
+Type: Bool
+
+=back
+
+=cut
+
+# Enum: SafetyRating::HarmProbability
+our $SafetyRating_HARM_PROBABILITY_UNSPECIFIED = 0;
+our $SafetyRating_NEGLIGIBLE = 1;
+our $SafetyRating_LOW = 2;
+our $SafetyRating_MEDIUM = 3;
+our $SafetyRating_HIGH = 4;
+
+=pod
+
+=head2 Enum: SafetyRating::HarmProbability
+
+Values:
+
+=over 4
+
+=item * C<HARM_PROBABILITY_UNSPECIFIED> => 0
+
+=item * C<NEGLIGIBLE> => 1
+
+=item * C<LOW> => 2
+
+=item * C<MEDIUM> => 3
+
+=item * C<HIGH> => 4
+
+=back
+
+=cut
+
+# === Message: Google::Ai::Generativelanguage::V1::Safety::SafetySetting ===
+    # Fields for SafetySetting
+    # Field: category Type: 14 (.google.ai.generativelanguage.v1.HarmCategory)
+    # Field: threshold Type: 14 (.google.ai.generativelanguage.v1.SafetySetting.HarmBlockThreshold)
+
+=pod
+
+=head1 NAME
+
+Google::Ai::Generativelanguage::V1::Safety::SafetySetting - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1::Safety;
+
+    my $msg = Google::Ai::Generativelanguage::V1::Safety::SafetySetting->new(
+        category => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<category>
+
+Type: Enum (.google.ai.generativelanguage.v1.HarmCategory)
+
+=item * B<threshold>
+
+Type: Enum (.google.ai.generativelanguage.v1.SafetySetting.HarmBlockThreshold)
+
+=back
+
+=cut
+
+# Enum: SafetySetting::HarmBlockThreshold
+our $SafetySetting_HARM_BLOCK_THRESHOLD_UNSPECIFIED = 0;
+our $SafetySetting_BLOCK_LOW_AND_ABOVE = 1;
+our $SafetySetting_BLOCK_MEDIUM_AND_ABOVE = 2;
+our $SafetySetting_BLOCK_ONLY_HIGH = 3;
+our $SafetySetting_BLOCK_NONE = 4;
+our $SafetySetting_OFF = 5;
+
+=pod
+
+=head2 Enum: SafetySetting::HarmBlockThreshold
+
+Values:
+
+=over 4
+
+=item * C<HARM_BLOCK_THRESHOLD_UNSPECIFIED> => 0
+
+=item * C<BLOCK_LOW_AND_ABOVE> => 1
+
+=item * C<BLOCK_MEDIUM_AND_ABOVE> => 2
+
+=item * C<BLOCK_ONLY_HIGH> => 3
+
+=item * C<BLOCK_NONE> => 4
+
+=item * C<OFF> => 5
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Ai::Generativelanguage::V1::Safety - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

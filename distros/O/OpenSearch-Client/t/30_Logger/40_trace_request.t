@@ -24,7 +24,7 @@ use Test::More;
 use Test::Exception;
 use OpenSearch::Client;
 
-do './t/lib/LogCallback.pl' or die( $@ || $! );
+do './t/lib/LogCapture.pl' or die( $@ || $! );
 
 ok my $e
     = OpenSearch::Client->new( nodes => 'https://foo.bar:444/some/path' ),
@@ -47,7 +47,7 @@ ok $l->trace_request(
     ),
     'No body';
 
-is $format, <<'REQUEST', 'No body - format';
+is $messagetext, <<'REQUEST', 'No body - format';
 # Request to: https://foo.bar:444/some/path
 curl -XPOST 'http://localhost:9200/xyz?foo=bar&pretty=true'
 REQUEST
@@ -67,7 +67,7 @@ ok $l->trace_request(
     ),
     'Body';
 
-is $format, <<'REQUEST', 'Body - format';
+is $messagetext, <<'REQUEST', 'Body - format';
 # Request to: https://foo.bar:444/some/path
 curl -H "Content-type: application/json" -XPOST 'http://localhost:9200/xyz?foo=bar&pretty=true' -d '
 {
@@ -91,7 +91,7 @@ ok $l->trace_request(
     ),
     'Bulk';
 
-is $format, <<'REQUEST', 'Bulk - format';
+is $messagetext, <<'REQUEST', 'Bulk - format';
 # Request to: https://foo.bar:444/some/path
 curl -H "Content-type: application/json" -XPOST 'http://localhost:9200/xyz?foo=bar&pretty=true' -d '
 {"foo":"bar\n\u0027baz"}
@@ -113,7 +113,7 @@ ok $l->trace_request(
     ),
     'Body string';
 
-is $format, <<'REQUEST', 'Body string - format';
+is $messagetext, <<'REQUEST', 'Body string - format';
 # Request to: https://foo.bar:444/some/path
 curl -H "Content-type: application/json" -XPOST 'http://localhost:9200/xyz?foo=bar&pretty=true' -d '
 The quick brown fox
