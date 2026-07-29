@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::RSS - Check if the resident set size of a process mat
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{rss} ) ){
 		die ('No rss key specified in the argument hash');
 	}
-	if ( ref( \$args{rss} ) eq 'ARRAY' ){
+	if ( ref( $args{rss} ) ne 'ARRAY' ){
 		die ('The rss key is not a array');
 	}
 	if ( ! defined $args{rss}[0] ){
 		die ('Nothing defined in the rss array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				rss=>$args{rss},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -135,7 +136,7 @@ sub match{
 		my $rss=$self->{rss}[$rss_int];
 		if (
 			( $rss =~ /^[0-9]+$/ ) &&
-			( $rss eq $proc_rss )
+			( $rss == $proc_rss )
 			){
 			return 1;
 		}elsif( $rss =~ /^\<\=[0-9]+$/ ){
@@ -160,7 +161,7 @@ sub match{
 			}
 		}elsif( $rss =~ /^\![0-9]+$/ ){
 			$rss=~s/^\!//;
-			if ( $proc_rss ne $rss ){
+			if ( $proc_rss != $rss ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

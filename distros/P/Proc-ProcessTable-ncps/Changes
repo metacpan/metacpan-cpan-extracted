@@ -1,19 +1,40 @@
 Revision history for Proc-ProcessTable-ncps
 
-0.1.2	 2020-12-30/05:00
-		 - Now use ColorThemes::Standard.
-		 - Fix --stats.
+0.2.1    2026-07-28/23:15
+         - add a inf/nan fix that can crop up on linux for pctcpu
+         - perltidy
 
-0.1.1	 2020-10-04/03:30
-		 - Update so it plays nicely with Text::ANSITable 0.600
+0.2.0    2026-07-28/22:30
+         - Fix -z.
+         - -v now uses the module version.
+         - Error on bad command line options.
+         - Hide or error on columns and switches the OS lacks the fields for.
+         - Compute pctmem and rss when the OS does not provide them.
+         - Find physmem via POSIX::sysconf or sysctl -n, fixing a OpenBSD crash.
+         - Warn on match check errors.
+         - Skip the stats table when nothing matches.
+         - NCPS_* env vars now require being set to 1.
+         - new() no longer clobbers defaults for unspecified args.
+         - Round fractional seconds and memory values.
+         - Fix column padding and stats table column styles.
+         - Per-OS -h output for switches and info symbols.
+         - Fix assorted typos and remove dead links.
+         - Add tests.
 
-0.1.0	 2019-08-28/02:00
-		 - Now use Proc::ProcessTable::InfoString.
-		 - Document information symbols.
+0.1.2    2020-12-30/05:00
+         - Now use ColorThemes::Standard.
+         - Fix --stats.
 
-0.0.1	 2019-08-26/20:45
-		 - Handle time properly on linux now
-		   by converting it to seconds.
+0.1.1    2020-10-04/03:30
+         - Update so it plays nicely with Text::ANSITable 0.600
 
-0.0.0	 2019-08-26/00:15
-		 - Initial release.
+0.1.0    2019-08-28/02:00
+         - Now use Proc::ProcessTable::InfoString.
+         - Document information symbols.
+
+0.0.1    2019-08-26/20:45
+         - Handle time properly on linux now
+           by converting it to seconds.
+
+0.0.0    2019-08-26/00:15
+         - Initial release.

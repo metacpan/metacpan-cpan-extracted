@@ -27,7 +27,7 @@ use MIME::Base64 qw(encode_base64);
 use Google::Auth::Exceptions;
 use Log::Any qw($log);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub retrieve_subject_token {
     my ($self) = @_;

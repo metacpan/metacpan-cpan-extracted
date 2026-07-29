@@ -26,7 +26,7 @@ use Google::Auth::Exceptions;
 use Google::Auth::RetryHelper;
 use Log::Any qw($log);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has base_credentials => (
     is       => 'ro',

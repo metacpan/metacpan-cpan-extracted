@@ -1,0 +1,17 @@
+---
+module: CGI::Lingua
+function: language
+
+new:
+  supported: 'en_gb'
+
+input: undef
+
+output:
+  type: string
+  min: 2
+
+config:
+  test_undef: no
+  test_nuls: no
+  test_empty: no

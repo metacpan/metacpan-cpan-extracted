@@ -32,7 +32,7 @@ WriteMakefile1(
         provides => {
             'PDF::Reuse' => {
                 file    => 'lib/PDF/Reuse.pm',
-                version => '0.43',
+                version => '0.44',
             },
             'PDF::Reuse::Util' => {
                 file    => 'lib/PDF/Reuse/Util.pm',

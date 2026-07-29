@@ -43,6 +43,7 @@ requires:
   HTTP::BrowserDetect: '0'
   I18N::AcceptLanguage: '0'
   I18N::LangTags::Detect: '1.04'
+  JSON::PP: '2.27'
   Locale::Codes: '3.59'
   Locale::Language: '0'
   Locale::Object: '0.8'
@@ -52,8 +53,8 @@ requires:
   Net::Whois::IANA: '0'
   Net::Whois::IP: '0'
   NetAddr::IP: '0'
-  Object::Configure: '0.14'
-  Params::Get: '0.13'
+  Object::Configure: '0.23'
+  Params::Get: '0.15'
   Readonly: '0'
   Sys::Syslog: '0'
   autodie: '0'
@@ -61,5 +62,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.82'
+version: '0.83'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

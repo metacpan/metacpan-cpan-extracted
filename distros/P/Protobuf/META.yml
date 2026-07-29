@@ -56,9 +56,9 @@ requires:
   Moo: '0'
   Type::Tiny: '0'
   Types::Standard: '0'
-  perl: '5.014'
+  perl: '0.120'
 resources:
   bugtracker: https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues
   repository: https://github.com/GoogleCloudPlatform/google-auth-library-perl.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

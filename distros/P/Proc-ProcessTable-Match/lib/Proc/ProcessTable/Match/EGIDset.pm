@@ -11,11 +11,11 @@ Proc::ProcessTable::Match::EGIDset - Check if the the process has a EGID set.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -39,9 +39,10 @@ This intiates the object.
 =cut
 
 sub new{
+    my $class=$_[0];
     my $self = {
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -94,7 +95,7 @@ sub match{
 		return 0;
 	}
 
-	if ( $proc_egid ne $proc_gid ){
+	if ( $proc_egid != $proc_gid ){
 		return 1;
 	}
 
@@ -128,14 +129,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

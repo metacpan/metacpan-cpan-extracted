@@ -1,5 +1,12 @@
 Revision history for Perl extension PDF::Reuse::Barcode.
 
+0.10 Wed Jul 29 2026
+     Added "textsize" parameter to set the point size of the human readable
+     text below the barcode. Defaults to 10, so existing output is unchanged.
+     Applies to Code128, Code39, the 2of5 family, ITF, NW7 and QRcode; the
+     EAN and UPC functions place their text in fixed positions and still use
+     10 point. GitHub #3.
+
 0.09 Thu Jan 22 2026
      Address CPANTS Kwalitee metrics: add provides, LICENSE,
      SECURITY.md, CONTRIBUTING.md

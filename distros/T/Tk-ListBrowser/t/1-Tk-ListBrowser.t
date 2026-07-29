@@ -394,6 +394,7 @@ push @tests, (
 	}, [], 'selectionGet no selection' ],
 	[ sub {
 		$ib->refresh;
+		pause(600);
 		return defined $ib->anchorGet
 	}, '', 'anchorGet no anchor' ],
 	[ sub {
@@ -449,6 +450,7 @@ push @tests, (
 	}, 'new data', 'entryConfigure' ],
 	[ sub {
 		$ib->refresh;
+		pause(600);
 		return 1
 	}, 1, 'refresh' ],
 	[ sub {

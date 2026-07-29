@@ -11,7 +11,7 @@ Net::WoRMS bundles functionalities for the tool query-worms.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 
@@ -28,7 +28,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 
-our $VERSION = 1.3;
+our $VERSION = 1.4;
 
 =head1 MODULE DEPENDENCIES
 

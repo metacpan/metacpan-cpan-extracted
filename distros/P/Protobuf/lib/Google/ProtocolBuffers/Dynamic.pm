@@ -6,7 +6,7 @@ use Protobuf;
 use Protobuf::DescriptorPool;
 use File::Basename qw(dirname basename);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
     my ($class, %opts) = @_;

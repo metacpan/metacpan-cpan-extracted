@@ -20,13 +20,15 @@ use warnings;
 use Moo;
 extends 'Google::Auth::Credentials';
 
+use URI;
+
 use JSON::PP;
 use LWP::UserAgent;
 use Google::Auth::Exceptions;
 use Google::Auth::RetryHelper;
 use Log::Any qw($log);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has audience => (
     is       => 'ro',
@@ -169,6 +171,7 @@ sub retrieve_subject_token {
         }
 
         $log->tracef('Retrieving subject token from URL: %s...', $source_name);
+        $self->_validate_url($source_name, 'credential_source.url');
         my $response = $ua->get( $source_name, @header_list );
         if ( !$response->is_success ) {
             $log->errorf('Failed to fetch subject token from URL %s: %s', $source_name, $response->status_line);
@@ -221,6 +224,7 @@ sub fetch_access_token {
 
     my $ua = $self->ua;
     $log->infof('Exchanging subject token for GCP STS access token at %s...', $self->token_url);
+    $self->_validate_url($self->token_url, 'token_url');
     my $response = Google::Auth::RetryHelper->execute_with_retry(sub {
         my $res = $ua->post(
             $self->token_url,
@@ -243,6 +247,7 @@ sub fetch_access_token {
             scope => \@scopes_list
         });
 
+        $self->_validate_url($self->service_account_impersonation_url, 'service_account_impersonation_url');
         my $impers_res = Google::Auth::RetryHelper->execute_with_retry(sub {
             my $res = $ua->post(
                 $self->service_account_impersonation_url,
@@ -272,6 +277,33 @@ sub fetch_access_token {
     $self->expires_at($expire_iso);
 
     return $sts_token;
+}
+
+sub _validate_url {
+    my ($self, $url_str, $name) = @_;
+    return unless defined $url_str;
+
+    my $uri = URI->new($url_str);
+    my $host = $uri->host;
+
+    unless ($host) {
+        Google::Auth::Error->throw("Invalid URL for $name: $url_str");
+    }
+
+    my $universe_domain = $self->universe_domain // 'googleapis.com';
+
+    my $is_valid = 0;
+    if ( $host eq 'googleapis.com' || $host =~ /\.googleapis.com$/ ) {
+        $is_valid = 1;
+    }
+    elsif ( $host eq $universe_domain || $host =~ /\.\Q$universe_domain\E$/ ) {
+        $is_valid = 1;
+    }
+
+    unless ($is_valid) {
+        $log->errorf("URL %s (%s) does not match expected domain (%s)", $name, $url_str, $universe_domain);
+        Google::Auth::Error->throw("URL $name ($url_str) carries security violation: domain does not match $universe_domain or googleapis.com");
+    }
 }
 
 1;

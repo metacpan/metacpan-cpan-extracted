@@ -1,13 +1,19 @@
 Revision history for Net-Connection
 
-0.2.0	 2019-07-12/05:40
-		 - Add support for proc, pctmem, pctcpu, and wchan.
+0.3.0   2026-07-28:23:30
+        - Add the pid_start method.
+        - Resolve port names using the connection protocol instead of always tcp.
+        - Fix PTR resolution and share a single Net::DNS::Resolver between objects.
+        - Die if uid_resolve is true but neither uid or username is defined.
 
-0.1.0	 2019-07-28/21:45
-		 - Add the pid method.
-		 - Resolve ports when the port is numeric.
+0.2.0   2019-07-12/05:40
+        - Add support for proc, pctmem, pctcpu, and wchan.
 
-0.0,0    2019-07-06/23:00
-		 -Initial release.
+0.1.0   2019-07-28/21:45
+        - Add the pid method.
+        - Resolve ports when the port is numeric.
+
+0.0.0   2019-07-06/23:00
+        -Initial release.
 
 

@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 $SIG{PIPE} = 'IGNORE';
 use IO::Socket::INET;
-use Test::More tests => 9;
+use Test::More;
 use EV;
 use Net::WebSocket::EVx;
 use Net::EmptyPort 'empty_port';
@@ -19,7 +19,8 @@ sub make_pair {
     my (%opts) = @_;
     my $port = empty_port;
     my $listen = IO::Socket::INET->new(
-        Listen => 1, LocalAddr => '127.0.0.1', LocalPort => $port, Proto => 'tcp',
+        # ReuseAddr: an earlier pair may still hold this port in TIME_WAIT
+        Listen => 1, LocalAddr => '127.0.0.1', LocalPort => $port, Proto => 'tcp', ReuseAddr => 1,
     ) or die "listen: $!";
     my $cli_sock = IO::Socket::INET->new(
         PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Blocking => 0,
@@ -43,7 +44,7 @@ sub make_pair {
 
 my $port1 = empty_port;
 my $server_sock = IO::Socket::INET->new(
-    Listen => 5, LocalAddr => '127.0.0.1', LocalPort => $port1, Proto => 'tcp',
+    Listen => 5, LocalAddr => '127.0.0.1', LocalPort => $port1, Proto => 'tcp', ReuseAddr => 1,
 ) or die 'Failed to bind server!';
 
 my ($server1, $connected1);
@@ -257,3 +258,5 @@ my $timeout = EV::timer 10, 0, sub { fail("test timeout"); EV::break(EV::BREAK_A
 call_next_test;
 
 EV::run;
+
+done_testing();

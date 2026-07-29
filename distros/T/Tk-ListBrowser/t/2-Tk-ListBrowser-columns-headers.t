@@ -330,10 +330,8 @@ push @tests, (
 			-text => 'Frth',
 			-sortable => 1,
 		);
-#		$ib->configure('sorton' => '');
-#		$ib->sortMode('', 'ascending');
-#		$ib->sortList;
 		$ib->refresh;
+		return ''
 	}, '', 'refresh' ],
 );
 

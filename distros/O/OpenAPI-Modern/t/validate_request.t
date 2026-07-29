@@ -391,7 +391,7 @@ subtest $::TYPE.': path-item lookup' => sub {
   );
 };
 
-subtest $::TYPE.': validation errors in requests' => sub {
+subtest $::TYPE.': parameter validation' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
@@ -2076,6 +2076,35 @@ YAML
       ],
     },
     'query, header parameters: operation overshadows path-item',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /:
+    get: {}
+    parameters:
+      - name: Accept
+        in: header
+        required: true
+        schema: false
+      - name: Authorization
+        in: header
+        required: true
+        schema: false
+      - name: Content-Type
+        in: header
+        required: true
+        schema: false
+YAML
+
+  $request = request('GET', 'http://example.com', [ map +($_ => 1), qw(accept authorization content-type) ]);
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'Accept, Authorization, Content-Type headers are ignored in requests',
   );
 };
 

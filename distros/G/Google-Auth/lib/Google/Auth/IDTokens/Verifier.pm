@@ -9,7 +9,7 @@ use MIME::Base64 qw(decode_base64);
 use Google::Auth;
 use Google::Auth::IDTokens::KeySources;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has key_source => (
     is       => 'ro',

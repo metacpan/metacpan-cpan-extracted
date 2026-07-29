@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.14;
+$VERSION =  0.16;
 
 use Math::Round qw(round);
 
@@ -70,7 +70,7 @@ sub draw {
 		my @eregion = $item->getRegion;
 		my $p = $self->get($parent);
 		my @pregion = $p->region;
-		my $half = 8;
+#		my $half = 8;
 
 		#draw horizontal guide
 		my $hx1 = $x - round($indentsize/2);
@@ -78,7 +78,7 @@ sub draw {
 		my $hx2 = $x;
 		my $hy2 = $hy1;
 		my $guideh = $c->createLine($hx1, $hy1, $hx2, $hy2,
-			-fill => $self->cget('-foreground'),
+			-fill => $self->cget('-guidecolor'),
 			-tags => ['main', 'guides'],
 		);
 		$item->cguideH($guideh);
@@ -90,16 +90,13 @@ sub draw {
 		my $vx2 = $vx1;
 		my $vy2 = $hy1;
 		my $guidev = $c->createLine($vx1, $vy1, $vx2, $vy2,
-			-fill => $self->cget('-foreground'),
+			-fill => $self->cget('-guidecolor'),
 			-tags => ['main', 'guides'],
 		);
 		$item->cguideV($guidev);
 
-		my @ind = $c->find('withtag', 'indicator');
-		for (@ind) {
-			$c->raise($_, $guideh);
-			$c->raise($_, $guidev);
-		}
+		my @sel = $c->find('withtag', 'sel');
+		$c->raise('guides', 'sel') if @sel;
 	}
 }
 

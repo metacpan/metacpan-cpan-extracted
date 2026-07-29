@@ -5,6 +5,9 @@ author:
   - 'Chris Nighswonger cnighs@cpan.org'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,9 +24,10 @@ no_index:
 provides:
   PDF::Reuse::Barcode:
     file: Barcode.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Barcode::Code128: '0'
+  Carp: '0'
   GD::Barcode: '0'
   GD::Barcode::COOP2of5: '0'
   GD::Barcode::Code39: '0'
@@ -40,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/cnighswonger/PDF-Reuse-Barcode/issues
   repository: https://github.com/cnighswonger/PDF-Reuse-Barcode.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

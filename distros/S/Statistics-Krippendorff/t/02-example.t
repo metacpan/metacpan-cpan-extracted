@@ -76,5 +76,5 @@ subtest_buffered stackexchange_stats_511927 => sub {
     is $sk->alpha, float(0.152, precision => 3);
 
     $sk->delta('masi');
-    is $sk->alpha, float(0.1296, precision => 4);  # nltk would say 0.1297
+    is $sk->alpha, float(0.1296, precision => 4);
 };

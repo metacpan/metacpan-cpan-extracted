@@ -1,0 +1,1029 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use POSIX ();
+use Proc::ProcessTable;
+use Proc::ProcessTable::ncps;
+
+# figure out what fields this platform supports so switches
+# that require unsupported fields can be hidden and errored on
+my %have_field;
+foreach my $field ( Proc::ProcessTable->new->fields ) {
+	$have_field{$field} = 1;
+}
+# rss is still usable if it can be computed from rssize and the page size
+if ( ( !$have_field{rss} )
+	&& $have_field{rssize} )
+{
+	my $pagesize;
+	eval { $pagesize = POSIX::sysconf( POSIX::_SC_PAGESIZE() ); };
+	if ($pagesize) {
+		$have_field{rss} = 1;
+	}
+}
+# pctmem is still usable if it can be computed from rss and physmem
+if (   ( !$have_field{pctmem} )
+	&& $have_field{rss}
+	&& defined( Proc::ProcessTable::ncps->physmem ) )
+{
+	$have_field{pctmem} = 1;
+}
+
+sub version {
+	print "ncps v. " . $Proc::ProcessTable::ncps::VERSION . "\n";
+}
+
+sub help {
+	my $help_text = '
+
+-c <regex>    Search procs using the matching regex.
+--ci          Invert the command search.
+';
+
+	if ( $have_field{cminflt} ) {
+		$help_text = $help_text . '
+--cf          Show children minor faults.
+';
+	}
+
+	if ( $have_field{cmajflt} ) {
+		$help_text = $help_text . '
+--cF          Show children major faults.
+';
+	}
+
+	if ( $have_field{egid} ) {
+		$help_text = $help_text . '
+--eg          Search for procs with an EGID set.
+--egi         Invert the EGID set search.
+';
+	}
+
+	if ( $have_field{euid} ) {
+		$help_text = $help_text . '
+--eu          Search for procs with an EUID set.
+--eui         Invert the EUID set search.
+';
+	}
+
+	if ( $have_field{minflt} ) {
+		$help_text = $help_text . '
+-f            Show minor faults.
+';
+	}
+
+	if ( $have_field{majflt} ) {
+		$help_text = $help_text . '
+-F            Show major faults.
+';
+	}
+
+	if ( $have_field{jid} ) {
+		$help_text = $help_text . '
+-J            Show jail IDs.
+-j <jids>     A comma separated list of JIDs to search for.
+--ji          Invert the JIDs search.
+';
+	}
+
+	$help_text = $help_text . '
+--idle        Show the idle kernel process.
+
+--kern        Searches for kernel processes.
+--kerni       Invert the kernel process search.
+';
+
+	if ( $have_field{pctmem} ) {
+		$help_text = $help_text . '
+-m <pctmem>   Memory usage percent to search for.
+--mi          Invert the memory usage search.
+';
+	}
+
+	if ( $have_field{numthr} ) {
+		$help_text = $help_text . '
+-n            Show number of threads.
+';
+	}
+
+	$help_text = $help_text . '
+--nc          disable color.
+';
+
+	if ( $have_field{pctcpu} ) {
+		$help_text = $help_text . '
+-p <pctcpu>   CPU usage percent to search for.
+--pi          Invert the CPU usage search.
+';
+	}
+
+	$help_text = $help_text . '
+--pid <pids>  PIDs to search for.
+--pidi        Invert the PID search.
+';
+
+	if ( $have_field{rss} ) {
+		$help_text = $help_text . '
+-r <RSSs>     A comma separated list of RSS values to search for.
+--ri          Invert the RSS search.
+';
+	}
+
+	$help_text = $help_text . '
+-s            Show swapped out procs.
+--si          Invert the swapped out search.
+
+--self        Show the ncps process as well.
+
+--st <states> A comma separated list of states to search for.
+--sti         Invert the state search.
+
+--stats       Print some general stats about CPU usage and memory usage.
+';
+
+	if ( $have_field{time} ) {
+		$help_text = $help_text . '
+-t <times>    A comma separated value of time, in seconds, to search for.
+--ti          Invert the time search.
+';
+	}
+
+	if ( $have_field{ttydev} ) {
+		$help_text = $help_text . '
+--tty         Show TTYs.
+';
+	}
+
+	$help_text = $help_text . '
+-u <UIDs>     A comma separated list of UIDs or usernames.
+--ui          Invert the UID/username search.
+';
+
+	if ( $have_field{size} ) {
+		$help_text = $help_text . '
+--vs <VSZs>   A comma separated list of VSZs to search for.
+--vsi         Invert the VSZ search.
+';
+	}
+
+	if ( $have_field{wchan} ) {
+		$help_text = $help_text . '
+-w <wchans>   A string search for wait channels.
+--wi          Invert the wait channel search.
+';
+	}
+
+	$help_text = $help_text . '
+-z            Show zombie procs.
+
+
+For the various switches above that can take numeric values,
+the equalities below can be used, by directly prepending them to
+the number.
+<
+<=
+>
+>=
+!
+
+
+The symbols in the information column are as below.
+
+   States  Description
+   Z       Zombie
+   S       Sleep
+   W       Wait
+   R       Run
+   T       Stopped
+   t       Tracing stop
+   I       Idle
+   L       Blocked on a kernel lock
+   D       Uninterruptible sleep
+   X       Dead
+   K       Wakekill
+   P       Parked
+   ?       Unknown state
+
+   Flags   Description
+   O       Swapped Output
+';
+
+	# flag support varies by OS, so only show the ones
+	# Proc::ProcessTable::InfoString supports on this one
+	if ( $^O =~ /freebsd/ ) {
+		$help_text = $help_text . '   E       Exiting
+   s       Session Leader
+   L       POSIX lock advisory
+   +       has controlling terminal
+   c       controlling tty is active
+   X       traced by a debugger
+   F       being forked
+';
+	} elsif ( $^O =~ /linux/ ) {
+		$help_text = $help_text . '   E       Exiting
+   s       Session Leader
+   +       has controlling terminal
+   X       traced by a debugger
+   F       being forked
+';
+	}
+
+	print $help_text;
+} ## end sub help
+
+# defaults
+my $wait_channels_string;
+my $wait_channels_invert = 0;
+my $zombie               = 0;
+my $swapped              = 0;
+my $no_color             = 0;
+my $swapped_invert       = 0;
+my $version;
+my $help;
+my $commands_string;
+my $commands_invert = 0;
+my $pids_string;
+my $pids_invert = 0;
+my $cpu_string;
+my $cpu_invert = 0;
+my $mem_string;
+my $mem_invert = 0;
+my $rss_string;
+my $rss_invert = 0;
+my $time_string;
+my $time_invert = 0;
+my $states_string;
+my $states_invert = 0;
+my $minor_faults  = 0;
+my $major_faults  = 0;
+my $cminor_faults = 0;
+my $cmajor_faults = 0;
+my $numthr        = 0;
+my $tty           = 0;
+my $jid           = 0;
+my $jids_string;
+my $jids_invert = 0;
+my $uids_string;
+my $uids_invert = 0;
+my $euid        = 0;
+my $euid_invert = 0;
+my $egid        = 0;
+my $egid_invert = 0;
+my $self_proc   = 0;
+my $idle        = 0;
+my $stats       = 0;
+my $kern        = 0;
+my $kern_invert = 0;
+my $vsz_string;
+my $vsz_invert = 0;
+
+# get the commandline options
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+my $getopt_success = GetOptions(
+	'w=s'     => \$wait_channels_string,
+	'wi'      => \$wait_channels_invert,
+	'h'       => \$help,
+	'help'    => \$help,
+	'v'       => \$version,
+	'version' => \$version,
+	'z'       => \$zombie,
+	's'       => \$swapped,
+	'si'      => \$swapped_invert,
+	'c=s'     => \$commands_string,
+	'ci'      => \$commands_invert,
+	'pid=s'   => \$pids_string,
+	'pidi'    => \$pids_invert,
+	'p=s'     => \$cpu_string,
+	'pi'      => \$cpu_invert,
+	'm=s'     => \$mem_string,
+	'mi'      => \$mem_invert,
+	'r=s'     => \$rss_string,
+	'ri'      => \$rss_invert,
+	't=s'     => \$time_string,
+	'ti'      => \$time_invert,
+	'st=s'    => \$states_string,
+	'sti'     => \$states_invert,
+	'f'       => \$minor_faults,
+	'F'       => \$major_faults,
+	'cf'      => \$cminor_faults,
+	'cF'      => \$cmajor_faults,
+	'n'       => \$numthr,
+	'tty'     => \$tty,
+	'J'       => \$jid,
+	'nc'      => \$no_color,
+	'j=s'     => \$jids_string,
+	'ji'      => \$jids_invert,
+	'u=s'     => \$uids_string,
+	'ui'      => \$uids_invert,
+	'eu'      => \$euid,
+	'eui'     => \$euid_invert,
+	'eg'      => \$egid,
+	'egi'     => \$egid_invert,
+	'self'    => \$self_proc,
+	'idle'    => \$idle,
+	'stats'   => \$stats,
+	'kern'    => \$kern,
+	'kerni'   => \$kern_invert,
+	'vs=s'    => \$vsz_string,
+	'vsi'     => \$vsz_invert,
+);
+if ( !$getopt_success ) {
+	warn('Failed to parse the command line options');
+	exit 255;
+}
+
+# error on any switches requiring fields this platform does not support
+my @unusable_switches;
+if ( $minor_faults                  && ( !$have_field{minflt} ) )  { push( @unusable_switches, '-f' ); }
+if ( $major_faults                  && ( !$have_field{majflt} ) )  { push( @unusable_switches, '-F' ); }
+if ( $cminor_faults                 && ( !$have_field{cminflt} ) ) { push( @unusable_switches, '--cf' ); }
+if ( $cmajor_faults                 && ( !$have_field{cmajflt} ) ) { push( @unusable_switches, '--cF' ); }
+if ( $numthr                        && ( !$have_field{numthr} ) )  { push( @unusable_switches, '-n' ); }
+if ( $tty                           && ( !$have_field{ttydev} ) )  { push( @unusable_switches, '--tty' ); }
+if ( $jid                           && ( !$have_field{jid} ) )     { push( @unusable_switches, '-J' ); }
+if ( defined($jids_string)          && ( !$have_field{jid} ) )     { push( @unusable_switches, '-j' ); }
+if ( defined($mem_string)           && ( !$have_field{pctmem} ) )  { push( @unusable_switches, '-m' ); }
+if ( defined($cpu_string)           && ( !$have_field{pctcpu} ) )  { push( @unusable_switches, '-p' ); }
+if ( defined($rss_string)           && ( !$have_field{rss} ) )     { push( @unusable_switches, '-r' ); }
+if ( defined($time_string)          && ( !$have_field{time} ) )    { push( @unusable_switches, '-t' ); }
+if ( defined($vsz_string)           && ( !$have_field{size} ) )    { push( @unusable_switches, '--vs' ); }
+if ( defined($wait_channels_string) && ( !$have_field{wchan} ) )   { push( @unusable_switches, '-w' ); }
+if ( $euid                          && ( !$have_field{euid} ) )    { push( @unusable_switches, '--eu' ); }
+if ( $egid                          && ( !$have_field{egid} ) )    { push( @unusable_switches, '--eg' ); }
+
+if ( defined( $unusable_switches[0] ) ) {
+	warn( 'The following switches can not be used on this OS as the fields they require are not supported: '
+			. join( ' ', @unusable_switches ) );
+	exit 255;
+}
+
+# print the version info if requested
+if ($version) {
+	&version;
+	exit;
+}
+
+if ($help) {
+	&version;
+	&help;
+	exit;
+}
+
+my @filters;
+
+#
+# handles wait channels
+#
+if ( defined($wait_channels_string) ) {
+	my @wchans = split( /\,/, $wait_channels_string );
+	push(
+		@filters,
+		{
+			type   => 'WChan',
+			invert => $wait_channels_invert,
+			args   => {
+				wchans => \@wchans,
+			},
+		}
+	);
+} ## end if ( defined($wait_channels_string) )
+
+#
+# handles swappped procs search
+#
+if ($swapped) {
+	push(
+		@filters,
+		{
+			type   => 'Swapped',
+			invert => $swapped_invert,
+			args   => {},
+		}
+	);
+} ## end if ($swapped)
+
+#
+# handles the zombie procs search
+#
+if ($zombie) {
+	push(
+		@filters,
+		{
+			type   => 'State',
+			invert => 0,
+			args   => {
+				states => [ 'zombie', 'defunct' ],
+			},
+		}
+	);
+} ## end if ($zombie)
+
+#
+# handles the commands search
+#
+if ( defined($commands_string) ) {
+	my @commands = split( /\,/, $commands_string );
+	push(
+		@filters,
+		{
+			type   => 'Command',
+			invert => $commands_invert,
+			args   => {
+				commands => \@commands,
+			},
+		}
+	);
+} ## end if ( defined($commands_string) )
+
+#
+# handles the PIDs search
+#
+if ( defined($pids_string) ) {
+	my @pids = split( /\,/, $pids_string );
+	push(
+		@filters,
+		{
+			type   => 'PID',
+			invert => $pids_invert,
+			args   => {
+				pids => \@pids,
+			},
+		}
+	);
+} ## end if ( defined($pids_string) )
+
+#
+# handles the CPU search
+#
+if ( defined($cpu_string) ) {
+	my @cpus = split( /\,/, $cpu_string );
+	push(
+		@filters,
+		{
+			type   => 'PctCPU',
+			invert => $cpu_invert,
+			args   => {
+				pctcpus => \@cpus,
+			},
+		}
+	);
+} ## end if ( defined($cpu_string) )
+
+#
+# handles the memory search
+#
+if ( defined($mem_string) ) {
+	my @mems = split( /\,/, $mem_string );
+	push(
+		@filters,
+		{
+			type   => 'PctMem',
+			invert => $mem_invert,
+			args   => {
+				pctmems => \@mems,
+			},
+		}
+	);
+} ## end if ( defined($mem_string) )
+
+#
+# handles the RSS search
+#
+if ( defined($rss_string) ) {
+	my @rss = split( /\,/, $rss_string );
+	push(
+		@filters,
+		{
+			type   => 'RSS',
+			invert => $rss_invert,
+			args   => {
+				rss => \@rss,
+			},
+		}
+	);
+} ## end if ( defined($rss_string) )
+
+#
+# handles the JID search
+#
+if ( defined($jids_string) ) {
+	my @jids = split( /\,/, $jids_string );
+	push(
+		@filters,
+		{
+			type   => 'JID',
+			invert => $jids_invert,
+			args   => {
+				jids => \@jids,
+			},
+		}
+	);
+} ## end if ( defined($jids_string) )
+
+#
+# handles the time search
+#
+if ( defined($time_string) ) {
+	my @times = split( /\,/, $time_string );
+	push(
+		@filters,
+		{
+			type   => 'Time',
+			invert => $time_invert,
+			args   => {
+				times => \@times,
+			},
+		}
+	);
+} ## end if ( defined($time_string) )
+
+#
+# handles the UID/username search
+#
+if ( defined($uids_string) ) {
+	my @uids = split( /\,/, $uids_string );
+	push(
+		@filters,
+		{
+			type   => 'UID',
+			invert => $uids_invert,
+			args   => {
+				uids => \@uids,
+			},
+		}
+	);
+} ## end if ( defined($uids_string) )
+
+#
+# handles the virtual size search
+#
+if ( defined($vsz_string) ) {
+	my @vszs = split( /\,/, $vsz_string );
+	push(
+		@filters,
+		{
+			type   => 'Size',
+			invert => $vsz_invert,
+			args   => {
+				sizes => \@vszs,
+			},
+		}
+	);
+} ## end if ( defined($vsz_string) )
+
+#
+# handles the kernel process search
+#
+if ($kern) {
+	push(
+		@filters,
+		{
+			type   => 'KernProc',
+			invert => $kern_invert,
+			args   => {},
+		}
+	);
+} ## end if ($kern)
+
+#
+# handles the EUID set search
+#
+if ($euid) {
+	push(
+		@filters,
+		{
+			type   => 'EUIDset',
+			invert => $euid_invert,
+			args   => {},
+		}
+	);
+} ## end if ($euid)
+
+#
+# handles the EGID set search
+#
+if ($egid) {
+	push(
+		@filters,
+		{
+			type   => 'EGIDset',
+			invert => $egid_invert,
+			args   => {},
+		}
+	);
+} ## end if ($egid)
+
+#
+# handles the states search
+#
+if ( defined($states_string) ) {
+	my @states = split( /\,/, $states_string );
+	push(
+		@filters,
+		{
+			type   => 'State',
+			invert => $states_invert,
+			args   => {
+				states => \@states,
+			},
+		}
+	);
+} ## end if ( defined($states_string) )
+
+# XOR common boolean CLI flags
+if ( defined( $ENV{NCPS_jid} ) && ( $ENV{NCPS_jid} eq '1' ) ) {
+	$jid = $jid ^ 1;
+}
+if ( defined( $ENV{NCPS_numthr} ) && ( $ENV{NCPS_numthr} eq '1' ) ) {
+	$numthr = $numthr ^ 1;
+}
+if ( defined( $ENV{NCPS_cmajflt} ) && ( $ENV{NCPS_cmajflt} eq '1' ) ) {
+	$cmajor_faults = $cmajor_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_majflt} ) && ( $ENV{NCPS_majflt} eq '1' ) ) {
+	$major_faults = $major_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_cminflt} ) && ( $ENV{NCPS_cminflt} eq '1' ) ) {
+	$cminor_faults = $cminor_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_minflt} ) && ( $ENV{NCPS_minflt} eq '1' ) ) {
+	$minor_faults = $minor_faults ^ 1;
+}
+if ( defined( $ENV{NCPS_tty} ) && ( $ENV{NCPS_tty} eq '1' ) ) {
+	$tty = $tty ^ 1;
+}
+if ( defined( $ENV{NCPS_self} ) && ( $ENV{NCPS_self} eq '1' ) ) {
+	$self_proc = $self_proc ^ 1;
+}
+if ( defined( $ENV{NCPS_idle} ) && ( $ENV{NCPS_idle} eq '1' ) ) {
+	$idle = $idle ^ 1;
+}
+#if ( defined( $ENV{NCPS_inverted} ) ){
+# no invert support really yet
+#}
+
+# xor --nc if needed
+if ( defined( $ENV{NO_COLOR} ) ) {
+	$no_color = $no_color ^ 1;
+}
+# disable the color if requested
+if ($no_color) {
+	$ENV{ANSI_COLORS_DISABLED} = 1;
+}
+
+#
+# handles the self proc flag
+#
+if ( !$self_proc ) {
+	push(
+		@filters,
+		{
+			type   => 'PID',
+			invert => 1,
+			args   => {
+				pids => [$$],
+			},
+		}
+	);
+} ## end if ( !$self_proc )
+
+#
+# handles the idle proc flag
+#
+if ( !$idle ) {
+	push(
+		@filters,
+		{
+			type   => 'Idle',
+			invert => 1,
+			args   => {},
+		}
+	);
+} ## end if ( !$idle )
+
+my $args = {
+	cmajor_faults => $cmajor_faults,
+	cminor_faults => $cminor_faults,
+	major_faults  => $major_faults,
+	minor_faults  => $minor_faults,
+	numthr        => $numthr,
+	tty           => $tty,
+	jid           => $jid,
+	stats         => $stats,
+	match         => {
+		checks => \@filters,
+	}
+};
+
+my $ncps = Proc::ProcessTable::ncps->new($args);
+print $ncps->run;
+exit 0;
+
+=head1 NAME
+
+ncps - Searches the process table and displays the results.
+
+=head1 SYNOPSIS
+
+ncps [B<-c> <regex>] [B<--ci>] [B<--cf>] [B<--cF>] [B<--eg>] [B<--egi>]
+[B<-f>] [B<-F>] [B<-J>] [B<-j> <JIDs>] [B<--ji>] [B<--idle>] [B<--kern>]
+[B<--kerni>] [B<-m> <pctmem>] [B<--mi>] [B<-n>] [B<--nc>] [B<-p> <pctcpu>]
+[B<--pi>] [B<--pid> <PIDs>] [B<--pidi>] [B<-r> <RSS>] [B<--ri>] [B<-s>]
+[B<--si>] [B<--self>] [B<--st> <states>] [B<--sti>] [B<--stats>]
+[B<-t> <times>] [B<--ti>] [B<--tty>] [B<-u> <UIDs>] [B<--ui>] [B<--vs> <VSZs>]
+[B<--vsi>] [B<-w> <WChans>] [B<--wi>] [B<-z>]
+
+=head1 DESCRIPTION
+
+No flags needed passed to use. By default it will show all processes except
+for its own and the idle process.
+
+The info column is provided by L<Proc::ProcessTable::InfoString>. That
+POD has the information on what they all mean. At the time of writing, this is
+as below.
+
+   States  Description
+   Z       Zombie
+   S       Sleep
+   W       Wait
+   R       Run
+   T       Stopped
+   t       Tracing stop
+   I       Idle
+   L       Blocked on a kernel lock
+   D       Uninterruptible sleep
+   X       Dead
+   K       Wakekill
+   P       Parked
+   ?       Unknown state
+
+   Flags   Description
+   O       Swapped Output
+   E       Exiting
+   s       Session Leader
+   L       POSIX lock advisory
+   +       has controlling terminal
+   c       controlling tty is active
+   X       traced by a debugger
+   F       being forked
+
+Flag support varies by OS. FreeBSD has the fullest support. On Linux the
+flags O, E, s, +, X, and F are supported. On other platforms only O is.
+The ncps -h output only lists the ones usable on the current OS.
+
+Switch availability also varies by OS. Switches requiring process table
+fields the OS does not support are not shown by ncps -h and will error
+if used.
+
+=head1 SWITCHES
+
+=head2 -c <regex>
+
+Search procs using the matching regex.
+
+=head2 --ci
+
+Invert the command search.
+
+=head2 --cf
+
+Show children minor faults.
+
+=head2 --cF
+
+Show children major faults.
+
+=head2 --eg
+
+Search for procs with an EGID set.
+
+=head2 --egi
+
+Invert the EGID set search.
+
+=head2 --eu
+
+Search for procs with an EUID set.
+
+=head2 --eui
+
+Invert the EUID set search.
+
+=head2 -f
+
+Show minor faults.
+
+=head2 -F
+
+Show major faults.
+
+=head2 -J
+
+Show jail IDs.
+
+=head2 -j <jids>
+
+A comma separated list of JIDs to search for.
+
+=head2 --ji
+
+Invert the JIDs search.
+
+=head2 --idle
+
+Show the idle kernel process.
+
+=head2 --kern
+
+Searches for kernel processes.
+
+=head2 --kerni
+
+Invert the kernel process search.
+
+=head2 -m <pctmem>
+
+Memory usage percent to search for.
+
+=head2 --mi
+
+Invert the memory usage search.
+
+=head2 -n
+
+Show number of threads.
+
+=head2 --nc
+
+Disable color.
+
+=head2 -p <pctcpu>
+
+CPU usage percent to search for.
+
+=head2 --pi
+
+Invert the CPU usage search.
+
+=head2 --pid <pids>
+
+PIDs to search for.
+
+=head2 --pidi
+
+Invert the PID search.
+
+=head2 -r <RSSs>
+
+A comma separated list of RSS values to search for.
+
+=head2 --ri
+
+Invert the RSS search.
+
+=head2 -s
+
+Show swapped out procs.
+
+=head2 --si
+
+Invert the swapped out search.
+
+=head2 --self
+
+Show the ncps process as well.
+
+=head2 --st <states>
+
+A comma separated list of states to search for.
+
+=head2 --sti
+
+Invert the state search.
+
+=head2 --stats
+
+Print some general stats about CPU usage and memory usage.
+
+=head2 -t <times>
+
+A comma separated value of time, in seconds, to search for.
+
+=head2 --ti
+
+Invert the time search.
+
+=head2 --tty
+
+Show TTYs.
+
+=head2 -u <UIDs>
+
+A comma separated list of UIDs or usernames.
+
+=head2 --ui
+
+Invert the UID/username search.
+
+=head2 --vs <VSZs>
+
+A comma separated list of VSZs to search for.
+
+=head2 --vsi
+
+Invert the VSZ search.
+
+=head2 -w <wchans>
+
+A string search for wait channels.
+
+=head2 --wi
+
+Invert the wait channel search.
+
+=head2 -z
+
+Show zombie procs.
+
+=head1 EQUALITIES
+
+For the various switches above that can take numeric values,
+the equalities below can be used, by directly prepending them to
+the number.
+
+    <
+    <=
+    >
+    >=
+    !
+
+=head1 ENVIRONMENTAL VARIABLES
+
+The environmental variables below may be set to
+set the default for the flag in question.
+
+Unless defined and set to 1, these will
+default to 0.
+
+=head2 NCPS_jid
+
+Sets the default for the -J flag.
+
+=head2 NCPS_numthr
+
+Sets the default for the -n flag.
+
+=head2 NCPS_cmajflt
+
+Sets the default for the --cF flag.
+
+=head2 NCPS_majflt
+
+Sets the default for the -F flag.
+
+=head2 NCPS_cminflt
+
+Sets the default for the --cf flag.
+
+=head2 NCPS_minflt
+
+Sets the default for the -f flag.
+
+=head2 NCPS_tty
+
+Sets the default for the --tty flag.
+
+=head2 NCPS_self
+
+Sets the default for the --self flag.
+
+=head2 NCPS_idle
+
+Sets the default for the --idle flag.
+
+=head2 NO_COLOR
+
+Don't colorize the output.
+
+=head1 EXAMPLES
+
+    ncps -J -j 0 --ji
+
+Display all processes with a jail ID other than zero.
+
+    ncps -c firefox --stats
+
+Show all firefox processes and the stats for them.
+
+    ncps -F -f -cF -cf
+
+Show all minor/major values for processes.
+
+    ncps -p '>1'
+
+Show all processes using more than 1% of the CPU time.
+
+=cut

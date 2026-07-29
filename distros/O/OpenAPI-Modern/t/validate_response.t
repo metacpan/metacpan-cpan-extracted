@@ -920,6 +920,51 @@ YAML
     },
     'demonstrate recipe for guaranteeing that there is no response body',
   );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /:
+    get:
+      operationId: my_get
+      responses:
+        default:
+          headers:
+            Accept:
+              required: true
+              schema: false
+            Authorization:
+              required: true
+              schema: false
+            Content-Type:
+              required: true
+              schema: false
+YAML
+
+  is_equal(
+    $openapi->validate_response(
+      response(400, [ map +($_ => 1), qw(accept authorization content-type) ]), { operation_id => 'my_get' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Accept',
+          keywordLocation => jsonp(qw(/paths / get responses default headers Accept schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths / get responses default headers Accept schema)))->to_string,
+          error => 'response header not permitted',
+        },
+        {
+          instanceLocation => '/response/header/Authorization',
+          keywordLocation => jsonp(qw(/paths / get responses default headers Authorization schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths / get responses default headers Authorization schema)))->to_string,
+          error => 'response header not permitted',
+        },
+      ],
+    },
+    'Accept and Authorization are allowed; Content-Type header is ignored in responses',
+  );
 };
 
 subtest $::TYPE.': parameter parsing' => sub {

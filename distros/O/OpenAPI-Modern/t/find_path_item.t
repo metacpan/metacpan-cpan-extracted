@@ -1296,6 +1296,9 @@ YAML
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+servers:
+  - url: http://example.com
+  - url: http://example2.com/foo
 paths:
   /:
     get: {}
@@ -1325,6 +1328,14 @@ YAML
     $options,
     $expected,
     'provided path_template verified against request uri with empty path',
+  );
+
+  @request = (method => 'GET', uri => 'http://example2.com/foo');
+  ok($openapi->find_path_item($options = { @request }), 'lookup succeeded');
+  cmp_result(
+    $options,
+    $expected,
+    'path_template inferred from request uri; empty path (because server url swallows path) maps to /',
   );
 
 
@@ -2390,6 +2401,32 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
+    debug => 1,
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /:
+    get:
+      servers:
+        - url: http://example1.com/foo%2Fbaz
+        - url: http://example2.com/{x}
+          variables:
+            x:
+              default: foo
+YAML
+
+  ok($openapi->find_path_item(
+      $options = { @request = (method => 'GET', uri => 'http://example1.com/foo%2Fbaz') }),
+    to_str(@request).': lookup succeeded');
+
+  ok($openapi->find_path_item(
+      $options = { @request = (method => 'GET', uri => 'http://example2.com/foo%2Fbar') }),
+    to_str(@request).': lookup succeeded');
+
+  is_equal($options->{uri_captures}{x}, 'foo/bar', 'got server variable, url-decoded');
+
+
+  $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri_rel,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
@@ -2883,7 +2920,7 @@ YAML
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /login/{username} get)))),
       errors => [],
     },
-    'url-escaped characters in the URI can still be matched against an unescaped template',
+    'url-escaped characters in the URI do not match against an unescaped template',
   );
 
   ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/login/%5Fether') }),
@@ -2908,6 +2945,34 @@ YAML
 
 subtest 'no uri is provided: other values are relied on as the sole source of truth' => sub {
   my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  pathItems:
+    my_path_item:
+      post:
+        operationId: my_operation_id
+YAML
+
+  ok(!$openapi->find_path_item(my $options = { path_template => '/foo', method => 'GET' }), 'lookup failed');
+  cmp_result(
+    $options,
+    {
+      path_template => '/foo',
+      method => 'GET',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/paths',
+          absoluteKeywordLocation => $doc_uri.'#/paths',
+          error => 'missing path "/foo"',
+        }),
+      ],
+    },
+    'no /paths in this document',
+  );
+
+  $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
@@ -2944,7 +3009,7 @@ paths:
       operationId: nothing_operation
 YAML
 
-  ok($openapi->find_path_item(my $options = { operation_id => '0' }), 'lookup succeeded');
+  ok($openapi->find_path_item($options = { operation_id => '0' }), 'lookup succeeded');
   cmp_result(
     $options,
     {

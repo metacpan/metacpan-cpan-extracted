@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::Priority - Check if the Priority of a process matches
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -52,6 +52,8 @@ additional comparisons.
     >=
     !
 
+Negative values are supported.
+
 Atleast one Priority must be specified.
 
 If the new method fails, it dies.
@@ -77,17 +79,18 @@ sub new{
 	if ( ! defined( $args{priorities} ) ){
 		die ('No priorities key specified in the argument hash');
 	}
-	if ( ref( \$args{priorities} ) eq 'ARRAY' ){
+	if ( ref( $args{priorities} ) ne 'ARRAY' ){
 		die ('The priorities key is not a array');
 	}
 	if ( ! defined $args{priorities}[0] ){
 		die ('Nothing defined in the priorities array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				priorities=>$args{priorities},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -134,33 +137,33 @@ sub match{
 	while (defined( $self->{priorities}[$priority_int] )){
 		my $priority=$self->{priorities}[$priority_int];
 		if (
-			( $priority =~ /^[0-9]+$/ ) &&
-			( $priority eq $proc_priority )
+			( $priority =~ /^-?[0-9]+$/ ) &&
+			( $priority == $proc_priority )
 			){
 			return 1;
-		}elsif( $priority =~ /^\<\=[0-9]+$/ ){
+		}elsif( $priority =~ /^\<\=-?[0-9]+$/ ){
 			$priority=~s/^\<\=//;
 			if ( $proc_priority <= $priority ){
 				return 1;
 			}
-		}elsif( $priority =~ /^\<[0-9]+$/ ){
+		}elsif( $priority =~ /^\<-?[0-9]+$/ ){
 			$priority=~s/^\<//;
 			if ( $proc_priority < $priority ){
 				return 1;
 			}
-		}elsif( $priority =~ /^\>\=[0-9]+$/ ){
+		}elsif( $priority =~ /^\>\=-?[0-9]+$/ ){
 			$priority=~s/^\>\=//;
 			if ( $proc_priority >= $priority ){
 				return 1;
 			}
-		}elsif( $priority =~ /^\>[0-9]+$/ ){
+		}elsif( $priority =~ /^\>-?[0-9]+$/ ){
 			$priority=~s/^\>//;
 			if ( $proc_priority > $priority ){
 				return 1;
 			}
-		}elsif( $priority =~ /^\![0-9]+$/ ){
+		}elsif( $priority =~ /^\!-?[0-9]+$/ ){
 			$priority=~s/^\!//;
-			if ( $proc_priority ne $priority ){
+			if ( $proc_priority != $priority ){
 				return 1;
 			}
 		}
@@ -197,14 +200,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

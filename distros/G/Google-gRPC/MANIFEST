@@ -19,6 +19,7 @@ NGHTTP2.o
 NGHTTP2.xs
 project/plan/001-engine-architecture.md
 README.md
+SECURITY.md
 t/00-load.t
 t/01-framing.t
 t/02-engine-pp.t

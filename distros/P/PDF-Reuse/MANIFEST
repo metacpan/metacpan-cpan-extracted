@@ -1,16 +1,18 @@
 Changes
 CONTRIBUTING.md
+docs/ci-pin-maintenance.md
+lib/PDF/Reuse.pm
+lib/PDF/Reuse/Util.pm
+lib/PDF/Util/graphObj_pl
+lib/PDF/Util/reuseComponent_pl
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
 README
 SECURITY.md
-lib/PDF/Reuse.pm
-t/test.t
-t/Reuse.t
 t/regression.t
-lib/PDF/Util/reuseComponent_pl
-lib/PDF/Util/graphObj_pl
-lib/PDF/Reuse/Util.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+t/Reuse.t
+t/test.t
 META.json                                Module JSON meta-data (added by MakeMaker)

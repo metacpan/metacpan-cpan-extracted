@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::PID - Check if the PID of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{pids} ) ){
 		die ('No pids key specified in the argument hash');
 	}
-	if ( ref( \$args{pids} ) eq 'ARRAY' ){
+	if ( ref( $args{pids} ) ne 'ARRAY' ){
 		die ('The pids key is not a array');
 	}
 	if ( ! defined $args{pids}[0] ){
 		die ('Nothing defined in the pids array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				pids=>$args{pids},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -101,7 +102,7 @@ One argument is taken and that is a Proc::ProcessTable::Process object.
 The returned value is a boolean.
 
     if ( $checker->match( $proc ) ){
-        print "The connection matches.\n";
+        print "The process matches.\n";
     }
 
 =cut
@@ -124,7 +125,7 @@ sub match{
 	};
 
 	# don't bother proceeding, the object won't match ever
-	# as it does not have a UID
+	# as it does not have a PID
 	if ( ! defined( $proc_pid ) ){
 		return 0;
 	}
@@ -135,7 +136,7 @@ sub match{
 		my $pid=$self->{pids}[$pid_int];
 		if (
 			( $pid =~ /^[0-9]+$/ ) &&
-			( $pid eq $proc_pid )
+			( $pid == $proc_pid )
 			){
 			return 1;
 		}elsif( $pid =~ /^\<\=[0-9]+$/ ){
@@ -160,7 +161,7 @@ sub match{
 			}
 		}elsif( $pid =~ /^\![0-9]+$/ ){
 			$pid=~s/^\!//;
-			if ( $proc_pid ne $pid ){
+			if ( $proc_pid != $pid ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

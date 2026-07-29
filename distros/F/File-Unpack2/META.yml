@@ -46,5 +46,5 @@ resources:
   homepage: https://github.com/openSUSE/cavil
   license: https://dev.perl.org/licenses/
   repository: https://github.com/openSUSE/perl-File-Unpack2.git
-version: '2.01'
+version: '2.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

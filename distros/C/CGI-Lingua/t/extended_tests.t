@@ -938,17 +938,19 @@ subtest 'DESTROY: does not write when key already in cache' => sub {
 	local %ENV = (REMOTE_ADDR => '99.88.77.66', HTTP_ACCEPT_LANGUAGE => 'en');
 	my $cache = _fresh_cache();
 
-	# Pre-seed the cache so the DESTROY guard fires and skips the write.
-	require Storable;
-	my $sentinel = bless { _slanguage => 'PreExisting' }, 'CGI::Lingua';
-	$cache->set('99.88.77.66/en/en', Storable::nfreeze($sentinel), '1 month');
+	# Pre-seed the cache with a JSON blob so the DESTROY guard fires and skips
+	# the write.  DESTROY() checks $cache->get($key) and returns early if any
+	# truthy value is present; it should not overwrite an existing entry.
+	require JSON::PP;
+	$cache->set('99.88.77.66/en/en',
+		JSON::PP::encode_json({ _slanguage => 'PreExisting' }), '1 month');
 
 	{
 		my $l = _obj(['en'], cache => $cache);
 		$l->language();
 	}    # DESTROY fires here
 
-	my $thawed = Storable::thaw($cache->get('99.88.77.66/en/en'));
+	my $thawed = JSON::PP::decode_json($cache->get('99.88.77.66/en/en'));
 	is($thawed->{_slanguage}, 'PreExisting',
 		'DESTROY does not overwrite existing cache entry');
 };

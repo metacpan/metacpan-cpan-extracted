@@ -1,0 +1,1091 @@
+package Google::Cloud::Kms::V1::EkmService;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.12';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::FieldMask };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CiVnb29nbGUvY2xvdWQva21zL3YxL2VrbV9zZXJ2aWNlLnByb3RvEhNnb29nbGUuY2xvdWQu
+a21zLnYxGhxnb29nbGUvYXBpL2Fubm90YXRpb25zLnByb3RvGhdnb29nbGUvYXBpL2NsaWVu
+dC5wcm90bxofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90bxoZZ29vZ2xlL2FwaS9y
+ZXNvdXJjZS5wcm90bxogZ29vZ2xlL3Byb3RvYnVmL2ZpZWxkX21hc2sucHJvdG8aH2dvb2ds
+ZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8i4QEKGUxpc3RFa21Db25uZWN0aW9uc1JlcXVl
+c3QSQQoGcGFyZW50GAEgASgJQingQQL6QSMKIWxvY2F0aW9ucy5nb29nbGVhcGlzLmNvbS9M
+b2NhdGlvblIGcGFyZW50EiAKCXBhZ2Vfc2l6ZRgCIAEoBUID4EEBUghwYWdlU2l6ZRIiCgpw
+YWdlX3Rva2VuGAMgASgJQgPgQQFSCXBhZ2VUb2tlbhIbCgZmaWx0ZXIYBCABKAlCA+BBAVIG
+ZmlsdGVyEh4KCG9yZGVyX2J5GAUgASgJQgPgQQFSB29yZGVyQnkisAEKGkxpc3RFa21Db25u
+ZWN0aW9uc1Jlc3BvbnNlEksKD2VrbV9jb25uZWN0aW9ucxgBIAMoCzIiLmdvb2dsZS5jbG91
+ZC5rbXMudjEuRWttQ29ubmVjdGlvblIOZWttQ29ubmVjdGlvbnMSJgoPbmV4dF9wYWdlX3Rv
+a2VuGAIgASgJUg1uZXh0UGFnZVRva2VuEh0KCnRvdGFsX3NpemUYAyABKAVSCXRvdGFsU2l6
+ZSJcChdHZXRFa21Db25uZWN0aW9uUmVxdWVzdBJBCgRuYW1lGAEgASgJQi3gQQL6QScKJWNs
+b3Vka21zLmdvb2dsZWFwaXMuY29tL0VrbUNvbm5lY3Rpb25SBG5hbWUi4AEKGkNyZWF0ZUVr
+bUNvbm5lY3Rpb25SZXF1ZXN0EkEKBnBhcmVudBgBIAEoCUIp4EEC+kEjCiFsb2NhdGlvbnMu
+Z29vZ2xlYXBpcy5jb20vTG9jYXRpb25SBnBhcmVudBIvChFla21fY29ubmVjdGlvbl9pZBgC
+IAEoCUID4EECUg9la21Db25uZWN0aW9uSWQSTgoOZWttX2Nvbm5lY3Rpb24YAyABKAsyIi5n
+b29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25CA+BBAlINZWttQ29ubmVjdGlvbiKu
+AQoaVXBkYXRlRWttQ29ubmVjdGlvblJlcXVlc3QSTgoOZWttX2Nvbm5lY3Rpb24YASABKAsy
+Ii5nb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25CA+BBAlINZWttQ29ubmVjdGlv
+bhJACgt1cGRhdGVfbWFzaxgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE1hc2tCA+BB
+AlIKdXBkYXRlTWFzayJUChNHZXRFa21Db25maWdSZXF1ZXN0Ej0KBG5hbWUYASABKAlCKeBB
+AvpBIwohY2xvdWRrbXMuZ29vZ2xlYXBpcy5jb20vRWttQ29uZmlnUgRuYW1lIp4BChZVcGRh
+dGVFa21Db25maWdSZXF1ZXN0EkIKCmVrbV9jb25maWcYASABKAsyHi5nb29nbGUuY2xvdWQu
+a21zLnYxLkVrbUNvbmZpZ0ID4EECUglla21Db25maWcSQAoLdXBkYXRlX21hc2sYAiABKAsy
+Gi5nb29nbGUucHJvdG9idWYuRmllbGRNYXNrQgPgQQJSCnVwZGF0ZU1hc2siugMKC0NlcnRp
+ZmljYXRlEhwKB3Jhd19kZXIYASABKAxCA+BBAlIGcmF3RGVyEhsKBnBhcnNlZBgCIAEoCEID
+4EEDUgZwYXJzZWQSGwoGaXNzdWVyGAMgASgJQgPgQQNSBmlzc3VlchIdCgdzdWJqZWN0GAQg
+ASgJQgPgQQNSB3N1YmplY3QSRgodc3ViamVjdF9hbHRlcm5hdGl2ZV9kbnNfbmFtZXMYBSAD
+KAlCA+BBA1Iac3ViamVjdEFsdGVybmF0aXZlRG5zTmFtZXMSRwoPbm90X2JlZm9yZV90aW1l
+GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEID4EEDUg1ub3RCZWZvcmVUaW1l
+EkUKDm5vdF9hZnRlcl90aW1lGAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEID
+4EEDUgxub3RBZnRlclRpbWUSKAoNc2VyaWFsX251bWJlchgIIAEoCUID4EEDUgxzZXJpYWxO
+dW1iZXISMgoSc2hhMjU2X2ZpbmdlcnByaW50GAkgASgJQgPgQQNSEXNoYTI1NkZpbmdlcnBy
+aW50IvcGCg1Fa21Db25uZWN0aW9uEhcKBG5hbWUYASABKAlCA+BBA1IEbmFtZRJACgtjcmVh
+dGVfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1IKY3JlYXRl
+VGltZRJkChFzZXJ2aWNlX3Jlc29sdmVycxgDIAMoCzIyLmdvb2dsZS5jbG91ZC5rbXMudjEu
+RWttQ29ubmVjdGlvbi5TZXJ2aWNlUmVzb2x2ZXJCA+BBAVIQc2VydmljZVJlc29sdmVycxIX
+CgRldGFnGAUgASgJQgPgQQFSBGV0YWcSaQoTa2V5X21hbmFnZW1lbnRfbW9kZRgGIAEoDjI0
+Lmdvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbi5LZXlNYW5hZ2VtZW50TW9kZUID
+4EEBUhFrZXlNYW5hZ2VtZW50TW9kZRIvChFjcnlwdG9fc3BhY2VfcGF0aBgHIAEoCUID4EEB
+Ug9jcnlwdG9TcGFjZVBhdGgapQIKD1NlcnZpY2VSZXNvbHZlchJrChlzZXJ2aWNlX2RpcmVj
+dG9yeV9zZXJ2aWNlGAEgASgJQi/gQQL6QSkKJ3NlcnZpY2VkaXJlY3RvcnkuZ29vZ2xlYXBp
+cy5jb20vU2VydmljZVIXc2VydmljZURpcmVjdG9yeVNlcnZpY2USLAoPZW5kcG9pbnRfZmls
+dGVyGAIgASgJQgPgQQFSDmVuZHBvaW50RmlsdGVyEh8KCGhvc3RuYW1lGAMgASgJQgPgQQJS
+CGhvc3RuYW1lElYKE3NlcnZlcl9jZXJ0aWZpY2F0ZXMYBCADKAsyIC5nb29nbGUuY2xvdWQu
+a21zLnYxLkNlcnRpZmljYXRlQgPgQQJSEnNlcnZlckNlcnRpZmljYXRlcyJTChFLZXlNYW5h
+Z2VtZW50TW9kZRIjCh9LRVlfTUFOQUdFTUVOVF9NT0RFX1VOU1BFQ0lGSUVEEAASCgoGTUFO
+VUFMEAESDQoJQ0xPVURfS01TEAI6c+pBcAolY2xvdWRrbXMuZ29vZ2xlYXBpcy5jb20vRWtt
+Q29ubmVjdGlvbhJHcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2Vr
+bUNvbm5lY3Rpb25zL3tla21fY29ubmVjdGlvbn0i5AEKCUVrbUNvbmZpZxIXCgRuYW1lGAEg
+ASgJQgPgQQNSBG5hbWUSYwoWZGVmYXVsdF9la21fY29ubmVjdGlvbhgCIAEoCUIt4EEB+kEn
+CiVjbG91ZGttcy5nb29nbGVhcGlzLmNvbS9Fa21Db25uZWN0aW9uUhRkZWZhdWx0RWttQ29u
+bmVjdGlvbjpZ6kFWCiFjbG91ZGttcy5nb29nbGVhcGlzLmNvbS9Fa21Db25maWcSMXByb2pl
+Y3RzL3twcm9qZWN0fS9sb2NhdGlvbnMve2xvY2F0aW9ufS9la21Db25maWciXgoZVmVyaWZ5
+Q29ubmVjdGl2aXR5UmVxdWVzdBJBCgRuYW1lGAEgASgJQi3gQQL6QScKJWNsb3Vka21zLmdv
+b2dsZWFwaXMuY29tL0VrbUNvbm5lY3Rpb25SBG5hbWUiHAoaVmVyaWZ5Q29ubmVjdGl2aXR5
+UmVzcG9uc2Uy3AsKCkVrbVNlcnZpY2USugEKEkxpc3RFa21Db25uZWN0aW9ucxIuLmdvb2ds
+ZS5jbG91ZC5rbXMudjEuTGlzdEVrbUNvbm5lY3Rpb25zUmVxdWVzdBovLmdvb2dsZS5jbG91
+ZC5rbXMudjEuTGlzdEVrbUNvbm5lY3Rpb25zUmVzcG9uc2UiQ4LT5JMCNBIyL3YxL3twYXJl
+bnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vZWttQ29ubmVjdGlvbnPaQQZwYXJlbnQSpwEK
+EEdldEVrbUNvbm5lY3Rpb24SLC5nb29nbGUuY2xvdWQua21zLnYxLkdldEVrbUNvbm5lY3Rp
+b25SZXF1ZXN0GiIuZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25uZWN0aW9uIkGC0+STAjQS
+Mi92MS97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL2VrbUNvbm5lY3Rpb25zLyp92kEE
+bmFtZRLgAQoTQ3JlYXRlRWttQ29ubmVjdGlvbhIvLmdvb2dsZS5jbG91ZC5rbXMudjEuQ3Jl
+YXRlRWttQ29ubmVjdGlvblJlcXVlc3QaIi5nb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5l
+Y3Rpb24idILT5JMCRCIyL3YxL3twYXJlbnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vZWtt
+Q29ubmVjdGlvbnM6DmVrbV9jb25uZWN0aW9u2kEncGFyZW50LGVrbV9jb25uZWN0aW9uX2lk
+LGVrbV9jb25uZWN0aW9uEuIBChNVcGRhdGVFa21Db25uZWN0aW9uEi8uZ29vZ2xlLmNsb3Vk
+Lmttcy52MS5VcGRhdGVFa21Db25uZWN0aW9uUmVxdWVzdBoiLmdvb2dsZS5jbG91ZC5rbXMu
+djEuRWttQ29ubmVjdGlvbiJ2gtPkkwJTMkEvdjEve2VrbV9jb25uZWN0aW9uLm5hbWU9cHJv
+amVjdHMvKi9sb2NhdGlvbnMvKi9la21Db25uZWN0aW9ucy8qfToOZWttX2Nvbm5lY3Rpb27a
+QRpla21fY29ubmVjdGlvbix1cGRhdGVfbWFzaxKUAQoMR2V0RWttQ29uZmlnEiguZ29vZ2xl
+LmNsb3VkLmttcy52MS5HZXRFa21Db25maWdSZXF1ZXN0Gh4uZ29vZ2xlLmNsb3VkLmttcy52
+MS5Fa21Db25maWciOoLT5JMCLRIrL3YxL3tuYW1lPXByb2plY3RzLyovbG9jYXRpb25zLyov
+ZWttQ29uZmlnfdpBBG5hbWUSwwEKD1VwZGF0ZUVrbUNvbmZpZxIrLmdvb2dsZS5jbG91ZC5r
+bXMudjEuVXBkYXRlRWttQ29uZmlnUmVxdWVzdBoeLmdvb2dsZS5jbG91ZC5rbXMudjEuRWtt
+Q29uZmlnImOC0+STAkQyNi92MS97ZWttX2NvbmZpZy5uYW1lPXByb2plY3RzLyovbG9jYXRp
+b25zLyovZWttQ29uZmlnfToKZWttX2NvbmZpZ9pBFmVrbV9jb25maWcsdXBkYXRlX21hc2sS
+ywEKElZlcmlmeUNvbm5lY3Rpdml0eRIuLmdvb2dsZS5jbG91ZC5rbXMudjEuVmVyaWZ5Q29u
+bmVjdGl2aXR5UmVxdWVzdBovLmdvb2dsZS5jbG91ZC5rbXMudjEuVmVyaWZ5Q29ubmVjdGl2
+aXR5UmVzcG9uc2UiVILT5JMCRxJFL3YxL3tuYW1lPXByb2plY3RzLyovbG9jYXRpb25zLyov
+ZWttQ29ubmVjdGlvbnMvKn06dmVyaWZ5Q29ubmVjdGl2aXR52kEEbmFtZRp0ykEXY2xvdWRr
+bXMuZ29vZ2xlYXBpcy5jb23SQVdodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Ns
+b3VkLXBsYXRmb3JtLGh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvY2xvdWRrbXNC
+ggIKF2NvbS5nb29nbGUuY2xvdWQua21zLnYxQg9Fa21TZXJ2aWNlUHJvdG9QAVopY2xvdWQu
+Z29vZ2xlLmNvbS9nby9rbXMvYXBpdjEva21zcGI7a21zcGKqAhNHb29nbGUuQ2xvdWQuS21z
+LlYxygITR29vZ2xlXENsb3VkXEttc1xWMepBfAonc2VydmljZWRpcmVjdG9yeS5nb29nbGVh
+cGlzLmNvbS9TZXJ2aWNlElFwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlv
+bn0vbmFtZXNwYWNlcy97bmFtZXNwYWNlfS9zZXJ2aWNlcy97c2VydmljZX1KtYcBCgcSBQ4A
+yAMlCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2Vk
+IHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIp
+OwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRo
+IHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0
+CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVu
+bGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGlu
+Zywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1
+dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElU
+SU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUg
+TGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9u
+cyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAcCgkKAgMA
+EgMSACYKCQoCAwESAxMAIQoJCgIDAhIDFAApCgkKAgMDEgMVACMKCQoCAwQSAxYAKgoJCgID
+BRIDFwApCggKAQgSAxkAMAoJCgIIJRIDGQAwCggKAQgSAxoAQAoJCgIICxIDGgBACggKAQgS
+AxsAIgoJCgIIChIDGwAiCggKAQgSAxwAMAoJCgIICBIDHAAwCggKAQgSAx0AMAoJCgIIARID
+HQAwCggKAQgSAx4AMAoJCgIIKRIDHgAwCgkKAQgSBB8AIgIKDAoECJ0IABIEHwAiAgroAQoC
+BgASBCkAdAEa2wEgR29vZ2xlIENsb3VkIEtleSBNYW5hZ2VtZW50IEVLTSBTZXJ2aWNlCgog
+TWFuYWdlcyBleHRlcm5hbCBjcnlwdG9ncmFwaGljIGtleXMgYW5kIG9wZXJhdGlvbnMgdXNp
+bmcgdGhvc2Uga2V5cy4KIEltcGxlbWVudHMgYSBSRVNUIG1vZGVsIHdpdGggdGhlIGZvbGxv
+d2luZyBvYmplY3RzOgogKiBbRWttQ29ubmVjdGlvbl1bZ29vZ2xlLmNsb3VkLmttcy52MS5F
+a21Db25uZWN0aW9uXQoKCgoDBgABEgMpCBIKCgoDBgADEgMqAj8KDAoFBgADmQgSAyoCPwoL
+CgMGAAMSBCsCLTEKDQoFBgADmggSBCsCLTEKSgoEBgACABIEMAI2Axo8IExpc3RzIFtFa21D
+b25uZWN0aW9uc11bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25uZWN0aW9uXS4KCgwKBQYA
+AgABEgMwBhgKDAoFBgACAAISAzAZMgoMCgUGAAIAAxIDMQ8pCg0KBQYAAgAEEgQyBDQGChEK
+CQYAAgAEsMq8IhIEMgQ0BgoMCgUGAAIABBIDNQQ0Cg8KCAYAAgAEmwgAEgM1BDQKYQoEBgAC
+ARIEOgI/AxpTIFJldHVybnMgbWV0YWRhdGEgZm9yIGEgZ2l2ZW4KIFtFa21Db25uZWN0aW9u
+XVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dLgoKDAoFBgACAQESAzoGFgoM
+CgUGAAIBAhIDOhcuCgwKBQYAAgEDEgM6OUYKDQoFBgACAQQSBDsEPQYKEQoJBgACAQSwyrwi
+EgQ7BD0GCgwKBQYAAgEEEgM+BDIKDwoIBgACAQSbCAASAz4EMgpyCgQGAAICEgRDAkoDGmQg
+Q3JlYXRlcyBhIG5ldyBbRWttQ29ubmVjdGlvbl1bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21D
+b25uZWN0aW9uXSBpbiBhIGdpdmVuCiBQcm9qZWN0IGFuZCBMb2NhdGlvbi4KCgwKBQYAAgIB
+EgNDBhkKDAoFBgACAgISA0MaNAoMCgUGAAICAxIDQz9MCg0KBQYAAgIEEgREBEcGChEKCQYA
+AgIEsMq8IhIERARHBgoNCgUGAAICBBIESARJMgoQCggGAAICBJsIABIESARJMgpZCgQGAAID
+EgRNAlMDGksgVXBkYXRlcyBhbiBbRWttQ29ubmVjdGlvbl1bZ29vZ2xlLmNsb3VkLmttcy52
+MS5Fa21Db25uZWN0aW9uXSdzIG1ldGFkYXRhLgoKDAoFBgACAwESA00GGQoMCgUGAAIDAhID
+TRo0CgwKBQYAAgMDEgNNP0wKDQoFBgACAwQSBE4EUQYKEQoJBgACAwSwyrwiEgROBFEGCgwK
+BQYAAgMEEgNSBEgKDwoIBgACAwSbCAASA1IESAp8CgQGAAIEEgRXAlwDGm4gUmV0dXJucyB0
+aGUgW0VrbUNvbmZpZ11bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25maWddIHNpbmdsZXRv
+biByZXNvdXJjZQogZm9yIGEgZ2l2ZW4gcHJvamVjdCBhbmQgbG9jYXRpb24uCgoMCgUGAAIE
+ARIDVwYSCgwKBQYAAgQCEgNXEyYKDAoFBgACBAMSA1cxOgoNCgUGAAIEBBIEWARaBgoRCgkG
+AAIEBLDKvCISBFgEWgYKDAoFBgACBAQSA1sEMgoPCggGAAIEBJsIABIDWwQyCnwKBAYAAgUS
+BGACZgMabiBVcGRhdGVzIHRoZSBbRWttQ29uZmlnXVtnb29nbGUuY2xvdWQua21zLnYxLkVr
+bUNvbmZpZ10gc2luZ2xldG9uIHJlc291cmNlCiBmb3IgYSBnaXZlbiBwcm9qZWN0IGFuZCBs
+b2NhdGlvbi4KCgwKBQYAAgUBEgNgBhUKDAoFBgACBQISA2AWLAoMCgUGAAIFAxIDYDdACg0K
+BQYAAgUEEgRhBGQGChEKCQYAAgUEsMq8IhIEYQRkBgoMCgUGAAIFBBIDZQRECg8KCAYAAgUE
+mwgAEgNlBEQK7AIKBAYAAgYSBG0CcwMa3QIgVmVyaWZpZXMgdGhhdCBDbG91ZCBLTVMgY2Fu
+IHN1Y2Nlc3NmdWxseSBjb25uZWN0IHRvIHRoZSBleHRlcm5hbCBrZXkKIG1hbmFnZXIgc3Bl
+Y2lmaWVkIGJ5IGFuIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNv
+bm5lY3Rpb25dLgogSWYgdGhlcmUgaXMgYW4gZXJyb3IgY29ubmVjdGluZyB0byB0aGUgRUtN
+LCB0aGlzIG1ldGhvZCByZXR1cm5zIGEKIEZBSUxFRF9QUkVDT05ESVRJT04gc3RhdHVzIGNv
+bnRhaW5pbmcgc3RydWN0dXJlZCBpbmZvcm1hdGlvbiBhcyBkZXNjcmliZWQKIGF0IGh0dHBz
+Oi8vY2xvdWQuZ29vZ2xlLmNvbS9rbXMvZG9jcy9yZWZlcmVuY2UvZWttX2Vycm9ycy4KCgwK
+BQYAAgYBEgNtBhgKDAoFBgACBgISA20ZMgoMCgUGAAIGAxIDbg8pCg0KBQYAAgYEEgRvBHEG
+ChEKCQYAAgYEsMq8IhIEbwRxBgoMCgUGAAIGBBIDcgQyCg8KCAYAAgYEmwgAEgNyBDIKdwoC
+BAASBXgAmwEBGmogUmVxdWVzdCBtZXNzYWdlIGZvcgogW0VrbVNlcnZpY2UuTGlzdEVrbUNv
+bm5lY3Rpb25zXVtnb29nbGUuY2xvdWQua21zLnYxLkVrbVNlcnZpY2UuTGlzdEVrbUNvbm5l
+Y3Rpb25zXS4KCgoKAwQAARIDeAghCrgBCgQEAAIAEgV8AoEBBBqoASBSZXF1aXJlZC4gVGhl
+IHJlc291cmNlIG5hbWUgb2YgdGhlIGxvY2F0aW9uIGFzc29jaWF0ZWQgd2l0aCB0aGUKIFtF
+a21Db25uZWN0aW9uc11bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25uZWN0aW9uXSB0byBs
+aXN0LCBpbiB0aGUgZm9ybWF0CiBgcHJvamVjdHMvKi9sb2NhdGlvbnMvKmAuCgoMCgUEAAIA
+BRIDfAIICgwKBQQAAgABEgN8CQ8KDAoFBAACAAMSA3wSEwoOCgUEAAIACBIFfBSBAQMKDwoI
+BAACAAicCAASA30EKgoQCgcEAAIACJ8IEgV+BIABBQq9AwoEBAACARIEigECPxquAyBPcHRp
+b25hbC4gT3B0aW9uYWwgbGltaXQgb24gdGhlIG51bWJlciBvZgogW0VrbUNvbm5lY3Rpb25z
+XVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dIHRvIGluY2x1ZGUgaW4gdGhl
+CiByZXNwb25zZS4gRnVydGhlciBbRWttQ29ubmVjdGlvbnNdW2dvb2dsZS5jbG91ZC5rbXMu
+djEuRWttQ29ubmVjdGlvbl0gY2FuCiBzdWJzZXF1ZW50bHkgYmUgb2J0YWluZWQgYnkgaW5j
+bHVkaW5nIHRoZQogW0xpc3RFa21Db25uZWN0aW9uc1Jlc3BvbnNlLm5leHRfcGFnZV90b2tl
+bl1bZ29vZ2xlLmNsb3VkLmttcy52MS5MaXN0RWttQ29ubmVjdGlvbnNSZXNwb25zZS5uZXh0
+X3BhZ2VfdG9rZW5dCiBpbiBhIHN1YnNlcXVlbnQgcmVxdWVzdC4gSWYgdW5zcGVjaWZpZWQs
+IHRoZSBzZXJ2ZXIgd2lsbCBwaWNrIGFuCiBhcHByb3ByaWF0ZSBkZWZhdWx0LgoKDQoFBAAC
+AQUSBIoBAgcKDQoFBAACAQESBIoBCBEKDQoFBAACAQMSBIoBFBUKDQoFBAACAQgSBIoBFj4K
+EAoIBAACAQicCAASBIoBFz0KuQEKBAQAAgISBI4BAkEaqgEgT3B0aW9uYWwuIE9wdGlvbmFs
+IHBhZ2luYXRpb24gdG9rZW4sIHJldHVybmVkIGVhcmxpZXIgdmlhCiBbTGlzdEVrbUNvbm5l
+Y3Rpb25zUmVzcG9uc2UubmV4dF9wYWdlX3Rva2VuXVtnb29nbGUuY2xvdWQua21zLnYxLkxp
+c3RFa21Db25uZWN0aW9uc1Jlc3BvbnNlLm5leHRfcGFnZV90b2tlbl0uCgoNCgUEAAICBRIE
+jgECCAoNCgUEAAICARIEjgEJEwoNCgUEAAICAxIEjgEWFwoNCgUEAAICCBIEjgEYQAoQCggE
+AAICCJwIABIEjgEZPwrUAQoEBAACAxIElAECPRrFASBPcHRpb25hbC4gT25seSBpbmNsdWRl
+IHJlc291cmNlcyB0aGF0IG1hdGNoIHRoZSBmaWx0ZXIgaW4gdGhlIHJlc3BvbnNlLiBGb3IK
+IG1vcmUgaW5mb3JtYXRpb24sIHNlZQogW1NvcnRpbmcgYW5kIGZpbHRlcmluZyBsaXN0CiBy
+ZXN1bHRzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20va21zL2RvY3Mvc29ydGluZy1hbmQt
+ZmlsdGVyaW5nKS4KCg0KBQQAAgMFEgSUAQIICg0KBQQAAgMBEgSUAQkPCg0KBQQAAgMDEgSU
+ARITCg0KBQQAAgMIEgSUARQ8ChAKCAQAAgMInAgAEgSUARU7CoQCCgQEAAIEEgSaAQI/GvUB
+IE9wdGlvbmFsLiBTcGVjaWZ5IGhvdyB0aGUgcmVzdWx0cyBzaG91bGQgYmUgc29ydGVkLiBJ
+ZiBub3Qgc3BlY2lmaWVkLCB0aGUKIHJlc3VsdHMgd2lsbCBiZSBzb3J0ZWQgaW4gdGhlIGRl
+ZmF1bHQgb3JkZXIuICBGb3IgbW9yZSBpbmZvcm1hdGlvbiwgc2VlCiBbU29ydGluZyBhbmQg
+ZmlsdGVyaW5nIGxpc3QKIHJlc3VsdHNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9rbXMv
+ZG9jcy9zb3J0aW5nLWFuZC1maWx0ZXJpbmcpLgoKDQoFBAACBAUSBJoBAggKDQoFBAACBAES
+BJoBCREKDQoFBAACBAMSBJoBFBUKDQoFBAACBAgSBJoBFj4KEAoIBAACBAicCAASBJoBFz0K
+eQoCBAESBp8BAK8BARprIFJlc3BvbnNlIG1lc3NhZ2UgZm9yCiBbRWttU2VydmljZS5MaXN0
+RWttQ29ubmVjdGlvbnNdW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttU2VydmljZS5MaXN0RWtt
+Q29ubmVjdGlvbnNdLgoKCwoDBAEBEgSfAQgiClAKBAQBAgASBKEBAi0aQiBUaGUgbGlzdCBv
+ZiBbRWttQ29ubmVjdGlvbnNdW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbl0u
+CgoNCgUEAQIABBIEoQECCgoNCgUEAQIABhIEoQELGAoNCgUEAQIAARIEoQEZKAoNCgUEAQIA
+AxIEoQErLArWAQoEBAECARIEpgECHRrHASBBIHRva2VuIHRvIHJldHJpZXZlIG5leHQgcGFn
+ZSBvZiByZXN1bHRzLiBQYXNzIHRoaXMgdmFsdWUgaW4KIFtMaXN0RWttQ29ubmVjdGlvbnNS
+ZXF1ZXN0LnBhZ2VfdG9rZW5dW2dvb2dsZS5jbG91ZC5rbXMudjEuTGlzdEVrbUNvbm5lY3Rp
+b25zUmVxdWVzdC5wYWdlX3Rva2VuXQogdG8gcmV0cmlldmUgdGhlIG5leHQgcGFnZSBvZiBy
+ZXN1bHRzLgoKDQoFBAECAQUSBKYBAggKDQoFBAECAQESBKYBCRgKDQoFBAECAQMSBKYBGxwK
++QEKBAQBAgISBK4BAhca6gEgVGhlIHRvdGFsIG51bWJlciBvZiBbRWttQ29ubmVjdGlvbnNd
+W2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbl0KIHRoYXQgbWF0Y2hlZCB0aGUg
+cXVlcnkuCgogVGhpcyBmaWVsZCBpcyBub3QgcG9wdWxhdGVkIGlmCiBbTGlzdEVrbUNvbm5l
+Y3Rpb25zUmVxdWVzdC5maWx0ZXJdW2dvb2dsZS5jbG91ZC5rbXMudjEuTGlzdEVrbUNvbm5l
+Y3Rpb25zUmVxdWVzdC5maWx0ZXJdCiBpcyBhcHBsaWVkLgoKDQoFBAECAgUSBK4BAgcKDQoF
+BAECAgESBK4BCBIKDQoFBAECAgMSBK4BFRYKdAoCBAISBrMBALwBARpmIFJlcXVlc3QgbWVz
+c2FnZSBmb3IKIFtFa21TZXJ2aWNlLkdldEVrbUNvbm5lY3Rpb25dW2dvb2dsZS5jbG91ZC5r
+bXMudjEuRWttU2VydmljZS5HZXRFa21Db25uZWN0aW9uXS4KCgsKAwQCARIEswEIHwqSAQoE
+BAICABIGtgECuwEEGoEBIFJlcXVpcmVkLiBUaGUgW25hbWVdW2dvb2dsZS5jbG91ZC5rbXMu
+djEuRWttQ29ubmVjdGlvbi5uYW1lXSBvZiB0aGUKIFtFa21Db25uZWN0aW9uXVtnb29nbGUu
+Y2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dIHRvIGdldC4KCg0KBQQCAgAFEgS2AQIICg0K
+BQQCAgABEgS2AQkNCg0KBQQCAgADEgS2ARARCg8KBQQCAgAIEga2ARK7AQMKEAoIBAICAAic
+CAASBLcBBCoKEQoHBAICAAifCBIGuAEEugEFCnoKAgQDEgbAAQDSAQEabCBSZXF1ZXN0IG1l
+c3NhZ2UgZm9yCiBbRWttU2VydmljZS5DcmVhdGVFa21Db25uZWN0aW9uXVtnb29nbGUuY2xv
+dWQua21zLnYxLkVrbVNlcnZpY2UuQ3JlYXRlRWttQ29ubmVjdGlvbl0uCgoLCgMEAwESBMAB
+CCIKsAEKBAQDAgASBsQBAskBBBqfASBSZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2Yg
+dGhlIGxvY2F0aW9uIGFzc29jaWF0ZWQgd2l0aCB0aGUKIFtFa21Db25uZWN0aW9uXVtnb29n
+bGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dLCBpbiB0aGUgZm9ybWF0CiBgcHJvamVj
+dHMvKi9sb2NhdGlvbnMvKmAuCgoNCgUEAwIABRIExAECCAoNCgUEAwIAARIExAEJDwoNCgUE
+AwIAAxIExAESEwoPCgUEAwIACBIGxAEUyQEDChAKCAQDAgAInAgAEgTFAQQqChEKBwQDAgAI
+nwgSBsYBBMgBBQp2CgQEAwIBEgTNAQJIGmggUmVxdWlyZWQuIEl0IG11c3QgYmUgdW5pcXVl
+IHdpdGhpbiBhIGxvY2F0aW9uIGFuZCBtYXRjaCB0aGUgcmVndWxhcgogZXhwcmVzc2lvbiBg
+W2EtekEtWjAtOV8tXXsxLDYzfWAuCgoNCgUEAwIBBRIEzQECCAoNCgUEAwIBARIEzQEJGgoN
+CgUEAwIBAxIEzQEdHgoNCgUEAwIBCBIEzQEfRwoQCggEAwIBCJwIABIEzQEgRgprCgQEAwIC
+EgTRAQJMGl0gUmVxdWlyZWQuIEFuIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21z
+LnYxLkVrbUNvbm5lY3Rpb25dIHdpdGgKIGluaXRpYWwgZmllbGQgdmFsdWVzLgoKDQoFBAMC
+AgYSBNEBAg8KDQoFBAMCAgESBNEBEB4KDQoFBAMCAgMSBNEBISIKDQoFBAMCAggSBNEBI0sK
+EAoIBAMCAgicCAASBNEBJEoKegoCBAQSBtYBAN4BARpsIFJlcXVlc3QgbWVzc2FnZSBmb3IK
+IFtFa21TZXJ2aWNlLlVwZGF0ZUVrbUNvbm5lY3Rpb25dW2dvb2dsZS5jbG91ZC5rbXMudjEu
+RWttU2VydmljZS5VcGRhdGVFa21Db25uZWN0aW9uXS4KCgsKAwQEARIE1gEIIgpiCgQEBAIA
+EgTZAQJMGlQgUmVxdWlyZWQuIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21zLnYx
+LkVrbUNvbm5lY3Rpb25dIHdpdGggdXBkYXRlZAogdmFsdWVzLgoKDQoFBAQCAAYSBNkBAg8K
+DQoFBAQCAAESBNkBEB4KDQoFBAQCAAMSBNkBISIKDQoFBAQCAAgSBNkBI0sKEAoIBAQCAAic
+CAASBNkBJEoKSQoEBAQCARIG3AEC3QEvGjkgUmVxdWlyZWQuIExpc3Qgb2YgZmllbGRzIHRv
+IGJlIHVwZGF0ZWQgaW4gdGhpcyByZXF1ZXN0LgoKDQoFBAQCAQYSBNwBAhsKDQoFBAQCAQES
+BNwBHCcKDQoFBAQCAQMSBNwBKisKDQoFBAQCAQgSBN0BBi4KEAoIBAQCAQicCAASBN0BBy0K
+bAoCBAUSBuIBAOsBARpeIFJlcXVlc3QgbWVzc2FnZSBmb3IKIFtFa21TZXJ2aWNlLkdldEVr
+bUNvbmZpZ11bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21TZXJ2aWNlLkdldEVrbUNvbmZpZ10u
+CgoLCgMEBQESBOIBCBsKhQEKBAQFAgASBuUBAuoBBBp1IFJlcXVpcmVkLiBUaGUgW25hbWVd
+W2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29uZmlnLm5hbWVdIG9mIHRoZQogW0VrbUNvbmZp
+Z11bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25maWddIHRvIGdldC4KCg0KBQQFAgAFEgTl
+AQIICg0KBQQFAgABEgTlAQkNCg0KBQQFAgADEgTlARARCg8KBQQFAgAIEgblARLqAQMKEAoI
+BAUCAAicCAASBOYBBCoKEQoHBAUCAAifCBIG5wEE6QEFCnIKAgQGEgbvAQD2AQEaZCBSZXF1
+ZXN0IG1lc3NhZ2UgZm9yCiBbRWttU2VydmljZS5VcGRhdGVFa21Db25maWddW2dvb2dsZS5j
+bG91ZC5rbXMudjEuRWttU2VydmljZS5VcGRhdGVFa21Db25maWddLgoKCwoDBAYBEgTvAQge
+ClkKBAQGAgASBPEBAkQaSyBSZXF1aXJlZC4gW0VrbUNvbmZpZ11bZ29vZ2xlLmNsb3VkLmtt
+cy52MS5Fa21Db25maWddIHdpdGggdXBkYXRlZCB2YWx1ZXMuCgoNCgUEBgIABhIE8QECCwoN
+CgUEBgIAARIE8QEMFgoNCgUEBgIAAxIE8QEZGgoNCgUEBgIACBIE8QEbQwoQCggEBgIACJwI
+ABIE8QEcQgpJCgQEBgIBEgb0AQL1AS8aOSBSZXF1aXJlZC4gTGlzdCBvZiBmaWVsZHMgdG8g
+YmUgdXBkYXRlZCBpbiB0aGlzIHJlcXVlc3QuCgoNCgUEBgIBBhIE9AECGwoNCgUEBgIBARIE
+9AEcJwoNCgUEBgIBAxIE9AEqKwoNCgUEBgIBCBIE9QEGLgoQCggEBgIBCJwIABIE9QEHLQqa
+AQoCBAcSBvoBAJ8CARqLASBBIFtDZXJ0aWZpY2F0ZV1bZ29vZ2xlLmNsb3VkLmttcy52MS5D
+ZXJ0aWZpY2F0ZV0gcmVwcmVzZW50cyBhbiBYLjUwOQogY2VydGlmaWNhdGUgdXNlZCB0byBh
+dXRoZW50aWNhdGUgSFRUUFMgY29ubmVjdGlvbnMgdG8gRUtNIHJlcGxpY2FzLgoKCwoDBAcB
+EgT6AQgTCkIKBAQHAgASBPwBAj0aNCBSZXF1aXJlZC4gVGhlIHJhdyBjZXJ0aWZpY2F0ZSBi
+eXRlcyBpbiBERVIgZm9ybWF0LgoKDQoFBAcCAAUSBPwBAgcKDQoFBAcCAAESBPwBCA8KDQoF
+BAcCAAMSBPwBEhMKDQoFBAcCAAgSBPwBFDwKEAoIBAcCAAicCAASBPwBFTsKTQoEBAcCARIE
+/wECPho/IE91dHB1dCBvbmx5LiBUcnVlIGlmIHRoZSBjZXJ0aWZpY2F0ZSB3YXMgcGFyc2Vk
+IHN1Y2Nlc3NmdWxseS4KCg0KBQQHAgEFEgT/AQIGCg0KBQQHAgEBEgT/AQcNCg0KBQQHAgED
+EgT/ARARCg0KBQQHAgEIEgT/ARI9ChAKCAQHAgEInAgAEgT/ARM8CpoBCgQEBwICEgSDAgJA
+GosBIE91dHB1dCBvbmx5LiBUaGUgaXNzdWVyIGRpc3Rpbmd1aXNoZWQgbmFtZSBpbiBSRkMg
+MjI1MyBmb3JtYXQuIE9ubHkgcHJlc2VudAogaWYgW3BhcnNlZF1bZ29vZ2xlLmNsb3VkLmtt
+cy52MS5DZXJ0aWZpY2F0ZS5wYXJzZWRdIGlzIHRydWUuCgoNCgUEBwICBRIEgwICCAoNCgUE
+BwICARIEgwIJDwoNCgUEBwICAxIEgwISEwoNCgUEBwICCBIEgwIUPwoQCggEBwICCJwIABIE
+gwIVPgqbAQoEBAcCAxIEhwICQRqMASBPdXRwdXQgb25seS4gVGhlIHN1YmplY3QgZGlzdGlu
+Z3Vpc2hlZCBuYW1lIGluIFJGQyAyMjUzIGZvcm1hdC4gT25seQogcHJlc2VudCBpZiBbcGFy
+c2VkXVtnb29nbGUuY2xvdWQua21zLnYxLkNlcnRpZmljYXRlLnBhcnNlZF0gaXMgdHJ1ZS4K
+Cg0KBQQHAgMFEgSHAgIICg0KBQQHAgMBEgSHAgkQCg0KBQQHAgMDEgSHAhMUCg0KBQQHAgMI
+EgSHAhVAChAKCAQHAgMInAgAEgSHAhY/CowBCgQEBwIEEgaLAgKMAjIafCBPdXRwdXQgb25s
+eS4gVGhlIHN1YmplY3QgQWx0ZXJuYXRpdmUgRE5TIG5hbWVzLiBPbmx5IHByZXNlbnQgaWYK
+IFtwYXJzZWRdW2dvb2dsZS5jbG91ZC5rbXMudjEuQ2VydGlmaWNhdGUucGFyc2VkXSBpcyB0
+cnVlLgoKDQoFBAcCBAQSBIsCAgoKDQoFBAcCBAUSBIsCCxEKDQoFBAcCBAESBIsCEi8KDQoF
+BAcCBAMSBIsCMjMKDQoFBAcCBAgSBIwCBjEKEAoIBAcCBAicCAASBIwCBzAKmQEKBAQHAgUS
+BpACApECMhqIASBPdXRwdXQgb25seS4gVGhlIGNlcnRpZmljYXRlIGlzIG5vdCB2YWxpZCBi
+ZWZvcmUgdGhpcyB0aW1lLiBPbmx5IHByZXNlbnQgaWYKIFtwYXJzZWRdW2dvb2dsZS5jbG91
+ZC5rbXMudjEuQ2VydGlmaWNhdGUucGFyc2VkXSBpcyB0cnVlLgoKDQoFBAcCBQYSBJACAhsK
+DQoFBAcCBQESBJACHCsKDQoFBAcCBQMSBJACLi8KDQoFBAcCBQgSBJECBjEKEAoIBAcCBQic
+CAASBJECBzAKmAEKBAQHAgYSBpUCApYCMhqHASBPdXRwdXQgb25seS4gVGhlIGNlcnRpZmlj
+YXRlIGlzIG5vdCB2YWxpZCBhZnRlciB0aGlzIHRpbWUuIE9ubHkgcHJlc2VudCBpZgogW3Bh
+cnNlZF1bZ29vZ2xlLmNsb3VkLmttcy52MS5DZXJ0aWZpY2F0ZS5wYXJzZWRdIGlzIHRydWUu
+CgoNCgUEBwIGBhIElQICGwoNCgUEBwIGARIElQIcKgoNCgUEBwIGAxIElQItLgoNCgUEBwIG
+CBIElgIGMQoQCggEBwIGCJwIABIElgIHMAqXAQoEBAcCBxIEmgICRxqIASBPdXRwdXQgb25s
+eS4gVGhlIGNlcnRpZmljYXRlIHNlcmlhbCBudW1iZXIgYXMgYSBoZXggc3RyaW5nLiBPbmx5
+IHByZXNlbnQgaWYKIFtwYXJzZWRdW2dvb2dsZS5jbG91ZC5rbXMudjEuQ2VydGlmaWNhdGUu
+cGFyc2VkXSBpcyB0cnVlLgoKDQoFBAcCBwUSBJoCAggKDQoFBAcCBwESBJoCCRYKDQoFBAcC
+BwMSBJoCGRoKDQoFBAcCBwgSBJoCG0YKEAoIBAcCBwicCAASBJoCHEUKnQEKBAQHAggSBJ4C
+AkwajgEgT3V0cHV0IG9ubHkuIFRoZSBTSEEtMjU2IGNlcnRpZmljYXRlIGZpbmdlcnByaW50
+IGFzIGEgaGV4IHN0cmluZy4gT25seQogcHJlc2VudCBpZiBbcGFyc2VkXVtnb29nbGUuY2xv
+dWQua21zLnYxLkNlcnRpZmljYXRlLnBhcnNlZF0gaXMgdHJ1ZS4KCg0KBQQHAggFEgSeAgII
+Cg0KBQQHAggBEgSeAgkbCg0KBQQHAggDEgSeAh4fCg0KBQQHAggIEgSeAiBLChAKCAQHAggI
+nAgAEgSeAiFKCoAECgIECBIGqQIAmgMBGvEDIEFuIFtFa21Db25uZWN0aW9uXVtnb29nbGUu
+Y2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dIHJlcHJlc2VudHMgYW4KIGluZGl2aWR1YWwg
+RUtNIGNvbm5lY3Rpb24uIEl0IGNhbiBiZSB1c2VkIGZvciBjcmVhdGluZwogW0NyeXB0b0tl
+eXNdW2dvb2dsZS5jbG91ZC5rbXMudjEuQ3J5cHRvS2V5XSBhbmQKIFtDcnlwdG9LZXlWZXJz
+aW9uc11bZ29vZ2xlLmNsb3VkLmttcy52MS5DcnlwdG9LZXlWZXJzaW9uXSB3aXRoIGEKIFtQ
+cm90ZWN0aW9uTGV2ZWxdW2dvb2dsZS5jbG91ZC5rbXMudjEuUHJvdGVjdGlvbkxldmVsXSBv
+ZgogW0VYVEVSTkFMX1ZQQ11bZ29vZ2xlLmNsb3VkLmttcy52MS5Qcm90ZWN0aW9uTGV2ZWwu
+RVhURVJOQUxfVlBDXSwgYXMgd2VsbCBhcwogcGVyZm9ybWluZyBjcnlwdG9ncmFwaGljIG9w
+ZXJhdGlvbnMgdXNpbmcga2V5cyBjcmVhdGVkIHdpdGhpbiB0aGUKIFtFa21Db25uZWN0aW9u
+XVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dLgoKCwoDBAgBEgSpAggVCg0K
+AwQIBxIGqgICrQIECg8KBQQIB50IEgaqAgKtAgQKxwEKBAQIAwASBrICAs0CAxq2ASBBIFtT
+ZXJ2aWNlUmVzb2x2ZXJdW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbi5TZXJ2
+aWNlUmVzb2x2ZXJdCiByZXByZXNlbnRzIGFuIEVLTSByZXBsaWNhIHRoYXQgY2FuIGJlIHJl
+YWNoZWQgd2l0aGluIGFuCiBbRWttQ29ubmVjdGlvbl1bZ29vZ2xlLmNsb3VkLmttcy52MS5F
+a21Db25uZWN0aW9uXS4KCg0KBQQIAwABEgSyAgoZCq8BCgYECAMAAgASBrYCBLsCBhqcASBS
+ZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIFNlcnZpY2UgRGlyZWN0b3J5IHNl
+cnZpY2UgcG9pbnRpbmcgdG8KIGFuIEVLTSByZXBsaWNhLCBpbiB0aGUgZm9ybWF0CiBgcHJv
+amVjdHMvKi9sb2NhdGlvbnMvKi9uYW1lc3BhY2VzLyovc2VydmljZXMvKmAuCgoPCgcECAMA
+AgAFEgS2AgQKCg8KBwQIAwACAAESBLYCCyQKDwoHBAgDAAIAAxIEtgInKAoRCgcECAMAAgAI
+Ega2Aim7AgUKEgoKBAgDAAIACJwIABIEtwIGLAoTCgkECAMAAgAInwgSBrgCBroCBwqOAwoG
+BAgDAAIBEgTDAgRIGv0CIE9wdGlvbmFsLiBUaGUgZmlsdGVyIGFwcGxpZWQgdG8gdGhlIGVu
+ZHBvaW50cyBvZiB0aGUgcmVzb2x2ZWQgc2VydmljZS4gSWYKIG5vIGZpbHRlciBpcyBzcGVj
+aWZpZWQsIGFsbCBlbmRwb2ludHMgd2lsbCBiZSBjb25zaWRlcmVkLiBBbiBlbmRwb2ludAog
+d2lsbCBiZSBjaG9zZW4gYXJiaXRyYXJpbHkgZnJvbSB0aGUgZmlsdGVyZWQgbGlzdCBmb3Ig
+ZWFjaCByZXF1ZXN0LgoKIEZvciBlbmRwb2ludCBmaWx0ZXIgc3ludGF4IGFuZCBleGFtcGxl
+cywgc2VlCiBodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vc2VydmljZS1kaXJlY3RvcnkvZG9j
+cy9yZWZlcmVuY2UvcnBjL2dvb2dsZS5jbG91ZC5zZXJ2aWNlZGlyZWN0b3J5LnYxI3Jlc29s
+dmVzZXJ2aWNlcmVxdWVzdC4KCg8KBwQIAwACAQUSBMMCBAoKDwoHBAgDAAIBARIEwwILGgoP
+CgcECAMAAgEDEgTDAh0eCg8KBwQIAwACAQgSBMMCH0cKEgoKBAgDAAIBCJwIABIEwwIgRgpY
+CgYECAMAAgISBMYCBEEaSCBSZXF1aXJlZC4gVGhlIGhvc3RuYW1lIG9mIHRoZSBFS00gcmVw
+bGljYSB1c2VkIGF0IFRMUyBhbmQgSFRUUCBsYXllcnMuCgoPCgcECAMAAgIFEgTGAgQKCg8K
+BwQIAwACAgESBMYCCxMKDwoHBAgDAAICAxIExgIWFwoPCgcECAMAAgIIEgTGAhhAChIKCgQI
+AwACAgicCAASBMYCGT8K1gEKBgQIAwACAxIGywIEzAIxGsMBIFJlcXVpcmVkLiBBIGxpc3Qg
+b2YgbGVhZiBzZXJ2ZXIgY2VydGlmaWNhdGVzIHVzZWQgdG8gYXV0aGVudGljYXRlIEhUVFBT
+CiBjb25uZWN0aW9ucyB0byB0aGUgRUtNIHJlcGxpY2EuIEN1cnJlbnRseSwgYSBtYXhpbXVt
+IG9mIDEwCiBbQ2VydGlmaWNhdGVdW2dvb2dsZS5jbG91ZC5rbXMudjEuQ2VydGlmaWNhdGVd
+IGlzIHN1cHBvcnRlZC4KCg8KBwQIAwACAwQSBMsCBAwKDwoHBAgDAAIDBhIEywINGAoPCgcE
+CAMAAgMBEgTLAhksCg8KBwQIAwACAwMSBMsCLzAKDwoHBAgDAAIDCBIEzAIIMAoSCgoECAMA
+AgMInAgAEgTMAgkvCt0BCgQECAQAEgbSAgL1AgMazAEgW0tleU1hbmFnZW1lbnRNb2RlXVtn
+b29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb24uS2V5TWFuYWdlbWVudE1vZGVdCiBk
+ZXNjcmliZXMgd2hvIGNhbiBwZXJmb3JtIGNvbnRyb2wgcGxhbmUgY3J5cHRvZ3JhcGhpYyBv
+cGVyYXRpb25zIHVzaW5nIHRoaXMKIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21z
+LnYxLkVrbUNvbm5lY3Rpb25dLgoKDQoFBAgEAAESBNICBxgKIAoGBAgEAAIAEgTUAgQoGhAg
+Tm90IHNwZWNpZmllZC4KCg8KBwQIBAACAAESBNQCBCMKDwoHBAgEAAIAAhIE1AImJwqEBgoG
+BAgEAAIBEgTjAgQPGvMFIEVLTS1zaWRlIGtleSBtYW5hZ2VtZW50IG9wZXJhdGlvbnMgb24K
+IFtDcnlwdG9LZXlzXVtnb29nbGUuY2xvdWQua21zLnYxLkNyeXB0b0tleV0gY3JlYXRlZCB3
+aXRoIHRoaXMKIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5l
+Y3Rpb25dIG11c3QgYmUgaW5pdGlhdGVkIGZyb20KIHRoZSBFS00gZGlyZWN0bHkgYW5kIGNh
+bm5vdCBiZSBwZXJmb3JtZWQgZnJvbSBDbG91ZCBLTVMuIFRoaXMgbWVhbnMgdGhhdDoKICog
+V2hlbiBjcmVhdGluZyBhCiBbQ3J5cHRvS2V5VmVyc2lvbl1bZ29vZ2xlLmNsb3VkLmttcy52
+MS5DcnlwdG9LZXlWZXJzaW9uXSBhc3NvY2lhdGVkIHdpdGgKIHRoaXMKICAgW0VrbUNvbm5l
+Y3Rpb25dW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbl0sIHRoZSBjYWxsZXIg
+bXVzdAogICBzdXBwbHkgdGhlIGtleSBwYXRoIG9mIHByZS1leGlzdGluZyBleHRlcm5hbCBr
+ZXkgbWF0ZXJpYWwgdGhhdCB3aWxsIGJlCiAgIGxpbmtlZCB0byB0aGUgW0NyeXB0b0tleVZl
+cnNpb25dW2dvb2dsZS5jbG91ZC5rbXMudjEuQ3J5cHRvS2V5VmVyc2lvbl0uCiAqIERlc3Ry
+dWN0aW9uIG9mIGV4dGVybmFsIGtleSBtYXRlcmlhbCBjYW5ub3QgYmUgcmVxdWVzdGVkIHZp
+YSB0aGUKICAgQ2xvdWQgS01TIEFQSSBhbmQgbXVzdCBiZSBwZXJmb3JtZWQgZGlyZWN0bHkg
+aW4gdGhlIEVLTS4KICogQXV0b21hdGljIHJvdGF0aW9uIG9mIGtleSBtYXRlcmlhbCBpcyBu
+b3Qgc3VwcG9ydGVkLgoKDwoHBAgEAAIBARIE4wIECgoPCgcECAQAAgECEgTjAg0OCrYGCgYE
+CAQAAgISBPQCBBIapQYgQWxsIFtDcnlwdG9LZXlzXVtnb29nbGUuY2xvdWQua21zLnYxLkNy
+eXB0b0tleV0gY3JlYXRlZCB3aXRoIHRoaXMKIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xv
+dWQua21zLnYxLkVrbUNvbm5lY3Rpb25dIHVzZSBFS00tc2lkZSBrZXkKIG1hbmFnZW1lbnQg
+b3BlcmF0aW9ucyBpbml0aWF0ZWQgZnJvbSBDbG91ZCBLTVMuIFRoaXMgbWVhbnMgdGhhdDoK
+CiAqIFdoZW4gYSBbQ3J5cHRvS2V5VmVyc2lvbl1bZ29vZ2xlLmNsb3VkLmttcy52MS5Dcnlw
+dG9LZXlWZXJzaW9uXQogYXNzb2NpYXRlZCB3aXRoIHRoaXMgW0VrbUNvbm5lY3Rpb25dW2dv
+b2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbl0KIGlzCiAgIGNyZWF0ZWQsIHRoZSBF
+S00gYXV0b21hdGljYWxseSBnZW5lcmF0ZXMgbmV3IGtleSBtYXRlcmlhbCBhbmQgYSBuZXcK
+ICAga2V5IHBhdGguIFRoZSBjYWxsZXIgY2Fubm90IHN1cHBseSB0aGUga2V5IHBhdGggb2Yg
+cHJlLWV4aXN0aW5nCiAgIGV4dGVybmFsIGtleSBtYXRlcmlhbC4KICogRGVzdHJ1Y3Rpb24g
+b2YgZXh0ZXJuYWwga2V5IG1hdGVyaWFsIGFzc29jaWF0ZWQgd2l0aCB0aGlzCiAgIFtFa21D
+b25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb25dIGNhbiBiZSBy
+ZXF1ZXN0ZWQgYnkKICAgY2FsbGluZwogICBbRGVzdHJveUNyeXB0b0tleVZlcnNpb25dW2dv
+b2dsZS5jbG91ZC5rbXMudjEuS2V5TWFuYWdlbWVudFNlcnZpY2UuRGVzdHJveUNyeXB0b0tl
+eVZlcnNpb25dLgogKiBBdXRvbWF0aWMgcm90YXRpb24gb2Yga2V5IG1hdGVyaWFsIGlzIHN1
+cHBvcnRlZC4KCg8KBwQIBAACAgESBPQCBA0KDwoHBAgEAAICAhIE9AIQEQqlAQoEBAgCABIE
++gICPhqWASBPdXRwdXQgb25seS4gVGhlIHJlc291cmNlIG5hbWUgZm9yIHRoZQogW0VrbUNv
+bm5lY3Rpb25dW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbl0gaW4gdGhlIGZv
+cm1hdAogYHByb2plY3RzLyovbG9jYXRpb25zLyovZWttQ29ubmVjdGlvbnMvKmAuCgoNCgUE
+CAIABRIE+gICCAoNCgUECAIAARIE+gIJDQoNCgUECAIAAxIE+gIQEQoNCgUECAIACBIE+gIS
+PQoQCggECAIACJwIABIE+gITPAp1CgQECAIBEgb+AgL/AjIaZSBPdXRwdXQgb25seS4gVGhl
+IHRpbWUgYXQgd2hpY2ggdGhlCiBbRWttQ29ubmVjdGlvbl1bZ29vZ2xlLmNsb3VkLmttcy52
+MS5Fa21Db25uZWN0aW9uXSB3YXMgY3JlYXRlZC4KCg0KBQQIAgEGEgT+AgIbCg0KBQQIAgEB
+EgT+AhwnCg0KBQQIAgEDEgT+AiorCg0KBQQIAgEIEgT/AgYxChAKCAQIAgEInAgAEgT/Agcw
+CrACCgQECAICEgaHAwKIAy8anwIgT3B0aW9uYWwuIEEgbGlzdCBvZgogW1NlcnZpY2VSZXNv
+bHZlcnNdW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVjdGlvbi5TZXJ2aWNlUmVzb2x2
+ZXJdIHdoZXJlCiB0aGUgRUtNIGNhbiBiZSByZWFjaGVkLiBUaGVyZSBzaG91bGQgYmUgb25l
+IFNlcnZpY2VSZXNvbHZlciBwZXIgRUtNCiByZXBsaWNhLiBDdXJyZW50bHksIG9ubHkgYSBz
+aW5nbGUKIFtTZXJ2aWNlUmVzb2x2ZXJdW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29ubmVj
+dGlvbi5TZXJ2aWNlUmVzb2x2ZXJdIGlzCiBzdXBwb3J0ZWQuCgoNCgUECAICBBIEhwMCCgoN
+CgUECAICBhIEhwMLGgoNCgUECAICARIEhwMbLAoNCgUECAICAxIEhwMvMAoNCgUECAICCBIE
+iAMGLgoQCggECAICCJwIABIEiAMHLQprCgQECAIDEgSMAwI7Gl0gT3B0aW9uYWwuIEV0YWcg
+b2YgdGhlIGN1cnJlbnRseSBzdG9yZWQKIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQu
+a21zLnYxLkVrbUNvbm5lY3Rpb25dLgoKDQoFBAgCAwUSBIwDAggKDQoFBAgCAwESBIwDCQ0K
+DQoFBAgCAwMSBIwDEBEKDQoFBAgCAwgSBIwDEjoKEAoIBAgCAwicCAASBIwDEzkKvgEKBAQI
+AgQSBpEDApIDLxqtASBPcHRpb25hbC4gRGVzY3JpYmVzIHdobyBjYW4gcGVyZm9ybSBjb250
+cm9sIHBsYW5lIG9wZXJhdGlvbnMgb24gdGhlIEVLTS4gSWYKIHVuc2V0LCB0aGlzIGRlZmF1
+bHRzIHRvCiBbTUFOVUFMXVtnb29nbGUuY2xvdWQua21zLnYxLkVrbUNvbm5lY3Rpb24uS2V5
+TWFuYWdlbWVudE1vZGUuTUFOVUFMXS4KCg0KBQQIAgQGEgSRAwITCg0KBQQIAgQBEgSRAxQn
+Cg0KBQQIAgQDEgSRAyorCg0KBQQIAgQIEgSSAwYuChAKCAQIAgQInAgAEgSSAwctCrwCCgQE
+CAIFEgSZAwJIGq0CIE9wdGlvbmFsLiBJZGVudGlmaWVzIHRoZSBFS00gQ3J5cHRvIFNwYWNl
+IHRoYXQgdGhpcwogW0VrbUNvbm5lY3Rpb25dW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29u
+bmVjdGlvbl0gbWFwcyB0by4gTm90ZTogVGhpcwogZmllbGQgaXMgcmVxdWlyZWQgaWYKIFtL
+ZXlNYW5hZ2VtZW50TW9kZV1bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25uZWN0aW9uLktl
+eU1hbmFnZW1lbnRNb2RlXSBpcwogW0NMT1VEX0tNU11bZ29vZ2xlLmNsb3VkLmttcy52MS5F
+a21Db25uZWN0aW9uLktleU1hbmFnZW1lbnRNb2RlLkNMT1VEX0tNU10uCgoNCgUECAIFBRIE
+mQMCCAoNCgUECAIFARIEmQMJGgoNCgUECAIFAxIEmQMdHgoNCgUECAIFCBIEmQMfRwoQCggE
+CAIFCJwIABIEmQMgRgqkAwoCBAkSBqMDALcDARqVAyBBbiBbRWttQ29uZmlnXVtnb29nbGUu
+Y2xvdWQua21zLnYxLkVrbUNvbmZpZ10gaXMgYSBzaW5nbGV0b24gcmVzb3VyY2UgdGhhdAog
+cmVwcmVzZW50cyBjb25maWd1cmF0aW9uIHBhcmFtZXRlcnMgdGhhdCBhcHBseSB0byBhbGwK
+IFtDcnlwdG9LZXlzXVtnb29nbGUuY2xvdWQua21zLnYxLkNyeXB0b0tleV0gYW5kCiBbQ3J5
+cHRvS2V5VmVyc2lvbnNdW2dvb2dsZS5jbG91ZC5rbXMudjEuQ3J5cHRvS2V5VmVyc2lvbl0g
+d2l0aCBhCiBbUHJvdGVjdGlvbkxldmVsXVtnb29nbGUuY2xvdWQua21zLnYxLlByb3RlY3Rp
+b25MZXZlbF0gb2YKIFtFWFRFUk5BTF9WUENdW2dvb2dsZS5jbG91ZC5rbXMudjEuUHJvdGVj
+dGlvbkxldmVsLkVYVEVSTkFMX1ZQQ10gaW4gYSBnaXZlbgogcHJvamVjdCBhbmQgbG9jYXRp
+b24uCgoLCgMECQESBKMDCBEKDQoDBAkHEgakAwKnAwQKDwoFBAkHnQgSBqQDAqcDBAqWAQoE
+BAkCABIErAMCPhqHASBPdXRwdXQgb25seS4gVGhlIHJlc291cmNlIG5hbWUgZm9yIHRoZQog
+W0VrbUNvbmZpZ11bZ29vZ2xlLmNsb3VkLmttcy52MS5Fa21Db25maWddIGluIHRoZSBmb3Jt
+YXQKIGBwcm9qZWN0cy8qL2xvY2F0aW9ucy8qL2VrbUNvbmZpZ2AuCgoNCgUECQIABRIErAMC
+CAoNCgUECQIAARIErAMJDQoNCgUECQIAAxIErAMQEQoNCgUECQIACBIErAMSPQoQCggECQIA
+CJwIABIErAMTPAqrAQoEBAkCARIGsQMCtgMEGpoBIE9wdGlvbmFsLiBSZXNvdXJjZSBuYW1l
+IG9mIHRoZSBkZWZhdWx0CiBbRWttQ29ubmVjdGlvbl1bZ29vZ2xlLmNsb3VkLmttcy52MS5F
+a21Db25uZWN0aW9uXS4gU2V0dGluZyB0aGlzIGZpZWxkIHRvCiB0aGUgZW1wdHkgc3RyaW5n
+IHJlbW92ZXMgdGhlIGRlZmF1bHQuCgoNCgUECQIBBRIEsQMCCAoNCgUECQIBARIEsQMJHwoN
+CgUECQIBAxIEsQMiIwoPCgUECQIBCBIGsQMktgMDChAKCAQJAgEInAgAEgSyAwQqChEKBwQJ
+AgEInwgSBrMDBLUDBQp4CgIEChIGuwMAxAMBGmogUmVxdWVzdCBtZXNzYWdlIGZvcgogW0Vr
+bVNlcnZpY2UuVmVyaWZ5Q29ubmVjdGl2aXR5XVtnb29nbGUuY2xvdWQua21zLnYxLkVrbVNl
+cnZpY2UuVmVyaWZ5Q29ubmVjdGl2aXR5XS4KCgsKAwQKARIEuwMIIQqVAQoEBAoCABIGvgMC
+wwMEGoQBIFJlcXVpcmVkLiBUaGUgW25hbWVdW2dvb2dsZS5jbG91ZC5rbXMudjEuRWttQ29u
+bmVjdGlvbi5uYW1lXSBvZiB0aGUKIFtFa21Db25uZWN0aW9uXVtnb29nbGUuY2xvdWQua21z
+LnYxLkVrbUNvbm5lY3Rpb25dIHRvIHZlcmlmeS4KCg0KBQQKAgAFEgS+AwIICg0KBQQKAgAB
+EgS+AwkNCg0KBQQKAgADEgS+AxARCg8KBQQKAgAIEga+AxLDAwMKEAoIBAoCAAicCAASBL8D
+BCoKEQoHBAoCAAifCBIGwAMEwgMFCncKAgQLEgTIAwAlGmsgUmVzcG9uc2UgbWVzc2FnZSBm
+b3IKIFtFa21TZXJ2aWNlLlZlcmlmeUNvbm5lY3Rpdml0eV1bZ29vZ2xlLmNsb3VkLmttcy52
+MS5Fa21TZXJ2aWNlLlZlcmlmeUNvbm5lY3Rpdml0eV0uCgoLCgMECwESBMgDCCJiBnByb3Rv
+Mw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest ===
+    # Fields for ListEkmConnectionsRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest->new(
+        parent => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<parent>
+
+Type: String
+
+=item * B<page_size>
+
+Type: Int32
+
+=item * B<page_token>
+
+Type: String
+
+=item * B<filter>
+
+Type: String
+
+=item * B<order_by>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse ===
+    # Fields for ListEkmConnectionsResponse
+    # Field: ekm_connections Type: 11 (.google.cloud.kms.v1.EkmConnection)
+    # Field: next_page_token Type: 9 ()
+    # Field: total_size Type: 5 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse->new(
+        ekm_connections => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<ekm_connections>
+
+Type: Message (.google.cloud.kms.v1.EkmConnection)
+
+=item * B<next_page_token>
+
+Type: String
+
+=item * B<total_size>
+
+Type: Int32
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest ===
+    # Fields for GetEkmConnectionRequest
+    # Field: name Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest ===
+    # Fields for CreateEkmConnectionRequest
+    # Field: parent Type: 9 ()
+    # Field: ekm_connection_id Type: 9 ()
+    # Field: ekm_connection Type: 11 (.google.cloud.kms.v1.EkmConnection)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest->new(
+        parent => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<parent>
+
+Type: String
+
+=item * B<ekm_connection_id>
+
+Type: String
+
+=item * B<ekm_connection>
+
+Type: Message (.google.cloud.kms.v1.EkmConnection)
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest ===
+    # Fields for UpdateEkmConnectionRequest
+    # Field: ekm_connection Type: 11 (.google.cloud.kms.v1.EkmConnection)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest->new(
+        ekm_connection => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<ekm_connection>
+
+Type: Message (.google.cloud.kms.v1.EkmConnection)
+
+=item * B<update_mask>
+
+Type: Message (.google.protobuf.FieldMask)
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest ===
+    # Fields for GetEkmConfigRequest
+    # Field: name Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest ===
+    # Fields for UpdateEkmConfigRequest
+    # Field: ekm_config Type: 11 (.google.cloud.kms.v1.EkmConfig)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest->new(
+        ekm_config => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<ekm_config>
+
+Type: Message (.google.cloud.kms.v1.EkmConfig)
+
+=item * B<update_mask>
+
+Type: Message (.google.protobuf.FieldMask)
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::Certificate ===
+    # Fields for Certificate
+    # Field: raw_der Type: 12 ()
+    # Field: parsed Type: 8 ()
+    # Field: issuer Type: 9 ()
+    # Field: subject Type: 9 ()
+    # Field: subject_alternative_dns_names Type: 9 ()
+    # Field: not_before_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: not_after_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: serial_number Type: 9 ()
+    # Field: sha256_fingerprint Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::Certificate - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::Certificate->new(
+        raw_der => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<raw_der>
+
+Type: Bytes
+
+=item * B<parsed>
+
+Type: Bool
+
+=item * B<issuer>
+
+Type: String
+
+=item * B<subject>
+
+Type: String
+
+=item * B<subject_alternative_dns_names>
+
+Type: String
+
+=item * B<not_before_time>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<not_after_time>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<serial_number>
+
+Type: String
+
+=item * B<sha256_fingerprint>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::EkmConnection ===
+    # Fields for EkmConnection
+    # Field: name Type: 9 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: service_resolvers Type: 11 (.google.cloud.kms.v1.EkmConnection.ServiceResolver)
+    # Field: etag Type: 9 ()
+    # Field: key_management_mode Type: 14 (.google.cloud.kms.v1.EkmConnection.KeyManagementMode)
+    # Field: crypto_space_path Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::EkmConnection - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::EkmConnection->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<create_time>
+
+Type: Message (.google.protobuf.Timestamp)
+
+=item * B<service_resolvers>
+
+Type: Message (.google.cloud.kms.v1.EkmConnection.ServiceResolver)
+
+=item * B<etag>
+
+Type: String
+
+=item * B<key_management_mode>
+
+Type: Enum (.google.cloud.kms.v1.EkmConnection.KeyManagementMode)
+
+=item * B<crypto_space_path>
+
+Type: String
+
+=back
+
+=cut
+
+# Enum: EkmConnection::KeyManagementMode
+our $EkmConnection_KEY_MANAGEMENT_MODE_UNSPECIFIED = 0;
+our $EkmConnection_MANUAL = 1;
+our $EkmConnection_CLOUD_KMS = 2;
+
+=pod
+
+=head2 Enum: EkmConnection::KeyManagementMode
+
+Values:
+
+=over 4
+
+=item * C<KEY_MANAGEMENT_MODE_UNSPECIFIED> => 0
+
+=item * C<MANUAL> => 1
+
+=item * C<CLOUD_KMS> => 2
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::EkmConfig ===
+    # Fields for EkmConfig
+    # Field: name Type: 9 ()
+    # Field: default_ekm_connection Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::EkmConfig - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::EkmConfig->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=item * B<default_ekm_connection>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest ===
+    # Fields for VerifyConnectivityRequest
+    # Field: name Type: 9 ()
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest->new(
+        name => $value,
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=item * B<name>
+
+Type: String
+
+=back
+
+=cut
+
+# === Message: Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse ===
+    # Fields for VerifyConnectivityResponse
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse - Compiled Protocol Buffers message class
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse->new(
+    );
+
+=head1 FIELDS
+
+=over 4
+
+=back
+
+=cut
+
+# === Service Client: Google::Cloud::Kms::V1::EkmService::EkmServiceClient ===
+package Google::Cloud::Kms::V1::EkmService::EkmServiceClient;
+
+=pod
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService::EkmServiceClient - Client stub representing the remote EkmService service
+
+=head1 DESCRIPTION
+
+This class acts as a local client stub for the remote gRPC service.
+It delegates call dispatching to an underlying L<Google::gRPC::Client>
+instance, ensuring type-safe request parsing and response mapping.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head2 target
+
+The endpoint target address. Defaults to C<kms.googleapis.com:443>.
+
+=head2 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'kms.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub list_ekm_connections {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'ListEkmConnections',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse',
+    });
+}
+
+sub get_ekm_connection {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'GetEkmConnection',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::EkmConnection',
+    });
+}
+
+sub create_ekm_connection {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'CreateEkmConnection',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::EkmConnection',
+    });
+}
+
+sub update_ekm_connection {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'UpdateEkmConnection',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::EkmConnection',
+    });
+}
+
+sub get_ekm_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'GetEkmConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::EkmConfig',
+    });
+}
+
+sub update_ekm_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'UpdateEkmConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::EkmConfig',
+    });
+}
+
+sub verify_connectivity {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.kms.v1.EkmService',
+        method         => 'VerifyConnectivity',
+        request        => $req,
+        response_class => 'Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse',
+    });
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Kms::V1::EkmService - Protocol Buffers schema definition
+
+=head1 DESCRIPTION
+
+Auto-generated Protocol Buffers schema definition class.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

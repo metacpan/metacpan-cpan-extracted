@@ -1,3 +1,6 @@
+2.02	kraih Mon Jul 28 14:00:00 CEST 2026
+  - Clean release tarball.
+
 2.01	kraih Mon Jul 27 15:48:00 CEST 2026
   - Require BSD::Resource and Filesys::Statvfs again, so the maxfilesize and
     free-space safeguards are always enforced (they were silently disabled when

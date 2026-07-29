@@ -10,18 +10,18 @@ Proc::ProcessTable::Match::Swapped - Check if the process is swapped out.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
 
     use Proc::ProcessTable::Match::Swapped;
     
-    my $checker=Proc::ProcessTable::Match::Swapped->new(;
+    my $checker=Proc::ProcessTable::Match::Swapped->new;
     
     if ( $checker->match( $proc ) ){
         print "It matches.\n";
@@ -38,9 +38,10 @@ This intiates the object.
 =cut
 
 sub new{
+    my $class=$_[0];
     my $self = {
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -54,7 +55,7 @@ One argument is taken and that is a Proc::ProcessTable::Process object.
 The returned value is a boolean.
 
     if ( $checker->match( $proc ) ){
-        print "The connection matches.\n";
+        print "The process matches.\n";
     }
 
 =cut
@@ -77,13 +78,32 @@ sub match{
 	};
 
 	# don't bother proceeding, the object won't match ever
-	# as it does not have a fname
+	# as it does not have a state
 	if ( ! defined( $proc_state ) ){
 		return 0;
 	}
 
 	# will have a 0 rss, but is not swapped
-	if ( $proc_state =~ /^zombie$/ ){
+	# "zombie" is used by the BSDs and "defunct" by Linux
+	if ( $proc_state =~ /^(zombie|defunct)$/ ){
+		return 0;
+	}
+
+	# kernel procs always have a rss of 0, but are not swapped out
+	my $proc_uid;
+	eval{
+		$proc_uid=$object->uid;
+	};
+	my $proc_cmndline;
+	eval{
+		$proc_cmndline=$object->cmndline;
+	};
+	if (
+		( defined( $proc_uid ) ) &&
+		( $proc_uid == 0 ) &&
+		( defined( $proc_cmndline ) ) &&
+		( $proc_cmndline =~ /^$/ )
+		){
 		return 0;
 	}
 
@@ -93,7 +113,7 @@ sub match{
 	};
 
 	# don't bother proceeding, the object won't match ever
-	# as it does not have a fname
+	# as it does not have a rss
 	if ( ! defined( $proc_rss ) ){
 		return 0;
 	}
@@ -133,14 +153,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

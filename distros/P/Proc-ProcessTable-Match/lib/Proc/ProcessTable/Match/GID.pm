@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::GID - Check if the GID of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{gids} ) ){
 		die ('No gids key specified in the argument hash');
 	}
-	if ( ref( \$args{gids} ) eq 'ARRAY' ){
+	if ( ref( $args{gids} ) ne 'ARRAY' ){
 		die ('The gids key is not a array');
 	}
 	if ( ! defined $args{gids}[0] ){
 		die ('Nothing defined in the gids array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				gids=>$args{gids},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -135,7 +136,7 @@ sub match{
 		my $gid=$self->{gids}[$gid_int];
 		if (
 			( $gid =~ /^[0-9]+$/ ) &&
-			( $gid eq $proc_gid )
+			( $gid == $proc_gid )
 			){
 			return 1;
 		}elsif( $gid =~ /^\<\=[0-9]+$/ ){
@@ -160,7 +161,7 @@ sub match{
 			}
 		}elsif( $gid =~ /^\![0-9]+$/ ){
 			$gid=~s/^\!//;
-			if ( $proc_gid ne $gid ){
+			if ( $proc_gid != $gid ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

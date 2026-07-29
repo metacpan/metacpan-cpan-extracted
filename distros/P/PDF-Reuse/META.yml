@@ -28,7 +28,7 @@ no_index:
 provides:
   PDF::Reuse:
     file: lib/PDF/Reuse.pm
-    version: '0.43'
+    version: '0.44'
   PDF::Reuse::Util:
     file: lib/PDF/Reuse/Util.pm
 requires:
@@ -44,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/cnighswonger/PDF-Reuse/issues
   repository: https://github.com/cnighswonger/PDF-Reuse.git
-version: '0.43'
+version: '0.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,13 +4,33 @@ Net::WebSocket::EVx - Perl wrapper around Wslay websocket library
 
 =head1 DESCRIPTION
 
-Net::WebSocket::EVx - websocket module based on L<EV> and L<Alien::Wslay>.
-This is fork of L<Net::WebSocket::EV> which looks abandoned.
-The main differences are usage of Alien::Wslay and rsv bit support (eg. for compressed tranfers)
+Net::WebSocket::EVx is a websocket module based on L<EV> and L<Alien::Wslay>.
+It is a fork of L<Net::WebSocket::EV>, which looks abandoned; the main
+differences are the use of Alien::Wslay and RSV bit support (for compressed
+transfers, for example).
+
+The module does not perform the HTTP handshake. Complete the upgrade yourself,
+then hand the socket to C<new()>.
 
 =head1 SYNOPSIS
 
-app.psgi for websocket echo server with compression support:
+    use EV;
+    use Net::WebSocket::EVx;
+
+    # $fh is a non-blocking socket whose websocket handshake is already done
+    my $ws; $ws = Net::WebSocket::EVx->new({
+        fh          => $fh,
+        rsv         => WS_RSV_NONE,   # no extension negotiated
+        on_msg_recv => sub {
+            my ($rsv, $opcode, $msg, $status_code) = @_;
+            $ws->queue_msg($msg);     # echo it back
+        },
+        on_close    => sub { my ($code) = @_; undef $ws; close $fh },
+    });
+
+    EV::run;
+
+=head2 A complete PSGI echo server with compression
 
     use strict; use experimental 'signatures';
     use Net::WebSocket::EVx;
@@ -18,7 +38,7 @@ app.psgi for websocket echo server with compression support:
     use Digest::SHA1 'sha1_base64';
 
     use constant {
-        ws_max_size => 1<<31-1,
+        ws_max_size => (1<<31)-1,
         ws_guid => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11',
         ws_inflate_tail => pack(C4 => 0, 0, 255, 255),
         crlf => "\015\012"
@@ -47,6 +67,7 @@ app.psgi for websocket echo server with compression support:
             open(my $fh, '+<&', $io) or die $!;
             my $srv; $srv = Net::WebSocket::EVx->new({
                 fh => $fh, max_recv_size => ws_max_size,
+                rsv => $deflate ? WS_RSV1_BIT : WS_RSV_NONE,
                 on_msg_recv => sub ($rsv, $opcode, $msg, $status_code) {
                     $srv->queue_msg($msg), return unless $rsv && $inflate; # plain echo
                     return unless $inflate->inflate(($msg .= ws_inflate_tail), my $out) == Z_OK;
@@ -59,11 +80,11 @@ app.psgi for websocket echo server with compression support:
         }
     }
 
-run it via Twiggy/Feersum which support "psgix.io":
+Run it via Twiggy or Feersum, which support C<psgix.io>:
 
     plackup -l $(realpath app.sock) -s Feersum app.psgi
 
-put nginx in front:
+Put nginx in front:
 
     http {
       upstream app { server unix:app.sock; }
@@ -82,141 +103,258 @@ put nginx in front:
       }
     }
 
-run it:
+Run it:
 
     /usr/sbin/nginx -p . -e nginx.err -c nginx.conf
 
+=head1 EXPORTS
+
+C<WS_FRAGMENTED_DATA>, C<WS_FRAGMENTED_EOF>, C<WS_FRAGMENTED_ERROR>,
+C<WS_RSV_NONE> and C<WS_RSV1_BIT> are exported by default.
+
 =head1 METHODS
 
-=head2 new( { params } )
+=head2 new( \%params )
 
-Params:
+Returns a new websocket. The parameter hash becomes the object itself, so the
+callback keys stay live: replacing C<< $ws->{on_msg_recv} >> later takes effect
+on the next message.
 
 =over
 
 =item fh or fd
 
-Filehandle or numeric file descriptor of socket to use. Socket must be set in non blocking mode.
+Filehandle or numeric file descriptor of the socket to use. The socket must be
+in non-blocking mode, and its websocket handshake must already be complete.
 
-Net::WebSocket::EVx doesn't do handshake, you must do it before calling new().
+The descriptor is duplicated with C<dup(2)>, so the module owns and closes only
+its own copy. Ownership of what you pass in stays with you: keep the handle
+alive for as long as the websocket is in use, and close it yourself afterwards.
+
+Croaks unless a defined, non-negative descriptor can be resolved - a missing,
+undefined or already closed C<fh> is an error rather than a silent fallback.
 
 =item type
 
-Either "client" or "server"
+Either C<client> or C<server>.
 
-default: server
+Default: C<server>
 
 =item buffering
 
-If set to 0 - disables buffering. on_msg_recv is always called with empty $msg, use on_frame_recv_* to handle messages. Useful for handling big binary data without buffering it in memory.
+If set to 0, disables buffering: C<on_msg_recv> is then always called with an
+empty C<$msg> and you use the C<on_frame_recv_*> callbacks instead. Useful for
+handling large binary data without buffering it in memory.
 
-Default if not defined : 1
+Default: 1
 
 =item max_recv_size
 
-Max message or frame size, see L<https://tatsuhiro-t.github.io/wslay/man/wslay_event_config_set_max_recv_msg_length.html>
+Maximum message or frame size. See
+L<wslay_event_config_set_max_recv_msg_length|https://tatsuhiro-t.github.io/wslay/man/wslay_event_config_set_max_recv_msg_length.html>.
+
+=item rsv
+
+Reserved bits used by C<queue_msg_ex()> and C<queue_fragmented_ex()> when the
+caller omits their C<rsv> argument. A per-call argument always wins.
+
+Default: C<WS_RSV1_BIT>
+
+RFC 6455 section 5.2 requires the RSV bits to be 0 unless an extension that
+defines them has been negotiated, so a connection without permessage-deflate
+should be created with C<< rsv => WS_RSV_NONE >>. The default is kept for
+backwards compatibility.
+
+=item allowed_rsv
+
+Bitmask of reserved bits accepted on incoming frames; a frame carrying any other
+RSV bit fails the connection. Only C<WS_RSV_NONE> and C<WS_RSV1_BIT> are
+meaningful to wslay.
+
+Default: C<WS_RSV1_BIT>
 
 =item on_msg_recv
 
-This callback is called when library receives complete message. Close messages aren't handled by this callback. When buffering is disabled $msg is always empty
+Called when a complete message has been received. Close messages are not
+reported here - use C<on_close>. When C<buffering> is disabled, C<$msg> is
+always empty.
 
-Callback arguments: my ($rsv, $opcode, $msg, $status_code) = @_;
+    my ($rsv, $opcode, $msg, $status_code) = @_;
 
 =item on_close
 
-Called when connection is closed.
+Called when the connection is closed.
 
-Callback arguments: my ($close_code) = @_;
+    my ($close_code) = @_;
 
 =item genmask
 
-Used only by Net::WebSocket::EVx type=client mode. Must return $len bytes scalar to mask message. If not specified, then simple rand() mask generator is used.
+Client mode only. Must return a scalar of exactly C<$len> bytes to mask the
+message with; any other length is an error and aborts the connection.
 
-Callback arguments: my ($len) = @_;
+If not specified, a C<rand()> based generator seeded from perl's entropy source
+is used. That is adequate for the RFC's "unpredictable to intermediaries"
+requirement, but it is not cryptographically strong - supply your own callback
+if you need that.
+
+    my ($len) = @_;
 
 =item on_frame_recv_start
 
-Called when frame header is received.
+Called when a frame header has been received.
 
-Callback arguments: my ($fin, $rsv,$opcode,$payload_length) = @_;
+    my ($fin, $rsv, $opcode, $payload_length) = @_;
 
 =item on_frame_recv_chunk
 
-Called when next data portion is received.
+Called for each portion of frame data received.
 
-Callback arguments: my ($data) = @_;
+    my ($data) = @_;
 
 =item on_frame_recv_end
 
-Called when message is received. No arguments
+Called at the end of a frame. No arguments.
 
 =back
 
-=cut
-
 =head2 queue_msg( message, opcode )
 
-Queue message, opcode is optional default is 1 (text message).
-Returns 0 on success, negative wslay error code on failure.
+Queues a message. C<opcode> is optional, default 1 (text). Returns 0 on success
+or a negative wslay error code on failure.
+
+Control frames go through the same call: C<< $ws->queue_msg($payload, 0x9) >>
+sends a ping, and wslay answers incoming pings with a pong by itself.
 
 =head2 queue_msg_ex( message, opcode, rsv )
 
-Queue message, opcode is optional default is 1 (text message).
-rsv is optional default is WS_RSV1_BIT.
-Returns 0 on success, negative wslay error code on failure.
+As C<queue_msg()>, but with explicit reserved bits. C<rsv> is optional and
+defaults to the connection's C<rsv> setting (see C<new()>).
 
-=head2 queue_fragmented ( callback, opcode )
+=head2 queue_fragmented( callback, opcode )
 
-Queue fragmented message, opcode is optional, default is 2 (binary message)
+Queues a fragmented message whose data comes from a callback. C<opcode> is
+optional, default 2 (binary).
 
-Callback arguments: my ($len) = @_;
+    my ($len) = @_;
 
-Callback must return one or two elements: ( $data ) or ( $data, $status )
+The callback must return one or two elements: C<($data)> or C<($data, $status)>.
+With a single scalar, the status defaults to C<WS_FRAGMENTED_DATA>. Status can
+be:
 
-When returning a single scalar, status defaults to WS_FRAGMENTED_DATA.
+=over
 
-Status can be:
+=item C<WS_FRAGMENTED_DATA>
 
-WS_FRAGMENTED_DATA - Data chunk. Wslay will constantly re-invoke callback when it returns WS_FRAGMENTED_DATA. It will let other events run, but you will get 100% CPU load if there is no data to send and your callback always returns WS_FRAGMENTED_DATA with empty scalar while waiting for data. To prevent this use ->stop_write to suspend all IO when there is no more data to send and ->start_write when new portion of data is ready.
+A data chunk. Wslay re-invokes the callback continuously while it returns this.
+Other events still run, but you will see 100% CPU if the callback keeps
+returning an empty scalar while waiting for data. To avoid that, call
+C<stop_write()> when you have nothing more to send and C<start_write()> when the
+next portion is ready.
 
-WS_FRAGMENTED_ERROR - Error. Don't call callback anymore
+=item C<WS_FRAGMENTED_EOF>
 
-WS_FRAGMENTED_EOF - End of message.
+End of message.
 
-=head2 queue_fragmented_ex ( callback, opcode, rsv )
+=item C<WS_FRAGMENTED_ERROR>
 
-Queue fragmented message, opcode is optional, default is 2 (binary message).
-rsv is optional default is WS_RSV1_BIT
+Error; the callback is not called again and the connection is aborted.
 
-=head2 wait(cb)
+=back
 
-Callback called when send queue becomes empty.
+=head2 queue_fragmented_ex( callback, opcode, rsv )
+
+As C<queue_fragmented()>, but with explicit reserved bits. C<rsv> is optional
+and defaults to the connection's C<rsv> setting (see C<new()>).
+
+=head2 wait( cb )
+
+Registers a callback to be run when the send queue becomes empty. Setting a new
+one replaces any callback not yet fired.
 
 =head2 queued_count()
 
-Returns number of messages in send queue
+Returns the number of messages in the send queue.
 
 =head2 start() and stop()
 
-Start or stop all websocket IO
+Resume or suspend all websocket IO.
 
 =head2 start_write() and stop_write()
 
+Resume or suspend the write side only. Use this for flow control while sending a
+fragmented message, as described under C<queue_fragmented()>.
+
 =head2 start_read() and stop_read()
+
+Resume or suspend the read side only. Data already in the socket buffer is
+delivered once reading is resumed.
 
 =head2 shutdown_read() and shutdown_write()
 
-Permanently disable read or write at the wslay protocol level. Unlike stop_*/start_* which only pause the event watcher, shutdown is irreversible for the lifetime of the connection
+Permanently disable reading or writing at the wslay protocol level. Unlike
+C<stop_*>/C<start_*>, which only pause the event watcher, a shutdown is
+irreversible for the lifetime of the connection.
 
-=head2 close( status_code, reason_data)
+=head2 close( status_code, reason_data )
 
-Queue close frame. Status and reason are optional.
+Queues a close frame. Both arguments are optional. C<reason_data> must not
+exceed 123 bytes; anything longer is rejected by wslay and croaks. (Wslay's own
+header says "less than 123 bytes", but the implementation accepts 123.)
 
-Possible attack vector: client can hold connection after receiving close frame and make a lot of connections.
-So if you want to guaranteed close connection, then call $ws->close() and ->wait until close frame will be sent, then close $ws->{fh}.
+Possible attack vector: a client can hold the connection open after receiving
+the close frame, and open many such connections. To close for certain, call
+C<close()>, C<wait()> until the close frame has been sent, then close
+C<< $ws->{fh} >> yourself.
+
+That handshake cannot complete while writing is suspended: call C<start_write()>
+first if you have used C<stop_write()>, otherwise the close frame is never sent
+and C<wait()> never fires.
+
+=head1 ERRORS AND EXCEPTIONS
+
+The queueing methods return a negative wslay error code for conditions you are
+expected to handle - in practice only C<WSLAY_ERR_NO_MORE_MSG> (-302), returned
+when queueing after a close frame has been queued.
+
+Programming errors croak instead: an invalid argument (an over-long close
+reason, for instance), C<WSLAY_ERR_NOMEM>, and calling any method on a
+connection that is already closed or on an object that has been destroyed. Wrap
+sends in C<eval> if you cannot rule those out.
+
+A callback that dies does not unwind through wslay and libev. The exception is
+held until the C state is consistent, then rethrown from whichever call entered
+the module - an C<EV::run>, or the C<queue_*>/C<start_*>/C<stop_*> method you
+called. While an exception is pending, the remaining callbacks for that event
+are skipped.
+
+Whether the connection survives depends on which callback died. C<on_msg_recv>,
+C<on_frame_recv_*>, C<on_close> and the C<wait()> callback are advisory, so the
+connection is left intact and you can carry on using it. C<genmask> and the
+C<queue_fragmented> source callback produce bytes that wslay is in the middle of
+framing, so a failure there - dying, or returning the wrong length - aborts the
+connection.
+
+The object must not outlive the event loop it was created on. Watchers are
+disarmed automatically if the default loop is destroyed first, but any websocket
+still open at that point stops doing IO.
+
+Unix only. The WIN32 guards in the XS are incomplete: socket errors are read
+from C<errno> rather than C<WSAGetLastError()>, and descriptors are closed with
+C<close()> rather than C<closesocket()>.
+
+=head1 SEE ALSO
+
+L<EV>, L<Alien::Wslay>, L<Net::WebSocket::EV>,
+L<RFC 6455|https://datatracker.ietf.org/doc/html/rfc6455>,
+L<RFC 7692|https://datatracker.ietf.org/doc/html/rfc7692> (permessage-deflate)
+
+=head1 AUTHOR
+
+Yegor Korablev <egor@cpan.org>
 
 =head1 LICENSE
 
-This is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
 
 =cut

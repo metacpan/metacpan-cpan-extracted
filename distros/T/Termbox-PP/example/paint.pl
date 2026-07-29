@@ -71,6 +71,7 @@ sub update_and_redraw_all { # void ($mx, $my)
     ] => 'Termbox::Cell';
   }
   copy: {
+    no warnings 'deprecated';
     my $cells = Termbox::tb_cell_buffer();
     @{$cells->[$_]} = @{$backbuf->[$_]} for 0..$#$cells;
   }

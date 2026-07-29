@@ -785,7 +785,7 @@ subtest 'Custom types with complex inheritance' => sub {
 		},
 		email => {
 			type => 'string',
-			matches => qr/^[\w\.\-]+@[\w\.\-]+\.\w+$/,
+			matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/,
 			transform => sub { lc trim($_[0]) }
 		},
 		profile => {

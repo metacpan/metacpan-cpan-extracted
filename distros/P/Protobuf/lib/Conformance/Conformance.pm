@@ -3,7 +3,7 @@ package Conformance::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;

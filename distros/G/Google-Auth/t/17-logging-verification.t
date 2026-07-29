@@ -15,6 +15,8 @@
 use strict;
 use warnings;
 
+$ENV{GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES} = '1';
+
 use Test::More;
 use Test::LWP::UserAgent;
 use HTTP::Response;
@@ -119,7 +121,7 @@ subtest 'Pluggable credentials WIF Logging' => sub {
         token_url          => 'https://sts.googleapis.com/v1/token',
         credential_source  => {
             executable => {
-                command => sprintf('"%s" -e "print q({\"id_token\":\"mock_pluggable_token\"})"', $^X),
+                command => sprintf('"%s" -e "print q({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"id_token\":\"mock_pluggable_token\"})"', $^X),
             },
         },
     );

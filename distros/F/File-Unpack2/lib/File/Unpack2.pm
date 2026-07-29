@@ -42,12 +42,12 @@ File::Unpack2 - Aggressively unpack any archive, recursively, by mime type
 
 =head1 VERSION
 
-Version 2.01
+Version 2.02
 
 =cut
 
 # Please run perl Makefile.PL after changing the version here.
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 POSIX::setlocale(&POSIX::LC_ALL, 'C');
 $ENV{PATH} = '/usr/bin:/bin';

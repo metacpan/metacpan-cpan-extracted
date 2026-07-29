@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::JID - Check if the JID of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{jids} ) ){
 		die ('No jids key specified in the argument hash');
 	}
-	if ( ref( \$args{jids} ) eq 'ARRAY' ){
+	if ( ref( $args{jids} ) ne 'ARRAY' ){
 		die ('The jids key is not a array');
 	}
 	if ( ! defined $args{jids}[0] ){
 		die ('Nothing defined in the jids array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				jids=>$args{jids},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -135,7 +136,7 @@ sub match{
 		my $jid=$self->{jids}[$jid_int];
 		if (
 			( $jid =~ /^[0-9]+$/ ) &&
-			( $jid eq $proc_jid )
+			( $jid == $proc_jid )
 			){
 			return 1;
 		}elsif( $jid =~ /^\<\=[0-9]+$/ ){
@@ -160,7 +161,7 @@ sub match{
 			}
 		}elsif( $jid =~ /^\![0-9]+$/ ){
 			$jid=~s/^\!//;
-			if ( $proc_jid ne $jid ){
+			if ( $proc_jid != $jid ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

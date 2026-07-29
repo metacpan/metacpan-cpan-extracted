@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::EUID - Check if the EUID of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{euids} ) ){
 		die ('No euids key specified in the argument hash');
 	}
-	if ( ref( \$args{euids} ) eq 'ARRAY' ){
+	if ( ref( $args{euids} ) ne 'ARRAY' ){
 		die ('The euids key is not a array');
 	}
 	if ( ! defined $args{euids}[0] ){
 		die ('Nothing defined in the euids array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				euids=>$args{euids},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -135,7 +136,7 @@ sub match{
 		my $euid=$self->{euids}[$euid_int];
 		if (
 			( $euid =~ /^[0-9]+$/ ) &&
-			( $euid eq $proc_euid )
+			( $euid == $proc_euid )
 			){
 			return 1;
 		}elsif( $euid =~ /^\<\=[0-9]+$/ ){
@@ -160,7 +161,7 @@ sub match{
 			}
 		}elsif( $euid =~ /^\![0-9]+$/ ){
 			$euid=~s/^\!//;
-			if ( $proc_euid ne $euid ){
+			if ( $proc_euid != $euid ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

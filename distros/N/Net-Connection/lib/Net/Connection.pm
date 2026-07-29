@@ -11,11 +11,14 @@ Net::Connection - Represents a network connection as a object.
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
+
+# cached DNS resolver shared by all objects doing PTR lookups
+our $dns_resolver;
 
 
 =head1 SYNOPSIS
@@ -204,6 +207,9 @@ then it will attempt to resolve the UID from the username.
 If set to true and uid is given, then a attempt will be made to
 resolve the UID to a username.
 
+If this is true and neither uid or username is defined,
+then new will die.
+
 =head4 username
 
 This is the username for a connection.
@@ -254,6 +260,15 @@ sub new{
 		die '$args{"uid"} is not numeric';
 	}
 
+	# resolving requires either a UID or username to work from
+	if (
+		$args{'uid_resolve'} &&
+		( !defined( $args{'uid'} ) ) &&
+		( !defined( $args{'username'} ) )
+		){
+		die '$args{"uid_resolve"} is true, but neither $args{"uid"} or $args{"username"} is defined';
+	}
+
 	# set the sendq/recvq and make sure they are numeric if given
 	if (
 		defined( $args{'sendq'} ) &&
@@ -278,6 +293,7 @@ sub new{
 			  'sendq' => undef,
 			  'recvq' => undef,
 			  'pid' => undef,
+			  'pid_start' => undef,
 			  'uid' => undef,
 			  'username' => undef,
 			  'state' => $args{'state'},
@@ -310,6 +326,9 @@ sub new{
 	if (defined( $args{'pid'} )){
 		$self->{'pid'}=$args{'pid'};
 	}
+	if (defined( $args{'pid_start'} )){
+		$self->{'pid_start'}=$args{'pid_start'};
+	}
 	if (defined( $args{'username'} )){
 		$self->{'username'}=$args{'username'};
 	}
@@ -328,24 +347,29 @@ sub new{
 
 	# resolve port names if asked to
 	if ( $args{ports} ){
+		# derive the base protocol for services lookups...
+		# tcp4, TCP6, tcpv4, and the like all become tcp
+		my $base_protocol=lc( $self->{'proto'} );
+		$base_protocol =~ s/v?[46]$//;
+
 		# If the port is non-numeric, set the name and attempt to resolve it.
 		if ( $self->{'local_port'} =~ /[A-Za-z]/ ){
 			$self->{'local_port_name'}=$self->{'local_port'};
-			my $service=getservbyname($self->{'local_port_name'}, undef);
+			my $service=getservbyname( $self->{'local_port_name'}, $base_protocol );
 			if (defined( $service )){
 				$self->{'local_port'}=$service;
 			}
 		}elsif( $self->{'local_port'} =~ /^[0-9]+$/ ){
-			$self->{'local_port_name'}=getservbyport( $self->{'local_port'}, 'tcp' );
+			$self->{'local_port_name'}=getservbyport( $self->{'local_port'}, $base_protocol );
 		}
 		if ( $self->{'foreign_port'} =~ /[A-Za-z]/	){
 			$self->{'foreign_port_name'}=$self->{'foreign_port'};
-			my $service=getservbyname($self->{'foreign_port_name'}, undef);
+			my $service=getservbyname( $self->{'foreign_port_name'}, $base_protocol );
 			if (defined( $service )){
 				$self->{'foreign_port'}=$service;
 			}
 		}elsif( $self->{'foreign_port'} =~ /^[0-9]+$/ ){
-			$self->{'foreign_port_name'}=getservbyport( $self->{'foreign_port'}, 'tcp' );
+			$self->{'foreign_port_name'}=getservbyport( $self->{'foreign_port'}, $base_protocol );
 		}
 	}else{
 		# If the port is non-numeric, set it as the port name
@@ -357,13 +381,15 @@ sub new{
 		}
 	}
 
-	my $dns=Net::DNS::Resolver->new;
-
 	# resolve PTRs if asked to
 	if (
 		defined( $args{ptrs} ) &&
 		$args{ptrs}
 		){
+		# create the resolver if a previous object has not already
+		if ( !defined( $dns_resolver ) ){
+			$dns_resolver=Net::DNS::Resolver->new;
+		}
 		# process foreign_host
 		if (
 			( $self->{'foreign_host'} =~ /[A-Za-z]/ ) &&
@@ -374,11 +400,14 @@ sub new{
 		}else{
 			# attempt to resolve it
 			eval{
-				my $answer=$dns->search( $self->{'foreign_host'} );
-				if ( defined( $answer->{answer}[0] ) &&
-					 ( ref( $answer->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
-					){
-					$self->{'foreign_ptr'}=lc($answer->{answer}[0]->ptrdname);
+				my $answer=$dns_resolver->search( $self->{'foreign_host'} );
+				if ( defined( $answer ) ){
+					my @answers=$answer->answer;
+					if ( defined( $answers[0] ) &&
+						 ( $answers[0]->type eq 'PTR' )
+						){
+						$self->{'foreign_ptr'}=lc( $answers[0]->ptrdname );
+					}
 				}
 			}
 		}
@@ -392,11 +421,14 @@ sub new{
 		}else{
 			# attempt to resolve it
 			eval{
-				my $answer=$dns->search( $self->{'local_host'} );
-				if ( defined( $answer->{answer}[0] ) &&
-					 ( ref( $answer->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
-					){
-					$self->{'local_ptr'}=lc($answer->{answer}[0]->ptrdname);
+				my $answer=$dns_resolver->search( $self->{'local_host'} );
+				if ( defined( $answer ) ){
+					my @answers=$answer->answer;
+					if ( defined( $answers[0] ) &&
+						 ( $answers[0]->type eq 'PTR' )
+						){
+						$self->{'local_ptr'}=lc( $answers[0]->ptrdname );
+					}
 				}
 			}
 		}
@@ -595,6 +627,20 @@ This may return undef.
 
 sub pid{
 	return $_[0]->{'pid'};
+}
+
+=head2 pid_start
+
+Returns the start time in seconds of the PID for the connection.
+
+This may return undef.
+
+    my $pid_start=$conn->pid_start;
+
+=cut
+
+sub pid_start{
+	return $_[0]->{'pid_start'};
 }
 
 =head2 proc

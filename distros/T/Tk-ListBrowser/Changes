@@ -1,5 +1,14 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.16  Date
+	- Fixed silly bug in 2-Tk-ListBrowser-columns-headers.t that caused a test to fail.
+	- Added option -guidecolor.
+	- Revisited selectiondrawing. Overlapping columns now show correct.
+	- The oscillating scrollbars problem has somewhat reduced. Modified OnConfigure.
+	- Completed the refresh mechanism.
+	- Wrote a chapter in the pod about cell sizes and refresh.
+	- Overlapping side columns have a small separator.
+
 0.15  Mon Jul 20 2026
 	- Fixed anchor drawing in a multi column setup.
 	- Fixed bad startXY when headers are present.

@@ -1,5 +1,8 @@
 Revision history for Statistics-Krippendorff
 
+0.06    2026-07-29
+        - Remove nltk comments, the issue has been fixed.
+
 0.05    2026-06-13
         - Avoid unitialised warnings (missing ordinal value).
 

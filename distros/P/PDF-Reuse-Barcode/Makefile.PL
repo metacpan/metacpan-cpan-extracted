@@ -5,7 +5,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'          => 'PDF::Reuse::Barcode',
     'VERSION_FROM'  => 'Barcode.pm',
-    'PREREQ_PM'     => {     'PDF::Reuse'                  => 0,
+    'PREREQ_PM'     => {     'Carp'                        => 0,
+                             'PDF::Reuse'                  => 0,
                              'GD::Barcode'                 => 0,
                              'GD::Barcode::Code39'         => 0,
                              'GD::Barcode::COOP2of5'       => 0,
@@ -19,6 +20,9 @@ WriteMakefile(
                              'GD::Barcode::UPCA'           => 0,
                              'GD::Barcode::UPCE'           => 0,
                              'Barcode::Code128'            => 0},
+    TEST_REQUIRES   => { 'Test::More' => 0,
+                         'File::Temp' => 0,
+                         'File::Spec' => 0 },
     LICENSE => 'perl',
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -35,7 +39,7 @@ WriteMakefile(
         provides => {
             'PDF::Reuse::Barcode' => {
                 file    => 'Barcode.pm',
-                version => '0.09',
+                version => '0.10',
             },
         },
     },

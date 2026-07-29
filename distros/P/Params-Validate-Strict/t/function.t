@@ -2000,4 +2000,61 @@ subtest 'validate_strict: union [string, stringref] — hashref rejected by both
 	);
 };
 
+# ══════════════════════════════════════════════════════════════════════════════
+# validate_strict — type: void
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'validate_strict: type void — undef value passes' => sub {
+	my $r = _vs({
+		schema => { result => { type => 'void' } },
+		input  => { result => undef },
+	});
+	ok(exists($r->{result}), 'void key present in result');
+	ok(!defined($r->{result}), 'void value is undef');
+};
+
+subtest 'validate_strict: type void — absent key passes (implicitly optional)' => sub {
+	my $r = _vs({
+		schema => { result => { type => 'void' } },
+		input  => {},
+	});
+	ok(!defined($r->{result}), 'absent void key yields undef');
+};
+
+subtest 'validate_strict: type void — defined value rejected' => sub {
+	for my $val (0, 1, '', 'hello', [], {}) {
+		my $label = ref($val) ? 'a ' . ref($val) . 'ref' : "\"$val\"";
+		_vs_throws(
+			{ schema => { result => { type => 'void' } }, input => { result => $val } },
+			qr/must be undef/,
+			"defined value $label rejected for void type"
+		);
+	}
+};
+
+subtest 'validate_strict: type void — multiple schema keys rejected' => sub {
+	_vs_throws(
+		{
+			schema => {
+				result => { type => 'void' },
+				extra  => { type => 'string', optional => 1 },
+			},
+			input => { result => undef },
+		},
+		qr/exactly one parameter/,
+		'void type with more than one schema key croaks'
+	);
+};
+
+subtest 'validate_strict: type void — error_msg override honoured' => sub {
+	_vs_throws(
+		{
+			schema => { result => { type => 'void', error_msg => 'custom void error' } },
+			input  => { result => 'not undef' },
+		},
+		qr/custom void error/,
+		'custom error_msg used for void type violation'
+	);
+};
+
 done_testing;

@@ -1,0 +1,54 @@
+* Overview
+
+|       WHEN | WHO | VER | WHAT                                            |
+| 2026-07-28 | I4W | 1.4 | Adding the Changelog                            |
+| 2026-07-27 | I4W | 1.3 | Sustantial CPAN depolyment corrections          |
+| 2026-07-27 | I4W | 1.2 | Technical CPAN depolyment corrections           |
+| 2026-07-27 | I4W | 1.1 | Refactoring towards PERL CPAN first Deployment  |
+| 2017-08-05 | I4W | 1.0 | Generate a published version for githup.com     |
+| 2012-03-12 | AWE | 0.1 | Initial script retrieve taxa for IfAÖ Bentos DB |
+
+* 1.4 -- 2026-07-28 CPAN Deployment Changelog
+
+- collection info from 2012 to 2026 to have a consistent log
+- generate a minimal changelog (ORG)
+- transferring it via ~pandoc~
+
+* 1.3 -- 2026-07-28 CPAN Deployment Corrections (substantial)
+
+- flagging [ExeDir] in DIZL
+- flagging [autoprerecq] to add used modules
+- managing [ReadmeFromPod]
+
+
+* 1.2 -- 2026-07-27 CPAN Deployment Corrections (technical)
+
+- fighting the DZIL configuration madness
+- add a full in line POD to ~lib/Net/WoRMS.pm~
+- change the abstract line
+
+* 1.1 -- 2026-07-27 CPAN Deployment
+
+- renaming the tool to ~bin/query-worms~
+- pin minimal Perl version v5.20 
+- switch to modern Perl syntax (signatures) keyword (match-case)
+- moved away form pure github.com published repo towards Dist::Zilla
+- add the module Net::WoRMS for abstraction and maintainability
+  in ~lib/Net/WoRMS.pm~
+- re-factor the CLI via Getopt::Long and Net::WoRMS
+- remove the buggy ~find-fuzzy~ task
+- add a full POD for ~bin/query-worms~
+
+* 1.0 -- 2017-08-01 Published Version for Github
+
+- publihed under bigopensky/web-harvester/worms-harvester.pl at github
+- cleaned mode selector via switch statement
+- minimal POD was added
+- licensing issues addessed und GPL/3
+  
+* 0.1 -- 2012-03-12  Initial release
+
+Initial release to track an correct taxa for the Benthos database of the
+Institute for Applied Ecology (IfAÖ).
+
+#@ 2026-07-28 I4W

@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Barcode::Code128" : "0",
+            "Carp" : "0",
             "GD::Barcode" : "0",
             "GD::Barcode::COOP2of5" : "0",
             "GD::Barcode::Code39" : "0",
@@ -48,12 +49,19 @@
             "GD::Barcode::UPCE" : "0",
             "PDF::Reuse" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "PDF::Reuse::Barcode" : {
          "file" : "Barcode.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -67,6 +75,6 @@
          "web" : "https://github.com/cnighswonger/PDF-Reuse-Barcode"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

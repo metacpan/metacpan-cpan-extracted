@@ -23,7 +23,7 @@ use File::Spec;
 use Google::Auth::EnvironmentVars;
 use Google::Auth::Exceptions;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has environment => (
     is      => 'ro',

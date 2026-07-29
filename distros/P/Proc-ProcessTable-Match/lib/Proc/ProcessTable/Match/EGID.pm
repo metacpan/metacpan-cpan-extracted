@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::EGID - Check if the EGID of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{egids} ) ){
 		die ('No egids key specified in the argument hash');
 	}
-	if ( ref( \$args{egids} ) eq 'ARRAY' ){
+	if ( ref( $args{egids} ) ne 'ARRAY' ){
 		die ('The egids key is not a array');
 	}
 	if ( ! defined $args{egids}[0] ){
 		die ('Nothing defined in the egids array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				egids=>$args{egids},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -135,7 +136,7 @@ sub match{
 		my $egid=$self->{egids}[$egid_int];
 		if (
 			( $egid =~ /^[0-9]+$/ ) &&
-			( $egid eq $proc_egid )
+			( $egid == $proc_egid )
 			){
 			return 1;
 		}elsif( $egid =~ /^\<\=[0-9]+$/ ){
@@ -161,7 +162,7 @@ sub match{
 		}
 		elsif( $egid =~ /^\![0-9]+$/ ){
 			$egid=~s/^\!//;
-			if ( $proc_egid ne $egid ){
+			if ( $proc_egid != $egid ){
 				return 1;
 			}
 		}
@@ -198,14 +199,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

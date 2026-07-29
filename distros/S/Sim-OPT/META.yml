@@ -20,7 +20,7 @@ no_index:
 requires:
   Data::Dump: '0'
   Data::Dumper: '0'
-  Devel::Repl: '0'
+  Devel::REPL: '0'
   File::Copy: '0'
   List::AllUtils: '0'
   List::Compare: '0'
@@ -36,6 +36,7 @@ requires:
   Set::Intersection: '0'
   Storable: '0'
   Switch::Back: '0'
+  Vector::Object3D::Polygon: '0'
   warnings::unused: '0'
-version: '0.903'
+version: '0.919'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

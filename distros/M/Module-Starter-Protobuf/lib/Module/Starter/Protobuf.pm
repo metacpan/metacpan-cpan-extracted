@@ -11,7 +11,7 @@ use File::Spec;
 use File::Basename qw(basename);
 use File::Which qw(which);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub create_distro {
     my ($self, %args) = @_;
@@ -128,6 +128,13 @@ sub create_modules {
 
     # First, let the base class create the standard module skeletons
     my @files = $self->SUPER::create_modules(@modules);
+
+    # Generate SECURITY.md
+    my $security_file = File::Spec->catfile($self->{basedir}, 'SECURITY.md');
+    my $security_guts = $self->SECURITY_md_guts();
+    $self->create_file($security_file, $security_guts);
+    $self->progress("Created $security_file");
+    push @files, 'SECURITY.md';
 
     # If no protobuf files are configured, behave like a standard starter
     return @files unless $self->{_protobuf_files};
@@ -793,6 +800,23 @@ EOF
 sub README_md_guts {
     my ($self, $build_fn, $date) = @_;
     return $self->README_guts($build_fn, $date);
+}
+
+sub SECURITY_md_guts {
+    my ($self) = @_;
+    my $link = $self->{security_link} || $ENV{SECURITY_LINK};
+    
+    if ($link) {
+        return "# Security Policy\n\nThis security policy covers all packages contained within this repository.\n\nTo report a security issue, please visit [$link]($link).\n";
+    } else {
+        my $author_str = ref($self->{author}) eq 'ARRAY' ? $self->{author}->[0] : $self->{author};
+        $author_str ||= 'Maintainer';
+        if ($author_str =~ /<([^>]+)>/) {
+            return "# Security Policy\n\n## Reporting a Vulnerability\n\nIf you discover a security vulnerability in this project, please report it to the maintainer:\n\n*   **Contact:** $author_str\n\nWe take security issues seriously and will respond to reports as quickly as possible.\n";
+        } else {
+            return "# Security Policy\n\n## Reporting a Vulnerability\n\nIf you discover a security vulnerability in this project, please report it to the maintainer.\n\nWe take security issues seriously and will respond to reports as quickly as possible.\n";
+        }
+    }
 }
 
 sub license_guts {

@@ -1,0 +1,26 @@
+#!include_default
+
+# version control / editors / local tooling
+^\.git/
+^\.github/
+^\.pcg/
+^\.claude/
+~$
+\.sw[po]$
+
+# local notes, not part of the distribution
+^CLAUDE\.md$
+
+# build products
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^EVx\.(c|o|bs)$
+\.o$
+\.bs$
+
+# previously built distributions
+^Net-WebSocket-EVx-[0-9._]+/
+^Net-WebSocket-EVx-[0-9._]+\.tar\.gz$

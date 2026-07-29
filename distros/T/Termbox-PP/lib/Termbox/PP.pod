@@ -190,10 +190,11 @@ grouped by functionality:
 
   my $rv = tb_init();
 
-Initializes the termbox library using C</dev/tty>.
+Initializes the termbox library using C</dev/tty> on Unix-like operating systems
+and C<$CONIN/$CONOUT> on Windows platforms.
 
 This is the most common entry point and should be called before any other
-API function. Internally, it is equivalent to:
+API function. For Unix-like operating systems, it is equivalent to:
 
   tb_init_file('/dev/tty');
 
@@ -217,11 +218,14 @@ Path to the tty device (e.g. C</dev/tty>).
 
 Returns C<TB_OK> on success or a negative error code on failure.
 
+Returns C<TB_ERR_WIN_UNSUPPORTED> on Windows platforms, as direct file 
+descriptor access is not supported. 
+
 =head2 tb_init_fd
 
   my $rv = tb_init_fd($ttyfd);
 
-Initializes the termbox library using an existing file descriptor.
+Initializes the termbox library using an existing file descriptor. 
 
 Arguments:
 
@@ -237,12 +241,15 @@ This is a convenience wrapper for C<tb_init_rwfd($ttyfd, $ttyfd)>.
 
 Returns C<TB_OK> on success or a negative error code on failure.
 
+Returns C<TB_ERR_WIN_UNSUPPORTED> on Windows platforms, as one file 
+descriptor access is not supported. Please use C<tb_init_rwfd()> instead.
+
 =head2 tb_init_rwfd
 
   my $rv = tb_init_rwfd($rfd, $wfd);
 
 Initializes the termbox library using separate read and write
-file descriptors.
+file descriptors (see L<IO::File> or L<Win32API::File> for details).
 
 Arguments:
 
@@ -700,9 +707,12 @@ Returns C<TB_OK> on success or a negative error code on failure.
 
 =head2 tb_get_fds
 
-  my $rv = tb_get_fds($ttyfd, $resizefd);
+  my $rv = tb_get_fds(\$ttyfd, \$resizefd);
 
 Returns internal file descriptors used by termbox.
+
+Returns C<TB_ERR_WIN_UNSUPPORTED> on Windows platforms, as direct file 
+descriptor access is not supported.
 
 Arguments:
 
@@ -1140,15 +1150,15 @@ Fields:
 
 =over
 
-=item * C<ch> (B<Int>)
+=item * C<ch> (B<PositiveOrZeroInt>)
 
 Unicode codepoint.
 
-=item * C<fg> (B<Int>)
+=item * C<fg> (B<PositiveOrZeroInt>)
 
 Foreground attributes.
 
-=item * C<bg> (B<Int>)
+=item * C<bg> (B<PositiveOrZeroInt>)
 
 Background attributes.
 
@@ -1178,14 +1188,14 @@ Example usage:
     print "Cluster size: ", scalar(@$cluster), "\n";
   }
 
-=item * C<nech> (B<Int>)
+=item * C<nech> (B<PositiveOrZeroInt>)
 
   my $n = $cell->nech();
 
 Returns the length of the extended grapheme cluster if it contains more
 than one codepoint, otherwise returns 0.
 
-=item * C<cech> (B<Int>)
+=item * C<cech> (B<PositiveOrZeroInt>)
 
   my $count = $cell->cech();
 
@@ -1229,7 +1239,7 @@ Fields:
 
 =over
 
-=item * C<type> (B<Int>)
+=item * C<type> (B<PositiveOrZeroInt>)
 
 Event type:
 
@@ -1237,15 +1247,15 @@ Event type:
   TB_EVENT_RESIZE
   TB_EVENT_MOUSE
 
-=item * C<key> (B<Int>)
+=item * C<key> (B<PositiveOrZeroInt>)
 
 Key constant (C<TB_KEY_*>). Used for special keys.
 
-=item * C<ch> (B<Int>)
+=item * C<ch> (B<PositiveOrZeroInt>)
 
 Unicode codepoint (for character input).
 
-=item * C<mod> (B<Int>)
+=item * C<mod> (B<PositiveOrZeroInt>)
 
 Modifier flags (bitmask of C<TB_MOD_*>):
 
@@ -1284,7 +1294,7 @@ Depending on the event type, the following fields are populated:
 
 =over
 
-=item * C<type> (B<Int>)
+=item * C<type> (B<PositiveOrZeroInt>)
 
 One of:
 
@@ -1292,15 +1302,15 @@ One of:
   TB_EVENT_RESIZE
   TB_EVENT_MOUSE
 
-=item * C<key> (B<Int>)
+=item * C<key> (B<PositiveOrZeroInt>)
 
 Key constant (C<TB_KEY_*>).
 
-=item * C<ch> (B<Int>)
+=item * C<ch> (B<PositiveOrZeroInt>)
 
 Unicode codepoint (for character input).
 
-=item * C<mod> (B<Int>)
+=item * C<mod> (B<PositiveOrZeroInt>)
 
 Modifier flags (C<TB_MOD_*>).
 
@@ -1409,7 +1419,7 @@ C<Unicode::UCD::prop_invmap> and C<Unicode::UCD::search_invlist> is available.
 
 =item * Disabled (default)
 
-Uses the bundled fallback implementation.
+Uses the bundled L<Terminal::WCWidth> implementation.
 
 =back
 
@@ -1468,6 +1478,23 @@ Defines the timeout (in milliseconds) used for fallback terminal size
 detection.
 
 Default: 1000 ms.
+
+=head2 TB_DEBUG_LEVEL
+
+Specifies the runtime debugging and tracing level.
+
+A value of C<0> disables all debugging output. Higher values enable 
+progressively more detailed diagnostic information.
+
+The exact meaning of individual levels is implementation-defined and may vary 
+between releases. In general, higher levels produce more verbose output, 
+including tracing of C<tb_*> function calls.
+
+Debug output is delivered through the user-defined
+C<Termbox::tb_debug_handler()> callback.
+
+If C<PERL_NDEBUG> or C<NDEBUG> is set, debugging support is disabled
+regardless of the value of C<TB_DEBUG_LEVEL>.
 
 =head2 TB_OPT_TRUECOLOR
 
@@ -2264,6 +2291,32 @@ Alias for C<TB_ERR_RESIZE_POLL>.
 For the upstream definition see
 L<termbox2.h|https://github.com/termbox/termbox2/blob/605398fa79108412976191e062ea14bd4bd30213/termbox2.h#L330>.
 
+=head3 Windows-specific error codes
+
+=over 4
+
+=item C<TB_ERR_WIN_RESIZE>
+
+Resize operation failed on Windows.
+
+=item C<TB_ERR_WIN_GET_CONMODE>
+
+Failed to get console mode on Windows.
+
+=item C<TB_ERR_WIN_SET_CONMODE>
+
+Failed to set console mode on Windows.
+
+=item C<TB_ERR_WIN_NO_STDIO>
+
+No standard input/output handles available on Windows.
+
+=item C<TB_ERR_WIN_UNSUPPORTED>
+
+The current Windows console does not support the requested operation.
+
+=back
+
 =head2 C<:func>
 
 Imports function hook type constants for use with
@@ -2311,6 +2364,17 @@ J. Schneider E<lt>L<http://github.com/brickpool>E<gt>
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
+
+=head1 ACKNOWLEDGEMENT
+
+The tracing and debugging helpers were inspired by the debug macro
+design used by C<libserialport>.
+
+The positional parameter checking API provided by C<compile()> was
+inspired by L<Type::Params>.
+
+Several template names follow conventions established by
+L<Types::Standard> and L<Types::Common>.
 
 =head1 REQUIRES
 

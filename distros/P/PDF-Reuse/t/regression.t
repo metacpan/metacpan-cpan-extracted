@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 19;
 use IO::String;
 use File::Temp qw(tempfile);
+use File::Spec;
 
 BEGIN {
     use_ok('PDF::Reuse') or BAIL_OUT "Can't load PDF::Reuse";
@@ -209,4 +210,114 @@ SKIP: {
     };
     ok($ok3, 'GitHub #24: Multiple prTTFont sessions do not crash')
         or diag("Error: $@");
+}
+
+# GitHub #21 / #22 (RT #103758, RT #103768)
+# %processed caches byte offsets keyed by filename. Reusing a filename for
+# fresh content within one session must not apply the old file's offsets to
+# the new bytes -- that failed with "Didn't find pages" on the second pass.
+{
+    my $dir = File::Temp->newdir();
+    my $tpl = File::Spec->catfile($dir, 'tpl.pdf');
+
+    my $build = sub {
+        my ($pages, $label) = @_;
+        prFile($tpl);
+        for my $p (1 .. $pages) {
+            prPage() if $p > 1;
+            prFontSize(24);
+            prText(72, 700, "$label page $p");
+        }
+        prEnd();
+    };
+
+    my $ok = eval {
+        for my $i (1 .. 3) {
+            $build->($i * 3, "ITER$i");
+            prFile(File::Spec->catfile($dir, "out_$i.pdf"));
+            prDoc($tpl);
+            prEnd();
+        }
+        1;
+    };
+    ok($ok, 'GitHub #21/#22: reusing a filename for new content does not die')
+        or diag("Error: $@");
+
+    # The cache must survive for a file that has NOT changed -- that is what it
+    # exists for, and clearing it wholesale would be a performance regression.
+    my $fixed = File::Spec->catfile($dir, 'fixed.pdf');
+    prFile($fixed);
+    prPage();
+    prText(72, 700, 'unchanged template');
+    prEnd();
+
+    prFile(File::Spec->catfile($dir, 'r1.pdf'));
+    prDoc($fixed);
+    prEnd();
+    my $first = do { no strict 'refs'; ${"PDF::Reuse::processed"}{$fixed}{root} };
+
+    prFile(File::Spec->catfile($dir, 'r2.pdf'));
+    prDoc($fixed);
+    prEnd();
+    my $second = do { no strict 'refs'; ${"PDF::Reuse::processed"}{$fixed}{root} };
+
+    ok(defined $first && defined $second,
+        'GitHub #21/#22: cache retained across reuse of an unchanged file');
+    is($second, $first,
+        'GitHub #21/#22: cached root is stable for an unchanged file');
+}
+
+# RT #123564 / GitHub #15
+# Embedded TrueType text must be extractable, which requires a /ToUnicode CMap.
+# Text::PDF::TTFont0's own ToUnicode support emits a malformed CMap (RT #123562,
+# unfixed upstream), so PDF::Reuse builds the mapping itself.
+SKIP: {
+    # Runners differ: Linux images carry DejaVu/Liberation, macOS keeps fonts
+    # under /System or /Library, Windows under the system root. Glob rather
+    # than list, so this exercises the CMap on every platform that has any
+    # TrueType font rather than silently skipping.
+    my @globs = (
+        '/usr/share/fonts/truetype/*/*.ttf',
+        '/usr/share/fonts/*/*.ttf',
+        '/Library/Fonts/*.ttf',
+        '/System/Library/Fonts/*.ttf',
+        '/System/Library/Fonts/Supplemental/*.ttf',
+        ($ENV{SystemRoot} ? "$ENV{SystemRoot}\\Fonts\\*.ttf" : ()),
+        'C:/Windows/Fonts/*.ttf',
+    );
+    my ($ttf) = grep { -r $_ } map { glob $_ } @globs;
+    skip 'no TrueType font available on this platform', 4 unless $ttf;
+    diag("using font: $ttf");
+
+    my $dir = File::Temp->newdir();
+    my $out = File::Spec->catfile($dir, 'tt.pdf');
+
+    prInitVars();
+    prFile($out);
+    prTTFont($ttf);
+    prFontSize(14);
+    prText(60, 700, 'Hello ToUnicode');
+    prEnd();
+
+    open my $fh, '<', $out or BAIL_OUT "can't read $out: $!";
+    binmode $fh;
+    my $pdf = do { local $/; <$fh> };
+    close $fh;
+
+    like($pdf, qr{/ToUnicode}, 'GitHub #15: /ToUnicode key present for TrueType font');
+    like($pdf, qr{beginbfchar}, 'GitHub #15: CMap uses bfchar mappings');
+    like($pdf, qr{currentdict}, 'GitHub #15: CMap trailer is well formed');
+
+    # Every section must declare exactly as many entries as it contains --
+    # a miscount produces a CMap some readers silently reject.
+    my @declared = $pdf =~ /(\d+) beginbfchar/g;
+    my @bodies   = $pdf =~ /beginbfchar\n(.*?)endbfchar/gs;
+    my $consistent = scalar(@declared) == scalar(@bodies);
+    if ($consistent) {
+        for my $i (0 .. $#declared) {
+            my $actual = grep { /\S/ } split /\n/, $bodies[$i];
+            $consistent = 0 if $actual != $declared[$i];
+        }
+    }
+    ok($consistent, 'GitHub #15: each bfchar section declares its true entry count');
 }

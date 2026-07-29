@@ -68,7 +68,7 @@ use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
 use Google::Cloud::Bigquery::V2::IcebergManagedTableConfig;
 use Google::Cloud::Bigquery::V2::ThriftOptions;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );

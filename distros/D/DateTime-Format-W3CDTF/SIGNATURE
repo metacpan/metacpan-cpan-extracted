@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.93.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,35 +12,34 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 b01d24935711b60a8476b5bea2bf986aafe74acb Changes
-SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
-SHA1 8616fe842e648129ff0383d9e0caab4a53e955cd MANIFEST
-SHA1 dfa06ed9526fc4a4d16ba26a2b2733897dc73de2 META.yml
-SHA1 dda389961c031ae551a39568f29bd10e33ff4ef4 Makefile.PL
-SHA1 bee25dfc8c7b9823a45ebc7cd4efade3bdbe39b0 README
-SHA1 8f033b8d00052585fd49221934f9df392981d798 examples/now.pl
-SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
-SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
-SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
-SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
-SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
-SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
-SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
-SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
-SHA1 bd0bb52d1802bdfd731cdf9dc3a358de005d9917 lib/DateTime/Format/W3CDTF.pm
-SHA1 ef4377c3768e7fe0b96151032b0ab184c0b57b5f meta/changes.ttl
-SHA1 71cbf0df8c25a43c7baf65877c60c852fae1f1c0 t/00load.t
-SHA1 1728f1baf5164a1ea328c5316d113d55788fdc3a t/01parse.t
-SHA1 ab204d2b9f47767b179a1d89b335a064e9cc76c8 t/02bugs.t
-SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a t/pod.t
-SHA1 9115f7ffe1933ad736dc292f3c89595b36ed6aa2 t/pod_coverage.t
+SHA256 26400302b935b59f0defcb4fb64572d143ffe71cff62528075fda4916729b34d Changes
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 8edfdc90710dc7f56fd3950412177c21875133e0d18935fcaa631dee0a702867 MANIFEST
+SHA256 023f782d3cb3b1355a1c24f5d48d77ad29d74f0c7038e83959e2d48d3e3f7404 META.yml
+SHA256 f4195623d1c2995bcf515bdf97c60fea29c64acfe50091b59c3fb157f97270a5 Makefile.PL
+SHA256 54e6cb528af76a2b196c9d32a7fe57ce5b20ea31cc36873adcc6303a423a32ff README
+SHA256 7512acfe6c5f63247282c5d1fb1f4289e4e32c20db6464e6e00aea3999f4490f examples/now.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 668306ae2fad17b3049f885251b8679497c4eb8d5c4b0d13f5c95bda331d1f00 inc/Module/Install/DOAPChangeSets.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 6fd1008dee9dbd86d2dbe3dd9d89870acfb424d47c0a75eac0d13896bcb40850 lib/DateTime/Format/W3CDTF.pm
+SHA256 8883444a0c8953fba143bffdc730febaa44ea4b123fe790ebe065deb30ba8367 meta/changes.ttl
+SHA256 4b212e05c750ee8045b165db118328493b9ab9e920997bbcceda6985fa282b86 t/00load.t
+SHA256 a8521c97643a64e80d89d5b28ec4a9c8a700c06a6fa4c5b5bd31b645ac28923c t/01parse.t
+SHA256 bb302419c6df70f2ab5f9bbcc89ebdc638eba49fa2980b1553b42a89c1af89af t/02bugs.t
+SHA256 2b04b20ff767801fde2fb6435361dc8ca0a9b60dda6cb0bbd18dd52962e1c1a3 t/pod.t
+SHA256 e6e078c49bc4b95f50305d90878d84cfdc5f2b327f7cbe8447523b52b609e87b t/pod_coverage.t
 -----BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAl/dfhoACgkQhPK6VMqoyC3k8ACeOO0KAgoEM+WptlMcrmYqTAUA
-jQgAoLRsa5YXyQj2WRKY8uMYdCbQZmd1
-=jLjc
+iF0EAREDAB0WIQSC+8GhU5AgVmDLxA+E8rpUyqjILQUCamiVYQAKCRCE8rpUyqjI
+Le96AJ9yyE5pCnabmEYvz5RAFJtZjcbbHQCgi6+mmm0GE9iWbPTnGoJgMwpBEJs=
+=0tED
 -----END PGP SIGNATURE-----

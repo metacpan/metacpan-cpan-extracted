@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::Fname - Check if the fname of a process matches via r
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -70,17 +70,27 @@ sub new{
 	if ( ! defined( $args{fnames} ) ){
 		die ('No fnames key specified in the argument hash');
 	}
-	if ( ref( \$args{fnames} ) eq 'ARRAY' ){
+	if ( ref( $args{fnames} ) ne 'ARRAY' ){
 		die ('The fnames key is not a array');
 	}
 	if ( ! defined $args{fnames}[0] ){
 		die ('Nothing defined in the fnames array');
 	}
 
+	# make sure each specified value compiles as a regex
+	my $regex_int=0;
+	while ( defined( $args{fnames}[$regex_int] ) ){
+		if ( ! eval{ qr/$args{fnames}[$regex_int]/ } ){
+			die (q{The value "}.$args{fnames}[$regex_int].q{" in the fnames array does not compile as a regex... }.$@);
+		}
+		$regex_int++;
+	}
+
+    my $class=$_[0];
     my $self = {
 				fnames=>$args{fnames},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -94,7 +104,7 @@ One argument is taken and that is a Proc::ProcessTable::Process object.
 The returned value is a boolean.
 
     if ( $checker->match( $proc ) ){
-        print "The connection matches.\n";
+        print "The process matches.\n";
     }
 
 =cut
@@ -158,14 +168,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

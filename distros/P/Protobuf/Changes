@@ -1,6 +1,7 @@
 Revision history for Protobuf
 
 0.12    2026-07-26
+    - Added SECURITY.md
         [Ecosystem Hardening & Parity]
         - Merged Google-Protobuf-WKT into core Protobuf distribution.
         - Bundled standard Well-Known Types (Timestamp, Any, Descriptor, etc.) directly in lib/Google/Protobuf/.

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.141-11-gddf5720f
+package OpenAPI::Modern; # git description: v0.142-4-g9244b208
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.142';
+our $VERSION = '0.143';
 
 use 5.020;
 use utf8;
@@ -156,6 +156,10 @@ sub validate_request ($self, $request, $options = {}) {
         }
 
         my $fc_name = $param_obj->{in} eq 'header' ? fc($param_obj->{name}) : $param_obj->{name};
+
+        # v3.2.0 §4.12.2.1: "If in is "header" and the name field is "Accept", "Content-Type" or
+        # "Authorization", the parameter definition SHALL be ignored."
+        next if $param_obj->{in} eq 'header' and elem($fc_name, [map fc, qw(Accept Content-Type Authorization)]);
 
         # v3.2.0 §4.10.1:"The list MUST NOT include duplicated parameters. A unique parameter is
         # defined by a combination of a name and location."
@@ -341,7 +345,10 @@ sub validate_response ($self, $response, $options = {}) {
     }
 
     foreach my $header_name (sort keys(($response_obj->{headers}//{})->%*)) {
+      # v3.2.0 §4.17.1: "If a response header is defined with the name "Content-Type", it SHALL be
+      # ignored."
       next if fc $header_name eq fc 'Content-Type';
+
       my $state = { %$state, keyword_path => jsonp($state->{keyword_path}, 'headers', $header_name) };
       my $header_obj = $response_obj->{headers}{$header_name};
       while (defined(my $ref = $header_obj->{'$ref'})) {
@@ -485,7 +492,8 @@ sub find_path_item ($self, $options, $state = {}) {
   # path_template from options
   return E({ %$state, ($options->{uri} ? (data_path => '/request/uri') : ()),
         keyword => 'paths' }, 'missing path "%s"', $options->{path_template})
-    if exists $options->{path_template} and not exists $schema->{paths}{$options->{path_template}};
+    if exists $options->{path_template}
+      and not exists(($schema->{paths}//{})->{$options->{path_template}});
 
   my $captures;  # hashref of template variable names -> concrete values from the uri
 
@@ -679,17 +687,13 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 sub _match_uri ($self, $method, $uri, $path_template, $state) {
   $uri = $uri->clone->fragment(undef)->query('');
 
-  # RFC9112 §3.2.1-3: "If the target URI's path component is empty, the client MUST send "/" as the
-  # path within the origin-form of request-target." This also lets us match a path template of "/".
-  # we don't call $uri->path->leading_slash(1) because it normalizes escaped characters like /
-  $uri->path('/') if $uri->path eq '';
-
   # v3.2.0 §4.8.2, "Path Templating": "The value for these path parameters MUST NOT contain any
   # unescaped “generic syntax” characters described by RFC3986 Section 3: forward slashes (/),
   # question marks (?), or hashes (#)."
-  my $path_pattern = join '',
-    map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)),
-    split /(\{[^{}]+\})/, $path_template;
+  # If the path template equals '/' then we should ALWAYS match, and propagate to server url matching
+  my $path_pattern = $path_template eq '/' ? ''
+    : join '', map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)),
+      split /(\{[^{}]+\})/, $path_template;
 
   # if the uri doesn't match against the path alone, we can immediately bail (and keep looking for
   # another /paths entry that might match)... this also saves us needless parsing of server objects
@@ -698,7 +702,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
   return if $uri !~ m/$path_pattern\z/;
 
   # identify the unmatched part of the request URI, to be later matched against server urls
-  my $uri_prefix = substr($uri, 0, -length($&));
+  my $uri_prefix = $path_template eq '/' ? $uri : substr($uri, 0, -length($&));
 
   # extract all capture values from path template variables: ($1 .. $n)
   # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
@@ -758,14 +762,18 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
       ->to_abs($self->openapi_document->retrieval_uri)
       ->to_abs($uri);
 
-    # strips slash if path is '/'; otherwise has no effect on stringified URI
-    $normalized_server_url->path->leading_slash(0);
+    my $normalized_host = $normalized_server_url->host;
+
+    # note: this stringifies the uri.
+    # we don't call $uri->path->leading_slash(0) because it normalizes escaped characters like /
+    $normalized_server_url =~ s{/\z}{} if $normalized_server_url->path eq '/';
 
     my $server_pattern = join '',
       map +($_ eq '%00' ? '([^/?#]*)' : quotemeta($_)),
       split /(%00)/, $normalized_server_url;  # all NULs appear as %00 in the stringified form
     do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, '^'.$server_pattern }
       if exists $state->{debug};
+
     next if $uri_prefix !~ m/^$server_pattern\z/;
 
     # extract all capture values from server variables: ($1 .. $n)...
@@ -773,7 +781,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
     my @server_capture_values = map substr($uri_prefix, $-[$_], $+[$_]-$-[$_]), 1 .. $#-;
 
     # ...and punycode-decode those from the host, and url-unescape those from the path
-    my $host_variable_count = ()= ($normalized_server_url->host//'') =~ /\x00/g;
+    my $host_variable_count = ()= ($normalized_host//'') =~ /\x00/g;
     @server_capture_values = (
       (map +(/^xn--(.+)\z/ ? punycode_decode($1) : $_), @server_capture_values[0 .. $host_variable_count-1]),
       (map uri_decode($_), @server_capture_values[$host_variable_count .. $#server_capture_values]));
@@ -977,8 +985,6 @@ sub _deserialize_query_parameter ($self, $state, $param_obj, $params) {
 sub _deserialize_header_parameter ($self, $state, $header_obj, $header_name, $headers) {
   croak '$headers must be a Mojo::Headers object'
     if not blessed($headers) or not $headers->isa('Mojo::Headers');
-
-  return if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
 
   # temporary, until the ABNF is enforced in the OAD schema
   return E($state, 'non-ascii character detected in header name: not deserializable')
@@ -2309,7 +2315,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.142
+version 0.143
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

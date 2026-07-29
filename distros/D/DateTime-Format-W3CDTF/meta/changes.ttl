@@ -29,8 +29,20 @@ my:project
 	doap:download-page		<https://metacpan.org/release/DateTime-Format-W3CDTF/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
 	:release				my:v_0-03 , my:v_0-04 , my:v_0-05 , my:v_0-06 ,
-							my:v_0-07 , my:v_0-08 ;
+							my:v_0-07 , my:v_0-08 , my:v_0-09 ;
 	.
+
+my:v_0-09
+	a					:Version ;
+	dc:issued			"2026-07-24"^^xsd:date ;
+	:revision			"0.09" ;
+	dcterms:replaces	my:v_0-08 ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Fix nanosecond value to be an integer for Specio 0.50+ compatibility (#4 by @hitode909)" ]
+	]
+	.
+
 
 my:v_0-08
 	a					:Version ;

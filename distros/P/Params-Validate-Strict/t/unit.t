@@ -1849,4 +1849,248 @@ subtest 'values + max → "makes no sense" error' => sub {
 	} qr/makes no sense with memberof/, 'values combined with max croaks';
 };
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# API Ledger  (tracks new documented states added in this session)
+# Each subtest that exercises a state deletes its entry from %ledger.
+# The assertion at the bottom verifies full coverage of these states.
+# ══════════════════════════════════════════════════════════════════════════════
+
+my %ledger = (
+	'void: undef value passes'               => 1,
+	'void: defined integer rejected'         => 1,
+	'void: multiple-key schema rejected'     => 1,
+	'void: error_msg override'               => 1,
+	'type num: synonym for number'           => 1,
+	'type double: synonym for number'        => 1,
+	'minimum: alias for min on string'       => 1,
+	'minimum: alias for min on integer'      => 1,
+	'semantic: unix_timestamp valid'         => 1,
+	'semantic: unix_timestamp below 0'       => 1,
+	'semantic: unix_timestamp above max'     => 1,
+	'semantic: unknown semantic warns'       => 1,
+	'as_string on rule value'                => 1,
+	'control chars stripped from error msg'  => 1,
+	'invalid unknown_parameter_handler'      => 1,
+	'unknown rule name croaks'               => 1,
+);
+
+# ── type: void ───────────────────────────────────────────────────────────────
+# void asserts the parameter value is undef; exactly one key allowed in schema.
+
+subtest 'type void: undef value passes' => sub {
+	my $r = validate_strict(
+		schema => { result => { type => 'void' } },
+		input  => { result => undef },
+	);
+	ok(exists $r->{result}, 'void key present in result');
+	ok(!defined($r->{result}), 'void value is undef');
+	delete $ledger{'void: undef value passes'};
+};
+
+subtest 'type void: defined integer value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { result => { type => 'void' } },
+			input  => { result => 0 },
+		)
+	} qr/must be undef/, 'defined integer 0 rejected for void type';
+	delete $ledger{'void: defined integer rejected'};
+};
+
+subtest 'type void: multiple-key schema rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { result => { type => 'void' }, extra => { type => 'string', optional => 1 } },
+			input  => { result => undef },
+		)
+	} qr/requires exactly one parameter/, 'void type with multiple schema keys croaks';
+	delete $ledger{'void: multiple-key schema rejected'};
+};
+
+subtest 'type void: error_msg override honoured' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { result => { type => 'void', error_msg => 'no return value expected' } },
+			input  => { result => 'oops' },
+		)
+	} qr/no return value expected/, 'custom error_msg used for void type violation';
+	delete $ledger{'void: error_msg override'};
+};
+
+# ── type synonyms: num and double ────────────────────────────────────────────
+
+subtest 'type num: synonym for number — valid value accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'num' } },
+		input  => { n => '3.14' },
+	);
+	ok(defined $r->{n}, 'num type: value returned');
+	is($r->{n} + 0, 3.14, 'num: numeric coercion applied');
+	delete $ledger{'type num: synonym for number'};
+};
+
+subtest 'type double: synonym for number — valid value accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'double' } },
+		input  => { n => '2.718' },
+	);
+	ok(defined $r->{n}, 'double type: value returned');
+	delete $ledger{'type double: synonym for number'};
+};
+
+# ── minimum alias for min ─────────────────────────────────────────────────────
+
+subtest 'minimum: string too short is rejected (minimum alias)' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', minimum => 5 } },
+			input  => { s => 'hi' },
+		)
+	} qr/too short/, 'minimum alias: short string rejected';
+	delete $ledger{'minimum: alias for min on string'};
+};
+
+subtest 'minimum: integer below minimum is rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', minimum => 10 } },
+			input  => { n => 5 },
+		)
+	} qr/at least 10/, 'minimum alias: integer below threshold rejected';
+	delete $ledger{'minimum: alias for min on integer'};
+};
+
+# ── semantic: unix_timestamp ──────────────────────────────────────────────────
+# Bug fixed: error() → _error() so the handler now correctly croaks.
+
+subtest 'semantic unix_timestamp: valid value passes' => sub {
+	my $r;
+	lives_ok {
+		$r = validate_strict(
+			schema => { ts => { type => 'integer', semantic => 'unix_timestamp' } },
+			input  => { ts => 1_000_000 },
+		)
+	} 'valid unix timestamp does not croak';
+	is($r->{ts}, 1_000_000, 'timestamp value preserved');
+	delete $ledger{'semantic: unix_timestamp valid'};
+};
+
+subtest 'semantic unix_timestamp: negative value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { ts => { type => 'integer', semantic => 'unix_timestamp' } },
+			input  => { ts => -1 },
+		)
+	} qr/Invalid Unix timestamp/, 'negative timestamp croaks';
+	delete $ledger{'semantic: unix_timestamp below 0'};
+};
+
+subtest 'semantic unix_timestamp: value above 2147483647 rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { ts => { type => 'integer', semantic => 'unix_timestamp' } },
+			input  => { ts => 2_147_483_648 },
+		)
+	} qr/Invalid Unix timestamp/, 'out-of-range timestamp croaks';
+	delete $ledger{'semantic: unix_timestamp above max'};
+};
+
+subtest 'semantic: unsupported semantic type emits warning but does not croak' => sub {
+	my @w;
+	local $SIG{__WARN__} = sub { push @w, @_ };
+	lives_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', semantic => 'future_type' } },
+			input  => { n => 42 },
+		)
+	} 'unknown semantic: does not croak';
+	ok(scalar @w > 0, 'unknown semantic emits a warning');
+	delete $ledger{'semantic: unknown semantic warns'};
+};
+
+# ── as_string() on schema rule values ────────────────────────────────────────
+# Rule values that are blessed objects with as_string() are coerced to their
+# string representation before the rule check runs.  This lets callers pass
+# objects (e.g. value objects from their domain model) as min/max/matches.
+
+{
+	package Unit::MinValue;
+	sub new    { bless { val => $_[1] }, $_[0] }
+	sub as_string { $_[0]->{val} }
+}
+
+subtest 'as_string on rule value: object coerced to string for min check' => sub {
+	# Unit::MinValue->new(3)->as_string returns '3'; the string must be >= 3 chars.
+	my $r = validate_strict(
+		schema => { s => { type => 'string', min => Unit::MinValue->new(3) } },
+		input  => { s => 'abc' },
+	);
+	is($r->{s}, 'abc', 'as_string coercion: 3-char string accepted when min object stringifies to 3');
+
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', min => Unit::MinValue->new(5) } },
+			input  => { s => 'hi' },
+		)
+	} qr/too short/, 'as_string coercion: short string rejected when min object stringifies to 5';
+	delete $ledger{'as_string on rule value'};
+};
+
+# ── control-character stripping in error messages ────────────────────────────
+# _error() strips [[:cntrl:]] from the assembled message before logging or
+# croaking, so CRLF-injection or NUL bytes in parameter values cannot corrupt
+# log lines.
+
+subtest 'control chars stripped from error message' => sub {
+	# CR and LF embedded in a parameter value would normally appear verbatim in
+	# the error string, enabling log injection.  _error() replaces [[:cntrl:]]
+	# with spaces so the assembled message is safe before croak fires.
+	my $evil = "bad\r\nvalue";
+	my $err = '';
+	eval {
+		validate_strict(
+			schema => { n => { type => 'integer' } },
+			input  => { n => $evil },
+		)
+	};
+	$err = $@ // '';
+	ok(length($err) > 0, 'validation failed (control-char value is not an integer)');
+	# CR must not appear; Carp appends a trailing "\n" which is allowed.
+	unlike($err, qr/\r/, 'no raw CR in the error message');
+	# The stripped value should appear as "bad  value" (two spaces for CR+LF).
+	like($err, qr/bad  value/, 'control chars in value replaced with spaces in error');
+	delete $ledger{'control chars stripped from error msg'};
+};
+
+# ── invalid unknown_parameter_handler value ───────────────────────────────────
+
+subtest 'unknown_parameter_handler: invalid value croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema                    => { name => { type => 'string' } },
+			input                     => { name => 'Alice', extra => 'x' },
+			unknown_parameter_handler => 'frobnicate',
+		)
+	} qr/unknown_parameter_handler must be one of die, warn, ignore/, 'invalid handler value croaks';
+	delete $ledger{'invalid unknown_parameter_handler'};
+};
+
+# ── unknown rule name ─────────────────────────────────────────────────────────
+
+subtest 'unknown rule name in schema croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', blah_xyz_unknown => 1 } },
+			input  => { n => 5 },
+		)
+	} qr/Unknown rule 'blah_xyz_unknown'/, 'unrecognised rule name croaks';
+	delete $ledger{'unknown rule name croaks'};
+};
+
+# ── Ledger assertion ──────────────────────────────────────────────────────────
+
+ok(!%ledger, 'all new documented states have been triggered by subtests')
+	or diag('Untested states: ', join(', ', sort keys %ledger));
+
 done_testing;

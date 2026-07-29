@@ -139,7 +139,7 @@ use warnings;
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Descriptor::File;
 use Protobuf::Descriptor::MessageDef;

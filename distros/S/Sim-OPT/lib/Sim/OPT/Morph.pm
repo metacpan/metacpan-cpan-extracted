@@ -1343,6 +1343,12 @@ sub morph
         my $laxmode = "n";
         my ( @countvars, @countsteps, %hashis );
 
+        # December/basic behaviour: in ordinary mode Morph acts on the single
+        # variable/level carried by the instance.  OPTcue::relax is allowed to
+        # expand this only when it explicitly returns laxmode = y.
+        @countvars  = ( $countvar );
+        @countsteps = ( $countstep );
+
         if ( Sim::OPT::checkOPTcue )
         {
           my ( $countvars_r, $countsteps_r, $laxmod, $hashis_r )
@@ -1351,23 +1357,12 @@ sub morph
           $laxmode = $laxmod // "n";
           %hashis  = ( ref($hashis_r) eq "HASH" ) ? %{$hashis_r} : ();
 
-          # In laxmode (e.g. newrandompick), always morph ONLY the variables in the current block.
-          # This prevents later (non-block) vars from overwriting the effects of the block vars.
+          # Only genuine laxmode may expand one instance into a block-vector.
           if ( $laxmode eq "y" )
           {
             @countvars  = @blockelts;
             @countsteps = map { $hashis{$_} } @countvars;
           }
-          else
-          {
-            @countvars  = @$countvars_r;
-            @countsteps = @$countsteps_r;
-          }
-        }
-        else
-        {
-          @countvars  = ( $countvar );
-          @countsteps = ( $countstep );
         }
 
         # Keep scalar countvar/countstep in the instance for downstream stages (Sim::OPT::Sim) when in laxmode.
@@ -1402,6 +1397,7 @@ sub morph
 
 		my %varnums = %{ $d{varnums} };
 		my %mids = %{ $d{mids} };
+        my %carrier = %{ $d{carrier} };
 		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
 
 		my $varnumber = $countvar;
@@ -1502,29 +1498,45 @@ sub morph
 				my $sequencer = $$general_variables[1];
 				my $dffile = "df-$file.txt";
 
-                #my $target = $to{crypto};
-                #my $orig = $orig{crypto};
+                my $target = $to{crypto};
+                my $orig = $orig{crypto};
 
-                my $starttarget = Sim::OPT::giveback( \%mids );  #say  "STARTTARGET $starttarget";
-				my $semph = 0;
-				unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
-				{
-					$starttarget = "$mypath/$file" . "_" . "$starttarget"; say  "\$starttarget $starttarget";
-					if ( not ( -e $starttarget ) )
-					{
-                        if ( !defined($dowhat{names}) || $dowhat{names} ne "short" )
-                        {
-                          my $starttarget = Sim::OPT::giveback( \%mids );
-                          $starttarget = "$mypath/$file" . "_" . "$starttarget";
-                          if ( not ( -e $starttarget ) )
-                          {
-                            `cp -R $mypath/$file $starttarget`;
-                            say "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
-                          }
-                        }
-					}
-					$semph++;
-				}
+                my $starttarget = Sim::OPT::giveback( \%mids );  #say  "STARTTARGET $starttarget";#DDD#HERE
+
+                my $starttarget_path = "$mypath/$file" . "_" . "$starttarget";
+
+                my $semph = 0;
+                unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
+                {
+                  if ( not ( -e $starttarget_path ) )
+                  {
+                    `cp -R $mypath/$file $starttarget_path`;
+                    say "LEVEL 0a: cp -R $mypath/$file $starttarget_path\n";
+                  }
+                  $semph++;
+                }
+
+
+
+				#my $semph = 0;
+				#unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
+				#{
+				#	$starttarget = "$mypath/$file" . "_" . "$starttarget"; say  "\$starttarget $starttarget";
+				#	if ( not ( -e $starttarget ) )
+				#	{
+                #        if ( !defined($dowhat{names}) || $dowhat{names} ne "short" )
+                #        {
+                #          my $starttarget = Sim::OPT::giveback( \%mids );
+                #          $starttarget = "$mypath/$file" . "_" . "$starttarget";
+                #          if ( not ( -e $starttarget ) )
+                #          {
+                #            `cp -R $mypath/$file $starttarget`;
+                #            say "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
+                #          }
+                #        }
+				#	}
+				#	$semph++;
+				#}
                 
 
 				#if ( ( ( ( $countblock > 0 ) and ( $countstep > 1 ) ) and ( not ( ( $dirfiles{randompick} eq "y" ) and ( $dirfiles{ga} eq "y" ) ) ) )
@@ -1543,19 +1555,14 @@ sub morph
                           or ( ( $laxmode eq "y" ) and ( $countp > 0 ) ) 
                           ) #HERE I.
 						{
-							#if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) or ( $dirfiles{patternsearch} )
-                               #or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) 
-                               # or ( $dirfiles{NSGAII} eq "y" ) or ( $dirfiles{NSGAIII} eq "y" ) 
-                           # or ( $dirfiles{simulatedannealing} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) 
-                           #or ( $dirfiles{pso} eq "y" ) or ( $dirfiles{armijo} eq "y" ) 
-                           #or ( $dirfiles{neldermead} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) )                           )
+							if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
 							{
 								if ( ( "begin" ~~ @whatto ) and ( not ( "end" ~~ @whatto ) ) and ( $dowhat{jumpinst} eq "y" ) )
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
 									if ( ( not ( -e $orig ) ) 
-                                     #and ( $origin eq $starttarget )
+                                     and ( $origin eq $starttarget )
                                       )
 									{
 										$orig = "$mypath/$file";
@@ -1571,7 +1578,7 @@ sub morph
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}";
 									if ( ( not ( -e $orig ) ) 
-                                     #and ( $origin eq $starttarget ) 
+                                     and ( $origin eq $starttarget ) 
                                       )
 									{
 										$orig = "$mypath/$file";
@@ -1589,7 +1596,7 @@ sub morph
 									$orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
 									if ( ( not ( -e $orig ) ) 
-                                     #( AND $origin eq $starttarget ) 
+                                     and ( $origin eq $starttarget ) 
                                       )
 									{
 										$orig = "$mypath/$file";
@@ -1605,9 +1612,7 @@ sub morph
 								{
 									$orig = "$orig{crypto}";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) )
-                                     #and ( $origin eq $starttarget )
-                                      )
+									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1623,7 +1628,7 @@ sub morph
 	                                $orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}";
 									if ( ( not ( -e $orig ) )  
-                                     #and ( $origin eq $starttarget ) 
+                                     and ( $origin eq $starttarget ) 
                                       )
 									{
 										$orig = "$mypath/$file";
@@ -1638,9 +1643,7 @@ sub morph
 								{
 	                                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) )
-                                     #and ( $origin eq $starttarget ) 
-                                      )
+									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1656,7 +1659,7 @@ sub morph
 	                                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
 									if ( ( not ( -e $orig ) )  
-                                     #and ( $origin eq $starttarget ) 
+                                     and ( $origin eq $starttarget ) 
                                       )
 									{
 										$orig = "$mypath/$file";
@@ -1670,7 +1673,70 @@ sub morph
 
 							}
 
-							if ( ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{newrandompick} eq "y" ) ) 
+
+
+                            my @optcue_expand_modes = qw(
+                              randompick
+                              newrandompick
+                              fundamentality
+                              newenumerate
+                              ga
+                              patternsearch
+                              neldermead
+                              armijo
+                              NSGAII
+                              pso
+                              simulatedannealing
+                              NSGAIII
+                              MOEAD
+                              SPEA2
+                            );
+
+                            my $optcue_expand_mode = "";
+
+                            foreach my $mode ( @optcue_expand_modes )
+                            {
+                              if ( ( $dirfiles{$mode} || "" ) eq "y" )
+                              {
+                                $optcue_expand_mode = $mode;
+                                last;
+                              }
+                            }
+
+                            # Direct/generated OPTcue modes create a full target instance directly.
+                            # Legacy randompick/latinhypercube/ga keep their begin/transition/end
+                            # source-copy logic above, so this block does not disturb that machinery.
+                            if ( ( $optcue_expand_mode ne "" )
+                              and ( ( $dirfiles{randompick} || "" ) ne "y" )
+                              and ( ( $dirfiles{latinhypercube} || "" ) ne "y" )
+                              and ( ( $dirfiles{ga} || "" ) ne "y" ) )
+                            {
+                              $target = "$to{crypto}";
+                              $orig   = "$orig{crypto}";
+
+                              if ( not ( -e $target ) )
+                              {
+                                if ( defined( $orig ) and ( $orig ne "" ) and ( -e $orig ) )
+                                {
+                                  `cp -R $orig $target`;
+                                  say "LEVEL 1N [$optcue_expand_mode]: cp -R $orig $target\n";
+                                }
+                                elsif ( defined( $origin )
+                                        and defined( $starttarget )
+                                        and ( $origin eq $starttarget ) )
+                                {
+                                  my $baseorig = "$mypath/$file";
+                                  `cp -R $baseorig $target`;
+                                  say "LEVEL 1N [$optcue_expand_mode]: cp -R $baseorig $target\n";
+                                }
+                                else
+                                {
+                                  die "MORPH NEWMODE SOURCE ERROR [$optcue_expand_mode]: origin=$origin starttarget=$starttarget chosen_orig=$orig target=$target is=$is countvar=$countvar countstep=$countstep\n";
+                                }
+                              }
+                            }
+
+							if ( ( $optcue_expand_mode eq "" ) and ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{newrandompick} eq "y" ) ) 
                               and ( not ( $dirfiles{patternsearch} eq "y" ) ) and ( not ( $dirfiles{latinhypercube} eq "y" ) )
 							  and ( not ( $dirfiles{ga} eq "y" ) ) and ( not ( $dirfiles{simulatedannealing} eq "y" ) )
                               and ( not ( $dirfiles{armijo} eq "y" ) ) and ( not ( $dirfiles{NSAII} eq "y" ) )
@@ -1682,9 +1748,7 @@ sub morph
 								$orig;
 								$target = "$to{crypto}";
 
-								if ( ( not ( -e $origin ) ) 
-                                 #and ( $origin eq $starttarget ) 
-                                 )
+								if ( ( not ( -e $origin ) ) and ( $origin eq $starttarget ) )
 								{
 									$orig = "$mypath/$file";
 								}
@@ -1703,6 +1767,10 @@ sub morph
 
 						my $to = $target; #say  "\$to: $to!!!"; ### TAKE CARE!!! REASSIGNIMENT!!!
 						my $from = $orig; #say  "\$from: $from!!!"; ### TAKE CARE!!! REASSIGNIMENT!!!
+
+                        if ( ( !defined $to  ) and ( $from eq "" ) ) { say "EXITING: \$to and \$from are not assigned."; }
+                        if ( !defined $to ) { say "EXITING: \$to is not assigned."; }
+                        if ( !defined $from ) { say "EXITING: \$from is not assigned."; }
 
 						if ( $dowhat{actonmodels} eq "y" )
 						{ #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 6";
@@ -2223,18 +2291,20 @@ sub morph
 								}
 
 
-                                if ( $laxmode eq "n" )
+                                if ( $laxmode eq "nXXX" )
                                 {
                                   if ( ( ( $countvar == $blockelts[-1] ) ) and ( $countstep == $varnums{$countvar} ) 
                                        and ( $countop == $#applytype ) and ( $dowhat{shadeupdate} eq "y" ) )
                                   {
+                                    if ( !defined $to ) { say "STOPPING IN CALLING. \$to UNDEFINED." and die; }
+                                    say "CALLING RECALCULATEISH WITH \$to: $to";
                                     recalculateish( $to, $stepsvar, $countop, 
                                         $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
                                         \@menus, $countinstance, \%dowhat );
                                         #say  "FOUNDIT";
                                   }
                                 }
-                                elsif( $laxmode eq "y" )
+                                elsif( $laxmode eq "yXXX" )
                                 {
                                  if ( ( $countvar == $blockelts[-1] ) and ( $countop == $#applytype ) and ( $dowhat{shadeupdate} eq "y" ) )
                                  {
@@ -4096,6 +4166,7 @@ sub recalculateish
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance, $dowhat_r ) = @_;
 
+    if ( !defined $to ) { say "STOPPING IN RECALCULATEISH: \$to IS UNDEFINED." and die; }
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my $recalculateish = $recalculateish_ref->[ $countop ];
@@ -4115,7 +4186,8 @@ sub recalculateish
 	if ( ( $whatto eq "y" ) or ( $dowhat{shadeupdate} eq "y" ) )
 	{
 	  $printthis =
-"cd $to/cfg/
+"
+cd $to/cfg/
 prj -file $fileconfig -mode script<<YYY
 m
 c
@@ -4190,6 +4262,7 @@ YYY
 
 	unless ($exeonfiles eq "n")
 	{
+      "say TO: $to";
       print `$printthis`;
 	}
 

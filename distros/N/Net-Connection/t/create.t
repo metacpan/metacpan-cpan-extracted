@@ -238,6 +238,17 @@ eval{
 };
 ok( $worked eq '0', 'uid non-numeric check') or diag("Created a object when uid was non-numeric");
 
+# Makes sure uid_resolve errors if both uid and username are undef
+$test->{'uid'}=undef;
+$test->{'username'}=undef;
+$test->{'uid_resolve'}='1';
+$worked=0;
+eval{
+	$object=Net::Connection->new( $test );
+	$worked=1;
+};
+ok( $worked eq '0', 'uid_resolve undef uid/username check') or diag("Created a object when uid_resolve was true and both uid and username were undef");
+
 # UID resolving tests if on unix
 if (
 	( $^O =~ /bsd$/ ) ||
@@ -271,5 +282,150 @@ if (
 	ok( $worked eq '0', 'root->uid 0 resolve check') or diag("Unable to resolve root to UID 0");
 }
 
-my $tests_ran=15+$extra_tests;
+# Make sure what is set via new is what the accessors return
+my $accessor_args={
+		  'foreign_host' => '10.0.0.1',
+		  'local_host' => '10.0.0.2',
+		  'foreign_port' => '22',
+		  'local_port' => '11132',
+		  'proto' => 'tcp4',
+		  'state' => 'ESTABLISHED',
+		  'sendq' => '1',
+		  'recvq' => '2',
+		  'pid' => '33',
+		  'uid' => '1000',
+		  'username' => 'someuser',
+		  'proc' => '/usr/bin/perl',
+		  'wchan' => 'kqread',
+		  'pctcpu' => '1.5',
+		  'pctmem' => '2.5',
+		  'pid_start' => '12345',
+		  'local_ptr' => 'a.example.com',
+		  'foreign_ptr' => 'b.example.com',
+		  };
+$object=Net::Connection->new( $accessor_args );
+my @round_trip_accessors=(
+						  'foreign_host', 'local_host', 'foreign_port', 'local_port',
+						  'proto', 'state', 'sendq', 'recvq', 'pid', 'uid', 'username',
+						  'proc', 'wchan', 'pctcpu', 'pctmem', 'pid_start',
+						  'local_ptr', 'foreign_ptr',
+						  );
+foreach my $accessor_name (@round_trip_accessors){
+	is( $object->$accessor_name, $accessor_args->{$accessor_name}, $accessor_name.' round trip check' );
+}
+
+# Numeric ports with the ports option unset should leave the port names undef
+is( $object->local_port_name, undef, 'numeric local port, no ports option, name undef check' );
+is( $object->foreign_port_name, undef, 'numeric foreign port, no ports option, name undef check' );
+
+# Named ports with the ports option unset should be copied to the name and otherwise left as is
+my $named_ports_args={
+		  'foreign_host' => '10.0.0.1',
+		  'local_host' => '10.0.0.2',
+		  'foreign_port' => 'smtp',
+		  'local_port' => 'ssh',
+		  'proto' => 'tcp4',
+		  'state' => 'ESTABLISHED',
+		  };
+$object=Net::Connection->new( $named_ports_args );
+is( $object->local_port, 'ssh', 'named local port, no ports option, port check' );
+is( $object->local_port_name, 'ssh', 'named local port, no ports option, name check' );
+is( $object->foreign_port, 'smtp', 'named foreign port, no ports option, port check' );
+is( $object->foreign_port_name, 'smtp', 'named foreign port, no ports option, name check' );
+
+# The ports option with numeric ports should resolve names using the connection protocol
+my $ports_tcp_args={
+		  'foreign_host' => '10.0.0.1',
+		  'local_host' => '10.0.0.2',
+		  'foreign_port' => '514',
+		  'local_port' => '22',
+		  'proto' => 'TCPv4',
+		  'state' => 'ESTABLISHED',
+		  'ports' => '1',
+		  };
+$object=Net::Connection->new( $ports_tcp_args );
+is( $object->local_port, '22', 'ports option numeric port unchanged check' );
+is( $object->local_port_name, scalar getservbyport( 22, 'tcp' ), 'numeric local port resolved as tcp check' );
+is( $object->foreign_port_name, scalar getservbyport( 514, 'tcp' ), 'numeric foreign port resolved as tcp check' );
+
+my $ports_udp_args={
+		  'foreign_host' => '10.0.0.1',
+		  'local_host' => '10.0.0.2',
+		  'foreign_port' => '514',
+		  'local_port' => '514',
+		  'proto' => 'udp4',
+		  'state' => 'ESTABLISHED',
+		  'ports' => '1',
+		  };
+$object=Net::Connection->new( $ports_udp_args );
+is( $object->local_port_name, scalar getservbyport( 514, 'udp' ), 'numeric local port resolved as udp check' );
+
+# The ports option with named ports should resolve numbers using the connection protocol
+my $expected_ssh_port=getservbyname( 'ssh', 'tcp' );
+if ( !defined( $expected_ssh_port ) ){
+	$expected_ssh_port='ssh';
+}
+my $named_tcp_args={
+		  'foreign_host' => '10.0.0.1',
+		  'local_host' => '10.0.0.2',
+		  'foreign_port' => '514',
+		  'local_port' => 'ssh',
+		  'proto' => 'tcp4',
+		  'state' => 'ESTABLISHED',
+		  'ports' => '1',
+		  };
+$object=Net::Connection->new( $named_tcp_args );
+is( $object->local_port, $expected_ssh_port, 'named local port resolved as tcp check' );
+is( $object->local_port_name, 'ssh', 'named local port name kept check' );
+
+my $expected_syslog_port=getservbyname( 'syslog', 'udp' );
+if ( !defined( $expected_syslog_port ) ){
+	$expected_syslog_port='syslog';
+}
+my $named_udp_args={
+		  'foreign_host' => '10.0.0.1',
+		  'local_host' => '10.0.0.2',
+		  'foreign_port' => '514',
+		  'local_port' => 'syslog',
+		  'proto' => 'udp6',
+		  'state' => 'ESTABLISHED',
+		  'ports' => '1',
+		  };
+$object=Net::Connection->new( $named_udp_args );
+is( $object->local_port, $expected_syslog_port, 'named local port resolved as udp check' );
+is( $object->local_port_name, 'syslog', 'named udp local port name kept check' );
+
+# Hostname hosts should be copied to the PTRs when ptrs is unset
+my $hostname_args={
+		  'foreign_host' => 'b.example.com',
+		  'local_host' => 'a.example.com',
+		  'foreign_port' => '22',
+		  'local_port' => '11132',
+		  'proto' => 'tcp4',
+		  'state' => 'ESTABLISHED',
+		  };
+$object=Net::Connection->new( $hostname_args );
+is( $object->local_ptr, 'a.example.com', 'hostname local host, no ptrs option, ptr check' );
+is( $object->foreign_ptr, 'b.example.com', 'hostname foreign host, no ptrs option, ptr check' );
+
+# Hostname hosts should be copied to the PTRs when ptrs is set, with out a DNS lookup
+$hostname_args->{'ptrs'}='1';
+$object=Net::Connection->new( $hostname_args );
+is( $object->local_ptr, 'a.example.com', 'hostname local host, ptrs option, ptr check' );
+is( $object->foreign_ptr, 'b.example.com', 'hostname foreign host, ptrs option, ptr check' );
+
+# IPv6 hosts contain letters, but should not be treated as hostnames
+my $ipv6_args={
+		  'foreign_host' => 'fe80::1',
+		  'local_host' => '::1',
+		  'foreign_port' => '22',
+		  'local_port' => '11132',
+		  'proto' => 'tcp6',
+		  'state' => 'ESTABLISHED',
+		  };
+$object=Net::Connection->new( $ipv6_args );
+is( $object->local_ptr, undef, 'IPv6 local host not treated as a hostname check' );
+is( $object->foreign_ptr, undef, 'IPv6 foreign host not treated as a hostname check' );
+
+my $tests_ran=54+$extra_tests;
 done_testing($tests_ran);

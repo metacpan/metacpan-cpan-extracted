@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::Idle - Attempts to match the kernel idle process.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
@@ -43,9 +43,10 @@ This intiates the object.
 =cut
 
 sub new{
+    my $class=$_[0];
     my $self = {
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -59,7 +60,7 @@ One argument is taken and that is a Proc::ProcessTable::Process object.
 The returned value is a boolean.
 
     if ( $checker->match( $proc ) ){
-        print "The connection matches.\n";
+        print "The process matches.\n";
     }
 
 =cut
@@ -110,7 +111,7 @@ sub match{
 	}
 
 	if (
-		( $proc_uid eq 0 ) &&
+		( $proc_uid == 0 ) &&
 		( $proc_fname =~ /^idle$/ ) &&
 		( $proc_cmd =~ /^$/ )
 		){
@@ -147,14 +148,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

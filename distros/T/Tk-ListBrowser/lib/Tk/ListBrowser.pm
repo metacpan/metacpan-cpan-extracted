@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -225,6 +225,15 @@ Default value I<main>, which is the main entry list. You may also set it to a va
 
 =item Switch B<-font>
 
+=item Name B<guideColor>
+
+=item Class B<GuideColor>
+
+=item Switch B<-guidecolor>
+
+The color in which the guides in hlist and tree mode are drawn.
+The default is #7F7F7F.
+
 =item Name B<headerBorderWidth>
 
 =item Class B<headerBorderWidth>
@@ -375,6 +384,12 @@ Default value is an empty string. When set to one character, hierarchy mode is e
 When I<-arrange> is set to any other than 'hlist' or 'tree', only the root list is shown when hierarchy
 mode is enabled.
 
+=item Switch B<-sizesample>
+
+Default value is undef. You can set it to an instance of the entry class. B<refresh> will
+try to obtain a cell size through this sample. Everytime you assing a sample, the B<cellSizeKnown>
+flag is cleared.
+
 =item Switch B<-sortbottom>
 
 Default value -(10**32). Used while sorting whenever a column item is found that requires
@@ -516,6 +531,7 @@ sub Populate {
 	$c->Tk::bind('<Motion>', [ $self, 'Motion', Ev('x'), Ev('y') ]);
 
 	$self->{ARRANGE} = undef;
+	$self->{CELLSIZEKNOWN} = 0;
 	$self->{COLUMNS} = [];
 	$self->{HANDLER} = undef;
 	$self->{POOL} = new Tk::ListBrowser::HashList;
@@ -532,21 +548,15 @@ sub Populate {
 	my $minusbmp = $self->Bitmap(-data => $minusimg);
 	my $plusbmp = $self->Bitmap(-data => $plusimg);
 	$self->ConfigSpecs(
+
 		#general
 		-arrange => ['METHOD', undef, undef, 'row'],
 		-autorefresh => ['PASSIVE', undef, undef, 0],
 		-borderwidth => [$c, 'borderWidth', 'BorderWidth', 1],
 		-browsecmd => ['CALLBACK'],
-		-cellwidth => ['METHOD', undef, undef, 0],
-		-cellheight => ['METHOD', undef, undef, 0],
-		-cellimagewidth => ['PASSIVE', undef, undef, 0],
-		-cellimageheight => ['PASSIVE', undef, undef, 0],
-		-celltextwidth => ['PASSIVE', undef, undef, 0],
-		-celltextheight => ['PASSIVE', undef, undef, 0],
 		-command => ['CALLBACK'],
 		-entryclass => ['PASSIVE', undef, undef, 'Tk::ListBrowser::Entry'],
 		-font => ['PASSIVE', 'font', 'Font', 'Arial 9'],
-		-height => [$c, 'height', 'Height', $height],
 		-indent => ['PASSIVE', 'indent', 'Indent', 22],
 		-motionselect => ['PASSIVE', undef, undef, ''],
 		-refreshentriespercycle => ['PASSIVE', undef, undef, 10],
@@ -556,11 +566,22 @@ sub Populate {
 		-selectmode => ['PASSIVE', undef, undef, 'single'],
 		-selectstyle => ['PASSIVE', undef, undef, 'anchor'],
 		-separator => ['PASSIVE', undef, undef, ''],
+
+		#sizes
+		-cellwidth => ['METHOD', undef, undef, 0],
+		-cellheight => ['METHOD', undef, undef, 0],
+		-cellimagewidth => ['PASSIVE', undef, undef, 0],
+		-cellimageheight => ['PASSIVE', undef, undef, 0],
+		-celltextwidth => ['PASSIVE', undef, undef, 0],
+		-celltextheight => ['PASSIVE', undef, undef, 0],
+		-height => [$c, 'height', 'Height', $height],
+		-sizesample => ['METHOD'],
 		-width => [$c, 'width', 'Width', $width],
 
 		#colors
 		-background => [$c, 'background', 'Background', '#E8E8E8'],
 		-foreground => [$c, 'foreground', 'Foreground', '#3C3C3C'],
+		-guidecolor => ['PASSIVE', 'guideColor', 'GuideColor', '#7F7F7F'],
 		-selectbackground => ['PASSIVE', 'selectBackground', 'SelectBackground', '#A0A0FF'],
 		-selectforeground => ['PASSIVE', 'selectForeground', 'SelectForeground', '#FAF9EA'],
 
@@ -1074,15 +1095,22 @@ sub cellwidth {
 
 =item B<cellSize>I<(?$entryobj?)>
 
-Calculates the optimal cell size for I<$entryobj> and sets all I<-cell...> options accordingly.
-If you do not specify I<$entryobj> it will iterate over the present list to find the optimal cell size.
-The B<refresh> method calls this by default, so you do not have to worry about the cell size. If you
-only use B<refreshPurge>, use this method to determine the correct cell size first.
+Calculates the optimal cell size for the list and sets the config variables
+I<-cellheight>, I<-cellimageheight>, I<-cellimagewidth>, I<-celltextheight>,
+I<-celltextwidth> and I<-cellwidth>.
+
+If you specify I<$entryobj> it will use it as the sample to calculate the cell size.
+
+If you do not specify I<$entryobj> it will look for a sample in the config variable I<-sizesample>.
+
+If it finds nothing there it will iterate over the whole list.
 
 =cut
 
 sub cellSize {
 	my ($self, $item) = @_;
+
+	$item = $self->cget('-sizesample') unless defined $item;
 
 	my $cellheight = 0;
 	my $cellwidth = 0;
@@ -1126,8 +1154,39 @@ sub cellSize {
 	$self->configure(-celltextheight => $textheight);
 	$self->configure(-celltextwidth => $textwidth);
 	$self->listWidth($cellwidth);
+	$self->cellSizeKnown(1);
 	return ($cellwidth, $cellheight)
 }
+
+=item B<cellSizeColumns>
+
+Walks through every side column and determines it's best cell width by iterating over every entry.
+The cell height of side columns is determined by the entry.
+
+=cut
+
+sub cellSizeColumns {
+	my $self = shift;
+	if ($self->listMode) {
+		my @columns = $self->columnList;
+		for (@columns) {
+			my $col = $self->columnGet($_)->cellSize;
+		}
+	}
+}
+
+=item B<cellSizeKnown>I<(?$b?)>
+
+Sets and returns the flag to indicate wether cell size is known or should be calculated.
+
+=cut
+
+sub cellSizeKnown {
+	my $self = shift;
+	$self->{CELLSIZEKNOWN} = shift if @_;
+	return $self->{CELLSIZEKNOWN}
+}
+
 
 =item B<clear>
 
@@ -2978,30 +3037,27 @@ sub OnConfigure {
 
 	if (my $id = $self->{'timer_id'}) {
 		$self->afterCancel($id);
-		my $nid = $self->after(50, ['OnConfigureTimer', $self]);
+		my $nid = $self->after(100, ['OnConfigureTimer', $self]);
 		$self->{'timer_id'} = $nid;
 	}
 
 	unless (defined $timer) {
-		$self->update;
 		my $id = $self->after(100, ['OnConfigureTimer', $self]);
 		$self->{'timer_id'} = $id;
 		return
 	}
 
-	#redraw headers in list mode
-	my @sel;
+	#catch and clear selection
+	my @sel = $self->selectionGet;
+	$self->selectionClear;
+
 	if ($self->listMode) {
-		my @col = $self->columnList;
-		if (@col) {
-			@sel = $self->selectionGet;
-			$self->selectionClear;
-			$self->setScrollRegion;
-		}
 		$self->headerPlace;
+	} else {
+		$self->refreshPurge;
 	}
 
-	$self->refreshPurge;
+	#redraw selection
 	for (@sel) {
 		$self->selectionSet($_)
 	}
@@ -3119,71 +3175,37 @@ sub prioritySet {
 	$self->priorityMax($priority) if $max < $priority;
 }
 
-=item B<refresh>I<(?$havecellsize?)>
+=item B<refresh>I<(?$entrysample?)>
 
-Clears the canvas and rebuilds it. Call this method after you are done making changes.
-If you set I<$havecellsize> to 1 it will assume the cellsize is known and save you one iteration
-over the entire list. If you do not specify it, the method B<cellSize> will be called.
-View and selection are preserved.
+Clears the canvas and rebuilds it. Call this method if option I<-autorefresh> if not enabled 
+after you are done making changes.
+
+If you specify I<$entrsample> it will use it to obtain a cell size unless cell size is known.
+
+If you do not specify I<$entrysample> and cell size is not known it will try to obtain a cell size
+through the sample stored in the option I<-sizesample>.
+
+If that also fails it will iterate the list to obtain a cell size if cell size is not known.
+
+After establishing a cell size it calls B<refreshPurge>.
 
 =cut
 
 sub refresh {
-	my ($self, $nocellsize) = @_;
-	$nocellsize = 0 unless defined $nocellsize;
+	my ($self, $sizeitem) = @_;
 
-	unless ($nocellsize) {
-		$self->cellSize;
-	}
-
-	if (($self->listMode) and (! $nocellsize)) {
-		my @columns = $self->columnList;
-		for (@columns) {
-			my $col = $self->columnGet($_)->cellSize;
-		}
-	}
+	$self->cellSize($sizeitem) unless $self->cellSizeKnown;
 
 	my $anch = $self->anchorGet;
 	$self->refreshSaveView;
+
+	$self->refreshPurge;
 	
-	my $handler = $self->handler;
-
-	$self->clear;
-	my ($x, $y) = $handler->startXY;
-	my $column = 0;
-	my $row = 0;
-
-	my @pool = $self->getPool;
-	for (@pool) {
-		my $item = $_;
-		next if $item->noshow;
-		$handler->draw($item, $x, $y, $column, $row);
-
-		($x, $y, $column, $row) = $handler->nextPosition($x, $y, $column, $row);
-	}
-	$self->setScrollRegion;
 
 	$self->refreshRestoreView;
 	$self->anchorSet($anch) if defined $anch;
 
-	if ($self->listMode) {
-#		@columns = reverse @columns;
-#		my $c = $self->Subwidget('Canvas');
-#		while (@columns) {
-#			my $last = shift @columns;
-#			my $tag;
-#			my $prev = $columns[0];
-#			if (defined $prev) {
-#				my $col = $self->columnGet($prev);
-#				$tag = $col->crect;
-#			} else {
-#				$tag = 'main'
-#			}
-#			my $rlast = $self->columnGet($last)->crect;
-#			$c->lower($tag, $rlast);
-#		}
-		$self->headerPlace;
-	}
+	$self->headerPlace if $self->listMode;
 }
 
 sub refreshCheck {
@@ -3556,6 +3578,16 @@ sub show {
 	$a->hidden(0);
 }
 
+sub sizesample {
+	my $self = shift;
+	if (@_) {
+		$self->{SIZESAMPLE} = shift;
+		$self->cellSizeKnown(0);
+	}
+	return $self->{SIZESAMPLE}
+}
+
+
 sub sortActive {
 	my $self = shift;
 	$self->{SORTACTIVE} = shift if @_;
@@ -3726,6 +3758,74 @@ sub xScrollCheck {
 }
 
 =back
+
+=head1 CELL SIZE AND REFRESH
+
+Before we can meaningfully display the list we need to know the cell size
+of our entries. Below some considerations and strategies.
+
+=head3 All cells have equal size
+
+This is a basic principle. Only if cells have identical sizes the I<column> and I<row>
+arrange modes can work. In list modes the cell width is less relevant.
+
+If you have side columns configured, their cell height is determined by their owning entry. You may
+want to configure the columns cell width by calling B<cellSizeColumns> at some point. However, if you
+have configured headers, the cell width is governed by them and you do not need to bother.
+
+Below some ways to obtain your cell size.
+
+=head3 Configure manually
+
+We highly advise against doing it this way. However, if you must...
+
+You can manually calculate all the values and set the config variables
+I<-cellheight>, I<-cellimageheight>, I<-cellimagewidth>, I<-celltextheight>,
+I<-celltextwidth> and I<-cellwidth> yourself. After that you can safely call B<refreshPurge>.
+
+If you do it this way, do not forget to set B<cellSizeKnown> to 1.
+
+=head3 Do nothing
+
+Just call B<refresh>. It will iterate over the list and obtain a cell size the first time you call it.
+It will skip that step each time you call it afterward, untill you clear B<cellSizeKnown>.
+The first time you call B<refresh> is expensive, but it gives a cell size that is guaranteed to fit
+every entry.
+
+=head3 Set a sample
+
+Create an entry class object (Tk::ListBrowser::Entry unless you derieved your own). Make it have an image at
+least as large as the largest image in your list and a text at least as long as any text in your list.
+Assign it to the config variable I<-sizesample> or use it as a parameter to the B<refresh> method.
+
+ my $e = new Tk::ListBrowser::Entry(
+    -name => 'sample',
+    -listbrowser => $lb, #reference to a Tk::ListBrowser object
+    -text => 'A darn long string, possibly multiline',
+    -image => $tkimage,
+ );
+ $lb->configure(-sizesample => $e);
+ #or
+ $lb->refresh($e);
+
+=head3 Adding and deleting entries.
+
+If you want the cell size recalculated every time you add or delete content, do the following.
+
+ $lb->add($name, @options);
+ $lb->cellSizeKnown(0);
+ #or
+ $lb->insert($entryobj, $index);
+ $lb->cellSizeKnown(0);
+ #or
+ $lb->delete($name);
+ $lb->cellSizeKnown(0);
+
+=head3 Using -autorefresh
+
+When -autorefresh is active a B<refreshPurge> is initiated after every addition or deletion.
+It totally assumes cell size is known. So you better take care of that before you add or
+remove anything.
 
 =head1 USING THE KEYBOARD
 

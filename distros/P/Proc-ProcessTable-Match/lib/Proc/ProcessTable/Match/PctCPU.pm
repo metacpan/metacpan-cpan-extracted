@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::PctCPU - Check if a process matches based on the CPU 
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{pctcpus} ) ){
 		die ('No pctcpus key specified in the argument hash');
 	}
-	if ( ref( \$args{pctcpus} ) eq 'ARRAY' ){
+	if ( ref( $args{pctcpus} ) ne 'ARRAY' ){
 		die ('The pctcpus key is not a array');
 	}
 	if ( ! defined $args{pctcpus}[0] ){
 		die ('Nothing defined in the pctcpus array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				pctcpus=>$args{pctcpus},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -134,33 +135,33 @@ sub match{
 	while (defined( $self->{pctcpus}[$pctcpu_int] )){
 		my $pctcpu=$self->{pctcpus}[$pctcpu_int];
 		if (
-			( $pctcpu =~ /^[0-9.]+$/ ) &&
-			( $pctcpu eq $proc_pctcpu )
+			( $pctcpu =~ /^[0-9]+(?:\.[0-9]+)?$/ ) &&
+			( $pctcpu == $proc_pctcpu )
 			){
 			return 1;
-		}elsif( $pctcpu =~ /^\<\=[0-9.]+$/ ){
+		}elsif( $pctcpu =~ /^\<\=[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctcpu=~s/^\<\=//;
 			if ( $proc_pctcpu <= $pctcpu ){
 				return 1;
 			}
-		}elsif( $pctcpu =~ /^\<[0-9.]+$/ ){
+		}elsif( $pctcpu =~ /^\<[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctcpu=~s/^\<//;
 			if ( $proc_pctcpu < $pctcpu ){
 				return 1;
 			}
-		}elsif( $pctcpu =~ /^\>\=[0-9.]+$/ ){
+		}elsif( $pctcpu =~ /^\>\=[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctcpu=~s/^\>\=//;
 			if ( $proc_pctcpu >= $pctcpu ){
 				return 1;
 			}
-		}elsif( $pctcpu =~ /^\>[0-9.]+$/ ){
+		}elsif( $pctcpu =~ /^\>[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctcpu=~s/^\>//;
 			if ( $proc_pctcpu > $pctcpu ){
 				return 1;
 			}
-		}elsif( $pctcpu =~ /^\![0-9.]+$/ ){
+		}elsif( $pctcpu =~ /^\![0-9]+(?:\.[0-9]+)?$/ ){
 			$pctcpu=~s/^\!//;
-			if ( $proc_pctcpu ne $pctcpu ){
+			if ( $proc_pctcpu != $pctcpu ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

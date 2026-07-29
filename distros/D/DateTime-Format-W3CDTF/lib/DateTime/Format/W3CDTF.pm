@@ -4,7 +4,7 @@ DateTime::Format::W3CDTF - Parse and format W3CDTF datetime strings
 
 =head1 VERSION
 
-This document describes DateTime::Format::W3CDTF version 0.08
+This document describes DateTime::Format::W3CDTF version 0.09
 
 =head1 SYNOPSIS
 
@@ -35,10 +35,11 @@ use warnings;
 
 use vars qw ($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use DateTime;
 use DateTime::TimeZone;
+use POSIX qw(floor);
 
 sub new {
     my $class = shift;
@@ -98,7 +99,7 @@ sub parse_datetime {
     }
 
     if ( $p{fraction} ) {
-        $p{nanosecond} = $p{fraction} * 1_000_000_000;
+        $p{nanosecond} = floor($p{fraction} * 1_000_000_000);
         delete $p{fraction}
     }
 

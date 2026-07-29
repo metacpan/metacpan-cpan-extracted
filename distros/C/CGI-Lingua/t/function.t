@@ -11,6 +11,7 @@ use strict;
 use warnings;
 
 use CHI;
+use JSON::PP ();
 use Readonly;
 use Scalar::Util qw(blessed);
 use Test::Memory::Cycle;
@@ -186,7 +187,7 @@ subtest 'DESTROY: stores serialised state in cache' => sub {
 	my $blob = $cache->get($key);
 	ok(defined $blob, 'DESTROY wrote a frozen blob to the cache');
 
-	my $thawed = Storable::thaw($blob);
+	my $thawed = JSON::PP::decode_json($blob);
 	is($thawed->{_slanguage}, 'French', 'Frozen blob contains correct _slanguage');
 };
 
@@ -203,9 +204,11 @@ subtest 'DESTROY: does not overwrite existing cache entry' => sub {
 	local %ENV = (REMOTE_ADDR => '55.55.55.55', HTTP_ACCEPT_LANGUAGE => 'en');
 	my $cache = _fresh_cache();
 
-	# Pre-seed the cache with a frozen object so the set-if-absent guard fires
-	my $sentinel = bless { _slanguage => 'SentinelLanguage' }, 'CGI::Lingua';
-	$cache->set('55.55.55.55/en/en', Storable::nfreeze($sentinel), '1 month');
+	# Pre-seed the cache with a JSON blob so the set-if-absent guard fires.
+	# The blob only needs to be truthy (non-empty JSON object); DESTROY checks
+	# $cache->get($key) and returns early if it already has a value.
+	my $sentinel_json = JSON::PP::encode_json({ _slanguage => 'SentinelLanguage' });
+	$cache->set('55.55.55.55/en/en', $sentinel_json, '1 month');
 
 	{
 		my $l = CGI::Lingua->new(supported => ['en'], cache => $cache);
@@ -213,7 +216,7 @@ subtest 'DESTROY: does not overwrite existing cache entry' => sub {
 	}    # DESTROY fires
 
 	my $blob    = $cache->get('55.55.55.55/en/en');
-	my $thawed  = Storable::thaw($blob);
+	my $thawed  = JSON::PP::decode_json($blob);
 	is($thawed->{_slanguage}, 'SentinelLanguage', 'Existing cache entry was not overwritten');
 };
 
@@ -969,7 +972,7 @@ subtest 'No memory cycles in frozen DESTROY copy' => sub {
 		$l->language();
 	}
 	my $blob   = $cache->get('5.5.5.5/en/en');
-	my $thawed = Storable::thaw($blob);
+	my $thawed = JSON::PP::decode_json($blob);
 	memory_cycle_ok($thawed, 'Thawed DESTROY copy has no cycles');
 };
 

@@ -1,5 +1,8 @@
 Revision history for Google::gRPC
 
+0.06    Tue Jul 28 2026
+    - Added SECURITY.md
+
 0.05    2026-07-27
         - Exclude BUILD from POD coverage tests.
         - Resolved author testing failures (Kwalitee, PerlTidy).

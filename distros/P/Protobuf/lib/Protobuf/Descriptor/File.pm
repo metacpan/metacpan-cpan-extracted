@@ -73,7 +73,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 # The object is a blessed IV (the pointer itself) from the C layer,

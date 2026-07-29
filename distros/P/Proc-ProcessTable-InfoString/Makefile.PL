@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
 										   'Test::More' => '0',
 										   },
 						 PREREQ_PM => {
-									   'Term::ANSIColor' => '4.06',
-									   'Proc::ProcessTable' => '0.59',
+									   'Term::ANSIColor' => '0',
+									   'Proc::ProcessTable' => '0',
 									   },
 						 dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 						 clean => { FILES => 'Proc-ProcessTable-InfoString-*' },

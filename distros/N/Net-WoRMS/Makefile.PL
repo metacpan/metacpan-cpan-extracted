@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -17,23 +17,17 @@ my %WriteMakefileArgs = (
     "bin/query-worms"
   ],
   "LICENSE" => "open_source",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Net::WoRMS",
   "PREREQ_PM" => {
-    "Data::Dumper" => 0,
-    "Getopt::Long" => 0,
-    "Moo" => 0,
-    "MooX::Types::MooseLike::Base" => 0,
-    "Pod::Usage" => 0,
-    "SOAP::Lite" => 0,
-    "Syntax::Keyword::Match" => 0,
-    "feature" => 0,
-    "open" => 0,
-    "strict" => 0,
-    "utf8" => 0,
-    "warnings" => 0
+    "Data::Dumper" => "2.10",
+    "Moo" => "2.0",
+    "MooX::Types::MooseLike::Base" => "0.12",
+    "Pod::Usage" => "1.60",
+    "SOAP::Lite" => "0.711",
+    "Syntax::Keyword::Match" => "0.15"
   },
-  "VERSION" => "1.3",
+  "VERSION" => "1.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,18 +35,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dumper" => 0,
-  "Getopt::Long" => 0,
-  "Moo" => 0,
-  "MooX::Types::MooseLike::Base" => 0,
-  "Pod::Usage" => 0,
-  "SOAP::Lite" => 0,
-  "Syntax::Keyword::Match" => 0,
-  "feature" => 0,
-  "open" => 0,
-  "strict" => 0,
-  "utf8" => 0,
-  "warnings" => 0
+  "Data::Dumper" => "2.10",
+  "Moo" => "2.0",
+  "MooX::Types::MooseLike::Base" => "0.12",
+  "Pod::Usage" => "1.60",
+  "SOAP::Lite" => "0.711",
+  "Syntax::Keyword::Match" => "0.15"
 );
 
 

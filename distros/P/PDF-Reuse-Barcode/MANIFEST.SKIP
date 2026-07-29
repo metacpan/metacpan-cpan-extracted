@@ -1,0 +1,24 @@
+# Version control and build products
+^\.git/
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA\.
+^MANIFEST\.bak$
+\.tar\.gz$
+
+# CI and repository furniture, not part of the distribution
+^\.github/
+^\.gitignore$
+
+# Code review artifacts are a record of how a change was reviewed here.
+# They are meaningful in the repository and noise on CPAN.
+^docs/reviews/
+
+# Editor and OS leavings
+~$
+^\.vscode/
+^\.idea/
+\.swp$
+^\.DS_Store$

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Model;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.04';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;

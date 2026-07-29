@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'Proc::ProcessTable::ncps' ) || print "Bail out!\n";
+	use_ok('Proc::ProcessTable::ncps') || print "Bail out!\n";
 }
 
-diag( "Testing Proc::ProcessTable::ncps $Proc::ProcessTable::ncps::VERSION, Perl $], $^X" );
+diag("Testing Proc::ProcessTable::ncps $Proc::ProcessTable::ncps::VERSION, Perl $], $^X");

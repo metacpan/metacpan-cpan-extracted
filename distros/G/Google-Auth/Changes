@@ -1,5 +1,8 @@
 Revision history for Google-Auth
 
+0.06    Tue Jul 28 2026
+    - Added SECURITY.md
+
 0.05    Wed Jul 22 2026
         - Fixed POD test failures.
         - Resolved author testing failures (Kwalitee, PerlTidy).

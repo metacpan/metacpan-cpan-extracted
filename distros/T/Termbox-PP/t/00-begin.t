@@ -125,9 +125,7 @@ bytes
 Carp
 constant
 Config
-Errno
 Exporter
-Fcntl
 IO::File
 Params::Check
 Scalar::Util
@@ -152,6 +150,7 @@ Time::HiRes
 Unicode::EastAsianWidth
 Unicode::EastAsianWidth::Detect
 
+Win32
 Win32::API
 Win32::Console
 Win32API::File
@@ -180,4 +179,5 @@ $TB_OPT_LIBC_WCHAR
 $TB_OPT_ATTR_W
 $TB_TERMINFO_DIR
 $TB_RESIZE_FALLBACK_MS
+$TB_DEBUG_LEVEL
 $TB_OPT_TRUECOLOR

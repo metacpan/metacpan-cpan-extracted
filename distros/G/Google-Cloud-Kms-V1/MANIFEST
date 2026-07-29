@@ -1,0 +1,43 @@
+Changes
+lib/Google/Cloud/Kms/AutokeyAdminClient.pm
+lib/Google/Cloud/Kms/AutokeyClient.pm
+lib/Google/Cloud/Kms/EkmServiceClient.pm
+lib/Google/Cloud/Kms/HsmManagementClient.pm
+lib/Google/Cloud/Kms/KeyAccessJustificationsConfigClient.pm
+lib/Google/Cloud/Kms/KeyManagementServiceClient.pm
+lib/Google/Cloud/Kms/V1.pm
+lib/Google/Cloud/Kms/V1/Autokey.pm
+lib/Google/Cloud/Kms/V1/Autokey/Types.pm
+lib/Google/Cloud/Kms/V1/AutokeyAdmin.pm
+lib/Google/Cloud/Kms/V1/AutokeyAdmin/Types.pm
+lib/Google/Cloud/Kms/V1/EkmService.pm
+lib/Google/Cloud/Kms/V1/EkmService/Types.pm
+lib/Google/Cloud/Kms/V1/HsmManagement.pm
+lib/Google/Cloud/Kms/V1/HsmManagement/Types.pm
+lib/Google/Cloud/Kms/V1/Resources.pm
+lib/Google/Cloud/Kms/V1/Resources/Types.pm
+lib/Google/Cloud/Kms/V1/Service.pm
+lib/Google/Cloud/Kms/V1/Service/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Autokey.t
+t/01-service-AutokeyAdmin.t
+t/01-service-Default.t
+t/01-service-EkmService.t
+t/01-service-HsmManagement.t
+t/01-service-KeyManagementService.t
+t/02-rest-transport-Autokey.t
+t/02-rest-transport-AutokeyAdmin.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-EkmService.t
+t/02-rest-transport-HsmManagement.t
+t/02-rest-transport-KeyManagementService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

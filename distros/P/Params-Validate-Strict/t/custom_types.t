@@ -11,7 +11,7 @@ use Params::Validate::Strict qw(validate_strict);
     my $custom_types = {
         email => {
             type => 'string',
-            matches => qr/^[\w\.\-]+@[\w\.\-]+\.\w+$/
+            matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
         }
     };
 
@@ -85,7 +85,7 @@ use Params::Validate::Strict qw(validate_strict);
     my $custom_types = {
         email => {
             type => 'string',
-            matches => qr/^[\w\.\-]+@[\w\.\-]+\.\w+$/
+            matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
         },
         zipcode => {
             type => 'string',
@@ -386,7 +386,7 @@ if(0) {
     my $custom_types = {
         email => {
             type => 'string',
-            matches => qr/^[\w\.\-]+@[\w\.\-]+\.\w+$/
+            matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
         }
     };
 

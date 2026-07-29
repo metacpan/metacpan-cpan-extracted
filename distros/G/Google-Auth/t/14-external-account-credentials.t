@@ -78,7 +78,7 @@ subtest 'Subject Token from URL and Impersonated Exchange' => sub {
         subject_token_type                => 'urn:ietf:params:oauth:token-type:jwt',
         token_url                         => 'https://sts.googleapis.com/v1/token',
         credential_source                 => {
-            url     => 'http://169.254.169.254/metadata/identity/oauth2/token',
+            url     => 'https://mock.googleapis.com/metadata/identity/oauth2/token',
             headers => {
                 Metadata => 'true',
             },
@@ -94,7 +94,7 @@ subtest 'Subject Token from URL and Impersonated Exchange' => sub {
     $mock_ua->map_response(
         sub {
             my ($request) = @_;
-            return $request->url eq 'http://169.254.169.254/metadata/identity/oauth2/token'
+            return $request->url eq 'https://mock.googleapis.com/metadata/identity/oauth2/token'
                && $request->header('Metadata') eq 'true';
         },
         HTTP::Response->new(
@@ -188,7 +188,7 @@ subtest 'Initialization and Validation Errors' => sub {
         Google::Auth::ExternalAccountCredentials->new(
             %$base_opts,
             credential_source => {
-                url            => 'http://dummyurl.com',
+                url            => 'https://mock.googleapis.com',
                 environment_id => 'aws1'
             }
         );
@@ -201,7 +201,7 @@ subtest 'Initialization and Validation Errors' => sub {
             %$base_opts,
             credential_source => {
                 file => '/tmp/token',
-                url  => 'http://dummyurl.com'
+                url  => 'https://mock.googleapis.com'
             }
         );
     };
@@ -221,7 +221,7 @@ subtest 'Initialization and Validation Errors' => sub {
         Google::Auth::ExternalAccountCredentials->new(
             %$base_opts,
             credential_source => {
-                url    => 'http://dummyurl.com',
+                url    => 'https://mock.googleapis.com',
                 format => { type => 'invalid_format' }
             }
         );
@@ -233,12 +233,24 @@ subtest 'Initialization and Validation Errors' => sub {
         Google::Auth::ExternalAccountCredentials->new(
             %$base_opts,
             credential_source => {
-                url    => 'http://dummyurl.com',
+                url    => 'https://mock.googleapis.com',
                 format => { type => 'json' }
             }
         );
     };
     like( $@, qr/Missing subject_token_field_name for JSON credential_source format/, 'throws error on missing json field name' );
+
+    # 7. Safety violation on invalid domain
+    my $creds_evil = Google::Auth::ExternalAccountCredentials->new(
+        %$base_opts,
+        credential_source => {
+            url => 'http://evil.com',
+        }
+    );
+    eval {
+        $creds_evil->retrieve_subject_token();
+    };
+    like( $@, qr/carries security violation/, 'throws error on invalid domain in url' );
 };
 
 subtest 'STS Exchange Failure' => sub {

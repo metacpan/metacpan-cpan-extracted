@@ -1,7 +1,7 @@
 package Sim::OPT;
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # Sim::OPT is distributed under a dual licence, open-source (GPL v3) and proprietary.
-# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# Copyright (C) 2008-2026 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
 
 use Exporter;
@@ -79,7 +79,7 @@ eval { use Sim::OPTcue::Exogen::GBDT; 1 };
 eval { use Sim::OPTcue::Endogen::DWGN2; 1 };
 eval { use Sim::OPTcue::Endogen::NeuralBoltzmann; 1 };
 
-$VERSION = '0.903';
+$VERSION = '0.919';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -175,9 +175,9 @@ sub washblockelts
   my @bag;
   foreach my $elt ( @blockelts )
   {  my ( @bin, $newelt );
-     if ( $elt =~ /(>|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|ſ|ł|€|°|ø|ŧ|ù)/ )
+     if ( $elt =~ /(>|<|£|§|ì|#|ò|è|ß|ð|æ|đ|ŋ|ħ|ſ|ł|€|°|ø|ŧ|ù|þ)/ )
      {
-       @bin = split( ">|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|̉ſ|ł|à|°|ø|ŧ|ù", $elt );
+       @bin = split( ">|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|̉ſ|ł|à|°|ø|ŧ|ù|þ", $elt );
        $newelt = $bin[1];
        $newelt =~ s/(ù|ç|ł)// ;
        push( @bag, $newelt );
@@ -195,7 +195,7 @@ sub wash_sourcesweeps
 {
   my ($sweeps_r) = @_;
 
-  my $sep = qr/[><£§ìàòèßðæđŋħſł€ø°ŧùéç]/u;
+  my $sep = qr/[><£§ìàòèßðæđŋħſł€ø°ŧùéçþ]/u;
   my $wash; $wash = sub
   {
     my ($x) = @_;
@@ -1029,6 +1029,77 @@ sub enumerate
   $rec->( 0 );
   return( \@out );
 }
+
+
+
+
+sub genfund
+{
+  say "THSTHS ENTERED genfund IN OPT.pm.";
+  
+  my ( $varnums_r, $blockelts_r, $from, $fundamentalitynum ) = @_;
+
+  my %varnums = %$varnums_r;
+
+  my @pairs = split /_/, $from;
+
+  my @vars;
+  for my $p ( @pairs )
+  {
+    my ( $v, $l ) = split /-/, $p, 2;
+    push( @vars, $v );
+  }
+
+  @vars = sort { $a <=> $b } @vars;
+
+  my @out;
+
+  require List::Util;
+
+  for my $focal_v ( @vars )
+  {
+    for my $rep ( 1 .. $fundamentalitynum )
+    {
+      my @other_vars = grep { $_ ne $focal_v } @vars;
+
+      @other_vars = List::Util::shuffle( @other_vars );
+
+      my @random_parts;
+
+      for my $v ( @other_vars )
+      {
+        my $random_level = 1 + int( rand( $varnums{$v} ) );
+        push( @random_parts, "$v-$random_level" );
+      }
+
+      my $random_tail = join( "_", @random_parts );
+
+      for my $focal_level ( 1 .. $varnums{$focal_v} )
+      {
+        my $name;
+
+        if ( $random_tail ne "" )
+        {
+          $name = "$focal_v-$focal_level" . "_" . $random_tail;
+        }
+        else
+        {
+          $name = "$focal_v-$focal_level";
+        }
+
+        push( @out, $name );
+      }
+    }
+  }
+
+  return( \@out );
+}
+
+
+
+
+
+
 
 
 sub instid
@@ -1996,6 +2067,7 @@ sub cleansweeps
         $elt =~ s/^(\d*)ł// ;
         $elt =~ s/^(\d*)€// ;
         $elt =~ s/^(\d*)ø// ;
+        $elt =~ s/^(\d*)þ// ;
 
 
 				$elt =~ s/[A-za-z]*//g ;
@@ -2310,7 +2382,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 	@varnumbers = Sim::OPT::washn( @varnumbers );
-  say  "IN CALLBLOCK EXE flags: randompick=$dirfiles{randompick} randompicknum=$dirfiles{randompicknum} newrandompick=$dirfiles{newrandompick} newrandompicknum=$dirfiles{newrandompicknum}";
+  say  "IN CALLBLOCK EXE flags: randompick=$dirfiles{randompick} randompicknum=$dirfiles{randompicknum} newrandompick=$dirfiles{newrandompick} newrandompicknum=$dirfiles{newrandompicknum} fundamentality=$dirfiles{fundamentality} fundamentalitynum=$dirfiles{fundamentalitynum}";
 
 
 	if ( $countcase > $#sweeps )   # NUMBER OF CASES OF THE CURRENT PROBLEM
@@ -2422,7 +2494,8 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
     }
 
   }
-
+  
+  say "THSTHS \$dirfiles{fundamentality}: $dirfiles{fundamentality}, \$dirfiles{fundamentalitynum}: $dirfiles{fundamentalitynum}";
   ###...
 
   @blockelts = @{ washblockelts( \@blockelts ) }; say  "WASHED BLOCKELTS " . dump( @blockelts );
@@ -2560,8 +2633,10 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		}
 
     unless ( 
-      ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) 
-    or ( $dirfiles{patternsearch} eq "y" ) or ( $dirfiles{neldermead} eq "y" ) 
+      ( $dirfiles{randompick} eq "y" ) 
+      or ( $dirfiles{newrandompick} eq "y" ) #DDD# ADDED THIS
+      or ( $dirfiles{newenumerate} eq "y" ) #DDD# ADDED THIS
+    or ( $dirfiles{patternsearch} eq "y" ) or ( $dirfiles{neldermead} eq "y" ) or ( $dirfiles{fundamentality} eq "y" ) 
     or ( $dirfiles{armijo} eq "y" ) or ( $dirfiles{NSGAII} eq "y" ) 
     or ( $dirfiles{pso} eq "y" ) or ( $dirfiles{simulatedannealing} eq "y" ) 
     or ( $dirfiles{NSGAIII} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) )
@@ -2640,6 +2715,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
       or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
 			#or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
       #or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{fundamentality} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
       #or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
       #or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
       #or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
@@ -2948,7 +3024,8 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 			#
       if ( not ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) )
 			{
-				unless ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) 
+				unless ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) or ( $dirfiles{fundamentality} eq "y" ) 
+        or ( $dirfiles{newenumerate} eq "y" )
         or ( $dirfiles{patternsearch} eq "y" ) or ( $dirfiles{neldermead} eq "y" ) 
         or ( $dirfiles{armijo} eq "y" ) or ( $dirfiles{NSGAII} eq "y" ) 
         or ( $dirfiles{pso} eq "y" ) or ( $dirfiles{simulatedannealing} eq "y" ) 
@@ -3049,10 +3126,12 @@ sub exe
 	
 	###################################################################################################
 	elsif ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) 
+  or ( $dirfiles{newenumerate} eq "y" )   or ( $dirfiles{fundamentality} eq "y" ) 
   or ( $dirfiles{patternsearch} eq "y" ) or ( $dirfiles{neldermead} eq "y" ) 
   or ( $dirfiles{armijo} eq "y" ) or ( $dirfiles{NSGAII} eq "y" ) or ( $dirfiles{ga} eq "y" ) 
   or ( $dirfiles{pso} eq "y" ) or ( $dirfiles{simulatedannealing} eq "y" ) 
-  or ( $dirfiles{NSGAIII} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) )
+  or ( $dirfiles{NSGAIII} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) 
+  or ( $dirfiles{SPEA2} eq "y" ) )
 	{
     if ( checkOPTcue() )
     {
@@ -3679,7 +3758,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
 
 =cut

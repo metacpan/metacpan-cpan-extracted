@@ -35,7 +35,7 @@ use strict;
 require Protobuf;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 sub next_key {

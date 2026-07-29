@@ -1,5 +1,8 @@
 Revision history for Module-Starter-Protobuf
 
+0.04    Tue Jul 28 2026
+    - Added SECURITY.md
+
 0.03    2026-07-22
         - Encode source .proto paths into generated POD.
         - Exclude uppercase guts methods from POD coverage.

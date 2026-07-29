@@ -1,6 +1,6 @@
 package Sim::OPT::Descend;
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations, distributed under a dual licence, open-source (GPL v3) and proprietary.
-# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
 use Math::Trig;
 use Math::Round;
@@ -66,6 +66,834 @@ $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT modu
 #########################################################################################
 # HERE FOLLOWS THE CONTENT OF "Descend.pm" - Sim::OPT::Descend
 ##############################################################################
+
+
+
+sub fundamentality_indices
+{
+  my ($args_r) = @_;
+  my %args = %$args_r;
+
+  my $file      = $args{file}      or die "Missing argument: file\n";
+  my $outdir    = $args{outdir}    || ".";
+  my $instcol   = $args{instcol}   || 1;
+  my $ycol      = $args{ycol}      || 3;
+  my $metric    = $args{metric};
+  my $metriccol = $args{metriccol} || 2;
+  my $sep       = defined($args{sep}) ? $args{sep} : ",";
+  my $header    = $args{header}    || 0;
+  my $quiet     = $args{quiet}     || 0;
+  my $fundnum   = $args{fundamentalitynum};
+
+  my $ordinary_file = $args{ordinary_sensitivity_file}
+                   || $args{sensitivity_file}
+                   || $args{ordinary_file};
+
+  my ( $fund_rows_r, $vars_r, $fund_skipped ) = fund_read_totres_rows(
+    $file,
+    {
+      instcol   => $instcol,
+      ycol      => $ycol,
+      metric    => $metric,
+      metriccol => $metriccol,
+      sep       => $sep,
+      header    => $header,
+      quiet     => $quiet,
+    }
+  );
+
+  my @rows      = @$fund_rows_r;
+  my @vars      = @$vars_r;
+  my $n_skipped = $fund_skipped;
+
+  die "No complete fundamentality rows found in $file\n" unless @rows;
+
+  my @sens_rows;
+  my $sens_rows_skipped = 0;
+
+  if ( defined($ordinary_file) && $ordinary_file ne "" && -e $ordinary_file )
+  {
+    my ( $sens_rows_r, $sens_vars_r, $sens_skipped ) = fund_read_totres_rows(
+      $ordinary_file,
+      {
+        instcol       => $instcol,
+        ycol          => $ycol,
+        metric        => $metric,
+        metriccol     => $metriccol,
+        sep           => $sep,
+        header        => $header,
+        quiet         => $quiet,
+        required_vars => \@vars,
+        require_sensvar => 1,
+      }
+    );
+
+    @sens_rows = @$sens_rows_r;
+    $sens_rows_skipped = $sens_skipped;
+    $n_skipped += $sens_skipped;
+  }
+  elsif ( defined($ordinary_file) && $ordinary_file ne "" )
+  {
+    warn "Ordinary sensitivity file was requested but not found: $ordinary_file\n"
+      unless $quiet;
+  }
+  else
+  {
+    warn "No ordinary_sensitivity_file supplied. sensitivities.csv and relfund.csv will not contain ordinary sensitivities.\n"
+      unless $quiet;
+  }
+
+  my %absolute;
+  my %abs_rows_used;
+  my %abs_rows_requested;
+  my %ordinary;
+  my %sens_rows_used;
+  my %sens_rows_requested;
+
+  for my $v ( @vars )
+  {
+    my @subrows = grep {
+      defined($_->{order}[0]) && $_->{order}[0] == $v
+    } @rows;
+
+    $abs_rows_used{$v} = scalar @subrows;
+    my @levels = fund_levels_for_var( \@rows, $v );
+    $abs_rows_requested{$v} = ( defined($fundnum) && $fundnum ne "" )
+                            ? scalar(@levels) * $fundnum
+                            : "";
+
+    if ( !@subrows )
+    {
+      $absolute{$v} = undef;
+    }
+    else
+    {
+      my $abs_r = fund_onevar_sensitivity( \@subrows, $v );
+      $absolute{$v} = $abs_r->{sensitivity};
+    }
+
+    if ( @sens_rows )
+    {
+      my @sens_subrows = grep {
+        defined($_->{sensvar}) && $_->{sensvar} == $v
+      } @sens_rows;
+
+      $sens_rows_used{$v} = scalar @sens_subrows;
+      $sens_rows_requested{$v} = $abs_rows_requested{$v};
+
+      if ( @sens_subrows )
+      {
+        my $sens_r = fund_onevar_sensitivity( \@sens_subrows, $v );
+        $ordinary{$v}{sensitivity} = $sens_r->{sensitivity};
+      }
+      else
+      {
+        $ordinary{$v}{sensitivity} = undef;
+      }
+    }
+    else
+    {
+      $sens_rows_used{$v} = 0;
+      $sens_rows_requested{$v} = $abs_rows_requested{$v};
+      $ordinary{$v}{sensitivity} = undef;
+    }
+  }
+
+  my $abs_file  = "$outdir/absfund.csv";
+  my $sens_file = "$outdir/sensitivities.csv";
+  my $rel_file  = "$outdir/relfund.csv";
+
+  open my $ABS, ">", $abs_file or die "Cannot write $abs_file: $!\n";
+  print $ABS "Variable,Absolute_fundamentality,Rows_used_first_position,Rows_requested\n";
+  for my $v ( @vars )
+  {
+    my $a = defined($absolute{$v}) ? $absolute{$v} : "";
+    my $n = $abs_rows_used{$v} || 0;
+    my $q = defined($abs_rows_requested{$v}) ? $abs_rows_requested{$v} : "";
+    print $ABS "X$v,$a,$n,$q\n";
+  }
+  close $ABS;
+
+  open my $SENS, ">", $sens_file or die "Cannot write $sens_file: $!\n";
+  print $SENS "Variable,Sensitivity,Rows_used_ordinary_sample,Rows_requested,Ordinary_sample_file\n";
+  for my $v ( @vars )
+  {
+    my $s = defined($ordinary{$v}{sensitivity}) ? $ordinary{$v}{sensitivity} : "";
+    my $n = $sens_rows_used{$v} || 0;
+    my $q = defined($sens_rows_requested{$v}) ? $sens_rows_requested{$v} : "";
+    my $of = defined($ordinary_file) ? $ordinary_file : "";
+    print $SENS "X$v,$s,$n,$q,$of\n";
+  }
+  close $SENS;
+
+  open my $REL, ">", $rel_file or die "Cannot write $rel_file: $!\n";
+  print $REL "Variable,Absolute_fundamentality,Ordinary_sensitivity,Relative_fundamentality,Rows_used_first_position,Rows_used_ordinary_sample\n";
+  for my $v ( @vars )
+  {
+    my $a = $absolute{$v};
+    my $s = $ordinary{$v}{sensitivity};
+
+    my $rel = "";
+
+    if ( defined($a) && defined($s) && fund_is_number($a) && fund_is_number($s) && $s != 0 )
+    {
+      $rel = ( $a - $s ) / $s;
+    }
+
+    $a = "" unless defined $a;
+    $s = "" unless defined $s;
+
+    my $an = $abs_rows_used{$v} || 0;
+    my $sn = $sens_rows_used{$v} || 0;
+
+    print $REL "X$v,$a,$s,$rel,$an,$sn\n";
+  }
+  close $REL;
+
+  return({
+    absfund_file       => $abs_file,
+    sensitivities_file => $sens_file,
+    relfund_file       => $rel_file,
+    ordinary_sensitivity_file => $ordinary_file,
+    rows_used          => scalar(@rows),
+    ordinary_rows_used => scalar(@sens_rows),
+    rows_skipped       => $n_skipped,
+    fundamentality_rows_skipped => $fund_skipped,
+    ordinary_rows_skipped => $sens_rows_skipped,
+    variables          => \@vars,
+  });
+}
+
+
+sub fund_read_totres_rows
+{
+  my ( $file, $opts_r ) = @_;
+  my %opts = %{ $opts_r || {} };
+
+  my $instcol   = $opts{instcol}   || 1;
+  my $ycol      = $opts{ycol}      || 3;
+  my $metric    = $opts{metric};
+  my $metriccol = $opts{metriccol} || 2;
+  my $sep       = defined($opts{sep}) ? $opts{sep} : ",";
+  my $header    = $opts{header}    || 0;
+  my $quiet     = $opts{quiet}     || 0;
+  my @required_vars = @{ $opts{required_vars} || [] };
+  my $require_sensvar = $opts{require_sensvar} || 0;
+
+  open my $fh, "<", $file or die "Cannot open $file: $!\n";
+
+  my $line_no = 0;
+  if ( $header )
+  {
+    <$fh>;
+    $line_no++;
+  }
+
+  my @raw_rows;
+  my %var_seen;
+  my $n_skipped = 0;
+
+  while ( my $line = <$fh> )
+  {
+    $line_no++;
+    chomp $line;
+    $line =~ s/\r\z//;
+    next if $line =~ /^\s*$/;
+
+    my @f = fund_parse_csv_line( $line, $sep );
+
+    if ( defined $metric )
+    {
+      next if !defined $f[$metriccol - 1];
+      next if $f[$metriccol - 1] ne $metric;
+    }
+
+    my $instname = $f[$instcol - 1];
+    my $y        = $f[$ycol - 1];
+
+    if ( !defined($instname) || !defined($y) || !fund_is_number($y) )
+    {
+      warn "Skipping line $line_no in $file: missing instance name or non-numeric Y\n"
+        unless $quiet;
+      $n_skipped++;
+      next;
+    }
+
+    my ( $x_r, $order_r ) = fund_parse_instance_ordered( $instname );
+    my %x     = %$x_r;
+    my @order = @$order_r;
+
+    if ( !%x || !@order )
+    {
+      warn "Skipping line $line_no in $file: cannot parse instance '$instname'\n"
+        unless $quiet;
+      $n_skipped++;
+      next;
+    }
+
+    my $sensvar;
+    for ( my $i = 0; $i < $#f; $i++ )
+    {
+      if ( defined($f[$i]) && $f[$i] eq "sensvar" )
+      {
+        $sensvar = $f[$i + 1];
+        last;
+      }
+    }
+
+    if ( $require_sensvar && ( !defined($sensvar) || !fund_is_number($sensvar) ) )
+    {
+      warn "Skipping line $line_no in $file: ordinary sensitivity row lacks sensvar tag\n"
+        unless $quiet;
+      $n_skipped++;
+      next;
+    }
+
+    for my $v ( keys %x )
+    {
+      $var_seen{$v} = 1;
+    }
+
+    push @raw_rows, {
+      instance => $instname,
+      x        => \%x,
+      order    => \@order,
+      y        => 0 + $y,
+      sensvar  => defined($sensvar) ? 0 + $sensvar : undef,
+      line     => $line_no,
+    };
+  }
+
+  close $fh;
+
+  die "No usable rows found in $file\n" unless @raw_rows;
+
+  my @vars = @required_vars ? @required_vars : sort { $a <=> $b } keys %var_seen;
+  my @rows;
+
+  ROW:
+  for my $r ( @raw_rows )
+  {
+    for my $v ( @vars )
+    {
+      if ( !exists $r->{x}{$v} )
+      {
+        warn "Skipping line $r->{line} in $file: missing variable $v\n" unless $quiet;
+        $n_skipped++;
+        next ROW;
+      }
+    }
+
+    push @rows, $r;
+  }
+
+  die "No complete rows left after variable consistency check in $file\n" unless @rows;
+
+  return( \@rows, \@vars, $n_skipped );
+}
+
+
+sub fund_levels_for_var
+{
+  my ( $rows_r, $var ) = @_;
+  my %seen;
+
+  for my $r ( @$rows_r )
+  {
+    next unless exists $r->{x}{$var};
+    $seen{ $r->{x}{$var} } = 1;
+  }
+
+  return fund_sort_levels( keys %seen );
+}
+
+
+sub fund_onevar_sensitivity
+{
+  my ( $rows_r, $var ) = @_;
+  my @rows = grep { exists $_->{x}{$var} } @$rows_r;
+
+  return({ sensitivity => undef, rows_used => 0, nlevels => 0 }) unless @rows;
+
+  my %groups;
+  my @y;
+
+  for my $r ( @rows )
+  {
+    push @{ $groups{ $r->{x}{$var} } }, $r->{y};
+    push @y, $r->{y};
+  }
+
+  my @levels = fund_sort_levels( keys %groups );
+  return({ sensitivity => undef, rows_used => scalar(@rows), nlevels => scalar(@levels) })
+    if scalar(@levels) < 2;
+
+  my $grand = fund_mean( \@y );
+  my $sst = 0.0;
+  for my $yy ( @y )
+  {
+    $sst += ( $yy - $grand ) ** 2;
+  }
+
+  if ( $sst <= 0 )
+  {
+    return({ sensitivity => "NA", rows_used => scalar(@rows), nlevels => scalar(@levels), levels => join("|", @levels) });
+  }
+
+  my $ss_between = 0.0;
+  for my $lev ( @levels )
+  {
+    my @gy = @{ $groups{$lev} };
+    my $m = fund_mean( \@gy );
+    $ss_between += scalar(@gy) * ( $m - $grand ) ** 2;
+  }
+
+  my $sens = $ss_between / $sst;
+
+  return({
+    sensitivity => $sens,
+    rows_used   => scalar(@rows),
+    nlevels     => scalar(@levels),
+    levels      => join("|", @levels),
+    ss_between  => $ss_between,
+    sst         => $sst,
+  });
+}
+
+
+sub fund_anova_main_effects
+{
+  my ( $rows_r, $vars_r ) = @_;
+
+  my @rows = @$rows_r;
+  my @vars = @$vars_r;
+
+  my @y = map { $_->{y} } @rows;
+
+  my %level_seen;
+
+  for my $r ( @rows )
+  {
+    for my $v ( @vars )
+    {
+      $level_seen{$v}{ $r->{x}{$v} } = 1;
+    }
+  }
+
+  my @levels;
+
+  for my $j ( 0 .. $#vars )
+  {
+    my $v = $vars[$j];
+    my @lev = fund_sort_levels( keys %{ $level_seen{$v} || {} } );
+
+    die "Variable $v has no observed levels in ANOVA subset\n" unless @lev;
+
+    $levels[$j] = \@lev;
+  }
+
+  my @col_var_index;
+  my @col_level;
+
+  push @col_var_index, undef;
+  push @col_level, undef;
+
+  for my $j ( 0 .. $#vars )
+  {
+    my @lev = @{ $levels[$j] };
+
+    for my $m ( 1 .. $#lev )
+    {
+      push @col_var_index, $j;
+      push @col_level, $lev[$m];
+    }
+  }
+
+  my @X;
+
+  for my $r ( @rows )
+  {
+    my @xr = (1.0);
+
+    for my $j ( 0 .. $#vars )
+    {
+      my $v   = $vars[$j];
+      my @lev = @{ $levels[$j] };
+
+      for my $m ( 1 .. $#lev )
+      {
+        push @xr, ( $r->{x}{$v} eq $lev[$m] ) ? 1.0 : 0.0;
+      }
+    }
+
+    push @X, \@xr;
+  }
+
+  my $mean_y = fund_mean( \@y );
+
+  my $sst = 0.0;
+  for my $v ( @y )
+  {
+    $sst += ( $v - $mean_y ) ** 2;
+  }
+
+  
+
+
+
+
+
+
+  if ( $sst <= 0 )
+	{
+	  my %out;
+
+	  for my $j ( 0 .. $#vars )
+	  {
+	    my $v = $vars[$j];
+
+	    $out{$v} = {
+	      var          => $v,
+	      nlevels      => scalar @{ $levels[$j] },
+	      levels       => join( "|", @{ $levels[$j] } ),
+	      ref_level    => $levels[$j][0],
+	      df           => 0,
+	      ss           => 0,
+	      sensitivity  => "NA",
+	      partial_eta2 => "NA",
+	      f            => "NA",
+	      p            => "NA",
+	    };
+	  }
+
+	  return( \%out );
+	}
+
+
+
+
+
+
+  my @all_cols = ( 0 .. $#col_var_index );
+
+  my ( $sse_full, $rank_full ) =
+    fund_sse_for_cols( \@X, \@y, \@all_cols );
+
+  my $n = scalar @y;
+  my $df_error = $n - $rank_full;
+
+  die "No residual degrees of freedom. Rows=$n, model_rank=$rank_full\n"
+    if $df_error <= 0;
+
+  my $mse_error = $sse_full / $df_error;
+
+  my %out;
+
+  for my $j ( 0 .. $#vars )
+  {
+    my @reduced_cols = grep {
+      !defined($col_var_index[$_]) || $col_var_index[$_] != $j
+    } @all_cols;
+
+    my ( $sse_reduced, $rank_reduced ) =
+      fund_sse_for_cols( \@X, \@y, \@reduced_cols );
+
+    my $df = $rank_full - $rank_reduced;
+    my $ss = $sse_reduced - $sse_full;
+
+    $ss = 0 if $ss < 0 && abs($ss) < 1e-7;
+
+    my $sensitivity  = $ss / $sst;
+    my $partial_eta2 = ( $ss + $sse_full ) > 0
+                     ? $ss / ( $ss + $sse_full )
+                     : 0;
+
+    my $fstat = ( $df > 0 && $mse_error > 0 )
+              ? ( $ss / $df ) / $mse_error
+              : 0;
+
+    $out{ $vars[$j] } = {
+      var          => $vars[$j],
+      nlevels      => scalar @{ $levels[$j] },
+      levels       => join( "|", @{ $levels[$j] } ),
+      ref_level    => $levels[$j][0],
+      df           => $df,
+      ss           => $ss,
+      sensitivity  => $sensitivity,
+      partial_eta2 => $partial_eta2,
+      fstat        => $fstat,
+    };
+  }
+
+  return \%out;
+}
+
+
+sub fund_parse_instance_ordered
+{
+  my ($s) = @_;
+
+  $s =~ s/\r\z//;
+  $s =~ s/^.*[\\\/]//;
+  $s =~ s/\.csv\z//i;
+
+  my ($left) = split /__/, $s, 2;
+
+  my %x;
+  my @order;
+
+  for my $part ( split /_/, $left )
+  {
+    next if !defined($part) || $part eq "";
+
+    if ( $part =~ /^\s*(\d+)\s*-\s*([^_]+?)\s*\z/ )
+    {
+      my ( $var, $lev ) = ( $1, $2 );
+      $var = 0 + $var;
+
+      $x{$var} = $lev;
+      push @order, $var;
+    }
+  }
+
+  return( \%x, \@order );
+}
+
+
+sub fund_parse_csv_line
+{
+  my ( $line, $sep ) = @_;
+
+  chomp $line if defined $line;
+  $line =~ s/\r\z// if defined $line;
+
+  if ( $line !~ /"/ )
+  {
+    return split /\Q$sep\E/, $line, -1;
+  }
+
+  my @fields;
+  my $field = "";
+  my $in_quotes = 0;
+  my @chars = split //, $line;
+
+  for ( my $i = 0; $i < @chars; $i++ )
+  {
+    my $c = $chars[$i];
+
+    if ( $in_quotes )
+    {
+      if ( $c eq '"' )
+      {
+        if ( $i + 1 < @chars && $chars[$i + 1] eq '"' )
+        {
+          $field .= '"';
+          $i++;
+        }
+        else
+        {
+          $in_quotes = 0;
+        }
+      }
+      else
+      {
+        $field .= $c;
+      }
+    }
+    else
+    {
+      if ( $c eq '"' )
+      {
+        $in_quotes = 1;
+      }
+      elsif ( $c eq $sep )
+      {
+        push @fields, $field;
+        $field = "";
+      }
+      else
+      {
+        $field .= $c;
+      }
+    }
+  }
+
+  push @fields, $field;
+
+  return @fields;
+}
+
+
+
+sub fund_is_number
+{
+  my ($x) = @_;
+
+  return defined($x)
+      && $x =~ /^\s*[-+]?(?:(?:\d+(?:\.\d*)?)|(?:\.\d+))(?:[eE][-+]?\d+)?\s*\z/;
+}
+
+
+
+sub fund_sort_levels
+{
+  my @v = @_;
+
+  my $all_numeric = 1;
+
+  for my $x ( @v )
+  {
+    if ( !fund_is_number($x) )
+    {
+      $all_numeric = 0;
+      last;
+    }
+  }
+
+  return $all_numeric ? sort { $a <=> $b } @v : sort @v;
+}
+
+
+
+sub fund_mean
+{
+  my ($a) = @_;
+
+  my $s = 0.0;
+  $s += $_ for @$a;
+
+  return $s / @$a;
+}
+
+
+sub fund_sse_for_cols
+{
+  my ( $X, $y, $cols ) = @_;
+
+  my $n = scalar @$y;
+  my $p = scalar @$cols;
+
+  my @xtx = map { [(0.0) x $p] } 1 .. $p;
+  my @xty = (0.0) x $p;
+  my $yty = 0.0;
+
+  for my $r ( 0 .. $n - 1 )
+  {
+    my $yr = $y->[$r];
+
+    $yty += $yr * $yr;
+
+    for my $a ( 0 .. $p - 1 )
+    {
+      my $xa = $X->[$r][ $cols->[$a] ];
+
+      $xty[$a] += $xa * $yr;
+
+      for my $b ( 0 .. $a )
+      {
+        my $xb = $X->[$r][ $cols->[$b] ];
+        $xtx[$a][$b] += $xa * $xb;
+      }
+    }
+  }
+
+  for my $a ( 0 .. $p - 1 )
+  {
+    for my $b ( $a + 1 .. $p - 1 )
+    {
+      $xtx[$a][$b] = $xtx[$b][$a];
+    }
+  }
+
+  my ( $beta, $rank ) = fund_solve_linear_system( \@xtx, \@xty );
+
+  my $explained = 0.0;
+
+  for my $i ( 0 .. $p - 1 )
+  {
+    $explained += $beta->[$i] * $xty[$i];
+  }
+
+  my $sse = $yty - $explained;
+
+  $sse = 0 if $sse < 0 && abs($sse) < 1e-7;
+
+  return( $sse, $rank );
+}
+
+
+
+sub fund_solve_linear_system
+{
+  my ( $Ain, $bin ) = @_;
+
+  my $n = scalar @$bin;
+
+  my @A = map { [ @$_ ] } @$Ain;
+  my @b = @$bin;
+
+  my @where = (-1) x $n;
+  my $rank = 0;
+  my $eps = 1e-10;
+
+  for my $col ( 0 .. $n - 1 )
+  {
+    my $sel = $rank;
+
+    for my $i ( $rank .. $n - 1 )
+    {
+      $sel = $i if abs($A[$i][$col]) > abs($A[$sel][$col]);
+    }
+
+    next if abs($A[$sel][$col]) < $eps;
+
+    if ( $sel != $rank )
+    {
+      @A[$sel, $rank] = @A[$rank, $sel];
+      @b[$sel, $rank] = @b[$rank, $sel];
+    }
+
+    my $pivot = $A[$rank][$col];
+
+    for my $j ( $col .. $n - 1 )
+    {
+      $A[$rank][$j] /= $pivot;
+    }
+
+    $b[$rank] /= $pivot;
+
+    for my $i ( 0 .. $n - 1 )
+    {
+      next if $i == $rank;
+
+      my $factor = $A[$i][$col];
+
+      next if abs($factor) < $eps;
+
+      for my $j ( $col .. $n - 1 )
+      {
+        $A[$i][$j] -= $factor * $A[$rank][$j];
+      }
+
+      $b[$i] -= $factor * $b[$rank];
+    }
+
+    $where[$col] = $rank;
+    $rank++;
+  }
+
+  my @x = (0.0) x $n;
+
+  for my $j ( 0 .. $n - 1 )
+  {
+    $x[$j] = $b[ $where[$j] ] if $where[$j] != -1;
+  }
+
+  return( \@x, $rank );
+}
+
+
+
 
 sub odd
 {
@@ -184,6 +1012,33 @@ sub descend
   my @packet = @{ $dt{packet} }; #say  "HERE IN DESCEND \@packet: " . dump( @packet );
 
   my $exitname = $dirfiles{exitname};
+  
+  
+  
+  
+  	my $fundamentality_run = "n";
+
+	if ( ( $dt{fundamentality_run} || "" ) eq "y" )
+	{
+	  $fundamentality_run = "y";
+	}
+	elsif ( ( $dirfiles{fundamentality} || "" ) eq "y" )
+	{
+	  $fundamentality_run = "y";
+	}
+	elsif ( ref( $d{dirfiles} ) eq "HASH"
+		&& ( $d{dirfiles}{fundamentality} || "" ) eq "y" )
+	{
+	  $fundamentality_run = "y";
+	}
+
+	say "THSTHS DESCEND fundamentality_run=$fundamentality_run";
+
+
+
+
+
+
 
   #say  "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 
@@ -1147,6 +2002,16 @@ for ( my $i = 0 ; $i < $max ; $i++ )
       }
       close TOTRES;
       close SORTMIXED;
+      
+      
+      
+      
+
+	
+
+
+
+      
 
 
       if ( $fire eq "y" ) ###DDD!!! ATTENTION
@@ -1644,6 +2509,51 @@ for ( my $i = 0 ; $i < $max ; $i++ )
     say TOTRES $string;
   }
   close TOTRES;
+  
+  
+  
+        say "##DDD## dirfiles fundamentality: $dirfiles{fundamentality}";
+	if ( $fundamentality_run eq "y" )
+	{
+	  my $totres = $dirfiles{totres};
+
+	  if ( !defined($totres) || $totres eq "" )
+	  {
+	    $totres = "$dowhat{mypath}/$dowhat{file}-$countcase" . "_totres.csv";
+	  }
+
+	  say "FUND POSTPROCESS in Descend.pm";
+	  say "FUND POSTPROCESS totres=$totres";
+	  say "FUND POSTPROCESS exists=" . ( -e $totres ? "yes" : "no" );
+
+	  if ( -e $totres )
+	  {
+	    my $fund_r = fundamentality_indices(
+	      {
+		file      => $totres,
+		outdir    => $dowhat{mypath},
+		instcol   => 1,
+		metriccol => 2,
+		ycol      => 3,
+		metric    => "totdhs",
+		sep       => ",",
+		header    => 0,
+		quiet     => 0,
+		ordinary_sensitivity_file => $dt{ordinary_sensitivity_file} || $dirfiles{ordinary_sensitivity_file},
+		fundamentalitynum => $dt{fundamentalitynum} || $dirfiles{fundamentalitynum},
+	      });
+
+	    say "Fundamentality indices written:";
+	    say "  $fund_r->{absfund_file}";
+	    say "  $fund_r->{sensitivities_file}";
+	    say "  $fund_r->{relfund_file}";
+	  }
+	  else
+	  {
+	    warn "Cannot compute fundamentality indices: totres file not found after Descend.pm result aggregation: $totres\n";
+	  }
+	} #DDD#
+
 
 
 #################################################################################
@@ -1999,6 +2909,11 @@ for ( my $i = 0 ; $i < $max ; $i++ )
       close ORDEREDFILE;
       say "!!!!!IN TAKEOPTINA OPENED \$sortmixed $orderedfile: " . dump ( @lines );
     }
+    
+    
+    
+    
+    
 
 
 
@@ -2637,7 +3552,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
 
 =cut

@@ -17,7 +17,7 @@ package Google::Auth::WebUserAuthorizer;
 use JSON::MaybeXS;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my $coder = JSON::MaybeXS->new->ascii->pretty->allow_nonref;
 

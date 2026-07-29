@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::Start - Check if the start time of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{starts} ) ){
 		die ('No starts key specified in the argument hash');
 	}
-	if ( ref( \$args{starts} ) eq 'ARRAY' ){
+	if ( ref( $args{starts} ) ne 'ARRAY' ){
 		die ('The starts key is not a array');
 	}
 	if ( ! defined $args{starts}[0] ){
 		die ('Nothing defined in the starts array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				starts=>$args{starts},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -134,33 +135,33 @@ sub match{
 	while (defined( $self->{starts}[$start_int] )){
 		my $start=$self->{starts}[$start_int];
 		if (
-			( $start =~ /^[.0-9]+$/ ) &&
-			( $start eq $proc_start )
+			( $start =~ /^[0-9]+(?:\.[0-9]+)?$/ ) &&
+			( $start == $proc_start )
 			){
 			return 1;
-		}elsif( $start =~ /^\<\=[.0-9]+$/ ){
+		}elsif( $start =~ /^\<\=[0-9]+(?:\.[0-9]+)?$/ ){
 			$start=~s/^\<\=//;
 			if ( $proc_start <= $start ){
 				return 1;
 			}
-		}elsif( $start =~ /^\<[.0-9]+$/ ){
+		}elsif( $start =~ /^\<[0-9]+(?:\.[0-9]+)?$/ ){
 			$start=~s/^\<//;
 			if ( $proc_start < $start ){
 				return 1;
 			}
-		}elsif( $start =~ /^\>\=[.0-9]+$/ ){
+		}elsif( $start =~ /^\>\=[0-9]+(?:\.[0-9]+)?$/ ){
 			$start=~s/^\>\=//;
 			if ( $proc_start >= $start ){
 				return 1;
 			}
-		}elsif( $start =~ /^\>[.0-9]+$/ ){
+		}elsif( $start =~ /^\>[0-9]+(?:\.[0-9]+)?$/ ){
 			$start=~s/^\>//;
 			if ( $proc_start > $start ){
 				return 1;
 			}
-		}elsif( $start =~ /^\![.0-9]+$/ ){
+		}elsif( $start =~ /^\![0-9]+(?:\.[0-9]+)?$/ ){
 			$start=~s/^\!//;
-			if ( $proc_start ne $start ){
+			if ( $proc_start != $start ){
 				return 1;
 			}
 		}
@@ -197,14 +198,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

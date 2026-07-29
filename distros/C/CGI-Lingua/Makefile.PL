@@ -36,13 +36,13 @@ if($ENV{'AUTHOR_TESTING'}) {
 	}
 }
 
-if(eval 'require IP::Country') {
+if(eval { require IP::Country; 1 }) {
 	my $v = IP::Country->VERSION;
 	print "You have IP::Country version $v installed, so CGI::Lingua can work fast\n";
 	# It also shouldn't need to do anything with the Internet,
 	# so we can do all tests
 	$online_tests = 1;
-} elsif(eval 'require Geo::IP') {
+} elsif(eval { require Geo::IP; 1 }) {
 	my $v = Geo::IP->VERSION;
 	if(($^O ne 'MSWin32') && (! -r '/usr/local/share/GeoIP/GeoIP.dat')) {
 		print "Warning: Can't find your GeoIP.dat file for Geo::IP, disabling that module\n";
@@ -55,7 +55,7 @@ if(eval 'require IP::Country') {
 		# so we can do all tests
 		$online_tests = 1;
 	}
-} elsif(eval 'require Geo::IPfree') {
+} elsif(eval { require Geo::IPfree; 1 }) {
 	my $v = Geo::IPfree->VERSION;
 	print "You have Geo::IPfree version $v installed, so CGI::Lingua can work fast\n";
 	# It also shouldn't need to do anything with the Internet,
@@ -113,6 +113,7 @@ WriteMakefile(
     }, TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'autodie' => 0,		# used at compile time: use autodie qw(:all)
+	'JSON::PP' => 2.27,	# cache serialisation; in core from 5.13.9, explicit for 5.10/5.12 compat
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
 	'Log::Abstraction' => 0,	# used by Object::Configure for logger conversion
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
@@ -125,8 +126,8 @@ WriteMakefile(
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
 	'NetAddr::IP' => 0,
-	'Object::Configure' => 0.14,
-	'Params::Get' => 0.13,
+	'Object::Configure' => 0.23,
+	'Params::Get' => 0.15,	# 0.15 fast-path: unblessed hashref arg returned directly (not stored under default key)
 	'Readonly' => 0,
 	'Class::Load' => 0,
 	'CGI::Info' => 0.60, # For AUTOLOAD

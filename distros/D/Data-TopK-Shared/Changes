@@ -1,0 +1,10 @@
+Revision history for Data-TopK-Shared
+
+0.02      2026-07-21
+          - Add time-decayed mode (new_decayed/new_decayed_memfd, half_life,
+            is_decayed) for recency-weighted top-k.
+          - On-disk format change: 0.01 files cannot be opened by 0.02.
+          - Resolve argument magic before capturing the path string.
+
+0.01      2026-07-10
+          - Initial release.

@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION =  0.10;
+$VERSION =  0.16;
 
 sub new {
 	my $class = shift;
@@ -24,19 +24,11 @@ sub add {
 		return
 	}
 	my $l = $self->{LIST};
-	my $h = $self->{INDEX};
+	my $i = $self->{INDEX};
 	$index = @$l unless defined $index;
 	
-	$h->{$entry->name} = $index;
+	$i->{$entry->name} = $index;
 	splice(@$l, $index, 0, $entry);
-	$self->build($index);
-}
-
-sub build {
-	my ($self, $index) = @_;
-	$index = 0 unless defined $index;
-	my $l = $self->{LIST};
-	my $i = $self->{INDEX};
 	grep {	$i->{$l->[$_]->name} = $_ } $index .. @$l - 1;
 }
 
@@ -49,7 +41,7 @@ sub delete {
 		$del->clear;
 		my $i = $self->{INDEX};
 		delete $i->{$name};
-		$self->build($index);
+		grep {	$i->{$l->[$_]->name} = $_ } $index .. @$l - 1;
 		return $del
 	}
 	croak "Entry '$name' not found";

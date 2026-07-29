@@ -19,7 +19,7 @@ use warnings;
 
 use Moo;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has json_key => (
     is       => 'ro',

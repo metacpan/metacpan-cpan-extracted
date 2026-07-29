@@ -25,10 +25,15 @@ use Google::Auth::Exceptions;
 use Capture::Tiny qw(capture);
 use Log::Any qw($log);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub retrieve_subject_token {
     my ($self) = @_;
+
+    if ( ($ENV{GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES} // '0') ne '1' ) {
+        $log->errorf('Pluggable credentials are not enabled. Set GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES=1 to enable.');
+        Google::Auth::Error->throw('Pluggable credentials are not enabled. Set GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES=1 to enable.');
+    }
 
     my $source = $self->credential_source;
     my $exec   = $source->{executable};
@@ -50,9 +55,28 @@ sub retrieve_subject_token {
     }
 
     $log->infof('Executing Pluggable credential command: %s', $command);
-    my ($stdout, $stderr, $exit) = capture {
-        system($command);
+    
+    my $timeout = $exec->{timeout_millis} ? $exec->{timeout_millis} / 1000 : 30;
+    my ($stdout, $stderr, $exit);
+    
+    eval {
+        local $SIG{ALRM} = sub { die "Timeout\n" };
+        alarm($timeout);
+        ($stdout, $stderr, $exit) = capture {
+            system($command);
+        };
+        alarm(0);
     };
+    if ($@) {
+        alarm(0);
+        if ($@ eq "Timeout\n") {
+            $log->errorf('Pluggable command timed out after %d seconds', $timeout);
+            Google::Auth::Error->throw("Pluggable command timed out after $timeout seconds");
+        }
+        else {
+            die $@; # Re-throw other errors
+        }
+    }
 
     if ($exit != 0) {
         my $exit_code = $exit >> 8;
@@ -72,6 +96,16 @@ sub retrieve_subject_token {
         if ($@) {
             $log->errorf('Pluggable JSON parsing failed: %s', $@);
             Google::Auth::Error->throw('Failed to parse JSON from pluggable command output: ' . $@);
+        }
+
+        # Schema Validation
+        unless ( defined $data->{version} && defined $data->{success} && defined $data->{expiration_time} ) {
+            $log->errorf('Pluggable command output missing required schema fields (version, success, expiration_time)');
+            Google::Auth::Error->throw('Pluggable command output missing required schema fields (version, success, expiration_time)');
+        }
+        unless ( $data->{success} ) {
+            $log->errorf('Pluggable command reported failure (success=false)');
+            Google::Auth::Error->throw('Pluggable command reported failure (success=false)');
         }
         my $field = $format->{subject_token_field_name} // 'id_token';
         $token = $data->{$field};

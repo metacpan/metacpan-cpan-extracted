@@ -5,11 +5,11 @@ use strict;
 use autodie qw(:all);
 
 use Carp qw(croak carp);
-use Object::Configure 0.14;
-use Params::Get 0.13;
+use Object::Configure 0.23;
+use Params::Get 0.15;	# 0.15 fast-path: unblessed hashref returned directly
 use Readonly;
 use Scalar::Util qw(blessed);
-use Storable;
+use JSON::PP ();
 use Class::Autouse qw{
 	Locale::Language
 	Locale::Object::Country
@@ -18,7 +18,7 @@ use Class::Autouse qw{
 	I18N::LangTags::Detect
 };
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 # ── Module-level constants ───────────────────────────────────────────────────
 # Gathering magic strings here makes behavioural changes one-edit operations.
@@ -31,6 +31,7 @@ Readonly my $BAIDU_SUBNET        => '185.10.104.0/22';# RT-86809: Baidu misrepor
 Readonly my $DEPRECATED_EN_UK    => 'en-uk';          # some browsers still send this
 Readonly my $CANONICAL_EN_GB     => 'en-gb';
 Readonly my $ACCEPT_LANG_MAX     => 256;              # max bytes we accept from the header
+Readonly my $UA_MAX              => 512;              # max bytes we accept from HTTP_USER_AGENT
 Readonly my $GEO_UNKNOWN         => -1;               # geo-module sentinel: not yet probed
 Readonly my $GEO_ABSENT          =>  0;               # geo-module sentinel: unavailable
 Readonly my $GEO_PRESENT         =>  1;               # geo-module sentinel: loaded OK
@@ -43,7 +44,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =cut
 
@@ -106,6 +107,26 @@ Creates a CGI::Lingua object.
       debug      => Bool                  # optional; enable debug logging
 
     Returns: CGI::Lingua blessed hashref, or a clone when called on an object.
+
+=head3 EXAMPLE
+
+    # Array-ref of supported codes (most common form)
+    my $l = CGI::Lingua->new({ supported => ['en', 'fr', 'de'] });
+
+    # Single scalar code
+    my $l = CGI::Lingua->new(supported => 'en');
+
+    # With cache, logger, and CGI::Info object
+    use CHI;
+    my $cache = CHI->new(driver => 'File', root_dir => '/tmp/lingua-cache');
+    my $l = CGI::Lingua->new({
+        supported => ['en', 'fr'],
+        cache     => $cache,
+        logger    => $my_log_object,
+    });
+
+    # Clone an existing object with different supported list
+    my $clone = $l->new(supported => ['de']);
 
 =head3 MESSAGES
 
@@ -183,10 +204,21 @@ sub new
 	# Try to restore a frozen state from the cache before doing any work
 	if($cache && $ENV{'REMOTE_ADDR'}) {
 		my $key = _build_cache_key($ENV{'REMOTE_ADDR'}, $params, $class, $info);
-		if(my $rc = $cache->get($key)) {
-			$rc = Storable::thaw($rc);
-			# Re-inject transient/non-serialisable fields
-			$rc->{logger}           = $params->{'logger'};
+		if(my $frozen = $cache->get($key)) {
+			# JSON::PP is used in preference to Storable::thaw because Storable
+			# can execute arbitrary Perl code via STORABLE_thaw hooks if an
+			# attacker manages to write a crafted blob to the cache backend.
+			# JSON cannot execute code regardless of its content.
+			# If the blob is not valid JSON (e.g. a legacy Storable entry), the
+			# eval catches the error and we fall through to fresh construction.
+			my $rc = eval { JSON::PP::decode_json($frozen) };
+			unless(defined $rc && ref($rc) eq 'HASH') {
+				$rc = undef;    # stale or corrupt entry — rebuild below
+			}
+			if(defined $rc) {
+				bless $rc, $class;
+				# Re-inject transient/non-serialisable fields
+				$rc->{logger}           = $params->{'logger'};
 			$rc->{_syslog}          = $params->{syslog};
 			$rc->{_cache}           = $cache;
 			$rc->{_supported}       = $params->{supported};
@@ -196,10 +228,11 @@ sub new
 			$rc->{_have_geoipfree}  = $GEO_UNKNOWN;
 
 			# If lang= CGI param is active, the cached language choice may be stale
-			if(($rc->{_what_language} || $rc->{_rlanguage}) && $info && $info->lang()) {
-				delete @{$rc}{qw(_what_language _rlanguage _country)};
+				if(($rc->{_what_language} || $rc->{_rlanguage}) && $info && $info->lang()) {
+					delete @{$rc}{qw(_what_language _rlanguage _country)};
+				}
+				return $rc;
 			}
-			return $rc;
 		}
 	}
 
@@ -277,21 +310,23 @@ sub DESTROY {
 
 	$self->_debug("Storing self in cache as $key");
 
-	# Freeze only the computed state — not loggers, file handles, or
+	# Serialise only the computed state — not loggers, file handles, or
 	# geo-module objects (they are re-initialised on next construction).
-	my $copy = bless {
-		_slanguage              => $self->{_slanguage},
-		_slanguage_code_alpha2  => $self->{_slanguage_code_alpha2},
+	# JSON::PP is used instead of Storable so that a compromised cache backend
+	# cannot deliver a blob that executes code via STORABLE_thaw hooks.
+	my %state = (
+		_slanguage               => $self->{_slanguage},
+		_slanguage_code_alpha2   => $self->{_slanguage_code_alpha2},
 		_sublanguage_code_alpha2 => $self->{_sublanguage_code_alpha2},
-		_country                => $self->{_country},
-		_rlanguage              => $self->{_rlanguage},
-		_dont_use_ip            => $self->{_dont_use_ip},
-		_have_ipcountry         => $self->{_have_ipcountry},
-		_have_geoip             => $self->{_have_geoip},
-		_have_geoipfree         => $self->{_have_geoipfree},
-	}, ref($self);
+		_country                 => $self->{_country},
+		_rlanguage               => $self->{_rlanguage},
+		_dont_use_ip             => $self->{_dont_use_ip},
+		_have_ipcountry          => $self->{_have_ipcountry},
+		_have_geoip              => $self->{_have_geoip},
+		_have_geoipfree          => $self->{_have_geoipfree},
+	);
 
-	$cache->set($key, Storable::nfreeze($copy), $CACHE_TTL_LONG);
+	$cache->set($key, JSON::PP::encode_json(\%state), $CACHE_TTL_LONG);
 }
 
 =head2 language
@@ -304,6 +339,12 @@ on a site that only serves British English, language() will return 'English'.
 
 If none of the requested languages is included within the supported lists,
 language() returns 'Unknown'.
+
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'fr,en;q=0.9';
+    my $l = CGI::Lingua->new(supported => ['en', 'fr']);
+    print $l->language();   # "French"
 
 =head3 API SPECIFICATION
 
@@ -347,6 +388,12 @@ sub name {
 Tells the CGI what variant to use e.g. 'United Kingdom', or undef if
 it can't be determined.
 
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb']);
+    print $l->sublanguage();   # "United Kingdom"
+
 =head3 API SPECIFICATION
 
     Input:  none beyond $self
@@ -370,6 +417,12 @@ when you've asked for en-gb.
 
 If none of the requested languages is included within the supported lists,
 language_code_alpha2() returns undef.
+
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb']);
+    print $l->language_code_alpha2();   # "en"
 
 =head3 API SPECIFICATION
 
@@ -403,6 +456,12 @@ sub code_alpha2 {
 Gives the two-character representation of the supported language, e.g. 'gb'
 when you've asked for en-gb, or undef.
 
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb']);
+    print $l->sublanguage_code_alpha2();   # "gb"
+
 =head3 API SPECIFICATION
 
     Input:  none beyond $self
@@ -424,6 +483,12 @@ or not it is supported.
 
 Returns the sublanguage (if appropriate) in parentheses,
 e.g. "English (United Kingdom)"
+
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en']);
+    print $l->requested_language();   # "English (United Kingdom)"
 
 =head3 API SPECIFICATION
 
@@ -1038,6 +1103,16 @@ caching capability of CGI::Lingua.
     Returns: Str (2 lowercase chars) | undef
       'Unknown' is only returned in the Baidu-EU special case via _handle_eu_country.
 
+=head3 EXAMPLE
+
+    # With mod_geoip (fastest - no IP lookup at all):
+    local $ENV{GEOIP_COUNTRY_CODE} = 'DE';
+    print $l->country();   # "de"
+
+    # With REMOTE_ADDR and IP::Country installed:
+    local $ENV{REMOTE_ADDR} = '8.8.8.8';
+    print $l->country();   # "us" (depends on geo database)
+
 =head3 MESSAGES
 
     "GEOIP_COUNTRY_CODE contains an invalid country code; ignoring"
@@ -1048,6 +1123,22 @@ caching capability of CGI::Lingua.
     "cache contains a numeric country: N"
     "IP matches to a numeric country"
 
+=head3 PSEUDOCODE
+
+    1. Return cached _country if set
+    2. Check GEOIP_COUNTRY_CODE env var (mod_geoip); validate /^[A-Z]{2}$/
+    3. Check HTTP_CF_IPCOUNTRY (Cloudflare); skip 'XX'; validate /^[A-Z]{2}$/
+    4. Untaint and validate REMOTE_ADDR; return undef if absent or invalid
+    5. Skip private and loopback IPs (return undef)
+    6. Check CHI cache; return cached value if present
+    7. Try IP::Country::Fast (local DB, fastest)
+    8. Try Geo::IP (local DB)
+    9. Try Geo::IPfree (local DB, skip $BROKEN_GEOIPFREE)
+    10. Try geoplugin.net JSON API (LWP::Simple::WithCache or LWP::Simple)
+    11. Last resort: Net::Whois::IP then Net::Whois::IANA
+    12. Sanitise: discard numeric, normalise HK->CN, handle EU special case
+    13. Store in CHI cache; return result
+
 =cut
 
 sub country {
@@ -1055,7 +1146,11 @@ sub country {
 
 	$self->_trace(__PACKAGE__, ': Entered country()');
 
-	# Return cached result immediately (but see FIXME below about undef caching)
+	# Return cached result immediately if a previous call already resolved it.
+	# Note: undef results (private/loopback IPs) are NOT cached here because
+	# country() reads REMOTE_ADDR at call time, not construction time; caching
+	# undef would give wrong answers if REMOTE_ADDR changes between calls on
+	# the same object (the documented lazy-read design).  See LIMITATIONS.
 	if($self->{_country}) {
 		$self->_trace('quick return: ', $self->{_country});
 		return $self->{_country};
@@ -1136,8 +1231,9 @@ sub country {
 
 	# Try IP::Country first (fastest, local database)
 	if($self->{_have_ipcountry} == $GEO_UNKNOWN) {
-		if(eval { require IP::Country }) {
-			IP::Country->import();
+		if(eval { require IP::Country::Fast }) {
+			# Require the concrete class directly; IP::Country->import() is not needed
+			# because IP::Country::Fast->new() is a fully-qualified class method call.
 			$self->{_have_ipcountry} = $GEO_PRESENT;
 			$self->{_ipcountry}      = IP::Country::Fast->new();
 		} else {
@@ -1169,7 +1265,9 @@ sub country {
 			if($self->{_have_geoipfree} == $GEO_UNKNOWN) {
 				eval { require Geo::IPfree };
 				unless($@) {
-					Geo::IPfree::IP->import();
+					# No ->import(): Geo::IPfree uses only OO (->LookUp); the old
+					# Geo::IPfree::IP->import() call was a wrong package and could
+					# clobber Test::Mockingbird mocks on some versions.
 					$self->{_have_geoipfree} = $GEO_PRESENT;
 					$self->{_geoipfree}      = Geo::IPfree->new();
 				} else {
@@ -1194,7 +1292,7 @@ sub country {
 	   (eval { require LWP::Simple::WithCache; require JSON::Parse })) {
 		$self->_debug("Look up $ip on geoplugin");
 
-		if(my $data = LWP::Simple::WithCache::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
+		if(my $data = LWP::Simple::WithCache::get("https://www.geoplugin.net/json.gp?ip=$ip")) {
 			eval { $self->{_country} = JSON::Parse::parse_json($data)->{'geoplugin_countryCode'} };
 			$self->_warn({ warning => "geoplugin returned unparseable JSON: $@" }) if $@;
 		}
@@ -1223,6 +1321,16 @@ sub country {
 			if($self->{_country} && ($self->{_country} !~ /\D/)) {
 				$self->_warn({ warning => "cache contains a numeric country: $self->{_country}" });
 				delete $self->{_country};
+			} elsif($self->{_country} &&
+				$self->{_country} ne 'Unknown' &&
+				($self->{_country} !~ /^[a-z]{2}$/)) {
+				# Reject anything that is not exactly 2 lowercase ASCII letters,
+				# unless it is the 'Unknown' sentinel written by _handle_eu_country
+				# for EU addresses that do not map to a specific country.
+				# Guards against Whois CRLF injection leftovers ("gbx-header: evil")
+				# and XSS payloads in JSON API responses ("gb<script>...</script>").
+				$self->_warn({ warning => "Discarding malformed country code '$self->{_country}'" });
+				delete $self->{_country};
 			} elsif($self->{_country} && $self->{_cache}) {
 				$self->_debug("Set $ip to $self->{_country}");
 				$self->{_cache}->set(
@@ -1249,7 +1357,8 @@ sub _resolve_country_via_whois
 	$self->_debug("Look up $ip on Whois");
 
 	require Net::Whois::IP;
-	Net::Whois::IP->import();
+	# No ->import(): whoisip_query is called fully-qualified, so import is unneeded
+	# and on some versions reinstalls the real function, clobbering Test::Mockingbird mocks.
 
 	my $whois;
 	eval {
@@ -1276,18 +1385,17 @@ sub _resolve_country_via_whois
 
 	if($self->{_country}) {
 		$self->_debug("Found $ip on Net::Whois::IP as ", $self->{_country});
-		# Strip carriage returns (e.g. 190.24.1.122) and trailing comments
-		$self->{_country} =~ s/[\r\n]//g;
-		if($self->{_country} =~ /^(..)\s*#/) {
-			$self->{_country} = $1;
-		}
-		return;
+		$self->{_country} = _clean_country_code($self->{_country});
+		# _clean_country_code returns undef for malformed values (e.g. CRLF
+		# injection leftovers); if so, fall through to the IANA look-up.
+		return if defined $self->{_country};
+		delete $self->{_country};
 	}
 
 	$self->_debug("Look up $ip on IANA");
 
 	require Net::Whois::IANA;
-	Net::Whois::IANA->import();
+	# No ->import(): Net::Whois::IANA->new() is a class method; import not needed.
 
 	my $iana = Net::Whois::IANA->new();
 	eval { $iana->whois_query(-ip => $ip) };
@@ -1297,11 +1405,30 @@ sub _resolve_country_via_whois
 	}
 
 	if($self->{_country}) {
-		$self->{_country} =~ s/[\r\n]//g;
-		if($self->{_country} =~ /^(..)\s*#/) {
-			$self->{_country} = $1;
-		}
+		$self->{_country} = _clean_country_code($self->{_country});
+		delete $self->{_country} unless defined $self->{_country};
 	}
+}
+
+# ── _clean_country_code ───────────────────────────────────────────────────
+# Purpose:      Strip carriage returns and trailing "#…" comments that some
+#               Whois servers append to their country field
+#               (e.g. "US\r", "GB # United Kingdom").
+# Entry:        $raw — raw country string from a Whois response.
+# Exit:         Cleaned 2-char country code string.
+# Side Effects: None.
+sub _clean_country_code
+{
+	my ($raw) = @_;
+	$raw =~ s/[\r\n]//g;
+	# Accept exactly 2 alpha chars, optionally followed by whitespace and a
+	# comment (e.g. "GB # United Kingdom").  Anything else (CRLF injection
+	# leftovers, embedded headers) returns undef so the caller can discard it
+	# rather than propagating a malformed string through the geo pipeline.
+	if($raw =~ /^([A-Za-z]{2})\s*(?:#.*)?$/) {
+		return $1;
+	}
+	return;
 }
 
 # ── _handle_eu_country ────────────────────────────────────────────────────
@@ -1355,7 +1482,7 @@ sub _load_geoip
 		return;
 	}
 
-	Geo::IP->import();
+	# No ->import(): Geo::IP->open() and Geo::IP->new() are class methods; import unneeded.
 	$self->{_have_geoip} = $GEO_PRESENT;
 
 	# GEOIP_STANDARD = 0 (can't use the constant name directly)
@@ -1376,10 +1503,28 @@ and is not 100% reliable.  But it's better than nothing ;-)
 
 Returns a L<Locale::Object::Country> object.
 
+=head3 EXAMPLE
+
+    local $ENV{REMOTE_ADDR} = '8.8.8.8';
+    my $locale = $l->locale();
+    if (defined $locale) {
+        print $locale->name();          # e.g. "United States"
+        print $locale->currency_code(); # e.g. "USD"
+    }
+
 =head3 API SPECIFICATION
 
     Input:  none beyond $self
     Returns: Locale::Object::Country | undef
+
+=head3 PSEUDOCODE
+
+    1. Return cached _locale immediately if already computed
+    2. Parse HTTP_USER_AGENT parenthetical for xx-YY language tag
+    3. Try HTTP::BrowserDetect on the full User-Agent string
+    4. Fall back to country() IP lookup
+    5. Fall back to GEOIP_COUNTRY_CODE env var (ISO 3166-1 validated)
+    6. Return undef if all strategies fail
 
 =cut
 
@@ -1388,7 +1533,17 @@ sub locale {
 
 	return $self->{_locale} if $self->{_locale};
 
-	my $agent = $ENV{'HTTP_USER_AGENT'};
+	# Validate and untaint HTTP_USER_AGENT before passing to any parser.
+	# The User-Agent header is attacker-controlled; apply the same discipline
+	# as HTTP_ACCEPT_LANGUAGE.  Printable ASCII (0x20-0x7e), bounded length.
+	my $agent;
+	if(defined(my $raw_agent = $ENV{'HTTP_USER_AGENT'})) {
+		if($raw_agent =~ /^([\x20-\x7e]{1,$UA_MAX})$/a) {
+			$agent = $1;    # untainted
+		} else {
+			$self->_warn({ warning => 'HTTP_USER_AGENT contains invalid characters or exceeds length limit; ignoring' });
+		}
+	}
 
 	# First try: parse the language tag from the User-Agent parenthetical
 	if(defined($agent) && ($agent =~ /\((.+)\)/)) {
@@ -1409,9 +1564,16 @@ sub locale {
 		if(eval { require HTTP::BrowserDetect }) {
 			HTTP::BrowserDetect->import();
 			my $browser = HTTP::BrowserDetect->new($agent);
-			if($browser && $browser->country() && (my $c = $self->_code2country($browser->country()))) {
-				$self->{_locale} = $c;
-				return $c;
+			# Validate country() result before use — the return value comes from
+			# the third-party module and is not yet untainted or range-checked.
+			if($browser) {
+				my $bc = $browser->country() // '';
+				if($bc =~ /^([A-Za-z]{2})$/a) {
+					if(my $c = $self->_code2country($1)) {
+						$self->{_locale} = $c;
+						return $c;
+					}
+				}
 			}
 		}
 	}
@@ -1458,11 +1620,31 @@ CGI::Lingua will make use of that, otherwise it will use L<ip-api.com>
     Input:  none beyond $self
     Returns: Str (IANA timezone name) | undef
 
+=head3 EXAMPLE
+
+    local $ENV{REMOTE_ADDR} = '8.8.8.8';
+    my $tz = $l->time_zone();
+    print $tz // 'unknown';   # e.g. "America/New_York"
+
 =head3 MESSAGES
 
     "Couldn't determine the timezone"
     "LWP::Simple::WithCache and LWP::Simple are both absent; cannot contact ip-api.com"
       Returns undef rather than croaking; install either LWP variant to enable ip-api lookups.
+
+=head3 PSEUDOCODE
+
+    1. Return cached _timezone immediately if already computed
+    2. If REMOTE_ADDR is set:
+       a. Untaint and validate the IP
+       b. Try Geo::IP->time_zone() (local DB)
+       c. Try LWP::Simple::WithCache + JSON::Parse against ip-api.com
+       d. Fall back to LWP::Simple + JSON::Parse against ip-api.com
+       e. Warn and return undef if neither LWP variant is installed
+    3. If REMOTE_ADDR is absent (local/CLI mode):
+       a. Read /etc/timezone if readable
+       b. Fall back to DateTime::TimeZone::Local->TimeZone()->name()
+    4. Warn "Couldn't determine the timezone" and return undef if all fail
 
 =cut
 
@@ -1530,6 +1712,16 @@ sub time_zone {
 		}
 	}
 
+	# Validate the timezone string against a permissive but bounded IANA pattern.
+	# Rejects XSS payloads (e.g. "Europe/London<script>...") from hostile JSON
+	# responses while accepting all real IANA zone names (e.g. "America/New_York",
+	# "Etc/GMT+8", "UTC").
+	if(defined($self->{_timezone}) &&
+	   $self->{_timezone} !~ /^[A-Za-z][A-Za-z0-9_+\-\/]{0,50}$/) {
+		$self->_warn({ warning => "Discarding malformed timezone '$self->{_timezone}'" });
+		delete $self->{_timezone};
+	}
+
 	unless(defined($self->{_timezone})) {
 		$self->_warn({ warning => "Couldn't determine the timezone" });
 	}
@@ -1541,6 +1733,12 @@ sub time_zone {
 Returns true (1) if the negotiated language is written right-to-left, false (0)
 otherwise.  Covers Arabic, Hebrew, Persian, Urdu, Yiddish, Dhivehi, Pashto,
 Sindhi, Uyghur, and Kurdish.
+
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'ar';
+    my $l = CGI::Lingua->new(supported => ['ar', 'en']);
+    print $l->is_rtl();   # 1
 
 =head3 API SPECIFICATION
 
@@ -1559,6 +1757,12 @@ sub is_rtl
 
 Returns C<'rtl'> or C<'ltr'> for the negotiated language, suitable for direct
 use as an HTML C<dir> attribute value.
+
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'he';
+    my $l = CGI::Lingua->new(supported => ['he', 'en']);
+    print qq(<html dir="} . $l->text_direction() . qq(">);   # dir="rtl"
 
 =head3 API SPECIFICATION
 
@@ -1585,6 +1789,14 @@ Romanian, Latvian, Lithuanian, and Slovenian.  Languages not in the table fall
 back to the English rule (n == 1 => C<'one'>, else C<'other'>).
 
 For fractional numbers or full CLDR v42+ accuracy, use C<Locale::CLDR>.
+
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'ru';
+    my $l = CGI::Lingua->new(supported => ['ru']);
+    print $l->plural_category(1);    # "one"
+    print $l->plural_category(3);    # "few"
+    print $l->plural_category(11);   # "many"
 
 =head3 API SPECIFICATION
 
@@ -1766,6 +1978,17 @@ Returns C<undef> if no matching file exists.
       $ext - Str   file extension without leading dot (default: 'json')
     Returns: Str (absolute or relative path) | undef
 
+=head3 EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb', 'en']);
+    my $path = $l->translation_file('/var/www/i18n');
+    # Returns '/var/www/i18n/en-gb.json' if it exists,
+    # then '/var/www/i18n/en.json', or undef.
+
+    # Custom extension:
+    my $path = $l->translation_file('/var/www/i18n', 'po');
+
 =head3 MESSAGES
 
     (none - returns undef silently when no file is found)
@@ -1776,8 +1999,25 @@ sub translation_file
 {
 	my ($self, $dir, $ext) = @_;
 	return unless defined $dir;
+
+	# Reject traversal attempts in the directory argument.  A real translation
+	# directory never needs '..', null bytes, or other shell metacharacters.
+	# The caller is responsible for not passing user-controlled data as $dir,
+	# but we guard here as a defence-in-depth measure.
+	if($dir =~ /\.\./ || $dir =~ /\x00/) {
+		$self->_warn({ warning => "translation_file: unsafe directory '$dir' rejected" });
+		return;
+	}
+
 	$ext //= 'json';
 	$ext =~ s/^\.//;    # accept '.json' or 'json'
+
+	# Reject extensions containing path-traversal sequences or shell metacharacters.
+	# Valid extensions are word characters and hyphens only (e.g. 'json', 'po', 'yml').
+	unless($ext =~ /^[A-Za-z0-9\-]+$/) {
+		$self->_warn({ warning => "translation_file: unsafe extension '$ext' rejected" });
+		return;
+	}
 
 	my @candidates;
 	if(my $sub = $self->sublanguage_code_alpha2()) {
@@ -1930,13 +2170,14 @@ sub _trace  { my $self = shift; $self->_log('trace',  @_) }
 sub _warn
 {
 	my $self = shift;
+
+	# Parse once; both branches need the same $msg.
+	my $params = Params::Get::get_params('warning', @_);
+	my $msg    = (ref($params) ? $params->{'warning'} : undef) // join('', grep defined, @_);
+
 	if(defined($self->{'logger'})) {
-		# Logger gets the warning text as a plain string, not a data structure
-		my $params = Params::Get::get_params('warning', @_);
-		$self->{'logger'}->warn($params->{'warning'} // join('', grep defined, @_));
+		$self->{'logger'}->warn($msg);
 	} else {
-		my $params = Params::Get::get_params('warning', @_);
-		my $msg    = $params->{'warning'} // join('', grep defined, @_);
 		$self->_log('warn', $msg);
 		carp($msg);
 	}
@@ -1980,11 +2221,12 @@ falls back to Whois queries against live RIPE/ARIN/IANA servers.  These can
 time out under load.  Install at least one local geo-database module and enable
 the CHI cache to avoid this.
 
-=item * B<Sub::Private not yet enforced>
+=item * B<Private methods are accessible from outside the package>
 
-The C<_*> private methods are currently accessible from outside the package.
-C<Sub::Private> should be added to enforce encapsulation once white-box tests
-are updated to call only the public API.
+The C<_*> methods use the naming convention for privacy but Perl does not enforce
+it.  C<Sub::Private> or C<Sub::Protected> should be added once all white-box
+tests (C<t/function.t>, C<t/extended_tests.t>) are updated to use the public API
+exclusively.
 
 =item * B<IPv4-mapped IPv6 addresses are normalised to IPv4>
 
@@ -1998,6 +2240,17 @@ address string is not preserved in cache keys or log messages.
 IP addresses that Whois reports as country C<EU> are mapped to C<'Unknown'>
 unless they fall within Baidu's known subnet (RT-86809).  There is no ISO
 3166-1 country code for the European Union.
+
+=item * B<country() does not cache undef results>
+
+When C<country()> cannot determine a country (private IPs, loopback,
+unresolvable addresses), it returns C<undef> without storing the result.  A
+second call on the same object repeats the full validation pipeline.  This is
+intentional: C<country()> reads C<REMOTE_ADDR> at call time rather than at
+construction time, so caching C<undef> would return a wrong answer if
+C<REMOTE_ADDR> changes between calls.  In practice this is rarely a problem
+because C<country()> is called once per request and CGI applications typically
+create a fresh object per request.
 
 =back
 
@@ -2088,6 +2341,54 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
     language : CGI::Lingua → Str
     result ∈ {name(l) | l ∈ supported} ∪ {'Unknown'}
 
+=head2 sublanguage
+
+    sublanguage : CGI::Lingua -> Str | undef
+    result = country_name(sublanguage_code_alpha2(self))
+             when sublanguage_code_alpha2(self) is defined,
+             undef otherwise
+
+=head2 language_code_alpha2
+
+    language_code_alpha2 : CGI::Lingua -> Str(2) | undef
+    result = base_code(matched_supported_entry)
+             when a supported language was matched, undef otherwise
+
+=head2 sublanguage_code_alpha2
+
+    sublanguage_code_alpha2 : CGI::Lingua -> Str(2) | undef
+    result = variety_code(matched_supported_entry) | undef
+
+=head2 requested_language
+
+    requested_language : CGI::Lingua -> Str
+    result = name(base) + " (" + name(variety) + ")"
+             when variety is known,
+           = name(base)   when no variety,
+           = 'Unknown'    when no language detected
+
+=head2 country
+
+    country : CGI::Lingua -> Str(2,lowercase) | undef
+    -- 'Unknown' returned only in the EU/Baidu special case
+    result = lc(code) where code satisfies ISO 3166-1 alpha-2
+             | undef when IP is private, loopback, or unresolvable
+
+=head2 locale
+
+    locale : CGI::Lingua -> Locale::Object::Country | undef
+    -- Best-guess detection; not guaranteed accurate.
+    result = first defined value from:
+        1. UA parenthetical language tag
+        2. HTTP::BrowserDetect country
+        3. country() IP lookup
+        4. GEOIP_COUNTRY_CODE env var
+
+=head2 time_zone
+
+    time_zone : CGI::Lingua -> Str | undef
+    result is an IANA timezone name (e.g. 'Europe/London') or undef
+
 =head2 is_rtl
 
     is_rtl : CGI::Lingua → Bool
@@ -2100,8 +2401,10 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 =head2 plural_category
 
-    plural_category : CGI::Lingua × ℕ → PluralCategory
-    plural_category(s, n) ≙ PLURAL_RULES[language_code_alpha2(s)](n)
+    plural_category : CGI::Lingua x N -> PluralCategory
+    plural_category(s, n) = PLURAL_RULES[language_code_alpha2(s)](trunc(n))
+    -- Falls back to English rule (n=1 -> 'one'; else 'other')
+    -- when language_code_alpha2(s) is undef or not in the rules table.
 
 =head2 translation_file
 
@@ -2116,7 +2419,9 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 Copyright 2010-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

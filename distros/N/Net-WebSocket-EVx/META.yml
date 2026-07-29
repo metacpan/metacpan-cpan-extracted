@@ -3,28 +3,45 @@ abstract: 'Perl wrapper around Wslay websocket library'
 author:
   - 'Yegor Korablev <egor@cpan.org>'
 build_requires:
+  Devel::Peek: '0'
+  ExtUtils::MakeMaker: '0'
+  Fcntl: '0'
   IO::Socket::INET: '0'
   Net::EmptyPort: '0'
-  Test::More: '0'
+  POSIX: '0'
+  Socket: '0'
+  Test::More: '0.94'
   utf8: '0'
 configure_requires:
-  Alien::Wslay: '0'
-  EV: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+  Alien::Base::Wrapper: '1.97'
+  Alien::Wslay: '0.3'
+  EV: '4.0'
+  EV::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-WebSocket-EVx
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Net::WebSocket::EVx:
+    file: lib/Net/WebSocket/EVx.pm
+    version: '0.21'
 requires:
-  EV: '0'
+  Carp: '0'
+  EV: '4.0'
   Exporter: '0'
   XSLoader: '0'
   constant: '0'
-  strict: '0'
-  warnings: '0'
-version: '0.20'
-x_generated_by_perl: v5.40.2
-x_serialization_backend: 'YAML::Tiny version 1.76'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/vividsnow/Net-WebSocket-EVx/issues
+  repository: https://github.com/vividsnow/Net-WebSocket-EVx.git
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

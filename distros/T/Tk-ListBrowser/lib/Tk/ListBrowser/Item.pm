@@ -2,7 +2,7 @@ package Tk::ListBrowser::Item;
 
 =head1 NAME
 
-Tk::ListBrowser::Item - List entry holding object.
+Tk::ListBrowser::Item - Side column item holding object.
 
 =cut
 
@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.15;
+$VERSION = 0.16;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -22,16 +22,16 @@ my $dlmreg = qr/\.|\(|\)|\:|\!|\+|\,|\-|\<|\=|\>|\%|\&|\*|\"|\'|\/|\;|\?|\[|\]|\
 
 =head1 SYNOPSIS
 
- my $item = $listbrowser->add($entryname, @options);
+ my $entry = $listbrowser->add($entryname, @entryoptions);
 
- my $item = $listbrowser->get($entryname);
+ my $item = $listbrowser->itemCreate($entryname, $columnname, @itemoptions);
 
 =head1 DESCRIPTION
 
 Inherits L<Tk::ListBrowser::BaseItem>.
 
 This module creates an object that holds all information of
-a cell in a side column. You will never need to create an 
+a cell in a side column. You will never need to create an
 item object yourself.
 
 Besides the options in it's parent, you can use the I<-data>, I<-image>,
@@ -96,7 +96,7 @@ sub deleteImage {
 	my $self = shift;
 	my $i = $self->cimage;
 	return unless defined $i;
-	
+
 	my $c = $self->Subwidget('Canvas');
 	$c->delete($i);
 	$self->cimage(undef);
@@ -106,17 +106,22 @@ sub deleteRect {
 	my $self = shift;
 	my $r = $self->crect;
 	return unless defined $r;
-	
+
 	my $c = $self->Subwidget('Canvas');
 	$c->delete($r);
 	$self->crect(undef);
+}
+
+sub deleteSelect {
+	my $self = shift;
+	$self->deleteRect;
 }
 
 sub deleteText {
 	my $self = shift;
 	my $t = $self->ctext;
 	return unless defined $t;
-	
+
 	my $c = $self->Subwidget('Canvas');
 	$c->delete($t);
 	$self->ctext(undef);
@@ -233,7 +238,8 @@ sub draw {
 	my $e = ref $entry;
 	my $sel = $entry->selected and $self->ismapped;
 	$self->setRegion;
-	$self->drawRect($x, $y) unless $sel;
+	$self->drawRect unless $sel;
+	$self->drawSelect if $sel;
 	$self->drawImage;
 	$self->drawText;
 
@@ -269,6 +275,7 @@ sub drawRect {
 	my $c = $self->Subwidget('Canvas');
 
 	my ($x, $y, $dx, $dy) = $self->region;
+	$x -- unless $self->isentry; #make overlapping columns better readable
 	my $rtag = $c->createRectangle($x, $y, $dx, $dy,
 		-fill => $self->background,
 		-outline => $self->background,
@@ -276,6 +283,75 @@ sub drawRect {
 	);
 #	$self->anchorRaise($rtag);
 	$self->crect($rtag);
+}
+
+sub drawSelect {
+	my ($self) = @_;
+	$self->deleteSelect;
+	my $lb = $self->listbrowser;
+	return unless $self->get($self->name)->selected ;
+	return unless $lb->ismapped;
+
+	my $left = 1;
+	my $right = 1;
+	my $owner = $self->owner;
+	my $c = $lb->Subwidget('Canvas');
+	my $si = Tk::ListBrowser::SelectXPM->new($lb);
+	my @ecoords = $self->elementCoords;
+
+	unless ($self->listMode) { #non list mode, keep it simple and be done
+		my ($x, $y) = @ecoords;
+		my $pixmap = $si->selectimage(@ecoords, $left, $right);
+		my $image = $c->createImage($x, $y,
+			-image => $pixmap,
+			-anchor => 'nw',
+			-tags => ['sel', 'rect', $self->name],
+		);
+		$self->crect($image);
+		return
+	}
+
+	my @columns = $self->columnList;
+	my @coords = $self->region;
+
+	#check if we are out of the picture
+	return if $coords[2] < $ecoords[0];
+	return if $coords[0] > $ecoords[2];
+
+	if ($self->isentry) { #this is an entry
+		if (@columns) { #we have to consider columns
+			$coords[0] = $ecoords[0];
+			$right = 0;
+		} else { #no columns
+			@coords = @ecoords;
+		}
+	} else { #this is a column item
+		$coords[0] = $coords[0] - 1; #make overlapping columns better readable.
+		my $lastcolumn = pop @columns;
+		if ($lastcolumn eq $owner->name) { #the item is in the last column
+			$left = 0;
+			$coords[2] = $ecoords[2];
+		} else {
+			$left = 0;
+			$right = 0;
+		}
+	}
+
+	#let's draw something
+	my ($x, $y) = @coords;
+	my $pixmap = $si->selectimage(@coords, $left, $right);
+	my $image = $c->createImage($x, $y,
+		-image => $pixmap,
+		-anchor => 'nw',
+		-tags => ['sel', 'rect', $self->name],
+	);
+
+	#some administration
+	$self->crect($image);
+	my @guides = $c->find('withtag', 'guides');
+	$c->raise('guides', 'sel') if @guides;
+	$c->raise('indicator', 'sel');
+	$c->raise('indicator', 'guides') if @guides;
 }
 
 sub drawText {
@@ -314,6 +390,31 @@ sub drawText {
 #			}
 #		}
 #	}
+}
+
+sub elementCoords {
+	my $self = shift;
+	my $lb = $self->listbrowser;
+	my $c = $lb->Subwidget('Canvas');
+
+	my @coords = $self->region;
+
+	if ($self->listMode) {
+
+		my ($width) = $lb->lastScrollRegion;
+		my ($cw) = $self->canvasSize;
+
+		my ($xv) = $c->xview;
+
+		my $x1 = int($width * $xv);
+		$coords[0] = $x1;
+		my $x2 = $cw;
+		if ($xv > 0) {
+			$x2 = $x1 + $cw
+		}
+		$coords[2] = $x2;
+	}
+	return @coords
 }
 
 sub getRegion {
@@ -628,3 +729,6 @@ If you find any bugs, please report them here: L<https://github.com/haje61/Tk-Li
 
 =back
 
+=cut
+
+1;

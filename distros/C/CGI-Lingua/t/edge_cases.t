@@ -21,7 +21,7 @@ use lib 't/lib';
 
 BEGIN { use_ok('CGI::Lingua') }
 
-# Pre-require lazily-loaded modules before installing mocks (CLAUDE.md pitfall).
+# Pre-require lazily-loaded modules before installing mocks
 my $HAS_LWP  = eval { require LWP::Simple::WithCache; 1 } ? 1 : 0;
 my $HAS_JSON = eval { require JSON::Parse;             1 } ? 1 : 0;
 

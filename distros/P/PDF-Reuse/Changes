@@ -1,5 +1,21 @@
 Revision history for Perl extension PDF::Reuse
 
+0.44 Wed Jul 29 2026
+     - Embedded TrueType text is now searchable and copyable (GitHub #15,
+       RT #123564). A /ToUnicode CMap is generated for each embedded font,
+       covering only the glyphs actually used. Built here rather than via
+       Text::PDF::TTFont0, whose ToUnicode support emits a malformed CMap
+       (RT #123562, unfixed upstream).
+     - Fix "Didn't find pages" when a source filename is reused within one
+       session (GitHub #21, #22, RT #103758, RT #103768). %processed cached
+       byte offsets keyed by filename and was never invalidated when the
+       file behind that name was replaced, so the first file's offsets were
+       applied to the second file's bytes.
+     - CI now covers Linux, macOS and Windows again, with per-platform
+       isolation so one failing cell no longer masks the others
+       (GitHub #9, #10). Upstream workflow references are pinned to a SHA;
+       see docs/ci-pin-maintenance.md.
+
 0.43 Thu Jan 23 2026
      - Fix prTTFont/prEnd crash from orphaned docProxy (GitHub #24)
        DESTROY was releasing TTFont0 objects still owned by DocProxy,

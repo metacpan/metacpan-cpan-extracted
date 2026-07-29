@@ -29,6 +29,7 @@ t/01_basic/01_types.t
 t/01_basic/02_common.t
 t/01_basic/03_cellbuf.t
 t/01_basic/04_wcwidth.t
+t/01_basic/05_debug_macros.t
 t/03_terminfo/00_load.t
 t/03_terminfo/01_terminfo_builtin_test.t
 t/03_terminfo/02_terminfo.t

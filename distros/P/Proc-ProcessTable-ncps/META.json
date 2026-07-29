@@ -1,0 +1,64 @@
+{
+   "abstract" : "New Colorized(optional) PS, an enhanced version of PS with advanced searching capabilities",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Proc-ProcessTable-ncps",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ColorTheme::NoColor" : "0.003",
+            "Data::Unixish::Apply" : "1.572",
+            "Getopt::Long" : "v0.0.0",
+            "List::Util" : "1.63",
+            "POSIX" : "0",
+            "Proc::ProcessTable" : "0.634",
+            "Proc::ProcessTable::InfoString" : "v0.1.0",
+            "Proc::ProcessTable::Match" : "v0.1.0",
+            "Statistics::Basic" : "1.6611",
+            "Term::ANSIColor" : "5.01",
+            "Text::ANSITable" : "0.501",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/VVelox/Proc-ProcessTable-ncps"
+      }
+   },
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

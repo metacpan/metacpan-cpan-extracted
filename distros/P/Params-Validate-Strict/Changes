@@ -1,5 +1,37 @@
 Revision history for Params-Validate-Strict
 
+0.37	Tue Jul 28 09:29:48 EDT 2026
+  [Enhancements]
+  - New type 'void': asserts that the parameter value is undef, representing
+    a void return or absent output.  A schema using 'void' must contain
+    exactly one parameter; a defined value is an error.  The void parameter
+    is implicitly optional (undef is the expected value, not an absent one),
+    so 'optional => 1' is not required.  Supports 'error_msg' override.
+  - 'semantic' rule documented in POD (was implemented but undocumented):
+    semantic => 'unix_timestamp' validates that the value is a non-negative
+    integer no greater than 2147483647.
+
+  [Bug Fixes]
+  - Fixed: 'semantic => unix_timestamp' rejection path called the non-existent
+    bare function error() instead of the internal helper _error(); out-of-range
+    timestamps now correctly croak instead of dying with "Undefined subroutine".
+    The error message also used single-quotes so $value was not interpolated;
+    both are now fixed.
+
+  [Tests]
+  - function.t: 5 new subtests for type 'void' covering undef acceptance,
+    absent-key acceptance, all defined-value rejections (0, 1, empty string,
+    string, arrayref, hashref), multiple-schema-key rejection, and
+    error_msg override.
+  - unit.t: 17 new subtests covering: type 'void' (undef passes, defined
+    rejected, multiple-key schema rejected, error_msg override); type synonyms
+    'num' and 'double'; 'minimum' alias for 'min' on string and integer;
+    'semantic => unix_timestamp' (valid pass, below-0 rejection,
+    above-2147483647 rejection, unknown semantic warns); as_string() coercion
+    on schema rule values; control-character stripping from error messages;
+    invalid unknown_parameter_handler value; unknown rule name.  API ledger
+    asserts all new states are triggered.
+
 0.36	Wed Jul 22 21:02:37 EDT 2026
 
   [Tests]

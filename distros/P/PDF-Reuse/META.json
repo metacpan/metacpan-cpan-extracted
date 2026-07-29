@@ -60,7 +60,7 @@
    "provides" : {
       "PDF::Reuse" : {
          "file" : "lib/PDF/Reuse.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       },
       "PDF::Reuse::Util" : {
          "file" : "lib/PDF/Reuse/Util.pm"
@@ -77,6 +77,6 @@
          "web" : "https://github.com/cnighswonger/PDF-Reuse"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

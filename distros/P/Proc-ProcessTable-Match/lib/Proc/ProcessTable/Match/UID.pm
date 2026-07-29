@@ -11,11 +11,11 @@ Proc::ProcessTable::Match::UID - Check if the UID or username of a process match
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -85,17 +85,18 @@ sub new{
 	if ( ! defined( $args{uids} ) ){
 		die ('No uids key specified in the argument hash');
 	}
-	if ( ref( \$args{uids} ) eq 'ARRAY' ){
+	if ( ref( $args{uids} ) ne 'ARRAY' ){
 		die ('The uids key is not a array');
 	}
 	if ( ! defined $args{uids}[0] ){
 		die ('Nothing defined in the uids array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				uids=>$args{uids},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -143,7 +144,7 @@ sub match{
 		my $uid=$self->{uids}[$uid_int];
 		if (
 			( $uid =~ /^[0-9]+$/ ) &&
-			( $uid eq $proc_uid )
+			( $uid == $proc_uid )
 			){
 			return 1;
 		}elsif(
@@ -152,7 +153,7 @@ sub match{
 			   ){
 			my $pw=getpwnam($uid);
 			if ( defined( $pw ) ){
-				if ( $pw->uid eq $proc_uid ){
+				if ( $pw->uid == $proc_uid ){
 					return 1;
 				}
 			}
@@ -163,7 +164,7 @@ sub match{
 			$uid =~ s/^\!//;
 			my $pw=getpwnam($uid);
 			if ( defined( $pw ) ){
-				if ( $pw->uid ne $proc_uid ){
+				if ( $pw->uid != $proc_uid ){
 					return 1;
 				}
 			}
@@ -189,7 +190,7 @@ sub match{
 			}
 		}elsif( $uid =~ /^\![0-9]+$/ ){
 			$uid=~s/^\!//;
-			if ( $proc_uid ne $uid ){
+			if ( $proc_uid != $uid ){
 				return 1;
 			}
 		}
@@ -226,14 +227,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

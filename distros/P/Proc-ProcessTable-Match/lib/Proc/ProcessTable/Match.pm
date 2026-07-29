@@ -10,11 +10,11 @@ Proc::ProcessTable::Match - Matches a Proc::ProcessTable::Process against a stac
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -59,7 +59,7 @@ our $VERSION = '0.0.1';
     } or die "New failed with...".$@;
     
     my $pt = Proc::ProcessTable->new;
-    foreach my $proc ( @{$t->table} ){
+    foreach my $proc ( @{$pt->table} ){
         if ( $ppm->match( $proc ) ){
             print Dumper( $proc );
         }
@@ -136,21 +136,22 @@ sub new{
 	if ( ! defined( $args{checks} )	){
 		die ('No check key specified in the argument hash');
 	}
-	if ( ref( @{ $args{checks} } ) eq 'ARRAY' ){
+	if ( ref( $args{checks} ) ne 'ARRAY' ){
 		die ('The checks key is not a array');
 	}
 	# Will never match anything.
 	if ( ! defined $args{checks}[0] ){
 		die ('Nothing in the checks array');
 	}
-	if ( ref( %{ $args{checks}[0] } ) eq 'HASH' ){
+	if ( ref( $args{checks}[0] ) ne 'HASH' ){
 		die ('The first item in the checks array is not a hash');
 	}
 
+	my $class=$_[0];
     my $self = {
 				checks=>[],
 				};
-    bless $self;
+    bless $self, $class;
 
 	# will hold the created check objects
 	my @checks;
@@ -175,7 +176,7 @@ sub new{
 		my $type_test=$new_check{type};
 		$type_test=~s/[A-Za-z0-9]//g;
 		$type_test=~s/\:\://g;
-		if ( $type_test !~ /^$/ ){
+		if ( $type_test ne '' ){
 			die 'The type "'.$new_check{type}.'" for check '.$check_int.' is not a valid check name';
 		}
 
@@ -186,7 +187,7 @@ sub new{
 			){
 		   $new_check{args}=$args{checks}[$check_int]{'args'};
 		}else{
-			die('No type defined for check '.$check_int.' or it is not a HASH');
+			die('No args defined for check '.$check_int.' or it is not a HASH');
 		}
 
 		# makes sure we have a args object and that it is a hash
@@ -203,9 +204,14 @@ sub new{
 		}
 
 		my $check;
-		my $eval_string='use Proc::ProcessTable::Match::'.$new_check{type}.';'.
-		'$check=Proc::ProcessTable::Match::'.$new_check{type}.'->new( $new_check{args} );';
-		eval( $eval_string );
+		my $check_module='Proc::ProcessTable::Match::'.$new_check{type};
+		my $check_module_file=$check_module;
+		$check_module_file=~s/\:\:/\//g;
+		$check_module_file=$check_module_file.'.pm';
+		eval{
+			require $check_module_file;
+			$check=$check_module->new( $new_check{args} );
+		};
 
 		if (!defined( $check )){
 			die 'Failed to init the check for '.$check_int.' as it returned undef... '.$@;
@@ -218,10 +224,6 @@ sub new{
 		$check_int++;
 	}
 
-	if ( $args{testing} ){
-		$self->{testing}=1;
-	}
-
 	return $self;
 }
 
@@ -229,11 +231,14 @@ sub new{
 
 Checks if a single Proc::ProcessTable::Process object matches the stack.
 
-One object is argument is taken and that is the Net::Connection to check.
+One argument is taken and that is the Proc::ProcessTable::Process to check.
 
 The return value is a boolean.
 
-    if ( $ppm->match( $conn ) ){
+If the passed object is undefined or not a Proc::ProcessTable::Process,
+this method dies.
+
+    if ( $ppm->match( $proc ) ){
         print "It matched.\n";
     }
 
@@ -247,12 +252,7 @@ sub match{
 		( ! defined( $proc ) ) ||
 		( ref( $proc ) ne 'Proc::ProcessTable::Process' )
 		){
-		$self->{error}=2;
-		$self->{errorString}='Either the connection is undefined or is not a Proc::ProcessTable::Process object';
-		if ( ! $self->{testing} ){
-			$self->warn;
-		}
-		return undef;
+		die('Either the process is undefined or is not a Proc::ProcessTable::Process object');
 	}
 
 	# Stores the number of hits
@@ -264,12 +264,12 @@ sub match{
 			$hit=$check->{check}->match($proc);
 		};
 
-		# If $hits is undef, then one of the checks errored and we skip processing the results.
+		# If $hit is undef, then one of the checks errored and we skip processing the results.
 		# Should only be 0 or 1.
 		if ( defined( $hit ) ){
 			# invert if needed
 			if ( $check->{invert} ){
-				$hit = $hit ^ 1;
+				$hit = $hit ? 0 : 1;
 			}
 
 			# increment the hits count if we hit
@@ -282,7 +282,7 @@ sub match{
 	}
 
 	# if these are the same, then we have a match
-	if ( $required eq $hits ){
+	if ( $required == $hits ){
 		return 1;
 	}
 
@@ -318,21 +318,9 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Proc-ProcessTable-Match>
-
-=item * Repository
-
-L<https://gitea.eesdp.org/vvelox/Proc-ProcessTable-Match>
 
 =back
 

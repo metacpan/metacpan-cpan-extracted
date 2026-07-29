@@ -1,3 +1,6 @@
+- 0.21
+	Fix memory safety and callback bugs, add rsv options, switch to ExtUtils::MakeMaker
+
 - 0.20
 	Fix test prereqs for CPAN Testers
 

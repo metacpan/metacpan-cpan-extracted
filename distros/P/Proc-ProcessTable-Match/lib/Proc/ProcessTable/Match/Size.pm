@@ -10,11 +10,11 @@ Proc::ProcessTable::Match::Size - Check if the Size of a process matches.
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,17 +77,18 @@ sub new{
 	if ( ! defined( $args{sizes} ) ){
 		die ('No sizes key specified in the argument hash');
 	}
-	if ( ref( \$args{sizes} ) eq 'ARRAY' ){
+	if ( ref( $args{sizes} ) ne 'ARRAY' ){
 		die ('The sizes key is not a array');
 	}
 	if ( ! defined $args{sizes}[0] ){
 		die ('Nothing defined in the sizes array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				sizes=>$args{sizes},
 				};
-    bless $self;
+    bless $self, $class;
 
 	return $self;
 }
@@ -136,7 +137,7 @@ sub match{
 
 		if (
 			( $size =~ /^[0-9]+$/ ) &&
-			( $size eq $proc_size )
+			( $size == $proc_size )
 			){
 			return 1;
 		}elsif( $size =~ /^\<\=[0-9]+$/ ){
@@ -161,7 +162,7 @@ sub match{
 			}
 		}elsif( $size =~ /^\![0-9]+$/ ){
 			$size=~s/^\!//;
-			if ( $proc_size ne $size ){
+			if ( $proc_size != $size ){
 				return 1;
 			}
 		}
@@ -198,14 +199,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

@@ -1,9 +1,19 @@
 Revision history for Proc-ProcessTable-Match
 
-0.0.1	 2019-08-26/20:45
-		 - Handle time properly on linux now
-		   by converting it to seconds.
+0.1.0   2026-07-28/20:45
+        - Fix the argument validation in new for all modules.
+        - Load checker modules via require instead of a string eval.
+        - match now dies on undef or non-process objects.
+        - Validate the regexes passed to Cmndline, Command, Fname,
+          State, and WChan.
+        - PctMem now falls back on rss/physmem where pctmem is
+          not available.
+        - Add functional tests for all modules.
+        - Doc cleanups.
 
-0.0.0	 2019-08-25/06:00
-		 - Initial release.
+0.0.1   2019-08-26/20:45
+        - Handle time properly on linux now
+          by converting it to seconds.
 
+0.0.0   2019-08-25/06:00
+        - Initial release.

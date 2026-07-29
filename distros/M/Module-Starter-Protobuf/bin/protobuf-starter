@@ -19,6 +19,7 @@ GetOptions(
     'protos=s'     => \$config{protos},        # Custom option!
     'import-path=s'=> \$config{import_path},   # Custom option!
     'grpc-target=s'=> \$config{grpc_target},   # Custom option!
+    'security-link=s' => \$config{security_link}, # New custom option!
     'author=s@'    => \$config{author},
     'email=s'      => \$config{email},
     'license=s'    => \$config{license},
@@ -65,6 +66,7 @@ protobuf-starter - bootstrap a gRPC client library Perl distribution from Protoc
                      --import-path=protos \
                      --grpc-target=bigquery.googleapis.com \
                      --dir=Google-Cloud-BigQuery \
+                     --security-link="https://bughunters.google.com/" \
                      --author="C.J. Collier <cjac@google.com>"
 
 =head1 DESCRIPTION

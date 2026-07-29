@@ -9,6 +9,7 @@ BUILD
 build_defs.bzl
 c_test_config.bzl
 Changes
+conformance-failures.txt
 CONTRIBUTING.md
 cpanfile
 inc/templates/bazel.tt
@@ -421,6 +422,7 @@ vendor/third_party/utf8_range/boost.cpp
 vendor/third_party/utf8_range/BUILD.bazel
 vendor/third_party/utf8_range/cmake/utf8_range-config.cmake.in
 vendor/third_party/utf8_range/cmake/utf8_range.pc.cmake
+vendor/third_party/utf8_range/CMakeLists.txt
 vendor/third_party/utf8_range/fuzz/BUILD.bazel
 vendor/third_party/utf8_range/fuzz/utf8_fuzzer.dict
 vendor/third_party/utf8_range/fuzz/utf8_validity_fuzzer.cc
@@ -437,6 +439,9 @@ vendor/third_party/utf8_range/range-sse.c
 vendor/third_party/utf8_range/range2-neon.c
 vendor/third_party/utf8_range/range2-sse.c
 vendor/third_party/utf8_range/README.md
+vendor/third_party/utf8_range/UTF-8-demo.txt
+vendor/third_party/utf8_range/utf8_corpus_dir/utf8_corpus_durst.txt
+vendor/third_party/utf8_range/utf8_corpus_dir/utf8_corpus_kuhn.txt
 vendor/third_party/utf8_range/utf8_range.c
 vendor/third_party/utf8_range/utf8_range.h
 vendor/third_party/utf8_range/utf8_range_neon.inc
@@ -481,6 +486,8 @@ vendor/upb/cmake/staleness_test_lib.py
 vendor/upb/conformance/BUILD
 vendor/upb/conformance/build_defs.bzl
 vendor/upb/conformance/conformance_upb.c
+vendor/upb/conformance/conformance_upb_failures.txt
+vendor/upb/conformance/conformance_upb_failures_performance.txt
 vendor/upb/generated_code_support.h
 vendor/upb/hash/BUILD
 vendor/upb/hash/common.c
@@ -604,6 +611,7 @@ vendor/upb/mini_table/compat_test.cc
 vendor/upb/mini_table/debug_string.c
 vendor/upb/mini_table/debug_string.h
 vendor/upb/mini_table/debug_string_test.proto
+vendor/upb/mini_table/debug_string_test.txt
 vendor/upb/mini_table/debug_string_test_generate.cc
 vendor/upb/mini_table/enum.h
 vendor/upb/mini_table/extension.h
@@ -839,6 +847,7 @@ vendor/utf8_range/boost.cpp
 vendor/utf8_range/BUILD.bazel
 vendor/utf8_range/cmake/utf8_range-config.cmake.in
 vendor/utf8_range/cmake/utf8_range.pc.cmake
+vendor/utf8_range/CMakeLists.txt
 vendor/utf8_range/fuzz/BUILD.bazel
 vendor/utf8_range/fuzz/utf8_fuzzer.dict
 vendor/utf8_range/fuzz/utf8_validity_fuzzer.cc
@@ -855,6 +864,9 @@ vendor/utf8_range/range-sse.c
 vendor/utf8_range/range2-neon.c
 vendor/utf8_range/range2-sse.c
 vendor/utf8_range/README.md
+vendor/utf8_range/UTF-8-demo.txt
+vendor/utf8_range/utf8_corpus_dir/utf8_corpus_durst.txt
+vendor/utf8_range/utf8_corpus_dir/utf8_corpus_kuhn.txt
 vendor/utf8_range/utf8_range.c
 vendor/utf8_range/utf8_range.h
 vendor/utf8_range/utf8_range_neon.inc

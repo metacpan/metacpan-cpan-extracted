@@ -142,18 +142,17 @@ subtest 'new: cached language NOT invalidated when info->lang() returns undef (C
 	#     condition: (_rlanguage='French') && MockInfo && undef → FALSE
 	#     Original (if): skips delete → _rlanguage='French' → requested_language()='French'
 	#     Mutant (unless): deletes _rlanguage → recomputes from en → 'English'
-	require Storable;
+	require JSON::PP;
 	my $cache = _fresh_cache();
 
 	{
-		# Pre-populate cache with a minimal fake object carrying the "wrong" language.
-		# The bless is required so Storable::nfreeze produces a typed object that
-		# Storable::thaw will restore as a CGI::Lingua instance.
+		# Pre-populate cache with a minimal JSON blob carrying the "wrong" language.
+		# new() now uses JSON::PP::decode_json (not Storable::thaw) so we store
+		# JSON here to match the production serialisation format.
 		local %ENV = (HTTP_ACCEPT_LANGUAGE => $LANG_EN, REMOTE_ADDR => $IP_PUBLIC);
-		my $fake = bless { _rlanguage => 'French' }, 'CGI::Lingua';
-		my $key  = CGI::Lingua::_build_cache_key($IP_PUBLIC,
+		my $key = CGI::Lingua::_build_cache_key($IP_PUBLIC,
 			{ supported => [$LANG_EN, $LANG_FR] }, 'CGI::Lingua', undef);
-		$cache->set($key, Storable::nfreeze($fake));
+		$cache->set($key, JSON::PP::encode_json({ _rlanguage => 'French' }));
 	}
 
 	{

@@ -5,6 +5,11 @@ Created:      2003-02-25
 Home page:    <https://metacpan.org/release/DateTime-Format-W3CDTF/>
 Bug tracker:  <https://github.com/kasei/datetime-format-w3cdtf/issues>
 
+0.09  2026-07-24
+
+ - (Update) Fix nanosecond value to be an integer for Specio 0.50+
+   compatibility (#4 by @hitode909)
+
 0.08  2020-12-18
 
  - (Update) Add 'strict' option to require timezone in time components (PR

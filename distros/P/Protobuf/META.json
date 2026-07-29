@@ -67,7 +67,7 @@
             "Moo" : "0",
             "Type::Tiny" : "0",
             "Types::Standard" : "0",
-            "perl" : "5.014"
+            "perl" : "0.120"
          }
       },
       "test" : {
@@ -90,6 +90,6 @@
          "web" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

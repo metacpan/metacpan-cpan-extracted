@@ -4,7 +4,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = 'v2.9.1.0';
+our $VERSION = 'v2.11.0.0';
 
 require Alien::NLopt;
 
@@ -33,7 +33,7 @@ Alien::NLopt::Install::Files
 
 =head1 VERSION
 
-version v2.9.1.0
+version v2.11.0.0
 
 =for Pod::Coverage Inline
 
@@ -47,11 +47,11 @@ Please report any bugs or feature requests to bug-alien-nlopt@rt.cpan.org  or th
 
 Source is available at
 
-  https://gitlab.com/djerius/alien-nlopt
+  https://codeberg.org/djerius/p5-Alien-NLopt
 
 and may be cloned from
 
-  https://gitlab.com/djerius/alien-nlopt.git
+  https://codeberg.org/djerius/p5-Alien-NLopt.git
 
 =head1 SEE ALSO
 

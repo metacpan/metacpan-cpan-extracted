@@ -6,7 +6,7 @@ CGI-Lingua
 [![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Lingua/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Lingua?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/CGI-Lingua.svg)](http://search.cpan.org/~nhorne/CGI-Lingua/)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/cgi-lingua/test.yml?branch=master)
-![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
+![Perl Version](https://img.shields.io/badge/perl-5.10+-blue)
 [![Travis Status](https://travis-ci.org/nigelhorne/CGI-Lingua.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Lingua)
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-lingua&via=nigelhorne)
 
@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.82
+Version 0.83
 
 # SYNOPSIS
 
@@ -78,6 +78,26 @@ Creates a CGI::Lingua object.
 
     Returns: CGI::Lingua blessed hashref, or a clone when called on an object.
 
+### EXAMPLE
+
+    # Array-ref of supported codes (most common form)
+    my $l = CGI::Lingua->new({ supported => ['en', 'fr', 'de'] });
+
+    # Single scalar code
+    my $l = CGI::Lingua->new(supported => 'en');
+
+    # With cache, logger, and CGI::Info object
+    use CHI;
+    my $cache = CHI->new(driver => 'File', root_dir => '/tmp/lingua-cache');
+    my $l = CGI::Lingua->new({
+        supported => ['en', 'fr'],
+        cache     => $cache,
+        logger    => $my_log_object,
+    });
+
+    # Clone an existing object with different supported list
+    my $clone = $l->new(supported => ['de']);
+
 ### MESSAGES
 
     "You must give a list of supported languages"  - no 'supported' key provided
@@ -104,6 +124,12 @@ on a site that only serves British English, language() will return 'English'.
 If none of the requested languages is included within the supported lists,
 language() returns 'Unknown'.
 
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'fr,en;q=0.9';
+    my $l = CGI::Lingua->new(supported => ['en', 'fr']);
+    print $l->language();   # "French"
+
 ### API SPECIFICATION
 
     Input:  none beyond $self
@@ -122,6 +148,12 @@ Synonym for language, for compatibility with Locale::Object::Language.
 Tells the CGI what variant to use e.g. 'United Kingdom', or undef if
 it can't be determined.
 
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb']);
+    print $l->sublanguage();   # "United Kingdom"
+
 ### API SPECIFICATION
 
     Input:  none beyond $self
@@ -134,6 +166,12 @@ when you've asked for en-gb.
 
 If none of the requested languages is included within the supported lists,
 language\_code\_alpha2() returns undef.
+
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb']);
+    print $l->language_code_alpha2();   # "en"
 
 ### API SPECIFICATION
 
@@ -149,6 +187,12 @@ Synonym for language\_code\_alpha2, kept for historical reasons.
 Gives the two-character representation of the supported language, e.g. 'gb'
 when you've asked for en-gb, or undef.
 
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb']);
+    print $l->sublanguage_code_alpha2();   # "gb"
+
 ### API SPECIFICATION
 
     Input:  none beyond $self
@@ -161,6 +205,12 @@ or not it is supported.
 
 Returns the sublanguage (if appropriate) in parentheses,
 e.g. "English (United Kingdom)"
+
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en']);
+    print $l->requested_language();   # "English (United Kingdom)"
 
 ### API SPECIFICATION
 
@@ -182,6 +232,16 @@ caching capability of CGI::Lingua.
     Returns: Str (2 lowercase chars) | undef
       'Unknown' is only returned in the Baidu-EU special case via _handle_eu_country.
 
+### EXAMPLE
+
+    # With mod_geoip (fastest - no IP lookup at all):
+    local $ENV{GEOIP_COUNTRY_CODE} = 'DE';
+    print $l->country();   # "de"
+
+    # With REMOTE_ADDR and IP::Country installed:
+    local $ENV{REMOTE_ADDR} = '8.8.8.8';
+    print $l->country();   # "us" (depends on geo database)
+
 ### MESSAGES
 
     "GEOIP_COUNTRY_CODE contains an invalid country code; ignoring"
@@ -191,6 +251,22 @@ caching capability of CGI::Lingua.
     "Can't determine country from loopback connection X"
     "cache contains a numeric country: N"
     "IP matches to a numeric country"
+
+### PSEUDOCODE
+
+    1. Return cached _country if set
+    2. Check GEOIP_COUNTRY_CODE env var (mod_geoip); validate /^[A-Z]{2}$/
+    3. Check HTTP_CF_IPCOUNTRY (Cloudflare); skip 'XX'; validate /^[A-Z]{2}$/
+    4. Untaint and validate REMOTE_ADDR; return undef if absent or invalid
+    5. Skip private and loopback IPs (return undef)
+    6. Check CHI cache; return cached value if present
+    7. Try IP::Country::Fast (local DB, fastest)
+    8. Try Geo::IP (local DB)
+    9. Try Geo::IPfree (local DB, skip $BROKEN_GEOIPFREE)
+    10. Try geoplugin.net JSON API (LWP::Simple::WithCache or LWP::Simple)
+    11. Last resort: Net::Whois::IP then Net::Whois::IANA
+    12. Sanitise: discard numeric, normalise HK->CN, handle EU special case
+    13. Store in CHI cache; return result
 
 ## locale
 
@@ -202,10 +278,28 @@ and is not 100% reliable.  But it's better than nothing ;-)
 
 Returns a [Locale::Object::Country](https://metacpan.org/pod/Locale%3A%3AObject%3A%3ACountry) object.
 
+### EXAMPLE
+
+    local $ENV{REMOTE_ADDR} = '8.8.8.8';
+    my $locale = $l->locale();
+    if (defined $locale) {
+        print $locale->name();          # e.g. "United States"
+        print $locale->currency_code(); # e.g. "USD"
+    }
+
 ### API SPECIFICATION
 
     Input:  none beyond $self
     Returns: Locale::Object::Country | undef
+
+### PSEUDOCODE
+
+    1. Return cached _locale immediately if already computed
+    2. Parse HTTP_USER_AGENT parenthetical for xx-YY language tag
+    3. Try HTTP::BrowserDetect on the full User-Agent string
+    4. Fall back to country() IP lookup
+    5. Fall back to GEOIP_COUNTRY_CODE env var (ISO 3166-1 validated)
+    6. Return undef if all strategies fail
 
 ## time\_zone
 
@@ -219,17 +313,43 @@ CGI::Lingua will make use of that, otherwise it will use [ip-api.com](https://me
     Input:  none beyond $self
     Returns: Str (IANA timezone name) | undef
 
+### EXAMPLE
+
+    local $ENV{REMOTE_ADDR} = '8.8.8.8';
+    my $tz = $l->time_zone();
+    print $tz // 'unknown';   # e.g. "America/New_York"
+
 ### MESSAGES
 
     "Couldn't determine the timezone"
     "LWP::Simple::WithCache and LWP::Simple are both absent; cannot contact ip-api.com"
       Returns undef rather than croaking; install either LWP variant to enable ip-api lookups.
 
+### PSEUDOCODE
+
+    1. Return cached _timezone immediately if already computed
+    2. If REMOTE_ADDR is set:
+       a. Untaint and validate the IP
+       b. Try Geo::IP->time_zone() (local DB)
+       c. Try LWP::Simple::WithCache + JSON::Parse against ip-api.com
+       d. Fall back to LWP::Simple + JSON::Parse against ip-api.com
+       e. Warn and return undef if neither LWP variant is installed
+    3. If REMOTE_ADDR is absent (local/CLI mode):
+       a. Read /etc/timezone if readable
+       b. Fall back to DateTime::TimeZone::Local->TimeZone()->name()
+    4. Warn "Couldn't determine the timezone" and return undef if all fail
+
 ## is\_rtl
 
 Returns true (1) if the negotiated language is written right-to-left, false (0)
 otherwise.  Covers Arabic, Hebrew, Persian, Urdu, Yiddish, Dhivehi, Pashto,
 Sindhi, Uyghur, and Kurdish.
+
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'ar';
+    my $l = CGI::Lingua->new(supported => ['ar', 'en']);
+    print $l->is_rtl();   # 1
 
 ### API SPECIFICATION
 
@@ -240,6 +360,12 @@ Sindhi, Uyghur, and Kurdish.
 
 Returns `'rtl'` or `'ltr'` for the negotiated language, suitable for direct
 use as an HTML `dir` attribute value.
+
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'he';
+    my $l = CGI::Lingua->new(supported => ['he', 'en']);
+    print qq(<html dir="} . $l->text_direction() . qq(">);   # dir="rtl"
 
 ### API SPECIFICATION
 
@@ -258,6 +384,14 @@ Romanian, Latvian, Lithuanian, and Slovenian.  Languages not in the table fall
 back to the English rule (n == 1 => `'one'`, else `'other'`).
 
 For fractional numbers or full CLDR v42+ accuracy, use `Locale::CLDR`.
+
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'ru';
+    my $l = CGI::Lingua->new(supported => ['ru']);
+    print $l->plural_category(1);    # "one"
+    print $l->plural_category(3);    # "few"
+    print $l->plural_category(11);   # "many"
 
 ### API SPECIFICATION
 
@@ -282,6 +416,17 @@ Returns `undef` if no matching file exists.
       $dir - Str   path to the directory containing translation files
       $ext - Str   file extension without leading dot (default: 'json')
     Returns: Str (absolute or relative path) | undef
+
+### EXAMPLE
+
+    local $ENV{HTTP_ACCEPT_LANGUAGE} = 'en-gb';
+    my $l = CGI::Lingua->new(supported => ['en-gb', 'en']);
+    my $path = $l->translation_file('/var/www/i18n');
+    # Returns '/var/www/i18n/en-gb.json' if it exists,
+    # then '/var/www/i18n/en.json', or undef.
+
+    # Custom extension:
+    my $path = $l->translation_file('/var/www/i18n', 'po');
 
 ### MESSAGES
 
@@ -323,11 +468,12 @@ Returns `undef` if no matching file exists.
     time out under load.  Install at least one local geo-database module and enable
     the CHI cache to avoid this.
 
-- **Sub::Private not yet enforced**
+- **Private methods are accessible from outside the package**
 
-    The `_*` private methods are currently accessible from outside the package.
-    `Sub::Private` should be added to enforce encapsulation once white-box tests
-    are updated to call only the public API.
+    The `_*` methods use the naming convention for privacy but Perl does not enforce
+    it.  `Sub::Private` or `Sub::Protected` should be added once all white-box
+    tests (`t/function.t`, `t/extended_tests.t`) are updated to use the public API
+    exclusively.
 
 - **IPv4-mapped IPv6 addresses are normalised to IPv4**
 
@@ -341,6 +487,17 @@ Returns `undef` if no matching file exists.
     IP addresses that Whois reports as country `EU` are mapped to `'Unknown'`
     unless they fall within Baidu's known subnet (RT-86809).  There is no ISO
     3166-1 country code for the European Union.
+
+- **country() does not cache undef results**
+
+    When `country()` cannot determine a country (private IPs, loopback,
+    unresolvable addresses), it returns `undef` without storing the result.  A
+    second call on the same object repeats the full validation pipeline.  This is
+    intentional: `country()` reads `REMOTE_ADDR` at call time rather than at
+    construction time, so caching `undef` would return a wrong answer if
+    `REMOTE_ADDR` changes between calls.  In practice this is rarely a problem
+    because `country()` is called once per request and CGI applications typically
+    create a fresh object per request.
 
 # AUTHOR
 
@@ -414,6 +571,54 @@ You can also look for information at:
     language : CGI::Lingua → Str
     result ∈ {name(l) | l ∈ supported} ∪ {'Unknown'}
 
+## sublanguage
+
+    sublanguage : CGI::Lingua -> Str | undef
+    result = country_name(sublanguage_code_alpha2(self))
+             when sublanguage_code_alpha2(self) is defined,
+             undef otherwise
+
+## language\_code\_alpha2
+
+    language_code_alpha2 : CGI::Lingua -> Str(2) | undef
+    result = base_code(matched_supported_entry)
+             when a supported language was matched, undef otherwise
+
+## sublanguage\_code\_alpha2
+
+    sublanguage_code_alpha2 : CGI::Lingua -> Str(2) | undef
+    result = variety_code(matched_supported_entry) | undef
+
+## requested\_language
+
+    requested_language : CGI::Lingua -> Str
+    result = name(base) + " (" + name(variety) + ")"
+             when variety is known,
+           = name(base)   when no variety,
+           = 'Unknown'    when no language detected
+
+## country
+
+    country : CGI::Lingua -> Str(2,lowercase) | undef
+    -- 'Unknown' returned only in the EU/Baidu special case
+    result = lc(code) where code satisfies ISO 3166-1 alpha-2
+             | undef when IP is private, loopback, or unresolvable
+
+## locale
+
+    locale : CGI::Lingua -> Locale::Object::Country | undef
+    -- Best-guess detection; not guaranteed accurate.
+    result = first defined value from:
+        1. UA parenthetical language tag
+        2. HTTP::BrowserDetect country
+        3. country() IP lookup
+        4. GEOIP_COUNTRY_CODE env var
+
+## time\_zone
+
+    time_zone : CGI::Lingua -> Str | undef
+    result is an IANA timezone name (e.g. 'Europe/London') or undef
+
 ## is\_rtl
 
     is_rtl : CGI::Lingua → Bool
@@ -426,8 +631,10 @@ You can also look for information at:
 
 ## plural\_category
 
-    plural_category : CGI::Lingua × ℕ → PluralCategory
-    plural_category(s, n) ≙ PLURAL_RULES[language_code_alpha2(s)](n)
+    plural_category : CGI::Lingua x N -> PluralCategory
+    plural_category(s, n) = PLURAL_RULES[language_code_alpha2(s)](trunc(n))
+    -- Falls back to English rule (n=1 -> 'one'; else 'other')
+    -- when language_code_alpha2(s) is undef or not in the rules table.
 
 ## translation\_file
 
@@ -442,4 +649,6 @@ You can also look for information at:
 
 Copyright 2010-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

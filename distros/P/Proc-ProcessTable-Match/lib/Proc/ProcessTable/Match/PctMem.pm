@@ -3,6 +3,7 @@ package Proc::ProcessTable::Match::PctMem;
 use 5.006;
 use strict;
 use warnings;
+use POSIX ();
 
 =head1 NAME
 
@@ -10,11 +11,11 @@ Proc::ProcessTable::Match::PctMem - Check if the memory usage by percent of a pr
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -77,24 +78,50 @@ sub new{
 	if ( ! defined( $args{pctmems} ) ){
 		die ('No pctmems key specified in the argument hash');
 	}
-	if ( ref( \$args{pctmems} ) eq 'ARRAY' ){
+	if ( ref( $args{pctmems} ) ne 'ARRAY' ){
 		die ('The pctmems key is not a array');
 	}
 	if ( ! defined $args{pctmems}[0] ){
 		die ('Nothing defined in the pctmems array');
 	}
 
+    my $class=$_[0];
     my $self = {
 				pctmems=>$args{pctmems},
 				physmem=>undef,
 				};
-    bless $self;
+    bless $self, $class;
 
-	if ( $^O =~ /bsd/ ){
-		$self->{physmem}=`/sbin/sysctl -a hw.physmem`;
-		chomp( $self->{physmem} );
-		$self->{physmem}=~s/^.*\: //;
+	# Figure out how much physical memory this machine has, which is
+	# needed on platforms where Proc::ProcessTable does not provide
+	# pctmem. First try POSIX::sysconf, which requires no external
+	# programs, but not every POSIX module exposes _SC_PHYS_PAGES.
+	eval{
+		my $phys_pages=POSIX::sysconf( POSIX::_SC_PHYS_PAGES() );
+		my $pagesize=POSIX::sysconf( POSIX::_SC_PAGESIZE() );
+		if ( $phys_pages && $pagesize ){
+			$self->{physmem}=$phys_pages * $pagesize;
+		}
+	};
+
+	# Fall back on sysctl, checking the various places it may live.
+	if ( ! defined( $self->{physmem} ) ){
+		foreach my $sysctl_bin ( '/sbin/sysctl', '/usr/sbin/sysctl' ){
+			if ( -x $sysctl_bin ){
+				my $physmem=`$sysctl_bin -n hw.physmem 2> /dev/null`;
+				if ( defined( $physmem ) ){
+					chomp( $physmem );
+					if ( $physmem =~ /^[0-9]+$/ ){
+						$self->{physmem}=$physmem;
+						last;
+					}
+				}
+			}
+		}
 	}
+
+	# If physmem could not be found, match falls back on requiring
+	# the pctmem method, so failing here is not fatal.
 
 	return $self;
 }
@@ -126,13 +153,18 @@ sub match{
 	}
 
 	my $proc_pctmem;
-	if ($^O =~ /bsd/){
+	eval{
+		$proc_pctmem=$object->pctmem;
+	};
+
+	# Not all platforms provide pctmem, so on those compute it from
+	# the RSS, which Proc::ProcessTable provides in bytes everywhere.
+	if (
+		( ! defined( $proc_pctmem ) ) &&
+		( defined( $self->{physmem} ) )
+		){
 		eval{
-			$proc_pctmem=(($object->{rssize} * 1024 * 4 ) / $self->{physmem}) * 100;
-		}
-	}else{
-		eval{
-			$proc_pctmem=$object->pctmem;
+			$proc_pctmem=( $object->rss / $self->{physmem} ) * 100;
 		};
 	}
 
@@ -147,33 +179,33 @@ sub match{
 	while (defined( $self->{pctmems}[$pctmem_int] )){
 		my $pctmem=$self->{pctmems}[$pctmem_int];
 		if (
-			( $pctmem =~ /^[0-9.]+$/ ) &&
-			( $pctmem eq $proc_pctmem )
+			( $pctmem =~ /^[0-9]+(?:\.[0-9]+)?$/ ) &&
+			( $pctmem == $proc_pctmem )
 			){
 			return 1;
-		}elsif( $pctmem =~ /^\<\=[0-9.]+$/ ){
+		}elsif( $pctmem =~ /^\<\=[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctmem=~s/^\<\=//;
 			if ( $proc_pctmem <= $pctmem ){
 				return 1;
 			}
-		}elsif( $pctmem =~ /^\<[0-9.]+$/ ){
+		}elsif( $pctmem =~ /^\<[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctmem=~s/^\<//;
 			if ( $proc_pctmem < $pctmem ){
 				return 1;
 			}
-		}elsif( $pctmem =~ /^\>\=[0-9.]+$/ ){
+		}elsif( $pctmem =~ /^\>\=[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctmem=~s/^\>\=//;
 			if ( $proc_pctmem >= $pctmem ){
 				return 1;
 			}
-		}elsif( $pctmem =~ /^\>[0-9.]+$/ ){
+		}elsif( $pctmem =~ /^\>[0-9]+(?:\.[0-9]+)?$/ ){
 			$pctmem=~s/^\>//;
 			if ( $proc_pctmem > $pctmem ){
 				return 1;
 			}
-		}elsif( $pctmem =~ /^\![0-9.]+$/ ){
+		}elsif( $pctmem =~ /^\![0-9]+(?:\.[0-9]+)?$/ ){
 			$pctmem=~s/^\!//;
-			if ( $proc_pctmem ne $pctmem ){
+			if ( $proc_pctmem != $pctmem ){
 				return 1;
 			}
 		}
@@ -210,14 +242,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Proc-ProcessTable-Match>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Proc-ProcessTable-Match>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Proc-ProcessTable-Match>
 
 =item * Search CPAN
 

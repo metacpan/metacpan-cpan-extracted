@@ -28,7 +28,7 @@ use warnings;
 # version '...'
 use version;
 our $version = version->declare('v2.7.0_0');
-our $VERSION = version->declare('v0.5.3');
+our $VERSION = version->declare('v0.6.0');
 
 # authority '...'
 our $authority = 'github:adsr';
@@ -41,11 +41,9 @@ our $AUTHORITY = 'github:brickpool';
 require bytes;
 use Carp ();
 use Config;
-use Errno ();
-use Fcntl;
 use IO::File ();
 use Params::Check ();
-use POSIX qw( :termios_h );
+use POSIX qw( :termios_h :fcntl_h );
 use Scalar::Util qw( blessed );
 use Unicode::UCD ();
 use utf8;
@@ -97,11 +95,11 @@ use constant TB_OPT_EGC => TB_LIB_OPTS || ($ENV{TB_OPT_EGC} ? 1 : 0);
 # Write buffer size for printf operations. Represents the largest string that 
 # can be sent in one call to tb_print and tb_send functions. Defaults to 4096.
 use constant TB_OPT_PRINTF_BUF => !TB_LIB_OPTS 
-  && exists $ENV{TB_OPT_PRINTF_BUF} ? 0+$ENV{TB_OPT_PRINTF_BUF} : 4096;
+  && exists $ENV{TB_OPT_PRINTF_BUF} ? ($ENV{TB_OPT_PRINTF_BUF} || 4096): 4096;
 
 # Read buffer size for tty reads. Defaults to 64.
 use constant TB_OPT_READ_BUF => !TB_LIB_OPTS 
-  && exists $ENV{TB_OPT_READ_BUF} ? 0+$ENV{TB_OPT_READ_BUF} : 64;
+  && exists $ENV{TB_OPT_READ_BUF} ? ($ENV{TB_OPT_READ_BUF} || 64): 64;
 
 # If set, use Perl's core Unicode::UCD module instead of the built-in 
 # Unicode-aware versions. Note, Unicode::UCD are version-dependent and must 
@@ -117,8 +115,13 @@ use constant TB_TERMINFO_DIR => exists $ENV{TB_TERMINFO_DIR}
   : undef;
 
 use constant TB_RESIZE_FALLBACK_MS => exists $ENV{TB_RESIZE_FALLBACK_MS} 
-  ? 0+$ENV{TB_RESIZE_FALLBACK_MS}
+  ? ($ENV{TB_RESIZE_FALLBACK_MS} || 1000)
   : 1000;
+
+# Retrieve the debug level from the environment variable TB_DEBUG_LEVEL. 
+use constant _DEBUG => $ENV{TB_DEBUG_LEVEL} && !$ENV{PERL_NDEBUG} && !$ENV{NDEBUG} 
+  ? ($ENV{TB_DEBUG_LEVEL} || 0)
+  : 0;
 
 # ------------------------------------------------------------------------
 # Exports ----------------------------------------------------------------
@@ -705,6 +708,19 @@ use constant {
   TYPE_MAX   => 3,
 };
 
+# Standard error codes (POSIX errors)
+use constant {
+  EIO     => defined(&POSIX::EIO)        ? POSIX::EIO()        : 5,
+  EBADF   => defined(&POSIX::EBADF)      ? POSIX::EBADF()      : 9,
+  EACCES  => defined(&POSIX::EACCES)     ? POSIX::EACCES()     : 13,
+  EINVAL  => defined(&POSIX::EINVAL)     ? POSIX::EINVAL()     : 22,
+  ENOTTY  => defined(&POSIX::ENOTTY)     ? POSIX::ENOTTY()     : 25,
+  EPIPE   => defined(&POSIX::EPIPE)      ? POSIX::EPIPE()      : 32,
+  ENOTSUP => defined(&POSIX::ENOTSUP)    ? POSIX::ENOTSUP()    : 
+             defined(&POSIX::EOPNOTSUPP) ? POSIX::EOPNOTSUPP() : 
+             95,
+};
+
 # ------------------------------------------------------------------------
 # Globals ----------------------------------------------------------------
 # ------------------------------------------------------------------------
@@ -917,6 +933,56 @@ use constant {
 };
 
 # ------------------------------------------------------------------------
+# Debug helpers ----------------------------------------------------------
+# ------------------------------------------------------------------------
+
+# The tracing and debugging helpers were inspired by the debug macros
+# used by libserialport.
+
+# Internal debugging helper
+sub DEBUG($@) {    # void ($fmt, @args)
+  return unless defined &Termbox::tb_debug_handler;
+  my $fmt = shift;
+  # suppress warnings and exceptions from the debug handler
+  try: local $@; eval {
+    local $SIG{__WARN__} = sub { };
+    Termbox::tb_debug_handler("$fmt.\n", @_);
+  };
+  return;
+}
+
+# Internal tracing helper
+sub TRACE($@) {    # void ($fmt, @args)
+  my $fmt = shift;
+  my $sub = (caller(1))[3] // '__ANON__';
+  (my $func = $sub) =~ s/^.*:://;
+  DEBUG("%s($fmt) called", $func, @_);
+  return;
+}
+
+sub Termbox::OnLeavingScope::DESTROY {
+  my $self = shift;
+  my $func = $self->{func};
+  my $rv_ref = $self->{rv};
+  if (defined $rv_ref && defined $$rv_ref) {
+    DEBUG("\&%s returning %d", $func, int($$rv_ref));
+  } else {
+    DEBUG("\&%s returning", $func);
+  }
+}
+
+# Internal scope guard used to trace subroutine return values
+sub TRACE_LEAVE($) {    # $guard (\$rv)
+  my $rv_ref = shift;
+  my $sub = (caller(1))[3] // '__ANON__';
+  (my $func = $sub) =~ s/^.*:://;
+  return bless {
+    func => $func,
+    rv   => $rv_ref
+  } => 'Termbox::OnLeavingScope';
+}
+
+# ------------------------------------------------------------------------
 # WinVT ------------------------------------------------------------------
 # ------------------------------------------------------------------------
 
@@ -927,17 +993,6 @@ use if _WIN32, 'Win32API::File', qw(
   :Func
   :FILE_TYPE_
 );
-
-# Standard error codes (POSIX errors)
-use if _WIN32, constant => {
-  EIO        => exists(&Errno::EIO)        ? &Errno::EIO        : 5,
-  EBADF      => exists(&Errno::EBADF)      ? &Errno::EBADF      : 9,
-  EACCES     => exists(&Errno::EACCES)     ? &Errno::EACCES     : 13,
-  EINVAL     => exists(&Errno::EINVAL)     ? &Errno::EINVAL     : 22,
-  ENOTTY     => exists(&Errno::ENOTTY)     ? &Errno::ENOTTY     : 25,
-  EPIPE      => exists(&Errno::EPIPE)      ? &Errno::EPIPE      : 32,
-  EOPNOTSUPP => exists(&Errno::EOPNOTSUPP) ? &Errno::EOPNOTSUPP : 95,
-};
 
 # Windows Error Codes
 use if _WIN32, constant => {
@@ -1102,7 +1157,7 @@ if (TB_OPT_EGC) {
   *Termbox::Cell::nech = sub {
     my $ch = $_[0]->[0];
     my $n = length($ch);
-    return ($ch =~ /\A\X\z/ && $n > 1) ? $n : 0;
+    return ($n && $ch =~ /\A\X\z/) ? $n : 0;
   };
   *Termbox::Cell::cech = sub {
     my $ech = $_[0]->ech;
@@ -1217,8 +1272,9 @@ sub cellbuf::clear {    # $int ()
   my ($c) = $sig->(@_);
   my $rv;
   for my $i (0 .. $c->{width}*$c->{height}-1) {
-    return $rv if $rv = $c->{cells}[$i]->set(' ', $global->{fg}, $global->{bg});
+    $c->{cells}[$i]->set(' ', $global->{fg}, $global->{bg});
   }
+  $global->{dirty_lines} = [ (1) x ($c->{height} || 0) ];
   return TB_OK;
 }
 
@@ -1474,13 +1530,16 @@ $global = {
 
   # (Error) state
   last_errno  => 0,
-  errbuf      => "",
   initialized => 0,
   # ->{errbuf} is not needed
 
   # Custom callbacks for escape sequence parsing
   fn_extract_esc_pre  => undef,
   fn_extract_esc_post => undef,
+
+  # Dirty lines tracking for efficient rendering
+  full_repaint => 0,
+  dirty_lines  => [],
 };
 
 # ------------------------------------------------------------------------
@@ -1654,8 +1713,11 @@ sub bytebuf_free;
 #
 
 sub tb_init {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
 if (_WIN32) {
   # Windows Terminal (WT) does not support the traditional termios interface, 
   # so we need to use the Windows API to open the console handles directly.
@@ -1663,55 +1725,63 @@ if (_WIN32) {
   my $err = sysopen(TB_OUT, 'CONOUT$', O_RDWR) ? 0 : $!+0;
   if ($err != 0) {
     $global->{last_errno} = $err;
-    return TB_ERR_WIN_NO_STDIO;
+    return $rv = TB_ERR_WIN_NO_STDIO;
   }
   $err = sysopen(TB_IN, 'CONIN$', O_RDWR) ? 0 : $!+0;
   if ($err != 0) {
     $global->{last_errno} = $err;
-    return TB_ERR_WIN_NO_STDIO;
+    return $rv = TB_ERR_WIN_NO_STDIO;
   }
   $global->{ttyfd_open} = 1;
-  return tb_init_rwfd(fileno(TB_IN), fileno(TB_OUT));
+  return $rv = tb_init_rwfd(fileno(TB_IN), fileno(TB_OUT));
 } #endif
-  return tb_init_file('/dev/tty');
+  return $rv = tb_init_file('/dev/tty');
 }
 
 sub tb_init_file {    # $int ($path)
+  TRACE('"%s"', @_) if _DEBUG;
   state $sig = compile(
     _Str,
   );
-  my ($path) =$sig->(@_);
-  return TB_ERR_INIT_ALREADY if $global->{initialized};
+  my ($path) = $sig->(@_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_INIT_ALREADY if $global->{initialized};
 if (_WIN32) {
-  return TB_ERR_WIN_UNSUPPORTED;
+  return $rv = TB_ERR_WIN_UNSUPPORTED;
 } #endif
   my $ttyfd = sysopen(TB_OUT, $path, O_RDWR) ? (fileno(TB_OUT) // -1) : -1;
   if ($ttyfd < 0) {
     $global->{last_errno} = 0+ $!;
-    return TB_ERR_INIT_OPEN;
+    return $rv = TB_ERR_INIT_OPEN;
   }
   $global->{ttyfd_open} = 1;
-  return tb_init_fd($ttyfd);
+  return $rv = tb_init_fd($ttyfd);
 }
 
 sub tb_init_fd {    # $int ($ttyfd)
+  TRACE('%d', @_) if _DEBUG;
   state $sig = compile(
     _Int,
   );
   my ($ttyfd) = $sig->(@_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
 if (_WIN32) {
-  return TB_ERR_WIN_UNSUPPORTED;
+  return $rv = TB_ERR_WIN_UNSUPPORTED;
 } #endif
-  return tb_init_rwfd($ttyfd, $ttyfd);
+  return $rv = tb_init_rwfd($ttyfd, $ttyfd);
 }
 
 sub tb_init_rwfd {    # $int ($rfd, $wfd)
+  TRACE('%d, %d', @_) if _DEBUG;
   state $sig = compile(
     _Int,
     _Int,
   );
   my ($rfd, $wfd) = $sig->(@_);
   my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
 
   tb_reset();
 if (_WIN32) {
@@ -1752,12 +1822,14 @@ if (_WIN32) {
       $global->{last_errno} = $! = EBADF;
       last;
     };
-    case: TB_ERR_WIN_GET_CONMODE() == $_ and do {
+    case: TB_ERR_WIN_GET_CONMODE() == $_ ||
+          TB_ERR_WIN_SET_CONMODE() == $_ 
+    and do {
       $global->{last_errno} = $! = ENOTTY;
       last;
     };
     case: TB_ERR_WIN_UNSUPPORTED() == $_ and do {
-      $global->{last_errno} = $! = EOPNOTSUPP;
+      $global->{last_errno} = $! = ENOTSUP;
       last;
     };
     default: {
@@ -1797,11 +1869,14 @@ if (_WIN32) {
 }
 
 sub tb_shutdown {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
   tb_deinit();
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 #
@@ -1809,17 +1884,23 @@ sub tb_shutdown {    # $int ()
 #
 
 sub tb_width {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  return $global->{width};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  return $rv = $global->{width};
 }
 
 sub tb_height {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  return $global->{height};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  return $rv = $global->{height};
 }
 
 #
@@ -1827,22 +1908,28 @@ sub tb_height {    # $int ()
 #
 
 sub tb_clear {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  return cellbuf_clear($global->{back});
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  return $rv = cellbuf_clear($global->{back});
 }
 
 sub tb_set_clear_attrs {    # $int ($fg, $bg)
+  TRACE('%d, %d', @_) if _DEBUG;
   state $sig = compile(
     _PositiveOrZeroInt,
     _PositiveOrZeroInt,
   );
   my ($fg, $bg) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
   $global->{fg} = $fg;
   $global->{bg} = $bg;
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 #
@@ -1850,27 +1937,30 @@ sub tb_set_clear_attrs {    # $int ($fg, $bg)
 #
 
 sub tb_present {    # $int ()
+  TRACE('') if _DEBUG > 1;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-
   my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 
-  # TODO: assert $global->{back}[width,height] == global->{front}[width,height]
+  # TODO: assert $global->{back}[width,height] == $global->{front}[width,height]
 
-  my $front       = $global->{front};
-  my $back        = $global->{back};
-  my $front_cells = $front->{cells};
-  my $back_cells  = $back->{cells};
-  my $width       = $front->{width};
-  my $height      = $front->{height};
+  my $full_repaint = $global->{full_repaint};
+  my $dirty_lines  = $global->{dirty_lines};
+  my $front        = $global->{front};
+  my $back         = $global->{back};
+  my $front_cells  = $front->{cells};
+  my $back_cells   = $back->{cells};
+  my $width        = $front->{width};
+  my $height       = $front->{height};
 
   $global->{last_x} = -1;
   $global->{last_y} = -1;
 
-  my @last = ("\0", ~0, ~0);
-
   for (my $y = 0; $y < $height; $y++) {
+    # Skip lines that are not dirty unless we are doing a full repaint
+    next unless $full_repaint || $dirty_lines->[$y];
     my $line_offset = $y * $width;
 
     for (my $x = 0; $x < $width; ) {
@@ -1906,10 +1996,7 @@ if (TB_OPT_EGC &&
       ) {
         @$front_cell = @$back_cell;
 
-        if ($back_cell->[1] != $last[1] || $back_cell->[2] != $last[2]) {
-          send_attr($back_cell->[1], $back_cell->[2]);
-          @last = @$back_cell;
-        }
+        send_attr($back_cell->[1], $back_cell->[2]);
         if ($w > 1 && $x >= $width - ($w - 1)) {
           # Not enough room for wide char, send spaces
           for (my $i = $x; $i < $width; $i++) {
@@ -1942,6 +2029,7 @@ if (TB_OPT_EGC &&
       }
       $x += $w;
     }
+    $dirty_lines->[$y] = 0;
   }
 
   $rv = send_cursor_if($global->{cursor_x}, $global->{cursor_y});
@@ -1949,7 +2037,7 @@ if (TB_OPT_EGC &&
   $rv = bytebuf_flush(\$global->{outbuf}, $global->{wfd});
   return $rv if $rv != TB_OK;
 
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 #
@@ -1957,12 +2045,15 @@ if (TB_OPT_EGC &&
 #
 
 sub tb_invalidate {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  my $rv = resize_cellbufs();
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  $rv = resize_cellbufs();
   return $rv if $rv != TB_OK;
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 #
@@ -1970,17 +2061,19 @@ sub tb_invalidate {    # $int ()
 #
 
 sub tb_set_cursor {    # $int ($cx, $cy)
+  TRACE('%d, %d', @_) if _DEBUG;
   state $sig = compile(
     _Int,
     _Int,
   );
   my ($cx, $cy) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 
   $cx = 0 if $cx < 0;
   $cy = 0 if $cy < 0;
 
-  my $rv;
   if ($global->{cursor_x} == -1) {
     $rv = bytebuf_puts(\$global->{outbuf}, $global->{caps}[TB_CAP_SHOW_CURSOR]);
     return $rv if $rv != TB_OK;
@@ -1991,23 +2084,26 @@ sub tb_set_cursor {    # $int ($cx, $cy)
   $global->{cursor_x} = $cx;
   $global->{cursor_y} = $cy;
 
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 sub tb_hide_cursor {   # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 
   if ($global->{cursor_x} >= 0) {
-    my $rv = bytebuf_puts(\$global->{outbuf}, $global->{caps}[TB_CAP_HIDE_CURSOR]);
+    $rv = bytebuf_puts(\$global->{outbuf}, $global->{caps}[TB_CAP_HIDE_CURSOR]);
     return $rv if $rv != TB_OK;
   }
 
   $global->{cursor_x} = -1;
   $global->{cursor_y} = -1;
 
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 #
@@ -2015,6 +2111,7 @@ sub tb_hide_cursor {   # $int ()
 #
 
 sub tb_set_cell {    # $int ($x, $y, $ch, $fg, $bg)
+  TRACE('%d, %d, "%s", %d, %d', @_) if _DEBUG > 1;
   state $sig = compile(
     _Int,
     _Int,
@@ -2023,11 +2120,14 @@ sub tb_set_cell {    # $int ($x, $y, $ch, $fg, $bg)
     _PositiveOrZeroInt,
   );
   my ($x, $y, $ch, $fg, $bg) = $sig->(@_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
   # Note: tb_set_cell stores only the first Perl character
-  return tb_set_cell_ex($x, $y, substr($ch, 0, 1), 1, $fg, $bg);
+  return $rv = tb_set_cell_ex($x, $y, substr($ch, 0, 1), 1, $fg, $bg);
 }
 
 sub tb_set_cell_ex {    # $int ($x, $y, $ch, $nch, $fg, $bg)
+  TRACE('%d, %d, "%s", %d, %d, %d', @_) if _DEBUG > 2;
   state $sig = compile(
     _Int,
     _Int,
@@ -2037,37 +2137,42 @@ sub tb_set_cell_ex {    # $int ($x, $y, $ch, $nch, $fg, $bg)
     _PositiveOrZeroInt,
   );
   my ($x, $y, $ch, $nch, $fg, $bg) = $sig->(@_);
-  # Note: ch is a Perl string, not an array of codepoints
-  # Note: nch is accepted for API compatibility but ignored in the Perl port
-  return TB_ERR_NOT_INIT unless $global->{initialized};
   my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 2;
+  # Note: ch is a Perl string, not an array of codepoints
+  # and nch is accepted for API compatibility but ignored in the Perl port
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
   my $cell;
   $rv = cellbuf_get($global->{back}, $x, $y, \$cell);
   return $rv if $rv != TB_OK;
+  $global->{dirty_lines}[$y] = 1;
   $rv = $cell->set($ch, $fg, $bg);
   return $rv if $rv != TB_OK;
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 sub tb_extend_cell {    # $int ($x, $y, $ch)
+  TRACE('%d, %d, "%s"', @_) if _DEBUG > 1;
   state $sig = compile(
     _Int,
     _Int,
     _Str,
   );
   my ($x, $y, $ch) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 if (TB_OPT_EGC) {
   # TODO: iswprint ch?
-  my $rv;
   my $cell;
   $rv = cellbuf_get($global->{back}, $x, $y, \$cell);
   return $rv if $rv != TB_OK;
+  $global->{dirty_lines}[$y] = 1;
   # Note: tb_extend_cell appends only the first Perl character
   $cell->[0] .= substr($ch, 0, 1);
-  return TB_OK;
+  return $rv = TB_OK;
 } else {
-  return TB_ERR;
+  return $rv = TB_ERR;
 } #endif
 }
 
@@ -2076,6 +2181,7 @@ if (TB_OPT_EGC) {
 #
 
 sub tb_get_cell {    # $int ($x, $y, $back, \$cell)
+  TRACE('%d, %d, %d, %s', @_) if _DEBUG;
   state $sig = compile(
     _Int,
     _Int,
@@ -2083,8 +2189,11 @@ sub tb_get_cell {    # $int ($x, $y, $back, \$cell)
     _Ref,
   );
   my ($x, $y, $back, $cell) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  return cellbuf_get($back ? $global->{back} : $global->{front}, $x, $y, $cell);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  return $rv = cellbuf_get($back ? $global->{back} : $global->{front}, $x, $y, 
+    $cell);
 }
 
 #
@@ -2092,14 +2201,17 @@ sub tb_get_cell {    # $int ($x, $y, $back, \$cell)
 #
 
 sub tb_set_input_mode {    # $int ($mode)
+  TRACE('%d', @_) if _DEBUG;
   state $sig = compile(
     _Int,
   );
   my ($mode) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 
   if ($mode == TB_INPUT_CURRENT) {
-    return $global->{input_mode};
+    return $rv = $global->{input_mode};
   }
 
   my $esc_or_alt = TB_INPUT_ESC | TB_INPUT_ALT;
@@ -2120,18 +2232,21 @@ sub tb_set_input_mode {    # $int ($mode)
   }
 
   $global->{input_mode} = $mode;
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 sub tb_set_output_mode {    # $int ($mode)
+  TRACE('%d', @_) if _DEBUG;
   state $sig = compile(
     _Int,
   );
   my ($mode) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
   switch: for ($mode) {
     case: TB_OUTPUT_CURRENT == $_ and 
-      return $global->{output_mode};
+      return $rv = $global->{output_mode};
     case: TB_OUTPUT_NORMAL    == $_ || 
           TB_OUTPUT_256       == $_ ||
           TB_OUTPUT_216       == $_ ||
@@ -2144,10 +2259,10 @@ sub tb_set_output_mode {    # $int ($mode)
       $global->{last_fg} = ~$global->{fg};
       $global->{last_bg} = ~$global->{bg};
       $global->{output_mode} = $mode;
-      return TB_OK;
+      return $rv = TB_OK;
     }
   }
-  return TB_ERR;
+  return $rv = TB_ERR;
 }
 
 #
@@ -2155,22 +2270,28 @@ sub tb_set_output_mode {    # $int ($mode)
 #
 
 sub tb_peek_event {   # $int ($event, $timeout_ms)
+  TRACE('%s, %d', @_) if _DEBUG > 2;
   state $sig = compile(
     _Object,
     _Int,
   );
   my ($event, $timeout_ms) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  return wait_event($event, $timeout_ms);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 2;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  return $rv = wait_event($event, $timeout_ms);
 }
 
 sub tb_poll_event {   # $int ($event)
+  TRACE('%s', @_) if _DEBUG > 1;
   state $sig = compile(
     _Object,
   );
   my ($event) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
-  return wait_event($event, -1);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
+  return $rv = wait_event($event, -1);
 }
 
 #
@@ -2178,19 +2299,22 @@ sub tb_poll_event {   # $int ($event)
 #
 
 sub tb_get_fds {      # $int (\$ttyfd, \$resizefd)
+  TRACE('%s, %s', @_) if _DEBUG;
   state $sig = compile(
     _ScalarRef,
     _ScalarRef,
   );
   my ($ttyfd, $resizefd) = $sig->(@_);
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 if (_WIN32) {
-  return TB_ERR_WIN_UNSUPPORTED;
+  return $rv = TB_ERR_WIN_UNSUPPORTED;
 } #endif
   $$ttyfd    = $global->{rfd};
   $$resizefd = $global->{resize_pipefd}[0];
 
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 #
@@ -2198,6 +2322,7 @@ if (_WIN32) {
 #
 
 sub tb_print {    # $int ($x, $y, $fg, $bg, $str)
+  TRACE('%d, %d, %d, %d, "%s"', @_) if _DEBUG;
   state $sig = compile(
     _Int,
     _Int,
@@ -2206,10 +2331,14 @@ sub tb_print {    # $int ($x, $y, $fg, $bg, $str)
     _Str,
   );
   my ($x, $y, $fg, $bg, $str) = $sig->(@_);
-  return tb_print_ex($x, $y, $fg, $bg, undef, $str);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = tb_print_ex($x, $y, $fg, $bg, undef, $str);
 }
 
 sub tb_printf {    # $int ($x, $y, $fg, $bg, $fmt, @args)
+  TRACE('%d, %d, %d, %d, "%s", %s', @_[0..4], join(', ', @_[5..$#_])) 
+    if _DEBUG;
   state $sig = compile(
     _Int,
     _Int,
@@ -2218,10 +2347,14 @@ sub tb_printf {    # $int ($x, $y, $fg, $bg, $fmt, @args)
     _Str,
   );
   my ($x, $y, $fg, $bg, $fmt, @args) = ($sig->(@_[0..4]), @_[5..$#_]);
-  return tb_printf_inner($x, $y, $fg, $bg, undef, $fmt, @args);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = tb_printf_inner($x, $y, $fg, $bg, undef, $fmt, @args);
 }
 
 sub tb_print_ex {    # $int ($x, $y, $fg, $bg, \$out_w|undef, $str)
+  TRACE('%d, %d, %d, %d, %s, "%s"', @_[0..3], $_[4] // 'undef', $_[5])
+    if _DEBUG > 1;
   state $sig = compile(
     _Int,
     _Int,
@@ -2231,22 +2364,22 @@ sub tb_print_ex {    # $int ($x, $y, $fg, $bg, \$out_w|undef, $str)
     _Str,
   );
   my ($x, $y, $fg, $bg, $out_w, $str) = $sig->(@_);
-
-  return TB_ERR_NOT_INIT unless $global->{initialized};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
+  return $rv = TB_ERR_NOT_INIT unless $global->{initialized};
 
   my $back = $global->{back};
-  return TB_ERR_OUT_OF_BOUNDS unless $back->in_bounds($x, $y);
+  return $rv = TB_ERR_OUT_OF_BOUNDS unless $back->in_bounds($x, $y);
 
   $$out_w = 0 if defined $out_w;
 
-  my $rv;
   my $w;
   my $ix = $x;
   my $x_prev = $x;
   my $uni;
 
   while ($str) {
-    $rv = tb_utf8_char_to_unicode(\$uni, $str);
+    $rv = tb_utf8_char_to_unicode(\$uni, substr($str, 0, 1));
     if ($rv < 0) {
       $uni = 0xfffd;            # replace invalid UTF-8 char with U+FFFD
       bytes::substr($str, 0, -$rv, '');
@@ -2288,10 +2421,13 @@ sub tb_print_ex {    # $int ($x, $y, $fg, $bg, \$out_w|undef, $str)
     }
   }
 
-  return TB_OK;
+  return $rv = TB_OK;
 }
 
 sub tb_printf_ex {    # $int ($x, $y, $fg, $bg, \$out_w|undef, $fmt, @args)
+  TRACE('%d, %d, %d, %d, %s, "%s", %s', @_[0..3], $_[4] // 'undef', $_[5], 
+    join(', ', @_[6..$#_])) if _DEBUG;
+  DEBUG("goto &tb_printf_inner") if _DEBUG;
   goto &tb_printf_inner;
 }
 
@@ -2300,23 +2436,29 @@ sub tb_printf_ex {    # $int ($x, $y, $fg, $bg, \$out_w|undef, $fmt, @args)
 #
 
 sub tb_send {    # $int ($buf, $nbuf)
+  TRACE('"%s", %d', @_) if _DEBUG > 1;
   state $sig = compile(
     _Str,
     _PositiveOrZeroInt,
   );
   my ($buf, $nbuf) = $sig->(@_);
-  return bytebuf_nputs(\$global->{outbuf}, $buf, $nbuf);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
+  return $rv = bytebuf_nputs(\$global->{outbuf}, $buf, $nbuf);
 }
 
 sub tb_sendf {   # $int ($fmt, @args)
+  TRACE('"%s", %s', $_[0], join(', ', @_[1..$#_])) if _DEBUG > 1;
   state $sig = compile(
     _Str,
   );
   my ($fmt, @args) = ($sig->(shift), @_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 1;
   my $buf = @args ? sprintf($fmt, @args) : $fmt;
   my $len = bytes::length($buf);
-  return TB_ERR if $len >= TB_OPT_PRINTF_BUF;
-  return tb_send($buf, $len);
+  return $rv = TB_ERR if $len >= TB_OPT_PRINTF_BUF;
+  return $rv = tb_send($buf, $len);
 }
 
 #
@@ -2324,28 +2466,33 @@ sub tb_sendf {   # $int ($fmt, @args)
 #
 
 sub tb_set_func {    # $int ($fn_type, $fn)
+  TRACE('%d, %s', @_) if _DEBUG;
   state $sig = compile(
     _Int,
     _CodeRef,
   );
   my ($fn_type, $fn) = $sig->(@_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
 
   state $warned = 0;
-  warn "tb_set_func() is deprecated and may be removed in a future release\n" 
-    if STRICT && !$warned++;
+  warnings::warnif(
+    deprecated =>
+      "tb_set_func() is deprecated and may be removed in a future release"
+  ) unless $warned++;
 
   switch: for ($fn_type) {
     case: TB_FUNC_EXTRACT_PRE == $_ and do {
       $global->{fn_extract_esc_pre} = $fn;
-      return TB_OK;
+      return $rv = TB_OK;
     };
     case: TB_FUNC_EXTRACT_POST == $_ and do {
       $global->{fn_extract_esc_post} = $fn;
-      return TB_OK;
+      return $rv = TB_OK;
     };
   }
 
-  return TB_ERR;
+  return $rv = TB_ERR;
 }
 
 #
@@ -2353,10 +2500,12 @@ sub tb_set_func {    # $int ($fn_type, $fn)
 #
 
 sub tb_utf8_char_length {    # $length ($c)
+  TRACE('"%s"', @_) if _DEBUG > 2;
   state $sig = compile(
     _Str,
   );
   my ($c) = $sig->(@_);
+  my $guard = TRACE_LEAVE(undef) if _DEBUG > 2;
   return 0 if $c eq '';
   $c = bytes::substr($c, 0, 1);
   state $utf8_length = {};
@@ -2373,11 +2522,13 @@ sub tb_utf8_char_length {    # $length ($c)
 }
 
 sub tb_utf8_char_to_unicode {    # $length (\$out, $c)
+  TRACE('%s, "%s"', @_) if _DEBUG > 2;
   state $sig = compile(
     _ScalarRef,
     _Str,
   );
   my ($out, $c) = $sig->(@_);
+  my $guard = TRACE_LEAVE(undef) if _DEBUG > 2;
   use bytes;
 
   return 0 if $c eq '';
@@ -2405,11 +2556,13 @@ sub tb_utf8_char_to_unicode {    # $length (\$out, $c)
 }
 
 sub tb_utf8_unicode_to_char {    # $length (\$out, $c)
+  TRACE('%s, %d', @_) if _DEBUG > 2;
   state $sig = compile(
     _ScalarRef,
     _PositiveOrZeroInt,
   );
   my ($out, $c) = $sig->(@_);
+  my $guard = TRACE_LEAVE(undef) if _DEBUG > 2;
 
   # Fast path for real Unicode scalar values (<= 0x10FFFF)
   if ($c <= 0x10FFFF) {
@@ -2445,16 +2598,21 @@ sub tb_utf8_unicode_to_char {    # $length (\$out, $c)
 #
 
 sub tb_last_errno {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return 0+ $global->{last_errno};
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = 0+ $global->{last_errno};
 }
 
 sub tb_strerror {    # $str ($err)
+  TRACE('%d', @_) if _DEBUG;
   state $sig = compile(
     _Int,
   );
   my ($err) = $sig->(@_);
+  my $guard = TRACE_LEAVE(undef) if _DEBUG;
   switch: for (int($err)) {
     case: TB_OK == $_ and 
       return "Success";
@@ -2515,60 +2673,87 @@ if (_WIN32) {
 }
 
 sub tb_cell_buffer {    # \@ ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
+  my $guard = TRACE_LEAVE(undef) if _DEBUG;
 
   state $warned = 0;
-  warn "tb_cell_buffer() is deprecated; ".
-       "use tb_get_cell() and related APIs instead\n"
-    if STRICT && !$warned++;
+  warnings::warnif(
+    deprecated =>
+      "tb_cell_buffer() is deprecated; ".
+      "use tb_get_cell() and related APIs instead"
+  ) unless $warned++;
 
   my $back = $global->{back};
   return [] unless ref($back) eq 'cellbuf' && ref($back->{cells}) eq 'ARRAY';
+  # Exposing the back buffer allows callers to modify it without going through 
+  # the normal APIs. Dirty tracking can no longer be considered reliable, 
+  # therefore all future tb_present() calls use full repaint mode until 
+  # tb_reset().
+  $global->{full_repaint} = 1;
   return $back->{cells};
 }
 
 sub tb_has_truecolor {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_OPT_ATTR_W >= 32 ? 1 : 0;
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_OPT_ATTR_W >= 32 ? 1 : 0;
 }
 
 sub tb_has_egc {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_OPT_EGC ? 1 : 0;
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_OPT_EGC ? 1 : 0;
 }
 
 sub tb_attr_width {    # $int ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
-  return TB_OPT_ATTR_W;
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG;
+  return $rv = TB_OPT_ATTR_W;
 }
 
 sub tb_version {    # $str ()
+  TRACE('') if _DEBUG;
   state $sig = compile();
   $sig->(@_);
+  my $guard = TRACE_LEAVE(undef) if _DEBUG;
+  DEBUG("return TB_VERSION_STR = '%s'", TB_VERSION_STR) if _DEBUG;
   return TB_VERSION_STR;
 }
 
 sub tb_iswprint {    # $int ($codepoint)
+  TRACE('%d', @_) if _DEBUG > 2;
   state $sig = compile(
     _PositiveOrZeroInt,
   );
   my ($codepoint) = $sig->(@_);
-  return tb_iswprint_ex($codepoint, undef);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 2;
+  return $rv = tb_iswprint_ex($codepoint, undef);
 }
 
 sub tb_wcwidth {    # $int ($codepoint)
+  TRACE('%d', @_) if _DEBUG > 2;
   state $sig = compile(
     _PositiveOrZeroInt,
   );
   my ($codepoint) = $sig->(@_);
+  my $rv;
+  my $guard = TRACE_LEAVE(\$rv) if _DEBUG > 2;
 if (TB_OPT_LIBC_WCHAR) {
-  return wcwidth($codepoint);
+  return $rv = wcwidth($codepoint);
 } else {
-  return Terminal::WCWidth::wcwidth($codepoint);
+  return $rv = Terminal::WCWidth::wcwidth($codepoint);
 } #endif
 }
 
@@ -2622,11 +2807,13 @@ sub tb_reset {    # $int ()
     has_orig_tios => 0,
 
     last_errno    => 0,
-    errbuf        => '',
     initialized   => 0,
 
     fn_extract_esc_pre  => undef,
     fn_extract_esc_post => undef,
+
+    full_repaint => 0,
+    dirty_lines  => [],
   };
 
   return TB_OK;
@@ -2745,10 +2932,13 @@ if (!_WIN32) {
   return TB_OK;
 }
 
-END { if ($global->{initialized}) {
-  if (STRICT) { warn "tb_shutdown() not called before program exit\n"; sleep 2 }
-  tb_deinit();
-}}
+END {
+  return unless $global && $global->{initialized};
+  DEBUG("tb_shutdown() not called before program exit") if _DEBUG;
+  try: local $@; eval {
+    tb_deinit()
+  };
+}
 
 sub tb_iswprint_ex {    # $bool ($ch, \$width|undef)
   state $sig = compile(
@@ -3243,10 +3433,13 @@ if (_WIN32) {
     $global->{last_errno} = 0+ $!;
     return TB_ERR_RESIZE_PIPE;
   }
-
   $global->{resize_pipefd} = [$rfd, $wfd];
 
-  $SIG{WINCH} = \&handle_resize if exists $SIG{WINCH};
+  unless (exists $SIG{WINCH}) {
+    $global->{last_errno} = $! = EACCES;
+    return TB_ERR_RESIZE_SIGACTION;
+  }
+  $SIG{WINCH} = \&handle_resize;
   return TB_OK;
 }
 
@@ -3254,6 +3447,7 @@ sub resize_cellbufs {    # $int ()
   state $sig = compile();
   $sig->(@_);
   my $rv;
+  $global->{dirty_lines} = [ (1) x ($global->{height} || 0) ];
   $rv = cellbuf_resize($global->{back}, $global->{width}, $global->{height});
   return $rv if $rv != TB_OK;
   $rv = cellbuf_resize($global->{front}, $global->{width}, $global->{height});
@@ -3334,10 +3528,11 @@ if (_WIN32) {
     $global->{wfd},
     $move_and_report,
     length($move_and_report),
-  );
-  return TB_ERR_RESIZE_WRITE
-    if !defined($write_rv) 
-    || $write_rv != length($move_and_report);
+  ) // 0;
+  if ($write_rv != length($move_and_report)) {
+    $global->{last_errno} = 0+ $!;
+    return TB_ERR_RESIZE_WRITE;
+  }
 
   my $rin = '';
   vec($rin, $global->{rfd}, 1) = 1;
@@ -3357,6 +3552,7 @@ if (_WIN32) {
   }
 
   if ($buf !~ /\e\[(\d+);(\d+)R/) {
+    $global->{last_errno} = $! = EIO;
     return TB_ERR_RESIZE_SSCANF;
   }
   my ($rh, $rw) = ($1, $2);
@@ -4068,6 +4264,7 @@ sub init_cellbuf {    # $int ()
   $global->{back}  ||= cellbuf->new();
   $global->{front} ||= cellbuf->new();
 
+  $global->{dirty_lines} = [ (1) x ($global->{height} || 0) ];
   $rv = $global->{back}->init($global->{width}, $global->{height});
   return $rv if $rv != TB_OK;
   $rv = $global->{front}->init($global->{width}, $global->{height});

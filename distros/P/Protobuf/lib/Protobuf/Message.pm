@@ -245,7 +245,7 @@ require Protobuf;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Internal::Repeated;
 use Protobuf::Internal::Map;

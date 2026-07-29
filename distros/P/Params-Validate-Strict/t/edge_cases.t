@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Test::Most;
 use Scalar::Util qw(blessed looks_like_number);
-use POSIX        qw(DBL_MAX);
+use POSIX        qw();
 
 use Params::Validate::Strict qw(validate_strict);
 

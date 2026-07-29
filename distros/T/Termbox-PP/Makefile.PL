@@ -48,9 +48,7 @@ WriteMakefile1(
           'Carp'               => 0,
           'constant'           => 0,
 #          'Config'             => 0,
-#          'Errno'              => 0,
           'Exporter'           => 0,
-#          'Fcntl'              => 0,
           'IO::File'           => 0,
           'Params::Check'      => 0,
           'Scalar::Util'       => 0,
@@ -100,6 +98,7 @@ sub WriteMakefile1 { # void (%params)
 
   if ($^O eq 'MSWin32') {
     $params{PREREQ_PM}->{'Time::HiRes'}     = 0;
+    $params{PREREQ_PM}->{'Win32'}           = 0;
     $params{PREREQ_PM}->{'Win32::Console'}  = 0.10;
     $params{PREREQ_PM}->{'Win32::API'}      = 0.75;
     $params{PREREQ_PM}->{'Win32API::File'}  = 0.1201;

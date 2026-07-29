@@ -2014,21 +2014,6 @@ subtest 'header parameters' => sub {
     # errors => compared to what is collected from $state, defaults to []
     # todo
     {
-      header_name => 'Accept',
-      header_obj => {},
-      values => [ 'application/json' ],
-    },
-    {
-      header_name => 'Content-Type',
-      header_obj => {},
-      values => [ 'application/json' ],
-    },
-    {
-      header_name => 'Authorization',
-      header_obj => {},
-      values => [ 'Basic whargarbl' ],
-    },
-    {
       name => 'encoded number',
       header_obj => { content => { 'application/json' => { schema => { type => 'integer' } } } },
       values => [ '3' ],

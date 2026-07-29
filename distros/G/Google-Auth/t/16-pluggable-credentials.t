@@ -15,6 +15,8 @@
 use strict;
 use warnings;
 
+$ENV{GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES} = '1';
+
 use Test::More;
 use Test::LWP::UserAgent;
 use HTTP::Response;
@@ -41,8 +43,26 @@ subtest 'Pluggable WIF Initialization and Factory' => sub {
     isa_ok( $creds, 'Google::Auth::ExternalAccountCredentials::Pluggable' );
 };
 
+subtest 'Pluggable WIF Disabled without Env Var' => sub {
+    local $ENV{GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES} = '0';
+    my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
+        audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
+        subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
+        token_url          => 'https://sts.googleapis.com/v1/token',
+        credential_source  => {
+            executable => {
+                command => 'echo 1',
+            },
+        },
+    );
+    eval {
+        $creds->retrieve_subject_token();
+    };
+    like( $@, qr/Pluggable credentials are not enabled/, 'throws when env var is not 1' );
+};
+
 subtest 'Pluggable WIF Success JSON Output' => sub {
-    my $command = sprintf('"%s" -e "print q({\"my_token_field\":\"mock_pluggable_token\"})"', $^X);
+    my $command = sprintf('"%s" -e "print q({\"version\":1,\"success\":true,\"expiration_time\":1234567890,\"my_token_field\":\"mock_pluggable_token\"})"', $^X);
     my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
         audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',
         subject_token_type => 'urn:ietf:params:oauth:token-type:jwt',
@@ -86,7 +106,7 @@ subtest 'Pluggable WIF Environment Variable Injection' => sub {
     # Command that prints a JSON containing the value of the environment variable MOCK_ENV_VAR
     # We use perl to print it portably
     my $env_sigil = $^O eq 'MSWin32' ? '$' : '\$';
-    my $command = '"' . $^X . '" -e "print q({) . chr(34) . q(id_token) . chr(34) . q(:) . chr(34) . ' . $env_sigil . 'ENV{MOCK_ENV_VAR} . chr(34) . q(})"';
+    my $command = '"' . $^X . '" -e "print q({) . chr(34) . q(version) . chr(34) . q(:1,) . chr(34) . q(success) . chr(34) . q(:true,) . chr(34) . q(expiration_time) . chr(34) . q(:1234567890,) . chr(34) . q(id_token) . chr(34) . q(:) . chr(34) . ' . $env_sigil . 'ENV{MOCK_ENV_VAR} . chr(34) . q(})"';
 
     my $creds = Google::Auth::ExternalAccountCredentials->make_creds(
         audience           => '//iam.googleapis.com/projects/123456/locations/global/workloadIdentityPools/my-pool/providers/my-provider',

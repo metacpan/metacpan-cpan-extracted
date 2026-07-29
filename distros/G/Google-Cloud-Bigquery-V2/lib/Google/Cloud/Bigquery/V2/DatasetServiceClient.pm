@@ -58,7 +58,7 @@ use Google::Cloud::Bigquery::V2::Table;
 use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::Job;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );

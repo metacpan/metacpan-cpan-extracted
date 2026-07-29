@@ -1,5 +1,76 @@
 Revision history for CGI-Lingua
 
+0.83	Tue Jul 28 20:30:23 EDT 2026
+	[ Security ]
+	- Replace Storable::nfreeze/thaw with JSON::PP encode/decode for cache
+	  serialisation in new() and DESTROY(); Storable::thaw can execute arbitrary
+	  Perl code via STORABLE_thaw hooks if an attacker writes a crafted blob to
+	  the cache backend (world-writable /tmp, unauthenticated Redis/Memcached),
+	  whereas JSON cannot execute code regardless of content
+	- locale(): validate and untaint HTTP_USER_AGENT before parsing — apply the
+	  same printable-ASCII + length-cap discipline as HTTP_ACCEPT_LANGUAGE; also
+	  validate the country code returned by HTTP::BrowserDetect against
+	  /^([A-Za-z]{2})$/ before passing to _code2country()
+	- translation_file(): reject $dir containing '..' or null bytes to prevent
+	  path-traversal attacks when callers pass user-controlled input as $dir
+	- _clean_country_code(): replace strip-then-return with a single anchored
+	  capture /^([A-Za-z]{2})\s*(?:#.*)?$/ that returns undef for any malformed
+	  value; callers in _resolve_country_via_whois() fall through to IANA on
+	  undef rather than propagating a malformed code string
+	- geoplugin.net URL changed from http:// to https:// to prevent MITM
+	  injection of plausible-but-wrong country codes; ip-api.com retains
+	  http:// because its free tier does not support TLS (paid plan required)
+	- country(): after lc() and legacy mappings, reject any result that is not
+	  exactly 2 lowercase ASCII letters (or the 'Unknown' EU sentinel from
+	  _handle_eu_country); guards against Whois CRLF injection leftovers
+	  (e.g. "gbx-header: evil" produced by _clean_country_code stripping \n from
+	  "GB\nX-Header: evil") and XSS payloads in geoplugin JSON countryCode fields
+	- time_zone(): validate extracted timezone string against bounded IANA pattern
+	  /^[A-Za-z][A-Za-z0-9_+\-\/]{0,50}$/ before returning; discards XSS payloads
+	  from hostile ip-api.com JSON responses (e.g. "Europe/London<script>...")
+	- translation_file(): after stripping a leading dot from $ext, reject any
+	  extension not matching /^[A-Za-z0-9\-]+$/; prevents path-traversal attacks
+	  when callers pass user-controlled data as $ext (e.g. '../../../etc/passwd')
+
+	[ Bug Fixes ]
+	- Remove spurious ->import() after lazy require in _load_geoip() (Geo::IP->import()),
+	  country() (Geo::IPfree::IP->import()), and _resolve_country_via_whois()
+	  (Net::Whois::IP->import(), Net::Whois::IANA->import()): class methods and
+	  fully-qualified function calls work without import, and on some module versions
+	  the import() call reinstalls the real function in the symbol table, clobbering
+	  Test::Mockingbird mocks (mirrors the LWP::Simple::WithCache fix in 0.82)
+	- Replace 'require IP::Country' + IP::Country->import() with
+	  'require IP::Country::Fast' directly (the concrete class we actually instantiate)
+	- Extract _clean_country_code() helper to deduplicate the strip-carriage-return and
+	  strip-trailing-comment pattern repeated in _resolve_country_via_whois()
+	- Bump minimum Params::Get to 0.15 in both Makefile.PL and the module's use declaration
+	  (0.15 fast-path: unblessed hashref arg returned directly rather than stored under the
+	  default key; this determines which code path new({ logger => ... }) takes and was the
+	  root cause of the t/carp.t regression correlated with Params::Get 0.15)
+
+	[ Enhancement ]
+	- Declare JSON::PP (>= 2.27) as an explicit PREREQ_PM dependency; it was used
+	  for cache serialisation but not declared, causing install failures on Perl
+	  5.10.x and 5.12.x where JSON::PP is not yet bundled with core
+	- Makefile.PL: convert string eval ('require Module') to block eval
+	  ({ require Module; 1 }) for module-probe checks; string eval produces
+	  deprecation warnings on modern Perls and bypasses taint propagation
+	- LIMITATIONS: add note that country() does not cache undef results for
+	  private/loopback IPs; document the intentional reason (lazy REMOTE_ADDR
+	  read design); remove dangling inline FIXME reference
+	- _warn(): call Params::Get::get_params once (was called twice, once per branch)
+	- Bump $VERSION to 0.83 and update POD Version line accordingly
+	- Add =head3 EXAMPLE, inline =head3 FORMAL SPECIFICATION, and =head3 PSEUDOCODE to
+	  all public methods that were missing them: language, sublanguage, language_code_alpha2,
+	  sublanguage_code_alpha2, requested_language, country, locale, time_zone, is_rtl,
+	  text_direction, plural_category, translation_file
+	- Add t/cgi_security.t: 34 penetration subtests covering env-var injection
+	  (CRLF, null-byte, shell meta, overlength), country-code format enforcement,
+	  Whois/JSON API response injection, cache-key poisoning, IPv4-mapped IPv6
+	  normalisation, and translation_file() extension path-traversal; two confirmed
+	  findings documented as TODO (JSON countryCode and time_zone() format not
+	  validated after external fetch)
+
 0.82	Sat Jul 11 20:41:15 UTC 2026
 	[ Distribution ]
 	- Move autodie from TEST_REQUIRES to PREREQ_PM — it is now a compile-time

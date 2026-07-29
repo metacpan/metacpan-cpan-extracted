@@ -78,6 +78,6 @@
          "web" : "https://github.com/openSUSE/perl-File-Unpack2"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

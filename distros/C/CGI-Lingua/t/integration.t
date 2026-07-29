@@ -35,7 +35,6 @@ BEGIN { use_ok('CGI::Lingua') }
 # A module's BEGIN block runs on first require and would clobber any mock
 # installed before that point.  We load both unconditionally so the symbol
 # table entries are stable before any mocks are installed.
-# (See CLAUDE.md "Mocking pitfalls: Pre-require before mocking".)
 my $HAS_LWP  = eval { require LWP::Simple::WithCache; 1 } ? 1 : 0;
 my $HAS_JSON = eval { require JSON::Parse;             1 } ? 1 : 0;
 
@@ -333,8 +332,8 @@ subtest 'IP fallback: loopback IP with no Accept-Language gives Unknown language
 # ═══════════════════════════════════════════════════════════════════════════════
 # SECTION 5: Cache workflow across object construction and destruction
 #
-# Strategy: verify the DESTROY → Storable::nfreeze → thaw cycle that the module
-# uses to skip expensive geo-lookups on subsequent requests from the same IP.
+# Strategy: verify the DESTROY → JSON::PP::encode_json → decode_json cycle that
+# the module uses to skip expensive geo-lookups on subsequent requests from the same IP.
 # ═══════════════════════════════════════════════════════════════════════════════
 
 subtest 'cache: DESTROY stores state and second construction thaws it' => sub {

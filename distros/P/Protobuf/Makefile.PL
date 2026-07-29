@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 BEGIN {
     $ENV{PACKAGE_STASH_IMPLEMENTATION} ||= 'PP';
     $ENV{MOO_XS_DISABLE} ||= '1';
@@ -760,7 +760,7 @@ sub MY::fixin {
 WriteMakefile(
     NAME              => 'Protobuf',
     VERSION           => $VERSION,
-    MIN_PERL_VERSION  => '5.014',
+    MIN_PERL_VERSION  => '0.12',
     EXE_FILES         => ($is_win32 ? ['bin/protoc-gen-perl-pb.exe'] : ['bin/protoc-gen-perl-pb']),
     MAN1PODS          => {},
     ABSTRACT          => 'High-performance Protocol Buffers implementation using upb',

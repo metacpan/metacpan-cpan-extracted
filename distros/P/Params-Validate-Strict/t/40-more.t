@@ -137,19 +137,22 @@ subtest 'Security tests' => sub {
 		);
 	} qr//, 'ReDoS patterns handled';
 
-	# Test callback security
+	# Test callback security — the callback runs arbitrary Perl but that is
+	# expected behaviour; validate_strict must not suppress or sandbox it.
+	my $side_effect = 0;
 	my $malicious_callback = sub {
-		system("echo 'malicious code executed'");
+		$side_effect = 1;	# arbitrary side effect; no shell-out needed
 		return 1;
 	};
 
-	# This should work but the callback shouldn't cause harm in validation context
+	# validate_strict must not suppress or sandbox the callback; it must run.
 	lives_ok {
 		validate_strict(
 			schema => {test => {type => 'string', callback => $malicious_callback}},
 			args => {test => 'safe_value'}
 		);
 	} 'Callback validation works safely';
+	ok($side_effect, 'callback was actually executed by validate_strict');
 };
 
 # Test optional parameter edge cases
@@ -665,7 +668,7 @@ subtest 'Input validation and error handling' => sub {
 	# Test memory and DoS protection
 	throws_ok {
 		validate_strict(
-			schema => {big_string => { type => 'string', max => 100 }},,
+			schema => {big_string => { type => 'string', max => 100 } },
 			args => {big_string => 'x' x 1_500_000}
 		);
 	} qr/must be no longer than 100/, 'DoS protection for strings works';

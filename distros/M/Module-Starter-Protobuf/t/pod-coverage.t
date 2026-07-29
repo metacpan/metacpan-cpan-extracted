@@ -25,7 +25,7 @@ for my $module (@modules) {
         note("Skipping POD coverage for $module (no POD present)");
         next;
     }
-    pod_coverage_ok($module, { also_private => [ 'Changes_guts', 'README_guts', 'README_md_guts', qr!^[a-z_]! ] });
+    pod_coverage_ok($module, { also_private => [ 'Changes_guts', 'README_guts', 'README_md_guts', 'SECURITY_md_guts', qr!^[a-z_]! ] });
     push @tested, $module;
 }
 

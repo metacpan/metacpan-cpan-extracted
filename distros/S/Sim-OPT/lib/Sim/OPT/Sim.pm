@@ -1,6 +1,6 @@
 package Sim::OPT::Sim;
 # This is the module Sim::OPT::Sim of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
-# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
 
 use Exporter;
@@ -321,8 +321,8 @@ sub sim
                     say  "IN SIM, FOR INSOLATION  \$countop $countop \$#applytype $#applytype \@applytype ";
                     say  "IN SIM, FOR INSOLATION  \$dowhat{shadeupdate} $dowhat{shadeupdate}";
                     if ( $dowhat{shadeupdate} eq "y" )
-                    {
-                      my $done = Sim::OPT::Morph::recalculateish( $crypto, $stepsvar, $countop, 
+                    { # TAKE CARE, $simelt IN PLACE OF $crypto!
+                      my $done = Sim::OPT::Morph::recalculateish( $simelt, $stepsvar, $countop, 
                           $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
                           \@menus, $countinstance, \%dowhat );
                     }
@@ -1116,6 +1116,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
 =cut

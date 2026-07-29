@@ -3,7 +3,7 @@ package Google::Protobuf::Duration;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
